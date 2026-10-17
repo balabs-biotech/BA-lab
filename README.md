@@ -3,69 +3,55 @@
 ![Status](https://img.shields.io/badge/Status-Active_R%26D-brightgreen)
 ![Focus](https://img.shields.io/badge/Focus-Biotech_%26_Frugal_Engineering-blue)
 ![Location](https://img.shields.io/badge/Location-S%C3%A9tif%2C_Algeria-orange)
-![License](https://img.shields.io/badge/License-Proprietary_%2F_Open_Hardware-lightgrey)
+![License](https://img.shields.io/badge/License-Mixed_(see_LICENSE)-lightgrey)
 
-## 📌 Executive Overview
+## Overview
 
-**SARL B.A. LAB** is an agricultural biotechnology and environmental engineering enterprise based in Sétif, Algeria. Our mission is to deploy an integrated bio-economic platform to achieve input sovereignty, automate environmental control, and regenerate degraded soils.
+**SARL B.A. LAB** is an agricultural biotechnology and environmental engineering company based in Sétif, Algeria. Its mission is to deploy an integrated bio-economy platform for input sovereignty, automated environmental control and regeneration of degraded soils, combining applied microbiology (PGPR, ligninolytic fungi, seaweed hydrolysates) with frugal engineering and IoT automation.
 
-By combining applied microbiology (PGPR strains, ligninolytic fungi, seaweed hydrolysates) with frugal engineering (*Low-Tech High-Efficiency*) and IoT automation, B.A. LAB designs autonomous, modular, turnkey solutions tailored to local and arid pedo-climatic constraints.
-
----
-
-## 🏛️ System Architecture & Core Pillars
-
-The platform is structured around four complementary technological pillars forming a circular bio-economy loop:
-
-| Pillar | Core Technologies | Key Applications & Impact |
+| Pillar | Core technologies | Applications |
 | :--- | :--- | :--- |
-| **1. Bio-Inputs & Biostimulants** | Seaweed hydrolysates, PGPR (*Bacillus spp.*), *Trichoderma spp.*, Biochar matrices | Soil regeneration, biological pest control, and living Technosoil activation. |
-| **2. Modular Myciculture** | Edible & medicinal strains (*Pleurotus*, *Hericium*, *Agrocybe*, *Cordyceps*) | Waste upcycling into fertile substrates, myco-materials, and high-value biomass. |
-| **3. In Vitro Micropropagation** | Temporary Immersion Systems (TIS), *Twin-Bottle* bioreactors, RITA modules | High-throughput, low-cost multiplication of elite resilient plant varieties. |
-| **4. Frugal Hardware & IoT** | Laminar flow hoods, PEHD biofermenters, ESP32 climate automation | Local manufacturing of lab gear, water optimization, and automated control. |
+| **1. Bio-inputs & biostimulants** | Seaweed hydrolysates, PGPR (*Bacillus* spp.), *Trichoderma* spp., biochar | Soil regeneration, biocontrol |
+| **2. Modular myciculture** | *Pleurotus*, *Hericium*, *Agrocybe*, *Cordyceps* | Waste upcycling, high-value biomass |
+| **3. In vitro micropropagation** | Temporary Immersion Systems, Twin-Bottle bioreactors | Low-cost multiplication of resilient varieties |
+| **4. Frugal hardware & IoT** | Laminar-flow hoods, PEHD biofermenters, ESP32 climate automation | Local manufacturing, water optimisation, automation |
 
----
+## Where things live (no duplicates)
 
-### 1. Bio-Inputs & Biostimulants
-* **Bio-based Formulations:** Development of seaweed biostimulant hydrolysates, enriched organic extracts, and activated biochar matrices.
-* **Biocontrol & Microbiome:** Isolation and propagation of Plant Growth-Promoting Rhizobacteria (PGPR, *Bacillus spp.*) and biocontrol agents (*Trichoderma spp.*).
+Each kind of content has **one** source of truth. This repository is not a copy of the other two.
 
-### 2. Modular Myciculture & Bioremediation
-* **Fungal Production:** Optimized incubation and fruiting protocols for edible and medicinal species (*Pleurotus spp.*, *Hericium erinaceus*, *Agrocybe aegerita*, *Cordyceps militaris*).
-* **Biomass & Upcycling:** Processing local lignocellulosic waste into fertile substrates and upcycling co-products into myco-materials and soil amendments.
+| Content | Source of truth | In this repository? |
+| :--- | :--- | :--- |
+| Cultures, batches, measurements, observations, QC; auth, access rules, RPC, Edge Functions | **Supabase** (project `BALabs`) | **No** — no SQL, migrations, dumps or exports |
+| Experiments, strains, reference protocols, field notebook | **Notion** | **No**, except technical sheets needed to build or run equipment |
+| Firmware, IoT configuration, hardware plans, technical SOPs, tests, CI | **GitHub** (this repository) | **Yes** |
+| Batch Tracker web interface (`batch-tracker/`) | This repository | **Yes** — see [`batch-tracker/README.md`](batch-tracker/README.md) |
 
-### 3. In Vitro Plant Micropropagation (TIS)
-* **Temporary Immersion Systems:** Design and deployment of *Twin-Bottle* bioreactors and RITA modules for high-throughput multiplication of resilient elite plant varieties.
-* **Media Autonomy:** Custom liquid and gelled culture media formulations to eliminate reliance on expensive imported laboratory reagents.
-
-### 4. Frugal Engineering & IoT Systems
-* **"Made in Algeria" Hardware:** In-house engineering of sterile laboratory equipment and substrate processing tools (HEPA laminar flow hoods, optimized straw shredders, horizontal PEHD biofermenters, modified mixers).
-* **IoT Climate Regulation:** Microcontroller systems (ESP32 / Arduino) paired with sensor arrays (Temperature, Humidity, CO2) for real-time automation of bioclimatic greenhouses and incubation chambers.
-
----
-
-## 🛠️ Repository Organization
-
-This repository centralizes technical documentation, engineering schematics, Standard Operating Procedures (SOPs), and source code for the B.A. LAB ecosystem:
+## Repository map
 
 ```text
 .
-├── 📂 hardware/            # 3D schematics, manufacturing plans, and BOMs (Hoods, Fermenters, TIS)
-├── 📂 firmware/            # ESP32/Arduino source code for climate regulation and irrigation loops
+├── batch-tracker/    # Batch Tracker web UI (static page; talks to Supabase)
+├── firmware/         # ESP32 firmware: single PlatformIO project, tests, safety model
+├── hardware/         # Equipment plans (HW-ENG-001..003) — concepts, NOT qualified
+├── biotech-sops/     # SOPs: bacteria isolation, mycology, micropropagation
+├── bio-inputs/       # Technical sheets for bio-input formulations
+├── 01_R-and-D_Lab/   # R&D protocol notes (to be reconciled with Notion)
+├── docs/             # Facility layout and infrastructure notes
+├── assets/           # Images and visual assets
+├── LICENSE           # Licence map by directory
+├── LICENSES/         # Licence texts
+└── index.html        # Redirects to batch-tracker/
+```
 
-🎯 Industrial Vision & Impact
-Technological Sovereignty: Replacing costly imported lab gear and reagents with locally engineered, calibrated, and maintained hardware.
+## Safety and validation status
 
-Soil Regeneration: Restructuring degraded, saline, or arid soils through combined active microbiomes and stable humic matrices.
+- **Hardware sheets are design concepts**, not certified or qualified designs. Each carries a status banner. In particular: no ISO class is claimed for the laminar-flow hood, the Kon-Tiki hot-quench step is suspended, and the PEHD biofermenter must never be pressurised.
+- **Firmware has not been tested on real hardware.** It passes host-side logic tests only; relay polarity and all thresholds must be verified on the actual equipment. See [`firmware/README.md`](firmware/README.md).
+- **SOPs are working drafts** until each one carries an explicit validation status. Values are internal targets, not validated results.
 
-SOP Democratization: Standardizing complex lab procedures into robust protocols for seamless execution on the field and in production units.
+## Licensing
 
-📜 License & Intellectual Property
-© 2026 SARL B.A. LAB. All rights reserved.
+Mixed licensing by directory — see [`LICENSE`](LICENSE). Summary: firmware MIT, hardware CERN-OHL-P-2.0, biotechnology documents and the Batch Tracker all rights reserved.
 
-Hardware schematics and source code shared in this repository are subject to specific licenses detailed within each directory (/hardware under Open Hardware License, /firmware under MIT or proprietary license depending on the module).
-
-📧 Contact & Support: SARL B.A. LAB — Sétif, Algeria.
-├── 📂 biotech-sops/        # Standard Operating Procedures (Media prep, inoculation, sterilization)
-├── 📂 bio-inputs/          # Technical datasheets for formulations (Seaweed hydrolysates, biochar, PGPR complexes)
-└── 📂 docs/                # Facility layout schematics, zoning, and administrative documentation
+© 2026 SARL B.A. LAB — Sétif, Algeria.

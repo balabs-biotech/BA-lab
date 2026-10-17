@@ -1,0 +1,21 @@
+# Build / tooling
+.pio/
+.vscode/
+.idea/
+build/
+node_modules/
+*.log
+.DS_Store
+
+# Secrets — never commit
+.env
+.env.*
+*.pem
+*.key
+secrets.*
+
+# Source of truth is Supabase: no SQL, migrations, dumps or backups here
+batch-tracker/supabase/migrations/
+batch-tracker/supabase/.temp/
+*.dump
+*.backup
