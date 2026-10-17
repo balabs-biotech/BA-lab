@@ -6,6 +6,11 @@
 * **Capacity:** 50L – 200L Batch Volume
 * **Licensing:** CERN Open Hardware Licence Version 2 - Permissive (CERN-OHL-P)
 * **Author:** SARL B.A. LAB — Hardware & Engineering Unit
+* **Status:** 🔴 **CONCEPT — NOT VALIDATED. NOT A PRESSURE VESSEL. Never pressurise.**
+
+> ⛔ **Do not pressurise this vessel** (no air test, no "working pressure"). A PEHD drum with bulkhead fittings has no demonstrated allowable pressure here, and a compressed-air test stores energy that can burst it violently.
+> ✅ The vessel is operated **at atmospheric pressure**, vented through the exhaust filter. A blocked exhaust filter combined with an aeration pump rated for 0.04 MPa can overpressurise the drum: a large-bore low-pressure vent / overflow path must be added (sized by a competent engineer) and the exhaust filters must be monitored.
+> ⚠️ Aeration rate, oxygen transfer, filtration, cleaning and sterility are design hypotheses, **not demonstrated**. A pressurised design requires a certified vessel and an engineering review.
 
 ---
 
@@ -60,9 +65,10 @@ Deburr cut edges and sanitize with $70\%$ ethanol.Install food-grade Tri-Clamp /
 Phase B: Micro-Sparger Positioning
 Position the micro-sparger along the lowest horizontal central axis of the vessel.
 Secure the air feed line using reinforced silicone tubing capable of withstanding $2.0\ \text{bar}$ pressure.
-Phase C: Pneumatic Hydro-Pressure TestFill the vessel to $100\%$ capacity with tap water and seal all sanitary ports.
-Pressurize the vessel with clean air to $0.3\ \text{bar}$ ($30\ \text{kPa}$) above atmospheric pressure.Apply soapy water solution to all threaded joints, gaskets, and port welds.
-Acceptance Metric: Zero bubble formation over a 30-minute hold period.🧼
+Phase C: Atmospheric Leak Test (NO pressurisation)
+Fill the vessel to its normal working level with tap water, leave all vents open through the exhaust filter, and hold for 24 hours.
+Inspect all bulkheads, gaskets and fittings visually and by touch for weeping.
+Acceptance Metric: no visible leak. Do NOT apply compressed air to the vessel.🧼
 
 🧼 4. Chemical Sanitization & Sterilization (CIP)
 PEHD undergoes thermal deformation above $80^\circ\text{C}$ and cannot be steam-autoclaved.
@@ -91,7 +97,7 @@ Cold Cold-Sterilization: Fill vessel spray ball or recirculate 0.2% (v/v) Perac
 ​
   for 45 minutes.
 
-Final Rinse & Purge: Drain solution thoroughly under positive pressure with sterile 0.22 μm filtered air.
+Final Rinse & Purge: Drain the solution by gravity, letting sterile 0.22 µm filtered air enter through the vent filter. Do not pressurise the vessel to push liquid out.
 
 📊 5. Instrumentation & ESP32 Telemetry Integration
 Sensor / Actuator	Signal Type	Range / Spec	Function
@@ -106,6 +112,8 @@ DS18B20 Temp Probe	OneWire Digital (GPIO)	−10
 Dissolved Oxygen (DO)	Galvanic / Optical DO module	0−200% saturation	Air pump frequency modulation
 Peristaltic Relays	GPIO Digital Output (Active LOW)	12V DC/2A drive	Automated pH adjustment dosing
 📜 Operational Safety Notes
-Maximum Vessel Working Pressure: Do not exceed 0.5 bar (50 kPa). Install a calibrated 0.4 bar mechanical pressure relief valve on the exhaust manifold.
+Operating pressure: **atmospheric only**. This vessel has no rated working pressure. A relief valve does not turn a PEHD drum into a pressure vessel.
+
+Chemical compatibility and residues: compatibility of PEHD, EPDM/Viton seals and the 316L sparger with 1% NaOH at 50 °C and with peracetic acid / hydrogen peroxide is **not validated**; rinse efficacy and residual-oxidant checks must be demonstrated before any microbiological use. Ventilate the room during peracetic acid use.
 
 Chemical Handling: Wear nitrile gloves, face shield, and chemical apron when preparing Peracetic Acid and Concentrated NaOH wash solutions.
