@@ -28,19 +28,33 @@ Platform and library versions in `platformio.ini` have not been verified by a re
 
 ## Safety model
 
+### Firmware safeguards (not a substitute for hardware safety)
+
+The control logic includes the following **software-only** protective measures. They reduce risk in the event of sensor failure or logic error, but **do not replace hardware interlocks, thermal cut-outs, or independent safety devices.** They are **not validated as safety-critical**, and they depend on the ESP32 remaining responsive:
+
 1. **Invalid measurement ⇒ dependent actuators OFF, immediately.** Failed or out-of-range DHT22 read: heater and humidifier OFF. Soil ADC pinned at a rail (open or shorted sensor): pump OFF. CO₂ missing, erroring, 0 ppm or older than 20 s: CO₂ fan OFF and an alarm on the serial port.
 2. **No simulated values.** The former fake 800 ppm CO₂ is gone; without a real SCD4x reading the value is *invalid*.
-3. **Maximum run times.** Heater: 30 min continuous, then 5 min lockout. Pump: 60 s, then 10 min lockout. Heater latched OFF at 30 °C until the temperature falls back below (setpoint − hysteresis).
+3. **Maximum run times (software timers).** Heater: 30 min continuous, then 5 min lockout. Pump: 60 s, then 10 min lockout. Heater latched OFF at 30 °C until the temperature falls back below (setpoint − hysteresis). These are **not** independent thermal or time-based cutouts and cannot prevent runaway if the ESP32 freezes.
 4. **Non-blocking loop.** No more `delay(30000)`: regulation keeps running during the purge.
 5. **Safe start-up.** The relay OFF level is written before the pin becomes an output.
 6. **Configurable relay polarity** (`RELAY_ACTIVE_LOW`). Both nodes now share the same default (energised on LOW). The old irrigation sketch assumed the opposite: **check with a multimeter, with no load connected, before first power-up.**
 
-### What software does not replace
+### Hardware dependencies: critical safety systems NOT in firmware
 
-- An **independent hardware thermal cut-out** on the heater. If the ESP32 hangs, the relays keep their last state.
-- There is no software watchdog in this version (the API differs between Arduino-ESP32 core versions).
-- Ventilation on `climate_node` is a **timer**, not CO₂ regulation (that node has no CO₂ sensor).
-- The code does not connect to Wi-Fi and sends no telemetry.
+**Heating system:**
+- An **independent hardware thermal cut-out** (bimetal or electronic thermostat, rated for the heater's power) must be installed in series with the heater relay. This is a single point of failure for the software.
+- If the ESP32 hangs or the firmware enters an infinite loop, the relay maintains its last state. Only a hardware cut-out prevents overheating.
+
+**Watchdog and reboot:**
+- There is no software watchdog in this version (the API differs between Arduino-ESP32 core versions). If the ESP32 becomes unresponsive, none of the firmware safeguards will act.
+- An external hardware watchdog (if present) can reset the ESP32, but this does not guarantee the heating system will de-energise.
+
+**Ventilation:**
+- Ventilation on `climate_node` is a **software timer**, not an independent regulator. It does not respond to actual CO₂ or O₂ concentration.
+- That node has no CO₂ sensor. If the chamber becomes hypoxic or hypercapnic, the software timer is unaware.
+
+**Network and remote operation:**
+- The code does not connect to Wi-Fi and sends no telemetry. Off-grid operation only.
 
 ## Calibration required before use
 

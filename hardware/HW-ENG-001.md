@@ -70,3 +70,19 @@ Test 2: Laminar Stream Visualization (Smoke Test)Equipment: Non-contaminating gl
 Test 3: Biological Settling Plate ExposureEquipment: 5 Open TSA / PDA Agar Petri dishes.Procedure: Place open plates in the center and 4 corners of the work area. Run the blower for 60 minutes. Incubate plates at $28^\circ\text{C}$ for 72 hours.Acceptance Criteria (internal, indicative only): $0\ \text{CFU}$ across all plates. Zero colonies on five plates is a weak indicator; it does not demonstrate an ISO class or process safety.
 
 📜 Revision & Maintenance LogDifferential Pressure Baseline: Initial $\Delta P_0 = 120\ \text{Pa}$. Replace G4 prefilter when $\Delta P \ge 200\ \text{Pa}$. Replace HEPA H14 filter when $\Delta P \ge 350\ \text{Pa}$.
+
+---
+
+## ⚠️ Known Discrepancies
+
+Specifications vary across design iterations and external documentation. This document specifies:
+- **HEPA H14 filter:** $610 \times 610 \times 150\ \text{mm}$ (depth)
+- **Blower capacity:** $\ge 700\ \text{m}^3/\text{h}$ at $300\ \text{Pa}$
+
+Older or external sources may reference $78\ \text{mm}$ filter depth or $650\ \text{m}^3/\text{h}$ blower capacity. These figures have not been reconciled with the aeraulic sizing in section 1 and require owner decision:
+
+1. **Confirm the target filter depth and blower capacity** with available supplier datasheets and operating experience.
+2. **Recalculate static-pressure loss** if a different filter depth is chosen.
+3. **Document the final choice** in a revised bill of materials (section 2) and update this section.
+
+Until confirmed, both sets of figures must be treated as **preliminary design parameters**, not validated specifications.

@@ -2,16 +2,21 @@
 
 | File | Status |
 |---|---|
-| `MIT.txt` | Present. Applies to `firmware/`. |
-| `CERN-OHL-P-2.0.txt` | **MISSING — to add.** Applies to `hardware/`. |
+| `MIT.txt` | ✓ Present. Applies to `firmware/`. |
+| `CERN-OHL-P-2.0.txt` | ✓ Present. Applies to `hardware/`. |
 
-## To do (owner action)
+## Licence status per directory
 
-The official CERN-OHL-P-2.0 text could not be added automatically: it was not available offline and a licence text must be copied verbatim from the official source. Add it with one of:
+- **`firmware/`**: MIT (permissive, any use)
+- **`hardware/`**: CERN-OHL-P-2.0 (open-hardware; derivatives must disclose source)
+- **`batch-tracker/`**: **Status undefined** — see below.
+- **Root, `biotech-sops/`, `bio-inputs/`, `docs/`, `01_R-and-D_Lab/`**: Proprietary (B.A. LAB, SARL)
 
-```bash
-reuse download CERN-OHL-P-2.0        # https://reuse.software
-# or save the official text from https://ohwr.org/cern_ohl_p_v2.txt as LICENSES/CERN-OHL-P-2.0.txt
-```
+## Batch-tracker licence: to be confirmed
 
-Until that file exists, the hardware licence is declared but not complete, and `hardware/` should not be advertised as "open hardware".
+The `batch-tracker/` frontend uses `supabase-js@^2` and depends on open-source libraries.
+Its own licence has not been assigned. This must be decided by the owner before the UI
+is published or distributed:
+
+- If the batch-tracker is proprietary (B.A. LAB use only): add a `PROPRIETARY` notice in `batch-tracker/` and tag dependencies with their respective licences.
+- If it is to be open-source: assign a SPDX identifier in `batch-tracker/package.json` (e.g. MIT, Apache-2.0, etc.) and document dependencies using a tools like `license-report` or `npm-check-licenses`.
