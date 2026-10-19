@@ -23,8 +23,10 @@
 #define TEMP_HARD_MAX_C      30.0f   // heater latched OFF at/above this (software limit)
 #define HUM_SETPOINT         85.0f
 #define HUM_HYSTERESIS        3.0f
-#define HEATER_MAX_ON_MS     (30UL * 60UL * 1000UL)  // 30 min continuous, then lockout
-#define HEATER_COOLDOWN_MS   ( 5UL * 60UL * 1000UL)
+#define HEATER_MAX_ON_MS      (30UL * 60UL * 1000UL)  // 30 min continuous, then lockout
+#define HEATER_COOLDOWN_MS    ( 5UL * 60UL * 1000UL)
+#define HUMIDIFIER_MAX_ON_MS  (20UL * 60UL * 1000UL)  // 20 min continuous, then lockout (prevent water overflow)
+#define HUMIDIFIER_COOLDOWN_MS ( 5UL * 60UL * 1000UL)
 #define FAULT_AFTER_FAILED_READS 3
 #define SENSOR_INTERVAL_MS   2000UL  // DHT22 minimum sampling period is ~2 s
 
