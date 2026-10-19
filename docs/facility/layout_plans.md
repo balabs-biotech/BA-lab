@@ -7,7 +7,7 @@ Spatial organisation, environmental isolation levels, and airflow routing across
 | Floor Level | Operational Zone | Environmental Control Level | Primary Functions |
 | :--- | :--- | :--- | :--- |
 | **Ground Floor** | Fungal Production Unit | High Air Exchange / Controlled RH | Incubation chambers, fructification rooms, substrate pasteurization & bagging. |
-| **Middle Level** | R&D Laboratory & In Vitro Unit | Cleanroom Class 100 / ISO 5 | Laminar flow transfers, media prep, culture maintenance, TIS bioreactor benches. |
+| **Middle Level** | R&D Laboratory & In Vitro Unit | Clean work zone (design target only; no ISO class qualified) | Laminar flow transfers, media prep, culture maintenance, TIS bioreactor benches. |
 | **Rooftop Level** | Bioclimatic Greenhouse & Passive Collectors | Bioclimatic Passive / Solar | Acclimatization of micropropagated plants, solar condensation testing, crop trials. |
 
 ## Sanitary & Process Flow Rules

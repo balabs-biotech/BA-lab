@@ -13,4 +13,4 @@ Environmental targets across colonization, primordia initiation, and fructificat
 * **Fruiting Phase:** $18-21^\circ\text{C}$ | $88-92\%$ RH | $\text{CO}_2 < 800\text{ ppm}$ | Indirect light
 
 ## Fructification Controls
-* Fresh air exchange (FAE) must be synchronized with extraction fans via the **02_IoT_and_Automation** module when $\text{CO}_2$ exceeds phase thresholds.
+* Fresh air exchange (FAE) must be synchronized with extraction fans via the firmware nodes in `firmware/` (see `firmware/README.md`) when $\text{CO}_2$ exceeds phase thresholds.

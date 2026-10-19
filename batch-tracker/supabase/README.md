@@ -1,66 +1,23 @@
-# Batch Tracker — Supabase
+# Batch Tracker — Supabase (reference only)
 
-Source versionnée du backend Supabase du BA Labs Batch Tracker.
+**Supabase is the source of truth for the backend.** This directory deliberately contains no SQL, migrations, schema dumps or data exports, and none must be added: the schema, access rules (RLS), RPC functions and Edge Functions are managed and documented in the Supabase project itself.
 
-## Projet Supabase
+| | |
+|---|---|
+| Project | `BALabs` (ref `axcouwiodqsauwnsiotn`, region `eu-west-3`) |
+| Frontend | [`../index.html`](../index.html) |
+| Edge Functions | `claim-ba-labs`, `sync-culture-to-notion` (deployed in Supabase, not versioned here) |
 
-Project ref:
+## Batch workflow (as applied in production)
 
-axcouwiodqsauwnsiotn
+```text
+preparation → sterilization → inoculation → incubation → cultivation
+→ harvest → formulation → packaging → qc → release
+```
 
-## Frontend
+Standard stage advancement cannot cross `qc`. Release goes through `release_batch()` only, after the QC checks pass or are explicitly waived.
 
-Le frontend actuel est :
+## Secrets
 
-batch-tracker/index.html
-
-## Edge Functions
-
-Fonction actuellement déployée :
-
-claim-ba-labs
-
-## Workflow Batch
-
-Le workflow standard actuellement appliqué en production est :
-
-preparation
-→ sterilization
-→ inoculation
-→ incubation
-→ cultivation
-→ harvest
-→ formulation
-→ packaging
-→ qc
-→ release
-
-L'étape QC ne peut pas être franchie par l'avancement standard.
-La libération doit passer par release_batch() après validation des contrôles QC.
-
-## Migrations présentes en production
-
-20260930002507 — balabs_core_v1_1_1
-20260930002521 — balabs_core_v1_1_1_fk_indexes
-20261001215359 — add_batch_tracking_v1
-20261001215407 — complete_batch_tracking_indexes_and_stages
-20261001221338 — add_batch_workflow_rpc_v1
-20261001223719 — add_batch_qc_release_v1
-20261001224930 — add_qc_templates_v1
-20261002154849 — seed_ba_labs_core_v1
-20261003100557 — seed_ba_labs_references_v1
-20261003100817 — seed_ba_labs_media_v1
-20261003100916 — seed_ba_labs_strains_v1
-20261003101003 — seed_ba_labs_material_generations_v1
-20261003101043 — add_culture_generation_rpc_v1
-20261003101130 — add_culture_creation_options_v1
-20261003204716 — grant_authenticated_usage_private_schema_v1
-20261003204826 — fix_culture_generation_material_code_ambiguity_v1
-20261003204933 — fix_culture_created_event_subject_v1
-20261003205156 — fix_culture_generation_rpc_result_v1
-20261004210134 — fix_batch_qc_release_transition_v2
-20261004210226 — lock_batch_creation_workflow_v1
-20261004210540 — complete_release_stage_state_v1
-20261004210813 — remove_redundant_indexes_v1
-
-## Important
+- The frontend uses the project URL and a **publishable** key only. That key is meant for browsers.
+- A `service_role` / secret key or a Notion token must **never** be placed in this repository or in the frontend. They belong in Supabase Edge Function secrets.

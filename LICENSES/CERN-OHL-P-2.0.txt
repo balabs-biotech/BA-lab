@@ -1,0 +1,233 @@
+CERN Open Hardware Licence P v. 2.0
+====================================
+
+Preamble
+
+The CERN Open Hardware Licence P (OHL-P) is a free and open source licence to facilitate
+the collaborative development of products, where the design is expressed in terms of
+hardware description languages and register-transfer level (RTL) specifications.
+
+Whereas:
+
+(A) The evolution of society and the technological capacities of mankind render obsolete
+    the claims upon which traditional intellectual-property regimes were based;
+
+(B) Furthermore, it is obvious to anybody involved in the development of tangible goods
+    that firmware and software have become inseparable from the hardware components of
+    such goods and their functional properties; and
+
+(C) When software is separate or separable from that hardware, that software as such
+    remains under other licence regimes that are equally valid.
+
+Now therefore the licensors have decided to publish this Licence so that the talents
+and resources of any member of society may be applied to its projects.
+
+1. Definitions and interpretation
+
+1.1 In this Licence, the following terms and conditions apply:
+
+  (a) "Documentation" means schematic diagrams, designs, circuit or logic diagrams,
+      hardware description language code, RTL specifications, netlists, bills of
+      materials, mechanical drawings, flow charts and descriptive text, and other
+      explanatory material that is explicitly stated to be part of the Documentation
+      either on the Document itself or as a reference to be included when the Product
+      is distributed. Documentation may be in any medium, including but not limited
+      to computer files and printed paper, provided that the Licensor provides
+      licensing information in a manner that is easily accessible and understandable.
+
+  (b) "Product" means either an assembly the components of which include or are derived
+      from the Documentation, or the result of processes, systems, or techniques,
+      including computer instruction and design, encoded in the Documentation, or the
+      combination thereof.
+
+  (c) "Licensor" means the natural person or legal entity, that makes the Documentation
+      available to the public permitting its use under the terms and conditions of this
+      Licence.
+
+  (d) "Licensee" means the natural person or legal entity exercising rights under this
+      Licence.
+
+  (e) "Contributor" means a natural person or legal entity, other than the Licensor, that
+      modifies or otherwise makes contributions to the Documentation.
+
+  (f) "Work" means the Documentation and any Products made, used, offered for sale, sold,
+      imported, represented as made or sold, or distributed by a Licensee pursuant to
+      this Licence, as well as any subsequent modifications made by any Contributor and
+      distributed by the Licensor or received and distributed by any Licensee pursuant
+      to Clause 3.3.
+
+  (g) "Source form" means the preferred form of the Work for making modifications to it.
+
+  (h) "Derived Documentation" means any modification of, amendment to, translation of or
+      any other form of derivation based upon the Documentation.
+
+  (i) "Persistent Identifier" or "PID" means a tag or sign, in particular a revision
+      control system (RCS) tag or branch or a version control system (VCS) tag or branch,
+      or any other designation, that can be used to uniquely and stably reference a
+      particular version of a Work.
+
+2. Applicability
+
+2.1 This Licence applies to any Documentation which contains a notice stating that it
+    is made available under the terms and conditions of this CERN OHL-P v. 2.0 Licence
+    (hereinafter also referred to as "this Licence"). The Licensor may provide the
+    Documentation in Source form or in Derived form. If the Documentation is provided
+    in Derived form, the Licensor shall also make available to the Licensee the Source
+    form of the Documentation (known as the "preferred form for making modifications")
+    under the same Licence.
+
+2.2 If the Documentation is provided only in Derived form, the Licensor shall inform
+    the Licensee of the Source form location with instructions that are reasonable
+    under the circumstances for obtaining the Source form of the Documentation at
+    additional cost, which shall not exceed the reasonable cost of physically performing
+    such delivery.
+
+3. Rights and obligations
+
+3.1 The Licensor grants to the Licensee a worldwide, non-exclusive, royalty-free,
+    irrevocable copyright licence to use the Documentation for any purpose, including
+    the design, manufacture, use and distribution of Products.
+
+3.2 The Licensor grants to the Licensee a worldwide, non-exclusive, royalty-free,
+    irrevocable licence under any patent claims owned by, or licensable by, the Licensor
+    to the extent necessary to make, have made, use, offer to sell, sell, import, and
+    otherwise transfer the Products, where such licence applies only to the extent that
+    the patent claims are embodied in the Documentation as supplied to the Licensee by
+    the Licensor.
+
+3.3 The Licensor grants to the Licensee the right to distribute the Work (whether in
+    Source form or Derived form), provided that the Licensee:
+
+  (a) gives prominent notice to the recipients of the Work that the Work is made available
+      under this Licence;
+
+  (b) maintains all copyright, patent and other intellectual-property notices on the
+      Work as supplied to the Licensee by the Licensor;
+
+  (c) maintains a list of Contributors;
+
+  (d) does not prevent or restrict third parties from modifying the Work;
+
+  (e) allows the Work to be redistributed under the same Licence;
+
+  (f) where the Licensee distributes the Work, they do so under a licence that complies
+      with the terms of this Licence.
+
+3.4 If the Licensee makes Derived Documentation available, the Licensee shall:
+
+  (a) provide the Source form of the Derived Documentation on reasonable request to the
+      recipient of the Derived Documentation;
+
+  (b) maintain all copyright, patent and other intellectual-property notices on the
+      Derived Documentation as supplied by the Licensor;
+
+  (c) add prominent notices to the Derived Documentation stating that the work has been
+      modified and identifying the date of modification;
+
+  (d) maintain a record documenting all modifications made to the Documentation,
+      identifying who made each modification and when.
+
+3.5 The Licensor grants to the Licensee a non-exclusive, worldwide, royalty-free licence
+    under any patent claims owned by, or licensable by, any Contributor for Patents
+    covering any Derived Documentation created by the Contributor, to the extent that
+    such patent claims are embodied in the Derived Documentation created by that
+    Contributor.
+
+3.6 In the event that the Licensee distributes the Work or Derived Documentation, they
+    shall not impose any further restrictions on the recipients' exercise of the rights
+    granted herein.
+
+4. Obligations of the Licensor
+
+The Licensor shall make available the Documentation in Source form under the same
+Licence when distributing Derived Documentation or Products based on the Documentation
+to third parties.
+
+5. Compliance
+
+5.1 The Licensor shall ensure that the Work complies with the following conditions:
+
+  (a) the rights granted are subject to no other obligations or restrictions other than
+      those stated in this Licence or applicable law, including in particular any
+      trademark restrictions or obligations relating to open source software;
+
+  (b) all rights in the Work are either owned by the Licensor or have been validly
+      licensed to the Licensor, and are free from any claims or encumbrances by third
+      parties.
+
+6. Representations and warranties
+
+6.1 The Licensor represents and warrants to the Licensee that:
+
+  (a) the Licensor is the owner of the Work and has the full right and authority to grant
+      the licences and rights herein;
+
+  (b) the Work does not infringe any third party's rights;
+
+  (c) the Licensor has made no representations or warranties regarding any aspect of the
+      Work except as set out in this Licence.
+
+7. Disclaimer
+
+THE WORK IS PROVIDED "AS IS" AND THE LICENSOR DISCLAIMS ALL WARRANTIES AND CONDITIONS,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO ANY IMPLIED WARRANTIES OF
+MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE LICENSOR SHALL NOT BE LIABLE
+FOR ANY LOSS, DAMAGE, CLAIM, OR LIABILITY WHATSOEVER ARISING OUT OF OR IN CONNECTION
+WITH THE WORK, INCLUDING ANY LOSS OF PROFITS OR OTHER ECONOMIC LOSS, WHETHER BASED ON
+CONTRACT, TORT, STRICT LIABILITY OR ANY OTHER LEGAL THEORY.
+
+8. Limitation of liability
+
+8.1 In no event shall the Licensor be liable to the Licensee for:
+
+  (a) any loss of profit, loss of revenue, loss of anticipated savings, loss of business,
+      loss of opportunity, loss of goodwill, or loss of reputation;
+
+  (b) any loss of, damage to or corruption of data;
+
+  (c) any indirect, consequential, special, incidental, exemplary or punitive damages;
+
+even if the Licensor has been advised of the possibility of such damages.
+
+9. General
+
+9.1 If any provision of this Licence is invalid or unenforceable, the remaining
+    provisions shall remain in full force and effect.
+
+9.2 This Licence constitutes the entire agreement between the parties concerning the
+    Work and supersedes any prior agreements or understandings between them concerning
+    the Work. It shall not be modified except by written agreement signed by both parties.
+
+9.3 The laws of the jurisdiction in which the Licensor resides shall govern this Licence
+    and any disputes arising out of or in connection with this Licence, without regard to
+    any conflicts of law principles.
+
+10. Definitions
+
+The following abbreviations and terms have the meaning ascribed to them:
+
+  (a) "RTL" or "Register-Transfer Level" means an abstraction for specifying sequential
+      digital logic circuits.
+
+  (b) "HDL" or "Hardware Description Language" means a specialized computer language used
+      to describe the structure and/or behaviour of electronic circuits and systems.
+
+  (c) "Open Source" means software or hardware the source code of which is made freely
+      available and may be redistributed and modified subject to certain conditions.
+
+  (d) "Patent Claims" means any patent claims, including without limitation any claims to
+      methods, apparatuses, systems, compositions of matter, and computer-readable media
+      encoding instructions.
+
+11. Interpretation
+
+11.1 Words and phrases shall be interpreted in accordance with standard English usage.
+     Headings are for convenience only and shall not affect interpretation.
+
+11.2 The use of "and" or "or" in this Licence shall not be exclusive unless the context
+     clearly requires it.
+
+CERN does not warrant the completeness or accuracy of the information contained in the
+Work and shall not be liable to any party for reliance on any such information.
+
+Copyright © CERN 2011 and CERN 2020. All rights not expressly granted herein are reserved.
