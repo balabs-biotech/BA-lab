@@ -280,6 +280,66 @@ static void test_climate_humidifier_max_on_and_lockout() {
   CHECK(s.humidifier && !s.humidifier_lockout);  // cooled down, restarts
 }
 
+static void test_irrigation_initialization() {
+  ba::IrrigationState s = {};
+  CHECK(!s.pump);                           // pump OFF at start (aggregate init)
+  CHECK(!s.fan);                            // fan OFF at start
+  CHECK(!s.pump_lockout);                   // no lockout yet
+}
+
+static void test_climate_rapid_cycling() {
+  ba::ClimateState s = ba::climateInit(0);
+  uint32_t t = 2000;
+  // Start from cold to activate heater
+  ba::climateStepSensors(CC, s, cin(20.0f, 80.0f, t));
+  CHECK(s.heater && s.humidifier);
+  t += 100;
+  // Oscillate rapidly around setpoint: should not cause excessive lockout
+  for (int i = 0; i < 5; i++) {
+    ba::climateStepSensors(CC, s, cin(23.4f, 82.0f, t));  // below hysteresis: keep heating
+    t += 100;
+    ba::climateStepSensors(CC, s, cin(24.2f, 86.0f, t));  // above setpoint: stop heating
+    t += 100;
+  }
+  // Rapid cycling should not trigger lockout (heater has not been ON continuously long enough)
+  CHECK(!s.heater_lockout);
+}
+
+static void test_climate_heater_and_humidifier_interaction() {
+  ba::ClimateState s = ba::climateInit(0);
+  uint32_t t = 2000;
+  // Both should OFF independently when their targets are reached
+  ba::climateStepSensors(CC, s, cin(20.0f, 80.0f, t));
+  CHECK(s.heater && s.humidifier);
+  // Reach temp target but miss humidity
+  ba::climateStepSensors(CC, s, cin(24.2f, 80.0f, t += 1000));
+  CHECK(!s.heater && s.humidifier);         // heater OFF, humidifier ON
+  // Reach humidity target but temp rises
+  ba::climateStepSensors(CC, s, cin(24.2f, 86.1f, t += 1000));
+  CHECK(!s.heater && !s.humidifier);        // both OFF
+  // Recover: both reactivate independently
+  ba::climateStepSensors(CC, s, cin(23.0f, 80.0f, t += 1000));
+  CHECK(s.heater && s.humidifier);
+}
+
+static void test_irrigation_co2_invalid_forces_fan_off() {
+  ba::IrrigationConfig IC = {45.0f, 50.0f, 60UL * 1000, 10UL * 60 * 1000,
+                             1200UL, 1000UL};
+  ba::IrrigationState s = {};
+  // CO2 below ON threshold with valid sensor: fan OFF
+  ba::irrigationStep(IC, s, iin(true, 50.0f, true, 1100, 5000));
+  CHECK(!s.fan);
+  // CO2 above ON threshold with valid sensor: fan ON
+  ba::irrigationStep(IC, s, iin(true, 50.0f, true, 1250, 6000));
+  CHECK(s.fan);
+  // CO2 becomes invalid (sensor stale or error): fan forced OFF
+  ba::irrigationStep(IC, s, iin(true, 50.0f, false, 1250, 7000));
+  CHECK(!s.fan);
+  // Even with high CO2, invalid sensor keeps fan OFF
+  ba::irrigationStep(IC, s, iin(true, 50.0f, false, 2000, 8000));
+  CHECK(!s.fan);
+}
+
 int main() {
   test_helpers();
   test_climate_normal();
@@ -288,6 +348,10 @@ int main() {
   test_climate_heater_max_on_and_lockout();
   test_climate_humidifier_max_on_and_lockout();
   test_climate_purge_non_blocking();
+  test_climate_rapid_cycling();
+  test_climate_heater_and_humidifier_interaction();
+  test_irrigation_initialization();
+  test_irrigation_co2_invalid_forces_fan_off();
   test_irrigation_pump();
   test_irrigation_pump_max_run();
   test_irrigation_fan_and_invalid_co2();
