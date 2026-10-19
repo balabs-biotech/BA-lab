@@ -4,11 +4,57 @@ Single static page ([`index.html`](index.html), HTML/CSS/JavaScript, no build st
 
 The repository root `index.html` only redirects here.
 
-## Open points
+## Known issues and risk mitigation
 
-- **Hosting is not documented.** The redirect suggests GitHub Pages, but this is unconfirmed. The deployment URL and publication procedure should be written here.
-- `supabase-js` is loaded as `@2` from jsDelivr, which is not a pinned version. Pin an exact version after testing it in a browser.
-- Notion sync (`syncPendingCultures()`) only retries cultures with status `pending`. Cultures that end in `error` are not retried, and the `sync-culture-to-notion` function can create a duplicate Notion page if its final database write fails. This must be fixed on the Supabase side (idempotency, retry policy) before retry is added in the UI.
+### Notion sync — Idempotence and duplicates
+**Status** : 🟡 Medium priority — Discoverable but not prevented  
+**Risk** : The `sync-culture-to-notion` Edge Function can create duplicate Notion pages if it fails after creating the page but before updating the culture's `notion_page_id` in Supabase.
+
+**How it happens** :
+1. Frontend calls Edge Function with culture_id = 42
+2. Function creates Notion page successfully
+3. Network timeout before `notion_page_id` update in Supabase → stays `null` in DB
+4. Next call to `syncPendingCultures()` finds culture 42 again (filter: `notion_page_id IS NULL`)
+5. Culture synced twice → duplicate Notion page
+
+**Current mitigation** :
+- Limit to 20 cultures per sync batch (prevents runaway)
+- Log errors to browser console (manual discovery)
+- No automatic retry of failed syncs (prevents cascade)
+
+**Permanent fix** (owner action) :
+- Add database-level constraint: `notion_page_id` can only be updated from `NULL` → non-null once
+- OR: Implement transaction in Edge Function (Supabase code review needed)
+- See [`../SUPABASE_AUDIT.md`](../SUPABASE_AUDIT.md) for options A/B/C
+
+### supabase-js version not pinned
+**Status** : 🟡 Medium priority — No reproducibility  
+**Issue** : Loads `@supabase/supabase-js@2` from jsDelivr, which resolves to the latest 2.x at runtime (currently 2.118.0).
+
+**Risk** : Breaking changes in future 2.x releases could break sync without warning.
+
+**Fix** :
+```html
+<!-- Change from: -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<!-- To: -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.118.0"></script>
+```
+
+### batch-tracker licence undefined
+**Status** : 📋 To be decided  
+**Issue** : `batch-tracker/` depends on 25+ open-source packages but its own licence is not declared.
+
+**Decision needed** :
+- **Proprietary** (B.A. LAB internal use only) → add `"private": true` to package.json
+- **Open-source** (MIT / Apache-2.0 / ...) → add licence key to package.json
+
+See root [`LICENSE`](../LICENSE) for per-directory mapping.
+
+### Hosting not documented
+**Status** : 📋 To be confirmed  
+**Issue** : Current hosting (GitHub Pages? Vercel?) and URL not documented. Deployment procedure unclear.
 
 ## Manual test checklist
 
