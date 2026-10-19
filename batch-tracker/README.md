@@ -28,19 +28,11 @@ The repository root `index.html` only redirects here.
 - See [`../SUPABASE_AUDIT.md`](../SUPABASE_AUDIT.md) for options A/B/C
 
 ### supabase-js version not pinned
-**Status** : 🟡 Medium priority — No reproducibility  
-**Issue** : Loads `@supabase/supabase-js@2` from jsDelivr, which resolves to the latest 2.x at runtime (currently 2.118.0).
+**Status** : ✅ **Fixed** (2026-10-19) — Pinned to `2.118.0` in `index.html`.
 
-**Risk** : Breaking changes in future 2.x releases could break sync without warning.
-
-**Fix** :
-```html
-<!-- Change from: -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-<!-- To: -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.118.0"></script>
-```
+Previously loaded `@supabase/supabase-js@2` (latest 2.x, floating). Breaking changes in a future
+2.x release could have broken sync without warning. Now pinned to a specific, tested version.
+To upgrade deliberately: change the version in the `<script>` tag, test in a browser, then commit.
 
 ### batch-tracker licence undefined
 **Status** : 📋 To be decided  
