@@ -63,6 +63,8 @@ struct ClimateConfig {
   float hum_hysteresis;
   uint32_t heater_max_on_ms;       // max continuous heating
   uint32_t heater_cooldown_ms;     // forced OFF period after max_on reached
+  uint32_t humidifier_max_on_ms;   // max continuous humidification (prevent water overflow)
+  uint32_t humidifier_cooldown_ms; // forced OFF period after humidifier max_on reached
   uint8_t  fault_after_failed_reads;
   uint32_t purge_interval_ms;      // timed fresh-air purge (NOT CO2-driven)
   uint32_t purge_duration_ms;
@@ -82,9 +84,12 @@ struct ClimateState {
   bool fault;            // sensor lost for >= fault_after_failed_reads cycles
   bool overtemp_latched;
   bool heater_lockout;
+  bool humidifier_lockout;
   uint8_t failed_reads;
   uint32_t heater_on_since;
   uint32_t heater_lockout_since;
+  uint32_t humidifier_on_since;
+  uint32_t humidifier_lockout_since;
   uint32_t purge_ref;    // end of last purge (or boot)
   bool purging;
 };
@@ -140,8 +145,22 @@ inline void climateStepSensors(const ClimateConfig& c, ClimateState& s,
   }
   s.heater = want_heat;
 
-  s.humidifier = hysteresisLow(s.humidifier, in.hum,
-                               c.hum_setpoint - c.hum_hysteresis, c.hum_setpoint);
+  // Humidifier lockout release after cooldown.
+  if (s.humidifier_lockout && elapsed(in.now_ms, s.humidifier_lockout_since, c.humidifier_cooldown_ms)) {
+    s.humidifier_lockout = false;
+  }
+
+  bool want_humid = hysteresisLow(s.humidifier, in.hum,
+                                  c.hum_setpoint - c.hum_hysteresis, c.hum_setpoint);
+  if (s.humidifier_lockout) want_humid = false;
+
+  if (want_humid && !s.humidifier) s.humidifier_on_since = in.now_ms;
+  if (want_humid && s.humidifier && elapsed(in.now_ms, s.humidifier_on_since, c.humidifier_max_on_ms)) {
+    want_humid = false;
+    s.humidifier_lockout = true;
+    s.humidifier_lockout_since = in.now_ms;
+  }
+  s.humidifier = want_humid;
 }
 
 // Timed purge (non-blocking). Independent of sensors.

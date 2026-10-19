@@ -7,7 +7,9 @@ static int g_fail = 0, g_run = 0;
 #define CHECK(c) do { g_run++; if (!(c)) { g_fail++; printf("FAIL %s:%d  %s\n", __FILE__, __LINE__, #c); } } while (0)
 
 static const ba::ClimateConfig CC = {24.0f, 0.5f, 30.0f, 85.0f, 3.0f,
-                                     30UL * 60 * 1000, 5UL * 60 * 1000, 3,
+                                     30UL * 60 * 1000, 5UL * 60 * 1000,  // heater: 30 min on, 5 min cooldown
+                                     20UL * 60 * 1000, 5UL * 60 * 1000,  // humidifier: 20 min on, 5 min cooldown
+                                     3,
                                      300000UL, 30000UL};
 static ba::ClimateInput cin(float t, float h, uint32_t now, bool valid = true) {
   ba::ClimateInput i; i.valid = valid; i.temp_c = t; i.hum = h; i.now_ms = now; return i;
@@ -161,16 +163,139 @@ static void test_irrigation_fan_and_invalid_co2() {
   CHECK(!s.fan);
 }
 
+static void test_irrigation_moisture_invalid_adc_rail() {
+  // ADC pinned at a rail (open or shorted sensor) should stop the pump.
+  ba::IrrigationState s = {};
+  // Valid state
+  ba::irrigationStep(IC, s, iin(true, 40, true, 800, 1000));
+  CHECK(s.pump);
+  // ADC pinned at rail -> invalid
+  ba::irrigationStep(IC, s, iin(false, 0, true, 800, 2000));
+  CHECK(!s.pump);
+  // Recovery after a valid read
+  ba::irrigationStep(IC, s, iin(true, 30, true, 800, 3000));
+  CHECK(s.pump);
+}
+
+static void test_climate_purge_survives_sensor_loss() {
+  // Purge timer should keep running even if the sensor is down
+  ba::ClimateState s = ba::climateInit(0);
+  ba::climateStepPurge(CC, s, 299999);
+  CHECK(!s.fan);
+  // Sensor fails
+  ba::climateStepSensors(CC, s, cin(0, 0, 300000, false));
+  // But purge should start (timer-based, not sensor-based)
+  ba::climateStepPurge(CC, s, 300000);
+  CHECK(s.fan && s.purging);
+  // Heater and humidifier OFF due to failed sensor
+  CHECK(!s.heater && !s.humidifier);
+  // Purge continues
+  ba::climateStepPurge(CC, s, 310000);
+  CHECK(s.fan);
+  // Purge ends and resets timer
+  ba::climateStepPurge(CC, s, 330000);
+  CHECK(!s.fan && !s.purging);
+}
+
+static void test_climate_recovery_from_extended_fault() {
+  // After multiple failed reads, a single valid read should recover.
+  ba::ClimateState s = ba::climateInit(0);
+  // Fault condition: 3 consecutive failed reads (fault_after_failed_reads = 3)
+  ba::climateStepSensors(CC, s, cin(0, 0, 1000, false));
+  CHECK(s.failed_reads == 1 && !s.fault);
+  ba::climateStepSensors(CC, s, cin(0, 0, 2000, false));
+  CHECK(s.failed_reads == 2 && !s.fault);
+  ba::climateStepSensors(CC, s, cin(0, 0, 3000, false));
+  CHECK(s.failed_reads == 3 && s.fault);
+  CHECK(!s.heater && !s.humidifier);
+  // Single valid read should clear fault
+  ba::climateStepSensors(CC, s, cin(20.0f, 70.0f, 4000));
+  CHECK(!s.fault && s.failed_reads == 0);
+  CHECK(s.heater && s.humidifier);  // Resume normal operation
+}
+
+static void test_climate_boundary_values() {
+  // Test with temperature and humidity at exact setpoint boundaries
+  // hysteresisLow: turns ON when v < on_below, OFF when v >= off_at
+  ba::ClimateState s = ba::climateInit(0);
+  // Config: temp_setpoint = 24.0, hysteresis = 0.5, hum_setpoint = 85, hum_hysteresis = 3
+
+  // Below lower boundary (< 23.5): should turn ON
+  ba::climateStepSensors(CC, s, cin(23.4f, 70.0f, 1000));
+  CHECK(s.heater);
+
+  // At upper boundary (>= 24.0): should turn OFF
+  ba::climateStepSensors(CC, s, cin(24.0f, 70.0f, 2000));
+  CHECK(!s.heater);
+
+  // Inside band (23.5 <= v < 24.0): keeps OFF
+  ba::climateStepSensors(CC, s, cin(23.7f, 70.0f, 3000));
+  CHECK(!s.heater);
+
+  // Below lower boundary of humidity (< 82): should turn ON
+  ba::climateStepSensors(CC, s, cin(20.0f, 81.9f, 4000));
+  CHECK(s.humidifier);
+
+  // At upper boundary of humidity (>= 85): should turn OFF
+  ba::climateStepSensors(CC, s, cin(20.0f, 85.0f, 5000));
+  CHECK(!s.humidifier);
+}
+
+static void test_irrigation_pump_lockout_edge_case() {
+  // Ensure pump lockout is correctly released at exact time boundary
+  ba::IrrigationState s = {};
+  uint32_t t = 1000;
+  ba::irrigationStep(IC, s, iin(true, 10, true, 800, t));
+  CHECK(s.pump);
+  // Max run reached
+  t += IC.pump_max_run_ms;
+  ba::irrigationStep(IC, s, iin(true, 10, true, 800, t));
+  CHECK(!s.pump && s.pump_lockout);
+  // One ms before lockout expiry
+  t += IC.pump_lockout_ms - 1;
+  ba::irrigationStep(IC, s, iin(true, 10, true, 800, t));
+  CHECK(s.pump_lockout);
+  // Exact lockout expiry: should be released
+  ba::irrigationStep(IC, s, iin(true, 10, true, 800, t + 1));
+  CHECK(!s.pump_lockout);
+}
+
+static void test_climate_humidifier_max_on_and_lockout() {
+  // Same pattern as heater: max continuous run followed by forced cooldown
+  ba::ClimateState s = ba::climateInit(0);
+  uint32_t t = 2000;
+  ba::climateStepSensors(CC, s, cin(15.0f, 80.0f, t));  // humidifier ON, on_since = 2000
+  CHECK(s.humidifier);
+  t = 2000 + CC.humidifier_max_on_ms - 1;
+  ba::climateStepSensors(CC, s, cin(15.0f, 80.0f, t));
+  CHECK(s.humidifier);
+  t += 1;
+  ba::climateStepSensors(CC, s, cin(15.0f, 80.0f, t));  // max reached
+  CHECK(!s.humidifier && s.humidifier_lockout);
+  t += CC.humidifier_cooldown_ms - 1;
+  ba::climateStepSensors(CC, s, cin(15.0f, 80.0f, t));
+  CHECK(!s.humidifier);  // still locked out
+  t += 1;
+  ba::climateStepSensors(CC, s, cin(15.0f, 80.0f, t));
+  CHECK(s.humidifier && !s.humidifier_lockout);  // cooled down, restarts
+}
+
 int main() {
   test_helpers();
   test_climate_normal();
   test_climate_failsafe_on_sensor_loss();
   test_climate_overtemp_latch();
   test_climate_heater_max_on_and_lockout();
+  test_climate_humidifier_max_on_and_lockout();
   test_climate_purge_non_blocking();
   test_irrigation_pump();
   test_irrigation_pump_max_run();
   test_irrigation_fan_and_invalid_co2();
+  test_irrigation_moisture_invalid_adc_rail();
+  test_climate_purge_survives_sensor_loss();
+  test_climate_recovery_from_extended_fault();
+  test_climate_boundary_values();
+  test_irrigation_pump_lockout_edge_case();
   printf("%d checks, %d failed\n", g_run, g_fail);
   return g_fail ? 1 : 0;
 }
