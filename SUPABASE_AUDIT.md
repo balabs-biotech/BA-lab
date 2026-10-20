@@ -93,6 +93,10 @@ test ! -f dist/batch-tracker/index.html || echo "ERROR: proprietary UI in dist"
 
 ## 3. supabase-js Version Pinning
 
+### Status: ✅ RESOLVED (2026-10-19)
+Pinned to `2.118.0` in `batch-tracker/index.html` (Option A below). SRI (Option C) is not yet
+applied — remains a lower-priority hardening step if the owner wants it.
+
 ### Finding
 `batch-tracker/index.html` loads from CDN:
 ```html
@@ -216,7 +220,7 @@ Document retry policy in `batch-tracker/supabase/README.md`:
 |---|---|---|---|
 | **Notion sync atomicity** | Owner/DevOps | HIGH | 📋 To decide (A/B/C) |
 | **batch-tracker licence** | Owner | HIGH | 📋 To define |
-| **supabase-js pin version** | DevOps | MEDIUM | ⏳ Implement |
+| **supabase-js pin version** | DevOps | MEDIUM | ✅ Done (2.118.0) |
 | **Sync retry policy doc** | Owner | MEDIUM | 📋 To write |
 | **RLS audit** | Security | MEDIUM | 📋 To verify |
 

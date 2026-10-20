@@ -6,410 +6,242 @@
 
   <title>BA Labs — Culture & Batch Tracker</title>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.118.0"></script>
 
   <style>
     :root {
-      font-family:
-        Inter,
-        system-ui,
-        -apple-system,
-        BlinkMacSystemFont,
-        "Segoe UI",
-        sans-serif;
-
-      color: #172018;
-      background: #f4f6f3;
+      --bg: #f4f6f3;
+      --surface: #fff;
+      --surface-2: #f5f7f5;
+      --border: #dfe5df;
+      --border-strong: #b9c4ba;
+      --text: #172018;
+      --muted: #596459;
+      --brand: #183b24;
+      --brand-hover: #245a35;
+      --ok: #1d5a29;
+      --warn: #765b12;
+      --err: #8a2020;
+      --focus: #1b6fd1;
+      --radius: 12px;
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      background: var(--bg);
+      color-scheme: light;
     }
 
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
+
+    html { -webkit-text-size-adjust: 100%; }
 
     body {
       margin: 0;
-      padding: 32px 16px;
-      background: #f4f6f3;
+      padding: 32px 16px 56px;
+      background: var(--bg);
+      line-height: 1.5;
     }
 
-    .container {
-      width: 100%;
-      max-width: 1000px;
-      margin: 0 auto;
-    }
+    .container { width: 100%; max-width: 1000px; margin: 0 auto; }
 
-    header {
-      margin-bottom: 24px;
+    .skip-link {
+      position: absolute;
+      left: 12px;
+      top: -48px;
+      padding: 10px 14px;
+      background: var(--brand);
+      color: #fff;
+      border-radius: 8px;
+      z-index: 10;
+      text-decoration: none;
+      font-weight: 600;
     }
+    .skip-link:focus { top: 12px; }
 
-    h1 {
-      margin: 0 0 6px;
-      font-size: 28px;
-    }
-
-    h2 {
-      margin: 0 0 14px;
-      font-size: 20px;
-    }
-
-    h3 {
-      margin: 24px 0 12px;
-      font-size: 17px;
-    }
-
-    .subtitle {
-      color: #657066;
-    }
+    header { margin-bottom: 24px; }
+    h1 { margin: 0 0 6px; font-size: clamp(22px, 4.5vw, 28px); line-height: 1.2; }
+    h2 { margin: 0 0 14px; font-size: 20px; }
+    h3 { margin: 28px 0 12px; font-size: 17px; padding-top: 18px; border-top: 1px solid var(--border); }
+    h2 + .muted + h3, h2 + h3 { border-top: 0; padding-top: 0; }
+    .subtitle { color: var(--muted); }
 
     .card {
-      background: #fff;
-      border: 1px solid #dfe5df;
+      background: var(--surface);
+      border: 1px solid var(--border);
       border-radius: 14px;
       padding: 22px;
       margin-bottom: 16px;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
     }
 
-    label {
-      display: block;
-      margin: 16px 0 7px;
-      font-weight: 600;
-    }
+    label { display: block; margin: 16px 0 6px; font-weight: 600; }
+    .req { color: var(--err); margin-left: 3px; font-weight: 700; }
+    .hint { display: block; margin-top: 5px; color: var(--muted); font-size: 13px; }
 
-    input,
-    select,
-    textarea,
-    button {
+    input, select, textarea, button {
       width: 100%;
-      padding: 11px 12px;
+      min-height: 44px;
+      padding: 10px 12px;
       border-radius: 9px;
-      border: 1px solid #ccd5cc;
+      border: 1px solid var(--border-strong);
       font: inherit;
+      font-size: 16px;
     }
+    input, select, textarea { background: var(--surface); color: var(--text); }
+    input::placeholder { color: #7b857c; }
+    input:disabled, select:disabled { background: var(--surface-2); color: var(--muted); }
 
-    input,
-    select,
-    textarea {
-      background: #fff;
-      color: #172018;
+    :focus-visible {
+      outline: 3px solid var(--focus);
+      outline-offset: 2px;
     }
 
     button {
+      position: relative;
       margin-top: 20px;
       border: 0;
-      background: #183b24;
+      background: var(--brand);
       color: #fff;
       font-weight: 700;
       cursor: pointer;
+      transition: background-color .15s ease;
     }
+    button:hover { background: var(--brand-hover); }
+    button:disabled { opacity: .55; cursor: not-allowed; }
 
-    button:hover {
-      background: #245a35;
+    button[aria-busy="true"] { cursor: progress; }
+    button[aria-busy="true"]::before {
+      content: "";
+      display: inline-block;
+      width: 14px;
+      height: 14px;
+      margin-right: 8px;
+      vertical-align: -2px;
+      border: 2px solid rgba(255, 255, 255, .45);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin .8s linear infinite;
     }
+    @keyframes spin { to { transform: rotate(360deg); } }
 
-    button:disabled {
-      opacity: 0.55;
-      cursor: not-allowed;
-    }
+    .secondary-button { background: #4f5a53; }
+    .secondary-button:hover { background: #3d4640; }
+    .danger-button { background: var(--err); }
+    .danger-button:hover { background: #6f1717; }
 
-    .secondary-button {
-      background: #66716a;
-    }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .auth-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 
-    .secondary-button:hover {
-      background: #4e5852;
-    }
+    .info { background: var(--surface-2); border-radius: 9px; padding: 12px; margin-top: 12px; line-height: 1.6; }
+    .success { background: #edf8ef; border: 1px solid #b8dfbe; color: var(--ok); }
+    .error { background: #fff0f0; border: 1px solid #e5bcbc; color: var(--err); }
+    .warning { background: #fff8e8; border: 1px solid #ead7a0; color: var(--warn); }
+    #message .card { margin-bottom: 16px; font-weight: 600; }
+    .muted { color: var(--muted); font-size: 14px; }
 
-    .danger-button {
-      background: #8a2020;
-    }
+    code { background: #eef1ee; padding: 2px 5px; border-radius: 4px; word-break: break-word; }
+    .hidden { display: none !important; }
 
-    .danger-button:hover {
-      background: #6f1717;
-    }
+    .batch-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 14px; }
+    .batch-stat { background: var(--surface-2); border-radius: 9px; padding: 12px; }
+    .batch-stat-label { color: var(--muted); font-size: 12px; margin-bottom: 4px; }
+    .batch-stat-value { font-weight: 700; word-break: break-word; }
 
-    .grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-    }
+    .progress { margin-top: 12px; }
+    .progress-label { font-size: 14px; color: var(--muted); margin-bottom: 6px; }
+    .progress-track { height: 8px; background: #e3e9e3; border-radius: 999px; overflow: hidden; }
+    .progress-bar { height: 100%; width: 0; background: var(--brand-hover); transition: width .3s ease; }
 
-    .auth-actions {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-    }
-
-    .info {
-      background: #f5f7f5;
-      border-radius: 9px;
-      padding: 12px;
-      margin-top: 12px;
-      line-height: 1.6;
-    }
-
-    .success {
-      background: #edf8ef;
-      border: 1px solid #b8dfbe;
-      color: #1d5a29;
-    }
-
-    .error {
-      background: #fff0f0;
-      border: 1px solid #e5bcbc;
-      color: #8a2020;
-    }
-
-    .warning {
-      background: #fff8e8;
-      border: 1px solid #ead7a0;
-      color: #765b12;
-    }
-
-    .muted {
-      color: #69736b;
-      font-size: 14px;
-    }
-
-    code {
-      background: #eef1ee;
-      padding: 2px 5px;
-      border-radius: 4px;
-      word-break: break-word;
-    }
-
-    .hidden {
-      display: none !important;
-    }
-
-    .batch-grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 12px;
-      margin-top: 14px;
-    }
-
-    .batch-stat {
-      background: #f5f7f5;
-      border-radius: 9px;
-      padding: 12px;
-    }
-
-    .batch-stat-label {
-      color: #69736b;
-      font-size: 12px;
-      margin-bottom: 4px;
-    }
-
-    .batch-stat-value {
-      font-weight: 700;
-      word-break: break-word;
-    }
-
-    .stage-list {
-      display: grid;
-      gap: 8px;
-      margin-top: 12px;
-    }
-
+    .stage-list { display: grid; gap: 8px; margin-top: 12px; }
     .stage {
       display: grid;
       grid-template-columns: 42px 1fr auto;
       gap: 10px;
       align-items: center;
       padding: 11px 12px;
-      border: 1px solid #dfe5df;
+      border: 1px solid var(--border);
       border-radius: 9px;
       background: #fafbfa;
     }
+    .stage-number { font-weight: 700; color: var(--muted); }
+    .stage-name { font-weight: 600; }
+    .stage-status { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .03em; white-space: nowrap; }
+    .stage.active { border-color: #6fa37d; background: #f0f8f1; box-shadow: inset 4px 0 0 var(--brand-hover); }
+    .stage.completed { background: #f3f7f3; }
+    .stage.failed { border-color: #d99a9a; background: #fff2f2; box-shadow: inset 4px 0 0 var(--err); }
+    .status-pending { color: var(--muted); }
+    .status-active { color: var(--ok); }
+    .status-completed { color: #315d3a; }
+    .status-failed { color: var(--err); }
 
-    .stage-number {
-      font-weight: 700;
-      color: #69736b;
-    }
-
-    .stage-name {
-      font-weight: 600;
-    }
-
-    .stage-status {
-      font-size: 12px;
-      font-weight: 700;
-      text-transform: uppercase;
-    }
-
-    .stage.active {
-      border-color: #8ab596;
-      background: #f0f8f1;
-    }
-
-    .stage.completed {
-      background: #f3f7f3;
-    }
-
-    .stage.failed {
-      border-color: #d99a9a;
-      background: #fff2f2;
-    }
-
-    .status-pending {
-      color: #69736b;
-    }
-
-    .status-active {
-      color: #1d5a29;
-    }
-
-    .status-completed {
-      color: #315d3a;
-    }
-
-    .status-failed {
-      color: #8a2020;
-    }
-
-    .qc-list {
-      display: grid;
-      gap: 10px;
-      margin-top: 12px;
-    }
-
+    .qc-list { display: grid; gap: 10px; margin-top: 12px; }
     .qc-row {
       display: grid;
-      grid-template-columns: 1fr 130px 120px;
+      grid-template-columns: 1fr 150px 130px;
       gap: 10px;
       align-items: center;
       padding: 12px;
-      border: 1px solid #dfe5df;
+      border: 1px solid var(--border);
       border-radius: 9px;
       background: #fafbfa;
     }
+    .qc-label { font-weight: 600; }
+    .qc-code { display: block; margin-top: 3px; color: var(--muted); font-size: 12px; }
+    .qc-row input, .qc-row select { margin: 0; width: 100%; }
+    .qc-save { margin: 0; padding: 9px 10px; font-size: 14px; }
 
-    .qc-label {
-      font-weight: 600;
-    }
+    .batch-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px; }
+    .batch-actions button { margin-top: 0; }
 
-    .qc-code {
-      display: block;
-      margin-top: 3px;
-      color: #69736b;
-      font-size: 12px;
-    }
-
-    .qc-row input,
-    .qc-row select {
-      margin: 0;
-      width: 100%;
-    }
-
-    .qc-save {
-      margin: 0;
-      padding: 9px 10px;
-      font-size: 13px;
-    }
-
-    .batch-actions {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      margin-top: 12px;
-    }
-
-    .batch-actions button {
-      margin-top: 0;
-    }
-
-    .batch-list {
-      display: grid;
-      gap: 8px;
-      margin-top: 12px;
-    }
-
+    .batch-list { display: grid; gap: 8px; margin-top: 12px; }
     .batch-item {
       width: 100%;
       margin: 0;
       text-align: left;
-      background: #f5f7f5;
-      color: #172018;
-      border: 1px solid #dfe5df;
+      background: var(--surface-2);
+      color: var(--text);
+      border: 1px solid var(--border);
       font-weight: 600;
     }
+    .batch-item:hover { background: #edf1ed; }
 
-    .batch-item:hover {
-      background: #edf1ed;
-    }
+    .small-button { width: auto; min-height: 40px; padding: 8px 11px; margin: 0; font-size: 14px; }
 
-    .small-button {
-      width: auto;
-      padding: 8px 11px;
-      margin: 0;
-      font-size: 13px;
-    }
+    .sync-line { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-top: 12px; }
+    .sync-line .small-button { margin: 0; }
 
     .consent-panel {
       margin-top: 16px;
       padding: 14px;
-      border: 1px solid #dfe5df;
+      border: 1px solid var(--border);
       border-radius: 10px;
       background: #f8faf8;
       line-height: 1.55;
     }
-
-    .consent-option {
-      display: grid;
-      grid-template-columns: 20px 1fr;
-      gap: 10px;
-      align-items: start;
-      margin: 10px 0;
-      font-weight: 400;
-    }
-
-    .consent-option input[type="checkbox"] {
-      width: 18px;
-      height: 18px;
-      margin: 3px 0 0;
-    }
-
-    .consent-option label {
-      margin: 0;
-      font-weight: 400;
-    }
-
-    .consent-panel a {
-      color: #245a35;
-      text-decoration: underline;
-    }
+    .consent-option { display: grid; grid-template-columns: 24px 1fr; gap: 10px; align-items: start; margin: 12px 0; font-weight: 400; }
+    .consent-option input[type="checkbox"] { width: 22px; height: 22px; min-height: 0; margin: 2px 0 0; padding: 0; }
+    .consent-option label { margin: 0; font-weight: 400; }
+    .consent-panel a { color: var(--brand-hover); text-decoration: underline; }
 
     @media (max-width: 700px) {
-      .grid,
-      .auth-actions,
-      .batch-grid,
-      .batch-actions {
-        grid-template-columns: 1fr;
-      }
+      .grid, .auth-actions, .batch-grid, .batch-actions { grid-template-columns: 1fr; }
+      .stage { grid-template-columns: 34px 1fr; }
+      .stage-status { grid-column: 2; }
+      .qc-row { grid-template-columns: 1fr; }
+      .card { padding: 16px; }
+      body { padding: 18px 10px 40px; }
+    }
 
-      .stage {
-        grid-template-columns: 34px 1fr;
-      }
-
-      .stage-status {
-        grid-column: 2;
-      }
-
-      .qc-row {
-        grid-template-columns: 1fr;
-      }
-
-      body {
-        padding: 18px 10px;
-      }
+    @media (prefers-reduced-motion: reduce) {
+      * { animation-duration: .01ms !important; transition-duration: .01ms !important; }
     }
   </style>
 </head>
 
 <body>
 
-<div class="container">
+<a class="skip-link" href="#main">Aller au contenu principal</a>
+
+<main class="container" id="main" tabindex="-1">
 
   <header>
     <h1>BA Labs — Culture & Batch Tracker</h1>
@@ -425,7 +257,7 @@
        MESSAGES
        ====================================================== -->
 
-  <div id="message"></div>
+  <div id="message" aria-live="polite" aria-atomic="true"></div>
 
 
   <!-- ======================================================
@@ -446,9 +278,7 @@
       Email
     </label>
 
-    <input
-      id="authEmail"
-      type="email"
+    <input id="authEmail" type="email" required inputmode="email" aria-describedby="authStatus"
       autocomplete="email"
       value="ba.labs.redev@gmail.com"
     >
@@ -457,9 +287,7 @@
       Mot de passe
     </label>
 
-    <input
-      id="authPassword"
-      type="password"
+    <input id="authPassword" type="password" required aria-describedby="authStatus"
       autocomplete="current-password"
       placeholder="Mot de passe"
     >
@@ -485,6 +313,8 @@
     <div
       id="authStatus"
       class="info muted"
+      role="status"
+      aria-live="polite"
     >
       Vérification de la session...
     </div>
@@ -512,10 +342,10 @@
     <h2>Nouvelle culture</h2>
 
     <label for="strain">
-      Souche / ressource biologique
+      Souche / ressource biologique<span class="req" aria-hidden="true"> *</span>
     </label>
 
-    <select id="strain">
+    <select id="strain" aria-required="true">
 
       <option value="">
         Chargement...
@@ -533,14 +363,15 @@
 
 
     <label for="cultureCode">
-      Code de culture
+      Code de culture<span class="req" aria-hidden="true"> *</span>
     </label>
 
-    <input
-      id="cultureCode"
+    <input id="cultureCode" aria-required="true"
       type="text"
       placeholder="Ex. CULT-PO-P80-001"
+      aria-describedby="cultureCodeHint"
     >
+    <span class="hint" id="cultureCodeHint">Identifiant unique de la culture, utilisé aussi dans Notion.</span>
 
 
     <div class="grid">
@@ -647,6 +478,11 @@
       Créer la culture
     </button>
 
+    <div class="sync-line">
+      <span id="syncStatus" class="muted" role="status" aria-live="polite">Synchronisation Notion : en attente de connexion.</span>
+      <button id="retrySyncButton" type="button" class="secondary-button small-button hidden">Réessayer la synchronisation Notion</button>
+    </div>
+
   </section>
 
 
@@ -677,11 +513,10 @@
       <div>
 
         <label for="batchCode">
-          Code du batch
-        </label>
+      Code du batch<span class="req" aria-hidden="true"> *</span>
+    </label>
 
-        <input
-          id="batchCode"
+        <input id="batchCode" aria-required="true"
           type="text"
           placeholder="Ex. BATCH-PO-P80-001"
         >
@@ -692,11 +527,10 @@
       <div>
 
         <label for="batchName">
-          Nom du batch
-        </label>
+      Nom du batch<span class="req" aria-hidden="true"> *</span>
+    </label>
 
-        <input
-          id="batchName"
+        <input id="batchName" aria-required="true"
           type="text"
           placeholder="Ex. Grain P80 G1"
         >
@@ -756,10 +590,10 @@
       <div>
 
         <label for="batchCulture">
-          Culture source
-        </label>
+      Culture source<span class="req" aria-hidden="true"> *</span>
+    </label>
 
-        <select id="batchCulture">
+        <select id="batchCulture" aria-required="true">
 
           <option value="">
             Chargement...
@@ -839,9 +673,18 @@
 
       <h3>Étapes du batch</h3>
 
+      <div class="progress" id="stageProgress">
+        <div class="progress-label" id="stageProgressLabel"></div>
+        <div class="progress-track" id="stageProgressTrack" role="progressbar" aria-labelledby="stageProgressLabel" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+          <div class="progress-bar" id="stageProgressBar"></div>
+        </div>
+      </div>
+
       <div
         id="batchStageList"
         class="stage-list"
+        role="list"
+        aria-label="Étapes du batch"
       ></div>
 
       <div class="batch-actions">
@@ -918,7 +761,7 @@
 
   </section>
 
-</div>
+</main>
 
 
 <script>
@@ -1012,6 +855,16 @@ const BATCH_STAGE_LABELS = {
 
   release:
     "Libération"
+
+};
+
+
+const STAGE_STATUS_LABELS = {
+
+  pending: "À venir",
+  active: "En cours",
+  completed: "Terminée",
+  failed: "Échec"
 
 };
 
@@ -1152,10 +1005,27 @@ function showMessage(
   div.className =
     `card ${type}`;
 
+  div.setAttribute(
+    "role",
+    type === "error" || type === "warning"
+      ? "alert"
+      : "status"
+  );
+
   div.textContent =
     text;
 
   message.appendChild(div);
+
+  const reduceMotion =
+    window.matchMedia(
+      "(prefers-reduced-motion: reduce)"
+    ).matches;
+
+  message.scrollIntoView({
+    block: "nearest",
+    behavior: reduceMotion ? "auto" : "smooth"
+  });
 }
 
 
@@ -2259,53 +2129,140 @@ async function getProtocolVersionId(
    CREATION CULTURE
    ============================================================ */
 
+let syncInProgress = false;
+
+
+function setSyncStatus(
+  text,
+  showRetry
+) {
+
+  const statusEl =
+    document.getElementById("syncStatus");
+
+  const retryEl =
+    document.getElementById("retrySyncButton");
+
+  if (statusEl) {
+    statusEl.textContent = text;
+  }
+
+  if (retryEl) {
+    retryEl.classList.toggle(
+      "hidden",
+      !showRetry
+    );
+  }
+}
+
+
 async function syncPendingCultures() {
   if (!organizationId) return;
 
-  const { data: cultures, error } = await supabaseClient
-    .from("cultures")
-    .select("id, code")
-    .eq("organization_id", organizationId)
-    .eq("notion_sync_status", "pending")
-    .is("notion_page_id", null)
-    .order("created_at", { ascending: true })
-    .limit(20);
+  if (syncInProgress) return;
 
-  if (error) {
-    console.error(
-      "Erreur lors du chargement des cultures en attente :",
-      error.message
-    );
-    return;
-  }
+  syncInProgress = true;
 
-  for (const culture of cultures || []) {
-    try {
-      const { data, error: syncError } =
-        await supabaseClient.functions.invoke(
-          "sync-culture-to-notion",
-          { body: { culture_id: culture.id } }
-        );
+  setSyncStatus(
+    "Synchronisation Notion en cours...",
+    false
+  );
 
-      if (syncError || !data?.ok) {
+  try {
+
+    // Les cultures en erreur sont reprises : la fonction serveur est
+    // idempotente (elle retrouve la page Notion existante avant d'en créer une).
+    const { data: cultures, error } = await supabaseClient
+      .from("cultures")
+      .select("id, code")
+      .eq("organization_id", organizationId)
+      .in("notion_sync_status", ["pending", "error"])
+      .order("created_at", { ascending: true })
+      .limit(20);
+
+    if (error) {
+      console.error(
+        "Erreur lors du chargement des cultures à synchroniser :",
+        error.message
+      );
+
+      setSyncStatus(
+        "État de synchronisation Notion indisponible.",
+        true
+      );
+
+      return;
+    }
+
+    let synced = 0;
+    let failed = 0;
+    let lastError = "";
+
+    for (const culture of cultures || []) {
+      try {
+        const { data, error: syncError } =
+          await supabaseClient.functions.invoke(
+            "sync-culture-to-notion",
+            { body: { culture_id: culture.id } }
+          );
+
+        if (syncError || !data?.ok) {
+          failed += 1;
+
+          lastError =
+            data?.error ||
+            syncError?.message ||
+            "Erreur inconnue";
+
+          console.error(
+            "Échec de synchronisation Notion :",
+            culture.code,
+            lastError
+          );
+        } else {
+          synced += 1;
+
+          console.info(
+            "Culture synchronisée avec Notion :",
+            culture.code
+          );
+        }
+      } catch (err) {
+        failed += 1;
+
+        lastError =
+          err?.message ||
+          "Erreur inattendue";
+
         console.error(
-          "Échec de synchronisation Notion :",
+          "Erreur inattendue de synchronisation :",
           culture.code,
-          syncError?.message || data?.error || "Erreur inconnue"
-        );
-      } else {
-        console.info(
-          "Culture synchronisée avec Notion :",
-          culture.code
+          err
         );
       }
-    } catch (err) {
-      console.error(
-        "Erreur inattendue de synchronisation :",
-        culture.code,
-        err
+    }
+
+    if (failed > 0) {
+      setSyncStatus(
+        `Synchronisation Notion : ${failed} culture(s) en échec. Dernière erreur : ${lastError}`,
+        true
+      );
+    } else if (synced > 0) {
+      setSyncStatus(
+        `Synchronisation Notion terminée (${synced} culture(s)).`,
+        false
+      );
+    } else {
+      setSyncStatus(
+        "Synchronisation Notion à jour.",
+        false
       );
     }
+
+  } finally {
+
+    syncInProgress = false;
+
   }
 }
 
@@ -3441,7 +3398,7 @@ function renderBatchStages(
 
       <div class="stage-status ${statusClass}">
         ${escapeHtml(
-          status
+          STAGE_STATUS_LABELS[status] || status
         )}
       </div>
 
@@ -3529,6 +3486,9 @@ function renderBatchQc(
       <select
         data-qc-status="${escapeHtml(
           check.id
+        )}"
+        aria-label="Statut du contrôle ${escapeHtml(
+          check.label || check.check_code
         )}"
       >
 
@@ -4588,6 +4548,133 @@ async function init() {
   }
 
 }
+
+
+/* ============================================================
+   INTERFACE : chargement, accessibilité, progression
+   ============================================================ */
+
+function setupUiEnhancements() {
+
+  const busyLabel =
+    /(\.\.\.|…)\s*$/;
+
+  const syncBusy = (button) => {
+    button.setAttribute(
+      "aria-busy",
+      busyLabel.test(button.textContent.trim())
+        ? "true"
+        : "false"
+    );
+  };
+
+  [
+    "signInButton",
+    "signUpButton",
+    "signOutButton",
+    "createButton",
+    "createBatchButton",
+    "advanceBatchButton",
+    "reloadBatchButton",
+    "releaseBatchButton"
+  ].forEach((id) => {
+    const button = document.getElementById(id);
+
+    if (!button) return;
+
+    new MutationObserver(
+      () => syncBusy(button)
+    ).observe(
+      button,
+      { childList: true, characterData: true, subtree: true }
+    );
+
+    syncBusy(button);
+  });
+
+  new MutationObserver(() => {
+    batchQcList
+      .querySelectorAll(".qc-save")
+      .forEach(syncBusy);
+  }).observe(
+    batchQcList,
+    { childList: true, characterData: true, subtree: true }
+  );
+
+  const stageList =
+    document.getElementById("batchStageList");
+
+  const progressLabel =
+    document.getElementById("stageProgressLabel");
+
+  const progressBar =
+    document.getElementById("stageProgressBar");
+
+  const progressTrack =
+    document.getElementById("stageProgressTrack");
+
+  const updateProgress = () => {
+    const items = [...stageList.children];
+
+    const done = items.filter(
+      (item) => item.classList.contains("completed")
+    ).length;
+
+    items.forEach((item) => {
+      item.setAttribute("role", "listitem");
+
+      if (item.classList.contains("active")) {
+        item.setAttribute("aria-current", "step");
+      } else {
+        item.removeAttribute("aria-current");
+      }
+    });
+
+    const percent =
+      items.length
+        ? Math.round((done / items.length) * 100)
+        : 0;
+
+    progressLabel.textContent =
+      items.length
+        ? `${done} étape(s) terminée(s) sur ${items.length}`
+        : "";
+
+    progressBar.style.width =
+      `${percent}%`;
+
+    progressTrack.setAttribute(
+      "aria-valuenow",
+      String(percent)
+    );
+  };
+
+  new MutationObserver(updateProgress)
+    .observe(stageList, { childList: true });
+
+  authPassword.addEventListener(
+    "keydown",
+    (event) => {
+      if (
+        event.key === "Enter" &&
+        !signInButton.disabled
+      ) {
+        event.preventDefault();
+        signInButton.click();
+      }
+    }
+  );
+
+  document
+    .getElementById("retrySyncButton")
+    .addEventListener(
+      "click",
+      () => syncPendingCultures()
+    );
+}
+
+
+setupUiEnhancements();
 
 
 init();
