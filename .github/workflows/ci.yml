@@ -70,7 +70,8 @@ jobs:
           [ -f LICENSES/MIT.txt ] && echo "✓ LICENSES/MIT.txt" || exit 1
           [ -f LICENSES/CERN-OHL-P-2.0.txt ] && echo "✓ LICENSES/CERN-OHL-P-2.0.txt" || exit 1
       - name: Verify gitignore is present
-        run: [ -f .gitignore ] && echo "✓ .gitignore" || exit 1
+        run: |
+          [ -f .gitignore ] && echo "✓ .gitignore" || exit 1
 
   batch-tracker-audit:
     runs-on: ubuntu-latest
