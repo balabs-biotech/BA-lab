@@ -94,3 +94,32 @@ jobs:
       - name: Verify batch-tracker README covers Notion sync
         run: |
           grep -q "Notion\|sync" batch-tracker/README.md && echo "✓ Notion sync documented" || echo "⚠ Notion sync not documented in README"
+
+  supabase-migrations:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      PGHOST: localhost
+      PGUSER: postgres
+      PGPASSWORD: postgres
+      PGDATABASE: postgres
+    steps:
+      - uses: actions/checkout@v4
+      - name: Versioned SQL and function sources must not be empty
+        run: |
+          for f in supabase/migrations/*.sql supabase/tests/*.sql supabase/functions/*/index.ts; do
+            [ -s "$f" ] && echo "✓ $f" || { echo "empty file: $f" >&2; exit 1; }
+          done
+      - name: Test notion_* protection migration on PostgreSQL 16
+        run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/protect_cultures_notion_cols.test.sql
