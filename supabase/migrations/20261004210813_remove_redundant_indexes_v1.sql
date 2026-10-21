@@ -1,0 +1,7 @@
+drop index if exists public.batch_stages_org_batch_idx;
+drop index if exists public.cultures_organization_id_experiment_id_fkey_idx;
+drop index if exists public.cultures_organization_id_material_id_fkey_idx;
+drop index if exists public.materials_organization_id_parent_material_id_fkey_idx;
+drop index if exists public.materials_organization_id_strain_id_fkey_idx;
+drop index if exists public.measurements_organization_id_culture_id_fkey_idx;
+drop index if exists public.measurements_organization_id_sample_id_fkey_idx;

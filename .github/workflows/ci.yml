@@ -128,3 +128,41 @@ jobs:
           node-version: "22"
       - name: Test sync-culture-to-notion (mocked Supabase and Notion, no network)
         run: node --experimental-strip-types supabase/tests/sync-culture-to-notion.test.mts
+
+  supabase-migration-replay:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      PGHOST: localhost
+      PGUSER: postgres
+      PGPASSWORD: postgres
+      PGDATABASE: postgres
+    steps:
+      - uses: actions/checkout@v4
+      - name: Bootstrap Supabase auth roles
+        run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/migration_replay_bootstrap.sql
+      - name: Replay every versioned migration in timestamp order
+        run: |
+          set -eu
+          count=0
+          for f in $(find supabase/migrations -maxdepth 1 -type f -name '*.sql' | sort); do
+            echo "Applying $f"
+            psql -v ON_ERROR_STOP=1 -X -q -f "$f"
+            count=$((count + 1))
+          done
+          test "$count" -ge 25
+          echo "Replayed $count migration files successfully"
+      - name: Verify expected schema after replay
+        run: |
+          psql -At -v ON_ERROR_STOP=1 -X -q -c "select to_regclass('public.cultures'), to_regclass('public.batches'), to_regclass('public.culture_data_consents')" | grep -q 'cultures'
