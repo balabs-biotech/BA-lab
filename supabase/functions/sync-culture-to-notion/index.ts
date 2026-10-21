@@ -67,28 +67,27 @@ function pageBelongsToCulture(page: Record<string, any>, databaseId: string, cul
 }
 
 // Reconciliation before creating: a page may already exist if a previous run
-// created it but could not save notion_page_id in Supabase. Best effort only.
+// created it but could not save notion_page_id in Supabase.
+// This lookup guards against duplicates, so it must never fail open: if Notion
+// cannot answer, or answers ambiguously, the sync stops instead of creating.
 async function findPageByCultureId(headers: Record<string, string>, databaseId: string, cultureId: string) {
-  try {
-    const response = await fetch(`https://api.notion.com/v1/databases/${databaseId}/query`, {
-      method: "POST",
-      headers,
-      body: JSON.stringify({
-        filter: { property: "Supabase Culture ID", rich_text: { equals: cultureId } },
-        page_size: 1,
-      }),
-    });
-    if (!response.ok) {
-      console.error("sync-culture-to-notion: reconcile query failed", response.status);
-      return null;
-    }
-    const result = await response.json();
-    const page = result.results?.[0];
-    return page && pageBelongsToCulture(page, databaseId, cultureId) ? page : null;
-  } catch (error) {
-    console.error("sync-culture-to-notion: reconcile query error", error instanceof Error ? error.message : error);
-    return null;
+  const response = await fetch(`https://api.notion.com/v1/databases/${databaseId}/query`, {
+    method: "POST",
+    headers,
+    body: JSON.stringify({
+      filter: { property: "Supabase Culture ID", rich_text: { equals: cultureId } },
+      page_size: 2,
+    }),
+  });
+  if (!response.ok) {
+    throw new Error(`Notion lookup failed (${response.status}); no page was created to avoid a duplicate.`);
   }
+  const result = await response.json();
+  const pages = (result.results ?? []).filter((page: Record<string, any>) => pageBelongsToCulture(page, databaseId, cultureId));
+  if (pages.length > 1) {
+    throw new Error("Several Notion pages already carry this Supabase Culture ID; resolve the duplicate manually.");
+  }
+  return pages[0] ?? null;
 }
 
 Deno.serve(async (req: Request) => {
