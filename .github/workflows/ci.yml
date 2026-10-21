@@ -99,7 +99,7 @@ jobs:
     runs-on: ubuntu-latest
     services:
       postgres:
-        image: postgres:16
+        image: postgres:17
         env:
           POSTGRES_PASSWORD: postgres
         ports:
@@ -121,8 +121,10 @@ jobs:
           for f in supabase/migrations/*.sql supabase/tests/* supabase/functions/*/index.ts; do
             [ -s "$f" ] && echo "✓ $f" || { echo "empty file: $f" >&2; exit 1; }
           done
-      - name: Test notion_* protection migration on PostgreSQL 16
+      - name: Test notion_* protection migration on PostgreSQL 17
         run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/protect_cultures_notion_cols.test.sql
+      - name: Test batch workflow protection migration on PostgreSQL 17
+        run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/protect_batch_workflow.test.sql
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
