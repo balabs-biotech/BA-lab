@@ -18,7 +18,7 @@ drop table if exists public.batch_qc_templates cascade;
 drop table if exists public.batch_stages cascade;
 drop table if exists public.events cascade;
 drop table if exists public.batches cascade;
-create table public.organization_members(organization_id uuid, user_id uuid);
+create table if not exists public.organization_members(organization_id uuid, user_id uuid);
 create or replace function private.is_org_member(p_org uuid) returns boolean
   language sql stable security definer set search_path = pg_catalog, public
   as $$ select exists (select 1 from public.organization_members om
