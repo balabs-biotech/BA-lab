@@ -154,6 +154,10 @@ begin
       new.checked_by := auth.uid();
       new.checked_at := now();
     end if;
+  else
+    -- Les clients ne peuvent pas falsifier l'auteur/la date sans changer le résultat.
+    new.checked_by := old.checked_by;
+    new.checked_at := old.checked_at;
   end if;
   return new;
 end
