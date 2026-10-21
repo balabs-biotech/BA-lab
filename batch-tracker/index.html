@@ -3570,7 +3570,68 @@ function renderBatchQc(
    ENREGISTREMENT QC
    ============================================================ */
 
+const qcSavesInFlight =
+  new Set();
+
+
 async function saveQcCheck(
+  checkId
+) {
+
+  if (qcSavesInFlight.has(checkId)) {
+
+    return;
+
+  }
+
+  qcSavesInFlight.add(checkId);
+
+  const button =
+    batchQcList.querySelector(
+      `[data-qc-save="${CSS.escape(checkId)}"]`
+    );
+
+  const label =
+    button
+      ? button.textContent
+      : "";
+
+  if (button) {
+
+    button.disabled = true;
+
+    button.textContent =
+      "Enregistrement...";
+
+  }
+
+  try {
+
+    await saveQcCheckNow(
+      checkId
+    );
+
+  }
+
+  finally {
+
+    qcSavesInFlight.delete(checkId);
+
+    // Après un enregistrement réussi la liste est re-rendue : l'ancien bouton n'est plus dans le DOM.
+    if (button && button.isConnected) {
+
+      button.disabled = false;
+
+      button.textContent = label;
+
+    }
+
+  }
+
+}
+
+
+async function saveQcCheckNow(
   checkId
 ) {
 

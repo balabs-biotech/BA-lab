@@ -118,8 +118,13 @@ jobs:
       - uses: actions/checkout@v4
       - name: Versioned SQL and function sources must not be empty
         run: |
-          for f in supabase/migrations/*.sql supabase/tests/*.sql supabase/functions/*/index.ts; do
+          for f in supabase/migrations/*.sql supabase/tests/* supabase/functions/*/index.ts; do
             [ -s "$f" ] && echo "✓ $f" || { echo "empty file: $f" >&2; exit 1; }
           done
       - name: Test notion_* protection migration on PostgreSQL 16
         run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/protect_cultures_notion_cols.test.sql
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Test sync-culture-to-notion (mocked Supabase and Notion, no network)
+        run: node --experimental-strip-types supabase/tests/sync-culture-to-notion.test.mts
