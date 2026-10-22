@@ -2122,6 +2122,7 @@ async function loadLatestBatches() {
         status,
         current_stage,
         culture_id,
+        environment_id,
         material_id,
         planned_at,
         quantity_planned,
