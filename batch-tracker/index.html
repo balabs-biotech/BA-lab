@@ -3708,6 +3708,7 @@ async function loadCultureOptions() {
 
   renderCultureCatalog();
   renderMeasurementTargets();
+  renderStatisticsFilters();
   updateOverview();
 
   batchCultureSelect.innerHTML =
@@ -6206,7 +6207,7 @@ async function loadStatistics() {
     if (period !== "all") { const since = new Date(); since.setDate(since.getDate() - Number(period)); query = query.gte("measured_at", since.toISOString()); }
     const {data,error} = await query; if (error) throw new Error(error.message);
     const rows = data || [], variable = measurementVariables.find(item => item.code === variableCode), cultureById = new Map(cultureOptions.map(culture => [culture.id,culture]));
-    const prepared = rows.map(row => { const normalized = row.normalized_value !== null && row.normalized_value !== undefined && row.normalized_unit_code; return {...row, plotValue:Number(normalized ? row.normalized_value : row.raw_value), plotUnit:normalized ? row.normalized_unit_code : row.raw_unit_code, normalized:Boolean(normalized)}; }).filter(row => Number.isFinite(row.plotValue));
+    const prepared = rows.map(row => { const normalized = row.normalized_value !== null && row.normalized_value !== undefined && row.normalized_value !== "" && row.normalized_unit_code; const raw = normalized ? row.normalized_value : row.raw_value; const hasValue = raw !== null && raw !== undefined && raw !== "" && typeof raw !== "boolean"; return {...row, plotValue:hasValue ? Number(raw) : NaN, plotUnit:normalized ? row.normalized_unit_code : row.raw_unit_code, normalized:Boolean(normalized)}; }).filter(row => Number.isFinite(row.plotValue));
     const canonical = variable?.canonical_unit_code;
     const plotted = canonical ? prepared.filter(row => row.plotUnit === canonical) : (prepared[0]?.plotUnit ? prepared.filter(row => row.plotUnit === prepared[0].plotUnit) : []);
     const excluded = prepared.length - plotted.length;
