@@ -59,6 +59,13 @@
     return denominator ? numerator / denominator : null;
   }
 
+  function resolveBatchId(row, eventToBatch, cultureToBatch, sampleToBatch) {
+    if (row.event_id) return eventToBatch.get(row.event_id) || null;
+    if (row.culture_id) return cultureToBatch.get(row.culture_id) || null;
+    if (row.sample_id) return sampleToBatch.get(row.sample_id) || null;
+    return null;
+  }
+
   function convertUnit(value, fromUnit, toUnit, dimension) {
     if (!Number.isFinite(value) || !fromUnit || !toUnit) return null;
     if (fromUnit.code === toUnit.code) return value;
@@ -92,6 +99,7 @@
     summarize: summarize,
     detectOutlierIds: detectOutlierIds,
     pearson: pearson,
-    convertUnit: convertUnit
+    convertUnit: convertUnit,
+    resolveBatchId: resolveBatchId
   };
 })(typeof window !== "undefined" ? window : globalThis);
