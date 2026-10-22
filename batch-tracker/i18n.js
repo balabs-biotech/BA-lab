@@ -1223,7 +1223,7 @@
       "Enter the planned quantity or clear the selected unit.",
       "Introduza a quantidade prevista ou limpe a unidade selecionada.",
       "أدخل الكمية المخططة أو ألغِ تحديد الوحدة."
-    ],
+    ]
   ];
   for (const [fr, en, pt, ar] of supplementalCoverage) {
     dictionaries.en[fr] ||= en;
