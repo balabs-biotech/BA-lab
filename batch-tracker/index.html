@@ -6234,7 +6234,7 @@ async function loadStatistics() {
       batchEventIds = (batchEvents || []).map(event => event.id);
     }
     if (cultureId) {
-      const {data: cultureBatches, error: cultureBatchesError} = await supabaseClient.from("batches").select("id").eq("organization_id", organizationId).eq("culture_id", cultureId).limit(100);
+      const {data: cultureBatches, error: cultureBatchesError} = await supabaseClient.from("batches").select("id").eq("organization_id", organizationId).eq("culture_id", cultureId).order("created_at", {ascending:false}).limit(1000);
       if (cultureBatchesError) throw new Error("Chargement des lots liés à la culture impossible : " + cultureBatchesError.message);
       if (requestId !== statisticsRequestId) return;
       const cultureBatchIds = (cultureBatches || []).map(batch => batch.id);
