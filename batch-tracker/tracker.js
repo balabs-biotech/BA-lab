@@ -4671,6 +4671,7 @@ function comparisonLocale() {
 }
 
 let lotComparisonRequestId = 0;
+let lotComparisonHasRun = false;
 
 function renderComparisonBatchOptions() {
   const picker = document.getElementById("compareBatchPicker");
@@ -4792,6 +4793,7 @@ async function loadLotComparison() {
     status.textContent = comparisonText("La sélection a changé. Actualisez la liste des lots et réessayez.", "The selection has changed. Refresh the batch list and try again.", "A seleção mudou. Atualize a lista de lotes e tente novamente.", "تغير التحديد. حدّث قائمة الدفعات وحاول مرة أخرى.");
     return;
   }
+  lotComparisonHasRun = true;
   const fromDate = document.getElementById("compareFromDate").value;
   const toDate = document.getElementById("compareToDate").value;
   if (fromDate && toDate && fromDate > toDate) {
@@ -5042,6 +5044,11 @@ async function loadLotComparison() {
     }
   }
 }
+
+window.addEventListener("ba-labs-language-change", () => {
+  renderComparisonBatchOptions();
+  if (lotComparisonHasRun) loadLotComparison();
+});
 
 async function loadBiologicalLineage(cultureId) {
   const target = document.getElementById('cultureLineage');
