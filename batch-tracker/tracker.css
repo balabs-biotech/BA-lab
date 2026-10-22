@@ -1628,3 +1628,67 @@ html[data-domain="agronomy"] body #authStatus {
   opacity: 1 !important;
   text-shadow: none !important;
 }
+
+
+/* Mycology: readable empty states and connection messages on the warm light palette. */
+body[data-domain="mycology"] #authStatus,
+body[data-domain="mycology"] #batchList > .info,
+body[data-domain="mycology"] #syncStatus,
+body[data-domain="mycology"] #message .card {
+  background: #fff7ed !important;
+  background-image: none !important;
+  color: #30251d !important;
+  -webkit-text-fill-color: #30251d !important;
+  border: 1px solid #c17a52 !important;
+  opacity: 1 !important;
+  text-shadow: none !important;
+}
+body[data-domain="mycology"] #authStatus.success,
+body[data-domain="mycology"] #batchList > .info.success,
+body[data-domain="mycology"] #message .card.success {
+  background: #f3e8dc !important;
+  color: #50341f !important;
+  -webkit-text-fill-color: #50341f !important;
+  border-color: #b8794e !important;
+}
+body[data-domain="mycology"] #authStatus.error,
+body[data-domain="mycology"] #batchList > .info.error,
+body[data-domain="mycology"] #message .card.error {
+  background: #fff0ed !important;
+  color: #782d25 !important;
+  -webkit-text-fill-color: #782d25 !important;
+  border-color: #bd6558 !important;
+}
+
+/* Laboratory: keep every operational accent in the blue palette, including status indicators. */
+body[data-domain="laboratory"] {
+  --ok: #215b91 !important;
+  --brand: #215b91 !important;
+  --brand-hover: #174875 !important;
+  --focus: #0a70c4 !important;
+  accent-color: #215b91;
+}
+body[data-domain="laboratory"] .success,
+body[data-domain="laboratory"] .overview-live,
+body[data-domain="laboratory"] .status-pulse {
+  background-color: #e4eef7 !important;
+  border-color: #9bbbd7 !important;
+  color: #174875 !important;
+}
+body[data-domain="laboratory"] .success,
+body[data-domain="laboratory"] .success *,
+body[data-domain="laboratory"] .overview-live,
+body[data-domain="laboratory"] .overview-live * {
+  color: #174875 !important;
+  -webkit-text-fill-color: #174875 !important;
+}
+body[data-domain="laboratory"] :is(.overview-live span, .status-pulse, .status-indicator, .status-dot, .live-dot, .progress-bar) {
+  background: #397eb6 !important;
+  background-image: none !important;
+}
+body[data-domain="laboratory"] .req,
+body[data-domain="laboratory"] .culture-catalog-meta span:first-child,
+body[data-domain="laboratory"] .culture-catalog-code,
+body[data-domain="laboratory"] .statistics-summary-item strong {
+  color: #215b91 !important;
+}
