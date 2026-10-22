@@ -2937,6 +2937,9 @@ function renderBatchInfo(
         }`;
 
 
+  const locationName = batchLocationOptions.find(location => location.id === batch.location_id)?.name || "—";
+  const environmentName = batchEnvironmentOptions.find(environment => environment.id === batch.environment_id)?.name || "—";
+
   batchInfo.className =
     "info";
 
@@ -3045,6 +3048,20 @@ function renderBatchInfo(
           )}
         </div>
 
+      </div>
+
+      <div class="batch-stat">
+        <div class="batch-stat-label">Emplacement</div>
+        <div class="batch-stat-value">
+          ${escapeHtml(locationName)}
+        </div>
+      </div>
+
+      <div class="batch-stat">
+        <div class="batch-stat-label">Environnement</div>
+        <div class="batch-stat-value">
+          ${escapeHtml(environmentName)}
+        </div>
       </div>
 
     </div>
