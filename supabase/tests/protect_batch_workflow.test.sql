@@ -76,8 +76,8 @@ values ('00000000-0000-0000-0000-0000000000a1','test','appearance','Appearance',
 
 \i supabase/migrations/20261021090000_protect_batch_workflow_v1.sql
 \i supabase/migrations/20261021090000_protect_batch_workflow_v1.sql
-\i supabase/migrations/20261022100000_add_atomic_batch_movement_rpc.sql
-\i supabase/migrations/20261022110000_enable_category_batch_workflows.sql
+\i supabase/migrations/20261022221934_add_atomic_batch_movement_rpc.sql
+\i supabase/migrations/20261022221939_enable_category_batch_workflows.sql
 
 select set_config('request.jwt.claim.sub','00000000-0000-0000-0000-0000000000b1',false);
 set role authenticated;
