@@ -21,4 +21,14 @@ assert.equal(api.detectOutlierIds([{ id: "a", value: 1 }, { id: "b", value: 2 },
 assert.ok(Math.abs(api.pearson([{x:1,y:2},{x:2,y:4},{x:3,y:6},{x:4,y:8}]) - 1) < 1e-12);
 assert.equal(api.pearson([{x:1,y:2},{x:2,y:2},{x:3,y:2},{x:4,y:2}]), null);
 assert.equal(api.pearson([{x:1,y:2},{x:2,y:4},{x:3,y:6}]), null);
-console.log("✓ median, descriptive statistics, IQR outliers and Pearson guard tests passed");
+const kg = { code: "kg", dimension: "mass", factor: 1000, offset_value: 0, is_linear: true };
+const g = { code: "g", dimension: "mass", factor: 1, offset_value: 0, is_linear: true };
+assert.equal(api.convertUnit(1, kg, g, "mass"), 1000);
+const kelvin = { code: "K", dimension: "temperature", factor: 1, offset_value: 0, is_linear: true };
+const celsius = { code: "degC", dimension: "temperature", factor: 1, offset_value: 0, is_linear: true };
+assert.ok(Math.abs(api.convertUnit(273.15, kelvin, celsius, "temperature")) < 1e-12);
+assert.ok(Math.abs(api.convertUnit(0, celsius, kelvin, "temperature") - 273.15) < 1e-12);
+const phA = { code: "pH-a", dimension: "pH", factor: 1, offset_value: 0, is_linear: false };
+const phB = { code: "pH-b", dimension: "pH", factor: 1, offset_value: 0, is_linear: false };
+assert.equal(api.convertUnit(7, phA, phB, "pH"), null);
+console.log("✓ median, descriptive statistics, IQR outliers, Pearson guards and unit conversion tests passed");
