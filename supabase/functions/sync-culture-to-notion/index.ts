@@ -27,6 +27,11 @@ function normalizeNotionId(raw: string | null | undefined): string | null {
   return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
 }
 
+// Bound external requests so a stalled Notion call cannot hold a sync claim indefinitely.
+async function notionFetch(input: string | URL, init: RequestInit = {}) {
+  return fetch(input, { ...init, signal: AbortSignal.timeout(15_000) });
+}
+
 function richText(value: unknown) {
   const text = value == null ? "" : String(value);
   return text ? [{ type: "text", text: { content: text.slice(0, 1900) } }] : [];
@@ -71,7 +76,7 @@ function pageBelongsToCulture(page: Record<string, any>, databaseId: string, cul
 // This lookup guards against duplicates, so it must never fail open: if Notion
 // cannot answer, or answers ambiguously, the sync stops instead of creating.
 async function findPageByCultureId(headers: Record<string, string>, databaseId: string, cultureId: string) {
-  const response = await fetch(`https://api.notion.com/v1/databases/${databaseId}/query`, {
+  const response = await notionFetch(`https://api.notion.com/v1/databases/${databaseId}/query`, {
     method: "POST",
     headers,
     body: JSON.stringify({
@@ -137,6 +142,21 @@ Deno.serve(async (req: Request) => {
     if (accessError || !allowedCulture) return json({ error: "Culture not found or access denied." }, 404);
     cultureIdForError = allowedCulture.id;
     organizationIdForError = allowedCulture.organization_id;
+
+    // Serialize sync requests across tabs, devices and external callers.
+    const requestedClaimToken = crypto.randomUUID();
+    const { data: claimAcquired, error: claimError } = await adminClient.rpc("claim_notion_sync", {
+      p_organization_id: allowedCulture.organization_id,
+      p_culture_id: allowedCulture.id,
+      p_claim_token: requestedClaimToken,
+    });
+    if (claimError) throw new Error(`Could not acquire Notion sync claim: ${claimError.message}`);
+    if (claimAcquired !== true) {
+      return json({ error: "A sync for this culture is already in progress. Retry shortly." }, 409);
+    }
+    claimCultureId = allowedCulture.id;
+    claimOrganizationId = allowedCulture.organization_id;
+    claimToken = requestedClaimToken;
 
     const { data: culture, error: cultureError } = await adminClient
       .from("cultures")
@@ -208,7 +228,7 @@ Deno.serve(async (req: Request) => {
     // 1) Trust the stored page id only if it really is this culture's page.
     let existing: Record<string, any> | null = null;
     if (culture.notion_page_id) {
-      const response = await fetch(`https://api.notion.com/v1/pages/${encodeURIComponent(culture.notion_page_id)}`, {
+      const response = await notionFetch(`https://api.notion.com/v1/pages/${encodeURIComponent(culture.notion_page_id)}`, {
         method: "GET",
         headers: notionHeaders,
       });
@@ -222,7 +242,7 @@ Deno.serve(async (req: Request) => {
 
     let page: Record<string, any>;
     if (existing) {
-      const response = await fetch(`https://api.notion.com/v1/pages/${existing.id}`, {
+      const response = await notionFetch(`https://api.notion.com/v1/pages/${existing.id}`, {
         method: "PATCH",
         headers: notionHeaders,
         body: JSON.stringify({ properties: notionProperties(record, existing.url) }),
@@ -231,7 +251,7 @@ Deno.serve(async (req: Request) => {
       if (!response.ok) throw new Error(result.message ?? `Notion update failed (${response.status}).`);
       page = result;
     } else {
-      const response = await fetch("https://api.notion.com/v1/pages", {
+      const response = await notionFetch("https://api.notion.com/v1/pages", {
         method: "POST",
         headers: notionHeaders,
         body: JSON.stringify({
@@ -250,7 +270,7 @@ Deno.serve(async (req: Request) => {
 
       // Best effort: store the page link. A failure here is harmless.
       if (page.url) {
-        await fetch(`https://api.notion.com/v1/pages/${page.id}`, {
+        await notionFetch(`https://api.notion.com/v1/pages/${page.id}`, {
           method: "PATCH",
           headers: notionHeaders,
           body: JSON.stringify({ properties: { "Record URL": { url: page.url } } }),
@@ -286,5 +306,14 @@ Deno.serve(async (req: Request) => {
         .eq("organization_id", organizationIdForError);
     }
     return json({ error: message }, 502);
+  } finally {
+    if (claimCultureId && claimOrganizationId && claimToken) {
+      const { error: releaseError } = await adminClient.rpc("release_notion_sync_claim", {
+        p_organization_id: claimOrganizationId,
+        p_culture_id: claimCultureId,
+        p_claim_token: claimToken,
+      });
+      if (releaseError) console.error("Could not release Notion sync claim:", releaseError.message);
+    }
   }
 });
