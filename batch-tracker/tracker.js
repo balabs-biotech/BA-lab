@@ -5855,6 +5855,33 @@ function setupDomainWorkspaces() {
 }
 setupDomainWorkspaces();
 setupProgressiveCultureEntry();
+setupBioOperationFormGuidance();
+
+
+/* Only operations that can create descendants expose descendant-code entry. */
+function setupBioOperationFormGuidance() {
+  const operation = document.getElementById("bioOperationType");
+  const field = document.getElementById("bioChildCodesField");
+  const codes = document.getElementById("bioChildCodes");
+  if (!operation || !field || !codes) return;
+
+  const operationsWithDescendants = new Set([
+    "repiquage",
+    "passage",
+    "transfert",
+    "division_aliquotes",
+    "changement_milieu",
+    "conservation"
+  ]);
+  const update = () => {
+    const allowed = operationsWithDescendants.has(operation.value);
+    field.hidden = !allowed;
+    codes.disabled = !allowed;
+    if (!allowed) codes.value = "";
+  };
+  operation.addEventListener("change", update);
+  update();
+}
 
 
 /* Progressive disclosure: reveal the next capture step only after the current identity is complete. */
