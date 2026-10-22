@@ -43,11 +43,11 @@ create table public.batch_qc_templates(
   id uuid primary key default gen_random_uuid(), organization_id uuid not null,
   batch_type text not null, check_code text not null, label text not null,
   default_unit_code text, required boolean not null default true, sequence_no integer not null default 1);
-create table public.materials(
+create table if not exists public.materials(
   id uuid primary key, organization_id uuid not null, material_code text not null);
-create table public.cultures(
+create table if not exists public.cultures(
   id uuid primary key, organization_id uuid not null, material_id uuid not null);
-create table public.protocol_versions(
+create table if not exists public.protocol_versions(
   id uuid primary key, organization_id uuid not null);
 create table public.locations(
   id uuid primary key, organization_id uuid not null, name text not null);
