@@ -1573,3 +1573,30 @@ body[data-domain="agronomy"] #message .card.warning {
   color: #ffe2a0 !important;
   border-color: #8d7541 !important;
 }
+
+
+/* Fix the two remaining pale status panels in the Green Tech dark theme. */
+body[data-domain="agronomy"] #authCard #authStatus.info.muted,
+body[data-domain="agronomy"] #batchCard #batchList .info.muted,
+body[data-domain="agronomy"] .card .batch-list .info,
+body[data-domain="agronomy"] .card .info.muted {
+  background: #222f28 !important;
+  background-image: none !important;
+  color: #f1f5ef !important;
+  border: 1px solid #506657 !important;
+  -webkit-text-fill-color: #f1f5ef !important;
+}
+body[data-domain="agronomy"] #authCard #authStatus.info.muted.success,
+body[data-domain="agronomy"] #batchCard #batchList .info.muted.success {
+  background: #203b2a !important;
+  color: #c8ff91 !important;
+  border-color: #527c55 !important;
+  -webkit-text-fill-color: #c8ff91 !important;
+}
+body[data-domain="agronomy"] #authCard #authStatus.info.muted.error,
+body[data-domain="agronomy"] #batchCard #batchList .info.muted.error {
+  background: #402724 !important;
+  color: #ffd2ca !important;
+  border-color: #a65c50 !important;
+  -webkit-text-fill-color: #ffd2ca !important;
+}
