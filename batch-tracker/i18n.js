@@ -808,10 +808,10 @@
     // Keep the remainder untouched and require a word boundary to avoid
     // replacing unrelated strings that merely begin with the same letters.
     for (const [key, translated] of Object.entries(dict)) {
-      if (!/\\s$/.test(key)) continue;
+      if (!/\s$/.test(key)) continue;
       const prefix = normalize(key);
       if (!prefix || !source.startsWith(prefix + " ")) continue;
-      const leading = (value.match(/^\\s*/) || [""])[0];
+      const leading = (value.match(/^\s*/) || [""])[0];
       const body = value.slice(leading.length);
       const originalPrefix = body.slice(0, body.indexOf(prefix) + prefix.length);
       if (normalize(originalPrefix) !== prefix) continue;
