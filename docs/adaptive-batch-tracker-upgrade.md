@@ -38,11 +38,10 @@ A static regression assertion was added to `scripts/check-batch-tracker-js.mjs`.
 
 ## Next implementation sequence
 
-1. Validate the current comparison logic and unit warning.
-2. Map harvest/yield and physical movement concepts onto existing `batches`, `events`, `locations`, and `environments`; inspect the deployed schema/RPC permissions before changing SQL.
-3. Implement the smallest coherent workflow behind the existing UI and organization/RLS protections.
-4. Add migration replay and regression tests; keep all changes on this branch until verified.
-5. Only then open a pull request for review. Do not merge to `main` or apply database migrations automatically.
+1. Validate the latest comparison, harvest-entry, controlled-unit and biological-operation form changes in CI.
+2. Review stage sequences by batch category. The current workflow still shares the standard stage sequence; any specialization must preserve the protected workflow RPCs and be covered by SQL migration replay and regression tests.
+3. Audit location and movement fields against the actual `locations`, `environments`, `batches` and `events` schema before adding movement UI.
+4. Keep changes on this branch until checks pass. Do not merge to `main` or apply database migrations automatically.
 
 ## Licensing note
 
