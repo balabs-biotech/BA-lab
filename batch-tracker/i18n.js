@@ -593,6 +593,180 @@
     "excluded",
     "excluída",
     "مستبعدة"
+  ],
+  [
+    "Impossible de charger l’historique des mesures. L’enregistrement reste disponible.",
+    "Could not load measurement history. Recording is still available.",
+    "Não foi possível carregar o histórico de medições. O registo continua disponível.",
+    "تعذّر تحميل سجل القياسات. لا يزال التسجيل متاحًا."
+  ],
+  [
+    "Impossible de charger l’historique des observations. L’enregistrement reste disponible.",
+    "Could not load observation history. Recording is still available.",
+    "Não foi possível carregar o histórico de observações. O registo continua disponível.",
+    "تعذّر تحميل سجل الملاحظات. لا يزال التسجيل متاحًا."
+  ],
+  [
+    "Le catalogue des mesures est indisponible ; les modules de culture et de production restent utilisables.",
+    "The measurement catalogue is unavailable; culture and production modules remain usable.",
+    "O catálogo de medições está indisponível; os módulos de cultura e produção continuam disponíveis.",
+    "كتالوج القياسات غير متاح؛ لا تزال وحدات الزراعة والإنتاج قابلة للاستخدام."
+  ],
+  [
+    "Le catalogue des observations est indisponible ; les modules de culture et de production restent utilisables.",
+    "The observation catalogue is unavailable; culture and production modules remain usable.",
+    "O catálogo de observações está indisponível; os módulos de cultura e produção continuam disponíveis.",
+    "كتالوج الملاحظات غير متاح؛ لا تزال وحدات الزراعة والإنتاج قابلة للاستخدام."
+  ],
+  [
+    "Aucune variable disponible",
+    "No variables available",
+    "Nenhuma variável disponível",
+    "لا توجد متغيرات متاحة"
+  ],
+  [
+    "Toutes les cultures accessibles",
+    "All accessible cultures",
+    "Todas as culturas acessíveis",
+    "جميع المزارع المتاحة"
+  ],
+  [
+    "Culture sans code",
+    "Culture without a code",
+    "Cultura sem código",
+    "مزرعة بلا رمز"
+  ],
+  [
+    "Tous les lots chargés",
+    "All loaded batches",
+    "Todos os lotes carregados",
+    "جميع الدفعات المحمّلة"
+  ],
+  [
+    "Lot sans code",
+    "Batch without a code",
+    "Lote sem código",
+    "دفعة بلا رمز"
+  ],
+  [
+    "Aucune culture ne correspond à cette recherche.",
+    "No cultures match this search.",
+    "Nenhuma cultura corresponde a esta pesquisa.",
+    "لا توجد مزارع تطابق هذا البحث."
+  ],
+  [
+    "Aucune culture chargée. Créez une culture avec le formulaire ci-dessus.",
+    "No cultures loaded. Create a culture using the form above.",
+    "Nenhuma cultura carregada. Crie uma cultura através do formulário acima.",
+    "لم يتم تحميل أي مزرعة. أنشئ مزرعة باستخدام النموذج أعلاه."
+  ],
+  [
+    "Type non renseigné",
+    "Type not specified",
+    "Tipo não indicado",
+    "النوع غير محدد"
+  ],
+  [
+    "Démarrage : ",
+    "Started: ",
+    "Início: ",
+    "تاريخ البدء: "
+  ],
+  [
+    "Date de démarrage non renseignée",
+    "Start date not specified",
+    "Data de início não indicada",
+    "تاريخ البدء غير محدد"
+  ],
+  [
+    "＋ Observer",
+    "＋ Observe",
+    "＋ Observar",
+    "＋ ملاحظة"
+  ],
+  [
+    "Ajouter une observation à ",
+    "Add an observation to ",
+    "Adicionar uma observação a ",
+    "إضافة ملاحظة إلى "
+  ],
+  [
+    "cette culture",
+    "this culture",
+    "esta cultura",
+    "هذه المزرعة"
+  ],
+  [
+    "＋ Mesurer",
+    "＋ Measure",
+    "＋ Medir",
+    "＋ قياس"
+  ],
+  [
+    "Ajouter une mesure à ",
+    "Add a measurement to ",
+    "Adicionar uma medição a ",
+    "إضافة قياس إلى "
+  ],
+  [
+    "Voir la fiche et l’historique",
+    "View record and history",
+    "Ver ficha e histórico",
+    "عرض السجل والتاريخ"
+  ],
+  [
+    "Aucune mesure enregistrée pour le moment.",
+    "No measurements recorded yet.",
+    "Ainda não foram registadas medições.",
+    "لم تُسجّل قياسات بعد."
+  ],
+  [
+    "Aucune observation enregistrée pour le moment.",
+    "No observations recorded yet.",
+    "Ainda não foram registadas observações.",
+    "لم تُسجّل ملاحظات بعد."
+  ],
+  [
+    "Sélectionner une catégorie…",
+    "Select a category…",
+    "Selecionar uma categoria…",
+    "اختر فئة…"
+  ],
+  [
+    "Aucune catégorie disponible",
+    "No categories available",
+    "Nenhuma categoria disponível",
+    "لا توجد فئات متاحة"
+  ],
+  [
+    "Culture absente du périmètre chargé.",
+    "Culture is outside the loaded scope.",
+    "A cultura não está no âmbito carregado.",
+    "المزرعة خارج نطاق البيانات المحمّلة."
+  ],
+  [
+    "Fiche ouverte",
+    "Open record",
+    "Ficha aberta",
+    "السجل المفتوح"
+  ],
+  [
+    "Cultures parentes",
+    "Parent cultures",
+    "Culturas progenitoras",
+    "المزارع الأم"
+  ],
+  [
+    "Aucun ascendant ou descendant enregistré dans les fiches de culture. L’origine matérielle initiale reste indiquée par l’identifiant matériel de la fiche.",
+    "No ancestors or descendants are recorded in the culture records. The initial material origin remains indicated by the record's material ID.",
+    "Não há ascendentes ou descendentes registados nas fichas de cultura. A origem material inicial continua indicada pelo identificador do material.",
+    "لا توجد أسلاف أو فروع مسجلة في سجلات المزارع. يظل أصل المادة الأولي موضحًا بمعرّف المادة في السجل."
+  ],
+  [
+    "Filiation partielle : limite de 1 000 cultures atteinte.",
+    "Partial lineage: the 1,000-culture limit was reached.",
+    "Filiação parcial: foi atingido o limite de 1 000 culturas.",
+    "النسب جزئي: تم بلوغ حد 1000 مزرعة."
   ]
 ];
   for (const [fr, en, pt, ar] of supplementalCoverage) {
