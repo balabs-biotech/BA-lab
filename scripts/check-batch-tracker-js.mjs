@@ -111,4 +111,6 @@ for(const label of ["Emplacement (facultatif)","Location (optional)","Localizaç
  if(!i18n.includes(label))throw new Error("Batch location/environment localisation missing: "+label);
 }
 console.log("✓ Batch creation supports organization-scoped location and environment selection");
+if(!engine.includes("const locationName = batchLocationOptions.find")||!engine.includes("const environmentName = batchEnvironmentOptions.find")||!engine.includes("escapeHtml(locationName)")||!engine.includes("escapeHtml(environmentName)"))throw new Error("Batch detail does not safely display its selected location/environment");
+
 
