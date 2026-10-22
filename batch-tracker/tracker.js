@@ -2389,7 +2389,6 @@ async function compareSelectedBatches() {
       .map(batch => batch.culture_id ? contextsByCultureId.get(batch.culture_id)?.experimentalUnitId : null)
       .filter(Boolean);
     const repeatedUnitCount = selectedUnitIds.length - new Set(selectedUnitIds).size;
-    const capped = cultureMeasurementResult.data?.length >= 1000 || environmentMeasurementResult.data?.length >= 1000;
     const statusParts = [
       labels.loaded,
       labels.count,
