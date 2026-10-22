@@ -920,7 +920,7 @@ button,input,select,textarea{border-radius:9px}button{min-height:42px}.hidden{di
     </div>
   </header>
 
-  <section class="card workspace-inactive" id="overviewCard" aria-labelledby="overviewTitle">
+  <section class="card hidden workspace-inactive" id="overviewCard" aria-labelledby="overviewTitle">
     <div class="section-kicker"><span>ESPACE EXPÉRIMENTAL</span><span class="kicker-line"></span><span>ÉTAT DES DONNÉES</span></div>
     <div class="overview-heading">
       <div><h2 id="overviewTitle">Vue générale</h2><p class="muted">Aperçu des enregistrements chargés depuis Supabase. Les compteurs reflètent les limites de chargement actuelles, pas nécessairement le total de la base.</p></div>
@@ -2270,6 +2270,8 @@ async function signOut() {
 
   hideElement(trackerCard);
   hideElement(batchCard);
+  hideElement(measurementCard);
+  hideElement(document.getElementById("overviewCard"));
   hideElement(resultCard);
   hideElement(signOutButton);
 
@@ -2294,6 +2296,8 @@ async function refreshAuthUI() {
 
     hideElement(trackerCard);
     hideElement(batchCard);
+    hideElement(measurementCard);
+    hideElement(document.getElementById("overviewCard"));
     hideElement(resultCard);
     hideElement(signOutButton);
 
@@ -2440,6 +2444,7 @@ async function initializeAuthenticatedTracker(
     hideElement(trackerCard);
     hideElement(batchCard);
     hideElement(measurementCard);
+    hideElement(document.getElementById("overviewCard"));
 
 
     showMessage(
@@ -5462,6 +5467,8 @@ async function init() {
       hideElement(
         batchCard
       );
+      hideElement(measurementCard);
+      hideElement(document.getElementById("overviewCard"));
 
       return;
 
