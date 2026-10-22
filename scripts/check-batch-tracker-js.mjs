@@ -50,6 +50,9 @@ if(!engine.includes('in("experimental_unit_id", unitIds)'))throw new Error("Unit
 if(!engine.includes("<th>Observations qualitatives</th>"))throw new Error("Qualitative observation column is missing");
 if(!engine.includes("batchObservations.slice(0, 3)"))throw new Error("Observation summary is not bounded");
 
+if(!template.includes('id="batchEvents"')||!template.includes('id="batchEventList"'))throw new Error("Batch event timeline UI missing");
+if(!engine.includes('from("events")')||!engine.includes("renderBatchEventTimeline")||!engine.includes('eq("batch_id", batchId)'))throw new Error("Batch event timeline is not linked to the selected batch");
+if(!engine.includes("measurement_recorded")||!engine.includes("batch_stage_advanced")||!engine.includes("batch_released"))throw new Error("Batch timeline omits key workflow event types");
 if(!engine.includes("const measurementUnitsByVariable = new Map()")||!engine.includes("unitMismatchCount > 0 ? labels.unitMismatch(unitMismatchCount) : \"\""))throw new Error("Mixed measurement units are not flagged in batch comparison");
 for(const label of ["Comparabilité :","Comparability:","Comparabilidade:","قابلية المقارنة:"]){
  if(!engine.includes(label))throw new Error("Mixed-unit warning translation missing: "+label);
