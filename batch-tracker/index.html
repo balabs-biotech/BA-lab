@@ -6428,7 +6428,20 @@ async function loadCultureDetail(cultureId) {
         const state = batch.status ? " · Statut : " + batch.status : "";
         description.textContent = (batch.batch_type || "Type non renseigné") + stage + state;
         content.append(heading, description);
-        item.appendChild(content);
+        const openBatch = document.createElement("button");
+        openBatch.type = "button";
+        openBatch.className = "culture-catalog-action";
+        openBatch.textContent = "Ouvrir le lot";
+        openBatch.setAttribute("aria-label", "Ouvrir le lot " + (batch.batch_code || batch.name || ""));
+        openBatch.addEventListener("click", async () => {
+          activateWorkspaceModule("batchCard");
+          document.getElementById("batchCard")?.scrollIntoView({
+            block: "start",
+            behavior: window.matchMedia("(prefers-reduced-motion, reduce)").matches ? "auto" : "smooth"
+          });
+          await loadBatch(batch.id);
+        });
+        item.append(content, openBatch);
         batchSection.appendChild(item);
       });
       timeline.appendChild(batchSection);
