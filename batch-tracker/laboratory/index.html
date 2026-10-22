@@ -19,12 +19,20 @@
         const i18nScript = document.createElement("script");
         i18nScript.src = "../i18n.js";
         i18nScript.onload = () => {
-          const script = document.createElement("script");
-          script.src = "../tracker.js";
+          const compareScript = document.createElement("script");
+          compareScript.src = "../compare-analysis.js";
+          compareScript.onload = () => {
+            const script = document.createElement("script");
+            script.src = "../tracker.js";
           script.onerror = () => {
             document.getElementById("workspace-root").innerHTML = "<main class='container'><p role='alert'>Le moteur du Batch Tracker n’a pas pu être chargé. Rechargez la page.</p></main>";
           };
-          document.body.appendChild(script);
+            document.body.appendChild(script);
+          };
+          compareScript.onerror = () => {
+            document.getElementById("workspace-root").innerHTML = "<main class='container'><p role='alert'>Le module d’analyse comparative n’a pas pu être chargé. Rechargez la page.</p></main>";
+          };
+          document.body.appendChild(compareScript);
         };
         i18nScript.onerror = () => {
           document.getElementById("workspace-root").innerHTML = "<main class='container'><p role='alert'>Le module de langues n’a pas pu être chargé. Rechargez la page.</p></main>";
