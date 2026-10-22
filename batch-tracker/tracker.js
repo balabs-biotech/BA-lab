@@ -4827,6 +4827,17 @@ async function loadLotComparison() {
           .select("id,batch_id,culture_id,occurred_at,event_type,payload")
           .eq("organization_id", organizationId).in("culture_id", unambiguousCultureIds).is("batch_id", null).order("occurred_at", { ascending: true }).order("id", { ascending: true }))
       : [];
+    const sampleRows = unambiguousCultureIds.length
+      ? await fetchComparisonRows(() => supabaseClient.from("samples")
+          .select("id,culture_id").eq("organization_id", organizationId)
+          .in("culture_id", unambiguousCultureIds).order("id", { ascending: true }))
+      : [];
+    const sampleToBatch = new Map();
+    sampleRows.forEach(sample => {
+      const batchId = safeCultureToBatch.get(sample.culture_id);
+      if (batchId) sampleToBatch.set(sample.id, batchId);
+    });
+
     const eventToBatch = new Map();
     batchEvents.forEach(event => { if (selectedBatchIds.includes(event.batch_id)) eventToBatch.set(event.id, event.batch_id); });
     cultureEvents.forEach(event => { const batchId = safeCultureToBatch.get(event.culture_id); if (batchId && !event.batch_id) eventToBatch.set(event.id, batchId); });
@@ -4852,14 +4863,13 @@ async function loadLotComparison() {
     }
 
     const [measurementRows, observationRows] = await Promise.all([
-      fetchLinkedRows("measurements", "id,variable_code,raw_value,raw_unit_code,normalized_value,normalized_unit_code,measured_at,method,instrument,quality_state,exclusion_reason,culture_id,event_id,metadata", "measured_at"),
-      fetchLinkedRows("observations", "id,variable_code,value_text,observed_at,quality_state,culture_id,event_id,metadata", "observed_at")
+      fetchLinkedRows("measurements", "id,variable_code,raw_value,raw_unit_code,normalized_value,normalized_unit_code,measured_at,method,instrument,quality_state,exclusion_reason,culture_id,sample_id,event_id,metadata", "measured_at"),
+      fetchLinkedRows("observations", "id,variable_code,value_text,observed_at,quality_state,culture_id,sample_id,event_id,metadata", "observed_at")
     ]);
     if (requestId !== lotComparisonRequestId) return;
 
     function assignBatch(row) {
-      if (row.event_id) return eventToBatch.get(row.event_id) || null;
-      return row.culture_id ? (safeCultureToBatch.get(row.culture_id) || null) : null;
+      return BACompareAnalysis.resolveBatchId(row, eventToBatch, safeCultureToBatch, sampleToBatch);
     }
     const variableMap = new Map(measurementVariables.map(variable => [variable.code, variable]));
     const unitMap = new Map(measurementUnits.map(unit => [unit.code, unit]));
