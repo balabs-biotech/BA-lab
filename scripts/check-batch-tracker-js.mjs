@@ -3,15 +3,19 @@ import vm from "node:vm";
 
 const html = fs.readFileSync("batch-tracker/index.html", "utf8");
 const rootHtml = fs.readFileSync("index.html", "utf8");
-const scripts = [...html.matchAll(/<script\\b([^>]*)>([\\s\\S]*?)<\\/script>/gi)]
-  .filter((match) => !/\\bsrc\\s*=/.test(match[1]) && match[2].trim());
+const scripts = html.split("<script").slice(1).map((chunk) => {
+  const endOfTag = chunk.indexOf(">");
+  const endOfScript = chunk.indexOf("</script>");
+  if (endOfTag < 0 || endOfScript < 0) return null;
+  return { attributes: chunk.slice(0, endOfTag), source: chunk.slice(endOfTag + 1, endOfScript) };
+}).filter((script) => script && !script.attributes.includes("src=") && script.source.trim());
 
 if (scripts.length === 0) {
   throw new Error("No inline JavaScript found in batch-tracker/index.html");
 }
 
-for (const [index, match] of scripts.entries()) {
-  new vm.Script(match[2], { filename: `batch-tracker/index.html:inline-script-${index + 1}` });
+for (const [index, script] of scripts.entries()) {
+  new vm.Script(script.source, { filename: `batch-tracker/index.html:inline-script-${index + 1}` });
 }
 
 const supportedDomains = ["agronomy", "mycology", "laboratory"];
@@ -21,7 +25,7 @@ for (const domain of supportedDomains) {
   }
 }
 
-const entryGuard = scripts.find((match) => match[2].includes("initialDomain"));
+const entryGuard = scripts.find((script) => script.source.includes("initialDomain"));
 if (!entryGuard) {
   throw new Error("Direct tracker entry has no universe chooser guard");
 }
@@ -37,7 +41,7 @@ function evaluateEntryGuard(search) {
       },
     },
   };
-  vm.runInNewContext(entryGuard[2], context);
+  vm.runInNewContext(entryGuard.source, context);
   return redirectedTo;
 }
 
