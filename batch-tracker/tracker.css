@@ -1780,3 +1780,55 @@ body[data-domain="laboratory"] #overviewCard .overview-shortcuts .overview-short
   -webkit-text-fill-color: #ffffff !important;
   opacity: 1 !important;
 }
+
+
+/* Mycology: keep operational states within the existing ink, terracotta and cream palette. */
+body[data-domain="mycology"] {
+  --brand: #a94f1d !important;
+  --brand-hover: #853d16 !important;
+  --focus: #d18d65 !important;
+  --ok: #a94f1d !important;
+  accent-color: #a94f1d !important;
+}
+body[data-domain="mycology"] :is(.success, .overview-live, .status-pulse, .status-indicator, .status-dot, .live-dot, .progress-bar) {
+  background: #f3e8dc !important;
+  background-image: none !important;
+  border-color: #c17a52 !important;
+  color: #50341f !important;
+  -webkit-text-fill-color: #50341f !important;
+}
+body[data-domain="mycology"] :is(.overview-live span, .status-pulse, .status-indicator, .status-dot, .live-dot, .progress-bar) {
+  background: #a94f1d !important;
+  border-color: #a94f1d !important;
+}
+body[data-domain="mycology"] :is(.success, .success *) {
+  color: #50341f !important;
+  -webkit-text-fill-color: #50341f !important;
+}
+body[data-domain="mycology"] :is(.shortcut-index, .culture-catalog-count, .statistics-summary-item strong, .statistics-table caption, .culture-catalog-code, .req) {
+  color: #a94f1d !important;
+  -webkit-text-fill-color: #a94f1d !important;
+}
+body[data-domain="mycology"] .shortcut-index {
+  background: #f3e8dc !important;
+  border-color: #d7bba6 !important;
+}
+body[data-domain="mycology"] :is(button, .primary-button, .culture-catalog-action, .section-nav a[aria-current="page"], .domain-option[aria-pressed="true"]) {
+  box-shadow: none;
+}
+body[data-domain="mycology"] :is(button, .primary-button):not(.secondary-button):not(.danger-button):not(.culture-catalog-action) {
+  background-color: #a94f1d !important;
+  background-image: none !important;
+  border-color: #a94f1d !important;
+  color: #fff7ed !important;
+  -webkit-text-fill-color: #fff7ed !important;
+}
+body[data-domain="mycology"] :is(button, .primary-button):not(.secondary-button):not(.danger-button):not(.culture-catalog-action):hover:not(:disabled) {
+  background-color: #853d16 !important;
+  border-color: #853d16 !important;
+  color: #fff7ed !important;
+  -webkit-text-fill-color: #fff7ed !important;
+}
+body[data-domain="mycology"] :is(.info, .success, .warning) {
+  text-shadow: none !important;
+}
