@@ -785,6 +785,138 @@
       "Step 3: validation and consent",
       "Etapa 3: validação e consentimentos",
       "الخطوة 3: التحقق والموافقات"
+    ],
+    [
+      "Suivi environnemental",
+      "Environmental monitoring",
+      "Monitorização ambiental",
+      "المراقبة البيئية"
+    ],
+    [
+      "Analyse agronomique",
+      "Agronomic analysis",
+      "Análise agronómica",
+      "التحليل الزراعي"
+    ],
+    [
+      "Observations mycologiques",
+      "Mycological observations",
+      "Observações micológicas",
+      "الملاحظات الفطرية"
+    ],
+    [
+      "Analyse mycologique",
+      "Mycological analysis",
+      "Análise micológica",
+      "التحليل الفطري"
+    ],
+    [
+      "Green Tech",
+      "Green Tech",
+      "Green Tech",
+      "التقنيات الخضراء"
+    ],
+    [
+      "Registre mycologique",
+      "Mycology register",
+      "Registo micológico",
+      "السجل الفطري"
+    ],
+    [
+      "Suivi expérimental",
+      "Experimental tracking",
+      "Acompanhamento experimental",
+      "المتابعة التجريبية"
+    ],
+    [
+      "Serre, substrats, irrigation, climat et croissance.",
+      "Greenhouse, substrates, irrigation, climate, and growth.",
+      "Estufa, substratos, rega, clima e crescimento.",
+      "الدفيئة والركائز والري والمناخ والنمو."
+    ],
+    [
+      "Culture",
+      "Culture",
+      "Cultura",
+      "المزرعة"
+    ],
+    [
+      "supervision agronomique",
+      "agronomic monitoring",
+      "monitorização agronómica",
+      "المراقبة الزراعية"
+    ],
+    [
+      "Souches",
+      "Strains",
+      "Estirpes",
+      "السلالات"
+    ],
+    [
+      "Générations",
+      "Generations",
+      "Gerações",
+      "الأجيال"
+    ],
+    [
+      "Contamination",
+      "Contamination",
+      "Contaminação",
+      "التلوث"
+    ],
+    [
+      "Milieux",
+      "Media",
+      "Meios",
+      "الأوساط"
+    ],
+    [
+      "Protocoles",
+      "Protocols",
+      "Protocolos",
+      "البروتوكولات"
+    ],
+    [
+      "Mesures",
+      "Measurements",
+      "Medições",
+      "القياسات"
+    ],
+    [
+      "BA LABS / AGRITECH",
+      "BA LABS / AGRITECH",
+      "BA LABS / AGRITECH",
+      "BA LABS / التقنيات الزراعية"
+    ],
+    [
+      "BA LABS / MYCOLOGIE",
+      "BA LABS / MYCOLOGY",
+      "BA LABS / MICOLOGIA",
+      "BA LABS / علم الفطريات"
+    ],
+    [
+      "BA LABS / LABORATOIRE",
+      "BA LABS / LABORATORY",
+      "BA LABS / LABORATÓRIO",
+      "BA LABS / المختبر"
+    ],
+    [
+      "AGRITECH / MONITORING",
+      "AGRITECH / MONITORING",
+      "AGRITECH / MONITORIZAÇÃO",
+      "التقنيات الزراعية / المراقبة"
+    ],
+    [
+      "MYCOLOGY / SPECIMEN LEDGER",
+      "MYCOLOGY / SPECIMEN LEDGER",
+      "MICOLOGIA / REGISTO DE AMOSTRAS",
+      "علم الفطريات / سجل العينات"
+    ],
+    [
+      "LAB / EXPERIMENT TRACKING",
+      "LAB / EXPERIMENT TRACKING",
+      "LAB / ACOMPANHAMENTO EXPERIMENTAL",
+      "المختبر / المتابعة التجريبية"
     ]
   ];
   for (const [fr, en, pt, ar] of supplementalCoverage) {
