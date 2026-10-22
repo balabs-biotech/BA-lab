@@ -2245,7 +2245,9 @@ async function compareSelectedBatches() {
     });
     table.appendChild(tbody);
     results.appendChild(table);
-    status.textContent = "Comparaison chargée. Seules les mesures directement liées à la culture du lot sont comptées ; les données manquantes ne sont pas interprétées comme zéro.";
+    status.textContent = measurements.length >= 1000
+      ? "Comparaison chargée avec une limite de 1 000 mesures récentes au total ; les comptes peuvent être incomplets. Seules les mesures directement liées à la culture du lot sont prises en compte."
+      : "Comparaison chargée. Seules les mesures directement liées à la culture du lot sont comptées ; les données manquantes ne sont pas interprétées comme zéro.";
   } catch (error) {
     status.textContent = error?.message || "Impossible de comparer les lots.";
   } finally {
