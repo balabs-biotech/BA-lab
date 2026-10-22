@@ -56,3 +56,12 @@ The reference repository declares AGPL-3.0-or-later. This branch documents and a
 - Les transitions de workflow passent par les RPC protégées; les colonnes de workflow ne doivent pas être mises à jour directement depuis le navigateur.
 - Cette itération ajoute une chronologie en lecture seule au détail du lot. Elle réutilise les événements déjà produits par la création, l'avancement, la mesure et la libération. Elle limite le chargement aux 50 événements les plus récents et ne bloque pas le détail du lot si le journal est indisponible.
 - Étape suivante : concevoir la saisie de récolte/rendement avec une écriture transactionnelle et des droits explicites, puis tester les cas multi-organisation, les quantités nulles/zéro, l'unité et les doublons. Ne pas assimiler le nombre de mesures à celui des récoltes ou des répétitions indépendantes.
+
+
+## Récoltes — première saisie
+
+- Ajout d'une saisie de récolte limitée à l'étape `harvest` du lot sélectionné. La quantité doit être strictement positive, et l'unité est validée contre `public.units`.
+- Chaque récolte est enregistrée comme un événement `harvest_recorded` dans `public.events`, avec quantité, unité, date, utilisateur, lot, culture et note facultative.
+- La chronologie affiche les récoltes et calcule un total par unité pour les événements chargés. Des unités différentes restent séparées et ne sont jamais additionnées ensemble.
+- Cette version n'écrase pas `batches.quantity_actual` : ce champ ne peut pas représenter correctement des récoltes multiples avec des unités ou des dates différentes. L'historique événementiel sert de source de traçabilité.
+- Aucun changement SQL ni migration de production n'est requis pour cette première itération. Les permissions RLS existantes sur `events` restent le contrôle d'accès.
