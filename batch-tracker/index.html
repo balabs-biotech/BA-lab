@@ -7222,10 +7222,6 @@ function setupDomainWorkspaces() {
   };
   const buttons = [...document.querySelectorAll("[data-domain-choice]")];
   const requestedDomain = new URLSearchParams(window.location.search).get("domain");
-  if (["agronomy", "mycology", "laboratory"].includes(requestedDomain)) {
-    const switcher = document.querySelector(".domain-switcher");
-    if (switcher) switcher.hidden = true;
-  }
   const eyebrow = document.querySelector(".app-hero .eyebrow");
   const title = document.querySelector(".app-hero h1");
   const heroDescription = document.querySelector(".hero-description");
