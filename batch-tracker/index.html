@@ -869,7 +869,23 @@ button,input,select,textarea{border-radius:9px}button{min-height:42px}.hidden{di
 .culture-catalog-main{min-width:0}
 .culture-catalog-code{display:block;overflow-wrap:anywhere;color:#21452e;font-size:13px;font-weight:750}
 .culture-catalog-meta{display:flex;flex-wrap:wrap;gap:6px 12px;margin-top:5px;color:var(--muted);font-size:11px}
+.culture-catalog-actions{display:flex;flex-wrap:wrap;gap:7px;justify-content:flex-end}
 .culture-catalog-action{width:auto;min-height:38px;margin:0;padding:7px 10px;font-size:12px;box-shadow:none}
+.culture-detail{margin-top:18px;padding:18px;border:1px solid #d6e2d2;border-radius:13px;background:#fbfcf8}
+.culture-detail-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.culture-detail-heading h3{margin:5px 0 4px;padding:0;border:0;font-size:18px}
+.culture-detail-heading p{margin:0}
+.section-kicker-label{color:#59715b;font-size:10px;font-weight:800;letter-spacing:.12em}
+.culture-detail-summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:15px}
+.culture-detail-field{padding:11px;border:1px solid #e0e8dc;border-radius:9px;background:#fff;min-width:0}
+.culture-detail-field span{display:block;color:var(--muted);font-size:10px}
+.culture-detail-field strong{display:block;margin-top:4px;font-size:12px;overflow-wrap:anywhere}
+.culture-detail h4{margin:20px 0 10px;font-size:13px}
+.culture-detail-timeline{display:grid;gap:8px}
+.culture-timeline-entry{display:grid;grid-template-columns:125px minmax(0,1fr);gap:12px;padding:12px;border-left:3px solid #8ca98a;border-radius:0 9px 9px 0;background:#fff}
+.culture-timeline-date{color:var(--muted);font-size:10px}
+.culture-timeline-entry strong{font-size:12px}
+.culture-timeline-entry p{margin:4px 0 0;color:#59675c;font-size:12px;overflow-wrap:anywhere}
 @media(max-width:520px){.culture-catalog-filters{grid-template-columns:minmax(0,1fr)}.culture-catalog-row{grid-template-columns:minmax(0,1fr)}.culture-catalog-action{width:100%}.culture-catalog-heading{align-items:flex-start}}
 @media(max-width:820px){.overview-metrics{grid-template-columns:repeat(3,minmax(0,1fr))}.overview-lower{grid-template-columns:minmax(0,1fr)}}
 @media(max-width:520px){.overview-heading{display:block}.overview-live{margin-top:12px}.overview-metrics{grid-template-columns:minmax(0,1fr)}.overview-metric{grid-template-columns:minmax(0,1fr) auto;align-items:center}.overview-metric-note{grid-column:1/-1}.overview-metric strong{grid-column:2;grid-row:1/3}.overview-section-heading{align-items:flex-start;flex-direction:column}}
@@ -1202,6 +1218,12 @@ button,input,select,textarea{border-radius:9px}button{min-height:42px}.hidden{di
         <div><label for="cultureTypeFilter">Type de culture</label><select id="cultureTypeFilter"><option value="">Tous les types</option></select></div>
       </div>
       <div id="cultureCatalogList" class="culture-catalog-list" aria-live="polite"><p class="muted">Connectez-vous pour charger les cultures.</p></div>
+      <section id="cultureDetailPanel" class="culture-detail hidden" aria-labelledby="cultureDetailTitle">
+        <div class="culture-detail-heading"><div><span class="section-kicker-label">FICHE EXPÉRIMENTALE</span><h3 id="cultureDetailTitle">Culture</h3><p id="cultureDetailMeta" class="muted"></p></div><button id="closeCultureDetail" type="button" class="secondary-button small-button">Fermer la fiche</button></div>
+        <div class="culture-detail-summary" id="cultureDetailSummary"></div>
+        <h4>Chronologie disponible</h4>
+        <div id="cultureDetailTimeline" class="culture-detail-timeline"><p class="muted">Sélectionnez une culture pour charger son historique.</p></div>
+      </section>
     </section>
 
   </section>
@@ -6069,12 +6091,19 @@ function renderCultureCatalog() {
     meta.appendChild(date);
     main.append(code, meta);
 
-    const action = document.createElement("button");
-    action.type = "button";
-    action.className = "secondary-button culture-catalog-action";
-    action.textContent = "Ajouter une donnée";
-    action.setAttribute("aria-label", "Ajouter une mesure ou observation à " + (culture.code || "cette culture"));
-    action.addEventListener("click", () => {
+    const actions = document.createElement("div");
+    actions.className = "culture-catalog-actions";
+    const detailAction = document.createElement("button");
+    detailAction.type = "button";
+    detailAction.className = "secondary-button culture-catalog-action";
+    detailAction.textContent = "Consulter la fiche";
+    detailAction.addEventListener("click", () => loadCultureDetail(culture.id));
+    const dataAction = document.createElement("button");
+    dataAction.type = "button";
+    dataAction.className = "culture-catalog-action";
+    dataAction.textContent = "Ajouter une donnée";
+    dataAction.setAttribute("aria-label", "Ajouter une mesure ou observation à " + (culture.code || "cette culture"));
+    dataAction.addEventListener("click", () => {
       measurementTargetSelect.value = "culture:" + culture.id;
       activateWorkspaceModule("measurementCard");
       document.getElementById("measurementCard")?.scrollIntoView({
@@ -6083,9 +6112,134 @@ function renderCultureCatalog() {
       });
       measurementVariableSelect.focus({ preventScroll: true });
     });
-    row.append(main, action);
+    actions.append(detailAction, dataAction);
+    row.append(main, actions);
     list.appendChild(row);
   });
+}
+
+async function loadCultureDetail(cultureId) {
+  const culture = cultureOptions.find(item => item.id === cultureId);
+  const panel = document.getElementById("cultureDetailPanel");
+  const title = document.getElementById("cultureDetailTitle");
+  const meta = document.getElementById("cultureDetailMeta");
+  const summary = document.getElementById("cultureDetailSummary");
+  const timeline = document.getElementById("cultureDetailTimeline");
+  if (!culture || !panel || !title || !meta || !summary || !timeline) return;
+
+  panel.classList.remove("hidden");
+  title.textContent = culture.code || "Culture sans code";
+  meta.textContent = culture.culture_type || "Type de culture non renseigné";
+  summary.innerHTML = "";
+  [
+    ["Identifiant", culture.code || "Non renseigné"],
+    ["Type", culture.culture_type || "Non renseigné"],
+    ["Démarrage", culture.started_at ? new Date(culture.started_at).toLocaleString("fr-FR") : "Non renseigné"],
+    ["Matériel lié", culture.material_id || "Identifiant non disponible"],
+    ["Événements", "Chargement…"],
+    ["Mesures / observations", "Chargement…"]
+  ].forEach(([label, value]) => {
+    const field = document.createElement("div");
+    field.className = "culture-detail-field";
+    const name = document.createElement("span");
+    name.textContent = label;
+    const content = document.createElement("strong");
+    content.textContent = value;
+    field.append(name, content);
+    summary.appendChild(field);
+  });
+  timeline.innerHTML = '<p class="muted">Chargement de l’historique lié à cette culture…</p>';
+
+  try {
+    const results = await Promise.all([
+      supabaseClient.from("events").select("id, event_type, occurred_at, batch_id, payload")
+        .eq("organization_id", organizationId).eq("culture_id", culture.id)
+        .order("occurred_at", { ascending: false }).limit(100),
+      supabaseClient.from("measurements").select("id, variable_code, raw_value, raw_unit_code, measured_at, event_id, metadata")
+        .eq("organization_id", organizationId).eq("culture_id", culture.id)
+        .order("measured_at", { ascending: false }).limit(100),
+      supabaseClient.from("observations").select("id, variable_code, value_text, observed_at, event_id, metadata")
+        .eq("organization_id", organizationId).eq("culture_id", culture.id)
+        .order("observed_at", { ascending: false }).limit(100)
+    ]);
+    const eventResult = results[0], measurementResult = results[1], observationResult = results[2];
+    if (eventResult.error) throw new Error("Événements : " + eventResult.error.message);
+    if (measurementResult.error) throw new Error("Mesures : " + measurementResult.error.message);
+    if (observationResult.error) throw new Error("Observations : " + observationResult.error.message);
+
+    const events = eventResult.data || [];
+    const measurements = measurementResult.data || [];
+    const observations = observationResult.data || [];
+    const measurementsByEvent = new Map(measurements.filter(row => row.event_id).map(row => [row.event_id, row]));
+    const observationsByEvent = new Map(observations.filter(row => row.event_id).map(row => [row.event_id, row]));
+    const variableLabel = code => measurementVariables.find(item => item.code === code)?.label || code || "Donnée";
+    const entries = events.map(event => {
+      const measurement = measurementsByEvent.get(event.id);
+      const observation = observationsByEvent.get(event.id);
+      if (measurement) return {
+        date: measurement.measured_at || event.occurred_at,
+        type: "Mesure · " + variableLabel(measurement.variable_code),
+        detail: String(measurement.raw_value) + " " + (measurement.raw_unit_code || "") +
+          (measurement.metadata?.note ? " — " + measurement.metadata.note : "")
+      };
+      if (observation) return {
+        date: observation.observed_at || event.occurred_at,
+        type: "Observation · " + variableLabel(observation.variable_code),
+        detail: (observation.value_text || "Sans description") +
+          (observation.metadata?.note ? " — " + observation.metadata.note : "")
+      };
+      return {
+        date: event.occurred_at,
+        type: String(event.event_type || "Événement").replaceAll("_", " "),
+        detail: event.payload?.note || event.payload?.description ||
+          (event.batch_id ? "Événement associé à un lot." : "Événement de traçabilité.")
+      };
+    });
+    const eventIds = new Set(events.map(event => event.id));
+    measurements.filter(row => !row.event_id || !eventIds.has(row.event_id)).forEach(row => entries.push({
+      date: row.measured_at, type: "Mesure · " + variableLabel(row.variable_code),
+      detail: String(row.raw_value) + " " + (row.raw_unit_code || "") +
+        (row.metadata?.note ? " — " + row.metadata.note : "")
+    }));
+    observations.filter(row => !row.event_id || !eventIds.has(row.event_id)).forEach(row => entries.push({
+      date: row.observed_at, type: "Observation · " + variableLabel(row.variable_code),
+      detail: (row.value_text || "Sans description") +
+        (row.metadata?.note ? " — " + row.metadata.note : "")
+    }));
+    entries.sort((a,b) => new Date(b.date || 0) - new Date(a.date || 0));
+
+    const fields = summary.querySelectorAll(".culture-detail-field strong");
+    if (fields[4]) fields[4].textContent = String(events.length);
+    if (fields[5]) fields[5].textContent = String(measurements.length + observations.length);
+    timeline.innerHTML = "";
+    if (!entries.length) {
+      timeline.innerHTML = '<p class="muted">Aucun événement, mesure ou observation n’est actuellement lié à cette culture.</p>';
+    } else {
+      entries.forEach(entry => {
+        const article = document.createElement("article");
+        article.className = "culture-timeline-entry";
+        const date = document.createElement("time");
+        date.className = "culture-timeline-date";
+        date.textContent = entry.date ? new Date(entry.date).toLocaleString("fr-FR") : "Date inconnue";
+        const content = document.createElement("div");
+        const heading = document.createElement("strong");
+        heading.textContent = entry.type;
+        const description = document.createElement("p");
+        description.textContent = String(entry.detail || "Aucun détail enregistré");
+        content.append(heading, description);
+        article.append(date, content);
+        timeline.appendChild(article);
+      });
+    }
+    panel.scrollIntoView({block:"start",behavior:window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth"});
+  } catch (error) {
+    console.error("Chargement de la fiche culture :", error);
+    timeline.innerHTML = "";
+    const message = document.createElement("p");
+    message.className = "error info";
+    message.textContent = "Impossible de charger l’historique de cette culture : " + error.message;
+    timeline.appendChild(message);
+  }
 }
 
 function updateOverview() {
@@ -6278,6 +6432,9 @@ function setupUiEnhancements() {
 
   document.getElementById("cultureSearch")?.addEventListener("input", renderCultureCatalog);
   document.getElementById("cultureTypeFilter")?.addEventListener("change", renderCultureCatalog);
+  document.getElementById("closeCultureDetail")?.addEventListener("click", () => {
+    document.getElementById("cultureDetailPanel")?.classList.add("hidden");
+  });
 
   measurementVariableSelect.addEventListener("change", updateMeasurementUnits);
   saveMeasurementButton.addEventListener("click", saveMeasurement);
