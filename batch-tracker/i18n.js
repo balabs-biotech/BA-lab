@@ -430,17 +430,467 @@
   [
     "Mesures et résultats expérimentaux",
     "Measurements and experimental results",
-    "Measurements and experimental results",
+    "Medições e resultados experimentais",
     "القياسات والنتائج التجريبية"
+  ],
+  [
+    "ANALYSE EXPLORATOIRE",
+    "EXPLORATORY ANALYSIS",
+    "ANÁLISE EXPLORATÓRIA",
+    "التحليل الاستكشافي"
+  ],
+  [
+    "Comparer mes lots",
+    "Compare my batches",
+    "Comparar os meus lotes",
+    "مقارنة دفعاتي"
+  ],
+  [
+    "Comparez les mesures et observations déjà enregistrées. Aucun enregistrement ne sera créé ou modifié.",
+    "Compare measurements and observations already recorded. No records will be created or changed.",
+    "Compare as medições e observações já registadas. Nenhum registo será criado ou alterado.",
+    "قارن القياسات والملاحظات المسجلة بالفعل. لن يتم إنشاء السجلات أو تعديلها."
+  ],
+  [
+    "Sélection limitée aux 30 lots les plus récents actuellement chargés. Les données sont rattachées à un lot via ses événements ; les données liées uniquement à une culture ne sont attribuées que si cette culture correspond sans ambiguïté à un seul lot sélectionné.",
+    "Selection is limited to the 30 most recently loaded batches. Data are linked through events; culture-only data are assigned only when that culture unambiguously maps to one selected batch.",
+    "A seleção está limitada aos 30 lotes carregados mais recentes. Os dados são associados através de eventos; dados ligados apenas a uma cultura só são atribuídos quando essa cultura corresponde inequivocamente a um único lote selecionado.",
+    "يقتصر الاختيار على أحدث 30 دفعة محملة. تُربط البيانات عبر الأحداث؛ ولا تُنسب البيانات المرتبطة بالثقافة فقط إلا إذا كانت تلك الثقافة مرتبطة بوضوح بدفعة واحدة محددة."
+  ],
+  [
+    "Depuis le",
+    "From",
+    "Desde",
+    "من تاريخ"
+  ],
+  [
+    "Jusqu’au",
+    "Through",
+    "Até",
+    "إلى تاريخ"
+  ],
+  [
+    "Comparer les lots sélectionnés",
+    "Compare selected batches",
+    "Comparar os lotes selecionados",
+    "قارن الدفعات المحددة"
+  ],
+  [
+    "Sélectionnez au moins deux lots pour commencer.",
+    "Select at least two batches to begin.",
+    "Selecione pelo menos dois lotes para começar.",
+    "حدد دفعتين على الأقل للبدء."
+  ],
+  [
+    "1. Constats descriptifs",
+    "1. Descriptive findings",
+    "1. Constatações descritivas",
+    "١. ملاحظات وصفية"
+  ],
+  [
+    "2. Corrélations exploratoires",
+    "2. Exploratory correlations",
+    "2. Correlações exploratórias",
+    "٢. ارتباطات استكشافية"
+  ],
+  [
+    "3. Hypothèses à tester ensuite",
+    "3. Hypotheses to test next",
+    "3. Hipóteses a testar a seguir",
+    "٣. فرضيات للاختبار لاحقًا"
+  ],
+  [
+    "Mesures numériques par lot et unité",
+    "Numeric measurements by batch and unit",
+    "Medições numéricas por lote e unidade",
+    "القياسات الرقمية حسب الدفعة والوحدة"
+  ],
+  [
+    "Observations qualitatives par lot",
+    "Qualitative observations by batch",
+    "Observações qualitativas por lote",
+    "الملاحظات النوعية حسب الدفعة"
+  ],
+  [
+    "Lecture scientifique : les constats décrivent les données disponibles ; les corrélations sont exploratoires et ne démontrent pas de causalité ; les variables suggérées sont des pistes à mesurer lors d’un prochain essai. L’absence de mesure enregistrée ne prouve pas qu’une mesure était prévue. Les unités sont converties seulement si le catalogue permet une conversion compatible et sûre ; sinon, les séries restent séparées.",
+    "Scientific interpretation: findings describe available data; correlations are exploratory and do not demonstrate causality; suggested variables are candidates to measure in a future experiment. No recorded measurement does not prove one was scheduled. Units are converted only when the catalogue supports a safe compatible conversion; otherwise series remain separate.",
+    "Interpretação científica: as constatações descrevem os dados disponíveis; as correlações são exploratórias e não demonstram causalidade; as variáveis sugeridas são opções a medir numa experiência futura. A ausência de uma medição registada não prova que estivesse prevista. As unidades só são convertidas quando o catálogo permite uma conversão compatível e segura; caso contrário, as séries permanecem separadas.",
+    "التفسير العلمي: تصف النتائج البيانات المتاحة؛ والارتباطات استكشافية ولا تثبت السببية؛ والمتغيرات المقترحة خيارات لقياسها في تجربة لاحقة. غياب القياس المسجل لا يثبت أنه كان مقرراً. تُحوّل الوحدات فقط عندما يسمح الكتالوج بتحويل آمن ومتوافق؛ وإلا فتبقى السلاسل منفصلة."
   ],
   [
     "Analyse expérimentale",
     "Experimental analysis",
     "Análise experimental",
     "التحليل التجريبي"
+  ],
+  [
+    "Aucun lot disponible dans le chargement courant. Créez un lot ou vérifiez les droits d’accès à votre organisation.",
+    "No batches are available in the current load. Create a batch or check your organization access.",
+    "Não há lotes disponíveis no carregamento atual. Crie um lote ou verifique o acesso à organização.",
+    "لا توجد دفعات متاحة في التحميل الحالي. أنشئ دفعة أو تحقق من صلاحيات الوصول إلى مؤسستك."
+  ],
+  [
+    "Lot sans code",
+    "Batch without a code",
+    "Lote sem código",
+    "دفعة بلا رمز"
+  ],
+  [
+    "Sans description",
+    "No description",
+    "Sem descrição",
+    "بلا وصف"
+  ],
+  [
+    "Étape non renseignée",
+    "Stage not specified",
+    "Etapa não indicada",
+    "المرحلة غير محددة"
+  ],
+  [
+    "Aucune donnée disponible.",
+    "No data available.",
+    "Nenhum dado disponível.",
+    "لا تتوفر بيانات."
+  ],
+  [
+    "Date de mesure",
+    "Measurement date",
+    "Data da medição",
+    "تاريخ القياس"
+  ],
+  [
+    "Évolution temporelle de",
+    "Time evolution of",
+    "Evolução temporal de",
+    "التغير الزمني لـ"
+  ],
+  [
+    "Lot",
+    "Batch",
+    "Lote",
+    "دفعة"
+  ],
+  [
+    "Connectez-vous pour comparer les lots de votre organisation.",
+    "Sign in to compare batches in your organization.",
+    "Inicie sessão para comparar os lotes da sua organização.",
+    "سجّل الدخول لمقارنة دفعات مؤسستك."
+  ],
+  [
+    "Sélectionnez au moins deux lots.",
+    "Select at least two batches.",
+    "Selecione pelo menos dois lotes.",
+    "حدد دفعتين على الأقل."
+  ],
+  [
+    "La sélection a changé. Actualisez la liste des lots et réessayez.",
+    "The selection has changed. Refresh the batch list and try again.",
+    "A seleção mudou. Atualize a lista de lotes e tente novamente.",
+    "تغير التحديد. حدّث قائمة الدفعات وحاول مرة أخرى."
+  ],
+  [
+    "La date de début doit précéder ou correspondre à la date de fin.",
+    "The start date must be on or before the end date.",
+    "A data inicial deve ser anterior ou igual à data final.",
+    "يجب أن يكون تاريخ البداية قبل تاريخ النهاية أو مساوياً له."
+  ],
+  [
+    "Comparaison en cours…",
+    "Comparison in progress…",
+    "Comparação em curso…",
+    "المقارنة قيد التنفيذ…"
+  ],
+  [
+    "Lecture des données autorisées dans Supabase…",
+    "Reading data authorized by Supabase…",
+    "A ler os dados autorizados no Supabase…",
+    "جارٍ قراءة البيانات المصرح بها في Supabase…"
+  ],
+  [
+    "unité non renseignée",
+    "unit not specified",
+    "unidade não indicada",
+    "الوحدة غير محددة"
+  ],
+  [
+    "normalisée",
+    "normalized",
+    "normalizada",
+    "مطَبَّعة"
+  ],
+  [
+    "convertie",
+    "converted",
+    "convertida",
+    "محوّلة"
+  ],
+  [
+    "Variable non référencée",
+    "Unreferenced variable",
+    "Variável sem referência",
+    "متغير غير مرجعي"
+  ],
+  [
+    "début non limité",
+    "unbounded start",
+    "início sem limite",
+    "بداية غير محددة"
+  ],
+  [
+    "fin non limitée",
+    "unbounded end",
+    "fim sem limite",
+    "نهاية غير محددة"
+  ],
+  [
+    "aucune date disponible",
+    "no dates available",
+    "nenhuma data disponível",
+    "لا تتوفر تواريخ"
+  ],
+  [
+    "Lots sélectionnés",
+    "Selected batches",
+    "Lotes selecionados",
+    "الدفعات المحددة"
+  ],
+  [
+    "Mesures utilisables",
+    "Usable measurements",
+    "Medições utilizáveis",
+    "القياسات القابلة للاستخدام"
+  ],
+  [
+    "Observations qualitatives",
+    "Qualitative observations",
+    "Observações qualitativas",
+    "الملاحظات النوعية"
+  ],
+  [
+    "Aucune mesure ni observation exploitable n’a été trouvée pour ces lots et cette période. Cela ne permet pas de conclure sur leurs performances.",
+    "No usable measurements or observations were found for these batches and this period. No conclusion about their performance can be drawn.",
+    "Não foram encontradas medições ou observações utilizáveis para estes lotes e período. Não é possível tirar conclusões sobre o seu desempenho.",
+    "لم يُعثر على قياسات أو ملاحظات قابلة للاستخدام لهذه الدفعات والفترة. لا يمكن استخلاص استنتاج بشأن أدائها."
+  ],
+  [
+    "Valeurs atypiques",
+    "Outliers",
+    "Valores atípicos",
+    "قيم شاذة"
+  ],
+  [
+    "Aucune mesure numérique exploitable dans la sélection. Les observations qualitatives restent analysées séparément.",
+    "No usable numeric measurements in this selection. Qualitative observations are analyzed separately.",
+    "Não há medições numéricas utilizáveis nesta seleção. As observações qualitativas são analisadas separadamente.",
+    "لا توجد قياسات رقمية قابلة للاستخدام في هذا التحديد. تُحلل الملاحظات النوعية بشكل منفصل."
+  ],
+  [
+    "variable_non_renseignée",
+    "unspecified_variable",
+    "variável_não_indicada",
+    "متغير_غير_محدد"
+  ],
+  [
+    "Observation sans texte",
+    "Observation without text",
+    "Observação sem texto",
+    "ملاحظة بلا نص"
+  ],
+  [
+    "Aucune observation enregistrée",
+    "No observation recorded",
+    "Nenhuma observação registada",
+    "لم تُسجّل أي ملاحظة"
+  ],
+  [
+    "Variable observée",
+    "Observed variable",
+    "Variável observada",
+    "المتغير المرصود"
+  ],
+  [
+    "Dernière valeur textuelle",
+    "Latest text value",
+    "Último valor textual",
+    "آخر قيمة نصية"
+  ],
+  [
+    "Dernière date",
+    "Latest date",
+    "Data mais recente",
+    "أحدث تاريخ"
+  ],
+  [
+    "Aucune observation qualitative enregistrée pour les lots sélectionnés et la période choisie.",
+    "No qualitative observations were recorded for the selected batches and period.",
+    "Não foram registadas observações qualitativas para os lotes e período selecionados.",
+    "لم تُسجّل ملاحظات نوعية للدفعات والفترة المحددة."
+  ],
+  [
+    "Association linéaire exploratoire marquée",
+    "Strong exploratory linear association",
+    "Associação linear exploratória forte",
+    "ارتباط خطي استكشافي قوي"
+  ],
+  [
+    "Association linéaire exploratoire",
+    "Exploratory linear association",
+    "Associação linear exploratória",
+    "ارتباط خطي استكشافي"
+  ],
+  [
+    "Corrélation de Pearson sur des moyennes journalières appariées au sein du même lot (au moins 4 journées appariées). Les répétitions ne sont pas indépendantes et les effets du temps ou des traitements ne sont pas contrôlés.",
+    "Pearson correlation on paired daily means within the same batch (at least 4 paired days). Repeated observations are not independent, and time or treatment effects are not controlled.",
+    "Correlação de Pearson sobre médias diárias emparelhadas dentro do mesmo lote (pelo menos 4 dias emparelhados). As repetições não são independentes e os efeitos do tempo ou dos tratamentos não são controlados.",
+    "ارتباط بيرسون بين المتوسطات اليومية المقترنة داخل الدفعة نفسها (أربعة أيام مقترنة على الأقل). التكرارات ليست مستقلة ولم تُضبط آثار الزمن أو المعالجات."
+  ],
+  [
+    "Journées appariées (n)",
+    "Paired days (n)",
+    "Dias emparelhados (n)",
+    "الأيام المقترنة (n)"
+  ],
+  [
+    "Associations observées",
+    "Observed associations",
+    "Associações observadas",
+    "الارتباطات المرصودة"
+  ],
+  [
+    "Une corrélation, même forte, ne démontre pas de causalité.",
+    "A correlation, even a strong one, does not demonstrate causality.",
+    "Uma correlação, mesmo forte, não demonstra causalidade.",
+    "الارتباط، حتى إن كان قوياً، لا يثبت السببية."
+  ],
+  [
+    "Pas assez de journées appariées entre variables différentes pour calculer une corrélation interprétable (minimum opérationnel : 4 journées au sein du même lot).",
+    "Not enough paired days between different variables to calculate an interpretable correlation (operational minimum: 4 days within the same batch).",
+    "Não existem dias emparelhados suficientes entre variáveis diferentes para calcular uma correlação interpretável (mínimo operacional: 4 dias no mesmo lote).",
+    "لا توجد أيام مقترنة كافية بين المتغيرات المختلفة لحساب ارتباط قابل للتفسير (الحد الأدنى العملي: 4 أيام داخل الدفعة نفسها)."
+  ],
+  [
+    "Pour un prochain essai, envisager de mesurer conjointement — si pertinent pour le système étudié —",
+    "For a future trial, consider measuring together — if relevant to the system studied —",
+    "Num próximo ensaio, considere medir em conjunto — se for pertinente para o sistema estudado —",
+    "في تجربة لاحقة، فكّر في قياس المتغيرات معاً — إذا كان ذلك مناسباً للنظام المدروس —"
+  ],
+  [
+    "Choisir une variable de réponse et enregistrer en parallèle les facteurs de milieu ou de procédé pertinents déjà présents dans le catalogue. Préspécifier fréquence, méthode, unités et répétitions.",
+    "Choose a response variable and simultaneously record relevant environmental or process factors already in the catalogue. Predefine frequency, method, units and replicates.",
+    "Escolha uma variável de resposta e registe em paralelo os fatores ambientais ou de processo relevantes já existentes no catálogo. Defina previamente frequência, método, unidades e repetições.",
+    "اختر متغير استجابة وسجّل بالتوازي عوامل البيئة أو العملية ذات الصلة الموجودة في الكتالوج. حدّد مسبقاً التواتر والطريقة والوحدات والتكرارات."
+  ],
+  [
+    "Ces variables sont des pistes de protocole, pas des explications démontrées des différences observées.",
+    "These variables are protocol ideas, not proven explanations for the observed differences.",
+    "Estas variáveis são pistas para o protocolo, não explicações comprovadas das diferenças observadas.",
+    "هذه المتغيرات مقترحات للبروتوكول وليست تفسيرات مثبتة للاختلافات المرصودة."
+  ],
+  [
+    "Variable · unité / lot",
+    "Variable · unit / batch",
+    "Variável · unidade / lote",
+    "المتغير · الوحدة / الدفعة"
+  ],
+  [
+    "Min–max",
+    "Min–max",
+    "Mín.–máx.",
+    "الحد الأدنى–الأقصى"
+  ],
+  [
+    "Période réellement couverte par les données utilisées :",
+    "Actual period covered by the data used:",
+    "Período efetivamente abrangido pelos dados utilizados:",
+    "الفترة الفعلية التي تغطيها البيانات المستخدمة:"
+  ],
+  [
+    "Lots à comparer",
+    "Batches to compare",
+    "Lotes a comparar",
+    "الدفعات المطلوب مقارنتها"
+  ],
+  [
+    "Les lots disponibles apparaîtront après connexion.",
+    "Available batches will appear after sign-in.",
+    "Os lotes disponíveis aparecerão após iniciar sessão.",
+    "ستظهر الدفعات المتاحة بعد تسجيل الدخول."
+  ],
+  [
+    "Variable A",
+    "Variable A",
+    "Variável A",
+    "المتغير أ"
+  ],
+  [
+    "Variable B",
+    "Variable B",
+    "Variável B",
+    "المتغير ب"
+  ],
+  [
+    "r de Pearson",
+    "Pearson's r",
+    "r de Pearson",
+    "معامل بيرسون r"
+  ],
+  [
+    "Lecture",
+    "Interpretation",
+    "Interpretação",
+    "التفسير"
+  ],
+  [
+    "Aucune série temporelle datée pour",
+    "No dated time series for",
+    "Não existe série temporal datada para",
+    "لا توجد سلسلة زمنية مؤرخة لـ"
+  ],
+  [
+    "Aucune mesure exécutée.",
+    "No analysis run.",
+    "Nenhuma análise executada.",
+    "لم يتم إجراء أي تحليل."
+  ],
+  [
+    "Choisissez une variable pour commencer l’analyse.",
+    "Choose a variable to begin the analysis.",
+    "Escolha uma variável para iniciar a análise.",
+    "اختر متغيراً لبدء التحليل."
+  ],
+  [
+    "Données brutes utilisées",
+    "Raw data used",
+    "Dados brutos utilizados",
+    "البيانات الخام المستخدمة"
+  ],
+  [
+    "Valeur",
+    "Value",
+    "Valor",
+    "القيمة"
+  ],
+  [
+    "Unité",
+    "Unit",
+    "Unidade",
+    "الوحدة"
+  ],
+  [
+    "Méthode",
+    "Method",
+    "Método",
+    "الطريقة"
+  ],
+  [
+    "Certaines cultures sont liées à plusieurs lots de votre organisation : les mesures/observations rattachées seulement à la culture ou à un échantillon sont laissées de côté pour éviter une attribution ambiguë.",
+    "Some cultures are linked to multiple batches in your organization. Measurements or observations linked only to the culture or a sample are omitted to avoid ambiguous attribution.",
+    "Algumas culturas estão associadas a vários lotes da sua organização. As medições ou observações ligadas apenas à cultura ou a uma amostra são omitidas para evitar uma atribuição ambígua.",
+    "ترتبط بعض المزارع بعدة دفعات في مؤسستك. تُستبعد القياسات أو الملاحظات المرتبطة بالمزرعة أو العينة فقط لتجنب الإسناد الملتبس."
   ]
 ];
-  for (const [fr, en, pt, ar] of supplementalCoverage) {
+for (const [fr, en, pt, ar] of supplementalCoverage) {
     dictionaries.en[fr] ||= en;
     dictionaries.pt[fr] ||= pt;
     dictionaries.ar[fr] ||= ar;
@@ -486,6 +936,7 @@
     const label = document.getElementById("languageLabel");
     if (label) label.textContent = currentLanguage === "ar" ? "اللغة" : currentLanguage === "pt" ? "Idioma" : currentLanguage === "en" ? "Language" : "Langue";
     try { localStorage.setItem("ba-labs-language", currentLanguage); } catch (_) {}
+    window.dispatchEvent(new CustomEvent("ba-labs-language-change", { detail: { language: currentLanguage } }));
   }
   function mountSelector() {
     const toolbar = document.querySelector(".app-toolbar");

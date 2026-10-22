@@ -623,6 +623,32 @@
     <div id="statisticsChart" class="statistics-chart"><p class="muted">Le graphique apparaîtra lorsque des mesures numériques compatibles seront disponibles.</p></div>
     <div class="statistics-table-wrap"><table class="statistics-table"><caption>Données brutes utilisées</caption><thead><tr><th>Date</th><th>Culture</th><th>Valeur</th><th>Unité</th><th>Méthode</th></tr></thead><tbody id="statisticsRows"><tr><td colspan="5">Aucune analyse exécutée.</td></tr></tbody></table></div>
     <p class="statistics-footnote">Les résultats sont descriptifs. Aucune moyenne ni inférence statistique n’est calculée. Les mesures hors unité comparable sont exclues du graphique et restent visibles dans les données brutes.</p>
+
+    <section class="comparison-panel" aria-labelledby="compareLotsTitle">
+      <div class="comparison-heading">
+        <div>
+          <span class="section-kicker-label">ANALYSE EXPLORATOIRE</span>
+          <h3 id="compareLotsTitle">Comparer mes lots</h3>
+          <p class="muted">Comparez les mesures et observations déjà enregistrées. Aucun enregistrement ne sera créé ou modifié.</p>
+        </div>
+      </div>
+      <p class="comparison-note">Sélection limitée aux 30 lots les plus récents actuellement chargés. Les données sont rattachées à un lot via ses événements ; les données liées uniquement à une culture ne sont attribuées que si cette culture correspond sans ambiguïté à un seul lot sélectionné.</p>
+      <div id="compareBatchPicker" class="comparison-batch-picker" aria-label="Lots à comparer">
+        <p class="muted">Les lots disponibles apparaîtront après connexion.</p>
+      </div>
+      <div class="comparison-filters">
+        <div><label for="compareFromDate">Depuis le</label><input id="compareFromDate" type="date"></div>
+        <div><label for="compareToDate">Jusqu’au</label><input id="compareToDate" type="date"></div>
+        <div class="comparison-filter-action"><button id="compareLotsButton" type="button">Comparer les lots sélectionnés</button></div>
+      </div>
+      <p id="compareLotsStatus" class="muted" role="status" aria-live="polite">Sélectionnez au moins deux lots pour commencer.</p>
+      <div id="compareLotsSummary" class="statistics-summary"></div>
+      <div id="compareLotsFindings" class="comparison-findings"></div>
+      <div id="compareLotsCharts" class="comparison-charts"></div>
+      <div id="compareLotsTables" class="comparison-tables"></div>
+      <p class="statistics-footnote">Lecture scientifique : les constats décrivent les données disponibles ; les corrélations sont exploratoires et ne démontrent pas de causalité ; les variables suggérées sont des pistes à mesurer lors d’un prochain essai. L’absence de mesure enregistrée ne prouve pas qu’une mesure était prévue. Les unités sont converties seulement si le catalogue permet une conversion compatible et sûre ; sinon, les séries restent séparées.</p>
+    </section>
+
   </section>
 
   <!-- ======================================================

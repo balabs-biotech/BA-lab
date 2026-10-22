@@ -676,6 +676,7 @@ async function signOut() {
   referenceData = [];
   cultureOptions = [];
   latestBatches = [];
+  clearLotComparisonState();
   selectedBatchId = null;
   selectedBatch = null;
 
@@ -706,6 +707,11 @@ async function refreshAuthUI() {
 
 
   if (!session) {
+
+    clearLotComparisonState();
+    organizationId = null;
+    organization = null;
+    latestBatches = [];
 
     hideElement(trackerCard);
     hideElement(batchCard);
@@ -2158,6 +2164,7 @@ async function loadLatestBatches() {
   renderBatchList();
   renderMeasurementTargets();
   renderStatisticsFilters();
+  renderComparisonBatchOptions();
 
 }
 
@@ -3941,7 +3948,7 @@ async function loadMeasurementReferences() {
       .select("code, label, dimension, canonical_unit_code, description")
       .order("label"),
     supabaseClient.from("units")
-      .select("code, label, dimension")
+      .select("code, label, dimension, factor, offset_value, is_linear")
       .order("code")
   ]);
 
@@ -4442,7 +4449,7 @@ function renderStatisticsFilters() {
   latestBatches.forEach(batch => {
     const option = document.createElement("option");
     option.value = batch.id;
-    option.textContent = (batch.batch_code || "Lot sans code") + (batch.name ? " · " + batch.name : "");
+    option.textContent = (batch.batch_code || comparisonText("Lot sans code", "Batch without code", "Lote sem código", "دفعة بلا رمز")) + (batch.name ? " · " + batch.name : "");
     batchSelect.appendChild(option);
   });
   if (latestBatches.some(batch => batch.id === previousBatch)) batchSelect.value = previousBatch;
@@ -4645,15 +4652,529 @@ async function loadStatistics() {
       for(let tick=0;tick<5;tick++){const value=min+(max-min)*tick/4,yy=y(value),line=document.createElementNS(ns,"line");line.setAttribute("x1",left);line.setAttribute("x2",width-right);line.setAttribute("y1",yy);line.setAttribute("y2",yy);line.setAttribute("stroke","#e5ebe1");svg.appendChild(line);const label=document.createElementNS(ns,"text");label.setAttribute("x",left-9);label.setAttribute("y",yy+4);label.setAttribute("text-anchor","end");label.setAttribute("font-size","11");label.setAttribute("fill","#657267");label.textContent=Number(value.toPrecision(4)).toString();svg.appendChild(label);}
       const polyline=document.createElementNS(ns,"polyline");polyline.setAttribute("points",plotted.map((row,i)=>x(i)+","+y(row.plotValue)).join(" "));polyline.setAttribute("fill","none");polyline.setAttribute("stroke","#47764d");polyline.setAttribute("stroke-width","2.5");polyline.setAttribute("stroke-linejoin","round");svg.appendChild(polyline);
       plotted.forEach((row,i)=>{const circle=document.createElementNS(ns,"circle");circle.setAttribute("cx",x(i));circle.setAttribute("cy",y(row.plotValue));circle.setAttribute("r","3.5");circle.setAttribute("fill","#47764d");const title=document.createElementNS(ns,"title");title.textContent=(row.measured_at?new Date(row.measured_at).toLocaleString("fr-FR"):"Date inconnue")+": "+row.plotValue+" "+(row.plotUnit||"");circle.appendChild(title);svg.appendChild(circle);});
-      const xl=document.createElementNS(ns,"text");xl.setAttribute("x",(left+width-right)/2);xl.setAttribute("y",height-10);xl.setAttribute("text-anchor","middle");xl.setAttribute("font-size","11");xl.setAttribute("fill","#4f6252");xl.textContent="Date de mesure";svg.appendChild(xl);
+      const xl=document.createElementNS(ns,"text");xl.setAttribute("x",(left+width-right)/2);xl.setAttribute("y",height-10);xl.setAttribute("text-anchor","middle");xl.setAttribute("font-size","11");xl.setAttribute("fill","#4f6252");xl.textContent=comparisonText("Date de mesure", "Measurement date", "Data da medição", "تاريخ القياس");svg.appendChild(xl);
       const yl=document.createElementNS(ns,"text");yl.setAttribute("transform","translate(15 "+((top+height-bottom)/2)+") rotate(-90)");yl.setAttribute("text-anchor","middle");yl.setAttribute("font-size","11");yl.setAttribute("fill","#4f6252");yl.textContent=(variable?.label||variableCode)+" ("+(canonical||plotted[0].plotUnit||"unité inconnue")+")";svg.appendChild(yl);chart.appendChild(svg);
-      const periodLabel=document.createElement("p");periodLabel.className="muted";periodLabel.textContent="Période représentée : "+(plotted[0].measured_at?new Date(plotted[0].measured_at).toLocaleDateString("fr-FR"):"date inconnue")+" — "+(plotted[plotted.length-1].measured_at?new Date(plotted[plotted.length-1].measured_at).toLocaleDateString("fr-FR"):"date inconnue");chart.appendChild(periodLabel);
+      const periodLabel=document.createElement("p");periodLabel.className="muted";periodLabel.textContent=comparisonText("Période représentée : ", "Period shown: ", "Período apresentado: ", "الفترة المعروضة: ") +(plotted[0].measured_at?new Date(plotted[0].measured_at).toLocaleDateString("fr-FR"):comparisonText("date inconnue", "unknown date", "data desconhecida", "تاريخ غير معروف"))+" — "+(plotted[plotted.length-1].measured_at?new Date(plotted[plotted.length-1].measured_at).toLocaleDateString("fr-FR"):comparisonText("date inconnue", "unknown date", "data desconhecida", "تاريخ غير معروف"));chart.appendChild(periodLabel);
     }
     if(!rows.length) tbody.innerHTML='<tr><td colspan="5">Aucune mesure pour ces filtres.</td></tr>';
     else { rows.slice().reverse().slice(0,200).forEach(row=>{const tr=document.createElement("tr"),culture=cultureById.get(row.culture_id),cells=[row.measured_at?new Date(row.measured_at).toLocaleString("fr-FR"):"Date inconnue",culture?.code||(row.culture_id?"Culture liée par identifiant":"Lot / cible sans culture directe"),String(row.raw_value??"—"),row.raw_unit_code||"Unité non renseignée",row.method||"—"];cells.forEach(value=>{const td=document.createElement("td");td.textContent=value;tr.appendChild(td);});tbody.appendChild(tr);});if(rows.length>200){const tr=document.createElement("tr"),td=document.createElement("td");td.colSpan=5;td.textContent="Affichage limité aux 200 mesures les plus récentes sur "+rows.length+" chargées.";tr.appendChild(td);tbody.appendChild(tr);}}
   } catch(error) { if (requestId !== statisticsRequestId) return; console.error("Analyse des mesures impossible :",error); status.textContent="Impossible de charger les mesures : "+error.message; chart.innerHTML='<p class="muted">Le graphique n’a pas pu être produit.</p>'; summary.innerHTML=""; tbody.innerHTML='<tr><td colspan="5">Données indisponibles.</td></tr>'; }
   finally { if (requestId === statisticsRequestId) { button.disabled=false; button.textContent="Analyser les données"; } }
 }
+
+
+/* ============================================================
+   COMPARAISON EXPLORATOIRE DES LOTS — lecture seule
+   ============================================================ */
+function comparisonText(fr, en, pt, ar) {
+  const language = document.documentElement.lang || "fr";
+  return ({ fr: fr, en: en, pt: pt, ar: ar })[language] || fr;
+}
+
+function comparisonLocale() {
+  const language = document.documentElement.lang || "fr";
+  return language === "ar" ? "ar-DZ" : language === "pt" ? "pt-PT" : language === "en" ? "en-GB" : "fr-FR";
+}
+
+function comparisonUnitLabel(code) {
+  const labels = {
+    "%": ["%", "%", "%", "%"],
+    "1/h": ["h⁻¹ (1/h)", "h⁻¹ (1/h)", "h⁻¹ (1/h)", "ساعة⁻¹ (1/h)"],
+    "1/min": ["min⁻¹ (1/min)", "min⁻¹ (1/min)", "min⁻¹ (1/min)", "دقيقة⁻¹ (1/min)"],
+    cells: ["cellules", "cells", "células", "خلايا"],
+    "cells/mL": ["cellules/mL", "cells/mL", "células/mL", "خلايا/مل"],
+    CFU: ["UFC", "CFU", "UFC", "وحدة تكوين مستعمرة"],
+    "CFU/mL": ["UFC/mL", "CFU/mL", "UFC/mL", "وحدة تكوين مستعمرة/مل"],
+    count: ["comptage", "count", "contagem", "عدد"],
+    cm: ["cm", "cm", "cm", "سم"],
+    degC: ["°C", "°C", "°C", "°م"],
+    dimensionless: ["sans dimension", "dimensionless", "adimensional", "بلا أبعاد"],
+    g: ["g", "g", "g", "غ"],
+    h: ["h", "h", "h", "ساعة"],
+    K: ["K", "K", "K", "كلفن (K)"],
+    kg: ["kg", "kg", "kg", "كغ"],
+    L: ["L", "L", "L", "لتر"],
+    lux: ["lux", "lux", "lux", "لوكس"],
+    mg: ["mg", "mg", "mg", "ملغ"],
+    min: ["min", "min", "min", "دقيقة"],
+    mL: ["mL", "mL", "mL", "مل"],
+    mm: ["mm", "mm", "mm", "مم"],
+    "mS/cm": ["mS/cm", "mS/cm", "mS/cm", "ملي سيمنز/سم"],
+    pH: ["pH", "pH", "pH", "الأس الهيدروجيني"],
+    ppm: ["ppm", "ppm", "ppm", "جزء في المليون"],
+    s: ["s", "s", "s", "ثانية"],
+    ug: ["µg", "µg", "µg", "ميكروغرام"],
+    uL: ["µL", "µL", "µL", "ميكرولتر"]
+  };
+  const index = ({ fr: 0, en: 1, pt: 2, ar: 3 })[document.documentElement.lang || "fr"] || 0;
+  return labels[code]?.[index] || code || comparisonText("unité non renseignée", "unit not specified", "unidade não indicada", "الوحدة غير محددة");
+}
+
+function comparisonVariableLabel(variable) {
+  if (!variable) return "";
+  const labels = {
+    cell_count: ["Nombre de cellules", "Cell count", "Contagem celular", "عدد الخلايا"],
+    cell_count_per_ml: ["Concentration cellulaire", "Cell concentration", "Concentração celular", "تركيز الخلايا"],
+    cfu: ["Nombre d’UFC", "CFU count", "Contagem de UFC", "عدد وحدات تكوين المستعمرات"],
+    cfu_per_ml: ["Concentration en UFC", "CFU concentration", "Concentração de UFC", "تركيز وحدات تكوين المستعمرات"],
+    co2_concentration: ["Concentration en CO₂", "CO₂ concentration", "Concentração de CO₂", "تركيز ثاني أكسيد الكربون"],
+    colony_count: ["Nombre de colonies", "Colony count", "Contagem de colónias", "عدد المستعمرات"],
+    dry_biomass: ["Biomasse sèche", "Dry biomass", "Biomassa seca", "الكتلة الحيوية الجافة"],
+    dry_mass: ["Masse sèche", "Dry mass", "Massa seca", "الكتلة الجافة"],
+    electrical_conductivity: ["Conductivité électrique (CE)", "Electrical conductivity (EC)", "Condutividade elétrica (CE)", "التوصيلية الكهربائية"],
+    fresh_mass: ["Masse fraîche", "Fresh mass", "Massa fresca", "الكتلة الطازجة"],
+    generation_time: ["Temps de génération", "Generation time", "Tempo de geração", "زمن الجيل"],
+    growth_rate: ["Taux de croissance", "Growth rate", "Taxa de crescimento", "معدل النمو"],
+    illuminance: ["Éclairement", "Illuminance", "Iluminância", "الاستضاءة"],
+    incubation_time: ["Durée d’incubation", "Incubation time", "Tempo de incubação", "مدة الحضانة"],
+    od600: ["Densité optique à 600 nm", "Optical density at 600 nm", "Densidade ótica a 600 nm", "الكثافة الضوئية عند 600 نانومتر"],
+    ph: ["pH", "pH", "pH", "الأس الهيدروجيني"],
+    relative_humidity: ["Humidité relative", "Relative humidity", "Humidade relativa", "الرطوبة النسبية"],
+    root_length: ["Longueur des racines", "Root length", "Comprimento das raízes", "طول الجذور"],
+    shoot_length: ["Longueur des pousses", "Shoot length", "Comprimento dos rebentos", "طول الأفرع"],
+    substrate_moisture: ["Humidité du substrat", "Substrate moisture", "Humidade do substrato", "رطوبة الركيزة"],
+    temperature: ["Température", "Temperature", "Temperatura", "درجة الحرارة"],
+    viability: ["Viabilité", "Viability", "Viabilidade", "الحيوية"],
+    volume: ["Volume", "Volume", "Volume", "الحجم"],
+    wet_biomass: ["Biomasse humide", "Wet biomass", "Biomassa húmida", "الكتلة الحيوية الرطبة"]
+  };
+  const index = ({ fr: 0, en: 1, pt: 2, ar: 3 })[document.documentElement.lang || "fr"] || 0;
+  return labels[variable.code]?.[index] || variable.label || variable.code;
+}
+
+let lotComparisonRequestId = 0;
+let lotComparisonHasRun = false;
+
+function clearLotComparisonState() {
+  lotComparisonRequestId += 1;
+  lotComparisonHasRun = false;
+  ["compareLotsSummary", "compareLotsFindings", "compareLotsCharts", "compareLotsTables"].forEach(id => {
+    const element = document.getElementById(id);
+    if (element) element.innerHTML = "";
+  });
+  const picker = document.getElementById("compareBatchPicker");
+  if (picker) picker.innerHTML = '<p class="muted">' + escapeHtml(comparisonText("Les lots disponibles apparaîtront après connexion.", "Available batches will appear after sign-in.", "Os lotes disponíveis aparecerão após iniciar sessão.", "ستظهر الدفعات المتاحة بعد تسجيل الدخول.")) + '</p>';
+  const status = document.getElementById("compareLotsStatus");
+  if (status) status.textContent = comparisonText("Sélectionnez au moins deux lots pour commencer.", "Select at least two batches to begin.", "Selecione pelo menos dois lotes para começar.", "حدد دفعتين على الأقل للبدء.");
+  const button = document.getElementById("compareLotsButton");
+  if (button) {
+    button.disabled = false;
+    button.textContent = comparisonText("Comparer les lots sélectionnés", "Compare selected batches", "Comparar os lotes selecionados", "قارن الدفعات المحددة");
+  }
+}
+
+function renderComparisonBatchOptions() {
+  const picker = document.getElementById("compareBatchPicker");
+  if (!picker) return;
+  const previouslySelected = new Set(Array.from(picker.querySelectorAll('input[name="compareBatch"]:checked')).map(input => input.value));
+  if (!organizationId) {
+    picker.innerHTML = '<p class="muted">' + escapeHtml(comparisonText("Les lots disponibles apparaîtront après connexion.", "Available batches will appear after sign-in.", "Os lotes disponíveis aparecerão após iniciar sessão.", "ستظهر الدفعات المتاحة بعد تسجيل الدخول.")) + '</p>';
+    return;
+  }
+  if (!latestBatches.length) {
+    picker.innerHTML = '<p class="comparison-empty">' + escapeHtml(comparisonText("Aucun lot disponible dans le chargement courant. Créez un lot ou vérifiez les droits d’accès à votre organisation.", "No batches are available in the current load. Create a batch or check your organization access.", "Não há lotes disponíveis no carregamento atual. Crie um lote ou verifique o acesso à organização.", "لا توجد دفعات متاحة في التحميل الحالي. أنشئ دفعة أو تحقق من صلاحيات الوصول إلى مؤسستك.")) + '</p>';
+    return;
+  }
+  picker.innerHTML = latestBatches.map(batch => {
+    const id = escapeHtml(batch.id);
+    const code = escapeHtml(batch.batch_code || comparisonText("Lot sans code", "Batch without code", "Lote sem código", "دفعة بلا رمز"));
+    const name = escapeHtml(batch.name || batch.batch_type || comparisonText("Sans description", "No description", "Sem descrição", "بلا وصف"));
+    const stage = escapeHtml(batch.current_stage || batch.status || comparisonText("Étape non renseignée", "Stage not specified", "Etapa não indicada", "المرحلة غير محددة"));
+    return '<label class="comparison-batch-option"><input type="checkbox" name="compareBatch" value="' + id + '"' + (previouslySelected.has(batch.id) ? " checked" : "") + '><span><strong>' + code + '</strong><small>' + name + ' · ' + stage + '</small></span></label>';
+  }).join("");
+}
+
+async function fetchComparisonRows(buildQuery) {
+  const all = [];
+  const pageSize = 1000;
+  for (let offset = 0; ; offset += pageSize) {
+    const result = await buildQuery().range(offset, offset + pageSize - 1);
+    if (result.error) throw new Error(result.error.message);
+    const page = result.data || [];
+    all.push.apply(all, page);
+    if (page.length < pageSize) break;
+  }
+  return all;
+}
+
+function comparisonDateInRange(value, fromDate, toDate) {
+  return BACompareAnalysis.dateInRange(value, fromDate, toDate);
+}
+
+function comparisonNumber(value) {
+  if (value === null || value === undefined || value === "") return null;
+  const number = Number(value);
+  return Number.isFinite(number) ? number : null;
+}
+
+function comparisonFormat(value, digits) {
+  if (value === null || value === undefined || !Number.isFinite(value)) return "—";
+  return new Intl.NumberFormat(comparisonLocale(), { maximumFractionDigits: digits === undefined ? 3 : digits }).format(value);
+}
+
+function comparisonTable(headers, rows, caption) {
+  const head = headers.map(value => "<th scope=\"col\">" + escapeHtml(value) + "</th>").join("");
+  const body = rows.length
+    ? rows.map(row => "<tr>" + row.map(value => "<td>" + value + "</td>").join("") + "</tr>").join("")
+    : '<tr><td colspan="' + headers.length + '">' + escapeHtml(comparisonText("Aucune donnée disponible.", "No data available.", "Nenhum dado disponível.", "لا تتوفر بيانات.")) + '</td></tr>';
+  return '<div class="comparison-table-wrap"><table class="comparison-table"><caption>' + escapeHtml(caption) + '</caption><thead><tr>' + head + '</tr></thead><tbody>' + body + '</tbody></table></div>';
+}
+
+function renderComparisonChart(group, batches, outlierIds) {
+  const points = group.points.filter(point => Number.isFinite(point.value) && point.measured_at);
+  if (!points.length) return '<div class="comparison-empty">' + escapeHtml(comparisonText("Aucune série temporelle datée pour ", "No dated time series for ", "Não existe série temporal datada para ", "لا توجد سلسلة زمنية مؤرخة لـ ") + group.label) + '.</div>';
+  const width = 760, height = 260, left = 58, right = 20, top = 20, bottom = 48;
+  const plotWidth = width - left - right, plotHeight = height - top - bottom;
+  const times = points.map(point => new Date(point.measured_at).getTime());
+  const values = points.map(point => point.value);
+  let minTime = Math.min.apply(null, times), maxTime = Math.max.apply(null, times);
+  let minValue = Math.min.apply(null, values), maxValue = Math.max.apply(null, values);
+  if (minTime === maxTime) { minTime -= 12 * 60 * 60 * 1000; maxTime += 12 * 60 * 60 * 1000; }
+  if (minValue === maxValue) { const pad = Math.abs(minValue) * 0.08 || 1; minValue -= pad; maxValue += pad; }
+  const palette = ["#276749", "#b45309", "#2563eb", "#7c3aed", "#0f766e", "#be123c", "#475569", "#a16207"];
+  const batchMap = new Map(batches.map(batch => [batch.id, batch]));
+  const batchIds = Array.from(new Set(points.map(point => point.batchId)));
+  const x = value => left + ((new Date(value).getTime() - minTime) / (maxTime - minTime)) * plotWidth;
+  const y = value => top + (1 - (value - minValue) / (maxValue - minValue)) * plotHeight;
+  let svg = '<svg viewBox="0 0 ' + width + ' ' + height + '" role="img" aria-label="' + escapeHtml(comparisonText("Évolution temporelle de ", "Time evolution of ", "Evolução temporal de ", "التغير الزمني لـ ") + group.label) + '">';
+  for (let tick = 0; tick < 5; tick++) {
+    const value = minValue + ((maxValue - minValue) * tick / 4);
+    const py = y(value);
+    svg += '<line x1="' + left + '" y1="' + py + '" x2="' + (width - right) + '" y2="' + py + '" stroke="currentColor" opacity=".12"/>';
+    svg += '<text x="' + (left - 8) + '" y="' + (py + 4) + '" text-anchor="end" font-size="10" fill="currentColor">' + comparisonFormat(value, 2) + '</text>';
+  }
+  svg += '<line x1="' + left + '" y1="' + (height - bottom) + '" x2="' + (width - right) + '" y2="' + (height - bottom) + '" stroke="currentColor" opacity=".35"/>';
+  batchIds.forEach((batchId, batchIndex) => {
+    const series = points.filter(point => point.batchId === batchId).sort((a, b) => new Date(a.measured_at) - new Date(b.measured_at));
+    const color = palette[batchIndex % palette.length];
+    if (series.length > 1) {
+      const path = series.map((point, index) => (index ? "L" : "M") + x(point.measured_at).toFixed(2) + " " + y(point.value).toFixed(2)).join(" ");
+      svg += '<path d="' + path + '" fill="none" stroke="' + color + '" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>';
+    }
+    series.forEach(point => {
+      const radius = outlierIds.has(point.id) ? 5 : 3.2;
+      svg += '<circle cx="' + x(point.measured_at).toFixed(2) + '" cy="' + y(point.value).toFixed(2) + '" r="' + radius + '" fill="' + color + '" stroke="' + (outlierIds.has(point.id) ? "#b91c1c" : "#fff") + '" stroke-width="' + (outlierIds.has(point.id) ? 2 : 1) + '"><title>' + escapeHtml((batchMap.get(batchId)?.batch_code || comparisonText("Lot", "Batch", "Lote", "دفعة")) + " · " + new Date(point.measured_at).toLocaleString(comparisonLocale()) + " · " + comparisonFormat(point.value) + " " + comparisonUnitLabel(group.unit)) + '</title></circle>';
+    });
+  });
+  svg += '<text x="' + left + '" y="' + (height - 17) + '" font-size="10" fill="currentColor">' + new Date(minTime).toLocaleDateString(comparisonLocale()) + '</text>';
+  svg += '<text x="' + (width - right) + '" y="' + (height - 17) + '" text-anchor="end" font-size="10" fill="currentColor">' + new Date(maxTime).toLocaleDateString(comparisonLocale()) + '</text>';
+  svg += '<text x="' + (left + plotWidth / 2) + '" y="' + (height - 2) + '" text-anchor="middle" font-size="10" fill="currentColor">' + escapeHtml(comparisonText("Date de mesure", "Measurement date", "Data da medição", "تاريخ القياس")) + '</text></svg>';
+  const legend = batchIds.map((batchId, index) => '<span><i style="background:' + palette[index % palette.length] + '"></i>' + escapeHtml(batchMap.get(batchId)?.batch_code || comparisonText("Lot sans code", "Batch without code", "Lote sem código", "دفعة بلا رمز")) + '</span>').join("");
+  return '<article class="comparison-chart-card"><h4>' + escapeHtml(group.label) + ' <span class="muted">(' + escapeHtml(comparisonUnitLabel(group.unit)) + ')</span></h4>' + svg + '<div class="comparison-legend">' + legend + '</div></article>';
+}
+
+async function loadLotComparison() {
+  const requestId = ++lotComparisonRequestId;
+  const status = document.getElementById("compareLotsStatus");
+  const summary = document.getElementById("compareLotsSummary");
+  const findings = document.getElementById("compareLotsFindings");
+  const charts = document.getElementById("compareLotsCharts");
+  const tables = document.getElementById("compareLotsTables");
+  const button = document.getElementById("compareLotsButton");
+  if (!organizationId) {
+    status.textContent = comparisonText("Connectez-vous pour comparer les lots de votre organisation.", "Sign in to compare batches in your organization.", "Inicie sessão para comparar os lotes da sua organização.", "سجّل الدخول لمقارنة دفعات مؤسستك.");
+    return;
+  }
+  const selectedIds = Array.from(document.querySelectorAll('input[name="compareBatch"]:checked')).map(input => input.value);
+  if (selectedIds.length < 2) {
+    status.textContent = comparisonText("Sélectionnez au moins deux lots.", "Select at least two batches.", "Selecione pelo menos dois lotes.", "حدد دفعتين على الأقل.");
+    return;
+  }
+  const selectedBatches = latestBatches.filter(batch => selectedIds.includes(batch.id));
+  if (selectedBatches.length < 2) {
+    status.textContent = comparisonText("La sélection a changé. Actualisez la liste des lots et réessayez.", "The selection has changed. Refresh the batch list and try again.", "A seleção mudou. Atualize a lista de lotes e tente novamente.", "تغير التحديد. حدّث قائمة الدفعات وحاول مرة أخرى.");
+    return;
+  }
+  lotComparisonHasRun = true;
+  const fromDate = document.getElementById("compareFromDate").value;
+  const toDate = document.getElementById("compareToDate").value;
+  if (fromDate && toDate && fromDate > toDate) {
+    status.textContent = comparisonText("La date de début doit précéder ou correspondre à la date de fin.", "The start date must be on or before the end date.", "A data inicial deve ser anterior ou igual à data final.", "يجب أن يكون تاريخ البداية قبل تاريخ النهاية أو مساوياً له.");
+    return;
+  }
+
+  button.disabled = true;
+  button.textContent = comparisonText("Comparaison en cours…", "Comparison in progress…", "Comparação em curso…", "المقارنة قيد التنفيذ…");
+  status.textContent = comparisonText("Lecture des données autorisées dans Supabase…", "Reading data authorized by Supabase…", "A ler os dados autorizados no Supabase…", "جارٍ قراءة البيانات المصرح بها في Supabase…");
+  summary.innerHTML = "";
+  findings.innerHTML = "";
+  charts.innerHTML = "";
+  tables.innerHTML = "";
+
+  try {
+    const selectedBatchIds = selectedBatches.map(batch => batch.id);
+    const selectedCultureIds = Array.from(new Set(selectedBatches.map(batch => batch.culture_id).filter(Boolean)));
+    const cultureBatchRows = selectedCultureIds.length
+      ? await fetchComparisonRows(() => supabaseClient.from("batches").select("id,culture_id")
+          .eq("organization_id", organizationId).in("culture_id", selectedCultureIds).order("id", { ascending: true }))
+      : [];
+    const cultureBatchCounts = new Map();
+    const cultureToBatch = new Map();
+    cultureBatchRows.forEach(batch => {
+      if (!batch.culture_id) return;
+      cultureBatchCounts.set(batch.culture_id, (cultureBatchCounts.get(batch.culture_id) || 0) + 1);
+      if (!cultureToBatch.has(batch.culture_id)) cultureToBatch.set(batch.culture_id, batch.id);
+    });
+    const unambiguousCultureIds = Array.from(cultureBatchCounts.entries())
+      .filter(entry => entry[1] === 1 && selectedBatchIds.includes(cultureToBatch.get(entry[0])))
+      .map(entry => entry[0]);
+    const safeCultureToBatch = new Map(Array.from(cultureToBatch.entries())
+      .filter(entry => cultureBatchCounts.get(entry[0]) === 1 && selectedBatchIds.includes(entry[1])));
+
+    const batchEvents = await fetchComparisonRows(() => supabaseClient.from("events")
+      .select("id,batch_id,culture_id,sample_id,occurred_at,event_type,payload")
+      .eq("organization_id", organizationId).in("batch_id", selectedBatchIds).order("occurred_at", { ascending: true }).order("id", { ascending: true }));
+    const cultureEvents = unambiguousCultureIds.length
+      ? await fetchComparisonRows(() => supabaseClient.from("events")
+          .select("id,batch_id,culture_id,sample_id,occurred_at,event_type,payload")
+          .eq("organization_id", organizationId).in("culture_id", unambiguousCultureIds).is("batch_id", null).order("occurred_at", { ascending: true }).order("id", { ascending: true }))
+      : [];
+    const sampleRows = unambiguousCultureIds.length
+      ? await fetchComparisonRows(() => supabaseClient.from("samples")
+          .select("id,culture_id").eq("organization_id", organizationId)
+          .in("culture_id", unambiguousCultureIds).order("id", { ascending: true }))
+      : [];
+    const sampleToBatch = new Map();
+    sampleRows.forEach(sample => {
+      const batchId = safeCultureToBatch.get(sample.culture_id);
+      if (batchId) sampleToBatch.set(sample.id, batchId);
+    });
+
+    const eventToBatch = new Map();
+    batchEvents.forEach(event => { if (selectedBatchIds.includes(event.batch_id)) eventToBatch.set(event.id, event.batch_id); });
+    cultureEvents.forEach(event => { const batchId = safeCultureToBatch.get(event.culture_id); if (batchId && !event.batch_id) eventToBatch.set(event.id, batchId); });
+    const sampleIds = sampleRows.map(sample => sample.id);
+    for (let offset = 0; offset < sampleIds.length; offset += 100) {
+      const sampleChunk = sampleIds.slice(offset, offset + 100);
+      const sampleEvents = await fetchComparisonRows(() => supabaseClient.from("events")
+        .select("id,batch_id,culture_id,sample_id,occurred_at,event_type,payload")
+        .eq("organization_id", organizationId).in("sample_id", sampleChunk)
+        .is("batch_id", null).order("occurred_at", { ascending: true }).order("id", { ascending: true }));
+      sampleEvents.forEach(event => {
+        const batchId = event.culture_id
+          ? safeCultureToBatch.get(event.culture_id)
+          : sampleToBatch.get(event.sample_id);
+        if (batchId && !event.batch_id) eventToBatch.set(event.id, batchId);
+      });
+    }
+    const eventIds = Array.from(eventToBatch.keys());
+
+    async function fetchLinkedRows(tableName, selectFields, dateField) {
+      const results = [];
+      // Chunk event IDs to keep PostgREST query URLs bounded for batches with long histories.
+      for (let offset = 0; offset < eventIds.length; offset += 100) {
+        const eventChunk = eventIds.slice(offset, offset + 100);
+        const rows = await fetchComparisonRows(() => supabaseClient.from(tableName).select(selectFields)
+          .eq("organization_id", organizationId).in("event_id", eventChunk).order(dateField, { ascending: true }).order("id", { ascending: true }));
+        results.push(rows);
+      }
+      if (unambiguousCultureIds.length) {
+        const cultureRows = await fetchComparisonRows(() => supabaseClient.from(tableName).select(selectFields)
+          .eq("organization_id", organizationId).in("culture_id", unambiguousCultureIds).is("event_id", null).order(dateField, { ascending: true }).order("id", { ascending: true }));
+        results.push(cultureRows);
+      }
+      // Sample-linked records may have neither event_id nor culture_id; query them explicitly.
+      for (let offset = 0; offset < sampleIds.length; offset += 100) {
+        const sampleChunk = sampleIds.slice(offset, offset + 100);
+        const sampleLinkedRows = await fetchComparisonRows(() => supabaseClient.from(tableName).select(selectFields)
+          .eq("organization_id", organizationId).in("sample_id", sampleChunk).is("event_id", null)
+          .order(dateField, { ascending: true }).order("id", { ascending: true }));
+        results.push(sampleLinkedRows);
+      }
+      const unique = new Map();
+      results.flat().forEach(row => unique.set(row.id, row));
+      return Array.from(unique.values()).filter(row => comparisonDateInRange(row[dateField], fromDate, toDate));
+    }
+
+    const [measurementRows, observationRows] = await Promise.all([
+      fetchLinkedRows("measurements", "id,variable_code,raw_value,raw_unit_code,normalized_value,normalized_unit_code,measured_at,method,instrument,quality_state,exclusion_reason,culture_id,sample_id,event_id,metadata", "measured_at"),
+      fetchLinkedRows("observations", "id,variable_code,value_text,observed_at,quality_state,culture_id,sample_id,event_id,metadata", "observed_at")
+    ]);
+    if (requestId !== lotComparisonRequestId) return;
+
+    function assignBatch(row) {
+      return BACompareAnalysis.resolveBatchId(row, eventToBatch, safeCultureToBatch, sampleToBatch);
+    }
+    const variableMap = new Map(measurementVariables.map(variable => [variable.code, variable]));
+    const unitMap = new Map(measurementUnits.map(unit => [unit.code, unit]));
+    const assignedMeasurements = measurementRows.map(row => Object.assign({}, row, { batchId: assignBatch(row) }))
+      .filter(row => row.batchId && row.quality_state !== "excluded" && !row.exclusion_reason)
+      .map(row => {
+        const normalized = comparisonNumber(row.normalized_value);
+        const raw = comparisonNumber(row.raw_value);
+        const sourceUnitCode = normalized !== null && row.normalized_unit_code ? row.normalized_unit_code : (row.raw_unit_code || "unité non renseignée");
+        const sourceUnit = unitMap.get(sourceUnitCode);
+        const variable = variableMap.get(row.variable_code);
+        const targetUnitCode = variable?.canonical_unit_code;
+        const targetUnit = targetUnitCode ? unitMap.get(targetUnitCode) : null;
+        const sourceValue = normalized !== null && row.normalized_unit_code ? normalized : raw;
+        const converted = sourceValue !== null && sourceUnit && targetUnit
+          ? BACompareAnalysis.convertUnit(sourceValue, sourceUnit, targetUnit, variable?.dimension)
+          : null;
+        return Object.assign({}, row, {
+          value: converted !== null ? converted : sourceValue,
+          unit: converted !== null ? targetUnitCode : sourceUnitCode,
+          valueBasis: converted !== null && sourceUnitCode !== targetUnitCode ? comparisonText("convertie", "converted", "convertida", "محولة") : (normalized !== null && row.normalized_unit_code ? comparisonText("normalisée", "normalized", "normalizada", "مطَبَّعة") : comparisonText("brute", "raw", "bruta", "خام"))
+        });
+      }).filter(row => row.value !== null);
+    const assignedObservations = observationRows.map(row => Object.assign({}, row, { batchId: assignBatch(row) }))
+      .filter(row => row.batchId && row.quality_state !== "excluded");
+
+    const groupsByKey = new Map();
+    assignedMeasurements.forEach(row => {
+      const variable = variableMap.get(row.variable_code);
+      const key = row.variable_code + "::" + row.unit;
+      if (!groupsByKey.has(key)) groupsByKey.set(key, { key: key, variableCode: row.variable_code, variable: variable, unit: row.unit, label: comparisonVariableLabel(variable) || row.variable_code || comparisonText("Variable non référencée", "Unreferenced variable", "Variável sem referência", "متغير غير مرجعي"), points: [] });
+      groupsByKey.get(key).points.push(row);
+    });
+    const groups = Array.from(groupsByKey.values()).sort((a, b) => a.label.localeCompare(b.label, "fr") || a.unit.localeCompare(b.unit, "fr"));
+    const outlierByGroup = new Map();
+    const selectedBatchIdsForOutliers = selectedBatches.map(batch => batch.id);
+    groups.forEach(group => outlierByGroup.set(
+      group.key,
+      new Set(BACompareAnalysis.detectOutliersByBatch(group.points, selectedBatchIdsForOutliers))
+    ));
+
+    const allDates = assignedMeasurements.map(row => row.measured_at).concat(assignedObservations.map(row => row.observed_at)).filter(Boolean).sort();
+    const periodLabel = allDates.length
+      ? new Date(allDates[0]).toLocaleDateString(comparisonLocale()) + " — " + new Date(allDates[allDates.length - 1]).toLocaleDateString(comparisonLocale())
+      : (fromDate || toDate)
+        ? (fromDate || comparisonText("début non limité", "unbounded start", "início sem limite", "بداية غير محددة")) + " — " + (toDate || comparisonText("fin non limitée", "unbounded end", "fim não limitado", "نهاية غير محددة"))
+        : comparisonText("aucune date disponible", "no dates available", "nenhuma data disponível", "لا تتوفر تواريخ");
+    const outlierCount = Array.from(outlierByGroup.values()).reduce((sum, ids) => sum + ids.size, 0);
+    summary.innerHTML = [
+      [comparisonText("Lots sélectionnés", "Selected batches", "Lotes selecionados", "الدفعات المحددة"), String(selectedBatches.length)],
+      [comparisonText("Mesures utilisables", "Usable measurements", "Medições utilizáveis", "القياسات القابلة للاستخدام"), String(assignedMeasurements.length)],
+      [comparisonText("Observations qualitatives", "Qualitative observations", "Observações qualitativas", "الملاحظات النوعية"), String(assignedObservations.length)]
+    ].map(item => '<div class="statistics-summary-item"><span>' + escapeHtml(item[0]) + '</span><strong>' + escapeHtml(item[1]) + '</strong></div>').join("");
+
+    const descriptive = [];
+    if (!assignedMeasurements.length && !assignedObservations.length) {
+      descriptive.push(comparisonText("Aucune mesure ni observation exploitable n’a été trouvée pour ces lots et cette période. Cela ne permet pas de conclure sur leurs performances.", "No usable measurements or observations were found for these batches and this period. No conclusion about their performance can be drawn.", "Não foram encontradas medições ou observações utilizáveis para estes lotes e período. Não é possível tirar conclusões sobre o seu desempenho.", "لم يُعثر على قياسات أو ملاحظات قابلة للاستخدام لهذه الدفعات والفترة. لا يمكن استخلاص استنتاج بشأن أدائها."));
+    } else {
+      descriptive.push(comparisonText(assignedMeasurements.length + " mesure(s) numérique(s) et " + assignedObservations.length + " observation(s) qualitative(s) sont exploitables après exclusion des enregistrements marqués exclus.", assignedMeasurements.length + " numeric measurement(s) and " + assignedObservations.length + " qualitative observation(s) are usable after excluding records marked as excluded.", assignedMeasurements.length + " medição(ões) numérica(s) e " + assignedObservations.length + " observação(ões) qualitativa(s) são utilizáveis após excluir os registos marcados como excluídos.", "يمكن استخدام " + assignedMeasurements.length + " قياس(ات) رقمي(ة) و" + assignedObservations.length + " ملاحظة(ات) نوعية بعد استبعاد السجلات المحددة كمستبعدة."));
+    }
+    if (outlierCount) descriptive.push(comparisonText(outlierCount + " valeur(s) atypique(s) signalée(s) par la règle exploratoire des 1,5 × IQR au sein de chaque lot ; elles restent incluses dans les graphiques et les statistiques.", outlierCount + " outlier(s) flagged by the exploratory 1.5 × IQR rule within each batch; they remain included in charts and statistics.", outlierCount + " valor(es) atípico(s) assinalado(s) pela regra exploratória de 1,5 × IQR dentro de cada lote; continuam incluídos nos gráficos e nas estatísticas.", "تم تحديد " + outlierCount + " قيمة شاذة وفق قاعدة 1.5 × IQR الاستكشافية داخل كل دفعة؛ وتظل مشمولة في الرسوم والإحصاءات."));
+    const missingLotVariablePairs = groups.reduce((sum, group) => sum + selectedBatches.filter(batch => !group.points.some(point => point.batchId === batch.id)).length, 0);
+    if (missingLotVariablePairs) descriptive.push(comparisonText(
+      missingLotVariablePairs + " combinaison(s) lot-variable sans mesure numérique exploitable ; cela signifie qu’aucune valeur utilisable n’a été trouvée, pas nécessairement qu’une mesure prévue a été oubliée.",
+      missingLotVariablePairs + " batch-variable combination(s) have no usable numeric measurement. This means no usable value was found, not necessarily that a scheduled measurement was missed.",
+      missingLotVariablePairs + " combinação(ões) lote-variável sem medição numérica utilizável; isto significa que não foi encontrado um valor utilizável, não necessariamente que uma medição prevista foi esquecida.",
+      missingLotVariablePairs + " تركيبة دفعة-متغير بلا قياس رقمي قابل للاستخدام؛ وهذا يعني عدم العثور على قيمة قابلة للاستخدام، ولا يعني بالضرورة نسيان قياس مجدول."
+    ));
+    if (Array.from(cultureBatchCounts.values()).some(count => count > 1)) descriptive.push(comparisonText("Certaines cultures sont liées à plusieurs lots de votre organisation : les mesures/observations rattachées seulement à la culture ou à un échantillon sont laissées de côté pour éviter une attribution ambiguë.", "Some cultures are linked to multiple batches in your organization. Measurements or observations linked only to the culture or a sample are omitted to avoid ambiguous attribution.", "Algumas culturas estão associadas a vários lotes da sua organização. As medições ou observações ligadas apenas à cultura ou a uma amostra são omitidas para evitar uma atribuição ambígua.", "ترتبط بعض المزارع بعدة دفعات في مؤسستك. تُستبعد القياسات أو الملاحظات المرتبطة بالمزرعة أو العينة فقط لتجنب الإسناد الملتبس."));
+    if (allDates.length) descriptive.push(comparisonText("Période réellement couverte par les données utilisées : ", "Actual period covered by the data used: ", "Período efetivamente abrangido pelos dados utilizados: ", "الفترة الفعلية التي تغطيها البيانات المستخدمة: ") + periodLabel + ".");
+    const undatedCount = assignedMeasurements.filter(row => !row.measured_at).length + assignedObservations.filter(row => !row.observed_at).length;
+    if (undatedCount) descriptive.push(comparisonText(undatedCount + " enregistrement(s) sans date sont inclus dans les effectifs, mais pas dans les graphiques temporels ni les corrélations.", undatedCount + " undated record(s) are included in counts but not in time-series charts or correlations.", undatedCount + " registo(s) sem data estão incluídos nas contagens, mas não nos gráficos temporais nem nas correlações.", "تم تضمين " + undatedCount + " سجل(ات) بلا تاريخ في الأعداد، ولكن ليس في الرسوم الزمنية أو الارتباطات."));
+    findings.innerHTML += '<article class="comparison-finding"><h4>' + escapeHtml(comparisonText("1. Constats descriptifs", "1. Descriptive findings", "1. Constatações descritivas", "1. النتائج الوصفية")) + '</h4><ul>' + descriptive.map(item => "<li>" + escapeHtml(item) + "</li>").join("") + "</ul></article>";
+
+    if (groups.length) {
+      const metricRows = [];
+      groups.forEach(group => {
+        const outlierIds = outlierByGroup.get(group.key);
+        const perLot = selectedBatches.map(batch => {
+          const points = group.points.filter(point => point.batchId === batch.id);
+          const stats = BACompareAnalysis.summarize(points.map(point => point.value));
+          const outliers = points.filter(point => outlierIds.has(point.id)).length;
+          return [
+            escapeHtml(group.label + " · " + comparisonUnitLabel(group.unit) + " / " + (batch.batch_code || comparisonText("Lot sans code", "Batch without code", "Lote sem código", "دفعة بلا رمز"))),
+            String(stats.n),
+            comparisonFormat(stats.median),
+            stats.n ? comparisonFormat(stats.min) + "–" + comparisonFormat(stats.max) : "—",
+            outliers ? '<span class="comparison-outlier">' + outliers + escapeHtml(comparisonText(" valeur(s) atypique(s)", " outlier(s)", " valor(es) atípico(s)", " قيمة شاذة")) + "</span>" : "0"
+          ];
+        });
+        perLot.forEach(row => metricRows.push(row));
+        charts.innerHTML += renderComparisonChart(group, selectedBatches, outlierIds);
+      });
+      tables.innerHTML += comparisonTable([comparisonText("Variable · unité / lot", "Variable · unit / batch", "Variável · unidade / lote", "المتغير · الوحدة / الدفعة"), "n", comparisonText("Médiane", "Median", "Mediana", "الوسيط"), comparisonText("Min–max", "Min–max", "Mín–máx", "الحد الأدنى–الأقصى"), comparisonText("Valeurs atypiques", "Outliers", "Valores atípicos", "القيم الشاذة")], metricRows, comparisonText("Mesures numériques par lot et unité", "Numeric measurements by batch and unit", "Medições numéricas por lote e unidade", "القياسات الرقمية حسب الدفعة والوحدة"));
+    } else {
+      tables.innerHTML += '<div class="comparison-empty">' + escapeHtml(comparisonText("Aucune mesure numérique exploitable dans la sélection. Les observations qualitatives restent analysées séparément.", "No usable numeric measurements in the selection. Qualitative observations are analyzed separately.", "Não há medições numéricas utilizáveis na seleção. As observações qualitativas são analisadas separadamente.", "لا توجد قياسات رقمية قابلة للاستخدام في التحديد. تُحلل الملاحظات النوعية بشكل منفصل.")) + '</div>';
+    }
+
+    if (assignedObservations.length) {
+      const byVariable = new Map();
+      assignedObservations.forEach(row => {
+        const variable = variableMap.get(row.variable_code);
+        const key = row.variable_code || "variable_non_renseignée";
+        if (!byVariable.has(key)) byVariable.set(key, { label: comparisonVariableLabel(variable) || key, rows: [] });
+        byVariable.get(key).rows.push(row);
+      });
+      const observationRows = [];
+      Array.from(byVariable.entries()).sort((a, b) => a[1].label.localeCompare(b[1].label, "fr")).forEach(([code, group]) => {
+        selectedBatches.forEach(batch => {
+          const values = group.rows.filter(row => row.batchId === batch.id);
+          const latest = values.slice().sort((a, b) => new Date(b.observed_at || 0) - new Date(a.observed_at || 0))[0];
+          observationRows.push([escapeHtml(group.label), escapeHtml(batch.batch_code || comparisonText("Lot sans code", "Batch without code", "Lote sem código", "دفعة بلا رمز")), String(values.length), latest ? escapeHtml(String(latest.value_text || comparisonText("Observation sans texte", "Observation without text", "Observação sem texto", "ملاحظة بلا نص"))) : comparisonText("Aucune observation enregistrée", "No observation recorded", "Nenhuma observação registada", "لم تُسجل ملاحظة"), latest?.observed_at ? escapeHtml(new Date(latest.observed_at).toLocaleDateString(comparisonLocale())) : "—"]);
+        });
+      });
+      tables.innerHTML += comparisonTable([comparisonText("Variable observée", "Observed variable", "Variável observada", "المتغير المرصود"), comparisonText("Lot", "Batch", "Lote", "دفعة"), "n", comparisonText("Dernière valeur textuelle", "Latest text value", "Último valor textual", "أحدث قيمة نصية"), comparisonText("Dernière date", "Latest date", "Data mais recente", "أحدث تاريخ")], observationRows, comparisonText("Observations qualitatives par lot", "Qualitative observations by batch", "Observações qualitativas por lote", "الملاحظات النوعية حسب الدفعة"));
+    } else {
+      tables.innerHTML += '<div class="comparison-empty">' + escapeHtml(comparisonText("Aucune observation qualitative enregistrée pour les lots sélectionnés et la période choisie.", "No qualitative observations recorded for the selected batches and period.", "Não há observações qualitativas registadas para os lotes e período selecionados.", "لا توجد ملاحظات نوعية مسجلة للدفعات والفترة المحددة.")) + '</div>';
+    }
+
+    const dailyGroups = new Map();
+    groups.forEach(group => {
+      group.points.forEach(point => {
+        if (!point.measured_at) return;
+        const day = BACompareAnalysis.dateKey(point.measured_at);
+        if (!day) return;
+        const key = group.key + "::" + point.batchId + "::" + day;
+        if (!dailyGroups.has(key)) dailyGroups.set(key, { groupKey: group.key, batchId: point.batchId, date: day, values: [] });
+        dailyGroups.get(key).values.push(point.value);
+      });
+    });
+    const daily = Array.from(dailyGroups.values()).map(item => Object.assign({}, item, { value: item.values.reduce((sum, value) => sum + value, 0) / item.values.length }));
+    const correlations = [];
+    for (let i = 0; i < groups.length; i++) {
+      for (let j = i + 1; j < groups.length; j++) {
+        if (groups[i].variableCode === groups[j].variableCode) continue;
+        const rightByKey = new Map(daily.filter(item => item.groupKey === groups[j].key).map(item => [item.batchId + "::" + item.date, item.value]));
+        const pairs = daily.filter(item => item.groupKey === groups[i].key && rightByKey.has(item.batchId + "::" + item.date))
+          .map(item => ({ x: item.value, y: rightByKey.get(item.batchId + "::" + item.date) }));
+        if (pairs.length < 4) continue;
+        const r = BACompareAnalysis.pearson(pairs);
+        if (r !== null) correlations.push({ a: groups[i], b: groups[j], n: pairs.length, r: r });
+      }
+    }
+    correlations.sort((a, b) => Math.abs(b.r) - Math.abs(a.r));
+    if (correlations.length) {
+      const rows = correlations.slice(0, 8).map(item => [escapeHtml(item.a.label + " (" + comparisonUnitLabel(item.a.unit) + ")"), escapeHtml(item.b.label + " (" + comparisonUnitLabel(item.b.unit) + ")"), String(item.n), '<span class="comparison-correlation">' + comparisonFormat(item.r, 3) + '</span>', Math.abs(item.r) >= 0.7 ? comparisonText("Association linéaire exploratoire marquée", "Strong exploratory linear association", "Associação linear exploratória forte", "ارتباط خطي استكشافي قوي") : comparisonText("Association linéaire exploratoire", "Exploratory linear association", "Associação linear exploratória", "ارتباط خطي استكشافي")]);
+      findings.innerHTML += '<article class="comparison-finding"><h4>' + escapeHtml(comparisonText("2. Corrélations exploratoires", "2. Exploratory correlations", "2. Correlações exploratórias", "2. الارتباطات الاستكشافية")) + '</h4><p>' + escapeHtml(comparisonText("Corrélation de Pearson sur des moyennes journalières appariées au sein du même lot (au moins 4 journées appariées). Les répétitions ne sont pas indépendantes et les effets du temps ou des traitements ne sont pas contrôlés.", "Pearson correlation on paired daily means within the same batch (at least 4 paired days). Repeated observations are not independent, and time or treatment effects are not controlled.", "Correlação de Pearson sobre médias diárias emparelhadas no mesmo lote (pelo menos 4 dias emparelhados). As repetições não são independentes e os efeitos do tempo ou dos tratamentos não são controlados.", "ارتباط بيرسون على المتوسطات اليومية المقترنة داخل الدفعة نفسها (4 أيام مقترنة على الأقل). القياسات المتكررة ليست مستقلة، ولم تُضبط آثار الزمن أو المعالجات.")) + '</p>' + comparisonTable([comparisonText("Variable A", "Variable A", "Variável A", "المتغير أ"), comparisonText("Variable B", "Variable B", "Variável B", "المتغير ب"), comparisonText("Journées appariées (n)", "Paired days (n)", "Dias emparelhados (n)", "الأيام المقترنة (n)"), comparisonText("r de Pearson", "Pearson r", "r de Pearson", "معامل بيرسون r"), comparisonText("Lecture", "Interpretation", "Interpretação", "التفسير")], rows, comparisonText("Associations observées", "Observed associations", "Associações observadas", "الارتباطات المرصودة")) + '<p>' + escapeHtml(comparisonText("Une corrélation, même forte, ne démontre pas de causalité.", "A correlation, even a strong one, does not demonstrate causality.", "Uma correlação, mesmo forte, não demonstra causalidade.", "الارتباط، حتى إن كان قوياً، لا يثبت السببية.")) + '</p></article>';
+    } else {
+      findings.innerHTML += '<article class="comparison-finding"><h4>' + escapeHtml(comparisonText("2. Corrélations exploratoires", "2. Exploratory correlations", "2. Correlações exploratórias", "2. الارتباطات الاستكشافية")) + '</h4><p>' + escapeHtml(comparisonText("Pas assez de journées appariées entre variables différentes pour calculer une corrélation interprétable (minimum opérationnel : 4 journées au sein du même lot).", "Not enough paired days between different variables to calculate an interpretable correlation (operational minimum: 4 days within the same batch).", "Não existem dias emparelhados suficientes entre variáveis diferentes para calcular uma correlação interpretável (mínimo operacional: 4 dias no mesmo lote).", "لا توجد أيام مقترنة كافية بين المتغيرات المختلفة لحساب ارتباط قابل للتفسير (الحد الأدنى العملي: 4 أيام داخل الدفعة نفسها).")) + '</p></article>';
+    }
+
+    const measuredCodes = new Set(groups.map(group => group.variableCode));
+    const candidateCodes = ["temperature", "relative_humidity", "substrate_moisture", "ph", "electrical_conductivity", "illuminance", "co2_concentration", "dry_biomass", "fresh_mass", "growth_rate"];
+    const candidates = candidateCodes.map(code => variableMap.get(code)).filter(variable => variable && !measuredCodes.has(variable.code));
+    const hypothesisText = candidates.length
+      ? comparisonText("Pour un prochain essai, envisager de mesurer conjointement — si pertinent pour le système étudié — ", "For a future trial, consider measuring together — if relevant to the system studied — ", "Num próximo ensaio, considere medir em conjunto — se for pertinente para o sistema estudado — ", "في تجربة لاحقة، فكّر في قياس المتغيرات معاً — إذا كان ذلك مناسباً للنظام المدروس — ") + candidates.slice(0, 6).map(variable => comparisonVariableLabel(variable) + " (" + variable.code + ")").join(", ") + comparisonText(". Définir avant l’essai la variable de réponse, la fréquence, la méthode et les répétitions.", ". Define the response variable, frequency, method and replicates before the trial.", ". Defina a variável de resposta, a frequência, o método e as repetições antes do ensaio.", ". حدّد متغير الاستجابة والتواتر والطريقة والتكرارات قبل التجربة.")
+      : comparisonText("Choisir une variable de réponse et enregistrer en parallèle les facteurs de milieu ou de procédé pertinents déjà présents dans le catalogue. Préspécifier fréquence, méthode, unités et répétitions.", "Choose a response variable and simultaneously record relevant environmental or process factors already in the catalogue. Predefine frequency, method, units and replicates.", "Escolha uma variável de resposta e registe em paralelo os fatores ambientais ou de processo relevantes já existentes no catálogo. Defina previamente frequência, método, unidades e repetições.", "اختر متغير استجابة وسجّل بالتوازي عوامل البيئة أو العملية ذات الصلة الموجودة في الكتالوج. حدّد مسبقاً التواتر والطريقة والوحدات والتكرارات.");
+    findings.innerHTML += '<article class="comparison-finding"><h4>' + escapeHtml(comparisonText("3. Hypothèses à tester ensuite", "3. Hypotheses to test next", "3. Hipóteses a testar a seguir", "3. فرضيات للاختبار لاحقاً")) + '</h4><p>' + escapeHtml(hypothesisText) + '</p><p>' + escapeHtml(comparisonText("Ces variables sont des pistes de protocole, pas des explications démontrées des différences observées.", "These variables are protocol ideas, not proven explanations for the observed differences.", "Estas variáveis são pistas para o protocolo, não explicações comprovadas das diferenças observadas.", "هذه المتغيرات مقترحات للبروتوكول وليست تفسيرات مثبتة للاختلافات المرصودة.")) + '</p></article>';
+
+    const selectedPeriodText = (fromDate || comparisonText("début non limité", "unbounded start", "início sem limite", "بداية غير محددة")) + " → " + (toDate || comparisonText("fin non limitée", "unbounded end", "fim não limitado", "نهاية غير محددة"));
+    status.textContent = comparisonText("Comparaison terminée : ", "Comparison complete: ", "Comparação concluída: ", "اكتملت المقارنة: ") + selectedBatches.length + comparisonText(" lots ; ", " batches; ", " lotes; ", " دفعات؛ ") + assignedMeasurements.length + comparisonText(" mesures et ", " measurements and ", " medições e ", " قياسات و") + assignedObservations.length + comparisonText(" observations retenues. Filtre demandé : ", " observations retained. Requested filter: ", " observações incluídas. Filtro solicitado: ", " ملاحظات مدرجة. المرشح المطلوب: ") + selectedPeriodText + comparisonText(". Période des données : ", ". Data period: ", ". Período dos dados: ", ". فترة البيانات: ") + periodLabel + ".";
+  } catch (error) {
+    console.error("Comparaison des lots :", error);
+    status.textContent = comparisonText(
+      "La comparaison a échoué. Vérifiez la connexion et vos droits d’accès, puis réessayez. Aucune donnée n’a été modifiée.",
+      "The comparison failed. Check your connection and access permissions, then try again. No data was changed.",
+      "A comparação falhou. Verifique a ligação e as permissões de acesso e tente novamente. Nenhum dado foi alterado.",
+      "فشلت المقارنة. تحقق من الاتصال وصلاحيات الوصول ثم حاول مجدداً. لم يتم تعديل أي بيانات."
+    );
+  } finally {
+    if (requestId === lotComparisonRequestId) {
+      button.disabled = false;
+      button.textContent = comparisonText("Comparer les lots sélectionnés", "Compare selected batches", "Comparar os lotes selecionados", "قارن الدفعات المحددة");
+    }
+  }
+}
+
+window.addEventListener("ba-labs-language-change", () => {
+  renderComparisonBatchOptions();
+  if (lotComparisonHasRun) loadLotComparison();
+});
 
 async function loadBiologicalLineage(cultureId) {
   const target = document.getElementById('cultureLineage');
@@ -5192,6 +5713,7 @@ function setupUiEnhancements() {
   });
 
   document.getElementById("loadStatisticsButton")?.addEventListener("click", loadStatistics);
+document.getElementById("compareLotsButton")?.addEventListener("click", loadLotComparison);
   document.getElementById("statisticsVariable")?.addEventListener("change", () => { document.getElementById("statisticsStatus").textContent = "Variable modifiée. Lancez l’analyse pour actualiser les résultats."; });
   document.getElementById("statisticsCulture")?.addEventListener("change", () => { document.getElementById("statisticsStatus").textContent = "Culture modifiée. Lancez l’analyse pour actualiser les résultats."; });
   document.getElementById("statisticsBatch")?.addEventListener("change", () => { document.getElementById("statisticsStatus").textContent = "Lot modifié. Lancez l’analyse pour actualiser les résultats."; });

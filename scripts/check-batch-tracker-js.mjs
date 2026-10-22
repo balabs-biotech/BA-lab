@@ -17,6 +17,14 @@ for(const r of routes){
 }
 if(template.includes('class="domain-switcher"'))throw new Error("Switcher remains inside workspace");
 if(!engine.includes("const modulesByDomain")||!engine.includes('domain !== "laboratory"'))throw new Error("Domain module scope missing");
+const comparison=fs.readFileSync("batch-tracker/compare-analysis.js","utf8");
+new vm.Script(comparison,{filename:"batch-tracker/compare-analysis.js"});
+if(!template.includes("Comparer mes lots")||!template.includes("compareLotsButton"))throw new Error("Lot comparison interface missing");
+if(!engine.includes('.in("sample_id", sampleChunk)')||!engine.includes('is("event_id", null)'))throw new Error("Direct sample-linked measurement/observation lookup missing");
+if(!engine.includes("detectOutliersByBatch"))throw new Error("Outlier detection is not isolated per batch");
+if(!engine.includes('window.addEventListener("ba-labs-language-change"'))throw new Error("Comparison does not refresh on language changes");
+for(const r of routes){const html=fs.readFileSync(r.file,"utf8");if(!html.includes("../compare-analysis.js"))throw new Error("Comparison analysis loader missing: "+r.file);}
+console.log("✓ Lot comparison interface and analysis loader verified");
 const css=fs.readFileSync("batch-tracker/tracker.css","utf8");
 if(!css.includes("--brand:#a94f1d")||!css.includes("--focus:#a94f1d"))throw new Error("Terracotta palette missing");
 if(!root.includes(".universe.myco{--accent:#a94f1d;"))throw new Error("Chooser mycology accent is still fluorescent");
