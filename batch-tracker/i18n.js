@@ -503,6 +503,96 @@
     "Experimental analysis",
     "Análise experimental",
     "التحليل التجريبي"
+  ],
+  [
+    "Comparaison descriptive des lots sélectionnés",
+    "Descriptive comparison of selected batches",
+    "Comparação descritiva dos lotes selecionados",
+    "مقارنة وصفية للدفعات المحددة"
+  ],
+  [
+    "Expérience",
+    "Experiment",
+    "Experiência",
+    "التجربة"
+  ],
+  [
+    "Unité / traitement / répétition",
+    "Unit / treatment / replicate",
+    "Unidade / tratamento / repetição",
+    "الوحدة / المعاملة / التكرار"
+  ],
+  [
+    "État / étape",
+    "Status / stage",
+    "Estado / etapa",
+    "الحالة / المرحلة"
+  ],
+  [
+    "Étapes terminées",
+    "Completed stages",
+    "Etapas concluídas",
+    "المراحل المكتملة"
+  ],
+  [
+    "Mesures de culture",
+    "Culture measurements",
+    "Medições da cultura",
+    "قياسات المزرعة"
+  ],
+  [
+    "Mesures d'environnement",
+    "Environmental measurements",
+    "Medições ambientais",
+    "القياسات البيئية"
+  ],
+  [
+    "Observations qualitatives",
+    "Qualitative observations",
+    "Observações qualitativas",
+    "الملاحظات النوعية"
+  ],
+  [
+    "Résumé numérique séparé par source",
+    "Numeric summary by source",
+    "Resumo numérico por origem",
+    "ملخص رقمي حسب المصدر"
+  ],
+  [
+    "Dernière mesure",
+    "Latest measurement",
+    "Última medição",
+    "آخر قياس"
+  ],
+  [
+    "Aucune observation",
+    "No observations",
+    "Sem observações",
+    "لا توجد ملاحظات"
+  ],
+  [
+    "Non renseignée",
+    "Not specified",
+    "Não indicada",
+    "غير محددة"
+  ],
+  [
+    "Sans nom",
+    "Unnamed",
+    "Sem nome",
+    "بلا اسم"
+  ],
+  [
+    "variable inconnue",
+    "unknown variable",
+    "variável desconhecida",
+    "متغير غير معروف"
+  ],
+  [
+    "exclue",
+    "excluded",
+    "excluída",
+    "مستبعدة"
   ]
 ];
   for (const [fr, en, pt, ar] of supplementalCoverage) {
