@@ -83,6 +83,19 @@ begin
     raise exception 'material_not_found_or_forbidden' using errcode = '23503';
   end if;
 
+  if p_culture_id is null and p_material_id is null then
+    raise exception 'biological_traceability_anchor_required' using errcode = '23514';
+  end if;
+
+  if p_culture_id is not null and p_material_id is not null and not exists (
+    select 1 from public.cultures c
+    where c.id=p_culture_id
+      and c.organization_id=p_organization_id
+      and c.material_id=p_material_id
+  ) then
+    raise exception 'culture_material_mismatch' using errcode = '23514';
+  end if;
+
   if p_protocol_version_id is not null and not exists (
     select 1 from public.protocol_versions pv
     where pv.id=p_protocol_version_id and pv.organization_id=p_organization_id
