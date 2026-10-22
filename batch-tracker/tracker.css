@@ -1832,3 +1832,18 @@ body[data-domain="mycology"] :is(button, .primary-button):not(.secondary-button)
 body[data-domain="mycology"] :is(.info, .success, .warning) {
   text-shadow: none !important;
 }
+
+
+/* Mycology: labels and field headings must use the warm palette, never inherited green. */
+body[data-domain="mycology"] .card label,
+body[data-domain="mycology"] .card .bio-operation-form label,
+body[data-domain="mycology"] .card .statistics-filters label,
+body[data-domain="mycology"] .card .culture-catalog-filters label {
+  color: #f0e6dc !important;
+  -webkit-text-fill-color: #f0e6dc !important;
+}
+body[data-domain="mycology"] .card label .req,
+body[data-domain="mycology"] .card .req {
+  color: #d18d65 !important;
+  -webkit-text-fill-color: #d18d65 !important;
+}
