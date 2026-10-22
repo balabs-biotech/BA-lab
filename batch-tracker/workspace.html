@@ -416,15 +416,14 @@
 
         <select id="batchType" required aria-describedby="batchTypeHint">
           <option value="">Choisir une famille de lot…</option>
-          <option value="CULTURE">Culture biologique / culture de laboratoire</option>
+          <option value="CULTURE">Culture biologique / lot de culture générique</option>
           <option value="TRICHODERMA">Préparation à base de Trichoderma</option>
           <option value="PLEUROTUS_SPAWN">Mycélium sur grain — Pleurotus</option>
           <option value="MUSHROOM_PRODUCT">Champignons récoltés / produit frais</option>
           <option value="BIOSTIMULANT">Biostimulant / biofertilisant</option>
           <option value="FORMULATION">Formulation / mélange final</option>
-          <option value="OTHER">Autre lot</option>
         </select>
-        <small class="hint" id="batchTypeHint">Ce choix détermine les contrôles qualité proposés. Choisissez la catégorie la plus proche du produit suivi.</small>
+        <small class="hint" id="batchTypeHint">Ce choix détermine les contrôles qualité associés. Pour un cas non spécialisé, utilisez « Culture biologique / lot de culture générique ».</small>
 
       </div>
 
@@ -432,16 +431,17 @@
       <div>
 
         <label for="batchCulture">
-      Culture source<span class="req" aria-hidden="true"> *</span>
+      Culture ou ressource source<span class="req" aria-hidden="true"> *</span>
     </label>
 
-        <select id="batchCulture" aria-required="true">
+        <select id="batchCulture" required aria-describedby="batchCultureHint">
 
           <option value="">
             Chargement...
           </option>
 
         </select>
+        <small class="hint" id="batchCultureHint">Choisissez la culture réellement à l’origine du lot. Elle sert à conserver la filiation biologique.</small>
 
       </div>
 
