@@ -3935,6 +3935,8 @@ function renderBatchList() {
    CHARGEMENT D'UN BATCH
    ============================================================ */
 
+let batchDetailRequestId = 0;
+
 async function loadBatch(
   batchId
 ) {
@@ -3946,6 +3948,7 @@ async function loadBatch(
   }
 
 
+  const requestId = ++batchDetailRequestId;
   selectedBatchId =
     batchId;
 
@@ -3991,6 +3994,7 @@ async function loadBatch(
       )
       .single();
 
+  if (requestId !== batchDetailRequestId) return;
 
   if (batchError) {
 
@@ -4038,6 +4042,7 @@ async function loadBatch(
         "sequence_no"
       );
 
+  if (requestId !== batchDetailRequestId) return;
 
   if (stagesError) {
 
@@ -4082,6 +4087,7 @@ async function loadBatch(
         "check_code"
       );
 
+  if (requestId !== batchDetailRequestId) return;
 
   if (qcError) {
 
