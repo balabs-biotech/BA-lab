@@ -2208,7 +2208,7 @@ async function compareSelectedBatches() {
         .eq("organization_id", organizationId).in("batch_id", ids),
       cultureIds.length
         ? supabaseClient.from("measurements")
-            .select("culture_id,variable_code,measured_at,quality_state")
+            .select("culture_id,variable_code,raw_value,raw_unit_code,normalized_value,normalized_unit_code,measured_at,quality_state,exclusion_reason")
             .eq("organization_id", organizationId).in("culture_id", cultureIds)
             .order("measured_at", { ascending: false }).limit(1000)
         : Promise.resolve({data:[],error:null})
@@ -2219,7 +2219,7 @@ async function compareSelectedBatches() {
     const measurements = measurementResult.data || [];
     const table = document.createElement("table");
     table.className = "statistics-table";
-    table.innerHTML = "<caption>Comparaison descriptive des lots sélectionnés</caption><thead><tr><th>Lot</th><th>Type</th><th>État / étape</th><th>Quantité prévue</th><th>Quantité réelle</th><th>Étapes terminées</th><th>Mesures liées à la culture</th><th>Dernière mesure</th></tr></thead>";
+    table.innerHTML = "<caption>Comparaison descriptive des lots sélectionnés</caption><thead><tr><th>Lot</th><th>Type</th><th>État / étape</th><th>Quantité prévue</th><th>Quantité réelle</th><th>Étapes terminées</th><th>Mesures liées à la culture</th><th>Résumé numérique par variable</th><th>Dernière mesure</th></tr></thead>";
     const tbody = document.createElement("tbody");
     batches.forEach(batch => {
       const batchStages = stages.filter(stage => stage.batch_id === batch.id);
@@ -2237,6 +2237,31 @@ async function compareSelectedBatches() {
         batch.quantity_actual == null ? "—" : `${batch.quantity_actual} ${batch.quantity_unit_code || ""}`.trim(),
         `${completed} / ${batchStages.length}`,
         batch.culture_id ? String(linked.length) : "Aucune culture directement liée",
+        (() => {
+          const groups = new Map();
+          linked.forEach(row => {
+            if (row.quality_state === "excluded") return;
+            const value = row.normalized_value ?? row.raw_value;
+            if (value == null || !Number.isFinite(Number(value))) return;
+            const unit = row.normalized_value != null ? (row.normalized_unit_code || "") : (row.raw_unit_code || "");
+            const key = `${row.variable_code || "variable inconnue"}||${unit}||${row.quality_state || "raw"}`;
+            if (!groups.has(key)) groups.set(key, []);
+            groups.get(key).push(Number(value));
+          });
+          const summaries = [...groups.entries()].map(([key, values]) => {
+            const [variable, unit, quality] = key.split("||");
+            const mean = values.reduce((sum, value) => sum + value, 0) / values.length;
+            const min = Math.min(...values);
+            const max = Math.max(...values);
+            const fmt = value => new Intl.NumberFormat(undefined, {maximumSignificantDigits: 5}).format(value);
+            return `${variable}${unit ? " (" + unit + ")" : ""}: moyenne ${fmt(mean)}, min–max ${fmt(min)}–${fmt(max)}, n=${values.length} [${quality}]`;
+          });
+          const excluded = linked.filter(row => row.quality_state === "excluded").length;
+          const nonNumeric = linked.filter(row => row.quality_state !== "excluded" && (row.normalized_value ?? row.raw_value) == null).length;
+          if (excluded) summaries.push(`exclues: ${excluded}`);
+          if (nonNumeric) summaries.push(`sans valeur numérique: ${nonNumeric}`);
+          return summaries.length ? summaries.join("; ") : "Aucune mesure numérique exploitable";
+        })(),
         lastDate ? lastDate.toLocaleString() : "—"
       ];
       const tr = document.createElement("tr");
