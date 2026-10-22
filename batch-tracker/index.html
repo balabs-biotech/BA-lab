@@ -6806,7 +6806,12 @@ async function loadCultureDetail(cultureId) {
       if (!linkedMeasurements.length && !linkedObservations.length) entries.push({
         date: event.occurred_at,
         type: String(event.event_type || "Événement").replaceAll("_", " "),
-        detail: event.payload?.note || event.payload?.description ||
+        detail: [
+          event.payload?.note,
+          event.payload?.details?.conditions ? "Conditions : " + event.payload.details.conditions : null,
+          event.payload?.details?.outcome ? "Résultat : " + String(event.payload.details.outcome).replaceAll("_", " ") : null,
+          event.payload?.description
+        ].filter(Boolean).join(" — ") ||
           (event.batch_id ? "Événement associé à un lot." : "Événement de traçabilité.")
       });
     }
