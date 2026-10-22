@@ -57,7 +57,10 @@ create table public.events(
   id uuid primary key default gen_random_uuid(), organization_id uuid not null,
   event_type text not null, occurred_at timestamptz not null, actor_user_id uuid,
   culture_id uuid, material_id uuid, location_id uuid, environment_id uuid,
-  batch_id uuid, payload jsonb);
+  batch_id uuid, payload jsonb,
+  constraint events_check check (
+    num_nonnulls(culture_id, material_id, sample_id, experimental_unit_id) = 1
+  ));
 
 grant select, insert, update, delete on public.organization_members, public.batches,
   public.batch_stages, public.batch_qc_checks, public.batch_qc_templates, public.events
