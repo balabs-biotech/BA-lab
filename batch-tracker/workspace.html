@@ -414,41 +414,17 @@
           Type de batch
         </label>
 
-        <select id="batchType">
-
-          <option value="Biologique">
-            Biologique
-          </option>
-
-          <option value="Milieu">
-            Milieu
-          </option>
-
-          <option value="Substrat">
-            Substrat
-          </option>
-
-          <option value="Grain">
-            Grain
-          </option>
-
-          <option value="SMS">
-            SMS
-          </option>
-
-          <option value="Inoculum">
-            Inoculum
-          </option>
-
-          <option value="Préparation biologique">
-            Préparation biologique
-          </option>
-
-          <option value="Autre">
-            Autre
-          </option>
-
+        <select id="batchType" required aria-describedby="batchTypeHint">
+          <option value="">Choisir une famille de lot…</option>
+          <option value="CULTURE">Culture biologique / culture de laboratoire</option>
+          <option value="TRICHODERMA">Préparation à base de Trichoderma</option>
+          <option value="PLEUROTUS_SPAWN">Mycélium sur grain — Pleurotus</option>
+          <option value="MUSHROOM_PRODUCT">Champignons récoltés / produit frais</option>
+          <option value="BIOSTIMULANT">Biostimulant / biofertilisant</option>
+          <option value="FORMULATION">Formulation / mélange final</option>
+          <option value="OTHER">Autre lot</option>
         </select>
+        <small class="hint" id="batchTypeHint">Ce choix détermine les contrôles qualité proposés. Choisissez la catégorie la plus proche du produit suivi.</small>
 
       </div>
 
@@ -497,11 +473,10 @@
           Unité
         </label>
 
-        <input
-          id="batchUnit"
-          type="text"
-          placeholder="kg, L, unités..."
-        >
+        <select id="batchUnit" aria-describedby="batchUnitHint">
+          <option value="">Choisir une unité…</option>
+        </select>
+        <small class="hint" id="batchUnitHint">L’unité doit provenir du référentiel. La quantité prévue reste facultative.</small>
 
       </div>
 
@@ -625,7 +600,7 @@
         <p class="muted">Disponible lorsque l’étape actuelle du lot est « Récolte ». Chaque enregistrement reste distinct dans l’historique.</p>
         <div class="grid">
           <div><label for="harvestQuantity">Quantité récoltée</label><input id="harvestQuantity" type="number" min="0.000001" step="any" inputmode="decimal" placeholder="Ex. 125"></div>
-          <div><label for="harvestUnit">Unité (code existant)</label><input id="harvestUnit" type="text" maxlength="24" placeholder="Ex. g, kg, unit"></div>
+          <div><label for="harvestUnit">Unité</label><select id="harvestUnit"><option value="">Choisir une unité…</option></select></div>
         </div>
         <label for="harvestNote">Note (facultatif)</label>
         <textarea id="harvestNote" rows="2" maxlength="1000" placeholder="Produit récolté, qualité, conditions…"></textarea>
