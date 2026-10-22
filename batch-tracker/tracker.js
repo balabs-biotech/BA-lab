@@ -4897,15 +4897,23 @@ async function loadLotComparison() {
 
   try {
     const selectedBatchIds = selectedBatches.map(batch => batch.id);
+    const selectedCultureIds = Array.from(new Set(selectedBatches.map(batch => batch.culture_id).filter(Boolean)));
+    const cultureBatchRows = selectedCultureIds.length
+      ? await fetchComparisonRows(() => supabaseClient.from("batches").select("id,culture_id")
+          .eq("organization_id", organizationId).in("culture_id", selectedCultureIds).order("id", { ascending: true }))
+      : [];
     const cultureBatchCounts = new Map();
     const cultureToBatch = new Map();
-    selectedBatches.forEach(batch => {
+    cultureBatchRows.forEach(batch => {
       if (!batch.culture_id) return;
       cultureBatchCounts.set(batch.culture_id, (cultureBatchCounts.get(batch.culture_id) || 0) + 1);
       if (!cultureToBatch.has(batch.culture_id)) cultureToBatch.set(batch.culture_id, batch.id);
     });
-    const unambiguousCultureIds = Array.from(cultureBatchCounts.entries()).filter(entry => entry[1] === 1).map(entry => entry[0]);
-    const safeCultureToBatch = new Map(Array.from(cultureToBatch.entries()).filter(entry => cultureBatchCounts.get(entry[0]) === 1));
+    const unambiguousCultureIds = Array.from(cultureBatchCounts.entries())
+      .filter(entry => entry[1] === 1 && selectedBatchIds.includes(cultureToBatch.get(entry[0])))
+      .map(entry => entry[0]);
+    const safeCultureToBatch = new Map(Array.from(cultureToBatch.entries())
+      .filter(entry => cultureBatchCounts.get(entry[0]) === 1 && selectedBatchIds.includes(entry[1])));
 
     const batchEvents = await fetchComparisonRows(() => supabaseClient.from("events")
       .select("id,batch_id,culture_id,sample_id,occurred_at,event_type,payload")
