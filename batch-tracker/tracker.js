@@ -61,6 +61,19 @@ const BATCH_STAGES = [
   "release"
 ];
 
+const BATCH_STAGES_BY_TYPE = {
+  CULTURE: ["preparation", "sterilization", "inoculation", "incubation", "cultivation", "qc", "release"],
+  TRICHODERMA: ["preparation", "sterilization", "inoculation", "incubation", "cultivation", "formulation", "packaging", "qc", "release"],
+  PLEUROTUS_SPAWN: ["preparation", "sterilization", "inoculation", "incubation", "packaging", "qc", "release"],
+  MUSHROOM_PRODUCT: ["harvest", "packaging", "qc", "release"],
+  BIOSTIMULANT: ["preparation", "sterilization", "inoculation", "incubation", "cultivation", "formulation", "packaging", "qc", "release"],
+  FORMULATION: ["preparation", "formulation", "packaging", "qc", "release"]
+};
+
+function getBatchStages(batchType) {
+  return BATCH_STAGES_BY_TYPE[batchType] || BATCH_STAGES_BY_TYPE.CULTURE;
+}
+
 
 const BATCH_STAGE_LABELS = {
 
@@ -3046,32 +3059,22 @@ function renderBatchStages(
     "";
 
 
-  const stageMap =
-    new Map(
-      stages.map(
-        stage =>
-          [
-            stage.stage_code,
-            stage
-          ]
-      )
-    );
-
+  const orderedStages = stages.length
+    ? [...stages].sort((a, b) => (a.sequence_no ?? 0) - (b.sequence_no ?? 0))
+    : BATCH_STAGES.map((stage_code, sequence_no) => ({
+        stage_code,
+        sequence_no,
+        status: "pending"
+      }));
 
   for (
     let index = 0;
-    index < BATCH_STAGES.length;
+    index < orderedStages.length;
     index++
   ) {
 
-    const stageCode =
-      BATCH_STAGES[index];
-
-
-    const stage =
-      stageMap.get(
-        stageCode
-      );
+    const stage = orderedStages[index];
+    const stageCode = stage.stage_code;
 
 
     const div =
@@ -3791,7 +3794,7 @@ async function createBatch() {
             null,
 
           p_stages:
-            BATCH_STAGES
+            getBatchStages(batchType)
 
         }
       );
