@@ -882,6 +882,18 @@
     "Method",
     "Método",
     "الطريقة"
+  ],
+  [
+    "Certaines cultures sont liées à plusieurs lots sélectionnés : les mesures/observations rattachées seulement à la culture et non à un événement de lot sont laissées de côté pour éviter une attribution ambiguë.",
+    "Some cultures are linked to multiple selected batches. Measurements or observations linked only to the culture, rather than a batch event, are omitted to avoid ambiguous attribution.",
+    "Algumas culturas estão associadas a vários lotes selecionados. As medições ou observações ligadas apenas à cultura, e não a um evento do lote, são omitidas para evitar uma atribuição ambígua.",
+    "ترتبط بعض المزارع بعدة دفعات محددة. تُستبعد القياسات أو الملاحظات المرتبطة بالمزرعة فقط، وليس بحدث دفعة، لتجنب الإسناد الملتبس."
+  ],
+  [
+    " valeur(s) atypique(s) signalée(s) par la règle exploratoire des 1,5 × IQR ; elles restent incluses dans les graphiques et les statistiques.",
+    " outlier(s) flagged by the exploratory 1.5 × IQR rule; they remain included in charts and statistics.",
+    " قيمة/قيم شاذة تم تحديدها بقاعدة 1.5 × IQR الاستكشافية؛ وتظل مشمولة في الرسوم والإحصاءات.",
+    " قيمة/قيم شاذة تم تحديدها بقاعدة 1.5 × IQR الاستكشافية؛ وتظل مشمولة في الرسوم والإحصاءات."
   ]
 ];
 for (const [fr, en, pt, ar] of supplementalCoverage) {
