@@ -4,6 +4,18 @@ import vm from "node:vm";
 const source = fs.readFileSync("batch-tracker/i18n.js", "utf8");
 new vm.Script(source, { filename: "batch-tracker/i18n.js" });
 
+for (const required of [
+  "function translate(value, lang)",
+  "function translateTree(root = document)",
+  "attributes: true",
+  'attributeFilter: ["placeholder", "title", "aria-label"]',
+  "const prefix = normalize(key)"
+]) {
+  if (!source.includes(required)) {
+    throw new Error(`Missing localisation behaviour: ${required}`);
+  }
+}
+
 const match = source.match(/const supplementalCoverage = (\[[\s\S]*?\]);\s*for \(const \[fr, en, pt, ar\] of supplementalCoverage\)/);
 if (!match) throw new Error("Supplemental translation table is missing or malformed");
 const rows = JSON.parse(match[1]);
