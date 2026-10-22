@@ -18,6 +18,7 @@
 |---|---|
 | Biological cultures | \`cultures.id, code, culture_type, material_id, parent_culture_id, experiment_id, experimental_unit_id, environment_id, started_at, metadata\` |
 | Production lots | \`batches.id, batch_code, name, batch_type, status, current_stage, culture_id, material_id, protocol_version_id, location_id, environment_id, started_at, completed_at, quantity_planned, quantity_actual, quantity_unit_code, metadata\` |
+| Biological samples | `samples.organization_id, id, code, culture_id, parent_sample_id, collected_at, material_id, metadata` |
 | Traceability / operations | \`events.id, event_type, occurred_at, culture_id, material_id, sample_id, experimental_unit_id, environment_id, payload, batch_id\` |
 | Numeric measurements | \`measurements.id, variable_code, raw_value, raw_unit_code, normalized_value, normalized_unit_code, measured_at, method, instrument, quality_state, exclusion_reason, culture_id, sample_id, experimental_unit_id, event_id, result_id, metadata\` |
 | Qualitative observations | \`observations.id, variable_code, value_text, observed_at, culture_id, sample_id, experimental_unit_id, event_id, quality_state, metadata\` |
@@ -38,7 +39,7 @@ This is a point-in-time count, not an experiment. The current production data ca
 
 1. Add a read-only comparison panel to the existing Statistics module.
 2. Allow selection of two or more of the 30 most recently loaded production lots.
-3. Resolve records through batch events first. Records linked only to a culture or sample are assigned only when that culture maps to exactly one batch in the organization and that batch is selected.
+3. Resolve records through batch events first. Records linked only to a culture or sample are assigned only when that culture maps to exactly one batch in the organization and that batch is selected. Sample-to-culture resolution uses `samples.organization_id, id, culture_id`; sample-linked records are not assigned when the culture-to-batch link is ambiguous.
 4. Query \`measurements\` and \`observations\` using existing organization-scoped RLS, paginating reads. Exclude records explicitly marked \`quality_state='excluded'\`; exclude numeric records with an \`exclusion_reason\`.
 5. Filter by optional date bounds. Show counts, actual data period, median and min/max by variable and unit, missing recorded values by selected lot, qualitative observation counts, time-series charts, and IQR outlier flags. Outliers remain visible and are never automatically removed.
 6. Calculate Pearson correlations only for pairs of different numeric variables with at least four paired lot-days, using daily means within the same lot. Label them exploratory and disclose that time, treatment and repeated measurements are not controlled.
