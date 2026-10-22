@@ -95,4 +95,4 @@ The reference repository declares AGPL-3.0-or-later. This branch documents and a
 - Le formulaire appelle la RPC transactionnelle `move_batch_to_location`, puis recharge la fiche et la chronologie afin d'afficher l'événement `batch_moved`.
 - Les lots clôturés sont désactivés dans l'interface. Le serveur reste l'autorité finale : il vérifie l'organisation, l'environnement et l'absence de déplacement sans changement.
 - Les libellés du formulaire et l'événement de déplacement sont ajoutés à la couverture FR/EN/PT/AR. Les tests statiques vérifient la présence des contrôles et des paramètres RPC.
-- À vérifier dans l'environnement CI : le contrat exact de la migration avec le schéma réel et les tests d'isolation inter-organisations. Aucun déploiement ni fusion n'a été effectué.
+- Le test SQL inclut maintenant un cas de refus lorsqu'un membre tente de déplacer un lot d'une autre organisation, en plus du cas d'environnement incompatible. La validation CI du commit final reste à attendre. Aucun déploiement ni fusion n'a été effectué.
