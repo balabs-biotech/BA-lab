@@ -34,6 +34,8 @@ if(!engine.includes("limite de 1 000 mesures récentes par lien culture/environn
 if(!engine.includes("normalized_value,normalized_unit_code")||!engine.includes("raw_value,raw_unit_code"))throw new Error("Numeric measurement fields missing from comparison");
 if(!engine.includes('row.quality_state === "excluded"'))throw new Error("Excluded measurements are not handled explicitly");
 if(!engine.includes("min–max")||!engine.includes("values.length"))throw new Error("Descriptive numeric summary missing");
+if(!engine.includes("n_mesures=${values.length}"))throw new Error("Numeric summary does not distinguish measurement count from independent replicates");
+if(!engine.includes("repeatedUnitCount")||!engine.includes("répétitions indépendantes"))throw new Error("Shared experimental units are not flagged as non-independent replicates");
 const i18n=fs.readFileSync("batch-tracker/i18n.js","utf8");
 for(const label of ["Résumé numérique par variable","Resumo numérico por variável","ملخص رقمي حسب المتغير"]){
  if(!i18n.includes(label))throw new Error("Comparison heading translation missing: "+label);
