@@ -47,3 +47,12 @@ A static regression assertion was added to `scripts/check-batch-tracker-js.mjs`.
 ## Licensing note
 
 The reference repository declares AGPL-3.0-or-later. This branch documents and adapts its concepts; it does not copy its application code or schema.
+
+
+## Audit concret du workflow et amélioration suivante
+
+- La CI de la branche d'adaptation a réussi sur le commit initial : replay complet des migrations, tests SQL de protection du workflow, contrôles des scripts et vérification des secrets.
+- Le schéma dispose déjà de `batches.quantity_planned`, `batches.quantity_actual`, `batch_stages` et `events.batch_id`. La migration `20261001215407_complete_batch_tracking_indexes_and_stages.sql` valide les dix étapes standard, y compris `cultivation`, `harvest`, `formulation` et `packaging`. Il ne faut donc pas créer une seconde table de récolte avant d'avoir démontré un besoin de données répétées par récolte.
+- Les transitions de workflow passent par les RPC protégées; les colonnes de workflow ne doivent pas être mises à jour directement depuis le navigateur.
+- Cette itération ajoute une chronologie en lecture seule au détail du lot. Elle réutilise les événements déjà produits par la création, l'avancement, la mesure et la libération. Elle limite le chargement aux 50 événements les plus récents et ne bloque pas le détail du lot si le journal est indisponible.
+- Étape suivante : concevoir la saisie de récolte/rendement avec une écriture transactionnelle et des droits explicites, puis tester les cas multi-organisation, les quantités nulles/zéro, l'unité et les doublons. Ne pas assimiler le nombre de mesures à celui des récoltes ou des répétitions indépendantes.
