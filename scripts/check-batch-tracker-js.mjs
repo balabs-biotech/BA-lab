@@ -34,8 +34,8 @@ if(!engine.includes("async function fetchAllComparisonPages")||!engine.includes(
 const comparisonStart=engine.indexOf("async function compareSelectedBatches()");
 const comparisonEnd=engine.indexOf('document.getElementById("compareBatchesButton")?.addEventListener',comparisonStart);
 const comparisonCode=engine.slice(comparisonStart,comparisonEnd);
-if((comparisonCode.match(/fetchAllComparisonPages\\(supabaseClient\\.from\\("(?:measurements|observations)"\\)/g)||[]).length!==4)throw new Error("Measurements and observations are not fully paginated");
-if((comparisonCode.match(/\\.limit\\(1000\\)/g)||[]).length!==0)throw new Error("Batch comparison still has a hard 1,000-row cap");
+if((comparisonCode.match(/fetchAllComparisonPages\(supabaseClient\.from\("(?:measurements|observations)"\)/g)||[]).length!==4)throw new Error("Measurements and observations are not fully paginated");
+if((comparisonCode.match(/\.limit\(1000\)/g)||[]).length!==0)throw new Error("Batch comparison still has a hard 1,000-row cap");
 if(!comparisonCode.includes('.order("measured_at", { ascending: false }).order("id", { ascending: true })')||!comparisonCode.includes('.order("observed_at", { ascending: false }).order("id", { ascending: true })'))throw new Error("Paginated comparison queries lack deterministic ordering");
 if(!engine.includes("normalized_value,normalized_unit_code")||!engine.includes("raw_value,raw_unit_code"))throw new Error("Numeric measurement fields missing from comparison");
 if(!engine.includes('row.quality_state === "excluded"'))throw new Error("Excluded measurements are not handled explicitly");
