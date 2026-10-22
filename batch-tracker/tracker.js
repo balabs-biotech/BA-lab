@@ -2200,13 +2200,13 @@ async function compareSelectedBatches() {
   if (!select || !status || !results || !button) return;
   const language = window.BALabsI18n?.language || "fr";
   const ui = ({
-    fr: { selection:"Sélectionnez entre 2 et 4 lots.", stale:"Un ou plusieurs lots ne sont plus dans la liste chargée. Actualisez la page.", loading:"Chargement des étapes et des mesures…", loaded:"Comparaison chargée.", capped:"Comparaison chargée avec une récupération paginée des mesures disponibles ; les données chargées couvrent toutes les pages renvoyées par Supabase.", count:"n_mesures désigne le nombre de mesures, pas le nombre de répétitions biologiques indépendantes.", shared:"Les mesures d'un environnement partagé peuvent apparaître pour plusieurs lots.", repeated:n=>`Attention : ${n} lien(s) d'unité expérimentale sont partagés entre les lots sélectionnés ; ces lots ne constituent pas autant de répétitions indépendantes.`, missing:"Les données manquantes ne sont pas interprétées comme zéro.", impossible:"Impossible de comparer les lots.", culture:"Culture", environment:"Environnement", observations:n=>`${n} observation(s)`, noObservations:"Aucune observation", treatment:"traitement", replicate:"répétition", excluded:"exclue" },
-    en: { selection:"Select between 2 and 4 batches.", stale:"One or more batches are no longer in the loaded list. Refresh the page.", loading:"Loading stages and measurements…", loaded:"Comparison loaded.", capped:"Comparison loaded with a all available measurements fetched with pagination; loaded data covers all pages returned by Supabase.", count:"n_measurements is the number of measurements, not the number of independent biological replicates.", shared:"Measurements from a shared environment may appear for multiple batches.", repeated:n=>`Warning: ${n} experimental-unit link(s) are shared by the selected batches; these batches do not represent that many independent replicates.`, missing:"Missing data is not treated as zero.", impossible:"Unable to compare batches.", culture:"Culture", environment:"Environment", observations:n=>`${n} observation(s)`, noObservations:"No observations", treatment:"treatment", replicate:"replicate", excluded:"excluded" },
+    fr: { selection:"Sélectionnez entre 2 et 4 lots.", stale:"Un ou plusieurs lots ne sont plus dans la liste chargée. Actualisez la page.", loading:"Chargement des étapes et des mesures…", loaded:"Comparaison chargée.", capped:"Comparaison chargée avec une limite de 1 000 mesures récentes par lien culture/environnement ; les comptes peuvent être incomplets.", count:"n_mesures désigne le nombre de mesures, pas le nombre de répétitions biologiques indépendantes.", shared:"Les mesures d'un environnement partagé peuvent apparaître pour plusieurs lots.", repeated:n=>`Attention : ${n} lien(s) d'unité expérimentale sont partagés entre les lots sélectionnés ; ces lots ne constituent pas autant de répétitions indépendantes.`, missing:"Les données manquantes ne sont pas interprétées comme zéro.", impossible:"Impossible de comparer les lots.", culture:"Culture", environment:"Environnement", observations:n=>`${n} observation(s)`, noObservations:"Aucune observation", treatment:"traitement", replicate:"répétition", excluded:"exclue" },
+    en: { selection:"Select between 2 and 4 batches.", stale:"One or more batches are no longer in the loaded list. Refresh the page.", loading:"Loading stages and measurements…", loaded:"Comparison loaded.", capped:"Comparison loaded with a limit of 1,000 recent measurements per culture/environment link; counts may be incomplete.", count:"n_measurements is the number of measurements, not the number of independent biological replicates.", shared:"Measurements from a shared environment may appear for multiple batches.", repeated:n=>`Warning: ${n} experimental-unit link(s) are shared by the selected batches; these batches do not represent that many independent replicates.`, missing:"Missing data is not treated as zero.", impossible:"Unable to compare batches.", culture:"Culture", environment:"Environment", observations:n=>`${n} observation(s)`, noObservations:"No observations", treatment:"treatment", replicate:"replicate", excluded:"excluded" },
     pt: { selection:"Selecione entre 2 e 4 lotes.", stale:"Um ou mais lotes já não estão na lista carregada. Atualize a página.", loading:"A carregar etapas e medições…", loaded:"Comparação carregada.", capped:"Comparação carregada com um limite de 1.000 medições recentes por ligação cultura/ambiente; as contagens podem estar incompletas.", count:"n_medições indica o número de medições, não o número de repetições biológicas independentes.", shared:"As medições de um ambiente partilhado podem aparecer em vários lotes.", repeated:n=>`Atenção: ${n} ligação(ões) de unidade experimental são partilhadas pelos lotes selecionados; estes lotes não representam esse número de repetições independentes.`, missing:"Os dados em falta não são tratados como zero.", impossible:"Não foi possível comparar os lotes.", culture:"Cultura", environment:"Ambiente", observations:n=>`${n} observação(ões)`, noObservations:"Sem observações", treatment:"tratamento", replicate:"repetição", excluded:"excluída" },
     ar: { selection:"اختر من دفعتين إلى أربع دفعات.", stale:"لم تعد دفعة واحدة أو أكثر موجودة في القائمة المحمّلة. حدّث الصفحة.", loading:"جارٍ تحميل المراحل والقياسات…", loaded:"اكتملت المقارنة.", capped:"اكتملت المقارنة مع حد أقصى قدره ١٬٠٠٠ قياس حديث لكل ارتباط بين المزرعة والبيئة؛ وقد تكون الأعداد غير مكتملة.", count:"n_measurements هو عدد القياسات وليس عدد المكررات البيولوجية المستقلة.", shared:"قد تظهر قياسات البيئة المشتركة في عدة دفعات.", repeated:n=>`تحذير: توجد ${n} روابط لوحدات تجريبية مشتركة بين الدفعات المحددة؛ ولا تمثل هذه الدفعات هذا العدد من المكررات المستقلة.`, missing:"لا تُعامل البيانات المفقودة على أنها صفر.", impossible:"تعذرت مقارنة الدفعات.", culture:"المزرعة", environment:"البيئة", observations:n=>`${n} ملاحظة`, noObservations:"لا توجد ملاحظات", treatment:"المعاملة", replicate:"مكرر", excluded:"مستبعدة" }
   })[language] || null;
   const labels = ui || ({
-    selection:"Sélectionnez entre 2 et 4 lots.", stale:"Un ou plusieurs lots ne sont plus dans la liste chargée. Actualisez la page.", loading:"Chargement des étapes et des mesures…", loaded:"Comparaison chargée.", capped:"Comparaison chargée avec une récupération paginée des mesures disponibles ; les données chargées couvrent toutes les pages renvoyées par Supabase.", count:"n_mesures désigne le nombre de mesures, pas le nombre de répétitions biologiques indépendantes.", shared:"Les mesures d'un environnement partagé peuvent apparaître pour plusieurs lots.", repeated:n=>`Attention : ${n} lien(s) d'unité expérimentale sont partagés entre les lots sélectionnés ; ces lots ne constituent pas autant de répétitions indépendantes.`, missing:"Les données manquantes ne sont pas interprétées comme zéro.", impossible:"Impossible de comparer les lots.", culture:"Culture", environment:"Environnement", observations:n=>`${n} observation(s)`, noObservations:"Aucune observation", treatment:"traitement", replicate:"répétition", excluded:"exclue"
+    selection:"Sélectionnez entre 2 et 4 lots.", stale:"Un ou plusieurs lots ne sont plus dans la liste chargée. Actualisez la page.", loading:"Chargement des étapes et des mesures…", loaded:"Comparaison chargée.", capped:"Comparaison chargée avec une limite de 1 000 mesures récentes par lien culture/environnement ; les comptes peuvent être incomplets.", count:"n_mesures désigne le nombre de mesures, pas le nombre de répétitions biologiques indépendantes.", shared:"Les mesures d'un environnement partagé peuvent apparaître pour plusieurs lots.", repeated:n=>`Attention : ${n} lien(s) d'unité expérimentale sont partagés entre les lots sélectionnés ; ces lots ne constituent pas autant de répétitions indépendantes.`, missing:"Les données manquantes ne sont pas interprétées comme zéro.", impossible:"Impossible de comparer les lots.", culture:"Culture", environment:"Environnement", observations:n=>`${n} observation(s)`, noObservations:"Aucune observation", treatment:"traitement", replicate:"répétition", excluded:"exclue"
   });
   const ids = [...select.selectedOptions].map(option => option.value);
   if (ids.length < 2 || ids.length > 4) {
@@ -2233,13 +2233,13 @@ async function compareSelectedBatches() {
         ? fetchAllComparisonPages(supabaseClient.from("measurements")
             .select("id,culture_id,environment_id,variable_code,raw_value,raw_unit_code,normalized_value,normalized_unit_code,measured_at,quality_state,exclusion_reason")
             .eq("organization_id", organizationId).in("culture_id", cultureIds)
-            .order("measured_at", { ascending: false }))
+            .order("measured_at", { ascending: false }).order("id", { ascending: true }))
         : Promise.resolve({data:[],error:null}),
       environmentIds.length
         ? fetchAllComparisonPages(supabaseClient.from("measurements")
             .select("id,culture_id,environment_id,variable_code,raw_value,raw_unit_code,normalized_value,normalized_unit_code,measured_at,quality_state,exclusion_reason")
             .eq("organization_id", organizationId).in("environment_id", environmentIds)
-            .order("measured_at", { ascending: false }))
+            .order("measured_at", { ascending: false }).order("id", { ascending: true }))
         : Promise.resolve({data:[],error:null}),
       cultureIds.length
         ? supabaseClient.from("cultures")
@@ -2286,14 +2286,14 @@ async function compareSelectedBatches() {
       ? await fetchAllComparisonPages(supabaseClient.from("observations")
           .select("id,culture_id,experimental_unit_id,variable_code,value_text,observed_at,quality_state")
           .eq("organization_id", organizationId).in("culture_id", cultureIds)
-          .order("observed_at", { ascending: false }))
+          .order("observed_at", { ascending: false }).order("id", { ascending: true }))
       : {data:[],error:null};
     if (observationCultureResult.error) throw new Error("Chargement des observations de culture impossible : " + observationCultureResult.error.message);
     const observationUnitResult = unitIds.length
       ? await fetchAllComparisonPages(supabaseClient.from("observations")
           .select("id,culture_id,experimental_unit_id,variable_code,value_text,observed_at,quality_state")
           .eq("organization_id", organizationId).in("experimental_unit_id", unitIds)
-          .order("observed_at", { ascending: false }))
+          .order("observed_at", { ascending: false }).order("id", { ascending: true }))
       : {data:[],error:null};
     if (observationUnitResult.error) throw new Error("Chargement des observations expérimentales impossible : " + observationUnitResult.error.message);
     const observationMap = new Map();
@@ -2389,7 +2389,7 @@ async function compareSelectedBatches() {
       .map(batch => batch.culture_id ? contextsByCultureId.get(batch.culture_id)?.experimentalUnitId : null)
       .filter(Boolean);
     const repeatedUnitCount = selectedUnitIds.length - new Set(selectedUnitIds).size;
-    
+    const capped = cultureMeasurementResult.data?.length >= 1000 || environmentMeasurementResult.data?.length >= 1000;
     const statusParts = [
       labels.loaded,
       labels.count,
@@ -4574,7 +4574,7 @@ async function saveObservation() {
       throw new Error(cultureWorkflowText("observationInvalid"));
     }
 
-    const insertResult = await fetchAllComparisonPages(supabaseClient.from("observations").insert({
+    const insertResult = await supabaseClient.from("observations").insert({
       organization_id: organizationId,
       variable_code: variable.code,
       value_text: valueText,
@@ -4620,7 +4620,7 @@ async function saveObservation() {
 async function loadRecentObservations() {
   if (!organizationId || !observationHistory) return;
 
-  const query = await fetchAllComparisonPages(supabaseClient.from("observations")
+  const query = await supabaseClient.from("observations")
     .select("id, variable_code, value_text, observed_at, culture_id, event_id, metadata")
     .eq("organization_id", organizationId)
     .order("observed_at", { ascending: false })
@@ -4876,7 +4876,7 @@ async function loadStatistics() {
       }
       cultureEventIds = [...new Set(cultureEventResults.flatMap(result => (result.data || []).map(event => event.id)))];
     }
-    let query = fetchAllComparisonPages(supabaseClient.from("measurements").select("id, variable_code, raw_value, raw_unit_code, normalized_value, normalized_unit_code, measured_at, method, culture_id, event_id, metadata").eq("organization_id", organizationId).eq("variable_code", variableCode).order("measured_at", {ascending:false}).limit(1000);
+    let query = supabaseClient.from("measurements").select("id, variable_code, raw_value, raw_unit_code, normalized_value, normalized_unit_code, measured_at, method, culture_id, event_id, metadata").eq("organization_id", organizationId).eq("variable_code", variableCode).order("measured_at", {ascending:false}).limit(1000);
     if (cultureId && batchId) {
       const matchingEventIds = cultureEventIds.filter(id => batchEventIds.includes(id));
       if (matchingEventIds.length) query = query.in("event_id", matchingEventIds);
@@ -5084,23 +5084,23 @@ async function loadCultureDetail(cultureId) {
     const events = [...eventsById.values()].sort((a, b) => new Date(b.occurred_at || 0) - new Date(a.occurred_at || 0));
     const linkedEventIds = events.map(event => event.id);
     const measurementQueries = [
-      fetchAllComparisonPages(supabaseClient.from("measurements").select("id, variable_code, raw_value, raw_unit_code, measured_at, event_id, metadata")
+      supabaseClient.from("measurements").select("id, variable_code, raw_value, raw_unit_code, measured_at, event_id, metadata")
         .eq("organization_id", organizationId).eq("culture_id", culture.id)
         .order("measured_at", { ascending: false }).limit(100)
     ];
     const observationQueries = [
-      fetchAllComparisonPages(supabaseClient.from("observations").select("id, variable_code, value_text, observed_at, event_id, metadata")
+      supabaseClient.from("observations").select("id, variable_code, value_text, observed_at, event_id, metadata")
         .eq("organization_id", organizationId).eq("culture_id", culture.id)
         .order("observed_at", { ascending: false }).limit(100)
     ];
     if (linkedEventIds.length) {
       measurementQueries.push(
-        fetchAllComparisonPages(supabaseClient.from("measurements").select("id, variable_code, raw_value, raw_unit_code, measured_at, event_id, metadata")
+        supabaseClient.from("measurements").select("id, variable_code, raw_value, raw_unit_code, measured_at, event_id, metadata")
           .eq("organization_id", organizationId).in("event_id", linkedEventIds)
           .order("measured_at", { ascending: false }).limit(100)
       );
       observationQueries.push(
-        fetchAllComparisonPages(supabaseClient.from("observations").select("id, variable_code, value_text, observed_at, event_id, metadata")
+        supabaseClient.from("observations").select("id, variable_code, value_text, observed_at, event_id, metadata")
           .eq("organization_id", organizationId).in("event_id", linkedEventIds)
           .order("observed_at", { ascending: false }).limit(100)
       );
