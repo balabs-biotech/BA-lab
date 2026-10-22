@@ -4833,10 +4833,19 @@ async function loadLotComparison() {
     const eventIds = Array.from(eventToBatch.keys());
 
     async function fetchLinkedRows(tableName, selectFields, dateField) {
-      const queries = [];
-      if (eventIds.length) queries.push(fetchComparisonRows(() => supabaseClient.from(tableName).select(selectFields).eq("organization_id", organizationId).in("event_id", eventIds).order(dateField, { ascending: true })));
-      if (unambiguousCultureIds.length) queries.push(fetchComparisonRows(() => supabaseClient.from(tableName).select(selectFields).eq("organization_id", organizationId).in("culture_id", unambiguousCultureIds).is("event_id", null).order(dateField, { ascending: true })));
-      const results = await Promise.all(queries);
+      const results = [];
+      // Chunk event IDs to keep PostgREST query URLs bounded for batches with long histories.
+      for (let offset = 0; offset < eventIds.length; offset += 100) {
+        const eventChunk = eventIds.slice(offset, offset + 100);
+        const rows = await fetchComparisonRows(() => supabaseClient.from(tableName).select(selectFields)
+          .eq("organization_id", organizationId).in("event_id", eventChunk).order(dateField, { ascending: true }));
+        results.push(rows);
+      }
+      if (unambiguousCultureIds.length) {
+        const cultureRows = await fetchComparisonRows(() => supabaseClient.from(tableName).select(selectFields)
+          .eq("organization_id", organizationId).in("culture_id", unambiguousCultureIds).is("event_id", null).order(dateField, { ascending: true }));
+        results.push(cultureRows);
+      }
       const unique = new Map();
       results.flat().forEach(row => unique.set(row.id, row));
       return Array.from(unique.values()).filter(row => comparisonDateInRange(row[dateField], fromDate, toDate));
