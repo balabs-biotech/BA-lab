@@ -957,6 +957,26 @@ input:focus-visible,select:focus-visible,textarea:focus-visible,button:focus-vis
 }
 
 
+/* Visual quick capture: action tiles reduce the feeling of filling out a long form. */
+.quick-capture{margin:20px 0 24px;padding:17px;border:1px solid #d9e5d4;border-radius:15px;background:linear-gradient(135deg,#f5f9f0 0%,#fff 78%)}
+.quick-capture-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.quick-capture-heading h3{margin:5px 0 4px;padding:0;border:0;font-size:17px;color:#203d29}
+.quick-capture-heading p{margin:0;color:#647367;font-size:12px;line-height:1.55}
+.quick-capture-spark{display:grid;place-items:center;width:36px;height:36px;flex:0 0 36px;border-radius:11px;background:#e5efde;color:#3f7045;font-size:21px}
+.quick-capture-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin-top:15px}
+.quick-capture-tile{display:grid;grid-template-columns:40px minmax(0,1fr) 14px;align-items:center;gap:10px;min-width:0;margin:0;padding:12px;text-align:left;border:1px solid #dce6d7;border-radius:12px;background:#fff;color:#24442e;box-shadow:0 2px 7px rgba(24,52,31,.035);transition:transform .15s,border-color .15s,background .15s}
+.quick-capture-tile:hover{transform:translateY(-2px);border-color:#9eb99a;background:#fbfdf8;color:#183b2a}
+.quick-capture-tile>span:nth-child(2){display:grid;gap:3px;min-width:0}
+.quick-capture-tile strong{font-size:12px;line-height:1.35;color:#243d2a}
+.quick-capture-tile small{font-size:10px;line-height:1.4;color:#68776b;font-weight:500}
+.quick-capture-icon{display:grid;place-items:center;width:38px;height:38px;border-radius:10px;background:#eaf2e5;color:#315c38;font-size:12px;font-weight:850}
+.quick-capture-observation .quick-capture-icon{background:#f6edda;color:#85652a;font-size:23px}
+.quick-capture-arrow{color:#6e8a6d;font-size:16px}
+.quick-capture-tip{display:flex;gap:7px;margin:13px 0 0;color:#69766a;font-size:11px;line-height:1.5}
+.quick-capture-tip span{color:#47714a;font-weight:800}
+@media(max-width:520px){.quick-capture{padding:13px}.quick-capture-grid{grid-template-columns:minmax(0,1fr)}.quick-capture-tile{min-height:62px}.quick-capture-heading h3{font-size:16px}}
+@media(prefers-reduced-motion:reduce){.quick-capture-tile{transition:none}.quick-capture-tile:hover{transform:none}}
+
 /* Hero contrast fix: the hero background is light, but its child elements kept the original light-on-dark colours. */
 .app-hero h1{color:var(--brand)}
 .app-hero h1 span{color:#8a6a2c}
@@ -1592,6 +1612,17 @@ input:focus-visible,select:focus-visible,textarea:focus-visible,button:focus-vis
     <div class="section-kicker"><span>MODULE 04</span><span class="kicker-line"></span><span>DONNÉES EXPÉRIMENTALES</span></div>
     <h2 id="measurementTitle">Mesures &amp; observations instrumentales</h2>
     <p class="muted">Enregistrez une mesure numérique avec son unité, son horodatage et sa méthode. Les mesures de lot sont reliées à la traçabilité par un événement, sans ajouter de table parallèle.</p>
+
+    <div class="quick-capture" aria-label="Saisie rapide">
+      <div class="quick-capture-heading"><div><span class="context-eyebrow">SAISIE EXPRESS</span><h3>Qu’est-ce que tu veux noter ?</h3><p>Un clic prépare la fiche. Choisis ensuite la culture et complète seulement ce qui manque.</p></div><span class="quick-capture-spark" aria-hidden="true">✳</span></div>
+      <div class="quick-capture-grid">
+        <button type="button" class="quick-capture-tile" data-quick-measure="ph"><span class="quick-capture-icon">pH</span><span><strong>Acidité</strong><small>Mesurer le pH</small></span><span class="quick-capture-arrow">↗</span></button>
+        <button type="button" class="quick-capture-tile" data-quick-measure="temperature"><span class="quick-capture-icon">°C</span><span><strong>Température</strong><small>Air, substrat, milieu…</small></span><span class="quick-capture-arrow">↗</span></button>
+        <button type="button" class="quick-capture-tile" data-quick-measure="ec"><span class="quick-capture-icon">EC</span><span><strong>Conductivité</strong><small>Suivi de la solution</small></span><span class="quick-capture-arrow">↗</span></button>
+        <button type="button" class="quick-capture-tile quick-capture-observation" data-quick-observation><span class="quick-capture-icon">◎</span><span><strong>Observation visuelle</strong><small>Aspect, croissance, anomalie…</small></span><span class="quick-capture-arrow">↗</span></button>
+      </div>
+      <p class="quick-capture-tip"><span aria-hidden="true">↳</span> Astuce : la culture ou le lot choisi est conservé pendant la saisie des mesures et observations.</p>
+    </div>
 
     <div class="grid">
       <div>
@@ -6796,6 +6827,63 @@ function setupUiEnhancements() {
       () => syncPendingCultures()
     );
 }
+
+
+// Quick capture presets: select a matching variable, update its units, then focus the first missing field.
+function setupQuickCapture() {
+  const nowLocal = () => {
+    const date = new Date();
+    date.setMinutes(date.getMinutes() - date.getTimezoneOffset());
+    return date.toISOString().slice(0, 16);
+  };
+  const pickOption = (select, terms) => {
+    if (!select) return false;
+    const options = [...select.options].filter(option => option.value);
+    const match = options.find(option => terms.some(term => (option.textContent + " " + option.value).toLocaleLowerCase().includes(term)));
+    if (!match) return false;
+    select.value = match.value;
+    select.dispatchEvent(new Event("change", { bubbles: true }));
+    return true;
+  };
+  document.querySelectorAll("[data-quick-measure]").forEach(button => {
+    button.addEventListener("click", () => {
+      const preset = button.dataset.quickMeasure;
+      const options = [...measurementVariableSelect.options].filter(option => option.value);
+      const selectedOption = options.find(option => {
+        const label = option.textContent.toLocaleLowerCase();
+        const code = option.value.toLocaleLowerCase();
+        if (preset === "ph") return /\bph\b/.test(label) || /\bph\b/.test(code) || /acidité|acidity/.test(label);
+        if (preset === "ec") return /\bec\b/.test(label) || /\bec\b/.test(code) || /conductivité|conductivity|µs\/cm|ms\/cm/.test(label);
+        return /température|temperature|\btemp\b/.test(label) || /temperature|temp/.test(code);
+      });
+      const selected = Boolean(selectedOption);
+      if (selectedOption) {
+        measurementVariableSelect.value = selectedOption.value;
+        measurementVariableSelect.dispatchEvent(new Event("change", { bubbles: true }));
+      }
+      if (!measurementAtInput.value) measurementAtInput.value = nowLocal();
+      activateWorkspaceModule("measurementCard");
+      document.getElementById("measurementCard")?.scrollIntoView({ block: "start", behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+      if (measurementTargetSelect.options.length > 1 && !measurementTargetSelect.value) measurementTargetSelect.focus({ preventScroll: true });
+      else if (!selected) measurementVariableSelect.focus({ preventScroll: true });
+      else measurementValueInput.focus({ preventScroll: true });
+      if (!selected) showMessage("Le paramètre n’a pas été reconnu automatiquement. Sélectionnez-le dans la liste ; la saisie express reste disponible.", "info");
+    });
+  });
+  document.querySelector("[data-quick-observation]")?.addEventListener("click", () => {
+    const details = document.querySelector(".observation-details");
+    if (details) details.open = true;
+    if (!observationAtInput.value) observationAtInput.value = nowLocal();
+    pickOption(observationVariableSelect, ["morphologie", "aspect", "visuel", "observation", "croissance"]);
+    activateWorkspaceModule("measurementCard");
+    document.getElementById("measurementCard")?.scrollIntoView({ block: "start", behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+    if (measurementTargetSelect.options.length > 1 && !measurementTargetSelect.value) measurementTargetSelect.focus({ preventScroll: true });
+    else if (!observationVariableSelect.value) observationVariableSelect.focus({ preventScroll: true });
+    else observationValueInput.focus({ preventScroll: true });
+  });
+}
+
+setupQuickCapture();
 
 
 setupUiEnhancements();
