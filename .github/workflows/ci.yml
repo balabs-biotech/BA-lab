@@ -80,6 +80,7 @@ jobs:
       - name: Check batch-tracker structure
         run: |
           node scripts/check-batch-tracker-js.mjs
+          node scripts/test-compare-analysis.mjs
           node scripts/check-i18n.mjs
           [ -f batch-tracker/index.html ] && echo "✓ batch-tracker/index.html exists" || exit 1
           [ -f batch-tracker/README.md ] && echo "✓ batch-tracker/README.md exists" || exit 1
