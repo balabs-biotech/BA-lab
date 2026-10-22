@@ -6517,7 +6517,7 @@ function setupUiEnhancements() {
   document.querySelectorAll(".section-nav a").forEach((link) => {
     link.addEventListener("click", (event) => {
       const target = link.getAttribute("href");
-      if (target === "#overviewCard" || target === "#trackerCard" || target === "#batchCard" || target === "#measurementCard") {
+      if (target === "#overviewCard" || target === "#trackerCard" || target === "#batchCard" || target === "#measurementCard" || target === "#statisticsCard") {
         event.preventDefault();
         activateWorkspaceModule(target.slice(1));
         document.getElementById(target.slice(1))?.scrollIntoView({
