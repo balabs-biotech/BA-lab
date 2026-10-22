@@ -111,6 +111,21 @@ for(const label of ["Emplacement (facultatif)","Location (optional)","Localizaç
  if(!i18n.includes(label))throw new Error("Batch location/environment localisation missing: "+label);
 }
 console.log("✓ Batch creation supports organization-scoped location and environment selection");
+if(!template.includes('id="moveBatchLocation"')||!template.includes('id="moveBatchEnvironment"')||!template.includes('id="moveBatchButton"'))throw new Error("Batch movement controls are missing");
+for(const snippet of [
+ 'rpc("move_batch_to_location"',
+ 'p_batch_id: selectedBatchId',
+ 'p_location_id: locationId',
+ 'p_environment_id: environmentId',
+ 'p_note: note',
+ 'prepareMovementControls(batch)',
+ 'batch_moved: "Déplacement du lot"',
+ 'event_type === "batch_moved"'
+]) if(!engine.includes(snippet))throw new Error("Batch movement UI integration missing: "+snippet);
+for(const label of ["Déplacer le lot","Move batch","Mover lote","نقل الدفعة","Enregistrer le déplacement","Save move","Guardar movimentação","حفظ النقل"]){
+ if(!i18n.includes(label))throw new Error("Batch movement localisation missing: "+label);
+}
+console.log("✓ Batch movement calls the atomic RPC and refreshes the traceability timeline");
 if(!engine.includes("const locationName = batchLocationOptions.find")||!engine.includes("const environmentName = batchEnvironmentOptions.find")||!engine.includes("escapeHtml(locationName)")||!engine.includes("escapeHtml(environmentName)"))throw new Error("Batch detail does not safely display its selected location/environment");
 
 
