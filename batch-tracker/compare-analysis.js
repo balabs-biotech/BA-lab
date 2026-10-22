@@ -59,10 +59,39 @@
     return denominator ? numerator / denominator : null;
   }
 
+  function convertUnit(value, fromUnit, toUnit, dimension) {
+    if (!Number.isFinite(value) || !fromUnit || !toUnit) return null;
+    if (fromUnit.code === toUnit.code) return value;
+    if (dimension === "pH" || fromUnit.dimension !== toUnit.dimension || fromUnit.dimension !== dimension) return null;
+    if (fromUnit.is_linear !== true || toUnit.is_linear !== true) return null;
+
+    // Kelvin/Celsius are affine units. The live catalogue currently records
+    // K with offset 0, so use the exact standard conversion for these two codes.
+    if (dimension === "temperature") {
+      let celsius;
+      if (fromUnit.code === "K") celsius = value - 273.15;
+      else if (fromUnit.code === "degC") celsius = value;
+      else return null;
+      if (toUnit.code === "degC") return celsius;
+      if (toUnit.code === "K") return celsius + 273.15;
+      return null;
+    }
+
+    const fromFactor = Number(fromUnit.factor);
+    const fromOffset = Number(fromUnit.offset_value);
+    const toFactor = Number(toUnit.factor);
+    const toOffset = Number(toUnit.offset_value);
+    if (![fromFactor, fromOffset, toFactor, toOffset].every(Number.isFinite) || fromFactor <= 0 || toFactor <= 0) return null;
+    const baseValue = value * fromFactor + fromOffset;
+    const converted = (baseValue - toOffset) / toFactor;
+    return Number.isFinite(converted) ? converted : null;
+  }
+
   root.BACompareAnalysis = {
     median: median,
     summarize: summarize,
     detectOutlierIds: detectOutlierIds,
-    pearson: pearson
+    pearson: pearson,
+    convertUnit: convertUnit
   };
 })(typeof window !== "undefined" ? window : globalThis);
