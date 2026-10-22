@@ -80,6 +80,7 @@ for(const label of ["Choisir une famille de lot…","Mycélium sur grain — Ple
  if(!i18n.includes(label))throw new Error("Batch form localisation missing: "+label);
 }
 if(!template.includes('id="batchCultureHint"')||!template.includes("filiation biologique"))throw new Error("Batch source culture purpose is not explained");
+if(!i18n.includes("Ce choix détermine les contrôles qualité associés."))throw new Error("Batch category guidance translation missing");
 for(const label of ["Culture ou ressource source","Culture biologique / lot de culture générique","Source culture or resource","Cultura ou recurso de origem","المزرعة أو المورد المصدر"]){
  if(!i18n.includes(label))throw new Error("Batch source guidance localisation missing: "+label);
 }
