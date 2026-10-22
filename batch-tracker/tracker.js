@@ -5157,7 +5157,12 @@ async function loadLotComparison() {
     status.textContent = comparisonText("Comparaison terminée : ", "Comparison complete: ", "Comparação concluída: ", "اكتملت المقارنة: ") + selectedBatches.length + comparisonText(" lots ; ", " batches; ", " lotes; ", " دفعات؛ ") + assignedMeasurements.length + comparisonText(" mesures et ", " measurements and ", " medições e ", " قياسات و") + assignedObservations.length + comparisonText(" observations retenues. Filtre demandé : ", " observations retained. Requested filter: ", " observações incluídas. Filtro solicitado: ", " ملاحظات مدرجة. المرشح المطلوب: ") + selectedPeriodText + comparisonText(". Période des données : ", ". Data period: ", ". Período dos dados: ", ". فترة البيانات: ") + periodLabel + ".";
   } catch (error) {
     console.error("Comparaison des lots :", error);
-    status.textContent = comparisonText("La comparaison a échoué : ", "Comparison failed: ", "A comparação falhou: ", "فشلت المقارنة: ") + (error.message || comparisonText("erreur inconnue", "unknown error", "erro desconhecido", "خطأ غير معروف")) + comparisonText(". Aucune donnée n’a été modifiée.", ". No data was changed.", ". Nenhum dado foi alterado.", ". لم يتم تعديل أي بيانات.");
+    status.textContent = comparisonText(
+      "La comparaison a échoué. Vérifiez la connexion et vos droits d’accès, puis réessayez. Aucune donnée n’a été modifiée.",
+      "The comparison failed. Check your connection and access permissions, then try again. No data was changed.",
+      "A comparação falhou. Verifique a ligação e as permissões de acesso e tente novamente. Nenhum dado foi alterado.",
+      "فشلت المقارنة. تحقق من الاتصال وصلاحيات الوصول ثم حاول مجدداً. لم يتم تعديل أي بيانات."
+    );
   } finally {
     if (requestId === lotComparisonRequestId) {
       button.disabled = false;
