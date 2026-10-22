@@ -1142,3 +1142,31 @@ body[data-domain="mycology"] .domain-option[aria-pressed="true"] {box-shadow:4px
 body[data-domain="mycology"] .domain-option-icon {background:#f0dfd0}
 body[data-domain="mycology"] :is(input,select,textarea,button,a):focus-visible {outline-color:#a94f1d}
 body[data-domain="mycology"] .guided-entry-step {box-shadow:4px 4px 0 #d7bba6}
+
+
+/* Human-facing workspace: keep internal data-model/architecture notes out of operational pages. */
+#contextPanel { display: none !important; }
+.container {
+  grid-template-columns: minmax(0, 1fr) !important;
+  grid-template-areas:
+    "nav"
+    "hero"
+    "message"
+    "auth"
+    "workspace"
+    "measurements"
+    "result" !important;
+}
+@media (max-width: 820px) {
+  .container {
+    grid-template-columns: minmax(0, 1fr) !important;
+    grid-template-areas:
+      "nav"
+      "hero"
+      "message"
+      "auth"
+      "workspace"
+      "measurements"
+      "result" !important;
+  }
+}
