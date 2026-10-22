@@ -2232,22 +2232,26 @@ async function compareSelectedBatches() {
     if (cultureContextResult.error) throw new Error("Chargement du contexte expérimental impossible : " + cultureContextResult.error.message);
     const cultureContexts = cultureContextResult.data || [];
     const unitIds = [...new Set(cultureContexts.map(row => row.experimental_unit_id).filter(Boolean))];
-    const experimentIds = [...new Set(cultureContexts.map(row => row.experiment_id).filter(Boolean))];
-    const [unitResult, experimentResult] = await Promise.all([
+    const [unitResult] = await Promise.all([
       unitIds.length
         ? supabaseClient.from("experimental_units")
             .select("id,experiment_id,unit_code,replicate_no,treatment_code")
             .eq("organization_id", organizationId).in("id", unitIds)
-        : Promise.resolve({data:[],error:null}),
-      experimentIds.length
-        ? supabaseClient.from("experiments")
-            .select("id,code,name")
-            .eq("organization_id", organizationId).in("id", experimentIds)
         : Promise.resolve({data:[],error:null})
     ]);
     if (unitResult.error) throw new Error("Chargement des unités expérimentales impossible : " + unitResult.error.message);
+    const units = unitResult.data || [];
+    const unitsById = new Map(units.map(row => [row.id, row]));
+    const experimentIds = [...new Set([
+      ...cultureContexts.map(row => row.experiment_id),
+      ...units.map(row => row.experiment_id)
+    ].filter(Boolean))];
+    const experimentResult = experimentIds.length
+      ? await supabaseClient.from("experiments")
+          .select("id,code,name")
+          .eq("organization_id", organizationId).in("id", experimentIds)
+      : {data:[],error:null};
     if (experimentResult.error) throw new Error("Chargement des expériences impossible : " + experimentResult.error.message);
-    const unitsById = new Map((unitResult.data || []).map(row => [row.id, row]));
     const experimentsById = new Map((experimentResult.data || []).map(row => [row.id, row]));
     const contextsByCultureId = new Map(cultureContexts.map(row => {
       const unit = unitsById.get(row.experimental_unit_id);
