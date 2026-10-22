@@ -838,6 +838,8 @@ async function initializeAuthenticatedTracker(
 
     await loadQuantityUnitOptions();
 
+    await loadBatchPlaceOptions();
+
     await syncPendingCultures();
 
     await loadLatestBatches();
@@ -4428,6 +4430,72 @@ async function loadQuantityUnitOptions() {
     }
   }
 }
+
+
+/* ============================================================
+   EMPLACEMENTS ET ENVIRONNEMENTS DES LOTS
+   ============================================================ */
+
+function renderBatchEnvironmentOptions() {
+  if (!batchEnvironmentInput) return;
+  const selectedLocationId = batchLocationInput?.value || "";
+  const available = batchEnvironmentOptions.filter(environment =>
+    selectedLocationId
+      ? !environment.location_id || environment.location_id === selectedLocationId
+      : !environment.location_id
+  );
+  batchEnvironmentInput.replaceChildren();
+  const placeholder = document.createElement("option");
+  placeholder.value = "";
+  placeholder.textContent = "Aucun environnement";
+  batchEnvironmentInput.appendChild(placeholder);
+  for (const environment of available) {
+    const option = document.createElement("option");
+    option.value = environment.id;
+    option.textContent = environment.name;
+    batchEnvironmentInput.appendChild(option);
+  }
+  batchEnvironmentInput.disabled = available.length === 0;
+}
+
+async function loadBatchPlaceOptions() {
+  if (!organizationId || !batchLocationInput || !batchEnvironmentInput) return;
+  batchLocationInput.disabled = true;
+  batchEnvironmentInput.disabled = true;
+  try {
+    const [{ data: locations, error: locationsError }, { data: environments, error: environmentsError }] = await Promise.all([
+      supabaseClient.from("locations").select("id,code,name").eq("organization_id", organizationId).order("name"),
+      supabaseClient.from("environments").select("id,name,location_id").eq("organization_id", organizationId).order("name")
+    ]);
+    if (locationsError) throw locationsError;
+    if (environmentsError) throw environmentsError;
+    batchLocationOptions = locations || [];
+    batchEnvironmentOptions = environments || [];
+    batchLocationInput.replaceChildren();
+    const placeholder = document.createElement("option");
+    placeholder.value = "";
+    placeholder.textContent = "Aucun emplacement";
+    batchLocationInput.appendChild(placeholder);
+    for (const location of batchLocationOptions) {
+      const option = document.createElement("option");
+      option.value = location.id;
+      option.textContent = location.code ? location.name + " (" + location.code + ")" : location.name;
+      batchLocationInput.appendChild(option);
+    }
+    batchLocationInput.disabled = batchLocationOptions.length === 0;
+    renderBatchEnvironmentOptions();
+  } catch (error) {
+    console.error("Référentiel des emplacements indisponible :", error);
+    batchLocationOptions = [];
+    batchEnvironmentOptions = [];
+    batchLocationInput.replaceChildren(new Option("Emplacements indisponibles", ""));
+    batchEnvironmentInput.replaceChildren(new Option("Environnements indisponibles", ""));
+    batchLocationInput.disabled = true;
+    batchEnvironmentInput.disabled = true;
+  }
+}
+
+batchLocationInput?.addEventListener("change", renderBatchEnvironmentOptions);
 
 
 /* ============================================================
