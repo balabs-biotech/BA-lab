@@ -3,10 +3,11 @@
 create schema if not exists private;
 
 create table if not exists private.notion_sync_claims (
-  culture_id uuid primary key,
+  culture_id uuid not null,
   organization_id uuid not null,
   claim_token uuid not null,
   expires_at timestamptz not null,
+  primary key (organization_id, culture_id),
   foreign key (organization_id, culture_id)
     references public.cultures (organization_id, id) on delete cascade
 );
@@ -38,7 +39,7 @@ begin
 
   insert into private.notion_sync_claims (culture_id, organization_id, claim_token, expires_at)
   values (p_culture_id, p_organization_id, p_claim_token, clock_timestamp() + interval '3 minutes')
-  on conflict (culture_id) do update
+  on conflict (organization_id, culture_id) do update
     set organization_id = excluded.organization_id,
         claim_token = excluded.claim_token,
         expires_at = excluded.expires_at
