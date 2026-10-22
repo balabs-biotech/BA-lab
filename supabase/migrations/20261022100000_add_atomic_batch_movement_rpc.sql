@@ -33,6 +33,10 @@ begin
     raise exception 'batch_not_found_or_forbidden' using errcode = '42501';
   end if;
 
+  if v_batch.status in ('released', 'rejected', 'aborted', 'completed') then
+    raise exception 'batch_is_closed' using errcode = '23514';
+  end if;
+
   if p_location_id is not null and not exists (
     select 1 from public.locations l
     where l.organization_id = v_batch.organization_id and l.id = p_location_id
