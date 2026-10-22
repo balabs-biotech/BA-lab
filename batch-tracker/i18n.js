@@ -961,7 +961,11 @@
       const result = translate(original, currentLanguage);
       if (node.nodeValue !== result) node.nodeValue = result;
     }
-    const elements = root.querySelectorAll ? root.querySelectorAll("*") : [];
+    // MutationObserver passes each newly inserted element as the root.
+    // Include that element itself: querySelectorAll("*") only returns descendants.
+    const elements = [];
+    if (root.nodeType === 1) elements.push(root);
+    if (root.querySelectorAll) elements.push(...root.querySelectorAll("*"));
     for (const el of elements) {
       const attrs = ["placeholder", "title", "aria-label"];
       if (!sourceAttrs.has(el)) sourceAttrs.set(el, Object.fromEntries(attrs.filter(a => el.hasAttribute(a)).map(a => [a, el.getAttribute(a)])));
