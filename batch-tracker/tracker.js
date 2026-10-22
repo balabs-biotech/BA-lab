@@ -239,6 +239,11 @@ const batchQc =
 
 const batchEvents = document.getElementById("batchEvents");
 const batchEventList = document.getElementById("batchEventList");
+const moveBatchLocationInput = document.getElementById("moveBatchLocation");
+const moveBatchEnvironmentInput = document.getElementById("moveBatchEnvironment");
+const moveBatchNoteInput = document.getElementById("moveBatchNote");
+const moveBatchButton = document.getElementById("moveBatchButton");
+const moveBatchStatus = document.getElementById("moveBatchStatus");
 const harvestQuantityInput = document.getElementById("harvestQuantity");
 const harvestUnitInput = document.getElementById("harvestUnit");
 const harvestNoteInput = document.getElementById("harvestNote");
@@ -2736,6 +2741,7 @@ async function loadBatch(
   );
   renderBatchEventTimeline(batchEventsData || [], batchEventsError?.message || null);
   updateHarvestEntryState(batch, batchEventsData || []);
+  prepareMovementControls(batch);
 
 
   showElement(
@@ -4457,6 +4463,102 @@ async function loadQuantityUnitOptions() {
    EMPLACEMENTS ET ENVIRONNEMENTS DES LOTS
    ============================================================ */
 
+function renderMovementEnvironmentOptions() {
+  if (!moveBatchEnvironmentInput) return;
+  const locationId = moveBatchLocationInput?.value || "";
+  const current = moveBatchEnvironmentInput.value;
+  const available = batchEnvironmentOptions.filter(environment =>
+    locationId
+      ? !environment.location_id || environment.location_id === locationId
+      : !environment.location_id
+  );
+  moveBatchEnvironmentInput.replaceChildren();
+  const placeholder = document.createElement("option");
+  placeholder.value = "";
+  placeholder.textContent = "Aucun environnement";
+  moveBatchEnvironmentInput.appendChild(placeholder);
+  for (const environment of available) {
+    const option = document.createElement("option");
+    option.value = environment.id;
+    option.textContent = environment.name;
+    moveBatchEnvironmentInput.appendChild(option);
+  }
+  moveBatchEnvironmentInput.value = available.some(environment => environment.id === current) ? current : "";
+  moveBatchEnvironmentInput.disabled = available.length === 0 || !selectedBatch;
+}
+
+function prepareMovementControls(batch) {
+  if (!moveBatchLocationInput || !moveBatchEnvironmentInput || !moveBatchButton || !moveBatchStatus) return;
+  moveBatchLocationInput.replaceChildren();
+  const noLocation = document.createElement("option");
+  noLocation.value = "";
+  noLocation.textContent = "Aucun emplacement";
+  moveBatchLocationInput.appendChild(noLocation);
+  for (const location of batchLocationOptions) {
+    const option = document.createElement("option");
+    option.value = location.id;
+    option.textContent = location.name || location.code || location.id;
+    moveBatchLocationInput.appendChild(option);
+  }
+  moveBatchLocationInput.value = batch?.location_id || "";
+  renderMovementEnvironmentOptions();
+  moveBatchEnvironmentInput.value = batch?.environment_id || "";
+  // If legacy data contains a now-incompatible pairing, don't silently retain it.
+  if (![...moveBatchEnvironmentInput.options].some(option => option.value === moveBatchEnvironmentInput.value)) {
+    moveBatchEnvironmentInput.value = "";
+  }
+  const isOpen = batch && !["released", "rejected", "aborted", "completed"].includes(batch.status);
+  moveBatchButton.disabled = !isOpen || (!batchLocationOptions.length && !batchEnvironmentOptions.length);
+  moveBatchLocationInput.disabled = !isOpen;
+  moveBatchEnvironmentInput.disabled = !isOpen || moveBatchEnvironmentInput.options.length <= 1;
+  moveBatchStatus.textContent = batch
+    ? "Choisissez l’emplacement et l’environnement de destination. Un déplacement sans changement sera refusé."
+    : "Sélectionnez un lot pour préparer un déplacement.";
+}
+
+async function moveSelectedBatch() {
+  if (!organizationId || !selectedBatch || !selectedBatchId) {
+    showMessage("Sélectionnez d’abord un lot.", "error");
+    return;
+  }
+  if (["released", "rejected", "aborted", "completed"].includes(selectedBatch.status)) {
+    showMessage("Un lot clôturé ne peut pas être déplacé depuis ce formulaire.", "error");
+    return;
+  }
+  const locationId = moveBatchLocationInput?.value || null;
+  const environmentId = moveBatchEnvironmentInput?.value || null;
+  const note = moveBatchNoteInput?.value.trim() || null;
+  const currentLocation = selectedBatch.location_id || null;
+  const currentEnvironment = selectedBatch.environment_id || null;
+  if (locationId === currentLocation && environmentId === currentEnvironment) {
+    showMessage("Le nouvel emplacement et l’environnement sont identiques aux valeurs actuelles.", "error");
+    return;
+  }
+  moveBatchButton.disabled = true;
+  const label = moveBatchButton.textContent;
+  moveBatchButton.textContent = "Enregistrement…";
+  try {
+    const { data, error } = await supabaseClient.rpc("move_batch_to_location", {
+      p_batch_id: selectedBatchId,
+      p_location_id: locationId,
+      p_environment_id: environmentId,
+      p_note: note
+    });
+    if (error) throw error;
+    if (!data?.event_id) throw new Error("La RPC n’a pas confirmé la création de l’événement de déplacement.");
+    if (moveBatchNoteInput) moveBatchNoteInput.value = "";
+    await loadLatestBatches();
+    await loadBatch(selectedBatchId);
+    showMessage("Déplacement enregistré dans la chronologie du lot.", "success");
+  } catch (error) {
+    console.error("Déplacement du lot impossible:", error);
+    showMessage("Déplacement impossible : " + (error.message || "erreur inconnue"), "error");
+  } finally {
+    moveBatchButton.textContent = label;
+    if (selectedBatch) prepareMovementControls(selectedBatch);
+  }
+}
+
 function renderBatchEnvironmentOptions() {
   if (!batchEnvironmentInput) return;
   const selectedLocationId = batchLocationInput?.value || "";
@@ -4517,6 +4619,8 @@ async function loadBatchPlaceOptions() {
 }
 
 batchLocationInput?.addEventListener("change", renderBatchEnvironmentOptions);
+moveBatchLocationInput?.addEventListener("change", renderMovementEnvironmentOptions);
+moveBatchButton?.addEventListener("click", moveSelectedBatch);
 
 
 /* ============================================================
