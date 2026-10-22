@@ -4,6 +4,15 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
+  <script>
+    // Direct access to the tracker starts at the universe chooser.
+    // Links from the chooser include one of the supported domain values.
+    const initialDomain = new URLSearchParams(window.location.search).get("domain");
+    if (!["agronomy", "mycology", "laboratory"].includes(initialDomain)) {
+      window.location.replace("../");
+    }
+  </script>
+
   <title>BA Labs — Culture & Batch Tracker</title>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.118.0"></script>
