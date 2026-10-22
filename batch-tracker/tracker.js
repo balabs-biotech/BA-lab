@@ -4676,6 +4676,40 @@ function comparisonLocale() {
   return language === "ar" ? "ar-DZ" : language === "pt" ? "pt-PT" : language === "en" ? "en-GB" : "fr-FR";
 }
 
+function comparisonUnitLabel(code) {
+  const labels = {
+    "%": ["%", "%", "%", "%"],
+    "1/h": ["h⁻¹ (1/h)", "h⁻¹ (1/h)", "h⁻¹ (1/h)", "ساعة⁻¹ (1/h)"],
+    "1/min": ["min⁻¹ (1/min)", "min⁻¹ (1/min)", "min⁻¹ (1/min)", "دقيقة⁻¹ (1/min)"],
+    cells: ["cellules", "cells", "células", "خلايا"],
+    "cells/mL": ["cellules/mL", "cells/mL", "células/mL", "خلايا/مل"],
+    CFU: ["UFC", "CFU", "UFC", "وحدة تكوين مستعمرة"],
+    "CFU/mL": ["UFC/mL", "CFU/mL", "UFC/mL", "وحدة تكوين مستعمرة/مل"],
+    count: ["comptage", "count", "contagem", "عدد"],
+    cm: ["cm", "cm", "cm", "سم"],
+    degC: ["°C", "°C", "°C", "°م"],
+    dimensionless: ["sans dimension", "dimensionless", "adimensional", "بلا أبعاد"],
+    g: ["g", "g", "g", "غ"],
+    h: ["h", "h", "h", "ساعة"],
+    K: ["K", "K", "K", "كلفن (K)"],
+    kg: ["kg", "kg", "kg", "كغ"],
+    L: ["L", "L", "L", "لتر"],
+    lux: ["lux", "lux", "lux", "لوكس"],
+    mg: ["mg", "mg", "mg", "ملغ"],
+    min: ["min", "min", "min", "دقيقة"],
+    mL: ["mL", "mL", "mL", "مل"],
+    mm: ["mm", "mm", "mm", "مم"],
+    "mS/cm": ["mS/cm", "mS/cm", "mS/cm", "ملي سيمنز/سم"],
+    pH: ["pH", "pH", "pH", "الأس الهيدروجيني"],
+    ppm: ["ppm", "ppm", "ppm", "جزء في المليون"],
+    s: ["s", "s", "s", "ثانية"],
+    ug: ["µg", "µg", "µg", "ميكروغرام"],
+    uL: ["µL", "µL", "µL", "ميكرولتر"]
+  };
+  const index = ({ fr: 0, en: 1, pt: 2, ar: 3 })[document.documentElement.lang || "fr"] || 0;
+  return labels[code]?.[index] || code || comparisonText("unité non renseignée", "unit not specified", "unidade não indicada", "الوحدة غير محددة");
+}
+
 function comparisonVariableLabel(variable) {
   if (!variable) return "";
   const labels = {
@@ -4815,14 +4849,14 @@ function renderComparisonChart(group, batches, outlierIds) {
     }
     series.forEach(point => {
       const radius = outlierIds.has(point.id) ? 5 : 3.2;
-      svg += '<circle cx="' + x(point.measured_at).toFixed(2) + '" cy="' + y(point.value).toFixed(2) + '" r="' + radius + '" fill="' + color + '" stroke="' + (outlierIds.has(point.id) ? "#b91c1c" : "#fff") + '" stroke-width="' + (outlierIds.has(point.id) ? 2 : 1) + '"><title>' + escapeHtml((batchMap.get(batchId)?.batch_code || "Lot") + " · " + new Date(point.measured_at).toLocaleString(comparisonLocale()) + " · " + comparisonFormat(point.value) + " " + group.unit) + '</title></circle>';
+      svg += '<circle cx="' + x(point.measured_at).toFixed(2) + '" cy="' + y(point.value).toFixed(2) + '" r="' + radius + '" fill="' + color + '" stroke="' + (outlierIds.has(point.id) ? "#b91c1c" : "#fff") + '" stroke-width="' + (outlierIds.has(point.id) ? 2 : 1) + '"><title>' + escapeHtml((batchMap.get(batchId)?.batch_code || "Lot") + " · " + new Date(point.measured_at).toLocaleString(comparisonLocale()) + " · " + comparisonFormat(point.value) + " " + comparisonUnitLabel(group.unit)) + '</title></circle>';
     });
   });
   svg += '<text x="' + left + '" y="' + (height - 17) + '" font-size="10" fill="currentColor">' + new Date(minTime).toLocaleDateString(comparisonLocale()) + '</text>';
   svg += '<text x="' + (width - right) + '" y="' + (height - 17) + '" text-anchor="end" font-size="10" fill="currentColor">' + new Date(maxTime).toLocaleDateString(comparisonLocale()) + '</text>';
   svg += '<text x="' + (left + plotWidth / 2) + '" y="' + (height - 2) + '" text-anchor="middle" font-size="10" fill="currentColor">Date de mesure</text></svg>';
   const legend = batchIds.map((batchId, index) => '<span><i style="background:' + palette[index % palette.length] + '"></i>' + escapeHtml(batchMap.get(batchId)?.batch_code || "Lot sans code") + '</span>').join("");
-  return '<article class="comparison-chart-card"><h4>' + escapeHtml(group.label) + ' <span class="muted">(' + escapeHtml(group.unit) + ')</span></h4>' + svg + '<div class="comparison-legend">' + legend + '</div></article>';
+  return '<article class="comparison-chart-card"><h4>' + escapeHtml(group.label) + ' <span class="muted">(' + escapeHtml(comparisonUnitLabel(group.unit)) + ')</span></h4>' + svg + '<div class="comparison-legend">' + legend + '</div></article>';
 }
 
 async function loadLotComparison() {
@@ -5012,7 +5046,7 @@ async function loadLotComparison() {
           const stats = BACompareAnalysis.summarize(points.map(point => point.value));
           const outliers = points.filter(point => outlierIds.has(point.id)).length;
           return [
-            escapeHtml(group.label + " · " + group.unit + " / " + (batch.batch_code || "Lot sans code")),
+            escapeHtml(group.label + " · " + comparisonUnitLabel(group.unit) + " / " + (batch.batch_code || "Lot sans code")),
             String(stats.n),
             comparisonFormat(stats.median),
             stats.n ? comparisonFormat(stats.min) + "–" + comparisonFormat(stats.max) : "—",
@@ -5072,7 +5106,7 @@ async function loadLotComparison() {
     }
     correlations.sort((a, b) => Math.abs(b.r) - Math.abs(a.r));
     if (correlations.length) {
-      const rows = correlations.slice(0, 8).map(item => [escapeHtml(item.a.label + " (" + item.a.unit + ")"), escapeHtml(item.b.label + " (" + item.b.unit + ")"), String(item.n), '<span class="comparison-correlation">' + comparisonFormat(item.r, 3) + '</span>', Math.abs(item.r) >= 0.7 ? comparisonText("Association linéaire exploratoire marquée", "Strong exploratory linear association", "Associação linear exploratória forte", "ارتباط خطي استكشافي قوي") : comparisonText("Association linéaire exploratoire", "Exploratory linear association", "Associação linear exploratória", "ارتباط خطي استكشافي")]);
+      const rows = correlations.slice(0, 8).map(item => [escapeHtml(item.a.label + " (" + comparisonUnitLabel(item.a.unit) + ")"), escapeHtml(item.b.label + " (" + comparisonUnitLabel(item.b.unit) + ")"), String(item.n), '<span class="comparison-correlation">' + comparisonFormat(item.r, 3) + '</span>', Math.abs(item.r) >= 0.7 ? comparisonText("Association linéaire exploratoire marquée", "Strong exploratory linear association", "Associação linear exploratória forte", "ارتباط خطي استكشافي قوي") : comparisonText("Association linéaire exploratoire", "Exploratory linear association", "Associação linear exploratória", "ارتباط خطي استكشافي")]);
       findings.innerHTML += '<article class="comparison-finding"><h4>2. Corrélations exploratoires</h4><p>Corrélation de Pearson sur des moyennes journalières appariées au sein du même lot (au moins 4 journées appariées). Les répétitions ne sont pas indépendantes et les effets du temps ou des traitements ne sont pas contrôlés.</p>' + comparisonTable(["Variable A", "Variable B", "Journées appariées (n)", "r de Pearson", "Lecture"], rows, "Associations observées") + '<p>' + escapeHtml(comparisonText("Une corrélation, même forte, ne démontre pas de causalité.", "A correlation, even a strong one, does not demonstrate causality.", "Uma correlação, mesmo forte, não demonstra causalidade.", "الارتباط، حتى إن كان قوياً، لا يثبت السببية.")) + '</p></article>';
     } else {
       findings.innerHTML += '<article class="comparison-finding"><h4>2. Corrélations exploratoires</h4><p>' + escapeHtml(comparisonText("Pas assez de journées appariées entre variables différentes pour calculer une corrélation interprétable (minimum opérationnel : 4 journées au sein du même lot).", "Not enough paired days between different variables to calculate an interpretable correlation (operational minimum: 4 days within the same batch).", "Não existem dias emparelhados suficientes entre variáveis diferentes para calcular uma correlação interpretável (mínimo operacional: 4 dias no mesmo lote).", "لا توجد أيام مقترنة كافية بين المتغيرات المختلفة لحساب ارتباط قابل للتفسير (الحد الأدنى العملي: 4 أيام داخل الدفعة نفسها).")) + '</p></article>';
