@@ -4973,6 +4973,14 @@ async function loadLotComparison() {
           .eq("organization_id", organizationId).in("culture_id", unambiguousCultureIds).is("event_id", null).order(dateField, { ascending: true }).order("id", { ascending: true }));
         results.push(cultureRows);
       }
+      // Sample-linked records may have neither event_id nor culture_id; query them explicitly.
+      for (let offset = 0; offset < sampleIds.length; offset += 100) {
+        const sampleChunk = sampleIds.slice(offset, offset + 100);
+        const sampleLinkedRows = await fetchComparisonRows(() => supabaseClient.from(tableName).select(selectFields)
+          .eq("organization_id", organizationId).in("sample_id", sampleChunk).is("event_id", null)
+          .order(dateField, { ascending: true }).order("id", { ascending: true }));
+        results.push(sampleLinkedRows);
+      }
       const unique = new Map();
       results.flat().forEach(row => unique.set(row.id, row));
       return Array.from(unique.values()).filter(row => comparisonDateInRange(row[dateField], fromDate, toDate));
