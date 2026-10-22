@@ -1494,14 +1494,14 @@ body[data-domain="mycology"] :is(input, select, textarea, button, a):focus-visib
 }
 
 
-/* Green Tech: restore the universe selector's vivid leaf-green accents,
-   while keeping button surfaces dark to avoid large fluorescent blocks. */
+/* Green Tech accent matches the homepage universe selector (#b4f477).
+   Keep interactive surfaces dark; use the bright green for text, icons and outlines. */
 body[data-domain="agronomy"] {
-  --brand: #a7f36a !important;
-  --brand-hover: #c2ff91 !important;
-  --focus: #a7f36a !important;
-  --ok: #a7f36a !important;
-  accent-color: #a7f36a;
+  --brand: #b4f477 !important;
+  --brand-hover: #c8ff91 !important;
+  --focus: #b4f477 !important;
+  --ok: #b4f477 !important;
+  accent-color: #b4f477;
 }
 body[data-domain="agronomy"] :is(
   button, .primary-button, .culture-catalog-action[data-culture-action="observe"],
@@ -1510,29 +1510,29 @@ body[data-domain="agronomy"] :is(
   background-color: #222f28 !important;
   background-image: none !important;
   border-color: #506657 !important;
-  color: #a7f36a !important;
+  color: #b4f477 !important;
   box-shadow: none;
 }
 body[data-domain="agronomy"] :is(button, .primary-button):hover:not(:disabled) {
   background-color: #2b3a30 !important;
-  border-color: #a7f36a !important;
-  color: #c2ff91 !important;
+  border-color: #b4f477 !important;
+  color: #c8ff91 !important;
 }
 body[data-domain="agronomy"] :is(a, .culture-catalog-code, .statistics-summary-item strong,
   .overview-metric strong, .section-kicker-label, .observation-details summary,
   .overview-live, .shortcut-index, .culture-catalog-count, .domain-option-icon,
   .hero-art) {
-  color: #a7f36a !important;
+  color: #b4f477 !important;
 }
 body[data-domain="agronomy"] :is(.progress-bar, .overview-live span, .status-indicator,
   .status-dot, .live-dot) {
-  background: #a7f36a !important;
+  background: #b4f477 !important;
   background-image: none !important;
 }
 body[data-domain="agronomy"] :is(input, select, textarea, button, a):focus-visible {
-  outline-color: #a7f36a !important;
-  box-shadow: 0 0 0 2px rgba(167, 243, 106, .24) !important;
+  outline-color: #b4f477 !important;
+  box-shadow: 0 0 0 2px rgba(180, 244, 119, .24) !important;
 }
 body[data-domain="agronomy"] .domain-option[aria-pressed="true"] {
-  box-shadow: inset 0 -3px 0 #a7f36a !important;
+  box-shadow: inset 0 -3px 0 #b4f477 !important;
 }
