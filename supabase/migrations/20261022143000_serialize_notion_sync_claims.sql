@@ -15,7 +15,7 @@ alter table private.notion_sync_claims enable row level security;
 revoke all on table private.notion_sync_claims from public, anon, authenticated;
 grant all on table private.notion_sync_claims to service_role;
 
-create or replace function private.claim_notion_sync(
+create or replace function public.claim_notion_sync(
   p_organization_id uuid,
   p_culture_id uuid,
   p_claim_token uuid
@@ -49,7 +49,7 @@ begin
 end;
 $$;
 
-create or replace function private.release_notion_sync(
+create or replace function public.release_notion_sync_claim(
   p_organization_id uuid,
   p_culture_id uuid,
   p_claim_token uuid
@@ -71,10 +71,10 @@ begin
 end;
 $$;
 
-revoke all on function private.claim_notion_sync(uuid, uuid, uuid) from public, anon, authenticated;
-revoke all on function private.release_notion_sync(uuid, uuid, uuid) from public, anon, authenticated;
-grant execute on function private.claim_notion_sync(uuid, uuid, uuid) to service_role;
-grant execute on function private.release_notion_sync(uuid, uuid, uuid) to service_role;
+revoke all on function public.claim_notion_sync(uuid, uuid, uuid) from public, anon, authenticated;
+revoke all on function public.release_notion_sync_claim(uuid, uuid, uuid) from public, anon, authenticated;
+grant execute on function public.claim_notion_sync(uuid, uuid, uuid) to service_role;
+grant execute on function public.release_notion_sync_claim(uuid, uuid, uuid) to service_role;
 
 comment on table private.notion_sync_claims is
   'Short-lived per-culture claim to serialize Notion sync requests; service-role functions only.';
