@@ -1060,25 +1060,25 @@ body[data-domain="agronomy"] .statistics-table th{background:#222f28;color:#c6d5
 body[data-domain="agronomy"] .statistics-table td,body[data-domain="agronomy"] .culture-timeline-entry p{color:#e1e9e1;border-color:#35483d}
 body[data-domain="agronomy"] .quick-capture-tile{background:#19231e;border-color:#35483d;color:#f1f5ef}
 body[data-domain="agronomy"] .quick-capture-tile strong,body[data-domain="agronomy"] .quick-capture-tile small{color:#f1f5ef}
-body[data-domain="mycology"]{--bg:#f0eddf;--surface:#fffdf5;--surface-2:#e5e0d0;--border:#24251f;--border-strong:#24251f;--text:#20211c;--muted:#53544a;--brand:#20211c;--brand-hover:#3a3b32;--focus:#bdff3b;--ok:#315a28;--warn:#8b5a00;color-scheme:light;background:var(--bg);font-family:Arial,Helvetica,sans-serif}
+body[data-domain="mycology"]{--bg:#f0eddf;--surface:#fffdf5;--surface-2:#e5e0d0;--border:#24251f;--border-strong:#24251f;--text:#20211c;--muted:#53544a;--brand:#a94f1d;--brand-hover:#853d16;--focus:#a94f1d;--ok:#315a28;--warn:#8b5a00;color-scheme:light;background:var(--bg);font-family:Arial,Helvetica,sans-serif}
 body[data-domain="mycology"] .app-toolbar,body[data-domain="mycology"] .domain-switcher,body[data-domain="mycology"] .card,body[data-domain="mycology"] #contextPanel{background:var(--surface);border:2px solid #20211c;border-radius:2px;box-shadow:4px 4px 0 #20211c;color:var(--text)}
-body[data-domain="mycology"] .app-hero{background:#20211c;border:2px solid #20211c;border-radius:2px;color:#fffdf5;box-shadow:6px 6px 0 #bdff3b}
+body[data-domain="mycology"] .app-hero{background:#20211c;border:2px solid #20211c;border-radius:2px;color:#fffdf5;box-shadow:6px 6px 0 #a94f1d}
 body[data-domain="mycology"] .app-hero h1,body[data-domain="mycology"] .app-hero h1 span{color:#fffdf5}
 body[data-domain="mycology"] .eyebrow,body[data-domain="mycology"] .hero-description{color:#e5e0d0}
-body[data-domain="mycology"] .hero-tags span,body[data-domain="mycology"] .hero-note{background:#bdff3b;color:#20211c;border:2px solid #20211c;border-radius:2px}
-body[data-domain="mycology"] .hero-art{color:#bdff3b}
+body[data-domain="mycology"] .hero-tags span,body[data-domain="mycology"] .hero-note{background:#a94f1d;color:#20211c;border:2px solid #20211c;border-radius:2px}
+body[data-domain="mycology"] .hero-art{color:#a94f1d}
 body[data-domain="mycology"] .card h2,body[data-domain="mycology"] .card h3{font-family:Arial,Helvetica,sans-serif;font-weight:900;letter-spacing:-.04em;text-transform:uppercase}
 body[data-domain="mycology"] .card .culture-catalog-row,body[data-domain="mycology"] .card .culture-detail-field,body[data-domain="mycology"] .card .culture-timeline-entry,body[data-domain="mycology"] .card .statistics-summary-item,body[data-domain="mycology"] .card .statistics-chart,body[data-domain="mycology"] .card .statistics-table-wrap,body[data-domain="mycology"] .quick-capture{background:#fffdf5;border:2px solid #20211c;border-radius:2px;box-shadow:3px 3px 0 #20211c;color:#20211c}
 body[data-domain="mycology"] .culture-catalog-code{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:15px;color:#20211c;text-transform:uppercase}
-body[data-domain="mycology"] .culture-catalog-meta span:first-child{background:#bdff3b;color:#20211c;border-radius:2px}
+body[data-domain="mycology"] .culture-catalog-meta span:first-child{background:#a94f1d;color:#20211c;border-radius:2px}
 body[data-domain="mycology"] .culture-catalog-action{border:2px solid #20211c;border-radius:2px;font-weight:800}
-body[data-domain="mycology"] .culture-catalog-action[data-culture-action="observe"]{background:#bdff3b;color:#20211c;border-color:#20211c}
+body[data-domain="mycology"] .culture-catalog-action[data-culture-action="observe"]{background:#a94f1d;color:#20211c;border-color:#20211c}
 body[data-domain="mycology"] .culture-catalog-action[data-culture-action="measure"]{background:#fffdf5;color:#20211c;border-color:#20211c}
 body[data-domain="mycology"] .culture-catalog-action[data-culture-action="history"]{background:#20211c;color:#fffdf5;border-color:#20211c}
-body[data-domain="mycology"] .section-nav a[aria-current="page"]{background:#bdff3b;color:#20211c;border-color:#20211c;border-radius:2px}
+body[data-domain="mycology"] .section-nav a[aria-current="page"]{background:#a94f1d;color:#20211c;border-color:#20211c;border-radius:2px}
 body[data-domain="mycology"] .domain-option{border:2px solid #20211c;border-radius:2px;background:#fffdf5;color:#20211c}
-body[data-domain="mycology"] .domain-option[aria-pressed="true"]{background:#bdff3b;box-shadow:4px 4px 0 #20211c}
-body[data-domain="mycology"] .domain-option-icon{background:#20211c;color:#bdff3b;border-radius:2px}
+body[data-domain="mycology"] .domain-option[aria-pressed="true"]{background:#a94f1d;box-shadow:4px 4px 0 #20211c}
+body[data-domain="mycology"] .domain-option-icon{background:#20211c;color:#a94f1d;border-radius:2px}
 body[data-domain="mycology"] .domain-overline{color:#20211c}
 body[data-domain="mycology"] .domain-switcher-copy strong,body[data-domain="mycology"] .domain-switcher-copy>span:last-child{color:#20211c}
 body[data-domain="mycology"] .overview-metric,body[data-domain="mycology"] .overview-activity,body[data-domain="mycology"] .overview-shortcuts{background:#fffdf5;border:2px solid #20211c;border-radius:2px;color:#20211c}
