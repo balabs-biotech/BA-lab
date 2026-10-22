@@ -731,6 +731,60 @@
       "Partial lineage: the 1,000-culture limit was reached.",
       "Filiação parcial: foi atingido o limite de 1 000 culturas.",
       "النسب جزئي: تم بلوغ حد 1000 مزرعة."
+    ],
+    [
+      "Enregistrement...",
+      "Saving...",
+      "A guardar...",
+      "جارٍ الحفظ..."
+    ],
+    [
+      "Avancement...",
+      "Progress...",
+      "Progresso...",
+      "جارٍ التقدم..."
+    ],
+    [
+      "Évolution de ",
+      "Trend for ",
+      "Evolução de ",
+      "تطور "
+    ],
+    [
+      "Lots de production liés (",
+      "Linked production batches (",
+      "Lotes de produção associados (",
+      "دفعات الإنتاج المرتبطة ("
+    ],
+    [
+      "Ouvrir le lot",
+      "Open batch",
+      "Abrir lote",
+      "فتح الدفعة"
+    ],
+    [
+      "Ouvrir le lot ",
+      "Open batch ",
+      "Abrir lote ",
+      "فتح الدفعة "
+    ],
+    [
+      "Impossible de charger l’historique de cette culture : ",
+      "Unable to load this culture’s history: ",
+      "Não foi possível carregar o histórico desta cultura: ",
+      "تعذر تحميل سجل هذه المزرعة: "
+    ],
+    [
+      "Étape 2 : conditions de culture",
+      "Step 2: growing conditions",
+      "Etapa 2: condições de cultivo",
+      "الخطوة 2: ظروف الزراعة"
+    ],
+    [
+      "Étape 3 : validation et consentements",
+      "Step 3: validation and consent",
+      "Etapa 3: validação e consentimentos",
+      "الخطوة 3: التحقق والموافقات"
     ]
   ];
   for (const [fr, en, pt, ar] of supplementalCoverage) {
