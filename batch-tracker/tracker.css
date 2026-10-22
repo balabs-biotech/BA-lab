@@ -1208,3 +1208,40 @@ html[dir="rtl"] .statistics-filters { text-align: right; }
   .language-control { font-size: 10px; }
   .language-control select { min-width: 82px; max-width: 108px; }
 }
+
+
+/* Comparaison exploratoire des lots — sans dépendance externe */
+.comparison-panel{margin-top:28px;padding-top:24px;border-top:1px solid var(--border)}
+.comparison-heading h3{margin:5px 0 7px;font-size:clamp(20px,2.2vw,27px)}
+.comparison-note{font-size:12px;line-height:1.6;color:var(--muted);padding:10px 12px;border-left:3px solid var(--brand);background:var(--surface-2);border-radius:0 8px 8px 0}
+.comparison-batch-picker{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:14px 0}
+.comparison-batch-option{display:flex;align-items:flex-start;gap:9px;padding:11px;border:1px solid var(--border);border-radius:10px;background:var(--surface);min-width:0}
+.comparison-batch-option input{margin-top:3px;flex:0 0 auto}
+.comparison-batch-option span{min-width:0;overflow-wrap:anywhere}
+.comparison-batch-option strong,.comparison-batch-option small{display:block}
+.comparison-batch-option small{color:var(--muted);font-size:11px;margin-top:3px}
+.comparison-filters{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;align-items:end}
+.comparison-filters label{display:block;margin-bottom:6px}
+.comparison-filters input{width:100%;min-width:0}
+.comparison-filter-action button{width:100%;margin:0}
+.comparison-findings{display:grid;gap:10px;margin:14px 0}
+.comparison-finding{padding:12px 14px;border:1px solid var(--border);border-radius:10px;background:var(--surface-2);font-size:13px;line-height:1.55}
+.comparison-finding h4{margin:0 0 6px;font-size:14px}
+.comparison-finding ul{margin:6px 0 0;padding-left:20px}
+.comparison-charts{display:grid;grid-template-columns:minmax(0,1fr);gap:12px}
+.comparison-chart-card{min-width:0;padding:12px;border:1px solid var(--border);border-radius:12px;background:var(--surface)}
+.comparison-chart-card h4{margin:0 0 4px;font-size:15px}
+.comparison-chart-card svg{width:100%;height:auto;display:block;min-height:170px}
+.comparison-legend{display:flex;flex-wrap:wrap;gap:8px 14px;font-size:11px;color:var(--muted)}
+.comparison-legend span{display:inline-flex;align-items:center;gap:5px}
+.comparison-legend i{display:inline-block;width:15px;height:3px;border-radius:2px}
+.comparison-table-wrap{overflow-x:auto;margin:12px 0}
+.comparison-table{width:100%;border-collapse:collapse;font-size:12px}
+.comparison-table caption{text-align:left;font-weight:750;padding:9px 0;color:var(--text)}
+.comparison-table th,.comparison-table td{padding:9px 10px;border-bottom:1px solid var(--border);text-align:left;vertical-align:top}
+.comparison-table th{font-size:10px;color:var(--muted);background:var(--surface-2)}
+.comparison-outlier{font-weight:700;color:var(--err)}
+.comparison-empty{padding:14px;border:1px dashed var(--border-strong);border-radius:10px;color:var(--muted);font-size:13px}
+.comparison-correlation{font-variant-numeric:tabular-nums}
+@media(max-width:620px){.comparison-batch-picker,.comparison-filters{grid-template-columns:minmax(0,1fr)}.comparison-batch-option{padding:10px}.comparison-table{font-size:11px}.comparison-table th,.comparison-table td{padding:8px}}
+
