@@ -6226,6 +6226,7 @@ async function loadStatistics() {
   try {
     let batchEventIds = null;
     let cultureEventIds = null;
+    let noMatchingCultureBatchEvents = false;
     if (batchId) {
       const {data: batchEvents, error: batchEventsError} = await supabaseClient.from("events").select("id").eq("organization_id", organizationId).eq("batch_id", batchId);
       if (batchEventsError) throw new Error("Chargement des événements du lot impossible : " + batchEventsError.message);
@@ -6254,6 +6255,7 @@ async function loadStatistics() {
     if (cultureId && batchId) {
       const matchingEventIds = cultureEventIds.filter(id => batchEventIds.includes(id));
       if (matchingEventIds.length) query = query.in("event_id", matchingEventIds);
+      else noMatchingCultureBatchEvents = true;
     } else if (cultureId) {
       query = cultureEventIds.length
         ? query.or("culture_id.eq." + cultureId + ",event_id.in.(" + cultureEventIds.join(",") + ")")
@@ -6262,7 +6264,7 @@ async function loadStatistics() {
       query = query.in("event_id", batchEventIds);
     }
     if (period !== "all") { const since = new Date(); since.setDate(since.getDate() - Number(period)); query = query.gte("measured_at", since.toISOString()); }
-    const queryResult = (batchId && !batchEventIds.length) || (cultureId && !cultureEventIds.length && batchId) ? {data:[],error:null} : await query;
+    const queryResult = (batchId && !batchEventIds.length) || (cultureId && !cultureEventIds.length && batchId) || noMatchingCultureBatchEvents ? {data:[],error:null} : await query;
     if (requestId !== statisticsRequestId) return;
     const {data,error} = queryResult; if (error) throw new Error(error.message);
     const rows = data || [], variable = measurementVariables.find(item => item.code === variableCode), cultureById = new Map(cultureOptions.map(culture => [culture.id,culture]));
