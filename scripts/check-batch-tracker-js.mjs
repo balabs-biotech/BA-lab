@@ -102,3 +102,13 @@ for(const type of ["TRICHODERMA","PLEUROTUS_SPAWN","MUSHROOM_PRODUCT","BIOSTIMUL
  if(!match||!match[1].includes('"qc"')||!match[1].includes('"release"'))throw new Error("QC/release stages missing for "+type);
 }
 console.log("✓ Batch-specific workflows retain QC and release gates; UI follows saved stage order");
+
+if(!template.includes('id="batchLocation"')||!template.includes('id="batchEnvironment"'))throw new Error("Batch location/environment selectors are missing");
+if(!engine.includes('from("locations").select("id,code,name")')||!engine.includes('from("environments").select("id,name,location_id")'))throw new Error("Batch place options are not loaded from the existing schema");
+if(!engine.includes('.eq("organization_id", organizationId).order("name")'))throw new Error("Batch place options are not scoped to the active organization");
+if(!engine.includes('p_location_id:')||!engine.includes('batchLocationInput?.value || null')||!engine.includes('batchEnvironmentInput?.value || null'))throw new Error("Batch creation does not persist the selected location/environment");
+for(const label of ["Emplacement (facultatif)","Location (optional)","Localização (opcional)","الموقع (اختياري)","Environnement (facultatif)","Environment (optional)","Ambiente (opcional)","البيئة (اختياري)"]){
+ if(!i18n.includes(label))throw new Error("Batch location/environment localisation missing: "+label);
+}
+console.log("✓ Batch creation supports organization-scoped location and environment selection");
+
