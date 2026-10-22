@@ -6852,9 +6852,9 @@ function setupQuickCapture() {
       const selectedOption = options.find(option => {
         const label = option.textContent.toLocaleLowerCase();
         const code = option.value.toLocaleLowerCase();
-        if (preset === "ph") return /\\bph\\b/.test(label) || /\\bph\\b/.test(code) || /acidité|acidity/.test(label);
-        if (preset === "ec") return /\\bec\\b/.test(label) || /\\bec\\b/.test(code) || /conductivité|conductivity|µs\\/cm|ms\\/cm/.test(label);
-        return /température|temperature|\\btemp\\b/.test(label) || /temperature|temp/.test(code);
+        if (preset === "ph") return /\bph\b/.test(label) || /\bph\b/.test(code) || /acidité|acidity/.test(label);
+        if (preset === "ec") return /\bec\b/.test(label) || /\bec\b/.test(code) || /conductivité|conductivity|µs\/cm|ms\/cm/.test(label);
+        return /température|temperature|\btemp\b/.test(label) || /temperature|temp/.test(code);
       });
       const selected = Boolean(selectedOption);
       if (selectedOption) {
