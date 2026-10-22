@@ -4872,7 +4872,9 @@ async function loadLotComparison() {
     const allDates = assignedMeasurements.map(row => row.measured_at).concat(assignedObservations.map(row => row.observed_at)).filter(Boolean).sort();
     const periodLabel = allDates.length
       ? new Date(allDates[0]).toLocaleDateString("fr-FR") + " — " + new Date(allDates[allDates.length - 1]).toLocaleDateString("fr-FR")
-      : (fromDate || "date libre") + " — " + (toDate || "date libre");
+      : (fromDate || toDate)
+        ? (fromDate || "début non limité") + " — " + (toDate || "fin non limitée")
+        : "aucune date disponible";
     const outlierCount = Array.from(outlierByGroup.values()).reduce((sum, ids) => sum + ids.size, 0);
     summary.innerHTML = [
       ["Lots sélectionnés", String(selectedBatches.length)],
