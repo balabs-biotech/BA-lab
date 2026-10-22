@@ -141,7 +141,7 @@ insert into public.batches(
 );
 select set_config('request.jwt.claim.sub','00000000-0000-0000-0000-0000000000b1',false);
 set role authenticated;
-do $ declare v_result jsonb; v_batch_id uuid; v_closed_batch_id uuid; begin
+do $$ declare v_result jsonb; v_batch_id uuid; v_closed_batch_id uuid; begin
   select id into v_batch_id from public.batches where batch_code='TEST-1';
   select id into v_closed_batch_id from public.batches where batch_code='CLOSED-1';
   v_result := public.move_batch_to_location(
