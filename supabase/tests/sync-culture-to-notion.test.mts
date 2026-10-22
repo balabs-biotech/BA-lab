@@ -24,6 +24,8 @@ let notion: (url: string, init: Json) => { status: number; body: Json };
 let notionCalls: { url: string; method: string; body: Json | null }[] = [];
 let updates: { payload: Json; filters: Record<string, any> }[] = [];
 let queries: { table: string; filters: Record<string, any> }[] = [];
+let activeClaims = new Map<string, string>();
+let rpcCalls: { name: string; args: Json }[] = [];
 let handler: (req: Request) => Promise<Response>;
 
 function builder(table: string, role: "user" | "admin") {
@@ -53,6 +55,22 @@ function builder(table: string, role: "user" | "admin") {
 (globalThis as any).__createClient = (_url: string, key: string) => ({
   auth: { getUser: async () => (db.userOk ? { data: { user: { id: "user-1" } }, error: null } : { data: { user: null }, error: { message: "bad" } }) },
   from: (table: string) => builder(table, key === "pub" ? "user" : "admin"),
+  rpc: async (name: string, args: Json) => {
+    rpcCalls.push({ name, args });
+    if (name === "claim_notion_sync") {
+      const id = args.p_culture_id;
+      if (activeClaims.has(id)) return { data: false, error: null };
+      activeClaims.set(id, args.p_claim_token);
+      return { data: true, error: null };
+    }
+    if (name === "release_notion_sync_claim") {
+      const id = args.p_culture_id;
+      if (activeClaims.get(id) !== args.p_claim_token) return { data: false, error: null };
+      activeClaims.delete(id);
+      return { data: true, error: null };
+    }
+    return { data: null, error: { message: `unexpected rpc: ${name}` } };
+  },
 });
 (globalThis as any).Deno = {
   env: { get: (k: string) => env[k] },
@@ -87,7 +105,7 @@ function reset(overrides: { env?: Json; notion?: typeof notion; cultures?: Json[
     userOk: overrides.userOk ?? true,
   };
   notion = overrides.notion ?? (() => ({ status: 500, body: { message: "unexpected notion call" } }));
-  notionCalls = []; updates = []; queries = [];
+  notionCalls = []; updates = []; queries = []; activeClaims = new Map(); rpcCalls = [];
 }
 
 async function call(body: Json | null = { culture_id: CULTURE }, headers: Record<string, string> = { Authorization: "Bearer jwt" }, method = "POST") {
@@ -107,6 +125,17 @@ function eq(actual: any, expected: any, what: string) {
   if (JSON.stringify(actual) !== JSON.stringify(expected)) throw new Error(`${what}: expected ${JSON.stringify(expected)}, got ${JSON.stringify(actual)}`);
 }
 function ok(cond: any, what: string) { if (!cond) throw new Error(what); }
+
+await test("deux synchronisations simultanées pour la même culture : une seule obtient le claim", async () => {
+  reset({
+    notion: (url, init) => url.endsWith("/query") ? { status: 200, body: { results: [] } }
+      : init.method === "POST" ? { status: 200, body: page("page-new", CULTURE) } : { status: 200, body: {} },
+  });
+  const results = await Promise.all([call(), call()]);
+  eq(results.map((r) => r.status).sort(), [200, 409], "statuses");
+  eq(creates().length, 1, "Notion page creations");
+  eq(activeClaims.size, 0, "claim released");
+});
 
 await test("sans en-tête Authorization : 401 et aucun appel Notion", async () => {
   reset(); const r = await call({ culture_id: CULTURE }, {});
