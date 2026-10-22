@@ -2782,12 +2782,21 @@ async function recordBatchHarvest() {
     const { data: unit, error: unitError } = await supabaseClient.from("units").select("code").eq("code", unitCode).maybeSingle();
     if (unitError) throw new Error("Vérification de l’unité impossible : " + unitError.message);
     if (!unit) throw new Error("Code d’unité inconnu. Utilisez un code déjà présent dans le référentiel des unités.");
+    // events requires exactly one biological/material/sample/unit anchor in addition to batch_id.
+    const eventAnchor = selectedBatch.culture_id
+      ? { culture_id: selectedBatch.culture_id }
+      : selectedBatch.material_id
+        ? { material_id: selectedBatch.material_id }
+        : null;
+    if (!eventAnchor) {
+      throw new Error("Ce lot doit être lié à une culture ou à un matériau pour enregistrer une récolte dans le journal biologique.");
+    }
     const { error } = await supabaseClient.from("events").insert({
       organization_id: organizationId,
       event_type: "harvest_recorded",
       occurred_at: new Date().toISOString(),
       actor_user_id: session.user.id,
-      culture_id: selectedBatch.culture_id || null,
+      ...eventAnchor,
       batch_id: selectedBatch.id,
       payload: { quantity, unit_code: unit.code, note: note || null, source: "batch-tracker-harvest-entry", schema_version: 1 }
     });
