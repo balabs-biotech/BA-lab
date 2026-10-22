@@ -2232,16 +2232,48 @@ async function compareSelectedBatches() {
     const measurements = [...measurementMap.values()];
     const table = document.createElement("table");
     table.className = "statistics-table";
-    table.innerHTML = "<caption>Comparaison descriptive des lots sélectionnés</caption><thead><tr><th>Lot</th><th>Type</th><th>État / étape</th><th>Quantité prévue</th><th>Quantité réelle</th><th>Étapes terminées</th><th>Mesures liées à la culture</th><th>Résumé numérique par variable</th><th>Dernière mesure</th></tr></thead>";
+    table.innerHTML = "<caption>Comparaison descriptive des lots sélectionnés</caption><thead><tr><th>Lot</th><th>Type</th><th>État / étape</th><th>Quantité prévue</th><th>Quantité réelle</th><th>Étapes terminées</th><th>Mesures de culture</th><th>Mesures d'environnement</th><th>Résumé numérique séparé par source</th><th>Dernière mesure</th></tr></thead>";
     const tbody = document.createElement("tbody");
+    const summarize = rows => {
+      const groups = new Map();
+      rows.forEach(row => {
+        if (row.quality_state === "excluded") return;
+        const value = row.normalized_value ?? row.raw_value;
+        if (value == null || !Number.isFinite(Number(value))) return;
+        const unit = row.normalized_value != null ? (row.normalized_unit_code || "") : (row.raw_unit_code || "");
+        const key = `${row.variable_code || "variable inconnue"}||${unit}||${row.quality_state || "raw"}`;
+        if (!groups.has(key)) groups.set(key, []);
+        groups.get(key).push(Number(value));
+      });
+      const language = window.BALabsI18n?.language || "fr";
+      const labels = {
+        fr: {mean:"moyenne",range:"min–max",excluded:"exclues",nonNumeric:"sans valeur numérique",empty:"Aucune mesure numérique exploitable"},
+        en: {mean:"mean",range:"min–max",excluded:"excluded",nonNumeric:"without numeric value",empty:"No usable numeric measurements"},
+        pt: {mean:"média",range:"mín–máx",excluded:"excluídas",nonNumeric:"sem valor numérico",empty:"Sem medições numéricas utilizáveis"},
+        ar: {mean:"المتوسط",range:"الحد الأدنى–الأقصى",excluded:"مستبعدة",nonNumeric:"دون قيمة رقمية",empty:"لا توجد قياسات رقمية قابلة للاستخدام"}
+      }[language] || {mean:"moyenne",range:"min–max",excluded:"exclues",nonNumeric:"sans valeur numérique",empty:"Aucune mesure numérique exploitable"};
+      const summaries = [...groups.entries()].map(([key, values]) => {
+        const [variable, unit, quality] = key.split("||");
+        const mean = values.reduce((sum, value) => sum + value, 0) / values.length;
+        const min = Math.min(...values);
+        const max = Math.max(...values);
+        const fmt = value => new Intl.NumberFormat(undefined, {maximumSignificantDigits: 5}).format(value);
+        return `${variable}${unit ? " (" + unit + ")" : ""}: ${labels.mean} ${fmt(mean)}, ${labels.range} ${fmt(min)}–${fmt(max)}, n=${values.length} [${quality}]`;
+      });
+      const excluded = rows.filter(row => row.quality_state === "excluded").length;
+      const nonNumeric = rows.filter(row => row.quality_state !== "excluded" && (row.normalized_value ?? row.raw_value) == null).length;
+      if (excluded) summaries.push(`${labels.excluded}: ${excluded}`);
+      if (nonNumeric) summaries.push(`${labels.nonNumeric}: ${nonNumeric}`);
+      return summaries.length ? summaries.join("; ") : labels.empty;
+    };
     batches.forEach(batch => {
       const batchStages = stages.filter(stage => stage.batch_id === batch.id);
       const completed = batchStages.filter(stage => stage.status === "completed").length;
-      const linked = measurements.filter(row =>
-        (batch.culture_id && row.culture_id === batch.culture_id) ||
-        (batch.environment_id && row.environment_id === batch.environment_id)
-      );
-      const lastDate = linked.reduce((latest, row) => {
+      const cultureLinked = batch.culture_id ? measurements.filter(row => row.culture_id === batch.culture_id) : [];
+      const environmentLinked = batch.environment_id ? measurements.filter(row => row.environment_id === batch.environment_id) : [];
+      const linked = new Map([...cultureLinked, ...environmentLinked].map(row => [row.id, row]));
+      const linkedRows = [...linked.values()];
+      const lastDate = linkedRows.reduce((latest, row) => {
         const date = row.measured_at ? new Date(row.measured_at) : null;
         return date && (!latest || date > latest) ? date : latest;
       }, null);
@@ -2252,39 +2284,9 @@ async function compareSelectedBatches() {
         batch.quantity_planned == null ? "—" : `${batch.quantity_planned} ${batch.quantity_unit_code || ""}`.trim(),
         batch.quantity_actual == null ? "—" : `${batch.quantity_actual} ${batch.quantity_unit_code || ""}`.trim(),
         `${completed} / ${batchStages.length}`,
-        linked.length ? String(linked.length) : "Aucune mesure liée à la culture ou à l'environnement",
-        (() => {
-          const groups = new Map();
-          linked.forEach(row => {
-            if (row.quality_state === "excluded") return;
-            const value = row.normalized_value ?? row.raw_value;
-            if (value == null || !Number.isFinite(Number(value))) return;
-            const unit = row.normalized_value != null ? (row.normalized_unit_code || "") : (row.raw_unit_code || "");
-            const key = `${row.variable_code || "variable inconnue"}||${unit}||${row.quality_state || "raw"}`;
-            if (!groups.has(key)) groups.set(key, []);
-            groups.get(key).push(Number(value));
-          });
-          const language = window.BALabsI18n?.language || "fr";
-          const labels = {
-            fr: {mean:"moyenne",range:"min–max",excluded:"exclues",nonNumeric:"sans valeur numérique",empty:"Aucune mesure numérique exploitable"},
-            en: {mean:"mean",range:"min–max",excluded:"excluded",nonNumeric:"without numeric value",empty:"No usable numeric measurements"},
-            pt: {mean:"média",range:"mín–máx",excluded:"excluídas",nonNumeric:"sem valor numérico",empty:"Sem medições numéricas utilizáveis"},
-            ar: {mean:"المتوسط",range:"الحد الأدنى–الأقصى",excluded:"مستبعدة",nonNumeric:"دون قيمة رقمية",empty:"لا توجد قياسات رقمية قابلة للاستخدام"}
-          }[language] || {mean:"moyenne",range:"min–max",excluded:"exclues",nonNumeric:"sans valeur numérique",empty:"Aucune mesure numérique exploitable"};
-          const summaries = [...groups.entries()].map(([key, values]) => {
-            const [variable, unit, quality] = key.split("||");
-            const mean = values.reduce((sum, value) => sum + value, 0) / values.length;
-            const min = Math.min(...values);
-            const max = Math.max(...values);
-            const fmt = value => new Intl.NumberFormat(undefined, {maximumSignificantDigits: 5}).format(value);
-            return `${variable}${unit ? " (" + unit + ")" : ""}: ${labels.mean} ${fmt(mean)}, ${labels.range} ${fmt(min)}–${fmt(max)}, n=${values.length} [${quality}]`;
-          });
-          const excluded = linked.filter(row => row.quality_state === "excluded").length;
-          const nonNumeric = linked.filter(row => row.quality_state !== "excluded" && (row.normalized_value ?? row.raw_value) == null).length;
-          if (excluded) summaries.push(`${labels.excluded}: ${excluded}`);
-          if (nonNumeric) summaries.push(`${labels.nonNumeric}: ${nonNumeric}`);
-          return summaries.length ? summaries.join("; ") : labels.empty;
-        })(),
+        String(cultureLinked.length),
+        String(environmentLinked.length),
+        `Culture : ${summarize(cultureLinked)} | Environnement : ${summarize(environmentLinked)}`,
         lastDate ? lastDate.toLocaleString() : "—"
       ];
       const tr = document.createElement("tr");
