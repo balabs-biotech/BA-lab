@@ -62,3 +62,5 @@ console.log("✓ Batch comparison warns when a variable uses incompatible/missin
 if(!template.includes('id="harvestQuantity"')||!template.includes('id="harvestUnit"')||!template.includes('id="recordHarvestButton"'))throw new Error("Harvest entry form missing");
 if(!engine.includes('event_type: "harvest_recorded"')||!engine.includes('function recordBatchHarvest')||!engine.includes('current_stage !== "harvest"'))throw new Error("Harvest event workflow missing or not restricted to harvest stage");
 if(!engine.includes('from("units")')||!engine.includes('unit_code: unit.code'))throw new Error("Harvest unit validation missing");
+
+if(!engine.includes("const eventAnchor = selectedBatch.culture_id")||!engine.includes("Ce lot doit être lié à une culture ou à un matériau"))throw new Error("Harvest event biological anchor validation missing");
