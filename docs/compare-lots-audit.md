@@ -47,7 +47,7 @@ This is a point-in-time count, not an experiment. The current production data ca
 
 ## 5. Interpretation and limits
 
-- No conversion is silently performed between different unit codes. Series with different units are kept separate because a unit catalogue entry alone is not enough to assume every conversion is correctly configured. This is conservative and avoids misleading values (notably for non-linear pH and temperature offsets).
+- Compatible linear units are converted using the deployed unit factors/offsets. Kelvin/Celsius uses the standard affine conversion because the live catalogue currently records K with offset 0. Non-linear pH is never converted. If units cannot be converted safely from the available reference data, series remain separate.
 - A missing value means “no recorded value found for this lot/variable/window,” not “a scheduled measurement was missed”; the schema does not currently define an expected measurement cadence.
 - Culture-only data are not assigned to a selected lot if more than one selected lot uses the same culture.
 - \`results\` are not included in the lot-level comparison in this version: their deployed keys link them to experiments and experimental units, not directly to a batch. Joining them by guess would be misleading.
