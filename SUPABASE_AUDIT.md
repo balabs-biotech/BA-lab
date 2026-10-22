@@ -1,49 +1,23 @@
-# Supabase Integration Audit — BA-Labs Batch Tracker
+## 1. Notion Sync Idempotence — Updated Finding
 
-**Date** : 2026-10-19  
-**Scope** : Notion sync, data consistency, security posture  
-**Status** : FINDINGS — Implementation decisions deferred to owner
+**Status: Partially mitigated; concurrent duplicate creation remains possible.**
 
----
+The current versioned Edge Function (`supabase/functions/sync-culture-to-notion/index.ts`) now reconciles sequential retries before creating a page:
 
-## 1. Notion Sync Idempotence Risk
+1. It trusts a stored `notion_page_id` only when the page belongs to the configured Notion database and its `Supabase Culture ID` matches the requested culture.
+2. Otherwise, it queries the database by `Supabase Culture ID`.
+3. One matching page is updated; multiple matches cause the function to stop for manual resolution; lookup errors fail closed rather than creating a page.
+4. If a page is created but its ID cannot be persisted in Supabase, the next retry should find that page through the reconciliation query.
 
-### Finding
-The `syncPendingCultures()` frontend function (batch-tracker/index.html:2262) fetches cultures where:
-```javascript
-.eq("notion_sync_status", "pending")
-.is("notion_page_id", null)
-```
+This addresses the earlier documented **sequential partial-failure scenario**. The previous description that every retry could create a duplicate is stale and has been replaced.
 
-If the Edge Function `sync-culture-to-notion` partially fails or if `notion_page_id` is not atomically updated in Supabase, **the same culture can be synced multiple times**, creating duplicate pages in Notion.
+### Residual race condition
 
-### Scenario
-1. Frontend calls Edge Function with `culture_id = 42`
-2. Edge Function creates Notion page successfully
-3. Network timeout before `notion_page_id` update → DB still shows `null`
-4. Next call to `syncPendingCultures()` finds culture 42 again → duplicate sync
+Notion creation and the Supabase write cannot be committed in one transaction. Two concurrent requests for the same culture can both query before either page exists, both see no match, and both create a page. The frontend's `syncInProgress` flag only coordinates calls within one page instance; it is not a cross-tab or server-side lock.
 
-### Root Cause
-- **Frontend**: No retry logic or confirmation loop
-- **Edge Function**: Logic assumed to be atomic (not verified in repo)
-- **Database**: No application-level trigger to prevent double-updates
+### Recommended next step
 
-### Mitigation Options (owner decision)
-
-**Option A: Database-side** (recommended)
-- Add RLS policy or database trigger: `notion_page_id` can only be updated from `null` → non-null once
-- Prevents physical duplicates regardless of Edge Function retries
-
-**Option B: Edge Function** (requires Supabase review)
-- Wrap schema update in transaction with Notion page creation
-- Return updated `notion_page_id` to confirm client-side
-
-**Option C: Frontend** (weakest)
-- Track `notion_page_id` locally before retry
-- Implement exponential backoff with max attempts
-
-### Severity
-🟡 **Medium** — Causes Notion duplicates, not data loss; discoverable via manual audit
+Before claiming full idempotence, implement and test a cross-request claim/lock or another server-side idempotency mechanism, then test simultaneous requests and partial failures against a non-production Notion database. No production schema or data was changed by this documentation audit.
 
 ---
 
