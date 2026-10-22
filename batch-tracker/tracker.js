@@ -2248,19 +2248,26 @@ async function compareSelectedBatches() {
             if (!groups.has(key)) groups.set(key, []);
             groups.get(key).push(Number(value));
           });
+          const language = window.BALabsI18n?.language || "fr";
+          const labels = {
+            fr: {mean:"moyenne",range:"min–max",excluded:"exclues",nonNumeric:"sans valeur numérique",empty:"Aucune mesure numérique exploitable"},
+            en: {mean:"mean",range:"min–max",excluded:"excluded",nonNumeric:"without numeric value",empty:"No usable numeric measurements"},
+            pt: {mean:"média",range:"mín–máx",excluded:"excluídas",nonNumeric:"sem valor numérico",empty:"Sem medições numéricas utilizáveis"},
+            ar: {mean:"المتوسط",range:"الحد الأدنى–الأقصى",excluded:"مستبعدة",nonNumeric:"دون قيمة رقمية",empty:"لا توجد قياسات رقمية قابلة للاستخدام"}
+          }[language] || {mean:"moyenne",range:"min–max",excluded:"exclues",nonNumeric:"sans valeur numérique",empty:"Aucune mesure numérique exploitable"};
           const summaries = [...groups.entries()].map(([key, values]) => {
             const [variable, unit, quality] = key.split("||");
             const mean = values.reduce((sum, value) => sum + value, 0) / values.length;
             const min = Math.min(...values);
             const max = Math.max(...values);
             const fmt = value => new Intl.NumberFormat(undefined, {maximumSignificantDigits: 5}).format(value);
-            return `${variable}${unit ? " (" + unit + ")" : ""}: moyenne ${fmt(mean)}, min–max ${fmt(min)}–${fmt(max)}, n=${values.length} [${quality}]`;
+            return `${variable}${unit ? " (" + unit + ")" : ""}: ${labels.mean} ${fmt(mean)}, ${labels.range} ${fmt(min)}–${fmt(max)}, n=${values.length} [${quality}]`;
           });
           const excluded = linked.filter(row => row.quality_state === "excluded").length;
           const nonNumeric = linked.filter(row => row.quality_state !== "excluded" && (row.normalized_value ?? row.raw_value) == null).length;
-          if (excluded) summaries.push(`exclues: ${excluded}`);
-          if (nonNumeric) summaries.push(`sans valeur numérique: ${nonNumeric}`);
-          return summaries.length ? summaries.join("; ") : "Aucune mesure numérique exploitable";
+          if (excluded) summaries.push(`${labels.excluded}: ${excluded}`);
+          if (nonNumeric) summaries.push(`${labels.nonNumeric}: ${nonNumeric}`);
+          return summaries.length ? summaries.join("; ") : labels.empty;
         })(),
         lastDate ? lastDate.toLocaleString() : "—"
       ];
