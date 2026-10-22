@@ -90,685 +90,649 @@
 
 
   const supplementalCoverage = [
-  [
-    "Préparation",
-    "Preparation",
-    "Preparação",
-    "التحضير"
-  ],
-  [
-    "Stérilisation",
-    "Sterilization",
-    "Esterilização",
-    "التعقيم"
-  ],
-  [
-    "Récolte",
-    "Harvest",
-    "Colheita",
-    "الحصاد"
-  ],
-  [
-    "Libération",
-    "Release",
-    "Libertação",
-    "الإفراج"
-  ],
-  [
-    "À venir",
-    "Upcoming",
-    "A seguir",
-    "قادم"
-  ],
-  [
-    "Terminée",
-    "Completed",
-    "Concluída",
-    "مكتملة"
-  ],
-  [
-    "Échec",
-    "Failed",
-    "Falhou",
-    "فشل"
-  ],
-  [
-    "L'appel à claim-ba-labs a échoué.",
-    "The BA Labs account-linking request failed.",
-    "O pedido de associação à conta BA Labs falhou.",
-    "فشل طلب ربط الحساب بـ BA Labs."
-  ],
-  [
-    "claim-ba-labs n'a retourné aucune donnée.",
-    "The account-linking request returned no data.",
-    "O pedido de associação da conta não devolveu dados.",
-    "لم يُرجع طلب ربط الحساب أي بيانات."
-  ],
-  [
-    "Le compte n'a pas pu être rattaché à BA-LABS.",
-    "The account could not be linked to BA-LABS.",
-    "Não foi possível associar a conta à BA-LABS.",
-    "تعذّر ربط الحساب بـ BA-LABS."
-  ],
-  [
-    "claim-ba-labs n'a pas retourné l'organisation BA-LABS.",
-    "The account-linking request did not return the BA-LABS organization.",
-    "O pedido de associação não devolveu a organização BA-LABS.",
-    "لم يُرجع طلب الربط مؤسسة BA-LABS."
-  ],
-  [
-    "Le mot de passe doit comporter au moins 6 caractères.",
-    "The password must contain at least 6 characters.",
-    "A palavra-passe deve conter pelo menos 6 caracteres.",
-    "يجب أن تتكون كلمة المرور من 6 أحرف على الأقل."
-  ],
-  [
-    "Compte créé. Vérifiez l'email de confirmation Supabase, puis revenez ici et connectez-vous.",
-    "Account created. Check the Supabase confirmation email, then return here and sign in.",
-    "Conta criada. Verifique o email de confirmação do Supabase e depois volte para iniciar sessão.",
-    "تم إنشاء الحساب. تحقّق من رسالة تأكيد Supabase ثم عُد لتسجيل الدخول."
-  ],
-  [
-    "Création du compte impossible.",
-    "Unable to create the account.",
-    "Não foi possível criar a conta.",
-    "تعذّر إنشاء الحساب."
-  ],
-  [
-    "Erreur déconnexion:",
-    "Sign-out error:",
-    "Erro ao terminar sessão:",
-    "خطأ في تسجيل الخروج:"
-  ],
-  [
-    "Non connecté.",
-    "Not signed in.",
-    "Sessão não iniciada.",
-    "لم يتم تسجيل الدخول."
-  ],
-  [
-    "Sélectionner une souche...",
-    "Select a strain...",
-    "Selecionar uma estirpe...",
-    "اختر سلالة..."
-  ],
-  [
-    "Organisation absente avant chargement des références.",
-    "Organization is missing before reference data can load.",
-    "A organização está em falta antes de carregar os dados de referência.",
-    "المؤسسة غير محددة قبل تحميل البيانات المرجعية."
-  ],
-  [
-    "Sélectionner...",
-    "Select...",
-    "Selecionar...",
-    "اختر..."
-  ],
-  [
-    "Votre session a expiré.",
-    "Your session has expired.",
-    "A sua sessão expirou.",
-    "انتهت صلاحية جلستك."
-  ],
-  [
-    "Contrôle qualité enregistré.",
-    "Quality control saved.",
-    "Controlo de qualidade guardado.",
-    "تم حفظ مراقبة الجودة."
-  ],
-  [
-    "QC : utiliser la libération",
-    "QC: use the release action",
-    "CQ: utilize a ação de libertação",
-    "مراقبة الجودة: استخدم إجراء الإفراج"
-  ],
-  [
-    "Batch terminé",
-    "Batch completed",
-    "Lote concluído",
-    "اكتملت الدفعة"
-  ],
-  [
-    "Démarrer / passer à l'étape suivante",
-    "Start / move to the next stage",
-    "Iniciar / avançar para a etapa seguinte",
-    "ابدأ / انتقل إلى المرحلة التالية"
-  ],
-  [
-    "Sélectionnez un type de batch.",
-    "Select a batch type.",
-    "Selecione um tipo de lote.",
-    "اختر نوع الدفعة."
-  ],
-  [
-    "Sélectionnez une culture source.",
-    "Select a source culture.",
-    "Selecione uma cultura de origem.",
-    "اختر مزرعة مصدر."
-  ],
-  [
-    "La culture sélectionnée n'est plus disponible.",
-    "The selected culture is no longer available.",
-    "A cultura selecionada já não está disponível.",
-    "لم تعد المزرعة المحددة متاحة."
-  ],
-  [
-    "La quantité prévue est invalide.",
-    "The planned quantity is invalid.",
-    "A quantidade prevista é inválida.",
-    "الكمية المخططة غير صالحة."
-  ],
-  [
-    "Création...",
-    "Creating...",
-    "A criar...",
-    "جارٍ الإنشاء..."
-  ],
-  [
-    "Batch créé dans Supabase.",
-    "Batch created in Supabase.",
-    "Lote criado no Supabase.",
-    "تم إنشاء الدفعة في Supabase."
-  ],
-  [
-    "La création du batch a échoué.",
-    "Batch creation failed.",
-    "A criação do lote falhou.",
-    "فشل إنشاء الدفعة."
-  ],
-  [
-    "Sélectionnez d'abord un batch.",
-    "Select a batch first.",
-    "Selecione primeiro um lote.",
-    "اختر دفعة أولاً."
-  ],
-  [
-    "Cette étape ne peut pas être avancée avec cette action.",
-    "This stage cannot be advanced with this action.",
-    "Não é possível avançar esta etapa com esta ação.",
-    "لا يمكن تقديم هذه المرحلة بهذا الإجراء."
-  ],
-  [
-    "Vérification QC...",
-    "Checking quality control...",
-    "A verificar o controlo de qualidade...",
-    "جارٍ التحقق من مراقبة الجودة..."
-  ],
-  [
-    "Le batch ne peut pas être libéré.",
-    "The batch cannot be released.",
-    "Não é possível libertar o lote.",
-    "لا يمكن الإفراج عن الدفعة."
-  ],
-  [
-    "Sélectionner un paramètre…",
-    "Select a parameter…",
-    "Selecionar um parâmetro…",
-    "اختر معلماً…"
-  ],
-  [
-    "Aucun paramètre disponible",
-    "No parameters available",
-    "Nenhum parâmetro disponível",
-    "لا توجد معلمات متاحة"
-  ],
-  [
-    "Sélectionner une catégorie…",
-    "Select a category…",
-    "Selecionar uma categoria…",
-    "اختر فئة…"
-  ],
-  [
-    "Aucune catégorie disponible",
-    "No categories available",
-    "Nenhuma categoria disponível",
-    "لا توجد فئات متاحة"
-  ],
-  [
-    "Créez d’abord une culture ou un lot",
-    "Create a culture or batch first",
-    "Crie primeiro uma cultura ou um lote",
-    "أنشئ مزرعة أو دفعة أولاً"
-  ],
-  [
-    "Sélectionner une unité…",
-    "Select a unit…",
-    "Selecionar uma unidade…",
-    "اختر وحدة…"
-  ],
-  [
-    "Aucune unité compatible",
-    "No compatible units",
-    "Nenhuma unidade compatível",
-    "لا توجد وحدات متوافقة"
-  ],
-  [
-    "Choisissez une culture ou un lot, un paramètre, une valeur numérique et une unité.",
-    "Choose a culture or batch, a parameter, a numeric value, and a unit.",
-    "Escolha uma cultura ou lote, um parâmetro, um valor numérico e uma unidade.",
-    "اختر مزرعة أو دفعة ومعلمة وقيمة رقمية ووحدة."
-  ],
-  [
-    "L’unité choisie n’est pas compatible avec la dimension du paramètre.",
-    "The selected unit is incompatible with the parameter dimension.",
-    "A unidade selecionada é incompatível com a dimensão do parâmetro.",
-    "الوحدة المحددة غير متوافقة مع بُعد المعلمة."
-  ],
-  [
-    "Le lot sélectionné n’est plus disponible.",
-    "The selected batch is no longer available.",
-    "O lote selecionado já não está disponível.",
-    "لم تعد الدفعة المحددة متاحة."
-  ],
-  [
-    "Mesure enregistrée dans Supabase avec sa provenance.",
-    "Measurement saved in Supabase with its provenance.",
-    "Medição guardada no Supabase com a respetiva proveniência.",
-    "تم حفظ القياس في Supabase مع مصدره."
-  ],
-  [
-    "L’enregistrement de la mesure a échoué.",
-    "Saving the measurement failed.",
-    "Falha ao guardar a medição.",
-    "فشل حفظ القياس."
-  ],
-  [
-    "Choisissez une cible, une catégorie et décrivez l’observation.",
-    "Choose a target and category, then describe the observation.",
-    "Escolha um alvo e uma categoria e descreva a observação.",
-    "اختر هدفاً وفئة ثم صِف الملاحظة."
-  ],
-  [
-    "Observation enregistrée dans Supabase avec sa provenance.",
-    "Observation saved in Supabase with its provenance.",
-    "Observação guardada no Supabase com a respetiva proveniência.",
-    "تم حفظ الملاحظة في Supabase مع مصدرها."
-  ],
-  [
-    "L’enregistrement de l’observation a échoué.",
-    "Saving the observation failed.",
-    "Falha ao guardar a observação.",
-    "فشل حفظ الملاحظة."
-  ],
-  [
-    "Aucune culture ne correspond à cette recherche.",
-    "No cultures match this search.",
-    "Nenhuma cultura corresponde a esta pesquisa.",
-    "لا توجد مزارع تطابق هذا البحث."
-  ],
-  [
-    "Aucune culture chargée. Créez une culture avec le formulaire ci-dessus.",
-    "No cultures loaded. Create one using the form above.",
-    "Não foram carregadas culturas. Crie uma usando o formulário acima.",
-    "لم يتم تحميل أي مزارع. أنشئ مزرعة باستخدام النموذج أعلاه."
-  ],
-  [
-    "Type non renseigné",
-    "Type not specified",
-    "Tipo não indicado",
-    "النوع غير محدد"
-  ],
-  [
-    "Date de démarrage non renseignée",
-    "Start date not specified",
-    "Data de início não indicada",
-    "تاريخ البدء غير محدد"
-  ],
-  [
-    "Connectez-vous pour analyser les données de votre organisation.",
-    "Sign in to analyze your organization's data.",
-    "Inicie sessão para analisar os dados da sua organização.",
-    "سجّل الدخول لتحليل بيانات مؤسستك."
-  ],
-  [
-    "Sélectionnez une variable mesurée.",
-    "Select a measured variable.",
-    "Selecione uma variável medida.",
-    "اختر متغيراً مقاساً."
-  ],
-  [
-    "Valeurs numériques",
-    "Numeric values",
-    "Valores numéricos",
-    "القيم الرقمية"
-  ],
-  [
-    "Données chargées depuis Supabase. Les résultats sont descriptifs.",
-    "Data loaded from Supabase. Results are descriptive.",
-    "Dados carregados do Supabase. Os resultados são descritivos.",
-    "تم تحميل البيانات من Supabase. النتائج وصفية."
-  ],
-  [
-    "Aucune mesure ne correspond aux filtres sélectionnés.",
-    "No measurements match the selected filters.",
-    "Nenhuma medição corresponde aos filtros selecionados.",
-    "لا توجد قياسات تطابق عوامل التصفية المحددة."
-  ],
-  [
-    "Période représentée :",
-    "Period shown:",
-    "Período apresentado:",
-    "الفترة المعروضة:"
-  ],
-  [
-    "Unité non renseignée",
-    "Unit not specified",
-    "Unidade não indicada",
-    "الوحدة غير محددة"
-  ],
-  [
-    "Culture liée par identifiant",
-    "Culture linked by identifier",
-    "Cultura associada por identificador",
-    "المزرعة مرتبطة بالمعرّف"
-  ],
-  [
-    "Historique partiel : au moins une catégorie atteint sa limite de chargement. Certaines données anciennes peuvent ne pas apparaître ici.",
-    "Partial history: at least one category reached its loading limit. Some older data may not appear here.",
-    "Histórico parcial: pelo menos uma categoria atingiu o limite de carregamento. Alguns dados antigos podem não aparecer aqui.",
-    "السجل جزئي: بلغت فئة واحدة على الأقل حد التحميل. قد لا تظهر بعض البيانات القديمة هنا."
-  ],
-  [
-    "Aucun détail enregistré",
-    "No details recorded",
-    "Nenhum detalhe registado",
-    "لم تُسجّل تفاصيل"
-  ],
-  [
-    "Suivez les conditions de culture, les mesures environnementales et l’évolution des plantes.",
-    "Track growing conditions, environmental measurements, and plant development.",
-    "Acompanhe as condições de cultivo, as medições ambientais e o desenvolvimento das plantas.",
-    "تابع ظروف الزراعة والقياسات البيئية وتطور النباتات."
-  ],
-  [
-    "Cultures végétales et substrats",
-    "Plant cultures and substrates",
-    "Culturas vegetais e substratos",
-    "المحاصيل النباتية والركائز"
-  ],
-  [
-    "Cultures sources et matières biologiques",
-    "Source cultures and biological materials",
-    "Culturas de origem e materiais biológicos",
-    "مزارع المصدر والمواد البيولوجية"
-  ],
-  [
-    "Mesures et résultats expérimentaux",
-    "Measurements and experimental results",
-    "Measurements and experimental results",
-    "القياسات والنتائج التجريبية"
-  ],
-  [
-    "Analyse expérimentale",
-    "Experimental analysis",
-    "Análise experimental",
-    "التحليل التجريبي"
-  ],
-  [
-    "Comparaison descriptive des lots sélectionnés",
-    "Descriptive comparison of selected batches",
-    "Comparação descritiva dos lotes selecionados",
-    "مقارنة وصفية للدفعات المحددة"
-  ],
-  [
-    "Expérience",
-    "Experiment",
-    "Experiência",
-    "التجربة"
-  ],
-  [
-    "Unité / traitement / répétition",
-    "Unit / treatment / replicate",
-    "Unidade / tratamento / repetição",
-    "الوحدة / المعاملة / التكرار"
-  ],
-  [
-    "État / étape",
-    "Status / stage",
-    "Estado / etapa",
-    "الحالة / المرحلة"
-  ],
-  [
-    "Étapes terminées",
-    "Completed stages",
-    "Etapas concluídas",
-    "المراحل المكتملة"
-  ],
-  [
-    "Mesures de culture",
-    "Culture measurements",
-    "Medições da cultura",
-    "قياسات المزرعة"
-  ],
-  [
-    "Mesures d'environnement",
-    "Environmental measurements",
-    "Medições ambientais",
-    "القياسات البيئية"
-  ],
-  [
-    "Observations qualitatives",
-    "Qualitative observations",
-    "Observações qualitativas",
-    "الملاحظات النوعية"
-  ],
-  [
-    "Résumé numérique séparé par source",
-    "Numeric summary by source",
-    "Resumo numérico por origem",
-    "ملخص رقمي حسب المصدر"
-  ],
-  [
-    "Dernière mesure",
-    "Latest measurement",
-    "Última medição",
-    "آخر قياس"
-  ],
-  [
-    "Aucune observation",
-    "No observations",
-    "Sem observações",
-    "لا توجد ملاحظات"
-  ],
-  [
-    "Non renseignée",
-    "Not specified",
-    "Não indicada",
-    "غير محددة"
-  ],
-  [
-    "Sans nom",
-    "Unnamed",
-    "Sem nome",
-    "بلا اسم"
-  ],
-  [
-    "variable inconnue",
-    "unknown variable",
-    "variável desconhecida",
-    "متغير غير معروف"
-  ],
-  [
-    "exclue",
-    "excluded",
-    "excluída",
-    "مستبعدة"
-  ],
-  [
-    "Impossible de charger l’historique des mesures. L’enregistrement reste disponible.",
-    "Could not load measurement history. Recording is still available.",
-    "Não foi possível carregar o histórico de medições. O registo continua disponível.",
-    "تعذّر تحميل سجل القياسات. لا يزال التسجيل متاحًا."
-  ],
-  [
-    "Impossible de charger l’historique des observations. L’enregistrement reste disponible.",
-    "Could not load observation history. Recording is still available.",
-    "Não foi possível carregar o histórico de observações. O registo continua disponível.",
-    "تعذّر تحميل سجل الملاحظات. لا يزال التسجيل متاحًا."
-  ],
-  [
-    "Le catalogue des mesures est indisponible ; les modules de culture et de production restent utilisables.",
-    "The measurement catalogue is unavailable; culture and production modules remain usable.",
-    "O catálogo de medições está indisponível; os módulos de cultura e produção continuam disponíveis.",
-    "كتالوج القياسات غير متاح؛ لا تزال وحدات الزراعة والإنتاج قابلة للاستخدام."
-  ],
-  [
-    "Le catalogue des observations est indisponible ; les modules de culture et de production restent utilisables.",
-    "The observation catalogue is unavailable; culture and production modules remain usable.",
-    "O catálogo de observações está indisponível; os módulos de cultura e produção continuam disponíveis.",
-    "كتالوج الملاحظات غير متاح؛ لا تزال وحدات الزراعة والإنتاج قابلة للاستخدام."
-  ],
-  [
-    "Aucune variable disponible",
-    "No variables available",
-    "Nenhuma variável disponível",
-    "لا توجد متغيرات متاحة"
-  ],
-  [
-    "Toutes les cultures accessibles",
-    "All accessible cultures",
-    "Todas as culturas acessíveis",
-    "جميع المزارع المتاحة"
-  ],
-  [
-    "Culture sans code",
-    "Culture without a code",
-    "Cultura sem código",
-    "مزرعة بلا رمز"
-  ],
-  [
-    "Tous les lots chargés",
-    "All loaded batches",
-    "Todos os lotes carregados",
-    "جميع الدفعات المحمّلة"
-  ],
-  [
-    "Lot sans code",
-    "Batch without a code",
-    "Lote sem código",
-    "دفعة بلا رمز"
-  ],
-  [
-    "Aucune culture ne correspond à cette recherche.",
-    "No cultures match this search.",
-    "Nenhuma cultura corresponde a esta pesquisa.",
-    "لا توجد مزارع تطابق هذا البحث."
-  ],
-  [
-    "Aucune culture chargée. Créez une culture avec le formulaire ci-dessus.",
-    "No cultures loaded. Create a culture using the form above.",
-    "Nenhuma cultura carregada. Crie uma cultura através do formulário acima.",
-    "لم يتم تحميل أي مزرعة. أنشئ مزرعة باستخدام النموذج أعلاه."
-  ],
-  [
-    "Type non renseigné",
-    "Type not specified",
-    "Tipo não indicado",
-    "النوع غير محدد"
-  ],
-  [
-    "Démarrage : ",
-    "Started: ",
-    "Início: ",
-    "تاريخ البدء: "
-  ],
-  [
-    "Date de démarrage non renseignée",
-    "Start date not specified",
-    "Data de início não indicada",
-    "تاريخ البدء غير محدد"
-  ],
-  [
-    "＋ Observer",
-    "＋ Observe",
-    "＋ Observar",
-    "＋ ملاحظة"
-  ],
-  [
-    "Ajouter une observation à ",
-    "Add an observation to ",
-    "Adicionar uma observação a ",
-    "إضافة ملاحظة إلى "
-  ],
-  [
-    "cette culture",
-    "this culture",
-    "esta cultura",
-    "هذه المزرعة"
-  ],
-  [
-    "＋ Mesurer",
-    "＋ Measure",
-    "＋ Medir",
-    "＋ قياس"
-  ],
-  [
-    "Ajouter une mesure à ",
-    "Add a measurement to ",
-    "Adicionar uma medição a ",
-    "إضافة قياس إلى "
-  ],
-  [
-    "Voir la fiche et l’historique",
-    "View record and history",
-    "Ver ficha e histórico",
-    "عرض السجل والتاريخ"
-  ],
-  [
-    "Aucune mesure enregistrée pour le moment.",
-    "No measurements recorded yet.",
-    "Ainda não foram registadas medições.",
-    "لم تُسجّل قياسات بعد."
-  ],
-  [
-    "Aucune observation enregistrée pour le moment.",
-    "No observations recorded yet.",
-    "Ainda não foram registadas observações.",
-    "لم تُسجّل ملاحظات بعد."
-  ],
-  [
-    "Sélectionner une catégorie…",
-    "Select a category…",
-    "Selecionar uma categoria…",
-    "اختر فئة…"
-  ],
-  [
-    "Aucune catégorie disponible",
-    "No categories available",
-    "Nenhuma categoria disponível",
-    "لا توجد فئات متاحة"
-  ],
-  [
-    "Culture absente du périmètre chargé.",
-    "Culture is outside the loaded scope.",
-    "A cultura não está no âmbito carregado.",
-    "المزرعة خارج نطاق البيانات المحمّلة."
-  ],
-  [
-    "Fiche ouverte",
-    "Open record",
-    "Ficha aberta",
-    "السجل المفتوح"
-  ],
-  [
-    "Cultures parentes",
-    "Parent cultures",
-    "Culturas progenitoras",
-    "المزارع الأم"
-  ],
-  [
-    "Aucun ascendant ou descendant enregistré dans les fiches de culture. L’origine matérielle initiale reste indiquée par l’identifiant matériel de la fiche.",
-    "No ancestors or descendants are recorded in the culture records. The initial material origin remains indicated by the record's material ID.",
-    "Não há ascendentes ou descendentes registados nas fichas de cultura. A origem material inicial continua indicada pelo identificador do material.",
-    "لا توجد أسلاف أو فروع مسجلة في سجلات المزارع. يظل أصل المادة الأولي موضحًا بمعرّف المادة في السجل."
-  ],
-  [
-    "Filiation partielle : limite de 1 000 cultures atteinte.",
-    "Partial lineage: the 1,000-culture limit was reached.",
-    "Filiação parcial: foi atingido o limite de 1 000 culturas.",
-    "النسب جزئي: تم بلوغ حد 1000 مزرعة."
-  ]
-];
+    [
+      "Préparation",
+      "Preparation",
+      "Preparação",
+      "التحضير"
+    ],
+    [
+      "Stérilisation",
+      "Sterilization",
+      "Esterilização",
+      "التعقيم"
+    ],
+    [
+      "Récolte",
+      "Harvest",
+      "Colheita",
+      "الحصاد"
+    ],
+    [
+      "Libération",
+      "Release",
+      "Libertação",
+      "الإفراج"
+    ],
+    [
+      "À venir",
+      "Upcoming",
+      "A seguir",
+      "قادم"
+    ],
+    [
+      "Terminée",
+      "Completed",
+      "Concluída",
+      "مكتملة"
+    ],
+    [
+      "Échec",
+      "Failed",
+      "Falhou",
+      "فشل"
+    ],
+    [
+      "L'appel à claim-ba-labs a échoué.",
+      "The BA Labs account-linking request failed.",
+      "O pedido de associação à conta BA Labs falhou.",
+      "فشل طلب ربط الحساب بـ BA Labs."
+    ],
+    [
+      "claim-ba-labs n'a retourné aucune donnée.",
+      "The account-linking request returned no data.",
+      "O pedido de associação da conta não devolveu dados.",
+      "لم يُرجع طلب ربط الحساب أي بيانات."
+    ],
+    [
+      "Le compte n'a pas pu être rattaché à BA-LABS.",
+      "The account could not be linked to BA-LABS.",
+      "Não foi possível associar a conta à BA-LABS.",
+      "تعذّر ربط الحساب بـ BA-LABS."
+    ],
+    [
+      "claim-ba-labs n'a pas retourné l'organisation BA-LABS.",
+      "The account-linking request did not return the BA-LABS organization.",
+      "O pedido de associação não devolveu a organização BA-LABS.",
+      "لم يُرجع طلب الربط مؤسسة BA-LABS."
+    ],
+    [
+      "Le mot de passe doit comporter au moins 6 caractères.",
+      "The password must contain at least 6 characters.",
+      "A palavra-passe deve conter pelo menos 6 caracteres.",
+      "يجب أن تتكون كلمة المرور من 6 أحرف على الأقل."
+    ],
+    [
+      "Compte créé. Vérifiez l'email de confirmation Supabase, puis revenez ici et connectez-vous.",
+      "Account created. Check the Supabase confirmation email, then return here and sign in.",
+      "Conta criada. Verifique o email de confirmação do Supabase e depois volte para iniciar sessão.",
+      "تم إنشاء الحساب. تحقّق من رسالة تأكيد Supabase ثم عُد لتسجيل الدخول."
+    ],
+    [
+      "Création du compte impossible.",
+      "Unable to create the account.",
+      "Não foi possível criar a conta.",
+      "تعذّر إنشاء الحساب."
+    ],
+    [
+      "Erreur déconnexion:",
+      "Sign-out error:",
+      "Erro ao terminar sessão:",
+      "خطأ في تسجيل الخروج:"
+    ],
+    [
+      "Non connecté.",
+      "Not signed in.",
+      "Sessão não iniciada.",
+      "لم يتم تسجيل الدخول."
+    ],
+    [
+      "Sélectionner une souche...",
+      "Select a strain...",
+      "Selecionar uma estirpe...",
+      "اختر سلالة..."
+    ],
+    [
+      "Organisation absente avant chargement des références.",
+      "Organization is missing before reference data can load.",
+      "A organização está em falta antes de carregar os dados de referência.",
+      "المؤسسة غير محددة قبل تحميل البيانات المرجعية."
+    ],
+    [
+      "Sélectionner...",
+      "Select...",
+      "Selecionar...",
+      "اختر..."
+    ],
+    [
+      "Votre session a expiré.",
+      "Your session has expired.",
+      "A sua sessão expirou.",
+      "انتهت صلاحية جلستك."
+    ],
+    [
+      "Contrôle qualité enregistré.",
+      "Quality control saved.",
+      "Controlo de qualidade guardado.",
+      "تم حفظ مراقبة الجودة."
+    ],
+    [
+      "QC : utiliser la libération",
+      "QC: use the release action",
+      "CQ: utilize a ação de libertação",
+      "مراقبة الجودة: استخدم إجراء الإفراج"
+    ],
+    [
+      "Batch terminé",
+      "Batch completed",
+      "Lote concluído",
+      "اكتملت الدفعة"
+    ],
+    [
+      "Démarrer / passer à l'étape suivante",
+      "Start / move to the next stage",
+      "Iniciar / avançar para a etapa seguinte",
+      "ابدأ / انتقل إلى المرحلة التالية"
+    ],
+    [
+      "Sélectionnez un type de batch.",
+      "Select a batch type.",
+      "Selecione um tipo de lote.",
+      "اختر نوع الدفعة."
+    ],
+    [
+      "Sélectionnez une culture source.",
+      "Select a source culture.",
+      "Selecione uma cultura de origem.",
+      "اختر مزرعة مصدر."
+    ],
+    [
+      "La culture sélectionnée n'est plus disponible.",
+      "The selected culture is no longer available.",
+      "A cultura selecionada já não está disponível.",
+      "لم تعد المزرعة المحددة متاحة."
+    ],
+    [
+      "La quantité prévue est invalide.",
+      "The planned quantity is invalid.",
+      "A quantidade prevista é inválida.",
+      "الكمية المخططة غير صالحة."
+    ],
+    [
+      "Création...",
+      "Creating...",
+      "A criar...",
+      "جارٍ الإنشاء..."
+    ],
+    [
+      "Batch créé dans Supabase.",
+      "Batch created in Supabase.",
+      "Lote criado no Supabase.",
+      "تم إنشاء الدفعة في Supabase."
+    ],
+    [
+      "La création du batch a échoué.",
+      "Batch creation failed.",
+      "A criação do lote falhou.",
+      "فشل إنشاء الدفعة."
+    ],
+    [
+      "Sélectionnez d'abord un batch.",
+      "Select a batch first.",
+      "Selecione primeiro um lote.",
+      "اختر دفعة أولاً."
+    ],
+    [
+      "Cette étape ne peut pas être avancée avec cette action.",
+      "This stage cannot be advanced with this action.",
+      "Não é possível avançar esta etapa com esta ação.",
+      "لا يمكن تقديم هذه المرحلة بهذا الإجراء."
+    ],
+    [
+      "Vérification QC...",
+      "Checking quality control...",
+      "A verificar o controlo de qualidade...",
+      "جارٍ التحقق من مراقبة الجودة..."
+    ],
+    [
+      "Le batch ne peut pas être libéré.",
+      "The batch cannot be released.",
+      "Não é possível libertar o lote.",
+      "لا يمكن الإفراج عن الدفعة."
+    ],
+    [
+      "Sélectionner un paramètre…",
+      "Select a parameter…",
+      "Selecionar um parâmetro…",
+      "اختر معلماً…"
+    ],
+    [
+      "Aucun paramètre disponible",
+      "No parameters available",
+      "Nenhum parâmetro disponível",
+      "لا توجد معلمات متاحة"
+    ],
+    [
+      "Sélectionner une catégorie…",
+      "Select a category…",
+      "Selecionar uma categoria…",
+      "اختر فئة…"
+    ],
+    [
+      "Aucune catégorie disponible",
+      "No categories available",
+      "Nenhuma categoria disponível",
+      "لا توجد فئات متاحة"
+    ],
+    [
+      "Créez d’abord une culture ou un lot",
+      "Create a culture or batch first",
+      "Crie primeiro uma cultura ou um lote",
+      "أنشئ مزرعة أو دفعة أولاً"
+    ],
+    [
+      "Sélectionner une unité…",
+      "Select a unit…",
+      "Selecionar uma unidade…",
+      "اختر وحدة…"
+    ],
+    [
+      "Aucune unité compatible",
+      "No compatible units",
+      "Nenhuma unidade compatível",
+      "لا توجد وحدات متوافقة"
+    ],
+    [
+      "Choisissez une culture ou un lot, un paramètre, une valeur numérique et une unité.",
+      "Choose a culture or batch, a parameter, a numeric value, and a unit.",
+      "Escolha uma cultura ou lote, um parâmetro, um valor numérico e uma unidade.",
+      "اختر مزرعة أو دفعة ومعلمة وقيمة رقمية ووحدة."
+    ],
+    [
+      "L’unité choisie n’est pas compatible avec la dimension du paramètre.",
+      "The selected unit is incompatible with the parameter dimension.",
+      "A unidade selecionada é incompatível com a dimensão do parâmetro.",
+      "الوحدة المحددة غير متوافقة مع بُعد المعلمة."
+    ],
+    [
+      "Le lot sélectionné n’est plus disponible.",
+      "The selected batch is no longer available.",
+      "O lote selecionado já não está disponível.",
+      "لم تعد الدفعة المحددة متاحة."
+    ],
+    [
+      "Mesure enregistrée dans Supabase avec sa provenance.",
+      "Measurement saved in Supabase with its provenance.",
+      "Medição guardada no Supabase com a respetiva proveniência.",
+      "تم حفظ القياس في Supabase مع مصدره."
+    ],
+    [
+      "L’enregistrement de la mesure a échoué.",
+      "Saving the measurement failed.",
+      "Falha ao guardar a medição.",
+      "فشل حفظ القياس."
+    ],
+    [
+      "Choisissez une cible, une catégorie et décrivez l’observation.",
+      "Choose a target and category, then describe the observation.",
+      "Escolha um alvo e uma categoria e descreva a observação.",
+      "اختر هدفاً وفئة ثم صِف الملاحظة."
+    ],
+    [
+      "Observation enregistrée dans Supabase avec sa provenance.",
+      "Observation saved in Supabase with its provenance.",
+      "Observação guardada no Supabase com a respetiva proveniência.",
+      "تم حفظ الملاحظة في Supabase مع مصدرها."
+    ],
+    [
+      "L’enregistrement de l’observation a échoué.",
+      "Saving the observation failed.",
+      "Falha ao guardar a observação.",
+      "فشل حفظ الملاحظة."
+    ],
+    [
+      "Aucune culture ne correspond à cette recherche.",
+      "No cultures match this search.",
+      "Nenhuma cultura corresponde a esta pesquisa.",
+      "لا توجد مزارع تطابق هذا البحث."
+    ],
+    [
+      "Aucune culture chargée. Créez une culture avec le formulaire ci-dessus.",
+      "No cultures loaded. Create one using the form above.",
+      "Não foram carregadas culturas. Crie uma usando o formulário acima.",
+      "لم يتم تحميل أي مزارع. أنشئ مزرعة باستخدام النموذج أعلاه."
+    ],
+    [
+      "Type non renseigné",
+      "Type not specified",
+      "Tipo não indicado",
+      "النوع غير محدد"
+    ],
+    [
+      "Date de démarrage non renseignée",
+      "Start date not specified",
+      "Data de início não indicada",
+      "تاريخ البدء غير محدد"
+    ],
+    [
+      "Connectez-vous pour analyser les données de votre organisation.",
+      "Sign in to analyze your organization's data.",
+      "Inicie sessão para analisar os dados da sua organização.",
+      "سجّل الدخول لتحليل بيانات مؤسستك."
+    ],
+    [
+      "Sélectionnez une variable mesurée.",
+      "Select a measured variable.",
+      "Selecione uma variável medida.",
+      "اختر متغيراً مقاساً."
+    ],
+    [
+      "Valeurs numériques",
+      "Numeric values",
+      "Valores numéricos",
+      "القيم الرقمية"
+    ],
+    [
+      "Données chargées depuis Supabase. Les résultats sont descriptifs.",
+      "Data loaded from Supabase. Results are descriptive.",
+      "Dados carregados do Supabase. Os resultados são descritivos.",
+      "تم تحميل البيانات من Supabase. النتائج وصفية."
+    ],
+    [
+      "Aucune mesure ne correspond aux filtres sélectionnés.",
+      "No measurements match the selected filters.",
+      "Nenhuma medição corresponde aos filtros selecionados.",
+      "لا توجد قياسات تطابق عوامل التصفية المحددة."
+    ],
+    [
+      "Période représentée :",
+      "Period shown:",
+      "Período apresentado:",
+      "الفترة المعروضة:"
+    ],
+    [
+      "Unité non renseignée",
+      "Unit not specified",
+      "Unidade não indicada",
+      "الوحدة غير محددة"
+    ],
+    [
+      "Culture liée par identifiant",
+      "Culture linked by identifier",
+      "Cultura associada por identificador",
+      "المزرعة مرتبطة بالمعرّف"
+    ],
+    [
+      "Historique partiel : au moins une catégorie atteint sa limite de chargement. Certaines données anciennes peuvent ne pas apparaître ici.",
+      "Partial history: at least one category reached its loading limit. Some older data may not appear here.",
+      "Histórico parcial: pelo menos uma categoria atingiu o limite de carregamento. Alguns dados antigos podem não aparecer aqui.",
+      "السجل جزئي: بلغت فئة واحدة على الأقل حد التحميل. قد لا تظهر بعض البيانات القديمة هنا."
+    ],
+    [
+      "Aucun détail enregistré",
+      "No details recorded",
+      "Nenhum detalhe registado",
+      "لم تُسجّل تفاصيل"
+    ],
+    [
+      "Suivez les conditions de culture, les mesures environnementales et l’évolution des plantes.",
+      "Track growing conditions, environmental measurements, and plant development.",
+      "Acompanhe as condições de cultivo, as medições ambientais e o desenvolvimento das plantas.",
+      "تابع ظروف الزراعة والقياسات البيئية وتطور النباتات."
+    ],
+    [
+      "Cultures végétales et substrats",
+      "Plant cultures and substrates",
+      "Culturas vegetais e substratos",
+      "المحاصيل النباتية والركائز"
+    ],
+    [
+      "Cultures sources et matières biologiques",
+      "Source cultures and biological materials",
+      "Culturas de origem e materiais biológicos",
+      "مزارع المصدر والمواد البيولوجية"
+    ],
+    [
+      "Mesures et résultats expérimentaux",
+      "Measurements and experimental results",
+      "Measurements and experimental results",
+      "القياسات والنتائج التجريبية"
+    ],
+    [
+      "Analyse expérimentale",
+      "Experimental analysis",
+      "Análise experimental",
+      "التحليل التجريبي"
+    ],
+    [
+      "Comparaison descriptive des lots sélectionnés",
+      "Descriptive comparison of selected batches",
+      "Comparação descritiva dos lotes selecionados",
+      "مقارنة وصفية للدفعات المحددة"
+    ],
+    [
+      "Expérience",
+      "Experiment",
+      "Experiência",
+      "التجربة"
+    ],
+    [
+      "Unité / traitement / répétition",
+      "Unit / treatment / replicate",
+      "Unidade / tratamento / repetição",
+      "الوحدة / المعاملة / التكرار"
+    ],
+    [
+      "État / étape",
+      "Status / stage",
+      "Estado / etapa",
+      "الحالة / المرحلة"
+    ],
+    [
+      "Étapes terminées",
+      "Completed stages",
+      "Etapas concluídas",
+      "المراحل المكتملة"
+    ],
+    [
+      "Mesures de culture",
+      "Culture measurements",
+      "Medições da cultura",
+      "قياسات المزرعة"
+    ],
+    [
+      "Mesures d'environnement",
+      "Environmental measurements",
+      "Medições ambientais",
+      "القياسات البيئية"
+    ],
+    [
+      "Observations qualitatives",
+      "Qualitative observations",
+      "Observações qualitativas",
+      "الملاحظات النوعية"
+    ],
+    [
+      "Résumé numérique séparé par source",
+      "Numeric summary by source",
+      "Resumo numérico por origem",
+      "ملخص رقمي حسب المصدر"
+    ],
+    [
+      "Dernière mesure",
+      "Latest measurement",
+      "Última medição",
+      "آخر قياس"
+    ],
+    [
+      "Aucune observation",
+      "No observations",
+      "Sem observações",
+      "لا توجد ملاحظات"
+    ],
+    [
+      "Non renseignée",
+      "Not specified",
+      "Não indicada",
+      "غير محددة"
+    ],
+    [
+      "Sans nom",
+      "Unnamed",
+      "Sem nome",
+      "بلا اسم"
+    ],
+    [
+      "variable inconnue",
+      "unknown variable",
+      "variável desconhecida",
+      "متغير غير معروف"
+    ],
+    [
+      "exclue",
+      "excluded",
+      "excluída",
+      "مستبعدة"
+    ],
+    [
+      "Impossible de charger l’historique des mesures. L’enregistrement reste disponible.",
+      "Could not load measurement history. Recording is still available.",
+      "Não foi possível carregar o histórico de medições. O registo continua disponível.",
+      "تعذّر تحميل سجل القياسات. لا يزال التسجيل متاحًا."
+    ],
+    [
+      "Impossible de charger l’historique des observations. L’enregistrement reste disponible.",
+      "Could not load observation history. Recording is still available.",
+      "Não foi possível carregar o histórico de observações. O registo continua disponível.",
+      "تعذّر تحميل سجل الملاحظات. لا يزال التسجيل متاحًا."
+    ],
+    [
+      "Le catalogue des mesures est indisponible ; les modules de culture et de production restent utilisables.",
+      "The measurement catalogue is unavailable; culture and production modules remain usable.",
+      "O catálogo de medições está indisponível; os módulos de cultura e produção continuam disponíveis.",
+      "كتالوج القياسات غير متاح؛ لا تزال وحدات الزراعة والإنتاج قابلة للاستخدام."
+    ],
+    [
+      "Le catalogue des observations est indisponible ; les modules de culture et de production restent utilisables.",
+      "The observation catalogue is unavailable; culture and production modules remain usable.",
+      "O catálogo de observações está indisponível; os módulos de cultura e produção continuam disponíveis.",
+      "كتالوج الملاحظات غير متاح؛ لا تزال وحدات الزراعة والإنتاج قابلة للاستخدام."
+    ],
+    [
+      "Aucune variable disponible",
+      "No variables available",
+      "Nenhuma variável disponível",
+      "لا توجد متغيرات متاحة"
+    ],
+    [
+      "Toutes les cultures accessibles",
+      "All accessible cultures",
+      "Todas as culturas acessíveis",
+      "جميع المزارع المتاحة"
+    ],
+    [
+      "Culture sans code",
+      "Culture without a code",
+      "Cultura sem código",
+      "مزرعة بلا رمز"
+    ],
+    [
+      "Tous les lots chargés",
+      "All loaded batches",
+      "Todos os lotes carregados",
+      "جميع الدفعات المحمّلة"
+    ],
+    [
+      "Lot sans code",
+      "Batch without a code",
+      "Lote sem código",
+      "دفعة بلا رمز"
+    ],
+    [
+      "Démarrage : ",
+      "Started: ",
+      "Início: ",
+      "تاريخ البدء: "
+    ],
+    [
+      "＋ Observer",
+      "＋ Observe",
+      "＋ Observar",
+      "＋ ملاحظة"
+    ],
+    [
+      "Ajouter une observation à ",
+      "Add an observation to ",
+      "Adicionar uma observação a ",
+      "إضافة ملاحظة إلى "
+    ],
+    [
+      "cette culture",
+      "this culture",
+      "esta cultura",
+      "هذه المزرعة"
+    ],
+    [
+      "＋ Mesurer",
+      "＋ Measure",
+      "＋ Medir",
+      "＋ قياس"
+    ],
+    [
+      "Ajouter une mesure à ",
+      "Add a measurement to ",
+      "Adicionar uma medição a ",
+      "إضافة قياس إلى "
+    ],
+    [
+      "Voir la fiche et l’historique",
+      "View record and history",
+      "Ver ficha e histórico",
+      "عرض السجل والتاريخ"
+    ],
+    [
+      "Aucune mesure enregistrée pour le moment.",
+      "No measurements recorded yet.",
+      "Ainda não foram registadas medições.",
+      "لم تُسجّل قياسات بعد."
+    ],
+    [
+      "Aucune observation enregistrée pour le moment.",
+      "No observations recorded yet.",
+      "Ainda não foram registadas observações.",
+      "لم تُسجّل ملاحظات بعد."
+    ],
+    [
+      "Culture absente du périmètre chargé.",
+      "Culture is outside the loaded scope.",
+      "A cultura não está no âmbito carregado.",
+      "المزرعة خارج نطاق البيانات المحمّلة."
+    ],
+    [
+      "Fiche ouverte",
+      "Open record",
+      "Ficha aberta",
+      "السجل المفتوح"
+    ],
+    [
+      "Cultures parentes",
+      "Parent cultures",
+      "Culturas progenitoras",
+      "المزارع الأم"
+    ],
+    [
+      "Aucun ascendant ou descendant enregistré dans les fiches de culture. L’origine matérielle initiale reste indiquée par l’identifiant matériel de la fiche.",
+      "No ancestors or descendants are recorded in the culture records. The initial material origin remains indicated by the record's material ID.",
+      "Não há ascendentes ou descendentes registados nas fichas de cultura. A origem material inicial continua indicada pelo identificador do material.",
+      "لا توجد أسلاف أو فروع مسجلة في سجلات المزارع. يظل أصل المادة الأولي موضحًا بمعرّف المادة في السجل."
+    ],
+    [
+      "Filiation partielle : limite de 1 000 cultures atteinte.",
+      "Partial lineage: the 1,000-culture limit was reached.",
+      "Filiação parcial: foi atingido o limite de 1 000 culturas.",
+      "النسب جزئي: تم بلوغ حد 1000 مزرعة."
+    ]
+  ];
   for (const [fr, en, pt, ar] of supplementalCoverage) {
     dictionaries.en[fr] ||= en;
     dictionaries.pt[fr] ||= pt;
