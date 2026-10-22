@@ -4520,7 +4520,8 @@ function prepareMovementControls(batch) {
     moveBatchEnvironmentInput.value = "";
   }
   const isOpen = batch && !["released", "rejected", "aborted", "completed"].includes(batch.status);
-  moveBatchButton.disabled = !isOpen || (!batchLocationOptions.length && !batchEnvironmentOptions.length);
+  const hasCurrentAssignment = Boolean(batch?.location_id || batch?.environment_id);
+  moveBatchButton.disabled = !isOpen || (!batchLocationOptions.length && !batchEnvironmentOptions.length && !hasCurrentAssignment);
   moveBatchLocationInput.disabled = !isOpen;
   moveBatchEnvironmentInput.disabled = !isOpen || moveBatchEnvironmentInput.options.length <= 1;
   moveBatchStatus.textContent = batch
