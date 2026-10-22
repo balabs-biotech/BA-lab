@@ -59,6 +59,20 @@
     return denominator ? numerator / denominator : null;
   }
 
+  function dateKey(value) {
+    if (!value) return null;
+    const date = new Date(value);
+    if (!Number.isFinite(date.getTime())) return null;
+    const pad = function (number) { return String(number).padStart(2, "0"); };
+    return date.getFullYear() + "-" + pad(date.getMonth() + 1) + "-" + pad(date.getDate());
+  }
+
+  function dateInRange(value, fromDate, toDate) {
+    if (!value) return !fromDate && !toDate;
+    const day = dateKey(value);
+    return !!day && (!fromDate || day >= fromDate) && (!toDate || day <= toDate);
+  }
+
   function resolveBatchId(row, eventToBatch, cultureToBatch, sampleToBatch) {
     if (row.event_id) return eventToBatch.get(row.event_id) || null;
     if (row.culture_id) return cultureToBatch.get(row.culture_id) || null;
@@ -100,6 +114,8 @@
     detectOutlierIds: detectOutlierIds,
     pearson: pearson,
     convertUnit: convertUnit,
-    resolveBatchId: resolveBatchId
+    resolveBatchId: resolveBatchId,
+    dateKey: dateKey,
+    dateInRange: dateInRange
   };
 })(typeof window !== "undefined" ? window : globalThis);
