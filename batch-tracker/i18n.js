@@ -997,7 +997,7 @@
       "يُفعّل التسجيل فقط أثناء مرحلة الحصاد لدفعة مفتوحة."
     ],
     [
-      "Total des 50 événements chargés, par unité :",
+      "Total des 50 événements chargés, par unité: ",
       "Total of the 50 loaded events, by unit:",
       "Total dos 50 eventos carregados, por unidade:",
       "إجمالي الأحداث الخمسين المحمّلة حسب الوحدة:"
@@ -1021,7 +1021,7 @@
       "أدخل كمية موجبة ورمز وحدة."
     ],
     [
-      "Vérification de l’unité impossible :",
+      "Vérification de l’unité impossible : ",
       "Unable to validate unit:",
       "Não foi possível validar a unidade:",
       "تعذر التحقق من الوحدة:"
@@ -1039,7 +1039,7 @@
       "يجب ربط هذه الدفعة بمزرعة أو مادة لتسجيل الحصاد في السجل البيولوجي."
     ],
     [
-      "Enregistrement de la récolte impossible :",
+      "Enregistrement de la récolte impossible : ",
       "Unable to record harvest:",
       "Não foi possível registar a colheita:",
       "تعذر تسجيل الحصاد:"
