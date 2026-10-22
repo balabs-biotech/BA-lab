@@ -3785,10 +3785,10 @@ async function createBatch() {
             cultureId,
 
           p_location_id:
-            null,
+            batchLocationInput?.value || null,
 
           p_environment_id:
-            null,
+            batchEnvironmentInput?.value || null,
 
           p_planned_at:
             new Date().toISOString(),
@@ -3833,6 +3833,10 @@ async function createBatch() {
 
     batchUnitInput.value =
       "";
+
+    if (batchLocationInput) batchLocationInput.value = "";
+    renderBatchEnvironmentOptions();
+    if (batchEnvironmentInput) batchEnvironmentInput.value = "";
 
 
     showElement(
