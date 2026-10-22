@@ -220,6 +220,11 @@ const batchQc =
 
 const batchEvents = document.getElementById("batchEvents");
 const batchEventList = document.getElementById("batchEventList");
+const harvestQuantityInput = document.getElementById("harvestQuantity");
+const harvestUnitInput = document.getElementById("harvestUnit");
+const harvestNoteInput = document.getElementById("harvestNote");
+const recordHarvestButton = document.getElementById("recordHarvestButton");
+const harvestStatus = document.getElementById("harvestStatus");
 
 const batchQcList =
   document.getElementById("batchQcList");
@@ -681,6 +686,11 @@ async function signOut() {
   latestBatches = [];
   selectedBatchId = null;
   selectedBatch = null;
+  if (harvestQuantityInput) harvestQuantityInput.value = "";
+  if (harvestUnitInput) harvestUnitInput.value = "";
+  if (harvestNoteInput) harvestNoteInput.value = "";
+  if (recordHarvestButton) recordHarvestButton.disabled = true;
+  if (harvestStatus) harvestStatus.textContent = "Connectez-vous et sélectionnez un lot à l’étape Récolte.";
 
 
   hideElement(trackerCard);
@@ -2702,6 +2712,7 @@ async function loadBatch(
     qcChecks || []
   );
   renderBatchEventTimeline(batchEventsData || [], batchEventsError?.message || null);
+  updateHarvestEntryState(batch, batchEventsData || []);
 
 
   showElement(
@@ -2731,6 +2742,74 @@ async function loadBatch(
    INFORMATIONS BATCH
    ============================================================ */
 
+function updateHarvestEntryState(batch, events) {
+  if (!recordHarvestButton || !harvestStatus) return;
+  const allowed = batch?.current_stage === "harvest" && !["released", "rejected", "aborted", "completed"].includes(batch?.status);
+  recordHarvestButton.disabled = !allowed;
+  const groups = new Map();
+  (events || []).filter(event => event.event_type === "harvest_recorded").forEach(event => {
+    const p = event.payload && typeof event.payload === "object" ? event.payload : {};
+    const q = Number(p.quantity), unit = String(p.unit_code || "").trim();
+    if (Number.isFinite(q) && q > 0 && unit) groups.set(unit, (groups.get(unit) || 0) + q);
+  });
+  harvestStatus.textContent = allowed ? "Étape Récolte active. Chaque saisie reste distincte." : "La saisie est activée uniquement pendant l’étape Récolte d’un lot ouvert.";
+  if (groups.size) harvestStatus.textContent += " Total journalisé par unité : " + [...groups].map(([u,q]) => Number(q.toPrecision(8)) + " " + u).join(" · ") + ".";
+}
+
+async function recordBatchHarvest() {
+  if (!organizationId || !selectedBatch || !selectedBatchId) {
+    showMessage("Sélectionnez d’abord un lot.", "error");
+    return;
+  }
+  if (selectedBatch.current_stage !== "harvest" || ["released", "rejected", "aborted", "completed"].includes(selectedBatch.status)) {
+    showMessage("La récolte ne peut être enregistrée que pendant l’étape Récolte d’un lot ouvert.", "error");
+    return;
+  }
+  const quantityText = harvestQuantityInput.value.trim();
+  const quantity = Number(quantityText);
+  const unitCode = harvestUnitInput.value.trim();
+  const note = harvestNoteInput.value.trim();
+  if (!quantityText || !Number.isFinite(quantity) || quantity <= 0 || !unitCode) {
+    showMessage("Indiquez une quantité strictement positive et un code d’unité.", "error");
+    return;
+  }
+  recordHarvestButton.disabled = true;
+  const originalLabel = recordHarvestButton.textContent;
+  recordHarvestButton.textContent = "Enregistrement…";
+  try {
+    const session = await getCurrentSession();
+    if (!session) throw new Error("Session expirée. Reconnectez-vous.");
+    const { data: unit, error: unitError } = await supabaseClient.from("units").select("code").eq("code", unitCode).maybeSingle();
+    if (unitError) throw new Error("Vérification de l’unité impossible : " + unitError.message);
+    if (!unit) throw new Error("Code d’unité inconnu. Utilisez un code déjà présent dans le référentiel des unités.");
+    const { error } = await supabaseClient.from("events").insert({
+      organization_id: organizationId,
+      event_type: "harvest_recorded",
+      occurred_at: new Date().toISOString(),
+      actor_user_id: session.user.id,
+      culture_id: selectedBatch.culture_id || null,
+      batch_id: selectedBatch.id,
+      payload: { quantity, unit_code: unit.code, note: note || null, source: "batch-tracker-harvest-entry", schema_version: 1 }
+    });
+    if (error) throw new Error("Enregistrement de la récolte impossible : " + error.message);
+    harvestQuantityInput.value = "";
+    harvestNoteInput.value = "";
+    showMessage("Récolte enregistrée dans la chronologie du lot.", "success");
+    await loadBatch(selectedBatch.id);
+    await loadLatestBatches();
+  } catch (error) {
+    console.error("Enregistrement récolte :", error);
+    showMessage(error?.message || "Enregistrement de la récolte impossible.", "error");
+  } finally {
+    recordHarvestButton.textContent = originalLabel;
+    if (selectedBatch) {
+      recordHarvestButton.disabled = !(selectedBatch.current_stage === "harvest" && !["released", "rejected", "aborted", "completed"].includes(selectedBatch.status));
+    }
+  }
+}
+recordHarvestButton?.addEventListener("click", recordBatchHarvest);
+
+
 function renderBatchEventTimeline(events, loadError = null) {
   if (!batchEventList) return;
   batchEventList.replaceChildren();
@@ -2750,6 +2829,7 @@ function renderBatchEventTimeline(events, loadError = null) {
     batch_completed: "Cycle terminé",
     batch_released: "Lot libéré",
     measurement_recorded: "Mesure enregistrée",
+    harvest_recorded: "Récolte enregistrée",
     observation_recorded: "Observation enregistrée"
   };
   const summarize = event => {
@@ -2762,6 +2842,12 @@ function renderBatchEventTimeline(events, loadError = null) {
       if (Number.isFinite(Number(p.passed))) parts.push("validés : " + p.passed);
       if (Number.isFinite(Number(p.waived))) parts.push("dérogations : " + p.waived);
       if (Number.isFinite(Number(p.qc_checks))) parts.push("contrôles : " + p.qc_checks);
+      return parts.join(" · ");
+    }
+    if (event.event_type === "harvest_recorded") {
+      const parts = [];
+      if (p.quantity !== undefined && p.quantity !== null) parts.push("Quantité : " + String(p.quantity) + (p.unit_code ? " " + p.unit_code : ""));
+      if (p.note) parts.push(String(p.note));
       return parts.join(" · ");
     }
     if (event.event_type === "measurement_recorded") {
