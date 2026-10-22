@@ -23,6 +23,9 @@
       "Mesures liées à la culture": "Measurements linked to culture",
       "Dernière mesure": "Latest measurement",
       "Aucune culture directement liée": "No directly linked culture",
+      "Sélectionnez de 2 à 4 lots parmi les 30 plus récents. La comparaison utilise uniquement les étapes et les mesures directement liées à une culture ; elle ne désigne pas de « meilleur » lot.": "Select 2 to 4 of the 30 most recent batches. The comparison uses only stages and measurements directly linked to a culture; it does not identify a “best” batch.",
+      "Un ou plusieurs lots ne sont plus dans la liste chargée. Actualisez la page.": "One or more batches are no longer in the loaded list. Refresh the page.",
+      "Comparaison chargée. Seules les mesures directement liées à la culture du lot sont comptées ; les données manquantes ne sont pas interprétées comme zéro.": "Comparison loaded. Only measurements directly linked to the batch culture are counted; missing data is not treated as zero.",
       "Tous les univers":"All workspaces"
     },
     pt: {
@@ -46,6 +49,7 @@
       "Sur mobile, utilisez la sélection multiple du navigateur.": "No telemóvel, utilize a seleção múltipla do navegador.",
       "Un ou plusieurs lots ne sont plus dans la liste chargée. Actualisez la page.": "Um ou mais lotes já não estão na lista carregada. Atualize a página.",
       "Comparaison chargée. Seules les mesures directement liées à la culture du lot sont comptées ; les données manquantes ne sont pas interprétées comme zéro.": "Comparação carregada. Só são contabilizadas medições diretamente ligadas à cultura do lote; dados em falta não são tratados como zero.",
+      "Sélectionnez de 2 à 4 lots parmi les 30 plus récents. La comparaison utilise uniquement les étapes et les mesures directement liées à une culture ; elle ne désigne pas de « meilleur » lot.": "Selecione 2 a 4 dos 30 lotes mais recentes. A comparação utiliza apenas etapas e medições diretamente ligadas a uma cultura; não identifica um lote «melhor».",
       "Tous les univers":"Todos os espaços"
     },
     ar: {
@@ -69,6 +73,7 @@
       "Sur mobile, utilisez la sélection multiple du navigateur.": "على الهاتف، استخدم أداة التحديد المتعدد في المتصفح.",
       "Un ou plusieurs lots ne sont plus dans la liste chargée. Actualisez la page.": "لم تعد دفعة أو أكثر موجودة في القائمة المحمّلة. حدّث الصفحة.",
       "Comparaison chargée. Seules les mesures directement liées à la culture du lot sont comptées ; les données manquantes ne sont pas interprétées comme zéro.": "اكتملت المقارنة. تُحتسب القياسات المرتبطة مباشرةً بمزرعة الدفعة فقط؛ ولا تُعامل البيانات المفقودة كأنها صفر.",
+      "Sélectionnez de 2 à 4 lots parmi les 30 plus récents. La comparaison utilise uniquement les étapes et les mesures directement liées à une culture ; elle ne désigne pas de « meilleur » lot.": "اختر من دفعتين إلى أربع دفعات من أحدث 30 دفعة. تستخدم المقارنة المراحل والقياسات المرتبطة مباشرةً بمزرعة فقط، ولا تحدد «أفضل» دفعة.",
       "Tous les univers":"جميع المساحات"
     }
   };
