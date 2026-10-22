@@ -9,7 +9,9 @@ for (const required of [
   "function translateTree(root = document)",
   "attributes: true",
   'attributeFilter: ["placeholder", "title", "aria-label"]',
-  "const prefix = normalize(key)"
+  "const prefix = normalize(key)",
+  "if (root.nodeType === 1) elements.push(root)",
+  'elements.push(...root.querySelectorAll("*"))'
 ]) {
   if (!source.includes(required)) {
     throw new Error(`Missing localisation behaviour: ${required}`);
