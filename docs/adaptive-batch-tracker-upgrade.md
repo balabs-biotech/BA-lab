@@ -1,0 +1,49 @@
+# Adaptive Batch Tracker upgrade — reference audit
+
+Date: 2026-10-22
+
+## Scope
+
+Reference reviewed: [FarmerAdam/batch-tracker-template](https://github.com/FarmerAdam/batch-tracker-template), a static mushroom/produce batch-tracking application backed by Supabase.
+
+BA Labs remains the canonical application and data model. This is an adaptation of product concepts, not a port or copy of the reference implementation.
+
+## Useful reference concepts and BA Labs mapping
+
+| Reference concept | BA Labs target | Adaptation rule |
+| --- | --- | --- |
+| Rooms, zones, bays and placements | `locations`, `environments`, batch/culture links | Reuse the current location/environment hierarchy; don't add a second parallel location model. |
+| Batch movements between states/places | Existing batch workflow, `events`, location/environment references | Preserve auditability and organization scoping; use a transactional RPC where state changes need to be atomic. |
+| Harvest records and yield | Existing batch quantities, measurements, observations and `events.payload` | First define event semantics and query needs; add a dedicated table only when repeated harvest records cannot be represented cleanly. |
+| Yield/production analytics | Batch statistics and the existing measurement/experiment model | Distinguish observations, measurements, and independent experimental replicates; never infer zero from missing data. |
+| QR labels | Stable batch/culture codes and public product/culture pages | Generate labels without exposing private identifiers, secrets, or organization-only data. |
+| Cost tracking | Future opt-in production module | Keep financial assumptions separate from biological measurements and don't add reference-specific USD assumptions. |
+| Archive | Status/history in the current batch workflow | Prefer lifecycle status and auditable events over deleting records. |
+
+## Existing BA Labs foundations to preserve
+
+- Three workspaces: Green Tech, Mycology, Laboratory, sharing a common engine.
+- Multi-organization Supabase model with RLS and organization-scoped reads.
+- Culture/material lineage and biological operations.
+- Batch stages, quality-control checks, and release workflow.
+- Experiments, experimental units, measurements, qualitative observations, and quality states.
+- IoT device registry, environment-linked measurements, and controlled public dataset exports.
+- Notion synchronization for culture records.
+
+## First code change on this branch
+
+Batch comparison now detects when the same measurement variable is represented by multiple units across the selected batches. It keeps the values grouped separately and displays a warning in French, English, Portuguese, and Arabic. This prevents a misleading side-by-side interpretation without adding schema or dependency risk.
+
+A static regression assertion was added to `scripts/check-batch-tracker-js.mjs`.
+
+## Next implementation sequence
+
+1. Validate the current comparison logic and unit warning.
+2. Map harvest/yield and physical movement concepts onto existing `batches`, `events`, `locations`, and `environments`; inspect the deployed schema/RPC permissions before changing SQL.
+3. Implement the smallest coherent workflow behind the existing UI and organization/RLS protections.
+4. Add migration replay and regression tests; keep all changes on this branch until verified.
+5. Only then open a pull request for review. Do not merge to `main` or apply database migrations automatically.
+
+## Licensing note
+
+The reference repository declares AGPL-3.0-or-later. This branch documents and adapts its concepts; it does not copy its application code or schema.
