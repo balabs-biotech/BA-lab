@@ -884,10 +884,10 @@
     "الطريقة"
   ],
   [
-    "Certaines cultures sont liées à plusieurs lots sélectionnés : les mesures/observations rattachées seulement à la culture et non à un événement de lot sont laissées de côté pour éviter une attribution ambiguë.",
-    "Some cultures are linked to multiple selected batches. Measurements or observations linked only to the culture, rather than a batch event, are omitted to avoid ambiguous attribution.",
-    "Algumas culturas estão associadas a vários lotes selecionados. As medições ou observações ligadas apenas à cultura, e não a um evento do lote, são omitidas para evitar uma atribuição ambígua.",
-    "ترتبط بعض المزارع بعدة دفعات محددة. تُستبعد القياسات أو الملاحظات المرتبطة بالمزرعة فقط، وليس بحدث دفعة، لتجنب الإسناد الملتبس."
+    "Certaines cultures sont liées à plusieurs lots de votre organisation : les mesures/observations rattachées seulement à la culture ou à un échantillon sont laissées de côté pour éviter une attribution ambiguë.",
+    "Some cultures are linked to multiple batches in your organization. Measurements or observations linked only to the culture or a sample are omitted to avoid ambiguous attribution.",
+    "Algumas culturas estão associadas a vários lotes da sua organização. As medições ou observações ligadas apenas à cultura ou a uma amostra são omitidas para evitar uma atribuição ambígua.",
+    "ترتبط بعض المزارع بعدة دفعات في مؤسستك. تُستبعد القياسات أو الملاحظات المرتبطة بالمزرعة أو العينة فقط لتجنب الإسناد الملتبس."
   ]
 ];
 for (const [fr, en, pt, ar] of supplementalCoverage) {
