@@ -1,3 +1,11 @@
+# Supabase Integration Audit — BA-Labs Batch Tracker
+
+**Updated**: 2026-10-22  
+**Scope**: Notion sync idempotence and data consistency  
+**Status**: Partial mitigation confirmed in versioned source; concurrent race remains.
+
+---
+
 ## 1. Notion Sync Idempotence — Updated Finding
 
 **Status: Partially mitigated; concurrent duplicate creation remains possible.**
