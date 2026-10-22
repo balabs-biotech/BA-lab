@@ -6225,17 +6225,44 @@ async function loadStatistics() {
   status.textContent = "Chargement des mesures depuis Supabase…"; chart.innerHTML = '<p class="muted">Chargement des données…</p>'; summary.innerHTML = ""; tbody.innerHTML = "";
   try {
     let batchEventIds = null;
+    let cultureEventIds = null;
     if (batchId) {
       const {data: batchEvents, error: batchEventsError} = await supabaseClient.from("events").select("id").eq("organization_id", organizationId).eq("batch_id", batchId);
       if (batchEventsError) throw new Error("Chargement des événements du lot impossible : " + batchEventsError.message);
       if (requestId !== statisticsRequestId) return;
       batchEventIds = (batchEvents || []).map(event => event.id);
     }
+    if (cultureId) {
+      const {data: cultureBatches, error: cultureBatchesError} = await supabaseClient.from("batches").select("id").eq("organization_id", organizationId).eq("culture_id", cultureId).limit(100);
+      if (cultureBatchesError) throw new Error("Chargement des lots liés à la culture impossible : " + cultureBatchesError.message);
+      if (requestId !== statisticsRequestId) return;
+      const cultureBatchIds = (cultureBatches || []).map(batch => batch.id);
+      const cultureEventQueries = [
+        supabaseClient.from("events").select("id").eq("organization_id", organizationId).eq("culture_id", cultureId)
+      ];
+      if (cultureBatchIds.length) {
+        cultureEventQueries.push(supabaseClient.from("events").select("id").eq("organization_id", organizationId).in("batch_id", cultureBatchIds));
+      }
+      const cultureEventResults = await Promise.all(cultureEventQueries);
+      if (requestId !== statisticsRequestId) return;
+      for (const result of cultureEventResults) {
+        if (result.error) throw new Error("Chargement des événements liés à la culture impossible : " + result.error.message);
+      }
+      cultureEventIds = [...new Set(cultureEventResults.flatMap(result => (result.data || []).map(event => event.id)))];
+    }
     let query = supabaseClient.from("measurements").select("id, variable_code, raw_value, raw_unit_code, normalized_value, normalized_unit_code, measured_at, method, culture_id, event_id, metadata").eq("organization_id", organizationId).eq("variable_code", variableCode).order("measured_at", {ascending:true}).limit(1000);
-    if (cultureId) query = query.eq("culture_id", cultureId);
-    if (batchId && batchEventIds.length) query = query.in("event_id", batchEventIds);
+    if (cultureId && batchId) {
+      const matchingEventIds = cultureEventIds.filter(id => batchEventIds.includes(id));
+      if (matchingEventIds.length) query = query.in("event_id", matchingEventIds);
+    } else if (cultureId) {
+      query = cultureEventIds.length
+        ? query.or("culture_id.eq." + cultureId + ",event_id.in.(" + cultureEventIds.join(",") + ")")
+        : query.eq("culture_id", cultureId);
+    } else if (batchId && batchEventIds.length) {
+      query = query.in("event_id", batchEventIds);
+    }
     if (period !== "all") { const since = new Date(); since.setDate(since.getDate() - Number(period)); query = query.gte("measured_at", since.toISOString()); }
-    const queryResult = batchId && !batchEventIds.length ? {data:[],error:null} : await query;
+    const queryResult = (batchId && !batchEventIds.length) || (cultureId && !cultureEventIds.length && batchId) ? {data:[],error:null} : await query;
     if (requestId !== statisticsRequestId) return;
     const {data,error} = queryResult; if (error) throw new Error(error.message);
     const rows = data || [], variable = measurementVariables.find(item => item.code === variableCode), cultureById = new Map(cultureOptions.map(culture => [culture.id,culture]));
