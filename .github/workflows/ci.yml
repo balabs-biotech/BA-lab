@@ -127,6 +127,8 @@ jobs:
         run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/protect_batch_workflow.test.sql
       - name: Test FK indexes and consent RLS migration on PostgreSQL 17
         run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/add_missing_fk_indexes_optimize_consent_rls.test.sql
+      - name: Test subscription write protection on PostgreSQL 17
+        run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/lock_subscription_writes.test.sql
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
