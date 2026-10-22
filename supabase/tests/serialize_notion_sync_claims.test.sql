@@ -31,23 +31,23 @@ begin
   select public.claim_notion_sync(org_id, v_culture_id, token_a) into result;
   if result is distinct from true then raise exception 'FAIL: first claim should succeed'; end if;
 
-  select public.claim_notion_sync(org_id, culture_id, token_b) into result;
+  select public.claim_notion_sync(org_id, v_culture_id, token_b) into result;
   if result is distinct from false then raise exception 'FAIL: concurrent second claim should be rejected'; end if;
 
   select public.release_notion_sync_claim(org_id, v_culture_id, token_b) into result;
   if result is distinct from false then raise exception 'FAIL: a different token must not release the active claim'; end if;
 
-  select public.release_notion_sync_claim(org_id, culture_id, token_a) into result;
+  select public.release_notion_sync_claim(org_id, v_culture_id, token_a) into result;
   if result is distinct from true then raise exception 'FAIL: owner token should release claim'; end if;
 
-  select public.claim_notion_sync(org_id, culture_id, token_b) into result;
+  select public.claim_notion_sync(org_id, v_culture_id, token_b) into result;
   if result is distinct from true then raise exception 'FAIL: claim should succeed after release'; end if;
 
   update private.notion_sync_claims
     set expires_at = clock_timestamp() - interval '1 second'
     where private.notion_sync_claims.culture_id = v_culture_id and private.notion_sync_claims.organization_id = org_id;
 
-  select public.claim_notion_sync(org_id, culture_id, token_a) into result;
+  select public.claim_notion_sync(org_id, v_culture_id, token_a) into result;
   if result is distinct from true then raise exception 'FAIL: expired claim should be recoverable'; end if;
 
   begin
