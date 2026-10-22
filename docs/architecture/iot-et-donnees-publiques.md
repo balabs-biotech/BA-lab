@@ -1,6 +1,6 @@
 # IoT et données publiques — architecture de raccordement
 
-**État vérifié le 22 octobre 2026.** Cette note décrit le raccordement à réaliser ; elle ne signifie pas que le firmware a été qualifié ni que des données sont publiées.
+**État vérifié le 22 octobre 2026.** Le registre IoT existe dans la base active, l’ingestion sécurisée est déployée et les tables d’export public sont en place. Aucun appareil n’est encore provisionné et aucun jeu public n’est publié. Le firmware ESP32 reste hors ligne et non qualifié sur matériel.
 
 ## 1. État existant
 
@@ -22,20 +22,19 @@ Le schéma comporte déjà :
 
 Les politiques RLS observées protègent les tables de mesures et d'événements par appartenance à l'organisation. En revanche, aucun flux public filtré de mesures n'a été identifié dans les vues publiques existantes. La table `commons_datasets` est lisible par les utilisateurs authentifiés, mais cela ne constitue pas en soi une publication publique de données scientifiques.
 
-## 2. Cible IoT minimale
+## 2. IoT — état de la première implémentation
 
-1. **Identité d'appareil dédiée** : registre des appareils avec organisation, environnement, type, statut activé/révoqué et identifiant public non secret. Aucun secret partagé dans le dépôt Git.
-2. **Entrée télémétrique dédiée** : Edge Function authentifiant chaque appareil avec un jeton distinct et révocable. Ne jamais exposer la clé `service_role` au firmware.
-3. **Validation côté serveur** : liste de variables autorisées, unités contrôlées, plages plausibles, taille de lot limitée, horodatage appareil conservé comme donnée déclarée et horodatage de réception généré par le serveur.
-4. **Idempotence** : chaque lecture possède un identifiant d'événement/mesure stable ; la répétition d'un envoi après une coupure réseau ne crée pas de doublons.
-5. **Traçabilité** : créer un événement contextualisé à l'environnement puis une ligne dans `measurements`, avec `variable_code`, valeur, unité, méthode, instrument, état qualité et métadonnées de diagnostic.
-6. **Mode déconnecté** : file locale bornée, reprise après reconnexion, aucun faux relevé si le capteur est absent ou invalide.
-7. **Séparation mesure/commande** : la télémétrie est d'abord en lecture seule. Les commandes distantes d'actionneurs sont un chantier séparé avec authentification, expiration, journal d'audit et sécurité matérielle indépendante.
+1. **Registre existant** : `iot_devices` lie l’appareil à une organisation et à un environnement. Le jeton est stocké sous forme de SHA-256 ; les empreintes sont uniques. Aucun appareil n’est encore enregistré.
+2. **Ingestion déployée** : Edge Function `iot-ingest`, version 1, avec authentification par jeton appareil distinct. La validation du jeton est interne à la fonction ; `verify_jwt=false` est nécessaire pour les ESP32, mais toute requête reste refusée sans jeton appareil valide. La clé `service_role` reste côté serveur.
+3. **Validation** : 1–20 lectures par paquet, corps limité à 32 kB, variables/unités autorisées, plages plausibles, dates contrôlées et réponses d’erreur génériques.
+4. **Idempotence transactionnelle** : `ingest_iot_payload` crée le reçu et toutes les mesures dans une seule transaction. Même identifiant + même empreinte = doublon ignoré ; même identifiant + charge différente = conflit HTTP 409.
+5. **Traçabilité** : `measurements` contient désormais `environment_id` et `iot_device_id`, ainsi que la valeur, l’unité, la méthode, l’instrument, l’état qualité `raw` et des métadonnées minimales.
+6. **Limites** : le firmware n’envoie toujours rien et ne possède pas de file hors ligne. La commande distante des relais n’est pas implémentée.
 
 ### Variables de départ
 Mapper les capteurs vers les codes existants : `temperature` (degC), `relative_humidity` (%), `substrate_moisture` (% selon la méthode réelle) et `co2_concentration` (ppm). Ajouter une variable seulement si le catalogue ne couvre réellement pas la mesure. L'humidité du sol issue d'un ADC doit être documentée comme estimation calibrée localement, pas comme teneur volumique absolue.
 
-## 3. Données publiques : ne jamais exposer directement les tables privées
+## 3. Données publiques — surface de publication en place
 
 La publication doit être une projection distincte, pas une ouverture de RLS sur `measurements`, `events`, `cultures` ou `environments`.
 
@@ -43,24 +42,24 @@ La publication doit être une projection distincte, pas une ouverture de RLS sur
 - **Consentement explicite et granulaire** : portée (lot, expérience, environnement ou jeu de données), version des conditions, profil de dé-identification, date d'accord et retrait.
 - **Minimisation** : supprimer les identifiants d'organisation/utilisateur, les noms internes, coordonnées précises, notes libres et métadonnées pouvant révéler une recette ou une localisation. Agréger les horodatages/localisations si nécessaire.
 - **Qualité visible** : distinguer données brutes, validées, exclues et données estimées ; exposer unités, méthode, instrument, calibration connue et limites.
-- **Publication versionnée** : `commons_datasets` doit décrire un jeu effectivement exporté (version, politique de source, date, licence, schéma, nombre de lignes et empreinte), pas seulement un catalogue nominal.
+- **Publication versionnée** : `commons_datasets` décrit les jeux et `public_dataset_records` stocke les lignes d’export assainies. Les deux sont lisibles par `anon`/`authenticated` uniquement lorsque le jeu parent a `status='published'`. Les clients ne disposent pas de droits d’écriture. La publication réelle reste à construire et aucun jeu n’est actuellement publié.
 - **Retrait opérant** : un retrait doit empêcher les exports futurs et entraîner le retrait des données contrôlées de la publication active ; préciser séparément ce qui a déjà été téléchargé par des tiers.
 - **Séparation des accès** : API publique limitée à des vues ou fichiers pré-calculés et assainis ; aucun accès anonyme direct aux tables de travail.
 
 ## 4. Ordre de réalisation et critères de validation
 
-### Étape A — contrat de données et sécurité
+### Étape A — terminée : contrat et sécurité de base
 - Définir le schéma d'identité des appareils et le format d'un paquet de télémétrie.
 - Vérifier les politiques RLS et les contraintes d'intégrité des tables de mesures/événements.
 - Définir la matrice de variables, unités, plages, fréquence et précision par capteur.
 - Définir le profil public et le cycle de vie du consentement.
 
-### Étape B — ingestion sans commande distante
+### Étape B — ingestion de base déployée ; essais encore requis
 - Ajouter registre/secret d'appareil et fonction d'ingestion authentifiée.
 - Ajouter déduplication et liaison des mesures à un environnement.
 - Garder le firmware hors ligne tant que le contrat n'est pas testé ; ne pas inventer de valeurs de capteur.
 
-### Étape C — publication contrôlée
+### Étape C — structure de publication en place ; pipeline encore requis
 - Construire un export public à partir des seuls scopes consentis et des données assainies.
 - Ajouter une prévisualisation avant publication, un historique des versions et une procédure de retrait.
 - Ne publier aucune donnée BA Labs réelle par défaut ; démarrer par un jeu de démonstration explicitement synthétique ou un jeu de test autorisé.
