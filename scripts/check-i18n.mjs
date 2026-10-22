@@ -60,7 +60,15 @@ const cases = [
   ["ar", "Ajouter une mesure à CULT-002", "إضافة قياس إلى CULT-002"],
   ["en", "Votre session a expiré.", "Your session has expired."],
   ["fr", "Démarrage : 2026-10-22", "Démarrage : 2026-10-22"],
-  ["en", "Untranslated runtime text", "Untranslated runtime text"]
+  ["en", "Untranslated runtime text", "Untranslated runtime text"],
+  ["en", "Suivi environnemental", "Environmental monitoring"],
+  ["pt", "Analyse agronomique", "Análise agronómica"],
+  ["ar", "Analyse mycologique", "التحليل الفطري"],
+  ["en", "Serre, substrats, irrigation, climat et croissance.", "Greenhouse, substrates, irrigation, climate, and growth."],
+  ["pt", "Souches", "Estirpes"],
+  ["ar", "Contamination", "التلوث"],
+  ["en", "supervision agronomique", "agronomic monitoring"],
+  ["pt", "LAB / EXPERIMENT TRACKING", "LAB / ACOMPANHAMENTO EXPERIMENTAL"]
 ];
 for (const [lang, input, expected] of cases) {
   const actual = translate(input, lang);
