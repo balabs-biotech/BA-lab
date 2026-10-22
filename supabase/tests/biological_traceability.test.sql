@@ -77,15 +77,15 @@ create policy events_org on public.events to authenticated using(private.is_org_
 select set_config('request.jwt.claim.sub','00000000-0000-0000-0000-0000000000b1',false);
 set role authenticated;
 do $$
-declare result jsonb; parent_id uuid; child_id uuid; child_material_id uuid; event_count integer; caught boolean;
+declare result jsonb; parent_id uuid; child_id uuid; v_child_material_id uuid; event_count integer; caught boolean;
 begin
   select id into parent_id from public.cultures where organization_id='00000000-0000-0000-0000-0000000000a1' and code='PARENT-001';
   result := public.record_biological_operation('00000000-0000-0000-0000-0000000000a1',parent_id,'division_aliquotes',now(),'test transaction','{"conditions":"agar 24C","outcome":"en_cours"}'::jsonb,array['CHILD-A','CHILD-B']);
   if jsonb_array_length(result->'children') <> 2 then raise exception 'FAIL: expected two descendants'; end if;
-  select id,material_id into child_id,child_material_id from public.cultures where organization_id='00000000-0000-0000-0000-0000000000a1' and code='CHILD-A';
+  select id,material_id into child_id,v_child_material_id from public.cultures where organization_id='00000000-0000-0000-0000-0000000000a1' and code='CHILD-A';
   if not exists(select 1 from public.cultures where organization_id='00000000-0000-0000-0000-0000000000a1' and code='CHILD-A' and parent_culture_id=parent_id) then raise exception 'FAIL: child culture lineage missing'; end if;
-  if not exists(select 1 from public.materials where organization_id='00000000-0000-0000-0000-0000000000a1' and id=child_material_id and parent_material_id=(select material_id from public.cultures where id=parent_id) and generation=1) then raise exception 'FAIL: child material lineage/generation missing'; end if;
-  if not exists(select 1 from public.material_relationships where organization_id='00000000-0000-0000-0000-0000000000a1' and child_material_id=child_material_id) then raise exception 'FAIL: material relationship missing'; end if;
+  if not exists(select 1 from public.materials where organization_id='00000000-0000-0000-0000-0000000000a1' and id=v_child_material_id and parent_material_id=(select material_id from public.cultures where id=parent_id) and generation=1) then raise exception 'FAIL: child material lineage/generation missing'; end if;
+  if not exists(select 1 from public.material_relationships where organization_id='00000000-0000-0000-0000-0000000000a1' and child_material_id=v_child_material_id) then raise exception 'FAIL: material relationship missing'; end if;
   select count(*) into event_count from public.events where organization_id='00000000-0000-0000-0000-0000000000a1' and culture_id in (parent_id, (select id from public.cultures where code='CHILD-A'), (select id from public.cultures where code='CHILD-B'));
   if event_count <> 3 then raise exception 'FAIL: expected operation event and two descendant events, got %',event_count; end if;
   caught := false;
