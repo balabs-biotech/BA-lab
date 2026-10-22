@@ -4792,9 +4792,7 @@ async function fetchComparisonRows(buildQuery) {
 }
 
 function comparisonDateInRange(value, fromDate, toDate) {
-  if (!value) return !fromDate && !toDate;
-  const day = new Date(value).toISOString().slice(0, 10);
-  return (!fromDate || day >= fromDate) && (!toDate || day <= toDate);
+  return BACompareAnalysis.dateInRange(value, fromDate, toDate);
 }
 
 function comparisonNumber(value) {
@@ -5086,8 +5084,10 @@ async function loadLotComparison() {
     groups.forEach(group => {
       group.points.forEach(point => {
         if (!point.measured_at) return;
-        const key = group.key + "::" + point.batchId + "::" + new Date(point.measured_at).toISOString().slice(0, 10);
-        if (!dailyGroups.has(key)) dailyGroups.set(key, { groupKey: group.key, batchId: point.batchId, date: new Date(point.measured_at).toISOString().slice(0, 10), values: [] });
+        const day = BACompareAnalysis.dateKey(point.measured_at);
+        if (!day) return;
+        const key = group.key + "::" + point.batchId + "::" + day;
+        if (!dailyGroups.has(key)) dailyGroups.set(key, { groupKey: group.key, batchId: point.batchId, date: day, values: [] });
         dailyGroups.get(key).values.push(point.value);
       });
     });
