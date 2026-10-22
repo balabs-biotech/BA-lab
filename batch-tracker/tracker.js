@@ -5021,11 +5021,15 @@ async function loadLotComparison() {
     });
     const groups = Array.from(groupsByKey.values()).sort((a, b) => a.label.localeCompare(b.label, "fr") || a.unit.localeCompare(b.unit, "fr"));
     const outlierByGroup = new Map();
-    const selectedBatchIdsForOutliers = selectedBatches.map(batch => batch.id);
-    groups.forEach(group => outlierByGroup.set(
-      group.key,
-      new Set(BACompareAnalysis.detectOutliersByBatch(group.points, selectedBatchIdsForOutliers))
-    ));
+    groups.forEach(group => {
+      const ids = new Set();
+      // Assess outliers within each lot so between-lot differences are not mislabeled as anomalies.
+      selectedBatches.forEach(batch => {
+        BACompareAnalysis.detectOutlierIds(group.points.filter(point => point.batchId === batch.id))
+          .forEach(id => ids.add(id));
+      });
+      outlierByGroup.set(group.key, ids);
+    });
 
     const allDates = assignedMeasurements.map(row => row.measured_at).concat(assignedObservations.map(row => row.observed_at)).filter(Boolean).sort();
     const periodLabel = allDates.length
