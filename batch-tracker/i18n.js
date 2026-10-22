@@ -43,6 +43,9 @@
       "Mesures liées à la culture": "Medições ligadas à cultura",
       "Dernière mesure": "Medição mais recente",
       "Aucune culture directement liée": "Nenhuma cultura diretamente associada",
+      "Sur mobile, utilisez la sélection multiple du navigateur.": "No telemóvel, utilize a seleção múltipla do navegador.",
+      "Un ou plusieurs lots ne sont plus dans la liste chargée. Actualisez la page.": "Um ou mais lotes já não estão na lista carregada. Atualize a página.",
+      "Comparaison chargée. Seules les mesures directement liées à la culture du lot sont comptées ; les données manquantes ne sont pas interprétées comme zéro.": "Comparação carregada. Só são contabilizadas medições diretamente ligadas à cultura do lote; dados em falta não são tratados como zero.",
       "Tous les univers":"Todos os espaços"
     },
     ar: {
@@ -63,6 +66,9 @@
       "Mesures liées à la culture": "القياسات المرتبطة بالمزرعة",
       "Dernière mesure": "أحدث قياس",
       "Aucune culture directement liée": "لا توجد مزرعة مرتبطة مباشرة",
+      "Sur mobile, utilisez la sélection multiple du navigateur.": "على الهاتف، استخدم أداة التحديد المتعدد في المتصفح.",
+      "Un ou plusieurs lots ne sont plus dans la liste chargée. Actualisez la page.": "لم تعد دفعة أو أكثر موجودة في القائمة المحمّلة. حدّث الصفحة.",
+      "Comparaison chargée. Seules les mesures directement liées à la culture du lot sont comptées ; les données manquantes ne sont pas interprétées comme zéro.": "اكتملت المقارنة. تُحتسب القياسات المرتبطة مباشرةً بمزرعة الدفعة فقط؛ ولا تُعامل البيانات المفقودة كأنها صفر.",
       "Tous les univers":"جميع المساحات"
     }
   };
