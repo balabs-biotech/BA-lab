@@ -119,6 +119,7 @@ Deno.serve(async (req: Request) => {
 
   let cultureIdForError = "";
   let organizationIdForError = "";
+  let heldLock: { cultureId: string; organizationId: string; token: string } | null = null;
   try {
     const { data: authData, error: authError } = await userClient.auth.getUser();
     if (authError || !authData.user) return json({ error: "Invalid session." }, 401);
@@ -137,6 +138,21 @@ Deno.serve(async (req: Request) => {
     if (accessError || !allowedCulture) return json({ error: "Culture not found or access denied." }, 404);
     cultureIdForError = allowedCulture.id;
     organizationIdForError = allowedCulture.organization_id;
+
+    // Only one Edge Function instance may reconcile/create a Notion page per culture.
+    // Authorization above is RLS-scoped and happens before this service-role RPC.
+    const lockToken = crypto.randomUUID();
+    const { data: lockAcquired, error: lockError } = await adminClient.rpc("claim_notion_sync_lock", {
+      p_organization_id: allowedCulture.organization_id,
+      p_culture_id: allowedCulture.id,
+      p_lock_token: lockToken,
+      p_lease_seconds: 300,
+    });
+    if (lockError) throw new Error("Could not claim Notion sync lock: " + lockError.message);
+    if (lockAcquired !== true) {
+      return json({ error: "A sync for this culture is already in progress. Retry shortly." }, 409);
+    }
+    heldLock = { cultureId: allowedCulture.id, organizationId: allowedCulture.organization_id, token: lockToken };
 
     const { data: culture, error: cultureError } = await adminClient
       .from("cultures")
@@ -286,5 +302,16 @@ Deno.serve(async (req: Request) => {
         .eq("organization_id", organizationIdForError);
     }
     return json({ error: message }, 502);
+  } finally {
+    // Token matching prevents an expired lease's former owner from releasing a newer lock.
+    if (heldLock) {
+      await adminClient.rpc("release_notion_sync_lock", {
+        p_organization_id: heldLock.organizationId,
+        p_culture_id: heldLock.cultureId,
+        p_lock_token: heldLock.token,
+      }).catch((releaseError: unknown) => {
+        console.error("sync-culture-to-notion: lock release failed", releaseError instanceof Error ? releaseError.message : "unknown error");
+      });
+    }
   }
 });

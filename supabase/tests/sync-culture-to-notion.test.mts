@@ -20,7 +20,8 @@ const OTHER_CULTURE = "21c7fbc8-b590-420b-87bf-3e2cd9ed4e49";
 type Json = Record<string, any>;
 let env: Record<string, string | undefined> = {};
 let db: { cultures: Json[]; visible: string[]; userOk: boolean; updateError?: string };
-let notion: (url: string, init: Json) => { status: number; body: Json };
+let notion: (url: string, init: Json) => { status: number; body: Json } | Promise<{ status: number; body: Json }>;
+let activeLock: { cultureId: string; organizationId: string; token: string } | null = null;
 let notionCalls: { url: string; method: string; body: Json | null }[] = [];
 let updates: { payload: Json; filters: Record<string, any> }[] = [];
 let queries: { table: string; filters: Record<string, any> }[] = [];
@@ -53,6 +54,23 @@ function builder(table: string, role: "user" | "admin") {
 (globalThis as any).__createClient = (_url: string, key: string) => ({
   auth: { getUser: async () => (db.userOk ? { data: { user: { id: "user-1" } }, error: null } : { data: { user: null }, error: { message: "bad" } }) },
   from: (table: string) => builder(table, key === "pub" ? "user" : "admin"),
+  rpc: async (fn: string, args: Json) => {
+    if (key !== "svc") return { data: null, error: { message: "service role required" } };
+    if (fn === "claim_notion_sync_lock") {
+      const row = db.cultures.find((c) => c.id === args.p_culture_id && c.organization_id === args.p_organization_id);
+      if (!row) return { data: null, error: { message: "culture not found for organization" } };
+      if (activeLock) return { data: false, error: null };
+      activeLock = { cultureId: args.p_culture_id, organizationId: args.p_organization_id, token: args.p_lock_token };
+      return { data: true, error: null };
+    }
+    if (fn === "release_notion_sync_lock") {
+      const owns = activeLock?.cultureId === args.p_culture_id &&
+        activeLock?.organizationId === args.p_organization_id && activeLock?.token === args.p_lock_token;
+      if (owns) activeLock = null;
+      return { data: Boolean(owns), error: null };
+    }
+    return { data: null, error: { message: "unknown RPC" } };
+  },
 });
 (globalThis as any).Deno = {
   env: { get: (k: string) => env[k] },
@@ -61,7 +79,7 @@ function builder(table: string, role: "user" | "admin") {
 (globalThis as any).fetch = async (url: string, init: Json = {}) => {
   const method = init.method ?? "GET";
   notionCalls.push({ url, method, body: init.body ? JSON.parse(init.body) : null });
-  const r = notion(url, init);
+  const r = await notion(url, init);
   return { ok: r.status >= 200 && r.status < 300, status: r.status, json: async () => r.body };
 };
 
@@ -87,7 +105,7 @@ function reset(overrides: { env?: Json; notion?: typeof notion; cultures?: Json[
     userOk: overrides.userOk ?? true,
   };
   notion = overrides.notion ?? (() => ({ status: 500, body: { message: "unexpected notion call" } }));
-  notionCalls = []; updates = []; queries = [];
+  notionCalls = []; updates = []; queries = []; activeLock = null;
 }
 
 async function call(body: Json | null = { culture_id: CULTURE }, headers: Record<string, string> = { Authorization: "Bearer jwt" }, method = "POST") {
@@ -211,6 +229,44 @@ await test("la lecture admin de la culture est filtrée par organization_id", as
   await call();
   const adminRead = queries.find((q) => q.table === "cultures" && q.filters.organization_id);
   ok(adminRead && adminRead.filters.organization_id === ORG, "admin read must filter on the organization of the caller");
+});
+await test("deux requêtes simultanées pour une culture : une seule entre dans la synchronisation", async () => {
+  let signalStarted: (() => void) | undefined;
+  let releaseQuery: (() => void) | undefined;
+  const queryStarted = new Promise<void>((resolve) => { signalStarted = resolve; });
+  const queryGate = new Promise<void>((resolve) => { releaseQuery = resolve; });
+  let created = false;
+  reset({
+    notion: async (url, init) => {
+      if (url.endsWith("/query")) {
+        if (!created) {
+          signalStarted?.();
+          await queryGate;
+          return { status: 200, body: { results: [] } };
+        }
+        return { status: 200, body: { results: [page("page-created", CULTURE)] } };
+      }
+      if (init.method === "POST") {
+        created = true;
+        return { status: 200, body: page("page-created", CULTURE) };
+      }
+      if (init.method === "PATCH") return { status: 200, body: page("page-created", CULTURE) };
+      return { status: 200, body: {} };
+    },
+  });
+  const firstPromise = call();
+  await queryStarted;
+  const second = await call();
+  eq(second.status, 409, "second request status while lock is held");
+  eq(creates().length, 0, "second request must not create a page");
+  releaseQuery?.();
+  const first = await firstPromise;
+  eq(first.status, 200, "first request status");
+  eq(creates().length, 1, "only one page created");
+  eq(activeLock, null, "lock released after first request");
+  const retry = await call();
+  eq(retry.status, 200, "retry status");
+  eq(creates().length, 1, "retry reconciles the created page instead of duplicating it");
 });
 await test("le jeton Notion n'apparaît dans aucune réponse ni message d'erreur", async () => {
   reset({ notion: (url) => url.endsWith("/query") ? { status: 503, body: { message: "unavailable" } } : { status: 200, body: {} } });
