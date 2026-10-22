@@ -1,0 +1,787 @@
+
+
+<a class="skip-link" href="#main">Aller au contenu principal</a>
+
+<main class="container" id="main" tabindex="-1">
+
+  <div class="app-toolbar">
+    <a class="toolbar-brand" href="#main" aria-label="BA Labs, début de page">
+      <span class="brand-symbol" aria-hidden="true"><svg viewBox="0 0 40 40"><path d="M20 4v9M20 27v9M4 20h9M27 20h9M8.7 8.7l6.4 6.4M24.9 24.9l6.4 6.4M31.3 8.7l-6.4 6.4M15.1 24.9l-6.4 6.4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="20" cy="20" r="8" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="20" cy="20" r="3" fill="currentColor"/></svg></span>
+      <span class="brand-wordmark"><strong>BA LABS</strong><small>LAB OPERATIONS</small></span>
+    </a>
+    <div class="toolbar-divider" aria-hidden="true"></div>
+    <nav class="section-nav" aria-label="Navigation des modules">
+      <a href="#overviewCard"><span class="nav-number">01</span> Vue générale</a>
+      <a href="#trackerCard"><span class="nav-number">02</span> Cultures</a>
+      <a href="#batchCard"><span class="nav-number">03</span> Lots</a>
+      <a href="#measurementCard"><span class="nav-number">04</span> Données</a>
+      <a href="#statisticsCard"><span class="nav-number">05</span> Statistiques</a>
+    </nav>
+    <div class="toolbar-status"><span class="status-pulse" aria-hidden="true"></span><span>ESPACE DE TRAÇABILITÉ</span></div>
+  </div>
+
+  <a class="universe-home-link" href="../../" aria-label="Retour au choix des univers">← Tous les univers</a><header class="app-hero">
+    <div class="hero-copy">
+      <div class="eyebrow"><span class="eyebrow-dot" aria-hidden="true"></span> BA LABS <span class="eyebrow-separator">/</span> LABORATOIRE & PRODUCTION</div>
+      <h1>Culture <span>&amp;</span><br>traçabilité biologique</h1>
+      <p class="hero-description">
+        Du suivi des cultures à la libération des lots : un espace unique pour documenter,
+        piloter et contrôler chaque étape.
+      </p>
+      <div class="hero-tags" aria-label="Fonctions de l’application">
+        <span><span aria-hidden="true">✳</span> Cultures</span>
+        <span><span aria-hidden="true">↗</span> Lots de production</span>
+        <span><span aria-hidden="true">✓</span> Contrôle qualité</span>
+      </div>
+    </div>
+    <div class="hero-art" aria-hidden="true">
+      <div class="hero-orbit orbit-one"></div>
+      <div class="hero-orbit orbit-two"></div>
+      <div class="hero-core">
+        <svg viewBox="0 0 120 120" role="presentation">
+          <path d="M60 18v20M60 82v20M18 60h20M82 60h20M30 30l14 14M76 76l14 14M90 30 76 44M44 76 30 90" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+          <circle cx="60" cy="60" r="25" fill="none" stroke="currentColor" stroke-width="2.5"/>
+          <circle cx="60" cy="60" r="12" fill="currentColor" opacity=".22"/>
+          <circle cx="60" cy="60" r="5" fill="currentColor"/>
+          <circle cx="60" cy="18" r="4" fill="#d6a85c"/><circle cx="102" cy="60" r="4" fill="#d6a85c"/>
+          <circle cx="60" cy="102" r="4" fill="#d6a85c"/><circle cx="18" cy="60" r="4" fill="#d6a85c"/>
+        </svg>
+      </div>
+      <div class="hero-note"><span class="hero-note-mark"></span><span><strong>BA LABS</strong><small>Applied biotechnology</small></span></div>
+    </div>
+  </header>
+
+  <section class="card hidden workspace-inactive" id="overviewCard" aria-labelledby="overviewTitle">
+    <div class="section-kicker"><span>ESPACE EXPÉRIMENTAL</span><span class="kicker-line"></span><span>ÉTAT DES DONNÉES</span></div>
+    <div class="overview-heading">
+      <div><h2 id="overviewTitle">Vue générale</h2><p class="muted">Aperçu des enregistrements chargés depuis Supabase. Les compteurs reflètent les limites de chargement actuelles, pas nécessairement le total de la base.</p></div>
+      <span class="overview-live"><span aria-hidden="true"></span> Session connectée</span>
+    </div>
+    <div class="overview-metrics" aria-label="Compteurs de données chargées">
+      <article class="overview-metric"><span class="overview-metric-label">Cultures chargées</span><strong id="overviewCultureCount">—</strong><span class="overview-metric-note">Limite actuelle : 100</span></article>
+      <article class="overview-metric"><span class="overview-metric-label">Lots récents</span><strong id="overviewBatchCount">—</strong><span class="overview-metric-note">Limite actuelle : 30</span></article>
+      <article class="overview-metric"><span class="overview-metric-label">Observations récentes</span><strong id="overviewObservationCount">—</strong><span class="overview-metric-note">Limite actuelle : 8</span></article>
+    </div>
+    <div class="overview-lower">
+      <section class="overview-activity" aria-labelledby="overviewActivityTitle">
+        <div class="overview-section-heading"><h3 id="overviewActivityTitle">Dernières observations chargées</h3><button class="secondary-button small-button" id="overviewOpenData" type="button">Ouvrir les données</button></div>
+        <div id="overviewRecentObservations" class="overview-observations"><p class="muted">Connectez-vous pour charger les données de l’organisation.</p></div>
+      </section>
+      <aside class="overview-shortcuts" aria-label="Accès rapides">
+        <h3>Accès rapides</h3>
+        <button type="button" class="overview-shortcut" data-workspace-target="trackerCard"><span class="shortcut-index">01</span><span><strong>Créer une culture</strong><small>Identité et génération</small></span><span aria-hidden="true">↗</span></button>
+        <button type="button" class="overview-shortcut" data-workspace-target="batchCard"><span class="shortcut-index">02</span><span><strong>Consulter les lots</strong><small>Étapes et traçabilité</small></span><span aria-hidden="true">↗</span></button>
+        <button type="button" class="overview-shortcut" data-workspace-target="measurementCard"><span class="shortcut-index">03</span><span><strong>Saisir une donnée</strong><small>Mesure ou observation</small></span><span aria-hidden="true">↗</span></button>
+      </aside>
+    </div>
+    <p class="overview-footnote">Cette vue ne calcule pas encore de statistiques analytiques. Toute analyse doit sélectionner une variable, une unité, une période et des lots comparables.</p>
+  </section>
+
+  <!-- ======================================================
+       MESSAGES
+       ====================================================== -->
+
+  <div id="message" aria-live="polite" aria-atomic="true"></div>
+
+
+  <!-- ======================================================
+       AUTHENTIFICATION
+       ====================================================== -->
+
+  <section class="card" id="authCard">
+
+    <div class="section-kicker"><span>MODULE 01</span><span class="kicker-line"></span><span>IDENTITÉ &amp; SESSION</span></div>
+    <h2>Accès BA Labs</h2>
+
+    <div class="muted">
+      Connectez-vous avec le compte BA Labs.
+      Le rattachement à l'organisation BA-LABS est effectué
+      automatiquement après authentification.
+    </div>
+
+    <label for="authEmail">
+      Email
+    </label>
+
+    <input id="authEmail" type="email" required inputmode="email" aria-describedby="authStatus"
+      autocomplete="email"
+      value="ba.labs.redev@gmail.com"
+    >
+
+    <label for="authPassword">
+      Mot de passe
+    </label>
+
+    <input id="authPassword" type="password" required aria-describedby="authStatus"
+      autocomplete="current-password"
+      placeholder="Mot de passe"
+    >
+
+    <div class="auth-actions">
+
+      <button
+        id="signInButton"
+        type="button"
+      >
+        Se connecter
+      </button>
+
+      <button
+        id="signUpButton"
+        type="button"
+      >
+        Créer le compte
+      </button>
+
+    </div>
+
+    <div
+      id="authStatus"
+      class="info muted"
+      role="status"
+      aria-live="polite"
+    >
+      Vérification de la session...
+    </div>
+
+    <button
+      id="signOutButton"
+      type="button"
+      class="hidden"
+    >
+      Se déconnecter
+    </button>
+
+  </section>
+
+
+  <!-- ======================================================
+       CULTURE TRACKER
+       ====================================================== -->
+
+  <section
+    class="card hidden"
+    id="trackerCard"
+  >
+
+    <div class="section-kicker"><span>MODULE 02</span><span class="kicker-line"></span><span>RESSOURCES BIOLOGIQUES</span></div>
+    <div class="entry-intro"><span class="entry-step-mark">01 / IDENTITÉ</span><h2>Nouvelle culture</h2><p class="muted">On commence par identifier la ressource. Les champs suivants apparaissent quand les informations de base sont renseignées.</p></div>
+    <div class="guided-entry-step" data-entry-step="1">
+
+    <label for="strain">
+      Souche / ressource biologique<span class="req" aria-hidden="true"> *</span>
+    </label>
+
+    <select id="strain" aria-required="true">
+
+      <option value="">
+        Chargement...
+      </option>
+
+    </select>
+
+
+    <div
+      id="strainInfo"
+      class="info muted"
+    >
+      Sélectionnez une souche.
+    </div>
+
+
+    <label for="cultureCode">
+      Code de culture<span class="req" aria-hidden="true"> *</span>
+    </label>
+
+    <input id="cultureCode" aria-required="true"
+      type="text"
+      placeholder="Ex. CULT-PO-P80-001"
+      aria-describedby="cultureCodeHint"
+    >
+    <span class="hint" id="cultureCodeHint">Identifiant unique de la culture, utilisé aussi dans Notion.</span>
+    </div>
+
+    <div class="guided-entry-step is-locked" data-entry-step="2" hidden>
+      <div class="entry-step-mark">02 / CONDITIONS</div>
+    <div class="grid">
+
+      <div>
+
+        <label for="cultureType">
+          Type de culture
+        </label>
+
+        <select id="cultureType">
+
+          <option value="">
+            Chargement...
+          </option>
+
+        </select>
+
+      </div>
+
+
+      <div>
+
+        <label for="protocol">
+          Protocole
+        </label>
+
+        <select id="protocol">
+
+          <option value="">
+            Aucun protocole
+          </option>
+
+        </select>
+
+      </div>
+
+    </div>
+
+
+    <label for="startedAt">
+      Date de démarrage
+    </label>
+
+    <input
+      id="startedAt"
+      type="datetime-local"
+    >
+    </div>
+
+    <div class="guided-entry-step is-locked" data-entry-step="3" hidden>
+      <div class="entry-step-mark">03 / VALIDATION</div>
+    <div
+      id="generationInfo"
+      class="info"
+    >
+      Génération : —
+    </div>
+
+    <div class="consent-panel">
+      <strong>Conditions d’utilisation et traitement des données</strong>
+      <p>
+        Les informations saisies dans BatchTracker sont enregistrées dans la base de données
+        BA Labs afin d’assurer la traçabilité des cultures, des générations et des lots.
+        L’accès à l’application nécessite l’acceptation des conditions d’utilisation.
+      </p>
+      <p>
+        La réutilisation de données pour des analyses statistiques ou des travaux de recherche
+        en mycologie, microbiologie et biologie végétale est facultative. Elle n’est pas
+        nécessaire pour créer une culture. Les données utilisées à cette fin doivent être
+        limitées à ce qui est nécessaire et, lorsque cela est possible, analysées sous une
+        forme agrégée ou dé-identifiée.
+      </p>
+      <p>
+        <a href="https://app.notion.com/p/3f473152f17181d3a52bd679904b568f" target="_blank" rel="noopener noreferrer">
+          Lire les conditions d’utilisation complètes
+        </a>
+      </p>
+
+      <div class="consent-option">
+        <input id="termsAccepted" type="checkbox" required>
+        <label for="termsAccepted">
+          J’ai lu et j’accepte les conditions d’utilisation de BA Labs BatchTracker.
+          <strong>Obligatoire pour créer une culture.</strong>
+        </label>
+      </div>
+
+      <div class="consent-option">
+        <input id="researchStatisticsConsent" type="checkbox">
+        <label for="researchStatisticsConsent">
+          J’accepte séparément que mes données de culture puissent être réutilisées à des
+          fins statistiques et de recherche en mycologie, microbiologie et biologie végétale.
+          Ce choix est facultatif et peut être refusé sans bloquer l’utilisation de BatchTracker.
+        </label>
+      </div>
+      <div class="muted">
+        Version des conditions : 2026-10-09-v1. Le choix statistique est enregistré séparément
+        de l’acceptation des conditions d’utilisation.
+      </div>
+    </div>
+    </div>
+
+    <button
+      id="createButton"
+      type="button"
+    >
+      Créer la culture
+    </button>
+
+    <div class="sync-line">
+      <span id="syncStatus" class="muted" role="status" aria-live="polite">Synchronisation Notion : en attente de connexion.</span>
+      <button id="retrySyncButton" type="button" class="secondary-button small-button hidden">Réessayer la synchronisation Notion</button>
+    </div>
+
+    <section class="culture-catalog" aria-labelledby="cultureCatalogTitle">
+      <div class="culture-catalog-heading">
+        <div><h3 id="cultureCatalogTitle">Cultures enregistrées</h3><p class="muted">Cultures accessibles dans le chargement courant. Sélectionnez une culture pour préparer une nouvelle mesure ou observation.</p></div>
+        <span id="cultureCatalogCount" class="culture-catalog-count">0</span>
+      </div>
+      <div class="culture-catalog-filters">
+        <div><label for="cultureSearch">Rechercher</label><input id="cultureSearch" type="search" placeholder="Code ou type de culture" autocomplete="off"></div>
+        <div><label for="cultureTypeFilter">Type de culture</label><select id="cultureTypeFilter"><option value="">Tous les types</option></select></div>
+      </div>
+      <div id="cultureCatalogList" class="culture-catalog-list" aria-live="polite"><p class="muted">Connectez-vous pour charger les cultures.</p></div>
+      <section id="cultureDetailPanel" class="culture-detail hidden" aria-labelledby="cultureDetailTitle">
+        <div class="culture-detail-heading"><div><span class="section-kicker-label">FICHE EXPÉRIMENTALE</span><h3 id="cultureDetailTitle">Culture</h3><p id="cultureDetailMeta" class="muted"></p></div><button id="closeCultureDetail" type="button" class="secondary-button small-button">Fermer la fiche</button></div>
+        <div class="culture-detail-summary" id="cultureDetailSummary"></div>
+<section class="bio-operation-panel" aria-labelledby="bioOperationTitle">
+<h4 id="bioOperationTitle">Tracer une opération biologique</h4>
+<p class="muted">Enregistrez l’opération sur la culture source. Pour un repiquage, un passage ou une division, ajoutez les codes des descendants : leurs fiches et liens de filiation seront créés ensemble.</p>
+<form id="bioOperationForm" class="bio-operation-form">
+<div><label for="bioOperationType">Opération</label><select id="bioOperationType" required>
+<option value="repiquage">Repiquage</option><option value="passage">Passage</option><option value="transfert">Transfert</option><option value="division_aliquotes">Division en aliquotes</option><option value="changement_milieu">Changement de milieu</option><option value="contamination_suspectee">Contamination suspectée</option><option value="conservation">Conservation</option><option value="resultat_final">Résultat final</option><option value="autre_operation">Autre opération</option>
+</select></div>
+<div><label for="bioOperationDate">Date et heure</label><input id="bioOperationDate" type="datetime-local" required></div>
+<div class="bio-operation-wide"><label for="bioChildCodes">Codes des descendants (facultatif)</label><input id="bioChildCodes" type="text" placeholder="Ex. PO-P80-G2-A, PO-P80-G2-B"><small>Un code par virgule. Pour une division en aliquotes, indiquez un code par aliquote.</small></div>
+<div><label for="bioOperationConditions">Milieu / conditions / quantité</label><input id="bioOperationConditions" type="text" placeholder="Ex. PDA, 24 °C, 3 aliquotes, durée…"></div>
+<div><label for="bioOperationOutcome">État / résultat observé</label><select id="bioOperationOutcome"><option value="">Non renseigné</option><option value="en_cours">En cours</option><option value="conforme">Conforme</option><option value="resultat_positif">Résultat positif</option><option value="resultat_negatif">Résultat négatif</option><option value="contamination_suspectee">Contamination suspectée</option><option value="contamination_confirmee">Contamination confirmée</option><option value="conserve">Matériel conservé</option><option value="termine">Terminé</option><option value="arrete">Arrêté / exclu</option></select></div>
+<div class="bio-operation-wide"><label for="bioOperationNote">Compte rendu / observations</label><textarea id="bioOperationNote" rows="2" placeholder="Observations, anomalies, décision et justification…"></textarea></div>
+<div class="bio-operation-wide"><button id="saveBioOperation" type="submit">Enregistrer l’opération</button><p id="bioOperationMessage" class="muted" aria-live="polite"></p></div>
+</form></section>
+<section class="bio-lineage-panel" aria-labelledby="bioLineageTitle"><h4 id="bioLineageTitle">Filiation biologique</h4><div id="cultureLineage" class="culture-lineage"><p class="muted">Chargement de la filiation…</p></div></section>
+<h4>Chronologie complète</h4>
+        <div id="cultureDetailTimeline" class="culture-detail-timeline"><p class="muted">Sélectionnez une culture pour charger son historique.</p></div>
+      </section>
+    </section>
+
+  </section>
+
+
+  <!-- ======================================================
+       BATCH TRACKER
+       ====================================================== -->
+
+  <section
+    class="card hidden"
+    id="batchCard"
+  >
+
+    <div class="section-kicker"><span>MODULE 03</span><span class="kicker-line"></span><span>PRODUCTION &amp; QUALITÉ</span></div>
+    <h2>Batch Tracker</h2>
+
+    <div class="muted">
+      Création et suivi du cycle complet :
+      préparation → stérilisation → inoculation →
+      incubation → cultivation → récolte →
+      formulation → packaging → QC → libération.
+    </div>
+
+
+    <h3>Nouveau batch</h3>
+
+
+    <div class="grid">
+
+      <div>
+
+        <label for="batchCode">
+      Code du batch<span class="req" aria-hidden="true"> *</span>
+    </label>
+
+        <input id="batchCode" aria-required="true"
+          type="text"
+          placeholder="Ex. BATCH-PO-P80-001"
+        >
+
+      </div>
+
+
+      <div>
+
+        <label for="batchName">
+      Nom du batch<span class="req" aria-hidden="true"> *</span>
+    </label>
+
+        <input id="batchName" aria-required="true"
+          type="text"
+          placeholder="Ex. Grain P80 G1"
+        >
+
+      </div>
+
+    </div>
+
+
+    <div class="grid">
+
+      <div>
+
+        <label for="batchType">
+          Type de batch
+        </label>
+
+        <select id="batchType">
+
+          <option value="Biologique">
+            Biologique
+          </option>
+
+          <option value="Milieu">
+            Milieu
+          </option>
+
+          <option value="Substrat">
+            Substrat
+          </option>
+
+          <option value="Grain">
+            Grain
+          </option>
+
+          <option value="SMS">
+            SMS
+          </option>
+
+          <option value="Inoculum">
+            Inoculum
+          </option>
+
+          <option value="Préparation biologique">
+            Préparation biologique
+          </option>
+
+          <option value="Autre">
+            Autre
+          </option>
+
+        </select>
+
+      </div>
+
+
+      <div>
+
+        <label for="batchCulture">
+      Culture source<span class="req" aria-hidden="true"> *</span>
+    </label>
+
+        <select id="batchCulture" aria-required="true">
+
+          <option value="">
+            Chargement...
+          </option>
+
+        </select>
+
+      </div>
+
+    </div>
+
+
+    <div class="grid">
+
+      <div>
+
+        <label for="batchQuantity">
+          Quantité prévue
+        </label>
+
+        <input
+          id="batchQuantity"
+          type="number"
+          min="0"
+          step="any"
+          placeholder="Ex. 10"
+        >
+
+      </div>
+
+
+      <div>
+
+        <label for="batchUnit">
+          Unité
+        </label>
+
+        <input
+          id="batchUnit"
+          type="text"
+          placeholder="kg, L, unités..."
+        >
+
+      </div>
+
+    </div>
+
+
+    <button
+      id="createBatchButton"
+      type="button"
+    >
+      Créer le batch
+    </button>
+
+
+    <h3>Batchs existants</h3>
+
+    <div
+      id="batchList"
+      class="batch-list"
+    >
+      Chargement...
+    </div>
+
+
+    <div
+      id="batchInfo"
+      class="info hidden"
+    ></div>
+
+
+    <div
+      id="batchStages"
+      class="hidden"
+    >
+
+      <h3>Étapes du batch</h3>
+
+      <div class="progress" id="stageProgress">
+        <div class="progress-label" id="stageProgressLabel"></div>
+        <div class="progress-track" id="stageProgressTrack" role="progressbar" aria-labelledby="stageProgressLabel" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+          <div class="progress-bar" id="stageProgressBar"></div>
+        </div>
+      </div>
+
+      <div
+        id="batchStageList"
+        class="stage-list"
+        role="list"
+        aria-label="Étapes du batch"
+      ></div>
+
+      <div class="batch-actions">
+
+        <button
+          id="advanceBatchButton"
+          type="button"
+        >
+          Passer à l'étape suivante
+        </button>
+
+        <button
+          id="reloadBatchButton"
+          type="button"
+          class="secondary-button"
+        >
+          Actualiser
+        </button>
+
+      </div>
+
+    </div>
+
+
+    <div
+      id="batchQc"
+      class="hidden"
+    >
+
+      <h3>Contrôle qualité</h3>
+
+      <div class="muted">
+        Tous les contrôles obligatoires doivent être
+        validés ou explicitement déclarés comme dérogés
+        avant la libération du batch.
+      </div>
+
+      <div
+        id="batchQcList"
+        class="qc-list"
+      ></div>
+
+    </div>
+
+
+    <button
+      id="releaseBatchButton"
+      type="button"
+      class="hidden"
+    >
+      Libérer le batch
+    </button>
+
+  </section>
+
+
+  <section class="card workspace-inactive" id="statisticsCard" aria-labelledby="statisticsTitle">
+    <div class="section-kicker"><span>MODULE 05</span><span class="kicker-line"></span><span>ANALYSE DES DONNÉES</span></div>
+    <h2 id="statisticsTitle">Statistiques expérimentales</h2>
+    <p class="muted">Explorez les mesures numériques réellement enregistrées. Les observations qualitatives ne sont pas converties en valeurs numériques. Les comparaisons sont limitées aux unités compatibles.</p>
+    <div class="statistics-filters">
+      <div><label for="statisticsVariable">Variable mesurée</label><select id="statisticsVariable"><option value="">Sélectionner une variable…</option></select></div>
+      <div><label for="statisticsCulture">Culture</label><select id="statisticsCulture"><option value="">Toutes les cultures accessibles</option></select></div>
+      <div><label for="statisticsBatch">Lot (30 plus récents)</label><select id="statisticsBatch"><option value="">Tous les lots récents (30 max.)</option></select></div>
+      <div><label for="statisticsPeriod">Période</label><select id="statisticsPeriod"><option value="all">Toutes les dates disponibles</option><option value="30">30 derniers jours</option><option value="90">90 derniers jours</option><option value="365">12 derniers mois</option></select></div>
+      <div class="statistics-filter-action"><button id="loadStatisticsButton" type="button">Analyser les données</button></div>
+    </div>
+    <p id="statisticsStatus" class="muted" role="status" aria-live="polite">Choisissez une variable pour commencer l’analyse.</p>
+    <div id="statisticsSummary" class="statistics-summary"></div>
+    <div id="statisticsChart" class="statistics-chart"><p class="muted">Le graphique apparaîtra lorsque des mesures numériques compatibles seront disponibles.</p></div>
+    <div class="statistics-table-wrap"><table class="statistics-table"><caption>Données brutes utilisées</caption><thead><tr><th>Date</th><th>Culture</th><th>Valeur</th><th>Unité</th><th>Méthode</th></tr></thead><tbody id="statisticsRows"><tr><td colspan="5">Aucune analyse exécutée.</td></tr></tbody></table></div>
+    <p class="statistics-footnote">Les résultats sont descriptifs. Aucune moyenne ni inférence statistique n’est calculée. Les mesures hors unité comparable sont exclues du graphique et restent visibles dans les données brutes.</p>
+  </section>
+
+  <!-- ======================================================
+       RESULTAT
+       ====================================================== -->
+
+
+
+  <section
+    class="card hidden"
+    id="measurementCard"
+    aria-labelledby="measurementTitle"
+  >
+    <div class="section-kicker"><span>MODULE 04</span><span class="kicker-line"></span><span>DONNÉES EXPÉRIMENTALES</span></div>
+    <h2 id="measurementTitle">Mesures &amp; observations instrumentales</h2>
+    <p class="muted">Enregistrez une mesure numérique avec son unité, son horodatage et sa méthode. Les mesures de lot sont reliées à la traçabilité par un événement, sans ajouter de table parallèle.</p>
+
+    <div class="quick-capture" aria-label="Saisie rapide">
+      <div class="quick-capture-heading"><div><span class="context-eyebrow">SAISIE EXPRESS</span><h3>Qu’est-ce que tu veux noter ?</h3><p>Un clic prépare la fiche. Choisis ensuite la culture et complète seulement ce qui manque.</p></div><span class="quick-capture-spark" aria-hidden="true">✳</span></div>
+      <div class="quick-capture-grid">
+        <button type="button" class="quick-capture-tile" data-quick-measure="ph"><span class="quick-capture-icon">pH</span><span><strong>Acidité</strong><small>Mesurer le pH</small></span><span class="quick-capture-arrow">↗</span></button>
+        <button type="button" class="quick-capture-tile" data-quick-measure="temperature"><span class="quick-capture-icon">°C</span><span><strong>Température</strong><small>Air, substrat, milieu…</small></span><span class="quick-capture-arrow">↗</span></button>
+        <button type="button" class="quick-capture-tile" data-quick-measure="ec"><span class="quick-capture-icon">EC</span><span><strong>Conductivité</strong><small>Suivi de la solution</small></span><span class="quick-capture-arrow">↗</span></button>
+        <button type="button" class="quick-capture-tile quick-capture-observation" data-quick-observation><span class="quick-capture-icon">◎</span><span><strong>Observation visuelle</strong><small>Aspect, croissance, anomalie…</small></span><span class="quick-capture-arrow">↗</span></button>
+      </div>
+      <p class="quick-capture-tip"><span aria-hidden="true">↳</span> Astuce : la culture ou le lot choisi est conservé pendant la saisie des mesures et observations.</p>
+    </div>
+
+    <div class="grid">
+      <div>
+        <label for="measurementTarget">Culture ou lot</label>
+        <select id="measurementTarget" required>
+          <option value="">Chargement des cibles…</option>
+        </select>
+      </div>
+      <div>
+        <label for="measurementVariable">Paramètre mesuré</label>
+        <select id="measurementVariable" required>
+          <option value="">Chargement des paramètres…</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div>
+        <label for="measurementValue">Valeur</label>
+        <input id="measurementValue" type="number" step="any" inputmode="decimal" placeholder="Ex. 6.5" required>
+      </div>
+      <div>
+        <label for="measurementUnit">Unité de la mesure</label>
+        <select id="measurementUnit" required>
+          <option value="">Sélectionner une unité…</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div>
+        <label for="measurementAt">Date et heure</label>
+        <input id="measurementAt" type="datetime-local" required>
+      </div>
+      <div>
+        <label for="measurementInstrument">Instrument / capteur</label>
+        <input id="measurementInstrument" type="text" maxlength="160" placeholder="Ex. pH-mètre, ESP32, sonde">
+      </div>
+    </div>
+
+    <label for="measurementMethod">Méthode / protocole de mesure</label>
+    <input id="measurementMethod" type="text" maxlength="240" placeholder="Ex. mesure directe, extrait 1:5, moyenne sur 5 min">
+
+    <label for="measurementNote">Note de terrain (facultatif)</label>
+    <textarea id="measurementNote" rows="2" maxlength="1200" placeholder="Conditions, emplacement de la sonde, observations utiles…"></textarea>
+
+    <button id="saveMeasurementButton" type="button">Enregistrer la mesure</button>
+    <div class="context-divider"></div>
+    <div class="row measurement-history-heading">
+      <div>
+        <div class="context-eyebrow">HISTORIQUE RÉCENT</div>
+        <h3>Dernières mesures</h3>
+      </div>
+      <button id="reloadMeasurementsButton" type="button" class="secondary">Actualiser</button>
+    </div>
+    <div id="measurementHistory" class="measurement-history" aria-live="polite">
+      <p class="muted">Les mesures apparaîtront ici après connexion.</p>
+    </div>
+    <details class="observation-details">
+      <summary>Ajouter une observation qualitative</summary>
+      <p class="muted">Décrivez une morphologie, une contamination suspectée, un comportement végétal, une odeur, une texture ou tout autre constat. L’observation est horodatée et reliée à la culture ou au lot choisi ci-dessus.</p>
+      <div class="grid">
+        <div>
+          <label for="observationVariable">Catégorie / variable</label>
+          <select id="observationVariable" required><option value="">Chargement des paramètres…</option></select>
+        </div>
+        <div>
+          <label for="observationAt">Date et heure</label>
+          <input id="observationAt" type="datetime-local" required>
+        </div>
+      </div>
+      <label for="observationValue">Observation</label>
+      <textarea id="observationValue" rows="3" maxlength="4000" placeholder="Décrivez ce qui a été observé, sans confondre constat et interprétation…" required></textarea>
+      <div class="grid">
+        <div>
+          <label for="observationMethod">Méthode (facultatif)</label>
+          <input id="observationMethod" type="text" maxlength="240" placeholder="Ex. inspection visuelle standardisée">
+        </div>
+        <div>
+          <label for="observationInstrument">Instrument (facultatif)</label>
+          <input id="observationInstrument" type="text" maxlength="160" placeholder="Ex. loupe, appareil photo">
+        </div>
+      </div>
+      <label for="observationNote">Contexte / note (facultatif)</label>
+      <input id="observationNote" type="text" maxlength="1200" placeholder="Emplacement, conditions, incertitude…">
+      <button id="saveObservationButton" type="button">Enregistrer l’observation</button>
+      <div class="context-divider"></div>
+      <div class="context-eyebrow">OBSERVATIONS RÉCENTES</div>
+      <div id="observationHistory" class="measurement-history" aria-live="polite"><p class="muted">Les observations apparaîtront ici après connexion.</p></div>
+    </details>
+  </section>
+
+  <aside id="contextPanel" aria-label="Modèle de traçabilité et axes de collecte">
+    <div class="context-eyebrow">MODÈLE DE DONNÉES</div>
+    <h2 class="context-title">Une seule chaîne de traçabilité</h2>
+    <p class="context-copy">Le même modèle doit suivre une culture végétale, fongique ou microbienne, sans imposer une méthode biologique unique.</p>
+    <ol class="data-flow">
+      <li><span>01</span>Ressource biologique</li>
+      <li><span>02</span>Culture / génération</li>
+      <li><span>03</span>Lot de production</li>
+      <li><span>04</span>Étapes et événements</li>
+      <li><span>05</span>Contrôles qualité</li>
+      <li><span>06</span>Mesures et résultats</li>
+    </ol>
+    <div class="context-divider"></div>
+    <div class="context-eyebrow">AXES DE COLLECTE À UNIFIER</div>
+    <div class="metric-chips" aria-label="Exemples de paramètres à structurer">
+      <span>Température</span><span>pH</span><span>EC</span><span>Humidité</span><span>CO₂</span><span>Lumière</span><span>Substrat / milieu</span><span>Observations</span>
+    </div>
+    <p class="context-note">Ces paramètres représentent le modèle de collecte à construire autour des mesures, observations et événements. Leur présence ici ne signifie pas qu’ils sont tous déjà enregistrés automatiquement.</p>
+    <div class="context-divider"></div>
+    <div class="context-eyebrow">PRINCIPE D’ARCHITECTURE</div>
+    <p class="context-copy">Supabase conserve les données structurées. L’interface sert à saisir et consulter les opérations ; Notion reste la couche documentaire et de diffusion.</p>
+  </aside>
+
+  <section
+    class="card hidden"
+    id="resultCard"
+  >
+
+    <div class="section-kicker"><span>JOURNAL D’OPÉRATION</span><span class="kicker-line"></span><span>RETOUR SYSTÈME</span></div>
+    <h2>Résultat</h2>
+
+    <div
+      id="result"
+      class="muted"
+    >
+      Aucune opération effectuée pour le moment.
+    </div>
+
+  </section>
+
+</main>
+
+
