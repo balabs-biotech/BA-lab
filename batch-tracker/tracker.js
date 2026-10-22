@@ -4842,6 +4842,8 @@ async function loadLotComparison() {
       if (row.event_id) return eventToBatch.get(row.event_id) || null;
       return row.culture_id ? (safeCultureToBatch.get(row.culture_id) || null) : null;
     }
+    const variableMap = new Map(measurementVariables.map(variable => [variable.code, variable]));
+    const unitMap = new Map(measurementUnits.map(unit => [unit.code, unit]));
     const assignedMeasurements = measurementRows.map(row => Object.assign({}, row, { batchId: assignBatch(row) }))
       .filter(row => row.batchId && row.quality_state !== "excluded" && !row.exclusion_reason)
       .map(row => {
@@ -4865,8 +4867,6 @@ async function loadLotComparison() {
     const assignedObservations = observationRows.map(row => Object.assign({}, row, { batchId: assignBatch(row) }))
       .filter(row => row.batchId && row.quality_state !== "excluded");
 
-    const variableMap = new Map(measurementVariables.map(variable => [variable.code, variable]));
-    const unitMap = new Map(measurementUnits.map(unit => [unit.code, unit]));
     const groupsByKey = new Map();
     assignedMeasurements.forEach(row => {
       const variable = variableMap.get(row.variable_code);
