@@ -800,12 +800,6 @@
     "الحد الأدنى–الأقصى"
   ],
   [
-    "Dernière valeur textuelle",
-    "Latest text value",
-    "Último valor textual",
-    "آخر قيمة نصية"
-  ],
-  [
     "Période réellement couverte par les données utilisées :",
     "Actual period covered by the data used:",
     "Período efetivamente abrangido pelos dados utilizados:",
