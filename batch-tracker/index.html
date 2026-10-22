@@ -6440,7 +6440,12 @@ async function loadCultureDetail(cultureId) {
       timeline.appendChild(limitNotice);
     }
     if (!entries.length) {
-      timeline.innerHTML = '<p class="muted">Aucun événement, mesure ou observation n’est actuellement lié à cette culture.</p>';
+      const emptyHistory = document.createElement("p");
+      emptyHistory.className = "muted";
+      emptyHistory.textContent = batches.length
+        ? "Aucun événement, mesure ou observation n’est encore enregistré pour les lots liés à cette culture."
+        : "Aucun événement, mesure ou observation n’est actuellement lié à cette culture.";
+      timeline.appendChild(emptyHistory);
     } else {
       entries.forEach(entry => {
         const article = document.createElement("article");
