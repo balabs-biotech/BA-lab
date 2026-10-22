@@ -818,6 +818,14 @@ button,input,select,textarea{border-radius:9px}button{min-height:42px}.hidden{di
   #measurementCard .grid { grid-template-columns: minmax(0, 1fr); }
 }
 
+
+.observation-details{margin-top:14px;border:1px solid var(--border);border-radius:11px;background:var(--surface-2)}
+.observation-details summary{padding:13px 14px;cursor:pointer;color:var(--brand);font-size:13px;font-weight:750}
+.observation-details[open]{padding:0 14px 14px}
+.observation-details[open] summary{margin:0 -14px 12px;border-bottom:1px solid var(--border)}
+.observation-details textarea,.observation-details input,.observation-details select{min-width:0;width:100%}
+.observation-details button{margin-top:12px}
+
 </style>
 </head>
 
@@ -1436,6 +1444,38 @@ button,input,select,textarea{border-radius:9px}button{min-height:42px}.hidden{di
     <div id="measurementHistory" class="measurement-history" aria-live="polite">
       <p class="muted">Les mesures apparaîtront ici après connexion.</p>
     </div>
+    <details class="observation-details">
+      <summary>Ajouter une observation qualitative</summary>
+      <p class="muted">Décrivez une morphologie, une contamination suspectée, un comportement végétal, une odeur, une texture ou tout autre constat. L’observation est horodatée et reliée à la culture ou au lot choisi ci-dessus.</p>
+      <div class="grid">
+        <div>
+          <label for="observationVariable">Catégorie / variable</label>
+          <select id="observationVariable" required><option value="">Chargement des paramètres…</option></select>
+        </div>
+        <div>
+          <label for="observationAt">Date et heure</label>
+          <input id="observationAt" type="datetime-local" required>
+        </div>
+      </div>
+      <label for="observationValue">Observation</label>
+      <textarea id="observationValue" rows="3" maxlength="4000" placeholder="Décrivez ce qui a été observé, sans confondre constat et interprétation…" required></textarea>
+      <div class="grid">
+        <div>
+          <label for="observationMethod">Méthode (facultatif)</label>
+          <input id="observationMethod" type="text" maxlength="240" placeholder="Ex. inspection visuelle standardisée">
+        </div>
+        <div>
+          <label for="observationInstrument">Instrument (facultatif)</label>
+          <input id="observationInstrument" type="text" maxlength="160" placeholder="Ex. loupe, appareil photo">
+        </div>
+      </div>
+      <label for="observationNote">Contexte / note (facultatif)</label>
+      <input id="observationNote" type="text" maxlength="1200" placeholder="Emplacement, conditions, incertitude…">
+      <button id="saveObservationButton" type="button">Enregistrer l’observation</button>
+      <div class="context-divider"></div>
+      <div class="context-eyebrow">OBSERVATIONS RÉCENTES</div>
+      <div id="observationHistory" class="measurement-history" aria-live="polite"><p class="muted">Les observations apparaîtront ici après connexion.</p></div>
+    </details>
   </section>
 
   <aside id="contextPanel" aria-label="Modèle de traçabilité et axes de collecte">
@@ -1523,6 +1563,7 @@ let selectedBatch = null;
 let initializationInProgress = false;
 let measurementVariables = [];
 let measurementUnits = [];
+let recentObservations = [];
 
 
 /* ============================================================
@@ -1718,6 +1759,14 @@ const measurementNoteInput = document.getElementById("measurementNote");
 const saveMeasurementButton = document.getElementById("saveMeasurementButton");
 const reloadMeasurementsButton = document.getElementById("reloadMeasurementsButton");
 const measurementHistory = document.getElementById("measurementHistory");
+const observationVariableSelect = document.getElementById("observationVariable");
+const observationAtInput = document.getElementById("observationAt");
+const observationValueInput = document.getElementById("observationValue");
+const observationMethodInput = document.getElementById("observationMethod");
+const observationInstrumentInput = document.getElementById("observationInstrument");
+const observationNoteInput = document.getElementById("observationNote");
+const saveObservationButton = document.getElementById("saveObservationButton");
+const observationHistory = document.getElementById("observationHistory");
 
 
 /* ============================================================
@@ -2278,12 +2327,24 @@ async function initializeAuthenticatedTracker(
 
     try {
       await loadMeasurementReferences();
-      await loadRecentMeasurements();
       saveMeasurementButton.disabled = false;
+      saveObservationButton.disabled = false;
+      try { await loadRecentMeasurements(); }
+      catch (historyError) {
+        console.error("Historique des mesures indisponible :", historyError);
+        measurementHistory.textContent = "Impossible de charger l’historique des mesures. L’enregistrement reste disponible.";
+      }
+      try { await loadRecentObservations(); }
+      catch (observationHistoryError) {
+        console.error("Historique des observations indisponible :", observationHistoryError);
+        observationHistory.textContent = "Impossible de charger l’historique des observations. L’enregistrement reste disponible.";
+      }
     } catch (measurementError) {
-      console.error("Initialisation du module de mesures :", measurementError);
-      measurementHistory.textContent = "Le module de mesures est indisponible pour le moment ; les modules de culture et de production restent utilisables.";
+      console.error("Initialisation du catalogue de mesures :", measurementError);
+      measurementHistory.textContent = "Le catalogue des mesures est indisponible ; les modules de culture et de production restent utilisables.";
+      observationHistory.textContent = "Le catalogue des observations est indisponible ; les modules de culture et de production restent utilisables.";
       saveMeasurementButton.disabled = true;
+      saveObservationButton.disabled = true;
     }
 
     setDefaultDate();
@@ -2354,6 +2415,9 @@ function setDefaultDate() {
 
   if (measurementAtInput) {
     measurementAtInput.value = now.toISOString().slice(0, 16);
+  }
+  if (observationAtInput) {
+    observationAtInput.value = now.toISOString().slice(0, 16);
   }
 
 }
@@ -5404,6 +5468,18 @@ async function loadMeasurementReferences() {
     measurementVariableSelect.appendChild(option);
   }
 
+  observationVariableSelect.innerHTML = "";
+  const observationPlaceholder = document.createElement("option");
+  observationPlaceholder.value = "";
+  observationPlaceholder.textContent = measurementVariables.length ? "Sélectionner une catégorie…" : "Aucune catégorie disponible";
+  observationVariableSelect.appendChild(observationPlaceholder);
+  for (const variable of measurementVariables) {
+    const option = document.createElement("option");
+    option.value = variable.code;
+    option.textContent = `${variable.label} · ${variable.code}`;
+    observationVariableSelect.appendChild(option);
+  }
+
   renderMeasurementTargets();
   updateMeasurementUnits();
 }
@@ -5672,6 +5748,163 @@ async function loadRecentMeasurements() {
   }).join("");
 }
 
+
+async function saveObservation() {
+  if (!organizationId) {
+    showMessage("Organisation absente. Reconnectez-vous.", "error");
+    return;
+  }
+
+  const targetValue = measurementTargetSelect.value;
+  const variable = measurementVariables.find(item => item.code === observationVariableSelect.value);
+  const valueText = observationValueInput.value.trim();
+  const observedAt = observationAtInput.value ? new Date(observationAtInput.value).toISOString() : new Date().toISOString();
+
+  if (!targetValue || !variable || !valueText) {
+    showMessage("Choisissez une cible, une catégorie et décrivez l’observation.", "error");
+    return;
+  }
+
+  const session = await getCurrentSession();
+  if (!session) {
+    showMessage("Votre session a expiré. Reconnectez-vous.", "error");
+    return;
+  }
+
+  saveObservationButton.disabled = true;
+  saveObservationButton.textContent = "Enregistrement…";
+  let eventId = null;
+  let observationSaved = false;
+
+  try {
+    let cultureId = null;
+    let batchId = null;
+    const parts = targetValue.split(":");
+    const targetType = parts[0];
+    const targetId = parts[1];
+
+    if (targetType === "culture") {
+      const culture = cultureOptions.find(item => item.id === targetId);
+      if (!culture) throw new Error("La culture sélectionnée n’est plus disponible.");
+      cultureId = culture.id;
+    } else if (targetType === "batch") {
+      const batch = latestBatches.find(item => item.id === targetId);
+      if (!batch) throw new Error("Le lot sélectionné n’est plus disponible.");
+      batchId = batch.id;
+      cultureId = batch.culture_id || null;
+
+      const eventResult = await supabaseClient.from("events").insert({
+        organization_id: organizationId,
+        event_type: "observation_recorded",
+        occurred_at: observedAt,
+        actor_user_id: session.user.id,
+        culture_id: cultureId,
+        batch_id: batchId,
+        payload: {
+          variable_code: variable.code,
+          value_text: valueText,
+          method: observationMethodInput.value.trim() || null,
+          instrument: observationInstrumentInput.value.trim() || null,
+          note: observationNoteInput.value.trim() || null
+        }
+      }).select("id").single();
+
+      if (eventResult.error) throw new Error("Création de l’événement de traçabilité impossible : " + eventResult.error.message);
+      eventId = eventResult.data.id;
+    } else {
+      throw new Error("Cible d’observation invalide.");
+    }
+
+    const insertResult = await supabaseClient.from("observations").insert({
+      organization_id: organizationId,
+      variable_code: variable.code,
+      value_text: valueText,
+      observed_at: observedAt,
+      culture_id: cultureId,
+      event_id: eventId,
+      metadata: {
+        source: "batch-tracker-manual",
+        method: observationMethodInput.value.trim() || null,
+        instrument: observationInstrumentInput.value.trim() || null,
+        note: observationNoteInput.value.trim() || null,
+        target_type: targetType,
+        batch_id: batchId
+      }
+    });
+
+    if (insertResult.error) throw new Error("Enregistrement de l’observation impossible : " + insertResult.error.message);
+    observationSaved = true;
+    observationValueInput.value = "";
+    observationMethodInput.value = "";
+    observationInstrumentInput.value = "";
+    observationNoteInput.value = "";
+    showMessage("Observation enregistrée dans Supabase avec sa provenance.", "success");
+    await loadRecentObservations();
+  } catch (error) {
+    console.error("Enregistrement observation :", error);
+    if (observationSaved) {
+      showMessage("L’observation a été enregistrée, mais l’actualisation de l’historique a échoué. Utilisez Actualiser pour recharger les données.", "warning");
+    } else {
+      if (eventId) {
+        const cleanup = await supabaseClient.from("events").delete()
+          .eq("organization_id", organizationId).eq("id", eventId);
+        if (cleanup.error) console.error("Nettoyage de l’événement incomplet :", cleanup.error);
+      }
+      showMessage(error.message || "L’enregistrement de l’observation a échoué.", "error");
+    }
+  } finally {
+    saveObservationButton.disabled = false;
+    saveObservationButton.textContent = "Enregistrer l’observation";
+  }
+}
+
+async function loadRecentObservations() {
+  if (!organizationId || !observationHistory) return;
+
+  const query = await supabaseClient.from("observations")
+    .select("id, variable_code, value_text, observed_at, culture_id, event_id, metadata")
+    .eq("organization_id", organizationId)
+    .order("observed_at", { ascending: false })
+    .limit(8);
+
+  if (query.error) throw new Error("Chargement de l’historique des observations impossible : " + query.error.message);
+  recentObservations = query.data || [];
+  const eventIds = [...new Set(recentObservations.map(row => row.event_id).filter(Boolean))];
+  const eventsById = {};
+
+  if (eventIds.length) {
+    const eventsResult = await supabaseClient.from("events")
+      .select("id, batch_id")
+      .eq("organization_id", organizationId)
+      .in("id", eventIds);
+    if (eventsResult.error) console.warn("Détails des événements d’observation indisponibles :", eventsResult.error.message);
+    for (const event of eventsResult.data || []) eventsById[event.id] = event;
+  }
+
+  if (!recentObservations.length) {
+    observationHistory.innerHTML = '<p class="muted">Aucune observation enregistrée pour le moment.</p>';
+    return;
+  }
+
+  observationHistory.innerHTML = recentObservations.map(row => {
+    const variable = measurementVariables.find(item => item.code === row.variable_code);
+    const culture = cultureOptions.find(item => item.id === row.culture_id);
+    const batchId = row.event_id ? (eventsById[row.event_id] || {}).batch_id : null;
+    const batch = batchId ? latestBatches.find(item => item.id === batchId) : null;
+    const target = batch ? "Lot · " + escapeHtml(batch.batch_code) :
+      culture ? "Culture · " + escapeHtml(culture.code) : "Cible liée par identifiant";
+    const stamp = row.observed_at ? new Date(row.observed_at).toLocaleString() : "Date inconnue";
+    const note = row.metadata && row.metadata.note
+      ? '<div class="measurement-meta">' + escapeHtml(row.metadata.note) + '</div>' : "";
+    return '<article class="measurement-entry"><div><strong>' +
+      escapeHtml(variable ? variable.label : row.variable_code) +
+      '</strong><div class="measurement-meta">' + target + '</div>' + note +
+      '</div><div class="measurement-meta">' + escapeHtml(stamp) +
+      '</div><div class="measurement-stamp">' + escapeHtml(row.value_text) +
+      '</div></article>';
+  }).join("");
+}
+
 function setupUiEnhancements() {
 
   const busyLabel =
@@ -5695,7 +5928,8 @@ function setupUiEnhancements() {
     "advanceBatchButton",
     "reloadBatchButton",
     "releaseBatchButton",
-    "saveMeasurementButton"
+    "saveMeasurementButton",
+    "saveObservationButton"
   ].forEach((id) => {
     const button = document.getElementById(id);
 
@@ -5786,6 +6020,7 @@ function setupUiEnhancements() {
 
   measurementVariableSelect.addEventListener("change", updateMeasurementUnits);
   saveMeasurementButton.addEventListener("click", saveMeasurement);
+  saveObservationButton.addEventListener("click", saveObservation);
   reloadMeasurementsButton.addEventListener("click", () => loadRecentMeasurements().catch(error => showMessage(error.message, "error")));
 
   document
