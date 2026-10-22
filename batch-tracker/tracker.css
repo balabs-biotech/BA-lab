@@ -1847,3 +1847,63 @@ body[data-domain="mycology"] .card .req {
   color: #d18d65 !important;
   -webkit-text-fill-color: #d18d65 !important;
 }
+
+
+/* Mycology final palette pass: remove remaining inherited green typography,
+   including authentication fields (Email), hints, and form controls. */
+body[data-domain="mycology"] #authCard label,
+body[data-domain="mycology"] #authCard .muted,
+body[data-domain="mycology"] #authCard small,
+body[data-domain="mycology"] #authStatus,
+body[data-domain="mycology"] .card label,
+body[data-domain="mycology"] .card .muted,
+body[data-domain="mycology"] .card .help-text,
+body[data-domain="mycology"] .card .field-hint,
+body[data-domain="mycology"] .card .hint,
+body[data-domain="mycology"] .card small,
+body[data-domain="mycology"] .card .section-kicker-label,
+body[data-domain="mycology"] .card .quick-capture-heading h3,
+body[data-domain="mycology"] .card .quick-capture-heading p,
+body[data-domain="mycology"] .card .quick-capture-tip,
+body[data-domain="mycology"] .card .quick-capture-tip span,
+body[data-domain="mycology"] .card .culture-catalog-meta,
+body[data-domain="mycology"] .card .culture-catalog-meta span,
+body[data-domain="mycology"] .card .statistics-table th,
+body[data-domain="mycology"] .card .statistics-table td,
+body[data-domain="mycology"] .card .culture-timeline-entry p {
+  color: #eee5dc !important;
+  -webkit-text-fill-color: #eee5dc !important;
+}
+body[data-domain="mycology"] #authCard input,
+body[data-domain="mycology"] .card input,
+body[data-domain="mycology"] .card select,
+body[data-domain="mycology"] .card textarea {
+  color: #eee5dc !important;
+  -webkit-text-fill-color: #eee5dc !important;
+  caret-color: #d18d65 !important;
+  background-color: #1b1917 !important;
+  border-color: #786252 !important;
+}
+body[data-domain="mycology"] #authCard input::placeholder,
+body[data-domain="mycology"] .card input::placeholder,
+body[data-domain="mycology"] .card textarea::placeholder {
+  color: #b9a99b !important;
+  -webkit-text-fill-color: #b9a99b !important;
+  opacity: 1 !important;
+}
+body[data-domain="mycology"] #authCard label,
+body[data-domain="mycology"] .card label {
+  color: #f0e6dc !important;
+  -webkit-text-fill-color: #f0e6dc !important;
+}
+body[data-domain="mycology"] #authCard .req,
+body[data-domain="mycology"] .card .req {
+  color: #d18d65 !important;
+  -webkit-text-fill-color: #d18d65 !important;
+}
+body[data-domain="mycology"] {
+  --ok: #c17a52 !important;
+  --success: #c17a52 !important;
+  --positive: #c17a52 !important;
+  --valid: #c17a52 !important;
+}
