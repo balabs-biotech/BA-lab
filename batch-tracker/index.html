@@ -818,6 +818,14 @@ button,input,select,textarea{border-radius:9px}button{min-height:42px}.hidden{di
   #measurementCard .grid { grid-template-columns: minmax(0, 1fr); }
 }
 
+
+.observation-details{margin-top:14px;border:1px solid var(--border);border-radius:11px;background:var(--surface-2)}
+.observation-details summary{padding:13px 14px;cursor:pointer;color:var(--brand);font-size:13px;font-weight:750}
+.observation-details[open]{padding:0 14px 14px}
+.observation-details[open] summary{margin:0 -14px 12px;border-bottom:1px solid var(--border)}
+.observation-details textarea,.observation-details input,.observation-details select{min-width:0;width:100%}
+.observation-details button{margin-top:12px}
+
 </style>
 </head>
 
@@ -1436,6 +1444,38 @@ button,input,select,textarea{border-radius:9px}button{min-height:42px}.hidden{di
     <div id="measurementHistory" class="measurement-history" aria-live="polite">
       <p class="muted">Les mesures apparaîtront ici après connexion.</p>
     </div>
+    <details class="observation-details">
+      <summary>Ajouter une observation qualitative</summary>
+      <p class="muted">Décrivez une morphologie, une contamination suspectée, un comportement végétal, une odeur, une texture ou tout autre constat. L’observation est horodatée et reliée à la culture ou au lot choisi ci-dessus.</p>
+      <div class="grid">
+        <div>
+          <label for="observationVariable">Catégorie / variable</label>
+          <select id="observationVariable" required><option value="">Chargement des paramètres…</option></select>
+        </div>
+        <div>
+          <label for="observationAt">Date et heure</label>
+          <input id="observationAt" type="datetime-local" required>
+        </div>
+      </div>
+      <label for="observationValue">Observation</label>
+      <textarea id="observationValue" rows="3" maxlength="4000" placeholder="Décrivez ce qui a été observé, sans confondre constat et interprétation…" required></textarea>
+      <div class="grid">
+        <div>
+          <label for="observationMethod">Méthode (facultatif)</label>
+          <input id="observationMethod" type="text" maxlength="240" placeholder="Ex. inspection visuelle standardisée">
+        </div>
+        <div>
+          <label for="observationInstrument">Instrument (facultatif)</label>
+          <input id="observationInstrument" type="text" maxlength="160" placeholder="Ex. loupe, appareil photo">
+        </div>
+      </div>
+      <label for="observationNote">Contexte / note (facultatif)</label>
+      <input id="observationNote" type="text" maxlength="1200" placeholder="Emplacement, conditions, incertitude…">
+      <button id="saveObservationButton" type="button">Enregistrer l’observation</button>
+      <div class="context-divider"></div>
+      <div class="context-eyebrow">OBSERVATIONS RÉCENTES</div>
+      <div id="observationHistory" class="measurement-history" aria-live="polite"><p class="muted">Les observations apparaîtront ici après connexion.</p></div>
+    </details>
   </section>
 
   <aside id="contextPanel" aria-label="Modèle de traçabilité et axes de collecte">
