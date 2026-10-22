@@ -6254,7 +6254,10 @@ async function loadStatistics() {
   finally { button.disabled=false; button.textContent="Analyser les données"; }
 }
 
+let cultureDetailRequestId = 0;
+
 async function loadCultureDetail(cultureId) {
+  const requestId = ++cultureDetailRequestId;
   const culture = cultureOptions.find(item => item.id === cultureId);
   const panel = document.getElementById("cultureDetailPanel");
   const title = document.getElementById("cultureDetailTitle");
@@ -6298,6 +6301,7 @@ async function loadCultureDetail(cultureId) {
         .eq("organization_id", organizationId).eq("culture_id", culture.id)
         .order("observed_at", { ascending: false }).limit(100)
     ]);
+    if (requestId !== cultureDetailRequestId) return;
     const eventResult = results[0], measurementResult = results[1], observationResult = results[2];
     if (eventResult.error) throw new Error("Événements : " + eventResult.error.message);
     if (measurementResult.error) throw new Error("Mesures : " + measurementResult.error.message);
@@ -6359,6 +6363,12 @@ async function loadCultureDetail(cultureId) {
     if (fields[4]) fields[4].textContent = String(events.length);
     if (fields[5]) fields[5].textContent = String(measurements.length + observations.length);
     timeline.innerHTML = "";
+    if (events.length === 100 || measurements.length === 100 || observations.length === 100) {
+      const limitNotice = document.createElement("p");
+      limitNotice.className = "info warning";
+      limitNotice.textContent = "Historique partiel : au moins une catégorie atteint la limite de 100 enregistrements. Affinez la période dans les modules de données pour examiner les séries complètes.";
+      timeline.appendChild(limitNotice);
+    }
     if (!entries.length) {
       timeline.innerHTML = '<p class="muted">Aucun événement, mesure ou observation n’est actuellement lié à cette culture.</p>';
     } else {
@@ -6380,6 +6390,7 @@ async function loadCultureDetail(cultureId) {
     }
     panel.scrollIntoView({block:"start",behavior:window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth"});
   } catch (error) {
+    if (requestId !== cultureDetailRequestId) return;
     console.error("Chargement de la fiche culture :", error);
     timeline.innerHTML = "";
     const message = document.createElement("p");
