@@ -62,7 +62,7 @@ h1{max-width:800px;margin:0;font-size:clamp(38px,7vw,76px);line-height:.98;lette
     document.querySelector(".agronomy p"), document.querySelector(".agronomy .enter span:first-child"),
     document.querySelector(".myco p"), document.querySelector(".lab p"), document.querySelector(".footer span:last-child")
   ];
-  const targets = [".kicker","h1","h1 span",".lead",null,".agronomy p",".agronomy .enter span:first-child",".myco p",".lab p",".footer span:last-child"];
+  const targets = [".kicker",null,null,".lead",null,".agronomy p",".agronomy .enter span:first-child",".myco p",".lab p",".footer span:last-child"];
   const select = document.getElementById("pageLanguage");
   function apply(lang) {
     const vals = copy[lang];
@@ -75,7 +75,7 @@ h1{max-width:800px;margin:0;font-size:clamp(38px,7vw,76px);line-height:.98;lette
         if (el) el.textContent = vals[i];
       } else document.querySelector(".universes").setAttribute("aria-label", vals[i]);
     });
-    document.querySelectorAll(".enter span:first-child").forEach(el => { el.textContent = lang === "ar" ? "الدخول إلى المساحة" : lang === "pt" ? "Entrar no espaço" : lang === "en" ? "Enter workspace" : "Entrer dans l’espace"; });
+    document.querySelectorAll(".enter span:first-child").forEach(el => { el.textContent = vals ? vals[6] : "Entrer dans l’espace"; });
     document.querySelector(".footer span:last-child").textContent = vals ? vals[9] : "Une plateforme commune · Trois interfaces spécialisées";
     try { localStorage.setItem("ba-labs-language", lang); } catch (_) {}
   }
