@@ -804,6 +804,84 @@
     "Actual period covered by the data used:",
     "Período efetivamente abrangido pelos dados utilizados:",
     "الفترة الفعلية التي تغطيها البيانات المستخدمة:"
+  ],
+  [
+    "Lots à comparer",
+    "Batches to compare",
+    "Lotes a comparar",
+    "الدفعات المطلوب مقارنتها"
+  ],
+  [
+    "Les lots disponibles apparaîtront après connexion.",
+    "Available batches will appear after sign-in.",
+    "Os lotes disponíveis aparecerão após iniciar sessão.",
+    "ستظهر الدفعات المتاحة بعد تسجيل الدخول."
+  ],
+  [
+    "Variable A",
+    "Variable A",
+    "Variável A",
+    "المتغير أ"
+  ],
+  [
+    "Variable B",
+    "Variable B",
+    "Variável B",
+    "المتغير ب"
+  ],
+  [
+    "r de Pearson",
+    "Pearson's r",
+    "r de Pearson",
+    "معامل بيرسون r"
+  ],
+  [
+    "Lecture",
+    "Interpretation",
+    "Interpretação",
+    "التفسير"
+  ],
+  [
+    "Aucune série temporelle datée pour",
+    "No dated time series for",
+    "Não existe série temporal datada para",
+    "لا توجد سلسلة زمنية مؤرخة لـ"
+  ],
+  [
+    "Aucune mesure exécutée.",
+    "No analysis run.",
+    "Nenhuma análise executada.",
+    "لم يتم إجراء أي تحليل."
+  ],
+  [
+    "Choisissez une variable pour commencer l’analyse.",
+    "Choose a variable to begin the analysis.",
+    "Escolha uma variável para iniciar a análise.",
+    "اختر متغيراً لبدء التحليل."
+  ],
+  [
+    "Données brutes utilisées",
+    "Raw data used",
+    "Dados brutos utilizados",
+    "البيانات الخام المستخدمة"
+  ],
+  [
+    "Valeur",
+    "Value",
+    "Valor",
+    "القيمة"
+  ],
+  [
+    "Unité",
+    "Unit",
+    "Unidade",
+    "الوحدة"
+  ],
+  [
+    "Méthode",
+    "Method",
+    "Método",
+    "الطريقة"
   ]
 ];
 for (const [fr, en, pt, ar] of supplementalCoverage) {
