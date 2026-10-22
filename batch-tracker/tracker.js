@@ -2187,19 +2187,29 @@ async function compareSelectedBatches() {
   const results = document.getElementById("batchCompareResults");
   const button = document.getElementById("compareBatchesButton");
   if (!select || !status || !results || !button) return;
+  const language = window.BALabsI18n?.language || "fr";
+  const ui = ({
+    fr: { selection:"Sélectionnez entre 2 et 4 lots.", stale:"Un ou plusieurs lots ne sont plus dans la liste chargée. Actualisez la page.", loading:"Chargement des étapes et des mesures…", loaded:"Comparaison chargée.", capped:"Comparaison chargée avec une limite de 1 000 mesures récentes par lien culture/environnement ; les comptes peuvent être incomplets.", count:"n_mesures désigne le nombre de mesures, pas le nombre de répétitions biologiques indépendantes.", shared:"Les mesures d'un environnement partagé peuvent apparaître pour plusieurs lots.", repeated:n=>`Attention : ${n} lien(s) d'unité expérimentale sont partagés entre les lots sélectionnés ; ces lots ne constituent pas autant de répétitions indépendantes.`, missing:"Les données manquantes ne sont pas interprétées comme zéro.", impossible:"Impossible de comparer les lots.", culture:"Culture", environment:"Environnement", observations:n=>`${n} observation(s)`, noObservations:"Aucune observation", treatment:"traitement", replicate:"répétition", excluded:"exclue" },
+    en: { selection:"Select between 2 and 4 batches.", stale:"One or more batches are no longer in the loaded list. Refresh the page.", loading:"Loading stages and measurements…", loaded:"Comparison loaded.", capped:"Comparison loaded with a limit of 1,000 recent measurements per culture/environment link; counts may be incomplete.", count:"n_measurements is the number of measurements, not the number of independent biological replicates.", shared:"Measurements from a shared environment may appear for multiple batches.", repeated:n=>`Warning: ${n} experimental-unit link(s) are shared by the selected batches; these batches do not represent that many independent replicates.`, missing:"Missing data is not treated as zero.", impossible:"Unable to compare batches.", culture:"Culture", environment:"Environment", observations:n=>`${n} observation(s)`, noObservations:"No observations", treatment:"treatment", replicate:"replicate", excluded:"excluded" },
+    pt: { selection:"Selecione entre 2 e 4 lotes.", stale:"Um ou mais lotes já não estão na lista carregada. Atualize a página.", loading:"A carregar etapas e medições…", loaded:"Comparação carregada.", capped:"Comparação carregada com um limite de 1.000 medições recentes por ligação cultura/ambiente; as contagens podem estar incompletas.", count:"n_medições indica o número de medições, não o número de repetições biológicas independentes.", shared:"As medições de um ambiente partilhado podem aparecer em vários lotes.", repeated:n=>`Atenção: ${n} ligação(ões) de unidade experimental são partilhadas pelos lotes selecionados; estes lotes não representam esse número de repetições independentes.`, missing:"Os dados em falta não são tratados como zero.", impossible:"Não foi possível comparar os lotes.", culture:"Cultura", environment:"Ambiente", observations:n=>`${n} observação(ões)`, noObservations:"Sem observações", treatment:"tratamento", replicate:"repetição", excluded:"excluída" },
+    ar: { selection:"اختر من دفعتين إلى أربع دفعات.", stale:"لم تعد دفعة واحدة أو أكثر موجودة في القائمة المحمّلة. حدّث الصفحة.", loading:"جارٍ تحميل المراحل والقياسات…", loaded:"اكتملت المقارنة.", capped:"اكتملت المقارنة مع حد أقصى قدره ١٬٠٠٠ قياس حديث لكل ارتباط بين المزرعة والبيئة؛ وقد تكون الأعداد غير مكتملة.", count:"n_measurements هو عدد القياسات وليس عدد المكررات البيولوجية المستقلة.", shared:"قد تظهر قياسات البيئة المشتركة في عدة دفعات.", repeated:n=>`تحذير: توجد ${n} روابط لوحدات تجريبية مشتركة بين الدفعات المحددة؛ ولا تمثل هذه الدفعات هذا العدد من المكررات المستقلة.`, missing:"لا تُعامل البيانات المفقودة على أنها صفر.", impossible:"تعذرت مقارنة الدفعات.", culture:"المزرعة", environment:"البيئة", observations:n=>`${n} ملاحظة`, noObservations:"لا توجد ملاحظات", treatment:"المعاملة", replicate:"مكرر", excluded:"مستبعدة" }
+  })[language] || null;
+  const labels = ui || ({
+    selection:"Sélectionnez entre 2 et 4 lots.", stale:"Un ou plusieurs lots ne sont plus dans la liste chargée. Actualisez la page.", loading:"Chargement des étapes et des mesures…", loaded:"Comparaison chargée.", capped:"Comparaison chargée avec une limite de 1 000 mesures récentes par lien culture/environnement ; les comptes peuvent être incomplets.", count:"n_mesures désigne le nombre de mesures, pas le nombre de répétitions biologiques indépendantes.", shared:"Les mesures d'un environnement partagé peuvent apparaître pour plusieurs lots.", repeated:n=>`Attention : ${n} lien(s) d'unité expérimentale sont partagés entre les lots sélectionnés ; ces lots ne constituent pas autant de répétitions indépendantes.`, missing:"Les données manquantes ne sont pas interprétées comme zéro.", impossible:"Impossible de comparer les lots.", culture:"Culture", environment:"Environnement", observations:n=>`${n} observation(s)`, noObservations:"Aucune observation", treatment:"traitement", replicate:"répétition", excluded:"exclue"
+  });
   const ids = [...select.selectedOptions].map(option => option.value);
   if (ids.length < 2 || ids.length > 4) {
-    status.textContent = "Sélectionnez entre 2 et 4 lots.";
+    status.textContent = labels.selection;
     results.replaceChildren();
     return;
   }
   const batches = latestBatches.filter(batch => ids.includes(batch.id));
   if (batches.length !== ids.length) {
-    status.textContent = "Un ou plusieurs lots ne sont plus dans la liste chargée. Actualisez la page.";
+    status.textContent = labels.stale;
     return;
   }
   button.disabled = true;
-  status.textContent = "Chargement des étapes et des mesures…";
+  status.textContent = labels.loading;
   results.replaceChildren();
   try {
     const cultureIds = [...new Set(batches.map(batch => batch.culture_id).filter(Boolean))];
@@ -2257,8 +2267,8 @@ async function compareSelectedBatches() {
       const unit = unitsById.get(row.experimental_unit_id);
       const experiment = experimentsById.get(row.experiment_id || unit?.experiment_id);
       return [row.id, {
-        experiment: experiment ? `${experiment.code} — ${experiment.name}` : "Non renseignée",
-        unit: unit ? [unit.unit_code, unit.treatment_code ? `traitement ${unit.treatment_code}` : null, unit.replicate_no != null ? `répétition ${unit.replicate_no}` : null].filter(Boolean).join(" · ") : "Non renseignée", experimentalUnitId: unit?.id || null
+        experiment: experiment ? `${experiment.code} — ${experiment.name}` : (language === "en" ? "Not specified" : language === "pt" ? "Não indicado" : language === "ar" ? "غير محدد" : "Non renseignée"),
+        unit: unit ? [unit.unit_code, unit.treatment_code ? `${labels.treatment} ${unit.treatment_code}` : null, unit.replicate_no != null ? `${labels.replicate} ${unit.replicate_no}` : null].filter(Boolean).join(" · ") : (language === "en" ? "Not specified" : language === "pt" ? "Não indicado" : language === "ar" ? "غير محدد" : "Non renseignée"), experimentalUnitId: unit?.id || null
       }];
     }));
     const observationCultureResult = cultureIds.length
@@ -2335,10 +2345,10 @@ async function compareSelectedBatches() {
         (context?.experimentalUnitId && row.experimental_unit_id === context.experimentalUnitId)
       ).sort((a, b) => new Date(b.observed_at) - new Date(a.observed_at));
       const observationSummary = batchObservations.length
-        ? batchObservations.length + " observation(s) : " + batchObservations.slice(0, 3).map(row =>
-            row.variable_code + " — " + row.value_text + (row.quality_state === "excluded" ? " [exclue]" : "")
+        ? labels.observations(batchObservations.length) + " : " + batchObservations.slice(0, 3).map(row =>
+            row.variable_code + " — " + row.value_text + (row.quality_state === "excluded" ? " [" + labels.excluded + "]" : "")
           ).join(" ; ") + (batchObservations.length > 3 ? " ; …" : "")
-        : "Aucune observation";
+        : labels.noObservations;
       const lastDate = linkedRows.reduce((latest, row) => {
         const date = row.measured_at ? new Date(row.measured_at) : null;
         return date && (!latest || date > latest) ? date : latest;
@@ -2355,7 +2365,7 @@ async function compareSelectedBatches() {
         String(cultureLinked.length),
         String(environmentLinked.length),
         observationSummary,
-        `Culture : ${summarize(cultureLinked)} | Environnement : ${summarize(environmentLinked)}`,
+        `${labels.culture} : ${summarize(cultureLinked)} | ${labels.environment} : ${summarize(environmentLinked)}`,
         lastDate ? lastDate.toLocaleString() : "—"
       ];
       const tr = document.createElement("tr");
@@ -2370,19 +2380,15 @@ async function compareSelectedBatches() {
     const repeatedUnitCount = selectedUnitIds.length - new Set(selectedUnitIds).size;
     const capped = cultureMeasurementResult.data?.length >= 1000 || environmentMeasurementResult.data?.length >= 1000;
     const statusParts = [
-      capped
-        ? "Comparaison chargée avec une limite de 1 000 mesures récentes par lien culture/environnement ; les comptes peuvent être incomplets."
-        : "Comparaison chargée.",
-      "n_mesures désigne le nombre de mesures, pas le nombre de répétitions biologiques indépendantes.",
-      "Les mesures d'un environnement partagé peuvent apparaître pour plusieurs lots.",
-      repeatedUnitCount > 0
-        ? `Attention : ${repeatedUnitCount} lien(s) d'unité expérimentale sont partagés entre les lots sélectionnés ; ces lots ne constituent pas autant de répétitions indépendantes.`
-        : "",
-      "Les données manquantes ne sont pas interprétées comme zéro."
+      capped ? labels.capped : labels.loaded,
+      labels.count,
+      labels.shared,
+      repeatedUnitCount > 0 ? labels.repeated(repeatedUnitCount) : "",
+      labels.missing
     ].filter(Boolean);
     status.textContent = statusParts.join(" ");
   } catch (error) {
-    status.textContent = error?.message || "Impossible de comparer les lots.";
+    status.textContent = error?.message || labels.impossible;
   } finally {
     button.disabled = false;
   }
