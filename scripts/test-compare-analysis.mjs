@@ -31,4 +31,12 @@ assert.ok(Math.abs(api.convertUnit(0, celsius, kelvin, "temperature") - 273.15) 
 const phA = { code: "pH-a", dimension: "pH", factor: 1, offset_value: 0, is_linear: false };
 const phB = { code: "pH-b", dimension: "pH", factor: 1, offset_value: 0, is_linear: false };
 assert.equal(api.convertUnit(7, phA, phB, "pH"), null);
-console.log("✓ median, descriptive statistics, IQR outliers, Pearson guards and unit conversion tests passed");
+const eventMap = new Map([["event-1", "batch-1"]]);
+const cultureMap = new Map([["culture-1", "batch-1"]]);
+const sampleMap = new Map([["sample-1", "batch-2"]]);
+assert.equal(api.resolveBatchId({ event_id: "event-1", culture_id: "culture-2" }, eventMap, cultureMap, sampleMap), "batch-1");
+assert.equal(api.resolveBatchId({ culture_id: "culture-1" }, eventMap, cultureMap, sampleMap), "batch-1");
+assert.equal(api.resolveBatchId({ culture_id: "ambiguous-culture" }, eventMap, cultureMap, sampleMap), null);
+assert.equal(api.resolveBatchId({ sample_id: "sample-1" }, eventMap, cultureMap, sampleMap), "batch-2");
+assert.equal(api.resolveBatchId({ culture_id: "ambiguous-culture", sample_id: "sample-1" }, eventMap, cultureMap, sampleMap), null);
+console.log("✓ descriptive statistics, IQR outliers, Pearson guards, unit conversion and unambiguous traceability tests passed");
