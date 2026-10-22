@@ -87,3 +87,15 @@ for(const label of ["Culture ou ressource source","Culture biologique / lot de c
 if(!template.includes('id="bioChildCodesField"')||!engine.includes("function setupBioOperationFormGuidance")||!engine.includes('"division_aliquotes"'))throw new Error("Descendant-code field is not restricted to compatible biological operations");
 if(!template.includes('min="0.000001"'))throw new Error("Planned batch quantity does not require a positive value");
 console.log("✓ Batch types align with QC template keys; planned and harvested quantities use canonical units");
+
+if(!engine.includes("const BATCH_STAGES_BY_TYPE = {")||!engine.includes("function getBatchStages(batchType)"))throw new Error("Batch-specific stage sequences are missing");
+for(const type of ["CULTURE","TRICHODERMA","PLEUROTUS_SPAWN","MUSHROOM_PRODUCT","BIOSTIMULANT","FORMULATION"]){
+ if(!engine.includes(type+": ["))throw new Error("Batch-specific stage sequence missing: "+type);
+}
+if(!engine.includes("getBatchStages(batchType)"))throw new Error("Batch creation still sends one universal stage sequence");
+if(!engine.includes("const orderedStages = stages.length")||!engine.includes("orderedStages[index]"))throw new Error("Batch stages are not rendered from persisted sequence order");
+for(const type of ["TRICHODERMA","PLEUROTUS_SPAWN","MUSHROOM_PRODUCT","BIOSTIMULANT","FORMULATION"]){
+ const match=engine.match(new RegExp(type+": \\[([^\\]]+)\\]"));
+ if(!match||!match[1].includes('"qc"')||!match[1].includes('"release"'))throw new Error("QC/release stages missing for "+type);
+}
+console.log("✓ Batch-specific workflows retain QC and release gates; UI follows saved stage order");
