@@ -124,6 +124,9 @@ Deno.serve(async (req: Request) => {
 
   let cultureIdForError = "";
   let organizationIdForError = "";
+  let claimCultureId: string | null = null;
+  let claimOrganizationId: string | null = null;
+  let claimToken: string | null = null;
   try {
     const { data: authData, error: authError } = await userClient.auth.getUser();
     if (authError || !authData.user) return json({ error: "Invalid session." }, 401);
