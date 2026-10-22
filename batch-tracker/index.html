@@ -6383,7 +6383,7 @@ async function loadCultureDetail(cultureId) {
     }
     const variableLabel = code => measurementVariables.find(item => item.code === code)?.label || code || "Donnée";
     const entries = [];
-    const eventIds = new Set(events.map(event => event.id));
+    const eventIdSet = new Set(events.map(event => event.id));
     for (const event of events) {
       const linkedMeasurements = measurementsByEvent.get(event.id) || [];
       const linkedObservations = observationsByEvent.get(event.id) || [];
@@ -6406,12 +6406,12 @@ async function loadCultureDetail(cultureId) {
           (event.batch_id ? "Événement associé à un lot." : "Événement de traçabilité.")
       });
     }
-    measurements.filter(row => !row.event_id || !eventIds.has(row.event_id)).forEach(row => entries.push({
+    measurements.filter(row => !row.event_id || !eventIdSet.has(row.event_id)).forEach(row => entries.push({
       date: row.measured_at, type: "Mesure · " + variableLabel(row.variable_code),
       detail: String(row.raw_value ?? "Valeur absente") + " " + (row.raw_unit_code || "") +
         (row.metadata?.note ? " — " + row.metadata.note : "")
     }));
-    observations.filter(row => !row.event_id || !eventIds.has(row.event_id)).forEach(row => entries.push({
+    observations.filter(row => !row.event_id || !eventIdSet.has(row.event_id)).forEach(row => entries.push({
       date: row.observed_at, type: "Observation · " + variableLabel(row.variable_code),
       detail: (row.value_text || "Sans description") +
         (row.metadata?.note ? " — " + row.metadata.note : "")
