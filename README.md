@@ -41,8 +41,18 @@ Each kind of content has **one** source of truth. This repository is not a copy 
 ├── assets/           # Images and visual assets
 ├── LICENSE           # Licence map by directory
 ├── LICENSES/         # Licence texts
-└── index.html        # Redirects to batch-tracker/
+└── index.html        # Public landing page: choose Agronomy, Mycology or Laboratory
 ```
+
+## Batch Tracker entry
+
+Open the repository's published site at its root to choose an interface before entering the tracker. The three supported entry links are:
+
+- Agronomy: `batch-tracker/?domain=agronomy`
+- Mycology: `batch-tracker/?domain=mycology`
+- Laboratory: `batch-tracker/?domain=laboratory`
+
+Opening `batch-tracker/` without a supported `domain` query parameter redirects to the landing page. The CI regression check verifies that these links and the redirect guard stay aligned.
 
 ## Safety and validation status
 
