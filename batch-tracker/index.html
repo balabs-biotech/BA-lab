@@ -1129,6 +1129,14 @@ body[data-domain="laboratory"] .section-nav a[aria-current="page"]{background:#e
 @media(max-width:600px){.domain-switcher{padding:12px;gap:12px}.domain-options{grid-template-columns:minmax(0,1fr)}.domain-option{min-height:54px}.domain-option small{font-size:11px}.domain-option{padding:9px}}
 @media(prefers-reduced-motion:reduce){.domain-option{transition:none}}
 
+/* Keep the universe selector in the first viewport, including deep links with ?domain=. */
+.universe-home-link{grid-area:universe;align-self:start;margin:0}
+.domain-switcher{grid-area:switcher;align-self:start;margin:0}
+.app-hero{grid-area:hero}
+.container{grid-template-areas:"nav nav" "universe universe" "switcher switcher" "hero hero" "message message" "auth auth" "workspace context" "result result"}
+@media(max-width:900px){
+  .container{grid-template-columns:minmax(0,1fr);grid-template-areas:"nav" "universe" "switcher" "hero" "message" "auth" "workspace" "context" "result"}
+}
 </style>
 </head>
 
@@ -7222,10 +7230,6 @@ function setupDomainWorkspaces() {
   };
   const buttons = [...document.querySelectorAll("[data-domain-choice]")];
   const requestedDomain = new URLSearchParams(window.location.search).get("domain");
-  if (["agronomy", "mycology", "laboratory"].includes(requestedDomain)) {
-    const switcher = document.querySelector(".domain-switcher");
-    if (switcher) switcher.hidden = true;
-  }
   const eyebrow = document.querySelector(".app-hero .eyebrow");
   const title = document.querySelector(".app-hero h1");
   const heroDescription = document.querySelector(".hero-description");
