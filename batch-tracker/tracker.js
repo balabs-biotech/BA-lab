@@ -4693,7 +4693,7 @@ async function fetchComparisonRows(buildQuery) {
 }
 
 function comparisonDateInRange(value, fromDate, toDate) {
-  if (!value) return false;
+  if (!value) return !fromDate && !toDate;
   const day = new Date(value).toISOString().slice(0, 10);
   return (!fromDate || day >= fromDate) && (!toDate || day <= toDate);
 }
@@ -4889,6 +4889,8 @@ async function loadLotComparison() {
     if (outlierCount) descriptive.push(outlierCount + " valeur(s) atypique(s) signalée(s) par la règle exploratoire des 1,5 × IQR ; elles restent incluses dans les graphiques et les statistiques.");
     if (Array.from(cultureBatchCounts.values()).some(count => count > 1)) descriptive.push("Certaines cultures sont liées à plusieurs lots sélectionnés : les mesures/observations rattachées seulement à la culture et non à un événement de lot sont laissées de côté pour éviter une attribution ambiguë.");
     if (allDates.length) descriptive.push("Période réellement couverte par les données utilisées : " + periodLabel + ".");
+    const undatedCount = assignedMeasurements.filter(row => !row.measured_at).length + assignedObservations.filter(row => !row.observed_at).length;
+    if (undatedCount) descriptive.push(undatedCount + " enregistrement(s) sans date sont inclus dans les effectifs, mais pas dans les graphiques temporels ni les corrélations.");
     findings.innerHTML += '<article class="comparison-finding"><h4>1. Constats descriptifs</h4><ul>' + descriptive.map(item => "<li>" + escapeHtml(item) + "</li>").join("") + "</ul></article>";
 
     if (groups.length) {
