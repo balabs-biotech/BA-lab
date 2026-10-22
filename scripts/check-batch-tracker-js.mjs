@@ -82,4 +82,6 @@ if(!template.includes('id="batchCultureHint"')||!template.includes("filiation bi
 for(const label of ["Culture ou ressource source","Culture biologique / lot de culture générique","Source culture or resource","Cultura ou recurso de origem","المزرعة أو المورد المصدر"]){
  if(!i18n.includes(label))throw new Error("Batch source guidance localisation missing: "+label);
 }
+if(!template.includes('id="bioChildCodesField"')||!engine.includes("function setupBioOperationFormGuidance")||!engine.includes('"division_aliquotes"'))throw new Error("Descendant-code field is not restricted to compatible biological operations");
+if(!template.includes('min="0.000001"'))throw new Error("Planned batch quantity does not require a positive value");
 console.log("✓ Batch types align with QC template keys; planned and harvested quantities use canonical units");
