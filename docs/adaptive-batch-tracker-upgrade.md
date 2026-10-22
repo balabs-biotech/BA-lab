@@ -76,3 +76,12 @@ The reference repository declares AGPL-3.0-or-later. This branch documents and a
 - Le formulaire explique pourquoi la culture source doit être sélectionnée : maintenir la filiation biologique. Les choix et aides de saisie ajoutés sont localisés en français, anglais, portugais et arabe.
 - Des assertions de non-régression couvrent les clés de catégorie, les sélecteurs d'unité, la validation et les libellés traduits.
 - Le champ des codes descendants n'apparaît que pour les opérations qui peuvent réellement créer ou dériver des cultures descendantes selon la RPC existante; passer à une opération incompatible vide et désactive le champ pour éviter une soumission incohérente.
+
+
+## Emplacement et environnement des lots — première intégration UI
+
+- Le formulaire de création charge les emplacements et environnements existants depuis Supabase, en filtrant chaque requête sur l'organisation active.
+- L'environnement proposé est soit sans emplacement associé, soit associé à l'emplacement sélectionné. Changer d'emplacement réinitialise la sélection d'environnement pour éviter une association obsolète.
+- La création transmet les identifiants choisis à la RPC existante `create_batch_with_stages`; le détail du lot affiche les noms correspondants.
+- Aucun nouveau schéma SQL ni changement de base de production n'a été appliqué.
+- Cette étape ne constitue pas encore un historique des déplacements. La suite doit définir une RPC transactionnelle qui change l'emplacement et inscrit l'événement dans la même transaction, puis tester l'accès inter-organisations et les conflits de mise à jour.
