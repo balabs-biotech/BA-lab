@@ -43,20 +43,41 @@ create table public.batch_qc_templates(
   id uuid primary key default gen_random_uuid(), organization_id uuid not null,
   batch_type text not null, check_code text not null, label text not null,
   default_unit_code text, required boolean not null default true, sequence_no integer not null default 1);
+create table if not exists public.materials(
+  id uuid primary key, organization_id uuid not null, material_code text not null);
+create table if not exists public.cultures(
+  id uuid primary key, organization_id uuid not null, material_id uuid not null);
+create table if not exists public.protocol_versions(
+  id uuid primary key, organization_id uuid not null);
+create table public.locations(
+  id uuid primary key, organization_id uuid not null, name text not null);
+create table public.environments(
+  id uuid primary key, organization_id uuid not null, location_id uuid, name text not null);
 create table public.events(
   id uuid primary key default gen_random_uuid(), organization_id uuid not null,
-  event_type text not null, occurred_at timestamptz not null, batch_id uuid, payload jsonb);
+  event_type text not null, occurred_at timestamptz not null, actor_user_id uuid,
+  culture_id uuid, material_id uuid, sample_id uuid, experimental_unit_id uuid,
+  location_id uuid, environment_id uuid, batch_id uuid, payload jsonb,
+  constraint events_check check (
+    num_nonnulls(culture_id, material_id, sample_id, experimental_unit_id) = 1
+  ));
 
 grant select, insert, update, delete on public.organization_members, public.batches,
   public.batch_stages, public.batch_qc_checks, public.batch_qc_templates, public.events
   to authenticated, anon, service_role;
 insert into public.organization_members values
   ('00000000-0000-0000-0000-0000000000a1','00000000-0000-0000-0000-0000000000b1');
+insert into public.materials(id,organization_id,material_code) values
+  ('00000000-0000-0000-0000-0000000000e1','00000000-0000-0000-0000-0000000000a1','MAT-A1'),
+  ('00000000-0000-0000-0000-0000000000e2','00000000-0000-0000-0000-0000000000a2','MAT-B1'),
+  ('00000000-0000-0000-0000-0000000000e3','00000000-0000-0000-0000-0000000000a1','MAT-A2');
 insert into public.batch_qc_templates(organization_id,batch_type,check_code,label,default_unit_code)
 values ('00000000-0000-0000-0000-0000000000a1','test','appearance','Appearance',null);
 
 \i supabase/migrations/20261021090000_protect_batch_workflow_v1.sql
 \i supabase/migrations/20261021090000_protect_batch_workflow_v1.sql
+\i supabase/migrations/20261022221934_add_atomic_batch_movement_rpc.sql
+\i supabase/migrations/20261022221939_enable_category_batch_workflows.sql
 
 select set_config('request.jwt.claim.sub','00000000-0000-0000-0000-0000000000b1',false);
 set role authenticated;
@@ -64,7 +85,7 @@ set role authenticated;
 -- RPC creates the batch/stages/QC rows and remains usable by an authorized member.
 do $$ declare b public.batches; n integer; begin
   select * into b from public.create_batch_with_stages(
-    '00000000-0000-0000-0000-0000000000a1','TEST-1','Workflow test','test');
+    '00000000-0000-0000-0000-0000000000a1','TEST-1','Workflow test','test', p_material_id := '00000000-0000-0000-0000-0000000000e1');
   if b.status <> 'planned' then raise exception 'FAIL: new batch status is not planned'; end if;
   select count(*) into n from public.batch_stages where batch_id=b.id;
   if n <> 10 then raise exception 'FAIL: expected 10 stages, got %', n; end if;
@@ -107,6 +128,131 @@ do $$ begin
     raise exception 'FAIL: closed batch was advanced';
   exception when others then
     if sqlerrm like 'FAIL:%' then raise; end if;
+  end;
+end $$;
+reset role;
+
+
+-- Movement updates the batch and writes a server-attributed history event atomically.
+update public.batches set status='planned', current_stage='preparation' where batch_code='TEST-1';
+insert into public.locations(id,organization_id,name) values
+ ('00000000-0000-0000-0000-0000000000c1','00000000-0000-0000-0000-0000000000a1','Room A'),
+ ('00000000-0000-0000-0000-0000000000c2','00000000-0000-0000-0000-0000000000a1','Room B');
+insert into public.environments(id,organization_id,location_id,name) values
+ ('00000000-0000-0000-0000-0000000000d1','00000000-0000-0000-0000-0000000000a1',
+  '00000000-0000-0000-0000-0000000000c2','Incubator B');
+update public.batches set material_id='00000000-0000-0000-0000-0000000000e1'
+where batch_code='TEST-1';
+
+insert into public.batches(
+  id,organization_id,batch_code,name,batch_type,material_id,current_stage,status
+) values (
+  '00000000-0000-0000-0000-0000000000f2',
+  '00000000-0000-0000-0000-0000000000a1',
+  'CLOSED-1','Closed batch','test',
+  '00000000-0000-0000-0000-0000000000e3',
+  'release','released'
+);
+select set_config('request.jwt.claim.sub','00000000-0000-0000-0000-0000000000b1',false);
+set role authenticated;
+do $$ declare v_result jsonb; v_batch_id uuid; v_closed_batch_id uuid; begin
+  select id into v_batch_id from public.batches where batch_code='TEST-1';
+  select id into v_closed_batch_id from public.batches where batch_code='CLOSED-1';
+  v_result := public.move_batch_to_location(
+    v_batch_id,
+    '00000000-0000-0000-0000-0000000000c2',
+    '00000000-0000-0000-0000-0000000000d1',
+    'Moved for incubation'
+  );
+  if not exists (
+    select 1 from public.batches
+    where id=v_batch_id
+      and location_id='00000000-0000-0000-0000-0000000000c2'
+      and environment_id='00000000-0000-0000-0000-0000000000d1'
+  ) then raise exception 'FAIL: batch location/environment were not updated'; end if;
+  if not exists (
+    select 1 from public.events
+    where id=(v_result->>'event_id')::uuid
+      and event_type='batch_moved'
+      and batch_id=v_batch_id
+      and material_id='00000000-0000-0000-0000-0000000000e1'
+      and actor_user_id=auth.uid()
+      and payload->>'note'='Moved for incubation'
+  ) then raise exception 'FAIL: movement audit event missing or incomplete'; end if;
+
+  begin
+    perform public.move_batch_to_location(v_closed_batch_id, null, null, 'closed batch');
+    raise exception 'FAIL: closed batch movement was allowed';
+  exception when sqlstate '23514' then
+    if sqlerrm = 'FAIL: closed batch movement was allowed' then raise; end if;
+  end;
+
+  begin
+    perform public.move_batch_to_location(
+      v_batch_id,
+      '00000000-0000-0000-0000-0000000000c1',
+      '00000000-0000-0000-0000-0000000000d1',
+      null
+    );
+    raise exception 'FAIL: environment from another location was accepted';
+  exception when sqlstate '23503' then null; end;
+end $$;
+reset role;
+
+-- A member of organization A cannot move a batch owned by organization B.
+insert into public.batches(
+  id,organization_id,batch_code,name,batch_type,material_id,current_stage,status
+) values (
+  '00000000-0000-0000-0000-0000000000f1',
+  '00000000-0000-0000-0000-0000000000a2',
+  'FOREIGN-1','Foreign batch','test',
+  '00000000-0000-0000-0000-0000000000e2',
+  'preparation','planned'
+);
+select set_config('request.jwt.claim.sub','00000000-0000-0000-0000-0000000000b1',false);
+set role authenticated;
+do $$ begin
+  begin
+    perform public.move_batch_to_location(
+      '00000000-0000-0000-0000-0000000000f1',
+      '00000000-0000-0000-0000-0000000000c1',
+      null,
+      'should be denied'
+    );
+    raise exception 'FAIL: cross-organization batch movement was allowed';
+  exception when sqlstate '42501' then
+    if sqlerrm = 'FAIL: cross-organization batch movement was allowed' then raise; end if;
+  end;
+end $$;
+reset role;
+
+
+-- Category-specific stage sequences are accepted only when they match the category.
+select set_config('request.jwt.claim.sub','00000000-0000-0000-0000-0000000000b1',false);
+set role authenticated;
+do $$ declare v_batch public.batches; v_codes text[]; begin
+  select * into v_batch from public.create_batch_with_stages(
+    '00000000-0000-0000-0000-0000000000a1',
+    'TRICHO-1','Trichoderma workflow','TRICHODERMA',
+    p_material_id := '00000000-0000-0000-0000-0000000000e1',
+    p_stages := array['preparation','sterilization','inoculation','incubation','cultivation','formulation','packaging','qc','release']
+  );
+  select array_agg(stage_code order by sequence_no) into v_codes
+  from public.batch_stages where batch_id=v_batch.id;
+  if v_batch.current_stage <> 'preparation' or v_codes is distinct from
+    array['preparation','sterilization','inoculation','incubation','cultivation','formulation','packaging','qc','release']::text[] then
+    raise exception 'FAIL: Trichoderma batch did not persist its category-specific workflow';
+  end if;
+
+  begin
+    perform public.create_batch_with_stages(
+      '00000000-0000-0000-0000-0000000000a1',
+      'INVALID-1','Invalid category workflow','CULTURE',
+      p_stages := array['preparation','sterilization','inoculation','incubation','cultivation','harvest','formulation','packaging','qc','release']
+    );
+    raise exception 'FAIL: mismatched stage workflow was accepted';
+  exception when sqlstate '22023' then
+    if sqlerrm = 'FAIL: mismatched stage workflow was accepted' then raise; end if;
   end;
 end $$;
 reset role;

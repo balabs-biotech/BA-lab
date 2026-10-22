@@ -40,6 +40,9 @@ let selectedBatch = null;
 let initializationInProgress = false;
 let measurementVariables = [];
 let measurementUnits = [];
+let quantityUnitOptions = [];
+let batchLocationOptions = [];
+let batchEnvironmentOptions = [];
 let recentObservations = [];
 
 
@@ -59,6 +62,19 @@ const BATCH_STAGES = [
   "qc",
   "release"
 ];
+
+const BATCH_STAGES_BY_TYPE = {
+  CULTURE: ["preparation", "sterilization", "inoculation", "incubation", "cultivation", "qc", "release"],
+  TRICHODERMA: ["preparation", "sterilization", "inoculation", "incubation", "cultivation", "formulation", "packaging", "qc", "release"],
+  PLEUROTUS_SPAWN: ["preparation", "sterilization", "inoculation", "incubation", "packaging", "qc", "release"],
+  MUSHROOM_PRODUCT: ["harvest", "packaging", "qc", "release"],
+  BIOSTIMULANT: ["preparation", "sterilization", "inoculation", "incubation", "cultivation", "formulation", "packaging", "qc", "release"],
+  FORMULATION: ["preparation", "formulation", "packaging", "qc", "release"]
+};
+
+function getBatchStages(batchType) {
+  return BATCH_STAGES_BY_TYPE[batchType] || BATCH_STAGES_BY_TYPE.CULTURE;
+}
 
 
 const BATCH_STAGE_LABELS = {
@@ -194,6 +210,9 @@ const batchQuantityInput =
 const batchUnitInput =
   document.getElementById("batchUnit");
 
+const batchLocationInput = document.getElementById("batchLocation");
+const batchEnvironmentInput = document.getElementById("batchEnvironment");
+
 const createBatchButton =
   document.getElementById("createBatchButton");
 
@@ -217,6 +236,19 @@ const reloadBatchButton =
 
 const batchQc =
   document.getElementById("batchQc");
+
+const batchEvents = document.getElementById("batchEvents");
+const batchEventList = document.getElementById("batchEventList");
+const moveBatchLocationInput = document.getElementById("moveBatchLocation");
+const moveBatchEnvironmentInput = document.getElementById("moveBatchEnvironment");
+const moveBatchNoteInput = document.getElementById("moveBatchNote");
+const moveBatchButton = document.getElementById("moveBatchButton");
+const moveBatchStatus = document.getElementById("moveBatchStatus");
+const harvestQuantityInput = document.getElementById("harvestQuantity");
+const harvestUnitInput = document.getElementById("harvestUnit");
+const harvestNoteInput = document.getElementById("harvestNote");
+const recordHarvestButton = document.getElementById("recordHarvestButton");
+const harvestStatus = document.getElementById("harvestStatus");
 
 const batchQcList =
   document.getElementById("batchQcList");
@@ -678,6 +710,11 @@ async function signOut() {
   latestBatches = [];
   selectedBatchId = null;
   selectedBatch = null;
+  if (harvestQuantityInput) harvestQuantityInput.value = "";
+  if (harvestUnitInput) harvestUnitInput.value = "";
+  if (harvestNoteInput) harvestNoteInput.value = "";
+  if (recordHarvestButton) recordHarvestButton.disabled = true;
+  if (harvestStatus) harvestStatus.textContent = "Connectez-vous et sélectionnez un lot à l’étape Récolte.";
 
 
   hideElement(trackerCard);
@@ -803,6 +840,10 @@ async function initializeAuthenticatedTracker(
     await loadReferenceData();
 
     await loadCultureOptions();
+
+    await loadQuantityUnitOptions();
+
+    await loadBatchPlaceOptions();
 
     await syncPendingCultures();
 
@@ -2189,10 +2230,10 @@ async function compareSelectedBatches() {
   if (!select || !status || !results || !button) return;
   const language = window.BALabsI18n?.language || "fr";
   const ui = ({
-    fr: { selection:"Sélectionnez entre 2 et 4 lots.", stale:"Un ou plusieurs lots ne sont plus dans la liste chargée. Actualisez la page.", loading:"Chargement des étapes et des mesures…", loaded:"Comparaison chargée.", capped:"Comparaison chargée avec une limite de 1 000 mesures récentes par lien culture/environnement ; les comptes peuvent être incomplets.", count:"n_mesures désigne le nombre de mesures, pas le nombre de répétitions biologiques indépendantes.", shared:"Les mesures d'un environnement partagé peuvent apparaître pour plusieurs lots.", repeated:n=>`Attention : ${n} lien(s) d'unité expérimentale sont partagés entre les lots sélectionnés ; ces lots ne constituent pas autant de répétitions indépendantes.`, missing:"Les données manquantes ne sont pas interprétées comme zéro.", impossible:"Impossible de comparer les lots.", culture:"Culture", environment:"Environnement", observations:n=>`${n} observation(s)`, noObservations:"Aucune observation", treatment:"traitement", replicate:"répétition", excluded:"exclue" },
-    en: { selection:"Select between 2 and 4 batches.", stale:"One or more batches are no longer in the loaded list. Refresh the page.", loading:"Loading stages and measurements…", loaded:"Comparison loaded.", capped:"Comparison loaded with a limit of 1,000 recent measurements per culture/environment link; counts may be incomplete.", count:"n_measurements is the number of measurements, not the number of independent biological replicates.", shared:"Measurements from a shared environment may appear for multiple batches.", repeated:n=>`Warning: ${n} experimental-unit link(s) are shared by the selected batches; these batches do not represent that many independent replicates.`, missing:"Missing data is not treated as zero.", impossible:"Unable to compare batches.", culture:"Culture", environment:"Environment", observations:n=>`${n} observation(s)`, noObservations:"No observations", treatment:"treatment", replicate:"replicate", excluded:"excluded" },
-    pt: { selection:"Selecione entre 2 e 4 lotes.", stale:"Um ou mais lotes já não estão na lista carregada. Atualize a página.", loading:"A carregar etapas e medições…", loaded:"Comparação carregada.", capped:"Comparação carregada com um limite de 1.000 medições recentes por ligação cultura/ambiente; as contagens podem estar incompletas.", count:"n_medições indica o número de medições, não o número de repetições biológicas independentes.", shared:"As medições de um ambiente partilhado podem aparecer em vários lotes.", repeated:n=>`Atenção: ${n} ligação(ões) de unidade experimental são partilhadas pelos lotes selecionados; estes lotes não representam esse número de repetições independentes.`, missing:"Os dados em falta não são tratados como zero.", impossible:"Não foi possível comparar os lotes.", culture:"Cultura", environment:"Ambiente", observations:n=>`${n} observação(ões)`, noObservations:"Sem observações", treatment:"tratamento", replicate:"repetição", excluded:"excluída" },
-    ar: { selection:"اختر من دفعتين إلى أربع دفعات.", stale:"لم تعد دفعة واحدة أو أكثر موجودة في القائمة المحمّلة. حدّث الصفحة.", loading:"جارٍ تحميل المراحل والقياسات…", loaded:"اكتملت المقارنة.", capped:"اكتملت المقارنة مع حد أقصى قدره ١٬٠٠٠ قياس حديث لكل ارتباط بين المزرعة والبيئة؛ وقد تكون الأعداد غير مكتملة.", count:"n_measurements هو عدد القياسات وليس عدد المكررات البيولوجية المستقلة.", shared:"قد تظهر قياسات البيئة المشتركة في عدة دفعات.", repeated:n=>`تحذير: توجد ${n} روابط لوحدات تجريبية مشتركة بين الدفعات المحددة؛ ولا تمثل هذه الدفعات هذا العدد من المكررات المستقلة.`, missing:"لا تُعامل البيانات المفقودة على أنها صفر.", impossible:"تعذرت مقارنة الدفعات.", culture:"المزرعة", environment:"البيئة", observations:n=>`${n} ملاحظة`, noObservations:"لا توجد ملاحظات", treatment:"المعاملة", replicate:"مكرر", excluded:"مستبعدة" }
+    fr: { selection:"Sélectionnez entre 2 et 4 lots.", stale:"Un ou plusieurs lots ne sont plus dans la liste chargée. Actualisez la page.", loading:"Chargement des étapes et des mesures…", loaded:"Comparaison chargée.", capped:"Comparaison chargée avec une limite de 1 000 mesures récentes par lien culture/environnement ; les comptes peuvent être incomplets.", count:"n_mesures désigne le nombre de mesures, pas le nombre de répétitions biologiques indépendantes.", shared:"Les mesures d'un environnement partagé peuvent apparaître pour plusieurs lots.", repeated:n=>`Attention : ${n} lien(s) d'unité expérimentale sont partagés entre les lots sélectionnés ; ces lots ne constituent pas autant de répétitions indépendantes.`, unitMismatch:n=>`Comparabilité : ${n} variable(s) utilisent plusieurs unités dans les lots sélectionnés ; leurs valeurs restent séparées et ne doivent pas être comparées directement.`, missing:"Les données manquantes ne sont pas interprétées comme zéro.", impossible:"Impossible de comparer les lots.", culture:"Culture", environment:"Environnement", observations:n=>`${n} observation(s)`, noObservations:"Aucune observation", treatment:"traitement", replicate:"répétition", excluded:"exclue" },
+    en: { selection:"Select between 2 and 4 batches.", stale:"One or more batches are no longer in the loaded list. Refresh the page.", loading:"Loading stages and measurements…", loaded:"Comparison loaded.", capped:"Comparison loaded with a limit of 1,000 recent measurements per culture/environment link; counts may be incomplete.", count:"n_measurements is the number of measurements, not the number of independent biological replicates.", shared:"Measurements from a shared environment may appear for multiple batches.", repeated:n=>`Warning: ${n} experimental-unit link(s) are shared by the selected batches; these batches do not represent that many independent replicates.`, unitMismatch:n=>`Comparability: ${n} variable(s) use multiple units across the selected batches; values remain separated and must not be compared directly.`, missing:"Missing data is not treated as zero.", impossible:"Unable to compare batches.", culture:"Culture", environment:"Environment", observations:n=>`${n} observation(s)`, noObservations:"No observations", treatment:"treatment", replicate:"replicate", excluded:"excluded" },
+    pt: { selection:"Selecione entre 2 e 4 lotes.", stale:"Um ou mais lotes já não estão na lista carregada. Atualize a página.", loading:"A carregar etapas e medições…", loaded:"Comparação carregada.", capped:"Comparação carregada com um limite de 1.000 medições recentes por ligação cultura/ambiente; as contagens podem estar incompletas.", count:"n_medições indica o número de medições, não o número de repetições biológicas independentes.", shared:"As medições de um ambiente partilhado podem aparecer em vários lotes.", repeated:n=>`Atenção: ${n} ligação(ões) de unidade experimental são partilhadas pelos lotes selecionados; estes lotes não representam esse número de repetições independentes.`, unitMismatch:n=>`Comparabilidade: ${n} variável(is) usam várias unidades nos lotes selecionados; os valores permanecem separados e não devem ser comparados diretamente.`, missing:"Os dados em falta não são tratados como zero.", impossible:"Não foi possível comparar os lotes.", culture:"Cultura", environment:"Ambiente", observations:n=>`${n} observação(ões)`, noObservations:"Sem observações", treatment:"tratamento", replicate:"repetição", excluded:"excluída" },
+    ar: { selection:"اختر من دفعتين إلى أربع دفعات.", stale:"لم تعد دفعة واحدة أو أكثر موجودة في القائمة المحمّلة. حدّث الصفحة.", loading:"جارٍ تحميل المراحل والقياسات…", loaded:"اكتملت المقارنة.", capped:"اكتملت المقارنة مع حد أقصى قدره ١٬٠٠٠ قياس حديث لكل ارتباط بين المزرعة والبيئة؛ وقد تكون الأعداد غير مكتملة.", count:"n_measurements هو عدد القياسات وليس عدد المكررات البيولوجية المستقلة.", shared:"قد تظهر قياسات البيئة المشتركة في عدة دفعات.", repeated:n=>`تحذير: توجد ${n} روابط لوحدات تجريبية مشتركة بين الدفعات المحددة؛ ولا تمثل هذه الدفعات هذا العدد من المكررات المستقلة.`, unitMismatch:n=>`قابلية المقارنة: تستخدم ${n} متغيرات وحدات متعددة بين الدفعات المحددة؛ ستبقى القيم منفصلة ولا ينبغي مقارنتها مباشرة.`, missing:"لا تُعامل البيانات المفقودة على أنها صفر.", impossible:"تعذرت مقارنة الدفعات.", culture:"المزرعة", environment:"البيئة", observations:n=>`${n} ملاحظة`, noObservations:"لا توجد ملاحظات", treatment:"المعاملة", replicate:"مكرر", excluded:"مستبعدة" }
   })[language] || null;
   const labels = ui || ({
     selection:"Sélectionnez entre 2 et 4 lots.", stale:"Un ou plusieurs lots ne sont plus dans la liste chargée. Actualisez la page.", loading:"Chargement des étapes et des mesures…", loaded:"Comparaison chargée.", capped:"Comparaison chargée avec une limite de 1 000 mesures récentes par lien culture/environnement ; les comptes peuvent être incomplets.", count:"n_mesures désigne le nombre de mesures, pas le nombre de répétitions biologiques indépendantes.", shared:"Les mesures d'un environnement partagé peuvent apparaître pour plusieurs lots.", repeated:n=>`Attention : ${n} lien(s) d'unité expérimentale sont partagés entre les lots sélectionnés ; ces lots ne constituent pas autant de répétitions indépendantes.`, missing:"Les données manquantes ne sont pas interprétées comme zéro.", impossible:"Impossible de comparer les lots.", culture:"Culture", environment:"Environnement", observations:n=>`${n} observation(s)`, noObservations:"Aucune observation", treatment:"traitement", replicate:"répétition", excluded:"exclue"
@@ -2296,6 +2337,18 @@ async function compareSelectedBatches() {
       if (row.id) measurementMap.set(row.id, row);
     });
     const measurements = [...measurementMap.values()];
+    // Unit-aware comparison: never treat values in different units as directly comparable.
+    const measurementUnitsByVariable = new Map();
+    measurements.forEach(row => {
+      if (row.quality_state === "excluded") return;
+      const value = row.normalized_value ?? row.raw_value;
+      if (value == null || !Number.isFinite(Number(value))) return;
+      const variable = row.variable_code || "variable inconnue";
+      const unit = row.normalized_value != null ? (row.normalized_unit_code || "") : (row.raw_unit_code || "");
+      if (!measurementUnitsByVariable.has(variable)) measurementUnitsByVariable.set(variable, new Set());
+      measurementUnitsByVariable.get(variable).add(unit || "(unité non renseignée)");
+    });
+    const unitMismatchCount = [...measurementUnitsByVariable.values()].filter(units => units.size > 1).length;
     const table = document.createElement("table");
     table.className = "statistics-table";
     table.innerHTML = "<caption>Comparaison descriptive des lots sélectionnés</caption><thead><tr><th>Lot</th><th>Type</th><th>Expérience</th><th>Unité / traitement / répétition</th><th>État / étape</th><th>Quantité prévue</th><th>Quantité réelle</th><th>Étapes terminées</th><th>Mesures de culture</th><th>Mesures d'environnement</th><th>Observations qualitatives</th><th>Résumé numérique séparé par source</th><th>Dernière mesure</th></tr></thead>";
@@ -2384,6 +2437,7 @@ async function compareSelectedBatches() {
       labels.count,
       labels.shared,
       repeatedUnitCount > 0 ? labels.repeated(repeatedUnitCount) : "",
+      unitMismatchCount > 0 ? labels.unitMismatch(unitMismatchCount) : "",
       labels.missing
     ].filter(Boolean);
     status.textContent = statusParts.join(" ");
@@ -2662,6 +2716,17 @@ async function loadBatch(
 
   }
 
+  // Le journal est en lecture seule : il réutilise les événements déjà reliés au lot.
+  // Une indisponibilité du journal ne doit pas empêcher l'accès aux étapes ou au QC.
+  const { data: batchEventsData, error: batchEventsError } = await supabaseClient
+    .from("events")
+    .select("id,event_type,occurred_at,payload,location_id,environment_id")
+    .eq("organization_id", organizationId)
+    .eq("batch_id", batchId)
+    .order("occurred_at", { ascending: false })
+    .limit(50);
+
+  if (requestId !== batchDetailRequestId) return;
 
   renderBatchInfo(
     batch
@@ -2674,6 +2739,9 @@ async function loadBatch(
   renderBatchQc(
     qcChecks || []
   );
+  renderBatchEventTimeline(batchEventsData || [], batchEventsError?.message || null);
+  updateHarvestEntryState(batch, batchEventsData || []);
+  prepareMovementControls(batch);
 
 
   showElement(
@@ -2687,6 +2755,7 @@ async function loadBatch(
   showElement(
     batchQc
   );
+  showElement(batchEvents);
 
 
   updateBatchActionState(
@@ -2701,6 +2770,166 @@ async function loadBatch(
 /* ============================================================
    INFORMATIONS BATCH
    ============================================================ */
+
+function updateHarvestEntryState(batch, events) {
+  if (!recordHarvestButton || !harvestStatus) return;
+  const allowed = batch?.current_stage === "harvest" && !["released", "rejected", "aborted", "completed"].includes(batch?.status);
+  recordHarvestButton.disabled = !allowed;
+  const groups = new Map();
+  (events || []).filter(event => event.event_type === "harvest_recorded").forEach(event => {
+    const p = event.payload && typeof event.payload === "object" ? event.payload : {};
+    const q = Number(p.quantity), unit = String(p.unit_code || "").trim();
+    if (Number.isFinite(q) && q > 0 && unit) groups.set(unit, (groups.get(unit) || 0) + q);
+  });
+  harvestStatus.textContent = allowed ? "Étape Récolte active. Chaque saisie reste distincte." : "La saisie est activée uniquement pendant l’étape Récolte d’un lot ouvert.";
+  if (groups.size) harvestStatus.textContent += " Total des 50 événements chargés, par unité : " + [...groups].map(([u,q]) => Number(q.toPrecision(8)) + " " + u).join(" · ") + ".";
+}
+
+async function recordBatchHarvest() {
+  if (!organizationId || !selectedBatch || !selectedBatchId) {
+    showMessage("Sélectionnez d’abord un lot.", "error");
+    return;
+  }
+  if (selectedBatch.current_stage !== "harvest" || ["released", "rejected", "aborted", "completed"].includes(selectedBatch.status)) {
+    showMessage("La récolte ne peut être enregistrée que pendant l’étape Récolte d’un lot ouvert.", "error");
+    return;
+  }
+  const quantityText = harvestQuantityInput.value.trim();
+  const quantity = Number(quantityText);
+  const unitCode = harvestUnitInput.value.trim();
+  const note = harvestNoteInput.value.trim();
+  if (!quantityText || !Number.isFinite(quantity) || quantity <= 0 || !unitCode) {
+    showMessage("Indiquez une quantité strictement positive et un code d’unité.", "error");
+    return;
+  }
+  recordHarvestButton.disabled = true;
+  const originalLabel = recordHarvestButton.textContent;
+  recordHarvestButton.textContent = "Enregistrement…";
+  try {
+    const session = await getCurrentSession();
+    if (!session) throw new Error("Session expirée. Reconnectez-vous.");
+    const { data: unit, error: unitError } = await supabaseClient.from("units").select("code").eq("code", unitCode).maybeSingle();
+    if (unitError) throw new Error("Vérification de l’unité impossible : " + unitError.message);
+    if (!unit) throw new Error("Code d’unité inconnu. Utilisez un code déjà présent dans le référentiel des unités.");
+    // events requires exactly one biological/material/sample/unit anchor in addition to batch_id.
+    const eventAnchor = selectedBatch.culture_id
+      ? { culture_id: selectedBatch.culture_id }
+      : selectedBatch.material_id
+        ? { material_id: selectedBatch.material_id }
+        : null;
+    if (!eventAnchor) {
+      throw new Error("Ce lot doit être lié à une culture ou à un matériau pour enregistrer une récolte dans le journal biologique.");
+    }
+    const { error } = await supabaseClient.from("events").insert({
+      organization_id: organizationId,
+      event_type: "harvest_recorded",
+      occurred_at: new Date().toISOString(),
+      actor_user_id: session.user.id,
+      ...eventAnchor,
+      batch_id: selectedBatch.id,
+      payload: { quantity, unit_code: unit.code, note: note || null, source: "batch-tracker-harvest-entry", schema_version: 1 }
+    });
+    if (error) throw new Error("Enregistrement de la récolte impossible : " + error.message);
+    harvestQuantityInput.value = "";
+    harvestNoteInput.value = "";
+    showMessage("Récolte enregistrée dans la chronologie du lot.", "success");
+    await loadBatch(selectedBatch.id);
+    await loadLatestBatches();
+  } catch (error) {
+    console.error("Enregistrement récolte :", error);
+    showMessage(error?.message || "Enregistrement de la récolte impossible.", "error");
+  } finally {
+    recordHarvestButton.textContent = originalLabel;
+    if (selectedBatch) {
+      recordHarvestButton.disabled = !(selectedBatch.current_stage === "harvest" && !["released", "rejected", "aborted", "completed"].includes(selectedBatch.status));
+    }
+  }
+}
+recordHarvestButton?.addEventListener("click", recordBatchHarvest);
+
+
+function renderBatchEventTimeline(events, loadError = null) {
+  if (!batchEventList) return;
+  batchEventList.replaceChildren();
+
+  if (loadError) {
+    batchEventList.textContent = "Chronologie indisponible : " + loadError;
+    return;
+  }
+  if (!events?.length) {
+    batchEventList.innerHTML = '<p class="muted">Aucun événement enregistré pour ce lot.</p>';
+    return;
+  }
+
+  const labels = {
+    batch_created: "Lot créé",
+    batch_stage_advanced: "Étape avancée",
+    batch_completed: "Cycle terminé",
+    batch_released: "Lot libéré",
+    measurement_recorded: "Mesure enregistrée",
+    harvest_recorded: "Récolte enregistrée",
+    observation_recorded: "Observation enregistrée",
+    batch_moved: "Déplacement du lot"
+  };
+  const summarize = event => {
+    const p = event.payload && typeof event.payload === "object" ? event.payload : {};
+    if (event.event_type === "batch_created") return [p.batch_code, p.batch_type].filter(Boolean).join(" · ");
+    if (event.event_type === "batch_stage_advanced") return [p.from, p.to].filter(Boolean).join(" → ");
+    if (event.event_type === "batch_completed") return p.final_stage ? "Étape finale : " + p.final_stage : "";
+    if (event.event_type === "batch_released") {
+      const parts = [];
+      if (Number.isFinite(Number(p.passed))) parts.push("validés : " + p.passed);
+      if (Number.isFinite(Number(p.waived))) parts.push("dérogations : " + p.waived);
+      if (Number.isFinite(Number(p.qc_checks))) parts.push("contrôles : " + p.qc_checks);
+      return parts.join(" · ");
+    }
+    if (event.event_type === "harvest_recorded") {
+      const parts = [];
+      if (p.quantity !== undefined && p.quantity !== null) parts.push("Quantité : " + String(p.quantity) + (p.unit_code ? " " + p.unit_code : ""));
+      if (p.note) parts.push(String(p.note));
+      return parts.join(" · ");
+    }
+    if (event.event_type === "measurement_recorded") {
+      const parts = [];
+      if (p.variable_code) parts.push(p.variable_code);
+      if (p.raw_value !== undefined && p.raw_value !== null) parts.push(String(p.raw_value) + (p.raw_unit_code ? " " + p.raw_unit_code : ""));
+      return parts.join(" : ");
+    }
+    if (event.event_type === "batch_moved") {
+      const parts = [];
+      const location = batchLocationOptions.find(item => item.id === event.location_id);
+      const environment = batchEnvironmentOptions.find(item => item.id === event.environment_id);
+      if (location) parts.push("Emplacement : " + (location.name || location.code || location.id));
+      else if (event.location_id) parts.push("Emplacement mis à jour");
+      if (environment) parts.push("Environnement : " + environment.name);
+      else if (event.environment_id) parts.push("Environnement mis à jour");
+      if (p.note) parts.push(String(p.note));
+      return parts.join(" · ");
+    }
+    return "";
+  };
+
+  events.forEach(event => {
+    const item = document.createElement("article");
+    item.className = "info batch-event-item";
+    const date = event.occurred_at ? new Date(event.occurred_at) : null;
+    const dateLabel = date && !Number.isNaN(date.getTime()) ? date.toLocaleString() : "Date inconnue";
+    const heading = document.createElement("strong");
+    heading.textContent = labels[event.event_type] || String(event.event_type || "Événement");
+    const time = document.createElement("div");
+    time.className = "muted";
+    time.textContent = dateLabel;
+    item.append(heading, time);
+    const detailText = summarize(event);
+    if (detailText) {
+      const detail = document.createElement("div");
+      detail.textContent = detailText;
+      item.appendChild(detail);
+    }
+    batchEventList.appendChild(item);
+  });
+}
+
 
 function renderBatchInfo(
   batch
@@ -2725,6 +2954,9 @@ function renderBatchInfo(
           ""
         }`;
 
+
+  const locationName = batchLocationOptions.find(location => location.id === batch.location_id)?.name || "—";
+  const environmentName = batchEnvironmentOptions.find(environment => environment.id === batch.environment_id)?.name || "—";
 
   batchInfo.className =
     "info";
@@ -2836,6 +3068,20 @@ function renderBatchInfo(
 
       </div>
 
+      <div class="batch-stat">
+        <div class="batch-stat-label">Emplacement</div>
+        <div class="batch-stat-value">
+          ${escapeHtml(locationName)}
+        </div>
+      </div>
+
+      <div class="batch-stat">
+        <div class="batch-stat-label">Environnement</div>
+        <div class="batch-stat-value">
+          ${escapeHtml(environmentName)}
+        </div>
+      </div>
+
     </div>
 
   `;
@@ -2855,32 +3101,22 @@ function renderBatchStages(
     "";
 
 
-  const stageMap =
-    new Map(
-      stages.map(
-        stage =>
-          [
-            stage.stage_code,
-            stage
-          ]
-      )
-    );
-
+  const orderedStages = stages.length
+    ? [...stages].sort((a, b) => (a.sequence_no ?? 0) - (b.sequence_no ?? 0))
+    : BATCH_STAGES.map((stage_code, sequence_no) => ({
+        stage_code,
+        sequence_no,
+        status: "pending"
+      }));
 
   for (
     let index = 0;
-    index < BATCH_STAGES.length;
+    index < orderedStages.length;
     index++
   ) {
 
-    const stageCode =
-      BATCH_STAGES[index];
-
-
-    const stage =
-      stageMap.get(
-        stageCode
-      );
+    const stage = orderedStages[index];
+    const stageCode = stage.stage_code;
 
 
     const div =
@@ -3504,10 +3740,8 @@ async function createBatch() {
   if (
     quantityPlanned !== null &&
     (
-      !Number.isFinite(
-        quantityPlanned
-      ) ||
-      quantityPlanned < 0
+      !Number.isFinite(quantityPlanned) ||
+      quantityPlanned <= 0
     )
   ) {
 
@@ -3520,6 +3754,22 @@ async function createBatch() {
 
   }
 
+
+  if (quantityPlanned !== null && !quantityUnit) {
+    showMessage(
+      "Choisissez une unité dans le référentiel pour la quantité prévue.",
+      "error"
+    );
+    return;
+  }
+
+  if (quantityPlanned === null && quantityUnit) {
+    showMessage(
+      "Saisissez la quantité prévue ou effacez l’unité sélectionnée.",
+      "error"
+    );
+    return;
+  }
 
   const protocolVersionId =
     await getCultureProtocolVersionId(
@@ -3570,10 +3820,10 @@ async function createBatch() {
             cultureId,
 
           p_location_id:
-            null,
+            batchLocationInput?.value || null,
 
           p_environment_id:
-            null,
+            batchEnvironmentInput?.value || null,
 
           p_planned_at:
             new Date().toISOString(),
@@ -3586,7 +3836,7 @@ async function createBatch() {
             null,
 
           p_stages:
-            BATCH_STAGES
+            getBatchStages(batchType)
 
         }
       );
@@ -3618,6 +3868,10 @@ async function createBatch() {
 
     batchUnitInput.value =
       "";
+
+    if (batchLocationInput) batchLocationInput.value = "";
+    renderBatchEnvironmentOptions();
+    if (batchEnvironmentInput) batchEnvironmentInput.value = "";
 
 
     showElement(
@@ -3659,7 +3913,7 @@ async function createBatch() {
 
       Première étape :
       <strong>
-        Préparation
+        ${escapeHtml(BATCH_STAGE_LABELS[getBatchStages(batchType)[0]] || getBatchStages(batchType)[0])}
       </strong>
 
     `;
@@ -4163,6 +4417,223 @@ async function init() {
 /* ============================================================
    INTERFACE : chargement, accessibilité, progression
    ============================================================ */
+
+
+/* ============================================================
+   UNITÉS DE QUANTITÉ — LOTS ET RÉCOLTES
+   ============================================================ */
+
+async function loadQuantityUnitOptions() {
+  const selects = [batchUnitInput, harvestUnitInput].filter(Boolean);
+  for (const select of selects) {
+    select.replaceChildren();
+    const placeholder = document.createElement("option");
+    placeholder.value = "";
+    placeholder.textContent = "Choisir une unité…";
+    select.appendChild(placeholder);
+  }
+
+  try {
+    const { data, error } = await supabaseClient
+      .from("units")
+      .select("code,label,dimension")
+      .order("code");
+    if (error) throw error;
+
+    quantityUnitOptions = data || [];
+    for (const select of selects) {
+      for (const unit of quantityUnitOptions) {
+        const option = document.createElement("option");
+        option.value = unit.code;
+        const label = unit.label && unit.label !== unit.code
+          ? `${unit.label} (${unit.code})`
+          : unit.code;
+        option.textContent = unit.dimension
+          ? `${label} — ${unit.dimension}`
+          : label;
+        select.appendChild(option);
+      }
+      select.disabled = quantityUnitOptions.length === 0;
+    }
+    if (!quantityUnitOptions.length) {
+      for (const select of selects) {
+        select.options[0].textContent = "Aucune unité disponible";
+      }
+    }
+  } catch (error) {
+    console.error("Référentiel des unités indisponible :", error);
+    quantityUnitOptions = [];
+    for (const select of selects) {
+      select.disabled = true;
+      if (select.options[0]) select.options[0].textContent = "Unités indisponibles";
+    }
+  }
+}
+
+
+/* ============================================================
+   EMPLACEMENTS ET ENVIRONNEMENTS DES LOTS
+   ============================================================ */
+
+function renderMovementEnvironmentOptions() {
+  if (!moveBatchEnvironmentInput) return;
+  const locationId = moveBatchLocationInput?.value || "";
+  const current = moveBatchEnvironmentInput.value;
+  const available = batchEnvironmentOptions.filter(environment =>
+    locationId
+      ? !environment.location_id || environment.location_id === locationId
+      : !environment.location_id
+  );
+  moveBatchEnvironmentInput.replaceChildren();
+  const placeholder = document.createElement("option");
+  placeholder.value = "";
+  placeholder.textContent = "Aucun environnement";
+  moveBatchEnvironmentInput.appendChild(placeholder);
+  for (const environment of available) {
+    const option = document.createElement("option");
+    option.value = environment.id;
+    option.textContent = environment.name;
+    moveBatchEnvironmentInput.appendChild(option);
+  }
+  moveBatchEnvironmentInput.value = available.some(environment => environment.id === current) ? current : "";
+  moveBatchEnvironmentInput.disabled = available.length === 0 || !selectedBatch;
+}
+
+function prepareMovementControls(batch) {
+  if (!moveBatchLocationInput || !moveBatchEnvironmentInput || !moveBatchButton || !moveBatchStatus) return;
+  moveBatchLocationInput.replaceChildren();
+  const noLocation = document.createElement("option");
+  noLocation.value = "";
+  noLocation.textContent = "Aucun emplacement";
+  moveBatchLocationInput.appendChild(noLocation);
+  for (const location of batchLocationOptions) {
+    const option = document.createElement("option");
+    option.value = location.id;
+    option.textContent = location.name || location.code || location.id;
+    moveBatchLocationInput.appendChild(option);
+  }
+  moveBatchLocationInput.value = batch?.location_id || "";
+  renderMovementEnvironmentOptions();
+  moveBatchEnvironmentInput.value = batch?.environment_id || "";
+  // If legacy data contains a now-incompatible pairing, don't silently retain it.
+  if (![...moveBatchEnvironmentInput.options].some(option => option.value === moveBatchEnvironmentInput.value)) {
+    moveBatchEnvironmentInput.value = "";
+  }
+  const isOpen = batch && !["released", "rejected", "aborted", "completed"].includes(batch.status);
+  const hasCurrentAssignment = Boolean(batch?.location_id || batch?.environment_id);
+  moveBatchButton.disabled = !isOpen || (!batchLocationOptions.length && !batchEnvironmentOptions.length && !hasCurrentAssignment);
+  moveBatchLocationInput.disabled = !isOpen;
+  moveBatchEnvironmentInput.disabled = !isOpen || moveBatchEnvironmentInput.options.length <= 1;
+  moveBatchStatus.textContent = batch
+    ? "Choisissez l’emplacement et l’environnement de destination. Un déplacement sans changement sera refusé."
+    : "Sélectionnez un lot pour préparer un déplacement.";
+}
+
+async function moveSelectedBatch() {
+  if (!organizationId || !selectedBatch || !selectedBatchId) {
+    showMessage("Sélectionnez d’abord un lot.", "error");
+    return;
+  }
+  if (["released", "rejected", "aborted", "completed"].includes(selectedBatch.status)) {
+    showMessage("Un lot clôturé ne peut pas être déplacé depuis ce formulaire.", "error");
+    return;
+  }
+  const locationId = moveBatchLocationInput?.value || null;
+  const environmentId = moveBatchEnvironmentInput?.value || null;
+  const note = moveBatchNoteInput?.value.trim() || null;
+  const currentLocation = selectedBatch.location_id || null;
+  const currentEnvironment = selectedBatch.environment_id || null;
+  if (locationId === currentLocation && environmentId === currentEnvironment) {
+    showMessage("Le nouvel emplacement et l’environnement sont identiques aux valeurs actuelles.", "error");
+    return;
+  }
+  moveBatchButton.disabled = true;
+  const label = moveBatchButton.textContent;
+  moveBatchButton.textContent = "Enregistrement…";
+  try {
+    const { data, error } = await supabaseClient.rpc("move_batch_to_location", {
+      p_batch_id: selectedBatchId,
+      p_location_id: locationId,
+      p_environment_id: environmentId,
+      p_note: note
+    });
+    if (error) throw error;
+    if (!data?.event_id) throw new Error("La RPC n’a pas confirmé la création de l’événement de déplacement.");
+    if (moveBatchNoteInput) moveBatchNoteInput.value = "";
+    await loadLatestBatches();
+    await loadBatch(selectedBatchId);
+    showMessage("Déplacement enregistré dans la chronologie du lot.", "success");
+  } catch (error) {
+    console.error("Déplacement du lot impossible:", error);
+    showMessage("Déplacement impossible : " + (error.message || "erreur inconnue"), "error");
+  } finally {
+    moveBatchButton.textContent = label;
+    if (selectedBatch) prepareMovementControls(selectedBatch);
+  }
+}
+
+function renderBatchEnvironmentOptions() {
+  if (!batchEnvironmentInput) return;
+  const selectedLocationId = batchLocationInput?.value || "";
+  const available = batchEnvironmentOptions.filter(environment =>
+    selectedLocationId
+      ? !environment.location_id || environment.location_id === selectedLocationId
+      : !environment.location_id
+  );
+  batchEnvironmentInput.replaceChildren();
+  const placeholder = document.createElement("option");
+  placeholder.value = "";
+  placeholder.textContent = "Aucun environnement";
+  batchEnvironmentInput.appendChild(placeholder);
+  for (const environment of available) {
+    const option = document.createElement("option");
+    option.value = environment.id;
+    option.textContent = environment.name;
+    batchEnvironmentInput.appendChild(option);
+  }
+  batchEnvironmentInput.disabled = available.length === 0;
+}
+
+async function loadBatchPlaceOptions() {
+  if (!organizationId || !batchLocationInput || !batchEnvironmentInput) return;
+  batchLocationInput.disabled = true;
+  batchEnvironmentInput.disabled = true;
+  try {
+    const [{ data: locations, error: locationsError }, { data: environments, error: environmentsError }] = await Promise.all([
+      supabaseClient.from("locations").select("id,code,name").eq("organization_id", organizationId).order("name"),
+      supabaseClient.from("environments").select("id,name,location_id").eq("organization_id", organizationId).order("name")
+    ]);
+    if (locationsError) throw locationsError;
+    if (environmentsError) throw environmentsError;
+    batchLocationOptions = locations || [];
+    batchEnvironmentOptions = environments || [];
+    batchLocationInput.replaceChildren();
+    const placeholder = document.createElement("option");
+    placeholder.value = "";
+    placeholder.textContent = "Aucun emplacement";
+    batchLocationInput.appendChild(placeholder);
+    for (const location of batchLocationOptions) {
+      const option = document.createElement("option");
+      option.value = location.id;
+      option.textContent = location.code ? location.name + " (" + location.code + ")" : location.name;
+      batchLocationInput.appendChild(option);
+    }
+    batchLocationInput.disabled = batchLocationOptions.length === 0;
+    renderBatchEnvironmentOptions();
+  } catch (error) {
+    console.error("Référentiel des emplacements indisponible :", error);
+    batchLocationOptions = [];
+    batchEnvironmentOptions = [];
+    batchLocationInput.replaceChildren(new Option("Emplacements indisponibles", ""));
+    batchEnvironmentInput.replaceChildren(new Option("Environnements indisponibles", ""));
+    batchLocationInput.disabled = true;
+    batchEnvironmentInput.disabled = true;
+  }
+}
+
+batchLocationInput?.addEventListener("change", renderBatchEnvironmentOptions);
+moveBatchLocationInput?.addEventListener("change", renderMovementEnvironmentOptions);
+moveBatchButton?.addEventListener("click", moveSelectedBatch);
 
 
 /* ============================================================
@@ -5606,6 +6077,33 @@ function setupDomainWorkspaces() {
 }
 setupDomainWorkspaces();
 setupProgressiveCultureEntry();
+setupBioOperationFormGuidance();
+
+
+/* Only operations that can create descendants expose descendant-code entry. */
+function setupBioOperationFormGuidance() {
+  const operation = document.getElementById("bioOperationType");
+  const field = document.getElementById("bioChildCodesField");
+  const codes = document.getElementById("bioChildCodes");
+  if (!operation || !field || !codes) return;
+
+  const operationsWithDescendants = new Set([
+    "repiquage",
+    "passage",
+    "transfert",
+    "division_aliquotes",
+    "changement_milieu",
+    "conservation"
+  ]);
+  const update = () => {
+    const allowed = operationsWithDescendants.has(operation.value);
+    field.hidden = !allowed;
+    codes.disabled = !allowed;
+    if (!allowed) codes.value = "";
+  };
+  operation.addEventListener("change", update);
+  update();
+}
 
 
 /* Progressive disclosure: reveal the next capture step only after the current identity is complete. */

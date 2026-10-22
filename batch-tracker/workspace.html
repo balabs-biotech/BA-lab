@@ -7,7 +7,7 @@
   <div class="app-toolbar">
     <a class="toolbar-brand" href="#main" aria-label="BA Labs, début de page">
       <span class="brand-symbol" aria-hidden="true"><svg viewBox="0 0 40 40"><path d="M20 4v9M20 27v9M4 20h9M27 20h9M8.7 8.7l6.4 6.4M24.9 24.9l6.4 6.4M31.3 8.7l-6.4 6.4M15.1 24.9l-6.4 6.4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="20" cy="20" r="8" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="20" cy="20" r="3" fill="currentColor"/></svg></span>
-      <span class="brand-wordmark"><strong>BA LABS</strong><small>LAB OPERATIONS</small></span>
+      <span class="brand-wordmark"><strong>BA LABS</strong><small>CULTUREOPS</small></span>
     </a>
     <div class="toolbar-divider" aria-hidden="true"></div>
     <nav class="section-nav" aria-label="Navigation des modules">
@@ -263,7 +263,7 @@
     <div class="consent-panel">
       <strong>Conditions d’utilisation et traitement des données</strong>
       <p>
-        Les informations saisies dans BatchTracker sont enregistrées dans la base de données
+        Les informations saisies dans CultureOps sont enregistrées dans la base de données
         BA Labs afin d’assurer la traçabilité des cultures, des générations et des lots.
         L’accès à l’application nécessite l’acceptation des conditions d’utilisation.
       </p>
@@ -283,7 +283,7 @@
       <div class="consent-option">
         <input id="termsAccepted" type="checkbox" required>
         <label for="termsAccepted">
-          J’ai lu et j’accepte les conditions d’utilisation de BA Labs BatchTracker.
+          J’ai lu et j’accepte les conditions d’utilisation de BA Labs CultureOps.
           <strong>Obligatoire pour créer une culture.</strong>
         </label>
       </div>
@@ -293,7 +293,7 @@
         <label for="researchStatisticsConsent">
           J’accepte séparément que mes données de culture puissent être réutilisées à des
           fins statistiques et de recherche en mycologie, microbiologie et biologie végétale.
-          Ce choix est facultatif et peut être refusé sans bloquer l’utilisation de BatchTracker.
+          Ce choix est facultatif et peut être refusé sans bloquer l’utilisation de CultureOps.
         </label>
       </div>
       <div class="muted">
@@ -336,7 +336,7 @@
 <option value="repiquage">Repiquage</option><option value="passage">Passage</option><option value="transfert">Transfert</option><option value="division_aliquotes">Division en aliquotes</option><option value="changement_milieu">Changement de milieu</option><option value="contamination_suspectee">Contamination suspectée</option><option value="conservation">Conservation</option><option value="resultat_final">Résultat final</option><option value="autre_operation">Autre opération</option>
 </select></div>
 <div><label for="bioOperationDate">Date et heure</label><input id="bioOperationDate" type="datetime-local" required></div>
-<div class="bio-operation-wide"><label for="bioChildCodes">Codes des descendants (facultatif)</label><input id="bioChildCodes" type="text" placeholder="Ex. PO-P80-G2-A, PO-P80-G2-B"><small>Un code par virgule. Pour une division en aliquotes, indiquez un code par aliquote.</small></div>
+<div class="bio-operation-wide" id="bioChildCodesField"><label for="bioChildCodes">Codes des descendants (facultatif)</label><input id="bioChildCodes" type="text" placeholder="Ex. PO-P80-G2-A, PO-P80-G2-B"><small>Un code par virgule. Pour une division en aliquotes, indiquez un code par aliquote.</small></div>
 <div><label for="bioOperationConditions">Milieu / conditions / quantité</label><input id="bioOperationConditions" type="text" placeholder="Ex. PDA, 24 °C, 3 aliquotes, durée…"></div>
 <div><label for="bioOperationOutcome">État / résultat observé</label><select id="bioOperationOutcome"><option value="">Non renseigné</option><option value="en_cours">En cours</option><option value="conforme">Conforme</option><option value="resultat_positif">Résultat positif</option><option value="resultat_negatif">Résultat négatif</option><option value="contamination_suspectee">Contamination suspectée</option><option value="contamination_confirmee">Contamination confirmée</option><option value="conserve">Matériel conservé</option><option value="termine">Terminé</option><option value="arrete">Arrêté / exclu</option></select></div>
 <div class="bio-operation-wide"><label for="bioOperationNote">Compte rendu / observations</label><textarea id="bioOperationNote" rows="2" placeholder="Observations, anomalies, décision et justification…"></textarea></div>
@@ -352,7 +352,7 @@
 
 
   <!-- ======================================================
-       BATCH TRACKER
+       LOTS DE PRODUCTION
        ====================================================== -->
 
   <section
@@ -361,7 +361,7 @@
   >
 
     <div class="section-kicker"><span>MODULE 03</span><span class="kicker-line"></span><span>PRODUCTION &amp; QUALITÉ</span></div>
-    <h2>Batch Tracker</h2>
+    <h2>Lots de production</h2>
 
     <div class="muted">
       Création et suivi du cycle complet :
@@ -414,41 +414,16 @@
           Type de batch
         </label>
 
-        <select id="batchType">
-
-          <option value="Biologique">
-            Biologique
-          </option>
-
-          <option value="Milieu">
-            Milieu
-          </option>
-
-          <option value="Substrat">
-            Substrat
-          </option>
-
-          <option value="Grain">
-            Grain
-          </option>
-
-          <option value="SMS">
-            SMS
-          </option>
-
-          <option value="Inoculum">
-            Inoculum
-          </option>
-
-          <option value="Préparation biologique">
-            Préparation biologique
-          </option>
-
-          <option value="Autre">
-            Autre
-          </option>
-
+        <select id="batchType" required aria-describedby="batchTypeHint">
+          <option value="">Choisir une famille de lot…</option>
+          <option value="CULTURE">Culture biologique / lot de culture générique</option>
+          <option value="TRICHODERMA">Préparation à base de Trichoderma</option>
+          <option value="PLEUROTUS_SPAWN">Mycélium sur grain — Pleurotus</option>
+          <option value="MUSHROOM_PRODUCT">Champignons récoltés / produit frais</option>
+          <option value="BIOSTIMULANT">Biostimulant / biofertilisant</option>
+          <option value="FORMULATION">Formulation / mélange final</option>
         </select>
+        <small class="hint" id="batchTypeHint">Ce choix détermine les contrôles qualité associés. Pour un cas non spécialisé, utilisez « Culture biologique / lot de culture générique ».</small>
 
       </div>
 
@@ -456,16 +431,17 @@
       <div>
 
         <label for="batchCulture">
-      Culture source<span class="req" aria-hidden="true"> *</span>
+      Culture ou ressource source<span class="req" aria-hidden="true"> *</span>
     </label>
 
-        <select id="batchCulture" aria-required="true">
+        <select id="batchCulture" required aria-describedby="batchCultureHint">
 
           <option value="">
             Chargement...
           </option>
 
         </select>
+        <small class="hint" id="batchCultureHint">Choisissez la culture réellement à l’origine du lot. Elle sert à conserver la filiation biologique.</small>
 
       </div>
 
@@ -483,7 +459,7 @@
         <input
           id="batchQuantity"
           type="number"
-          min="0"
+          min="0.000001"
           step="any"
           placeholder="Ex. 10"
         >
@@ -497,16 +473,32 @@
           Unité
         </label>
 
-        <input
-          id="batchUnit"
-          type="text"
-          placeholder="kg, L, unités..."
-        >
+        <select id="batchUnit" aria-describedby="batchUnitHint">
+          <option value="">Choisir une unité…</option>
+        </select>
+        <small class="hint" id="batchUnitHint">L’unité doit provenir du référentiel. La quantité prévue reste facultative.</small>
 
       </div>
 
     </div>
 
+
+    <div class="grid">
+      <div>
+        <label for="batchLocation">Emplacement (facultatif)</label>
+        <select id="batchLocation" aria-describedby="batchLocationHint">
+          <option value="">Aucun emplacement</option>
+        </select>
+        <small class="hint" id="batchLocationHint">Zone, salle ou espace où le lot démarre.</small>
+      </div>
+      <div>
+        <label for="batchEnvironment">Environnement (facultatif)</label>
+        <select id="batchEnvironment" aria-describedby="batchEnvironmentHint">
+          <option value="">Aucun environnement</option>
+        </select>
+        <small class="hint" id="batchEnvironmentHint">Environnement associé au lot, si déjà défini.</small>
+      </div>
+    </div>
 
     <button
       id="createBatchButton"
@@ -615,6 +607,37 @@
     >
       Libérer le batch
     </button>
+
+    <section class="card hidden" id="batchEvents" aria-labelledby="batchEventsTitle">
+      <div class="section-kicker"><span>TRAÇABILITÉ</span><span class="kicker-line"></span><span>JOURNAL DU LOT</span></div>
+      <h3 id="batchEventsTitle">Chronologie du lot</h3>
+      <p class="muted">Événements enregistrés pour ce lot, du démarrage aux mesures, récoltes et libération. Les détails affichés sont limités aux champs utiles du journal.</p>
+      <div class="batch-harvest-entry">
+        <h4>Enregistrer une récolte</h4>
+        <p class="muted">Disponible lorsque l’étape actuelle du lot est « Récolte ». Chaque enregistrement reste distinct dans l’historique.</p>
+        <div class="grid">
+          <div><label for="harvestQuantity">Quantité récoltée</label><input id="harvestQuantity" type="number" min="0.000001" step="any" inputmode="decimal" placeholder="Ex. 125"></div>
+          <div><label for="harvestUnit">Unité</label><select id="harvestUnit"><option value="">Choisir une unité…</option></select></div>
+        </div>
+        <label for="harvestNote">Note (facultatif)</label>
+        <textarea id="harvestNote" rows="2" maxlength="1000" placeholder="Produit récolté, qualité, conditions…"></textarea>
+        <button id="recordHarvestButton" type="button" disabled>Enregistrer la récolte</button>
+        <p id="harvestStatus" class="muted" role="status" aria-live="polite">Sélectionnez un lot à l’étape Récolte.</p>
+      </div>
+      <div class="batch-harvest-entry" id="batchMovementEntry">
+        <h4>Déplacer le lot</h4>
+        <p class="muted">Le déplacement et son événement de traçabilité sont enregistrés ensemble.</p>
+        <div class="grid">
+          <div><label for="moveBatchLocation">Nouvel emplacement</label><select id="moveBatchLocation"><option value="">Aucun emplacement</option></select></div>
+          <div><label for="moveBatchEnvironment">Nouvel environnement</label><select id="moveBatchEnvironment"><option value="">Aucun environnement</option></select></div>
+        </div>
+        <label for="moveBatchNote">Note du déplacement (facultatif)</label>
+        <textarea id="moveBatchNote" rows="2" maxlength="1000" placeholder="Ex. transfert vers l’incubateur…"></textarea>
+        <button id="moveBatchButton" type="button" disabled>Enregistrer le déplacement</button>
+        <p id="moveBatchStatus" class="muted" role="status" aria-live="polite">Sélectionnez un lot pour préparer un déplacement.</p>
+      </div>
+      <div id="batchEventList" class="batch-event-list" aria-live="polite"><p class="muted">Sélectionnez un lot pour charger sa chronologie.</p></div>
+    </section>
 
   </section>
 
