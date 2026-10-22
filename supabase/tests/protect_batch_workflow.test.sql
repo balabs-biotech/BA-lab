@@ -163,6 +163,7 @@ do $$ declare v_result jsonb; v_batch_id uuid; begin
     if sqlerrm = 'FAIL: closed batch movement was allowed' then raise; end if;
   end;
 
+  update public.batches set status='planned' where id=v_batch_id;
   begin
     perform public.move_batch_to_location(
       v_batch_id,
