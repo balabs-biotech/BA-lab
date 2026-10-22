@@ -43,9 +43,15 @@ create table public.batch_qc_templates(
   id uuid primary key default gen_random_uuid(), organization_id uuid not null,
   batch_type text not null, check_code text not null, label text not null,
   default_unit_code text, required boolean not null default true, sequence_no integer not null default 1);
+create table public.locations(
+  id uuid primary key, organization_id uuid not null, name text not null);
+create table public.environments(
+  id uuid primary key, organization_id uuid not null, location_id uuid, name text not null);
 create table public.events(
   id uuid primary key default gen_random_uuid(), organization_id uuid not null,
-  event_type text not null, occurred_at timestamptz not null, batch_id uuid, payload jsonb);
+  event_type text not null, occurred_at timestamptz not null, actor_user_id uuid,
+  culture_id uuid, material_id uuid, location_id uuid, environment_id uuid,
+  batch_id uuid, payload jsonb);
 
 grant select, insert, update, delete on public.organization_members, public.batches,
   public.batch_stages, public.batch_qc_checks, public.batch_qc_templates, public.events
@@ -57,6 +63,7 @@ values ('00000000-0000-0000-0000-0000000000a1','test','appearance','Appearance',
 
 \i supabase/migrations/20261021090000_protect_batch_workflow_v1.sql
 \i supabase/migrations/20261021090000_protect_batch_workflow_v1.sql
+\i supabase/migrations/20261022100000_add_atomic_batch_movement_rpc.sql
 
 select set_config('request.jwt.claim.sub','00000000-0000-0000-0000-0000000000b1',false);
 set role authenticated;
@@ -108,5 +115,53 @@ do $$ begin
   exception when others then
     if sqlerrm like 'FAIL:%' then raise; end if;
   end;
+end $$;
+reset role;
+
+
+-- Movement updates the batch and writes a server-attributed history event atomically.
+insert into public.locations(id,organization_id,name) values
+ ('00000000-0000-0000-0000-0000000000c1','00000000-0000-0000-0000-0000000000a1','Room A'),
+ ('00000000-0000-0000-0000-0000000000c2','00000000-0000-0000-0000-0000000000a1','Room B');
+insert into public.environments(id,organization_id,location_id,name) values
+ ('00000000-0000-0000-0000-0000000000d1','00000000-0000-0000-0000-0000000000a1',
+  '00000000-0000-0000-0000-0000000000c2','Incubator B');
+update public.batches set material_id='00000000-0000-0000-0000-0000000000e1'
+where batch_code='TEST-1';
+select set_config('request.jwt.claim.sub','00000000-0000-0000-0000-0000000000b1',false);
+set role authenticated;
+do $$ declare v_result jsonb; v_batch_id uuid; begin
+  select id into v_batch_id from public.batches where batch_code='TEST-1';
+  v_result := public.move_batch_to_location(
+    v_batch_id,
+    '00000000-0000-0000-0000-0000000000c2',
+    '00000000-0000-0000-0000-0000000000d1',
+    'Moved for incubation'
+  );
+  if not exists (
+    select 1 from public.batches
+    where id=v_batch_id
+      and location_id='00000000-0000-0000-0000-0000000000c2'
+      and environment_id='00000000-0000-0000-0000-0000000000d1'
+  ) then raise exception 'FAIL: batch location/environment were not updated'; end if;
+  if not exists (
+    select 1 from public.events
+    where id=(v_result->>'event_id')::uuid
+      and event_type='batch_moved'
+      and batch_id=v_batch_id
+      and material_id='00000000-0000-0000-0000-0000000000e1'
+      and actor_user_id=auth.uid()
+      and payload->>'note'='Moved for incubation'
+  ) then raise exception 'FAIL: movement audit event missing or incomplete'; end if;
+
+  begin
+    perform public.move_batch_to_location(
+      v_batch_id,
+      '00000000-0000-0000-0000-0000000000c1',
+      '00000000-0000-0000-0000-0000000000d1',
+      null
+    );
+    raise exception 'FAIL: environment from another location was accepted';
+  exception when sqlstate '23503' then null; end;
 end $$;
 reset role;
