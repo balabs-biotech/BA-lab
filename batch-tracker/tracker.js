@@ -4707,7 +4707,7 @@ function comparisonUnitLabel(code) {
     uL: ["µL", "µL", "µL", "ميكرولتر"]
   };
   const index = ({ fr: 0, en: 1, pt: 2, ar: 3 })[document.documentElement.lang || "fr"] || 0;
-  return labels[code]?.[index] || code || comparisonText(comparisonText("unité non renseignée", "unit not specified", "unidade não indicada", "الوحدة غير محددة"), "unit not specified", "unidade não indicada", "الوحدة غير محددة");
+  return labels[code]?.[index] || code || comparisonText("unité non renseignée", "unit not specified", "unidade não indicada", "الوحدة غير محددة");
 }
 
 function comparisonVariableLabel(variable) {
@@ -4816,7 +4816,7 @@ function comparisonTable(headers, rows, caption) {
   const head = headers.map(value => "<th scope=\"col\">" + escapeHtml(value) + "</th>").join("");
   const body = rows.length
     ? rows.map(row => "<tr>" + row.map(value => "<td>" + value + "</td>").join("") + "</tr>").join("")
-    : '<tr><td colspan="' + headers.length + '">' + escapeHtml(comparisonText(comparisonText("Aucune donnée disponible.", "No data available.", "Nenhum dado disponível.", "لا تتوفر بيانات."), "No data available.", "Nenhum dado disponível.", "لا تتوفر بيانات.")) + '</td></tr>';
+    : '<tr><td colspan="' + headers.length + '">' + escapeHtml(comparisonText("Aucune donnée disponible.", "No data available.", "Nenhum dado disponível.", "لا تتوفر بيانات.")) + '</td></tr>';
   return '<div class="comparison-table-wrap"><table class="comparison-table"><caption>' + escapeHtml(caption) + '</caption><thead><tr>' + head + '</tr></thead><tbody>' + body + '</tbody></table></div>';
 }
 
