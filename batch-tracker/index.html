@@ -6206,7 +6206,10 @@ function renderCultureCatalog() {
   });
 }
 
+let statisticsRequestId = 0;
+
 async function loadStatistics() {
+  const requestId = ++statisticsRequestId;
   const variableCode = document.getElementById("statisticsVariable").value;
   const cultureId = document.getElementById("statisticsCulture").value;
   const batchId = document.getElementById("statisticsBatch").value;
@@ -6225,6 +6228,7 @@ async function loadStatistics() {
     if (batchId) {
       const {data: batchEvents, error: batchEventsError} = await supabaseClient.from("events").select("id").eq("organization_id", organizationId).eq("batch_id", batchId);
       if (batchEventsError) throw new Error("Chargement des événements du lot impossible : " + batchEventsError.message);
+      if (requestId !== statisticsRequestId) return;
       batchEventIds = (batchEvents || []).map(event => event.id);
     }
     let query = supabaseClient.from("measurements").select("id, variable_code, raw_value, raw_unit_code, normalized_value, normalized_unit_code, measured_at, method, culture_id, event_id, metadata").eq("organization_id", organizationId).eq("variable_code", variableCode).order("measured_at", {ascending:true}).limit(1000);
@@ -6232,6 +6236,7 @@ async function loadStatistics() {
     if (batchId && batchEventIds.length) query = query.in("event_id", batchEventIds);
     if (period !== "all") { const since = new Date(); since.setDate(since.getDate() - Number(period)); query = query.gte("measured_at", since.toISOString()); }
     const queryResult = batchId && !batchEventIds.length ? {data:[],error:null} : await query;
+    if (requestId !== statisticsRequestId) return;
     const {data,error} = queryResult; if (error) throw new Error(error.message);
     const rows = data || [], variable = measurementVariables.find(item => item.code === variableCode), cultureById = new Map(cultureOptions.map(culture => [culture.id,culture]));
     const prepared = rows.map(row => { const normalized = row.normalized_value !== null && row.normalized_value !== undefined && row.normalized_value !== "" && row.normalized_unit_code; const raw = normalized ? row.normalized_value : row.raw_value; const hasValue = raw !== null && raw !== undefined && raw !== "" && typeof raw !== "boolean"; return {...row, plotValue:hasValue ? Number(raw) : NaN, plotUnit:normalized ? row.normalized_unit_code : row.raw_unit_code, normalized:Boolean(normalized)}; }).filter(row => Number.isFinite(row.plotValue));
@@ -6256,8 +6261,8 @@ async function loadStatistics() {
     }
     if(!rows.length) tbody.innerHTML='<tr><td colspan="5">Aucune mesure pour ces filtres.</td></tr>';
     else { rows.slice().reverse().slice(0,200).forEach(row=>{const tr=document.createElement("tr"),culture=cultureById.get(row.culture_id),cells=[row.measured_at?new Date(row.measured_at).toLocaleString("fr-FR"):"Date inconnue",culture?.code||(row.culture_id?"Culture liée par identifiant":"Lot / cible sans culture directe"),String(row.raw_value??"—"),row.raw_unit_code||"Unité non renseignée",row.method||"—"];cells.forEach(value=>{const td=document.createElement("td");td.textContent=value;tr.appendChild(td);});tbody.appendChild(tr);});if(rows.length>200){const tr=document.createElement("tr"),td=document.createElement("td");td.colSpan=5;td.textContent="Affichage limité aux 200 mesures les plus récentes sur "+rows.length+" chargées.";tr.appendChild(td);tbody.appendChild(tr);}}
-  } catch(error) { console.error("Analyse des mesures impossible :",error); status.textContent="Impossible de charger les mesures : "+error.message; chart.innerHTML='<p class="muted">Le graphique n’a pas pu être produit.</p>'; summary.innerHTML=""; tbody.innerHTML='<tr><td colspan="5">Données indisponibles.</td></tr>'; }
-  finally { button.disabled=false; button.textContent="Analyser les données"; }
+  } catch(error) { if (requestId !== statisticsRequestId) return; console.error("Analyse des mesures impossible :",error); status.textContent="Impossible de charger les mesures : "+error.message; chart.innerHTML='<p class="muted">Le graphique n’a pas pu être produit.</p>'; summary.innerHTML=""; tbody.innerHTML='<tr><td colspan="5">Données indisponibles.</td></tr>'; }
+  finally { if (requestId === statisticsRequestId) { button.disabled=false; button.textContent="Analyser les données"; } }
 }
 
 let cultureDetailRequestId = 0;
