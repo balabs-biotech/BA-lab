@@ -1,8 +1,9 @@
 -- Serialize Notion sync per culture across Edge Function instances.
 -- The short lease prevents permanent locks after an interrupted request.
 create table if not exists public.notion_sync_locks (
-  culture_id uuid primary key references public.cultures(id) on delete cascade,
+  culture_id uuid primary key,
   organization_id uuid not null,
+  foreign key (organization_id, culture_id) references public.cultures(organization_id, id) on delete cascade,
   lock_token uuid not null,
   lease_expires_at timestamptz not null,
   created_at timestamptz not null default now()
