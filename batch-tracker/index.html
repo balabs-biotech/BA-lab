@@ -997,6 +997,22 @@ input:focus-visible,select:focus-visible,textarea:focus-visible,button:focus-vis
 .hero-note{color:var(--brand);background:#fff;border-color:var(--border-strong);backdrop-filter:none}
 .hero-note small{color:#4b5d50}
 
+/* Entry navigation and progressive culture capture */
+.universe-home-link{display:inline-flex;align-items:center;gap:8px;margin:0 0 18px;padding:9px 12px;border:1px solid var(--border);border-radius:9px;color:var(--text);text-decoration:none;font-size:12px;font-weight:750}
+.universe-home-link:hover{border-color:var(--brand)}
+.entry-intro{margin-bottom:16px}
+.entry-intro h2{margin:5px 0 6px}
+.entry-intro p{max-width:680px;margin:0;font-size:13px}
+.entry-step-mark{display:inline-flex;align-items:center;gap:7px;color:var(--brand);font:800 10px/1.4 ui-monospace,SFMono-Regular,Consolas,monospace;letter-spacing:.1em}
+.guided-entry-step{margin:16px 0;padding:16px;border:1px solid var(--border);border-radius:12px;background:var(--surface-2)}
+.guided-entry-step[hidden]{display:none!important}
+.guided-entry-step>.entry-step-mark{margin-bottom:12px}
+.guided-entry-step.is-ready{border-color:var(--brand)}
+.guided-entry-step .grid{margin-top:8px}
+body[data-domain="mycology"] .guided-entry-step{border:2px solid var(--border-strong);border-radius:0;box-shadow:4px 4px 0 var(--border)}
+body[data-domain="laboratory"] .guided-entry-step{background:#f3f8fd;border-color:#c9dbea}
+@media(max-width:600px){.guided-entry-step{padding:12px;margin:12px 0}.entry-intro p{font-size:12px}}
+
 /* Domain workspaces: one data platform, three purpose-built visual languages. */
 .domain-switcher{display:grid;grid-template-columns:minmax(190px,.72fr) minmax(0,2fr);gap:18px;align-items:center;margin:0 0 20px;padding:16px;border:1px solid var(--border);border-radius:16px;background:var(--surface);box-shadow:0 5px 20px rgba(20,40,28,.06)}
 .domain-switcher-copy{display:grid;gap:4px;min-width:0}
@@ -1112,6 +1128,8 @@ body[data-domain="laboratory"] .section-nav a[aria-current="page"]{background:#e
     </nav>
     <div class="toolbar-status"><span class="status-pulse" aria-hidden="true"></span><span>ESPACE DE TRAÇABILITÉ</span></div>
   </div>
+
+  <a class="universe-home-link" href="../" aria-label="Retour au choix des univers">← Tous les univers</a>
 
   <section class="domain-switcher" aria-label="Choisir un univers de travail">
     <div class="domain-switcher-copy">
@@ -1277,7 +1295,8 @@ body[data-domain="laboratory"] .section-nav a[aria-current="page"]{background:#e
   >
 
     <div class="section-kicker"><span>MODULE 02</span><span class="kicker-line"></span><span>RESSOURCES BIOLOGIQUES</span></div>
-    <h2>Nouvelle culture</h2>
+    <div class="entry-intro"><span class="entry-step-mark">01 / IDENTITÉ</span><h2>Nouvelle culture</h2><p class="muted">On commence par identifier la ressource. Les champs suivants apparaissent quand les informations de base sont renseignées.</p></div>
+    <div class="guided-entry-step" data-entry-step="1">
 
     <label for="strain">
       Souche / ressource biologique<span class="req" aria-hidden="true"> *</span>
@@ -1310,8 +1329,10 @@ body[data-domain="laboratory"] .section-nav a[aria-current="page"]{background:#e
       aria-describedby="cultureCodeHint"
     >
     <span class="hint" id="cultureCodeHint">Identifiant unique de la culture, utilisé aussi dans Notion.</span>
+    </div>
 
-
+    <div class="guided-entry-step is-locked" data-entry-step="2" hidden>
+      <div class="entry-step-mark">02 / CONDITIONS</div>
     <div class="grid">
 
       <div>
@@ -1358,8 +1379,10 @@ body[data-domain="laboratory"] .section-nav a[aria-current="page"]{background:#e
       id="startedAt"
       type="datetime-local"
     >
+    </div>
 
-
+    <div class="guided-entry-step is-locked" data-entry-step="3" hidden>
+      <div class="entry-step-mark">03 / VALIDATION</div>
     <div
       id="generationInfo"
       class="info"
@@ -1407,6 +1430,7 @@ body[data-domain="laboratory"] .section-nav a[aria-current="page"]{background:#e
         Version des conditions : 2026-10-09-v1. Le choix statistique est enregistré séparément
         de l’acceptation des conditions d’utilisation.
       </div>
+    </div>
     </div>
 
     <button
@@ -7067,6 +7091,11 @@ function setupDomainWorkspaces() {
     }
   };
   const buttons = [...document.querySelectorAll("[data-domain-choice]")];
+  const requestedDomain = new URLSearchParams(window.location.search).get("domain");
+  if (["agronomy", "mycology", "laboratory"].includes(requestedDomain)) {
+    const switcher = document.querySelector(".domain-switcher");
+    if (switcher) switcher.hidden = true;
+  }
   const eyebrow = document.querySelector(".app-hero .eyebrow");
   const title = document.querySelector(".app-hero h1");
   const heroDescription = document.querySelector(".hero-description");
@@ -7099,12 +7128,45 @@ function setupDomainWorkspaces() {
     }
   };
   buttons.forEach(button => button.addEventListener("click", () => setDomain(button.dataset.domainChoice)));
-  let saved = "agronomy";
-  try { saved = localStorage.getItem("baLabsCultureTrackerDomain") || "agronomy"; } catch (_) {}
-  setDomain(saved, false);
+  let saved = requestedDomain || "agronomy";
+  if (!requestedDomain) { try { saved = localStorage.getItem("baLabsCultureTrackerDomain") || "agronomy"; } catch (_) {} }
+  setDomain(saved, Boolean(requestedDomain));
 }
 setupDomainWorkspaces();
+setupProgressiveCultureEntry();
 
+
+/* Progressive disclosure: reveal the next capture step only after the current identity is complete. */
+function setupProgressiveCultureEntry() {
+  const steps = [...document.querySelectorAll("[data-entry-step]")];
+  if (steps.length !== 3) return;
+  const strain = document.getElementById("strain");
+  const code = document.getElementById("cultureCode");
+  const type = document.getElementById("cultureType");
+  const protocol = document.getElementById("protocol");
+  const startedAt = document.getElementById("startedAt");
+  const update = () => {
+    const identityReady = Boolean(strain?.value && code?.value.trim());
+    steps[1].hidden = !identityReady;
+    steps[1].classList.toggle("is-ready", identityReady);
+    const conditionsReady = identityReady && Boolean(type?.value);
+    steps[2].hidden = !conditionsReady;
+    steps[2].classList.toggle("is-ready", conditionsReady);
+    steps[0].classList.toggle("is-ready", identityReady);
+    steps[1].setAttribute("aria-label", "Étape 2 : conditions de culture");
+    steps[2].setAttribute("aria-label", "Étape 3 : validation et consentements");
+    if (identityReady && !conditionsReady) {
+      type?.setAttribute("aria-describedby", "entryStepHint");
+    } else {
+      type?.removeAttribute("aria-describedby");
+    }
+  };
+  [strain, code, type, protocol, startedAt].forEach(field => {
+    field?.addEventListener("input", update);
+    field?.addEventListener("change", update);
+  });
+  update();
+}
 
 setupQuickCapture();
 
