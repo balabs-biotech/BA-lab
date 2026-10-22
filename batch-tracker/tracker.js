@@ -4847,10 +4847,19 @@ async function loadLotComparison() {
       .map(row => {
         const normalized = comparisonNumber(row.normalized_value);
         const raw = comparisonNumber(row.raw_value);
+        const sourceUnitCode = normalized !== null && row.normalized_unit_code ? row.normalized_unit_code : (row.raw_unit_code || "unité non renseignée");
+        const sourceUnit = unitMap.get(sourceUnitCode);
+        const variable = variableMap.get(row.variable_code);
+        const targetUnitCode = variable?.canonical_unit_code;
+        const targetUnit = targetUnitCode ? unitMap.get(targetUnitCode) : null;
+        const sourceValue = normalized !== null && row.normalized_unit_code ? normalized : raw;
+        const converted = sourceValue !== null && sourceUnit && targetUnit
+          ? BACompareAnalysis.convertUnit(sourceValue, sourceUnit, targetUnit, variable?.dimension)
+          : null;
         return Object.assign({}, row, {
-          value: normalized !== null && row.normalized_unit_code ? normalized : raw,
-          unit: normalized !== null && row.normalized_unit_code ? row.normalized_unit_code : (row.raw_unit_code || "unité non renseignée"),
-          valueBasis: normalized !== null && row.normalized_unit_code ? "normalisée" : "brute"
+          value: converted !== null ? converted : sourceValue,
+          unit: converted !== null ? targetUnitCode : sourceUnitCode,
+          valueBasis: converted !== null && sourceUnitCode !== targetUnitCode ? "convertie" : (normalized !== null && row.normalized_unit_code ? "normalisée" : "brute")
         });
       }).filter(row => row.value !== null);
     const assignedObservations = observationRows.map(row => Object.assign({}, row, { batchId: assignBatch(row) }))
