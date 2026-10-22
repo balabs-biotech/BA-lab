@@ -64,3 +64,7 @@ if(!engine.includes('event_type: "harvest_recorded"')||!engine.includes('functio
 if(!engine.includes('from("units")')||!engine.includes('unit_code: unit.code'))throw new Error("Harvest unit validation missing");
 
 if(!engine.includes("const eventAnchor = selectedBatch.culture_id")||!engine.includes("Ce lot doit être lié à une culture ou à un matériau"))throw new Error("Harvest event biological anchor validation missing");
+for(const label of ["Chronologie du lot","Enregistrer une récolte","Récolte enregistrée","Batch timeline","Record a harvest","Harvest recorded","Cronologia do lote","Registar uma colheita","Colheita registada","الخط الزمني للدفعة","تسجيل حصاد","تم تسجيل الحصاد"]){
+ if(!i18n.includes(label))throw new Error("Harvest timeline translation missing: "+label);
+}
+console.log("✓ Harvest entry, timeline labels and feedback are covered in French, English, Portuguese and Arabic");
