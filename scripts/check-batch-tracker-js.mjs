@@ -49,3 +49,9 @@ if(!engine.includes('from("observations")')||!engine.includes('value_text,observ
 if(!engine.includes('in("experimental_unit_id", unitIds)'))throw new Error("Unit-linked observations are not loaded");
 if(!engine.includes("<th>Observations qualitatives</th>"))throw new Error("Qualitative observation column is missing");
 if(!engine.includes("batchObservations.slice(0, 3)"))throw new Error("Observation summary is not bounded");
+
+if(!engine.includes("const measurementUnitsByVariable = new Map()")||!engine.includes("unitMismatchCount > 0 ? labels.unitMismatch(unitMismatchCount) : \"\""))throw new Error("Mixed measurement units are not flagged in batch comparison");
+for(const label of ["Comparabilité :","Comparability:","Comparabilidade:","قابلية المقارنة:"]){
+ if(!engine.includes(label))throw new Error("Mixed-unit warning translation missing: "+label);
+}
+console.log("✓ Batch comparison warns when a variable uses incompatible/missing units across selected batches");
