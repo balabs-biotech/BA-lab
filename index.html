@@ -10,7 +10,7 @@
 :root{color-scheme:dark;--bg:#101512;--panel:#191f1b;--line:#343d36;--ink:#f3f5ef;--muted:#aab4aa;--green:#b4f477;--blue:#91c9ff;--acid:#d5ff46;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
 *{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 50% -15%,#2b3b2e 0,transparent 48%),var(--bg);color:var(--ink);min-height:100vh}
 main{width:min(1100px,100% - 36px);margin:0 auto;padding:clamp(28px,7vw,76px) 0 36px}
-.brand{display:flex;align-items:center;gap:10px;font-size:12px;font-weight:850;letter-spacing:.16em}.brand-mark{display:grid;place-items:center;width:34px;height:34px;border:1px solid #62705f;color:var(--green);font-size:17px}
+.brand{display:flex;align-items:center;gap:10px;font-size:12px;font-weight:850;letter-spacing:.16em}.language-picker{float:right;display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted)}.language-picker select{padding:8px 10px;border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:5px;font:inherit}.brand-mark{display:grid;place-items:center;width:34px;height:34px;border:1px solid #62705f;color:var(--green);font-size:17px}
 .kicker{margin:clamp(46px,8vw,84px) 0 16px;color:var(--green);font:750 11px ui-monospace,SFMono-Regular,Consolas,monospace;letter-spacing:.16em}
 h1{max-width:800px;margin:0;font-size:clamp(38px,7vw,76px);line-height:.98;letter-spacing:-.055em;font-weight:800}h1 span{color:var(--green)}
 .lead{max-width:620px;margin:22px 0 36px;color:var(--muted);font-size:clamp(14px,2vw,17px);line-height:1.7}
@@ -48,5 +48,41 @@ h1{max-width:800px;margin:0;font-size:clamp(38px,7vw,76px);line-height:.98;lette
   </nav>
   <footer class="footer"><span>BA LABS · CULTURE & BATCH TRACKER</span><span>Une plateforme commune · Trois interfaces spécialisées</span></footer>
 </main>
-</body>
+
+<script>
+(() => {
+  const copy = {
+    en: ["BIOLOGICAL TRACKING PLATFORM · 01—03","Every culture","its own universe.","Choose your workspace. Each universe has its own page and specialist tools, with shared biological traceability.","Choose a workspace","Plants, substrates, greenhouse, irrigation, fungal digesters and environmental monitoring.","Enter workspace","Strains, generations, transfers, morphology and contamination tracking.","Culture media, protocols, experimental parameters, measurements and results.","One shared platform · Three specialised workspaces"],
+    pt: ["PLATAFORMA DE ACOMPANHAMENTO BIOLÓGICO · 01—03","Cada cultura","o seu universo.","Escolha o seu espaço de trabalho. Cada espaço tem a sua própria página e ferramentas específicas, com rastreabilidade biológica comum.","Escolher um espaço de trabalho","Plantas, substratos, estufa, irrigação, digestores fúngicos e monitorização ambiental.","Entrar no espaço","Estirpes, gerações, transferências, morfologia e acompanhamento de contaminações.","Meios de cultura, protocolos, parâmetros experimentais, medições e resultados.","Uma plataforma comum · Três interfaces especializadas"],
+    ar: ["منصة تتبّع بيولوجي · 01—03","لكل مزرعة","مساحتها الخاصة.","اختر مساحة العمل. لكل مساحة صفحة وأدوات متخصصة، مع تتبّع بيولوجي مشترك.","اختر مساحة العمل","النباتات والركائز والبيت المحمي والري والهاضمات الفطرية ومراقبة البيئة.","الدخول إلى المساحة","السلالات والأجيال وعمليات النقل والمورفولوجيا ومتابعة التلوث.","أوساط الزراعة والبروتوكولات والمعايير التجريبية والقياسات والنتائج.","منصة مشتركة · ثلاث واجهات متخصصة"]
+  };
+  const original = [
+    document.querySelector(".kicker"), document.querySelector("h1"), document.querySelector("h1 span"),
+    document.querySelector(".lead"), document.querySelector(".universes").getAttribute("aria-label"),
+    document.querySelector(".agronomy p"), document.querySelector(".agronomy .enter span:first-child"),
+    document.querySelector(".myco p"), document.querySelector(".lab p"), document.querySelector(".footer span:last-child")
+  ];
+  const targets = [".kicker","h1","h1 span",".lead",null,".agronomy p",".agronomy .enter span:first-child",".myco p",".lab p",".footer span:last-child"];
+  const select = document.getElementById("pageLanguage");
+  function apply(lang) {
+    const vals = copy[lang];
+    document.documentElement.lang = lang;
+    document.documentElement.dir = lang === "ar" ? "rtl" : "ltr";
+    document.getElementById("langLabel").textContent = lang === "ar" ? "اللغة" : lang === "pt" ? "Idioma" : lang === "en" ? "Language" : "Langue";
+    if (vals) targets.forEach((selector, i) => {
+      if (selector) {
+        const el = document.querySelector(selector);
+        if (el) el.textContent = vals[i];
+      } else document.querySelector(".universes").setAttribute("aria-label", vals[i]);
+    });
+    document.querySelectorAll(".enter span:first-child").forEach(el => { el.textContent = lang === "ar" ? "الدخول إلى المساحة" : lang === "pt" ? "Entrar no espaço" : lang === "en" ? "Enter workspace" : "Entrer dans l’espace"; });
+    document.querySelector(".footer span:last-child").textContent = vals ? vals[9] : "Une plateforme commune · Trois interfaces spécialisées";
+    try { localStorage.setItem("ba-labs-language", lang); } catch (_) {}
+  }
+  let lang = "fr"; try { lang = localStorage.getItem("ba-labs-language") || "fr"; } catch (_) {}
+  select.value = ["fr","en","pt","ar"].includes(lang) ? lang : "fr";
+  apply(select.value); select.addEventListener("change", () => apply(select.value));
+})();
+</script>
+\n</body>
 </html>
