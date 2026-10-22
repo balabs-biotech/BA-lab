@@ -1481,7 +1481,9 @@ body[data-domain="laboratory"] .section-nav a[aria-current="page"]{background:#e
 </select></div>
 <div><label for="bioOperationDate">Date et heure</label><input id="bioOperationDate" type="datetime-local" required></div>
 <div class="bio-operation-wide"><label for="bioChildCodes">Codes des descendants (facultatif)</label><input id="bioChildCodes" type="text" placeholder="Ex. PO-P80-G2-A, PO-P80-G2-B"><small>Un code par virgule. Pour une division en aliquotes, indiquez un code par aliquote.</small></div>
-<div class="bio-operation-wide"><label for="bioOperationNote">Compte rendu / observations</label><textarea id="bioOperationNote" rows="2" placeholder="Milieu, quantité, conditions, résultat ou suspicion…"></textarea></div>
+<div><label for="bioOperationConditions">Milieu / conditions / quantité</label><input id="bioOperationConditions" type="text" placeholder="Ex. PDA, 24 °C, 3 aliquotes, durée…"></div>
+<div><label for="bioOperationOutcome">État / résultat observé</label><select id="bioOperationOutcome"><option value="">Non renseigné</option><option value="en_cours">En cours</option><option value="conforme">Conforme</option><option value="resultat_positif">Résultat positif</option><option value="resultat_negatif">Résultat négatif</option><option value="contamination_suspectee">Contamination suspectée</option><option value="contamination_confirmee">Contamination confirmée</option><option value="conserve">Matériel conservé</option><option value="termine">Terminé</option><option value="arrete">Arrêté / exclu</option></select></div>
+<div class="bio-operation-wide"><label for="bioOperationNote">Compte rendu / observations</label><textarea id="bioOperationNote" rows="2" placeholder="Observations, anomalies, décision et justification…"></textarea></div>
 <div class="bio-operation-wide"><button id="saveBioOperation" type="submit">Enregistrer l’opération</button><p id="bioOperationMessage" class="muted" aria-live="polite"></p></div>
 </form></section>
 <section class="bio-lineage-panel" aria-labelledby="bioLineageTitle"><h4 id="bioLineageTitle">Filiation biologique</h4><div id="cultureLineage" class="culture-lineage"><p class="muted">Chargement de la filiation…</p></div></section>
@@ -6634,6 +6636,8 @@ async function saveBiologicalOperation(event) {
   const operationType = document.getElementById('bioOperationType').value;
   const dateValue = document.getElementById('bioOperationDate').value;
   const note = document.getElementById('bioOperationNote').value.trim();
+  const conditions = document.getElementById('bioOperationConditions').value.trim();
+  const outcome = document.getElementById('bioOperationOutcome').value;
   const childCodes = [...new Set(document.getElementById('bioChildCodes').value.split(',').map(value => value.trim()).filter(Boolean))];
   if (!dateValue) { message.textContent = 'Indiquez la date de l’opération.'; return; }
   if (childCodes.length > 12) { message.textContent = 'Maximum : 12 descendants par opération.'; return; }
@@ -6643,11 +6647,11 @@ async function saveBiologicalOperation(event) {
     const { data, error } = await supabaseClient.rpc('record_biological_operation', {
       p_organization_id: organizationId, p_parent_culture_id: cultureId, p_event_type: operationType,
       p_occurred_at: new Date(dateValue).toISOString(), p_note: note || null,
-      p_details: { source: 'BA Labs Culture Tracker', interface_version: '3.0' }, p_child_codes: childCodes
+      p_details: { source: 'BA Labs Culture Tracker', interface_version: '3.0', conditions: conditions || null, outcome: outcome || null }, p_child_codes: childCodes
     });
     if (error) throw error;
     const result = Array.isArray(data) ? data[0] : data;
-    document.getElementById('bioOperationNote').value = ''; document.getElementById('bioChildCodes').value = '';
+    document.getElementById('bioOperationNote').value = ''; document.getElementById('bioOperationConditions').value = ''; document.getElementById('bioOperationOutcome').value = ''; document.getElementById('bioChildCodes').value = '';
     message.textContent = 'Opération enregistrée' + (result?.children?.length ? ' · ' + result.children.length + ' descendant(s) créé(s).' : '.') ;
     await loadCultureOptions();
     await loadCultureDetail(cultureId);
