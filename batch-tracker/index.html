@@ -1503,7 +1503,7 @@ button,input,select,textarea{border-radius:9px}button{min-height:42px}.hidden{di
   </section>
 
 
-  <section class="card hidden workspace-inactive" id="statisticsCard" aria-labelledby="statisticsTitle">
+  <section class="card workspace-inactive" id="statisticsCard" aria-labelledby="statisticsTitle">
     <div class="section-kicker"><span>MODULE 05</span><span class="kicker-line"></span><span>ANALYSE DES DONNÉES</span></div>
     <h2 id="statisticsTitle">Statistiques expérimentales</h2>
     <p class="muted">Explorez les mesures numériques réellement enregistrées. Les observations qualitatives ne sont pas converties en valeurs numériques. Les comparaisons sont limitées aux unités compatibles.</p>
@@ -2354,6 +2354,7 @@ async function signOut() {
   hideElement(trackerCard);
   hideElement(batchCard);
   hideElement(measurementCard);
+  hideElement(document.getElementById("statisticsCard"));
   hideElement(document.getElementById("overviewCard"));
   hideElement(resultCard);
   hideElement(signOutButton);
@@ -2380,6 +2381,7 @@ async function refreshAuthUI() {
     hideElement(trackerCard);
     hideElement(batchCard);
     hideElement(measurementCard);
+    hideElement(document.getElementById("statisticsCard"));
     hideElement(document.getElementById("overviewCard"));
     hideElement(resultCard);
     hideElement(signOutButton);
@@ -2506,6 +2508,7 @@ async function initializeAuthenticatedTracker(
 
     showElement(batchCard);
     showElement(measurementCard);
+    showElement(document.getElementById("statisticsCard"));
     showElement(document.getElementById("overviewCard"));
     updateOverview();
 
@@ -2527,6 +2530,7 @@ async function initializeAuthenticatedTracker(
     hideElement(trackerCard);
     hideElement(batchCard);
     hideElement(measurementCard);
+    hideElement(document.getElementById("statisticsCard"));
     hideElement(document.getElementById("overviewCard"));
 
 
@@ -5554,6 +5558,7 @@ async function init() {
         batchCard
       );
       hideElement(measurementCard);
+      hideElement(document.getElementById("statisticsCard"));
       hideElement(document.getElementById("overviewCard"));
 
       return;
@@ -6203,7 +6208,7 @@ async function loadStatistics() {
     const rows = data || [], variable = measurementVariables.find(item => item.code === variableCode), cultureById = new Map(cultureOptions.map(culture => [culture.id,culture]));
     const prepared = rows.map(row => { const normalized = row.normalized_value !== null && row.normalized_value !== undefined && row.normalized_unit_code; return {...row, plotValue:Number(normalized ? row.normalized_value : row.raw_value), plotUnit:normalized ? row.normalized_unit_code : row.raw_unit_code, normalized:Boolean(normalized)}; }).filter(row => Number.isFinite(row.plotValue));
     const canonical = variable?.canonical_unit_code;
-    const plotted = canonical ? prepared.filter(row => (row.normalized && row.normalized_unit_code === canonical) || row.raw_unit_code === canonical) : prepared.filter(row => row.plotUnit === prepared[0]?.plotUnit);
+    const plotted = canonical ? prepared.filter(row => row.plotUnit === canonical) : prepared.filter(row => row.plotUnit === prepared[0]?.plotUnit);
     const excluded = prepared.length - plotted.length;
     const addSummary = (label,value) => { const item=document.createElement("div"); item.className="statistics-summary-item"; const name=document.createElement("span"); name.textContent=label; const number=document.createElement("strong"); number.textContent=value; item.append(name,number); summary.appendChild(item); };
     addSummary("Mesures chargées",String(rows.length)); addSummary("Valeurs numériques",String(prepared.length)); addSummary("Valeurs comparables",String(plotted.length));
