@@ -25,6 +25,11 @@ if(!engine.includes("async function compareSelectedBatches")||!engine.includes('
 if(!engine.includes('map(batch => batch.environment_id)')||!engine.includes('environmentMeasurementResult')||!engine.includes('row.environment_id === batch.environment_id'))throw new Error("Environment-linked measurements are not included in batch comparison");
 if(!engine.includes("Résumé numérique séparé par source")||!engine.includes("Culture : ${summarize(cultureLinked)} | Environnement : ${summarize(environmentLinked)}"))throw new Error("Culture and environment summaries are not separated");
 if(!engine.includes("row.environment_id === batch.environment_id && !(batch.culture_id && row.culture_id === batch.culture_id)"))throw new Error("Culture-linked measurements may be double-counted as environmental-only data");
+if(!engine.includes('from("cultures")')||!engine.includes('select("id,experiment_id,experimental_unit_id")'))throw new Error("Culture experimental context is not loaded");
+if(!engine.includes('from("experimental_units")')||!engine.includes('unit_code,replicate_no,treatment_code'))throw new Error("Experimental unit treatment/replicate context is not loaded");
+if(!engine.includes('from("experiments")')||!engine.includes('select("id,code,name")'))throw new Error("Experiment metadata is not loaded");
+if(!engine.includes("<th>Expérience</th><th>Unité / traitement / répétition</th>"))throw new Error("Experimental context columns are missing from batch comparison");
+if(!engine.includes('...units.map(row => row.experiment_id)'))throw new Error("Experiment lookup does not fall back to the experimental unit link");
 if(!engine.includes("limite de 1 000 mesures récentes par lien culture/environnement"))throw new Error("Batch comparison measurement cap is not disclosed");
 if(!engine.includes("normalized_value,normalized_unit_code")||!engine.includes("raw_value,raw_unit_code"))throw new Error("Numeric measurement fields missing from comparison");
 if(!engine.includes('row.quality_state === "excluded"'))throw new Error("Excluded measurements are not handled explicitly");
