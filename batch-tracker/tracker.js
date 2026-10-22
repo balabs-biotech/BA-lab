@@ -2270,7 +2270,7 @@ async function compareSelectedBatches() {
       const batchStages = stages.filter(stage => stage.batch_id === batch.id);
       const completed = batchStages.filter(stage => stage.status === "completed").length;
       const cultureLinked = batch.culture_id ? measurements.filter(row => row.culture_id === batch.culture_id) : [];
-      const environmentLinked = batch.environment_id ? measurements.filter(row => row.environment_id === batch.environment_id) : [];
+      const environmentLinked = batch.environment_id ? measurements.filter(row => row.environment_id === batch.environment_id && !(batch.culture_id && row.culture_id === batch.culture_id)) : [];
       const linked = new Map([...cultureLinked, ...environmentLinked].map(row => [row.id, row]));
       const linkedRows = [...linked.values()];
       const lastDate = linkedRows.reduce((latest, row) => {
