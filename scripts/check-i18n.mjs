@@ -4,7 +4,7 @@ import vm from "node:vm";
 const source = fs.readFileSync("batch-tracker/i18n.js", "utf8");
 new vm.Script(source, { filename: "batch-tracker/i18n.js" });
 
-const match = source.match(/const supplementalCoverage = (\\[[\\s\\S]*?\\]);\\s*for \\(const \\[fr, en, pt, ar\\] of supplementalCoverage\\)/);
+const match = source.match(/const supplementalCoverage = (\[[\s\S]*?\]);\s*for \(const \[fr, en, pt, ar\] of supplementalCoverage\)/);
 if (!match) throw new Error("Supplemental translation table is missing or malformed");
 const rows = JSON.parse(match[1]);
 if (rows.length < 60) throw new Error(`Expected at least 60 operational translation rows, found ${rows.length}`);
