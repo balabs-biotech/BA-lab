@@ -93,7 +93,15 @@
     ["Date inconnue", "Unknown date", "Data desconhecida", "تاريخ غير معروف"],
     ["Chronologie indisponible : ", "Timeline unavailable: ", "Cronologia indisponível: ", "الخط الزمني غير متاح: "],
     ["Étape finale : ", "Final stage: ", "Etapa final: ", "المرحلة النهائية: "],
-    ["Quantité : ", "Quantity: ", "Quantidade: ", "الكمية: "]];
+    ["Quantité : ", "Quantity: ", "Quantidade: ", "الكمية: "],
+    ["Emplacement (facultatif)", "Location (optional)", "Localização (opcional)", "الموقع (اختياري)"],
+    ["Environnement (facultatif)", "Environment (optional)", "Ambiente (opcional)", "البيئة (اختياري)"],
+    ["Aucun emplacement", "No location", "Sem localização", "لا يوجد موقع"],
+    ["Aucun environnement", "No environment", "Sem ambiente", "لا توجد بيئة"],
+    ["Zone, salle ou espace où le lot démarre.", "Area, room or space where the batch starts.", "Área, sala ou espaço onde o lote começa.", "المنطقة أو الغرفة أو المساحة التي تبدأ فيها الدفعة."],
+    ["Environnement associé au lot, si déjà défini.", "Environment associated with the batch, if already defined.", "Ambiente associado ao lote, se já estiver definido.", "البيئة المرتبطة بالدفعة، إن كانت محددة."],
+    ["Emplacements indisponibles", "Locations unavailable", "Localizações indisponíveis", "المواقع غير متاحة"],
+    ["Environnements indisponibles", "Environments unavailable", "Ambientes indisponíveis", "البيئات غير متاحة"]];
   for (const [fr, en, pt, ar] of supplemental) {
     dictionaries.en[fr] ||= en;
     dictionaries.pt[fr] ||= pt;
