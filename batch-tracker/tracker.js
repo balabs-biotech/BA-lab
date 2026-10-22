@@ -218,6 +218,9 @@ const reloadBatchButton =
 const batchQc =
   document.getElementById("batchQc");
 
+const batchEvents = document.getElementById("batchEvents");
+const batchEventList = document.getElementById("batchEventList");
+
 const batchQcList =
   document.getElementById("batchQcList");
 
@@ -2675,6 +2678,17 @@ async function loadBatch(
 
   }
 
+  // Le journal est en lecture seule : il réutilise les événements déjà reliés au lot.
+  // Une indisponibilité du journal ne doit pas empêcher l'accès aux étapes ou au QC.
+  const { data: batchEventsData, error: batchEventsError } = await supabaseClient
+    .from("events")
+    .select("id,event_type,occurred_at,payload")
+    .eq("organization_id", organizationId)
+    .eq("batch_id", batchId)
+    .order("occurred_at", { ascending: false })
+    .limit(50);
+
+  if (requestId !== batchDetailRequestId) return;
 
   renderBatchInfo(
     batch
@@ -2687,6 +2701,7 @@ async function loadBatch(
   renderBatchQc(
     qcChecks || []
   );
+  renderBatchEventTimeline(batchEventsData || [], batchEventsError?.message || null);
 
 
   showElement(
@@ -2700,6 +2715,7 @@ async function loadBatch(
   showElement(
     batchQc
   );
+  showElement(batchEvents);
 
 
   updateBatchActionState(
@@ -2714,6 +2730,70 @@ async function loadBatch(
 /* ============================================================
    INFORMATIONS BATCH
    ============================================================ */
+
+function renderBatchEventTimeline(events, loadError = null) {
+  if (!batchEventList) return;
+  batchEventList.replaceChildren();
+
+  if (loadError) {
+    batchEventList.textContent = "Chronologie indisponible : " + loadError;
+    return;
+  }
+  if (!events?.length) {
+    batchEventList.innerHTML = '<p class="muted">Aucun événement enregistré pour ce lot.</p>';
+    return;
+  }
+
+  const labels = {
+    batch_created: "Lot créé",
+    batch_stage_advanced: "Étape avancée",
+    batch_completed: "Cycle terminé",
+    batch_released: "Lot libéré",
+    measurement_recorded: "Mesure enregistrée",
+    observation_recorded: "Observation enregistrée"
+  };
+  const summarize = event => {
+    const p = event.payload && typeof event.payload === "object" ? event.payload : {};
+    if (event.event_type === "batch_created") return [p.batch_code, p.batch_type].filter(Boolean).join(" · ");
+    if (event.event_type === "batch_stage_advanced") return [p.from, p.to].filter(Boolean).join(" → ");
+    if (event.event_type === "batch_completed") return p.final_stage ? "Étape finale : " + p.final_stage : "";
+    if (event.event_type === "batch_released") {
+      const parts = [];
+      if (Number.isFinite(Number(p.passed))) parts.push("validés : " + p.passed);
+      if (Number.isFinite(Number(p.waived))) parts.push("dérogations : " + p.waived);
+      if (Number.isFinite(Number(p.qc_checks))) parts.push("contrôles : " + p.qc_checks);
+      return parts.join(" · ");
+    }
+    if (event.event_type === "measurement_recorded") {
+      const parts = [];
+      if (p.variable_code) parts.push(p.variable_code);
+      if (p.raw_value !== undefined && p.raw_value !== null) parts.push(String(p.raw_value) + (p.raw_unit_code ? " " + p.raw_unit_code : ""));
+      return parts.join(" : ");
+    }
+    return "";
+  };
+
+  events.forEach(event => {
+    const item = document.createElement("article");
+    item.className = "info batch-event-item";
+    const date = event.occurred_at ? new Date(event.occurred_at) : null;
+    const dateLabel = date && !Number.isNaN(date.getTime()) ? date.toLocaleString() : "Date inconnue";
+    const heading = document.createElement("strong");
+    heading.textContent = labels[event.event_type] || String(event.event_type || "Événement");
+    const time = document.createElement("div");
+    time.className = "muted";
+    time.textContent = dateLabel;
+    item.append(heading, time);
+    const detailText = summarize(event);
+    if (detailText) {
+      const detail = document.createElement("div");
+      detail.textContent = detailText;
+      item.appendChild(detail);
+    }
+    batchEventList.appendChild(item);
+  });
+}
+
 
 function renderBatchInfo(
   batch
