@@ -67,5 +67,8 @@ begin
   if has_function_privilege('authenticated', 'public.claim_notion_sync(uuid,uuid,uuid)', 'EXECUTE') then
     raise exception 'FAIL: authenticated can execute claim RPC';
   end if;
+  if not has_function_privilege('service_role', 'public.claim_notion_sync(uuid,uuid,uuid)', 'EXECUTE') then
+    raise exception 'FAIL: service_role cannot execute claim RPC';
+  end if;
 end
 $assertions$;
