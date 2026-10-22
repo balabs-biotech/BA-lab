@@ -6,8 +6,9 @@ do $$ begin
   if not exists (select 1 from pg_roles where rolname = 'service_role') then create role service_role nologin bypassrls; end if;
 end $$;
 create table public.cultures (
-  id uuid primary key,
-  organization_id uuid not null
+  id uuid not null,
+  organization_id uuid not null,
+  primary key (organization_id, id)
 );
 insert into public.cultures values
  ('00000000-0000-0000-0000-0000000000c1','00000000-0000-0000-0000-0000000000a1'),
