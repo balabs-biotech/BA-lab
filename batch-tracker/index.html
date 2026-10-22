@@ -6651,8 +6651,15 @@ async function saveBiologicalOperation(event) {
     });
     if (error) throw error;
     const result = Array.isArray(data) ? data[0] : data;
+    let notionSyncWarning = '';
+    for (const child of (result?.children || [])) {
+      try {
+        const { data: syncData, error: syncError } = await supabaseClient.functions.invoke('sync-culture-to-notion', { body: { culture_id: child.id } });
+        if (syncError || (syncData && syncData.ok === false)) notionSyncWarning = ' La filiation est enregistrée dans Supabase ; vérifiez la synchronisation Notion des descendants.';
+      } catch (syncError) { notionSyncWarning = ' La filiation est enregistrée dans Supabase ; synchronisation Notion à vérifier.'; }
+    }
     document.getElementById('bioOperationNote').value = ''; document.getElementById('bioOperationConditions').value = ''; document.getElementById('bioOperationOutcome').value = ''; document.getElementById('bioChildCodes').value = '';
-    message.textContent = 'Opération enregistrée' + (result?.children?.length ? ' · ' + result.children.length + ' descendant(s) créé(s).' : '.') ;
+    message.textContent = 'Opération enregistrée' + (result?.children?.length ? ' · ' + result.children.length + ' descendant(s) créé(s).' : '.') + notionSyncWarning;
     await loadCultureOptions();
     await loadCultureDetail(cultureId);
     await loadBiologicalLineage(cultureId);
