@@ -70,6 +70,9 @@
 
   function dateKey(value) {
     if (!value) return null;
+    // Preserve calendar-date strings; parsing YYYY-MM-DD as UTC can shift them
+    // to the previous local day in time zones west of UTC.
+    if (typeof value === "string" && /^\d{4}-\d{2}-\d{2}$/.test(value)) return value;
     const date = new Date(value);
     if (!Number.isFinite(date.getTime())) return null;
     const pad = function (number) { return String(number).padStart(2, "0"); };
