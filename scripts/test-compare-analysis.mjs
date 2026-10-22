@@ -39,4 +39,9 @@ assert.equal(api.resolveBatchId({ culture_id: "culture-1" }, eventMap, cultureMa
 assert.equal(api.resolveBatchId({ culture_id: "ambiguous-culture" }, eventMap, cultureMap, sampleMap), null);
 assert.equal(api.resolveBatchId({ sample_id: "sample-1" }, eventMap, cultureMap, sampleMap), "batch-2");
 assert.equal(api.resolveBatchId({ culture_id: "ambiguous-culture", sample_id: "sample-1" }, eventMap, cultureMap, sampleMap), null);
-console.log("✓ descriptive statistics, IQR outliers, Pearson guards, unit conversion and unambiguous traceability tests passed");
+assert.equal(api.dateKey("2026-10-22T12:00:00"), "2026-10-22");
+assert.equal(api.dateInRange("2026-10-22T12:00:00", "2026-10-22", "2026-10-22"), true);
+assert.equal(api.dateInRange("2026-10-21T23:59:59", "2026-10-22", null), false);
+assert.equal(api.dateInRange(null, null, null), true);
+assert.equal(api.dateInRange(null, "2026-10-22", null), false);
+console.log("✓ descriptive statistics, IQR outliers, Pearson guards, unit conversion, date filtering and unambiguous traceability tests passed");
