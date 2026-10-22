@@ -75,6 +75,7 @@ for(const type of ["CULTURE","TRICHODERMA","PLEUROTUS_SPAWN","MUSHROOM_PRODUCT",
 }
 if(!engine.includes('async function loadQuantityUnitOptions')||!engine.includes('.from("units")')||!engine.includes('select("code,label,dimension")'))throw new Error("Batch/harvest units are not loaded from the canonical unit catalogue");
 if(!engine.includes("quantityPlanned <= 0")||!engine.includes("Choisissez une unité dans le référentiel pour la quantité prévue."))throw new Error("Planned quantity validation does not require a valid unit");
+if(!engine.includes("quantityPlanned === null && quantityUnit")||!engine.includes("Saisissez la quantité prévue ou effacez l’unité sélectionnée."))throw new Error("Planned quantity and unit can be recorded inconsistently");
 for(const label of ["Choisir une famille de lot…","Mycélium sur grain — Pleurotus","Biostimulant / biofertilisant","Choisir une unité…","Choose a batch category…","Escolha uma categoria de lote…","اختر فئة الدفعة…"]){
  if(!i18n.includes(label))throw new Error("Batch form localisation missing: "+label);
 }
