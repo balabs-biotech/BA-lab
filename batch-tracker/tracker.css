@@ -1600,3 +1600,17 @@ body[data-domain="agronomy"] #batchCard #batchList .info.muted.error {
   border-color: #a65c50 !important;
   -webkit-text-fill-color: #ffd2ca !important;
 }
+
+
+/* Green Tech contrast safeguard: explicit selectors for the two status messages. */
+body[data-domain="agronomy"] #authStatus,
+body[data-domain="agronomy"] #batchList > .info,
+html[data-domain="agronomy"] body #authStatus,
+html[data-domain="agronomy"] body #batchList > .info {
+  background-color: #222f28 !important;
+  background-image: none !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  opacity: 1 !important;
+  border: 1px solid #718b78 !important;
+}
