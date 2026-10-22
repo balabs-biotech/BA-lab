@@ -676,6 +676,7 @@ async function signOut() {
   referenceData = [];
   cultureOptions = [];
   latestBatches = [];
+  clearLotComparisonState();
   selectedBatchId = null;
   selectedBatch = null;
 
@@ -706,6 +707,11 @@ async function refreshAuthUI() {
 
 
   if (!session) {
+
+    clearLotComparisonState();
+    organizationId = null;
+    organization = null;
+    latestBatches = [];
 
     hideElement(trackerCard);
     hideElement(batchCard);
@@ -4672,6 +4678,22 @@ function comparisonLocale() {
 
 let lotComparisonRequestId = 0;
 let lotComparisonHasRun = false;
+
+function clearLotComparisonState() {
+  lotComparisonRequestId += 1;
+  lotComparisonHasRun = false;
+  ["compareLotsSummary", "compareLotsFindings", "compareLotsCharts", "compareLotsTables"].forEach(id => {
+    const element = document.getElementById(id);
+    if (element) element.innerHTML = "";
+  });
+  const status = document.getElementById("compareLotsStatus");
+  if (status) status.textContent = comparisonText("Sélectionnez au moins deux lots pour commencer.", "Select at least two batches to begin.", "Selecione pelo menos dois lotes para começar.", "حدد دفعتين على الأقل للبدء.");
+  const button = document.getElementById("compareLotsButton");
+  if (button) {
+    button.disabled = false;
+    button.textContent = comparisonText("Comparer les lots sélectionnés", "Compare selected batches", "Comparar os lotes selecionados", "قارن الدفعات المحددة");
+  }
+}
 
 function renderComparisonBatchOptions() {
   const picker = document.getElementById("compareBatchPicker");
