@@ -124,8 +124,6 @@ jobs:
           done
       - name: Test environmental measurement catalogue on PostgreSQL 17
         run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/seed_environment_measurement_variables.test.sql
-      - name: Test biological traceability RPC, lineage and tenant isolation on PostgreSQL 17
-        run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/biological_traceability.test.sql
       - name: Test notion_* protection migration on PostgreSQL 17
         run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/protect_cultures_notion_cols.test.sql
       - name: Test batch workflow protection migration on PostgreSQL 17
@@ -142,6 +140,8 @@ jobs:
         run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/revoke_excess_view_privileges.test.sql
       - name: Test read-only culture reference views on PostgreSQL 17
         run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/make_culture_reference_views_read_only.test.sql
+      - name: Test biological traceability RPC, lineage and tenant isolation on PostgreSQL 17
+        run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/biological_traceability.test.sql
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
