@@ -917,6 +917,198 @@
       "LAB / EXPERIMENT TRACKING",
       "LAB / ACOMPANHAMENTO EXPERIMENTAL",
       "المختبر / المتابعة التجريبية"
+    ],
+    [
+      "Chronologie du lot",
+      "Batch timeline",
+      "Cronologia do lote",
+      "الخط الزمني للدفعة"
+    ],
+    [
+      "Événements enregistrés pour ce lot, du démarrage aux mesures, récoltes et libération. Les détails affichés sont limités aux champs utiles du journal.",
+      "Events recorded for this batch, from start through measurements, harvests and release. Only useful log fields are shown.",
+      "Eventos registados para este lote, desde o início até às medições, colheitas e libertação. São apresentados apenas os campos úteis do registo.",
+      "الأحداث المسجلة لهذه الدفعة، من البدء إلى القياسات والحصاد والإفراج. تُعرض فقط الحقول المفيدة من السجل."
+    ],
+    [
+      "Enregistrer une récolte",
+      "Record a harvest",
+      "Registar uma colheita",
+      "تسجيل حصاد"
+    ],
+    [
+      "Disponible lorsque l’étape actuelle du lot est « Récolte ». Chaque enregistrement reste distinct dans l’historique.",
+      "Available when the batch is in the Harvest stage. Each entry remains separate in the history.",
+      "Disponível quando o lote está na etapa Colheita. Cada registo permanece separado no histórico.",
+      "متاح عندما تكون المرحلة الحالية للدفعة هي الحصاد. يبقى كل تسجيل منفصلًا في السجل."
+    ],
+    [
+      "Quantité récoltée",
+      "Harvest quantity",
+      "Quantidade colhida",
+      "كمية الحصاد"
+    ],
+    [
+      "Unité (code existant)",
+      "Unit (existing code)",
+      "Unidade (código existente)",
+      "الوحدة (رمز موجود)"
+    ],
+    [
+      "Note (facultatif)",
+      "Note (optional)",
+      "Nota (opcional)",
+      "ملاحظة (اختياري)"
+    ],
+    [
+      "Ex. 125",
+      "E.g. 125",
+      "Ex.: 125",
+      "مثال: 125"
+    ],
+    [
+      "Ex. g, kg, unit",
+      "E.g. g, kg, unit",
+      "Ex.: g, kg, unit",
+      "مثال: g, kg, unit"
+    ],
+    [
+      "Produit récolté, qualité, conditions…",
+      "Harvested product, quality, conditions…",
+      "Produto colhido, qualidade, condições…",
+      "المنتج المحصود والجودة والظروف…"
+    ],
+    [
+      "Sélectionnez un lot à l’étape Récolte.",
+      "Select a batch in the Harvest stage.",
+      "Selecione um lote na etapa Colheita.",
+      "اختر دفعة في مرحلة الحصاد."
+    ],
+    [
+      "Étape Récolte active. Chaque saisie reste distincte.",
+      "Harvest stage active. Each entry remains separate.",
+      "Etapa Colheita ativa. Cada registo permanece separado.",
+      "مرحلة الحصاد نشطة. يبقى كل تسجيل منفصلًا."
+    ],
+    [
+      "La saisie est activée uniquement pendant l’étape Récolte d’un lot ouvert.",
+      "Entry is enabled only during the Harvest stage of an open batch.",
+      "O registo só é ativado durante a etapa Colheita de um lote aberto.",
+      "يُفعّل التسجيل فقط أثناء مرحلة الحصاد لدفعة مفتوحة."
+    ],
+    [
+      "Total des 50 événements chargés, par unité :",
+      "Total of the 50 loaded events, by unit:",
+      "Total dos 50 eventos carregados, por unidade:",
+      "إجمالي الأحداث الخمسين المحمّلة حسب الوحدة:"
+    ],
+    [
+      "Sélectionnez d’abord un lot.",
+      "Select a batch first.",
+      "Selecione primeiro um lote.",
+      "اختر دفعة أولًا."
+    ],
+    [
+      "La récolte ne peut être enregistrée que pendant l’étape Récolte d’un lot ouvert.",
+      "Harvest can only be recorded during the Harvest stage of an open batch.",
+      "A colheita só pode ser registada durante a etapa Colheita de um lote aberto.",
+      "لا يمكن تسجيل الحصاد إلا أثناء مرحلة الحصاد لدفعة مفتوحة."
+    ],
+    [
+      "Indiquez une quantité strictement positive et un code d’unité.",
+      "Enter a strictly positive quantity and a unit code.",
+      "Introduza uma quantidade estritamente positiva e um código de unidade.",
+      "أدخل كمية موجبة ورمز وحدة."
+    ],
+    [
+      "Vérification de l’unité impossible :",
+      "Unable to validate unit:",
+      "Não foi possível validar a unidade:",
+      "تعذر التحقق من الوحدة:"
+    ],
+    [
+      "Code d’unité inconnu. Utilisez un code déjà présent dans le référentiel des unités.",
+      "Unknown unit code. Use a code already present in the unit catalogue.",
+      "Código de unidade desconhecido. Utilize um código existente no catálogo de unidades.",
+      "رمز الوحدة غير معروف. استخدم رمزًا موجودًا في دليل الوحدات."
+    ],
+    [
+      "Ce lot doit être lié à une culture ou à un matériau pour enregistrer une récolte dans le journal biologique.",
+      "This batch must be linked to a culture or material to record a harvest in the biological log.",
+      "Este lote tem de estar associado a uma cultura ou material para registar a colheita no registo biológico.",
+      "يجب ربط هذه الدفعة بمزرعة أو مادة لتسجيل الحصاد في السجل البيولوجي."
+    ],
+    [
+      "Enregistrement de la récolte impossible :",
+      "Unable to record harvest:",
+      "Não foi possível registar a colheita:",
+      "تعذر تسجيل الحصاد:"
+    ],
+    [
+      "Récolte enregistrée dans la chronologie du lot.",
+      "Harvest recorded in the batch timeline.",
+      "Colheita registada na cronologia do lote.",
+      "تم تسجيل الحصاد في الخط الزمني للدفعة."
+    ],
+    [
+      "Récolte enregistrée",
+      "Harvest recorded",
+      "Colheita registada",
+      "تم تسجيل الحصاد"
+    ],
+    [
+      "Aucun événement enregistré pour ce lot.",
+      "No events recorded for this batch.",
+      "Não há eventos registados para este lote.",
+      "لا توجد أحداث مسجلة لهذه الدفعة."
+    ],
+    [
+      "Chronologie indisponible : ",
+      "Timeline unavailable: ",
+      "Cronologia indisponível: ",
+      "الخط الزمني غير متاح: "
+    ],
+    [
+      "Lot créé",
+      "Batch created",
+      "Lote criado",
+      "تم إنشاء الدفعة"
+    ],
+    [
+      "Étape avancée",
+      "Stage advanced",
+      "Etapa avançada",
+      "تم تقديم المرحلة"
+    ],
+    [
+      "Cycle terminé",
+      "Cycle completed",
+      "Ciclo concluído",
+      "اكتملت الدورة"
+    ],
+    [
+      "Lot libéré",
+      "Batch released",
+      "Lote libertado",
+      "تم الإفراج عن الدفعة"
+    ],
+    [
+      "Mesure enregistrée",
+      "Measurement recorded",
+      "Medição registada",
+      "تم تسجيل القياس"
+    ],
+    [
+      "Observation enregistrée",
+      "Observation recorded",
+      "Observação registada",
+      "تم تسجيل الملاحظة"
+    ],
+    [
+      "Date inconnue",
+      "Unknown date",
+      "Data desconhecida",
+      "تاريخ غير معروف"
     ]
   ];
   for (const [fr, en, pt, ar] of supplementalCoverage) {
