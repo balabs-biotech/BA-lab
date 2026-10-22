@@ -4899,13 +4899,18 @@ async function loadLotComparison() {
           const points = group.points.filter(point => point.batchId === batch.id);
           const stats = BACompareAnalysis.summarize(points.map(point => point.value));
           const outliers = points.filter(point => outlierIds.has(point.id)).length;
-          return [escapeHtml(batch.batch_code || "Lot sans code"), String(stats.n), comparisonFormat(stats.median), stats.n ? comparisonFormat(stats.min) + "–" + comparisonFormat(stats.max) : "—", outliers ? '<span class="comparison-outlier">' + outliers + " atypique(s)</span>" : "0"];
+          return [
+            escapeHtml(group.label + " · " + group.unit + " / " + (batch.batch_code || "Lot sans code")),
+            String(stats.n),
+            comparisonFormat(stats.median),
+            stats.n ? comparisonFormat(stats.min) + "–" + comparisonFormat(stats.max) : "—",
+            outliers ? '<span class="comparison-outlier">' + outliers + " atypique(s)</span>" : "0"
+          ];
         });
-        metricRows.push([escapeHtml(group.label + " · " + group.unit), "—", "—", "—", "—"]);
         perLot.forEach(row => metricRows.push(row));
         charts.innerHTML += renderComparisonChart(group, selectedBatches, outlierIds);
       });
-      tables.innerHTML += comparisonTable(["Variable · unité", "Lot", "n", "Médiane", "Min–max", "Valeurs atypiques"], metricRows.filter(row => row[1] !== "—"), "Mesures numériques par lot et unité");
+      tables.innerHTML += comparisonTable(["Variable · unité / lot", "n", "Médiane", "Min–max", "Valeurs atypiques"], metricRows, "Mesures numériques par lot et unité");
     } else {
       tables.innerHTML += '<div class="comparison-empty">Aucune mesure numérique exploitable dans la sélection. Les observations qualitatives restent analysées séparément.</div>';
     }
