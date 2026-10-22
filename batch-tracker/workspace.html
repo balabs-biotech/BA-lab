@@ -624,6 +624,18 @@
         <button id="recordHarvestButton" type="button" disabled>Enregistrer la récolte</button>
         <p id="harvestStatus" class="muted" role="status" aria-live="polite">Sélectionnez un lot à l’étape Récolte.</p>
       </div>
+      <div class="batch-harvest-entry" id="batchMovementEntry">
+        <h4>Déplacer le lot</h4>
+        <p class="muted">Le déplacement et son événement de traçabilité sont enregistrés ensemble.</p>
+        <div class="grid">
+          <div><label for="moveBatchLocation">Nouvel emplacement</label><select id="moveBatchLocation"><option value="">Aucun emplacement</option></select></div>
+          <div><label for="moveBatchEnvironment">Nouvel environnement</label><select id="moveBatchEnvironment"><option value="">Aucun environnement</option></select></div>
+        </div>
+        <label for="moveBatchNote">Note du déplacement (facultatif)</label>
+        <textarea id="moveBatchNote" rows="2" maxlength="1000" placeholder="Ex. transfert vers l’incubateur…"></textarea>
+        <button id="moveBatchButton" type="button" disabled>Enregistrer le déplacement</button>
+        <p id="moveBatchStatus" class="muted" role="status" aria-live="polite">Sélectionnez un lot pour préparer un déplacement.</p>
+      </div>
       <div id="batchEventList" class="batch-event-list" aria-live="polite"><p class="muted">Sélectionnez un lot pour charger sa chronologie.</p></div>
     </section>
 
