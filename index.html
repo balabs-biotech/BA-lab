@@ -18,7 +18,7 @@ h1{max-width:800px;margin:0;font-size:clamp(38px,7vw,76px);line-height:.98;lette
 .universe{--accent:var(--green);position:relative;display:flex;flex-direction:column;min-height:285px;padding:20px;text-decoration:none;color:var(--ink);background:var(--panel);border:1px solid var(--line);transition:transform .16s ease,border-color .16s ease;overflow:hidden}
 .universe:hover,.universe:focus-visible{transform:translateY(-4px);border-color:var(--accent);outline:none}
 .universe:focus-visible{box-shadow:0 0 0 3px var(--accent)}
-.universe.myco{--accent:var(--acid);border-radius:0;box-shadow:5px 5px 0 #343a2a}.universe.lab{--accent:var(--blue);background:linear-gradient(145deg,#202c35,#171d22);border-color:#3a4a57}
+.universe.myco{--accent:#a94f1d;border-radius:0;box-shadow:5px 5px 0 #343a2a}.universe.lab{--accent:var(--blue);background:linear-gradient(145deg,#202c35,#171d22);border-color:#3a4a57}
 .universe-no{font:800 11px ui-monospace,monospace;color:var(--accent);letter-spacing:.13em}.symbol{display:grid;place-items:center;width:54px;height:54px;margin:25px 0 22px;border:1px solid var(--accent);color:var(--accent);font-size:28px}
 .universe h2{margin:0 0 9px;font-size:23px;letter-spacing:-.03em}.universe p{margin:0;color:var(--muted);font-size:13px;line-height:1.55}.enter{display:flex;justify-content:space-between;align-items:center;margin-top:auto;padding-top:24px;color:var(--accent);font-size:12px;font-weight:850;letter-spacing:.04em}.enter span:last-child{font-size:21px}
 .footer{display:flex;justify-content:space-between;gap:16px;margin-top:35px;padding-top:17px;border-top:1px solid var(--line);color:#7e8b80;font-size:11px}
@@ -31,17 +31,17 @@ h1{max-width:800px;margin:0;font-size:clamp(38px,7vw,76px);line-height:.98;lette
   <div class="brand"><span class="brand-mark" aria-hidden="true">B</span><span>BA LABS</span><span style="color:#718071;font-weight:500">/ CULTURE TRACKER</span></div>
   <p class="kicker">PLATEFORME DE SUIVI BIOLOGIQUE · 01—03</p>
   <h1>Chaque culture<br>son <span>univers.</span></h1>
-  <p class="lead">Choisissez votre espace de travail. Chaque univers adapte l’interface à votre pratique, tout en conservant une traçabilité commune pour les cultures, les observations et les lots.</p>
+  <p class="lead">Choisissez votre espace de travail. Chaque univers possède sa propre page et ses outils métier, avec une traçabilité biologique commune.</p>
   <nav class="universes" aria-label="Choisir un univers de travail">
-    <a class="universe agronomy" href="batch-tracker/?domain=agronomy">
+    <a class="universe agronomy" href="batch-tracker/green-tech/">
       <span class="universe-no">01 / AGRITECH</span><span class="symbol" aria-hidden="true">↗</span>
-      <h2>Agronomie</h2><p>Plantes, substrats, serre, irrigation et suivi des conditions de croissance.</p><span class="enter"><span>Entrer dans l’espace</span><span aria-hidden="true">↗</span></span>
+      <h2>Green Tech</h2><p>Plantes, substrats, serre, irrigation, digesteurs fongiques et suivi environnemental.</p><span class="enter"><span>Entrer dans l’espace</span><span aria-hidden="true">↗</span></span>
     </a>
-    <a class="universe myco" href="batch-tracker/?domain=mycology">
+    <a class="universe myco" href="batch-tracker/mycology/">
       <span class="universe-no">02 / FUNGAL SYSTEMS</span><span class="symbol" aria-hidden="true">✳</span>
       <h2>Mycologie</h2><p>Souches, générations, transferts, morphologie et suivi des contaminations.</p><span class="enter"><span>Entrer dans l’espace</span><span aria-hidden="true">↗</span></span>
     </a>
-    <a class="universe lab" href="batch-tracker/?domain=laboratory">
+    <a class="universe lab" href="batch-tracker/laboratory/">
       <span class="universe-no">03 / LAB NOTES</span><span class="symbol" aria-hidden="true">＋</span>
       <h2>Laboratoire</h2><p>Milieux, protocoles, paramètres expérimentaux, mesures et résultats.</p><span class="enter"><span>Entrer dans l’espace</span><span aria-hidden="true">↗</span></span>
     </a>

@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Espace Green Tech BA Labs : plantes, substrats, serre, irrigation et paramètres environnementaux.">
+  <meta name="theme-color" content="#183b24">
+  <title>BA Labs — Green Tech</title>
+  <link rel="stylesheet" href="../tracker.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.118.0"></script>
+</head>
+<body data-domain="agronomy">
+  <div id="workspace-root" aria-live="polite"><main class="container"><p>Chargement de l’espace Green Tech…</p></main></div>
+  <script>
+    window.BA_LABS_DOMAIN = "agronomy";
+    fetch("../workspace.html")
+      .then(response => {
+        if (!response.ok) throw new Error("Impossible de charger l’interface commune.");
+        return response.text();
+      })
+      .then(markup => {
+        document.getElementById("workspace-root").innerHTML = markup;
+        const script = document.createElement("script");
+        script.src = "../tracker.js";
+        script.onerror = () => {
+          document.getElementById("workspace-root").innerHTML = "<main class='container'><p role='alert'>Le moteur du Batch Tracker n’a pas pu être chargé. Rechargez la page.</p></main>";
+        };
+        document.body.appendChild(script);
+      })
+      .catch(() => {
+        document.getElementById("workspace-root").innerHTML = "<main class='container'><p role='alert'>L’interface n’a pas pu être chargée. Vérifiez la connexion puis rechargez la page.</p></main>";
+      });
+  </script>
+</body>
+</html>
