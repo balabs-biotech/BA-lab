@@ -1540,3 +1540,8 @@ body[data-domain="agronomy"] :is(input, select, textarea, button, a):focus-visib
   outline-color: #b4f477 !important;
   box-shadow: 0 0 0 2px rgba(180, 244, 119, .24) !important;
 }
+
+/* Use the exact homepage accent on the Green Tech hero title highlight. */
+body[data-domain="agronomy"] .app-hero h1 span {
+  color: #b4f477 !important;
+}
