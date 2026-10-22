@@ -1,63 +1,27 @@
 import fs from "node:fs";
 import vm from "node:vm";
-
-const html = fs.readFileSync("batch-tracker/index.html", "utf8");
-const rootHtml = fs.readFileSync("index.html", "utf8");
-const scripts = html.split("<script").slice(1).map((chunk) => {
-  const endOfTag = chunk.indexOf(">");
-  const endOfScript = chunk.indexOf("</script>");
-  if (endOfTag < 0 || endOfScript < 0) return null;
-  return { attributes: chunk.slice(0, endOfTag), source: chunk.slice(endOfTag + 1, endOfScript) };
-}).filter((script) => script && !script.attributes.includes("src=") && script.source.trim());
-
-if (scripts.length === 0) {
-  throw new Error("No inline JavaScript found in batch-tracker/index.html");
+const root=fs.readFileSync("index.html","utf8");
+const engine=fs.readFileSync("batch-tracker/tracker.js","utf8");
+const template=fs.readFileSync("batch-tracker/workspace.html","utf8");
+new vm.Script(engine,{filename:"batch-tracker/tracker.js"});
+const routes=[
+ {domain:"agronomy",url:"batch-tracker/green-tech/",file:"batch-tracker/green-tech/index.html"},
+ {domain:"mycology",url:"batch-tracker/mycology/",file:"batch-tracker/mycology/index.html"},
+ {domain:"laboratory",url:"batch-tracker/laboratory/",file:"batch-tracker/laboratory/index.html"}
+];
+for(const r of routes){
+ const html=fs.readFileSync(r.file,"utf8");
+ if(!html.includes(`window.BA_LABS_DOMAIN = "${r.domain}"`))throw new Error("Wrong domain: "+r.file);
+ if(!html.includes('fetch("../workspace.html")')||!html.includes('script.src = "../tracker.js"'))throw new Error("Shared engine missing: "+r.file);
+ if(!root.includes(`href="${r.url}"`))throw new Error("Root link missing: "+r.url);
 }
-
-for (const [index, script] of scripts.entries()) {
-  new vm.Script(script.source, { filename: `batch-tracker/index.html:inline-script-${index + 1}` });
-}
-
-const supportedDomains = ["agronomy", "mycology", "laboratory"];
-for (const domain of supportedDomains) {
-  if (!rootHtml.includes(`href="batch-tracker/?domain=${domain}"`)) {
-    throw new Error(`Universe chooser is missing the "${domain}" entry link`);
-  }
-}
-
-const entryGuard = scripts.find((script) => script.source.includes("initialDomain"));
-if (!entryGuard) {
-  throw new Error("Direct tracker entry has no universe chooser guard");
-}
-
-function evaluateEntryGuard(search) {
-  let redirectedTo = null;
-  const context = {
-    URLSearchParams,
-    window: {
-      location: {
-        search,
-        replace: (url) => { redirectedTo = url; },
-      },
-    },
-  };
-  vm.runInNewContext(entryGuard.source, context);
-  return redirectedTo;
-}
-
-for (const domain of supportedDomains) {
-  const result = evaluateEntryGuard(`?domain=${domain}`);
-  if (result !== null) {
-    throw new Error(`Valid universe "${domain}" unexpectedly redirects to ${result}`);
-  }
-}
-
-for (const search of ["", "?domain=unknown", "?domain=", "?domain=mycology&domain=unknown", "?domain=mycology&domain=mycology"]) {
-  const result = evaluateEntryGuard(search);
-  if (result !== "../") {
-    throw new Error(`Invalid entry "${search}" must redirect to ../; got ${String(result)}`);
-  }
-}
-
-console.log(`✓ Parsed ${scripts.length} inline JavaScript block(s) in batch-tracker/index.html`);
-console.log("✓ Universe chooser links and direct-entry redirect regression tests passed");
+if(template.includes('class="domain-switcher"'))throw new Error("Switcher remains inside workspace");
+if(!engine.includes("const modulesByDomain")||!engine.includes('domain !== "laboratory"'))throw new Error("Domain module scope missing");
+const css=fs.readFileSync("batch-tracker/tracker.css","utf8");
+if(!css.includes("--brand:#a94f1d")||!css.includes("--focus:#a94f1d"))throw new Error("Terracotta palette missing");
+if(!root.includes(".universe.myco{--accent:#a94f1d;"))throw new Error("Chooser mycology accent is still fluorescent");
+console.log("✓ JavaScript syntax parsed");
+console.log("✓ Three fixed-domain entry pages and chooser links verified");
+console.log("✓ Shared workspace excludes universe switcher");
+console.log("✓ Batch production scoped to Laboratory");
+console.log("✓ Mycology terracotta palette verified in workspace and chooser");
