@@ -4752,6 +4752,8 @@ function clearLotComparisonState() {
     const element = document.getElementById(id);
     if (element) element.innerHTML = "";
   });
+  const picker = document.getElementById("compareBatchPicker");
+  if (picker) picker.innerHTML = '<p class="muted">' + escapeHtml(comparisonText("Les lots disponibles apparaîtront après connexion.", "Available batches will appear after sign-in.", "Os lotes disponíveis aparecerão após iniciar sessão.", "ستظهر الدفعات المتاحة بعد تسجيل الدخول.")) + '</p>';
   const status = document.getElementById("compareLotsStatus");
   if (status) status.textContent = comparisonText("Sélectionnez au moins deux lots pour commencer.", "Select at least two batches to begin.", "Selecione pelo menos dois lotes para começar.", "حدد دفعتين على الأقل للبدء.");
   const button = document.getElementById("compareLotsButton");
@@ -4765,6 +4767,10 @@ function renderComparisonBatchOptions() {
   const picker = document.getElementById("compareBatchPicker");
   if (!picker) return;
   const previouslySelected = new Set(Array.from(picker.querySelectorAll('input[name="compareBatch"]:checked')).map(input => input.value));
+  if (!organizationId) {
+    picker.innerHTML = '<p class="muted">' + escapeHtml(comparisonText("Les lots disponibles apparaîtront après connexion.", "Available batches will appear after sign-in.", "Os lotes disponíveis aparecerão após iniciar sessão.", "ستظهر الدفعات المتاحة بعد تسجيل الدخول.")) + '</p>';
+    return;
+  }
   if (!latestBatches.length) {
     picker.innerHTML = '<p class="comparison-empty">' + escapeHtml(comparisonText("Aucun lot disponible dans le chargement courant. Créez un lot ou vérifiez les droits d’accès à votre organisation.", "No batches are available in the current load. Create a batch or check your organization access.", "Não há lotes disponíveis no carregamento atual. Crie um lote ou verifique o acesso à organização.", "لا توجد دفعات متاحة في التحميل الحالي. أنشئ دفعة أو تحقق من صلاحيات الوصول إلى مؤسستك.")) + '</p>';
     return;
