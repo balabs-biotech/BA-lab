@@ -4297,9 +4297,20 @@ function updateMeasurementUnits() {
   }
 }
 
+function cultureWorkflowText(key) {
+  const lang = window.BALabsI18n?.language || "fr";
+  const messages = {
+    fr: { organization:"Organisation absente. Reconnectez-vous.", target:"Choisissez une culture ou un lot, un paramètre, une valeur numérique et une unité.", incompatible:"L’unité choisie n’est pas compatible avec la dimension du paramètre.", expired:"Votre session a expiré. Reconnectez-vous.", saving:"Enregistrement…", cultureMissing:"La culture sélectionnée n’est plus disponible.", batchMissing:"Le lot sélectionné n’est plus disponible.", eventError:"Création de l’événement de traçabilité impossible : ", invalidTarget:"Cible de mesure invalide.", measureError:"Enregistrement de la mesure impossible : ", measureSaved:"Mesure enregistrée dans Supabase avec sa provenance.", measureRefresh:"La mesure a été enregistrée, mais l’actualisation de l’historique a échoué. Utilisez « Actualiser » pour recharger les données.", measureFailed:"L’enregistrement de la mesure a échoué.", saveMeasure:"Enregistrer la mesure", observationTarget:"Choisissez une cible, une catégorie et décrivez l’observation.", observationInvalid:"Cible d’observation invalide.", observationError:"Enregistrement de l’observation impossible : ", observationSaved:"Observation enregistrée dans Supabase avec sa provenance.", observationRefresh:"L’observation a été enregistrée, mais l’actualisation de l’historique a échoué. Utilisez Actualiser pour recharger les données.", observationFailed:"L’enregistrement de l’observation a échoué.", saveObservation:"Enregistrer l’observation" },
+    en: { organization:"Organization missing. Please sign in again.", target:"Choose a culture or batch, a parameter, a numeric value, and a unit.", incompatible:"The selected unit is incompatible with the parameter dimension.", expired:"Your session has expired. Sign in again.", saving:"Saving…", cultureMissing:"The selected culture is no longer available.", batchMissing:"The selected batch is no longer available.", eventError:"Could not create the traceability event: ", invalidTarget:"Invalid measurement target.", measureError:"Could not save the measurement: ", measureSaved:"Measurement saved to Supabase with its provenance.", measureRefresh:"The measurement was saved, but its history could not be refreshed. Use Refresh to reload the data.", measureFailed:"The measurement could not be saved.", saveMeasure:"Save measurement", observationTarget:"Choose a target and category, then describe the observation.", observationInvalid:"Invalid observation target.", observationError:"Could not save the observation: ", observationSaved:"Observation saved to Supabase with its provenance.", observationRefresh:"The observation was saved, but its history could not be refreshed. Use Refresh to reload the data.", observationFailed:"The observation could not be saved.", saveObservation:"Save observation" },
+    pt: { organization:"Organização ausente. Inicie sessão novamente.", target:"Escolha uma cultura ou lote, um parâmetro, um valor numérico e uma unidade.", incompatible:"A unidade escolhida não é compatível com a dimensão do parâmetro.", expired:"A sua sessão expirou. Inicie sessão novamente.", saving:"A guardar…", cultureMissing:"A cultura selecionada já não está disponível.", batchMissing:"O lote selecionado já não está disponível.", eventError:"Não foi possível criar o evento de rastreabilidade: ", invalidTarget:"Alvo de medição inválido.", measureError:"Não foi possível guardar a medição: ", measureSaved:"Medição guardada no Supabase com a respetiva proveniência.", measureRefresh:"A medição foi guardada, mas não foi possível atualizar o histórico. Use Atualizar para recarregar os dados.", measureFailed:"Não foi possível guardar a medição.", saveMeasure:"Guardar medição", observationTarget:"Escolha um alvo e uma categoria e descreva a observação.", observationInvalid:"Alvo de observação inválido.", observationError:"Não foi possível guardar a observação: ", observationSaved:"Observação guardada no Supabase com a respetiva proveniência.", observationRefresh:"A observação foi guardada, mas não foi possível atualizar o histórico. Use Atualizar para recarregar os dados.", observationFailed:"Não foi possível guardar a observação.", saveObservation:"Guardar observação" },
+    ar: { organization:"المنظمة غير محددة. سجّل الدخول مجددًا.", target:"اختر مزرعة أو دفعة، ومعيارًا، وقيمة رقمية، ووحدة قياس.", incompatible:"وحدة القياس المختارة غير متوافقة مع بُعد المعيار.", expired:"انتهت جلستك. سجّل الدخول مجددًا.", saving:"جارٍ الحفظ…", cultureMissing:"لم تعد المزرعة المحددة متاحة.", batchMissing:"لم تعد الدفعة المحددة متاحة.", eventError:"تعذّر إنشاء حدث التتبّع: ", invalidTarget:"هدف القياس غير صالح.", measureError:"تعذّر حفظ القياس: ", measureSaved:"تم حفظ القياس في Supabase مع مصدره.", measureRefresh:"تم حفظ القياس، لكن تعذّر تحديث السجل. استخدم «تحديث» لإعادة تحميل البيانات.", measureFailed:"تعذّر حفظ القياس.", saveMeasure:"حفظ القياس", observationTarget:"اختر هدفًا وفئة، ثم صِف الملاحظة.", observationInvalid:"هدف الملاحظة غير صالح.", observationError:"تعذّر حفظ الملاحظة: ", observationSaved:"تم حفظ الملاحظة في Supabase مع مصدرها.", observationRefresh:"تم حفظ الملاحظة، لكن تعذّر تحديث السجل. استخدم «تحديث» لإعادة تحميل البيانات.", observationFailed:"تعذّر حفظ الملاحظة.", saveObservation:"حفظ الملاحظة" }
+  };
+  return (messages[lang] || messages.fr)[key] || messages.fr[key] || key;
+}
+
 async function saveMeasurement() {
   if (!organizationId) {
-    showMessage("Organisation absente. Reconnectez-vous.", "error");
+    showMessage(cultureWorkflowText("organization"), "error");
     return;
   }
 
@@ -4312,22 +4323,22 @@ async function saveMeasurement() {
     : new Date().toISOString();
 
   if (!targetValue || !variable || !unit || measurementValueInput.value.trim() === "" || !Number.isFinite(rawValue)) {
-    showMessage("Choisissez une culture ou un lot, un paramètre, une valeur numérique et une unité.", "error");
+    showMessage(cultureWorkflowText("target"), "error");
     return;
   }
   if (variable.dimension !== unit.dimension) {
-    showMessage("L’unité choisie n’est pas compatible avec la dimension du paramètre.", "error");
+    showMessage(cultureWorkflowText("incompatible"), "error");
     return;
   }
 
   const session = await getCurrentSession();
   if (!session) {
-    showMessage("Votre session a expiré. Reconnectez-vous.", "error");
+    showMessage(cultureWorkflowText("expired"), "error");
     return;
   }
 
   saveMeasurementButton.disabled = true;
-  saveMeasurementButton.textContent = "Enregistrement…";
+  saveMeasurementButton.textContent = cultureWorkflowText("saving");
   let eventId = null;
   let measurementSaved = false;
 
@@ -4338,11 +4349,11 @@ async function saveMeasurement() {
 
     if (targetType === "culture") {
       const culture = cultureOptions.find(item => item.id === targetId);
-      if (!culture) throw new Error("La culture sélectionnée n’est plus disponible.");
+      if (!culture) throw new Error(cultureWorkflowText("cultureMissing"));
       cultureId = culture.id;
     } else if (targetType === "batch") {
       const batch = latestBatches.find(item => item.id === targetId);
-      if (!batch) throw new Error("Le lot sélectionné n’est plus disponible.");
+      if (!batch) throw new Error(cultureWorkflowText("batchMissing"));
       batchId = batch.id;
       cultureId = batch.culture_id || null;
 
@@ -4367,10 +4378,10 @@ async function saveMeasurement() {
         .select("id")
         .single();
 
-      if (eventError) throw new Error(`Création de l’événement de traçabilité impossible : ${eventError.message}`);
+      if (eventError) throw new Error(cultureWorkflowText("eventError") + eventError.message);
       eventId = event.id;
     } else {
-      throw new Error("Cible de mesure invalide.");
+      throw new Error(cultureWorkflowText("invalidTarget"));
     }
 
     const sameAsCanonical = variable.canonical_unit_code === unit.code;
@@ -4396,7 +4407,7 @@ async function saveMeasurement() {
         }
       });
 
-    if (measurementError) throw new Error(`Enregistrement de la mesure impossible : ${measurementError.message}`);
+    if (measurementError) throw new Error(cultureWorkflowText("measureError") + measurementError.message);
     measurementSaved = true;
 
     measurementValueInput.value = "";
@@ -4404,12 +4415,12 @@ async function saveMeasurement() {
     measurementMethodInput.value = "";
     measurementNoteInput.value = "";
 
-    showMessage("Mesure enregistrée dans Supabase avec sa provenance.", "success");
+    showMessage(cultureWorkflowText("measureSaved"), "success");
     await loadRecentMeasurements();
   } catch (error) {
     console.error("Enregistrement mesure :", error);
     if (measurementSaved) {
-      showMessage("La mesure a été enregistrée, mais l’actualisation de l’historique a échoué. Utilisez « Actualiser » pour recharger les données.", "warning");
+      showMessage(cultureWorkflowText("measureRefresh"), "warning");
     } else {
       if (eventId) {
         const { error: cleanupError } = await supabaseClient
@@ -4419,11 +4430,11 @@ async function saveMeasurement() {
           .eq("id", eventId);
         if (cleanupError) console.error("Nettoyage de l’événement incomplet :", cleanupError);
       }
-      showMessage(error.message || "L’enregistrement de la mesure a échoué.", "error");
+      showMessage(error.message || cultureWorkflowText("measureFailed"), "error");
     }
   } finally {
     saveMeasurementButton.disabled = false;
-    saveMeasurementButton.textContent = "Enregistrer la mesure";
+    saveMeasurementButton.textContent = cultureWorkflowText("saveMeasure");
   }
 }
 
@@ -4488,7 +4499,7 @@ async function loadRecentMeasurements() {
 
 async function saveObservation() {
   if (!organizationId) {
-    showMessage("Organisation absente. Reconnectez-vous.", "error");
+    showMessage(cultureWorkflowText("organization"), "error");
     return;
   }
 
@@ -4498,18 +4509,18 @@ async function saveObservation() {
   const observedAt = observationAtInput.value ? new Date(observationAtInput.value).toISOString() : new Date().toISOString();
 
   if (!targetValue || !variable || !valueText) {
-    showMessage("Choisissez une cible, une catégorie et décrivez l’observation.", "error");
+    showMessage(cultureWorkflowText("observationTarget"), "error");
     return;
   }
 
   const session = await getCurrentSession();
   if (!session) {
-    showMessage("Votre session a expiré. Reconnectez-vous.", "error");
+    showMessage(cultureWorkflowText("expired"), "error");
     return;
   }
 
   saveObservationButton.disabled = true;
-  saveObservationButton.textContent = "Enregistrement…";
+  saveObservationButton.textContent = cultureWorkflowText("saving");
   let eventId = null;
   let observationSaved = false;
 
@@ -4522,11 +4533,11 @@ async function saveObservation() {
 
     if (targetType === "culture") {
       const culture = cultureOptions.find(item => item.id === targetId);
-      if (!culture) throw new Error("La culture sélectionnée n’est plus disponible.");
+      if (!culture) throw new Error(cultureWorkflowText("cultureMissing"));
       cultureId = culture.id;
     } else if (targetType === "batch") {
       const batch = latestBatches.find(item => item.id === targetId);
-      if (!batch) throw new Error("Le lot sélectionné n’est plus disponible.");
+      if (!batch) throw new Error(cultureWorkflowText("batchMissing"));
       batchId = batch.id;
       cultureId = batch.culture_id || null;
 
@@ -4546,10 +4557,10 @@ async function saveObservation() {
         }
       }).select("id").single();
 
-      if (eventResult.error) throw new Error("Création de l’événement de traçabilité impossible : " + eventResult.error.message);
+      if (eventResult.error) throw new Error(cultureWorkflowText("eventError") + eventResult.error.message);
       eventId = eventResult.data.id;
     } else {
-      throw new Error("Cible d’observation invalide.");
+      throw new Error(cultureWorkflowText("observationInvalid"));
     }
 
     const insertResult = await supabaseClient.from("observations").insert({
@@ -4569,29 +4580,29 @@ async function saveObservation() {
       }
     });
 
-    if (insertResult.error) throw new Error("Enregistrement de l’observation impossible : " + insertResult.error.message);
+    if (insertResult.error) throw new Error(cultureWorkflowText("observationError") + insertResult.error.message);
     observationSaved = true;
     observationValueInput.value = "";
     observationMethodInput.value = "";
     observationInstrumentInput.value = "";
     observationNoteInput.value = "";
-    showMessage("Observation enregistrée dans Supabase avec sa provenance.", "success");
+    showMessage(cultureWorkflowText("observationSaved"), "success");
     await loadRecentObservations();
   } catch (error) {
     console.error("Enregistrement observation :", error);
     if (observationSaved) {
-      showMessage("L’observation a été enregistrée, mais l’actualisation de l’historique a échoué. Utilisez Actualiser pour recharger les données.", "warning");
+      showMessage(cultureWorkflowText("observationRefresh"), "warning");
     } else {
       if (eventId) {
         const cleanup = await supabaseClient.from("events").delete()
           .eq("organization_id", organizationId).eq("id", eventId);
         if (cleanup.error) console.error("Nettoyage de l’événement incomplet :", cleanup.error);
       }
-      showMessage(error.message || "L’enregistrement de l’observation a échoué.", "error");
+      showMessage(error.message || cultureWorkflowText("observationFailed"), "error");
     }
   } finally {
     saveObservationButton.disabled = false;
-    saveObservationButton.textContent = "Enregistrer l’observation";
+    saveObservationButton.textContent = cultureWorkflowText("saveObservation");
   }
 }
 
