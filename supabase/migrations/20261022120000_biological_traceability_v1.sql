@@ -28,7 +28,7 @@ begin
   if not private.is_org_member(p_organization_id) then
     raise exception 'organization_access_denied' using errcode = '42501';
   end if;
-  if p_event_type not in ('repiquage','transfert','division_aliquotes','changement_milieu','contamination_suspectee','conservation','resultat_final','passage','autre_operation') then
+  if p_event_type is null or p_event_type not in ('repiquage','transfert','division_aliquotes','changement_milieu','contamination_suspectee','conservation','resultat_final','passage','autre_operation') then
     raise exception 'unsupported_biological_operation';
   end if;
   if coalesce(array_length(p_child_codes,1),0) > 12 then
