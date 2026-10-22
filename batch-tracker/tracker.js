@@ -4778,7 +4778,7 @@ function renderComparisonBatchOptions() {
   picker.innerHTML = latestBatches.map(batch => {
     const id = escapeHtml(batch.id);
     const code = escapeHtml(batch.batch_code || comparisonText("Lot sans code", "Batch without code", "Lote sem código", "دفعة بلا رمز"));
-    const name = escapeHtml(batch.name || batch.batch_type || "Sans description");
+    const name = escapeHtml(batch.name || batch.batch_type || comparisonText("Sans description", "No description", "Sem descrição", "بلا وصف"));
     const stage = escapeHtml(batch.current_stage || batch.status || comparisonText("Étape non renseignée", "Stage not specified", "Etapa não indicada", "المرحلة غير محددة"));
     return '<label class="comparison-batch-option"><input type="checkbox" name="compareBatch" value="' + id + '"' + (previouslySelected.has(batch.id) ? " checked" : "") + '><span><strong>' + code + '</strong><small>' + name + ' · ' + stage + '</small></span></label>';
   }).join("");
@@ -5077,7 +5077,7 @@ async function loadLotComparison() {
           const stats = BACompareAnalysis.summarize(points.map(point => point.value));
           const outliers = points.filter(point => outlierIds.has(point.id)).length;
           return [
-            escapeHtml(group.label + " · " + comparisonUnitLabel(group.unit) + " / " + (batch.batch_code || "Lot sans code")),
+            escapeHtml(group.label + " · " + comparisonUnitLabel(group.unit) + " / " + (batch.batch_code || comparisonText("Lot sans code", "Batch without code", "Lote sem código", "دفعة بلا رمز"))),
             String(stats.n),
             comparisonFormat(stats.median),
             stats.n ? comparisonFormat(stats.min) + "–" + comparisonFormat(stats.max) : "—",
@@ -5105,7 +5105,7 @@ async function loadLotComparison() {
         selectedBatches.forEach(batch => {
           const values = group.rows.filter(row => row.batchId === batch.id);
           const latest = values.slice().sort((a, b) => new Date(b.observed_at || 0) - new Date(a.observed_at || 0))[0];
-          observationRows.push([escapeHtml(group.label), escapeHtml(batch.batch_code || "Lot sans code"), String(values.length), latest ? escapeHtml(String(latest.value_text || comparisonText("Observation sans texte", "Observation without text", "Observação sem texto", "ملاحظة بلا نص"))) : comparisonText("Aucune observation enregistrée", "No observation recorded", "Nenhuma observação registada", "لم تُسجل ملاحظة"), latest?.observed_at ? escapeHtml(new Date(latest.observed_at).toLocaleDateString(comparisonLocale())) : "—"]);
+          observationRows.push([escapeHtml(group.label), escapeHtml(batch.batch_code || comparisonText("Lot sans code", "Batch without code", "Lote sem código", "دفعة بلا رمز")), String(values.length), latest ? escapeHtml(String(latest.value_text || comparisonText("Observation sans texte", "Observation without text", "Observação sem texto", "ملاحظة بلا نص"))) : comparisonText("Aucune observation enregistrée", "No observation recorded", "Nenhuma observação registada", "لم تُسجل ملاحظة"), latest?.observed_at ? escapeHtml(new Date(latest.observed_at).toLocaleDateString(comparisonLocale())) : "—"]);
         });
       });
       tables.innerHTML += comparisonTable([comparisonText("Variable observée", "Observed variable", "Variável observada", "المتغير المرصود"), comparisonText("Lot", "Batch", "Lote", "دفعة"), "n", comparisonText("Dernière valeur textuelle", "Latest text value", "Último valor textual", "أحدث قيمة نصية"), comparisonText("Dernière date", "Latest date", "Data mais recente", "أحدث تاريخ")], observationRows, comparisonText("Observations qualitatives par lot", "Qualitative observations by batch", "Observações qualitativas por lote", "الملاحظات النوعية حسب الدفعة"));
