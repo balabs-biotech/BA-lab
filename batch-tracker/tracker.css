@@ -1692,3 +1692,31 @@ body[data-domain="laboratory"] .culture-catalog-code,
 body[data-domain="laboratory"] .statistics-summary-item strong {
   color: #215b91 !important;
 }
+
+
+/* Laboratory: force primary action buttons (including data-saving actions) to blue. */
+body[data-domain="laboratory"] button:not(.secondary-button):not(.danger-button),
+body[data-domain="laboratory"] button[type="submit"],
+body[data-domain="laboratory"] #saveMeasurementButton,
+body[data-domain="laboratory"] #saveObservationButton,
+body[data-domain="laboratory"] #saveBioOperation,
+body[data-domain="laboratory"] .primary-button {
+  background: #215b91 !important;
+  background-image: none !important;
+  border-color: #215b91 !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  box-shadow: none !important;
+}
+body[data-domain="laboratory"] button:not(.secondary-button):not(.danger-button):hover:not(:disabled),
+body[data-domain="laboratory"] button[type="submit"]:hover:not(:disabled),
+body[data-domain="laboratory"] #saveMeasurementButton:hover:not(:disabled),
+body[data-domain="laboratory"] #saveObservationButton:hover:not(:disabled),
+body[data-domain="laboratory"] #saveBioOperation:hover:not(:disabled),
+body[data-domain="laboratory"] .primary-button:hover:not(:disabled) {
+  background: #174875 !important;
+  background-image: none !important;
+  border-color: #174875 !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+}
