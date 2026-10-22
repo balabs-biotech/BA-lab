@@ -128,6 +128,8 @@ jobs:
         run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/seed_environment_measurement_variables.test.sql
       - name: Test notion_* protection migration on PostgreSQL 17
         run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/protect_cultures_notion_cols.test.sql
+      - name: Test Notion sync claim serialization on PostgreSQL 17
+        run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/serialize_notion_sync_claims.test.sql
       - name: Test batch workflow protection migration on PostgreSQL 17
         run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/protect_batch_workflow.test.sql
       - name: Test FK indexes and consent RLS migration on PostgreSQL 17
