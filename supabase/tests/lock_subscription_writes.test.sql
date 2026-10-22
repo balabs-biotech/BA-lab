@@ -5,9 +5,10 @@ do $$ begin
   if not exists (select 1 from pg_roles where rolname='service_role') then create role service_role nologin bypassrls; end if;
 end $$;
 create schema if not exists private;
-create table public.organizations(id uuid primary key);
-create table public.service_plans(id uuid primary key);
-create table public.organization_members(organization_id uuid, user_id uuid);
+create table if not exists public.organizations(id uuid primary key);
+create table if not exists public.service_plans(id uuid primary key);
+create table if not exists public.organization_members(organization_id uuid, user_id uuid);
+drop table if exists public.organization_subscriptions cascade;
 create table public.organization_subscriptions(
   id uuid primary key,
   organization_id uuid not null references public.organizations(id),
