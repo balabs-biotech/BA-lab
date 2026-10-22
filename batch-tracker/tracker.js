@@ -4908,10 +4908,22 @@ async function loadStatistics() {
   finally { if (requestId === statisticsRequestId) { button.disabled=false; button.textContent=L.buttonAnalyze; } }
 }
 
+function biologicalWorkflowText(key, count = 0) {
+  const lang = window.BALabsI18n?.language || "fr";
+  const messages = {
+    fr: { loading:"Chargement de la filiation…", missing:"Culture absente du périmètre chargé.", open:"Ouvrir la fiche de culture ", noCode:"sans code", typeMissing:"type non renseigné", materialOrigin:"Origine matérielle (de la souche source au matériel actuel)", materialNoCode:"Matériel sans code", unknownType:"type inconnu", generation:"génération ", parents:"Cultures parentes", selected:"Culture sélectionnée", openSheet:"Fiche ouverte", parentCulture:"Culture parente", descendants:"Descendants", noLineage:"Aucun ascendant ou descendant enregistré dans les fiches de culture. L’origine matérielle initiale reste indiquée par l’identifiant matériel de la fiche.", partial:"Filiation partielle : limite de 1 000 cultures atteinte.", loadError:"Impossible de charger la filiation : ", selectCulture:"Sélectionnez une culture avant d’enregistrer.", dateRequired:"Indiquez la date de l’opération.", childLimit:"Maximum : 12 descendants par opération.", invalidPropagation:"Cette opération ne peut pas créer de descendants. Retirez les codes ou choisissez une opération de propagation.", saving:"Enregistrement…", syncWarning:" La filiation est enregistrée dans Supabase ; vérifiez la synchronisation Notion des descendants.", syncWarningShort:" La filiation est enregistrée dans Supabase ; synchronisation Notion à vérifier.", saved:"Opération enregistrée", childCreated:" descendant(s) créé(s).", failed:"Échec : ", notSaved:"opération non enregistrée", save:"Enregistrer l’opération" },
+    en: { loading:"Loading lineage…", missing:"Culture is outside the loaded scope.", open:"Open culture record ", noCode:"no code", typeMissing:"type not specified", materialOrigin:"Material origin (from source strain to current material)", materialNoCode:"Material without a code", unknownType:"unknown type", generation:"generation ", parents:"Parent cultures", selected:"Selected culture", openSheet:"Open record", parentCulture:"Parent culture", descendants:"Descendants", noLineage:"No ancestors or descendants are recorded in the culture records. The initial material origin remains indicated by the record's material ID.", partial:"Partial lineage: the 1,000-culture limit was reached.", loadError:"Could not load lineage: ", selectCulture:"Select a culture before saving.", dateRequired:"Enter the operation date.", childLimit:"Maximum: 12 descendants per operation.", invalidPropagation:"This operation cannot create descendants. Remove the codes or choose a propagation operation.", saving:"Saving…", syncWarning:" Lineage is saved in Supabase; check Notion synchronization for descendants.", syncWarningShort:" Lineage is saved in Supabase; verify Notion synchronization.", saved:"Operation saved", childCreated:" descendant(s) created.", failed:"Failed: ", notSaved:"operation not saved", save:"Save operation" },
+    pt: { loading:"A carregar a filiação…", missing:"A cultura não está no âmbito carregado.", open:"Abrir ficha da cultura ", noCode:"sem código", typeMissing:"tipo não indicado", materialOrigin:"Origem material (da estirpe de origem ao material atual)", materialNoCode:"Material sem código", unknownType:"tipo desconhecido", generation:"geração ", parents:"Culturas progenitoras", selected:"Cultura selecionada", openSheet:"Ficha aberta", parentCulture:"Cultura progenitora", descendants:"Descendentes", noLineage:"Não há ascendentes ou descendentes registados nas fichas de cultura. A origem material inicial continua indicada pelo identificador do material.", partial:"Filiação parcial: foi atingido o limite de 1 000 culturas.", loadError:"Não foi possível carregar a filiação: ", selectCulture:"Selecione uma cultura antes de guardar.", dateRequired:"Indique a data da operação.", childLimit:"Máximo: 12 descendentes por operação.", invalidPropagation:"Esta operação não pode criar descendentes. Remova os códigos ou escolha uma operação de propagação.", saving:"A guardar…", syncWarning:" A filiação está guardada no Supabase; verifique a sincronização dos descendentes com o Notion.", syncWarningShort:" A filiação está guardada no Supabase; verifique a sincronização com o Notion.", saved:"Operação guardada", childCreated:" descendente(s) criado(s).", failed:"Falha: ", notSaved:"operação não guardada", save:"Guardar operação" },
+    ar: { loading:"جارٍ تحميل النسب…", missing:"المزرعة خارج نطاق البيانات المحمّلة.", open:"فتح سجل المزرعة ", noCode:"بلا رمز", typeMissing:"النوع غير محدد", materialOrigin:"أصل المادة (من السلالة المصدر إلى المادة الحالية)", materialNoCode:"مادة بلا رمز", unknownType:"نوع غير معروف", generation:"الجيل ", parents:"المزارع الأم", selected:"المزرعة المحددة", openSheet:"السجل المفتوح", parentCulture:"المزرعة الأم", descendants:"الفروع", noLineage:"لا توجد أسلاف أو فروع مسجلة في سجلات المزارع. يظل أصل المادة الأولي موضحًا بمعرّف المادة في السجل.", partial:"النسب جزئي: تم بلوغ حد 1000 مزرعة.", loadError:"تعذّر تحميل النسب: ", selectCulture:"حدد مزرعة قبل الحفظ.", dateRequired:"أدخل تاريخ العملية.", childLimit:"الحد الأقصى 12 فرعًا لكل عملية.", invalidPropagation:"لا يمكن لهذه العملية إنشاء فروع. احذف الرموز أو اختر عملية إكثار.", saving:"جارٍ الحفظ…", syncWarning:" تم حفظ النسب في Supabase؛ تحقق من مزامنة الفروع مع Notion.", syncWarningShort:" تم حفظ النسب في Supabase؛ تحقق من المزامنة مع Notion.", saved:"تم حفظ العملية", childCreated:" فرع/فروع تم إنشاؤها.", failed:"فشل: ", notSaved:"لم تُحفظ العملية", save:"حفظ العملية" }
+  };
+  const selected = (messages[lang] || messages.fr)[key];
+  return typeof selected === "function" ? selected(count) : (selected ?? messages.fr[key] ?? key);
+}
+
 async function loadBiologicalLineage(cultureId) {
   const target = document.getElementById('cultureLineage');
   if (!target || !organizationId) return;
-  target.textContent = 'Chargement de la filiation…';
+  target.textContent = biologicalWorkflowText("loading");
   try {
     const { data, error } = await supabaseClient.from('cultures')
       .select('id,code,culture_type,material_id,parent_culture_id,started_at,metadata')
@@ -4920,7 +4932,7 @@ async function loadBiologicalLineage(cultureId) {
     const rows = data || [];
     const byId = new Map(rows.map(row => [row.id, row]));
     const current = byId.get(cultureId);
-    if (!current) { target.textContent = 'Culture absente du périmètre chargé.'; return; }
+    if (!current) { target.textContent = biologicalWorkflowText("missing"); return; }
     const { data: materials, error: materialError } = await supabaseClient.from('materials')
       .select('id,material_code,material_type,parent_material_id,generation,state,strain_id')
       .eq('organization_id', organizationId).limit(2000);
@@ -4932,21 +4944,21 @@ async function loadBiologicalLineage(cultureId) {
     while (parentId && guard++ < 50) { const parent = byId.get(parentId); if (!parent) break; ancestors.unshift(parent); parentId = parent.parent_culture_id; }
     const descendants = []; const queue = [{ id: current.id, depth: 0 }]; const visited = new Set([current.id]);
     while (queue.length && descendants.length < 200) { const node = queue.shift(); for (const child of rows.filter(row => row.parent_culture_id === node.id)) { if (visited.has(child.id)) continue; visited.add(child.id); descendants.push({ ...child, depth: node.depth + 1 }); queue.push({ id: child.id, depth: node.depth + 1 }); } }
-    const renderNode = (row, label) => { const node = document.createElement('button'); node.type = 'button'; node.className = 'culture-lineage-node'; node.addEventListener('click', () => loadCultureDetail(row.id)); node.setAttribute('aria-label', 'Ouvrir la fiche de culture ' + (row.code || 'sans code')); const strong = document.createElement('strong'); strong.textContent = row.code || 'Culture sans code'; const small = document.createElement('small'); small.textContent = label + ' · ' + (row.culture_type || 'type non renseigné'); node.append(strong, small); return node; };
+    const renderNode = (row, label) => { const node = document.createElement('button'); node.type = 'button'; node.className = 'culture-lineage-node'; node.addEventListener('click', () => loadCultureDetail(row.id)); node.setAttribute('aria-label', biologicalWorkflowText("open") + (row.code || biologicalWorkflowText("noCode"))); const strong = document.createElement('strong'); strong.textContent = row.code || 'Culture sans code'; const small = document.createElement('small'); small.textContent = label + ' · ' + (row.culture_type || biologicalWorkflowText("typeMissing")); node.append(strong, small); return node; };
     target.replaceChildren();
     const makeGroup = (title, items) => { const section = document.createElement('section'); const heading = document.createElement('p'); heading.className = 'muted'; heading.textContent = title; section.appendChild(heading); const list = document.createElement('div'); list.className = 'culture-lineage-list'; items.forEach((item, index) => { if (index) { const arrow = document.createElement('span'); arrow.className = 'culture-lineage-arrow'; arrow.textContent = '→'; list.appendChild(arrow); } list.appendChild(renderNode(item.row, item.label)); }); section.appendChild(list); target.appendChild(section); };
     if (materialChain.length) {
-      const section = document.createElement('section'); const heading = document.createElement('p'); heading.className = 'muted'; heading.textContent = 'Origine matérielle (de la souche source au matériel actuel)'; section.appendChild(heading);
+      const section = document.createElement('section'); const heading = document.createElement('p'); heading.className = 'muted'; heading.textContent = biologicalWorkflowText("materialOrigin"); section.appendChild(heading);
       const list = document.createElement('div'); list.className = 'culture-lineage-list';
-      materialChain.forEach((material, index) => { if (index) { const arrow = document.createElement('span'); arrow.className = 'culture-lineage-arrow'; arrow.textContent = '→'; list.appendChild(arrow); } const node = document.createElement('div'); node.className = 'culture-lineage-node'; const strong = document.createElement('strong'); strong.textContent = material.material_code || 'Matériel sans code'; const small = document.createElement('small'); small.textContent = (material.material_type || 'type inconnu') + (material.generation == null ? '' : ' · génération ' + material.generation) + (material.state ? ' · ' + material.state : ''); node.append(strong,small); list.appendChild(node); });
+      materialChain.forEach((material, index) => { if (index) { const arrow = document.createElement('span'); arrow.className = 'culture-lineage-arrow'; arrow.textContent = '→'; list.appendChild(arrow); } const node = document.createElement('div'); node.className = 'culture-lineage-node'; const strong = document.createElement('strong'); strong.textContent = material.material_code || biologicalWorkflowText("materialNoCode"); const small = document.createElement('small'); small.textContent = (material.material_type || biologicalWorkflowText("unknownType")) + (material.generation == null ? '' : ' · ' + biologicalWorkflowText("generation") + material.generation) + (material.state ? ' · ' + material.state : ''); node.append(strong,small); list.appendChild(node); });
       section.appendChild(list); target.appendChild(section);
     }
-    if (ancestors.length) makeGroup('Cultures parentes', ancestors.map(row => ({ row, label: 'Culture parente' })));
-    makeGroup('Culture sélectionnée', [{ row: current, label: 'Fiche ouverte' }]);
-    if (descendants.length) makeGroup('Descendants (' + descendants.length + ')', descendants.map(row => ({ row, label: 'Génération ' + (row.depth || 1) })));
-    if (!ancestors.length && !descendants.length) { const p = document.createElement('p'); p.className = 'muted'; p.textContent = 'Aucun ascendant ou descendant enregistré dans les fiches de culture. L’origine matérielle initiale reste indiquée par l’identifiant matériel de la fiche.'; target.appendChild(p); }
-    if (rows.length >= 1000) { const note = document.createElement('p'); note.className = 'muted'; note.textContent = 'Filiation partielle : limite de 1 000 cultures atteinte.'; target.appendChild(note); }
-  } catch (error) { target.textContent = 'Impossible de charger la filiation : ' + (error.message || error); }
+    if (ancestors.length) makeGroup(biologicalWorkflowText("parents"), ancestors.map(row => ({ row, label: biologicalWorkflowText("parentCulture") })));
+    makeGroup(biologicalWorkflowText("selected"), [{ row: current, label: biologicalWorkflowText("openSheet") }]);
+    if (descendants.length) makeGroup(biologicalWorkflowText("descendants") + ' (' + descendants.length + ')', descendants.map(row => ({ row, label: biologicalWorkflowText("generation") + (row.depth || 1) })));
+    if (!ancestors.length && !descendants.length) { const p = document.createElement('p'); p.className = 'muted'; p.textContent = biologicalWorkflowText("noLineage"); target.appendChild(p); }
+    if (rows.length >= 1000) { const note = document.createElement('p'); note.className = 'muted'; note.textContent = biologicalWorkflowText("partial"); target.appendChild(note); }
+  } catch (error) { target.textContent = biologicalWorkflowText("loadError") + (error.message || error); }
 }
 
 async function saveBiologicalOperation(event) {
@@ -4954,17 +4966,17 @@ async function saveBiologicalOperation(event) {
   const button = document.getElementById('saveBioOperation');
   const message = document.getElementById('bioOperationMessage');
   const cultureId = document.getElementById('cultureDetailPanel')?.dataset.cultureId;
-  if (!cultureId || !organizationId) { message.textContent = 'Sélectionnez une culture avant d’enregistrer.'; return; }
+  if (!cultureId || !organizationId) { message.textContent = biologicalWorkflowText("selectCulture"); return; }
   const operationType = document.getElementById('bioOperationType').value;
   const dateValue = document.getElementById('bioOperationDate').value;
   const note = document.getElementById('bioOperationNote').value.trim();
   const conditions = document.getElementById('bioOperationConditions').value.trim();
   const outcome = document.getElementById('bioOperationOutcome').value;
   const childCodes = [...new Set(document.getElementById('bioChildCodes').value.split(',').map(value => value.trim()).filter(Boolean))];
-  if (!dateValue) { message.textContent = 'Indiquez la date de l’opération.'; return; }
-  if (childCodes.length > 12) { message.textContent = 'Maximum : 12 descendants par opération.'; return; }
-  if (childCodes.length && !['repiquage','passage','transfert','division_aliquotes','changement_milieu','conservation'].includes(operationType)) { message.textContent = 'Cette opération ne peut pas créer de descendants. Retirez les codes ou choisissez une opération de propagation.'; return; }
-  button.disabled = true; button.textContent = 'Enregistrement…'; message.textContent = '';
+  if (!dateValue) { message.textContent = biologicalWorkflowText("dateRequired"); return; }
+  if (childCodes.length > 12) { message.textContent = biologicalWorkflowText("childLimit"); return; }
+  if (childCodes.length && !['repiquage','passage','transfert','division_aliquotes','changement_milieu','conservation'].includes(operationType)) { message.textContent = biologicalWorkflowText("invalidPropagation"); return; }
+  button.disabled = true; button.textContent = biologicalWorkflowText("saving"); message.textContent = '';
   try {
     const { data, error } = await supabaseClient.rpc('record_biological_operation', {
       p_organization_id: organizationId, p_parent_culture_id: cultureId, p_event_type: operationType,
@@ -4977,16 +4989,16 @@ async function saveBiologicalOperation(event) {
     for (const child of (result?.children || [])) {
       try {
         const { data: syncData, error: syncError } = await supabaseClient.functions.invoke('sync-culture-to-notion', { body: { culture_id: child.id } });
-        if (syncError || (syncData && syncData.ok === false)) notionSyncWarning = ' La filiation est enregistrée dans Supabase ; vérifiez la synchronisation Notion des descendants.';
-      } catch (syncError) { notionSyncWarning = ' La filiation est enregistrée dans Supabase ; synchronisation Notion à vérifier.'; }
+        if (syncError || (syncData && syncData.ok === false)) notionSyncWarning = biologicalWorkflowText("syncWarning");
+      } catch (syncError) { notionSyncWarning = biologicalWorkflowText("syncWarningShort"); }
     }
     document.getElementById('bioOperationNote').value = ''; document.getElementById('bioOperationConditions').value = ''; document.getElementById('bioOperationOutcome').value = ''; document.getElementById('bioChildCodes').value = '';
-    message.textContent = 'Opération enregistrée' + (result?.children?.length ? ' · ' + result.children.length + ' descendant(s) créé(s).' : '.') + notionSyncWarning;
+    message.textContent = biologicalWorkflowText("saved") + (result?.children?.length ? ' · ' + result.children.length + biologicalWorkflowText("childCreated") : '.') + notionSyncWarning;
     await loadCultureOptions();
     await loadCultureDetail(cultureId);
     await loadBiologicalLineage(cultureId);
-  } catch (error) { message.textContent = 'Échec : ' + (error.message || 'opération non enregistrée'); }
-  finally { button.disabled = false; button.textContent = 'Enregistrer l’opération'; }
+  } catch (error) { message.textContent = biologicalWorkflowText("failed") + (error.message || biologicalWorkflowText("notSaved")); }
+  finally { button.disabled = false; button.textContent = biologicalWorkflowText("save"); }
 }
 
 let cultureDetailRequestId = 0;
