@@ -79,6 +79,7 @@ jobs:
       - uses: actions/checkout@v4
       - name: Check batch-tracker structure
         run: |
+          node scripts/check-batch-tracker-js.mjs
           [ -f batch-tracker/index.html ] && echo "✓ batch-tracker/index.html exists" || exit 1
           [ -f batch-tracker/README.md ] && echo "✓ batch-tracker/README.md exists" || exit 1
           [ -f batch-tracker/supabase/README.md ] && echo "✓ batch-tracker/supabase/README.md exists" || exit 1
