@@ -4718,11 +4718,11 @@ function comparisonTable(headers, rows, caption) {
 }
 
 function renderComparisonChart(group, batches, outlierIds) {
-  const points = group.points.filter(point => Number.isFinite(point.value) && point.date);
+  const points = group.points.filter(point => Number.isFinite(point.value) && point.measured_at);
   if (!points.length) return '<div class="comparison-empty">Aucune série temporelle datée pour ' + escapeHtml(group.label) + '.</div>';
   const width = 760, height = 260, left = 58, right = 20, top = 20, bottom = 48;
   const plotWidth = width - left - right, plotHeight = height - top - bottom;
-  const times = points.map(point => new Date(point.date).getTime());
+  const times = points.map(point => new Date(point.measured_at).getTime());
   const values = points.map(point => point.value);
   let minTime = Math.min.apply(null, times), maxTime = Math.max.apply(null, times);
   let minValue = Math.min.apply(null, values), maxValue = Math.max.apply(null, values);
@@ -4745,12 +4745,12 @@ function renderComparisonChart(group, batches, outlierIds) {
     const series = points.filter(point => point.batchId === batchId).sort((a, b) => new Date(a.date) - new Date(b.date));
     const color = palette[batchIndex % palette.length];
     if (series.length > 1) {
-      const path = series.map((point, index) => (index ? "L" : "M") + x(point.date).toFixed(2) + " " + y(point.value).toFixed(2)).join(" ");
+      const path = series.map((point, index) => (index ? "L" : "M") + x(point.measured_at).toFixed(2) + " " + y(point.value).toFixed(2)).join(" ");
       svg += '<path d="' + path + '" fill="none" stroke="' + color + '" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>';
     }
     series.forEach(point => {
       const radius = outlierIds.has(point.id) ? 5 : 3.2;
-      svg += '<circle cx="' + x(point.date).toFixed(2) + '" cy="' + y(point.value).toFixed(2) + '" r="' + radius + '" fill="' + color + '" stroke="' + (outlierIds.has(point.id) ? "#b91c1c" : "#fff") + '" stroke-width="' + (outlierIds.has(point.id) ? 2 : 1) + '"><title>' + escapeHtml((batchMap.get(batchId)?.batch_code || "Lot") + " · " + new Date(point.date).toLocaleString("fr-FR") + " · " + comparisonFormat(point.value) + " " + group.unit) + '</title></circle>';
+      svg += '<circle cx="' + x(point.measured_at).toFixed(2) + '" cy="' + y(point.value).toFixed(2) + '" r="' + radius + '" fill="' + color + '" stroke="' + (outlierIds.has(point.id) ? "#b91c1c" : "#fff") + '" stroke-width="' + (outlierIds.has(point.id) ? 2 : 1) + '"><title>' + escapeHtml((batchMap.get(batchId)?.batch_code || "Lot") + " · " + new Date(point.measured_at).toLocaleString("fr-FR") + " · " + comparisonFormat(point.value) + " " + group.unit) + '</title></circle>';
     });
   });
   svg += '<text x="' + left + '" y="' + (height - 17) + '" font-size="10" fill="currentColor">' + new Date(minTime).toLocaleDateString("fr-FR") + '</text>';
