@@ -4821,11 +4821,11 @@ async function loadLotComparison() {
 
     const batchEvents = await fetchComparisonRows(() => supabaseClient.from("events")
       .select("id,batch_id,culture_id,occurred_at,event_type,payload")
-      .eq("organization_id", organizationId).in("batch_id", selectedBatchIds).order("occurred_at", { ascending: true }));
+      .eq("organization_id", organizationId).in("batch_id", selectedBatchIds).order("occurred_at", { ascending: true }).order("id", { ascending: true }));
     const cultureEvents = unambiguousCultureIds.length
       ? await fetchComparisonRows(() => supabaseClient.from("events")
           .select("id,batch_id,culture_id,occurred_at,event_type,payload")
-          .eq("organization_id", organizationId).in("culture_id", unambiguousCultureIds).is("batch_id", null).order("occurred_at", { ascending: true }))
+          .eq("organization_id", organizationId).in("culture_id", unambiguousCultureIds).is("batch_id", null).order("occurred_at", { ascending: true }).order("id", { ascending: true }))
       : [];
     const eventToBatch = new Map();
     batchEvents.forEach(event => { if (selectedBatchIds.includes(event.batch_id)) eventToBatch.set(event.id, event.batch_id); });
@@ -4838,12 +4838,12 @@ async function loadLotComparison() {
       for (let offset = 0; offset < eventIds.length; offset += 100) {
         const eventChunk = eventIds.slice(offset, offset + 100);
         const rows = await fetchComparisonRows(() => supabaseClient.from(tableName).select(selectFields)
-          .eq("organization_id", organizationId).in("event_id", eventChunk).order(dateField, { ascending: true }));
+          .eq("organization_id", organizationId).in("event_id", eventChunk).order(dateField, { ascending: true }).order("id", { ascending: true }));
         results.push(rows);
       }
       if (unambiguousCultureIds.length) {
         const cultureRows = await fetchComparisonRows(() => supabaseClient.from(tableName).select(selectFields)
-          .eq("organization_id", organizationId).in("culture_id", unambiguousCultureIds).is("event_id", null).order(dateField, { ascending: true }));
+          .eq("organization_id", organizationId).in("culture_id", unambiguousCultureIds).is("event_id", null).order(dateField, { ascending: true }).order("id", { ascending: true }));
         results.push(cultureRows);
       }
       const unique = new Map();
