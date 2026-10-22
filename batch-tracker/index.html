@@ -6597,6 +6597,13 @@ async function loadBiologicalLineage(cultureId) {
     const byId = new Map(rows.map(row => [row.id, row]));
     const current = byId.get(cultureId);
     if (!current) { target.textContent = 'Culture absente du périmètre chargé.'; return; }
+    const { data: materials, error: materialError } = await supabaseClient.from('materials')
+      .select('id,material_code,material_type,parent_material_id,generation,state,strain_id')
+      .eq('organization_id', organizationId).limit(2000);
+    if (materialError) throw materialError;
+    const materialById = new Map((materials || []).map(item => [item.id, item]));
+    const materialChain = []; let materialId = current.material_id; let materialGuard = 0;
+    while (materialId && materialGuard++ < 50) { const material = materialById.get(materialId); if (!material) break; materialChain.unshift(material); materialId = material.parent_material_id; }
     const ancestors = []; let parentId = current.parent_culture_id; let guard = 0;
     while (parentId && guard++ < 50) { const parent = byId.get(parentId); if (!parent) break; ancestors.unshift(parent); parentId = parent.parent_culture_id; }
     const descendants = []; const queue = [{ id: current.id, depth: 0 }]; const visited = new Set([current.id]);
@@ -6604,7 +6611,13 @@ async function loadBiologicalLineage(cultureId) {
     const renderNode = (row, label) => { const node = document.createElement('div'); node.className = 'culture-lineage-node'; const strong = document.createElement('strong'); strong.textContent = row.code || 'Culture sans code'; const small = document.createElement('small'); small.textContent = label + ' · ' + (row.culture_type || 'type non renseigné'); node.append(strong, small); return node; };
     target.replaceChildren();
     const makeGroup = (title, items) => { const section = document.createElement('section'); const heading = document.createElement('p'); heading.className = 'muted'; heading.textContent = title; section.appendChild(heading); const list = document.createElement('div'); list.className = 'culture-lineage-list'; items.forEach((item, index) => { if (index) { const arrow = document.createElement('span'); arrow.className = 'culture-lineage-arrow'; arrow.textContent = '→'; list.appendChild(arrow); } list.appendChild(renderNode(item.row, item.label)); }); section.appendChild(list); target.appendChild(section); };
-    if (ancestors.length) makeGroup('Origine et ascendants', ancestors.map(row => ({ row, label: 'Ascendant' })));
+    if (materialChain.length) {
+      const section = document.createElement('section'); const heading = document.createElement('p'); heading.className = 'muted'; heading.textContent = 'Origine matérielle (de la souche source au matériel actuel)'; section.appendChild(heading);
+      const list = document.createElement('div'); list.className = 'culture-lineage-list';
+      materialChain.forEach((material, index) => { if (index) { const arrow = document.createElement('span'); arrow.className = 'culture-lineage-arrow'; arrow.textContent = '→'; list.appendChild(arrow); } const node = document.createElement('div'); node.className = 'culture-lineage-node'; const strong = document.createElement('strong'); strong.textContent = material.material_code || 'Matériel sans code'; const small = document.createElement('small'); small.textContent = (material.material_type || 'type inconnu') + (material.generation == null ? '' : ' · génération ' + material.generation) + (material.state ? ' · ' + material.state : ''); node.append(strong,small); list.appendChild(node); });
+      section.appendChild(list); target.appendChild(section);
+    }
+    if (ancestors.length) makeGroup('Cultures parentes', ancestors.map(row => ({ row, label: 'Culture parente' })));
     makeGroup('Culture sélectionnée', [{ row: current, label: 'Fiche ouverte' }]);
     if (descendants.length) makeGroup('Descendants (' + descendants.length + ')', descendants.map(row => ({ row, label: 'Génération ' + (row.depth || 1) })));
     if (!ancestors.length && !descendants.length) { const p = document.createElement('p'); p.className = 'muted'; p.textContent = 'Aucun ascendant ou descendant enregistré dans les fiches de culture. L’origine matérielle initiale reste indiquée par l’identifiant matériel de la fiche.'; target.appendChild(p); }
