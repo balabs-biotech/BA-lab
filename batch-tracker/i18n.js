@@ -1243,6 +1243,108 @@
       "Enter the planned quantity or clear the selected unit.",
       "Introduza a quantidade prevista ou limpe a unidade selecionada.",
       "أدخل الكمية المخططة أو ألغِ تحديد الوحدة."
+    ],
+    [
+      "Déplacer le lot",
+      "Move batch",
+      "Mover lote",
+      "نقل الدفعة"
+    ],
+    [
+      "Le déplacement et son événement de traçabilité sont enregistrés ensemble.",
+      "The move and its traceability event are saved together.",
+      "A movimentação e o respetivo evento de rastreabilidade são guardados em conjunto.",
+      "يتم حفظ النقل وحدث التتبع معًا."
+    ],
+    [
+      "Nouvel emplacement",
+      "New location",
+      "Novo local",
+      "الموقع الجديد"
+    ],
+    [
+      "Nouvel environnement",
+      "New environment",
+      "Novo ambiente",
+      "البيئة الجديدة"
+    ],
+    [
+      "Note du déplacement (facultatif)",
+      "Move note (optional)",
+      "Nota da movimentação (opcional)",
+      "ملاحظة النقل (اختياري)"
+    ],
+    [
+      "Ex. transfert vers l’incubateur…",
+      "E.g. transfer to the incubator…",
+      "Ex.: transferência para a incubadora…",
+      "مثال: النقل إلى الحاضنة…"
+    ],
+    [
+      "Enregistrer le déplacement",
+      "Save move",
+      "Guardar movimentação",
+      "حفظ النقل"
+    ],
+    [
+      "Sélectionnez un lot pour préparer un déplacement.",
+      "Select a batch to prepare a move.",
+      "Selecione um lote para preparar uma movimentação.",
+      "اختر دفعة لإعداد النقل."
+    ],
+    [
+      "Choisissez l’emplacement et l’environnement de destination. Un déplacement sans changement sera refusé.",
+      "Choose the destination location and environment. A no-op move will be rejected.",
+      "Escolha o local e o ambiente de destino. Uma movimentação sem alterações será recusada.",
+      "اختر موقع وبيئة الوجهة. سيتم رفض النقل دون تغيير."
+    ],
+    [
+      "Un lot clôturé ne peut pas être déplacé depuis ce formulaire.",
+      "A closed batch cannot be moved from this form.",
+      "Um lote fechado não pode ser movido através deste formulário.",
+      "لا يمكن نقل دفعة مغلقة من هذا النموذج."
+    ],
+    [
+      "Le nouvel emplacement et l’environnement sont identiques aux valeurs actuelles.",
+      "The new location and environment match the current values.",
+      "O novo local e ambiente são iguais aos valores atuais.",
+      "الموقع والبيئة الجديدان مطابقان للقيم الحالية."
+    ],
+    [
+      "La RPC n’a pas confirmé la création de l’événement de déplacement.",
+      "The RPC did not confirm creation of the movement event.",
+      "A RPC não confirmou a criação do evento de movimentação.",
+      "لم تؤكد RPC إنشاء حدث النقل."
+    ],
+    [
+      "Déplacement enregistré dans la chronologie du lot.",
+      "Move recorded in the batch timeline.",
+      "Movimentação registada na cronologia do lote.",
+      "تم تسجيل النقل في الخط الزمني للدفعة."
+    ],
+    [
+      "Déplacement impossible : ",
+      "Unable to move batch: ",
+      "Não foi possível mover o lote: ",
+      "تعذر نقل الدفعة: "
+    ],
+    [
+      "Déplacement du lot",
+      "Batch moved",
+      "Lote movimentado",
+      "تم نقل الدفعة"
+    ],
+    [
+      "Emplacement mis à jour",
+      "Location updated",
+      "Local atualizado",
+      "تم تحديث الموقع"
+    ],
+    [
+      "Environnement mis à jour",
+      "Environment updated",
+      "Ambiente atualizado",
+      "تم تحديث البيئة"
     ]
   ];
   for (const [fr, en, pt, ar] of supplementalCoverage) {
