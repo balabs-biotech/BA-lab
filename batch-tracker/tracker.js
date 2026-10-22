@@ -4820,11 +4820,11 @@ async function loadLotComparison() {
     const safeCultureToBatch = new Map(Array.from(cultureToBatch.entries()).filter(entry => cultureBatchCounts.get(entry[0]) === 1));
 
     const batchEvents = await fetchComparisonRows(() => supabaseClient.from("events")
-      .select("id,batch_id,culture_id,occurred_at,event_type,payload")
+      .select("id,batch_id,culture_id,sample_id,occurred_at,event_type,payload")
       .eq("organization_id", organizationId).in("batch_id", selectedBatchIds).order("occurred_at", { ascending: true }).order("id", { ascending: true }));
     const cultureEvents = unambiguousCultureIds.length
       ? await fetchComparisonRows(() => supabaseClient.from("events")
-          .select("id,batch_id,culture_id,occurred_at,event_type,payload")
+          .select("id,batch_id,culture_id,sample_id,occurred_at,event_type,payload")
           .eq("organization_id", organizationId).in("culture_id", unambiguousCultureIds).is("batch_id", null).order("occurred_at", { ascending: true }).order("id", { ascending: true }))
       : [];
     const sampleRows = unambiguousCultureIds.length
@@ -4841,6 +4841,20 @@ async function loadLotComparison() {
     const eventToBatch = new Map();
     batchEvents.forEach(event => { if (selectedBatchIds.includes(event.batch_id)) eventToBatch.set(event.id, event.batch_id); });
     cultureEvents.forEach(event => { const batchId = safeCultureToBatch.get(event.culture_id); if (batchId && !event.batch_id) eventToBatch.set(event.id, batchId); });
+    const sampleIds = sampleRows.map(sample => sample.id);
+    for (let offset = 0; offset < sampleIds.length; offset += 100) {
+      const sampleChunk = sampleIds.slice(offset, offset + 100);
+      const sampleEvents = await fetchComparisonRows(() => supabaseClient.from("events")
+        .select("id,batch_id,culture_id,sample_id,occurred_at,event_type,payload")
+        .eq("organization_id", organizationId).in("sample_id", sampleChunk)
+        .is("batch_id", null).order("occurred_at", { ascending: true }).order("id", { ascending: true }));
+      sampleEvents.forEach(event => {
+        const batchId = event.culture_id
+          ? safeCultureToBatch.get(event.culture_id)
+          : sampleToBatch.get(event.sample_id);
+        if (batchId && !event.batch_id) eventToBatch.set(event.id, batchId);
+      });
+    }
     const eventIds = Array.from(eventToBatch.keys());
 
     async function fetchLinkedRows(tableName, selectFields, dateField) {
