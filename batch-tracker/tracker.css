@@ -1756,3 +1756,27 @@ body[data-domain="laboratory"] .overview-shortcut strong {
 body[data-domain="laboratory"] .overview-shortcut small {
   color: #476078 !important;
 }
+
+
+/* Laboratory overview: enforce high-contrast blue controls and shortcut badges. */
+body[data-domain="laboratory"] #overviewCard #overviewOpenData,
+body[data-domain="laboratory"] #overviewCard #overviewOpenData.secondary-button {
+  background-color: #174875 !important;
+  background-image: none !important;
+  border: 1px solid #174875 !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+}
+body[data-domain="laboratory"] #overviewCard #overviewOpenData *,
+body[data-domain="laboratory"] #overviewCard #overviewOpenData.secondary-button * {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+}
+body[data-domain="laboratory"] #overviewCard .overview-shortcuts .overview-shortcut .shortcut-index {
+  background-color: #174875 !important;
+  background-image: none !important;
+  border: 1px solid #174875 !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  opacity: 1 !important;
+}
