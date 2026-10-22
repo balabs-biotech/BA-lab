@@ -3718,6 +3718,14 @@ async function createBatch() {
     return;
   }
 
+  if (quantityPlanned === null && quantityUnit) {
+    showMessage(
+      "Saisissez la quantité prévue ou effacez l’unité sélectionnée.",
+      "error"
+    );
+    return;
+  }
+
   const protocolVersionId =
     await getCultureProtocolVersionId(
       selectedCulture.id
