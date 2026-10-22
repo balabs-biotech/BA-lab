@@ -1109,3 +1109,36 @@ body[data-domain="laboratory"] .section-nav a[aria-current="page"]{background:#e
 @media(max-width:600px){.domain-switcher{padding:12px;gap:12px}.domain-options{grid-template-columns:minmax(0,1fr)}.domain-option{min-height:54px}.domain-option small{font-size:11px}.domain-option{padding:9px}}
 @media(prefers-reduced-motion:reduce){.domain-option{transition:none}}
 
+
+/* Mycology palette repair: override every legacy fluorescent accent with terracotta. */
+body[data-domain="mycology"] {
+  --bg:#f7f1e9; --surface:#fffaf4; --surface-2:#eee1d4;
+  --border:#d7bba6; --border-strong:#a94f1d; --text:#35251d; --muted:#755b4c;
+  --brand:#a94f1d; --brand-hover:#853d16; --focus:#a94f1d;
+  --ok:#496b45; --warn:#8b4b1d; color-scheme:light; background:var(--bg);
+}
+body[data-domain="mycology"] .app-hero {
+  background:linear-gradient(135deg,#56331f 0%,#7e4227 100%);
+  border-color:#56331f; box-shadow:6px 6px 0 #d7bba6;
+}
+body[data-domain="mycology"] .app-hero h1,
+body[data-domain="mycology"] .app-hero h1 span,
+body[data-domain="mycology"] .eyebrow,
+body[data-domain="mycology"] .hero-description,
+body[data-domain="mycology"] .hero-note small {color:#fff7ed}
+body[data-domain="mycology"] .hero-tags span,
+body[data-domain="mycology"] .hero-note {
+  background:#f0dfd0; color:#56331f; border-color:#d7bba6;
+}
+body[data-domain="mycology"] .hero-art,
+body[data-domain="mycology"] .domain-option-icon {color:#a94f1d}
+body[data-domain="mycology"] .culture-catalog-meta span:first-child,
+body[data-domain="mycology"] .culture-catalog-action[data-culture-action="observe"],
+body[data-domain="mycology"] .section-nav a[aria-current="page"],
+body[data-domain="mycology"] .domain-option[aria-pressed="true"] {
+  background:#a94f1d; color:#fffaf4; border-color:#a94f1d;
+}
+body[data-domain="mycology"] .domain-option[aria-pressed="true"] {box-shadow:4px 4px 0 #d7bba6}
+body[data-domain="mycology"] .domain-option-icon {background:#f0dfd0}
+body[data-domain="mycology"] :is(input,select,textarea,button,a):focus-visible {outline-color:#a94f1d}
+body[data-domain="mycology"] .guided-entry-step {box-shadow:4px 4px 0 #d7bba6}
