@@ -87,3 +87,12 @@ The reference repository declares AGPL-3.0-or-later. This branch documents and a
 - Une RPC `move_batch_to_location` est maintenant ajoutée dans une migration versionnée : elle verrouille le lot, vérifie l'appartenance à l'organisation, valide la cohérence emplacement/environnement, met à jour les deux champs et inscrit `batch_moved` dans la même transaction. L'événement conserve l'acteur, les anciennes/nouvelles valeurs et une note facultative.
 - La RPC refuse les lots sans ancrage `culture_id` ou `material_id`, car le schéma `events` exige exactement un ancrage biologique. Elle rejette aussi les déplacements sans changement et les environnements rattachés à un autre emplacement.
 - Le test SQL existant couvre le déplacement, l'événement d'audit et le refus d'un environnement incompatible. La migration reste dans la branche/PR : elle n'a pas été appliquée à la base de production. L'intégration du déplacement depuis l'interface et les tests d'isolation inter-organisations restent à faire.
+
+
+## Déplacement des lots depuis l’interface
+
+- Le panneau de chronologie propose désormais un formulaire de déplacement pour un lot ouvert : emplacement, environnement compatible et note facultative.
+- Le formulaire appelle la RPC transactionnelle `move_batch_to_location`, puis recharge la fiche et la chronologie afin d'afficher l'événement `batch_moved`.
+- Les lots clôturés sont désactivés dans l'interface. Le serveur reste l'autorité finale : il vérifie l'organisation, l'environnement et l'absence de déplacement sans changement.
+- Les libellés du formulaire et l'événement de déplacement sont ajoutés à la couverture FR/EN/PT/AR. Les tests statiques vérifient la présence des contrôles et des paramètres RPC.
+- À vérifier dans l'environnement CI : le contrat exact de la migration avec le schéma réel et les tests d'isolation inter-organisations. Aucun déploiement ni fusion n'a été effectué.
