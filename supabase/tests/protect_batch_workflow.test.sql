@@ -43,6 +43,12 @@ create table public.batch_qc_templates(
   id uuid primary key default gen_random_uuid(), organization_id uuid not null,
   batch_type text not null, check_code text not null, label text not null,
   default_unit_code text, required boolean not null default true, sequence_no integer not null default 1);
+create table public.materials(
+  id uuid primary key, organization_id uuid not null, material_code text not null);
+create table public.cultures(
+  id uuid primary key, organization_id uuid not null, material_id uuid not null);
+create table public.protocol_versions(
+  id uuid primary key, organization_id uuid not null);
 create table public.locations(
   id uuid primary key, organization_id uuid not null, name text not null);
 create table public.environments(
@@ -58,6 +64,10 @@ grant select, insert, update, delete on public.organization_members, public.batc
   to authenticated, anon, service_role;
 insert into public.organization_members values
   ('00000000-0000-0000-0000-0000000000a1','00000000-0000-0000-0000-0000000000b1');
+insert into public.materials(id,organization_id,material_code) values
+  ('00000000-0000-0000-0000-0000000000e1','00000000-0000-0000-0000-0000000000a1','MAT-A1'),
+  ('00000000-0000-0000-0000-0000000000e2','00000000-0000-0000-0000-0000000000a2','MAT-B1'),
+  ('00000000-0000-0000-0000-0000000000e3','00000000-0000-0000-0000-0000000000a1','MAT-A2');
 insert into public.batch_qc_templates(organization_id,batch_type,check_code,label,default_unit_code)
 values ('00000000-0000-0000-0000-0000000000a1','test','appearance','Appearance',null);
 
@@ -72,7 +82,7 @@ set role authenticated;
 -- RPC creates the batch/stages/QC rows and remains usable by an authorized member.
 do $$ declare b public.batches; n integer; begin
   select * into b from public.create_batch_with_stages(
-    '00000000-0000-0000-0000-0000000000a1','TEST-1','Workflow test','test');
+    '00000000-0000-0000-0000-0000000000a1','TEST-1','Workflow test','test', p_material_id := '00000000-0000-0000-0000-0000000000e1');
   if b.status <> 'planned' then raise exception 'FAIL: new batch status is not planned'; end if;
   select count(*) into n from public.batch_stages where batch_id=b.id;
   if n <> 10 then raise exception 'FAIL: expected 10 stages, got %', n; end if;
@@ -221,6 +231,7 @@ do $$ declare v_batch public.batches; v_codes text[]; begin
   select * into v_batch from public.create_batch_with_stages(
     '00000000-0000-0000-0000-0000000000a1',
     'TRICHO-1','Trichoderma workflow','TRICHODERMA',
+    p_material_id := '00000000-0000-0000-0000-0000000000e1',
     p_stages := array['preparation','sterilization','inoculation','incubation','cultivation','formulation','packaging','qc','release']
   );
   select array_agg(stage_code order by sequence_no) into v_codes
