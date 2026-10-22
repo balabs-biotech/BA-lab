@@ -41,6 +41,15 @@
     return valid.filter(function (point) { return point.value < low || point.value > high; }).map(function (point) { return point.id; });
   }
 
+  function detectOutliersByBatch(points, batchIds) {
+    const ids = new Set();
+    batchIds.forEach(function (batchId) {
+      detectOutlierIds(points.filter(function (point) { return point.batchId === batchId; }))
+        .forEach(function (id) { ids.add(id); });
+    });
+    return Array.from(ids);
+  }
+
   function pearson(pairs) {
     if (pairs.length < 4) return null;
     const meanX = pairs.reduce(function (sum, pair) { return sum + pair.x; }, 0) / pairs.length;
@@ -112,6 +121,7 @@
     median: median,
     summarize: summarize,
     detectOutlierIds: detectOutlierIds,
+    detectOutliersByBatch: detectOutliersByBatch,
     pearson: pearson,
     convertUnit: convertUnit,
     resolveBatchId: resolveBatchId,
