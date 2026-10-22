@@ -6848,12 +6848,19 @@ function setupQuickCapture() {
   document.querySelectorAll("[data-quick-measure]").forEach(button => {
     button.addEventListener("click", () => {
       const preset = button.dataset.quickMeasure;
-      const terms = preset === "ph"
-        ? ["ph", "acidité", "acidity"]
-        : preset === "ec"
-          ? ["conductivité", "conductivity", "ec", "µs/cm", "ms/cm"]
-          : ["température", "temperature", "temp"];
-      const selected = pickOption(measurementVariableSelect, terms);
+      const options = [...measurementVariableSelect.options].filter(option => option.value);
+      const selectedOption = options.find(option => {
+        const label = option.textContent.toLocaleLowerCase();
+        const code = option.value.toLocaleLowerCase();
+        if (preset === "ph") return /\\bph\\b/.test(label) || /\\bph\\b/.test(code) || /acidité|acidity/.test(label);
+        if (preset === "ec") return /\\bec\\b/.test(label) || /\\bec\\b/.test(code) || /conductivité|conductivity|µs\\/cm|ms\\/cm/.test(label);
+        return /température|temperature|\\btemp\\b/.test(label) || /temperature|temp/.test(code);
+      });
+      const selected = Boolean(selectedOption);
+      if (selectedOption) {
+        measurementVariableSelect.value = selectedOption.value;
+        measurementVariableSelect.dispatchEvent(new Event("change", { bubbles: true }));
+      }
       if (!measurementAtInput.value) measurementAtInput.value = nowLocal();
       activateWorkspaceModule("measurementCard");
       document.getElementById("measurementCard")?.scrollIntoView({ block: "start", behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
