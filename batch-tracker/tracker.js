@@ -2154,12 +2154,105 @@ async function loadLatestBatches() {
   latestBatches =
     data || [];
 
-
+  renderBatchComparisonOptions();
   renderBatchList();
   renderMeasurementTargets();
   renderStatisticsFilters();
 
 }
+
+
+/* ============================================================
+   COMPARAISON DES LOTS — descriptif, sans inférence statistique
+   ============================================================ */
+
+function renderBatchComparisonOptions() {
+  const select = document.getElementById("batchCompareSelect");
+  if (!select) return;
+  const previous = new Set([...select.selectedOptions].map(option => option.value));
+  select.replaceChildren();
+  latestBatches.forEach(batch => {
+    const option = document.createElement("option");
+    option.value = batch.id;
+    option.textContent = `${batch.batch_code} — ${batch.name || "Sans nom"}`;
+    option.selected = previous.has(batch.id);
+    select.appendChild(option);
+  });
+}
+
+async function compareSelectedBatches() {
+  const select = document.getElementById("batchCompareSelect");
+  const status = document.getElementById("batchCompareStatus");
+  const results = document.getElementById("batchCompareResults");
+  const button = document.getElementById("compareBatchesButton");
+  if (!select || !status || !results || !button) return;
+  const ids = [...select.selectedOptions].map(option => option.value);
+  if (ids.length < 2 || ids.length > 4) {
+    status.textContent = "Sélectionnez entre 2 et 4 lots.";
+    results.replaceChildren();
+    return;
+  }
+  const batches = latestBatches.filter(batch => ids.includes(batch.id));
+  if (batches.length !== ids.length) {
+    status.textContent = "Un ou plusieurs lots ne sont plus dans la liste chargée. Actualisez la page.";
+    return;
+  }
+  button.disabled = true;
+  status.textContent = "Chargement des étapes et des mesures…";
+  results.replaceChildren();
+  try {
+    const cultureIds = [...new Set(batches.map(batch => batch.culture_id).filter(Boolean))];
+    const [stageResult, measurementResult] = await Promise.all([
+      supabaseClient.from("batch_stages")
+        .select("batch_id,stage_code,status,sequence_no,started_at,completed_at")
+        .eq("organization_id", organizationId).in("batch_id", ids),
+      cultureIds.length
+        ? supabaseClient.from("measurements")
+            .select("culture_id,variable_code,measured_at,quality_state")
+            .eq("organization_id", organizationId).in("culture_id", cultureIds)
+            .order("measured_at", { ascending: false }).limit(1000)
+        : Promise.resolve({data:[],error:null})
+    ]);
+    if (stageResult.error) throw new Error("Chargement des étapes impossible : " + stageResult.error.message);
+    if (measurementResult.error) throw new Error("Chargement des mesures impossible : " + measurementResult.error.message);
+    const stages = stageResult.data || [];
+    const measurements = measurementResult.data || [];
+    const table = document.createElement("table");
+    table.className = "statistics-table";
+    table.innerHTML = "<caption>Comparaison descriptive des lots sélectionnés</caption><thead><tr><th>Lot</th><th>Type</th><th>État / étape</th><th>Quantité prévue</th><th>Quantité réelle</th><th>Étapes terminées</th><th>Mesures liées à la culture</th><th>Dernière mesure</th></tr></thead>";
+    const tbody = document.createElement("tbody");
+    batches.forEach(batch => {
+      const batchStages = stages.filter(stage => stage.batch_id === batch.id);
+      const completed = batchStages.filter(stage => stage.status === "completed").length;
+      const linked = batch.culture_id ? measurements.filter(row => row.culture_id === batch.culture_id) : [];
+      const lastDate = linked.reduce((latest, row) => {
+        const date = row.measured_at ? new Date(row.measured_at) : null;
+        return date && (!latest || date > latest) ? date : latest;
+      }, null);
+      const values = [
+        `${batch.batch_code || "—"} — ${batch.name || "Sans nom"}`,
+        batch.batch_type || "—",
+        `${batch.status || "—"} / ${batch.current_stage || "—"}`,
+        batch.quantity_planned == null ? "—" : `${batch.quantity_planned} ${batch.quantity_unit_code || ""}`.trim(),
+        batch.quantity_actual == null ? "—" : `${batch.quantity_actual} ${batch.quantity_unit_code || ""}`.trim(),
+        `${completed} / ${batchStages.length}`,
+        batch.culture_id ? String(linked.length) : "Aucune culture directement liée",
+        lastDate ? lastDate.toLocaleString() : "—"
+      ];
+      const tr = document.createElement("tr");
+      values.forEach(value => { const td=document.createElement("td"); td.textContent=value; tr.appendChild(td); });
+      tbody.appendChild(tr);
+    });
+    table.appendChild(tbody);
+    results.appendChild(table);
+    status.textContent = "Comparaison chargée. Seules les mesures directement liées à la culture du lot sont comptées ; les données manquantes ne sont pas interprétées comme zéro.";
+  } catch (error) {
+    status.textContent = error?.message || "Impossible de comparer les lots.";
+  } finally {
+    button.disabled = false;
+  }
+}
+document.getElementById("compareBatchesButton")?.addEventListener("click", compareSelectedBatches);
 
 
 /* ============================================================
