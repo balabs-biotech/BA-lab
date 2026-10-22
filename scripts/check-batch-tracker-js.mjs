@@ -2,8 +2,8 @@ import fs from "node:fs";
 import vm from "node:vm";
 
 const html = fs.readFileSync("batch-tracker/index.html", "utf8");
-const scripts = [...html.matchAll(/<script\\b([^>]*)>([\\s\\S]*?)<\\/script>/gi)]
-  .filter((match) => !/\\bsrc\\s*=/.test(match[1]) && match[2].trim());
+const scripts = [...html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/gi)]
+  .filter((match) => !/\bsrc\s*=/.test(match[1]) && match[2].trim());
 
 if (scripts.length === 0) {
   throw new Error("No inline JavaScript found in batch-tracker/index.html");
