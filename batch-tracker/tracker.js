@@ -4660,6 +4660,16 @@ async function loadStatistics() {
 /* ============================================================
    COMPARAISON EXPLORATOIRE DES LOTS — lecture seule
    ============================================================ */
+function comparisonText(fr, en, pt, ar) {
+  const language = document.documentElement.lang || "fr";
+  return ({ fr: fr, en: en, pt: pt, ar: ar })[language] || fr;
+}
+
+function comparisonLocale() {
+  const language = document.documentElement.lang || "fr";
+  return language === "ar" ? "ar-DZ" : language === "pt" ? "pt-PT" : language === "en" ? "en-GB" : "fr-FR";
+}
+
 let lotComparisonRequestId = 0;
 
 function renderComparisonBatchOptions() {
@@ -4667,7 +4677,7 @@ function renderComparisonBatchOptions() {
   if (!picker) return;
   const previouslySelected = new Set(Array.from(picker.querySelectorAll('input[name="compareBatch"]:checked')).map(input => input.value));
   if (!latestBatches.length) {
-    picker.innerHTML = '<p class="comparison-empty">Aucun lot disponible dans le chargement courant. Créez un lot ou vérifiez les droits d’accès à votre organisation.</p>';
+    picker.innerHTML = '<p class="comparison-empty">' + escapeHtml(comparisonText("Aucun lot disponible dans le chargement courant. Créez un lot ou vérifiez les droits d’accès à votre organisation.", "No batches are available in the current load. Create a batch or check your organization access.", "Não há lotes disponíveis no carregamento atual. Crie um lote ou verifique o acesso à organização.", "لا توجد دفعات متاحة في التحميل الحالي. أنشئ دفعة أو تحقق من صلاحيات الوصول إلى مؤسستك.")) + '</p>';
     return;
   }
   picker.innerHTML = latestBatches.map(batch => {
@@ -4706,7 +4716,7 @@ function comparisonNumber(value) {
 
 function comparisonFormat(value, digits) {
   if (value === null || value === undefined || !Number.isFinite(value)) return "—";
-  return new Intl.NumberFormat("fr-FR", { maximumFractionDigits: digits === undefined ? 3 : digits }).format(value);
+  return new Intl.NumberFormat(comparisonLocale(), { maximumFractionDigits: digits === undefined ? 3 : digits }).format(value);
 }
 
 function comparisonTable(headers, rows, caption) {
@@ -4769,29 +4779,29 @@ async function loadLotComparison() {
   const tables = document.getElementById("compareLotsTables");
   const button = document.getElementById("compareLotsButton");
   if (!organizationId) {
-    status.textContent = "Connectez-vous pour comparer les lots de votre organisation.";
+    status.textContent = comparisonText("Connectez-vous pour comparer les lots de votre organisation.", "Sign in to compare batches in your organization.", "Inicie sessão para comparar os lotes da sua organização.", "سجّل الدخول لمقارنة دفعات مؤسستك.");
     return;
   }
   const selectedIds = Array.from(document.querySelectorAll('input[name="compareBatch"]:checked')).map(input => input.value);
   if (selectedIds.length < 2) {
-    status.textContent = "Sélectionnez au moins deux lots.";
+    status.textContent = comparisonText("Sélectionnez au moins deux lots.", "Select at least two batches.", "Selecione pelo menos dois lotes.", "حدد دفعتين على الأقل.");
     return;
   }
   const selectedBatches = latestBatches.filter(batch => selectedIds.includes(batch.id));
   if (selectedBatches.length < 2) {
-    status.textContent = "La sélection a changé. Actualisez la liste des lots et réessayez.";
+    status.textContent = comparisonText("La sélection a changé. Actualisez la liste des lots et réessayez.", "The selection has changed. Refresh the batch list and try again.", "A seleção mudou. Atualize a lista de lotes e tente novamente.", "تغير التحديد. حدّث قائمة الدفعات وحاول مرة أخرى.");
     return;
   }
   const fromDate = document.getElementById("compareFromDate").value;
   const toDate = document.getElementById("compareToDate").value;
   if (fromDate && toDate && fromDate > toDate) {
-    status.textContent = "La date de début doit précéder ou correspondre à la date de fin.";
+    status.textContent = comparisonText("La date de début doit précéder ou correspondre à la date de fin.", "The start date must be on or before the end date.", "A data inicial deve ser anterior ou igual à data final.", "يجب أن يكون تاريخ البداية قبل تاريخ النهاية أو مساوياً له.");
     return;
   }
 
   button.disabled = true;
-  button.textContent = "Comparaison en cours…";
-  status.textContent = "Lecture des données autorisées dans Supabase…";
+  button.textContent = comparisonText("Comparaison en cours…", "Comparison in progress…", "Comparação em curso…", "المقارنة قيد التنفيذ…");
+  status.textContent = comparisonText("Lecture des données autorisées dans Supabase…", "Reading data authorized by Supabase…", "A ler os dados autorizados no Supabase…", "جارٍ قراءة البيانات المصرح بها في Supabase…");
   summary.innerHTML = "";
   findings.innerHTML = "";
   charts.innerHTML = "";
@@ -4886,22 +4896,22 @@ async function loadLotComparison() {
         : "aucune date disponible";
     const outlierCount = Array.from(outlierByGroup.values()).reduce((sum, ids) => sum + ids.size, 0);
     summary.innerHTML = [
-      ["Lots sélectionnés", String(selectedBatches.length)],
-      ["Mesures utilisables", String(assignedMeasurements.length)],
-      ["Observations qualitatives", String(assignedObservations.length)]
+      [comparisonText("Lots sélectionnés", "Selected batches", "Lotes selecionados", "الدفعات المحددة"), String(selectedBatches.length)],
+      [comparisonText("Mesures utilisables", "Usable measurements", "Medições utilizáveis", "القياسات القابلة للاستخدام"), String(assignedMeasurements.length)],
+      [comparisonText("Observations qualitatives", "Qualitative observations", "Observações qualitativas", "الملاحظات النوعية"), String(assignedObservations.length)]
     ].map(item => '<div class="statistics-summary-item"><span>' + escapeHtml(item[0]) + '</span><strong>' + escapeHtml(item[1]) + '</strong></div>').join("");
 
     const descriptive = [];
     if (!assignedMeasurements.length && !assignedObservations.length) {
-      descriptive.push("Aucune mesure ni observation exploitable n’a été trouvée pour ces lots et cette période. Cela ne permet pas de conclure sur leurs performances.");
+      descriptive.push(comparisonText("Aucune mesure ni observation exploitable n’a été trouvée pour ces lots et cette période. Cela ne permet pas de conclure sur leurs performances.", "No usable measurements or observations were found for these batches and this period. No conclusion about their performance can be drawn.", "Não foram encontradas medições ou observações utilizáveis para estes lotes e período. Não é possível tirar conclusões sobre o seu desempenho.", "لم يُعثر على قياسات أو ملاحظات قابلة للاستخدام لهذه الدفعات والفترة. لا يمكن استخلاص استنتاج بشأن أدائها."));
     } else {
-      descriptive.push(assignedMeasurements.length + " mesure(s) numérique(s) et " + assignedObservations.length + " observation(s) qualitative(s) sont exploitables après exclusion des enregistrements marqués exclus.");
+      descriptive.push(comparisonText(assignedMeasurements.length + " mesure(s) numérique(s) et " + assignedObservations.length + " observation(s) qualitative(s) sont exploitables après exclusion des enregistrements marqués exclus.", assignedMeasurements.length + " numeric measurement(s) and " + assignedObservations.length + " qualitative observation(s) are usable after excluding records marked as excluded.", assignedMeasurements.length + " medição(ões) numérica(s) e " + assignedObservations.length + " observação(ões) qualitativa(s) são utilizáveis após excluir os registos marcados como excluídos.", "يمكن استخدام " + assignedMeasurements.length + " قياس(ات) رقمي(ة) و" + assignedObservations.length + " ملاحظة(ات) نوعية بعد استبعاد السجلات المحددة كمستبعدة."));
     }
     if (outlierCount) descriptive.push(outlierCount + " valeur(s) atypique(s) signalée(s) par la règle exploratoire des 1,5 × IQR ; elles restent incluses dans les graphiques et les statistiques.");
     if (Array.from(cultureBatchCounts.values()).some(count => count > 1)) descriptive.push("Certaines cultures sont liées à plusieurs lots sélectionnés : les mesures/observations rattachées seulement à la culture et non à un événement de lot sont laissées de côté pour éviter une attribution ambiguë.");
-    if (allDates.length) descriptive.push("Période réellement couverte par les données utilisées : " + periodLabel + ".");
+    if (allDates.length) descriptive.push(comparisonText("Période réellement couverte par les données utilisées : ", "Actual period covered by the data used: ", "Período efetivamente abrangido pelos dados utilizados: ", "الفترة الفعلية التي تغطيها البيانات المستخدمة: ") + periodLabel + ".");
     const undatedCount = assignedMeasurements.filter(row => !row.measured_at).length + assignedObservations.filter(row => !row.observed_at).length;
-    if (undatedCount) descriptive.push(undatedCount + " enregistrement(s) sans date sont inclus dans les effectifs, mais pas dans les graphiques temporels ni les corrélations.");
+    if (undatedCount) descriptive.push(comparisonText(undatedCount + " enregistrement(s) sans date sont inclus dans les effectifs, mais pas dans les graphiques temporels ni les corrélations.", undatedCount + " undated record(s) are included in counts but not in time-series charts or correlations.", undatedCount + " registo(s) sem data estão incluídos nas contagens, mas não nos gráficos temporais nem nas correlações.", "تم تضمين " + undatedCount + " سجل(ات) بلا تاريخ في الأعداد، ولكن ليس في الرسوم الزمنية أو الارتباطات."));
     findings.innerHTML += '<article class="comparison-finding"><h4>1. Constats descriptifs</h4><ul>' + descriptive.map(item => "<li>" + escapeHtml(item) + "</li>").join("") + "</ul></article>";
 
     if (groups.length) {
@@ -4995,7 +5005,7 @@ async function loadLotComparison() {
   } finally {
     if (requestId === lotComparisonRequestId) {
       button.disabled = false;
-      button.textContent = "Comparer les lots sélectionnés";
+      button.textContent = comparisonText("Comparer les lots sélectionnés", "Compare selected batches", "Comparar os lotes selecionados", "قارن الدفعات المحددة");
     }
   }
 }
