@@ -39,9 +39,21 @@ assert.equal(api.resolveBatchId({ culture_id: "culture-1" }, eventMap, cultureMa
 assert.equal(api.resolveBatchId({ culture_id: "ambiguous-culture" }, eventMap, cultureMap, sampleMap), null);
 assert.equal(api.resolveBatchId({ sample_id: "sample-1" }, eventMap, cultureMap, sampleMap), "batch-2");
 assert.equal(api.resolveBatchId({ culture_id: "ambiguous-culture", sample_id: "sample-1" }, eventMap, cultureMap, sampleMap), null);
+const batchSeries = [
+  { id: "a1", batchId: "a", value: 1 },
+  { id: "a2", batchId: "a", value: 2 },
+  { id: "a3", batchId: "a", value: 3 },
+  { id: "a4", batchId: "a", value: 100 },
+  { id: "b1", batchId: "b", value: 1000 },
+  { id: "b2", batchId: "b", value: 1001 },
+  { id: "b3", batchId: "b", value: 1002 },
+  { id: "b4", batchId: "b", value: 1003 }
+];
+assert.deepEqual(Array.from(api.detectOutliersByBatch(batchSeries, ["a", "b"])), ["a4"]);
+assert.equal(api.detectOutlierIds(batchSeries).length, 0);
 assert.equal(api.dateKey("2026-10-22T12:00:00"), "2026-10-22");
 assert.equal(api.dateInRange("2026-10-22T12:00:00", "2026-10-22", "2026-10-22"), true);
 assert.equal(api.dateInRange("2026-10-21T23:59:59", "2026-10-22", null), false);
 assert.equal(api.dateInRange(null, null, null), true);
 assert.equal(api.dateInRange(null, "2026-10-22", null), false);
-console.log("✓ descriptive statistics, IQR outliers, Pearson guards, unit conversion, date filtering and unambiguous traceability tests passed");
+console.log("✓ descriptive statistics, per-batch IQR outliers, Pearson guards, unit conversion, date filtering and unambiguous traceability tests passed");
