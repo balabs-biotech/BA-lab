@@ -3913,7 +3913,7 @@ async function createBatch() {
 
       Première étape :
       <strong>
-        Préparation
+        ${escapeHtml(BATCH_STAGE_LABELS[getBatchStages(batchType)[0]] || getBatchStages(batchType)[0])}
       </strong>
 
     `;
