@@ -6290,26 +6290,74 @@ async function loadCultureDetail(cultureId) {
   timeline.innerHTML = '<p class="muted">Chargement de l’historique lié à cette culture…</p>';
 
   try {
-    const results = await Promise.all([
+    const { data: cultureBatches, error: batchesError } = await supabaseClient
+      .from("batches")
+      .select("id, batch_code, name, batch_type, status, current_stage, started_at, completed_at")
+      .eq("organization_id", organizationId)
+      .eq("culture_id", culture.id)
+      .order("created_at", { ascending: false })
+      .limit(100);
+    if (batchesError) throw new Error("Lots liés à la culture : " + batchesError.message);
+    if (requestId !== cultureDetailRequestId) return;
+
+    const batches = cultureBatches || [];
+    const batchIds = batches.map(batch => batch.id);
+    const eventQueries = [
       supabaseClient.from("events").select("id, event_type, occurred_at, batch_id, payload")
         .eq("organization_id", organizationId).eq("culture_id", culture.id)
-        .order("occurred_at", { ascending: false }).limit(100),
+        .order("occurred_at", { ascending: false }).limit(100)
+    ];
+    if (batchIds.length) {
+      eventQueries.push(
+        supabaseClient.from("events").select("id, event_type, occurred_at, batch_id, payload")
+          .eq("organization_id", organizationId).in("batch_id", batchIds)
+          .order("occurred_at", { ascending: false }).limit(100)
+      );
+    }
+    const eventResults = await Promise.all(eventQueries);
+    if (requestId !== cultureDetailRequestId) return;
+    for (const result of eventResults) {
+      if (result.error) throw new Error("Événements : " + result.error.message);
+    }
+    const eventsById = new Map();
+    eventResults.forEach(result => (result.data || []).forEach(event => eventsById.set(event.id, event)));
+    const events = [...eventsById.values()].sort((a, b) => new Date(b.occurred_at || 0) - new Date(a.occurred_at || 0));
+    const eventIds = events.map(event => event.id);
+    const measurementQueries = [
       supabaseClient.from("measurements").select("id, variable_code, raw_value, raw_unit_code, measured_at, event_id, metadata")
         .eq("organization_id", organizationId).eq("culture_id", culture.id)
-        .order("measured_at", { ascending: false }).limit(100),
+        .order("measured_at", { ascending: false }).limit(100)
+    ];
+    const observationQueries = [
       supabaseClient.from("observations").select("id, variable_code, value_text, observed_at, event_id, metadata")
         .eq("organization_id", organizationId).eq("culture_id", culture.id)
         .order("observed_at", { ascending: false }).limit(100)
+    ];
+    if (eventIds.length) {
+      measurementQueries.push(
+        supabaseClient.from("measurements").select("id, variable_code, raw_value, raw_unit_code, measured_at, event_id, metadata")
+          .eq("organization_id", organizationId).in("event_id", eventIds)
+          .order("measured_at", { ascending: false }).limit(100)
+      );
+      observationQueries.push(
+        supabaseClient.from("observations").select("id, variable_code, value_text, observed_at, event_id, metadata")
+          .eq("organization_id", organizationId).in("event_id", eventIds)
+          .order("observed_at", { ascending: false }).limit(100)
+      );
+    }
+    const [measurementResults, observationResults] = await Promise.all([
+      Promise.all(measurementQueries), Promise.all(observationQueries)
     ]);
     if (requestId !== cultureDetailRequestId) return;
-    const eventResult = results[0], measurementResult = results[1], observationResult = results[2];
-    if (eventResult.error) throw new Error("Événements : " + eventResult.error.message);
-    if (measurementResult.error) throw new Error("Mesures : " + measurementResult.error.message);
-    if (observationResult.error) throw new Error("Observations : " + observationResult.error.message);
-
-    const events = eventResult.data || [];
-    const measurements = measurementResult.data || [];
-    const observations = observationResult.data || [];
+    for (const result of measurementResults) {
+      if (result.error) throw new Error("Mesures : " + result.error.message);
+    }
+    for (const result of observationResults) {
+      if (result.error) throw new Error("Observations : " + result.error.message);
+    }
+    const uniqueRows = results => [...new Map(results.flatMap(result => result.data || []).map(row => [row.id, row])).values()];
+    const measurements = uniqueRows(measurementResults);
+    const observations = uniqueRows(observationResults);
     const measurementsByEvent = new Map();
     const observationsByEvent = new Map();
     for (const row of measurements) {
@@ -6363,10 +6411,32 @@ async function loadCultureDetail(cultureId) {
     if (fields[4]) fields[4].textContent = String(events.length);
     if (fields[5]) fields[5].textContent = String(measurements.length + observations.length);
     timeline.innerHTML = "";
-    if (events.length === 100 || measurements.length === 100 || observations.length === 100) {
+    if (batches.length) {
+      const batchSection = document.createElement("section");
+      batchSection.className = "culture-linked-batches";
+      const batchHeading = document.createElement("h3");
+      batchHeading.textContent = "Lots de production liés (" + batches.length + ")";
+      batchSection.appendChild(batchHeading);
+      batches.forEach(batch => {
+        const item = document.createElement("article");
+        item.className = "culture-timeline-entry";
+        const content = document.createElement("div");
+        const heading = document.createElement("strong");
+        heading.textContent = batch.batch_code || batch.name || "Lot sans code";
+        const description = document.createElement("p");
+        const stage = batch.current_stage ? " · Étape : " + batch.current_stage : "";
+        const state = batch.status ? " · Statut : " + batch.status : "";
+        description.textContent = (batch.batch_type || "Type non renseigné") + stage + state;
+        content.append(heading, description);
+        item.appendChild(content);
+        batchSection.appendChild(item);
+      });
+      timeline.appendChild(batchSection);
+    }
+    if (events.length === 100 || measurements.length >= 100 || observations.length >= 100 || batches.length === 100) {
       const limitNotice = document.createElement("p");
       limitNotice.className = "info warning";
-      limitNotice.textContent = "Historique partiel : au moins une catégorie atteint la limite de 100 enregistrements. Affinez la période dans les modules de données pour examiner les séries complètes.";
+      limitNotice.textContent = "Historique partiel : au moins une catégorie atteint sa limite de chargement. Certaines données anciennes peuvent ne pas apparaître ici.";
       timeline.appendChild(limitNotice);
     }
     if (!entries.length) {
