@@ -133,17 +133,33 @@ begin
     );
   end loop;
 
-  insert into public.events(
-    organization_id,event_type,occurred_at,batch_id,payload
-  )
-  values (
-    p_organization_id,'batch_created',now(),v_batch.id,
-    jsonb_build_object(
-      'batch_code',p_batch_code,
-      'batch_type',p_batch_type,
-      'qc_template_applied',true
+  -- events enforces exactly one biological anchor. Prefer the source culture
+  -- when supplied; otherwise anchor the creation event to the input material.
+  if p_culture_id is not null then
+    insert into public.events(
+      organization_id,event_type,occurred_at,culture_id,batch_id,payload
     )
-  );
+    values (
+      p_organization_id,'batch_created',now(),p_culture_id,v_batch.id,
+      jsonb_build_object(
+        'batch_code',p_batch_code,
+        'batch_type',p_batch_type,
+        'qc_template_applied',true
+      )
+    );
+  else
+    insert into public.events(
+      organization_id,event_type,occurred_at,material_id,batch_id,payload
+    )
+    values (
+      p_organization_id,'batch_created',now(),p_material_id,v_batch.id,
+      jsonb_build_object(
+        'batch_code',p_batch_code,
+        'batch_type',p_batch_type,
+        'qc_template_applied',true
+      )
+    );
+  end if;
 
   return v_batch;
 end;
