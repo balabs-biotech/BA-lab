@@ -6208,7 +6208,7 @@ async function loadStatistics() {
     const rows = data || [], variable = measurementVariables.find(item => item.code === variableCode), cultureById = new Map(cultureOptions.map(culture => [culture.id,culture]));
     const prepared = rows.map(row => { const normalized = row.normalized_value !== null && row.normalized_value !== undefined && row.normalized_unit_code; return {...row, plotValue:Number(normalized ? row.normalized_value : row.raw_value), plotUnit:normalized ? row.normalized_unit_code : row.raw_unit_code, normalized:Boolean(normalized)}; }).filter(row => Number.isFinite(row.plotValue));
     const canonical = variable?.canonical_unit_code;
-    const plotted = canonical ? prepared.filter(row => row.plotUnit === canonical) : prepared.filter(row => row.plotUnit === prepared[0]?.plotUnit);
+    const plotted = canonical ? prepared.filter(row => row.plotUnit === canonical) : (prepared[0]?.plotUnit ? prepared.filter(row => row.plotUnit === prepared[0].plotUnit) : []);
     const excluded = prepared.length - plotted.length;
     const addSummary = (label,value) => { const item=document.createElement("div"); item.className="statistics-summary-item"; const name=document.createElement("span"); name.textContent=label; const number=document.createElement("strong"); number.textContent=value; item.append(name,number); summary.appendChild(item); };
     addSummary("Mesures chargées",String(rows.length)); addSummary("Valeurs numériques",String(prepared.length)); addSummary("Valeurs comparables",String(plotted.length));
