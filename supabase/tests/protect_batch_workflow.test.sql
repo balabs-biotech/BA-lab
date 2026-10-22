@@ -64,6 +64,7 @@ values ('00000000-0000-0000-0000-0000000000a1','test','appearance','Appearance',
 \i supabase/migrations/20261021090000_protect_batch_workflow_v1.sql
 \i supabase/migrations/20261021090000_protect_batch_workflow_v1.sql
 \i supabase/migrations/20261022100000_add_atomic_batch_movement_rpc.sql
+\i supabase/migrations/20261022110000_enable_category_batch_workflows.sql
 
 select set_config('request.jwt.claim.sub','00000000-0000-0000-0000-0000000000b1',false);
 set role authenticated;
@@ -208,6 +209,36 @@ do $$ begin
     raise exception 'FAIL: cross-organization batch movement was allowed';
   exception when sqlstate '42501' then
     if sqlerrm = 'FAIL: cross-organization batch movement was allowed' then raise; end if;
+  end;
+end $$;
+reset role;
+
+
+-- Category-specific stage sequences are accepted only when they match the category.
+select set_config('request.jwt.claim.sub','00000000-0000-0000-0000-0000000000b1',false);
+set role authenticated;
+do $$ declare v_batch public.batches; v_codes text[]; begin
+  select * into v_batch from public.create_batch_with_stages(
+    '00000000-0000-0000-0000-0000000000a1',
+    'TRICHO-1','Trichoderma workflow','TRICHODERMA',
+    p_stages := array['preparation','sterilization','inoculation','incubation','cultivation','formulation','packaging','qc','release']
+  );
+  select array_agg(stage_code order by sequence_no) into v_codes
+  from public.batch_stages where batch_id=v_batch.id;
+  if v_batch.current_stage <> 'preparation' or v_codes is distinct from
+    array['preparation','sterilization','inoculation','incubation','cultivation','formulation','packaging','qc','release']::text[] then
+    raise exception 'FAIL: Trichoderma batch did not persist its category-specific workflow';
+  end if;
+
+  begin
+    perform public.create_batch_with_stages(
+      '00000000-0000-0000-0000-0000000000a1',
+      'INVALID-1','Invalid category workflow','CULTURE',
+      p_stages := array['preparation','sterilization','inoculation','incubation','cultivation','harvest','formulation','packaging','qc','release']
+    );
+    raise exception 'FAIL: mismatched stage workflow was accepted';
+  exception when sqlstate '22023' then
+    if sqlerrm = 'FAIL: mismatched stage workflow was accepted' then raise; end if;
   end;
 end $$;
 reset role;
