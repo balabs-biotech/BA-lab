@@ -68,3 +68,14 @@ for(const label of ["Chronologie du lot","Enregistrer une récolte","Récolte en
  if(!i18n.includes(label))throw new Error("Harvest timeline translation missing: "+label);
 }
 console.log("✓ Harvest entry, timeline labels and feedback are covered in French, English, Portuguese and Arabic");
+if(!template.includes('<select id="batchUnit"')||!template.includes('<select id="harvestUnit"'))throw new Error("Batch and harvest quantities must use controlled unit selectors");
+if(template.includes('<input\n          id="batchUnit"')||template.includes('<input id="harvestUnit"'))throw new Error("Free-text quantity units remain in the forms");
+for(const type of ["CULTURE","TRICHODERMA","PLEUROTUS_SPAWN","MUSHROOM_PRODUCT","BIOSTIMULANT","FORMULATION","OTHER"]){
+ if(!template.includes('value="'+type+'"'))throw new Error("Batch category missing: "+type);
+}
+if(!engine.includes('async function loadQuantityUnitOptions')||!engine.includes('.from("units")')||!engine.includes('select("code,label,dimension")'))throw new Error("Batch/harvest units are not loaded from the canonical unit catalogue");
+if(!engine.includes("quantityPlanned <= 0")||!engine.includes("Choisissez une unité dans le référentiel pour la quantité prévue."))throw new Error("Planned quantity validation does not require a valid unit");
+for(const label of ["Choisir une famille de lot…","Mycélium sur grain — Pleurotus","Biostimulant / biofertilisant","Choisir une unité…","Choose a batch category…","Escolha uma categoria de lote…","اختر فئة الدفعة…"]){
+ if(!i18n.includes(label))throw new Error("Batch form localisation missing: "+label);
+}
+console.log("✓ Batch types align with QC template keys; planned and harvested quantities use canonical units");
