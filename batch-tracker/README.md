@@ -1,6 +1,8 @@
-# Batch Tracker
+# BA Labs BioTrack
 
-The Batch Tracker uses a shared HTML template, CSS and JavaScript engine with three distinct static entry pages. Supabase remains the operational source of truth.
+**BioTrack** is the working product name for the BA Labs culture, batch and experimental-data tracker.
+
+BioTrack uses a shared HTML template, CSS and JavaScript engine with three distinct static entry pages. Supabase remains the operational source of truth.
 
 ## Workspaces
 - Green Tech: `green-tech/` — plant/substrate cultures, greenhouse, DF beds and environmental measurements.
@@ -16,3 +18,6 @@ This change separates entry pages and scopes visible workflow modules. Existing 
 
 ## Notion sync and validation
 Supabase remains the operational source of truth. Validate sync and biological lineage with a non-production organization and Notion database. Static CI does not constitute production or mobile-browser validation.
+
+## Batch workflows
+Batch creation selects a workflow by batch category: generic biological culture, Trichoderma preparation, Pleurotus grain spawn, harvested mushroom product, biostimulant/biofertilizer, or final formulation. Each workflow retains quality control and release stages. Existing batches render the stages actually stored for that batch, ordered by their saved sequence number. The legacy universal sequence is only a display fallback when a batch has no stage rows.
