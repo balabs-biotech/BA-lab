@@ -2753,7 +2753,7 @@ function updateHarvestEntryState(batch, events) {
     if (Number.isFinite(q) && q > 0 && unit) groups.set(unit, (groups.get(unit) || 0) + q);
   });
   harvestStatus.textContent = allowed ? "Étape Récolte active. Chaque saisie reste distincte." : "La saisie est activée uniquement pendant l’étape Récolte d’un lot ouvert.";
-  if (groups.size) harvestStatus.textContent += " Total journalisé par unité : " + [...groups].map(([u,q]) => Number(q.toPrecision(8)) + " " + u).join(" · ") + ".";
+  if (groups.size) harvestStatus.textContent += " Total des 50 événements chargés, par unité : " + [...groups].map(([u,q]) => Number(q.toPrecision(8)) + " " + u).join(" · ") + ".";
 }
 
 async function recordBatchHarvest() {
