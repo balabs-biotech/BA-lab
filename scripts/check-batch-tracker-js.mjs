@@ -67,6 +67,9 @@ if(!engine.includes("const eventAnchor = selectedBatch.culture_id")||!engine.inc
 for(const label of ["Chronologie du lot","Enregistrer une récolte","Récolte enregistrée","Batch timeline","Record a harvest","Harvest recorded","Cronologia do lote","Registar uma colheita","Colheita registada","الخط الزمني للدفعة","تسجيل حصاد","تم تسجيل الحصاد"]){
  if(!i18n.includes(label))throw new Error("Harvest timeline translation missing: "+label);
 }
+for(const label of ["Lot créé","Batch created","Lote criado","تم إنشاء الدفعة","Étape avancée","Stage advanced","Etapa avançada","تم الانتقال إلى المرحلة التالية","Aucun événement enregistré pour ce lot.","No events recorded for this batch.","Nenhum evento registado para este lote.","لا توجد أحداث مسجلة لهذه الدفعة.","Chronologie indisponible : ","Timeline unavailable: ","Cronologia indisponível: ","الخط الزمني غير متاح: "]){
+ if(!i18n.includes(label))throw new Error("Dynamic batch timeline localisation missing: "+label);
+}
 console.log("✓ Harvest entry, timeline labels and feedback are covered in French, English, Portuguese and Arabic");
 if(!template.includes('<select id="batchUnit"')||!template.includes('<select id="harvestUnit"'))throw new Error("Batch and harvest quantities must use controlled unit selectors");
 if(template.includes('<input\n          id="batchUnit"')||template.includes('<input id="harvestUnit"'))throw new Error("Free-text quantity units remain in the forms");
