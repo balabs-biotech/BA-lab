@@ -50,6 +50,6 @@ This is a point-in-time count, not an experiment. The current production data ca
 - Compatible linear units are converted using the deployed unit factors/offsets. Kelvin/Celsius uses the standard affine conversion because the live catalogue currently records K with offset 0. Non-linear pH is never converted. If units cannot be converted safely from the available reference data, series remain separate.
 - A missing value means “no recorded value found for this lot/variable/window,” not “a scheduled measurement was missed”; the schema does not currently define an expected measurement cadence.
 - Culture-only and sample-only data are not assigned to a selected lot when the culture is associated with multiple batches in the organization.
-- \`results\` are not included in the lot-level comparison in this version: their deployed keys link them to experiments and experimental units, not directly to a batch. Joining them by guess would be misleading.
+- \`results\` are not included in the lot-level comparison in this version: their deployed keys link them to experiments and experimental units, not directly to a batch. Measurements or observations linked only to an \`experimental_unit_id\` are likewise not assigned to a lot unless an existing event/culture/sample link resolves them unambiguously. Joining by guess would be misleading.
 - Correlation is not causal inference; no significance tests or treatment-effect claims are made.
 - This implementation introduces no tables, columns, RPCs, views, Edge Functions, data duplication, or production migration.
