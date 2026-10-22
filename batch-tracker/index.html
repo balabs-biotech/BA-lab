@@ -7,8 +7,9 @@
   <script>
     // Direct access to the tracker starts at the universe chooser.
     // Links from the chooser include one of the supported domain values.
-    const initialDomain = new URLSearchParams(window.location.search).get("domain");
-    if (!["agronomy", "mycology", "laboratory"].includes(initialDomain)) {
+    const domainParams = new URLSearchParams(window.location.search).getAll("domain");
+    const initialDomain = domainParams[0];
+    if (domainParams.length !== 1 || !["agronomy", "mycology", "laboratory"].includes(initialDomain)) {
       window.location.replace("../");
     }
   </script>
