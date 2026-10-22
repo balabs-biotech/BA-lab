@@ -40,6 +40,7 @@ let selectedBatch = null;
 let initializationInProgress = false;
 let measurementVariables = [];
 let measurementUnits = [];
+let quantityUnitOptions = [];
 let recentObservations = [];
 
 
@@ -816,6 +817,8 @@ async function initializeAuthenticatedTracker(
     await loadReferenceData();
 
     await loadCultureOptions();
+
+    await loadQuantityUnitOptions();
 
     await syncPendingCultures();
 
@@ -3692,10 +3695,8 @@ async function createBatch() {
   if (
     quantityPlanned !== null &&
     (
-      !Number.isFinite(
-        quantityPlanned
-      ) ||
-      quantityPlanned < 0
+      !Number.isFinite(quantityPlanned) ||
+      quantityPlanned <= 0
     )
   ) {
 
@@ -3708,6 +3709,14 @@ async function createBatch() {
 
   }
 
+
+  if (quantityPlanned !== null && !quantityUnit) {
+    showMessage(
+      "Choisissez une unité dans le référentiel pour la quantité prévue.",
+      "error"
+    );
+    return;
+  }
 
   const protocolVersionId =
     await getCultureProtocolVersionId(
@@ -4351,6 +4360,58 @@ async function init() {
 /* ============================================================
    INTERFACE : chargement, accessibilité, progression
    ============================================================ */
+
+
+/* ============================================================
+   UNITÉS DE QUANTITÉ — LOTS ET RÉCOLTES
+   ============================================================ */
+
+async function loadQuantityUnitOptions() {
+  const selects = [batchUnitInput, harvestUnitInput].filter(Boolean);
+  for (const select of selects) {
+    select.replaceChildren();
+    const placeholder = document.createElement("option");
+    placeholder.value = "";
+    placeholder.textContent = "Choisir une unité…";
+    select.appendChild(placeholder);
+  }
+
+  try {
+    const { data, error } = await supabaseClient
+      .from("units")
+      .select("code,label,dimension")
+      .order("code");
+    if (error) throw error;
+
+    quantityUnitOptions = data || [];
+    for (const select of selects) {
+      for (const unit of quantityUnitOptions) {
+        const option = document.createElement("option");
+        option.value = unit.code;
+        const label = unit.label && unit.label !== unit.code
+          ? `${unit.label} (${unit.code})`
+          : unit.code;
+        option.textContent = unit.dimension
+          ? `${label} — ${unit.dimension}`
+          : label;
+        select.appendChild(option);
+      }
+      select.disabled = quantityUnitOptions.length === 0;
+    }
+    if (!quantityUnitOptions.length) {
+      for (const select of selects) {
+        select.options[0].textContent = "Aucune unité disponible";
+      }
+    }
+  } catch (error) {
+    console.error("Référentiel des unités indisponible :", error);
+    quantityUnitOptions = [];
+    for (const select of selects) {
+      select.disabled = true;
+      if (select.options[0]) select.options[0].textContent = "Unités indisponibles";
+    }
+  }
+}
 
 
 /* ============================================================
