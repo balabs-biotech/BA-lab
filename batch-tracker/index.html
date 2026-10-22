@@ -1758,6 +1758,14 @@ const measurementNoteInput = document.getElementById("measurementNote");
 const saveMeasurementButton = document.getElementById("saveMeasurementButton");
 const reloadMeasurementsButton = document.getElementById("reloadMeasurementsButton");
 const measurementHistory = document.getElementById("measurementHistory");
+const observationVariableSelect = document.getElementById("observationVariable");
+const observationAtInput = document.getElementById("observationAt");
+const observationValueInput = document.getElementById("observationValue");
+const observationMethodInput = document.getElementById("observationMethod");
+const observationInstrumentInput = document.getElementById("observationInstrument");
+const observationNoteInput = document.getElementById("observationNote");
+const saveObservationButton = document.getElementById("saveObservationButton");
+const observationHistory = document.getElementById("observationHistory");
 
 
 /* ============================================================
@@ -2318,12 +2326,24 @@ async function initializeAuthenticatedTracker(
 
     try {
       await loadMeasurementReferences();
-      await loadRecentMeasurements();
       saveMeasurementButton.disabled = false;
+      saveObservationButton.disabled = false;
+      try { await loadRecentMeasurements(); }
+      catch (historyError) {
+        console.error("Historique des mesures indisponible :", historyError);
+        measurementHistory.textContent = "Impossible de charger l’historique des mesures. L’enregistrement reste disponible.";
+      }
+      try { await loadRecentObservations(); }
+      catch (observationHistoryError) {
+        console.error("Historique des observations indisponible :", observationHistoryError);
+        observationHistory.textContent = "Impossible de charger l’historique des observations. L’enregistrement reste disponible.";
+      }
     } catch (measurementError) {
-      console.error("Initialisation du module de mesures :", measurementError);
-      measurementHistory.textContent = "Le module de mesures est indisponible pour le moment ; les modules de culture et de production restent utilisables.";
+      console.error("Initialisation du catalogue de mesures :", measurementError);
+      measurementHistory.textContent = "Le catalogue des mesures est indisponible ; les modules de culture et de production restent utilisables.";
+      observationHistory.textContent = "Le catalogue des observations est indisponible ; les modules de culture et de production restent utilisables.";
       saveMeasurementButton.disabled = true;
+      saveObservationButton.disabled = true;
     }
 
     setDefaultDate();
@@ -2394,6 +2414,9 @@ function setDefaultDate() {
 
   if (measurementAtInput) {
     measurementAtInput.value = now.toISOString().slice(0, 16);
+  }
+  if (observationAtInput) {
+    observationAtInput.value = now.toISOString().slice(0, 16);
   }
 
 }
@@ -5442,6 +5465,18 @@ async function loadMeasurementReferences() {
     option.value = variable.code;
     option.textContent = `${variable.label} · ${variable.code}`;
     measurementVariableSelect.appendChild(option);
+  }
+
+  observationVariableSelect.innerHTML = "";
+  const observationPlaceholder = document.createElement("option");
+  observationPlaceholder.value = "";
+  observationPlaceholder.textContent = measurementVariables.length ? "Sélectionner une catégorie…" : "Aucune catégorie disponible";
+  observationVariableSelect.appendChild(observationPlaceholder);
+  for (const variable of measurementVariables) {
+    const option = document.createElement("option");
+    option.value = variable.code;
+    option.textContent = `${variable.label} · ${variable.code}`;
+    observationVariableSelect.appendChild(option);
   }
 
   renderMeasurementTargets();
