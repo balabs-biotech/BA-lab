@@ -619,7 +619,19 @@
     <section class="card hidden" id="batchEvents" aria-labelledby="batchEventsTitle">
       <div class="section-kicker"><span>TRAÇABILITÉ</span><span class="kicker-line"></span><span>JOURNAL DU LOT</span></div>
       <h3 id="batchEventsTitle">Chronologie du lot</h3>
-      <p class="muted">Événements enregistrés pour ce lot, du démarrage aux mesures et à la libération. Les détails affichés sont limités aux champs utiles du journal.</p>
+      <p class="muted">Événements enregistrés pour ce lot, du démarrage aux mesures, récoltes et libération. Les détails affichés sont limités aux champs utiles du journal.</p>
+      <div class="batch-harvest-entry">
+        <h4>Enregistrer une récolte</h4>
+        <p class="muted">Disponible lorsque l’étape actuelle du lot est « Récolte ». Chaque enregistrement reste distinct dans l’historique.</p>
+        <div class="grid">
+          <div><label for="harvestQuantity">Quantité récoltée</label><input id="harvestQuantity" type="number" min="0.000001" step="any" inputmode="decimal" placeholder="Ex. 125"></div>
+          <div><label for="harvestUnit">Unité (code existant)</label><input id="harvestUnit" type="text" maxlength="24" placeholder="Ex. g, kg, unit"></div>
+        </div>
+        <label for="harvestNote">Note (facultatif)</label>
+        <textarea id="harvestNote" rows="2" maxlength="1000" placeholder="Produit récolté, qualité, conditions…"></textarea>
+        <button id="recordHarvestButton" type="button" disabled>Enregistrer la récolte</button>
+        <p id="harvestStatus" class="muted" role="status" aria-live="polite">Sélectionnez un lot à l’étape Récolte.</p>
+      </div>
       <div id="batchEventList" class="batch-event-list" aria-live="polite"><p class="muted">Sélectionnez un lot pour charger sa chronologie.</p></div>
     </section>
 
