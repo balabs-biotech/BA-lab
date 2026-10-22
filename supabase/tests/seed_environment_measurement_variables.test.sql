@@ -18,7 +18,7 @@ CREATE TABLE public.variables (
 INSERT INTO public.units (code, label, dimension, factor, offset_value, is_linear)
 VALUES ('%', 'percent', 'fraction', 1, 0, true);
 
-\i supabase/migrations/20261022113000_seed_environment_measurement_variables.sql
+\i supabase/migrations/20261022004302_seed_environment_measurement_variables.sql
 
 DO $assertions$
 BEGIN

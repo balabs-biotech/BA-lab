@@ -21,7 +21,7 @@ CREATE VIEW public.view_privilege_hardening_fixture_view AS
 GRANT ALL PRIVILEGES ON TABLE public.view_privilege_hardening_fixture TO anon, authenticated;
 GRANT ALL PRIVILEGES ON TABLE public.view_privilege_hardening_fixture_view TO anon, authenticated;
 
-\i supabase/migrations/20261022111500_revoke_excess_view_privileges.sql
+\i supabase/migrations/20261022004057_revoke_excess_view_privileges.sql
 
 DO $assertions$
 BEGIN

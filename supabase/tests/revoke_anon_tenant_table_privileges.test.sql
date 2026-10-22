@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS public.privilege_hardening_fixture (
 );
 GRANT ALL PRIVILEGES ON TABLE public.privilege_hardening_fixture TO anon, authenticated;
 
-\i supabase/migrations/20261022110000_revoke_anon_tenant_table_privileges.sql
+\i supabase/migrations/20261022003608_revoke_anon_tenant_table_privileges.sql
 
 DO $assertions$
 BEGIN

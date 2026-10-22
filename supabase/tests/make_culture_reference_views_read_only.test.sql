@@ -23,7 +23,7 @@ CREATE VIEW public.v_culture_creation_reference AS
 GRANT ALL PRIVILEGES ON TABLE public.v_culture_creation_options TO anon, authenticated;
 GRANT ALL PRIVILEGES ON TABLE public.v_culture_creation_reference TO anon, authenticated;
 
-\i supabase/migrations/20261022114500_make_culture_reference_views_read_only.sql
+\i supabase/migrations/20261022004559_make_culture_reference_views_read_only.sql
 
 DO $assertions$
 DECLARE
