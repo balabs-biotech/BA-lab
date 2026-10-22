@@ -868,16 +868,43 @@
     setLanguage(preferred);
     const observer = new MutationObserver(records => {
       for (const record of records) {
-        if (record.type === "childList") record.addedNodes.forEach(node => {
-          if (node.nodeType === Node.TEXT_NODE) {
-            if (!sourceText.has(node)) sourceText.set(node, node.nodeValue);
-            const result = translate(sourceText.get(node), currentLanguage);
-            if (node.nodeValue !== result) node.nodeValue = result;
-          } else if (node.nodeType === Node.ELEMENT_NODE) translateTree(node);
-        });
+        if (record.type === "childList") {
+          record.addedNodes.forEach(node => {
+            if (node.nodeType === Node.TEXT_NODE) {
+              if (!sourceText.has(node)) sourceText.set(node, node.nodeValue);
+              const result = translate(sourceText.get(node), currentLanguage);
+              if (node.nodeValue !== result) node.nodeValue = result;
+            } else if (node.nodeType === Node.ELEMENT_NODE) translateTree(node);
+          });
+          continue;
+        }
+
+        // The tracker frequently changes aria-labels on existing controls as
+        // users switch cultures or batches. Observe those updates as well as
+        // inserted nodes, while ignoring our own translated attribute writes.
+        const el = record.target;
+        const attr = record.attributeName;
+        if (!el || !attr || !["placeholder", "title", "aria-label"].includes(attr)) continue;
+        if (!sourceAttrs.has(el)) sourceAttrs.set(el, {});
+        const cached = sourceAttrs.get(el);
+        const current = el.getAttribute(attr);
+        const previous = cached[attr];
+        if (previous !== undefined && current === translate(previous, currentLanguage)) continue;
+        if (current === null) {
+          delete cached[attr];
+          continue;
+        }
+        cached[attr] = current;
+        const result = translate(current, currentLanguage);
+        if (current !== result) el.setAttribute(attr, result);
       }
     });
-    observer.observe(document.getElementById("workspace-root") || document.body, {subtree:true, childList:true});
+    observer.observe(document.getElementById("workspace-root") || document.body, {
+      subtree: true,
+      childList: true,
+      attributes: true,
+      attributeFilter: ["placeholder", "title", "aria-label"]
+    });
   }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init, {once:true}); else init();
   window.BALabsI18n = { setLanguage, get language() { return currentLanguage; } };
