@@ -891,6 +891,7 @@ button,input,select,textarea{border-radius:9px}button{min-height:42px}.hidden{di
 .culture-lineage-node{padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:var(--surface,#fff);font-size:12px}
 .culture-lineage-node strong{display:block}
 .culture-lineage-node small{display:block;color:var(--muted);margin-top:3px}
+.culture-lineage-node{text-align:left;cursor:pointer;font:inherit;color:inherit}
 .culture-lineage-arrow{color:var(--muted);font-weight:800}
 @media(max-width:650px){.bio-operation-form{grid-template-columns:minmax(0,1fr)}.bio-operation-wide{grid-column:auto}}
 .culture-detail-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
@@ -6610,7 +6611,7 @@ async function loadBiologicalLineage(cultureId) {
     while (parentId && guard++ < 50) { const parent = byId.get(parentId); if (!parent) break; ancestors.unshift(parent); parentId = parent.parent_culture_id; }
     const descendants = []; const queue = [{ id: current.id, depth: 0 }]; const visited = new Set([current.id]);
     while (queue.length && descendants.length < 200) { const node = queue.shift(); for (const child of rows.filter(row => row.parent_culture_id === node.id)) { if (visited.has(child.id)) continue; visited.add(child.id); descendants.push({ ...child, depth: node.depth + 1 }); queue.push({ id: child.id, depth: node.depth + 1 }); } }
-    const renderNode = (row, label) => { const node = document.createElement('div'); node.className = 'culture-lineage-node'; const strong = document.createElement('strong'); strong.textContent = row.code || 'Culture sans code'; const small = document.createElement('small'); small.textContent = label + ' · ' + (row.culture_type || 'type non renseigné'); node.append(strong, small); return node; };
+    const renderNode = (row, label) => { const node = document.createElement('button'); node.type = 'button'; node.className = 'culture-lineage-node'; node.addEventListener('click', () => loadCultureDetail(row.id)); node.setAttribute('aria-label', 'Ouvrir la fiche de culture ' + (row.code || 'sans code')); const strong = document.createElement('strong'); strong.textContent = row.code || 'Culture sans code'; const small = document.createElement('small'); small.textContent = label + ' · ' + (row.culture_type || 'type non renseigné'); node.append(strong, small); return node; };
     target.replaceChildren();
     const makeGroup = (title, items) => { const section = document.createElement('section'); const heading = document.createElement('p'); heading.className = 'muted'; heading.textContent = title; section.appendChild(heading); const list = document.createElement('div'); list.className = 'culture-lineage-list'; items.forEach((item, index) => { if (index) { const arrow = document.createElement('span'); arrow.className = 'culture-lineage-arrow'; arrow.textContent = '→'; list.appendChild(arrow); } list.appendChild(renderNode(item.row, item.label)); }); section.appendChild(list); target.appendChild(section); };
     if (materialChain.length) {
