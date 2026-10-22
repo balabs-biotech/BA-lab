@@ -483,6 +483,23 @@
     </div>
 
 
+    <div class="grid">
+      <div>
+        <label for="batchLocation">Emplacement (facultatif)</label>
+        <select id="batchLocation" aria-describedby="batchLocationHint">
+          <option value="">Aucun emplacement</option>
+        </select>
+        <small class="hint" id="batchLocationHint">Zone, salle ou espace où le lot démarre.</small>
+      </div>
+      <div>
+        <label for="batchEnvironment">Environnement (facultatif)</label>
+        <select id="batchEnvironment" aria-describedby="batchEnvironmentHint">
+          <option value="">Aucun environnement</option>
+        </select>
+        <small class="hint" id="batchEnvironmentHint">Environnement associé au lot, si déjà défini.</small>
+      </div>
+    </div>
+
     <button
       id="createBatchButton"
       type="button"
