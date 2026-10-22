@@ -39,3 +39,31 @@ for (const required of [
 }
 
 console.log(`✓ i18n.js syntax valid; ${rows.length} supplemental entries have French, English, Portuguese and Arabic values`);
+const testableSource = source.replace(
+  /  if \(document\.readyState === "loading"\)[\s\S]*?\n  window\.BALabsI18n = \{ setLanguage, get language\(\) \{ return currentLanguage; \} \};\n\}\)\(\);\s*$/,
+  "  window.__testTranslate = translate;\n})();"
+);
+if (testableSource === source) throw new Error("Could not isolate the translation function for behaviour tests");
+const testWindow = {};
+vm.runInNewContext(testableSource, {
+  window: testWindow,
+  document: {},
+  localStorage: { getItem: () => null, setItem: () => {} }
+});
+const translate = testWindow.__testTranslate;
+const cases = [
+  ["en", "Démarrage : 2026-10-22", "Started: 2026-10-22"],
+  ["pt", "Démarrage : 2026-10-22", "Início: 2026-10-22"],
+  ["ar", "Démarrage : 2026-10-22", "تاريخ البدء: 2026-10-22"],
+  ["en", "Ajouter une observation à CULT-001", "Add an observation to CULT-001"],
+  ["pt", "Ajouter une mesure à CULT-002", "Adicionar uma medição a CULT-002"],
+  ["ar", "Ajouter une mesure à CULT-002", "إضافة قياس إلى CULT-002"],
+  ["en", "Votre session a expiré.", "Your session has expired."],
+  ["fr", "Démarrage : 2026-10-22", "Démarrage : 2026-10-22"],
+  ["en", "Untranslated runtime text", "Untranslated runtime text"]
+];
+for (const [lang, input, expected] of cases) {
+  const actual = translate(input, lang);
+  if (actual !== expected) throw new Error(`Translation behaviour failed (${lang}): ${JSON.stringify(input)} => ${JSON.stringify(actual)}; expected ${JSON.stringify(expected)}`);
+}
+console.log(`✓ translation behaviour valid; ${cases.length} exact, dynamic-prefix, fallback and French-preservation cases passed`);
