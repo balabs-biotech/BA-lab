@@ -126,6 +126,7 @@ for(const label of ["Déplacer le lot","Move batch","Mover lote","نقل الد�
  if(!i18n.includes(label))throw new Error("Batch movement localisation missing: "+label);
 }
 console.log("✓ Batch movement calls the atomic RPC and refreshes the traceability timeline");
+if(!engine.includes("const hasCurrentAssignment = Boolean(batch?.location_id || batch?.environment_id)"))throw new Error("Assigned batches cannot retain movement controls when destination options are unavailable");
 if(!engine.includes("const locationName = batchLocationOptions.find")||!engine.includes("const environmentName = batchEnvironmentOptions.find")||!engine.includes("escapeHtml(locationName)")||!engine.includes("escapeHtml(environmentName)"))throw new Error("Batch detail does not safely display its selected location/environment");
 
 
