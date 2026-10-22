@@ -997,7 +997,7 @@
       "يُفعّل التسجيل فقط أثناء مرحلة الحصاد لدفعة مفتوحة."
     ],
     [
-      "Total des 50 événements chargés, par unité: ",
+      "Total des 50 événements chargés, par unité : ",
       "Total of the 50 loaded events, by unit:",
       "Total dos 50 eventos carregados, por unidade:",
       "إجمالي الأحداث الخمسين المحمّلة حسب الوحدة:"
