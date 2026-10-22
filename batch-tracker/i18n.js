@@ -427,14 +427,8 @@
     "Culturas de origem e materiais biológicos",
     "مزارع المصدر والمواد البيولوجية"
   ],
-  [
-    "Mesures et résultats expérimentaux",
-    "Measurements and experimental results",
-    "Measurements and experimental results",
-    "القياسات والنتائج التجريبية"
-  ],
-  [
-    ["ANALYSE EXPLORATOIRE","EXPLORATORY ANALYSIS","ANÁLISE EXPLORATÓRIA","التحليل الاستكشافي"],
+  ["Mesures et résultats expérimentaux","Measurements and experimental results","Medições e resultados experimentais","القياسات والنتائج التجريبية"],
+  ["ANALYSE EXPLORATOIRE","EXPLORATORY ANALYSIS","ANÁLISE EXPLORATÓRIA","التحليل الاستكشافي"],
   ["Comparer mes lots","Compare my batches","Comparar os meus lotes","مقارنة دفعاتي"],
   ["Comparez les mesures et observations déjà enregistrées. Aucun enregistrement ne sera créé ou modifié.","Compare measurements and observations already recorded. No records will be created or changed.","Compare as medições e observações já registadas. Nenhum registo será criado ou alterado.","قارن القياسات والملاحظات المسجلة بالفعل. لن يتم إنشاء السجلات أو تعديلها."],
   ["Sélection limitée aux 30 lots les plus récents actuellement chargés. Les données sont rattachées à un lot via ses événements ; les données liées uniquement à une culture ne sont attribuées que si cette culture correspond sans ambiguïté à un seul lot sélectionné.","Selection is limited to the 30 most recently loaded batches. Data are linked through events; culture-only data are assigned only when that culture unambiguously maps to one selected batch.","A seleção está limitada aos 30 lotes carregados mais recentes. Os dados são associados através de eventos; dados ligados apenas a uma cultura só são atribuídos quando essa cultura corresponde inequivocamente a um único lote selecionado.","يقتصر الاختيار على أحدث 30 دفعة محملة. تُربط البيانات عبر الأحداث؛ ولا تُنسب البيانات المرتبطة بالثقافة فقط إلا إذا كانت تلك الثقافة مرتبطة بوضوح بدفعة واحدة محددة."],
@@ -448,15 +442,7 @@
   ["Mesures numériques par lot et unité","Numeric measurements by batch and unit","Medições numéricas por lote e unidade","القياسات الرقمية حسب الدفعة والوحدة"],
   ["Observations qualitatives par lot","Qualitative observations by batch","Observações qualitativas por lote","الملاحظات النوعية حسب الدفعة"],
   ["Lecture scientifique : les constats décrivent les données disponibles ; les corrélations sont exploratoires et ne démontrent pas de causalité ; les variables suggérées sont des pistes à mesurer lors d’un prochain essai. L’absence de mesure enregistrée ne prouve pas qu’une mesure était prévue. Les unités différentes ne sont pas converties implicitement.","Scientific interpretation: findings describe available data; correlations are exploratory and do not demonstrate causality; suggested variables are candidates to measure in a future experiment. No recorded measurement does not prove one was scheduled. Different units are not silently converted.","Interpretação científica: as constatações descrevem os dados disponíveis; as correlações são exploratórias e não demonstram causalidade; as variáveis sugeridas são opções a medir numa experiência futura. A ausência de uma medição registada não prova que estivesse prevista. Unidades diferentes não são convertidas implicitamente.","التفسير العلمي: تصف النتائج البيانات المتاحة؛ والارتباطات استكشافية ولا تثبت السببية؛ والمتغيرات المقترحة خيارات لقياسها في تجربة لاحقة. غياب القياس المسجل لا يثبت أنه كان مقرراً. لا تُحوّل الوحدات المختلفة ضمنياً."],
-  "Analyse expérimentale",
-  "Experimental analysis",
-  "Análise experimental",
-  [
-    "Analyse expérimentale",
-    "Experimental analysis",
-    "Análise experimental",
-    "التحليل التجريبي"
-  ]
+  ["Analyse expérimentale","Experimental analysis","Análise experimental","التحليل التجريبي"]
 ];
   for (const [fr, en, pt, ar] of supplementalCoverage) {
     dictionaries.en[fr] ||= en;
