@@ -2204,7 +2204,7 @@ async function compareSelectedBatches() {
   try {
     const cultureIds = [...new Set(batches.map(batch => batch.culture_id).filter(Boolean))];
     const environmentIds = [...new Set(batches.map(batch => batch.environment_id).filter(Boolean))];
-    const [stageResult, cultureMeasurementResult, environmentMeasurementResult] = await Promise.all([
+    const [stageResult, cultureMeasurementResult, environmentMeasurementResult, cultureContextResult] = await Promise.all([
       supabaseClient.from("batch_stages")
         .select("batch_id,stage_code,status,sequence_no,started_at,completed_at")
         .eq("organization_id", organizationId).in("batch_id", ids),
@@ -2219,11 +2219,44 @@ async function compareSelectedBatches() {
             .select("id,culture_id,environment_id,variable_code,raw_value,raw_unit_code,normalized_value,normalized_unit_code,measured_at,quality_state,exclusion_reason")
             .eq("organization_id", organizationId).in("environment_id", environmentIds)
             .order("measured_at", { ascending: false }).limit(1000)
+        : Promise.resolve({data:[],error:null}),
+      cultureIds.length
+        ? supabaseClient.from("cultures")
+            .select("id,experiment_id,experimental_unit_id")
+            .eq("organization_id", organizationId).in("id", cultureIds)
         : Promise.resolve({data:[],error:null})
     ]);
     if (stageResult.error) throw new Error("Chargement des étapes impossible : " + stageResult.error.message);
     if (cultureMeasurementResult.error) throw new Error("Chargement des mesures de culture impossible : " + cultureMeasurementResult.error.message);
     if (environmentMeasurementResult.error) throw new Error("Chargement des mesures d'environnement impossible : " + environmentMeasurementResult.error.message);
+    if (cultureContextResult.error) throw new Error("Chargement du contexte expérimental impossible : " + cultureContextResult.error.message);
+    const cultureContexts = cultureContextResult.data || [];
+    const unitIds = [...new Set(cultureContexts.map(row => row.experimental_unit_id).filter(Boolean))];
+    const experimentIds = [...new Set(cultureContexts.map(row => row.experiment_id).filter(Boolean))];
+    const [unitResult, experimentResult] = await Promise.all([
+      unitIds.length
+        ? supabaseClient.from("experimental_units")
+            .select("id,experiment_id,unit_code,replicate_no,treatment_code")
+            .eq("organization_id", organizationId).in("id", unitIds)
+        : Promise.resolve({data:[],error:null}),
+      experimentIds.length
+        ? supabaseClient.from("experiments")
+            .select("id,code,name")
+            .eq("organization_id", organizationId).in("id", experimentIds)
+        : Promise.resolve({data:[],error:null})
+    ]);
+    if (unitResult.error) throw new Error("Chargement des unités expérimentales impossible : " + unitResult.error.message);
+    if (experimentResult.error) throw new Error("Chargement des expériences impossible : " + experimentResult.error.message);
+    const unitsById = new Map((unitResult.data || []).map(row => [row.id, row]));
+    const experimentsById = new Map((experimentResult.data || []).map(row => [row.id, row]));
+    const contextsByCultureId = new Map(cultureContexts.map(row => {
+      const unit = unitsById.get(row.experimental_unit_id);
+      const experiment = experimentsById.get(row.experiment_id || unit?.experiment_id);
+      return [row.id, {
+        experiment: experiment ? `${experiment.code} — ${experiment.name}` : "Non renseignée",
+        unit: unit ? [unit.unit_code, unit.treatment_code ? `traitement ${unit.treatment_code}` : null, unit.replicate_no != null ? `répétition ${unit.replicate_no}` : null].filter(Boolean).join(" · ") : "Non renseignée"
+      }];
+    }));
     const stages = stageResult.data || [];
     const measurementMap = new Map();
     [...(cultureMeasurementResult.data || []), ...(environmentMeasurementResult.data || [])].forEach(row => {
@@ -2232,7 +2265,7 @@ async function compareSelectedBatches() {
     const measurements = [...measurementMap.values()];
     const table = document.createElement("table");
     table.className = "statistics-table";
-    table.innerHTML = "<caption>Comparaison descriptive des lots sélectionnés</caption><thead><tr><th>Lot</th><th>Type</th><th>État / étape</th><th>Quantité prévue</th><th>Quantité réelle</th><th>Étapes terminées</th><th>Mesures de culture</th><th>Mesures d'environnement</th><th>Résumé numérique séparé par source</th><th>Dernière mesure</th></tr></thead>";
+    table.innerHTML = "<caption>Comparaison descriptive des lots sélectionnés</caption><thead><tr><th>Lot</th><th>Type</th><th>Expérience</th><th>Unité / traitement / répétition</th><th>État / étape</th><th>Quantité prévue</th><th>Quantité réelle</th><th>Étapes terminées</th><th>Mesures de culture</th><th>Mesures d'environnement</th><th>Résumé numérique séparé par source</th><th>Dernière mesure</th></tr></thead>";
     const tbody = document.createElement("tbody");
     const summarize = rows => {
       const groups = new Map();
@@ -2273,6 +2306,7 @@ async function compareSelectedBatches() {
       const environmentLinked = batch.environment_id ? measurements.filter(row => row.environment_id === batch.environment_id && !(batch.culture_id && row.culture_id === batch.culture_id)) : [];
       const linked = new Map([...cultureLinked, ...environmentLinked].map(row => [row.id, row]));
       const linkedRows = [...linked.values()];
+      const context = batch.culture_id ? contextsByCultureId.get(batch.culture_id) : null;
       const lastDate = linkedRows.reduce((latest, row) => {
         const date = row.measured_at ? new Date(row.measured_at) : null;
         return date && (!latest || date > latest) ? date : latest;
@@ -2280,6 +2314,8 @@ async function compareSelectedBatches() {
       const values = [
         `${batch.batch_code || "—"} — ${batch.name || "Sans nom"}`,
         batch.batch_type || "—",
+        context?.experiment || "Non renseignée",
+        context?.unit || "Non renseignée",
         `${batch.status || "—"} / ${batch.current_stage || "—"}`,
         batch.quantity_planned == null ? "—" : `${batch.quantity_planned} ${batch.quantity_unit_code || ""}`.trim(),
         batch.quantity_actual == null ? "—" : `${batch.quantity_actual} ${batch.quantity_unit_code || ""}`.trim(),
