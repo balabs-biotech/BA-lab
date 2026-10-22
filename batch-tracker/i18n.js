@@ -1224,6 +1224,12 @@
       "Introduza a quantidade prevista ou limpe a unidade selecionada.",
       "أدخل الكمية المخططة أو ألغِ تحديد الوحدة."
     ],
+    [
+      "Ce choix détermine les contrôles qualité associés. Pour un cas non spécialisé, utilisez « Culture biologique / lot de culture générique ».",
+      "This choice determines the associated quality checks. For a non-specialized case, use “Biological culture / generic culture batch”.",
+      "Esta escolha determina os controlos de qualidade associados. Para um caso não especializado, use « Cultura biológica / lote de cultura genérico ».",
+      "يحدد هذا الاختيار فحوصات الجودة المرتبطة. للحالات غير المتخصصة، استخدم «مزرعة بيولوجية / دفعة مزرعة عامة»."
+    ],
   ];
   for (const [fr, en, pt, ar] of supplementalCoverage) {
     dictionaries.en[fr] ||= en;
