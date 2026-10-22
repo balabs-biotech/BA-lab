@@ -23,6 +23,13 @@ if(!root.includes(".universe.myco{--accent:#a94f1d;"))throw new Error("Chooser m
 if(!template.includes('id="batchCompareSelect"')||!template.includes('id="batchCompareResults"'))throw new Error("Batch comparison UI missing");
 if(!engine.includes("async function compareSelectedBatches")||!engine.includes('from("batch_stages")')||!engine.includes('from("measurements")'))throw new Error("Batch comparison data flow missing");
 if(!engine.includes("limite de 1 000 mesures récentes au total"))throw new Error("Batch comparison measurement cap is not disclosed");
+if(!engine.includes("normalized_value,normalized_unit_code")||!engine.includes("raw_value,raw_unit_code"))throw new Error("Numeric measurement fields missing from comparison");
+if(!engine.includes('row.quality_state === "excluded"'))throw new Error("Excluded measurements are not handled explicitly");
+if(!engine.includes("min–max")||!engine.includes("values.length"))throw new Error("Descriptive numeric summary missing");
+const i18n=fs.readFileSync("batch-tracker/i18n.js","utf8");
+for(const label of ["Résumé numérique par variable","Resumo numérico por variável","ملخص رقمي حسب المتغير"]){
+ if(!i18n.includes(label))throw new Error("Comparison heading translation missing: "+label);
+}
 console.log("✓ JavaScript syntax parsed");
 console.log("✓ Three fixed-domain entry pages and chooser links verified");
 console.log("✓ Shared workspace excludes universe switcher");
