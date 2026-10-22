@@ -1720,3 +1720,39 @@ body[data-domain="laboratory"] .primary-button:hover:not(:disabled) {
   color: #ffffff !important;
   -webkit-text-fill-color: #ffffff !important;
 }
+
+
+/* Laboratory overview: replace inherited green on data access and shortcut numbers with blue. */
+body[data-domain="laboratory"] #overviewOpenData {
+  background: #e4eef7 !important;
+  background-image: none !important;
+  border-color: #b6ccdf !important;
+  color: #174875 !important;
+  -webkit-text-fill-color: #174875 !important;
+}
+body[data-domain="laboratory"] #overviewOpenData:hover:not(:disabled) {
+  background: #d4e4f2 !important;
+  border-color: #8eaecb !important;
+  color: #123e65 !important;
+  -webkit-text-fill-color: #123e65 !important;
+}
+body[data-domain="laboratory"] .overview-shortcut {
+  background: #ffffff !important;
+  border-color: #c7d6e4 !important;
+  color: #183a59 !important;
+}
+body[data-domain="laboratory"] .overview-shortcut:hover {
+  background: #f1f6fb !important;
+  border-color: #8eaecb !important;
+}
+body[data-domain="laboratory"] .overview-shortcut .shortcut-index {
+  background: #e4eef7 !important;
+  border: 1px solid #c7d6e4 !important;
+  color: #215b91 !important;
+}
+body[data-domain="laboratory"] .overview-shortcut strong {
+  color: #183a59 !important;
+}
+body[data-domain="laboratory"] .overview-shortcut small {
+  color: #476078 !important;
+}
