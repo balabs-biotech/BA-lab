@@ -936,6 +936,7 @@ for (const [fr, en, pt, ar] of supplementalCoverage) {
     const label = document.getElementById("languageLabel");
     if (label) label.textContent = currentLanguage === "ar" ? "اللغة" : currentLanguage === "pt" ? "Idioma" : currentLanguage === "en" ? "Language" : "Langue";
     try { localStorage.setItem("ba-labs-language", currentLanguage); } catch (_) {}
+    window.dispatchEvent(new CustomEvent("ba-labs-language-change", { detail: { language: currentLanguage } }));
   }
   function mountSelector() {
     const toolbar = document.querySelector(".app-toolbar");
