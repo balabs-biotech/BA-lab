@@ -4752,7 +4752,7 @@ function renderComparisonChart(group, batches, outlierIds) {
   }
   svg += '<line x1="' + left + '" y1="' + (height - bottom) + '" x2="' + (width - right) + '" y2="' + (height - bottom) + '" stroke="currentColor" opacity=".35"/>';
   batchIds.forEach((batchId, batchIndex) => {
-    const series = points.filter(point => point.batchId === batchId).sort((a, b) => new Date(a.date) - new Date(b.date));
+    const series = points.filter(point => point.batchId === batchId).sort((a, b) => new Date(a.measured_at) - new Date(b.measured_at));
     const color = palette[batchIndex % palette.length];
     if (series.length > 1) {
       const path = series.map((point, index) => (index ? "L" : "M") + x(point.measured_at).toFixed(2) + " " + y(point.value).toFixed(2)).join(" ");
