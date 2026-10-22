@@ -2276,8 +2276,15 @@ async function initializeAuthenticatedTracker(
 
     await loadLatestBatches();
 
-    await loadMeasurementReferences();
-    await loadRecentMeasurements();
+    try {
+      await loadMeasurementReferences();
+      await loadRecentMeasurements();
+      saveMeasurementButton.disabled = false;
+    } catch (measurementError) {
+      console.error("Initialisation du module de mesures :", measurementError);
+      measurementHistory.textContent = "Le module de mesures est indisponible pour le moment ; les modules de culture et de production restent utilisables.";
+      saveMeasurementButton.disabled = true;
+    }
 
     setDefaultDate();
 
@@ -5588,15 +5595,19 @@ async function saveMeasurement() {
     await loadRecentMeasurements();
   } catch (error) {
     console.error("Enregistrement mesure :", error);
-    if (eventId && !measurementSaved) {
-      const { error: cleanupError } = await supabaseClient
-        .from("events")
-        .delete()
-        .eq("organization_id", organizationId)
-        .eq("id", eventId);
-      if (cleanupError) console.error("Nettoyage de l’événement incomplet :", cleanupError);
+    if (measurementSaved) {
+      showMessage("La mesure a été enregistrée, mais l’actualisation de l’historique a échoué. Utilisez « Actualiser » pour recharger les données.", "warning");
+    } else {
+      if (eventId) {
+        const { error: cleanupError } = await supabaseClient
+          .from("events")
+          .delete()
+          .eq("organization_id", organizationId)
+          .eq("id", eventId);
+        if (cleanupError) console.error("Nettoyage de l’événement incomplet :", cleanupError);
+      }
+      showMessage(error.message || "L’enregistrement de la mesure a échoué.", "error");
     }
-    showMessage(error.message || "L’enregistrement de la mesure a échoué.", "error");
   } finally {
     saveMeasurementButton.disabled = false;
     saveMeasurementButton.textContent = "Enregistrer la mesure";
