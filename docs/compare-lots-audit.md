@@ -38,7 +38,7 @@ This is a point-in-time count, not an experiment. The current production data ca
 
 1. Add a read-only comparison panel to the existing Statistics module.
 2. Allow selection of two or more of the 30 most recently loaded production lots.
-3. Resolve records through batch events first. Records linked only to a culture or sample are assigned only when that culture maps unambiguously to one selected lot.
+3. Resolve records through batch events first. Records linked only to a culture or sample are assigned only when that culture maps to exactly one batch in the organization and that batch is selected.
 4. Query \`measurements\` and \`observations\` using existing organization-scoped RLS, paginating reads. Exclude records explicitly marked \`quality_state='excluded'\`; exclude numeric records with an \`exclusion_reason\`.
 5. Filter by optional date bounds. Show counts, actual data period, median and min/max by variable and unit, missing recorded values by selected lot, qualitative observation counts, time-series charts, and IQR outlier flags. Outliers remain visible and are never automatically removed.
 6. Calculate Pearson correlations only for pairs of different numeric variables with at least four paired lot-days, using daily means within the same lot. Label them exploratory and disclose that time, treatment and repeated measurements are not controlled.
@@ -49,7 +49,7 @@ This is a point-in-time count, not an experiment. The current production data ca
 
 - Compatible linear units are converted using the deployed unit factors/offsets. Kelvin/Celsius uses the standard affine conversion because the live catalogue currently records K with offset 0. Non-linear pH is never converted. If units cannot be converted safely from the available reference data, series remain separate.
 - A missing value means “no recorded value found for this lot/variable/window,” not “a scheduled measurement was missed”; the schema does not currently define an expected measurement cadence.
-- Culture-only and sample-only data are not assigned to a selected lot when more than one selected lot uses the same culture.
+- Culture-only and sample-only data are not assigned to a selected lot when the culture is associated with multiple batches in the organization.
 - \`results\` are not included in the lot-level comparison in this version: their deployed keys link them to experiments and experimental units, not directly to a batch. Joining them by guess would be misleading.
 - Correlation is not causal inference; no significance tests or treatment-effect claims are made.
 - This implementation introduces no tables, columns, RPCs, views, Edge Functions, data duplication, or production migration.
