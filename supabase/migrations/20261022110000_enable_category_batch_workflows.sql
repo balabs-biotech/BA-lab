@@ -51,6 +51,45 @@ begin
       using errcode = '22023';
   end if;
 
+  -- Validate every referenced resource at the RPC boundary; client-side
+  -- organization filters are not an authorization control.
+  if p_location_id is not null and not exists (
+    select 1 from public.locations l
+    where l.id=p_location_id and l.organization_id=p_organization_id
+  ) then
+    raise exception 'location_not_found_or_forbidden' using errcode = '23503';
+  end if;
+
+  if p_environment_id is not null and not exists (
+    select 1 from public.environments e
+    where e.id=p_environment_id
+      and e.organization_id=p_organization_id
+      and (e.location_id is null or e.location_id=p_location_id)
+  ) then
+    raise exception 'environment_not_found_or_incompatible' using errcode = '23503';
+  end if;
+
+  if p_culture_id is not null and not exists (
+    select 1 from public.cultures c
+    where c.id=p_culture_id and c.organization_id=p_organization_id
+  ) then
+    raise exception 'culture_not_found_or_forbidden' using errcode = '23503';
+  end if;
+
+  if p_material_id is not null and not exists (
+    select 1 from public.materials m
+    where m.id=p_material_id and m.organization_id=p_organization_id
+  ) then
+    raise exception 'material_not_found_or_forbidden' using errcode = '23503';
+  end if;
+
+  if p_protocol_version_id is not null and not exists (
+    select 1 from public.protocol_versions pv
+    where pv.id=p_protocol_version_id and pv.organization_id=p_organization_id
+  ) then
+    raise exception 'protocol_version_not_found_or_forbidden' using errcode = '23503';
+  end if;
+
   insert into public.batches(
     organization_id,batch_code,name,batch_type,protocol_version_id,
     material_id,culture_id,location_id,environment_id,planned_at,
