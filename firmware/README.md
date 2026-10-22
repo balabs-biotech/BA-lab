@@ -54,7 +54,9 @@ The control logic includes the following **software-only** protective measures. 
 - That node has no CO₂ sensor. If the chamber becomes hypoxic or hypercapnic, the software timer is unaware.
 
 **Network and remote operation:**
-- The code does not connect to Wi-Fi and sends no telemetry. Off-grid operation only.
+- The firmware itself still does not connect to Wi-Fi or send telemetry; no device has been provisioned or tested against the backend.
+- The authenticated ingestion endpoint is deployed separately. Its payload contract is documented in [`docs/architecture/iot-ingestion-v1.md`](../docs/architecture/iot-ingestion-v1.md). Do not add a service-role key to firmware; devices require an individually provisioned, revocable token.
+- The endpoint accepts measurements only. Remote relay control is intentionally out of scope.
 
 ## Calibration required before use
 
