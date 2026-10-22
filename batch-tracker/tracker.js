@@ -2314,7 +2314,7 @@ async function compareSelectedBatches() {
         const min = Math.min(...values);
         const max = Math.max(...values);
         const fmt = value => new Intl.NumberFormat(undefined, {maximumSignificantDigits: 5}).format(value);
-        return `${variable}${unit ? " (" + unit + ")" : ""}: ${labels.mean} ${fmt(mean)}, ${labels.range} ${fmt(min)}–${fmt(max)}, n=${values.length} [${quality}]`;
+        return `${variable}${unit ? " (" + unit + ")" : ""}: ${labels.mean} ${fmt(mean)}, ${labels.range} ${fmt(min)}–${fmt(max)}, n_mesures=${values.length} [${quality}]`;
       });
       const excluded = rows.filter(row => row.quality_state === "excluded").length;
       const nonNumeric = rows.filter(row => row.quality_state !== "excluded" && (row.normalized_value ?? row.raw_value) == null).length;
@@ -2364,9 +2364,23 @@ async function compareSelectedBatches() {
     });
     table.appendChild(tbody);
     results.appendChild(table);
-    status.textContent = (cultureMeasurementResult.data?.length >= 1000 || environmentMeasurementResult.data?.length >= 1000)
-      ? "Comparaison chargée avec une limite de 1 000 mesures récentes par lien culture/environnement ; les comptes peuvent être incomplets. Les mesures d'un environnement partagé peuvent apparaître pour plusieurs lots."
-      : "Comparaison chargée. Les mesures liées à la culture et/ou à l'environnement du lot sont prises en compte ; un environnement partagé peut donc contribuer à plusieurs lots. Les données manquantes ne sont pas interprétées comme zéro.";
+    const selectedUnitIds = batches
+      .map(batch => batch.culture_id ? contextsByCultureId.get(batch.culture_id)?.experimentalUnitId : null)
+      .filter(Boolean);
+    const repeatedUnitCount = selectedUnitIds.length - new Set(selectedUnitIds).size;
+    const capped = cultureMeasurementResult.data?.length >= 1000 || environmentMeasurementResult.data?.length >= 1000;
+    const statusParts = [
+      capped
+        ? "Comparaison chargée avec une limite de 1 000 mesures récentes par lien culture/environnement ; les comptes peuvent être incomplets."
+        : "Comparaison chargée.",
+      "n_mesures désigne le nombre de mesures, pas le nombre de répétitions biologiques indépendantes.",
+      "Les mesures d'un environnement partagé peuvent apparaître pour plusieurs lots.",
+      repeatedUnitCount > 0
+        ? `Attention : ${repeatedUnitCount} lien(s) d'unité expérimentale sont partagés entre les lots sélectionnés ; ces lots ne constituent pas autant de répétitions indépendantes.`
+        : "",
+      "Les données manquantes ne sont pas interprétées comme zéro."
+    ].filter(Boolean);
+    status.textContent = statusParts.join(" ");
   } catch (error) {
     status.textContent = error?.message || "Impossible de comparer les lots.";
   } finally {
