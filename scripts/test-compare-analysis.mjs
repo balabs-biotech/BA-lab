@@ -52,6 +52,7 @@ const batchSeries = [
 assert.deepEqual(Array.from(api.detectOutliersByBatch(batchSeries, ["a", "b"])), ["a4"]);
 assert.equal(api.detectOutlierIds(batchSeries).length, 0);
 assert.equal(api.dateKey("2026-10-22T12:00:00"), "2026-10-22");
+assert.equal(api.dateKey("2026-10-22"), "2026-10-22");
 assert.equal(api.dateInRange("2026-10-22T12:00:00", "2026-10-22", "2026-10-22"), true);
 assert.equal(api.dateInRange("2026-10-21T23:59:59", "2026-10-22", null), false);
 assert.equal(api.dateInRange(null, null, null), true);
