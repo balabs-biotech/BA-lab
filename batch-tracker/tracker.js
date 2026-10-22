@@ -4449,7 +4449,7 @@ function renderStatisticsFilters() {
   latestBatches.forEach(batch => {
     const option = document.createElement("option");
     option.value = batch.id;
-    option.textContent = (batch.batch_code || "Lot sans code") + (batch.name ? " · " + batch.name : "");
+    option.textContent = (batch.batch_code || comparisonText("Lot sans code", "Batch without code", "Lote sem código", "دفعة بلا رمز")) + (batch.name ? " · " + batch.name : "");
     batchSelect.appendChild(option);
   });
   if (latestBatches.some(batch => batch.id === previousBatch)) batchSelect.value = previousBatch;
@@ -4707,7 +4707,7 @@ function comparisonUnitLabel(code) {
     uL: ["µL", "µL", "µL", "ميكرولتر"]
   };
   const index = ({ fr: 0, en: 1, pt: 2, ar: 3 })[document.documentElement.lang || "fr"] || 0;
-  return labels[code]?.[index] || code || comparisonText("unité non renseignée", "unit not specified", "unidade não indicada", "الوحدة غير محددة");
+  return labels[code]?.[index] || code || comparisonText(comparisonText("unité non renseignée", "unit not specified", "unidade não indicada", "الوحدة غير محددة"), "unit not specified", "unidade não indicada", "الوحدة غير محددة");
 }
 
 function comparisonVariableLabel(variable) {
@@ -4779,7 +4779,7 @@ function renderComparisonBatchOptions() {
     const id = escapeHtml(batch.id);
     const code = escapeHtml(batch.batch_code || "Lot sans code");
     const name = escapeHtml(batch.name || batch.batch_type || "Sans description");
-    const stage = escapeHtml(batch.current_stage || batch.status || "Étape non renseignée");
+    const stage = escapeHtml(batch.current_stage || batch.status || comparisonText("Étape non renseignée", "Stage not specified", "Etapa não indicada", "المرحلة غير محددة"));
     return '<label class="comparison-batch-option"><input type="checkbox" name="compareBatch" value="' + id + '"' + (previouslySelected.has(batch.id) ? " checked" : "") + '><span><strong>' + code + '</strong><small>' + name + ' · ' + stage + '</small></span></label>';
   }).join("");
 }
@@ -4816,7 +4816,7 @@ function comparisonTable(headers, rows, caption) {
   const head = headers.map(value => "<th scope=\"col\">" + escapeHtml(value) + "</th>").join("");
   const body = rows.length
     ? rows.map(row => "<tr>" + row.map(value => "<td>" + value + "</td>").join("") + "</tr>").join("")
-    : '<tr><td colspan="' + headers.length + '">' + escapeHtml(comparisonText("Aucune donnée disponible.", "No data available.", "Nenhum dado disponível.", "لا تتوفر بيانات.")) + '</td></tr>';
+    : '<tr><td colspan="' + headers.length + '">' + escapeHtml(comparisonText(comparisonText("Aucune donnée disponible.", "No data available.", "Nenhum dado disponível.", "لا تتوفر بيانات."), "No data available.", "Nenhum dado disponível.", "لا تتوفر بيانات.")) + '</td></tr>';
   return '<div class="comparison-table-wrap"><table class="comparison-table"><caption>' + escapeHtml(caption) + '</caption><thead><tr>' + head + '</tr></thead><tbody>' + body + '</tbody></table></div>';
 }
 
@@ -4853,13 +4853,13 @@ function renderComparisonChart(group, batches, outlierIds) {
     }
     series.forEach(point => {
       const radius = outlierIds.has(point.id) ? 5 : 3.2;
-      svg += '<circle cx="' + x(point.measured_at).toFixed(2) + '" cy="' + y(point.value).toFixed(2) + '" r="' + radius + '" fill="' + color + '" stroke="' + (outlierIds.has(point.id) ? "#b91c1c" : "#fff") + '" stroke-width="' + (outlierIds.has(point.id) ? 2 : 1) + '"><title>' + escapeHtml((batchMap.get(batchId)?.batch_code || "Lot") + " · " + new Date(point.measured_at).toLocaleString(comparisonLocale()) + " · " + comparisonFormat(point.value) + " " + comparisonUnitLabel(group.unit)) + '</title></circle>';
+      svg += '<circle cx="' + x(point.measured_at).toFixed(2) + '" cy="' + y(point.value).toFixed(2) + '" r="' + radius + '" fill="' + color + '" stroke="' + (outlierIds.has(point.id) ? "#b91c1c" : "#fff") + '" stroke-width="' + (outlierIds.has(point.id) ? 2 : 1) + '"><title>' + escapeHtml((batchMap.get(batchId)?.batch_code || comparisonText("Lot", "Batch", "Lote", "دفعة")) + " · " + new Date(point.measured_at).toLocaleString(comparisonLocale()) + " · " + comparisonFormat(point.value) + " " + comparisonUnitLabel(group.unit)) + '</title></circle>';
     });
   });
   svg += '<text x="' + left + '" y="' + (height - 17) + '" font-size="10" fill="currentColor">' + new Date(minTime).toLocaleDateString(comparisonLocale()) + '</text>';
   svg += '<text x="' + (width - right) + '" y="' + (height - 17) + '" text-anchor="end" font-size="10" fill="currentColor">' + new Date(maxTime).toLocaleDateString(comparisonLocale()) + '</text>';
-  svg += '<text x="' + (left + plotWidth / 2) + '" y="' + (height - 2) + '" text-anchor="middle" font-size="10" fill="currentColor">Date de mesure</text></svg>';
-  const legend = batchIds.map((batchId, index) => '<span><i style="background:' + palette[index % palette.length] + '"></i>' + escapeHtml(batchMap.get(batchId)?.batch_code || "Lot sans code") + '</span>').join("");
+  svg += '<text x="' + (left + plotWidth / 2) + '" y="' + (height - 2) + '" text-anchor="middle" font-size="10" fill="currentColor">' + escapeHtml(comparisonText("Date de mesure", "Measurement date", "Data da medição", "تاريخ القياس")) + '</text></svg>';
+  const legend = batchIds.map((batchId, index) => '<span><i style="background:' + palette[index % palette.length] + '"></i>' + escapeHtml(batchMap.get(batchId)?.batch_code || comparisonText("Lot sans code", "Batch without code", "Lote sem código", "دفعة بلا رمز")) + '</span>').join("");
   return '<article class="comparison-chart-card"><h4>' + escapeHtml(group.label) + ' <span class="muted">(' + escapeHtml(comparisonUnitLabel(group.unit)) + ')</span></h4>' + svg + '<div class="comparison-legend">' + legend + '</div></article>';
 }
 
@@ -5006,7 +5006,7 @@ async function loadLotComparison() {
         return Object.assign({}, row, {
           value: converted !== null ? converted : sourceValue,
           unit: converted !== null ? targetUnitCode : sourceUnitCode,
-          valueBasis: converted !== null && sourceUnitCode !== targetUnitCode ? "convertie" : (normalized !== null && row.normalized_unit_code ? "normalisée" : "brute")
+          valueBasis: converted !== null && sourceUnitCode !== targetUnitCode ? comparisonText("convertie", "converted", "convertida", "محولة") : (normalized !== null && row.normalized_unit_code ? comparisonText("normalisée", "normalized", "normalizada", "مطَبَّعة") : comparisonText("brute", "raw", "bruta", "خام"))
         });
       }).filter(row => row.value !== null);
     const assignedObservations = observationRows.map(row => Object.assign({}, row, { batchId: assignBatch(row) }))
@@ -5047,7 +5047,7 @@ async function loadLotComparison() {
       descriptive.push(comparisonText(assignedMeasurements.length + " mesure(s) numérique(s) et " + assignedObservations.length + " observation(s) qualitative(s) sont exploitables après exclusion des enregistrements marqués exclus.", assignedMeasurements.length + " numeric measurement(s) and " + assignedObservations.length + " qualitative observation(s) are usable after excluding records marked as excluded.", assignedMeasurements.length + " medição(ões) numérica(s) e " + assignedObservations.length + " observação(ões) qualitativa(s) são utilizáveis após excluir os registos marcados como excluídos.", "يمكن استخدام " + assignedMeasurements.length + " قياس(ات) رقمي(ة) و" + assignedObservations.length + " ملاحظة(ات) نوعية بعد استبعاد السجلات المحددة كمستبعدة."));
     }
     if (outlierCount) descriptive.push(comparisonText(outlierCount + " valeur(s) atypique(s) signalée(s) par la règle exploratoire des 1,5 × IQR au sein de chaque lot ; elles restent incluses dans les graphiques et les statistiques.", outlierCount + " outlier(s) flagged by the exploratory 1.5 × IQR rule within each batch; they remain included in charts and statistics.", outlierCount + " valor(es) atípico(s) assinalado(s) pela regra exploratória de 1,5 × IQR dentro de cada lote; continuam incluídos nos gráficos e nas estatísticas.", "تم تحديد " + outlierCount + " قيمة شاذة وفق قاعدة 1.5 × IQR الاستكشافية داخل كل دفعة؛ وتظل مشمولة في الرسوم والإحصاءات."));
-    if (Array.from(cultureBatchCounts.values()).some(count => count > 1)) descriptive.push("Certaines cultures sont liées à plusieurs lots de votre organisation : les mesures/observations rattachées seulement à la culture ou à un échantillon sont laissées de côté pour éviter une attribution ambiguë.");
+    if (Array.from(cultureBatchCounts.values()).some(count => count > 1)) descriptive.push(comparisonText("Certaines cultures sont liées à plusieurs lots de votre organisation : les mesures/observations rattachées seulement à la culture ou à un échantillon sont laissées de côté pour éviter une attribution ambiguë.", "Some cultures are linked to multiple batches in your organization. Measurements or observations linked only to the culture or a sample are omitted to avoid ambiguous attribution.", "Algumas culturas estão associadas a vários lotes da sua organização. As medições ou observações ligadas apenas à cultura ou a uma amostra são omitidas para evitar uma atribuição ambígua.", "ترتبط بعض المزارع بعدة دفعات في مؤسستك. تُستبعد القياسات أو الملاحظات المرتبطة بالمزرعة أو العينة فقط لتجنب الإسناد الملتبس."));
     if (allDates.length) descriptive.push(comparisonText("Période réellement couverte par les données utilisées : ", "Actual period covered by the data used: ", "Período efetivamente abrangido pelos dados utilizados: ", "الفترة الفعلية التي تغطيها البيانات المستخدمة: ") + periodLabel + ".");
     const undatedCount = assignedMeasurements.filter(row => !row.measured_at).length + assignedObservations.filter(row => !row.observed_at).length;
     if (undatedCount) descriptive.push(comparisonText(undatedCount + " enregistrement(s) sans date sont inclus dans les effectifs, mais pas dans les graphiques temporels ni les corrélations.", undatedCount + " undated record(s) are included in counts but not in time-series charts or correlations.", undatedCount + " registo(s) sem data estão incluídos nas contagens, mas não nos gráficos temporais nem nas correlações.", "تم تضمين " + undatedCount + " سجل(ات) بلا تاريخ في الأعداد، ولكن ليس في الرسوم الزمنية أو الارتباطات."));
@@ -5072,7 +5072,7 @@ async function loadLotComparison() {
         perLot.forEach(row => metricRows.push(row));
         charts.innerHTML += renderComparisonChart(group, selectedBatches, outlierIds);
       });
-      tables.innerHTML += comparisonTable(["Variable · unité / lot", "n", "Médiane", "Min–max", "Valeurs atypiques"], metricRows, "Mesures numériques par lot et unité");
+      tables.innerHTML += comparisonTable([comparisonText("Variable · unité / lot", "Variable · unit / batch", "Variável · unidade / lote", "المتغير · الوحدة / الدفعة"), "n", comparisonText("Médiane", "Median", "Mediana", "الوسيط"), comparisonText("Min–max", "Min–max", "Mín–máx", "الحد الأدنى–الأقصى"), comparisonText("Valeurs atypiques", "Outliers", "Valores atípicos", "القيم الشاذة")], metricRows, comparisonText("Mesures numériques par lot et unité", "Numeric measurements by batch and unit", "Medições numéricas por lote e unidade", "القياسات الرقمية حسب الدفعة والوحدة"));
     } else {
       tables.innerHTML += '<div class="comparison-empty">Aucune mesure numérique exploitable dans la sélection. Les observations qualitatives restent analysées séparément.</div>';
     }
@@ -5090,10 +5090,10 @@ async function loadLotComparison() {
         selectedBatches.forEach(batch => {
           const values = group.rows.filter(row => row.batchId === batch.id);
           const latest = values.slice().sort((a, b) => new Date(b.observed_at || 0) - new Date(a.observed_at || 0))[0];
-          observationRows.push([escapeHtml(group.label), escapeHtml(batch.batch_code || "Lot sans code"), String(values.length), latest ? escapeHtml(String(latest.value_text || "Observation sans texte")) : "Aucune observation enregistrée", latest?.observed_at ? escapeHtml(new Date(latest.observed_at).toLocaleDateString(comparisonLocale())) : "—"]);
+          observationRows.push([escapeHtml(group.label), escapeHtml(batch.batch_code || "Lot sans code"), String(values.length), latest ? escapeHtml(String(latest.value_text || comparisonText("Observation sans texte", "Observation without text", "Observação sem texto", "ملاحظة بلا نص"))) : comparisonText("Aucune observation enregistrée", "No observation recorded", "Nenhuma observação registada", "لم تُسجل ملاحظة"), latest?.observed_at ? escapeHtml(new Date(latest.observed_at).toLocaleDateString(comparisonLocale())) : "—"]);
         });
       });
-      tables.innerHTML += comparisonTable(["Variable observée", "Lot", "n", "Dernière valeur textuelle", "Dernière date"], observationRows, "Observations qualitatives par lot");
+      tables.innerHTML += comparisonTable([comparisonText("Variable observée", "Observed variable", "Variável observada", "المتغير المرصود"), comparisonText("Lot", "Batch", "Lote", "دفعة"), "n", comparisonText("Dernière valeur textuelle", "Latest text value", "Último valor textual", "أحدث قيمة نصية"), comparisonText("Dernière date", "Latest date", "Data mais recente", "أحدث تاريخ")], observationRows, comparisonText("Observations qualitatives par lot", "Qualitative observations by batch", "Observações qualitativas por lote", "الملاحظات النوعية حسب الدفعة"));
     } else {
       tables.innerHTML += '<div class="comparison-empty">Aucune observation qualitative enregistrée pour les lots sélectionnés et la période choisie.</div>';
     }
@@ -5125,7 +5125,7 @@ async function loadLotComparison() {
     correlations.sort((a, b) => Math.abs(b.r) - Math.abs(a.r));
     if (correlations.length) {
       const rows = correlations.slice(0, 8).map(item => [escapeHtml(item.a.label + " (" + comparisonUnitLabel(item.a.unit) + ")"), escapeHtml(item.b.label + " (" + comparisonUnitLabel(item.b.unit) + ")"), String(item.n), '<span class="comparison-correlation">' + comparisonFormat(item.r, 3) + '</span>', Math.abs(item.r) >= 0.7 ? comparisonText("Association linéaire exploratoire marquée", "Strong exploratory linear association", "Associação linear exploratória forte", "ارتباط خطي استكشافي قوي") : comparisonText("Association linéaire exploratoire", "Exploratory linear association", "Associação linear exploratória", "ارتباط خطي استكشافي")]);
-      findings.innerHTML += '<article class="comparison-finding"><h4>2. Corrélations exploratoires</h4><p>Corrélation de Pearson sur des moyennes journalières appariées au sein du même lot (au moins 4 journées appariées). Les répétitions ne sont pas indépendantes et les effets du temps ou des traitements ne sont pas contrôlés.</p>' + comparisonTable(["Variable A", "Variable B", "Journées appariées (n)", "r de Pearson", "Lecture"], rows, "Associations observées") + '<p>' + escapeHtml(comparisonText("Une corrélation, même forte, ne démontre pas de causalité.", "A correlation, even a strong one, does not demonstrate causality.", "Uma correlação, mesmo forte, não demonstra causalidade.", "الارتباط، حتى إن كان قوياً، لا يثبت السببية.")) + '</p></article>';
+      findings.innerHTML += '<article class="comparison-finding"><h4>' + escapeHtml(comparisonText("2. Corrélations exploratoires", "2. Exploratory correlations", "2. Correlações exploratórias", "2. الارتباطات الاستكشافية")) + '</h4><p>' + escapeHtml(comparisonText("Corrélation de Pearson sur des moyennes journalières appariées au sein du même lot (au moins 4 journées appariées). Les répétitions ne sont pas indépendantes et les effets du temps ou des traitements ne sont pas contrôlés.", "Pearson correlation on paired daily means within the same batch (at least 4 paired days). Repeated observations are not independent, and time or treatment effects are not controlled.", "Correlação de Pearson sobre médias diárias emparelhadas no mesmo lote (pelo menos 4 dias emparelhados). As repetições não são independentes e os efeitos do tempo ou dos tratamentos não são controlados.", "ارتباط بيرسون على المتوسطات اليومية المقترنة داخل الدفعة نفسها (4 أيام مقترنة على الأقل). القياسات المتكررة ليست مستقلة، ولم تُضبط آثار الزمن أو المعالجات.")) + '</p>'' + comparisonTable([comparisonText("Variable A", "Variable A", "Variável A", "المتغير أ"), comparisonText("Variable B", "Variable B", "Variável B", "المتغير ب"), comparisonText("Journées appariées (n)", "Paired days (n)", "Dias emparelhados (n)", "الأيام المقترنة (n)"), comparisonText("r de Pearson", "Pearson r", "r de Pearson", "معامل بيرسون r"), comparisonText("Lecture", "Interpretation", "Interpretação", "التفسير")], rows, comparisonText("Associations observées", "Observed associations", "Associações observadas", "الارتباطات المرصودة")) + '<p>' + escapeHtml(comparisonText("Une corrélation, même forte, ne démontre pas de causalité.", "A correlation, even a strong one, does not demonstrate causality.", "Uma correlação, mesmo forte, não demonstra causalidade.", "الارتباط، حتى إن كان قوياً، لا يثبت السببية.")) + '</p></article>';
     } else {
       findings.innerHTML += '<article class="comparison-finding"><h4>2. Corrélations exploratoires</h4><p>' + escapeHtml(comparisonText("Pas assez de journées appariées entre variables différentes pour calculer une corrélation interprétable (minimum opérationnel : 4 journées au sein du même lot).", "Not enough paired days between different variables to calculate an interpretable correlation (operational minimum: 4 days within the same batch).", "Não existem dias emparelhados suficientes entre variáveis diferentes para calcular uma correlação interpretável (mínimo operacional: 4 dias no mesmo lote).", "لا توجد أيام مقترنة كافية بين المتغيرات المختلفة لحساب ارتباط قابل للتفسير (الحد الأدنى العملي: 4 أيام داخل الدفعة نفسها).")) + '</p></article>';
     }
@@ -5136,7 +5136,7 @@ async function loadLotComparison() {
     const hypothesisText = candidates.length
       ? comparisonText("Pour un prochain essai, envisager de mesurer conjointement — si pertinent pour le système étudié — ", "For a future trial, consider measuring together — if relevant to the system studied — ", "Num próximo ensaio, considere medir em conjunto — se for pertinente para o sistema estudado — ", "في تجربة لاحقة، فكّر في قياس المتغيرات معاً — إذا كان ذلك مناسباً للنظام المدروس — ") + candidates.slice(0, 6).map(variable => comparisonVariableLabel(variable) + " (" + variable.code + ")").join(", ") + comparisonText(". Définir avant l’essai la variable de réponse, la fréquence, la méthode et les répétitions.", ". Define the response variable, frequency, method and replicates before the trial.", ". Defina a variável de resposta, a frequência, o método e as repetições antes do ensaio.", ". حدّد متغير الاستجابة والتواتر والطريقة والتكرارات قبل التجربة.")
       : comparisonText("Choisir une variable de réponse et enregistrer en parallèle les facteurs de milieu ou de procédé pertinents déjà présents dans le catalogue. Préspécifier fréquence, méthode, unités et répétitions.", "Choose a response variable and simultaneously record relevant environmental or process factors already in the catalogue. Predefine frequency, method, units and replicates.", "Escolha uma variável de resposta e registe em paralelo os fatores ambientais ou de processo relevantes já existentes no catálogo. Defina previamente frequência, método, unidades e repetições.", "اختر متغير استجابة وسجّل بالتوازي عوامل البيئة أو العملية ذات الصلة الموجودة في الكتالوج. حدّد مسبقاً التواتر والطريقة والوحدات والتكرارات.");
-    findings.innerHTML += '<article class="comparison-finding"><h4>3. Hypothèses à tester ensuite</h4><p>' + escapeHtml(hypothesisText) + '</p><p>' + escapeHtml(comparisonText("Ces variables sont des pistes de protocole, pas des explications démontrées des différences observées.", "These variables are protocol ideas, not proven explanations for the observed differences.", "Estas variáveis são pistas para o protocolo, não explicações comprovadas das diferenças observadas.", "هذه المتغيرات مقترحات للبروتوكول وليست تفسيرات مثبتة للاختلافات المرصودة.")) + '</p></article>';
+    findings.innerHTML += '<article class="comparison-finding"><h4>' + escapeHtml(comparisonText("3. Hypothèses à tester ensuite", "3. Hypotheses to test next", "3. Hipóteses a testar a seguir", "3. فرضيات للاختبار لاحقاً")) + '</h4><p>' + escapeHtml(hypothesisText) + '</p><p>' + escapeHtml(comparisonText("Ces variables sont des pistes de protocole, pas des explications démontrées des différences observées.", "These variables are protocol ideas, not proven explanations for the observed differences.", "Estas variáveis são pistas para o protocolo, não explicações comprovadas das diferenças observadas.", "هذه المتغيرات مقترحات للبروتوكول وليست تفسيرات مثبتة للاختلافات المرصودة.")) + '</p></article>';
 
     const selectedPeriodText = (fromDate || comparisonText("début non limité", "unbounded start", "início sem limite", "بداية غير محددة")) + " → " + (toDate || comparisonText("fin non limitée", "unbounded end", "fim não limitado", "نهاية غير محددة"));
     status.textContent = comparisonText("Comparaison terminée : ", "Comparison complete: ", "Comparação concluída: ", "اكتملت المقارنة: ") + selectedBatches.length + comparisonText(" lots ; ", " batches; ", " lotes; ", " دفعات؛ ") + assignedMeasurements.length + comparisonText(" mesures et ", " measurements and ", " medições e ", " قياسات و") + assignedObservations.length + comparisonText(" observations retenues. Filtre demandé : ", " observations retained. Requested filter: ", " observações incluídas. Filtro solicitado: ", " ملاحظات مدرجة. المرشح المطلوب: ") + selectedPeriodText + comparisonText(". Période des données : ", ". Data period: ", ". Período dos dados: ", ". فترة البيانات: ") + periodLabel + ".";
