@@ -879,6 +879,20 @@ button,input,select,textarea{border-radius:9px}button{min-height:42px}.hidden{di
 @media(max-width:650px){.culture-catalog-list{grid-template-columns:minmax(0,1fr);gap:9px}.culture-catalog-row{padding:13px}.culture-catalog-actions{grid-template-columns:repeat(2,minmax(0,1fr))}.culture-catalog-action{min-height:42px}}
 @media(prefers-reduced-motion:reduce){.culture-catalog-row{transition:none}.culture-catalog-row:hover{transform:none}}
 .culture-detail{margin-top:18px;padding:18px;border:1px solid #d6e2d2;border-radius:13px;background:#fbfcf8}
+.bio-operation-panel,.bio-lineage-panel{margin-top:18px;padding:15px;border:1px solid var(--border);border-radius:11px;background:var(--surface,#fff)}
+.bio-operation-panel h4,.bio-lineage-panel h4{margin:0 0 8px}
+.bio-operation-form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:12px}
+.bio-operation-form label{display:block;margin:0 0 5px;font-size:12px;font-weight:700}
+.bio-operation-form input,.bio-operation-form select,.bio-operation-form textarea{width:100%;box-sizing:border-box}
+.bio-operation-wide{grid-column:1/-1}
+.bio-operation-wide small{display:block;color:var(--muted);margin-top:4px;font-size:11px}
+.culture-lineage{display:grid;gap:8px}
+.culture-lineage-list{display:flex;flex-wrap:wrap;gap:7px;align-items:center}
+.culture-lineage-node{padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:var(--surface,#fff);font-size:12px}
+.culture-lineage-node strong{display:block}
+.culture-lineage-node small{display:block;color:var(--muted);margin-top:3px}
+.culture-lineage-arrow{color:var(--muted);font-weight:800}
+@media(max-width:650px){.bio-operation-form{grid-template-columns:minmax(0,1fr)}.bio-operation-wide{grid-column:auto}}
 .culture-detail-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
 .culture-detail-heading h3{margin:5px 0 4px;padding:0;border:0;font-size:18px}
 .culture-detail-heading p{margin:0}
@@ -1458,7 +1472,20 @@ body[data-domain="laboratory"] .section-nav a[aria-current="page"]{background:#e
       <section id="cultureDetailPanel" class="culture-detail hidden" aria-labelledby="cultureDetailTitle">
         <div class="culture-detail-heading"><div><span class="section-kicker-label">FICHE EXPÉRIMENTALE</span><h3 id="cultureDetailTitle">Culture</h3><p id="cultureDetailMeta" class="muted"></p></div><button id="closeCultureDetail" type="button" class="secondary-button small-button">Fermer la fiche</button></div>
         <div class="culture-detail-summary" id="cultureDetailSummary"></div>
-        <h4>Chronologie disponible</h4>
+<section class="bio-operation-panel" aria-labelledby="bioOperationTitle">
+<h4 id="bioOperationTitle">Tracer une opération biologique</h4>
+<p class="muted">Enregistrez l’opération sur la culture source. Pour un repiquage, un passage ou une division, ajoutez les codes des descendants : leurs fiches et liens de filiation seront créés ensemble.</p>
+<form id="bioOperationForm" class="bio-operation-form">
+<div><label for="bioOperationType">Opération</label><select id="bioOperationType" required>
+<option value="repiquage">Repiquage</option><option value="passage">Passage</option><option value="transfert">Transfert</option><option value="division_aliquotes">Division en aliquotes</option><option value="changement_milieu">Changement de milieu</option><option value="contamination_suspectee">Contamination suspectée</option><option value="conservation">Conservation</option><option value="resultat_final">Résultat final</option><option value="autre_operation">Autre opération</option>
+</select></div>
+<div><label for="bioOperationDate">Date et heure</label><input id="bioOperationDate" type="datetime-local" required></div>
+<div class="bio-operation-wide"><label for="bioChildCodes">Codes des descendants (facultatif)</label><input id="bioChildCodes" type="text" placeholder="Ex. PO-P80-G2-A, PO-P80-G2-B"><small>Un code par virgule. Pour une division en aliquotes, indiquez un code par aliquote.</small></div>
+<div class="bio-operation-wide"><label for="bioOperationNote">Compte rendu / observations</label><textarea id="bioOperationNote" rows="2" placeholder="Milieu, quantité, conditions, résultat ou suspicion…"></textarea></div>
+<div class="bio-operation-wide"><button id="saveBioOperation" type="submit">Enregistrer l’opération</button><p id="bioOperationMessage" class="muted" aria-live="polite"></p></div>
+</form></section>
+<section class="bio-lineage-panel" aria-labelledby="bioLineageTitle"><h4 id="bioLineageTitle">Filiation biologique</h4><div id="cultureLineage" class="culture-lineage"><p class="muted">Chargement de la filiation…</p></div></section>
+<h4>Chronologie complète</h4>
         <div id="cultureDetailTimeline" class="culture-detail-timeline"><p class="muted">Sélectionnez une culture pour charger son historique.</p></div>
       </section>
     </section>
@@ -6557,6 +6584,65 @@ async function loadStatistics() {
   finally { if (requestId === statisticsRequestId) { button.disabled=false; button.textContent="Analyser les données"; } }
 }
 
+async function loadBiologicalLineage(cultureId) {
+  const target = document.getElementById('cultureLineage');
+  if (!target || !organizationId) return;
+  target.textContent = 'Chargement de la filiation…';
+  try {
+    const { data, error } = await supabaseClient.from('cultures')
+      .select('id,code,culture_type,material_id,parent_culture_id,started_at,metadata')
+      .eq('organization_id', organizationId).order('created_at', { ascending: true }).limit(1000);
+    if (error) throw error;
+    const rows = data || [];
+    const byId = new Map(rows.map(row => [row.id, row]));
+    const current = byId.get(cultureId);
+    if (!current) { target.textContent = 'Culture absente du périmètre chargé.'; return; }
+    const ancestors = []; let parentId = current.parent_culture_id; let guard = 0;
+    while (parentId && guard++ < 50) { const parent = byId.get(parentId); if (!parent) break; ancestors.unshift(parent); parentId = parent.parent_culture_id; }
+    const descendants = []; const queue = [{ id: current.id, depth: 0 }]; const visited = new Set([current.id]);
+    while (queue.length && descendants.length < 200) { const node = queue.shift(); for (const child of rows.filter(row => row.parent_culture_id === node.id)) { if (visited.has(child.id)) continue; visited.add(child.id); descendants.push({ ...child, depth: node.depth + 1 }); queue.push({ id: child.id, depth: node.depth + 1 }); } }
+    const renderNode = (row, label) => { const node = document.createElement('div'); node.className = 'culture-lineage-node'; const strong = document.createElement('strong'); strong.textContent = row.code || 'Culture sans code'; const small = document.createElement('small'); small.textContent = label + ' · ' + (row.culture_type || 'type non renseigné'); node.append(strong, small); return node; };
+    target.replaceChildren();
+    const makeGroup = (title, items) => { const section = document.createElement('section'); const heading = document.createElement('p'); heading.className = 'muted'; heading.textContent = title; section.appendChild(heading); const list = document.createElement('div'); list.className = 'culture-lineage-list'; items.forEach((item, index) => { if (index) { const arrow = document.createElement('span'); arrow.className = 'culture-lineage-arrow'; arrow.textContent = '→'; list.appendChild(arrow); } list.appendChild(renderNode(item.row, item.label)); }); section.appendChild(list); target.appendChild(section); };
+    if (ancestors.length) makeGroup('Origine et ascendants', ancestors.map(row => ({ row, label: 'Ascendant' })));
+    makeGroup('Culture sélectionnée', [{ row: current, label: 'Fiche ouverte' }]);
+    if (descendants.length) makeGroup('Descendants (' + descendants.length + ')', descendants.map(row => ({ row, label: 'Génération ' + (row.depth || 1) })));
+    if (!ancestors.length && !descendants.length) { const p = document.createElement('p'); p.className = 'muted'; p.textContent = 'Aucun ascendant ou descendant enregistré dans les fiches de culture. L’origine matérielle initiale reste indiquée par l’identifiant matériel de la fiche.'; target.appendChild(p); }
+    if (rows.length >= 1000) { const note = document.createElement('p'); note.className = 'muted'; note.textContent = 'Filiation partielle : limite de 1 000 cultures atteinte.'; target.appendChild(note); }
+  } catch (error) { target.textContent = 'Impossible de charger la filiation : ' + (error.message || error); }
+}
+
+async function saveBiologicalOperation(event) {
+  event.preventDefault();
+  const button = document.getElementById('saveBioOperation');
+  const message = document.getElementById('bioOperationMessage');
+  const cultureId = document.getElementById('cultureDetailPanel')?.dataset.cultureId;
+  if (!cultureId || !organizationId) { message.textContent = 'Sélectionnez une culture avant d’enregistrer.'; return; }
+  const operationType = document.getElementById('bioOperationType').value;
+  const dateValue = document.getElementById('bioOperationDate').value;
+  const note = document.getElementById('bioOperationNote').value.trim();
+  const childCodes = [...new Set(document.getElementById('bioChildCodes').value.split(',').map(value => value.trim()).filter(Boolean))];
+  if (!dateValue) { message.textContent = 'Indiquez la date de l’opération.'; return; }
+  if (childCodes.length > 12) { message.textContent = 'Maximum : 12 descendants par opération.'; return; }
+  if (childCodes.length && !['repiquage','passage','transfert','division_aliquotes','changement_milieu','conservation'].includes(operationType)) { message.textContent = 'Cette opération ne peut pas créer de descendants. Retirez les codes ou choisissez une opération de propagation.'; return; }
+  button.disabled = true; button.textContent = 'Enregistrement…'; message.textContent = '';
+  try {
+    const { data, error } = await supabaseClient.rpc('record_biological_operation', {
+      p_organization_id: organizationId, p_parent_culture_id: cultureId, p_event_type: operationType,
+      p_occurred_at: new Date(dateValue).toISOString(), p_note: note || null,
+      p_details: { source: 'BA Labs Culture Tracker', interface_version: '3.0' }, p_child_codes: childCodes
+    });
+    if (error) throw error;
+    const result = Array.isArray(data) ? data[0] : data;
+    document.getElementById('bioOperationNote').value = ''; document.getElementById('bioChildCodes').value = '';
+    message.textContent = 'Opération enregistrée' + (result?.children?.length ? ' · ' + result.children.length + ' descendant(s) créé(s).' : '.') ;
+    await loadCultureOptions();
+    await loadCultureDetail(cultureId);
+    await loadBiologicalLineage(cultureId);
+  } catch (error) { message.textContent = 'Échec : ' + (error.message || 'opération non enregistrée'); }
+  finally { button.disabled = false; button.textContent = 'Enregistrer l’opération'; }
+}
+
 let cultureDetailRequestId = 0;
 
 async function loadCultureDetail(cultureId) {
@@ -6569,6 +6655,8 @@ async function loadCultureDetail(cultureId) {
   const timeline = document.getElementById("cultureDetailTimeline");
   if (!culture || !panel || !title || !meta || !summary || !timeline) return;
 
+  panel.dataset.cultureId = culture.id;
+  loadBiologicalLineage(culture.id);
   panel.classList.remove("hidden");
   title.textContent = culture.code || "Culture sans code";
   meta.textContent = culture.culture_type || "Type de culture non renseigné";
@@ -6986,6 +7074,8 @@ function setupUiEnhancements() {
   document.getElementById("statisticsPeriod")?.addEventListener("change", () => { document.getElementById("statisticsStatus").textContent = "Période modifiée. Lancez l’analyse pour actualiser les résultats."; });
   document.getElementById("cultureSearch")?.addEventListener("input", renderCultureCatalog);
   document.getElementById("cultureTypeFilter")?.addEventListener("change", renderCultureCatalog);
+  document.getElementById("bioOperationForm")?.addEventListener("submit", saveBiologicalOperation);
+  document.getElementById("bioOperationDate")?.setAttribute("value", new Date().toISOString().slice(0,16));
   document.getElementById("closeCultureDetail")?.addEventListener("click", () => {
     document.getElementById("cultureDetailPanel")?.classList.add("hidden");
   });
