@@ -2202,21 +2202,33 @@ async function compareSelectedBatches() {
   results.replaceChildren();
   try {
     const cultureIds = [...new Set(batches.map(batch => batch.culture_id).filter(Boolean))];
-    const [stageResult, measurementResult] = await Promise.all([
+    const environmentIds = [...new Set(batches.map(batch => batch.environment_id).filter(Boolean))];
+    const [stageResult, cultureMeasurementResult, environmentMeasurementResult] = await Promise.all([
       supabaseClient.from("batch_stages")
         .select("batch_id,stage_code,status,sequence_no,started_at,completed_at")
         .eq("organization_id", organizationId).in("batch_id", ids),
       cultureIds.length
         ? supabaseClient.from("measurements")
-            .select("culture_id,variable_code,raw_value,raw_unit_code,normalized_value,normalized_unit_code,measured_at,quality_state,exclusion_reason")
+            .select("id,culture_id,environment_id,variable_code,raw_value,raw_unit_code,normalized_value,normalized_unit_code,measured_at,quality_state,exclusion_reason")
             .eq("organization_id", organizationId).in("culture_id", cultureIds)
+            .order("measured_at", { ascending: false }).limit(1000)
+        : Promise.resolve({data:[],error:null}),
+      environmentIds.length
+        ? supabaseClient.from("measurements")
+            .select("id,culture_id,environment_id,variable_code,raw_value,raw_unit_code,normalized_value,normalized_unit_code,measured_at,quality_state,exclusion_reason")
+            .eq("organization_id", organizationId).in("environment_id", environmentIds)
             .order("measured_at", { ascending: false }).limit(1000)
         : Promise.resolve({data:[],error:null})
     ]);
     if (stageResult.error) throw new Error("Chargement des étapes impossible : " + stageResult.error.message);
-    if (measurementResult.error) throw new Error("Chargement des mesures impossible : " + measurementResult.error.message);
+    if (cultureMeasurementResult.error) throw new Error("Chargement des mesures de culture impossible : " + cultureMeasurementResult.error.message);
+    if (environmentMeasurementResult.error) throw new Error("Chargement des mesures d'environnement impossible : " + environmentMeasurementResult.error.message);
     const stages = stageResult.data || [];
-    const measurements = measurementResult.data || [];
+    const measurementMap = new Map();
+    [...(cultureMeasurementResult.data || []), ...(environmentMeasurementResult.data || [])].forEach(row => {
+      if (row.id) measurementMap.set(row.id, row);
+    });
+    const measurements = [...measurementMap.values()];
     const table = document.createElement("table");
     table.className = "statistics-table";
     table.innerHTML = "<caption>Comparaison descriptive des lots sélectionnés</caption><thead><tr><th>Lot</th><th>Type</th><th>État / étape</th><th>Quantité prévue</th><th>Quantité réelle</th><th>Étapes terminées</th><th>Mesures liées à la culture</th><th>Résumé numérique par variable</th><th>Dernière mesure</th></tr></thead>";
@@ -2224,7 +2236,10 @@ async function compareSelectedBatches() {
     batches.forEach(batch => {
       const batchStages = stages.filter(stage => stage.batch_id === batch.id);
       const completed = batchStages.filter(stage => stage.status === "completed").length;
-      const linked = batch.culture_id ? measurements.filter(row => row.culture_id === batch.culture_id) : [];
+      const linked = measurements.filter(row =>
+        (batch.culture_id && row.culture_id === batch.culture_id) ||
+        (batch.environment_id && row.environment_id === batch.environment_id)
+      );
       const lastDate = linked.reduce((latest, row) => {
         const date = row.measured_at ? new Date(row.measured_at) : null;
         return date && (!latest || date > latest) ? date : latest;
@@ -2236,7 +2251,7 @@ async function compareSelectedBatches() {
         batch.quantity_planned == null ? "—" : `${batch.quantity_planned} ${batch.quantity_unit_code || ""}`.trim(),
         batch.quantity_actual == null ? "—" : `${batch.quantity_actual} ${batch.quantity_unit_code || ""}`.trim(),
         `${completed} / ${batchStages.length}`,
-        batch.culture_id ? String(linked.length) : "Aucune culture directement liée",
+        linked.length ? String(linked.length) : "Aucune mesure liée à la culture ou à l'environnement",
         (() => {
           const groups = new Map();
           linked.forEach(row => {
@@ -2277,9 +2292,9 @@ async function compareSelectedBatches() {
     });
     table.appendChild(tbody);
     results.appendChild(table);
-    status.textContent = measurements.length >= 1000
-      ? "Comparaison chargée avec une limite de 1 000 mesures récentes au total ; les comptes peuvent être incomplets. Seules les mesures directement liées à la culture du lot sont prises en compte."
-      : "Comparaison chargée. Seules les mesures directement liées à la culture du lot sont comptées ; les données manquantes ne sont pas interprétées comme zéro.";
+    status.textContent = (cultureMeasurementResult.data?.length >= 1000 || environmentMeasurementResult.data?.length >= 1000)
+      ? "Comparaison chargée avec une limite de 1 000 mesures récentes par lien culture/environnement ; les comptes peuvent être incomplets. Les mesures d'un environnement partagé peuvent apparaître pour plusieurs lots."
+      : "Comparaison chargée. Les mesures liées à la culture et/ou à l'environnement du lot sont prises en compte ; un environnement partagé peut donc contribuer à plusieurs lots. Les données manquantes ne sont pas interprétées comme zéro.";
   } catch (error) {
     status.textContent = error?.message || "Impossible de comparer les lots.";
   } finally {
