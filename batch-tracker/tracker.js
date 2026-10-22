@@ -4723,13 +4723,13 @@ function comparisonTable(headers, rows, caption) {
   const head = headers.map(value => "<th scope=\"col\">" + escapeHtml(value) + "</th>").join("");
   const body = rows.length
     ? rows.map(row => "<tr>" + row.map(value => "<td>" + value + "</td>").join("") + "</tr>").join("")
-    : '<tr><td colspan="' + headers.length + '">Aucune donnée disponible.</td></tr>';
+    : '<tr><td colspan="' + headers.length + '">' + escapeHtml(comparisonText("Aucune donnée disponible.", "No data available.", "Nenhum dado disponível.", "لا تتوفر بيانات.")) + '</td></tr>';
   return '<div class="comparison-table-wrap"><table class="comparison-table"><caption>' + escapeHtml(caption) + '</caption><thead><tr>' + head + '</tr></thead><tbody>' + body + '</tbody></table></div>';
 }
 
 function renderComparisonChart(group, batches, outlierIds) {
   const points = group.points.filter(point => Number.isFinite(point.value) && point.measured_at);
-  if (!points.length) return '<div class="comparison-empty">Aucune série temporelle datée pour ' + escapeHtml(group.label) + '.</div>';
+  if (!points.length) return '<div class="comparison-empty">' + escapeHtml(comparisonText("Aucune série temporelle datée pour ", "No dated time series for ", "Não existe série temporal datada para ", "لا توجد سلسلة زمنية مؤرخة لـ ") + group.label) + '.</div>';
   const width = 760, height = 260, left = 58, right = 20, top = 20, bottom = 48;
   const plotWidth = width - left - right, plotHeight = height - top - bottom;
   const times = points.map(point => new Date(point.measured_at).getTime());
@@ -4743,7 +4743,7 @@ function renderComparisonChart(group, batches, outlierIds) {
   const batchIds = Array.from(new Set(points.map(point => point.batchId)));
   const x = value => left + ((new Date(value).getTime() - minTime) / (maxTime - minTime)) * plotWidth;
   const y = value => top + (1 - (value - minValue) / (maxValue - minValue)) * plotHeight;
-  let svg = '<svg viewBox="0 0 ' + width + ' ' + height + '" role="img" aria-label="Évolution temporelle de ' + escapeHtml(group.label) + '">';
+  let svg = '<svg viewBox="0 0 ' + width + ' ' + height + '" role="img" aria-label="' + escapeHtml(comparisonText("Évolution temporelle de ", "Time evolution of ", "Evolução temporal de ", "التغير الزمني لـ ") + group.label) + '">';
   for (let tick = 0; tick < 5; tick++) {
     const value = minValue + ((maxValue - minValue) * tick / 4);
     const py = y(value);
@@ -4760,11 +4760,11 @@ function renderComparisonChart(group, batches, outlierIds) {
     }
     series.forEach(point => {
       const radius = outlierIds.has(point.id) ? 5 : 3.2;
-      svg += '<circle cx="' + x(point.measured_at).toFixed(2) + '" cy="' + y(point.value).toFixed(2) + '" r="' + radius + '" fill="' + color + '" stroke="' + (outlierIds.has(point.id) ? "#b91c1c" : "#fff") + '" stroke-width="' + (outlierIds.has(point.id) ? 2 : 1) + '"><title>' + escapeHtml((batchMap.get(batchId)?.batch_code || "Lot") + " · " + new Date(point.measured_at).toLocaleString("fr-FR") + " · " + comparisonFormat(point.value) + " " + group.unit) + '</title></circle>';
+      svg += '<circle cx="' + x(point.measured_at).toFixed(2) + '" cy="' + y(point.value).toFixed(2) + '" r="' + radius + '" fill="' + color + '" stroke="' + (outlierIds.has(point.id) ? "#b91c1c" : "#fff") + '" stroke-width="' + (outlierIds.has(point.id) ? 2 : 1) + '"><title>' + escapeHtml((batchMap.get(batchId)?.batch_code || "Lot") + " · " + new Date(point.measured_at).toLocaleString(comparisonLocale()) + " · " + comparisonFormat(point.value) + " " + group.unit) + '</title></circle>';
     });
   });
-  svg += '<text x="' + left + '" y="' + (height - 17) + '" font-size="10" fill="currentColor">' + new Date(minTime).toLocaleDateString("fr-FR") + '</text>';
-  svg += '<text x="' + (width - right) + '" y="' + (height - 17) + '" text-anchor="end" font-size="10" fill="currentColor">' + new Date(maxTime).toLocaleDateString("fr-FR") + '</text>';
+  svg += '<text x="' + left + '" y="' + (height - 17) + '" font-size="10" fill="currentColor">' + new Date(minTime).toLocaleDateString(comparisonLocale()) + '</text>';
+  svg += '<text x="' + (width - right) + '" y="' + (height - 17) + '" text-anchor="end" font-size="10" fill="currentColor">' + new Date(maxTime).toLocaleDateString(comparisonLocale()) + '</text>';
   svg += '<text x="' + (left + plotWidth / 2) + '" y="' + (height - 2) + '" text-anchor="middle" font-size="10" fill="currentColor">Date de mesure</text></svg>';
   const legend = batchIds.map((batchId, index) => '<span><i style="background:' + palette[index % palette.length] + '"></i>' + escapeHtml(batchMap.get(batchId)?.batch_code || "Lot sans code") + '</span>').join("");
   return '<article class="comparison-chart-card"><h4>' + escapeHtml(group.label) + ' <span class="muted">(' + escapeHtml(group.unit) + ')</span></h4>' + svg + '<div class="comparison-legend">' + legend + '</div></article>';
@@ -4951,7 +4951,7 @@ async function loadLotComparison() {
         selectedBatches.forEach(batch => {
           const values = group.rows.filter(row => row.batchId === batch.id);
           const latest = values.slice().sort((a, b) => new Date(b.observed_at || 0) - new Date(a.observed_at || 0))[0];
-          observationRows.push([escapeHtml(group.label), escapeHtml(batch.batch_code || "Lot sans code"), String(values.length), latest ? escapeHtml(String(latest.value_text || "Observation sans texte")) : "Aucune observation enregistrée", latest?.observed_at ? escapeHtml(new Date(latest.observed_at).toLocaleDateString("fr-FR")) : "—"]);
+          observationRows.push([escapeHtml(group.label), escapeHtml(batch.batch_code || "Lot sans code"), String(values.length), latest ? escapeHtml(String(latest.value_text || "Observation sans texte")) : "Aucune observation enregistrée", latest?.observed_at ? escapeHtml(new Date(latest.observed_at).toLocaleDateString(comparisonLocale())) : "—"]);
         });
       });
       tables.innerHTML += comparisonTable(["Variable observée", "Lot", "n", "Dernière valeur textuelle", "Dernière date"], observationRows, "Observations qualitatives par lot");
@@ -4983,7 +4983,7 @@ async function loadLotComparison() {
     }
     correlations.sort((a, b) => Math.abs(b.r) - Math.abs(a.r));
     if (correlations.length) {
-      const rows = correlations.slice(0, 8).map(item => [escapeHtml(item.a.label + " (" + item.a.unit + ")"), escapeHtml(item.b.label + " (" + item.b.unit + ")"), String(item.n), '<span class="comparison-correlation">' + comparisonFormat(item.r, 3) + '</span>', Math.abs(item.r) >= 0.7 ? "Association linéaire exploratoire marquée" : "Association linéaire exploratoire"]);
+      const rows = correlations.slice(0, 8).map(item => [escapeHtml(item.a.label + " (" + item.a.unit + ")"), escapeHtml(item.b.label + " (" + item.b.unit + ")"), String(item.n), '<span class="comparison-correlation">' + comparisonFormat(item.r, 3) + '</span>', Math.abs(item.r) >= 0.7 ? comparisonText("Association linéaire exploratoire marquée", "Strong exploratory linear association", "Associação linear exploratória forte", "ارتباط خطي استكشافي قوي") : comparisonText("Association linéaire exploratoire", "Exploratory linear association", "Associação linear exploratória", "ارتباط خطي استكشافي")]);
       findings.innerHTML += '<article class="comparison-finding"><h4>2. Corrélations exploratoires</h4><p>Corrélation de Pearson sur des moyennes journalières appariées au sein du même lot (au moins 4 journées appariées). Les répétitions ne sont pas indépendantes et les effets du temps ou des traitements ne sont pas contrôlés.</p>' + comparisonTable(["Variable A", "Variable B", "Journées appariées (n)", "r de Pearson", "Lecture"], rows, "Associations observées") + '<p>Une corrélation, même forte, ne démontre pas de causalité.</p></article>';
     } else {
       findings.innerHTML += '<article class="comparison-finding"><h4>2. Corrélations exploratoires</h4><p>Pas assez de journées appariées entre variables différentes pour calculer une corrélation interprétable (minimum opérationnel : 4 journées au sein du même lot).</p></article>';
@@ -4998,10 +4998,10 @@ async function loadLotComparison() {
     findings.innerHTML += '<article class="comparison-finding"><h4>3. Hypothèses à tester ensuite</h4><p>' + escapeHtml(hypothesisText) + '</p><p>Ces variables sont des pistes de protocole, pas des explications démontrées des différences observées.</p></article>';
 
     const selectedPeriodText = (fromDate || "début non limité") + " → " + (toDate || "fin non limitée");
-    status.textContent = "Comparaison terminée : " + selectedBatches.length + " lots ; " + assignedMeasurements.length + " mesures et " + assignedObservations.length + " observations retenues. Filtre demandé : " + selectedPeriodText + ". Période des données : " + periodLabel + ".";
+    status.textContent = comparisonText("Comparaison terminée : ", "Comparison complete: ", "Comparação concluída: ", "اكتملت المقارنة: ") + selectedBatches.length + comparisonText(" lots ; ", " batches; ", " lotes; ", " دفعات؛ ") + assignedMeasurements.length + comparisonText(" mesures et ", " measurements and ", " medições e ", " قياسات و") + assignedObservations.length + comparisonText(" observations retenues. Filtre demandé : ", " observations retained. Requested filter: ", " observações incluídas. Filtro solicitado: ", " ملاحظات مدرجة. المرشح المطلوب: ") + selectedPeriodText + comparisonText(". Période des données : ", ". Data period: ", ". Período dos dados: ", ". فترة البيانات: ") + periodLabel + ".";
   } catch (error) {
     console.error("Comparaison des lots :", error);
-    status.textContent = "La comparaison a échoué : " + (error.message || "erreur inconnue") + ". Aucune donnée n’a été modifiée.";
+    status.textContent = comparisonText("La comparaison a échoué : ", "Comparison failed: ", "A comparação falhou: ", "فشلت المقارنة: ") + (error.message || comparisonText("erreur inconnue", "unknown error", "erro desconhecido", "خطأ غير معروف")) + comparisonText(". Aucune donnée n’a été modifiée.", ". No data was changed.", ". Nenhum dado foi alterado.", ". لم يتم تعديل أي بيانات.");
   } finally {
     if (requestId === lotComparisonRequestId) {
       button.disabled = false;
