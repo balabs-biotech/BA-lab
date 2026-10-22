@@ -9,11 +9,11 @@
 <style>
 :root{color-scheme:dark;--bg:#101512;--panel:#191f1b;--line:#343d36;--ink:#f3f5ef;--muted:#aab4aa;--green:#b4f477;--blue:#91c9ff;--acid:#d5ff46;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
 *{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 50% -15%,#2b3b2e 0,transparent 48%),var(--bg);color:var(--ink);min-height:100vh}
-main{width:min(1100px,100% - 36px);margin:0 auto;padding:clamp(28px,7vw,76px) 0 36px}
-.brand{display:flex;align-items:center;gap:10px;font-size:12px;font-weight:850;letter-spacing:.16em}.language-picker{float:right;display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted)}.language-picker select{padding:8px 10px;border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:5px;font:inherit}.brand-mark{display:grid;place-items:center;width:34px;height:34px;border:1px solid #62705f;color:var(--green);font-size:17px}
-.kicker{margin:clamp(46px,8vw,84px) 0 16px;color:var(--green);font:750 11px ui-monospace,SFMono-Regular,Consolas,monospace;letter-spacing:.16em}
+main{width:min(1100px,100% - 36px);margin:0 auto;padding:clamp(18px,3.5vw,38px) 0 28px}
+.brand{display:flex;align-items:center;gap:10px;font-size:12px;font-weight:850;letter-spacing:.16em}.topbar{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}.language-picker{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted)}.language-picker select{padding:8px 10px;border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:5px;font:inherit}.brand-mark{display:grid;place-items:center;width:34px;height:34px;border:1px solid #62705f;color:var(--green);font-size:17px}
+.kicker{margin:clamp(24px,4vw,42px) 0 12px;color:var(--green);font:750 11px ui-monospace,SFMono-Regular,Consolas,monospace;letter-spacing:.16em}
 h1{max-width:800px;margin:0;font-size:clamp(38px,7vw,76px);line-height:.98;letter-spacing:-.055em;font-weight:800}h1 span{color:var(--green)}
-.lead{max-width:620px;margin:22px 0 36px;color:var(--muted);font-size:clamp(14px,2vw,17px);line-height:1.7}
+.lead{max-width:620px;margin:14px 0 22px;color:var(--muted);font-size:clamp(14px,2vw,17px);line-height:1.7}
 .universes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
 .universe{--accent:var(--green);position:relative;display:flex;flex-direction:column;min-height:285px;padding:20px;text-decoration:none;color:var(--ink);background:var(--panel);border:1px solid var(--line);transition:transform .16s ease,border-color .16s ease;overflow:hidden}
 .universe:hover,.universe:focus-visible{transform:translateY(-4px);border-color:var(--accent);outline:none}
@@ -22,13 +22,13 @@ h1{max-width:800px;margin:0;font-size:clamp(38px,7vw,76px);line-height:.98;lette
 .universe-no{font:800 11px ui-monospace,monospace;color:var(--accent);letter-spacing:.13em}.symbol{display:grid;place-items:center;width:54px;height:54px;margin:25px 0 22px;border:1px solid var(--accent);color:var(--accent);font-size:28px}
 .universe h2{margin:0 0 9px;font-size:23px;letter-spacing:-.03em}.universe p{margin:0;color:var(--muted);font-size:13px;line-height:1.55}.enter{display:flex;justify-content:space-between;align-items:center;margin-top:auto;padding-top:24px;color:var(--accent);font-size:12px;font-weight:850;letter-spacing:.04em}.enter span:last-child{font-size:21px}
 .footer{display:flex;justify-content:space-between;gap:16px;margin-top:35px;padding-top:17px;border-top:1px solid var(--line);color:#7e8b80;font-size:11px}
-@media(max-width:760px){.universes{grid-template-columns:1fr}.universe{min-height:0;padding:18px;display:grid;grid-template-columns:58px 1fr;column-gap:14px}.universe-no{grid-column:1/-1}.symbol{grid-column:1;grid-row:2/4;width:48px;height:48px;margin:18px 0 0}.universe h2{grid-column:2;align-self:end;margin-top:15px}.universe p{grid-column:2}.enter{grid-column:1/-1;padding-top:17px}.kicker{margin-top:45px}.footer{flex-direction:column;gap:6px}}
+@media(max-width:760px){main{padding:16px 0 22px}.topbar{gap:10px}.brand{font-size:11px}.language-picker{font-size:11px}.language-picker select{padding:6px 8px}.kicker{margin:22px 0 10px}h1{font-size:clamp(34px,9vw,54px);line-height:1.02}.lead{margin:12px 0 18px;line-height:1.5}.universes{grid-template-columns:1fr;gap:9px}.universe{min-height:0;padding:18px;display:grid;grid-template-columns:58px 1fr;column-gap:14px}.universe-no{grid-column:1/-1}.symbol{grid-column:1;grid-row:2/4;width:48px;height:48px;margin:18px 0 0}.universe h2{grid-column:2;align-self:end;margin-top:15px}.universe p{grid-column:2}.enter{grid-column:1/-1;padding-top:17px}.kicker{margin-top:45px}.footer{flex-direction:column;gap:6px}}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{transition:none!important;scroll-behavior:auto!important}}
 </style>
 </head>
 <body>
 <main>
-  <div class="brand"><span class="brand-mark" aria-hidden="true">B</span><span>BA LABS</span><span style="color:#718071;font-weight:500">/ CULTURE TRACKER</span></div>
+  <div class="topbar"><div class="brand"><span class="brand-mark" aria-hidden="true">B</span><span>BA LABS</span><span style="color:#718071;font-weight:500">/ CULTURE TRACKER</span></div><label class="language-picker"><span id="langLabel">Langue</span><select id="pageLanguage" aria-label="Langue"><option value="fr">FR</option><option value="en">EN</option><option value="pt">PT</option><option value="ar">AR</option></select></label></div>
   <p class="kicker">PLATEFORME DE SUIVI BIOLOGIQUE · 01—03</p>
   <h1>Chaque culture<br>son <span>univers.</span></h1>
   <p class="lead">Choisissez votre espace de travail. Chaque univers possède sa propre page et ses outils métier, avec une traçabilité biologique commune.</p>
