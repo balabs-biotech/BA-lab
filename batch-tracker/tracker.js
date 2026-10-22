@@ -4777,7 +4777,7 @@ function renderComparisonBatchOptions() {
   }
   picker.innerHTML = latestBatches.map(batch => {
     const id = escapeHtml(batch.id);
-    const code = escapeHtml(batch.batch_code || "Lot sans code");
+    const code = escapeHtml(batch.batch_code || comparisonText("Lot sans code", "Batch without code", "Lote sem código", "دفعة بلا رمز"));
     const name = escapeHtml(batch.name || batch.batch_type || "Sans description");
     const stage = escapeHtml(batch.current_stage || batch.status || comparisonText("Étape non renseignée", "Stage not specified", "Etapa não indicada", "المرحلة غير محددة"));
     return '<label class="comparison-batch-option"><input type="checkbox" name="compareBatch" value="' + id + '"' + (previouslySelected.has(batch.id) ? " checked" : "") + '><span><strong>' + code + '</strong><small>' + name + ' · ' + stage + '</small></span></label>';
@@ -4858,7 +4858,7 @@ function renderComparisonChart(group, batches, outlierIds) {
   });
   svg += '<text x="' + left + '" y="' + (height - 17) + '" font-size="10" fill="currentColor">' + new Date(minTime).toLocaleDateString(comparisonLocale()) + '</text>';
   svg += '<text x="' + (width - right) + '" y="' + (height - 17) + '" text-anchor="end" font-size="10" fill="currentColor">' + new Date(maxTime).toLocaleDateString(comparisonLocale()) + '</text>';
-  svg += '<text x="' + (left + plotWidth / 2) + '" y="' + (height - 2) + '" text-anchor="middle" font-size="10" fill="currentColor">' + escapeHtml(comparisonText(comparisonText("Date de mesure", "Measurement date", "Data da medição", "تاريخ القياس"), "Measurement date", "Data da medição", "تاريخ القياس")) + '</text></svg>';
+  svg += '<text x="' + (left + plotWidth / 2) + '" y="' + (height - 2) + '" text-anchor="middle" font-size="10" fill="currentColor">' + escapeHtml(comparisonText("Date de mesure", "Measurement date", "Data da medição", "تاريخ القياس")) + '</text></svg>';
   const legend = batchIds.map((batchId, index) => '<span><i style="background:' + palette[index % palette.length] + '"></i>' + escapeHtml(batchMap.get(batchId)?.batch_code || comparisonText("Lot sans code", "Batch without code", "Lote sem código", "دفعة بلا رمز")) + '</span>').join("");
   return '<article class="comparison-chart-card"><h4>' + escapeHtml(group.label) + ' <span class="muted">(' + escapeHtml(comparisonUnitLabel(group.unit)) + ')</span></h4>' + svg + '<div class="comparison-legend">' + legend + '</div></article>';
 }
@@ -5066,7 +5066,7 @@ async function loadLotComparison() {
             String(stats.n),
             comparisonFormat(stats.median),
             stats.n ? comparisonFormat(stats.min) + "–" + comparisonFormat(stats.max) : "—",
-            outliers ? '<span class="comparison-outlier">' + outliers + " atypique(s)</span>" : "0"
+            outliers ? '<span class="comparison-outlier">' + outliers + escapeHtml(comparisonText(" valeur(s) atypique(s)", " outlier(s)", " valor(es) atípico(s)", " قيمة شاذة")) + "</span>" : "0"
           ];
         });
         perLot.forEach(row => metricRows.push(row));
