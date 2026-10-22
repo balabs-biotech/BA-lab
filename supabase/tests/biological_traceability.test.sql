@@ -7,6 +7,16 @@ do $$ begin
 end $$;
 create schema if not exists auth;
 create schema if not exists private;
+-- The preceding SQL tests share this disposable database; clear only fixture tables.
+drop table if exists public.events cascade;
+drop table if exists public.material_relationships cascade;
+drop table if exists public.cultures cascade;
+drop table if exists public.materials cascade;
+drop table if exists public.strains cascade;
+drop table if exists public.material_types cascade;
+drop table if exists public.culture_types cascade;
+drop table if exists public.organization_members cascade;
+drop table if exists public.organizations cascade;
 create table if not exists auth.users(id uuid primary key);
 create or replace function auth.uid() returns uuid language sql stable
   as $$ select nullif(current_setting('request.jwt.claim.sub', true), '')::uuid $$;
