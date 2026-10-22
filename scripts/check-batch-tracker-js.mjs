@@ -58,3 +58,7 @@ for(const label of ["Comparabilité :","Comparability:","Comparabilidade:","قا
  if(!engine.includes(label))throw new Error("Mixed-unit warning translation missing: "+label);
 }
 console.log("✓ Batch comparison warns when a variable uses incompatible/missing units across selected batches");
+
+if(!template.includes('id="harvestQuantity"')||!template.includes('id="harvestUnit"')||!template.includes('id="recordHarvestButton"'))throw new Error("Harvest entry form missing");
+if(!engine.includes('event_type: "harvest_recorded"')||!engine.includes('function recordBatchHarvest')||!engine.includes('current_stage !== "harvest"'))throw new Error("Harvest event workflow missing or not restricted to harvest stage");
+if(!engine.includes('from("units")')||!engine.includes('unit_code: unit.code'))throw new Error("Harvest unit validation missing");
