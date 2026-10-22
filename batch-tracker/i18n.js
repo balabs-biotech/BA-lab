@@ -1109,7 +1109,7 @@
       "Unknown date",
       "Data desconhecida",
       "تاريخ غير معروف"
-    ]
+    ],
     [
       "Choisir une famille de lot…",
       "Choose a batch category…",
@@ -1223,12 +1223,6 @@
       "Enter the planned quantity or clear the selected unit.",
       "Introduza a quantidade prevista ou limpe a unidade selecionada.",
       "أدخل الكمية المخططة أو ألغِ تحديد الوحدة."
-    ],
-    [
-      "Ce choix détermine les contrôles qualité associés. Pour un cas non spécialisé, utilisez « Culture biologique / lot de culture générique ».",
-      "This choice determines the associated quality checks. For a non-specialized case, use “Biological culture / generic culture batch”.",
-      "Esta escolha determina os controlos de qualidade associados. Para um caso não especializado, use « Cultura biológica / lote de cultura genérico ».",
-      "يحدد هذا الاختيار فحوصات الجودة المرتبطة. للحالات غير المتخصصة، استخدم «مزرعة بيولوجية / دفعة مزرعة عامة»."
     ],
   ];
   for (const [fr, en, pt, ar] of supplementalCoverage) {
