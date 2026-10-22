@@ -1492,3 +1492,44 @@ body[data-domain="mycology"] .card .hint {
 body[data-domain="mycology"] :is(input, select, textarea, button, a):focus-visible {
   outline-color: #d18d65;
 }
+
+
+/* Green Tech final override: no fluorescent greens in interactive elements. */
+body[data-domain="agronomy"] {
+  --brand: #748d68 !important;
+  --brand-hover: #849c77 !important;
+  --focus: #91a883 !important;
+  --ok: #8ba57c !important;
+  accent-color: #849c77;
+}
+body[data-domain="agronomy"] :is(
+  button, .primary-button, .culture-catalog-action[data-culture-action="observe"],
+  .section-nav a[aria-current="page"], .domain-option[aria-pressed="true"]
+) {
+  background-color: #344538 !important;
+  background-image: none !important;
+  border-color: #566b57 !important;
+  color: #e6ece3 !important;
+  box-shadow: none;
+}
+body[data-domain="agronomy"] :is(button, .primary-button):hover:not(:disabled) {
+  background-color: #405744 !important;
+  border-color: #71866f !important;
+}
+body[data-domain="agronomy"] :is(a, .culture-catalog-code, .statistics-summary-item strong,
+  .overview-metric strong, .section-kicker-label, .observation-details summary,
+  .overview-live, .shortcut-index, .culture-catalog-count) {
+  color: #b7c9ad !important;
+}
+body[data-domain="agronomy"] :is(.progress-bar, .overview-live span, .status-indicator,
+  .status-dot, .live-dot) {
+  background: #718b66 !important;
+  background-image: none !important;
+}
+body[data-domain="agronomy"] :is(input, select, textarea, button, a):focus-visible {
+  outline-color: #91a883 !important;
+  box-shadow: 0 0 0 2px rgba(145, 168, 131, .22) !important;
+}
+body[data-domain="agronomy"] .domain-option[aria-pressed="true"] {
+  box-shadow: inset 0 -3px 0 #718b66 !important;
+}
