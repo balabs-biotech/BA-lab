@@ -4676,6 +4676,38 @@ function comparisonLocale() {
   return language === "ar" ? "ar-DZ" : language === "pt" ? "pt-PT" : language === "en" ? "en-GB" : "fr-FR";
 }
 
+function comparisonVariableLabel(variable) {
+  if (!variable) return "";
+  const labels = {
+    cell_count: ["Nombre de cellules", "Cell count", "Contagem celular", "عدد الخلايا"],
+    cell_count_per_ml: ["Concentration cellulaire", "Cell concentration", "Concentração celular", "تركيز الخلايا"],
+    cfu: ["Nombre d’UFC", "CFU count", "Contagem de UFC", "عدد وحدات تكوين المستعمرات"],
+    cfu_per_ml: ["Concentration en UFC", "CFU concentration", "Concentração de UFC", "تركيز وحدات تكوين المستعمرات"],
+    co2_concentration: ["Concentration en CO₂", "CO₂ concentration", "Concentração de CO₂", "تركيز ثاني أكسيد الكربون"],
+    colony_count: ["Nombre de colonies", "Colony count", "Contagem de colónias", "عدد المستعمرات"],
+    dry_biomass: ["Biomasse sèche", "Dry biomass", "Biomassa seca", "الكتلة الحيوية الجافة"],
+    dry_mass: ["Masse sèche", "Dry mass", "Massa seca", "الكتلة الجافة"],
+    electrical_conductivity: ["Conductivité électrique (CE)", "Electrical conductivity (EC)", "Condutividade elétrica (CE)", "التوصيلية الكهربائية"],
+    fresh_mass: ["Masse fraîche", "Fresh mass", "Massa fresca", "الكتلة الطازجة"],
+    generation_time: ["Temps de génération", "Generation time", "Tempo de geração", "زمن الجيل"],
+    growth_rate: ["Taux de croissance", "Growth rate", "Taxa de crescimento", "معدل النمو"],
+    illuminance: ["Éclairement", "Illuminance", "Iluminância", "الاستضاءة"],
+    incubation_time: ["Durée d’incubation", "Incubation time", "Tempo de incubação", "مدة الحضانة"],
+    od600: ["Densité optique à 600 nm", "Optical density at 600 nm", "Densidade ótica a 600 nm", "الكثافة الضوئية عند 600 نانومتر"],
+    ph: ["pH", "pH", "pH", "الأس الهيدروجيني"],
+    relative_humidity: ["Humidité relative", "Relative humidity", "Humidade relativa", "الرطوبة النسبية"],
+    root_length: ["Longueur des racines", "Root length", "Comprimento das raízes", "طول الجذور"],
+    shoot_length: ["Longueur des pousses", "Shoot length", "Comprimento dos rebentos", "طول الأفرع"],
+    substrate_moisture: ["Humidité du substrat", "Substrate moisture", "Humidade do substrato", "رطوبة الركيزة"],
+    temperature: ["Température", "Temperature", "Temperatura", "درجة الحرارة"],
+    viability: ["Viabilité", "Viability", "Viabilidade", "الحيوية"],
+    volume: ["Volume", "Volume", "Volume", "الحجم"],
+    wet_biomass: ["Biomasse humide", "Wet biomass", "Biomassa húmida", "الكتلة الحيوية الرطبة"]
+  };
+  const index = ({ fr: 0, en: 1, pt: 2, ar: 3 })[document.documentElement.lang || "fr"] || 0;
+  return labels[variable.code]?.[index] || variable.label || variable.code;
+}
+
 let lotComparisonRequestId = 0;
 let lotComparisonHasRun = false;
 
@@ -4938,7 +4970,7 @@ async function loadLotComparison() {
     assignedMeasurements.forEach(row => {
       const variable = variableMap.get(row.variable_code);
       const key = row.variable_code + "::" + row.unit;
-      if (!groupsByKey.has(key)) groupsByKey.set(key, { key: key, variableCode: row.variable_code, variable: variable, unit: row.unit, label: variable?.label || row.variable_code || "Variable non référencée", points: [] });
+      if (!groupsByKey.has(key)) groupsByKey.set(key, { key: key, variableCode: row.variable_code, variable: variable, unit: row.unit, label: comparisonVariableLabel(variable) || row.variable_code || comparisonText("Variable non référencée", "Unreferenced variable", "Variável sem referência", "متغير غير مرجعي"), points: [] });
       groupsByKey.get(key).points.push(row);
     });
     const groups = Array.from(groupsByKey.values()).sort((a, b) => a.label.localeCompare(b.label, "fr") || a.unit.localeCompare(b.unit, "fr"));
@@ -5000,7 +5032,7 @@ async function loadLotComparison() {
       assignedObservations.forEach(row => {
         const variable = variableMap.get(row.variable_code);
         const key = row.variable_code || "variable_non_renseignée";
-        if (!byVariable.has(key)) byVariable.set(key, { label: variable?.label || key, rows: [] });
+        if (!byVariable.has(key)) byVariable.set(key, { label: comparisonVariableLabel(variable) || key, rows: [] });
         byVariable.get(key).rows.push(row);
       });
       const observationRows = [];
@@ -5050,7 +5082,7 @@ async function loadLotComparison() {
     const candidateCodes = ["temperature", "relative_humidity", "substrate_moisture", "ph", "electrical_conductivity", "illuminance", "co2_concentration", "dry_biomass", "fresh_mass", "growth_rate"];
     const candidates = candidateCodes.map(code => variableMap.get(code)).filter(variable => variable && !measuredCodes.has(variable.code));
     const hypothesisText = candidates.length
-      ? comparisonText("Pour un prochain essai, envisager de mesurer conjointement — si pertinent pour le système étudié — ", "For a future trial, consider measuring together — if relevant to the system studied — ", "Num próximo ensaio, considere medir em conjunto — se for pertinente para o sistema estudado — ", "في تجربة لاحقة، فكّر في قياس المتغيرات معاً — إذا كان ذلك مناسباً للنظام المدروس — ") + candidates.slice(0, 6).map(variable => variable.label + " (" + variable.code + ")").join(", ") + comparisonText(". Définir avant l’essai la variable de réponse, la fréquence, la méthode et les répétitions.", ". Define the response variable, frequency, method and replicates before the trial.", ". Defina a variável de resposta, a frequência, o método e as repetições antes do ensaio.", ". حدّد متغير الاستجابة والتواتر والطريقة والتكرارات قبل التجربة.")
+      ? comparisonText("Pour un prochain essai, envisager de mesurer conjointement — si pertinent pour le système étudié — ", "For a future trial, consider measuring together — if relevant to the system studied — ", "Num próximo ensaio, considere medir em conjunto — se for pertinente para o sistema estudado — ", "في تجربة لاحقة، فكّر في قياس المتغيرات معاً — إذا كان ذلك مناسباً للنظام المدروس — ") + candidates.slice(0, 6).map(variable => comparisonVariableLabel(variable) + " (" + variable.code + ")").join(", ") + comparisonText(". Définir avant l’essai la variable de réponse, la fréquence, la méthode et les répétitions.", ". Define the response variable, frequency, method and replicates before the trial.", ". Defina a variável de resposta, a frequência, o método e as repetições antes do ensaio.", ". حدّد متغير الاستجابة والتواتر والطريقة والتكرارات قبل التجربة.")
       : comparisonText("Choisir une variable de réponse et enregistrer en parallèle les facteurs de milieu ou de procédé pertinents déjà présents dans le catalogue. Préspécifier fréquence, méthode, unités et répétitions.", "Choose a response variable and simultaneously record relevant environmental or process factors already in the catalogue. Predefine frequency, method, units and replicates.", "Escolha uma variável de resposta e registe em paralelo os fatores ambientais ou de processo relevantes já existentes no catálogo. Defina previamente frequência, método, unidades e repetições.", "اختر متغير استجابة وسجّل بالتوازي عوامل البيئة أو العملية ذات الصلة الموجودة في الكتالوج. حدّد مسبقاً التواتر والطريقة والوحدات والتكرارات.");
     findings.innerHTML += '<article class="comparison-finding"><h4>3. Hypothèses à tester ensuite</h4><p>' + escapeHtml(hypothesisText) + '</p><p>' + escapeHtml(comparisonText("Ces variables sont des pistes de protocole, pas des explications démontrées des différences observées.", "These variables are protocol ideas, not proven explanations for the observed differences.", "Estas variáveis são pistas para o protocolo, não explicações comprovadas das diferenças observadas.", "هذه المتغيرات مقترحات للبروتوكول وليست تفسيرات مثبتة للاختلافات المرصودة.")) + '</p></article>';
 
