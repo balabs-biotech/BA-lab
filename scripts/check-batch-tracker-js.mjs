@@ -24,6 +24,7 @@ if(!template.includes('id="batchCompareSelect"')||!template.includes('id="batchC
 if(!engine.includes("async function compareSelectedBatches")||!engine.includes('from("batch_stages")')||!engine.includes('from("measurements")'))throw new Error("Batch comparison data flow missing");
 if(!engine.includes('map(batch => batch.environment_id)')||!engine.includes('environmentMeasurementResult')||!engine.includes('row.environment_id === batch.environment_id'))throw new Error("Environment-linked measurements are not included in batch comparison");
 if(!engine.includes("Résumé numérique séparé par source")||!engine.includes("Culture : ${summarize(cultureLinked)} | Environnement : ${summarize(environmentLinked)}"))throw new Error("Culture and environment summaries are not separated");
+if(!engine.includes("row.environment_id === batch.environment_id && !(batch.culture_id && row.culture_id === batch.culture_id)"))throw new Error("Culture-linked measurements may be double-counted as environmental-only data");
 if(!engine.includes("limite de 1 000 mesures récentes par lien culture/environnement"))throw new Error("Batch comparison measurement cap is not disclosed");
 if(!engine.includes("normalized_value,normalized_unit_code")||!engine.includes("raw_value,raw_unit_code"))throw new Error("Numeric measurement fields missing from comparison");
 if(!engine.includes('row.quality_state === "excluded"'))throw new Error("Excluded measurements are not handled explicitly");
