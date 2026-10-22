@@ -527,7 +527,7 @@
     "Aucun lot disponible dans le chargement courant. Créez un lot ou vérifiez les droits d’accès à votre organisation.",
     "No batches are available in the current load. Create a batch or check your organization access.",
     "Não há lotes disponíveis no carregamento atual. Crie um lote ou verifique o acesso à organização.",
-    "Não há lotes disponíveis no carregamento atual. Crie um lote ou verifique o acesso à organização."
+    "لا توجد دفعات متاحة في التحميل الحالي. أنشئ دفعة أو تحقق من صلاحيات الوصول إلى مؤسستك."
   ],
   [
     "Lot sans code",
