@@ -22,19 +22,6 @@ do $$ begin
   ) then
     raise exception 'FAIL: authenticated users still have an organization INSERT policy';
   end if;
-  if not exists (
-    select 1 from pg_policies
-    where schemaname='public'
-      and tablename='organizations'
-      and policyname='organizations_select'
-      and cmd='SELECT'
-      and roles && array['authenticated']::name[]
-  ) and exists (
-    select 1 from pg_tables where schemaname='public' and tablename='organizations'
-  ) then
-    -- This fixture tests INSERT policy removal only; it does not require SELECT.
-    null;
-  end if;
   if not exists (select 1 from pg_roles where rolname='service_role' and rolbypassrls) then
     raise exception 'FAIL: trusted service_role should bypass RLS';
   end if;
