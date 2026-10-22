@@ -165,3 +165,30 @@ do $$ declare v_result jsonb; v_batch_id uuid; begin
   exception when sqlstate '23503' then null; end;
 end $$;
 reset role;
+
+-- A member of organization A cannot move a batch owned by organization B.
+insert into public.batches(
+  id,organization_id,batch_code,name,batch_type,material_id,current_stage,status
+) values (
+  '00000000-0000-0000-0000-0000000000f1',
+  '00000000-0000-0000-0000-0000000000a2',
+  'FOREIGN-1','Foreign batch','test',
+  '00000000-0000-0000-0000-0000000000e2',
+  'preparation','planned'
+);
+select set_config('request.jwt.claim.sub','00000000-0000-0000-0000-0000000000b1',false);
+set role authenticated;
+do $$ begin
+  begin
+    perform public.move_batch_to_location(
+      '00000000-0000-0000-0000-0000000000f1',
+      '00000000-0000-0000-0000-0000000000c1',
+      null,
+      'should be denied'
+    );
+    raise exception 'FAIL: cross-organization batch movement was allowed';
+  exception when sqlstate '42501' then
+    if sqlerrm = 'FAIL: cross-organization batch movement was allowed' then raise; end if;
+  end;
+end $$;
+reset role;
