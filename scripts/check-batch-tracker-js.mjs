@@ -20,6 +20,9 @@ if(!engine.includes("const modulesByDomain")||!engine.includes('domain !== "labo
 const css=fs.readFileSync("batch-tracker/tracker.css","utf8");
 if(!css.includes("--brand:#a94f1d")||!css.includes("--focus:#a94f1d"))throw new Error("Terracotta palette missing");
 if(!root.includes(".universe.myco{--accent:#a94f1d;"))throw new Error("Chooser mycology accent is still fluorescent");
+if(!template.includes('id="batchCompareSelect"')||!template.includes('id="batchCompareResults"'))throw new Error("Batch comparison UI missing");
+if(!engine.includes("async function compareSelectedBatches")||!engine.includes('from("batch_stages")')||!engine.includes('from("measurements")'))throw new Error("Batch comparison data flow missing");
+if(!engine.includes("limite de 1 000 mesures récentes au total"))throw new Error("Batch comparison measurement cap is not disclosed");
 console.log("✓ JavaScript syntax parsed");
 console.log("✓ Three fixed-domain entry pages and chooser links verified");
 console.log("✓ Shared workspace excludes universe switcher");
