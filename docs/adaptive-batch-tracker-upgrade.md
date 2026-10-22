@@ -65,3 +65,14 @@ The reference repository declares AGPL-3.0-or-later. This branch documents and a
 - La chronologie affiche les récoltes et calcule un total par unité pour les événements chargés. Des unités différentes restent séparées et ne sont jamais additionnées ensemble.
 - Cette version n'écrase pas `batches.quantity_actual` : ce champ ne peut pas représenter correctement des récoltes multiples avec des unités ou des dates différentes. L'historique événementiel sert de source de traçabilité.
 - Aucun changement SQL ni migration de production n'est requis pour cette première itération. Les permissions RLS existantes sur `events` restent le contrôle d'accès. La contrainte du journal exige aussi un ancrage biologique unique : l'enregistrement choisit la culture si elle existe, sinon le matériau, et refuse explicitement les lots sans l'un de ces liens.
+
+
+
+## Cohérence des formulaires de lots et des unités
+
+- Les catégories de lots de l'interface utilisent désormais les clés existantes des modèles de contrôle qualité : `CULTURE`, `TRICHODERMA`, `PLEUROTUS_SPAWN`, `MUSHROOM_PRODUCT`, `BIOSTIMULANT` et `FORMULATION`. Cela permet au workflow QC de retrouver les contrôles configurés au lieu d'enregistrer des catégories libres sans modèle correspondant.
+- La catégorie générique est explicitement décrite comme « Culture biologique / lot de culture générique ». Les catégories non prises en charge par un modèle QC ne sont pas proposées comme si elles étaient prêtes à être libérées.
+- L'unité de la quantité prévue et celle de la récolte sont sélectionnées dans `public.units`, avec le libellé, le code et la dimension lorsqu'elle est disponible. La saisie libre des codes d'unité a été supprimée.
+- Une quantité prévue renseignée doit être strictement positive et accompagnée d'une unité du référentiel. La quantité prévue reste facultative.
+- Le formulaire explique pourquoi la culture source doit être sélectionnée : maintenir la filiation biologique. Les choix et aides de saisie ajoutés sont localisés en français, anglais, portugais et arabe.
+- Des assertions de non-régression couvrent les clés de catégorie, les sélecteurs d'unité, la validation et les libellés traduits.
