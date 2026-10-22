@@ -120,6 +120,7 @@ reset role;
 
 
 -- Movement updates the batch and writes a server-attributed history event atomically.
+update public.batches set status='planned', current_stage='preparation' where batch_code='TEST-1';
 insert into public.locations(id,organization_id,name) values
  ('00000000-0000-0000-0000-0000000000c1','00000000-0000-0000-0000-0000000000a1','Room A'),
  ('00000000-0000-0000-0000-0000000000c2','00000000-0000-0000-0000-0000000000a1','Room B');
@@ -153,6 +154,14 @@ do $$ declare v_result jsonb; v_batch_id uuid; begin
       and actor_user_id=auth.uid()
       and payload->>'note'='Moved for incubation'
   ) then raise exception 'FAIL: movement audit event missing or incomplete'; end if;
+
+  update public.batches set status='released' where id=v_batch_id;
+  begin
+    perform public.move_batch_to_location(v_batch_id, null, null, 'closed batch');
+    raise exception 'FAIL: closed batch movement was allowed';
+  exception when sqlstate '23514' then
+    if sqlerrm = 'FAIL: closed batch movement was allowed' then raise; end if;
+  end;
 
   begin
     perform public.move_batch_to_location(
