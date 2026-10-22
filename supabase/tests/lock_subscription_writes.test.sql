@@ -32,7 +32,7 @@ create policy organization_subscriptions_update on public.organization_subscript
 create policy organization_subscriptions_delete on public.organization_subscriptions
   for delete to authenticated using (private.is_org_member(organization_id));
 
-\i supabase/migrations/20261022100000_lock_subscription_writes_to_trusted_backend.sql
+\i supabase/migrations/20261022001422_lock_subscription_writes_to_trusted_backend.sql
 
 do $$ begin
   if exists (
