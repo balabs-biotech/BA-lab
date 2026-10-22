@@ -336,7 +336,7 @@
 <option value="repiquage">Repiquage</option><option value="passage">Passage</option><option value="transfert">Transfert</option><option value="division_aliquotes">Division en aliquotes</option><option value="changement_milieu">Changement de milieu</option><option value="contamination_suspectee">Contamination suspectée</option><option value="conservation">Conservation</option><option value="resultat_final">Résultat final</option><option value="autre_operation">Autre opération</option>
 </select></div>
 <div><label for="bioOperationDate">Date et heure</label><input id="bioOperationDate" type="datetime-local" required></div>
-<div class="bio-operation-wide"><label for="bioChildCodes">Codes des descendants (facultatif)</label><input id="bioChildCodes" type="text" placeholder="Ex. PO-P80-G2-A, PO-P80-G2-B"><small>Un code par virgule. Pour une division en aliquotes, indiquez un code par aliquote.</small></div>
+<div class="bio-operation-wide" id="bioChildCodesField"><label for="bioChildCodes">Codes des descendants (facultatif)</label><input id="bioChildCodes" type="text" placeholder="Ex. PO-P80-G2-A, PO-P80-G2-B"><small>Un code par virgule. Pour une division en aliquotes, indiquez un code par aliquote.</small></div>
 <div><label for="bioOperationConditions">Milieu / conditions / quantité</label><input id="bioOperationConditions" type="text" placeholder="Ex. PDA, 24 °C, 3 aliquotes, durée…"></div>
 <div><label for="bioOperationOutcome">État / résultat observé</label><select id="bioOperationOutcome"><option value="">Non renseigné</option><option value="en_cours">En cours</option><option value="conforme">Conforme</option><option value="resultat_positif">Résultat positif</option><option value="resultat_negatif">Résultat négatif</option><option value="contamination_suspectee">Contamination suspectée</option><option value="contamination_confirmee">Contamination confirmée</option><option value="conserve">Matériel conservé</option><option value="termine">Terminé</option><option value="arrete">Arrêté / exclu</option></select></div>
 <div class="bio-operation-wide"><label for="bioOperationNote">Compte rendu / observations</label><textarea id="bioOperationNote" rows="2" placeholder="Observations, anomalies, décision et justification…"></textarea></div>
@@ -459,7 +459,7 @@
         <input
           id="batchQuantity"
           type="number"
-          min="0"
+          min="0.000001"
           step="any"
           placeholder="Ex. 10"
         >
