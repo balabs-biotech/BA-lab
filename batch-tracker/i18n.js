@@ -1110,6 +1110,90 @@
       "Data desconhecida",
       "تاريخ غير معروف"
     ]
+    [
+      "Choisir une famille de lot…",
+      "Choose a batch category…",
+      "Escolha uma categoria de lote…",
+      "اختر فئة الدفعة…"
+    ],
+    [
+      "Culture biologique / culture de laboratoire",
+      "Biological culture / laboratory culture",
+      "Cultura biológica / cultura de laboratório",
+      "مزرعة بيولوجية / مزرعة مخبرية"
+    ],
+    [
+      "Préparation à base de Trichoderma",
+      "Trichoderma-based preparation",
+      "Preparação à base de Trichoderma",
+      "مستحضر قائم على Trichoderma"
+    ],
+    [
+      "Mycélium sur grain — Pleurotus",
+      "Grain spawn — Pleurotus",
+      "Micélio em grão — Pleurotus",
+      "ميسيليوم على الحبوب — Pleurotus"
+    ],
+    [
+      "Champignons récoltés / produit frais",
+      "Harvested mushrooms / fresh product",
+      "Cogumelos colhidos / produto fresco",
+      "فطر محصود / منتج طازج"
+    ],
+    [
+      "Biostimulant / biofertilisant",
+      "Biostimulant / biofertilizer",
+      "Bioestimulante / biofertilizante",
+      "منشط حيوي / سماد حيوي"
+    ],
+    [
+      "Formulation / mélange final",
+      "Formulation / final blend",
+      "Formulação / mistura final",
+      "تركيبة / مزيج نهائي"
+    ],
+    [
+      "Autre lot",
+      "Other batch",
+      "Outro lote",
+      "دفعة أخرى"
+    ],
+    [
+      "Ce choix détermine les contrôles qualité proposés. Choisissez la catégorie la plus proche du produit suivi.",
+      "This choice determines the proposed quality checks. Choose the category closest to the product being tracked.",
+      "Esta escolha determina os controlos de qualidade propostos. Escolha a categoria mais próxima do produto acompanhado.",
+      "يحدد هذا الاختيار فحوصات الجودة المقترحة. اختر الفئة الأقرب إلى المنتج المتتبع."
+    ],
+    [
+      "Choisir une unité…",
+      "Choose a unit…",
+      "Escolha uma unidade…",
+      "اختر وحدة…"
+    ],
+    [
+      "L’unité doit provenir du référentiel. La quantité prévue reste facultative.",
+      "The unit must come from the catalogue. Planned quantity is optional.",
+      "A unidade deve provir do catálogo. A quantidade prevista é opcional.",
+      "يجب أن تكون الوحدة من الدليل. الكمية المخططة اختيارية."
+    ],
+    [
+      "Aucune unité disponible",
+      "No units available",
+      "Nenhuma unidade disponível",
+      "لا توجد وحدات متاحة"
+    ],
+    [
+      "Unités indisponibles",
+      "Units unavailable",
+      "Unidades indisponíveis",
+      "الوحدات غير متاحة"
+    ],
+    [
+      "Choisissez une unité dans le référentiel pour la quantité prévue.",
+      "Choose a catalogue unit for the planned quantity.",
+      "Escolha uma unidade do catálogo para a quantidade prevista.",
+      "اختر وحدة من الدليل للكمية المخططة."
+    ],
   ];
   for (const [fr, en, pt, ar] of supplementalCoverage) {
     dictionaries.en[fr] ||= en;
