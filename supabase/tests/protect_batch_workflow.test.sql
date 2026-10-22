@@ -129,10 +129,21 @@ insert into public.environments(id,organization_id,location_id,name) values
   '00000000-0000-0000-0000-0000000000c2','Incubator B');
 update public.batches set material_id='00000000-0000-0000-0000-0000000000e1'
 where batch_code='TEST-1';
+
+insert into public.batches(
+  id,organization_id,batch_code,name,batch_type,material_id,current_stage,status
+) values (
+  '00000000-0000-0000-0000-0000000000f2',
+  '00000000-0000-0000-0000-0000000000a1',
+  'CLOSED-1','Closed batch','test',
+  '00000000-0000-0000-0000-0000000000e3',
+  'release','released'
+);
 select set_config('request.jwt.claim.sub','00000000-0000-0000-0000-0000000000b1',false);
 set role authenticated;
-do $$ declare v_result jsonb; v_batch_id uuid; begin
+do $ declare v_result jsonb; v_batch_id uuid; v_closed_batch_id uuid; begin
   select id into v_batch_id from public.batches where batch_code='TEST-1';
+  select id into v_closed_batch_id from public.batches where batch_code='CLOSED-1';
   v_result := public.move_batch_to_location(
     v_batch_id,
     '00000000-0000-0000-0000-0000000000c2',
@@ -155,15 +166,13 @@ do $$ declare v_result jsonb; v_batch_id uuid; begin
       and payload->>'note'='Moved for incubation'
   ) then raise exception 'FAIL: movement audit event missing or incomplete'; end if;
 
-  update public.batches set status='released' where id=v_batch_id;
   begin
-    perform public.move_batch_to_location(v_batch_id, null, null, 'closed batch');
+    perform public.move_batch_to_location(v_closed_batch_id, null, null, 'closed batch');
     raise exception 'FAIL: closed batch movement was allowed';
   exception when sqlstate '23514' then
     if sqlerrm = 'FAIL: closed batch movement was allowed' then raise; end if;
   end;
 
-  update public.batches set status='planned' where id=v_batch_id;
   begin
     perform public.move_batch_to_location(
       v_batch_id,
