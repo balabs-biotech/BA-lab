@@ -525,6 +525,18 @@
       Chargement...
     </div>
 
+    <section class="batch-compare-panel" aria-labelledby="batchCompareTitle">
+      <div class="section-kicker"><span>ANALYSE DES LOTS</span><span class="kicker-line"></span><span>COMPARAISON DESCRIPTIVE</span></div>
+      <h3 id="batchCompareTitle">Comparer mes lots</h3>
+      <p class="muted">Sélectionnez de 2 à 4 lots parmi les 30 plus récents. La comparaison utilise uniquement les étapes et les mesures directement liées à une culture ; elle ne désigne pas de « meilleur » lot.</p>
+      <label for="batchCompareSelect">Lots à comparer</label>
+      <select id="batchCompareSelect" multiple size="5" aria-describedby="batchCompareHint"></select>
+      <p id="batchCompareHint" class="muted">Sur mobile, utilisez la sélection multiple du navigateur.</p>
+      <button id="compareBatchesButton" type="button">Comparer les lots sélectionnés</button>
+      <p id="batchCompareStatus" class="muted" role="status" aria-live="polite">Les résultats apparaîtront ici.</p>
+      <div id="batchCompareResults" class="statistics-table-wrap"></div>
+    </section>
+
 
     <div
       id="batchInfo"
