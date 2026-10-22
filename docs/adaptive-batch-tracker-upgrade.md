@@ -75,3 +75,4 @@ The reference repository declares AGPL-3.0-or-later. This branch documents and a
 - Une quantité prévue renseignée doit être strictement positive et accompagnée d'une unité du référentiel. La quantité prévue reste facultative.
 - Le formulaire explique pourquoi la culture source doit être sélectionnée : maintenir la filiation biologique. Les choix et aides de saisie ajoutés sont localisés en français, anglais, portugais et arabe.
 - Des assertions de non-régression couvrent les clés de catégorie, les sélecteurs d'unité, la validation et les libellés traduits.
+- Le champ des codes descendants n'apparaît que pour les opérations qui peuvent réellement créer ou dériver des cultures descendantes selon la RPC existante; passer à une opération incompatible vide et désactive le champ pour éviter une soumission incohérente.
