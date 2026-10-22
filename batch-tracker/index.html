@@ -6322,7 +6322,7 @@ async function loadCultureDetail(cultureId) {
     const eventsById = new Map();
     eventResults.forEach(result => (result.data || []).forEach(event => eventsById.set(event.id, event)));
     const events = [...eventsById.values()].sort((a, b) => new Date(b.occurred_at || 0) - new Date(a.occurred_at || 0));
-    const eventIds = events.map(event => event.id);
+    const linkedEventIds = events.map(event => event.id);
     const measurementQueries = [
       supabaseClient.from("measurements").select("id, variable_code, raw_value, raw_unit_code, measured_at, event_id, metadata")
         .eq("organization_id", organizationId).eq("culture_id", culture.id)
@@ -6333,15 +6333,15 @@ async function loadCultureDetail(cultureId) {
         .eq("organization_id", organizationId).eq("culture_id", culture.id)
         .order("observed_at", { ascending: false }).limit(100)
     ];
-    if (eventIds.length) {
+    if (linkedEventIds.length) {
       measurementQueries.push(
         supabaseClient.from("measurements").select("id, variable_code, raw_value, raw_unit_code, measured_at, event_id, metadata")
-          .eq("organization_id", organizationId).in("event_id", eventIds)
+          .eq("organization_id", organizationId).in("event_id", linkedEventIds)
           .order("measured_at", { ascending: false }).limit(100)
       );
       observationQueries.push(
         supabaseClient.from("observations").select("id, variable_code, value_text, observed_at, event_id, metadata")
-          .eq("organization_id", organizationId).in("event_id", eventIds)
+          .eq("organization_id", organizationId).in("event_id", linkedEventIds)
           .order("observed_at", { ascending: false }).limit(100)
       );
     }
