@@ -1,61 +1,41 @@
-# Batch Tracker (web interface)
+# Batch Tracker
 
-Single static page ([`index.html`](index.html), HTML/CSS/JavaScript, no build step) that talks to the `BALabs` Supabase project through `@supabase/supabase-js`. Backend details: [`supabase/README.md`](supabase/README.md).
+The Batch Tracker is a static HTML/CSS/JavaScript interface in `index.html`; it uses the `BALabs` Supabase project for operational data. There is no frontend build step.
 
-The repository root `index.html` only redirects here.
+## Entry and navigation
 
-## Known issues and risk mitigation
+The repository root `../index.html` is the **universe chooser**, not a redirect. It links to the tracker with one of three supported query parameters:
 
-### Notion sync — Idempotence and duplicates
-**Status** : 🟡 Medium priority — Discoverable but not prevented  
-**Risk** : The `sync-culture-to-notion` Edge Function can create duplicate Notion pages if it fails after creating the page but before updating the culture's `notion_page_id` in Supabase.
+- Agronomy: `../batch-tracker/?domain=agronomy`
+- Mycology: `../batch-tracker/?domain=mycology`
+- Laboratory: `../batch-tracker/?domain=laboratory`
 
-**How it happens** :
-1. Frontend calls Edge Function with culture_id = 42
-2. Function creates Notion page successfully
-3. Network timeout before `notion_page_id` update in Supabase → stays `null` in DB
-4. Next call to `syncPendingCultures()` finds culture 42 again (filter: `notion_page_id IS NULL`)
-5. Culture synced twice → duplicate Notion page
+Opening this page without exactly one supported `domain` parameter redirects to the root chooser. The in-tracker link **“Tous les univers”** returns to that chooser. CI checks the three entry links and verifies valid, missing, unknown, and duplicated domain parameters.
 
-**Current mitigation** :
-- Limit to 20 cultures per sync batch (prevents runaway)
-- Log errors to browser console (manual discovery)
-- No automatic retry of failed syncs (prevents cascade)
+## Notion synchronisation
 
-**Permanent fix** (owner action) :
-- Add database-level constraint: `notion_page_id` can only be updated from `NULL` → non-null once
-- OR: Implement transaction in Edge Function (Supabase code review needed)
-- See [`../SUPABASE_AUDIT.md`](../SUPABASE_AUDIT.md) for options A/B/C
+Supabase remains the operational source of truth. The Edge Function source is versioned at `../supabase/functions/sync-culture-to-notion/index.ts`; the deployed function and its secrets are managed in Supabase.
 
-### supabase-js version not pinned
-**Status** : ✅ **Fixed** (2026-10-19) — Pinned to `2.118.0` in `index.html`.
+The current function implements sequential retry reconciliation:
 
-Previously loaded `@supabase/supabase-js@2` (latest 2.x, floating). Breaking changes in a future
-2.x release could have broken sync without warning. Now pinned to a specific, tested version.
-To upgrade deliberately: change the version in the `<script>` tag, test in a browser, then commit.
+1. It only trusts a stored Notion page ID after verifying that the page belongs to the configured cultures database and carries the same `Supabase Culture ID`.
+2. If that check fails, it queries the database for a page carrying that culture ID.
+3. If one page is found, it updates it; if more than one is found, it stops for manual duplicate resolution; if the lookup fails, it fails closed instead of creating a page.
+4. If a new page is created but writing its ID back to Supabase fails, a later retry should find the existing page through the lookup.
 
-### batch-tracker licence undefined
-**Status** : 📋 To be decided  
-**Issue** : `batch-tracker/` depends on 25+ open-source packages but its own licence is not declared.
+**Residual limitation:** Notion page creation and the Supabase update are not one atomic transaction. Two concurrent requests can both query before either page exists and then create duplicates. The frontend's in-page `syncInProgress` guard does not coordinate separate tabs or external requests. Do not describe the flow as fully race-proof until cross-request idempotency or a lock is implemented and tested.
 
-**Decision needed** :
-- **Proprietary** (B.A. LAB internal use only) → add `"private": true` to package.json
-- **Open-source** (MIT / Apache-2.0 / ...) → add licence key to package.json
+The frontend can retry pending/error records and provides a manual retry control. Validate sync behavior with a non-production organisation and Notion database before operational use.
 
-See root [`LICENSE`](../LICENSE) for per-directory mapping.
-
-### Hosting not documented
-**Status** : 📋 To be confirmed  
-**Issue** : Current hosting (GitHub Pages? Vercel?) and URL not documented. Deployment procedure unclear.
-
-## Manual test checklist
+## Manual validation checklist
 
 Run against a non-production organisation before publishing a change:
 
-1. Sign in, sign out; wrong password; expired session.
-2. Create a culture (valid and invalid input); check its Notion sync status.
-3. Create a batch from a culture; advance each stage in order.
-4. Confirm `qc` cannot be crossed by normal advancement.
-5. Complete QC checks (pass, fail, waived); `release_batch` only when all pass or are waived.
-6. Network error during each action: no success message must be shown unless the backend confirmed it.
-7. Any new field rendered through `innerHTML` must go through `escapeHtml`.
+1. Sign in and out; test wrong password and expired session.
+2. Create a culture with valid and invalid input; check its sync status.
+3. Create a batch from a culture and advance each stage in order.
+4. Confirm normal advancement cannot cross `qc`.
+5. Release only after QC checks pass or are explicitly waived.
+6. Simulate network errors; never show success unless the backend confirms the action.
+7. Ensure user-controlled values rendered with `innerHTML` pass through `escapeHtml`.
+8. Test Notion sync retry after a partial failure and test concurrent requests separately.

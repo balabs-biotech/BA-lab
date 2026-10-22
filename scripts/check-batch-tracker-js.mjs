@@ -52,7 +52,7 @@ for (const domain of supportedDomains) {
   }
 }
 
-for (const search of ["", "?domain=unknown", "?domain=", "?domain=mycology&domain=unknown"]) {
+for (const search of ["", "?domain=unknown", "?domain=", "?domain=mycology&domain=unknown", "?domain=mycology&domain=mycology"]) {
   const result = evaluateEntryGuard(search);
   if (result !== "../") {
     throw new Error(`Invalid entry "${search}" must redirect to ../; got ${String(result)}`);
