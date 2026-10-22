@@ -1545,3 +1545,31 @@ body[data-domain="agronomy"] :is(input, select, textarea, button, a):focus-visib
 body[data-domain="agronomy"] .app-hero h1 span {
   color: #b4f477 !important;
 }
+
+
+/* Green Tech: keep authentication and connection messages readable on dark surfaces. */
+body[data-domain="agronomy"] #authStatus,
+body[data-domain="agronomy"] #message .card,
+body[data-domain="agronomy"] #syncStatus {
+  background: #222f28 !important;
+  color: #f1f5ef !important;
+  border-color: #506657 !important;
+}
+body[data-domain="agronomy"] #authStatus.success,
+body[data-domain="agronomy"] #message .card.success {
+  background: #203b2a !important;
+  color: #c8ff91 !important;
+  border-color: #527c55 !important;
+}
+body[data-domain="agronomy"] #authStatus.error,
+body[data-domain="agronomy"] #message .card.error {
+  background: #402724 !important;
+  color: #ffd2ca !important;
+  border-color: #a65c50 !important;
+}
+body[data-domain="agronomy"] #authStatus.warning,
+body[data-domain="agronomy"] #message .card.warning {
+  background: #3b3220 !important;
+  color: #ffe2a0 !important;
+  border-color: #8d7541 !important;
+}
