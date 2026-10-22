@@ -222,6 +222,238 @@
     .consent-option label { margin: 0; font-weight: 400; }
     .consent-panel a { color: var(--brand-hover); text-decoration: underline; }
 
+
+    /* ============================================================
+       IDENTITÉ VISUELLE — BA LABS
+       ============================================================ */
+    :root {
+      --bg: #f1f3ed;
+      --surface: #ffffff;
+      --surface-2: #f6f7f2;
+      --border: #e1e6dc;
+      --border-strong: #bfcabb;
+      --text: #17251d;
+      --muted: #657267;
+      --brand: #173e2c;
+      --brand-hover: #245c40;
+      --ok: #216344;
+      --radius: 16px;
+    }
+
+    body {
+      padding-top: 28px;
+      background:
+        radial-gradient(ellipse at 8% 0%, rgba(206, 222, 194, .42), transparent 34rem),
+        linear-gradient(180deg, #f4f6f0 0%, var(--bg) 58%, #edf1e9 100%);
+    }
+
+    .container { max-width: 1080px; }
+
+    .app-hero {
+      position: relative;
+      display: grid;
+      grid-template-columns: minmax(0, 1.35fr) minmax(230px, .65fr);
+      gap: 24px;
+      align-items: center;
+      min-height: 270px;
+      margin-bottom: 26px;
+      padding: clamp(24px, 4vw, 42px);
+      overflow: hidden;
+      color: #f7f8f2;
+      background:
+        radial-gradient(circle at 78% 22%, rgba(180, 207, 163, .2), transparent 16rem),
+        linear-gradient(122deg, #153b2b 0%, #1e4a34 55%, #2b6043 100%);
+      border: 1px solid rgba(18, 54, 37, .18);
+      border-radius: 24px;
+      box-shadow: 0 18px 42px rgba(27, 61, 41, .15);
+    }
+
+    .hero-copy { position: relative; z-index: 1; }
+    .eyebrow {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      margin-bottom: 18px;
+      color: #d4e4ce;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: .16em;
+    }
+    .eyebrow-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: #d6a85c;
+      box-shadow: 0 0 0 4px rgba(214, 168, 92, .16);
+    }
+    .eyebrow-separator { opacity: .45; }
+    .app-hero h1 {
+      margin: 0;
+      max-width: 630px;
+      font-size: clamp(32px, 4.7vw, 50px);
+      font-weight: 750;
+      line-height: 1.02;
+      letter-spacing: -.045em;
+    }
+    .app-hero h1 span { color: #d9b66e; }
+    .hero-description {
+      max-width: 550px;
+      margin: 17px 0 0;
+      color: #d7e2d7;
+      font-size: 15px;
+      line-height: 1.7;
+    }
+    .hero-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 22px;
+    }
+    .hero-tags span {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 7px 10px;
+      border: 1px solid rgba(233, 242, 226, .2);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, .075);
+      color: #f2f5ed;
+      font-size: 11px;
+      font-weight: 650;
+      letter-spacing: .01em;
+    }
+    .hero-tags span span { color: #e1bd74; font-size: 13px; }
+    .hero-art {
+      position: relative;
+      display: grid;
+      place-items: center;
+      min-height: 190px;
+      color: #dce9d4;
+    }
+    .hero-orbit {
+      position: absolute;
+      width: 190px; height: 190px;
+      border: 1px solid rgba(225, 239, 218, .18);
+      border-radius: 50%;
+    }
+    .orbit-two { width: 145px; height: 145px; border-style: dashed; opacity: .7; }
+    .hero-core {
+      display: grid;
+      place-items: center;
+      width: 116px; height: 116px;
+      border: 1px solid rgba(231, 241, 224, .4);
+      border-radius: 50%;
+      background: rgba(236, 245, 229, .09);
+      box-shadow: 0 0 0 13px rgba(236, 245, 229, .035), 0 0 42px rgba(206, 230, 190, .1);
+    }
+    .hero-core svg { width: 88px; height: 88px; }
+    .hero-note {
+      position: absolute;
+      right: 0; bottom: 0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 13px;
+      border: 1px solid rgba(233, 242, 226, .18);
+      border-radius: 12px;
+      background: rgba(8, 33, 21, .28);
+      backdrop-filter: blur(8px);
+    }
+    .hero-note-mark { width: 7px; height: 27px; border-radius: 8px; background: #d6a85c; }
+    .hero-note strong { display: block; font-size: 11px; letter-spacing: .12em; }
+    .hero-note small { display: block; margin-top: 2px; color: #d0ded0; font-size: 10px; }
+
+    .card {
+      position: relative;
+      padding: clamp(20px, 3vw, 30px);
+      margin-bottom: 18px;
+      border-color: rgba(208, 218, 205, .9);
+      border-radius: 18px;
+      box-shadow: 0 6px 20px rgba(29, 52, 34, .045);
+      transition: box-shadow .18s ease, border-color .18s ease;
+    }
+    .card h2 {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 17px;
+      font-size: 20px;
+      letter-spacing: -.025em;
+    }
+    .card h2::before {
+      content: "";
+      flex: 0 0 4px;
+      height: 23px;
+      border-radius: 8px;
+      background: #c7a15d;
+    }
+    .card h3 { color: #294a35; }
+    label { margin-top: 18px; font-size: 14px; }
+    .hint { line-height: 1.5; }
+    input, select, textarea {
+      border-color: #cbd5c7;
+      border-radius: 11px;
+      transition: border-color .15s ease, box-shadow .15s ease, background .15s ease;
+    }
+    input:hover, select:hover, textarea:hover { border-color: #9daf9c; }
+    input:focus, select:focus, textarea:focus {
+      border-color: #477b57;
+      box-shadow: 0 0 0 3px rgba(71, 123, 87, .12);
+      outline: none;
+    }
+    button {
+      min-height: 46px;
+      border-radius: 11px;
+      box-shadow: 0 3px 8px rgba(22, 61, 40, .1);
+      transition: transform .15s ease, background-color .15s ease, box-shadow .15s ease;
+    }
+    button:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 13px rgba(22, 61, 40, .14);
+    }
+    button:active:not(:disabled) { transform: translateY(0); }
+    .secondary-button { background: #667368; }
+    .secondary-button:hover { background: #4f5d52; }
+    .info { border: 1px solid #e1e8dc; border-radius: 12px; padding: 14px; }
+    .success { background: #edf7ee; border-color: #c9e2cb; }
+    .error { background: #fff1ef; border-color: #f0c8c3; }
+    .warning { background: #fff8e9; border-color: #ead8a8; }
+    .batch-stat { border: 1px solid #e7ebe2; border-radius: 12px; padding: 15px; }
+    .batch-stat-value { font-size: 15px; }
+    .progress-track { height: 10px; background: #e7ece3; }
+    .progress-bar { background: linear-gradient(90deg, #38764d, #8fb66d); }
+    .stage, .qc-row { border-radius: 12px; border-color: #e0e7dc; }
+    .stage { padding: 14px; }
+    .stage.active { border-color: #8ab598; background: #f0f8ef; }
+    .batch-item { border-radius: 11px; padding: 13px; }
+    .consent-panel { background: #f8faf5; border-color: #e1e8dc; border-radius: 13px; }
+    #message .card { padding: 15px 18px; }
+    .skip-link { border-radius: 10px; }
+
+    @media (max-width: 700px) {
+      body { padding: 12px 10px 30px; }
+      .app-hero {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 8px;
+        min-height: 0;
+        padding: 25px 22px;
+        border-radius: 19px;
+      }
+      .app-hero h1 { font-size: clamp(32px, 9vw, 43px); }
+      .hero-description { font-size: 14px; }
+      .hero-art { min-height: 130px; margin-top: 4px; }
+      .hero-orbit { width: 132px; height: 132px; }
+      .orbit-two { width: 100px; height: 100px; }
+      .hero-core { width: 84px; height: 84px; box-shadow: 0 0 0 8px rgba(236, 245, 229, .035); }
+      .hero-core svg { width: 65px; height: 65px; }
+      .hero-note { right: 2px; bottom: 0; }
+      .hero-tags { gap: 6px; }
+      .hero-tags span { font-size: 10px; }
+      .card { padding: 19px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .card, button, input, select, textarea { transition: none !important; }
+    }
+
     @media (max-width: 700px) {
       .grid, .auth-actions, .batch-grid, .batch-actions { grid-template-columns: 1fr; }
       .stage { grid-template-columns: 34px 1fr; }
@@ -243,12 +475,34 @@
 
 <main class="container" id="main" tabindex="-1">
 
-  <header>
-    <h1>BA Labs — Culture & Batch Tracker</h1>
-
-    <div class="subtitle">
-      Gestion des cultures, générations, lots biologiques,
-      étapes de production et contrôle qualité.
+  <header class="app-hero">
+    <div class="hero-copy">
+      <div class="eyebrow"><span class="eyebrow-dot" aria-hidden="true"></span> BA LABS <span class="eyebrow-separator">/</span> LABORATOIRE & PRODUCTION</div>
+      <h1>Culture <span>&amp;</span><br>traçabilité biologique</h1>
+      <p class="hero-description">
+        Du suivi des cultures à la libération des lots : un espace unique pour documenter,
+        piloter et contrôler chaque étape.
+      </p>
+      <div class="hero-tags" aria-label="Fonctions de l’application">
+        <span><span aria-hidden="true">✳</span> Cultures</span>
+        <span><span aria-hidden="true">↗</span> Lots de production</span>
+        <span><span aria-hidden="true">✓</span> Contrôle qualité</span>
+      </div>
+    </div>
+    <div class="hero-art" aria-hidden="true">
+      <div class="hero-orbit orbit-one"></div>
+      <div class="hero-orbit orbit-two"></div>
+      <div class="hero-core">
+        <svg viewBox="0 0 120 120" role="presentation">
+          <path d="M60 18v20M60 82v20M18 60h20M82 60h20M30 30l14 14M76 76l14 14M90 30 76 44M44 76 30 90" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+          <circle cx="60" cy="60" r="25" fill="none" stroke="currentColor" stroke-width="2.5"/>
+          <circle cx="60" cy="60" r="12" fill="currentColor" opacity=".22"/>
+          <circle cx="60" cy="60" r="5" fill="currentColor"/>
+          <circle cx="60" cy="18" r="4" fill="#d6a85c"/><circle cx="102" cy="60" r="4" fill="#d6a85c"/>
+          <circle cx="60" cy="102" r="4" fill="#d6a85c"/><circle cx="18" cy="60" r="4" fill="#d6a85c"/>
+        </svg>
+      </div>
+      <div class="hero-note"><span class="hero-note-mark"></span><span><strong>BA LABS</strong><small>Applied biotechnology</small></span></div>
     </div>
   </header>
 
