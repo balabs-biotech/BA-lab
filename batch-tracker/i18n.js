@@ -1194,6 +1194,30 @@
       "Escolha uma unidade do catálogo para a quantidade prevista.",
       "اختر وحدة من الدليل للكمية المخططة."
     ],
+    [
+      "Culture biologique / lot de culture générique",
+      "Biological culture / generic culture batch",
+      "Cultura biológica / lote de cultura genérico",
+      "مزرعة بيولوجية / دفعة مزرعة عامة"
+    ],
+    [
+      "Ce choix détermine les contrôles qualité associés. Pour un cas non spécialisé, utilisez « Culture biologique / lot de culture générique ».",
+      "This choice determines the associated quality checks. For a non-specialized case, use “Biological culture / generic culture batch”.",
+      "Esta escolha determina os controlos de qualidade associados. Para um caso não especializado, use « Cultura biológica / lote de cultura genérico ».",
+      "يحدد هذا الاختيار فحوصات الجودة المرتبطة. للحالات غير المتخصصة، استخدم «مزرعة بيولوجية / دفعة مزرعة عامة»."
+    ],
+    [
+      "Culture ou ressource source",
+      "Source culture or resource",
+      "Cultura ou recurso de origem",
+      "المزرعة أو المورد المصدر"
+    ],
+    [
+      "Choisissez la culture réellement à l’origine du lot. Elle sert à conserver la filiation biologique.",
+      "Choose the culture that actually gave rise to this batch. It preserves biological lineage.",
+      "Escolha a cultura que realmente deu origem a este lote. Isto preserva a linhagem biológica.",
+      "اختر المزرعة التي نشأت منها هذه الدفعة فعليًا. يحافظ ذلك على النسب البيولوجي."
+    ],
   ];
   for (const [fr, en, pt, ar] of supplementalCoverage) {
     dictionaries.en[fr] ||= en;
