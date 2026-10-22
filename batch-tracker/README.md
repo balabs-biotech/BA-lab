@@ -1,8 +1,8 @@
-# BA Labs BioTrack
+# BA Labs CultureOps
 
-**BioTrack** is the working product name for the BA Labs culture, batch and experimental-data tracker.
+**CultureOps** is the working product name for the BA Labs culture, batch and experimental-data tracker.
 
-BioTrack uses a shared HTML template, CSS and JavaScript engine with three distinct static entry pages. Supabase remains the operational source of truth.
+CultureOps uses a shared HTML template, CSS and JavaScript engine with three distinct static entry pages. Supabase remains the operational source of truth.
 
 ## Workspaces
 - Green Tech: `green-tech/` — plant/substrate cultures, greenhouse, DF beds and environmental measurements.
