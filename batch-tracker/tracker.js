@@ -41,6 +41,8 @@ let initializationInProgress = false;
 let measurementVariables = [];
 let measurementUnits = [];
 let quantityUnitOptions = [];
+let batchLocationOptions = [];
+let batchEnvironmentOptions = [];
 let recentObservations = [];
 
 
@@ -207,6 +209,9 @@ const batchQuantityInput =
 
 const batchUnitInput =
   document.getElementById("batchUnit");
+
+const batchLocationInput = document.getElementById("batchLocation");
+const batchEnvironmentInput = document.getElementById("batchEnvironment");
 
 const createBatchButton =
   document.getElementById("createBatchButton");
