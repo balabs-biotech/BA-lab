@@ -26,6 +26,7 @@
       "Sélectionnez de 2 à 4 lots parmi les 30 plus récents. La comparaison utilise uniquement les étapes et les mesures directement liées à une culture ; elle ne désigne pas de « meilleur » lot.": "Select 2 to 4 of the 30 most recent batches. The comparison uses only stages and measurements directly linked to a culture; it does not identify a “best” batch.",
       "Un ou plusieurs lots ne sont plus dans la liste chargée. Actualisez la page.": "One or more batches are no longer in the loaded list. Refresh the page.",
       "Comparaison chargée. Seules les mesures directement liées à la culture du lot sont comptées ; les données manquantes ne sont pas interprétées comme zéro.": "Comparison loaded. Only measurements directly linked to the batch culture are counted; missing data is not treated as zero.",
+      "Comparaison chargée avec une limite de 1 000 mesures récentes au total ; les comptes peuvent être incomplets. Seules les mesures directement liées à la culture du lot sont prises en compte.": "Comparison loaded with a limit of 1,000 recent measurements total; counts may be incomplete. Only measurements directly linked to the batch culture are included.",
       "Tous les univers":"All workspaces"
     },
     pt: {
@@ -50,6 +51,7 @@
       "Un ou plusieurs lots ne sont plus dans la liste chargée. Actualisez la page.": "Um ou mais lotes já não estão na lista carregada. Atualize a página.",
       "Comparaison chargée. Seules les mesures directement liées à la culture du lot sont comptées ; les données manquantes ne sont pas interprétées comme zéro.": "Comparação carregada. Só são contabilizadas medições diretamente ligadas à cultura do lote; dados em falta não são tratados como zero.",
       "Sélectionnez de 2 à 4 lots parmi les 30 plus récents. La comparaison utilise uniquement les étapes et les mesures directement liées à une culture ; elle ne désigne pas de « meilleur » lot.": "Selecione 2 a 4 dos 30 lotes mais recentes. A comparação utiliza apenas etapas e medições diretamente ligadas a uma cultura; não identifica um lote «melhor».",
+      "Comparaison chargée avec une limite de 1 000 mesures récentes au total ; les comptes peuvent être incomplets. Seules les mesures directement liées à la culture du lot sont prises en compte.": "Comparação carregada com um limite total de 1 000 medições recentes; as contagens podem estar incompletas. Só são consideradas medições diretamente ligadas à cultura do lote.",
       "Tous les univers":"Todos os espaços"
     },
     ar: {
@@ -74,6 +76,7 @@
       "Un ou plusieurs lots ne sont plus dans la liste chargée. Actualisez la page.": "لم تعد دفعة أو أكثر موجودة في القائمة المحمّلة. حدّث الصفحة.",
       "Comparaison chargée. Seules les mesures directement liées à la culture du lot sont comptées ; les données manquantes ne sont pas interprétées comme zéro.": "اكتملت المقارنة. تُحتسب القياسات المرتبطة مباشرةً بمزرعة الدفعة فقط؛ ولا تُعامل البيانات المفقودة كأنها صفر.",
       "Sélectionnez de 2 à 4 lots parmi les 30 plus récents. La comparaison utilise uniquement les étapes et les mesures directement liées à une culture ; elle ne désigne pas de « meilleur » lot.": "اختر من دفعتين إلى أربع دفعات من أحدث 30 دفعة. تستخدم المقارنة المراحل والقياسات المرتبطة مباشرةً بمزرعة فقط، ولا تحدد «أفضل» دفعة.",
+      "Comparaison chargée avec une limite de 1 000 mesures récentes au total ; les comptes peuvent être incomplets. Seules les mesures directement liées à la culture du lot sont prises en compte.": "اكتملت المقارنة مع حد أقصى إجمالي قدره 1000 قياس حديث؛ قد تكون الأعداد غير مكتملة. تُحتسب القياسات المرتبطة مباشرةً بمزرعة الدفعة فقط.",
       "Tous les univers":"جميع المساحات"
     }
   };
