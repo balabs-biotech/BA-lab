@@ -956,6 +956,19 @@ input:focus-visible,select:focus-visible,textarea:focus-visible,button:focus-vis
   .statistics-table{font-size:11px}
 }
 
+
+/* Hero contrast fix: the hero background is light, but its child elements kept the original light-on-dark colours. */
+.app-hero h1{color:var(--brand)}
+.app-hero h1 span{color:#8a6a2c}
+.eyebrow{color:#3e5544}
+.hero-description{color:#3f4d42}
+.hero-tags span{color:var(--brand);background:#fff;border-color:var(--border-strong)}
+.hero-tags span span{color:#8a6a2c}
+.hero-art{color:var(--brand)}
+.hero-orbit{border-color:rgba(24,59,42,.22)}
+.hero-core{border-color:rgba(24,59,42,.3);background:rgba(24,59,42,.05);box-shadow:none}
+.hero-note{color:var(--brand);background:#fff;border-color:var(--border-strong);backdrop-filter:none}
+.hero-note small{color:#4b5d50}
 </style>
 </head>
 
