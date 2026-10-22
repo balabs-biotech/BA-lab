@@ -6271,7 +6271,7 @@ async function loadCultureDetail(cultureId) {
     ["Identifiant", culture.code || "Non renseigné"],
     ["Type", culture.culture_type || "Non renseigné"],
     ["Démarrage", culture.started_at ? new Date(culture.started_at).toLocaleString("fr-FR") : "Non renseigné"],
-    ["Matériel lié", culture.material_id || "Identifiant non disponible"],
+    ["Identifiant matériel", culture.material_id || "Non renseigné"],
     ["Événements", "Chargement…"],
     ["Mesures / observations", "Chargement…"]
   ].forEach(([label, value]) => {
@@ -6306,35 +6306,46 @@ async function loadCultureDetail(cultureId) {
     const events = eventResult.data || [];
     const measurements = measurementResult.data || [];
     const observations = observationResult.data || [];
-    const measurementsByEvent = new Map(measurements.filter(row => row.event_id).map(row => [row.event_id, row]));
-    const observationsByEvent = new Map(observations.filter(row => row.event_id).map(row => [row.event_id, row]));
+    const measurementsByEvent = new Map();
+    const observationsByEvent = new Map();
+    for (const row of measurements) {
+      if (!row.event_id) continue;
+      if (!measurementsByEvent.has(row.event_id)) measurementsByEvent.set(row.event_id, []);
+      measurementsByEvent.get(row.event_id).push(row);
+    }
+    for (const row of observations) {
+      if (!row.event_id) continue;
+      if (!observationsByEvent.has(row.event_id)) observationsByEvent.set(row.event_id, []);
+      observationsByEvent.get(row.event_id).push(row);
+    }
     const variableLabel = code => measurementVariables.find(item => item.code === code)?.label || code || "Donnée";
-    const entries = events.map(event => {
-      const measurement = measurementsByEvent.get(event.id);
-      const observation = observationsByEvent.get(event.id);
-      if (measurement) return {
-        date: measurement.measured_at || event.occurred_at,
-        type: "Mesure · " + variableLabel(measurement.variable_code),
-        detail: String(measurement.raw_value) + " " + (measurement.raw_unit_code || "") +
-          (measurement.metadata?.note ? " — " + measurement.metadata.note : "")
-      };
-      if (observation) return {
-        date: observation.observed_at || event.occurred_at,
-        type: "Observation · " + variableLabel(observation.variable_code),
-        detail: (observation.value_text || "Sans description") +
-          (observation.metadata?.note ? " — " + observation.metadata.note : "")
-      };
-      return {
+    const entries = [];
+    const eventIds = new Set(events.map(event => event.id));
+    for (const event of events) {
+      const linkedMeasurements = measurementsByEvent.get(event.id) || [];
+      const linkedObservations = observationsByEvent.get(event.id) || [];
+      linkedMeasurements.forEach(row => entries.push({
+        date: row.measured_at || event.occurred_at,
+        type: "Mesure · " + variableLabel(row.variable_code),
+        detail: String(row.raw_value ?? "Valeur absente") + " " + (row.raw_unit_code || "") +
+          (row.metadata?.note ? " — " + row.metadata.note : "")
+      }));
+      linkedObservations.forEach(row => entries.push({
+        date: row.observed_at || event.occurred_at,
+        type: "Observation · " + variableLabel(row.variable_code),
+        detail: (row.value_text || "Sans description") +
+          (row.metadata?.note ? " — " + row.metadata.note : "")
+      }));
+      if (!linkedMeasurements.length && !linkedObservations.length) entries.push({
         date: event.occurred_at,
         type: String(event.event_type || "Événement").replaceAll("_", " "),
         detail: event.payload?.note || event.payload?.description ||
           (event.batch_id ? "Événement associé à un lot." : "Événement de traçabilité.")
-      };
-    });
-    const eventIds = new Set(events.map(event => event.id));
+      });
+    }
     measurements.filter(row => !row.event_id || !eventIds.has(row.event_id)).forEach(row => entries.push({
       date: row.measured_at, type: "Mesure · " + variableLabel(row.variable_code),
-      detail: String(row.raw_value) + " " + (row.raw_unit_code || "") +
+      detail: String(row.raw_value ?? "Valeur absente") + " " + (row.raw_unit_code || "") +
         (row.metadata?.note ? " — " + row.metadata.note : "")
     }));
     observations.filter(row => !row.event_id || !eventIds.has(row.event_id)).forEach(row => entries.push({
