@@ -2720,7 +2720,7 @@ async function loadBatch(
   // Une indisponibilité du journal ne doit pas empêcher l'accès aux étapes ou au QC.
   const { data: batchEventsData, error: batchEventsError } = await supabaseClient
     .from("events")
-    .select("id,event_type,occurred_at,payload")
+    .select("id,event_type,occurred_at,payload,location_id,environment_id")
     .eq("organization_id", organizationId)
     .eq("batch_id", batchId)
     .order("occurred_at", { ascending: false })
@@ -2868,7 +2868,8 @@ function renderBatchEventTimeline(events, loadError = null) {
     batch_released: "Lot libéré",
     measurement_recorded: "Mesure enregistrée",
     harvest_recorded: "Récolte enregistrée",
-    observation_recorded: "Observation enregistrée"
+    observation_recorded: "Observation enregistrée",
+    batch_moved: "Déplacement du lot"
   };
   const summarize = event => {
     const p = event.payload && typeof event.payload === "object" ? event.payload : {};
@@ -2893,6 +2894,17 @@ function renderBatchEventTimeline(events, loadError = null) {
       if (p.variable_code) parts.push(p.variable_code);
       if (p.raw_value !== undefined && p.raw_value !== null) parts.push(String(p.raw_value) + (p.raw_unit_code ? " " + p.raw_unit_code : ""));
       return parts.join(" : ");
+    }
+    if (event.event_type === "batch_moved") {
+      const parts = [];
+      const location = batchLocationOptions.find(item => item.id === event.location_id);
+      const environment = batchEnvironmentOptions.find(item => item.id === event.environment_id);
+      if (location) parts.push("Emplacement : " + (location.name || location.code || location.id));
+      else if (event.location_id) parts.push("Emplacement mis à jour");
+      if (environment) parts.push("Environnement : " + environment.name);
+      else if (event.environment_id) parts.push("Environnement mis à jour");
+      if (p.note) parts.push(String(p.note));
+      return parts.join(" · ");
     }
     return "";
   };
