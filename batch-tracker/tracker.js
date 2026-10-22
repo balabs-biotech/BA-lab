@@ -2158,6 +2158,7 @@ async function loadLatestBatches() {
   renderBatchList();
   renderMeasurementTargets();
   renderStatisticsFilters();
+  renderComparisonBatchOptions();
 
 }
 
@@ -3941,7 +3942,7 @@ async function loadMeasurementReferences() {
       .select("code, label, dimension, canonical_unit_code, description")
       .order("label"),
     supabaseClient.from("units")
-      .select("code, label, dimension")
+      .select("code, label, dimension, factor, offset_value, is_linear")
       .order("code")
   ]);
 
@@ -4655,6 +4656,332 @@ async function loadStatistics() {
   finally { if (requestId === statisticsRequestId) { button.disabled=false; button.textContent="Analyser les données"; } }
 }
 
+
+/* ============================================================
+   COMPARAISON EXPLORATOIRE DES LOTS — lecture seule
+   ============================================================ */
+let lotComparisonRequestId = 0;
+
+function renderComparisonBatchOptions() {
+  const picker = document.getElementById("compareBatchPicker");
+  if (!picker) return;
+  const previouslySelected = new Set(Array.from(picker.querySelectorAll('input[name="compareBatch"]:checked')).map(input => input.value));
+  if (!latestBatches.length) {
+    picker.innerHTML = '<p class="comparison-empty">Aucun lot disponible dans le chargement courant. Créez un lot ou vérifiez les droits d’accès à votre organisation.</p>';
+    return;
+  }
+  picker.innerHTML = latestBatches.map(batch => {
+    const id = escapeHtml(batch.id);
+    const code = escapeHtml(batch.batch_code || "Lot sans code");
+    const name = escapeHtml(batch.name || batch.batch_type || "Sans description");
+    const stage = escapeHtml(batch.current_stage || batch.status || "Étape non renseignée");
+    return '<label class="comparison-batch-option"><input type="checkbox" name="compareBatch" value="' + id + '"' + (previouslySelected.has(batch.id) ? " checked" : "") + '><span><strong>' + code + '</strong><small>' + name + ' · ' + stage + '</small></span></label>';
+  }).join("");
+}
+
+async function fetchComparisonRows(buildQuery) {
+  const all = [];
+  const pageSize = 1000;
+  for (let offset = 0; ; offset += pageSize) {
+    const result = await buildQuery().range(offset, offset + pageSize - 1);
+    if (result.error) throw new Error(result.error.message);
+    const page = result.data || [];
+    all.push.apply(all, page);
+    if (page.length < pageSize) break;
+  }
+  return all;
+}
+
+function comparisonDateInRange(value, fromDate, toDate) {
+  if (!value) return false;
+  const day = new Date(value).toISOString().slice(0, 10);
+  return (!fromDate || day >= fromDate) && (!toDate || day <= toDate);
+}
+
+function comparisonNumber(value) {
+  if (value === null || value === undefined || value === "") return null;
+  const number = Number(value);
+  return Number.isFinite(number) ? number : null;
+}
+
+function comparisonFormat(value, digits) {
+  if (value === null || value === undefined || !Number.isFinite(value)) return "—";
+  return new Intl.NumberFormat("fr-FR", { maximumFractionDigits: digits === undefined ? 3 : digits }).format(value);
+}
+
+function comparisonTable(headers, rows, caption) {
+  const head = headers.map(value => "<th scope=\"col\">" + escapeHtml(value) + "</th>").join("");
+  const body = rows.length
+    ? rows.map(row => "<tr>" + row.map(value => "<td>" + value + "</td>").join("") + "</tr>").join("")
+    : '<tr><td colspan="' + headers.length + '">Aucune donnée disponible.</td></tr>';
+  return '<div class="comparison-table-wrap"><table class="comparison-table"><caption>' + escapeHtml(caption) + '</caption><thead><tr>' + head + '</tr></thead><tbody>' + body + '</tbody></table></div>';
+}
+
+function renderComparisonChart(group, batches, outlierIds) {
+  const points = group.points.filter(point => Number.isFinite(point.value) && point.date);
+  if (!points.length) return '<div class="comparison-empty">Aucune série temporelle datée pour ' + escapeHtml(group.label) + '.</div>';
+  const width = 760, height = 260, left = 58, right = 20, top = 20, bottom = 48;
+  const plotWidth = width - left - right, plotHeight = height - top - bottom;
+  const times = points.map(point => new Date(point.date).getTime());
+  const values = points.map(point => point.value);
+  let minTime = Math.min.apply(null, times), maxTime = Math.max.apply(null, times);
+  let minValue = Math.min.apply(null, values), maxValue = Math.max.apply(null, values);
+  if (minTime === maxTime) { minTime -= 12 * 60 * 60 * 1000; maxTime += 12 * 60 * 60 * 1000; }
+  if (minValue === maxValue) { const pad = Math.abs(minValue) * 0.08 || 1; minValue -= pad; maxValue += pad; }
+  const palette = ["#276749", "#b45309", "#2563eb", "#7c3aed", "#0f766e", "#be123c", "#475569", "#a16207"];
+  const batchMap = new Map(batches.map(batch => [batch.id, batch]));
+  const batchIds = Array.from(new Set(points.map(point => point.batchId)));
+  const x = value => left + ((new Date(value).getTime() - minTime) / (maxTime - minTime)) * plotWidth;
+  const y = value => top + (1 - (value - minValue) / (maxValue - minValue)) * plotHeight;
+  let svg = '<svg viewBox="0 0 ' + width + ' ' + height + '" role="img" aria-label="Évolution temporelle de ' + escapeHtml(group.label) + '">';
+  for (let tick = 0; tick < 5; tick++) {
+    const value = minValue + ((maxValue - minValue) * tick / 4);
+    const py = y(value);
+    svg += '<line x1="' + left + '" y1="' + py + '" x2="' + (width - right) + '" y2="' + py + '" stroke="currentColor" opacity=".12"/>';
+    svg += '<text x="' + (left - 8) + '" y="' + (py + 4) + '" text-anchor="end" font-size="10" fill="currentColor">' + comparisonFormat(value, 2) + '</text>';
+  }
+  svg += '<line x1="' + left + '" y1="' + (height - bottom) + '" x2="' + (width - right) + '" y2="' + (height - bottom) + '" stroke="currentColor" opacity=".35"/>';
+  batchIds.forEach((batchId, batchIndex) => {
+    const series = points.filter(point => point.batchId === batchId).sort((a, b) => new Date(a.date) - new Date(b.date));
+    const color = palette[batchIndex % palette.length];
+    if (series.length > 1) {
+      const path = series.map((point, index) => (index ? "L" : "M") + x(point.date).toFixed(2) + " " + y(point.value).toFixed(2)).join(" ");
+      svg += '<path d="' + path + '" fill="none" stroke="' + color + '" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>';
+    }
+    series.forEach(point => {
+      const radius = outlierIds.has(point.id) ? 5 : 3.2;
+      svg += '<circle cx="' + x(point.date).toFixed(2) + '" cy="' + y(point.value).toFixed(2) + '" r="' + radius + '" fill="' + color + '" stroke="' + (outlierIds.has(point.id) ? "#b91c1c" : "#fff") + '" stroke-width="' + (outlierIds.has(point.id) ? 2 : 1) + '"><title>' + escapeHtml((batchMap.get(batchId)?.batch_code || "Lot") + " · " + new Date(point.date).toLocaleString("fr-FR") + " · " + comparisonFormat(point.value) + " " + group.unit) + '</title></circle>';
+    });
+  });
+  svg += '<text x="' + left + '" y="' + (height - 17) + '" font-size="10" fill="currentColor">' + new Date(minTime).toLocaleDateString("fr-FR") + '</text>';
+  svg += '<text x="' + (width - right) + '" y="' + (height - 17) + '" text-anchor="end" font-size="10" fill="currentColor">' + new Date(maxTime).toLocaleDateString("fr-FR") + '</text>';
+  svg += '<text x="' + (left + plotWidth / 2) + '" y="' + (height - 2) + '" text-anchor="middle" font-size="10" fill="currentColor">Date de mesure</text></svg>';
+  const legend = batchIds.map((batchId, index) => '<span><i style="background:' + palette[index % palette.length] + '"></i>' + escapeHtml(batchMap.get(batchId)?.batch_code || "Lot sans code") + '</span>').join("");
+  return '<article class="comparison-chart-card"><h4>' + escapeHtml(group.label) + ' <span class="muted">(' + escapeHtml(group.unit) + ')</span></h4>' + svg + '<div class="comparison-legend">' + legend + '</div></article>';
+}
+
+async function loadLotComparison() {
+  const requestId = ++lotComparisonRequestId;
+  const status = document.getElementById("compareLotsStatus");
+  const summary = document.getElementById("compareLotsSummary");
+  const findings = document.getElementById("compareLotsFindings");
+  const charts = document.getElementById("compareLotsCharts");
+  const tables = document.getElementById("compareLotsTables");
+  const button = document.getElementById("compareLotsButton");
+  if (!organizationId) {
+    status.textContent = "Connectez-vous pour comparer les lots de votre organisation.";
+    return;
+  }
+  const selectedIds = Array.from(document.querySelectorAll('input[name="compareBatch"]:checked')).map(input => input.value);
+  if (selectedIds.length < 2) {
+    status.textContent = "Sélectionnez au moins deux lots.";
+    return;
+  }
+  const selectedBatches = latestBatches.filter(batch => selectedIds.includes(batch.id));
+  if (selectedBatches.length < 2) {
+    status.textContent = "La sélection a changé. Actualisez la liste des lots et réessayez.";
+    return;
+  }
+  const fromDate = document.getElementById("compareFromDate").value;
+  const toDate = document.getElementById("compareToDate").value;
+  if (fromDate && toDate && fromDate > toDate) {
+    status.textContent = "La date de début doit précéder ou correspondre à la date de fin.";
+    return;
+  }
+
+  button.disabled = true;
+  button.textContent = "Comparaison en cours…";
+  status.textContent = "Lecture des données autorisées dans Supabase…";
+  summary.innerHTML = "";
+  findings.innerHTML = "";
+  charts.innerHTML = "";
+  tables.innerHTML = "";
+
+  try {
+    const selectedBatchIds = selectedBatches.map(batch => batch.id);
+    const cultureBatchCounts = new Map();
+    const cultureToBatch = new Map();
+    selectedBatches.forEach(batch => {
+      if (!batch.culture_id) return;
+      cultureBatchCounts.set(batch.culture_id, (cultureBatchCounts.get(batch.culture_id) || 0) + 1);
+      if (!cultureToBatch.has(batch.culture_id)) cultureToBatch.set(batch.culture_id, batch.id);
+    });
+    const unambiguousCultureIds = Array.from(cultureBatchCounts.entries()).filter(entry => entry[1] === 1).map(entry => entry[0]);
+    const safeCultureToBatch = new Map(Array.from(cultureToBatch.entries()).filter(entry => cultureBatchCounts.get(entry[0]) === 1));
+
+    const batchEvents = await fetchComparisonRows(() => supabaseClient.from("events")
+      .select("id,batch_id,culture_id,occurred_at,event_type,payload")
+      .eq("organization_id", organizationId).in("batch_id", selectedBatchIds).order("occurred_at", { ascending: true }));
+    const cultureEvents = unambiguousCultureIds.length
+      ? await fetchComparisonRows(() => supabaseClient.from("events")
+          .select("id,batch_id,culture_id,occurred_at,event_type,payload")
+          .eq("organization_id", organizationId).in("culture_id", unambiguousCultureIds).is("batch_id", null).order("occurred_at", { ascending: true }))
+      : [];
+    const eventToBatch = new Map();
+    batchEvents.forEach(event => { if (selectedBatchIds.includes(event.batch_id)) eventToBatch.set(event.id, event.batch_id); });
+    cultureEvents.forEach(event => { const batchId = safeCultureToBatch.get(event.culture_id); if (batchId && !event.batch_id) eventToBatch.set(event.id, batchId); });
+    const eventIds = Array.from(eventToBatch.keys());
+
+    async function fetchLinkedRows(tableName, selectFields, dateField) {
+      const queries = [];
+      if (eventIds.length) queries.push(fetchComparisonRows(() => supabaseClient.from(tableName).select(selectFields).eq("organization_id", organizationId).in("event_id", eventIds).order(dateField, { ascending: true })));
+      if (unambiguousCultureIds.length) queries.push(fetchComparisonRows(() => supabaseClient.from(tableName).select(selectFields).eq("organization_id", organizationId).in("culture_id", unambiguousCultureIds).is("event_id", null).order(dateField, { ascending: true })));
+      const results = await Promise.all(queries);
+      const unique = new Map();
+      results.flat().forEach(row => unique.set(row.id, row));
+      return Array.from(unique.values()).filter(row => comparisonDateInRange(row[dateField], fromDate, toDate));
+    }
+
+    const [measurementRows, observationRows] = await Promise.all([
+      fetchLinkedRows("measurements", "id,variable_code,raw_value,raw_unit_code,normalized_value,normalized_unit_code,measured_at,method,instrument,quality_state,exclusion_reason,culture_id,event_id,metadata", "measured_at"),
+      fetchLinkedRows("observations", "id,variable_code,value_text,observed_at,quality_state,culture_id,event_id,metadata", "observed_at")
+    ]);
+    if (requestId !== lotComparisonRequestId) return;
+
+    function assignBatch(row) {
+      if (row.event_id) return eventToBatch.get(row.event_id) || null;
+      return row.culture_id ? (safeCultureToBatch.get(row.culture_id) || null) : null;
+    }
+    const assignedMeasurements = measurementRows.map(row => Object.assign({}, row, { batchId: assignBatch(row) }))
+      .filter(row => row.batchId && row.quality_state !== "excluded" && !row.exclusion_reason)
+      .map(row => {
+        const normalized = comparisonNumber(row.normalized_value);
+        const raw = comparisonNumber(row.raw_value);
+        return Object.assign({}, row, {
+          value: normalized !== null && row.normalized_unit_code ? normalized : raw,
+          unit: normalized !== null && row.normalized_unit_code ? row.normalized_unit_code : (row.raw_unit_code || "unité non renseignée"),
+          valueBasis: normalized !== null && row.normalized_unit_code ? "normalisée" : "brute"
+        });
+      }).filter(row => row.value !== null);
+    const assignedObservations = observationRows.map(row => Object.assign({}, row, { batchId: assignBatch(row) }))
+      .filter(row => row.batchId && row.quality_state !== "excluded");
+
+    const variableMap = new Map(measurementVariables.map(variable => [variable.code, variable]));
+    const unitMap = new Map(measurementUnits.map(unit => [unit.code, unit]));
+    const groupsByKey = new Map();
+    assignedMeasurements.forEach(row => {
+      const variable = variableMap.get(row.variable_code);
+      const key = row.variable_code + "::" + row.unit;
+      if (!groupsByKey.has(key)) groupsByKey.set(key, { key: key, variableCode: row.variable_code, variable: variable, unit: row.unit, label: variable?.label || row.variable_code || "Variable non référencée", points: [] });
+      groupsByKey.get(key).points.push(row);
+    });
+    const groups = Array.from(groupsByKey.values()).sort((a, b) => a.label.localeCompare(b.label, "fr") || a.unit.localeCompare(b.unit, "fr"));
+    const outlierByGroup = new Map();
+    groups.forEach(group => outlierByGroup.set(group.key, new Set(BACompareAnalysis.detectOutlierIds(group.points))));
+
+    const allDates = assignedMeasurements.map(row => row.measured_at).concat(assignedObservations.map(row => row.observed_at)).filter(Boolean).sort();
+    const periodLabel = allDates.length
+      ? new Date(allDates[0]).toLocaleDateString("fr-FR") + " — " + new Date(allDates[allDates.length - 1]).toLocaleDateString("fr-FR")
+      : (fromDate || "date libre") + " — " + (toDate || "date libre");
+    const outlierCount = Array.from(outlierByGroup.values()).reduce((sum, ids) => sum + ids.size, 0);
+    summary.innerHTML = [
+      ["Lots sélectionnés", String(selectedBatches.length)],
+      ["Mesures utilisables", String(assignedMeasurements.length)],
+      ["Observations qualitatives", String(assignedObservations.length)]
+    ].map(item => '<div class="statistics-summary-item"><span>' + escapeHtml(item[0]) + '</span><strong>' + escapeHtml(item[1]) + '</strong></div>').join("");
+
+    const descriptive = [];
+    if (!assignedMeasurements.length && !assignedObservations.length) {
+      descriptive.push("Aucune mesure ni observation exploitable n’a été trouvée pour ces lots et cette période. Cela ne permet pas de conclure sur leurs performances.");
+    } else {
+      descriptive.push(assignedMeasurements.length + " mesure(s) numérique(s) et " + assignedObservations.length + " observation(s) qualitative(s) sont exploitables après exclusion des enregistrements marqués exclus.");
+    }
+    if (outlierCount) descriptive.push(outlierCount + " valeur(s) atypique(s) signalée(s) par la règle exploratoire des 1,5 × IQR ; elles restent incluses dans les graphiques et les statistiques.");
+    if (Array.from(cultureBatchCounts.values()).some(count => count > 1)) descriptive.push("Certaines cultures sont liées à plusieurs lots sélectionnés : les mesures/observations rattachées seulement à la culture et non à un événement de lot sont laissées de côté pour éviter une attribution ambiguë.");
+    if (allDates.length) descriptive.push("Période réellement couverte par les données utilisées : " + periodLabel + ".");
+    findings.innerHTML += '<article class="comparison-finding"><h4>1. Constats descriptifs</h4><ul>' + descriptive.map(item => "<li>" + escapeHtml(item) + "</li>").join("") + "</ul></article>";
+
+    if (groups.length) {
+      const metricRows = [];
+      groups.forEach(group => {
+        const outlierIds = outlierByGroup.get(group.key);
+        const perLot = selectedBatches.map(batch => {
+          const points = group.points.filter(point => point.batchId === batch.id);
+          const stats = BACompareAnalysis.summarize(points.map(point => point.value));
+          const outliers = points.filter(point => outlierIds.has(point.id)).length;
+          return [escapeHtml(batch.batch_code || "Lot sans code"), String(stats.n), comparisonFormat(stats.median), stats.n ? comparisonFormat(stats.min) + "–" + comparisonFormat(stats.max) : "—", outliers ? '<span class="comparison-outlier">' + outliers + " atypique(s)</span>" : "0"];
+        });
+        metricRows.push([escapeHtml(group.label + " · " + group.unit), "—", "—", "—", "—"]);
+        perLot.forEach(row => metricRows.push(row));
+        charts.innerHTML += renderComparisonChart(group, selectedBatches, outlierIds);
+      });
+      tables.innerHTML += comparisonTable(["Variable · unité", "Lot", "n", "Médiane", "Min–max", "Valeurs atypiques"], metricRows.filter(row => row[1] !== "—"), "Mesures numériques par lot et unité");
+    } else {
+      tables.innerHTML += '<div class="comparison-empty">Aucune mesure numérique exploitable dans la sélection. Les observations qualitatives restent analysées séparément.</div>';
+    }
+
+    if (assignedObservations.length) {
+      const byVariable = new Map();
+      assignedObservations.forEach(row => {
+        const variable = variableMap.get(row.variable_code);
+        const key = row.variable_code || "variable_non_renseignée";
+        if (!byVariable.has(key)) byVariable.set(key, { label: variable?.label || key, rows: [] });
+        byVariable.get(key).rows.push(row);
+      });
+      const observationRows = [];
+      Array.from(byVariable.entries()).sort((a, b) => a[1].label.localeCompare(b[1].label, "fr")).forEach(([code, group]) => {
+        selectedBatches.forEach(batch => {
+          const values = group.rows.filter(row => row.batchId === batch.id);
+          const latest = values.slice().sort((a, b) => new Date(b.observed_at || 0) - new Date(a.observed_at || 0))[0];
+          observationRows.push([escapeHtml(group.label), escapeHtml(batch.batch_code || "Lot sans code"), String(values.length), latest ? escapeHtml(String(latest.value_text || "Observation sans texte")) : "Aucune observation enregistrée", latest?.observed_at ? escapeHtml(new Date(latest.observed_at).toLocaleDateString("fr-FR")) : "—"]);
+        });
+      });
+      tables.innerHTML += comparisonTable(["Variable observée", "Lot", "n", "Dernière valeur textuelle", "Dernière date"], observationRows, "Observations qualitatives par lot");
+    } else {
+      tables.innerHTML += '<div class="comparison-empty">Aucune observation qualitative enregistrée pour les lots sélectionnés et la période choisie.</div>';
+    }
+
+    const dailyGroups = new Map();
+    groups.forEach(group => {
+      group.points.forEach(point => {
+        if (!point.measured_at) return;
+        const key = group.key + "::" + point.batchId + "::" + new Date(point.measured_at).toISOString().slice(0, 10);
+        if (!dailyGroups.has(key)) dailyGroups.set(key, { groupKey: group.key, batchId: point.batchId, date: new Date(point.measured_at).toISOString().slice(0, 10), values: [] });
+        dailyGroups.get(key).values.push(point.value);
+      });
+    });
+    const daily = Array.from(dailyGroups.values()).map(item => Object.assign({}, item, { value: item.values.reduce((sum, value) => sum + value, 0) / item.values.length }));
+    const correlations = [];
+    for (let i = 0; i < groups.length; i++) {
+      for (let j = i + 1; j < groups.length; j++) {
+        if (groups[i].variableCode === groups[j].variableCode) continue;
+        const rightByKey = new Map(daily.filter(item => item.groupKey === groups[j].key).map(item => [item.batchId + "::" + item.date, item.value]));
+        const pairs = daily.filter(item => item.groupKey === groups[i].key && rightByKey.has(item.batchId + "::" + item.date))
+          .map(item => ({ x: item.value, y: rightByKey.get(item.batchId + "::" + item.date) }));
+        if (pairs.length < 4) continue;
+        const r = BACompareAnalysis.pearson(pairs);
+        if (r !== null) correlations.push({ a: groups[i], b: groups[j], n: pairs.length, r: r });
+      }
+    }
+    correlations.sort((a, b) => Math.abs(b.r) - Math.abs(a.r));
+    if (correlations.length) {
+      const rows = correlations.slice(0, 8).map(item => [escapeHtml(item.a.label + " (" + item.a.unit + ")"), escapeHtml(item.b.label + " (" + item.b.unit + ")"), String(item.n), '<span class="comparison-correlation">' + comparisonFormat(item.r, 3) + '</span>', Math.abs(item.r) >= 0.7 ? "Association linéaire exploratoire marquée" : "Association linéaire exploratoire"]);
+      findings.innerHTML += '<article class="comparison-finding"><h4>2. Corrélations exploratoires</h4><p>Corrélation de Pearson sur des moyennes journalières appariées au sein du même lot (au moins 4 journées appariées). Les répétitions ne sont pas indépendantes et les effets du temps ou des traitements ne sont pas contrôlés.</p>' + comparisonTable(["Variable A", "Variable B", "Journées appariées (n)", "r de Pearson", "Lecture"], rows, "Associations observées") + '<p>Une corrélation, même forte, ne démontre pas de causalité.</p></article>';
+    } else {
+      findings.innerHTML += '<article class="comparison-finding"><h4>2. Corrélations exploratoires</h4><p>Pas assez de journées appariées entre variables différentes pour calculer une corrélation interprétable (minimum opérationnel : 4 journées au sein du même lot).</p></article>';
+    }
+
+    const measuredCodes = new Set(groups.map(group => group.variableCode));
+    const candidateCodes = ["temperature", "relative_humidity", "substrate_moisture", "ph", "electrical_conductivity", "illuminance", "co2_concentration", "dry_biomass", "fresh_mass", "growth_rate"];
+    const candidates = candidateCodes.map(code => variableMap.get(code)).filter(variable => variable && !measuredCodes.has(variable.code));
+    const hypothesisText = candidates.length
+      ? "Pour un prochain essai, envisager de mesurer conjointement — si pertinent pour le système étudié — " + candidates.slice(0, 6).map(variable => variable.label + " (" + variable.code + ")").join(", ") + ". Définir avant l’essai la variable de réponse, la fréquence, la méthode et les répétitions."
+      : "Choisir une variable de réponse et enregistrer en parallèle les facteurs de milieu ou de procédé pertinents déjà présents dans le catalogue. Préspécifier fréquence, méthode, unités et répétitions.";
+    findings.innerHTML += '<article class="comparison-finding"><h4>3. Hypothèses à tester ensuite</h4><p>' + escapeHtml(hypothesisText) + '</p><p>Ces variables sont des pistes de protocole, pas des explications démontrées des différences observées.</p></article>';
+
+    const selectedPeriodText = (fromDate || "début non limité") + " → " + (toDate || "fin non limitée");
+    status.textContent = "Comparaison terminée : " + selectedBatches.length + " lots ; " + assignedMeasurements.length + " mesures et " + assignedObservations.length + " observations retenues. Filtre demandé : " + selectedPeriodText + ". Période des données : " + periodLabel + ".";
+  } catch (error) {
+    console.error("Comparaison des lots :", error);
+    status.textContent = "La comparaison a échoué : " + (error.message || "erreur inconnue") + ". Aucune donnée n’a été modifiée.";
+  } finally {
+    if (requestId === lotComparisonRequestId) {
+      button.disabled = false;
+      button.textContent = "Comparer les lots sélectionnés";
+    }
+  }
+}
+
 async function loadBiologicalLineage(cultureId) {
   const target = document.getElementById('cultureLineage');
   if (!target || !organizationId) return;
@@ -5192,6 +5519,7 @@ function setupUiEnhancements() {
   });
 
   document.getElementById("loadStatisticsButton")?.addEventListener("click", loadStatistics);
+document.getElementById("compareLotsButton")?.addEventListener("click", loadLotComparison);
   document.getElementById("statisticsVariable")?.addEventListener("change", () => { document.getElementById("statisticsStatus").textContent = "Variable modifiée. Lancez l’analyse pour actualiser les résultats."; });
   document.getElementById("statisticsCulture")?.addEventListener("change", () => { document.getElementById("statisticsStatus").textContent = "Culture modifiée. Lancez l’analyse pour actualiser les résultats."; });
   document.getElementById("statisticsBatch")?.addEventListener("change", () => { document.getElementById("statisticsStatus").textContent = "Lot modifié. Lancez l’analyse pour actualiser les résultats."; });
