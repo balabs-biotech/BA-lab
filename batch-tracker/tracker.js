@@ -2258,9 +2258,28 @@ async function compareSelectedBatches() {
       const experiment = experimentsById.get(row.experiment_id || unit?.experiment_id);
       return [row.id, {
         experiment: experiment ? `${experiment.code} — ${experiment.name}` : "Non renseignée",
-        unit: unit ? [unit.unit_code, unit.treatment_code ? `traitement ${unit.treatment_code}` : null, unit.replicate_no != null ? `répétition ${unit.replicate_no}` : null].filter(Boolean).join(" · ") : "Non renseignée"
+        unit: unit ? [unit.unit_code, unit.treatment_code ? `traitement ${unit.treatment_code}` : null, unit.replicate_no != null ? `répétition ${unit.replicate_no}` : null].filter(Boolean).join(" · ") : "Non renseignée", experimentalUnitId: unit?.id || null
       }];
     }));
+    const observationCultureResult = cultureIds.length
+      ? await supabaseClient.from("observations")
+          .select("id,culture_id,experimental_unit_id,variable_code,value_text,observed_at,quality_state")
+          .eq("organization_id", organizationId).in("culture_id", cultureIds)
+          .order("observed_at", { ascending: false }).limit(1000)
+      : {data:[],error:null};
+    if (observationCultureResult.error) throw new Error("Chargement des observations de culture impossible : " + observationCultureResult.error.message);
+    const observationUnitResult = unitIds.length
+      ? await supabaseClient.from("observations")
+          .select("id,culture_id,experimental_unit_id,variable_code,value_text,observed_at,quality_state")
+          .eq("organization_id", organizationId).in("experimental_unit_id", unitIds)
+          .order("observed_at", { ascending: false }).limit(1000)
+      : {data:[],error:null};
+    if (observationUnitResult.error) throw new Error("Chargement des observations expérimentales impossible : " + observationUnitResult.error.message);
+    const observationMap = new Map();
+    [...(observationCultureResult.data || []), ...(observationUnitResult.data || [])].forEach(row => {
+      if (row.id) observationMap.set(row.id, row);
+    });
+    const observations = [...observationMap.values()];
     const stages = stageResult.data || [];
     const measurementMap = new Map();
     [...(cultureMeasurementResult.data || []), ...(environmentMeasurementResult.data || [])].forEach(row => {
@@ -2269,7 +2288,7 @@ async function compareSelectedBatches() {
     const measurements = [...measurementMap.values()];
     const table = document.createElement("table");
     table.className = "statistics-table";
-    table.innerHTML = "<caption>Comparaison descriptive des lots sélectionnés</caption><thead><tr><th>Lot</th><th>Type</th><th>Expérience</th><th>Unité / traitement / répétition</th><th>État / étape</th><th>Quantité prévue</th><th>Quantité réelle</th><th>Étapes terminées</th><th>Mesures de culture</th><th>Mesures d'environnement</th><th>Résumé numérique séparé par source</th><th>Dernière mesure</th></tr></thead>";
+    table.innerHTML = "<caption>Comparaison descriptive des lots sélectionnés</caption><thead><tr><th>Lot</th><th>Type</th><th>Expérience</th><th>Unité / traitement / répétition</th><th>État / étape</th><th>Quantité prévue</th><th>Quantité réelle</th><th>Étapes terminées</th><th>Mesures de culture</th><th>Mesures d'environnement</th><th>Observations qualitatives</th><th>Résumé numérique séparé par source</th><th>Dernière mesure</th></tr></thead>";
     const tbody = document.createElement("tbody");
     const summarize = rows => {
       const groups = new Map();
@@ -2311,6 +2330,15 @@ async function compareSelectedBatches() {
       const linked = new Map([...cultureLinked, ...environmentLinked].map(row => [row.id, row]));
       const linkedRows = [...linked.values()];
       const context = batch.culture_id ? contextsByCultureId.get(batch.culture_id) : null;
+      const batchObservations = observations.filter(row =>
+        (batch.culture_id && row.culture_id === batch.culture_id) ||
+        (context?.experimentalUnitId && row.experimental_unit_id === context.experimentalUnitId)
+      ).sort((a, b) => new Date(b.observed_at) - new Date(a.observed_at));
+      const observationSummary = batchObservations.length
+        ? batchObservations.length + " observation(s) : " + batchObservations.slice(0, 3).map(row =>
+            row.variable_code + " — " + row.value_text + (row.quality_state === "excluded" ? " [exclue]" : "")
+          ).join(" ; ") + (batchObservations.length > 3 ? " ; …" : "")
+        : "Aucune observation";
       const lastDate = linkedRows.reduce((latest, row) => {
         const date = row.measured_at ? new Date(row.measured_at) : null;
         return date && (!latest || date > latest) ? date : latest;
@@ -2326,6 +2354,7 @@ async function compareSelectedBatches() {
         `${completed} / ${batchStages.length}`,
         String(cultureLinked.length),
         String(environmentLinked.length),
+        observationSummary,
         `Culture : ${summarize(cultureLinked)} | Environnement : ${summarize(environmentLinked)}`,
         lastDate ? lastDate.toLocaleString() : "—"
       ];
