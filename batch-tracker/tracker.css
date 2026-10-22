@@ -1494,42 +1494,45 @@ body[data-domain="mycology"] :is(input, select, textarea, button, a):focus-visib
 }
 
 
-/* Green Tech palette: natural leaf green, balanced between muted sage and neon. */
+/* Green Tech: restore the universe selector's vivid leaf-green accents,
+   while keeping button surfaces dark to avoid large fluorescent blocks. */
 body[data-domain="agronomy"] {
-  --brand: #83a96f !important;
-  --brand-hover: #94b87e !important;
-  --focus: #a5c692 !important;
-  --ok: #91b77d !important;
-  accent-color: #8eb779;
+  --brand: #a7f36a !important;
+  --brand-hover: #c2ff91 !important;
+  --focus: #a7f36a !important;
+  --ok: #a7f36a !important;
+  accent-color: #a7f36a;
 }
 body[data-domain="agronomy"] :is(
   button, .primary-button, .culture-catalog-action[data-culture-action="observe"],
   .section-nav a[aria-current="page"], .domain-option[aria-pressed="true"]
 ) {
-  background-color: #3b523b !important;
+  background-color: #222f28 !important;
   background-image: none !important;
-  border-color: #66815e !important;
-  color: #edf3e9 !important;
+  border-color: #506657 !important;
+  color: #a7f36a !important;
   box-shadow: none;
 }
 body[data-domain="agronomy"] :is(button, .primary-button):hover:not(:disabled) {
-  background-color: #496747 !important;
-  border-color: #83a575 !important;
+  background-color: #2b3a30 !important;
+  border-color: #a7f36a !important;
+  color: #c2ff91 !important;
 }
 body[data-domain="agronomy"] :is(a, .culture-catalog-code, .statistics-summary-item strong,
   .overview-metric strong, .section-kicker-label, .observation-details summary,
-  .overview-live, .shortcut-index, .culture-catalog-count) {
-  color: #bdd5ae !important;
+  .overview-live, .shortcut-index, .culture-catalog-count, .domain-option-icon,
+  .hero-art) {
+  color: #a7f36a !important;
 }
 body[data-domain="agronomy"] :is(.progress-bar, .overview-live span, .status-indicator,
   .status-dot, .live-dot) {
-  background: #83a96f !important;
+  background: #a7f36a !important;
   background-image: none !important;
 }
 body[data-domain="agronomy"] :is(input, select, textarea, button, a):focus-visible {
-  outline-color: #a5c692 !important;
-  box-shadow: 0 0 0 2px rgba(165, 198, 146, .24) !important;
+  outline-color: #a7f36a !important;
+  box-shadow: 0 0 0 2px rgba(167, 243, 106, .24) !important;
 }
 body[data-domain="agronomy"] .domain-option[aria-pressed="true"] {
-  box-shadow: inset 0 -3px 0 #83a96f !important;
+  box-shadow: inset 0 -3px 0 #a7f36a !important;
 }
