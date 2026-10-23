@@ -228,3 +228,25 @@ The current Supabase integration is **functional** but has **idempotence and ret
 **Author** : Claude (Audit Phase 4)  
 **Review Date** : 2026-10-19  
 **Next Review** : After Edge Function retry logic implementation
+
+
+---
+
+## Update — 2026-10-23 (production verification)
+
+This update supersedes older status statements above where they conflict with the live deployment. Earlier sections are retained as historical audit notes.
+
+- The deployed `sync-culture-to-notion` Edge Function is **active, version 13**, with JWT verification enabled. Its current source uses `acquire_culture_notion_sync_lock` and `release_culture_notion_sync_lock` with a 180-second lease, checks the caller's RLS-scoped access to the culture before using the service role, and reconciles Notion pages by `Supabase Culture ID` before creating.
+- The production migration ledger includes `20261020090000_protect_cultures_notion_columns_v1`; the old instruction that it still needs to be applied manually is stale.
+- Current Security Advisor findings: two IoT tables have RLS enabled without policies; four authenticated-callable `SECURITY DEFINER` batch RPCs are flagged; leaked-password protection is disabled. The IoT tables were previously verified to have no direct grants to `anon` or `authenticated`, so do not add permissive policies merely to silence the informational warning.
+- The four RPC definitions inspected on 2026-10-23 include organization-membership checks and validate referenced records against the same organization. Their authenticated execution should be retained only with regression tests for cross-organization denial and least-privilege grants.
+- The CI workflow now declares top-level `permissions: contents: read`. A new CI run was queued for the resulting `main` commit; success must be verified from the run results rather than inferred from the commit.
+- Branch-protection status could not be verified through the connected GitHub integration (API returned 403). Do not report branch protection as enabled until it is checked in repository settings by an administrator.
+
+### Remaining actions
+
+1. Enable leaked/compromised-password protection in Supabase Auth settings.
+2. Confirm the new CI run passes after the workflow permission change.
+3. Verify branch protection/rulesets in GitHub settings and require CI checks before merge.
+4. Add/retain automated cross-organization tests for every exposed tenant-scoped RPC.
+5. Compare deployed Edge Function source/version against the repository source before future deployments; test simultaneous sync attempts, lease expiry, and partial failure.
