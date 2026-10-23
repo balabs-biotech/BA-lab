@@ -2385,13 +2385,21 @@ async function compareSelectedBatches() {
       const summaries = [...groups.entries()].map(([key, values]) => {
         const [variable, unit, quality] = key.split("||");
         const mean = values.reduce((sum, value) => sum + value, 0) / values.length;
-        const min = Math.min(...values);
-        const max = Math.max(...values);
+        let min = Infinity;
+        let max = -Infinity;
+        values.forEach(value => {
+          if (value < min) min = value;
+          if (value > max) max = value;
+        });
         const fmt = value => new Intl.NumberFormat(undefined, {maximumSignificantDigits: 5}).format(value);
         return `${variable}${unit ? " (" + unit + ")" : ""}: ${labels.mean} ${fmt(mean)}, ${labels.range} ${fmt(min)}–${fmt(max)}, n_mesures=${values.length} [${quality}]`;
       });
       const excluded = rows.filter(row => row.quality_state === "excluded").length;
-      const nonNumeric = rows.filter(row => row.quality_state !== "excluded" && (row.normalized_value ?? row.raw_value) == null).length;
+      const nonNumeric = rows.filter(row => {
+        if (row.quality_state === "excluded") return false;
+        const value = row.normalized_value ?? row.raw_value;
+        return value == null || !Number.isFinite(Number(value));
+      }).length;
       if (excluded) summaries.push(`${labels.excluded}: ${excluded}`);
       if (nonNumeric) summaries.push(`${labels.nonNumeric}: ${nonNumeric}`);
       return summaries.length ? summaries.join("; ") : labels.empty;
