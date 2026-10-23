@@ -5034,6 +5034,24 @@ async function saveMeasurement() {
   }
 }
 
+function belongsToActiveWorkspace(record, eventsById = {}) {
+  const domain = document.body.dataset.domain || "mycology";
+  const event = record.event_id ? eventsById[record.event_id] : null;
+  const cultureId = record.culture_id || event?.culture_id;
+  const plantId = record.plant_culture_id || event?.plant_culture_id;
+  const batchId = event?.batch_id;
+  if (domain === "agronomy") {
+    return Boolean(plantId && plantCultureOptions.some(plant => plant.id === plantId));
+  }
+  if (domain === "mycology") {
+    return Boolean(cultureId && cultureOptions.some(culture => culture.id === cultureId));
+  }
+  return Boolean(
+    (cultureId && cultureOptions.some(culture => culture.id === cultureId)) ||
+    (batchId && latestBatches.some(batch => batch.id === batchId))
+  );
+}
+
 async function loadRecentMeasurements() {
   if (!organizationId || !measurementHistory) return;
 
@@ -5042,7 +5060,7 @@ async function loadRecentMeasurements() {
     .select("id, variable_code, raw_value, raw_unit_code, normalized_value, normalized_unit_code, measured_at, method, instrument, culture_id, plant_culture_id, event_id, metadata")
     .eq("organization_id", organizationId)
     .order("measured_at", { ascending: false })
-    .limit(10);
+    .limit(1000);
 
   if (error) throw new Error(`Chargement de l’historique des mesures impossible : ${error.message}`);
 
@@ -5052,19 +5070,20 @@ async function loadRecentMeasurements() {
   if (eventIds.length) {
     const { data: events, error: eventsError } = await supabaseClient
       .from("events")
-      .select("id, batch_id")
+      .select("id, batch_id, culture_id, plant_culture_id")
       .eq("organization_id", organizationId)
       .in("id", eventIds);
     if (eventsError) console.warn("Détails des événements de mesure indisponibles :", eventsError.message);
     for (const event of events || []) eventsById[event.id] = event;
   }
 
-  if (!rows.length) {
-    measurementHistory.innerHTML = '<p class="muted">Aucune mesure enregistrée pour le moment.</p>';
+  const visibleRows = rows.filter(row => belongsToActiveWorkspace(row, eventsById)).slice(0, 10);
+  if (!visibleRows.length) {
+    measurementHistory.innerHTML = '<p class="muted">Aucune mesure enregistrée dans cet univers pour le moment.</p>';
     return;
   }
 
-  measurementHistory.innerHTML = rows.map(row => {
+  measurementHistory.innerHTML = visibleRows.map(row => {
     const variable = measurementVariables.find(item => item.code === row.variable_code);
     const culture = cultureOptions.find(item => item.id === row.culture_id);
     const batchId = row.event_id ? eventsById[row.event_id]?.batch_id : null;
@@ -5234,25 +5253,26 @@ async function loadRecentObservations() {
     .select("id, variable_code, value_text, observed_at, culture_id, plant_culture_id, event_id, metadata")
     .eq("organization_id", organizationId)
     .order("observed_at", { ascending: false })
-    .limit(8);
+    .limit(1000);
 
   if (query.error) throw new Error("Chargement de l’historique des observations impossible : " + query.error.message);
-  recentObservations = query.data || [];
-  updateOverview();
-  const eventIds = [...new Set(recentObservations.map(row => row.event_id).filter(Boolean))];
+  const observationRows = query.data || [];
+  const eventIds = [...new Set(observationRows.map(row => row.event_id).filter(Boolean))];
   const eventsById = {};
 
   if (eventIds.length) {
     const eventsResult = await supabaseClient.from("events")
-      .select("id, batch_id")
+      .select("id, batch_id, culture_id, plant_culture_id")
       .eq("organization_id", organizationId)
       .in("id", eventIds);
     if (eventsResult.error) console.warn("Détails des événements d’observation indisponibles :", eventsResult.error.message);
     for (const event of eventsResult.data || []) eventsById[event.id] = event;
   }
 
+  recentObservations = observationRows.filter(row => belongsToActiveWorkspace(row, eventsById)).slice(0, 8);
+  updateOverview();
   if (!recentObservations.length) {
-    observationHistory.innerHTML = '<p class="muted">Aucune observation enregistrée pour le moment.</p>';
+    observationHistory.innerHTML = '<p class="muted">Aucune observation enregistrée dans cet univers pour le moment.</p>';
     return;
   }
 
