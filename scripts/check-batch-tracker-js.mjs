@@ -169,7 +169,7 @@ for (const snippet of [
   'outlierCaution:"rever; não são automaticamente erros"',
   'outlierCaution:"تحتاج إلى مراجعة ولا تعني أنها خاطئة تلقائيًا"',
   '(${labels.outlierCaution})',
-  'outliers:"valeurs atypiques (règle IQR)',
+  'outliers:"valeurs atypiques (règle IQR)"',
   'outliers:"potential outliers (IQR rule)"',
   'outliers:"valores atípicos potenciais (regra IQR)"',
   'outliers:"قيم شاذة محتملة (قاعدة المدى الربيعي)"',
