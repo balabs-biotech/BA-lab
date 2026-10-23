@@ -5812,6 +5812,7 @@ function activateWorkspaceModule(moduleId) {
   const modules = modulesByDomain[activeDomain] || modulesByDomain.laboratory;
   document.getElementById("trackerCard")?.classList.toggle("workspace-inactive", activeDomain === "agronomy");
   document.getElementById("plantCard")?.classList.toggle("workspace-inactive", activeDomain !== "agronomy");
+  document.getElementById("batchCard")?.classList.toggle("workspace-inactive", activeDomain !== "laboratory");
   document.querySelectorAll("[data-domain-nav]").forEach(link => {
     link.hidden = link.dataset.domainNav === "agronomy" ? activeDomain !== "agronomy" : activeDomain === "agronomy";
   });
