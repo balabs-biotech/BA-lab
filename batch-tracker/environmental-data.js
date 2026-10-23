@@ -133,7 +133,9 @@
       }catch(e){satelliteResults.replaceChildren(node("p",{class:"muted"},"Échec de la recherche : "+(e?.message||"erreur inconnue")));}
       finally{satelliteButton.disabled=false;}
     }
-    location.addEventListener("change",selectLocation);
+    location.addEventListener("change",()=>{satelliteResults.replaceChildren();selectLocation().then(()=>location.value&&loadRows());});
+    from.addEventListener("change",()=>location.value&&loadRows());
+    to.addEventListener("change",()=>location.value&&loadRows());
     save.addEventListener("click",async()=>{
       if(!location.value || lat.value==="" || lon.value===""){status.textContent="Choisissez un emplacement et saisissez latitude et longitude.";return;}
       const a=Number(lat.value),o=Number(lon.value),acc=accuracy.value===""?null:Number(accuracy.value);
