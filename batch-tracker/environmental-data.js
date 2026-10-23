@@ -29,8 +29,8 @@
     [["user_confirmed","Vérifié par l’utilisateur"],["gps_field","GPS terrain"],["map_estimate","Estimation cartographique"]].forEach(([v,t])=>source.append(node("option",{value:v},t)));
     const end=new Date(); end.setDate(end.getDate()-1);
     const start=new Date(end); start.setDate(start.getDate()-29);
-    const from=node("input",{id:"envFrom",type:"date",value:dateString(start)});
-    const to=node("input",{id:"envTo",type:"date",value:dateString(end)});
+    const from=node("input",{id:"envFrom",type:"date",value:dateString(start),max:dateString(end)});
+    const to=node("input",{id:"envTo",type:"date",value:dateString(end),max:dateString(end)});
     const save=node("button",{type:"button"},"Enregistrer les coordonnées");
     const run=node("button",{type:"button"},"Actualiser la météo");
     const refresh=node("button",{type:"button"},"Forcer l’actualisation météo");
