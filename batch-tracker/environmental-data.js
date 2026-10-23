@@ -46,16 +46,22 @@
     const picker=node("section",{class:"location-picker card","aria-labelledby":"locationPickerTitle"});
     picker.append(node("h3",{id:"locationPickerTitle"},"Définir l’emplacement sans saisir de coordonnées"));
     picker.append(node("p",{class:"muted"},"Utilisez votre position si vous êtes sur place, ou cliquez sur la carte puis déplacez le repère. Vérifiez le point avant de l’enregistrer."));
+    const placeSearch=node("div",{class:"location-search"});
+    const placeQuery=node("input",{type:"search",id:"envPlaceSearch",placeholder:"Ville, village, adresse ou lieu-dit","aria-label":"Rechercher un lieu"});
+    const placeSearchButton=node("button",{type:"button",class:"small-button"},"Rechercher ce lieu");
+    const placeResults=node("div",{class:"location-search-results","aria-live":"polite"});
+    placeSearch.append(field("Rechercher par nom ou adresse","envPlaceSearch",placeQuery),placeSearchButton,placeResults);
     const pickerActions=node("div",{class:"location-picker-actions"});
     const locateButton=node("button",{type:"button",class:"small-button"},"Me localiser");
     const mapSaveButton=node("button",{type:"button",class:"small-button secondary-button"},"Enregistrer cet emplacement");
+    picker.append(placeSearch);
     pickerActions.append(locateButton,mapSaveButton);
     const mapStatus=node("p",{class:"muted","aria-live":"polite"},"Carte en chargement…");
     const mapNode=node("div",{id:"envLocationMap","role":"application","aria-label":"Carte interactive : cliquer pour choisir un emplacement"});
     mapNode.style.cssText="height:320px;min-height:240px;border:1px solid #cbd5c7;border-radius:12px;overflow:hidden;background:#eef2ea;z-index:0";
     picker.append(pickerActions,mapStatus,mapNode);
     const mapStyle=node("style");
-    mapStyle.textContent=".location-picker-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.location-picker-actions button{margin-top:8px}.location-picker h3{margin-top:0;padding-top:0;border-top:0}.leaflet-container{font:inherit}.leaflet-control-attribution{font-size:10px!important}@media(max-width:600px){.location-picker-actions{grid-template-columns:1fr}.location-picker #envLocationMap{height:280px!important}}";
+    mapStyle.textContent=".location-picker-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.location-picker-actions button{margin-top:8px}.location-picker h3{margin-top:0;padding-top:0;border-top:0}.location-search{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:end;margin:12px 0}.location-search>div{min-width:0}.location-search-results{grid-column:1/-1;display:grid;gap:6px}.location-search-results button{text-align:left;white-space:normal}.leaflet-container{font:inherit}.leaflet-control-attribution{font-size:10px!important}@media(max-width:600px){.location-picker-actions{grid-template-columns:1fr}.location-search{grid-template-columns:1fr}.location-picker #envLocationMap{height:280px!important}}";
     document.head.append(mapStyle);
     form.append(field("Emplacement","envLocation",location),field("Du","envFrom",from),field("Au","envTo",to),run,coordinates);
 
@@ -104,6 +110,33 @@
       else mapStatus.textContent="Cliquez sur la carte pour placer le repère. La carte peut être déplacée et zoomée.";
       setTimeout(()=>locationMap.invalidateSize(),100);
     }
+    placeSearchButton.addEventListener("click",async()=>{
+      const query=placeQuery.value.trim();
+      if(query.length<3){placeResults.replaceChildren(node("p",{class:"muted"},"Saisissez au moins 3 caractères."));return;}
+      placeSearchButton.disabled=true;placeResults.replaceChildren(node("p",{class:"muted"},"Recherche du lieu…"));
+      try{
+        const url="https://nominatim.openstreetmap.org/search?format=jsonv2&limit=5&addressdetails=1&q="+encodeURIComponent(query);
+        const response=await fetch(url,{headers:{Accept:"application/json"}});
+        if(!response.ok)throw new Error("Service de recherche indisponible (HTTP "+response.status+").");
+        const places=await response.json();placeResults.replaceChildren();
+        if(!Array.isArray(places)||!places.length){placeResults.append(node("p",{class:"muted"},"Aucun lieu trouvé. Essayez un nom plus précis ou placez le repère sur la carte."));return;}
+        places.forEach(place=>{
+          const label=place.display_name||query;
+          const choose=node("button",{type:"button",class:"small-button secondary-button"},label);
+          choose.addEventListener("click",()=>{
+            const latitude=Number(place.lat),longitude=Number(place.lon);
+            if(!Number.isFinite(latitude)||!Number.isFinite(longitude)){mapStatus.textContent="Résultat sans coordonnées utilisables.";return;}
+            setMapPoint(latitude,longitude,"map_estimate",null,true);
+            mapStatus.textContent="Lieu choisi : "+label+". Position indicative du géocodeur ; vérifiez le repère sur la carte puis enregistrez.";
+            placeResults.replaceChildren(node("p",{class:"muted"},"Lieu sélectionné. Vérifiez le repère avant l’enregistrement."));
+          });
+          placeResults.append(choose);
+        });
+        placeResults.append(node("small",{class:"muted"},"Résultats OpenStreetMap/Nominatim. La position peut correspondre au centre d’un lieu et non à votre parcelle."));
+      }catch(error){placeResults.replaceChildren(node("p",{class:"muted"},"Recherche impossible : "+(error?.message||"erreur inconnue")+". Vous pouvez utiliser la carte."));}
+      finally{placeSearchButton.disabled=false;}
+    });
+    placeQuery.addEventListener("keydown",event=>{if(event.key==="Enter"){event.preventDefault();placeSearchButton.click();}});
     locateButton.addEventListener("click",()=>{
       if(!navigator.geolocation){mapStatus.textContent="La géolocalisation n’est pas prise en charge par ce navigateur.";return;}
       locateButton.disabled=true;mapStatus.textContent="Demande de position… Autorisez la localisation dans le navigateur si demandé.";
