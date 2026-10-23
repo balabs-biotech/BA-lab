@@ -272,3 +272,12 @@ This update supersedes older status statements above where they conflict with th
 - Added `supabase/migrations/20261023020000_version_nasa_power_cron_secret_verifier.sql` and applied its SQL to production. The verifier is `SECURITY DEFINER` with an empty search path; its routine grants were checked after application and expose `EXECUTE` only to `service_role` among application roles.
 - Added the NASA POWER scheduled importer to source control and documented current provider limitations and a staged Copernicus Sentinel-2 integration plan in `docs/architecture/iot-et-donnees-publiques.md`.
 - Satellite ingestion remains unimplemented. The next safe step is a read-only Copernicus STAC catalogue adapter that stores scene metadata only; raster downloads and indices should follow after provenance, cloud masking, geometry and compute requirements are validated.
+
+
+## Update — 2026-10-23 (Sentinel-2 catalogue adapter)
+
+- Added `supabase/functions/copernicus-sentinel-catalogue/index.ts` as a versioned, read-only Edge Function source. It authenticates the caller and reads the selected location through the caller-scoped Supabase client, then queries Copernicus STAC for Sentinel-2 L2A scene metadata.
+- The adapter caps searches at 180 days and 20 scenes, supports a maximum cloud-cover filter, returns only a small set of metadata fields, and does not persist observations or download imagery.
+- Its bounding box is a regional window around the stored point, not a parcel polygon. Scene-level cloud cover cannot establish that the specific crop is cloud-free.
+- **Not deployed to production yet.** CI for the new source is still running; live STAC response validation and authorization tests are required before deployment. The production table still contains zero satellite observations.
+- Official API reference: https://documentation.dataspace.copernicus.eu/APIs/STAC.html (collection `sentinel-2-l2a`, search endpoint `/v1/search`).
