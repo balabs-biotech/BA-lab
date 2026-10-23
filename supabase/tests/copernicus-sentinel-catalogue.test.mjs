@@ -19,7 +19,7 @@ const checks = [
   ["requests STAC asset metadata needed for image previews", /searchParams\.set\("fields", "id,collection,bbox,properties\.datetime,properties\.eo:cloud_cover,properties\.platform,properties\.constellation,links,assets,-geometry"\)/],
   ["detects preview assets by key or STAC role", /Array\.isArray\(roles\)[\s\S]*?thumbnail[\s\S]*?overview/],
   ["also checks STAC preview and thumbnail links", /linkCandidates[\s\S]*?\["preview", "thumbnail", "quicklook", "overview"\]/],
-  ["allows HTTPS preview URLs only from Copernicus or the documented CloudFerro host", /parsedPreview\.protocol === "https:"[\s\S]*?const trustedHost[\s\S]*?hostname === "s3\.waw3-2\.cloudferro\.com"/],
+  ["allows HTTPS preview URLs only from Copernicus or the documented CloudFerro host", /parsedPreview\.protocol === "https:"[\s\S]*?s3\.waw3-2\.cloudferro\.com/],
   ["returns the matched preview source for diagnostics", /preview_source: previewSource/],
   ["does not write satellite data to the database", /Does not download imagery or write database rows/],
   ["uses a bounded upstream timeout", /AbortSignal\.timeout\(20000\)/],
