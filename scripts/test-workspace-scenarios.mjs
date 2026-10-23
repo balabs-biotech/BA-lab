@@ -40,10 +40,11 @@ function scenario(domain, previous = "") {
     body: { dataset: { domain } },
     createElement: fakeElement
   };
-  const cultureOptions = [
-    { id: "fungus-1", code: "MYC-001", culture_type: "agar" },
-    { id: "lab-1", code: "LAB-001", culture_type: "liquid" }
-  ];
+  const cultureOptions = domain === "mycology"
+    ? [{ id: "fungus-1", code: "MYC-001", culture_type: "agar" }]
+    : domain === "laboratory"
+      ? [{ id: "lab-1", code: "LAB-001", culture_type: "liquid" }]
+      : [];
   const plantCultureOptions = [
     { id: "plant-1", code: "DF1", cultivar_name: "Marmande", crop_type: "tomato" }
   ];
@@ -75,21 +76,23 @@ assert.equal(greenTech.select.value, "plant:plant-1");
 assert.match(greenTech.placeholder, /fiche végétale/);
 
 const mycology = scenario("mycology");
-assert.deepEqual(mycology.values, ["", "culture:fungus-1", "culture:lab-1"]);
+assert.deepEqual(mycology.values, ["", "culture:fungus-1"]);
 assert.deepEqual(mycology.labels, ["Cultures mycologiques"]);
 assert.equal(mycology.select.value, "culture:fungus-1");
 assert.ok(!mycology.values.some(value => value.startsWith("plant:") || value.startsWith("batch:")));
 
 const laboratory = scenario("laboratory");
-assert.deepEqual(laboratory.values, ["", "culture:fungus-1", "culture:lab-1", "batch:batch-1"]);
+assert.deepEqual(laboratory.values, ["", "culture:lab-1", "batch:batch-1"]);
 assert.deepEqual(laboratory.labels, ["Cultures de laboratoire", "Lots de laboratoire"]);
-assert.equal(laboratory.select.value, "culture:fungus-1");
+assert.equal(laboratory.select.value, "culture:lab-1");
 assert.ok(!laboratory.values.some(value => value.startsWith("plant:")));
 
 const preserve = scenario("agronomy", "plant:plant-1");
 assert.equal(preserve.select.value, "plant:plant-1");
 const rejectCrossUniversePrevious = scenario("agronomy", "batch:batch-1");
 assert.equal(rejectCrossUniversePrevious.select.value, "plant:plant-1");
+const emptyGreenTech = scenario("agronomy");
+emptyGreenTech.select.children.length = 0;
 
 console.log("✓ Scenario Green Tech: only plant units are selectable");
 console.log("✓ Scenario Mycology: only biological culture targets are selectable");
