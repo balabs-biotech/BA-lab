@@ -175,7 +175,10 @@
         ? "Chargement des coordonnées de l’emplacement sélectionné…"
         : "Choisissez un emplacement avant d’enregistrer un point.");
       if(!location.value)return;
-      const {data,error}=await db.from("locations").select("latitude,longitude,coordinate_accuracy_m,coordinate_source").eq("id",location.value).maybeSingle();
+      const requestedLocationId=location.value;
+      const {data,error}=await db.from("locations").select("latitude,longitude,coordinate_accuracy_m,coordinate_source").eq("id",requestedLocationId).maybeSingle();
+      // Ignore stale responses if the user switched locations while this read was in flight.
+      if(location.value!==requestedLocationId)return;
       if(error){
         clearMapPoint("Impossible de charger cet emplacement : "+error.message);
         return;
