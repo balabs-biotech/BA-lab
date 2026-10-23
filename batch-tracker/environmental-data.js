@@ -203,11 +203,49 @@
         card.append(show);parcelList.append(card);
       });
     }
+    // Lightweight geometry checks before storing a user-drawn polygon.
+    // Coordinates are [latitude, longitude]; intersections are tested in lon/lat
+    // space, which is appropriate for ordinary small agricultural parcels.
+    function validateParcelVertices(vertices){
+      if(!Array.isArray(vertices)||vertices.length<3)return "Il faut au moins trois sommets.";
+      for(const point of vertices){
+        if(!Array.isArray(point)||point.length!==2||!Number.isFinite(point[0])||!Number.isFinite(point[1])||point[0]<-90||point[0]>90||point[1]<-180||point[1]>180)
+          return "Un sommet contient des coordonnées invalides.";
+      }
+      const unique=new Set(vertices.map(([a,b])=>a.toFixed(8)+","+b.toFixed(8)));
+      if(unique.size<3)return "Le contour doit contenir au moins trois sommets distincts.";
+      const points=vertices.map(([latitude,longitude])=>({x:longitude,y:latitude}));
+      let twiceArea=0;
+      for(let i=0;i<points.length;i++){
+        const a=points[i],b=points[(i+1)%points.length];
+        twiceArea+=a.x*b.y-b.x*a.y;
+        if(Math.hypot(a.x-b.x,a.y-b.y)<1e-9)return "Deux sommets consécutifs sont confondus.";
+      }
+      if(Math.abs(twiceArea)<1e-10)return "Le contour a une surface nulle ou trop petite pour être fiable.";
+      const orient=(a,b,c)=>(b.x-a.x)*(c.y-a.y)-(b.y-a.y)*(c.x-a.x);
+      const onSegment=(a,b,p)=>p.x>=Math.min(a.x,b.x)-1e-10&&p.x<=Math.max(a.x,b.x)+1e-10&&p.y>=Math.min(a.y,b.y)-1e-10&&p.y<=Math.max(a.y,b.y)+1e-10;
+      const intersects=(a,b,c,d)=>{
+        const o1=orient(a,b,c),o2=orient(a,b,d),o3=orient(c,d,a),o4=orient(c,d,b);
+        if(((o1>1e-10&&o2< -1e-10)||(o1< -1e-10&&o2>1e-10))&&((o3>1e-10&&o4< -1e-10)||(o3< -1e-10&&o4>1e-10)))return true;
+        return (Math.abs(o1)<=1e-10&&onSegment(a,b,c))||(Math.abs(o2)<=1e-10&&onSegment(a,b,d))||(Math.abs(o3)<=1e-10&&onSegment(c,d,a))||(Math.abs(o4)<=1e-10&&onSegment(c,d,b));
+      };
+      for(let i=0;i<points.length;i++){
+        const a=points[i],b=points[(i+1)%points.length];
+        for(let j=i+1;j<points.length;j++){
+          // Adjacent edges share an endpoint by design, including first/last.
+          if(j===i||j===(i+1)%points.length||(j+1)%points.length===i)continue;
+          if(intersects(a,b,points[j],points[(j+1)%points.length]))return "Le contour se croise ou touche un segment non adjacent. Corrigez les sommets.";
+        }
+      }
+      return null;
+    }
     saveParcelButton.addEventListener("click",async()=>{
       const code=parcelCode.value.trim(),name=parcelName.value.trim();
       if(!location.value){parcelStatus.textContent="Choisissez un emplacement.";return;}
       if(!code||!name){parcelStatus.textContent="Renseignez le code et le nom de la parcelle.";return;}
       if(!parcelCompleted||parcelVertices.length<3){parcelStatus.textContent="Terminez d’abord un contour de trois sommets minimum.";return;}
+      const geometryError=validateParcelVertices(parcelVertices);
+      if(geometryError){parcelStatus.textContent=geometryError;return;}
       if(!window.L||!parcelLayer){parcelStatus.textContent="Le contour n’est pas disponible.";return;}
       saveParcelButton.disabled=true;parcelStatus.textContent="Enregistrement de la parcelle…";
       try{
