@@ -20,6 +20,8 @@ const OTHER_CULTURE = "21c7fbc8-b590-420b-87bf-3e2cd9ed4e49";
 type Json = Record<string, any>;
 let env: Record<string, string | undefined> = {};
 let db: { cultures: Json[]; visible: string[]; userOk: boolean; updateError?: string };
+let lockBusy = false;
+let lockCalls: { name: string; args: Json }[] = [];
 let notion: (url: string, init: Json) => { status: number; body: Json };
 let notionCalls: { url: string; method: string; body: Json | null }[] = [];
 let updates: { payload: Json; filters: Record<string, any> }[] = [];
@@ -53,6 +55,19 @@ function builder(table: string, role: "user" | "admin") {
 (globalThis as any).__createClient = (_url: string, key: string) => ({
   auth: { getUser: async () => (db.userOk ? { data: { user: { id: "user-1" } }, error: null } : { data: { user: null }, error: { message: "bad" } }) },
   from: (table: string) => builder(table, key === "pub" ? "user" : "admin"),
+  rpc: async (name: string, args: Json) => {
+    lockCalls.push({ name, args });
+    if (name === "acquire_culture_notion_sync_lock") {
+      if (lockBusy) return { data: false, error: null };
+      lockBusy = true;
+      return { data: true, error: null };
+    }
+    if (name === "release_culture_notion_sync_lock") {
+      lockBusy = false;
+      return { data: true, error: null };
+    }
+    return { data: null, error: { message: "unexpected rpc" } };
+  },
 });
 (globalThis as any).Deno = {
   env: { get: (k: string) => env[k] },
@@ -76,7 +91,7 @@ function page(id: string, cultureId: string, dbId = DB_ID, extra: Json = {}) {
   };
 }
 
-function reset(overrides: { env?: Json; notion?: typeof notion; cultures?: Json[]; visible?: string[]; userOk?: boolean; updateError?: string } = {}) {
+function reset(overrides: { env?: Json; notion?: typeof notion; cultures?: Json[]; visible?: string[]; userOk?: boolean; updateError?: string; lockBusy?: boolean } = {}) {
   env = {
     SUPABASE_URL: "http://sb.test", SUPABASE_PUBLISHABLE_KEY: "pub", SUPABASE_SECRET_KEY: "svc",
     NOTION_API_KEY: "test-token-not-a-secret", NOTION_CULTURES_DATABASE_ID: DB_ID, ...(overrides.env ?? {}),
@@ -87,6 +102,8 @@ function reset(overrides: { env?: Json; notion?: typeof notion; cultures?: Json[
     userOk: overrides.userOk ?? true,
     updateError: overrides.updateError,
   };
+  lockBusy = overrides.lockBusy ?? false;
+  lockCalls = [];
   notion = overrides.notion ?? (() => ({ status: 500, body: { message: "unexpected notion call" } }));
   notionCalls = []; updates = []; queries = [];
 }
@@ -255,6 +272,27 @@ await test("récupération après création Notion mais échec de sauvegarde Sup
   eq(second.body.notion_page_id, "page-recovered", "recovered page id");
   eq(finalUpdate().payload.notion_page_id, "page-recovered", "page link persisted on retry");
   ok(queryCount >= 2, "retry must reconcile against Notion");
+});
+
+await test("synchronisation déjà verrouillée : 409, aucun appel Notion et aucune écriture de statut", async () => {
+  reset({ lockBusy: true });
+  const r = await call();
+  eq(r.status, 409, "status");
+  eq(r.body.code, "sync_in_progress", "error code");
+  eq(notionCalls.length, 0, "Notion calls");
+  eq(updates.length, 0, "culture updates");
+  eq(lockCalls[0].name, "acquire_culture_notion_sync_lock", "lock RPC");
+});
+
+await test("verrou de synchronisation libéré après succès", async () => {
+  reset({
+    notion: (url, init) => url.endsWith("/query") ? { status: 200, body: { results: [] } }
+      : init.method === "POST" ? { status: 200, body: page("page-lock", CULTURE) } : { status: 200, body: {} },
+  });
+  const r = await call();
+  eq(r.status, 200, "status");
+  eq(lockCalls.map((c) => c.name), ["acquire_culture_notion_sync_lock", "release_culture_notion_sync_lock"], "lock lifecycle");
+  eq(lockBusy, false, "lock released");
 });
 
 console.log(failed ? `\n${failed} test(s) en échec` : "\nOK: sync-culture-to-notion tests passed");
