@@ -151,7 +151,7 @@
       });
       const table=node("table");
       const head=node("tr");
-      ["Variable","Jours couverts","Couverture","Dernière date"].forEach(t=>head.append(node("th",{},t)));
+      ["Variable","Jours couverts","Couverture","Dernière date","État"].forEach(t=>head.append(node("th",{},t)));
       const thead=node("thead");thead.append(head);table.append(thead);
       const tbody=node("tbody");
       Object.entries(labels).forEach(([key,label])=>{
@@ -159,12 +159,14 @@
         const count=dates.length;
         const last=dates.length?dates[dates.length-1]:"—";
         const percent=expected>0?Math.round(count/expected*100):0;
+        const gapDays=dates.length&&Number.isFinite(endMs)?Math.floor((endMs-Date.parse(last+"T00:00:00Z"))/86400000):null;
+        const state=!count?"Aucune donnée":percent<80?"Couverture faible":gapDays>2?"Dernière donnée à plus de 2 jours":"À surveiller normalement";
         const tr=node("tr");
-        [label,count+" / "+Math.max(expected,0),expected>0?percent+" %":"—",last].forEach(t=>tr.append(node("td",{},String(t))));
+        [label,count+" / "+Math.max(expected,0),expected>0?percent+" %":"—",last,state].forEach(t=>tr.append(node("td",{},String(t))));
         tbody.append(tr);
       });
       table.append(tbody);coverage.append(table);
-      coverage.append(node("p",{class:"muted"},"La couverture compte les dates calendaires avec une valeur numérique dans la période sélectionnée. Une date absente peut refléter une donnée indisponible chez le fournisseur, un import incomplet ou un défaut de coordonnées ; ce tableau ne permet pas seul d’en déterminer la cause."));
+      coverage.append(node("p",{class:"muted"},"La couverture compte les dates calendaires avec une valeur numérique dans la période sélectionnée. « Couverture faible » signifie moins de 80 % des jours attendus ; « Dernière donnée à plus de 2 jours » signale un écart avec la fin de période. Ces signaux ne déterminent pas seuls la cause : retard du fournisseur, import incomplet ou coordonnées peuvent être en jeu. NASA POWER fournit des estimations régionales, pas des mesures locales."));
       summary.append(coverage);
     }
     async function loadRows(){
