@@ -60,3 +60,18 @@ Reference:
 - Do not expose service-role credentials in the static GitHub Pages client.
 - Do not schedule automatic refresh until the deployment has a verified scheduler (e.g. Supabase Cron/pg_cron or an external GitHub Actions schedule) and its costs/limits are understood.
 - Free data does not mean unlimited processing, guaranteed availability or zero operational cost.
+
+
+## First implementation — NASA POWER daily import
+
+The first connector is implemented as the Supabase Edge Function `nasa-power-agroclimate` and the Green Tech panel loaded by `batch-tracker/environmental-data.js`.
+
+- A signed-in organization member selects an existing location and explicitly enters or confirms its latitude/longitude. The interface does not infer the user's precise location.
+- The browser calls the Edge Function; it does not call NASA POWER directly or hold server credentials.
+- The function validates the location through the caller's RLS-scoped session, accepts a maximum 366-day date window, calls NASA POWER's daily point endpoint and upserts values into `environmental_observations`.
+- Imported variables: daily mean/minimum/maximum 2 m air temperature, corrected precipitation and all-sky surface shortwave radiation.
+- Idempotency uses the organization/location/provider/dataset/variable/observation-time unique key. Recently retrieved complete-enough ranges may be served from the database cache; a subsequent manual refresh control can be added if operational testing shows it is needed.
+- Each record retains the NASA parameter name, source date/time standard, coordinate provenance, source URL, retrieval time, unit and an indicative grid scale. Missing sentinel values are excluded.
+- The panel labels these values as gridded estimates and does not turn them into diagnoses or irrigation commands.
+
+Before production use, deploy the Edge Function with JWT verification enabled and test with a real organization location whose coordinates have been explicitly checked. Confirm read/update RLS policies on `locations` and read RLS on `environmental_observations`. Do not populate live data using invented coordinates or synthetic observations.
