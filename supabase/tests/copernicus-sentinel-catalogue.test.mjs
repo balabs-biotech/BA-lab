@@ -13,7 +13,7 @@ const checks = [
   ["limits searches to 180 past days", /days > 180 \|\| Date\.parse\(end \+ "T00:00:00Z"\) > Date\.now\(\)/],
   ["bounds result count to 1–20", /limit < 1 \|\| limit > 20/],
   ["bounds cloud cover to 0–100%", /cloud < 0 \|\| cloud > 100/],
-  ["checks location access through the user's RLS scope", /db\.from\("locations"\)[\s\S]*?\.eq\("id", locationId\)\.maybeSingle\(\)/],
+  ["checks location access through the user's RLS scope", /db\.from\("locations"\)[  ["detects preview assets by key or STAC role", /Array\.isArray\(roles\)[\s\S]*?thumbnail[\s\S]*?overview/],\S]*?\.eq\("id", locationId\)\.maybeSingle\(\)/],
   ["queries Sentinel-2 L2A", /collections", "sentinel-2-l2a"/],
   ["returns the newest matching scenes first", /sortby", "-properties\.datetime"/],
   ["requests STAC asset metadata needed for image previews", /searchParams\.set\("fields", "id,collection,bbox,properties\.datetime,properties\.eo:cloud_cover,properties\.platform,properties\.constellation,links,assets,-geometry"\)/],
