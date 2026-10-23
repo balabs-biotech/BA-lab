@@ -344,7 +344,7 @@
     const {data: authState}=await db.auth.getSession();
     if(!authState?.session){
       status.textContent="Connectez-vous à CultureOps pour accéder aux emplacements de votre organisation.";
-      db.auth.onAuthStateChange((_event,session)=>{if(session){panel.classList.remove("hidden");loadLocations().then(()=>location.value&&loadRows());}});
+      db.auth.onAuthStateChange((_event,session)=>{if(session){panel.classList.remove("hidden");loadMapLibrary();loadLocations().then(()=>location.value&&loadRows());}});
       return;
     }
     panel.classList.remove("hidden");
