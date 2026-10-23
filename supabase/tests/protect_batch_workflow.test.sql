@@ -310,15 +310,16 @@ do $$ begin
       'preparation'
     );
     raise exception 'FAIL: cross-organization stage advancement was allowed';
-  exception when sqlstate '42501' then
-    if sqlerrm = 'FAIL: cross-organization stage advancement was allowed' then raise; end if;
+  exception when sqlstate 'P0001' then
+    if sqlerrm <> 'batch not found' then raise; end if;
   end;
 
   begin
     perform public.release_batch('00000000-0000-0000-0000-0000000000f1');
     raise exception 'FAIL: cross-organization release was allowed';
-  exception when sqlstate '42501' then
+  exception when sqlstate 'P0001' then
     if sqlerrm = 'FAIL: cross-organization release was allowed' then raise; end if;
+    if sqlerrm <> 'batch not found' then raise; end if;
   end;
 
   begin
