@@ -165,6 +165,8 @@ console.log("✓ Batch comparison reports median and interquartile range with fo
 
 for (const snippet of [
   'outlierCaution:"à examiner, pas automatiquement erronées"',
+  'outliers:"valeurs atypiques (règle IQR)",
+  'outlierCaution:"à examiner, pas automatiquement erronées"',
   'outlierCaution:"review; not automatically erroneous"',
   'outlierCaution:"rever; não são automaticamente erros"',
   'outlierCaution:"تحتاج إلى مراجعة ولا تعني أنها خاطئة تلقائيًا"',
