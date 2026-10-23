@@ -68,7 +68,7 @@
       summary.replaceChildren();
       if(!data.length){summary.append(node("p",{class:"muted"},"Pas encore de données météo pour cette période. Importez l’historique pour obtenir des repères utiles."));return;}
       const byDate=new Map();
-      data.forEach(r=>{const day=String(r.observed_at).slice(0,10);if(!byDate.has(day))byDate.set(day,{});byDate.get(day)[r.variable_code]=Number(r.value);});
+      data.forEach(r=>{if(r.value===null||r.value===undefined)return;const value=Number(r.value);if(!Number.isFinite(value))return;const day=String(r.observed_at).slice(0,10);if(!byDate.has(day))byDate.set(day,{});byDate.get(day)[r.variable_code]=value;});
       const days=[...byDate.keys()].sort().slice(-7);
       const rows=days.map(d=>byDate.get(d));
       const maxTemps=rows.map(x=>x.air_temperature_max).filter(Number.isFinite);
