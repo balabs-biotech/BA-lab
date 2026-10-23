@@ -60,8 +60,26 @@
     const mapNode=node("div",{id:"envLocationMap","role":"application","aria-label":"Carte interactive : cliquer pour choisir un emplacement"});
     mapNode.style.cssText="height:320px;min-height:240px;border:1px solid #cbd5c7;border-radius:12px;overflow:hidden;background:#eef2ea;z-index:0";
     picker.append(pickerActions,mapStatus,mapNode);
+    const parcelPanel=node("section",{class:"parcel-editor card","aria-labelledby":"parcelEditorTitle"});
+    parcelPanel.append(node("h3",{id:"parcelEditorTitle"},"Contour de parcelle"));
+    parcelPanel.append(node("p",{class:"muted"},"Sélectionnez un emplacement, démarrez le dessin puis cliquez sur la carte pour placer au moins trois sommets. Le contour est enregistré séparément des coordonnées du site."));
+    const parcelCode=node("input",{type:"text",id:"parcelCode",maxlength:"80",placeholder:"Ex. PARCELLE-01","aria-label":"Code de la parcelle"});
+    const parcelName=node("input",{type:"text",id:"parcelName",maxlength:"160",placeholder:"Nom de la parcelle","aria-label":"Nom de la parcelle"});
+    const parcelFields=node("div",{class:"parcel-fields"});
+    parcelFields.append(field("Code unique","parcelCode",parcelCode),field("Nom affiché","parcelName",parcelName));
+    const parcelActions=node("div",{class:"location-picker-actions"});
+    const drawParcelButton=node("button",{type:"button",class:"small-button"},"Démarrer le contour");
+    const finishParcelButton=node("button",{type:"button",class:"small-button secondary-button",disabled:true},"Terminer le contour");
+    const undoParcelButton=node("button",{type:"button",class:"small-button secondary-button",disabled:true},"Retirer le dernier sommet");
+    const clearParcelButton=node("button",{type:"button",class:"small-button secondary-button"},"Effacer le contour");
+    const saveParcelButton=node("button",{type:"button",class:"small-button",disabled:true},"Enregistrer la parcelle");
+    parcelActions.append(drawParcelButton,finishParcelButton,undoParcelButton,clearParcelButton,saveParcelButton);
+    const parcelStatus=node("p",{class:"muted","aria-live":"polite"},"Aucun contour en cours.");
+    const parcelList=node("div",{class:"parcel-list","aria-live":"polite"});
+    parcelPanel.append(parcelFields,parcelActions,parcelStatus,parcelList);
+    picker.append(parcelPanel);
     const mapStyle=node("style");
-    mapStyle.textContent=".location-picker-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.location-picker-actions button{margin-top:8px}.location-picker h3{margin-top:0;padding-top:0;border-top:0}.location-search{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:end;margin:12px 0}.location-search>div{min-width:0}.location-search-results{grid-column:1/-1;display:grid;gap:6px}.location-search-results button{text-align:left;white-space:normal}.leaflet-container{font:inherit}.leaflet-control-attribution{font-size:10px!important}@media(max-width:600px){.location-picker-actions{grid-template-columns:1fr}.location-search{grid-template-columns:1fr}.location-picker #envLocationMap{height:280px!important}}";
+    mapStyle.textContent=".location-picker-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.location-picker-actions button{margin-top:8px}.location-picker h3{margin-top:0;padding-top:0;border-top:0}.location-search{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:end;margin:12px 0}.location-search>div{min-width:0}.location-search-results{grid-column:1/-1;display:grid;gap:6px}.location-search-results button{text-align:left;white-space:normal}.parcel-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.parcel-editor{margin-top:14px}.parcel-editor input{width:100%;box-sizing:border-box}.parcel-list{display:grid;gap:8px}.parcel-list .card{padding:10px}.leaflet-container{font:inherit}.leaflet-control-attribution{font-size:10px!important}@media(max-width:600px){.location-picker-actions{grid-template-columns:1fr}.location-search{grid-template-columns:1fr}.parcel-fields{grid-template-columns:1fr}.location-picker #envLocationMap{height:280px!important}}";
     document.head.append(mapStyle);
     form.append(field("Emplacement","envLocation",location),field("Du","envFrom",from),field("Au","envTo",to),run,coordinates);
 
@@ -70,6 +88,7 @@
     const satelliteHint=node("p",{class:"muted"},"Sentinel-2 : scènes disponibles et couverture nuageuse. L’image ne constitue pas à elle seule un diagnostic de culture.");
     panel.append(form,picker,status,summary,satelliteHint,satelliteButton,satelliteResults,details);
     let locationMap=null, locationMarker=null, mapReady=false;
+    let drawingParcel=false, parcelVertices=[], parcelLayer=null, parcelCompleted=false;
     function setMapPoint(latitude,longitude,origin,precision=null,zoomToPoint=false){
       lat.value=String(latitude);lon.value=String(longitude);accuracy.value=precision==null?"":String(precision);
       source.value=origin;
@@ -104,12 +123,107 @@
       if(mapReady||!window.L)return;
       locationMap=L.map(mapNode,{scrollWheelZoom:false}).setView([28,2],4);
       L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,attribution:'&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a>'}).addTo(locationMap);
-      locationMap.on("click",event=>setMapPoint(event.latlng.lat,event.latlng.lng,"map_estimate"));
+      locationMap.on("click",event=>{
+         if(drawingParcel){
+           parcelVertices.push([event.latlng.lat,event.latlng.lng]);
+           renderParcelDraft();
+           parcelStatus.textContent="Sommet "+parcelVertices.length+" ajouté.";
+         }else setMapPoint(event.latlng.lat,event.latlng.lng,"map_estimate");
+       });
       mapReady=true;
       if(lat.value!==""&&lon.value!=="")setMapPoint(Number(lat.value),Number(lon.value),source.value||"user_confirmed",accuracy.value===""?null:Number(accuracy.value),true);
       else mapStatus.textContent="Cliquez sur la carte pour placer le repère. La carte peut être déplacée et zoomée.";
       setTimeout(()=>locationMap.invalidateSize(),100);
     }
+    function removeParcelLayer(){
+      if(parcelLayer&&locationMap)locationMap.removeLayer(parcelLayer);
+      parcelLayer=null;
+    }
+    function renderParcelDraft(){
+      removeParcelLayer();
+      if(!locationMap||!window.L||!parcelVertices.length)return;
+      const points=parcelVertices.map(([a,b])=>[a,b]);
+      if(points.length===1)parcelLayer=L.circleMarker(points[0],{radius:6,color:"#8a5a00"}).addTo(locationMap);
+      else parcelLayer=L.polyline(points,{color:"#8a5a00",weight:3,dashArray:parcelCompleted?null:"6 6"}).addTo(locationMap);
+      undoParcelButton.disabled=!drawingParcel||parcelVertices.length===0;
+      finishParcelButton.disabled=!drawingParcel||parcelVertices.length<3;
+      saveParcelButton.disabled=drawingParcel||!parcelCompleted||parcelVertices.length<3;
+    }
+    function resetParcelDraft(message="Contour effacé."){
+      drawingParcel=false;parcelCompleted=false;parcelVertices=[];removeParcelLayer();
+      drawParcelButton.disabled=false;finishParcelButton.disabled=true;undoParcelButton.disabled=true;saveParcelButton.disabled=true;
+      if(locationMap)locationMap.getContainer().style.cursor="";
+      parcelStatus.textContent=message;
+    }
+    drawParcelButton.addEventListener("click",()=>{
+      if(!location.value){parcelStatus.textContent="Choisissez d’abord un emplacement.";return;}
+      resetParcelDraft("Dessin démarré : cliquez sur la carte pour ajouter les sommets.");
+      drawingParcel=true;drawParcelButton.disabled=true;finishParcelButton.disabled=true;
+      if(locationMap)locationMap.getContainer().style.cursor="crosshair";
+    });
+    finishParcelButton.addEventListener("click",()=>{
+      if(parcelVertices.length<3){parcelStatus.textContent="Il faut au moins trois sommets.";return;}
+      drawingParcel=false;parcelCompleted=true;
+      if(locationMap)locationMap.getContainer().style.cursor="";
+      removeParcelLayer();
+      const ring=[...parcelVertices,parcelVertices[0]];
+      parcelLayer=L.polygon(ring,{color:"#236b4b",weight:3,fillOpacity:0.18}).addTo(locationMap);
+      locationMap.fitBounds(parcelLayer.getBounds(),{padding:[18,18]});
+      drawParcelButton.disabled=false;finishParcelButton.disabled=true;undoParcelButton.disabled=true;saveParcelButton.disabled=false;
+      parcelStatus.textContent="Contour fermé. Vérifiez qu’il suit la parcelle et ne se croise pas avant l’enregistrement.";
+    });
+    undoParcelButton.addEventListener("click",()=>{
+      if(!drawingParcel||!parcelVertices.length)return;
+      parcelVertices.pop();renderParcelDraft();parcelStatus.textContent="Dernier sommet retiré.";
+    });
+    clearParcelButton.addEventListener("click",()=>resetParcelDraft());
+    async function loadParcels(){
+      parcelList.replaceChildren();
+      if(!location.value)return;
+      const {data,error}=await db.from("farm_parcels").select("id,parcel_code,name,boundary_geojson,boundary_source,created_at").eq("location_id",location.value).order("name");
+      if(error){parcelList.append(node("p",{class:"muted"},"Lecture des parcelles indisponible : "+error.message));return;}
+      if(!data?.length){parcelList.append(node("p",{class:"muted"},"Aucune parcelle enregistrée pour cet emplacement."));return;}
+      data.forEach(parcel=>{
+        const card=node("article",{class:"card"});
+        card.append(node("strong",{},parcel.name+" ("+parcel.parcel_code+")"));
+        const coords=parcel.boundary_geojson?.coordinates;
+        const ring=Array.isArray(coords?.[0]?.[0])?coords[0][0]:coords?.[0];
+        card.append(node("p",{class:"muted"},(Array.isArray(ring)?ring.length:0)+" positions dans le contour · source "+parcel.boundary_source));
+        const show=node("button",{type:"button",class:"small-button secondary-button"},"Afficher sur la carte");
+        show.addEventListener("click",()=>{
+          const geo=parcel.boundary_geojson;
+          if(!window.L||!locationMap){parcelStatus.textContent="Carte pas encore prête.";return;}
+          removeParcelLayer();
+          parcelLayer=L.geoJSON(geo,{style:{color:"#236b4b",weight:3,fillOpacity:0.18}}).addTo(locationMap);
+          parcelVertices=[];parcelCompleted=false;drawingParcel=false;
+          drawParcelButton.disabled=false;finishParcelButton.disabled=true;undoParcelButton.disabled=true;saveParcelButton.disabled=true;
+          locationMap.fitBounds(parcelLayer.getBounds(),{padding:[18,18]});
+          parcelStatus.textContent="Parcelle affichée : "+parcel.name+".";
+        });
+        card.append(show);parcelList.append(card);
+      });
+    }
+    saveParcelButton.addEventListener("click",async()=>{
+      const code=parcelCode.value.trim(),name=parcelName.value.trim();
+      if(!location.value){parcelStatus.textContent="Choisissez un emplacement.";return;}
+      if(!code||!name){parcelStatus.textContent="Renseignez le code et le nom de la parcelle.";return;}
+      if(!parcelCompleted||parcelVertices.length<3){parcelStatus.textContent="Terminez d’abord un contour de trois sommets minimum.";return;}
+      if(!window.L||!parcelLayer){parcelStatus.textContent="Le contour n’est pas disponible.";return;}
+      saveParcelButton.disabled=true;parcelStatus.textContent="Enregistrement de la parcelle…";
+      try{
+        const {data:loc,error:locError}=await db.from("locations").select("organization_id").eq("id",location.value).maybeSingle();
+        if(locError||!loc?.organization_id)throw new Error(locError?.message||"Organisation de l’emplacement introuvable ou accès refusé.");
+        const ring=[...parcelVertices.map(([latitude,longitude])=>[longitude,latitude]),[parcelVertices[0][1],parcelVertices[0][0]]];
+        const payload={organization_id:loc.organization_id,location_id:location.value,parcel_code:code,name,boundary_geojson:{type:"Polygon",coordinates:[ring]},boundary_source:"manual"};
+        const {error}=await db.from("farm_parcels").insert(payload);
+        if(error)throw error;
+        resetParcelDraft("Parcelle enregistrée. Vérifiez le contour dans la liste.");
+        await loadParcels();
+      }catch(error){
+        saveParcelButton.disabled=false;
+        parcelStatus.textContent="Échec de l’enregistrement : "+(error?.message||"erreur inconnue");
+      }
+    });
     placeSearchButton.addEventListener("click",async()=>{
       const query=placeQuery.value.trim();
       if(query.length<3){placeResults.replaceChildren(node("p",{class:"muted"},"Saisissez au moins 3 caractères."));return;}
@@ -160,7 +274,7 @@
       if(error){status.textContent="Chargement des emplacements impossible : "+error.message;return;}
       data.forEach(x=>location.append(node("option",{value:x.id},x.code?x.name+" ("+x.code+")":x.name)));
       if(data.length===1) location.value=data[0].id;
-      selectLocation();
+      selectLocation().then(()=>location.value&&loadParcels());
     }
     function clearMapPoint(message="Choisissez un point sur la carte ou utilisez « Me localiser »."){
       lat.value="";lon.value="";accuracy.value="";
@@ -364,7 +478,7 @@
       }catch(e){satelliteResults.replaceChildren(node("p",{class:"muted"},"Échec de la recherche : "+(e?.message||"erreur inconnue")));}
       finally{satelliteButton.disabled=false;}
     }
-    location.addEventListener("change",()=>{satelliteResults.replaceChildren();selectLocation().then(()=>location.value&&loadRows());});
+    location.addEventListener("change",()=>{satelliteResults.replaceChildren();resetParcelDraft("Emplacement changé. Démarrez un nouveau contour.");selectLocation().then(()=>{if(location.value){loadRows();loadParcels();}else parcelList.replaceChildren();});});
     from.addEventListener("change",()=>location.value&&loadRows());
     to.addEventListener("change",()=>location.value&&loadRows());
     save.addEventListener("click",async()=>{
@@ -405,7 +519,7 @@
     const {data: authState}=await db.auth.getSession();
     if(!authState?.session){
       status.textContent="Connectez-vous à CultureOps pour accéder aux emplacements de votre organisation.";
-      db.auth.onAuthStateChange((_event,session)=>{if(session){panel.classList.remove("hidden");loadMapLibrary();loadLocations().then(()=>location.value&&loadRows());}});
+      db.auth.onAuthStateChange((_event,session)=>{if(session){panel.classList.remove("hidden");loadMapLibrary();loadLocations().then(()=>{if(location.value){loadRows();loadParcels();}});}});
       return;
     }
     panel.classList.remove("hidden");
