@@ -69,7 +69,7 @@ Deno.serve(async (req: Request) => {
     // Return the newest matching scenes first so the UI does not show an arbitrary subset.
     search.searchParams.set("sortby", "-properties.datetime");
     search.searchParams.set("query", JSON.stringify({ "eo:cloud_cover": { "lte": cloud } }));
-    search.searchParams.set("fields", "id,collection,bbox,properties.datetime,properties.eo:cloud_cover,properties.platform,properties.constellation,links,-assets,-geometry");
+    search.searchParams.set("fields", "id,collection,bbox,properties.datetime,properties.eo:cloud_cover,properties.platform,properties.constellation,links,assets,-geometry");
     const upstream = await fetch(search, { signal: AbortSignal.timeout(20000) });
     if (!upstream.ok) {
       console.error("[copernicus-sentinel-catalogue] STAC status", upstream.status);
@@ -86,6 +86,18 @@ Deno.serve(async (req: Request) => {
         const parsed = new URL(self?.href ?? "");
         if (parsed.protocol === "https:" && parsed.hostname === "stac.dataspace.copernicus.eu") itemUrl = parsed.toString();
       } catch { /* omit malformed catalogue link */ }
+      const assets = f.assets && typeof f.assets === "object" ? f.assets : {};
+      const previewAsset = ["thumbnail", "rendered_preview", "preview", "visual"].map((key) => assets[key])
+        .find((asset: any) => asset && typeof asset.href === "string");
+      let previewUrl: string | null = null;
+      try {
+        const parsedPreview = new URL(previewAsset?.href ?? "");
+        if (parsedPreview.protocol === "https:" &&
+            (parsedPreview.hostname === "stac.dataspace.copernicus.eu" ||
+             parsedPreview.hostname.endsWith(".dataspace.copernicus.eu"))) {
+          previewUrl = parsedPreview.toString();
+        }
+      } catch { /* omit missing or malformed preview */ }
       return {
         id: typeof f.id === "string" ? f.id : null,
         acquired_at: typeof p.datetime === "string" ? p.datetime : null,
@@ -94,13 +106,14 @@ Deno.serve(async (req: Request) => {
         constellation: typeof p.constellation === "string" ? p.constellation : "Sentinel-2",
         bbox: Array.isArray(f.bbox) && f.bbox.length === 4 ? f.bbox : null,
         catalogue_item_url: itemUrl,
+        preview_url: previewUrl,
       };
     });
     return reply(200, { ok: true, provider: "Copernicus Data Space STAC", collection: "sentinel-2-l2a",
       location_id: loc.id, search_bbox_wgs84: bbox,
       bbox_note: "Regional context window, not a parcel boundary.",
       date_range: { start, end }, max_cloud_cover_percent: cloud, scenes_found: scenes.length, scenes,
-      note: "Metadata only; no imagery downloaded and no vegetation index calculated." });
+      note: "Scene metadata and available preview URLs; full-resolution imagery and vegetation indices are not processed." });
   } catch (e) {
     const message = e instanceof Error ? e.message : "unknown_error";
     console.error("[copernicus-sentinel-catalogue] request failed", message);
