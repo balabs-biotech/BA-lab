@@ -162,13 +162,34 @@
       if(data.length===1) location.value=data[0].id;
       selectLocation();
     }
+    function clearMapPoint(message="Choisissez un point sur la carte ou utilisez « Me localiser »."){
+      lat.value="";lon.value="";accuracy.value="";
+      if(locationMarker&&locationMap){locationMap.removeLayer(locationMarker);locationMarker=null;}
+      if(locationMap)locationMap.setView([28,2],4);
+      mapStatus.textContent=message;
+    }
     async function selectLocation(){
-      if(!location.value){lat.value="";lon.value="";accuracy.value="";return;}
-      const {data}=await db.from("locations").select("latitude,longitude,coordinate_accuracy_m,coordinate_source").eq("id",location.value).maybeSingle();
-      if(!data)return;
-      lat.value=data.latitude??""; lon.value=data.longitude??""; accuracy.value=data.coordinate_accuracy_m??"";
+      // Clear the previous location immediately so a failed read cannot leave
+      // another site's coordinates available for accidental saving.
+      clearMapPoint(location.value
+        ? "Chargement des coordonnées de l’emplacement sélectionné…"
+        : "Choisissez un emplacement avant d’enregistrer un point.");
+      if(!location.value)return;
+      const {data,error}=await db.from("locations").select("latitude,longitude,coordinate_accuracy_m,coordinate_source").eq("id",location.value).maybeSingle();
+      if(error){
+        clearMapPoint("Impossible de charger cet emplacement : "+error.message);
+        return;
+      }
+      if(!data){
+        clearMapPoint("Emplacement introuvable ou accès refusé. Sélectionnez un emplacement autorisé.");
+        return;
+      }
       if(data.coordinate_source && [...source.options].some(o=>o.value===data.coordinate_source))source.value=data.coordinate_source;
-      if(mapReady&&data.latitude!=null&&data.longitude!=null)setMapPoint(Number(data.latitude),Number(data.longitude),source.value, data.coordinate_accuracy_m==null?null:Number(data.coordinate_accuracy_m),true);
+      if(data.latitude!=null&&data.longitude!=null){
+        setMapPoint(Number(data.latitude),Number(data.longitude),source.value,data.coordinate_accuracy_m==null?null:Number(data.coordinate_accuracy_m),true);
+      }else{
+        clearMapPoint("Aucune coordonnée enregistrée pour cet emplacement. Choisissez un point sur la carte ou utilisez « Me localiser ».");
+      }
     }
     function renderClimateSummary(data){
       summary.replaceChildren();
