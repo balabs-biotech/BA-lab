@@ -5491,6 +5491,7 @@ async function loadStatistics() {
     let batchEventIds = null;
     let cultureEventIds = null;
     let noMatchingCultureBatchEvents = false;
+    let noWorkspaceTargets = false;
     if (batchId) {
       const {data: batchEvents, error: batchEventsError} = await supabaseClient.from("events").select("id").eq("organization_id", organizationId).eq("batch_id", batchId);
       if (batchEventsError) throw new Error("Chargement des événements du lot impossible : " + batchEventsError.message);
@@ -5529,8 +5530,32 @@ async function loadStatistics() {
     } else if (batchId && batchEventIds.length) {
       query = query.in("event_id", batchEventIds);
     }
+    if (!plantCultureId && !cultureId && !batchId) {
+      if (domain === "agronomy") {
+        const plantIds = plantCultureOptions.map(plant => plant.id);
+        if (plantIds.length) query = query.in("plant_culture_id", plantIds);
+        else noWorkspaceTargets = true;
+      } else {
+        const cultureIds = cultureOptions.map(culture => culture.id);
+        const batchIds = domain === "laboratory" ? latestBatches.map(batch => batch.id) : [];
+        const eventQueries = [];
+        if (cultureIds.length) eventQueries.push(supabaseClient.from("events").select("id").eq("organization_id", organizationId).in("culture_id", cultureIds));
+        if (batchIds.length) eventQueries.push(supabaseClient.from("events").select("id").eq("organization_id", organizationId).in("batch_id", batchIds));
+        const eventResults = await Promise.all(eventQueries);
+        if (requestId !== statisticsRequestId) return;
+        for (const result of eventResults) {
+          if (result.error) throw new Error("Chargement du périmètre des statistiques impossible : " + result.error.message);
+        }
+        const workspaceEventIds = [...new Set(eventResults.flatMap(result => (result.data || []).map(event => event.id)))];
+        const scopeClauses = [];
+        if (cultureIds.length) scopeClauses.push("culture_id.in.(" + cultureIds.join(",") + ")");
+        if (workspaceEventIds.length) scopeClauses.push("event_id.in.(" + workspaceEventIds.join(",") + ")");
+        if (scopeClauses.length) query = query.or(scopeClauses.join(","));
+        else noWorkspaceTargets = true;
+      }
+    }
     if (period !== "all") { const since = new Date(); since.setDate(since.getDate() - Number(period)); query = query.gte("measured_at", since.toISOString()); }
-    const queryResult = (batchId && !batchEventIds.length) || (cultureId && !cultureEventIds.length && batchId) || noMatchingCultureBatchEvents ? {data:[],error:null} : await query;
+    const queryResult = noWorkspaceTargets || (batchId && !batchEventIds.length) || (cultureId && !cultureEventIds.length && batchId) || noMatchingCultureBatchEvents ? {data:[],error:null} : await query;
     if (requestId !== statisticsRequestId) return;
     const {data,error} = queryResult; if (error) throw new Error(error.message);
     const rows = (data || []).slice().sort((a,b) => new Date(a.measured_at || 0).getTime() - new Date(b.measured_at || 0).getTime()), variable = measurementVariables.find(item => item.code === variableCode), cultureById = new Map(cultureOptions.map(culture => [culture.id,culture]));
