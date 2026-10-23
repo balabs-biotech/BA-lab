@@ -18,7 +18,7 @@ const checks = [
   ["returns the newest matching scenes first", /sortby", "-properties\.datetime"/],
   ["requests STAC asset metadata needed for image previews", /searchParams\.set\("fields", "id,collection,bbox,properties\.datetime,properties\.eo:cloud_cover,properties\.platform,properties\.constellation,links,assets,-geometry"\)/],
   ["detects preview assets by key or STAC role", /asset\.roles[\s\S]*?thumbnail[\s\S]*?overview/],
-  ["only returns HTTPS preview URLs from Copernicus Data Space", /parsedPreview\.protocol === "https:"[\s\S]*?endsWith\("\.dataspace\.copernicus\.eu"\)/],
+  ["allows HTTPS preview URLs only from Copernicus or the documented CloudFerro host", /parsedPreview\.protocol === "https:"[\s\S]*?hostname === "s3\.waw3-2\.cloudferro\.com"/],
   ["does not write satellite data to the database", /Does not download imagery or write database rows/],
   ["uses a bounded upstream timeout", /AbortSignal\.timeout\(20000\)/],
   ["does not leak upstream response bodies", /copernicus_catalogue_unavailable/],
