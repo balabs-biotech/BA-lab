@@ -47,7 +47,7 @@
     const satelliteButton=node("button",{type:"button"},"Chercher les images satellite");
     const satelliteResults=node("div",{id:"satelliteResults",class:"overview-observations","aria-live":"polite"});
     const satelliteHint=node("p",{class:"muted"},"Sentinel-2 : scènes disponibles et couverture nuageuse. L’image ne constitue pas à elle seule un diagnostic de culture.");
-    panel.append(form,summary,satelliteHint,satelliteButton,satelliteResults,details);
+    panel.append(form,status,summary,satelliteHint,satelliteButton,satelliteResults,details);
     plant.parentNode.insertBefore(panel,plant.nextSibling);
     const nav=document.querySelector(".section-nav");
     if(nav && !document.getElementById("envNav")) { const a=node("a",{href:"#environmentalCard",id:"envNav"},"Contexte environnemental"); nav.append(a); }
