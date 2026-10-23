@@ -1,6 +1,6 @@
 # IoT et données publiques — architecture de raccordement
 
-**État vérifié le 22 octobre 2026.** Le registre IoT existe dans la base active, l’ingestion sécurisée est déployée et les tables d’export public sont en place. Aucun appareil n’est encore provisionné et aucun jeu public n’est publié. Le firmware ESP32 reste hors ligne et non qualifié sur matériel.
+**État vérifié le 23 octobre 2026.** Le registre IoT existe dans la base active, l’ingestion sécurisée est déployée et les tables d’export public sont en place. Aucun appareil n’est encore provisionné et aucun jeu public n’est publié. Le firmware ESP32 reste hors ligne et non qualifié sur matériel.
 
 ## 1. État existant
 
@@ -126,3 +126,16 @@ Références officielles :
 - La table contient actuellement **575 observations météo NASA POWER pour 5 lieux** ; la dernière importation observée date du 23 octobre 2026 à 04:30 UTC. **Aucune observation satellite n'est encore stockée.**
 - La fenêtre présente dans ces données va du 23 septembre au 19 octobre 2026, ce qui reflète le décalage des produits NASA POWER ; il ne faut pas présenter ces valeurs comme de la météo en temps réel.
 - Le code du job planifié, la fonction de vérification du secret et le contrat de stockage sont versionnés. La définition complète du job `pg_cron` et sa configuration de déploiement restent à documenter de façon reproductible sans jamais mettre le secret dans Git.
+
+
+### Adaptateur catalogue Sentinel-2 ajouté au dépôt — 23 octobre 2026
+
+Le fichier `supabase/functions/copernicus-sentinel-catalogue/index.ts` est maintenant versionné. Il s'agit d'une fonction **en lecture seule**, non encore déployée en production.
+
+- Authentifie l'utilisateur et vérifie l'accès au lieu par la lecture RLS de `locations`.
+- Interroge le catalogue STAC Copernicus pour la collection `sentinel-2-l2a`, sur une fenêtre temporelle maximale de 180 jours et un maximum de 20 scènes par requête.
+- Retourne les métadonnées de scène (date, couverture nuageuse, plateforme, emprise et lien catalogue), sans télécharger d'images ni écrire dans la base.
+- La zone de recherche est une boîte régionale autour du point enregistré. Elle ne représente pas la parcelle et ne permet pas d'affirmer qu'une scène couvre exactement la culture suivie.
+- Les scènes filtrées par couverture nuageuse ne garantissent pas l'absence de nuages sur la parcelle. Aucun NDVI/NDMI ni conseil agronomique n'est calculé.
+
+**Avant déploiement :** exécuter CI, tester une requête STAC réelle et les cas d'accès refusé/coordonnées absentes, vérifier le schéma des propriétés retournées par le fournisseur, puis déployer explicitement la fonction. À ce stade, aucune donnée satellite n'est persistée dans `environmental_observations`.
