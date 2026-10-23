@@ -246,7 +246,19 @@ This update supersedes older status statements above where they conflict with th
 ### Remaining actions
 
 1. Enable leaked/compromised-password protection in Supabase Auth settings.
-2. Confirm the new CI run passes after the workflow permission change.
-3. Verify branch protection/rulesets in GitHub settings and require CI checks before merge.
-4. Add/retain automated cross-organization tests for every exposed tenant-scoped RPC.
-5. Compare deployed Edge Function source/version against the repository source before future deployments; test simultaneous sync attempts, lease expiry, and partial failure.
+2. Verify branch protection/rulesets in GitHub settings and require CI checks before merge.
+3. Keep automated cross-organization tests for every exposed tenant-scoped RPC.
+4. Test simultaneous sync attempts and lease expiry; current sync tests are mocked and do not prove live Notion/Supabase integration behavior.
+
+
+## Update — 2026-10-23 (CI and regression tests)
+
+- CI run [39977641549](https://github.com/balabs-biotech/BA-lab/actions/runs/39977641549) completed successfully on commit `79702b26ad8489f52334d6a20b814e4ee6bfe7f8`. All seven jobs passed, including PostgreSQL migration tests, migration replay, the mocked `sync-culture-to-notion` test suite, secret scanning, repository checks, and firmware build/logic tests.
+- Added a mocked regression test confirming that a Notion query failure returns an error, persists the sync error status, and still releases the per-culture lock. This verifies the function's `finally` path under the test harness; it is not a live-service integration test.
+- Tenant-isolation coverage now explicitly checks the exposed batch workflow RPCs for cross-organization denial: stage advancement, batch creation, movement, and release. These tests run against disposable CI PostgreSQL fixtures; production behavior still depends on the deployed schema matching the versioned migrations.
+- GitHub Pages deployment for the same commit completed successfully: [run 39977640375](https://github.com/balabs-biotech/BA-lab/actions/runs/39977640375).
+
+### Still open
+- Enable leaked/compromised-password protection in Supabase Auth settings.
+- Confirm branch protection/rulesets in GitHub settings; the connected GitHub API returned 403, so this remains unverified.
+- Add tests for concurrent sync attempts and lock-lease expiry, and perform a controlled end-to-end check with real Supabase/Notion services.
