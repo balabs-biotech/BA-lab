@@ -14,6 +14,15 @@ begin
 end
 $$;
 
+-- Supabase Vault compatibility shim for CI migration replay.
+-- Production provides vault.decrypted_secrets through the Vault extension.
+-- This empty local table only satisfies function-definition dependencies; no secret is seeded.
+create schema if not exists vault;
+create table if not exists vault.decrypted_secrets (
+  name text primary key,
+  decrypted_secret text
+);
+
 create schema if not exists auth;
 create table if not exists auth.users (id uuid primary key);
 create or replace function auth.uid()
