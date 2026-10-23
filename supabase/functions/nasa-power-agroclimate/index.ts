@@ -103,24 +103,26 @@ Deno.serve(async (req: Request) => {
         "relative_humidity_mean",
         "wind_speed_mean",
       ];
-      const freshAfter = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+      const now = Date.now();
+      const recentPeriod = now - endMs <= 7 * DAY_MS;
+      const freshAfterMs = now - 24 * 60 * 60 * 1000;
       const minimumDays = Math.max(1, Math.ceil(dayCount * 0.9));
       const coverage = await Promise.all(coreVariables.map(async (variable) => {
         const { data, error } = await userClient
           .from("environmental_observations")
-          .select("observed_at")
+          .select("observed_at,retrieved_at")
           .eq("location_id", location.id)
           .eq("provider_code", "NASA_POWER")
           .eq("dataset_code", "POWER_DAILY_AGRO")
           .eq("variable_code", variable)
           .gte("observed_at", observedStart)
           .lte("observed_at", observedEnd)
-          .gte("retrieved_at", freshAfter)
           .order("observed_at", { ascending: false })
           .limit(dayCount);
-        if (error) return { variable, error: error.message, dates: [] as string[] };
-        const dates = [...new Set((data ?? []).map((row) => String(row.observed_at).slice(0, 10)))];
-        return { variable, error: null, dates };
+        if (error) return { variable, error: error.message, dates: [] as string[], latestRetrievedAt: null as string | null };
+        const rows = data ?? [];
+        const dates = [...new Set(rows.map((row) => String(row.observed_at).slice(0, 10)))];
+        return { variable, error: null, dates, latestRetrievedAt: rows[0]?.retrieved_at ?? null };
       }));
       const failedLookup = coverage.find((item) => item.error !== null);
       if (failedLookup) {
@@ -131,7 +133,12 @@ Deno.serve(async (req: Request) => {
         const latest = item.dates[0];
         const recentEnough = Boolean(latest) &&
           Date.parse(endDate + "T00:00:00Z") - Date.parse(latest + "T00:00:00Z") <= 2 * DAY_MS;
-        return item.dates.length >= minimumDays && recentEnough;
+        // Historical ranges are stable enough to reuse. For a range ending in
+        // the last seven days, require a fresh retrieval so recent revisions
+        // and provider lag can be picked up without re-downloading old history.
+        const latestIsFresh = !recentPeriod ||
+          Boolean(item.latestRetrievedAt && Date.parse(item.latestRetrievedAt) >= freshAfterMs);
+        return item.dates.length >= minimumDays && recentEnough && latestIsFresh;
       });
       if (complete) {
         return json(200, {
