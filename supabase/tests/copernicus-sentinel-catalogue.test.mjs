@@ -16,7 +16,7 @@ const checks = [
   ["checks location access through the user's RLS scope", /db\.from\("locations"\)[\s\S]*?\.eq\("id", locationId\)\.maybeSingle\(\)/],
   ["queries Sentinel-2 L2A", /collections", "sentinel-2-l2a"/],
   ["returns the newest matching scenes first", /sortby", "-properties\.datetime"/],
-  ["keeps catalogue responses metadata-only", /exclude: \["assets", "geometry"\]/],
+  ["uses documented STAC GET fields syntax and excludes imagery assets", /searchParams\.set\("fields", "id,collection,bbox,properties\.datetime,properties\.eo:cloud_cover,properties\.platform,properties\.constellation,links,-assets,-geometry"\)/],
   ["does not write satellite data to the database", /Does not download imagery or write database rows/],
   ["uses a bounded upstream timeout", /AbortSignal\.timeout\(20000\)/],
   ["does not leak upstream response bodies", /copernicus_catalogue_unavailable/],
