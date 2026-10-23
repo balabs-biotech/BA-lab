@@ -297,3 +297,41 @@ begin
   end loop;
 end $$;
 reset role;
+
+
+-- Tenant-isolation regression: all public SECURITY DEFINER workflow RPCs must reject
+-- a batch belonging to another organization, not only the movement RPC.
+select set_config('request.jwt.claim.sub','00000000-0000-0000-0000-0000000000b1',false);
+set role authenticated;
+do $$ begin
+  begin
+    perform * from public.advance_batch_stage(
+      '00000000-0000-0000-0000-0000000000f1',
+      'preparation'
+    );
+    raise exception 'FAIL: cross-organization stage advancement was allowed';
+  exception when sqlstate '42501' then
+    if sqlerrm = 'FAIL: cross-organization stage advancement was allowed' then raise; end if;
+  end;
+
+  begin
+    perform public.release_batch('00000000-0000-0000-0000-0000000000f1');
+    raise exception 'FAIL: cross-organization release was allowed';
+  exception when sqlstate '42501' then
+    if sqlerrm = 'FAIL: cross-organization release was allowed' then raise; end if;
+  end;
+
+  begin
+    perform * from public.create_batch_with_stages(
+      '00000000-0000-0000-0000-0000000000a2',
+      'CROSS-ORG-CREATE',
+      'Must be rejected',
+      'test',
+      p_material_id := '00000000-0000-0000-0000-0000000000e2'
+    );
+    raise exception 'FAIL: batch creation in a non-member organization was allowed';
+  exception when sqlstate '42501' then
+    if sqlerrm = 'FAIL: batch creation in a non-member organization was allowed' then raise; end if;
+  end;
+end $$;
+reset role;
