@@ -122,9 +122,9 @@ const typeCatalogue = [
   "agar", "plate", "slant", "broth", "flask", "other_liquid", "fermentation", "other",
   "organoid", "suspension", "micropropagation", "solid"
 ].map(code => ({ code }));
-const mycologyTypes = callHelper("workspaceCultureTypes", [typeCatalogue], "mycology").map(item => item.code);
-const labTypes = callHelper("workspaceCultureTypes", [typeCatalogue], "laboratory").map(item => item.code);
-const agronomyTypes = callHelper("workspaceCultureTypes", [typeCatalogue], "agronomy").map(item => item.code);
+const mycologyTypes = Array.from(callHelper("workspaceCultureTypes", [typeCatalogue], "mycology"), item => item.code);
+const labTypes = Array.from(callHelper("workspaceCultureTypes", [typeCatalogue], "laboratory"), item => item.code);
+const agronomyTypes = Array.from(callHelper("workspaceCultureTypes", [typeCatalogue], "agronomy"), item => item.code);
 assert.ok(mycologyTypes.includes("agar") && mycologyTypes.includes("broth"));
 assert.ok(!mycologyTypes.includes("organoid") && !mycologyTypes.includes("micropropagation"));
 assert.equal(labTypes.length, typeCatalogue.length);
@@ -135,9 +135,9 @@ const variableCatalogue = [
   "substrate_moisture", "co2_concentration", "cfu", "cfu_per_ml",
   "colony_count", "od600", "root_length", "illuminance", "generation_time"
 ].map(code => ({ code }));
-const agronomyVariables = callHelper("workspaceMeasurementVariables", [variableCatalogue], "agronomy").map(item => item.code);
-const mycologyVariables = callHelper("workspaceMeasurementVariables", [variableCatalogue], "mycology").map(item => item.code);
-const labVariables = callHelper("workspaceMeasurementVariables", [variableCatalogue], "laboratory").map(item => item.code);
+const agronomyVariables = Array.from(callHelper("workspaceMeasurementVariables", [variableCatalogue], "agronomy"), item => item.code);
+const mycologyVariables = Array.from(callHelper("workspaceMeasurementVariables", [variableCatalogue], "mycology"), item => item.code);
+const labVariables = Array.from(callHelper("workspaceMeasurementVariables", [variableCatalogue], "laboratory"), item => item.code);
 assert.ok(agronomyVariables.includes("ph") && agronomyVariables.includes("substrate_moisture"));
 assert.ok(!agronomyVariables.includes("cfu") && !agronomyVariables.includes("od600"));
 assert.ok(mycologyVariables.includes("cfu") && mycologyVariables.includes("od600"));
