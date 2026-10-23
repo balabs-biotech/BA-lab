@@ -4746,9 +4746,9 @@ function renderMeasurementTargets() {
 
   const placeholder = document.createElement("option");
   placeholder.value = "";
-  placeholder.textContent = cultureOptions.length || latestBatches.length
-    ? "Choisir une culture ou un lot…"
-    : "Créez d’abord une culture ou un lot";
+  placeholder.textContent = cultureOptions.length || latestBatches.length || plantCultureOptions.length
+    ? "Choisir une culture, un lot ou une unité végétale…"
+    : "Créez d’abord une culture, un lot ou une fiche végétale";
   measurementTargetSelect.appendChild(placeholder);
 
   if (cultureOptions.length) {
@@ -4758,6 +4758,18 @@ function renderMeasurementTargets() {
       const option = document.createElement("option");
       option.value = `culture:${culture.id}`;
       option.textContent = `${culture.code} · ${culture.culture_type || "culture"}`;
+      group.appendChild(option);
+    }
+    measurementTargetSelect.appendChild(group);
+  }
+
+  if (plantCultureOptions.length) {
+    const group = document.createElement("optgroup");
+    group.label = "Unités végétales · AgriTech";
+    for (const plant of plantCultureOptions) {
+      const option = document.createElement("option");
+      option.value = `plant:${plant.id}`;
+      option.textContent = `${plant.code} · ${plant.cultivar_name || plant.crop_type}`;
       group.appendChild(option);
     }
     measurementTargetSelect.appendChild(group);
@@ -4782,6 +4794,8 @@ function renderMeasurementTargets() {
     measurementTargetSelect.value = `culture:${cultureOptions[0].id}`;
   } else if (latestBatches.length) {
     measurementTargetSelect.value = `batch:${latestBatches[0].id}`;
+  } else if (plantCultureOptions.length) {
+    measurementTargetSelect.value = `plant:${plantCultureOptions[0].id}`;
   }
 }
 
@@ -4863,12 +4877,51 @@ async function saveMeasurement() {
   try {
     let cultureId = null;
     let batchId = null;
+    let plantCultureId = null;
+    let environmentId = null;
+    let locationId = null;
     const [targetType, targetId] = targetValue.split(":");
 
     if (targetType === "culture") {
       const culture = cultureOptions.find(item => item.id === targetId);
       if (!culture) throw new Error(cultureWorkflowText("cultureMissing"));
       cultureId = culture.id;
+    } else if (targetType === "plant") {
+      const plant = plantCultureOptions.find(item => item.id === targetId);
+      if (!plant) throw new Error("L’unité végétale sélectionnée n’est plus disponible.");
+      plantCultureId = plant.id;
+      environmentId = plant.environment_id || null;
+      locationId = plant.location_id || null;
+      const { data: event, error: eventError } = await supabaseClient.from("events").insert({
+        organization_id: organizationId,
+        event_type: "measurement_recorded",
+        occurred_at: measuredAt,
+        actor_user_id: session.user.id,
+        plant_culture_id: plantCultureId,
+        environment_id: environmentId,
+        location_id: locationId,
+        payload: { variable_code: variable.code, raw_value: rawValue, raw_unit_code: unit.code, source: "agritech-manual" }
+      }).select("id").single();
+      if (eventError) throw new Error(cultureWorkflowText("eventError") + eventError.message);
+      eventId = event.id;
+    } else if (targetType === "plant") {
+      const plant = plantCultureOptions.find(item => item.id === targetId);
+      if (!plant) throw new Error("L’unité végétale sélectionnée n’est plus disponible.");
+      plantCultureId = plant.id;
+      environmentId = plant.environment_id || null;
+      locationId = plant.location_id || null;
+      const eventResult = await supabaseClient.from("events").insert({
+        organization_id: organizationId,
+        event_type: "observation_recorded",
+        occurred_at: observedAt,
+        actor_user_id: session.user.id,
+        plant_culture_id: plantCultureId,
+        environment_id: environmentId,
+        location_id: locationId,
+        payload: { variable_code: variable.code, value_text: valueText, source: "agritech-manual" }
+      }).select("id").single();
+      if (eventResult.error) throw new Error(cultureWorkflowText("eventError") + eventResult.error.message);
+      eventId = eventResult.data.id;
     } else if (targetType === "batch") {
       const batch = latestBatches.find(item => item.id === targetId);
       if (!batch) throw new Error(cultureWorkflowText("batchMissing"));
@@ -4916,6 +4969,8 @@ async function saveMeasurement() {
         method: measurementMethodInput.value.trim() || null,
         instrument: measurementInstrumentInput.value.trim() || null,
         culture_id: cultureId,
+        plant_culture_id: plantCultureId,
+        environment_id: environmentId,
         event_id: eventId,
         metadata: {
           source: "batch-tracker-manual",
@@ -4961,7 +5016,7 @@ async function loadRecentMeasurements() {
 
   const { data, error } = await supabaseClient
     .from("measurements")
-    .select("id, variable_code, raw_value, raw_unit_code, normalized_value, normalized_unit_code, measured_at, method, instrument, culture_id, event_id, metadata")
+    .select("id, variable_code, raw_value, raw_unit_code, normalized_value, normalized_unit_code, measured_at, method, instrument, culture_id, plant_culture_id, event_id, metadata")
     .eq("organization_id", organizationId)
     .order("measured_at", { ascending: false })
     .limit(10);
@@ -4991,11 +5046,14 @@ async function loadRecentMeasurements() {
     const culture = cultureOptions.find(item => item.id === row.culture_id);
     const batchId = row.event_id ? eventsById[row.event_id]?.batch_id : null;
     const batch = batchId ? latestBatches.find(item => item.id === batchId) : null;
-    const target = batch
-      ? `Lot · ${escapeHtml(batch.batch_code)}`
-      : culture
-        ? `Culture · ${escapeHtml(culture.code)}`
-        : "Cible liée par identifiant";
+    const plant = plantCultureOptions.find(item => item.id === row.plant_culture_id);
+    const target = plant
+      ? `AgriTech · ${escapeHtml(plant.code)} · ${escapeHtml(plant.cultivar_name || plant.crop_type)}`
+      : batch
+        ? `Lot · ${escapeHtml(batch.batch_code)}`
+        : culture
+          ? `Culture · ${escapeHtml(culture.code)}`
+          : "Cible liée par identifiant";
     const stamp = row.measured_at ? new Date(row.measured_at).toLocaleString() : "Date inconnue";
     const note = row.metadata?.note ? `<div class="measurement-meta">${escapeHtml(row.metadata.note)}</div>` : "";
     const method = row.method ? ` · ${escapeHtml(row.method)}` : "";
@@ -5045,6 +5103,9 @@ async function saveObservation() {
   try {
     let cultureId = null;
     let batchId = null;
+    let plantCultureId = null;
+    let environmentId = null;
+    let locationId = null;
     const parts = targetValue.split(":");
     const targetType = parts[0];
     const targetId = parts[1];
@@ -5087,6 +5148,7 @@ async function saveObservation() {
       value_text: valueText,
       observed_at: observedAt,
       culture_id: cultureId,
+      plant_culture_id: plantCultureId,
       event_id: eventId,
       metadata: {
         source: "batch-tracker-manual",
@@ -5128,7 +5190,7 @@ async function loadRecentObservations() {
   if (!organizationId || !observationHistory) return;
 
   const query = await supabaseClient.from("observations")
-    .select("id, variable_code, value_text, observed_at, culture_id, event_id, metadata")
+    .select("id, variable_code, value_text, observed_at, culture_id, plant_culture_id, event_id, metadata")
     .eq("organization_id", organizationId)
     .order("observed_at", { ascending: false })
     .limit(8);
@@ -5158,7 +5220,9 @@ async function loadRecentObservations() {
     const culture = cultureOptions.find(item => item.id === row.culture_id);
     const batchId = row.event_id ? (eventsById[row.event_id] || {}).batch_id : null;
     const batch = batchId ? latestBatches.find(item => item.id === batchId) : null;
-    const target = batch ? "Lot · " + escapeHtml(batch.batch_code) :
+    const plant = plantCultureOptions.find(item => item.id === row.plant_culture_id);
+    const target = plant ? "AgriTech · " + escapeHtml(plant.code) + " · " + escapeHtml(plant.cultivar_name || plant.crop_type) :
+      batch ? "Lot · " + escapeHtml(batch.batch_code) :
       culture ? "Culture · " + escapeHtml(culture.code) : "Cible liée par identifiant";
     const stamp = row.observed_at ? new Date(row.observed_at).toLocaleString() : "Date inconnue";
     const note = row.metadata && row.metadata.note
@@ -6230,6 +6294,8 @@ async function loadPlantCultures() {
       .limit(300);
     if (error) throw error;
     renderPlantCultureList(data || []);
+    plantCultureOptions = data || [];
+    renderMeasurementTargets();
     if (status) status.textContent = "Registre végétal chargé depuis Supabase.";
   } catch (error) {
     console.error("Chargement du registre végétal impossible :", error);
