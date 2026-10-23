@@ -119,6 +119,8 @@ Deno.serve(async (req: Request) => {
 
   let cultureIdForError = "";
   let organizationIdForError = "";
+  let syncLockToken: string | null = null;
+  let syncLockCultureId: string | null = null;
   try {
     const { data: authData, error: authError } = await userClient.auth.getUser();
     if (authError || !authData.user) return json({ error: "Invalid session." }, 401);
@@ -145,6 +147,25 @@ Deno.serve(async (req: Request) => {
       .eq("organization_id", allowedCulture.organization_id)
       .single();
     if (cultureError || !culture) throw new Error("Could not load culture record.");
+
+    // Serialize sync attempts per culture. A short lease recovers automatically
+    // if an Edge Function invocation terminates before releasing its lock.
+    const candidateLockToken = crypto.randomUUID();
+    const { data: lockAcquired, error: lockError } = await adminClient.rpc(
+      "acquire_culture_notion_sync_lock",
+      {
+        p_culture_id: culture.id,
+        p_organization_id: culture.organization_id,
+        p_lock_token: candidateLockToken,
+        p_lease_seconds: 180,
+      },
+    );
+    if (lockError) throw new Error(`Could not acquire Notion sync lock: ${lockError.message}`);
+    if (lockAcquired !== true) {
+      return json({ error: "A Notion sync for this culture is already in progress. Retry shortly.", code: "sync_in_progress" }, 409);
+    }
+    syncLockToken = candidateLockToken;
+    syncLockCultureId = culture.id;
 
     let record: Record<string, any> = { ...culture };
     if (culture.material_id) {
@@ -286,5 +307,12 @@ Deno.serve(async (req: Request) => {
         .eq("organization_id", organizationIdForError);
     }
     return json({ error: message }, 502);
+  } finally {
+    if (syncLockToken && syncLockCultureId) {
+      await adminClient.rpc("release_culture_notion_sync_lock", {
+        p_culture_id: syncLockCultureId,
+        p_lock_token: syncLockToken,
+      }).catch(() => undefined);
+    }
   }
 });
