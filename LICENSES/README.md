@@ -10,7 +10,7 @@
 - **`firmware/`**: MIT (permissive, any use)
 - **`hardware/`**: CERN-OHL-P-2.0 (open-hardware; derivatives must disclose source)
 - **`batch-tracker/`**: **Status undefined** — see below.
-- **Root, `biotech-sops/`, `bio-inputs/`, `docs/`, `01_R-and-D_Lab/`**: Proprietary (B.A. LAB, SARL)
+- **Root, `biotech-sops/`, `bio-inputs/`, `docs/`, `01_R-and-D_Lab/`**: Proprietary (B.A. LAB project)
 
 ## Batch-tracker licence: to be confirmed
 
