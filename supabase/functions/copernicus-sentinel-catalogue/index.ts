@@ -66,6 +66,8 @@ Deno.serve(async (req: Request) => {
     search.searchParams.set("bbox", bbox.join(","));
     search.searchParams.set("datetime", start + "T00:00:00Z/" + end + "T23:59:59Z");
     search.searchParams.set("limit", String(limit));
+    // Return the newest matching scenes first so the UI does not show an arbitrary subset.
+    search.searchParams.set("sortby", "-properties.datetime");
     search.searchParams.set("query", JSON.stringify({ "eo:cloud_cover": { "lte": cloud } }));
     search.searchParams.set("fields", JSON.stringify({ include: ["id", "collection", "bbox", "properties.datetime",
       "properties.eo:cloud_cover", "properties.platform", "properties.constellation", "links"], exclude: ["assets", "geometry"] }));
