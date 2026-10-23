@@ -182,3 +182,10 @@ for (const snippet of [
   if (!comparisonQuartileSummary.includes(snippet) && !comparisonSummary.includes(snippet)) throw new Error("IQR outlier summary missing: " + snippet);
 }
 console.log("✓ Potential outliers use the 1.5×IQR rule only with at least four numeric measurements");
+
+const plantMigration=fs.readFileSync("supabase/migrations/20261023010000_add_agritech_plant_cultures.sql","utf8");
+if(!template.includes('id="plantCultureForm"')||!template.includes('id="plantCard"')||!template.includes('value="tomato_cherry"')||!template.includes('value="tomato"'))throw new Error("AgriTech plant registry form or tomato types are missing");
+if(!engine.includes('from("plant_cultures")')||!engine.includes('domain: "agronomy"')||!engine.includes('if (activeDomain === "agronomy") return false;'))throw new Error("AgriTech registry persistence or domain separation is missing");
+if(!engine.includes('domain: document.body.dataset.domain === "laboratory" ? "laboratory" : "mycology"'))throw new Error("Biological culture records must retain their originating workspace");
+for(const snippet of ["create table if not exists public.plant_cultures","alter table public.plant_cultures enable row level security","private.is_org_member(organization_id)","constraint plant_cultures_org_code_key unique"])if(!plantMigration.includes(snippet))throw new Error("Plant registry migration missing security/constraint: "+snippet);
+console.log("✓ AgriTech plant records are separate from mycology/laboratory culture lineages");
