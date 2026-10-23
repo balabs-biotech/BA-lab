@@ -69,8 +69,7 @@ Deno.serve(async (req: Request) => {
     // Return the newest matching scenes first so the UI does not show an arbitrary subset.
     search.searchParams.set("sortby", "-properties.datetime");
     search.searchParams.set("query", JSON.stringify({ "eo:cloud_cover": { "lte": cloud } }));
-    search.searchParams.set("fields", JSON.stringify({ include: ["id", "collection", "bbox", "properties.datetime",
-      "properties.eo:cloud_cover", "properties.platform", "properties.constellation", "links"], exclude: ["assets", "geometry"] }));
+    search.searchParams.set("fields", "id,collection,bbox,properties.datetime,properties.eo:cloud_cover,properties.platform,properties.constellation,links,-assets,-geometry");
     const upstream = await fetch(search, { signal: AbortSignal.timeout(20000) });
     if (!upstream.ok) {
       console.error("[copernicus-sentinel-catalogue] STAC status", upstream.status);
