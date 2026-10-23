@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-// Copyright (c) 2026 SARL B.A. LAB
+// Copyright (c) 2026 B.A. LAB project
 // Irrigation / CO2 node configuration. EVERY value is a provisional default:
 // calibrate on the real sensor, substrate and relay board before use.
 #pragma once
