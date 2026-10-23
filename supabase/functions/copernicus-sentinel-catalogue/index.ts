@@ -100,7 +100,8 @@ Deno.serve(async (req: Request) => {
         const parsedPreview = new URL(previewAsset?.href ?? "");
         if (parsedPreview.protocol === "https:" &&
             (parsedPreview.hostname === "dataspace.copernicus.eu" ||
-             parsedPreview.hostname.endsWith(".dataspace.copernicus.eu"))) {
+             parsedPreview.hostname.endsWith(".dataspace.copernicus.eu") ||
+             parsedPreview.hostname === "s3.waw3-2.cloudferro.com")) {
           previewUrl = parsedPreview.toString();
         }
       } catch { /* omit missing or malformed preview */ }
