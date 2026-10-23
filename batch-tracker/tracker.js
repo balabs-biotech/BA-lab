@@ -2222,6 +2222,17 @@ function renderBatchComparisonOptions() {
   });
 }
 
+async function fetchAllComparisonPages(queryBuilder, pageSize = 1000) {
+  const rows = [];
+  for (let from = 0; ; from += pageSize) {
+    const { data, error } = await queryBuilder.range(from, from + pageSize - 1);
+    if (error) return { data: null, error };
+    const page = data || [];
+    rows.push(...page);
+    if (page.length < pageSize) return { data: rows, error: null };
+  }
+}
+
 async function compareSelectedBatches() {
   const select = document.getElementById("batchCompareSelect");
   const status = document.getElementById("batchCompareStatus");
@@ -2260,16 +2271,16 @@ async function compareSelectedBatches() {
         .select("batch_id,stage_code,status,sequence_no,started_at,completed_at")
         .eq("organization_id", organizationId).in("batch_id", ids),
       cultureIds.length
-        ? supabaseClient.from("measurements")
+        ? fetchAllComparisonPages(supabaseClient.from("measurements")
             .select("id,culture_id,environment_id,variable_code,raw_value,raw_unit_code,normalized_value,normalized_unit_code,measured_at,quality_state,exclusion_reason")
             .eq("organization_id", organizationId).in("culture_id", cultureIds)
-            .order("measured_at", { ascending: false }).limit(1000)
+            .order("measured_at", { ascending: false }).order("id", { ascending: true }))
         : Promise.resolve({data:[],error:null}),
       environmentIds.length
-        ? supabaseClient.from("measurements")
+        ? fetchAllComparisonPages(supabaseClient.from("measurements")
             .select("id,culture_id,environment_id,variable_code,raw_value,raw_unit_code,normalized_value,normalized_unit_code,measured_at,quality_state,exclusion_reason")
             .eq("organization_id", organizationId).in("environment_id", environmentIds)
-            .order("measured_at", { ascending: false }).limit(1000)
+            .order("measured_at", { ascending: false }).order("id", { ascending: true }))
         : Promise.resolve({data:[],error:null}),
       cultureIds.length
         ? supabaseClient.from("cultures")
@@ -2313,17 +2324,17 @@ async function compareSelectedBatches() {
       }];
     }));
     const observationCultureResult = cultureIds.length
-      ? await supabaseClient.from("observations")
+      ? await fetchAllComparisonPages(supabaseClient.from("observations")
           .select("id,culture_id,experimental_unit_id,variable_code,value_text,observed_at,quality_state")
           .eq("organization_id", organizationId).in("culture_id", cultureIds)
-          .order("observed_at", { ascending: false }).limit(1000)
+          .order("observed_at", { ascending: false }).order("id", { ascending: true }))
       : {data:[],error:null};
     if (observationCultureResult.error) throw new Error("Chargement des observations de culture impossible : " + observationCultureResult.error.message);
     const observationUnitResult = unitIds.length
-      ? await supabaseClient.from("observations")
+      ? await fetchAllComparisonPages(supabaseClient.from("observations")
           .select("id,culture_id,experimental_unit_id,variable_code,value_text,observed_at,quality_state")
           .eq("organization_id", organizationId).in("experimental_unit_id", unitIds)
-          .order("observed_at", { ascending: false }).limit(1000)
+          .order("observed_at", { ascending: false }).order("id", { ascending: true }))
       : {data:[],error:null};
     if (observationUnitResult.error) throw new Error("Chargement des observations expérimentales impossible : " + observationUnitResult.error.message);
     const observationMap = new Map();
@@ -2431,9 +2442,8 @@ async function compareSelectedBatches() {
       .map(batch => batch.culture_id ? contextsByCultureId.get(batch.culture_id)?.experimentalUnitId : null)
       .filter(Boolean);
     const repeatedUnitCount = selectedUnitIds.length - new Set(selectedUnitIds).size;
-    const capped = cultureMeasurementResult.data?.length >= 1000 || environmentMeasurementResult.data?.length >= 1000;
     const statusParts = [
-      capped ? labels.capped : labels.loaded,
+      labels.loaded,
       labels.count,
       labels.shared,
       repeatedUnitCount > 0 ? labels.repeated(repeatedUnitCount) : "",
