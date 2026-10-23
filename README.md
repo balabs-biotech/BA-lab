@@ -1,4 +1,4 @@
-# SARL B.A. LAB — Integrated Agritech & Environmental Biotechnology Platform
+# B.A. LAB — Integrated Agritech & Environmental Biotechnology Platform
 
 ![Status](https://img.shields.io/badge/Status-Active_R%26D-brightgreen)
 ![Focus](https://img.shields.io/badge/Focus-Biotech_%26_Frugal_Engineering-blue)
@@ -7,7 +7,7 @@
 
 ## Overview
 
-**SARL B.A. LAB** is an agricultural biotechnology and environmental engineering company based in Sétif, Algeria. Its mission is to deploy an integrated bio-economy platform for input sovereignty, automated environmental control and regeneration of degraded soils, combining applied microbiology (PGPR, ligninolytic fungi, seaweed hydrolysates) with frugal engineering and IoT automation.
+**B.A. LAB** is an applied biotechnology and environmental engineering project based in Sétif, Algeria. This repository uses B.A. LAB as a project name and does not assert that a legal entity has been registered under that name. Its mission is to deploy an integrated bio-economy platform for input sovereignty, automated environmental control and regeneration of degraded soils, combining applied microbiology (PGPR, ligninolytic fungi, seaweed hydrolysates) with frugal engineering and IoT automation.
 
 | Pillar | Core technologies | Applications |
 | :--- | :--- | :--- |
@@ -22,7 +22,7 @@ Each kind of content has **one** source of truth. This repository is not a copy 
 
 | Content | Source of truth | In this repository? |
 | :--- | :--- | :--- |
-| Cultures, batches, measurements, observations, QC; auth, access rules, RPC, Edge Functions | **Supabase** (project `BALabs`) | **No** — no SQL, migrations, dumps or exports |
+| Live data, authentication, access rules and deployed Edge Functions | **Supabase** (project `BALabs`) | Runtime lives in Supabase; versioned migrations, tests and function source are maintained under `supabase/` |
 | Experiments, strains, reference protocols, field notebook | **Notion** | **No**, except technical sheets needed to build or run equipment |
 | Firmware, IoT configuration, hardware plans, technical SOPs, tests, CI | **GitHub** (this repository) | **Yes** |
 | Batch Tracker web interface (`batch-tracker/`) | This repository | **Yes** — see [`batch-tracker/README.md`](batch-tracker/README.md) |
@@ -64,4 +64,4 @@ Opening `batch-tracker/` without a supported `domain` query parameter redirects 
 
 Mixed licensing by directory — see [`LICENSE`](LICENSE). Summary: firmware MIT, hardware CERN-OHL-P-2.0, biotechnology documents and the Batch Tracker all rights reserved.
 
-© 2026 SARL B.A. LAB — Sétif, Algeria.
+© 2026 B.A. LAB project — Sétif, Algeria. See `LICENSE` for directory-specific rights; the project name is not a statement of legal incorporation.
