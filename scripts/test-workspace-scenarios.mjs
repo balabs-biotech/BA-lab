@@ -119,13 +119,14 @@ console.log("✓ Scenario Laboratory: lab cultures and production batches are se
 console.log("✓ Scenario navigation: valid selection is preserved; cross-universe selection is discarded");
 
 const typeCatalogue = [
-  "agar", "plate", "slant", "broth", "flask", "other_liquid", "fermentation", "other",
+  "agar", "plate", "slant", "broth", "flask", "other_liquid", "grain_spawn", "substrate", "fermentation", "other",
   "organoid", "suspension", "micropropagation", "solid"
 ].map(code => ({ code }));
 const mycologyTypes = Array.from(callHelper("workspaceCultureTypes", [typeCatalogue], "mycology"), item => item.code);
 const labTypes = Array.from(callHelper("workspaceCultureTypes", [typeCatalogue], "laboratory"), item => item.code);
 const agronomyTypes = Array.from(callHelper("workspaceCultureTypes", [typeCatalogue], "agronomy"), item => item.code);
 assert.ok(mycologyTypes.includes("agar") && mycologyTypes.includes("broth"));
+assert.ok(mycologyTypes.includes("grain_spawn") && mycologyTypes.includes("substrate"));
 assert.ok(!mycologyTypes.includes("organoid") && !mycologyTypes.includes("micropropagation"));
 assert.equal(labTypes.length, typeCatalogue.length);
 assert.deepEqual(agronomyTypes, []);
