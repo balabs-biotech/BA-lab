@@ -129,7 +129,10 @@
         advice.append(item);
       });
       const latestDay=days.length?days[days.length-1]:null;
+      const selectedEnd=to.value;
+      const lagDays=latestDay&&selectedEnd?Math.round((Date.parse(selectedEnd+"T00:00:00Z")-Date.parse(latestDay+"T00:00:00Z"))/86400000):null;
       const coverage=node("p",{class:"muted"},"Qualité des données : "+days.length+" jour(s) avec au moins une valeur exploitable ; températures maximales "+heatCoverage+" jour(s), précipitations "+rainCoverage+" jour(s), humidité "+humidityCoverage+" jour(s)."+(latestDay?" Dernière date disponible : "+latestDay+".":""));
+      if(lagDays!==null&&lagDays>2)coverage.append(node("strong",{}," Écart de couverture : "+lagDays+" jours entre la fin de période sélectionnée et la dernière date disponible."));
       summary.append(node("h3",{},"Lecture agronomique provisoire"),advice,coverage,node("p",{class:"muted"},"Ces signaux sont des règles indicatives appliquées à des estimations NASA POWER sur grille régionale, pas à des mesures locales. Ils servent à décider quoi vérifier, pas à établir un diagnostic. La météo affichée est historique : aucune prévision ni commande automatique d’irrigation."));
     }
     async function loadRows(){
