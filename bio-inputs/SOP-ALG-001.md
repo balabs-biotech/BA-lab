@@ -4,7 +4,7 @@
 * **Version:** 1.0
 * **Category:** Algology & Biostimulant Extraction
 * **Target Platform:** MARINOR Seaweed Hydrolysate / Crop Biostimulants
-* **Author:** SARL B.A. LAB — Algology & Bio-Inputs Unit
+* **Author:** B.A. LAB project — Algology & Bio-Inputs Unit
 
 ---
 
