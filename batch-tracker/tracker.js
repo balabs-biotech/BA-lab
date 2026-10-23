@@ -5282,39 +5282,61 @@ function renderStatisticsFilters() {
   const cultureSelect = document.getElementById("statisticsCulture");
   const batchSelect = document.getElementById("statisticsBatch");
   if (!variableSelect || !cultureSelect || !batchSelect) return;
+  const domain = document.body.dataset.domain || "mycology";
+  const visibleVariables = workspaceMeasurementVariables(measurementVariables, domain);
+  const visibleTargets = domain === "agronomy" ? plantCultureOptions : cultureOptions;
   const previousVariable = variableSelect.value;
   const previousCulture = cultureSelect.value;
   const previousBatch = batchSelect.value;
-  variableSelect.innerHTML = "";
-  const placeholder = document.createElement("option");
-  placeholder.value = "";
-  placeholder.textContent = measurementVariables.length ? "Sélectionner une variable…" : "Aucune variable disponible";
-  variableSelect.appendChild(placeholder);
-  measurementVariables.forEach(variable => {
+
+  variableSelect.replaceChildren();
+  const variablePlaceholder = document.createElement("option");
+  variablePlaceholder.value = "";
+  variablePlaceholder.textContent = visibleVariables.length ? "Sélectionner une variable…" : "Aucune variable adaptée à cet univers";
+  variableSelect.appendChild(variablePlaceholder);
+  visibleVariables.forEach(variable => {
     const option = document.createElement("option");
     option.value = variable.code;
     option.textContent = variable.label + " · " + variable.code;
     variableSelect.appendChild(option);
   });
-  if (measurementVariables.some(variable => variable.code === previousVariable)) variableSelect.value = previousVariable;
-  cultureSelect.innerHTML = '<option value="">Toutes les cultures accessibles</option>';
-  cultureOptions.forEach(culture => {
+  if (visibleVariables.some(variable => variable.code === previousVariable)) variableSelect.value = previousVariable;
+
+  const targetLabel = document.querySelector('label[for="statisticsCulture"]');
+  if (targetLabel) targetLabel.textContent = domain === "agronomy" ? "Unité végétale" : domain === "laboratory" ? "Culture de laboratoire" : "Culture mycologique";
+  cultureSelect.replaceChildren();
+  const targetPlaceholder = document.createElement("option");
+  targetPlaceholder.value = "";
+  targetPlaceholder.textContent = domain === "agronomy" ? "Toutes les unités végétales" : domain === "laboratory" ? "Toutes les cultures de laboratoire" : "Toutes les cultures mycologiques";
+  cultureSelect.appendChild(targetPlaceholder);
+  visibleTargets.forEach(target => {
     const option = document.createElement("option");
-    option.value = culture.id;
-    option.textContent = culture.code || "Culture sans code";
+    option.value = target.id;
+    option.textContent = domain === "agronomy"
+      ? (target.code || "Unité sans code") + " · " + (target.cultivar_name || target.crop_type || "")
+      : target.code || "Culture sans code";
     cultureSelect.appendChild(option);
   });
-  if (cultureOptions.some(culture => culture.id === previousCulture)) cultureSelect.value = previousCulture;
-  batchSelect.innerHTML = '<option value="">Tous les lots chargés</option>';
-  latestBatches.forEach(batch => {
-    const option = document.createElement("option");
-    option.value = batch.id;
-    option.textContent = (batch.batch_code || "Lot sans code") + (batch.name ? " · " + batch.name : "");
-    batchSelect.appendChild(option);
-  });
-  if (latestBatches.some(batch => batch.id === previousBatch)) batchSelect.value = previousBatch;
-}
+  if (visibleTargets.some(target => target.id === previousCulture)) cultureSelect.value = previousCulture;
 
+  const batchField = batchSelect.closest("div");
+  if (batchField) batchField.hidden = domain !== "laboratory";
+  batchSelect.disabled = domain !== "laboratory";
+  batchSelect.replaceChildren();
+  const batchPlaceholder = document.createElement("option");
+  batchPlaceholder.value = "";
+  batchPlaceholder.textContent = "Tous les lots récents (30 max.)";
+  batchSelect.appendChild(batchPlaceholder);
+  if (domain === "laboratory") {
+    latestBatches.forEach(batch => {
+      const option = document.createElement("option");
+      option.value = batch.id;
+      option.textContent = (batch.batch_code || "Lot sans code") + (batch.name ? " · " + batch.name : "");
+      batchSelect.appendChild(option);
+    });
+    if (latestBatches.some(batch => batch.id === previousBatch)) batchSelect.value = previousBatch;
+  }
+}
 function renderCultureCatalog() {
   const list = document.getElementById("cultureCatalogList");
   const count = document.getElementById("cultureCatalogCount");
@@ -5441,8 +5463,11 @@ let statisticsRequestId = 0;
 async function loadStatistics() {
   const requestId = ++statisticsRequestId;
   const variableCode = document.getElementById("statisticsVariable").value;
-  const cultureId = document.getElementById("statisticsCulture").value;
-  const batchId = document.getElementById("statisticsBatch").value;
+  const domain = document.body.dataset.domain || "mycology";
+  const selectedTargetId = document.getElementById("statisticsCulture").value;
+  const cultureId = domain === "agronomy" ? "" : selectedTargetId;
+  const plantCultureId = domain === "agronomy" ? selectedTargetId : "";
+  const batchId = domain === "laboratory" ? document.getElementById("statisticsBatch").value : "";
   const period = document.getElementById("statisticsPeriod").value;
   const status = document.getElementById("statisticsStatus");
   const chart = document.getElementById("statisticsChart");
@@ -5489,8 +5514,10 @@ async function loadStatistics() {
       }
       cultureEventIds = [...new Set(cultureEventResults.flatMap(result => (result.data || []).map(event => event.id)))];
     }
-    let query = supabaseClient.from("measurements").select("id, variable_code, raw_value, raw_unit_code, normalized_value, normalized_unit_code, measured_at, method, culture_id, event_id, metadata").eq("organization_id", organizationId).eq("variable_code", variableCode).order("measured_at", {ascending:false}).limit(1000);
-    if (cultureId && batchId) {
+    let query = supabaseClient.from("measurements").select("id, variable_code, raw_value, raw_unit_code, normalized_value, normalized_unit_code, measured_at, method, culture_id, plant_culture_id, event_id, metadata").eq("organization_id", organizationId).eq("variable_code", variableCode).order("measured_at", {ascending:false}).limit(1000);
+    if (plantCultureId) {
+      query = query.eq("plant_culture_id", plantCultureId);
+    } else if (cultureId && batchId) {
       const matchingEventIds = cultureEventIds.filter(id => batchEventIds.includes(id));
       if (matchingEventIds.length) query = query.in("event_id", matchingEventIds);
       else noMatchingCultureBatchEvents = true;
@@ -6336,6 +6363,7 @@ async function loadPlantCultures() {
     renderPlantCultureList(data || []);
     plantCultureOptions = data || [];
     renderMeasurementTargets();
+    renderStatisticsFilters();
     if (status) status.textContent = "Registre végétal chargé depuis Supabase.";
   } catch (error) {
     console.error("Chargement du registre végétal impossible :", error);
