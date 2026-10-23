@@ -73,7 +73,7 @@ const greenTech = scenario("agronomy");
 assert.deepEqual(greenTech.values, ["", "plant:plant-1"]);
 assert.deepEqual(greenTech.labels, ["Unités végétales · Green Tech"]);
 assert.equal(greenTech.select.value, ""); // Explicit target choice is required.
-assert.match(greenTech.placeholder, /fiche végétale/);
+assert.match(greenTech.placeholder, /cible de cet univers/);
 
 const mycology = scenario("mycology");
 assert.deepEqual(mycology.values, ["", "culture:fungus-1"]);
