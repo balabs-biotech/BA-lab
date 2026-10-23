@@ -87,13 +87,19 @@ Deno.serve(async (req: Request) => {
         if (parsed.protocol === "https:" && parsed.hostname === "stac.dataspace.copernicus.eu") itemUrl = parsed.toString();
       } catch { /* omit malformed catalogue link */ }
       const assets = f.assets && typeof f.assets === "object" ? f.assets : {};
-      const previewAsset = ["thumbnail", "rendered_preview", "preview", "visual"].map((key) => assets[key])
-        .find((asset: any) => asset && typeof asset.href === "string");
+      const previewAsset = Object.entries(assets)
+        .map(([assetKey, asset]: [string, any]) => ({ assetKey, asset }))
+        .find(({ assetKey, asset }) => {
+          if (!asset || typeof asset.href !== "string") return false;
+          if (["thumbnail", "rendered_preview", "preview", "visual", "overview"].includes(assetKey.toLowerCase())) return true;
+          return Array.isArray(asset.roles) && asset.roles.some((role: unknown) =>
+            typeof role === "string" && ["thumbnail", "overview", "visual"].includes(role.toLowerCase()));
+        })?.asset;
       let previewUrl: string | null = null;
       try {
         const parsedPreview = new URL(previewAsset?.href ?? "");
         if (parsedPreview.protocol === "https:" &&
-            (parsedPreview.hostname === "stac.dataspace.copernicus.eu" ||
+            (parsedPreview.hostname === "dataspace.copernicus.eu" ||
              parsedPreview.hostname.endsWith(".dataspace.copernicus.eu"))) {
           previewUrl = parsedPreview.toString();
         }
