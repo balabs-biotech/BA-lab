@@ -130,7 +130,7 @@ Références officielles :
 
 ### Adaptateur catalogue Sentinel-2 ajouté au dépôt — 23 octobre 2026
 
-Le fichier `supabase/functions/copernicus-sentinel-catalogue/index.ts` est maintenant versionné. Il s'agit d'une fonction **en lecture seule**, non encore déployée en production.
+Le fichier `supabase/functions/copernicus-sentinel-catalogue/index.ts` est versionné et la fonction est déployée sur Supabase en version active 1, avec vérification JWT activée. Elle est **en lecture seule**.
 
 - Authentifie l'utilisateur et vérifie l'accès au lieu par la lecture RLS de `locations`.
 - Interroge le catalogue STAC Copernicus pour la collection `sentinel-2-l2a`, sur une fenêtre temporelle maximale de 180 jours et un maximum de 20 scènes par requête.
@@ -138,7 +138,7 @@ Le fichier `supabase/functions/copernicus-sentinel-catalogue/index.ts` est maint
 - La zone de recherche est une boîte régionale autour du point enregistré. Elle ne représente pas la parcelle et ne permet pas d'affirmer qu'une scène couvre exactement la culture suivie.
 - Les scènes filtrées par couverture nuageuse ne garantissent pas l'absence de nuages sur la parcelle. Aucun NDVI/NDMI ni conseil agronomique n'est calculé.
 
-**Avant déploiement :** exécuter CI, tester une requête STAC réelle et les cas d'accès refusé/coordonnées absentes, vérifier le schéma des propriétés retournées par le fournisseur, puis déployer explicitement la fonction. À ce stade, aucune donnée satellite n'est persistée dans `environmental_observations`.
+**Validation restante :** effectuer une requête de bout en bout depuis une session utilisateur authentifiée, puis tester les cas d'accès refusé et de coordonnées absentes. À ce stade, aucune donnée satellite n'est persistée dans `environmental_observations`.
 
 
 ### Exploitation dans Green Tech — 23 octobre 2026
@@ -151,4 +151,4 @@ L'objectif fonctionnel est de transformer les données en décisions de vérific
 - Un bouton lance une recherche Sentinel-2 sur la même localisation et la période sélectionnée, puis affiche les scènes, leur date, la couverture nuageuse et le lien catalogue. Recherche limitée à 180 jours et 20 scènes côté fonction, 10 scènes par défaut dans l'interface.
 - Les résultats satellite sont des pistes d'observation, pas des diagnostics de culture : la couverture nuageuse est celle de la scène entière, le point enregistré n'est pas un contour de parcelle, et aucun indice végétal n'est calculé à ce stade.
 
-La fonction `copernicus-sentinel-catalogue` a été déployée sur Supabase avec vérification JWT activée. Le CI précédent de l'adaptateur est passé. Le CI de la dernière modification de l'interface est encore en cours ; ne pas considérer cette version comme validée avant sa fin.
+La fonction `copernicus-sentinel-catalogue` est déployée sur Supabase avec vérification JWT activée. Les indicateurs affichent désormais aussi le nombre de jours ayant des valeurs exploitables et la date de la dernière observation. Le CI et le déploiement Pages de la dernière correction de couverture des données sont en cours ; ne pas considérer cette dernière correction comme publiée avant leur réussite.
