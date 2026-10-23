@@ -256,3 +256,44 @@ do $$ declare v_batch public.batches; v_codes text[]; begin
   end;
 end $$;
 reset role;
+
+
+-- Regression coverage for every reviewed category-specific workflow.
+-- These cases run only in the disposable CI fixture, never against production data.
+select set_config('request.jwt.claim.sub','00000000-0000-0000-0000-0000000000b1',false);
+set role authenticated;
+do $$
+declare
+  v_case record;
+  v_batch public.batches;
+  v_codes text[];
+begin
+  for v_case in
+    select * from (values
+      ('CULTURE'::text, array['preparation','sterilization','inoculation','incubation','cultivation','qc','release']::text[]),
+      ('TRICHODERMA'::text, array['preparation','sterilization','inoculation','incubation','cultivation','formulation','packaging','qc','release']::text[]),
+      ('PLEUROTUS_SPAWN'::text, array['preparation','sterilization','inoculation','incubation','packaging','qc','release']::text[]),
+      ('MUSHROOM_PRODUCT'::text, array['harvest','packaging','qc','release']::text[]),
+      ('BIOSTIMULANT'::text, array['preparation','sterilization','inoculation','incubation','cultivation','formulation','packaging','qc','release']::text[]),
+      ('FORMULATION'::text, array['preparation','formulation','packaging','qc','release']::text[])
+    ) as expected(batch_type, stages)
+  loop
+    select * into v_batch from public.create_batch_with_stages(
+      '00000000-0000-0000-0000-0000000000a1',
+      'CATEGORY-' || v_case.batch_type,
+      'Category workflow test ' || v_case.batch_type,
+      v_case.batch_type,
+      p_material_id := '00000000-0000-0000-0000-0000000000e1',
+      p_stages := v_case.stages
+    );
+
+    select array_agg(stage_code order by sequence_no) into v_codes
+    from public.batch_stages where batch_id = v_batch.id;
+
+    if v_batch.current_stage is distinct from v_case.stages[1]
+       or v_codes is distinct from v_case.stages then
+      raise exception 'FAIL: category % stored unexpected stages: %', v_case.batch_type, v_codes;
+    end if;
+  end loop;
+end $$;
+reset role;
