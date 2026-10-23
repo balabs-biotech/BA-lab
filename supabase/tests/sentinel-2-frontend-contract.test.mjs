@@ -16,6 +16,7 @@ const checks = [
   ["opens catalogue links in a protected new tab", /target:"_blank",rel:"noopener noreferrer"/],
   ["renders catalogue-provided preview images", /if\(scene\.preview_url\)[\s\S]*?node\("img"/],
   ["handles missing preview images without breaking scene cards", /Aucun aperçu image fourni par le catalogue/],
+  ["offers a per-scene Copernicus Browser date view when no thumbnail exists", /scene\.browser_url[\s\S]*?Visualiser cette date dans Copernicus Browser/],
   ["does not claim that parcel-level NDVI analysis is already available", /calcul NDVI et le traitement des bandes satellite restent à intégrer/],
   ["restores the button after success or failure", /finally\{satelliteButton\.disabled=false;\}/],
 ];
