@@ -19,6 +19,8 @@ const PARAMETERS = {
   T2M_MIN: { variable: "air_temperature_min", unit: "degC", resolution: 55_000 },
   PRECTOTCORR: { variable: "precipitation_corrected", unit: "mm/day", resolution: 55_000 },
   ALLSKY_SFC_SW_DWN: { variable: "solar_radiation_all_sky", unit: "kWh/m2/day", resolution: 111_000 },
+  RH2M: { variable: "relative_humidity_mean", unit: "%", resolution: 55_000 },
+  WS2M: { variable: "wind_speed_mean", unit: "m/s", resolution: 55_000 },
 };
 
 function json(status: number, body: Record<string, unknown>) {
