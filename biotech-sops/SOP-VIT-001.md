@@ -4,7 +4,7 @@
 * **Version:** 1.0
 * **Biosafety Level:** BSL-1
 * **Target Application:** Plant Tissue Culture, Organogenesis, and Temporary Immersion Systems (TIS / RITA / Twin-Bottle)
-* **Author:** SARL B.A. LAB — Micropropagation & Plant Biotechnology Unit
+* **Author:** B.A. LAB project — Micropropagation & Plant Biotechnology Unit
 
 ---
 
