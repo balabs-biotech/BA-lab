@@ -30,7 +30,13 @@ if(!engine.includes('from("experimental_units")')||!engine.includes('unit_code,r
 if(!engine.includes('from("experiments")')||!engine.includes('select("id,code,name")'))throw new Error("Experiment metadata is not loaded");
 if(!engine.includes("<th>Expérience</th><th>Unité / traitement / répétition</th>"))throw new Error("Experimental context columns are missing from batch comparison");
 if(!engine.includes('...units.map(row => row.experiment_id)'))throw new Error("Experiment lookup does not fall back to the experimental unit link");
-if(!engine.includes("limite de 1 000 mesures récentes par lien culture/environnement"))throw new Error("Batch comparison measurement cap is not disclosed");
+if(!engine.includes("async function fetchAllComparisonPages")||!engine.includes("queryBuilder.range(from, from + pageSize - 1)"))throw new Error("Batch comparison pagination is missing");
+const comparisonStart=engine.indexOf("async function compareSelectedBatches()");
+const comparisonEnd=engine.indexOf('document.getElementById("compareBatchesButton")?.addEventListener',comparisonStart);
+const comparisonCode=engine.slice(comparisonStart,comparisonEnd);
+if((comparisonCode.match(/fetchAllComparisonPages\\(supabaseClient\\.from\\("(?:measurements|observations)"\\)/g)||[]).length!==4)throw new Error("Measurements and observations are not fully paginated");
+if((comparisonCode.match(/\\.limit\\(1000\\)/g)||[]).length!==0)throw new Error("Batch comparison still has a hard 1,000-row cap");
+if(!comparisonCode.includes('.order("measured_at", { ascending: false }).order("id", { ascending: true })')||!comparisonCode.includes('.order("observed_at", { ascending: false }).order("id", { ascending: true })'))throw new Error("Paginated comparison queries lack deterministic ordering");
 if(!engine.includes("normalized_value,normalized_unit_code")||!engine.includes("raw_value,raw_unit_code"))throw new Error("Numeric measurement fields missing from comparison");
 if(!engine.includes('row.quality_state === "excluded"'))throw new Error("Excluded measurements are not handled explicitly");
 if(!engine.includes("min–max")||!engine.includes("values.length"))throw new Error("Descriptive numeric summary missing");
