@@ -56,21 +56,52 @@ Deno.serve(async (req: Request) => {
       return reply(422, { error: "valid_location_coordinates_required" });
     }
 
-    // Regional context box only; without a parcel polygon this cannot confirm parcel-level coverage.
+    // Prefer a saved parcel geometry when supplied; retain the regional bbox fallback.
+    const parcelId = typeof body.parcel_id === "string" ? body.parcel_id.trim() : "";
+    let parcelGeometry: Record<string, unknown> | null = null;
+    if (parcelId) {
+      if (parcelId.length > 128) return reply(422, { error: "invalid_parcel_id" });
+      const { data: parcel, error: parcelError } = await db.from("farm_parcels")
+        .select("id,location_id,boundary_geojson").eq("id", parcelId).eq("location_id", locationId).maybeSingle();
+      if (parcelError || !parcel) return reply(404, { error: "parcel_not_found_or_access_denied" });
+      const geometry = parcel.boundary_geojson;
+      const validPosition = (p: unknown) => Array.isArray(p) && p.length >= 2 &&
+        typeof p[0] === "number" && Number.isFinite(p[0]) && p[0] >= -180 && p[0] <= 180 &&
+        typeof p[1] === "number" && Number.isFinite(p[1]) && p[1] >= -90 && p[1] <= 90;
+      const validRing = (ring: unknown) => Array.isArray(ring) && ring.length >= 4 &&
+        ring.every(validPosition) && JSON.stringify(ring[0]) === JSON.stringify(ring[ring.length - 1]);
+      const validGeometry = geometry && typeof geometry === "object" &&
+        ((geometry.type === "Polygon" && Array.isArray(geometry.coordinates) &&
+          geometry.coordinates.length > 0 && geometry.coordinates.every(validRing)) ||
+         (geometry.type === "MultiPolygon" && Array.isArray(geometry.coordinates) &&
+          geometry.coordinates.length > 0 && geometry.coordinates.every((polygon: unknown) =>
+            Array.isArray(polygon) && polygon.length > 0 && polygon.every(validRing))));
+      if (!validGeometry) return reply(422, { error: "saved_parcel_geometry_invalid" });
+      parcelGeometry = { type: geometry.type, coordinates: geometry.coordinates };
+    }
+
     const dLat = 0.03;
     const dLon = Math.min(0.15, 0.03 / Math.max(0.2, Math.cos(loc.latitude * Math.PI / 180)));
     const bbox = [Math.max(-180, loc.longitude - dLon), Math.max(-90, loc.latitude - dLat),
       Math.min(180, loc.longitude + dLon), Math.min(90, loc.latitude + dLat)];
     const search = new URL("https://stac.dataspace.copernicus.eu/v1/search");
-    search.searchParams.set("collections", "sentinel-2-l2a");
-    search.searchParams.set("bbox", bbox.join(","));
-    search.searchParams.set("datetime", start + "T00:00:00Z/" + end + "T23:59:59Z");
-    search.searchParams.set("limit", String(limit));
-    // Return the newest matching scenes first so the UI does not show an arbitrary subset.
-    search.searchParams.set("sortby", "-properties.datetime");
-    search.searchParams.set("query", JSON.stringify({ "eo:cloud_cover": { "lte": cloud } }));
-    search.searchParams.set("fields", "id,collection,bbox,properties.datetime,properties.eo:cloud_cover,properties.platform,properties.constellation,links,assets,-geometry");
-    const upstream = await fetch(search, { signal: AbortSignal.timeout(20000) });
+    const searchBody: Record<string, unknown> = {
+      collections: ["sentinel-2-l2a"],
+      datetime: start + "T00:00:00Z/" + end + "T23:59:59Z",
+      limit,
+      sortby: [{ field: "properties.datetime", direction: "desc" }],
+      query: { "eo:cloud_cover": { lte: cloud } },
+      fields: { include: ["id", "collection", "bbox", "properties.datetime", "properties.eo:cloud_cover",
+        "properties.platform", "properties.constellation", "links", "assets"], exclude: ["geometry"] },
+    };
+    if (parcelGeometry) searchBody.intersects = parcelGeometry;
+    else searchBody.bbox = bbox;
+    const upstream = await fetch(search, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Accept": "application/geo+json, application/json" },
+      body: JSON.stringify(searchBody),
+      signal: AbortSignal.timeout(20000),
+    });
     if (!upstream.ok) {
       console.error("[copernicus-sentinel-catalogue] STAC status", upstream.status);
       return reply(502, { error: "copernicus_catalogue_unavailable", upstream_status: upstream.status });
@@ -143,10 +174,13 @@ Deno.serve(async (req: Request) => {
       };
     });
     return reply(200, { ok: true, provider: "Copernicus Data Space STAC", collection: "sentinel-2-l2a",
-      location_id: loc.id, search_bbox_wgs84: bbox,
-      bbox_note: "Regional context window, not a parcel boundary.",
+      location_id: loc.id, parcel_id: parcelId || null,
+      search_geometry_source: parcelGeometry ? "saved_parcel" : "regional_bbox",
+      ...(!parcelGeometry ? { search_bbox_wgs84: bbox, bbox_note: "Regional context window, not a parcel boundary." } : {}),
       date_range: { start, end }, max_cloud_cover_percent: cloud, scenes_found: scenes.length, scenes,
-      note: "Scene metadata and available preview URLs; full-resolution imagery and vegetation indices are not processed." });
+      note: parcelGeometry
+        ? "Scenes whose footprints intersect the saved parcel geometry; this is not pixel-level cloud screening and no vegetation index is calculated."
+        : "Scene metadata and available preview URLs for a regional context box; full-resolution imagery and vegetation indices are not processed." });
   } catch (e) {
     const message = e instanceof Error ? e.message : "unknown_error";
     console.error("[copernicus-sentinel-catalogue] request failed", message);

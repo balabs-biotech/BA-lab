@@ -43,11 +43,272 @@
     const coordinates=node("details",{class:"environmental-settings"});
     coordinates.append(node("summary",{},"Paramètres avancés : coordonnées et actualisation"));
     coordinates.append(field("Latitude","envLat",lat),field("Longitude","envLon",lon),field("Précision des coordonnées (m)","envAccuracy",accuracy),field("Origine des coordonnées","envSource",source),save,refresh);
+    const picker=node("section",{class:"location-picker card","aria-labelledby":"locationPickerTitle"});
+    picker.append(node("h3",{id:"locationPickerTitle"},"Définir l’emplacement sans saisir de coordonnées"));
+    picker.append(node("p",{class:"muted"},"Utilisez votre position si vous êtes sur place, ou cliquez sur la carte puis déplacez le repère. Vérifiez le point avant de l’enregistrer."));
+    const placeSearch=node("div",{class:"location-search"});
+    const placeQuery=node("input",{type:"search",id:"envPlaceSearch",placeholder:"Ville, village, adresse ou lieu-dit","aria-label":"Rechercher un lieu"});
+    const placeSearchButton=node("button",{type:"button",class:"small-button"},"Rechercher ce lieu");
+    const placeResults=node("div",{class:"location-search-results","aria-live":"polite"});
+    placeSearch.append(field("Rechercher par nom ou adresse","envPlaceSearch",placeQuery),placeSearchButton,placeResults);
+    const pickerActions=node("div",{class:"location-picker-actions"});
+    const locateButton=node("button",{type:"button",class:"small-button"},"Me localiser");
+    const mapSaveButton=node("button",{type:"button",class:"small-button secondary-button"},"Enregistrer cet emplacement");
+    picker.append(placeSearch);
+    pickerActions.append(locateButton,mapSaveButton);
+    const mapStatus=node("p",{class:"muted","aria-live":"polite"},"Carte en chargement…");
+    const mapNode=node("div",{id:"envLocationMap","role":"application","aria-label":"Carte interactive : cliquer pour choisir un emplacement"});
+    mapNode.style.cssText="height:320px;min-height:240px;border:1px solid #cbd5c7;border-radius:12px;overflow:hidden;background:#eef2ea;z-index:0";
+    picker.append(pickerActions,mapStatus,mapNode);
+    const parcelPanel=node("section",{class:"parcel-editor card","aria-labelledby":"parcelEditorTitle"});
+    parcelPanel.append(node("h3",{id:"parcelEditorTitle"},"Contour de parcelle"));
+    parcelPanel.append(node("p",{class:"muted"},"Sélectionnez un emplacement, démarrez le dessin puis cliquez sur la carte pour placer au moins trois sommets. Le contour est enregistré séparément des coordonnées du site."));
+    const parcelCode=node("input",{type:"text",id:"parcelCode",maxlength:"80",placeholder:"Ex. PARCELLE-01","aria-label":"Code de la parcelle"});
+    const parcelName=node("input",{type:"text",id:"parcelName",maxlength:"160",placeholder:"Nom de la parcelle","aria-label":"Nom de la parcelle"});
+    const parcelFields=node("div",{class:"parcel-fields"});
+    parcelFields.append(field("Code unique","parcelCode",parcelCode),field("Nom affiché","parcelName",parcelName));
+    const parcelActions=node("div",{class:"location-picker-actions"});
+    const drawParcelButton=node("button",{type:"button",class:"small-button"},"Démarrer le contour");
+    const finishParcelButton=node("button",{type:"button",class:"small-button secondary-button",disabled:true},"Terminer le contour");
+    const undoParcelButton=node("button",{type:"button",class:"small-button secondary-button",disabled:true},"Retirer le dernier sommet");
+    const clearParcelButton=node("button",{type:"button",class:"small-button secondary-button"},"Effacer le contour");
+    const saveParcelButton=node("button",{type:"button",class:"small-button",disabled:true},"Enregistrer la parcelle");
+    parcelActions.append(drawParcelButton,finishParcelButton,undoParcelButton,clearParcelButton,saveParcelButton);
+    const parcelStatus=node("p",{class:"muted","aria-live":"polite"},"Aucun contour en cours.");
+    const parcelList=node("div",{class:"parcel-list","aria-live":"polite"});
+    parcelPanel.append(parcelFields,parcelActions,parcelStatus,parcelList);
+    picker.append(parcelPanel);
+    const mapStyle=node("style");
+    mapStyle.textContent=".location-picker-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.location-picker-actions button{margin-top:8px}.location-picker h3{margin-top:0;padding-top:0;border-top:0}.location-search{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:end;margin:12px 0}.location-search>div{min-width:0}.location-search-results{grid-column:1/-1;display:grid;gap:6px}.location-search-results button{text-align:left;white-space:normal}.parcel-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.parcel-editor{margin-top:14px}.parcel-editor input{width:100%;box-sizing:border-box}.parcel-list{display:grid;gap:8px}.parcel-list .card{padding:10px}.leaflet-container{font:inherit}.leaflet-control-attribution{font-size:10px!important}@media(max-width:600px){.location-picker-actions{grid-template-columns:1fr}.location-search{grid-template-columns:1fr}.parcel-fields{grid-template-columns:1fr}.location-picker #envLocationMap{height:280px!important}}";
+    document.head.append(mapStyle);
     form.append(field("Emplacement","envLocation",location),field("Du","envFrom",from),field("Au","envTo",to),run,coordinates);
+
+    const satelliteParcel=node("select",{id:"satelliteParcel"});
+    satelliteParcel.append(node("option",{value:""},"Recherche régionale (sans contour de parcelle)"));
     const satelliteButton=node("button",{type:"button"},"Chercher les images satellite");
     const satelliteResults=node("div",{id:"satelliteResults",class:"overview-observations","aria-live":"polite"});
-    const satelliteHint=node("p",{class:"muted"},"Sentinel-2 : scènes disponibles et couverture nuageuse. L’image ne constitue pas à elle seule un diagnostic de culture.");
-    panel.append(form,status,summary,satelliteHint,satelliteButton,satelliteResults,details);
+    const satelliteHint=node("p",{class:"muted"},"Sentinel-2 : choisissez une parcelle enregistrée pour rechercher les scènes dont l’emprise intersecte son contour. La couverture nuageuse catalogue ne garantit pas des pixels clairs sur la parcelle.");
+    panel.append(form,picker,status,summary,satelliteHint,field("Périmètre de recherche satellite","satelliteParcel",satelliteParcel),satelliteButton,satelliteResults,details);
+    let locationMap=null, locationMarker=null, mapReady=false;
+    let drawingParcel=false, parcelVertices=[], parcelLayer=null, parcelCompleted=false;
+    function setMapPoint(latitude,longitude,origin,precision=null,zoomToPoint=false){
+      lat.value=String(latitude);lon.value=String(longitude);accuracy.value=precision==null?"":String(precision);
+      source.value=origin;
+      if(locationMap){
+        const point=[latitude,longitude];
+        if(!locationMarker){
+          locationMarker=L.marker(point,{draggable:true}).addTo(locationMap);
+          locationMarker.on("dragend",event=>{
+            const p=event.target.getLatLng();
+            lat.value=p.lat.toFixed(6);lon.value=p.lng.toFixed(6);accuracy.value="";source.value="map_estimate";
+            mapStatus.textContent="Repère déplacé : "+p.lat.toFixed(6)+", "+p.lng.toFixed(6)+". Enregistrez pour confirmer.";
+          });
+        } else locationMarker.setLatLng(point);
+        if(zoomToPoint)locationMap.setView(point,Math.max(locationMap.getZoom(),13));
+      }
+      mapStatus.textContent="Point sélectionné : "+latitude.toFixed(6)+", "+longitude.toFixed(6)+(precision==null?"":" · précision estimée "+Math.round(precision)+" m")+". Enregistrez pour l’associer à l’emplacement choisi.";
+    }
+    function loadMapLibrary(){
+      if(window.L){initMap();return;}
+      if(!document.getElementById("leaflet-css")){
+        const css=node("link",{id:"leaflet-css",rel:"stylesheet",href:"https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"});
+        document.head.append(css);
+      }
+      if(window.__baLeafletLoading){window.__baLeafletLoading.then(initMap).catch(()=>mapStatus.textContent="Carte indisponible. Vous pouvez toujours utiliser « Me localiser ».");return;}
+      window.__baLeafletLoading=new Promise((resolve,reject)=>{
+        const script=node("script",{src:"https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"});
+        script.onload=resolve;script.onerror=reject;document.head.append(script);
+      });
+      window.__baLeafletLoading.then(initMap).catch(()=>mapStatus.textContent="Carte indisponible. Vérifiez la connexion ou utilisez « Me localiser ».");
+    }
+    function initMap(){
+      if(mapReady||!window.L)return;
+      locationMap=L.map(mapNode,{scrollWheelZoom:false}).setView([28,2],4);
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,attribution:'&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a>'}).addTo(locationMap);
+      locationMap.on("click",event=>{
+         if(drawingParcel){
+           parcelVertices.push([event.latlng.lat,event.latlng.lng]);
+           renderParcelDraft();
+           parcelStatus.textContent="Sommet "+parcelVertices.length+" ajouté.";
+         }else setMapPoint(event.latlng.lat,event.latlng.lng,"map_estimate");
+       });
+      mapReady=true;
+      if(lat.value!==""&&lon.value!=="")setMapPoint(Number(lat.value),Number(lon.value),source.value||"user_confirmed",accuracy.value===""?null:Number(accuracy.value),true);
+      else mapStatus.textContent="Cliquez sur la carte pour placer le repère. La carte peut être déplacée et zoomée.";
+      setTimeout(()=>locationMap.invalidateSize(),100);
+    }
+    function removeParcelLayer(){
+      if(parcelLayer&&locationMap)locationMap.removeLayer(parcelLayer);
+      parcelLayer=null;
+    }
+    function renderParcelDraft(){
+      removeParcelLayer();
+      if(!locationMap||!window.L||!parcelVertices.length)return;
+      const points=parcelVertices.map(([a,b])=>[a,b]);
+      if(points.length===1)parcelLayer=L.circleMarker(points[0],{radius:6,color:"#8a5a00"}).addTo(locationMap);
+      else parcelLayer=L.polyline(points,{color:"#8a5a00",weight:3,dashArray:parcelCompleted?null:"6 6"}).addTo(locationMap);
+      undoParcelButton.disabled=!drawingParcel||parcelVertices.length===0;
+      finishParcelButton.disabled=!drawingParcel||parcelVertices.length<3;
+      saveParcelButton.disabled=drawingParcel||!parcelCompleted||parcelVertices.length<3;
+    }
+    function resetParcelDraft(message="Contour effacé."){
+      drawingParcel=false;parcelCompleted=false;parcelVertices=[];removeParcelLayer();
+      drawParcelButton.disabled=false;finishParcelButton.disabled=true;undoParcelButton.disabled=true;saveParcelButton.disabled=true;
+      if(locationMap)locationMap.getContainer().style.cursor="";
+      parcelStatus.textContent=message;
+    }
+    drawParcelButton.addEventListener("click",()=>{
+      if(!location.value){parcelStatus.textContent="Choisissez d’abord un emplacement.";return;}
+      resetParcelDraft("Dessin démarré : cliquez sur la carte pour ajouter les sommets.");
+      drawingParcel=true;drawParcelButton.disabled=true;finishParcelButton.disabled=true;
+      if(locationMap)locationMap.getContainer().style.cursor="crosshair";
+    });
+    finishParcelButton.addEventListener("click",()=>{
+      if(parcelVertices.length<3){parcelStatus.textContent="Il faut au moins trois sommets.";return;}
+      drawingParcel=false;parcelCompleted=true;
+      if(locationMap)locationMap.getContainer().style.cursor="";
+      removeParcelLayer();
+      const ring=[...parcelVertices,parcelVertices[0]];
+      parcelLayer=L.polygon(ring,{color:"#236b4b",weight:3,fillOpacity:0.18}).addTo(locationMap);
+      locationMap.fitBounds(parcelLayer.getBounds(),{padding:[18,18]});
+      drawParcelButton.disabled=false;finishParcelButton.disabled=true;undoParcelButton.disabled=true;saveParcelButton.disabled=false;
+      parcelStatus.textContent="Contour fermé. Vérifiez qu’il suit la parcelle et ne se croise pas avant l’enregistrement.";
+    });
+    undoParcelButton.addEventListener("click",()=>{
+      if(!drawingParcel||!parcelVertices.length)return;
+      parcelVertices.pop();renderParcelDraft();parcelStatus.textContent="Dernier sommet retiré.";
+    });
+    clearParcelButton.addEventListener("click",()=>resetParcelDraft());
+    async function loadParcels(){
+      parcelList.replaceChildren();
+      satelliteParcel.replaceChildren(node("option",{value:""},"Recherche régionale (sans contour de parcelle)"));
+      if(!location.value)return;
+      const requestedLocationId=location.value;
+      const {data,error}=await db.from("farm_parcels").select("id,parcel_code,name,boundary_geojson,boundary_source,created_at").eq("location_id",requestedLocationId).order("name");
+      if(location.value!==requestedLocationId)return;
+      if(error){parcelList.append(node("p",{class:"muted"},"Lecture des parcelles indisponible : "+error.message));return;}
+      (data||[]).forEach(parcel=>satelliteParcel.append(node("option",{value:parcel.id},parcel.name+" ("+parcel.parcel_code+")")));
+      if(!data?.length){parcelList.append(node("p",{class:"muted"},"Aucune parcelle enregistrée pour cet emplacement."));return;}
+      data.forEach(parcel=>{
+        const card=node("article",{class:"card"});
+        card.append(node("strong",{},parcel.name+" ("+parcel.parcel_code+")"));
+        const coords=parcel.boundary_geojson?.coordinates;
+        const ring=Array.isArray(coords?.[0]?.[0])?coords[0][0]:coords?.[0];
+        card.append(node("p",{class:"muted"},(Array.isArray(ring)?ring.length:0)+" positions dans le contour · source "+parcel.boundary_source));
+        const show=node("button",{type:"button",class:"small-button secondary-button"},"Afficher sur la carte");
+        show.addEventListener("click",()=>{
+          const geo=parcel.boundary_geojson;
+          if(!window.L||!locationMap){parcelStatus.textContent="Carte pas encore prête.";return;}
+          removeParcelLayer();
+          parcelLayer=L.geoJSON(geo,{style:{color:"#236b4b",weight:3,fillOpacity:0.18}}).addTo(locationMap);
+          parcelVertices=[];parcelCompleted=false;drawingParcel=false;
+          drawParcelButton.disabled=false;finishParcelButton.disabled=true;undoParcelButton.disabled=true;saveParcelButton.disabled=true;
+          locationMap.fitBounds(parcelLayer.getBounds(),{padding:[18,18]});
+          parcelStatus.textContent="Parcelle affichée : "+parcel.name+".";
+        });
+        card.append(show);parcelList.append(card);
+      });
+    }
+    // Lightweight geometry checks before storing a user-drawn polygon.
+    // Coordinates are [latitude, longitude]; intersections are tested in lon/lat
+    // space, which is appropriate for ordinary small agricultural parcels.
+    function validateParcelVertices(vertices){
+      if(!Array.isArray(vertices)||vertices.length<3)return "Il faut au moins trois sommets.";
+      for(const point of vertices){
+        if(!Array.isArray(point)||point.length!==2||!Number.isFinite(point[0])||!Number.isFinite(point[1])||point[0]<-90||point[0]>90||point[1]<-180||point[1]>180)
+          return "Un sommet contient des coordonnées invalides.";
+      }
+      const unique=new Set(vertices.map(([a,b])=>a.toFixed(8)+","+b.toFixed(8)));
+      if(unique.size<3)return "Le contour doit contenir au moins trois sommets distincts.";
+      const points=vertices.map(([latitude,longitude])=>({x:longitude,y:latitude}));
+      let twiceArea=0;
+      for(let i=0;i<points.length;i++){
+        const a=points[i],b=points[(i+1)%points.length];
+        twiceArea+=a.x*b.y-b.x*a.y;
+        if(Math.hypot(a.x-b.x,a.y-b.y)<1e-9)return "Deux sommets consécutifs sont confondus.";
+      }
+      if(Math.abs(twiceArea)<1e-10)return "Le contour a une surface nulle ou trop petite pour être fiable.";
+      const orient=(a,b,c)=>(b.x-a.x)*(c.y-a.y)-(b.y-a.y)*(c.x-a.x);
+      const onSegment=(a,b,p)=>p.x>=Math.min(a.x,b.x)-1e-10&&p.x<=Math.max(a.x,b.x)+1e-10&&p.y>=Math.min(a.y,b.y)-1e-10&&p.y<=Math.max(a.y,b.y)+1e-10;
+      const intersects=(a,b,c,d)=>{
+        const o1=orient(a,b,c),o2=orient(a,b,d),o3=orient(c,d,a),o4=orient(c,d,b);
+        if(((o1>1e-10&&o2< -1e-10)||(o1< -1e-10&&o2>1e-10))&&((o3>1e-10&&o4< -1e-10)||(o3< -1e-10&&o4>1e-10)))return true;
+        return (Math.abs(o1)<=1e-10&&onSegment(a,b,c))||(Math.abs(o2)<=1e-10&&onSegment(a,b,d))||(Math.abs(o3)<=1e-10&&onSegment(c,d,a))||(Math.abs(o4)<=1e-10&&onSegment(c,d,b));
+      };
+      for(let i=0;i<points.length;i++){
+        const a=points[i],b=points[(i+1)%points.length];
+        for(let j=i+1;j<points.length;j++){
+          // Adjacent edges share an endpoint by design, including first/last.
+          if(j===i||j===(i+1)%points.length||(j+1)%points.length===i)continue;
+          if(intersects(a,b,points[j],points[(j+1)%points.length]))return "Le contour se croise ou touche un segment non adjacent. Corrigez les sommets.";
+        }
+      }
+      return null;
+    }
+    saveParcelButton.addEventListener("click",async()=>{
+      const code=parcelCode.value.trim(),name=parcelName.value.trim();
+      if(!location.value){parcelStatus.textContent="Choisissez un emplacement.";return;}
+      if(!code||!name){parcelStatus.textContent="Renseignez le code et le nom de la parcelle.";return;}
+      if(!parcelCompleted||parcelVertices.length<3){parcelStatus.textContent="Terminez d’abord un contour de trois sommets minimum.";return;}
+      const geometryError=validateParcelVertices(parcelVertices);
+      if(geometryError){parcelStatus.textContent=geometryError;return;}
+      if(!window.L||!parcelLayer){parcelStatus.textContent="Le contour n’est pas disponible.";return;}
+      saveParcelButton.disabled=true;parcelStatus.textContent="Enregistrement de la parcelle…";
+      try{
+        const {data:loc,error:locError}=await db.from("locations").select("organization_id").eq("id",location.value).maybeSingle();
+        if(locError||!loc?.organization_id)throw new Error(locError?.message||"Organisation de l’emplacement introuvable ou accès refusé.");
+        const ring=[...parcelVertices.map(([latitude,longitude])=>[longitude,latitude]),[parcelVertices[0][1],parcelVertices[0][0]]];
+        const payload={organization_id:loc.organization_id,location_id:location.value,parcel_code:code,name,boundary_geojson:{type:"Polygon",coordinates:[ring]},boundary_source:"manual"};
+        const {error}=await db.from("farm_parcels").insert(payload);
+        if(error)throw error;
+        resetParcelDraft("Parcelle enregistrée. Vérifiez le contour dans la liste.");
+        await loadParcels();
+      }catch(error){
+        saveParcelButton.disabled=false;
+        parcelStatus.textContent="Échec de l’enregistrement : "+(error?.message||"erreur inconnue");
+      }
+    });
+    placeSearchButton.addEventListener("click",async()=>{
+      const query=placeQuery.value.trim();
+      if(query.length<3){placeResults.replaceChildren(node("p",{class:"muted"},"Saisissez au moins 3 caractères."));return;}
+      placeSearchButton.disabled=true;placeResults.replaceChildren(node("p",{class:"muted"},"Recherche du lieu…"));
+      try{
+        const url="https://nominatim.openstreetmap.org/search?format=jsonv2&limit=5&addressdetails=1&q="+encodeURIComponent(query);
+        const response=await fetch(url,{headers:{Accept:"application/json"}});
+        if(!response.ok)throw new Error("Service de recherche indisponible (HTTP "+response.status+").");
+        const places=await response.json();placeResults.replaceChildren();
+        if(!Array.isArray(places)||!places.length){placeResults.append(node("p",{class:"muted"},"Aucun lieu trouvé. Essayez un nom plus précis ou placez le repère sur la carte."));return;}
+        places.forEach(place=>{
+          const label=place.display_name||query;
+          const choose=node("button",{type:"button",class:"small-button secondary-button"},label);
+          choose.addEventListener("click",()=>{
+            const latitude=Number(place.lat),longitude=Number(place.lon);
+            if(!Number.isFinite(latitude)||!Number.isFinite(longitude)){mapStatus.textContent="Résultat sans coordonnées utilisables.";return;}
+            setMapPoint(latitude,longitude,"map_estimate",null,true);
+            mapStatus.textContent="Lieu choisi : "+label+". Position indicative du géocodeur ; vérifiez le repère sur la carte puis enregistrez.";
+            placeResults.replaceChildren(node("p",{class:"muted"},"Lieu sélectionné. Vérifiez le repère avant l’enregistrement."));
+          });
+          placeResults.append(choose);
+        });
+        placeResults.append(node("small",{class:"muted"},"Résultats OpenStreetMap/Nominatim. La position peut correspondre au centre d’un lieu et non à votre parcelle."));
+      }catch(error){placeResults.replaceChildren(node("p",{class:"muted"},"Recherche impossible : "+(error?.message||"erreur inconnue")+". Vous pouvez utiliser la carte."));}
+      finally{placeSearchButton.disabled=false;}
+    });
+    placeQuery.addEventListener("keydown",event=>{if(event.key==="Enter"){event.preventDefault();placeSearchButton.click();}});
+    locateButton.addEventListener("click",()=>{
+      if(!navigator.geolocation){mapStatus.textContent="La géolocalisation n’est pas prise en charge par ce navigateur.";return;}
+      locateButton.disabled=true;mapStatus.textContent="Demande de position… Autorisez la localisation dans le navigateur si demandé.";
+      navigator.geolocation.getCurrentPosition(pos=>{
+        setMapPoint(pos.coords.latitude,pos.coords.longitude,"gps_field",pos.coords.accuracy,true);
+        if(locationMap)locationMap.setView([pos.coords.latitude,pos.coords.longitude],16);
+        locateButton.disabled=false;
+      },err=>{
+        const reasons={1:"Autorisation refusée. Autorisez la localisation dans les paramètres du navigateur.",2:"Position indisponible. Vérifiez les services de localisation ou choisissez le point sur la carte.",3:"Délai dépassé. Réessayez ou choisissez le point sur la carte."};
+        mapStatus.textContent=reasons[err.code]||"Géolocalisation impossible. Choisissez le point sur la carte.";
+        locateButton.disabled=false;
+      },{enableHighAccuracy:true,timeout:12000,maximumAge:60000});
+    });
+    mapSaveButton.addEventListener("click",()=>save.click());
     plant.parentNode.insertBefore(panel,plant.nextSibling);
     const nav=document.querySelector(".section-nav");
     if(nav && !document.getElementById("envNav")) { const a=node("a",{href:"#environmentalCard",id:"envNav"},"Contexte environnemental"); nav.append(a); }
@@ -57,14 +318,43 @@
       if(error){status.textContent="Chargement des emplacements impossible : "+error.message;return;}
       data.forEach(x=>location.append(node("option",{value:x.id},x.code?x.name+" ("+x.code+")":x.name)));
       if(data.length===1) location.value=data[0].id;
-      selectLocation();
+      selectLocation().then(()=>location.value&&loadParcels());
+    }
+    function clearMapPoint(message="Choisissez un point sur la carte ou utilisez « Me localiser »."){
+      lat.value="";lon.value="";accuracy.value="";
+      if(locationMarker&&locationMap){locationMap.removeLayer(locationMarker);locationMarker=null;}
+      if(locationMap)locationMap.setView([28,2],4);
+      mapStatus.textContent=message;
     }
     async function selectLocation(){
-      if(!location.value){lat.value="";lon.value="";accuracy.value="";return;}
-      const {data}=await db.from("locations").select("latitude,longitude,coordinate_accuracy_m,coordinate_source").eq("id",location.value).maybeSingle();
-      if(!data)return;
-      lat.value=data.latitude??""; lon.value=data.longitude??""; accuracy.value=data.coordinate_accuracy_m??"";
+      // Clear the previous location immediately so a failed read cannot leave
+      // another site's coordinates available for accidental saving.
+      clearMapPoint(location.value
+        ? "Chargement des coordonnées de l’emplacement sélectionné…"
+        : "Choisissez un emplacement avant d’enregistrer un point.");
+      if(!location.value)return;
+      const requestedLocationId=location.value;
+      const {data,error}=await db.from("locations").select("latitude,longitude,coordinate_accuracy_m,coordinate_source").eq("id",requestedLocationId).maybeSingle();
+      // Ignore stale responses if the user switched locations while this read was in flight.
+      if(location.value!==requestedLocationId)return;
+      if(error){
+        clearMapPoint("Impossible de charger cet emplacement : "+error.message);
+        return;
+      }
+      if(!data){
+        clearMapPoint("Emplacement introuvable ou accès refusé. Sélectionnez un emplacement autorisé.");
+        return;
+      }
       if(data.coordinate_source && [...source.options].some(o=>o.value===data.coordinate_source))source.value=data.coordinate_source;
+      // Keep the coordinate inputs populated even while the map library is still loading.
+      lat.value=data.latitude??"";
+      lon.value=data.longitude??"";
+      accuracy.value=data.coordinate_accuracy_m??"";
+      if(data.latitude!=null&&data.longitude!=null){
+        setMapPoint(Number(data.latitude),Number(data.longitude),source.value,data.coordinate_accuracy_m==null?null:Number(data.coordinate_accuracy_m),true);
+      }else{
+        clearMapPoint("Aucune coordonnée enregistrée pour cet emplacement. Choisissez un point sur la carte ou utilisez « Me localiser ».");
+      }
     }
     function renderClimateSummary(data){
       summary.replaceChildren();
@@ -200,11 +490,13 @@
       satelliteButton.disabled=true;
       satelliteResults.replaceChildren(node("p",{class:"muted"},"Recherche de scènes Sentinel-2…"));
       try{
-        const {data,error}=await db.functions.invoke("copernicus-sentinel-catalogue",{body:{location_id:location.value,start_date:from.value,end_date:to.value,limit:10,max_cloud_cover:60}});
+        const requestBody={location_id:location.value,start_date:from.value,end_date:to.value,limit:10,max_cloud_cover:60};
+        if(satelliteParcel.value)requestBody.parcel_id=satelliteParcel.value;
+        const {data,error}=await db.functions.invoke("copernicus-sentinel-catalogue",{body:requestBody});
         satelliteResults.replaceChildren();
         if(error){satelliteResults.append(node("p",{class:"muted"},"Recherche satellite indisponible : "+(error.context?.json?.error||error.message)));return;}
         if(!data?.ok){satelliteResults.append(node("p",{class:"muted"},"Catalogue indisponible : "+(data?.error||"réponse invalide")));return;}
-        satelliteResults.append(node("p",{},data.scenes_found+" scène(s) trouvée(s), couverture nuageuse maximale de 60 %."));
+        satelliteResults.append(node("p",{},data.scenes_found+" scène(s) trouvée(s), couverture nuageuse catalogue maximale de 60 %."+(data.search_geometry_source==="saved_parcel"?" Recherche limitée aux scènes intersectant le contour de la parcelle sélectionnée.":" Recherche régionale indicative.")));
         if(!data.scenes?.length){satelliteResults.append(node("p",{class:"muted"},"Aucune scène ne correspond à ces critères. Essayez une période plus longue ou un seuil nuageux plus élevé."));return;}
         data.scenes.forEach(scene=>{
           const item=node("article",{class:"card"});
@@ -228,11 +520,11 @@
           if(scene.catalogue_item_url){const a=node("a",{href:scene.catalogue_item_url,target:"_blank",rel:"noopener noreferrer"},"Ouvrir la fiche de la scène");item.append(a);}
           satelliteResults.append(item);
         });
-        satelliteResults.append(node("p",{class:"muted"},"Les aperçus sont des vignettes de catalogue, pas une analyse de la parcelle. Le calcul NDVI et le traitement des bandes satellite restent à intégrer."));
+        satelliteResults.append(node("p",{class:"muted"},data.search_geometry_source==="saved_parcel"?"L’intersection géométrique ne calcule pas la couverture nuageuse à l’intérieur du polygone. Les aperçus sont des vignettes de catalogue ; le calcul NDVI et le contrôle des pixels restent à intégrer.":"Les aperçus sont des vignettes de catalogue, pas une analyse de la parcelle. Le calcul NDVI et le traitement des bandes satellite restent à intégrer."));
       }catch(e){satelliteResults.replaceChildren(node("p",{class:"muted"},"Échec de la recherche : "+(e?.message||"erreur inconnue")));}
       finally{satelliteButton.disabled=false;}
     }
-    location.addEventListener("change",()=>{satelliteResults.replaceChildren();selectLocation().then(()=>location.value&&loadRows());});
+    location.addEventListener("change",()=>{satelliteResults.replaceChildren();resetParcelDraft("Emplacement changé. Démarrez un nouveau contour.");selectLocation().then(()=>{if(location.value){loadRows();loadParcels();}else parcelList.replaceChildren();});});
     from.addEventListener("change",()=>location.value&&loadRows());
     to.addEventListener("change",()=>location.value&&loadRows());
     save.addEventListener("click",async()=>{
@@ -273,10 +565,11 @@
     const {data: authState}=await db.auth.getSession();
     if(!authState?.session){
       status.textContent="Connectez-vous à CultureOps pour accéder aux emplacements de votre organisation.";
-      db.auth.onAuthStateChange((_event,session)=>{if(session){panel.classList.remove("hidden");loadLocations().then(()=>location.value&&loadRows());}});
+      db.auth.onAuthStateChange((_event,session)=>{if(session){panel.classList.remove("hidden");loadMapLibrary();loadLocations().then(()=>{if(location.value){loadRows();loadParcels();}});}});
       return;
     }
     panel.classList.remove("hidden");
+    loadMapLibrary();
     await loadLocations();
     if(location.value) await loadRows();
   }
