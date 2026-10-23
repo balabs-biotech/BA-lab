@@ -92,25 +92,54 @@ Deno.serve(async (req: Request) => {
     const observedStart = startDate + "T00:00:00.000Z";
     const observedEnd = endDate + "T23:59:59.999Z";
     if (!forceRefresh) {
-      const { data: cached, error: cacheError } = await userClient
-        .from("environmental_observations")
-        .select("id, observed_at, retrieved_at")
-        .eq("location_id", location.id)
-        .eq("provider_code", "NASA_POWER")
-        .eq("dataset_code", "POWER_DAILY_AGRO")
-        .gte("observed_at", observedStart)
-        .lte("observed_at", observedEnd)
-        .gte("retrieved_at", new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString())
-        .limit(dayCount * 5);
-      if (cacheError) {
-        console.error("[nasa-power-agroclimate] Cache lookup failed", cacheError.message);
+      // A global row count can hide missing variables. Check each core series
+      // independently; solar radiation is intentionally optional because its
+      // upstream coverage can lag behind the other NASA POWER daily variables.
+      const coreVariables = [
+        "air_temperature_mean",
+        "air_temperature_max",
+        "air_temperature_min",
+        "precipitation_corrected",
+        "relative_humidity_mean",
+        "wind_speed_mean",
+      ];
+      const freshAfter = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+      const minimumDays = Math.max(1, Math.ceil(dayCount * 0.9));
+      const coverage = await Promise.all(coreVariables.map(async (variable) => {
+        const { data, error } = await userClient
+          .from("environmental_observations")
+          .select("observed_at")
+          .eq("location_id", location.id)
+          .eq("provider_code", "NASA_POWER")
+          .eq("dataset_code", "POWER_DAILY_AGRO")
+          .eq("variable_code", variable)
+          .gte("observed_at", observedStart)
+          .lte("observed_at", observedEnd)
+          .gte("retrieved_at", freshAfter)
+          .order("observed_at", { ascending: false })
+          .limit(dayCount);
+        if (error) return { variable, error: error.message, dates: [] as string[] };
+        const dates = [...new Set((data ?? []).map((row) => String(row.observed_at).slice(0, 10)))];
+        return { variable, error: null, dates };
+      }));
+      const failedLookup = coverage.find((item) => item.error !== null);
+      if (failedLookup) {
+        console.error("[nasa-power-agroclimate] Cache lookup failed", failedLookup.variable, failedLookup.error);
         return json(500, { error: "cache_lookup_failed" });
       }
-      if ((cached?.length ?? 0) >= dayCount * 3) {
+      const complete = coverage.every((item) => {
+        const latest = item.dates[0];
+        const recentEnough = Boolean(latest) &&
+          Date.parse(endDate + "T00:00:00Z") - Date.parse(latest + "T00:00:00Z") <= 2 * DAY_MS;
+        return item.dates.length >= minimumDays && recentEnough;
+      });
+      if (complete) {
         return json(200, {
           ok: true, cached: true, provider: "NASA POWER", location_id: location.id,
-          start_date: startDate, end_date: endDate, records: cached!.length,
-          note: "Données quotidiennes estimées sur grille; ce ne sont pas des mesures locales.",
+          start_date: startDate, end_date: endDate,
+          variables_checked: coreVariables.length,
+          coverage_by_variable: coverage.map((item) => ({ variable: item.variable, days: item.dates.length })),
+          note: "Cache récent vérifié variable par variable; le rayonnement solaire peut avoir une couverture distincte. Données estimées sur grille, pas des mesures locales.",
         });
       }
     }
