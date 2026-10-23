@@ -162,3 +162,16 @@ for (const snippet of [
   if (!comparisonQuartileSummary.includes(snippet)) throw new Error("Batch comparison median/quartile summary missing: " + snippet);
 }
 console.log("✓ Batch comparison reports median and interquartile range with four-language labels");
+
+for (const snippet of [
+  'outliers:"valeurs atypiques (règle IQR)"',
+  'outliers:"potential outliers (IQR rule)"',
+  'outliers:"valores atípicos potenciais (regra IQR)"',
+  'outliers:"قيم شاذة محتملة (قاعدة المدى الربيعي)"',
+  "const iqr = q3 - q1",
+  "values.length >= 4",
+  "sorted.filter(value => value < q1 - 1.5 * iqr || value > q3 + 1.5 * iqr).length"
+]) {
+  if (!comparisonQuartileSummary.includes(snippet) && !comparisonSummary.includes(snippet)) throw new Error("IQR outlier summary missing: " + snippet);
+}
+console.log("✓ Potential outliers use the 1.5×IQR rule only with at least four numeric measurements");

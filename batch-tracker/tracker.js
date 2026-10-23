@@ -2377,10 +2377,10 @@ async function compareSelectedBatches() {
       });
       const language = window.BALabsI18n?.language || "fr";
       const labels = {
-        fr: {mean:"moyenne",median:"médiane",quartiles:"Q1–Q3",range:"min–max",excluded:"exclues",nonNumeric:"valeurs non numériques",empty:"Aucune mesure numérique exploitable"},
-        en: {mean:"mean",median:"median",quartiles:"Q1–Q3",range:"min–max",excluded:"excluded",nonNumeric:"non-numeric values",empty:"No usable numeric measurements"},
-        pt: {mean:"média",median:"mediana",quartiles:"Q1–Q3",range:"mín–máx",excluded:"excluídas",nonNumeric:"valores não numéricos",empty:"Sem medições numéricas utilizáveis"},
-        ar: {mean:"المتوسط",median:"الوسيط",quartiles:"الربيع الأول–الثالث",range:"الحد الأدنى–الأقصى",excluded:"مستبعدة",nonNumeric:"قيم غير رقمية",empty:"لا توجد قياسات رقمية قابلة للاستخدام"}
+        fr: {mean:"moyenne",median:"médiane",quartiles:"Q1–Q3",outliers:"valeurs atypiques (règle IQR)",range:"min–max",excluded:"exclues",nonNumeric:"valeurs non numériques",empty:"Aucune mesure numérique exploitable"},
+        en: {mean:"mean",median:"median",quartiles:"Q1–Q3",outliers:"potential outliers (IQR rule)",range:"min–max",excluded:"excluded",nonNumeric:"non-numeric values",empty:"No usable numeric measurements"},
+        pt: {mean:"média",median:"mediana",quartiles:"Q1–Q3",outliers:"valores atípicos potenciais (regra IQR)",range:"mín–máx",excluded:"excluídas",nonNumeric:"valores não numéricos",empty:"Sem medições numéricas utilizáveis"},
+        ar: {mean:"المتوسط",median:"الوسيط",quartiles:"الربيع الأول–الثالث",outliers:"قيم شاذة محتملة (قاعدة المدى الربيعي)",range:"الحد الأدنى–الأقصى",excluded:"مستبعدة",nonNumeric:"قيم غير رقمية",empty:"لا توجد قياسات رقمية قابلة للاستخدام"}
       }[language] || {mean:"moyenne",median:"médiane",quartiles:"Q1–Q3",range:"min–max",excluded:"exclues",nonNumeric:"valeurs non numériques",empty:"Aucune mesure numérique exploitable"};
       const summaries = [...groups.entries()].map(([key, values]) => {
         const [variable, unit, quality] = key.split("||");
@@ -2401,8 +2401,13 @@ async function compareSelectedBatches() {
         const median = quantile(0.5);
         const q1 = quantile(0.25);
         const q3 = quantile(0.75);
+        const iqr = q3 - q1;
+        const outlierCount = values.length >= 4
+          ? sorted.filter(value => value < q1 - 1.5 * iqr || value > q3 + 1.5 * iqr).length
+          : null;
         const fmt = value => new Intl.NumberFormat(undefined, {maximumSignificantDigits: 5}).format(value);
-        return `${variable}${unit ? " (" + unit + ")" : ""}: ${labels.mean} ${fmt(mean)}, ${labels.median} ${fmt(median)}, ${labels.quartiles} ${fmt(q1)}–${fmt(q3)}, ${labels.range} ${fmt(min)}–${fmt(max)}, n_mesures=${values.length} [${quality}]`;
+        const outlierSummary = outlierCount == null ? "" : `, ${labels.outliers} ${outlierCount}`;
+        return `${variable}${unit ? " (" + unit + ")" : ""}: ${labels.mean} ${fmt(mean)}, ${labels.median} ${fmt(median)}, ${labels.quartiles} ${fmt(q1)}–${fmt(q3)}, ${labels.range} ${fmt(min)}–${fmt(max)}${outlierSummary}, n_mesures=${values.length} [${quality}]`;
       });
       const excluded = rows.filter(row => row.quality_state === "excluded").length;
       const nonNumeric = rows.filter(row => {
