@@ -6099,6 +6099,7 @@ function setupPlantRegistry() {
       option.value = name;
       list.appendChild(option);
     });
+    if (cultivar.value && !(selected?.cultivars || []).includes(cultivar.value)) cultivar.value = "";
     if (selected?.cultivars.length === 1 && !cultivar.value) cultivar.value = selected.cultivars[0];
   };
   const renderPlantEnvironments = () => {
