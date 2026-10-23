@@ -295,5 +295,18 @@ await test("verrou de synchronisation libéré après succès", async () => {
   eq(lockBusy, false, "lock released");
 });
 
+
+await test("verrou de synchronisation libéré après une erreur Notion", async () => {
+  reset({ notion: (url) => url.endsWith("/query")
+    ? { status: 503, body: { message: "temporary Notion outage" } }
+    : { status: 500, body: { message: "unexpected" } },
+  });
+  const r = await call();
+  eq(r.status, 502, "status");
+  eq(lockCalls.map((c) => c.name), ["acquire_culture_notion_sync_lock", "release_culture_notion_sync_lock"], "lock lifecycle after failure");
+  eq(lockBusy, false, "lock released after failure");
+  eq(finalUpdate().payload.notion_sync_status, "error", "sync error persisted");
+});
+
 console.log(failed ? `\n${failed} test(s) en échec` : "\nOK: sync-culture-to-notion tests passed");
 process.exit(failed ? 1 : 0);
