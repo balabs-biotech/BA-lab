@@ -81,6 +81,7 @@ jobs:
         run: |
           node scripts/check-batch-tracker-js.mjs
           node scripts/check-i18n.mjs
+          node scripts/test-workspace-scenarios.mjs
           [ -f batch-tracker/index.html ] && echo "✓ batch-tracker/index.html exists" || exit 1
           [ -f batch-tracker/README.md ] && echo "✓ batch-tracker/README.md exists" || exit 1
           [ -f batch-tracker/supabase/README.md ] && echo "✓ batch-tracker/supabase/README.md exists" || exit 1
@@ -126,6 +127,8 @@ jobs:
           done
       - name: Test environmental measurement catalogue on PostgreSQL 17
         run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/seed_environment_measurement_variables.test.sql
+      - name: Test BA Labs fungal culture formats on PostgreSQL 17
+        run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/add_mycology_culture_formats.test.sql
       - name: Test notion_* protection migration on PostgreSQL 17
         run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/protect_cultures_notion_cols.test.sql
       - name: Test batch workflow protection migration on PostgreSQL 17

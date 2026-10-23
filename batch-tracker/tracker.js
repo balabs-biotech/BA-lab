@@ -1140,6 +1140,37 @@ async function loadReferenceData() {
    TYPES DE CULTURE
    ============================================================ */
 
+function workspaceCultureTypes(types, domain = document.body.dataset.domain) {
+  if (domain === "laboratory") return types;
+  if (domain === "agronomy") return [];
+  const mycologyCodes = new Set([
+    "agar", "plate", "slant", "broth", "flask", "other_liquid", "grain_spawn",
+    "substrate", "fermentation", "other"
+  ]);
+  return types.filter(item => mycologyCodes.has(item.code));
+}
+
+function workspaceMeasurementVariables(variables, domain = document.body.dataset.domain) {
+  if (domain === "laboratory") return variables;
+  const allowedByDomain = {
+    agronomy: new Set([
+      "co2_concentration", "electrical_conductivity", "illuminance", "ph",
+      "relative_humidity", "root_length", "shoot_length", "substrate_moisture",
+      "temperature", "fresh_mass", "dry_mass", "wet_biomass", "volume"
+    ]),
+    mycology: new Set([
+      "cfu", "cfu_per_ml", "co2_concentration", "colony_count", "dry_biomass",
+      "electrical_conductivity", "fresh_mass", "generation_time", "growth_rate",
+      "incubation_time", "od600", "ph", "relative_humidity", "temperature",
+      "viability", "volume", "wet_biomass"
+    ])
+  };
+  const allowed = allowedByDomain[domain];
+  return allowed ? variables.filter(variable => allowed.has(variable.code)) : [];
+}
+
+
+
 function loadCultureTypes() {
 
   cultureTypeSelect.innerHTML =
@@ -1173,10 +1204,10 @@ function loadCultureTypes() {
         row.reference_type ===
           "culture_types"
     );
-
+  const visibleTypes = workspaceCultureTypes(types, document.body.dataset.domain);
 
   for (
-    const item of types
+    const item of visibleTypes
   ) {
 
     const option =
@@ -4707,15 +4738,16 @@ async function loadMeasurementReferences() {
   measurementVariables = variableResult.data || [];
   measurementUnits = unitResult.data || [];
 
+  const visibleVariables = workspaceMeasurementVariables(measurementVariables);
   measurementVariableSelect.innerHTML = "";
   const placeholder = document.createElement("option");
   placeholder.value = "";
-  placeholder.textContent = measurementVariables.length
+  placeholder.textContent = visibleVariables.length
     ? "Sélectionner un paramètre…"
-    : "Aucun paramètre disponible";
+    : "Aucun paramètre adapté à cet univers";
   measurementVariableSelect.appendChild(placeholder);
 
-  for (const variable of measurementVariables) {
+  for (const variable of visibleVariables) {
     const option = document.createElement("option");
     option.value = variable.code;
     option.textContent = `${variable.label} · ${variable.code}`;
@@ -4725,9 +4757,9 @@ async function loadMeasurementReferences() {
   observationVariableSelect.innerHTML = "";
   const observationPlaceholder = document.createElement("option");
   observationPlaceholder.value = "";
-  observationPlaceholder.textContent = measurementVariables.length ? "Sélectionner une catégorie…" : "Aucune catégorie disponible";
+  observationPlaceholder.textContent = visibleVariables.length ? "Sélectionner une catégorie…" : "Aucune catégorie adaptée à cet univers";
   observationVariableSelect.appendChild(observationPlaceholder);
-  for (const variable of measurementVariables) {
+  for (const variable of visibleVariables) {
     const option = document.createElement("option");
     option.value = variable.code;
     option.textContent = `${variable.label} · ${variable.code}`;
@@ -4742,19 +4774,28 @@ async function loadMeasurementReferences() {
 function renderMeasurementTargets() {
   if (!measurementTargetSelect) return;
   const previous = measurementTargetSelect.value;
-  measurementTargetSelect.innerHTML = "";
+  const domain = document.body.dataset.domain || "mycology";
+  const visibleCultures = domain === "agronomy" ? [] : cultureOptions;
+  const visiblePlants = domain === "agronomy" ? plantCultureOptions : [];
+  const visibleBatches = domain === "laboratory" ? latestBatches : [];
+  const hasTargets = visibleCultures.length || visiblePlants.length || visibleBatches.length;
+  measurementTargetSelect.replaceChildren();
 
   const placeholder = document.createElement("option");
   placeholder.value = "";
-  placeholder.textContent = cultureOptions.length || latestBatches.length || plantCultureOptions.length
-    ? "Choisir une culture, un lot ou une unité végétale…"
-    : "Créez d’abord une culture, un lot ou une fiche végétale";
+  placeholder.textContent = hasTargets
+    ? "Choisir une cible de cet univers…"
+    : domain === "agronomy"
+      ? "Ajoutez d’abord une fiche végétale dans Green Tech"
+      : domain === "laboratory"
+        ? "Créez d’abord une culture de laboratoire ou un lot"
+        : "Créez d’abord une culture mycologique";
   measurementTargetSelect.appendChild(placeholder);
 
-  if (cultureOptions.length) {
+  if (visibleCultures.length) {
     const group = document.createElement("optgroup");
-    group.label = "Cultures";
-    for (const culture of cultureOptions) {
+    group.label = domain === "laboratory" ? "Cultures de laboratoire" : "Cultures mycologiques";
+    for (const culture of visibleCultures) {
       const option = document.createElement("option");
       option.value = `culture:${culture.id}`;
       option.textContent = `${culture.code} · ${culture.culture_type || "culture"}`;
@@ -4763,10 +4804,10 @@ function renderMeasurementTargets() {
     measurementTargetSelect.appendChild(group);
   }
 
-  if (plantCultureOptions.length) {
+  if (visiblePlants.length) {
     const group = document.createElement("optgroup");
-    group.label = "Unités végétales · AgriTech";
-    for (const plant of plantCultureOptions) {
+    group.label = "Unités végétales · Green Tech";
+    for (const plant of visiblePlants) {
       const option = document.createElement("option");
       option.value = `plant:${plant.id}`;
       option.textContent = `${plant.code} · ${plant.cultivar_name || plant.crop_type}`;
@@ -4775,10 +4816,10 @@ function renderMeasurementTargets() {
     measurementTargetSelect.appendChild(group);
   }
 
-  if (latestBatches.length) {
+  if (visibleBatches.length) {
     const group = document.createElement("optgroup");
-    group.label = "Lots de production";
-    for (const batch of latestBatches) {
+    group.label = "Lots de laboratoire";
+    for (const batch of visibleBatches) {
       const option = document.createElement("option");
       option.value = `batch:${batch.id}`;
       option.textContent = `${batch.batch_code} · ${batch.name || batch.batch_type || "lot"}`;
@@ -4790,12 +4831,12 @@ function renderMeasurementTargets() {
   const values = [...measurementTargetSelect.options].map(option => option.value);
   if (values.includes(previous)) {
     measurementTargetSelect.value = previous;
-  } else if (cultureOptions.length) {
-    measurementTargetSelect.value = `culture:${cultureOptions[0].id}`;
-  } else if (latestBatches.length) {
-    measurementTargetSelect.value = `batch:${latestBatches[0].id}`;
-  } else if (plantCultureOptions.length) {
-    measurementTargetSelect.value = `plant:${plantCultureOptions[0].id}`;
+  } else if (visiblePlants.length) {
+    measurementTargetSelect.value = `plant:${visiblePlants[0].id}`;
+  } else if (visibleCultures.length) {
+    measurementTargetSelect.value = `culture:${visibleCultures[0].id}`;
+  } else if (visibleBatches.length) {
+    measurementTargetSelect.value = `batch:${visibleBatches[0].id}`;
   }
 }
 
@@ -4993,6 +5034,24 @@ async function saveMeasurement() {
   }
 }
 
+function belongsToActiveWorkspace(record, eventsById = {}) {
+  const domain = document.body.dataset.domain || "mycology";
+  const event = record.event_id ? eventsById[record.event_id] : null;
+  const cultureId = record.culture_id || event?.culture_id;
+  const plantId = record.plant_culture_id || event?.plant_culture_id;
+  const batchId = event?.batch_id;
+  if (domain === "agronomy") {
+    return Boolean(plantId && plantCultureOptions.some(plant => plant.id === plantId));
+  }
+  if (domain === "mycology") {
+    return Boolean(cultureId && cultureOptions.some(culture => culture.id === cultureId));
+  }
+  return Boolean(
+    (cultureId && cultureOptions.some(culture => culture.id === cultureId)) ||
+    (batchId && latestBatches.some(batch => batch.id === batchId))
+  );
+}
+
 async function loadRecentMeasurements() {
   if (!organizationId || !measurementHistory) return;
 
@@ -5001,7 +5060,7 @@ async function loadRecentMeasurements() {
     .select("id, variable_code, raw_value, raw_unit_code, normalized_value, normalized_unit_code, measured_at, method, instrument, culture_id, plant_culture_id, event_id, metadata")
     .eq("organization_id", organizationId)
     .order("measured_at", { ascending: false })
-    .limit(10);
+    .limit(1000);
 
   if (error) throw new Error(`Chargement de l’historique des mesures impossible : ${error.message}`);
 
@@ -5011,19 +5070,20 @@ async function loadRecentMeasurements() {
   if (eventIds.length) {
     const { data: events, error: eventsError } = await supabaseClient
       .from("events")
-      .select("id, batch_id")
+      .select("id, batch_id, culture_id, plant_culture_id")
       .eq("organization_id", organizationId)
       .in("id", eventIds);
     if (eventsError) console.warn("Détails des événements de mesure indisponibles :", eventsError.message);
     for (const event of events || []) eventsById[event.id] = event;
   }
 
-  if (!rows.length) {
-    measurementHistory.innerHTML = '<p class="muted">Aucune mesure enregistrée pour le moment.</p>';
+  const visibleRows = rows.filter(row => belongsToActiveWorkspace(row, eventsById)).slice(0, 10);
+  if (!visibleRows.length) {
+    measurementHistory.innerHTML = '<p class="muted">Aucune mesure enregistrée dans cet univers pour le moment.</p>';
     return;
   }
 
-  measurementHistory.innerHTML = rows.map(row => {
+  measurementHistory.innerHTML = visibleRows.map(row => {
     const variable = measurementVariables.find(item => item.code === row.variable_code);
     const culture = cultureOptions.find(item => item.id === row.culture_id);
     const batchId = row.event_id ? eventsById[row.event_id]?.batch_id : null;
@@ -5193,25 +5253,26 @@ async function loadRecentObservations() {
     .select("id, variable_code, value_text, observed_at, culture_id, plant_culture_id, event_id, metadata")
     .eq("organization_id", organizationId)
     .order("observed_at", { ascending: false })
-    .limit(8);
+    .limit(1000);
 
   if (query.error) throw new Error("Chargement de l’historique des observations impossible : " + query.error.message);
-  recentObservations = query.data || [];
-  updateOverview();
-  const eventIds = [...new Set(recentObservations.map(row => row.event_id).filter(Boolean))];
+  const observationRows = query.data || [];
+  const eventIds = [...new Set(observationRows.map(row => row.event_id).filter(Boolean))];
   const eventsById = {};
 
   if (eventIds.length) {
     const eventsResult = await supabaseClient.from("events")
-      .select("id, batch_id")
+      .select("id, batch_id, culture_id, plant_culture_id")
       .eq("organization_id", organizationId)
       .in("id", eventIds);
     if (eventsResult.error) console.warn("Détails des événements d’observation indisponibles :", eventsResult.error.message);
     for (const event of eventsResult.data || []) eventsById[event.id] = event;
   }
 
+  recentObservations = observationRows.filter(row => belongsToActiveWorkspace(row, eventsById)).slice(0, 8);
+  updateOverview();
   if (!recentObservations.length) {
-    observationHistory.innerHTML = '<p class="muted">Aucune observation enregistrée pour le moment.</p>';
+    observationHistory.innerHTML = '<p class="muted">Aucune observation enregistrée dans cet univers pour le moment.</p>';
     return;
   }
 
@@ -5242,39 +5303,61 @@ function renderStatisticsFilters() {
   const cultureSelect = document.getElementById("statisticsCulture");
   const batchSelect = document.getElementById("statisticsBatch");
   if (!variableSelect || !cultureSelect || !batchSelect) return;
+  const domain = document.body.dataset.domain || "mycology";
+  const visibleVariables = workspaceMeasurementVariables(measurementVariables, domain);
+  const visibleTargets = domain === "agronomy" ? plantCultureOptions : cultureOptions;
   const previousVariable = variableSelect.value;
   const previousCulture = cultureSelect.value;
   const previousBatch = batchSelect.value;
-  variableSelect.innerHTML = "";
-  const placeholder = document.createElement("option");
-  placeholder.value = "";
-  placeholder.textContent = measurementVariables.length ? "Sélectionner une variable…" : "Aucune variable disponible";
-  variableSelect.appendChild(placeholder);
-  measurementVariables.forEach(variable => {
+
+  variableSelect.replaceChildren();
+  const variablePlaceholder = document.createElement("option");
+  variablePlaceholder.value = "";
+  variablePlaceholder.textContent = visibleVariables.length ? "Sélectionner une variable…" : "Aucune variable adaptée à cet univers";
+  variableSelect.appendChild(variablePlaceholder);
+  visibleVariables.forEach(variable => {
     const option = document.createElement("option");
     option.value = variable.code;
     option.textContent = variable.label + " · " + variable.code;
     variableSelect.appendChild(option);
   });
-  if (measurementVariables.some(variable => variable.code === previousVariable)) variableSelect.value = previousVariable;
-  cultureSelect.innerHTML = '<option value="">Toutes les cultures accessibles</option>';
-  cultureOptions.forEach(culture => {
+  if (visibleVariables.some(variable => variable.code === previousVariable)) variableSelect.value = previousVariable;
+
+  const targetLabel = document.querySelector('label[for="statisticsCulture"]');
+  if (targetLabel) targetLabel.textContent = domain === "agronomy" ? "Unité végétale" : domain === "laboratory" ? "Culture de laboratoire" : "Culture mycologique";
+  cultureSelect.replaceChildren();
+  const targetPlaceholder = document.createElement("option");
+  targetPlaceholder.value = "";
+  targetPlaceholder.textContent = domain === "agronomy" ? "Toutes les unités végétales" : domain === "laboratory" ? "Toutes les cultures de laboratoire" : "Toutes les cultures mycologiques";
+  cultureSelect.appendChild(targetPlaceholder);
+  visibleTargets.forEach(target => {
     const option = document.createElement("option");
-    option.value = culture.id;
-    option.textContent = culture.code || "Culture sans code";
+    option.value = target.id;
+    option.textContent = domain === "agronomy"
+      ? (target.code || "Unité sans code") + " · " + (target.cultivar_name || target.crop_type || "")
+      : target.code || "Culture sans code";
     cultureSelect.appendChild(option);
   });
-  if (cultureOptions.some(culture => culture.id === previousCulture)) cultureSelect.value = previousCulture;
-  batchSelect.innerHTML = '<option value="">Tous les lots chargés</option>';
-  latestBatches.forEach(batch => {
-    const option = document.createElement("option");
-    option.value = batch.id;
-    option.textContent = (batch.batch_code || "Lot sans code") + (batch.name ? " · " + batch.name : "");
-    batchSelect.appendChild(option);
-  });
-  if (latestBatches.some(batch => batch.id === previousBatch)) batchSelect.value = previousBatch;
-}
+  if (visibleTargets.some(target => target.id === previousCulture)) cultureSelect.value = previousCulture;
 
+  const batchField = batchSelect.closest("div");
+  if (batchField) batchField.hidden = domain !== "laboratory";
+  batchSelect.disabled = domain !== "laboratory";
+  batchSelect.replaceChildren();
+  const batchPlaceholder = document.createElement("option");
+  batchPlaceholder.value = "";
+  batchPlaceholder.textContent = "Tous les lots récents (30 max.)";
+  batchSelect.appendChild(batchPlaceholder);
+  if (domain === "laboratory") {
+    latestBatches.forEach(batch => {
+      const option = document.createElement("option");
+      option.value = batch.id;
+      option.textContent = (batch.batch_code || "Lot sans code") + (batch.name ? " · " + batch.name : "");
+      batchSelect.appendChild(option);
+    });
+    if (latestBatches.some(batch => batch.id === previousBatch)) batchSelect.value = previousBatch;
+  }
+}
 function renderCultureCatalog() {
   const list = document.getElementById("cultureCatalogList");
   const count = document.getElementById("cultureCatalogCount");
@@ -5401,8 +5484,11 @@ let statisticsRequestId = 0;
 async function loadStatistics() {
   const requestId = ++statisticsRequestId;
   const variableCode = document.getElementById("statisticsVariable").value;
-  const cultureId = document.getElementById("statisticsCulture").value;
-  const batchId = document.getElementById("statisticsBatch").value;
+  const domain = document.body.dataset.domain || "mycology";
+  const selectedTargetId = document.getElementById("statisticsCulture").value;
+  const cultureId = domain === "agronomy" ? "" : selectedTargetId;
+  const plantCultureId = domain === "agronomy" ? selectedTargetId : "";
+  const batchId = domain === "laboratory" ? document.getElementById("statisticsBatch").value : "";
   const period = document.getElementById("statisticsPeriod").value;
   const status = document.getElementById("statisticsStatus");
   const chart = document.getElementById("statisticsChart");
@@ -5425,6 +5511,7 @@ async function loadStatistics() {
     let batchEventIds = null;
     let cultureEventIds = null;
     let noMatchingCultureBatchEvents = false;
+    let noWorkspaceTargets = false;
     if (batchId) {
       const {data: batchEvents, error: batchEventsError} = await supabaseClient.from("events").select("id").eq("organization_id", organizationId).eq("batch_id", batchId);
       if (batchEventsError) throw new Error("Chargement des événements du lot impossible : " + batchEventsError.message);
@@ -5449,8 +5536,10 @@ async function loadStatistics() {
       }
       cultureEventIds = [...new Set(cultureEventResults.flatMap(result => (result.data || []).map(event => event.id)))];
     }
-    let query = supabaseClient.from("measurements").select("id, variable_code, raw_value, raw_unit_code, normalized_value, normalized_unit_code, measured_at, method, culture_id, event_id, metadata").eq("organization_id", organizationId).eq("variable_code", variableCode).order("measured_at", {ascending:false}).limit(1000);
-    if (cultureId && batchId) {
+    let query = supabaseClient.from("measurements").select("id, variable_code, raw_value, raw_unit_code, normalized_value, normalized_unit_code, measured_at, method, culture_id, plant_culture_id, event_id, metadata").eq("organization_id", organizationId).eq("variable_code", variableCode).order("measured_at", {ascending:false}).limit(1000);
+    if (plantCultureId) {
+      query = query.eq("plant_culture_id", plantCultureId);
+    } else if (cultureId && batchId) {
       const matchingEventIds = cultureEventIds.filter(id => batchEventIds.includes(id));
       if (matchingEventIds.length) query = query.in("event_id", matchingEventIds);
       else noMatchingCultureBatchEvents = true;
@@ -5461,8 +5550,32 @@ async function loadStatistics() {
     } else if (batchId && batchEventIds.length) {
       query = query.in("event_id", batchEventIds);
     }
+    if (!plantCultureId && !cultureId && !batchId) {
+      if (domain === "agronomy") {
+        const plantIds = plantCultureOptions.map(plant => plant.id);
+        if (plantIds.length) query = query.in("plant_culture_id", plantIds);
+        else noWorkspaceTargets = true;
+      } else {
+        const cultureIds = cultureOptions.map(culture => culture.id);
+        const batchIds = domain === "laboratory" ? latestBatches.map(batch => batch.id) : [];
+        const eventQueries = [];
+        if (cultureIds.length) eventQueries.push(supabaseClient.from("events").select("id").eq("organization_id", organizationId).in("culture_id", cultureIds));
+        if (batchIds.length) eventQueries.push(supabaseClient.from("events").select("id").eq("organization_id", organizationId).in("batch_id", batchIds));
+        const eventResults = await Promise.all(eventQueries);
+        if (requestId !== statisticsRequestId) return;
+        for (const result of eventResults) {
+          if (result.error) throw new Error("Chargement du périmètre des statistiques impossible : " + result.error.message);
+        }
+        const workspaceEventIds = [...new Set(eventResults.flatMap(result => (result.data || []).map(event => event.id)))];
+        const scopeClauses = [];
+        if (cultureIds.length) scopeClauses.push("culture_id.in.(" + cultureIds.join(",") + ")");
+        if (workspaceEventIds.length) scopeClauses.push("event_id.in.(" + workspaceEventIds.join(",") + ")");
+        if (scopeClauses.length) query = query.or(scopeClauses.join(","));
+        else noWorkspaceTargets = true;
+      }
+    }
     if (period !== "all") { const since = new Date(); since.setDate(since.getDate() - Number(period)); query = query.gte("measured_at", since.toISOString()); }
-    const queryResult = (batchId && !batchEventIds.length) || (cultureId && !cultureEventIds.length && batchId) || noMatchingCultureBatchEvents ? {data:[],error:null} : await query;
+    const queryResult = noWorkspaceTargets || (batchId && !batchEventIds.length) || (cultureId && !cultureEventIds.length && batchId) || noMatchingCultureBatchEvents ? {data:[],error:null} : await query;
     if (requestId !== statisticsRequestId) return;
     const {data,error} = queryResult; if (error) throw new Error(error.message);
     const rows = (data || []).slice().sort((a,b) => new Date(a.measured_at || 0).getTime() - new Date(b.measured_at || 0).getTime()), variable = measurementVariables.find(item => item.code === variableCode), cultureById = new Map(cultureOptions.map(culture => [culture.id,culture]));
@@ -6296,6 +6409,7 @@ async function loadPlantCultures() {
     renderPlantCultureList(data || []);
     plantCultureOptions = data || [];
     renderMeasurementTargets();
+    renderStatisticsFilters();
     if (status) status.textContent = "Registre végétal chargé depuis Supabase.";
   } catch (error) {
     console.error("Chargement du registre végétal impossible :", error);
