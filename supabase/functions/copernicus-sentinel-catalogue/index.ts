@@ -87,24 +87,35 @@ Deno.serve(async (req: Request) => {
         if (parsed.protocol === "https:" && parsed.hostname === "stac.dataspace.copernicus.eu") itemUrl = parsed.toString();
       } catch { /* omit malformed catalogue link */ }
       const assets = f.assets && typeof f.assets === "object" ? f.assets : {};
-      const previewAsset = Object.entries(assets)
-        .map(([assetKey, asset]: [string, any]) => ({ assetKey, asset }))
-        .find(({ assetKey, asset }) => {
-          if (!asset || typeof asset.href !== "string") return false;
-          if (["thumbnail", "rendered_preview", "preview", "visual", "overview"].includes(assetKey.toLowerCase())) return true;
-          return Array.isArray(asset.roles) && asset.roles.some((role: unknown) =>
-            typeof role === "string" && ["thumbnail", "overview", "visual"].includes(role.toLowerCase()));
-        })?.asset;
+      const assetCandidates = Object.entries(assets)
+        .map(([assetKey, asset]: [string, any]) => ({ href: asset?.href, key: assetKey.toLowerCase(), roles: asset?.roles, type: asset?.type }))
+        .filter(({ href, key, roles }) => typeof href === "string" && (
+          ["thumbnail", "rendered_preview", "preview", "visual", "overview", "quicklook"].includes(key) ||
+          (Array.isArray(roles) && roles.some((role: unknown) =>
+            typeof role === "string" && ["thumbnail", "overview", "visual", "preview", "quicklook"].includes(role.toLowerCase())))
+        ));
+      const linkCandidates = (Array.isArray(f.links) ? f.links : [])
+        .filter((l: any) => l && typeof l.href === "string" &&
+          ["preview", "thumbnail", "quicklook", "overview"].includes(String(l.rel ?? "").toLowerCase()) &&
+          (typeof l.type === "string" && l.type.toLowerCase().startsWith("image/") ||
+           /\\.(png|jpe?g|webp)(?:$|[?#])/i.test(l.href)))
+        .map((l: any) => ({ href: l.href, key: String(l.rel).toLowerCase(), type: l.type }));
+      const previewCandidates = [...assetCandidates, ...linkCandidates];
       let previewUrl: string | null = null;
-      try {
-        const parsedPreview = new URL(previewAsset?.href ?? "");
-        if (parsedPreview.protocol === "https:" &&
-            (parsedPreview.hostname === "dataspace.copernicus.eu" ||
-             parsedPreview.hostname.endsWith(".dataspace.copernicus.eu") ||
-             parsedPreview.hostname === "s3.waw3-2.cloudferro.com")) {
-          previewUrl = parsedPreview.toString();
-        }
-      } catch { /* omit missing or malformed preview */ }
+      let previewSource: string | null = null;
+      for (const candidate of previewCandidates) {
+        try {
+          const parsedPreview = new URL(candidate.href);
+          const trustedHost = parsedPreview.hostname === "dataspace.copernicus.eu" ||
+            parsedPreview.hostname.endsWith(".dataspace.copernicus.eu") ||
+            parsedPreview.hostname === "s3.waw3-2.cloudferro.com";
+          if (parsedPreview.protocol === "https:" && trustedHost) {
+            previewUrl = parsedPreview.toString();
+            previewSource = candidate.key;
+            break;
+          }
+        } catch { /* omit malformed or untrusted preview URLs */ }
+      }
       return {
         id: typeof f.id === "string" ? f.id : null,
         acquired_at: typeof p.datetime === "string" ? p.datetime : null,
@@ -113,7 +124,7 @@ Deno.serve(async (req: Request) => {
         constellation: typeof p.constellation === "string" ? p.constellation : "Sentinel-2",
         bbox: Array.isArray(f.bbox) && f.bbox.length === 4 ? f.bbox : null,
         catalogue_item_url: itemUrl,
-        preview_url: previewUrl,
+        preview_url: previewUrl,\n        preview_source: previewSource,
       };
     });
     return reply(200, { ok: true, provider: "Copernicus Data Space STAC", collection: "sentinel-2-l2a",
