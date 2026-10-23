@@ -30,6 +30,7 @@ let strainOptions = [];
 let referenceData = [];
 
 let cultureOptions = [];
+let plantCultureOptions = [];
 
 let latestBatches = [];
 
@@ -5768,7 +5769,21 @@ function updateOverview() {
   const observationsPanel = document.getElementById("overviewRecentObservations");
   if (!cultureCount || !batchCount || !observationCount || !observationsPanel) return;
 
-  cultureCount.textContent = String(cultureOptions.length);
+  const domain = document.body.dataset.domain;
+  const cultureMetricLabel = cultureCount.closest(".overview-metric")?.querySelector(".overview-metric-label");
+  const batchMetric = batchCount.closest(".overview-metric");
+  const observationMetricLabel = observationCount.closest(".overview-metric")?.querySelector(".overview-metric-label");
+  if (domain === "agronomy") {
+    cultureCount.textContent = String(plantCultureOptions.length);
+    if (cultureMetricLabel) cultureMetricLabel.textContent = "Fiches végétales";
+    if (batchMetric) batchMetric.hidden = true;
+    if (observationMetricLabel) observationMetricLabel.textContent = "Observations récentes";
+  } else {
+    cultureCount.textContent = String(cultureOptions.length);
+    if (cultureMetricLabel) cultureMetricLabel.textContent = domain === "mycology" ? "Cultures mycologiques" : "Cultures de laboratoire";
+    if (batchMetric) batchMetric.hidden = false;
+    if (observationMetricLabel) observationMetricLabel.textContent = domain === "mycology" ? "Observations mycologiques" : "Observations récentes";
+  }
   batchCount.textContent = String(latestBatches.length);
   observationCount.textContent = String(recentObservations.length);
 
@@ -6151,11 +6166,13 @@ function populatePlantLocationOptions() {
 }
 
 function renderPlantCultureList(rows) {
+  plantCultureOptions = rows || [];
   const list = document.getElementById("plantCultureList");
   const count = document.getElementById("plantCultureCount");
   if (!list || !count) return;
   count.textContent = String(rows.length);
   list.replaceChildren();
+  updateOverview();
   if (!rows.length) {
     const empty = document.createElement("p");
     empty.className = "muted";
