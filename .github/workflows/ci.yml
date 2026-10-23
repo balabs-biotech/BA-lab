@@ -157,6 +157,8 @@ jobs:
           node-version: "22"
       - name: Test sync-culture-to-notion (mocked Supabase and Notion, no network)
         run: node --experimental-strip-types supabase/tests/sync-culture-to-notion.test.mts
+      - name: Test Sentinel-2 catalogue security and query contract
+        run: node supabase/tests/copernicus-sentinel-catalogue.test.mjs
 
   supabase-migration-replay:
     runs-on: ubuntu-latest
