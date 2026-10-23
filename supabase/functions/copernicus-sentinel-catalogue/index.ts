@@ -124,7 +124,8 @@ Deno.serve(async (req: Request) => {
         constellation: typeof p.constellation === "string" ? p.constellation : "Sentinel-2",
         bbox: Array.isArray(f.bbox) && f.bbox.length === 4 ? f.bbox : null,
         catalogue_item_url: itemUrl,
-        preview_url: previewUrl,\n        preview_source: previewSource,
+        preview_url: previewUrl,
+        preview_source: previewSource,
       };
     });
     return reply(200, { ok: true, provider: "Copernicus Data Space STAC", collection: "sentinel-2-l2a",
