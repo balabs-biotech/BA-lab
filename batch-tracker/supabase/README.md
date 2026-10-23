@@ -1,29 +1,49 @@
-# Batch Tracker — Supabase (reference only)
+# Batch Tracker — Supabase
 
-**Supabase is the source of truth for the backend.** This directory deliberately contains no SQL, migrations, schema dumps or data exports, and none must be added: the schema, access rules (RLS), RPC functions and Edge Functions are managed and documented in the Supabase project itself.
+**Production backend:** Supabase project `BALabs` (ref `axcouwiodqsauwnsiotn`, region `eu-west-3`). Supabase is the runtime source of truth; the repository also keeps versioned SQL migrations, tests, and Edge Function source under the root-level `supabase/` directory. A repository copy is not proof that the deployed function matches it: compare the deployed version and source hash before release.
 
 | | |
 |---|---|
-| Project | `BALabs` (ref `axcouwiodqsauwnsiotn`, region `eu-west-3`) |
 | Frontend | [`../index.html`](../index.html) |
-| Edge Functions | `claim-ba-labs`, `sync-culture-to-notion` (deployed in Supabase, not versioned here) |
+| Versioned migrations | [`../../supabase/migrations/`](../../supabase/migrations/) |
+| Versioned Edge Functions | [`../../supabase/functions/`](../../supabase/functions/) |
+| Database tests | [`../../supabase/tests/`](../../supabase/tests/) |
 
-## Batch workflow (as applied in production)
+## Batch workflow
 
 ```text
 preparation → sterilization → inoculation → incubation → cultivation
 → harvest → formulation → packaging → qc → release
 ```
 
-Standard stage advancement cannot cross `qc`. Release goes through `release_batch()` only, after the QC checks pass or are explicitly waived.
+The deployed RPCs validate organization membership and resource ownership. Standard stage advancement cannot skip QC; release goes through `release_batch()` only after QC checks pass or are explicitly waived. These controls must remain covered by automated cross-organization tests.
 
-## Secrets
+## Secrets and browser configuration
 
-- The frontend uses the project URL and a **publishable** key only. That key is meant for browsers.
-- A `service_role` / secret key or a Notion token must **never** be placed in this repository or in the frontend. They belong in Supabase Edge Function secrets.
+- The frontend may contain the project URL and a **publishable** Supabase key. Publishable keys are not authorization controls; RLS, grants, and RPC authorization must enforce access.
+- Never put a Supabase secret/service-role key or a Notion token in Git, public documentation, or browser code.
+- Keep Notion credentials in Supabase Edge Function secrets and grant the connected Notion integration only the access it needs.
 
-## Synchronisation Notion : code et migration versionnés
+## Notion synchronization
 
-- `supabase/functions/sync-culture-to-notion/index.ts` : copie du code de la fonction Edge déployée (v11). Elle normalise `NOTION_CULTURES_DATABASE_ID`, ne modifie une page Notion que si elle appartient à la culture (`Supabase Culture ID`) et retrouve une page existante avant d'en créer une (pas de doublon à la relance).
-- `supabase/migrations/20261020090000_protect_cultures_notion_columns_v1.sql` : trigger qui réserve l'écriture des colonnes `notion_*` de `public.cultures` à `service_role` / aux rôles d'administration. RLS et privilèges ne changent pas. **À appliquer manuellement** (`supabase db push` ou SQL Editor) ; rollback indiqué en tête du fichier.
-- Après application, vérifier : une modification directe de `notion_sync_status` par un utilisateur authentifié échoue (`42501`), la synchronisation via la fonction réussit toujours.
+The deployed `sync-culture-to-notion` Edge Function was observed at **version 13** on 2026-10-23. The repository contains a source copy under `supabase/functions/sync-culture-to-notion/index.ts`; verify parity before deployment rather than assuming the copy is identical.
+
+The deployed implementation:
+1. Authenticates the caller and checks access to the requested culture through the caller-scoped Supabase client before using the service role.
+2. Uses a per-culture server-side lock with a 180-second lease to serialize concurrent requests.
+3. Verifies a stored Notion page belongs to the configured database and carries the matching Supabase Culture ID.
+4. Reconciles a prior partial success by querying Notion before creating a new page.
+5. Fails closed on lookup errors or ambiguous duplicate matches, and releases the lock in a `finally` block.
+
+This reduces duplicate creation risk but does not replace integration tests for simultaneous requests, expired leases, partial failures, and lock-release errors. Do not describe synchronization as fully idempotent until those cases are exercised.
+
+## Database migrations
+
+Migrations are versioned in `supabase/migrations/`. The production migration ledger reports `20261020090000_protect_cultures_notion_columns_v1` as applied. The repository migration remains the source for replay and review; do not instruct operators to apply it manually unless the production ledger shows it is missing.
+
+## Security review follow-up
+
+- Review Supabase Security Advisor findings. The two RLS-enabled IoT tables without policies currently have no direct grants to `anon` or `authenticated`; keep that grant boundary explicit and recheck it after schema changes.
+- The Security Advisor flags four authenticated-callable `SECURITY DEFINER` batch RPCs. Their definitions include organization membership checks, but keep least-privilege grants and cross-organization denial tests in CI.
+- Enable leaked/compromised-password protection in Supabase Auth settings.
+- Verify repository branch protection/rulesets and require successful CI checks before merging.
