@@ -115,3 +115,14 @@ Références officielles :
 - Phase 4 : ne connecter ces variables à des recommandations que lorsque la validation locale et les limites d'incertitude sont documentées.
 
 **Bloquant avant le code de production :** inspecter le schéma actif et les droits d'accès des tables d'observations environnementales, choisir un modèle de stockage canonique et ajouter des tests de provenance, de cache, d'autorisation et d'absence de fuite de coordonnées.
+
+
+### État de production vérifié — 23 octobre 2026
+
+- Le schéma actif contient `environmental_observations` avec une clé de déduplication par organisation, lieu, fournisseur, jeu, variable et horodatage. La table est RLS-protégée ; les utilisateurs authentifiés ont un droit de lecture limité à leur organisation, et les clients ne peuvent pas y écrire directement.
+- La fonction `nasa-power-agroclimate` est active en version 2 pour les imports à la demande. La fonction `nasa-power-scheduled-import` est active en version 2, avec `verify_jwt=false` mais validation d'un secret de cron côté serveur.
+- Le cron de production est actif chaque jour à **04:30 UTC**. Son secret reste dans Supabase Vault. La fonction SQL `verify_nasa_power_cron_secret(text)` a été versionnée dans le dépôt et sa migration appliquée ; les droits d'exécution ont été vérifiés : `service_role` uniquement parmi les rôles applicatifs.
+- La source déployée de `nasa-power-scheduled-import` a été comparée au fichier versionné : correspondance exacte (5 972 caractères).
+- La table contient actuellement **575 observations météo NASA POWER pour 5 lieux** ; la dernière importation observée date du 23 octobre 2026 à 04:30 UTC. **Aucune observation satellite n'est encore stockée.**
+- La fenêtre présente dans ces données va du 23 septembre au 19 octobre 2026, ce qui reflète le décalage des produits NASA POWER ; il ne faut pas présenter ces valeurs comme de la météo en temps réel.
+- Le code du job planifié, la fonction de vérification du secret et le contrat de stockage sont versionnés. La définition complète du job `pg_cron` et sa configuration de déploiement restent à documenter de façon reproductible sans jamais mettre le secret dans Git.
