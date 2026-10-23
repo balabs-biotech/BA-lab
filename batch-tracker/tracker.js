@@ -1144,7 +1144,8 @@ function workspaceCultureTypes(types, domain = document.body.dataset.domain) {
   if (domain === "laboratory") return types;
   if (domain === "agronomy") return [];
   const mycologyCodes = new Set([
-    "agar", "plate", "slant", "broth", "flask", "other_liquid", "fermentation", "other"
+    "agar", "plate", "slant", "broth", "flask", "other_liquid", "grain_spawn",
+    "substrate", "fermentation", "other"
   ]);
   return types.filter(item => mycologyCodes.has(item.code));
 }
