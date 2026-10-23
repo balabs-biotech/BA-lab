@@ -1,6 +1,6 @@
-SARL B.A. LAB — Licence map
+B.A. LAB project — Licence map
 
-This repository mixes several licences. The table below states which one applies
+B.A. LAB is used here as a project name; this file does not assert that a legal entity has been registered under that name. This repository mixes several licences. The table below states which one applies
 to which directory. Where a directory is not listed, ALL RIGHTS RESERVED applies.
 
 | Path                                                        | Licence (SPDX)                | Text                              |
@@ -17,13 +17,13 @@ licence to be complete. See LICENSES/README.md.
 ----------------------------------------------------------------------------------
 Proprietary material
 ----------------------------------------------------------------------------------
-Copyright (c) 2026 SARL B.A. LAB. All Rights Reserved.
+Copyright (c) 2026 B.A. LAB project. All Rights Reserved.
 
 The Standard Operating Procedures (SOPs), biological formulation profiles, R&D notes,
 facility layouts and the Batch Tracker web interface are published for evaluation,
 educational and validation purposes. Commercial use, replication of proprietary
 biological strain complexes, or industrial exploitation without prior written consent
-of SARL B.A. LAB is strictly prohibited.
+of B.A. LAB project is strictly prohibited.
 
 ----------------------------------------------------------------------------------
 Hardware sheets and safety
@@ -31,4 +31,4 @@ Hardware sheets and safety
 Hardware sheets in hardware/ are design concepts and carry no warranty. They are NOT
 qualified or certified designs; see the status banner of each sheet before building.
 
-Contact & licensing inquiries: SARL B.A. LAB — Sétif, Algeria.
+Contact & licensing inquiries: B.A. LAB project — Sétif, Algeria.
