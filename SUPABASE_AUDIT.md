@@ -276,8 +276,9 @@ This update supersedes older status statements above where they conflict with th
 
 ## Update — 2026-10-23 (Sentinel-2 catalogue adapter)
 
-- Added `supabase/functions/copernicus-sentinel-catalogue/index.ts` as a versioned, read-only Edge Function source. It authenticates the caller and reads the selected location through the caller-scoped Supabase client, then queries Copernicus STAC for Sentinel-2 L2A scene metadata.
+- Added `supabase/functions/copernicus-sentinel-catalogue/index.ts` and deployed it to Supabase as active version 1 with JWT verification enabled. It authenticates the caller and reads the selected location through the caller-scoped Supabase client, then queries Copernicus STAC for Sentinel-2 L2A scene metadata.
 - The adapter caps searches at 180 days and 20 scenes, supports a maximum cloud-cover filter, returns only a small set of metadata fields, and does not persist observations or download imagery.
 - Its bounding box is a regional window around the stored point, not a parcel polygon. Scene-level cloud cover cannot establish that the specific crop is cloud-free.
-- **Not deployed to production yet.** CI for the new source is still running; live STAC response validation and authorization tests are required before deployment. The production table still contains zero satellite observations.
+- Green Tech now displays concise weather indicators and cautious verification prompts, keeps the full weather table collapsed, and provides a button to search Sentinel-2 scenes. These UI changes are versioned but their latest CI/Pages runs are still in progress.
+- A live authenticated STAC query has not yet been validated end-to-end. The production table still contains zero satellite observations; the catalogue adapter returns transient results only.
 - Official API reference: https://documentation.dataspace.copernicus.eu/APIs/STAC.html (collection `sentinel-2-l2a`, search endpoint `/v1/search`).
