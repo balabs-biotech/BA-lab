@@ -262,3 +262,13 @@ This update supersedes older status statements above where they conflict with th
 - Enable leaked/compromised-password protection in Supabase Auth settings.
 - Confirm branch protection/rulesets in GitHub settings; the connected GitHub API returned 403, so this remains unverified.
 - Add tests for concurrent sync attempts and lock-lease expiry, and perform a controlled end-to-end check with real Supabase/Notion services.
+
+
+## Update — 2026-10-23 (agroclimate pipeline parity)
+
+- Live database inspection found 575 `environmental_observations` rows from `NASA_POWER / POWER_DAILY_AGRO` across five locations; all are weather records and there are currently zero satellite records. Latest retrieval: 2026-10-23 04:30 UTC; observed data currently extends through 2026-10-19.
+- Confirmed the production `nasa-power-scheduled-import` Edge Function is active at version 2 and its deployed `index.ts` exactly matches the source now committed under `supabase/functions/nasa-power-scheduled-import/index.ts`.
+- Confirmed the production cron is active daily at 04:30 UTC. The cron secret remains in Supabase Vault, not in Git.
+- Added `supabase/migrations/20261023020000_version_nasa_power_cron_secret_verifier.sql` and applied its SQL to production. The verifier is `SECURITY DEFINER` with an empty search path; its routine grants were checked after application and expose `EXECUTE` only to `service_role` among application roles.
+- Added the NASA POWER scheduled importer to source control and documented current provider limitations and a staged Copernicus Sentinel-2 integration plan in `docs/architecture/iot-et-donnees-publiques.md`.
+- Satellite ingestion remains unimplemented. The next safe step is a read-only Copernicus STAC catalogue adapter that stores scene metadata only; raster downloads and indices should follow after provenance, cloud masking, geometry and compute requirements are validated.
