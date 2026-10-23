@@ -2381,7 +2381,7 @@ async function compareSelectedBatches() {
         en: {mean:"mean",median:"median",quartiles:"Q1–Q3",outliers:"potential outliers (IQR rule)",outlierCaution:"review; not automatically erroneous",range:"min–max",excluded:"excluded",nonNumeric:"non-numeric values",empty:"No usable numeric measurements"},
         pt: {mean:"média",median:"mediana",quartiles:"Q1–Q3",outliers:"valores atípicos potenciais (regra IQR)",outlierCaution:"rever; não são automaticamente erros",range:"mín–máx",excluded:"excluídas",nonNumeric:"valores não numéricos",empty:"Sem medições numéricas utilizáveis"},
         ar: {mean:"المتوسط",median:"الوسيط",quartiles:"الربيع الأول–الثالث",outliers:"قيم شاذة محتملة (قاعدة المدى الربيعي)",outlierCaution:"تحتاج إلى مراجعة ولا تعني أنها خاطئة تلقائيًا",range:"الحد الأدنى–الأقصى",excluded:"مستبعدة",nonNumeric:"قيم غير رقمية",empty:"لا توجد قياسات رقمية قابلة للاستخدام"}
-      }[language] || {mean:"moyenne",median:"médiane",quartiles:"Q1–Q3",range:"min–max",excluded:"exclues",nonNumeric:"valeurs non numériques",empty:"Aucune mesure numérique exploitable"};
+      }[language] || {mean:"moyenne",median:"médiane",quartiles:"Q1–Q3",outliers:"valeurs atypiques (règle IQR)",outlierCaution:"à examiner, pas automatiquement erronées",range:"min–max",excluded:"exclues",nonNumeric:"valeurs non numériques",empty:"Aucune mesure numérique exploitable"};
       const summaries = [...groups.entries()].map(([key, values]) => {
         const [variable, unit, quality] = key.split("||");
         const mean = values.reduce((sum, value) => sum + value, 0) / values.length;
