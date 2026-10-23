@@ -43,11 +43,81 @@
     const coordinates=node("details",{class:"environmental-settings"});
     coordinates.append(node("summary",{},"Paramètres avancés : coordonnées et actualisation"));
     coordinates.append(field("Latitude","envLat",lat),field("Longitude","envLon",lon),field("Précision des coordonnées (m)","envAccuracy",accuracy),field("Origine des coordonnées","envSource",source),save,refresh);
+    const picker=node("section",{class:"location-picker card","aria-labelledby":"locationPickerTitle"});
+    picker.append(node("h3",{id:"locationPickerTitle"},"Définir l’emplacement sans saisir de coordonnées"));
+    picker.append(node("p",{class:"muted"},"Utilisez votre position si vous êtes sur place, ou cliquez sur la carte puis déplacez le repère. Vérifiez le point avant de l’enregistrer."));
+    const pickerActions=node("div",{class:"location-picker-actions"});
+    const locateButton=node("button",{type:"button",class:"small-button"},"Me localiser");
+    const mapSaveButton=node("button",{type:"button",class:"small-button secondary-button"},"Enregistrer cet emplacement");
+    pickerActions.append(locateButton,mapSaveButton);
+    const mapStatus=node("p",{class:"muted","aria-live":"polite"},"Carte en chargement…");
+    const mapNode=node("div",{id:"envLocationMap","role":"application","aria-label":"Carte interactive : cliquer pour choisir un emplacement"});
+    mapNode.style.cssText="height:320px;min-height:240px;border:1px solid #cbd5c7;border-radius:12px;overflow:hidden;background:#eef2ea;z-index:0";
+    picker.append(pickerActions,mapStatus,mapNode);
+    const mapStyle=node("style");
+    mapStyle.textContent=".location-picker-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.location-picker-actions button{margin-top:8px}.location-picker h3{margin-top:0;padding-top:0;border-top:0}.leaflet-container{font:inherit}.leaflet-control-attribution{font-size:10px!important}@media(max-width:600px){.location-picker-actions{grid-template-columns:1fr}.location-picker #envLocationMap{height:280px!important}}";
+    document.head.append(mapStyle);
     form.append(field("Emplacement","envLocation",location),field("Du","envFrom",from),field("Au","envTo",to),run,coordinates);
+
     const satelliteButton=node("button",{type:"button"},"Chercher les images satellite");
     const satelliteResults=node("div",{id:"satelliteResults",class:"overview-observations","aria-live":"polite"});
     const satelliteHint=node("p",{class:"muted"},"Sentinel-2 : scènes disponibles et couverture nuageuse. L’image ne constitue pas à elle seule un diagnostic de culture.");
-    panel.append(form,status,summary,satelliteHint,satelliteButton,satelliteResults,details);
+    panel.append(form,picker,status,summary,satelliteHint,satelliteButton,satelliteResults,details);
+    let locationMap=null, locationMarker=null, mapReady=false;
+    function setMapPoint(latitude,longitude,origin,precision=null){
+      lat.value=String(latitude);lon.value=String(longitude);accuracy.value=precision==null?"":String(precision);
+      source.value=origin;
+      if(locationMap){
+        const point=[latitude,longitude];
+        if(!locationMarker){
+          locationMarker=L.marker(point,{draggable:true}).addTo(locationMap);
+          locationMarker.on("dragend",event=>{
+            const p=event.target.getLatLng();
+            lat.value=p.lat.toFixed(6);lon.value=p.lng.toFixed(6);accuracy.value="";source.value="map_estimate";
+            mapStatus.textContent="Repère déplacé : "+p.lat.toFixed(6)+", "+p.lng.toFixed(6)+". Enregistrez pour confirmer.";
+          });
+        } else locationMarker.setLatLng(point);
+        locationMap.setView(point,Math.max(locationMap.getZoom(),13));
+      }
+      mapStatus.textContent="Point sélectionné : "+latitude.toFixed(6)+", "+longitude.toFixed(6)+(precision==null?"":" · précision estimée "+Math.round(precision)+" m")+". Enregistrez pour l’associer à l’emplacement choisi.";
+    }
+    function loadMapLibrary(){
+      if(window.L){initMap();return;}
+      if(!document.getElementById("leaflet-css")){
+        const css=node("link",{id:"leaflet-css",rel:"stylesheet",href:"https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"});
+        document.head.append(css);
+      }
+      if(window.__baLeafletLoading){window.__baLeafletLoading.then(initMap).catch(()=>mapStatus.textContent="Carte indisponible. Vous pouvez toujours utiliser « Me localiser ».");return;}
+      window.__baLeafletLoading=new Promise((resolve,reject)=>{
+        const script=node("script",{src:"https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"});
+        script.onload=resolve;script.onerror=reject;document.head.append(script);
+      });
+      window.__baLeafletLoading.then(initMap).catch(()=>mapStatus.textContent="Carte indisponible. Vérifiez la connexion ou utilisez « Me localiser ».");
+    }
+    function initMap(){
+      if(mapReady||!window.L)return;
+      locationMap=L.map(mapNode,{scrollWheelZoom:false}).setView([28,2],4);
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,attribution:'&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a>'}).addTo(locationMap);
+      locationMap.on("click",event=>setMapPoint(event.latlng.lat,event.latlng.lng,"map_estimate"));
+      mapReady=true;
+      if(lat.value!==""&&lon.value!=="")setMapPoint(Number(lat.value),Number(lon.value),source.value||"user_confirmed",accuracy.value===""?null:Number(accuracy.value));
+      else mapStatus.textContent="Cliquez sur la carte pour placer le repère. La carte peut être déplacée et zoomée.";
+      setTimeout(()=>locationMap.invalidateSize(),100);
+    }
+    locateButton.addEventListener("click",()=>{
+      if(!navigator.geolocation){mapStatus.textContent="La géolocalisation n’est pas prise en charge par ce navigateur.";return;}
+      locateButton.disabled=true;mapStatus.textContent="Demande de position… Autorisez la localisation dans le navigateur si demandé.";
+      navigator.geolocation.getCurrentPosition(pos=>{
+        setMapPoint(pos.coords.latitude,pos.coords.longitude,"gps_field",pos.coords.accuracy);
+        if(locationMap)locationMap.setView([pos.coords.latitude,pos.coords.longitude],16);
+        locateButton.disabled=false;
+      },err=>{
+        const reasons={1:"Autorisation refusée. Autorisez la localisation dans les paramètres du navigateur.",2:"Position indisponible. Vérifiez les services de localisation ou choisissez le point sur la carte.",3:"Délai dépassé. Réessayez ou choisissez le point sur la carte."};
+        mapStatus.textContent=reasons[err.code]||"Géolocalisation impossible. Choisissez le point sur la carte.";
+        locateButton.disabled=false;
+      },{enableHighAccuracy:true,timeout:12000,maximumAge:60000});
+    });
+    mapSaveButton.addEventListener("click",()=>save.click());
     plant.parentNode.insertBefore(panel,plant.nextSibling);
     const nav=document.querySelector(".section-nav");
     if(nav && !document.getElementById("envNav")) { const a=node("a",{href:"#environmentalCard",id:"envNav"},"Contexte environnemental"); nav.append(a); }
@@ -65,6 +135,7 @@
       if(!data)return;
       lat.value=data.latitude??""; lon.value=data.longitude??""; accuracy.value=data.coordinate_accuracy_m??"";
       if(data.coordinate_source && [...source.options].some(o=>o.value===data.coordinate_source))source.value=data.coordinate_source;
+      if(mapReady&&data.latitude!=null&&data.longitude!=null)setMapPoint(Number(data.latitude),Number(data.longitude),source.value, data.coordinate_accuracy_m==null?null:Number(data.coordinate_accuracy_m));
     }
     function renderClimateSummary(data){
       summary.replaceChildren();
@@ -277,6 +348,7 @@
       return;
     }
     panel.classList.remove("hidden");
+    loadMapLibrary();
     await loadLocations();
     if(location.value) await loadRows();
   }
