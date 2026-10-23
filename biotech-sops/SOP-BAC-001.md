@@ -4,7 +4,7 @@
 * **Version:** 1.0
 * **Biosafety Level:** BSL-1
 * **Target Organisms:** Plant Growth-Promoting Rhizobacteria (*Bacillus subtilis*, *Bacillus amyloliquefaciens*)
-* **Author:** SARL B.A. LAB — Applied Bacteriology Unit
+* **Author:** B.A. LAB project — Applied Bacteriology Unit
 
 ---
 
