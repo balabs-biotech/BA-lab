@@ -19,6 +19,27 @@ for (let i = open; i < engine.length; i++) {
 if (end < 0) throw new Error("Could not extract renderMeasurementTargets()");
 const functionSource = engine.slice(start, end);
 
+
+function extractFunction(source, name) {
+  const start = source.indexOf(`function ${name}(`);
+  if (start < 0) throw new Error(name + "() not found");
+  const open = source.indexOf("{", start);
+  let depth = 0;
+  for (let i = open; i < source.length; i++) {
+    if (source[i] === "{") depth++;
+    if (source[i] === "}" && --depth === 0) return source.slice(start, i + 1);
+  }
+  throw new Error("Could not extract " + name + "()");
+}
+
+function callHelper(name, args, domain) {
+  const source = extractFunction(engine, name);
+  return vm.runInNewContext(
+    `${source}; ${name}(...injected.args, injected.domain)`,
+    { injected: { args, domain }, document: { body: { dataset: { domain } } } }
+  );
+}
+
 function fakeElement(tag) {
   return {
     tag, value: "", textContent: "", label: "", children: [],
@@ -96,3 +117,35 @@ console.log("✓ Scenario Green Tech: only plant units are selectable");
 console.log("✓ Scenario Mycology: only biological culture targets are selectable");
 console.log("✓ Scenario Laboratory: lab cultures and production batches are selectable");
 console.log("✓ Scenario navigation: valid selection is preserved; cross-universe selection is discarded");
+
+const typeCatalogue = [
+  "agar", "plate", "slant", "broth", "flask", "other_liquid", "fermentation", "other",
+  "organoid", "suspension", "micropropagation", "solid"
+].map(code => ({ code }));
+const mycologyTypes = callHelper("workspaceCultureTypes", [typeCatalogue], "mycology").map(item => item.code);
+const labTypes = callHelper("workspaceCultureTypes", [typeCatalogue], "laboratory").map(item => item.code);
+const agronomyTypes = callHelper("workspaceCultureTypes", [typeCatalogue], "agronomy").map(item => item.code);
+assert.ok(mycologyTypes.includes("agar") && mycologyTypes.includes("broth"));
+assert.ok(!mycologyTypes.includes("organoid") && !mycologyTypes.includes("micropropagation"));
+assert.equal(labTypes.length, typeCatalogue.length);
+assert.deepEqual(agronomyTypes, []);
+
+const variableCatalogue = [
+  "ph", "temperature", "electrical_conductivity", "relative_humidity",
+  "substrate_moisture", "co2_concentration", "cfu", "cfu_per_ml",
+  "colony_count", "od600", "root_length", "illuminance", "generation_time"
+].map(code => ({ code }));
+const agronomyVariables = callHelper("workspaceMeasurementVariables", [variableCatalogue], "agronomy").map(item => item.code);
+const mycologyVariables = callHelper("workspaceMeasurementVariables", [variableCatalogue], "mycology").map(item => item.code);
+const labVariables = callHelper("workspaceMeasurementVariables", [variableCatalogue], "laboratory").map(item => item.code);
+assert.ok(agronomyVariables.includes("ph") && agronomyVariables.includes("substrate_moisture"));
+assert.ok(!agronomyVariables.includes("cfu") && !agronomyVariables.includes("od600"));
+assert.ok(mycologyVariables.includes("cfu") && mycologyVariables.includes("od600"));
+assert.ok(!mycologyVariables.includes("root_length"));
+assert.equal(labVariables.length, variableCatalogue.length);
+
+assert.ok(engine.includes('query = query.eq("plant_culture_id", plantCultureId)'));
+assert.ok(engine.includes('targetLabel.textContent = domain === "agronomy" ? "Unité végétale"'));
+assert.ok(engine.includes('batchField.hidden = domain !== "laboratory"'));
+console.log("✓ Scenario choices: culture formats and measurement variables are domain-specific");
+console.log("✓ Scenario AgriTech statistics: plant filters query plant_culture_id and hide laboratory batches");
