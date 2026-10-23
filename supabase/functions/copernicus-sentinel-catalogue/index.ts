@@ -98,7 +98,7 @@ Deno.serve(async (req: Request) => {
         .filter((l: any) => l && typeof l.href === "string" &&
           ["preview", "thumbnail", "quicklook", "overview"].includes(String(l.rel ?? "").toLowerCase()) &&
           (typeof l.type === "string" && l.type.toLowerCase().startsWith("image/") ||
-           /\\.(png|jpe?g|webp)(?:$|[?#])/i.test(l.href)))
+           /\.(png|jpe?g|webp)(?:$|[?#])/i.test(l.href)))
         .map((l: any) => ({ href: l.href, key: String(l.rel).toLowerCase(), type: l.type }));
       const previewCandidates = [...assetCandidates, ...linkCandidates];
       let previewUrl: string | null = null;
