@@ -130,7 +130,7 @@ Références officielles :
 
 ### Adaptateur catalogue Sentinel-2 ajouté au dépôt — 23 octobre 2026
 
-Le fichier `supabase/functions/copernicus-sentinel-catalogue/index.ts` est versionné et la fonction est déployée sur Supabase en version active 1, avec vérification JWT activée. Elle est **en lecture seule**.
+Le fichier `supabase/functions/copernicus-sentinel-catalogue/index.ts` est versionné et la fonction est déployée sur Supabase en **version active 2**, avec vérification JWT activée. Elle est **en lecture seule**. Le catalogue demande désormais un tri décroissant sur `properties.datetime` afin de retourner en priorité les scènes les plus récentes.
 
 - Authentifie l'utilisateur et vérifie l'accès au lieu par la lecture RLS de `locations`.
 - Interroge le catalogue STAC Copernicus pour la collection `sentinel-2-l2a`, sur une fenêtre temporelle maximale de 180 jours et un maximum de 20 scènes par requête.
@@ -138,7 +138,7 @@ Le fichier `supabase/functions/copernicus-sentinel-catalogue/index.ts` est versi
 - La zone de recherche est une boîte régionale autour du point enregistré. Elle ne représente pas la parcelle et ne permet pas d'affirmer qu'une scène couvre exactement la culture suivie.
 - Les scènes filtrées par couverture nuageuse ne garantissent pas l'absence de nuages sur la parcelle. Aucun NDVI/NDMI ni conseil agronomique n'est calculé.
 
-**Validation restante :** effectuer une requête de bout en bout depuis une session utilisateur authentifiée, puis tester les cas d'accès refusé et de coordonnées absentes. À ce stade, aucune donnée satellite n'est persistée dans `environmental_observations`.
+**Tests et limites :** le contrat de sécurité/requête est couvert par `supabase/tests/copernicus-sentinel-catalogue.test.mjs` et le test est exécuté par la CI GitHub. Le run CI `39982870586` a réussi le 23 octobre 2026, y compris ce test et les tests de migrations; le déploiement GitHub Pages `39982871002` a également réussi. Ces tests sont des vérifications de contrat statiques, pas un test d'appel réel avec une session utilisateur. La validation de bout en bout authentifiée et les cas d'accès refusé/coordonnées absentes restent à exécuter. Aucune donnée satellite n'est persistée dans `environmental_observations`.
 
 
 ### Exploitation dans Green Tech — 23 octobre 2026
