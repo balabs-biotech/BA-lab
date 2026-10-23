@@ -76,3 +76,42 @@ La publication doit être une projection distincte, pas une ouverture de RLS sur
 
 ## 5. Hors périmètre immédiat
 Pas de commande distante de chauffage/pompe, pas de publication automatique des données brutes, pas de dépendance à un broker externe payant, pas de clé Supabase privilégiée dans l'ESP32. Les seuils de contrôle restent des paramètres expérimentaux jusqu'à calibration et validation matérielle.
+
+
+## 6. Données météo et satellite — intégration sans coût API obligatoire
+
+Objectif : enrichir les observations agronomiques de chaque environnement avec des variables externes datées, traçables et explicitement distinguées des mesures de capteurs. L'absence de coût API ne garantit pas une disponibilité permanente ni un coût nul de calcul/stockage.
+
+### Sources retenues
+
+| Source | Usage initial | Accès et limites | Décision |
+|---|---|---|---|
+| NASA POWER Daily API | Historique quotidien météo/énergie solaire à partir de coordonnées : températures, précipitations, humidité, vent et rayonnement selon les paramètres disponibles | API publique sans clé pour les requêtes ordinaires ; données modélisées/grillées, pas une station locale ; respecter les limites et conserver les métadonnées de requête | **Source prioritaire** pour les séries historiques et le contexte agroclimatique |
+| Copernicus Data Space — STAC / Sentinel-2 L2A | Découverte de scènes, dates, couverture nuageuse et imagerie de réflectance de surface ; calcul ultérieur d'indices comme NDVI/NDMI si les bandes et la qualité le permettent | Données d'observation de la Terre ouvertes ; la recherche catalogue est distincte du téléchargement et du traitement des rasters. Téléchargement complet/traitement peut nécessiter un compte, OAuth et du calcul | **Deuxième étape** : d'abord catalogue et métadonnées, ensuite indices calculés de façon reproductible |
+| Open-Meteo Free API | Prototype de prévisions météo | Conditions officielles : API gratuite réservée à un usage non commercial ; les applications avec abonnement, publicité ou activité commerciale doivent utiliser une offre autorisant l'usage commercial | **Ne pas intégrer comme dépendance de production** pour BA Labs sans licence adaptée |
+
+Références officielles :
+- NASA POWER Daily API : https://power.larc.nasa.gov/docs/services/api/temporal/daily/
+- Copernicus Data Space APIs : https://dataspace.copernicus.eu/analyse/apis
+- Copernicus STAC : https://documentation.dataspace.copernicus.eu/APIs/STAC.html
+- Conditions Open-Meteo : https://open-meteo.com/en/terms
+
+### Architecture proposée
+
+1. **Lieu et portée** : utiliser les coordonnées d'un environnement uniquement si elles sont fournies et autorisées par son propriétaire. Ne jamais publier de coordonnées précises par défaut. Une zone approximative suffit pour le premier prototype.
+2. **Adaptateurs fournisseurs** : un module par source, avec paramètres explicités, délais, cache, gestion des erreurs et attribution. Les clés OAuth éventuelles restent côté serveur.
+3. **Cache par point et période** : ne pas refaire la même requête à chaque ouverture d'écran. Dédupliquer par fournisseur, zone, date/période, produit et version de paramètres.
+4. **Modèle de provenance** : chaque observation importée doit stocker au minimum fournisseur, identifiant/paramètres du produit, date d'observation, date d'import, unité, résolution spatiale/temporale connue, indicateur de qualité, version de transformation et URL de provenance.
+5. **Séparation des mesures** : les données distantes sont des observations externes ou des estimations de modèle, jamais des mesures de capteurs. Elles ne doivent pas être écrites comme si elles provenaient d'un ESP32.
+6. **Traitement satellite différé** : conserver d'abord les métadonnées de scène et la couverture nuageuse ; ne calculer NDVI/NDMI qu'après validation des bandes, masque nuage/ombres, projection et résolution. Éviter de stocker des rasters volumineux dans les lignes PostgreSQL.
+7. **Utilisation agronomique prudente** : comparer pluie/température/rayonnement à la croissance, l'irrigation et les événements de culture, mais présenter les résultats comme contexte ou signal exploratoire, pas comme diagnostic ni causalité démontrée.
+8. **Budget zéro** : démarrer avec des appels ponctuels/cachés à NASA POWER et une recherche de catalogue Copernicus. Pas de service de traitement satellite payant, pas de collecte continue, pas d'achat de données. Les quotas, conditions et disponibilité des services doivent être revérifiés avant mise en production.
+
+### MVP recommandé
+
+- Phase 1 : associer un environnement à une zone autorisée ; récupérer une série quotidienne NASA POWER ; afficher date, fournisseur, unité et statut « donnée externe/modélisée ».
+- Phase 2 : calculer quelques agrégats utiles à la culture (pluie cumulée sur 7/30 jours, température minimale/maximale, rayonnement) sans remplacer les relevés locaux.
+- Phase 3 : rechercher les scènes Sentinel-2 L2A et afficher date/couverture nuageuse ; ne produire aucun indice si les scènes sont nuageuses ou si la géométrie de la parcelle n'est pas assez précise.
+- Phase 4 : ne connecter ces variables à des recommandations que lorsque la validation locale et les limites d'incertitude sont documentées.
+
+**Bloquant avant le code de production :** inspecter le schéma actif et les droits d'accès des tables d'observations environnementales, choisir un modèle de stockage canonique et ajouter des tests de provenance, de cache, d'autorisation et d'absence de fuite de coordonnées.
