@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-// Copyright (c) 2026 SARL B.A. LAB
+// Copyright (c) 2026 B.A. LAB project
 //
 // B.A. LAB — Irrigation & CO2 purge node (ESP32 + capacitive soil sensor + SCD4x).
 // CO2 comes from a real SCD4x read. There is NO simulated value: if the sensor is
