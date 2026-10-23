@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-// Copyright (c) 2026 SARL B.A. LAB
+// Copyright (c) 2026 B.A. LAB project
 // Climate node configuration. EVERY value here is a provisional default:
 // validate against the real chamber, heater and relay board before use.
 #pragma once
