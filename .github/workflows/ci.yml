@@ -84,6 +84,7 @@ jobs:
       - name: Check batch-tracker structure
         run: |
           node scripts/check-batch-tracker-js.mjs
+          node supabase/tests/copernicus-sentinel-catalogue.test.mjs
           node --check batch-tracker/environmental-data.js
           node scripts/check-i18n.mjs
           node scripts/test-workspace-scenarios.mjs
