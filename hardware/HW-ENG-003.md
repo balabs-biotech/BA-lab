@@ -5,7 +5,7 @@
 * **System Target:** Low-Cost Submerged Liquid Fermentation for PGPR and Microbial Inoculants
 * **Capacity:** 50L – 200L Batch Volume
 * **Licensing:** CERN Open Hardware Licence Version 2 - Permissive (CERN-OHL-P)
-* **Author:** SARL B.A. LAB — Hardware & Engineering Unit
+* **Author:** B.A. LAB project — Hardware & Engineering Unit
 * **Status:** 🔴 **CONCEPT — NOT VALIDATED. NOT A PRESSURE VESSEL. Never pressurise.**
 
 > ⛔ **Do not pressurise this vessel** (no air test, no "working pressure"). A PEHD drum with bulkhead fittings has no demonstrated allowable pressure here, and a compressed-air test stores energy that can burst it violently.
