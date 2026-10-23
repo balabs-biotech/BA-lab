@@ -957,6 +957,8 @@ function setDefaultDate() {
   if (observationAtInput) {
     observationAtInput.value = now.toISOString().slice(0, 16);
   }
+  const plantStartedAt = document.getElementById("plantStartedAt");
+  if (plantStartedAt) plantStartedAt.value = now.toISOString().slice(0, 16);
 
 }
 
@@ -6332,8 +6334,8 @@ function setupDomainWorkspaces() {
     const strainLabel = document.getElementById("strainLabel");
     const cultureTypeLabel = document.getElementById("cultureTypeLabel");
     if (cultureEntryTitle) cultureEntryTitle.textContent = activeDomain === "laboratory" ? "Nouvelle culture de laboratoire" : "Nouvelle culture fongique";
-    if (strainLabel) strainLabel.textContent = activeDomain === "laboratory" ? "Souche / ressource biologique source" : "Souche fongique source";
-    if (cultureTypeLabel) cultureTypeLabel.textContent = activeDomain === "laboratory" ? "Format de culture au laboratoire" : "Support / forme de culture";
+    if (strainLabel?.firstChild) strainLabel.firstChild.textContent = activeDomain === "laboratory" ? "Souche / ressource biologique source" : "Souche fongique source";
+    if (cultureTypeLabel?.firstChild) cultureTypeLabel.firstChild.textContent = activeDomain === "laboratory" ? "Format de culture au laboratoire" : "Support / forme de culture";
     if (eyebrow) eyebrow.innerHTML = config.eyebrow.replace(" / ", ' <span class="eyebrow-separator">/</span> ');
     if (title) title.innerHTML = config.title;
     if (heroDescription) heroDescription.textContent = config.descriptionHero;
