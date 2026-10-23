@@ -135,6 +135,13 @@
           } else {
             item.append(node("p",{class:"muted"},"Aucun aperçu image fourni par le catalogue pour cette scène."));
           }
+          if(scene.browser_url){
+            const browserLink=node("a",{href:scene.browser_url,target:"_blank",rel:"noopener noreferrer"},"Visualiser cette date dans Copernicus Browser");
+            browserLink.style.display="block";
+            browserLink.style.marginTop="8px";
+            item.append(browserLink);
+            item.append(node("small",{class:"muted"},"Vue de la zone et de la date dans le navigateur Copernicus ; ce lien ne garantit pas l’affichage exact du produit listé."));
+          }
           if(scene.catalogue_item_url){const a=node("a",{href:scene.catalogue_item_url,target:"_blank",rel:"noopener noreferrer"},"Ouvrir la fiche de la scène");item.append(a);}
           satelliteResults.append(item);
         });
