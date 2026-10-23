@@ -334,5 +334,5 @@ do $$ begin
   exception when sqlstate 'P0001' then
     if sqlerrm <> 'not authorized for organization' then raise; end if;
   end;
-end $;
+end $$;
 reset role;
