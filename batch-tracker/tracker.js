@@ -1140,6 +1140,36 @@ async function loadReferenceData() {
    TYPES DE CULTURE
    ============================================================ */
 
+function workspaceCultureTypes(types, domain = document.body.dataset.domain) {
+  if (domain === "laboratory") return types;
+  if (domain === "agronomy") return [];
+  const mycologyCodes = new Set([
+    "agar", "plate", "slant", "broth", "flask", "other_liquid", "fermentation", "other"
+  ]);
+  return types.filter(item => mycologyCodes.has(item.code));
+}
+
+function workspaceMeasurementVariables(variables, domain = document.body.dataset.domain) {
+  if (domain === "laboratory") return variables;
+  const allowedByDomain = {
+    agronomy: new Set([
+      "co2_concentration", "electrical_conductivity", "illuminance", "ph",
+      "relative_humidity", "root_length", "shoot_length", "substrate_moisture",
+      "temperature", "fresh_mass", "dry_mass", "wet_biomass", "volume"
+    ]),
+    mycology: new Set([
+      "cfu", "cfu_per_ml", "co2_concentration", "colony_count", "dry_biomass",
+      "electrical_conductivity", "fresh_mass", "generation_time", "growth_rate",
+      "incubation_time", "od600", "ph", "relative_humidity", "temperature",
+      "viability", "volume", "wet_biomass"
+    ])
+  };
+  const allowed = allowedByDomain[domain];
+  return allowed ? variables.filter(variable => allowed.has(variable.code)) : [];
+}
+
+
+
 function loadCultureTypes() {
 
   cultureTypeSelect.innerHTML =
@@ -1173,10 +1203,10 @@ function loadCultureTypes() {
         row.reference_type ===
           "culture_types"
     );
-
+  const visibleTypes = workspaceCultureTypes(types, document.body.dataset.domain);
 
   for (
-    const item of types
+    const item of visibleTypes
   ) {
 
     const option =
@@ -4707,15 +4737,16 @@ async function loadMeasurementReferences() {
   measurementVariables = variableResult.data || [];
   measurementUnits = unitResult.data || [];
 
+  const visibleVariables = workspaceMeasurementVariables(measurementVariables);
   measurementVariableSelect.innerHTML = "";
   const placeholder = document.createElement("option");
   placeholder.value = "";
-  placeholder.textContent = measurementVariables.length
+  placeholder.textContent = visibleVariables.length
     ? "Sélectionner un paramètre…"
-    : "Aucun paramètre disponible";
+    : "Aucun paramètre adapté à cet univers";
   measurementVariableSelect.appendChild(placeholder);
 
-  for (const variable of measurementVariables) {
+  for (const variable of visibleVariables) {
     const option = document.createElement("option");
     option.value = variable.code;
     option.textContent = `${variable.label} · ${variable.code}`;
@@ -4725,9 +4756,9 @@ async function loadMeasurementReferences() {
   observationVariableSelect.innerHTML = "";
   const observationPlaceholder = document.createElement("option");
   observationPlaceholder.value = "";
-  observationPlaceholder.textContent = measurementVariables.length ? "Sélectionner une catégorie…" : "Aucune catégorie disponible";
+  observationPlaceholder.textContent = visibleVariables.length ? "Sélectionner une catégorie…" : "Aucune catégorie adaptée à cet univers";
   observationVariableSelect.appendChild(observationPlaceholder);
-  for (const variable of measurementVariables) {
+  for (const variable of visibleVariables) {
     const option = document.createElement("option");
     option.value = variable.code;
     option.textContent = `${variable.label} · ${variable.code}`;
