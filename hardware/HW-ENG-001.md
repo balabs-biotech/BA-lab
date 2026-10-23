@@ -5,7 +5,7 @@
 * **Design target:** low-particulate horizontal laminar-flow workstation (aspiration: ISO 14644-1 Class 5 conditions)
 * **Status:** 🟠 **CONCEPT / PROTOTYPE — NOT QUALIFIED.** ISO Class 5 is a design aspiration, not a result.
 * **Licensing:** CERN Open Hardware Licence Version 2 - Permissive (CERN-OHL-P)
-* **Author:** SARL B.A. LAB — Hardware & Engineering Unit
+* **Author:** B.A. LAB project — Hardware & Engineering Unit
 
 > ⚠️ **Do not claim ISO 5 or validated aseptic use** until an independent qualification is done on the *assembled* unit: HEPA filter and seal integrity scan (aerosol photometer / particle counter), airborne particle count per ISO 14644-1, velocity uniformity and a documented protocol. The checks in section 4 are *commissioning checks*, not a qualification.
 > ⚠️ A horizontal laminar-flow hood blows air **towards the operator**. It protects the product, not the user. **Never handle pathogens, biohazardous or sensitising material in it** — that requires a certified biological safety cabinet.
@@ -15,7 +15,7 @@
 
 ## 📌 1. Technical Overview & Physics
 
-This document details the engineering specifications, dimensioning formulas, assembly protocol, and aeraulic validation for the SARL B.A. LAB laminar flow workstation. The workstation provides a horizontal laminar air stream filtered through a High-Efficiency Particulate Air (HEPA H14) filter, guaranteeing $99.995\%$ filtration efficiency for particles $\ge 0.3\ \mu\text{m}$.
+This document details the engineering specifications, dimensioning formulas, assembly protocol, and aeraulic validation for the B.A. LAB project laminar flow workstation. The workstation provides a horizontal laminar air stream filtered through a High-Efficiency Particulate Air (HEPA H14) filter, guaranteeing $99.995\%$ filtration efficiency for particles $\ge 0.3\ \mu\text{m}$.
 
 ### Aeraulic Sizing Formulas
 
