@@ -85,16 +85,25 @@
       grid.append(card("Pluie cumulée",rainTotal===null?"Indisponible":rainTotal.toFixed(1)+" mm","Somme estimée sur les jours disponibles"));
       grid.append(card("Humidité de l’air",humidity===null?"Indisponible":humidity.toFixed(0)+" %","Moyenne des observations disponibles"));
       summary.append(grid);
-      const notes=[];
-      if(temp!==null&&temp>=35)notes.push("Chaleur forte dans les données : vérifier l’humidité réelle du substrat et le stress thermique avant d’augmenter l’irrigation.");
-      if(rainTotal!==null&&rainTotal<=2)notes.push("Pluie estimée faible : pour une culture extérieure, contrôler l’humidité du sol avant d’arroser. En serre, la pluie n’indique pas le besoin en eau.");
-      if(humidity!==null&&humidity>=85)notes.push("Humidité de l’air élevée : surveiller la ventilation et les signes de maladies foliaires.");
-      if(!notes.length)notes.push("Aucun seuil d’alerte simple détecté dans ces indicateurs. Croisez toujours ces estimations régionales avec les mesures locales.");
-      const advice=node("ul",{class:"environmental-advice"});
-      notes.forEach(note=>advice.append(node("li",{},note)));
+      const signals=[];
+      const rainCoverage=rain.length;
+      const heatCoverage=maxTemps.length;
+      const humidityCoverage=humid.length;
+      if(temp!==null&&temp>=35)signals.push({priority:"Priorité élevée",title:"Épisode de chaleur à vérifier",text:"Le maximum régional atteint "+temp.toFixed(1)+" °C. Vérifiez l’humidité réelle du sol ou du substrat, le flétrissement et l’état des plantes aux heures chaudes. N’augmentez pas l’irrigation automatiquement sans contrôle de terrain."});
+      else if(temp!==null&&temp>=30)signals.push({priority:"Vigilance",title:"Températures élevées",text:"Le maximum régional atteint "+temp.toFixed(1)+" °C. Surveillez les cultures sensibles, surtout en pot ou sous serre, et contrôlez l’humidité réelle avant d’ajuster l’arrosage."});
+      if(rainCoverage>=5&&rainTotal!==null&&rainTotal<=2)signals.push({priority:"À vérifier",title:"Peu de précipitations récentes",text:"Le cumul estimé est de "+rainTotal.toFixed(1)+" mm sur "+rainCoverage+" jour(s) renseigné(s). En plein champ, contrôlez l’humidité du sol avant toute décision d’irrigation. Cette information ne permet pas de déduire seule le besoin en eau."});
+      else if(rainCoverage<5)signals.push({priority:"Données partielles",title:"Cumul de pluie insuffisamment couvert",text:"Seulement "+rainCoverage+" jour(s) contiennent une valeur de précipitation exploitable sur les jours affichés. Le cumul ne permet pas de conclure sur le déficit hydrique."});
+      if(humidityCoverage>=3&&humidity!==null&&humidity>=85)signals.push({priority:"Vigilance",title:"Humidité atmosphérique élevée",text:"La moyenne des valeurs disponibles est de "+humidity.toFixed(0)+" %. Vérifiez la ventilation sous serre et inspectez les feuilles. L’humidité régionale ne confirme ni la présence ni le risque certain d’une maladie."});
+      if(!signals.length)signals.push({priority:"Pas de signal simple",title:"Aucune alerte détectée par les règles actuelles",text:"Cela ne signifie pas que la culture est sans stress. Vérifiez les observations de terrain et les mesures locales ; les seuils ne sont pas encore adaptés à une espèce, un stade cultural ou un type de sol précis."});
+      const advice=node("div",{class:"environmental-advice"});
+      signals.forEach(signal=>{
+        const item=node("article",{class:"card"});
+        item.append(node("small",{class:"muted"},signal.priority),node("h3",{},signal.title),node("p",{},signal.text));
+        advice.append(item);
+      });
       const latestDay=days.length?days[days.length-1]:null;
-      const coverage=node("p",{class:"muted"},"Couverture : "+days.length+" jour(s) avec au moins une valeur exploitable sur la période affichée"+(latestDay?" · dernière date disponible : "+latestDay:"")+". Les variables peuvent avoir des dates manquantes.");
-      summary.append(advice,coverage,node("p",{class:"muted"},"Repères indicatifs, calculés à partir des 7 derniers jours disponibles (pas nécessairement les 7 derniers jours calendaires). Les sommes et moyennes ne remplacent pas les mesures locales. Pas de prévision ni de commande automatique d’irrigation."));
+      const coverage=node("p",{class:"muted"},"Qualité des données : "+days.length+" jour(s) avec au moins une valeur exploitable ; températures maximales "+heatCoverage+" jour(s), précipitations "+rainCoverage+" jour(s), humidité "+humidityCoverage+" jour(s)."+(latestDay?" Dernière date disponible : "+latestDay+".":""));
+      summary.append(node("h3",{},"Lecture agronomique provisoire"),advice,coverage,node("p",{class:"muted"},"Ces signaux sont des règles indicatives appliquées à des estimations NASA POWER sur grille régionale, pas à des mesures locales. Ils servent à décider quoi vérifier, pas à établir un diagnostic. La météo affichée est historique : aucune prévision ni commande automatique d’irrigation."));
     }
     async function loadRows(){
       const {data,error}=await db.from("environmental_observations").select("observed_at,variable_code,value,unit_code,provider_code,quality_flag").eq("location_id",location.value).eq("data_family","weather").gte("observed_at",from.value+"T00:00:00Z").lte("observed_at",to.value+"T23:59:59Z").order("observed_at",{ascending:false}).limit(1000);
