@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-// Copyright (c) 2026 SARL B.A. LAB
+// Copyright (c) 2026 B.A. LAB project
 //
 // Pure control logic for the B.A. LAB ESP32 nodes.
 // No hardware access: every function takes its inputs explicitly so it can be
