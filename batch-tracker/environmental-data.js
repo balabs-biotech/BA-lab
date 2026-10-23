@@ -97,7 +97,7 @@
       const trend=node("div",{class:"card"});
       trend.append(node("h3",{},"Évolution par rapport aux 7 dates précédentes"));
       const comparisons=[];
-      const compare=(label,current,previous,unit,mode,minCount,currentCount,previousCount)=>{
+      const compare=(label,current,previous,unit,minCount,currentCount,previousCount)=>{
         if(currentCount<minCount||previousCount<minCount||current===null||previous===null){
           comparisons.push(label+" : comparaison indisponible (historique insuffisant).");
           return;
@@ -106,9 +106,9 @@
         const direction=Math.abs(delta)<0.1?"stable":delta>0?"en hausse":"en baisse";
         comparisons.push(label+" : "+direction+" ("+(delta>0?"+":"")+delta.toFixed(1)+" "+unit+").");
       };
-      compare("Pic de température",temp,previousTemp,"°C","max",5,maxTemps.length,previousTemps.length);
-      compare("Pluie cumulée",rainTotal,previousRainTotal,"mm","sum",5,rain.length,previousRain.length);
-      compare("Humidité moyenne",humidity,previousHumidity,"points de %","mean",3,humid.length,previousHumid.length);
+      compare("Pic de température",temp,previousTemp,"°C",5,maxTemps.length,previousTemps.length);
+      compare("Pluie cumulée",rainTotal,previousRainTotal,"mm",7,rain.length,previousRain.length);
+      compare("Humidité moyenne",humidity,previousHumidity,"points de %",3,humid.length,previousHumid.length);
       comparisons.forEach(line=>trend.append(node("p",{class:"muted"},line)));
       trend.append(node("small",{class:"muted"},"Comparaison descriptive de périodes constituées des dernières dates disponibles, pas nécessairement de 7 jours calendaires consécutifs. Une hausse ou une baisse n’établit pas à elle seule un stress cultural."));
       summary.append(trend);
