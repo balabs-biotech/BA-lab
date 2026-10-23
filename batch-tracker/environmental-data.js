@@ -64,7 +64,7 @@
     const satelliteHint=node("p",{class:"muted"},"Sentinel-2 : scènes disponibles et couverture nuageuse. L’image ne constitue pas à elle seule un diagnostic de culture.");
     panel.append(form,picker,status,summary,satelliteHint,satelliteButton,satelliteResults,details);
     let locationMap=null, locationMarker=null, mapReady=false;
-    function setMapPoint(latitude,longitude,origin,precision=null){
+    function setMapPoint(latitude,longitude,origin,precision=null,zoomToPoint=false){
       lat.value=String(latitude);lon.value=String(longitude);accuracy.value=precision==null?"":String(precision);
       source.value=origin;
       if(locationMap){
@@ -77,7 +77,7 @@
             mapStatus.textContent="Repère déplacé : "+p.lat.toFixed(6)+", "+p.lng.toFixed(6)+". Enregistrez pour confirmer.";
           });
         } else locationMarker.setLatLng(point);
-        locationMap.setView(point,Math.max(locationMap.getZoom(),13));
+        if(zoomToPoint)locationMap.setView(point,Math.max(locationMap.getZoom(),13));
       }
       mapStatus.textContent="Point sélectionné : "+latitude.toFixed(6)+", "+longitude.toFixed(6)+(precision==null?"":" · précision estimée "+Math.round(precision)+" m")+". Enregistrez pour l’associer à l’emplacement choisi.";
     }
@@ -100,7 +100,7 @@
       L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,attribution:'&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a>'}).addTo(locationMap);
       locationMap.on("click",event=>setMapPoint(event.latlng.lat,event.latlng.lng,"map_estimate"));
       mapReady=true;
-      if(lat.value!==""&&lon.value!=="")setMapPoint(Number(lat.value),Number(lon.value),source.value||"user_confirmed",accuracy.value===""?null:Number(accuracy.value));
+      if(lat.value!==""&&lon.value!=="")setMapPoint(Number(lat.value),Number(lon.value),source.value||"user_confirmed",accuracy.value===""?null:Number(accuracy.value),true);
       else mapStatus.textContent="Cliquez sur la carte pour placer le repère. La carte peut être déplacée et zoomée.";
       setTimeout(()=>locationMap.invalidateSize(),100);
     }
@@ -108,7 +108,7 @@
       if(!navigator.geolocation){mapStatus.textContent="La géolocalisation n’est pas prise en charge par ce navigateur.";return;}
       locateButton.disabled=true;mapStatus.textContent="Demande de position… Autorisez la localisation dans le navigateur si demandé.";
       navigator.geolocation.getCurrentPosition(pos=>{
-        setMapPoint(pos.coords.latitude,pos.coords.longitude,"gps_field",pos.coords.accuracy);
+        setMapPoint(pos.coords.latitude,pos.coords.longitude,"gps_field",pos.coords.accuracy,true);
         if(locationMap)locationMap.setView([pos.coords.latitude,pos.coords.longitude],16);
         locateButton.disabled=false;
       },err=>{
@@ -135,7 +135,7 @@
       if(!data)return;
       lat.value=data.latitude??""; lon.value=data.longitude??""; accuracy.value=data.coordinate_accuracy_m??"";
       if(data.coordinate_source && [...source.options].some(o=>o.value===data.coordinate_source))source.value=data.coordinate_source;
-      if(mapReady&&data.latitude!=null&&data.longitude!=null)setMapPoint(Number(data.latitude),Number(data.longitude),source.value, data.coordinate_accuracy_m==null?null:Number(data.coordinate_accuracy_m));
+      if(mapReady&&data.latitude!=null&&data.longitude!=null)setMapPoint(Number(data.latitude),Number(data.longitude),source.value, data.coordinate_accuracy_m==null?null:Number(data.coordinate_accuracy_m),true);
     }
     function renderClimateSummary(data){
       summary.replaceChildren();
