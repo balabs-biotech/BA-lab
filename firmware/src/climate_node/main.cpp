@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-// Copyright (c) 2026 SARL B.A. LAB
+// Copyright (c) 2026 B.A. LAB project
 //
 // B.A. LAB — Environmental & Incubation Climate Node (ESP32 + DHT22).
 // Regulates temperature and relative humidity, plus a timed air purge.
