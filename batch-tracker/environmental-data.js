@@ -18,7 +18,7 @@
     const panel = node("section", {id:"environmentalCard", class:"card hidden"});
     panel.append(node("div",{class:"section-kicker"},"OSINT AGRO-ENVIRONNEMENTAL"));
     panel.append(node("h2",{},"Contexte environnemental"));
-    panel.append(node("p",{class:"muted"},"Historique NASA POWER. Les valeurs sont des estimations climatiques sur grille régionale, pas des mesures locales ni des prévisions."));
+    panel.append(node("p",{class:"muted"},"Historique NASA POWER : températures, précipitations, rayonnement solaire, humidité relative et vent. Estimations sur grille régionale, pas des mesures locales ni des prévisions."));
     const form = node("div",{class:"grid"});
     const field = (label,id,input) => { const w=node("div"); w.append(node("label",{for:id},label),input); return w; };
     const location=node("select",{id:"envLocation"}); location.append(node("option",{value:""},"Choisir un emplacement…"));
@@ -64,7 +64,8 @@
       ["Date","Variable","Valeur","Unité","Source"].forEach(t=>head.append(node("th",{},t)));
       const thead=node("thead");thead.append(head);table.append(thead);
       const tbody=node("tbody");
-      data.forEach(r=>{const tr=node("tr");[String(r.observed_at).slice(0,10),r.variable_code,r.value==null?"—":String(r.value),r.unit_code||"—",r.provider_code+" · "+(r.quality_flag||"")].forEach(t=>tr.append(node("td",{},t)));tbody.append(tr);});
+      const labels={air_temperature_mean:"Température moyenne",air_temperature_max:"Température maximale",air_temperature_min:"Température minimale",precipitation_corrected:"Précipitations",solar_radiation_all_sky:"Rayonnement solaire",relative_humidity_mean:"Humidité relative moyenne",wind_speed_mean:"Vitesse moyenne du vent"};
+      data.forEach(r=>{const tr=node("tr");[String(r.observed_at).slice(0,10),labels[r.variable_code]||r.variable_code,r.value==null?"—":String(r.value),r.unit_code||"—",r.provider_code+" · "+(r.quality_flag||"")].forEach(t=>tr.append(node("td",{},t)));tbody.append(tr);});
       table.append(tbody);results.append(table);
     }
     location.addEventListener("change",selectLocation);
