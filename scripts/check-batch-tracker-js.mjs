@@ -183,7 +183,7 @@ for (const snippet of [
 }
 console.log("✓ Potential outliers use the 1.5×IQR rule only with at least four numeric measurements");
 
-const plantMigration=fs.readFileSync("supabase/migrations/20261023010000_add_agritech_plant_cultures.sql","utf8");
+const plantMigration=fs.readFileSync("supabase/migrations/20261023010136_add_agritech_plant_cultures.sql","utf8");
 if(!template.includes('id="plantCultureForm"')||!template.includes('id="plantCard"')||!template.includes('value="tomato_cherry"')||!template.includes('value="tomato"'))throw new Error("AgriTech plant registry form or tomato types are missing");
 if(!engine.includes('from("plant_cultures")')||!engine.includes('domain: "agronomy"')||!engine.includes('if (activeDomain === "agronomy") return false;'))throw new Error("AgriTech registry persistence or domain separation is missing");
 if(!engine.includes('domain: document.body.dataset.domain === "laboratory" ? "laboratory" : "mycology"'))throw new Error("Biological culture records must retain their originating workspace");
