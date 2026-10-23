@@ -252,7 +252,17 @@
       try{
         const {data,error}=await db.functions.invoke("nasa-power-agroclimate",{body:{location_id:location.value,start_date:from.value,end_date:to.value,refresh:forceRefresh}});
         if(error){status.textContent="Échec : "+(error.context?.json?.error||error.message);return;}
-        status.textContent=data?.ok?(data.cached?"Cache récent":forceRefresh?"Actualisation terminée":"Import terminé")+" — "+data.records+" enregistrements. Données estimées sur grille, non mesurées localement.":"Import refusé : "+(data?.error||"réponse invalide");
+        if(data?.ok){
+          const detail=data.cached
+            ? "Cache réutilisé ; "+(data.variables_checked??0)+" variables principales vérifiées."
+            : (data.records??0)+" enregistrements importés.";
+          status.textContent=(data.cached?"Cache historique validé":forceRefresh?"Actualisation terminée":"Import terminé")+" — "+detail+" Données estimées sur grille, non mesurées localement.";
+          if(Array.isArray(data.coverage_by_variable)&&data.coverage_by_variable.length){
+            status.textContent+=" Couverture du cache : "+data.coverage_by_variable.map(x=>x.variable+" "+x.days+" j").join(", ")+".";
+          }
+        }else{
+          status.textContent="Import refusé : "+(data?.error||"réponse invalide");
+        }
         await loadRows();
       }catch(error){status.textContent="Échec de la collecte : "+(error?.message||"erreur inconnue");}
       finally{run.disabled=false;refresh.disabled=false;}
