@@ -188,6 +188,10 @@
         return;
       }
       if(data.coordinate_source && [...source.options].some(o=>o.value===data.coordinate_source))source.value=data.coordinate_source;
+      // Keep the coordinate inputs populated even while the map library is still loading.
+      lat.value=data.latitude??"";
+      lon.value=data.longitude??"";
+      accuracy.value=data.coordinate_accuracy_m??"";
       if(data.latitude!=null&&data.longitude!=null){
         setMapPoint(Number(data.latitude),Number(data.longitude),source.value,data.coordinate_accuracy_m==null?null:Number(data.coordinate_accuracy_m),true);
       }else{
