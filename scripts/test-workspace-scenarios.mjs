@@ -23,7 +23,9 @@ const functionSource = engine.slice(start, end);
 function extractFunction(source, name) {
   const start = source.indexOf(`function ${name}(`);
   if (start < 0) throw new Error(name + "() not found");
-  const open = source.indexOf("{", start);
+  const signatureEnd = source.indexOf(") {", start);
+  if (signatureEnd < 0) throw new Error("Could not find body for " + name + "()");
+  const open = signatureEnd + 2;
   let depth = 0;
   for (let i = open; i < source.length; i++) {
     if (source[i] === "{") depth++;
