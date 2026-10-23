@@ -159,6 +159,8 @@ jobs:
         run: node --experimental-strip-types supabase/tests/sync-culture-to-notion.test.mts
       - name: Test Sentinel-2 catalogue security and query contract
         run: node supabase/tests/copernicus-sentinel-catalogue.test.mjs
+      - name: Test Sentinel-2 frontend catalogue contract
+        run: node supabase/tests/sentinel-2-frontend-contract.test.mjs
 
   supabase-migration-replay:
     runs-on: ubuntu-latest
