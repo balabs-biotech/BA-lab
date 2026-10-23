@@ -4,13 +4,13 @@
 * **Version:** 1.0
 * **Biosafety Level:** BSL-1
 * **Target Species:** *Hericium erinaceus*, *Pleurotus ostreatus*, *Cordyceps militaris*, *Agrocybe aegerita*
-* **Author:** SARL B.A. LAB — Mycology Unit
+* **Author:** B.A. LAB project — Mycology Unit
 
 ---
 
 ## 🎯 1. Objective & Scope
 
-This Standard Operating Procedure (SOP) defines the protocol for maintaining vegetative mycelial vigor, avoiding somatic senescence (sectoring), and ensuring high-viability long-term storage of elite fungal cultures in the SARL B.A. LAB Strain Bank. It covers routine aseptic transfer, mineral oil overlay for medium-term preservation, and cryopreservation protocols.
+This Standard Operating Procedure (SOP) defines the protocol for maintaining vegetative mycelial vigor, avoiding somatic senescence (sectoring), and ensuring high-viability long-term storage of elite fungal cultures in the B.A. LAB project Strain Bank. It covers routine aseptic transfer, mineral oil overlay for medium-term preservation, and cryopreservation protocols.
 
 ---
 
@@ -70,4 +70,4 @@ B.A. LAB Strain Registry using the code:BAL-MYC-[SPECIES_CODE]-[STRAIN_ID]-[PASS
 Growth Rate (mm/day)
 Pleurotus: 8-12 mm/day
 Hericium: 4-6 mm/day 30% reduction from baseline growth velocity  Sterility Check 0 bacterial colonies / zero mold halos Discard culture immediately via autoclaving
-📜 Strain Cataloging Syntax All preserved units must be registered in the SARL B.A. LAB Strain Registry using the code: BAL-MYC-[SPECIES_CODE]-[STRAIN_ID]-[PASSAGE_NUM]-[YEAR]Example: BAL-MYC-HER-001-P2-2026 (Hericium erinaceus strain 001, Passage 2, preserved 2026).
+📜 Strain Cataloging Syntax All preserved units must be registered in the B.A. LAB project Strain Registry using the code: BAL-MYC-[SPECIES_CODE]-[STRAIN_ID]-[PASSAGE_NUM]-[YEAR]Example: BAL-MYC-HER-001-P2-2026 (Hericium erinaceus strain 001, Passage 2, preserved 2026).
