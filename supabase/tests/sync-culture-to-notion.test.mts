@@ -76,7 +76,7 @@ function page(id: string, cultureId: string, dbId = DB_ID, extra: Json = {}) {
   };
 }
 
-function reset(overrides: { env?: Json; notion?: typeof notion; cultures?: Json[]; visible?: string[]; userOk?: boolean } = {}) {
+function reset(overrides: { env?: Json; notion?: typeof notion; cultures?: Json[]; visible?: string[]; userOk?: boolean; updateError?: string } = {}) {
   env = {
     SUPABASE_URL: "http://sb.test", SUPABASE_PUBLISHABLE_KEY: "pub", SUPABASE_SECRET_KEY: "svc",
     NOTION_API_KEY: "test-token-not-a-secret", NOTION_CULTURES_DATABASE_ID: DB_ID, ...(overrides.env ?? {}),
@@ -85,6 +85,7 @@ function reset(overrides: { env?: Json; notion?: typeof notion; cultures?: Json[
     cultures: overrides.cultures ?? [{ id: CULTURE, organization_id: ORG, code: "cult-p80-g1", culture_type: "mycelium", notion_page_id: null }],
     visible: overrides.visible ?? [CULTURE],
     userOk: overrides.userOk ?? true,
+    updateError: overrides.updateError,
   };
   notion = overrides.notion ?? (() => ({ status: 500, body: { message: "unexpected notion call" } }));
   notionCalls = []; updates = []; queries = [];
@@ -217,6 +218,43 @@ await test("le jeton Notion n'apparaît dans aucune réponse ni message d'erreur
   const r = await call();
   ok(!JSON.stringify(r.body).includes("test-token-not-a-secret"), "token leaked in response");
   ok(!JSON.stringify(updates).includes("test-token-not-a-secret"), "token leaked in stored error");
+});
+
+await test("récupération après création Notion mais échec de sauvegarde Supabase : la relance retrouve la page", async () => {
+  let createdPage: Json | null = null;
+  let queryCount = 0;
+  const mockNotion = (url: string, init: Json) => {
+    if (url.endsWith("/query")) {
+      queryCount++;
+      return { status: 200, body: { results: createdPage ? [createdPage] : [] } };
+    }
+    if (init.method === "POST" && url.endsWith("/v1/pages")) {
+      createdPage = page("page-recovered", CULTURE);
+      return { status: 200, body: createdPage };
+    }
+    if (init.method === "PATCH" && url.includes("/v1/pages/page-recovered")) {
+      return { status: 200, body: createdPage ?? {} };
+    }
+    return { status: 200, body: {} };
+  };
+
+  reset({ notion: mockNotion, updateError: "temporary Supabase write failure" });
+  const first = await call();
+  eq(first.status, 502, "first sync status");
+  eq(creates().length, 1, "first sync creates exactly one page");
+
+  // Simulate a retry after the Supabase write path recovers, while the page id
+  // is still absent from the stored culture row.
+  db.updateError = undefined;
+  notionCalls = [];
+  updates = [];
+  queries = [];
+  const second = await call();
+  eq(second.status, 200, "retry status");
+  eq(creates().length, 0, "retry must not create a duplicate");
+  eq(second.body.notion_page_id, "page-recovered", "recovered page id");
+  eq(finalUpdate().payload.notion_page_id, "page-recovered", "page link persisted on retry");
+  ok(queryCount >= 2, "retry must reconcile against Notion");
 });
 
 console.log(failed ? `\n${failed} test(s) en échec` : "\nOK: sync-culture-to-notion tests passed");
