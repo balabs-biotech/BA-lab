@@ -846,6 +846,9 @@ async function initializeAuthenticatedTracker(
 
     await loadBatchPlaceOptions();
 
+    populatePlantLocationOptions();
+    document.getElementById("plantLocation")?.dispatchEvent(new Event("change"));
+
     await loadPlantCultures();
 
     await syncPendingCultures();
@@ -5788,6 +5791,8 @@ function activateWorkspaceModule(moduleId) {
   };
   const activeDomain = document.body.dataset.domain;
   const modules = modulesByDomain[activeDomain] || modulesByDomain.laboratory;
+  document.getElementById("trackerCard")?.classList.toggle("workspace-inactive", activeDomain === "agronomy");
+  document.getElementById("plantCard")?.classList.toggle("workspace-inactive", activeDomain !== "agronomy");
   document.querySelectorAll("[data-domain-nav]").forEach(link => {
     link.hidden = link.dataset.domainNav === "agronomy" ? activeDomain !== "agronomy" : activeDomain === "agronomy";
   });
@@ -6323,6 +6328,12 @@ function setupDomainWorkspaces() {
     buttons.forEach(button => button.setAttribute("aria-pressed", String(button.dataset.domainChoice === activeDomain)));
     if (heading) heading.textContent = config.heading;
     if (description) description.textContent = config.description;
+    const cultureEntryTitle = document.getElementById("cultureEntryTitle");
+    const strainLabel = document.getElementById("strainLabel");
+    const cultureTypeLabel = document.getElementById("cultureTypeLabel");
+    if (cultureEntryTitle) cultureEntryTitle.textContent = activeDomain === "laboratory" ? "Nouvelle culture de laboratoire" : "Nouvelle culture fongique";
+    if (strainLabel) strainLabel.textContent = activeDomain === "laboratory" ? "Souche / ressource biologique source" : "Souche fongique source";
+    if (cultureTypeLabel) cultureTypeLabel.textContent = activeDomain === "laboratory" ? "Format de culture au laboratoire" : "Support / forme de culture";
     if (eyebrow) eyebrow.innerHTML = config.eyebrow.replace(" / ", ' <span class="eyebrow-separator">/</span> ');
     if (title) title.innerHTML = config.title;
     if (heroDescription) heroDescription.textContent = config.descriptionHero;
