@@ -14,8 +14,9 @@ const checks = [
   ["requests a conservative scene cloud-cover threshold", /max_cloud_cover:60/],
   ["renders scene details with DOM text nodes", /node\("strong",\{\},scene\.acquired_at/],
   ["opens catalogue links in a protected new tab", /target:"_blank",rel:"noopener noreferrer"/],
-  ["explains that scene-wide cloud cover is not parcel-level quality", /couverture nuageuse est celle de la scène entière/],
-  ["does not claim that NDVI or imagery analysis is already available", /indices végétaux ne sont pas encore analysés/],
+  ["renders catalogue-provided preview images", /if\(scene\.preview_url\)[\s\S]*?node\("img"/],
+  ["handles missing preview images without breaking scene cards", /Aucun aperçu image fourni par le catalogue/],
+  ["does not claim that parcel-level NDVI analysis is already available", /calcul NDVI et le traitement des bandes satellite restent à intégrer/],
   ["restores the button after success or failure", /finally\{satelliteButton\.disabled=false;\}/],
 ];
 

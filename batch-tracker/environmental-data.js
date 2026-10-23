@@ -128,10 +128,17 @@
           item.append(node("strong",{},scene.acquired_at?new Date(scene.acquired_at).toLocaleDateString():"Date inconnue"));
           item.append(node("p",{},(scene.platform||"Sentinel-2")+" · nuages "+(scene.cloud_cover_percent==null?"inconnus":scene.cloud_cover_percent.toFixed(1)+" %")));
           item.append(node("small",{class:"muted"},scene.id||"Identifiant de scène indisponible"));
+          if(scene.preview_url){
+            const preview=node("img",{src:scene.preview_url,alt:"Aperçu satellite Sentinel-2 du "+(scene.acquired_at||"date inconnue"),loading:"lazy",decoding:"async",style:"display:block;width:100%;max-height:320px;object-fit:contain;background:#111827;border-radius:8px;margin:12px 0"});
+            preview.addEventListener("error",()=>{preview.remove();item.append(node("p",{class:"muted"},"Aperçu non accessible depuis le navigateur pour cette scène."));},{once:true});
+            item.append(preview);
+          } else {
+            item.append(node("p",{class:"muted"},"Aucun aperçu image fourni par le catalogue pour cette scène."));
+          }
           if(scene.catalogue_item_url){const a=node("a",{href:scene.catalogue_item_url,target:"_blank",rel:"noopener noreferrer"},"Ouvrir la fiche de la scène");item.append(a);}
           satelliteResults.append(item);
         });
-        satelliteResults.append(node("p",{class:"muted"},"La couverture nuageuse est celle de la scène entière, pas nécessairement celle de la parcelle. Les images et indices végétaux ne sont pas encore analysés."));
+        satelliteResults.append(node("p",{class:"muted"},"Les aperçus sont des vignettes de catalogue, pas une analyse de la parcelle. Le calcul NDVI et le traitement des bandes satellite restent à intégrer."));
       }catch(e){satelliteResults.replaceChildren(node("p",{class:"muted"},"Échec de la recherche : "+(e?.message||"erreur inconnue")));}
       finally{satelliteButton.disabled=false;}
     }
