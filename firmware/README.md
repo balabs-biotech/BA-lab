@@ -2,7 +2,7 @@
 
 **Canonical location** of all firmware: one PlatformIO project. It replaces `firmware/esp32_climate_node.ino`, `iot-digital/` and `02_IoT_and_Automation/`.
 
-> **Status: not qualified on hardware.** The control logic passes host-side tests, but the firmware has **not** been compiled with PlatformIO or run on a real ESP32. Every value in `config.h` is a **provisional default**.
+> **Status: not qualified on hardware.** The firmware build is checked in hosted CI, and the control logic passes host-side tests; the firmware has **not** been validated on a physical ESP32. Every value in `config.h` is a **provisional default**.
 
 ## Two nodes
 
@@ -24,7 +24,7 @@ pio run -e irrigation_node --target upload
 sh test/run_tests.sh                 # logic tests + syntax check (needs g++, no hardware)
 ```
 
-Platform and library versions in `platformio.ini` have not been verified by a real `pio run`; pin exact versions after the first successful build. `test/mocks/` holds fake headers used only for the syntax check; they do not replace the real ESP32 SDK or the real SCD4x library.
+The hosted CI build checks the PlatformIO configuration. Physical sensor, relay, timing and electrical behavior still require controlled validation on the actual hardware. `test/mocks/` holds fake headers used only for the syntax check; they do not replace the real ESP32 SDK or the real SCD4x library.
 
 ## Safety model
 
