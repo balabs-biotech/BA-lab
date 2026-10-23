@@ -34,9 +34,10 @@
     form.append(field("Emplacement","envLocation",location),field("Latitude","envLat",lat),field("Longitude","envLon",lon),field("Précision des coordonnées (m)","envAccuracy",accuracy),field("Origine des coordonnées","envSource",source),field("Du","envFrom",from),field("Au","envTo",to));
     const save=node("button",{type:"button"},"Enregistrer les coordonnées");
     const run=node("button",{type:"button"},"Importer NASA POWER");
+    const refresh=node("button",{type:"button"},"Forcer l’actualisation");
     const status=node("p",{class:"muted","aria-live":"polite"},"Choisissez un emplacement et confirmez ses coordonnées.");
     const results=node("div",{id:"envResults",class:"overview-observations"});
-    form.append(save,run,status); panel.append(form,results); plant.parentNode.insertBefore(panel,plant.nextSibling);
+    form.append(save,run,refresh,status); panel.append(form,results); plant.parentNode.insertBefore(panel,plant.nextSibling);
     const nav=document.querySelector(".section-nav");
     if(nav && !document.getElementById("envNav")) { const a=node("a",{href:"#environmentalCard",id:"envNav"},"Contexte environnemental"); nav.append(a); }
 
@@ -75,16 +76,22 @@
       const {error}=await db.from("locations").update({latitude:a,longitude:o,coordinate_accuracy_m:acc,coordinate_source:source.value}).eq("id",location.value);
       status.textContent=error?"Échec de l’enregistrement : "+error.message:"Coordonnées enregistrées.";
     });
-    run.addEventListener("click",async()=>{
+    async function importWeather(forceRefresh=false){
       if(!location.value||!from.value||!to.value||from.value>to.value){status.textContent="Choisissez un emplacement et une période valide.";return;}
       const days=(Date.parse(to.value)-Date.parse(from.value))/86400000+1;
       if(days>366){status.textContent="La période maximale est de 366 jours.";return;}
-      status.textContent="Collecte en cours…";
-      const {data,error}=await db.functions.invoke("nasa-power-agroclimate",{body:{location_id:location.value,start_date:from.value,end_date:to.value}});
-      if(error){status.textContent="Échec : "+(error.context?.json?.error||error.message);return;}
-      status.textContent=data?.ok?(data.cached?"Cache récent":"Import terminé")+" — "+data.records+" enregistrements. Données estimées sur grille, non mesurées localement.":"Import refusé : "+(data?.error||"réponse invalide");
-      await loadRows();
-    });
+      run.disabled=true; refresh.disabled=true;
+      status.textContent=forceRefresh?"Actualisation forcée en cours…":"Collecte en cours…";
+      try{
+        const {data,error}=await db.functions.invoke("nasa-power-agroclimate",{body:{location_id:location.value,start_date:from.value,end_date:to.value,refresh:forceRefresh}});
+        if(error){status.textContent="Échec : "+(error.context?.json?.error||error.message);return;}
+        status.textContent=data?.ok?(data.cached?"Cache récent":forceRefresh?"Actualisation terminée":"Import terminé")+" — "+data.records+" enregistrements. Données estimées sur grille, non mesurées localement.":"Import refusé : "+(data?.error||"réponse invalide");
+        await loadRows();
+      }catch(error){status.textContent="Échec de la collecte : "+(error?.message||"erreur inconnue");}
+      finally{run.disabled=false;refresh.disabled=false;}
+    }
+    run.addEventListener("click",()=>importWeather(false));
+    refresh.addEventListener("click",()=>importWeather(true));
     const {data: authState}=await db.auth.getSession();
     if(!authState?.session){
       status.textContent="Connectez-vous à CultureOps pour accéder aux emplacements de votre organisation.";
