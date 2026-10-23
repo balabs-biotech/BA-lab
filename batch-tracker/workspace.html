@@ -12,7 +12,8 @@
     <div class="toolbar-divider" aria-hidden="true"></div>
     <nav class="section-nav" aria-label="Navigation des modules">
       <a href="#overviewCard"><span class="nav-number">01</span> Vue générale</a>
-      <a href="#trackerCard"><span class="nav-number">02</span> Cultures</a>
+      <a href="#trackerCard" data-domain-nav="biological"><span class="nav-number">02</span> Cultures biologiques</a>
+      <a href="#plantCard" data-domain-nav="agronomy"><span class="nav-number">02</span> Cultures végétales</a>
       <a href="#batchCard"><span class="nav-number">03</span> Lots</a>
       <a href="#measurementCard"><span class="nav-number">04</span> Données</a>
       <a href="#statisticsCard"><span class="nav-number">05</span> Statistiques</a>
@@ -165,10 +166,10 @@
   >
 
     <div class="section-kicker"><span>MODULE 02</span><span class="kicker-line"></span><span>RESSOURCES BIOLOGIQUES</span></div>
-    <div class="entry-intro"><span class="entry-step-mark">01 / IDENTITÉ</span><h2>Nouvelle culture</h2><p class="muted">On commence par identifier la ressource. Les champs suivants apparaissent quand les informations de base sont renseignées.</p></div>
+    <div class="entry-intro"><span class="entry-step-mark">01 / IDENTITÉ</span><h2 id="cultureEntryTitle">Nouvelle culture</h2><p class="muted">On commence par identifier la ressource. Les champs suivants apparaissent quand les informations de base sont renseignées.</p></div>
     <div class="guided-entry-step" data-entry-step="1">
 
-    <label for="strain">
+    <label for="strain" id="strainLabel">
       Souche / ressource biologique<span class="req" aria-hidden="true"> *</span>
     </label>
 
@@ -207,7 +208,7 @@
 
       <div>
 
-        <label for="cultureType">
+        <label for="cultureType" id="cultureTypeLabel">
           Type de culture
         </label>
 
@@ -350,6 +351,85 @@
 
   </section>
 
+
+  <!-- ======================================================
+       REGISTRE AGRITECH — CULTURES VEGETALES
+       ====================================================== -->
+
+  <section class="card hidden" id="plantCard" aria-labelledby="plantCardTitle">
+    <div class="section-kicker"><span>MODULE 02</span><span class="kicker-line"></span><span>AG RITECH / REGISTRE VEGETAL</span></div>
+    <h2 id="plantCardTitle">Cultures végétales</h2>
+    <p class="muted">Suivez les plantes par unité de culture, variété, emplacement et substrat. Ce registre est séparé des souches fongiques et des cultures de laboratoire.</p>
+
+    <form id="plantCultureForm" class="grid" autocomplete="off">
+      <div>
+        <label for="plantCode">Code de l’unité <span class="req" aria-hidden="true">*</span></label>
+        <input id="plantCode" required maxlength="100" placeholder="Ex. DF1-MARMANDE ou SERRE-YELLOW-PEAR">
+      </div>
+      <div>
+        <label for="plantCropType">Culture végétale <span class="req" aria-hidden="true">*</span></label>
+        <select id="plantCropType" required>
+          <option value="">Choisir une culture…</option>
+          <option value="tomato_cherry">Tomate cerise</option>
+          <option value="tomato">Tomate</option>
+          <option value="zucchini">Courgette</option>
+          <option value="basil">Basilic</option>
+          <option value="mint">Menthe</option>
+          <option value="long_bean">Haricot kilomètre</option>
+          <option value="pattypan_squash">Pâtisson</option>
+          <option value="luffa">Luffa</option>
+          <option value="bottle_gourd">Gourde pèlerine</option>
+          <option value="other">Autre culture</option>
+        </select>
+      </div>
+      <div>
+        <label for="plantCultivar">Variété / cultivar <span class="req" aria-hidden="true">*</span></label>
+        <input id="plantCultivar" list="plantCultivarOptions" required maxlength="160" placeholder="Ex. Yellow Pear">
+        <datalist id="plantCultivarOptions"></datalist>
+      </div>
+      <div>
+        <label for="plantQuantity">Nombre de plantes / unités</label>
+        <input id="plantQuantity" type="number" min="1" step="1" value="1" required>
+      </div>
+      <div>
+        <label for="plantLocation">Emplacement</label>
+        <select id="plantLocation"><option value="">Non précisé</option></select>
+      </div>
+      <div>
+        <label for="plantEnvironment">Environnement / unité</label>
+        <select id="plantEnvironment"><option value="">Non précisé</option></select>
+      </div>
+      <div>
+        <label for="plantSubstrate">Substrat / système</label>
+        <input id="plantSubstrate" maxlength="240" placeholder="Ex. Technosoil · DF1">
+      </div>
+      <div>
+        <label for="plantStartedAt">Date de plantation / démarrage</label>
+        <input id="plantStartedAt" type="datetime-local">
+      </div>
+      <div>
+        <label for="plantStatus">État</label>
+        <select id="plantStatus">
+          <option value="active">En culture</option>
+          <option value="planned">Planifiée</option>
+          <option value="harvested">Récoltée</option>
+          <option value="lost">Perdue / arrêtée</option>
+          <option value="archived">Archivée</option>
+        </select>
+      </div>
+      <div class="bio-operation-wide">
+        <label for="plantNotes">Notes de suivi</label>
+        <textarea id="plantNotes" rows="2" maxlength="4000" placeholder="Observations, taille, irrigation ou contexte expérimental…"></textarea>
+      </div>
+      <div class="bio-operation-wide">
+        <button id="savePlantCultureButton" type="submit">Enregistrer la culture végétale</button>
+        <p id="plantCultureStatus" class="muted" role="status" aria-live="polite">Les fiches végétales seront enregistrées séparément des cultures fongiques.</p>
+      </div>
+    </form>
+
+    <div class="overview-section-heading"><h3>Registre des cultures végétales</h3><span id="plantCultureCount" class="culture-catalog-count">0</span></div>
+    <div id="plantCultureList" class="culture-catalog-list" aria-live="polite"><p class="muted">Connectez-vous pour charger les cultures végétales.</p></div>
+  </section>
 
   <!-- ======================================================
        LOTS DE PRODUCTION
