@@ -4904,24 +4904,6 @@ async function saveMeasurement() {
       }).select("id").single();
       if (eventError) throw new Error(cultureWorkflowText("eventError") + eventError.message);
       eventId = event.id;
-    } else if (targetType === "plant") {
-      const plant = plantCultureOptions.find(item => item.id === targetId);
-      if (!plant) throw new Error("L’unité végétale sélectionnée n’est plus disponible.");
-      plantCultureId = plant.id;
-      environmentId = plant.environment_id || null;
-      locationId = plant.location_id || null;
-      const eventResult = await supabaseClient.from("events").insert({
-        organization_id: organizationId,
-        event_type: "observation_recorded",
-        occurred_at: observedAt,
-        actor_user_id: session.user.id,
-        plant_culture_id: plantCultureId,
-        environment_id: environmentId,
-        location_id: locationId,
-        payload: { variable_code: variable.code, value_text: valueText, source: "agritech-manual" }
-      }).select("id").single();
-      if (eventResult.error) throw new Error(cultureWorkflowText("eventError") + eventResult.error.message);
-      eventId = eventResult.data.id;
     } else if (targetType === "batch") {
       const batch = latestBatches.find(item => item.id === targetId);
       if (!batch) throw new Error(cultureWorkflowText("batchMissing"));
@@ -5114,6 +5096,24 @@ async function saveObservation() {
       const culture = cultureOptions.find(item => item.id === targetId);
       if (!culture) throw new Error(cultureWorkflowText("cultureMissing"));
       cultureId = culture.id;
+    } else if (targetType === "plant") {
+      const plant = plantCultureOptions.find(item => item.id === targetId);
+      if (!plant) throw new Error("L’unité végétale sélectionnée n’est plus disponible.");
+      plantCultureId = plant.id;
+      environmentId = plant.environment_id || null;
+      locationId = plant.location_id || null;
+      const eventResult = await supabaseClient.from("events").insert({
+        organization_id: organizationId,
+        event_type: "observation_recorded",
+        occurred_at: observedAt,
+        actor_user_id: session.user.id,
+        plant_culture_id: plantCultureId,
+        environment_id: environmentId,
+        location_id: locationId,
+        payload: { variable_code: variable.code, value_text: valueText, source: "agritech-manual" }
+      }).select("id").single();
+      if (eventResult.error) throw new Error(cultureWorkflowText("eventError") + eventResult.error.message);
+      eventId = eventResult.data.id;
     } else if (targetType === "batch") {
       const batch = latestBatches.find(item => item.id === targetId);
       if (!batch) throw new Error(cultureWorkflowText("batchMissing"));
