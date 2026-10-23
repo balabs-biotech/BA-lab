@@ -331,8 +331,8 @@ do $$ begin
       p_material_id := '00000000-0000-0000-0000-0000000000e2'
     );
     raise exception 'FAIL: batch creation in a non-member organization was allowed';
-  exception when sqlstate '42501' then
-    if sqlerrm = 'FAIL: batch creation in a non-member organization was allowed' then raise; end if;
+  exception when sqlstate 'P0001' then
+    if sqlerrm <> 'not authorized for organization' then raise; end if;
   end;
-end $$;
+end $;
 reset role;
