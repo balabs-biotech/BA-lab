@@ -71,20 +71,47 @@
       if(!data.length){summary.append(node("p",{class:"muted"},"Pas encore de données météo pour cette période. Importez l’historique pour obtenir des repères utiles."));return;}
       const byDate=new Map();
       data.forEach(r=>{if(r.value===null||r.value===undefined)return;const value=Number(r.value);if(!Number.isFinite(value))return;const day=String(r.observed_at).slice(0,10);if(!byDate.has(day))byDate.set(day,{});byDate.get(day)[r.variable_code]=value;});
-      const days=[...byDate.keys()].sort().slice(-7);
+      const allDays=[...byDate.keys()].sort();
+      const days=allDays.slice(-7);
+      const previousDays=allDays.slice(-14,-7);
       const rows=days.map(d=>byDate.get(d));
+      const previousRows=previousDays.map(d=>byDate.get(d));
       const maxTemps=rows.map(x=>x.air_temperature_max).filter(Number.isFinite);
       const rain=rows.map(x=>x.precipitation_corrected).filter(Number.isFinite);
       const humid=rows.map(x=>x.relative_humidity_mean).filter(Number.isFinite);
+      const previousTemps=previousRows.map(x=>x.air_temperature_max).filter(Number.isFinite);
+      const previousRain=previousRows.map(x=>x.precipitation_corrected).filter(Number.isFinite);
+      const previousHumid=previousRows.map(x=>x.relative_humidity_mean).filter(Number.isFinite);
       const temp=maxTemps.length?Math.max(...maxTemps):null;
       const rainTotal=rain.length?rain.reduce((a,b)=>a+b,0):null;
       const humidity=humid.length?humid.reduce((a,b)=>a+b,0)/humid.length:null;
+      const previousTemp=previousTemps.length?Math.max(...previousTemps):null;
+      const previousRainTotal=previousRain.length?previousRain.reduce((a,b)=>a+b,0):null;
+      const previousHumidity=previousHumid.length?previousHumid.reduce((a,b)=>a+b,0)/previousHumid.length:null;
       const card=(label,value,note)=>{const box=node("div",{class:"card"});box.append(node("strong",{},label),node("p",{},value),node("small",{class:"muted"},note));return box;};
       const grid=node("div",{class:"grid"});
-      grid.append(card("Pic de température",temp===null?"Indisponible":temp.toFixed(1)+" °C","Maximum observé sur les 7 derniers jours disponibles"));
-      grid.append(card("Pluie cumulée",rainTotal===null?"Indisponible":rainTotal.toFixed(1)+" mm","Somme estimée sur les jours disponibles"));
+      grid.append(card("Pic de température",temp===null?"Indisponible":temp.toFixed(1)+" °C","Maximum observé sur les 7 dernières dates disponibles"));
+      grid.append(card("Pluie cumulée",rainTotal===null?"Indisponible":rainTotal.toFixed(1)+" mm","Somme des précipitations disponibles"));
       grid.append(card("Humidité de l’air",humidity===null?"Indisponible":humidity.toFixed(0)+" %","Moyenne des observations disponibles"));
       summary.append(grid);
+      const trend=node("div",{class:"card"});
+      trend.append(node("h3",{},"Évolution par rapport aux 7 dates précédentes"));
+      const comparisons=[];
+      const compare=(label,current,previous,unit,mode,minCount,currentCount,previousCount)=>{
+        if(currentCount<minCount||previousCount<minCount||current===null||previous===null){
+          comparisons.push(label+" : comparaison indisponible (historique insuffisant).");
+          return;
+        }
+        const delta=current-previous;
+        const direction=Math.abs(delta)<0.1?"stable":delta>0?"en hausse":"en baisse";
+        comparisons.push(label+" : "+direction+" ("+(delta>0?"+":"")+delta.toFixed(1)+" "+unit+").");
+      };
+      compare("Pic de température",temp,previousTemp,"°C","max",5,maxTemps.length,previousTemps.length);
+      compare("Pluie cumulée",rainTotal,previousRainTotal,"mm","sum",5,rain.length,previousRain.length);
+      compare("Humidité moyenne",humidity,previousHumidity,"points de %","mean",3,humid.length,previousHumid.length);
+      comparisons.forEach(line=>trend.append(node("p",{class:"muted"},line)));
+      trend.append(node("small",{class:"muted"},"Comparaison descriptive de périodes constituées des dernières dates disponibles, pas nécessairement de 7 jours calendaires consécutifs. Une hausse ou une baisse n’établit pas à elle seule un stress cultural."));
+      summary.append(trend);
       const signals=[];
       const rainCoverage=rain.length;
       const heatCoverage=maxTemps.length;
