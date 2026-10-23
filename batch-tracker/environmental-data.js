@@ -85,6 +85,13 @@
       status.textContent=data?.ok?(data.cached?"Cache récent":"Import terminé")+" — "+data.records+" enregistrements. Données estimées sur grille, non mesurées localement.":"Import refusé : "+(data?.error||"réponse invalide");
       await loadRows();
     });
+    const {data: authState}=await db.auth.getSession();
+    if(!authState?.session){
+      status.textContent="Connectez-vous à CultureOps pour accéder aux emplacements de votre organisation.";
+      db.auth.onAuthStateChange((_event,session)=>{if(session){panel.classList.remove("hidden");loadLocations().then(()=>location.value&&loadRows());}});
+      return;
+    }
+    panel.classList.remove("hidden");
     await loadLocations();
     if(location.value) await loadRows();
   }
