@@ -92,7 +92,9 @@
       if(!notes.length)notes.push("Aucun seuil d’alerte simple détecté dans ces indicateurs. Croisez toujours ces estimations régionales avec les mesures locales.");
       const advice=node("ul",{class:"environmental-advice"});
       notes.forEach(note=>advice.append(node("li",{},note)));
-      summary.append(advice,node("p",{class:"muted"},"Repères indicatifs, calculés à partir des 7 derniers jours disponibles (pas nécessairement les 7 derniers jours calendaires). Pas de prévision ni de commande automatique d’irrigation."));
+      const latestDay=days.length?days[days.length-1]:null;
+      const coverage=node("p",{class:"muted"},"Couverture : "+days.length+" jour(s) avec au moins une valeur exploitable sur la période affichée"+(latestDay?" · dernière date disponible : "+latestDay:"")+". Les variables peuvent avoir des dates manquantes.");
+      summary.append(advice,coverage,node("p",{class:"muted"},"Repères indicatifs, calculés à partir des 7 derniers jours disponibles (pas nécessairement les 7 derniers jours calendaires). Les sommes et moyennes ne remplacent pas les mesures locales. Pas de prévision ni de commande automatique d’irrigation."));
     }
     async function loadRows(){
       const {data,error}=await db.from("environmental_observations").select("observed_at,variable_code,value,unit_code,provider_code,quality_flag").eq("location_id",location.value).eq("data_family","weather").gte("observed_at",from.value+"T00:00:00Z").lte("observed_at",to.value+"T23:59:59Z").order("observed_at",{ascending:false}).limit(1000);
