@@ -116,16 +116,30 @@ Deno.serve(async (req: Request) => {
           }
         } catch { /* omit malformed or untrusted preview URLs */ }
       }
+      const sceneBbox = Array.isArray(f.bbox) && f.bbox.length === 4 &&
+        f.bbox.every((n: unknown) => typeof n === "number" && Number.isFinite(n)) ? f.bbox : null;
+      let browserUrl: string | null = null;
+      if (sceneBbox && typeof p.datetime === "string" && /^\d{4}-\d{2}-\d{2}T/.test(p.datetime)) {
+        const browser = new URL("https://browser.dataspace.copernicus.eu/");
+        browser.searchParams.set("zoom", "11");
+        browser.searchParams.set("lat", String((sceneBbox[1] + sceneBbox[3]) / 2));
+        browser.searchParams.set("lng", String((sceneBbox[0] + sceneBbox[2]) / 2));
+        browser.searchParams.set("datasetId", "S2_L2A_CDAS");
+        browser.searchParams.set("layerId", "1_TRUE_COLOR");
+        browser.searchParams.set("date", p.datetime.slice(0, 10));
+        browserUrl = browser.toString();
+      }
       return {
         id: typeof f.id === "string" ? f.id : null,
         acquired_at: typeof p.datetime === "string" ? p.datetime : null,
         cloud_cover_percent: typeof p["eo:cloud_cover"] === "number" ? p["eo:cloud_cover"] : null,
         platform: typeof p.platform === "string" ? p.platform : null,
         constellation: typeof p.constellation === "string" ? p.constellation : "Sentinel-2",
-        bbox: Array.isArray(f.bbox) && f.bbox.length === 4 ? f.bbox : null,
+        bbox: sceneBbox,
         catalogue_item_url: itemUrl,
         preview_url: previewUrl,
         preview_source: previewSource,
+        browser_url: browserUrl,
       };
     });
     return reply(200, { ok: true, provider: "Copernicus Data Space STAC", collection: "sentinel-2-l2a",
