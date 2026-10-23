@@ -118,6 +118,20 @@ console.log("✓ Scenario Mycology: only biological culture targets are selectab
 console.log("✓ Scenario Laboratory: lab cultures and production batches are selectable");
 console.log("✓ Scenario navigation: valid selection is preserved; cross-universe selection is discarded");
 
+function recordScenario(record, eventsById, domain, cultures, plants, batches) {
+  const source = extractFunction(engine, "belongsToActiveWorkspace");
+  return vm.runInNewContext(
+    `${source}; belongsToActiveWorkspace(injected.record, injected.events)`,
+    {
+      injected: { record, events: eventsById },
+      document: { body: { dataset: { domain } } },
+      cultureOptions: cultures,
+      plantCultureOptions: plants,
+      latestBatches: batches
+    }
+  );
+}
+
 const typeCatalogue = [
   "agar", "plate", "slant", "broth", "flask", "other_liquid", "grain_spawn", "substrate", "fermentation", "other",
   "organoid", "suspension", "micropropagation", "solid"
@@ -155,3 +169,14 @@ assert.ok(engine.includes("else noWorkspaceTargets = true"));
 assert.ok(engine.includes("noWorkspaceTargets || (batchId && !batchEventIds.length)"));
 console.log("✓ Scenario choices: culture formats and measurement variables are domain-specific");
 console.log("✓ Scenario AgriTech statistics: plant filters query plant_culture_id and hide laboratory batches");
+
+const cultureRows = [{ id: "myc-1", code: "MYC-1" }, { id: "lab-1", code: "LAB-1" }];
+const plantRows = [{ id: "plant-1", code: "DF1" }];
+const batchRows = [{ id: "batch-1", batch_code: "BT-1" }];
+assert.equal(recordScenario({ plant_culture_id: "plant-1" }, {}, "agronomy", [], plantRows, []), true);
+assert.equal(recordScenario({ culture_id: "myc-1" }, {}, "agronomy", cultureRows, plantRows, batchRows), false);
+assert.equal(recordScenario({ culture_id: "myc-1" }, {}, "mycology", [cultureRows[0]], plantRows, batchRows), true);
+assert.equal(recordScenario({ plant_culture_id: "plant-1" }, {}, "mycology", [cultureRows[0]], plantRows, batchRows), false);
+assert.equal(recordScenario({ event_id: "event-1" }, { "event-1": { batch_id: "batch-1" } }, "laboratory", [cultureRows[1]], plantRows, batchRows), true);
+assert.equal(recordScenario({ event_id: "event-1" }, { "event-1": { batch_id: "batch-1" } }, "mycology", [cultureRows[0]], plantRows, batchRows), false);
+console.log("✓ Scenario histories: plant, mycology and lab records stay within their own workspace");
