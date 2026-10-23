@@ -91,8 +91,6 @@ const preserve = scenario("agronomy", "plant:plant-1");
 assert.equal(preserve.select.value, "plant:plant-1");
 const rejectCrossUniversePrevious = scenario("agronomy", "batch:batch-1");
 assert.equal(rejectCrossUniversePrevious.select.value, "plant:plant-1");
-const emptyGreenTech = scenario("agronomy");
-emptyGreenTech.select.children.length = 0;
 
 console.log("✓ Scenario Green Tech: only plant units are selectable");
 console.log("✓ Scenario Mycology: only biological culture targets are selectable");
