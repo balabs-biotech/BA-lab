@@ -4742,19 +4742,28 @@ async function loadMeasurementReferences() {
 function renderMeasurementTargets() {
   if (!measurementTargetSelect) return;
   const previous = measurementTargetSelect.value;
-  measurementTargetSelect.innerHTML = "";
+  const domain = document.body.dataset.domain || "mycology";
+  const visibleCultures = domain === "agronomy" ? [] : cultureOptions;
+  const visiblePlants = domain === "agronomy" ? plantCultureOptions : [];
+  const visibleBatches = domain === "laboratory" ? latestBatches : [];
+  const hasTargets = visibleCultures.length || visiblePlants.length || visibleBatches.length;
+  measurementTargetSelect.replaceChildren();
 
   const placeholder = document.createElement("option");
   placeholder.value = "";
-  placeholder.textContent = cultureOptions.length || latestBatches.length || plantCultureOptions.length
-    ? "Choisir une culture, un lot ou une unité végétale…"
-    : "Créez d’abord une culture, un lot ou une fiche végétale";
+  placeholder.textContent = hasTargets
+    ? "Choisir une cible de cet univers…"
+    : domain === "agronomy"
+      ? "Ajoutez d’abord une fiche végétale dans Green Tech"
+      : domain === "laboratory"
+        ? "Créez d’abord une culture de laboratoire ou un lot"
+        : "Créez d’abord une culture mycologique";
   measurementTargetSelect.appendChild(placeholder);
 
-  if (cultureOptions.length) {
+  if (visibleCultures.length) {
     const group = document.createElement("optgroup");
-    group.label = "Cultures";
-    for (const culture of cultureOptions) {
+    group.label = domain === "laboratory" ? "Cultures de laboratoire" : "Cultures mycologiques";
+    for (const culture of visibleCultures) {
       const option = document.createElement("option");
       option.value = `culture:${culture.id}`;
       option.textContent = `${culture.code} · ${culture.culture_type || "culture"}`;
@@ -4763,10 +4772,10 @@ function renderMeasurementTargets() {
     measurementTargetSelect.appendChild(group);
   }
 
-  if (plantCultureOptions.length) {
+  if (visiblePlants.length) {
     const group = document.createElement("optgroup");
-    group.label = "Unités végétales · AgriTech";
-    for (const plant of plantCultureOptions) {
+    group.label = "Unités végétales · Green Tech";
+    for (const plant of visiblePlants) {
       const option = document.createElement("option");
       option.value = `plant:${plant.id}`;
       option.textContent = `${plant.code} · ${plant.cultivar_name || plant.crop_type}`;
@@ -4775,10 +4784,10 @@ function renderMeasurementTargets() {
     measurementTargetSelect.appendChild(group);
   }
 
-  if (latestBatches.length) {
+  if (visibleBatches.length) {
     const group = document.createElement("optgroup");
-    group.label = "Lots de production";
-    for (const batch of latestBatches) {
+    group.label = "Lots de laboratoire";
+    for (const batch of visibleBatches) {
       const option = document.createElement("option");
       option.value = `batch:${batch.id}`;
       option.textContent = `${batch.batch_code} · ${batch.name || batch.batch_type || "lot"}`;
@@ -4790,12 +4799,12 @@ function renderMeasurementTargets() {
   const values = [...measurementTargetSelect.options].map(option => option.value);
   if (values.includes(previous)) {
     measurementTargetSelect.value = previous;
-  } else if (cultureOptions.length) {
-    measurementTargetSelect.value = `culture:${cultureOptions[0].id}`;
-  } else if (latestBatches.length) {
-    measurementTargetSelect.value = `batch:${latestBatches[0].id}`;
-  } else if (plantCultureOptions.length) {
-    measurementTargetSelect.value = `plant:${plantCultureOptions[0].id}`;
+  } else if (visiblePlants.length) {
+    measurementTargetSelect.value = `plant:${visiblePlants[0].id}`;
+  } else if (visibleCultures.length) {
+    measurementTargetSelect.value = `culture:${visibleCultures[0].id}`;
+  } else if (visibleBatches.length) {
+    measurementTargetSelect.value = `batch:${visibleBatches[0].id}`;
   }
 }
 
