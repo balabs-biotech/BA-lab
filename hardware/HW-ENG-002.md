@@ -4,7 +4,7 @@
 * **Version:** 1.0
 * **System Target:** Biomass Pyrolysis & Porous Carbon Matrix Production for Terra Preta / PGPR Carrier
 * **Licensing:** CERN Open Hardware Licence Version 2 - Permissive (CERN-OHL-P)
-* **Author:** SARL B.A. LAB — Hardware & Soil Regeneration Unit
+* **Author:** B.A. LAB project — Hardware & Soil Regeneration Unit
 * **Status:** 🔴 **CONCEPT — NOT VALIDATED. Hot-quench step (old Phase C) SUSPENDED pending a safety review.**
 
 > ⛔ **Never inject water or any organic / nutrient solution onto hot or glowing biochar.** Sudden steam generation can throw scalding material out of the kiln, and organic compounds can ignite. The former "rapid injection at ~600 °C" procedure has been removed from this document.
