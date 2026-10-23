@@ -145,3 +145,20 @@ if (!comparisonSummary.includes("!Number.isFinite(Number(value))")) {
   throw new Error("Non-numeric comparison values must be counted explicitly");
 }
 console.log("✓ Batch comparison summaries handle large datasets and classify non-numeric values");
+
+const comparisonQuartileStart = engine.indexOf("const summarize = rows =>");
+const comparisonQuartileEnd = engine.indexOf("batches.forEach(batch =>", comparisonQuartileStart);
+const comparisonQuartileSummary = engine.slice(comparisonQuartileStart, comparisonQuartileEnd);
+for (const snippet of [
+  'median:"médiane"',
+  'median:"median"',
+  'median:"mediana"',
+  'median:"الوسيط"',
+  'const median = quantile(0.5)',
+  'const q1 = quantile(0.25)',
+  'const q3 = quantile(0.75)',
+  'labels.quartiles'
+]) {
+  if (!comparisonQuartileSummary.includes(snippet)) throw new Error("Batch comparison median/quartile summary missing: " + snippet);
+}
+console.log("✓ Batch comparison reports median and interquartile range with four-language labels");
