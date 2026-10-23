@@ -135,4 +135,13 @@ console.log("✓ Batch movement calls the atomic RPC and refreshes the traceabil
 if(!engine.includes("const hasCurrentAssignment = Boolean(batch?.location_id || batch?.environment_id)"))throw new Error("Assigned batches cannot retain movement controls when destination options are unavailable");
 if(!engine.includes("const locationName = batchLocationOptions.find")||!engine.includes("const environmentName = batchEnvironmentOptions.find")||!engine.includes("escapeHtml(locationName)")||!engine.includes("escapeHtml(environmentName)"))throw new Error("Batch detail does not safely display its selected location/environment");
 
-
+const comparisonSummaryStart = engine.indexOf("const summarize = rows =>");
+const comparisonSummaryEnd = engine.indexOf("batches.forEach(batch =>", comparisonSummaryStart);
+const comparisonSummary = engine.slice(comparisonSummaryStart, comparisonSummaryEnd);
+if (!comparisonSummary.includes("let min = Infinity") || !comparisonSummary.includes("let max = -Infinity") || comparisonSummary.includes("Math.min(...values)") || comparisonSummary.includes("Math.max(...values)")) {
+  throw new Error("Comparison summary must handle large arrays without spread-argument limits");
+}
+if (!comparisonSummary.includes("!Number.isFinite(Number(value))")) {
+  throw new Error("Non-numeric comparison values must be counted explicitly");
+}
+console.log("✓ Batch comparison summaries handle large datasets and classify non-numeric values");
