@@ -72,19 +72,19 @@ function scenario(domain, previous = "") {
 const greenTech = scenario("agronomy");
 assert.deepEqual(greenTech.values, ["", "plant:plant-1"]);
 assert.deepEqual(greenTech.labels, ["Unités végétales · Green Tech"]);
-assert.equal(greenTech.select.value, "plant:plant-1");
+assert.equal(greenTech.select.value, ""); // Explicit target choice is required.
 assert.match(greenTech.placeholder, /fiche végétale/);
 
 const mycology = scenario("mycology");
 assert.deepEqual(mycology.values, ["", "culture:fungus-1"]);
 assert.deepEqual(mycology.labels, ["Cultures mycologiques"]);
-assert.equal(mycology.select.value, "culture:fungus-1");
+assert.equal(mycology.select.value, ""); // Explicit target choice is required.
 assert.ok(!mycology.values.some(value => value.startsWith("plant:") || value.startsWith("batch:")));
 
 const laboratory = scenario("laboratory");
 assert.deepEqual(laboratory.values, ["", "culture:lab-1", "batch:batch-1"]);
 assert.deepEqual(laboratory.labels, ["Cultures de laboratoire", "Lots de laboratoire"]);
-assert.equal(laboratory.select.value, "culture:lab-1");
+assert.equal(laboratory.select.value, ""); // Explicit target choice is required.
 assert.ok(!laboratory.values.some(value => value.startsWith("plant:")));
 
 const preserve = scenario("agronomy", "plant:plant-1");
