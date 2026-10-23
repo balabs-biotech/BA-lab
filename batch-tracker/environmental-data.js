@@ -135,11 +135,53 @@
       if(lagDays!==null&&lagDays>2)coverage.append(node("strong",{}," Écart de couverture : "+lagDays+" jours entre la fin de période sélectionnée et la dernière date disponible."));
       summary.append(node("h3",{},"Lecture agronomique provisoire"),advice,coverage,node("p",{class:"muted"},"Ces signaux sont des règles indicatives appliquées à des estimations NASA POWER sur grille régionale, pas à des mesures locales. Ils servent à décider quoi vérifier, pas à établir un diagnostic. La météo affichée est historique : aucune prévision ni commande automatique d’irrigation."));
     }
+    function renderVariableCoverage(data){
+      const labels={air_temperature_mean:"Température moyenne",air_temperature_max:"Température maximale",air_temperature_min:"Température minimale",precipitation_corrected:"Précipitations",solar_radiation_all_sky:"Rayonnement solaire",relative_humidity_mean:"Humidité relative moyenne",wind_speed_mean:"Vitesse moyenne du vent"};
+      const coverage=node("div",{class:"card"});
+      coverage.append(node("h3",{},"Couverture par variable"));
+      const startMs=Date.parse(from.value+"T00:00:00Z");
+      const endMs=Date.parse(to.value+"T00:00:00Z");
+      const expected=Math.floor((endMs-startMs)/86400000)+1;
+      const byVariable=new Map();
+      (data||[]).forEach(r=>{
+        if(r.value===null||r.value===undefined||!Number.isFinite(Number(r.value)))return;
+        const key=r.variable_code;
+        if(!byVariable.has(key))byVariable.set(key,new Set());
+        byVariable.get(key).add(String(r.observed_at).slice(0,10));
+      });
+      const table=node("table");
+      const head=node("tr");
+      ["Variable","Jours couverts","Couverture","Dernière date"].forEach(t=>head.append(node("th",{},t)));
+      const thead=node("thead");thead.append(head);table.append(thead);
+      const tbody=node("tbody");
+      Object.entries(labels).forEach(([key,label])=>{
+        const dates=[...(byVariable.get(key)||[])].sort();
+        const count=dates.length;
+        const last=dates.length?dates[dates.length-1]:"—";
+        const percent=expected>0?Math.round(count/expected*100):0;
+        const tr=node("tr");
+        [label,count+" / "+Math.max(expected,0),expected>0?percent+" %":"—",last].forEach(t=>tr.append(node("td",{},String(t))));
+        tbody.append(tr);
+      });
+      table.append(tbody);coverage.append(table);
+      coverage.append(node("p",{class:"muted"},"La couverture compte les dates calendaires avec une valeur numérique dans la période sélectionnée. Une date absente peut refléter une donnée indisponible chez le fournisseur, un import incomplet ou un défaut de coordonnées ; ce tableau ne permet pas seul d’en déterminer la cause."));
+      summary.append(coverage);
+    }
     async function loadRows(){
-      const {data,error}=await db.from("environmental_observations").select("observed_at,variable_code,value,unit_code,provider_code,quality_flag").eq("location_id",location.value).eq("data_family","weather").gte("observed_at",from.value+"T00:00:00Z").lte("observed_at",to.value+"T23:59:59Z").order("observed_at",{ascending:false}).limit(1000);
       results.replaceChildren();
-      if(error){results.textContent="Historique indisponible : "+error.message;summary.replaceChildren(node("p",{class:"muted"},"Impossible de calculer les indicateurs météo."));return;}
-      renderClimateSummary(data||[]);
+      const columns="observed_at,variable_code,value,unit_code,provider_code,quality_flag";
+      let data=[];
+      let offset=0;
+      const pageSize=1000;
+      while(true){
+        const {data:page,error}=await db.from("environmental_observations").select(columns).eq("location_id",location.value).eq("data_family","weather").gte("observed_at",from.value+"T00:00:00Z").lte("observed_at",to.value+"T23:59:59Z").order("observed_at",{ascending:false}).range(offset,offset+pageSize-1);
+        if(error){results.textContent="Historique indisponible : "+error.message;summary.replaceChildren(node("p",{class:"muted"},"Impossible de calculer les indicateurs météo."));return;}
+        data=data.concat(page||[]);
+        if(!page||page.length<pageSize)break;
+        offset+=pageSize;
+      }
+      renderClimateSummary(data);
+      renderVariableCoverage(data);
       if(!data.length){results.textContent="Aucune observation pour cette période.";return;}
       const table=node("table"); const head=node("tr");
       ["Date","Variable","Valeur","Unité","Source"].forEach(t=>head.append(node("th",{},t)));
