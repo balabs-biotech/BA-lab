@@ -139,3 +139,16 @@ Le fichier `supabase/functions/copernicus-sentinel-catalogue/index.ts` est maint
 - Les scènes filtrées par couverture nuageuse ne garantissent pas l'absence de nuages sur la parcelle. Aucun NDVI/NDMI ni conseil agronomique n'est calculé.
 
 **Avant déploiement :** exécuter CI, tester une requête STAC réelle et les cas d'accès refusé/coordonnées absentes, vérifier le schéma des propriétés retournées par le fournisseur, puis déployer explicitement la fonction. À ce stade, aucune donnée satellite n'est persistée dans `environmental_observations`.
+
+
+### Exploitation dans Green Tech — 23 octobre 2026
+
+L'objectif fonctionnel est de transformer les données en décisions de vérification, sans ajouter un écran de télémétrie illisible.
+
+- Le module `batch-tracker/environmental-data.js` présente maintenant trois indicateurs synthétiques : pic de température, pluie cumulée et humidité relative moyenne sur les sept derniers jours disponibles.
+- Il génère des repères prudents : contrôle du substrat en période chaude ou sèche, vigilance ventilation en humidité atmosphérique élevée. Ces repères ne déclenchent aucune commande d'irrigation et rappellent que la pluie extérieure n'est pas un indicateur du besoin en eau d'une serre.
+- Le tableau complet des observations est replié par défaut dans « Voir les observations détaillées ».
+- Un bouton lance une recherche Sentinel-2 sur la même localisation et la période sélectionnée, puis affiche les scènes, leur date, la couverture nuageuse et le lien catalogue. Recherche limitée à 180 jours et 20 scènes côté fonction, 10 scènes par défaut dans l'interface.
+- Les résultats satellite sont des pistes d'observation, pas des diagnostics de culture : la couverture nuageuse est celle de la scène entière, le point enregistré n'est pas un contour de parcelle, et aucun indice végétal n'est calculé à ce stade.
+
+La fonction `copernicus-sentinel-catalogue` a été déployée sur Supabase avec vérification JWT activée. Le CI précédent de l'adaptateur est passé. Le CI de la dernière modification de l'interface est encore en cours ; ne pas considérer cette version comme validée avant sa fin.
