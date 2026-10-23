@@ -83,10 +83,12 @@
     document.head.append(mapStyle);
     form.append(field("Emplacement","envLocation",location),field("Du","envFrom",from),field("Au","envTo",to),run,coordinates);
 
+    const satelliteParcel=node("select",{id:"satelliteParcel"});
+    satelliteParcel.append(node("option",{value:""},"Recherche régionale (sans contour de parcelle)"));
     const satelliteButton=node("button",{type:"button"},"Chercher les images satellite");
     const satelliteResults=node("div",{id:"satelliteResults",class:"overview-observations","aria-live":"polite"});
-    const satelliteHint=node("p",{class:"muted"},"Sentinel-2 : scènes disponibles et couverture nuageuse. L’image ne constitue pas à elle seule un diagnostic de culture.");
-    panel.append(form,picker,status,summary,satelliteHint,satelliteButton,satelliteResults,details);
+    const satelliteHint=node("p",{class:"muted"},"Sentinel-2 : choisissez une parcelle enregistrée pour rechercher les scènes dont l’emprise intersecte son contour. La couverture nuageuse catalogue ne garantit pas des pixels clairs sur la parcelle.");
+    panel.append(form,picker,status,summary,satelliteHint,field("Périmètre de recherche satellite","satelliteParcel",satelliteParcel),satelliteButton,satelliteResults,details);
     let locationMap=null, locationMarker=null, mapReady=false;
     let drawingParcel=false, parcelVertices=[], parcelLayer=null, parcelCompleted=false;
     function setMapPoint(latitude,longitude,origin,precision=null,zoomToPoint=false){
@@ -179,9 +181,13 @@
     clearParcelButton.addEventListener("click",()=>resetParcelDraft());
     async function loadParcels(){
       parcelList.replaceChildren();
+      satelliteParcel.replaceChildren(node("option",{value:""},"Recherche régionale (sans contour de parcelle)"));
       if(!location.value)return;
-      const {data,error}=await db.from("farm_parcels").select("id,parcel_code,name,boundary_geojson,boundary_source,created_at").eq("location_id",location.value).order("name");
+      const requestedLocationId=location.value;
+      const {data,error}=await db.from("farm_parcels").select("id,parcel_code,name,boundary_geojson,boundary_source,created_at").eq("location_id",requestedLocationId).order("name");
+      if(location.value!==requestedLocationId)return;
       if(error){parcelList.append(node("p",{class:"muted"},"Lecture des parcelles indisponible : "+error.message));return;}
+      (data||[]).forEach(parcel=>satelliteParcel.append(node("option",{value:parcel.id},parcel.name+" ("+parcel.parcel_code+")")));
       if(!data?.length){parcelList.append(node("p",{class:"muted"},"Aucune parcelle enregistrée pour cet emplacement."));return;}
       data.forEach(parcel=>{
         const card=node("article",{class:"card"});
@@ -484,11 +490,13 @@
       satelliteButton.disabled=true;
       satelliteResults.replaceChildren(node("p",{class:"muted"},"Recherche de scènes Sentinel-2…"));
       try{
-        const {data,error}=await db.functions.invoke("copernicus-sentinel-catalogue",{body:{location_id:location.value,start_date:from.value,end_date:to.value,limit:10,max_cloud_cover:60}});
+        const requestBody={location_id:location.value,start_date:from.value,end_date:to.value,limit:10,max_cloud_cover:60};
+        if(satelliteParcel.value)requestBody.parcel_id=satelliteParcel.value;
+        const {data,error}=await db.functions.invoke("copernicus-sentinel-catalogue",{body:requestBody});
         satelliteResults.replaceChildren();
         if(error){satelliteResults.append(node("p",{class:"muted"},"Recherche satellite indisponible : "+(error.context?.json?.error||error.message)));return;}
         if(!data?.ok){satelliteResults.append(node("p",{class:"muted"},"Catalogue indisponible : "+(data?.error||"réponse invalide")));return;}
-        satelliteResults.append(node("p",{},data.scenes_found+" scène(s) trouvée(s), couverture nuageuse maximale de 60 %."));
+        satelliteResults.append(node("p",{},data.scenes_found+" scène(s) trouvée(s), couverture nuageuse catalogue maximale de 60 %."+(data.search_geometry_source==="saved_parcel"?" Recherche limitée aux scènes intersectant le contour de la parcelle sélectionnée.":" Recherche régionale indicative.")));
         if(!data.scenes?.length){satelliteResults.append(node("p",{class:"muted"},"Aucune scène ne correspond à ces critères. Essayez une période plus longue ou un seuil nuageux plus élevé."));return;}
         data.scenes.forEach(scene=>{
           const item=node("article",{class:"card"});
@@ -512,7 +520,7 @@
           if(scene.catalogue_item_url){const a=node("a",{href:scene.catalogue_item_url,target:"_blank",rel:"noopener noreferrer"},"Ouvrir la fiche de la scène");item.append(a);}
           satelliteResults.append(item);
         });
-        satelliteResults.append(node("p",{class:"muted"},"Les aperçus sont des vignettes de catalogue, pas une analyse de la parcelle. Le calcul NDVI et le traitement des bandes satellite restent à intégrer."));
+        satelliteResults.append(node("p",{class:"muted"},data.search_geometry_source==="saved_parcel"?"L’intersection géométrique ne calcule pas la couverture nuageuse à l’intérieur du polygone. Les aperçus sont des vignettes de catalogue ; le calcul NDVI et le contrôle des pixels restent à intégrer.":"Les aperçus sont des vignettes de catalogue, pas une analyse de la parcelle. Le calcul NDVI et le traitement des bandes satellite restent à intégrer."));
       }catch(e){satelliteResults.replaceChildren(node("p",{class:"muted"},"Échec de la recherche : "+(e?.message||"erreur inconnue")));}
       finally{satelliteButton.disabled=false;}
     }
