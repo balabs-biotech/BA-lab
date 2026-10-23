@@ -4,7 +4,7 @@
 * **Version:** 1.0
 * **Target Application:** Bio-Fertilizer Formulation, Soil Regeneration, and Rhizosphere Colonization
 * **Associated Hardware / Protocols:** HW-ENG-002 (Kon-Tiki Kiln), SOP-BAC-002 (PGPR Liquid Fermentation)
-* **Author:** SARL B.A. LAB — Bio-Inputs & Soil Regeneration Unit
+* **Author:** B.A. LAB project — Bio-Inputs & Soil Regeneration Unit
 
 ---
 
