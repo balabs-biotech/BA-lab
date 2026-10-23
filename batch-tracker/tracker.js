@@ -5244,7 +5244,9 @@ function renderCultureCatalog() {
     empty.className = "muted";
     empty.textContent = cultureOptions.length
       ? "Aucune culture ne correspond à cette recherche."
-      : "Aucune culture chargée. Créez une culture avec le formulaire ci-dessus.";
+      : document.body.dataset.domain === "laboratory"
+        ? "Aucune fiche classée Laboratoire. Les fiches historiques non classées restent en Mycologie ; créez ici les cultures suivies spécifiquement au laboratoire."
+        : "Aucune culture mycologique chargée. Créez une culture avec le formulaire ci-dessus.";
     list.appendChild(empty);
     return;
   }
