@@ -30,6 +30,7 @@ let strainOptions = [];
 let referenceData = [];
 
 let cultureOptions = [];
+let plantCultureOptions = [];
 
 let latestBatches = [];
 
@@ -746,6 +747,7 @@ async function refreshAuthUI() {
 
     hideElement(trackerCard);
     hideElement(batchCard);
+    hideElement(document.getElementById("plantCard"));
     hideElement(measurementCard);
     hideElement(document.getElementById("statisticsCard"));
     hideElement(document.getElementById("overviewCard"));
@@ -845,6 +847,11 @@ async function initializeAuthenticatedTracker(
 
     await loadBatchPlaceOptions();
 
+    populatePlantLocationOptions();
+    document.getElementById("plantLocation")?.dispatchEvent(new Event("change"));
+
+    await loadPlantCultures();
+
     await syncPendingCultures();
 
     await loadLatestBatches();
@@ -876,6 +883,8 @@ async function initializeAuthenticatedTracker(
 
     showElement(trackerCard);
 
+    showElement(document.getElementById("plantCard"));
+
     showElement(batchCard);
     showElement(measurementCard);
     showElement(document.getElementById("statisticsCard"));
@@ -899,6 +908,7 @@ async function initializeAuthenticatedTracker(
 
     hideElement(trackerCard);
     hideElement(batchCard);
+    hideElement(document.getElementById("plantCard"));
     hideElement(measurementCard);
     hideElement(document.getElementById("statisticsCard"));
     hideElement(document.getElementById("overviewCard"));
@@ -948,6 +958,8 @@ function setDefaultDate() {
   if (observationAtInput) {
     observationAtInput.value = now.toISOString().slice(0, 16);
   }
+  const plantStartedAt = document.getElementById("plantStartedAt");
+  if (plantStartedAt) plantStartedAt.value = now.toISOString().slice(0, 16);
 
 }
 
@@ -1815,13 +1827,9 @@ async function createCulture() {
               : null,
 
           p_metadata: {
-
-            source:
-              "BA Labs Culture Tracker",
-
-            interface_version:
-              "2.0"
-
+            source: "BA Labs Culture Tracker",
+            interface_version: "2.0",
+            domain: document.body.dataset.domain === "laboratory" ? "laboratory" : "mycology"
           }
 
         }
@@ -2049,7 +2057,8 @@ async function loadCultureOptions() {
         code,
         culture_type,
         material_id,
-        started_at
+        started_at,
+        metadata
       `)
       .eq(
         "organization_id",
@@ -2073,8 +2082,13 @@ async function loadCultureOptions() {
   }
 
 
-  cultureOptions =
-    data || [];
+  const activeDomain = document.body.dataset.domain;
+  cultureOptions = (data || []).filter(culture => {
+    if (activeDomain === "agronomy") return false;
+    const recordDomain = culture.metadata?.domain;
+    if (recordDomain) return recordDomain === activeDomain;
+    return activeDomain === "mycology";
+  });
 
   renderCultureCatalog();
   renderMeasurementTargets();
@@ -5231,7 +5245,9 @@ function renderCultureCatalog() {
     empty.className = "muted";
     empty.textContent = cultureOptions.length
       ? "Aucune culture ne correspond à cette recherche."
-      : "Aucune culture chargée. Créez une culture avec le formulaire ci-dessus.";
+      : document.body.dataset.domain === "laboratory"
+        ? "Aucune fiche classée Laboratoire. Les fiches historiques non classées restent en Mycologie ; créez ici les cultures suivies spécifiquement au laboratoire."
+        : "Aucune culture mycologique chargée. Créez une culture avec le formulaire ci-dessus.";
     list.appendChild(empty);
     return;
   }
@@ -5753,7 +5769,21 @@ function updateOverview() {
   const observationsPanel = document.getElementById("overviewRecentObservations");
   if (!cultureCount || !batchCount || !observationCount || !observationsPanel) return;
 
-  cultureCount.textContent = String(cultureOptions.length);
+  const domain = document.body.dataset.domain;
+  const cultureMetricLabel = cultureCount.closest(".overview-metric")?.querySelector(".overview-metric-label");
+  const batchMetric = batchCount.closest(".overview-metric");
+  const observationMetricLabel = observationCount.closest(".overview-metric")?.querySelector(".overview-metric-label");
+  if (domain === "agronomy") {
+    cultureCount.textContent = String(plantCultureOptions.length);
+    if (cultureMetricLabel) cultureMetricLabel.textContent = "Fiches végétales";
+    if (batchMetric) batchMetric.hidden = true;
+    if (observationMetricLabel) observationMetricLabel.textContent = "Observations récentes";
+  } else {
+    cultureCount.textContent = String(cultureOptions.length);
+    if (cultureMetricLabel) cultureMetricLabel.textContent = domain === "mycology" ? "Cultures mycologiques" : "Cultures de laboratoire";
+    if (batchMetric) batchMetric.hidden = false;
+    if (observationMetricLabel) observationMetricLabel.textContent = domain === "mycology" ? "Observations mycologiques" : "Observations récentes";
+  }
   batchCount.textContent = String(latestBatches.length);
   observationCount.textContent = String(recentObservations.length);
 
@@ -5774,11 +5804,18 @@ function updateOverview() {
 
 function activateWorkspaceModule(moduleId) {
   const modulesByDomain = {
-    agronomy: ["overviewCard", "trackerCard", "measurementCard", "statisticsCard"],
+    agronomy: ["overviewCard", "plantCard", "measurementCard", "statisticsCard"],
     mycology: ["overviewCard", "trackerCard", "measurementCard", "statisticsCard"],
     laboratory: ["overviewCard", "trackerCard", "batchCard", "measurementCard", "statisticsCard"]
   };
-  const modules = modulesByDomain[document.body.dataset.domain] || modulesByDomain.laboratory;
+  const activeDomain = document.body.dataset.domain;
+  const modules = modulesByDomain[activeDomain] || modulesByDomain.laboratory;
+  document.getElementById("trackerCard")?.classList.toggle("workspace-inactive", activeDomain === "agronomy");
+  document.getElementById("plantCard")?.classList.toggle("workspace-inactive", activeDomain !== "agronomy");
+  document.getElementById("batchCard")?.classList.toggle("workspace-inactive", activeDomain !== "laboratory");
+  document.querySelectorAll("[data-domain-nav]").forEach(link => {
+    link.hidden = link.dataset.domainNav === "agronomy" ? activeDomain !== "agronomy" : activeDomain === "agronomy";
+  });
   if (!modules.includes(moduleId)) return;
 
   modules.forEach((id) => {
@@ -5912,7 +5949,7 @@ function setupUiEnhancements() {
   document.querySelectorAll(".section-nav a").forEach((link) => {
     link.addEventListener("click", (event) => {
       const target = link.getAttribute("href");
-      if (target === "#overviewCard" || target === "#trackerCard" || target === "#batchCard" || target === "#measurementCard" || target === "#statisticsCard") {
+      if (target === "#overviewCard" || target === "#trackerCard" || target === "#plantCard" || target === "#batchCard" || target === "#measurementCard" || target === "#statisticsCard") {
         event.preventDefault();
         activateWorkspaceModule(target.slice(1));
         document.getElementById(target.slice(1))?.scrollIntoView({
@@ -5929,6 +5966,7 @@ function setupUiEnhancements() {
   }
   if (domain === "agronomy") {
     document.querySelector(".bio-operation-panel")?.classList.add("hidden");
+    document.querySelectorAll("[data-domain-nav='biological']").forEach(el => el.hidden = true);
     document.querySelector(".bio-lineage-panel")?.classList.add("hidden");
   }
   const workspaceHeadings = {
@@ -6043,6 +6081,231 @@ function setupQuickCapture() {
 
 
 /* Domain-specific workspace identity. Presentation changes only; save and sync flows remain shared. */
+
+/* ============================================================
+   AGRITECH — REGISTRE DES CULTURES VEGETALES
+   ============================================================ */
+
+const PLANT_CROP_OPTIONS = {
+  tomato_cherry: { label: "Tomate cerise", species: "Solanum lycopersicum", cultivars: ["Yellow Pear", "Cerise — variété non précisée"] },
+  tomato: { label: "Tomate", species: "Solanum lycopersicum", cultivars: ["Marmande", "Variété non précisée"] },
+  zucchini: { label: "Courgette", species: "Cucurbita pepo", cultivars: ["Quarantaine", "Diamant", "Variété non précisée"] },
+  basil: { label: "Basilic", species: "Ocimum basilicum", cultivars: ["Variété non précisée"] },
+  mint: { label: "Menthe", species: "Mentha sp.", cultivars: ["Variété non précisée"] },
+  long_bean: { label: "Haricot kilomètre", species: "Vigna unguiculata subsp. sesquipedalis", cultivars: ["Variété non précisée"] },
+  pattypan_squash: { label: "Pâtisson", species: "Cucurbita pepo", cultivars: ["Pâtisson blanc", "Variété non précisée"] },
+  luffa: { label: "Luffa", species: "Luffa aegyptiaca", cultivars: ["Variété non précisée"] },
+  bottle_gourd: { label: "Gourde pèlerine", species: "Lagenaria siceraria", cultivars: ["Gourde pèlerine"] },
+  other: { label: "Autre culture", species: "À préciser", cultivars: ["Variété non précisée"] }
+};
+
+function setupPlantRegistry() {
+  const form = document.getElementById("plantCultureForm");
+  const crop = document.getElementById("plantCropType");
+  const cultivar = document.getElementById("plantCultivar");
+  const location = document.getElementById("plantLocation");
+  const environment = document.getElementById("plantEnvironment");
+  if (!form || !crop || !cultivar) return;
+
+  const updateCultivarSuggestions = () => {
+    const selected = PLANT_CROP_OPTIONS[crop.value];
+    const list = document.getElementById("plantCultivarOptions");
+    if (!list) return;
+    list.replaceChildren();
+    (selected?.cultivars || []).forEach(name => {
+      const option = document.createElement("option");
+      option.value = name;
+      list.appendChild(option);
+    });
+    if (cultivar.value && !(selected?.cultivars || []).includes(cultivar.value)) cultivar.value = "";
+    if (selected?.cultivars.length === 1 && !cultivar.value) cultivar.value = selected.cultivars[0];
+  };
+  const renderPlantEnvironments = () => {
+    if (!environment) return;
+    const previous = environment.value;
+    const locationId = location?.value || "";
+    const available = batchEnvironmentOptions.filter(item =>
+      locationId ? (!item.location_id || item.location_id === locationId) : !item.location_id
+    );
+    environment.replaceChildren();
+    const placeholder = document.createElement("option");
+    placeholder.value = "";
+    placeholder.textContent = "Non précisé";
+    environment.appendChild(placeholder);
+    available.forEach(item => {
+      const option = document.createElement("option");
+      option.value = item.id;
+      option.textContent = item.name || item.id;
+      environment.appendChild(option);
+    });
+    environment.value = available.some(item => item.id === previous) ? previous : "";
+  };
+  crop.addEventListener("change", updateCultivarSuggestions);
+  location?.addEventListener("change", renderPlantEnvironments);
+  form.addEventListener("submit", savePlantCulture);
+  populatePlantLocationOptions();
+  updateCultivarSuggestions();
+  renderPlantEnvironments();
+}
+
+function populatePlantLocationOptions() {
+  const location = document.getElementById("plantLocation");
+  if (!location) return;
+  const previous = location.value;
+  location.replaceChildren();
+  const placeholder = document.createElement("option");
+  placeholder.value = "";
+  placeholder.textContent = "Non précisé";
+  location.appendChild(placeholder);
+  batchLocationOptions.forEach(item => {
+    const option = document.createElement("option");
+    option.value = item.id;
+    option.textContent = item.name || item.code || item.id;
+    location.appendChild(option);
+  });
+  location.value = batchLocationOptions.some(item => item.id === previous) ? previous : "";
+}
+
+function renderPlantCultureList(rows) {
+  plantCultureOptions = rows || [];
+  const list = document.getElementById("plantCultureList");
+  const count = document.getElementById("plantCultureCount");
+  if (!list || !count) return;
+  count.textContent = String(rows.length);
+  list.replaceChildren();
+  updateOverview();
+  if (!rows.length) {
+    const empty = document.createElement("p");
+    empty.className = "muted";
+    empty.textContent = "Aucune culture végétale enregistrée. Ajoutez une plante ou un groupe de plantes ci-dessus.";
+    list.appendChild(empty);
+    return;
+  }
+  const statusLabels = { planned: "Planifiée", active: "En culture", harvested: "Récoltée", lost: "Perdue / arrêtée", archived: "Archivée" };
+  rows.forEach(row => {
+    const article = document.createElement("article");
+    article.className = "culture-catalog-row";
+    const main = document.createElement("div");
+    main.className = "culture-catalog-main";
+    const code = document.createElement("strong");
+    code.className = "culture-catalog-code";
+    code.textContent = row.code || "Unité végétale sans code";
+    const meta = document.createElement("div");
+    meta.className = "culture-catalog-meta";
+    const crop = PLANT_CROP_OPTIONS[row.crop_type]?.label || row.crop_type || "Culture végétale";
+    const details = document.createElement("span");
+    details.textContent = crop + " · " + (row.cultivar_name || "Variété non renseignée") + " · " + row.quantity + " " + (row.unit_code || "plants");
+    const place = document.createElement("span");
+    const location = batchLocationOptions.find(item => item.id === row.location_id);
+    const environment = batchEnvironmentOptions.find(item => item.id === row.environment_id);
+    place.textContent = [location?.name, environment?.name, row.substrate].filter(Boolean).join(" · ") || "Emplacement / substrat non précisé";
+    const status = document.createElement("span");
+    status.textContent = statusLabels[row.status] || row.status || "État non renseigné";
+    meta.append(details, place, status);
+    if (row.started_at) {
+      const date = document.createElement("span");
+      date.textContent = "Démarrage : " + new Date(row.started_at).toLocaleDateString("fr-FR");
+      meta.appendChild(date);
+    }
+    main.append(code, meta);
+    article.appendChild(main);
+    if (row.notes) {
+      const notes = document.createElement("p");
+      notes.className = "muted";
+      notes.textContent = row.notes;
+      article.appendChild(notes);
+    }
+    list.appendChild(article);
+  });
+}
+
+async function loadPlantCultures() {
+  if (!organizationId) return;
+  const status = document.getElementById("plantCultureStatus");
+  try {
+    const { data, error } = await supabaseClient.from("plant_cultures")
+      .select("id,code,crop_type,species_name,cultivar_name,quantity,unit_code,location_id,environment_id,substrate,started_at,status,notes")
+      .eq("organization_id", organizationId)
+      .order("created_at", { ascending: false })
+      .limit(300);
+    if (error) throw error;
+    renderPlantCultureList(data || []);
+    if (status) status.textContent = "Registre végétal chargé depuis Supabase.";
+  } catch (error) {
+    console.error("Chargement du registre végétal impossible :", error);
+    if (status) status.textContent = "Registre végétal indisponible : " + (error.message || "erreur inconnue");
+    const list = document.getElementById("plantCultureList");
+    if (list) list.textContent = "Impossible de charger le registre végétal. Vérifiez que la migration est déployée puis rechargez la page.";
+  }
+}
+
+async function savePlantCulture(event) {
+  event.preventDefault();
+  if (!organizationId) {
+    showMessage("Organisation absente : reconnectez-vous avant d’enregistrer une culture végétale.", "error");
+    return;
+  }
+  const form = document.getElementById("plantCultureForm");
+  const button = document.getElementById("savePlantCultureButton");
+  const status = document.getElementById("plantCultureStatus");
+  const cropType = document.getElementById("plantCropType").value;
+  const crop = PLANT_CROP_OPTIONS[cropType];
+  const code = document.getElementById("plantCode").value.trim();
+  const cultivarName = document.getElementById("plantCultivar").value.trim();
+  const quantity = Number(document.getElementById("plantQuantity").value);
+  if (!crop || !code || !cultivarName || !Number.isInteger(quantity) || quantity < 1) {
+    showMessage("Renseignez un code, une culture, une variété et une quantité entière positive.", "error");
+    return;
+  }
+  button.disabled = true;
+  const oldLabel = button.textContent;
+  button.textContent = "Enregistrement…";
+  if (status) status.textContent = "Enregistrement de la fiche végétale…";
+  try {
+    const startedValue = document.getElementById("plantStartedAt").value;
+    const { error } = await supabaseClient.from("plant_cultures").insert({
+      organization_id: organizationId,
+      code,
+      crop_type: cropType,
+      species_name: crop.species,
+      cultivar_name: cultivarName,
+      quantity,
+      unit_code: "plants",
+      location_id: document.getElementById("plantLocation").value || null,
+      environment_id: document.getElementById("plantEnvironment").value || null,
+      substrate: document.getElementById("plantSubstrate").value.trim() || null,
+      started_at: startedValue ? new Date(startedValue).toISOString() : null,
+      status: document.getElementById("plantStatus").value || "active",
+      notes: document.getElementById("plantNotes").value.trim() || null,
+      metadata: { source: "BA Labs CultureOps", domain: "agronomy", interface_version: "1.0" }
+    });
+    if (error) throw error;
+    form.reset();
+    document.getElementById("plantQuantity").value = "1";
+    document.getElementById("plantStatus").value = "active";
+    document.getElementById("plantCultivarOptions")?.replaceChildren();
+    populatePlantLocationOptions();
+    const plantEnvironment = document.getElementById("plantEnvironment");
+    if (plantEnvironment) {
+      plantEnvironment.replaceChildren();
+      const option = document.createElement("option");
+      option.value = "";
+      option.textContent = "Non précisé";
+      plantEnvironment.appendChild(option);
+    }
+    await loadPlantCultures();
+    showMessage("Culture végétale enregistrée.", "success");
+    if (status) status.textContent = "Culture enregistrée dans le registre AgriTech.";
+  } catch (error) {
+    console.error("Enregistrement de la culture végétale impossible :", error);
+    showMessage("Enregistrement impossible : " + (error.message || "erreur inconnue"), "error");
+    if (status) status.textContent = "Échec de l’enregistrement. Vérifiez le code unique et les références.";
+  } finally {
+    button.disabled = false;
+    button.textContent = oldLabel;
+  }
+}
+
 function setupDomainWorkspaces() {
   const modes = {
     agronomy: {
@@ -6088,6 +6351,12 @@ function setupDomainWorkspaces() {
     buttons.forEach(button => button.setAttribute("aria-pressed", String(button.dataset.domainChoice === activeDomain)));
     if (heading) heading.textContent = config.heading;
     if (description) description.textContent = config.description;
+    const cultureEntryTitle = document.getElementById("cultureEntryTitle");
+    const strainLabel = document.getElementById("strainLabel");
+    const cultureTypeLabel = document.getElementById("cultureTypeLabel");
+    if (cultureEntryTitle) cultureEntryTitle.textContent = activeDomain === "laboratory" ? "Nouvelle culture de laboratoire" : "Nouvelle culture fongique";
+    if (strainLabel?.firstChild) strainLabel.firstChild.textContent = activeDomain === "laboratory" ? "Souche / ressource biologique source" : "Souche fongique source";
+    if (cultureTypeLabel?.firstChild) cultureTypeLabel.firstChild.textContent = activeDomain === "laboratory" ? "Format de culture au laboratoire" : "Support / forme de culture";
     if (eyebrow) eyebrow.innerHTML = config.eyebrow.replace(" / ", ' <span class="eyebrow-separator">/</span> ');
     if (title) title.innerHTML = config.title;
     if (heroDescription) heroDescription.textContent = config.descriptionHero;
@@ -6109,6 +6378,7 @@ function setupDomainWorkspaces() {
   setDomain(window.BA_LABS_DOMAIN, false);
 }
 setupDomainWorkspaces();
+setupPlantRegistry();
 setupProgressiveCultureEntry();
 setupBioOperationFormGuidance();
 
