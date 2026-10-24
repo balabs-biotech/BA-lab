@@ -79,4 +79,14 @@ assert.deepEqual(edgeCandidates.sort((a,b)=>a-b), [7847, 82832], "unexpected can
 execFileSync("node", ["--check", `${base}/osint-ndvi.js`], { stdio: "inherit" });
 execFileSync("node", ["--check", `${base}/environmental-data.js`], { stdio: "inherit" });
 execFileSync("node", ["--check", `${base}/forecast-rules.js`], { stdio: "inherit" });
-console.log("OSINT checks passed: NDVI integrity, 65 candidate points, deterministic forecast rules, missing-data handling, and JavaScript syntax.");
+
+// Integration contract: the Green Tech page must actually load both OSINT modules,
+// and each runtime data path must point to an asset present in the repository.
+const greenTechHtml = readFileSync(`${base}/green-tech/index.html`, "utf8");
+assert.match(greenTechHtml, /\.\.\/forecast-rules\.js/, "Green Tech page must load deterministic forecast rules");
+assert.match(greenTechHtml, /\.\.\/osint-ndvi\.js/, "Green Tech page must load the NDVI summary module");
+assert.match(greenTechHtml, /\.\.\/environmental-data\.js/, "Green Tech page must load the environmental context module");
+assert.match(readFileSync(`${base}/osint-ndvi.js`, "utf8"), /\.\.\/data\/osint-ndvi-transitions\.json/, "NDVI module must reference the committed transition dataset");
+assert.match(readFileSync(`${base}/osint-ndvi.js`, "utf8"), /\.\.\/data\/osint-priority-zones\.csv/, "NDVI module must reference the committed candidate-zone dataset");
+
+console.log("OSINT checks passed: NDVI integrity, 65 candidate points, deterministic forecast rules, missing-data handling, frontend wiring, and JavaScript syntax.");
