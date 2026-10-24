@@ -232,6 +232,7 @@
         grid.append(metric("Température minimale",min(temps)," °C"),metric("Température maximale",max(temps)," °C"),metric("Pluie cumulée prévue",sum(rain)," mm"),metric("Probabilité de pluie maximale",max(prob),"%"),metric("Vent maximal",max(wind)," km/h"),metric("Humidité moyenne",avg(humid),"%"));
         forecastSummary.append(grid);
         const advice=node("div",{class:"environmental-advice"});
+        const advise=(level,title,message)=>{const card=node("article",{class:"card"});card.append(node("small",{class:"muted"},level),node("h4",{},title),node("p",{},message));advice.append(card);};
         const profileGuidance={
           field_crop:["Culture en extérieur","La prévision décrit l’air à proximité des coordonnées. Exposition au soleil, pente, vent, irrigation et couvert végétal peuvent modifier les conditions au niveau de la culture."],
           greenhouse:["Culture sous serre","La météo extérieure n’est pas la météo de la serre : l’ensoleillement, la ventilation, l’inertie et l’humidité peuvent produire des écarts importants. Utilisez une sonde intérieure pour les décisions."],
@@ -240,7 +241,6 @@
         };
         const context=profileGuidance[profile.value]||profileGuidance.custom;
         advise("Contexte d’interprétation",context[0],context[1]);
-        const advise=(level,title,message)=>{const card=node("article",{class:"card"});card.append(node("small",{class:"muted"},level),node("h4",{},title),node("p",{},message));advice.append(card);};
         let flags=0;
         if(max(temps)!==null&&max(temps)>=30){advise("Vigilance chaleur","Température extérieure élevée","Le maximum prévu atteint "+max(temps).toFixed(1)+" °C. Pour les cultures et les cultures microbiologiques exposées, réduire l’exposition directe au soleil et contrôler la température réelle sur place. Ce seuil est un repère météo général, pas une limite de tolérance biologique.");flags++;}
         if(min(temps)!==null&&min(temps)<=5){advise("Vigilance froid","Température extérieure basse","Le minimum prévu atteint "+min(temps).toFixed(1)+" °C. Vérifiez la protection des plantes sensibles et des contenants exposés au froid ; référez-vous aux limites de température propres à chaque espèce ou protocole.");flags++;}
