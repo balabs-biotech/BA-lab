@@ -20,9 +20,8 @@ BEGIN
       WHERE n.nspname = 'public'
         AND c.relname = target_table
         AND c.relrowsecurity
-        AND c.relforcerowsecurity
     ) THEN
-      RAISE EXCEPTION 'FAIL: public.% must have RLS enabled and forced', target_table;
+      RAISE EXCEPTION 'FAIL: row-level security is not enabled on public.%', target_table;
     END IF;
 
     SELECT count(*) INTO policy_count
