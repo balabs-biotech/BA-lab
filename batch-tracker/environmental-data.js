@@ -253,10 +253,13 @@
         }else if(rangeEvaluation?.status==="no_data"){
           advise("Données insuffisantes","Impossible de comparer la plage","Aucune température horaire valide n’est disponible pour évaluer les limites saisies.");
         }else if(rangeEvaluation?.configured){
+          const coverageNote=" Comparaison calculée sur "+rangeEvaluation.availableHours+" heure(s) avec température disponible sur "+h.time.length+" heure(s) de prévision.";
           if(outsideHours>0){
-            advise("Votre plage de température est dépassée",""+outsideHours+" heure(s) hors plage sur 48 h","Selon la prévision extérieure, "+outsideHours+" heure(s) sont sous la limite minimale ou au-dessus de la limite maximale que vous avez saisie. Vérifiez l’exposition réelle avec un thermomètre ou une sonde au niveau du matériel ; la prévision météo ne prédit pas sa température interne.");
+            advise("Votre plage de température est dépassée",""+outsideHours+" heure(s) prévues hors plage","Selon la prévision extérieure, "+outsideHours+" heure(s) sont sous la limite minimale ou au-dessus de la limite maximale que vous avez saisie."+coverageNote+" Vérifiez l’exposition réelle avec un thermomètre ou une sonde au niveau du matériel ; la prévision météo ne prédit pas sa température interne.");
+          }else if(rangeEvaluation.availableHours<h.time.length){
+            advise("Comparaison partielle","Aucun dépassement parmi les heures disponibles","Des températures horaires sont manquantes : l’absence de dépassement n’est pas établie pour toute la période."+coverageNote+" Cela ne garantit pas la température réelle du substrat, de la serre ou du contenant.");
           }else{
-            advise("Aucun dépassement calculé","La prévision reste dans la plage saisie","Aucune heure disponible ne sort de votre plage configurée. Cela ne garantit pas la température réelle du substrat, de la serre ou du contenant.");
+            advise("Aucun dépassement calculé","La prévision reste dans la plage saisie","Aucune heure disponible ne sort de votre plage configurée."+coverageNote+" Cela ne garantit pas la température réelle du substrat, de la serre ou du contenant.");
           }
         }else{
           advise("Personnalisation disponible","Ajouter les limites de votre protocole","Saisissez les limites basse et/ou haute validées pour votre culture ou protocole afin de calculer les heures de dépassement. Aucun seuil biologique n’est imposé par défaut.");
