@@ -127,7 +127,12 @@
       records.forEach(z => { const m=window.L.circleMarker([z.latitude,z.longitude],{radius:Math.max(4,Math.min(10,3+Math.sqrt(z.surface_ha))),color:"#7f1d1d",fillColor:"#dc6b45",fillOpacity:0.72,weight:1}).bindPopup("<strong>Zone "+z.zone_id+"</strong><br>Surface estimée : "+fmt(z.surface_ha,2)+" ha<br>Fréquence moyenne de baisse : "+fmt(z.frequence_baisse_moyenne*100,1)+" %<br>Pixels avec 3 baisses ou plus : "+fmt(z.pixels_3_baisses_ou_plus_pct,2)+" %").addTo(map); markers.push(m); });
       if(markers.length) map.fitBounds(window.L.featureGroup(markers).getBounds().pad(0.08));
       setTimeout(() => map.invalidateSize(),150);
-    } catch(error) { console.error("Zones OSINT indisponibles :",error); statusNode.textContent="Impossible de charger la carte des zones. Vérifier la connexion et l’accès au fichier de données."; }
+    } catch(error) {
+      console.error("Carte OSINT indisponible :", error);
+      statusNode.textContent = error && error.message === "Leaflet indisponible"
+        ? "Les données sont chargées, mais la bibliothèque cartographique externe est inaccessible. Réessayez avec une connexion active ; le tableau de points reste disponible."
+        : "Impossible de charger les données des zones. Vérifiez que le fichier CSV est accessible puis rechargez la page.";
+    }
   }
   async function start() {
     try {
