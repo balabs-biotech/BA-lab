@@ -23,5 +23,45 @@
     return { valid: true, configured: true, lower, upper, availableHours: values.length, outsideHours, status: outsideHours ? "outside_range" : "within_range" };
   }
 
-  root.BALabsForecastRules = Object.freeze({ evaluateTemperatureRange });
+  // Provider-neutral contract for future forecast adapters (ECMWF/NOAA/etc.).
+  // Missing temperatures remain null; timestamps are normalized to ISO UTC.
+  function normalizeHourlyForecast(rows, metadata = {}) {
+    const source = String(metadata.source ?? "").trim();
+    const retrievedAt = Date.parse(metadata.retrievedAt ?? "");
+    const issuedAt = Date.parse(metadata.issuedAt ?? "");
+    if (!source) return { valid: false, reason: "missing_source", hours: [] };
+    if (!Number.isFinite(retrievedAt)) return { valid: false, reason: "invalid_retrieved_at", hours: [] };
+    if (!Number.isFinite(issuedAt)) return { valid: false, reason: "invalid_issued_at", hours: [] };
+    if (!Array.isArray(rows) || rows.length === 0) return { valid: false, reason: "no_rows", hours: [] };
+
+    const seen = new Set();
+    const hours = [];
+    for (const row of rows) {
+      const timestamp = Date.parse(row?.time ?? "");
+      if (!Number.isFinite(timestamp)) return { valid: false, reason: "invalid_timestamp", hours: [] };
+      const time = new Date(timestamp).toISOString();
+      if (seen.has(time)) return { valid: false, reason: "duplicate_timestamp", hours: [] };
+      seen.add(time);
+      let temperatureC = null;
+      if (row?.temperatureC !== null && row?.temperatureC !== undefined && row?.temperatureC !== "") {
+        temperatureC = Number(row.temperatureC);
+        if (!Number.isFinite(temperatureC) || temperatureC < -100 || temperatureC > 70) {
+          return { valid: false, reason: "invalid_temperature", hours: [] };
+        }
+      }
+      hours.push({ time, temperatureC });
+    }
+    hours.sort((left, right) => Date.parse(left.time) - Date.parse(right.time));
+    return {
+      valid: true,
+      source,
+      retrievedAt: new Date(retrievedAt).toISOString(),
+      issuedAt: new Date(issuedAt).toISOString(),
+      hours,
+      availableTemperatures: hours.filter(hour => hour.temperatureC !== null).length,
+      missingTemperatures: hours.filter(hour => hour.temperatureC === null).length,
+    };
+  }
+
+  root.BALabsForecastRules = Object.freeze({ evaluateTemperatureRange, normalizeHourlyForecast });
 })();
