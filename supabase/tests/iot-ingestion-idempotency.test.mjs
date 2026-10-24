@@ -29,6 +29,11 @@ assert.match(migration, /grant execute on function public\.ingest_iot_payload\(u
 assert.match(edgeFunction, /message\.includes\("message_id_payload_mismatch"\)[\s\S]{0,180}response\(409,/);
 assert.match(edgeFunction, /const payloadHash = await sha256Hex\(raw\)/);
 
+// Revocation contract: disabled devices cannot pass the Edge Function token lookup.
+assert.match(edgeFunction, /\.eq\("enabled", true\)/);
+assert.ok(edgeFunction.includes('response(401, { error: "invalid_or_revoked_device_token" })'),
+  "missing or disabled device tokens must be rejected with HTTP 401");
+
 // Authenticate and apply the per-device budget before buffering or parsing attacker-controlled bodies.
 const deviceAuthIndex = edgeFunction.indexOf('.from("iot_devices")');
 const rateLimitIndex = edgeFunction.indexOf('"allow_iot_ingest_request"');
