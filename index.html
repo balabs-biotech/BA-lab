@@ -109,9 +109,9 @@ h1 span{color:var(--green);white-space:nowrap}
 <script>
 (() => {
   const copy = {
-    en: ["BIOLOGICAL TRACKING PLATFORM · 01—03","Every culture","its own universe.","Choose your workspace. Each universe has its own page and specialist tools, with shared biological traceability.","Choose a workspace","Plants, substrates, greenhouse, irrigation, fungal digesters and environmental monitoring.","Enter workspace","Strains, generations, transfers, morphology and contamination tracking.","Culture media, protocols, experimental parameters, measurements and results.","One shared platform · Three specialised workspaces"],
-    pt: ["PLATAFORMA DE ACOMPANHAMENTO BIOLÓGICO · 01—03","Cada cultura","o seu universo.","Escolha o seu espaço de trabalho. Cada espaço tem a sua própria página e ferramentas específicas, com rastreabilidade biológica comum.","Escolher um espaço de trabalho","Plantas, substratos, estufa, irrigação, digestores fúngicos e monitorização ambiental.","Entrar no espaço","Estirpes, gerações, transferências, morfologia e acompanhamento de contaminações.","Meios de cultura, protocolos, parâmetros experimentais, medições e resultados.","Uma plataforma comum · Três interfaces especializadas"],
-    ar: ["منصة تتبّع بيولوجي · 01—03","لكل مزرعة","مساحتها الخاصة.","اختر مساحة العمل. لكل مساحة صفحة وأدوات متخصصة، مع تتبّع بيولوجي مشترك.","اختر مساحة العمل","النباتات والركائز والبيت المحمي والري والهاضمات الفطرية ومراقبة البيئة.","الدخول إلى المساحة","السلالات والأجيال وعمليات النقل والمورفولوجيا ومتابعة التلوث.","أوساط الزراعة والبروتوكولات والمعايير التجريبية والقياسات والنتائج.","منصة مشتركة · ثلاث واجهات متخصصة"]
+    en: ["BIOLOGICAL TRACKING PLATFORM · 01—03","Every culture has","its own universe.","Choose your workspace. Each universe has its own page and specialist tools, with shared biological traceability.","Choose a workspace","Plants, substrates, greenhouse, irrigation, fungal digesters and environmental monitoring.","Enter workspace","Strains, generations, transfers, morphology and contamination tracking.","Culture media, protocols, experimental parameters, measurements and results.","One shared platform · Three specialised workspaces","Choose your workspace","One platform. Three specialised workspaces.","One shared standard of biological traceability, with tools adapted to each activity.","BA LABS / CULTURE & BATCH TRACKER","Agritech & environment","Mycology & fungal cultures","Research & laboratory","Green Tech","Mycology","Laboratory"],
+    pt: ["PLATAFORMA DE ACOMPANHAMENTO BIOLÓGICO · 01—03","Cada cultura tem","o seu universo.","Escolha o seu espaço de trabalho. Cada espaço tem a sua própria página e ferramentas específicas, com rastreabilidade biológica comum.","Escolher um espaço de trabalho","Plantas, substratos, estufa, irrigação, digestores fúngicos e monitorização ambiental.","Entrar no espaço","Estirpes, gerações, transferências, morfologia e acompanhamento de contaminações.","Meios de cultura, protocolos, parâmetros experimentais, medições e resultados.","Uma plataforma comum · Três interfaces especializadas","Escolha o seu espaço de trabalho","Uma plataforma. Três espaços especializados.","O mesmo rigor de rastreabilidade biológica, com ferramentas adaptadas a cada atividade.","BA LABS / CULTURA & RASTREIO DE LOTES","Agrotecnologia & ambiente","Micologia & culturas fúngicas","Investigação & laboratório","Tecnologia verde","Micologia","Laboratório"],
+    ar: ["منصة تتبّع بيولوجي · 01—03","لكل ثقافة","عالمها الخاص.","اختر مساحة العمل. لكل مساحة صفحة وأدوات متخصصة، مع تتبّع بيولوجي مشترك.","اختر مساحة العمل","النباتات والركائز والبيت المحمي والري والهاضمات الفطرية ومراقبة البيئة.","الدخول إلى المساحة","السلالات والأجيال وعمليات النقل والمورفولوجيا ومتابعة التلوث.","أوساط الزراعة والبروتوكولات والمعايير التجريبية والقياسات والنتائج.","منصة مشتركة · ثلاث واجهات متخصصة","اختر مساحة العمل","منصة واحدة. ثلاث مساحات متخصصة.","منهج موحّد للتتبّع البيولوجي، مع أدوات ملائمة لكل نشاط.","BA LABS / تتبّع الثقافات والدفعات","التقنيات الزراعية والبيئة","علم الفطريات وزراعاته","البحث والمختبر","التقنيات الخضراء","علم الفطريات","المختبر"]
   };
   const original = [
     document.querySelector(".kicker"), document.querySelector("h1"), document.querySelector("h1 span"),
@@ -132,6 +132,16 @@ h1 span{color:var(--green);white-space:nowrap}
       document.querySelector("h1 span").textContent = vals[2];
       document.querySelector(".lead").textContent = vals[3];
       document.querySelector(".universes").setAttribute("aria-label", vals[4]);
+      document.querySelector(".section-head h2").textContent = vals[10];
+      document.querySelector(".intro-note strong").textContent = vals[11];
+      document.querySelector(".intro-note").lastChild.textContent = vals[12];
+      document.querySelector(".section-head p").textContent = vals[13];
+      document.querySelector(".agronomy .universe-label").textContent = vals[14];
+      document.querySelector(".myco .universe-label").textContent = vals[15];
+      document.querySelector(".lab .universe-label").textContent = vals[16];
+      document.querySelector(".agronomy h3").textContent = vals[17];
+      document.querySelector(".myco h3").textContent = vals[18];
+      document.querySelector(".lab h3").textContent = vals[19];
       [".agronomy p", ".myco p", ".lab p"].forEach((selector, i) => { document.querySelector(selector).textContent = vals[[5, 7, 8][i]]; });
     }
     document.querySelectorAll(".enter span:first-child").forEach(el => { el.textContent = vals ? vals[6] : "Entrer dans l’espace"; });
