@@ -21,6 +21,13 @@ begin
   if p_event is null or p_measurement is null then
     raise exception 'Event and measurement payloads are required' using errcode = '22023';
   end if;
+  if p_event->>'event_type' <> 'measurement_recorded' then
+    raise exception 'Unsupported manual measurement event type' using errcode = '22023';
+  end if;
+  if nullif(p_event->>'culture_id', '')::uuid is distinct from nullif(p_measurement->>'culture_id', '')::uuid
+     or nullif(p_event->>'plant_culture_id', '')::uuid is distinct from nullif(p_measurement->>'plant_culture_id', '')::uuid then
+    raise exception 'Event and measurement targets must match' using errcode = '22023';
+  end if;
 
   insert into public.events (
     organization_id, event_type, occurred_at, actor_user_id,
@@ -29,7 +36,7 @@ begin
     v_org_id,
     p_event->>'event_type',
     coalesce(nullif(p_event->>'occurred_at', '')::timestamptz, now()),
-    nullif(p_event->>'actor_user_id', '')::uuid,
+    auth.uid(),
     nullif(p_event->>'culture_id', '')::uuid,
     nullif(p_event->>'plant_culture_id', '')::uuid,
     nullif(p_event->>'environment_id', '')::uuid,
@@ -83,6 +90,13 @@ begin
 
   if p_event is null or p_observation is null then
     raise exception 'Event and observation payloads are required' using errcode = '22023';
+  end if;
+  if p_event->>'event_type' <> 'observation_recorded' then
+    raise exception 'Unsupported manual observation event type' using errcode = '22023';
+  end if;
+  if nullif(p_event->>'culture_id', '')::uuid is distinct from nullif(p_observation->>'culture_id', '')::uuid
+     or nullif(p_event->>'plant_culture_id', '')::uuid is distinct from nullif(p_observation->>'plant_culture_id', '')::uuid then
+    raise exception 'Event and observation targets must match' using errcode = '22023';
   end if;
 
   insert into public.events (
