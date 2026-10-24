@@ -13,6 +13,8 @@ const corsHeaders = {
   "Cache-Control": "no-store",
 };
 
+const MAX_PAYLOAD_BYTES = 32_000;
+
 const allowed: Record<string, { unit: string; min: number; max: number }> = {
   temperature: { unit: "degC", min: -20, max: 80 },
   relative_humidity: { unit: "%", min: 0, max: 100 },
@@ -38,15 +40,40 @@ Deno.serve(async (req: Request) => {
   const match = auth.match(/^Bearer\s+([A-Za-z0-9._~-]{32,200})$/i);
   if (!match) return response(401, { error: "device_token_required" });
 
-  const declaredLength = Number(req.headers.get("content-length") ?? "0");
-  if (declaredLength > 32_000) return response(413, { error: "payload_too_large" });
+  const contentLength = req.headers.get("content-length");
+  if (contentLength !== null && /^\d+$/.test(contentLength) &&
+      Number(contentLength) > MAX_PAYLOAD_BYTES) {
+    return response(413, { error: "payload_too_large" });
+  }
 
+  // Enforce the limit while streaming, before buffering an untrusted body in memory.
   let raw: string;
+  const reader = req.body?.getReader();
+  if (!reader) return response(400, { error: "invalid_body" });
+  const chunks: Uint8Array[] = [];
+  let totalBytes = 0;
   try {
-    raw = await req.text();
-    if (new TextEncoder().encode(raw).byteLength > 32_000) {
-      return response(413, { error: "payload_too_large" });
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      totalBytes += value.byteLength;
+      if (totalBytes > MAX_PAYLOAD_BYTES) {
+        try {
+          await reader.cancel();
+        } catch {
+          // The payload is already rejected; cancellation failure must not change the response.
+        }
+        return response(413, { error: "payload_too_large" });
+      }
+      chunks.push(value);
     }
+    const bytes = new Uint8Array(totalBytes);
+    let offset = 0;
+    for (const chunk of chunks) {
+      bytes.set(chunk, offset);
+      offset += chunk.byteLength;
+    }
+    raw = new TextDecoder("utf-8", { fatal: true }).decode(bytes);
   } catch {
     return response(400, { error: "invalid_body" });
   }
@@ -121,6 +148,18 @@ Deno.serve(async (req: Request) => {
       return response(500, { error: "device_lookup_failed" });
     }
     if (!device) return response(401, { error: "invalid_or_revoked_device_token" });
+
+    const { data: withinRateLimit, error: rateLimitError } = await supabase.rpc(
+      "allow_iot_ingest_request",
+      { p_device_id: device.id },
+    );
+    if (rateLimitError) {
+      console.error("[iot-ingest] Rate-limit check failed", rateLimitError.message);
+      return response(500, { error: "rate_limit_check_failed" });
+    }
+    if (withinRateLimit !== true) {
+      return response(429, { error: "device_rate_limit_exceeded" });
+    }
 
     const payloadHash = await sha256Hex(raw);
     const { data, error } = await supabase.rpc("ingest_iot_payload", {

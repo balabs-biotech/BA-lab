@@ -162,6 +162,8 @@ jobs:
         run: node supabase/tests/copernicus-sentinel-catalogue.test.mjs
       - name: Test Sentinel-2 frontend catalogue contract
         run: node supabase/tests/sentinel-2-frontend-contract.test.mjs
+      - name: Test IoT idempotency payload-conflict contract
+        run: node supabase/tests/iot-ingestion-idempotency.test.mjs
       - name: Test NASA POWER scheduled-import security contract
         run: node supabase/tests/nasa-power-scheduled-import.test.mjs
 
@@ -204,3 +206,7 @@ jobs:
           psql -At -v ON_ERROR_STOP=1 -X -q -c "select to_regclass('public.cultures'), to_regclass('public.batches'), to_regclass('public.culture_data_consents')" | grep -q 'cultures'
       - name: Test environmental observation schema and access contract
         run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/environmental_observations_contract.test.sql
+      - name: Test IoT database security and idempotency contract
+        run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/iot-ingestion-security.test.sql
+      - name: Test IoT ingestion runtime idempotency on PostgreSQL 17
+        run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/iot-ingestion-runtime.test.sql
