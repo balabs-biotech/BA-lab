@@ -12,6 +12,7 @@ DECLARE
   retry_result jsonb;
   conflict_caught boolean := false;
   invalid_batch_caught boolean := false;
+  null_payload_caught boolean := false;
   measurement_count integer;
   receipt_count integer;
 BEGIN
@@ -128,7 +129,33 @@ BEGIN
   IF receipt_count <> 0 THEN
     RAISE EXCEPTION 'FAIL: invalid batch left a receipt: %', receipt_count;
   END IF;
+
+  -- SQL NULL differs from JSON null: guard it before jsonb_typeof/array_length.
+  BEGIN
+    PERFORM public.ingest_iot_payload(
+      v_device_id,
+      'ci-message-null-001',
+      repeat('e', 64),
+      NULL
+    );
+  EXCEPTION WHEN OTHERS THEN
+    IF SQLERRM = 'invalid_readings_count' THEN
+      null_payload_caught := true;
+    ELSE
+      RAISE;
+    END IF;
+  END;
+  IF NOT null_payload_caught THEN
+    RAISE EXCEPTION 'FAIL: SQL-NULL readings payload was accepted';
+  END IF;
+
+  SELECT count(*) INTO receipt_count
+  FROM public.iot_ingest_receipts
+  WHERE device_id = v_device_id AND message_id = 'ci-message-null-001';
+  IF receipt_count <> 0 THEN
+    RAISE EXCEPTION 'FAIL: SQL-NULL payload left a receipt: %', receipt_count;
+  END IF;
 END
 $iot_runtime$;
 
-SELECT 'PASS: IoT RPC processes once, retries idempotently, rejects hash conflict, persists one measurement' AS test_result;
+SELECT 'PASS: IoT RPC processes once, retries idempotently, rejects hash conflict, invalid batches and SQL NULL' AS test_result;
