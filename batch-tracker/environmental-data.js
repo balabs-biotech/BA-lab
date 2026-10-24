@@ -76,6 +76,7 @@
       if(!data)return;
       lat.value=data.latitude??""; lon.value=data.longitude??""; accuracy.value=data.coordinate_accuracy_m??"";
       if(data.coordinate_source && [...source.options].some(o=>o.value===data.coordinate_source))source.value=data.coordinate_source;
+      await loadForecast();
     }
     function renderClimateSummary(data){
       summary.replaceChildren();
