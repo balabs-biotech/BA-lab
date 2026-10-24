@@ -23,8 +23,10 @@ for (const [name, rpc, payloadKey, directTable] of [
   if (!migration.includes("create or replace function public." + rpc + "(") ||
       !migration.includes("insert into public.events") ||
       !migration.includes("insert into public." + directTable) ||
-      !migration.includes("grant execute on function public." + rpc + "(jsonb, jsonb) to authenticated")) {
-    throw new Error(name + " RPC migration is incomplete");
+      !migration.includes("grant execute on function public." + rpc + "(jsonb, jsonb) to authenticated") ||
+      !migration.includes("auth.uid(),") ||
+      !migration.includes("Event and " + name + " target" + (name === "measurement" ? "s" : "s") + " must match")) {
+    throw new Error(name + " RPC migration is incomplete or misses actor/target integrity checks");
   }
 }
 console.log("✓ Manual measurement and observation writes use atomic RPCs; client-side split inserts are absent");
