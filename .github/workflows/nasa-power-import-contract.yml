@@ -27,3 +27,8 @@ jobs:
           node-version: "22"
       - name: Validate NASA POWER importer security contract
         run: node supabase/tests/nasa-power-scheduled-import.test.mjs
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      - name: Type-check NASA POWER Edge Function
+        run: deno check supabase/functions/nasa-power-scheduled-import/index.ts
