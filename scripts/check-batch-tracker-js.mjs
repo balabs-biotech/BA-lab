@@ -189,3 +189,9 @@ if(!engine.includes('from("plant_cultures")')||!engine.includes('domain: "agrono
 if(!engine.includes('domain: document.body.dataset.domain === "laboratory" ? "laboratory" : "mycology"'))throw new Error("Biological culture records must retain their originating workspace");
 for(const snippet of ["create table if not exists public.plant_cultures","alter table public.plant_cultures enable row level security","private.is_org_member(organization_id)","constraint plant_cultures_org_code_key unique"])if(!plantMigration.includes(snippet))throw new Error("Plant registry migration missing security/constraint: "+snippet);
 console.log("✓ AgriTech plant records are separate from mycology/laboratory culture lineages");
+
+
+if(!root.includes('class="kicker"')||!root.includes('document.querySelector(".kicker").textContent'))throw new Error("Landing-page language switcher references a missing translated kicker");
+if(!root.includes('<a class="skip-link" href="#main">')||!root.includes('<main id="main" tabindex="-1">'))throw new Error("Landing page skip link/main target missing");
+if(!root.includes('id="pageLanguage"')||!root.includes('value="ar"'))throw new Error("Landing-page multilingual selector missing Arabic option");
+console.log("✓ Landing page language switcher target exists; skip navigation and multilingual options are present");
