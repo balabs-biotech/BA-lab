@@ -15,6 +15,7 @@ DECLARE
   null_payload_caught boolean := false;
   bad_shape_count integer := 0;
   invalid_payload jsonb;
+  previous_rotation timestamptz;
   measurement_count integer;
   receipt_count integer;
 BEGIN
@@ -181,7 +182,23 @@ BEGIN
   IF bad_shape_count <> 4 THEN
     RAISE EXCEPTION 'FAIL: expected all 4 non-array JSON values to be rejected, got %', bad_shape_count;
   END IF;
+
+  -- A changed token hash must advance the rotation timestamp automatically.
+  UPDATE public.iot_devices
+    SET token_rotated_at = '2000-01-01 00:00:00+00'
+    WHERE id = v_device_id;
+  SELECT token_rotated_at INTO previous_rotation
+    FROM public.iot_devices WHERE id = v_device_id;
+  UPDATE public.iot_devices
+    SET token_sha256 = repeat('c', 64)
+    WHERE id = v_device_id;
+  IF NOT EXISTS (
+    SELECT 1 FROM public.iot_devices
+    WHERE id = v_device_id AND token_rotated_at > previous_rotation
+  ) THEN
+    RAISE EXCEPTION 'FAIL: changing device token hash did not advance token_rotated_at';
+  END IF;
 END
 $iot_runtime$;
 
-SELECT 'PASS: IoT RPC processes once, retries idempotently, rejects hash conflict, invalid batches, SQL NULL and non-array JSON' AS test_result;
+SELECT 'PASS: IoT RPC idempotency, invalid-payload rejection and token-rotation timestamp' AS test_result;
