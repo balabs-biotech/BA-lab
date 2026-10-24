@@ -39,6 +39,7 @@ let selectedBatchId = null;
 let selectedBatch = null;
 
 let initializationInProgress = false;
+let authStateRevision = 0;
 let measurementVariables = [];
 let measurementUnits = [];
 let quantityUnitOptions = [];
@@ -714,6 +715,7 @@ async function signOut() {
   }
 
 
+  authStateRevision += 1;
   organizationId = null;
   organization = null;
   strainOptions = [];
@@ -810,6 +812,7 @@ async function initializeAuthenticatedTracker(
   initializationInProgress =
     true;
 
+  const initRevision = authStateRevision;
 
   try {
 
@@ -891,6 +894,8 @@ async function initializeAuthenticatedTracker(
 
     setDefaultDate();
 
+    // Never reveal data loaded by an initialization superseded by an auth change.
+    if (initRevision !== authStateRevision) return;
 
     showElement(trackerCard);
 
@@ -916,6 +921,7 @@ async function initializeAuthenticatedTracker(
       error
     );
 
+    if (initRevision !== authStateRevision) return;
 
     hideElement(trackerCard);
     hideElement(batchCard);
@@ -937,6 +943,15 @@ async function initializeAuthenticatedTracker(
 
     initializationInProgress =
       false;
+
+    // If the session changed while loading, reconcile the UI against the latest session.
+    if (initRevision !== authStateRevision) {
+      setTimeout(() => {
+        refreshAuthUI().catch(error => {
+          console.error("Actualisation de session :", error);
+        });
+      }, 0);
+    }
 
   }
 
@@ -4423,6 +4438,8 @@ supabaseClient.auth.onAuthStateChange(
     event,
     session
   ) => {
+
+    authStateRevision += 1;
 
     setTimeout(
       () => {
