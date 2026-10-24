@@ -2,6 +2,7 @@
 (() => {
   "use strict";
   const dataUrl = "../data/osint-ndvi-transitions.json";
+  const zonesUrl = "../data/osint-priority-zones.csv";
   const fmt = (v, digits = 1) => Number(v).toLocaleString("fr-FR", { minimumFractionDigits: digits, maximumFractionDigits: digits });
   const el = (tag, attrs = {}, text = "") => {
     const n = document.createElement(tag);
@@ -82,10 +83,51 @@
     table.append(tbody); panel.append(table);
     const note = el("p", { class: "muted" }, "Seuil ±0,05 descriptif uniquement. La transition vers le 22 octobre 2026 ne couvre que 74,68 % de l’emprise en pixels comparables ; interpréter avec prudence. Les baisses estivales peuvent refléter la saisonnalité, les récoltes, le sol nu ou d’autres facteurs.");
     panel.append(note);
-    const status = el("p", { class: "muted", "aria-live": "polite" }, "Résumé pré-calculé. Les 65 zones candidates ne sont pas encore affichées : leur GeoJSON complet doit être importé dans les ressources de l’application après contrôle géospatial.");
-    panel.append(status);
+    panel.append(el("h3", {}, "Zones candidates à examiner"));
+    panel.append(el("p", { class: "muted" }, "65 points candidats issus du tableau zonal. Ce ne sont pas des limites parcellaires ni des diagnostics agronomiques confirmés."));
+    const mapNode = el("div", { id: "osintPriorityMap", role: "region", "aria-label": "Carte des zones candidates de baisse NDVI" });
+    mapNode.style.cssText = "height:420px;min-height:320px;border-radius:10px;border:1px solid #dfe5df;overflow:hidden;background:#f5f7f5;";
+    panel.append(mapNode);
+    const zoneStatus = el("p", { class: "muted", "aria-live": "polite" }, "Chargement des zones candidates…");
+    panel.append(zoneStatus);
+    const zoneTable = el("table", { class: "table" });
+    const zhead = el("thead"), zrow = el("tr");
+    ["Zone", "Surface estimée (ha)", "Fréquence moyenne de baisse", "Pixels avec 3 baisses ou plus", "Coordonnées"].forEach(t => zrow.append(el("th", {}, t)));
+    zhead.append(zrow); zoneTable.append(zhead);
+    const zbody = el("tbody"); zoneTable.append(zbody); panel.append(zoneTable);
+    loadZones(mapNode, zoneStatus, zbody);
     anchor.parentNode.insertBefore(panel, anchor.nextSibling);
     return true;
+  }
+  async function loadZones(mapNode, statusNode, tbody) {
+    try {
+      const response = await fetch(zonesUrl, { cache: "no-store" });
+      if (!response.ok) throw new Error("HTTP " + response.status);
+      const lines = (await response.text()).trim().split(/\r?\n/);
+      const headers = lines.shift().split(",");
+      const records = lines.filter(Boolean).map(line => {
+        const values = line.split(","), row = {};
+        headers.forEach((h, i) => row[h] = values[i]);
+        ["zone_id","pixels","surface_ha","longitude","latitude","frequence_baisse_moyenne","frequence_baisse_mediane","pixels_3_baisses_ou_plus_pct","transitions_valides_moyenne","pixels_3_baisses_estimes"].forEach(k => row[k] = Number(row[k]));
+        return row;
+      }).filter(z => Number.isFinite(z.longitude) && Number.isFinite(z.latitude));
+      if (!records.length) throw new Error("Aucune zone exploitable");
+      [...records].sort((a,b) => b.pixels_3_baisses_ou_plus_pct-a.pixels_3_baisses_ou_plus_pct).slice(0,15).forEach(z => {
+        const tr = el("tr"), td = el("td");
+        tr.append(el("td", {}, String(z.zone_id)), el("td", {}, fmt(z.surface_ha,2)), el("td", {}, fmt(z.frequence_baisse_moyenne*100,1)+" %"), el("td", {}, fmt(z.pixels_3_baisses_ou_plus_pct,2)+" %"));
+        td.append(el("a", { href:"https://www.openstreetmap.org/?mlat="+z.latitude+"&mlon="+z.longitude+"#map=15/"+z.latitude+"/"+z.longitude, target:"_blank", rel:"noopener noreferrer" }, fmt(z.latitude,5)+", "+fmt(z.longitude,5)));
+        tr.append(td); tbody.append(tr);
+      });
+      statusNode.textContent = records.length+" zones chargées. Le tableau affiche les 15 points avec la plus forte proportion de pixels ayant connu au moins trois baisses.";
+      const css = document.createElement("link"); css.rel="stylesheet"; css.href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"; document.head.append(css);
+      await new Promise((resolve,reject) => { if(window.L) return resolve(); const s=document.createElement("script"); s.src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"; s.onload=resolve; s.onerror=()=>reject(new Error("Leaflet indisponible")); document.head.append(s); });
+      const map = window.L.map(mapNode).setView([36.24,5.36],10);
+      window.L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:18,attribution:"© OpenStreetMap contributors"}).addTo(map);
+      const markers=[];
+      records.forEach(z => { const m=window.L.circleMarker([z.latitude,z.longitude],{radius:Math.max(4,Math.min(10,3+Math.sqrt(z.surface_ha))),color:"#7f1d1d",fillColor:"#dc6b45",fillOpacity:0.72,weight:1}).bindPopup("<strong>Zone "+z.zone_id+"</strong><br>Surface estimée : "+fmt(z.surface_ha,2)+" ha<br>Fréquence moyenne de baisse : "+fmt(z.frequence_baisse_moyenne*100,1)+" %<br>Pixels avec 3 baisses ou plus : "+fmt(z.pixels_3_baisses_ou_plus_pct,2)+" %").addTo(map); markers.push(m); });
+      if(markers.length) map.fitBounds(window.L.featureGroup(markers).getBounds().pad(0.08));
+      setTimeout(() => map.invalidateSize(),150);
+    } catch(error) { console.error("Zones OSINT indisponibles :",error); statusNode.textContent="Impossible de charger la carte des zones. Vérifier la connexion et l’accès au fichier de données."; }
   }
   async function start() {
     try {
