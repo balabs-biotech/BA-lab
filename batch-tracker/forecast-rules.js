@@ -32,6 +32,7 @@
     if (!source) return { valid: false, reason: "missing_source", hours: [] };
     if (!Number.isFinite(retrievedAt)) return { valid: false, reason: "invalid_retrieved_at", hours: [] };
     if (!Number.isFinite(issuedAt)) return { valid: false, reason: "invalid_issued_at", hours: [] };
+    if (issuedAt > retrievedAt) return { valid: false, reason: "issued_after_retrieved_at", hours: [] };
     if (!Array.isArray(rows) || rows.length === 0) return { valid: false, reason: "no_rows", hours: [] };
 
     const seen = new Set();
