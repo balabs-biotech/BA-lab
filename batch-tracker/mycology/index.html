@@ -12,7 +12,10 @@
 <body data-domain="mycology">
   <div id="workspace-root" aria-live="polite"><main class="container"><p>Chargement de l’espace Mycology…</p></main></div>
   <script>
-    window.BA_LABS_DOMAIN = "mycology";
+    if (!window.supabase || typeof window.supabase.createClient !== "function") {
+      document.getElementById("workspace-root").innerHTML = "<main class='container'><section class='card' role='alert'><h1>Service de données indisponible</h1><p>La bibliothèque Supabase n’a pas pu être chargée. Vérifiez la connexion puis rechargez la page.</p></section></main>";
+    } else {
+      window.BA_LABS_DOMAIN = "mycology";"mycology";
     fetch("../workspace.html")
       .then(response => {
         if (!response.ok) throw new Error("Impossible de charger l’interface commune.");
@@ -38,6 +41,7 @@
       .catch(() => {
         document.getElementById("workspace-root").innerHTML = "<main class='container'><p role='alert'>L’interface n’a pas pu être chargée. Vérifiez la connexion puis rechargez la page.</p></main>";
       });
+    }
   </script>
 </body>
 </html>
