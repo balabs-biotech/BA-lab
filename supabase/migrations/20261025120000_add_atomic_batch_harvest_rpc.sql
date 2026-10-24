@@ -33,7 +33,7 @@ begin
     raise exception 'authentication_required' using errcode = '42501';
   end if;
 
-  if p_batch_id is null or p_quantity is null or p_quantity <= 0 or v_unit_code is null then
+  if p_batch_id is null or p_quantity is null or p_quantity::text = 'NaN' or p_quantity <= 0 or v_unit_code is null then
     raise exception 'invalid_harvest_payload' using errcode = '22023';
   end if;
 
@@ -47,7 +47,7 @@ begin
   end if;
 
   if v_batch.current_stage is distinct from 'harvest'
-     or v_batch.status in ('released','rejected','aborted','completed') then
+     or v_batch.status is distinct from 'active' then
     raise exception 'harvest_stage_required_for_open_batch' using errcode = '23514';
   end if;
 
