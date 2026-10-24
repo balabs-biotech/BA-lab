@@ -7,7 +7,7 @@ DECLARE
   org_id uuid := '10000000-0000-0000-0000-000000000001';
   location_id uuid;
   environment_id uuid;
-  device_id uuid;
+  v_device_id uuid;
   first_result jsonb;
   retry_result jsonb;
   conflict_caught boolean := false;
@@ -34,10 +34,10 @@ BEGIN
     org_id, environment_id, 'ci-iot-device', 'esp32-test',
     repeat('a', 64)
   )
-  RETURNING id INTO device_id;
+  RETURNING id INTO v_device_id;
 
   first_result := public.ingest_iot_payload(
-    device_id,
+    v_device_id,
     'ci-message-001',
     repeat('b', 64),
     '[{"variable_code":"temperature","unit_code":"degC","value":24.5}]'::jsonb
@@ -48,7 +48,7 @@ BEGIN
   END IF;
 
   retry_result := public.ingest_iot_payload(
-    device_id,
+    v_device_id,
     'ci-message-001',
     repeat('b', 64),
     '[{"variable_code":"temperature","unit_code":"degC","value":24.5}]'::jsonb
@@ -59,7 +59,7 @@ BEGIN
 
   BEGIN
     PERFORM public.ingest_iot_payload(
-      device_id,
+      v_device_id,
       'ci-message-001',
       repeat('c', 64),
       '[{"variable_code":"temperature","unit_code":"degC","value":25.5}]'::jsonb
@@ -78,7 +78,7 @@ BEGIN
   SELECT count(*) INTO measurement_count
   FROM public.measurements
   WHERE organization_id = org_id
-    AND iot_device_id = device_id
+    AND iot_device_id = v_device_id
     AND metadata->>'message_id' = 'ci-message-001';
   IF measurement_count <> 1 THEN
     RAISE EXCEPTION 'FAIL: expected exactly one persisted measurement, got %', measurement_count;
@@ -86,7 +86,7 @@ BEGIN
 
   SELECT count(*) INTO receipt_count
   FROM public.iot_ingest_receipts
-  WHERE device_id = device_id AND message_id = 'ci-message-001';
+  WHERE iot_ingest_receipts.device_id = v_device_id AND message_id = 'ci-message-001';
   IF receipt_count <> 1 THEN
     RAISE EXCEPTION 'FAIL: expected exactly one receipt, got %', receipt_count;
   END IF;
