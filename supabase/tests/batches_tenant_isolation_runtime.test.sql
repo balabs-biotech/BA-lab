@@ -4,6 +4,10 @@
 
 BEGIN;
 
+INSERT INTO auth.users (id)
+VALUES ('20000000-0000-0000-0000-000000000001')
+ON CONFLICT (id) DO NOTHING;
+
 INSERT INTO public.organizations (id, code, name)
 VALUES
   ('10000000-0000-0000-0000-000000000001', 'ci-tenant-a', 'CI Tenant A'),
