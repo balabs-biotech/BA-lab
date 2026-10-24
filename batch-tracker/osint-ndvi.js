@@ -29,6 +29,40 @@
     metric("Baisse médiane la plus forte", fmt(largestDecline.delta_NDVI_median, 3), largestDecline.date_depart + " → " + largestDecline.date_arrivee);
     metric("Couverture comparable récente", fmt(latest.couverture_comparable_pct, 2) + " %", latest.date_depart + " → " + latest.date_arrivee);
     panel.append(grid);
+    panel.append(el("h3", {}, "Trajectoire du NDVI médian"));
+    const chartWrap = el("div", { class: "card", role: "img", "aria-label": "Graphique du NDVI médian aux cinq dates Sentinel-2" });
+    const chart = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    chart.setAttribute("viewBox", "0 0 640 250");
+    chart.setAttribute("width", "100%");
+    chart.setAttribute("height", "auto");
+    chart.setAttribute("aria-hidden", "true");
+    const NS = "http://www.w3.org/2000/svg";
+    const addSvg = (tag, attrs, text) => {
+      const n = document.createElementNS(NS, tag);
+      Object.entries(attrs).forEach(([k, v]) => n.setAttribute(k, String(v)));
+      if (text !== undefined) n.textContent = text;
+      chart.append(n);
+      return n;
+    };
+    const left = 52, right = 610, top = 18, bottom = 190;
+    [0, 0.2, 0.4, 0.6, 0.8].forEach(v => {
+      const y = bottom - (v / 0.9) * (bottom - top);
+      addSvg("line", { x1: left, y1: y, x2: right, y2: y, stroke: "#dfe5df", "stroke-width": 1 });
+      addSvg("text", { x: left - 10, y: y + 4, "text-anchor": "end", fill: "currentColor", "font-size": 11 }, v.toFixed(1));
+    });
+    const xAt = i => left + i * (right - left) / (data.observations.length - 1);
+    const yAt = v => bottom - (v / 0.9) * (bottom - top);
+    const points = data.observations.map((o, i) => xAt(i) + "," + yAt(o.median_ndvi)).join(" ");
+    addSvg("polyline", { points, fill: "none", stroke: "#276749", "stroke-width": 3, "stroke-linejoin": "round", "stroke-linecap": "round" });
+    data.observations.forEach((o, i) => {
+      const x = xAt(i), y = yAt(o.median_ndvi);
+      addSvg("circle", { cx: x, cy: y, r: 5, fill: "#276749", stroke: "#ffffff", "stroke-width": 2 });
+      addSvg("text", { x, y: y - 11, "text-anchor": "middle", fill: "currentColor", "font-size": 11 }, fmt(o.median_ndvi, 3));
+      addSvg("text", { x, y: 211, "text-anchor": "middle", fill: "currentColor", "font-size": 10 }, o.date.slice(5));
+    });
+    chartWrap.append(chart);
+    chartWrap.append(el("p", { class: "muted" }, "Valeurs médianes sur les pixels terrestres valides de chaque acquisition. Les dates sont saisonnières et les surfaces valides diffèrent ; ne pas interpréter la courbe comme une mesure directe de rendement."));
+    panel.append(chartWrap);
     panel.append(el("h3", {}, "Comparaison entre acquisitions"));
     const table = el("table", { class: "table" });
     const thead = el("thead");
