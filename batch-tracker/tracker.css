@@ -2084,3 +2084,129 @@ textarea:focus-visible {
   .universe-home-link, .section-nav a, .batch-item, .overview-shortcut,
   .culture-catalog-action, .domain-option { transition: none !important; }
 }
+
+
+/* Contrast correction — Mycology keeps its light paper/terracotta canvas.
+   Keep dark ink on paper surfaces; reserve cream text for the dark hero only. */
+body[data-domain="mycology"] .card,
+body[data-domain="mycology"] .card h2,
+body[data-domain="mycology"] .card h3,
+body[data-domain="mycology"] .card p,
+body[data-domain="mycology"] .card li,
+body[data-domain="mycology"] .card label,
+body[data-domain="mycology"] .card legend,
+body[data-domain="mycology"] .card strong,
+body[data-domain="mycology"] .card .muted,
+body[data-domain="mycology"] .card small,
+body[data-domain="mycology"] .card .hint,
+body[data-domain="mycology"] .card .help-text,
+body[data-domain="mycology"] .card .field-hint,
+body[data-domain="mycology"] .card .section-kicker,
+body[data-domain="mycology"] .card .culture-catalog-meta,
+body[data-domain="mycology"] .card .culture-catalog-meta span,
+body[data-domain="mycology"] .card .statistics-table th,
+body[data-domain="mycology"] .card .statistics-table td,
+body[data-domain="mycology"] .card .culture-timeline-entry p {
+  color: #35251d !important;
+  -webkit-text-fill-color: #35251d !important;
+}
+body[data-domain="mycology"] .card .section-kicker > span:first-child,
+body[data-domain="mycology"] .card .req,
+body[data-domain="mycology"] .card .entry-step-mark {
+  color: #853d16 !important;
+  -webkit-text-fill-color: #853d16 !important;
+}
+body[data-domain="mycology"] #authCard input,
+body[data-domain="mycology"] .card input,
+body[data-domain="mycology"] .card select,
+body[data-domain="mycology"] .card textarea {
+  color: #35251d !important;
+  -webkit-text-fill-color: #35251d !important;
+  caret-color: #853d16 !important;
+  background-color: #fffaf4 !important;
+  border-color: #b9957d !important;
+}
+body[data-domain="mycology"] #authCard input::placeholder,
+body[data-domain="mycology"] .card input::placeholder,
+body[data-domain="mycology"] .card textarea::placeholder {
+  color: #755b4c !important;
+  -webkit-text-fill-color: #755b4c !important;
+  opacity: 1 !important;
+}
+body[data-domain="mycology"] #authStatus,
+body[data-domain="mycology"] #syncStatus,
+body[data-domain="mycology"] #batchList > .info,
+body[data-domain="mycology"] #message .card {
+  color: #35251d !important;
+  -webkit-text-fill-color: #35251d !important;
+  background: #fffaf4 !important;
+  border: 1px solid #c9a78f !important;
+  box-shadow: none !important;
+}
+body[data-domain="mycology"] #authStatus.success,
+body[data-domain="mycology"] #message .card.success {
+  color: #27472b !important;
+  -webkit-text-fill-color: #27472b !important;
+  background: #edf4e8 !important;
+  border-color: #a7c49b !important;
+}
+body[data-domain="mycology"] #authStatus.error,
+body[data-domain="mycology"] #message .card.error {
+  color: #782d25 !important;
+  -webkit-text-fill-color: #782d25 !important;
+  background: #fff0ed !important;
+  border-color: #d89a8f !important;
+}
+body[data-domain="mycology"] .consent-panel,
+body[data-domain="mycology"] .guided-entry-step,
+body[data-domain="mycology"] .batch-stat,
+body[data-domain="mycology"] .stage,
+body[data-domain="mycology"] .qc-row {
+  color: #35251d;
+  background: #fffaf4;
+  border-color: #d7bba6;
+}
+body[data-domain="mycology"] .stage.active {
+  background: #f4e4d7;
+  border-color: #a94f1d;
+}
+body[data-domain="mycology"] .stage.completed {
+  background: #f4eee4;
+}
+body[data-domain="mycology"] .progress-track {
+  background: #e5d7c8;
+}
+
+/* Keep controls and data tables usable on narrow screens. */
+#authCard { min-width: 0; }
+#authCard input { min-width: 0; }
+#batchCard, #measurementCard, #statisticsCard, #trackerCard { min-width: 0; }
+@media (max-width: 700px) {
+  .container { width: 100%; }
+  .app-hero {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+    padding: 22px 18px;
+    border-radius: 15px;
+  }
+  .hero-art { min-height: 110px; }
+  .hero-orbit { width: 110px; height: 110px; }
+  .orbit-two { width: 82px; height: 82px; }
+  .hero-core { width: 74px; height: 74px; }
+  .hero-core svg { width: 72px; height: 72px; }
+  .hero-note { right: 0; bottom: 0; }
+  #authCard { grid-template-columns: minmax(0, 1fr); }
+  #authCard .section-kicker,
+  #authCard h2,
+  #authCard .muted,
+  #authCard label,
+  #authCard input,
+  #authCard .auth-actions,
+  #authCard #authStatus,
+  #authCard #signOutButton { grid-column: 1; }
+  .guided-entry-step { padding: 12px; }
+  .grid, #measurementCard .grid { grid-template-columns: minmax(0, 1fr); }
+  .batch-grid, .batch-actions { grid-template-columns: minmax(0, 1fr); }
+  .qc-row { grid-template-columns: minmax(0, 1fr); }
+  .statistics-filters, .statistics-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
