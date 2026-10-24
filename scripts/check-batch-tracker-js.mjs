@@ -195,3 +195,8 @@ if(!root.includes('class="kicker"')||!root.includes('document.querySelector(".ki
 if(!root.includes('<a class="skip-link" href="#main">')||!root.includes('<main id="main" tabindex="-1">'))throw new Error("Landing page skip link/main target missing");
 if(!root.includes('id="pageLanguage"')||!root.includes('value="ar"'))throw new Error("Landing-page multilingual selector missing Arabic option");
 console.log("✓ Landing page language switcher target exists; skip navigation and multilingual options are present");
+
+if(!root.includes('"Every culture has","its own universe."')||!root.includes('"Cada cultura tem","o seu universo."')||!root.includes('"لكل ثقافة","عالمها الخاص."'))throw new Error("Landing-page headline translation is missing a complete phrase");
+for(const selector of ['.section-head h2','.intro-note strong','.section-head p','.agronomy .universe-label','.myco .universe-label','.lab .universe-label','.agronomy h3','.myco h3','.lab h3'])if(!root.includes('document.querySelector("'+selector+'").textContent'))throw new Error("Landing-page translated selector missing: "+selector);
+for(const label of ["Choose your workspace","Escolha o seu espaço de trabalho","اختر مساحة العمل"])if(!root.includes('"'+label+'"'))throw new Error("Landing-page translated workspace heading missing: "+label);
+console.log("✓ English, Portuguese and Arabic landing headlines are grammatical; workspace headings are wired to translation arrays");
