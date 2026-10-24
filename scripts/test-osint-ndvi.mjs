@@ -50,4 +50,5 @@ for (const line of csv) {
 }
 
 execFileSync("node", ["--check", `${base}/osint-ndvi.js`], { stdio: "inherit" });
-console.log("OSINT NDVI checks passed: 5 observations, 4 transitions, 65 unique candidate points, coordinates within AOI, and valid JavaScript syntax.");
+execFileSync("node", ["--check", `${base}/environmental-data.js`], { stdio: "inherit" });
+console.log("OSINT checks passed: NDVI data integrity, 65 candidate points, and valid NDVI/environmental JavaScript syntax.");
