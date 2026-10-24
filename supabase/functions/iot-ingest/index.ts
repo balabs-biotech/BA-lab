@@ -149,6 +149,18 @@ Deno.serve(async (req: Request) => {
     }
     if (!device) return response(401, { error: "invalid_or_revoked_device_token" });
 
+    const { data: withinRateLimit, error: rateLimitError } = await supabase.rpc(
+      "allow_iot_ingest_request",
+      { p_device_id: device.id },
+    );
+    if (rateLimitError) {
+      console.error("[iot-ingest] Rate-limit check failed", rateLimitError.message);
+      return response(500, { error: "rate_limit_check_failed" });
+    }
+    if (withinRateLimit !== true) {
+      return response(429, { error: "device_rate_limit_exceeded" });
+    }
+
     const payloadHash = await sha256Hex(raw);
     const { data, error } = await supabase.rpc("ingest_iot_payload", {
       p_device_id: device.id,
