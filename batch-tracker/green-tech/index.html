@@ -33,6 +33,10 @@
             environmental.src = "../environmental-data.js";
             environmental.onerror = () => console.error("Le module de contexte environnemental n’a pas pu être chargé.");
             document.body.appendChild(environmental);
+            const osintNdvi = document.createElement("script");
+            osintNdvi.src = "../osint-ndvi.js";
+            osintNdvi.onerror = () => console.error("Le module de synthèse NDVI OSINT n’a pas pu être chargé.");
+            document.body.appendChild(osintNdvi);
           };
           document.body.appendChild(script);
         };
