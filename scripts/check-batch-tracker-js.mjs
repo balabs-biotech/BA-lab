@@ -252,18 +252,18 @@ for (const [fn, button, label] of [
 }
 console.log("✓ Measurement and observation writes handle session-verification failures before enabling the write operation");
 
-for (const [fn, label] of [
-  ["async function saveMeasurement()", "mesure"],
-  ["async function saveObservation()", "observation"]
+for (const [fn, rpc, savedFlag] of [
+  ["async function saveMeasurement()", "record_manual_measurement", "measurementSaved"],
+  ["async function saveObservation()", "record_manual_observation", "observationSaved"]
 ]) {
   const start = engine.indexOf(fn);
   const next = engine.indexOf("\nasync function ", start + fn.length);
   const block = engine.slice(start, next);
-  if (!block.includes("let eventCleanupFailed = false;") ||
-      !block.includes("catch (cleanupError)") ||
-      !block.includes("Vérifiez l’historique avant de réessayer.") ||
-      !block.includes("eventCleanupFailed = true;")) {
-    throw new Error("Cleanup network failures must be contained and reported for " + label);
+  if (!block.includes('rpc("' + rpc + '"') ||
+      !block.includes(savedFlag + " = true;") ||
+      block.includes('.from("events").delete(') ||
+      block.includes("eventCleanupFailed")) {
+    throw new Error("Atomic save must not attempt separate event cleanup for " + rpc);
   }
 }
-console.log("✓ Failed event cleanup cannot mask the original write error; the user is warned to check history before retrying");
+console.log("✓ Atomic measurement/observation writes no longer perform separate event cleanup");
