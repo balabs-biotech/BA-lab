@@ -40,6 +40,7 @@ let selectedBatch = null;
 
 let initializationInProgress = false;
 let authStateRevision = 0;
+let initializationWarnings = [];
 let measurementVariables = [];
 let measurementUnits = [];
 let quantityUnitOptions = [];
@@ -817,7 +818,7 @@ async function initializeAuthenticatedTracker(
   try {
 
     clearMessage();
-
+    initializationWarnings = [];
 
     authStatus.textContent =
       `Connexion BA-LABS : ${
@@ -877,15 +878,18 @@ async function initializeAuthenticatedTracker(
       try { await loadRecentMeasurements(); }
       catch (historyError) {
         console.error("Historique des mesures indisponible :", historyError);
+        initializationWarnings.push("historique des mesures");
         measurementHistory.textContent = "Impossible de charger l’historique des mesures. L’enregistrement reste disponible.";
       }
       try { await loadRecentObservations(); }
       catch (observationHistoryError) {
         console.error("Historique des observations indisponible :", observationHistoryError);
+        initializationWarnings.push("historique des observations");
         observationHistory.textContent = "Impossible de charger l’historique des observations. L’enregistrement reste disponible.";
       }
     } catch (measurementError) {
       console.error("Initialisation du catalogue de mesures :", measurementError);
+      initializationWarnings.push("catalogue des mesures");
       measurementHistory.textContent = "Le catalogue des mesures est indisponible ; les modules de culture et de production restent utilisables.";
       observationHistory.textContent = "Le catalogue des observations est indisponible ; les modules de culture et de production restent utilisables.";
       saveMeasurementButton.disabled = true;
@@ -908,9 +912,16 @@ async function initializeAuthenticatedTracker(
     updateOverview();
 
 
-    showMessage(
-      `BA-LABS chargée — organisation ${organization.code}.`
-    );
+    if (initializationWarnings.length) {
+      showMessage(
+        `BA-LABS chargée — organisation ${organization.code}. Chargement partiel : ${initializationWarnings.join(", ")} indisponible(s). Les modules principaux restent accessibles.`,
+        "warning"
+      );
+    } else {
+      showMessage(
+        `BA-LABS chargée — organisation ${organization.code}.`
+      );
+    }
 
   }
 
@@ -4568,6 +4579,7 @@ async function loadQuantityUnitOptions() {
     }
   } catch (error) {
     console.error("Référentiel des unités indisponible :", error);
+    initializationWarnings.push("unités");
     quantityUnitOptions = [];
     for (const select of selects) {
       select.disabled = true;
@@ -4728,6 +4740,7 @@ async function loadBatchPlaceOptions() {
     renderBatchEnvironmentOptions();
   } catch (error) {
     console.error("Référentiel des emplacements indisponible :", error);
+    initializationWarnings.push("emplacements et environnements");
     batchLocationOptions = [];
     batchEnvironmentOptions = [];
     batchLocationInput.replaceChildren(new Option("Emplacements indisponibles", ""));
@@ -6441,6 +6454,7 @@ async function loadPlantCultures() {
     if (status) status.textContent = "Registre végétal chargé depuis Supabase.";
   } catch (error) {
     console.error("Chargement du registre végétal impossible :", error);
+    initializationWarnings.push("registre végétal");
     if (status) status.textContent = "Registre végétal indisponible : " + (error.message || "erreur inconnue");
     const list = document.getElementById("plantCultureList");
     if (list) list.textContent = "Impossible de charger le registre végétal. Vérifiez que la migration est déployée puis rechargez la page.";
