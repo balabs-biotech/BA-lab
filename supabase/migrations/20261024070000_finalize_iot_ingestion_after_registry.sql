@@ -1,3 +1,7 @@
+-- Install the atomic ingestion RPC only after the device registry and receipt ledger exist.
+create unique index if not exists iot_devices_token_sha256_uidx
+  on public.iot_devices (token_sha256);
+
 -- Atomic IoT ingestion RPC. Only the service role may execute it.
 create or replace function public.ingest_iot_payload(
   p_device_id uuid,

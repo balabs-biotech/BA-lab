@@ -1,8 +1,15 @@
 -- Public dataset release surface. Draft datasets and source tables stay private.
 -- Only trusted backend code may create/update public export rows.
 
-create unique index if not exists iot_devices_token_sha256_uidx
-  on public.iot_devices (token_sha256);
+-- The device registry is created by a later version in the production ledger.
+-- Create this index here only on databases where that registry already exists.
+do $migration$
+begin
+  if to_regclass('public.iot_devices') is not null then
+    execute 'create unique index if not exists iot_devices_token_sha256_uidx on public.iot_devices (token_sha256)';
+  end if;
+end
+$migration$;
 
 create table if not exists public.public_dataset_records (
   id uuid primary key default gen_random_uuid(),

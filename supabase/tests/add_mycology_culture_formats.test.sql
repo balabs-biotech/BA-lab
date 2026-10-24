@@ -7,7 +7,7 @@ CREATE TABLE public.culture_types (
 );
 INSERT INTO public.culture_types (code, label) VALUES ('solid', 'Solid');
 
-\i supabase/migrations/20261023012000_add_mycology_culture_formats.sql
+\i supabase/migrations/20261023012845_add_mycology_culture_formats.sql
 
 DO $assertions$
 BEGIN
