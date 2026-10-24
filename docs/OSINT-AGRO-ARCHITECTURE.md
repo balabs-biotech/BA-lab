@@ -8,7 +8,7 @@ Transformer des observations publiques et des mesures de terrain en décisions a
 
 1. **Sources**
    - Sentinel-2 L2A / Copernicus Data Space : réflectance et indices de végétation, avec dates d’acquisition, couverture nuageuse et masque de qualité.
-   - Open-Meteo : prévisions horaires à court terme et, séparément, historiques/réanalyses lorsque le produit et la variable sont adaptés.
+   - Open-Meteo : candidat technique pour les prévisions horaires, mais son API gratuite est réservée à l’usage non commercial. Les appels live sont désactivés dans l’application BA Labs jusqu’à obtention d’une autorisation commerciale ou remplacement par une source compatible.
    - NASA POWER : contexte agroclimatique historique à échelle de grille, pas mesure locale.
    - Terrain / capteurs BA Labs : coordonnées, température réelle, humidité, pH, EC et observations visuelles lorsque disponibles.
 2. **Ingestion**
@@ -35,7 +35,7 @@ Transformer des observations publiques et des mesures de terrain en décisions a
 
 ## Profils de température
 
-Le panneau de prévision 48 h distingue désormais quatre contextes : culture extérieure, serre, boîtes de Petri / culture microbiologique exposée, et usage personnalisé.
+Le panneau de prévision 48 h et son moteur de règles distinguent quatre contextes : culture extérieure, serre, boîtes de Petri / culture microbiologique exposée, et usage personnalisé. **Limite d’exploitation :** le bouton et les requêtes Open-Meteo restent désactivés par défaut tant que les droits commerciaux ne sont pas établis. Le moteur de règles peut être testé avec des données de test, mais aucune prévision live ne doit être présentée comme disponible.
 
 Ces profils adaptent l’interprétation, pas les limites biologiques. L’utilisateur peut saisir une limite basse et/ou haute provenant de son protocole ou d’une référence adaptée. L’application compte les heures prévues hors plage. Elle précise que la prévision concerne l’air extérieur au point géographique et ne prédit pas la température réelle d’une serre, d’un substrat ou d’un milieu gélosé.
 
@@ -58,7 +58,7 @@ Chaque recommandation devrait évoluer vers un objet normalisé comportant :
 
 ### P0 — Fiabilité avant expansion
 - Faire exécuter les contrôles de syntaxe et d’intégrité dans GitHub Actions sur chaque mise à jour de la PR.
-- Tester la réponse Open-Meteo, les réponses HTTP en erreur, les données manquantes, les coordonnées invalides et les tableaux horaires incomplets.
+- Tester le garde-fou qui empêche toute requête Open-Meteo tant que l’autorisation commerciale n’est pas confirmée ; si une source est ensuite autorisée, tester ses réponses HTTP, données manquantes, coordonnées invalides et séries horaires incomplètes.
 - Contrôler la génération des zones candidates NDVI : les étiquettes des composantes connexes doivent correspondre aux objets géométriques réellement extraits.
 - Ne pas prendre de décision agronomique sur les 65 points candidats avant validation de leurs géométries et de leur position.
 
@@ -119,3 +119,8 @@ Les contrôles ont été exécutés sur le commit `6a25a1dba7f6dddfa49c3e0bc6ac8
 - Contrôles OSINT NDVI : succès, y compris intégrité du résumé, 65 zones candidates, règles de prévision et syntaxe JavaScript.
 
 Ces résultats valident les contrôles automatisés du dépôt, pas le comportement de bout en bout en production. Les tests navigateur/API, la validation en conditions réelles et la revue finale de la lignée des migrations restent nécessaires avant fusion ou déploiement.
+
+
+## Mise à jour — conformité de la source météo (24 octobre 2026)
+
+La vérification des conditions officielles confirme que l’API Open-Meteo gratuite est destinée à l’usage non commercial ; l’utilisation commerciale nécessite une autorisation/offre adaptée. En conséquence, le module Green Tech garde le bouton de prévision désactivé et bloque `loadForecast()` tant que `OPEN_METEO_COMMERCIAL_USE_APPROVED` reste à `false`. Le test de contrat `supabase/tests/sentinel-2-frontend-contract.test.mjs` vérifie ce verrouillage. L’historique NASA POWER reste distinct et utilisable comme donnée climatique quotidienne modélisée, avec son décalage temporel. La prochaine étape est d’évaluer un flux de prévision open-data compatible avec l’exploitation commerciale, en intégrant le coût réel de calcul, de stockage et de maintenance — pas seulement le prix de l’API.
