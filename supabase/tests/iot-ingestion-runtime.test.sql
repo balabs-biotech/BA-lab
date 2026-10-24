@@ -13,6 +13,8 @@ DECLARE
   conflict_caught boolean := false;
   invalid_batch_caught boolean := false;
   null_payload_caught boolean := false;
+  bad_shape_count integer := 0;
+  invalid_payload jsonb;
   measurement_count integer;
   receipt_count integer;
 BEGIN
@@ -155,7 +157,31 @@ BEGIN
   IF receipt_count <> 0 THEN
     RAISE EXCEPTION 'FAIL: SQL-NULL payload left a receipt: %', receipt_count;
   END IF;
+
+  -- JSON null, objects, numbers and strings must be rejected consistently
+  -- before jsonb_array_length is called.
+  FOR invalid_payload IN
+    SELECT value FROM jsonb_array_elements('[null, {}, 1, "not-an-array"]'::jsonb)
+  LOOP
+    BEGIN
+      PERFORM public.ingest_iot_payload(
+        v_device_id,
+        'ci-message-bad-shape-' || bad_shape_count::text,
+        repeat('f', 64),
+        invalid_payload
+      );
+    EXCEPTION WHEN OTHERS THEN
+      IF SQLERRM = 'invalid_readings_count' THEN
+        bad_shape_count := bad_shape_count + 1;
+      ELSE
+        RAISE;
+      END IF;
+    END;
+  END LOOP;
+  IF bad_shape_count <> 4 THEN
+    RAISE EXCEPTION 'FAIL: expected all 4 non-array JSON values to be rejected, got %', bad_shape_count;
+  END IF;
 END
 $iot_runtime$;
 
-SELECT 'PASS: IoT RPC processes once, retries idempotently, rejects hash conflict, invalid batches and SQL NULL' AS test_result;
+SELECT 'PASS: IoT RPC processes once, retries idempotently, rejects hash conflict, invalid batches, SQL NULL and non-array JSON' AS test_result;
