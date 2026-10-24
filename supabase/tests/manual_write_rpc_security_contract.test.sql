@@ -26,7 +26,7 @@ begin
     end if;
 
     select setting into v_setting
-      from unnest(coalesce(v_proc.proconfig, array[]::text[])) as setting
+      from unnest(coalesce(v_proc.proconfig, array[]::text[])) as settings(setting)
      where setting like 'search_path=%'
      limit 1;
 
