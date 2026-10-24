@@ -2210,3 +2210,176 @@ body[data-domain="mycology"] .progress-track {
   .qc-row { grid-template-columns: minmax(0, 1fr); }
   .statistics-filters, .statistics-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
+
+
+/* CultureOps data surfaces: clearer hierarchy for batch history and analysis. */
+.culture-detail {
+  padding: clamp(14px, 2vw, 22px);
+  border-radius: 14px;
+  border-color: var(--ui-line);
+  background: var(--surface);
+  box-shadow: var(--ui-elevation);
+}
+.culture-detail-field {
+  border-color: var(--ui-line);
+  background: var(--surface-2);
+  border-radius: 10px;
+}
+.culture-detail-field span,
+.culture-timeline-date,
+.statistics-summary-item span,
+.overview-metric-label {
+  font-size: 11px;
+  line-height: 1.45;
+}
+.culture-detail-field strong,
+.culture-timeline-entry strong {
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+.culture-detail-timeline { gap: 10px; }
+.culture-timeline-entry {
+  position: relative;
+  border-left: 3px solid var(--ui-accent);
+  border-radius: 0 10px 10px 0;
+  background: var(--surface-2);
+  padding: 13px 15px;
+  box-shadow: none;
+}
+.culture-timeline-entry p { line-height: 1.55; }
+.statistics-summary-item {
+  border-color: var(--ui-line);
+  background: var(--surface-2);
+  border-radius: 12px;
+}
+.statistics-summary-item strong {
+  font-size: clamp(20px, 2.3vw, 28px);
+  color: var(--ui-accent);
+}
+.statistics-chart {
+  border-color: var(--ui-line);
+  border-radius: 12px;
+  background: var(--surface);
+}
+.statistics-table-wrap {
+  border: 1px solid var(--ui-line);
+  border-radius: 12px;
+  background: var(--surface);
+}
+.statistics-table { overflow: hidden; }
+.statistics-table th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--surface-2);
+  color: var(--text);
+  border-bottom-color: var(--ui-line);
+}
+.statistics-table td { border-bottom-color: var(--ui-line); }
+.overview-observation,
+.overview-shortcut,
+.batch-item {
+  border-color: var(--ui-line);
+}
+.overview-observation {
+  background: var(--surface);
+  border-radius: 10px;
+}
+.overview-observation strong { color: var(--text); }
+.overview-observation time { font-variant-numeric: tabular-nums; }
+.stage {
+  grid-template-columns: 36px minmax(0, 1fr) auto;
+  border-color: var(--ui-line);
+  background: var(--surface);
+  border-radius: 10px;
+}
+.stage.active {
+  background: var(--ui-accent-soft);
+  border-color: var(--ui-accent);
+}
+.stage.completed { background: var(--surface-2); }
+.qc-row {
+  border-color: var(--ui-line);
+  background: var(--surface);
+  border-radius: 10px;
+}
+.progress-track { overflow: hidden; border-radius: 999px; }
+.progress-bar { border-radius: inherit; transition: width .25s ease; }
+
+body[data-domain="mycology"] .culture-detail,
+body[data-domain="mycology"] .culture-detail-field,
+body[data-domain="mycology"] .culture-timeline-entry,
+body[data-domain="mycology"] .statistics-summary-item,
+body[data-domain="mycology"] .statistics-chart,
+body[data-domain="mycology"] .statistics-table-wrap,
+body[data-domain="mycology"] .overview-observation {
+  background: #fffaf4;
+  border-color: #d7bba6;
+  box-shadow: none;
+  color: #35251d;
+}
+body[data-domain="mycology"] .culture-timeline-entry { border-left: 3px solid #a94f1d; }
+body[data-domain="mycology"] .statistics-summary-item strong { color: #853d16; }
+body[data-domain="mycology"] .statistics-table th { background: #eee1d4; }
+body[data-domain="mycology"] .stage.active { background: #f4e4d7; border-color: #a94f1d; }
+body[data-domain="mycology"] .progress-bar { background: #a94f1d; }
+body[data-domain="mycology"] .overview-observation strong { color: #35251d; }
+
+body[data-domain="laboratory"] .culture-detail,
+body[data-domain="laboratory"] .culture-detail-field,
+body[data-domain="laboratory"] .culture-timeline-entry,
+body[data-domain="laboratory"] .statistics-summary-item,
+body[data-domain="laboratory"] .statistics-chart,
+body[data-domain="laboratory"] .statistics-table-wrap,
+body[data-domain="laboratory"] .overview-observation {
+  background: #fff;
+  border-color: #c7d6e4;
+  color: #183a59;
+  box-shadow: 0 2px 9px rgba(24,58,89,.04);
+}
+body[data-domain="laboratory"] .culture-timeline-entry { border-left-color: #215b91; }
+body[data-domain="laboratory"] .statistics-summary-item strong { color: #215b91; }
+body[data-domain="laboratory"] .statistics-table th { background: #e4eef7; }
+body[data-domain="laboratory"] .stage.active { background: #e4eef7; border-color: #215b91; }
+body[data-domain="laboratory"] .progress-bar { background: #215b91; }
+body[data-domain="laboratory"] .overview-observation strong { color: #183a59; }
+
+body[data-domain="agronomy"] .culture-detail,
+body[data-domain="agronomy"] .culture-detail-field,
+body[data-domain="agronomy"] .culture-timeline-entry,
+body[data-domain="agronomy"] .statistics-summary-item,
+body[data-domain="agronomy"] .statistics-chart,
+body[data-domain="agronomy"] .statistics-table-wrap,
+body[data-domain="agronomy"] .overview-observation {
+  background: #202d25;
+  border-color: #35483d;
+  color: #f1f5ef;
+  box-shadow: none;
+}
+body[data-domain="agronomy"] .culture-detail-field span,
+body[data-domain="agronomy"] .culture-timeline-date,
+body[data-domain="agronomy"] .statistics-summary-item span { color: #b6c8bb; }
+body[data-domain="agronomy"] .culture-timeline-entry { border-left-color: #a7f36a; }
+body[data-domain="agronomy"] .culture-timeline-entry p,
+body[data-domain="agronomy"] .overview-observation p,
+body[data-domain="agronomy"] .overview-observation time { color: #d0ddd2; }
+body[data-domain="agronomy"] .statistics-summary-item strong { color: #d7f6c1; }
+body[data-domain="agronomy"] .statistics-table th { background: #19231e; color: #d7f6c1; }
+body[data-domain="agronomy"] .statistics-table td { color: #f1f5ef; border-bottom-color: #35483d; }
+body[data-domain="agronomy"] .stage { background: #19231e; color: #f1f5ef; }
+body[data-domain="agronomy"] .stage.active { background: #294638; border-color: #a7f36a; }
+body[data-domain="agronomy"] .stage.completed { background: #222f28; }
+body[data-domain="agronomy"] .overview-observation strong { color: #f1f5ef; }
+
+@media (max-width: 700px) {
+  .culture-detail { padding: 13px; }
+  .culture-detail-fields { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .culture-timeline-entry { grid-template-columns: minmax(0, 1fr); gap: 5px; }
+  .statistics-summary-item { padding: 11px; }
+  .statistics-table th, .statistics-table td { padding: 9px 10px; }
+  .stage { grid-template-columns: 28px minmax(0, 1fr); }
+  .stage-status { grid-column: 2; white-space: normal; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .progress-bar { transition: none; }
+}
