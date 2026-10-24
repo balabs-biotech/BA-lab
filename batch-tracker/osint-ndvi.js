@@ -118,13 +118,41 @@
         td.append(el("a", { href:"https://www.openstreetmap.org/?mlat="+z.latitude+"&mlon="+z.longitude+"#map=15/"+z.latitude+"/"+z.longitude, target:"_blank", rel:"noopener noreferrer" }, fmt(z.latitude,5)+", "+fmt(z.longitude,5)));
         tr.append(td); tbody.append(tr);
       });
-      statusNode.textContent = records.length+" zones chargées. Le tableau affiche les 15 points avec la plus forte proportion de pixels ayant connu au moins trois baisses.";
+      statusNode.textContent = records.length+" zones chargées. Navigation satellite intégrée sans compte ni clé API BA Labs ; le tableau affiche les 15 points avec la plus forte proportion de pixels ayant connu au moins trois baisses. La disponibilité dépend des fournisseurs de tuiles.";
       const css = document.createElement("link"); css.rel="stylesheet"; css.href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"; document.head.append(css);
       await new Promise((resolve,reject) => { if(window.L) return resolve(); const s=document.createElement("script"); s.src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"; s.onload=resolve; s.onerror=()=>reject(new Error("Leaflet indisponible")); document.head.append(s); });
-      const map = window.L.map(mapNode).setView([36.24,5.36],10);
-      window.L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:18,attribution:"© OpenStreetMap contributors"}).addTo(map);
+      const map = window.L.map(mapNode, { zoomControl: true }).setView([36.24,5.36],10);
+      // Public tile endpoints; no BA Labs account, API key or credentials are sent.
+      // Provider availability and terms still apply.
+      const street = window.L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        maxZoom: 19, attribution: "© OpenStreetMap contributors"
+      });
+      const satellite = window.L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", {
+        maxZoom: 19, attribution: "Imagery © Esri, Maxar, Earthstar Geographics, and the GIS User Community"
+      });
+      const labels = window.L.tileLayer("https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png", {
+        maxZoom: 19, attribution: "Labels © OpenStreetMap contributors, © CARTO"
+      });
+      satellite.addTo(map);
+      labels.addTo(map);
+      window.L.control.layers(
+        { "Satellite": satellite, "Plan OpenStreetMap": street },
+        { "Noms de lieux": labels },
+        { collapsed: false }
+      ).addTo(map);
+      window.L.control.scale({ imperial: false }).addTo(map);
       const markers=[];
-      records.forEach(z => { const m=window.L.circleMarker([z.latitude,z.longitude],{radius:Math.max(4,Math.min(10,3+Math.sqrt(z.surface_ha))),color:"#7f1d1d",fillColor:"#dc6b45",fillOpacity:0.72,weight:1}).bindPopup("<strong>Zone "+z.zone_id+"</strong><br>Surface estimée : "+fmt(z.surface_ha,2)+" ha<br>Fréquence moyenne de baisse : "+fmt(z.frequence_baisse_moyenne*100,1)+" %<br>Pixels avec 3 baisses ou plus : "+fmt(z.pixels_3_baisses_ou_plus_pct,2)+" %").addTo(map); markers.push(m); });
+      records.forEach(z => {
+        const satelliteUrl = "https://www.google.com/maps/@"+z.latitude+","+z.longitude+",500m/data=!3m1!1e3";
+        const popup = document.createElement("div");
+        const title = document.createElement("strong"); title.textContent = "Zone " + z.zone_id; popup.append(title);
+        [["Surface estimée : ",fmt(z.surface_ha,2)+" ha"],["Fréquence moyenne de baisse : ",fmt(z.frequence_baisse_moyenne*100,1)+" %"],["Pixels avec 3 baisses ou plus : ",fmt(z.pixels_3_baisses_ou_plus_pct,2)+" %"]].forEach(([label,value]) => {
+          const p = document.createElement("p"); p.style.margin = "4px 0"; p.textContent = label + value; popup.append(p);
+        });
+        const link = document.createElement("a"); link.href = satelliteUrl; link.target = "_blank"; link.rel = "noopener noreferrer"; link.textContent = "Ouvrir cette position dans Google Maps satellite"; popup.append(link);
+        const m=window.L.circleMarker([z.latitude,z.longitude],{radius:Math.max(4,Math.min(10,3+Math.sqrt(z.surface_ha))),color:"#7f1d1d",fillColor:"#dc6b45",fillOpacity:0.72,weight:1}).bindPopup(popup).addTo(map);
+        markers.push(m);
+      });
       if(markers.length) map.fitBounds(window.L.featureGroup(markers).getBounds().pad(0.08));
       setTimeout(() => map.invalidateSize(),150);
     } catch(error) {
