@@ -236,3 +236,17 @@ console.log("✓ Auth refreshes are revision-checked and optional data-load fail
 
 if(!refreshBlock.includes("catch (error)")||!refreshBlock.includes("Session non vérifiable.")||!refreshBlock.includes("Impossible de vérifier votre session.")||!refreshBlock.includes("Vos données ne sont pas supprimées.")||!refreshBlock.includes("hideElement(trackerCard)"))throw new Error("Auth session verification failures must fail closed and explain the recovery action");
 console.log("✓ Unverifiable sessions hide protected workspace content and show a recovery message without claiming data loss");
+
+for (const [fn, button, label] of [
+  ["async function saveMeasurement()", "saveMeasurementButton.disabled = true;", "mesure"],
+  ["async function saveObservation()", "saveObservationButton.disabled = true;", "observation"]
+]) {
+  const start = engine.indexOf(fn);
+  const next = engine.indexOf("\nasync function ", start + fn.length);
+  if (start < 0 || next < 0) throw new Error("Could not isolate " + label + " save handler");
+  const block = engine.slice(start, next);
+  if (!block.includes("let session;") || !block.includes("catch (error)") || !block.includes("Impossible de vérifier votre session.") || !block.includes("Aucune " + label + " n’a été enregistrée.") || block.indexOf("Impossible de vérifier votre session.") > block.indexOf(button)) {
+    throw new Error("Session verification failure must be handled before writing " + label + " data");
+  }
+}
+console.log("✓ Measurement and observation writes handle session-verification failures before enabling the write operation");
