@@ -36,20 +36,20 @@ h1 span{color:var(--green);white-space:nowrap}
 .section-head h2{margin:0;font-size:15px;font-weight:650;letter-spacing:.01em}
 .section-head p{margin:0;color:#859389;font-size:12px}
 .universes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
-.universe{--accent:var(--green);--accent-soft:#202f24;position:relative;isolation:isolate;display:flex;flex-direction:column;min-height:320px;padding:23px 23px 21px;text-decoration:none;color:var(--ink);background:linear-gradient(145deg,rgba(27,36,30,.97),rgba(18,24,21,.98));border:1px solid #303b33;border-radius:16px;overflow:hidden;transition:transform .22s cubic-bezier(.2,.8,.2,1),border-color .22s ease,background-color .22s ease}
+.universe{--accent:var(--green);--accent-ink:var(--accent);--accent-soft:#202f24;position:relative;isolation:isolate;display:flex;flex-direction:column;min-height:320px;padding:23px 23px 21px;text-decoration:none;color:var(--ink);background:linear-gradient(145deg,rgba(27,36,30,.97),rgba(18,24,21,.98));border:1px solid #303b33;border-radius:16px;overflow:hidden;transition:transform .22s cubic-bezier(.2,.8,.2,1),border-color .22s ease,background-color .22s ease}
 .universe:before{content:"";position:absolute;z-index:-1;right:-45px;top:-62px;width:180px;height:180px;border:1px solid color-mix(in srgb,var(--accent) 23%,transparent);border-radius:50%;box-shadow:0 0 0 24px color-mix(in srgb,var(--accent) 4%,transparent),0 0 0 48px color-mix(in srgb,var(--accent) 3%,transparent);opacity:.8}
 .universe:hover{transform:translateY(-4px);border-color:color-mix(in srgb,var(--accent) 65%,#303b33);background:linear-gradient(145deg,#202a23,#171e1a)}
 .universe.agronomy{--accent:#a8c99b;--accent-soft:#20382a}
-.universe.myco{--accent:#d99a70;--accent-soft:#38271f;background:linear-gradient(145deg,#251f1b,#191714)}
+.universe.myco{--accent:#a94f1d;--accent-ink:#d99a70;--accent-soft:#38271f;background:linear-gradient(145deg,#251f1b,#191714)}
 .universe.lab{--accent:#8eb9df;--accent-soft:#1e2e3c;background:linear-gradient(145deg,#1b252d,#151b20)}
 .universe-top{display:flex;justify-content:space-between;align-items:center;gap:12px}
-.universe-label{font-size:10px;font-weight:750;letter-spacing:.15em;text-transform:uppercase;color:var(--accent)}
-.universe-index{display:grid;place-items:center;width:30px;height:30px;border:1px solid color-mix(in srgb,var(--accent) 35%,transparent);border-radius:9px;color:var(--accent);font-size:12px;font-variant-numeric:tabular-nums}
-.symbol{display:grid;place-items:center;width:62px;height:62px;margin:31px 0 25px;border:1px solid color-mix(in srgb,var(--accent) 40%,transparent);border-radius:16px;color:var(--accent);background:var(--accent-soft)}
+.universe-label{font-size:10px;font-weight:750;letter-spacing:.15em;text-transform:uppercase;color:var(--accent-ink,var(--accent))}
+.universe-index{display:grid;place-items:center;width:30px;height:30px;border:1px solid color-mix(in srgb,var(--accent-ink,var(--accent)) 35%,transparent);border-radius:9px;color:var(--accent-ink,var(--accent));font-size:12px;font-variant-numeric:tabular-nums}
+.symbol{display:grid;place-items:center;width:62px;height:62px;margin:31px 0 25px;border:1px solid color-mix(in srgb,var(--accent-ink,var(--accent)) 40%,transparent);border-radius:16px;color:var(--accent-ink,var(--accent));background:var(--accent-soft)}
 .symbol svg{width:32px;height:32px;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
 .universe h3{margin:0 0 10px;font-size:25px;line-height:1.15;letter-spacing:-.025em;font-weight:650}
 .universe p{max-width:34ch;margin:0;color:#aab5ac;font-size:13px;line-height:1.7}
-.enter{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:auto;padding-top:27px;color:var(--accent);font-size:12px;font-weight:700}
+.enter{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:auto;padding-top:27px;color:var(--accent-ink,var(--accent));font-size:12px;font-weight:700}
 .enter .arrow{display:grid;place-items:center;width:31px;height:31px;border:1px solid color-mix(in srgb,var(--accent) 35%,transparent);border-radius:50%;font-size:17px;transition:transform .2s ease,background .2s ease}
 .universe:hover .arrow{transform:translate(2px,-2px);background:var(--accent-soft)}
 .footer{display:flex;justify-content:space-between;gap:16px;margin-top:31px;padding-top:17px;border-top:1px solid var(--line);color:#849187;font-size:11px}
