@@ -39,8 +39,9 @@ assert.match(edgeFunction, /new TextDecoder\("utf-8", \{ fatal: true \}\)/);
 // Rate-limit contract: 120 requests per 60-second window and server-only RPC.
 assert.match(rateLimitMigration, /return v_count <= 120/i);
 assert.match(rateLimitMigration, /interval '60 seconds'/i);
-assert.match(rateLimitMigration, /revoke all on function public\\.allow_iot_ingest_request\\(uuid\\) from public, anon, authenticated/i);
+assert.ok(rateLimitMigration.includes("revoke all on function public.allow_iot_ingest_request(p_device_id uuid) from public, anon, authenticated"));
 assert.match(edgeFunction, /"allow_iot_ingest_request"/);
-assert.match(edgeFunction, /withinRateLimit !== true[\\s\\S]{0,100}response\\(429,/);
+assert.ok(edgeFunction.includes("withinRateLimit !== true"));
+assert.ok(edgeFunction.includes('response(429, { error: "device_rate_limit_exceeded" })'));
 
 console.log("IoT idempotency, bounded-body, and per-device rate-limit contract checks passed.");
