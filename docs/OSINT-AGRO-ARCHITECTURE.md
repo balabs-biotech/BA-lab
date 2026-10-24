@@ -124,3 +124,33 @@ Ces résultats valident les contrôles automatisés du dépôt, pas le comportem
 ## Mise à jour — conformité de la source météo (24 octobre 2026)
 
 La vérification des conditions officielles confirme que l’API Open-Meteo gratuite est destinée à l’usage non commercial ; l’utilisation commerciale nécessite une autorisation/offre adaptée. En conséquence, le module Green Tech garde le bouton de prévision désactivé et bloque `loadForecast()` tant que `OPEN_METEO_COMMERCIAL_USE_APPROVED` reste à `false`. Le test de contrat `supabase/tests/sentinel-2-frontend-contract.test.mjs` vérifie ce verrouillage. L’historique NASA POWER reste distinct et utilisable comme donnée climatique quotidienne modélisée, avec son décalage temporel. La prochaine étape est d’évaluer un flux de prévision open-data compatible avec l’exploitation commerciale, en intégrant le coût réel de calcul, de stockage et de maintenance — pas seulement le prix de l’API.
+
+
+## Candidat météo à évaluer — ECMWF Open Data (24 octobre 2026)
+
+**Premier candidat à tester : le sous-ensemble ECMWF Open Data**, plutôt qu'une dépendance à l'API Open-Meteo gratuite. La documentation officielle ECMWF indique que les produits Open Data couverts par CC BY 4.0 peuvent être redistribués et utilisés commercialement avec attribution, sous réserve des conditions ECMWF. Ce droit porte sur les produits explicitement publiés dans l'offre Open Data ; il ne doit pas être extrapolé à l'ensemble du catalogue ECMWF.
+
+- Portail et fichiers : https://data.ecmwf.int/forecasts/
+- Conditions / licence : https://www.ecmwf.int/en/forecasts/datasets/open-data
+- Règles d'accès : https://www.ecmwf.int/en/forecasts/access-forecasts/ordering
+- Attribution à afficher : « Based on data and products of the European Centre for Medium-Range Weather Forecasts (ECMWF). »
+- Alternative à comparer : NOAA NOMADS / GFS, https://nomads.ncep.noaa.gov/
+
+### Architecture d'essai recommandée — pas encore intégrée
+
+1. Un job planifié récupère uniquement les variables et échéances nécessaires pour les emplacements actifs ; limiter la zone téléchargée et le volume aux besoins réels.
+2. Un worker externe au runtime Edge Functions décode les fichiers GRIB2 et normalise température 2 m, précipitations et autres variables strictement nécessaires. Les Edge Functions ne doivent pas être chargées du décodage GRIB2.
+3. Le job envoie les valeurs normalisées à une fonction d'ingestion serveur protégée par un secret fort, jamais exposé au navigateur. Le schéma existant `environmental_observations` reste la destination privilégiée.
+4. Stocker l'heure d'exécution du modèle, l'échéance prévue, la résolution, l'heure d'ingestion, la source, la version du parseur, l'unité et les indicateurs de qualité. Distinguer une prévision d'une observation et d'une réanalyse.
+5. Mettre en cache par cycle de modèle et emplacement ; ne pas télécharger plusieurs fois les mêmes champs. En cas d'échec ou de données périmées, afficher « prévision indisponible » plutôt que fabriquer une valeur ou réutiliser silencieusement une ancienne prévision.
+6. Respecter l'attribution CC BY 4.0 et les conditions d'utilisation applicables ; conserver un lien de provenance consultable par l'utilisateur.
+
+### Porte de validation avant activation
+
+- Vérifier que les paramètres, pas de temps, horizons, résolution et échéances requis pour un profil à 48 h sont réellement présents dans le sous-ensemble Open Data publié.
+- Faire un prototype de récupération + décodage pour un emplacement de test à Sétif ; mesurer volume téléchargé, temps CPU, mémoire, latence et taux de champs manquants.
+- Comparer au moins un cycle ECMWF avec une source de référence et documenter les écarts sans présenter cette comparaison comme une validation météorologique officielle.
+- Démontrer l'idempotence, le cache, la gestion d'un cycle absent, la protection du secret, la reprise après échec et le budget opérationnel.
+- Confirmer les conditions de licence pour la redistribution des valeurs dérivées et l'affichage commercial avant d'activer la fonction.
+
+**Statut : piste documentée, non implémentée et non validée en production.** Le quota gratuit DUNIA/EO Africa peut servir à un prototype de recherche si les conditions du service le permettent, mais ne constitue pas à lui seul une infrastructure de production garantie. Si le coût total du worker, du stockage ou de l'exploitation n'est pas nul, le produit ne doit pas être présenté comme « gratuit à exploiter » sans préciser ces limites.
