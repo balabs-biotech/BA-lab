@@ -2961,16 +2961,14 @@ async function recordBatchHarvest() {
     if (!eventAnchor) {
       throw new Error("Ce lot doit être lié à une culture ou à un matériau pour enregistrer une récolte dans le journal biologique.");
     }
-    const { error } = await supabaseClient.from("events").insert({
-      organization_id: organizationId,
-      event_type: "harvest_recorded",
-      occurred_at: new Date().toISOString(),
-      actor_user_id: session.user.id,
-      ...eventAnchor,
-      batch_id: selectedBatch.id,
-      payload: { quantity, unit_code: unit.code, note: note || null, source: "batch-tracker-harvest-entry", schema_version: 1 }
+    const { data: eventId, error } = await supabaseClient.rpc("record_batch_harvest", {
+      p_batch_id: selectedBatch.id,
+      p_quantity: quantity,
+      p_unit_code: unit.code,
+      p_note: note || null
     });
     if (error) throw new Error("Enregistrement de la récolte impossible : " + error.message);
+    if (!eventId) throw new Error("La base n’a pas confirmé l’enregistrement de la récolte.");
     harvestQuantityInput.value = "";
     harvestNoteInput.value = "";
     showMessage("Récolte enregistrée dans la chronologie du lot.", "success");
