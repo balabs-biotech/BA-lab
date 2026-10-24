@@ -21,6 +21,8 @@ for (const [name, rpc, payloadKey, directTable] of [
     throw new Error(name + " handler still performs non-atomic direct inserts");
   }
   if (!migration.includes("create or replace function public." + rpc + "(") ||
+      !migration.includes("Event culture does not match batch culture") ||
+      !migration.includes("Batch needs a culture or material anchor for traceability") ||
       !migration.includes("insert into public.events") ||
       !migration.includes("insert into public." + directTable) ||
       !migration.includes("grant execute on function public." + rpc + "(jsonb, jsonb) to authenticated") ||
