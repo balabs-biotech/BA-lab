@@ -1,10 +1,11 @@
-// Static security contract for the scheduled NASA POWER importer.
+// Static security and data-integrity contract for the scheduled NASA POWER importer.
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 
 const source = readFileSync(new URL("../functions/nasa-power-scheduled-import/index.ts", import.meta.url), "utf8");
 const verifier = source.indexOf('rpc("verify_nasa_power_cron_secret"');
 const locationQuery = source.indexOf('from("locations")');
+const upsert = source.indexOf('.upsert(rows');
 
 assert.match(source, /req\.method !== "POST"/, "only POST requests are accepted");
 assert.match(source, /x-ba-cron-secret/, "dedicated cron secret header is required");
@@ -12,8 +13,29 @@ assert.match(source, /candidate\.length < 32/, "short secrets are rejected befor
 assert.ok(verifier >= 0, "cron secret must be verified by the database");
 assert.ok(locationQuery > verifier, "locations must not be queried before the secret is verified");
 assert.match(source, /if \(verifyError \|\| verified !== true\) return response\(401/, "failed secret verification must stop processing");
+assert.match(source, /SUPABASE_SECRET_KEY.*SUPABASE_SERVICE_ROLE_KEY/s, "server-side privileged key must come from environment variables");
 assert.match(source, /\.limit\(100\)/, "scheduled import must have a hard location cap");
-assert.match(source, /AbortSignal\.timeout\(25000\)/, "upstream requests must have a timeout");
+assert.match(source, /AbortSignal\.timeout\(Math\.min\(25000, remainingMs\)\)/, "upstream timeout must respect the remaining import budget");
+assert.match(source, /const deadlineAt = Date\.now\(\) \+ 100_000/, "import must have a global 100-second budget");
+assert.match(source, /const concurrency = 4/, "provider requests must use bounded concurrency");
+assert.match(source, /Promise\.all\(Array\.from\(\{ length: Math\.min\(concurrency, queue\.length\) \}/, "locations must be processed by a bounded worker pool");
+assert.match(source, /import_deadline_exceeded/, "unstarted locations after the deadline must be reported for retry");
+assert.match(source, /if \(Date\.now\(\) >= deadlineAt\) \{\s*results\.push\(\{ location_id: loc\.id, ok: false, error: "import_deadline_exceeded_before_persistence", retryable: true \}\);\s*return;\s*\}\s*if \(rows\.length\)/, "database writes must not start after the global import budget has expired");
+assert.match(source, /locations_total: \(locations \?\? \[\]\)\.length/, "response must report the total candidate locations");
+assert.match(source, /deadline_exceeded: Date\.now\(\) >= deadlineAt/, "response must disclose whether the deadline was reached");
 assert.match(source, /https:\/\/power\.larc\.nasa\.gov\/api\/temporal\/daily\/point/, "upstream host must be NASA POWER");
 assert.doesNotMatch(source, /Access-Control-Allow-Origin/, "cron endpoint must not enable browser CORS");
-console.log("PASS: NASA POWER scheduled-import security contract");
+
+// Data-quality and idempotency invariants.
+assert.match(source, /Number\.isFinite\(raw\)/, "non-finite provider values must be rejected");
+assert.match(source, /raw <= -900/, "NASA POWER missing-value sentinels must be rejected");
+assert.match(source, /!\/\^\\d\{8\}\$\/\.test\(keyDate\)/, "provider dates must use YYYYMMDD format");
+assert.ok(upsert > 0, "valid observations must be persisted through upsert");
+assert.match(source, /onConflict: "organization_id,location_id,provider_code,dataset_code,variable_code,observed_at"/, "upsert must use the observation deduplication key");
+assert.match(source, /ignoreDuplicates: false/, "new provider values must refresh matching observations");
+assert.match(source, /organization_id: loc\.organization_id/, "observations must retain the location organization scope");
+assert.match(source, /Daily gridded estimates; not local sensor measurements\./, "response must disclose gridded-data limitation");
+assert.match(source, /if \(!upstream\.ok\) \{ results\.push\(\{ location_id: loc\.id, ok: false, error: "nasa_power_http_" \+ upstream\.status \}\); return; \}/, "failed upstream HTTP responses must exit the location worker legally");
+assert.match(source, /if \(!series \|\| typeof series !== "object"\) \{ results\.push\(\{ location_id: loc\.id, ok: false, error: "invalid_provider_response" \}\); return; \}/, "invalid provider payloads must exit the location worker legally");
+
+console.log("PASS: NASA POWER importer security and data-integrity contract");

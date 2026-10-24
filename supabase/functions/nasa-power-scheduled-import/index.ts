@@ -38,7 +38,14 @@ Deno.serve(async (req: Request) => {
       .limit(100);
     if (locationsError) throw new Error("locations_query_failed");
     const results: Record<string, unknown>[] = [];
-    for (const loc of locations ?? []) {
+    const queue = [...(locations ?? [])];
+    const deadlineAt = Date.now() + 100_000;
+    const concurrency = 4;
+    const processLocation = async (loc: (typeof queue)[number]) => {
+      if (Date.now() >= deadlineAt) {
+        results.push({ location_id: loc.id, ok: false, error: "import_deadline_exceeded", retryable: true });
+        return;
+      }
       const sourceUrl = new URL("https://power.larc.nasa.gov/api/temporal/daily/point");
       sourceUrl.search = new URLSearchParams({
         parameters: Object.keys(PARAMETERS).join(","), community: "AG",
@@ -46,11 +53,12 @@ Deno.serve(async (req: Request) => {
         start: startDate.replaceAll("-", ""), end: endDate.replaceAll("-", ""), format: "JSON",
       }).toString();
       try {
-        const upstream = await fetch(sourceUrl, { signal: AbortSignal.timeout(25000) });
-        if (!upstream.ok) { results.push({ location_id: loc.id, ok: false, error: "nasa_power_http_" + upstream.status }); continue; }
+        const remainingMs = Math.max(1, deadlineAt - Date.now());
+        const upstream = await fetch(sourceUrl, { signal: AbortSignal.timeout(Math.min(25000, remainingMs)) });
+        if (!upstream.ok) { results.push({ location_id: loc.id, ok: false, error: "nasa_power_http_" + upstream.status }); return; }
         const payload = await upstream.json();
         const series = payload?.properties?.parameter;
-        if (!series || typeof series !== "object") { results.push({ location_id: loc.id, ok: false, error: "invalid_provider_response" }); continue; }
+        if (!series || typeof series !== "object") { results.push({ location_id: loc.id, ok: false, error: "invalid_provider_response" }); return; }
         const retrievedAt = new Date().toISOString();
         const rows: Record<string, unknown>[] = [];
         for (const [param, def] of Object.entries(PARAMETERS)) {
@@ -74,6 +82,10 @@ Deno.serve(async (req: Request) => {
             });
           }
         }
+        if (Date.now() >= deadlineAt) {
+          results.push({ location_id: loc.id, ok: false, error: "import_deadline_exceeded_before_persistence", retryable: true });
+          return;
+        }
         if (rows.length) {
           const { error } = await db.from("environmental_observations").upsert(rows, {
             onConflict: "organization_id,location_id,provider_code,dataset_code,variable_code,observed_at",
@@ -85,8 +97,23 @@ Deno.serve(async (req: Request) => {
       } catch (e) {
         results.push({ location_id: loc.id, ok: false, error: e instanceof Error ? e.message : "unknown_error" });
       }
-    }
-    return response(200, { ok: results.every(r => r.ok === true), provider: "NASA POWER", range: { start: startDate, end: endDate }, locations_processed: results.length, results, note: "Daily gridded estimates; not local sensor measurements." });
+    };
+    const worker = async () => {
+      while (queue.length > 0) {
+        const loc = queue.shift()!;
+        await processLocation(loc);
+      }
+    };
+    await Promise.all(Array.from({ length: Math.min(concurrency, queue.length) }, () => worker()));
+    return response(200, {
+      ok: results.length === (locations ?? []).length && results.every(r => r.ok === true),
+      provider: "NASA POWER", range: { start: startDate, end: endDate },
+      locations_total: (locations ?? []).length,
+      locations_processed: results.length,
+      deadline_exceeded: Date.now() >= deadlineAt,
+      results,
+      note: "Daily gridded estimates; not local sensor measurements."
+    });
   } catch (e) {
     console.error("[nasa-power-scheduled-import]", e instanceof Error ? e.message : "unknown_error");
     return response(500, { error: "scheduled_import_failed" });
