@@ -689,7 +689,11 @@ async function signOut() {
 
   try {
 
-    await supabaseClient.auth.signOut();
+    const { error } = await supabaseClient.auth.signOut();
+
+    if (error) {
+      throw error;
+    }
 
   }
 
@@ -699,6 +703,13 @@ async function signOut() {
       "Erreur déconnexion:",
       error
     );
+
+    showMessage(
+      error.message || "Déconnexion impossible. Votre session peut être encore active.",
+      "error"
+    );
+
+    return;
 
   }
 
