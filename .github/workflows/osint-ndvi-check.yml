@@ -3,7 +3,7 @@ name: OSINT NDVI data checks
 on:
   pull_request:
     paths:
-      - "batch-tracker/osint-ndvi.js"
+      - "batch-tracker/osint-ndvi.js"\n      - "batch-tracker/environmental-data.js"
       - "batch-tracker/data/osint-ndvi-transitions.json"
       - "batch-tracker/data/osint-priority-zones.csv"
       - "scripts/test-osint-ndvi.mjs"
