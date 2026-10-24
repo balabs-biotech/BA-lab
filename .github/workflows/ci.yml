@@ -206,3 +206,5 @@ jobs:
         run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/environmental_observations_contract.test.sql
       - name: Test anonymous table privilege contract after full migration replay
         run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/anon_table_privilege_contract.test.sql
+      - name: Test IoT measurement device FK after full migration replay
+        run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/iot_measurement_device_fk_contract.test.sql
