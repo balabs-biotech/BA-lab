@@ -212,3 +212,5 @@ jobs:
         run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/iot_measurement_device_fk_contract.test.sql
       - name: Test tenant RLS policy contract after full migration replay
         run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/tenant_rls_policy_contract.test.sql
+      - name: Test anonymous culture creation RPC access contract after full migration replay
+        run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/anon_culture_creation_rpc_contract.test.sql
