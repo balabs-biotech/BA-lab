@@ -33,7 +33,9 @@ for (const [name, rpc, payloadKey, directTable] of [
       !migration.includes("grant execute on function public." + rpc + "(jsonb, jsonb) to authenticated") ||
       !sqlFunction.includes("auth.uid(),") ||
       !sqlFunction.includes("v_batch_location_id") ||
-      !sqlFunction.includes("Event and " + name + " targets must match")) {
+      !sqlFunction.includes("Event and " + name + " targets must match") ||
+      (name === "measurement" && (!sqlFunction.includes("Event and measurement environments must match") ||
+        !sqlFunction.includes("nullif(p_measurement->>'environment_id', '')::uuid, v_batch_environment_id")))) {
     throw new Error(name + " RPC migration is incomplete or misses actor/target/batch integrity checks");
   }
 }
