@@ -61,9 +61,9 @@ This is a focused audit of current functions and grants, not a complete certific
 
 ## CI results and pending migrations
 
-The earlier CI run on commit `464cd9df324484a9f4ea438059b7868a01992c28` completed successfully. The scheduler reconstruction and default-privilege hardening have since been amended, so the latest CI run must complete successfully before the PR can be considered ready.
+The latest CI run on commit `c573015af2b203e232e0c05f75901b0f870eea82` completed successfully: migration replay, anonymous privilege contracts, the culture-creation RPC access test, firmware logic, both firmware builds, repository checks, and secret scanning all passed.
 
-The branch now has 56 migration files: 52 versions matching production history and four pending migrations (`20261024050000`, `20261024060000`, `20261024070000`, `20261024080000`). These pending migrations are intentionally not applied to production.
+The branch now has 57 migration files: 52 versions matching production history and five pending migrations (`20261024050000`, `20261024060000`, `20261024070000`, `20261024080000`, `20261024090000`). The last migration revokes `anon` and `PUBLIC` execution on `public.create_culture_with_generation(...)` while preserving authenticated and service-role grants. A dedicated SQL contract test checks this access boundary. These pending migrations are intentionally not applied to production.
 
 ## Safety constraints
 
