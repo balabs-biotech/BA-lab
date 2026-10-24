@@ -1,0 +1,126 @@
+{
+  "schema_version": 1,
+  "product": "BA Labs OSINT — Sentinel-2 NDVI change summary",
+  "aoi": {
+    "crs": "EPSG:4326",
+    "bbox": [
+      5.2,
+      36.1,
+      5.5,
+      36.4
+    ],
+    "area_km2_approx": 897.86
+  },
+  "method": {
+    "index": "NDVI",
+    "mask": "Sentinel-2 L2A SCL classes 4 and 5",
+    "change_threshold_absolute": 0.05,
+    "threshold_note": "Descriptive threshold only; not an agronomic alert threshold.",
+    "limitations": [
+      "NDVI change alone does not confirm crop identity, disease, water stress, or yield.",
+      "The analysis uses a rectangular regional AOI, not verified parcel boundaries.",
+      "The final transition has lower comparable coverage due to fewer valid pixels on 2026-10-22."
+    ]
+  },
+  "observations": [
+    {
+      "date": "2025-10-24",
+      "median_ndvi": 0.190691,
+      "mean_ndvi": 0.239572,
+      "p10": 0.101977,
+      "p90": 0.448883,
+      "valid_pixels": 9379853,
+      "valid_aoi_pct": 99.52
+    },
+    {
+      "date": "2026-01-12",
+      "median_ndvi": 0.330396,
+      "mean_ndvi": 0.361365,
+      "p10": 0.160484,
+      "p90": 0.620742,
+      "valid_pixels": 9210474,
+      "valid_aoi_pct": 97.72
+    },
+    {
+      "date": "2026-04-05",
+      "median_ndvi": 0.55582,
+      "mean_ndvi": 0.533513,
+      "p10": 0.198564,
+      "p90": 0.82716,
+      "valid_pixels": 9326408,
+      "valid_aoi_pct": 98.95
+    },
+    {
+      "date": "2026-07-31",
+      "median_ndvi": 0.146092,
+      "mean_ndvi": 0.181823,
+      "p10": 0.102209,
+      "p90": 0.300126,
+      "valid_pixels": 9340577,
+      "valid_aoi_pct": 99.1
+    },
+    {
+      "date": "2026-10-22",
+      "median_ndvi": 0.168467,
+      "mean_ndvi": 0.208627,
+      "p10": 0.10257,
+      "p90": 0.371951,
+      "valid_pixels": 7089550,
+      "valid_aoi_pct": 75.22
+    }
+  ],
+  "transitions": [
+    {
+      "date_depart": "2025-10-24",
+      "date_arrivee": "2026-01-12",
+      "pixels_comparables": 9208960,
+      "couverture_comparable_pct": 97.71,
+      "delta_NDVI_median": 0.117424,
+      "delta_NDVI_moyen": 0.124266,
+      "delta_p10": 0.009069,
+      "delta_p90": 0.272019,
+      "hausse_sup_0_05_pct": 78.64,
+      "baisse_inf_moins_0_05_pct": 4.74,
+      "variation_faible_ou_moderee_pct": 16.62
+    },
+    {
+      "date_depart": "2026-01-12",
+      "date_arrivee": "2026-04-05",
+      "pixels_comparables": 9150752,
+      "couverture_comparable_pct": 97.09,
+      "delta_NDVI_median": 0.13404,
+      "delta_NDVI_moyen": 0.172038,
+      "delta_p10": -0.01815,
+      "delta_p90": 0.449195,
+      "hausse_sup_0_05_pct": 73.83,
+      "baisse_inf_moins_0_05_pct": 5.99,
+      "variation_faible_ou_moderee_pct": 20.18
+    },
+    {
+      "date_depart": "2026-04-05",
+      "date_arrivee": "2026-07-31",
+      "pixels_comparables": 9274026,
+      "couverture_comparable_pct": 98.4,
+      "delta_NDVI_median": -0.361381,
+      "delta_NDVI_moyen": -0.352044,
+      "delta_p10": -0.662697,
+      "delta_p90": -0.042898,
+      "hausse_sup_0_05_pct": 2.64,
+      "baisse_inf_moins_0_05_pct": 89.24,
+      "variation_faible_ou_moderee_pct": 8.12
+    },
+    {
+      "date_depart": "2026-07-31",
+      "date_arrivee": "2026-10-22",
+      "pixels_comparables": 7039155,
+      "couverture_comparable_pct": 74.68,
+      "delta_NDVI_median": 0.021987,
+      "delta_NDVI_moyen": 0.03238,
+      "delta_p10": -0.033573,
+      "delta_p90": 0.116854,
+      "hausse_sup_0_05_pct": 28.96,
+      "baisse_inf_moins_0_05_pct": 6.6,
+      "variation_faible_ou_moderee_pct": 64.43
+    }
+  ]
+}
