@@ -34,6 +34,12 @@ begin
     raise exception 'Event and measurement targets must match' using errcode = '22023';
   end if;
 
+  if nullif(p_event->>'environment_id', '')::uuid is not null
+     and nullif(p_measurement->>'environment_id', '')::uuid is not null
+     and nullif(p_event->>'environment_id', '')::uuid is distinct from nullif(p_measurement->>'environment_id', '')::uuid then
+    raise exception 'Event and measurement environments must match' using errcode = '22023';
+  end if;
+
   if nullif(p_event->>'batch_id', '') is not null then
     select b.culture_id, b.material_id, b.location_id, b.environment_id
       into v_batch_culture_id, v_batch_material_id, v_batch_location_id, v_batch_environment_id
@@ -61,7 +67,7 @@ begin
     nullif(p_event->>'culture_id', '')::uuid,
     v_material_id,
     nullif(p_event->>'plant_culture_id', '')::uuid,
-    coalesce(nullif(p_event->>'environment_id', '')::uuid, v_batch_environment_id),
+    coalesce(nullif(p_event->>'environment_id', '')::uuid, nullif(p_measurement->>'environment_id', '')::uuid, v_batch_environment_id),
     coalesce(nullif(p_event->>'location_id', '')::uuid, v_batch_location_id),
     nullif(p_event->>'batch_id', '')::uuid,
     coalesce(p_event->'payload', '{}'::jsonb)
@@ -83,7 +89,7 @@ begin
     nullif(p_measurement->>'instrument', ''),
     nullif(p_measurement->>'culture_id', '')::uuid,
     nullif(p_measurement->>'plant_culture_id', '')::uuid,
-    nullif(p_measurement->>'environment_id', '')::uuid,
+    coalesce(nullif(p_measurement->>'environment_id', '')::uuid, nullif(p_event->>'environment_id', '')::uuid, v_batch_environment_id),
     v_event_id,
     coalesce(p_measurement->'metadata', '{}'::jsonb)
   );
