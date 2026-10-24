@@ -164,6 +164,8 @@ jobs:
         run: node supabase/tests/sentinel-2-frontend-contract.test.mjs
       - name: Test IoT idempotency payload-conflict contract
         run: node supabase/tests/iot-ingestion-idempotency.test.mjs
+      - name: Test NASA POWER scheduled-import security contract
+        run: node supabase/tests/nasa-power-scheduled-import.test.mjs
 
   supabase-migration-replay:
     runs-on: ubuntu-latest
