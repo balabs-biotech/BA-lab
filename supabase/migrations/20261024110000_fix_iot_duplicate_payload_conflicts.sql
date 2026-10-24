@@ -29,10 +29,13 @@ begin
   if p_payload_sha256 is null or p_payload_sha256 !~ '^[0-9a-f]{64}$' then
     raise exception 'invalid_payload_hash' using errcode = '22023';
   end if;
-  -- SQL NULL must be rejected explicitly: jsonb_typeof(NULL) is NULL, and
-  -- a PL/pgSQL IF condition evaluating to NULL does not enter the branch.
-  if p_readings is null or jsonb_typeof(p_readings) <> 'array'
-     or jsonb_array_length(p_readings) < 1 or jsonb_array_length(p_readings) > 20 then
+  -- Validate the JSON type before calling jsonb_array_length: PostgreSQL may
+  -- reorder boolean subexpressions, and array_length raises on scalar/object JSON.
+  -- SQL NULL must also be explicit because jsonb_typeof(SQL NULL) is SQL NULL.
+  if p_readings is null or jsonb_typeof(p_readings) <> 'array' then
+    raise exception 'invalid_readings_count' using errcode = '22023';
+  end if;
+  if jsonb_array_length(p_readings) < 1 or jsonb_array_length(p_readings) > 20 then
     raise exception 'invalid_readings_count' using errcode = '22023';
   end if;
 
