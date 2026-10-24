@@ -35,6 +35,17 @@ The extension and scheduled-job migrations were reconstructed to reproduce the o
 
 The scheduled job uses the existing project endpoint and retrieves its secret from Supabase Vault. No secret value is embedded in source. The pg_net/pg_cron setup is guarded so plain PostgreSQL test containers without these Supabase extensions can replay the remaining schema migrations; those containers do not validate the actual extension or scheduled-job behavior.
 
+### Clean-replay ordering correction
+
+The first replay attempt exposed a real ordering defect: the production ledger places the measurement-to-IoT-device migration before the IoT device registry migration. Production already contains the referenced table, but a clean database does not at that point in the replay.
+
+This branch now:
+- defers creation of the device foreign key when `public.iot_devices` does not yet exist;
+- adds an idempotent follow-up migration, `20261024060000_complete_measurements_iot_device_fk.sql`, after the registry is created;
+- adds a post-replay assertion that the foreign key exists and is validated.
+
+This is a source/replay correction. The live production database was not changed. The follow-up migration should be reviewed and applied only through the normal migration deployment process; because production already has the constraint, it should be a no-op there.
+
 ## Safety constraints
 
 1. Do not run `supabase db push`, reset production, or replay historical migrations against the live database as part of this reconciliation.
