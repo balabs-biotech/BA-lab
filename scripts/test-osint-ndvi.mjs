@@ -3,6 +3,21 @@ import { readFileSync } from "node:fs";
 import { execFileSync } from "node:child_process";
 
 const base = "batch-tracker";
+await import("../batch-tracker/forecast-rules.js");
+const forecastRules = globalThis.BALabsForecastRules;
+assert.ok(forecastRules && typeof forecastRules.evaluateTemperatureRange === "function", "forecast rules module must expose its deterministic evaluator");
+assert.deepEqual(
+  forecastRules.evaluateTemperatureRange([10, 20, 30], "15", "25").outsideHours,
+  2,
+  "temperature range should count both low and high excursions"
+);
+const missingTemperatureResult = forecastRules.evaluateTemperatureRange([null, undefined, "", 15, "20"], "15", "20");
+assert.equal(missingTemperatureResult.status, "within_range", "missing readings must not be counted as zero");
+assert.equal(missingTemperatureResult.availableHours, 2, "only numeric readings should be counted");
+assert.equal(forecastRules.evaluateTemperatureRange([10, 20], "30", "10").status, "invalid_range", "reversed limits must be rejected");
+assert.equal(forecastRules.evaluateTemperatureRange([10, 20], "", "").status, "not_configured", "empty limits must not imply a safe range");
+assert.equal(forecastRules.evaluateTemperatureRange([null, ""], "5", "30").status, "no_data", "missing forecast values must not be reported as safe");
+
 const summary = JSON.parse(readFileSync(`${base}/data/osint-ndvi-transitions.json`, "utf8"));
 const csv = readFileSync(`${base}/data/osint-priority-zones.csv`, "utf8").trim().split(/\r?\n/);
 const headers = csv.shift().split(",");
@@ -51,4 +66,5 @@ for (const line of csv) {
 
 execFileSync("node", ["--check", `${base}/osint-ndvi.js`], { stdio: "inherit" });
 execFileSync("node", ["--check", `${base}/environmental-data.js`], { stdio: "inherit" });
-console.log("OSINT checks passed: NDVI data integrity, 65 candidate points, and valid NDVI/environmental JavaScript syntax.");
+execFileSync("node", ["--check", `${base}/forecast-rules.js`], { stdio: "inherit" });
+console.log("OSINT checks passed: NDVI integrity, 65 candidate points, deterministic forecast rules, missing-data handling, and JavaScript syntax.");
