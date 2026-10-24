@@ -5093,15 +5093,27 @@ async function saveMeasurement() {
     if (measurementSaved) {
       showMessage(cultureWorkflowText("measureRefresh"), "warning");
     } else {
+      let eventCleanupFailed = false;
       if (eventId) {
-        const { error: cleanupError } = await supabaseClient
-          .from("events")
-          .delete()
-          .eq("organization_id", organizationId)
-          .eq("id", eventId);
-        if (cleanupError) console.error("Nettoyage de l’événement incomplet :", cleanupError);
+        try {
+          const { error: cleanupError } = await supabaseClient
+            .from("events")
+            .delete()
+            .eq("organization_id", organizationId)
+            .eq("id", eventId);
+          if (cleanupError) {
+            eventCleanupFailed = true;
+            console.error("Nettoyage de l’événement incomplet :", cleanupError);
+          }
+        } catch (cleanupError) {
+          eventCleanupFailed = true;
+          console.error("Nettoyage de l’événement impossible :", cleanupError);
+        }
       }
-      showMessage(error.message || cultureWorkflowText("measureFailed"), "error");
+      const cleanupNotice = eventCleanupFailed
+        ? " L’événement associé n’a pas pu être supprimé. Vérifiez l’historique avant de réessayer."
+        : "";
+      showMessage((error.message || cultureWorkflowText("measureFailed")) + cleanupNotice, "error");
     }
   } finally {
     saveMeasurementButton.disabled = false;
@@ -5315,12 +5327,24 @@ async function saveObservation() {
     if (observationSaved) {
       showMessage(cultureWorkflowText("observationRefresh"), "warning");
     } else {
+      let eventCleanupFailed = false;
       if (eventId) {
-        const cleanup = await supabaseClient.from("events").delete()
-          .eq("organization_id", organizationId).eq("id", eventId);
-        if (cleanup.error) console.error("Nettoyage de l’événement incomplet :", cleanup.error);
+        try {
+          const cleanup = await supabaseClient.from("events").delete()
+            .eq("organization_id", organizationId).eq("id", eventId);
+          if (cleanup.error) {
+            eventCleanupFailed = true;
+            console.error("Nettoyage de l’événement incomplet :", cleanup.error);
+          }
+        } catch (cleanupError) {
+          eventCleanupFailed = true;
+          console.error("Nettoyage de l’événement impossible :", cleanupError);
+        }
       }
-      showMessage(error.message || cultureWorkflowText("observationFailed"), "error");
+      const cleanupNotice = eventCleanupFailed
+        ? " L’événement associé n’a pas pu être supprimé. Vérifiez l’historique avant de réessayer."
+        : "";
+      showMessage((error.message || cultureWorkflowText("observationFailed")) + cleanupNotice, "error");
     }
   } finally {
     saveObservationButton.disabled = false;
