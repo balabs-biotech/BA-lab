@@ -355,7 +355,8 @@
       if(!Number.isFinite(a)||a < -90||a>90||!Number.isFinite(o)||o < -180||o>180||(acc!==null&&(!Number.isFinite(acc)||acc<0))){status.textContent="Coordonnées invalides. Vérifiez les plages de latitude, longitude et précision.";return;}
       status.textContent="Enregistrement…";
       const {error}=await db.from("locations").update({latitude:a,longitude:o,coordinate_accuracy_m:acc,coordinate_source:source.value}).eq("id",location.value);
-      status.textContent=error?"Échec de l’enregistrement : "+error.message:"Coordonnées enregistrées.";\n      if(!error) await loadForecast();
+      status.textContent=error?"Échec de l’enregistrement : "+error.message:"Coordonnées enregistrées.";
+      if(!error) await loadForecast();
     });
     async function importWeather(forceRefresh=false){
       if(!location.value||!from.value||!to.value||from.value>to.value){status.textContent="Choisissez un emplacement et une période valide.";return;}
@@ -381,7 +382,8 @@
       }catch(error){status.textContent="Échec de la collecte : "+(error?.message||"erreur inconnue");}
       finally{run.disabled=false;refresh.disabled=false;}
     }
-    forecastButton.addEventListener("click",loadForecast);\n    run.addEventListener("click",()=>importWeather(false));
+    forecastButton.addEventListener("click",loadForecast);
+    run.addEventListener("click",()=>importWeather(false));
     refresh.addEventListener("click",()=>importWeather(true));
     satelliteButton.addEventListener("click",searchSatellite);
     const {data: authState}=await db.auth.getSession();
