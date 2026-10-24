@@ -71,7 +71,7 @@
       selectLocation();
     }
     async function selectLocation(){
-      if(!location.value){lat.value="";lon.value="";accuracy.value="";return;}
+      if(!location.value){lat.value="";lon.value="";accuracy.value="";forecastStatus.textContent="Sélectionnez un emplacement pour charger la prévision.";forecastSummary.replaceChildren();forecastRows.replaceChildren();return;}
       const {data}=await db.from("locations").select("latitude,longitude,coordinate_accuracy_m,coordinate_source").eq("id",location.value).maybeSingle();
       if(!data)return;
       lat.value=data.latitude??""; lon.value=data.longitude??""; accuracy.value=data.coordinate_accuracy_m??"";
@@ -206,7 +206,7 @@
         const data=await response.json();
         const h=data.hourly;
         if(!h||!Array.isArray(h.time)||!h.time.length||!Array.isArray(h.temperature_2m))throw new Error("réponse météo incomplète");
-        const values=key=>Array.isArray(h[key])?h[key].map(Number).filter(Number.isFinite):[];
+        const values=key=>Array.isArray(h[key])?h[key].filter(v=>v!==null&&v!==undefined&&v!=="").map(Number).filter(Number.isFinite):[];
         const temps=values("temperature_2m"),rain=values("precipitation"),prob=values("precipitation_probability"),wind=values("wind_speed_10m"),humid=values("relative_humidity_2m");
         const max=(arr)=>arr.length?Math.max(...arr):null;
         const min=(arr)=>arr.length?Math.min(...arr):null;
