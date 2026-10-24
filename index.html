@@ -7,46 +7,98 @@
 <meta name="description" content="BA Labs CultureOps : suivi des cultures, traçabilité des lots et données expérimentales en agronomie, mycologie et laboratoire.">
 <title>BA Labs CultureOps — Choisir un univers</title>
 <style>
-:root{color-scheme:dark;--bg:#101512;--panel:#191f1b;--line:#343d36;--ink:#f3f5ef;--muted:#aab4aa;--green:#b4f477;--blue:#91c9ff;--acid:#d5ff46;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
-*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 50% -15%,#2b3b2e 0,transparent 48%),var(--bg);color:var(--ink);min-height:100vh}
-main{width:min(1100px,100% - 36px);margin:0 auto;padding:clamp(18px,3.5vw,38px) 0 28px}
-.brand{display:flex;align-items:center;gap:10px;font-size:12px;font-weight:850;letter-spacing:.16em}.topbar{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}.language-picker{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted)}.language-picker select{padding:8px 10px;border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:5px;font:inherit}.brand-mark{display:grid;place-items:center;width:34px;height:34px;border:1px solid #62705f;color:var(--green);font-size:17px}
-.kicker{margin:clamp(24px,4vw,42px) 0 12px;color:var(--green);font:750 11px ui-monospace,SFMono-Regular,Consolas,monospace;letter-spacing:.16em}
-h1{max-width:800px;margin:0;font-size:clamp(38px,7vw,76px);line-height:.98;letter-spacing:-.055em;font-weight:800}h1 span{color:var(--green)}
-.lead{max-width:620px;margin:14px 0 22px;color:var(--muted);font-size:clamp(14px,2vw,17px);line-height:1.7}
+:root{
+ color-scheme:dark;--bg:#0d1110;--surface:#151b18;--surface-raised:#1a221e;--line:#303b34;
+ --ink:#f0f4ef;--muted:#a6b2a8;--green:#a8c99b;--green-deep:#20382a;
+ --copper:#d99a70;--blue:#8eb9df;
+ font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+body{margin:0;min-height:100vh;background:var(--bg);color:var(--ink);font-size:15px;line-height:1.55}
+body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;background:radial-gradient(ellipse at 14% 0%,rgba(73,111,79,.18),transparent 34%),radial-gradient(ellipse at 90% 80%,rgba(47,83,68,.11),transparent 35%)}
+main{width:min(1160px,100% - 48px);margin:0 auto;padding:26px 0 28px}
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:18px;padding-bottom:22px;border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:11px;font-size:12px;font-weight:800;letter-spacing:.15em}
+.brand-mark{display:grid;place-items:center;width:38px;height:38px;border:1px solid #526a57;border-radius:11px;color:var(--green);background:#18221b}
+.brand-mark svg{width:24px;height:24px}
+.brand-slash{color:#59665d;font-weight:400}.brand-product{color:#a9b5ab;font-size:10px;font-weight:550;letter-spacing:.12em}
+.language-picker{display:flex;align-items:center;gap:9px;font-size:12px;color:var(--muted)}
+.language-picker select{padding:9px 12px;border:1px solid #3a473e;background:#151c17;color:var(--ink);border-radius:9px;font:inherit;cursor:pointer}
+.language-picker select:focus-visible,.universe:focus-visible{outline:3px solid var(--green);outline-offset:4px}
+.intro{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(240px,.75fr);align-items:end;gap:44px;padding:clamp(46px,8vw,96px) 0 42px}
+h1{max-width:760px;margin:0;font-size:clamp(42px,6.7vw,78px);line-height:1.01;letter-spacing:-.045em;font-weight:680}
+h1 span{color:var(--green);white-space:nowrap}
+.lead{max-width:650px;margin:22px 0 0;color:#b0bcb2;font-size:clamp(15px,1.6vw,18px);line-height:1.7}
+.intro-note{border-left:1px solid #516b56;padding:4px 0 4px 20px;color:#a9b7ac;font-size:13px;line-height:1.8}
+.intro-note strong{display:block;color:#e1e9e1;font-size:14px;font-weight:620;margin-bottom:5px}
+.section-head{display:flex;justify-content:space-between;align-items:baseline;gap:16px;margin:0 0 14px}
+.section-head h2{margin:0;font-size:15px;font-weight:650;letter-spacing:.01em}
+.section-head p{margin:0;color:#859389;font-size:12px}
 .universes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
-.universe{--accent:var(--green);position:relative;display:flex;flex-direction:column;min-height:285px;padding:20px;text-decoration:none;color:var(--ink);background:var(--panel);border:1px solid var(--line);transition:transform .16s ease,border-color .16s ease;overflow:hidden}
-.universe:hover,.universe:focus-visible{transform:translateY(-4px);border-color:var(--accent);outline:none}
-.universe:focus-visible{box-shadow:0 0 0 3px var(--accent)}
-.universe.myco{--accent:#a94f1d;border-radius:0;box-shadow:5px 5px 0 #343a2a}.universe.lab{--accent:var(--blue);background:linear-gradient(145deg,#202c35,#171d22);border-color:#3a4a57}
-.universe-no{font:800 11px ui-monospace,monospace;color:var(--accent);letter-spacing:.13em}.symbol{display:grid;place-items:center;width:54px;height:54px;margin:25px 0 22px;border:1px solid var(--accent);color:var(--accent);font-size:28px}
-.universe h2{margin:0 0 9px;font-size:23px;letter-spacing:-.03em}.universe p{margin:0;color:var(--muted);font-size:13px;line-height:1.55}.enter{display:flex;justify-content:space-between;align-items:center;margin-top:auto;padding-top:24px;color:var(--accent);font-size:12px;font-weight:850;letter-spacing:.04em}.enter span:last-child{font-size:21px}
-.footer{display:flex;justify-content:space-between;gap:16px;margin-top:35px;padding-top:17px;border-top:1px solid var(--line);color:#7e8b80;font-size:11px}
-@media(max-width:760px){main{padding:16px 0 22px}.topbar{gap:10px}.brand{font-size:11px}.language-picker{font-size:11px}.language-picker select{padding:6px 8px}.kicker{margin:22px 0 10px}h1{font-size:clamp(34px,9vw,54px);line-height:1.02}.lead{margin:12px 0 18px;line-height:1.5}.universes{grid-template-columns:1fr;gap:9px}.universe{min-height:0;padding:18px;display:grid;grid-template-columns:58px 1fr;column-gap:14px}.universe-no{grid-column:1/-1}.symbol{grid-column:1;grid-row:2/4;width:48px;height:48px;margin:18px 0 0}.universe h2{grid-column:2;align-self:end;margin-top:15px}.universe p{grid-column:2}.enter{grid-column:1/-1;padding-top:17px}.kicker{margin-top:22px}.footer{flex-direction:column;gap:6px}}
-@media(prefers-reduced-motion:reduce){*,*:before,*:after{transition:none!important;scroll-behavior:auto!important}}
+.universe{--accent:var(--green);--accent-soft:#202f24;position:relative;isolation:isolate;display:flex;flex-direction:column;min-height:320px;padding:23px 23px 21px;text-decoration:none;color:var(--ink);background:linear-gradient(145deg,rgba(27,36,30,.97),rgba(18,24,21,.98));border:1px solid #303b33;border-radius:16px;overflow:hidden;transition:transform .22s cubic-bezier(.2,.8,.2,1),border-color .22s ease,background-color .22s ease}
+.universe:before{content:"";position:absolute;z-index:-1;right:-45px;top:-62px;width:180px;height:180px;border:1px solid color-mix(in srgb,var(--accent) 23%,transparent);border-radius:50%;box-shadow:0 0 0 24px color-mix(in srgb,var(--accent) 4%,transparent),0 0 0 48px color-mix(in srgb,var(--accent) 3%,transparent);opacity:.8}
+.universe:hover{transform:translateY(-4px);border-color:color-mix(in srgb,var(--accent) 65%,#303b33);background:linear-gradient(145deg,#202a23,#171e1a)}
+.universe.agronomy{--accent:#a8c99b;--accent-soft:#20382a}
+.universe.myco{--accent:#d99a70;--accent-soft:#38271f;background:linear-gradient(145deg,#251f1b,#191714)}
+.universe.lab{--accent:#8eb9df;--accent-soft:#1e2e3c;background:linear-gradient(145deg,#1b252d,#151b20)}
+.universe-top{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.universe-label{font-size:10px;font-weight:750;letter-spacing:.15em;text-transform:uppercase;color:var(--accent)}
+.universe-index{display:grid;place-items:center;width:30px;height:30px;border:1px solid color-mix(in srgb,var(--accent) 35%,transparent);border-radius:9px;color:var(--accent);font-size:12px;font-variant-numeric:tabular-nums}
+.symbol{display:grid;place-items:center;width:62px;height:62px;margin:31px 0 25px;border:1px solid color-mix(in srgb,var(--accent) 40%,transparent);border-radius:16px;color:var(--accent);background:var(--accent-soft)}
+.symbol svg{width:32px;height:32px;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.universe h3{margin:0 0 10px;font-size:25px;line-height:1.15;letter-spacing:-.025em;font-weight:650}
+.universe p{max-width:34ch;margin:0;color:#aab5ac;font-size:13px;line-height:1.7}
+.enter{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:auto;padding-top:27px;color:var(--accent);font-size:12px;font-weight:700}
+.enter .arrow{display:grid;place-items:center;width:31px;height:31px;border:1px solid color-mix(in srgb,var(--accent) 35%,transparent);border-radius:50%;font-size:17px;transition:transform .2s ease,background .2s ease}
+.universe:hover .arrow{transform:translate(2px,-2px);background:var(--accent-soft)}
+.footer{display:flex;justify-content:space-between;gap:16px;margin-top:31px;padding-top:17px;border-top:1px solid var(--line);color:#849187;font-size:11px}
+.footer strong{color:#b7c2b8;font-weight:650;letter-spacing:.06em}
+@media(max-width:800px){main{width:min(680px,100% - 36px)}.intro{grid-template-columns:1fr;gap:22px;padding:54px 0 32px}.intro-note{max-width:480px}.universes{grid-template-columns:1fr;gap:10px}.universe{min-height:0;display:grid;grid-template-columns:64px 1fr;column-gap:17px;padding:18px}.universe:before{right:-65px;top:-105px}.universe-top{grid-column:1/-1}.symbol{grid-column:1;grid-row:2/4;width:54px;height:54px;margin:19px 0 0}.universe h3{grid-column:2;align-self:end;margin:16px 0 6px;font-size:21px}.universe p{grid-column:2}.enter{grid-column:1/-1;padding-top:16px}.section-head p{display:none}}
+@media(max-width:420px){main{width:calc(100% - 28px);padding-top:16px}.topbar{padding-bottom:16px}.brand{gap:8px;font-size:11px}.brand-mark{width:34px;height:34px}.brand-product{font-size:9px}.language-picker{gap:5px}.language-picker select{padding:7px 8px}.intro{padding-top:44px}h1{font-size:clamp(39px,11vw,49px)}.lead{font-size:14px}.intro-note{padding-left:14px}.universe{padding:16px;column-gap:13px}.footer{flex-direction:column;gap:7px}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;transition:none!important}}
 </style>
 </head>
 <body>
 <main>
-  <div class="topbar"><div class="brand"><span class="brand-mark" aria-hidden="true">B</span><span>BA LABS</span><span style="color:#718071;font-weight:500">/ CULTURE TRACKER</span></div><label class="language-picker"><span id="langLabel">Langue</span><select id="pageLanguage" aria-label="Langue"><option value="fr">FR</option><option value="en">EN</option><option value="pt">PT</option><option value="ar">AR</option></select></label></div>
-  <p class="kicker">PLATEFORME DE SUIVI BIOLOGIQUE · 01—03</p>
-  <h1>Chaque culture<br>son <span>univers.</span></h1>
-  <p class="lead">Choisissez votre espace de travail. Chaque univers possède sa propre page et ses outils métier, avec une traçabilité biologique commune.</p>
-  <nav class="universes" aria-label="Choisir un univers de travail">
-    <a class="universe agronomy" href="batch-tracker/green-tech/">
-      <span class="universe-no">01 / AGRITECH</span><span class="symbol" aria-hidden="true">↗</span>
-      <h2>Green Tech</h2><p>Plantes, substrats, serre, irrigation, digesteurs fongiques et suivi environnemental.</p><span class="enter"><span>Entrer dans l’espace</span><span aria-hidden="true">↗</span></span>
-    </a>
-    <a class="universe myco" href="batch-tracker/mycology/">
-      <span class="universe-no">02 / FUNGAL SYSTEMS</span><span class="symbol" aria-hidden="true">✳</span>
-      <h2>Mycologie</h2><p>Souches, générations, transferts, morphologie et suivi des contaminations.</p><span class="enter"><span>Entrer dans l’espace</span><span aria-hidden="true">↗</span></span>
-    </a>
-    <a class="universe lab" href="batch-tracker/laboratory/">
-      <span class="universe-no">03 / LAB NOTES</span><span class="symbol" aria-hidden="true">＋</span>
-      <h2>Laboratoire</h2><p>Milieux, protocoles, paramètres expérimentaux, mesures et résultats.</p><span class="enter"><span>Entrer dans l’espace</span><span aria-hidden="true">↗</span></span>
-    </a>
-  </nav>
-  <footer class="footer"><span>BA LABS · CULTURE & BATCH TRACKER</span><span>Une plateforme commune · Trois interfaces spécialisées</span></footer>
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M20 5v8M20 27v8M5 20h8M27 20h8M9.5 9.5l5.7 5.7M24.8 24.8l5.7 5.7M30.5 9.5l-5.7 5.7M15.2 24.8l-5.7 5.7"/><circle cx="20" cy="20" r="8.5"/><circle cx="20" cy="20" r="2.5" fill="currentColor"/></svg></span>
+      <span>BA LABS</span><span class="brand-slash">/</span><span class="brand-product">CULTUREOPS</span>
+    </div>
+    <label class="language-picker"><span id="langLabel">Langue</span><select id="pageLanguage" aria-label="Langue"><option value="fr">FR</option><option value="en">EN</option><option value="pt">PT</option><option value="ar">AR</option></select></label>
+  </header>
+  <section class="intro" aria-labelledby="page-title">
+    <div>
+      <h1 id="page-title">Chaque culture<br>a son <span>univers.</span></h1>
+      <p class="lead">Un espace de travail conçu pour suivre le vivant avec méthode : des cultures aux lots, des observations aux résultats.</p>
+    </div>
+    <aside class="intro-note"><strong>Une plateforme. Trois espaces spécialisés.</strong>Une même exigence de traçabilité biologique, avec des outils adaptés à chaque activité.</aside>
+  </section>
+  <section aria-labelledby="workspace-title">
+    <div class="section-head"><h2 id="workspace-title">Choisir votre espace de travail</h2><p>BA LABS / CULTURE &amp; BATCH TRACKER</p></div>
+    <nav class="universes" aria-label="Choisir un univers de travail">
+      <a class="universe agronomy" href="batch-tracker/green-tech/">
+        <div class="universe-top"><span class="universe-label">Agritech &amp; environnement</span><span class="universe-index">01</span></div>
+        <span class="symbol" aria-hidden="true"><svg viewBox="0 0 40 40"><path d="M8 30c0-12 8-20 24-21-1 15-9 23-21 23"/><path d="M9 32c4-8 10-13 18-17"/></svg></span>
+        <h3>Green Tech</h3><p>Plantes, substrats, serre, irrigation et suivi des paramètres environnementaux.</p>
+        <span class="enter"><span>Entrer dans l’espace</span><span class="arrow" aria-hidden="true">↗</span></span>
+      </a>
+      <a class="universe myco" href="batch-tracker/mycology/">
+        <div class="universe-top"><span class="universe-label">Mycologie &amp; cultures fongiques</span><span class="universe-index">02</span></div>
+        <span class="symbol" aria-hidden="true"><svg viewBox="0 0 40 40"><path d="M6 20c1-9 7-14 14-14s13 5 14 14H6Z"/><path d="M15 20v7c0 5 10 5 10 0v-7M20 27v7M10 34h20"/></svg></span>
+        <h3>Mycologie</h3><p>Souches, lignées, générations, transferts, morphologie et fructification.</p>
+        <span class="enter"><span>Entrer dans l’espace</span><span class="arrow" aria-hidden="true">↗</span></span>
+      </a>
+      <a class="universe lab" href="batch-tracker/laboratory/">
+        <div class="universe-top"><span class="universe-label">Recherche &amp; laboratoire</span><span class="universe-index">03</span></div>
+        <span class="symbol" aria-hidden="true"><svg viewBox="0 0 40 40"><path d="M15 6h10M18 6v12L9 32c-1 2 1 3 3 3h16c2 0 4-1 3-3L22 18V6"/><path d="M13 28h14M16 23h8"/></svg></span>
+        <h3>Laboratoire</h3><p>Milieux, protocoles, mesures, paramètres expérimentaux et résultats.</p>
+        <span class="enter"><span>Entrer dans l’espace</span><span class="arrow" aria-hidden="true">↗</span></span>
+      </a>
+    </nav>
+  </section>
+  <footer class="footer"><span><strong>BA LABS</strong> · CULTUREOPS</span><span>Biological culture &amp; batch traceability</span></footer>
 </main>
 
 <script>
