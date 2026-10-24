@@ -172,6 +172,7 @@ Deno.serve(async (req: Request) => {
     }
   }
 
+  try {
     const payloadHash = await sha256Hex(raw);
     const { data, error } = await supabase.rpc("ingest_iot_payload", {
       p_device_id: deviceId,
