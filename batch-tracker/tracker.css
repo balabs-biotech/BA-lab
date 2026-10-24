@@ -1907,3 +1907,180 @@ body[data-domain="mycology"] {
   --positive: #c17a52 !important;
   --valid: #c17a52 !important;
 }
+
+
+/* ============================================================
+   CULTUREOPS — couche de finition scientifique premium
+   Présentation uniquement : aucune modification du comportement métier.
+   ============================================================ */
+:root {
+  --ui-accent: #8eaf80;
+  --ui-accent-soft: rgba(142, 175, 128, .14);
+  --ui-line: rgba(155, 177, 157, .24);
+  --ui-elevation: 0 14px 34px rgba(0, 0, 0, .12);
+}
+body[data-domain="agronomy"] {
+  --ui-accent: #b4f477;
+  --ui-accent-soft: rgba(180, 244, 119, .11);
+  --ui-line: rgba(180, 244, 119, .22);
+}
+body[data-domain="mycology"] {
+  --ui-accent: #d18d65;
+  --ui-accent-soft: rgba(209, 141, 101, .12);
+  --ui-line: rgba(209, 141, 101, .24);
+}
+body[data-domain="laboratory"] {
+  --ui-accent: #78b6e5;
+  --ui-accent-soft: rgba(120, 182, 229, .12);
+  --ui-line: rgba(120, 182, 229, .24);
+}
+
+html { scroll-padding-top: 24px; }
+body { line-height: 1.55; }
+::selection { background: var(--ui-accent-soft); }
+
+.app-toolbar {
+  gap: 14px;
+  border-color: var(--ui-line);
+  box-shadow: var(--ui-elevation);
+}
+.toolbar-brand { flex-shrink: 0; }
+.section-nav { min-width: 0; flex-wrap: wrap; }
+.section-nav a {
+  min-height: 40px;
+  border-color: transparent;
+  border-radius: 10px;
+}
+.section-nav a[aria-current="page"] {
+  border-color: var(--ui-line);
+  background: var(--ui-accent-soft);
+}
+.toolbar-status { flex-shrink: 0; }
+
+.universe-home-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 38px;
+  margin: 0 0 14px;
+  padding: 8px 11px;
+  border: 1px solid var(--ui-line);
+  border-radius: 10px;
+  text-decoration: none;
+  font-size: 12px;
+  font-weight: 750;
+  transition: background-color .16s ease, border-color .16s ease;
+}
+.universe-home-link:hover {
+  background: var(--ui-accent-soft);
+  border-color: var(--ui-accent);
+}
+.universe-home-link:focus-visible,
+.section-nav a:focus-visible,
+.toolbar-brand:focus-visible {
+  outline: 2px solid var(--ui-accent);
+  outline-offset: 3px;
+}
+
+.card {
+  border-color: var(--ui-line);
+  box-shadow: var(--ui-elevation);
+}
+.card h2 { line-height: 1.25; }
+.card h2::before { background: var(--ui-accent); }
+.section-kicker {
+  letter-spacing: .12em;
+}
+.kicker-line {
+  opacity: .65;
+}
+input, select, textarea {
+  min-height: 44px;
+}
+textarea { resize: vertical; }
+button {
+  min-height: 44px;
+  letter-spacing: .005em;
+}
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--ui-accent);
+  outline-offset: 3px;
+}
+.batch-item,
+.overview-shortcut,
+.culture-catalog-action,
+.domain-option {
+  transition: border-color .16s ease, background-color .16s ease, transform .16s ease;
+}
+.batch-item:hover,
+.overview-shortcut:hover,
+.domain-option:hover {
+  border-color: var(--ui-accent);
+}
+.statistics-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  overflow: hidden;
+  border-radius: 12px;
+}
+.statistics-table th,
+.statistics-table td {
+  padding: 11px 13px;
+  line-height: 1.45;
+}
+.statistics-table th {
+  letter-spacing: .035em;
+}
+.stage, .qc-row, .batch-stat {
+  border-color: var(--ui-line);
+}
+.stage.active {
+  box-shadow: inset 3px 0 0 var(--ui-accent);
+}
+.progress-track { border: 1px solid var(--ui-line); }
+.progress-bar { background: var(--ui-accent); }
+.hint, .muted { line-height: 1.55; }
+
+@media (max-width: 980px) {
+  .app-toolbar {
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .toolbar-divider { display: none; }
+  .section-nav { order: 3; flex-basis: 100%; }
+  .toolbar-status { margin-left: auto; }
+}
+@media (max-width: 700px) {
+  .app-toolbar {
+    padding: 12px;
+    margin-bottom: 18px;
+    border-radius: 14px;
+  }
+  .section-nav {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px;
+  }
+  .section-nav a {
+    min-width: 0;
+    padding: 9px 8px;
+    font-size: 11px;
+  }
+  .toolbar-status {
+    min-height: 34px;
+    padding: 7px 9px;
+    font-size: 8px;
+  }
+  .toolbar-brand { min-width: 0; }
+  .universe-home-link { margin-bottom: 10px; }
+  .card { box-shadow: 0 8px 22px rgba(0, 0, 0, .10); }
+  .statistics-table { display: block; overflow-x: auto; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .universe-home-link, .section-nav a, .batch-item, .overview-shortcut,
+  .culture-catalog-action, .domain-option { transition: none !important; }
+}
