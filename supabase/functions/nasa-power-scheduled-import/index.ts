@@ -55,10 +55,10 @@ Deno.serve(async (req: Request) => {
       try {
         const remainingMs = Math.max(1, deadlineAt - Date.now());
         const upstream = await fetch(sourceUrl, { signal: AbortSignal.timeout(Math.min(25000, remainingMs)) });
-        if (!upstream.ok) { results.push({ location_id: loc.id, ok: false, error: "nasa_power_http_" + upstream.status }); continue; }
+        if (!upstream.ok) { results.push({ location_id: loc.id, ok: false, error: "nasa_power_http_" + upstream.status }); return; }
         const payload = await upstream.json();
         const series = payload?.properties?.parameter;
-        if (!series || typeof series !== "object") { results.push({ location_id: loc.id, ok: false, error: "invalid_provider_response" }); continue; }
+        if (!series || typeof series !== "object") { results.push({ location_id: loc.id, ok: false, error: "invalid_provider_response" }); return; }
         const retrievedAt = new Date().toISOString();
         const rows: Record<string, unknown>[] = [];
         for (const [param, def] of Object.entries(PARAMETERS)) {
