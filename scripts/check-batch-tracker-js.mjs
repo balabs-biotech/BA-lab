@@ -200,3 +200,10 @@ if(!root.includes('"Every culture has","its own universe."')||!root.includes('"C
 for(const selector of ['.section-head h2','.intro-note strong','.section-head p','.agronomy .universe-label','.myco .universe-label','.lab .universe-label','.agronomy h3','.myco h3','.lab h3'])if(!root.includes('document.querySelector("'+selector+'").textContent'))throw new Error("Landing-page translated selector missing: "+selector);
 for(const label of ["Choose your workspace","Escolha o seu espaço de trabalho","اختر مساحة العمل"])if(!root.includes('"'+label+'"'))throw new Error("Landing-page translated workspace heading missing: "+label);
 console.log("✓ English, Portuguese and Arabic landing headlines are grammatical; workspace headings are wired to translation arrays");
+
+const landingCopyMatch=root.match(/const copy = (\{[\s\S]*?\n  \});\n  const original/);
+if(!landingCopyMatch)throw new Error("Landing-page translation dictionary cannot be parsed by the audit");
+const landingCopy=vm.runInNewContext("("+landingCopyMatch[1]+")");
+for(const lang of ["en","pt","ar"])if(!Array.isArray(landingCopy[lang])||landingCopy[lang].length!==20)throw new Error("Landing-page translation array must contain 20 mapped strings: "+lang);
+for(const lang of ["en","pt","ar"])for(const index of [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19])if(typeof landingCopy[lang][index]!=="string"||!landingCopy[lang][index].trim())throw new Error("Landing-page translation missing: "+lang+"["+index+"]");
+console.log("✓ Landing-page translation dictionaries parse correctly and contain all 20 mapped strings for EN/PT/AR");
