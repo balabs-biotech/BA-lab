@@ -7,6 +7,10 @@ DECLARE
   org_id uuid := '10000000-0000-0000-0000-000000000001';
   location_id uuid;
   environment_id uuid;
+  other_org_id uuid := '10000000-0000-0000-0000-000000000011';
+  other_location_id uuid;
+  other_environment_id uuid;
+  cross_tenant_caught boolean := false;
   v_device_id uuid;
   first_result jsonb;
   retry_result jsonb;
@@ -33,6 +37,35 @@ BEGIN
   INSERT INTO public.environments (organization_id, location_id, name)
   VALUES (org_id, location_id, 'CI IoT environment')
   RETURNING id INTO environment_id;
+
+  -- A device must not bind to an environment owned by another organization.
+  INSERT INTO public.organizations (id, code, name)
+  VALUES (other_org_id, 'ci-iot-other-org', 'CI IoT other tenant')
+  ON CONFLICT (id) DO NOTHING;
+
+  INSERT INTO public.locations (organization_id, code, name, location_type)
+  VALUES (other_org_id, 'ci-iot-other-location', 'CI IoT other location', 'test')
+  ON CONFLICT (organization_id, code) DO UPDATE SET name = EXCLUDED.name
+  RETURNING id INTO other_location_id;
+
+  INSERT INTO public.environments (organization_id, location_id, name)
+  VALUES (other_org_id, other_location_id, 'CI IoT other environment')
+  RETURNING id INTO other_environment_id;
+
+  BEGIN
+    INSERT INTO public.iot_devices (
+      id, organization_id, environment_id, device_code, device_type, token_sha256
+    ) VALUES (
+      '10000000-0000-0000-0000-000000000012',
+      org_id, other_environment_id, 'ci-cross-tenant-device', 'esp32-test',
+      repeat('9', 64)
+    );
+  EXCEPTION WHEN foreign_key_violation THEN
+    cross_tenant_caught := true;
+  END;
+  IF NOT cross_tenant_caught THEN
+    RAISE EXCEPTION 'FAIL: IoT device accepted an environment owned by another organization';
+  END IF;
 
   INSERT INTO public.iot_devices (
     id, organization_id, environment_id, device_code, device_type, token_sha256
