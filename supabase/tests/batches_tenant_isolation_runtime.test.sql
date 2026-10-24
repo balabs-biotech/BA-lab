@@ -25,6 +25,9 @@ VALUES
 ON CONFLICT DO NOTHING;
 
 SELECT set_config('request.jwt.claim.sub', '20000000-0000-0000-0000-000000000001', true);
+-- CI's bare PostgreSQL replay does not install Supabase's normal API grants.
+-- Grant table operations in this disposable test transaction so assertions isolate RLS behavior.
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.batches TO authenticated;
 SET LOCAL ROLE authenticated;
 
 DO $assertions$
