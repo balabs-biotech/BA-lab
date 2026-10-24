@@ -5,6 +5,10 @@ const migration = readFileSync(
   new URL("../migrations/20261024110000_fix_iot_duplicate_payload_conflicts.sql", import.meta.url),
   "utf8",
 );
+const rateLimitMigration = readFileSync(
+  new URL("../migrations/20261024150000_limit_iot_ingest_rate.sql", import.meta.url),
+  "utf8",
+);
 const edgeFunction = readFileSync(
   new URL("../functions/iot-ingest/index.ts", import.meta.url),
   "utf8",
@@ -32,4 +36,11 @@ assert.match(edgeFunction, /totalBytes > MAX_PAYLOAD_BYTES/);
 assert.match(edgeFunction, /await reader\.cancel\(\)/);
 assert.match(edgeFunction, /new TextDecoder\("utf-8", \{ fatal: true \}\)/);
 
-console.log("IoT idempotency, HTTP conflict, and bounded-body contract checks passed.");
+// Rate-limit contract: 120 requests per 60-second window and server-only RPC.
+assert.match(rateLimitMigration, /return v_count <= 120/i);
+assert.match(rateLimitMigration, /interval '60 seconds'/i);
+assert.match(rateLimitMigration, /revoke all on function public\\.allow_iot_ingest_request\\(uuid\\) from public, anon, authenticated/i);
+assert.match(edgeFunction, /"allow_iot_ingest_request"/);
+assert.match(edgeFunction, /withinRateLimit !== true[\\s\\S]{0,100}response\\(429,/);
+
+console.log("IoT idempotency, bounded-body, and per-device rate-limit contract checks passed.");
