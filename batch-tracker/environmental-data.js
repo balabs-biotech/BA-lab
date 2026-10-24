@@ -1,5 +1,7 @@
 /* BA Labs Green Tech: NASA POWER historical agroclimate. */
 (() => {
+  // The Open-Meteo free API is non-commercial. Keep live forecast calls disabled until BA Labs has explicit commercial permission or switches to a cleared provider.
+  const OPEN_METEO_COMMERCIAL_USE_APPROVED = false;
   if (document.body.dataset.domain !== "agronomy" || !window.supabase) return;
   const db = window.supabase.createClient(
     "https://axcouwiodqsauwnsiotn.supabase.co",
@@ -40,7 +42,8 @@
     forecastPanel.append(node("h3",{},"Prévision météo — prochaines 48 heures"));
     forecastPanel.append(node("p",{class:"muted"},"Prévision horaire Open-Meteo. Estimation à l’échelle du point géographique, pas une mesure de serre ou de boîte de Petri."));
     const forecastButton=node("button",{type:"button"},"Actualiser la prévision 48 h");
-    const forecastStatus=node("p",{class:"muted","aria-live":"polite"},"Sélectionnez un emplacement pour charger la prévision.");
+    forecastButton.disabled = !OPEN_METEO_COMMERCIAL_USE_APPROVED;
+    const forecastStatus=node("p",{class:"muted","aria-live":"polite"},OPEN_METEO_COMMERCIAL_USE_APPROVED ? "Sélectionnez un emplacement pour charger la prévision." : "Prévision en pause : l’API gratuite Open-Meteo est réservée à l’usage non commercial. BA Labs réactivera cette fonction après validation d’une autorisation commerciale ou raccordement d’une source compatible.");
     const forecastSummary=node("div",{id:"forecast48Summary",class:"overview-observations"});
     const forecastDetails=node("details",{class:"environmental-details"});
     forecastDetails.append(node("summary",{},"Voir les prévisions horaires"));
@@ -190,6 +193,13 @@
       summary.append(coverage);
     }
     async function loadForecast(){
+      if(!OPEN_METEO_COMMERCIAL_USE_APPROVED){
+        forecastButton.disabled=true;
+        forecastStatus.textContent="Prévision indisponible pour le moment : aucune source de prévision n’est autorisée pour l’usage commercial de BA Labs dans cette configuration. L’historique NASA POWER reste disponible séparément.";
+        forecastSummary.replaceChildren();
+        forecastRows.replaceChildren();
+        return;
+      }
       forecastSummary.replaceChildren();
       forecastRows.replaceChildren();
       if(!location.value||lat.value===""||lon.value===""){
