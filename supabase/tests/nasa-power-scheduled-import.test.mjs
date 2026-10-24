@@ -34,4 +34,7 @@ assert.match(source, /onConflict: "organization_id,location_id,provider_code,dat
 assert.match(source, /ignoreDuplicates: false/, "new provider values must refresh matching observations");
 assert.match(source, /organization_id: loc\.organization_id/, "observations must retain the location organization scope");
 assert.match(source, /Daily gridded estimates; not local sensor measurements\./, "response must disclose gridded-data limitation");
+assert.match(source, /if \(!upstream\.ok\) \{ results\.push\(\{ location_id: loc\.id, ok: false, error: "nasa_power_http_" \+ upstream\.status \}\); return; \}/, "failed upstream HTTP responses must exit the location worker legally");
+assert.match(source, /if \(!series \|\| typeof series !== "object"\) \{ results\.push\(\{ location_id: loc\.id, ok: false, error: "invalid_provider_response" \}\); return; \}/, "invalid provider payloads must exit the location worker legally");
+
 console.log("PASS: NASA POWER importer security and data-integrity contract");
