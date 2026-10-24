@@ -8,6 +8,9 @@ const source = await readFile(
 
 const checks = [
   ["calls the deployed catalogue Edge Function", /db\.functions\.invoke\("copernicus-sentinel-catalogue"/],
+  ["keeps the Open-Meteo free API disabled until commercial use is cleared", /const OPEN_METEO_COMMERCIAL_USE_APPROVED = false/],
+  ["disables the forecast control when commercial permission is absent", /forecastButton\.disabled = !OPEN_METEO_COMMERCIAL_USE_APPROVED/],
+  ["prevents live forecast requests while commercial permission is absent", /async function loadForecast\(\)\{\s*if\(!OPEN_METEO_COMMERCIAL_USE_APPROVED\)\{[\s\S]*?return;\s*\}/],
   ["requires a selected location and valid date range", /if\(!location\.value\|\|!from\.value\|\|!to\.value\|\|from\.value>to\.value\)/],
   ["limits the UI search window to 180 days", /if\(days>180\)/],
   ["caps results at ten scenes in the UI", /limit:10/],
