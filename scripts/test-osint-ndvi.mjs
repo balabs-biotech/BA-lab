@@ -41,8 +41,10 @@ for (const line of csv) {
   const z = Object.fromEntries(headers.map((h, i) => [h, Number(values[i])]));
   assert.ok(Number.isInteger(z.zone_id) && !seen.has(z.zone_id), "zone IDs must be unique integers");
   seen.add(z.zone_id);
-  assert.ok(Number.isFinite(z.longitude) && z.longitude >= bbox[0] && z.longitude <= bbox[2], `zone ${z.zone_id}: longitude outside AOI`);
-  assert.ok(Number.isFinite(z.latitude) && z.latitude >= bbox[1] && z.latitude <= bbox[3], `zone ${z.zone_id}: latitude outside AOI`);
+  // Permit 0.001° (~100 m) around the nominal bbox for raster-grid edge/centroid alignment.
+  const edgeTolerance = 0.001;
+  assert.ok(Number.isFinite(z.longitude) && z.longitude >= bbox[0] - edgeTolerance && z.longitude <= bbox[2] + edgeTolerance, `zone ${z.zone_id}: longitude outside AOI edge tolerance`);
+  assert.ok(Number.isFinite(z.latitude) && z.latitude >= bbox[1] - edgeTolerance && z.latitude <= bbox[3] + edgeTolerance, `zone ${z.zone_id}: latitude outside AOI edge tolerance`);
   assert.ok(Number.isFinite(z.surface_ha) && z.surface_ha > 0, `zone ${z.zone_id}: invalid surface`);
   assert.ok(z.pixels_3_baisses_ou_plus_pct >= 0 && z.pixels_3_baisses_ou_plus_pct <= 100, `zone ${z.zone_id}: invalid repeated-decline percentage`);
 }
