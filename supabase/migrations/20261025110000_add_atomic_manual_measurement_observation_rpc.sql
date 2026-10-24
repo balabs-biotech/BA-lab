@@ -126,18 +126,35 @@ begin
     raise exception 'Event and observation targets must match' using errcode = '22023';
   end if;
 
+  if nullif(p_event->>'batch_id', '') is not null then
+    select b.culture_id, b.material_id, b.location_id, b.environment_id
+      into v_batch_culture_id, v_batch_material_id, v_batch_location_id, v_batch_environment_id
+      from public.batches b
+     where b.organization_id = v_org_id
+       and b.id = nullif(p_event->>'batch_id', '')::uuid;
+    if not found then raise exception 'Batch not found in organization' using errcode = '22023'; end if;
+    if nullif(p_event->>'culture_id', '')::uuid is distinct from v_batch_culture_id then
+      raise exception 'Event culture does not match batch culture' using errcode = '22023';
+    end if;
+    if v_batch_culture_id is null and v_batch_material_id is null then
+      raise exception 'Batch needs a culture or material anchor for traceability' using errcode = '22023';
+    end if;
+    v_material_id := case when v_batch_culture_id is null then v_batch_material_id else null end;
+  end if;
+
   insert into public.events (
     organization_id, event_type, occurred_at, actor_user_id,
-    culture_id, plant_culture_id, environment_id, location_id, batch_id, payload
+    culture_id, material_id, plant_culture_id, environment_id, location_id, batch_id, payload
   ) values (
     v_org_id,
     p_event->>'event_type',
     coalesce(nullif(p_event->>'occurred_at', '')::timestamptz, now()),
-    nullif(p_event->>'actor_user_id', '')::uuid,
+    auth.uid(),
     nullif(p_event->>'culture_id', '')::uuid,
+    v_material_id,
     nullif(p_event->>'plant_culture_id', '')::uuid,
-    nullif(p_event->>'environment_id', '')::uuid,
-    nullif(p_event->>'location_id', '')::uuid,
+    coalesce(nullif(p_event->>'environment_id', '')::uuid, v_batch_environment_id),
+    coalesce(nullif(p_event->>'location_id', '')::uuid, v_batch_location_id),
     nullif(p_event->>'batch_id', '')::uuid,
     coalesce(p_event->'payload', '{}'::jsonb)
   ) returning id into v_event_id;
