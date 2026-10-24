@@ -20,15 +20,21 @@ for (const [name, rpc, payloadKey, directTable] of [
   if (block.includes('.from("events").insert(') || block.includes('.from("' + directTable + '").insert(')) {
     throw new Error(name + " handler still performs non-atomic direct inserts");
   }
-  if (!migration.includes("create or replace function public." + rpc + "(") ||
-      !migration.includes("Event culture does not match batch culture") ||
-      !migration.includes("Batch needs a culture or material anchor for traceability") ||
-      !migration.includes("insert into public.events") ||
-      !migration.includes("insert into public." + directTable) ||
+  const sqlStart = migration.indexOf("create or replace function public." + rpc + "(");
+  const sqlEnd = migration.indexOf("$;", migration.indexOf("as $", sqlStart) + 5);
+  const sqlFunction = migration.slice(sqlStart, sqlEnd);
+  if (!sqlFunction.includes("create or replace function public." + rpc + "(") ||
+      !sqlFunction.includes("Event culture does not match batch culture") ||
+      !sqlFunction.includes("Batch needs a culture or material anchor for traceability") ||
+      !sqlFunction.includes("Batch not found in organization") ||
+      !sqlFunction.includes("insert into public.events") ||
+      !sqlFunction.includes("insert into public." + directTable) ||
+      !sqlFunction.includes("grant execute on function public." + rpc + "(jsonb, jsonb) to authenticated") && 
       !migration.includes("grant execute on function public." + rpc + "(jsonb, jsonb) to authenticated") ||
-      !migration.includes("auth.uid(),") ||
-      !migration.includes("Event and " + name + " target" + (name === "measurement" ? "s" : "s") + " must match")) {
-    throw new Error(name + " RPC migration is incomplete or misses actor/target integrity checks");
+      !sqlFunction.includes("auth.uid(),") ||
+      !sqlFunction.includes("v_batch_location_id") ||
+      !sqlFunction.includes("Event and " + name + " targets must match")) {
+    throw new Error(name + " RPC migration is incomplete or misses actor/target/batch integrity checks");
   }
 }
 console.log("✓ Manual measurement and observation writes use atomic RPCs; client-side split inserts are absent");
