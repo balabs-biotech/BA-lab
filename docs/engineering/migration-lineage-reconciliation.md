@@ -2,7 +2,7 @@
 
 **Prepared:** 2026-10-24  
 **Branch:** `fix/stabilize-migration-lineage-20261024`  
-**Scope:** source-control reconciliation only; no production schema or data changes were made.
+**Scope:** source-control reconciliation and CI hardening only; no production schema or data changes were made.
 
 ## Findings from the live Supabase migration ledger
 
@@ -45,6 +45,12 @@ This branch now:
 - adds a post-replay assertion that the foreign key exists and is validated.
 
 This is a source/replay correction. The live production database was not changed. The follow-up migration should be reviewed and applied only through the normal migration deployment process; because production already has the constraint, it should be a no-op there.
+
+## CI results and pending migrations
+
+The migration replay test now passes on a clean PostgreSQL 17 database, including the expected-schema check, environmental-observation access contract, anonymous-role privilege contract, and IoT device foreign-key contract. The latest full workflow was still completing its firmware-build job at the time of this note; other jobs had passed.
+
+The three new migrations are intentionally pending and must be reviewed before application to production. They should be applied through the normal reviewed deployment process, not by replaying the entire historical chain.
 
 ## Safety constraints
 
