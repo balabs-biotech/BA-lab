@@ -20,6 +20,7 @@ assert.match(source, /const deadlineAt = Date\.now\(\) \+ 100_000/, "import must
 assert.match(source, /const concurrency = 4/, "provider requests must use bounded concurrency");
 assert.match(source, /Promise\.all\(Array\.from\(\{ length: Math\.min\(concurrency, queue\.length\) \}/, "locations must be processed by a bounded worker pool");
 assert.match(source, /import_deadline_exceeded/, "unstarted locations after the deadline must be reported for retry");
+assert.match(source, /if \(Date\.now\(\) >= deadlineAt\) \{\s*results\.push\(\{ location_id: loc\.id, ok: false, error: "import_deadline_exceeded_before_persistence", retryable: true \}\);\s*return;\s*\}\s*if \(rows\.length\)/, "database writes must not start after the global import budget has expired");
 assert.match(source, /locations_total: \(locations \?\? \[\]\)\.length/, "response must report the total candidate locations");
 assert.match(source, /deadline_exceeded: Date\.now\(\) >= deadlineAt/, "response must disclose whether the deadline was reached");
 assert.match(source, /https:\/\/power\.larc\.nasa\.gov\/api\/temporal\/daily\/point/, "upstream host must be NASA POWER");
