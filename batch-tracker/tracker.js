@@ -2914,7 +2914,7 @@ async function loadBatch(
 
 function updateHarvestEntryState(batch, events) {
   if (!recordHarvestButton || !harvestStatus) return;
-  const allowed = batch?.current_stage === "harvest" && !["released", "rejected", "aborted", "completed"].includes(batch?.status);
+  const allowed = batch?.current_stage === "harvest" && batch?.status === "active";
   recordHarvestButton.disabled = !allowed;
   const groups = new Map();
   (events || []).filter(event => event.event_type === "harvest_recorded").forEach(event => {
@@ -2931,7 +2931,7 @@ async function recordBatchHarvest() {
     showMessage("Sélectionnez d’abord un lot.", "error");
     return;
   }
-  if (selectedBatch.current_stage !== "harvest" || ["released", "rejected", "aborted", "completed"].includes(selectedBatch.status)) {
+  if (selectedBatch.current_stage !== "harvest" || selectedBatch.status !== "active") {
     showMessage("La récolte ne peut être enregistrée que pendant l’étape Récolte d’un lot ouvert.", "error");
     return;
   }
@@ -2980,7 +2980,7 @@ async function recordBatchHarvest() {
   } finally {
     recordHarvestButton.textContent = originalLabel;
     if (selectedBatch) {
-      recordHarvestButton.disabled = !(selectedBatch.current_stage === "harvest" && !["released", "rejected", "aborted", "completed"].includes(selectedBatch.status));
+      recordHarvestButton.disabled = !(selectedBatch.current_stage === "harvest" && selectedBatch.status === "active");
     }
   }
 }
