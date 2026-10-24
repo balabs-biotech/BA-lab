@@ -11,6 +11,7 @@ DECLARE
   first_result jsonb;
   retry_result jsonb;
   conflict_caught boolean := false;
+  invalid_batch_caught boolean := false;
   measurement_count integer;
   receipt_count integer;
 BEGIN
@@ -89,6 +90,43 @@ BEGIN
   WHERE iot_ingest_receipts.device_id = v_device_id AND message_id = 'ci-message-001';
   IF receipt_count <> 1 THEN
     RAISE EXCEPTION 'FAIL: expected exactly one receipt, got %', receipt_count;
+  END IF;
+
+  -- A multi-reading payload must be atomic: a later invalid reading must not
+  -- leave the earlier valid reading or its receipt persisted.
+  BEGIN
+    PERFORM public.ingest_iot_payload(
+      v_device_id,
+      'ci-message-atomic-001',
+      repeat('d', 64),
+      '[{"variable_code":"temperature","unit_code":"degC","value":24.5},
+        {"variable_code":"temperature","unit_code":"degC","value":999}]'::jsonb
+    );
+  EXCEPTION WHEN OTHERS THEN
+    IF SQLERRM = 'unsupported_variable_unit_or_range' THEN
+      invalid_batch_caught := true;
+    ELSE
+      RAISE;
+    END IF;
+  END;
+  IF NOT invalid_batch_caught THEN
+    RAISE EXCEPTION 'FAIL: invalid reading in batch was accepted';
+  END IF;
+
+  SELECT count(*) INTO measurement_count
+  FROM public.measurements
+  WHERE organization_id = org_id
+    AND iot_device_id = v_device_id
+    AND metadata->>'message_id' = 'ci-message-atomic-001';
+  IF measurement_count <> 0 THEN
+    RAISE EXCEPTION 'FAIL: invalid batch left partial measurements: %', measurement_count;
+  END IF;
+
+  SELECT count(*) INTO receipt_count
+  FROM public.iot_ingest_receipts
+  WHERE device_id = v_device_id AND message_id = 'ci-message-atomic-001';
+  IF receipt_count <> 0 THEN
+    RAISE EXCEPTION 'FAIL: invalid batch left a receipt: %', receipt_count;
   END IF;
 END
 $iot_runtime$;
