@@ -208,10 +208,12 @@ for(const lang of ["en","pt","ar"])if(!Array.isArray(landingCopy[lang])||landing
 for(const lang of ["en","pt","ar"])for(const index of [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19])if(typeof landingCopy[lang][index]!=="string"||!landingCopy[lang][index].trim())throw new Error("Landing-page translation missing: "+lang+"["+index+"]");
 console.log("✓ Landing-page translation dictionaries parse correctly and contain all 20 mapped strings for EN/PT/AR");
 
-const signOutBlock=engine.match(/async function signOut\(\) \{([\s\S]*?)\n\}\n\n\/\* =+\n   AUTH UI/);
-if(!signOutBlock)throw new Error("Could not isolate signOut for session-failure regression guard");
-if(!signOutBlock[1].includes("const { error } = await supabaseClient.auth.signOut()")||!signOutBlock[1].includes("if (error)")||!signOutBlock[1].includes("Déconnexion impossible")||!signOutBlock[1].includes("return;"))throw new Error("Sign-out failure must be surfaced without clearing authenticated state");
-if(signOutBlock[1].indexOf("return;")>signOutBlock[1].indexOf("organizationId = null"))throw new Error("Sign-out failure return must precede local session-state reset");
+const signOutStart=engine.indexOf("async function signOut()");
+const authUiStart=engine.indexOf("/* ============================================================\\n   AUTH UI",signOutStart);
+if(signOutStart<0||authUiStart<0)throw new Error("Could not isolate signOut for session-failure regression guard");
+const signOutBlock=engine.slice(signOutStart,authUiStart);
+if(!signOutBlock.includes("const { error } = await supabaseClient.auth.signOut()")||!signOutBlock.includes("if (error)")||!signOutBlock.includes("Déconnexion impossible")||!signOutBlock.includes("return;"))throw new Error("Sign-out failure must be surfaced without clearing authenticated state");
+if(signOutBlock.indexOf("return;")>signOutBlock.indexOf("organizationId = null"))throw new Error("Sign-out failure return must precede local session-state reset");
 console.log("✓ Sign-out checks Supabase's returned error and preserves local state when logout fails");
 
 if(!engine.includes("let authStateRevision = 0;"))throw new Error("Auth revision guard is missing");
