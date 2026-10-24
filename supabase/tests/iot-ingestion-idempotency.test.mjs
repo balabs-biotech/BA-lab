@@ -29,6 +29,13 @@ assert.match(migration, /grant execute on function public\.ingest_iot_payload\(u
 assert.match(edgeFunction, /message\.includes\("message_id_payload_mismatch"\)[\s\S]{0,180}response\(409,/);
 assert.match(edgeFunction, /const payloadHash = await sha256Hex\(raw\)/);
 
+// Authenticate and apply the per-device budget before buffering or parsing attacker-controlled bodies.
+const deviceAuthIndex = edgeFunction.indexOf('.from("iot_devices")');
+const rateLimitIndex = edgeFunction.indexOf('"allow_iot_ingest_request"');
+const bodyReadIndex = edgeFunction.indexOf("req.body?.getReader()");
+assert.ok(deviceAuthIndex >= 0 && rateLimitIndex > deviceAuthIndex && bodyReadIndex > rateLimitIndex,
+  "device authentication and rate limiting must precede body buffering");
+
 // Resource contract: enforce the byte limit during streaming, not after buffering the whole body.
 assert.match(edgeFunction, /const MAX_PAYLOAD_BYTES = 32_000/);
 assert.match(edgeFunction, /req\.body\?\.getReader\(\)/);
