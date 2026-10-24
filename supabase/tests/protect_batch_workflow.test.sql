@@ -336,3 +336,29 @@ do $$ begin
   end;
 end $$;
 reset role;
+
+
+-- Privilege regression: workflow SECURITY DEFINER RPCs must never be callable by anon/PUBLIC.
+do $$
+declare
+  fn text;
+  workflow_functions text[] := array[
+    'public.create_batch_with_stages(uuid,text,text,text,uuid,uuid,uuid,uuid,uuid,timestamp with time zone,numeric,text,text[])',
+    'public.advance_batch_stage(uuid,text)',
+    'public.release_batch(uuid)',
+    'public.move_batch_to_location(uuid,uuid,uuid,text)'
+  ];
+begin
+  foreach fn in array workflow_functions loop
+    if has_function_privilege('anon', fn, 'EXECUTE') then
+      raise exception 'FAIL: anon can execute workflow RPC %', fn;
+    end if;
+    if has_function_privilege('PUBLIC', fn, 'EXECUTE') then
+      raise exception 'FAIL: PUBLIC can execute workflow RPC %', fn;
+    end if;
+    if not has_function_privilege('authenticated', fn, 'EXECUTE') then
+      raise exception 'FAIL: authenticated cannot execute intended workflow RPC %', fn;
+    end if;
+  end loop;
+end $$;
+select 'PASS: workflow RPC execution grants are least-privilege' as test_result;
