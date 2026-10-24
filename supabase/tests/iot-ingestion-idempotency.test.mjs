@@ -21,8 +21,15 @@ assert.match(migration, /jsonb_build_object\('status', 'duplicate'/i);
 assert.match(migration, /revoke all on function public\.ingest_iot_payload\(uuid, text, text, jsonb\) from public, anon, authenticated/i);
 assert.match(migration, /grant execute on function public\.ingest_iot_payload\(uuid, text, text, jsonb\) to service_role/i);
 
-// HTTP contract: the Edge Function translates a payload collision to 409.
+// HTTP contract: payload collisions map to 409 and hashes cover the exact raw body.
 assert.match(edgeFunction, /message\.includes\("message_id_payload_mismatch"\)[\s\S]{0,180}response\(409,/);
 assert.match(edgeFunction, /const payloadHash = await sha256Hex\(raw\)/);
 
-console.log("IoT idempotency and HTTP conflict contract checks passed.");
+// Resource contract: enforce the byte limit during streaming, not after buffering the whole body.
+assert.match(edgeFunction, /const MAX_PAYLOAD_BYTES = 32_000/);
+assert.match(edgeFunction, /req\.body\?\.getReader\(\)/);
+assert.match(edgeFunction, /totalBytes > MAX_PAYLOAD_BYTES/);
+assert.match(edgeFunction, /await reader\.cancel\(\)/);
+assert.match(edgeFunction, /new TextDecoder\("utf-8", \{ fatal: true \}\)/);
+
+console.log("IoT idempotency, HTTP conflict, and bounded-body contract checks passed.");
