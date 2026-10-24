@@ -15,7 +15,13 @@ assert.ok(locationQuery > verifier, "locations must not be queried before the se
 assert.match(source, /if \(verifyError \|\| verified !== true\) return response\(401/, "failed secret verification must stop processing");
 assert.match(source, /SUPABASE_SECRET_KEY.*SUPABASE_SERVICE_ROLE_KEY/s, "server-side privileged key must come from environment variables");
 assert.match(source, /\.limit\(100\)/, "scheduled import must have a hard location cap");
-assert.match(source, /AbortSignal\.timeout\(25000\)/, "upstream requests must have a timeout");
+assert.match(source, /AbortSignal\.timeout\(Math\.min\(25000, remainingMs\)\)/, "upstream timeout must respect the remaining import budget");
+assert.match(source, /const deadlineAt = Date\.now\(\) \+ 100_000/, "import must have a global 100-second budget");
+assert.match(source, /const concurrency = 4/, "provider requests must use bounded concurrency");
+assert.match(source, /Promise\.all\(Array\.from\(\{ length: Math\.min\(concurrency, queue\.length\) \}/, "locations must be processed by a bounded worker pool");
+assert.match(source, /import_deadline_exceeded/, "unstarted locations after the deadline must be reported for retry");
+assert.match(source, /locations_total: \(locations \?\? \[\]\)\.length/, "response must report the total candidate locations");
+assert.match(source, /deadline_exceeded: Date\.now\(\) >= deadlineAt/, "response must disclose whether the deadline was reached");
 assert.match(source, /https:\/\/power\.larc\.nasa\.gov\/api\/temporal\/daily\/point/, "upstream host must be NASA POWER");
 assert.doesNotMatch(source, /Access-Control-Allow-Origin/, "cron endpoint must not enable browser CORS");
 
