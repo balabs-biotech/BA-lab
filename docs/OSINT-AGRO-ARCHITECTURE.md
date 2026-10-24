@@ -104,3 +104,12 @@ Références d’audit : Supabase Security Advisor et inspection en lecture seul
 ## Architecture des tests
 
 Le calcul de plage de température est isolé dans `batch-tracker/forecast-rules.js` sans dépendance réseau ni DOM. Le test Node couvre les dépassements basse/haute, les données manquantes, les limites inversées, l’absence de configuration et l’absence de températures valides. Le workflow GitHub Actions doit vérifier ce module ainsi que la syntaxe des modules environnemental et NDVI.
+
+
+## Mise à jour — contrôle des zones candidates
+
+Le contrôle des données vérifie maintenant, pour les 65 points, la cohérence de la surface avec le nombre de pixels (résolution nominale de 0,01 ha/pixel), les fréquences de baisse et les centroïdes situés hors de l’emprise nominale. Deux centroïdes sont documentés en bordure (zones 7847 et 82832) et restent dans la tolérance technique de 0,001° ; ils doivent être validés sur les géométries source avant de guider une visite ou une décision agricole.
+
+## Limite du workflow CI
+
+Le workflow est ajouté dans la branche de cette PR, mais il n’existe pas encore sur la branche de base. GitHub ne peut donc pas nécessairement lancer l’événement `pull_request` pour ce workflow inédit avant sa fusion. Aucun run vert n’a été observé. La validation par GitHub Actions est donc une étape post-fusion ; les vérifications Node prévues dans le workflow ne doivent pas être décrites comme déjà exécutées.
