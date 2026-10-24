@@ -11,6 +11,7 @@ DECLARE
   other_location_id uuid;
   other_environment_id uuid;
   cross_tenant_caught boolean := false;
+  duplicate_token_caught boolean := false;
   v_device_id uuid;
   first_result jsonb;
   retry_result jsonb;
@@ -75,6 +76,22 @@ BEGIN
     repeat('a', 64)
   )
   RETURNING id INTO v_device_id;
+
+  -- A token hash must identify exactly one device; duplicate hashes are ambiguous.
+  BEGIN
+    INSERT INTO public.iot_devices (
+      id, organization_id, environment_id, device_code, device_type, token_sha256
+    ) VALUES (
+      '10000000-0000-0000-0000-000000000013',
+      org_id, environment_id, 'ci-duplicate-token-device', 'esp32-test',
+      repeat('a', 64)
+    );
+  EXCEPTION WHEN unique_violation THEN
+    duplicate_token_caught := true;
+  END;
+  IF NOT duplicate_token_caught THEN
+    RAISE EXCEPTION 'FAIL: duplicate IoT device token hash was accepted';
+  END IF;
 
   first_result := public.ingest_iot_payload(
     v_device_id,
