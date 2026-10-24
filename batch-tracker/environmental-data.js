@@ -36,6 +36,17 @@
     const refresh=node("button",{type:"button"},"Forcer l’actualisation météo");
     const status=node("p",{class:"muted","aria-live":"polite"},"Choisissez un emplacement pour consulter les indicateurs météo et les scènes satellite disponibles.");
     const summary=node("div",{id:"envSummary",class:"overview-observations","aria-live":"polite"});
+    const forecastPanel=node("section",{id:"forecast48Card",class:"card"});
+    forecastPanel.append(node("h3",{},"Prévision météo — prochaines 48 heures"));
+    forecastPanel.append(node("p",{class:"muted"},"Prévision horaire Open-Meteo. Estimation à l’échelle du point géographique, pas une mesure de serre ou de boîte de Petri."));
+    const forecastButton=node("button",{type:"button"},"Actualiser la prévision 48 h");
+    const forecastStatus=node("p",{class:"muted","aria-live":"polite"},"Sélectionnez un emplacement pour charger la prévision.");
+    const forecastSummary=node("div",{id:"forecast48Summary",class:"overview-observations"});
+    const forecastDetails=node("details",{class:"environmental-details"});
+    forecastDetails.append(node("summary",{},"Voir les prévisions horaires"));
+    const forecastRows=node("div",{id:"forecast48Rows",class:"overview-observations"});
+    forecastDetails.append(forecastRows);
+    forecastPanel.append(forecastButton,forecastStatus,forecastSummary,forecastDetails);
     const results=node("div",{id:"envResults",class:"overview-observations"});
     const details=node("details",{class:"environmental-details"});
     details.append(node("summary",{},"Voir les observations détaillées"));
@@ -47,7 +58,7 @@
     const satelliteButton=node("button",{type:"button"},"Chercher les images satellite");
     const satelliteResults=node("div",{id:"satelliteResults",class:"overview-observations","aria-live":"polite"});
     const satelliteHint=node("p",{class:"muted"},"Sentinel-2 : scènes disponibles et couverture nuageuse. L’image ne constitue pas à elle seule un diagnostic de culture.");
-    panel.append(form,status,summary,satelliteHint,satelliteButton,satelliteResults,details);
+    panel.append(form,status,summary,forecastPanel,satelliteHint,satelliteButton,satelliteResults,details);
     plant.parentNode.insertBefore(panel,plant.nextSibling);
     const nav=document.querySelector(".section-nav");
     if(nav && !document.getElementById("envNav")) { const a=node("a",{href:"#environmentalCard",id:"envNav"},"Contexte environnemental"); nav.append(a); }
@@ -169,6 +180,69 @@
       coverage.append(node("p",{class:"muted"},"La couverture compte les dates calendaires avec une valeur numérique dans la période sélectionnée. « Couverture faible » signifie moins de 80 % des jours attendus ; « Dernière donnée à plus de 2 jours » signale un écart avec la fin de période. Ces signaux ne déterminent pas seuls la cause : retard du fournisseur, import incomplet ou coordonnées peuvent être en jeu. NASA POWER fournit des estimations régionales, pas des mesures locales."));
       summary.append(coverage);
     }
+    async function loadForecast(){
+      forecastSummary.replaceChildren();
+      forecastRows.replaceChildren();
+      if(!location.value||lat.value===""||lon.value===""){
+        forecastStatus.textContent="Sélectionnez un emplacement avec des coordonnées valides.";
+        return;
+      }
+      const latitude=Number(lat.value),longitude=Number(lon.value);
+      if(!Number.isFinite(latitude)||latitude < -90||latitude>90||!Number.isFinite(longitude)||longitude < -180||longitude>180){
+        forecastStatus.textContent="Coordonnées invalides : impossible de demander une prévision.";
+        return;
+      }
+      forecastButton.disabled=true;
+      forecastStatus.textContent="Récupération de la prévision horaire…";
+      try{
+        const params=new URLSearchParams({
+          latitude:String(latitude),longitude:String(longitude),
+          hourly:"temperature_2m,relative_humidity_2m,precipitation_probability,precipitation,wind_speed_10m",
+          forecast_hours:"48",timezone:"auto",temperature_unit:"celsius",
+          wind_speed_unit:"kmh",precipitation_unit:"mm"
+        });
+        const response=await fetch("https://api.open-meteo.com/v1/forecast?"+params.toString(),{headers:{Accept:"application/json"}});
+        if(!response.ok)throw new Error("service météo HTTP "+response.status);
+        const data=await response.json();
+        const h=data.hourly;
+        if(!h||!Array.isArray(h.time)||!h.time.length||!Array.isArray(h.temperature_2m))throw new Error("réponse météo incomplète");
+        const values=key=>Array.isArray(h[key])?h[key].map(Number).filter(Number.isFinite):[];
+        const temps=values("temperature_2m"),rain=values("precipitation"),prob=values("precipitation_probability"),wind=values("wind_speed_10m"),humid=values("relative_humidity_2m");
+        const max=(arr)=>arr.length?Math.max(...arr):null;
+        const min=(arr)=>arr.length?Math.min(...arr):null;
+        const sum=arr=>arr.length?arr.reduce((a,b)=>a+b,0):null;
+        const avg=arr=>arr.length?arr.reduce((a,b)=>a+b,0)/arr.length:null;
+        const metric=(label,value,unit)=>{const box=node("article",{class:"card"});box.append(node("small",{class:"muted"},label),node("h4",{},value===null?"Indisponible":value.toFixed(1)+(unit||"")));return box;};
+        const grid=node("div",{class:"grid"});
+        grid.append(metric("Température minimale",min(temps)," °C"),metric("Température maximale",max(temps)," °C"),metric("Pluie cumulée prévue",sum(rain)," mm"),metric("Probabilité de pluie maximale",max(prob),"%"),metric("Vent maximal",max(wind)," km/h"),metric("Humidité moyenne",avg(humid),"%"));
+        forecastSummary.append(grid);
+        const advice=node("div",{class:"environmental-advice"});
+        const advise=(level,title,message)=>{const card=node("article",{class:"card"});card.append(node("small",{class:"muted"},level),node("h4",{},title),node("p",{},message));advice.append(card);};
+        let flags=0;
+        if(max(temps)!==null&&max(temps)>=30){advise("Vigilance chaleur","Température extérieure élevée","Le maximum prévu atteint "+max(temps).toFixed(1)+" °C. Pour les cultures et les cultures microbiologiques exposées, réduire l’exposition directe au soleil et contrôler la température réelle sur place. Ce seuil est un repère météo général, pas une limite de tolérance biologique.");flags++;}
+        if(min(temps)!==null&&min(temps)<=5){advise("Vigilance froid","Température extérieure basse","Le minimum prévu atteint "+min(temps).toFixed(1)+" °C. Vérifiez la protection des plantes sensibles et des contenants exposés au froid ; référez-vous aux limites de température propres à chaque espèce ou protocole.");flags++;}
+        if(max(prob)!==null&&max(prob)>=60){advise("Vigilance pluie","Épisode pluvieux possible","La probabilité horaire maximale de précipitation atteint "+max(prob)+" %. Vérifiez les cultures en extérieur, le drainage et la protection des boîtes ou matériels qui ne doivent pas être mouillés.");flags++;}
+        if(max(wind)!==null&&max(wind)>=35){advise("Vigilance vent","Rafales ou vent soutenu à surveiller","Le vent horaire prévu atteint "+max(wind).toFixed(1)+" km/h. Sécurisez les protections, couvercles et matériels légers exposés.");flags++;}
+        if(!flags)advise("Pas de seuil météo général franchi","Poursuivre la surveillance normale","Aucun des seuils généraux actuels n’a été franchi. Cela ne garantit pas des conditions adaptées à une culture ou un protocole particulier.");
+        forecastSummary.append(node("h4",{},"Conseils automatiques (règles explicites)"),advice);
+        const table=node("table"),thead=node("thead"),head=node("tr");
+        ["Heure locale","Temp. °C","Humidité %","Pluie mm","Probabilité %","Vent km/h"].forEach(t=>head.append(node("th",{},t)));
+        thead.append(head);table.append(thead);
+        const tbody=node("tbody");
+        for(let i=0;i<h.time.length;i+=3){
+          const tr=node("tr");
+          const stamp=h.time[i]||"";
+          const local=stamp.replace("T"," ");
+          const cellValues=[local,h.temperature_2m?.[i],h.relative_humidity_2m?.[i],h.precipitation?.[i],h.precipitation_probability?.[i],h.wind_speed_10m?.[i]];
+          cellValues.forEach((v,j)=>tr.append(node("td",{},v===null||v===undefined||v===""?"—":j===0?String(v):Number.isFinite(Number(v))?Number(v).toFixed(j===1?1:0):"—")));
+          tbody.append(tr);
+        }
+        table.append(tbody);forecastRows.append(table);
+        forecastStatus.textContent="Prévision chargée : "+h.time.length+" heure(s) disponibles, jusqu’au "+String(h.time[h.time.length-1]).replace("T"," ")+". Source : Open-Meteo. Prévision susceptible d’être révisée ; aucune commande automatique n’est déclenchée.";
+      }catch(error){
+        forecastStatus.textContent="Prévision indisponible : "+(error?.message||"erreur inconnue")+". Les données météo historiques restent indépendantes.";
+      }finally{forecastButton.disabled=false;}
+    }
     async function loadRows(){
       results.replaceChildren();
       const columns="observed_at,variable_code,value,unit_code,provider_code,quality_flag";
@@ -241,7 +315,7 @@
       if(!Number.isFinite(a)||a < -90||a>90||!Number.isFinite(o)||o < -180||o>180||(acc!==null&&(!Number.isFinite(acc)||acc<0))){status.textContent="Coordonnées invalides. Vérifiez les plages de latitude, longitude et précision.";return;}
       status.textContent="Enregistrement…";
       const {error}=await db.from("locations").update({latitude:a,longitude:o,coordinate_accuracy_m:acc,coordinate_source:source.value}).eq("id",location.value);
-      status.textContent=error?"Échec de l’enregistrement : "+error.message:"Coordonnées enregistrées.";
+      status.textContent=error?"Échec de l’enregistrement : "+error.message:"Coordonnées enregistrées.";\n      if(!error) await loadForecast();
     });
     async function importWeather(forceRefresh=false){
       if(!location.value||!from.value||!to.value||from.value>to.value){status.textContent="Choisissez un emplacement et une période valide.";return;}
@@ -267,7 +341,7 @@
       }catch(error){status.textContent="Échec de la collecte : "+(error?.message||"erreur inconnue");}
       finally{run.disabled=false;refresh.disabled=false;}
     }
-    run.addEventListener("click",()=>importWeather(false));
+    forecastButton.addEventListener("click",loadForecast);\n    run.addEventListener("click",()=>importWeather(false));
     refresh.addEventListener("click",()=>importWeather(true));
     satelliteButton.addEventListener("click",searchSatellite);
     const {data: authState}=await db.auth.getSession();
