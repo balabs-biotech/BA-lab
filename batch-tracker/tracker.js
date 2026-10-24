@@ -751,11 +751,12 @@ async function signOut() {
    AUTH UI
    ============================================================ */
 
-async function refreshAuthUI() {
+async function refreshAuthUI(revision = authStateRevision) {
 
   const session =
     await getCurrentSession();
 
+  if (revision !== authStateRevision) return;
 
   if (!session) {
 
@@ -787,7 +788,8 @@ async function refreshAuthUI() {
 
 
   await initializeAuthenticatedTracker(
-    session
+    session,
+    revision
   );
 
 }
@@ -798,7 +800,8 @@ async function refreshAuthUI() {
    ============================================================ */
 
 async function initializeAuthenticatedTracker(
-  session
+  session,
+  revision = authStateRevision
 ) {
 
   if (
@@ -813,7 +816,7 @@ async function initializeAuthenticatedTracker(
   initializationInProgress =
     true;
 
-  const initRevision = authStateRevision;
+  const initRevision = revision;
 
   try {
 
@@ -4451,11 +4454,12 @@ supabaseClient.auth.onAuthStateChange(
   ) => {
 
     authStateRevision += 1;
+    const revision = authStateRevision;
 
     setTimeout(
       () => {
 
-        refreshAuthUI()
+        refreshAuthUI(revision)
           .catch(
             error => {
 
