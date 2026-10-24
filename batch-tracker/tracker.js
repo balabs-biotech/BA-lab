@@ -753,8 +753,31 @@ async function signOut() {
 
 async function refreshAuthUI(revision = authStateRevision) {
 
-  const session =
-    await getCurrentSession();
+  let session;
+
+  try {
+    session = await getCurrentSession();
+  } catch (error) {
+    if (revision !== authStateRevision) return;
+
+    // Do not leave a previously authenticated workspace visible when the
+    // current session cannot be verified because of a network/auth failure.
+    hideElement(trackerCard);
+    hideElement(batchCard);
+    hideElement(document.getElementById("plantCard"));
+    hideElement(measurementCard);
+    hideElement(document.getElementById("statisticsCard"));
+    hideElement(document.getElementById("overviewCard"));
+    hideElement(resultCard);
+    hideElement(signOutButton);
+    authStatus.textContent = "Session non vérifiable.";
+    showMessage(
+      "Impossible de vérifier votre session. Vérifiez la connexion Internet puis rechargez la page. Vos données ne sont pas supprimées.",
+      "error"
+    );
+    console.error("Vérification de session impossible :", error);
+    return;
+  }
 
   if (revision !== authStateRevision) return;
 
