@@ -12,7 +12,9 @@
       (upper === null || Number.isFinite(upper)) &&
       (lower === null || upper === null || lower <= upper);
     const values = (Array.isArray(temperatures) ? temperatures : [])
-      .filter(value => value !== null && value !== undefined && value !== "")
+      .filter(value => value !== null && value !== undefined &&
+        !(typeof value === "string" && value.trim() === "") &&
+        (typeof value === "number" || typeof value === "string"))
       .map(Number).filter(Number.isFinite);
     const configured = lower !== null || upper !== null;
     if (!valid) return { valid: false, configured, lower, upper, availableHours: values.length, outsideHours: null, status: "invalid_range" };
