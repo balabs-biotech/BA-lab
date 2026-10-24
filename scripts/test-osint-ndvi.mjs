@@ -19,6 +19,14 @@ assert.equal(normalizedForecast.valid, true, "valid forecast rows should normali
 assert.equal(normalizedForecast.hours.length, 2, "normalizer should retain both hourly rows");
 assert.equal(normalizedForecast.hours[0].temperatureC, null, "missing temperature must remain null, not become zero");
 assert.equal(normalizedForecast.missingTemperatures, 1, "normalizer should report missing temperatures");
+const blankTemperature = forecastRules.normalizeHourlyForecast([
+  { time: "2026-10-24T02:00:00Z", temperatureC: "   " },
+], { source: "test-provider", retrievedAt: "2026-10-24T04:00:00Z", issuedAt: "2026-10-24T00:00:00Z" });
+assert.equal(blankTemperature.valid, true, "whitespace-only temperatures should be treated as missing, not zero");
+assert.equal(blankTemperature.hours[0].temperatureC, null, "whitespace-only temperature must remain null");
+assert.equal(forecastRules.normalizeHourlyForecast([{ time: "2026-10-24T02:00:00Z", temperatureC: true }], {
+  source: "test-provider", retrievedAt: "2026-10-24T04:00:00Z", issuedAt: "2026-10-24T00:00:00Z",
+}).reason, "invalid_temperature", "boolean values must not be coerced into temperatures");
 assert.equal(normalizedForecast.hours[0].time, "2026-10-24T02:00:00.000Z", "timestamps should normalize to UTC and sort chronologically");
 assert.equal(forecastRules.normalizeHourlyForecast([], {
   source: "test-provider", retrievedAt: "2026-10-24T04:00:00Z", issuedAt: "2026-10-24T00:00:00Z",
