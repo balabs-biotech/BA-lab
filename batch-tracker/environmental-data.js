@@ -223,7 +223,7 @@
         const lower=tempMin.value.trim()===""?null:Number(tempMin.value);
         const upper=tempMax.value.trim()===""?null:Number(tempMax.value);
         const validRange=(lower===null||Number.isFinite(lower))&&(upper===null||Number.isFinite(upper))&&(lower===null||upper===null||lower<=upper);
-        const outsideHours=validRange&&lower!==null||validRange&&upper!==null
+        const outsideHours=(validRange&&(lower!==null||upper!==null))
           ? h.time.reduce((count,time,i)=>{const raw=h.temperature_2m?.[i];if(raw===null||raw===undefined||raw===""||!Number.isFinite(Number(raw)))return count;const t=Number(raw);return count+((lower!==null&&t<lower)||(upper!==null&&t>upper)?1:0);},0)
           : null;
         const grid=node("div",{class:"grid"});
