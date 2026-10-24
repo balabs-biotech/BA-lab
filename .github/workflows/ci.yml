@@ -155,6 +155,8 @@ jobs:
         run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/biological_traceability.test.sql
       - name: Test atomic manual measurement and observation RPC contract
         run: node supabase/tests/manual-write-atomicity.test.mjs
+      - name: Test batch harvest RPC contract
+        run: node supabase/tests/batch-harvest-rpc-contract.test.mjs
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
@@ -206,5 +208,7 @@ jobs:
           psql -At -v ON_ERROR_STOP=1 -X -q -c "select to_regclass('public.cultures'), to_regclass('public.batches'), to_regclass('public.culture_data_consents')" | grep -q 'cultures'
       - name: Verify atomic manual-write RPC security contract after replay
         run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/manual_write_rpc_security_contract.test.sql
+      - name: Verify batch harvest RPC security contract after replay
+        run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/batch_harvest_rpc_security_contract.test.sql
       - name: Test environmental observation schema and access contract
         run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/environmental_observations_contract.test.sql
