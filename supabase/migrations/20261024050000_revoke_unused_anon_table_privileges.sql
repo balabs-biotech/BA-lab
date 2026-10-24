@@ -11,4 +11,4 @@ revoke all privileges on table
   public.service_plans,
   public.units,
   public.variables
-from anon;
+from anon, PUBLIC;
