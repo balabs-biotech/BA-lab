@@ -95,7 +95,7 @@ Le projet Supabase actif possède déjà les briques utiles : `locations`, `envi
 
 - **Alerte Supabase RLS sans politiques** : `iot_devices` et `iot_ingest_receipts` ont RLS activé mais aucune politique. Cela peut être intentionnel si seuls les Edge Functions avec clé serveur y accèdent ; vérifier les privilèges SQL et les chemins d’accès avant d’ajouter une politique. Ne pas exposer les jetons de dispositifs via une politique `authenticated` générique.
 - **Fonctions `SECURITY DEFINER` exposées par RPC** : les advisors signalent `advance_batch_stage`, `create_batch_with_stages`, `move_batch_to_location` et `release_batch`. L’inspection montre des contrôles d’appartenance à l’organisation dans ces fonctions, mais l’avertissement reste à traiter : confirmer les droits `EXECUTE` accordés à `PUBLIC` et `authenticated`, le comportement attendu pour chaque rôle, et la validation des paramètres. Ne pas révoquer ou changer leur mode sans tests de régression, car CultureOps les utilise probablement.
-- **Protection contre les mots de passe compromis désactivée** : activer cette option dans Supabase Auth avant d’élargir les comptes utilisateurs.
+- **Contrôle Auth non actionnable dans le périmètre Free** : l’Advisor signale le réglage de protection contre les mots de passe compromis, mais ce point dépend d’une option indisponible dans le plan actuellement utilisé. Il n’est donc pas retenu comme tâche d’implémentation ; cela ne remplace pas les contrôles applicatifs d’authentification et d’autorisation.
 - **Séparation des données** : les politiques vérifiées sur `locations`, `measurements` et `plant_cultures` utilisent `private.is_org_member(organization_id)`. La politique de lecture observée pour `environmental_observations` est également limitée aux membres de l’organisation. Vérifier que les politiques INSERT/UPDATE/DELETE nécessaires à l’ingestion historique sont intentionnellement réservées aux fonctions serveur.
 - **Ingestion IoT** : l’Edge Function utilise un jeton de dispositif stocké sous forme SHA-256, borne la taille du corps, valide les unités et les plages, limite le nombre de mesures par paquet et transmet un identifiant de message et une empreinte de charge utile à une RPC atomique. Conserver ces propriétés ; ajouter des tests d’abus, de répétition et de révocation avant le déploiement massif.
 
@@ -110,6 +110,12 @@ Le calcul de plage de température est isolé dans `batch-tracker/forecast-rules
 
 Le contrôle des données vérifie maintenant, pour les 65 points, la cohérence de la surface avec le nombre de pixels (résolution nominale de 0,01 ha/pixel), les fréquences de baisse et les centroïdes situés hors de l’emprise nominale. Deux centroïdes sont documentés en bordure (zones 7847 et 82832) et restent dans la tolérance technique de 0,001° ; ils doivent être validés sur les géométries source avant de guider une visite ou une décision agricole.
 
-## Limite du workflow CI
+## Validation CI — 24 octobre 2026
 
-Le workflow est ajouté dans la branche de cette PR, mais il n’existe pas encore sur la branche de base. GitHub ne peut donc pas nécessairement lancer l’événement `pull_request` pour ce workflow inédit avant sa fusion. Aucun run vert n’a été observé. La validation par GitHub Actions est donc une étape post-fusion ; les vérifications Node prévues dans le workflow ne doivent pas être décrites comme déjà exécutées.
+Les contrôles ont été exécutés sur le commit `6a25a1dba7f6dddfa49c3e0bc6ac87923d2a2c81` :
+
+- CI générale : succès, incluant le rejeu des migrations, les contrats RLS/tenant, les tests de migrations et le build firmware.
+- Contrat de l’importeur NASA POWER : succès, y compris `deno check`.
+- Contrôles OSINT NDVI : succès, y compris intégrité du résumé, 65 zones candidates, règles de prévision et syntaxe JavaScript.
+
+Ces résultats valident les contrôles automatisés du dépôt, pas le comportement de bout en bout en production. Les tests navigateur/API, la validation en conditions réelles et la revue finale de la lignée des migrations restent nécessaires avant fusion ou déploiement.
