@@ -1,0 +1,294 @@
+-- Runtime test: exercise the real IoT RPC after the full migration replay.
+-- Runs only against disposable PostgreSQL in GitHub Actions; never production.
+\set ON_ERROR_STOP on
+
+DO $iot_runtime$
+DECLARE
+  org_id uuid := '10000000-0000-0000-0000-000000000001';
+  location_id uuid;
+  environment_id uuid;
+  other_org_id uuid := '10000000-0000-0000-0000-000000000011';
+  other_location_id uuid;
+  other_environment_id uuid;
+  cross_tenant_caught boolean := false;
+  duplicate_token_caught boolean := false;
+  v_device_id uuid;
+  first_result jsonb;
+  retry_result jsonb;
+  conflict_caught boolean := false;
+  invalid_batch_caught boolean := false;
+  null_payload_caught boolean := false;
+  bad_shape_count integer := 0;
+  invalid_payload jsonb;
+  previous_rotation timestamptz;
+  rate_limit_allowed boolean;
+  request_index integer;
+  measurement_count integer;
+  receipt_count integer;
+BEGIN
+  INSERT INTO public.organizations (id, code, name)
+  VALUES (org_id, 'ci-iot-runtime', 'CI IoT runtime test')
+  ON CONFLICT (id) DO NOTHING;
+
+  INSERT INTO public.locations (organization_id, code, name, location_type)
+  VALUES (org_id, 'ci-iot-location', 'CI IoT location', 'test')
+  ON CONFLICT (organization_id, code) DO UPDATE SET name = EXCLUDED.name
+  RETURNING id INTO location_id;
+
+  INSERT INTO public.environments (organization_id, location_id, name)
+  VALUES (org_id, location_id, 'CI IoT environment')
+  RETURNING id INTO environment_id;
+
+  -- A device must not bind to an environment owned by another organization.
+  INSERT INTO public.organizations (id, code, name)
+  VALUES (other_org_id, 'ci-iot-other-org', 'CI IoT other tenant')
+  ON CONFLICT (id) DO NOTHING;
+
+  INSERT INTO public.locations (organization_id, code, name, location_type)
+  VALUES (other_org_id, 'ci-iot-other-location', 'CI IoT other location', 'test')
+  ON CONFLICT (organization_id, code) DO UPDATE SET name = EXCLUDED.name
+  RETURNING id INTO other_location_id;
+
+  INSERT INTO public.environments (organization_id, location_id, name)
+  VALUES (other_org_id, other_location_id, 'CI IoT other environment')
+  RETURNING id INTO other_environment_id;
+
+  BEGIN
+    INSERT INTO public.iot_devices (
+      id, organization_id, environment_id, device_code, device_type, token_sha256
+    ) VALUES (
+      '10000000-0000-0000-0000-000000000012',
+      org_id, other_environment_id, 'ci-cross-tenant-device', 'esp32-test',
+      repeat('9', 64)
+    );
+  EXCEPTION WHEN foreign_key_violation THEN
+    cross_tenant_caught := true;
+  END;
+  IF NOT cross_tenant_caught THEN
+    RAISE EXCEPTION 'FAIL: IoT device accepted an environment owned by another organization';
+  END IF;
+
+  INSERT INTO public.iot_devices (
+    id, organization_id, environment_id, device_code, device_type, token_sha256
+  ) VALUES (
+    '10000000-0000-0000-0000-000000000002',
+    org_id, environment_id, 'ci-iot-device', 'esp32-test',
+    repeat('a', 64)
+  )
+  RETURNING id INTO v_device_id;
+
+  -- A token hash must identify exactly one device; duplicate hashes are ambiguous.
+  BEGIN
+    INSERT INTO public.iot_devices (
+      id, organization_id, environment_id, device_code, device_type, token_sha256
+    ) VALUES (
+      '10000000-0000-0000-0000-000000000013',
+      org_id, environment_id, 'ci-duplicate-token-device', 'esp32-test',
+      repeat('a', 64)
+    );
+  EXCEPTION WHEN unique_violation THEN
+    duplicate_token_caught := true;
+  END;
+  IF NOT duplicate_token_caught THEN
+    RAISE EXCEPTION 'FAIL: duplicate IoT device token hash was accepted';
+  END IF;
+
+  first_result := public.ingest_iot_payload(
+    v_device_id,
+    'ci-message-001',
+    repeat('b', 64),
+    '[{"variable_code":"temperature","unit_code":"degC","value":24.5}]'::jsonb
+  );
+  IF first_result->>'status' <> 'processed'
+     OR (first_result->>'count')::integer <> 1 THEN
+    RAISE EXCEPTION 'FAIL: first ingestion was not processed: %', first_result;
+  END IF;
+
+  retry_result := public.ingest_iot_payload(
+    v_device_id,
+    'ci-message-001',
+    repeat('b', 64),
+    '[{"variable_code":"temperature","unit_code":"degC","value":24.5}]'::jsonb
+  );
+  IF retry_result->>'status' <> 'duplicate' THEN
+    RAISE EXCEPTION 'FAIL: identical retry was not marked duplicate: %', retry_result;
+  END IF;
+
+  BEGIN
+    PERFORM public.ingest_iot_payload(
+      v_device_id,
+      'ci-message-001',
+      repeat('c', 64),
+      '[{"variable_code":"temperature","unit_code":"degC","value":25.5}]'::jsonb
+    );
+  EXCEPTION WHEN OTHERS THEN
+    IF SQLERRM = 'message_id_payload_mismatch' THEN
+      conflict_caught := true;
+    ELSE
+      RAISE;
+    END IF;
+  END;
+  IF NOT conflict_caught THEN
+    RAISE EXCEPTION 'FAIL: same message ID with a different hash was accepted';
+  END IF;
+
+  SELECT count(*) INTO measurement_count
+  FROM public.measurements
+  WHERE organization_id = org_id
+    AND iot_device_id = v_device_id
+    AND metadata->>'message_id' = 'ci-message-001';
+  IF measurement_count <> 1 THEN
+    RAISE EXCEPTION 'FAIL: expected exactly one persisted measurement, got %', measurement_count;
+  END IF;
+
+  SELECT count(*) INTO receipt_count
+  FROM public.iot_ingest_receipts
+  WHERE iot_ingest_receipts.device_id = v_device_id AND message_id = 'ci-message-001';
+  IF receipt_count <> 1 THEN
+    RAISE EXCEPTION 'FAIL: expected exactly one receipt, got %', receipt_count;
+  END IF;
+
+  -- A multi-reading payload must be atomic: a later invalid reading must not
+  -- leave the earlier valid reading or its receipt persisted.
+  BEGIN
+    PERFORM public.ingest_iot_payload(
+      v_device_id,
+      'ci-message-atomic-001',
+      repeat('d', 64),
+      '[{"variable_code":"temperature","unit_code":"degC","value":24.5},
+        {"variable_code":"temperature","unit_code":"degC","value":999}]'::jsonb
+    );
+  EXCEPTION WHEN OTHERS THEN
+    IF SQLERRM = 'unsupported_variable_unit_or_range' THEN
+      invalid_batch_caught := true;
+    ELSE
+      RAISE;
+    END IF;
+  END;
+  IF NOT invalid_batch_caught THEN
+    RAISE EXCEPTION 'FAIL: invalid reading in batch was accepted';
+  END IF;
+
+  SELECT count(*) INTO measurement_count
+  FROM public.measurements
+  WHERE organization_id = org_id
+    AND iot_device_id = v_device_id
+    AND metadata->>'message_id' = 'ci-message-atomic-001';
+  IF measurement_count <> 0 THEN
+    RAISE EXCEPTION 'FAIL: invalid batch left partial measurements: %', measurement_count;
+  END IF;
+
+  SELECT count(*) INTO receipt_count
+  FROM public.iot_ingest_receipts
+  WHERE device_id = v_device_id AND message_id = 'ci-message-atomic-001';
+  IF receipt_count <> 0 THEN
+    RAISE EXCEPTION 'FAIL: invalid batch left a receipt: %', receipt_count;
+  END IF;
+
+  -- SQL NULL differs from JSON null: guard it before jsonb_typeof/array_length.
+  BEGIN
+    PERFORM public.ingest_iot_payload(
+      v_device_id,
+      'ci-message-null-001',
+      repeat('e', 64),
+      NULL
+    );
+  EXCEPTION WHEN OTHERS THEN
+    IF SQLERRM = 'invalid_readings_count' THEN
+      null_payload_caught := true;
+    ELSE
+      RAISE;
+    END IF;
+  END;
+  IF NOT null_payload_caught THEN
+    RAISE EXCEPTION 'FAIL: SQL-NULL readings payload was accepted';
+  END IF;
+
+  SELECT count(*) INTO receipt_count
+  FROM public.iot_ingest_receipts
+  WHERE device_id = v_device_id AND message_id = 'ci-message-null-001';
+  IF receipt_count <> 0 THEN
+    RAISE EXCEPTION 'FAIL: SQL-NULL payload left a receipt: %', receipt_count;
+  END IF;
+
+  -- JSON null, objects, numbers and strings must be rejected consistently
+  -- before jsonb_array_length is called.
+  FOR invalid_payload IN
+    SELECT value FROM jsonb_array_elements('[null, {}, 1, "not-an-array"]'::jsonb)
+  LOOP
+    BEGIN
+      PERFORM public.ingest_iot_payload(
+        v_device_id,
+        'ci-message-bad-shape-' || bad_shape_count::text,
+        repeat('f', 64),
+        invalid_payload
+      );
+    EXCEPTION WHEN OTHERS THEN
+      IF SQLERRM = 'invalid_readings_count' THEN
+        bad_shape_count := bad_shape_count + 1;
+      ELSE
+        RAISE;
+      END IF;
+    END;
+  END LOOP;
+  IF bad_shape_count <> 4 THEN
+    RAISE EXCEPTION 'FAIL: expected all 4 non-array JSON values to be rejected, got %', bad_shape_count;
+  END IF;
+
+  -- A changed token hash must advance the rotation timestamp automatically.
+  UPDATE public.iot_devices
+    SET token_rotated_at = '2000-01-01 00:00:00+00'
+    WHERE id = v_device_id;
+  SELECT token_rotated_at INTO previous_rotation
+    FROM public.iot_devices WHERE id = v_device_id;
+  UPDATE public.iot_devices
+    SET token_sha256 = repeat('c', 64)
+    WHERE id = v_device_id;
+  IF NOT EXISTS (
+    SELECT 1 FROM public.iot_devices
+    WHERE id = v_device_id AND token_rotated_at > previous_rotation
+  ) THEN
+    RAISE EXCEPTION 'FAIL: changing device token hash did not advance token_rotated_at';
+  END IF;
+
+  -- The first 120 requests in a 60-second window pass; request 121 is denied.
+  FOR request_index IN 1..121 LOOP
+    rate_limit_allowed := public.allow_iot_ingest_request(v_device_id);
+    IF request_index <= 120 AND rate_limit_allowed IS DISTINCT FROM true THEN
+      RAISE EXCEPTION 'FAIL: rate limiter rejected request % before the limit', request_index;
+    END IF;
+    IF request_index = 121 AND rate_limit_allowed IS DISTINCT FROM false THEN
+      RAISE EXCEPTION 'FAIL: rate limiter did not reject request 121';
+    END IF;
+  END LOOP;
+
+  -- A disabled device must not ingest even if a caller reaches the server-side RPC.
+  UPDATE public.iot_devices SET enabled = false WHERE id = v_device_id;
+  conflict_caught := false;
+  BEGIN
+    PERFORM public.ingest_iot_payload(
+      v_device_id,
+      'ci-message-revoked-001',
+      repeat('8', 64),
+      '[{"variable_code":"temperature","unit_code":"degC","value":24.5}]'::jsonb
+    );
+  EXCEPTION WHEN OTHERS THEN
+    IF SQLERRM = 'device_disabled_or_missing' THEN
+      conflict_caught := true;
+    ELSE
+      RAISE;
+    END IF;
+  END;
+  IF NOT conflict_caught THEN
+    RAISE EXCEPTION 'FAIL: disabled IoT device was allowed to ingest';
+  END IF;
+  IF EXISTS (
+    SELECT 1 FROM public.iot_ingest_receipts
+    WHERE device_id = v_device_id AND message_id = 'ci-message-revoked-001'
+  ) THEN
+    RAISE EXCEPTION 'FAIL: disabled device left an ingestion receipt';
+  END IF;
+END
+$iot_runtime$;
+
+SELECT 'PASS: IoT idempotency, invalid payloads, tenant isolation, token rotation, revocation and rate limit' AS test_result;
