@@ -1,14 +1,25 @@
 -- Remove unused anonymous-role table privileges from internal and tenant-scoped tables.
--- RLS currently has no anon policies for these tables, so this makes the SQL privilege
--- contract explicit without changing authenticated access or published dataset reads.
-revoke all privileges on table
-  public.culture_types,
-  public.material_types,
-  public.notion_migration_rows,
-  public.organisms,
-  public.organizations,
-  public.plant_cultures,
-  public.service_plans,
-  public.units,
-  public.variables
-from anon, PUBLIC;
+-- The repository supports staged schemas; revoke only on tables that exist in this migration history.
+-- RLS remains necessary, but SQL grants must also express the intended access contract.
+do $migration$
+declare
+  table_name text;
+begin
+  foreach table_name in array array[
+    'culture_types',
+    'material_types',
+    'notion_migration_rows',
+    'organisms',
+    'organizations',
+    'plant_cultures',
+    'service_plans',
+    'units',
+    'variables'
+  ]
+  loop
+    if to_regclass(format('public.%I', table_name)) is not null then
+      execute format('revoke all privileges on table public.%I from anon, public', table_name);
+    end if;
+  end loop;
+end
+$migration$;
