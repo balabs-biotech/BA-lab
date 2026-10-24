@@ -44,8 +44,14 @@
       if (seen.has(time)) return { valid: false, reason: "duplicate_timestamp", hours: [] };
       seen.add(time);
       let temperatureC = null;
-      if (row?.temperatureC !== null && row?.temperatureC !== undefined && row?.temperatureC !== "") {
-        temperatureC = Number(row.temperatureC);
+      const rawTemperature = row?.temperatureC;
+      const hasTemperature = rawTemperature !== null && rawTemperature !== undefined &&
+        !(typeof rawTemperature === "string" && rawTemperature.trim() === "");
+      if (hasTemperature) {
+        if (typeof rawTemperature !== "number" && typeof rawTemperature !== "string") {
+          return { valid: false, reason: "invalid_temperature", hours: [] };
+        }
+        temperatureC = Number(rawTemperature);
         if (!Number.isFinite(temperatureC) || temperatureC < -100 || temperatureC > 70) {
           return { valid: false, reason: "invalid_temperature", hours: [] };
         }
