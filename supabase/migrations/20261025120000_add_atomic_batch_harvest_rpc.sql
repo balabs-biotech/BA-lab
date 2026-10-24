@@ -19,7 +19,7 @@ create or replace function public.record_batch_harvest(
 returns uuid
 language plpgsql
 security definer
-set search_path = pg_catalog, public, private
+set search_path = pg_catalog
 as $function$
 declare
   v_batch public.batches%rowtype;
