@@ -2383,3 +2383,75 @@ body[data-domain="agronomy"] .overview-observation strong { color: #f1f5ef; }
 @media (prefers-reduced-motion: reduce) {
   .progress-bar { transition: none; }
 }
+
+
+/* Final interaction pass: visible focus, explicit status, high-contrast mode. */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[tabindex]:focus-visible {
+  outline: 3px solid var(--ui-accent, #4b8b62);
+  outline-offset: 3px;
+  scroll-margin-block: 18px;
+}
+button:disabled,
+input:disabled,
+select:disabled,
+textarea:disabled {
+  cursor: not-allowed;
+}
+.status-pending,
+.status-active,
+.status-completed,
+.status-failed {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  line-height: 1.45;
+}
+.status-completed { font-weight: 700; }
+.status-failed { font-weight: 750; }
+.status-active { font-weight: 700; }
+.statistics-table tbody tr:hover td {
+  background: var(--ui-accent-soft, rgba(75,139,98,.07));
+}
+body[data-domain="mycology"] .statistics-table tbody tr:hover td {
+  background: #f4e4d7;
+}
+body[data-domain="laboratory"] .statistics-table tbody tr:hover td {
+  background: #edf4fb;
+}
+body[data-domain="agronomy"] .statistics-table tbody tr:hover td {
+  background: #293a30;
+}
+@media (forced-colors: active) {
+  a:focus-visible,
+  button:focus-visible,
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible,
+  [tabindex]:focus-visible {
+    outline: 3px solid Highlight;
+  }
+  .stage.active,
+  .stage.completed,
+  .stage.failed,
+  .status-pending,
+  .status-active,
+  .status-completed,
+  .status-failed {
+    border: 1px solid CanvasText;
+  }
+  .progress-track { border: 1px solid CanvasText; }
+  .progress-bar { background: Highlight; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+}
