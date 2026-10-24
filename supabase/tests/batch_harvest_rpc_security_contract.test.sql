@@ -23,11 +23,8 @@ begin
     from unnest(coalesce(v_proc.proconfig, array[]::text[])) as settings(setting)
    where setting like 'search_path=%'
    limit 1;
-  if v_search_path is null
-     or position('pg_catalog' in v_search_path) = 0
-     or position('public' in v_search_path) = 0
-     or position('private' in v_search_path) = 0 then
-    raise exception 'FAIL: harvest RPC search_path is not explicitly pinned: %', v_search_path;
+  if v_search_path is distinct from 'search_path=pg_catalog' then
+    raise exception 'FAIL: harvest RPC must pin search_path to pg_catalog only: %', v_search_path;
   end if;
 
   if not has_function_privilege('authenticated', v_signature, 'EXECUTE') then
