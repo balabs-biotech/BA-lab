@@ -54,6 +54,9 @@ assert.deepEqual(
 const missingTemperatureResult = forecastRules.evaluateTemperatureRange([null, undefined, "", 15, "20"], "15", "20");
 assert.equal(missingTemperatureResult.status, "within_range", "missing readings must not be counted as zero");
 assert.equal(missingTemperatureResult.availableHours, 2, "only numeric readings should be counted");
+const whitespaceTemperatureResult = forecastRules.evaluateTemperatureRange(["   ", true, false, 12], "5", "20");
+assert.equal(whitespaceTemperatureResult.availableHours, 1, "blank strings and booleans must not become numeric readings");
+assert.equal(whitespaceTemperatureResult.outsideHours, 0, "ignored invalid readings must not create false threshold alerts");
 assert.equal(forecastRules.evaluateTemperatureRange([10, 20], "30", "10").status, "invalid_range", "reversed limits must be rejected");
 assert.equal(forecastRules.evaluateTemperatureRange([10, 20], "", "").status, "not_configured", "empty limits must not imply a safe range");
 assert.equal(forecastRules.evaluateTemperatureRange([null, ""], "5", "30").status, "no_data", "missing forecast values must not be reported as safe");
