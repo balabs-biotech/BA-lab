@@ -46,6 +46,12 @@
     forecastDetails.append(node("summary",{},"Voir les prévisions horaires"));
     const forecastRows=node("div",{id:"forecast48Rows",class:"overview-observations"});
     forecastDetails.append(forecastRows);
+    const exposureSettings=node("div",{class:"grid"});
+    const exposureLabel=node("div",{class:"muted"},"Optionnel — définissez les limites de température de votre protocole ou de votre culture. Laissez vide si elles ne sont pas établies.");
+    const tempMin=node("input",{id:"forecastTempMin",type:"number",step:"0.1",placeholder:"Température minimale °C"});
+    const tempMax=node("input",{id:"forecastTempMax",type:"number",step:"0.1",placeholder:"Température maximale °C"});
+    exposureSettings.append(field("Limite basse °C","forecastTempMin",tempMin),field("Limite haute °C","forecastTempMax",tempMax));
+    forecastPanel.append(exposureLabel,exposureSettings);
     forecastPanel.append(forecastButton,forecastStatus,forecastSummary,forecastDetails);
     const results=node("div",{id:"envResults",class:"overview-observations"});
     const details=node("details",{class:"environmental-details"});
@@ -214,6 +220,12 @@
         const sum=arr=>arr.length?arr.reduce((a,b)=>a+b,0):null;
         const avg=arr=>arr.length?arr.reduce((a,b)=>a+b,0)/arr.length:null;
         const metric=(label,value,unit)=>{const box=node("article",{class:"card"});box.append(node("small",{class:"muted"},label),node("h4",{},value===null?"Indisponible":value.toFixed(1)+(unit||"")));return box;};
+        const lower=tempMin.value.trim()===""?null:Number(tempMin.value);
+        const upper=tempMax.value.trim()===""?null:Number(tempMax.value);
+        const validRange=(lower===null||Number.isFinite(lower))&&(upper===null||Number.isFinite(upper))&&(lower===null||upper===null||lower<=upper);
+        const outsideHours=validRange&&lower!==null||validRange&&upper!==null
+          ? h.time.reduce((count,time,i)=>{const raw=h.temperature_2m?.[i];if(raw===null||raw===undefined||raw===""||!Number.isFinite(Number(raw)))return count;const t=Number(raw);return count+((lower!==null&&t<lower)||(upper!==null&&t>upper)?1:0);},0)
+          : null;
         const grid=node("div",{class:"grid"});
         grid.append(metric("Température minimale",min(temps)," °C"),metric("Température maximale",max(temps)," °C"),metric("Pluie cumulée prévue",sum(rain)," mm"),metric("Probabilité de pluie maximale",max(prob),"%"),metric("Vent maximal",max(wind)," km/h"),metric("Humidité moyenne",avg(humid),"%"));
         forecastSummary.append(grid);
@@ -225,6 +237,17 @@
         if(max(prob)!==null&&max(prob)>=60){advise("Vigilance pluie","Épisode pluvieux possible","La probabilité horaire maximale de précipitation atteint "+max(prob)+" %. Vérifiez les cultures en extérieur, le drainage et la protection des boîtes ou matériels qui ne doivent pas être mouillés.");flags++;}
         if(max(wind)!==null&&max(wind)>=35){advise("Vigilance vent","Rafales ou vent soutenu à surveiller","Le vent horaire prévu atteint "+max(wind).toFixed(1)+" km/h. Sécurisez les protections, couvercles et matériels légers exposés.");flags++;}
         if(!flags)advise("Pas de seuil météo général franchi","Poursuivre la surveillance normale","Aucun des seuils généraux actuels n’a été franchi. Cela ne garantit pas des conditions adaptées à une culture ou un protocole particulier.");
+        if(!validRange){
+          advise("Paramètres à corriger","Plage de température invalide","La limite minimale doit être inférieure ou égale à la limite maximale. Corrigez les valeurs pour évaluer votre protocole.");
+        }else if(lower!==null||upper!==null){
+          if(outsideHours>0){
+            advise("Votre plage de température est dépassée",""+outsideHours+" heure(s) hors plage sur 48 h","Selon la prévision extérieure, "+outsideHours+" heure(s) sont sous la limite minimale ou au-dessus de la limite maximale que vous avez saisie. Vérifiez l’exposition réelle avec un thermomètre ou une sonde au niveau du matériel ; la prévision météo ne prédit pas sa température interne.");
+          }else{
+            advise("Aucun dépassement calculé","La prévision reste dans la plage saisie","Aucune heure disponible ne sort de votre plage configurée. Cela ne garantit pas la température réelle du substrat, de la serre ou du contenant.");
+          }
+        }else{
+          advise("Personnalisation disponible","Ajouter les limites de votre protocole","Saisissez les limites basse et/ou haute validées pour votre culture ou protocole afin de calculer les heures de dépassement. Aucun seuil biologique n’est imposé par défaut.");
+        }
         forecastSummary.append(node("h4",{},"Conseils automatiques (règles explicites)"),advice);
         const table=node("table"),thead=node("thead"),head=node("tr");
         ["Heure locale","Temp. °C","Humidité %","Pluie mm","Probabilité %","Vent km/h"].forEach(t=>head.append(node("th",{},t)));
