@@ -3,16 +3,22 @@ name: OSINT NDVI data checks
 on:
   pull_request:
     paths:
-      - "batch-tracker/osint-ndvi.js"\n      - "batch-tracker/environmental-data.js"
+      - "batch-tracker/osint-ndvi.js"
+      - "batch-tracker/environmental-data.js"
+      - "batch-tracker/forecast-rules.js"
+      - "batch-tracker/green-tech/index.html"
       - "batch-tracker/data/osint-ndvi-transitions.json"
       - "batch-tracker/data/osint-priority-zones.csv"
       - "scripts/test-osint-ndvi.mjs"
       - ".github/workflows/osint-ndvi-check.yml"
+      - "docs/OSINT-AGRO-ARCHITECTURE.md"
   push:
     branches: [main]
     paths:
       - "batch-tracker/osint-ndvi.js"
       - "batch-tracker/environmental-data.js"
+      - "batch-tracker/forecast-rules.js"
+      - "batch-tracker/green-tech/index.html"
       - "batch-tracker/data/osint-ndvi-transitions.json"
       - "batch-tracker/data/osint-priority-zones.csv"
       - "scripts/test-osint-ndvi.mjs"
@@ -29,5 +35,5 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
-      - name: Validate summary, candidate CSV and JavaScript syntax
+      - name: Validate data, deterministic forecast rules and JavaScript syntax
         run: node scripts/test-osint-ndvi.mjs
