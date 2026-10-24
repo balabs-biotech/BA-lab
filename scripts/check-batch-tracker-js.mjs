@@ -223,3 +223,11 @@ if(!initBlock.includes("const initRevision = authStateRevision;")||!initBlock.in
 const authListener=engine.slice(engine.indexOf("supabaseClient.auth.onAuthStateChange("),engine.indexOf("async function init()",engine.indexOf("supabaseClient.auth.onAuthStateChange(")));
 if(!authListener.includes("authStateRevision += 1;"))throw new Error("Auth-state changes must increment the revision");
 console.log("✓ Auth initialization rejects stale session work and refreshes against the latest auth revision");
+
+const refreshStart=engine.indexOf("async function refreshAuthUI(");
+const refreshEnd=engine.indexOf("/* ============================================================\n   INITIALISATION AUTHENTIFIEE",refreshStart);
+if(refreshStart<0||refreshEnd<0)throw new Error("Could not isolate auth UI refresh");
+const refreshBlock=engine.slice(refreshStart,refreshEnd);
+if(!refreshBlock.includes("revision = authStateRevision")||!refreshBlock.includes("if (revision !== authStateRevision) return;")||!refreshBlock.includes("session,\n    revision"))throw new Error("Stale auth refresh must be rejected before initialization");
+if(!engine.includes("let initializationWarnings = [];")||!engine.includes('initializationWarnings.push("unités")')||!engine.includes('initializationWarnings.push("registre végétal")')||!engine.includes('"Chargement partiel :'))throw new Error("Partial data-load failures must be reported to the user");
+console.log("✓ Auth refreshes are revision-checked and optional data-load failures are surfaced as partial-load warnings");
