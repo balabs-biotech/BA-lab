@@ -108,26 +108,8 @@
         "La dernière transition ne couvre que " + fmt(latest.couverture_comparable_pct, 1) +
         " % de pixels comparables. Évitez d’en tirer une conclusion opérationnelle ; attendre une acquisition exploitable supplémentaire ou comparer une période mieux couverte.");
     }
-    const priorityZones = await fetch(zonesUrl, { cache: "no-store" }).then(r => {
-      if (!r.ok) throw new Error("zones CSV HTTP " + r.status);
-      return r.text();
-    }).then(csv => {
-      const lines = csv.trim().split(/\\r?\\n/);
-      const headers = lines.shift().split(",");
-      return lines.filter(Boolean).map(line => {
-        const values = line.split(",");
-        return Object.fromEntries(headers.map((h, i) => [h, Number(values[i])]));
-      }).filter(z => Number.isFinite(z.pixels_3_baisses_ou_plus_pct));
-    }).catch(() => []);
-    const repeated = priorityZones.filter(z => z.pixels_3_baisses_ou_plus_pct >= 20).length;
-    if (priorityZones.length) {
-      addAdvice("Action terrain", "Contrôler en priorité les points récurrents",
-        repeated + " point(s) candidat(s) sur " + priorityZones.length +
-        " ont au moins 20 % des pixels associés à trois baisses ou plus. Utilisez-les pour organiser une inspection visuelle et vérifier l’occupation du sol ; ne déclenchez pas automatiquement un arrosage ou un traitement.");
-    } else {
-      addAdvice("Données indisponibles", "Priorisation locale non calculée",
-        "Le tableau des points candidats n’a pas pu être lu ; aucune priorisation locale n’est produite.");
-    }
+    addAdvice("Action terrain", "Inspecter les points récurrents avant d’intervenir",
+      "Consultez le classement des 15 points candidats affiché ci-dessous. Confirmez visuellement l’occupation du sol et l’état de la végétation sur place ; le NDVI seul ne justifie ni irrigation supplémentaire ni traitement phytosanitaire.");
     panel.append(advice);
 
     panel.append(el("h3", {}, "Zones candidates à examiner"));
