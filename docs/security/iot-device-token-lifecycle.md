@@ -62,6 +62,6 @@ Because the registry accepts only one hash, the device may be unable to ingest d
 
 ## Known limitations
 
-- The per-device limiter is a fixed 60-second window and runs only after the token is accepted and the payload passes initial validation. It is not a network-level DDoS control.
+- The per-device limiter uses a fixed 60-second window and runs after token authentication but before the request body is read or parsed. Authenticated malformed requests consume budget, which prevents malformed payloads from bypassing the per-device limit. This is not a network-level DDoS control and does not protect the endpoint before a valid device token is identified.
 - The single-token schema does not provide a safe unattended rotation window.
 - No provisioning, secure-enrollment, remote rotation, or actuator-control endpoint is implemented by this document.
