@@ -206,3 +206,5 @@ jobs:
           psql -At -v ON_ERROR_STOP=1 -X -q -c "select to_regclass('public.cultures'), to_regclass('public.batches'), to_regclass('public.culture_data_consents')" | grep -q 'cultures'
       - name: Test environmental observation schema and access contract
         run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/environmental_observations_contract.test.sql
+      - name: Test IoT database security and idempotency contract
+        run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/iot-ingestion-security.test.sql
