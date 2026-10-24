@@ -5056,7 +5056,7 @@ async function saveMeasurement() {
         batch_id: batchId
       }
     };
-    const { data: recordedEventId, error: recordError } = await supabaseClient.rpc("record_manual_measurement", {
+    const { error: recordError } = await supabaseClient.rpc("record_manual_measurement", {
       p_event: eventPayload,
       p_measurement: measurementPayload
     });
@@ -5262,7 +5262,7 @@ async function saveObservation() {
         batch_id: batchId
       }
     };
-    const { data: recordedEventId, error: recordError } = await supabaseClient.rpc("record_manual_observation", {
+    const { error: recordError } = await supabaseClient.rpc("record_manual_observation", {
       p_event: eventPayload,
       p_observation: observationPayload
     });
