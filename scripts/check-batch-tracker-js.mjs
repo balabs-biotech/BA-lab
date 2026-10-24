@@ -233,3 +233,6 @@ const refreshBlock=engine.slice(refreshStart,refreshEnd);
 if(!refreshBlock.includes("revision = authStateRevision")||!refreshBlock.includes("if (revision !== authStateRevision) return;")||!refreshBlock.includes("session,\n    revision"))throw new Error("Stale auth refresh must be rejected before initialization");
 if(!engine.includes("let initializationWarnings = [];")||!engine.includes('initializationWarnings.push("unités")')||!engine.includes('initializationWarnings.push("registre végétal")')||!engine.includes("Chargement partiel"))throw new Error("Partial data-load failures must be reported to the user");
 console.log("✓ Auth refreshes are revision-checked and optional data-load failures are surfaced as partial-load warnings");
+
+if(!refreshBlock.includes("catch (error)")||!refreshBlock.includes("Session non vérifiable.")||!refreshBlock.includes("Impossible de vérifier votre session.")||!refreshBlock.includes("Vos données ne sont pas supprimées.")||!refreshBlock.includes("hideElement(trackerCard)"))throw new Error("Auth session verification failures must fail closed and explain the recovery action");
+console.log("✓ Unverifiable sessions hide protected workspace content and show a recovery message without claiming data loss");
