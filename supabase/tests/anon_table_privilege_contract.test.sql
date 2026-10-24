@@ -17,13 +17,15 @@ BEGIN
     'variables'
   ]
   LOOP
-    IF has_table_privilege('anon', format('public.%I', table_name), 'SELECT')
-       OR has_table_privilege('anon', format('public.%I', table_name), 'INSERT')
-       OR has_table_privilege('anon', format('public.%I', table_name), 'UPDATE')
-       OR has_table_privilege('anon', format('public.%I', table_name), 'DELETE')
-       OR has_table_privilege('anon', format('public.%I', table_name), 'TRUNCATE')
-       OR has_table_privilege('anon', format('public.%I', table_name), 'REFERENCES')
-       OR has_table_privilege('anon', format('public.%I', table_name), 'TRIGGER') THEN
+    IF to_regclass(format('public.%I', table_name)) IS NOT NULL AND (
+      has_table_privilege('anon', format('public.%I', table_name), 'SELECT')
+      OR has_table_privilege('anon', format('public.%I', table_name), 'INSERT')
+      OR has_table_privilege('anon', format('public.%I', table_name), 'UPDATE')
+      OR has_table_privilege('anon', format('public.%I', table_name), 'DELETE')
+      OR has_table_privilege('anon', format('public.%I', table_name), 'TRUNCATE')
+      OR has_table_privilege('anon', format('public.%I', table_name), 'REFERENCES')
+      OR has_table_privilege('anon', format('public.%I', table_name), 'TRIGGER')
+    ) THEN
       RAISE EXCEPTION 'FAIL: anon retains a table privilege on public.%', table_name;
     END IF;
   END LOOP;
