@@ -45,7 +45,7 @@ BEGIN
 
   IF position('existing_payload_sha256 is distinct from p_payload_sha256' in rpc_definition) = 0
      OR position('message_id_payload_mismatch' in rpc_definition) = 0
-     OR position('status'', ''duplicate' in rpc_definition) = 0 THEN
+     OR position($needle$status', 'duplicate$needle$ in rpc_definition) = 0 THEN
     RAISE EXCEPTION 'FAIL: IoT RPC does not enforce payload-hash idempotency contract';
   END IF;
 
