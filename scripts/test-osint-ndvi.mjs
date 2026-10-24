@@ -8,7 +8,7 @@ const forecastRules = globalThis.BALabsForecastRules;
 assert.ok(forecastRules && typeof forecastRules.evaluateTemperatureRange === "function", "forecast rules module must expose its deterministic evaluator");
 assert.equal(typeof forecastRules.normalizeHourlyForecast, "function", "forecast rules module must expose a provider-neutral data contract");
 const normalizedForecast = forecastRules.normalizeHourlyForecast([
-  { time: "2026-10-24T03:00:00+01:00", temperatureC: "18.5" },
+  { time: "2026-10-24T04:00:00+01:00", temperatureC: "18.5" },
   { time: "2026-10-24T02:00:00Z", temperatureC: null },
 ], {
   source: "test-provider",
