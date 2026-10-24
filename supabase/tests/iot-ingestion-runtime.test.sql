@@ -16,6 +16,8 @@ DECLARE
   bad_shape_count integer := 0;
   invalid_payload jsonb;
   previous_rotation timestamptz;
+  rate_limit_allowed boolean;
+  request_index integer;
   measurement_count integer;
   receipt_count integer;
 BEGIN
@@ -198,7 +200,18 @@ BEGIN
   ) THEN
     RAISE EXCEPTION 'FAIL: changing device token hash did not advance token_rotated_at';
   END IF;
+
+  -- The first 120 requests in a 60-second window pass; request 121 is denied.
+  FOR request_index IN 1..121 LOOP
+    rate_limit_allowed := public.allow_iot_ingest_request(v_device_id);
+    IF request_index <= 120 AND rate_limit_allowed IS DISTINCT FROM true THEN
+      RAISE EXCEPTION 'FAIL: rate limiter rejected request % before the limit', request_index;
+    END IF;
+    IF request_index = 121 AND rate_limit_allowed IS DISTINCT FROM false THEN
+      RAISE EXCEPTION 'FAIL: rate limiter did not reject request 121';
+    END IF;
+  END LOOP;
 END
 $iot_runtime$;
 
-SELECT 'PASS: IoT RPC idempotency, invalid-payload rejection and token-rotation timestamp' AS test_result;
+SELECT 'PASS: IoT idempotency, invalid payloads, token rotation and per-device rate limit' AS test_result;
