@@ -68,7 +68,7 @@ console.log("✓ Batch comparison warns when a variable uses incompatible/missin
 if(!template.includes('id="harvestQuantity"')||!template.includes('id="harvestUnit"')||!template.includes('id="recordHarvestButton"'))throw new Error("Harvest entry form missing");
 if(!engine.includes('function recordBatchHarvest')||!engine.includes('current_stage !== "harvest"')||!engine.includes('rpc("record_batch_harvest"'))throw new Error("Harvest event workflow missing, not RPC-backed, or not restricted to harvest stage");
 if(!engine.includes('from("units")')||!engine.includes('p_unit_code: unit.code'))throw new Error("Harvest unit validation or RPC payload missing");
-if(engine.includes('from("events").insert({') && engine.slice(engine.indexOf("async function recordBatchHarvest()"), engine.indexOf("\nrecordHarvestButton?.addEventListener")).includes('from("events").insert({'))throw new Error("Harvest handler still inserts events directly");
+if(engine.slice(engine.indexOf("async function recordBatchHarvest()"), engine.indexOf("\nrecordHarvestButton?.addEventListener")).includes('from("events").insert({'))throw new Error("Harvest handler still inserts events directly");
 
 if(!engine.includes("const eventAnchor = selectedBatch.culture_id")||!engine.includes("Ce lot doit être lié à une culture ou à un matériau"))throw new Error("Harvest event biological anchor validation missing");
 for(const label of ["Chronologie du lot","Enregistrer une récolte","Récolte enregistrée","Batch timeline","Record a harvest","Harvest recorded","Cronologia do lote","Registar uma colheita","Colheita registada","الخط الزمني للدفعة","تسجيل حصاد","تم تسجيل الحصاد"]){
