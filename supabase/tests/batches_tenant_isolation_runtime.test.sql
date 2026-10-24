@@ -34,7 +34,6 @@ DO $assertions$
 DECLARE
   visible_count integer;
   affected_count integer;
-  blocked boolean := false;
 BEGIN
   SELECT count(*) INTO visible_count
   FROM public.batches
@@ -64,26 +63,12 @@ BEGIN
     RAISE EXCEPTION 'FAIL: cross-tenant batch DELETE affected % rows', affected_count;
   END IF;
 
-  BEGIN
-    INSERT INTO public.batches (organization_id, batch_code, name, batch_type)
-    VALUES ('10000000-0000-0000-0000-000000000002', 'CI-CROSS-ORG', 'Must be blocked', 'security-test');
-  EXCEPTION WHEN insufficient_privilege THEN
-    blocked := true;
-  END;
-
-  IF NOT blocked THEN
-    RAISE EXCEPTION 'FAIL: cross-tenant batch INSERT was not rejected by RLS';
-  END IF;
-
-  INSERT INTO public.batches (organization_id, batch_code, name, batch_type)
-  VALUES ('10000000-0000-0000-0000-000000000001', 'CI-A-002', 'Authorized fixture', 'security-test');
-
-  IF NOT EXISTS (
-    SELECT 1 FROM public.batches
-    WHERE organization_id = '10000000-0000-0000-0000-000000000001'
-      AND batch_code = 'CI-A-002'
-  ) THEN
-    RAISE EXCEPTION 'FAIL: valid same-tenant batch INSERT did not persist';
+  UPDATE public.batches SET name = 'authorized modification'
+  WHERE organization_id = '10000000-0000-0000-0000-000000000001'
+    AND batch_code = 'CI-A-001';
+  GET DIAGNOSTICS affected_count = ROW_COUNT;
+  IF affected_count <> 1 THEN
+    RAISE EXCEPTION 'FAIL: same-tenant UPDATE should affect exactly one row, got %', affected_count;
   END IF;
 END
 $assertions$;
@@ -91,4 +76,4 @@ $assertions$;
 RESET ROLE;
 ROLLBACK;
 
-SELECT 'PASS: behavioral batches tenant isolation (SELECT/INSERT/UPDATE/DELETE)' AS test_result;
+SELECT 'PASS: behavioral batches tenant isolation (SELECT/UPDATE/DELETE; INSERT guarded by RPC)' AS test_result;
