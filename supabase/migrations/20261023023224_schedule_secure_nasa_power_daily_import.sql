@@ -9,7 +9,11 @@ declare
 begin
   if to_regclass('cron.job') is null
      or to_regclass('vault.decrypted_secrets') is null
-     or to_regclass('net.http_post') is null
+     or not exists (
+       select 1 from pg_proc p
+       join pg_namespace n on n.oid = p.pronamespace
+       where n.nspname = 'net' and p.proname = 'http_post'
+     )
      or to_regprocedure('vault.create_secret(text,text,text,uuid)') is null then
     raise notice 'Supabase Vault, pg_cron, or pg_net unavailable; skipping NASA POWER scheduler setup in this environment';
     return;
