@@ -85,3 +85,22 @@ Chaque recommandation devrait évoluer vers un objet normalisé comportant :
 - Les conseils sont déterministes et expliquent leur déclencheur.
 - Aucune action matérielle ou prescription de traitement n’est déclenchée automatiquement.
 - Une validation CI verte et un test navigateur réel sont requis avant de considérer le module comme validé.
+
+
+## État réel de la base et sécurité (audit du 24 octobre 2026)
+
+Le projet Supabase actif possède déjà les briques utiles : `locations`, `environmental_observations`, `measurements`, `observations`, `plant_cultures`, `cultures`, `events`, `analyses`, `evidence`, `provenance` et `iot_devices`. Les tables inspectées ont RLS activé. `environmental_observations` conserve déjà fournisseur, jeu de données, variable, unité, horodatage d’observation et de récupération, résolution spatiale, indicateur qualité, URL source et métadonnées : réutiliser cette table plutôt que créer une table météo concurrente.
+
+### Constats à traiter avant ouverture plus large
+
+- **Alerte Supabase RLS sans politiques** : `iot_devices` et `iot_ingest_receipts` ont RLS activé mais aucune politique. Cela peut être intentionnel si seuls les Edge Functions avec clé serveur y accèdent ; vérifier les privilèges SQL et les chemins d’accès avant d’ajouter une politique. Ne pas exposer les jetons de dispositifs via une politique `authenticated` générique.
+- **Fonctions `SECURITY DEFINER` exposées par RPC** : les advisors signalent `advance_batch_stage`, `create_batch_with_stages`, `move_batch_to_location` et `release_batch`. L’inspection montre des contrôles d’appartenance à l’organisation dans ces fonctions, mais l’avertissement reste à traiter : confirmer les droits `EXECUTE` accordés à `PUBLIC` et `authenticated`, le comportement attendu pour chaque rôle, et la validation des paramètres. Ne pas révoquer ou changer leur mode sans tests de régression, car CultureOps les utilise probablement.
+- **Protection contre les mots de passe compromis désactivée** : activer cette option dans Supabase Auth avant d’élargir les comptes utilisateurs.
+- **Séparation des données** : les politiques vérifiées sur `locations`, `measurements` et `plant_cultures` utilisent `private.is_org_member(organization_id)`. La politique de lecture observée pour `environmental_observations` est également limitée aux membres de l’organisation. Vérifier que les politiques INSERT/UPDATE/DELETE nécessaires à l’ingestion historique sont intentionnellement réservées aux fonctions serveur.
+- **Ingestion IoT** : l’Edge Function utilise un jeton de dispositif stocké sous forme SHA-256, borne la taille du corps, valide les unités et les plages, limite le nombre de mesures par paquet et transmet un identifiant de message et une empreinte de charge utile à une RPC atomique. Conserver ces propriétés ; ajouter des tests d’abus, de répétition et de révocation avant le déploiement massif.
+
+Références d’audit : Supabase Security Advisor et inspection en lecture seule des politiques/RPC du projet BALabs le 24 octobre 2026. Ces constats ne constituent pas une preuve d’exploitation ; ce sont des points de durcissement à vérifier.
+
+## Architecture des tests
+
+Le calcul de plage de température est isolé dans `batch-tracker/forecast-rules.js` sans dépendance réseau ni DOM. Le test Node couvre les dépassements basse/haute, les données manquantes, les limites inversées, l’absence de configuration et l’absence de températures valides. Le workflow GitHub Actions doit vérifier ce module ainsi que la syntaxe des modules environnemental et NDVI.
