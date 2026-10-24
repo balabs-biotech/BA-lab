@@ -82,6 +82,10 @@ Deno.serve(async (req: Request) => {
             });
           }
         }
+        if (Date.now() >= deadlineAt) {
+          results.push({ location_id: loc.id, ok: false, error: "import_deadline_exceeded_before_persistence", retryable: true });
+          return;
+        }
         if (rows.length) {
           const { error } = await db.from("environmental_observations").upsert(rows, {
             onConflict: "organization_id,location_id,provider_code,dataset_code,variable_code,observed_at",
