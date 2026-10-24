@@ -261,7 +261,34 @@ BEGIN
       RAISE EXCEPTION 'FAIL: rate limiter did not reject request 121';
     END IF;
   END LOOP;
+
+  -- A disabled device must not ingest even if a caller reaches the server-side RPC.
+  UPDATE public.iot_devices SET enabled = false WHERE id = v_device_id;
+  conflict_caught := false;
+  BEGIN
+    PERFORM public.ingest_iot_payload(
+      v_device_id,
+      'ci-message-revoked-001',
+      repeat('8', 64),
+      '[{"variable_code":"temperature","unit_code":"degC","value":24.5}]'::jsonb
+    );
+  EXCEPTION WHEN OTHERS THEN
+    IF SQLERRM = 'device_disabled_or_missing' THEN
+      conflict_caught := true;
+    ELSE
+      RAISE;
+    END IF;
+  END;
+  IF NOT conflict_caught THEN
+    RAISE EXCEPTION 'FAIL: disabled IoT device was allowed to ingest';
+  END IF;
+  IF EXISTS (
+    SELECT 1 FROM public.iot_ingest_receipts
+    WHERE device_id = v_device_id AND message_id = 'ci-message-revoked-001'
+  ) THEN
+    RAISE EXCEPTION 'FAIL: disabled device left an ingestion receipt';
+  END IF;
 END
 $iot_runtime$;
 
-SELECT 'PASS: IoT idempotency, invalid payloads, token rotation and per-device rate limit' AS test_result;
+SELECT 'PASS: IoT idempotency, invalid payloads, tenant isolation, token rotation, revocation and rate limit' AS test_result;
