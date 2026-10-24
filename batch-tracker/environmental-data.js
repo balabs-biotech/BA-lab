@@ -246,7 +246,9 @@
         if(max(prob)!==null&&max(prob)>=60){advise("Vigilance pluie","Épisode pluvieux possible","La probabilité horaire maximale de précipitation atteint "+max(prob)+" %. Vérifiez les cultures en extérieur, le drainage et la protection des boîtes ou matériels qui ne doivent pas être mouillés.");flags++;}
         if(max(wind)!==null&&max(wind)>=35){advise("Vigilance vent","Rafales ou vent soutenu à surveiller","Le vent horaire prévu atteint "+max(wind).toFixed(1)+" km/h. Sécurisez les protections, couvercles et matériels légers exposés.");flags++;}
         if(!flags)advise("Pas de seuil météo général franchi","Poursuivre la surveillance normale","Aucun des seuils généraux actuels n’a été franchi. Cela ne garantit pas des conditions adaptées à une culture ou un protocole particulier.");
-        if(!validRange){
+        if(!rangeEvaluation){
+          advise("Moteur de règles indisponible","Comparaison de plage désactivée","Le module de calcul des seuils n’a pas pu être chargé. La prévision météo reste informative ; rechargez la page avant d’utiliser la comparaison personnalisée.");
+        }else if(!validRange){
           advise("Paramètres à corriger","Plage de température invalide","La limite minimale doit être inférieure ou égale à la limite maximale. Corrigez les valeurs pour évaluer votre protocole.");
         }else if(rangeEvaluation?.status==="no_data"){
           advise("Données insuffisantes","Impossible de comparer la plage","Aucune température horaire valide n’est disponible pour évaluer les limites saisies.");
