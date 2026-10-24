@@ -250,3 +250,19 @@ for (const [fn, button, label] of [
   }
 }
 console.log("✓ Measurement and observation writes handle session-verification failures before enabling the write operation");
+
+for (const [fn, label] of [
+  ["async function saveMeasurement()", "mesure"],
+  ["async function saveObservation()", "observation"]
+]) {
+  const start = engine.indexOf(fn);
+  const next = engine.indexOf("\nasync function ", start + fn.length);
+  const block = engine.slice(start, next);
+  if (!block.includes("let eventCleanupFailed = false;") ||
+      !block.includes("catch (cleanupError)") ||
+      !block.includes("Vérifiez l’historique avant de réessayer.") ||
+      !block.includes("eventCleanupFailed = true;")) {
+    throw new Error("Cleanup network failures must be contained and reported for " + label);
+  }
+}
+console.log("✓ Failed event cleanup cannot mask the original write error; the user is warned to check history before retrying");
