@@ -83,6 +83,53 @@
     table.append(tbody); panel.append(table);
     const note = el("p", { class: "muted" }, "Seuil ±0,05 descriptif uniquement. La transition vers le 22 octobre 2026 ne couvre que 74,68 % de l’emprise en pixels comparables ; interpréter avec prudence. Les baisses estivales peuvent refléter la saisonnalité, les récoltes, le sol nu ou d’autres facteurs.");
     panel.append(note);
+
+    // Deterministic interpretation: transparent rules, no generative AI and no unsupported diagnosis.
+    panel.append(el("h3", {}, "Conseils opérationnels calculés"));
+    const advice = el("div", { class: "environmental-advice" });
+    const addAdvice = (priority, title, message) => {
+      const item = el("article", { class: "card" });
+      item.append(el("small", { class: "muted" }, priority), el("h4", {}, title), el("p", {}, message));
+      advice.append(item);
+    };
+    const strongest = data.transitions.reduce((a, b) => b.delta_NDVI_median < a.delta_NDVI_median ? b : a);
+    if (strongest.delta_NDVI_median <= -0.2 && strongest.couverture_comparable_pct >= 80) {
+      addAdvice("Priorité de vérification", "Baisse régionale importante détectée",
+        "Le NDVI médian a diminué de " + fmt(Math.abs(strongest.delta_NDVI_median), 3) +
+        " entre le " + strongest.date_depart + " et le " + strongest.date_arrivee +
+        ", sur " + fmt(strongest.couverture_comparable_pct, 1) +
+        " % des pixels comparables. Vérifiez d’abord la saison, les récoltes, le sol nu et les changements d’occupation du sol avant de conclure à un stress cultural.");
+    } else {
+      addAdvice("Surveillance", "Pas de baisse régionale majeure selon la règle actuelle",
+        "Aucune transition ne franchit le seuil descriptif de −0,20 de NDVI médian avec au moins 80 % de couverture comparable. Cela n’exclut pas des problèmes localisés ou propres à une parcelle.");
+    }
+    if (latest.couverture_comparable_pct < 80) {
+      addAdvice("Données à compléter", "Dernière comparaison incomplète",
+        "La dernière transition ne couvre que " + fmt(latest.couverture_comparable_pct, 1) +
+        " % de pixels comparables. Évitez d’en tirer une conclusion opérationnelle ; attendre une acquisition exploitable supplémentaire ou comparer une période mieux couverte.");
+    }
+    const priorityZones = await fetch(zonesUrl, { cache: "no-store" }).then(r => {
+      if (!r.ok) throw new Error("zones CSV HTTP " + r.status);
+      return r.text();
+    }).then(csv => {
+      const lines = csv.trim().split(/\\r?\\n/);
+      const headers = lines.shift().split(",");
+      return lines.filter(Boolean).map(line => {
+        const values = line.split(",");
+        return Object.fromEntries(headers.map((h, i) => [h, Number(values[i])]));
+      }).filter(z => Number.isFinite(z.pixels_3_baisses_ou_plus_pct));
+    }).catch(() => []);
+    const repeated = priorityZones.filter(z => z.pixels_3_baisses_ou_plus_pct >= 20).length;
+    if (priorityZones.length) {
+      addAdvice("Action terrain", "Contrôler en priorité les points récurrents",
+        repeated + " point(s) candidat(s) sur " + priorityZones.length +
+        " ont au moins 20 % des pixels associés à trois baisses ou plus. Utilisez-les pour organiser une inspection visuelle et vérifier l’occupation du sol ; ne déclenchez pas automatiquement un arrosage ou un traitement.");
+    } else {
+      addAdvice("Données indisponibles", "Priorisation locale non calculée",
+        "Le tableau des points candidats n’a pas pu être lu ; aucune priorisation locale n’est produite.");
+    }
+    panel.append(advice);
+
     panel.append(el("h3", {}, "Zones candidates à examiner"));
     panel.append(el("p", { class: "muted" }, "65 points candidats issus du tableau zonal. Ce ne sont pas des limites parcellaires ni des diagnostics agronomiques confirmés."));
     const mapNode = el("div", { id: "osintPriorityMap", role: "region", "aria-label": "Carte des zones candidates de baisse NDVI" });
