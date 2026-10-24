@@ -48,6 +48,8 @@ This is a source/replay correction. The live production database was not changed
 
 ### Security audit notes
 
+The live database also has broad default ACLs for the `postgres` and `supabase_admin` object owners in schema `public`: new tables and sequences inherit privileges for `anon`, and new functions inherit `EXECUTE` for `anon`. Existing RLS policies currently scope the tenant tables, but these defaults create avoidable risk for future objects. Migration `20261024080000_harden_public_default_privileges.sql` removes only `anon` and `PUBLIC` from future table, sequence, and function defaults for both owners; authenticated and service-role defaults are intentionally preserved. A dedicated replay contract test now checks the default ACLs.
+
 Read-only inspection of production `SECURITY DEFINER` functions found:
 - no execute grant to `anon` on the eight public-schema functions in the current audit set;
 - the three batch workflow functions callable by `authenticated` check organization membership through `private.is_org_member` before modifying batch state;
@@ -59,9 +61,9 @@ This is a focused audit of current functions and grants, not a complete certific
 
 ## CI results and pending migrations
 
-The latest CI run on commit `464cd9df324484a9f4ea438059b7868a01992c28` completed successfully. All seven jobs passed, including firmware build, firmware logic, migration contract tests, clean PostgreSQL 17 migration replay, and secret scanning. The scheduler reconstruction has since been amended, so its new commit must complete CI before the PR can be considered ready.
+The earlier CI run on commit `464cd9df324484a9f4ea438059b7868a01992c28` completed successfully. The scheduler reconstruction and default-privilege hardening have since been amended, so the latest CI run must complete successfully before the PR can be considered ready.
 
-The branch has 55 migration files: 52 versions matching production history and three pending migrations (`20261024050000`, `20261024060000`, `20261024070000`). These pending migrations are intentionally not applied to production.
+The branch now has 56 migration files: 52 versions matching production history and four pending migrations (`20261024050000`, `20261024060000`, `20261024070000`, `20261024080000`). These pending migrations are intentionally not applied to production.
 
 ## Safety constraints
 
