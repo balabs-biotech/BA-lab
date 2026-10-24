@@ -213,3 +213,13 @@ if(!signOutBlock)throw new Error("Could not isolate signOut for session-failure 
 if(!signOutBlock[1].includes("const { error } = await supabaseClient.auth.signOut()")||!signOutBlock[1].includes("if (error)")||!signOutBlock[1].includes("Déconnexion impossible")||!signOutBlock[1].includes("return;"))throw new Error("Sign-out failure must be surfaced without clearing authenticated state");
 if(signOutBlock[1].indexOf("return;")>signOutBlock[1].indexOf("organizationId = null"))throw new Error("Sign-out failure return must precede local session-state reset");
 console.log("✓ Sign-out checks Supabase's returned error and preserves local state when logout fails");
+
+if(!engine.includes("let authStateRevision = 0;"))throw new Error("Auth revision guard is missing");
+const initStart=engine.indexOf("async function initializeAuthenticatedTracker(");
+const initEnd=engine.indexOf("function setDefaultDate()",initStart);
+if(initStart<0||initEnd<0)throw new Error("Could not isolate authenticated initialization");
+const initBlock=engine.slice(initStart,initEnd);
+if(!initBlock.includes("const initRevision = authStateRevision;")||!initBlock.includes("if (initRevision !== authStateRevision) return;")||!initBlock.includes("if (initRevision !== authStateRevision) {"))throw new Error("Authenticated initialization must reject stale work and reconcile the latest session");
+const authListener=engine.slice(engine.indexOf("supabaseClient.auth.onAuthStateChange("),engine.indexOf("async function init()",engine.indexOf("supabaseClient.auth.onAuthStateChange(")));
+if(!authListener.includes("authStateRevision += 1;"))throw new Error("Auth-state changes must increment the revision");
+console.log("✓ Auth initialization rejects stale session work and refreshes against the latest auth revision");
