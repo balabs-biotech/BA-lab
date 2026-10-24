@@ -207,3 +207,9 @@ const landingCopy=vm.runInNewContext("("+landingCopyMatch[1]+")");
 for(const lang of ["en","pt","ar"])if(!Array.isArray(landingCopy[lang])||landingCopy[lang].length!==20)throw new Error("Landing-page translation array must contain 20 mapped strings: "+lang);
 for(const lang of ["en","pt","ar"])for(const index of [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19])if(typeof landingCopy[lang][index]!=="string"||!landingCopy[lang][index].trim())throw new Error("Landing-page translation missing: "+lang+"["+index+"]");
 console.log("✓ Landing-page translation dictionaries parse correctly and contain all 20 mapped strings for EN/PT/AR");
+
+const signOutBlock=engine.match(/async function signOut\(\) \{([\s\S]*?)\n\}\n\n\/\* =+\n   AUTH UI/);
+if(!signOutBlock)throw new Error("Could not isolate signOut for session-failure regression guard");
+if(!signOutBlock[1].includes("const { error } = await supabaseClient.auth.signOut()")||!signOutBlock[1].includes("if (error)")||!signOutBlock[1].includes("Déconnexion impossible")||!signOutBlock[1].includes("return;"))throw new Error("Sign-out failure must be surfaced without clearing authenticated state");
+if(signOutBlock[1].indexOf("return;")>signOutBlock[1].indexOf("organizationId = null"))throw new Error("Sign-out failure return must precede local session-state reset");
+console.log("✓ Sign-out checks Supabase's returned error and preserves local state when logout fails");
