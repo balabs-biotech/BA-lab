@@ -20,6 +20,12 @@ assert.equal(normalizedForecast.hours.length, 2, "normalizer should retain both 
 assert.equal(normalizedForecast.hours[0].temperatureC, null, "missing temperature must remain null, not become zero");
 assert.equal(normalizedForecast.missingTemperatures, 1, "normalizer should report missing temperatures");
 assert.equal(normalizedForecast.hours[0].time, "2026-10-24T02:00:00.000Z", "timestamps should normalize to UTC and sort chronologically");
+assert.equal(forecastRules.normalizeHourlyForecast([], {
+  source: "test-provider", retrievedAt: "2026-10-24T04:00:00Z", issuedAt: "2026-10-24T00:00:00Z",
+}).reason, "no_rows", "empty provider payloads should be rejected");
+assert.equal(forecastRules.normalizeHourlyForecast([{ time: "2026-10-24T05:00:00Z", temperatureC: 10 }], {
+  source: "test-provider", retrievedAt: "2026-10-24T04:00:00Z", issuedAt: "2026-10-24T05:00:00Z",
+}).reason, "issued_after_retrieved_at", "a forecast cycle issued after retrieval must be rejected as inconsistent metadata");
 assert.equal(forecastRules.normalizeHourlyForecast([{ time: "not-a-date", temperatureC: 10 }], {
   source: "test-provider", retrievedAt: "2026-10-24T04:00:00Z", issuedAt: "2026-10-24T00:00:00Z",
 }).reason, "invalid_timestamp", "invalid timestamps should be rejected");
