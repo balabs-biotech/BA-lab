@@ -17,6 +17,12 @@ assert.equal(missingTemperatureResult.availableHours, 2, "only numeric readings 
 assert.equal(forecastRules.evaluateTemperatureRange([10, 20], "30", "10").status, "invalid_range", "reversed limits must be rejected");
 assert.equal(forecastRules.evaluateTemperatureRange([10, 20], "", "").status, "not_configured", "empty limits must not imply a safe range");
 assert.equal(forecastRules.evaluateTemperatureRange([null, ""], "5", "30").status, "no_data", "missing forecast values must not be reported as safe");
+const lowerOnly = forecastRules.evaluateTemperatureRange([4, 5, 6], "5", "");
+assert.equal(lowerOnly.outsideHours, 1, "a lower-only limit must count only values below it");
+const upperOnly = forecastRules.evaluateTemperatureRange([4, 5, 6], "", "5");
+assert.equal(upperOnly.outsideHours, 1, "an upper-only limit must count only values above it");
+assert.equal(forecastRules.evaluateTemperatureRange([5, 10, 15], "5", "15").outsideHours, 0, "values exactly on configured boundaries are within range");
+assert.equal(forecastRules.evaluateTemperatureRange([10, 20], "not-a-number", "25").status, "invalid_range", "non-numeric limits must be rejected");
 
 const summary = JSON.parse(readFileSync(`${base}/data/osint-ndvi-transitions.json`, "utf8"));
 const csv = readFileSync(`${base}/data/osint-priority-zones.csv`, "utf8").trim().split(/\r?\n/);
