@@ -56,6 +56,7 @@ assert.equal(headers.length, 10, "unexpected priority-zone CSV schema");
 assert.equal(csv.length, 65, "expected 65 candidate locations");
 const bbox = summary.aoi.bbox;
 const seen = new Set();
+const edgeCandidates = [];
 for (const line of csv) {
   const values = line.split(",");
   assert.equal(values.length, headers.length, "CSV row width mismatch");
@@ -66,9 +67,14 @@ for (const line of csv) {
   const edgeTolerance = 0.001;
   assert.ok(Number.isFinite(z.longitude) && z.longitude >= bbox[0] - edgeTolerance && z.longitude <= bbox[2] + edgeTolerance, `zone ${z.zone_id}: longitude outside AOI edge tolerance`);
   assert.ok(Number.isFinite(z.latitude) && z.latitude >= bbox[1] - edgeTolerance && z.latitude <= bbox[3] + edgeTolerance, `zone ${z.zone_id}: latitude outside AOI edge tolerance`);
+  if (z.longitude < bbox[0] || z.longitude > bbox[2] || z.latitude < bbox[1] || z.latitude > bbox[3]) edgeCandidates.push(z.zone_id);
   assert.ok(Number.isFinite(z.surface_ha) && z.surface_ha > 0, `zone ${z.zone_id}: invalid surface`);
+  assert.ok(Math.abs(z.surface_ha - z.pixels * 0.01) < 0.011, `zone ${z.zone_id}: surface and pixel count disagree`);
+  assert.ok(Number.isFinite(z.frequence_baisse_moyenne) && z.frequence_baisse_moyenne >= 0 && z.frequence_baisse_moyenne <= 1, `zone ${z.zone_id}: invalid mean decline frequency`);
+  assert.ok(Number.isFinite(z.frequence_baisse_mediane) && z.frequence_baisse_mediane >= 0 && z.frequence_baisse_mediane <= 1, `zone ${z.zone_id}: invalid median decline frequency`);
   assert.ok(z.pixels_3_baisses_ou_plus_pct >= 0 && z.pixels_3_baisses_ou_plus_pct <= 100, `zone ${z.zone_id}: invalid repeated-decline percentage`);
 }
+assert.deepEqual(edgeCandidates.sort((a,b)=>a-b), [7847, 82832], "unexpected candidate centroid outside the nominal AOI bbox");
 
 execFileSync("node", ["--check", `${base}/osint-ndvi.js`], { stdio: "inherit" });
 execFileSync("node", ["--check", `${base}/environmental-data.js`], { stdio: "inherit" });
