@@ -222,12 +222,11 @@
         const sum=arr=>arr.length?arr.reduce((a,b)=>a+b,0):null;
         const avg=arr=>arr.length?arr.reduce((a,b)=>a+b,0)/arr.length:null;
         const metric=(label,value,unit)=>{const box=node("article",{class:"card"});box.append(node("small",{class:"muted"},label),node("h4",{},value===null?"Indisponible":value.toFixed(1)+(unit||"")));return box;};
-        const lower=tempMin.value.trim()===""?null:Number(tempMin.value);
-        const upper=tempMax.value.trim()===""?null:Number(tempMax.value);
-        const validRange=(lower===null||Number.isFinite(lower))&&(upper===null||Number.isFinite(upper))&&(lower===null||upper===null||lower<=upper);
-        const outsideHours=(validRange&&(lower!==null||upper!==null))
-          ? h.time.reduce((count,time,i)=>{const raw=h.temperature_2m?.[i];if(raw===null||raw===undefined||raw===""||!Number.isFinite(Number(raw)))return count;const t=Number(raw);return count+((lower!==null&&t<lower)||(upper!==null&&t>upper)?1:0);},0)
-          : null;
+        const rangeEvaluation=window.BALabsForecastRules?.evaluateTemperatureRange(h.temperature_2m,tempMin.value,tempMax.value);
+        const lower=rangeEvaluation?.lower??null;
+        const upper=rangeEvaluation?.upper??null;
+        const validRange=rangeEvaluation?.valid===true;
+        const outsideHours=rangeEvaluation?.outsideHours??null;
         const grid=node("div",{class:"grid"});
         grid.append(metric("Température minimale",min(temps)," °C"),metric("Température maximale",max(temps)," °C"),metric("Pluie cumulée prévue",sum(rain)," mm"),metric("Probabilité de pluie maximale",max(prob),"%"),metric("Vent maximal",max(wind)," km/h"),metric("Humidité moyenne",avg(humid),"%"));
         forecastSummary.append(grid);
@@ -249,7 +248,9 @@
         if(!flags)advise("Pas de seuil météo général franchi","Poursuivre la surveillance normale","Aucun des seuils généraux actuels n’a été franchi. Cela ne garantit pas des conditions adaptées à une culture ou un protocole particulier.");
         if(!validRange){
           advise("Paramètres à corriger","Plage de température invalide","La limite minimale doit être inférieure ou égale à la limite maximale. Corrigez les valeurs pour évaluer votre protocole.");
-        }else if(lower!==null||upper!==null){
+        }else if(rangeEvaluation?.status==="no_data"){
+          advise("Données insuffisantes","Impossible de comparer la plage","Aucune température horaire valide n’est disponible pour évaluer les limites saisies.");
+        }else if(rangeEvaluation?.configured){
           if(outsideHours>0){
             advise("Votre plage de température est dépassée",""+outsideHours+" heure(s) hors plage sur 48 h","Selon la prévision extérieure, "+outsideHours+" heure(s) sont sous la limite minimale ou au-dessus de la limite maximale que vous avez saisie. Vérifiez l’exposition réelle avec un thermomètre ou une sonde au niveau du matériel ; la prévision météo ne prédit pas sa température interne.");
           }else{
