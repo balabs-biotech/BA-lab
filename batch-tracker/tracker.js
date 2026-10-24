@@ -5008,77 +5008,63 @@ async function saveMeasurement() {
       plantCultureId = plant.id;
       environmentId = plant.environment_id || null;
       locationId = plant.location_id || null;
-      const { data: event, error: eventError } = await supabaseClient.from("events").insert({
-        organization_id: organizationId,
-        event_type: "measurement_recorded",
-        occurred_at: measuredAt,
-        actor_user_id: session.user.id,
-        plant_culture_id: plantCultureId,
-        environment_id: environmentId,
-        location_id: locationId,
-        payload: { variable_code: variable.code, raw_value: rawValue, raw_unit_code: unit.code, source: "agritech-manual" }
-      }).select("id").single();
-      if (eventError) throw new Error(cultureWorkflowText("eventError") + eventError.message);
-      eventId = event.id;
     } else if (targetType === "batch") {
       const batch = latestBatches.find(item => item.id === targetId);
       if (!batch) throw new Error(cultureWorkflowText("batchMissing"));
       batchId = batch.id;
       cultureId = batch.culture_id || null;
 
-      const { data: event, error: eventError } = await supabaseClient
-        .from("events")
-        .insert({
-          organization_id: organizationId,
-          event_type: "measurement_recorded",
-          occurred_at: measuredAt,
-          actor_user_id: session.user.id,
-          culture_id: cultureId,
-          batch_id: batchId,
-          payload: {
-            variable_code: variable.code,
-            raw_value: rawValue,
-            raw_unit_code: unit.code,
-            method: measurementMethodInput.value.trim() || null,
-            instrument: measurementInstrumentInput.value.trim() || null,
-            note: measurementNoteInput.value.trim() || null
-          }
-        })
-        .select("id")
-        .single();
-
-      if (eventError) throw new Error(cultureWorkflowText("eventError") + eventError.message);
-      eventId = event.id;
     } else {
       throw new Error(cultureWorkflowText("invalidTarget"));
     }
 
     const sameAsCanonical = variable.canonical_unit_code === unit.code;
-    const { error: measurementError } = await supabaseClient
-      .from("measurements")
-      .insert({
-        organization_id: organizationId,
+    const eventPayload = {
+      organization_id: organizationId,
+      event_type: "measurement_recorded",
+      occurred_at: measuredAt,
+      actor_user_id: session.user.id,
+      culture_id: cultureId,
+      plant_culture_id: plantCultureId,
+      environment_id: environmentId,
+      location_id: locationId,
+      batch_id: batchId,
+      payload: {
         variable_code: variable.code,
         raw_value: rawValue,
         raw_unit_code: unit.code,
-        normalized_value: sameAsCanonical ? rawValue : null,
-        normalized_unit_code: sameAsCanonical ? unit.code : null,
-        measured_at: measuredAt,
         method: measurementMethodInput.value.trim() || null,
         instrument: measurementInstrumentInput.value.trim() || null,
-        culture_id: cultureId,
-        plant_culture_id: plantCultureId,
-        environment_id: environmentId,
-        event_id: eventId,
-        metadata: {
-          source: "batch-tracker-manual",
-          note: measurementNoteInput.value.trim() || null,
-          target_type: targetType,
-          batch_id: batchId
-        }
-      });
-
-    if (measurementError) throw new Error(cultureWorkflowText("measureError") + measurementError.message);
+        note: measurementNoteInput.value.trim() || null,
+        source: targetType === "plant" ? "agritech-manual" : "batch-tracker-manual"
+      }
+    };
+    const measurementPayload = {
+      organization_id: organizationId,
+      variable_code: variable.code,
+      raw_value: rawValue,
+      raw_unit_code: unit.code,
+      normalized_value: sameAsCanonical ? rawValue : null,
+      normalized_unit_code: sameAsCanonical ? unit.code : null,
+      measured_at: measuredAt,
+      method: measurementMethodInput.value.trim() || null,
+      instrument: measurementInstrumentInput.value.trim() || null,
+      culture_id: cultureId,
+      plant_culture_id: plantCultureId,
+      environment_id: environmentId,
+      metadata: {
+        source: "batch-tracker-manual",
+        note: measurementNoteInput.value.trim() || null,
+        target_type: targetType,
+        batch_id: batchId
+      }
+    };
+    const { data: recordedEventId, error: recordError } = await supabaseClient.rpc("record_manual_measurement", {
+      p_event: eventPayload,
+      p_measurement: measurementPayload
+    });
+    if (recordError) throw new Error(cultureWorkflowText("measureError") + recordError.message);
+    eventId = recordedEventId;
     measurementSaved = true;
 
     measurementValueInput.value = "";
@@ -5256,54 +5242,42 @@ async function saveObservation() {
       plantCultureId = plant.id;
       environmentId = plant.environment_id || null;
       locationId = plant.location_id || null;
-      const eventResult = await supabaseClient.from("events").insert({
-        organization_id: organizationId,
-        event_type: "observation_recorded",
-        occurred_at: observedAt,
-        actor_user_id: session.user.id,
-        plant_culture_id: plantCultureId,
-        environment_id: environmentId,
-        location_id: locationId,
-        payload: { variable_code: variable.code, value_text: valueText, source: "agritech-manual" }
-      }).select("id").single();
-      if (eventResult.error) throw new Error(cultureWorkflowText("eventError") + eventResult.error.message);
-      eventId = eventResult.data.id;
     } else if (targetType === "batch") {
       const batch = latestBatches.find(item => item.id === targetId);
       if (!batch) throw new Error(cultureWorkflowText("batchMissing"));
       batchId = batch.id;
       cultureId = batch.culture_id || null;
 
-      const eventResult = await supabaseClient.from("events").insert({
-        organization_id: organizationId,
-        event_type: "observation_recorded",
-        occurred_at: observedAt,
-        actor_user_id: session.user.id,
-        culture_id: cultureId,
-        batch_id: batchId,
-        payload: {
-          variable_code: variable.code,
-          value_text: valueText,
-          method: observationMethodInput.value.trim() || null,
-          instrument: observationInstrumentInput.value.trim() || null,
-          note: observationNoteInput.value.trim() || null
-        }
-      }).select("id").single();
-
-      if (eventResult.error) throw new Error(cultureWorkflowText("eventError") + eventResult.error.message);
-      eventId = eventResult.data.id;
     } else {
       throw new Error(cultureWorkflowText("observationInvalid"));
     }
 
-    const insertResult = await supabaseClient.from("observations").insert({
+    const eventPayload = {
+      organization_id: organizationId,
+      event_type: "observation_recorded",
+      occurred_at: observedAt,
+      actor_user_id: session.user.id,
+      culture_id: cultureId,
+      plant_culture_id: plantCultureId,
+      environment_id: environmentId,
+      location_id: locationId,
+      batch_id: batchId,
+      payload: {
+        variable_code: variable.code,
+        value_text: valueText,
+        method: observationMethodInput.value.trim() || null,
+        instrument: observationInstrumentInput.value.trim() || null,
+        note: observationNoteInput.value.trim() || null,
+        source: targetType === "plant" ? "agritech-manual" : "batch-tracker-manual"
+      }
+    };
+    const observationPayload = {
       organization_id: organizationId,
       variable_code: variable.code,
       value_text: valueText,
       observed_at: observedAt,
       culture_id: cultureId,
       plant_culture_id: plantCultureId,
-      event_id: eventId,
       metadata: {
         source: "batch-tracker-manual",
         method: observationMethodInput.value.trim() || null,
@@ -5312,9 +5286,13 @@ async function saveObservation() {
         target_type: targetType,
         batch_id: batchId
       }
+    };
+    const { data: recordedEventId, error: recordError } = await supabaseClient.rpc("record_manual_observation", {
+      p_event: eventPayload,
+      p_observation: observationPayload
     });
-
-    if (insertResult.error) throw new Error(cultureWorkflowText("observationError") + insertResult.error.message);
+    if (recordError) throw new Error(cultureWorkflowText("observationError") + recordError.message);
+    eventId = recordedEventId;
     observationSaved = true;
     observationValueInput.value = "";
     observationMethodInput.value = "";
