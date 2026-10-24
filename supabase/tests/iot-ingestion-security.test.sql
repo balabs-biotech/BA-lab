@@ -57,6 +57,27 @@ BEGIN
   ) THEN
     RAISE EXCEPTION 'FAIL: IoT device environment relationship is not tenant-scoped';
   END IF;
+
+  IF to_regclass('public.iot_device_rate_limits') IS NULL
+     OR NOT (SELECT relrowsecurity FROM pg_class WHERE oid='public.iot_device_rate_limits'::regclass) THEN
+    RAISE EXCEPTION 'FAIL: per-device rate-limit table is missing or RLS is disabled';
+  END IF;
+
+  IF has_table_privilege('anon','public.iot_device_rate_limits','SELECT')
+     OR has_table_privilege('authenticated','public.iot_device_rate_limits','SELECT')
+     OR has_table_privilege('anon','public.iot_device_rate_limits','INSERT')
+     OR has_table_privilege('authenticated','public.iot_device_rate_limits','INSERT') THEN
+    RAISE EXCEPTION 'FAIL: client role has direct access to IoT rate-limit counters';
+  END IF;
+
+  IF NOT has_function_privilege('service_role',
+      'public.allow_iot_ingest_request(uuid)','EXECUTE')
+     OR has_function_privilege('anon',
+      'public.allow_iot_ingest_request(uuid)','EXECUTE')
+     OR has_function_privilege('authenticated',
+      'public.allow_iot_ingest_request(uuid)','EXECUTE') THEN
+    RAISE EXCEPTION 'FAIL: rate-limit RPC privileges are not server-only';
+  END IF;
 END
 $iot_security$;
 
