@@ -6,6 +6,32 @@ const base = "batch-tracker";
 await import("../batch-tracker/forecast-rules.js");
 const forecastRules = globalThis.BALabsForecastRules;
 assert.ok(forecastRules && typeof forecastRules.evaluateTemperatureRange === "function", "forecast rules module must expose its deterministic evaluator");
+assert.equal(typeof forecastRules.normalizeHourlyForecast, "function", "forecast rules module must expose a provider-neutral data contract");
+const normalizedForecast = forecastRules.normalizeHourlyForecast([
+  { time: "2026-10-24T03:00:00+01:00", temperatureC: "18.5" },
+  { time: "2026-10-24T02:00:00Z", temperatureC: null },
+], {
+  source: "test-provider",
+  retrievedAt: "2026-10-24T04:00:00Z",
+  issuedAt: "2026-10-24T00:00:00Z",
+});
+assert.equal(normalizedForecast.valid, true, "valid forecast rows should normalize");
+assert.equal(normalizedForecast.hours.length, 2, "normalizer should retain both hourly rows");
+assert.equal(normalizedForecast.hours[0].temperatureC, null, "missing temperature must remain null, not become zero");
+assert.equal(normalizedForecast.missingTemperatures, 1, "normalizer should report missing temperatures");
+assert.equal(normalizedForecast.hours[0].time, "2026-10-24T02:00:00.000Z", "timestamps should normalize to UTC and sort chronologically");
+assert.equal(forecastRules.normalizeHourlyForecast([{ time: "not-a-date", temperatureC: 10 }], {
+  source: "test-provider", retrievedAt: "2026-10-24T04:00:00Z", issuedAt: "2026-10-24T00:00:00Z",
+}).reason, "invalid_timestamp", "invalid timestamps should be rejected");
+assert.equal(forecastRules.normalizeHourlyForecast([
+  { time: "2026-10-24T02:00:00Z", temperatureC: 10 },
+  { time: "2026-10-24T02:00:00Z", temperatureC: 11 },
+], {
+  source: "test-provider", retrievedAt: "2026-10-24T04:00:00Z", issuedAt: "2026-10-24T00:00:00Z",
+}).reason, "duplicate_timestamp", "duplicate hourly timestamps should be rejected");
+assert.equal(forecastRules.normalizeHourlyForecast([{ time: "2026-10-24T02:00:00Z", temperatureC: 99 }], {
+  source: "test-provider", retrievedAt: "2026-10-24T04:00:00Z", issuedAt: "2026-10-24T00:00:00Z",
+}).reason, "invalid_temperature", "implausible temperatures should be rejected");
 assert.deepEqual(
   forecastRules.evaluateTemperatureRange([10, 20, 30], "15", "25").outsideHours,
   2,
