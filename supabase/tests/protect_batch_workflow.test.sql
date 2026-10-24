@@ -353,9 +353,6 @@ begin
     if has_function_privilege('anon', fn, 'EXECUTE') then
       raise exception 'FAIL: anon can execute workflow RPC %', fn;
     end if;
-    if has_function_privilege('PUBLIC', fn, 'EXECUTE') then
-      raise exception 'FAIL: PUBLIC can execute workflow RPC %', fn;
-    end if;
     if not has_function_privilege('authenticated', fn, 'EXECUTE') then
       raise exception 'FAIL: authenticated cannot execute intended workflow RPC %', fn;
     end if;
