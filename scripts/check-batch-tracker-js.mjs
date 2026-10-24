@@ -209,7 +209,7 @@ for(const lang of ["en","pt","ar"])for(const index of [0,1,2,3,4,5,6,7,8,9,10,11
 console.log("✓ Landing-page translation dictionaries parse correctly and contain all 20 mapped strings for EN/PT/AR");
 
 const signOutStart=engine.indexOf("async function signOut()");
-const authUiStart=engine.indexOf("/* ============================================================\\n   AUTH UI",signOutStart);
+const authUiStart=engine.indexOf("/* ============================================================\n   AUTH UI",signOutStart);
 if(signOutStart<0||authUiStart<0)throw new Error("Could not isolate signOut for session-failure regression guard");
 const signOutBlock=engine.slice(signOutStart,authUiStart);
 if(!signOutBlock.includes("const { error } = await supabaseClient.auth.signOut()")||!signOutBlock.includes("if (error)")||!signOutBlock.includes("Déconnexion impossible")||!signOutBlock.includes("return;"))throw new Error("Sign-out failure must be surfaced without clearing authenticated state");
