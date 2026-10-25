@@ -2547,3 +2547,164 @@ body[data-domain="agronomy"] .environmental-weather-chart svg { color: #f1f5ef; 
   .environmental-weather-chart { padding: 10px !important; }
   .environmental-weather-chart svg { min-width: 0; }
 }
+
+
+/* CultureOps overview refresh — legible counters, restrained meters, progressive disclosure. */
+#overviewCard .overview-heading { align-items: flex-start; gap: 18px; }
+#overviewCard .overview-heading .muted { max-width: 66ch; line-height: 1.6; }
+#overviewCard .overview-metrics { align-items: stretch; gap: 14px; }
+#overviewCard .overview-metric {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  min-width: 0;
+  padding: 20px;
+  border: 1px solid var(--overview-card-border, #dce4d8);
+  border-radius: 16px;
+  background: var(--overview-card-bg, #fffefa);
+  color: var(--overview-card-text, #18271e);
+  box-shadow: 0 8px 20px rgba(25, 38, 27, .055);
+}
+#overviewCard .overview-metric-label {
+  color: var(--overview-label, #536357);
+  font-size: 12px;
+  font-weight: 750;
+  letter-spacing: .035em;
+  line-height: 1.45;
+}
+#overviewCard .overview-metric strong {
+  display: block;
+  margin: 8px 0 10px;
+  color: var(--overview-number, #173e2c);
+  font-size: clamp(34px, 4vw, 44px);
+  font-weight: 850;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  letter-spacing: -.045em;
+}
+#overviewCard .overview-meter {
+  height: 9px;
+  width: 100%;
+  margin: 4px 0 9px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--overview-meter-track, #e6ebe2);
+}
+#overviewCard .overview-meter > span {
+  display: block;
+  width: 0;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--overview-meter-fill, linear-gradient(90deg, #397650, #9ac477));
+  transition: width .35s ease;
+}
+#overviewCard .overview-metric-note {
+  color: var(--overview-note, #5b695e);
+  font-size: 11px;
+  font-weight: 650;
+  line-height: 1.5;
+}
+#overviewCard .overview-lower { align-items: start; gap: 16px; }
+#overviewCard .overview-activity,
+#overviewCard .overview-shortcuts {
+  min-width: 0;
+  padding: 18px;
+  border: 1px solid var(--overview-card-border, #dce4d8);
+  border-radius: 16px;
+  background: var(--overview-card-bg, #fffefa);
+  color: var(--overview-card-text, #18271e);
+}
+#overviewCard .overview-section-heading { gap: 12px; align-items: center; }
+#overviewCard .overview-section-heading h3,
+#overviewCard .overview-shortcuts h3 { margin-top: 0; }
+#overviewCard .overview-observations-details { margin-top: 12px; }
+#overviewCard .overview-observations-details summary {
+  cursor: pointer;
+  padding: 12px 14px;
+  border: 1px solid var(--overview-card-border, #dce4d8);
+  border-radius: 11px;
+  color: var(--overview-number, #173e2c);
+  background: var(--overview-summary-bg, #f5f7f1);
+  font-size: 13px;
+  font-weight: 750;
+  line-height: 1.45;
+}
+#overviewCard .overview-observations-details[open] summary { margin-bottom: 10px; }
+#overviewCard .overview-footnote { line-height: 1.6; }
+
+body[data-domain="mycology"] #overviewCard {
+  --overview-card-bg: #fffaf4;
+  --overview-card-border: #d9bda7;
+  --overview-card-text: #30231c;
+  --overview-label: #654c3c;
+  --overview-number: #843e18;
+  --overview-note: #674e3e;
+  --overview-meter-track: #ead9ca;
+  --overview-meter-fill: linear-gradient(90deg, #91421b, #d58b4f);
+  --overview-summary-bg: #f5e8dc;
+}
+body[data-domain="mycology"] #overviewCard .overview-metric,
+body[data-domain="mycology"] #overviewCard .overview-activity,
+body[data-domain="mycology"] #overviewCard .overview-shortcuts {
+  background: #fffaf4;
+  color: #30231c;
+  border-color: #d9bda7;
+  box-shadow: 0 7px 20px rgba(75, 42, 20, .07);
+}
+body[data-domain="mycology"] #overviewCard .overview-metric-label,
+body[data-domain="mycology"] #overviewCard .overview-metric-note,
+body[data-domain="mycology"] #overviewCard .overview-heading .muted,
+body[data-domain="mycology"] #overviewCard .overview-footnote { color: #674e3e; }
+body[data-domain="mycology"] #overviewCard .overview-metric strong { color: #843e18; }
+body[data-domain="mycology"] #overviewCard .overview-section-heading h3,
+body[data-domain="mycology"] #overviewCard .overview-shortcuts h3 { color: #503021; }
+body[data-domain="mycology"] #overviewCard .overview-observations-details summary {
+  color: #713612;
+  background: #f5e8dc;
+  border-color: #d9bda7;
+}
+body[data-domain="mycology"] #overviewCard .overview-live {
+  color: #245b3c;
+  background: #e5f2e5;
+  border-color: #c4dfc3;
+}
+body[data-domain="laboratory"] #overviewCard {
+  --overview-card-bg: #fbfdff;
+  --overview-card-border: #c7d6e4;
+  --overview-card-text: #183a59;
+  --overview-label: #4b6177;
+  --overview-number: #215b91;
+  --overview-note: #50677e;
+  --overview-meter-track: #dce8f2;
+  --overview-meter-fill: linear-gradient(90deg, #215b91, #69a5d6);
+  --overview-summary-bg: #e8f1f9;
+}
+body[data-domain="agronomy"] #overviewCard {
+  --overview-card-bg: #202d25;
+  --overview-card-border: #3a5142;
+  --overview-card-text: #f1f5ef;
+  --overview-label: #c4d2c7;
+  --overview-number: #e1f6d1;
+  --overview-note: #c4d2c7;
+  --overview-meter-track: #34473a;
+  --overview-meter-fill: linear-gradient(90deg, #75b85b, #b5e68b);
+  --overview-summary-bg: #19231e;
+}
+body[data-domain="agronomy"] #overviewCard .overview-metric,
+body[data-domain="agronomy"] #overviewCard .overview-activity,
+body[data-domain="agronomy"] #overviewCard .overview-shortcuts { color: #f1f5ef; }
+body[data-domain="agronomy"] #overviewCard .overview-heading .muted,
+body[data-domain="agronomy"] #overviewCard .overview-footnote,
+body[data-domain="agronomy"] #overviewCard .overview-metric-note { color: #c4d2c7; }
+
+@media (max-width: 700px) {
+  #overviewCard .overview-heading { flex-direction: column; }
+  #overviewCard .overview-metric { padding: 16px; }
+  #overviewCard .overview-metric strong { font-size: 36px; }
+  #overviewCard .overview-lower { grid-template-columns: minmax(0, 1fr); }
+  #overviewCard .overview-section-heading { align-items: stretch; flex-direction: column; }
+  #overviewCard .overview-section-heading .small-button { width: 100%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  #overviewCard .overview-meter > span { transition: none; }
+}

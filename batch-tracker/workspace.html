@@ -59,14 +59,29 @@
       <span class="overview-live"><span aria-hidden="true"></span> Session connectée</span>
     </div>
     <div class="overview-metrics" aria-label="Compteurs de données chargées">
-      <article class="overview-metric"><span class="overview-metric-label">Cultures chargées</span><strong id="overviewCultureCount">—</strong><span class="overview-metric-note">Limite actuelle : 100</span></article>
-      <article class="overview-metric"><span class="overview-metric-label">Lots récents</span><strong id="overviewBatchCount">—</strong><span class="overview-metric-note">Limite actuelle : 30</span></article>
-      <article class="overview-metric"><span class="overview-metric-label">Observations récentes</span><strong id="overviewObservationCount">—</strong><span class="overview-metric-note">Limite actuelle : 8</span></article>
+      <article class="overview-metric">
+        <span class="overview-metric-label">Cultures chargées</span><strong id="overviewCultureCount">—</strong>
+        <div class="overview-meter" role="progressbar" aria-label="Cultures chargées par rapport à la limite de chargement" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span id="overviewCultureMeter"></span></div>
+        <span class="overview-metric-note" id="overviewCultureNote">Limite de chargement : 100</span>
+      </article>
+      <article class="overview-metric">
+        <span class="overview-metric-label">Lots récents</span><strong id="overviewBatchCount">—</strong>
+        <div class="overview-meter" role="progressbar" aria-label="Lots chargés par rapport à la limite de chargement" aria-valuemin="0" aria-valuemax="30" aria-valuenow="0"><span id="overviewBatchMeter"></span></div>
+        <span class="overview-metric-note" id="overviewBatchNote">Limite de chargement : 30</span>
+      </article>
+      <article class="overview-metric">
+        <span class="overview-metric-label">Observations récentes</span><strong id="overviewObservationCount">—</strong>
+        <div class="overview-meter" role="progressbar" aria-label="Observations chargées par rapport à la limite de chargement" aria-valuemin="0" aria-valuemax="8" aria-valuenow="0"><span id="overviewObservationMeter"></span></div>
+        <span class="overview-metric-note" id="overviewObservationNote">Limite de chargement : 8</span>
+      </article>
     </div>
     <div class="overview-lower">
       <section class="overview-activity" aria-labelledby="overviewActivityTitle">
-        <div class="overview-section-heading"><h3 id="overviewActivityTitle">Dernières observations chargées</h3><button class="secondary-button small-button" id="overviewOpenData" type="button">Ouvrir les données</button></div>
-        <div id="overviewRecentObservations" class="overview-observations"><p class="muted">Connectez-vous pour charger les données de l’organisation.</p></div>
+        <div class="overview-section-heading"><h3 id="overviewActivityTitle">Activité récente</h3><button class="secondary-button small-button" id="overviewOpenData" type="button">Ouvrir les données</button></div>
+        <details class="overview-observations-details">
+          <summary>Afficher les dernières observations</summary>
+          <div id="overviewRecentObservations" class="overview-observations"><p class="muted">Connectez-vous pour charger les données de l’organisation.</p></div>
+        </details>
       </section>
       <aside class="overview-shortcuts" aria-label="Accès rapides">
         <h3>Accès rapides</h3>
