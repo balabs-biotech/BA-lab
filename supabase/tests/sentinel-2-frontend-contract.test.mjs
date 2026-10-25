@@ -13,6 +13,7 @@ const checks = [
   ["caps results at ten scenes in the UI", /limit:10/],
   ["requests a conservative scene cloud-cover threshold", /max_cloud_cover:60/],
   ["renders scene details with DOM text nodes", /node\("strong",\{\},scene\.acquired_at/],
+  ["shows the Sentinel-2 NDVI colour thresholds in the embedded map legend", /Végétation dense[\s\S]*?Végétation faible/],
   ["requests a rendered Sentinel-2 NDVI image from the authenticated Edge Function", /sentinel-2-ndvi-preview/],
   ["renders the returned Sentinel-2 raster as an in-app Leaflet image overlay", /L\.imageOverlay\([\s\S]*?satelliteSentinelNDVILayer/],
   ["offers an in-app map action for each Sentinel-2 scene instead of relying only on an external map link", /Afficher cette date sur la carte BA Labs[\s\S]*?updateSatelliteMap\(\)/],
