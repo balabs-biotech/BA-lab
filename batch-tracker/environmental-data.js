@@ -487,10 +487,10 @@
           }
         }
         satelliteResults.replaceChildren();
-        if(error){satelliteResults.append(node("p",{class:"muted"},"Recherche satellite indisponible : "+await functionErrorMessage(error)));return;}
-        if(!data?.ok){satelliteResults.append(node("p",{class:"muted"},"Catalogue indisponible : "+(data?.error||"réponse invalide")));return;}
+        if(error){satelliteMapStatus.textContent="Catalogue satellite temporairement indisponible.";return;}
+        if(!data?.ok){satelliteMapStatus.textContent="Catalogue satellite temporairement indisponible.";return;}
         satelliteResults.append(node("p",{},data.scenes_found+" scène(s) trouvée(s) via "+catalogueSource+", couverture nuageuse maximale de 60 %."));
-        if(!data.scenes?.length){satelliteResults.append(node("p",{class:"muted"},"Aucune scène ne correspond à ces critères. Essayez une période plus longue ou un seuil nuageux plus élevé."));return;}
+        if(!data.scenes?.length){satelliteMapStatus.textContent="Aucune image satellite exploitable sur la période récente.";return;}
         const rankedScenes=[...data.scenes].sort((a,b)=>{
           const cloudA=Number.isFinite(a.cloud_cover_percent)?a.cloud_cover_percent:101;
           const cloudB=Number.isFinite(b.cloud_cover_percent)?b.cloud_cover_percent:101;
@@ -511,7 +511,7 @@
         }
         satelliteMapStatus.textContent="Image Sentinel-2 · "+sceneDate+" · calcul en cours…";
         await showSentinelNDVI(sceneDate,"ndvi");
-      }catch(e){satelliteResults.replaceChildren(node("p",{class:"muted"},"Échec de la recherche : "+(e?.message||"erreur inconnue")));}
+      }catch(e){satelliteMapStatus.textContent="Recherche satellite temporairement indisponible.";}
       finally{satelliteButton.disabled=false;}
     }
     location.addEventListener("change",()=>{satelliteResults.replaceChildren();selectLocation().then(()=>{if(location.value){loadRows();searchSatellite();}});});
