@@ -37,6 +37,7 @@
     const status=node("p",{class:"muted","aria-live":"polite"},"Choisissez un emplacement pour consulter les indicateurs météo et les scènes satellite disponibles.");
     const summary=node("div",{id:"envSummary",class:"overview-observations","aria-live":"polite"});
     const results=node("div",{id:"envResults",class:"overview-observations"});
+    const weatherCharts=node("div",{id:"envWeatherCharts",class:"environmental-weather-charts","aria-live":"polite"});
     const details=node("details",{class:"environmental-details"});
     details.append(node("summary",{},"Voir les observations détaillées"));
     details.append(results);
@@ -47,7 +48,7 @@
     const satelliteButton=node("button",{type:"button"},"Chercher les images satellite");
     const satelliteResults=node("div",{id:"satelliteResults",class:"overview-observations","aria-live":"polite"});
     const satelliteHint=node("p",{class:"muted"},"Sentinel-2 : scènes disponibles et couverture nuageuse. L’image ne constitue pas à elle seule un diagnostic de culture.");
-    panel.append(form,status,summary,satelliteHint,satelliteButton,satelliteResults,details);
+    panel.append(form,status,summary,weatherCharts,satelliteHint,satelliteButton,satelliteResults,details);
     plant.parentNode.insertBefore(panel,plant.nextSibling);
     const nav=document.querySelector(".section-nav");
     if(nav && !document.getElementById("envNav")) { const a=node("a",{href:"#environmentalCard",id:"envNav"},"Contexte environnemental"); nav.append(a); }
@@ -169,6 +170,56 @@
       coverage.append(node("p",{class:"muted"},"La couverture compte les dates calendaires avec une valeur numérique dans la période sélectionnée. « Couverture faible » signifie moins de 80 % des jours attendus ; « Dernière donnée à plus de 2 jours » signale un écart avec la fin de période. Ces signaux ne déterminent pas seuls la cause : retard du fournisseur, import incomplet ou coordonnées peuvent être en jeu. NASA POWER fournit des estimations régionales, pas des mesures locales."));
       summary.append(coverage);
     }
+    function renderWeatherCharts(data){
+      weatherCharts.replaceChildren();
+      const lang="fr";
+      const labels={
+        air_temperature_max:{title:"Température maximale",unit:"°C",color:"#d78b56"},
+        precipitation_corrected:{title:"Précipitations",unit:"mm",color:"#4b9bd5"},
+        relative_humidity_mean:{title:"Humidité relative moyenne",unit:"%",color:"#65b982"}
+      };
+      const byDay=new Map();
+      (data||[]).forEach(row=>{
+        if(row.value===null||row.value===undefined||!Number.isFinite(Number(row.value)))return;
+        const day=String(row.observed_at||"").slice(0,10);
+        if(!/^\\d{4}-\\d{2}-\\d{2}$/.test(day))return;
+        if(!byDay.has(day))byDay.set(day,{});
+        byDay.get(day)[row.variable_code]=Number(row.value);
+      });
+      const days=[...byDay.keys()].sort();
+      if(!days.length){
+        weatherCharts.append(node("p",{class:"muted"},"Les graphiques météo apparaîtront après l’import de données historiques réelles."));
+        return;
+      }
+      weatherCharts.append(node("h3",{},"Évolution météo — données historiques NASA POWER"));
+      weatherCharts.append(node("p",{class:"muted"},"Chaque graphique conserve sa propre unité. Les points correspondent uniquement aux observations historiques importées ; aucune valeur synthétique ni prévision n’est ajoutée."));
+      Object.entries(labels).forEach(([key,meta])=>{
+        const points=days.map(day=>({day,value:byDay.get(day)[key]})).filter(point=>Number.isFinite(point.value));
+        const card=node("section",{class:"environmental-weather-chart card"});
+        card.append(node("h4",{},meta.title+" ("+meta.unit+")"));
+        if(points.length<2){
+          card.append(node("p",{class:"muted"},"Au moins deux dates avec des valeurs réelles sont nécessaires pour tracer cette variable. Valeurs disponibles : "+points.length+"."));
+          weatherCharts.append(card);
+          return;
+        }
+        const width=760,height=230,left=60,right=18,top=20,bottom=42,values=points.map(p=>p.value),min=Math.min(...values),max=Math.max(...values),span=max-min||Math.max(Math.abs(max)*.1,1);
+        const x=i=>left+i*(width-left-right)/(points.length-1),y=value=>top+(max-value)*(height-top-bottom)/span,ns="http://www.w3.org/2000/svg",svg=document.createElementNS(ns,"svg");
+        svg.setAttribute("viewBox","0 0 "+width+" "+height);svg.setAttribute("role","img");svg.setAttribute("aria-label",meta.title+" ("+meta.unit+"), "+points.length+" dates réelles");
+        for(let tick=0;tick<5;tick++){
+          const value=min+(max-min)*tick/4,yy=y(value),line=document.createElementNS(ns,"line");
+          line.setAttribute("x1",left);line.setAttribute("x2",width-right);line.setAttribute("y1",yy);line.setAttribute("y2",yy);line.setAttribute("stroke","currentColor");line.setAttribute("stroke-opacity",".17");svg.append(line);
+          const label=node("text",{x:left-8,y:yy+4,"text-anchor":"end","font-size":"11",fill:"currentColor"},Number(value.toPrecision(4)).toString());svg.append(label);
+        }
+        const line=document.createElementNS(ns,"polyline");line.setAttribute("points",points.map((p,i)=>x(i)+","+y(p.value)).join(" "));line.setAttribute("fill","none");line.setAttribute("stroke",meta.color);line.setAttribute("stroke-width","2.7");line.setAttribute("stroke-linejoin","round");line.setAttribute("stroke-linecap","round");svg.append(line);
+        points.forEach((p,i)=>{
+          const circle=document.createElementNS(ns,"circle");circle.setAttribute("cx",x(i));circle.setAttribute("cy",y(p.value));circle.setAttribute("r","3.5");circle.setAttribute("fill",meta.color);
+          const tip=document.createElementNS(ns,"title");tip.textContent=p.day+": "+p.value+" "+meta.unit;circle.append(tip);svg.append(circle);
+        });
+        const first=node("text",{x:left,y:height-12,"font-size":"11",fill:"currentColor"},points[0].day);
+        const last=node("text",{x:width-right,y:height-12,"text-anchor":"end","font-size":"11",fill:"currentColor"},points[points.length-1].day);
+        svg.append(first,last);card.append(svg,node("p",{class:"muted"},"Dates couvertes : "+points.length+" · dernière valeur : "+points[points.length-1].value+" "+meta.unit+" ("+points[points.length-1].day+")"));weatherCharts.append(card);
+      });
+    }
     async function loadRows(){
       results.replaceChildren();
       const columns="observed_at,variable_code,value,unit_code,provider_code,quality_flag";
@@ -184,6 +235,7 @@
       }
       renderClimateSummary(data);
       renderVariableCoverage(data);
+      renderWeatherCharts(data);
       if(!data.length){results.textContent="Aucune observation pour cette période.";return;}
       const table=node("table"); const head=node("tr");
       ["Date","Variable","Valeur","Unité","Source"].forEach(t=>head.append(node("th",{},t)));
