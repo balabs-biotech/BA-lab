@@ -6354,7 +6354,7 @@ function setupQuickCapture() {
       "Transforme uniquement la description ci-dessous en un seul objet JSON valide, sans Markdown ni texte autour.",
       "N’invente jamais de mesure, de code de culture, de date, d’unité ou de méthode. Si une information manque, utilise null. Ne prétends pas que les données ont été enregistrées.",
       "Utilise exactement ce schéma :",
-      JSON.stringify({ protocol: "ba-labs-entry", version: 1, kind: "measurement ou observation", target: "code exact de culture/lot ou null", variable: "nom exact du paramètre/catégorie ou null", value: "valeur mesurée ou description de l'observation", unit: "unité ou null", occurred_at: "date ISO 8601 ou null", instrument: "instrument ou null", method: "méthode ou null", note: "contexte ou null", missing_information: [] }, null, 2),
+      JSON.stringify({ protocol: "ba-labs-entry", version: 1, kind: "measurement", target: null, variable: null, value: null, unit: null, occurred_at: null, instrument: null, method: null, note: null, missing_information: [] }, null, 2),
       "Pour kind, utilise uniquement measurement ou observation. Préserve les unités et le sens des observations. N’invente pas de référence de culture si elle n’est pas explicitement fournie.",
       "Module actuel : " + domain + ".",
       "Description utilisateur :",
@@ -6369,11 +6369,19 @@ function setupQuickCapture() {
       await navigator.clipboard.writeText(prompt);
       setAiStatus("Instructions copiées. Ouvrez ChatGPT, collez-les, puis revenez ici avec le JSON obtenu.", "success");
     } catch (error) {
-      if (descriptionInput) {
-        descriptionInput.value = descriptionInput.value.trim();
-        descriptionInput.focus();
-      }
-      setAiStatus("La copie automatique n’est pas autorisée par ce navigateur. Sélectionnez votre description et réessayez, ou copiez les instructions depuis un navigateur autorisant le presse-papiers.", "error");
+      const fallback = document.createElement("textarea");
+      fallback.value = prompt;
+      fallback.setAttribute("readonly", "");
+      fallback.style.position = "fixed";
+      fallback.style.opacity = "0";
+      fallback.style.pointerEvents = "none";
+      document.body.appendChild(fallback);
+      fallback.select();
+      let copied = false;
+      try { copied = document.execCommand("copy"); } catch (copyError) { copied = false; }
+      fallback.remove();
+      if (copied) setAiStatus("Instructions copiées. Ouvrez ChatGPT, collez-les, puis revenez ici avec le JSON obtenu.", "success");
+      else setAiStatus("La copie automatique a échoué. Autorisez le presse-papiers du navigateur ou copiez les instructions depuis un navigateur compatible.", "error");
     }
   });
   openChatButton?.addEventListener("click", () => {
@@ -6424,11 +6432,21 @@ function setupQuickCapture() {
       return;
     }
 
-    const targetMatched = matchSelectOption(measurementTargetSelect, payload.target);
+    measurementTargetSelect.value = "";
+    measurementTargetSelect.dispatchEvent(new Event("change", { bubbles: true }));
     let variableMatched = false;
+    let targetMatched = matchSelectOption(measurementTargetSelect, payload.target);
     if (payload.kind === "measurement") {
+      measurementVariableSelect.value = "";
+      measurementVariableSelect.dispatchEvent(new Event("change", { bubbles: true }));
+      measurementValueInput.value = "";
+      measurementUnitSelect.value = "";
+      measurementAtInput.value = "";
+      measurementInstrumentInput.value = "";
+      measurementMethodInput.value = "";
+      measurementNoteInput.value = "";
       variableMatched = matchSelectOption(measurementVariableSelect, payload.variable);
-      setIfPresent(measurementValueInput, typeof payload.value === "number" && Number.isFinite(payload.value) ? payload.value : "");
+      if (typeof payload.value === "number" && Number.isFinite(payload.value)) measurementValueInput.value = String(payload.value);
       setIfPresent(measurementInstrumentInput, payload.instrument);
       setIfPresent(measurementMethodInput, payload.method);
       setIfPresent(measurementNoteInput, payload.note);
@@ -6438,6 +6456,13 @@ function setupQuickCapture() {
         if (!unitMatched) setAiStatus("Les champs ont été préremplis, mais l’unité ne correspond pas exactement au référentiel. Vérifiez-la manuellement.", "warning");
       }
     } else {
+      observationVariableSelect.value = "";
+      observationVariableSelect.dispatchEvent(new Event("change", { bubbles: true }));
+      observationAtInput.value = "";
+      observationValueInput.value = "";
+      observationMethodInput.value = "";
+      observationInstrumentInput.value = "";
+      observationNoteInput.value = "";
       variableMatched = matchSelectOption(observationVariableSelect, payload.variable);
       setIfPresent(observationValueInput, payload.value);
       setIfPresent(observationMethodInput, payload.method);
