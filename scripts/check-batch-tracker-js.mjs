@@ -267,3 +267,7 @@ for (const [fn, rpc, savedFlag] of [
   }
 }
 console.log("✓ Atomic measurement/observation writes no longer perform separate event cleanup");
+
+const forbiddenDirectWrite = engine.match(/\.from\(["'](?:events|measurements|observations)["']\)\s*\.(?:insert|upsert|update|delete)\s*\(/);
+if (forbiddenDirectWrite) throw new Error("Audit-sensitive event/measurement/observation writes must go through validated RPCs, not direct table mutations");
+console.log("✓ Tracker uses RPC-backed writes for events, measurements and observations");
