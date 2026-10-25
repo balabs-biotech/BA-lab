@@ -212,5 +212,7 @@ jobs:
         run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/batch_harvest_rpc_security_contract.test.sql
       - name: Verify sensitive RPC search-path contracts after replay
         run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/sensitive_rpc_search_path_contract.test.sql
+      - name: Verify append-only audit table privileges after replay
+        run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/audit_table_write_privileges.test.sql
       - name: Test environmental observation schema and access contract
         run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/environmental_observations_contract.test.sql
