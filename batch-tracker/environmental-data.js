@@ -59,6 +59,8 @@
     const status=node("p",{class:"muted","aria-live":"polite"},"Choisissez un emplacement pour consulter les indicateurs météo et les scènes satellite disponibles.");
     const summary=node("div",{id:"envSummary",class:"overview-observations","aria-live":"polite"});
     const results=node("div",{id:"envResults",class:"overview-observations"});
+    const vegetationChart=node("section",{id:"vegetationTrendPanel",class:"card environmental-weather-chart","aria-live":"polite"});
+    vegetationChart.append(node("h3",{},"Évolution de la végétation (NDVI)"),node("p",{class:"muted"},"Comparaison automatique des dernières scènes Sentinel-2 disponibles."));
     const weatherCharts=node("div",{id:"envWeatherCharts",class:"environmental-weather-charts","aria-live":"polite"});
     const details=node("details",{class:"environmental-details"});
     details.append(node("summary",{},"Afficher l’analyse et les données détaillées"));
@@ -95,11 +97,11 @@
     const satelliteButton=node("button",{type:"button"},"Chercher les images satellite");
     const satelliteResults=node("div",{id:"satelliteResults",class:"overview-observations","aria-live":"polite"});
     // Keep the default experience focused on the map; advanced climate controls remain in code but are not shown here.
-    [form,status,weatherCharts,satelliteHint,satelliteButton,satelliteResults,details].forEach(el=>el.style.display="none");
+    [form,status,satelliteHint,satelliteButton,satelliteResults,details].forEach(el=>el.style.display="none");
     [satelliteMapLegend,satelliteModeHelp,satelliteNDVILegend,sentinelHighResNote,sentinelHighResLink,satelliteViewControls].forEach(el=>el.style.display="none");
     satelliteMapPanel.querySelector("h3").textContent="Carte satellite";
     satelliteMapPanel.append(locationControl,satelliteMapStatus,satelliteMap);
-    panel.append(satelliteMapPanel);
+    panel.append(satelliteMapPanel,vegetationChart,weatherCharts);
     const hero=document.querySelector(".app-hero");
     if(hero?.parentNode) hero.parentNode.insertBefore(panel,hero.nextSibling);
     else plant.parentNode.insertBefore(panel,plant);
@@ -197,15 +199,39 @@
         satelliteLeafletMap.fitBounds([[south,west],[north,east]],{padding:[12,12],maxZoom:14});
         to.value=sceneDate;
         const ndviStats=response.headers.get("X-NDVI-Stats");
-        let statsText="";
-        if(ndviStats){try{const st=JSON.parse(ndviStats);if(Number.isFinite(Number(st.mean_ndvi)))statsText=" · NDVI moyen "+Number(st.mean_ndvi).toFixed(2);}catch(_){}}
+        let statsText="",meanNDVI=null;
+        if(ndviStats){try{const st=JSON.parse(ndviStats);if(Number.isFinite(Number(st.mean_ndvi))){meanNDVI=Number(st.mean_ndvi);statsText=" · NDVI moyen "+meanNDVI.toFixed(2);}}catch(_){}}
         const modeLabels={ndvi:"NDVI",true_color:"couleurs naturelles",false_color:"fausses couleurs IR"};
         satelliteMapStatus.textContent="Sentinel-2 · "+sceneDate+(displayMode==="ndvi"?" · NDVI":" · "+(modeLabels[displayMode]||displayMode))+statsText;
+        return {date:sceneDate,mean:meanNDVI};
       }catch(error){
         const message=error?.message||"Erreur de chargement Sentinel-2";
         satelliteMapStatus.textContent="Image satellite temporairement indisponible. "+(satelliteSentinelNDVILayer?"Dernière image conservée.":"Contexte régional conservé.");
-
+        return null;
       }
+    }
+    async function fetchNDVIStats(sceneDate){
+      try{
+        const {data:authState,error}=await db.auth.getSession();
+        if(error||!authState?.session?.access_token)return null;
+        const headers={"Authorization":"Bearer "+authState.session.access_token,"apikey":"sb_publishable_8H4XRh8V07Hlo0WwdfOXwg_2RXRX992","Content-Type":"application/json","Accept":"image/png"};
+        let response=await fetch("https://axcouwiodqsauwnsiotn.supabase.co/functions/v1/sentinel-2-ndvi-preview",{method:"POST",headers,body:JSON.stringify({location_id:location.value,date:sceneDate,mode:"ndvi"})});
+        if(!response.ok){const issue=await response.clone().json().catch(()=>({}));if(issue.error==="sentinelhub_credentials_not_configured")response=await fetch("https://axcouwiodqsauwnsiotn.supabase.co/functions/v1/earth-search-sentinel2-ndvi-preview",{method:"POST",headers,body:JSON.stringify({location_id:location.value,date:sceneDate,mode:"ndvi"})});}
+        if(!response.ok)return null;const raw=response.headers.get("X-NDVI-Stats");if(!raw)return null;
+        const stats=JSON.parse(raw),mean=Number(stats.mean_ndvi);return Number.isFinite(mean)?{date:sceneDate,mean}:null;
+      }catch(_){return null;}
+    }
+    function renderVegetationChart(points){
+      vegetationChart.replaceChildren(node("h3",{},"Évolution de la végétation (NDVI)"));
+      const valid=(points||[]).filter(p=>p&&Number.isFinite(p.mean)).sort((a,b)=>a.date.localeCompare(b.date));
+      if(!valid.length){vegetationChart.append(node("p",{class:"muted"},"Statistiques NDVI indisponibles pour les scènes trouvées."));return;}
+      if(valid.length===1){vegetationChart.append(node("p",{},"Dernière scène · "+valid[0].date+" · NDVI moyen "+valid[0].mean.toFixed(3)),node("p",{class:"muted"},"Le comparatif apparaîtra lorsqu’une deuxième scène exploitable sera disponible."));return;}
+      const width=760,height=220,left=60,right=22,top=24,bottom=42,min=Math.min(0,...valid.map(p=>p.mean)),max=Math.max(1,...valid.map(p=>p.mean)),span=max-min||1,x=i=>left+i*(width-left-right)/(valid.length-1),y=v=>top+(max-v)*(height-top-bottom)/span,ns="http://www.w3.org/2000/svg",svg=document.createElementNS(ns,"svg");
+      svg.setAttribute("viewBox","0 0 "+width+" "+height);svg.setAttribute("role","img");svg.setAttribute("aria-label","Comparaison du NDVI moyen sur deux dates Sentinel-2");
+      for(let t=0;t<5;t++){const v=min+(max-min)*t/4,yy=y(v),grid=document.createElementNS(ns,"line");grid.setAttribute("x1",left);grid.setAttribute("x2",width-right);grid.setAttribute("y1",yy);grid.setAttribute("y2",yy);grid.setAttribute("stroke","currentColor");grid.setAttribute("opacity",".18");svg.append(grid);const label=document.createElementNS(ns,"text");label.setAttribute("x",left-9);label.setAttribute("y",yy+4);label.setAttribute("text-anchor","end");label.setAttribute("fill","currentColor");label.setAttribute("font-size","12");label.textContent=v.toFixed(2);svg.append(label);}
+      const line=document.createElementNS(ns,"polyline");line.setAttribute("points",valid.map((p,i)=>x(i)+","+y(p.mean)).join(" "));line.setAttribute("fill","none");line.setAttribute("stroke","#8ed16d");line.setAttribute("stroke-width","3");svg.append(line);
+      valid.forEach((p,i)=>{const dot=document.createElementNS(ns,"circle");dot.setAttribute("cx",x(i));dot.setAttribute("cy",y(p.mean));dot.setAttribute("r","5");dot.setAttribute("fill","#8ed16d");svg.append(dot);const label=document.createElementNS(ns,"text");label.setAttribute("x",x(i));label.setAttribute("y",height-17);label.setAttribute("text-anchor","middle");label.setAttribute("fill","currentColor");label.setAttribute("font-size","12");label.textContent=p.date;svg.append(label);});
+      vegetationChart.append(svg,node("p",{class:"muted"},"NDVI moyen : "+valid[0].mean.toFixed(3)+" → "+valid[valid.length-1].mean.toFixed(3)+" · indice spectral, pas une mesure de rendement."));
     }
     async function updateSatelliteMap(){
       const hasSelectedLocation=Boolean(location.value);
@@ -322,6 +348,11 @@
       grid.append(card("Humidité de l’air",humidity===null?"Indisponible":humidity.toFixed(0)+" %","Moyenne des observations disponibles"));
       grid.append(card("Indice UV moyen quotidien",uvMean===null?"Indisponible":uvMean.toFixed(1),"Estimation journalière NASA POWER ; ce n’est pas le pic UV instantané."));
       summary.append(grid);
+      const uvDays=days.map(d=>({date:d,value:byDate.get(d).uv_index_daily_mean})).filter(p=>Number.isFinite(p.value));
+      const uvCompare=node("div",{class:"card"});uvCompare.append(node("h3",{},"Comparatif UV automatique"));
+      if(uvDays.length>=2){const first=uvDays[uvDays.length-2],last=uvDays[uvDays.length-1],delta=last.value-first.value;uvCompare.append(node("p",{},first.date+" : "+first.value.toFixed(1)+" → "+last.date+" : "+last.value.toFixed(1)),node("strong",{},(delta>0?"+":"")+delta.toFixed(1)+" point(s) UV"),node("p",{class:"muted"},delta>0?"Indice UV en hausse entre les deux dernières dates disponibles.":delta<0?"Indice UV en baisse entre les deux dernières dates disponibles.":"Indice UV stable entre les deux dernières dates disponibles."));}
+      else uvCompare.append(node("p",{class:"muted"},"Le comparatif s’affichera dès que deux dates UV réelles seront disponibles."));
+      summary.append(uvCompare);
       const trend=node("div",{class:"card"});
       trend.append(node("h3",{},"Évolution par rapport aux 7 dates précédentes"));
       const comparisons=[];
@@ -515,7 +546,11 @@
           return;
         }
         satelliteMapStatus.textContent="Image Sentinel-2 · "+sceneDate+" · calcul en cours…";
-        await showSentinelNDVI(sceneDate,"ndvi");
+        const currentNDVI=await showSentinelNDVI(sceneDate,"ndvi");
+        const previousScene=rankedScenes.find(scene=>String(scene.acquired_at||"").slice(0,10)<sceneDate);
+        const previousDate=previousScene?String(previousScene.acquired_at).slice(0,10):"";
+        const previousNDVI=previousDate?await fetchNDVIStats(previousDate):null;
+        renderVegetationChart([previousNDVI,currentNDVI]);
       }catch(e){satelliteMapStatus.textContent="Recherche satellite indisponible.";}
       finally{satelliteButton.disabled=false;}
     }
@@ -578,12 +613,12 @@
     const {data: authState}=await db.auth.getSession();
     if(!authState?.session){
       status.textContent="Connectez-vous à CultureOps pour accéder aux emplacements de votre organisation.";
-      db.auth.onAuthStateChange((_event,session)=>{if(session){panel.classList.remove("hidden");loadLocations().then(()=>{if(location.value){loadRows();if(lat.value!==""&&lon.value!=="")searchSatellite();else satelliteMapStatus.textContent="Coordonnées du site manquantes.";}});}});
+      db.auth.onAuthStateChange((_event,session)=>{if(session){panel.classList.remove("hidden");loadLocations().then(()=>{if(location.value){importWeather(false);if(lat.value!==""&&lon.value!=="")searchSatellite();else satelliteMapStatus.textContent="Coordonnées du site manquantes.";}});}});
       return;
     }
     panel.classList.remove("hidden");
     await loadLocations();
-    if(location.value){loadRows();if(lat.value!==""&&lon.value!=="")searchSatellite();else satelliteMapStatus.textContent="Coordonnées du site manquantes.";}
+    if(location.value){importWeather(false);if(lat.value!==""&&lon.value!=="")searchSatellite();else satelliteMapStatus.textContent="Coordonnées du site manquantes.";}
   }
   const watch=new MutationObserver(()=>{if(document.getElementById("plantCard")){watch.disconnect();init().catch(e=>console.error("Environmental context",e));}});
   watch.observe(document.getElementById("workspace-root")||document.body,{childList:true,subtree:true});
