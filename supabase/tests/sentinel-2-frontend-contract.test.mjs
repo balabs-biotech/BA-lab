@@ -17,6 +17,10 @@ const checks = [
   ["renders scene details with DOM text nodes", /node\("strong",\{\},scene\.acquired_at/],
   ["shows the Sentinel-2 NDVI colour legend", /satelliteNDVILegend/],
   ["requests a rendered Sentinel-2 NDVI image from the authenticated Edge Function", /sentinel-2-ndvi-preview/],
+
+  ["falls back to public raster NDVI when Copernicus credentials are missing", /primaryError\.error===\"sentinelhub_credentials_not_configured\"[\\s\\S]*?earth-search-sentinel2-ndvi-preview/],
+  ["reports which NDVI raster provider produced the image", /X-NDVI-Stats[\\s\\S]*?via \"\+rasterSource/],
+  ["discloses that cloud pixels are not yet masked in the public raster preview", /les pixels nuageux ne sont pas encore masqués/],
   ["renders the returned Sentinel-2 raster as an in-app Leaflet image overlay", /L\.imageOverlay\([\s\S]*?satelliteSentinelNDVILayer/],
   ["offers an in-app map action for each Sentinel-2 scene instead of relying only on an external map link", /Afficher le contexte régional sur la carte BA Labs[\s\S]*?updateSatelliteMap\(\)/],
   ["opens catalogue links in a protected new tab", /target:"_blank",rel:"noopener noreferrer"/],
