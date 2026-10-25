@@ -85,7 +85,7 @@
     if(nav && !document.getElementById("envNav")) { const a=node("a",{href:"#environmentalCard",id:"envNav"},"Contexte environnemental"); nav.append(a); }
 
     let satelliteLeafletMap=null, satelliteMarker=null, satelliteGridCircle=null;
-    let satelliteNDVILayer=null, satelliteTrueColorLayer=null, satelliteLayerControl=null, leafletPromise=null;
+    let satelliteNDVILayer=null, satelliteTrueColorLayer=null, satelliteSentinelNDVILayer=null, satelliteSentinelObjectUrl=null, satelliteLayerControl=null, leafletPromise=null;
     function loadLeaflet(){
       if(window.L)return Promise.resolve(window.L);
       if(leafletPromise)return leafletPromise;
@@ -105,6 +105,55 @@
       const anchor=Date.UTC(2000,1,18);
       const aligned=anchor+Math.floor((d.getTime()-anchor)/period)*period;
       return dateString(new Date(aligned));
+    }
+    async function showSentinelNDVI(sceneDate){
+      if(!location.value||!sceneDate){satelliteMapStatus.textContent="Choisissez un emplacement et une date de scène valide.";return;}
+      satelliteMapStatus.textContent="Calcul du NDVI Sentinel-2 et chargement de l’image dans la carte BA Labs…";
+      try{
+        const {data:authState,error:authError}=await db.auth.getSession();
+        if(authError||!authState?.session?.access_token)throw new Error("Session expirée : reconnectez-vous à CultureOps.");
+        const response=await fetch("https://axcouwiodqsauwnsiotn.supabase.co/functions/v1/sentinel-2-ndvi-preview",{
+          method:"POST",
+          headers:{
+            "Authorization":"Bearer "+authState.session.access_token,
+            "apikey":"sb_publishable_8H4XRh8V07Hlo0WwdfOXwg_2RXRX992",
+            "Content-Type":"application/json",
+            "Accept":"image/png"
+          },
+          body:JSON.stringify({location_id:location.value,date:sceneDate})
+        });
+        if(!response.ok){
+          const payload=await response.json().catch(()=>({}));
+          const messages={
+            sentinelhub_credentials_not_configured:"L’accès au traitement Sentinel-2 n’est pas encore configuré côté serveur.",
+            sentinelhub_authentication_failed:"L’authentification Copernicus a échoué.",
+            sentinelhub_processing_failed:"Copernicus n’a pas pu produire l’image pour cette date.",
+            sentinelhub_rate_limited:"Quota temporaire Sentinel-2 atteint ; réessayez plus tard.",
+            sentinelhub_timeout:"Le traitement satellite a dépassé le délai autorisé."
+          };
+          throw new Error(messages[payload.error]||("Traitement Sentinel-2 indisponible (HTTP "+response.status+")."));
+        }
+        const boundsHeader=response.headers.get("X-Geo-Bounds");
+        const values=(boundsHeader||"").split(",").map(Number);
+        if(values.length!==4||!values.every(Number.isFinite))throw new Error("L’emprise géographique de l’image est invalide.");
+        const [west,south,east,north]=values;
+        const L=await loadLeaflet();
+        const blob=await response.blob();
+        if(!blob.size||blob.type!=="image/png")throw new Error("Le service n’a pas renvoyé une image PNG valide.");
+        const objectUrl=URL.createObjectURL(blob);
+        if(satelliteSentinelNDVILayer){satelliteLeafletMap.removeLayer(satelliteSentinelNDVILayer);}
+        if(satelliteSentinelObjectUrl)URL.revokeObjectURL(satelliteSentinelObjectUrl);
+        satelliteSentinelObjectUrl=objectUrl;
+        satelliteSentinelNDVILayer=L.imageOverlay(objectUrl,[[south,west],[north,east]],{opacity:0.88,interactive:true});
+        satelliteSentinelNDVILayer.addTo(satelliteLeafletMap);
+        satelliteLayerControl.addOverlay(satelliteSentinelNDVILayer,"NDVI Sentinel-2 · "+sceneDate);
+        satelliteLeafletMap.fitBounds([[south,west],[north,east]],{padding:[12,12],maxZoom:14});
+        to.value=sceneDate;
+        satelliteMapPanel.scrollIntoView({behavior:"smooth",block:"start"});
+        satelliteMapStatus.textContent="NDVI Sentinel-2 L2A du "+sceneDate+" affiché directement dans BA Labs. Bandes source à 10 m ; aperçu rendu en 512 × 512 pixels sur une emprise régionale d’environ 1 km. Cette emprise n’est pas une limite de parcelle et les nuages peuvent affecter le résultat.";
+      }catch(error){
+        satelliteMapStatus.textContent=(error?.message||"Erreur de chargement Sentinel-2")+" La couche régionale MODIS reste disponible comme contexte.";
+      }
     }
     async function updateSatelliteMap(){
       if(!location.value){satelliteMapStatus.textContent="Choisissez un emplacement pour afficher la carte.";return;}
@@ -384,7 +433,12 @@
           item.append(node("p",{},(scene.platform||"Sentinel-2")+" · nuages "+(scene.cloud_cover_percent==null?"inconnus":scene.cloud_cover_percent.toFixed(1)+" %")));
           item.append(node("small",{class:"muted"},scene.id||"Identifiant de scène indisponible"));
           if(scene.acquired_at){
-            const mapButton=node("button",{type:"button"},"Afficher cette date sur la carte BA Labs");
+            const sentinelButton=node("button",{type:"button"},"Afficher le NDVI Sentinel-2 dans la carte");
+            sentinelButton.addEventListener("click",()=>showSentinelNDVI(scene.acquired_at.slice(0,10)));
+            sentinelButton.style.display="block";
+            sentinelButton.style.marginTop="10px";
+            item.append(sentinelButton);
+            const mapButton=node("button",{type:"button"},"Afficher le contexte régional sur la carte BA Labs");
             mapButton.addEventListener("click",()=>{
               const sceneDate=scene.acquired_at.slice(0,10);
               to.value=sceneDate;
