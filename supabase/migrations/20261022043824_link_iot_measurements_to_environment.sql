@@ -19,7 +19,9 @@ begin
       on delete set null (environment_id);
   end if;
 
-  if not exists (
+  -- On a clean replay, iot_devices is created by a later migration. Defer
+  -- this FK to the post-registry reconciliation migration in that case.
+  if to_regclass('public.iot_devices') is not null and not exists (
     select 1 from pg_constraint
     where conname = 'measurements_org_iot_device_fk'
       and conrelid = 'public.measurements'::regclass
