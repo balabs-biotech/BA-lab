@@ -196,13 +196,13 @@
         to.value=sceneDate;
         const ndviStats=response.headers.get("X-NDVI-Stats");
         let statsText="";
-        if(ndviStats){try{const st=JSON.parse(ndviStats);statsText=" NDVI moyen "+st.mean_ndvi+" ; pixels valides "+st.valid_pixel_percent+" % ; couverture nuageuse globale de la scène "+(Number.isFinite(st.cloud_cover_scene_percent)?st.cloud_cover_scene_percent.toFixed(1)+" %":"inconnue")+" ; masque SCL des nuages/ombres "+(st.cloud_mask_applied?"appliqué":"indisponible")+". ";}catch(_){}}
-        const modeLabels={ndvi:"NDVI",true_color:"couleurs naturelles",false_color:"fausses couleurs infrarouges"};
-        satelliteMapStatus.textContent="Sentinel-2 · "+sceneDate+(displayMode==="ndvi"?" · NDVI":" · "+(modeLabels[displayMode]||displayMode))+(statsText?" · "+statsText.trim():"");
+        if(ndviStats){try{const st=JSON.parse(ndviStats);if(Number.isFinite(Number(st.mean_ndvi)))statsText=" · NDVI moyen "+Number(st.mean_ndvi).toFixed(2);}catch(_){}}
+        const modeLabels={ndvi:"NDVI",true_color:"couleurs naturelles",false_color:"fausses couleurs IR"};
+        satelliteMapStatus.textContent="Sentinel-2 · "+sceneDate+(displayMode==="ndvi"?" · NDVI":" · "+(modeLabels[displayMode]||displayMode))+statsText;
       }catch(error){
         const message=error?.message||"Erreur de chargement Sentinel-2";
         satelliteMapStatus.textContent="Image satellite temporairement indisponible. "+(satelliteSentinelNDVILayer?"Dernière image conservée.":"Contexte régional conservé.");
-        if(message.includes("pas encore configuré"))sentinelHighResLink.scrollIntoView({behavior:"smooth",block:"center"});
+
       }
     }
     async function updateSatelliteMap(){
@@ -274,7 +274,7 @@
       data.forEach(x=>location.append(node("option",{value:x.id},x.code?x.name+" ("+x.code+")":x.name)));
       let savedId="";try{savedId=localStorage.getItem("ba-labs-active-environment-location")||"";}catch(_){}
       const saved=data.find(x=>x.id===savedId);
-      const preferred=saved||data.find(x=>Number.isFinite(Number(x.latitude))&&Number.isFinite(Number(x.longitude)))||data[0];
+      const preferred=saved||data.find(x=>x.latitude!=null&&x.longitude!=null&&Number.isFinite(Number(x.latitude))&&Number.isFinite(Number(x.longitude)))||data[0];
       if(preferred){location.value=preferred.id;try{localStorage.setItem("ba-labs-active-environment-location",preferred.id);}catch(_){}}
       await selectLocation();
       if(!location.value) await updateSatelliteMap();
@@ -489,10 +489,10 @@
           }
         }
         satelliteResults.replaceChildren();
-        if(error){satelliteMapStatus.textContent="Catalogue satellite temporairement indisponible.";return;}
-        if(!data?.ok){satelliteMapStatus.textContent="Catalogue satellite temporairement indisponible.";return;}
+        if(error){satelliteMapStatus.textContent="Catalogue satellite indisponible.";return;}
+        if(!data?.ok){satelliteMapStatus.textContent="Catalogue satellite indisponible.";return;}
         satelliteResults.append(node("p",{},data.scenes_found+" scène(s) trouvée(s) via "+catalogueSource+", couverture nuageuse maximale de 60 %."));
-        if(!data.scenes?.length){satelliteMapStatus.textContent="Aucune image satellite exploitable sur la période récente.";return;}
+        if(!data.scenes?.length){satelliteMapStatus.textContent="Aucune image exploitable sur la période récente.";return;}
         const rankedScenes=[...data.scenes].sort((a,b)=>{
           const cloudA=Number.isFinite(a.cloud_cover_percent)?a.cloud_cover_percent:101;
           const cloudB=Number.isFinite(b.cloud_cover_percent)?b.cloud_cover_percent:101;
@@ -502,7 +502,6 @@
           if(usableA!==usableB)return usableA-usableB;
           return usableA===0?dateB-dateA:cloudA-cloudB||dateB-dateA;
         });
-        const candidate=rankedScenes[0];
         if(!rankedScenes.length){
           satelliteMapStatus.textContent="Aucune image satellite récente disponible.";
           return;
@@ -515,7 +514,7 @@
         }
         satelliteMapStatus.textContent="Image Sentinel-2 · "+sceneDate+" · calcul en cours…";
         await showSentinelNDVI(sceneDate,"ndvi");
-      }catch(e){satelliteMapStatus.textContent="Recherche satellite temporairement indisponible.";}
+      }catch(e){satelliteMapStatus.textContent="Recherche satellite indisponible.";}
       finally{satelliteButton.disabled=false;}
     }
     location.addEventListener("change",()=>{try{localStorage.setItem("ba-labs-active-environment-location",location.value);}catch(_){} satelliteResults.replaceChildren();selectLocation().then(()=>{if(location.value){loadRows();searchSatellite();}});});
