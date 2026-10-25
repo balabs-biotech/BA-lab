@@ -39,6 +39,8 @@ let selectedBatchId = null;
 let selectedBatch = null;
 
 let initializationInProgress = false;
+let authStateRevision = 0;
+let initializationWarnings = [];
 let measurementVariables = [];
 let measurementUnits = [];
 let quantityUnitOptions = [];
@@ -689,7 +691,11 @@ async function signOut() {
 
   try {
 
-    await supabaseClient.auth.signOut();
+    const { error } = await supabaseClient.auth.signOut();
+
+    if (error) {
+      throw error;
+    }
 
   }
 
@@ -700,9 +706,17 @@ async function signOut() {
       error
     );
 
+    showMessage(
+      error.message || "Déconnexion impossible. Votre session peut être encore active.",
+      "error"
+    );
+
+    return;
+
   }
 
 
+  authStateRevision += 1;
   organizationId = null;
   organization = null;
   strainOptions = [];
@@ -737,11 +751,35 @@ async function signOut() {
    AUTH UI
    ============================================================ */
 
-async function refreshAuthUI() {
+async function refreshAuthUI(revision = authStateRevision) {
 
-  const session =
-    await getCurrentSession();
+  let session;
 
+  try {
+    session = await getCurrentSession();
+  } catch (error) {
+    if (revision !== authStateRevision) return;
+
+    // Do not leave a previously authenticated workspace visible when the
+    // current session cannot be verified because of a network/auth failure.
+    hideElement(trackerCard);
+    hideElement(batchCard);
+    hideElement(document.getElementById("plantCard"));
+    hideElement(measurementCard);
+    hideElement(document.getElementById("statisticsCard"));
+    hideElement(document.getElementById("overviewCard"));
+    hideElement(resultCard);
+    hideElement(signOutButton);
+    authStatus.textContent = "Session non vérifiable.";
+    showMessage(
+      "Impossible de vérifier votre session. Vérifiez la connexion Internet puis rechargez la page. Vos données ne sont pas supprimées.",
+      "error"
+    );
+    console.error("Vérification de session impossible :", error);
+    return;
+  }
+
+  if (revision !== authStateRevision) return;
 
   if (!session) {
 
@@ -773,7 +811,8 @@ async function refreshAuthUI() {
 
 
   await initializeAuthenticatedTracker(
-    session
+    session,
+    revision
   );
 
 }
@@ -784,7 +823,8 @@ async function refreshAuthUI() {
    ============================================================ */
 
 async function initializeAuthenticatedTracker(
-  session
+  session,
+  revision = authStateRevision
 ) {
 
   if (
@@ -799,11 +839,12 @@ async function initializeAuthenticatedTracker(
   initializationInProgress =
     true;
 
+  const initRevision = revision;
 
   try {
 
     clearMessage();
-
+    initializationWarnings = [];
 
     authStatus.textContent =
       `Connexion BA-LABS : ${
@@ -863,15 +904,18 @@ async function initializeAuthenticatedTracker(
       try { await loadRecentMeasurements(); }
       catch (historyError) {
         console.error("Historique des mesures indisponible :", historyError);
+        initializationWarnings.push("historique des mesures");
         measurementHistory.textContent = "Impossible de charger l’historique des mesures. L’enregistrement reste disponible.";
       }
       try { await loadRecentObservations(); }
       catch (observationHistoryError) {
         console.error("Historique des observations indisponible :", observationHistoryError);
+        initializationWarnings.push("historique des observations");
         observationHistory.textContent = "Impossible de charger l’historique des observations. L’enregistrement reste disponible.";
       }
     } catch (measurementError) {
       console.error("Initialisation du catalogue de mesures :", measurementError);
+      initializationWarnings.push("catalogue des mesures");
       measurementHistory.textContent = "Le catalogue des mesures est indisponible ; les modules de culture et de production restent utilisables.";
       observationHistory.textContent = "Le catalogue des observations est indisponible ; les modules de culture et de production restent utilisables.";
       saveMeasurementButton.disabled = true;
@@ -880,6 +924,8 @@ async function initializeAuthenticatedTracker(
 
     setDefaultDate();
 
+    // Never reveal data loaded by an initialization superseded by an auth change.
+    if (initRevision !== authStateRevision) return;
 
     showElement(trackerCard);
 
@@ -892,9 +938,16 @@ async function initializeAuthenticatedTracker(
     updateOverview();
 
 
-    showMessage(
-      `BA-LABS chargée — organisation ${organization.code}.`
-    );
+    if (initializationWarnings.length) {
+      showMessage(
+        `BA-LABS chargée — organisation ${organization.code}. Chargement partiel : ${initializationWarnings.join(", ")} indisponible(s). Les modules principaux restent accessibles.`,
+        "warning"
+      );
+    } else {
+      showMessage(
+        `BA-LABS chargée — organisation ${organization.code}.`
+      );
+    }
 
   }
 
@@ -905,6 +958,7 @@ async function initializeAuthenticatedTracker(
       error
     );
 
+    if (initRevision !== authStateRevision) return;
 
     hideElement(trackerCard);
     hideElement(batchCard);
@@ -926,6 +980,15 @@ async function initializeAuthenticatedTracker(
 
     initializationInProgress =
       false;
+
+    // If the session changed while loading, reconcile the UI against the latest session.
+    if (initRevision !== authStateRevision) {
+      setTimeout(() => {
+        refreshAuthUI().catch(error => {
+          console.error("Actualisation de session :", error);
+        });
+      }, 0);
+    }
 
   }
 
@@ -2851,7 +2914,7 @@ async function loadBatch(
 
 function updateHarvestEntryState(batch, events) {
   if (!recordHarvestButton || !harvestStatus) return;
-  const allowed = batch?.current_stage === "harvest" && !["released", "rejected", "aborted", "completed"].includes(batch?.status);
+  const allowed = batch?.current_stage === "harvest" && batch?.status === "active";
   recordHarvestButton.disabled = !allowed;
   const groups = new Map();
   (events || []).filter(event => event.event_type === "harvest_recorded").forEach(event => {
@@ -2868,7 +2931,7 @@ async function recordBatchHarvest() {
     showMessage("Sélectionnez d’abord un lot.", "error");
     return;
   }
-  if (selectedBatch.current_stage !== "harvest" || ["released", "rejected", "aborted", "completed"].includes(selectedBatch.status)) {
+  if (selectedBatch.current_stage !== "harvest" || selectedBatch.status !== "active") {
     showMessage("La récolte ne peut être enregistrée que pendant l’étape Récolte d’un lot ouvert.", "error");
     return;
   }
@@ -2898,16 +2961,14 @@ async function recordBatchHarvest() {
     if (!eventAnchor) {
       throw new Error("Ce lot doit être lié à une culture ou à un matériau pour enregistrer une récolte dans le journal biologique.");
     }
-    const { error } = await supabaseClient.from("events").insert({
-      organization_id: organizationId,
-      event_type: "harvest_recorded",
-      occurred_at: new Date().toISOString(),
-      actor_user_id: session.user.id,
-      ...eventAnchor,
-      batch_id: selectedBatch.id,
-      payload: { quantity, unit_code: unit.code, note: note || null, source: "batch-tracker-harvest-entry", schema_version: 1 }
+    const { data: eventId, error } = await supabaseClient.rpc("record_batch_harvest", {
+      p_batch_id: selectedBatch.id,
+      p_quantity: quantity,
+      p_unit_code: unit.code,
+      p_note: note || null
     });
     if (error) throw new Error("Enregistrement de la récolte impossible : " + error.message);
+    if (!eventId) throw new Error("La base n’a pas confirmé l’enregistrement de la récolte.");
     harvestQuantityInput.value = "";
     harvestNoteInput.value = "";
     showMessage("Récolte enregistrée dans la chronologie du lot.", "success");
@@ -2919,7 +2980,7 @@ async function recordBatchHarvest() {
   } finally {
     recordHarvestButton.textContent = originalLabel;
     if (selectedBatch) {
-      recordHarvestButton.disabled = !(selectedBatch.current_stage === "harvest" && !["released", "rejected", "aborted", "completed"].includes(selectedBatch.status));
+      recordHarvestButton.disabled = !(selectedBatch.current_stage === "harvest" && selectedBatch.status === "active");
     }
   }
 }
@@ -4413,10 +4474,13 @@ supabaseClient.auth.onAuthStateChange(
     session
   ) => {
 
+    authStateRevision += 1;
+    const revision = authStateRevision;
+
     setTimeout(
       () => {
 
-        refreshAuthUI()
+        refreshAuthUI(revision)
           .catch(
             error => {
 
@@ -4540,6 +4604,7 @@ async function loadQuantityUnitOptions() {
     }
   } catch (error) {
     console.error("Référentiel des unités indisponible :", error);
+    initializationWarnings.push("unités");
     quantityUnitOptions = [];
     for (const select of selects) {
       select.disabled = true;
@@ -4700,6 +4765,7 @@ async function loadBatchPlaceOptions() {
     renderBatchEnvironmentOptions();
   } catch (error) {
     console.error("Référentiel des emplacements indisponible :", error);
+    initializationWarnings.push("emplacements et environnements");
     batchLocationOptions = [];
     batchEnvironmentOptions = [];
     batchLocationInput.replaceChildren(new Option("Emplacements indisponibles", ""));
@@ -4904,7 +4970,14 @@ async function saveMeasurement() {
     return;
   }
 
-  const session = await getCurrentSession();
+  let session;
+  try {
+    session = await getCurrentSession();
+  } catch (error) {
+    console.error("Vérification de session avant mesure impossible :", error);
+    showMessage("Impossible de vérifier votre session. Vérifiez la connexion puis réessayez. Aucune mesure n’a été enregistrée.", "error");
+    return;
+  }
   if (!session) {
     showMessage(cultureWorkflowText("expired"), "error");
     return;
@@ -4912,7 +4985,6 @@ async function saveMeasurement() {
 
   saveMeasurementButton.disabled = true;
   saveMeasurementButton.textContent = cultureWorkflowText("saving");
-  let eventId = null;
   let measurementSaved = false;
 
   try {
@@ -4933,77 +5005,62 @@ async function saveMeasurement() {
       plantCultureId = plant.id;
       environmentId = plant.environment_id || null;
       locationId = plant.location_id || null;
-      const { data: event, error: eventError } = await supabaseClient.from("events").insert({
-        organization_id: organizationId,
-        event_type: "measurement_recorded",
-        occurred_at: measuredAt,
-        actor_user_id: session.user.id,
-        plant_culture_id: plantCultureId,
-        environment_id: environmentId,
-        location_id: locationId,
-        payload: { variable_code: variable.code, raw_value: rawValue, raw_unit_code: unit.code, source: "agritech-manual" }
-      }).select("id").single();
-      if (eventError) throw new Error(cultureWorkflowText("eventError") + eventError.message);
-      eventId = event.id;
     } else if (targetType === "batch") {
       const batch = latestBatches.find(item => item.id === targetId);
       if (!batch) throw new Error(cultureWorkflowText("batchMissing"));
       batchId = batch.id;
       cultureId = batch.culture_id || null;
 
-      const { data: event, error: eventError } = await supabaseClient
-        .from("events")
-        .insert({
-          organization_id: organizationId,
-          event_type: "measurement_recorded",
-          occurred_at: measuredAt,
-          actor_user_id: session.user.id,
-          culture_id: cultureId,
-          batch_id: batchId,
-          payload: {
-            variable_code: variable.code,
-            raw_value: rawValue,
-            raw_unit_code: unit.code,
-            method: measurementMethodInput.value.trim() || null,
-            instrument: measurementInstrumentInput.value.trim() || null,
-            note: measurementNoteInput.value.trim() || null
-          }
-        })
-        .select("id")
-        .single();
-
-      if (eventError) throw new Error(cultureWorkflowText("eventError") + eventError.message);
-      eventId = event.id;
     } else {
       throw new Error(cultureWorkflowText("invalidTarget"));
     }
 
     const sameAsCanonical = variable.canonical_unit_code === unit.code;
-    const { error: measurementError } = await supabaseClient
-      .from("measurements")
-      .insert({
-        organization_id: organizationId,
+    const eventPayload = {
+      organization_id: organizationId,
+      event_type: "measurement_recorded",
+      occurred_at: measuredAt,
+      actor_user_id: session.user.id,
+      culture_id: cultureId,
+      plant_culture_id: plantCultureId,
+      environment_id: environmentId,
+      location_id: locationId,
+      batch_id: batchId,
+      payload: {
         variable_code: variable.code,
         raw_value: rawValue,
         raw_unit_code: unit.code,
-        normalized_value: sameAsCanonical ? rawValue : null,
-        normalized_unit_code: sameAsCanonical ? unit.code : null,
-        measured_at: measuredAt,
         method: measurementMethodInput.value.trim() || null,
         instrument: measurementInstrumentInput.value.trim() || null,
-        culture_id: cultureId,
-        plant_culture_id: plantCultureId,
-        environment_id: environmentId,
-        event_id: eventId,
-        metadata: {
-          source: "batch-tracker-manual",
-          note: measurementNoteInput.value.trim() || null,
-          target_type: targetType,
-          batch_id: batchId
-        }
-      });
-
-    if (measurementError) throw new Error(cultureWorkflowText("measureError") + measurementError.message);
+        note: measurementNoteInput.value.trim() || null,
+        source: targetType === "plant" ? "agritech-manual" : "batch-tracker-manual"
+      }
+    };
+    const measurementPayload = {
+      organization_id: organizationId,
+      variable_code: variable.code,
+      raw_value: rawValue,
+      raw_unit_code: unit.code,
+      normalized_value: sameAsCanonical ? rawValue : null,
+      normalized_unit_code: sameAsCanonical ? unit.code : null,
+      measured_at: measuredAt,
+      method: measurementMethodInput.value.trim() || null,
+      instrument: measurementInstrumentInput.value.trim() || null,
+      culture_id: cultureId,
+      plant_culture_id: plantCultureId,
+      environment_id: environmentId,
+      metadata: {
+        source: "batch-tracker-manual",
+        note: measurementNoteInput.value.trim() || null,
+        target_type: targetType,
+        batch_id: batchId
+      }
+    };
+    const { error: recordError } = await supabaseClient.rpc("record_manual_measurement", {
+      p_event: eventPayload,
+      p_measurement: measurementPayload
+    });
+    if (recordError) throw new Error(cultureWorkflowText("measureError") + recordError.message);
     measurementSaved = true;
 
     measurementValueInput.value = "";
@@ -5018,14 +5075,6 @@ async function saveMeasurement() {
     if (measurementSaved) {
       showMessage(cultureWorkflowText("measureRefresh"), "warning");
     } else {
-      if (eventId) {
-        const { error: cleanupError } = await supabaseClient
-          .from("events")
-          .delete()
-          .eq("organization_id", organizationId)
-          .eq("id", eventId);
-        if (cleanupError) console.error("Nettoyage de l’événement incomplet :", cleanupError);
-      }
       showMessage(error.message || cultureWorkflowText("measureFailed"), "error");
     }
   } finally {
@@ -5131,7 +5180,14 @@ async function saveObservation() {
     return;
   }
 
-  const session = await getCurrentSession();
+  let session;
+  try {
+    session = await getCurrentSession();
+  } catch (error) {
+    console.error("Vérification de session avant observation impossible :", error);
+    showMessage("Impossible de vérifier votre session. Vérifiez la connexion puis réessayez. Aucune observation n’a été enregistrée.", "error");
+    return;
+  }
   if (!session) {
     showMessage(cultureWorkflowText("expired"), "error");
     return;
@@ -5139,7 +5195,6 @@ async function saveObservation() {
 
   saveObservationButton.disabled = true;
   saveObservationButton.textContent = cultureWorkflowText("saving");
-  let eventId = null;
   let observationSaved = false;
 
   try {
@@ -5162,54 +5217,42 @@ async function saveObservation() {
       plantCultureId = plant.id;
       environmentId = plant.environment_id || null;
       locationId = plant.location_id || null;
-      const eventResult = await supabaseClient.from("events").insert({
-        organization_id: organizationId,
-        event_type: "observation_recorded",
-        occurred_at: observedAt,
-        actor_user_id: session.user.id,
-        plant_culture_id: plantCultureId,
-        environment_id: environmentId,
-        location_id: locationId,
-        payload: { variable_code: variable.code, value_text: valueText, source: "agritech-manual" }
-      }).select("id").single();
-      if (eventResult.error) throw new Error(cultureWorkflowText("eventError") + eventResult.error.message);
-      eventId = eventResult.data.id;
     } else if (targetType === "batch") {
       const batch = latestBatches.find(item => item.id === targetId);
       if (!batch) throw new Error(cultureWorkflowText("batchMissing"));
       batchId = batch.id;
       cultureId = batch.culture_id || null;
 
-      const eventResult = await supabaseClient.from("events").insert({
-        organization_id: organizationId,
-        event_type: "observation_recorded",
-        occurred_at: observedAt,
-        actor_user_id: session.user.id,
-        culture_id: cultureId,
-        batch_id: batchId,
-        payload: {
-          variable_code: variable.code,
-          value_text: valueText,
-          method: observationMethodInput.value.trim() || null,
-          instrument: observationInstrumentInput.value.trim() || null,
-          note: observationNoteInput.value.trim() || null
-        }
-      }).select("id").single();
-
-      if (eventResult.error) throw new Error(cultureWorkflowText("eventError") + eventResult.error.message);
-      eventId = eventResult.data.id;
     } else {
       throw new Error(cultureWorkflowText("observationInvalid"));
     }
 
-    const insertResult = await supabaseClient.from("observations").insert({
+    const eventPayload = {
+      organization_id: organizationId,
+      event_type: "observation_recorded",
+      occurred_at: observedAt,
+      actor_user_id: session.user.id,
+      culture_id: cultureId,
+      plant_culture_id: plantCultureId,
+      environment_id: environmentId,
+      location_id: locationId,
+      batch_id: batchId,
+      payload: {
+        variable_code: variable.code,
+        value_text: valueText,
+        method: observationMethodInput.value.trim() || null,
+        instrument: observationInstrumentInput.value.trim() || null,
+        note: observationNoteInput.value.trim() || null,
+        source: targetType === "plant" ? "agritech-manual" : "batch-tracker-manual"
+      }
+    };
+    const observationPayload = {
       organization_id: organizationId,
       variable_code: variable.code,
       value_text: valueText,
       observed_at: observedAt,
       culture_id: cultureId,
       plant_culture_id: plantCultureId,
-      event_id: eventId,
       metadata: {
         source: "batch-tracker-manual",
         method: observationMethodInput.value.trim() || null,
@@ -5218,9 +5261,12 @@ async function saveObservation() {
         target_type: targetType,
         batch_id: batchId
       }
+    };
+    const { error: recordError } = await supabaseClient.rpc("record_manual_observation", {
+      p_event: eventPayload,
+      p_observation: observationPayload
     });
-
-    if (insertResult.error) throw new Error(cultureWorkflowText("observationError") + insertResult.error.message);
+    if (recordError) throw new Error(cultureWorkflowText("observationError") + recordError.message);
     observationSaved = true;
     observationValueInput.value = "";
     observationMethodInput.value = "";
@@ -5233,11 +5279,6 @@ async function saveObservation() {
     if (observationSaved) {
       showMessage(cultureWorkflowText("observationRefresh"), "warning");
     } else {
-      if (eventId) {
-        const cleanup = await supabaseClient.from("events").delete()
-          .eq("organization_id", organizationId).eq("id", eventId);
-        if (cleanup.error) console.error("Nettoyage de l’événement incomplet :", cleanup.error);
-      }
       showMessage(error.message || cultureWorkflowText("observationFailed"), "error");
     }
   } finally {
@@ -6413,6 +6454,7 @@ async function loadPlantCultures() {
     if (status) status.textContent = "Registre végétal chargé depuis Supabase.";
   } catch (error) {
     console.error("Chargement du registre végétal impossible :", error);
+    initializationWarnings.push("registre végétal");
     if (status) status.textContent = "Registre végétal indisponible : " + (error.message || "erreur inconnue");
     const list = document.getElementById("plantCultureList");
     if (list) list.textContent = "Impossible de charger le registre végétal. Vérifiez que la migration est déployée puis rechargez la page.";

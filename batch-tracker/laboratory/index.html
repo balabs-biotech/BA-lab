@@ -3,15 +3,19 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101923">
   <meta name="description" content="Espace Laboratory BA Labs : géloses, cultures liquides, inoculation du grain, matières, protocoles et filiation des lots.">
   <title>BA Labs CultureOps — Laboratory</title>
-  <link rel="stylesheet" href="../tracker.css?v=2f580b2">
+  <link rel="stylesheet" href="../tracker.css?v=20261025-visual">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.118.0"></script>
 </head>
 <body data-domain="laboratory">
   <div id="workspace-root" aria-live="polite"><main class="container"><p>Chargement de l’espace Laboratory…</p></main></div>
   <script>
-    window.BA_LABS_DOMAIN = "laboratory";
+    if (!window.supabase || typeof window.supabase.createClient !== "function") {
+      document.getElementById("workspace-root").innerHTML = "<main class='container'><section class='card' role='alert'><h1>Service de données indisponible</h1><p>La bibliothèque Supabase n’a pas pu être chargée. Vérifiez la connexion puis rechargez la page.</p></section></main>";
+    } else {
+      window.BA_LABS_DOMAIN = "laboratory";
     fetch("../workspace.html")
       .then(response => { if (!response.ok) throw new Error("workspace unavailable"); return response.text(); })
       .then(markup => {
@@ -34,6 +38,7 @@
       .catch(() => {
         document.getElementById("workspace-root").innerHTML = "<main class='container'><p role='alert'>L’interface n’a pas pu être chargée. Vérifiez la connexion puis rechargez la page.</p></main>";
       });
+    }
   </script>
 </body>
 </html>

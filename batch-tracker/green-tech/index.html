@@ -4,15 +4,18 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Espace Green Tech BA Labs : plantes, substrats, serre, irrigation et paramètres environnementaux.">
-  <meta name="theme-color" content="#183b24">
+  <meta name="theme-color" content="#0d1510">
   <title>BA Labs CultureOps — Green Tech</title>
-  <link rel="stylesheet" href="../tracker.css?v=bc9cda3">
+  <link rel="stylesheet" href="../tracker.css?v=20261025-visual">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.118.0"></script>
 </head>
 <body data-domain="agronomy">
   <div id="workspace-root" aria-live="polite"><main class="container"><p>Chargement de l’espace Green Tech…</p></main></div>
   <script>
-    window.BA_LABS_DOMAIN = "agronomy";
+    if (!window.supabase || typeof window.supabase.createClient !== "function") {
+      document.getElementById("workspace-root").innerHTML = "<main class='container'><section class='card' role='alert'><h1>Service de données indisponible</h1><p>La bibliothèque Supabase n’a pas pu être chargée. Vérifiez la connexion puis rechargez la page.</p></section></main>";
+    } else {
+      window.BA_LABS_DOMAIN = "agronomy";
     fetch("../workspace.html")
       .then(response => {
         if (!response.ok) throw new Error("Impossible de charger l’interface commune.");
@@ -44,6 +47,7 @@
       .catch(() => {
         document.getElementById("workspace-root").innerHTML = "<main class='container'><p role='alert'>L’interface n’a pas pu être chargée. Vérifiez la connexion puis rechargez la page.</p></main>";
       });
+    }
   </script>
 </body>
 </html>

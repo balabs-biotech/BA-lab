@@ -153,6 +153,10 @@ jobs:
         run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/make_culture_reference_views_read_only.test.sql
       - name: Test biological traceability RPC, lineage and tenant isolation on PostgreSQL 17
         run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/biological_traceability.test.sql
+      - name: Test atomic manual measurement and observation RPC contract
+        run: node supabase/tests/manual-write-atomicity.test.mjs
+      - name: Test batch harvest RPC contract
+        run: node supabase/tests/batch-harvest-rpc-contract.test.mjs
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
@@ -202,5 +206,13 @@ jobs:
       - name: Verify expected schema after replay
         run: |
           psql -At -v ON_ERROR_STOP=1 -X -q -c "select to_regclass('public.cultures'), to_regclass('public.batches'), to_regclass('public.culture_data_consents')" | grep -q 'cultures'
+      - name: Verify atomic manual-write RPC security contract after replay
+        run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/manual_write_rpc_security_contract.test.sql
+      - name: Verify batch harvest RPC security contract after replay
+        run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/batch_harvest_rpc_security_contract.test.sql
+      - name: Verify sensitive RPC search-path contracts after replay
+        run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/sensitive_rpc_search_path_contract.test.sql
+      - name: Verify append-only audit table privileges after replay
+        run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/audit_table_write_privileges.test.sql
       - name: Test environmental observation schema and access contract
         run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/environmental_observations_contract.test.sql

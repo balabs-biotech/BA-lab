@@ -66,8 +66,9 @@ for(const label of ["Comparabilité :","Comparability:","Comparabilidade:","قا
 console.log("✓ Batch comparison warns when a variable uses incompatible/missing units across selected batches");
 
 if(!template.includes('id="harvestQuantity"')||!template.includes('id="harvestUnit"')||!template.includes('id="recordHarvestButton"'))throw new Error("Harvest entry form missing");
-if(!engine.includes('event_type: "harvest_recorded"')||!engine.includes('function recordBatchHarvest')||!engine.includes('current_stage !== "harvest"'))throw new Error("Harvest event workflow missing or not restricted to harvest stage");
-if(!engine.includes('from("units")')||!engine.includes('unit_code: unit.code'))throw new Error("Harvest unit validation missing");
+if(!engine.includes('function recordBatchHarvest')||!engine.includes('current_stage !== "harvest"')||!engine.includes('rpc("record_batch_harvest"'))throw new Error("Harvest event workflow missing, not RPC-backed, or not restricted to harvest stage");
+if(!engine.includes('from("units")')||!engine.includes('p_unit_code: unit.code'))throw new Error("Harvest unit validation or RPC payload missing");
+if(engine.slice(engine.indexOf("async function recordBatchHarvest()"), engine.indexOf("\nrecordHarvestButton?.addEventListener")).includes('from("events").insert({'))throw new Error("Harvest handler still inserts events directly");
 
 if(!engine.includes("const eventAnchor = selectedBatch.culture_id")||!engine.includes("Ce lot doit être lié à une culture ou à un matériau"))throw new Error("Harvest event biological anchor validation missing");
 for(const label of ["Chronologie du lot","Enregistrer une récolte","Récolte enregistrée","Batch timeline","Record a harvest","Harvest recorded","Cronologia do lote","Registar uma colheita","Colheita registada","الخط الزمني للدفعة","تسجيل حصاد","تم تسجيل الحصاد"]){
@@ -189,3 +190,84 @@ if(!engine.includes('from("plant_cultures")')||!engine.includes('domain: "agrono
 if(!engine.includes('domain: document.body.dataset.domain === "laboratory" ? "laboratory" : "mycology"'))throw new Error("Biological culture records must retain their originating workspace");
 for(const snippet of ["create table if not exists public.plant_cultures","alter table public.plant_cultures enable row level security","private.is_org_member(organization_id)","constraint plant_cultures_org_code_key unique"])if(!plantMigration.includes(snippet))throw new Error("Plant registry migration missing security/constraint: "+snippet);
 console.log("✓ AgriTech plant records are separate from mycology/laboratory culture lineages");
+
+
+if(!root.includes('class="kicker"')||!root.includes('document.querySelector(".kicker").textContent'))throw new Error("Landing-page language switcher references a missing translated kicker");
+if(!root.includes('<a class="skip-link" href="#main">')||!root.includes('<main id="main" tabindex="-1">'))throw new Error("Landing page skip link/main target missing");
+if(!root.includes('id="pageLanguage"')||!root.includes('value="ar"'))throw new Error("Landing-page multilingual selector missing Arabic option");
+console.log("✓ Landing page language switcher target exists; skip navigation and multilingual options are present");
+
+if(!root.includes('"Every culture has","its own universe."')||!root.includes('"Cada cultura tem","o seu universo."')||!root.includes('"لكل ثقافة","عالمها الخاص."'))throw new Error("Landing-page headline translation is missing a complete phrase");
+for(const selector of ['.section-head h2','.intro-note strong','.section-head p','.agronomy .universe-label','.myco .universe-label','.lab .universe-label','.agronomy h3','.myco h3','.lab h3'])if(!root.includes('document.querySelector("'+selector+'").textContent'))throw new Error("Landing-page translated selector missing: "+selector);
+for(const label of ["Choose your workspace","Escolha o seu espaço de trabalho","اختر مساحة العمل"])if(!root.includes('"'+label+'"'))throw new Error("Landing-page translated workspace heading missing: "+label);
+console.log("✓ English, Portuguese and Arabic landing headlines are grammatical; workspace headings are wired to translation arrays");
+
+const landingCopyMatch=root.match(/const copy = (\{[\s\S]*?\n  \});\n  const select/);
+if(!landingCopyMatch)throw new Error("Landing-page translation dictionary cannot be parsed by the audit");
+const landingCopy=vm.runInNewContext("("+landingCopyMatch[1]+")");
+for(const lang of ["fr","en","pt","ar"])if(!Array.isArray(landingCopy[lang])||landingCopy[lang].length!==20)throw new Error("Landing-page translation array must contain 20 mapped strings: "+lang);
+for(const lang of ["fr","en","pt","ar"])for(const index of [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19])if(typeof landingCopy[lang][index]!=="string"||!landingCopy[lang][index].trim())throw new Error("Landing-page translation missing: "+lang+"["+index+"]");
+console.log("✓ Landing-page translation dictionaries parse correctly and contain all 20 mapped strings for FR/EN/PT/AR");
+
+const signOutStart=engine.indexOf("async function signOut()");
+const authUiStart=engine.indexOf("/* ============================================================\n   AUTH UI",signOutStart);
+if(signOutStart<0||authUiStart<0)throw new Error("Could not isolate signOut for session-failure regression guard");
+const signOutBlock=engine.slice(signOutStart,authUiStart);
+if(!signOutBlock.includes("const { error } = await supabaseClient.auth.signOut()")||!signOutBlock.includes("if (error)")||!signOutBlock.includes("Déconnexion impossible")||!signOutBlock.includes("return;"))throw new Error("Sign-out failure must be surfaced without clearing authenticated state");
+if(signOutBlock.indexOf("return;")>signOutBlock.indexOf("organizationId = null"))throw new Error("Sign-out failure return must precede local session-state reset");
+console.log("✓ Sign-out checks Supabase's returned error and preserves local state when logout fails");
+
+if(!engine.includes("let authStateRevision = 0;"))throw new Error("Auth revision guard is missing");
+const initStart=engine.indexOf("async function initializeAuthenticatedTracker(");
+const initEnd=engine.indexOf("function setDefaultDate()",initStart);
+if(initStart<0||initEnd<0)throw new Error("Could not isolate authenticated initialization");
+const initBlock=engine.slice(initStart,initEnd);
+if(!initBlock.includes("const initRevision = revision;")||!initBlock.includes("if (initRevision !== authStateRevision) return;")||!initBlock.includes("if (initRevision !== authStateRevision) {"))throw new Error("Authenticated initialization must reject stale work and reconcile the latest session");
+const authListener=engine.slice(engine.indexOf("supabaseClient.auth.onAuthStateChange("),engine.indexOf("async function init()",engine.indexOf("supabaseClient.auth.onAuthStateChange(")));
+if(!authListener.includes("authStateRevision += 1;"))throw new Error("Auth-state changes must increment the revision");
+console.log("✓ Auth initialization rejects stale session work and refreshes against the latest auth revision");
+
+const refreshStart=engine.indexOf("async function refreshAuthUI(");
+const refreshEnd=engine.indexOf("/* ============================================================\n   INITIALISATION AUTHENTIFIEE",refreshStart);
+if(refreshStart<0||refreshEnd<0)throw new Error("Could not isolate auth UI refresh");
+const refreshBlock=engine.slice(refreshStart,refreshEnd);
+if(!refreshBlock.includes("revision = authStateRevision")||!refreshBlock.includes("if (revision !== authStateRevision) return;")||!refreshBlock.includes("session,\n    revision"))throw new Error("Stale auth refresh must be rejected before initialization");
+if(!engine.includes("let initializationWarnings = [];")||!engine.includes('initializationWarnings.push("unités")')||!engine.includes('initializationWarnings.push("registre végétal")')||!engine.includes("Chargement partiel"))throw new Error("Partial data-load failures must be reported to the user");
+console.log("✓ Auth refreshes are revision-checked and optional data-load failures are surfaced as partial-load warnings");
+
+if(!refreshBlock.includes("catch (error)")||!refreshBlock.includes("Session non vérifiable.")||!refreshBlock.includes("Impossible de vérifier votre session.")||!refreshBlock.includes("Vos données ne sont pas supprimées.")||!refreshBlock.includes("hideElement(trackerCard)"))throw new Error("Auth session verification failures must fail closed and explain the recovery action");
+console.log("✓ Unverifiable sessions hide protected workspace content and show a recovery message without claiming data loss");
+
+for (const [fn, button, label] of [
+  ["async function saveMeasurement()", "saveMeasurementButton.disabled = true;", "mesure"],
+  ["async function saveObservation()", "saveObservationButton.disabled = true;", "observation"]
+]) {
+  const start = engine.indexOf(fn);
+  const next = engine.indexOf("\nasync function ", start + fn.length);
+  if (start < 0 || next < 0) throw new Error("Could not isolate " + label + " save handler");
+  const block = engine.slice(start, next);
+  if (!block.includes("let session;") || !block.includes("catch (error)") || !block.includes("Impossible de vérifier votre session.") || !block.includes("Aucune " + label + " n’a été enregistrée.") || block.indexOf("Impossible de vérifier votre session.") > block.indexOf(button)) {
+    throw new Error("Session verification failure must be handled before writing " + label + " data");
+  }
+}
+console.log("✓ Measurement and observation writes handle session-verification failures before enabling the write operation");
+
+for (const [fn, rpc, savedFlag] of [
+  ["async function saveMeasurement()", "record_manual_measurement", "measurementSaved"],
+  ["async function saveObservation()", "record_manual_observation", "observationSaved"]
+]) {
+  const start = engine.indexOf(fn);
+  const next = engine.indexOf("\nasync function ", start + fn.length);
+  const block = engine.slice(start, next);
+  if (!block.includes('rpc("' + rpc + '"') ||
+      !block.includes(savedFlag + " = true;") ||
+      block.includes('.from("events").delete(') ||
+      block.includes("eventCleanupFailed")) {
+    throw new Error("Atomic save must not attempt separate event cleanup for " + rpc);
+  }
+}
+console.log("✓ Atomic measurement/observation writes no longer perform separate event cleanup");
+
+const forbiddenDirectWrite = engine.match(/\.from\(["'](?:events|measurements|observations)["']\)\s*\.(?:insert|upsert|update|delete)\s*\(/);
+if (forbiddenDirectWrite) throw new Error("Audit-sensitive event/measurement/observation writes must go through validated RPCs, not direct table mutations");
+console.log("✓ Tracker uses RPC-backed writes for events, measurements and observations");

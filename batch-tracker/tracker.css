@@ -1907,3 +1907,551 @@ body[data-domain="mycology"] {
   --positive: #c17a52 !important;
   --valid: #c17a52 !important;
 }
+
+
+/* ============================================================
+   CULTUREOPS — couche de finition scientifique premium
+   Présentation uniquement : aucune modification du comportement métier.
+   ============================================================ */
+:root {
+  --ui-accent: #8eaf80;
+  --ui-accent-soft: rgba(142, 175, 128, .14);
+  --ui-line: rgba(155, 177, 157, .24);
+  --ui-elevation: 0 14px 34px rgba(0, 0, 0, .12);
+}
+body[data-domain="agronomy"] {
+  --ui-accent: #b4f477;
+  --ui-accent-soft: rgba(180, 244, 119, .11);
+  --ui-line: rgba(180, 244, 119, .22);
+}
+body[data-domain="mycology"] {
+  --ui-accent: #d18d65;
+  --ui-accent-soft: rgba(209, 141, 101, .12);
+  --ui-line: rgba(209, 141, 101, .24);
+}
+body[data-domain="laboratory"] {
+  --ui-accent: #78b6e5;
+  --ui-accent-soft: rgba(120, 182, 229, .12);
+  --ui-line: rgba(120, 182, 229, .24);
+}
+
+html { scroll-padding-top: 24px; }
+body { line-height: 1.55; }
+::selection { background: var(--ui-accent-soft); }
+
+.app-toolbar {
+  gap: 14px;
+  border-color: var(--ui-line);
+  box-shadow: var(--ui-elevation);
+}
+.toolbar-brand { flex-shrink: 0; }
+.section-nav { min-width: 0; flex-wrap: wrap; }
+.section-nav a {
+  min-height: 40px;
+  border-color: transparent;
+  border-radius: 10px;
+}
+.section-nav a[aria-current="page"] {
+  border-color: var(--ui-line);
+  background: var(--ui-accent-soft);
+}
+.toolbar-status { flex-shrink: 0; }
+
+.universe-home-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 38px;
+  margin: 0 0 14px;
+  padding: 8px 11px;
+  border: 1px solid var(--ui-line);
+  border-radius: 10px;
+  text-decoration: none;
+  font-size: 12px;
+  font-weight: 750;
+  transition: background-color .16s ease, border-color .16s ease;
+}
+.universe-home-link:hover {
+  background: var(--ui-accent-soft);
+  border-color: var(--ui-accent);
+}
+.universe-home-link:focus-visible,
+.section-nav a:focus-visible,
+.toolbar-brand:focus-visible {
+  outline: 2px solid var(--ui-accent);
+  outline-offset: 3px;
+}
+
+.card {
+  border-color: var(--ui-line);
+  box-shadow: var(--ui-elevation);
+}
+.card h2 { line-height: 1.25; }
+.card h2::before { background: var(--ui-accent); }
+.section-kicker {
+  letter-spacing: .12em;
+}
+.kicker-line {
+  opacity: .65;
+}
+input, select, textarea {
+  min-height: 44px;
+}
+textarea { resize: vertical; }
+button {
+  min-height: 44px;
+  letter-spacing: .005em;
+}
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--ui-accent);
+  outline-offset: 3px;
+}
+.batch-item,
+.overview-shortcut,
+.culture-catalog-action,
+.domain-option {
+  transition: border-color .16s ease, background-color .16s ease, transform .16s ease;
+}
+.batch-item:hover,
+.overview-shortcut:hover,
+.domain-option:hover {
+  border-color: var(--ui-accent);
+}
+.statistics-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  overflow: hidden;
+  border-radius: 12px;
+}
+.statistics-table th,
+.statistics-table td {
+  padding: 11px 13px;
+  line-height: 1.45;
+}
+.statistics-table th {
+  letter-spacing: .035em;
+}
+.stage, .qc-row, .batch-stat {
+  border-color: var(--ui-line);
+}
+.stage.active {
+  box-shadow: inset 3px 0 0 var(--ui-accent);
+}
+.progress-track { border: 1px solid var(--ui-line); }
+.progress-bar { background: var(--ui-accent); }
+.hint, .muted { line-height: 1.55; }
+
+@media (max-width: 980px) {
+  .app-toolbar {
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .toolbar-divider { display: none; }
+  .section-nav { order: 3; flex-basis: 100%; }
+  .toolbar-status { margin-left: auto; }
+}
+@media (max-width: 700px) {
+  .app-toolbar {
+    padding: 12px;
+    margin-bottom: 18px;
+    border-radius: 14px;
+  }
+  .section-nav {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px;
+  }
+  .section-nav a {
+    min-width: 0;
+    padding: 9px 8px;
+    font-size: 11px;
+  }
+  .toolbar-status {
+    min-height: 34px;
+    padding: 7px 9px;
+    font-size: 8px;
+  }
+  .toolbar-brand { min-width: 0; }
+  .universe-home-link { margin-bottom: 10px; }
+  .card { box-shadow: 0 8px 22px rgba(0, 0, 0, .10); }
+  .statistics-table { display: block; overflow-x: auto; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .universe-home-link, .section-nav a, .batch-item, .overview-shortcut,
+  .culture-catalog-action, .domain-option { transition: none !important; }
+}
+
+
+/* Contrast correction — Mycology keeps its light paper/terracotta canvas.
+   Keep dark ink on paper surfaces; reserve cream text for the dark hero only. */
+body[data-domain="mycology"] .card,
+body[data-domain="mycology"] .card h2,
+body[data-domain="mycology"] .card h3,
+body[data-domain="mycology"] .card p,
+body[data-domain="mycology"] .card li,
+body[data-domain="mycology"] .card label,
+body[data-domain="mycology"] .card legend,
+body[data-domain="mycology"] .card strong,
+body[data-domain="mycology"] .card .muted,
+body[data-domain="mycology"] .card small,
+body[data-domain="mycology"] .card .hint,
+body[data-domain="mycology"] .card .help-text,
+body[data-domain="mycology"] .card .field-hint,
+body[data-domain="mycology"] .card .section-kicker,
+body[data-domain="mycology"] .card .culture-catalog-meta,
+body[data-domain="mycology"] .card .culture-catalog-meta span,
+body[data-domain="mycology"] .card .statistics-table th,
+body[data-domain="mycology"] .card .statistics-table td,
+body[data-domain="mycology"] .card .culture-timeline-entry p {
+  color: #35251d !important;
+  -webkit-text-fill-color: #35251d !important;
+}
+body[data-domain="mycology"] .card .section-kicker > span:first-child,
+body[data-domain="mycology"] .card .req,
+body[data-domain="mycology"] .card .entry-step-mark {
+  color: #853d16 !important;
+  -webkit-text-fill-color: #853d16 !important;
+}
+body[data-domain="mycology"] #authCard input,
+body[data-domain="mycology"] .card input,
+body[data-domain="mycology"] .card select,
+body[data-domain="mycology"] .card textarea {
+  color: #35251d !important;
+  -webkit-text-fill-color: #35251d !important;
+  caret-color: #853d16 !important;
+  background-color: #fffaf4 !important;
+  border-color: #b9957d !important;
+}
+body[data-domain="mycology"] #authCard input::placeholder,
+body[data-domain="mycology"] .card input::placeholder,
+body[data-domain="mycology"] .card textarea::placeholder {
+  color: #755b4c !important;
+  -webkit-text-fill-color: #755b4c !important;
+  opacity: 1 !important;
+}
+body[data-domain="mycology"] #authStatus,
+body[data-domain="mycology"] #syncStatus,
+body[data-domain="mycology"] #batchList > .info,
+body[data-domain="mycology"] #message .card {
+  color: #35251d !important;
+  -webkit-text-fill-color: #35251d !important;
+  background: #fffaf4 !important;
+  border: 1px solid #c9a78f !important;
+  box-shadow: none !important;
+}
+body[data-domain="mycology"] #authStatus.success,
+body[data-domain="mycology"] #message .card.success {
+  color: #27472b !important;
+  -webkit-text-fill-color: #27472b !important;
+  background: #edf4e8 !important;
+  border-color: #a7c49b !important;
+}
+body[data-domain="mycology"] #authStatus.error,
+body[data-domain="mycology"] #message .card.error {
+  color: #782d25 !important;
+  -webkit-text-fill-color: #782d25 !important;
+  background: #fff0ed !important;
+  border-color: #d89a8f !important;
+}
+body[data-domain="mycology"] .consent-panel,
+body[data-domain="mycology"] .guided-entry-step,
+body[data-domain="mycology"] .batch-stat,
+body[data-domain="mycology"] .stage,
+body[data-domain="mycology"] .qc-row {
+  color: #35251d;
+  background: #fffaf4;
+  border-color: #d7bba6;
+}
+body[data-domain="mycology"] .stage.active {
+  background: #f4e4d7;
+  border-color: #a94f1d;
+}
+body[data-domain="mycology"] .stage.completed {
+  background: #f4eee4;
+}
+body[data-domain="mycology"] .progress-track {
+  background: #e5d7c8;
+}
+
+/* Keep controls and data tables usable on narrow screens. */
+#authCard { min-width: 0; }
+#authCard input { min-width: 0; }
+#batchCard, #measurementCard, #statisticsCard, #trackerCard { min-width: 0; }
+@media (max-width: 700px) {
+  .container { width: 100%; }
+  .app-hero {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+    padding: 22px 18px;
+    border-radius: 15px;
+  }
+  .hero-art { min-height: 110px; }
+  .hero-orbit { width: 110px; height: 110px; }
+  .orbit-two { width: 82px; height: 82px; }
+  .hero-core { width: 74px; height: 74px; }
+  .hero-core svg { width: 72px; height: 72px; }
+  .hero-note { right: 0; bottom: 0; }
+  #authCard { grid-template-columns: minmax(0, 1fr); }
+  #authCard .section-kicker,
+  #authCard h2,
+  #authCard .muted,
+  #authCard label,
+  #authCard input,
+  #authCard .auth-actions,
+  #authCard #authStatus,
+  #authCard #signOutButton { grid-column: 1; }
+  .guided-entry-step { padding: 12px; }
+  .grid, #measurementCard .grid { grid-template-columns: minmax(0, 1fr); }
+  .batch-grid, .batch-actions { grid-template-columns: minmax(0, 1fr); }
+  .qc-row { grid-template-columns: minmax(0, 1fr); }
+  .statistics-filters, .statistics-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+
+/* CultureOps data surfaces: clearer hierarchy for batch history and analysis. */
+.culture-detail {
+  padding: clamp(14px, 2vw, 22px);
+  border-radius: 14px;
+  border-color: var(--ui-line);
+  background: var(--surface);
+  box-shadow: var(--ui-elevation);
+}
+.culture-detail-field {
+  border-color: var(--ui-line);
+  background: var(--surface-2);
+  border-radius: 10px;
+}
+.culture-detail-field span,
+.culture-timeline-date,
+.statistics-summary-item span,
+.overview-metric-label {
+  font-size: 11px;
+  line-height: 1.45;
+}
+.culture-detail-field strong,
+.culture-timeline-entry strong {
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+.culture-detail-timeline { gap: 10px; }
+.culture-timeline-entry {
+  position: relative;
+  border-left: 3px solid var(--ui-accent);
+  border-radius: 0 10px 10px 0;
+  background: var(--surface-2);
+  padding: 13px 15px;
+  box-shadow: none;
+}
+.culture-timeline-entry p { line-height: 1.55; }
+.statistics-summary-item {
+  border-color: var(--ui-line);
+  background: var(--surface-2);
+  border-radius: 12px;
+}
+.statistics-summary-item strong {
+  font-size: clamp(20px, 2.3vw, 28px);
+  color: var(--ui-accent);
+}
+.statistics-chart {
+  border-color: var(--ui-line);
+  border-radius: 12px;
+  background: var(--surface);
+}
+.statistics-table-wrap {
+  border: 1px solid var(--ui-line);
+  border-radius: 12px;
+  background: var(--surface);
+}
+.statistics-table { overflow: hidden; }
+.statistics-table th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--surface-2);
+  color: var(--text);
+  border-bottom-color: var(--ui-line);
+}
+.statistics-table td { border-bottom-color: var(--ui-line); }
+.overview-observation,
+.overview-shortcut,
+.batch-item {
+  border-color: var(--ui-line);
+}
+.overview-observation {
+  background: var(--surface);
+  border-radius: 10px;
+}
+.overview-observation strong { color: var(--text); }
+.overview-observation time { font-variant-numeric: tabular-nums; }
+.stage {
+  grid-template-columns: 36px minmax(0, 1fr) auto;
+  border-color: var(--ui-line);
+  background: var(--surface);
+  border-radius: 10px;
+}
+.stage.active {
+  background: var(--ui-accent-soft);
+  border-color: var(--ui-accent);
+}
+.stage.completed { background: var(--surface-2); }
+.qc-row {
+  border-color: var(--ui-line);
+  background: var(--surface);
+  border-radius: 10px;
+}
+.progress-track { overflow: hidden; border-radius: 999px; }
+.progress-bar { border-radius: inherit; transition: width .25s ease; }
+
+body[data-domain="mycology"] .culture-detail,
+body[data-domain="mycology"] .culture-detail-field,
+body[data-domain="mycology"] .culture-timeline-entry,
+body[data-domain="mycology"] .statistics-summary-item,
+body[data-domain="mycology"] .statistics-chart,
+body[data-domain="mycology"] .statistics-table-wrap,
+body[data-domain="mycology"] .overview-observation {
+  background: #fffaf4;
+  border-color: #d7bba6;
+  box-shadow: none;
+  color: #35251d;
+}
+body[data-domain="mycology"] .culture-timeline-entry { border-left: 3px solid #a94f1d; }
+body[data-domain="mycology"] .statistics-summary-item strong { color: #853d16; }
+body[data-domain="mycology"] .statistics-table th { background: #eee1d4; }
+body[data-domain="mycology"] .stage.active { background: #f4e4d7; border-color: #a94f1d; }
+body[data-domain="mycology"] .progress-bar { background: #a94f1d; }
+body[data-domain="mycology"] .overview-observation strong { color: #35251d; }
+
+body[data-domain="laboratory"] .culture-detail,
+body[data-domain="laboratory"] .culture-detail-field,
+body[data-domain="laboratory"] .culture-timeline-entry,
+body[data-domain="laboratory"] .statistics-summary-item,
+body[data-domain="laboratory"] .statistics-chart,
+body[data-domain="laboratory"] .statistics-table-wrap,
+body[data-domain="laboratory"] .overview-observation {
+  background: #fff;
+  border-color: #c7d6e4;
+  color: #183a59;
+  box-shadow: 0 2px 9px rgba(24,58,89,.04);
+}
+body[data-domain="laboratory"] .culture-timeline-entry { border-left-color: #215b91; }
+body[data-domain="laboratory"] .statistics-summary-item strong { color: #215b91; }
+body[data-domain="laboratory"] .statistics-table th { background: #e4eef7; }
+body[data-domain="laboratory"] .stage.active { background: #e4eef7; border-color: #215b91; }
+body[data-domain="laboratory"] .progress-bar { background: #215b91; }
+body[data-domain="laboratory"] .overview-observation strong { color: #183a59; }
+
+body[data-domain="agronomy"] .culture-detail,
+body[data-domain="agronomy"] .culture-detail-field,
+body[data-domain="agronomy"] .culture-timeline-entry,
+body[data-domain="agronomy"] .statistics-summary-item,
+body[data-domain="agronomy"] .statistics-chart,
+body[data-domain="agronomy"] .statistics-table-wrap,
+body[data-domain="agronomy"] .overview-observation {
+  background: #202d25;
+  border-color: #35483d;
+  color: #f1f5ef;
+  box-shadow: none;
+}
+body[data-domain="agronomy"] .culture-detail-field span,
+body[data-domain="agronomy"] .culture-timeline-date,
+body[data-domain="agronomy"] .statistics-summary-item span { color: #b6c8bb; }
+body[data-domain="agronomy"] .culture-timeline-entry { border-left-color: #a7f36a; }
+body[data-domain="agronomy"] .culture-timeline-entry p,
+body[data-domain="agronomy"] .overview-observation p,
+body[data-domain="agronomy"] .overview-observation time { color: #d0ddd2; }
+body[data-domain="agronomy"] .statistics-summary-item strong { color: #d7f6c1; }
+body[data-domain="agronomy"] .statistics-table th { background: #19231e; color: #d7f6c1; }
+body[data-domain="agronomy"] .statistics-table td { color: #f1f5ef; border-bottom-color: #35483d; }
+body[data-domain="agronomy"] .stage { background: #19231e; color: #f1f5ef; }
+body[data-domain="agronomy"] .stage.active { background: #294638; border-color: #a7f36a; }
+body[data-domain="agronomy"] .stage.completed { background: #222f28; }
+body[data-domain="agronomy"] .overview-observation strong { color: #f1f5ef; }
+
+@media (max-width: 700px) {
+  .culture-detail { padding: 13px; }
+  .culture-detail-fields { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .culture-timeline-entry { grid-template-columns: minmax(0, 1fr); gap: 5px; }
+  .statistics-summary-item { padding: 11px; }
+  .statistics-table th, .statistics-table td { padding: 9px 10px; }
+  .stage { grid-template-columns: 28px minmax(0, 1fr); }
+  .stage-status { grid-column: 2; white-space: normal; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .progress-bar { transition: none; }
+}
+
+
+/* Final interaction pass: visible focus, explicit status, high-contrast mode. */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[tabindex]:focus-visible {
+  outline: 3px solid var(--ui-accent, #4b8b62);
+  outline-offset: 3px;
+  scroll-margin-block: 18px;
+}
+button:disabled,
+input:disabled,
+select:disabled,
+textarea:disabled {
+  cursor: not-allowed;
+}
+.status-pending,
+.status-active,
+.status-completed,
+.status-failed {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  line-height: 1.45;
+}
+.status-completed { font-weight: 700; }
+.status-failed { font-weight: 750; }
+.status-active { font-weight: 700; }
+.statistics-table tbody tr:hover td {
+  background: var(--ui-accent-soft, rgba(75,139,98,.07));
+}
+body[data-domain="mycology"] .statistics-table tbody tr:hover td {
+  background: #f4e4d7;
+}
+body[data-domain="laboratory"] .statistics-table tbody tr:hover td {
+  background: #edf4fb;
+}
+body[data-domain="agronomy"] .statistics-table tbody tr:hover td {
+  background: #293a30;
+}
+@media (forced-colors: active) {
+  a:focus-visible,
+  button:focus-visible,
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible,
+  [tabindex]:focus-visible {
+    outline: 3px solid Highlight;
+  }
+  .stage.active,
+  .stage.completed,
+  .stage.failed,
+  .status-pending,
+  .status-active,
+  .status-completed,
+  .status-failed {
+    border: 1px solid CanvasText;
+  }
+  .progress-track { border: 1px solid CanvasText; }
+  .progress-bar { background: Highlight; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+}
