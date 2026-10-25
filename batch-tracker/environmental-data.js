@@ -12,6 +12,30 @@
     return n;
   };
   const dateString = d => [d.getFullYear(), String(d.getMonth()+1).padStart(2,"0"), String(d.getDate()).padStart(2,"0")].join("-");
+  // Supabase FunctionsHttpError.context is a Response, not a parsed JSON object.
+  // Read its body from a clone so the original response remains untouched.
+  async function functionErrorMessage(error) {
+    const response = error?.context;
+    let detail = "";
+    const statusCode = Number(response?.status) || 0;
+    if (response && typeof response.clone === "function") {
+      try {
+        const copy = response.clone();
+        const contentType = copy.headers?.get("content-type") || "";
+        if (contentType.includes("json")) {
+          const payload = await copy.json();
+          detail = payload?.error || payload?.message || payload?.details || payload?.hint || "";
+        } else {
+          detail = (await copy.text()).trim();
+        }
+      } catch (_) {
+        // Fall back to the SDK message when the response body is empty or unreadable.
+      }
+    }
+    if (!detail) detail = error?.message || "Erreur inconnue";
+    detail = String(detail).replace(/\\s+/g, " ").slice(0, 500);
+    return statusCode ? "HTTP " + statusCode + " — " + detail : detail;
+  }
   async function init() {
     const plant = document.getElementById("plantCard");
     if (!plant || document.getElementById("environmentalCard")) return;
@@ -254,7 +278,7 @@
       try{
         const {data,error}=await db.functions.invoke("copernicus-sentinel-catalogue",{body:{location_id:location.value,start_date:from.value,end_date:to.value,limit:10,max_cloud_cover:60}});
         satelliteResults.replaceChildren();
-        if(error){satelliteResults.append(node("p",{class:"muted"},"Recherche satellite indisponible : "+(error.context?.json?.error||error.message)));return;}
+        if(error){satelliteResults.append(node("p",{class:"muted"},"Recherche satellite indisponible : "+await functionErrorMessage(error)));return;}
         if(!data?.ok){satelliteResults.append(node("p",{class:"muted"},"Catalogue indisponible : "+(data?.error||"réponse invalide")));return;}
         satelliteResults.append(node("p",{},data.scenes_found+" scène(s) trouvée(s), couverture nuageuse maximale de 60 %."));
         if(!data.scenes?.length){satelliteResults.append(node("p",{class:"muted"},"Aucune scène ne correspond à ces critères. Essayez une période plus longue ou un seuil nuageux plus élevé."));return;}
@@ -303,7 +327,7 @@
       status.textContent=forceRefresh?"Actualisation forcée en cours…":"Collecte en cours…";
       try{
         const {data,error}=await db.functions.invoke("nasa-power-agroclimate",{body:{location_id:location.value,start_date:from.value,end_date:to.value,refresh:forceRefresh}});
-        if(error){status.textContent="Échec : "+(error.context?.json?.error||error.message);return;}
+        if(error){status.textContent="Échec de la collecte météo : "+await functionErrorMessage(error);return;}
         if(data?.ok){
           const detail=data.cached
             ? "Cache réutilisé ; "+(data.variables_checked??0)+" variables principales vérifiées."
