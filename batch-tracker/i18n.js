@@ -1511,6 +1511,17 @@
     const dict = dictionaries[lang] || {};
     if (dict[source]) return value.replace(source, dict[source]);
 
+    // Translate known French phrases embedded in dynamic chart labels while
+    // preserving dates, numeric values, and units that are assembled at runtime.
+    let embeddedResult = value;
+    const embeddedEntries = Object.entries(dict)
+      .filter(([key]) => normalize(key).length >= 12 && !/\\s$/.test(key))
+      .sort((a, b) => b[0].length - a[0].length);
+    for (const [key, translated] of embeddedEntries) {
+      if (embeddedResult.includes(key)) embeddedResult = embeddedResult.split(key).join(translated);
+    }
+    if (embeddedResult !== value) return embeddedResult;
+
     // Translate known French prefixes used to build dynamic labels (for example,
     // "Démarrage : " + date or "Ajouter une observation à " + culture code).
     // Keep the remainder untouched and require a word boundary to avoid
