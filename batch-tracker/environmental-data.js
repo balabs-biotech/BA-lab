@@ -79,7 +79,13 @@
     const satelliteViewControls=node("div",{id:"satelliteViewControls",style:"display:flex;flex-wrap:wrap;gap:8px;margin:10px 0"});
     const satelliteModeHelp=node("p",{class:"muted"},"Choisissez d’abord une scène Sentinel-2 dans la liste, puis un rendu. NDVI = intensité relative de végétation ; couleurs naturelles = apparence proche de l’œil humain ; fausses couleurs infrarouges = végétation généralement plus contrastée. L’indice UV est une mesure atmosphérique météo, pas une bande d’imagerie Sentinel-2.");
     const satelliteNDVILegend=node("div",{id:"satelliteNDVILegend",style:"display:flex;flex-wrap:wrap;gap:7px;margin:8px 0 14px;font-size:12px"});
-    satelliteNDVILegend.append(node("p",{class:"muted"},"Légende du produit NDVI MODIS : la palette NASA n’est pas une échelle qualitative universelle. Interpréter les valeurs avec la date, la phénologie et la résolution spatiale."));
+    satelliteNDVILegend.append(node("p",{class:"muted"},"Repères NDVI Sentinel-2 (classes indicatives, non universelles) :"));
+    [["#68529e","< −0,05","Eau / valeurs négatives"],["#a6423a","−0,05 à 0,10","Très faible signal végétal"],["#d67e37","0,10 à 0,20","Faible"],["#e7c04c","0,20 à 0,35","Intermédiaire faible"],["#a1c551","0,35 à 0,50","Intermédiaire"],["#4ca653","0,50 à 0,65","Végétation plus active"],["#18703a","> 0,65","Signal végétal élevé"]].forEach(([color,range,label])=>{
+      const swatch=node("div",{style:"display:flex;align-items:center;gap:6px;min-width:145px;flex:1"});
+      swatch.append(node("span",{style:"display:inline-block;width:18px;height:18px;flex:0 0 18px;border-radius:4px;background:"+color+";border:1px solid #ffffff55"}),node("span",{},range+" · "+label));
+      satelliteNDVILegend.append(swatch);
+    });
+    satelliteNDVILegend.append(node("p",{class:"muted"},"Les pixels transparents correspondent à des données invalides ou masquées, pas à une absence certaine de végétation. Les classes dépendent de la saison, du couvert, du sol et du masque nuageux ; elles ne constituent pas un diagnostic de culture."));
     satelliteMapPanel.append(satelliteMapStatus,satelliteMap,satelliteViewControls,satelliteMapLegend,satelliteModeHelp,satelliteNDVILegend);
     const sentinelHighResNote=node("p",{class:"muted"},"Pour examiner les limites de champs et les parcelles, utilisez l’explorateur Sentinel-2 L2A à 10 m. Cette vue externe exploite les bandes multispectrales de Sentinel-2 ; elle ne remplace pas une analyse agronomique validée.");
     const sentinelHighResLink=node("a",{href:"https://sentinel-2.allthingsspatial.io/",target:"_blank",rel:"noopener noreferrer"},"Ouvrir l’explorateur Sentinel-2 haute résolution (10 m) ↗");
