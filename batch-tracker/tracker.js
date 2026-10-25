@@ -5628,7 +5628,25 @@ async function loadStatistics() {
     addSummary(L.loadedMeasurements,String(rows.length)); addSummary(L.numericValues,String(prepared.length)); addSummary(L.comparableValues,String(plotted.length));
     status.textContent = rows.length >= 1000 ? L.capped : rows.length ? (excluded ? L.excluded(excluded) : "") + L.loaded : L.empty;
     chart.innerHTML = "";
-    if (plotted.length < 2) { chart.innerHTML = '<p class="muted">' + L.needTwo + '</p>'; }
+    if (plotted.length < 2) {
+      const demoSets = {
+        agronomy: { title: "GreenTech · suivi végétal illustratif", metric: "Humidité relative", unit: "%", values: [61, 64, 60, 68, 66, 71, 69], stroke: "#65b982" },
+        mycology: { title: "Mycologie · incubation illustrative", metric: "Température d’incubation", unit: "°C", values: [21.2, 21.8, 22.1, 21.7, 22.4, 22.0, 21.9], stroke: "#d78b56" },
+        laboratory: { title: "Laboratoire · mesures illustratives", metric: "pH", unit: "pH", values: [6.2, 6.4, 6.35, 6.5, 6.45, 6.6, 6.55], stroke: "#69a9e0" }
+      };
+      const demo = demoSets[domain] || demoSets.laboratory;
+      const width=760,height=290,left=64,right=22,top=40,bottom=48,values=demo.values,min=Math.min(...values),max=Math.max(...values),span=max-min||1;
+      const x=i=>left+i*(width-left-right)/(values.length-1), y=value=>top+20+(max-value)*(height-top-bottom-20)/span, ns="http://www.w3.org/2000/svg", svg=document.createElementNS(ns,"svg");
+      svg.setAttribute("viewBox","0 0 "+width+" "+height); svg.setAttribute("role","img"); svg.setAttribute("aria-label",demo.title+" — "+demo.metric); svg.classList.add("statistics-demo-svg");
+      const title=document.createElementNS(ns,"text"); title.setAttribute("x",left); title.setAttribute("y",20); title.setAttribute("font-size","14"); title.setAttribute("font-weight","700"); title.setAttribute("fill","currentColor"); title.textContent=demo.title; svg.appendChild(title);
+      for(let tick=0;tick<5;tick++){const value=min+span*tick/4,yy=y(value),line=document.createElementNS(ns,"line");line.setAttribute("x1",left);line.setAttribute("x2",width-right);line.setAttribute("y1",yy);line.setAttribute("y2",yy);line.setAttribute("stroke","currentColor");line.setAttribute("stroke-opacity",".16");svg.appendChild(line);const label=document.createElementNS(ns,"text");label.setAttribute("x",left-9);label.setAttribute("y",yy+4);label.setAttribute("text-anchor","end");label.setAttribute("font-size","11");label.setAttribute("fill","currentColor");label.textContent=Number(value.toPrecision(3)).toString();svg.appendChild(label);}
+      const polyline=document.createElementNS(ns,"polyline");polyline.setAttribute("points",values.map((value,i)=>x(i)+","+y(value)).join(" "));polyline.setAttribute("fill","none");polyline.setAttribute("stroke",demo.stroke);polyline.setAttribute("stroke-width","3");polyline.setAttribute("stroke-linecap","round");polyline.setAttribute("stroke-linejoin","round");svg.appendChild(polyline);
+      values.forEach((value,i)=>{const circle=document.createElementNS(ns,"circle");circle.setAttribute("cx",x(i));circle.setAttribute("cy",y(value));circle.setAttribute("r","4");circle.setAttribute("fill",demo.stroke);const pointTitle=document.createElementNS(ns,"title");pointTitle.textContent="Point illustratif "+(i+1)+": "+value+" "+demo.unit;circle.appendChild(pointTitle);svg.appendChild(circle);});
+      const axis=document.createElementNS(ns,"text");axis.setAttribute("x",(left+width-right)/2);axis.setAttribute("y",height-10);axis.setAttribute("text-anchor","middle");axis.setAttribute("font-size","11");axis.setAttribute("fill","currentColor");axis.textContent="Séquence illustrative";svg.appendChild(axis);
+      chart.appendChild(svg);
+      const note=document.createElement("p");note.className="statistics-demo-note";note.textContent="DONNÉES DE DÉMONSTRATION — exemple synthétique uniquement. Non mesuré, non enregistré et jamais mélangé aux données de l’organisation.";chart.appendChild(note);
+      const explanation=document.createElement("p");explanation.className="muted";explanation.textContent=L.needTwo;chart.appendChild(explanation);
+    } else {
     else {
       const width=760,height=270,left=64,right=20,top=22,bottom=50,values=plotted.map(row=>row.plotValue),min=Math.min(...values),max=Math.max(...values),span=max-min||Math.max(Math.abs(max)*.1,1);
       const x=i=>left+i*(width-left-right)/(plotted.length-1), y=value=>top+(max-value)*(height-top-bottom)/span, ns="http://www.w3.org/2000/svg", svg=document.createElementNS(ns,"svg");
