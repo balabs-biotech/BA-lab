@@ -71,17 +71,13 @@
     form.append(field("Emplacement","envLocation",location),field("Du","envFrom",from),field("Au","envTo",to),run,coordinates);
     const satelliteHint=node("p",{class:"muted"},"Sentinel-2 : scènes disponibles et couverture nuageuse. L’image ne constitue pas à elle seule un diagnostic de culture.");
     const satelliteMapPanel=node("section",{class:"card",id:"satelliteColorMapPanel"});
-    satelliteMapPanel.append(node("h3",{},"Carte satellitaire colorée"));
-    satelliteMapPanel.append(node("p",{class:"muted"},"Vue régionale en couleurs NDVI MODIS sur 16 jours, ou en couleur naturelle. La couche MODIS est de l’ordre du kilomètre : elle sert de contexte régional, pas de mesure d’une parcelle ou d’une serre."));
+    satelliteMapPanel.append(node("h3",{},"Télédétection optique — réflectance et indices de végétation"));
+    satelliteMapPanel.append(node("p",{class:"muted"},"Imagerie MODIS Terra en réflectance visible et indice différentiel normalisé de végétation (NDVI), composite de 16 jours. Résolution régionale kilométrique : utile pour le contexte paysager, insuffisante pour caractériser individuellement une serre ou une planche."));
     const satelliteMapStatus=node("p",{class:"muted","aria-live":"polite"},"Aperçu régional centré sur Sétif. Sélectionnez un emplacement enregistré pour recadrer la carte sur ses coordonnées.");
-    const satelliteMap=node("div",{id:"satelliteColorMap","aria-label":"Carte satellite avec couches colorées de végétation et couleur naturelle",style:"height:340px;min-height:280px;width:100%;border-radius:10px;overflow:hidden;background:#111827"});
-    const satelliteMapLegend=node("p",{class:"muted"},"NDVI : couleurs du produit satellite NASA GIBS ; indice de végétation régional, pas diagnostic de santé des plantes. Le cercle en pointillés illustre environ 1 km autour du point, à titre de repère d’échelle, pas comme limite de parcelle.");
+    const satelliteMap=node("div",{id:"satelliteColorMap","aria-label":"Carte de télédétection avec imagerie en réflectance visible et couche NDVI",style:"height:340px;min-height:280px;width:100%;border-radius:10px;overflow:hidden;background:#111827"});
+    const satelliteMapLegend=node("p",{class:"muted"},"NDVI MODIS : rendu colorimétrique natif NASA GIBS. Les faibles valeurs peuvent apparaître très claires ou transparentes dans cette palette ; l’absence de vert vif ne prouve pas l’absence de cultures. Indicateur régional, pas diagnostic de santé des plantes. Le cercle en pointillés est un repère d’échelle, pas une limite de parcelle.");
     const satelliteNDVILegend=node("div",{id:"satelliteNDVILegend",style:"display:flex;flex-wrap:wrap;gap:7px;margin:8px 0 14px;font-size:12px"});
-    [["#785ab4","NDVI < 0 · eau / surfaces non végétalisées"],["#b4463c","0–0,15 · végétation très faible"],["#eba537","0,15–0,30 · végétation faible"],["#dcdc5a","0,30–0,45 · végétation intermédiaire"],["#64be5f","0,45–0,60 · végétation active"],["#147337","> 0,60 · végétation dense"]].forEach(([color,label])=>{
-      const item=node("span",{style:"display:inline-flex;align-items:center;gap:5px;padding:4px 7px;border:1px solid #64748b55;border-radius:999px"});
-      item.append(node("span",{style:"display:inline-block;width:10px;height:10px;border-radius:50%;background:"+color,"aria-hidden":"true"}),document.createTextNode(label));
-      satelliteNDVILegend.append(item);
-    });
+    satelliteNDVILegend.append(node("p",{class:"muted"},"Légende du produit NDVI MODIS : la palette NASA n’est pas une échelle qualitative universelle. Interpréter les valeurs avec la date, la phénologie et la résolution spatiale."));
     satelliteMapPanel.append(satelliteMapStatus,satelliteMap,satelliteMapLegend,satelliteNDVILegend);
     const satelliteButton=node("button",{type:"button"},"Chercher les images satellite");
     const satelliteResults=node("div",{id:"satelliteResults",class:"overview-observations","aria-live":"polite"});
@@ -206,16 +202,19 @@
           "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/MODIS_Terra_CorrectedReflectance_TrueColor/default/"+(to.value||composite)+"/GoogleMapsCompatible_Level9/{z}/{y}/{x}.jpg",
           {maxZoom:9,opacity:0.92,attribution:'Imagerie &copy; <a href="https://earthdata.nasa.gov/" target="_blank" rel="noopener noreferrer">NASA GIBS / MODIS</a>',crossOrigin:true}
         );
-        satelliteLayerControl.addOverlay(satelliteNDVILayer,"Végétation colorée — NDVI MODIS (16 jours)");
-        satelliteLayerControl.addOverlay(satelliteTrueColorLayer,"Satellite — couleur naturelle");
-        satelliteNDVILayer.addTo(satelliteLeafletMap);
+        satelliteLayerControl.addOverlay(satelliteNDVILayer,"Indice spectral de végétation — NDVI MODIS");
+        satelliteLayerControl.addOverlay(satelliteTrueColorLayer,"Réflectance visible — composition en couleurs naturelles");
+        // Default to natural-colour imagery: it shows the landscape and cultivated patterns
+        // more intuitively. Keep NDVI as an explicit analytical overlay to avoid implying
+        // that the native NASA NDVI palette is a simple green=vegetation classification.
+        satelliteTrueColorLayer.addTo(satelliteLeafletMap);
         satelliteNDVILayer.on("tileerror",()=>{
-          satelliteMapStatus.textContent="Le fond cartographique reste disponible, mais NASA GIBS n’a pas fourni les tuiles NDVI pour le composite "+composite+". Essayez une autre date ou activez « Satellite — couleur naturelle » dans le sélecteur de couches.";
+          satelliteMapStatus.textContent="Le fond cartographique reste disponible, mais NASA GIBS n’a pas fourni les tuiles NDVI pour le composite "+composite+". Essayez une autre date ou activez « Réflectance visible — composition en couleurs naturelles » dans le sélecteur de couches.";
         });
         satelliteTrueColorLayer.on("tileerror",()=>{satelliteMapStatus.textContent="Le fond cartographique reste disponible ; la couche couleur naturelle n’est pas disponible pour la date choisie. La couche NDVI peut rester visible.";});
         satelliteMapStatus.textContent=hasValidCoordinates
-          ?"NDVI MODIS régional chargé autour de l’emplacement sélectionné · composite de 16 jours du "+composite+". Résolution trop grossière pour distinguer une serre ou des planches."
-          :"Aperçu régional centré sur Sétif · composite NDVI MODIS de 16 jours du "+composite+". Cette vue sert à présenter la carte et ne représente pas les coordonnées exactes de BA Labs. Choisissez un emplacement enregistré pour recadrer.";
+          ?"Imagerie MODIS Terra en réflectance visible chargée autour de l’emplacement sélectionné. Activez la couche NDVI pour examiner l’indice spectral ; la résolution reste régionale."
+          :"Aperçu régional MODIS Terra centré sur Sétif, en réflectance visible. Cette vue montre le paysage régional mais ne représente pas les coordonnées exactes de BA Labs. Choisissez un emplacement enregistré pour recadrer.";
         requestAnimationFrame(()=>satelliteLeafletMap&&satelliteLeafletMap.invalidateSize());
       }catch(error){
         satelliteMapStatus.textContent=(error?.message||"Carte indisponible")+" ; la vue régionale reste en attente du chargement de Leaflet.";
