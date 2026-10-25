@@ -13,6 +13,7 @@ const checks = [
   ["caps results at ten scenes in the UI", /limit:10/],
   ["requests a conservative scene cloud-cover threshold", /max_cloud_cover:60/],
   ["renders scene details with DOM text nodes", /node\("strong",\{\},scene\.acquired_at/],
+  ["offers an in-app map action for each Sentinel-2 scene instead of relying only on an external map link", /Afficher cette date sur la carte BA Labs[\s\S]*?updateSatelliteMap\(\)/],
   ["opens catalogue links in a protected new tab", /target:"_blank",rel:"noopener noreferrer"/],
   ["renders catalogue-provided preview images", /if\(scene\.preview_url\)[\s\S]*?node\("img"/],
   ["ranks a review candidate by lower scene-wide cloud cover then recency", /rankedScenes=\[\.\.\.data\.scenes\][\s\S]*?return cloudA-cloudB\|\|dateB-dateA/],
