@@ -435,11 +435,19 @@
       satelliteButton.disabled=true;
       satelliteResults.replaceChildren(node("p",{class:"muted"},"Recherche de scènes Sentinel-2…"));
       try{
-        const {data,error}=await db.functions.invoke("copernicus-sentinel-catalogue",{body:{location_id:location.value,start_date:from.value,end_date:to.value,limit:10,max_cloud_cover:60}});
+        let {data,error}=await db.functions.invoke("copernicus-sentinel-catalogue",{body:{location_id:location.value,start_date:from.value,end_date:to.value,limit:10,max_cloud_cover:60}});
+        let catalogueSource="Copernicus Data Space";
+        // OAuth-free fallback: public Sentinel-2 COG catalogue on AWS Open Data.
+        if(error||!data?.ok||!Array.isArray(data?.scenes)||data.scenes.length===0){
+          const fallback=await db.functions.invoke("earth-search-sentinel2-catalogue",{body:{location_id:location.value,start_date:from.value,end_date:to.value,limit:10,max_cloud_cover:60}});
+          if(!fallback.error&&fallback.data?.ok){
+            data=fallback.data;error=null;catalogueSource="Earth Search / AWS Open Data (sans OAuth)";
+          }
+        }
         satelliteResults.replaceChildren();
         if(error){satelliteResults.append(node("p",{class:"muted"},"Recherche satellite indisponible : "+await functionErrorMessage(error)));return;}
         if(!data?.ok){satelliteResults.append(node("p",{class:"muted"},"Catalogue indisponible : "+(data?.error||"réponse invalide")));return;}
-        satelliteResults.append(node("p",{},data.scenes_found+" scène(s) trouvée(s), couverture nuageuse maximale de 60 %."));
+        satelliteResults.append(node("p",{},data.scenes_found+" scène(s) trouvée(s) via "+catalogueSource+", couverture nuageuse maximale de 60 %."));
         if(!data.scenes?.length){satelliteResults.append(node("p",{class:"muted"},"Aucune scène ne correspond à ces critères. Essayez une période plus longue ou un seuil nuageux plus élevé."));return;}
         const rankedScenes=[...data.scenes].sort((a,b)=>{
           const cloudA=Number.isFinite(a.cloud_cover_percent)?a.cloud_cover_percent:101;
@@ -496,7 +504,7 @@
           if(scene.catalogue_item_url){const a=node("a",{href:scene.catalogue_item_url,target:"_blank",rel:"noopener noreferrer"},"Ouvrir la fiche de la scène");item.append(a);}
           satelliteResults.append(item);
         });
-        satelliteResults.append(node("p",{class:"muted"},"Les aperçus sont des vignettes de catalogue, pas une analyse de la parcelle. Le calcul NDVI à partir des bandes Sentinel-2 et l’analyse fine des zones restent à intégrer."));
+        satelliteResults.append(node("p",{class:"muted"},catalogueSource.includes("Earth Search")?"Source de secours publique, sans OAuth. Les vignettes sont des aperçus de catalogue ; les bandes Sentinel-2 sont en COG à 10 m, mais le calcul NDVI et la cartographie colorée des zones ne sont pas encore produits par ce catalogue.":"Les aperçus sont des vignettes de catalogue, pas une analyse de la parcelle. Le calcul NDVI à partir des bandes Sentinel-2 et l’analyse fine des zones restent à intégrer."));
       }catch(e){satelliteResults.replaceChildren(node("p",{class:"muted"},"Échec de la recherche : "+(e?.message||"erreur inconnue")));}
       finally{satelliteButton.disabled=false;}
     }
