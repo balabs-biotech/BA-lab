@@ -6481,7 +6481,8 @@ function setupQuickCapture() {
     if (!variableMatched) warnings.push("sélectionnez le paramètre ou la catégorie manuellement");
     if (payload.kind === "measurement" && !(typeof payload.value === "number" && Number.isFinite(payload.value))) warnings.push("vérifiez ou saisissez la valeur numérique");
     if (payload.kind === "observation" && (payload.value == null || !String(payload.value).trim())) warnings.push("ajoutez la description de l’observation");
-    if (unitMismatch) warnings.push("vérifiez l’unité, qui ne correspond pas exactement au référentiel");
+    if (payload.kind === "measurement" && (payload.unit == null || !String(payload.unit).trim())) warnings.push("sélectionnez l’unité manuellement");
+    else if (unitMismatch) warnings.push("vérifiez l’unité, qui ne correspond pas exactement au référentiel");
     setAiStatus(
       warnings.length
         ? "Préremplissage partiel : " + warnings.join(" ; ") + ". Rien n’a été enregistré ; vérifiez le formulaire."
