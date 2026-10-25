@@ -70,7 +70,6 @@
     const satelliteHint=node("p",{class:"muted"},"Sentinel-2 : scènes disponibles et couverture nuageuse. L’image ne constitue pas à elle seule un diagnostic de culture.");
     const satelliteMapPanel=node("section",{class:"card",id:"satelliteColorMapPanel"});
     satelliteMapPanel.append(node("h3",{},"Carte satellite"));
-    satelliteMapPanel.append(node("p",{class:"muted"},"Imagerie MODIS Terra en réflectance visible et indice différentiel normalisé de végétation (NDVI), composite de 16 jours. Résolution régionale kilométrique : utile pour le contexte paysager, insuffisante pour caractériser individuellement une serre ou une planche."));
     const satelliteMapStatus=node("p",{class:"muted","aria-live":"polite"},"Aperçu régional centré sur Sétif. Sélectionnez un emplacement enregistré pour recadrer la carte sur ses coordonnées.");
     const satelliteMap=node("div",{id:"satelliteColorMap","aria-label":"Carte de télédétection avec imagerie en réflectance visible et couche NDVI",style:"height:340px;min-height:280px;width:100%;border-radius:10px;overflow:hidden;background:#111827"});
     const satelliteMapLegend=node("p",{class:"muted"},"La vue régionale MODIS est un contexte paysager à résolution kilométrique : elle ne permet pas de conclure qu’une parcelle ou toute la région est dépourvue de végétation. Les pixels sans données ne doivent pas être interprétés comme des sols nus.");
@@ -475,7 +474,7 @@
     async function searchSatellite(){
       if(!location.value||!from.value||!to.value||from.value>to.value){satelliteMapStatus.textContent="Site satellite non configuré.";return;}
       const days=(Date.parse(to.value)-Date.parse(from.value))/86400000+1;
-      if(days>180){satelliteResults.textContent="La recherche satellite est limitée à 180 jours. Réduisez la période.";return;}
+      if(days>180){satelliteMapStatus.textContent="Période satellite trop longue.";return;}
       satelliteButton.disabled=true;
       satelliteMapStatus.textContent="Recherche de la dernière image satellite…";
       try{
@@ -581,7 +580,7 @@
     }
     panel.classList.remove("hidden");
     await loadLocations();
-    if(location.value){await loadRows();await searchSatellite();}
+    if(location.value){loadRows();searchSatellite();}
   }
   const watch=new MutationObserver(()=>{if(document.getElementById("plantCard")){watch.disconnect();init().catch(e=>console.error("Environmental context",e));}});
   watch.observe(document.getElementById("workspace-root")||document.body,{childList:true,subtree:true});
