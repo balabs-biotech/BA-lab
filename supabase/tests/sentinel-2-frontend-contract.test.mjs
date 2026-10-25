@@ -1,10 +1,10 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 
-const source = await readFile(
-  new URL("../../batch-tracker/environmental-data.js", import.meta.url),
-  "utf8",
-);
+const [source, entry] = await Promise.all([
+  readFile(new URL("../../batch-tracker/environmental-data.js", import.meta.url), "utf8"),
+  readFile(new URL("../../batch-tracker/green-tech/index.html", import.meta.url), "utf8"),
+]);
 const checks = [
   ["loads the satellite panel immediately after the Green Tech hero", /hero\.parentNode\.insertBefore\(panel,hero\.nextSibling\)/],
   ["restores the last used location automatically", /localStorage\.getItem\("ba-labs-active-environment-location"\)/],
