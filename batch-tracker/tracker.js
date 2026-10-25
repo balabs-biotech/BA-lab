@@ -6022,6 +6022,22 @@ function updateOverview() {
   batchCount.textContent = String(latestBatches.length);
   observationCount.textContent = String(recentObservations.length);
 
+  // These meters show the share of the current fetch limit used, not database completeness.
+  const meterSpecs = [
+    { id: "overviewCultureMeter", value: cultureCount.textContent, limit: 100, note: "overviewCultureNote", track: cultureCount.closest(".overview-metric")?.querySelector(".overview-meter") },
+    { id: "overviewBatchMeter", value: batchCount.textContent, limit: 30, note: "overviewBatchNote", track: batchCount.closest(".overview-metric")?.querySelector(".overview-meter") },
+    { id: "overviewObservationMeter", value: observationCount.textContent, limit: 8, note: "overviewObservationNote", track: observationCount.closest(".overview-metric")?.querySelector(".overview-meter") }
+  ];
+  meterSpecs.forEach(({ id, value, limit, note, track }) => {
+    const count = Math.max(0, Number(value) || 0);
+    const percent = Math.min(100, Math.round((count / limit) * 100));
+    const fill = document.getElementById(id);
+    if (fill) fill.style.width = percent + "%";
+    if (track) track.setAttribute("aria-valuenow", String(Math.min(count, limit)));
+    const noteElement = document.getElementById(note);
+    if (noteElement) noteElement.textContent = count + " chargé(s) · limite technique " + limit;
+  });
+
   if (!recentObservations.length) {
     observationsPanel.innerHTML = '<p class="muted">Aucune observation récente chargée. Vous pouvez en enregistrer une depuis le module Données.</p>';
     return;
