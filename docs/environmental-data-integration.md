@@ -10,7 +10,7 @@ Add environmental context to a user's own locations and Agritech units without m
 
 Use the public REST API first for daily historical agroclimate context. It requires latitude/longitude and does not require a user API key. It provides analysis-ready solar and meteorological variables, with daily history from 1981 to near-real-time. It is not a live weather-station feed or a short-term forecast. NASA documents meteorological source resolution around 0.5 x 0.625 degrees (roughly 50 km) and solar data around 1 degree (roughly 100 km); recent data may be revised as higher-quality products replace near-real-time data.
 
-Start with daily variables selected from the NASA POWER parameter dictionary, for example daily mean/min/max air temperature, precipitation and solar radiation. Confirm the exact parameter names, units and community before mapping values into BA Labs' canonical variable/unit vocabulary. Store UTC timestamps or explicit source time standard, not an unlabelled local date.
+Start with daily variables selected from the NASA POWER parameter dictionary, including daily mean/min/max air temperature, precipitation, solar radiation and `ALLSKY_SFC_UV_INDEX` (mapped internally to `uv_index_daily_mean`). The UV variable is a daily estimate on a coarse solar grid; it must not be described as the instantaneous or midday maximum UV index. Confirm parameter names, units and community before mapping values into BA Labs' canonical variable/unit vocabulary. Store UTC timestamps or explicit source time standard, not an unlabelled local date.
 
 Official docs:
 - https://power.larc.nasa.gov/docs/services/api/
