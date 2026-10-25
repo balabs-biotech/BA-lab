@@ -141,7 +141,7 @@
         const blob=await response.blob();
         if(!blob.size||blob.type!=="image/png")throw new Error("Le service n’a pas renvoyé une image PNG valide.");
         const objectUrl=URL.createObjectURL(blob);
-        if(satelliteSentinelNDVILayer){satelliteLeafletMap.removeLayer(satelliteSentinelNDVILayer);}
+        if(satelliteSentinelNDVILayer){satelliteLayerControl.removeLayer(satelliteSentinelNDVILayer);satelliteLeafletMap.removeLayer(satelliteSentinelNDVILayer);}
         if(satelliteSentinelObjectUrl)URL.revokeObjectURL(satelliteSentinelObjectUrl);
         satelliteSentinelObjectUrl=objectUrl;
         satelliteSentinelNDVILayer=L.imageOverlay(objectUrl,[[south,west],[north,east]],{opacity:0.88,interactive:true});
