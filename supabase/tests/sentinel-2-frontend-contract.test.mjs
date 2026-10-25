@@ -1,9 +1,10 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 
-const [source, entry] = await Promise.all([
+const [source, entry, i18n] = await Promise.all([
   readFile(new URL("../../batch-tracker/environmental-data.js", import.meta.url), "utf8"),
   readFile(new URL("../../batch-tracker/green-tech/index.html", import.meta.url), "utf8"),
+  readFile(new URL("../../batch-tracker/i18n.js", import.meta.url), "utf8"),
 ]);
 const checks = [
   ["loads the satellite panel immediately after the Green Tech hero", /hero\.parentNode\.insertBefore\(panel,hero\.nextSibling\)/],
@@ -22,8 +23,14 @@ const checks = [
   ["automatically imports weather history when Green Tech opens", /if\(location\.value\)\{importWeather\(false\);if\(lat\.value!==""&&lon\.value!==""\)searchSatellite\(\)/],
   ["compares the two latest real UV dates without manual date entry", /Comparatif UV automatique[\s\S]*?uvDays\[uvDays\.length-2\][\s\S]*?uvDays\[uvDays\.length-1\]/],
   ["builds a vegetation chart from real NDVI raster statistics", /X-NDVI-Stats[\s\S]*?function renderVegetationChart[\s\S]*?NDVI moyen/],
+  ["shows a coverage-aware agronomic synthesis", /function renderAgroSynthesis[\s\S]*?Couverture météo[\s\S]*?Les dates sans valeur ne sont pas assimilées à zéro/],
+  ["keeps satellite acquisition dates independent from the weather period", /Keep the weather date range independent from the satellite acquisition date/],
+  ["compares NDVI only against a previous scene with at most 30% cloud cover", /previousScene=rankedScenes\.find\(scene=>Number\(scene\.cloud_cover_percent\)<=30/],
  ];
-assert.match(entry, /environmental-data\.js\?v=20261026-weather-charts-1/, "uses a cache-busted module path in the Green Tech entry page");
+assert.match(entry, /environmental-data\.js\?v=20261026-agro-coherence-1/, "uses a cache-busted environmental module path");
+assert.match(entry, /i18n\.js\?v=20261026-green-tech-i18n-1/, "uses a cache-busted localization module path");
+assert.match(i18n, /Lecture agronomique/, "contains localized agronomic synthesis labels");
+assert.match(i18n, /Vegetation trend \\(NDVI\\)/, "contains localized satellite chart labels");
 for (const [label, pattern] of checks) {
   assert.match(source, pattern, label);
   console.log(`✓ ${label}`);
