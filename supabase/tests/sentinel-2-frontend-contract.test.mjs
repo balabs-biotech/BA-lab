@@ -18,7 +18,7 @@ const checks = [
   ["renders the returned raster as an in-app map overlay", /L\.imageOverlay\(objectUrl,\[\[south,west\],\[north,east\]\]/],
   ["uses a compact image date and NDVI status", /satelliteMapStatus\.textContent="Sentinel-2 · "\+sceneDate/],
   ["keeps the last image when a new request fails", /Dernière image conservée/],
-  ["renders weather charts directly below the satellite map", /panel\.append\(satelliteMapPanel,vegetationChart,weatherCharts,uvComparisonPanel\)/],
+  ["renders weather charts directly below the satellite map", /panel\.append\(satelliteMapPanel,vegetationChart,agroSynthesisPanel,weatherCharts,uvComparisonPanel\)/],
   ["keeps weather charts visible by default", /\[form,status,satelliteHint,satelliteButton,satelliteResults,details\]\.forEach\(el=>el\.style\.display="none"\)/],
   ["automatically imports weather history when Green Tech opens", /if\(location\.value\)\{importWeather\(false\);if\(lat\.value!==""&&lon\.value!==""\)searchSatellite\(\)/],
   ["compares the two latest real UV dates without manual date entry", /Comparatif UV automatique[\s\S]*?uvDays\[uvDays\.length-2\][\s\S]*?uvDays\[uvDays\.length-1\]/],
