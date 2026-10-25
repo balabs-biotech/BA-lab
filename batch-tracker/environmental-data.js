@@ -60,8 +60,10 @@
     const summary=node("div",{id:"envSummary",class:"overview-observations","aria-live":"polite"});
     const results=node("div",{id:"envResults",class:"overview-observations"});
     const vegetationChart=node("section",{id:"vegetationTrendPanel",class:"card environmental-weather-chart","aria-live":"polite"});
+    const agroSynthesisPanel=node("section",{id:"agroSynthesisPanel",class:"card","aria-live":"polite"});
     const uvComparisonPanel=node("section",{id:"uvComparisonPanel",class:"card","aria-live":"polite"});
     vegetationChart.append(node("h3",{},"Évolution de la végétation (NDVI)"),node("p",{class:"muted"},"Comparaison automatique des dernières scènes Sentinel-2 disponibles."));
+    agroSynthesisPanel.append(node("h3",{},"Lecture agronomique"),node("p",{class:"muted"},"Mise en relation des signaux météo disponibles. Les données régionales ne remplacent pas les mesures dans la parcelle."));
     const weatherCharts=node("div",{id:"envWeatherCharts",class:"environmental-weather-charts","aria-live":"polite"});
     const details=node("details",{class:"environmental-details"});
     details.append(node("summary",{},"Afficher l’analyse et les données détaillées"));
@@ -102,7 +104,7 @@
     [satelliteMapLegend,satelliteModeHelp,satelliteNDVILegend,sentinelHighResNote,sentinelHighResLink,satelliteViewControls].forEach(el=>el.style.display="none");
     satelliteMapPanel.querySelector("h3").textContent="Carte satellite";
     satelliteMapPanel.append(locationControl,satelliteMapStatus,satelliteMap);
-    panel.append(satelliteMapPanel,vegetationChart,weatherCharts,uvComparisonPanel);
+    panel.append(satelliteMapPanel,vegetationChart,agroSynthesisPanel,weatherCharts,uvComparisonPanel);
     const hero=document.querySelector(".app-hero");
     if(hero?.parentNode) hero.parentNode.insertBefore(panel,hero.nextSibling);
     else plant.parentNode.insertBefore(panel,plant);
@@ -316,6 +318,53 @@
       if(data.coordinate_source && [...source.options].some(o=>o.value===data.coordinate_source))source.value=data.coordinate_source;
       await updateSatelliteMap();
     }
+    function renderAgroSynthesis(data){
+      agroSynthesisPanel.replaceChildren(node("h3",{},"Lecture agronomique"));
+      const byDate=new Map();
+      for(const row of data||[]){
+        if(row.value===null||row.value===undefined)continue;
+        const value=Number(row.value);
+        if(!Number.isFinite(value))continue;
+        const day=String(row.observed_at||"").slice(0,10);
+        if(!day)continue;
+        if(!byDate.has(day))byDate.set(day,{});
+        byDate.get(day)[row.variable_code]=value;
+      }
+      const days=[...byDate.keys()].sort().slice(-7);
+      const temp=days.map(d=>byDate.get(d).air_temperature_max).filter(Number.isFinite);
+      const rain=days.map(d=>byDate.get(d).precipitation_corrected).filter(Number.isFinite);
+      const humidity=days.map(d=>byDate.get(d).relative_humidity_mean).filter(Number.isFinite);
+      const uv=days.map(d=>byDate.get(d).uv_index_daily_mean).filter(Number.isFinite);
+      const coverage=(values)=>Math.round(values.length/Math.max(days.length,1)*100);
+      const grid=node("div",{class:"grid"});
+      const metric=(label,value,note)=>{
+        const card=node("article",{class:"card"});
+        card.append(node("strong",{},label),node("p",{},value),node("small",{class:"muted"},note));
+        grid.append(card);
+      };
+      metric("Couverture météo",days.length+" date(s) · "+data.length+" observation(s)","Les taux ci-dessous indiquent la présence d’une valeur pour chaque date affichée.");
+      metric("Température maximale",temp.length?Math.max(...temp).toFixed(1)+" °C":"—",coverage(temp)+" % des dates avec une valeur");
+      metric("Précipitations",rain.length?rain.reduce((a,b)=>a+b,0).toFixed(1)+" mm":"—",coverage(rain)+" % des dates avec une valeur");
+      metric("Humidité relative",humidity.length?(humidity.reduce((a,b)=>a+b,0)/humidity.length).toFixed(0)+" %":"—",coverage(humidity)+" % des dates avec une valeur");
+      agroSynthesisPanel.append(grid);
+      const interpretations=[];
+      if(!days.length){
+        interpretations.push("Aucune observation météo exploitable pour établir un contexte agronomique.");
+      }else{
+        if(temp.length&&Math.max(...temp)>=35)interpretations.push("Chaleur élevée : contrôlez l’humidité du sol ou du substrat, le flétrissement et la température réelle au niveau des plantes avant de modifier l’irrigation.");
+        else if(temp.length&&Math.max(...temp)>=30)interpretations.push("Température élevée : surveillez les cultures sensibles et vérifiez l’humidité réelle avant d’ajuster l’arrosage.");
+        if(rain.length===days.length&&rain.reduce((a,b)=>a+b,0)<=2)interpretations.push("Faibles précipitations estimées sur les dates couvertes : vérifiez l’humidité du sol, car la pluie régionale ne mesure pas l’eau disponible dans la zone racinaire.");
+        else if(rain.length<days.length)interpretations.push("Couverture des précipitations partielle : ne concluez pas à un déficit hydrique à partir du cumul affiché.");
+        if(humidity.length&&humidity.reduce((a,b)=>a+b,0)/humidity.length>=85)interpretations.push("Humidité atmosphérique élevée : vérifiez la ventilation sous serre et inspectez les feuilles ; ce signal ne diagnostique pas une maladie.");
+        if(uv.length>=2){
+          const first=uv[0],last=uv[uv.length-1],delta=last-first;
+          interpretations.push("Indice UV journalier moyen : "+(delta>0?"en hausse":delta<0?"en baisse":"stable")+" entre les valeurs disponibles ("+first.toFixed(1)+" → "+last.toFixed(1)+"). Il décrit l’exposition UV atmosphérique, pas le stress hydrique de la plante.");
+        }
+        if(!interpretations.length)interpretations.push("Aucun signal simple ne dépasse les seuils généraux actuels. Cela ne garantit pas l’absence de stress : confrontez ce contexte aux observations et mesures locales.");
+      }
+      interpretations.forEach(line=>agroSynthesisPanel.append(node("p",{class:"muted"},line)));
+      agroSynthesisPanel.append(node("small",{class:"muted"},"Source météo : NASA POWER, estimations sur grille. Les dates sans valeur ne sont pas assimilées à zéro. Les seuils sont génériques et ne sont pas adaptés à une espèce, un stade cultural ou un sol précis."));
+    }
     function renderClimateSummary(data){
       summary.replaceChildren();
       if(!data.length){summary.append(node("p",{class:"muted"},"Pas encore de données météo pour cette période. Importez l’historique pour obtenir des repères utiles."));return;}
@@ -495,6 +544,7 @@
       }
       renderClimateSummary(data);
       renderVariableCoverage(data);
+      renderAgroSynthesis(data);
       renderWeatherCharts(data);
       if(!data.length){results.textContent="Aucune observation pour cette période.";return;}
       const table=node("table"); const head=node("tr");
