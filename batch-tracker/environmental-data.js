@@ -344,7 +344,7 @@
       };
       metric("Couverture météo",days.length+" date(s) · "+data.length+" observation(s)","Les taux ci-dessous indiquent la présence d’une valeur pour chaque date affichée.");
       metric("Température maximale",temp.length?Math.max(...temp).toFixed(1)+" °C":"—",coverage(temp)+" % des dates avec une valeur");
-      metric("Précipitations",rain.length?rain.reduce((a,b)=>a+b,0).toFixed(1)+" mm":"—",coverage(rain)+" % des dates avec une valeur");
+      metric("Précipitations",rain.length?rain.reduce((a,b)=>a+b,0).toFixed(1)+" mm":"—",rain.length===days.length?"Cumul complet · "+coverage(rain)+" % des dates":"Cumul partiel · "+coverage(rain)+" % des dates");
       metric("Humidité relative",humidity.length?(humidity.reduce((a,b)=>a+b,0)/humidity.length).toFixed(0)+" %":"—",coverage(humidity)+" % des dates avec une valeur");
       agroSynthesisPanel.append(grid);
       const interpretations=[];
@@ -369,7 +369,7 @@
       summary.replaceChildren();
       if(!data.length){summary.append(node("p",{class:"muted"},"Pas encore de données météo pour cette période. Importez l’historique pour obtenir des repères utiles."));return;}
       const byDate=new Map();
-      data.forEach(r=>{if(r.value===null||r.value===undefined)return;const value=Number(r.value);if(!Number.isFinite(value))return;const day=String(r.observed_at).slice(0,10);if(!byDate.has(day))byDate.set(day,{});byDate.get(day)[r.variable_code]=value;});
+      data.forEach(r=>{if(r.value===null||r.value===undefined)return;const value=Number(r.value);if(!Number.isFinite(value))return;const day=String(r.observed_at).slice(0,10);if(!byDate.has(day))byDate.set(day,{});if(!Object.prototype.hasOwnProperty.call(byDate.get(day),r.variable_code))byDate.get(day)[r.variable_code]=value;});
       const allDays=[...byDate.keys()].sort();
       const days=allDays.slice(-7);
       const previousDays=allDays.slice(-14,-7);
@@ -493,7 +493,7 @@
         const day=String(row.observed_at||"").slice(0,10);
         if(!/^\d{4}-\d{2}-\d{2}$/.test(day))return;
         if(!byDay.has(day))byDay.set(day,{});
-        byDay.get(day)[row.variable_code]=Number(row.value);
+        if(!Object.prototype.hasOwnProperty.call(byDay.get(day),row.variable_code))byDay.get(day)[row.variable_code]=Number(row.value);
       });
       const days=[...byDay.keys()].sort();
       if(!days.length){
