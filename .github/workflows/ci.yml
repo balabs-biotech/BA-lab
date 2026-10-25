@@ -190,6 +190,14 @@ jobs:
       PGDATABASE: postgres
     steps:
       - uses: actions/checkout@v4
+      - name: Ensure migration version identifiers are unique
+        run: |
+          set -eu
+          duplicates="$(find supabase/migrations -maxdepth 1 -type f -name '*.sql' -printf '%f\\n' | sed -E 's/^([0-9]+)_.*/\\1/' | sort | uniq -d)"
+          if [ -n "$duplicates" ]; then
+            echo "Duplicate Supabase migration version(s): $duplicates" >&2
+            exit 1
+          fi
       - name: Bootstrap Supabase auth roles
         run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/migration_replay_bootstrap.sql
       - name: Replay every versioned migration in timestamp order
