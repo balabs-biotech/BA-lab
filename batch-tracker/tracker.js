@@ -6355,7 +6355,7 @@ function setupQuickCapture() {
       "N’invente jamais de mesure, de code de culture, de date, d’unité ou de méthode. Si une information manque, utilise null. Ne prétends pas que les données ont été enregistrées.",
       "Utilise exactement ce schéma :",
       JSON.stringify({ protocol: "ba-labs-entry", version: 1, kind: "measurement", target: null, variable: null, value: null, unit: null, occurred_at: null, instrument: null, method: null, note: null, missing_information: [] }, null, 2),
-      "Pour kind, utilise uniquement measurement ou observation. Préserve les unités et le sens des observations. N’invente pas de référence de culture si elle n’est pas explicitement fournie.",
+      "Pour kind, utilise uniquement measurement ou observation. Pour une mesure, value doit être un nombre JSON (pas une chaîne) ou null. Pour une observation, value doit être une chaîne décrivant le constat ou null. Préserve les unités et le sens des observations. N’invente pas de référence de culture si elle n’est pas explicitement fournie.",
       "Module actuel : " + domain + ".",
       "Description utilisateur :",
       description
@@ -6435,7 +6435,8 @@ function setupQuickCapture() {
     measurementTargetSelect.value = "";
     measurementTargetSelect.dispatchEvent(new Event("change", { bubbles: true }));
     let variableMatched = false;
-    let targetMatched = matchSelectOption(measurementTargetSelect, payload.target);
+    let unitMismatch = false;
+    const targetMatched = matchSelectOption(measurementTargetSelect, payload.target);
     if (payload.kind === "measurement") {
       measurementVariableSelect.value = "";
       measurementVariableSelect.dispatchEvent(new Event("change", { bubbles: true }));
@@ -6453,7 +6454,7 @@ function setupQuickCapture() {
       setLocalDateTime(measurementAtInput, payload.occurred_at);
       if (payload.unit != null && String(payload.unit).trim()) {
         const unitMatched = matchSelectOption(measurementUnitSelect, payload.unit);
-        if (!unitMatched) setAiStatus("Les champs ont été préremplis, mais l’unité ne correspond pas exactement au référentiel. Vérifiez-la manuellement.", "warning");
+        if (!unitMatched) unitMismatch = true;
       }
     } else {
       observationVariableSelect.value = "";
@@ -6480,6 +6481,7 @@ function setupQuickCapture() {
     if (!variableMatched) warnings.push("sélectionnez le paramètre ou la catégorie manuellement");
     if (payload.kind === "measurement" && !(typeof payload.value === "number" && Number.isFinite(payload.value))) warnings.push("vérifiez ou saisissez la valeur numérique");
     if (payload.kind === "observation" && (payload.value == null || !String(payload.value).trim())) warnings.push("ajoutez la description de l’observation");
+    if (unitMismatch) warnings.push("vérifiez l’unité, qui ne correspond pas exactement au référentiel");
     setAiStatus(
       warnings.length
         ? "Préremplissage partiel : " + warnings.join(" ; ") + ". Rien n’a été enregistré ; vérifiez le formulaire."
