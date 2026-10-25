@@ -39,8 +39,8 @@
     const results=node("div",{id:"envResults",class:"overview-observations"});
     const weatherCharts=node("div",{id:"envWeatherCharts",class:"environmental-weather-charts","aria-live":"polite"});
     const details=node("details",{class:"environmental-details"});
-    details.append(node("summary",{},"Voir les observations détaillées"));
-    details.append(results);
+    details.append(node("summary",{},"Afficher l’analyse et les données détaillées"));
+    details.append(summary,results);
     const coordinates=node("details",{class:"environmental-settings"});
     coordinates.append(node("summary",{},"Paramètres avancés : coordonnées et actualisation"));
     coordinates.append(field("Latitude","envLat",lat),field("Longitude","envLon",lon),field("Précision des coordonnées (m)","envAccuracy",accuracy),field("Origine des coordonnées","envSource",source),save,refresh);
@@ -48,7 +48,7 @@
     const satelliteButton=node("button",{type:"button"},"Chercher les images satellite");
     const satelliteResults=node("div",{id:"satelliteResults",class:"overview-observations","aria-live":"polite"});
     const satelliteHint=node("p",{class:"muted"},"Sentinel-2 : scènes disponibles et couverture nuageuse. L’image ne constitue pas à elle seule un diagnostic de culture.");
-    panel.append(form,status,summary,weatherCharts,satelliteHint,satelliteButton,satelliteResults,details);
+    panel.append(form,status,weatherCharts,satelliteHint,satelliteButton,satelliteResults,details);
     plant.parentNode.insertBefore(panel,plant.nextSibling);
     const nav=document.querySelector(".section-nav");
     if(nav && !document.getElementById("envNav")) { const a=node("a",{href:"#environmentalCard",id:"envNav"},"Contexte environnemental"); nav.append(a); }
