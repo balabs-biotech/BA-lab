@@ -174,8 +174,8 @@
         satelliteMapPanel.scrollIntoView({behavior:"smooth",block:"start"});
         const ndviStats=response.headers.get("X-NDVI-Stats");
         let statsText="";
-        if(ndviStats){try{const st=JSON.parse(ndviStats);statsText=" NDVI moyen "+st.mean_ndvi+" ; pixels valides "+st.valid_pixel_percent+" % ; couverture nuageuse globale de la scène "+(Number.isFinite(st.cloud_cover_scene_percent)?st.cloud_cover_scene_percent.toFixed(1)+" %":"inconnue")+". ";}catch(_){}}
-        satelliteMapStatus.textContent="NDVI Sentinel-2 L2A du "+sceneDate+" affiché directement dans BA Labs via "+rasterSource+". Bandes source rouge/NIR à 10 m ; rendu coloré en 512 × 512 pixels sur une emprise régionale d’environ 1 km."+statsText+"Cette emprise n’est pas une limite de parcelle ; la couverture nuageuse est globale à la scène et les pixels nuageux ne sont pas encore masqués.";
+        if(ndviStats){try{const st=JSON.parse(ndviStats);statsText=" NDVI moyen "+st.mean_ndvi+" ; pixels valides "+st.valid_pixel_percent+" % ; couverture nuageuse globale de la scène "+(Number.isFinite(st.cloud_cover_scene_percent)?st.cloud_cover_scene_percent.toFixed(1)+" %":"inconnue")+" ; masque SCL des nuages/ombres "+(st.cloud_mask_applied?"appliqué":"indisponible")+". ";}catch(_){}}
+        satelliteMapStatus.textContent="NDVI Sentinel-2 L2A du "+sceneDate+" affiché directement dans BA Labs via "+rasterSource+". Bandes source rouge/NIR à 10 m ; rendu coloré en 512 × 512 pixels sur une emprise régionale d’environ 1 km."+statsText+"Cette emprise n’est pas une limite de parcelle ; la couverture nuageuse affichée est globale à la scène.";
       }catch(error){
         const message=error?.message||"Erreur de chargement Sentinel-2";
         satelliteMapStatus.textContent=message+" La couche régionale MODIS reste disponible comme contexte. Utilisez le lien vers l’explorateur Sentinel-2 haute résolution ci-dessus pour consulter les images sans configurer le service de traitement BA Labs.";
