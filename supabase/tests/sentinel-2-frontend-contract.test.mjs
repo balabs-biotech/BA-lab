@@ -26,6 +26,8 @@ const checks = [
   ["shows a coverage-aware agronomic synthesis", /function renderAgroSynthesis[\s\S]*?Couverture météo[\s\S]*?Les dates sans valeur ne sont pas assimilées à zéro/],
   ["keeps satellite acquisition dates independent from the weather period", /Keep the weather date range independent from the satellite acquisition date/],
   ["compares NDVI only against a previous scene with at most 30% cloud cover", /previousScene=rankedScenes\.find\(scene=>Number\(scene\.cloud_cover_percent\)<=30/],
+  ["preserves the latest observation when a date and variable have duplicates", /hasOwnProperty\.call\(byDate\.get\(day\),r\.variable_code\)/],
+  ["labels partial rainfall totals explicitly", /Cumul partiel · /],
  ];
 assert.match(entry, /environmental-data\.js\?v=20261026-agro-coherence-1/, "uses a cache-busted environmental module path");
 assert.match(entry, /i18n\.js\?v=20261026-green-tech-i18n-1/, "uses a cache-busted localization module path");
