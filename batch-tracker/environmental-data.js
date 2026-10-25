@@ -60,6 +60,7 @@
     const summary=node("div",{id:"envSummary",class:"overview-observations","aria-live":"polite"});
     const results=node("div",{id:"envResults",class:"overview-observations"});
     const vegetationChart=node("section",{id:"vegetationTrendPanel",class:"card environmental-weather-chart","aria-live":"polite"});
+    const uvComparisonPanel=node("section",{id:"uvComparisonPanel",class:"card","aria-live":"polite"});
     vegetationChart.append(node("h3",{},"Évolution de la végétation (NDVI)"),node("p",{class:"muted"},"Comparaison automatique des dernières scènes Sentinel-2 disponibles."));
     const weatherCharts=node("div",{id:"envWeatherCharts",class:"environmental-weather-charts","aria-live":"polite"});
     const details=node("details",{class:"environmental-details"});
@@ -101,7 +102,7 @@
     [satelliteMapLegend,satelliteModeHelp,satelliteNDVILegend,sentinelHighResNote,sentinelHighResLink,satelliteViewControls].forEach(el=>el.style.display="none");
     satelliteMapPanel.querySelector("h3").textContent="Carte satellite";
     satelliteMapPanel.append(locationControl,satelliteMapStatus,satelliteMap);
-    panel.append(satelliteMapPanel,vegetationChart,weatherCharts);
+    panel.append(satelliteMapPanel,vegetationChart,weatherCharts,uvComparisonPanel);
     const hero=document.querySelector(".app-hero");
     if(hero?.parentNode) hero.parentNode.insertBefore(panel,hero.nextSibling);
     else plant.parentNode.insertBefore(panel,plant);
@@ -349,10 +350,9 @@
       grid.append(card("Indice UV moyen quotidien",uvMean===null?"Indisponible":uvMean.toFixed(1),"Estimation journalière NASA POWER ; ce n’est pas le pic UV instantané."));
       summary.append(grid);
       const uvDays=days.map(d=>({date:d,value:byDate.get(d).uv_index_daily_mean})).filter(p=>Number.isFinite(p.value));
-      const uvCompare=node("div",{class:"card"});uvCompare.append(node("h3",{},"Comparatif UV automatique"));
+      const uvCompare=uvComparisonPanel;uvCompare.replaceChildren(node("h3",{},"Comparatif UV automatique"));
       if(uvDays.length>=2){const first=uvDays[uvDays.length-2],last=uvDays[uvDays.length-1],delta=last.value-first.value;uvCompare.append(node("p",{},first.date+" : "+first.value.toFixed(1)+" → "+last.date+" : "+last.value.toFixed(1)),node("strong",{},(delta>0?"+":"")+delta.toFixed(1)+" point(s) UV"),node("p",{class:"muted"},delta>0?"Indice UV en hausse entre les deux dernières dates disponibles.":delta<0?"Indice UV en baisse entre les deux dernières dates disponibles.":"Indice UV stable entre les deux dernières dates disponibles."));}
       else uvCompare.append(node("p",{class:"muted"},"Le comparatif s’affichera dès que deux dates UV réelles seront disponibles."));
-      summary.append(uvCompare);
       const trend=node("div",{class:"card"});
       trend.append(node("h3",{},"Évolution par rapport aux 7 dates précédentes"));
       const comparisons=[];
