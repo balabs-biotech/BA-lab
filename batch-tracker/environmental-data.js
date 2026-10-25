@@ -66,7 +66,10 @@
     const coordinates=node("details",{class:"environmental-settings"});
     coordinates.append(node("summary",{},"Paramètres avancés : coordonnées et actualisation"));
     coordinates.append(field("Latitude","envLat",lat),field("Longitude","envLon",lon),field("Précision des coordonnées (m)","envAccuracy",accuracy),field("Origine des coordonnées","envSource",source),save,refresh);
-    form.append(field("Emplacement","envLocation",location),field("Du","envFrom",from),field("Au","envTo",to),run,coordinates);
+    const locationControl=field("Emplacement","envLocation",location);
+    locationControl.style.cssText="display:grid;gap:6px;margin:0 0 10px;";
+    location.style.cssText="width:100%;min-height:42px;";
+    form.append(locationControl,field("Du","envFrom",from),field("Au","envTo",to),run,coordinates);
     const satelliteHint=node("p",{class:"muted"},"Sentinel-2 : scènes disponibles et couverture nuageuse. L’image ne constitue pas à elle seule un diagnostic de culture.");
     const satelliteMapPanel=node("section",{class:"card",id:"satelliteColorMapPanel"});
     satelliteMapPanel.append(node("h3",{},"Carte satellite"));
@@ -83,7 +86,7 @@
       satelliteNDVILegend.append(swatch);
     });
     satelliteNDVILegend.append(node("p",{class:"muted"},"Les pixels transparents correspondent à des données invalides ou masquées, pas à une absence certaine de végétation. Les classes dépendent de la saison, du couvert, du sol et du masque nuageux ; elles ne constituent pas un diagnostic de culture."));
-    satelliteMapPanel.append(satelliteMapStatus,satelliteMap,satelliteViewControls,satelliteMapLegend,satelliteModeHelp,satelliteNDVILegend);
+    satelliteMapPanel.append(locationControl,satelliteMapStatus,satelliteMap,satelliteViewControls,satelliteMapLegend,satelliteModeHelp,satelliteNDVILegend);
     const sentinelHighResNote=node("p",{class:"muted"},"Pour examiner les limites de champs et les parcelles, utilisez l’explorateur Sentinel-2 L2A à 10 m. Cette vue externe exploite les bandes multispectrales de Sentinel-2 ; elle ne remplace pas une analyse agronomique validée.");
     const sentinelHighResLink=node("a",{href:"https://sentinel-2.allthingsspatial.io/",target:"_blank",rel:"noopener noreferrer"},"Ouvrir l’explorateur Sentinel-2 haute résolution (10 m) ↗");
     sentinelHighResLink.style.display="inline-block";
@@ -95,7 +98,7 @@
     [form,status,weatherCharts,satelliteHint,satelliteButton,satelliteResults,details].forEach(el=>el.style.display="none");
     [satelliteMapLegend,satelliteModeHelp,satelliteNDVILegend,sentinelHighResNote,sentinelHighResLink,satelliteViewControls].forEach(el=>el.style.display="none");
     satelliteMapPanel.querySelector("h3").textContent="Carte satellite";
-    satelliteMapPanel.append(satelliteMapStatus,satelliteMap);
+    satelliteMapPanel.append(locationControl,satelliteMapStatus,satelliteMap);
     panel.append(satelliteMapPanel);
     const hero=document.querySelector(".app-hero");
     if(hero?.parentNode) hero.parentNode.insertBefore(panel,hero.nextSibling);
