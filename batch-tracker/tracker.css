@@ -2534,3 +2534,16 @@ body[data-domain="agronomy"] .statistics-demo-note { color: #f1f5ef; background:
   .statistics-chart svg { min-width: 0; }
   .statistics-demo-note { font-size: .82rem; }
 }
+
+
+/* Historical weather charts use imported NASA POWER observations only. */
+.environmental-weather-charts { display: grid; gap: 12px; min-width: 0; margin: 14px 0; }
+.environmental-weather-chart { min-width: 0; overflow: hidden; }
+.environmental-weather-chart svg { display: block; width: 100%; max-width: 100%; height: auto; color: var(--text, #243329); }
+.environmental-weather-chart h4 { margin-top: 0; }
+body[data-domain="agronomy"] .environmental-weather-chart { background: #202d25; border-color: #35483d; color: #f1f5ef; }
+body[data-domain="agronomy"] .environmental-weather-chart svg { color: #f1f5ef; }
+@media (max-width: 700px) {
+  .environmental-weather-chart { padding: 10px !important; }
+  .environmental-weather-chart svg { min-width: 0; }
+}
