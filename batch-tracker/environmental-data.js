@@ -42,7 +42,7 @@
     const panel = node("section", {id:"environmentalCard", class:"card hidden"});
     panel.append(node("div",{class:"section-kicker"},"OSINT AGRO-ENVIRONNEMENTAL"));
     panel.append(node("h2",{},"Contexte environnemental"));
-    panel.append(node("p",{class:"muted"},"Historique NASA POWER : températures, précipitations, rayonnement solaire, humidité relative et vent. Estimations sur grille régionale, pas des mesures locales ni des prévisions."));
+    panel.append(node("p",{class:"muted"},"Historique NASA POWER : températures, précipitations, rayonnement solaire, indice UV moyen journalier, humidité relative et vent. Estimations sur grille régionale, pas des mesures locales ni des prévisions ; l’indice UV journalier ne représente pas le pic instantané."));
     const form = node("div",{class:"grid"});
     const field = (label,id,input) => { const w=node("div"); w.append(node("label",{for:id},label),input); return w; };
     const location=node("select",{id:"envLocation"}); location.append(node("option",{value:""},"Choisir un emplacement…"));
@@ -104,6 +104,7 @@
       const maxTemps=rows.map(x=>x.air_temperature_max).filter(Number.isFinite);
       const rain=rows.map(x=>x.precipitation_corrected).filter(Number.isFinite);
       const humid=rows.map(x=>x.relative_humidity_mean).filter(Number.isFinite);
+      const uvValues=rows.map(x=>x.uv_index_daily_mean).filter(Number.isFinite);
       const previousTemps=previousRows.map(x=>x.air_temperature_max).filter(Number.isFinite);
       const previousRain=previousRows.map(x=>x.precipitation_corrected).filter(Number.isFinite);
       const previousHumid=previousRows.map(x=>x.relative_humidity_mean).filter(Number.isFinite);
@@ -113,11 +114,15 @@
       const previousTemp=previousTemps.length?Math.max(...previousTemps):null;
       const previousRainTotal=previousRain.length?previousRain.reduce((a,b)=>a+b,0):null;
       const previousHumidity=previousHumid.length?previousHumid.reduce((a,b)=>a+b,0)/previousHumid.length:null;
+      const previousUvValues=previousRows.map(x=>x.uv_index_daily_mean).filter(Number.isFinite);
+      const uvMean=uvValues.length?uvValues.reduce((a,b)=>a+b,0)/uvValues.length:null;
+      const previousUvMean=previousUvValues.length?previousUvValues.reduce((a,b)=>a+b,0)/previousUvValues.length:null;
       const card=(label,value,note)=>{const box=node("div",{class:"card"});box.append(node("strong",{},label),node("p",{},value),node("small",{class:"muted"},note));return box;};
       const grid=node("div",{class:"grid"});
       grid.append(card("Pic de température",temp===null?"Indisponible":temp.toFixed(1)+" °C","Maximum observé sur les 7 dernières dates disponibles"));
       grid.append(card("Pluie cumulée",rainTotal===null?"Indisponible":rainTotal.toFixed(1)+" mm","Somme des précipitations disponibles"));
       grid.append(card("Humidité de l’air",humidity===null?"Indisponible":humidity.toFixed(0)+" %","Moyenne des observations disponibles"));
+      grid.append(card("Indice UV moyen quotidien",uvMean===null?"Indisponible":uvMean.toFixed(1),"Estimation journalière NASA POWER ; ce n’est pas le pic UV instantané."));
       summary.append(grid);
       const trend=node("div",{class:"card"});
       trend.append(node("h3",{},"Évolution par rapport aux 7 dates précédentes"));
@@ -134,6 +139,7 @@
       compare("Pic de température",temp,previousTemp,"°C",5,maxTemps.length,previousTemps.length);
       compare("Pluie cumulée",rainTotal,previousRainTotal,"mm",7,rain.length,previousRain.length);
       compare("Humidité moyenne",humidity,previousHumidity,"points de %",3,humid.length,previousHumid.length);
+      compare("Indice UV moyen quotidien",uvMean,previousUvMean,"indice",3,uvValues.length,previousUvValues.length);
       comparisons.forEach(line=>trend.append(node("p",{class:"muted"},line)));
       trend.append(node("small",{class:"muted"},"Comparaison descriptive de périodes constituées des dernières dates disponibles, pas nécessairement de 7 jours calendaires consécutifs. Une hausse ou une baisse n’établit pas à elle seule un stress cultural."));
       summary.append(trend);
@@ -161,7 +167,7 @@
       summary.append(node("h3",{},"Lecture agronomique provisoire"),advice,coverage,node("p",{class:"muted"},"Ces signaux sont des règles indicatives appliquées à des estimations NASA POWER sur grille régionale, pas à des mesures locales. Ils servent à décider quoi vérifier, pas à établir un diagnostic. La météo affichée est historique : aucune prévision ni commande automatique d’irrigation."));
     }
     function renderVariableCoverage(data){
-      const labels={air_temperature_mean:"Température moyenne",air_temperature_max:"Température maximale",air_temperature_min:"Température minimale",precipitation_corrected:"Précipitations",solar_radiation_all_sky:"Rayonnement solaire",relative_humidity_mean:"Humidité relative moyenne",wind_speed_mean:"Vitesse moyenne du vent"};
+      const labels={air_temperature_mean:"Température moyenne",air_temperature_max:"Température maximale",air_temperature_min:"Température minimale",precipitation_corrected:"Précipitations",solar_radiation_all_sky:"Rayonnement solaire",relative_humidity_mean:"Humidité relative moyenne",wind_speed_mean:"Vitesse moyenne du vent",uv_index_daily_mean:"Indice UV moyen journalier"};
       const coverage=node("div",{class:"card"});
       coverage.append(node("h3",{},"Couverture par variable"));
       const startMs=Date.parse(from.value+"T00:00:00Z");
@@ -200,7 +206,8 @@
       const labels={
         air_temperature_max:{title:"Température maximale",unit:"°C",color:"#d78b56"},
         precipitation_corrected:{title:"Précipitations",unit:"mm",color:"#4b9bd5"},
-        relative_humidity_mean:{title:"Humidité relative moyenne",unit:"%",color:"#65b982"}
+        relative_humidity_mean:{title:"Humidité relative moyenne",unit:"%",color:"#65b982"},
+        uv_index_daily_mean:{title:"Indice UV moyen journalier estimé",unit:"indice UV",color:"#9a6bda"}
       };
       const byDay=new Map();
       (data||[]).forEach(row=>{
@@ -265,7 +272,7 @@
       ["Date","Variable","Valeur","Unité","Source"].forEach(t=>head.append(node("th",{},t)));
       const thead=node("thead");thead.append(head);table.append(thead);
       const tbody=node("tbody");
-      const labels={air_temperature_mean:"Température moyenne",air_temperature_max:"Température maximale",air_temperature_min:"Température minimale",precipitation_corrected:"Précipitations",solar_radiation_all_sky:"Rayonnement solaire",relative_humidity_mean:"Humidité relative moyenne",wind_speed_mean:"Vitesse moyenne du vent"};
+      const labels={air_temperature_mean:"Température moyenne",air_temperature_max:"Température maximale",air_temperature_min:"Température minimale",precipitation_corrected:"Précipitations",solar_radiation_all_sky:"Rayonnement solaire",relative_humidity_mean:"Humidité relative moyenne",wind_speed_mean:"Vitesse moyenne du vent",uv_index_daily_mean:"Indice UV moyen journalier"};
       data.forEach(r=>{const tr=node("tr");[String(r.observed_at).slice(0,10),labels[r.variable_code]||r.variable_code,r.value==null?"—":String(r.value),r.unit_code||"—",r.provider_code+" · "+(r.quality_flag||"")].forEach(t=>tr.append(node("td",{},t)));tbody.append(tr);});
       table.append(tbody);results.append(table);
     }
