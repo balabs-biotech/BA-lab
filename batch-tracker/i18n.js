@@ -1491,6 +1491,9 @@
     ["Impossible de calculer les indicateurs météo.", "Unable to calculate weather indicators.", "Não foi possível calcular os indicadores meteorológicos.", "تعذر حساب مؤشرات الطقس."],
     ["Pas encore de données météo pour cette période. Importez l’historique pour obtenir des repères utiles.", "No weather data for this period yet. Import historical data to get useful reference points.", "Ainda não existem dados meteorológicos para este período. Importe o histórico para obter referências úteis.", "لا توجد بيانات طقس لهذه الفترة بعد. استورد السجل للحصول على مؤشرات مفيدة."],
     ["Sentinel-2 · scènes disponibles et couverture nuageuse.", "Sentinel-2 · available scenes and cloud cover.", "Sentinel-2 · cenas disponíveis e cobertura de nuvens.", "Sentinel-2 · المشاهد المتاحة والغطاء السحابي."],
+    ["Cumul complet · ", "Complete total · ", "Total completo · ", "مجموع كامل · "],
+    ["Cumul partiel · ", "Partial total · ", "Total parcial · ", "مجموع جزئي · "],
+    [" des dates", " of dates", " das datas", " من التواريخ"],
   ];
   for (const [fr, en, pt, ar] of supplementalCoverage) {
     dictionaries.en[fr] ||= en;
