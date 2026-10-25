@@ -21,8 +21,8 @@ begin
       raise exception 'FAIL: expected RPC % does not exist', v_signature;
     end if;
 
-    if v_proc.prosecdef then
-      raise exception 'FAIL: % must remain SECURITY INVOKER', v_signature;
+    if not v_proc.prosecdef then
+      raise exception 'FAIL: % must be SECURITY DEFINER to support revoked direct table writes', v_signature;
     end if;
 
     select setting into v_setting
@@ -30,8 +30,8 @@ begin
      where setting like 'search_path=%'
      limit 1;
 
-    if v_setting is null or regexp_replace(v_setting, '^search_path=', '') not in ('""', '') then
-      raise exception 'FAIL: % must pin an empty search_path; got %', v_signature, v_setting;
+    if v_setting is null or regexp_replace(v_setting, '^search_path=', '') <> 'pg_catalog' then
+      raise exception 'FAIL: % must pin search_path to pg_catalog; got %', v_signature, v_setting;
     end if;
 
     if not has_function_privilege('authenticated', v_signature, 'EXECUTE') then
