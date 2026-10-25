@@ -85,7 +85,7 @@ begin
       iot_device_id, metadata
     ) values (
       d.organization_id, v_code, v_value, v_unit,
-      measured_at, v_method, v_instrument, 'raw', d.environment_id,
+      v_measured_at, v_method, v_instrument, 'raw', d.environment_id,
       d.id, jsonb_build_object(
         'source', 'iot',
         'message_id', p_message_id,
