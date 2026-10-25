@@ -5647,7 +5647,6 @@ async function loadStatistics() {
       const note=document.createElement("p");note.className="statistics-demo-note";note.textContent="DONNÉES DE DÉMONSTRATION — exemple synthétique uniquement. Non mesuré, non enregistré et jamais mélangé aux données de l’organisation.";chart.appendChild(note);
       const explanation=document.createElement("p");explanation.className="muted";explanation.textContent=L.needTwo;chart.appendChild(explanation);
     } else {
-    else {
       const width=760,height=270,left=64,right=20,top=22,bottom=50,values=plotted.map(row=>row.plotValue),min=Math.min(...values),max=Math.max(...values),span=max-min||Math.max(Math.abs(max)*.1,1);
       const x=i=>left+i*(width-left-right)/(plotted.length-1), y=value=>top+(max-value)*(height-top-bottom)/span, ns="http://www.w3.org/2000/svg", svg=document.createElementNS(ns,"svg");
       svg.setAttribute("viewBox","0 0 "+width+" "+height); svg.setAttribute("role","img"); svg.setAttribute("aria-label","Évolution de "+(variable?.label||variableCode)+", unité "+(canonical||plotted[0].plotUnit||"non renseignée"));
