@@ -7,6 +7,7 @@ const PARAMETERS = {
   T2M_MIN: { variable: "air_temperature_min", unit: "degC", resolution: 55000 },
   PRECTOTCORR: { variable: "precipitation_corrected", unit: "mm/day", resolution: 55000 },
   ALLSKY_SFC_SW_DWN: { variable: "solar_radiation_all_sky", unit: "kWh/m2/day", resolution: 111000 },
+  ALLSKY_SFC_UV_INDEX: { variable: "uv_index_daily_mean", unit: "index", resolution: 111000 },
   RH2M: { variable: "relative_humidity_mean", unit: "%", resolution: 55000 },
   WS2M: { variable: "wind_speed_mean", unit: "m/s", resolution: 55000 },
 };
