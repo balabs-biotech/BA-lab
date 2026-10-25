@@ -11,7 +11,7 @@ const checks = [
   ["restores the last used location automatically", /localStorage\.getItem\("ba-labs-active-environment-location"\)/],
   ["automatically selects a configured location when no previous site exists", /const preferred=saved\|\|data\.find/],
   ["waits for the map to initialize before requesting imagery", /async function selectLocation\(\)[\s\S]*?await updateSatelliteMap\(\);/],
-  ["searches the satellite catalogue automatically on initial load", /await loadLocations\(\);\s*if\(location\.value\)\{loadRows\(\);if\(lat\.value!==""&&lon\.value!==""\)searchSatellite\(\);/],
+  ["searches the satellite catalogue automatically on initial load", /await loadLocations\(\);\s*if\(location\.value\)\{importWeather\(false\);if\(lat\.value!==""&&lon\.value!==""\)searchSatellite\(\);/],
   ["automatically searches again when the selected location changes", /location\.addEventListener\("change"[\s\S]*?searchSatellite\(\)/],
   ["prioritizes recent scenes with at most 30% cloud cover", /usableA=cloudA<=30\?0:1[\s\S]*?return usableA===0\?dateB-dateA/],
   ["automatically requests a rendered Sentinel-2 NDVI image", /await showSentinelNDVI\(sceneDate,"ndvi"\)/],
