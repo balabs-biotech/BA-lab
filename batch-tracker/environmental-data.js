@@ -40,9 +40,7 @@
     const plant = document.getElementById("plantCard");
     if (!plant || document.getElementById("environmentalCard")) return;
     const panel = node("section", {id:"environmentalCard", class:"card hidden"});
-    panel.append(node("div",{class:"section-kicker"},"OSINT AGRO-ENVIRONNEMENTAL"));
-    panel.append(node("h2",{},"Contexte environnemental"));
-    panel.append(node("p",{class:"muted"},"Historique NASA POWER : températures, précipitations, rayonnement solaire, indice UV moyen journalier, humidité relative et vent. Estimations sur grille régionale, pas des mesures locales ni des prévisions ; l’indice UV journalier ne représente pas le pic instantané."));
+    // The satellite map is the primary Green Tech view; keep explanatory copy out of the default screen.
     const form = node("div",{class:"grid"});
     const field = (label,id,input) => { const w=node("div"); w.append(node("label",{for:id},label),input); return w; };
     const location=node("select",{id:"envLocation"}); location.append(node("option",{value:""},"Choisir un emplacement…"));
@@ -71,7 +69,7 @@
     form.append(field("Emplacement","envLocation",location),field("Du","envFrom",from),field("Au","envTo",to),run,coordinates);
     const satelliteHint=node("p",{class:"muted"},"Sentinel-2 : scènes disponibles et couverture nuageuse. L’image ne constitue pas à elle seule un diagnostic de culture.");
     const satelliteMapPanel=node("section",{class:"card",id:"satelliteColorMapPanel"});
-    satelliteMapPanel.append(node("h3",{},"Télédétection optique — réflectance et indices de végétation"));
+    satelliteMapPanel.append(node("h3",{},"Carte satellite"));
     satelliteMapPanel.append(node("p",{class:"muted"},"Imagerie MODIS Terra en réflectance visible et indice différentiel normalisé de végétation (NDVI), composite de 16 jours. Résolution régionale kilométrique : utile pour le contexte paysager, insuffisante pour caractériser individuellement une serre ou une planche."));
     const satelliteMapStatus=node("p",{class:"muted","aria-live":"polite"},"Aperçu régional centré sur Sétif. Sélectionnez un emplacement enregistré pour recadrer la carte sur ses coordonnées.");
     const satelliteMap=node("div",{id:"satelliteColorMap","aria-label":"Carte de télédétection avec imagerie en réflectance visible et couche NDVI",style:"height:340px;min-height:280px;width:100%;border-radius:10px;overflow:hidden;background:#111827"});
@@ -100,7 +98,9 @@
     satelliteMapPanel.querySelector("h3").textContent="Carte satellite";
     satelliteMapPanel.append(satelliteMapStatus,satelliteMap);
     panel.append(satelliteMapPanel);
-    plant.parentNode.insertBefore(panel,plant.nextSibling);
+    const hero=document.querySelector(".app-hero");
+    if(hero?.parentNode) hero.parentNode.insertBefore(panel,hero.nextSibling);
+    else plant.parentNode.insertBefore(panel,plant);
     const nav=document.querySelector(".section-nav");
     if(nav && !document.getElementById("envNav")) { const a=node("a",{href:"#environmentalCard",id:"envNav"},"Contexte environnemental"); nav.append(a); }
 
@@ -194,7 +194,6 @@
         satelliteLayerControl.addOverlay(satelliteSentinelNDVILayer,"NDVI Sentinel-2 · "+sceneDate);
         satelliteLeafletMap.fitBounds([[south,west],[north,east]],{padding:[12,12],maxZoom:14});
         to.value=sceneDate;
-        satelliteMapPanel.scrollIntoView({behavior:"smooth",block:"start"});
         const ndviStats=response.headers.get("X-NDVI-Stats");
         let statsText="";
         if(ndviStats){try{const st=JSON.parse(ndviStats);statsText=" NDVI moyen "+st.mean_ndvi+" ; pixels valides "+st.valid_pixel_percent+" % ; couverture nuageuse globale de la scène "+(Number.isFinite(st.cloud_cover_scene_percent)?st.cloud_cover_scene_percent.toFixed(1)+" %":"inconnue")+" ; masque SCL des nuages/ombres "+(st.cloud_mask_applied?"appliqué":"indisponible")+". ";}catch(_){}}
@@ -271,19 +270,22 @@
     }
     async function loadLocations() {
       const {data,error}=await db.from("locations").select("id,code,name,latitude,longitude,coordinate_accuracy_m,coordinate_source").order("name");
-      if(error){status.textContent="Chargement des emplacements impossible : "+error.message;return;}
+      if(error){satelliteMapStatus.textContent="Sites indisponibles.";return;}
       data.forEach(x=>location.append(node("option",{value:x.id},x.code?x.name+" ("+x.code+")":x.name)));
-      if(data.length===1) location.value=data[0].id;
-      selectLocation();
-      if(!location.value) updateSatelliteMap();
+      let savedId="";try{savedId=localStorage.getItem("ba-labs-active-environment-location")||"";}catch(_){}
+      const saved=data.find(x=>x.id===savedId);
+      const preferred=saved||data.find(x=>Number.isFinite(Number(x.latitude))&&Number.isFinite(Number(x.longitude)))||data[0];
+      if(preferred){location.value=preferred.id;try{localStorage.setItem("ba-labs-active-environment-location",preferred.id);}catch(_){}}
+      await selectLocation();
+      if(!location.value) await updateSatelliteMap();
     }
     async function selectLocation(){
-      if(!location.value){lat.value="";lon.value="";accuracy.value="";return;}
+      if(!location.value){lat.value="";lon.value="";accuracy.value="";await updateSatelliteMap();return;}
       const {data}=await db.from("locations").select("latitude,longitude,coordinate_accuracy_m,coordinate_source").eq("id",location.value).maybeSingle();
       if(!data)return;
       lat.value=data.latitude??""; lon.value=data.longitude??""; accuracy.value=data.coordinate_accuracy_m??"";
       if(data.coordinate_source && [...source.options].some(o=>o.value===data.coordinate_source))source.value=data.coordinate_source;
-      updateSatelliteMap();
+      await updateSatelliteMap();
     }
     function renderClimateSummary(data){
       summary.replaceChildren();
@@ -471,11 +473,11 @@
       table.append(tbody);results.append(table);
     }
     async function searchSatellite(){
-      if(!location.value||!from.value||!to.value||from.value>to.value){satelliteResults.textContent="Choisissez un emplacement et une période valide.";return;}
+      if(!location.value||!from.value||!to.value||from.value>to.value){satelliteMapStatus.textContent="Site satellite non configuré.";return;}
       const days=(Date.parse(to.value)-Date.parse(from.value))/86400000+1;
       if(days>180){satelliteResults.textContent="La recherche satellite est limitée à 180 jours. Réduisez la période.";return;}
       satelliteButton.disabled=true;
-      satelliteResults.replaceChildren(node("p",{class:"muted"},"Recherche de scènes Sentinel-2…"));
+      satelliteMapStatus.textContent="Recherche de la dernière image satellite…";
       try{
         let {data,error}=await db.functions.invoke("copernicus-sentinel-catalogue",{body:{location_id:location.value,start_date:from.value,end_date:to.value,limit:10,max_cloud_cover:60}});
         let catalogueSource="Copernicus Data Space";
@@ -496,7 +498,9 @@
           const cloudB=Number.isFinite(b.cloud_cover_percent)?b.cloud_cover_percent:101;
           const dateA=Date.parse(a.acquired_at||"")||0;
           const dateB=Date.parse(b.acquired_at||"")||0;
-          return cloudA-cloudB||dateB-dateA;
+          const usableA=cloudA<=30?0:1, usableB=cloudB<=30?0:1;
+          if(usableA!==usableB)return usableA-usableB;
+          return usableA===0?dateB-dateA:cloudA-cloudB||dateB-dateA;
         });
         const candidate=rankedScenes[0];
         if(!rankedScenes.length){
@@ -514,7 +518,7 @@
       }catch(e){satelliteMapStatus.textContent="Recherche satellite temporairement indisponible.";}
       finally{satelliteButton.disabled=false;}
     }
-    location.addEventListener("change",()=>{satelliteResults.replaceChildren();selectLocation().then(()=>{if(location.value){loadRows();searchSatellite();}});});
+    location.addEventListener("change",()=>{try{localStorage.setItem("ba-labs-active-environment-location",location.value);}catch(_){} satelliteResults.replaceChildren();selectLocation().then(()=>{if(location.value){loadRows();searchSatellite();}});});
     from.addEventListener("change",()=>location.value&&loadRows());
     to.addEventListener("change",()=>{if(location.value){loadRows();updateSatelliteMap();}});
     save.addEventListener("click",async()=>{
@@ -573,12 +577,12 @@
     const {data: authState}=await db.auth.getSession();
     if(!authState?.session){
       status.textContent="Connectez-vous à CultureOps pour accéder aux emplacements de votre organisation.";
-      db.auth.onAuthStateChange((_event,session)=>{if(session){panel.classList.remove("hidden");loadLocations().then(()=>location.value&&loadRows());}});
+      db.auth.onAuthStateChange((_event,session)=>{if(session){panel.classList.remove("hidden");loadLocations().then(()=>{if(location.value){loadRows();searchSatellite();}});}});
       return;
     }
     panel.classList.remove("hidden");
     await loadLocations();
-    if(location.value){await loadRows();searchSatellite();}
+    if(location.value){await loadRows();await searchSatellite();}
   }
   const watch=new MutationObserver(()=>{if(document.getElementById("plantCard")){watch.disconnect();init().catch(e=>console.error("Environmental context",e));}});
   watch.observe(document.getElementById("workspace-root")||document.body,{childList:true,subtree:true});
