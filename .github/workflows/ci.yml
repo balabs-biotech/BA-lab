@@ -193,7 +193,7 @@ jobs:
       - name: Ensure migration version identifiers are unique
         run: |
           set -eu
-          duplicates="$(find supabase/migrations -maxdepth 1 -type f -name '*.sql' -printf '%f\\n' | sed -E 's/^([0-9]+)_.*/\\1/' | sort | uniq -d)"
+          duplicates="$(find supabase/migrations -maxdepth 1 -type f -name '*.sql' | awk -F/ '{ n=$NF; sub(/_.*/, "", n); print n }' | sort | uniq -d)"
           if [ -n "$duplicates" ]; then
             echo "Duplicate Supabase migration version(s): $duplicates" >&2
             exit 1
