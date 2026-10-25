@@ -8,6 +8,8 @@ const source = await readFile(
 
 const checks = [
   ["calls the deployed catalogue Edge Function", /db\.functions\.invoke\("copernicus-sentinel-catalogue"/],
+  ["falls back to the public Earth Search catalogue when Copernicus OAuth or catalogue results are unavailable", /db\\.functions\\.invoke\\("earth-search-sentinel2-catalogue"[\\s\\S]*?Earth Search \\/ AWS Open Data \\(sans OAuth\\)/],
+  ["labels the Earth Search fallback as catalogue-only rather than claiming NDVI processing", /Source de secours publique, sans OAuth[\\s\\S]*?le calcul NDVI et la cartographie colorée des zones ne sont pas encore produits/],
   ["requires a selected location and valid date range", /if\(!location\.value\|\|!from\.value\|\|!to\.value\|\|from\.value>to\.value\)/],
   ["limits the UI search window to 180 days", /if\(days>180\)/],
   ["caps results at ten scenes in the UI", /limit:10/],
