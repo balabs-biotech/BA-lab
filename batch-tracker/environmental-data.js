@@ -70,7 +70,7 @@
     const satelliteHint=node("p",{class:"muted"},"Sentinel-2 : scènes disponibles et couverture nuageuse. L’image ne constitue pas à elle seule un diagnostic de culture.");
     const satelliteMapPanel=node("section",{class:"card",id:"satelliteColorMapPanel"});
     satelliteMapPanel.append(node("h3",{},"Carte satellite"));
-    const satelliteMapStatus=node("p",{class:"muted","aria-live":"polite"},"Aperçu régional centré sur Sétif. Sélectionnez un emplacement enregistré pour recadrer la carte sur ses coordonnées.");
+    const satelliteMapStatus=node("p",{class:"muted","aria-live":"polite"},"Chargement de l’image satellite…");
     const satelliteMap=node("div",{id:"satelliteColorMap","aria-label":"Carte de télédétection avec imagerie en réflectance visible et couche NDVI",style:"height:340px;min-height:280px;width:100%;border-radius:10px;overflow:hidden;background:#111827"});
     const satelliteMapLegend=node("p",{class:"muted"},"La vue régionale MODIS est un contexte paysager à résolution kilométrique : elle ne permet pas de conclure qu’une parcelle ou toute la région est dépourvue de végétation. Les pixels sans données ne doivent pas être interprétés comme des sols nus.");
     const satelliteViewControls=node("div",{id:"satelliteViewControls",style:"display:flex;flex-wrap:wrap;gap:8px;margin:10px 0"});
@@ -256,12 +256,12 @@
         // that the native NASA NDVI palette is a simple green=vegetation classification.
         satelliteTrueColorLayer.addTo(satelliteLeafletMap);
         satelliteNDVILayer.on("tileerror",()=>{
-          satelliteMapStatus.textContent="Le fond cartographique reste disponible, mais NASA GIBS n’a pas fourni les tuiles NDVI pour le composite "+composite+". Essayez une autre date ou activez « Réflectance visible — composition en couleurs naturelles » dans le sélecteur de couches.";
+          satelliteMapStatus.textContent="Couche NDVI régionale indisponible.";
         });
-        satelliteTrueColorLayer.on("tileerror",()=>{satelliteMapStatus.textContent="Le fond cartographique reste disponible ; la couche couleur naturelle n’est pas disponible pour la date choisie. La couche NDVI peut rester visible.";});
+        satelliteTrueColorLayer.on("tileerror",()=>{satelliteMapStatus.textContent="Couleurs naturelles indisponibles.";});
         satelliteMapStatus.textContent=hasValidCoordinates
-          ?"Imagerie MODIS Terra en réflectance visible chargée autour de l’emplacement sélectionné. Activez la couche NDVI pour examiner l’indice spectral ; la résolution reste régionale."
-          :"Aperçu régional MODIS Terra centré sur Sétif, en réflectance visible. Cette vue montre le paysage régional mais ne représente pas les coordonnées exactes de BA Labs. Choisissez un emplacement enregistré pour recadrer.";
+          ?"Contexte satellite chargé."
+          :"Carte régionale · site non configuré.";
         requestAnimationFrame(()=>satelliteLeafletMap&&satelliteLeafletMap.invalidateSize());
       }catch(error){
         satelliteMapStatus.textContent=(error?.message||"Carte indisponible")+" ; la vue régionale reste en attente du chargement de Leaflet.";
