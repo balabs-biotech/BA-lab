@@ -8,7 +8,7 @@ create or replace function public.ingest_iot_payload(
 ) returns jsonb
 language plpgsql
 security definer
-set search_path = pg_catalog, public, pg_temp
+set search_path = pg_catalog
 as $$
 declare
   d public.iot_devices%rowtype;
