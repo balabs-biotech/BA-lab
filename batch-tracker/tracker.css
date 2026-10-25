@@ -2508,3 +2508,29 @@ body[data-domain="agronomy"] .statistics-table tbody tr:hover td {
   .sync-line { align-items: stretch; }
   .sync-line .small-button { width: 100%; }
 }
+
+
+/* Analytics charts: responsive SVG and readable synthetic demo states. */
+.statistics-chart { min-width: 0; overflow: hidden; }
+.statistics-chart svg { display: block; width: 100%; max-width: 100%; height: auto; overflow: visible; }
+.statistics-chart .statistics-demo-svg { color: var(--text, #202820); }
+.statistics-demo-note {
+  margin: 12px 0 8px;
+  padding: 10px 12px;
+  border: 1px dashed currentColor;
+  border-radius: 8px;
+  color: var(--text, #202820);
+  background: var(--surface-2, #f3f5f2);
+  font-size: .88rem;
+  line-height: 1.5;
+  font-weight: 650;
+  overflow-wrap: anywhere;
+}
+body[data-domain="mycology"] .statistics-demo-note { color: #20211c; background: #f2e8dc; border-color: #a94f1d; }
+body[data-domain="laboratory"] .statistics-demo-note { color: #183a59; background: #e8f1f9; border-color: #215b91; }
+body[data-domain="agronomy"] .statistics-demo-note { color: #f1f5ef; background: #202d25; border-color: #65b982; }
+@media (max-width: 700px) {
+  .statistics-chart { padding: 10px !important; }
+  .statistics-chart svg { min-width: 0; }
+  .statistics-demo-note { font-size: .82rem; }
+}
