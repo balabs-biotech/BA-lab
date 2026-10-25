@@ -289,7 +289,20 @@
         if(!data?.ok){satelliteResults.append(node("p",{class:"muted"},"Catalogue indisponible : "+(data?.error||"réponse invalide")));return;}
         satelliteResults.append(node("p",{},data.scenes_found+" scène(s) trouvée(s), couverture nuageuse maximale de 60 %."));
         if(!data.scenes?.length){satelliteResults.append(node("p",{class:"muted"},"Aucune scène ne correspond à ces critères. Essayez une période plus longue ou un seuil nuageux plus élevé."));return;}
-        data.scenes.forEach(scene=>{
+        const rankedScenes=[...data.scenes].sort((a,b)=>{
+          const cloudA=Number.isFinite(a.cloud_cover_percent)?a.cloud_cover_percent:101;
+          const cloudB=Number.isFinite(b.cloud_cover_percent)?b.cloud_cover_percent:101;
+          const dateA=Date.parse(a.acquired_at||"")||0;
+          const dateB=Date.parse(b.acquired_at||"")||0;
+          return cloudA-cloudB||dateB-dateA;
+        });
+        const candidate=rankedScenes[0];
+        const candidateCard=node("article",{class:"card"});
+        candidateCard.append(node("strong",{},"Candidat à examiner en premier"));
+        candidateCard.append(node("p",{},(candidate.platform||"Sentinel-2")+" · "+(candidate.acquired_at?new Date(candidate.acquired_at).toLocaleDateString():"date inconnue")+" · nuages globaux "+(candidate.cloud_cover_percent==null?"inconnus":candidate.cloud_cover_percent.toFixed(1)+" %")));
+        candidateCard.append(node("small",{class:"muted"},"Priorité indicative selon la couverture nuageuse déclarée pour toute la scène, puis la date. Ce pourcentage ne décrit pas la couverture nuageuse exacte du site ; aucun NDVI n’est calculé à ce stade."));
+        satelliteResults.append(candidateCard);
+        rankedScenes.forEach(scene=>{
           const item=node("article",{class:"card"});
           item.append(node("strong",{},scene.acquired_at?new Date(scene.acquired_at).toLocaleDateString():"Date inconnue"));
           item.append(node("p",{},(scene.platform||"Sentinel-2")+" · nuages "+(scene.cloud_cover_percent==null?"inconnus":scene.cloud_cover_percent.toFixed(1)+" %")));
