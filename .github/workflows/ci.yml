@@ -210,6 +210,8 @@ jobs:
         run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/manual_write_rpc_security_contract.test.sql
       - name: Verify batch harvest RPC security contract after replay
         run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/batch_harvest_rpc_security_contract.test.sql
+      - name: Verify IoT ingestion idempotency and least-privilege contract after replay
+        run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/iot_ingestion_idempotency_contract.test.sql
       - name: Verify sensitive RPC search-path contracts after replay
         run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/sensitive_rpc_search_path_contract.test.sql
       - name: Verify append-only audit table privileges after replay
