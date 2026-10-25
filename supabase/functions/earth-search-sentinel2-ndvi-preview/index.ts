@@ -138,6 +138,26 @@ Deno.serve(async (req: Request) => {
       redImage.readRasters({ window: redWin.window, samples: [0], interleave: true }),
       nirImage.readRasters({ window: nirWin.window, samples: [0], interleave: true }),
     ]);
+    // SCL is a 20 m classification raster. Mask cloud/shadow/snow classes when available.
+    let sclRaster: any = null, sclWin: any = null, sclWidth = 0, sclHeight = 0;
+    let cloudMaskApplied = false;
+    const sclUrl = safeCogUrl(assets.scl?.href);
+    if (sclUrl) {
+      try {
+        const sclTif = await fromUrl(sclUrl, { allowFullFile: false });
+        const sclImage = await sclTif.getImage();
+        sclWin = makeWindow(sclImage);
+        sclWidth = sclWin.window[2] - sclWin.window[0];
+        sclHeight = sclWin.window[3] - sclWin.window[1];
+        if (sclWidth > 0 && sclHeight > 0 && sclWidth * sclHeight <= 1_000_000) {
+          sclRaster = await sclImage.readRasters({ window: sclWin.window, samples: [0], interleave: true });
+          cloudMaskApplied = true;
+        }
+      } catch (maskError) {
+        console.warn("[earth-search-sentinel2-ndvi] SCL mask unavailable; continuing without cloud mask",
+          maskError instanceof Error ? maskError.message.slice(0, 120) : "unknown");
+      }
+    }
     const width = 512, height = 512;
     const png = new PNG({ width, height, colorType: 6 });
     let valid = 0, sum = 0, min = 1, max = -1;
@@ -149,6 +169,23 @@ Deno.serve(async (req: Request) => {
         const ry = Math.min(redHeight - 1, Math.floor(py * redHeight / height));
         const nx = Math.min(nirWidth - 1, Math.floor(px * nirWidth / width));
         const ny = Math.min(nirHeight - 1, Math.floor(py * nirHeight / height));
+        if (cloudMaskApplied && sclRaster && sclWin) {
+          const mapX = minX + (px + 0.5) * (maxX - minX) / width;
+          const mapY = maxY - (py + 0.5) * (maxY - minY) / height;
+          const sc = Math.floor((mapX - sclWin.originX) / sclWin.resX) - sclWin.window[0];
+          const sr = Math.floor((mapY - sclWin.originY) / sclWin.resY) - sclWin.window[1];
+          if (sc < 0 || sr < 0 || sc >= sclWidth || sr >= sclHeight) {
+            png.data[i] = 0; png.data[i + 1] = 0; png.data[i + 2] = 0; png.data[i + 3] = 0;
+            continue;
+          }
+          const classification = Number(sclRaster[sr * sclWidth + sc]);
+          // SCL: 0 no data, 1 saturated/defective, 3 cloud shadow, 8/9 clouds,
+          // 10 cirrus and 11 snow/ice. Leave class 2 (dark area) and 7 (unclassified) visible.
+          if ([0, 1, 3, 8, 9, 10, 11].includes(classification)) {
+            png.data[i] = 0; png.data[i + 1] = 0; png.data[i + 2] = 0; png.data[i + 3] = 0;
+            continue;
+          }
+        }
         const red = Number((redRaster as any)[ry * redWidth + rx]);
         const nir = Number((nirRaster as any)[ny * nirWidth + nx]);
         const denom = nir + red;
@@ -165,13 +202,13 @@ Deno.serve(async (req: Request) => {
     if (!valid) return json(422, { error: "ndvi_no_valid_pixels" });
     const pngBuffer = PNG.sync.write(png);
     if (pngBuffer.byteLength > 5_000_000) return json(502, { error: "ndvi_png_size_invalid" });
-    const stats = { valid_pixel_percent: Math.round(valid / (width * height) * 1000) / 10, mean_ndvi: Math.round(sum / valid * 1000) / 1000, min_ndvi: Math.round(min * 1000) / 1000, max_ndvi: Math.round(max * 1000) / 1000, cloud_cover_scene_percent: Number(feature?.properties?.["eo:cloud_cover"] ?? NaN) };
+    const stats = { valid_pixel_percent: Math.round(valid / (width * height) * 1000) / 10, mean_ndvi: Math.round(sum / valid * 1000) / 1000, min_ndvi: Math.round(min * 1000) / 1000, max_ndvi: Math.round(max * 1000) / 1000, cloud_cover_scene_percent: Number(feature?.properties?.["eo:cloud_cover"] ?? NaN), cloud_mask_applied: cloudMaskApplied };
     return new Response(pngBuffer, {
       status: 200,
       headers: { ...corsHeaders, "Content-Type": "image/png", "Cache-Control": "private, max-age=900",
         "X-Geo-Bounds": [west, south, east, north].join(","),
         "X-Image-Date": String(feature?.properties?.datetime ?? date),
-        "X-Image-Source": "Sentinel-2 L2A public COG; red/NIR raster NDVI",
+        "X-Image-Source": "Sentinel-2 L2A public COG; red/NIR raster NDVI; SCL cloud mask when available",
         "X-NDVI-Stats": JSON.stringify(stats),
       },
     });
