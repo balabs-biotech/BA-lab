@@ -73,7 +73,7 @@
     const satelliteMapPanel=node("section",{class:"card",id:"satelliteColorMapPanel"});
     satelliteMapPanel.append(node("h3",{},"Carte satellitaire colorée"));
     satelliteMapPanel.append(node("p",{class:"muted"},"Vue régionale en couleurs NDVI MODIS sur 16 jours, ou en couleur naturelle. La couche MODIS est de l’ordre du kilomètre : elle sert de contexte régional, pas de mesure d’une parcelle ou d’une serre."));
-    const satelliteMapStatus=node("p",{class:"muted","aria-live":"polite"},"Choisissez un emplacement avec des coordonnées pour charger la carte.");
+    const satelliteMapStatus=node("p",{class:"muted","aria-live":"polite"},"Aperçu régional centré sur Sétif. Sélectionnez un emplacement enregistré pour recadrer la carte sur ses coordonnées.");
     const satelliteMap=node("div",{id:"satelliteColorMap","aria-label":"Carte satellite avec couches colorées de végétation et couleur naturelle",style:"height:340px;min-height:280px;width:100%;border-radius:10px;overflow:hidden;background:#111827"});
     const satelliteMapLegend=node("p",{class:"muted"},"NDVI : couleurs du produit satellite NASA GIBS ; indice de végétation régional, pas diagnostic de santé des plantes. Le cercle en pointillés illustre environ 1 km autour du point, à titre de repère d’échelle, pas comme limite de parcelle.");
     const satelliteNDVILegend=node("div",{id:"satelliteNDVILegend",style:"display:flex;flex-wrap:wrap;gap:7px;margin:8px 0 14px;font-size:12px"});
@@ -162,28 +162,38 @@
       }
     }
     async function updateSatelliteMap(){
-      if(!location.value){satelliteMapStatus.textContent="Choisissez un emplacement pour afficher la carte.";return;}
+      const hasSelectedLocation=Boolean(location.value);
       const latitude=Number(lat.value),longitude=Number(lon.value);
-      if(!Number.isFinite(latitude)||latitude < -90||latitude>90||!Number.isFinite(longitude)||longitude < -180||longitude>180){
-        satelliteMapStatus.textContent="Coordonnées absentes ou invalides. Enregistrez des coordonnées fiables pour afficher la carte.";return;
-      }
-      satelliteMapStatus.textContent="Chargement de la carte et des couches satellitaires…";
+      const hasValidCoordinates=hasSelectedLocation&&Number.isFinite(latitude)&&latitude>=-90&&latitude<=90&&Number.isFinite(longitude)&&longitude>=-180&&longitude<=180;
+      // Never leave the map blank just because the user has not selected or geocoded a site yet.
+      // This is a clearly labelled regional fallback, not a claim about the exact BA Labs parcel.
+      const mapLatitude=hasValidCoordinates?latitude:36.19;
+      const mapLongitude=hasValidCoordinates?longitude:5.41;
+      satelliteMapStatus.textContent="Chargement de la carte régionale et des couches satellitaires…";
       try{
         const L=await loadLeaflet();
         if(!satelliteLeafletMap){
-          satelliteLeafletMap=L.map(satelliteMap,{preferCanvas:true,scrollWheelZoom:false}).setView([latitude,longitude],8);
+          satelliteLeafletMap=L.map(satelliteMap,{preferCanvas:true,scrollWheelZoom:false}).setView([mapLatitude,mapLongitude],hasValidCoordinates?10:8);
           const osm=L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{
             maxZoom:19,attribution:'&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a>'
           }).addTo(satelliteLeafletMap);
           satelliteLayerControl=L.control.layers({"Carte de référence":osm},{},{collapsed:true}).addTo(satelliteLeafletMap);
-          satelliteMarker=L.circleMarker([latitude,longitude],{radius:6,color:"#f8fafc",weight:2,fillColor:"#2563eb",fillOpacity:1})
-            .bindPopup("Emplacement sélectionné · coordonnées enregistrées").addTo(satelliteLeafletMap);
-          satelliteGridCircle=L.circle([latitude,longitude],{radius:500,color:"#f59e0b",weight:1,dashArray:"5 5",fillColor:"#f59e0b",fillOpacity:0.07})
-            .bindPopup("Rayon indicatif de 500 m autour du point, pour rappeler l’ordre de grandeur d’une maille MODIS d’environ 1 km — ce n’est pas une limite de parcelle.").addTo(satelliteLeafletMap);
         }else{
-          satelliteLeafletMap.setView([latitude,longitude],Math.min(satelliteLeafletMap.getZoom(),9));
-          satelliteMarker.setLatLng([latitude,longitude]);
-          satelliteGridCircle.setLatLng([latitude,longitude]);
+          satelliteLeafletMap.setView([mapLatitude,mapLongitude],hasValidCoordinates?Math.min(satelliteLeafletMap.getZoom(),10):8);
+        }
+        if(hasValidCoordinates){
+          if(!satelliteMarker){
+            satelliteMarker=L.circleMarker([latitude,longitude],{radius:6,color:"#f8fafc",weight:2,fillColor:"#2563eb",fillOpacity:1})
+              .bindPopup("Emplacement sélectionné · coordonnées enregistrées").addTo(satelliteLeafletMap);
+            satelliteGridCircle=L.circle([latitude,longitude],{radius:500,color:"#f59e0b",weight:1,dashArray:"5 5",fillColor:"#f59e0b",fillOpacity:0.07})
+              .bindPopup("Rayon indicatif de 500 m autour du point, pour rappeler l’ordre de grandeur d’une maille MODIS d’environ 1 km — ce n’est pas une limite de parcelle.").addTo(satelliteLeafletMap);
+          }else{
+            satelliteMarker.setLatLng([latitude,longitude]);
+            satelliteGridCircle.setLatLng([latitude,longitude]);
+          }
+        }else{
+          if(satelliteMarker){satelliteLeafletMap.removeLayer(satelliteMarker);satelliteMarker=null;}
+          if(satelliteGridCircle){satelliteLeafletMap.removeLayer(satelliteGridCircle);satelliteGridCircle=null;}
         }
         if(satelliteNDVILayer){satelliteLayerControl.removeLayer(satelliteNDVILayer);satelliteLeafletMap.removeLayer(satelliteNDVILayer);}
         if(satelliteTrueColorLayer){satelliteLayerControl.removeLayer(satelliteTrueColorLayer);satelliteLeafletMap.removeLayer(satelliteTrueColorLayer);}
@@ -199,12 +209,16 @@
         satelliteLayerControl.addOverlay(satelliteNDVILayer,"Végétation colorée — NDVI MODIS (16 jours)");
         satelliteLayerControl.addOverlay(satelliteTrueColorLayer,"Satellite — couleur naturelle");
         satelliteNDVILayer.addTo(satelliteLeafletMap);
-        satelliteNDVILayer.on("tileerror",()=>{satelliteMapStatus.textContent="La carte de base est chargée, mais la couche NDVI n’a pas répondu pour cette date. Essayez une autre date ou la couche couleur naturelle.";});
-        satelliteTrueColorLayer.on("tileerror",()=>{satelliteMapStatus.textContent="La couche couleur naturelle n’est pas disponible pour la date choisie.";});
-        satelliteMapStatus.textContent="Couche NDVI MODIS · composite de 16 jours du "+composite+". Échelle régionale, résolution trop grossière pour cartographier séparément une serre ou des lits de culture.";
-        setTimeout(()=>satelliteLeafletMap&&satelliteLeafletMap.invalidateSize(),100);
+        satelliteNDVILayer.on("tileerror",()=>{
+          satelliteMapStatus.textContent="Le fond cartographique reste disponible, mais NASA GIBS n’a pas fourni les tuiles NDVI pour le composite "+composite+". Essayez une autre date ou activez « Satellite — couleur naturelle » dans le sélecteur de couches.";
+        });
+        satelliteTrueColorLayer.on("tileerror",()=>{satelliteMapStatus.textContent="Le fond cartographique reste disponible ; la couche couleur naturelle n’est pas disponible pour la date choisie. La couche NDVI peut rester visible.";});
+        satelliteMapStatus.textContent=hasValidCoordinates
+          ?"NDVI MODIS régional chargé autour de l’emplacement sélectionné · composite de 16 jours du "+composite+". Résolution trop grossière pour distinguer une serre ou des planches."
+          :"Aperçu régional centré sur Sétif · composite NDVI MODIS de 16 jours du "+composite+". Cette vue sert à présenter la carte et ne représente pas les coordonnées exactes de BA Labs. Choisissez un emplacement enregistré pour recadrer.";
+        requestAnimationFrame(()=>satelliteLeafletMap&&satelliteLeafletMap.invalidateSize());
       }catch(error){
-        satelliteMapStatus.textContent=(error?.message||"Carte indisponible")+" ; la recherche de scènes Sentinel-2 reste disponible ci-dessous.";
+        satelliteMapStatus.textContent=(error?.message||"Carte indisponible")+" ; la vue régionale reste en attente du chargement de Leaflet.";
       }
     }
     async function loadLocations() {
