@@ -182,7 +182,7 @@
       (data||[]).forEach(row=>{
         if(row.value===null||row.value===undefined||!Number.isFinite(Number(row.value)))return;
         const day=String(row.observed_at||"").slice(0,10);
-        if(!/^\\d{4}-\\d{2}-\\d{2}$/.test(day))return;
+        if(!/^\d{4}-\d{2}-\d{2}$/.test(day))return;
         if(!byDay.has(day))byDay.set(day,{});
         byDay.get(day)[row.variable_code]=Number(row.value);
       });
