@@ -891,7 +891,11 @@ async function initializeAuthenticatedTracker(
     populatePlantLocationOptions();
     document.getElementById("plantLocation")?.dispatchEvent(new Event("change"));
 
-    await loadPlantCultures();
+    // Mycology and Laboratory must not depend on the agronomy-only plant registry.
+    // A plant-registry/RLS failure must not block authentication in those workspaces.
+    if (document.body.dataset.domain === "agronomy") {
+      await loadPlantCultures();
+    }
 
     await syncPendingCultures();
 
