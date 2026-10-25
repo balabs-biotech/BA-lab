@@ -18,7 +18,7 @@ const checks = [
   ["ranks a review candidate by lower scene-wide cloud cover then recency", /rankedScenes=\[\.\.\.data\.scenes\][\s\S]*?return cloudA-cloudB\|\|dateB-dateA/],
   ["labels the candidate as indicative and discloses scene-wide cloud-cover limits", /Candidat à examiner en premier[\s\S]*?ne décrit pas la couverture nuageuse exacte du site/],
   ["renders an embedded satellite map panel", /id:"satelliteColorMap"/],
-  ["uses the public NASA GIBS NDVI raster layer", /MODIS_Terra_NDVI_16Day/],
+  ["uses the public NASA GIBS NDVI raster layer", /MODIS_Terra_L3_NDVI_16Day/],
   ["offers natural-colour satellite imagery", /MODIS_Terra_CorrectedReflectance_TrueColor/],
   ["states that MODIS is regional at roughly kilometre scale", /de l’ordre du kilomètre/],
   ["labels the NDVI map as a 16-day regional composite", /composite de 16 jours/],
