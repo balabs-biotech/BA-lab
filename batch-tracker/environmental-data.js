@@ -272,7 +272,7 @@
       if(error){satelliteMapStatus.textContent="Sites indisponibles.";return;}
       data.forEach(x=>location.append(node("option",{value:x.id},x.code?x.name+" ("+x.code+")":x.name)));
       let savedId="";try{savedId=localStorage.getItem("ba-labs-active-environment-location")||"";}catch(_){}
-      const saved=data.find(x=>x.id===savedId);
+      const saved=data.find(x=>x.id===savedId&&x.latitude!=null&&x.longitude!=null);
       const preferred=saved||data.find(x=>x.latitude!=null&&x.longitude!=null&&Number.isFinite(Number(x.latitude))&&Number.isFinite(Number(x.longitude)))||data[0];
       if(preferred){location.value=preferred.id;try{localStorage.setItem("ba-labs-active-environment-location",preferred.id);}catch(_){}}
       await selectLocation();
@@ -516,7 +516,7 @@
       }catch(e){satelliteMapStatus.textContent="Recherche satellite indisponible.";}
       finally{satelliteButton.disabled=false;}
     }
-    location.addEventListener("change",()=>{try{localStorage.setItem("ba-labs-active-environment-location",location.value);}catch(_){} satelliteResults.replaceChildren();selectLocation().then(()=>{if(location.value){loadRows();searchSatellite();}});});
+    location.addEventListener("change",()=>{try{localStorage.setItem("ba-labs-active-environment-location",location.value);}catch(_){} satelliteResults.replaceChildren();selectLocation().then(()=>{if(location.value){loadRows();if(lat.value!==""&&lon.value!=="")searchSatellite();else satelliteMapStatus.textContent="Coordonnées du site manquantes.";}});});
     from.addEventListener("change",()=>location.value&&loadRows());
     to.addEventListener("change",()=>{if(location.value){loadRows();updateSatelliteMap();}});
     save.addEventListener("click",async()=>{
