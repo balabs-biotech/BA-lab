@@ -46,6 +46,16 @@ const i18n=fs.readFileSync("batch-tracker/i18n.js","utf8");
 for(const label of ["Résumé numérique par variable","Resumo numérico por variável","ملخص رقمي حسب المتغير"]){
  if(!i18n.includes(label))throw new Error("Comparison heading translation missing: "+label);
 }
+
+if(!template.includes('id="aiEntryDescription"')||!template.includes('id="aiEntryJson"')||!template.includes('id="aiEntryApplyJson"'))throw new Error("AI-assisted entry controls are missing");
+if(!engine.includes('protocol: "ba-labs-entry"')||!engine.includes('payload.protocol !== "ba-labs-entry"')||!engine.includes('payload.version !== 1'))throw new Error("AI-assisted entry protocol validation is missing");
+if(!engine.includes('const textFields = ["target", "variable", "unit", "occurred_at", "instrument", "method", "note"]'))throw new Error("AI entry text-field validation missing");
+if(!engine.includes('!Number.isFinite(payload.value)')||!engine.includes('typeof payload.value !== "string"'))throw new Error("AI entry value type validation missing");
+if(!engine.includes('payload.missing_information.some(item => typeof item !== "string")'))throw new Error("AI entry missing-information validation missing");
+if(!engine.includes('["measurement", "observation"].includes(payload.kind)')||!engine.includes('activateWorkspaceModule("measurementCard")'))throw new Error("AI-assisted entry kind handling or form routing is missing");
+if(!engine.includes('Nothing was saved')&&!engine.includes('Rien n’a été enregistré'))throw new Error("AI-assisted entry must not claim or perform automatic persistence");
+console.log("✓ AI-assisted entry controls and protocol validation verified");
+
 console.log("✓ JavaScript syntax parsed");
 console.log("✓ Three fixed-domain entry pages and chooser links verified");
 console.log("✓ Shared workspace excludes universe switcher");

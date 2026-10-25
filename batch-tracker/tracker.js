@@ -6328,6 +6328,195 @@ function setupQuickCapture() {
     else if (!observationVariableSelect.value) observationVariableSelect.focus({ preventScroll: true });
     else observationValueInput.focus({ preventScroll: true });
   });
+
+  const descriptionInput = document.getElementById("aiEntryDescription");
+  const jsonInput = document.getElementById("aiEntryJson");
+  const status = document.getElementById("aiEntryStatus");
+  const copyPromptButton = document.getElementById("aiEntryCopyPrompt");
+  const openChatButton = document.getElementById("aiEntryOpenChat");
+  const applyJsonButton = document.getElementById("aiEntryApplyJson");
+
+  const setAiStatus = (text, kind = "info") => {
+    if (!status) return;
+    status.textContent = text;
+    status.dataset.kind = kind;
+  };
+  const buildAiPrompt = () => {
+    const description = descriptionInput?.value.trim() || "";
+    if (!description) {
+      setAiStatus("Décrivez d’abord l’opération. Vous pouvez utiliser la dictée du clavier de votre téléphone.", "error");
+      descriptionInput?.focus();
+      return "";
+    }
+    const domain = document.body.dataset.domain || "laboratory";
+    return [
+      "Tu aides à préparer une saisie pour BA Labs CultureOps.",
+      "Transforme uniquement la description ci-dessous en un seul objet JSON valide, sans Markdown ni texte autour.",
+      "N’invente jamais de mesure, de code de culture, de date, d’unité ou de méthode. Si une information manque, utilise null. Ne prétends pas que les données ont été enregistrées.",
+      "Utilise exactement ce schéma :",
+      JSON.stringify({ protocol: "ba-labs-entry", version: 1, kind: "measurement", target: null, variable: null, value: null, unit: null, occurred_at: null, instrument: null, method: null, note: null, missing_information: [] }, null, 2),
+      "Pour kind, utilise uniquement measurement ou observation. Pour une mesure, value doit être un nombre JSON (pas une chaîne) ou null. Pour une observation, value doit être une chaîne décrivant le constat ou null. Préserve les unités et le sens des observations. N’invente pas de référence de culture si elle n’est pas explicitement fournie.",
+      "Module actuel : " + domain + ".",
+      "Description utilisateur :",
+      description
+    ].join("\n");
+  };
+
+  copyPromptButton?.addEventListener("click", async () => {
+    const prompt = buildAiPrompt();
+    if (!prompt) return;
+    try {
+      await navigator.clipboard.writeText(prompt);
+      setAiStatus("Instructions copiées. Ouvrez ChatGPT, collez-les, puis revenez ici avec le JSON obtenu.", "success");
+    } catch (error) {
+      const fallback = document.createElement("textarea");
+      fallback.value = prompt;
+      fallback.setAttribute("readonly", "");
+      fallback.style.position = "fixed";
+      fallback.style.opacity = "0";
+      fallback.style.pointerEvents = "none";
+      document.body.appendChild(fallback);
+      fallback.select();
+      let copied = false;
+      try { copied = document.execCommand("copy"); } catch (copyError) { copied = false; }
+      fallback.remove();
+      if (copied) setAiStatus("Instructions copiées. Ouvrez ChatGPT, collez-les, puis revenez ici avec le JSON obtenu.", "success");
+      else setAiStatus("La copie automatique a échoué. Autorisez le presse-papiers du navigateur ou copiez les instructions depuis un navigateur compatible.", "error");
+    }
+  });
+  openChatButton?.addEventListener("click", () => {
+    window.open("https://chatgpt.com/", "_blank", "noopener,noreferrer");
+  });
+
+  const matchSelectOption = (select, rawValue) => {
+    if (!select || rawValue == null || String(rawValue).trim() === "") return false;
+    const wanted = String(rawValue).trim().toLocaleLowerCase();
+    const options = [...select.options].filter(option => option.value);
+    const matches = options.filter(option =>
+      option.value.trim().toLocaleLowerCase() === wanted ||
+      option.textContent.trim().toLocaleLowerCase() === wanted
+    );
+    if (matches.length !== 1) return false;
+    select.value = matches[0].value;
+    select.dispatchEvent(new Event("change", { bubbles: true }));
+    return true;
+  };
+  const setIfPresent = (element, value) => {
+    if (element && value != null && String(value).trim() !== "") element.value = String(value);
+  };
+  const setLocalDateTime = (element, value) => {
+    if (!element || value == null || String(value).trim() === "") return;
+    const raw = String(value).trim();
+    if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(raw)) {
+      element.value = raw;
+      return;
+    }
+    const date = new Date(raw);
+    if (Number.isNaN(date.getTime())) return;
+    date.setMinutes(date.getMinutes() - date.getTimezoneOffset());
+    element.value = date.toISOString().slice(0, 16);
+  };
+
+  applyJsonButton?.addEventListener("click", () => {
+    let payload;
+    try {
+      payload = JSON.parse(jsonInput?.value || "");
+    } catch (error) {
+      setAiStatus("JSON invalide. Collez l’objet JSON complet, sans les balises Markdown ```.", "error");
+      return;
+    }
+    if (!payload || typeof payload !== "object" || Array.isArray(payload) ||
+        payload.protocol !== "ba-labs-entry" || payload.version !== 1 ||
+        !["measurement", "observation"].includes(payload.kind)) {
+      setAiStatus("Format non reconnu. Attendu : protocole ba-labs-entry v1, avec kind measurement ou observation.", "error");
+      return;
+    }
+
+    const textFields = ["target", "variable", "unit", "occurred_at", "instrument", "method", "note"];
+    const invalidTextField = textFields.find(key =>
+      payload[key] !== undefined && payload[key] !== null && typeof payload[key] !== "string"
+    );
+    if (invalidTextField) {
+      setAiStatus("Format invalide : " + invalidTextField + " doit être du texte ou null. Aucun champ n’a été modifié.", "error");
+      return;
+    }
+    if (payload.kind === "measurement" &&
+        payload.value !== undefined && payload.value !== null &&
+        (typeof payload.value !== "number" || !Number.isFinite(payload.value))) {
+      setAiStatus("Format invalide : la valeur d’une mesure doit être un nombre JSON ou null. Aucun champ n’a été modifié.", "error");
+      return;
+    }
+    if (payload.kind === "observation" &&
+        payload.value !== undefined && payload.value !== null &&
+        typeof payload.value !== "string") {
+      setAiStatus("Format invalide : la valeur d’une observation doit être du texte ou null. Aucun champ n’a été modifié.", "error");
+      return;
+    }
+    if (payload.missing_information !== undefined &&
+        (!Array.isArray(payload.missing_information) ||
+         payload.missing_information.some(item => typeof item !== "string"))) {
+      setAiStatus("Format invalide : missing_information doit être une liste de textes. Aucun champ n’a été modifié.", "error");
+      return;
+    }
+
+    measurementTargetSelect.value = "";
+    measurementTargetSelect.dispatchEvent(new Event("change", { bubbles: true }));
+    let variableMatched = false;
+    let unitMismatch = false;
+    const targetMatched = matchSelectOption(measurementTargetSelect, payload.target);
+    if (payload.kind === "measurement") {
+      measurementVariableSelect.value = "";
+      measurementVariableSelect.dispatchEvent(new Event("change", { bubbles: true }));
+      measurementValueInput.value = "";
+      measurementUnitSelect.value = "";
+      measurementAtInput.value = "";
+      measurementInstrumentInput.value = "";
+      measurementMethodInput.value = "";
+      measurementNoteInput.value = "";
+      variableMatched = matchSelectOption(measurementVariableSelect, payload.variable);
+      if (typeof payload.value === "number" && Number.isFinite(payload.value)) measurementValueInput.value = String(payload.value);
+      setIfPresent(measurementInstrumentInput, payload.instrument);
+      setIfPresent(measurementMethodInput, payload.method);
+      setIfPresent(measurementNoteInput, payload.note);
+      setLocalDateTime(measurementAtInput, payload.occurred_at);
+      if (payload.unit != null && String(payload.unit).trim()) {
+        const unitMatched = matchSelectOption(measurementUnitSelect, payload.unit);
+        if (!unitMatched) unitMismatch = true;
+      }
+    } else {
+      observationVariableSelect.value = "";
+      observationVariableSelect.dispatchEvent(new Event("change", { bubbles: true }));
+      observationAtInput.value = "";
+      observationValueInput.value = "";
+      observationMethodInput.value = "";
+      observationInstrumentInput.value = "";
+      observationNoteInput.value = "";
+      variableMatched = matchSelectOption(observationVariableSelect, payload.variable);
+      setIfPresent(observationValueInput, payload.value);
+      setIfPresent(observationMethodInput, payload.method);
+      setIfPresent(observationInstrumentInput, payload.instrument);
+      setIfPresent(observationNoteInput, payload.note);
+      setLocalDateTime(observationAtInput, payload.occurred_at);
+      const details = document.querySelector(".observation-details");
+      if (details) details.open = true;
+    }
+
+    activateWorkspaceModule("measurementCard");
+    document.getElementById("measurementCard")?.scrollIntoView({ block: "start", behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+    const warnings = [];
+    if (!targetMatched) warnings.push("sélectionnez la culture ou le lot manuellement");
+    if (!variableMatched) warnings.push("sélectionnez le paramètre ou la catégorie manuellement");
+    if (payload.kind === "measurement" && !(typeof payload.value === "number" && Number.isFinite(payload.value))) warnings.push("vérifiez ou saisissez la valeur numérique");
+    if (payload.kind === "observation" && (payload.value == null || !String(payload.value).trim())) warnings.push("ajoutez la description de l’observation");
+    if (payload.kind === "measurement" && (payload.unit == null || !String(payload.unit).trim())) warnings.push("sélectionnez l’unité manuellement");
+    else if (unitMismatch) warnings.push("vérifiez l’unité, qui ne correspond pas exactement au référentiel");
+    setAiStatus(
+      warnings.length
+        ? "Préremplissage partiel : " + warnings.join(" ; ") + ". Rien n’a été enregistré ; vérifiez le formulaire."
+        : "Préremplissage effectué. Vérifiez la culture, le paramètre, la date et les valeurs, puis utilisez le bouton d’enregistrement habituel. Rien n’a été enregistré automatiquement.",
+      warnings.length ? "warning" : "success"
+    );
+  });
 }
 
 

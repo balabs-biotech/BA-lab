@@ -778,6 +778,25 @@
         <button type="button" class="quick-capture-tile" data-quick-measure="ec"><span class="quick-capture-icon">EC</span><span><strong>Conductivité</strong><small>Suivi de la solution</small></span><span class="quick-capture-arrow">↗</span></button>
         <button type="button" class="quick-capture-tile quick-capture-observation" data-quick-observation><span class="quick-capture-icon">◎</span><span><strong>Observation visuelle</strong><small>Aspect, croissance, anomalie…</small></span><span class="quick-capture-arrow">↗</span></button>
       </div>
+      <section class="ai-entry-assist" aria-labelledby="aiEntryTitle">
+        <div class="ai-entry-assist-heading">
+          <div><span class="context-eyebrow">SAISIE ASSISTÉE</span><h4 id="aiEntryTitle">Décrire au lieu de remplir</h4><p>Écrivez ou dictez votre opération. ChatGPT peut préparer les champs ; vous gardez le contrôle avant l’enregistrement.</p></div>
+          <span class="ai-entry-assist-icon" aria-hidden="true">✳</span>
+        </div>
+        <label for="aiEntryDescription">Que s’est-il passé ?</label>
+        <textarea id="aiEntryDescription" rows="3" maxlength="3000" placeholder="Ex. Ce matin, j’ai mesuré un pH de 6,4 sur le lot DF1."></textarea>
+        <div class="ai-entry-assist-actions">
+          <button type="button" id="aiEntryCopyPrompt" class="secondary-button">Copier les instructions pour ChatGPT</button>
+          <button type="button" id="aiEntryOpenChat" class="secondary-button">Ouvrir ChatGPT</button>
+        </div>
+        <details class="ai-entry-paste-details">
+          <summary>J’ai déjà une réponse structurée — l’importer</summary>
+          <label for="aiEntryJson">Coller le JSON reçu de l’IA</label>
+          <textarea id="aiEntryJson" rows="5" maxlength="12000" spellcheck="false" autocapitalize="off" autocomplete="off" placeholder='{"protocol":"ba-labs-entry","version":1,"kind":"measurement",...}'></textarea>
+          <button type="button" id="aiEntryApplyJson">Vérifier et préremplir le formulaire</button>
+          <p id="aiEntryStatus" class="ai-entry-status" role="status" aria-live="polite">Aucune donnée n’est enregistrée automatiquement. Vérifiez les champs puis utilisez le bouton d’enregistrement habituel.</p>
+        </details>
+      </section>
       <p class="quick-capture-tip"><span aria-hidden="true">↳</span> Astuce : la culture ou le lot choisi est conservé pendant la saisie des mesures et observations.</p>
     </div>
 
