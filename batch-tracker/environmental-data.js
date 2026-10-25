@@ -159,7 +159,9 @@
         satelliteMapPanel.scrollIntoView({behavior:"smooth",block:"start"});
         satelliteMapStatus.textContent="NDVI Sentinel-2 L2A du "+sceneDate+" affiché directement dans BA Labs. Bandes source à 10 m ; aperçu rendu en 512 × 512 pixels sur une emprise régionale d’environ 1 km. Cette emprise n’est pas une limite de parcelle et les nuages peuvent affecter le résultat.";
       }catch(error){
-        satelliteMapStatus.textContent=(error?.message||"Erreur de chargement Sentinel-2")+" La couche régionale MODIS reste disponible comme contexte.";
+        const message=error?.message||"Erreur de chargement Sentinel-2";
+        satelliteMapStatus.textContent=message+" La couche régionale MODIS reste disponible comme contexte. Utilisez le lien vers l’explorateur Sentinel-2 haute résolution ci-dessus pour consulter les images sans configurer le service de traitement BA Labs.";
+        if(message.includes("pas encore configuré"))sentinelHighResLink.scrollIntoView({behavior:"smooth",block:"center"});
       }
     }
     async function updateSatelliteMap(){
