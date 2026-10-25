@@ -75,10 +75,12 @@
     satelliteMapPanel.append(node("p",{class:"muted"},"Imagerie MODIS Terra en réflectance visible et indice différentiel normalisé de végétation (NDVI), composite de 16 jours. Résolution régionale kilométrique : utile pour le contexte paysager, insuffisante pour caractériser individuellement une serre ou une planche."));
     const satelliteMapStatus=node("p",{class:"muted","aria-live":"polite"},"Aperçu régional centré sur Sétif. Sélectionnez un emplacement enregistré pour recadrer la carte sur ses coordonnées.");
     const satelliteMap=node("div",{id:"satelliteColorMap","aria-label":"Carte de télédétection avec imagerie en réflectance visible et couche NDVI",style:"height:340px;min-height:280px;width:100%;border-radius:10px;overflow:hidden;background:#111827"});
-    const satelliteMapLegend=node("p",{class:"muted"},"NDVI MODIS : rendu colorimétrique natif NASA GIBS. Les faibles valeurs peuvent apparaître très claires ou transparentes dans cette palette ; l’absence de vert vif ne prouve pas l’absence de cultures. Indicateur régional, pas diagnostic de santé des plantes. Le cercle en pointillés est un repère d’échelle, pas une limite de parcelle.");
+    const satelliteMapLegend=node("p",{class:"muted"},"La vue régionale MODIS est un contexte paysager à résolution kilométrique : elle ne permet pas de conclure qu’une parcelle ou toute la région est dépourvue de végétation. Les pixels sans données ne doivent pas être interprétés comme des sols nus.");
+    const satelliteViewControls=node("div",{id:"satelliteViewControls",style:"display:flex;flex-wrap:wrap;gap:8px;margin:10px 0"});
+    const satelliteModeHelp=node("p",{class:"muted"},"Choisissez d’abord une scène Sentinel-2 dans la liste, puis un rendu. NDVI = intensité relative de végétation ; couleurs naturelles = apparence proche de l’œil humain ; fausses couleurs infrarouges = végétation généralement plus contrastée. L’indice UV est une mesure atmosphérique météo, pas une bande d’imagerie Sentinel-2.");
     const satelliteNDVILegend=node("div",{id:"satelliteNDVILegend",style:"display:flex;flex-wrap:wrap;gap:7px;margin:8px 0 14px;font-size:12px"});
     satelliteNDVILegend.append(node("p",{class:"muted"},"Légende du produit NDVI MODIS : la palette NASA n’est pas une échelle qualitative universelle. Interpréter les valeurs avec la date, la phénologie et la résolution spatiale."));
-    satelliteMapPanel.append(satelliteMapStatus,satelliteMap,satelliteMapLegend,satelliteNDVILegend);
+    satelliteMapPanel.append(satelliteMapStatus,satelliteMap,satelliteViewControls,satelliteMapLegend,satelliteModeHelp,satelliteNDVILegend);
     const sentinelHighResNote=node("p",{class:"muted"},"Pour examiner les limites de champs et les parcelles, utilisez l’explorateur Sentinel-2 L2A à 10 m. Cette vue externe exploite les bandes multispectrales de Sentinel-2 ; elle ne remplace pas une analyse agronomique validée.");
     const sentinelHighResLink=node("a",{href:"https://sentinel-2.allthingsspatial.io/",target:"_blank",rel:"noopener noreferrer"},"Ouvrir l’explorateur Sentinel-2 haute résolution (10 m) ↗");
     sentinelHighResLink.style.display="inline-block";
@@ -91,7 +93,7 @@
     const nav=document.querySelector(".section-nav");
     if(nav && !document.getElementById("envNav")) { const a=node("a",{href:"#environmentalCard",id:"envNav"},"Contexte environnemental"); nav.append(a); }
 
-    let satelliteLeafletMap=null, satelliteMarker=null, satelliteGridCircle=null;
+    let satelliteLeafletMap=null, satelliteMarker=null, satelliteGridCircle=null, selectedSentinelSceneDate=null, selectedSentinelDisplayMode="ndvi";
     let satelliteNDVILayer=null, satelliteTrueColorLayer=null, satelliteSentinelNDVILayer=null, satelliteSentinelObjectUrl=null, satelliteLayerControl=null, leafletPromise=null;
     function loadLeaflet(){
       if(window.L)return Promise.resolve(window.L);
@@ -113,9 +115,10 @@
       const aligned=anchor+Math.floor((d.getTime()-anchor)/period)*period;
       return dateString(new Date(aligned));
     }
-    async function showSentinelNDVI(sceneDate){
+    async function showSentinelNDVI(sceneDate,displayMode="ndvi"){
       if(!location.value||!sceneDate){satelliteMapStatus.textContent="Choisissez un emplacement et une date de scène valide.";return;}
-      satelliteMapStatus.textContent="Calcul du NDVI Sentinel-2 et chargement de l’image dans la carte BA Labs…";
+      selectedSentinelSceneDate=sceneDate;selectedSentinelDisplayMode=displayMode;
+      satelliteMapStatus.textContent="Préparation du rendu "+displayMode+" Sentinel-2 et chargement dans la carte BA Labs…";
       try{
         const {data:authState,error:authError}=await db.auth.getSession();
         if(authError||!authState?.session?.access_token)throw new Error("Session expirée : reconnectez-vous à CultureOps.");
@@ -125,16 +128,25 @@
           "Content-Type":"application/json",
           "Accept":"image/png"
         };
-        let response=await fetch("https://axcouwiodqsauwnsiotn.supabase.co/functions/v1/sentinel-2-ndvi-preview",{
-          method:"POST",headers:requestHeaders,body:JSON.stringify({location_id:location.value,date:sceneDate})
-        });
-        let rasterSource="Copernicus Data Space";
+        let response;
+        let rasterSource;
+        if(displayMode!=="ndvi"){
+          response=await fetch("https://axcouwiodqsauwnsiotn.supabase.co/functions/v1/earth-search-sentinel2-ndvi-preview",{
+            method:"POST",headers:requestHeaders,body:JSON.stringify({location_id:location.value,date:sceneDate,mode:displayMode})
+          });
+          rasterSource="Earth Search / AWS Open Data";
+        }else{
+          response=await fetch("https://axcouwiodqsauwnsiotn.supabase.co/functions/v1/sentinel-2-ndvi-preview",{
+            method:"POST",headers:requestHeaders,body:JSON.stringify({location_id:location.value,date:sceneDate,mode:displayMode})
+          });
+          rasterSource="Copernicus Data Space";
+        }
         if(!response.ok){
           const primaryError=await response.clone().json().catch(()=>({}));
           // If OAuth secrets have not arrived yet, compute NDVI from public Sentinel-2 COGs.
-          if(primaryError.error==="sentinelhub_credentials_not_configured"){
+          if(displayMode==="ndvi"&&primaryError.error==="sentinelhub_credentials_not_configured"){
             response=await fetch("https://axcouwiodqsauwnsiotn.supabase.co/functions/v1/earth-search-sentinel2-ndvi-preview",{
-              method:"POST",headers:requestHeaders,body:JSON.stringify({location_id:location.value,date:sceneDate})
+              method:"POST",headers:requestHeaders,body:JSON.stringify({location_id:location.value,date:sceneDate,mode:displayMode})
             });
             rasterSource="Earth Search / AWS Open Data";
           }
@@ -175,7 +187,8 @@
         const ndviStats=response.headers.get("X-NDVI-Stats");
         let statsText="";
         if(ndviStats){try{const st=JSON.parse(ndviStats);statsText=" NDVI moyen "+st.mean_ndvi+" ; pixels valides "+st.valid_pixel_percent+" % ; couverture nuageuse globale de la scène "+(Number.isFinite(st.cloud_cover_scene_percent)?st.cloud_cover_scene_percent.toFixed(1)+" %":"inconnue")+" ; masque SCL des nuages/ombres "+(st.cloud_mask_applied?"appliqué":"indisponible")+". ";}catch(_){}}
-        satelliteMapStatus.textContent="NDVI Sentinel-2 L2A du "+sceneDate+" affiché directement dans BA Labs via "+rasterSource+". Bandes source rouge/NIR à 10 m ; rendu coloré en 512 × 512 pixels sur une emprise régionale d’environ 1 km."+statsText+"Cette emprise n’est pas une limite de parcelle ; la couverture nuageuse affichée est globale à la scène.";
+        const modeLabels={ndvi:"NDVI",true_color:"couleurs naturelles",false_color:"fausses couleurs infrarouges"};
+        satelliteMapStatus.textContent="Rendu Sentinel-2 L2A (« "+(modeLabels[displayMode]||displayMode)+" ») du "+sceneDate+" affiché via "+rasterSource+". Bandes source à 10 m ; aperçu 512 × 512 pixels sur une emprise d’environ 1 km, non délimitée comme parcelle."+statsText+(displayMode==="ndvi"?" Les couleurs représentent des classes NDVI, pas une carte directe de présence/absence des cultures.":"");
       }catch(error){
         const message=error?.message||"Erreur de chargement Sentinel-2";
         satelliteMapStatus.textContent=message+" La couche régionale MODIS reste disponible comme contexte. Utilisez le lien vers l’explorateur Sentinel-2 haute résolution ci-dessus pour consulter les images sans configurer le service de traitement BA Labs.";
@@ -487,7 +500,7 @@
           item.append(node("small",{class:"muted"},scene.id||"Identifiant de scène indisponible"));
           if(scene.acquired_at){
             const sentinelButton=node("button",{type:"button"},"Afficher le NDVI Sentinel-2 dans la carte");
-            sentinelButton.addEventListener("click",()=>showSentinelNDVI(scene.acquired_at.slice(0,10)));
+            sentinelButton.addEventListener("click",()=>showSentinelNDVI(scene.acquired_at.slice(0,10),"ndvi"));
             sentinelButton.style.display="block";
             sentinelButton.style.marginTop="10px";
             item.append(sentinelButton);
@@ -565,6 +578,23 @@
     run.addEventListener("click",()=>importWeather(false));
     refresh.addEventListener("click",()=>importWeather(true));
     satelliteButton.addEventListener("click",searchSatellite);
+    [
+      ["ndvi","NDVI Sentinel-2"],
+      ["true_color","Couleurs naturelles"],
+      ["false_color","Fausses couleurs IR"]
+    ].forEach(([mode,label])=>{
+      const button=node("button",{type:"button"},label);
+      button.addEventListener("click",()=>{
+        if(!selectedSentinelSceneDate){satelliteMapStatus.textContent="Sélectionnez une scène Sentinel-2 dans les résultats avant de choisir ce rendu.";return;}
+        showSentinelNDVI(selectedSentinelSceneDate,mode);
+      });
+      satelliteViewControls.append(button);
+    });
+    const regionalTrueColorButton=node("button",{type:"button"},"Contexte régional : couleurs naturelles");
+    regionalTrueColorButton.addEventListener("click",()=>{if(satelliteLeafletMap&&satelliteTrueColorLayer){if(!satelliteLeafletMap.hasLayer(satelliteTrueColorLayer))satelliteTrueColorLayer.addTo(satelliteLeafletMap);if(satelliteNDVILayer&&satelliteLeafletMap.hasLayer(satelliteNDVILayer))satelliteLeafletMap.removeLayer(satelliteNDVILayer);satelliteMapStatus.textContent="Contexte régional MODIS en couleurs naturelles. Résolution kilométrique ; ne permet pas d’évaluer les parcelles individuellement.";}});
+    const regionalNDVIButton=node("button",{type:"button"},"Contexte régional : NDVI MODIS");
+    regionalNDVIButton.addEventListener("click",()=>{if(satelliteLeafletMap&&satelliteNDVILayer){if(!satelliteLeafletMap.hasLayer(satelliteNDVILayer))satelliteNDVILayer.addTo(satelliteLeafletMap);if(satelliteTrueColorLayer&&satelliteLeafletMap.hasLayer(satelliteTrueColorLayer))satelliteLeafletMap.removeLayer(satelliteTrueColorLayer);satelliteMapStatus.textContent="Contexte régional MODIS NDVI (composite 16 jours). Palette NASA et résolution kilométrique : interprétation indicative uniquement.";}});
+    satelliteViewControls.append(regionalTrueColorButton,regionalNDVIButton);
     const {data: authState}=await db.auth.getSession();
     if(!authState?.session){
       status.textContent="Connectez-vous à CultureOps pour accéder aux emplacements de votre organisation.";
