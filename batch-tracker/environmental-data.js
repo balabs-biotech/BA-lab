@@ -79,6 +79,11 @@
     const satelliteNDVILegend=node("div",{id:"satelliteNDVILegend",style:"display:flex;flex-wrap:wrap;gap:7px;margin:8px 0 14px;font-size:12px"});
     satelliteNDVILegend.append(node("p",{class:"muted"},"Légende du produit NDVI MODIS : la palette NASA n’est pas une échelle qualitative universelle. Interpréter les valeurs avec la date, la phénologie et la résolution spatiale."));
     satelliteMapPanel.append(satelliteMapStatus,satelliteMap,satelliteMapLegend,satelliteNDVILegend);
+    const sentinelHighResNote=node("p",{class:"muted"},"Pour examiner les limites de champs et les parcelles, utilisez l’explorateur Sentinel-2 L2A à 10 m. Cette vue externe exploite les bandes multispectrales de Sentinel-2 ; elle ne remplace pas une analyse agronomique validée.");
+    const sentinelHighResLink=node("a",{href:"https://sentinel-2.allthingsspatial.io/",target:"_blank",rel:"noopener noreferrer"},"Ouvrir l’explorateur Sentinel-2 haute résolution (10 m) ↗");
+    sentinelHighResLink.style.display="inline-block";
+    sentinelHighResLink.style.margin="4px 0 12px";
+    satelliteMapPanel.append(sentinelHighResNote,sentinelHighResLink);
     const satelliteButton=node("button",{type:"button"},"Chercher les images satellite");
     const satelliteResults=node("div",{id:"satelliteResults",class:"overview-observations","aria-live":"polite"});
     panel.append(form,status,weatherCharts,satelliteHint,satelliteMapPanel,satelliteButton,satelliteResults,details);
