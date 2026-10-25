@@ -1515,7 +1515,7 @@
     // preserving dates, numeric values, and units that are assembled at runtime.
     let embeddedResult = value;
     const embeddedEntries = Object.entries(dict)
-      .filter(([key]) => normalize(key).length >= 12 && !/\\s$/.test(key))
+      .filter(([key]) => normalize(key).length >= 12 && !/\s$/.test(key))
       .sort((a, b) => b[0].length - a[0].length);
     for (const [key, translated] of embeddedEntries) {
       if (embeddedResult.includes(key)) embeddedResult = embeddedResult.split(key).join(translated);
