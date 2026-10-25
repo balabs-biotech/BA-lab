@@ -19,6 +19,7 @@ const checks = [
   ["keeps the last image when a new request fails", /Dernière image conservée/],
  ];
 assert.match(entry, /environmental-data\.js\?v=20261026-auto-map-2/, "uses a cache-busted module path in the Green Tech entry page");
+assert.match(entry, /environmental-data\.js\?v=20261026-auto-map-2/, "uses a cache-busted module path in the Green Tech entry page");
 for (const [label, pattern] of checks) {
   assert.match(source, pattern, label);
   console.log(`✓ ${label}`);
