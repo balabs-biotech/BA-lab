@@ -2455,3 +2455,56 @@ body[data-domain="agronomy"] .statistics-table tbody tr:hover td {
     transition-duration: .01ms !important;
   }
 }
+
+
+/* Mobile form alignment: prevent grid children and controls from overflowing. */
+@media (max-width: 700px) {
+  html, body { width: 100%; max-width: 100%; overflow-x: clip; }
+  body { padding: 12px 10px 32px; }
+  .container, #workspace-root, main { width: 100%; min-width: 0; max-width: 100%; }
+  .card { min-width: 0; padding: 15px; border-radius: 12px; }
+  .grid,
+  .auth-actions,
+  .batch-grid,
+  .batch-actions,
+  .qc-row,
+  .app-hero,
+  .statistics-filters,
+  .statistics-summary,
+  .culture-detail-fields,
+  #environmentalCard .grid {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+  .grid > *,
+  .auth-actions > *,
+  .batch-grid > *,
+  .batch-actions > *,
+  .qc-row > *,
+  .statistics-filters > *,
+  .statistics-summary > *,
+  .culture-detail-fields > *,
+  #environmentalCard .grid > * {
+    min-width: 0;
+    max-width: 100%;
+  }
+  label { overflow-wrap: anywhere; }
+  input, select, textarea, button {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+  }
+  input[type="checkbox"], input[type="radio"] {
+    display: inline-block;
+    width: auto;
+    max-width: none;
+  }
+  .section-nav { max-width: 100%; flex-wrap: wrap; }
+  .statistics-table-wrap,
+  .table-wrap,
+  .environmental-details { max-width: 100%; overflow-x: auto; }
+  .statistics-table { min-width: 560px; }
+  #environmentalCard button { white-space: normal; overflow-wrap: anywhere; }
+  .sync-line { align-items: stretch; }
+  .sync-line .small-button { width: 100%; }
+}
