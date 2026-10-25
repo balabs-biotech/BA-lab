@@ -200,7 +200,7 @@
         satelliteSentinelNDVILayer.addTo(satelliteLeafletMap);
         satelliteLayerControl.addOverlay(satelliteSentinelNDVILayer,"NDVI Sentinel-2 · "+sceneDate);
         satelliteLeafletMap.fitBounds([[south,west],[north,east]],{padding:[12,12],maxZoom:14});
-        to.value=sceneDate;
+        // Keep the weather date range independent from the satellite acquisition date.
         const ndviStats=response.headers.get("X-NDVI-Stats");
         let statsText="",meanNDVI=null;
         if(ndviStats){try{const st=JSON.parse(ndviStats);if(Number.isFinite(Number(st.mean_ndvi))){meanNDVI=Number(st.mean_ndvi);statsText=" · NDVI moyen "+meanNDVI.toFixed(2);}}catch(_){}}
@@ -597,7 +597,7 @@
         }
         satelliteMapStatus.textContent="Image Sentinel-2 · "+sceneDate+" · calcul en cours…";
         const currentNDVI=await showSentinelNDVI(sceneDate,"ndvi");
-        const previousScene=rankedScenes.find(scene=>String(scene.acquired_at||"").slice(0,10)<sceneDate);
+        const previousScene=rankedScenes.find(scene=>Number(scene.cloud_cover_percent)<=30&&String(scene.acquired_at||"").slice(0,10)<sceneDate);
         const previousDate=previousScene?String(previousScene.acquired_at).slice(0,10):"";
         const previousNDVI=previousDate?await fetchNDVIStats(previousDate):null;
         renderVegetationChart([previousNDVI,currentNDVI]);
