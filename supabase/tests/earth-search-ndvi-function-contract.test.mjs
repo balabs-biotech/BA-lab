@@ -13,7 +13,7 @@ const checks = [
   ["renders a 512-by-512 RGBA PNG", /new PNG\(\{ width, height, colorType: 6 \}\)/],
   ["returns georeferencing bounds for the map overlay", /"X-Geo-Bounds"/],
   ["returns NDVI statistics", /"X-NDVI-Stats"/],
-  ["applies Sentinel-2 scene classification to mask clouds, shadows, snow and invalid pixels", /cloudMaskApplied[\\s\\S]*?\[0, 1, 3, 8, 9, 10, 11\]/],
+  ["applies Sentinel-2 scene classification to mask clouds, shadows, snow and invalid pixels", /cloudMaskApplied[\s\S]*?\[0, 1, 3, 8, 9, 10, 11\]/],
   ["reports whether the SCL mask was applied", /cloud_mask_applied: cloudMaskApplied/],
   ["requires an authenticated user and an authorized saved location", /db\.auth\.getUser\(\)[\s\S]*?from\("locations"\)[\s\S]*?maybeSingle\(\)/],
   ["rejects non-public asset URLs", /safeCogUrl[\s\S]*?amazonaws\.com/],
@@ -21,6 +21,6 @@ const checks = [
 ];
 for (const [label, pattern] of checks) {
   assert.match(source, pattern, label);
-  console.log(\`✓ \${label}\`);
+  console.log("✓ " + label);
 }
-console.log(\`Passed \${checks.length} Earth Search NDVI function contract checks.\`);
+console.log("Passed " + checks.length + " Earth Search NDVI function contract checks.");
