@@ -383,6 +383,21 @@
           item.append(node("strong",{},scene.acquired_at?new Date(scene.acquired_at).toLocaleDateString():"Date inconnue"));
           item.append(node("p",{},(scene.platform||"Sentinel-2")+" · nuages "+(scene.cloud_cover_percent==null?"inconnus":scene.cloud_cover_percent.toFixed(1)+" %")));
           item.append(node("small",{class:"muted"},scene.id||"Identifiant de scène indisponible"));
+          if(scene.acquired_at){
+            const mapButton=node("button",{type:"button"},"Afficher cette date sur la carte BA Labs");
+            mapButton.addEventListener("click",()=>{
+              const sceneDate=scene.acquired_at.slice(0,10);
+              to.value=sceneDate;
+              if(from.value>sceneDate)from.value=sceneDate;
+              updateSatelliteMap();
+              satelliteMapPanel.scrollIntoView({behavior:"smooth",block:"start"});
+              satelliteMapStatus.textContent="Contexte régional BA Labs pour le "+sceneDate+". La couche affichée reste le NDVI MODIS régional (composite de 16 jours), pas l’image Sentinel-2 de cette scène.";
+            });
+            mapButton.style.display="block";
+            mapButton.style.marginTop="10px";
+            item.append(mapButton);
+            item.append(node("small",{class:"muted"},"Affiche le contexte satellite régional dans cette application ; l’image Sentinel-2 exacte reste accessible via le lien externe."));
+          }
           if(scene.preview_url){
             const preview=node("img",{src:scene.preview_url,alt:"Aperçu satellite Sentinel-2 du "+(scene.acquired_at||"date inconnue"),loading:"lazy",decoding:"async",style:"display:block;width:100%;max-height:320px;object-fit:contain;background:#111827;border-radius:8px;margin:12px 0"});
             preview.addEventListener("error",()=>{preview.remove();item.append(node("p",{class:"muted"},"Aperçu non accessible depuis le navigateur pour cette scène."));},{once:true});
