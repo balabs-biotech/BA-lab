@@ -72,10 +72,10 @@
     const satelliteHint=node("p",{class:"muted"},"Sentinel-2 : scènes disponibles et couverture nuageuse. L’image ne constitue pas à elle seule un diagnostic de culture.");
     const satelliteMapPanel=node("section",{class:"card",id:"satelliteColorMapPanel"});
     satelliteMapPanel.append(node("h3",{},"Carte satellitaire colorée"));
-    satelliteMapPanel.append(node("p",{class:"muted"},"Vue régionale en couleurs NDVI MODIS sur 16 jours, ou en couleur naturelle. La couche MODIS est trop grossière pour distinguer une serre ou une petite parcelle : elle sert de contexte régional, pas de mesure du site."));
+    satelliteMapPanel.append(node("p",{class:"muted"},"Vue régionale en couleurs NDVI MODIS sur 16 jours, ou en couleur naturelle. La couche MODIS est de l’ordre du kilomètre : elle sert de contexte régional, pas de mesure d’une parcelle ou d’une serre."));
     const satelliteMapStatus=node("p",{class:"muted","aria-live":"polite"},"Choisissez un emplacement avec des coordonnées pour charger la carte.");
     const satelliteMap=node("div",{id:"satelliteColorMap","aria-label":"Carte satellite avec couches colorées de végétation et couleur naturelle",style:"height:340px;min-height:280px;width:100%;border-radius:10px;overflow:hidden;background:#111827"});
-    const satelliteMapLegend=node("p",{class:"muted"},"NDVI : couleurs du produit satellite NASA GIBS ; indice de végétation régional, pas diagnostic de santé des plantes. Le cercle en pointillés illustre une échelle de l’ordre de 250 m, ce n’est pas une limite de parcelle.");
+    const satelliteMapLegend=node("p",{class:"muted"},"NDVI : couleurs du produit satellite NASA GIBS ; indice de végétation régional, pas diagnostic de santé des plantes. Le cercle en pointillés illustre environ 1 km autour du point, à titre de repère d’échelle, pas comme limite de parcelle.");
     satelliteMapPanel.append(satelliteMapStatus,satelliteMap,satelliteMapLegend);
     const satelliteButton=node("button",{type:"button"},"Chercher les images satellite");
     const satelliteResults=node("div",{id:"satelliteResults",class:"overview-observations","aria-live":"polite"});
@@ -101,8 +101,10 @@
     function modisCompositeDate(dateValue){
       const d=new Date((dateValue||dateString(new Date()))+"T00:00:00Z");
       if(!Number.isFinite(d.getTime()))return dateString(new Date(Date.now()-17*86400000));
-      d.setUTCDate(d.getUTCDate()>=17?17:1);
-      return dateString(d);
+      const period=16*86400000;
+      const anchor=Date.UTC(2000,1,18);
+      const aligned=anchor+Math.floor((d.getTime()-anchor)/period)*period;
+      return dateString(new Date(aligned));
     }
     async function updateSatelliteMap(){
       if(!location.value){satelliteMapStatus.textContent="Choisissez un emplacement pour afficher la carte.";return;}
@@ -121,8 +123,8 @@
           satelliteLayerControl=L.control.layers({"Carte de référence":osm},{},{collapsed:true}).addTo(satelliteLeafletMap);
           satelliteMarker=L.circleMarker([latitude,longitude],{radius:6,color:"#f8fafc",weight:2,fillColor:"#2563eb",fillOpacity:1})
             .bindPopup("Emplacement sélectionné · coordonnées enregistrées").addTo(satelliteLeafletMap);
-          satelliteGridCircle=L.circle([latitude,longitude],{radius:250,color:"#f59e0b",weight:1,dashArray:"5 5",fillColor:"#f59e0b",fillOpacity:0.07})
-            .bindPopup("Rayon indicatif de 250 m autour du point, pour rappeler l’échelle grossière de MODIS — ce n’est pas une limite de parcelle.").addTo(satelliteLeafletMap);
+          satelliteGridCircle=L.circle([latitude,longitude],{radius:500,color:"#f59e0b",weight:1,dashArray:"5 5",fillColor:"#f59e0b",fillOpacity:0.07})
+            .bindPopup("Rayon indicatif de 500 m autour du point, pour rappeler l’ordre de grandeur d’une maille MODIS d’environ 1 km — ce n’est pas une limite de parcelle.").addTo(satelliteLeafletMap);
         }else{
           satelliteLeafletMap.setView([latitude,longitude],Math.min(satelliteLeafletMap.getZoom(),9));
           satelliteMarker.setLatLng([latitude,longitude]);
@@ -398,7 +400,7 @@
           if(scene.catalogue_item_url){const a=node("a",{href:scene.catalogue_item_url,target:"_blank",rel:"noopener noreferrer"},"Ouvrir la fiche de la scène");item.append(a);}
           satelliteResults.append(item);
         });
-        satelliteResults.append(node("p",{class:"muted"},"Les aperçus sont des vignettes de catalogue, pas une analyse de la parcelle. Le calcul NDVI et le traitement des bandes satellite restent à intégrer."));
+        satelliteResults.append(node("p",{class:"muted"},"Les aperçus sont des vignettes de catalogue, pas une analyse de la parcelle. Le calcul NDVI à partir des bandes Sentinel-2 et l’analyse fine des zones restent à intégrer."));
       }catch(e){satelliteResults.replaceChildren(node("p",{class:"muted"},"Échec de la recherche : "+(e?.message||"erreur inconnue")));}
       finally{satelliteButton.disabled=false;}
     }
@@ -412,6 +414,7 @@
       status.textContent="Enregistrement…";
       const {error}=await db.from("locations").update({latitude:a,longitude:o,coordinate_accuracy_m:acc,coordinate_source:source.value}).eq("id",location.value);
       status.textContent=error?"Échec de l’enregistrement : "+error.message:"Coordonnées enregistrées.";
+      if(!error)updateSatelliteMap();
     });
     async function importWeather(forceRefresh=false){
       if(!location.value||!from.value||!to.value||from.value>to.value){status.textContent="Choisissez un emplacement et une période valide.";return;}
