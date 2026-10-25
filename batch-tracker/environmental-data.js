@@ -76,7 +76,13 @@
     const satelliteMapStatus=node("p",{class:"muted","aria-live":"polite"},"Choisissez un emplacement avec des coordonnées pour charger la carte.");
     const satelliteMap=node("div",{id:"satelliteColorMap","aria-label":"Carte satellite avec couches colorées de végétation et couleur naturelle",style:"height:340px;min-height:280px;width:100%;border-radius:10px;overflow:hidden;background:#111827"});
     const satelliteMapLegend=node("p",{class:"muted"},"NDVI : couleurs du produit satellite NASA GIBS ; indice de végétation régional, pas diagnostic de santé des plantes. Le cercle en pointillés illustre environ 1 km autour du point, à titre de repère d’échelle, pas comme limite de parcelle.");
-    satelliteMapPanel.append(satelliteMapStatus,satelliteMap,satelliteMapLegend);
+    const satelliteNDVILegend=node("div",{id:"satelliteNDVILegend",style:"display:flex;flex-wrap:wrap;gap:7px;margin:8px 0 14px;font-size:12px"});
+    [["#785ab4","NDVI < 0 · eau / surfaces non végétalisées"],["#b4463c","0–0,15 · végétation très faible"],["#eba537","0,15–0,30 · végétation faible"],["#dcdc5a","0,30–0,45 · végétation intermédiaire"],["#64be5f","0,45–0,60 · végétation active"],["#147337","> 0,60 · végétation dense"]].forEach(([color,label])=>{
+      const item=node("span",{style:"display:inline-flex;align-items:center;gap:5px;padding:4px 7px;border:1px solid #64748b55;border-radius:999px"});
+      item.append(node("span",{style:"display:inline-block;width:10px;height:10px;border-radius:50%;background:"+color,"aria-hidden":"true"}),document.createTextNode(label));
+      satelliteNDVILegend.append(item);
+    });
+    satelliteMapPanel.append(satelliteMapStatus,satelliteMap,satelliteMapLegend,satelliteNDVILegend);
     const satelliteButton=node("button",{type:"button"},"Chercher les images satellite");
     const satelliteResults=node("div",{id:"satelliteResults",class:"overview-observations","aria-live":"polite"});
     panel.append(form,status,weatherCharts,satelliteHint,satelliteMapPanel,satelliteButton,satelliteResults,details);
