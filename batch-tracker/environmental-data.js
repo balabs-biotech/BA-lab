@@ -134,7 +134,7 @@
         if(satelliteTrueColorLayer){satelliteLayerControl.removeLayer(satelliteTrueColorLayer);satelliteLeafletMap.removeLayer(satelliteTrueColorLayer);}
         const composite=modisCompositeDate(to.value);
         satelliteNDVILayer=L.tileLayer(
-          "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/MODIS_Terra_NDVI_16Day/default/"+composite+"/GoogleMapsCompatible_Level9/{z}/{y}/{x}.png",
+          "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/MODIS_Terra_L3_NDVI_16Day/default/"+composite+"/GoogleMapsCompatible_Level9/{z}/{y}/{x}.png",
           {maxZoom:9,opacity:0.84,attribution:'NDVI &copy; <a href="https://earthdata.nasa.gov/" target="_blank" rel="noopener noreferrer">NASA GIBS / MODIS</a>',crossOrigin:true}
         );
         satelliteTrueColorLayer=L.tileLayer(
