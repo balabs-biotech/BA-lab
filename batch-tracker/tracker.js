@@ -6432,6 +6432,33 @@ function setupQuickCapture() {
       return;
     }
 
+    const textFields = ["target", "variable", "unit", "occurred_at", "instrument", "method", "note"];
+    const invalidTextField = textFields.find(key =>
+      payload[key] !== undefined && payload[key] !== null && typeof payload[key] !== "string"
+    );
+    if (invalidTextField) {
+      setAiStatus("Format invalide : " + invalidTextField + " doit être du texte ou null. Aucun champ n’a été modifié.", "error");
+      return;
+    }
+    if (payload.kind === "measurement" &&
+        payload.value !== undefined && payload.value !== null &&
+        (typeof payload.value !== "number" || !Number.isFinite(payload.value))) {
+      setAiStatus("Format invalide : la valeur d’une mesure doit être un nombre JSON ou null. Aucun champ n’a été modifié.", "error");
+      return;
+    }
+    if (payload.kind === "observation" &&
+        payload.value !== undefined && payload.value !== null &&
+        typeof payload.value !== "string") {
+      setAiStatus("Format invalide : la valeur d’une observation doit être du texte ou null. Aucun champ n’a été modifié.", "error");
+      return;
+    }
+    if (payload.missing_information !== undefined &&
+        (!Array.isArray(payload.missing_information) ||
+         payload.missing_information.some(item => typeof item !== "string"))) {
+      setAiStatus("Format invalide : missing_information doit être une liste de textes. Aucun champ n’a été modifié.", "error");
+      return;
+    }
+
     measurementTargetSelect.value = "";
     measurementTargetSelect.dispatchEvent(new Event("change", { bubbles: true }));
     let variableMatched = false;
