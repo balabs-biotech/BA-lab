@@ -5,7 +5,8 @@ import { createClient } from "npm:@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers": "authorization, apikey, content-type, x-client-info, x-supabase-api-version, accept, accept-profile, content-profile, prefer, range",
+  "Vary": "Access-Control-Request-Headers",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
   "Content-Type": "application/json; charset=utf-8",
   "Cache-Control": "no-store",
@@ -19,6 +20,7 @@ const PARAMETERS = {
   T2M_MIN: { variable: "air_temperature_min", unit: "degC", resolution: 55_000 },
   PRECTOTCORR: { variable: "precipitation_corrected", unit: "mm/day", resolution: 55_000 },
   ALLSKY_SFC_SW_DWN: { variable: "solar_radiation_all_sky", unit: "kWh/m2/day", resolution: 111_000 },
+  ALLSKY_SFC_UV_INDEX: { variable: "uv_index_daily_mean", unit: "index", resolution: 111_000 },
   RH2M: { variable: "relative_humidity_mean", unit: "%", resolution: 55_000 },
   WS2M: { variable: "wind_speed_mean", unit: "m/s", resolution: 55_000 },
 };
@@ -102,6 +104,7 @@ Deno.serve(async (req: Request) => {
         "precipitation_corrected",
         "relative_humidity_mean",
         "wind_speed_mean",
+        "uv_index_daily_mean",
       ];
       const now = Date.now();
       const recentPeriod = now - endMs <= 7 * DAY_MS;
@@ -205,8 +208,8 @@ Deno.serve(async (req: Request) => {
             source_time_standard: "NASA POWER daily local solar time",
             coordinate_source: location.coordinate_source ?? null,
             coordinate_accuracy_m: location.coordinate_accuracy_m ?? null,
-            spatial_resolution_note: parameter === "ALLSKY_SFC_SW_DWN"
-              ? "Approximate solar grid scale; not parcel resolution"
+            spatial_resolution_note: parameter === "ALLSKY_SFC_SW_DWN" || parameter === "ALLSKY_SFC_UV_INDEX"
+              ? "Approximate solar/UV grid scale; not parcel resolution"
               : "Approximate meteorological grid scale; not parcel resolution",
             provider_metadata: payload?.header ?? null,
           },
