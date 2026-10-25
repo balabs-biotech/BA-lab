@@ -227,6 +227,7 @@
       data.forEach(x=>location.append(node("option",{value:x.id},x.code?x.name+" ("+x.code+")":x.name)));
       if(data.length===1) location.value=data[0].id;
       selectLocation();
+      if(!location.value) updateSatelliteMap();
     }
     async function selectLocation(){
       if(!location.value){lat.value="";lon.value="";accuracy.value="";return;}
