@@ -2708,3 +2708,27 @@ body[data-domain="agronomy"] #overviewCard .overview-metric-note { color: #c4d2c
 @media (prefers-reduced-motion: reduce) {
   #overviewCard .overview-meter > span { transition: none; }
 }
+
+
+/* AI-assisted entry: compact, mobile-first, and visually integrated with quick capture. */
+.ai-entry-assist{margin-top:15px;padding:15px;border:1px solid var(--border);border-radius:12px;background:var(--surface-2)}
+.ai-entry-assist-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.ai-entry-assist-heading h4{margin:5px 0 4px;font-size:16px;line-height:1.35}
+.ai-entry-assist-heading p{margin:0;max-width:620px;font-size:12px;line-height:1.55;color:var(--muted)}
+.ai-entry-assist-icon{display:grid;place-items:center;width:34px;height:34px;flex:0 0 34px;border-radius:10px;background:#e8edf8;color:#365d9d;font-size:20px}
+.ai-entry-assist label{margin-top:12px}
+.ai-entry-assist textarea{width:100%;min-width:0;resize:vertical}
+.ai-entry-assist-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.ai-entry-assist-actions button,.ai-entry-assist details button{margin-top:10px;min-height:44px;font-size:13px}
+.ai-entry-assist .ai-entry-paste-details{margin-top:12px;padding-top:11px;border-top:1px solid var(--border)}
+.ai-entry-paste-details summary{cursor:pointer;font-size:13px;font-weight:750;padding:6px 0}
+.ai-entry-paste-details textarea{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:13px}
+.ai-entry-status{margin:10px 0 0;color:var(--muted);font-size:12px;line-height:1.5}
+.ai-entry-status[data-kind="success"]{color:var(--ok)}
+.ai-entry-status[data-kind="warning"]{color:var(--warn)}
+.ai-entry-status[data-kind="error"]{color:var(--err)}
+body[data-domain="mycology"] .ai-entry-assist{background:#201c19;border-color:#786252}
+body[data-domain="mycology"] .ai-entry-assist-heading p,body[data-domain="mycology"] .ai-entry-status{color:#eee5dc}
+body[data-domain="mycology"] .ai-entry-assist-heading h4{color:#f0e6dc}
+body[data-domain="mycology"] .ai-entry-assist-icon{background:#3a2b21;color:#e0a476}
+@media(max-width:520px){.ai-entry-assist{padding:12px}.ai-entry-assist-actions{grid-template-columns:minmax(0,1fr)}.ai-entry-assist-heading h4{font-size:15px}}
