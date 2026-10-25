@@ -69,14 +69,87 @@
     coordinates.append(node("summary",{},"Paramètres avancés : coordonnées et actualisation"));
     coordinates.append(field("Latitude","envLat",lat),field("Longitude","envLon",lon),field("Précision des coordonnées (m)","envAccuracy",accuracy),field("Origine des coordonnées","envSource",source),save,refresh);
     form.append(field("Emplacement","envLocation",location),field("Du","envFrom",from),field("Au","envTo",to),run,coordinates);
+    const satelliteHint=node("p",{class:"muted"},"Sentinel-2 : scènes disponibles et couverture nuageuse. L’image ne constitue pas à elle seule un diagnostic de culture.");
+    const satelliteMapPanel=node("section",{class:"card",id:"satelliteColorMapPanel"});
+    satelliteMapPanel.append(node("h3",{},"Carte satellitaire colorée"));
+    satelliteMapPanel.append(node("p",{class:"muted"},"Vue régionale en couleurs NDVI MODIS sur 16 jours, ou en couleur naturelle. La couche MODIS est trop grossière pour distinguer une serre ou une petite parcelle : elle sert de contexte régional, pas de mesure du site."));
+    const satelliteMapStatus=node("p",{class:"muted","aria-live":"polite"},"Choisissez un emplacement avec des coordonnées pour charger la carte.");
+    const satelliteMap=node("div",{id:"satelliteColorMap","aria-label":"Carte satellite avec couches colorées de végétation et couleur naturelle",style:"height:340px;min-height:280px;width:100%;border-radius:10px;overflow:hidden;background:#111827"});
+    const satelliteMapLegend=node("p",{class:"muted"},"NDVI : couleurs du produit satellite NASA GIBS ; indice de végétation régional, pas diagnostic de santé des plantes. Le cercle en pointillés illustre une échelle de l’ordre de 250 m, ce n’est pas une limite de parcelle.");
+    satelliteMapPanel.append(satelliteMapStatus,satelliteMap,satelliteMapLegend);
     const satelliteButton=node("button",{type:"button"},"Chercher les images satellite");
     const satelliteResults=node("div",{id:"satelliteResults",class:"overview-observations","aria-live":"polite"});
-    const satelliteHint=node("p",{class:"muted"},"Sentinel-2 : scènes disponibles et couverture nuageuse. L’image ne constitue pas à elle seule un diagnostic de culture.");
-    panel.append(form,status,weatherCharts,satelliteHint,satelliteButton,satelliteResults,details);
+    panel.append(form,status,weatherCharts,satelliteHint,satelliteMapPanel,satelliteButton,satelliteResults,details);
     plant.parentNode.insertBefore(panel,plant.nextSibling);
     const nav=document.querySelector(".section-nav");
     if(nav && !document.getElementById("envNav")) { const a=node("a",{href:"#environmentalCard",id:"envNav"},"Contexte environnemental"); nav.append(a); }
 
+    let satelliteLeafletMap=null, satelliteMarker=null, satelliteGridCircle=null;
+    let satelliteNDVILayer=null, satelliteTrueColorLayer=null, satelliteLayerControl=null, leafletPromise=null;
+    function loadLeaflet(){
+      if(window.L)return Promise.resolve(window.L);
+      if(leafletPromise)return leafletPromise;
+      if(!document.getElementById("ba-leaflet-css"))document.head.append(node("link",{id:"ba-leaflet-css",rel:"stylesheet",href:"https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"}));
+      leafletPromise=new Promise((resolve,reject)=>{
+        const script=node("script",{src:"https://unpkg.com/leaflet@1.9.4/dist/leaflet.js",async:""});
+        script.onload=()=>window.L?resolve(window.L):reject(new Error("Bibliothèque cartographique indisponible"));
+        script.onerror=()=>reject(new Error("Chargement de la bibliothèque cartographique impossible"));
+        document.head.append(script);
+      });
+      return leafletPromise;
+    }
+    function modisCompositeDate(dateValue){
+      const d=new Date((dateValue||dateString(new Date()))+"T00:00:00Z");
+      if(!Number.isFinite(d.getTime()))return dateString(new Date(Date.now()-17*86400000));
+      d.setUTCDate(d.getUTCDate()>=17?17:1);
+      return dateString(d);
+    }
+    async function updateSatelliteMap(){
+      if(!location.value){satelliteMapStatus.textContent="Choisissez un emplacement pour afficher la carte.";return;}
+      const latitude=Number(lat.value),longitude=Number(lon.value);
+      if(!Number.isFinite(latitude)||latitude < -90||latitude>90||!Number.isFinite(longitude)||longitude < -180||longitude>180){
+        satelliteMapStatus.textContent="Coordonnées absentes ou invalides. Enregistrez des coordonnées fiables pour afficher la carte.";return;
+      }
+      satelliteMapStatus.textContent="Chargement de la carte et des couches satellitaires…";
+      try{
+        const L=await loadLeaflet();
+        if(!satelliteLeafletMap){
+          satelliteLeafletMap=L.map(satelliteMap,{preferCanvas:true,scrollWheelZoom:false}).setView([latitude,longitude],8);
+          const osm=L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{
+            maxZoom:19,attribution:'&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a>'
+          }).addTo(satelliteLeafletMap);
+          satelliteLayerControl=L.control.layers({"Carte de référence":osm},{},{collapsed:true}).addTo(satelliteLeafletMap);
+          satelliteMarker=L.circleMarker([latitude,longitude],{radius:6,color:"#f8fafc",weight:2,fillColor:"#2563eb",fillOpacity:1})
+            .bindPopup("Emplacement sélectionné · coordonnées enregistrées").addTo(satelliteLeafletMap);
+          satelliteGridCircle=L.circle([latitude,longitude],{radius:250,color:"#f59e0b",weight:1,dashArray:"5 5",fillColor:"#f59e0b",fillOpacity:0.07})
+            .bindPopup("Rayon indicatif de 250 m autour du point, pour rappeler l’échelle grossière de MODIS — ce n’est pas une limite de parcelle.").addTo(satelliteLeafletMap);
+        }else{
+          satelliteLeafletMap.setView([latitude,longitude],Math.min(satelliteLeafletMap.getZoom(),9));
+          satelliteMarker.setLatLng([latitude,longitude]);
+          satelliteGridCircle.setLatLng([latitude,longitude]);
+        }
+        if(satelliteNDVILayer){satelliteLayerControl.removeLayer(satelliteNDVILayer);satelliteLeafletMap.removeLayer(satelliteNDVILayer);}
+        if(satelliteTrueColorLayer){satelliteLayerControl.removeLayer(satelliteTrueColorLayer);satelliteLeafletMap.removeLayer(satelliteTrueColorLayer);}
+        const composite=modisCompositeDate(to.value);
+        satelliteNDVILayer=L.tileLayer(
+          "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/MODIS_Terra_NDVI_16Day/default/"+composite+"/GoogleMapsCompatible_Level9/{z}/{y}/{x}.png",
+          {maxZoom:9,opacity:0.84,attribution:'NDVI &copy; <a href="https://earthdata.nasa.gov/" target="_blank" rel="noopener noreferrer">NASA GIBS / MODIS</a>',crossOrigin:true}
+        );
+        satelliteTrueColorLayer=L.tileLayer(
+          "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/MODIS_Terra_CorrectedReflectance_TrueColor/default/"+(to.value||composite)+"/GoogleMapsCompatible_Level9/{z}/{y}/{x}.jpg",
+          {maxZoom:9,opacity:0.92,attribution:'Imagerie &copy; <a href="https://earthdata.nasa.gov/" target="_blank" rel="noopener noreferrer">NASA GIBS / MODIS</a>',crossOrigin:true}
+        );
+        satelliteLayerControl.addOverlay(satelliteNDVILayer,"Végétation colorée — NDVI MODIS (16 jours)");
+        satelliteLayerControl.addOverlay(satelliteTrueColorLayer,"Satellite — couleur naturelle");
+        satelliteNDVILayer.addTo(satelliteLeafletMap);
+        satelliteNDVILayer.on("tileerror",()=>{satelliteMapStatus.textContent="La carte de base est chargée, mais la couche NDVI n’a pas répondu pour cette date. Essayez une autre date ou la couche couleur naturelle.";});
+        satelliteTrueColorLayer.on("tileerror",()=>{satelliteMapStatus.textContent="La couche couleur naturelle n’est pas disponible pour la date choisie.";});
+        satelliteMapStatus.textContent="Couche NDVI MODIS · composite de 16 jours du "+composite+". Échelle régionale, résolution trop grossière pour cartographier séparément une serre ou des lits de culture.";
+        setTimeout(()=>satelliteLeafletMap&&satelliteLeafletMap.invalidateSize(),100);
+      }catch(error){
+        satelliteMapStatus.textContent=(error?.message||"Carte indisponible")+" ; la recherche de scènes Sentinel-2 reste disponible ci-dessous.";
+      }
+    }
     async function loadLocations() {
       const {data,error}=await db.from("locations").select("id,code,name,latitude,longitude,coordinate_accuracy_m,coordinate_source").order("name");
       if(error){status.textContent="Chargement des emplacements impossible : "+error.message;return;}
@@ -90,6 +163,7 @@
       if(!data)return;
       lat.value=data.latitude??""; lon.value=data.longitude??""; accuracy.value=data.coordinate_accuracy_m??"";
       if(data.coordinate_source && [...source.options].some(o=>o.value===data.coordinate_source))source.value=data.coordinate_source;
+      updateSatelliteMap();
     }
     function renderClimateSummary(data){
       summary.replaceChildren();
@@ -330,7 +404,7 @@
     }
     location.addEventListener("change",()=>{satelliteResults.replaceChildren();selectLocation().then(()=>location.value&&loadRows());});
     from.addEventListener("change",()=>location.value&&loadRows());
-    to.addEventListener("change",()=>location.value&&loadRows());
+    to.addEventListener("change",()=>{if(location.value){loadRows();updateSatelliteMap();}});
     save.addEventListener("click",async()=>{
       if(!location.value || lat.value==="" || lon.value===""){status.textContent="Choisissez un emplacement et saisissez latitude et longitude.";return;}
       const a=Number(lat.value),o=Number(lon.value),acc=accuracy.value===""?null:Number(accuracy.value);
