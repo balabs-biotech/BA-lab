@@ -94,7 +94,12 @@
     satelliteMapPanel.append(sentinelHighResNote,sentinelHighResLink);
     const satelliteButton=node("button",{type:"button"},"Chercher les images satellite");
     const satelliteResults=node("div",{id:"satelliteResults",class:"overview-observations","aria-live":"polite"});
-    panel.append(form,status,weatherCharts,satelliteHint,satelliteMapPanel,satelliteButton,satelliteResults,details);
+    // Keep the default experience focused on the map; advanced climate controls remain in code but are not shown here.
+    [form,status,weatherCharts,satelliteHint,satelliteButton,satelliteResults,details].forEach(el=>el.style.display="none");
+    [satelliteMapLegend,satelliteModeHelp,satelliteNDVILegend,sentinelHighResNote,sentinelHighResLink,satelliteViewControls].forEach(el=>el.style.display="none");
+    satelliteMapPanel.querySelector("h3").textContent="Carte satellite";
+    satelliteMapPanel.append(satelliteMapStatus,satelliteMap);
+    panel.append(satelliteMapPanel);
     plant.parentNode.insertBefore(panel,plant.nextSibling);
     const nav=document.querySelector(".section-nav");
     if(nav && !document.getElementById("envNav")) { const a=node("a",{href:"#environmentalCard",id:"envNav"},"Contexte environnemental"); nav.append(a); }
@@ -194,10 +199,10 @@
         let statsText="";
         if(ndviStats){try{const st=JSON.parse(ndviStats);statsText=" NDVI moyen "+st.mean_ndvi+" ; pixels valides "+st.valid_pixel_percent+" % ; couverture nuageuse globale de la scène "+(Number.isFinite(st.cloud_cover_scene_percent)?st.cloud_cover_scene_percent.toFixed(1)+" %":"inconnue")+" ; masque SCL des nuages/ombres "+(st.cloud_mask_applied?"appliqué":"indisponible")+". ";}catch(_){}}
         const modeLabels={ndvi:"NDVI",true_color:"couleurs naturelles",false_color:"fausses couleurs infrarouges"};
-        satelliteMapStatus.textContent="Rendu Sentinel-2 L2A (« "+(modeLabels[displayMode]||displayMode)+" ») du "+sceneDate+" affiché via "+rasterSource+". Bandes source à 10 m ; aperçu 512 × 512 pixels sur une emprise d’environ 1 km, non délimitée comme parcelle."+statsText+(displayMode==="ndvi"?" Les couleurs représentent des classes NDVI, pas une carte directe de présence/absence des cultures.":"");
+        satelliteMapStatus.textContent="Sentinel-2 · "+sceneDate+(displayMode==="ndvi"?" · NDVI":" · "+(modeLabels[displayMode]||displayMode))+(statsText?" · "+statsText.trim():"");
       }catch(error){
         const message=error?.message||"Erreur de chargement Sentinel-2";
-        satelliteMapStatus.textContent=message+" La couche régionale MODIS reste disponible comme contexte. Utilisez le lien vers l’explorateur Sentinel-2 haute résolution ci-dessus pour consulter les images sans configurer le service de traitement BA Labs.";
+        satelliteMapStatus.textContent="Image satellite temporairement indisponible. "+(satelliteSentinelNDVILayer?"Dernière image conservée.":"Contexte régional conservé.");
         if(message.includes("pas encore configuré"))sentinelHighResLink.scrollIntoView({behavior:"smooth",block:"center"});
       }
     }
@@ -494,58 +499,22 @@
           return cloudA-cloudB||dateB-dateA;
         });
         const candidate=rankedScenes[0];
-        const candidateCard=node("article",{class:"card"});
-        candidateCard.append(node("strong",{},"Candidat à examiner en premier"));
-        candidateCard.append(node("p",{},(candidate.platform||"Sentinel-2")+" · "+(candidate.acquired_at?new Date(candidate.acquired_at).toLocaleDateString():"date inconnue")+" · nuages globaux "+(candidate.cloud_cover_percent==null?"inconnus":candidate.cloud_cover_percent.toFixed(1)+" %")));
-        candidateCard.append(node("small",{class:"muted"},"Priorité indicative selon la couverture nuageuse déclarée pour toute la scène, puis la date. Ce pourcentage ne décrit pas la couverture nuageuse exacte du site ; aucun NDVI n’est calculé à ce stade."));
-        satelliteResults.append(candidateCard);
-        rankedScenes.forEach(scene=>{
-          const item=node("article",{class:"card"});
-          item.append(node("strong",{},scene.acquired_at?new Date(scene.acquired_at).toLocaleDateString():"Date inconnue"));
-          item.append(node("p",{},(scene.platform||"Sentinel-2")+" · nuages "+(scene.cloud_cover_percent==null?"inconnus":scene.cloud_cover_percent.toFixed(1)+" %")));
-          item.append(node("small",{class:"muted"},scene.id||"Identifiant de scène indisponible"));
-          if(scene.acquired_at){
-            const sentinelButton=node("button",{type:"button"},"Afficher le NDVI Sentinel-2 dans la carte");
-            sentinelButton.addEventListener("click",()=>showSentinelNDVI(scene.acquired_at.slice(0,10),"ndvi"));
-            sentinelButton.style.display="block";
-            sentinelButton.style.marginTop="10px";
-            item.append(sentinelButton);
-            const mapButton=node("button",{type:"button"},"Afficher le contexte régional sur la carte BA Labs");
-            mapButton.addEventListener("click",()=>{
-              const sceneDate=scene.acquired_at.slice(0,10);
-              to.value=sceneDate;
-              if(from.value>sceneDate)from.value=sceneDate;
-              updateSatelliteMap();
-              satelliteMapPanel.scrollIntoView({behavior:"smooth",block:"start"});
-              satelliteMapStatus.textContent="Contexte régional BA Labs pour le "+sceneDate+". La couche affichée reste le NDVI MODIS régional (composite de 16 jours), pas l’image Sentinel-2 de cette scène.";
-            });
-            mapButton.style.display="block";
-            mapButton.style.marginTop="10px";
-            item.append(mapButton);
-            item.append(node("small",{class:"muted"},"Affiche le contexte satellite régional dans cette application ; l’image Sentinel-2 exacte reste accessible via le lien externe."));
-          }
-          if(scene.preview_url){
-            const preview=node("img",{src:scene.preview_url,alt:"Aperçu satellite Sentinel-2 du "+(scene.acquired_at||"date inconnue"),loading:"lazy",decoding:"async",style:"display:block;width:100%;max-height:320px;object-fit:contain;background:#111827;border-radius:8px;margin:12px 0"});
-            preview.addEventListener("error",()=>{preview.remove();item.append(node("p",{class:"muted"},"Aperçu non accessible depuis le navigateur pour cette scène."));},{once:true});
-            item.append(preview);
-          } else {
-            item.append(node("p",{class:"muted"},"Aucun aperçu image fourni par le catalogue pour cette scène."));
-          }
-          if(scene.browser_url){
-            const browserLink=node("a",{href:scene.browser_url,target:"_blank",rel:"noopener noreferrer"},"Visualiser cette date dans Copernicus Browser");
-            browserLink.style.display="block";
-            browserLink.style.marginTop="8px";
-            item.append(browserLink);
-            item.append(node("small",{class:"muted"},"Vue de la zone et de la date dans le navigateur Copernicus ; ce lien ne garantit pas l’affichage exact du produit listé."));
-          }
-          if(scene.catalogue_item_url){const a=node("a",{href:scene.catalogue_item_url,target:"_blank",rel:"noopener noreferrer"},"Ouvrir la fiche de la scène");item.append(a);}
-          satelliteResults.append(item);
-        });
-        satelliteResults.append(node("p",{class:"muted"},catalogueSource.includes("Earth Search")?"Source de secours publique, sans OAuth. Les vignettes sont des aperçus de catalogue ; les bandes Sentinel-2 sont en COG à 10 m, mais le calcul NDVI et la cartographie colorée des zones ne sont pas encore produits par ce catalogue.":"Les aperçus sont des vignettes de catalogue, pas une analyse de la parcelle. Le calcul NDVI à partir des bandes Sentinel-2 et l’analyse fine des zones restent à intégrer."));
+        if(!rankedScenes.length){
+          satelliteMapStatus.textContent="Aucune image satellite récente disponible.";
+          return;
+        }
+        const candidate=rankedScenes[0];
+        const sceneDate=candidate.acquired_at ? candidate.acquired_at.slice(0,10) : "";
+        if(!sceneDate){
+          satelliteMapStatus.textContent="Date d’image indisponible.";
+          return;
+        }
+        satelliteMapStatus.textContent="Image Sentinel-2 · "+sceneDate+" · calcul en cours…";
+        await showSentinelNDVI(sceneDate,"ndvi");
       }catch(e){satelliteResults.replaceChildren(node("p",{class:"muted"},"Échec de la recherche : "+(e?.message||"erreur inconnue")));}
       finally{satelliteButton.disabled=false;}
     }
-    location.addEventListener("change",()=>{satelliteResults.replaceChildren();selectLocation().then(()=>location.value&&loadRows());});
+    location.addEventListener("change",()=>{satelliteResults.replaceChildren();selectLocation().then(()=>{if(location.value){loadRows();searchSatellite();}});});
     from.addEventListener("change",()=>location.value&&loadRows());
     to.addEventListener("change",()=>{if(location.value){loadRows();updateSatelliteMap();}});
     save.addEventListener("click",async()=>{
@@ -609,7 +578,7 @@
     }
     panel.classList.remove("hidden");
     await loadLocations();
-    if(location.value) await loadRows();
+    if(location.value){await loadRows();searchSatellite();}
   }
   const watch=new MutationObserver(()=>{if(document.getElementById("plantCard")){watch.disconnect();init().catch(e=>console.error("Environmental context",e));}});
   watch.observe(document.getElementById("workspace-root")||document.body,{childList:true,subtree:true});
