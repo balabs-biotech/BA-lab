@@ -575,12 +575,12 @@
     const {data: authState}=await db.auth.getSession();
     if(!authState?.session){
       status.textContent="Connectez-vous à CultureOps pour accéder aux emplacements de votre organisation.";
-      db.auth.onAuthStateChange((_event,session)=>{if(session){panel.classList.remove("hidden");loadLocations().then(()=>{if(location.value){loadRows();searchSatellite();}});}});
+      db.auth.onAuthStateChange((_event,session)=>{if(session){panel.classList.remove("hidden");loadLocations().then(()=>{if(location.value){loadRows();if(lat.value!==""&&lon.value!=="")searchSatellite();else satelliteMapStatus.textContent="Coordonnées du site manquantes.";}});}});
       return;
     }
     panel.classList.remove("hidden");
     await loadLocations();
-    if(location.value){loadRows();searchSatellite();}
+    if(location.value){loadRows();if(lat.value!==""&&lon.value!=="")searchSatellite();else satelliteMapStatus.textContent="Coordonnées du site manquantes.";}
   }
   const watch=new MutationObserver(()=>{if(document.getElementById("plantCard")){watch.disconnect();init().catch(e=>console.error("Environmental context",e));}});
   watch.observe(document.getElementById("workspace-root")||document.body,{childList:true,subtree:true});
