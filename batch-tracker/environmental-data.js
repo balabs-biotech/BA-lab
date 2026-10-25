@@ -119,24 +119,39 @@
       try{
         const {data:authState,error:authError}=await db.auth.getSession();
         if(authError||!authState?.session?.access_token)throw new Error("Session expirée : reconnectez-vous à CultureOps.");
-        const response=await fetch("https://axcouwiodqsauwnsiotn.supabase.co/functions/v1/sentinel-2-ndvi-preview",{
-          method:"POST",
-          headers:{
-            "Authorization":"Bearer "+authState.session.access_token,
-            "apikey":"sb_publishable_8H4XRh8V07Hlo0WwdfOXwg_2RXRX992",
-            "Content-Type":"application/json",
-            "Accept":"image/png"
-          },
-          body:JSON.stringify({location_id:location.value,date:sceneDate})
+        const requestHeaders={
+          "Authorization":"Bearer "+authState.session.access_token,
+          "apikey":"sb_publishable_8H4XRh8V07Hlo0WwdfOXwg_2RXRX992",
+          "Content-Type":"application/json",
+          "Accept":"image/png"
+        };
+        let response=await fetch("https://axcouwiodqsauwnsiotn.supabase.co/functions/v1/sentinel-2-ndvi-preview",{
+          method:"POST",headers:requestHeaders,body:JSON.stringify({location_id:location.value,date:sceneDate})
         });
+        let rasterSource="Copernicus Data Space";
         if(!response.ok){
-          const payload=await response.json().catch(()=>({}));
+          const primaryError=await response.clone().json().catch(()=>({}));
+          // If OAuth secrets have not arrived yet, compute NDVI from public Sentinel-2 COGs.
+          if(primaryError.error==="sentinelhub_credentials_not_configured"){
+            response=await fetch("https://axcouwiodqsauwnsiotn.supabase.co/functions/v1/earth-search-sentinel2-ndvi-preview",{
+              method:"POST",headers:requestHeaders,body:JSON.stringify({location_id:location.value,date:sceneDate})
+            });
+            rasterSource="Earth Search / AWS Open Data";
+          }
+        }
+        if(!response.ok){
+          const payload=await response.clone().json().catch(()=>({}));
           const messages={
-            sentinelhub_credentials_not_configured:"L’accès au traitement Sentinel-2 n’est pas encore configuré côté serveur.",
+            sentinelhub_credentials_not_configured:"Les identifiants Copernicus sont absents et le traitement raster public a échoué.",
             sentinelhub_authentication_failed:"L’authentification Copernicus a échoué.",
             sentinelhub_processing_failed:"Copernicus n’a pas pu produire l’image pour cette date.",
             sentinelhub_rate_limited:"Quota temporaire Sentinel-2 atteint ; réessayez plus tard.",
-            sentinelhub_timeout:"Le traitement satellite a dépassé le délai autorisé."
+            sentinelhub_timeout:"Le traitement satellite a dépassé le délai autorisé.",
+            no_sentinel2_scene_for_date:"Aucune scène Sentinel-2 ne couvre ce point à cette date. Essayez une date d’acquisition voisine.",
+            earth_search_catalogue_unavailable:"Le catalogue public Sentinel-2 est momentanément indisponible.",
+            earth_search_raster_timeout:"Le téléchargement/traitement des bandes raster a dépassé le délai autorisé.",
+            sentinel2_red_nir_assets_unavailable:"Les bandes rouge et proche infrarouge ne sont pas disponibles pour cette scène.",
+            ndvi_raster_processing_failed:"Le calcul NDVI à partir des rasters publics a échoué."
           };
           throw new Error(messages[payload.error]||("Traitement Sentinel-2 indisponible (HTTP "+response.status+")."));
         }
@@ -157,7 +172,10 @@
         satelliteLeafletMap.fitBounds([[south,west],[north,east]],{padding:[12,12],maxZoom:14});
         to.value=sceneDate;
         satelliteMapPanel.scrollIntoView({behavior:"smooth",block:"start"});
-        satelliteMapStatus.textContent="NDVI Sentinel-2 L2A du "+sceneDate+" affiché directement dans BA Labs. Bandes source à 10 m ; aperçu rendu en 512 × 512 pixels sur une emprise régionale d’environ 1 km. Cette emprise n’est pas une limite de parcelle et les nuages peuvent affecter le résultat.";
+        const ndviStats=response.headers.get("X-NDVI-Stats");
+        let statsText="";
+        if(ndviStats){try{const st=JSON.parse(ndviStats);statsText=" NDVI moyen "+st.mean_ndvi+" ; pixels valides "+st.valid_pixel_percent+" % ; couverture nuageuse globale de la scène "+(Number.isFinite(st.cloud_cover_scene_percent)?st.cloud_cover_scene_percent.toFixed(1)+" %":"inconnue")+". ";}catch(_){}}
+        satelliteMapStatus.textContent="NDVI Sentinel-2 L2A du "+sceneDate+" affiché directement dans BA Labs via "+rasterSource+". Bandes source rouge/NIR à 10 m ; rendu coloré en 512 × 512 pixels sur une emprise régionale d’environ 1 km."+statsText+"Cette emprise n’est pas une limite de parcelle ; la couverture nuageuse est globale à la scène et les pixels nuageux ne sont pas encore masqués.";
       }catch(error){
         const message=error?.message||"Erreur de chargement Sentinel-2";
         satelliteMapStatus.textContent=message+" La couche régionale MODIS reste disponible comme contexte. Utilisez le lien vers l’explorateur Sentinel-2 haute résolution ci-dessus pour consulter les images sans configurer le service de traitement BA Labs.";
