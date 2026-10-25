@@ -2708,3 +2708,165 @@ body[data-domain="agronomy"] #overviewCard .overview-metric-note { color: #c4d2c
 @media (prefers-reduced-motion: reduce) {
   #overviewCard .overview-meter > span { transition: none; }
 }
+
+
+/* FINAL OVERRIDE — Mycology must remain readable regardless of legacy theme blocks.
+   Keep this block last: previous palette definitions conflict and were re-enabling dark surfaces. */
+html:has(body[data-domain="mycology"]) {
+  color-scheme: light !important;
+  background: #f7f1e9 !important;
+}
+body[data-domain="mycology"] {
+  --bg: #f7f1e9 !important;
+  --surface: #fffdf8 !important;
+  --surface-2: #f1e5d9 !important;
+  --border: #d8c2af !important;
+  --border-strong: #a98265 !important;
+  --text: #30231c !important;
+  --muted: #654d3e !important;
+  --brand: #8b431f !important;
+  --brand-hover: #713417 !important;
+  --focus: #245fbd !important;
+  color: #30231c !important;
+  color-scheme: light !important;
+  background: #f7f1e9 !important;
+}
+body[data-domain="mycology"] #workspace-root,
+body[data-domain="mycology"] main,
+body[data-domain="mycology"] .container {
+  color: #30231c !important;
+}
+body[data-domain="mycology"] .app-toolbar,
+body[data-domain="mycology"] .domain-switcher,
+body[data-domain="mycology"] .card,
+body[data-domain="mycology"] #contextPanel,
+body[data-domain="mycology"] #overviewCard .overview-metric,
+body[data-domain="mycology"] #overviewCard .overview-activity,
+body[data-domain="mycology"] #overviewCard .overview-shortcuts,
+body[data-domain="mycology"] .culture-catalog-row,
+body[data-domain="mycology"] .culture-detail-field,
+body[data-domain="mycology"] .culture-timeline-entry,
+body[data-domain="mycology"] .statistics-summary-item,
+body[data-domain="mycology"] .statistics-chart,
+body[data-domain="mycology"] .statistics-table-wrap,
+body[data-domain="mycology"] .quick-capture,
+body[data-domain="mycology"] .guided-entry-step {
+  color: #30231c !important;
+  background-color: #fffdf8 !important;
+  border-color: #d8c2af !important;
+}
+body[data-domain="mycology"] .card :is(h2,h3,h4,p,li,dt,dd,label,legend,strong,small,span,summary,figcaption),
+body[data-domain="mycology"] .domain-switcher-copy,
+body[data-domain="mycology"] .domain-switcher-copy strong,
+body[data-domain="mycology"] .domain-switcher-copy > span,
+body[data-domain="mycology"] .section-nav a,
+body[data-domain="mycology"] .toolbar-brand,
+body[data-domain="mycology"] .language-control {
+  color: #30231c !important;
+}
+body[data-domain="mycology"] .card .muted,
+body[data-domain="mycology"] .card .hint,
+body[data-domain="mycology"] .card .subtitle,
+body[data-domain="mycology"] .card .overview-metric-note,
+body[data-domain="mycology"] .card .overview-metric-label,
+body[data-domain="mycology"] .card .overview-heading .muted,
+body[data-domain="mycology"] .card .overview-footnote {
+  color: #654d3e !important;
+}
+body[data-domain="mycology"] .app-hero {
+  color: #fffaf4 !important;
+  background: linear-gradient(130deg, #56331f 0%, #7e4227 100%) !important;
+  border-color: #56331f !important;
+}
+body[data-domain="mycology"] .app-hero :is(h1,h1 span,.eyebrow,.hero-description,.hero-note,.hero-note small,.hero-tags span) {
+  color: #fffaf4 !important;
+}
+body[data-domain="mycology"] .hero-tags span,
+body[data-domain="mycology"] .hero-note {
+  background: #69402b !important;
+  border-color: #b98765 !important;
+}
+body[data-domain="mycology"] :is(input,select,textarea),
+body[data-domain="mycology"] .language-control select {
+  color: #30231c !important;
+  -webkit-text-fill-color: #30231c !important;
+  background: #ffffff !important;
+  border-color: #a98265 !important;
+  caret-color: #713417 !important;
+  color-scheme: light !important;
+}
+body[data-domain="mycology"] :is(input,textarea)::placeholder {
+  color: #715b4c !important;
+  -webkit-text-fill-color: #715b4c !important;
+  opacity: 1 !important;
+}
+body[data-domain="mycology"] select option {
+  color: #30231c !important;
+  background: #ffffff !important;
+}
+body[data-domain="mycology"] button,
+body[data-domain="mycology"] .culture-catalog-action,
+body[data-domain="mycology"] .small-button {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  background-color: #8b431f !important;
+  border-color: #8b431f !important;
+}
+body[data-domain="mycology"] button.secondary-button {
+  color: #ffffff !important;
+  background: #654d3e !important;
+  border-color: #654d3e !important;
+}
+body[data-domain="mycology"] .batch-item,
+body[data-domain="mycology"] .domain-option,
+body[data-domain="mycology"] .overview-observations-details summary,
+body[data-domain="mycology"] .culture-catalog-action[data-culture-action="measure"],
+body[data-domain="mycology"] .culture-catalog-action[data-culture-action="history"] {
+  color: #30231c !important;
+  -webkit-text-fill-color: #30231c !important;
+  background: #f1e5d9 !important;
+  border-color: #d0b49c !important;
+}
+body[data-domain="mycology"] .section-nav a[aria-current="page"],
+body[data-domain="mycology"] .domain-option[aria-pressed="true"],
+body[data-domain="mycology"] .culture-catalog-action[data-culture-action="observe"] {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  background: #8b431f !important;
+  border-color: #8b431f !important;
+}
+body[data-domain="mycology"] .statistics-table th {
+  color: #30231c !important;
+  background: #f1e5d9 !important;
+}
+body[data-domain="mycology"] .statistics-table td,
+body[data-domain="mycology"] table td,
+body[data-domain="mycology"] table th {
+  color: #30231c !important;
+  border-color: #d8c2af !important;
+}
+body[data-domain="mycology"] .progress-track,
+body[data-domain="mycology"] #overviewCard .overview-meter {
+  background: #ead8c7 !important;
+}
+body[data-domain="mycology"] .progress-bar,
+body[data-domain="mycology"] #overviewCard .overview-meter > span {
+  background: linear-gradient(90deg, #8b431f, #d58b4f) !important;
+}
+body[data-domain="mycology"] .overview-metric strong,
+body[data-domain="mycology"] #overviewCard .overview-metric strong {
+  color: #8b431f !important;
+}
+body[data-domain="mycology"] :is(input,select,textarea,button,a):focus-visible {
+  outline: 3px solid #245fbd !important;
+  outline-offset: 2px !important;
+}
+@media (max-width: 700px) {
+  body[data-domain="mycology"] {
+    padding: 12px 10px 32px !important;
+  }
+  body[data-domain="mycology"] .card {
+    min-width: 0 !important;
+    background: #fffdf8 !important;
+  }
+}
