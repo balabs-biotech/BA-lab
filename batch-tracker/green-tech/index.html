@@ -33,7 +33,7 @@
           };
           script.onload = () => {
             const environmental = document.createElement("script");
-            environmental.src = "../environmental-data.js";
+            environmental.src = "../environmental-data.js?v=20261025-inline-satellite-map";
             environmental.onerror = () => console.error("Le module de contexte environnemental n’a pas pu être chargé.");
             document.body.appendChild(environmental);
           };
