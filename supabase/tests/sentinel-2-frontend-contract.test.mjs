@@ -31,6 +31,7 @@ const checks = [
   ["explains the native NDVI palette may render low values pale or transparent", /valeurs peuvent apparaître très claires ou transparentes/],
   ["offers natural-colour satellite imagery", /MODIS_Terra_CorrectedReflectance_TrueColor/],
   ["links to a public high-resolution Sentinel-2 L2A explorer for field-scale inspection", /sentinel-2\.allthingsspatial\.io[\s\S]*?à 10 m/],
+  ["directs users to the external high-resolution explorer when BA Labs processing credentials are missing", /pas encore configuré[\s\S]*?sentinelHighResLink\.scrollIntoView/],
   ["states that MODIS is regional at roughly kilometre scale", /de l’ordre du kilomètre/],
   ["labels the NDVI map as a 16-day regional composite", /composite de 16 jours/],
   ["aligns NDVI dates to the actual 16-day cadence from 2000-02-18", /const anchor=Date\.UTC\(2000,1,18\)[\s\S]*?Math\.floor\(\(d\.getTime\(\)-anchor\)\/period\)/],
