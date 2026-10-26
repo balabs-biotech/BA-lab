@@ -12,6 +12,7 @@ const checks = [
   ["automatically selects a configured location when no previous site exists", /const preferred=saved\|\|data\.find/],
   ["waits for the map to initialize before requesting imagery", /async function selectLocation\(\)[\s\S]*?await updateSatelliteMap\(\);/],
   ["searches the satellite catalogue automatically on initial load", /await loadLocations\(\);\s*if\(location\.value\)\{importWeather\(false\);if\(lat\.value!==""&&lon\.value!==""\)searchSatellite\(\);/],
+  ["prioritizes the public AWS Open Data catalogue before the Copernicus fallback", /earth-search-sentinel2-catalogue[\s\S]*?copernicus-sentinel-catalogue/],
   ["automatically searches again when the selected location changes", /location\.addEventListener\("change"[\s\S]*?searchSatellite\(\)/],
   ["prioritizes recent scenes with at most 30% cloud cover", /usableA=cloudA<=30\?0:1[\s\S]*?return usableA===0\?dateB-dateA/],
   ["automatically requests a rendered Sentinel-2 NDVI image", /await showSentinelNDVI\(sceneDate,"ndvi"\)/],
