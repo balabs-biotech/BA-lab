@@ -330,19 +330,29 @@
         if(!byDate.has(day))byDate.set(day,{});
         byDate.get(day)[row.variable_code]=value;
       }
-      const days=[...byDate.keys()].sort().slice(-7);
-      const temp=days.map(d=>byDate.get(d).air_temperature_max).filter(Number.isFinite);
-      const rain=days.map(d=>byDate.get(d).precipitation_corrected).filter(Number.isFinite);
-      const humidity=days.map(d=>byDate.get(d).relative_humidity_mean).filter(Number.isFinite);
-      const uv=days.map(d=>byDate.get(d).uv_index_daily_mean).filter(Number.isFinite);
+      // Use calendar days, not only days with observations; otherwise missing data
+      // disappear from the denominator and coverage looks better than it is.
+      const selectedStart=Date.parse((from.value||to.value)+"T00:00:00Z");
+      const selectedEnd=Date.parse((to.value||from.value)+"T00:00:00Z");
+      const lastDay=Number.isFinite(selectedEnd)?selectedEnd:Date.now();
+      const firstDay=Number.isFinite(selectedStart)?selectedStart:lastDay;
+      const windowStart=Math.max(firstDay,lastDay-6*86400000);
+      const days=[];
+      for(let ts=windowStart;ts<=lastDay;ts+=86400000)days.push(new Date(ts).toISOString().slice(0,10));
+      const valueFor=(day,key)=>byDate.get(day)?.[key];
+      const temp=days.map(d=>valueFor(d,"air_temperature_max")).filter(Number.isFinite);
+      const rain=days.map(d=>valueFor(d,"precipitation_corrected")).filter(Number.isFinite);
+      const humidity=days.map(d=>valueFor(d,"relative_humidity_mean")).filter(Number.isFinite);
+      const uv=days.map(d=>valueFor(d,"uv_index_daily_mean")).filter(Number.isFinite);
       const coverage=(values)=>Math.round(values.length/Math.max(days.length,1)*100);
+      const windowObservations=(data||[]).filter(row=>days.includes(String(row.observed_at||"").slice(0,10))).length;
       const grid=node("div",{class:"grid"});
       const metric=(label,value,note)=>{
         const card=node("article",{class:"card"});
         card.append(node("strong",{},label),node("p",{},value),node("small",{class:"muted"},note));
         grid.append(card);
       };
-      metric("Couverture météo",days.length+" date(s) · "+data.length+" observation(s)","Les taux ci-dessous indiquent la présence d’une valeur pour chaque date affichée.");
+      metric("Couverture météo",days.length+" date(s) · "+windowObservations+" observation(s)","Fenêtre des 7 derniers jours calendaires de la période sélectionnée ; les jours manquants restent dans le calcul de couverture.");
       metric("Température maximale",temp.length?Math.max(...temp).toFixed(1)+" °C":"—",coverage(temp)+" % des dates avec une valeur");
       metric("Précipitations",rain.length?rain.reduce((a,b)=>a+b,0).toFixed(1)+" mm":"—",rain.length===days.length?"Cumul complet · "+coverage(rain)+" % des dates":"Cumul partiel · "+coverage(rain)+" % des dates");
       metric("Humidité relative",humidity.length?(humidity.reduce((a,b)=>a+b,0)/humidity.length).toFixed(0)+" %":"—",coverage(humidity)+" % des dates avec une valeur");
