@@ -34,7 +34,7 @@ const checks = [
 assert.match(entry, /environmental-data\.js\?v=20261026-agro-coherence-2/, "uses a cache-busted environmental module path");
 assert.match(entry, /i18n\.js\?v=20261026-green-tech-i18n-5/, "uses a cache-busted localization module path");
 assert.match(i18n, /Lecture agronomique/, "contains localized agronomic synthesis labels");
-assert.match(i18n, /Vegetation trend \\(NDVI\\)/, "contains localized satellite chart labels");
+assert.match(i18n, /Vegetation trend \(NDVI\)/, "contains localized satellite chart labels");
 assert.match(i18n, /Qualidade dos dados:/, "contains localized data-quality diagnostics in Portuguese");
 assert.match(i18n, /جودة البيانات:/, "contains localized data-quality diagnostics in Arabic");
 for (const [label, pattern] of checks) {
