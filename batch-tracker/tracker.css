@@ -2708,3 +2708,108 @@ body[data-domain="agronomy"] #overviewCard .overview-metric-note { color: #c4d2c
 @media (prefers-reduced-motion: reduce) {
   #overviewCard .overview-meter > span { transition: none; }
 }
+
+
+/* Premium form UX: precise focus, readable validation and stable mobile field sizing. */
+:root {
+  --control-radius: 12px;
+  --control-focus-ring: color-mix(in srgb, var(--focus, #4d88c7) 22%, transparent);
+}
+.card input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="submit"]):not([type="button"]),
+.card select,
+.card textarea {
+  min-width: 0;
+  border-radius: var(--control-radius);
+  border-color: var(--border-strong);
+  transition: border-color .16s ease, box-shadow .16s ease, background-color .16s ease;
+}
+.card input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="submit"]):not([type="button"]):hover,
+.card select:hover,
+.card textarea:hover {
+  border-color: var(--muted);
+}
+.card input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="submit"]):not([type="button"]):focus-visible,
+.card select:focus-visible,
+.card textarea:focus-visible {
+  border-color: var(--focus, #4d88c7);
+  box-shadow: 0 0 0 4px var(--control-focus-ring);
+}
+.card input[aria-invalid="true"],
+.card select[aria-invalid="true"],
+.card textarea[aria-invalid="true"],
+.card input:user-invalid,
+.card select:user-invalid,
+.card textarea:user-invalid {
+  border-color: var(--err, #a83e3e);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--err, #a83e3e) 18%, transparent);
+}
+.card input:disabled,
+.card select:disabled,
+.card textarea:disabled {
+  opacity: .72;
+  cursor: not-allowed;
+}
+.card textarea {
+  min-height: 104px;
+  resize: vertical;
+  line-height: 1.55;
+}
+.card input[type="checkbox"],
+.card input[type="radio"] {
+  width: 20px;
+  height: 20px;
+  min-width: 20px;
+  min-height: 20px;
+  padding: 0;
+  accent-color: var(--brand);
+  cursor: pointer;
+}
+.card input[type="checkbox"]:focus-visible,
+.card input[type="radio"]:focus-visible {
+  outline: 3px solid var(--focus, #4d88c7);
+  outline-offset: 3px;
+}
+.card label {
+  line-height: 1.4;
+  text-wrap: pretty;
+}
+.card .hint,
+.card small.hint {
+  max-width: 72ch;
+  line-height: 1.5;
+}
+.card .grid,
+.card .batch-grid,
+.card .auth-actions {
+  min-width: 0;
+}
+.card input[type="date"],
+.card input[type="datetime-local"],
+.card input[type="number"],
+.card input[type="time"] {
+  font-variant-numeric: tabular-nums;
+}
+.card :is(input, select, textarea, button):focus-visible {
+  scroll-margin-block: 120px;
+}
+@media (max-width: 700px) {
+  .card input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="submit"]):not([type="button"]),
+  .card select,
+  .card textarea {
+    max-width: 100%;
+    font-size: 16px;
+  }
+  .card label {
+    margin-top: 13px;
+  }
+  .card textarea {
+    min-height: 112px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .card input,
+  .card select,
+  .card textarea {
+    transition: none;
+  }
+}
