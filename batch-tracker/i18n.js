@@ -1345,7 +1345,7 @@
       "Environment updated",
       "Ambiente atualizado",
       "تم تحديث البيئة"
-    ]
+    ],
     ["Carte satellite", "Satellite map", "Mapa de satélite", "Mapa de satélite"],
     ["Carte de référence", "Reference map", "Mapa de referência", "خريطة مرجعية"],
     ["Emplacement", "Location", "Local", "الموقع"],
