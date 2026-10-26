@@ -302,7 +302,7 @@ if (!css.includes('body[data-domain="agronomy"] { --workspace-accent: #a7f36a; }
 if (!css.includes("env(safe-area-inset-left)") || !css.includes("env(safe-area-inset-right)")) {
   throw new Error("Mobile layout must respect device safe areas");
 }
-if (!/@media \\(max-width: 820px\\) \\{[\\s\\S]*?\\.qc-row \\{[\\s\\S]*?grid-template-columns: minmax\\(0, 1fr\\)/.test(css)) {
+if (!/@media \(max-width: 820px\) \{[\s\S]*?\.qc-row \{[\s\S]*?grid-template-columns: minmax\(0, 1fr\)/.test(css)) {
   throw new Error("Quality-control rows must collapse on mobile");
 }
 console.log("✓ Premium mobile polish preserves domain identity and compacts dense controls");
