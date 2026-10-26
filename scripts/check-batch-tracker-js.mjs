@@ -272,3 +272,26 @@ console.log("✓ Atomic measurement/observation writes no longer perform separat
 const forbiddenDirectWrite = engine.match(/\.from\(["'](?:events|measurements|observations)["']\)\s*\.(?:insert|upsert|update|delete)\s*\(/);
 if (forbiddenDirectWrite) throw new Error("Audit-sensitive event/measurement/observation writes must go through validated RPCs, not direct table mutations");
 console.log("✓ Tracker uses RPC-backed writes for events, measurements and observations");
+
+
+/* Premium form UX regression contract: inputs remain usable and validation states visible. */
+const formUxMarker = "/* Premium form UX: precise focus, readable validation and stable mobile field sizing. */";
+const formUxStart = css.lastIndexOf(formUxMarker);
+if (formUxStart < 0) throw new Error("Premium form UX styles missing");
+const formUxCss = css.slice(formUxStart);
+if (!/border-color:\s*var\(--focus, #4d88c7\)/.test(formUxCss) || !/box-shadow:\s*0 0 0 4px var\(--control-focus-ring\)/.test(formUxCss)) {
+  throw new Error("Form controls need a visible focus treatment");
+}
+if (!/\[aria-invalid="true"\]/.test(formUxCss) || !/:user-invalid/.test(formUxCss)) {
+  throw new Error("Form validation states must be visually identifiable");
+}
+if (!/input\[type="checkbox"\]/.test(formUxCss) || !/accent-color:\s*var\(--brand\)/.test(formUxCss)) {
+  throw new Error("Checkbox and radio controls must retain usable touch targets and clear state");
+}
+if (!/@media \(max-width: 700px\)/.test(formUxCss) || !/font-size:\s*16px/.test(formUxCss)) {
+  throw new Error("Mobile form controls must avoid undersized text and horizontal overflow");
+}
+if (!/prefers-reduced-motion:\s*reduce/.test(formUxCss)) {
+  throw new Error("Form transitions must respect reduced-motion preferences");
+}
+console.log("✓ Premium form controls have focus, validation, touch and mobile safeguards");
