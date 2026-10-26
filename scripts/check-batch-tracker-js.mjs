@@ -306,3 +306,20 @@ if (!/@media \(max-width: 820px\) \{[\s\S]*?\.qc-row \{[\s\S]*?grid-template-col
   throw new Error("Quality-control rows must collapse on mobile");
 }
 console.log("✓ Premium mobile polish preserves domain identity and compacts dense controls");
+
+
+/* Premium UX refinement contract: anchors remain visible beneath sticky mobile navigation. */
+const premiumUxMarker = "/* Premium UX refinement: safe anchor offsets, restrained motion and compact mobile hierarchy. */";
+const premiumUxStart = css.lastIndexOf(premiumUxMarker);
+if (premiumUxStart < 0) throw new Error("Premium UX refinement marker missing");
+const premiumUxCss = css.slice(premiumUxStart);
+if (!/scroll-padding-top:\s*184px/.test(premiumUxCss) || !/scroll-margin-top:\s*184px/.test(premiumUxCss)) {
+  throw new Error("Mobile anchor targets must account for the sticky toolbar");
+}
+if (!/\.section-nav a\[aria-current="page"\]/.test(premiumUxCss) || !/box-shadow:\s*inset 0 -2px 0 var\(--workspace-accent, var\(--brand\)\)/.test(premiumUxCss)) {
+  throw new Error("Current section must be identifiable using the active universe accent");
+}
+if (!/prefers-reduced-motion:\s*reduce/.test(premiumUxCss) || !/scroll-behavior:\s*auto/.test(premiumUxCss)) {
+  throw new Error("Smooth navigation must respect reduced-motion preferences");
+}
+console.log("✓ Premium UX keeps anchored sections visible and respects reduced-motion preferences");
