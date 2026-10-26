@@ -31,7 +31,7 @@
 @media(max-width:760px){#mainView.webgl-ready{min-height:620px}#mainView .webgl-stage{min-height:620px}#mainView .webgl-stage .webgl-hint{max-width:68%;font-size:9px;line-height:1.5}}
 
 /* Spatial focus panel: compact, glass-like instrument readout */
-#mainView .webgl-stage .webgl-focus{position:absolute;left:14px;top:14px;z-index:4;display:flex;flex-direction:column;gap:5px;width:min(230px,48%);padding:14px 15px;border:1px solid #6f8d6b55;border-radius:15px;background:linear-gradient(145deg,#101d16eF,#07100bd9);box-shadow:0 12px 38px #0005,inset 0 1px #ffffff0a;backdrop-filter:blur(14px);pointer-events:none;transition:border-color .25s,transform .25s}
+#mainView .webgl-stage .webgl-focus{position:absolute;left:14px;top:14px;z-index:4;display:flex;flex-direction:column;gap:5px;width:min(230px,48%);padding:14px 15px;border:1px solid #6f8d6b55;border-radius:15px;background:linear-gradient(145deg,#101d16eF,#07100bd9);box-shadow:0 12px 38px #0005,inset 0 1px #ffffff0a;backdrop-filter:blur(14px);pointer-events:auto;transition:border-color .25s,transform .25s}
 #mainView .webgl-stage .webgl-focus.has-world{border-color:#caff8a70;transform:translateY(2px)}
 #mainView .webgl-focus-kicker{color:#a7c79c;font:600 9px/1.4 ui-monospace,monospace;letter-spacing:.14em;text-transform:uppercase}
 #mainView .webgl-focus strong{color:#f0f7ec;font:600 clamp(15px,1.5vw,20px)/1.15 system-ui,sans-serif;letter-spacing:-.025em}
@@ -203,3 +203,10 @@ setLanguage('fr');applyOrbit();
 <script type="module" src="./constellation-3d.js"></script>
 </body>
 </html>
+<style>
+#mainView .webgl-focus-next{margin-top:5px;color:#829b80;font:600 9px/1.4 system-ui,sans-serif;letter-spacing:.09em;text-transform:uppercase}
+#mainView .webgl-focus-links{display:flex;flex-wrap:wrap;gap:5px;max-height:88px;overflow:auto;pointer-events:auto}
+#mainView .webgl-focus-link{max-width:100%;border:1px solid #caff8a36;border-radius:999px;padding:5px 8px;background:#caff8a0b;color:#d9e8d4;font:500 10px/1.25 system-ui,sans-serif;cursor:pointer;text-align:start;transition:background .18s,border-color .18s,color .18s}
+#mainView .webgl-focus-link:hover,#mainView .webgl-focus-link:focus-visible{background:#caff8a22;border-color:#caff8a9c;color:#caff8a;outline:none}
+@media(max-width:760px){#mainView .webgl-focus-links{max-height:72px;gap:4px}#mainView .webgl-focus-link{font-size:9px;padding:4px 6px}}
+</style>
