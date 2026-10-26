@@ -323,3 +323,20 @@ if (!/prefers-reduced-motion:\s*reduce/.test(premiumUxCss) || !/scroll-behavior:
   throw new Error("Smooth navigation must respect reduced-motion preferences");
 }
 console.log("✓ Premium UX keeps anchored sections visible and respects reduced-motion preferences");
+
+
+/* Premium scientific shell contract: graphite navigation remains readable across all universes. */
+const graphiteShellMarker = "/* Premium scientific shell: shared graphite navigation with restrained universe accents. */";
+const graphiteShellStart = css.lastIndexOf(graphiteShellMarker);
+if (graphiteShellStart < 0) throw new Error("Shared graphite shell marker missing");
+const graphiteShellCss = css.slice(graphiteShellStart);
+for (const accent of ["#8dbf75", "#d18a5d", "#79aee0"]) {
+  if (!graphiteShellCss.includes(accent)) throw new Error("Missing restrained workspace accent: " + accent);
+}
+if (!/body\[data-domain\] \.app-toolbar\s*\{[^}]*background:\s*rgba\(20, 26, 32, \.96\)/s.test(graphiteShellCss)) {
+  throw new Error("All workspace toolbars must share the graphite surface");
+}
+if (!/body\[data-domain\] \.section-nav a\[aria-current="page"\][\s\S]*?box-shadow:\s*inset 0 -2px 0 var\(--workspace-accent\)/.test(graphiteShellCss)) {
+  throw new Error("Active navigation must use the selected universe accent");
+}
+console.log("✓ Shared graphite navigation preserves distinct, readable universe accents");
