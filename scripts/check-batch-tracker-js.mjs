@@ -272,3 +272,71 @@ console.log("✓ Atomic measurement/observation writes no longer perform separat
 const forbiddenDirectWrite = engine.match(/\.from\(["'](?:events|measurements|observations)["']\)\s*\.(?:insert|upsert|update|delete)\s*\(/);
 if (forbiddenDirectWrite) throw new Error("Audit-sensitive event/measurement/observation writes must go through validated RPCs, not direct table mutations");
 console.log("✓ Tracker uses RPC-backed writes for events, measurements and observations");
+
+/* Mobile navigation regression contract: desktop fixed sidebar must collapse on phones. */
+const mobileNavMarker = "/* Mobile navigation repair: desktop sidebar becomes compact mobile navigation. */";
+const mobileNavStart = css.lastIndexOf(mobileNavMarker);
+if (mobileNavStart < 0) throw new Error("Mobile navigation repair marker missing");
+const mobileNavCss = css.slice(mobileNavStart);
+const mobileNavMedia = mobileNavCss.match(/@media\s*\(max-width:\s*820px\)\s*\{([\s\S]*?)\n\}/);
+if (!mobileNavMedia) throw new Error("Mobile navigation breakpoint is missing");
+const mobileNavRules = mobileNavMedia[1];
+if (!/\.app-toolbar\s*\{[^}]*position:\s*sticky[^}]*width:\s*auto/s.test(mobileNavRules)) {
+  throw new Error("Mobile toolbar must stop behaving like a fixed desktop sidebar");
+}
+if (!/body\s*\{[^}]*padding:\s*12px/s.test(mobileNavRules)) {
+  throw new Error("Mobile body padding must reclaim the desktop sidebar gutter");
+}
+if (!/\.section-nav\s*\{[^}]*flex-direction:\s*row[^}]*overflow-x:\s*auto/s.test(mobileNavRules)) {
+  throw new Error("Mobile section navigation must become horizontally scrollable");
+}
+console.log("✓ Mobile navigation collapses the desktop sidebar without losing section access");
+
+
+/* Premium mobile polish regression contract. */
+if (!css.includes('body[data-domain="agronomy"] { --workspace-accent: #a7f36a; }') ||
+    !css.includes('body[data-domain="mycology"] { --workspace-accent: #b85e2c; }') ||
+    !css.includes('body[data-domain="laboratory"] { --workspace-accent: #4b8bc7; }')) {
+  throw new Error("Each workspace must retain its own visual accent");
+}
+if (!css.includes("env(safe-area-inset-left)") || !css.includes("env(safe-area-inset-right)")) {
+  throw new Error("Mobile layout must respect device safe areas");
+}
+if (!/@media \(max-width: 820px\) \{[\s\S]*?\.qc-row \{[\s\S]*?grid-template-columns: minmax\(0, 1fr\)/.test(css)) {
+  throw new Error("Quality-control rows must collapse on mobile");
+}
+console.log("✓ Premium mobile polish preserves domain identity and compacts dense controls");
+
+
+/* Premium UX refinement contract: anchors remain visible beneath sticky mobile navigation. */
+const premiumUxMarker = "/* Premium UX refinement: safe anchor offsets, restrained motion and compact mobile hierarchy. */";
+const premiumUxStart = css.lastIndexOf(premiumUxMarker);
+if (premiumUxStart < 0) throw new Error("Premium UX refinement marker missing");
+const premiumUxCss = css.slice(premiumUxStart);
+if (!/scroll-padding-top:\s*184px/.test(premiumUxCss) || !/scroll-margin-top:\s*184px/.test(premiumUxCss)) {
+  throw new Error("Mobile anchor targets must account for the sticky toolbar");
+}
+if (!/\.section-nav a\[aria-current="page"\]/.test(premiumUxCss) || !/box-shadow:\s*inset 0 -2px 0 var\(--workspace-accent, var\(--brand\)\)/.test(premiumUxCss)) {
+  throw new Error("Current section must be identifiable using the active universe accent");
+}
+if (!/prefers-reduced-motion:\s*reduce/.test(premiumUxCss) || !/scroll-behavior:\s*auto/.test(premiumUxCss)) {
+  throw new Error("Smooth navigation must respect reduced-motion preferences");
+}
+console.log("✓ Premium UX keeps anchored sections visible and respects reduced-motion preferences");
+
+
+/* Premium scientific shell contract: graphite navigation remains readable across all universes. */
+const graphiteShellMarker = "/* Premium scientific shell: shared graphite navigation with restrained universe accents. */";
+const graphiteShellStart = css.lastIndexOf(graphiteShellMarker);
+if (graphiteShellStart < 0) throw new Error("Shared graphite shell marker missing");
+const graphiteShellCss = css.slice(graphiteShellStart);
+for (const accent of ["#8dbf75", "#d18a5d", "#79aee0"]) {
+  if (!graphiteShellCss.includes(accent)) throw new Error("Missing restrained workspace accent: " + accent);
+}
+if (!/body\[data-domain\] \.app-toolbar\s*\{[^}]*background:\s*rgba\(20, 26, 32, \.96\)/s.test(graphiteShellCss)) {
+  throw new Error("All workspace toolbars must share the graphite surface");
+}
+if (!/body\[data-domain\] \.section-nav a\[aria-current="page"\][\s\S]*?box-shadow:\s*inset 0 -2px 0 var\(--workspace-accent\)/.test(graphiteShellCss)) {
+  throw new Error("Active navigation must use the selected universe accent");
+}
+console.log("✓ Shared graphite navigation preserves distinct, readable universe accents");
