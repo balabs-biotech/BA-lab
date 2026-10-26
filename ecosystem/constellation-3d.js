@@ -48,7 +48,14 @@ if(root){
         const geom=new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0,0,0),p]);
         const line=new THREE.Line(geom,edgeMat);line.userData={kind:'edge',id};worldGroup.add(line);edges.push({line,id,a:new THREE.Vector3(0,0,0),b:p.clone()});
       }
-      const pairs=[['bio','myco'],['bio','lab'],['bio','soil'],['myco','lab'],['myco','soil'],['soil','lab'],['soil','products'],['lab','iot'],['lab','work'],['products','iot'],['products','learn'],['iot','work'],['work','learn'],['bio','learn']];
+      // Relations reflect the two editorial clusters stated in index.html:
+      // biological foundations (bio/myco/soil/lab) and applications/transmission
+      // (products/iot/work/learn). Cross-cluster links are limited to explicit
+      // R&D-to-application and soil-to-project pathways, not decorative all-to-all links.
+      const clusters=[['bio','myco','soil','lab'],['products','iot','work','learn']];
+      const pairs=[];
+      for(const cluster of clusters){for(let i=0;i<cluster.length;i++){for(let j=i+1;j<cluster.length;j++){pairs.push([cluster[i],cluster[j]])}}}
+      pairs.push(['lab','products'],['soil','work']);
       for(const [a,b] of pairs){const pa=points.find(p=>p.id===a),pb=points.find(p=>p.id===b);if(!pa||!pb)continue;const line=new THREE.Line(new THREE.BufferGeometry().setFromPoints([pa.base,pb.base]),new THREE.LineDashedMaterial({color:0x9acb8a,dashSize:.09,gapSize:.09,transparent:true,opacity:.38}));line.computeLineDistances();line.userData={kind:'relation',a,b};worldGroup.add(line);edges.push({line,id:a,relation:true,aId:a,bId:b,a:pa.base.clone(),b:pb.base.clone()})}
       root.classList.add('webgl-ready');worldGroup.visible=!root.classList.contains('universe-closed');new MutationObserver(()=>{if(worldGroup)worldGroup.visible=!root.classList.contains('universe-closed');if(root.classList.contains('universe-closed'))clearResourceNodes()}).observe(root,{attributes:true,attributeFilter:['class']});
       const textObserver=new MutationObserver(()=>refreshLabels());sphereEls.forEach(el=>{const b=el.querySelector('b');if(b)textObserver.observe(b,{childList:true,characterData:true,subtree:true})});
