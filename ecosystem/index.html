@@ -29,6 +29,16 @@
 #mainView .webgl-stage .webgl-status{position:absolute;right:14px;bottom:14px;color:#caff8a;font-size:9px;letter-spacing:.12em;pointer-events:none}
 #mainView.webgl-ready.universe-closed .webgl-stage .webgl-hint{opacity:.85}
 @media(max-width:760px){#mainView.webgl-ready{min-height:620px}#mainView .webgl-stage{min-height:620px}#mainView .webgl-stage .webgl-hint{max-width:68%;font-size:9px;line-height:1.5}}
+
+/* Ergonomic controls for the real-time 3D scene */
+#mainView .webgl-stage{min-height:680px;touch-action:pan-y;cursor:grab}
+#mainView .webgl-stage:active{cursor:grabbing}
+#mainView .webgl-stage .webgl-controls{position:absolute;right:14px;top:14px;z-index:5;display:flex;gap:6px;pointer-events:auto}
+#mainView .webgl-stage .webgl-controls button{width:38px;height:38px;border:1px solid #48634b;border-radius:12px;background:#0b170fdf;color:#eaf7e5;font:600 21px/1 system-ui;box-shadow:0 5px 18px #0005;cursor:pointer;backdrop-filter:blur(10px);transition:background .18s,border-color .18s,transform .18s}
+#mainView .webgl-stage .webgl-controls button:hover,#mainView .webgl-stage .webgl-controls button:focus-visible{background:#caff8a;color:#10200d;border-color:#caff8a;transform:translateY(-1px);outline:none}
+#mainView .webgl-stage .webgl-hint{max-width:min(65%,620px);line-height:1.6}
+#mainView .webgl-stage .webgl-status{max-width:28%;text-align:right;line-height:1.5}
+@media(max-width:760px){#mainView.webgl-ready{min-height:580px}#mainView .webgl-stage{min-height:580px}#mainView .webgl-stage .webgl-controls{top:10px;right:10px;gap:5px}#mainView .webgl-stage .webgl-controls button{width:34px;height:34px;border-radius:10px}#mainView .webgl-stage .webgl-hint{left:11px;bottom:11px;max-width:66%;font-size:9px}#mainView .webgl-stage .webgl-status{right:10px;bottom:11px;font-size:8px;max-width:30%}}
 </style>
 </head>
 <body>
