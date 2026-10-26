@@ -541,7 +541,7 @@
     ["Le graphique n’a pas pu être produit.","The chart could not be generated.","Não foi possível gerar o gráfico.","تعذر إنشاء الرسم البياني."],
     ["Données indisponibles.","Data unavailable.","Dados indisponíveis.","البيانات غير متاحة."],
   ];
-  for (const [fr, en, pt, ar] of supplementalCoverage {
+  for (const [fr, en, pt, ar] of supplementalCoverage) {
     dictionaries.en[fr] ||= en;
     dictionaries.pt[fr] ||= pt;
     dictionaries.ar[fr] ||= ar;
