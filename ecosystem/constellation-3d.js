@@ -4,7 +4,7 @@ const root=document.getElementById('mainView');
 if(root){
   const sphereEls=[...document.querySelectorAll('[data-sphere]')];
   const ids=['bio','myco','soil','lab','products','iot','work','learn'];
-  const colors={bio:0xcaff8a,myco:0xd9a5ff,soil:0xefc47b,lab:0x79e0d2,products:0xff9c82,iot:0xf4df85,work:0x8ebaff,learn:0xf5a9ce};
+  const colors={bio:0xa9c5a3,myco:0x8fb8b0,soil:0xc5ad7b,lab:0x7faea8,products:0xb7a48c,iot:0xaab79a,work:0x91a9bb,learn:0xb3bda8};
   const labels=Object.fromEntries(sphereEls.map(el=>[el.dataset.sphere,{title:el.querySelector('b')?.textContent||el.dataset.sphere,sub:el.querySelector('small')?.textContent||''}]));
   const stage=document.createElement('div');stage.className='webgl-stage';stage.setAttribute('role','application');stage.setAttribute('aria-label','Constellation 3D interactive BALabs');
   const hint=document.createElement('div');hint.className='webgl-hint';const hintText={fr:'GLISSER POUR TOURNER · PINCER POUR ZOOMER · TOUCHER UN UNIVERS',en:'DRAG TO ROTATE · PINCH TO ZOOM · TAP A WORLD',ar:'اسحب للتدوير · اقرص للتكبير · المس عالماً',pt:'ARRASTE PARA RODAR · PINÇA PARA ZOOM · TOQUE NUM UNIVERSO'};const refreshHint=()=>{hint.textContent=hintText[document.documentElement.lang]||hintText.fr};refreshHint();new MutationObserver(refreshHint).observe(document.documentElement,{attributes:true,attributeFilter:['lang']});
@@ -28,15 +28,15 @@ if(root){
       scene=new THREE.Scene();scene.fog=new THREE.FogExp2(0x07100b,.025);worldGroup=new THREE.Group();scene.add(worldGroup);
       camera=new THREE.PerspectiveCamera(42,1,.1,100);raycaster=new THREE.Raycaster();mouse=new THREE.Vector2();
       scene.add(new THREE.AmbientLight(0xb9d8b5,1.25));
-      const key=new THREE.PointLight(0xcaff8a,95,30);key.position.set(0,5,6);scene.add(key);
-      const fill=new THREE.PointLight(0x4b9a76,65,24);fill.position.set(-6,-2,-4);scene.add(fill);
+      const key=new THREE.PointLight(0xa9c5a3,58,30);key.position.set(0,5,6);scene.add(key);
+      const fill=new THREE.PointLight(0x658f83,42,24);fill.position.set(-6,-2,-4);scene.add(fill);
       const starGeo=new THREE.BufferGeometry(),arr=[];
       for(let i=0;i<650;i++){const radius=THREE.MathUtils.randFloat(8,22),a=Math.random()*Math.PI*2,z=THREE.MathUtils.randFloatSpread(18);arr.push(Math.cos(a)*radius,Math.sin(a)*radius,z)}
-      starGeo.setAttribute('position',new THREE.Float32BufferAttribute(arr,3));stars=new THREE.Points(starGeo,new THREE.PointsMaterial({color:0x9ecf8e,size:.025,transparent:true,opacity:.7}));scene.add(stars);
+      starGeo.setAttribute('position',new THREE.Float32BufferAttribute(arr,3));stars=new THREE.Points(starGeo,new THREE.PointsMaterial({color:0x9db7a0,size:.025,transparent:true,opacity:.55}));scene.add(stars);
       const coreGeo=new THREE.IcosahedronGeometry(.56,3);
-      core=new THREE.Mesh(coreGeo,new THREE.MeshStandardMaterial({color:0x234c2a,emissive:0x83c85a,emissiveIntensity:.75,metalness:.35,roughness:.22}));core.userData.kind='core';scene.add(core);
-      const halo=new THREE.Mesh(new THREE.TorusGeometry(.82,.009,8,120),new THREE.MeshBasicMaterial({color:0xcaff8a,transparent:true,opacity:.65}));halo.rotation.set(.8,.3,.2);core.add(halo);
-      const coreLabel=makeLabel('BALabs',0xcaff8a,38);coreLabel.position.set(0,-.86,0);coreLabel.scale.set(1.8,.45,1);core.add(coreLabel);
+      core=new THREE.Mesh(coreGeo,new THREE.MeshStandardMaterial({color:0x234c2a,emissive:0x769b78,emissiveIntensity:.42,metalness:.35,roughness:.22}));core.userData.kind='core';scene.add(core);
+      const halo=new THREE.Mesh(new THREE.TorusGeometry(.82,.009,8,120),new THREE.MeshBasicMaterial({color:0xa9c5a3,transparent:true,opacity:.48}));halo.rotation.set(.8,.3,.2);core.add(halo);
+      const coreLabel=makeLabel('BALabs',0xa9c5a3,38);coreLabel.position.set(0,-.86,0);coreLabel.scale.set(1.8,.45,1);core.add(coreLabel);
       const pos={bio:[0,3.05,0],myco:[-2.55,1.8,1.1],soil:[2.6,1.65,-.7],lab:[-3.15,-.55,-.5],products:[3.1,-.4,1],iot:[-2.15,-2.2,1.15],work:[2.2,-2.2,-.7],learn:[.15,-3.1,0]};
       for(const id of ids){
         const color=colors[id],p=new THREE.Vector3(...pos[id]).multiplyScalar(1.16);
