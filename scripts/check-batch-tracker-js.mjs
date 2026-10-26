@@ -278,16 +278,16 @@ const mobileNavMarker = "/* Mobile navigation repair: desktop sidebar becomes co
 const mobileNavStart = css.lastIndexOf(mobileNavMarker);
 if (mobileNavStart < 0) throw new Error("Mobile navigation repair marker missing");
 const mobileNavCss = css.slice(mobileNavStart);
-const mobileNavMedia = mobileNavCss.match(/@media\\s*\\(max-width:\\s*820px\\)\\s*\\{([\\s\\S]*?)\\n\\}/);
+const mobileNavMedia = mobileNavCss.match(/@media\s*\(max-width:\s*820px\)\s*\{([\s\S]*?)\n\}/);
 if (!mobileNavMedia) throw new Error("Mobile navigation breakpoint is missing");
 const mobileNavRules = mobileNavMedia[1];
-if (!/\\.app-toolbar\\s*\\{[^}]*position:\\s*sticky[^}]*width:\\s*auto/s.test(mobileNavRules)) {
+if (!/\.app-toolbar\s*\{[^}]*position:\s*sticky[^}]*width:\s*auto/s.test(mobileNavRules)) {
   throw new Error("Mobile toolbar must stop behaving like a fixed desktop sidebar");
 }
-if (!/body\\s*\\{[^}]*padding:\\s*12px/s.test(mobileNavRules)) {
+if (!/body\s*\{[^}]*padding:\s*12px/s.test(mobileNavRules)) {
   throw new Error("Mobile body padding must reclaim the desktop sidebar gutter");
 }
-if (!/\\.section-nav\\s*\\{[^}]*flex-direction:\\s*row[^}]*overflow-x:\\s*auto/s.test(mobileNavRules)) {
+if (!/\.section-nav\s*\{[^}]*flex-direction:\s*row[^}]*overflow-x:\s*auto/s.test(mobileNavRules)) {
   throw new Error("Mobile section navigation must become horizontally scrollable");
 }
 console.log("✓ Mobile navigation collapses the desktop sidebar without losing section access");
