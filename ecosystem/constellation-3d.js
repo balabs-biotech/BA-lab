@@ -29,12 +29,12 @@ if(root){
       camera=new THREE.PerspectiveCamera(42,1,.1,100);raycaster=new THREE.Raycaster();mouse=new THREE.Vector2();
       scene.add(new THREE.AmbientLight(0xb9d8b5,1.25));
       const key=new THREE.PointLight(0xa9c5a3,58,30);key.position.set(0,5,6);scene.add(key);
-      const fill=new THREE.PointLight(0x4b9a76,65,24);fill.position.set(-6,-2,-4);scene.add(fill);
+      const fill=new THREE.PointLight(0x658f83,42,24);fill.position.set(-6,-2,-4);scene.add(fill);
       const starGeo=new THREE.BufferGeometry(),arr=[];
       for(let i=0;i<650;i++){const radius=THREE.MathUtils.randFloat(8,22),a=Math.random()*Math.PI*2,z=THREE.MathUtils.randFloatSpread(18);arr.push(Math.cos(a)*radius,Math.sin(a)*radius,z)}
-      starGeo.setAttribute('position',new THREE.Float32BufferAttribute(arr,3));stars=new THREE.Points(starGeo,new THREE.PointsMaterial({color:0x9ecf8e,size:.025,transparent:true,opacity:.7}));scene.add(stars);
+      starGeo.setAttribute('position',new THREE.Float32BufferAttribute(arr,3));stars=new THREE.Points(starGeo,new THREE.PointsMaterial({color:0x9db7a0,size:.025,transparent:true,opacity:.55}));scene.add(stars);
       const coreGeo=new THREE.IcosahedronGeometry(.56,3);
-      core=new THREE.Mesh(coreGeo,new THREE.MeshStandardMaterial({color:0x234c2a,emissive:0x83c85a,emissiveIntensity:.75,metalness:.35,roughness:.22}));core.userData.kind='core';scene.add(core);
+      core=new THREE.Mesh(coreGeo,new THREE.MeshStandardMaterial({color:0x234c2a,emissive:0x769b78,emissiveIntensity:.42,metalness:.35,roughness:.22}));core.userData.kind='core';scene.add(core);
       const halo=new THREE.Mesh(new THREE.TorusGeometry(.82,.009,8,120),new THREE.MeshBasicMaterial({color:0xa9c5a3,transparent:true,opacity:.48}));halo.rotation.set(.8,.3,.2);core.add(halo);
       const coreLabel=makeLabel('BALabs',0xa9c5a3,38);coreLabel.position.set(0,-.86,0);coreLabel.scale.set(1.8,.45,1);core.add(coreLabel);
       const pos={bio:[0,3.05,0],myco:[-2.55,1.8,1.1],soil:[2.6,1.65,-.7],lab:[-3.15,-.55,-.5],products:[3.1,-.4,1],iot:[-2.15,-2.2,1.15],work:[2.2,-2.2,-.7],learn:[.15,-3.1,0]};
