@@ -12,7 +12,7 @@ const routes=[
 for(const r of routes){
  const html=fs.readFileSync(r.file,"utf8");
  if(!html.includes(`window.BA_LABS_DOMAIN = "${r.domain}"`))throw new Error("Wrong domain: "+r.file);
- if(!html.includes('fetch("../workspace.html")')||!html.includes('script.src = "../tracker.js"'))throw new Error("Shared engine missing: "+r.file);
+ if(!/fetch\("\.\.\/workspace\.html(?:\?v=[^"]*)?"\)/.test(html)||!/script\.src = "\.\.\/tracker\.js(?:\?v=[^"]*)?"/.test(html))throw new Error("Shared engine missing: "+r.file);
  if(!root.includes(`href="${r.url}"`))throw new Error("Root link missing: "+r.url);
 }
 if(template.includes('class="domain-switcher"'))throw new Error("Switcher remains inside workspace");
