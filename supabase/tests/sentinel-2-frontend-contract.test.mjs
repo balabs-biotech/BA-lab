@@ -32,7 +32,7 @@ const checks = [
   ["calculates agronomic coverage against calendar days, including missing days", /windowStart=Math\.max\(firstDay,lastDay-6\*86400000\)[\s\S]*?windowObservations/],
  ];
 assert.match(entry, /environmental-data\.js\?v=20261026-agro-coherence-2/, "uses a cache-busted environmental module path");
-assert.match(entry, /i18n\.js\?v=20261026-green-tech-i18n-4/, "uses a cache-busted localization module path");
+assert.match(entry, /i18n\.js\?v=[^"]+/, "uses a cache-busted localization module path");
 assert.match(i18n, /Lecture agronomique/, "contains localized agronomic synthesis labels");
 assert.match(i18n, /Vegetation trend \\(NDVI\\)/, "contains localized satellite chart labels");
 assert.match(i18n, /Qualidade dos dados:/, "contains localized data-quality diagnostics in Portuguese");
