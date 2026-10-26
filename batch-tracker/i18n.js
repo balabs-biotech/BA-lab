@@ -1537,8 +1537,7 @@
     ["L’indice UV est une mesure atmosphérique météo, pas une bande d’imagerie Sentinel-2.", "The UV index is an atmospheric weather measure, not a Sentinel-2 imaging band.", "O índice UV é uma medida meteorológica atmosférica, não uma banda de imagem Sentinel-2.", "مؤشر UV قياس جوي للطقس وليس نطاق تصوير Sentinel-2."],
     ["Température maximale", "Maximum temperature", "Temperatura máxima", "درجة الحرارة القصوى"],
     ["Humidité relative", "Relative humidity", "Humidade relativa", "الرطوبة النسبية"],
-    ["La météo affichée est historique : aucune prévision ni commande automatique d’irrigation.", "Displayed weather is historical: no forecast or automatic irrigation control.", "A meteorologia apresentada é histórica: sem previsão nem controlo automático da rega.", "الطقس المعروض تاريخي: لا توجد توقعات أو تحكم آلي في الري."],
-  ];
+    ["La météo affichée est historique : aucune prévision ni commande automatique d’irrigation.", "Displayed weather is historical: no forecast or automatic irrigation control.", "A meteorologia apresentada é histórica: sem previsão nem controlo automático da rega.", "الطقس المعروض تاريخي: لا توجد توقعات أو تحكم آلي في الري."];
   for (const [fr, en, pt, ar] of supplementalCoverage) {
     dictionaries.en[fr] ||= en;
     dictionaries.pt[fr] ||= pt;
