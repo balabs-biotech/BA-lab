@@ -272,3 +272,22 @@ console.log("✓ Atomic measurement/observation writes no longer perform separat
 const forbiddenDirectWrite = engine.match(/\.from\(["'](?:events|measurements|observations)["']\)\s*\.(?:insert|upsert|update|delete)\s*\(/);
 if (forbiddenDirectWrite) throw new Error("Audit-sensitive event/measurement/observation writes must go through validated RPCs, not direct table mutations");
 console.log("✓ Tracker uses RPC-backed writes for events, measurements and observations");
+
+/* Mobile navigation regression contract: desktop fixed sidebar must collapse on phones. */
+const mobileNavMarker = "/* Mobile navigation repair: desktop sidebar becomes compact mobile navigation. */";
+const mobileNavStart = css.lastIndexOf(mobileNavMarker);
+if (mobileNavStart < 0) throw new Error("Mobile navigation repair marker missing");
+const mobileNavCss = css.slice(mobileNavStart);
+const mobileNavMedia = mobileNavCss.match(/@media\\s*\\(max-width:\\s*820px\\)\\s*\\{([\\s\\S]*?)\\n\\}/);
+if (!mobileNavMedia) throw new Error("Mobile navigation breakpoint is missing");
+const mobileNavRules = mobileNavMedia[1];
+if (!/\\.app-toolbar\\s*\\{[^}]*position:\\s*sticky[^}]*width:\\s*auto/s.test(mobileNavRules)) {
+  throw new Error("Mobile toolbar must stop behaving like a fixed desktop sidebar");
+}
+if (!/body\\s*\\{[^}]*padding:\\s*12px/s.test(mobileNavRules)) {
+  throw new Error("Mobile body padding must reclaim the desktop sidebar gutter");
+}
+if (!/\\.section-nav\\s*\\{[^}]*flex-direction:\\s*row[^}]*overflow-x:\\s*auto/s.test(mobileNavRules)) {
+  throw new Error("Mobile section navigation must become horizontally scrollable");
+}
+console.log("✓ Mobile navigation collapses the desktop sidebar without losing section access");
