@@ -13,6 +13,57 @@
 @media(max-width:760px){.header{padding:13px 15px}.brandmark{width:36px;height:36px}.brandname{font-size:11px}.brandmeta{font-size:8px}.header-actions .btn{padding:8px 9px;font-size:10px}.main{display:flex;flex-direction:column}.stage{min-height:590px;height:64vh;max-height:720px;border-right:0;border-bottom:1px solid #24372a}.stagehead{left:18px;top:20px;max-width:75%}.stagehead h1{font-size:clamp(31px,8vw,44px)}.stagehead p{font-size:11px;max-width:300px}.legend{top:auto;right:10px;bottom:70px;gap:5px;max-width:150px}.legend button{padding:6px 8px;font-size:9px}.stagefoot{left:18px;bottom:16px;font-size:9px;max-width:38%}.side{max-height:none;padding:20px 16px 28px}.quickgrid{grid-template-columns:repeat(4,minmax(0,1fr))}.quick{padding:9px 7px;min-height:61px}.quick b{font-size:15px}.quick span{font-size:9px}.branchlist{grid-template-columns:1fr 1fr}.branchitem{padding:9px 8px;gap:7px}.branchitem .name{font-size:10px}.branchitem .summary{font-size:9px}.side-top{margin-bottom:13px}}
 @media(max-width:430px){.brand{gap:8px}.brandmeta{letter-spacing:.08em}.header-actions .btn:not(.primary){display:none}.stage{min-height:560px}.legend{max-width:135px}.legend button{font-size:8px}.branchlist{grid-template-columns:1fr}.quickgrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+
+/* Visual polish: stronger hierarchy, contrast and mobile navigation */
+:root{--bg:#070d09;--panel:#111d14;--panel2:#1a2b1e;--ink:#f5fbf4;--muted:#c0d0c1;--line:#3b5740;--accent:#c7ff8a}
+button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.btn{border-color:#4a684f;background:#17271b;color:#f2f8f0}
+.btn.primary{background:#c7ff8a;border-color:#c7ff8a;color:#10200f}
+.btn.primary:hover{background:#dcffb5}
+.stage{background:radial-gradient(ellipse at 50% 53%,#17291c 0%,#0b140e 58%,#080e0a 100%)}
+.stagehead h1{text-shadow:0 3px 22px #0009}
+.stagehead p{color:#d0dfd1;text-shadow:0 2px 12px #000b}
+.eyebrow{color:#c7ff8a}
+.legend button{border-color:#3b5740;background:#0a140eef;color:#f0f8ef;min-height:34px}
+.legend button.active{border-color:var(--c);box-shadow:0 0 0 1px var(--c),0 5px 18px #0005;background:#1a2b1e}
+.swatch{box-shadow:0 0 0 2px #0a140e,0 0 0 3px color-mix(in srgb,var(--c) 65%,transparent)}
+.side{background:linear-gradient(180deg,#111d14 0%,#0b140e 100%)}
+.side-top h2,.sectionlabel{color:#bfd0c1}
+.search{border-color:#405b45;background:#080f0a;color:#f5fbf4}
+.search::placeholder{color:#9eb3a1}
+.quick{border-color:#3a5340;background:#142219}
+.quick:hover,.branchitem:hover{border-color:#87b875}
+.quick span,.branchitem .summary{color:#bdcdbf}
+.branchitem{border-color:#344b38;background:#101b13}
+.branchitem.selected{box-shadow:inset 3px 0 0 var(--c);border-color:var(--c)}
+.detail{border-color:#49664d;background:linear-gradient(150deg,#1b2b1e,#101a13);box-shadow:0 12px 30px #0003}
+.detail p{color:#d0dfd1}
+.footer-note{color:#9caf9e;border-color:#344b38}
+@media(max-width:760px){
+ .stage{height:56vh;min-height:480px;max-height:650px}
+ .stagehead{max-width:calc(100% - 28px)}
+ .stagehead h1{font-size:clamp(30px,8vw,42px);margin-top:9px}
+ .stagehead p{max-width:320px;line-height:1.5}
+ .legend{left:12px;right:12px;bottom:12px;top:auto;display:flex;flex-wrap:nowrap;overflow-x:auto;overflow-y:hidden;max-width:none;padding:3px 2px 7px;gap:7px;scrollbar-width:thin}
+ .legend button{flex:none;white-space:nowrap;font-size:10px;min-height:36px;padding:8px 11px}
+ .stagefoot{display:none}
+ .side{padding-top:18px}
+ .branchitem .name{font-size:11px}
+ .branchitem .summary{font-size:10px}
+}
+@media(max-width:430px){
+ .header{gap:8px}
+ .brandmeta{font-size:8px}
+ .stage{min-height:470px}
+ .stagehead h1{font-size:32px}
+ .stagehead p{font-size:12px;max-width:290px}
+ .legend{bottom:10px}
+ .legend button{font-size:10px}
+ .quickgrid{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .quick{min-height:65px;padding:10px}
+ .quick b{font-size:17px}
+}
+
 </style>
 </head>
 <body>
