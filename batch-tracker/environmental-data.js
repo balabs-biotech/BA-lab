@@ -148,25 +148,19 @@
         };
         let response;
         let rasterSource;
-        if(displayMode!=="ndvi"){
-          response=await fetch("https://axcouwiodqsauwnsiotn.supabase.co/functions/v1/earth-search-sentinel2-ndvi-preview",{
-            method:"POST",headers:requestHeaders,body:JSON.stringify({location_id:location.value,date:sceneDate,mode:displayMode})
-          });
-          rasterSource="Earth Search / AWS Open Data";
-        }else{
-          response=await fetch("https://axcouwiodqsauwnsiotn.supabase.co/functions/v1/sentinel-2-ndvi-preview",{
-            method:"POST",headers:requestHeaders,body:JSON.stringify({location_id:location.value,date:sceneDate,mode:displayMode})
-          });
-          rasterSource="Copernicus Data Space";
-        }
+        // Public Earth Search / AWS Open Data is the primary route. Copernicus OAuth
+        // is only a fallback, so normal operation does not depend on provider credentials.
+        response=await fetch("https://axcouwiodqsauwnsiotn.supabase.co/functions/v1/earth-search-sentinel2-ndvi-preview",{
+          method:"POST",headers:requestHeaders,body:JSON.stringify({location_id:location.value,date:sceneDate,mode:displayMode})
+        });
+        rasterSource="Earth Search / AWS Open Data";
         if(!response.ok){
-          const primaryError=await response.clone().json().catch(()=>({}));
-          // If OAuth secrets have not arrived yet, compute NDVI from public Sentinel-2 COGs.
-          if(displayMode==="ndvi"&&primaryError.error==="sentinelhub_credentials_not_configured"){
-            response=await fetch("https://axcouwiodqsauwnsiotn.supabase.co/functions/v1/earth-search-sentinel2-ndvi-preview",{
+          const publicError=await response.clone().json().catch(()=>({}));
+          if(publicError.error!=="no_sentinel2_scene_for_date"){
+            const copernicusResponse=await fetch("https://axcouwiodqsauwnsiotn.supabase.co/functions/v1/sentinel-2-ndvi-preview",{
               method:"POST",headers:requestHeaders,body:JSON.stringify({location_id:location.value,date:sceneDate,mode:displayMode})
             });
-            rasterSource="Earth Search / AWS Open Data";
+            if(copernicusResponse.ok){response=copernicusResponse;rasterSource="Copernicus Data Space (secours)";}
           }
         }
         if(!response.ok){
@@ -218,8 +212,8 @@
         const {data:authState,error}=await db.auth.getSession();
         if(error||!authState?.session?.access_token)return null;
         const headers={"Authorization":"Bearer "+authState.session.access_token,"apikey":"sb_publishable_8H4XRh8V07Hlo0WwdfOXwg_2RXRX992","Content-Type":"application/json","Accept":"image/png"};
-        let response=await fetch("https://axcouwiodqsauwnsiotn.supabase.co/functions/v1/sentinel-2-ndvi-preview",{method:"POST",headers,body:JSON.stringify({location_id:location.value,date:sceneDate,mode:"ndvi"})});
-        if(!response.ok){const issue=await response.clone().json().catch(()=>({}));if(issue.error==="sentinelhub_credentials_not_configured")response=await fetch("https://axcouwiodqsauwnsiotn.supabase.co/functions/v1/earth-search-sentinel2-ndvi-preview",{method:"POST",headers,body:JSON.stringify({location_id:location.value,date:sceneDate,mode:"ndvi"})});}
+        let response=await fetch("https://axcouwiodqsauwnsiotn.supabase.co/functions/v1/earth-search-sentinel2-ndvi-preview",{method:"POST",headers,body:JSON.stringify({location_id:location.value,date:sceneDate,mode:"ndvi"})});
+        if(!response.ok){const issue=await response.clone().json().catch(()=>({}));if(issue.error!=="no_sentinel2_scene_for_date"){const backup=await fetch("https://axcouwiodqsauwnsiotn.supabase.co/functions/v1/sentinel-2-ndvi-preview",{method:"POST",headers,body:JSON.stringify({location_id:location.value,date:sceneDate,mode:"ndvi"})});if(backup.ok)response=backup;}}
         if(!response.ok)return null;const raw=response.headers.get("X-NDVI-Stats");if(!raw)return null;
         const stats=JSON.parse(raw),mean=Number(stats.mean_ndvi);return Number.isFinite(mean)?{date:sceneDate,mean}:null;
       }catch(_){return null;}
@@ -572,13 +566,13 @@
       satelliteButton.disabled=true;
       satelliteMapStatus.textContent="Recherche de la dernière image satellite…";
       try{
-        let {data,error}=await db.functions.invoke("copernicus-sentinel-catalogue",{body:{location_id:location.value,start_date:from.value,end_date:to.value,limit:10,max_cloud_cover:60}});
-        let catalogueSource="Copernicus Data Space";
-        // OAuth-free fallback: public Sentinel-2 COG catalogue on AWS Open Data.
+        // Search the open AWS Earth Search catalogue first; Copernicus is a fallback.
+        let {data,error}=await db.functions.invoke("earth-search-sentinel2-catalogue",{body:{location_id:location.value,start_date:from.value,end_date:to.value,limit:10,max_cloud_cover:60}});
+        let catalogueSource="Earth Search / AWS Open Data (sans OAuth)";
         if(error||!data?.ok||!Array.isArray(data?.scenes)||data.scenes.length===0){
-          const fallback=await db.functions.invoke("earth-search-sentinel2-catalogue",{body:{location_id:location.value,start_date:from.value,end_date:to.value,limit:10,max_cloud_cover:60}});
-          if(!fallback.error&&fallback.data?.ok){
-            data=fallback.data;error=null;catalogueSource="Earth Search / AWS Open Data (sans OAuth)";
+          const fallback=await db.functions.invoke("copernicus-sentinel-catalogue",{body:{location_id:location.value,start_date:from.value,end_date:to.value,limit:10,max_cloud_cover:60}});
+          if(!fallback.error&&fallback.data?.ok&&Array.isArray(fallback.data?.scenes)&&fallback.data.scenes.length){
+            data=fallback.data;error=null;catalogueSource="Copernicus Data Space (secours)";
           }
         }
         satelliteResults.replaceChildren();
