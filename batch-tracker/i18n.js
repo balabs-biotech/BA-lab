@@ -1345,199 +1345,1069 @@
       "Environment updated",
       "Ambiente atualizado",
       "تم تحديث البيئة"
+    ],
+    [
+      "Carte de référence",
+      "Reference map",
+      "Mapa de referência",
+      "خريطة مرجعية"
+    ],
+    [
+      "Emplacement",
+      "Location",
+      "Local",
+      "الموقع"
+    ],
+    [
+      "Choisir un emplacement…",
+      "Choose a location…",
+      "Escolha um local…",
+      "اختر موقعًا…"
+    ],
+    [
+      "Chargement de l’image satellite…",
+      "Loading satellite imagery…",
+      "A carregar imagens de satélite…",
+      "جارٍ تحميل صور الأقمار الصناعية…"
+    ],
+    [
+      "Carte régionale · site non configuré.",
+      "Regional map · site not configured.",
+      "Mapa regional · local não configurado.",
+      "خريطة إقليمية · الموقع غير مهيأ."
+    ],
+    [
+      "Contexte satellite chargé.",
+      "Satellite context loaded.",
+      "Contexto de satélite carregado.",
+      "تم تحميل سياق الأقمار الصناعية."
+    ],
+    [
+      "Contexte environnemental",
+      "Environmental context",
+      "Contexto ambiental",
+      "السياق البيئي"
+    ],
+    [
+      "NDVI moyen : ",
+      "Mean NDVI: ",
+      "NDVI médio: ",
+      "متوسط NDVI: "
+    ],
+    [
+      "indice spectral, pas une mesure de rendement.",
+      "spectral index, not a yield measurement.",
+      "índice espectral, não uma medição de produtividade.",
+      "مؤشر طيفي وليس قياسًا للمحصول."
+    ],
+    [
+      "NDVI moyen ",
+      "Mean NDVI ",
+      "NDVI médio ",
+      "متوسط NDVI "
+    ],
+    [
+      "Comparaison du NDVI moyen sur deux dates Sentinel-2",
+      "Comparison of mean NDVI across two Sentinel-2 dates",
+      "Comparação do NDVI médio em duas datas Sentinel-2",
+      "مقارنة متوسط NDVI بين تاريخين من Sentinel-2"
+    ],
+    [
+      "Comparatif UV automatique",
+      "Automatic UV comparison",
+      "Comparação automática do UV",
+      "مقارنة تلقائية للأشعة فوق البنفسجية"
+    ],
+    [
+      "Le comparatif s’affichera dès que deux dates UV réelles seront disponibles.",
+      "The comparison will appear once two real UV dates are available.",
+      "A comparação será apresentada quando existirem duas datas reais de UV.",
+      "ستظهر المقارنة عند توفر تاريخين فعليين للأشعة فوق البنفسجية."
+    ],
+    [
+      "Indice UV en hausse entre les deux dernières dates disponibles.",
+      "UV index increased between the two latest available dates.",
+      "O índice UV aumentou entre as duas últimas datas disponíveis.",
+      "ارتفع مؤشر الأشعة فوق البنفسجية بين آخر تاريخين متاحين."
+    ],
+    [
+      "Indice UV en baisse entre les deux dernières dates disponibles.",
+      "UV index decreased between the two latest available dates.",
+      "O índice UV انخفض بين آخر تاريخين متاحين.",
+      "انخفض مؤشر الأشعة فوق البنفسجية بين آخر تاريخين متاحين."
+    ],
+    [
+      "Indice UV stable entre les deux dernières dates disponibles.",
+      "UV index was stable between the two latest available dates.",
+      "O índice UV manteve-se estável entre as duas últimas datas disponíveis.",
+      "استقر مؤشر الأشعة فوق البنفسجية بين آخر تاريخين متاحين."
+    ],
+    [
+      "point(s) UV",
+      "UV point(s)",
+      "ponto(s) UV",
+      "نقطة UV"
+    ],
+    [
+      "Pic de température",
+      "Peak temperature",
+      "Pico de temperatura",
+      "ذروة الحرارة"
+    ],
+    [
+      "Pluie cumulée",
+      "Cumulative rainfall",
+      "Precipitação acumulada",
+      "الأمطار التراكمية"
+    ],
+    [
+      "Humidité de l’air",
+      "Air humidity",
+      "Humidade do ar",
+      "رطوبة الهواء"
+    ],
+    [
+      "Indice UV moyen quotidien",
+      "Mean daily UV index",
+      "Índice UV médio diário",
+      "متوسط مؤشر UV اليومي"
+    ],
+    [
+      "Indisponible",
+      "Unavailable",
+      "Indisponível",
+      "غير متاح"
+    ],
+    [
+      "Maximum observé sur les 7 dernières dates disponibles",
+      "Maximum across the 7 latest available dates",
+      "Máximo nas 7 últimas datas disponíveis",
+      "الحد الأقصى خلال آخر 7 تواريخ متاحة"
+    ],
+    [
+      "Somme des précipitations disponibles",
+      "Sum of available precipitation values",
+      "Soma das precipitações disponíveis",
+      "مجموع قيم الهطول المتاحة"
+    ],
+    [
+      "Moyenne des observations disponibles",
+      "Mean of available observations",
+      "Média das observações disponíveis",
+      "متوسط القراءات المتاحة"
+    ],
+    [
+      "Estimation journalière NASA POWER ; ce n’est pas le pic UV instantané.",
+      "NASA POWER daily estimate; not the instantaneous UV peak.",
+      "Estimativa diária NASA POWER; não é o pico UV instantâneo.",
+      "تقدير يومي من NASA POWER؛ وليس ذروة UV اللحظية."
+    ],
+    [
+      "Évolution par rapport aux 7 dates précédentes",
+      "Change versus the previous 7 available dates",
+      "Variação face às 7 datas anteriores",
+      "التغير مقارنة بآخر 7 تواريخ سابقة"
+    ],
+    [
+      "comparaison indisponible (historique insuffisant).",
+      "comparison unavailable (insufficient history).",
+      "comparação indisponível (histórico insuficiente).",
+      "المقارنة غير متاحة (السجل غير كافٍ)."
+    ],
+    [
+      "stable",
+      "stable",
+      "estável",
+      "مستقر"
+    ],
+    [
+      "Comparaison descriptive de périodes constituées des dernières dates disponibles, pas nécessairement de 7 jours calendaires consécutifs. Une hausse ou une baisse n’établit pas à elle seule un stress cultural.",
+      "Descriptive comparison of periods built from the latest available dates, not necessarily seven consecutive calendar days. A rise or fall alone does not establish crop stress.",
+      "Comparação descritiva de períodos formados pelas últimas datas disponíveis, não necessariamente sete dias consecutivos. Uma subida ou descida, por si só, não demonstra stress da cultura.",
+      "مقارنة وصفية لفترات مبنية على أحدث التواريخ المتاحة، وليست بالضرورة سبعة أيام تقويمية متتالية. ولا يثبت الارتفاع أو الانخفاض وحده إجهاد المحصول."
+    ],
+    [
+      "Priorité élevée",
+      "High priority",
+      "Prioridade elevada",
+      "أولوية مرتفعة"
+    ],
+    [
+      "Vigilance",
+      "Watch",
+      "Vigilância",
+      "تنبيه"
+    ],
+    [
+      "À vérifier",
+      "Check",
+      "A verificar",
+      "يجب التحقق"
+    ],
+    [
+      "Données partielles",
+      "Partial data",
+      "Dados parciais",
+      "بيانات جزئية"
+    ],
+    [
+      "Pas de signal simple",
+      "No simple signal",
+      "Sem sinal simples",
+      "لا توجد إشارة بسيطة"
+    ],
+    [
+      "Épisode de chaleur à vérifier",
+      "Heat episode to check",
+      "Episódio de calor a verificar",
+      "يجب التحقق من موجة الحر"
+    ],
+    [
+      "Températures élevées",
+      "High temperatures",
+      "Temperaturas elevadas",
+      "درجات حرارة مرتفعة"
+    ],
+    [
+      "Peu de précipitations récentes",
+      "Low recent rainfall",
+      "Pouca precipitação recente",
+      "انخفاض الهطول مؤخرًا"
+    ],
+    [
+      "Cumul de pluie insuffisamment couvert",
+      "Rainfall total has insufficient coverage",
+      "Cobertura insuficiente do total de precipitação",
+      "تغطية غير كافية لمجموع الأمطار"
+    ],
+    [
+      "Humidité atmosphérique élevée",
+      "High atmospheric humidity",
+      "Humidade atmosférica elevada",
+      "رطوبة جوية مرتفعة"
+    ],
+    [
+      "Aucune alerte détectée par les règles actuelles",
+      "No alert detected by current rules",
+      "Nenhum alerta detetado pelas regras atuais",
+      "لم تُكتشف تنبيهات وفق القواعد الحالية"
+    ],
+    [
+      "Le maximum régional atteint ",
+      "Regional maximum reached ",
+      "O máximo regional atingiu ",
+      "بلغ الحد الأقصى الإقليمي "
+    ],
+    [
+      "Le cumul estimé est de ",
+      "Estimated total is ",
+      "O total estimado é de ",
+      "المجموع المقدر هو "
+    ],
+    [
+      "Seulement ",
+      "Only ",
+      "Apenas ",
+      "فقط "
+    ],
+    [
+      " jour(s) renseigné(s).",
+      " reported day(s).",
+      " dia(s) com dados.",
+      " يوم/أيام مسجلة."
+    ],
+    [
+      " jour(s) contiennent une valeur de précipitation exploitable sur les jours affichés. Le cumul ne permet pas de conclure sur le déficit hydrique.",
+      " day(s) contain usable precipitation values among the displayed days. The total cannot establish water deficit.",
+      " dia(s) contêm valores de precipitação utilizáveis entre os dias apresentados. O total não permite concluir que existe défice hídrico.",
+      " يوم/أيام تحتوي على قيم هطول قابلة للاستخدام ضمن الأيام المعروضة. ولا يثبت المجموع وجود عجز مائي."
+    ],
+    [
+      "La moyenne des valeurs disponibles est de ",
+      "The mean of available values is ",
+      "A média dos valores disponíveis é ",
+      "متوسط القيم المتاحة هو "
+    ],
+    [
+      "Vérifiez l’humidité réelle du sol ou du substrat, le flétrissement et l’état des plantes aux heures chaudes. N’augmentez pas l’irrigation automatiquement sans contrôle de terrain.",
+      "Check actual soil or substrate moisture, wilting, and plant condition during hot hours. Do not automatically increase irrigation without field verification.",
+      "Verifique a humidade real do solo ou substrato, a murchidão e o estado das plantas nas horas mais quentes. Não aumente automaticamente a rega sem verificação no terreno.",
+      "تحقق من رطوبة التربة أو الركيزة الفعلية والذبول وحالة النباتات خلال ساعات الحر. لا تزد الري تلقائيًا دون فحص ميداني."
+    ],
+    [
+      "Surveillez les cultures sensibles, surtout en pot ou sous serre, et contrôlez l’humidité réelle avant d’ajuster l’arrosage.",
+      "Monitor sensitive crops, especially in pots or greenhouses, and check actual moisture before adjusting irrigation.",
+      "Vigie culturas sensíveis, sobretudo em vasos ou estufas, e verifique a humidade real antes de ajustar a rega.",
+      "راقب المحاصيل الحساسة، خصوصًا في الأصص أو البيوت المحمية، وتحقق من الرطوبة الفعلية قبل تعديل الري."
+    ],
+    [
+      "En plein champ, contrôlez l’humidité du sol avant toute décision d’irrigation. Cette information ne permet pas de déduire seule le besoin en eau.",
+      "In open fields, check soil moisture before deciding to irrigate. This information alone cannot determine water demand.",
+      "No campo, verifique a humidade do solo antes de decidir regar. Esta informação, por si só, não determina a necessidade de água.",
+      "في الحقول المفتوحة، تحقق من رطوبة التربة قبل اتخاذ قرار الري. ولا تكفي هذه المعلومات وحدها لتحديد الحاجة إلى الماء."
+    ],
+    [
+      "Vérifiez la ventilation sous serre et inspectez les feuilles. L’humidité régionale ne confirme ni la présence ni le risque certain d’une maladie.",
+      "Check greenhouse ventilation and inspect leaves. Regional humidity does not confirm disease presence or certain disease risk.",
+      "Verifique a ventilação da estufa e inspecione as folhas. A humidade regional não confirma a presença nem um risco certo de doença.",
+      "تحقق من تهوية البيت المحمي وافحص الأوراق. لا تؤكد الرطوبة الإقليمية وجود المرض أو خطره المؤكد."
+    ],
+    [
+      "Cela ne signifie pas que la culture est sans stress. Vérifiez les observations de terrain et les mesures locales ; les seuils ne sont pas encore adaptés à une espèce, un stade cultural ou un type de sol précis.",
+      "This does not mean the crop is stress-free. Check field observations and local measurements; thresholds are not yet tailored to a species, growth stage, or soil type.",
+      "Isto não significa que a cultura não esteja sob stress. Verifique as observações no terreno e as medições locais; os limiares ainda não estão adaptados à espécie, fase de crescimento ou tipo de solo.",
+      "هذا لا يعني أن المحصول خالٍ من الإجهاد. تحقق من الملاحظات الميدانية والقياسات المحلية؛ فالحدود لم تُخصص بعد لنوع أو مرحلة نمو أو تربة معينة."
+    ],
+    [
+      "Sentinel-2 : scènes disponibles et couverture nuageuse. L’image ne constitue pas à elle seule un diagnostic de culture.",
+      "Sentinel-2: available scenes and cloud cover. Imagery alone is not a crop diagnosis.",
+      "Sentinel-2: cenas disponíveis e cobertura de nuvens. A imagem, por si só, não constitui um diagnóstico da cultura.",
+      "Sentinel-2: المشاهد المتاحة والغطاء السحابي. لا تشكل الصورة وحدها تشخيصًا للمحصول."
+    ],
+    [
+      "Aucune image exploitable sur la période récente.",
+      "No usable imagery in the recent period.",
+      "Nenhuma imagem utilizável no período recente.",
+      "لا توجد صور قابلة للاستخدام في الفترة الأخيرة."
+    ],
+    [
+      "Catalogue satellite indisponible.",
+      "Satellite catalogue unavailable.",
+      "Catálogo de satélite indisponível.",
+      "فهرس الأقمار الصناعية غير متاح."
+    ],
+    [
+      "Recherche de la dernière image satellite…",
+      "Searching for the latest satellite image…",
+      "A procurar a imagem de satélite mais recente…",
+      "جارٍ البحث عن أحدث صورة قمر صناعي…"
+    ],
+    [
+      "Image satellite temporairement indisponible.",
+      "Satellite imagery temporarily unavailable.",
+      "Imagem de satélite temporariamente indisponível.",
+      "صور الأقمار الصناعية غير متاحة مؤقتًا."
+    ],
+    [
+      "Coordonnées du site manquantes.",
+      "Site coordinates missing.",
+      "Faltam as coordenadas do local.",
+      "إحداثيات الموقع مفقودة."
+    ],
+    [
+      "Site satellite non configuré.",
+      "Satellite site not configured.",
+      "Local de satélite não configurado.",
+      "لم يتم إعداد موقع القمر الصناعي."
+    ],
+    [
+      "Contexte régional conservé.",
+      "Regional context retained.",
+      "Contexto regional mantido.",
+      "تم الاحتفاظ بالسياق الإقليمي."
+    ],
+    [
+      "Dernière image conservée.",
+      "Last image retained.",
+      "Última imagem mantida.",
+      "تم الاحتفاظ بآخر صورة."
+    ],
+    [
+      "Indice spectral de végétation — NDVI MODIS",
+      "Vegetation spectral index — MODIS NDVI",
+      "Índice espectral de vegetação — NDVI MODIS",
+      "مؤشر الغطاء النباتي الطيفي — MODIS NDVI"
+    ],
+    [
+      "Réflectance visible — composition en couleurs naturelles",
+      "Visible reflectance — natural-colour composite",
+      "Reflectância visível — composição em cores naturais",
+      "الانعكاس المرئي — تركيب الألوان الطبيعية"
+    ],
+    [
+      "La vue régionale MODIS est un contexte paysager à résolution kilométrique : elle ne permet pas de conclure qu’une parcelle ou toute la région est dépourvue de végétation. Les pixels sans données ne doivent pas être interprétés comme des sols nus.",
+      "The regional MODIS view is landscape context at kilometre-scale resolution: it cannot establish that a field or region lacks vegetation. Pixels without data must not be interpreted as bare soil.",
+      "A vista regional MODIS fornece contexto paisagístico à escala quilométrica: não permite concluir que uma parcela ou região não tem vegetação. Pixels sem dados não devem ser interpretados como solo nu.",
+      "توفر صورة MODIS الإقليمية سياقًا على مقياس الكيلومترات، ولا تثبت غياب الغطاء النباتي عن قطعة أو منطقة. لا ينبغي تفسير البكسلات التي لا تحتوي على بيانات على أنها تربة عارية."
+    ],
+    [
+      "Couleurs naturelles",
+      "Natural colours",
+      "Cores naturais",
+      "ألوان طبيعية"
+    ],
+    [
+      "Fausses couleurs IR",
+      "False-colour infrared",
+      "Infravermelho em falsas cores",
+      "ألوان تحت الحمراء الزائفة"
+    ],
+    [
+      "Latitude",
+      "Latitude",
+      "Latitude",
+      "خط العرض"
+    ],
+    [
+      "Longitude",
+      "Longitude",
+      "Longitude",
+      "خط الطول"
+    ],
+    [
+      "Précision des coordonnées (m)",
+      "Coordinate accuracy (m)",
+      "Precisão das coordenadas (m)",
+      "دقة الإحداثيات (م)"
+    ],
+    [
+      "Origine des coordonnées",
+      "Coordinate source",
+      "Origem das coordenadas",
+      "مصدر الإحداثيات"
+    ],
+    [
+      "GPS terrain",
+      "Field GPS",
+      "GPS de campo",
+      "GPS ميداني"
+    ],
+    [
+      "Vérifié par l’utilisateur",
+      "User verified",
+      "Verificado pelo utilizador",
+      "تم التحقق من المستخدم"
+    ],
+    [
+      "Estimation cartographique",
+      "Map estimate",
+      "Estimativa cartográfica",
+      "تقدير الخرائط"
+    ],
+    [
+      "Du",
+      "From",
+      "De",
+      "من"
+    ],
+    [
+      "Au",
+      "To",
+      "Até",
+      "إلى"
+    ],
+    [
+      "Actualiser la météo",
+      "Refresh weather",
+      "Atualizar meteorologia",
+      "تحديث الطقس"
+    ],
+    [
+      "Enregistrer les coordonnées",
+      "Save coordinates",
+      "Guardar coordenadas",
+      "حفظ الإحداثيات"
+    ],
+    [
+      "Afficher l’analyse et les données détaillées",
+      "Show analysis and detailed data",
+      "Mostrar análise e dados detalhados",
+      "عرض التحليل والبيانات التفصيلية"
+    ],
+    [
+      "Paramètres avancés : coordonnées et actualisation",
+      "Advanced settings: coordinates and refresh",
+      "Definições avançadas: coordenadas e atualização",
+      "إعدادات متقدمة: الإحداثيات والتحديث"
+    ],
+    [
+      "dernière valeur : ",
+      "latest value: ",
+      "último valor: ",
+      "آخر قيمة: "
+    ],
+    [
+      "Aucune observation pour cette période.",
+      "No observations for this period.",
+      "Sem observações para este período.",
+      "لا توجد ملاحظات لهذه الفترة."
+    ],
+    [
+      "Historique indisponible : ",
+      "History unavailable: ",
+      "Histórico indisponível: ",
+      "السجل غير متاح: "
+    ],
+    [
+      "Échec de la collecte météo : ",
+      "Weather collection failed: ",
+      "Falha na recolha meteorológica: ",
+      "فشل جمع بيانات الطقس: "
+    ],
+    [
+      "Collecte en cours…",
+      "Collecting data…",
+      "A recolher dados…",
+      "جارٍ جمع البيانات…"
+    ],
+    [
+      "Actualisation forcée en cours…",
+      "Forced refresh in progress…",
+      "Atualização forçada em curso…",
+      "جارٍ التحديث الإجباري…"
+    ],
+    [
+      "Import terminé",
+      "Import complete",
+      "Importação concluída",
+      "اكتمل الاستيراد"
+    ],
+    [
+      "Actualisation terminée",
+      "Refresh complete",
+      "Atualização concluída",
+      "اكتمل التحديث"
+    ],
+    [
+      "Cache historique validé",
+      "Historical cache validated",
+      "Cache histórico validado",
+      "تم التحقق من ذاكرة التخزين المؤقت"
+    ],
+    [
+      "enregistrements importés.",
+      "records imported.",
+      "registos importados.",
+      "سجلات مستوردة."
+    ],
+    [
+      "variables principales vérifiées.",
+      "main variables checked.",
+      "variáveis principais verificadas.",
+      "متغيرات رئيسية تم التحقق منها."
+    ],
+    [
+      "Données estimées sur grille, non mesurées localement.",
+      "Gridded estimates, not locally measured.",
+      "Estimativas em grelha, não medidas localmente.",
+      "تقديرات شبكية وليست قياسات محلية."
+    ],
+    [
+      "Rayonnement solaire",
+      "Solar radiation",
+      "Radiação solar",
+      "الإشعاع الشمسي"
+    ],
+    [
+      "Température moyenne",
+      "Mean temperature",
+      "Temperatura média",
+      "متوسط الحرارة"
+    ],
+    [
+      "Température minimale",
+      "Minimum temperature",
+      "Temperatura mínima",
+      "الحرارة الدنيا"
+    ],
+    [
+      "Humidité relative moyenne",
+      "Mean relative humidity",
+      "Humidade relativa média",
+      "متوسط الرطوبة النسبية"
+    ],
+    [
+      "Vitesse moyenne du vent",
+      "Mean wind speed",
+      "Velocidade média do vento",
+      "متوسط سرعة الرياح"
+    ],
+    [
+      "Variable",
+      "Variable",
+      "Variável",
+      "المتغير"
+    ],
+    [
+      "Valeur",
+      "Value",
+      "Valor",
+      "القيمة"
+    ],
+    [
+      "Unité",
+      "Unit",
+      "Unidade",
+      "الوحدة"
+    ],
+    [
+      "Source",
+      "Source",
+      "Fonte",
+      "المصدر"
+    ],
+    [
+      "Qualité",
+      "Quality",
+      "Qualidade",
+      "الجودة"
+    ],
+    [
+      "Lecture agronomique",
+      "Agronomic interpretation",
+      "Leitura agronómica",
+      "قراءة زراعية"
+    ],
+    [
+      "Mise en relation des signaux météo disponibles. Les données régionales ne remplacent pas les mesures dans la parcelle.",
+      "Connecting available weather signals. Regional data do not replace measurements in the field.",
+      "Relação entre os sinais meteorológicos disponíveis. Os dados regionais não substituem as medições na parcela.",
+      "ربط إشارات الطقس المتاحة. لا تحل البيانات الإقليمية محل القياسات داخل الحقل."
+    ],
+    [
+      "Couverture météo",
+      "Weather data coverage",
+      "Cobertura meteorológica",
+      "تغطية بيانات الطقس"
+    ],
+    [
+      " date(s) · ",
+      " date(s) · ",
+      " data(s) · ",
+      " تاريخ · "
+    ],
+    [
+      " observation(s)",
+      " observation(s)",
+      " observação(ões)",
+      " ملاحظة"
+    ],
+    [
+      "Les taux ci-dessous indiquent la présence d’une valeur pour chaque date affichée.",
+      "The percentages below indicate whether a value exists for each displayed date.",
+      "As percentagens abaixo indicam a existência de um valor para cada data apresentada.",
+      "تشير النسب أدناه إلى وجود قيمة لكل تاريخ معروض."
+    ],
+    [
+      "Précipitations",
+      "Precipitation",
+      "Precipitação",
+      "الهطول"
+    ],
+    [
+      " % des dates avec une valeur",
+      "% of dates with a value",
+      "% das datas com valor",
+      "٪ من التواريخ ذات القيمة"
+    ],
+    [
+      "Aucune observation météo exploitable pour établir un contexte agronomique.",
+      "No usable weather observations are available to establish agronomic context.",
+      "Não existem observações meteorológicas utilizáveis para estabelecer o contexto agronómico.",
+      "لا توجد ملاحظات طقس قابلة للاستخدام لتحديد السياق الزراعي."
+    ],
+    [
+      "Chaleur élevée : contrôlez l’humidité du sol ou du substrat, le flétrissement et la température réelle au niveau des plantes avant de modifier l’irrigation.",
+      "High heat: check soil or substrate moisture, wilting, and actual plant-level temperature before changing irrigation.",
+      "Calor elevado: verifique a humidade do solo ou substrato, a murchidão e a temperatura real junto das plantas antes de alterar a rega.",
+      "حرارة مرتفعة: تحقق من رطوبة التربة أو الركيزة والذبول ودرجة الحرارة الفعلية عند النباتات قبل تعديل الري."
+    ],
+    [
+      "Température élevée : surveillez les cultures sensibles et vérifiez l’humidité réelle avant d’ajuster l’arrosage.",
+      "High temperature: monitor sensitive crops and check actual moisture before adjusting irrigation.",
+      "Temperatura elevada: vigie culturas sensíveis e verifique a humidade real antes de ajustar a rega.",
+      "درجة حرارة مرتفعة: راقب المحاصيل الحساسة وتحقق من الرطوبة الفعلية قبل تعديل الري."
+    ],
+    [
+      "Faibles précipitations estimées sur les dates couvertes : vérifiez l’humidité du sol, car la pluie régionale ne mesure pas l’eau disponible dans la zone racinaire.",
+      "Low estimated rainfall over the covered dates: check soil moisture, because regional rainfall does not measure water available in the root zone.",
+      "Pouca precipitação estimada nas datas abrangidas: verifique a humidade do solo, pois a chuva regional não mede a água disponível na zona radicular.",
+      "انخفاض الأمطار المقدرة خلال التواريخ المغطاة: تحقق من رطوبة التربة، لأن الأمطار الإقليمية لا تقيس الماء المتاح في منطقة الجذور."
+    ],
+    [
+      "Couverture des précipitations partielle : ne concluez pas à un déficit hydrique à partir du cumul affiché.",
+      "Rainfall coverage is partial: do not infer water deficit from the displayed total.",
+      "A cobertura da precipitação é parcial: não conclua que existe défice hídrico com base no total apresentado.",
+      "تغطية بيانات الأمطار جزئية: لا تستنتج وجود عجز مائي من المجموع المعروض."
+    ],
+    [
+      "Humidité atmosphérique élevée : vérifiez la ventilation sous serre et inspectez les feuilles ; ce signal ne diagnostique pas une maladie.",
+      "High atmospheric humidity: check greenhouse ventilation and inspect leaves; this signal does not diagnose disease.",
+      "Humidade atmosférica elevada: verifique a ventilação da estufa e inspecione as folhas; este sinal não diagnostica uma doença.",
+      "رطوبة جوية مرتفعة: تحقق من تهوية البيت المحمي وافحص الأوراق؛ هذه الإشارة لا تشخّص مرضًا."
+    ],
+    [
+      "Indice UV journalier moyen : ",
+      "Mean daily UV index: ",
+      "Índice UV médio diário: ",
+      "متوسط مؤشر UV اليومي: "
+    ],
+    [
+      "entre les valeurs disponibles (",
+      "between available values (",
+      "entre os valores disponíveis (",
+      "بين القيم المتاحة ("
+    ],
+    [
+      "). Il décrit l’exposition UV atmosphérique, pas le stress hydrique de la plante.",
+      "). It describes atmospheric UV exposure, not plant water stress.",
+      "). Descreve a exposição atmosférica aos UV, não o stress hídrico da planta.",
+      "). يصف التعرض الجوي للأشعة فوق البنفسجية، وليس الإجهاد المائي للنبات."
+    ],
+    [
+      "Aucun signal simple ne dépasse les seuils généraux actuels. Cela ne garantit pas l’absence de stress : confrontez ce contexte aux observations et mesures locales.",
+      "No simple signal exceeds the current general thresholds. This does not guarantee absence of stress: compare this context with field observations and local measurements.",
+      "Nenhum sinal simples ultrapassa os limiares gerais atuais. Isto não garante ausência de stress: compare este contexto com observações no terreno e medições locais.",
+      "لا تتجاوز أي إشارة بسيطة الحدود العامة الحالية. ولا يضمن ذلك غياب الإجهاد؛ قارن هذا السياق بالملاحظات الميدانية والقياسات المحلية."
+    ],
+    [
+      "Source météo : NASA POWER, estimations sur grille. Les dates sans valeur ne sont pas assimilées à zéro. Les seuils sont génériques et ne sont pas adaptés à une espèce, un stade cultural ou un sol précis.",
+      "Weather source: NASA POWER gridded estimates. Dates without values are not treated as zero. Thresholds are generic and not tailored to a species, growth stage, or specific soil.",
+      "Fonte meteorológica: estimativas em grelha da NASA POWER. Datas sem valores não são tratadas como zero. Os limiares são genéricos e não estão adaptados a uma espécie, fase de crescimento ou solo específico.",
+      "مصدر الطقس: تقديرات شبكية من NASA POWER. لا تُعامل التواريخ التي بلا قيم على أنها صفر. الحدود عامة وليست مخصصة لنوع أو مرحلة نمو أو تربة بعينها."
+    ],
+    [
+      "Évolution météo — données historiques NASA POWER",
+      "Weather trends — NASA POWER historical data",
+      "Evolução meteorológica — dados históricos NASA POWER",
+      "تطور الطقس — بيانات NASA POWER التاريخية"
+    ],
+    [
+      "Chaque graphique conserve sa propre unité. Les points correspondent uniquement aux observations historiques importées ; aucune valeur synthétique ni prévision n’est ajoutée.",
+      "Each chart keeps its own unit. Points represent only imported historical observations; no synthetic values or forecasts are added.",
+      "Cada gráfico mantém a sua própria unidade. Os pontos correspondem apenas às observações históricas importadas; não são adicionados valores sintéticos nem previsões.",
+      "يحتفظ كل مخطط بوحدته. تمثل النقاط الملاحظات التاريخية المستوردة فقط؛ ولا تُضاف قيم اصطناعية أو توقعات."
+    ],
+    [
+      "Les graphiques météo apparaîtront après l’import de données historiques réelles.",
+      "Weather charts will appear after real historical data is imported.",
+      "Os gráficos meteorológicos aparecerão após a importação de dados históricos reais.",
+      "ستظهر مخططات الطقس بعد استيراد البيانات التاريخية الفعلية."
+    ],
+    [
+      "Au moins deux dates avec des valeurs réelles sont nécessaires pour tracer cette variable. Valeurs disponibles : ",
+      "At least two dates with real values are required to chart this variable. Available values: ",
+      "São necessárias pelo menos duas datas com valores reais para representar esta variável. Valores disponíveis: ",
+      "يلزم تاريخان على الأقل بقيم فعلية لرسم هذا المتغير. القيم المتاحة: "
+    ],
+    [
+      "dates réelles",
+      "real dates",
+      "datas reais",
+      "تواريخ فعلية"
+    ],
+    [
+      "Dates couvertes : ",
+      "Dates covered: ",
+      "Datas abrangidas: ",
+      "التواريخ المشمولة: "
+    ],
+    [
+      " · dernière valeur : ",
+      " · latest value: ",
+      " · último valor: ",
+      " · آخر قيمة: "
+    ],
+    [
+      "Impossible de calculer les indicateurs météo.",
+      "Unable to calculate weather indicators.",
+      "Não foi possível calcular os indicadores meteorológicos.",
+      "تعذر حساب مؤشرات الطقس."
+    ],
+    [
+      "Pas encore de données météo pour cette période. Importez l’historique pour obtenir des repères utiles.",
+      "No weather data for this period yet. Import historical data to get useful reference points.",
+      "Ainda não existem dados meteorológicos para este período. Importe o histórico para obter referências úteis.",
+      "لا توجد بيانات طقس لهذه الفترة بعد. استورد السجل للحصول على مؤشرات مفيدة."
+    ],
+    [
+      "Sentinel-2 · scènes disponibles et couverture nuageuse.",
+      "Sentinel-2 · available scenes and cloud cover.",
+      "Sentinel-2 · cenas disponíveis e cobertura de nuvens.",
+      "Sentinel-2 · المشاهد المتاحة والغطاء السحابي."
+    ],
+    [
+      "Cumul complet · ",
+      "Complete total · ",
+      "Total completo · ",
+      "مجموع كامل · "
+    ],
+    [
+      "Cumul partiel · ",
+      "Partial total · ",
+      "Total parcial · ",
+      "مجموع جزئي · "
+    ],
+    [
+      " des dates",
+      " of dates",
+      " das datas",
+      " من التواريخ"
+    ],
+    [
+      "Évolution de la végétation (NDVI)",
+      "Vegetation trend (NDVI)",
+      "Evolução da vegetação (NDVI)",
+      "اتجاه الغطاء النباتي (NDVI)"
+    ],
+    [
+      "Comparaison automatique des dernières scènes Sentinel-2 disponibles.",
+      "Automatic comparison of the latest available Sentinel-2 scenes.",
+      "Comparação automática das últimas cenas Sentinel-2 disponíveis.",
+      "مقارنة تلقائية لأحدث مشاهد Sentinel-2 المتاحة."
+    ],
+    [
+      "Statistiques NDVI indisponibles pour les scènes trouvées.",
+      "NDVI statistics unavailable for the scenes found.",
+      "Estatísticas NDVI indisponíveis para as cenas encontradas.",
+      "إحصاءات NDVI غير متاحة للمشاهد التي عُثر عليها."
+    ],
+    [
+      "Dernière scène · ",
+      "Latest scene · ",
+      "Cena mais recente · ",
+      "أحدث مشهد · "
+    ],
+    [
+      " · NDVI moyen ",
+      " · Mean NDVI ",
+      " · NDVI médio ",
+      " · متوسط NDVI "
+    ],
+    [
+      "Le comparatif apparaîtra lorsqu’une deuxième scène exploitable sera disponible.",
+      "The comparison will appear when a second usable scene is available.",
+      "A comparação aparecerá quando estiver disponível uma segunda cena utilizável.",
+      "ستظهر المقارنة عند توفر مشهد ثانٍ قابل للاستخدام."
+    ],
+    [
+      "NDVI Sentinel-2 · ",
+      "Sentinel-2 NDVI · ",
+      "NDVI Sentinel-2 · ",
+      "NDVI Sentinel-2 · "
+    ],
+    [
+      "Préparation du rendu ",
+      "Preparing ",
+      "A preparar ",
+      "جارٍ إعداد "
+    ],
+    [
+      " et chargement dans la carte BA Labs…",
+      " rendering and loading into the BA Labs map…",
+      " e carregamento no mapa BA Labs…",
+      " وتحميله في خريطة BA Labs…"
+    ],
+    [
+      "Choisissez un emplacement et une date de scène valide.",
+      "Choose a location and a valid scene date.",
+      "Escolha um local e uma data de cena válida.",
+      "اختر موقعًا وتاريخ مشهد صالحًا."
+    ],
+    [
+      "Image satellite temporairement indisponible. ",
+      "Satellite imagery temporarily unavailable. ",
+      "Imagem de satélite temporariamente indisponível. ",
+      "صور الأقمار الصناعية غير متاحة مؤقتًا. "
+    ],
+    [
+      "Traitement Sentinel-2 indisponible (HTTP ",
+      "Sentinel-2 processing unavailable (HTTP ",
+      "Processamento Sentinel-2 indisponível (HTTP ",
+      "معالجة Sentinel-2 غير متاحة (HTTP "
+    ],
+    [
+      "Choisissez un emplacement pour consulter les indicateurs météo et les scènes satellite disponibles.",
+      "Choose a location to view weather indicators and available satellite scenes.",
+      "Escolha um local para consultar os indicadores meteorológicos e as cenas de satélite disponíveis.",
+      "اختر موقعًا لعرض مؤشرات الطقس ومشاهد الأقمار الصناعية المتاحة."
+    ],
+    [
+      "Carte satellite",
+      "Satellite map",
+      "Mapa de satélite",
+      "خريطة الأقمار الصناعية"
+    ],
+    [
+      "Indice UV moyen journalier estimé",
+      "Estimated mean daily UV index",
+      "Índice UV médio diário estimado",
+      "متوسط مؤشر UV اليومي المقدر"
+    ],
+    [
+      "Comparaison UV automatique",
+      "Automatic UV comparison",
+      "Comparação automática de UV",
+      "مقارنة UV تلقائية"
+    ],
+    [
+      "Comparatif UV",
+      "UV comparison",
+      "Comparação UV",
+      "مقارنة UV"
+    ],
+    [
+      "Stable",
+      "Stable",
+      "Estável",
+      "مستقر"
+    ],
+    [
+      "en hausse",
+      "increasing",
+      "a subir",
+      "في ارتفاع"
+    ],
+    [
+      "en baisse",
+      "decreasing",
+      "a descer",
+      "في انخفاض"
+    ],
+    [
+      "aucune donnée exploitable",
+      "no usable data",
+      "sem dados utilizáveis",
+      "لا توجد بيانات قابلة للاستخدام"
+    ],
+    [
+      "Couverture par variable",
+      "Coverage by variable",
+      "Cobertura por variável",
+      "التغطية حسب المتغير"
+    ],
+    [
+      "Jours couverts",
+      "Days covered",
+      "Dias cobertos",
+      "الأيام المغطاة"
+    ],
+    [
+      "Dernière date",
+      "Latest date",
+      "Data mais recente",
+      "أحدث تاريخ"
+    ],
+    [
+      "État",
+      "Status",
+      "Estado",
+      "الحالة"
+    ],
+    [
+      "Aucune donnée",
+      "No data",
+      "Sem dados",
+      "لا توجد بيانات"
+    ],
+    [
+      "Couverture faible",
+      "Low coverage",
+      "Cobertura baixa",
+      "تغطية منخفضة"
+    ],
+    [
+      "Dernière donnée à plus de 2 jours",
+      "Latest data is over 2 days old",
+      "Último dado com mais de 2 dias",
+      "آخر بيانات أقدم من يومين"
+    ],
+    [
+      "À surveiller normalement",
+      "Within expected range",
+      "Dentro do esperado",
+      "ضمن النطاق المتوقع"
+    ],
+    [
+      "Qualité des données : ",
+      "Data quality: ",
+      "Qualidade dos dados: ",
+      "جودة البيانات: "
+    ],
+    [
+      " jour(s) avec au moins une valeur exploitable ; températures maximales ",
+      " day(s) with at least one usable value; maximum temperatures ",
+      " dia(s) com pelo menos um valor utilizável; temperaturas máximas ",
+      " يومًا مع قيمة واحدة قابلة للاستخدام على الأقل؛ درجات الحرارة القصوى "
+    ],
+    [
+      " jour(s), précipitations ",
+      " day(s), precipitation ",
+      " dia(s), precipitação ",
+      " يومًا، والهطول "
+    ],
+    [
+      " jour(s), humidité ",
+      " day(s), humidity ",
+      " dia(s), humidade ",
+      " يومًا، والرطوبة "
+    ],
+    [
+      " Dernière date disponible : ",
+      " Latest available date: ",
+      " Data mais recente disponível: ",
+      " أحدث تاريخ متاح: "
+    ],
+    [
+      " Écart de couverture : ",
+      " Coverage gap: ",
+      " Lacuna de cobertura: ",
+      " فجوة التغطية: "
+    ],
+    [
+      " jours entre la fin de période sélectionnée et la dernière date disponible.",
+      " days between the selected period end and the latest available date.",
+      " dias entre o fim do período selecionado e a data mais recente disponível.",
+      " يومًا بين نهاية الفترة المحددة وأحدث تاريخ متاح."
+    ],
+    [
+      "Lecture agronomique provisoire",
+      "Preliminary agronomic interpretation",
+      "Interpretação agronómica preliminar",
+      "تفسير زراعي أولي"
+    ],
+    [
+      "Source météo : NASA POWER, estimations sur grille.",
+      "Weather source: NASA POWER gridded estimates.",
+      "Fonte meteorológica: estimativas em grelha NASA POWER.",
+      "مصدر الطقس: تقديرات شبكية من NASA POWER."
+    ],
+    [
+      "Sentinel-2 : scènes disponibles et couverture nuageuse.",
+      "Sentinel-2: available scenes and cloud cover.",
+      "Sentinel-2: cenas disponíveis e cobertura de nuvens.",
+      "Sentinel-2: المشاهد المتاحة والغطاء السحابي."
+    ],
+    [
+      "Aucune scène Sentinel-2 ne couvre ce point à cette date. Essayez une date d’acquisition voisine.",
+      "No Sentinel-2 scene covers this point on that date. Try a nearby acquisition date.",
+      "Nenhuma cena Sentinel-2 cobre este ponto nessa data. Experimente uma data de aquisição próxima.",
+      "لا يغطي أي مشهد Sentinel-2 هذه النقطة في ذلك التاريخ. جرّب تاريخ اقتناء قريبًا."
+    ],
+    [
+      "L’indice UV est une mesure atmosphérique météo, pas une bande d’imagerie Sentinel-2.",
+      "The UV index is an atmospheric weather measure, not a Sentinel-2 imaging band.",
+      "O índice UV é uma medida meteorológica atmosférica, não uma banda de imagem Sentinel-2.",
+      "مؤشر UV قياس جوي للطقس وليس نطاق تصوير Sentinel-2."
+    ],
+    [
+      "Température maximale",
+      "Maximum temperature",
+      "Temperatura máxima",
+      "درجة الحرارة القصوى"
+    ],
+    [
+      "Humidité relative",
+      "Relative humidity",
+      "Humidade relativa",
+      "الرطوبة النسبية"
+    ],
+    [
+      "La météo affichée est historique : aucune prévision ni commande automatique d’irrigation.",
+      "Displayed weather is historical: no forecast or automatic irrigation control.",
+      "A meteorologia apresentada é histórica: sem previsão nem controlo automático da rega.",
+      "الطقس المعروض تاريخي: لا توجد توقعات أو تحكم آلي في الري."
     ]
-    ["Carte satellite", "Satellite map", "Mapa de satélite", "Mapa de satélite"],
-    ["Carte de référence", "Reference map", "Mapa de referência", "خريطة مرجعية"],
-    ["Emplacement", "Location", "Local", "الموقع"],
-    ["Choisir un emplacement…", "Choose a location…", "Escolha um local…", "اختر موقعًا…"],
-    ["Chargement de l’image satellite…", "Loading satellite imagery…", "A carregar imagens de satélite…", "جارٍ تحميل صور الأقمار الصناعية…"],
-    ["Carte régionale · site non configuré.", "Regional map · site not configured.", "Mapa regional · local não configurado.", "خريطة إقليمية · الموقع غير مهيأ."],
-    ["Contexte satellite chargé.", "Satellite context loaded.", "Contexto de satélite carregado.", "تم تحميل سياق الأقمار الصناعية."],
-    ["Contexte environnemental", "Environmental context", "Contexto ambiental", "السياق البيئي"],
-    ["Évolution de la végétation (NDVI)", "Vegetation trend (NDVI)", "Evolução da vegetação (NDVI)", "تطور الغطاء النباتي (NDVI)"],
-    ["Comparaison automatique des dernières scènes Sentinel-2 disponibles.", "Automatic comparison of the latest available Sentinel-2 scenes.", "Comparação automática das últimas cenas Sentinel-2 disponíveis.", "مقارنة تلقائية لأحدث مشاهد Sentinel-2 المتاحة."],
-    ["Statistiques NDVI indisponibles pour les scènes trouvées.", "NDVI statistics are unavailable for the scenes found.", "Estatísticas NDVI indisponíveis para as cenas encontradas.", "إحصاءات NDVI غير متاحة للمشاهد التي عُثر عليها."],
-    ["Le comparatif apparaîtra lorsqu’une deuxième scène exploitable sera disponible.", "A comparison will appear when a second usable scene is available.", "A comparação será apresentada quando existir uma segunda cena utilizável.", "ستظهر المقارنة عند توفر مشهد ثانٍ قابل للاستخدام."],
-    ["NDVI moyen : ", "Mean NDVI: ", "NDVI médio: ", "متوسط NDVI: "],
-    ["indice spectral, pas une mesure de rendement.", "spectral index, not a yield measurement.", "índice espectral, não uma medição de produtividade.", "مؤشر طيفي وليس قياسًا للمحصول."],
-    ["Dernière scène · ", "Latest scene · ", "Última cena · ", "أحدث مشهد · "],
-    ["NDVI moyen ", "Mean NDVI ", "NDVI médio ", "متوسط NDVI "],
-    ["Comparaison du NDVI moyen sur deux dates Sentinel-2", "Comparison of mean NDVI across two Sentinel-2 dates", "Comparação do NDVI médio em duas datas Sentinel-2", "مقارنة متوسط NDVI بين تاريخين من Sentinel-2"],
-    ["Comparatif UV automatique", "Automatic UV comparison", "Comparação automática do UV", "مقارنة تلقائية للأشعة فوق البنفسجية"],
-    ["Le comparatif s’affichera dès que deux dates UV réelles seront disponibles.", "The comparison will appear once two real UV dates are available.", "A comparação será apresentada quando existirem duas datas reais de UV.", "ستظهر المقارنة عند توفر تاريخين فعليين للأشعة فوق البنفسجية."],
-    ["Indice UV en hausse entre les deux dernières dates disponibles.", "UV index increased between the two latest available dates.", "O índice UV aumentou entre as duas últimas datas disponíveis.", "ارتفع مؤشر الأشعة فوق البنفسجية بين آخر تاريخين متاحين."],
-    ["Indice UV en baisse entre les deux dernières dates disponibles.", "UV index decreased between the two latest available dates.", "O índice UV انخفض بين آخر تاريخين متاحين.", "انخفض مؤشر الأشعة فوق البنفسجية بين آخر تاريخين متاحين."],
-    ["Indice UV stable entre les deux dernières dates disponibles.", "UV index was stable between the two latest available dates.", "O índice UV manteve-se estável entre as duas últimas datas disponíveis.", "استقر مؤشر الأشعة فوق البنفسجية بين آخر تاريخين متاحين."],
-    ["point(s) UV", "UV point(s)", "ponto(s) UV", "نقطة UV"],
-    ["Pic de température", "Peak temperature", "Pico de temperatura", "ذروة الحرارة"],
-    ["Pluie cumulée", "Cumulative rainfall", "Precipitação acumulada", "الأمطار التراكمية"],
-    ["Humidité de l’air", "Air humidity", "Humidade do ar", "رطوبة الهواء"],
-    ["Indice UV moyen quotidien", "Mean daily UV index", "Índice UV médio diário", "متوسط مؤشر UV اليومي"],
-    ["Indisponible", "Unavailable", "Indisponível", "غير متاح"],
-    ["Maximum observé sur les 7 dernières dates disponibles", "Maximum across the 7 latest available dates", "Máximo nas 7 últimas datas disponíveis", "الحد الأقصى خلال آخر 7 تواريخ متاحة"],
-    ["Somme des précipitations disponibles", "Sum of available precipitation values", "Soma das precipitações disponíveis", "مجموع قيم الهطول المتاحة"],
-    ["Moyenne des observations disponibles", "Mean of available observations", "Média das observações disponíveis", "متوسط القراءات المتاحة"],
-    ["Estimation journalière NASA POWER ; ce n’est pas le pic UV instantané.", "NASA POWER daily estimate; not the instantaneous UV peak.", "Estimativa diária NASA POWER; não é o pico UV instantâneo.", "تقدير يومي من NASA POWER؛ وليس ذروة UV اللحظية."],
-    ["Évolution par rapport aux 7 dates précédentes", "Change versus the previous 7 available dates", "Variação face às 7 datas anteriores", "التغير مقارنة بآخر 7 تواريخ سابقة"],
-    ["comparaison indisponible (historique insuffisant).", "comparison unavailable (insufficient history).", "comparação indisponível (histórico insuficiente).", "المقارنة غير متاحة (السجل غير كافٍ)."],
-    ["stable", "stable", "estável", "مستقر"],
-    ["en hausse", "increased", "em alta", "مرتفع"],
-    ["en baisse", "decreased", "em baixa", "منخفض"],
-    ["Comparaison descriptive de périodes constituées des dernières dates disponibles, pas nécessairement de 7 jours calendaires consécutifs. Une hausse ou une baisse n’établit pas à elle seule un stress cultural.", "Descriptive comparison of periods built from the latest available dates, not necessarily seven consecutive calendar days. A rise or fall alone does not establish crop stress.", "Comparação descritiva de períodos formados pelas últimas datas disponíveis, não necessariamente sete dias consecutivos. Uma subida ou descida, por si só, não demonstra stress da cultura.", "مقارنة وصفية لفترات مبنية على أحدث التواريخ المتاحة، وليست بالضرورة سبعة أيام تقويمية متتالية. ولا يثبت الارتفاع أو الانخفاض وحده إجهاد المحصول."],
-    ["Priorité élevée", "High priority", "Prioridade elevada", "أولوية مرتفعة"],
-    ["Vigilance", "Watch", "Vigilância", "تنبيه"],
-    ["À vérifier", "Check", "A verificar", "يجب التحقق"],
-    ["Données partielles", "Partial data", "Dados parciais", "بيانات جزئية"],
-    ["Pas de signal simple", "No simple signal", "Sem sinal simples", "لا توجد إشارة بسيطة"],
-    ["Épisode de chaleur à vérifier", "Heat episode to check", "Episódio de calor a verificar", "يجب التحقق من موجة الحر"],
-    ["Températures élevées", "High temperatures", "Temperaturas elevadas", "درجات حرارة مرتفعة"],
-    ["Peu de précipitations récentes", "Low recent rainfall", "Pouca precipitação recente", "انخفاض الهطول مؤخرًا"],
-    ["Cumul de pluie insuffisamment couvert", "Rainfall total has insufficient coverage", "Cobertura insuficiente do total de precipitação", "تغطية غير كافية لمجموع الأمطار"],
-    ["Humidité atmosphérique élevée", "High atmospheric humidity", "Humidade atmosférica elevada", "رطوبة جوية مرتفعة"],
-    ["Aucune alerte détectée par les règles actuelles", "No alert detected by current rules", "Nenhum alerta detetado pelas regras atuais", "لم تُكتشف تنبيهات وفق القواعد الحالية"],
-    ["Le maximum régional atteint ", "Regional maximum reached ", "O máximo regional atingiu ", "بلغ الحد الأقصى الإقليمي "],
-    ["Le cumul estimé est de ", "Estimated total is ", "O total estimado é de ", "المجموع المقدر هو "],
-    ["Seulement ", "Only ", "Apenas ", "فقط "],
-    [" jour(s) renseigné(s).", " reported day(s).", " dia(s) com dados.", " يوم/أيام مسجلة."],
-    [" jour(s) contiennent une valeur de précipitation exploitable sur les jours affichés. Le cumul ne permet pas de conclure sur le déficit hydrique.", " day(s) contain usable precipitation values among the displayed days. The total cannot establish water deficit.", " dia(s) contêm valores de precipitação utilizáveis entre os dias apresentados. O total não permite concluir que existe défice hídrico.", " يوم/أيام تحتوي على قيم هطول قابلة للاستخدام ضمن الأيام المعروضة. ولا يثبت المجموع وجود عجز مائي."],
-    ["La moyenne des valeurs disponibles est de ", "The mean of available values is ", "A média dos valores disponíveis é ", "متوسط القيم المتاحة هو "],
-    ["Vérifiez l’humidité réelle du sol ou du substrat, le flétrissement et l’état des plantes aux heures chaudes. N’augmentez pas l’irrigation automatiquement sans contrôle de terrain.", "Check actual soil or substrate moisture, wilting, and plant condition during hot hours. Do not automatically increase irrigation without field verification.", "Verifique a humidade real do solo ou substrato, a murchidão e o estado das plantas nas horas mais quentes. Não aumente automaticamente a rega sem verificação no terreno.", "تحقق من رطوبة التربة أو الركيزة الفعلية والذبول وحالة النباتات خلال ساعات الحر. لا تزد الري تلقائيًا دون فحص ميداني."],
-    ["Surveillez les cultures sensibles, surtout en pot ou sous serre, et contrôlez l’humidité réelle avant d’ajuster l’arrosage.", "Monitor sensitive crops, especially in pots or greenhouses, and check actual moisture before adjusting irrigation.", "Vigie culturas sensíveis, sobretudo em vasos ou estufas, e verifique a humidade real antes de ajustar a rega.", "راقب المحاصيل الحساسة، خصوصًا في الأصص أو البيوت المحمية، وتحقق من الرطوبة الفعلية قبل تعديل الري."],
-    ["En plein champ, contrôlez l’humidité du sol avant toute décision d’irrigation. Cette information ne permet pas de déduire seule le besoin en eau.", "In open fields, check soil moisture before deciding to irrigate. This information alone cannot determine water demand.", "No campo, verifique a humidade do solo antes de decidir regar. Esta informação, por si só, não determina a necessidade de água.", "في الحقول المفتوحة، تحقق من رطوبة التربة قبل اتخاذ قرار الري. ولا تكفي هذه المعلومات وحدها لتحديد الحاجة إلى الماء."],
-    ["Vérifiez la ventilation sous serre et inspectez les feuilles. L’humidité régionale ne confirme ni la présence ni le risque certain d’une maladie.", "Check greenhouse ventilation and inspect leaves. Regional humidity does not confirm disease presence or certain disease risk.", "Verifique a ventilação da estufa e inspecione as folhas. A humidade regional não confirma a presença nem um risco certo de doença.", "تحقق من تهوية البيت المحمي وافحص الأوراق. لا تؤكد الرطوبة الإقليمية وجود المرض أو خطره المؤكد."],
-    ["Cela ne signifie pas que la culture est sans stress. Vérifiez les observations de terrain et les mesures locales ; les seuils ne sont pas encore adaptés à une espèce, un stade cultural ou un type de sol précis.", "This does not mean the crop is stress-free. Check field observations and local measurements; thresholds are not yet tailored to a species, growth stage, or soil type.", "Isto não significa que a cultura não esteja sob stress. Verifique as observações no terreno e as medições locais; os limiares ainda não estão adaptados à espécie, fase de crescimento ou tipo de solo.", "هذا لا يعني أن المحصول خالٍ من الإجهاد. تحقق من الملاحظات الميدانية والقياسات المحلية؛ فالحدود لم تُخصص بعد لنوع أو مرحلة نمو أو تربة معينة."],
-    ["Sentinel-2 : scènes disponibles et couverture nuageuse. L’image ne constitue pas à elle seule un diagnostic de culture.", "Sentinel-2: available scenes and cloud cover. Imagery alone is not a crop diagnosis.", "Sentinel-2: cenas disponíveis e cobertura de nuvens. A imagem, por si só, não constitui um diagnóstico da cultura.", "Sentinel-2: المشاهد المتاحة والغطاء السحابي. لا تشكل الصورة وحدها تشخيصًا للمحصول."],
-    ["Aucune image exploitable sur la période récente.", "No usable imagery in the recent period.", "Nenhuma imagem utilizável no período recente.", "لا توجد صور قابلة للاستخدام في الفترة الأخيرة."],
-    ["Catalogue satellite indisponible.", "Satellite catalogue unavailable.", "Catálogo de satélite indisponível.", "فهرس الأقمار الصناعية غير متاح."],
-    ["Recherche de la dernière image satellite…", "Searching for the latest satellite image…", "A procurar a imagem de satélite mais recente…", "جارٍ البحث عن أحدث صورة قمر صناعي…"],
-    ["Image satellite temporairement indisponible.", "Satellite imagery temporarily unavailable.", "Imagem de satélite temporariamente indisponível.", "صور الأقمار الصناعية غير متاحة مؤقتًا."],
-    ["Coordonnées du site manquantes.", "Site coordinates missing.", "Faltam as coordenadas do local.", "إحداثيات الموقع مفقودة."],
-    ["Site satellite non configuré.", "Satellite site not configured.", "Local de satélite não configurado.", "لم يتم إعداد موقع القمر الصناعي."],
-    ["Contexte régional conservé.", "Regional context retained.", "Contexto regional mantido.", "تم الاحتفاظ بالسياق الإقليمي."],
-    ["Dernière image conservée.", "Last image retained.", "Última imagem mantida.", "تم الاحتفاظ بآخر صورة."],
-    ["Indice spectral de végétation — NDVI MODIS", "Vegetation spectral index — MODIS NDVI", "Índice espectral de vegetação — NDVI MODIS", "مؤشر الغطاء النباتي الطيفي — MODIS NDVI"],
-    ["Réflectance visible — composition en couleurs naturelles", "Visible reflectance — natural-colour composite", "Reflectância visível — composição em cores naturais", "الانعكاس المرئي — تركيب الألوان الطبيعية"],
-    ["La vue régionale MODIS est un contexte paysager à résolution kilométrique : elle ne permet pas de conclure qu’une parcelle ou toute la région est dépourvue de végétation. Les pixels sans données ne doivent pas être interprétés comme des sols nus.", "The regional MODIS view is landscape context at kilometre-scale resolution: it cannot establish that a field or region lacks vegetation. Pixels without data must not be interpreted as bare soil.", "A vista regional MODIS fornece contexto paisagístico à escala quilométrica: não permite concluir que uma parcela ou região não tem vegetação. Pixels sem dados não devem ser interpretados como solo nu.", "توفر صورة MODIS الإقليمية سياقًا على مقياس الكيلومترات، ولا تثبت غياب الغطاء النباتي عن قطعة أو منطقة. لا ينبغي تفسير البكسلات التي لا تحتوي على بيانات على أنها تربة عارية."],
-    ["NDVI Sentinel-2 · ", "Sentinel-2 NDVI · ", "NDVI Sentinel-2 · ", "NDVI Sentinel-2 · "],
-    ["Couleurs naturelles", "Natural colours", "Cores naturais", "ألوان طبيعية"],
-    ["Fausses couleurs IR", "False-colour infrared", "Infravermelho em falsas cores", "ألوان تحت الحمراء الزائفة"],
-    ["Latitude", "Latitude", "Latitude", "خط العرض"],
-    ["Longitude", "Longitude", "Longitude", "خط الطول"],
-    ["Précision des coordonnées (m)", "Coordinate accuracy (m)", "Precisão das coordenadas (m)", "دقة الإحداثيات (م)"],
-    ["Origine des coordonnées", "Coordinate source", "Origem das coordenadas", "مصدر الإحداثيات"],
-    ["GPS terrain", "Field GPS", "GPS de campo", "GPS ميداني"],
-    ["Vérifié par l’utilisateur", "User verified", "Verificado pelo utilizador", "تم التحقق من المستخدم"],
-    ["Estimation cartographique", "Map estimate", "Estimativa cartográfica", "تقدير الخرائط"],
-    ["Du", "From", "De", "من"],
-    ["Au", "To", "Até", "إلى"],
-    ["Actualiser la météo", "Refresh weather", "Atualizar meteorologia", "تحديث الطقس"],
-    ["Enregistrer les coordonnées", "Save coordinates", "Guardar coordenadas", "حفظ الإحداثيات"],
-    ["Afficher l’analyse et les données détaillées", "Show analysis and detailed data", "Mostrar análise e dados detalhados", "عرض التحليل والبيانات التفصيلية"],
-    ["Paramètres avancés : coordonnées et actualisation", "Advanced settings: coordinates and refresh", "Definições avançadas: coordenadas e atualização", "إعدادات متقدمة: الإحداثيات والتحديث"],
-    ["Dates couvertes : ", "Dates covered: ", "Datas abrangidas: ", "التواريخ المغطاة: "],
-    ["dernière valeur : ", "latest value: ", "último valor: ", "آخر قيمة: "],
-    ["Aucune observation pour cette période.", "No observations for this period.", "Sem observações para este período.", "لا توجد ملاحظات لهذه الفترة."],
-    ["Historique indisponible : ", "History unavailable: ", "Histórico indisponível: ", "السجل غير متاح: "],
-    ["Échec de la collecte météo : ", "Weather collection failed: ", "Falha na recolha meteorológica: ", "فشل جمع بيانات الطقس: "],
-    ["Collecte en cours…", "Collecting data…", "A recolher dados…", "جارٍ جمع البيانات…"],
-    ["Actualisation forcée en cours…", "Forced refresh in progress…", "Atualização forçada em curso…", "جارٍ التحديث الإجباري…"],
-    ["Import terminé", "Import complete", "Importação concluída", "اكتمل الاستيراد"],
-    ["Actualisation terminée", "Refresh complete", "Atualização concluída", "اكتمل التحديث"],
-    ["Cache historique validé", "Historical cache validated", "Cache histórico validado", "تم التحقق من ذاكرة التخزين المؤقت"],
-    ["enregistrements importés.", "records imported.", "registos importados.", "سجلات مستوردة."],
-    ["variables principales vérifiées.", "main variables checked.", "variáveis principais verificadas.", "متغيرات رئيسية تم التحقق منها."],
-    ["Données estimées sur grille, non mesurées localement.", "Gridded estimates, not locally measured.", "Estimativas em grelha, não medidas localmente.", "تقديرات شبكية وليست قياسات محلية."],
-    ["Rayonnement solaire", "Solar radiation", "Radiação solar", "الإشعاع الشمسي"],
-    ["Précipitations", "Precipitation", "Precipitação", "الهطول"],
-    ["Température moyenne", "Mean temperature", "Temperatura média", "متوسط الحرارة"],
-    ["Température maximale", "Maximum temperature", "Temperatura máxima", "الحرارة القصوى"],
-    ["Température minimale", "Minimum temperature", "Temperatura mínima", "الحرارة الدنيا"],
-    ["Humidité relative moyenne", "Mean relative humidity", "Humidade relativa média", "متوسط الرطوبة النسبية"],
-    ["Vitesse moyenne du vent", "Mean wind speed", "Velocidade média do vento", "متوسط سرعة الرياح"],
-    ["Variable", "Variable", "Variável", "المتغير"],
-    ["Valeur", "Value", "Valor", "القيمة"],
-    ["Unité", "Unit", "Unidade", "الوحدة"],
-    ["Source", "Source", "Fonte", "المصدر"],
-    ["Qualité", "Quality", "Qualidade", "الجودة"],
-    ["Lecture agronomique", "Agronomic interpretation", "Leitura agronómica", "قراءة زراعية"],
-    ["Mise en relation des signaux météo disponibles. Les données régionales ne remplacent pas les mesures dans la parcelle.", "Connecting available weather signals. Regional data do not replace measurements in the field.", "Relação entre os sinais meteorológicos disponíveis. Os dados regionais não substituem as medições na parcela.", "ربط إشارات الطقس المتاحة. لا تحل البيانات الإقليمية محل القياسات داخل الحقل."],
-    ["Couverture météo", "Weather data coverage", "Cobertura meteorológica", "تغطية بيانات الطقس"],
-    [" date(s) · ", " date(s) · ", " data(s) · ", " تاريخ · "],
-    [" observation(s)", " observation(s)", " observação(ões)", " ملاحظة"],
-    ["Les taux ci-dessous indiquent la présence d’une valeur pour chaque date affichée.", "The percentages below indicate whether a value exists for each displayed date.", "As percentagens abaixo indicam a existência de um valor para cada data apresentada.", "تشير النسب أدناه إلى وجود قيمة لكل تاريخ معروض."],
-    ["Température maximale", "Maximum temperature", "Temperatura máxima", "درجة الحرارة القصوى"],
-    ["Précipitations", "Precipitation", "Precipitação", "الهطول"],
-    ["Humidité relative", "Relative humidity", "Humidade relativa", "الرطوبة النسبية"],
-    [" % des dates avec une valeur", "% of dates with a value", "% das datas com valor", "٪ من التواريخ ذات القيمة"],
-    ["Aucune observation météo exploitable pour établir un contexte agronomique.", "No usable weather observations are available to establish agronomic context.", "Não existem observações meteorológicas utilizáveis para estabelecer o contexto agronómico.", "لا توجد ملاحظات طقس قابلة للاستخدام لتحديد السياق الزراعي."],
-    ["Chaleur élevée : contrôlez l’humidité du sol ou du substrat, le flétrissement et la température réelle au niveau des plantes avant de modifier l’irrigation.", "High heat: check soil or substrate moisture, wilting, and actual plant-level temperature before changing irrigation.", "Calor elevado: verifique a humidade do solo ou substrato, a murchidão e a temperatura real junto das plantas antes de alterar a rega.", "حرارة مرتفعة: تحقق من رطوبة التربة أو الركيزة والذبول ودرجة الحرارة الفعلية عند النباتات قبل تعديل الري."],
-    ["Température élevée : surveillez les cultures sensibles et vérifiez l’humidité réelle avant d’ajuster l’arrosage.", "High temperature: monitor sensitive crops and check actual moisture before adjusting irrigation.", "Temperatura elevada: vigie culturas sensíveis e verifique a humidade real antes de ajustar a rega.", "درجة حرارة مرتفعة: راقب المحاصيل الحساسة وتحقق من الرطوبة الفعلية قبل تعديل الري."],
-    ["Faibles précipitations estimées sur les dates couvertes : vérifiez l’humidité du sol, car la pluie régionale ne mesure pas l’eau disponible dans la zone racinaire.", "Low estimated rainfall over the covered dates: check soil moisture, because regional rainfall does not measure water available in the root zone.", "Pouca precipitação estimada nas datas abrangidas: verifique a humidade do solo, pois a chuva regional não mede a água disponível na zona radicular.", "انخفاض الأمطار المقدرة خلال التواريخ المغطاة: تحقق من رطوبة التربة، لأن الأمطار الإقليمية لا تقيس الماء المتاح في منطقة الجذور."],
-    ["Couverture des précipitations partielle : ne concluez pas à un déficit hydrique à partir du cumul affiché.", "Rainfall coverage is partial: do not infer water deficit from the displayed total.", "A cobertura da precipitação é parcial: não conclua que existe défice hídrico com base no total apresentado.", "تغطية بيانات الأمطار جزئية: لا تستنتج وجود عجز مائي من المجموع المعروض."],
-    ["Humidité atmosphérique élevée : vérifiez la ventilation sous serre et inspectez les feuilles ; ce signal ne diagnostique pas une maladie.", "High atmospheric humidity: check greenhouse ventilation and inspect leaves; this signal does not diagnose disease.", "Humidade atmosférica elevada: verifique a ventilação da estufa e inspecione as folhas; este sinal não diagnostica uma doença.", "رطوبة جوية مرتفعة: تحقق من تهوية البيت المحمي وافحص الأوراق؛ هذه الإشارة لا تشخّص مرضًا."],
-    ["Indice UV journalier moyen : ", "Mean daily UV index: ", "Índice UV médio diário: ", "متوسط مؤشر UV اليومي: "],
-    ["entre les valeurs disponibles (", "between available values (", "entre os valores disponíveis (", "بين القيم المتاحة ("],
-    ["). Il décrit l’exposition UV atmosphérique, pas le stress hydrique de la plante.", "). It describes atmospheric UV exposure, not plant water stress.", "). Descreve a exposição atmosférica aos UV, não o stress hídrico da planta.", "). يصف التعرض الجوي للأشعة فوق البنفسجية، وليس الإجهاد المائي للنبات."],
-    ["Aucun signal simple ne dépasse les seuils généraux actuels. Cela ne garantit pas l’absence de stress : confrontez ce contexte aux observations et mesures locales.", "No simple signal exceeds the current general thresholds. This does not guarantee absence of stress: compare this context with field observations and local measurements.", "Nenhum sinal simples ultrapassa os limiares gerais atuais. Isto não garante ausência de stress: compare este contexto com observações no terreno e medições locais.", "لا تتجاوز أي إشارة بسيطة الحدود العامة الحالية. ولا يضمن ذلك غياب الإجهاد؛ قارن هذا السياق بالملاحظات الميدانية والقياسات المحلية."],
-    ["Source météo : NASA POWER, estimations sur grille. Les dates sans valeur ne sont pas assimilées à zéro. Les seuils sont génériques et ne sont pas adaptés à une espèce, un stade cultural ou un sol précis.", "Weather source: NASA POWER gridded estimates. Dates without values are not treated as zero. Thresholds are generic and not tailored to a species, growth stage, or specific soil.", "Fonte meteorológica: estimativas em grelha da NASA POWER. Datas sem valores não são tratadas como zero. Os limiares são genéricos e não estão adaptados a uma espécie, fase de crescimento ou solo específico.", "مصدر الطقس: تقديرات شبكية من NASA POWER. لا تُعامل التواريخ التي بلا قيم على أنها صفر. الحدود عامة وليست مخصصة لنوع أو مرحلة نمو أو تربة بعينها."],
-    ["Indice UV moyen journalier estimé", "Estimated mean daily UV index", "Índice UV médio diário estimado", "متوسط مؤشر UV اليومي المقدر"],
-    ["Évolution météo — données historiques NASA POWER", "Weather trends — NASA POWER historical data", "Evolução meteorológica — dados históricos NASA POWER", "تطور الطقس — بيانات NASA POWER التاريخية"],
-    ["Chaque graphique conserve sa propre unité. Les points correspondent uniquement aux observations historiques importées ; aucune valeur synthétique ni prévision n’est ajoutée.", "Each chart keeps its own unit. Points represent only imported historical observations; no synthetic values or forecasts are added.", "Cada gráfico mantém a sua própria unidade. Os pontos correspondem apenas às observações históricas importadas; não são adicionados valores sintéticos nem previsões.", "يحتفظ كل مخطط بوحدته. تمثل النقاط الملاحظات التاريخية المستوردة فقط؛ ولا تُضاف قيم اصطناعية أو توقعات."],
-    ["Les graphiques météo apparaîtront après l’import de données historiques réelles.", "Weather charts will appear after real historical data is imported.", "Os gráficos meteorológicos aparecerão após a importação de dados históricos reais.", "ستظهر مخططات الطقس بعد استيراد البيانات التاريخية الفعلية."],
-    ["Au moins deux dates avec des valeurs réelles sont nécessaires pour tracer cette variable. Valeurs disponibles : ", "At least two dates with real values are required to chart this variable. Available values: ", "São necessárias pelo menos duas datas com valores reais para representar esta variável. Valores disponíveis: ", "يلزم تاريخان على الأقل بقيم فعلية لرسم هذا المتغير. القيم المتاحة: "],
-    ["dates réelles", "real dates", "datas reais", "تواريخ فعلية"],
-    ["Dates couvertes : ", "Dates covered: ", "Datas abrangidas: ", "التواريخ المشمولة: "],
-    [" · dernière valeur : ", " · latest value: ", " · último valor: ", " · آخر قيمة: "],
-    ["Impossible de calculer les indicateurs météo.", "Unable to calculate weather indicators.", "Não foi possível calcular os indicadores meteorológicos.", "تعذر حساب مؤشرات الطقس."],
-    ["Pas encore de données météo pour cette période. Importez l’historique pour obtenir des repères utiles.", "No weather data for this period yet. Import historical data to get useful reference points.", "Ainda não existem dados meteorológicos para este período. Importe o histórico para obter referências úteis.", "لا توجد بيانات طقس لهذه الفترة بعد. استورد السجل للحصول على مؤشرات مفيدة."],
-    ["Sentinel-2 · scènes disponibles et couverture nuageuse.", "Sentinel-2 · available scenes and cloud cover.", "Sentinel-2 · cenas disponíveis e cobertura de nuvens.", "Sentinel-2 · المشاهد المتاحة والغطاء السحابي."],
-    ["Cumul complet · ", "Complete total · ", "Total completo · ", "مجموع كامل · "],
-    ["Cumul partiel · ", "Partial total · ", "Total parcial · ", "مجموع جزئي · "],
-    [" des dates", " of dates", " das datas", " من التواريخ"],
-    ["Évolution de la végétation (NDVI)", "Vegetation trend (NDVI)", "Evolução da vegetação (NDVI)", "اتجاه الغطاء النباتي (NDVI)"],
-    ["Comparaison automatique des dernières scènes Sentinel-2 disponibles.", "Automatic comparison of the latest available Sentinel-2 scenes.", "Comparação automática das últimas cenas Sentinel-2 disponíveis.", "مقارنة تلقائية لأحدث مشاهد Sentinel-2 المتاحة."],
-    ["Statistiques NDVI indisponibles pour les scènes trouvées.", "NDVI statistics unavailable for the scenes found.", "Estatísticas NDVI indisponíveis para as cenas encontradas.", "إحصاءات NDVI غير متاحة للمشاهد التي عُثر عليها."],
-    ["Dernière scène · ", "Latest scene · ", "Cena mais recente · ", "أحدث مشهد · "],
-    [" · NDVI moyen ", " · Mean NDVI ", " · NDVI médio ", " · متوسط NDVI "],
-    ["Le comparatif apparaîtra lorsqu’une deuxième scène exploitable sera disponible.", "The comparison will appear when a second usable scene is available.", "A comparação aparecerá quando estiver disponível uma segunda cena utilizável.", "ستظهر المقارنة عند توفر مشهد ثانٍ قابل للاستخدام."],
-    ["NDVI Sentinel-2 · ", "Sentinel-2 NDVI · ", "NDVI Sentinel-2 · ", "NDVI Sentinel-2 · "],
-    ["Préparation du rendu ", "Preparing ", "A preparar ", "جارٍ إعداد "],
-    [" et chargement dans la carte BA Labs…", " rendering and loading into the BA Labs map…", " e carregamento no mapa BA Labs…", " وتحميله في خريطة BA Labs…"],
-    ["Choisissez un emplacement et une date de scène valide.", "Choose a location and a valid scene date.", "Escolha um local e uma data de cena válida.", "اختر موقعًا وتاريخ مشهد صالحًا."],
-    ["Image satellite temporairement indisponible. ", "Satellite imagery temporarily unavailable. ", "Imagem de satélite temporariamente indisponível. ", "صور الأقمار الصناعية غير متاحة مؤقتًا. "],
-    ["Traitement Sentinel-2 indisponible (HTTP ", "Sentinel-2 processing unavailable (HTTP ", "Processamento Sentinel-2 indisponível (HTTP ", "معالجة Sentinel-2 غير متاحة (HTTP "],
-    ["Choisissez un emplacement pour consulter les indicateurs météo et les scènes satellite disponibles.", "Choose a location to view weather indicators and available satellite scenes.", "Escolha um local para consultar os indicadores meteorológicos e as cenas de satélite disponíveis.", "اختر موقعًا لعرض مؤشرات الطقس ومشاهد الأقمار الصناعية المتاحة."],
-    ["Carte satellite", "Satellite map", "Mapa de satélite", "خريطة الأقمار الصناعية"],
-    ["Indice UV moyen journalier estimé", "Estimated mean daily UV index", "Índice UV médio diário estimado", "متوسط مؤشر UV اليومي المقدر"],
-    ["Comparaison UV automatique", "Automatic UV comparison", "Comparação automática de UV", "مقارنة UV تلقائية"],
-    ["Comparatif UV", "UV comparison", "Comparação UV", "مقارنة UV"],
-    ["Stable", "Stable", "Estável", "مستقر"],
-    ["en hausse", "increasing", "a subir", "في ارتفاع"],
-    ["en baisse", "decreasing", "a descer", "في انخفاض"],
-    ["aucune donnée exploitable", "no usable data", "sem dados utilizáveis", "لا توجد بيانات قابلة للاستخدام"],
-    ["Couverture par variable", "Coverage by variable", "Cobertura por variável", "التغطية حسب المتغير"],
-    ["Jours couverts", "Days covered", "Dias cobertos", "الأيام المغطاة"],
-    ["Dernière date", "Latest date", "Data mais recente", "أحدث تاريخ"],
-    ["État", "Status", "Estado", "الحالة"],
-    ["Aucune donnée", "No data", "Sem dados", "لا توجد بيانات"],
-    ["Couverture faible", "Low coverage", "Cobertura baixa", "تغطية منخفضة"],
-    ["Dernière donnée à plus de 2 jours", "Latest data is over 2 days old", "Último dado com mais de 2 dias", "آخر بيانات أقدم من يومين"],
-    ["À surveiller normalement", "Within expected range", "Dentro do esperado", "ضمن النطاق المتوقع"],
-    ["Qualité des données : ", "Data quality: ", "Qualidade dos dados: ", "جودة البيانات: "],
-    [" jour(s) avec au moins une valeur exploitable ; températures maximales ", " day(s) with at least one usable value; maximum temperatures ", " dia(s) com pelo menos um valor utilizável; temperaturas máximas ", " يومًا مع قيمة واحدة قابلة للاستخدام على الأقل؛ درجات الحرارة القصوى "],
-    [" jour(s), précipitations ", " day(s), precipitation ", " dia(s), precipitação ", " يومًا، والهطول "],
-    [" jour(s), humidité ", " day(s), humidity ", " dia(s), humidade ", " يومًا، والرطوبة "],
-    [" Dernière date disponible : ", " Latest available date: ", " Data mais recente disponível: ", " أحدث تاريخ متاح: "],
-    [" Écart de couverture : ", " Coverage gap: ", " Lacuna de cobertura: ", " فجوة التغطية: "],
-    [" jours entre la fin de période sélectionnée et la dernière date disponible.", " days between the selected period end and the latest available date.", " dias entre o fim do período selecionado e a data mais recente disponível.", " يومًا بين نهاية الفترة المحددة وأحدث تاريخ متاح."],
-    ["Lecture agronomique provisoire", "Preliminary agronomic interpretation", "Interpretação agronómica preliminar", "تفسير زراعي أولي"],
-    ["Source météo : NASA POWER, estimations sur grille.", "Weather source: NASA POWER gridded estimates.", "Fonte meteorológica: estimativas em grelha NASA POWER.", "مصدر الطقس: تقديرات شبكية من NASA POWER."],
-    ["Sentinel-2 : scènes disponibles et couverture nuageuse.", "Sentinel-2: available scenes and cloud cover.", "Sentinel-2: cenas disponíveis e cobertura de nuvens.", "Sentinel-2: المشاهد المتاحة والغطاء السحابي."],
-    ["Aucune scène Sentinel-2 ne couvre ce point à cette date. Essayez une date d’acquisition voisine.", "No Sentinel-2 scene covers this point on that date. Try a nearby acquisition date.", "Nenhuma cena Sentinel-2 cobre este ponto nessa data. Experimente uma data de aquisição próxima.", "لا يغطي أي مشهد Sentinel-2 هذه النقطة في ذلك التاريخ. جرّب تاريخ اقتناء قريبًا."],
-    ["L’indice UV est une mesure atmosphérique météo, pas une bande d’imagerie Sentinel-2.", "The UV index is an atmospheric weather measure, not a Sentinel-2 imaging band.", "O índice UV é uma medida meteorológica atmosférica, não uma banda de imagem Sentinel-2.", "مؤشر UV قياس جوي للطقس وليس نطاق تصوير Sentinel-2."],
-    ["Température maximale", "Maximum temperature", "Temperatura máxima", "درجة الحرارة القصوى"],
-    ["Humidité relative", "Relative humidity", "Humidade relativa", "الرطوبة النسبية"],
-    ["La météo affichée est historique : aucune prévision ni commande automatique d’irrigation.", "Displayed weather is historical: no forecast or automatic irrigation control.", "A meteorologia apresentada é histórica: sem previsão nem controlo automático da rega.", "الطقس المعروض تاريخي: لا توجد توقعات أو تحكم آلي في الري."],
   ];
   for (const [fr, en, pt, ar] of supplementalCoverage) {
     dictionaries.en[fr] ||= en;

@@ -272,3 +272,51 @@ console.log("✓ Atomic measurement/observation writes no longer perform separat
 const forbiddenDirectWrite = engine.match(/\.from\(["'](?:events|measurements|observations)["']\)\s*\.(?:insert|upsert|update|delete)\s*\(/);
 if (forbiddenDirectWrite) throw new Error("Audit-sensitive event/measurement/observation writes must go through validated RPCs, not direct table mutations");
 console.log("✓ Tracker uses RPC-backed writes for events, measurements and observations");
+
+
+/* Analytics and culture records regression contract. */
+const analyticsMarker = "/* Analytics and culture records: responsive, keyboard-accessible data surfaces. */";
+const analyticsStart = css.lastIndexOf(analyticsMarker);
+if (analyticsStart < 0) throw new Error("Analytics readability styles missing");
+const analyticsCss = css.slice(analyticsStart);
+if (!/overscroll-behavior-inline:\s*contain/.test(analyticsCss) ||
+    !/scrollbar-width:\s*thin/.test(analyticsCss)) {
+  throw new Error("Scrollable data surfaces need contained, discoverable horizontal scrolling");
+}
+if (!/\.statistics-table-wrap:focus-visible/.test(analyticsCss) ||
+    !/outline:\s*3px solid var\(--ui-accent, #4b8b62\)/.test(analyticsCss)) {
+  throw new Error("Scrollable tables must expose a keyboard-visible focus state");
+}
+if (!/\.statistics-table\s*\{[\s\S]*?border-collapse:\s*separate/.test(analyticsCss) ||
+    !/\.statistics-table caption/.test(analyticsCss)) {
+  throw new Error("Analytical tables must preserve readable caption and cell structure");
+}
+if (!/\.culture-detail-field\s*\{[\s\S]*?overflow-wrap:\s*anywhere/.test(analyticsCss) ||
+    !/\.culture-timeline-date\s*\{[\s\S]*?font-variant-numeric:\s*tabular-nums/.test(analyticsCss)) {
+  throw new Error("Culture detail and timeline values must remain legible with long identifiers and dates");
+}
+if (!/@media \(max-width: 700px\)/.test(analyticsCss) ||
+    !/\.culture-detail-fields\s*\{\s*grid-template-columns:\s*minmax\(0, 1fr\)/.test(analyticsCss) ||
+    !/\.statistics-table\s*\{\s*min-width:\s*560px/.test(analyticsCss)) {
+  throw new Error("Small-screen culture details and data tables need explicit responsive behavior");
+}
+if (!/prefers-reduced-motion:\s*reduce/.test(analyticsCss)) {
+  throw new Error("Analytics scrolling must respect reduced-motion preferences");
+}
+console.log("✓ Analytics tables and culture details have responsive, keyboard-accessible readability safeguards");
+
+
+if (!/id="batchCompareResults" class="statistics-table-wrap" tabindex="0"/.test(template) ||
+    !/<div class="statistics-table-wrap" tabindex="0"><table class="statistics-table"/.test(template)) {
+  throw new Error("Scrollable analytics containers must be keyboard focusable");
+}
+console.log("✓ Analytics table containers are keyboard reachable");
+
+for (const route of routes) {
+  const html = fs.readFileSync(route.file, "utf8");
+  if (!html.includes('tracker.css?v=20261026-analytics-readability-1')) {
+    throw new Error("Analytics stylesheet cache key is stale: " + route.file);
+  }
+}
+console.log("✓ All three workspaces use the current analytics stylesheet cache key");
+
