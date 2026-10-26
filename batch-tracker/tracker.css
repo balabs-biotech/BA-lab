@@ -2949,3 +2949,65 @@ html {
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
 }
+
+
+/* Premium scientific shell: shared graphite navigation with restrained universe accents. */
+body[data-domain="agronomy"] { --workspace-accent: #8dbf75; }
+body[data-domain="mycology"] { --workspace-accent: #d18a5d; }
+body[data-domain="laboratory"] { --workspace-accent: #79aee0; }
+
+body[data-domain] .app-toolbar {
+  color: #e8edf2;
+  background: rgba(20, 26, 32, .96);
+  border-color: #303b46;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, .16);
+}
+body[data-domain] .toolbar-brand {
+  color: #edf2f7;
+}
+body[data-domain] .brand-symbol {
+  color: var(--workspace-accent);
+  background: #26313b;
+  box-shadow: inset 0 0 0 1px #3a4651;
+}
+body[data-domain] .toolbar-divider {
+  background: #394550;
+}
+body[data-domain] .section-nav {
+  border-color: #303b46;
+}
+body[data-domain] .section-nav a {
+  color: #b7c2cc;
+  border-color: transparent;
+}
+body[data-domain] .section-nav a:hover,
+body[data-domain] .section-nav a:focus-visible {
+  color: #f5f7fa;
+  background: #25303a;
+  border-color: #3a4651;
+}
+body[data-domain] .section-nav a[aria-current="page"] {
+  color: #f5f7fa;
+  background: #26313b;
+  border-color: #3a4651;
+  box-shadow: inset 0 -2px 0 var(--workspace-accent);
+}
+body[data-domain] .nav-number {
+  color: var(--workspace-accent);
+}
+body[data-domain] .toolbar-status {
+  color: #c5d0d9;
+  background: #202a33;
+  border-color: #38444f;
+}
+body[data-domain] .status-pulse {
+  background: var(--workspace-accent);
+  box-shadow: 0 0 0 4px rgba(141, 191, 117, .12);
+}
+body[data-domain] .section-nav a:focus-visible,
+body[data-domain] .toolbar-brand:focus-visible {
+  outline-color: var(--workspace-accent);
+}
+@media (prefers-reduced-motion: reduce) {
+  body[data-domain] .section-nav a { transition: none; }
+}
