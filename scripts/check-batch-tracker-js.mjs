@@ -304,3 +304,10 @@ if (!/prefers-reduced-motion:\s*reduce/.test(analyticsCss)) {
   throw new Error("Analytics scrolling must respect reduced-motion preferences");
 }
 console.log("✓ Analytics tables and culture details have responsive, keyboard-accessible readability safeguards");
+
+
+if (!/id="batchCompareResults" class="statistics-table-wrap" tabindex="0"/.test(template) ||
+    !/<div class="statistics-table-wrap" tabindex="0"><table class="statistics-table"/.test(template)) {
+  throw new Error("Scrollable analytics containers must be keyboard focusable");
+}
+console.log("✓ Analytics table containers are keyboard reachable");
