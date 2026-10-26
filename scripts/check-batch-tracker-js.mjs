@@ -291,3 +291,18 @@ if (!/\.section-nav\s*\{[^}]*flex-direction:\s*row[^}]*overflow-x:\s*auto/s.test
   throw new Error("Mobile section navigation must become horizontally scrollable");
 }
 console.log("✓ Mobile navigation collapses the desktop sidebar without losing section access");
+
+
+/* Premium mobile polish regression contract. */
+if (!css.includes('body[data-domain="agronomy"] { --workspace-accent: #a7f36a; }') ||
+    !css.includes('body[data-domain="mycology"] { --workspace-accent: #b85e2c; }') ||
+    !css.includes('body[data-domain="laboratory"] { --workspace-accent: #4b8bc7; }')) {
+  throw new Error("Each workspace must retain its own visual accent");
+}
+if (!css.includes("env(safe-area-inset-left)") || !css.includes("env(safe-area-inset-right)")) {
+  throw new Error("Mobile layout must respect device safe areas");
+}
+if (!/@media \\(max-width: 820px\\) \\{[\\s\\S]*?\\.qc-row \\{[\\s\\S]*?grid-template-columns: minmax\\(0, 1fr\\)/.test(css)) {
+  throw new Error("Quality-control rows must collapse on mobile");
+}
+console.log("✓ Premium mobile polish preserves domain identity and compacts dense controls");
