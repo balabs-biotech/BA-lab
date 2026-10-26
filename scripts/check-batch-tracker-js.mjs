@@ -311,3 +311,12 @@ if (!/id="batchCompareResults" class="statistics-table-wrap" tabindex="0"/.test(
   throw new Error("Scrollable analytics containers must be keyboard focusable");
 }
 console.log("✓ Analytics table containers are keyboard reachable");
+
+for (const route of routes) {
+  const html = fs.readFileSync(route.file, "utf8");
+  if (!html.includes('tracker.css?v=20261026-analytics-readability-1')) {
+    throw new Error("Analytics stylesheet cache key is stale: " + route.file);
+  }
+}
+console.log("✓ All three workspaces use the current analytics stylesheet cache key");
+
