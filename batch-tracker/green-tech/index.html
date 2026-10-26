@@ -24,7 +24,7 @@
       .then(markup => {
         document.getElementById("workspace-root").innerHTML = markup;
         const i18nScript = document.createElement("script");
-        i18nScript.src = "../i18n.js?v=20261026-green-tech-i18n-3";
+        i18nScript.src = "../i18n.js?v=20261026-green-tech-i18n-4";
         i18nScript.onload = () => {
           const script = document.createElement("script");
           script.src = "../tracker.js";
@@ -33,7 +33,7 @@
           };
           script.onload = () => {
             const environmental = document.createElement("script");
-            environmental.src = "../environmental-data.js?v=20261026-agro-coherence-1";
+            environmental.src = "../environmental-data.js?v=20261026-agro-coherence-2";
             environmental.onerror = () => console.error("Le module de contexte environnemental n’a pas pu être chargé.");
             document.body.appendChild(environmental);
           };
