@@ -4,7 +4,7 @@ const root=document.getElementById('mainView');
 if(root){
   const sphereEls=[...document.querySelectorAll('[data-sphere]')];
   const ids=['bio','myco','soil','lab','products','iot','work','learn'];
-  const colors={bio:0x9fbea1,myco:0x9c91bd,soil:0xbd936b,lab:0x829fba,products:0xc18b76,iot:0x9eabb7,work:0x9b8fa7,learn:0xb4b9a0};
+  const colors={bio:0x78b985,myco:0x9c82d4,soil:0xc18a4d,lab:0x579bd1,products:0xd87858,iot:0x8da6b8,work:0xb17caa,learn:0xb5b86c};
   const labels=Object.fromEntries(sphereEls.map(el=>[el.dataset.sphere,{title:el.querySelector('b')?.textContent||el.dataset.sphere,sub:el.querySelector('small')?.textContent||''}]));
   const stage=document.createElement('div');stage.className='webgl-stage';stage.setAttribute('role','application');stage.setAttribute('aria-label','Constellation 3D interactive BALabs');
   const hint=document.createElement('div');hint.className='webgl-hint';const hintText={fr:'GLISSER POUR TOURNER · PINCER POUR ZOOMER · TOUCHER UN UNIVERS',en:'DRAG TO ROTATE · PINCH TO ZOOM · TAP A WORLD',ar:'اسحب للتدوير · اقرص للتكبير · المس عالماً',pt:'ARRASTE PARA RODAR · PINÇA PARA ZOOM · TOQUE NUM UNIVERSO'};const refreshHint=()=>{hint.textContent=hintText[document.documentElement.lang]||hintText.fr};refreshHint();new MutationObserver(refreshHint).observe(document.documentElement,{attributes:true,attributeFilter:['lang']});
@@ -12,11 +12,11 @@ if(root){
   const focusPanel=document.createElement('div');focusPanel.className='webgl-focus';focusPanel.setAttribute('aria-live','polite');focusPanel.innerHTML='<span class="webgl-focus-kicker">SPATIAL INDEX · 08 WORLDS</span><strong>BA Labs</strong><small>Choisis un univers pour explorer ses connexions.</small>';
   const controls=document.createElement('div');controls.className='webgl-controls';controls.setAttribute('aria-label','Commandes de navigation 3D');controls.innerHTML='<button type="button" data-camera="out" aria-label="Dézoomer" title="Dézoomer">−</button><button type="button" data-camera="in" aria-label="Zoomer" title="Zoomer">+</button><button type="button" data-camera="reset" aria-label="Recentrer la constellation" title="Recentrer">⌖</button>';stage.append(hint,status,focusPanel,controls);root.append(stage);
   let renderer,scene,camera,raycaster,mouse,core,points=[],edges=[],stars,dragging=false,moved=false,lastX=0,lastY=0,theta=.25,phi=1.18,dist=14.2,selected=null,raf=0,worldGroup,hovered=null,transition=null,cameraTarget=new THREE.Vector3(),resourceGroup=null,resourceMeshes=[],rotateVX=0,rotateVY=0,pointers=new Map(),pinchDistance=0;
-  const material=(color,emissive=color)=>new THREE.MeshStandardMaterial({color,emissive,emissiveIntensity:.38,metalness:.18,roughness:.34});
+  const material=(color,emissive=color)=>new THREE.MeshStandardMaterial({color,emissive,emissiveIntensity:.62,metalness:.12,roughness:.3});
   const makeLabel=(text,color,size=26)=>{
     const cv=document.createElement('canvas'),ctx=cv.getContext('2d');cv.width=512;cv.height=128;
-    ctx.clearRect(0,0,512,128);ctx.font='700 '+size+'px system-ui, sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';
-    ctx.shadowColor='#000';ctx.shadowBlur=12;ctx.fillStyle='#'+color.toString(16).padStart(6,'0');ctx.fillText(text.slice(0,34),256,64,490);
+    ctx.clearRect(0,0,512,128);ctx.font='800 '+size+'px system-ui, sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';
+    const label=text.slice(0,34);ctx.lineJoin='round';ctx.lineWidth=8;ctx.strokeStyle='rgba(7,12,16,.96)';ctx.strokeText(label,256,64,490);ctx.shadowColor='rgba(0,0,0,.95)';ctx.shadowBlur=14;ctx.shadowOffsetY=2;ctx.fillStyle='#f5f7fa';ctx.fillText(label,256,64,490);
     const tex=new THREE.CanvasTexture(cv);tex.colorSpace=THREE.SRGBColorSpace;
     const spr=new THREE.Sprite(new THREE.SpriteMaterial({map:tex,transparent:true,depthWrite:false}));spr.scale.set(2.5,.62,1);return spr;
   };
@@ -36,14 +36,14 @@ if(root){
       const coreGeo=new THREE.IcosahedronGeometry(.56,3);
       core=new THREE.Mesh(coreGeo,new THREE.MeshStandardMaterial({color:0x234c2a,emissive:0x769b78,emissiveIntensity:.42,metalness:.35,roughness:.22}));core.userData.kind='core';scene.add(core);
       const halo=new THREE.Mesh(new THREE.TorusGeometry(.82,.009,8,120),new THREE.MeshBasicMaterial({color:0xa9c5a3,transparent:true,opacity:.48}));halo.rotation.set(.8,.3,.2);core.add(halo);
-      const coreLabel=makeLabel('BALabs',0xa9c5a3,38);coreLabel.position.set(0,-.86,0);coreLabel.scale.set(1.8,.45,1);core.add(coreLabel);
+      const coreLabel=makeLabel('BALabs',0xf5f7fa,40);coreLabel.position.set(0,-.86,0);coreLabel.scale.set(1.8,.45,1);core.add(coreLabel);
       const pos={bio:[0,3.05,0],myco:[-2.55,1.8,1.1],soil:[2.6,1.65,-.7],lab:[-3.15,-.55,-.5],products:[3.1,-.4,1],iot:[-2.15,-2.2,1.15],work:[2.2,-2.2,-.7],learn:[.15,-3.1,0]};
       for(const id of ids){
         const color=colors[id],p=new THREE.Vector3(...pos[id]).multiplyScalar(1.16);
-        const geo=new THREE.IcosahedronGeometry(.36,3),mat=material(color,new THREE.Color(color).multiplyScalar(.5));
+        const geo=new THREE.IcosahedronGeometry(.47,3),mat=material(color,new THREE.Color(color).multiplyScalar(.5));
         const mesh=new THREE.Mesh(geo,mat);mesh.position.copy(p);mesh.userData={kind:'sphere',id};mesh.scale.setScalar(1);worldGroup.add(mesh);
-        const wire=new THREE.Mesh(new THREE.IcosahedronGeometry(.39,1),new THREE.MeshBasicMaterial({color,wireframe:true,transparent:true,opacity:.22}));wire.position.copy(p);wire.userData.kind='wire';worldGroup.add(wire);
-        const label=makeLabel(labels[id].title,color,22);label.position.set(p.x,p.y-.58,p.z);label.scale.set(2.1,.42,1);label.userData={kind:'label',id,labelText:labels[id].title};worldGroup.add(label);
+        const wire=new THREE.Mesh(new THREE.IcosahedronGeometry(.505,1),new THREE.MeshBasicMaterial({color,wireframe:true,transparent:true,opacity:.38}));wire.position.copy(p);wire.userData.kind='wire';worldGroup.add(wire);
+        const label=makeLabel(labels[id].title,0xf5f7fa,27);label.position.set(p.x,p.y-.72,p.z);label.scale.set(2.8,.58,1);label.userData={kind:'label',id,labelText:labels[id].title};worldGroup.add(label);
         const node={id,mesh,wire,label,base:p,color};points.push(node);
         const edgeMat=new THREE.LineBasicMaterial({color,transparent:true,opacity:.25});
         const geom=new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0,0,0),p]);
@@ -70,7 +70,7 @@ if(root){
   function flyTo(target,next){const start={x:cameraTarget.x,y:cameraTarget.y,z:cameraTarget.z,dist};const end=target?{x:target.position.x,y:target.position.y,z:target.position.z,dist:4.6}:{x:0,y:0,z:0,dist:14.2};transition={start,end,at:performance.now(),duration:980,next};selected=target?.userData?.id||null;refreshFocus(selected);stage.classList.add('is-transitioning')}
   function clearResourceNodes(){if(resourceGroup){worldGroup.remove(resourceGroup);resourceGroup.traverse(o=>{o.geometry?.dispose();if(o.material){if(Array.isArray(o.material))o.material.forEach(m=>m.dispose());else o.material.dispose()}})}resourceGroup=null;resourceMeshes=[]}
   function buildResourceNodes(id){clearResourceNodes();const mini=document.getElementById('miniView');if(!mini||mini.hidden)return;const anchors=[...mini.querySelectorAll('.linknode')].filter(a=>a.href&&a.href!=='#'&&a.getAttribute('href')!=='#');if(!anchors.length)return;const parent=points.find(p=>p.id===id);if(!parent)return;resourceGroup=new THREE.Group();resourceGroup.userData.kind='resources';worldGroup.add(resourceGroup);const count=anchors.length,radius=1.45+count*.055,color=parent.color;anchors.forEach((a,i)=>{const angle=(i/count)*Math.PI*2-Math.PI/2;const p=new THREE.Vector3(parent.base.x+Math.cos(angle)*radius,parent.base.y+Math.sin(angle)*radius*.72,parent.base.z+Math.sin(angle*.8)*.48);const mesh=new THREE.Mesh(new THREE.IcosahedronGeometry(.13,1),new THREE.MeshStandardMaterial({color,emissive:color,emissiveIntensity:.55,metalness:.15,roughness:.3}));mesh.position.copy(p);mesh.userData={kind:'resource',url:a.href,title:a.querySelector('b')?.textContent||a.textContent.trim()};resourceGroup.add(mesh);const label=makeLabel(mesh.userData.title,color,15);label.position.set(p.x,p.y-.24,p.z);label.scale.set(1.8,.32,1);label.userData.kind='resource-label';resourceGroup.add(label);const line=new THREE.Line(new THREE.BufferGeometry().setFromPoints([parent.base,p]),new THREE.LineBasicMaterial({color,transparent:true,opacity:.52}));resourceGroup.add(line);resourceMeshes.push(mesh)})}
-  function refreshLabels(){for(const p of points){const el=document.querySelector('[data-sphere="'+p.id+'"]');if(!el)continue;const next=el.querySelector('b')?.textContent||p.id;if(p.label.userData.labelText===next)continue;p.label.userData.labelText=next;const old=p.label.material.map;const replacement=makeLabel(next,p.color,22);p.label.material.map=replacement.material.map;p.label.material.needsUpdate=true;old?.dispose();replacement.material.dispose()}}
+  function refreshLabels(){for(const p of points){const el=document.querySelector('[data-sphere="'+p.id+'"]');if(!el)continue;const next=el.querySelector('b')?.textContent||p.id;if(p.label.userData.labelText===next)continue;p.label.userData.labelText=next;const old=p.label.material.map;const replacement=makeLabel(next,0xf5f7fa,27);p.label.material.map=replacement.material.map;p.label.material.needsUpdate=true;old?.dispose();replacement.material.dispose()}}
   function bind(){
     window.addEventListener('resize',resize);
     stage.addEventListener('pointerdown',e=>{if(e.target.closest('.webgl-controls,.webgl-focus'))return;pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});if(pointers.size===2){const pts=[...pointers.values()];pinchDistance=Math.hypot(pts[1].x-pts[0].x,pts[1].y-pts[0].y);dragging=true;moved=true;return}dragging=true;moved=false;lastX=e.clientX;lastY=e.clientY;rotateVX=rotateVY=0;stage.setPointerCapture?.(e.pointerId)});
