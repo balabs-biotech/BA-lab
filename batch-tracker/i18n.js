@@ -539,7 +539,7 @@
     ["Il faut au moins deux mesures numériques comparables pour tracer une évolution. Les données brutes restent consultables ci-dessous.","At least two comparable numeric measurements are required to plot a trend. Raw data remain available below.","São necessárias pelo menos duas medições numéricas comparáveis para traçar uma tendência. Os dados brutos continuam disponíveis abaixo.","يلزم قياسان رقميان قابلان للمقارنة على الأقل لرسم الاتجاه. تظل البيانات الخام متاحة أدناه."],
     ["Aucune mesure pour ces filtres.","No measurements match these filters.","Não existem medições para estes filtros.","لا توجد قياسات تطابق عوامل التصفية هذه."],
     ["Le graphique n’a pas pu être produit.","The chart could not be generated.","Não foi possível gerar o gráfico.","تعذر إنشاء الرسم البياني."],
-    ["Données indisponibles.","Data unavailable.","Dados indisponíveis.","البيانات غير متاحة."],
+    ["Données indisponibles.","Data unavailable.","Dados indisponíveis.","البيانات غير متاحة."]
   ];
   for (const [fr, en, pt, ar] of supplementalCoverage) {
     dictionaries.en[fr] ||= en;
