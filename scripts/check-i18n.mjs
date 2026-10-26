@@ -35,7 +35,14 @@ for (const required of [
   "Votre session a expiré.",
   "L’enregistrement de la mesure a échoué.",
   "L’enregistrement de l’observation a échoué.",
-  "Historique partiel : au moins une catégorie atteint sa limite de chargement. Certaines données anciennes peuvent ne pas apparaître ici."
+  "Historique partiel : au moins une catégorie atteint sa limite de chargement. Certaines données anciennes peuvent ne pas apparaître ici.",
+  "Entrez une adresse email.",
+  "Erreur connexion:",
+  "Session non vérifiable.",
+  "Synchronisation Notion en cours...",
+  "Entrez un code de batch.",
+  "Aucune mesure numérique exploitable",
+  "Culture linked by ID"
 ]) {
   if (!seen.has(required)) throw new Error(`Missing critical translation: ${required}`);
 }
@@ -74,7 +81,11 @@ const cases = [
   ["ar", "Culture", "المستنبت"],
   ["ar", "Cultures", "المستنبتات"],
   ["ar", "Culture biologique / culture de laboratoire", "مستنبت بيولوجي / مستنبت مخبري"],
-  ["ar", "Libération", "اعتماد"]
+  ["ar", "Libération", "اعتماد"],
+  ["en", "Erreur connexion: Invalid login credentials", "Sign-in error: Invalid login credentials"],
+  ["pt", "Erreur connexion: credenciais inválidas", "Erro ao iniciar sessão: credenciais inválidas"],
+  ["ar", "Erreur connexion: بيانات غير صحيحة", "خطأ تسجيل الدخول: بيانات غير صحيحة"],
+  ["en", "Synchronisation Notion en cours...", "Notion sync in progress..."]
 ];
 for (const [lang, input, expected] of cases) {
   const actual = translate(input, lang);
