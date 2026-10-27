@@ -137,6 +137,7 @@ if(root){
         // Research ↔ applications, field feedback and knowledge transfer
         ['lab','products'],['lab','work'],['soil','work'],['bio','learn'],['iot','learn']
       ];
+      const mycelialTips=[];
       for(const [a,b] of pairs){const pa=points.find(p=>p.id===a),pb=points.find(p=>p.id===b);if(!pa||!pb)continue;
         const delta=pb.base.clone().sub(pa.base);
         const axis=new THREE.Vector3().crossVectors(delta,new THREE.Vector3(.31,.87,.43)).normalize();
@@ -155,6 +156,7 @@ if(root){
           const side=new THREE.Vector3(-tangent.y+Math.sin(seed)*.35,tangent.x+Math.cos(seed*.8)*.28,Math.sin(seed+1.1)*.85).normalize();
           const reach=.20+((ids.indexOf(a)+ids.indexOf(b)+branch)%3)*.055;
           const tip=anchor.clone().addScaledVector(side,reach).addScaledVector(tangent,(branch===0?1:-1)*.075);
+          mycelialTips.push({point:tip.clone(),a,b,branch});
           const control=anchor.clone().addScaledVector(side,reach*.55).addScaledVector(tangent,.035*Math.sin(seed));
           const offshoot=new THREE.QuadraticBezierCurve3(anchor,control,tip);
           const twig=makeNeurite(offshoot,signalColor,.011,.66,18);
@@ -166,6 +168,47 @@ if(root){
         }
         const pulse=new THREE.Mesh(new THREE.SphereGeometry(.022,10,8),new THREE.MeshBasicMaterial({color:signalColor,transparent:true,opacity:.72,depthWrite:false}));pulse.userData={kind:'relation-signal',a,b};worldGroup.add(pulse);
         edges.push({line,id:a,relation:true,aId:a,bId:b,a:pa.base.clone(),b:pb.base.clone(),pulse,curve,phase:(ids.indexOf(a)+ids.indexOf(b))*.071})}
+      // Turn nearby collateral tips from separate cross-links into shared
+      // anastomoses. This is the key visual difference between a set of chords
+      // and a continuous mycelial/neural mesh.
+      const joinedTips=new Set();
+      let joinCount=0;
+      for(let i=0;i<mycelialTips.length;i++){
+        const first=mycelialTips[i];
+        let best=-1,bestDistance=1.05;
+        for(let j=i+1;j<mycelialTips.length;j++){
+          const second=mycelialTips[j];
+          if(first.a===second.a&&first.b===second.b)continue;
+          const key=[first.a,first.b,second.a,second.b].join(':');
+          if(joinedTips.has(key))continue;
+          const distance=first.point.distanceTo(second.point);
+          if(distance<bestDistance){bestDistance=distance;best=j}
+        }
+        if(best<0)continue;
+        const second=mycelialTips[best];
+        const key=[first.a,first.b,second.a,second.b].join(':');
+        joinedTips.add(key);
+        const delta=second.point.clone().sub(first.point);
+        const bend=first.point.clone().lerp(second.point,.5).add(new THREE.Vector3(
+          Math.sin((i+1)*1.7)*.055,
+          .07+Math.cos((best+1)*1.3)*.045,
+          Math.sin((i+best+1)*.9)*.06
+        ));
+        const anastomosis=new THREE.QuadraticBezierCurve3(first.point,bend,second.point);
+        const mix=new THREE.Color(colors[first.a]).lerp(new THREE.Color(colors[second.b]),.5);
+        const connector=makeNeurite(anastomosis,mix,.014,.72,20);
+        connector.userData={kind:'dendrite',id:first.a,relation:true,a:first.a,b:second.b};
+        worldGroup.add(connector);
+        const junction=new THREE.Mesh(
+          new THREE.IcosahedronGeometry(.024,1),
+          new THREE.MeshStandardMaterial({color:mix,emissive:mix,emissiveIntensity:.24,roughness:1})
+        );
+        junction.position.copy(first.point.clone().add(second.point).multiplyScalar(.5));
+        junction.userData={kind:'synapse',id:first.a,relation:true,a:first.a,b:second.b};
+        worldGroup.add(junction);
+        joinCount++;
+        if(joinCount>=5)break;
+      }
       root.classList.add('webgl-ready','universe-open');root.classList.remove('universe-closed');worldGroup.visible=true;new MutationObserver(()=>{if(worldGroup)worldGroup.visible=!root.classList.contains('universe-closed');if(root.classList.contains('universe-closed'))clearResourceNodes()}).observe(root,{attributes:true,attributeFilter:['class']});
       const textObserver=new MutationObserver(()=>refreshLabels());sphereEls.forEach(el=>{const b=el.querySelector('b');if(b)textObserver.observe(b,{childList:true,characterData:true,subtree:true})});
       resize();bind();animate();
