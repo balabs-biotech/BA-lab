@@ -842,6 +842,7 @@ async function initializeAuthenticatedTracker(
   const initRevision = revision;
   let initializationStage = "préparation de la session";
   const setInitializationStage = (stage) => {
+    if (initRevision !== authStateRevision) return;
     initializationStage = stage;
     authStatus.textContent = `Connexion BA-LABS — ${stage}…`;
   };
@@ -855,6 +856,7 @@ async function initializeAuthenticatedTracker(
 
     const claim =
       await claimBALabs();
+    if (initRevision !== authStateRevision) return;
 
 
     if (!organizationId) {
@@ -880,18 +882,23 @@ async function initializeAuthenticatedTracker(
 
     setInitializationStage("chargement du catalogue des souches");
     await loadStrainOptions();
+    if (initRevision !== authStateRevision) return;
 
     setInitializationStage("chargement des référentiels");
     await loadReferenceData();
+    if (initRevision !== authStateRevision) return;
 
     setInitializationStage("chargement des cultures");
     await loadCultureOptions();
+    if (initRevision !== authStateRevision) return;
 
     setInitializationStage("chargement des unités");
     await loadQuantityUnitOptions();
+    if (initRevision !== authStateRevision) return;
 
     setInitializationStage("chargement des emplacements de lots");
     await loadBatchPlaceOptions();
+    if (initRevision !== authStateRevision) return;
 
     populatePlantLocationOptions();
     document.getElementById("plantLocation")?.dispatchEvent(new Event("change"));
@@ -901,26 +908,36 @@ async function initializeAuthenticatedTracker(
     if (document.body.dataset.domain === "agronomy") {
       setInitializationStage("chargement des cultures végétales");
       await loadPlantCultures();
+      if (initRevision !== authStateRevision) return;
     }
 
     setInitializationStage("synchronisation des cultures en attente");
     await syncPendingCultures();
+    if (initRevision !== authStateRevision) return;
 
     setInitializationStage("chargement des derniers lots");
     await loadLatestBatches();
+    if (initRevision !== authStateRevision) return;
 
     try {
       setInitializationStage("chargement du catalogue de mesures");
       await loadMeasurementReferences();
+      if (initRevision !== authStateRevision) return;
       saveMeasurementButton.disabled = false;
       saveObservationButton.disabled = false;
-      try { await loadRecentMeasurements(); }
+      try {
+        await loadRecentMeasurements();
+        if (initRevision !== authStateRevision) return;
+      }
       catch (historyError) {
         console.error("Historique des mesures indisponible :", historyError);
         initializationWarnings.push("historique des mesures");
         measurementHistory.textContent = "Impossible de charger l’historique des mesures. L’enregistrement reste disponible.";
       }
-      try { await loadRecentObservations(); }
+      try {
+        await loadRecentObservations();
+        if (initRevision !== authStateRevision) return;
+      }
       catch (observationHistoryError) {
         console.error("Historique des observations indisponible :", observationHistoryError);
         initializationWarnings.push("historique des observations");
