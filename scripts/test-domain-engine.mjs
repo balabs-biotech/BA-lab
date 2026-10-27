@@ -14,6 +14,12 @@ assert.match(trackerSource, /filterMeasurementVariables\(\s*measurementVariables
   "measurement filters must receive the active workspace domain");
 assert.match(trackerSource, /if \(cultureEntryTitle\) cultureEntryTitle\.textContent = entryLabels\.cultureTitle;/,
   "workspace labels must be selected from the active domain configuration");
+assert.match(trackerSource, /if \(persist && organizationId\) \{[\s\S]*?await loadMeasurementReferences\(\);[\s\S]*?loadRecentMeasurements\(\)[\s\S]*?loadRecentObservations\(\)/,
+  "switching workspaces while signed in must refresh domain-specific selectors and histories");
+assert.match(trackerSource, /if \(activeDomain === "agronomy"\) \{\s*hideElement\(trackerCard\);\s*hideElement\(batchCard\);\s*showElement\(plantCard\);/,
+  "Green Tech must switch to the plant registry after a live workspace change");
+assert.match(trackerSource, /else \{\s*showElement\(trackerCard\);\s*showElement\(batchCard\);\s*hideElement\(plantCard\);/,
+  "Mycology and Laboratory must restore culture and batch modules after a live workspace change");
 const window = {};
 vm.runInNewContext(source, { window });
 
