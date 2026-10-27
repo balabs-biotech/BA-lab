@@ -81,7 +81,7 @@ if(root){
         }
         const hitMesh=new THREE.Mesh(new THREE.SphereGeometry(.36,14,12),new THREE.MeshBasicMaterial({color,transparent:true,opacity:.0001,depthWrite:false}));hitMesh.position.copy(p);hitMesh.userData={kind:'sphere',id};worldGroup.add(hitMesh);
 
-        const label=makeLabel(labels[id].title,0xf5f7fa,25);label.position.set(p.x,p.y-.52,p.z+.08);label.scale.set(2.65,.52,1);label.userData={kind:'label',id,labelText:labels[id].title};worldGroup.add(label);
+        const label=makeLabel(labels[id].title,0xf5f7fa,25);label.position.set(p.x,p.y-.52,p.z+.08);label.scale.set(Math.min(3.45,Math.max(1.8,labels[id].title.length*.105)),.52,1);label.userData={kind:'label',id,labelText:labels[id].title};worldGroup.add(label);
         const node={id,mesh,hitMesh,label,base:p,color,twigs};points.push(node);
         // A root soma has no artificial central-hub connection. Every other axon
         // links to its actual biological parent in the graph.
