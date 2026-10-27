@@ -441,9 +441,9 @@ if(root){
     }
     // Never animate a misleading partial journey: every hop must exist in the graph.
     if(segments.length===route.length-1){
-      const mesh=new THREE.Mesh(new THREE.SphereGeometry(.027,12,10),new THREE.MeshBasicMaterial({color:0xe1f4d9,transparent:true,opacity:.95,depthWrite:false,toneMapped:false}));
+      const mesh=new THREE.Mesh(new THREE.SphereGeometry(.038,14,12),new THREE.MeshBasicMaterial({color:0xe1f4d9,transparent:true,opacity:1,depthWrite:false,toneMapped:false}));
       mesh.userData={kind:'relay-signal'};worldGroup.add(mesh);
-      const trail=new THREE.Mesh(new THREE.SphereGeometry(.016,10,8),new THREE.MeshBasicMaterial({color:0xb7dfbd,transparent:true,opacity:.88,depthWrite:false,toneMapped:false}));
+      const trail=new THREE.Mesh(new THREE.SphereGeometry(.022,12,10),new THREE.MeshBasicMaterial({color:0xb7dfbd,transparent:true,opacity:.92,depthWrite:false,toneMapped:false}));
       trail.userData={kind:'relay-signal',trail:true};worldGroup.add(trail);
       const totalLength=segments.reduce((sum,segment)=>sum+segment.length,0);
       relaySignals.push({mesh,trail,segments,totalLength,offset:relaySignals.length*.19,speed:.42+relaySignals.length*.035});
