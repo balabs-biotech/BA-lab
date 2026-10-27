@@ -22,11 +22,11 @@ assert.match(trackerSource, /await loadCultureOptions\(\);\s*await loadLatestBat
   "switching between Mycology and Laboratory must reload domain-scoped culture targets and batches");
 assert.match(trackerSource, /const visibleCultureIds = new Set\(cultureOptions\.map\(culture => culture\.id\)\);\s*latestBatches = \(data \|\| \[\]\)\.filter\(batch =>\s*Boolean\(batch\.culture_id && visibleCultureIds\.has\(batch\.culture_id\)\)\s*\);/,
   "batch lists must be scoped to the active workspace's culture registry");
-assert.match(trackerSource, /async function loadRecentWorkspaceHistory\([\\s\\S]*?\.range\(offset, offset \+ pageSize - 1\)[\\s\\S]*?belongsToActiveWorkspace\(row, eventsById\)[\\s\\S]*?visibleRows\.length >= displayLimit/,
+assert.match(trackerSource, /async function loadRecentWorkspaceHistory\([\s\S]*?\.range\(offset, offset \+ pageSize - 1\)[\s\S]*?belongsToActiveWorkspace\(row, eventsById\)[\s\S]*?visibleRows\.length >= displayLimit/,
   "measurement and observation histories must paginate before workspace filtering, so other workspaces cannot consume the global row limit");
-assert.match(trackerSource, /loadRecentWorkspaceHistory\(\s*"measurements"[\\s\\S]*?10\s*\)/,
+assert.match(trackerSource, /loadRecentWorkspaceHistory\(\s*"measurements"[\s\S]*?10\s*\)/,
   "measurement history must request the newest ten records belonging to the active workspace");
-assert.match(trackerSource, /loadRecentWorkspaceHistory\(\s*"observations"[\\s\\S]*?8\s*\)/,
+assert.match(trackerSource, /loadRecentWorkspaceHistory\(\s*"observations"[\s\S]*?8\s*\)/,
   "observation history must request the newest eight records belonging to the active workspace");
 assert.match(trackerSource, /filterMeasurementVariables\(\s*\[variable\],\s*window\.BALabsDomainEngine\.normalizeDomain\(document\.body\.dataset\.domain\)\s*\)\.length/,
   "manual measurements and observations must reject variables outside the active workspace");
