@@ -10,6 +10,8 @@ assert.match(trackerSource, /mycology:\s*\{\s*cultureTitle: "Nouvelle culture fo
   "Mycology must use mycology-specific culture entry labels");
 assert.match(trackerSource, /laboratory:\s*\{\s*cultureTitle: "Nouvelle culture de laboratoire"/,
   "Laboratory must use laboratory-specific culture entry labels");
+assert.match(trackerSource, /filterMeasurementVariables\(\s*measurementVariables,\s*document\.body\.dataset\.domain\s*\)/,
+  "measurement filters must receive the active workspace domain");
 assert.match(trackerSource, /if \(cultureEntryTitle\) cultureEntryTitle\.textContent = entryLabels\.cultureTitle;/,
   "workspace labels must be selected from the active domain configuration");
 const window = {};
