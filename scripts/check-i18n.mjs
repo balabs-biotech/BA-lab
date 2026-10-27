@@ -42,7 +42,12 @@ for (const required of [
   "Synchronisation Notion en cours...",
   "Entrez un code de batch.",
   "Aucune mesure numérique exploitable",
-  "Culture linked by ID"
+  "Culture linked by ID",
+  "Cultures végétales",
+  "Activité récente",
+  "Les informations saisies dans CultureOps sont enregistrées dans la base de données BA Labs afin d’assurer la traçabilité des cultures, des générations et des lots. L’accès à l’application nécessite l’acceptation des conditions d’utilisation.",
+  "Impossible de vérifier votre session. Vérifiez la connexion puis réessayez. Aucune mesure n’a été enregistrée.",
+  "Vérification de session avant observation impossible: "
 ]) {
   if (!seen.has(required)) throw new Error(`Missing critical translation: ${required}`);
 }
@@ -85,7 +90,12 @@ const cases = [
   ["en", "Erreur connexion: Invalid login credentials", "Sign-in error: Invalid login credentials"],
   ["pt", "Erreur connexion: credenciais inválidas", "Erro ao iniciar sessão: credenciais inválidas"],
   ["ar", "Erreur connexion: بيانات غير صحيحة", "خطأ تسجيل الدخول: بيانات غير صحيحة"],
-  ["en", "Synchronisation Notion en cours...", "Notion sync in progress..."]
+  ["en", "Synchronisation Notion en cours...", "Notion sync in progress..."],
+  ["en", "  Cultures végétales  ", "  Plant records  "],
+  ["pt", "Cultures végétales", "Registos vegetais"],
+  ["ar", "Cultures végétales", "سجلات النباتات"],
+  ["en", "Impossible de vérifier votre session. Vérifiez la connexion puis réessayez. Aucune mesure n’a été enregistrée.", "Could not verify your session. Check your connection and try again. No measurement was saved."],
+  ["pt", "Vérification de session avant observation impossible: timeout", "Não foi possível verificar a sessão antes da observação: timeout"]
 ];
 for (const [lang, input, expected] of cases) {
   const actual = translate(input, lang);
