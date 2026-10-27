@@ -172,6 +172,7 @@ if(root){
         const curve=new THREE.QuadraticBezierCurve3(pa.base,mid,pb.base);
         const signalColor=new THREE.Color(colors[a]).lerp(new THREE.Color(colors[b]),.5);
         const line=makeNeurite(curve,signalColor,.026,.86,48);
+        line.material.emissive.copy(signalColor).multiplyScalar(.22);line.material.emissiveIntensity=.32;
         line.userData={kind:'relation',a,b};worldGroup.add(line);
         // Cross-links branch like mycelial cords / axonal collaterals instead of
         // appearing as plain geometric chords. Each offshoot ends in a small junction.
@@ -186,6 +187,7 @@ if(root){
           const control=anchor.clone().addScaledVector(side,reach*.55).addScaledVector(tangent,.035*Math.sin(seed));
           const offshoot=new THREE.QuadraticBezierCurve3(anchor,control,tip);
           const twig=makeNeurite(offshoot,signalColor,.011,.66,18);
+          twig.material.emissive.copy(signalColor).multiplyScalar(.18);twig.material.emissiveIntensity=.28;
           twig.userData={kind:'dendrite',id:a,relation:true,a,b};worldGroup.add(twig);
           if(branch===0){
             const junction=new THREE.Mesh(new THREE.IcosahedronGeometry(.018,1),new THREE.MeshStandardMaterial({color:signalColor,emissive:signalColor,emissiveIntensity:.22,roughness:1}));
@@ -224,6 +226,7 @@ if(root){
         const anastomosis=new THREE.QuadraticBezierCurve3(first.point,bend,second.point);
         const mix=new THREE.Color(colors[first.a]).lerp(new THREE.Color(colors[second.b]),.5);
         const connector=makeNeurite(anastomosis,mix,.014,.72,20);
+        connector.material.emissive.copy(mix).multiplyScalar(.18);connector.material.emissiveIntensity=.28;
         connector.userData={kind:'dendrite',id:first.a,relation:true,a:first.a,b:second.b};
         worldGroup.add(connector);
         const junction=new THREE.Mesh(
