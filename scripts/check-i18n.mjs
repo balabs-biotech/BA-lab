@@ -47,7 +47,7 @@ for (const required of [
   "Activité récente",
   "Les informations saisies dans CultureOps sont enregistrées dans la base de données BA Labs afin d’assurer la traçabilité des cultures, des générations et des lots. L’accès à l’application nécessite l’acceptation des conditions d’utilisation.",
   "Impossible de vérifier votre session. Vérifiez la connexion puis réessayez. Aucune mesure n’a été enregistrée.",
-  "Vérification de session avant observation impossible: "
+  "Vérification de session avant observation impossible : "
 ]) {
   if (!seen.has(required)) throw new Error(`Missing critical translation: ${required}`);
 }
