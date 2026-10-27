@@ -352,14 +352,16 @@ if(root){
       const pathA=a.meta.url.pathname.split('/').filter(Boolean).slice(0,-1).join('/');
       const pathB=b.meta.url.pathname.split('/').filter(Boolean).slice(0,-1).join('/');
       const samePath=!!pathA&&pathA===pathB&&a.meta.url.origin===b.meta.url.origin;
-      const weightedTerms=shared.map(word=>{
+      const sharedTitles=[...new Set(a.meta.titleTokens.filter(word=>b.meta.titleTokens.includes(word)&&word.length>=4&&!genericResourceTerms.has(word)))];
+      // Score title matches separately so the same word is never counted twice.
+      const nonTitleShared=shared.filter(word=>!sharedTitles.includes(word));
+      const weightedTerms=nonTitleShared.map(word=>{
         const frequency=tokenFrequency.get(word)||nodes.length;
         return {word,weight:Math.max(.5,Math.min(4,Math.log2((nodes.length+1)/(frequency+1))*1.5))};
       }).sort((x,y)=>y.weight-x.weight||x.word.localeCompare(y.word));
-      // Cap lexical evidence so long titles or URL slugs cannot overwhelm a precise phrase match.
+      // Cap lexical evidence so long URL slugs cannot overwhelm a precise phrase match.
       const lexicalTerms=weightedTerms.slice(0,6);
       const lexicalScore=lexicalTerms.reduce((sum,item)=>sum+item.weight,0);
-      const sharedTitles=[...new Set(a.meta.titleTokens.filter(word=>b.meta.titleTokens.includes(word)&&word.length>=4&&!genericResourceTerms.has(word)))];
       const titleScore=sharedTitles.map(word=>Math.max(.25,Math.min(2,Math.log2((nodes.length+1)/((tokenFrequency.get(word)||nodes.length)+1))))).sort((x,y)=>y-x).slice(0,3).reduce((sum,weight)=>sum+weight,0);
       const score=lexicalScore+titleScore+(sharedPhrases.length*5)+(samePath?2:0);
       const evidence=lexicalTerms.length+sharedPhrases.length+sharedTitles.length;
