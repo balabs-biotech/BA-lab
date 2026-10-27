@@ -147,22 +147,11 @@
           "Accept":"image/png"
         };
         let response;
-        let rasterSource;
         // Public Earth Search / AWS Open Data is the primary route. Copernicus OAuth
         // is only a fallback, so normal operation does not depend on provider credentials.
         response=await fetch("https://axcouwiodqsauwnsiotn.supabase.co/functions/v1/earth-search-sentinel2-ndvi-preview",{
           method:"POST",headers:requestHeaders,body:JSON.stringify({location_id:location.value,date:sceneDate,mode:displayMode})
         });
-        rasterSource="Earth Search / AWS Open Data";
-        if(!response.ok){
-          const publicError=await response.clone().json().catch(()=>({}));
-          if(publicError.error!=="no_sentinel2_scene_for_date"){
-            const copernicusResponse=await fetch("https://axcouwiodqsauwnsiotn.supabase.co/functions/v1/sentinel-2-ndvi-preview",{
-              method:"POST",headers:requestHeaders,body:JSON.stringify({location_id:location.value,date:sceneDate,mode:displayMode})
-            });
-            if(copernicusResponse.ok){response=copernicusResponse;rasterSource="Copernicus Data Space (secours)";}
-          }
-        }
         if(!response.ok){
           const payload=await response.clone().json().catch(()=>({}));
           const messages={
@@ -175,7 +164,12 @@
             earth_search_catalogue_unavailable:"Le catalogue public Sentinel-2 est momentanément indisponible.",
             earth_search_raster_timeout:"Le téléchargement/traitement des bandes raster a dépassé le délai autorisé.",
             sentinel2_red_nir_assets_unavailable:"Les bandes rouge et proche infrarouge ne sont pas disponibles pour cette scène.",
-            ndvi_raster_processing_failed:"Le calcul NDVI à partir des rasters publics a échoué."
+            ndvi_raster_processing_failed:"Le calcul NDVI à partir des rasters publics a échoué.",
+            raster_window_invalid_or_too_large:"La zone raster demandée est invalide ou trop grande.",
+            sentinel2_projection_metadata_missing:"Les métadonnées de projection de cette scène sont absentes.",
+            sentinel2_projection_unsupported:"Le système de coordonnées de cette scène n’est pas pris en charge.",
+            valid_location_coordinates_required:"Cet emplacement doit avoir des coordonnées valides.",
+            past_valid_date_required:"Choisissez une date d’acquisition passée et valide."
           };
           throw new Error(messages[payload.error]||("Traitement Sentinel-2 indisponible (HTTP "+response.status+")."));
         }
@@ -203,7 +197,7 @@
         return {date:sceneDate,mean:meanNDVI};
       }catch(error){
         const message=error?.message||"Erreur de chargement Sentinel-2";
-        satelliteMapStatus.textContent="Image satellite temporairement indisponible. "+(satelliteSentinelNDVILayer?"Dernière image conservée.":"Contexte régional conservé.");
+        satelliteMapStatus.textContent="Image Sentinel-2 indisponible : "+message+". "+(satelliteSentinelNDVILayer?"Dernière image conservée.":"Contexte régional conservé.");
         return null;
       }
     }
@@ -213,7 +207,6 @@
         if(error||!authState?.session?.access_token)return null;
         const headers={"Authorization":"Bearer "+authState.session.access_token,"apikey":"sb_publishable_8H4XRh8V07Hlo0WwdfOXwg_2RXRX992","Content-Type":"application/json","Accept":"image/png"};
         let response=await fetch("https://axcouwiodqsauwnsiotn.supabase.co/functions/v1/earth-search-sentinel2-ndvi-preview",{method:"POST",headers,body:JSON.stringify({location_id:location.value,date:sceneDate,mode:"ndvi"})});
-        if(!response.ok){const issue=await response.clone().json().catch(()=>({}));if(issue.error!=="no_sentinel2_scene_for_date"){const backup=await fetch("https://axcouwiodqsauwnsiotn.supabase.co/functions/v1/sentinel-2-ndvi-preview",{method:"POST",headers,body:JSON.stringify({location_id:location.value,date:sceneDate,mode:"ndvi"})});if(backup.ok)response=backup;}}
         if(!response.ok)return null;const raw=response.headers.get("X-NDVI-Stats");if(!raw)return null;
         const stats=JSON.parse(raw),mean=Number(stats.mean_ndvi);return Number.isFinite(mean)?{date:sceneDate,mean}:null;
       }catch(_){return null;}
