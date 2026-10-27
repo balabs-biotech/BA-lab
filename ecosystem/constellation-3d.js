@@ -150,7 +150,7 @@ if(root){
         // appearing as plain geometric chords. Each offshoot ends in a small junction.
         for(let branch=0;branch<2;branch++){
           const seed=(ids.indexOf(a)+1)*1.73+(ids.indexOf(b)+1)*.91+branch*2.4;
-          const t=branch===0?.34:.68;
+          const t=branch===0 ? 0.34 : 0.68;
           const anchor=curve.getPoint(t),tangent=curve.getTangent(t);
           const side=new THREE.Vector3(-tangent.y+Math.sin(seed)*.35,tangent.x+Math.cos(seed*.8)*.28,Math.sin(seed+1.1)*.85).normalize();
           const reach=.20+((ids.indexOf(a)+ids.indexOf(b)+branch)%3)*.055;
