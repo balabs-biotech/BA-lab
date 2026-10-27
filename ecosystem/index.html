@@ -70,7 +70,7 @@
 #mainView.webgl-ready{position:relative;overflow:hidden;background:#101815}
 #mainView.webgl-ready .webgl-stage{inset:0;min-height:680px}
 #mainView.webgl-ready .webgl-stage canvas{position:absolute;inset:0;width:100%;height:100%;z-index:1}
-#mainView.webgl-ready .webgl-focus{background:linear-gradient(145deg,#18231feF,#101714e8);border-color:#3f5945;border-radius:8px;box-shadow:0 8px 28px #0003}
+#mainView.webgl-ready .webgl-focus{background:transparent!important;border-color:transparent!important;border-radius:0!important;box-shadow:none!important;backdrop-filter:none!important;padding:8px!important}
 #mainView.webgl-ready .webgl-controls button{border-radius:7px;background:#17221c;border-color:#3c5742}
 #mainView.webgl-ready .webgl-hint{border-radius:6px;background:#121b16eF;border-color:#344b38}
 @media(max-width:760px){
@@ -253,6 +253,6 @@ function goHome(){miniView.hidden=true;mainView.hidden=false;mainView.classList.
 document.querySelectorAll('[data-lang]').forEach(b=>b.addEventListener('click',()=>setLanguage(b.dataset.lang)));document.querySelectorAll('[data-sphere]').forEach(b=>{b.addEventListener('click',()=>enterSphere(b.dataset.sphere));b.addEventListener('mouseenter',()=>applyFocus(b.dataset.sphere,true));b.addEventListener('mouseleave',()=>applyFocus(selected,false));b.addEventListener('focus',()=>applyFocus(b.dataset.sphere,true));b.addEventListener('blur',()=>applyFocus(selected,false));});homeBtn.addEventListener('click',goHome);openUniverse.addEventListener('click',toggleUniverse);mainView.addEventListener('pointerdown',beginOrbit);mainView.addEventListener('pointermove',moveOrbit);mainView.addEventListener('pointerup',endOrbit);mainView.addEventListener('pointercancel',endOrbit);window.addEventListener('resize',()=>{applyOrbit();drawMiniConnections()});
 setLanguage('fr');applyOrbit();
 </script>
-<script type="module" src="./constellation-3d.js?v=cell-scale-plus-10-20261028b"></script>
+<script type="module" src="./constellation-3d.js?v=focus-plaque-removed-20261028c"></script>
 </body>
 </html>
