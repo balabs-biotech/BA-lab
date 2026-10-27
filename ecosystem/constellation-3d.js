@@ -363,7 +363,9 @@ if(root){
       const lexicalTerms=weightedTerms.slice(0,6);
       const lexicalScore=lexicalTerms.reduce((sum,item)=>sum+item.weight,0);
       const titleScore=sharedTitles.map(word=>Math.max(.25,Math.min(2,Math.log2((nodes.length+1)/((tokenFrequency.get(word)||nodes.length)+1))))).sort((x,y)=>y-x).slice(0,3).reduce((sum,weight)=>sum+weight,0);
-      const score=lexicalScore+titleScore+(sharedPhrases.length*5)+(samePath?2:0);
+      const semanticScore=lexicalScore+titleScore+(sharedPhrases.length*5);
+      // Shared folder paths may reinforce a semantic match, but never create a link alone.
+      const score=semanticScore+(samePath&&semanticScore>0?2:0);
       const evidence=lexicalTerms.length+sharedPhrases.length+sharedTitles.length;
       if(score>0)candidates.push({i,j,score,evidence,sharedTerms:lexicalTerms.length,sharedTitles:sharedTitles.length,sharedPhrases:sharedPhrases.length});
     }
