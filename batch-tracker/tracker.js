@@ -4777,7 +4777,10 @@ async function loadMeasurementReferences() {
   measurementVariables = variableResult.data || [];
   measurementUnits = unitResult.data || [];
 
-  const visibleVariables = window.BALabsDomainEngine.filterMeasurementVariables(measurementVariables);
+  const visibleVariables = window.BALabsDomainEngine.filterMeasurementVariables(
+    measurementVariables,
+    document.body.dataset.domain
+  );
   measurementVariableSelect.innerHTML = "";
   const placeholder = document.createElement("option");
   placeholder.value = "";
