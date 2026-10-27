@@ -641,8 +641,7 @@ async function signUp() {
       data.session
     ) {
 
-      await refreshAuthUI();
-
+      // SIGNED_IN is handled by onAuthStateChange; avoid a second concurrent initialization.
       return;
 
     }
