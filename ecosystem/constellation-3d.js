@@ -7,20 +7,23 @@ if(root){
   const colors={bio:0x9fbea1,myco:0xc98b52,soil:0xbd936b,lab:0x829fba,products:0xc18b76,iot:0x9eabb7,work:0x9b8fa7,learn:0xb4b9a0};
   const labels=Object.fromEntries(sphereEls.map(el=>[el.dataset.sphere,{title:el.querySelector('b')?.textContent||el.dataset.sphere,sub:el.querySelector('small')?.textContent||''}]));
   const stage=document.createElement('div');stage.className='webgl-stage';stage.setAttribute('role','application');stage.setAttribute('aria-label','Constellation 3D interactive BALabs');stage.tabIndex=0;
-  const hint=document.createElement('div');hint.className='webgl-hint';hint.id='webgl-navigation-hint';stage.setAttribute('aria-describedby',hint.id);const hintText={fr:'GLISSER POUR TOURNER · PINCER POUR ZOOMER · TOUCHER UN UNIVERS',en:'DRAG TO ROTATE · PINCH TO ZOOM · TAP A WORLD',ar:'اسحب للتدوير · اقرص للتكبير · المس عالماً',pt:'ARRASTE PARA RODAR · PINÇA PARA ZOOM · TOQUE NUM UNIVERSO'};const refreshHint=()=>{hint.textContent=hintText[document.documentElement.lang]||hintText.fr};refreshHint();new MutationObserver(refreshHint).observe(document.documentElement,{attributes:true,attributeFilter:['lang']});
+  const hint=document.createElement('div');hint.className='webgl-hint';hint.id='webgl-navigation-hint';stage.setAttribute('aria-describedby',hint.id);const hintText={fr:'GLISSER POUR TOURNER · PINCER POUR ZOOMER · TOUCHER UN UNIVERS',en:'DRAG TO ROTATE · PINCH TO ZOOM · TAP A WORLD',ar:'اسحب للتدوير · اقرص للتكبير · المس عالماً',pt:'ARRASTE PARA RODAR · USE DOIS DEDOS PARA AMPLIAR · TOQUE NUM UNIVERSO'};const refreshHint=()=>{hint.textContent=hintText[document.documentElement.lang]||hintText.fr};refreshHint();new MutationObserver(refreshHint).observe(document.documentElement,{attributes:true,attributeFilter:['lang']});
   const status=document.createElement('div');status.className='webgl-status';status.textContent='BALABS / SPATIAL KNOWLEDGE';
   const focusPanel=document.createElement('div');focusPanel.className='webgl-focus';focusPanel.setAttribute('aria-live','polite');focusPanel.innerHTML='<span class="webgl-focus-kicker">SPATIAL INDEX · 08 WORLDS</span><strong>BA Labs</strong><small>Choisis un univers pour explorer ses connexions.</small>';
   const controls=document.createElement('div');controls.className='webgl-controls';controls.setAttribute('aria-label','Commandes de navigation 3D');controls.innerHTML='<button type="button" data-camera="out" aria-label="Dézoomer" title="Dézoomer">−</button><button type="button" data-camera="in" aria-label="Zoomer" title="Zoomer">+</button><button type="button" data-camera="reset" aria-label="Recentrer la constellation" title="Recentrer">⌖</button>';stage.append(hint,status,focusPanel,controls);root.append(stage);
   let renderer,scene,camera,raycaster,mouse,core,points=[],edges=[],stars,dragging=false,moved=false,lastX=0,lastY=0,theta=.25,phi=1.18,dist=10.2,selected=null,raf=0,worldGroup,hovered=null,transition=null,cameraTarget=new THREE.Vector3(),resourceGroup=null,resourceMeshes=[],resourceSignals=[],rotateVX=0,rotateVY=0,pointers=new Map(),pinchDistance=0;
   const spatialUiCopy={
-    fr:{group:'Commandes de navigation 3D',out:'Dézoomer',in:'Zoomer',reset:'Recentrer la constellation'},
-    en:{group:'3D navigation controls',out:'Zoom out',in:'Zoom in',reset:'Reset constellation view'},
-    ar:{group:'أدوات التنقل ثلاثي الأبعاد',out:'تصغير',in:'تكبير',reset:'إعادة ضبط عرض الكوكبة'},
-    pt:{group:'Controlos de navegação 3D',out:'Diminuir zoom',in:'Aumentar zoom',reset:'Recentrar a constelação'}
+    fr:{group:'Commandes de navigation 3D',stage:'Constellation 3D interactive de BA Labs',canvas:'Scène 3D de BA Labs',status:'BALABS / CONNAISSANCES SPATIALES',out:'Dézoomer',in:'Zoomer',reset:'Recentrer la constellation'},
+    en:{group:'3D navigation controls',stage:'Interactive BA Labs 3D constellation',canvas:'BA Labs 3D scene',status:'BALABS / SPATIAL KNOWLEDGE',out:'Zoom out',in:'Zoom in',reset:'Reset constellation view'},
+    ar:{group:'أدوات التنقل ثلاثي الأبعاد',stage:'كوكبة BA Labs ثلاثية الأبعاد التفاعلية',canvas:'مشهد BA Labs ثلاثي الأبعاد',status:'BALABS / المعارف المكانية',out:'تصغير',in:'تكبير',reset:'إعادة ضبط عرض الكوكبة'},
+    pt:{group:'Controlos de navegação 3D',stage:'Constelação 3D interativa da BA Labs',canvas:'Cena 3D da BA Labs',status:'BALABS / CONHECIMENTO ESPACIAL',out:'Diminuir zoom',in:'Aumentar zoom',reset:'Recentrar a constelação'}
   };
   const refreshSpatialUi=()=>{
     const lang=document.documentElement.lang||'fr';
     const copy=spatialUiCopy[lang]||spatialUiCopy.fr;
+    stage.setAttribute('aria-label',copy.stage);
+    status.textContent=copy.status;
+    renderer?.domElement?.setAttribute('aria-label',copy.canvas);
     controls.setAttribute('aria-label',copy.group);
     for(const button of controls.querySelectorAll('[data-camera]')){
       const label=copy[button.dataset.camera];
