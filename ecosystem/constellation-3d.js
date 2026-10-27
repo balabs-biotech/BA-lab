@@ -339,6 +339,7 @@ if(root){
     }
     // Score resource-to-resource links using distinctive shared terms, not generic vocabulary.
     const genericResourceTerms=new Set(['culture','cultures','projet','projets','project','projects','essai','essais','trial','trials','test','tests','guide','guides','fiche','fiches','ressource','ressources','resource','resources','produit','produits','product','products','laboratoire','laboratory','documentation','application','applications','development','developpement','recherche','research','public','notion','catalogue','catalog','تقنية','حيوية','أحياء','احياء','دقيقة','فطر','فطريات','غزل','تربة','التربة','رمل','سماد','زراعة','مختبر','مخبر','تجربة','تجارب','قياس','منتج','منتجات','طلب','طلبات','تعليم','تعلم','تدريب','دليل','شرح','دورة','دروس','مشروع','مشاريع','بحث','تطوير','بيانات','رقمي','ماء','مياه','مستشعر','حساس','أتمتة']);
+    const normalizedGenericResourceTerms=new Set([...genericResourceTerms].map(normalizeToken));
     // Rare shared terms carry more semantic evidence than words repeated across many pages.
     const tokenFrequency=new Map();
     for(const node of nodes)for(const word of new Set(node.meta.text)){
@@ -347,12 +348,12 @@ if(root){
     const candidates=[];
     for(let i=0;i<nodes.length;i++)for(let j=i+1;j<nodes.length;j++){
       const a=nodes[i],b=nodes[j];
-      const shared=[...new Set(a.meta.text.filter(w=>b.meta.text.includes(w)&&w.length>=4&&!genericResourceTerms.has(w)))];
+      const shared=[...new Set(a.meta.text.filter(w=>b.meta.text.includes(w)&&w.length>=4&&!normalizedGenericResourceTerms.has(normalizeToken(w))))];
       const sharedPhrases=allDomainPhrases.filter(phrase=>matchesPhrase(a.meta.text,phrase)&&matchesPhrase(b.meta.text,phrase));
       const pathA=a.meta.url.pathname.split('/').filter(Boolean).slice(0,-1).join('/');
       const pathB=b.meta.url.pathname.split('/').filter(Boolean).slice(0,-1).join('/');
       const samePath=!!pathA&&pathA===pathB&&a.meta.url.origin===b.meta.url.origin;
-      const sharedTitles=[...new Set(a.meta.titleTokens.filter(word=>b.meta.titleTokens.includes(word)&&word.length>=4&&!genericResourceTerms.has(word)))];
+      const sharedTitles=[...new Set(a.meta.titleTokens.filter(word=>b.meta.titleTokens.includes(word)&&word.length>=4&&!normalizedGenericResourceTerms.has(normalizeToken(word))))];
       // Score title matches separately so the same word is never counted twice.
       const nonTitleShared=shared.filter(word=>!sharedTitles.includes(word));
       const weightedTerms=nonTitleShared.map(word=>{
