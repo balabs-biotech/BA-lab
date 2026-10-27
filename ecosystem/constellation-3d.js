@@ -131,11 +131,13 @@ if(root){
       // R&D-to-application and soil-to-project pathways, not decorative all-to-all links.
       // Sparse, meaningful cross-links: avoid the dense mesh of decorative all-to-all chords.
       const pairs=[
-        // Cross-links only: direct parent-child axons are already drawn above.
-        // Keeping those out here prevents doubled lines and makes the web easier to read.
-        ['bio','soil'],['bio','lab'],['soil','lab'],
-        // Research ↔ applications, field feedback and knowledge transfer
-        ['lab','products'],['lab','work'],['soil','work'],['bio','learn'],['iot','learn']
+        // Cross-links only: parent-child axons are already drawn above.
+        // Each link represents a real feedback loop between BA Labs workstreams.
+        ['bio','soil'],['bio','lab'],['soil','lab'],['myco','lab'],
+        ['lab','products'],['lab','work'],['soil','work'],['bio','learn'],
+        ['iot','learn'],['myco','products'],['soil','iot'],['soil','learn'],
+        ['lab','iot'],['lab','learn'],['products','learn'],['work','learn'],
+        ['bio','iot'],['myco','work']
       ];
       const mycelialTips=[];
       for(const [a,b] of pairs){const pa=points.find(p=>p.id===a),pb=points.find(p=>p.id===b);if(!pa||!pb)continue;
@@ -149,9 +151,9 @@ if(root){
         line.userData={kind:'relation',a,b};worldGroup.add(line);
         // Cross-links branch like mycelial cords / axonal collaterals instead of
         // appearing as plain geometric chords. Each offshoot ends in a small junction.
-        for(let branch=0;branch<2;branch++){
+        for(let branch=0;branch<3;branch++){
           const seed=(ids.indexOf(a)+1)*1.73+(ids.indexOf(b)+1)*.91+branch*2.4;
-          const t=branch===0 ? 0.34 : 0.68;
+          const t=[0.27,0.51,0.74][branch];
           const anchor=curve.getPoint(t),tangent=curve.getTangent(t);
           const side=new THREE.Vector3(-tangent.y+Math.sin(seed)*.35,tangent.x+Math.cos(seed*.8)*.28,Math.sin(seed+1.1)*.85).normalize();
           const reach=.20+((ids.indexOf(a)+ids.indexOf(b)+branch)%3)*.055;
@@ -214,7 +216,7 @@ if(root){
         worldGroup.add(signal);
         edges.push({line:connector,id:first.a,relation:true,aId:first.a,bId:second.b,a:first.point.clone(),b:second.point.clone(),pulse:signal,curve:anastomosis,phase:(i+best)*.093});
         joinCount++;
-        if(joinCount>=5)break;
+        if(joinCount>=12)break;
       }
       root.classList.add('webgl-ready','universe-open');root.classList.remove('universe-closed');worldGroup.visible=true;new MutationObserver(()=>{if(worldGroup)worldGroup.visible=!root.classList.contains('universe-closed');if(root.classList.contains('universe-closed'))clearResourceNodes()}).observe(root,{attributes:true,attributeFilter:['class']});
       const textObserver=new MutationObserver(()=>refreshLabels());sphereEls.forEach(el=>{const b=el.querySelector('b');if(b)textObserver.observe(b,{childList:true,characterData:true,subtree:true})});
