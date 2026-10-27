@@ -2288,8 +2288,13 @@ async function loadLatestBatches() {
   }
 
 
-  latestBatches =
-    data || [];
+  // A batch belongs to the workspace of its source culture. The schema
+  // has no authoritative domain column on batches, so use the already
+  // domain-scoped culture registry rather than guessing from batch_type.
+  const visibleCultureIds = new Set(cultureOptions.map(culture => culture.id));
+  latestBatches = (data || []).filter(batch =>
+    Boolean(batch.culture_id && visibleCultureIds.has(batch.culture_id))
+  );
 
   renderBatchComparisonOptions();
   renderBatchList();
