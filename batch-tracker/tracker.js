@@ -4960,6 +4960,13 @@ async function saveMeasurement() {
     showMessage(cultureWorkflowText("target"), "error");
     return;
   }
+  if (!window.BALabsDomainEngine.filterMeasurementVariables(
+    [variable],
+    window.BALabsDomainEngine.normalizeDomain(document.body.dataset.domain)
+  ).length) {
+    showMessage("Cette variable de mesure n’est pas autorisée dans l’espace de travail actif.", "error");
+    return;
+  }
   if (variable.dimension !== unit.dimension) {
     showMessage(cultureWorkflowText("incompatible"), "error");
     return;
@@ -5172,6 +5179,13 @@ async function saveObservation() {
 
   if (!targetValue || !variable || !valueText) {
     showMessage(cultureWorkflowText("observationTarget"), "error");
+    return;
+  }
+  if (!window.BALabsDomainEngine.filterMeasurementVariables(
+    [variable],
+    window.BALabsDomainEngine.normalizeDomain(document.body.dataset.domain)
+  ).length) {
+    showMessage("Cette catégorie d’observation n’est pas autorisée dans l’espace de travail actif.", "error");
     return;
   }
 
