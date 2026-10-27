@@ -352,13 +352,16 @@ if(root){
       const pathA=a.meta.url.pathname.split('/').filter(Boolean).slice(0,-1).join('/');
       const pathB=b.meta.url.pathname.split('/').filter(Boolean).slice(0,-1).join('/');
       const samePath=!!pathA&&pathA===pathB&&a.meta.url.origin===b.meta.url.origin;
-      const lexicalScore=shared.reduce((sum,w)=>{
-        const frequency=tokenFrequency.get(w)||nodes.length;
-        return sum+Math.max(.5,Math.min(4,Math.log2((nodes.length+1)/(frequency+1))*1.5));
-      },0);
+      const weightedTerms=shared.map(word=>{
+        const frequency=tokenFrequency.get(word)||nodes.length;
+        return {word,weight:Math.max(.5,Math.min(4,Math.log2((nodes.length+1)/(frequency+1))*1.5))};
+      }).sort((x,y)=>y.weight-x.weight||x.word.localeCompare(y.word));
+      // Cap lexical evidence so long titles or URL slugs cannot overwhelm a precise phrase match.
+      const lexicalTerms=weightedTerms.slice(0,6);
+      const lexicalScore=lexicalTerms.reduce((sum,item)=>sum+item.weight,0);
       const score=lexicalScore+(sharedPhrases.length*5)+(samePath?2:0);
-      const evidence=shared.length+sharedPhrases.length;
-      if(score>0)candidates.push({i,j,score,evidence,sharedTerms:shared.length,sharedPhrases:sharedPhrases.length});
+      const evidence=lexicalTerms.length+sharedPhrases.length;
+      if(score>0)candidates.push({i,j,score,evidence,sharedTerms:lexicalTerms.length,sharedPhrases:sharedPhrases.length});
     }
     candidates.sort((a,b)=>b.score-a.score||b.sharedPhrases-a.sharedPhrases||b.sharedTerms-a.sharedTerms||a.i-b.i||a.j-b.j);
     const resourceDegree=nodes.map(()=>0),maxResourceLinks=Math.min(nodes.length,Math.ceil(nodes.length*1.25));
