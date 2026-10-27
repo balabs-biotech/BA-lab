@@ -206,6 +206,13 @@ if(root){
         junction.position.copy(first.point.clone().add(second.point).multiplyScalar(.5));
         junction.userData={kind:'synapse',id:first.a,relation:true,a:first.a,b:second.b};
         worldGroup.add(junction);
+        const signal=new THREE.Mesh(
+          new THREE.SphereGeometry(.018,10,8),
+          new THREE.MeshBasicMaterial({color:mix,transparent:true,opacity:.82,depthWrite:false,toneMapped:false})
+        );
+        signal.userData={kind:'relation-signal',a:first.a,b:second.b};
+        worldGroup.add(signal);
+        edges.push({line:connector,id:first.a,relation:true,aId:first.a,bId:second.b,a:first.point.clone(),b:second.point.clone(),pulse:signal,curve:anastomosis,phase:(i+best)*.093});
         joinCount++;
         if(joinCount>=5)break;
       }
