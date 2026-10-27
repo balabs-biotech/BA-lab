@@ -77,11 +77,16 @@ if(root){
         const color=colors[id],p=new THREE.Vector3(...pos[id]).multiplyScalar(.98);
         // Neural soma: a compact, softly glowing junction, not a planet with an orbit.
         // Faceted, asymmetrical cell body: deliberately not a polished planet.
-        const geo=new THREE.IcosahedronGeometry(.145,2),attr=geo.attributes.position;
-        for(let v=0;v<attr.count;v++){const x=attr.getX(v),y=attr.getY(v),z=attr.getZ(v);const wave=1+.18*Math.sin(x*8.1+y*4.2+ids.indexOf(id)*.7)+.10*Math.cos(z*5.3-x*6.7+y*2.2);attr.setXYZ(v,x*wave,y*wave,z*wave)}
+        const geo=new THREE.IcosahedronGeometry(.14,1),attr=geo.attributes.position;
+        // A neuron is a small, uneven soma with visible polarity, not an egg-shaped orb.
+        for(let v=0;v<attr.count;v++){
+          const x=attr.getX(v),y=attr.getY(v),z=attr.getZ(v);
+          const wave=1+.20*Math.sin(x*13+y*7+ids.indexOf(id)*.9)+.12*Math.cos(z*11-x*8+y*3);
+          attr.setXYZ(v,x*wave,y*wave,z*wave);
+        }
         geo.computeVertexNormals();
-        const mat=new THREE.MeshStandardMaterial({color,emissive:new THREE.Color(color).multiplyScalar(.12),emissiveIntensity:.14,metalness:0,roughness:1,flatShading:false});
-        const mesh=new THREE.Mesh(geo,mat);mesh.position.copy(p);mesh.userData={kind:'sphere',id};mesh.scale.set(.78,1.12,.72);worldGroup.add(mesh);
+        const mat=new THREE.MeshStandardMaterial({color,emissive:new THREE.Color(color).multiplyScalar(.08),emissiveIntensity:.12,metalness:0,roughness:1,flatShading:true});
+        const mesh=new THREE.Mesh(geo,mat);mesh.position.copy(p);mesh.userData={kind:'sphere',id};mesh.scale.set(.92,.92,.92);worldGroup.add(mesh);
         // Unequal branching dendrites grow from the soma in several spatial directions.
         const twigs=[];
         for(let k=0;k<9;k++){
