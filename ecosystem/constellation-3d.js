@@ -13,10 +13,22 @@ if(root){
   const controls=document.createElement('div');controls.className='webgl-controls';controls.setAttribute('aria-label','Commandes de navigation 3D');controls.innerHTML='<button type="button" data-camera="out" aria-label="Dézoomer" title="Dézoomer">−</button><button type="button" data-camera="in" aria-label="Zoomer" title="Zoomer">+</button><button type="button" data-camera="reset" aria-label="Recentrer la constellation" title="Recentrer">⌖</button>';stage.append(hint,status,focusPanel,controls);root.append(stage);
   let renderer,scene,camera,raycaster,mouse,core,points=[],edges=[],stars,dragging=false,moved=false,lastX=0,lastY=0,theta=.25,phi=1.18,dist=10.2,selected=null,raf=0,worldGroup,hovered=null,transition=null,cameraTarget=new THREE.Vector3(),resourceGroup=null,resourceMeshes=[],rotateVX=0,rotateVY=0,pointers=new Map(),pinchDistance=0;
   const material=(color,emissive=color)=>new THREE.MeshStandardMaterial({color,emissive,emissiveIntensity:.62,metalness:.12,roughness:.3});
-  // Organic tubular neurites: geometry, not decorative hairlines, defines the network.
+  // Tapered, softly shaded biological processes: broad at the origin and fine at the tip.
+  // The taper is built into the mesh so branches read as living extensions, not hoses.
   const makeNeurite=(curve,color,radius=.016,opacity=.78,segments=20)=>{
-    const geometry=new THREE.TubeGeometry(curve,segments,radius,5,false);
-    const material=new THREE.MeshStandardMaterial({color,emissive:new THREE.Color(color).multiplyScalar(.12),emissiveIntensity:.35,roughness:.72,metalness:0,transparent:opacity<1,opacity,depthWrite:opacity>.8});
+    const radial=5,geometry=new THREE.TubeGeometry(curve,segments,radius,radial,false);
+    const positions=geometry.attributes.position;
+    for(let i=0;i<=segments;i++){
+      const u=i/segments,center=curve.getPointAt(u);
+      const taper=.10+.82*Math.pow(1-u,.72);
+      for(let j=0;j<=radial;j++){
+        const index=i*(radial+1)+j;
+        const x=positions.getX(index)-center.x,y=positions.getY(index)-center.y,z=positions.getZ(index)-center.z;
+        positions.setXYZ(index,center.x+x*taper,center.y+y*taper,center.z+z*taper);
+      }
+    }
+    positions.needsUpdate=true;geometry.computeVertexNormals();
+    const material=new THREE.MeshStandardMaterial({color,emissive:new THREE.Color(color).multiplyScalar(.06),emissiveIntensity:.18,roughness:.88,metalness:0,transparent:opacity<1,opacity,depthWrite:opacity>.8});
     return new THREE.Mesh(geometry,material);
   };
   const makeLabel=(text,color,size=26)=>{
@@ -59,11 +71,11 @@ if(root){
           const side=new THREE.Vector3(-dir.y,dir.x,Math.cos(a*1.7)).normalize();
           const mid=start.clone().lerp(end,.48).addScaledVector(side,.055*Math.sin(a*1.3));
           const twigCurve=new THREE.QuadraticBezierCurve3(start,mid,end);
-          const twig=makeNeurite(twigCurve,color,.036,.9,18);twig.userData={kind:'dendrite',id};worldGroup.add(twig);twigs.push(twig);
+          const twig=makeNeurite(twigCurve,color,.024,.88,18);twig.userData={kind:'dendrite',id};worldGroup.add(twig);twigs.push(twig);
           if(k%2===0){
             const forkStart=twigCurve.getPoint(.58),forkEnd=forkStart.clone().addScaledVector(side,.16+(k%3)*.035).addScaledVector(dir,.08);
             const forkCurve=new THREE.QuadraticBezierCurve3(forkStart,forkStart.clone().addScaledVector(side,.09),forkEnd);
-            const fork=makeNeurite(forkCurve,color,.024,.84,14);fork.userData={kind:'dendrite',id};worldGroup.add(fork);twigs.push(fork);
+            const fork=makeNeurite(forkCurve,color,.015,.82,14);fork.userData={kind:'dendrite',id};worldGroup.add(fork);twigs.push(fork);
           }
         }
         const hitMesh=new THREE.Mesh(new THREE.SphereGeometry(.36,14,12),new THREE.MeshBasicMaterial({color,transparent:true,opacity:.0001,depthWrite:false}));hitMesh.position.copy(p);hitMesh.userData={kind:'sphere',id};worldGroup.add(hitMesh);
@@ -81,7 +93,7 @@ if(root){
           const direction=new THREE.Vector3().crossVectors(origin.clone().add(new THREE.Vector3(.001,.002,.003)),p.clone().add(new THREE.Vector3(.013,.007,.019))).normalize();
           const bend=midpoint.addScaledVector(direction,.28+(ids.indexOf(id)%3)*.07).add(new THREE.Vector3(Math.sin(ids.indexOf(id)*1.7)*.15,Math.cos(ids.indexOf(id)*1.3)*.12,Math.cos(ids.indexOf(id)*1.1)*.16));
           const path=new THREE.QuadraticBezierCurve3(origin,bend,p);
-          const line=makeNeurite(path,color,.10,.96,52);line.userData={kind:'edge',id};worldGroup.add(line);
+          const line=makeNeurite(path,color,.045,.88,52);line.userData={kind:'edge',id};worldGroup.add(line);
           const pulse=new THREE.Mesh(new THREE.IcosahedronGeometry(.022,0),new THREE.MeshBasicMaterial({color,transparent:true,opacity:.8,depthWrite:false}));
           pulse.userData={kind:'signal',id};worldGroup.add(pulse);
           edges.push({line,id,a:origin,b:p.clone(),pulse,phase:ids.indexOf(id)*.13,curve:path});
@@ -91,7 +103,7 @@ if(root){
             const side=new THREE.Vector3(-tangent.y,tangent.x,Math.sin(ids.indexOf(id)+branch)*.65).normalize();
             const end=anchor.clone().addScaledVector(side,.3+branch*.08).addScaledVector(tangent,.16);
             const branchCurve=new THREE.QuadraticBezierCurve3(anchor,anchor.clone().addScaledVector(side,.17).addScaledVector(tangent,.09),end);
-            const branchLine=makeNeurite(branchCurve,color,.04,.92,18);
+            const branchLine=makeNeurite(branchCurve,color,.019,.86,18);
             branchLine.userData={kind:'dendrite',id};worldGroup.add(branchLine);
             const terminal=new THREE.Mesh(new THREE.SphereGeometry(.052,10,8),new THREE.MeshStandardMaterial({color,emissive:color,emissiveIntensity:.25,roughness:.8}));
             terminal.position.copy(end);terminal.userData={kind:'synapse',id};worldGroup.add(terminal);
@@ -113,7 +125,7 @@ if(root){
         const axis=new THREE.Vector3().crossVectors(pa.base,pb.base).normalize();
         mid.addScaledVector(axis,.16);
         const curve=new THREE.QuadraticBezierCurve3(pa.base,mid,pb.base);
-        const line=makeNeurite(curve,0xb2d5b5,.052,.82,40);
+        const line=makeNeurite(curve,0xb2d5b5,.022,.62,40);
         line.userData={kind:'relation',a,b};worldGroup.add(line);
         const signalColor=new THREE.Color(colors[a]).lerp(new THREE.Color(colors[b]),.5);
         const pulse=new THREE.Mesh(new THREE.SphereGeometry(.022,10,8),new THREE.MeshBasicMaterial({color:signalColor,transparent:true,opacity:.72,depthWrite:false}));pulse.userData={kind:'relation-signal',a,b};worldGroup.add(pulse);
