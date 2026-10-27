@@ -11,7 +11,7 @@ if(root){
   const status=document.createElement('div');status.className='webgl-status';status.textContent='BALABS / SPATIAL KNOWLEDGE';
   const focusPanel=document.createElement('div');focusPanel.className='webgl-focus';focusPanel.setAttribute('aria-live','polite');focusPanel.innerHTML='<span class="webgl-focus-kicker">SPATIAL INDEX · 08 WORLDS</span><strong>BA Labs</strong><small>Choisis un univers pour explorer ses connexions.</small>';
   const controls=document.createElement('div');controls.className='webgl-controls';controls.setAttribute('aria-label','Commandes de navigation 3D');controls.innerHTML='<button type="button" data-camera="out" aria-label="Dézoomer" title="Dézoomer">−</button><button type="button" data-camera="in" aria-label="Zoomer" title="Zoomer">+</button><button type="button" data-camera="reset" aria-label="Recentrer la constellation" title="Recentrer">⌖</button>';stage.append(hint,status,focusPanel,controls);root.append(stage);
-  let renderer,scene,camera,raycaster,mouse,core,points=[],edges=[],stars,dragging=false,moved=false,lastX=0,lastY=0,theta=.25,phi=1.18,dist=11.8,selected=null,raf=0,worldGroup,hovered=null,transition=null,cameraTarget=new THREE.Vector3(),resourceGroup=null,resourceMeshes=[],rotateVX=0,rotateVY=0,pointers=new Map(),pinchDistance=0;
+  let renderer,scene,camera,raycaster,mouse,core,points=[],edges=[],stars,dragging=false,moved=false,lastX=0,lastY=0,theta=.25,phi=1.18,dist=10.2,selected=null,raf=0,worldGroup,hovered=null,transition=null,cameraTarget=new THREE.Vector3(),resourceGroup=null,resourceMeshes=[],rotateVX=0,rotateVY=0,pointers=new Map(),pinchDistance=0;
   const material=(color,emissive=color)=>new THREE.MeshStandardMaterial({color,emissive,emissiveIntensity:.62,metalness:.12,roughness:.3});
   const makeLabel=(text,color,size=26)=>{
     const cv=document.createElement('canvas'),ctx=cv.getContext('2d');cv.width=512;cv.height=128;
@@ -26,67 +26,40 @@ if(root){
       renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,1.7));renderer.setClearColor(0x000000,0);renderer.outputColorSpace=THREE.SRGBColorSpace;
       stage.prepend(renderer.domElement);renderer.domElement.setAttribute('aria-label','Scène 3D BALabs');
       scene=new THREE.Scene();scene.fog=new THREE.FogExp2(0x07100b,.025);worldGroup=new THREE.Group();scene.add(worldGroup);
-      camera=new THREE.PerspectiveCamera(42,1,.1,100);raycaster=new THREE.Raycaster();mouse=new THREE.Vector2();
+      camera=new THREE.PerspectiveCamera(48,1,.1,100);raycaster=new THREE.Raycaster();mouse=new THREE.Vector2();
       scene.add(new THREE.AmbientLight(0xb8c8dc,1.05));
       const key=new THREE.PointLight(0x7eb8f0,38,30);key.position.set(0,5,6);scene.add(key);
       const fill=new THREE.PointLight(0x69c8a6,26,24);fill.position.set(-6,-2,-4);scene.add(fill);
       const warm=new THREE.PointLight(0xffa45e,18,18);warm.position.set(5,-3,4);scene.add(warm);
-      const starGeo=new THREE.BufferGeometry(),arr=[];
-      for(let i=0;i<650;i++){const radius=THREE.MathUtils.randFloat(8,22),a=Math.random()*Math.PI*2,z=THREE.MathUtils.randFloatSpread(18);arr.push(Math.cos(a)*radius,Math.sin(a)*radius,z)}
-      starGeo.setAttribute('position',new THREE.Float32BufferAttribute(arr,3));stars=new THREE.Points(starGeo,new THREE.PointsMaterial({color:0x9db7a0,size:.025,transparent:true,opacity:.55}));scene.add(stars);
-      // The centre is a synaptic hub, not a glossy planet: matte soma, branching axons and small terminal synapses.
-      const coreGeo=new THREE.SphereGeometry(.205,32,24);
-      core=new THREE.Mesh(coreGeo,new THREE.MeshStandardMaterial({color:0x9bc9a5,emissive:0x3b895c,emissiveIntensity:.55,metalness:0,roughness:.58}));
-      core.userData.kind='core';scene.add(core);
-      const coreNetwork=new THREE.Group();scene.add(coreNetwork);
-      const coreDirections=[];
-      for(let i=0;i<13;i++){
-        const a=i*2.3999632297, y=1-2*(i+.5)/13, r=Math.sqrt(1-y*y);
-        coreDirections.push(new THREE.Vector3(Math.cos(a)*r,y,Math.sin(a)*r).normalize());
-      }
-      for(let i=0;i<coreDirections.length;i++){
-        const dir=coreDirections[i],start=dir.clone().multiplyScalar(.16),end=dir.clone().multiplyScalar(.78+(i%3)*.09);
-        const bend=start.clone().lerp(end,.56).add(new THREE.Vector3(Math.sin(i*1.7)*.09,Math.cos(i*1.1)*.08,Math.sin(i*.8)*.08));
-        const curve=new THREE.QuadraticBezierCurve3(start,bend,end);
-        const line=new THREE.Line(new THREE.BufferGeometry().setFromPoints(curve.getPoints(16)),new THREE.LineBasicMaterial({color:i%3===0?0x78b985:0x9bc9a5,transparent:true,opacity:.48,depthWrite:false}));
-        coreNetwork.add(line);
-        const bead=new THREE.Mesh(new THREE.SphereGeometry(.027,10,8),new THREE.MeshBasicMaterial({color:i%3===0?0xb5e8b7:0x8fc6a1}));
-        bead.position.copy(end);coreNetwork.add(bead);
-        // Short side branches give the central hub a dendritic silhouette.
-        const side=new THREE.Vector3(-dir.y,dir.x,Math.sin(i*1.9)).normalize();
-        const forkStart=curve.getPoint(.58),forkEnd=forkStart.clone().addScaledVector(side,.19);
-        const forkCurve=new THREE.QuadraticBezierCurve3(forkStart,forkStart.clone().addScaledVector(side,.1).addScaledVector(dir,.05),forkEnd);
-        coreNetwork.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(forkCurve.getPoints(7)),new THREE.LineBasicMaterial({color:0x78b985,transparent:true,opacity:.35,depthWrite:false})));
-      }
-      const coreLabel=makeLabel('BALabs',0xf5f7fa,40);coreLabel.position.set(0,-.72,.22);coreLabel.scale.set(1.8,.45,1);core.add(coreLabel);
-      const pos={bio:[0,2.65,0],myco:[-2.15,1.55,1.0],soil:[2.2,1.45,-.65],lab:[-2.65,-.45,-.45],products:[2.65,-.35,.85],iot:[-1.8,-1.85,1.0],work:[1.9,-1.85,-.6],learn:[.1,-2.7,0]};
+      // No starfield, orbital rings or central planet: open directly on an irregular biological network.
+      const pos={bio:[-1.1,2.35,.35],myco:[-2.65,1.05,.9],soil:[-.35,.85,-.85],lab:[-2.25,-.45,-.25],products:[1.15,.15,.85],iot:[2.75,1.35,-.35],work:[1.9,-1.35,-.7],learn:[-.15,-2.35,.3]};
       for(const id of ids){
         const color=colors[id],p=new THREE.Vector3(...pos[id]).multiplyScalar(.98);
         // Neural soma: a compact, softly glowing junction, not a planet with an orbit.
-        const geo=new THREE.SphereGeometry(.105,24,18),mat=new THREE.MeshStandardMaterial({color,emissive:new THREE.Color(color).multiplyScalar(.9),emissiveIntensity:.62,metalness:.02,roughness:.46});
+        const geo=new THREE.SphereGeometry(.075,20,16),mat=new THREE.MeshStandardMaterial({color,emissive:new THREE.Color(color).multiplyScalar(.9),emissiveIntensity:.62,metalness:.02,roughness:.46});
         const mesh=new THREE.Mesh(geo,mat);mesh.position.copy(p);mesh.userData={kind:'sphere',id};mesh.scale.setScalar(1);worldGroup.add(mesh);
         // Short dendritic spines radiate from each soma and visually merge with the axon network.
         const twigs=[];
         for(let k=0;k<7;k++){
           const a=k*2.3999632297+ids.indexOf(id)*.43;
           const dir=new THREE.Vector3(Math.cos(a),Math.sin(a*.83),Math.sin(a*1.37+ids.indexOf(id))).normalize();
-          const start=p.clone().addScaledVector(dir,.075);
-          const end=p.clone().addScaledVector(dir,.19+(k%3)*.035);
+          const start=p.clone().addScaledVector(dir,.06);
+          const end=p.clone().addScaledVector(dir,.25+(k%3)*.045);
           const mid=start.clone().lerp(end,.55).add(new THREE.Vector3(Math.sin(a)*.025,Math.cos(a*1.4)*.025,Math.sin(a*.7)*.025));
           const twigCurve=new THREE.QuadraticBezierCurve3(start,mid,end);
           const twig=new THREE.Line(new THREE.BufferGeometry().setFromPoints(twigCurve.getPoints(7)),new THREE.LineBasicMaterial({color,transparent:true,opacity:.34,depthWrite:false}));
           twig.userData={kind:'dendrite',id};worldGroup.add(twig);twigs.push(twig);
         }
-        const glow=new THREE.Mesh(new THREE.SphereGeometry(.19,20,14),new THREE.MeshBasicMaterial({color,transparent:true,opacity:.035,depthWrite:false}));glow.position.copy(p);glow.userData.kind='glow';worldGroup.add(glow);
-        const hitMesh=new THREE.Mesh(new THREE.SphereGeometry(.29,12,10),new THREE.MeshBasicMaterial({color,transparent:true,opacity:.0001,depthWrite:false}));hitMesh.position.copy(p);hitMesh.userData={kind:'sphere',id};worldGroup.add(hitMesh);\n
+        const glow=new THREE.Mesh(new THREE.SphereGeometry(.16,16,12),new THREE.MeshBasicMaterial({color,transparent:true,opacity:.018,depthWrite:false}));glow.position.copy(p);glow.userData.kind='glow';worldGroup.add(glow);
+        const hitMesh=new THREE.Mesh(new THREE.SphereGeometry(.25,12,10),new THREE.MeshBasicMaterial({color,transparent:true,opacity:.0001,depthWrite:false}));hitMesh.position.copy(p);hitMesh.userData={kind:'sphere',id};worldGroup.add(hitMesh);\n
         const label=makeLabel(labels[id].title,0xf5f7fa,25);label.position.set(p.x,p.y-.52,p.z+.08);label.scale.set(2.65,.52,1);label.userData={kind:'label',id,labelText:labels[id].title};worldGroup.add(label);
         const node={id,mesh,hitMesh,label,base:p,color,twigs};points.push(node);
         // Organic axon: a gently branching, curved connection from the BALabs core.
         const edgeMat=new THREE.LineBasicMaterial({color,transparent:true,opacity:.28,depthWrite:false});
         // Build a connected neural graph instead of eight spokes radiating from a central planet.
-        const parentOf={bio:null,myco:'bio',soil:'myco',lab:'bio',products:'lab',iot:'products',work:'soil',learn:'work'};
+        const parentOf={bio:null,myco:'bio',soil:'myco',lab:'myco',products:'soil',iot:'products',work:'products',learn:'lab'};
         const parentNode=points.find(item=>item.id===parentOf[id]);
-        const origin=parentNode?parentNode.base.clone():new THREE.Vector3(0,0,0);
+        const origin=parentNode?parentNode.base.clone():new THREE.Vector3(-.15,2.95,.05);
         const midpoint=origin.clone().lerp(p,.5);
         const direction=new THREE.Vector3().crossVectors(origin.clone().add(new THREE.Vector3(.001,.002,.003)),p.clone().add(new THREE.Vector3(.013,.007,.019))).normalize();
         const bend=midpoint.addScaledVector(direction,.22+(ids.indexOf(id)%3)*.055).add(new THREE.Vector3(Math.sin(ids.indexOf(id)*1.7)*.12,Math.cos(ids.indexOf(id)*1.3)*.1,Math.cos(ids.indexOf(id)*1.1)*.12));
@@ -126,12 +99,12 @@ if(root){
         const signalColor=new THREE.Color(colors[a]).lerp(new THREE.Color(colors[b]),.5);
         const pulse=new THREE.Mesh(new THREE.SphereGeometry(.022,10,8),new THREE.MeshBasicMaterial({color:signalColor,transparent:true,opacity:.72,depthWrite:false}));pulse.userData={kind:'relation-signal',a,b};worldGroup.add(pulse);
         edges.push({line,id:a,relation:true,aId:a,bId:b,a:pa.base.clone(),b:pb.base.clone(),pulse,curve,phase:(ids.indexOf(a)+ids.indexOf(b))*.071})}
-      root.classList.add('webgl-ready');worldGroup.visible=!root.classList.contains('universe-closed');new MutationObserver(()=>{if(worldGroup)worldGroup.visible=!root.classList.contains('universe-closed');if(root.classList.contains('universe-closed'))clearResourceNodes()}).observe(root,{attributes:true,attributeFilter:['class']});
+      root.classList.add('webgl-ready','universe-open');root.classList.remove('universe-closed');worldGroup.visible=true;new MutationObserver(()=>{if(worldGroup)worldGroup.visible=!root.classList.contains('universe-closed');if(root.classList.contains('universe-closed'))clearResourceNodes()}).observe(root,{attributes:true,attributeFilter:['class']});
       const textObserver=new MutationObserver(()=>refreshLabels());sphereEls.forEach(el=>{const b=el.querySelector('b');if(b)textObserver.observe(b,{childList:true,characterData:true,subtree:true})});
       resize();bind();animate();
     }catch(e){stage.remove();console.warn('BALabs WebGL unavailable; accessible HTML fallback retained.',e)}
   }
-  function resize(){if(!renderer||!camera)return;const w=stage.clientWidth||640,h=stage.clientHeight||680;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();if(!selected)dist=camera.aspect<.78?15.2:camera.aspect<1.05?12.8:11.8;updateCamera()}
+  function resize(){if(!renderer||!camera)return;const w=stage.clientWidth||640,h=stage.clientHeight||680;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();if(!selected)dist=camera.aspect<.78?12.4:camera.aspect<1.05?11:10.2;updateCamera()}
   function updateCamera(){if(!camera)return;camera.position.set(cameraTarget.x+dist*Math.sin(phi)*Math.sin(theta),cameraTarget.y+dist*Math.cos(phi),cameraTarget.z+dist*Math.sin(phi)*Math.cos(theta));camera.lookAt(cameraTarget)}
   function easeInOut(t){return t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2}
   function refreshFocus(id){const p=points.find(item=>item.id===id);const lang=document.documentElement.lang||'fr';const copy={fr:{index:'INDEX SPATIAL · 08 UNIVERS',home:'Choisis un univers pour explorer ses connexions.',links:'Connexions',next:'Explorer aussi'},en:{index:'SPATIAL INDEX · 08 WORLDS',home:'Choose a world to explore its connections.',links:'Connections',next:'Explore next'},ar:{index:'الفهرس المكاني · ٨ عوالم',home:'اختر عالماً لاستكشاف الروابط بينه وبين العوالم الأخرى.',links:'روابط',next:'استكشف أيضاً'},pt:{index:'ÍNDICE ESPACIAL · 08 UNIVERSOS',home:'Escolha um universo para explorar as suas ligações.',links:'Ligações',next:'Explorar também'}}[lang]||{index:'SPATIAL INDEX · 08 WORLDS',home:'Choose a world to explore its connections.',links:'Connections',next:'Explore next'};if(!p){focusPanel.classList.remove('has-world');focusPanel.innerHTML='';const kicker=document.createElement('span');kicker.className='webgl-focus-kicker';kicker.textContent=copy.index;const title=document.createElement('strong');title.textContent='BA Labs';const sub=document.createElement('small');sub.textContent=copy.home;const open=document.createElement('button');open.type='button';open.dataset.openUniverse='true';open.className='webgl-open-action';open.textContent=({fr:'Ouvrir la constellation',en:'Open constellation',ar:'افتح الكوكبة',pt:'Abrir constelação'}[lang]||'Ouvrir la constellation');open.style.cssText='align-self:flex-start;margin-top:5px;padding:8px 11px;border:1px solid #8eb68a88;border-radius:999px;background:#a9c5a31a;color:#eaf7e5;font:600 11px/1.2 system-ui,sans-serif;cursor:pointer;pointer-events:auto';focusPanel.append(kicker,title,sub);if(root.classList.contains('universe-closed')){focusPanel.append(open)}else{const worlds=document.createElement('div');worlds.className='webgl-focus-links';worlds.setAttribute('aria-label',lang==='ar'?'اختر عالماً':lang==='pt'?'Escolher um universo':lang==='en'?'Choose a world':'Choisir un univers');ids.forEach(worldId=>{const button=document.createElement('button');button.type='button';button.className='webgl-focus-link';button.dataset.world=worldId;button.textContent=labels[worldId].title;worlds.append(button)});focusPanel.append(worlds)}return}const related=[...new Set(edges.filter(edge=>edge.relation&&(edge.aId===id||edge.bId===id)).map(edge=>edge.aId===id?edge.bId:edge.aId))];focusPanel.classList.add('has-world');focusPanel.innerHTML='';const kicker=document.createElement('span');kicker.className='webgl-focus-kicker';kicker.textContent='UNIVERS / '+String(ids.indexOf(id)+1).padStart(2,'0');const title=document.createElement('strong');title.textContent=labels[id].title;const sub=document.createElement('small');sub.textContent=labels[id].sub;const meta=document.createElement('span');meta.className='webgl-focus-meta';meta.textContent=copy.links+' · '+related.length;const next=document.createElement('span');next.className='webgl-focus-next';next.textContent=copy.next;const list=document.createElement('div');list.className='webgl-focus-links';related.forEach(other=>{const button=document.createElement('button');button.type='button';button.className='webgl-focus-link';button.dataset.world=other;button.textContent=labels[other].title;button.setAttribute('aria-label',(lang==='ar'?'استكشف ':lang==='pt'?'Explorar ':lang==='en'?'Explore ':'Explorer ')+labels[other].title);list.append(button)});focusPanel.append(kicker,title,sub,meta,next,list)}
