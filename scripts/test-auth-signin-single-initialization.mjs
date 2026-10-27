@@ -22,5 +22,6 @@ const initStart = tracker.indexOf("async function init()", listenerStart);
 assert.ok(listenerStart >= 0 && initStart > listenerStart, "auth-state listener must be present");
 const listener = tracker.slice(listenerStart, initStart);
 assert.match(listener, /refreshAuthUI\(revision\)/, "auth-state listener must reconcile the UI after auth changes");
+assert.match(listener, /event === "INITIAL_SESSION"\) return/, "startup INITIAL_SESSION must be handled only by init() to avoid competing reconciliation");
 
 console.log("Auth sign-in/sign-up single-initialization contract passed.");
