@@ -6635,6 +6635,42 @@ function setupDomainWorkspaces() {
     if (persist) {
       try { localStorage.setItem("baLabsCultureTrackerDomain", activeDomain); } catch (_) {}
     }
+
+    // Switching workspace after login must update the actual modules and data
+    // selectors, not only the hero labels. Keep protected modules hidden while
+    // signed out; refresh domain-specific targets and histories for active users.
+    if (persist && organizationId) {
+      const plantCard = document.getElementById("plantCard");
+      if (activeDomain === "agronomy") {
+        hideElement(trackerCard);
+        hideElement(batchCard);
+        showElement(plantCard);
+      } else {
+        showElement(trackerCard);
+        showElement(batchCard);
+        hideElement(plantCard);
+      }
+      showElement(measurementCard);
+      showElement(document.getElementById("statisticsCard"));
+      showElement(document.getElementById("overviewCard"));
+
+      void (async () => {
+        try {
+          if (activeDomain === "agronomy") await loadPlantCultures();
+          renderMeasurementTargets();
+          renderStatisticsFilters();
+          await loadMeasurementReferences();
+          await Promise.all([
+            loadRecentMeasurements(),
+            loadRecentObservations()
+          ]);
+          updateOverview();
+        } catch (error) {
+          console.error("Actualisation de l’espace de travail impossible :", error);
+          showMessage("L’espace a changé, mais certaines données n’ont pas pu être actualisées. Utilisez Actualiser ou rechargez la page.", "warning");
+        }
+      })();
+    }
   };
   buttons.forEach(button => button.addEventListener("click", () => setDomain(button.dataset.domainChoice)));
   setDomain(window.BA_LABS_DOMAIN, false);
