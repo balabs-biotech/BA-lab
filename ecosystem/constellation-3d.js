@@ -77,12 +77,17 @@ if(root){
         const color=colors[id],p=new THREE.Vector3(...pos[id]).multiplyScalar(.98);
         // Neural soma: a compact, softly glowing junction, not a planet with an orbit.
         // Faceted, asymmetrical cell body: deliberately not a polished planet.
-        const geo=new THREE.IcosahedronGeometry(.105,1),attr=geo.attributes.position;
-        // A neuron is a small, uneven soma with visible polarity, not an egg-shaped orb.
+        const geo=new THREE.IcosahedronGeometry(.085,3),attr=geo.attributes.position;
+        // Sculpt a compact membrane with shallow grooves and attachment pits.
+        // The body is deliberately small: the branching membrane, not a round
+        // ball, defines the silhouette of each domain.
         for(let v=0;v<attr.count;v++){
           const x=attr.getX(v),y=attr.getY(v),z=attr.getZ(v);
-          const wave=1+.28*Math.sin(x*15+y*9+ids.indexOf(id)*.9)+.16*Math.cos(z*13-x*8+y*5);
-          attr.setXYZ(v,x*wave,y*wave,z*wave);
+          const n=new THREE.Vector3(x,y,z).normalize();
+          const lobes=Math.sin(n.x*8.5+n.z*3.1+ids.indexOf(id)*.7)*Math.cos(n.y*7.2-n.x*2.4);
+          const grooves=Math.pow(Math.max(0,Math.sin(n.x*5.1+n.y*4.7+n.z*6.3+ids.indexOf(id))),5);
+          const wave=.91+.11*lobes-.17*grooves;
+          attr.setXYZ(v,x*wave*1.03,y*wave*.88,z*wave*.94);
         }
         geo.computeVertexNormals();
         const mat=new THREE.MeshStandardMaterial({color,emissive:new THREE.Color(color).multiplyScalar(.08),emissiveIntensity:.12,metalness:0,roughness:1,flatShading:true});
@@ -92,12 +97,12 @@ if(root){
         const twigs=[];
         const polarity=p.clone().normalize();
         const axonDir=polarity.clone().add(new THREE.Vector3(Math.sin(ids.indexOf(id)*1.7)*.22,Math.cos(ids.indexOf(id)*1.1)*.16,Math.sin(ids.indexOf(id)*.83)*.2)).normalize();
-        const axonStart=p.clone().addScaledVector(axonDir,.105);
+        const axonStart=p.clone().addScaledVector(axonDir,.055);
         const axonEnd=p.clone().addScaledVector(axonDir,1.18+((ids.indexOf(id)%3)*.13));
         const axonSide=new THREE.Vector3().crossVectors(axonDir,new THREE.Vector3(.31,.87,.43)).normalize();
         const axonMid=axonStart.clone().lerp(axonEnd,.52).addScaledVector(axonSide,.10);
         const axonCurve=new THREE.QuadraticBezierCurve3(axonStart,axonMid,axonEnd);
-        const axon=makeNeurite(axonCurve,color,.019,.92,30);
+        const axon=makeNeurite(axonCurve,color,.027,.94,30);
         axon.userData={kind:'dendrite',id,process:'axon'};worldGroup.add(axon);twigs.push(axon);
         // Terminal axon collaterals branch only near the far end.
         for(let b=0;b<2;b++){
@@ -118,13 +123,13 @@ if(root){
         ];
         for(let k=0;k<dendriteDirs.length;k++){
           const dir=dendriteDirs[k];
-          const start=p.clone().addScaledVector(dir,.105);
+          const start=p.clone().addScaledVector(dir,.055);
           const length=[.46,.61,.38,.52][k]+((ids.indexOf(id)+k)%3)*.045;
           const end=p.clone().addScaledVector(dir,length);
           const side=new THREE.Vector3().crossVectors(dir,polarity).normalize();
           const mid=start.clone().lerp(end,.46).addScaledVector(side,(k%2?-.11:.12));
           const curve=new THREE.QuadraticBezierCurve3(start,mid,end);
-          const dendrite=makeNeurite(curve,color,.022,.88,20);
+          const dendrite=makeNeurite(curve,color,.031,.91,20);
           dendrite.userData={kind:'dendrite',id,process:'dendrite'};worldGroup.add(dendrite);twigs.push(dendrite);
           for(let forkIndex=0;forkIndex<2;forkIndex++){
             const u=forkIndex===0?.58:.78,junction=curve.getPoint(u),tangent=curve.getTangent(u);
@@ -132,7 +137,7 @@ if(root){
             const forkSide=side.clone().multiplyScalar(sign*(k%2?-1:1));
             const tip=junction.clone().addScaledVector(forkSide,.17+((k+forkIndex)%2)*.045).addScaledVector(tangent,.09);
             const forkCurve=new THREE.QuadraticBezierCurve3(junction,junction.clone().addScaledVector(forkSide,.09).addScaledVector(tangent,.035),tip);
-            const fork=makeNeurite(forkCurve,color,.012,.82,15);
+            const fork=makeNeurite(forkCurve,color,.014,.84,15);
             fork.userData={kind:'dendrite',id,process:'dendritic-branch'};worldGroup.add(fork);twigs.push(fork);
             if(forkIndex===0){
               const terminal=tip.clone().addScaledVector(forkSide,.075).addScaledVector(tangent,.04);
