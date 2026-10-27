@@ -426,7 +426,11 @@ if(root){
     ['bio','myco','soil','products','work'],
     ['iot','products','soil','lab','learn'],
     // A visible feedback loop connecting biological output, productization and instrumentation.
-    ['bio','products','work','iot','learn']
+    ['bio','products','work','iot','learn'],
+    // Complementary routes expose links that are easy to miss in the primary circulation.
+    ['bio','soil','iot','work'],
+    ['myco','lab','learn','products'],
+    ['soil','lab','iot','products']
   ];
   const relaySignals=[];
   for(const route of relayRoutes){
