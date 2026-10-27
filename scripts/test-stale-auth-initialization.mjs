@@ -14,7 +14,7 @@ assert.match(
 );
 
 const awaitedSteps = [
-  "claimBALabs()",
+  "claimBALabs(session)",
   "loadStrainOptions()",
   "loadReferenceData()",
   "loadCultureOptions()",
