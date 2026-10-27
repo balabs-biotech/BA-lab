@@ -114,7 +114,7 @@ const cases = [
   ["en", "Séquence illustrative", "Illustrative sequence"],
   ["pt", "Séquence illustrative", "Sequência ilustrativa"],
   ["ar", "Séquence illustrative", "تسلسل توضيحي"],
-  ["pt", "MYCOLOGY / SPECIMEN LEDGER", "MYCOLOGIA / REGISTO DE ESTIRPES"],
+  ["pt", "MYCOLOGY / SPECIMEN LEDGER", "MICOLOGIA / REGISTO DE AMOSTRAS"],
   ["ar", "LABORATORY / EXPERIMENTAL LOG", "المختبر / السجل التجريبي"]
 ];
 for (const [lang, input, expected] of cases) {
