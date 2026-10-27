@@ -608,7 +608,20 @@
     ["Aucune variable adaptée à cet univers","No variable is available for this workspace","Não existe uma variável adequada a este espaço","لا يوجد متغير مناسب لمساحة العمل هذه"],
     ["Vérification de session avant mesure impossible : ","Could not verify session before measurement: ","Não foi possível verificar a sessão antes da medição: ","تعذر التحقق من الجلسة قبل القياس: "],
     ["Vérification de session avant observation impossible : ","Could not verify session before observation: ","Não foi possível verificar a sessão antes da observação: ","تعذر التحقق من الجلسة قبل الملاحظة: "],
-    ["traçabilité fongique","fungal traceability","rastreabilidade fúngica","تتبّع الفطريات"]
+    ["traçabilité fongique","fungal traceability","rastreabilidade fúngica","تتبّع الفطريات"],
+    ["Chargement du contexte expérimental impossible :","Could not load experimental context:","Não foi possível carregar o contexto experimental:","تعذّر تحميل السياق التجريبي:"],
+    ["Total des 50 événements chargés, par unité :","Total of the 50 loaded events, by unit:","Total dos 50 eventos carregados, por unidade:","إجمالي الأحداث الخمسين المحمّلة حسب الوحدة:"],
+    ["La base n’a pas confirmé l’enregistrement de la récolte.","The database did not confirm the harvest record.","A base de dados não confirmou o registo da colheita.","لم تؤكد قاعدة البيانات تسجيل الحصاد."],
+    ["Enregistrement récolte :","Harvest record:","Registo da colheita:","تسجيل الحصاد:"],
+    ["Enregistrement de la récolte impossible.","Could not record the harvest.","Não foi possível registar a colheita.","تعذّر تسجيل الحصاد."],
+    ["Séquence illustrative","Illustrative sequence","Sequência ilustrativa","تسلسل توضيحي"],
+    ["DONNÉES DE DÉMONSTRATION — exemple synthétique uniquement. Non mesuré, non enregistré et jamais mélangé aux données de l’organisation.","DEMONSTRATION DATA — synthetic example only. Not measured, not saved, and never mixed with organisation data.","DADOS DE DEMONSTRAÇÃO — apenas um exemplo sintético. Não medido, não guardado e nunca misturado com os dados da organização.","بيانات توضيحية — مثال اصطناعي فقط. لم تُقَس ولم تُحفظ ولا تُخلط مطلقًا ببيانات المؤسسة."],
+    ["Renseignez un code, une culture, une variété et une quantité entière positive.","Enter a code, crop, variety, and positive whole-number quantity.","Introduza um código, uma cultura, uma variedade e uma quantidade inteira positiva.","أدخل رمزًا ومحصولًا وصنفًا وكمية صحيحة موجبة."],
+    ["Enregistrement de la fiche végétale…","Saving plant record…","A guardar o registo vegetal…","جارٍ حفظ سجل النبات…"],
+    ["Culture enregistrée dans le registre AgriTech.","Plant record saved in the AgriTech register.","Registo vegetal guardado no registo AgriTech.","تم حفظ سجل النبات في سجل AgriTech."],
+    ["Enregistrement de la culture végétale impossible :","Could not save plant record:","Não foi possível guardar o registo vegetal:","تعذّر حفظ سجل النبات:"],
+    ["Échec de l’enregistrement. Vérifiez le code unique et les références.","Save failed. Check the unique code and references.","Falha ao guardar. Verifique o código único e as referências.","فشل الحفظ. تحقق من الرمز الفريد والمراجع."],
+    ["LABORATORY / EXPERIMENTAL LOG","LABORATORY / EXPERIMENTAL LOG","LABORATÓRIO / REGISTO EXPERIMENTAL","المختبر / السجل التجريبي"]
   ];
   for (const [fr, en, pt, ar] of supplementalCoverage) {
     dictionaries.en[fr] ||= en;
