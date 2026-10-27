@@ -143,7 +143,7 @@ if(root){
         const axis=new THREE.Vector3().crossVectors(pa.base,pb.base).normalize();
         mid.addScaledVector(axis,.16);
         const curve=new THREE.QuadraticBezierCurve3(pa.base,mid,pb.base);
-        const line=makeNeurite(curve,0xb2d5b5,.027,.72,44);
+        const line=makeNeurite(curve,0xc5e8c8,.038,.94,48);
         line.userData={kind:'relation',a,b};worldGroup.add(line);
         const signalColor=new THREE.Color(colors[a]).lerp(new THREE.Color(colors[b]),.5);
         const pulse=new THREE.Mesh(new THREE.SphereGeometry(.022,10,8),new THREE.MeshBasicMaterial({color:signalColor,transparent:true,opacity:.72,depthWrite:false}));pulse.userData={kind:'relation-signal',a,b};worldGroup.add(pulse);
