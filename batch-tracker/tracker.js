@@ -4529,31 +4529,8 @@ async function init() {
 
   try {
 
-    const session =
-      await getCurrentSession();
-
-
-    if (!session) {
-
-      authStatus.textContent =
-        "Non connecté.";
-
-      hideElement(
-        trackerCard
-      );
-
-      hideElement(
-        batchCard
-      );
-      hideElement(measurementCard);
-      hideElement(document.getElementById("statisticsCard"));
-      hideElement(document.getElementById("overviewCard"));
-
-      return;
-
-    }
-
-
+    // refreshAuthUI owns session verification and its recovery messaging.
+    // Avoid a duplicate startup getSession() call and keep one error path.
     await refreshAuthUI();
 
   }
@@ -4561,10 +4538,9 @@ async function init() {
   catch (error) {
 
     console.error(
-      "Initialisation:",
+      "Initialisation inattendue:",
       error
     );
-
 
     showMessage(
       error.message ||
