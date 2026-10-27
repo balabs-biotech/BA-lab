@@ -243,7 +243,18 @@ if(root){
       work:['projet','project','prototype','recherche','research','essai','trial','experiment','expériment','développement','development'],
       learn:['guide','formation','learning','apprendre','tutoriel','tutorial','documentation','ressource','resource','fiche','cours','course']
     };
-    const matchedDomains=meta=>ids.filter(other=>other!==id&&domainTerms[other].some(term=>meta.text.some(word=>word.includes(term)||term.includes(word)&&word.length>4)));
+    // Normalize dictionary entries exactly like resource tokens. Short words (e.g. "sol",
+    // "eau", "kit") only match as complete tokens; longer stems may match inflections.
+    const normalizeToken=value=>value.toLocaleLowerCase().normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').replace(/[^a-z0-9]+/g,'');
+    const normalizedDomainTerms=Object.fromEntries(ids.map(domain=>[
+      domain,domainTerms[domain].map(normalizeToken).filter(Boolean)
+    ]));
+    const matchesDomainTerm=(word,term)=>word===term||(
+      term.length>=5&&word.length>=term.length-1&&
+      (word.startsWith(term)||term.startsWith(word))
+    );
+    const matchedDomains=meta=>ids.filter(other=>other!==id&&
+      normalizedDomainTerms[other].some(term=>meta.text.some(word=>matchesDomainTerm(word,term))));
     for(const node of nodes){for(const otherId of matchedDomains(node.meta)){const target=points.find(p=>p.id===otherId);if(!target)continue;const delta=target.base.clone().sub(node.p),axis=new THREE.Vector3().crossVectors(delta,new THREE.Vector3(.31,.87,.43)).normalize();const mid=node.p.clone().lerp(target.base,.5).addScaledVector(axis,.16);const curve=new THREE.QuadraticBezierCurve3(node.p,mid,target.base);const targetColor=target.color;const bridge=makeNeurite(curve,targetColor,.008,.36,20);bridge.userData={kind:'resource-domain-link',id:otherId,resource:node.meta.titleClean};resourceGroup.add(bridge);const pulse=new THREE.Mesh(new THREE.SphereGeometry(.019,10,8),new THREE.MeshBasicMaterial({color:0xe1f4d9,transparent:true,opacity:.9,depthWrite:false,toneMapped:false}));pulse.userData.kind='resource-signal';resourceGroup.add(pulse);resourceSignals.push({mesh:pulse,curve,offset:(nodes.indexOf(node)+ids.indexOf(otherId))*.113,speed:.105+(ids.indexOf(otherId)%3)*.018})}}
     // Cross-connect only resources whose titles, descriptions or URL paths share a meaningful term.
     const linked=new Set();for(let i=0;i<nodes.length;i++)for(let j=i+1;j<nodes.length;j++){const a=nodes[i],b=nodes[j],shared=[...new Set(a.meta.text.filter(w=>b.meta.text.includes(w)))];const pathA=a.meta.url.pathname.split('/').filter(Boolean).slice(0,-1).join('/'),pathB=b.meta.url.pathname.split('/').filter(Boolean).slice(0,-1).join('/');const samePath=!!pathA&&pathA===pathB&&a.meta.url.origin===b.meta.url.origin;if(!shared.length&&!samePath)continue;const key=i+':'+j;if(linked.has(key))continue;linked.add(key);const delta=b.p.clone().sub(a.p),axis=new THREE.Vector3().crossVectors(delta,new THREE.Vector3(.31,.87,.43)).normalize();const mid=a.p.clone().lerp(b.p,.5).addScaledVector(axis,.12+(j-i)*.012);const curve=new THREE.QuadraticBezierCurve3(a.p,mid,b.p);const line=makeNeurite(curve,color,.009,.46,18);line.userData={kind:'resource-relation',id,a:a.mesh.userData.title,b:b.mesh.userData.title};resourceGroup.add(line);const pulse=new THREE.Mesh(new THREE.SphereGeometry(.022,10,8),new THREE.MeshBasicMaterial({color:0xe1f4d9,transparent:true,opacity:.9,depthWrite:false,toneMapped:false}));pulse.userData.kind='resource-signal';resourceGroup.add(pulse);resourceSignals.push({mesh:pulse,curve,offset:(i+j)*.137,speed:.12+((i+j)%3)*.018})}
