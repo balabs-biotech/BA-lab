@@ -25,10 +25,10 @@
 #mainView.webgl-ready>.hub,#mainView.webgl-ready>.sphere,#mainView.webgl-ready>.network,#mainView.webgl-ready>.galaxy{display:none!important}
 #mainView .webgl-stage{position:absolute;inset:0;min-height:680px;z-index:2;touch-action:none}
 #mainView .webgl-stage canvas{display:block;width:100%;height:100%;outline:none}
-#mainView .webgl-stage .webgl-hint{position:absolute;left:16px;bottom:14px;color:#a8c0a6;font-size:10px;letter-spacing:.06em;pointer-events:none;text-shadow:0 2px 8px #000}
+#mainView .webgl-stage .webgl-hint{position:absolute;left:16px;bottom:14px;z-index:5;max-width:calc(100% - 180px);padding:9px 12px;border:1px solid #78947555;border-radius:999px;background:linear-gradient(110deg,#11191de8,#18211de0);box-shadow:0 5px 18px #0005;color:#d4e6d0;font-size:10px;letter-spacing:.055em;line-height:1.45;pointer-events:none;text-shadow:0 1px 5px #000;backdrop-filter:blur(10px)}
 #mainView .webgl-stage .webgl-status{position:absolute;right:14px;bottom:14px;color:#a9c5a3;font-size:9px;letter-spacing:.12em;pointer-events:none}
 #mainView.webgl-ready.universe-closed .webgl-stage .webgl-hint{opacity:.85}
-@media(max-width:760px){#mainView.webgl-ready{min-height:620px}#mainView .webgl-stage{min-height:620px}#mainView .webgl-stage .webgl-hint{max-width:68%;font-size:9px;line-height:1.5}}
+@media(max-width:760px){#mainView.webgl-ready{min-height:620px}#mainView .webgl-stage{min-height:620px}#mainView .webgl-stage .webgl-hint{left:10px;bottom:10px;max-width:calc(100% - 112px);padding:7px 9px;font-size:8px;letter-spacing:.025em;line-height:1.45;border-radius:12px}#mainView .webgl-stage .webgl-status{right:10px;bottom:10px;max-width:94px;font-size:7px;line-height:1.4}}
 
 /* Spatial focus panel: compact, glass-like instrument readout */
 #mainView .webgl-stage .webgl-focus{position:absolute;left:14px;top:14px;z-index:4;display:flex;flex-direction:column;gap:5px;width:min(230px,48%);padding:14px 15px;border:1px solid #6f8d6b55;border-radius:15px;background:linear-gradient(145deg,#20282aef,#101419d9);box-shadow:0 12px 38px #0005,inset 0 1px #ffffff0a;backdrop-filter:blur(14px);pointer-events:auto;transition:border-color .25s,transform .25s}
