@@ -94,9 +94,9 @@ if(root){
           const bend=midpoint.addScaledVector(direction,.28+(ids.indexOf(id)%3)*.07).add(new THREE.Vector3(Math.sin(ids.indexOf(id)*1.7)*.15,Math.cos(ids.indexOf(id)*1.3)*.12,Math.cos(ids.indexOf(id)*1.1)*.16));
           const path=new THREE.QuadraticBezierCurve3(origin,bend,p);
           const line=makeNeurite(path,color,.045,.88,52);line.userData={kind:'edge',id};worldGroup.add(line);
-          const pulse=new THREE.Mesh(new THREE.IcosahedronGeometry(.022,0),new THREE.MeshBasicMaterial({color,transparent:true,opacity:.8,depthWrite:false}));
+          const pulse=new THREE.Mesh(new THREE.IcosahedronGeometry(.034,1),new THREE.MeshBasicMaterial({color,transparent:true,opacity:.96,depthWrite:false,toneMapped:false}));
           pulse.userData={kind:'signal',id};worldGroup.add(pulse);
-          edges.push({line,id,a:origin,b:p.clone(),pulse,phase:ids.indexOf(id)*.13,curve:path});
+          const pulse2=new THREE.Mesh(new THREE.SphereGeometry(.021,10,8),new THREE.MeshBasicMaterial({color,transparent:true,opacity:.78,depthWrite:false,toneMapped:false}));pulse2.userData={kind:'signal',id};worldGroup.add(pulse2);\n          edges.push({line,id,a:origin,b:p.clone(),pulse,pulse2,phase:ids.indexOf(id)*.13,curve:path});
           // Side branches break the impression of straight spokes and form dendritic junctions.
           for(let branch=0;branch<3;branch++){
             const seed=ids.indexOf(id)*2.17+branch*1.91;
@@ -129,16 +129,19 @@ if(root){
       // R&D-to-application and soil-to-project pathways, not decorative all-to-all links.
       // Sparse, meaningful cross-links: avoid the dense mesh of decorative all-to-all chords.
       const pairs=[
-        ['bio','soil'],['myco','lab'],['soil','lab'],
-        ['products','iot'],['iot','work'],['work','learn'],
-        ['lab','products'],['soil','work'],['bio','learn']
+        // Core biological relationships
+        ['bio','myco'],['bio','soil'],['bio','lab'],['myco','soil'],['myco','lab'],['soil','lab'],
+        // Translation from research into practical applications
+        ['soil','products'],['products','iot'],['products','work'],['iot','work'],['work','learn'],
+        // Bridges across the two editorial clusters: knowledge, tools and feedback
+        ['lab','products'],['lab','work'],['lab','learn'],['soil','work'],['bio','learn'],['iot','learn']
       ];
       for(const [a,b] of pairs){const pa=points.find(p=>p.id===a),pb=points.find(p=>p.id===b);if(!pa||!pb)continue;
         const mid=pa.base.clone().lerp(pb.base,.5);
         const axis=new THREE.Vector3().crossVectors(pa.base,pb.base).normalize();
         mid.addScaledVector(axis,.16);
         const curve=new THREE.QuadraticBezierCurve3(pa.base,mid,pb.base);
-        const line=makeNeurite(curve,0xb2d5b5,.022,.62,40);
+        const line=makeNeurite(curve,0xb2d5b5,.027,.72,44);
         line.userData={kind:'relation',a,b};worldGroup.add(line);
         const signalColor=new THREE.Color(colors[a]).lerp(new THREE.Color(colors[b]),.5);
         const pulse=new THREE.Mesh(new THREE.SphereGeometry(.022,10,8),new THREE.MeshBasicMaterial({color:signalColor,transparent:true,opacity:.72,depthWrite:false}));pulse.userData={kind:'relation-signal',a,b};worldGroup.add(pulse);
@@ -170,6 +173,6 @@ if(root){
   function hitTest(e){const r=renderer.domElement.getBoundingClientRect();mouse.x=((e.clientX-r.left)/r.width)*2-1;mouse.y=-((e.clientY-r.top)/r.height)*2+1;raycaster.setFromCamera(mouse,camera);return raycaster.intersectObjects([...points.map(p=>p.hitMesh),...points.map(p=>p.mesh),...resourceMeshes],false)}
   function updateHover(e){if(!renderer||!worldGroup?.visible)return;const hits=hitTest(e),obj=hits[0]?.object||null;const next=obj?.userData?.kind==='sphere'?obj.userData.id:null;const resource=obj?.userData?.kind==='resource'?obj.userData.url:null;if(next===hovered&&resource===stage.dataset.hoverResource)return;hovered=next;if(next)refreshFocus(next);else if(!selected)refreshFocus(null);stage.dataset.hoverResource=resource||'';stage.classList.toggle('resource-hover',!!resource);stage.style.cursor=(next||resource)?'pointer':'grab';for(const p of points){const active=p.id===hovered;p.mesh.material.emissiveIntensity=active?1.05:.62;p.mesh.scale.setScalar(active?1.08:(selected===p.id?1.04:1))}for(const edge of edges){if(!edge.relation)continue;const focus=hovered||selected;const connected=!!focus&&(edge.aId===focus||edge.bId===focus);edge.line.material.opacity=focus?(connected?.78:.025):.105;edge.line.material.needsUpdate=true}}
   function pick(e){if(transition)return;const hits=hitTest(e);if(!hits.length)return;const obj=hits[0].object;if(obj.userData.kind==='resource'){window.open(obj.userData.url,'_blank','noopener,noreferrer');return}if(obj.userData.kind==='sphere'){const id=obj.userData.id,node=points.find(p=>p.id===id);flyTo(node.mesh,()=>{document.querySelector('[data-sphere="'+id+'"]')?.click();requestAnimationFrame(()=>requestAnimationFrame(()=>buildResourceNodes(id)));stage.classList.remove('is-transitioning')})}}
-  function animate(){raf=requestAnimationFrame(animate);if(!renderer)return;const now=performance.now(),t=now*.001;if(transition){const k=Math.min(1,(now-transition.at)/transition.duration),e=easeInOut(k);cameraTarget.set(THREE.MathUtils.lerp(transition.start.x,transition.end.x,e),THREE.MathUtils.lerp(transition.start.y,transition.end.y,e),THREE.MathUtils.lerp(transition.start.z,transition.end.z,e));dist=THREE.MathUtils.lerp(transition.start.dist,transition.end.dist,e);if(k>=1){const next=transition.next;transition=null;stage.classList.remove('is-transitioning');next?.()}}for(const p of points){const f=p.id===hovered?1.24:(selected===p.id?1.12:1+Math.sin(t*1.1+ids.indexOf(p.id))*.018);p.mesh.scale.setScalar(f);p.mesh.rotation.y=t*.09+ids.indexOf(p.id)*.2;p.mesh.rotation.x=Math.sin(t*.32+ids.indexOf(p.id))*.035;p.label.quaternion.copy(camera.quaternion)}for(const e of edges){if(!e.pulse||!e.curve)continue;const progress=(t*(e.relation?.052:.105)+e.phase)%1;e.pulse.position.copy(e.curve.getPoint(progress));e.pulse.material.opacity=e.relation?.22+.48*Math.sin(progress*Math.PI):.42+.48*Math.sin(progress*Math.PI)}if(!dragging&&!transition){theta+=rotateVX;phi=THREE.MathUtils.clamp(phi+rotateVY,.35,2.78);rotateVX*=.88;rotateVY*=.88;if(Math.abs(rotateVX)<.00005)rotateVX=0;if(Math.abs(rotateVY)<.00005)rotateVY=0}updateCamera();renderer.render(scene,camera)}
+  function animate(){raf=requestAnimationFrame(animate);if(!renderer)return;const now=performance.now(),t=now*.001;if(transition){const k=Math.min(1,(now-transition.at)/transition.duration),e=easeInOut(k);cameraTarget.set(THREE.MathUtils.lerp(transition.start.x,transition.end.x,e),THREE.MathUtils.lerp(transition.start.y,transition.end.y,e),THREE.MathUtils.lerp(transition.start.z,transition.end.z,e));dist=THREE.MathUtils.lerp(transition.start.dist,transition.end.dist,e);if(k>=1){const next=transition.next;transition=null;stage.classList.remove('is-transitioning');next?.()}}for(const p of points){const f=p.id===hovered?1.24:(selected===p.id?1.12:1+Math.sin(t*1.1+ids.indexOf(p.id))*.018);p.mesh.scale.setScalar(f);p.mesh.rotation.y=t*.09+ids.indexOf(p.id)*.2;p.mesh.rotation.x=Math.sin(t*.32+ids.indexOf(p.id))*.035;p.label.quaternion.copy(camera.quaternion)}for(const e of edges){if(!e.pulse||!e.curve)continue;const speed=e.relation?.052:.105,progress=(t*speed+e.phase)%1;e.pulse.position.copy(e.curve.getPoint(progress));e.pulse.material.opacity=(e.relation?.48:.58)+.42*Math.sin(progress*Math.PI);if(e.pulse2){const progress2=(progress+.47)%1;e.pulse2.position.copy(e.curve.getPoint(progress2));e.pulse2.material.opacity=.3+.55*Math.sin(progress2*Math.PI)}}if(!dragging&&!transition){theta+=rotateVX;phi=THREE.MathUtils.clamp(phi+rotateVY,.35,2.78);rotateVX*=.88;rotateVY*=.88;if(Math.abs(rotateVX)<.00005)rotateVX=0;if(Math.abs(rotateVY)<.00005)rotateVY=0}updateCamera();renderer.render(scene,camera)}
   init();
 }
