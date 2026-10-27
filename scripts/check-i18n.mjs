@@ -50,7 +50,19 @@ for (const required of [
   "Les informations saisies dans CultureOps sont enregistrées dans la base de données BA Labs afin d’assurer la traçabilité des cultures, des générations et des lots. L’accès à l’application nécessite l’acceptation des conditions d’utilisation.",
   "Impossible de vérifier votre session. Vérifiez la connexion puis réessayez. Aucune mesure n’a été enregistrée.",
   "Vérification de session avant observation impossible : ",
-  "traçabilité fongique"
+  "traçabilité fongique",
+  "L'appel à claim-ba-labs a échoué.",
+  "Le compte n'a pas pu être rattaché à BA-LABS.",
+  "Chargement du contexte expérimental impossible :",
+  "Total des 50 événements chargés, par unité :",
+  "La base n’a pas confirmé l’enregistrement de la récolte.",
+  "Séquence illustrative",
+  "Renseignez un code, une culture, une variété et une quantité entière positive.",
+  "Enregistrement de la fiche végétale…",
+  "Culture enregistrée dans le registre AgriTech.",
+  "AGRITECH / MONITORING",
+  "MYCOLOGY / SPECIMEN LEDGER",
+  "LABORATORY / EXPERIMENTAL LOG"
 ]) {
   if (!seen.has(required)) throw new Error(`Missing critical translation: ${required}`);
 }
@@ -98,7 +110,12 @@ const cases = [
   ["pt", "Cultures végétales", "Registos vegetais"],
   ["ar", "Cultures végétales", "سجلات النباتات"],
   ["en", "Impossible de vérifier votre session. Vérifiez la connexion puis réessayez. Aucune mesure n’a été enregistrée.", "Could not verify your session. Check your connection and try again. No measurement was saved."],
-  ["pt", "Vérification de session avant observation impossible : timeout", "Não foi possível verificar a sessão antes da observação: timeout"]
+  ["pt", "Vérification de session avant observation impossible : timeout", "Não foi possível verificar a sessão antes da observação: timeout"],
+  ["en", "Séquence illustrative", "Illustrative sequence"],
+  ["pt", "Séquence illustrative", "Sequência ilustrativa"],
+  ["ar", "Séquence illustrative", "تسلسل توضيحي"],
+  ["pt", "MYCOLOGY / SPECIMEN LEDGER", "MYCOLOGIA / REGISTO DE ESTIRPES"],
+  ["ar", "LABORATORY / EXPERIMENTAL LOG", "المختبر / السجل التجريبي"]
 ];
 for (const [lang, input, expected] of cases) {
   const actual = translate(input, lang);
