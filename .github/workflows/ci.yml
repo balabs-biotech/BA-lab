@@ -90,6 +90,7 @@ jobs:
           node scripts/test-workspace-scenarios.mjs
           node scripts/test-domain-engine.mjs
           node scripts/test-workspace-auth-contract.mjs
+          node scripts/test-auth-initialization-diagnostics.mjs
           [ -f batch-tracker/index.html ] && echo "✓ batch-tracker/index.html exists" || exit 1
           [ -f batch-tracker/README.md ] && echo "✓ batch-tracker/README.md exists" || exit 1
           [ -f batch-tracker/supabase/README.md ] && echo "✓ batch-tracker/supabase/README.md exists" || exit 1

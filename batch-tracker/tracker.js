@@ -840,18 +840,18 @@ async function initializeAuthenticatedTracker(
     true;
 
   const initRevision = revision;
+  let initializationStage = "préparation de la session";
+  const setInitializationStage = (stage) => {
+    initializationStage = stage;
+    authStatus.textContent = `Connexion BA-LABS — ${stage}…`;
+  };
 
   try {
 
     clearMessage();
     initializationWarnings = [];
 
-    authStatus.textContent =
-      `Connexion BA-LABS : ${
-        session.user.email ||
-        session.user.id
-      }`;
-
+    setInitializationStage("rattachement à l’organisation");
 
     const claim =
       await claimBALabs();
@@ -878,14 +878,19 @@ async function initializeAuthenticatedTracker(
       }`;
 
 
+    setInitializationStage("chargement du catalogue des souches");
     await loadStrainOptions();
 
+    setInitializationStage("chargement des référentiels");
     await loadReferenceData();
 
+    setInitializationStage("chargement des cultures");
     await loadCultureOptions();
 
+    setInitializationStage("chargement des unités");
     await loadQuantityUnitOptions();
 
+    setInitializationStage("chargement des emplacements de lots");
     await loadBatchPlaceOptions();
 
     populatePlantLocationOptions();
@@ -894,14 +899,18 @@ async function initializeAuthenticatedTracker(
     // Mycology and Laboratory must not depend on the agronomy-only plant registry.
     // A plant-registry/RLS failure must not block authentication in those workspaces.
     if (document.body.dataset.domain === "agronomy") {
+      setInitializationStage("chargement des cultures végétales");
       await loadPlantCultures();
     }
 
+    setInitializationStage("synchronisation des cultures en attente");
     await syncPendingCultures();
 
+    setInitializationStage("chargement des derniers lots");
     await loadLatestBatches();
 
     try {
+      setInitializationStage("chargement du catalogue de mesures");
       await loadMeasurementReferences();
       saveMeasurementButton.disabled = false;
       saveObservationButton.disabled = false;
@@ -973,8 +982,7 @@ async function initializeAuthenticatedTracker(
 
 
     showMessage(
-      error.message ||
-      "Initialisation impossible.",
+      `Échec à l’étape « ${initializationStage} » : ${error.message || "erreur inconnue"}`,
       "error"
     );
 
