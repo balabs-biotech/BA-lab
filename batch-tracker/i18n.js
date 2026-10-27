@@ -625,8 +625,8 @@
     if (!source || lang === "fr") return value;
     const dict = dictionaries[lang] || {};
     if (dict[source]) {
-      const leading = (value.match(/^\\s*/) || [""])[0];
-      const trailing = (value.match(/\\s*$/) || [""])[0];
+      const leading = (value.match(/^\s*/) || [""])[0];
+      const trailing = (value.match(/\s*$/) || [""])[0];
       return leading + dict[source] + trailing;
     }
 
