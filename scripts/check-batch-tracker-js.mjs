@@ -4,6 +4,7 @@ const root=fs.readFileSync("index.html","utf8");
 const engine=fs.readFileSync("batch-tracker/tracker.js","utf8");
 const template=fs.readFileSync("batch-tracker/workspace.html","utf8");
 new vm.Script(engine,{filename:"batch-tracker/tracker.js"});
+if(!engine.includes('/invalid refresh token|refresh token not found/i')||!engine.includes('auth.signOut({ scope: "local" })')||!engine.includes("La session enregistrée sur cet appareil n’est plus valide"))throw new Error("Invalid local refresh-token recovery is missing");
 const routes=[
  {domain:"agronomy",url:"batch-tracker/green-tech/",file:"batch-tracker/green-tech/index.html"},
  {domain:"mycology",url:"batch-tracker/mycology/",file:"batch-tracker/mycology/index.html"},
