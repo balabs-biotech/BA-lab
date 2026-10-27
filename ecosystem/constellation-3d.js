@@ -381,9 +381,9 @@ if(root){
       const axis=new THREE.Vector3().crossVectors(delta,new THREE.Vector3(.31,.87,.43)).normalize();
       const mid=a.p.clone().lerp(b.p,.5).addScaledVector(axis,.12+((j-i)%4)*.012);
       const curve=new THREE.QuadraticBezierCurve3(a.p,mid,b.p);
-      const line=makeNeurite(curve,color,.009,.46,18);
+      const line=makeNeurite(curve,color,.012,.66,22);
       line.userData={kind:'resource-relation',id,sourceId:id,targetId:id,a:a.mesh.userData.title,b:b.mesh.userData.title};resourceGroup.add(line);
-      const pulse=new THREE.Mesh(new THREE.SphereGeometry(.022,10,8),new THREE.MeshBasicMaterial({color:0xe1f4d9,transparent:true,opacity:.9,depthWrite:false,toneMapped:false}));
+      const pulse=new THREE.Mesh(new THREE.SphereGeometry(.028,12,10),new THREE.MeshBasicMaterial({color:0xe1f4d9,transparent:true,opacity:.98,depthWrite:false,toneMapped:false}));
       pulse.userData.kind='resource-signal';resourceGroup.add(pulse);
       resourceSignals.push({mesh:pulse,curve,sourceId:id,targetId:id,offset:(i+j)*.137,speed:.12+((i+j)%3)*.018});
       resourceDegree[i]++;resourceDegree[j]++;resourceLinkCount++;
