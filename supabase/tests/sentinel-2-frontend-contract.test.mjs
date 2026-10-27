@@ -31,7 +31,7 @@ const checks = [
   ["labels partial rainfall totals explicitly", /Cumul partiel · /],
   ["calculates agronomic coverage against calendar days, including missing days", /windowStart=Math\.max\(firstDay,lastDay-6\*86400000\)[\s\S]*?windowObservations/],
  ];
-assert.match(entry, /environmental-data\\.js\\?v=20261027-sentinel-fallback-fix-1/, "uses a cache-busted environmental module path");
+assert.match(entry, /environmental-data\.js\?v=20261027-sentinel-fallback-fix-1/, "uses a cache-busted environmental module path");
 assert.match(entry, /i18n\.js\?v=[^"]+/, "uses a cache-busted localization module path");
 assert.match(i18n, /Lecture agronomique/, "contains localized agronomic synthesis labels");
 assert.match(i18n, /Vegetation trend \(NDVI\)/, "contains localized satellite chart labels");
