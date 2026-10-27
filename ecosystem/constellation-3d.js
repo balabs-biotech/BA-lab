@@ -82,9 +82,14 @@ if(root){
         const label=makeLabel(labels[id].title,0xf5f7fa,25);label.position.set(p.x,p.y-.52,p.z+.08);label.scale.set(2.65,.52,1);label.userData={kind:'label',id,labelText:labels[id].title};worldGroup.add(label);
         const node={id,mesh,hitMesh,label,base:p,color,twigs};points.push(node);
         // Organic axon: a gently branching, curved connection from the BALabs core.
-        const edgeMat=new THREE.LineBasicMaterial({color,transparent:true,opacity:.2});
-        const origin=new THREE.Vector3(0,0,0);
-        const bend=new THREE.Vector3(p.x*.48 + Math.sin(ids.indexOf(id)*1.7)*.28,p.y*.48 + .22*Math.cos(ids.indexOf(id)*1.3),p.z*.48 + Math.cos(ids.indexOf(id)*1.1)*.24);
+        const edgeMat=new THREE.LineBasicMaterial({color,transparent:true,opacity:.28,depthWrite:false});
+        // Build a connected neural graph instead of eight spokes radiating from a central planet.
+        const parentOf={bio:null,myco:'bio',soil:'myco',lab:'bio',products:'lab',iot:'products',work:'soil',learn:'work'};
+        const parentNode=points.find(item=>item.id===parentOf[id]);
+        const origin=parentNode?parentNode.base.clone():new THREE.Vector3(0,0,0);
+        const midpoint=origin.clone().lerp(p,.5);
+        const direction=new THREE.Vector3().crossVectors(origin.clone().add(new THREE.Vector3(.001,.002,.003)),p.clone().add(new THREE.Vector3(.013,.007,.019))).normalize();
+        const bend=midpoint.addScaledVector(direction,.22+(ids.indexOf(id)%3)*.055).add(new THREE.Vector3(Math.sin(ids.indexOf(id)*1.7)*.12,Math.cos(ids.indexOf(id)*1.3)*.1,Math.cos(ids.indexOf(id)*1.1)*.12));
         const path=new THREE.QuadraticBezierCurve3(origin,bend,p);
         const geom=new THREE.BufferGeometry().setFromPoints(path.getPoints(28));
         const line=new THREE.Line(geom,edgeMat);line.userData={kind:'edge',id};worldGroup.add(line);
