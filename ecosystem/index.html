@@ -36,8 +36,11 @@
 #mainView .webgl-focus-kicker{color:#a7c79c;font:600 9px/1.4 ui-monospace,monospace;letter-spacing:.14em;text-transform:uppercase}
 #mainView .webgl-focus strong{color:#f0f7ec;font:600 clamp(15px,1.5vw,20px)/1.15 system-ui,sans-serif;letter-spacing:-.025em}
 #mainView .webgl-focus small{color:#a9b9a8;font:11px/1.5 system-ui,sans-serif}
-#mainView .webgl-focus-meta{align-self:flex-start;margin-top:3px;padding:3px 7px;border:1px solid #a9c5a336;border-radius:999px;color:#a9c5a3;font:600 9px/1.4 system-ui,sans-serif}
-@media(max-width:760px){#mainView .webgl-stage .webgl-focus{left:10px;top:10px;width:min(190px,47%);padding:10px 11px;gap:4px}#mainView .webgl-focus small{font-size:10px}#mainView .webgl-stage .webgl-controls{top:auto;bottom:48px;right:10px}}
+#mainView .webgl-focus-meta{align-self:flex-start;max-width:100%;margin-top:3px;padding:4px 7px;border:1px solid #a9c5a336;border-radius:9px;color:#a9c5a3;font:600 9px/1.5 system-ui,sans-serif;white-space:normal;overflow-wrap:anywhere}
+#mainView .webgl-stage .webgl-focus{max-height:calc(100% - 92px);overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:#668363 transparent}
+#mainView .webgl-stage .webgl-focus button{max-width:100%;overflow-wrap:anywhere}
+@media(max-width:760px){#mainView .webgl-stage .webgl-focus{left:10px;top:10px;width:min(220px,calc(100% - 88px));max-height:calc(100% - 110px);padding:10px 11px;gap:5px}#mainView .webgl-focus small{font-size:10px}#mainView .webgl-stage .webgl-controls{top:10px;bottom:auto;right:10px}}
+@media(max-width:370px){#mainView .webgl-stage .webgl-focus{width:calc(100% - 76px);max-height:calc(100% - 105px);padding:9px}#mainView .webgl-focus strong{font-size:14px}#mainView .webgl-focus-meta{font-size:8px}}
 
 /* Ergonomic controls for the real-time 3D scene */
 #mainView .webgl-stage{min-height:680px;touch-action:none;cursor:grab}
