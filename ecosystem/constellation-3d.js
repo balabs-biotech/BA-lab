@@ -36,7 +36,7 @@ if(root){
       for(const id of ids){
         const color=colors[id],p=new THREE.Vector3(...pos[id]).multiplyScalar(.98);
         // Neural soma: a compact, softly glowing junction, not a planet with an orbit.
-        const geo=new THREE.SphereGeometry(.075,20,16),mat=new THREE.MeshStandardMaterial({color,emissive:new THREE.Color(color).multiplyScalar(.9),emissiveIntensity:.62,metalness:.02,roughness:.46});
+        const geo=new THREE.IcosahedronGeometry(.078,1),mat=new THREE.MeshStandardMaterial({color,emissive:new THREE.Color(color).multiplyScalar(.45),emissiveIntensity:.28,metalness:0,roughness:.82,flatShading:true});
         const mesh=new THREE.Mesh(geo,mat);mesh.position.copy(p);mesh.userData={kind:'sphere',id};mesh.scale.setScalar(1);worldGroup.add(mesh);
         // Short dendritic spines radiate from each soma and visually merge with the axon network.
         const twigs=[];
@@ -50,33 +50,35 @@ if(root){
           const twig=new THREE.Line(new THREE.BufferGeometry().setFromPoints(twigCurve.getPoints(7)),new THREE.LineBasicMaterial({color,transparent:true,opacity:.34,depthWrite:false}));
           twig.userData={kind:'dendrite',id};worldGroup.add(twig);twigs.push(twig);
         }
-        const glow=new THREE.Mesh(new THREE.SphereGeometry(.16,16,12),new THREE.MeshBasicMaterial({color,transparent:true,opacity:.018,depthWrite:false}));glow.position.copy(p);glow.userData.kind='glow';worldGroup.add(glow);
+        const glow=new THREE.Mesh(new THREE.IcosahedronGeometry(.115,1),new THREE.MeshBasicMaterial({color,transparent:true,opacity:.025,depthWrite:false,wireframe:true}));glow.position.copy(p);glow.userData.kind='glow';worldGroup.add(glow);
         const hitMesh=new THREE.Mesh(new THREE.SphereGeometry(.25,12,10),new THREE.MeshBasicMaterial({color,transparent:true,opacity:.0001,depthWrite:false}));hitMesh.position.copy(p);hitMesh.userData={kind:'sphere',id};worldGroup.add(hitMesh);\n
         const label=makeLabel(labels[id].title,0xf5f7fa,25);label.position.set(p.x,p.y-.52,p.z+.08);label.scale.set(2.65,.52,1);label.userData={kind:'label',id,labelText:labels[id].title};worldGroup.add(label);
         const node={id,mesh,hitMesh,label,base:p,color,twigs};points.push(node);
-        // Organic axon: a gently branching, curved connection from the BALabs core.
-        const edgeMat=new THREE.LineBasicMaterial({color,transparent:true,opacity:.28,depthWrite:false});
-        // Build a connected neural graph instead of eight spokes radiating from a central planet.
+        // A root soma has no artificial central-hub connection. Every other axon
+        // links to its actual biological parent in the graph.
         const parentOf={bio:null,myco:'bio',soil:'myco',lab:'myco',products:'soil',iot:'products',work:'products',learn:'lab'};
         const parentNode=points.find(item=>item.id===parentOf[id]);
-        const origin=parentNode?parentNode.base.clone():new THREE.Vector3(-.15,2.95,.05);
-        const midpoint=origin.clone().lerp(p,.5);
-        const direction=new THREE.Vector3().crossVectors(origin.clone().add(new THREE.Vector3(.001,.002,.003)),p.clone().add(new THREE.Vector3(.013,.007,.019))).normalize();
-        const bend=midpoint.addScaledVector(direction,.22+(ids.indexOf(id)%3)*.055).add(new THREE.Vector3(Math.sin(ids.indexOf(id)*1.7)*.12,Math.cos(ids.indexOf(id)*1.3)*.1,Math.cos(ids.indexOf(id)*1.1)*.12));
-        const path=new THREE.QuadraticBezierCurve3(origin,bend,p);
-        const geom=new THREE.BufferGeometry().setFromPoints(path.getPoints(28));
-        const line=new THREE.Line(geom,edgeMat);line.userData={kind:'edge',id};worldGroup.add(line);
-        const pulse=new THREE.Mesh(new THREE.SphereGeometry(.018,10,8),new THREE.MeshBasicMaterial({color,transparent:true,opacity:.92,depthWrite:false}));
-        pulse.userData={kind:'signal',id};worldGroup.add(pulse);
-        edges.push({line,id,a:origin,b:p.clone(),pulse,phase:ids.indexOf(id)*.13,curve:path});
-        // Fine dendrites emerge from the main path to make the graph feel continuous, not like isolated beads.
-        for(let branch=0;branch<2;branch++){
-          const t=.42+branch*.22,anchor=path.getPoint(t),tangent=path.getTangent(t);
-          const side=new THREE.Vector3(-tangent.y,tangent.x,Math.sin(ids.indexOf(id)+branch)*.65).normalize();
-          const end=anchor.clone().addScaledVector(side,.22+branch*.07).addScaledVector(tangent,.13);
-          const branchCurve=new THREE.QuadraticBezierCurve3(anchor,anchor.clone().addScaledVector(side,.12).addScaledVector(tangent,.08),end);
-          const branchLine=new THREE.Line(new THREE.BufferGeometry().setFromPoints(branchCurve.getPoints(8)),new THREE.LineBasicMaterial({color,transparent:true,opacity:.22,depthWrite:false}));
-          branchLine.userData={kind:'dendrite',id};worldGroup.add(branchLine);
+        if(parentNode){
+          const origin=parentNode.base.clone();
+          const edgeMat=new THREE.LineBasicMaterial({color,transparent:true,opacity:.34,depthWrite:false});
+          const midpoint=origin.clone().lerp(p,.5);
+          const direction=new THREE.Vector3().crossVectors(origin.clone().add(new THREE.Vector3(.001,.002,.003)),p.clone().add(new THREE.Vector3(.013,.007,.019))).normalize();
+          const bend=midpoint.addScaledVector(direction,.28+(ids.indexOf(id)%3)*.07).add(new THREE.Vector3(Math.sin(ids.indexOf(id)*1.7)*.15,Math.cos(ids.indexOf(id)*1.3)*.12,Math.cos(ids.indexOf(id)*1.1)*.16));
+          const path=new THREE.QuadraticBezierCurve3(origin,bend,p);
+          const geom=new THREE.BufferGeometry().setFromPoints(path.getPoints(32));
+          const line=new THREE.Line(geom,edgeMat);line.userData={kind:'edge',id};worldGroup.add(line);
+          const pulse=new THREE.Mesh(new THREE.IcosahedronGeometry(.022,0),new THREE.MeshBasicMaterial({color,transparent:true,opacity:.8,depthWrite:false}));
+          pulse.userData={kind:'signal',id};worldGroup.add(pulse);
+          edges.push({line,id,a:origin,b:p.clone(),pulse,phase:ids.indexOf(id)*.13,curve:path});
+          // Side branches break the impression of straight spokes and form dendritic junctions.
+          for(let branch=0;branch<2;branch++){
+            const t=.38+branch*.25,anchor=path.getPoint(t),tangent=path.getTangent(t);
+            const side=new THREE.Vector3(-tangent.y,tangent.x,Math.sin(ids.indexOf(id)+branch)*.65).normalize();
+            const end=anchor.clone().addScaledVector(side,.3+branch*.08).addScaledVector(tangent,.16);
+            const branchCurve=new THREE.QuadraticBezierCurve3(anchor,anchor.clone().addScaledVector(side,.17).addScaledVector(tangent,.09),end);
+            const branchLine=new THREE.Line(new THREE.BufferGeometry().setFromPoints(branchCurve.getPoints(10)),new THREE.LineBasicMaterial({color,transparent:true,opacity:.3,depthWrite:false}));
+            branchLine.userData={kind:'dendrite',id};worldGroup.add(branchLine);
+          }
         }
       }
       // Relations reflect the two editorial clusters stated in index.html:
