@@ -931,11 +931,18 @@ async function initializeAuthenticatedTracker(
     // Never reveal data loaded by an initialization superseded by an auth change.
     if (initRevision !== authStateRevision) return;
 
-    showElement(trackerCard);
-
-    showElement(document.getElementById("plantCard"));
-
-    showElement(batchCard);
+    const activeDomain = window.BALabsDomainEngine.normalizeDomain(document.body.dataset.domain);
+    // Keep the three workspaces operationally separate: agronomy uses the plant
+    // registry, while fungal and laboratory cultures use the culture/batch tracker.
+    if (activeDomain === "agronomy") {
+      hideElement(trackerCard);
+      hideElement(batchCard);
+      showElement(document.getElementById("plantCard"));
+    } else {
+      showElement(trackerCard);
+      showElement(batchCard);
+      hideElement(document.getElementById("plantCard"));
+    }
     showElement(measurementCard);
     showElement(document.getElementById("statisticsCard"));
     showElement(document.getElementById("overviewCard"));
@@ -1691,6 +1698,13 @@ async function createCulture() {
 
   clearMessage();
 
+  if (document.body.dataset.domain === "agronomy") {
+    showMessage(
+      "Dans Green Tech, enregistrez les plantes depuis le registre des cultures végétales.",
+      "warning"
+    );
+    return;
+  }
 
   const materialId =
     strainSelect.value;
