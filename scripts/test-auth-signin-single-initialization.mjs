@@ -25,3 +25,15 @@ assert.match(listener, /refreshAuthUI\(revision\)/, "auth-state listener must re
 assert.match(listener, /event === "INITIAL_SESSION"\) return/, "startup INITIAL_SESSION must be handled only by init() to avoid competing reconciliation");
 
 console.log("Auth sign-in/sign-up single-initialization contract passed.");
+const entryPages = [
+  "../batch-tracker/mycology/index.html",
+  "../batch-tracker/green-tech/index.html",
+  "../batch-tracker/laboratory/index.html"
+];
+for (const path of entryPages) {
+  const html = await readFile(new URL(path, import.meta.url), "utf8");
+  assert.match(html, /workspace\.html\?v=20261027-auth-reconciliation-2/, `${path} must fetch the current shared workspace markup`);
+  assert.match(html, /tracker\.js\?v=20261027-auth-reconciliation-2/, `${path} must load the current auth reconciliation engine`);
+}
+console.log("Auth entry-point cache-busting contract passed for Mycology, Green Tech and Laboratory.");
+
