@@ -159,9 +159,10 @@ if(root){
         ['iot','learn'],['myco','products'],['soil','iot'],['soil','learn'],
         ['lab','iot'],['lab','learn'],['products','learn'],['work','learn'],
         ['bio','iot'],['myco','work'],
-        // Additional grounded loops: biology feeds mycology, substrate work,
-        // applied products and instrumented workflows; these are not decorative chords.
-        ['bio','myco'],['myco','soil'],['bio','products'],['iot','work'],['products','work']
+        // Additional cross-domain loops only. Parent-child axons already cover
+        // bio→myco, myco→soil, myco→lab and products→work; repeating them here
+        // creates doubled lines that look like accidental overdraw, not richer links.
+        ['bio','products'],['iot','work']
       ];
       const mycelialTips=[];
       for(const [a,b] of pairs){const pa=points.find(p=>p.id===a),pb=points.find(p=>p.id===b);if(!pa||!pb)continue;
