@@ -22,9 +22,8 @@ for (const stage of [
   assert.ok(initializer.includes(stage), `missing initialization diagnostic stage: ${stage}`);
 }
 
-assert.match(
-  initializer,
-  /Échec à l’étape « \\?\$\{initializationStage\} » : \\?\$\{error\.message/,
+assert.ok(
+  initializer.includes("Échec à l’étape « ${initializationStage} » : ${error.message ||"),
   "initialization errors must identify the stage and retain the underlying error message",
 );
 assert.match(
