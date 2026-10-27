@@ -98,7 +98,7 @@ const cases = [
   ["pt", "Cultures végétales", "Registos vegetais"],
   ["ar", "Cultures végétales", "سجلات النباتات"],
   ["en", "Impossible de vérifier votre session. Vérifiez la connexion puis réessayez. Aucune mesure n’a été enregistrée.", "Could not verify your session. Check your connection and try again. No measurement was saved."],
-  ["pt", "Vérification de session avant observation impossible: timeout", "Não foi possível verificar a sessão antes da observação: timeout"]
+  ["pt", "Vérification de session avant observation impossible : timeout", "Não foi possível verificar a sessão antes da observação: timeout"]
 ];
 for (const [lang, input, expected] of cases) {
   const actual = translate(input, lang);
