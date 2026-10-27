@@ -162,7 +162,10 @@ if(root){
         // Additional cross-domain loops only. Parent-child axons already cover
         // bio→myco, myco→soil, myco→lab and products→work; repeating them here
         // creates doubled lines that look like accidental overdraw, not richer links.
-        ['bio','products'],['iot','work']
+        ['bio','products'],['iot','work'],
+        // Culture monitoring connects mycology to instrumentation; project execution
+        // links biological experimentation back to the operational workflow.
+        ['myco','iot'],['bio','work']
       ];
       const mycelialTips=[];
       for(const [a,b] of pairs){const pa=points.find(p=>p.id===a),pb=points.find(p=>p.id===b);if(!pa||!pb)continue;
@@ -431,7 +434,9 @@ if(root){
     // Complementary routes expose links that are easy to miss in the primary circulation.
     ['bio','soil','iot','work'],
     ['myco','lab','learn','products'],
-    ['soil','lab','iot','products']
+    ['soil','lab','iot','products'],
+    // Close the loop from culture monitoring through project execution back to biology.
+    ['myco','iot','work','bio','lab']
   ];
   const relaySignals=[];
   for(const route of relayRoutes){
