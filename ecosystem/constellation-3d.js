@@ -320,11 +320,18 @@ if(root){
     for(const node of nodes){
       const ranked=matchedDomains(node.meta).map(otherId=>{
         const terms=normalizedDomainTerms[otherId];
-        const exactTerms=terms.reduce((sum,term)=>sum+(node.meta.text.some(word=>word===term)?3:node.meta.text.some(word=>matchesDomainTerm(word,term))?1:0),0);
-        const phraseScore=normalizedDomainPhrases[otherId].reduce((sum,phrase)=>sum+(matchesPhrase(node.meta.text,phrase)?4:0),0);
-        const score=exactTerms+phraseScore;
-        return {otherId,score};
-      }).filter(item=>item.score>0).sort((a,b)=>b.score-a.score||ids.indexOf(a.otherId)-ids.indexOf(b.otherId)).slice(0,2);
+        // Score each distinct resource token once: overlapping stems and translations must not inflate a bridge.
+        const matchedTerms=[...new Set(terms.map(term=>({term,word:node.meta.text.find(word=>matchesDomainTerm(word,term))})).filter(match=>match.word).map(match=>match.word))];
+        const termScore=matchedTerms.reduce((sum,word)=>{
+          const exact=terms.some(term=>term===word);
+          const specificity=Math.min(1.6,Math.max(.65,word.length/7));
+          return sum+(exact?2.4:1.1)*specificity;
+        },0);
+        const matchedPhrases=normalizedDomainPhrases[otherId].filter(phrase=>matchesPhrase(node.meta.text,phrase));
+        const phraseScore=matchedPhrases.length*5;
+        const score=termScore+phraseScore;
+        return {otherId,score,evidence:matchedTerms.length+matchedPhrases.length};
+      }).filter(item=>item.score>0).sort((a,b)=>b.score-a.score||b.evidence-a.evidence||ids.indexOf(a.otherId)-ids.indexOf(b.otherId)).slice(0,2);
       for(const {otherId} of ranked){
         const target=points.find(p=>p.id===otherId);if(!target)continue;
         const delta=target.base.clone().sub(node.p),axis=new THREE.Vector3().crossVectors(delta,new THREE.Vector3(.31,.87,.43)).normalize();
