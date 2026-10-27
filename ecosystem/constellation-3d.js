@@ -98,7 +98,7 @@ if(root){
           const pulse=new THREE.Mesh(new THREE.IcosahedronGeometry(.034,1),new THREE.MeshBasicMaterial({color,transparent:true,opacity:.96,depthWrite:false,toneMapped:false}));
           pulse.userData={kind:'signal',id};worldGroup.add(pulse);
           const pulse2=new THREE.Mesh(new THREE.SphereGeometry(.021,10,8),new THREE.MeshBasicMaterial({color,transparent:true,opacity:.78,depthWrite:false,toneMapped:false}));pulse2.userData={kind:'signal',id};worldGroup.add(pulse2);
-          edges.push({line,id,a:origin,b:p.clone(),pulse,pulse2,phase:ids.indexOf(id)*.13,curve:path});
+          edges.push({line,id,parentId:parentNode.id,a:origin,b:p.clone(),pulse,pulse2,phase:ids.indexOf(id)*.13,curve:path});
           // Side branches break the impression of straight spokes and form dendritic junctions.
           for(let branch=0;branch<3;branch++){
             const seed=ids.indexOf(id)*2.17+branch*1.91;
