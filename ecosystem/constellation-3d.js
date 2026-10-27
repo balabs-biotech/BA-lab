@@ -77,35 +77,35 @@ if(root){
         const color=colors[id],p=new THREE.Vector3(...pos[id]).multiplyScalar(.98);
         // Neural soma: a compact, softly glowing junction, not a planet with an orbit.
         // Faceted, asymmetrical cell body: deliberately not a polished planet.
-        const geo=new THREE.IcosahedronGeometry(.14,1),attr=geo.attributes.position;
+        const geo=new THREE.IcosahedronGeometry(.105,1),attr=geo.attributes.position;
         // A neuron is a small, uneven soma with visible polarity, not an egg-shaped orb.
         for(let v=0;v<attr.count;v++){
           const x=attr.getX(v),y=attr.getY(v),z=attr.getZ(v);
-          const wave=1+.20*Math.sin(x*13+y*7+ids.indexOf(id)*.9)+.12*Math.cos(z*11-x*8+y*3);
+          const wave=1+.28*Math.sin(x*15+y*9+ids.indexOf(id)*.9)+.16*Math.cos(z*13-x*8+y*5);
           attr.setXYZ(v,x*wave,y*wave,z*wave);
         }
         geo.computeVertexNormals();
         const mat=new THREE.MeshStandardMaterial({color,emissive:new THREE.Color(color).multiplyScalar(.08),emissiveIntensity:.12,metalness:0,roughness:1,flatShading:true});
-        const mesh=new THREE.Mesh(geo,mat);mesh.position.copy(p);mesh.userData={kind:'sphere',id};mesh.scale.set(.92,.92,.92);worldGroup.add(mesh);
+        const mesh=new THREE.Mesh(geo,mat);mesh.position.copy(p);mesh.userData={kind:'sphere',id};mesh.scale.set(.92,.78,.72);worldGroup.add(mesh);
         // Unequal branching dendrites grow from the soma in several spatial directions.
         const twigs=[];
-        for(let k=0;k<9;k++){
+        for(let k=0;k<7;k++){
           const a=k*2.3999632297+ids.indexOf(id)*.43;
           const dir=new THREE.Vector3(Math.cos(a),Math.sin(a*.83),Math.sin(a*1.37+ids.indexOf(id))).normalize();
           const start=p.clone().addScaledVector(dir,.125);
-          const length=([1.02,.42,.68,.34,1.28,.51,.76,.38,.93][k]||.55);
+          const length=([1.34,.43,.72,.34,.96,.52,.39][k]||.5);
           const end=p.clone().addScaledVector(dir,length);
           const side=new THREE.Vector3(-dir.y,dir.x,Math.cos(a*1.7)).normalize();
           const mid=start.clone().lerp(end,.42+((k%3)-1)*.045).addScaledVector(side,.035*Math.sin(a*1.3)+.018*Math.cos(a*2.1));
           const twigCurve=new THREE.QuadraticBezierCurve3(start,mid,end);
           const twig=makeNeurite(twigCurve,color,.024,.88,18);twig.userData={kind:'dendrite',id};worldGroup.add(twig);twigs.push(twig);
-          if(k%2===0){
+          if(k!==3&&k%2===0){
             const forkStart=twigCurve.getPoint(.58),forkEnd=forkStart.clone().addScaledVector(side,.16+(k%3)*.035).addScaledVector(dir,.08);
             const forkCurve=new THREE.QuadraticBezierCurve3(forkStart,forkStart.clone().addScaledVector(side,.09),forkEnd);
             const fork=makeNeurite(forkCurve,color,.015,.82,14);fork.userData={kind:'dendrite',id};worldGroup.add(fork);twigs.push(fork);
           }
         }
-        const hitMesh=new THREE.Mesh(new THREE.SphereGeometry(.24,14,12),new THREE.MeshBasicMaterial({color,transparent:true,opacity:.0001,depthWrite:false}));hitMesh.position.copy(p);hitMesh.userData={kind:'sphere',id};worldGroup.add(hitMesh);
+        const hitMesh=new THREE.Mesh(new THREE.SphereGeometry(.21,14,12),new THREE.MeshBasicMaterial({color,transparent:true,opacity:.0001,depthWrite:false}));hitMesh.position.copy(p);hitMesh.userData={kind:'sphere',id};worldGroup.add(hitMesh);
 
         const label=makeLabel(labels[id].title,0xf5f7fa,25);label.position.set(p.x,p.y-.52,p.z+.08);label.scale.set(Math.min(3.45,Math.max(1.8,labels[id].title.length*.105)),.52,1);label.userData={kind:'label',id,labelText:labels[id].title};worldGroup.add(label);
         const node={id,mesh,hitMesh,label,base:p,color,twigs};points.push(node);
