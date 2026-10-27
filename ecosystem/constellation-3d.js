@@ -12,6 +12,24 @@ if(root){
   const focusPanel=document.createElement('div');focusPanel.className='webgl-focus';focusPanel.setAttribute('aria-live','polite');focusPanel.innerHTML='<span class="webgl-focus-kicker">SPATIAL INDEX · 08 WORLDS</span><strong>BA Labs</strong><small>Choisis un univers pour explorer ses connexions.</small>';
   const controls=document.createElement('div');controls.className='webgl-controls';controls.setAttribute('aria-label','Commandes de navigation 3D');controls.innerHTML='<button type="button" data-camera="out" aria-label="Dézoomer" title="Dézoomer">−</button><button type="button" data-camera="in" aria-label="Zoomer" title="Zoomer">+</button><button type="button" data-camera="reset" aria-label="Recentrer la constellation" title="Recentrer">⌖</button>';stage.append(hint,status,focusPanel,controls);root.append(stage);
   let renderer,scene,camera,raycaster,mouse,core,points=[],edges=[],stars,dragging=false,moved=false,lastX=0,lastY=0,theta=.25,phi=1.18,dist=10.2,selected=null,raf=0,worldGroup,hovered=null,transition=null,cameraTarget=new THREE.Vector3(),resourceGroup=null,resourceMeshes=[],resourceSignals=[],rotateVX=0,rotateVY=0,pointers=new Map(),pinchDistance=0;
+  const spatialUiCopy={
+    fr:{group:'Commandes de navigation 3D',out:'Dézoomer',in:'Zoomer',reset:'Recentrer la constellation'},
+    en:{group:'3D navigation controls',out:'Zoom out',in:'Zoom in',reset:'Reset constellation view'},
+    ar:{group:'أدوات التنقل ثلاثي الأبعاد',out:'تصغير',in:'تكبير',reset:'إعادة ضبط عرض الكوكبة'},
+    pt:{group:'Controlos de navegação 3D',out:'Diminuir zoom',in:'Aumentar zoom',reset:'Recentrar a constelação'}
+  };
+  const refreshSpatialUi=()=>{
+    const lang=document.documentElement.lang||'fr';
+    const copy=spatialUiCopy[lang]||spatialUiCopy.fr;
+    controls.setAttribute('aria-label',copy.group);
+    for(const button of controls.querySelectorAll('[data-camera]')){
+      const label=copy[button.dataset.camera];
+      if(label){button.setAttribute('aria-label',label);button.title=label;}
+    }
+    refreshFocus(selected);
+  };
+  new MutationObserver(refreshSpatialUi).observe(document.documentElement,{attributes:true,attributeFilter:['lang']});
+  refreshSpatialUi();
   const material=(color,emissive=color)=>new THREE.MeshStandardMaterial({color,emissive,emissiveIntensity:.62,metalness:.12,roughness:.3});
   // Tapered, softly shaded biological processes: broad at the origin and fine at the tip.
   // The taper is built into the mesh so branches read as living extensions, not hoses.
