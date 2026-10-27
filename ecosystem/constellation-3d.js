@@ -87,22 +87,59 @@ if(root){
         geo.computeVertexNormals();
         const mat=new THREE.MeshStandardMaterial({color,emissive:new THREE.Color(color).multiplyScalar(.08),emissiveIntensity:.12,metalness:0,roughness:1,flatShading:true});
         const mesh=new THREE.Mesh(geo,mat);mesh.position.copy(p);mesh.userData={kind:'sphere',id};mesh.scale.set(.92,.78,.72);worldGroup.add(mesh);
-        // Unequal branching dendrites grow from the soma in several spatial directions.
+        // Polarized neuronal morphology: one unmistakable axon plus an
+        // asymmetric dendritic crown. Avoid the radial "sea urchin" silhouette.
         const twigs=[];
-        for(let k=0;k<7;k++){
-          const a=k*2.3999632297+ids.indexOf(id)*.43;
-          const dir=new THREE.Vector3(Math.cos(a),Math.sin(a*.83),Math.sin(a*1.37+ids.indexOf(id))).normalize();
-          const start=p.clone().addScaledVector(dir,.125);
-          const length=([1.34,.43,.72,.34,.96,.52,.39][k]||.5);
+        const polarity=p.clone().normalize();
+        const axonDir=polarity.clone().add(new THREE.Vector3(Math.sin(ids.indexOf(id)*1.7)*.22,Math.cos(ids.indexOf(id)*1.1)*.16,Math.sin(ids.indexOf(id)*.83)*.2)).normalize();
+        const axonStart=p.clone().addScaledVector(axonDir,.105);
+        const axonEnd=p.clone().addScaledVector(axonDir,1.18+((ids.indexOf(id)%3)*.13));
+        const axonSide=new THREE.Vector3().crossVectors(axonDir,new THREE.Vector3(.31,.87,.43)).normalize();
+        const axonMid=axonStart.clone().lerp(axonEnd,.52).addScaledVector(axonSide,.10);
+        const axonCurve=new THREE.QuadraticBezierCurve3(axonStart,axonMid,axonEnd);
+        const axon=makeNeurite(axonCurve,color,.019,.92,30);
+        axon.userData={kind:'dendrite',id,process:'axon'};worldGroup.add(axon);twigs.push(axon);
+        // Terminal axon collaterals branch only near the far end.
+        for(let b=0;b<2;b++){
+          const u=.76+b*.12,anchor=axonCurve.getPoint(u),tangent=axonCurve.getTangent(u);
+          const side=new THREE.Vector3().crossVectors(tangent,axonSide).normalize().multiplyScalar(b===0?1:-1);
+          const tip=anchor.clone().addScaledVector(side,.18).addScaledVector(tangent,.13);
+          const collateral=new THREE.QuadraticBezierCurve3(anchor,anchor.clone().addScaledVector(side,.10),tip);
+          const branchMesh=makeNeurite(collateral,color,.010,.78,14);
+          branchMesh.userData={kind:'dendrite',id,process:'axon-collateral'};worldGroup.add(branchMesh);twigs.push(branchMesh);
+        }
+        // Dendrites emerge mainly from the side facing back toward the network,
+        // with varied lengths and two-level bifurcation rather than a symmetric halo.
+        const dendriteDirs=[
+          polarity.clone().negate().addScaledVector(axonSide,.78).add(new THREE.Vector3(.04,.12,-.08)).normalize(),
+          polarity.clone().negate().addScaledVector(axonSide,-.66).add(new THREE.Vector3(-.12,.03,.11)).normalize(),
+          axonSide.clone().addScaledVector(polarity,-.28).normalize(),
+          axonSide.clone().negate().addScaledVector(polarity,-.18).normalize()
+        ];
+        for(let k=0;k<dendriteDirs.length;k++){
+          const dir=dendriteDirs[k];
+          const start=p.clone().addScaledVector(dir,.105);
+          const length=[.46,.61,.38,.52][k]+((ids.indexOf(id)+k)%3)*.045;
           const end=p.clone().addScaledVector(dir,length);
-          const side=new THREE.Vector3(-dir.y,dir.x,Math.cos(a*1.7)).normalize();
-          const mid=start.clone().lerp(end,.42+((k%3)-1)*.045).addScaledVector(side,.035*Math.sin(a*1.3)+.018*Math.cos(a*2.1));
-          const twigCurve=new THREE.QuadraticBezierCurve3(start,mid,end);
-          const twig=makeNeurite(twigCurve,color,.024,.88,18);twig.userData={kind:'dendrite',id};worldGroup.add(twig);twigs.push(twig);
-          if(k!==3&&k%2===0){
-            const forkStart=twigCurve.getPoint(.58),forkEnd=forkStart.clone().addScaledVector(side,.16+(k%3)*.035).addScaledVector(dir,.08);
-            const forkCurve=new THREE.QuadraticBezierCurve3(forkStart,forkStart.clone().addScaledVector(side,.09),forkEnd);
-            const fork=makeNeurite(forkCurve,color,.015,.82,14);fork.userData={kind:'dendrite',id};worldGroup.add(fork);twigs.push(fork);
+          const side=new THREE.Vector3().crossVectors(dir,polarity).normalize();
+          const mid=start.clone().lerp(end,.46).addScaledVector(side,(k%2?-.11:.12));
+          const curve=new THREE.QuadraticBezierCurve3(start,mid,end);
+          const dendrite=makeNeurite(curve,color,.022,.88,20);
+          dendrite.userData={kind:'dendrite',id,process:'dendrite'};worldGroup.add(dendrite);twigs.push(dendrite);
+          for(let forkIndex=0;forkIndex<2;forkIndex++){
+            const u=forkIndex===0?.58:.78,junction=curve.getPoint(u),tangent=curve.getTangent(u);
+            const sign=forkIndex===0?1:-1;
+            const forkSide=side.clone().multiplyScalar(sign*(k%2?-1:1));
+            const tip=junction.clone().addScaledVector(forkSide,.17+((k+forkIndex)%2)*.045).addScaledVector(tangent,.09);
+            const forkCurve=new THREE.QuadraticBezierCurve3(junction,junction.clone().addScaledVector(forkSide,.09).addScaledVector(tangent,.035),tip);
+            const fork=makeNeurite(forkCurve,color,.012,.82,15);
+            fork.userData={kind:'dendrite',id,process:'dendritic-branch'};worldGroup.add(fork);twigs.push(fork);
+            if(forkIndex===0){
+              const terminal=tip.clone().addScaledVector(forkSide,.075).addScaledVector(tangent,.04);
+              const fineCurve=new THREE.QuadraticBezierCurve3(tip,tip.clone().addScaledVector(forkSide,.04),terminal);
+              const fine=makeNeurite(fineCurve,color,.007,.66,10);
+              fine.userData={kind:'dendrite',id,process:'terminal-dendrite'};worldGroup.add(fine);twigs.push(fine);
+            }
           }
         }
         const hitMesh=new THREE.Mesh(new THREE.SphereGeometry(.21,14,12),new THREE.MeshBasicMaterial({color,transparent:true,opacity:.0001,depthWrite:false}));hitMesh.position.copy(p);hitMesh.userData={kind:'sphere',id};worldGroup.add(hitMesh);
