@@ -3,6 +3,15 @@ import { readFile } from "node:fs/promises";
 import vm from "node:vm";
 
 const source = await readFile(new URL("../batch-tracker/domain-engine.js", import.meta.url), "utf8");
+const trackerSource = await readFile(new URL("../batch-tracker/tracker.js", import.meta.url), "utf8");
+assert.match(trackerSource, /agronomy:\s*\{\s*cultureTitle: "Nouvelle culture agronomique"/,
+  "Green Tech must use agronomy-specific culture entry labels");
+assert.match(trackerSource, /mycology:\s*\{\s*cultureTitle: "Nouvelle culture fongique"/,
+  "Mycology must use mycology-specific culture entry labels");
+assert.match(trackerSource, /laboratory:\s*\{\s*cultureTitle: "Nouvelle culture de laboratoire"/,
+  "Laboratory must use laboratory-specific culture entry labels");
+assert.match(trackerSource, /if \(cultureEntryTitle\) cultureEntryTitle\.textContent = entryLabels\.cultureTitle;/,
+  "workspace labels must be selected from the active domain configuration");
 const window = {};
 vm.runInNewContext(source, { window });
 
