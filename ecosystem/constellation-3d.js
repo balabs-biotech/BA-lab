@@ -255,9 +255,56 @@ if(root){
     );
     const matchedDomains=meta=>ids.filter(other=>other!==id&&
       normalizedDomainTerms[other].some(term=>meta.text.some(word=>matchesDomainTerm(word,term))));
-    for(const node of nodes){for(const otherId of matchedDomains(node.meta)){const target=points.find(p=>p.id===otherId);if(!target)continue;const delta=target.base.clone().sub(node.p),axis=new THREE.Vector3().crossVectors(delta,new THREE.Vector3(.31,.87,.43)).normalize();const mid=node.p.clone().lerp(target.base,.5).addScaledVector(axis,.16);const curve=new THREE.QuadraticBezierCurve3(node.p,mid,target.base);const targetColor=target.color;const bridge=makeNeurite(curve,targetColor,.008,.36,20);bridge.userData={kind:'resource-domain-link',id:otherId,resource:node.meta.titleClean};resourceGroup.add(bridge);const pulse=new THREE.Mesh(new THREE.SphereGeometry(.019,10,8),new THREE.MeshBasicMaterial({color:0xe1f4d9,transparent:true,opacity:.9,depthWrite:false,toneMapped:false}));pulse.userData.kind='resource-signal';resourceGroup.add(pulse);resourceSignals.push({mesh:pulse,curve,offset:(nodes.indexOf(node)+ids.indexOf(otherId))*.113,speed:.105+(ids.indexOf(otherId)%3)*.018})}}
-    // Cross-connect only resources whose titles, descriptions or URL paths share a meaningful term.
-    const linked=new Set();for(let i=0;i<nodes.length;i++)for(let j=i+1;j<nodes.length;j++){const a=nodes[i],b=nodes[j],shared=[...new Set(a.meta.text.filter(w=>b.meta.text.includes(w)))];const pathA=a.meta.url.pathname.split('/').filter(Boolean).slice(0,-1).join('/'),pathB=b.meta.url.pathname.split('/').filter(Boolean).slice(0,-1).join('/');const samePath=!!pathA&&pathA===pathB&&a.meta.url.origin===b.meta.url.origin;if(!shared.length&&!samePath)continue;const key=i+':'+j;if(linked.has(key))continue;linked.add(key);const delta=b.p.clone().sub(a.p),axis=new THREE.Vector3().crossVectors(delta,new THREE.Vector3(.31,.87,.43)).normalize();const mid=a.p.clone().lerp(b.p,.5).addScaledVector(axis,.12+(j-i)*.012);const curve=new THREE.QuadraticBezierCurve3(a.p,mid,b.p);const line=makeNeurite(curve,color,.009,.46,18);line.userData={kind:'resource-relation',id,a:a.mesh.userData.title,b:b.mesh.userData.title};resourceGroup.add(line);const pulse=new THREE.Mesh(new THREE.SphereGeometry(.022,10,8),new THREE.MeshBasicMaterial({color:0xe1f4d9,transparent:true,opacity:.9,depthWrite:false,toneMapped:false}));pulse.userData.kind='resource-signal';resourceGroup.add(pulse);resourceSignals.push({mesh:pulse,curve,offset:(i+j)*.137,speed:.12+((i+j)%3)*.018})}
+    // Rank bridges by evidence and cap each resource's degree to preserve readable topology.
+    // A page may connect to at most two other domains; specific multi-word stems outrank broad matches.
+    for(const node of nodes){
+      const ranked=matchedDomains(node.meta).map(otherId=>{
+        const terms=normalizedDomainTerms[otherId];
+        const score=terms.reduce((sum,term)=>sum+(node.meta.text.some(word=>word===term)?3:node.meta.text.some(word=>matchesDomainTerm(word,term))?1:0),0);
+        return {otherId,score};
+      }).filter(item=>item.score>0).sort((a,b)=>b.score-a.score||ids.indexOf(a.otherId)-ids.indexOf(b.otherId)).slice(0,2);
+      for(const {otherId} of ranked){
+        const target=points.find(p=>p.id===otherId);if(!target)continue;
+        const delta=target.base.clone().sub(node.p),axis=new THREE.Vector3().crossVectors(delta,new THREE.Vector3(.31,.87,.43)).normalize();
+        const mid=node.p.clone().lerp(target.base,.5).addScaledVector(axis,.16);
+        const curve=new THREE.QuadraticBezierCurve3(node.p,mid,target.base);
+        const bridge=makeNeurite(curve,target.color,.008,.36,20);
+        bridge.userData={kind:'resource-domain-link',id:otherId,resource:node.meta.titleClean};resourceGroup.add(bridge);
+        const pulse=new THREE.Mesh(new THREE.SphereGeometry(.019,10,8),new THREE.MeshBasicMaterial({color:0xe1f4d9,transparent:true,opacity:.9,depthWrite:false,toneMapped:false}));
+        pulse.userData.kind='resource-signal';resourceGroup.add(pulse);
+        resourceSignals.push({mesh:pulse,curve,offset:(nodes.indexOf(node)+ids.indexOf(otherId))*.113,speed:.105+(ids.indexOf(otherId)%3)*.018});
+      }
+    }
+    // Score resource-to-resource links using distinctive shared terms, not generic vocabulary.
+    const genericResourceTerms=new Set(['culture','cultures','projet','projets','project','projects','essai','essais','trial','trials','test','tests','guide','guides','fiche','fiches','ressource','ressources','resource','resources','produit','produits','product','products','laboratoire','laboratory','documentation','application','applications','development','developpement','recherche','research','public','notion','catalogue','catalog']);
+    const candidates=[];
+    for(let i=0;i<nodes.length;i++)for(let j=i+1;j<nodes.length;j++){
+      const a=nodes[i],b=nodes[j];
+      const shared=[...new Set(a.meta.text.filter(w=>b.meta.text.includes(w)&&w.length>=5&&!genericResourceTerms.has(w)))];
+      const pathA=a.meta.url.pathname.split('/').filter(Boolean).slice(0,-1).join('/');
+      const pathB=b.meta.url.pathname.split('/').filter(Boolean).slice(0,-1).join('/');
+      const samePath=!!pathA&&pathA===pathB&&a.meta.url.origin===b.meta.url.origin;
+      const score=shared.reduce((sum,w)=>sum+Math.min(w.length,12),0)+(samePath?5:0);
+      if(score>0)candidates.push({i,j,score});
+    }
+    candidates.sort((a,b)=>b.score-a.score||a.i-b.i||a.j-b.j);
+    const resourceDegree=nodes.map(()=>0),maxResourceLinks=Math.min(nodes.length,Math.ceil(nodes.length*1.25));
+    let resourceLinkCount=0;
+    for(const candidate of candidates){
+      const {i,j}=candidate;
+      if(resourceDegree[i]>=3||resourceDegree[j]>=3)continue;
+      if(resourceLinkCount>=maxResourceLinks)break;
+      const a=nodes[i],b=nodes[j],delta=b.p.clone().sub(a.p);
+      const axis=new THREE.Vector3().crossVectors(delta,new THREE.Vector3(.31,.87,.43)).normalize();
+      const mid=a.p.clone().lerp(b.p,.5).addScaledVector(axis,.12+((j-i)%4)*.012);
+      const curve=new THREE.QuadraticBezierCurve3(a.p,mid,b.p);
+      const line=makeNeurite(curve,color,.009,.46,18);
+      line.userData={kind:'resource-relation',id,a:a.mesh.userData.title,b:b.mesh.userData.title};resourceGroup.add(line);
+      const pulse=new THREE.Mesh(new THREE.SphereGeometry(.022,10,8),new THREE.MeshBasicMaterial({color:0xe1f4d9,transparent:true,opacity:.9,depthWrite:false,toneMapped:false}));
+      pulse.userData.kind='resource-signal';resourceGroup.add(pulse);
+      resourceSignals.push({mesh:pulse,curve,offset:(i+j)*.137,speed:.12+((i+j)%3)*.018});
+      resourceDegree[i]++;resourceDegree[j]++;resourceLinkCount++;
+    }
   }
   function refreshLabels(){for(const p of points){const el=document.querySelector('[data-sphere="'+p.id+'"]');if(!el)continue;const next=el.querySelector('b')?.textContent||p.id;if(p.label.userData.labelText===next)continue;p.label.userData.labelText=next;const old=p.label.material.map;const replacement=makeLabel(next,0xf5f7fa,27);p.label.material.map=replacement.material.map;p.label.scale.set(Math.min(3.45,Math.max(1.8,next.length*.105)),.52,1);p.label.material.needsUpdate=true;old?.dispose();replacement.material.dispose()}}
   function bind(){
