@@ -710,6 +710,18 @@
     setLanguage(preferred);
     const observer = new MutationObserver(records => {
       for (const record of records) {
+        if (record.type === "characterData") {
+          const node = record.target;
+          if (!sourceText.has(node)) sourceText.set(node, node.nodeValue);
+          const previous = sourceText.get(node);
+          const current = node.nodeValue;
+          if (current === translate(previous, currentLanguage)) continue;
+          sourceText.set(node, current);
+          const result = translate(current, currentLanguage);
+          if (current !== result) node.nodeValue = result;
+          continue;
+        }
+
         if (record.type === "childList") {
           record.addedNodes.forEach(node => {
             if (node.nodeType === Node.TEXT_NODE) {
@@ -744,6 +756,7 @@
     observer.observe(document.getElementById("workspace-root") || document.body, {
       subtree: true,
       childList: true,
+      characterData: true,
       attributes: true,
       attributeFilter: ["placeholder", "title", "aria-label"]
     });
