@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#11171b">
-<meta name="description" content="Explorez les sphères de l’écosystème BALabs et accédez directement aux ressources publiques Notion.">
-<title>BALabs — Univers des sphères</title>
+<meta name="description" content="Explorez le réseau vivant de BALabs : biotechnologies, mycologie, TechnoSoil, R&D et applications connectées aux ressources publiques.">
+<title>BALabs — Réseau vivant</title>
 <style>
 :root{color-scheme:dark;--bg:#11171b;--panel:#1b2428;--ink:#edf0ed;--muted:#aebbb8;--line:#344448;--lime:#a9c5a3;--bio:#9fbea1;--myco:#9c91bd;--soil:#bd936b;--lab:#829fba;--products:#c18b76;--iot:#9eabb7;--work:#9b8fa7;--learn:#b4b9a0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}
 *{box-sizing:border-box}[hidden]{display:none!important}html{background:var(--bg);scroll-behavior:smooth}body{margin:0;min-height:100vh;color:var(--ink);background:radial-gradient(ellipse at 50% 8%,#20282b 0%,#141a1e 42%,#0d1115 100%)}button,a{font:inherit}button{color:inherit}.wrap{max-width:1450px;margin:auto;padding:18px clamp(12px,3vw,38px) 28px}.top{display:flex;align-items:center;justify-content:space-between;gap:16px;border-bottom:1px solid #2b4030;padding-bottom:15px}.brand{display:flex;align-items:center;gap:11px}.mark{width:42px;height:42px;border:1px solid #769760;border-radius:14px;display:grid;place-items:center;color:var(--lime);font-size:21px;font-weight:900;background:linear-gradient(145deg,#2c3a34,#101a12);box-shadow:0 0 26px #a9c5a315}.brand strong{letter-spacing:.18em;font-size:12px}.brand small{display:block;color:#9caf9e;font-size:9px;letter-spacing:.15em;margin-top:4px}.tools{display:flex;align-items:center;justify-content:flex-end;gap:7px;flex-wrap:wrap}.lang{border:1px solid #344a37;border-radius:9px;padding:7px 9px;background:#20282a;font-size:11px;cursor:pointer}.lang[aria-pressed=true]{background:var(--lime);color:#152019;border-color:var(--lime)}.lang:focus-visible,.btn:focus-visible,.sphere:focus-visible,.linknode:focus-visible{outline:2px solid var(--lime);outline-offset:3px}
@@ -59,6 +59,20 @@
 .sphere:hover,.sphere.active{box-shadow:inset -12px -15px 25px #0007,0 0 0 5px color-mix(in srgb,var(--c) 12%,transparent),0 0 34px color-mix(in srgb,var(--c) 20%,transparent)}
 @media(max-width:760px){.sphere b{font-size:12px}.sphere small{font-size:9px}.sphere .idx{font-size:9px}}
 @media(max-width:370px){.sphere b{font-size:11px}.sphere small{font-size:8px}}
+
+/* BALabs neural-network redesign: remove every inherited celestial/planetary cue. */
+.scene{background:linear-gradient(135deg,#101916 0%,#121a1d 48%,#101519 100%);border-color:#354a3b;box-shadow:0 24px 70px #0005}
+.scene:before,.galaxy,.galaxy:before,.galaxy:after{display:none!important}
+.cluster-key{background:#121a17;border-color:#263a2e}
+.cluster-item i{box-shadow:0 0 10px currentColor}
+#mainView.webgl-ready{background:radial-gradient(ellipse at 50% 46%,#1b2821 0%,#121a18 52%,#101519 100%);min-height:690px}
+#mainView.webgl-ready .hub,#mainView.webgl-ready .galaxy,#mainView.webgl-ready>.network{display:none!important}
+#mainView .webgl-stage canvas{position:relative;z-index:1}
+#mainView .webgl-stage .webgl-status{letter-spacing:.18em;color:#90b89a}
+.hero{padding-top:clamp(24px,3vw,34px);padding-bottom:18px}
+h1{max-width:850px}
+.aside{border-color:#405c45}
+@media(max-width:760px){#mainView.webgl-ready{min-height:620px}.hero{padding-top:24px}.cluster-key{gap:8px}}
 </style>
 <style>
 #mainView .webgl-focus-next{margin-top:5px;color:#829b80;font:600 9px/1.4 system-ui,sans-serif;letter-spacing:.09em;text-transform:uppercase}
