@@ -258,6 +258,29 @@ if(root){
     };
     // Normalize dictionary entries exactly like resource tokens. Short words (e.g. "sol",
     // "eau", "kit") only match as complete tokens; longer stems may match inflections.
+    // Match multi-word scientific concepts as adjacent tokens, not concatenated strings.
+    const domainPhrases={
+      bio:['applied biotechnology','biotechnologie appliquee','biotecnologia aplicada','التقنية الحيوية','تقنية حيوية','أحياء دقيقة','microbial biotechnology'],
+      myco:['liquid culture','culture liquide','cultura liquida','tissue culture','culture cellulaire','mycelial growth','croissance mycelienne','نمو فطري','غزل فطري'],
+      soil:['soil amendment','amelioration du sol','mejoramiento del suelo','water retention','retention eau','احتفاظ بالماء','تحسين التربة','agriculture regenerative'],
+      lab:['research protocol','protocole de recherche','protocolo de pesquisa','experimental design','plan experimental','تصميم تجريبي','تحليل مخبري'],
+      products:['culture kit','kit de culture','kit de cultivo','sterile syringe','seringue sterile','emballage produit','تغليف المنتجات'],
+      iot:['smart sensor','capteur intelligent','sensor inteligente','remote monitoring','surveillance a distance','مراقبة عن بعد','internet of things'],
+      work:['proof of concept','prototype experimental','prototipo experimental','applied research','recherche appliquee','بحث تطبيقي','نموذج اولي'],
+      learn:['learning resource','ressource pedagogique','recurso educativo','training module','module de formation','وحدة تعليمية','تعلم تطبيقي']
+    };
+    const normalizeWords=value=>value.toLocaleLowerCase().normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').replace(/[\\u064B-\\u065F\\u0670\\u0640]/g,'').split(/[^\\p{L}\\p{N}]+/u).filter(Boolean);
+    const normalizedDomainPhrases=Object.fromEntries(ids.map(domain=>[
+      domain,domainPhrases[domain].map(normalizeWords).filter(parts=>parts.length>1)
+    ]));
+    const matchesPhrase=(words,phrase)=>{
+      for(let i=0;i<=words.length-phrase.length;i++){
+        let matched=true;
+        for(let j=0;j<phrase.length;j++)if(words[i+j]!==phrase[j]){matched=false;break;}
+        if(matched)return true;
+      }
+      return false;
+    };
     const normalizeToken=value=>value.toLocaleLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[\u064B-\u065F\u0670\u0640]/g,'').replace(/[^\p{L}\p{N}]+/gu,'');
     const normalizedDomainTerms=Object.fromEntries(ids.map(domain=>[
       domain,domainTerms[domain].map(normalizeToken).filter(Boolean)
@@ -266,14 +289,18 @@ if(root){
       term.length>=5&&word.length>=term.length-1&&
       (word.startsWith(term)||term.startsWith(word))
     );
-    const matchedDomains=meta=>ids.filter(other=>other!==id&&
-      normalizedDomainTerms[other].some(term=>meta.text.some(word=>matchesDomainTerm(word,term))));
+    const matchedDomains=meta=>ids.filter(other=>other!==id&&(
+      normalizedDomainTerms[other].some(term=>meta.text.some(word=>matchesDomainTerm(word,term)))||
+      normalizedDomainPhrases[other].some(phrase=>matchesPhrase(meta.text,phrase))
+    ));
     // Rank bridges by evidence and cap each resource's degree to preserve readable topology.
     // A page may connect to at most two other domains; specific multi-word stems outrank broad matches.
     for(const node of nodes){
       const ranked=matchedDomains(node.meta).map(otherId=>{
         const terms=normalizedDomainTerms[otherId];
-        const score=terms.reduce((sum,term)=>sum+(node.meta.text.some(word=>word===term)?3:node.meta.text.some(word=>matchesDomainTerm(word,term))?1:0),0);
+        const exactTerms=terms.reduce((sum,term)=>sum+(node.meta.text.some(word=>word===term)?3:node.meta.text.some(word=>matchesDomainTerm(word,term))?1:0),0);
+        const phraseScore=normalizedDomainPhrases[otherId].reduce((sum,phrase)=>sum+(matchesPhrase(node.meta.text,phrase)?4:0),0);
+        const score=exactTerms+phraseScore;
         return {otherId,score};
       }).filter(item=>item.score>0).sort((a,b)=>b.score-a.score||ids.indexOf(a.otherId)-ids.indexOf(b.otherId)).slice(0,2);
       for(const {otherId} of ranked){
