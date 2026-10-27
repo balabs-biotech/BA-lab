@@ -175,7 +175,7 @@ if(root){
         const mid=pa.base.clone().lerp(pb.base,.5).addScaledVector(axis,bend);
         const curve=new THREE.QuadraticBezierCurve3(pa.base,mid,pb.base);
         const signalColor=new THREE.Color(colors[a]).lerp(new THREE.Color(colors[b]),.5);
-        const line=makeNeurite(curve,signalColor,.026,.86,48);
+        const line=makeNeurite(curve,signalColor,.032,.94,56);
         line.material.emissive.copy(signalColor).multiplyScalar(.22);line.material.emissiveIntensity=.32;
         line.userData={kind:'relation',a,b};worldGroup.add(line);
         // Cross-links branch like mycelial cords / axonal collaterals instead of
@@ -190,7 +190,7 @@ if(root){
           mycelialTips.push({point:tip.clone(),a,b,branch});
           const control=anchor.clone().addScaledVector(side,reach*.55).addScaledVector(tangent,.035*Math.sin(seed));
           const offshoot=new THREE.QuadraticBezierCurve3(anchor,control,tip);
-          const twig=makeNeurite(offshoot,signalColor,.011,.66,18);
+          const twig=makeNeurite(offshoot,signalColor,.013,.76,20);
           twig.material.emissive.copy(signalColor).multiplyScalar(.18);twig.material.emissiveIntensity=.28;
           twig.userData={kind:'dendrite',id:a,relation:true,a,b};worldGroup.add(twig);
           if(branch===0){
@@ -198,8 +198,8 @@ if(root){
             junction.position.copy(tip);junction.userData={kind:'synapse',id:a,relation:true,a,b};worldGroup.add(junction);
           }
         }
-        const pulse=new THREE.Mesh(new THREE.SphereGeometry(.022,10,8),new THREE.MeshBasicMaterial({color:signalColor,transparent:true,opacity:.82,depthWrite:false,toneMapped:false}));pulse.userData={kind:'relation-signal',a,b};worldGroup.add(pulse);
-        const pulse2=new THREE.Mesh(new THREE.SphereGeometry(.014,8,6),new THREE.MeshBasicMaterial({color:signalColor,transparent:true,opacity:.58,depthWrite:false,toneMapped:false}));pulse2.userData={kind:'relation-signal',a,b,trail:true};worldGroup.add(pulse2);
+        const pulse=new THREE.Mesh(new THREE.SphereGeometry(.026,12,10),new THREE.MeshBasicMaterial({color:signalColor,transparent:true,opacity:.9,depthWrite:false,toneMapped:false}));pulse.userData={kind:'relation-signal',a,b};worldGroup.add(pulse);
+        const pulse2=new THREE.Mesh(new THREE.SphereGeometry(.018,10,8),new THREE.MeshBasicMaterial({color:signalColor,transparent:true,opacity:.68,depthWrite:false,toneMapped:false}));pulse2.userData={kind:'relation-signal',a,b,trail:true};worldGroup.add(pulse2);
         edges.push({line,id:a,relation:true,aId:a,bId:b,a:pa.base.clone(),b:pb.base.clone(),pulse,pulse2,curve,phase:(ids.indexOf(a)+ids.indexOf(b))*.071})}
       // Turn nearby collateral tips from separate cross-links into shared
       // anastomoses. This is the key visual difference between a set of chords
