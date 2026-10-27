@@ -8,6 +8,8 @@ for (const required of [
   "function translate(value, lang)",
   "function translateTree(root = document)",
   "attributes: true",
+  "characterData: true",
+  'record.type === "characterData"',
   'attributeFilter: ["placeholder", "title", "aria-label"]',
   "const prefix = normalize(key)",
   "if (root.nodeType === 1) elements.push(root)",
