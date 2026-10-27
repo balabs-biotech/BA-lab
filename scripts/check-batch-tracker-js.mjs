@@ -236,7 +236,7 @@ if(!refreshBlock.includes("revision = authStateRevision")||!refreshBlock.include
 if(!engine.includes("let initializationWarnings = [];")||!engine.includes('initializationWarnings.push("unités")')||!engine.includes('initializationWarnings.push("registre végétal")')||!engine.includes("Chargement partiel"))throw new Error("Partial data-load failures must be reported to the user");
 console.log("✓ Auth refreshes are revision-checked and optional data-load failures are surfaced as partial-load warnings");
 
-if(!refreshBlock.includes("catch (error)")||!refreshBlock.includes("Session non vérifiable.")||!refreshBlock.includes("Impossible de vérifier votre session.")||!refreshBlock.includes("Vos données ne sont pas supprimées.")||!refreshBlock.includes("hideElement(trackerCard)"))throw new Error("Auth session verification failures must fail closed and explain the recovery action");
+if(!refreshBlock.includes("catch (error)")||!refreshBlock.includes("getSessionVerificationGuidance(error)")||!refreshBlock.includes("guidance.status")||!refreshBlock.includes("guidance.message")||!refreshBlock.includes("hideElement(trackerCard)")||!engine.includes("function getSessionVerificationGuidance(error)")||!engine.includes("Session expirée ou invalide.")||!engine.includes("Connexion temporairement indisponible.")||!engine.includes("Vos données enregistrées ne sont pas supprimées."))throw new Error("Auth session verification failures must fail closed and provide classified recovery guidance");
 console.log("✓ Unverifiable sessions hide protected workspace content and show a recovery message without claiming data loss");
 
 for (const [fn, button, label] of [
