@@ -4494,6 +4494,10 @@ supabaseClient.auth.onAuthStateChange(
     session
   ) => {
 
+    // init() explicitly verifies the initial session; handling INITIAL_SESSION here
+    // would start a second, competing reconciliation during page startup.
+    if (event === "INITIAL_SESSION") return;
+
     authStateRevision += 1;
     const revision = authStateRevision;
 
