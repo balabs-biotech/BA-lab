@@ -304,7 +304,7 @@ if(root){
       return false;
     };
     const normalizeToken=value=>value.toLocaleLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[\u064B-\u065F\u0670\u0640]/g,'').replace(/[^\p{L}\p{N}]+/gu,'');
-    const broadDomainTerms=new Set(['culture','cultures','substrat','substrats','test','tests','product','products','produit','produits','kit','kits','catalogue','catalog','soil','sol','water','eau','lab','laboratoire','laboratory','research','recherche','learn','education','formation','iot','digital','project','projet','projets','guide','guides']);
+    const broadDomainTerms=new Set(['culture','cultures','substrat','substrats','test','tests','product','products','produit','produits','kit','kits','catalogue','catalog','project','projects','projet','projets','guide','guides']);
     const normalizedBroadDomainTerms=new Set([...broadDomainTerms].map(normalizeToken));
     const normalizedDomainTerms=Object.fromEntries(ids.map(domain=>[
       domain,domainTerms[domain].map(normalizeToken).filter(term=>term&&!normalizedBroadDomainTerms.has(term))
