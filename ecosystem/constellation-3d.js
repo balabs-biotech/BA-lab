@@ -18,7 +18,7 @@ if(root){
     ctx.clearRect(0,0,512,128);ctx.font='800 '+size+'px system-ui, sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';
     const label=text.slice(0,34);ctx.lineJoin='round';ctx.lineWidth=8;ctx.strokeStyle='rgba(7,12,16,.96)';ctx.strokeText(label,256,64,490);ctx.shadowColor='rgba(0,0,0,.95)';ctx.shadowBlur=14;ctx.shadowOffsetY=2;ctx.fillStyle='#f5f7fa';ctx.fillText(label,256,64,490);
     const tex=new THREE.CanvasTexture(cv);tex.colorSpace=THREE.SRGBColorSpace;
-    const spr=new THREE.Sprite(new THREE.SpriteMaterial({map:tex,transparent:true,depthWrite:false}));spr.scale.set(2.5,.62,1);return spr;
+    const spr=new THREE.Sprite(new THREE.SpriteMaterial({map:tex,transparent:true,depthWrite:false,depthTest:false}));spr.scale.set(2.5,.62,1);spr.renderOrder=20;return spr;
   };
   function init(){
     try{
@@ -40,14 +40,14 @@ if(root){
       const liquidMat=new THREE.ShaderMaterial({uniforms:liquidUniforms,vertexShader:`varying vec3 vN; varying vec3 vP; varying vec3 vV; void main(){vec4 mv=modelViewMatrix*vec4(position,1.0);vN=normalize(normalMatrix*normal);vP=position;vV=normalize(-mv.xyz);gl_Position=projectionMatrix*mv;}`,fragmentShader:`uniform float time;uniform vec3 blue;uniform vec3 green;uniform vec3 orange;varying vec3 vN;varying vec3 vP;varying vec3 vV;void main(){vec3 p=normalize(vP);float flow=sin(p.x*3.8+p.y*2.4+time*.65)+cos(p.z*4.2-p.x*2.2-time*.42);float blend=smoothstep(-1.15,1.15,flow);vec3 c=mix(blue,green,blend);float warm=smoothstep(.15,1.25,sin(p.y*4.0-p.z*2.8+time*.5));c=mix(c,orange,warm*.72);float bands=0.5+0.5*sin(p.x*8.0+p.y*5.0-p.z*6.0+time*.8);c=mix(c,green,bands*.12);float fres=pow(1.0-max(dot(normalize(vN),normalize(vV)),0.0),2.2);float spec=pow(max(dot(reflect(-normalize(vec3(.35,.7,1.0)),normalize(vN)),normalize(vV)),0.0),18.0);c+=vec3(.45,.72,.95)*fres*.75+vec3(1.0)*spec*.65;gl_FragColor=vec4(c,0.78+fres*.2);}` ,transparent:true,depthWrite:false,side:THREE.DoubleSide});
       liquidShell=new THREE.Mesh(new THREE.SphereGeometry(.665,96,64),liquidMat);liquidShell.userData.kind='liquid-shell';scene.add(liquidShell);
       const halo=new THREE.Mesh(new THREE.TorusGeometry(.86,.012,8,120),new THREE.MeshBasicMaterial({color:0x6ebedb,transparent:true,opacity:.35}));halo.rotation.set(.8,.3,.2);core.add(halo);
-      const coreLabel=makeLabel('BALabs',0xf5f7fa,40);coreLabel.position.set(0,-.86,0);coreLabel.scale.set(1.8,.45,1);core.add(coreLabel);
+      const coreLabel=makeLabel('BALabs',0xf5f7fa,40);coreLabel.position.set(0,-.92,.28);coreLabel.scale.set(1.8,.45,1);core.add(coreLabel);
       const pos={bio:[0,3.05,0],myco:[-2.55,1.8,1.1],soil:[2.6,1.65,-.7],lab:[-3.15,-.55,-.5],products:[3.1,-.4,1],iot:[-2.15,-2.2,1.15],work:[2.2,-2.2,-.7],learn:[.15,-3.1,0]};
       for(const id of ids){
         const color=colors[id],p=new THREE.Vector3(...pos[id]).multiplyScalar(1.16);
         const geo=new THREE.IcosahedronGeometry(.47,3),mat=material(color,new THREE.Color(color).multiplyScalar(.5));
         const mesh=new THREE.Mesh(geo,mat);mesh.position.copy(p);mesh.userData={kind:'sphere',id};mesh.scale.setScalar(1);worldGroup.add(mesh);
         const wire=new THREE.Mesh(new THREE.IcosahedronGeometry(.505,1),new THREE.MeshBasicMaterial({color,wireframe:true,transparent:true,opacity:.38}));wire.position.copy(p);wire.userData.kind='wire';worldGroup.add(wire);
-        const label=makeLabel(labels[id].title,0xf5f7fa,27);label.position.set(p.x,p.y-.72,p.z);label.scale.set(2.8,.58,1);label.userData={kind:'label',id,labelText:labels[id].title};worldGroup.add(label);
+        const label=makeLabel(labels[id].title,0xf5f7fa,27);label.position.set(p.x,p.y-.82,p.z+.18);label.scale.set(2.8,.58,1);label.userData={kind:'label',id,labelText:labels[id].title};worldGroup.add(label);
         const node={id,mesh,wire,label,base:p,color};points.push(node);
         const edgeMat=new THREE.LineBasicMaterial({color,transparent:true,opacity:.25});
         const geom=new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0,0,0),p]);
