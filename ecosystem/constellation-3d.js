@@ -258,7 +258,7 @@ if(root){
     };
     // Normalize dictionary entries exactly like resource tokens. Short words (e.g. "sol",
     // "eau", "kit") only match as complete tokens; longer stems may match inflections.
-    const normalizeToken=value=>value.toLocaleLowerCase().normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').replace(/[^a-z0-9]+/g,'');
+    const normalizeToken=value=>value.toLocaleLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'');
     const normalizedDomainTerms=Object.fromEntries(ids.map(domain=>[
       domain,domainTerms[domain].map(normalizeToken).filter(Boolean)
     ]));
