@@ -36,4 +36,16 @@ assert.match(
   "the existing final stale-session reconciliation must remain",
 );
 
+const finallyStart = initializer.lastIndexOf("finally {");
+assert.ok(finallyStart >= 0, "initializer must release its in-progress guard in finally");
+const finallyBlock = initializer.slice(finallyStart);
+const guardReset = finallyBlock.indexOf("initializationInProgress =");
+const retrySchedule = finallyBlock.indexOf("setTimeout(() =>");
+const retryCall = finallyBlock.indexOf("refreshAuthUI()");
+assert.ok(guardReset >= 0 && retrySchedule > guardReset && retryCall > retrySchedule,
+  "stale initialization must release the guard before retrying the latest session");
+assert.match(finallyBlock, /if \(initRevision !== authStateRevision\) \{[\s\S]*?refreshAuthUI\(\)/,
+  "a superseded initialization must schedule reconciliation against the latest auth state");
+
+
 console.log("Stale auth initialization contract passed.");
