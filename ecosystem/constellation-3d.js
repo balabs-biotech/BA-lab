@@ -51,7 +51,8 @@ if(root){
           twig.userData={kind:'dendrite',id};worldGroup.add(twig);twigs.push(twig);
         }
         const glow=new THREE.Mesh(new THREE.IcosahedronGeometry(.115,1),new THREE.MeshBasicMaterial({color,transparent:true,opacity:.025,depthWrite:false,wireframe:true}));glow.position.copy(p);glow.userData.kind='glow';worldGroup.add(glow);
-        const hitMesh=new THREE.Mesh(new THREE.SphereGeometry(.25,12,10),new THREE.MeshBasicMaterial({color,transparent:true,opacity:.0001,depthWrite:false}));hitMesh.position.copy(p);hitMesh.userData={kind:'sphere',id};worldGroup.add(hitMesh);\n
+        const hitMesh=new THREE.Mesh(new THREE.SphereGeometry(.25,12,10),new THREE.MeshBasicMaterial({color,transparent:true,opacity:.0001,depthWrite:false}));hitMesh.position.copy(p);hitMesh.userData={kind:'sphere',id};worldGroup.add(hitMesh);
+
         const label=makeLabel(labels[id].title,0xf5f7fa,25);label.position.set(p.x,p.y-.52,p.z+.08);label.scale.set(2.65,.52,1);label.userData={kind:'label',id,labelText:labels[id].title};worldGroup.add(label);
         const node={id,mesh,hitMesh,label,base:p,color,twigs};points.push(node);
         // A root soma has no artificial central-hub connection. Every other axon
