@@ -5085,6 +5085,49 @@ async function saveMeasurement() {
   }
 }
 
+async function loadRecentWorkspaceHistory(tableName, timestampColumn, columns, displayLimit) {
+  const pageSize = 250;
+  const visibleRows = [];
+  const eventsById = {};
+  let offset = 0;
+
+  // Paginate the organization-wide stream before applying workspace ownership.
+  // A single global LIMIT can hide this workspace's recent records when other
+  // workspaces generate more activity.
+  while (visibleRows.length < displayLimit) {
+    const { data, error } = await supabaseClient
+      .from(tableName)
+      .select(columns)
+      .eq("organization_id", organizationId)
+      .order(timestampColumn, { ascending: false })
+      .order("id", { ascending: false })
+      .range(offset, offset + pageSize - 1);
+    if (error) throw new Error("Chargement de l’historique impossible : " + error.message);
+
+    const page = data || [];
+    if (!page.length) break;
+    const eventIds = [...new Set(page.map(row => row.event_id).filter(Boolean))];
+    if (eventIds.length) {
+      const { data: events, error: eventsError } = await supabaseClient
+        .from("events")
+        .select("id, batch_id, culture_id, plant_culture_id")
+        .eq("organization_id", organizationId)
+        .in("id", eventIds);
+      if (eventsError) throw new Error("Chargement des liens d’événements impossible : " + eventsError.message);
+      for (const event of events || []) eventsById[event.id] = event;
+    }
+
+    for (const row of page) {
+      if (belongsToActiveWorkspace(row, eventsById)) visibleRows.push(row);
+      if (visibleRows.length >= displayLimit) break;
+    }
+    if (page.length < pageSize) break;
+    offset += pageSize;
+  }
+
+  return { rows: visibleRows.slice(0, displayLimit), eventsById };
+}
+
 function belongsToActiveWorkspace(record, eventsById = {}) {
   const domain = document.body.dataset.domain || "mycology";
   const event = record.event_id ? eventsById[record.event_id] : null;
@@ -5106,29 +5149,12 @@ function belongsToActiveWorkspace(record, eventsById = {}) {
 async function loadRecentMeasurements() {
   if (!organizationId || !measurementHistory) return;
 
-  const { data, error } = await supabaseClient
-    .from("measurements")
-    .select("id, variable_code, raw_value, raw_unit_code, normalized_value, normalized_unit_code, measured_at, method, instrument, culture_id, plant_culture_id, event_id, metadata")
-    .eq("organization_id", organizationId)
-    .order("measured_at", { ascending: false })
-    .limit(1000);
-
-  if (error) throw new Error(`Chargement de l’historique des mesures impossible : ${error.message}`);
-
-  const rows = data || [];
-  const eventIds = [...new Set(rows.map(row => row.event_id).filter(Boolean))];
-  let eventsById = {};
-  if (eventIds.length) {
-    const { data: events, error: eventsError } = await supabaseClient
-      .from("events")
-      .select("id, batch_id, culture_id, plant_culture_id")
-      .eq("organization_id", organizationId)
-      .in("id", eventIds);
-    if (eventsError) console.warn("Détails des événements de mesure indisponibles :", eventsError.message);
-    for (const event of events || []) eventsById[event.id] = event;
-  }
-
-  const visibleRows = rows.filter(row => belongsToActiveWorkspace(row, eventsById)).slice(0, 10);
+  const { rows: visibleRows, eventsById } = await loadRecentWorkspaceHistory(
+    "measurements",
+    "measured_at",
+    "id, variable_code, raw_value, raw_unit_code, normalized_value, normalized_unit_code, measured_at, method, instrument, culture_id, plant_culture_id, event_id, metadata",
+    10
+  );
   if (!visibleRows.length) {
     measurementHistory.innerHTML = '<p class="muted">Aucune mesure enregistrée dans cet univers pour le moment.</p>';
     return;
@@ -5299,27 +5325,12 @@ async function saveObservation() {
 async function loadRecentObservations() {
   if (!organizationId || !observationHistory) return;
 
-  const query = await supabaseClient.from("observations")
-    .select("id, variable_code, value_text, observed_at, culture_id, plant_culture_id, event_id, metadata")
-    .eq("organization_id", organizationId)
-    .order("observed_at", { ascending: false })
-    .limit(1000);
-
-  if (query.error) throw new Error("Chargement de l’historique des observations impossible : " + query.error.message);
-  const observationRows = query.data || [];
-  const eventIds = [...new Set(observationRows.map(row => row.event_id).filter(Boolean))];
-  const eventsById = {};
-
-  if (eventIds.length) {
-    const eventsResult = await supabaseClient.from("events")
-      .select("id, batch_id, culture_id, plant_culture_id")
-      .eq("organization_id", organizationId)
-      .in("id", eventIds);
-    if (eventsResult.error) console.warn("Détails des événements d’observation indisponibles :", eventsResult.error.message);
-    for (const event of eventsResult.data || []) eventsById[event.id] = event;
-  }
-
-  recentObservations = observationRows.filter(row => belongsToActiveWorkspace(row, eventsById)).slice(0, 8);
+  const { rows: recentObservations } = await loadRecentWorkspaceHistory(
+    "observations",
+    "observed_at",
+    "id, variable_code, value_text, observed_at, culture_id, plant_culture_id, event_id, metadata",
+    8
+  );
   updateOverview();
   if (!recentObservations.length) {
     observationHistory.innerHTML = '<p class="muted">Aucune observation enregistrée dans cet univers pour le moment.</p>';
@@ -5329,15 +5340,12 @@ async function loadRecentObservations() {
   observationHistory.innerHTML = recentObservations.map(row => {
     const variable = measurementVariables.find(item => item.code === row.variable_code);
     const culture = cultureOptions.find(item => item.id === row.culture_id);
-    const batchId = row.event_id ? (eventsById[row.event_id] || {}).batch_id : null;
-    const batch = batchId ? latestBatches.find(item => item.id === batchId) : null;
     const plant = plantCultureOptions.find(item => item.id === row.plant_culture_id);
-    const target = plant ? "AgriTech · " + escapeHtml(plant.code) + " · " + escapeHtml(plant.cultivar_name || plant.crop_type) :
-      batch ? "Lot · " + escapeHtml(batch.batch_code) :
-      culture ? "Culture · " + escapeHtml(culture.code) : "Cible liée par identifiant";
     const stamp = row.observed_at ? new Date(row.observed_at).toLocaleString() : "Date inconnue";
     const note = row.metadata && row.metadata.note
       ? '<div class="measurement-meta">' + escapeHtml(row.metadata.note) + '</div>' : "";
+    const target = plant ? "AgriTech · " + escapeHtml(plant.code) + " · " + escapeHtml(plant.cultivar_name || plant.crop_type) :
+      culture ? "Culture · " + escapeHtml(culture.code) : "Cible liée par identifiant";
     return '<article class="measurement-entry"><div><strong>' +
       escapeHtml(variable ? variable.label : row.variable_code) +
       '</strong><div class="measurement-meta">' + target + '</div>' + note +
