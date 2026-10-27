@@ -439,7 +439,8 @@ if(root){
       ));
       if(edge)segments.push({edge,reverse:edge.relation?(edge.aId===to&&edge.bId===from):(edge.parentId===to&&edge.id===from),length:edge.curve.getLength()});
     }
-    if(segments.length>1){
+    // Never animate a misleading partial journey: every hop must exist in the graph.
+    if(segments.length===route.length-1){
       const mesh=new THREE.Mesh(new THREE.SphereGeometry(.027,12,10),new THREE.MeshBasicMaterial({color:0xe1f4d9,transparent:true,opacity:.95,depthWrite:false,toneMapped:false}));
       mesh.userData={kind:'relay-signal'};worldGroup.add(mesh);
       const trail=new THREE.Mesh(new THREE.SphereGeometry(.016,10,8),new THREE.MeshBasicMaterial({color:0xb7dfbd,transparent:true,opacity:.88,depthWrite:false,toneMapped:false}));
