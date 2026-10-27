@@ -751,6 +751,31 @@ async function signOut() {
    AUTH UI
    ============================================================ */
 
+function getSessionVerificationGuidance(error) {
+  const name = String(error?.name || "").toLowerCase();
+  const message = String(error?.message || "").toLowerCase();
+  const diagnostic = name + " " + message;
+
+  if (/invalid refresh token|refresh token.{0,40}(not found|missing|invalid)|refresh_token_not_found|invalid_grant/.test(diagnostic)) {
+    return {
+      status: "Session expirée ou invalide.",
+      message: "Votre session a expiré ou n’est plus valide. Reconnectez-vous avec votre compte. Vos données enregistrées ne sont pas supprimées."
+    };
+  }
+
+  if (/authretryablefetcherror|failed to fetch|networkerror|network request failed|fetch failed|timed? ?out|timeout|econn|http 50[234]/.test(diagnostic)) {
+    return {
+      status: "Connexion temporairement indisponible.",
+      message: "Le serveur d’authentification ne répond pas correctement ou la connexion est instable. Vérifiez Internet et réessayez. Si l’erreur persiste, reconnectez-vous. Vos données enregistrées ne sont pas supprimées."
+    };
+  }
+
+  return {
+    status: "Session non vérifiable.",
+    message: "La session n’a pas pu être vérifiée. Réessayez ; si le problème persiste, reconnectez-vous. Vos données enregistrées ne sont pas supprimées."
+  };
+}
+
 async function refreshAuthUI(revision = authStateRevision) {
 
   let session;
@@ -770,11 +795,9 @@ async function refreshAuthUI(revision = authStateRevision) {
     hideElement(document.getElementById("overviewCard"));
     hideElement(resultCard);
     hideElement(signOutButton);
-    authStatus.textContent = "Session non vérifiable.";
-    showMessage(
-      "Impossible de vérifier votre session. Vérifiez la connexion Internet puis rechargez la page. Vos données ne sont pas supprimées.",
-      "error"
-    );
+    const guidance = getSessionVerificationGuidance(error);
+    authStatus.textContent = guidance.status;
+    showMessage(guidance.message, "error");
     console.error("Vérification de session impossible :", error);
     return;
   }
