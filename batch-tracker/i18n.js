@@ -539,7 +539,75 @@
     ["Il faut au moins deux mesures numériques comparables pour tracer une évolution. Les données brutes restent consultables ci-dessous.","At least two comparable numeric measurements are required to plot a trend. Raw data remain available below.","São necessárias pelo menos duas medições numéricas comparáveis para traçar uma tendência. Os dados brutos continuam disponíveis abaixo.","يلزم قياسان رقميان قابلان للمقارنة على الأقل لرسم الاتجاه. تظل البيانات الخام متاحة أدناه."],
     ["Aucune mesure pour ces filtres.","No measurements match these filters.","Não existem medições para estes filtros.","لا توجد قياسات تطابق عوامل التصفية هذه."],
     ["Le graphique n’a pas pu être produit.","The chart could not be generated.","Não foi possível gerar o gráfico.","تعذر إنشاء الرسم البياني."],
-    ["Données indisponibles.","Data unavailable.","Dados indisponíveis.","البيانات غير متاحة."]
+    ["Données indisponibles.","Data unavailable.","Dados indisponíveis.","البيانات غير متاحة."],
+    ["Cultures végétales","Plant records","Registos vegetais","سجلات النباتات"],
+    ["Activité récente","Recent activity","Atividade recente","النشاط الأخير"],
+    ["Afficher les dernières observations","Show latest observations","Mostrar as últimas observações","عرض أحدث الملاحظات"],
+    ["Connectez-vous pour charger les données de l’organisation.","Sign in to load the organisation’s data.","Inicie sessão para carregar os dados da organização.","سجّل الدخول لتحميل بيانات المؤسسة."],
+    ["Cette vue ne calcule pas encore de statistiques analytiques. Toute analyse doit sélectionner une variable, une unité, une période et des lots comparables.","This view does not yet calculate analytical statistics. Any analysis must select a variable, unit, period, and comparable batches.","Esta vista ainda não calcula estatísticas analíticas. Qualquer análise deve selecionar uma variável, unidade, período e lotes comparáveis.","لا يحسب هذا العرض الإحصاءات التحليلية بعد. يجب أن يحدد أي تحليل متغيرًا ووحدة وفترة ودفعات قابلة للمقارنة."],
+    ["IDENTITÉ & SESSION","IDENTITY & SESSION","IDENTIDADE E SESSÃO","الهوية والجلسة"],
+    ["Les informations saisies dans CultureOps sont enregistrées dans la base de données BA Labs afin d’assurer la traçabilité des cultures, des générations et des lots. L’accès à l’application nécessite l’acceptation des conditions d’utilisation.","Information entered in CultureOps is stored in the BA Labs database to maintain traceability of cultures, generations, and batches. Access to the application requires acceptance of the terms of use.","As informações introduzidas no CultureOps são guardadas na base de dados da BA Labs para assegurar a rastreabilidade das culturas, gerações e lotes. O acesso à aplicação exige a aceitação dos termos de utilização.","تُحفظ المعلومات المُدخلة في CultureOps في قاعدة بيانات BA Labs لضمان تتبّع المستنبتات والأجيال والدفعات. يتطلب الوصول إلى التطبيق قبول شروط الاستخدام."],
+    ["La réutilisation de données pour des analyses statistiques ou des travaux de recherche en mycologie, microbiologie et biologie végétale est facultative. Elle n’est pas nécessaire pour créer une culture. Les données utilisées à cette fin doivent être limitées à ce qui est nécessaire et, lorsque cela est possible, analysées sous une forme agrégée ou dé-identifiée.","Reusing data for statistical analysis or research in mycology, microbiology, and plant biology is optional. It is not required to create a culture. Data used for these purposes must be limited to what is necessary and, where possible, analysed in aggregated or de-identified form.","A reutilização de dados para análise estatística ou investigação em micologia, microbiologia e biologia vegetal é opcional. Não é necessária para criar uma cultura. Os dados utilizados para estes fins devem limitar-se ao necessário e, sempre que possível, ser analisados de forma agregada ou desidentificada.","إعادة استخدام البيانات للتحليل الإحصائي أو البحث في علم الفطريات والأحياء الدقيقة وبيولوجيا النبات اختيارية، وليست شرطًا لإنشاء مستنبت. يجب حصر البيانات المستخدمة لهذه الأغراض في القدر الضروري، وتحليلها مجمعة أو منزوعة الهوية متى أمكن."],
+    ["J’accepte séparément que mes données de culture puissent être réutilisées à des fins statistiques et de recherche en mycologie, microbiologie et biologie végétale. Ce choix est facultatif et peut être refusé sans bloquer l’utilisation de CultureOps.","I separately consent to the reuse of my culture data for statistics and research in mycology, microbiology, and plant biology. This is optional and can be declined without preventing use of CultureOps.","Autorizo separadamente a reutilização dos meus dados de cultura para fins estatísticos e de investigação em micologia, microbiologia e biologia vegetal. Esta opção é facultativa e pode ser recusada sem impedir a utilização do CultureOps.","أوافق بشكل منفصل على إعادة استخدام بيانات المستنبت الخاصة بي للإحصاء والبحث في علم الفطريات والأحياء الدقيقة وبيولوجيا النبات. هذا الخيار اختياري ويمكن رفضه دون منع استخدام CultureOps."],
+    ["Version des conditions : 2026-10-09-v1. Le choix statistique est enregistré séparément de l’acceptation des conditions d’utilisation.","Terms version: 2026-10-09-v1. The statistics consent choice is recorded separately from acceptance of the terms of use.","Versão dos termos: 2026-10-09-v1. A opção relativa à utilização estatística é registada separadamente da aceitação dos termos de utilização.","إصدار الشروط: 2026-10-09-v1. يُسجّل خيار الموافقة على الاستخدام الإحصائي بشكل منفصل عن قبول شروط الاستخدام."],
+    ["Cultures accessibles dans le chargement courant. Sélectionnez une culture pour préparer une nouvelle mesure ou observation.","Cultures available in the current load. Select a culture to prepare a new measurement or observation.","Culturas disponíveis no carregamento atual. Selecione uma cultura para preparar uma nova medição ou observação.","المستنبتات المتاحة في التحميل الحالي. اختر مستنبتًا لإعداد قياس أو ملاحظة جديدة."],
+    ["Enregistrez l’opération sur la culture source. Pour un repiquage, un passage ou une division, ajoutez les codes des descendants : leurs fiches et liens de filiation seront créés ensemble.","Record the operation on the source culture. For subculturing, passaging, or division, add descendant codes; their records and lineage links will be created together.","Registe a operação na cultura de origem. Para repicagem, passagem ou divisão, adicione os códigos dos descendentes: os respetivos registos e ligações de linhagem serão criados em conjunto.","سجّل العملية على المستنبت المصدر. عند إعادة الزرع أو التمرير أو التقسيم، أضف رموز المستنبتات الناتجة؛ ستُنشأ سجلاتها وروابط النسب معًا."],
+    ["AGRITECH / REGISTRE VÉGÉTAL","AGRITECH / PLANT REGISTER","AGRITECH / REGISTO VEGETAL","التقنيات الزراعية / سجل النباتات"],
+    ["Suivez les plantes par unité de culture, variété, emplacement et substrat. Ce registre est séparé des souches fongiques et des cultures de laboratoire.","Track plants by growing unit, variety, location, and substrate. This register is separate from fungal strains and laboratory cultures.","Acompanhe as plantas por unidade de cultivo, variedade, localização e substrato. Este registo é separado das estirpes fúngicas e das culturas de laboratório.","تابع النباتات حسب وحدة الزراعة والصنف والموقع والركيزة. هذا السجل منفصل عن السلالات الفطرية والمستنبتات المخبرية."],
+    ["Code de l’unité","Unit code","Código da unidade","رمز الوحدة"],
+    ["Culture végétale","Plant record","Registo vegetal","سجل نباتي"],
+    ["Haricot kilomètre","Yardlong bean","Feijão-de-metro","لوبيا طويلة"],
+    ["Pâtisson","Pattypan squash","Abóbora patisson","قرع باتيسون"],
+    ["Gourde pèlerine","Bottle gourd","Cabaça","قرع القنينة"],
+    ["Variété / cultivar","Variety / cultivar","Variedade / cultivar","الصنف الزراعي"],
+    ["Nombre de plantes / unités","Number of plants / units","Número de plantas / unidades","عدد النباتات / الوحدات"],
+    ["Non précisé","Not specified","Não especificado","غير محدد"],
+    ["Environnement / unité","Environment / unit","Ambiente / unidade","البيئة / الوحدة"],
+    ["Substrat / système","Substrate / system","Substrato / sistema","الركيزة / النظام"],
+    ["Date de plantation / démarrage","Planting / start date","Data de plantação / início","تاريخ الزراعة / البدء"],
+    ["Planifiée","Planned","Planeada","مخطط لها"],
+    ["Récoltée","Harvested","Colhida","محصودة"],
+    ["Perdue / arrêtée","Lost / stopped","Perdida / interrompida","مفقودة / متوقفة"],
+    ["Archivée","Archived","Arquivada","مؤرشفة"],
+    ["Enregistrer la culture végétale","Save plant record","Guardar registo vegetal","حفظ سجل النبات"],
+    ["Les fiches végétales seront enregistrées séparément des cultures fongiques.","Plant records will be stored separately from fungal cultures.","Os registos vegetais serão guardados separadamente das culturas fúngicas.","ستُحفظ سجلات النباتات بشكل منفصل عن المستنبتات الفطرية."],
+    ["Registre des cultures végétales","Plant register","Registo de culturas vegetais","سجل المستنبتات النباتية"],
+    ["Connectez-vous pour charger les cultures végétales.","Sign in to load plant records.","Inicie sessão para carregar os registos vegetais.","سجّل الدخول لتحميل سجلات النباتات."],
+    ["TRAÇABILITÉ","TRACEABILITY","RASTREABILIDADE","التتبّع"],
+    ["Enregistrer la récolte","Record harvest","Registar colheita","تسجيل الحصاد"],
+    ["Sélectionnez un lot pour charger sa chronologie.","Select a batch to load its timeline.","Selecione um lote para carregar a cronologia.","اختر دفعة لتحميل تسلسلها الزمني."],
+    ["Explorez les mesures numériques réellement enregistrées. Les observations qualitatives ne sont pas converties en valeurs numériques. Les comparaisons sont limitées aux unités compatibles.","Explore the numeric measurements actually recorded. Qualitative observations are not converted into numeric values. Comparisons are limited to compatible units.","Explore as medições numéricas efetivamente registadas. As observações qualitativas não são convertidas em valores numéricos. As comparações limitam-se a unidades compatíveis.","استعرض القياسات الرقمية المسجلة فعليًا. لا تُحوّل الملاحظات النوعية إلى قيم رقمية. تقتصر المقارنات على الوحدات المتوافقة."],
+    ["Lot (30 plus récents)","Batch (30 most recent)","Lote (30 mais recentes)","الدفعة (أحدث 30)"],
+    ["Tous les lots récents (30 max.)","All recent batches (max. 30)","Todos os lotes recentes (máx. 30)","كل الدفعات الحديثة (حد أقصى 30)"],
+    ["Le graphique apparaîtra lorsque des mesures numériques compatibles seront disponibles.","The chart will appear when compatible numeric measurements are available.","O gráfico será apresentado quando estiverem disponíveis medições numéricas compatíveis.","سيظهر الرسم البياني عند توفر قياسات رقمية متوافقة."],
+    ["Données brutes utilisées","Raw data used","Dados brutos utilizados","البيانات الخام المستخدمة"],
+    ["Les résultats sont descriptifs. Aucune moyenne ni inférence statistique n’est calculée. Les mesures hors unité comparable sont exclues du graphique et restent visibles dans les données brutes.","Results are descriptive. No mean or statistical inference is calculated. Measurements with incompatible units are excluded from the chart and remain visible in the raw data.","Os resultados são descritivos. Não é calculada qualquer média ou inferência estatística. As medições com unidades incompatíveis são excluídas do gráfico e permanecem visíveis nos dados brutos.","النتائج وصفية. لا يُحسب المتوسط ولا يُجرى استدلال إحصائي. تُستبعد القياسات ذات الوحدات غير المتوافقة من الرسم وتبقى ظاهرة في البيانات الخام."],
+    ["Conductivité","Conductivity","Condutividade","التوصيلية"],
+    ["Astuce : la culture ou le lot choisi est conservé pendant la saisie des mesures et observations.","Tip: the selected culture or batch is retained while entering measurements and observations.","Dica: a cultura ou o lote selecionado é mantido durante o registo de medições e observações.","تلميح: يبقى المستنبت أو الدفعة المحددة كما هي أثناء إدخال القياسات والملاحظات."],
+    ["Paramètre mesuré","Measured parameter","Parâmetro medido","المعامل المقاس"],
+    ["Chargement des paramètres…","Loading parameters…","A carregar os parâmetros…","جارٍ تحميل المعاملات…"],
+    ["Unité de la mesure","Measurement unit","Unidade de medição","وحدة القياس"],
+    ["Méthode / protocole de mesure","Measurement method / protocol","Método / protocolo de medição","طريقة / بروتوكول القياس"],
+    ["HISTORIQUE RÉCENT","RECENT HISTORY","HISTÓRICO RECENTE","السجل الحديث"],
+    ["Dernières mesures","Latest measurements","Últimas medições","أحدث القياسات"],
+    ["Les mesures apparaîtront ici après connexion.","Measurements will appear here after sign-in.","As medições serão apresentadas aqui após iniciar sessão.","ستظهر القياسات هنا بعد تسجيل الدخول."],
+    ["Décrivez une morphologie, une contamination suspectée, un comportement végétal, une odeur, une texture ou tout autre constat. L’observation est horodatée et reliée à la culture ou au lot choisi ci-dessus.","Describe morphology, suspected contamination, plant behaviour, smell, texture, or another finding. The observation is timestamped and linked to the culture or batch selected above.","Descreva a morfologia, uma suspeita de contaminação, o comportamento da planta, o odor, a textura ou outra observação. O registo recebe data e hora e fica ligado à cultura ou ao lote selecionado acima.","صف الشكل أو التلوث المشتبه به أو سلوك النبات أو الرائحة أو الملمس أو أي ملاحظة أخرى. تُسجّل الملاحظة بالتاريخ والوقت وتُربط بالمستنبت أو الدفعة المحددة أعلاه."],
+    ["Catégorie / variable","Category / variable","Categoria / variável","الفئة / المتغير"],
+    ["Méthode (facultatif)","Method (optional)","Método (opcional)","الطريقة (اختياري)"],
+    ["OBSERVATIONS RÉCENTES","RECENT OBSERVATIONS","OBSERVAÇÕES RECENTES","الملاحظات الحديثة"],
+    ["Les observations apparaîtront ici après connexion.","Observations will appear here after sign-in.","As observações serão apresentadas aqui após iniciar sessão.","ستظهر الملاحظات هنا بعد تسجيل الدخول."],
+    ["JOURNAL D’OPÉRATION","OPERATION LOG","REGISTO DE OPERAÇÕES","سجل العمليات"],
+    ["RETOUR SYSTÈME","SYSTEM FEEDBACK","RESPOSTA DO SISTEMA","استجابة النظام"],
+    ["Aucune opération effectuée pour le moment.","No operations recorded yet.","Ainda não foram registadas operações.","لم تُسجّل أي عمليات حتى الآن."],
+    ["Impossible de vérifier votre session. Vérifiez la connexion puis réessayez. Aucune mesure n’a été enregistrée.","Could not verify your session. Check your connection and try again. No measurement was saved.","Não foi possível verificar a sessão. Verifique a ligação e tente novamente. Não foi guardada qualquer medição.","تعذر التحقق من جلستك. تحقق من الاتصال ثم أعد المحاولة. لم يُحفظ أي قياس."],
+    ["Impossible de vérifier votre session. Vérifiez la connexion puis réessayez. Aucune observation n’a été enregistrée.","Could not verify your session. Check your connection and try again. No observation was saved.","Não foi possível verificar a sessão. Verifique a ligação e tente novamente. Não foi guardada qualquer observação.","تعذر التحقق من جلستك. تحقق من الاتصال ثم أعد المحاولة. لم تُحفظ أي ملاحظة."],
+    ["Déplacement du lot impossible: ","Could not move batch: ","Não foi possível mover o lote: ","تعذر نقل الدفعة: "],
+    ["Création batch: ","Batch creation: ","Criação do lote: ","إنشاء الدفعة: "],
+    ["Libération batch: ","Batch release: ","Libertação do lote: ","اعتماد الدفعة: "],
+    ["Session expirée. Reconnectez-vous.","Session expired. Sign in again.","A sessão expirou. Inicie sessão novamente.","انتهت الجلسة. سجّل الدخول مجددًا."],
+    ["Aucune variable adaptée à cet univers","No variable is available for this workspace","Não existe uma variável adequada a este espaço","لا يوجد متغير مناسب لمساحة العمل هذه"],
+    ["Vérification de session avant mesure impossible : ","Could not verify session before measurement: ","Não foi possível verificar a sessão antes da medição: ","تعذر التحقق من الجلسة قبل القياس: "],
+    ["Vérification de session avant observation impossible : ","Could not verify session before observation: ","Não foi possível verificar a sessão antes da observação: ","تعذر التحقق من الجلسة قبل الملاحظة: "]
   ];
   for (const [fr, en, pt, ar] of supplementalCoverage) {
     dictionaries.en[fr] ||= en;
@@ -555,7 +623,11 @@
     const source = normalize(value);
     if (!source || lang === "fr") return value;
     const dict = dictionaries[lang] || {};
-    if (dict[source]) return value.replace(source, dict[source]);
+    if (dict[source]) {
+      const leading = (value.match(/^\\s*/) || [""])[0];
+      const trailing = (value.match(/\\s*$/) || [""])[0];
+      return leading + dict[source] + trailing;
+    }
 
     // Translate known French phrases embedded in dynamic chart labels while
     // preserving dates, numeric values, and units that are assembled at runtime.
