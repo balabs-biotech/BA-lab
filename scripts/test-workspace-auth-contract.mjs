@@ -41,7 +41,7 @@ assert.match(tracker, /await\s+claimBALabs\s*\(/);
 // or Laboratory. Keep the dependency explicitly scoped to Green Tech.
 assert.match(
   tracker,
-  /if\s*\(document\.body\.dataset\.domain\s*===\s*["']agronomy["']\)\s*\{\s*(?:setInitializationStage\(["']chargement des cultures végétales["']\);\s*)?await\s+loadPlantCultures\(\);\s*\}/,
+  /if\s*\(document\.body\.dataset\.domain\s*===\s*["']agronomy["']\)\s*\{\s*(?:setInitializationStage\(["']chargement des cultures végétales["']\);\s*)?await\s+loadPlantCultures\(\);\s*(?:if\s*\(initRevision\s*!==\s*authStateRevision\)\s*return;\s*)?\}/,
   "only the agronomy workspace may load plant-culture registry data during initialization",
 );
 
