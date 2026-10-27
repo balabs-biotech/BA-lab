@@ -3,9 +3,9 @@ import { readFile } from "node:fs/promises";
 
 const tracker = await readFile(new URL("../batch-tracker/tracker.js", import.meta.url), "utf8");
 const signInStart = tracker.indexOf("async function signIn()");
-const signUpStart = tracker.indexOf("/* ============================================================\n   CREATION DE COMPTE", signInStart);
-assert.ok(signInStart >= 0 && signUpStart > signInStart, "signIn function must be present");
-const signIn = tracker.slice(signInStart, signUpStart);
+const signInEnd = tracker.indexOf("/* ============================================================\n   CREATION DE COMPTE", signInStart);
+assert.ok(signInStart >= 0 && signInEnd > signInStart, "signIn function must be present");
+const signIn = tracker.slice(signInStart, signInEnd);
 
 assert.match(signIn, /signInWithPassword\(/, "signIn must call Supabase password authentication");
 assert.doesNotMatch(signIn, /await refreshAuthUI\(/, "signIn must not start a second initialization; auth-state listener owns successful sign-in reconciliation");
