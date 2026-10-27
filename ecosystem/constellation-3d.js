@@ -131,21 +131,39 @@ if(root){
       // R&D-to-application and soil-to-project pathways, not decorative all-to-all links.
       // Sparse, meaningful cross-links: avoid the dense mesh of decorative all-to-all chords.
       const pairs=[
-        // Core biological relationships
-        ['bio','myco'],['bio','soil'],['bio','lab'],['myco','soil'],['myco','lab'],['soil','lab'],
-        // Translation from research into practical applications
-        ['soil','products'],['products','iot'],['products','work'],['iot','work'],['work','learn'],
-        // Bridges across the two editorial clusters: knowledge, tools and feedback
-        ['lab','products'],['lab','work'],['lab','learn'],['soil','work'],['bio','learn'],['iot','learn']
+        // Cross-links only: direct parent-child axons are already drawn above.
+        // Keeping those out here prevents doubled lines and makes the web easier to read.
+        ['bio','soil'],['bio','lab'],['soil','lab'],
+        // Research ↔ applications, field feedback and knowledge transfer
+        ['lab','products'],['lab','work'],['soil','work'],['bio','learn'],['iot','learn']
       ];
       for(const [a,b] of pairs){const pa=points.find(p=>p.id===a),pb=points.find(p=>p.id===b);if(!pa||!pb)continue;
-        const mid=pa.base.clone().lerp(pb.base,.5);
-        const axis=new THREE.Vector3().crossVectors(pa.base,pb.base).normalize();
-        mid.addScaledVector(axis,.16);
+        const delta=pb.base.clone().sub(pa.base);
+        const axis=new THREE.Vector3().crossVectors(delta,new THREE.Vector3(.31,.87,.43)).normalize();
+        const bend=.20+((ids.indexOf(a)+ids.indexOf(b))%3)*.075;
+        const mid=pa.base.clone().lerp(pb.base,.5).addScaledVector(axis,bend);
         const curve=new THREE.QuadraticBezierCurve3(pa.base,mid,pb.base);
-        const line=makeNeurite(curve,0xc5e8c8,.038,.94,48);
-        line.userData={kind:'relation',a,b};worldGroup.add(line);
         const signalColor=new THREE.Color(colors[a]).lerp(new THREE.Color(colors[b]),.5);
+        const line=makeNeurite(curve,0xc5e8c8,.024,.78,48);
+        line.userData={kind:'relation',a,b};worldGroup.add(line);
+        // Cross-links branch like mycelial cords / axonal collaterals instead of
+        // appearing as plain geometric chords. Each offshoot ends in a small junction.
+        for(let branch=0;branch<2;branch++){
+          const seed=(ids.indexOf(a)+1)*1.73+(ids.indexOf(b)+1)*.91+branch*2.4;
+          const t=branch===0?.34:.68;
+          const anchor=curve.getPoint(t),tangent=curve.getTangent(t);
+          const side=new THREE.Vector3(-tangent.y+Math.sin(seed)*.35,tangent.x+Math.cos(seed*.8)*.28,Math.sin(seed+1.1)*.85).normalize();
+          const reach=.20+((ids.indexOf(a)+ids.indexOf(b)+branch)%3)*.055;
+          const tip=anchor.clone().addScaledVector(side,reach).addScaledVector(tangent,(branch===0?1:-1)*.075);
+          const control=anchor.clone().addScaledVector(side,reach*.55).addScaledVector(tangent,.035*Math.sin(seed));
+          const offshoot=new THREE.QuadraticBezierCurve3(anchor,control,tip);
+          const twig=makeNeurite(offshoot,signalColor,.011,.66,18);
+          twig.userData={kind:'dendrite',id:a,relation:true,a,b};worldGroup.add(twig);
+          if(branch===0){
+            const junction=new THREE.Mesh(new THREE.IcosahedronGeometry(.018,1),new THREE.MeshStandardMaterial({color:signalColor,emissive:signalColor,emissiveIntensity:.22,roughness:1}));
+            junction.position.copy(tip);junction.userData={kind:'synapse',id:a,relation:true,a,b};worldGroup.add(junction);
+          }
+        }
         const pulse=new THREE.Mesh(new THREE.SphereGeometry(.022,10,8),new THREE.MeshBasicMaterial({color:signalColor,transparent:true,opacity:.72,depthWrite:false}));pulse.userData={kind:'relation-signal',a,b};worldGroup.add(pulse);
         edges.push({line,id:a,relation:true,aId:a,bId:b,a:pa.base.clone(),b:pb.base.clone(),pulse,curve,phase:(ids.indexOf(a)+ids.indexOf(b))*.071})}
       root.classList.add('webgl-ready','universe-open');root.classList.remove('universe-closed');worldGroup.visible=true;new MutationObserver(()=>{if(worldGroup)worldGroup.visible=!root.classList.contains('universe-closed');if(root.classList.contains('universe-closed'))clearResourceNodes()}).observe(root,{attributes:true,attributeFilter:['class']});
