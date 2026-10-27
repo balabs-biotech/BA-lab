@@ -273,6 +273,7 @@ if(root){
     const normalizedDomainPhrases=Object.fromEntries(ids.map(domain=>[
       domain,domainPhrases[domain].map(normalizeWords).filter(parts=>parts.length>1)
     ]));
+    const allDomainPhrases=[...new Map(Object.values(normalizedDomainPhrases).flat().map(phrase=>[phrase.join(' '),phrase])).values()];
     const matchesPhrase=(words,phrase)=>{
       for(let i=0;i<=words.length-phrase.length;i++){
         let matched=true;
@@ -321,14 +322,14 @@ if(root){
     for(let i=0;i<nodes.length;i++)for(let j=i+1;j<nodes.length;j++){
       const a=nodes[i],b=nodes[j];
       const shared=[...new Set(a.meta.text.filter(w=>b.meta.text.includes(w)&&w.length>=5&&!genericResourceTerms.has(w)))];
-      const sharedPhrases=normalizedDomainPhrases[id].filter(phrase=>matchesPhrase(a.meta.text,phrase)&&matchesPhrase(b.meta.text,phrase));
+      const sharedPhrases=allDomainPhrases.filter(phrase=>matchesPhrase(a.meta.text,phrase)&&matchesPhrase(b.meta.text,phrase));
       const pathA=a.meta.url.pathname.split('/').filter(Boolean).slice(0,-1).join('/');
       const pathB=b.meta.url.pathname.split('/').filter(Boolean).slice(0,-1).join('/');
       const samePath=!!pathA&&pathA===pathB&&a.meta.url.origin===b.meta.url.origin;
       const score=shared.reduce((sum,w)=>sum+Math.min(w.length,12),0)+(sharedPhrases.length*5)+(samePath?5:0);
       if(score>0)candidates.push({i,j,score,evidence:shared.length+sharedPhrases.length});
     }
-    candidates.sort((a,b)=>b.score-a.score||a.i-b.i||a.j-b.j);
+    candidates.sort((a,b)=>b.score-a.score||b.evidence-a.evidence||a.i-b.i||a.j-b.j);
     const resourceDegree=nodes.map(()=>0),maxResourceLinks=Math.min(nodes.length,Math.ceil(nodes.length*1.25));
     let resourceLinkCount=0;
     for(const candidate of candidates){
