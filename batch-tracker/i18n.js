@@ -607,7 +607,8 @@
     ["Session expirée. Reconnectez-vous.","Session expired. Sign in again.","A sessão expirou. Inicie sessão novamente.","انتهت الجلسة. سجّل الدخول مجددًا."],
     ["Aucune variable adaptée à cet univers","No variable is available for this workspace","Não existe uma variável adequada a este espaço","لا يوجد متغير مناسب لمساحة العمل هذه"],
     ["Vérification de session avant mesure impossible : ","Could not verify session before measurement: ","Não foi possível verificar a sessão antes da medição: ","تعذر التحقق من الجلسة قبل القياس: "],
-    ["Vérification de session avant observation impossible : ","Could not verify session before observation: ","Não foi possível verificar a sessão antes da observação: ","تعذر التحقق من الجلسة قبل الملاحظة: "]
+    ["Vérification de session avant observation impossible : ","Could not verify session before observation: ","Não foi possível verificar a sessão antes da observação: ","تعذر التحقق من الجلسة قبل الملاحظة: "],
+    ["traçabilité fongique","fungal traceability","rastreabilidade fúngica","تتبّع الفطريات"]
   ];
   for (const [fr, en, pt, ar] of supplementalCoverage) {
     dictionaries.en[fr] ||= en;
