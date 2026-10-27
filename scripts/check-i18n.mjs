@@ -31,6 +31,26 @@ for (const [index, row] of rows.entries()) {
   if (seen.has(row[0])) throw new Error(`Duplicate French source string: ${row[0]}`);
   seen.add(row[0]);
 }
+const expectedDomainTranslations = new Map([
+  ["Nouvelle culture agronomique", ["New agronomic culture", "Nova cultura agronómica", "محصول نباتي جديد"]],
+  ["Culture / ressource végétale source", ["Source plant culture / resource", "Cultura / recurso vegetal de origem", "المحصول / المورد النباتي المصدر"]],
+  ["Type de culture agronomique", ["Agronomic culture type", "Tipo de cultura agronómica", "نوع المحصول الزراعي"]],
+  ["Nouvelle culture fongique", ["New fungal culture", "Nova cultura fúngica", "مزرعة فطرية جديدة"]],
+  ["Souche fongique source", ["Source fungal strain", "Estirpe fúngica de origem", "السلالة الفطرية المصدر"]],
+  ["Support / forme de culture", ["Culture medium / format", "Meio / formato de cultura", "وسط الزراعة / شكلها"]],
+  ["Nouvelle culture de laboratoire", ["New laboratory culture", "Nova cultura laboratorial", "مزرعة مختبرية جديدة"]],
+  ["Souche / ressource biologique source", ["Source strain / biological resource", "Estirpe / recurso biológico de origem", "السلالة / المورد البيولوجي المصدر"]],
+  ["Format de culture au laboratoire", ["Laboratory culture format", "Formato de cultura laboratorial", "صيغة الزراعة المختبرية"]]
+]);
+const translationsBySource = new Map(rows.map(([fr, en, pt, ar]) => [fr, [en, pt, ar]]));
+for (const [source, expected] of expectedDomainTranslations) {
+  const actual = translationsBySource.get(source);
+  if (!actual) throw new Error(`Missing domain-specific translation: ${source}`);
+  if (actual.some((value, index) => value !== expected[index])) {
+    throw new Error(`Incorrect domain-specific translation for ${source}: ${JSON.stringify(actual)}`);
+  }
+}
+
 for (const required of [
   "Votre session a expiré.",
   "L’enregistrement de la mesure a échoué.",
