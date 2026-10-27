@@ -339,7 +339,7 @@ if(root){
         const delta=target.base.clone().sub(node.p),axis=new THREE.Vector3().crossVectors(delta,new THREE.Vector3(.31,.87,.43)).normalize();
         const mid=node.p.clone().lerp(target.base,.5).addScaledVector(axis,.16);
         const curve=new THREE.QuadraticBezierCurve3(node.p,mid,target.base);
-        const bridge=makeNeurite(curve,target.color,.008,.36,20);
+        const bridge=makeNeurite(curve,target.color,.014,.56,28);
         bridge.userData={kind:'resource-domain-link',id:otherId,sourceId:id,targetId:otherId,resource:node.meta.titleClean,resourceUrl:node.meta.url.href};resourceGroup.add(bridge);
         const pulse=new THREE.Mesh(new THREE.SphereGeometry(.019,10,8),new THREE.MeshBasicMaterial({color:0xe1f4d9,transparent:true,opacity:.9,depthWrite:false,toneMapped:false}));
         pulse.userData.kind='resource-signal';resourceGroup.add(pulse);
