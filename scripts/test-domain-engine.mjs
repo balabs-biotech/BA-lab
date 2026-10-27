@@ -20,6 +20,8 @@ assert.match(trackerSource, /if \(activeDomain === "agronomy"\) \{\s*hideElement
   "Green Tech must switch to the plant registry after a live workspace change");
 assert.match(trackerSource, /await loadCultureOptions\(\);\s*await loadLatestBatches\(\);/,
   "switching between Mycology and Laboratory must reload domain-scoped culture targets and batches");
+assert.match(trackerSource, /const visibleCultureIds = new Set\(cultureOptions\.map\(culture => culture\.id\)\);\s*latestBatches = \(data \|\| \[\]\)\.filter\(batch =>\s*Boolean\(batch\.culture_id && visibleCultureIds\.has\(batch\.culture_id\)\)\s*\);/,
+  "batch lists must be scoped to the active workspace's culture registry");
 assert.match(trackerSource, /cultureOptions = \[\];\s*latestBatches = \[\];\s*renderMeasurementTargets\(\);/,
   "switching to Green Tech must clear stale biological targets before loading plant records");
 assert.match(trackerSource, /else \{\s*showElement\(trackerCard\);\s*showElement\(batchCard\);\s*hideElement\(plantCard\);/,
