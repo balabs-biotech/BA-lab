@@ -107,7 +107,9 @@ const requiredThemeRules = [
   "color: #ffffff !important;",
   "body[data-domain=\"agronomy\"] .secondary-button",
   "body[data-domain=\"mycology\"] .secondary-button",
-  "body[data-domain=\"laboratory\"] .secondary-button"
+  "body[data-domain=\"laboratory\"] .secondary-button",
+  "button:not(.overview-shortcut):not(.quick-capture-tile):not(.statistics-filter-action):not(.secondary)",
+  ":not(.secondary-button):not(.danger-button)"
 ];
 for (const rule of requiredThemeRules) {
   if (!themeCss.includes(rule)) throw new Error(`Missing audited theme rule: ${rule}`);
