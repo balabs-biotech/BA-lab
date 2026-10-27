@@ -395,10 +395,10 @@ async function getCurrentSession() {
    CLAIM BA-LABS
    ============================================================ */
 
-async function claimBALabs() {
+async function claimBALabs(session) {
 
-  const session =
-    await getCurrentSession();
+  // refreshAuthUI already verified this session; do not trigger a second
+  // refresh-token lookup before the organization claim.
 
 
   if (!session) {
@@ -878,7 +878,7 @@ async function initializeAuthenticatedTracker(
     setInitializationStage("rattachement à l’organisation");
 
     const claim =
-      await claimBALabs();
+      await claimBALabs(session);
     if (initRevision !== authStateRevision) return;
 
 
