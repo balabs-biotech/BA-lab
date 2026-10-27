@@ -147,8 +147,9 @@
           "Accept":"image/png"
         };
         let response;
-        // Public Earth Search / AWS Open Data is the primary route. Copernicus OAuth
-        // is only a fallback, so normal operation does not depend on provider credentials.
+        // Use the public Earth Search / AWS Open Data renderer as the single active
+        // path. This avoids a known-unconfigured provider fallback and exposes its
+        // own diagnostics to the user.
         response=await fetch("https://axcouwiodqsauwnsiotn.supabase.co/functions/v1/earth-search-sentinel2-ndvi-preview",{
           method:"POST",headers:requestHeaders,body:JSON.stringify({location_id:location.value,date:sceneDate,mode:displayMode})
         });
