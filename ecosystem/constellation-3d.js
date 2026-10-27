@@ -317,8 +317,8 @@ if(root){
       normalizedDomainTerms[other].some(term=>meta.text.some(word=>matchesDomainTerm(word,term)))||
       normalizedDomainPhrases[other].some(phrase=>matchesPhrase(meta.text,phrase))
     ));
-    // Rank bridges by evidence and cap each resource's degree to preserve readable topology.
-    // A page may connect to at most two other domains; specific multi-word stems outrank broad matches.
+    // Rank bridges by evidence while allowing enough domain coverage to reveal cross-disciplinary links.
+    // A page may connect to at most three other domains; specific multi-word stems outrank broad matches.
     for(const node of nodes){
       const ranked=matchedDomains(node.meta).map(otherId=>{
         const terms=normalizedDomainTerms[otherId];
@@ -333,7 +333,7 @@ if(root){
         const phraseScore=matchedPhrases.length*5;
         const score=termScore+phraseScore;
         return {otherId,score,evidence:matchedTerms.length+matchedPhrases.length};
-      }).filter(item=>item.score>0).sort((a,b)=>b.score-a.score||b.evidence-a.evidence||ids.indexOf(a.otherId)-ids.indexOf(b.otherId)).slice(0,2);
+      }).filter(item=>item.score>0).sort((a,b)=>b.score-a.score||b.evidence-a.evidence||ids.indexOf(a.otherId)-ids.indexOf(b.otherId)).slice(0,3);
       for(const {otherId} of ranked){
         const target=points.find(p=>p.id===otherId);if(!target)continue;
         const delta=target.base.clone().sub(node.p),axis=new THREE.Vector3().crossVectors(delta,new THREE.Vector3(.31,.87,.43)).normalize();
