@@ -91,18 +91,18 @@ if(root){
         }
         geo.computeVertexNormals();
         const mat=new THREE.MeshStandardMaterial({color,emissive:new THREE.Color(color).multiplyScalar(.08),emissiveIntensity:.12,metalness:0,roughness:1,flatShading:true});
-        const mesh=new THREE.Mesh(geo,mat);mesh.position.copy(p);mesh.userData={kind:'sphere',id};mesh.scale.set(.92,.78,.72);worldGroup.add(mesh);
+        const mesh=new THREE.Mesh(geo,mat);mesh.position.copy(p);mesh.userData={kind:'sphere',id};mesh.scale.set(1.012,.858,.792);worldGroup.add(mesh);
         // Polarized neuronal morphology: one unmistakable axon plus an
         // asymmetric dendritic crown. Avoid the radial "sea urchin" silhouette.
         const twigs=[];
         const polarity=p.clone().normalize();
         const axonDir=polarity.clone().add(new THREE.Vector3(Math.sin(ids.indexOf(id)*1.7)*.22,Math.cos(ids.indexOf(id)*1.1)*.16,Math.sin(ids.indexOf(id)*.83)*.2)).normalize();
         const axonStart=p.clone().addScaledVector(axonDir,.055);
-        const axonEnd=p.clone().addScaledVector(axonDir,1.534+((ids.indexOf(id)%3)*.169));
+        const axonEnd=p.clone().addScaledVector(axonDir,1.6874+((ids.indexOf(id)%3)*.1859));
         const axonSide=new THREE.Vector3().crossVectors(axonDir,new THREE.Vector3(.31,.87,.43)).normalize();
         const axonMid=axonStart.clone().lerp(axonEnd,.52).addScaledVector(axonSide,.10);
         const axonCurve=new THREE.QuadraticBezierCurve3(axonStart,axonMid,axonEnd);
-        const axon=makeNeurite(axonCurve,color,.0351,.94,30);
+        const axon=makeNeurite(axonCurve,color,.03861,1.034,30);
         axon.userData={kind:'dendrite',id,process:'axon'};worldGroup.add(axon);twigs.push(axon);
         // Terminal axon collaterals branch only near the far end.
         for(let b=0;b<2;b++){
