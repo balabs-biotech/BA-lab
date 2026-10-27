@@ -4,7 +4,7 @@ const root=document.getElementById('mainView');
 if(root){
   const sphereEls=[...document.querySelectorAll('[data-sphere]')];
   const ids=['bio','myco','soil','lab','products','iot','work','learn'];
-  const colors={bio:0x78b985,myco:0x9c82d4,soil:0xc18a4d,lab:0x579bd1,products:0xd87858,iot:0x8da6b8,work:0xb17caa,learn:0xb5b86c};
+  const colors={bio:0x9fbea1,myco:0x9c91bd,soil:0xbd936b,lab:0x829fba,products:0xc18b76,iot:0x9eabb7,work:0x9b8fa7,learn:0xb4b9a0};
   const labels=Object.fromEntries(sphereEls.map(el=>[el.dataset.sphere,{title:el.querySelector('b')?.textContent||el.dataset.sphere,sub:el.querySelector('small')?.textContent||''}]));
   const stage=document.createElement('div');stage.className='webgl-stage';stage.setAttribute('role','application');stage.setAttribute('aria-label','Constellation 3D interactive BALabs');
   const hint=document.createElement('div');hint.className='webgl-hint';const hintText={fr:'GLISSER POUR TOURNER · PINCER POUR ZOOMER · TOUCHER UN UNIVERS',en:'DRAG TO ROTATE · PINCH TO ZOOM · TAP A WORLD',ar:'اسحب للتدوير · اقرص للتكبير · المس عالماً',pt:'ARRASTE PARA RODAR · PINÇA PARA ZOOM · TOQUE NUM UNIVERSO'};const refreshHint=()=>{hint.textContent=hintText[document.documentElement.lang]||hintText.fr};refreshHint();new MutationObserver(refreshHint).observe(document.documentElement,{attributes:true,attributeFilter:['lang']});
