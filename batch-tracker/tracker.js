@@ -6656,7 +6656,20 @@ function setupDomainWorkspaces() {
 
       void (async () => {
         try {
-          if (activeDomain === "agronomy") await loadPlantCultures();
+          if (activeDomain === "agronomy") {
+            // Do not leave the previous biological workspace's targets selectable.
+            cultureOptions = [];
+            latestBatches = [];
+            renderMeasurementTargets();
+            renderStatisticsFilters();
+            await loadPlantCultures();
+          } else {
+            // cultures are scoped by metadata.domain in loadCultureOptions();
+            // reload them on every switch so mycology and lab don't reuse each
+            // other's cached target list.
+            await loadCultureOptions();
+            await loadLatestBatches();
+          }
           renderMeasurementTargets();
           renderStatisticsFilters();
           await loadMeasurementReferences();
