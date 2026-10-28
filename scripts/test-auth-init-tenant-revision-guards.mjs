@@ -48,7 +48,7 @@ for (const loader of [
   const source = getFunctionBlock(loader);
   assert.match(source, /const loadRevision = authStateRevision;/,
     `${loader} must capture the auth revision before starting its request`);
-  assert.match(source, /isCurrentWorkspaceRevision\\(loadRevision, loadOrganizationId\\)/,
+  assert.match(source, /isCurrentWorkspaceRevision\(loadRevision, loadOrganizationId\)/,
     `${loader} must discard results from a superseded tenant`);
 }
 for (const loader of ["loadReferenceData", "loadQuantityUnitOptions", "loadMeasurementReferences"]) {
