@@ -344,6 +344,34 @@ for (const name of ["loadStrainOptions", "loadCultureOptions", "loadLatestBatche
 }
 console.log("Tenant snapshot initialization order passed.");
 
+// Repeated option/list refreshes in the same tenant must use latest-request-wins semantics.
+for (const [name, requestId] of [
+  ["loadStrainOptions", "strainOptionsRequestId"],
+  ["loadCultureOptions", "cultureOptionsRequestId"],
+  ["loadLatestBatches", "latestBatchesRequestId"],
+]) {
+  const handler = handlerSource(name);
+  assert.match(
+    tracker,
+    new RegExp(`let ${requestId} = 0;`),
+    `${name} must declare a dedicated request identity`,
+  );
+  assert.match(
+    handler,
+    new RegExp(`const requestId = \\+\\+${requestId};`),
+    `${name} must supersede an earlier overlapping refresh`,
+  );
+  assert.match(
+    handler,
+    new RegExp(`requestId !== ${requestId} \\|\\| !isCurrentWorkspaceRevision\\(loadRevision, loadOrganizationId\\)\\) return;`),
+    `${name} must reject stale responses before mutating shared state or UI`,
+  );
+}
+assert.match(clearWorkspaceHandler, /strainOptionsRequestId\\s*\\+=\\s*1;/, "session cleanup must invalidate pending strain-option requests");
+assert.match(clearWorkspaceHandler, /cultureOptionsRequestId\\s*\\+=\\s*1;/, "session cleanup must invalidate pending culture-option requests");
+assert.match(clearWorkspaceHandler, /latestBatchesRequestId\\s*\\+=\\s*1;/, "session cleanup must invalidate pending batch-list requests");
+console.log("Option and batch-list request-order guards passed.");
+
 
 // Background Notion sync and batch event timeline must never fall back to mutable tenant globals.
 for (const name of ["syncPendingCultures", "loadBatch"]) {
