@@ -2145,15 +2145,20 @@ async function loadCultureOptions() {
 
   }
 
-
+  const requestedDomain = document.body.dataset.domain;
+  const requestedOrganizationId = organizationId;
   const data = await loadOrganizationRowsInPages(
     "cultures",
     "id, code, culture_type, material_id, started_at, metadata",
     "Chargement des cultures impossible"
   );
 
+  // A slower response from a workspace we already left must not replace
+  // the current workspace's culture registry.
+  if (requestedOrganizationId !== organizationId ||
+      requestedDomain !== document.body.dataset.domain) return;
 
-  const activeDomain = document.body.dataset.domain;
+  const activeDomain = requestedDomain;
   cultureOptions = (data || []).filter(culture => {
     if (activeDomain === "agronomy") return false;
     const recordDomain = culture.metadata?.domain;
@@ -2233,18 +2238,23 @@ async function loadLatestBatches() {
 
   }
 
-
+  const requestedDomain = document.body.dataset.domain;
+  const requestedOrganizationId = organizationId;
+  const requestedCultures = cultureOptions.slice();
   const data = await loadOrganizationRowsInPages(
     "batches",
     "id, batch_code, name, batch_type, status, current_stage, culture_id, environment_id, material_id, planned_at, quantity_planned, quantity_actual, quantity_unit_code, created_at",
     "Chargement des batchs impossible"
   );
 
+  // Discard late responses after a workspace or organization change.
+  if (requestedOrganizationId !== organizationId ||
+      requestedDomain !== document.body.dataset.domain) return;
 
   // A batch belongs to the workspace of its source culture. The schema
   // has no authoritative domain column on batches, so use the already
   // domain-scoped culture registry rather than guessing from batch_type.
-  const visibleCultureIds = new Set(cultureOptions.map(culture => culture.id));
+  const visibleCultureIds = new Set(requestedCultures.map(culture => culture.id));
   latestBatches = (data || []).filter(batch =>
     Boolean(batch.culture_id && visibleCultureIds.has(batch.culture_id))
   );
@@ -5042,6 +5052,11 @@ async function loadRecentWorkspaceHistory(tableName, timestampColumn, columns, d
   const pageSize = 250;
   const visibleRows = [];
   const eventsById = {};
+  const requestedDomain = document.body.dataset.domain || "mycology";
+  const requestedOrganizationId = organizationId;
+  const requestedCultures = cultureOptions.slice();
+  const requestedPlants = plantCultureOptions.slice();
+  const requestedBatches = latestBatches.slice();
   let offset = 0;
 
   // Paginate the organization-wide stream before applying workspace ownership.
@@ -5051,11 +5066,15 @@ async function loadRecentWorkspaceHistory(tableName, timestampColumn, columns, d
     const { data, error } = await supabaseClient
       .from(tableName)
       .select(columns)
-      .eq("organization_id", organizationId)
+      .eq("organization_id", requestedOrganizationId)
       .order(timestampColumn, { ascending: false })
       .order("id", { ascending: false })
       .range(offset, offset + pageSize - 1);
     if (error) throw new Error("Chargement de l’historique impossible : " + error.message);
+    if (requestedOrganizationId !== organizationId ||
+        requestedDomain !== (document.body.dataset.domain || "mycology")) {
+      return { rows: [], eventsById, stale: true };
+    }
 
     const page = data || [];
     if (!page.length) break;
@@ -5064,50 +5083,64 @@ async function loadRecentWorkspaceHistory(tableName, timestampColumn, columns, d
       const { data: events, error: eventsError } = await supabaseClient
         .from("events")
         .select("id, batch_id, culture_id, plant_culture_id")
-        .eq("organization_id", organizationId)
+        .eq("organization_id", requestedOrganizationId)
         .in("id", eventIds);
       if (eventsError) throw new Error("Chargement des liens d’événements impossible : " + eventsError.message);
+      if (requestedOrganizationId !== organizationId ||
+          requestedDomain !== (document.body.dataset.domain || "mycology")) {
+        return { rows: [], eventsById, stale: true };
+      }
       for (const event of events || []) eventsById[event.id] = event;
     }
 
     for (const row of page) {
-      if (belongsToActiveWorkspace(row, eventsById)) visibleRows.push(row);
+      if (belongsToActiveWorkspace(row, eventsById, requestedDomain, {
+        cultures: requestedCultures,
+        plants: requestedPlants,
+        batches: requestedBatches
+      })) visibleRows.push(row);
       if (visibleRows.length >= displayLimit) break;
     }
     if (page.length < pageSize) break;
     offset += pageSize;
   }
 
-  return { rows: visibleRows.slice(0, displayLimit), eventsById };
+  return {
+    rows: visibleRows.slice(0, displayLimit),
+    eventsById,
+    stale: requestedOrganizationId !== organizationId ||
+      requestedDomain !== (document.body.dataset.domain || "mycology")
+  };
 }
 
-function belongsToActiveWorkspace(record, eventsById = {}) {
-  const domain = document.body.dataset.domain || "mycology";
+function belongsToActiveWorkspace(record, eventsById = {}, domain = document.body.dataset.domain || "mycology", registries = {}) {
   const event = record.event_id ? eventsById[record.event_id] : null;
   const cultureId = record.culture_id || event?.culture_id;
   const plantId = record.plant_culture_id || event?.plant_culture_id;
   const batchId = event?.batch_id;
   if (domain === "agronomy") {
-    return Boolean(plantId && plantCultureOptions.some(plant => plant.id === plantId));
+    return Boolean(plantId && (registries.plants || plantCultureOptions).some(plant => plant.id === plantId));
   }
   if (domain === "mycology") {
-    return Boolean(cultureId && cultureOptions.some(culture => culture.id === cultureId));
+    return Boolean(cultureId && (registries.cultures || cultureOptions).some(culture => culture.id === cultureId));
   }
   return Boolean(
     (cultureId && cultureOptions.some(culture => culture.id === cultureId)) ||
-    (batchId && latestBatches.some(batch => batch.id === batchId))
+    (batchId && (registries.batches || latestBatches).some(batch => batch.id === batchId))
   );
 }
 
 async function loadRecentMeasurements() {
   if (!organizationId || !measurementHistory) return;
 
-  const { rows: visibleRows, eventsById } = await loadRecentWorkspaceHistory(
+  const requestedDomain = document.body.dataset.domain || "mycology";
+  const { rows: visibleRows, eventsById, stale } = await loadRecentWorkspaceHistory(
     "measurements",
     "measured_at",
     "id, variable_code, raw_value, raw_unit_code, normalized_value, normalized_unit_code, measured_at, method, instrument, culture_id, plant_culture_id, event_id, metadata",
     10
   );
+  if (stale || requestedDomain !== (document.body.dataset.domain || "mycology")) return;
   if (!visibleRows.length) {
     measurementHistory.innerHTML = '<p class="muted">Aucune mesure enregistrée dans cet univers pour le moment.</p>';
     return;
@@ -5278,12 +5311,14 @@ async function saveObservation() {
 async function loadRecentObservations() {
   if (!organizationId || !observationHistory) return;
 
-  const { rows: recentObservations, eventsById } = await loadRecentWorkspaceHistory(
+  const requestedDomain = document.body.dataset.domain || "mycology";
+  const { rows: recentObservations, eventsById, stale } = await loadRecentWorkspaceHistory(
     "observations",
     "observed_at",
     "id, variable_code, value_text, observed_at, culture_id, plant_culture_id, event_id, metadata",
     8
   );
+  if (stale || requestedDomain !== (document.body.dataset.domain || "mycology")) return;
   updateOverview();
   if (!recentObservations.length) {
     observationHistory.innerHTML = '<p class="muted">Aucune observation enregistrée dans cet univers pour le moment.</p>';
