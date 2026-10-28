@@ -780,6 +780,12 @@ function clearAuthenticatedWorkspaceState() {
   // Drop tenant-scoped state whenever the current session is absent or cannot
   // be verified. Hiding the UI alone must not leave a previous tenant usable
   // by event handlers or a later partial initialization.
+  cultureDetailRequestId += 1;
+  const cultureDetailPanel = document.getElementById("cultureDetailPanel");
+  if (cultureDetailPanel) {
+    cultureDetailPanel.classList.add("hidden");
+    cultureDetailPanel.dataset.cultureId = "";
+  }
   organizationId = null;
   organization = null;
   strainOptions = [];
@@ -5922,7 +5928,7 @@ async function loadCultureDetail(cultureId) {
   const meta = document.getElementById("cultureDetailMeta");
   const summary = document.getElementById("cultureDetailSummary");
   const timeline = document.getElementById("cultureDetailTimeline");
-  if (!culture || !panel || !title || !meta || !summary || !timeline) return;
+  if (!loadOrganizationId || !culture || !panel || !title || !meta || !summary || !timeline) return;
 
   panel.dataset.cultureId = culture.id;
   loadBiologicalLineage(culture.id);
@@ -6099,6 +6105,8 @@ async function loadCultureDetail(cultureId) {
         openBatch.textContent = "Ouvrir le lot";
         openBatch.setAttribute("aria-label", "Ouvrir le lot " + (batch.batch_code || batch.name || ""));
         openBatch.addEventListener("click", async () => {
+          if (!isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
+          if (panel.dataset.cultureId !== culture.id) return;
           activateWorkspaceModule("batchCard");
           document.getElementById("batchCard")?.scrollIntoView({
             block: "start",
