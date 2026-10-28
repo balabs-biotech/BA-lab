@@ -125,6 +125,17 @@ h1 span{color:#c3dda9;text-shadow:0 4px 30px #b9d5a822}
 #mainView .webgl-stage .webgl-status{color:#c3dda9;text-shadow:0 2px 12px #101a12}
 @media(max-width:760px){.wrap{padding-top:13px}.scene{border-radius:16px}.hero p{font-size:13px}.aside{border-left-color:#78917c}}
 
+
+/* Mobile touch targets: keep the 3D controls comfortable on phones. */
+@media(max-width:760px){
+ #mainView .webgl-stage .webgl-controls{gap:7px}
+ #mainView .webgl-stage .webgl-controls button{width:44px;height:44px;border-radius:13px;font-size:23px;touch-action:manipulation}
+ #mainView .webgl-stage .webgl-controls button:focus-visible{outline:2px solid #c5e7b8;outline-offset:3px}
+}
+@media(max-width:370px){
+ #mainView .webgl-stage .webgl-controls{right:8px;gap:5px}
+ #mainView .webgl-stage .webgl-controls button{width:42px;height:42px}
+}
 </style>
 <style>
 #mainView .webgl-focus-next{margin-top:5px;color:#829b80;font:600 9px/1.4 system-ui,sans-serif;letter-spacing:.09em;text-transform:uppercase}
