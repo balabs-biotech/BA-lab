@@ -572,3 +572,15 @@ assert.match(
   "session cleanup must invalidate pending location/environment loads",
 );
 console.log("Batch location/environment request-order guards passed.");
+
+
+// Switching domain invalidates in-flight statistics computed with the previous domain's filters.
+const domainSetupStart = tracker.indexOf("function setupDomainWorkspaces()");
+const domainSetupEnd = tracker.indexOf("setupDomainWorkspaces();", domainSetupStart);
+const domainSetupSource = tracker.slice(domainSetupStart, domainSetupEnd);
+assert.match(
+  domainSetupSource,
+  /const previousDomain = document\.body\.dataset\.domain;[\s\S]*?previousDomain !== activeDomain[\s\S]*?statisticsRequestId \+= 1;/,
+  "switching workspace domains must invalidate pending statistics responses",
+);
+console.log("Domain-switch statistics invalidation guard passed.");
