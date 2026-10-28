@@ -48,6 +48,12 @@ let batchLocationOptions = [];
 let batchEnvironmentOptions = [];
 let recentObservations = [];
 
+function isCurrentWorkspaceRevision(revision, expectedOrganizationId) {
+  return revision === authStateRevision &&
+    Boolean(expectedOrganizationId) &&
+    organizationId === expectedOrganizationId;
+}
+
 
 /* ============================================================
    ETAPES STANDARD DU BATCH
@@ -1781,6 +1787,8 @@ async function syncPendingCultures() {
 async function createCulture() {
 
   clearMessage();
+  const operationRevision = authStateRevision;
+  const operationOrganizationId = organizationId;
 
 
   const materialId =
@@ -1858,6 +1866,7 @@ async function createCulture() {
   const session =
     await getCurrentSession();
 
+  if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
 
   if (!session) {
 
@@ -1892,11 +1901,12 @@ async function createCulture() {
       error: consentLookupError
     } = await consentTable
       .select("id")
-      .eq("organization_id", organizationId)
+      .eq("organization_id", operationOrganizationId)
       .eq("user_id", session.user.id)
       .eq("terms_version", "2026-10-09-v1")
       .maybeSingle();
 
+    if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
     if (consentLookupError) {
       throw new Error(
         `Impossible de vérifier le consentement : ${consentLookupError.message}`
@@ -1916,17 +1926,20 @@ async function createCulture() {
       // Conserver la date de première acceptation des conditions.
       const updateResult = await consentTable
         .update(consentValues)
+        .eq("organization_id", operationOrganizationId)
         .eq("id", existingConsent.id);
+      if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
       consentError = updateResult.error;
     } else {
       const insertResult = await consentTable
         .insert({
-          organization_id: organizationId,
+          organization_id: operationOrganizationId,
           user_id: session.user.id,
           terms_version: "2026-10-09-v1",
           terms_accepted_at: new Date().toISOString(),
           ...consentValues
         });
+      if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
       consentError = insertResult.error;
     }
 
@@ -1941,6 +1954,7 @@ async function createCulture() {
         protocolCode
       );
 
+    if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
 
     const {
       data,
@@ -1951,7 +1965,7 @@ async function createCulture() {
         {
 
           p_organization_id:
-            organizationId,
+            operationOrganizationId,
 
           p_code:
             cultureCode,
@@ -1994,6 +2008,7 @@ async function createCulture() {
       );
 
 
+    if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
     if (error) {
 
       throw new Error(
@@ -2999,11 +3014,15 @@ function updateHarvestEntryState(batch, events) {
 }
 
 async function recordBatchHarvest() {
-  if (!organizationId || !selectedBatch || !selectedBatchId) {
+  const operationRevision = authStateRevision;
+  const operationOrganizationId = organizationId;
+  const operationBatchId = selectedBatchId;
+  const operationBatch = selectedBatch;
+  if (!operationOrganizationId || !operationBatch || !operationBatchId) {
     showMessage("Sélectionnez d’abord un lot.", "error");
     return;
   }
-  if (selectedBatch.current_stage !== "harvest" || selectedBatch.status !== "active") {
+  if (operationBatch.current_stage !== "harvest" || operationBatch.status !== "active") {
     showMessage("La récolte ne peut être enregistrée que pendant l’étape Récolte d’un lot ouvert.", "error");
     return;
   }
@@ -3020,25 +3039,28 @@ async function recordBatchHarvest() {
   recordHarvestButton.textContent = "Enregistrement…";
   try {
     const session = await getCurrentSession();
+    if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId) || selectedBatchId !== operationBatchId) return;
     if (!session) throw new Error("Session expirée. Reconnectez-vous.");
     const { data: unit, error: unitError } = await supabaseClient.from("units").select("code").eq("code", unitCode).maybeSingle();
+    if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId) || selectedBatchId !== operationBatchId) return;
     if (unitError) throw new Error("Vérification de l’unité impossible : " + unitError.message);
     if (!unit) throw new Error("Code d’unité inconnu. Utilisez un code déjà présent dans le référentiel des unités.");
     // events requires exactly one biological/material/sample/unit anchor in addition to batch_id.
-    const eventAnchor = selectedBatch.culture_id
-      ? { culture_id: selectedBatch.culture_id }
-      : selectedBatch.material_id
-        ? { material_id: selectedBatch.material_id }
+    const eventAnchor = operationBatch.culture_id
+      ? { culture_id: operationBatch.culture_id }
+      : operationBatch.material_id
+        ? { material_id: operationBatch.material_id }
         : null;
     if (!eventAnchor) {
       throw new Error("Ce lot doit être lié à une culture ou à un matériau pour enregistrer une récolte dans le journal biologique.");
     }
     const { data: eventId, error } = await supabaseClient.rpc("record_batch_harvest", {
-      p_batch_id: selectedBatch.id,
+      p_batch_id: operationBatch.id,
       p_quantity: quantity,
       p_unit_code: unit.code,
       p_note: note || null
     });
+    if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId) || selectedBatchId !== operationBatchId) return;
     if (error) throw new Error("Enregistrement de la récolte impossible : " + error.message);
     if (!eventId) throw new Error("La base n’a pas confirmé l’enregistrement de la récolte.");
     harvestQuantityInput.value = "";
@@ -3047,6 +3069,7 @@ async function recordBatchHarvest() {
     await loadBatch(selectedBatch.id);
     await loadLatestBatches();
   } catch (error) {
+    if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
     console.error("Enregistrement récolte :", error);
     showMessage(error?.message || "Enregistrement de la récolte impossible.", "error");
   } finally {
@@ -3628,7 +3651,9 @@ async function saveQcCheckNow(
   checkId
 ) {
 
-  if (!organizationId) {
+  const operationRevision = authStateRevision;
+  const operationOrganizationId = organizationId;
+  if (!operationOrganizationId) {
 
     return;
 
@@ -3657,6 +3682,7 @@ async function saveQcCheckNow(
   } =
     await supabaseClient.auth.getSession();
 
+  if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
 
   if (!sessionData.session) {
 
@@ -3696,7 +3722,7 @@ async function saveQcCheckNow(
       .update(update)
       .eq(
         "organization_id",
-        organizationId
+        operationOrganizationId
       )
       .eq(
         "id",
@@ -3704,6 +3730,7 @@ async function saveQcCheckNow(
       );
 
 
+  if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
   if (error) {
 
     showMessage(
@@ -3844,6 +3871,8 @@ function updateBatchActionState(
 async function createBatch() {
 
   clearMessage();
+  const operationRevision = authStateRevision;
+  const operationOrganizationId = organizationId;
 
 
   if (!organizationId) {
@@ -3987,6 +4016,7 @@ async function createBatch() {
       selectedCulture.id
     );
 
+  if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
 
   const selectedMaterialId =
     selectedCulture.material_id;
@@ -4010,7 +4040,7 @@ async function createBatch() {
         {
 
           p_organization_id:
-            organizationId,
+            operationOrganizationId,
 
           p_batch_code:
             batchCode,
@@ -4053,6 +4083,7 @@ async function createBatch() {
       );
 
 
+    if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
     if (error) {
 
       throw new Error(
@@ -4153,6 +4184,7 @@ async function createBatch() {
 
   catch (error) {
 
+    if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
     console.error(
       "Création batch:",
       error
@@ -5008,7 +5040,9 @@ function cultureWorkflowText(key) {
 }
 
 async function saveMeasurement() {
-  if (!organizationId) {
+  const operationRevision = authStateRevision;
+  const operationOrganizationId = organizationId;
+  if (!operationOrganizationId) {
     showMessage(cultureWorkflowText("organization"), "error");
     return;
   }
@@ -5038,6 +5072,7 @@ async function saveMeasurement() {
     showMessage("Impossible de vérifier votre session. Vérifiez la connexion puis réessayez. Aucune mesure n’a été enregistrée.", "error");
     return;
   }
+  if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
   if (!session) {
     showMessage(cultureWorkflowText("expired"), "error");
     return;
@@ -5077,7 +5112,7 @@ async function saveMeasurement() {
 
     const sameAsCanonical = variable.canonical_unit_code === unit.code;
     const eventPayload = {
-      organization_id: organizationId,
+      organization_id: operationOrganizationId,
       event_type: "measurement_recorded",
       occurred_at: measuredAt,
       actor_user_id: session.user.id,
@@ -5097,7 +5132,7 @@ async function saveMeasurement() {
       }
     };
     const measurementPayload = {
-      organization_id: organizationId,
+      organization_id: operationOrganizationId,
       variable_code: variable.code,
       raw_value: rawValue,
       raw_unit_code: unit.code,
@@ -5116,6 +5151,7 @@ async function saveMeasurement() {
         batch_id: batchId
       }
     };
+    if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
     const { error: recordError } = await supabaseClient.rpc("record_manual_measurement", {
       p_event: eventPayload,
       p_measurement: measurementPayload
@@ -5228,7 +5264,9 @@ async function loadRecentMeasurements() {
 
 
 async function saveObservation() {
-  if (!organizationId) {
+  const operationRevision = authStateRevision;
+  const operationOrganizationId = organizationId;
+  if (!operationOrganizationId) {
     showMessage(cultureWorkflowText("organization"), "error");
     return;
   }
@@ -5251,6 +5289,7 @@ async function saveObservation() {
     showMessage("Impossible de vérifier votre session. Vérifiez la connexion puis réessayez. Aucune observation n’a été enregistrée.", "error");
     return;
   }
+  if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
   if (!session) {
     showMessage(cultureWorkflowText("expired"), "error");
     return;
@@ -5291,7 +5330,7 @@ async function saveObservation() {
     }
 
     const eventPayload = {
-      organization_id: organizationId,
+      organization_id: operationOrganizationId,
       event_type: "observation_recorded",
       occurred_at: observedAt,
       actor_user_id: session.user.id,
@@ -5310,7 +5349,7 @@ async function saveObservation() {
       }
     };
     const observationPayload = {
-      organization_id: organizationId,
+      organization_id: operationOrganizationId,
       variable_code: variable.code,
       value_text: valueText,
       observed_at: observedAt,
@@ -5325,6 +5364,7 @@ async function saveObservation() {
         batch_id: batchId
       }
     };
+    if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
     const { error: recordError } = await supabaseClient.rpc("record_manual_observation", {
       p_event: eventPayload,
       p_observation: observationPayload
@@ -5784,6 +5824,8 @@ async function loadBiologicalLineage(cultureId) {
 
 async function saveBiologicalOperation(event) {
   event.preventDefault();
+  const operationRevision = authStateRevision;
+  const operationOrganizationId = organizationId;
   const button = document.getElementById('saveBioOperation');
   const message = document.getElementById('bioOperationMessage');
   const cultureId = document.getElementById('cultureDetailPanel')?.dataset.cultureId;
@@ -5800,16 +5842,19 @@ async function saveBiologicalOperation(event) {
   button.disabled = true; button.textContent = biologicalWorkflowText("saving"); message.textContent = '';
   try {
     const { data, error } = await supabaseClient.rpc('record_biological_operation', {
-      p_organization_id: organizationId, p_parent_culture_id: cultureId, p_event_type: operationType,
+      p_organization_id: operationOrganizationId, p_parent_culture_id: cultureId, p_event_type: operationType,
       p_occurred_at: new Date(dateValue).toISOString(), p_note: note || null,
       p_details: { source: 'BA Labs Culture Tracker', interface_version: '3.0', conditions: conditions || null, outcome: outcome || null }, p_child_codes: childCodes
     });
+    if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
     if (error) throw error;
     const result = Array.isArray(data) ? data[0] : data;
     let notionSyncWarning = '';
     for (const child of (result?.children || [])) {
+      if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
       try {
         const { data: syncData, error: syncError } = await supabaseClient.functions.invoke('sync-culture-to-notion', { body: { culture_id: child.id } });
+        if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
         if (syncError || (syncData && syncData.ok === false)) notionSyncWarning = biologicalWorkflowText("syncWarning");
       } catch (syncError) { notionSyncWarning = biologicalWorkflowText("syncWarningShort"); }
     }
@@ -5818,7 +5863,7 @@ async function saveBiologicalOperation(event) {
     await loadCultureOptions();
     await loadCultureDetail(cultureId);
     await loadBiologicalLineage(cultureId);
-  } catch (error) { message.textContent = biologicalWorkflowText("failed") + (error.message || biologicalWorkflowText("notSaved")); }
+  } catch (error) { if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return; message.textContent = biologicalWorkflowText("failed") + (error.message || biologicalWorkflowText("notSaved")); }
   finally { button.disabled = false; button.textContent = biologicalWorkflowText("save"); }
 }
 
@@ -6565,7 +6610,9 @@ async function loadPlantCultures() {
 
 async function savePlantCulture(event) {
   event.preventDefault();
-  if (!organizationId) {
+  const operationRevision = authStateRevision;
+  const operationOrganizationId = organizationId;
+  if (!operationOrganizationId) {
     showMessage("Organisation absente : reconnectez-vous avant d’enregistrer une culture végétale.", "error");
     return;
   }
@@ -6588,7 +6635,7 @@ async function savePlantCulture(event) {
   try {
     const startedValue = document.getElementById("plantStartedAt").value;
     const { error } = await supabaseClient.from("plant_cultures").insert({
-      organization_id: organizationId,
+      organization_id: operationOrganizationId,
       code,
       crop_type: cropType,
       species_name: crop.species,
@@ -6603,6 +6650,7 @@ async function savePlantCulture(event) {
       notes: document.getElementById("plantNotes").value.trim() || null,
       metadata: { source: "BA Labs CultureOps", domain: "agronomy", interface_version: "1.0" }
     });
+    if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
     if (error) throw error;
     form.reset();
     document.getElementById("plantQuantity").value = "1";
@@ -6621,6 +6669,7 @@ async function savePlantCulture(event) {
     showMessage("Culture végétale enregistrée.", "success");
     if (status) status.textContent = "Culture enregistrée dans le registre AgriTech.";
   } catch (error) {
+    if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
     console.error("Enregistrement de la culture végétale impossible :", error);
     showMessage("Enregistrement impossible : " + (error.message || "erreur inconnue"), "error");
     if (status) status.textContent = "Échec de l’enregistrement. Vérifiez le code unique et les références.";
