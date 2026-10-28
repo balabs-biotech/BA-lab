@@ -302,5 +302,70 @@ document.querySelectorAll('[data-lang]').forEach(b=>b.addEventListener('click',(
 setLanguage('fr');applyOrbit();
 </script>
 <script type="module" src="./constellation-3d.js?v=legend-i18n-20261028o"></script>
+
+<style id="balabs-visual-refinement">
+/* BALabs visual refinement — editorial mineral / botanical system */
+:root{
+ color-scheme:light;
+ --bg:#eeeae0;--panel:#f7f5ee;--ink:#202a24;--muted:#657168;--line:#d4d8cc;
+ --lime:#82996b;--bio:#91aa86;--myco:#b98c5c;--soil:#b59a78;--lab:#809caf;
+ --products:#bf8e7c;--iot:#829da5;--work:#a398b8;--learn:#aeb68a;
+}
+html{background:#eeeae0}
+body{
+ color:#26312a;
+ background:
+  radial-gradient(ellipse at 8% 0%,#d9e0d0 0%,transparent 38%),
+  radial-gradient(ellipse at 92% 15%,#e4d9c8 0%,transparent 32%),
+  linear-gradient(145deg,#f3f0e7 0%,#e9e8de 52%,#f4f0e6 100%);
+}
+.wrap{max-width:1510px;padding-top:22px}
+.top{border-bottom:1px solid #d3d8cc;padding-bottom:18px}
+.mark{border-color:#91a584;background:linear-gradient(145deg,#f7f6ee,#dfe5d6);color:#526b47;box-shadow:0 5px 18px #475b3510}
+.brand strong{color:#27342b;letter-spacing:.2em}
+.brand small{color:#71816d}
+.lang{background:#f7f5ee;color:#435044;border-color:#d1d7ca;border-radius:999px;padding:8px 12px;transition:background .2s,transform .2s}
+.lang:hover{transform:translateY(-1px);border-color:#9baa8c}
+.lang[aria-pressed=true]{background:#455b43;color:#f8f6ee;border-color:#455b43}
+.hero{padding-top:clamp(32px,4.5vw,62px);padding-bottom:30px;gap:clamp(24px,4vw,58px)}
+.eyebrow{color:#71885e;letter-spacing:.24em}
+h1{color:#253229;line-height:.98;letter-spacing:-.072em}
+h1 span{color:#748b5e}
+.hero p{color:#626f63;line-height:1.9;font-size:clamp(13px,1.1vw,15px)}
+.aside{border-left-color:#c2cdb9;color:#69776b}
+.aside b{color:#2d3b30}
+.scene{border:1px solid #35483a;border-radius:24px;background:radial-gradient(ellipse at 50% 42%,#293b32 0%,#18251f 58%,#121a17 100%);box-shadow:0 28px 75px #45553b1c,0 3px 10px #3e4d3810}
+.scene:before{opacity:.15;background-size:44px 44px}
+.scenehead{background:linear-gradient(110deg,#1d2a23f5,#17221df5);border-bottom-color:#3a4c3b;padding:17px 20px}
+.scenehead small{color:#b0c19f}
+.scenehead strong{font-size:13px;letter-spacing:.015em}
+.btn{border-color:#53674f;background:#29372e;color:#f4f2e8;border-radius:999px;padding:10px 15px;transition:transform .2s,background .2s,box-shadow .2s}
+.btn:hover{border-color:#b7c7a5;transform:translateY(-1px);box-shadow:0 5px 16px #0002}
+.btn.primary{background:#d6dfc8;color:#27352a;border-color:#d6dfc8}
+.cluster-key{padding:16px 20px;background:#19251ff0;border-bottom-color:#344539}
+.cluster-item b{letter-spacing:.14em}
+.cluster-item small{color:#a8b7a5}
+.hub{background:radial-gradient(circle at 32% 23%,#60765a,#304333 50%,#18231c 83%);border-color:#b8cda0;box-shadow:0 0 0 12px #a9c5a308,0 0 0 30px #a9c5a304,0 0 70px #9ec57d22}
+.sphere{box-shadow:inset -12px -15px 25px #0006,inset 6px 6px 20px #ffffff0c,0 14px 34px #0005,0 0 27px color-mix(in srgb,var(--c) 14%,transparent)}
+.sphere:hover,.sphere.active{box-shadow:inset -12px -15px 25px #0006,0 0 0 5px color-mix(in srgb,var(--c) 12%,transparent),0 0 46px color-mix(in srgb,var(--c) 26%,transparent)}
+.minifooter{border-top-color:#d5dacf;color:#6c796d}
+.tile{border:1px solid #d8ddd1;background:linear-gradient(145deg,#faf9f3,#eeefe6);border-radius:16px;padding:18px;box-shadow:0 5px 20px #36432c08;transition:transform .22s,border-color .22s,box-shadow .22s}
+.tile:hover{transform:translateY(-3px);border-color:#b8c6aa;box-shadow:0 12px 26px #36432c10}
+.tile b{color:#2d3b30}
+.tile p,.tile small{color:#6b776b}
+.under{gap:12px;margin-top:16px}
+[dir=rtl] .aside{border-right-color:#c2cdb9}
+@media(max-width:760px){
+ .wrap{padding:13px 12px 24px}
+ .top{gap:10px}
+ .hero{padding-top:30px;padding-bottom:23px}
+ .scene{border-radius:18px}
+ .scenehead{padding:13px 14px}
+ .cluster-key{padding:12px 14px}
+ .tile{padding:14px}
+}
+@media(prefers-reduced-motion:reduce){.tile,.lang,.btn{transition:none!important}}
+</style>
+
 </body>
 </html>
