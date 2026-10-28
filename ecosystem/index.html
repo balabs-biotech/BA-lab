@@ -375,7 +375,11 @@ h1 span{color:#748b5e}
  .cluster-key{padding:12px 14px}
  .tile{padding:14px}
 }
-@media(prefers-reduced-motion:reduce){.tile,.lang,.btn{transition:none!important}}
+@media(prefers-reduced-motion:reduce){
+ .tile,.lang,.btn{transition:none!important}
+ .tile:hover,.lang:hover,.btn:hover{transform:none!important}
+ .webgl-intro-orb{animation:none!important}
+}
 </style>
 
 </body>
