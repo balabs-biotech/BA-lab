@@ -40,6 +40,8 @@ assert.match(trackerSource, /let workspaceSwitchRevision = 0;[\s\S]*?const switc
 
 assert.match(trackerSource, /async function loadPlantCultures\(\)[\s\S]*?loadOrganizationRowsInPages\(\s*"plant_cultures"/,
   "plant registry must paginate instead of silently truncating at 300 records");
+assert.match(trackerSource, /async function loadOrganizationRowsInPages\([\s\S]*?const requestedOrganizationId = organizationId;[\s\S]*?\.eq\("organization_id", requestedOrganizationId\)[\s\S]*?if \(requestedOrganizationId !== organizationId\) return \[\];/,
+  "paginated registry reads must stay bound to the organization captured at request start");
 assert.match(trackerSource, /async function loadRecentWorkspaceHistory\([\s\S]*?\.range\(offset, offset \+ pageSize - 1\)[\s\S]*?belongsToActiveWorkspace\(row, eventsById, requestedDomain[\s\S]*?visibleRows\.length >= displayLimit/,
   "measurement and observation histories must paginate before workspace filtering using the captured workspace");
 assert.match(trackerSource, /loadRecentWorkspaceHistory\(\s*"measurements"[\s\S]*?10\s*\)/,
