@@ -168,6 +168,11 @@ const writeContracts = [
     start: "async function releaseBatch()",
     rpc: 'supabaseClient.rpc(\n        "release_batch"',
   },
+  {
+    name: "moveSelectedBatch",
+    start: "async function moveSelectedBatch()",
+    rpc: 'supabaseClient.rpc("move_batch_to_location"',
+  },
 ];
 
 for (const contract of writeContracts) {
