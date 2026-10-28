@@ -281,6 +281,7 @@ assert.ok(
   "culture detail must recheck workspace identity after its asynchronous query phases",
 );
 console.log("Tenant-scoped analytics and lineage read guards passed.");
+assert.match(handlerSource("loadStatistics"), /finally \{ if \(requestId === statisticsRequestId && isCurrentWorkspaceRevision\(loadRevision, loadOrganizationId\)\)/, "statistics must not mutate button state after its workspace has been cleared");
 
 
 // Protocol lookups must not mix identifiers across tenant changes between awaits.
@@ -374,6 +375,7 @@ const listCleanupHandler = tracker.slice(
 assert.match(listCleanupHandler, /strainOptionsRequestId\s*\+=\s*1;/, "session cleanup must invalidate pending strain-option requests");
 assert.match(listCleanupHandler, /cultureOptionsRequestId\s*\+=\s*1;/, "session cleanup must invalidate pending culture-option requests");
 assert.match(listCleanupHandler, /latestBatchesRequestId\s*\+=\s*1;/, "session cleanup must invalidate pending batch-list requests");
+assert.match(listCleanupHandler, /statisticsRequestId\s*\+=\s*1;/, "session cleanup must invalidate pending statistics requests");
 console.log("Option and batch-list request-order guards passed.");
 
 
