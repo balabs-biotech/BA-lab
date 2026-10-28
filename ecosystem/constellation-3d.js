@@ -84,11 +84,11 @@ if(root){
       renderer=new THREE.WebGLRenderer({antialias:true,alpha:true,powerPreference:'high-performance'});
       renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,1.7));renderer.setClearColor(0x000000,0);renderer.outputColorSpace=THREE.SRGBColorSpace;
       stage.prepend(renderer.domElement);renderer.domElement.setAttribute('aria-label','Scène 3D BALabs');
-      scene=new THREE.Scene();scene.fog=new THREE.FogExp2(0x07100b,.025);worldGroup=new THREE.Group();scene.add(worldGroup);worldGroup.visible=false;
+      scene=new THREE.Scene();scene.fog=new THREE.FogExp2(0x0d1712,.018);worldGroup=new THREE.Group();scene.add(worldGroup);worldGroup.visible=false;
       camera=new THREE.PerspectiveCamera(48,1,.1,100);raycaster=new THREE.Raycaster();mouse=new THREE.Vector2();
-      scene.add(new THREE.AmbientLight(0xb8c8dc,1.05));
+      scene.add(new THREE.AmbientLight(0xc6d8ca,1.22));
       const key=new THREE.PointLight(0x7eb8f0,38,30);key.position.set(0,5,6);scene.add(key);
-      const fill=new THREE.PointLight(0x69c8a6,26,24);fill.position.set(-6,-2,-4);scene.add(fill);
+      const fill=new THREE.PointLight(0x82d5ad,30,26);fill.position.set(-6,-2,-4);scene.add(fill);
       const warm=new THREE.PointLight(0xffa45e,18,18);warm.position.set(5,-3,4);scene.add(warm);
       // No starfield, orbital rings or central planet: open directly on an irregular biological network.
       const pos={bio:[-1.1,2.35,.35],myco:[-2.65,1.05,.9],soil:[-.35,.85,-.85],lab:[-2.25,-.45,-.25],products:[1.15,.15,.85],iot:[2.75,1.35,-.35],work:[1.9,-1.35,-.7],learn:[-.15,-2.35,.3]};
