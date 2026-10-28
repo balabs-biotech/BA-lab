@@ -16,7 +16,7 @@ function element(id, options = []) {
   };
 }
 
-function createHarness() {
+function createHarness(domain = "mycology") {
   const elements = new Map();
   for (const id of ["smartEntryPanel", "smartEntrySource", "smartEntryApply", "smartEntryClear", "smartEntryStatus", "cultureCode", "cultureType", "protocol", "startedAt", "strain", "bioOperationNote"]) {
     elements.set(id, element(id));
@@ -41,9 +41,16 @@ function createHarness() {
   vm.runInNewContext(sourceCode, {
     document,
     Event: class Event { constructor(type, options) { this.type = type; this.options = options; } },
+    window: { BA_LABS_DOMAIN: domain },
     console,
   }, { filename: "batch-tracker/smart-entry.js" });
   return { elements, document };
+}
+
+
+{
+  const { elements } = createHarness("agronomy");
+  assert.equal(elements.get("smartEntryPanel").hidden, true);
 }
 
 {
@@ -90,4 +97,4 @@ function createHarness() {
   assert.match(elements.get("smartEntryStatus").textContent, /JSON|Unexpected/i);
 }
 
-console.log("✓ Assisted entry: JSON, labelled notes, and invalid dropdown values tested");
+console.log("✓ Assisted entry: JSON, labelled notes, ambiguous dropdowns, invalid JSON, and Green Tech scope tested");
