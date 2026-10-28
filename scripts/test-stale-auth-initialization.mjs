@@ -161,12 +161,12 @@ const writeContracts = [
   {
     name: "advanceBatch",
     start: "async function advanceBatch()",
-    rpc: 'supabaseClient.rpc(\\n        "advance_batch_stage"',
+    rpc: 'supabaseClient.rpc(\n        "advance_batch_stage"',
   },
   {
     name: "releaseBatch",
     start: "async function releaseBatch()",
-    rpc: 'supabaseClient.rpc(\\n        "release_batch"',
+    rpc: 'supabaseClient.rpc(\n        "release_batch"',
   },
 ];
 
