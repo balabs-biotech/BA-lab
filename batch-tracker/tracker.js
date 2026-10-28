@@ -790,6 +790,7 @@ function clearAuthenticatedWorkspaceState() {
   strainOptionsRequestId += 1;
   cultureOptionsRequestId += 1;
   latestBatchesRequestId += 1;
+  statisticsRequestId += 1;
   const cultureDetailPanel = document.getElementById("cultureDetailPanel");
   if (cultureDetailPanel) {
     cultureDetailPanel.classList.add("hidden");
@@ -5840,7 +5841,7 @@ async function loadStatistics() {
     if(!rows.length) tbody.innerHTML='<tr><td colspan="5">' + L.noRows + '</td></tr>';
     else { rows.slice().reverse().slice(0,200).forEach(row=>{const tr=document.createElement("tr"),culture=cultureById.get(row.culture_id),cells=[row.measured_at?new Date(row.measured_at).toLocaleString("fr-FR"):"Date inconnue",culture?.code||(row.culture_id?L.cultureLinked:L.noCulture),String(row.raw_value??"—"),row.raw_unit_code||"Unité non renseignée",row.method||"—"];cells.forEach(value=>{const td=document.createElement("td");td.textContent=value;tr.appendChild(td);});tbody.appendChild(tr);});if(rows.length>200){const tr=document.createElement("tr"),td=document.createElement("td");td.colSpan=5;td.textContent=L.limited(rows.length);tr.appendChild(td);tbody.appendChild(tr);}}
   } catch(error) { if (requestId !== statisticsRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return; console.error("Analyse des mesures impossible :",error); status.textContent=L.loadError+error.message; chart.innerHTML='<p class="muted">' + L.graphError + '</p>'; summary.innerHTML=""; tbody.innerHTML='<tr><td colspan="5">' + L.unavailable + '</td></tr>'; }
-  finally { if (requestId === statisticsRequestId) { button.disabled=false; button.textContent=L.buttonAnalyze; } }
+  finally { if (requestId === statisticsRequestId && isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) { button.disabled=false; button.textContent=L.buttonAnalyze; } }
 }
 
 function biologicalWorkflowText(key, count = 0) {
