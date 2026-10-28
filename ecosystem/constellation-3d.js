@@ -27,7 +27,11 @@ if(root){
   const introCopy={fr:['Un écosystème. Huit mondes. Des connexions vivantes.','ENTRER DANS L’UNIVERS'],en:['One ecosystem. Eight worlds. Living connections.','ENTER THE UNIVERSE'],ar:['منظومة واحدة. ثمانية عوالم. روابط حيّة.','ادخل إلى العالم'],pt:['Um ecossistema. Oito mundos. Ligações vivas.','ENTRAR NO UNIVERSO']};
   const refreshIntro=()=>{const copy=introCopy[document.documentElement.lang]||introCopy.fr;intro.querySelector('.webgl-intro-copy').textContent=copy[0];intro.querySelector('.webgl-intro-cta').childNodes[0].textContent=copy[1]+' ';intro.setAttribute('aria-label',copy[1]);};
   refreshIntro();new MutationObserver(refreshIntro).observe(document.documentElement,{attributes:true,attributeFilter:['lang']});
-  intro.addEventListener('click',()=>{intro.classList.add('is-opening');intro.disabled=true;intro.style.transition='opacity .55s ease,transform .55s ease';intro.style.opacity='0';intro.style.transform='scale(1.035)';window.setTimeout(()=>{intro.remove();if(worldGroup)worldGroup.visible=true;dist=11.8;updateCamera();},480);});
+  // Keep the gateway click isolated from the canvas pointer-up picker. Otherwise the same tap can select a hidden world underneath the intro and open directly into its close-up.
+  intro.addEventListener('pointerdown',e=>e.stopPropagation());
+  intro.addEventListener('pointerup',e=>e.stopPropagation());
+  intro.addEventListener('pointercancel',e=>e.stopPropagation());
+  intro.addEventListener('click',e=>{e.stopPropagation();intro.classList.add('is-opening');intro.disabled=true;intro.style.transition='opacity .55s ease,transform .55s ease';intro.style.opacity='0';intro.style.transform='scale(1.035)';window.setTimeout(()=>{intro.remove();if(worldGroup)worldGroup.visible=true;selected=null;hovered=null;cameraTarget.set(0,0,0);dist=11.8;theta=.25;phi=1.18;updateCamera();refreshFocus(null);},480);});
   const refreshSpatialUi=()=>{
     const lang=document.documentElement.lang||'fr';
     const copy=spatialUiCopy[lang]||spatialUiCopy.fr;
