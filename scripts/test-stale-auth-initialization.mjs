@@ -254,3 +254,30 @@ assert.ok(
 );
 
 console.log("Batch detail tenant-snapshot guards passed.");
+
+
+// Tenant-scoped analytics and lineage reads must not render into a newer workspace.
+for (const name of ["loadStatistics", "loadBiologicalLineage", "loadCultureDetail", "compareSelectedBatches"]) {
+  const handler = handlerSource(name);
+  assert.match(handler, /const loadRevision = authStateRevision;/, `${name} must capture the initiating auth revision`);
+  assert.match(handler, /const loadOrganizationId = organizationId;/, `${name} must capture the initiating organization`);
+  assert.doesNotMatch(
+    handler,
+    /\.eq\(["']organization_id["'],\s*organizationId\)/,
+    `${name} must query against the captured organization rather than mutable global state`,
+  );
+  assert.match(
+    handler,
+    /isCurrentWorkspaceRevision\(loadRevision, loadOrganizationId\)/,
+    `${name} must stop stale results and errors from updating the current workspace`,
+  );
+}
+assert.ok(
+  (handlerSource("loadStatistics").match(/isCurrentWorkspaceRevision\(loadRevision, loadOrganizationId\)/g) || []).length >= 4,
+  "statistics must recheck workspace identity after its asynchronous query phases",
+);
+assert.ok(
+  (handlerSource("loadCultureDetail").match(/isCurrentWorkspaceRevision\(loadRevision, loadOrganizationId\)/g) || []).length >= 3,
+  "culture detail must recheck workspace identity after its asynchronous query phases",
+);
+console.log("Tenant-scoped analytics and lineage read guards passed.");
