@@ -281,3 +281,26 @@ assert.ok(
   "culture detail must recheck workspace identity after its asynchronous query phases",
 );
 console.log("Tenant-scoped analytics and lineage read guards passed.");
+
+
+// Protocol lookups must not mix identifiers across tenant changes between awaits.
+for (const name of ["getProtocolVersionId", "getCultureProtocolVersionId"]) {
+  const handler = handlerSource(name);
+  assert.match(handler, /const loadRevision = authStateRevision;/, `${name} must capture the initiating auth revision`);
+  assert.match(handler, /const loadOrganizationId = organizationId;/, `${name} must capture the initiating organization`);
+  assert.doesNotMatch(
+    handler,
+    /\.eq\(["']organization_id["'],\s*organizationId\)/,
+    `${name} must query against the captured organization rather than mutable global state`,
+  );
+  assert.match(
+    handler,
+    /isCurrentWorkspaceRevision\(loadRevision, loadOrganizationId\)\) return null;/,
+    `${name} must stop and return no protocol reference when the workspace changes`,
+  );
+}
+assert.ok(
+  (handlerSource("getProtocolVersionId").match(/isCurrentWorkspaceRevision\(loadRevision, loadOrganizationId\)\) return null;/g) || []).length >= 2,
+  "getProtocolVersionId must recheck the workspace between protocol and version queries",
+);
+console.log("Protocol lookup tenant-snapshot guards passed.");
