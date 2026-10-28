@@ -775,6 +775,32 @@ function getSessionVerificationGuidance(error) {
   };
 }
 
+function clearAuthenticatedWorkspaceState() {
+  // Drop tenant-scoped state whenever the current session is absent or cannot
+  // be verified. Hiding the UI alone must not leave a previous tenant usable
+  // by event handlers or a later partial initialization.
+  organizationId = null;
+  organization = null;
+  strainOptions = [];
+  referenceData = [];
+  cultureOptions = [];
+  plantCultureOptions = [];
+  latestBatches = [];
+  selectedBatchId = null;
+  selectedBatch = null;
+  measurementVariables = [];
+  measurementUnits = [];
+  quantityUnitOptions = [];
+  batchLocationOptions = [];
+  batchEnvironmentOptions = [];
+  recentObservations = [];
+  initializationWarnings = [];
+
+  if (recordHarvestButton) recordHarvestButton.disabled = true;
+  if (saveMeasurementButton) saveMeasurementButton.disabled = true;
+  if (saveObservationButton) saveObservationButton.disabled = true;
+}
+
 async function refreshAuthUI(revision = authStateRevision) {
 
   let session;
@@ -784,8 +810,9 @@ async function refreshAuthUI(revision = authStateRevision) {
   } catch (error) {
     if (revision !== authStateRevision) return;
 
-    // Do not leave a previously authenticated workspace visible when the
-    // current session cannot be verified because of a network/auth failure.
+    // Do not leave a previously authenticated workspace visible or usable
+    // when the current session cannot be verified because of a network/auth failure.
+    clearAuthenticatedWorkspaceState();
     hideElement(trackerCard);
     hideElement(batchCard);
     hideElement(document.getElementById("plantCard"));
@@ -805,6 +832,7 @@ async function refreshAuthUI(revision = authStateRevision) {
 
   if (!session) {
 
+    clearAuthenticatedWorkspaceState();
     hideElement(trackerCard);
     hideElement(batchCard);
     hideElement(document.getElementById("plantCard"));
