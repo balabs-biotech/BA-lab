@@ -2119,17 +2119,19 @@ async function createCulture() {
    ============================================================ */
 
 async function loadOrganizationRowsInPages(tableName, columns, errorLabel, pageSize = 250) {
-  if (!organizationId) return [];
+  const requestedOrganizationId = organizationId;
+  if (!requestedOrganizationId) return [];
   const rows = [];
   for (let offset = 0; ; offset += pageSize) {
     const { data, error } = await supabaseClient
       .from(tableName)
       .select(columns)
-      .eq("organization_id", organizationId)
+      .eq("organization_id", requestedOrganizationId)
       .order("created_at", { ascending: false })
       .order("id", { ascending: false })
       .range(offset, offset + pageSize - 1);
     if (error) throw new Error(`${errorLabel} : ${error.message}`);
+    if (requestedOrganizationId !== organizationId) return [];
     const page = data || [];
     rows.push(...page);
     if (page.length < pageSize) break;
