@@ -231,7 +231,9 @@ if(root){
         ['bio','products'],['iot','work'],
         // Culture monitoring connects mycology to instrumentation; project execution
         // links biological experimentation back to the operational workflow.
-        ['myco','iot'],['bio','work']
+        ['myco','iot'],['bio','work'],
+        // Close the knowledge loop: protocols, cultivation practice and instrumented products feed learning back into R&D.
+        ['myco','learn'],['lab','learn'],['products','iot']
       ];
       const mycelialTips=[];
       for(const [a,b] of pairs){const pa=points.find(p=>p.id===a),pb=points.find(p=>p.id===b);if(!pa||!pb)continue;
