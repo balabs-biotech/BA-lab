@@ -49,6 +49,38 @@ let batchEnvironmentOptions = [];
 let recentObservations = [];
 
 
+function clearAuthenticatedWorkspaceState() {
+  // Remove the previous tenant context before an auth transition can yield.
+  organizationId = null;
+  organization = null;
+  strainOptions = [];
+  referenceData = [];
+  cultureOptions = [];
+  plantCultureOptions = [];
+  latestBatches = [];
+  selectedBatchId = null;
+  selectedBatch = null;
+  measurementVariables = [];
+  measurementUnits = [];
+  quantityUnitOptions = [];
+  batchLocationOptions = [];
+  batchEnvironmentOptions = [];
+  recentObservations = [];
+  initializationWarnings = [];
+
+  const cultureDetailPanel = document.getElementById("cultureDetailPanel");
+  if (cultureDetailPanel) {
+    cultureDetailPanel.classList.add("hidden");
+    cultureDetailPanel.dataset.cultureId = "";
+  }
+
+  if (recordHarvestButton) recordHarvestButton.disabled = true;
+  if (saveMeasurementButton) saveMeasurementButton.disabled = true;
+  if (saveObservationButton) saveObservationButton.disabled = true;
+}
+
+
+
 /* ============================================================
    ETAPES STANDARD DU BATCH
    ============================================================ */
@@ -532,7 +564,7 @@ async function signIn() {
     }
 
 
-    await refreshAuthUI();
+    // The Supabase auth listener owns the post-login reconciliation.
 
   }
 
@@ -636,15 +668,9 @@ async function signUp() {
     }
 
 
-    if (
-      data &&
-      data.session
-    ) {
-
-      await refreshAuthUI();
-
+    if (data && data.session) {
+      // The Supabase auth listener owns the post-signup reconciliation.
       return;
-
     }
 
 
@@ -760,8 +786,8 @@ async function refreshAuthUI(revision = authStateRevision) {
   } catch (error) {
     if (revision !== authStateRevision) return;
 
-    // Do not leave a previously authenticated workspace visible when the
-    // current session cannot be verified because of a network/auth failure.
+    // Do not leave previous tenant data visible or usable when session verification fails.
+    clearAuthenticatedWorkspaceState();
     hideElement(trackerCard);
     hideElement(batchCard);
     hideElement(document.getElementById("plantCard"));
@@ -783,6 +809,7 @@ async function refreshAuthUI(revision = authStateRevision) {
 
   if (!session) {
 
+    clearAuthenticatedWorkspaceState();
     hideElement(trackerCard);
     hideElement(batchCard);
     hideElement(document.getElementById("plantCard"));
@@ -4478,8 +4505,25 @@ supabaseClient.auth.onAuthStateChange(
     session
   ) => {
 
+    // init() owns the initial session check; don't race it with INITIAL_SESSION.
+    if (event === "INITIAL_SESSION") return;
+
     authStateRevision += 1;
     const revision = authStateRevision;
+
+    // Hide and invalidate the old tenant immediately on login/logout transitions.
+    if (event === "SIGNED_IN" || event === "SIGNED_OUT") {
+      clearAuthenticatedWorkspaceState();
+      hideElement(trackerCard);
+      hideElement(batchCard);
+      hideElement(document.getElementById("plantCard"));
+      hideElement(measurementCard);
+      hideElement(document.getElementById("statisticsCard"));
+      hideElement(document.getElementById("overviewCard"));
+      hideElement(resultCard);
+      hideElement(signOutButton);
+      authStatus.textContent = "Vérification de la session…";
+    }
 
     setTimeout(
       () => {
@@ -4509,56 +4553,14 @@ supabaseClient.auth.onAuthStateChange(
    ============================================================ */
 
 async function init() {
-
   try {
-
-    const session =
-      await getCurrentSession();
-
-
-    if (!session) {
-
-      authStatus.textContent =
-        "Non connecté.";
-
-      hideElement(
-        trackerCard
-      );
-
-      hideElement(
-        batchCard
-      );
-      hideElement(measurementCard);
-      hideElement(document.getElementById("statisticsCard"));
-      hideElement(document.getElementById("overviewCard"));
-
-      return;
-
-    }
-
-
+    // refreshAuthUI owns the single initial session verification.
     await refreshAuthUI();
-
+  } catch (error) {
+    console.error("Initialisation inattendue:", error);
+    showMessage(error.message || "Initialisation impossible.", "error");
   }
-
-  catch (error) {
-
-    console.error(
-      "Initialisation:",
-      error
-    );
-
-
-    showMessage(
-      error.message ||
-      "Initialisation impossible.",
-      "error"
-    );
-
-  }
-
 }
-
 
 /* ============================================================
    INTERFACE : chargement, accessibilité, progression
