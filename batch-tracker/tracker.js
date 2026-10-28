@@ -1671,7 +1671,8 @@ function setSyncStatus(
 
 async function syncPendingCultures() {
   const loadRevision = authStateRevision;
-  if (!organizationId) return;
+  const loadOrganizationId = organizationId;
+  if (!loadOrganizationId) return;
 
   if (syncInProgress) return;
 
@@ -1689,12 +1690,12 @@ async function syncPendingCultures() {
     const { data: cultures, error } = await supabaseClient
       .from("cultures")
       .select("id, code")
-      .eq("organization_id", organizationId)
+      .eq("organization_id", loadOrganizationId)
       .in("notion_sync_status", ["pending", "error"])
       .order("created_at", { ascending: true })
       .limit(20);
 
-    if (loadRevision !== authStateRevision) return;
+    if (!isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
 
     if (error) {
       console.error(
@@ -1715,7 +1716,7 @@ async function syncPendingCultures() {
     let lastError = "";
 
     for (const culture of cultures || []) {
-      if (loadRevision !== authStateRevision) return;
+      if (!isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
       try {
         const { data, error: syncError } =
           await supabaseClient.functions.invoke(
@@ -1723,7 +1724,7 @@ async function syncPendingCultures() {
             { body: { culture_id: culture.id } }
           );
 
-        if (loadRevision !== authStateRevision) return;
+        if (!isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
 
         if (syncError || !data?.ok) {
           failed += 1;
@@ -1747,6 +1748,7 @@ async function syncPendingCultures() {
           );
         }
       } catch (err) {
+        if (!isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
         failed += 1;
 
         lastError =
