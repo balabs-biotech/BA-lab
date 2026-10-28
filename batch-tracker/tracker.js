@@ -1119,18 +1119,13 @@ function setDefaultDate() {
    ============================================================ */
 
 async function loadStrainOptions() {
-
+  const loadRevision = authStateRevision;
+  const loadOrganizationId = organizationId;
   if (!loadOrganizationId) {
-
     throw new Error(
       "Organisation absente avant chargement des souches."
     );
-
   }
-
-
-  const loadRevision = authStateRevision;
-  const loadOrganizationId = organizationId;
 
   const {
     data,
@@ -2220,16 +2215,11 @@ async function createCulture() {
    ============================================================ */
 
 async function loadCultureOptions() {
-
-  if (!loadOrganizationId) {
-
-    return;
-
-  }
-
-
   const loadRevision = authStateRevision;
   const loadOrganizationId = organizationId;
+  if (!loadOrganizationId) {
+    return;
+  }
 
   const {
     data,
@@ -2342,16 +2332,11 @@ async function loadCultureOptions() {
    ============================================================ */
 
 async function loadLatestBatches() {
-
-  if (!loadOrganizationId) {
-
-    return;
-
-  }
-
-
   const loadRevision = authStateRevision;
   const loadOrganizationId = organizationId;
+  if (!loadOrganizationId) {
+    return;
+  }
 
   const {
     data,
