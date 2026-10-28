@@ -2433,7 +2433,10 @@ async function fetchAllComparisonPages(queryBuilder, pageSize = 1000) {
   }
 }
 
+let batchComparisonRequestId = 0;
+
 async function compareSelectedBatches() {
+  const comparisonRequestId = ++batchComparisonRequestId;
   const loadRevision = authStateRevision;
   const loadOrganizationId = organizationId;
   const select = document.getElementById("batchCompareSelect");
@@ -2490,7 +2493,7 @@ async function compareSelectedBatches() {
             .eq("organization_id", loadOrganizationId).in("id", cultureIds)
         : Promise.resolve({data:[],error:null})
     ]);
-    if (!isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
+    if (comparisonRequestId !== batchComparisonRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
     if (stageResult.error) throw new Error("Chargement des étapes impossible : " + stageResult.error.message);
     if (cultureMeasurementResult.error) throw new Error("Chargement des mesures de culture impossible : " + cultureMeasurementResult.error.message);
     if (environmentMeasurementResult.error) throw new Error("Chargement des mesures d'environnement impossible : " + environmentMeasurementResult.error.message);
@@ -2504,7 +2507,7 @@ async function compareSelectedBatches() {
             .eq("organization_id", loadOrganizationId).in("id", unitIds)
         : Promise.resolve({data:[],error:null})
     ]);
-    if (!isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
+    if (comparisonRequestId !== batchComparisonRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
     if (unitResult.error) throw new Error("Chargement des unités expérimentales impossible : " + unitResult.error.message);
     const units = unitResult.data || [];
     const unitsById = new Map(units.map(row => [row.id, row]));
@@ -2517,7 +2520,7 @@ async function compareSelectedBatches() {
           .select("id,code,name")
           .eq("organization_id", loadOrganizationId).in("id", experimentIds)
       : {data:[],error:null};
-    if (!isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
+    if (comparisonRequestId !== batchComparisonRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
     if (experimentResult.error) throw new Error("Chargement des expériences impossible : " + experimentResult.error.message);
     const experimentsById = new Map((experimentResult.data || []).map(row => [row.id, row]));
     const contextsByCultureId = new Map(cultureContexts.map(row => {
@@ -2534,7 +2537,7 @@ async function compareSelectedBatches() {
           .eq("organization_id", loadOrganizationId).in("culture_id", cultureIds)
           .order("observed_at", { ascending: false }).order("id", { ascending: true }))
       : {data:[],error:null};
-    if (!isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
+    if (comparisonRequestId !== batchComparisonRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
     if (observationCultureResult.error) throw new Error("Chargement des observations de culture impossible : " + observationCultureResult.error.message);
     const observationUnitResult = unitIds.length
       ? await fetchAllComparisonPages(supabaseClient.from("observations")
@@ -2542,7 +2545,7 @@ async function compareSelectedBatches() {
           .eq("organization_id", loadOrganizationId).in("experimental_unit_id", unitIds)
           .order("observed_at", { ascending: false }).order("id", { ascending: true }))
       : {data:[],error:null};
-    if (!isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
+    if (comparisonRequestId !== batchComparisonRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
     if (observationUnitResult.error) throw new Error("Chargement des observations expérimentales impossible : " + observationUnitResult.error.message);
     const observationMap = new Map();
     [...(observationCultureResult.data || []), ...(observationUnitResult.data || [])].forEach(row => {
@@ -2682,10 +2685,10 @@ async function compareSelectedBatches() {
     ].filter(Boolean);
     status.textContent = statusParts.join(" ");
   } catch (error) {
-    if (!isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
+    if (comparisonRequestId !== batchComparisonRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
     status.textContent = error?.message || labels.impossible;
   } finally {
-    if (isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) button.disabled = false;
+    if (comparisonRequestId === batchComparisonRequestId && isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) button.disabled = false;
   }
 }
 document.getElementById("compareBatchesButton")?.addEventListener("click", compareSelectedBatches);
