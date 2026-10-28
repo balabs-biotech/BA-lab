@@ -220,7 +220,7 @@ if(root){
       const pairs=[
         // Cross-links only: parent-child axons are already drawn above.
         // Each link represents a real feedback loop between BA Labs workstreams.
-        ['bio','soil'],['bio','lab'],['bio','myco'],['myco','soil'],['myco','lab'],['products','work'],['soil','lab'],
+        ['bio','soil'],['bio','lab'],['soil','lab'],
         ['lab','products'],['lab','work'],['soil','work'],['bio','learn'],
         ['iot','learn'],['myco','products'],['soil','iot'],['soil','learn'],
         ['lab','iot'],['products','learn'],['work','learn'],
