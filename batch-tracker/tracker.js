@@ -1544,6 +1544,8 @@ function updateGenerationPreview() {
 async function getProtocolVersionId(
   protocolCode
 ) {
+  const loadRevision = authStateRevision;
+  const loadOrganizationId = organizationId;
 
   if (!protocolCode) {
 
@@ -1561,7 +1563,7 @@ async function getProtocolVersionId(
       .select("id")
       .eq(
         "organization_id",
-        organizationId
+        loadOrganizationId
       )
       .eq(
         "code",
@@ -1569,6 +1571,8 @@ async function getProtocolVersionId(
       )
       .maybeSingle();
 
+
+  if (!isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return null;
 
   if (protocolError) {
 
@@ -1597,7 +1601,7 @@ async function getProtocolVersionId(
       )
       .eq(
         "organization_id",
-        organizationId
+        loadOrganizationId
       )
       .eq(
         "protocol_id",
@@ -1611,6 +1615,8 @@ async function getProtocolVersionId(
       )
       .limit(1);
 
+
+  if (!isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return null;
 
   if (versionError) {
 
@@ -4232,6 +4238,8 @@ async function createBatch() {
 async function getCultureProtocolVersionId(
   cultureId
 ) {
+  const loadRevision = authStateRevision;
+  const loadOrganizationId = organizationId;
 
   const {
     data: culture,
@@ -4244,7 +4252,7 @@ async function getCultureProtocolVersionId(
       )
       .eq(
         "organization_id",
-        organizationId
+        loadOrganizationId
       )
       .eq(
         "id",
@@ -4252,6 +4260,8 @@ async function getCultureProtocolVersionId(
       )
       .single();
 
+
+  if (!isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return null;
 
   if (cultureError) {
 
