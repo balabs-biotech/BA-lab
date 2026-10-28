@@ -2127,6 +2127,7 @@ async function loadOrganizationRowsInPages(tableName, columns, errorLabel, pageS
       .select(columns)
       .eq("organization_id", organizationId)
       .order("created_at", { ascending: false })
+      .order("id", { ascending: false })
       .range(offset, offset + pageSize - 1);
     if (error) throw new Error(`${errorLabel} : ${error.message}`);
     const page = data || [];
