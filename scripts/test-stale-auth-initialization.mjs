@@ -91,6 +91,7 @@ for (const loaderName of [
   "loadMeasurementReferences",
   "loadRecentMeasurements",
   "loadRecentObservations",
+  "syncPendingCultures",
 ]) {
   const loaderStart = tracker.indexOf(`async function ${loaderName}()`);
   assert.ok(loaderStart >= 0, `${loaderName} must exist`);
