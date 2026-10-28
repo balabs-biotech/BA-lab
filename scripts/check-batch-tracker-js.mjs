@@ -71,7 +71,7 @@ if(!engine.includes('function recordBatchHarvest')||!engine.includes('current_st
 if(!engine.includes('from("units")')||!engine.includes('p_unit_code: unit.code'))throw new Error("Harvest unit validation or RPC payload missing");
 if(engine.slice(engine.indexOf("async function recordBatchHarvest()"), engine.indexOf("\nrecordHarvestButton?.addEventListener")).includes('from("events").insert({'))throw new Error("Harvest handler still inserts events directly");
 
-if(!engine.includes("const eventAnchor = selectedBatch.culture_id")||!engine.includes("Ce lot doit être lié à une culture ou à un matériau"))throw new Error("Harvest event biological anchor validation missing");
+if(!engine.includes("const eventAnchor = operationBatch.culture_id")||!engine.includes("Ce lot doit être lié à une culture ou à un matériau"))throw new Error("Harvest event biological anchor validation missing");
 for(const label of ["Chronologie du lot","Enregistrer une récolte","Récolte enregistrée","Batch timeline","Record a harvest","Harvest recorded","Cronologia do lote","Registar uma colheita","Colheita registada","الخط الزمني للدفعة","تسجيل حصاد","تم تسجيل الحصاد"]){
  if(!i18n.includes(label))throw new Error("Harvest timeline translation missing: "+label);
 }
@@ -113,7 +113,7 @@ console.log("✓ Batch-specific workflows retain QC and release gates; UI follow
 
 if(!template.includes('id="batchLocation"')||!template.includes('id="batchEnvironment"'))throw new Error("Batch location/environment selectors are missing");
 if(!engine.includes('from("locations").select("id,code,name")')||!engine.includes('from("environments").select("id,name,location_id")'))throw new Error("Batch place options are not loaded from the existing schema");
-if(!engine.includes('.eq("organization_id", organizationId).order("name")'))throw new Error("Batch place options are not scoped to the active organization");
+if(!engine.includes('.eq("organization_id", loadOrganizationId).order("name")'))throw new Error("Batch place options are not scoped to the captured active organization");
 if(!engine.includes('p_location_id:')||!engine.includes('batchLocationInput?.value || null')||!engine.includes('batchEnvironmentInput?.value || null'))throw new Error("Batch creation does not persist the selected location/environment");
 for(const label of ["Emplacement (facultatif)","Location (optional)","Localização (opcional)","الموقع (اختياري)","Environnement (facultatif)","Environment (optional)","Ambiente (opcional)","البيئة (اختياري)"]){
  if(!i18n.includes(label))throw new Error("Batch location/environment localisation missing: "+label);
@@ -122,7 +122,7 @@ console.log("✓ Batch creation supports organization-scoped location and enviro
 if(!template.includes('id="moveBatchLocation"')||!template.includes('id="moveBatchEnvironment"')||!template.includes('id="moveBatchButton"'))throw new Error("Batch movement controls are missing");
 for(const snippet of [
  'rpc("move_batch_to_location"',
- 'p_batch_id: selectedBatchId',
+ 'p_batch_id: operationBatchId',
  'p_location_id: locationId',
  'p_environment_id: environmentId',
  'p_note: note',

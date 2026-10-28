@@ -1,0 +1,39 @@
+import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
+
+const tracker = await readFile(new URL("../batch-tracker/tracker.js", import.meta.url), "utf8");
+const signInStart = tracker.indexOf("async function signIn()");
+const signInEnd = tracker.indexOf("/* ============================================================\n   CREATION DE COMPTE", signInStart);
+assert.ok(signInStart >= 0 && signInEnd > signInStart, "signIn function must be present");
+const signIn = tracker.slice(signInStart, signInEnd);
+
+assert.match(signIn, /signInWithPassword\(/, "signIn must call Supabase password authentication");
+assert.doesNotMatch(signIn, /await refreshAuthUI\(/, "signIn must not start a second initialization; auth-state listener owns successful sign-in reconciliation");
+
+const signUpStart = tracker.indexOf("async function signUp()");
+const signOutStart = tracker.indexOf("/* ============================================================\n   DECONNEXION", signUpStart);
+assert.ok(signUpStart >= 0 && signOutStart > signUpStart, "signUp function must be present");
+const signUp = tracker.slice(signUpStart, signOutStart);
+assert.match(signUp, /supabaseClient\.auth\.signUp\(/, "signUp must call Supabase account creation");
+assert.doesNotMatch(signUp, /await refreshAuthUI\(/, "signUp must not start a second initialization when Supabase returns a session");
+
+const listenerStart = tracker.indexOf("supabaseClient.auth.onAuthStateChange(");
+const initStart = tracker.indexOf("async function init()", listenerStart);
+assert.ok(listenerStart >= 0 && initStart > listenerStart, "auth-state listener must be present");
+const listener = tracker.slice(listenerStart, initStart);
+assert.match(listener, /refreshAuthUI\(revision\)/, "auth-state listener must reconcile the UI after auth changes");
+assert.match(listener, /event === "INITIAL_SESSION"\) return/, "startup INITIAL_SESSION must be handled only by init() to avoid competing reconciliation");
+
+console.log("Auth sign-in/sign-up single-initialization contract passed.");
+const entryPages = [
+  "../batch-tracker/mycology/index.html",
+  "../batch-tracker/green-tech/index.html",
+  "../batch-tracker/laboratory/index.html"
+];
+for (const path of entryPages) {
+  const html = await readFile(new URL(path, import.meta.url), "utf8");
+  assert.match(html, /workspace\.html\?v=20261027-auth-reconciliation-2/, `${path} must fetch the current shared workspace markup`);
+  assert.match(html, /tracker\.js\?v=20261027-auth-reconciliation-2/, `${path} must load the current auth reconciliation engine`);
+}
+console.log("Auth entry-point cache-busting contract passed for Mycology, Green Tech and Laboratory.");
+

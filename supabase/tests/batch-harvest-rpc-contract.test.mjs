@@ -12,7 +12,7 @@ if (start < 0 || end < 0) throw new Error("Could not isolate recordBatchHarvest 
 const handler = tracker.slice(start, end);
 if (!handler.includes('rpc("record_batch_harvest"')) throw new Error("Harvest handler does not use the server RPC");
 if (handler.includes('.from("events").insert(')) throw new Error("Harvest handler still inserts events directly");
-if (!handler.includes("p_batch_id: selectedBatch.id") ||
+if (!handler.includes("p_batch_id: operationBatch.id") ||
     !handler.includes("p_quantity: quantity") ||
     !handler.includes("p_unit_code: unit.code") ||
     !handler.includes("p_note: note || null")) {
