@@ -1120,7 +1120,7 @@ function setDefaultDate() {
 
 async function loadStrainOptions() {
 
-  if (!organizationId) {
+  if (!loadOrganizationId) {
 
     throw new Error(
       "Organisation absente avant chargement des souches."
@@ -1130,6 +1130,7 @@ async function loadStrainOptions() {
 
 
   const loadRevision = authStateRevision;
+  const loadOrganizationId = organizationId;
 
   const {
     data,
@@ -1154,14 +1155,14 @@ async function loadStrainOptions() {
       `)
       .eq(
         "organization_id",
-        organizationId
+        loadOrganizationId
       )
       .order(
         "strain_code"
       );
 
 
-  if (loadRevision !== authStateRevision) return;
+  if (!isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
 
   if (error) {
 
@@ -2220,7 +2221,7 @@ async function createCulture() {
 
 async function loadCultureOptions() {
 
-  if (!organizationId) {
+  if (!loadOrganizationId) {
 
     return;
 
@@ -2228,6 +2229,7 @@ async function loadCultureOptions() {
 
 
   const loadRevision = authStateRevision;
+  const loadOrganizationId = organizationId;
 
   const {
     data,
@@ -2245,7 +2247,7 @@ async function loadCultureOptions() {
       `)
       .eq(
         "organization_id",
-        organizationId
+        loadOrganizationId
       )
       .order(
         "created_at",
@@ -2256,7 +2258,7 @@ async function loadCultureOptions() {
       .limit(100);
 
 
-  if (loadRevision !== authStateRevision) return;
+  if (!isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
 
   if (error) {
 
@@ -2341,7 +2343,7 @@ async function loadCultureOptions() {
 
 async function loadLatestBatches() {
 
-  if (!organizationId) {
+  if (!loadOrganizationId) {
 
     return;
 
@@ -2349,6 +2351,7 @@ async function loadLatestBatches() {
 
 
   const loadRevision = authStateRevision;
+  const loadOrganizationId = organizationId;
 
   const {
     data,
@@ -2374,7 +2377,7 @@ async function loadLatestBatches() {
       `)
       .eq(
         "organization_id",
-        organizationId
+        loadOrganizationId
       )
       .order(
         "created_at",
@@ -2385,7 +2388,7 @@ async function loadLatestBatches() {
       .limit(30);
 
 
-  if (loadRevision !== authStateRevision) return;
+  if (!isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
 
   if (error) {
 
