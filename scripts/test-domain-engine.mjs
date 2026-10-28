@@ -33,6 +33,11 @@ assert.match(trackerSource, /belongsToActiveWorkspace\(row, eventsById, requeste
 assert.match(trackerSource, /if \(stale \|\| requestedDomain !== \(document\.body\.dataset\.domain \|\| "mycology"\)\) return;/,
   "stale measurement and observation requests must not overwrite the active workspace UI");
 
+assert.match(trackerSource, /async function loadPlantCultures\(\)[\s\S]*?requestedOrganizationId !== organizationId \|\|[\s\S]*?requestedDomain !== document\.body\.dataset\.domain \|\|[\s\S]*?requestedDomain !== "agronomy"\) return;/,
+  "late plant-registry responses must be discarded after leaving Green Tech");
+assert.match(trackerSource, /let workspaceSwitchRevision = 0;[\s\S]*?const switchRevision = \+\+workspaceSwitchRevision;[\s\S]*?switchRevision !== workspaceSwitchRevision/,
+  "workspace refresh tasks must stop when a newer workspace switch supersedes them");
+
 assert.match(trackerSource, /async function loadRecentWorkspaceHistory\([\s\S]*?\.range\(offset, offset \+ pageSize - 1\)[\s\S]*?belongsToActiveWorkspace\(row, eventsById\)[\s\S]*?visibleRows\.length >= displayLimit/,
   "measurement and observation histories must paginate before workspace filtering, so other workspaces cannot consume the global row limit");
 assert.match(trackerSource, /loadRecentWorkspaceHistory\(\s*"measurements"[\s\S]*?10\s*\)/,
