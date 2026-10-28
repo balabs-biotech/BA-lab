@@ -78,3 +78,10 @@ assert.deepEqual(
 assert.equal(engine.normalizeDomain("unknown"), "laboratory");
 
 console.log("Domain engine contracts passed.");
+
+// Workspace filtering must happen after a sufficiently broad source query;
+// small organization-wide limits can otherwise hide records from one domain.
+assert.match(trackerSource, /async function loadCultureOptions\(\)[\s\S]*?\.limit\(1000\);/,
+  "culture loading must not truncate the organization before workspace filtering");
+assert.match(trackerSource, /async function loadLatestBatches\(\)[\s\S]*?\.limit\(1000\);/,
+  "batch loading must not truncate the organization before source-culture filtering");
