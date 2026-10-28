@@ -369,7 +369,7 @@ for (const [name, requestId] of [
 }
 const listCleanupHandler = tracker.slice(
   tracker.indexOf("function clearAuthenticatedWorkspaceState()"),
-  tracker.indexOf("\\nasync function refreshAuthUI")
+  tracker.indexOf("\nasync function refreshAuthUI")
 );
 assert.match(listCleanupHandler, /strainOptionsRequestId\\s*\\+=\\s*1;/, "session cleanup must invalidate pending strain-option requests");
 assert.match(listCleanupHandler, /cultureOptionsRequestId\\s*\\+=\\s*1;/, "session cleanup must invalidate pending culture-option requests");
