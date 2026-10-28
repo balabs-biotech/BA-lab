@@ -38,6 +38,8 @@ assert.match(trackerSource, /async function loadPlantCultures\(\)[\s\S]*?request
 assert.match(trackerSource, /let workspaceSwitchRevision = 0;[\s\S]*?const switchRevision = \+\+workspaceSwitchRevision;[\s\S]*?switchRevision !== workspaceSwitchRevision/,
   "workspace refresh tasks must stop when a newer workspace switch supersedes them");
 
+assert.match(trackerSource, /async function loadPlantCultures\(\)[\s\S]*?loadOrganizationRowsInPages\(\s*"plant_cultures"/,
+  "plant registry must paginate instead of silently truncating at 300 records");
 assert.match(trackerSource, /async function loadRecentWorkspaceHistory\([\s\S]*?\.range\(offset, offset \+ pageSize - 1\)[\s\S]*?belongsToActiveWorkspace\(row, eventsById\)[\s\S]*?visibleRows\.length >= displayLimit/,
   "measurement and observation histories must paginate before workspace filtering, so other workspaces cannot consume the global row limit");
 assert.match(trackerSource, /loadRecentWorkspaceHistory\(\s*"measurements"[\s\S]*?10\s*\)/,
