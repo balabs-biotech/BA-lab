@@ -6576,6 +6576,9 @@ async function savePlantCulture(event) {
     showMessage("Culture végétale enregistrée.", "success");
     if (status) status.textContent = "Culture enregistrée dans le registre AgriTech.";
   } catch (error) {
+    if (requestedOrganizationId !== organizationId ||
+        requestedDomain !== document.body.dataset.domain ||
+        requestedDomain !== "agronomy") return;
     console.error("Enregistrement de la culture végétale impossible :", error);
     showMessage("Enregistrement impossible : " + (error.message || "erreur inconnue"), "error");
     if (status) status.textContent = "Échec de l’enregistrement. Vérifiez le code unique et les références.";
