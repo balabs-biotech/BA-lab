@@ -1823,7 +1823,7 @@ async function createCulture() {
     startedAtInput.value;
 
 
-  if (!organizationId) {
+  if (!operationOrganizationId) {
 
     showMessage(
       "Organisation BA-LABS absente. Rechargez la page et reconnectez-vous.",
@@ -1978,7 +1978,7 @@ async function createCulture() {
         {
 
           p_organization_id:
-            organizationId,
+            operationOrganizationId,
 
           p_code:
             cultureCode,
@@ -3023,7 +3023,7 @@ async function recordBatchHarvest() {
   const operationRevision = authStateRevision;
   const operationOrganizationId = organizationId;
 
-  if (!organizationId || !selectedBatch || !selectedBatchId) {
+  if (!operationOrganizationId || !selectedBatch || !selectedBatchId) {
     showMessage("Sélectionnez d’abord un lot.", "error");
     return;
   }
@@ -3656,7 +3656,7 @@ async function saveQcCheckNow(
   const operationOrganizationId = organizationId;
 
 
-  if (!organizationId) {
+  if (!operationOrganizationId) {
 
     return;
 
@@ -3878,7 +3878,7 @@ async function createBatch() {
   clearMessage();
 
 
-  if (!organizationId) {
+  if (!operationOrganizationId) {
 
     showMessage(
       "Organisation BA-LABS absente.",
@@ -4043,7 +4043,7 @@ async function createBatch() {
         {
 
           p_organization_id:
-            organizationId,
+            operationOrganizationId,
 
           p_batch_code:
             batchCode,
@@ -4767,7 +4767,7 @@ async function moveSelectedBatch() {
   const operationRevision = authStateRevision;
   const operationOrganizationId = organizationId;
 
-  if (!organizationId || !selectedBatch || !selectedBatchId) {
+  if (!operationOrganizationId || !selectedBatch || !selectedBatchId) {
     showMessage("Sélectionnez d’abord un lot.", "error");
     return;
   }
@@ -5053,7 +5053,7 @@ async function saveMeasurement() {
   const operationRevision = authStateRevision;
   const operationOrganizationId = organizationId;
 
-  if (!organizationId) {
+  if (!operationOrganizationId) {
     showMessage(cultureWorkflowText("organization"), "error");
     return;
   }
@@ -5122,7 +5122,7 @@ async function saveMeasurement() {
 
     const sameAsCanonical = variable.canonical_unit_code === unit.code;
     const eventPayload = {
-      organization_id: organizationId,
+      organization_id: operationOrganizationId,
       event_type: "measurement_recorded",
       occurred_at: measuredAt,
       actor_user_id: session.user.id,
@@ -5142,7 +5142,7 @@ async function saveMeasurement() {
       }
     };
     const measurementPayload = {
-      organization_id: organizationId,
+      organization_id: operationOrganizationId,
       variable_code: variable.code,
       raw_value: rawValue,
       raw_unit_code: unit.code,
@@ -5280,7 +5280,7 @@ async function saveObservation() {
   const operationRevision = authStateRevision;
   const operationOrganizationId = organizationId;
 
-  if (!organizationId) {
+  if (!operationOrganizationId) {
     showMessage(cultureWorkflowText("organization"), "error");
     return;
   }
@@ -5343,7 +5343,7 @@ async function saveObservation() {
     }
 
     const eventPayload = {
-      organization_id: organizationId,
+      organization_id: operationOrganizationId,
       event_type: "observation_recorded",
       occurred_at: observedAt,
       actor_user_id: session.user.id,
@@ -5362,7 +5362,7 @@ async function saveObservation() {
       }
     };
     const observationPayload = {
-      organization_id: organizationId,
+      organization_id: operationOrganizationId,
       variable_code: variable.code,
       value_text: valueText,
       observed_at: observedAt,
@@ -5846,7 +5846,7 @@ async function saveBiologicalOperation(event) {
   const button = document.getElementById('saveBioOperation');
   const message = document.getElementById('bioOperationMessage');
   const cultureId = document.getElementById('cultureDetailPanel')?.dataset.cultureId;
-  if (!cultureId || !organizationId) { message.textContent = biologicalWorkflowText("selectCulture"); return; }
+  if (!cultureId || !operationOrganizationId) { message.textContent = biologicalWorkflowText("selectCulture"); return; }
   const operationType = document.getElementById('bioOperationType').value;
   const dateValue = document.getElementById('bioOperationDate').value;
   const note = document.getElementById('bioOperationNote').value.trim();
@@ -5860,7 +5860,7 @@ async function saveBiologicalOperation(event) {
   try {
     if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) throw new Error("Session ou espace de travail modifié pendant l’opération. Recommencez.");
     const { data, error } = await supabaseClient.rpc('record_biological_operation', {
-      p_organization_id: organizationId, p_parent_culture_id: cultureId, p_event_type: operationType,
+      p_organization_id: operationOrganizationId, p_parent_culture_id: cultureId, p_event_type: operationType,
       p_occurred_at: new Date(dateValue).toISOString(), p_note: note || null,
       p_details: { source: 'BA Labs Culture Tracker', interface_version: '3.0', conditions: conditions || null, outcome: outcome || null }, p_child_codes: childCodes
     });
@@ -6630,7 +6630,7 @@ async function savePlantCulture(event) {
   const operationOrganizationId = organizationId;
 
   event.preventDefault();
-  if (!organizationId) {
+  if (!operationOrganizationId) {
     showMessage("Organisation absente : reconnectez-vous avant d’enregistrer une culture végétale.", "error");
     return;
   }
