@@ -979,6 +979,7 @@ async function initializeAuthenticatedTracker(
         if (initRevision !== authStateRevision) return;
       }
       catch (historyError) {
+        if (initRevision !== authStateRevision) return;
         console.error("Historique des mesures indisponible :", historyError);
         initializationWarnings.push("historique des mesures");
         measurementHistory.textContent = "Impossible de charger l’historique des mesures. L’enregistrement reste disponible.";
@@ -988,11 +989,13 @@ async function initializeAuthenticatedTracker(
         if (initRevision !== authStateRevision) return;
       }
       catch (observationHistoryError) {
+        if (initRevision !== authStateRevision) return;
         console.error("Historique des observations indisponible :", observationHistoryError);
         initializationWarnings.push("historique des observations");
         observationHistory.textContent = "Impossible de charger l’historique des observations. L’enregistrement reste disponible.";
       }
     } catch (measurementError) {
+      if (initRevision !== authStateRevision) return;
       console.error("Initialisation du catalogue de mesures :", measurementError);
       initializationWarnings.push("catalogue des mesures");
       measurementHistory.textContent = "Le catalogue des mesures est indisponible ; les modules de culture et de production restent utilisables.";
