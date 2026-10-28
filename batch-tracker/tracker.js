@@ -5125,7 +5125,7 @@ function belongsToActiveWorkspace(record, eventsById = {}, domain = document.bod
     return Boolean(cultureId && (registries.cultures || cultureOptions).some(culture => culture.id === cultureId));
   }
   return Boolean(
-    (cultureId && cultureOptions.some(culture => culture.id === cultureId)) ||
+    (cultureId && (registries.cultures || cultureOptions).some(culture => culture.id === cultureId)) ||
     (batchId && (registries.batches || latestBatches).some(batch => batch.id === batchId))
   );
 }
