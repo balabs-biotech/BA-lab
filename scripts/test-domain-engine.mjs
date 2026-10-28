@@ -22,6 +22,17 @@ assert.match(trackerSource, /await loadCultureOptions\(\);\s*await loadLatestBat
   "switching between Mycology and Laboratory must reload domain-scoped culture targets and batches");
 assert.match(trackerSource, /const visibleCultureIds = new Set\(cultureOptions\.map\(culture => culture\.id\)\);\s*latestBatches = \(data \|\| \[\]\)\.filter\(batch =>\s*Boolean\(batch\.culture_id && visibleCultureIds\.has\(batch\.culture_id\)\)\s*\);/,
   "batch lists must be scoped to the active workspace's culture registry");
+assert.match(trackerSource, /const requestedDomain = document\.body\.dataset\.domain;[\s\S]*?requestedDomain !== document\.body\.dataset\.domain\) return;/,
+  "late culture registry responses must be discarded after a workspace switch");
+assert.match(trackerSource, /const requestedCultures = cultureOptions\.slice\(\);[\s\S]*?requestedDomain !== document\.body\.dataset\.domain\) return;[\s\S]*?requestedCultures\.map\(culture => culture\.id\)/,
+  "late batch responses must be discarded and batches must use the captured culture registry");
+assert.match(trackerSource, /const requestedDomain = document\.body\.dataset\.domain \|\| "mycology";[\s\S]*?requestedPlants = plantCultureOptions\.slice\(\);[\s\S]*?stale: requestedOrganizationId !== organizationId/,
+  "history pagination must detect workspace or organization changes during awaits");
+assert.match(trackerSource, /belongsToActiveWorkspace\(row, eventsById, requestedDomain, \{[\s\S]*?cultures: requestedCultures,[\s\S]*?plants: requestedPlants,[\s\S]*?batches: requestedBatches/,
+  "history filtering must use the workspace and registry snapshots captured at request start");
+assert.match(trackerSource, /if \(stale \|\| requestedDomain !== \(document\.body\.dataset\.domain \|\| "mycology"\)\) return;/,
+  "stale measurement and observation requests must not overwrite the active workspace UI");
+
 assert.match(trackerSource, /async function loadRecentWorkspaceHistory\([\s\S]*?\.range\(offset, offset \+ pageSize - 1\)[\s\S]*?belongsToActiveWorkspace\(row, eventsById\)[\s\S]*?visibleRows\.length >= displayLimit/,
   "measurement and observation histories must paginate before workspace filtering, so other workspaces cannot consume the global row limit");
 assert.match(trackerSource, /loadRecentWorkspaceHistory\(\s*"measurements"[\s\S]*?10\s*\)/,
