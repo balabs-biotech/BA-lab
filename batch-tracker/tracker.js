@@ -6517,6 +6517,8 @@ async function savePlantCulture(event) {
     showMessage("Organisation absente : reconnectez-vous avant d’enregistrer une culture végétale.", "error");
     return;
   }
+  const requestedOrganizationId = organizationId;
+  const requestedDomain = document.body.dataset.domain;
   const form = document.getElementById("plantCultureForm");
   const button = document.getElementById("savePlantCultureButton");
   const status = document.getElementById("plantCultureStatus");
@@ -6536,7 +6538,7 @@ async function savePlantCulture(event) {
   try {
     const startedValue = document.getElementById("plantStartedAt").value;
     const { error } = await supabaseClient.from("plant_cultures").insert({
-      organization_id: organizationId,
+      organization_id: requestedOrganizationId,
       code,
       crop_type: cropType,
       species_name: crop.species,
@@ -6552,6 +6554,11 @@ async function savePlantCulture(event) {
       metadata: { source: "BA Labs CultureOps", domain: "agronomy", interface_version: "1.0" }
     });
     if (error) throw error;
+    // A successful write belongs to the organization captured at submit time.
+    // Do not reset or announce success inside a different workspace/session.
+    if (requestedOrganizationId !== organizationId ||
+        requestedDomain !== document.body.dataset.domain ||
+        requestedDomain !== "agronomy") return;
     form.reset();
     document.getElementById("plantQuantity").value = "1";
     document.getElementById("plantStatus").value = "active";
