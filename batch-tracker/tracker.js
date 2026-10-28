@@ -4627,6 +4627,22 @@ supabaseClient.auth.onAuthStateChange(
     authStateRevision += 1;
     const revision = authStateRevision;
 
+    // Invalidate the previous tenant immediately on login/logout transitions.
+    // Waiting for getSession()/claimBALabs() must not leave the previous
+    // account's workspace visible during the reconciliation window.
+    if (event === "SIGNED_IN" || event === "SIGNED_OUT") {
+      clearAuthenticatedWorkspaceState();
+      hideElement(trackerCard);
+      hideElement(batchCard);
+      hideElement(document.getElementById("plantCard"));
+      hideElement(measurementCard);
+      hideElement(document.getElementById("statisticsCard"));
+      hideElement(document.getElementById("overviewCard"));
+      hideElement(resultCard);
+      hideElement(signOutButton);
+      authStatus.textContent = "Vérification de la session…";
+    }
+
     setTimeout(
       () => {
 
