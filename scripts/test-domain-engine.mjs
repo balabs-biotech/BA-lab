@@ -18,8 +18,8 @@ assert.match(trackerSource, /if \(persist && organizationId\) \{[\s\S]*?await lo
   "switching workspaces while signed in must refresh domain-specific selectors and histories");
 assert.match(trackerSource, /if \(activeDomain === "agronomy"\) \{\s*hideElement\(trackerCard\);\s*hideElement\(batchCard\);\s*showElement\(plantCard\);/,
   "Green Tech must switch to the plant registry after a live workspace change");
-assert.match(trackerSource, /await loadCultureOptions\(\);\s*await loadLatestBatches\(\);/,
-  "switching between Mycology and Laboratory must reload domain-scoped culture targets and batches");
+assert.match(trackerSource, /const switchRevision = \+\+workspaceSwitchRevision;[\s\S]*?await loadCultureOptions\(\);[\s\S]*?await loadLatestBatches\(\);/,
+  "switching between Mycology and Laboratory must reload domain-scoped culture targets and batches within the guarded refresh sequence");
 assert.match(trackerSource, /const requestedCultures = cultureOptions\.slice\(\);[\s\S]*?const visibleCultureIds = new Set\(requestedCultures\.map\(culture => culture\.id\)\);\s*latestBatches = \(data \|\| \[\]\)\.filter\(batch =>\s*Boolean\(batch\.culture_id && visibleCultureIds\.has\(batch\.culture_id\)\)\s*\);/,
   "batch lists must be scoped to the captured workspace culture registry");
 assert.match(trackerSource, /const requestedDomain = document\.body\.dataset\.domain;[\s\S]*?requestedDomain !== document\.body\.dataset\.domain\) return;/,
