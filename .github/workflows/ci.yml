@@ -96,6 +96,7 @@ jobs:
           node scripts/test-auth-startup-single-session-check.mjs
           node scripts/test-auth-claim-single-session.mjs
           node scripts/test-auth-signin-single-initialization.mjs
+          node scripts/test-auth-event-reconciliation-runtime.mjs
           [ -f batch-tracker/index.html ] && echo "✓ batch-tracker/index.html exists" || exit 1
           [ -f batch-tracker/README.md ] && echo "✓ batch-tracker/README.md exists" || exit 1
           [ -f batch-tracker/supabase/README.md ] && echo "✓ batch-tracker/supabase/README.md exists" || exit 1
