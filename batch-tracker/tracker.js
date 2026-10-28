@@ -6682,7 +6682,7 @@ async function loadPlantCultures() {
     renderStatisticsFilters();
     if (status) status.textContent = "Registre végétal chargé depuis Supabase.";
   } catch (error) {
-    if (!isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
+    if (requestId !== plantCultureListRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
     console.error("Chargement du registre végétal impossible :", error);
     initializationWarnings.push("registre végétal");
     if (status) status.textContent = "Registre végétal indisponible : " + (error.message || "erreur inconnue");
