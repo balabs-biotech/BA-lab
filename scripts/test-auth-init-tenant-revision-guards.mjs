@@ -59,4 +59,39 @@ for (const loader of ["loadReferenceData", "loadQuantityUnitOptions", "loadMeasu
     `${loader} must discard results from a superseded auth session`);
 }
 
-console.log("Auth initialization tenant-revision guards passed.");
+
+function getMutationBlock(name) {
+  const start = tracker.indexOf(`async function ${name}(`);
+  assert.ok(start >= 0, `Missing mutation handler: ${name}`);
+  const next = tracker.slice(start + 1).search(/\\n(?:async )?function /);
+  return tracker.slice(start, next >= 0 ? start + 1 + next : tracker.length);
+}
+
+for (const mutation of [
+  "createCulture", "recordBatchHarvest", "saveQcCheckNow", "createBatch",
+  "advanceBatch", "releaseBatch", "moveSelectedBatch", "saveMeasurement",
+  "saveObservation", "saveBiologicalOperation", "savePlantCulture"
+]) {
+  const source = getMutationBlock(mutation);
+  assert.match(source, /const operationRevision = authStateRevision;/,
+    `${mutation} must capture the auth revision before asynchronous work`);
+  assert.match(source, /const operationOrganizationId = organizationId;/,
+    `${mutation} must capture its organization context`);
+  assert.match(source, /isCurrentWorkspaceRevision\(operationRevision, operationOrganizationId\)/,
+    `${mutation} must refuse writes after the auth/workspace revision changes`);
+}
+
+
+const capturedOrganizationChecks = [
+  ["createCulture", /p_organization_id:\s*operationOrganizationId/],
+  ["createBatch", /p_organization_id:\s*operationOrganizationId/],
+  ["saveMeasurement", /organization_id:\s*operationOrganizationId/],
+  ["saveObservation", /organization_id:\s*operationOrganizationId/],
+  ["saveBiologicalOperation", /p_organization_id:\s*operationOrganizationId/]
+];
+for (const [mutation, pattern] of capturedOrganizationChecks) {
+  assert.match(getMutationBlock(mutation), pattern,
+    `${mutation} must send the captured organization ID, not a mutable global value`);
+}
+
+console.log("Auth initialization and tenant-write revision guards passed.");
