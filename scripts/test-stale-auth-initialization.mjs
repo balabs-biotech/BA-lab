@@ -358,7 +358,7 @@ for (const [name, requestId] of [
   );
   assert.match(
     handler,
-    new RegExp(`const requestId = \\+\\+${requestId};`),
+    new RegExp(`const requestId = \+\+${requestId};`),
     `${name} must supersede an earlier overlapping refresh`,
   );
   assert.match(
@@ -371,9 +371,9 @@ const listCleanupHandler = tracker.slice(
   tracker.indexOf("function clearAuthenticatedWorkspaceState()"),
   tracker.indexOf("\nasync function refreshAuthUI")
 );
-assert.match(listCleanupHandler, /strainOptionsRequestId\\s*\\+=\\s*1;/, "session cleanup must invalidate pending strain-option requests");
-assert.match(listCleanupHandler, /cultureOptionsRequestId\\s*\\+=\\s*1;/, "session cleanup must invalidate pending culture-option requests");
-assert.match(listCleanupHandler, /latestBatchesRequestId\\s*\\+=\\s*1;/, "session cleanup must invalidate pending batch-list requests");
+assert.match(listCleanupHandler, /strainOptionsRequestId\s*\+=\s*1;/, "session cleanup must invalidate pending strain-option requests");
+assert.match(listCleanupHandler, /cultureOptionsRequestId\s*\+=\s*1;/, "session cleanup must invalidate pending culture-option requests");
+assert.match(listCleanupHandler, /latestBatchesRequestId\s*\+=\s*1;/, "session cleanup must invalidate pending batch-list requests");
 console.log("Option and batch-list request-order guards passed.");
 
 
@@ -458,7 +458,7 @@ for (const [name, requestId] of [
   const handler = handlerSource(name);
   assert.match(
     tracker,
-    new RegExp(`let ${requestId} = 0;\\s*async function ${name}\\(\\) \\\{\\s*const requestId = \\\+\\+${requestId};`),
+    new RegExp(`let ${requestId} = 0;\s*async function ${name}\\(\\) \\\{\s*const requestId = \\+\+${requestId};`),
     `${name} must assign a unique request identity to each refresh`,
   );
   assert.ok(
@@ -487,7 +487,7 @@ for (const [name, button] of [
   );
   assert.match(
     finallyBlock,
-    new RegExp(`${button}\\.disabled\\s*=\\s*false`),
+    new RegExp(`${button}\\.disabled\s*=\s*false`),
     `${name} must restore its control after a current-workspace operation`,
   );
 }
