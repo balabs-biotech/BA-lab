@@ -110,7 +110,7 @@ if(root){
         }
         geo.computeVertexNormals();
         const mat=new THREE.MeshStandardMaterial({color,emissive:new THREE.Color(color).multiplyScalar(.08),emissiveIntensity:.12,metalness:0,roughness:1,flatShading:true});
-        const mesh=new THREE.Mesh(geo,mat);mesh.position.copy(p);mesh.userData={kind:'sphere',id};mesh.scale.set(1.1638,.9867,.9108);worldGroup.add(mesh);
+        const mesh=new THREE.Mesh(geo,mat);mesh.position.copy(p);mesh.userData={kind:'sphere',id};mesh.scale.set(1.33837,1.134705,1.04742);worldGroup.add(mesh);
         // Polarized neuronal morphology: one unmistakable axon plus an
         // asymmetric dendritic crown. Avoid the radial "sea urchin" silhouette.
         const twigs=[];
