@@ -88,6 +88,7 @@ jobs:
           node --check batch-tracker/environmental-data.js
           node scripts/check-i18n.mjs
           node scripts/test-workspace-scenarios.mjs
+          node scripts/test-auth-transition-workspace-lockdown.mjs
           [ -f batch-tracker/index.html ] && echo "✓ batch-tracker/index.html exists" || exit 1
           [ -f batch-tracker/README.md ] && echo "✓ batch-tracker/README.md exists" || exit 1
           [ -f batch-tracker/supabase/README.md ] && echo "✓ batch-tracker/supabase/README.md exists" || exit 1
