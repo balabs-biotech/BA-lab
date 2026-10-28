@@ -122,7 +122,7 @@ console.log("✓ Batch creation supports organization-scoped location and enviro
 if(!template.includes('id="moveBatchLocation"')||!template.includes('id="moveBatchEnvironment"')||!template.includes('id="moveBatchButton"'))throw new Error("Batch movement controls are missing");
 for(const snippet of [
  'rpc("move_batch_to_location"',
- 'p_batch_id: selectedBatchId',
+ 'p_batch_id: operationBatchId',
  'p_location_id: locationId',
  'p_environment_id: environmentId',
  'p_note: note',
