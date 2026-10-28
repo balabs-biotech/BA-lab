@@ -1662,6 +1662,7 @@ function setSyncStatus(
 
 
 async function syncPendingCultures() {
+  const loadRevision = authStateRevision;
   if (!organizationId) return;
 
   if (syncInProgress) return;
@@ -1685,6 +1686,8 @@ async function syncPendingCultures() {
       .order("created_at", { ascending: true })
       .limit(20);
 
+    if (loadRevision !== authStateRevision) return;
+
     if (error) {
       console.error(
         "Erreur lors du chargement des cultures à synchroniser :",
@@ -1704,12 +1707,15 @@ async function syncPendingCultures() {
     let lastError = "";
 
     for (const culture of cultures || []) {
+      if (loadRevision !== authStateRevision) return;
       try {
         const { data, error: syncError } =
           await supabaseClient.functions.invoke(
             "sync-culture-to-notion",
             { body: { culture_id: culture.id } }
           );
+
+        if (loadRevision !== authStateRevision) return;
 
         if (syncError || !data?.ok) {
           failed += 1;
