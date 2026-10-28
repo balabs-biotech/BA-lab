@@ -4612,6 +4612,7 @@ async function init() {
    ============================================================ */
 
 async function loadQuantityUnitOptions() {
+  const loadRevision = authStateRevision;
   const selects = [batchUnitInput, harvestUnitInput].filter(Boolean);
   for (const select of selects) {
     select.replaceChildren();
@@ -4626,6 +4627,7 @@ async function loadQuantityUnitOptions() {
       .from("units")
       .select("code,label,dimension")
       .order("code");
+    if (loadRevision !== authStateRevision) return;
     if (error) throw error;
 
     quantityUnitOptions = data || [];
@@ -4649,6 +4651,7 @@ async function loadQuantityUnitOptions() {
       }
     }
   } catch (error) {
+    if (loadRevision !== authStateRevision) return;
     console.error("Référentiel des unités indisponible :", error);
     initializationWarnings.push("unités");
     quantityUnitOptions = [];
@@ -4784,6 +4787,7 @@ function renderBatchEnvironmentOptions() {
 }
 
 async function loadBatchPlaceOptions() {
+  const loadRevision = authStateRevision;
   if (!organizationId || !batchLocationInput || !batchEnvironmentInput) return;
   batchLocationInput.disabled = true;
   batchEnvironmentInput.disabled = true;
@@ -4792,6 +4796,7 @@ async function loadBatchPlaceOptions() {
       supabaseClient.from("locations").select("id,code,name").eq("organization_id", organizationId).order("name"),
       supabaseClient.from("environments").select("id,name,location_id").eq("organization_id", organizationId).order("name")
     ]);
+    if (loadRevision !== authStateRevision) return;
     if (locationsError) throw locationsError;
     if (environmentsError) throw environmentsError;
     batchLocationOptions = locations || [];
@@ -4810,6 +4815,7 @@ async function loadBatchPlaceOptions() {
     batchLocationInput.disabled = batchLocationOptions.length === 0;
     renderBatchEnvironmentOptions();
   } catch (error) {
+    if (loadRevision !== authStateRevision) return;
     console.error("Référentiel des emplacements indisponible :", error);
     initializationWarnings.push("emplacements et environnements");
     batchLocationOptions = [];
@@ -4831,6 +4837,7 @@ moveBatchButton?.addEventListener("click", moveSelectedBatch);
    ============================================================ */
 
 async function loadMeasurementReferences() {
+  const loadRevision = authStateRevision;
   const [variableResult, unitResult] = await Promise.all([
     supabaseClient.from("variables")
       .select("code, label, dimension, canonical_unit_code, description")
@@ -4840,6 +4847,7 @@ async function loadMeasurementReferences() {
       .order("code")
   ]);
 
+  if (loadRevision !== authStateRevision) return;
   if (variableResult.error) {
     throw new Error(`Chargement des paramètres de mesure impossible : ${variableResult.error.message}`);
   }
@@ -5148,6 +5156,7 @@ function belongsToActiveWorkspace(record, eventsById = {}) {
 }
 
 async function loadRecentMeasurements() {
+  const loadRevision = authStateRevision;
   if (!organizationId || !measurementHistory) return;
 
   const { data, error } = await supabaseClient
@@ -5157,6 +5166,7 @@ async function loadRecentMeasurements() {
     .order("measured_at", { ascending: false })
     .limit(1000);
 
+  if (loadRevision !== authStateRevision) return;
   if (error) throw new Error(`Chargement de l’historique des mesures impossible : ${error.message}`);
 
   const rows = data || [];
@@ -5168,6 +5178,7 @@ async function loadRecentMeasurements() {
       .select("id, batch_id, culture_id, plant_culture_id")
       .eq("organization_id", organizationId)
       .in("id", eventIds);
+    if (loadRevision !== authStateRevision) return;
     if (eventsError) console.warn("Détails des événements de mesure indisponibles :", eventsError.message);
     for (const event of events || []) eventsById[event.id] = event;
   }
@@ -5334,6 +5345,7 @@ async function saveObservation() {
 }
 
 async function loadRecentObservations() {
+  const loadRevision = authStateRevision;
   if (!organizationId || !observationHistory) return;
 
   const query = await supabaseClient.from("observations")
@@ -5342,6 +5354,7 @@ async function loadRecentObservations() {
     .order("observed_at", { ascending: false })
     .limit(1000);
 
+  if (loadRevision !== authStateRevision) return;
   if (query.error) throw new Error("Chargement de l’historique des observations impossible : " + query.error.message);
   const observationRows = query.data || [];
   const eventIds = [...new Set(observationRows.map(row => row.event_id).filter(Boolean))];
@@ -5352,6 +5365,7 @@ async function loadRecentObservations() {
       .select("id, batch_id, culture_id, plant_culture_id")
       .eq("organization_id", organizationId)
       .in("id", eventIds);
+    if (loadRevision !== authStateRevision) return;
     if (eventsResult.error) console.warn("Détails des événements d’observation indisponibles :", eventsResult.error.message);
     for (const event of eventsResult.data || []) eventsById[event.id] = event;
   }
@@ -6517,6 +6531,7 @@ function renderPlantCultureList(rows) {
 }
 
 async function loadPlantCultures() {
+  const loadRevision = authStateRevision;
   if (!organizationId) return;
   const status = document.getElementById("plantCultureStatus");
   try {
@@ -6525,6 +6540,7 @@ async function loadPlantCultures() {
       .eq("organization_id", organizationId)
       .order("created_at", { ascending: false })
       .limit(300);
+    if (loadRevision !== authStateRevision) return;
     if (error) throw error;
     renderPlantCultureList(data || []);
     plantCultureOptions = data || [];
@@ -6532,6 +6548,7 @@ async function loadPlantCultures() {
     renderStatisticsFilters();
     if (status) status.textContent = "Registre végétal chargé depuis Supabase.";
   } catch (error) {
+    if (loadRevision !== authStateRevision) return;
     console.error("Chargement du registre végétal impossible :", error);
     initializationWarnings.push("registre végétal");
     if (status) status.textContent = "Registre végétal indisponible : " + (error.message || "erreur inconnue");
