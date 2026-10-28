@@ -5240,7 +5240,10 @@ function belongsToActiveWorkspace(record, eventsById = {}) {
   );
 }
 
+let measurementHistoryRequestId = 0;
+
 async function loadRecentMeasurements() {
+  const requestId = ++measurementHistoryRequestId;
   const loadRevision = authStateRevision;
   const loadOrganizationId = organizationId;
   if (!loadOrganizationId || !measurementHistory) return;
@@ -5252,7 +5255,7 @@ async function loadRecentMeasurements() {
     .order("measured_at", { ascending: false })
     .limit(1000);
 
-  if (!isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
+  if (requestId !== measurementHistoryRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
   if (error) throw new Error(`Chargement de l’historique des mesures impossible : ${error.message}`);
 
   const rows = data || [];
@@ -5264,11 +5267,12 @@ async function loadRecentMeasurements() {
       .select("id, batch_id, culture_id, plant_culture_id")
       .eq("organization_id", loadOrganizationId)
       .in("id", eventIds);
-    if (!isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
+    if (requestId !== measurementHistoryRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
     if (eventsError) console.warn("Détails des événements de mesure indisponibles :", eventsError.message);
     for (const event of events || []) eventsById[event.id] = event;
   }
 
+  if (requestId !== measurementHistoryRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
   const visibleRows = rows.filter(row => belongsToActiveWorkspace(row, eventsById)).slice(0, 10);
   if (!visibleRows.length) {
     measurementHistory.innerHTML = '<p class="muted">Aucune mesure enregistrée dans cet univers pour le moment.</p>';
@@ -5436,7 +5440,10 @@ async function saveObservation() {
   }
 }
 
+let observationHistoryRequestId = 0;
+
 async function loadRecentObservations() {
+  const requestId = ++observationHistoryRequestId;
   const loadRevision = authStateRevision;
   const loadOrganizationId = organizationId;
   if (!loadOrganizationId || !observationHistory) return;
@@ -5447,7 +5454,7 @@ async function loadRecentObservations() {
     .order("observed_at", { ascending: false })
     .limit(1000);
 
-  if (!isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
+  if (requestId !== observationHistoryRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
   if (query.error) throw new Error("Chargement de l’historique des observations impossible : " + query.error.message);
   const observationRows = query.data || [];
   const eventIds = [...new Set(observationRows.map(row => row.event_id).filter(Boolean))];
@@ -5458,11 +5465,12 @@ async function loadRecentObservations() {
       .select("id, batch_id, culture_id, plant_culture_id")
       .eq("organization_id", loadOrganizationId)
       .in("id", eventIds);
-    if (!isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
+    if (requestId !== observationHistoryRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
     if (eventsResult.error) console.warn("Détails des événements d’observation indisponibles :", eventsResult.error.message);
     for (const event of eventsResult.data || []) eventsById[event.id] = event;
   }
 
+  if (requestId !== observationHistoryRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
   recentObservations = observationRows.filter(row => belongsToActiveWorkspace(row, eventsById)).slice(0, 8);
   updateOverview();
   if (!recentObservations.length) {
