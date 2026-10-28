@@ -4753,16 +4753,16 @@ async function loadMeasurementReferences() {
       .order("code")
   ]);
 
+  // Ignore late responses, including errors, after an organization or workspace switch.
+  if (requestedOrganizationId !== organizationId ||
+      requestedDomain !== (document.body.dataset.domain || "mycology")) return;
+
   if (variableResult.error) {
     throw new Error(`Chargement des paramètres de mesure impossible : ${variableResult.error.message}`);
   }
   if (unitResult.error) {
     throw new Error(`Chargement des unités impossible : ${unitResult.error.message}`);
   }
-
-  // Ignore late reference responses after an organization or workspace switch.
-  if (requestedOrganizationId !== organizationId ||
-      requestedDomain !== (document.body.dataset.domain || "mycology")) return;
 
   measurementVariables = variableResult.data || [];
   measurementUnits = unitResult.data || [];
