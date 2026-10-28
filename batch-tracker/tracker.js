@@ -1800,6 +1800,9 @@ async function syncPendingCultures() {
 
 
 async function createCulture() {
+  const operationRevision = authStateRevision;
+  const operationOrganizationId = organizationId;
+
 
   clearMessage();
 
@@ -1913,7 +1916,7 @@ async function createCulture() {
       error: consentLookupError
     } = await consentTable
       .select("id")
-      .eq("organization_id", organizationId)
+      .eq("organization_id", operationOrganizationId)
       .eq("user_id", session.user.id)
       .eq("terms_version", "2026-10-09-v1")
       .maybeSingle();
@@ -1935,14 +1938,16 @@ async function createCulture() {
 
     if (existingConsent) {
       // Conserver la date de première acceptation des conditions.
-      const updateResult = await consentTable
+      if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) throw new Error("Session ou espace de travail modifié pendant l’opération. Recommencez.");
+    const updateResult = await consentTable
         .update(consentValues)
         .eq("id", existingConsent.id);
       consentError = updateResult.error;
     } else {
-      const insertResult = await consentTable
+      if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) throw new Error("Session ou espace de travail modifié pendant l’opération. Recommencez.");
+    const insertResult = await consentTable
         .insert({
-          organization_id: organizationId,
+          organization_id: operationOrganizationId,
           user_id: session.user.id,
           terms_version: "2026-10-09-v1",
           terms_accepted_at: new Date().toISOString(),
@@ -1963,6 +1968,7 @@ async function createCulture() {
       );
 
 
+    if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) throw new Error("Session ou espace de travail modifié pendant l’opération. Recommencez.");
     const {
       data,
       error
@@ -3014,6 +3020,9 @@ function updateHarvestEntryState(batch, events) {
 }
 
 async function recordBatchHarvest() {
+  const operationRevision = authStateRevision;
+  const operationOrganizationId = organizationId;
+
   if (!organizationId || !selectedBatch || !selectedBatchId) {
     showMessage("Sélectionnez d’abord un lot.", "error");
     return;
@@ -3048,6 +3057,7 @@ async function recordBatchHarvest() {
     if (!eventAnchor) {
       throw new Error("Ce lot doit être lié à une culture ou à un matériau pour enregistrer une récolte dans le journal biologique.");
     }
+    if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) throw new Error("Session ou espace de travail modifié pendant l’opération. Recommencez.");
     const { data: eventId, error } = await supabaseClient.rpc("record_batch_harvest", {
       p_batch_id: selectedBatch.id,
       p_quantity: quantity,
@@ -3642,6 +3652,9 @@ async function saveQcCheck(
 async function saveQcCheckNow(
   checkId
 ) {
+  const operationRevision = authStateRevision;
+  const operationOrganizationId = organizationId;
+
 
   if (!organizationId) {
 
@@ -3703,7 +3716,8 @@ async function saveQcCheckNow(
   };
 
 
-  const {
+  if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) throw new Error("Session ou espace de travail modifié pendant l’opération. Recommencez.");
+    const {
     error
   } =
     await supabaseClient
@@ -3711,7 +3725,7 @@ async function saveQcCheckNow(
       .update(update)
       .eq(
         "organization_id",
-        organizationId
+        operationOrganizationId
       )
       .eq(
         "id",
@@ -3857,6 +3871,9 @@ function updateBatchActionState(
    ============================================================ */
 
 async function createBatch() {
+  const operationRevision = authStateRevision;
+  const operationOrganizationId = organizationId;
+
 
   clearMessage();
 
@@ -4016,6 +4033,7 @@ async function createBatch() {
 
   try {
 
+    if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) throw new Error("Session ou espace de travail modifié pendant l’opération. Recommencez.");
     const {
       data,
       error
@@ -4243,6 +4261,9 @@ async function getCultureProtocolVersionId(
    ============================================================ */
 
 async function advanceBatch() {
+  const operationRevision = authStateRevision;
+  const operationOrganizationId = organizationId;
+
 
   if (
     !selectedBatchId ||
@@ -4288,6 +4309,7 @@ async function advanceBatch() {
 
   try {
 
+    if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) throw new Error("Session ou espace de travail modifié pendant l’opération. Recommencez.");
     const {
       data,
       error
@@ -4371,6 +4393,9 @@ async function advanceBatch() {
    ============================================================ */
 
 async function releaseBatch() {
+  const operationRevision = authStateRevision;
+  const operationOrganizationId = organizationId;
+
 
   if (!selectedBatchId) {
 
@@ -4393,6 +4418,7 @@ async function releaseBatch() {
 
   try {
 
+    if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) throw new Error("Session ou espace de travail modifié pendant l’opération. Recommencez.");
     const {
       data,
       error
@@ -4738,6 +4764,9 @@ function prepareMovementControls(batch) {
 }
 
 async function moveSelectedBatch() {
+  const operationRevision = authStateRevision;
+  const operationOrganizationId = organizationId;
+
   if (!organizationId || !selectedBatch || !selectedBatchId) {
     showMessage("Sélectionnez d’abord un lot.", "error");
     return;
@@ -4759,6 +4788,7 @@ async function moveSelectedBatch() {
   const label = moveBatchButton.textContent;
   moveBatchButton.textContent = "Enregistrement…";
   try {
+    if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) throw new Error("Session ou espace de travail modifié pendant l’opération. Recommencez.");
     const { data, error } = await supabaseClient.rpc("move_batch_to_location", {
       p_batch_id: selectedBatchId,
       p_location_id: locationId,
@@ -5020,6 +5050,9 @@ function cultureWorkflowText(key) {
 }
 
 async function saveMeasurement() {
+  const operationRevision = authStateRevision;
+  const operationOrganizationId = organizationId;
+
   if (!organizationId) {
     showMessage(cultureWorkflowText("organization"), "error");
     return;
@@ -5128,6 +5161,7 @@ async function saveMeasurement() {
         batch_id: batchId
       }
     };
+    if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) throw new Error("Session ou espace de travail modifié pendant l’opération. Recommencez.");
     const { error: recordError } = await supabaseClient.rpc("record_manual_measurement", {
       p_event: eventPayload,
       p_measurement: measurementPayload
@@ -5243,6 +5277,9 @@ async function loadRecentMeasurements() {
 
 
 async function saveObservation() {
+  const operationRevision = authStateRevision;
+  const operationOrganizationId = organizationId;
+
   if (!organizationId) {
     showMessage(cultureWorkflowText("organization"), "error");
     return;
@@ -5340,6 +5377,7 @@ async function saveObservation() {
         batch_id: batchId
       }
     };
+    if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) throw new Error("Session ou espace de travail modifié pendant l’opération. Recommencez.");
     const { error: recordError } = await supabaseClient.rpc("record_manual_observation", {
       p_event: eventPayload,
       p_observation: observationPayload
@@ -5801,6 +5839,9 @@ async function loadBiologicalLineage(cultureId) {
 }
 
 async function saveBiologicalOperation(event) {
+  const operationRevision = authStateRevision;
+  const operationOrganizationId = organizationId;
+
   event.preventDefault();
   const button = document.getElementById('saveBioOperation');
   const message = document.getElementById('bioOperationMessage');
@@ -5817,6 +5858,7 @@ async function saveBiologicalOperation(event) {
   if (childCodes.length && !['repiquage','passage','transfert','division_aliquotes','changement_milieu','conservation'].includes(operationType)) { message.textContent = biologicalWorkflowText("invalidPropagation"); return; }
   button.disabled = true; button.textContent = biologicalWorkflowText("saving"); message.textContent = '';
   try {
+    if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) throw new Error("Session ou espace de travail modifié pendant l’opération. Recommencez.");
     const { data, error } = await supabaseClient.rpc('record_biological_operation', {
       p_organization_id: organizationId, p_parent_culture_id: cultureId, p_event_type: operationType,
       p_occurred_at: new Date(dateValue).toISOString(), p_note: note || null,
@@ -6584,6 +6626,9 @@ async function loadPlantCultures() {
 }
 
 async function savePlantCulture(event) {
+  const operationRevision = authStateRevision;
+  const operationOrganizationId = organizationId;
+
   event.preventDefault();
   if (!organizationId) {
     showMessage("Organisation absente : reconnectez-vous avant d’enregistrer une culture végétale.", "error");
@@ -6607,8 +6652,9 @@ async function savePlantCulture(event) {
   if (status) status.textContent = "Enregistrement de la fiche végétale…";
   try {
     const startedValue = document.getElementById("plantStartedAt").value;
+    if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) throw new Error("Session ou espace de travail modifié pendant l’opération. Recommencez.");
     const { error } = await supabaseClient.from("plant_cultures").insert({
-      organization_id: organizationId,
+      organization_id: operationOrganizationId,
       code,
       crop_type: cropType,
       species_name: crop.species,
