@@ -6815,6 +6815,12 @@ function setupDomainWorkspaces() {
   const setDomain = (domain, persist = true) => {
     const activeDomain = Object.hasOwn(modes, domain) ? domain : "agronomy";
     const config = modes[activeDomain];
+    const previousDomain = document.body.dataset.domain;
+    if (previousDomain && previousDomain !== activeDomain) {
+      // A statistics request captures domain-specific filters. Ignore its
+      // response if the user switches workspaces before it completes.
+      statisticsRequestId += 1;
+    }
     document.body.dataset.domain = activeDomain;
     buttons.forEach(button => button.setAttribute("aria-pressed", String(button.dataset.domainChoice === activeDomain)));
     if (heading) heading.textContent = config.heading;
