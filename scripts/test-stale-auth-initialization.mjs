@@ -208,8 +208,8 @@ console.log("Tenant-scoped write auth contract passed.");
 function handlerSource(name) {
   const start = tracker.indexOf(`async function ${name}(`);
   assert.ok(start >= 0, `${name} must exist for stale-response checks`);
-  const nextAsync = tracker.indexOf("\\nasync function ", start + 1);
-  const nextNormal = tracker.indexOf("\\nfunction ", start + 1);
+  const nextAsync = tracker.indexOf("\nasync function ", start + 1);
+  const nextNormal = tracker.indexOf("\nfunction ", start + 1);
   const ends = [nextAsync, nextNormal].filter(index => index >= 0);
   return tracker.slice(start, ends.length ? Math.min(...ends) : tracker.length);
 }
@@ -218,19 +218,19 @@ for (const name of ["saveMeasurement", "saveObservation"]) {
   const handler = handlerSource(name);
   assert.match(
     handler,
-    /catch \\(error\\) \\{\\s*if \\(!isCurrentWorkspaceRevision\\(operationRevision, operationOrganizationId\\)\\) return;/,
+    /catch \(error\) \{\s*if \(!isCurrentWorkspaceRevision\(operationRevision, operationOrganizationId\)\) return;/,
     `${name} must ignore stale errors after a session change`,
   );
 }
 
 assert.match(
   handlerSource("createBatch"),
-  /await loadLatestBatches\\(\\);\\s*if \\(!isCurrentWorkspaceRevision\\(operationRevision, operationOrganizationId\\)\\) return;/,
+  /await loadLatestBatches\(\);\s*if \(!isCurrentWorkspaceRevision\(operationRevision, operationOrganizationId\)\) return;/,
   "createBatch must recheck auth before continuing after refreshing the batch list",
 );
 assert.match(
   handlerSource("savePlantCulture"),
-  /await loadPlantCultures\\(\\);\\s*if \\(!isCurrentWorkspaceRevision\\(operationRevision, operationOrganizationId\\)\\) return;/,
+  /await loadPlantCultures\(\);\s*if \(!isCurrentWorkspaceRevision\(operationRevision, operationOrganizationId\)\) return;/,
   "savePlantCulture must recheck auth before showing success after refresh",
 );
 
