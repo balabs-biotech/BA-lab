@@ -312,7 +312,7 @@ function goHome(){miniView.hidden=true;mainView.hidden=false;mainView.classList.
 document.querySelectorAll('[data-lang]').forEach(b=>b.addEventListener('click',()=>setLanguage(b.dataset.lang)));document.querySelectorAll('[data-sphere]').forEach(b=>{b.addEventListener('click',()=>enterSphere(b.dataset.sphere));b.addEventListener('mouseenter',()=>applyFocus(b.dataset.sphere,true));b.addEventListener('mouseleave',()=>applyFocus(selected,false));b.addEventListener('focus',()=>applyFocus(b.dataset.sphere,true));b.addEventListener('blur',()=>applyFocus(selected,false));});homeBtn.addEventListener('click',goHome);openUniverse.addEventListener('click',toggleUniverse);mainView.addEventListener('pointerdown',beginOrbit);mainView.addEventListener('pointermove',moveOrbit);mainView.addEventListener('pointerup',endOrbit);mainView.addEventListener('pointercancel',endOrbit);window.addEventListener('resize',()=>{applyOrbit();drawMiniConnections()});
 setLanguage('fr');applyOrbit();
 </script>
-<script type="module" src="./constellation-3d.js?v=network-loop-links-20261028r"></script>
+<script type="module" src="./constellation-3d.js?v=network-loop-links-20261028s"></script>
 
 <style id="balabs-visual-refinement">
 /* BALabs visual refinement — editorial mineral / botanical system */
@@ -345,9 +345,9 @@ h1 span{color:#748b5e}
 .hero p{color:#626f63;line-height:1.9;font-size:clamp(13px,1.1vw,15px)}
 .aside{border-left-color:#c2cdb9;color:#69776b}
 .aside b{color:#2d3b30}
-.scene{border:1px solid #35483a;border-radius:24px;background:radial-gradient(ellipse at 50% 42%,#31463a 0%,#202f26 58%,#18221d 100%);box-shadow:0 28px 75px #45553b1c,0 3px 10px #3e4d3810}
+.scene{border:1px solid #647b62;border-radius:24px;background:radial-gradient(ellipse at 50% 42%,#405a45 0%,#2b4032 58%,#223128 100%);box-shadow:0 28px 75px #45553b1c,0 3px 10px #3e4d3810}
 .scene:before{opacity:.15;background-size:44px 44px}
-.scenehead{background:linear-gradient(110deg,#1d2a23f5,#17221df5);border-bottom-color:#3a4c3b;padding:17px 20px}
+.scenehead{background:linear-gradient(110deg,#2b4031f5,#26382bf5);border-bottom-color:#50674c;padding:17px 20px}
 .scenehead small{color:#b0c19f}
 .scenehead strong{font-size:13px;letter-spacing:.015em}
 .btn{border-color:#53674f;background:#29372e;color:#f4f2e8;border-radius:999px;padding:10px 15px;transition:transform .2s,background .2s,box-shadow .2s}
