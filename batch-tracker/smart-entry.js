@@ -11,6 +11,12 @@
   const clearButton = $("smartEntryClear");
   const status = $("smartEntryStatus");
   if (!panel || !source || !applyButton || !status) return;
+  // Green Tech uses the separate plant registry; do not expose a biological
+  // culture prefill panel there until a plant-specific adapter exists.
+  if (window.BA_LABS_DOMAIN === "agronomy") {
+    panel.hidden = true;
+    return;
+  }
 
   const aliases = {
     strain: ["strain", "souche", "ressource", "organisme", "biological resource"],
@@ -77,8 +83,10 @@
     const partial = options.filter((option) => {
       const value = normalize(option.value);
       const label = normalize(option.textContent);
-      if (!value || !label || target.length < 4) return false;
-      return value.includes(target) || label.includes(target) || target.includes(value) || target.includes(label);
+      if (target.length < 4) return false;
+      const valueMatch = value.length >= 4 && (value.includes(target) || target.includes(value));
+      const labelMatch = label.length >= 4 && (label.includes(target) || target.includes(label));
+      return valueMatch || labelMatch;
     });
     if (partial.length !== 1) return "unmatched";
     const match = partial[0];
