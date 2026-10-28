@@ -1123,6 +1123,8 @@ async function loadStrainOptions() {
   }
 
 
+  const loadRevision = authStateRevision;
+
   const {
     data,
     error
@@ -1152,6 +1154,8 @@ async function loadStrainOptions() {
         "strain_code"
       );
 
+
+  if (loadRevision !== authStateRevision) return;
 
   if (error) {
 
@@ -1243,6 +1247,8 @@ async function loadReferenceData() {
   }
 
 
+  const loadRevision = authStateRevision;
+
   const {
     data,
     error
@@ -1259,6 +1265,8 @@ async function loadReferenceData() {
         "code"
       );
 
+
+  if (loadRevision !== authStateRevision) return;
 
   if (error) {
 
@@ -2190,6 +2198,8 @@ async function loadCultureOptions() {
   }
 
 
+  const loadRevision = authStateRevision;
+
   const {
     data,
     error
@@ -2216,6 +2226,8 @@ async function loadCultureOptions() {
       )
       .limit(100);
 
+
+  if (loadRevision !== authStateRevision) return;
 
   if (error) {
 
@@ -2307,6 +2319,8 @@ async function loadLatestBatches() {
   }
 
 
+  const loadRevision = authStateRevision;
+
   const {
     data,
     error
@@ -2341,6 +2355,8 @@ async function loadLatestBatches() {
       )
       .limit(30);
 
+
+  if (loadRevision !== authStateRevision) return;
 
   if (error) {
 
