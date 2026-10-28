@@ -3088,9 +3088,11 @@ async function recordBatchHarvest() {
     console.error("Enregistrement récolte :", error);
     showMessage(error?.message || "Enregistrement de la récolte impossible.", "error");
   } finally {
-    recordHarvestButton.textContent = originalLabel;
-    if (selectedBatch) {
-      recordHarvestButton.disabled = !(selectedBatch.current_stage === "harvest" && selectedBatch.status === "active");
+    if (isCurrentWorkspaceRevision(operationRevision, operationOrganizationId) && selectedBatchId === operationBatchId) {
+      recordHarvestButton.textContent = originalLabel;
+      if (selectedBatch && selectedBatch.id === operationBatchId) {
+        recordHarvestButton.disabled = !(selectedBatch.current_stage === "harvest" && selectedBatch.status === "active");
+      }
     }
   }
 }
@@ -4832,8 +4834,10 @@ async function moveSelectedBatch() {
     console.error("Déplacement du lot impossible:", error);
     showMessage("Déplacement impossible : " + (error.message || "erreur inconnue"), "error");
   } finally {
-    moveBatchButton.textContent = label;
-    if (selectedBatch) prepareMovementControls(selectedBatch);
+    if (isCurrentWorkspaceRevision(operationRevision, operationOrganizationId) && selectedBatchId === operationBatchId) {
+      moveBatchButton.textContent = label;
+      if (selectedBatch && selectedBatch.id === operationBatchId) prepareMovementControls(selectedBatch);
+    }
   }
 }
 
@@ -5925,7 +5929,12 @@ async function saveBiologicalOperation(event) {
     await loadCultureDetail(cultureId);
     await loadBiologicalLineage(cultureId);
   } catch (error) { if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return; message.textContent = biologicalWorkflowText("failed") + (error.message || biologicalWorkflowText("notSaved")); }
-  finally { button.disabled = false; button.textContent = biologicalWorkflowText("save"); }
+  finally {
+    if (isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) {
+      button.disabled = false;
+      button.textContent = biologicalWorkflowText("save");
+    }
+  }
 }
 
 let cultureDetailRequestId = 0;
