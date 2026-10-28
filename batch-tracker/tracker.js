@@ -2431,6 +2431,8 @@ async function fetchAllComparisonPages(queryBuilder, pageSize = 1000) {
 }
 
 async function compareSelectedBatches() {
+  const loadRevision = authStateRevision;
+  const loadOrganizationId = organizationId;
   const select = document.getElementById("batchCompareSelect");
   const status = document.getElementById("batchCompareStatus");
   const results = document.getElementById("batchCompareResults");
@@ -2466,25 +2468,26 @@ async function compareSelectedBatches() {
     const [stageResult, cultureMeasurementResult, environmentMeasurementResult, cultureContextResult] = await Promise.all([
       supabaseClient.from("batch_stages")
         .select("batch_id,stage_code,status,sequence_no,started_at,completed_at")
-        .eq("organization_id", organizationId).in("batch_id", ids),
+        .eq("organization_id", loadOrganizationId).in("batch_id", ids),
       cultureIds.length
         ? fetchAllComparisonPages(supabaseClient.from("measurements")
             .select("id,culture_id,environment_id,variable_code,raw_value,raw_unit_code,normalized_value,normalized_unit_code,measured_at,quality_state,exclusion_reason")
-            .eq("organization_id", organizationId).in("culture_id", cultureIds)
+            .eq("organization_id", loadOrganizationId).in("culture_id", cultureIds)
             .order("measured_at", { ascending: false }).order("id", { ascending: true }))
         : Promise.resolve({data:[],error:null}),
       environmentIds.length
         ? fetchAllComparisonPages(supabaseClient.from("measurements")
             .select("id,culture_id,environment_id,variable_code,raw_value,raw_unit_code,normalized_value,normalized_unit_code,measured_at,quality_state,exclusion_reason")
-            .eq("organization_id", organizationId).in("environment_id", environmentIds)
+            .eq("organization_id", loadOrganizationId).in("environment_id", environmentIds)
             .order("measured_at", { ascending: false }).order("id", { ascending: true }))
         : Promise.resolve({data:[],error:null}),
       cultureIds.length
         ? supabaseClient.from("cultures")
             .select("id,experiment_id,experimental_unit_id")
-            .eq("organization_id", organizationId).in("id", cultureIds)
+            .eq("organization_id", loadOrganizationId).in("id", cultureIds)
         : Promise.resolve({data:[],error:null})
     ]);
+    if (!isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
     if (stageResult.error) throw new Error("Chargement des étapes impossible : " + stageResult.error.message);
     if (cultureMeasurementResult.error) throw new Error("Chargement des mesures de culture impossible : " + cultureMeasurementResult.error.message);
     if (environmentMeasurementResult.error) throw new Error("Chargement des mesures d'environnement impossible : " + environmentMeasurementResult.error.message);
@@ -2495,9 +2498,10 @@ async function compareSelectedBatches() {
       unitIds.length
         ? supabaseClient.from("experimental_units")
             .select("id,experiment_id,unit_code,replicate_no,treatment_code")
-            .eq("organization_id", organizationId).in("id", unitIds)
+            .eq("organization_id", loadOrganizationId).in("id", unitIds)
         : Promise.resolve({data:[],error:null})
     ]);
+    if (!isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
     if (unitResult.error) throw new Error("Chargement des unités expérimentales impossible : " + unitResult.error.message);
     const units = unitResult.data || [];
     const unitsById = new Map(units.map(row => [row.id, row]));
@@ -2508,8 +2512,9 @@ async function compareSelectedBatches() {
     const experimentResult = experimentIds.length
       ? await supabaseClient.from("experiments")
           .select("id,code,name")
-          .eq("organization_id", organizationId).in("id", experimentIds)
+          .eq("organization_id", loadOrganizationId).in("id", experimentIds)
       : {data:[],error:null};
+    if (!isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
     if (experimentResult.error) throw new Error("Chargement des expériences impossible : " + experimentResult.error.message);
     const experimentsById = new Map((experimentResult.data || []).map(row => [row.id, row]));
     const contextsByCultureId = new Map(cultureContexts.map(row => {
@@ -2523,16 +2528,18 @@ async function compareSelectedBatches() {
     const observationCultureResult = cultureIds.length
       ? await fetchAllComparisonPages(supabaseClient.from("observations")
           .select("id,culture_id,experimental_unit_id,variable_code,value_text,observed_at,quality_state")
-          .eq("organization_id", organizationId).in("culture_id", cultureIds)
+          .eq("organization_id", loadOrganizationId).in("culture_id", cultureIds)
           .order("observed_at", { ascending: false }).order("id", { ascending: true }))
       : {data:[],error:null};
+    if (!isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
     if (observationCultureResult.error) throw new Error("Chargement des observations de culture impossible : " + observationCultureResult.error.message);
     const observationUnitResult = unitIds.length
       ? await fetchAllComparisonPages(supabaseClient.from("observations")
           .select("id,culture_id,experimental_unit_id,variable_code,value_text,observed_at,quality_state")
-          .eq("organization_id", organizationId).in("experimental_unit_id", unitIds)
+          .eq("organization_id", loadOrganizationId).in("experimental_unit_id", unitIds)
           .order("observed_at", { ascending: false }).order("id", { ascending: true }))
       : {data:[],error:null};
+    if (!isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
     if (observationUnitResult.error) throw new Error("Chargement des observations expérimentales impossible : " + observationUnitResult.error.message);
     const observationMap = new Map();
     [...(observationCultureResult.data || []), ...(observationUnitResult.data || [])].forEach(row => {
@@ -2672,9 +2679,10 @@ async function compareSelectedBatches() {
     ].filter(Boolean);
     status.textContent = statusParts.join(" ");
   } catch (error) {
+    if (!isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
     status.textContent = error?.message || labels.impossible;
   } finally {
-    button.disabled = false;
+    if (isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) button.disabled = false;
   }
 }
 document.getElementById("compareBatchesButton")?.addEventListener("click", compareSelectedBatches);
@@ -5656,6 +5664,8 @@ let statisticsRequestId = 0;
 
 async function loadStatistics() {
   const requestId = ++statisticsRequestId;
+  const loadRevision = authStateRevision;
+  const loadOrganizationId = organizationId;
   const variableCode = document.getElementById("statisticsVariable").value;
   const domain = document.body.dataset.domain || "mycology";
   const selectedTargetId = document.getElementById("statisticsCulture").value;
@@ -5675,7 +5685,7 @@ async function loadStatistics() {
     ar: { login:"سجّل الدخول لتحليل بيانات مؤسستك.", variable:"اختر متغيرًا مقاسًا.", loading:"جارٍ تحميل القياسات من Supabase…", loadingData:"جارٍ تحميل البيانات…", buttonLoading:"جارٍ التحميل…", buttonAnalyze:"تحليل البيانات", loadedMeasurements:"القياسات المحمّلة", numericValues:"القيم الرقمية", comparableValues:"القيم القابلة للمقارنة", capped:"تطابق ١٬٠٠٠ قياس على الأقل عوامل التصفية. قد تكون النتائج مقتطعة؛ قلّص الفترة أو اختر مزرعة.", excluded:n=>n+" قيمة مستبعدة من الرسم لأن الوحدة غير قابلة للمقارنة. ", loaded:"تم تحميل البيانات من Supabase. النتائج وصفية.", empty:"لا توجد قياسات تطابق عوامل التصفية المحددة.", needTwo:"يلزم قياسان رقميان قابلان للمقارنة على الأقل لرسم الاتجاه. تبقى البيانات الخام متاحة أدناه.", unknownDate:"تاريخ غير معروف", measurementDate:"تاريخ القياس", unknownUnit:"وحدة غير معروفة", period:"الفترة المعروضة: ", noRows:"لا توجد قياسات لهذه العوامل.", limited:n=>"يقتصر العرض على أحدث ٢٠٠ قياس من أصل "+n+" قياسًا محمّلًا.", graphError:"تعذر إنشاء الرسم البياني.", unavailable:"البيانات غير متاحة.", loadError:"تعذر تحميل القياسات: ", cultureLinked:"مزرعة مرتبطة بالمعرّف", noCulture:"دفعة / هدف دون مزرعة مباشرة", unitMissing:"الوحدة غير محددة" }
   })[lang] || null;
   const L = tr || ({ fr: true }).fr && ({ login:"Connectez-vous pour analyser les données de votre organisation.", variable:"Sélectionnez une variable mesurée.", loading:"Chargement des mesures depuis Supabase…", loadingData:"Chargement des données…", buttonLoading:"Chargement…", buttonAnalyze:"Analyser les données", loadedMeasurements:"Mesures chargées", numericValues:"Valeurs numériques", comparableValues:"Valeurs comparables", capped:"Au moins 1 000 mesures correspondent aux filtres. Le résultat peut être tronqué ; réduisez la période ou sélectionnez une culture.", excluded:n=>n+" valeur(s) exclue(s) du graphique car l’unité n’est pas comparable. ", loaded:"Données chargées depuis Supabase. Les résultats sont descriptifs.", empty:"Aucune mesure ne correspond aux filtres sélectionnés.", needTwo:"Il faut au moins deux mesures numériques comparables pour tracer une évolution. Les données brutes restent consultables ci-dessous.", unknownDate:"Date inconnue", measurementDate:"Date de mesure", unknownUnit:"unité inconnue", period:"Période représentée : ", noRows:"Aucune mesure pour ces filtres.", limited:n=>"Affichage limité aux 200 mesures les plus récentes sur "+n+" chargées.", graphError:"Le graphique n’a pas pu être produit.", unavailable:"Données indisponibles.", loadError:"Impossible de charger les mesures : ", cultureLinked:"Culture liée par identifiant", noCulture:"Lot / cible sans culture directe", unitMissing:"Unité non renseignée" });
-  if (!organizationId) { status.textContent = L.login; return; }
+  if (!loadOrganizationId) { status.textContent = L.login; return; }
   if (!variableCode) { status.textContent = L.variable; return; }
   const button = document.getElementById("loadStatisticsButton");
   button.disabled = true; button.textContent = L.buttonLoading;
@@ -5686,30 +5696,30 @@ async function loadStatistics() {
     let noMatchingCultureBatchEvents = false;
     let noWorkspaceTargets = false;
     if (batchId) {
-      const {data: batchEvents, error: batchEventsError} = await supabaseClient.from("events").select("id").eq("organization_id", organizationId).eq("batch_id", batchId);
+      const {data: batchEvents, error: batchEventsError} = await supabaseClient.from("events").select("id").eq("organization_id", loadOrganizationId).eq("batch_id", batchId);
       if (batchEventsError) throw new Error("Chargement des événements du lot impossible : " + batchEventsError.message);
-      if (requestId !== statisticsRequestId) return;
+      if (requestId !== statisticsRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
       batchEventIds = (batchEvents || []).map(event => event.id);
     }
     if (cultureId) {
-      const {data: cultureBatches, error: cultureBatchesError} = await supabaseClient.from("batches").select("id").eq("organization_id", organizationId).eq("culture_id", cultureId).order("created_at", {ascending:false}).limit(1000);
+      const {data: cultureBatches, error: cultureBatchesError} = await supabaseClient.from("batches").select("id").eq("organization_id", loadOrganizationId).eq("culture_id", cultureId).order("created_at", {ascending:false}).limit(1000);
       if (cultureBatchesError) throw new Error("Chargement des lots liés à la culture impossible : " + cultureBatchesError.message);
-      if (requestId !== statisticsRequestId) return;
+      if (requestId !== statisticsRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
       const cultureBatchIds = (cultureBatches || []).map(batch => batch.id);
       const cultureEventQueries = [
-        supabaseClient.from("events").select("id").eq("organization_id", organizationId).eq("culture_id", cultureId)
+        supabaseClient.from("events").select("id").eq("organization_id", loadOrganizationId).eq("culture_id", cultureId)
       ];
       if (cultureBatchIds.length) {
-        cultureEventQueries.push(supabaseClient.from("events").select("id").eq("organization_id", organizationId).in("batch_id", cultureBatchIds));
+        cultureEventQueries.push(supabaseClient.from("events").select("id").eq("organization_id", loadOrganizationId).in("batch_id", cultureBatchIds));
       }
       const cultureEventResults = await Promise.all(cultureEventQueries);
-      if (requestId !== statisticsRequestId) return;
+      if (requestId !== statisticsRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
       for (const result of cultureEventResults) {
         if (result.error) throw new Error("Chargement des événements liés à la culture impossible : " + result.error.message);
       }
       cultureEventIds = [...new Set(cultureEventResults.flatMap(result => (result.data || []).map(event => event.id)))];
     }
-    let query = supabaseClient.from("measurements").select("id, variable_code, raw_value, raw_unit_code, normalized_value, normalized_unit_code, measured_at, method, culture_id, plant_culture_id, event_id, metadata").eq("organization_id", organizationId).eq("variable_code", variableCode).order("measured_at", {ascending:false}).limit(1000);
+    let query = supabaseClient.from("measurements").select("id, variable_code, raw_value, raw_unit_code, normalized_value, normalized_unit_code, measured_at, method, culture_id, plant_culture_id, event_id, metadata").eq("organization_id", loadOrganizationId).eq("variable_code", variableCode).order("measured_at", {ascending:false}).limit(1000);
     if (plantCultureId) {
       query = query.eq("plant_culture_id", plantCultureId);
     } else if (cultureId && batchId) {
@@ -5732,10 +5742,10 @@ async function loadStatistics() {
         const cultureIds = cultureOptions.map(culture => culture.id);
         const batchIds = domain === "laboratory" ? latestBatches.map(batch => batch.id) : [];
         const eventQueries = [];
-        if (cultureIds.length) eventQueries.push(supabaseClient.from("events").select("id").eq("organization_id", organizationId).in("culture_id", cultureIds));
-        if (batchIds.length) eventQueries.push(supabaseClient.from("events").select("id").eq("organization_id", organizationId).in("batch_id", batchIds));
+        if (cultureIds.length) eventQueries.push(supabaseClient.from("events").select("id").eq("organization_id", loadOrganizationId).in("culture_id", cultureIds));
+        if (batchIds.length) eventQueries.push(supabaseClient.from("events").select("id").eq("organization_id", loadOrganizationId).in("batch_id", batchIds));
         const eventResults = await Promise.all(eventQueries);
-        if (requestId !== statisticsRequestId) return;
+        if (requestId !== statisticsRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
         for (const result of eventResults) {
           if (result.error) throw new Error("Chargement du périmètre des statistiques impossible : " + result.error.message);
         }
@@ -5749,7 +5759,7 @@ async function loadStatistics() {
     }
     if (period !== "all") { const since = new Date(); since.setDate(since.getDate() - Number(period)); query = query.gte("measured_at", since.toISOString()); }
     const queryResult = noWorkspaceTargets || (batchId && !batchEventIds.length) || (cultureId && !cultureEventIds.length && batchId) || noMatchingCultureBatchEvents ? {data:[],error:null} : await query;
-    if (requestId !== statisticsRequestId) return;
+    if (requestId !== statisticsRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
     const {data,error} = queryResult; if (error) throw new Error(error.message);
     const rows = (data || []).slice().sort((a,b) => new Date(a.measured_at || 0).getTime() - new Date(b.measured_at || 0).getTime()), variable = measurementVariables.find(item => item.code === variableCode), cultureById = new Map(cultureOptions.map(culture => [culture.id,culture]));
     const prepared = rows.map(row => { const normalized = row.normalized_value !== null && row.normalized_value !== undefined && row.normalized_value !== "" && row.normalized_unit_code; const raw = normalized ? row.normalized_value : row.raw_value; const hasValue = raw !== null && raw !== undefined && raw !== "" && typeof raw !== "boolean"; return {...row, plotValue:hasValue ? Number(raw) : NaN, plotUnit:normalized ? row.normalized_unit_code : row.raw_unit_code, normalized:Boolean(normalized)}; }).filter(row => Number.isFinite(row.plotValue));
@@ -5791,7 +5801,7 @@ async function loadStatistics() {
     }
     if(!rows.length) tbody.innerHTML='<tr><td colspan="5">' + L.noRows + '</td></tr>';
     else { rows.slice().reverse().slice(0,200).forEach(row=>{const tr=document.createElement("tr"),culture=cultureById.get(row.culture_id),cells=[row.measured_at?new Date(row.measured_at).toLocaleString("fr-FR"):"Date inconnue",culture?.code||(row.culture_id?L.cultureLinked:L.noCulture),String(row.raw_value??"—"),row.raw_unit_code||"Unité non renseignée",row.method||"—"];cells.forEach(value=>{const td=document.createElement("td");td.textContent=value;tr.appendChild(td);});tbody.appendChild(tr);});if(rows.length>200){const tr=document.createElement("tr"),td=document.createElement("td");td.colSpan=5;td.textContent=L.limited(rows.length);tr.appendChild(td);tbody.appendChild(tr);}}
-  } catch(error) { if (requestId !== statisticsRequestId) return; console.error("Analyse des mesures impossible :",error); status.textContent=L.loadError+error.message; chart.innerHTML='<p class="muted">' + L.graphError + '</p>'; summary.innerHTML=""; tbody.innerHTML='<tr><td colspan="5">' + L.unavailable + '</td></tr>'; }
+  } catch(error) { if (requestId !== statisticsRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return; console.error("Analyse des mesures impossible :",error); status.textContent=L.loadError+error.message; chart.innerHTML='<p class="muted">' + L.graphError + '</p>'; summary.innerHTML=""; tbody.innerHTML='<tr><td colspan="5">' + L.unavailable + '</td></tr>'; }
   finally { if (requestId === statisticsRequestId) { button.disabled=false; button.textContent=L.buttonAnalyze; } }
 }
 
@@ -5808,13 +5818,16 @@ function biologicalWorkflowText(key, count = 0) {
 }
 
 async function loadBiologicalLineage(cultureId) {
+  const loadRevision = authStateRevision;
+  const loadOrganizationId = organizationId;
   const target = document.getElementById('cultureLineage');
-  if (!target || !organizationId) return;
+  if (!target || !loadOrganizationId) return;
   target.textContent = biologicalWorkflowText("loading");
   try {
     const { data, error } = await supabaseClient.from('cultures')
       .select('id,code,culture_type,material_id,parent_culture_id,started_at,metadata')
-      .eq('organization_id', organizationId).order('created_at', { ascending: true }).limit(1000);
+      .eq('organization_id', loadOrganizationId).order('created_at', { ascending: true }).limit(1000);
+    if (!isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
     if (error) throw error;
     const rows = data || [];
     const byId = new Map(rows.map(row => [row.id, row]));
@@ -5822,7 +5835,8 @@ async function loadBiologicalLineage(cultureId) {
     if (!current) { target.textContent = biologicalWorkflowText("missing"); return; }
     const { data: materials, error: materialError } = await supabaseClient.from('materials')
       .select('id,material_code,material_type,parent_material_id,generation,state,strain_id')
-      .eq('organization_id', organizationId).limit(2000);
+      .eq('organization_id', loadOrganizationId).limit(2000);
+    if (!isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
     if (materialError) throw materialError;
     const materialById = new Map((materials || []).map(item => [item.id, item]));
     const materialChain = []; let materialId = current.material_id; let materialGuard = 0;
@@ -5845,7 +5859,7 @@ async function loadBiologicalLineage(cultureId) {
     if (descendants.length) makeGroup(biologicalWorkflowText("descendants") + ' (' + descendants.length + ')', descendants.map(row => ({ row, label: biologicalWorkflowText("generation") + (row.depth || 1) })));
     if (!ancestors.length && !descendants.length) { const p = document.createElement('p'); p.className = 'muted'; p.textContent = biologicalWorkflowText("noLineage"); target.appendChild(p); }
     if (rows.length >= 1000) { const note = document.createElement('p'); note.className = 'muted'; note.textContent = biologicalWorkflowText("partial"); target.appendChild(note); }
-  } catch (error) { target.textContent = biologicalWorkflowText("loadError") + (error.message || error); }
+  } catch (error) { if (!isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return; target.textContent = biologicalWorkflowText("loadError") + (error.message || error); }
 }
 
 async function saveBiologicalOperation(event) {
@@ -5897,6 +5911,8 @@ let cultureDetailRequestId = 0;
 
 async function loadCultureDetail(cultureId) {
   const requestId = ++cultureDetailRequestId;
+  const loadRevision = authStateRevision;
+  const loadOrganizationId = organizationId;
   const culture = cultureOptions.find(item => item.id === cultureId);
   const panel = document.getElementById("cultureDetailPanel");
   const title = document.getElementById("cultureDetailTitle");
@@ -5934,29 +5950,29 @@ async function loadCultureDetail(cultureId) {
     const { data: cultureBatches, error: batchesError } = await supabaseClient
       .from("batches")
       .select("id, batch_code, name, batch_type, status, current_stage, started_at, completed_at")
-      .eq("organization_id", organizationId)
+      .eq("organization_id", loadOrganizationId)
       .eq("culture_id", culture.id)
       .order("created_at", { ascending: false })
       .limit(100);
     if (batchesError) throw new Error("Lots liés à la culture : " + batchesError.message);
-    if (requestId !== cultureDetailRequestId) return;
+    if (requestId !== cultureDetailRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
 
     const batches = cultureBatches || [];
     const batchIds = batches.map(batch => batch.id);
     const eventQueries = [
       supabaseClient.from("events").select("id, event_type, occurred_at, batch_id, payload")
-        .eq("organization_id", organizationId).eq("culture_id", culture.id)
+        .eq("organization_id", loadOrganizationId).eq("culture_id", culture.id)
         .order("occurred_at", { ascending: false }).limit(100)
     ];
     if (batchIds.length) {
       eventQueries.push(
         supabaseClient.from("events").select("id, event_type, occurred_at, batch_id, payload")
-          .eq("organization_id", organizationId).in("batch_id", batchIds)
+          .eq("organization_id", loadOrganizationId).in("batch_id", batchIds)
           .order("occurred_at", { ascending: false }).limit(100)
       );
     }
     const eventResults = await Promise.all(eventQueries);
-    if (requestId !== cultureDetailRequestId) return;
+    if (requestId !== cultureDetailRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
     for (const result of eventResults) {
       if (result.error) throw new Error("Événements : " + result.error.message);
     }
@@ -5966,30 +5982,30 @@ async function loadCultureDetail(cultureId) {
     const linkedEventIds = events.map(event => event.id);
     const measurementQueries = [
       supabaseClient.from("measurements").select("id, variable_code, raw_value, raw_unit_code, measured_at, event_id, metadata")
-        .eq("organization_id", organizationId).eq("culture_id", culture.id)
+        .eq("organization_id", loadOrganizationId).eq("culture_id", culture.id)
         .order("measured_at", { ascending: false }).limit(100)
     ];
     const observationQueries = [
       supabaseClient.from("observations").select("id, variable_code, value_text, observed_at, event_id, metadata")
-        .eq("organization_id", organizationId).eq("culture_id", culture.id)
+        .eq("organization_id", loadOrganizationId).eq("culture_id", culture.id)
         .order("observed_at", { ascending: false }).limit(100)
     ];
     if (linkedEventIds.length) {
       measurementQueries.push(
         supabaseClient.from("measurements").select("id, variable_code, raw_value, raw_unit_code, measured_at, event_id, metadata")
-          .eq("organization_id", organizationId).in("event_id", linkedEventIds)
+          .eq("organization_id", loadOrganizationId).in("event_id", linkedEventIds)
           .order("measured_at", { ascending: false }).limit(100)
       );
       observationQueries.push(
         supabaseClient.from("observations").select("id, variable_code, value_text, observed_at, event_id, metadata")
-          .eq("organization_id", organizationId).in("event_id", linkedEventIds)
+          .eq("organization_id", loadOrganizationId).in("event_id", linkedEventIds)
           .order("observed_at", { ascending: false }).limit(100)
       );
     }
     const [measurementResults, observationResults] = await Promise.all([
       Promise.all(measurementQueries), Promise.all(observationQueries)
     ]);
-    if (requestId !== cultureDetailRequestId) return;
+    if (requestId !== cultureDetailRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
     for (const result of measurementResults) {
       if (result.error) throw new Error("Mesures : " + result.error.message);
     }
@@ -6124,7 +6140,7 @@ async function loadCultureDetail(cultureId) {
     }
     panel.scrollIntoView({block:"start",behavior:window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth"});
   } catch (error) {
-    if (requestId !== cultureDetailRequestId) return;
+    if (requestId !== cultureDetailRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
     console.error("Chargement de la fiche culture :", error);
     timeline.innerHTML = "";
     const message = document.createElement("p");
