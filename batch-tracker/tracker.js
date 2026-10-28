@@ -6500,6 +6500,9 @@ async function loadPlantCultures() {
     renderStatisticsFilters();
     if (status) status.textContent = "Registre végétal chargé depuis Supabase.";
   } catch (error) {
+    if (requestedOrganizationId !== organizationId ||
+        requestedDomain !== document.body.dataset.domain ||
+        requestedDomain !== "agronomy") return;
     console.error("Chargement du registre végétal impossible :", error);
     initializationWarnings.push("registre végétal");
     if (status) status.textContent = "Registre végétal indisponible : " + (error.message || "erreur inconnue");
