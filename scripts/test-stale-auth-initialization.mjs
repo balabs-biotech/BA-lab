@@ -282,6 +282,7 @@ assert.ok(
 );
 console.log("Tenant-scoped analytics and lineage read guards passed.");
 assert.match(handlerSource("loadStatistics"), /finally \{ if \(requestId === statisticsRequestId && isCurrentWorkspaceRevision\(loadRevision, loadOrganizationId\)\)/, "statistics must not mutate button state after its workspace has been cleared");
+assert.match(handlerSource("loadStatistics"), /if \(!loadOrganizationId\) \{ status\.textContent = L\.login; if \(button && requestId === statisticsRequestId\) \{ button\.disabled = false; button\.textContent = L\.buttonAnalyze; \} return; \}\s*if \(!variableCode\) \{ status\.textContent = L\.variable; if \(button && requestId === statisticsRequestId\) \{ button\.disabled = false; button\.textContent = L\.buttonAnalyze; \} return; \}/, "statistics validation must restore the action button when the latest request exits early");
 
 
 // Protocol lookups must not mix identifiers across tenant changes between awaits.
