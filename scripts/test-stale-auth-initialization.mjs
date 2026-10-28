@@ -358,7 +358,7 @@ for (const [name, requestId] of [
   );
   assert.match(
     handler,
-    new RegExp(`const requestId = \+\+${requestId};`),
+    new RegExp(`const requestId = \\+\\+${requestId};`),
     `${name} must supersede an earlier overlapping refresh`,
   );
   assert.match(
