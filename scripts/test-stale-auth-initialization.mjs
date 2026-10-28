@@ -456,9 +456,12 @@ for (const [name, requestId] of [
   ["loadRecentObservations", "observationHistoryRequestId"],
 ]) {
   const handler = handlerSource(name);
-  assert.match(
-    tracker,
-    new RegExp(`let ${requestId} = 0;\s*async function ${name}\\(\\) \\\{\s*const requestId = \\+\+${requestId};`),
+  const declarationIndex = tracker.indexOf(`let ${requestId} = 0;`);
+  const functionIndex = tracker.indexOf(`async function ${name}()`);
+  assert.ok(
+    declarationIndex >= 0 &&
+      functionIndex > declarationIndex &&
+      tracker.slice(functionIndex, functionIndex + 180).includes(`const requestId = ++${requestId};`),
     `${name} must assign a unique request identity to each refresh`,
   );
   assert.ok(
