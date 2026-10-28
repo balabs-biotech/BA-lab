@@ -783,6 +783,7 @@ function clearAuthenticatedWorkspaceState() {
   cultureDetailRequestId += 1;
   biologicalLineageRequestId += 1;
   plantCultureListRequestId += 1;
+  batchPlaceOptionsRequestId += 1;
   const cultureDetailPanel = document.getElementById("cultureDetailPanel");
   if (cultureDetailPanel) {
     cultureDetailPanel.classList.add("hidden");
@@ -4864,7 +4865,10 @@ function renderBatchEnvironmentOptions() {
   batchEnvironmentInput.disabled = available.length === 0;
 }
 
+let batchPlaceOptionsRequestId = 0;
+
 async function loadBatchPlaceOptions() {
+  const requestId = ++batchPlaceOptionsRequestId;
   const loadRevision = authStateRevision;
   const loadOrganizationId = organizationId;
   if (!loadOrganizationId || !batchLocationInput || !batchEnvironmentInput) return;
@@ -4875,7 +4879,7 @@ async function loadBatchPlaceOptions() {
       supabaseClient.from("locations").select("id,code,name").eq("organization_id", loadOrganizationId).order("name"),
       supabaseClient.from("environments").select("id,name,location_id").eq("organization_id", loadOrganizationId).order("name")
     ]);
-    if (!isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
+    if (requestId !== batchPlaceOptionsRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
     if (locationsError) throw locationsError;
     if (environmentsError) throw environmentsError;
     batchLocationOptions = locations || [];
@@ -4894,7 +4898,7 @@ async function loadBatchPlaceOptions() {
     batchLocationInput.disabled = batchLocationOptions.length === 0;
     renderBatchEnvironmentOptions();
   } catch (error) {
-    if (!isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
+    if (requestId !== batchPlaceOptionsRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
     console.error("Référentiel des emplacements indisponible :", error);
     initializationWarnings.push("emplacements et environnements");
     batchLocationOptions = [];
