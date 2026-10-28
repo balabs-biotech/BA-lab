@@ -2957,7 +2957,7 @@ async function loadBatch(
   const { data: batchEventsData, error: batchEventsError } = await supabaseClient
     .from("events")
     .select("id,event_type,occurred_at,payload,location_id,environment_id")
-    .eq("organization_id", organizationId)
+    .eq("organization_id", loadOrganizationId)
     .eq("batch_id", batchId)
     .order("occurred_at", { ascending: false })
     .limit(50);
