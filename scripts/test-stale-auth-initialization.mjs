@@ -163,8 +163,8 @@ const writeContracts = [
 for (const contract of writeContracts) {
   const start = tracker.indexOf(contract.start);
   assert.ok(start >= 0, `${contract.name} must exist`);
-  const nextAsync = tracker.indexOf("\\nasync function ", start + 1);
-  const nextNormal = tracker.indexOf("\\nfunction ", start + 1);
+  const nextAsync = tracker.indexOf("\nasync function ", start + 1);
+  const nextNormal = tracker.indexOf("\nfunction ", start + 1);
   const ends = [nextAsync, nextNormal].filter(index => index >= 0);
   const end = ends.length ? Math.min(...ends) : tracker.length;
   const handler = tracker.slice(start, end);
