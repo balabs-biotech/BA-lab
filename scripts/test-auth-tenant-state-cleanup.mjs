@@ -20,6 +20,7 @@ const context = {
   selectedBatchId: "batch-old",
   selectedBatch: { id: "batch-old" },
   cultureDetailRequestId: 7,
+  biologicalLineageRequestId: 11,
   document: {
     cultureDetailPanel: {
       classList: { hidden: false, add(name) { if (name === "hidden") this.hidden = true; } },
@@ -41,6 +42,7 @@ assert.equal(context.organization, null, "tenant organization object must be cle
 assert.equal(context.selectedBatchId, null, "selected batch ID must be cleared");
 assert.equal(context.selectedBatch, null, "selected batch object must be cleared");
 assert.equal(context.cultureDetailRequestId, 8, "pending culture-detail requests must be invalidated");
+assert.equal(context.biologicalLineageRequestId, 12, "pending lineage requests must be invalidated");
 assert.equal(context.document.cultureDetailPanel.classList.hidden, true, "culture detail panel must be hidden after session loss");
 assert.equal(context.document.cultureDetailPanel.dataset.cultureId, "", "culture detail panel must release the previous culture identity");
 for (const field of arrayFields) {
