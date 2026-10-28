@@ -26,7 +26,7 @@ const awaitedSteps = [
 ];
 for (const step of awaitedSteps) {
   const escaped = step.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  const pattern = new RegExp(`await ${escaped};\\s*if \\(initRevision !== authStateRevision\\) return;`);
+  const pattern = new RegExp(`await ${escaped};\s*if \(initRevision !== authStateRevision\) return;`);
   assert.match(initializer, pattern, `stale initialization must stop after ${step}`);
 }
 
@@ -101,7 +101,7 @@ for (const loaderName of [
   const loader = tracker.slice(loaderStart, loaderEnd);
   assert.match(
     loader,
-    /const loadRevision = authStateRevision;[\\s\\S]*?if \\(loadRevision !== authStateRevision\\) return;/,
+    /const loadRevision = authStateRevision;[\s\\S]*?if \(loadRevision !== authStateRevision\) return;/,
     `${loaderName} must discard query results when its auth session is superseded`,
   );
 }
