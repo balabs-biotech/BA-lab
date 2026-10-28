@@ -521,7 +521,8 @@ if(root){
       const trail=new THREE.Mesh(new THREE.SphereGeometry(.03,14,10),new THREE.MeshBasicMaterial({color:0xb7dfbd,transparent:true,opacity:1,depthWrite:false,toneMapped:false}));
       trail.userData={kind:'relay-signal',trail:true};worldGroup.add(trail);
       const totalLength=segments.reduce((sum,segment)=>sum+segment.length,0);
-      relaySignals.push({mesh,trail,segments,totalLength,offset:relaySignals.length*.19,speed:.42+relaySignals.length*.035});
+      // Keep signal velocity consistent in world space: longer routes take proportionally longer to complete instead of racing through more distance.
+      relaySignals.push({mesh,trail,segments,totalLength,offset:relaySignals.length*.19,speed:1.05/Math.max(totalLength,.1)});
     }
   }
   const placeRelayParticle=(mesh,route,progress)=>{
