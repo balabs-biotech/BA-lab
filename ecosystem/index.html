@@ -134,6 +134,20 @@ h1 span{color:#c3dda9;text-shadow:0 4px 30px #b9d5a822}
 #mainView .webgl-focus-link:focus-visible{background:#a9c5a322;border-color:#a9c5a3;color:#eaf7e5;outline:2px solid #a9c5a3;outline-offset:2px}
 #mainView .webgl-stage .webgl-controls button:focus-visible{outline:2px solid #a9c5a3;outline-offset:3px}
 @media(max-width:760px){#mainView .webgl-focus-links{max-height:140px;gap:4px}#mainView .webgl-focus-link{font-size:9px;padding:5px 7px}#mainView .webgl-focus-reason{font-size:8px}}
+
+/* Instrument-panel finish and accessibility pass */
+#mainView .webgl-stage .webgl-focus-kicker{color:#c3dda9;letter-spacing:.16em}
+#mainView .webgl-focus strong{color:#f2f5ec;text-shadow:0 2px 16px #0b140d66}
+#mainView .webgl-focus-meta{color:#d0ddd1}
+#mainView .webgl-focus-links{gap:7px}
+#mainView .webgl-focus-link{background:#304237d9;border-color:#718c73;color:#eef5e9;transition:background .18s,border-color .18s,transform .18s}
+#mainView .webgl-focus-link:hover,#mainView .webgl-focus-link:focus-visible{background:#405847;border-color:#c3dda9;transform:translateY(-1px)}
+#mainView .webgl-focus-reason{color:#c4d2c5}
+#mainView .webgl-stage .webgl-controls button:focus-visible,#mainView .webgl-focus-link:focus-visible{outline:2px solid #d5e9bf;outline-offset:3px}
+#mainView .webgl-stage .webgl-hint{letter-spacing:.11em;font-weight:750}
+#mainView .webgl-stage .webgl-status{font-weight:800}
+@media(prefers-reduced-motion:reduce){.btn,.lang,#mainView .webgl-focus-link{transition:none!important}.btn:hover,#mainView .webgl-focus-link:hover{transform:none}}
+
 </style>
 </head>
 <body>
