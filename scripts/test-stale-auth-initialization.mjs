@@ -85,11 +85,17 @@ for (const loaderName of [
   "loadReferenceData",
   "loadCultureOptions",
   "loadLatestBatches",
+  "loadQuantityUnitOptions",
+  "loadBatchPlaceOptions",
+  "loadPlantCultures",
+  "loadMeasurementReferences",
+  "loadRecentMeasurements",
+  "loadRecentObservations",
 ]) {
   const loaderStart = tracker.indexOf(`async function ${loaderName}()`);
   assert.ok(loaderStart >= 0, `${loaderName} must exist`);
-  const nextFunction = tracker.indexOf("\\nfunction ", loaderStart + 1);
-  const nextAsyncFunction = tracker.indexOf("\\nasync function ", loaderStart + 1);
+  const nextFunction = tracker.indexOf("\nfunction ", loaderStart + 1);
+  const nextAsyncFunction = tracker.indexOf("\nasync function ", loaderStart + 1);
   const candidates = [nextFunction, nextAsyncFunction].filter(index => index >= 0);
   const loaderEnd = candidates.length ? Math.min(...candidates) : tracker.length;
   const loader = tracker.slice(loaderStart, loaderEnd);
