@@ -101,7 +101,7 @@ for (const loaderName of [
   const loader = tracker.slice(loaderStart, loaderEnd);
   assert.match(
     loader,
-    /const loadRevision = authStateRevision;[\s\\S]*?if \(loadRevision !== authStateRevision\) return;/,
+    /const loadRevision = authStateRevision;[\s\S]*?if \(loadRevision !== authStateRevision\) return;/,
     `${loaderName} must discard query results when its auth session is superseded`,
   );
 }
