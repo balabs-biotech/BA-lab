@@ -2037,6 +2037,7 @@ async function createCulture() {
             }
           );
 
+        if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
         if (syncError) {
           notionSyncMessage =
             `Culture enregistrée dans Supabase. Synchronisation Notion à vérifier : ${syncError.message}`;
@@ -2050,6 +2051,7 @@ async function createCulture() {
             }.`;
         }
       } catch (syncError) {
+        if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
         console.error("Synchronisation Notion:", syncError);
         notionSyncMessage =
           "Culture enregistrée dans Supabase, mais la synchronisation Notion a échoué. Vérifiez le statut dans Supabase.";
