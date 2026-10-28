@@ -460,3 +460,19 @@ for (const [name, button] of [
   );
 }
 console.log("Stale-write control restoration guards passed.");
+
+
+// QC save wrappers must not re-enable an old button after the workspace changes or the QC list rerenders.
+const qcSaveHandler = handlerSource("saveQcCheck");
+const qcFinallyBlock = qcSaveHandler.slice(qcSaveHandler.lastIndexOf("finally"));
+assert.match(
+  qcFinallyBlock,
+  /isCurrentWorkspaceRevision\(operationRevision, operationOrganizationId\)/,
+  "QC save must only restore a control while the original workspace is current",
+);
+assert.match(
+  qcFinallyBlock,
+  /batchQcList\.querySelector\(.*data-qc-save.*\) === button/s,
+  "QC save must not restore an obsolete button after the QC list is rerendered",
+);
+console.log("QC stale-workspace control restoration guards passed.");
