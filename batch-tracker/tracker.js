@@ -6480,6 +6480,8 @@ function renderPlantCultureList(rows) {
 
 async function loadPlantCultures() {
   if (!organizationId) return;
+  const requestedOrganizationId = organizationId;
+  const requestedDomain = document.body.dataset.domain;
   const status = document.getElementById("plantCultureStatus");
   try {
     const { data, error } = await supabaseClient.from("plant_cultures")
@@ -6488,6 +6490,9 @@ async function loadPlantCultures() {
       .order("created_at", { ascending: false })
       .limit(300);
     if (error) throw error;
+    if (requestedOrganizationId !== organizationId ||
+        requestedDomain !== document.body.dataset.domain ||
+        requestedDomain !== "agronomy") return;
     renderPlantCultureList(data || []);
     plantCultureOptions = data || [];
     renderMeasurementTargets();
@@ -6607,8 +6612,10 @@ function setupDomainWorkspaces() {
   const toolbarStatus = document.querySelector(".toolbar-status span:last-child");
   const heading = document.getElementById("domainHeading");
   const description = document.getElementById("domainDescription");
+  let workspaceSwitchRevision = 0;
   const setDomain = (domain, persist = true) => {
     const activeDomain = Object.hasOwn(modes, domain) ? domain : "agronomy";
+    const switchRevision = ++workspaceSwitchRevision;
     const config = modes[activeDomain];
     document.body.dataset.domain = activeDomain;
     buttons.forEach(button => button.setAttribute("aria-pressed", String(button.dataset.domainChoice === activeDomain)));
@@ -6674,6 +6681,8 @@ function setupDomainWorkspaces() {
 
       void (async () => {
         try {
+          if (switchRevision !== workspaceSwitchRevision ||
+              activeDomain !== document.body.dataset.domain) return;
           if (activeDomain === "agronomy") {
             // Do not leave the previous biological workspace's targets selectable.
             cultureOptions = [];
@@ -6695,8 +6704,12 @@ function setupDomainWorkspaces() {
             loadRecentMeasurements(),
             loadRecentObservations()
           ]);
+          if (switchRevision !== workspaceSwitchRevision ||
+              activeDomain !== document.body.dataset.domain) return;
           updateOverview();
         } catch (error) {
+          if (switchRevision !== workspaceSwitchRevision ||
+              activeDomain !== document.body.dataset.domain) return;
           console.error("Actualisation de l’espace de travail impossible :", error);
           showMessage("L’espace a changé, mais certaines données n’ont pas pu être actualisées. Utilisez Actualiser ou rechargez la page.", "warning");
         }
