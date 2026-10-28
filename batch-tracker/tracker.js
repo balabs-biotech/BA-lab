@@ -4169,7 +4169,7 @@ async function createBatch() {
 
 
     await loadLatestBatches();
-
+    if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
 
     if (
       createdBatch &&
@@ -4179,6 +4179,7 @@ async function createBatch() {
       await loadBatch(
         createdBatch.id
       );
+      if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
 
     }
 
@@ -5187,6 +5188,7 @@ async function saveMeasurement() {
     showMessage(cultureWorkflowText("measureSaved"), "success");
     await loadRecentMeasurements();
   } catch (error) {
+    if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
     console.error("Enregistrement mesure :", error);
     if (measurementSaved) {
       showMessage(cultureWorkflowText("measureRefresh"), "warning");
@@ -5399,6 +5401,7 @@ async function saveObservation() {
     showMessage(cultureWorkflowText("observationSaved"), "success");
     await loadRecentObservations();
   } catch (error) {
+    if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
     console.error("Enregistrement observation :", error);
     if (observationSaved) {
       showMessage(cultureWorkflowText("observationRefresh"), "warning");
@@ -6687,6 +6690,7 @@ async function savePlantCulture(event) {
       plantEnvironment.appendChild(option);
     }
     await loadPlantCultures();
+    if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
     showMessage("Culture végétale enregistrée.", "success");
     if (status) status.textContent = "Culture enregistrée dans le registre AgriTech.";
   } catch (error) {
