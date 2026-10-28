@@ -416,3 +416,22 @@ assert.match(
   "only the latest comparison may re-enable its button",
 );
 console.log("Batch comparison request-order guards passed.");
+
+
+// History panels can be refreshed repeatedly within one tenant; only the newest request may render.
+for (const [name, requestId] of [
+  ["loadRecentMeasurements", "measurementHistoryRequestId"],
+  ["loadRecentObservations", "observationHistoryRequestId"],
+]) {
+  const handler = handlerSource(name);
+  assert.match(
+    tracker,
+    new RegExp(`let ${requestId} = 0;\\s*async function ${name}\\(\\) \\\{\\s*const requestId = \\\+\\+${requestId};`),
+    `${name} must assign a unique request identity to each refresh`,
+  );
+  assert.ok(
+    (handler.match(new RegExp(`requestId !== ${requestId}`, "g")) || []).length >= 3,
+    `${name} must reject stale results after asynchronous boundaries and before rendering`,
+  );
+}
+console.log("Measurement and observation history request-order guards passed.");
