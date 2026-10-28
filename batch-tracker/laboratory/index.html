@@ -16,17 +16,23 @@
       document.getElementById("workspace-root").innerHTML = "<main class='container'><section class='card' role='alert'><h1>Service de données indisponible</h1><p>La bibliothèque Supabase n’a pas pu être chargée. Vérifiez la connexion puis rechargez la page.</p></section></main>";
     } else {
       window.BA_LABS_DOMAIN = "laboratory";
-    fetch("../workspace.html?v=20261026-core-refresh-1")
+    fetch("../workspace.html?v=20261028-assisted-entry-1")
       .then(response => { if (!response.ok) throw new Error("workspace unavailable"); return response.text(); })
       .then(markup => {
         document.getElementById("workspace-root").innerHTML = markup;
         const i18nScript = document.createElement("script");
-        i18nScript.src = "../i18n.js?v=20261026-core-refresh-1";
+        i18nScript.src = "../i18n.js?v=20261028-assisted-entry-1";
         i18nScript.onload = () => {
           const script = document.createElement("script");
           script.src = "../tracker.js?v=20261026-core-refresh-1";
           script.onerror = () => {
             document.getElementById("workspace-root").innerHTML = "<main class='container'><p role='alert'>Le moteur de CultureOps n’a pas pu être chargé. Rechargez la page.</p></main>";
+          };
+          script.onload = () => {
+            const assistedEntry = document.createElement("script");
+            assistedEntry.src = "../smart-entry.js?v=20261028-assisted-entry-1";
+            assistedEntry.onerror = () => console.error("Le module de saisie assistée n’a pas pu être chargé.");
+            document.body.appendChild(assistedEntry);
           };
           document.body.appendChild(script);
         };
