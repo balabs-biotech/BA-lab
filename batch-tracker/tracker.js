@@ -2151,7 +2151,7 @@ async function loadCultureOptions() {
           ascending: false
         }
       )
-      .limit(100);
+      .limit(1000);
 
 
   if (error) {
@@ -2276,7 +2276,7 @@ async function loadLatestBatches() {
           ascending: false
         }
       )
-      .limit(30);
+      .limit(1000);
 
 
   if (error) {
