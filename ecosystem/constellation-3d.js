@@ -244,8 +244,9 @@ if(root){
         const mid=pa.base.clone().lerp(pb.base,.5).addScaledVector(axis,bend);
         const curve=new THREE.QuadraticBezierCurve3(pa.base,mid,pb.base);
         const signalColor=new THREE.Color(colors[a]).lerp(new THREE.Color(colors[b]),.5);
-        const line=makeNeurite(curve,signalColor,.047,1,64);
-        line.material.emissive.copy(signalColor).multiplyScalar(.48);line.material.emissiveIntensity=.56;
+        const line=makeNeurite(curve,signalColor,.038,.92,64);
+        // Keep transverse pathways legible without letting them overpower the biological branches.
+        line.material.emissive.copy(signalColor).multiplyScalar(.40);line.material.emissiveIntensity=.48;
         line.userData={kind:'relation',a,b};worldGroup.add(line);
         // Cross-links branch like mycelial cords / axonal collaterals instead of
         // appearing as plain geometric chords. Each offshoot ends in a small junction.
