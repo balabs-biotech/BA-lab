@@ -6484,12 +6484,11 @@ async function loadPlantCultures() {
   const requestedDomain = document.body.dataset.domain;
   const status = document.getElementById("plantCultureStatus");
   try {
-    const { data, error } = await supabaseClient.from("plant_cultures")
-      .select("id,code,crop_type,species_name,cultivar_name,quantity,unit_code,location_id,environment_id,substrate,started_at,status,notes")
-      .eq("organization_id", organizationId)
-      .order("created_at", { ascending: false })
-      .limit(300);
-    if (error) throw error;
+    const data = await loadOrganizationRowsInPages(
+      "plant_cultures",
+      "id,code,crop_type,species_name,cultivar_name,quantity,unit_code,location_id,environment_id,substrate,started_at,status,notes",
+      "Chargement du registre végétal impossible"
+    );
     if (requestedOrganizationId !== organizationId ||
         requestedDomain !== document.body.dataset.domain ||
         requestedDomain !== "agronomy") return;
