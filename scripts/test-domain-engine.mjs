@@ -82,6 +82,8 @@ console.log("Domain engine contracts passed.");
 // Workspace registries must paginate organization rows before filtering by domain.
 assert.match(trackerSource, /async function loadOrganizationRowsInPages\([\s\S]*?\.range\(offset, offset \+ pageSize - 1\)[\s\S]*?if \(page\.length < pageSize\) break;/,
   "organization registry loading must paginate until the final partial page");
+assert.match(trackerSource, /async function loadOrganizationRowsInPages\([\s\S]*?\.order\("created_at", \{ ascending: false \}\)\s*\.order\("id", \{ ascending: false \}\)/,
+  "registry pagination must use a deterministic tie-breaker to avoid skipped or duplicated rows");
 assert.match(trackerSource, /async function loadCultureOptions\(\)[\s\S]*?loadOrganizationRowsInPages\(\s*"cultures"/,
   "culture loading must paginate before workspace filtering");
 assert.match(trackerSource, /async function loadLatestBatches\(\)[\s\S]*?loadOrganizationRowsInPages\(\s*"batches"/,
