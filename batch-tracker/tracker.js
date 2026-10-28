@@ -805,7 +805,8 @@ async function refreshAuthUI(revision = authStateRevision) {
     hideElement(document.getElementById("overviewCard"));
     hideElement(resultCard);
     hideElement(signOutButton);
-    authStatus.textContent = "Session non vérifiable.";
+    const guidance = getSessionVerificationGuidance(error);
+    authStatus.textContent = guidance.status;
     showMessage(
       "Impossible de vérifier votre session. Vérifiez la connexion Internet puis rechargez la page. Vos données ne sont pas supprimées.",
       "error"
