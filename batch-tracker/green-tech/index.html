@@ -32,10 +32,16 @@
             document.getElementById("workspace-root").innerHTML = "<main class='container'><p role='alert'>Le moteur de CultureOps n’a pas pu être chargé. Rechargez la page.</p></main>";
           };
           script.onload = () => {
-            const environmental = document.createElement("script");
-            environmental.src = "../environmental-data.js?v=20261026-agro-coherence-2";
-            environmental.onerror = () => console.error("Le module de contexte environnemental n’a pas pu être chargé.");
-            document.body.appendChild(environmental);
+            const assistedEntry = document.createElement("script");
+            assistedEntry.src = "../smart-entry.js?v=20261028-assisted-entry-1";
+            assistedEntry.onload = () => {
+              const environmental = document.createElement("script");
+              environmental.src = "../environmental-data.js?v=20261026-agro-coherence-2";
+              environmental.onerror = () => console.error("Le module de contexte environnemental n’a pas pu être chargé.");
+              document.body.appendChild(environmental);
+            };
+            assistedEntry.onerror = () => console.error("Le module de saisie assistée n’a pas pu être chargé.");
+            document.body.appendChild(assistedEntry);
           };
           document.body.appendChild(script);
         };
