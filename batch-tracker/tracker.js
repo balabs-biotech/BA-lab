@@ -5325,7 +5325,7 @@ async function saveObservation() {
 async function loadRecentObservations() {
   if (!organizationId || !observationHistory) return;
 
-  const { rows: recentObservations } = await loadRecentWorkspaceHistory(
+  const { rows: recentObservations, eventsById } = await loadRecentWorkspaceHistory(
     "observations",
     "observed_at",
     "id, variable_code, value_text, observed_at, culture_id, plant_culture_id, event_id, metadata",
@@ -5341,10 +5341,13 @@ async function loadRecentObservations() {
     const variable = measurementVariables.find(item => item.code === row.variable_code);
     const culture = cultureOptions.find(item => item.id === row.culture_id);
     const plant = plantCultureOptions.find(item => item.id === row.plant_culture_id);
+    const event = row.event_id ? eventsById[row.event_id] : null;
+    const batch = event?.batch_id ? latestBatches.find(item => item.id === event.batch_id) : null;
     const stamp = row.observed_at ? new Date(row.observed_at).toLocaleString() : "Date inconnue";
     const note = row.metadata && row.metadata.note
       ? '<div class="measurement-meta">' + escapeHtml(row.metadata.note) + '</div>' : "";
     const target = plant ? "AgriTech · " + escapeHtml(plant.code) + " · " + escapeHtml(plant.cultivar_name || plant.crop_type) :
+      batch ? "Lot · " + escapeHtml(batch.batch_code) :
       culture ? "Culture · " + escapeHtml(culture.code) : "Cible liée par identifiant";
     return '<article class="measurement-entry"><div><strong>' +
       escapeHtml(variable ? variable.label : row.variable_code) +
