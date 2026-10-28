@@ -79,4 +79,25 @@ assert.match(
   "a stale measurement-catalog failure must not re-enable stale workspace controls",
 );
 
+
+for (const loaderName of [
+  "loadStrainOptions",
+  "loadReferenceData",
+  "loadCultureOptions",
+  "loadLatestBatches",
+]) {
+  const loaderStart = tracker.indexOf(`async function ${loaderName}()`);
+  assert.ok(loaderStart >= 0, `${loaderName} must exist`);
+  const nextFunction = tracker.indexOf("\\nfunction ", loaderStart + 1);
+  const nextAsyncFunction = tracker.indexOf("\\nasync function ", loaderStart + 1);
+  const candidates = [nextFunction, nextAsyncFunction].filter(index => index >= 0);
+  const loaderEnd = candidates.length ? Math.min(...candidates) : tracker.length;
+  const loader = tracker.slice(loaderStart, loaderEnd);
+  assert.match(
+    loader,
+    /const loadRevision = authStateRevision;[\\s\\S]*?if \\(loadRevision !== authStateRevision\\) return;/,
+    `${loaderName} must discard query results when its auth session is superseded`,
+  );
+}
+
 console.log("Stale auth initialization contract passed.");
