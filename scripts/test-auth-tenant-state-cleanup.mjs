@@ -19,6 +19,14 @@ const context = {
   organization: { id: "tenant-old" },
   selectedBatchId: "batch-old",
   selectedBatch: { id: "batch-old" },
+  cultureDetailRequestId: 7,
+  document: {
+    cultureDetailPanel: {
+      classList: { hidden: false, add(name) { if (name === "hidden") this.hidden = true; } },
+      dataset: { cultureId: "culture-old" }
+    },
+    getElementById(id) { return id === "cultureDetailPanel" ? this.cultureDetailPanel : null; }
+  },
   recordHarvestButton: { disabled: false },
   saveMeasurementButton: { disabled: false },
   saveObservationButton: { disabled: false }
@@ -32,6 +40,9 @@ assert.equal(context.organizationId, null, "tenant organization ID must be clear
 assert.equal(context.organization, null, "tenant organization object must be cleared");
 assert.equal(context.selectedBatchId, null, "selected batch ID must be cleared");
 assert.equal(context.selectedBatch, null, "selected batch object must be cleared");
+assert.equal(context.cultureDetailRequestId, 8, "pending culture-detail requests must be invalidated");
+assert.equal(context.document.cultureDetailPanel.classList.hidden, true, "culture detail panel must be hidden after session loss");
+assert.equal(context.document.cultureDetailPanel.dataset.cultureId, "", "culture detail panel must release the previous culture identity");
 for (const field of arrayFields) {
   assert.deepEqual(Array.from(context[field]), [], `${field} must not retain tenant-scoped cache data`);
 }
