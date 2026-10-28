@@ -343,3 +343,26 @@ for (const name of ["loadStrainOptions", "loadCultureOptions", "loadLatestBatche
   );
 }
 console.log("Tenant snapshot initialization order passed.");
+
+
+// Background Notion sync and batch event timeline must never fall back to mutable tenant globals.
+for (const name of ["syncPendingCultures", "loadBatch"]) {
+  const handler = handlerSource(name);
+  assert.match(handler, /const loadOrganizationId = organizationId;/, `${name} must capture the initiating organization`);
+  assert.doesNotMatch(
+    handler,
+    /\.eq\(["']organization_id["'],\s*organizationId\)/,
+    `${name} must not issue tenant-scoped queries against mutable organizationId`,
+  );
+  assert.match(
+    handler,
+    /isCurrentWorkspaceRevision\(loadRevision, loadOrganizationId\)|loadRevision !== authStateRevision/,
+    `${name} must discard work when the auth context changes`,
+  );
+}
+assert.match(
+  handlerSource("syncPendingCultures"),
+  /catch \(err\) \{\s*if \(!isCurrentWorkspaceRevision\(loadRevision, loadOrganizationId\)\) return;/,
+  "culture sync must stop its per-item error path after a tenant switch",
+);
+console.log("Background sync and batch timeline tenant guards passed.");
