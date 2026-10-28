@@ -490,7 +490,7 @@ for (const [name, button] of [
   );
   assert.match(
     finallyBlock,
-    new RegExp(`${button}\\.disabled\s*=\s*false`),
+    new RegExp(`${button}\\.disabled\\s*=\\s*false`),
     `${name} must restore its control after a current-workspace operation`,
   );
 }
