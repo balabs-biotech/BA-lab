@@ -49,6 +49,13 @@ let batchEnvironmentOptions = [];
 let recentObservations = [];
 
 
+function isCurrentWorkspaceRevision(revision, expectedOrganizationId) {
+  return revision === authStateRevision &&
+    Boolean(expectedOrganizationId) &&
+    organizationId === expectedOrganizationId;
+}
+
+
 function clearAuthenticatedWorkspaceState() {
   // Remove the previous tenant context before an auth transition can yield.
   organizationId = null;
@@ -427,10 +434,10 @@ async function getCurrentSession() {
    CLAIM BA-LABS
    ============================================================ */
 
-async function claimBALabs() {
+async function claimBALabs(session) {
 
-  const session =
-    await getCurrentSession();
+  // refreshAuthUI already verified this session; do not trigger a second
+  // refresh-token lookup before the organization claim.
 
 
   if (!session) {
@@ -495,13 +502,8 @@ async function claimBALabs() {
   }
 
 
-  organization =
-    data.organization;
-
-  organizationId =
-    data.organization.id;
-
-
+  // The caller owns tenant-state mutation and checks its auth revision
+  // before committing this claim to the current workspace.
   return data;
 
 }
@@ -867,22 +869,28 @@ async function initializeAuthenticatedTracker(
     true;
 
   const initRevision = revision;
+  let initializationStage = "préparation de la session";
+  const setInitializationStage = (stage) => {
+    if (initRevision !== authStateRevision) return;
+    initializationStage = stage;
+    authStatus.textContent = `Connexion BA-LABS — ${stage}…`;
+  };
 
   try {
 
     clearMessage();
     initializationWarnings = [];
 
-    authStatus.textContent =
-      `Connexion BA-LABS : ${
-        session.user.email ||
-        session.user.id
-      }`;
-
+    setInitializationStage("rattachement à l’organisation");
 
     const claim =
-      await claimBALabs();
+      await claimBALabs(session);
+    if (initRevision !== authStateRevision) return;
 
+    // Commit the tenant context only after confirming this initialization is
+    // still current; an obsolete claim must never overwrite the active tenant.
+    organization = claim.organization;
+    organizationId = claim.organization.id;
 
     if (!organizationId) {
 
@@ -905,15 +913,25 @@ async function initializeAuthenticatedTracker(
       }`;
 
 
+    setInitializationStage("chargement du catalogue des souches");
     await loadStrainOptions();
+    if (initRevision !== authStateRevision) return;
 
+    setInitializationStage("chargement des référentiels");
     await loadReferenceData();
+    if (initRevision !== authStateRevision) return;
 
+    setInitializationStage("chargement des cultures");
     await loadCultureOptions();
+    if (initRevision !== authStateRevision) return;
 
+    setInitializationStage("chargement des unités");
     await loadQuantityUnitOptions();
+    if (initRevision !== authStateRevision) return;
 
+    setInitializationStage("chargement des emplacements de lots");
     await loadBatchPlaceOptions();
+    if (initRevision !== authStateRevision) return;
 
     populatePlantLocationOptions();
     document.getElementById("plantLocation")?.dispatchEvent(new Event("change"));
@@ -921,30 +939,47 @@ async function initializeAuthenticatedTracker(
     // Mycology and Laboratory must not depend on the agronomy-only plant registry.
     // A plant-registry/RLS failure must not block authentication in those workspaces.
     if (document.body.dataset.domain === "agronomy") {
+      setInitializationStage("chargement des cultures végétales");
       await loadPlantCultures();
+      if (initRevision !== authStateRevision) return;
     }
 
+    setInitializationStage("synchronisation des cultures en attente");
     await syncPendingCultures();
+    if (initRevision !== authStateRevision) return;
 
+    setInitializationStage("chargement des derniers lots");
     await loadLatestBatches();
+    if (initRevision !== authStateRevision) return;
 
     try {
+      setInitializationStage("chargement du catalogue de mesures");
       await loadMeasurementReferences();
+      if (initRevision !== authStateRevision) return;
       saveMeasurementButton.disabled = false;
       saveObservationButton.disabled = false;
-      try { await loadRecentMeasurements(); }
+      try {
+        await loadRecentMeasurements();
+        if (initRevision !== authStateRevision) return;
+      }
       catch (historyError) {
+        if (initRevision !== authStateRevision) return;
         console.error("Historique des mesures indisponible :", historyError);
         initializationWarnings.push("historique des mesures");
         measurementHistory.textContent = "Impossible de charger l’historique des mesures. L’enregistrement reste disponible.";
       }
-      try { await loadRecentObservations(); }
+      try {
+        await loadRecentObservations();
+        if (initRevision !== authStateRevision) return;
+      }
       catch (observationHistoryError) {
+        if (initRevision !== authStateRevision) return;
         console.error("Historique des observations indisponible :", observationHistoryError);
         initializationWarnings.push("historique des observations");
         observationHistory.textContent = "Impossible de charger l’historique des observations. L’enregistrement reste disponible.";
       }
     } catch (measurementError) {
+      if (initRevision !== authStateRevision) return;
       console.error("Initialisation du catalogue de mesures :", measurementError);
       initializationWarnings.push("catalogue des mesures");
       measurementHistory.textContent = "Le catalogue des mesures est indisponible ; les modules de culture et de production restent utilisables.";
@@ -1000,8 +1035,7 @@ async function initializeAuthenticatedTracker(
 
 
     showMessage(
-      error.message ||
-      "Initialisation impossible.",
+      `Échec à l’étape « ${initializationStage} » : ${error.message || "erreur inconnue"}`,
       "error"
     );
 
