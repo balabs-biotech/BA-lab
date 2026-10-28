@@ -48,4 +48,35 @@ assert.match(finallyBlock, /if \(initRevision !== authStateRevision\) \{[\s\S]*?
   "a superseded initialization must schedule reconciliation against the latest auth state");
 
 
+
+const measurementHistoryCatch = initializer.slice(
+  initializer.indexOf("catch (historyError)"),
+  initializer.indexOf("catch (observationHistoryError)")
+);
+assert.match(
+  measurementHistoryCatch,
+  /catch \(historyError\) \{\s*if \(initRevision !== authStateRevision\) return;/,
+  "a stale measurement-history failure must not mutate warnings or UI",
+);
+
+const observationHistoryCatch = initializer.slice(
+  initializer.indexOf("catch (observationHistoryError)"),
+  initializer.indexOf("} catch (measurementError)")
+);
+assert.match(
+  observationHistoryCatch,
+  /catch \(observationHistoryError\) \{\s*if \(initRevision !== authStateRevision\) return;/,
+  "a stale observation-history failure must not mutate warnings or UI",
+);
+
+const measurementCatalogCatch = initializer.slice(
+  initializer.indexOf("} catch (measurementError)"),
+  initializer.indexOf("setDefaultDate();")
+);
+assert.match(
+  measurementCatalogCatch,
+  /catch \(measurementError\) \{\s*if \(initRevision !== authStateRevision\) return;/,
+  "a stale measurement-catalog failure must not re-enable stale workspace controls",
+);
+
 console.log("Stale auth initialization contract passed.");
