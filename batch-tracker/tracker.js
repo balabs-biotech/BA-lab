@@ -2118,6 +2118,24 @@ async function createCulture() {
    CULTURES DISPONIBLES POUR LES BATCHS
    ============================================================ */
 
+async function loadOrganizationRowsInPages(tableName, columns, errorLabel, pageSize = 250) {
+  if (!organizationId) return [];
+  const rows = [];
+  for (let offset = 0; ; offset += pageSize) {
+    const { data, error } = await supabaseClient
+      .from(tableName)
+      .select(columns)
+      .eq("organization_id", organizationId)
+      .order("created_at", { ascending: false })
+      .range(offset, offset + pageSize - 1);
+    if (error) throw new Error(`${errorLabel} : ${error.message}`);
+    const page = data || [];
+    rows.push(...page);
+    if (page.length < pageSize) break;
+  }
+  return rows;
+}
+
 async function loadCultureOptions() {
 
   if (!organizationId) {
@@ -2127,40 +2145,11 @@ async function loadCultureOptions() {
   }
 
 
-  const {
-    data,
-    error
-  } =
-    await supabaseClient
-      .from("cultures")
-      .select(`
-        id,
-        code,
-        culture_type,
-        material_id,
-        started_at,
-        metadata
-      `)
-      .eq(
-        "organization_id",
-        organizationId
-      )
-      .order(
-        "created_at",
-        {
-          ascending: false
-        }
-      )
-      .limit(1000);
-
-
-  if (error) {
-
-    throw new Error(
-      `Chargement des cultures impossible : ${error.message}`
-    );
-
-  }
+  const data = await loadOrganizationRowsInPages(
+    "cultures",
+    "id, code, culture_type, material_id, started_at, metadata",
+    "Chargement des cultures impossible"
+  );
 
 
   const activeDomain = document.body.dataset.domain;
@@ -2244,48 +2233,11 @@ async function loadLatestBatches() {
   }
 
 
-  const {
-    data,
-    error
-  } =
-    await supabaseClient
-      .from("batches")
-      .select(`
-        id,
-        batch_code,
-        name,
-        batch_type,
-        status,
-        current_stage,
-        culture_id,
-        environment_id,
-        material_id,
-        planned_at,
-        quantity_planned,
-        quantity_actual,
-        quantity_unit_code,
-        created_at
-      `)
-      .eq(
-        "organization_id",
-        organizationId
-      )
-      .order(
-        "created_at",
-        {
-          ascending: false
-        }
-      )
-      .limit(1000);
-
-
-  if (error) {
-
-    throw new Error(
-      `Chargement des batchs impossible : ${error.message}`
-    );
-
-  }
+  const data = await loadOrganizationRowsInPages(
+    "batches",
+    "id, batch_code, name, batch_type, status, current_stage, culture_id, environment_id, material_id, planned_at, quantity_planned, quantity_actual, quantity_unit_code, created_at",
+    "Chargement des batchs impossible"
+  );
 
 
   // A batch belongs to the workspace of its source culture. The schema
