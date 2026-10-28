@@ -268,8 +268,8 @@ if(root){
             junction.position.copy(tip);junction.userData={kind:'synapse',id:a,relation:true,a,b};worldGroup.add(junction);
           }
         }
-        const pulse=new THREE.Mesh(new THREE.SphereGeometry(.033,12,10),new THREE.MeshBasicMaterial({color:signalColor,transparent:true,opacity:1,depthWrite:false,toneMapped:false}));pulse.userData={kind:'relation-signal',a,b};worldGroup.add(pulse);
-        const pulse2=new THREE.Mesh(new THREE.SphereGeometry(.022,10,8),new THREE.MeshBasicMaterial({color:signalColor,transparent:true,opacity:.82,depthWrite:false,toneMapped:false}));pulse2.userData={kind:'relation-signal',a,b,trail:true};worldGroup.add(pulse2);
+        const pulse=new THREE.Mesh(new THREE.SphereGeometry(.043,14,12),new THREE.MeshBasicMaterial({color:signalColor,transparent:true,opacity:1,depthWrite:false,toneMapped:false}));pulse.userData={kind:'relation-signal',a,b};worldGroup.add(pulse);
+        const pulse2=new THREE.Mesh(new THREE.SphereGeometry(.027,12,10),new THREE.MeshBasicMaterial({color:signalColor,transparent:true,opacity:.86,depthWrite:false,toneMapped:false}));pulse2.userData={kind:'relation-signal',a,b,trail:true};worldGroup.add(pulse2);
         edges.push({line,id:a,relation:true,aId:a,bId:b,a:pa.base.clone(),b:pb.base.clone(),pulse,pulse2,curve,phase:(ids.indexOf(a)+ids.indexOf(b))*.071})}
       // Turn nearby collateral tips from separate cross-links into shared
       // anastomoses. This is the key visual difference between a set of chords
