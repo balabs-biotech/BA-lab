@@ -463,13 +463,8 @@ async function claimBALabs(session) {
   }
 
 
-  organization =
-    data.organization;
-
-  organizationId =
-    data.organization.id;
-
-
+  // The caller owns tenant-state mutation and checks its auth revision
+  // before committing this claim to the current workspace.
   return data;
 
 }
@@ -908,6 +903,10 @@ async function initializeAuthenticatedTracker(
       await claimBALabs(session);
     if (initRevision !== authStateRevision) return;
 
+    // Commit the tenant context only after confirming this initialization is
+    // still current; an obsolete claim must never overwrite the active tenant.
+    organization = claim.organization;
+    organizationId = claim.organization.id;
 
     if (!organizationId) {
 
