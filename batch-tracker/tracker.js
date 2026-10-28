@@ -781,6 +781,7 @@ function clearAuthenticatedWorkspaceState() {
   // be verified. Hiding the UI alone must not leave a previous tenant usable
   // by event handlers or a later partial initialization.
   cultureDetailRequestId += 1;
+  biologicalLineageRequestId += 1;
   const cultureDetailPanel = document.getElementById("cultureDetailPanel");
   if (cultureDetailPanel) {
     cultureDetailPanel.classList.add("hidden");
@@ -5827,6 +5828,7 @@ function biologicalWorkflowText(key, count = 0) {
 }
 
 async function loadBiologicalLineage(cultureId) {
+  const requestId = ++biologicalLineageRequestId;
   const loadRevision = authStateRevision;
   const loadOrganizationId = organizationId;
   const target = document.getElementById('cultureLineage');
@@ -5836,7 +5838,7 @@ async function loadBiologicalLineage(cultureId) {
     const { data, error } = await supabaseClient.from('cultures')
       .select('id,code,culture_type,material_id,parent_culture_id,started_at,metadata')
       .eq('organization_id', loadOrganizationId).order('created_at', { ascending: true }).limit(1000);
-    if (!isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
+    if (requestId !== biologicalLineageRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
     if (error) throw error;
     const rows = data || [];
     const byId = new Map(rows.map(row => [row.id, row]));
@@ -5845,7 +5847,7 @@ async function loadBiologicalLineage(cultureId) {
     const { data: materials, error: materialError } = await supabaseClient.from('materials')
       .select('id,material_code,material_type,parent_material_id,generation,state,strain_id')
       .eq('organization_id', loadOrganizationId).limit(2000);
-    if (!isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
+    if (requestId !== biologicalLineageRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
     if (materialError) throw materialError;
     const materialById = new Map((materials || []).map(item => [item.id, item]));
     const materialChain = []; let materialId = current.material_id; let materialGuard = 0;
@@ -5868,7 +5870,7 @@ async function loadBiologicalLineage(cultureId) {
     if (descendants.length) makeGroup(biologicalWorkflowText("descendants") + ' (' + descendants.length + ')', descendants.map(row => ({ row, label: biologicalWorkflowText("generation") + (row.depth || 1) })));
     if (!ancestors.length && !descendants.length) { const p = document.createElement('p'); p.className = 'muted'; p.textContent = biologicalWorkflowText("noLineage"); target.appendChild(p); }
     if (rows.length >= 1000) { const note = document.createElement('p'); note.className = 'muted'; note.textContent = biologicalWorkflowText("partial"); target.appendChild(note); }
-  } catch (error) { if (!isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return; target.textContent = biologicalWorkflowText("loadError") + (error.message || error); }
+  } catch (error) { if (requestId !== biologicalLineageRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return; target.textContent = biologicalWorkflowText("loadError") + (error.message || error); }
 }
 
 async function saveBiologicalOperation(event) {
@@ -5917,6 +5919,7 @@ async function saveBiologicalOperation(event) {
 }
 
 let cultureDetailRequestId = 0;
+let biologicalLineageRequestId = 0;
 
 async function loadCultureDetail(cultureId) {
   const requestId = ++cultureDetailRequestId;
