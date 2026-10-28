@@ -71,7 +71,7 @@ if(!engine.includes('function recordBatchHarvest')||!engine.includes('current_st
 if(!engine.includes('from("units")')||!engine.includes('p_unit_code: unit.code'))throw new Error("Harvest unit validation or RPC payload missing");
 if(engine.slice(engine.indexOf("async function recordBatchHarvest()"), engine.indexOf("\nrecordHarvestButton?.addEventListener")).includes('from("events").insert({'))throw new Error("Harvest handler still inserts events directly");
 
-if(!engine.includes("const eventAnchor = selectedBatch.culture_id")||!engine.includes("Ce lot doit être lié à une culture ou à un matériau"))throw new Error("Harvest event biological anchor validation missing");
+if(!engine.includes("const eventAnchor = operationBatch.culture_id")||!engine.includes("Ce lot doit être lié à une culture ou à un matériau"))throw new Error("Harvest event biological anchor validation missing");
 for(const label of ["Chronologie du lot","Enregistrer une récolte","Récolte enregistrée","Batch timeline","Record a harvest","Harvest recorded","Cronologia do lote","Registar uma colheita","Colheita registada","الخط الزمني للدفعة","تسجيل حصاد","تم تسجيل الحصاد"]){
  if(!i18n.includes(label))throw new Error("Harvest timeline translation missing: "+label);
 }
