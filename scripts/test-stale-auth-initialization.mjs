@@ -435,3 +435,28 @@ for (const [name, requestId] of [
   );
 }
 console.log("Measurement and observation history request-order guards passed.");
+
+
+// A stale write must not re-enable controls after logout or a tenant switch.
+for (const [name, button] of [
+  ["createCulture", "createButton"],
+  ["createBatch", "createBatchButton"],
+  ["advanceBatch", "advanceBatchButton"],
+  ["releaseBatch", "releaseBatchButton"],
+  ["saveMeasurement", "saveMeasurementButton"],
+  ["saveObservation", "saveObservationButton"],
+]) {
+  const handler = handlerSource(name);
+  const finallyBlock = handler.slice(handler.lastIndexOf("finally"));
+  assert.match(
+    finallyBlock,
+    /isCurrentWorkspaceRevision\(operationRevision, operationOrganizationId\)/,
+    `${name} must not re-enable controls after its workspace becomes stale`,
+  );
+  assert.match(
+    finallyBlock,
+    new RegExp(`${button}\\.disabled\\s*=\\s*false`),
+    `${name} must restore its control after a current-workspace operation`,
+  );
+}
+console.log("Stale-write control restoration guards passed.");
