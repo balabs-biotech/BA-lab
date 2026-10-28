@@ -40,6 +40,13 @@ let selectedBatch = null;
 
 let initializationInProgress = false;
 let authStateRevision = 0;
+let strainOptionsRequestId = 0;
+let cultureOptionsRequestId = 0;
+let batchPlaceOptionsRequestId = 0;
+let plantCultureListRequestId = 0;
+let latestBatchesRequestId = 0;
+let measurementHistoryRequestId = 0;
+let observationHistoryRequestId = 0;
 let initializationWarnings = [];
 let measurementVariables = [];
 let measurementUnits = [];
@@ -1097,15 +1104,14 @@ function setDefaultDate() {
    ============================================================ */
 
 async function loadStrainOptions() {
-
-  if (!organizationId) {
-
+  const requestId = ++strainOptionsRequestId;
+  const loadRevision = authStateRevision;
+  const loadOrganizationId = organizationId;
+  if (!loadOrganizationId) {
     throw new Error(
       "Organisation absente avant chargement des souches."
     );
-
   }
-
 
   const {
     data,
@@ -1130,12 +1136,14 @@ async function loadStrainOptions() {
       `)
       .eq(
         "organization_id",
-        organizationId
+        loadOrganizationId
       )
       .order(
         "strain_code"
       );
 
+
+  if (requestId !== strainOptionsRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
 
   if (error) {
 
@@ -1227,6 +1235,8 @@ async function loadReferenceData() {
   }
 
 
+  const loadRevision = authStateRevision;
+
   const {
     data,
     error
@@ -1243,6 +1253,8 @@ async function loadReferenceData() {
         "code"
       );
 
+
+  if (loadRevision !== authStateRevision) return;
 
   if (error) {
 
@@ -1669,7 +1681,9 @@ function setSyncStatus(
 
 
 async function syncPendingCultures() {
-  if (!organizationId) return;
+  const loadRevision = authStateRevision;
+  const loadOrganizationId = organizationId;
+  if (!loadOrganizationId) return;
 
   if (syncInProgress) return;
 
@@ -1687,10 +1701,12 @@ async function syncPendingCultures() {
     const { data: cultures, error } = await supabaseClient
       .from("cultures")
       .select("id, code")
-      .eq("organization_id", organizationId)
+      .eq("organization_id", loadOrganizationId)
       .in("notion_sync_status", ["pending", "error"])
       .order("created_at", { ascending: true })
       .limit(20);
+
+    if (!isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
 
     if (error) {
       console.error(
@@ -1711,12 +1727,15 @@ async function syncPendingCultures() {
     let lastError = "";
 
     for (const culture of cultures || []) {
+      if (!isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
       try {
         const { data, error: syncError } =
           await supabaseClient.functions.invoke(
             "sync-culture-to-notion",
             { body: { culture_id: culture.id } }
           );
+
+        if (!isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
 
         if (syncError || !data?.ok) {
           failed += 1;
@@ -1740,6 +1759,7 @@ async function syncPendingCultures() {
           );
         }
       } catch (err) {
+        if (!isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
         failed += 1;
 
         lastError =
@@ -2197,13 +2217,12 @@ async function createCulture() {
    ============================================================ */
 
 async function loadCultureOptions() {
-
-  if (!organizationId) {
-
+  const requestId = ++cultureOptionsRequestId;
+  const loadRevision = authStateRevision;
+  const loadOrganizationId = organizationId;
+  if (!loadOrganizationId) {
     return;
-
   }
-
 
   const {
     data,
@@ -2221,7 +2240,7 @@ async function loadCultureOptions() {
       `)
       .eq(
         "organization_id",
-        organizationId
+        loadOrganizationId
       )
       .order(
         "created_at",
@@ -2231,6 +2250,8 @@ async function loadCultureOptions() {
       )
       .limit(100);
 
+
+  if (requestId !== cultureOptionsRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
 
   if (error) {
 
@@ -2314,13 +2335,12 @@ async function loadCultureOptions() {
    ============================================================ */
 
 async function loadLatestBatches() {
-
-  if (!organizationId) {
-
+  const requestId = ++latestBatchesRequestId;
+  const loadRevision = authStateRevision;
+  const loadOrganizationId = organizationId;
+  if (!loadOrganizationId) {
     return;
-
   }
-
 
   const {
     data,
@@ -2346,7 +2366,7 @@ async function loadLatestBatches() {
       `)
       .eq(
         "organization_id",
-        organizationId
+        loadOrganizationId
       )
       .order(
         "created_at",
@@ -2356,6 +2376,8 @@ async function loadLatestBatches() {
       )
       .limit(30);
 
+
+  if (requestId !== latestBatchesRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
 
   if (error) {
 
@@ -4606,6 +4628,7 @@ async function init() {
    ============================================================ */
 
 async function loadQuantityUnitOptions() {
+  const loadRevision = authStateRevision;
   const selects = [batchUnitInput, harvestUnitInput].filter(Boolean);
   for (const select of selects) {
     select.replaceChildren();
@@ -4620,6 +4643,7 @@ async function loadQuantityUnitOptions() {
       .from("units")
       .select("code,label,dimension")
       .order("code");
+    if (loadRevision !== authStateRevision) return;
     if (error) throw error;
 
     quantityUnitOptions = data || [];
@@ -4643,6 +4667,7 @@ async function loadQuantityUnitOptions() {
       }
     }
   } catch (error) {
+    if (loadRevision !== authStateRevision) return;
     console.error("Référentiel des unités indisponible :", error);
     initializationWarnings.push("unités");
     quantityUnitOptions = [];
@@ -4778,14 +4803,18 @@ function renderBatchEnvironmentOptions() {
 }
 
 async function loadBatchPlaceOptions() {
-  if (!organizationId || !batchLocationInput || !batchEnvironmentInput) return;
+  const requestId = ++batchPlaceOptionsRequestId;
+  const loadRevision = authStateRevision;
+  const loadOrganizationId = organizationId;
+  if (!loadOrganizationId || !batchLocationInput || !batchEnvironmentInput) return;
   batchLocationInput.disabled = true;
   batchEnvironmentInput.disabled = true;
   try {
     const [{ data: locations, error: locationsError }, { data: environments, error: environmentsError }] = await Promise.all([
-      supabaseClient.from("locations").select("id,code,name").eq("organization_id", organizationId).order("name"),
-      supabaseClient.from("environments").select("id,name,location_id").eq("organization_id", organizationId).order("name")
+      supabaseClient.from("locations").select("id,code,name").eq("organization_id", loadOrganizationId).order("name"),
+      supabaseClient.from("environments").select("id,name,location_id").eq("organization_id", loadOrganizationId).order("name")
     ]);
+    if (requestId !== batchPlaceOptionsRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
     if (locationsError) throw locationsError;
     if (environmentsError) throw environmentsError;
     batchLocationOptions = locations || [];
@@ -4804,6 +4833,7 @@ async function loadBatchPlaceOptions() {
     batchLocationInput.disabled = batchLocationOptions.length === 0;
     renderBatchEnvironmentOptions();
   } catch (error) {
+    if (requestId !== batchPlaceOptionsRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
     console.error("Référentiel des emplacements indisponible :", error);
     initializationWarnings.push("emplacements et environnements");
     batchLocationOptions = [];
@@ -4825,6 +4855,7 @@ moveBatchButton?.addEventListener("click", moveSelectedBatch);
    ============================================================ */
 
 async function loadMeasurementReferences() {
+  const loadRevision = authStateRevision;
   const [variableResult, unitResult] = await Promise.all([
     supabaseClient.from("variables")
       .select("code, label, dimension, canonical_unit_code, description")
@@ -4834,6 +4865,7 @@ async function loadMeasurementReferences() {
       .order("code")
   ]);
 
+  if (loadRevision !== authStateRevision) return;
   if (variableResult.error) {
     throw new Error(`Chargement des paramètres de mesure impossible : ${variableResult.error.message}`);
   }
@@ -4844,7 +4876,7 @@ async function loadMeasurementReferences() {
   measurementVariables = variableResult.data || [];
   measurementUnits = unitResult.data || [];
 
-  const visibleVariables = workspaceMeasurementVariables(measurementVariables);
+  const visibleVariables = window.BALabsDomainEngine.filterMeasurementVariables(measurementVariables);
   measurementVariableSelect.innerHTML = "";
   const placeholder = document.createElement("option");
   placeholder.value = "";
@@ -5142,15 +5174,19 @@ function belongsToActiveWorkspace(record, eventsById = {}) {
 }
 
 async function loadRecentMeasurements() {
-  if (!organizationId || !measurementHistory) return;
+  const requestId = ++measurementHistoryRequestId;
+  const loadRevision = authStateRevision;
+  const loadOrganizationId = organizationId;
+  if (!loadOrganizationId || !measurementHistory) return;
 
   const { data, error } = await supabaseClient
     .from("measurements")
     .select("id, variable_code, raw_value, raw_unit_code, normalized_value, normalized_unit_code, measured_at, method, instrument, culture_id, plant_culture_id, event_id, metadata")
-    .eq("organization_id", organizationId)
+    .eq("organization_id", loadOrganizationId)
     .order("measured_at", { ascending: false })
     .limit(1000);
 
+  if (requestId !== measurementHistoryRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
   if (error) throw new Error(`Chargement de l’historique des mesures impossible : ${error.message}`);
 
   const rows = data || [];
@@ -5160,12 +5196,14 @@ async function loadRecentMeasurements() {
     const { data: events, error: eventsError } = await supabaseClient
       .from("events")
       .select("id, batch_id, culture_id, plant_culture_id")
-      .eq("organization_id", organizationId)
+      .eq("organization_id", loadOrganizationId)
       .in("id", eventIds);
+    if (requestId !== measurementHistoryRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
     if (eventsError) console.warn("Détails des événements de mesure indisponibles :", eventsError.message);
     for (const event of events || []) eventsById[event.id] = event;
   }
 
+  if (requestId !== measurementHistoryRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
   const visibleRows = rows.filter(row => belongsToActiveWorkspace(row, eventsById)).slice(0, 10);
   if (!visibleRows.length) {
     measurementHistory.innerHTML = '<p class="muted">Aucune mesure enregistrée dans cet univers pour le moment.</p>';
@@ -5328,14 +5366,18 @@ async function saveObservation() {
 }
 
 async function loadRecentObservations() {
-  if (!organizationId || !observationHistory) return;
+  const requestId = ++observationHistoryRequestId;
+  const loadRevision = authStateRevision;
+  const loadOrganizationId = organizationId;
+  if (!loadOrganizationId || !observationHistory) return;
 
   const query = await supabaseClient.from("observations")
     .select("id, variable_code, value_text, observed_at, culture_id, plant_culture_id, event_id, metadata")
-    .eq("organization_id", organizationId)
+    .eq("organization_id", loadOrganizationId)
     .order("observed_at", { ascending: false })
     .limit(1000);
 
+  if (requestId !== observationHistoryRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
   if (query.error) throw new Error("Chargement de l’historique des observations impossible : " + query.error.message);
   const observationRows = query.data || [];
   const eventIds = [...new Set(observationRows.map(row => row.event_id).filter(Boolean))];
@@ -5344,12 +5386,14 @@ async function loadRecentObservations() {
   if (eventIds.length) {
     const eventsResult = await supabaseClient.from("events")
       .select("id, batch_id, culture_id, plant_culture_id")
-      .eq("organization_id", organizationId)
+      .eq("organization_id", loadOrganizationId)
       .in("id", eventIds);
+    if (requestId !== observationHistoryRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
     if (eventsResult.error) console.warn("Détails des événements d’observation indisponibles :", eventsResult.error.message);
     for (const event of eventsResult.data || []) eventsById[event.id] = event;
   }
 
+  if (requestId !== observationHistoryRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
   recentObservations = observationRows.filter(row => belongsToActiveWorkspace(row, eventsById)).slice(0, 8);
   updateOverview();
   if (!recentObservations.length) {
@@ -6511,14 +6555,18 @@ function renderPlantCultureList(rows) {
 }
 
 async function loadPlantCultures() {
-  if (!organizationId) return;
+  const requestId = ++plantCultureListRequestId;
+  const loadRevision = authStateRevision;
+  const loadOrganizationId = organizationId;
+  if (!loadOrganizationId) return;
   const status = document.getElementById("plantCultureStatus");
   try {
     const { data, error } = await supabaseClient.from("plant_cultures")
       .select("id,code,crop_type,species_name,cultivar_name,quantity,unit_code,location_id,environment_id,substrate,started_at,status,notes")
-      .eq("organization_id", organizationId)
+      .eq("organization_id", loadOrganizationId)
       .order("created_at", { ascending: false })
       .limit(300);
+    if (requestId !== plantCultureListRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
     if (error) throw error;
     renderPlantCultureList(data || []);
     plantCultureOptions = data || [];
@@ -6526,6 +6574,7 @@ async function loadPlantCultures() {
     renderStatisticsFilters();
     if (status) status.textContent = "Registre végétal chargé depuis Supabase.";
   } catch (error) {
+    if (requestId !== plantCultureListRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
     console.error("Chargement du registre végétal impossible :", error);
     initializationWarnings.push("registre végétal");
     if (status) status.textContent = "Registre végétal indisponible : " + (error.message || "erreur inconnue");
