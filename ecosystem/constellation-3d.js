@@ -233,7 +233,7 @@ if(root){
         // links biological experimentation back to the operational workflow.
         ['myco','iot'],['bio','work'],
         // Close the knowledge loop: protocols, cultivation practice and instrumented products feed learning back into R&D.
-        ['myco','learn'],['lab','learn'],['products','iot']
+        ['myco','learn'],['lab','learn'],['products','iot'],['soil','products']
       ];
       const mycelialTips=[];
       for(const [a,b] of pairs){const pa=points.find(p=>p.id===a),pb=points.find(p=>p.id===b);if(!pa||!pb)continue;
