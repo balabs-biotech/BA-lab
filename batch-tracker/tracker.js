@@ -3648,8 +3648,13 @@ async function saveQcCheck(
 
     qcSavesInFlight.delete(checkId);
 
-    // Après un enregistrement réussi la liste est re-rendue : l'ancien bouton n'est plus dans le DOM.
-    if (button && button.isConnected) {
+    // Ne jamais réactiver un contrôle appartenant à une session ou à une organisation obsolète.
+    if (
+      button &&
+      button.isConnected &&
+      isCurrentWorkspaceRevision(operationRevision, operationOrganizationId) &&
+      batchQcList.querySelector(`[data-qc-save="${CSS.escape(checkId)}"]`) === button
+    ) {
 
       button.disabled = false;
 
