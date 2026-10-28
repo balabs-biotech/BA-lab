@@ -3,6 +3,10 @@ import vm from "node:vm";
 const root=fs.readFileSync("index.html","utf8");
 const engine=fs.readFileSync("batch-tracker/tracker.js","utf8");
 const template=fs.readFileSync("batch-tracker/workspace.html","utf8");
+const assistedEntry=fs.readFileSync("batch-tracker/smart-entry.js","utf8");
+new vm.Script(assistedEntry,{filename:"batch-tracker/smart-entry.js"});
+if(!template.includes('id="smartEntryPanel"')||!template.includes('id="smartEntrySource"')||!template.includes('id="smartEntryApply"'))throw new Error("Assisted-entry UI is incomplete");
+if(!assistedEntry.includes("function parseSource")||!assistedEntry.includes("dispatchEvent(new Event("))throw new Error("Assisted entry must parse input and prefill the existing form");
 new vm.Script(engine,{filename:"batch-tracker/tracker.js"});
 const routes=[
  {domain:"agronomy",url:"batch-tracker/green-tech/",file:"batch-tracker/green-tech/index.html"},
@@ -13,6 +17,7 @@ for(const r of routes){
  const html=fs.readFileSync(r.file,"utf8");
  if(!html.includes(`window.BA_LABS_DOMAIN = "${r.domain}"`))throw new Error("Wrong domain: "+r.file);
  if(!/fetch\("\.\.\/workspace\.html(?:\?v=[^"]*)?"\)/.test(html)||!/script\.src = "\.\.\/tracker\.js(?:\?v=[^"]*)?"/.test(html))throw new Error("Shared engine missing: "+r.file);
+ if(!html.includes("../smart-entry.js?v=20261028-assisted-entry-1"))throw new Error("Assisted-entry module missing: "+r.file);
  if(!root.includes(`href="${r.url}"`))throw new Error("Root link missing: "+r.url);
 }
 if(template.includes('class="domain-switcher"'))throw new Error("Switcher remains inside workspace");
