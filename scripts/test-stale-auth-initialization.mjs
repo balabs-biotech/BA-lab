@@ -331,3 +331,15 @@ assert.ok(
   "observation history must recheck workspace identity after its main query and event lookup",
 );
 console.log("Tenant-snapshot history, location and plant-register guards passed.");
+
+
+// Tenant snapshot declarations must precede every guard that reads them.
+for (const name of ["loadStrainOptions", "loadCultureOptions", "loadLatestBatches"]) {
+  const handler = handlerSource(name);
+  assert.match(
+    handler,
+    /const loadRevision = authStateRevision;\s*const loadOrganizationId = organizationId;\s*if \(!loadOrganizationId\)/,
+    `${name} must initialize the tenant snapshot before checking it`,
+  );
+}
+console.log("Tenant snapshot initialization order passed.");
