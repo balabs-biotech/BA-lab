@@ -2795,6 +2795,8 @@ async function loadBatch(
 
 
   const requestId = ++batchDetailRequestId;
+  const loadRevision = authStateRevision;
+  const loadOrganizationId = organizationId;
   selectedBatchId =
     batchId;
 
@@ -2832,7 +2834,7 @@ async function loadBatch(
       `)
       .eq(
         "organization_id",
-        organizationId
+        loadOrganizationId
       )
       .eq(
         "id",
@@ -2840,7 +2842,7 @@ async function loadBatch(
       )
       .single();
 
-  if (requestId !== batchDetailRequestId) return;
+  if (requestId !== batchDetailRequestId || loadRevision !== authStateRevision || organizationId !== loadOrganizationId) return;
 
   if (batchError) {
 
@@ -2878,7 +2880,7 @@ async function loadBatch(
       `)
       .eq(
         "organization_id",
-        organizationId
+        loadOrganizationId
       )
       .eq(
         "batch_id",
@@ -2888,7 +2890,7 @@ async function loadBatch(
         "sequence_no"
       );
 
-  if (requestId !== batchDetailRequestId) return;
+  if (requestId !== batchDetailRequestId || loadRevision !== authStateRevision || organizationId !== loadOrganizationId) return;
 
   if (stagesError) {
 
@@ -2923,7 +2925,7 @@ async function loadBatch(
       `)
       .eq(
         "organization_id",
-        organizationId
+        loadOrganizationId
       )
       .eq(
         "batch_id",
@@ -2933,7 +2935,7 @@ async function loadBatch(
         "check_code"
       );
 
-  if (requestId !== batchDetailRequestId) return;
+  if (requestId !== batchDetailRequestId || loadRevision !== authStateRevision || organizationId !== loadOrganizationId) return;
 
   if (qcError) {
 
@@ -2956,7 +2958,7 @@ async function loadBatch(
     .order("occurred_at", { ascending: false })
     .limit(50);
 
-  if (requestId !== batchDetailRequestId) return;
+  if (requestId !== batchDetailRequestId || loadRevision !== authStateRevision || organizationId !== loadOrganizationId) return;
 
   renderBatchInfo(
     batch
