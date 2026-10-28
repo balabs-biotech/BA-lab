@@ -5156,6 +5156,7 @@ async function saveMeasurement() {
       p_event: eventPayload,
       p_measurement: measurementPayload
     });
+    if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
     if (recordError) throw new Error(cultureWorkflowText("measureError") + recordError.message);
     measurementSaved = true;
 
@@ -5369,6 +5370,7 @@ async function saveObservation() {
       p_event: eventPayload,
       p_observation: observationPayload
     });
+    if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
     if (recordError) throw new Error(cultureWorkflowText("observationError") + recordError.message);
     observationSaved = true;
     observationValueInput.value = "";
