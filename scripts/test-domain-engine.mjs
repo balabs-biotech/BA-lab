@@ -35,6 +35,8 @@ assert.match(trackerSource, /if \(stale \|\| requestedDomain !== \(document\.bod
 
 assert.match(trackerSource, /async function loadPlantCultures\(\)[\s\S]*?requestedOrganizationId !== organizationId \|\|[\s\S]*?requestedDomain !== document\.body\.dataset\.domain \|\|[\s\S]*?requestedDomain !== "agronomy"\) return;/,
   "late plant-registry responses must be discarded after leaving Green Tech");
+assert.match(trackerSource, /async function savePlantCulture\(event\)[\s\S]*?const requestedOrganizationId = organizationId;[\s\S]*?organization_id: requestedOrganizationId,[\s\S]*?if \(requestedOrganizationId !== organizationId \|\|[\s\S]*?requestedDomain !== "agronomy"\) return;[\s\S]*?form\.reset\(\);/,
+  "plant culture saves must remain bound to the submitting organization and avoid resetting a different workspace after await");
 assert.match(trackerSource, /let workspaceSwitchRevision = 0;[\s\S]*?const switchRevision = \+\+workspaceSwitchRevision;[\s\S]*?switchRevision !== workspaceSwitchRevision/,
   "workspace refresh tasks must stop when a newer workspace switch supersedes them");
 
