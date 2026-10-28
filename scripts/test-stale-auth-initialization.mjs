@@ -367,9 +367,13 @@ for (const [name, requestId] of [
     `${name} must reject stale responses before mutating shared state or UI`,
   );
 }
-assert.match(clearWorkspaceHandler, /strainOptionsRequestId\\s*\\+=\\s*1;/, "session cleanup must invalidate pending strain-option requests");
-assert.match(clearWorkspaceHandler, /cultureOptionsRequestId\\s*\\+=\\s*1;/, "session cleanup must invalidate pending culture-option requests");
-assert.match(clearWorkspaceHandler, /latestBatchesRequestId\\s*\\+=\\s*1;/, "session cleanup must invalidate pending batch-list requests");
+const listCleanupHandler = tracker.slice(
+  tracker.indexOf("function clearAuthenticatedWorkspaceState()"),
+  tracker.indexOf("\\nasync function refreshAuthUI")
+);
+assert.match(listCleanupHandler, /strainOptionsRequestId\\s*\\+=\\s*1;/, "session cleanup must invalidate pending strain-option requests");
+assert.match(listCleanupHandler, /cultureOptionsRequestId\\s*\\+=\\s*1;/, "session cleanup must invalidate pending culture-option requests");
+assert.match(listCleanupHandler, /latestBatchesRequestId\\s*\\+=\\s*1;/, "session cleanup must invalidate pending batch-list requests");
 console.log("Option and batch-list request-order guards passed.");
 
 
