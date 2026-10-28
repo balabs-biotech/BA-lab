@@ -397,3 +397,22 @@ assert.match(
   "session cleanup must invalidate pending lineage loads",
 );
 console.log("Biological lineage request-order guards passed.");
+
+
+// Repeated comparisons within the same tenant must not let an older response replace the latest selection.
+const comparisonHandler = handlerSource("compareSelectedBatches");
+assert.match(
+  tracker,
+  /let batchComparisonRequestId = 0;\s*async function compareSelectedBatches\(\) \{\s*const comparisonRequestId = \+\+batchComparisonRequestId;/,
+  "each batch comparison must have its own monotonically increasing request identity",
+);
+assert.ok(
+  (comparisonHandler.match(/comparisonRequestId !== batchComparisonRequestId/g) || []).length >= 2,
+  "stale batch comparison results and errors must be ignored",
+);
+assert.match(
+  comparisonHandler,
+  /comparisonRequestId === batchComparisonRequestId && isCurrentWorkspaceRevision\(loadRevision, loadOrganizationId\)\) button\.disabled = false;/,
+  "only the latest comparison may re-enable its button",
+);
+console.log("Batch comparison request-order guards passed.");
