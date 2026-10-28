@@ -81,6 +81,14 @@ function createHarness(domain = "mycology") {
 
 {
   const { elements } = createHarness();
+  elements.get("smartEntrySource").value = JSON.stringify({ cultureType: "culture" });
+  elements.get("smartEntryApply").click();
+  assert.equal(elements.get("cultureType").value, "");
+  assert.match(elements.get("smartEntryStatus").textContent, /sélectionner manuellement/);
+}
+
+{
+  const { elements } = createHarness();
   elements.get("smartEntrySource").value = JSON.stringify({
     cultureType: "a value that does not exist in the dropdown",
   });
