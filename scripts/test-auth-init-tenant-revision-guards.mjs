@@ -36,7 +36,7 @@ assert.match(tracker, /function isCurrentWorkspaceRevision\(revision, expectedOr
 function getFunctionBlock(name) {
   const start = tracker.indexOf(`async function ${name}(`);
   assert.ok(start >= 0, `Missing async loader: ${name}`);
-  const next = tracker.slice(start + 1).search(/\\n(?:async )?function /);
+  const next = tracker.slice(start + 1).search(/\n(?:async )?function /);
   return tracker.slice(start, next >= 0 ? start + 1 + next : tracker.length);
 }
 
