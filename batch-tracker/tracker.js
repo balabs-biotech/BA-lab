@@ -4742,6 +4742,8 @@ moveBatchButton?.addEventListener("click", moveSelectedBatch);
    ============================================================ */
 
 async function loadMeasurementReferences() {
+  const requestedDomain = document.body.dataset.domain || "mycology";
+  const requestedOrganizationId = organizationId;
   const [variableResult, unitResult] = await Promise.all([
     supabaseClient.from("variables")
       .select("code, label, dimension, canonical_unit_code, description")
@@ -4757,6 +4759,10 @@ async function loadMeasurementReferences() {
   if (unitResult.error) {
     throw new Error(`Chargement des unités impossible : ${unitResult.error.message}`);
   }
+
+  // Ignore late reference responses after an organization or workspace switch.
+  if (requestedOrganizationId !== organizationId ||
+      requestedDomain !== (document.body.dataset.domain || "mycology")) return;
 
   measurementVariables = variableResult.data || [];
   measurementUnits = unitResult.data || [];
