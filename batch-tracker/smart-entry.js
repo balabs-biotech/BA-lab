@@ -62,14 +62,26 @@
     if (!select || value == null || String(value).trim() === "") return "skipped";
     const target = normalize(value);
     const options = Array.from(select.options);
-    const match = options.find((option) =>
+    const exact = options.filter((option) =>
       normalize(option.value) === target || normalize(option.textContent) === target
-    ) || options.find((option) => {
-      const v = normalize(option.value);
+    );
+    if (exact.length === 1) {
+      select.value = exact[0].value;
+      select.dispatchEvent(new Event("change", { bubbles: true }));
+      return "filled";
+    }
+    if (exact.length > 1) return "unmatched";
+
+    // Permit a partial match only when it is unique and both compared values
+    // are non-empty. Empty placeholder labels must never match every input.
+    const partial = options.filter((option) => {
+      const value = normalize(option.value);
       const label = normalize(option.textContent);
-      return target.length > 2 && (v.includes(target) || label.includes(target) || target.includes(label));
+      if (!value || !label || target.length < 4) return false;
+      return value.includes(target) || label.includes(target) || target.includes(value) || target.includes(label);
     });
-    if (!match) return "unmatched";
+    if (partial.length !== 1) return "unmatched";
+    const match = partial[0];
     select.value = match.value;
     select.dispatchEvent(new Event("change", { bubbles: true }));
     return "filled";
