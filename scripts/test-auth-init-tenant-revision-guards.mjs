@@ -77,7 +77,7 @@ for (const mutation of [
     `${mutation} must capture the auth revision before asynchronous work`);
   assert.match(source, /const operationOrganizationId = organizationId;/,
     `${mutation} must capture its organization context`);
-  assert.match(source, /isCurrentWorkspaceRevision\\(operationRevision, operationOrganizationId\\)/,
+  assert.match(source, /isCurrentWorkspaceRevision\(operationRevision, operationOrganizationId\)/,
     `${mutation} must refuse writes after the auth/workspace revision changes`);
 }
 
