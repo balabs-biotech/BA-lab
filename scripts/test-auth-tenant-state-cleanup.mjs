@@ -23,6 +23,9 @@ const context = {
   biologicalLineageRequestId: 11,
   plantCultureListRequestId: 13,
   batchPlaceOptionsRequestId: 17,
+  strainOptionsRequestId: 19,
+  cultureOptionsRequestId: 23,
+  latestBatchesRequestId: 29,
   document: {
     cultureDetailPanel: {
       classList: { hidden: false, add(name) { if (name === "hidden") this.hidden = true; } },
@@ -47,6 +50,9 @@ assert.equal(context.cultureDetailRequestId, 8, "pending culture-detail requests
 assert.equal(context.biologicalLineageRequestId, 12, "pending lineage requests must be invalidated");
 assert.equal(context.plantCultureListRequestId, 14, "pending plant registry requests must be invalidated");
 assert.equal(context.batchPlaceOptionsRequestId, 18, "pending location/environment requests must be invalidated");
+assert.equal(context.strainOptionsRequestId, 20, "pending strain-option requests must be invalidated");
+assert.equal(context.cultureOptionsRequestId, 24, "pending culture-option requests must be invalidated");
+assert.equal(context.latestBatchesRequestId, 30, "pending batch-list requests must be invalidated");
 assert.equal(context.document.cultureDetailPanel.classList.hidden, true, "culture detail panel must be hidden after session loss");
 assert.equal(context.document.cultureDetailPanel.dataset.cultureId, "", "culture detail panel must release the previous culture identity");
 for (const field of arrayFields) {
