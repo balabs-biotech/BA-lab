@@ -81,4 +81,17 @@ for (const mutation of [
     `${mutation} must refuse writes after the auth/workspace revision changes`);
 }
 
+
+const capturedOrganizationChecks = [
+  ["createCulture", /p_organization_id:\\s*operationOrganizationId/],
+  ["createBatch", /p_organization_id:\\s*operationOrganizationId/],
+  ["saveMeasurement", /organization_id:\\s*operationOrganizationId/],
+  ["saveObservation", /organization_id:\\s*operationOrganizationId/],
+  ["saveBiologicalOperation", /p_organization_id:\\s*operationOrganizationId/]
+];
+for (const [mutation, pattern] of capturedOrganizationChecks) {
+  assert.match(getMutationBlock(mutation), pattern,
+    `${mutation} must send the captured organization ID, not a mutable global value`);
+}
+
 console.log("Auth initialization and tenant-write revision guards passed.");
