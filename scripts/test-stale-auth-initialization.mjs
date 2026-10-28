@@ -158,6 +158,16 @@ const writeContracts = [
     start: "async function saveQcCheckNow(",
     rpc: '.from("batch_qc_checks")',
   },
+  {
+    name: "advanceBatch",
+    start: "async function advanceBatch()",
+    rpc: 'supabaseClient.rpc(\\n        "advance_batch_stage"',
+  },
+  {
+    name: "releaseBatch",
+    start: "async function releaseBatch()",
+    rpc: 'supabaseClient.rpc(\\n        "release_batch"',
+  },
 ];
 
 for (const contract of writeContracts) {
