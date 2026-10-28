@@ -382,3 +382,18 @@ assert.match(cultureDetailHandler, /if \(!loadOrganizationId \|\| !culture \|\| 
 assert.match(cultureDetailHandler, /openBatch\.addEventListener\("click", async \(\) => \{\s*if \(!isCurrentWorkspaceRevision\(loadRevision, loadOrganizationId\)\) return;/, "opening a culture-linked batch must revalidate the captured workspace");
 assert.match(cultureDetailHandler, /if \(panel\.dataset\.cultureId !== culture\.id\) return;/, "opening a culture-linked batch must reject an obsolete culture panel");
 console.log("Culture detail logout and stale-interaction guards passed.");
+
+
+// Lineage has an independent request identity: two culture selections in one tenant can race too.
+const lineageHandler = handlerSource("loadBiologicalLineage");
+assert.match(lineageHandler, /const requestId = \+\+biologicalLineageRequestId;/, "lineage loads must receive a monotonically increasing request ID");
+assert.ok(
+  (lineageHandler.match(/requestId !== biologicalLineageRequestId/g) || []).length >= 3,
+  "lineage must reject stale success and error paths after each asynchronous phase",
+);
+assert.match(
+  tracker.slice(tracker.indexOf("function clearAuthenticatedWorkspaceState()"), tracker.indexOf("\\nasync function refreshAuthUI")),
+  /biologicalLineageRequestId\s*\+=\s*1;/,
+  "session cleanup must invalidate pending lineage loads",
+);
+console.log("Biological lineage request-order guards passed.");
