@@ -4772,19 +4772,23 @@ function prepareMovementControls(batch) {
 }
 
 async function moveSelectedBatch() {
-  if (!organizationId || !selectedBatch || !selectedBatchId) {
+  const operationRevision = authStateRevision;
+  const operationOrganizationId = organizationId;
+  const operationBatchId = selectedBatchId;
+  const operationBatch = selectedBatch;
+  if (!operationOrganizationId || !operationBatch || !operationBatchId) {
     showMessage("Sélectionnez d’abord un lot.", "error");
     return;
   }
-  if (["released", "rejected", "aborted", "completed"].includes(selectedBatch.status)) {
+  if (["released", "rejected", "aborted", "completed"].includes(operationBatch.status)) {
     showMessage("Un lot clôturé ne peut pas être déplacé depuis ce formulaire.", "error");
     return;
   }
   const locationId = moveBatchLocationInput?.value || null;
   const environmentId = moveBatchEnvironmentInput?.value || null;
   const note = moveBatchNoteInput?.value.trim() || null;
-  const currentLocation = selectedBatch.location_id || null;
-  const currentEnvironment = selectedBatch.environment_id || null;
+  const currentLocation = operationBatch.location_id || null;
+  const currentEnvironment = operationBatch.environment_id || null;
   if (locationId === currentLocation && environmentId === currentEnvironment) {
     showMessage("Le nouvel emplacement et l’environnement sont identiques aux valeurs actuelles.", "error");
     return;
@@ -4794,18 +4798,21 @@ async function moveSelectedBatch() {
   moveBatchButton.textContent = "Enregistrement…";
   try {
     const { data, error } = await supabaseClient.rpc("move_batch_to_location", {
-      p_batch_id: selectedBatchId,
+      p_batch_id: operationBatchId,
       p_location_id: locationId,
       p_environment_id: environmentId,
       p_note: note
     });
+    if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId) || selectedBatchId !== operationBatchId) return;
     if (error) throw error;
     if (!data?.event_id) throw new Error("La RPC n’a pas confirmé la création de l’événement de déplacement.");
     if (moveBatchNoteInput) moveBatchNoteInput.value = "";
     await loadLatestBatches();
-    await loadBatch(selectedBatchId);
+    await loadBatch(operationBatchId);
+    if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
     showMessage("Déplacement enregistré dans la chronologie du lot.", "success");
   } catch (error) {
+    if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
     console.error("Déplacement du lot impossible:", error);
     showMessage("Déplacement impossible : " + (error.message || "erreur inconnue"), "error");
   } finally {
