@@ -366,3 +366,19 @@ assert.match(
   "culture sync must stop its per-item error path after a tenant switch",
 );
 console.log("Background sync and batch timeline tenant guards passed.");
+
+
+// Culture detail panels and their nested actions must be invalidated on logout/session loss.
+const clearWorkspaceHandler = tracker.slice(
+  tracker.indexOf("function clearAuthenticatedWorkspaceState()"),
+  tracker.indexOf("\\nasync function refreshAuthUI")
+);
+assert.match(clearWorkspaceHandler, /cultureDetailRequestId\s*\+=\s*1;/, "clearing authenticated state must invalidate pending culture-detail requests");
+assert.match(clearWorkspaceHandler, /cultureDetailPanel\.classList\.add\("hidden"\)/, "clearing authenticated state must hide the previous culture detail panel");
+assert.match(clearWorkspaceHandler, /cultureDetailPanel\.dataset\.cultureId\s*=\s*""/, "clearing authenticated state must detach the previous culture identity");
+
+const cultureDetailHandler = handlerSource("loadCultureDetail");
+assert.match(cultureDetailHandler, /if \(!loadOrganizationId \|\| !culture \|\| !panel/, "culture detail must not render without an authenticated tenant");
+assert.match(cultureDetailHandler, /openBatch\.addEventListener\("click", async \(\) => \{\s*if \(!isCurrentWorkspaceRevision\(loadRevision, loadOrganizationId\)\) return;/, "opening a culture-linked batch must revalidate the captured workspace");
+assert.match(cultureDetailHandler, /if \(panel\.dataset\.cultureId !== culture\.id\) return;/, "opening a culture-linked batch must reject an obsolete culture panel");
+console.log("Culture detail logout and stale-interaction guards passed.");
