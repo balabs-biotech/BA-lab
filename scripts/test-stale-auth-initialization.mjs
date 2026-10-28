@@ -476,3 +476,16 @@ assert.match(
   "QC save must not restore an obsolete button after the QC list is rerendered",
 );
 console.log("QC stale-workspace control restoration guards passed.");
+
+
+// Remaining batch and biological writes must not restore controls from an obsolete workspace.
+for (const [name, expected] of [
+  ["recordBatchHarvest", /isCurrentWorkspaceRevision\(operationRevision, operationOrganizationId\) && selectedBatchId === operationBatchId/],
+  ["moveSelectedBatch", /isCurrentWorkspaceRevision\(operationRevision, operationOrganizationId\) && selectedBatchId === operationBatchId/],
+  ["saveBiologicalOperation", /isCurrentWorkspaceRevision\(operationRevision, operationOrganizationId\)/],
+]) {
+  const handler = handlerSource(name);
+  const finallyBlock = handler.slice(handler.lastIndexOf("finally"));
+  assert.match(finallyBlock, expected, `${name} must not restore controls after the workspace or selected batch becomes stale`);
+}
+console.log("Batch harvest, movement, and biological-operation stale-control guards passed.");
