@@ -83,11 +83,11 @@ for (const mutation of [
 
 
 const capturedOrganizationChecks = [
-  ["createCulture", /p_organization_id:\\s*operationOrganizationId/],
-  ["createBatch", /p_organization_id:\\s*operationOrganizationId/],
-  ["saveMeasurement", /organization_id:\\s*operationOrganizationId/],
-  ["saveObservation", /organization_id:\\s*operationOrganizationId/],
-  ["saveBiologicalOperation", /p_organization_id:\\s*operationOrganizationId/]
+  ["createCulture", /p_organization_id:\s*operationOrganizationId/],
+  ["createBatch", /p_organization_id:\s*operationOrganizationId/],
+  ["saveMeasurement", /organization_id:\s*operationOrganizationId/],
+  ["saveObservation", /organization_id:\s*operationOrganizationId/],
+  ["saveBiologicalOperation", /p_organization_id:\s*operationOrganizationId/]
 ];
 for (const [mutation, pattern] of capturedOrganizationChecks) {
   assert.match(getMutationBlock(mutation), pattern,
