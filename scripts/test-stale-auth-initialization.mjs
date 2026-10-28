@@ -489,3 +489,27 @@ for (const [name, expected] of [
   assert.match(finallyBlock, expected, `${name} must not restore controls after the workspace or selected batch becomes stale`);
 }
 console.log("Batch harvest, movement, and biological-operation stale-control guards passed.");
+
+
+// The plant registry can refresh after save and during workspace initialization; newest request wins.
+const plantListHandler = handlerSource("loadPlantCultures");
+assert.match(
+  tracker,
+  /let plantCultureListRequestId = 0;/,
+  "plant registry refreshes need a request identity",
+);
+assert.match(
+  plantListHandler,
+  /const requestId = \+\+plantCultureListRequestId;/,
+  "each plant registry refresh must supersede the previous request",
+);
+assert.ok(
+  (plantListHandler.match(/requestId !== plantCultureListRequestId/g) || []).length >= 2,
+  "plant registry success and error paths must ignore stale responses",
+);
+assert.match(
+  tracker.slice(tracker.indexOf("function clearAuthenticatedWorkspaceState()"), tracker.indexOf("async function refreshAuthUI")),
+  /plantCultureListRequestId\s*\+=\s*1;/,
+  "session cleanup must invalidate pending plant registry refreshes",
+);
+console.log("Plant registry request-order guards passed.");
