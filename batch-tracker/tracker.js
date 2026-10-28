@@ -6694,16 +6694,24 @@ function setupDomainWorkspaces() {
             renderMeasurementTargets();
             renderStatisticsFilters();
             await loadPlantCultures();
+            if (switchRevision !== workspaceSwitchRevision ||
+                activeDomain !== document.body.dataset.domain) return;
           } else {
             // cultures are scoped by metadata.domain in loadCultureOptions();
             // reload them on every switch so mycology and lab don't reuse each
             // other's cached target list.
             await loadCultureOptions();
+            if (switchRevision !== workspaceSwitchRevision ||
+                activeDomain !== document.body.dataset.domain) return;
             await loadLatestBatches();
+            if (switchRevision !== workspaceSwitchRevision ||
+                activeDomain !== document.body.dataset.domain) return;
           }
           renderMeasurementTargets();
           renderStatisticsFilters();
           await loadMeasurementReferences();
+          if (switchRevision !== workspaceSwitchRevision ||
+              activeDomain !== document.body.dataset.domain) return;
           await Promise.all([
             loadRecentMeasurements(),
             loadRecentObservations()
