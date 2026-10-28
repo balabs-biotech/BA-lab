@@ -79,9 +79,10 @@ assert.equal(engine.normalizeDomain("unknown"), "laboratory");
 
 console.log("Domain engine contracts passed.");
 
-// Workspace filtering must happen after a sufficiently broad source query;
-// small organization-wide limits can otherwise hide records from one domain.
-assert.match(trackerSource, /async function loadCultureOptions\(\)[\s\S]*?\.limit\(1000\);/,
-  "culture loading must not truncate the organization before workspace filtering");
-assert.match(trackerSource, /async function loadLatestBatches\(\)[\s\S]*?\.limit\(1000\);/,
-  "batch loading must not truncate the organization before source-culture filtering");
+// Workspace registries must paginate organization rows before filtering by domain.
+assert.match(trackerSource, /async function loadOrganizationRowsInPages\([\s\S]*?\.range\(offset, offset \+ pageSize - 1\)[\s\S]*?if \(page\.length < pageSize\) break;/,
+  "organization registry loading must paginate until the final partial page");
+assert.match(trackerSource, /async function loadCultureOptions\(\)[\s\S]*?loadOrganizationRowsInPages\(\s*"cultures"/,
+  "culture loading must paginate before workspace filtering");
+assert.match(trackerSource, /async function loadLatestBatches\(\)[\s\S]*?loadOrganizationRowsInPages\(\s*"batches"/,
+  "batch loading must paginate before source-culture filtering");
