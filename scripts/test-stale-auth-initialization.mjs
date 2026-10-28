@@ -304,3 +304,30 @@ assert.ok(
   "getProtocolVersionId must recheck the workspace between protocol and version queries",
 );
 console.log("Protocol lookup tenant-snapshot guards passed.");
+
+
+// Tenant-scoped history, location and plant-register reads must retain the initiating organization.
+for (const name of ["loadRecentMeasurements", "loadRecentObservations", "loadBatchPlaceOptions", "loadPlantCultures"]) {
+  const handler = handlerSource(name);
+  assert.match(handler, /const loadRevision = authStateRevision;/, `${name} must capture the initiating auth revision`);
+  assert.match(handler, /const loadOrganizationId = organizationId;/, `${name} must capture the initiating organization`);
+  assert.doesNotMatch(
+    handler,
+    /\.eq\(["']organization_id["'],\s*organizationId\)/,
+    `${name} must query against the captured organization rather than mutable global state`,
+  );
+  assert.match(
+    handler,
+    /isCurrentWorkspaceRevision\(loadRevision, loadOrganizationId\)/,
+    `${name} must stop stale results and errors from updating the current workspace`,
+  );
+}
+assert.ok(
+  (handlerSource("loadRecentMeasurements").match(/isCurrentWorkspaceRevision\(loadRevision, loadOrganizationId\)/g) || []).length >= 2,
+  "measurement history must recheck workspace identity after its main query and event lookup",
+);
+assert.ok(
+  (handlerSource("loadRecentObservations").match(/isCurrentWorkspaceRevision\(loadRevision, loadOrganizationId\)/g) || []).length >= 2,
+  "observation history must recheck workspace identity after its main query and event lookup",
+);
+console.log("Tenant-snapshot history, location and plant-register guards passed.");
