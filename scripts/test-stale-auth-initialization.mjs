@@ -235,3 +235,22 @@ assert.match(
 );
 
 console.log("Stale write-result UI guards passed.");
+
+
+// Batch detail uses several sequential tenant-scoped queries, so it must retain the same tenant snapshot throughout.
+const batchDetailStart = tracker.indexOf("async function loadBatch(");
+const batchDetailEnd = tracker.indexOf("\n/* ============================================================\n   INFORMATIONS BATCH", batchDetailStart);
+assert.ok(batchDetailStart >= 0 && batchDetailEnd > batchDetailStart, "loadBatch must exist");
+const batchDetailHandler = tracker.slice(batchDetailStart, batchDetailEnd);
+assert.match(batchDetailHandler, /const loadRevision = authStateRevision;/, "loadBatch must capture the auth revision");
+assert.match(batchDetailHandler, /const loadOrganizationId = organizationId;/, "loadBatch must capture the organization identity");
+assert.ok(
+  !batchDetailHandler.includes('"organization_id",\n        organizationId'),
+  "loadBatch queries must use the captured organization id, not mutable global state",
+);
+assert.ok(
+  (batchDetailHandler.match(/loadRevision !== authStateRevision/g) || []).length >= 4,
+  "loadBatch must check the auth revision after each sequential query",
+);
+
+console.log("Batch detail tenant-snapshot guards passed.");
