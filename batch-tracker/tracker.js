@@ -931,11 +931,18 @@ async function initializeAuthenticatedTracker(
     // Never reveal data loaded by an initialization superseded by an auth change.
     if (initRevision !== authStateRevision) return;
 
-    showElement(trackerCard);
-
-    showElement(document.getElementById("plantCard"));
-
-    showElement(batchCard);
+    const activeDomain = window.BALabsDomainEngine.normalizeDomain(document.body.dataset.domain);
+    // Keep the three workspaces operationally separate: agronomy uses the plant
+    // registry, while fungal and laboratory cultures use the culture/batch tracker.
+    if (activeDomain === "agronomy") {
+      hideElement(trackerCard);
+      hideElement(batchCard);
+      showElement(document.getElementById("plantCard"));
+    } else {
+      showElement(trackerCard);
+      showElement(batchCard);
+      hideElement(document.getElementById("plantCard"));
+    }
     showElement(measurementCard);
     showElement(document.getElementById("statisticsCard"));
     showElement(document.getElementById("overviewCard"));
@@ -1207,37 +1214,6 @@ async function loadReferenceData() {
    TYPES DE CULTURE
    ============================================================ */
 
-function workspaceCultureTypes(types, domain = document.body.dataset.domain) {
-  if (domain === "laboratory") return types;
-  if (domain === "agronomy") return [];
-  const mycologyCodes = new Set([
-    "agar", "plate", "slant", "broth", "flask", "other_liquid", "grain_spawn",
-    "substrate", "fermentation", "other"
-  ]);
-  return types.filter(item => mycologyCodes.has(item.code));
-}
-
-function workspaceMeasurementVariables(variables, domain = document.body.dataset.domain) {
-  if (domain === "laboratory") return variables;
-  const allowedByDomain = {
-    agronomy: new Set([
-      "co2_concentration", "electrical_conductivity", "illuminance", "ph",
-      "relative_humidity", "root_length", "shoot_length", "substrate_moisture",
-      "temperature", "fresh_mass", "dry_mass", "wet_biomass", "volume"
-    ]),
-    mycology: new Set([
-      "cfu", "cfu_per_ml", "co2_concentration", "colony_count", "dry_biomass",
-      "electrical_conductivity", "fresh_mass", "generation_time", "growth_rate",
-      "incubation_time", "od600", "ph", "relative_humidity", "temperature",
-      "viability", "volume", "wet_biomass"
-    ])
-  };
-  const allowed = allowedByDomain[domain];
-  return allowed ? variables.filter(variable => allowed.has(variable.code)) : [];
-}
-
-
-
 function loadCultureTypes() {
 
   cultureTypeSelect.innerHTML =
@@ -1271,7 +1247,7 @@ function loadCultureTypes() {
         row.reference_type ===
           "culture_types"
     );
-  const visibleTypes = workspaceCultureTypes(types, document.body.dataset.domain);
+  const visibleTypes = window.BALabsDomainEngine.filterCultureTypes(types, document.body.dataset.domain);
 
   for (
     const item of visibleTypes
@@ -1722,6 +1698,13 @@ async function createCulture() {
 
   clearMessage();
 
+  if (document.body.dataset.domain === "agronomy") {
+    showMessage(
+      "Dans Green Tech, enregistrez les plantes depuis le registre des cultures végétales.",
+      "warning"
+    );
+    return;
+  }
 
   const materialId =
     strainSelect.value;
@@ -2135,6 +2118,27 @@ async function createCulture() {
    CULTURES DISPONIBLES POUR LES BATCHS
    ============================================================ */
 
+async function loadOrganizationRowsInPages(tableName, columns, errorLabel, pageSize = 250) {
+  const requestedOrganizationId = organizationId;
+  if (!requestedOrganizationId) return [];
+  const rows = [];
+  for (let offset = 0; ; offset += pageSize) {
+    const { data, error } = await supabaseClient
+      .from(tableName)
+      .select(columns)
+      .eq("organization_id", requestedOrganizationId)
+      .order("created_at", { ascending: false })
+      .order("id", { ascending: false })
+      .range(offset, offset + pageSize - 1);
+    if (error) throw new Error(`${errorLabel} : ${error.message}`);
+    if (requestedOrganizationId !== organizationId) return [];
+    const page = data || [];
+    rows.push(...page);
+    if (page.length < pageSize) break;
+  }
+  return rows;
+}
+
 async function loadCultureOptions() {
 
   if (!organizationId) {
@@ -2143,44 +2147,20 @@ async function loadCultureOptions() {
 
   }
 
+  const requestedDomain = document.body.dataset.domain;
+  const requestedOrganizationId = organizationId;
+  const data = await loadOrganizationRowsInPages(
+    "cultures",
+    "id, code, culture_type, material_id, started_at, metadata",
+    "Chargement des cultures impossible"
+  );
 
-  const {
-    data,
-    error
-  } =
-    await supabaseClient
-      .from("cultures")
-      .select(`
-        id,
-        code,
-        culture_type,
-        material_id,
-        started_at,
-        metadata
-      `)
-      .eq(
-        "organization_id",
-        organizationId
-      )
-      .order(
-        "created_at",
-        {
-          ascending: false
-        }
-      )
-      .limit(100);
+  // A slower response from a workspace we already left must not replace
+  // the current workspace's culture registry.
+  if (requestedOrganizationId !== organizationId ||
+      requestedDomain !== document.body.dataset.domain) return;
 
-
-  if (error) {
-
-    throw new Error(
-      `Chargement des cultures impossible : ${error.message}`
-    );
-
-  }
-
-
-  const activeDomain = document.body.dataset.domain;
+  const activeDomain = requestedDomain;
   cultureOptions = (data || []).filter(culture => {
     if (activeDomain === "agronomy") return false;
     const recordDomain = culture.metadata?.domain;
@@ -2260,53 +2240,26 @@ async function loadLatestBatches() {
 
   }
 
+  const requestedDomain = document.body.dataset.domain;
+  const requestedOrganizationId = organizationId;
+  const requestedCultures = cultureOptions.slice();
+  const data = await loadOrganizationRowsInPages(
+    "batches",
+    "id, batch_code, name, batch_type, status, current_stage, culture_id, environment_id, material_id, planned_at, quantity_planned, quantity_actual, quantity_unit_code, created_at",
+    "Chargement des batchs impossible"
+  );
 
-  const {
-    data,
-    error
-  } =
-    await supabaseClient
-      .from("batches")
-      .select(`
-        id,
-        batch_code,
-        name,
-        batch_type,
-        status,
-        current_stage,
-        culture_id,
-        environment_id,
-        material_id,
-        planned_at,
-        quantity_planned,
-        quantity_actual,
-        quantity_unit_code,
-        created_at
-      `)
-      .eq(
-        "organization_id",
-        organizationId
-      )
-      .order(
-        "created_at",
-        {
-          ascending: false
-        }
-      )
-      .limit(30);
+  // Discard late responses after a workspace or organization change.
+  if (requestedOrganizationId !== organizationId ||
+      requestedDomain !== document.body.dataset.domain) return;
 
-
-  if (error) {
-
-    throw new Error(
-      `Chargement des batchs impossible : ${error.message}`
-    );
-
-  }
-
-
-  latestBatches =
-    data || [];
+  // A batch belongs to the workspace of its source culture. The schema
+  // has no authoritative domain column on batches, so use the already
+  // domain-scoped culture registry rather than guessing from batch_type.
+  const visibleCultureIds = new Set(requestedCultures.map(culture => culture.id));
+  latestBatches = (data || []).filter(batch =>
+    Boolean(batch.culture_id && visibleCultureIds.has(batch.culture_id))
+  );
 
   renderBatchComparisonOptions();
   renderBatchList();
@@ -2353,13 +2306,13 @@ async function compareSelectedBatches() {
   if (!select || !status || !results || !button) return;
   const language = window.BALabsI18n?.language || "fr";
   const ui = ({
-    fr: { selection:"Sélectionnez entre 2 et 4 lots.", stale:"Un ou plusieurs lots ne sont plus dans la liste chargée. Actualisez la page.", loading:"Chargement des étapes et des mesures…", loaded:"Comparaison chargée.", capped:"Comparaison chargée avec une limite de 1 000 mesures récentes par lien culture/environnement ; les comptes peuvent être incomplets.", count:"n_mesures désigne le nombre de mesures, pas le nombre de répétitions biologiques indépendantes.", shared:"Les mesures d'un environnement partagé peuvent apparaître pour plusieurs lots.", repeated:n=>`Attention : ${n} lien(s) d'unité expérimentale sont partagés entre les lots sélectionnés ; ces lots ne constituent pas autant de répétitions indépendantes.`, unitMismatch:n=>`Comparabilité : ${n} variable(s) utilisent plusieurs unités dans les lots sélectionnés ; leurs valeurs restent séparées et ne doivent pas être comparées directement.`, missing:"Les données manquantes ne sont pas interprétées comme zéro.", impossible:"Impossible de comparer les lots.", culture:"Culture", environment:"Environnement", observations:n=>`${n} observation(s)`, noObservations:"Aucune observation", treatment:"traitement", replicate:"répétition", excluded:"exclue" },
-    en: { selection:"Select between 2 and 4 batches.", stale:"One or more batches are no longer in the loaded list. Refresh the page.", loading:"Loading stages and measurements…", loaded:"Comparison loaded.", capped:"Comparison loaded with a limit of 1,000 recent measurements per culture/environment link; counts may be incomplete.", count:"n_measurements is the number of measurements, not the number of independent biological replicates.", shared:"Measurements from a shared environment may appear for multiple batches.", repeated:n=>`Warning: ${n} experimental-unit link(s) are shared by the selected batches; these batches do not represent that many independent replicates.`, unitMismatch:n=>`Comparability: ${n} variable(s) use multiple units across the selected batches; values remain separated and must not be compared directly.`, missing:"Missing data is not treated as zero.", impossible:"Unable to compare batches.", culture:"Culture", environment:"Environment", observations:n=>`${n} observation(s)`, noObservations:"No observations", treatment:"treatment", replicate:"replicate", excluded:"excluded" },
-    pt: { selection:"Selecione entre 2 e 4 lotes.", stale:"Um ou mais lotes já não estão na lista carregada. Atualize a página.", loading:"A carregar etapas e medições…", loaded:"Comparação carregada.", capped:"Comparação carregada com um limite de 1.000 medições recentes por ligação cultura/ambiente; as contagens podem estar incompletas.", count:"n_medições indica o número de medições, não o número de repetições biológicas independentes.", shared:"As medições de um ambiente partilhado podem aparecer em vários lotes.", repeated:n=>`Atenção: ${n} ligação(ões) de unidade experimental são partilhadas pelos lotes selecionados; estes lotes não representam esse número de repetições independentes.`, unitMismatch:n=>`Comparabilidade: ${n} variável(is) usam várias unidades nos lotes selecionados; os valores permanecem separados e não devem ser comparados diretamente.`, missing:"Os dados em falta não são tratados como zero.", impossible:"Não foi possível comparar os lotes.", culture:"Cultura", environment:"Ambiente", observations:n=>`${n} observação(ões)`, noObservations:"Sem observações", treatment:"tratamento", replicate:"repetição", excluded:"excluída" },
-    ar: { selection:"اختر من دفعتين إلى أربع دفعات.", stale:"لم تعد دفعة واحدة أو أكثر موجودة في القائمة المحمّلة. حدّث الصفحة.", loading:"جارٍ تحميل المراحل والقياسات…", loaded:"اكتملت المقارنة.", capped:"اكتملت المقارنة مع حد أقصى قدره ١٬٠٠٠ قياس حديث لكل ارتباط بين المزرعة والبيئة؛ وقد تكون الأعداد غير مكتملة.", count:"n_measurements هو عدد القياسات وليس عدد المكررات البيولوجية المستقلة.", shared:"قد تظهر قياسات البيئة المشتركة في عدة دفعات.", repeated:n=>`تحذير: توجد ${n} روابط لوحدات تجريبية مشتركة بين الدفعات المحددة؛ ولا تمثل هذه الدفعات هذا العدد من المكررات المستقلة.`, unitMismatch:n=>`قابلية المقارنة: تستخدم ${n} متغيرات وحدات متعددة بين الدفعات المحددة؛ ستبقى القيم منفصلة ولا ينبغي مقارنتها مباشرة.`, missing:"لا تُعامل البيانات المفقودة على أنها صفر.", impossible:"تعذرت مقارنة الدفعات.", culture:"المزرعة", environment:"البيئة", observations:n=>`${n} ملاحظة`, noObservations:"لا توجد ملاحظات", treatment:"المعاملة", replicate:"مكرر", excluded:"مستبعدة" }
+    fr: { selection:"Sélectionnez entre 2 et 4 lots.", stale:"Un ou plusieurs lots ne sont plus dans la liste chargée. Actualisez la page.", loading:"Chargement des étapes et des mesures…", loaded:"Comparaison chargée.", capped:"Comparaison chargée. Les mesures sont paginées ; les liens vers un environnement partagé peuvent apparaître pour plusieurs lots.", count:"n_mesures désigne le nombre de mesures, pas le nombre de répétitions biologiques indépendantes.", shared:"Les mesures d'un environnement partagé peuvent apparaître pour plusieurs lots.", repeated:n=>`Attention : ${n} lien(s) d'unité expérimentale sont partagés entre les lots sélectionnés ; ces lots ne constituent pas autant de répétitions indépendantes.`, unitMismatch:n=>`Comparabilité : ${n} variable(s) utilisent plusieurs unités dans les lots sélectionnés ; leurs valeurs restent séparées et ne doivent pas être comparées directement.`, missing:"Les données manquantes ne sont pas interprétées comme zéro.", impossible:"Impossible de comparer les lots.", culture:"Culture", environment:"Environnement", observations:n=>`${n} observation(s)`, noObservations:"Aucune observation", treatment:"traitement", replicate:"répétition", excluded:"exclue" },
+    en: { selection:"Select between 2 and 4 batches.", stale:"One or more batches are no longer in the loaded list. Refresh the page.", loading:"Loading stages and measurements…", loaded:"Comparison loaded.", capped:"Comparison loaded. Measurements are paginated; links to a shared environment may appear for multiple batches.", count:"n_measurements is the number of measurements, not the number of independent biological replicates.", shared:"Measurements from a shared environment may appear for multiple batches.", repeated:n=>`Warning: ${n} experimental-unit link(s) are shared by the selected batches; these batches do not represent that many independent replicates.`, unitMismatch:n=>`Comparability: ${n} variable(s) use multiple units across the selected batches; values remain separated and must not be compared directly.`, missing:"Missing data is not treated as zero.", impossible:"Unable to compare batches.", culture:"Culture", environment:"Environment", observations:n=>`${n} observation(s)`, noObservations:"No observations", treatment:"treatment", replicate:"replicate", excluded:"excluded" },
+    pt: { selection:"Selecione entre 2 e 4 lotes.", stale:"Um ou mais lotes já não estão na lista carregada. Atualize a página.", loading:"A carregar etapas e medições…", loaded:"Comparação carregada.", capped:"Comparação carregada. As medições são paginadas; ligações a um ambiente partilhado podem aparecer em vários lotes.", count:"n_medições indica o número de medições, não o número de repetições biológicas independentes.", shared:"As medições de um ambiente partilhado podem aparecer em vários lotes.", repeated:n=>`Atenção: ${n} ligação(ões) de unidade experimental são partilhadas pelos lotes selecionados; estes lotes não representam esse número de repetições independentes.`, unitMismatch:n=>`Comparabilidade: ${n} variável(is) usam várias unidades nos lotes selecionados; os valores permanecem separados e não devem ser comparados diretamente.`, missing:"Os dados em falta não são tratados como zero.", impossible:"Não foi possível comparar os lotes.", culture:"Cultura", environment:"Ambiente", observations:n=>`${n} observação(ões)`, noObservations:"Sem observações", treatment:"tratamento", replicate:"repetição", excluded:"excluída" },
+    ar: { selection:"اختر من دفعتين إلى أربع دفعات.", stale:"لم تعد دفعة واحدة أو أكثر موجودة في القائمة المحمّلة. حدّث الصفحة.", loading:"جارٍ تحميل المراحل والقياسات…", loaded:"اكتملت المقارنة.", capped:"اكتملت المقارنة. تُحمّل القياسات على صفحات؛ وقد تظهر الارتباطات بالبيئة المشتركة في عدة دفعات.", count:"n_measurements هو عدد القياسات وليس عدد المكررات البيولوجية المستقلة.", shared:"قد تظهر قياسات البيئة المشتركة في عدة دفعات.", repeated:n=>`تحذير: توجد ${n} روابط لوحدات تجريبية مشتركة بين الدفعات المحددة؛ ولا تمثل هذه الدفعات هذا العدد من المكررات المستقلة.`, unitMismatch:n=>`قابلية المقارنة: تستخدم ${n} متغيرات وحدات متعددة بين الدفعات المحددة؛ ستبقى القيم منفصلة ولا ينبغي مقارنتها مباشرة.`, missing:"لا تُعامل البيانات المفقودة على أنها صفر.", impossible:"تعذرت مقارنة الدفعات.", culture:"المزرعة", environment:"البيئة", observations:n=>`${n} ملاحظة`, noObservations:"لا توجد ملاحظات", treatment:"المعاملة", replicate:"مكرر", excluded:"مستبعدة" }
   })[language] || null;
   const labels = ui || ({
-    selection:"Sélectionnez entre 2 et 4 lots.", stale:"Un ou plusieurs lots ne sont plus dans la liste chargée. Actualisez la page.", loading:"Chargement des étapes et des mesures…", loaded:"Comparaison chargée.", capped:"Comparaison chargée avec une limite de 1 000 mesures récentes par lien culture/environnement ; les comptes peuvent être incomplets.", count:"n_mesures désigne le nombre de mesures, pas le nombre de répétitions biologiques indépendantes.", shared:"Les mesures d'un environnement partagé peuvent apparaître pour plusieurs lots.", repeated:n=>`Attention : ${n} lien(s) d'unité expérimentale sont partagés entre les lots sélectionnés ; ces lots ne constituent pas autant de répétitions indépendantes.`, missing:"Les données manquantes ne sont pas interprétées comme zéro.", impossible:"Impossible de comparer les lots.", culture:"Culture", environment:"Environnement", observations:n=>`${n} observation(s)`, noObservations:"Aucune observation", treatment:"traitement", replicate:"répétition", excluded:"exclue"
+    selection:"Sélectionnez entre 2 et 4 lots.", stale:"Un ou plusieurs lots ne sont plus dans la liste chargée. Actualisez la page.", loading:"Chargement des étapes et des mesures…", loaded:"Comparaison chargée.", capped:"Comparaison chargée. Les mesures sont paginées ; les liens vers un environnement partagé peuvent apparaître pour plusieurs lots.", count:"n_mesures désigne le nombre de mesures, pas le nombre de répétitions biologiques indépendantes.", shared:"Les mesures d'un environnement partagé peuvent apparaître pour plusieurs lots.", repeated:n=>`Attention : ${n} lien(s) d'unité expérimentale sont partagés entre les lots sélectionnés ; ces lots ne constituent pas autant de répétitions indépendantes.`, missing:"Les données manquantes ne sont pas interprétées comme zéro.", impossible:"Impossible de comparer les lots.", culture:"Culture", environment:"Environnement", observations:n=>`${n} observation(s)`, noObservations:"Aucune observation", treatment:"traitement", replicate:"répétition", excluded:"exclue"
   });
   const ids = [...select.selectedOptions].map(option => option.value);
   if (ids.length < 2 || ids.length > 4) {
@@ -4789,6 +4742,8 @@ moveBatchButton?.addEventListener("click", moveSelectedBatch);
    ============================================================ */
 
 async function loadMeasurementReferences() {
+  const requestedDomain = document.body.dataset.domain || "mycology";
+  const requestedOrganizationId = organizationId;
   const [variableResult, unitResult] = await Promise.all([
     supabaseClient.from("variables")
       .select("code, label, dimension, canonical_unit_code, description")
@@ -4797,6 +4752,10 @@ async function loadMeasurementReferences() {
       .select("code, label, dimension")
       .order("code")
   ]);
+
+  // Ignore late responses, including errors, after an organization or workspace switch.
+  if (requestedOrganizationId !== organizationId ||
+      requestedDomain !== (document.body.dataset.domain || "mycology")) return;
 
   if (variableResult.error) {
     throw new Error(`Chargement des paramètres de mesure impossible : ${variableResult.error.message}`);
@@ -4808,7 +4767,10 @@ async function loadMeasurementReferences() {
   measurementVariables = variableResult.data || [];
   measurementUnits = unitResult.data || [];
 
-  const visibleVariables = workspaceMeasurementVariables(measurementVariables);
+  const visibleVariables = window.BALabsDomainEngine.filterMeasurementVariables(
+    measurementVariables,
+    document.body.dataset.domain
+  );
   measurementVariableSelect.innerHTML = "";
   const placeholder = document.createElement("option");
   placeholder.value = "";
@@ -4969,6 +4931,13 @@ async function saveMeasurement() {
     showMessage(cultureWorkflowText("target"), "error");
     return;
   }
+  if (!window.BALabsDomainEngine.filterMeasurementVariables(
+    [variable],
+    window.BALabsDomainEngine.normalizeDomain(document.body.dataset.domain)
+  ).length) {
+    showMessage("Cette variable de mesure n’est pas autorisée dans l’espace de travail actif.", "error");
+    return;
+  }
   if (variable.dimension !== unit.dimension) {
     showMessage(cultureWorkflowText("incompatible"), "error");
     return;
@@ -5087,50 +5056,99 @@ async function saveMeasurement() {
   }
 }
 
-function belongsToActiveWorkspace(record, eventsById = {}) {
-  const domain = document.body.dataset.domain || "mycology";
+async function loadRecentWorkspaceHistory(tableName, timestampColumn, columns, displayLimit) {
+  const pageSize = 250;
+  const visibleRows = [];
+  const eventsById = {};
+  const requestedDomain = document.body.dataset.domain || "mycology";
+  const requestedOrganizationId = organizationId;
+  const requestedCultures = cultureOptions.slice();
+  const requestedPlants = plantCultureOptions.slice();
+  const requestedBatches = latestBatches.slice();
+  let offset = 0;
+
+  // Paginate the organization-wide stream before applying workspace ownership.
+  // A single global LIMIT can hide this workspace's recent records when other
+  // workspaces generate more activity.
+  while (visibleRows.length < displayLimit) {
+    const { data, error } = await supabaseClient
+      .from(tableName)
+      .select(columns)
+      .eq("organization_id", requestedOrganizationId)
+      .order(timestampColumn, { ascending: false })
+      .order("id", { ascending: false })
+      .range(offset, offset + pageSize - 1);
+    if (error) throw new Error("Chargement de l’historique impossible : " + error.message);
+    if (requestedOrganizationId !== organizationId ||
+        requestedDomain !== (document.body.dataset.domain || "mycology")) {
+      return { rows: [], eventsById, stale: true };
+    }
+
+    const page = data || [];
+    if (!page.length) break;
+    const eventIds = [...new Set(page.map(row => row.event_id).filter(Boolean))];
+    if (eventIds.length) {
+      const { data: events, error: eventsError } = await supabaseClient
+        .from("events")
+        .select("id, batch_id, culture_id, plant_culture_id")
+        .eq("organization_id", requestedOrganizationId)
+        .in("id", eventIds);
+      if (eventsError) throw new Error("Chargement des liens d’événements impossible : " + eventsError.message);
+      if (requestedOrganizationId !== organizationId ||
+          requestedDomain !== (document.body.dataset.domain || "mycology")) {
+        return { rows: [], eventsById, stale: true };
+      }
+      for (const event of events || []) eventsById[event.id] = event;
+    }
+
+    for (const row of page) {
+      if (belongsToActiveWorkspace(row, eventsById, requestedDomain, {
+        cultures: requestedCultures,
+        plants: requestedPlants,
+        batches: requestedBatches
+      })) visibleRows.push(row);
+      if (visibleRows.length >= displayLimit) break;
+    }
+    if (page.length < pageSize) break;
+    offset += pageSize;
+  }
+
+  return {
+    rows: visibleRows.slice(0, displayLimit),
+    eventsById,
+    stale: requestedOrganizationId !== organizationId ||
+      requestedDomain !== (document.body.dataset.domain || "mycology")
+  };
+}
+
+function belongsToActiveWorkspace(record, eventsById = {}, domain = document.body.dataset.domain || "mycology", registries = {}) {
   const event = record.event_id ? eventsById[record.event_id] : null;
   const cultureId = record.culture_id || event?.culture_id;
   const plantId = record.plant_culture_id || event?.plant_culture_id;
   const batchId = event?.batch_id;
   if (domain === "agronomy") {
-    return Boolean(plantId && plantCultureOptions.some(plant => plant.id === plantId));
+    return Boolean(plantId && (registries.plants || plantCultureOptions).some(plant => plant.id === plantId));
   }
   if (domain === "mycology") {
-    return Boolean(cultureId && cultureOptions.some(culture => culture.id === cultureId));
+    return Boolean(cultureId && (registries.cultures || cultureOptions).some(culture => culture.id === cultureId));
   }
   return Boolean(
-    (cultureId && cultureOptions.some(culture => culture.id === cultureId)) ||
-    (batchId && latestBatches.some(batch => batch.id === batchId))
+    (cultureId && (registries.cultures || cultureOptions).some(culture => culture.id === cultureId)) ||
+    (batchId && (registries.batches || latestBatches).some(batch => batch.id === batchId))
   );
 }
 
 async function loadRecentMeasurements() {
   if (!organizationId || !measurementHistory) return;
 
-  const { data, error } = await supabaseClient
-    .from("measurements")
-    .select("id, variable_code, raw_value, raw_unit_code, normalized_value, normalized_unit_code, measured_at, method, instrument, culture_id, plant_culture_id, event_id, metadata")
-    .eq("organization_id", organizationId)
-    .order("measured_at", { ascending: false })
-    .limit(1000);
-
-  if (error) throw new Error(`Chargement de l’historique des mesures impossible : ${error.message}`);
-
-  const rows = data || [];
-  const eventIds = [...new Set(rows.map(row => row.event_id).filter(Boolean))];
-  let eventsById = {};
-  if (eventIds.length) {
-    const { data: events, error: eventsError } = await supabaseClient
-      .from("events")
-      .select("id, batch_id, culture_id, plant_culture_id")
-      .eq("organization_id", organizationId)
-      .in("id", eventIds);
-    if (eventsError) console.warn("Détails des événements de mesure indisponibles :", eventsError.message);
-    for (const event of events || []) eventsById[event.id] = event;
-  }
-
-  const visibleRows = rows.filter(row => belongsToActiveWorkspace(row, eventsById)).slice(0, 10);
+  const requestedDomain = document.body.dataset.domain || "mycology";
+  const { rows: visibleRows, eventsById, stale } = await loadRecentWorkspaceHistory(
+    "measurements",
+    "measured_at",
+    "id, variable_code, raw_value, raw_unit_code, normalized_value, normalized_unit_code, measured_at, method, instrument, culture_id, plant_culture_id, event_id, metadata",
+    10
+  );
+  if (stale || requestedDomain !== (document.body.dataset.domain || "mycology")) return;
   if (!visibleRows.length) {
     measurementHistory.innerHTML = '<p class="muted">Aucune mesure enregistrée dans cet univers pour le moment.</p>';
     return;
@@ -5181,6 +5199,13 @@ async function saveObservation() {
 
   if (!targetValue || !variable || !valueText) {
     showMessage(cultureWorkflowText("observationTarget"), "error");
+    return;
+  }
+  if (!window.BALabsDomainEngine.filterMeasurementVariables(
+    [variable],
+    window.BALabsDomainEngine.normalizeDomain(document.body.dataset.domain)
+  ).length) {
+    showMessage("Cette catégorie d’observation n’est pas autorisée dans l’espace de travail actif.", "error");
     return;
   }
 
@@ -5294,27 +5319,14 @@ async function saveObservation() {
 async function loadRecentObservations() {
   if (!organizationId || !observationHistory) return;
 
-  const query = await supabaseClient.from("observations")
-    .select("id, variable_code, value_text, observed_at, culture_id, plant_culture_id, event_id, metadata")
-    .eq("organization_id", organizationId)
-    .order("observed_at", { ascending: false })
-    .limit(1000);
-
-  if (query.error) throw new Error("Chargement de l’historique des observations impossible : " + query.error.message);
-  const observationRows = query.data || [];
-  const eventIds = [...new Set(observationRows.map(row => row.event_id).filter(Boolean))];
-  const eventsById = {};
-
-  if (eventIds.length) {
-    const eventsResult = await supabaseClient.from("events")
-      .select("id, batch_id, culture_id, plant_culture_id")
-      .eq("organization_id", organizationId)
-      .in("id", eventIds);
-    if (eventsResult.error) console.warn("Détails des événements d’observation indisponibles :", eventsResult.error.message);
-    for (const event of eventsResult.data || []) eventsById[event.id] = event;
-  }
-
-  recentObservations = observationRows.filter(row => belongsToActiveWorkspace(row, eventsById)).slice(0, 8);
+  const requestedDomain = document.body.dataset.domain || "mycology";
+  const { rows: recentObservations, eventsById, stale } = await loadRecentWorkspaceHistory(
+    "observations",
+    "observed_at",
+    "id, variable_code, value_text, observed_at, culture_id, plant_culture_id, event_id, metadata",
+    8
+  );
+  if (stale || requestedDomain !== (document.body.dataset.domain || "mycology")) return;
   updateOverview();
   if (!recentObservations.length) {
     observationHistory.innerHTML = '<p class="muted">Aucune observation enregistrée dans cet univers pour le moment.</p>';
@@ -5324,15 +5336,15 @@ async function loadRecentObservations() {
   observationHistory.innerHTML = recentObservations.map(row => {
     const variable = measurementVariables.find(item => item.code === row.variable_code);
     const culture = cultureOptions.find(item => item.id === row.culture_id);
-    const batchId = row.event_id ? (eventsById[row.event_id] || {}).batch_id : null;
-    const batch = batchId ? latestBatches.find(item => item.id === batchId) : null;
     const plant = plantCultureOptions.find(item => item.id === row.plant_culture_id);
-    const target = plant ? "AgriTech · " + escapeHtml(plant.code) + " · " + escapeHtml(plant.cultivar_name || plant.crop_type) :
-      batch ? "Lot · " + escapeHtml(batch.batch_code) :
-      culture ? "Culture · " + escapeHtml(culture.code) : "Cible liée par identifiant";
+    const event = row.event_id ? eventsById[row.event_id] : null;
+    const batch = event?.batch_id ? latestBatches.find(item => item.id === event.batch_id) : null;
     const stamp = row.observed_at ? new Date(row.observed_at).toLocaleString() : "Date inconnue";
     const note = row.metadata && row.metadata.note
       ? '<div class="measurement-meta">' + escapeHtml(row.metadata.note) + '</div>' : "";
+    const target = plant ? "AgriTech · " + escapeHtml(plant.code) + " · " + escapeHtml(plant.cultivar_name || plant.crop_type) :
+      batch ? "Lot · " + escapeHtml(batch.batch_code) :
+      culture ? "Culture · " + escapeHtml(culture.code) : "Cible liée par identifiant";
     return '<article class="measurement-entry"><div><strong>' +
       escapeHtml(variable ? variable.label : row.variable_code) +
       '</strong><div class="measurement-meta">' + target + '</div>' + note +
@@ -5349,7 +5361,7 @@ function renderStatisticsFilters() {
   const batchSelect = document.getElementById("statisticsBatch");
   if (!variableSelect || !cultureSelect || !batchSelect) return;
   const domain = document.body.dataset.domain || "mycology";
-  const visibleVariables = workspaceMeasurementVariables(measurementVariables, domain);
+  const visibleVariables = window.BALabsDomainEngine.filterMeasurementVariables(measurementVariables, domain);
   const visibleTargets = domain === "agronomy" ? plantCultureOptions : cultureOptions;
   const previousVariable = variableSelect.value;
   const previousCulture = cultureSelect.value;
@@ -6476,20 +6488,27 @@ function renderPlantCultureList(rows) {
 
 async function loadPlantCultures() {
   if (!organizationId) return;
+  const requestedOrganizationId = organizationId;
+  const requestedDomain = document.body.dataset.domain;
   const status = document.getElementById("plantCultureStatus");
   try {
-    const { data, error } = await supabaseClient.from("plant_cultures")
-      .select("id,code,crop_type,species_name,cultivar_name,quantity,unit_code,location_id,environment_id,substrate,started_at,status,notes")
-      .eq("organization_id", organizationId)
-      .order("created_at", { ascending: false })
-      .limit(300);
-    if (error) throw error;
+    const data = await loadOrganizationRowsInPages(
+      "plant_cultures",
+      "id,code,crop_type,species_name,cultivar_name,quantity,unit_code,location_id,environment_id,substrate,started_at,status,notes",
+      "Chargement du registre végétal impossible"
+    );
+    if (requestedOrganizationId !== organizationId ||
+        requestedDomain !== document.body.dataset.domain ||
+        requestedDomain !== "agronomy") return;
     renderPlantCultureList(data || []);
     plantCultureOptions = data || [];
     renderMeasurementTargets();
     renderStatisticsFilters();
     if (status) status.textContent = "Registre végétal chargé depuis Supabase.";
   } catch (error) {
+    if (requestedOrganizationId !== organizationId ||
+        requestedDomain !== document.body.dataset.domain ||
+        requestedDomain !== "agronomy") return;
     console.error("Chargement du registre végétal impossible :", error);
     initializationWarnings.push("registre végétal");
     if (status) status.textContent = "Registre végétal indisponible : " + (error.message || "erreur inconnue");
@@ -6504,6 +6523,8 @@ async function savePlantCulture(event) {
     showMessage("Organisation absente : reconnectez-vous avant d’enregistrer une culture végétale.", "error");
     return;
   }
+  const requestedOrganizationId = organizationId;
+  const requestedDomain = document.body.dataset.domain;
   const form = document.getElementById("plantCultureForm");
   const button = document.getElementById("savePlantCultureButton");
   const status = document.getElementById("plantCultureStatus");
@@ -6523,7 +6544,7 @@ async function savePlantCulture(event) {
   try {
     const startedValue = document.getElementById("plantStartedAt").value;
     const { error } = await supabaseClient.from("plant_cultures").insert({
-      organization_id: organizationId,
+      organization_id: requestedOrganizationId,
       code,
       crop_type: cropType,
       species_name: crop.species,
@@ -6539,6 +6560,11 @@ async function savePlantCulture(event) {
       metadata: { source: "BA Labs CultureOps", domain: "agronomy", interface_version: "1.0" }
     });
     if (error) throw error;
+    // A successful write belongs to the organization captured at submit time.
+    // Do not reset or announce success inside a different workspace/session.
+    if (requestedOrganizationId !== organizationId ||
+        requestedDomain !== document.body.dataset.domain ||
+        requestedDomain !== "agronomy") return;
     form.reset();
     document.getElementById("plantQuantity").value = "1";
     document.getElementById("plantStatus").value = "active";
@@ -6556,6 +6582,9 @@ async function savePlantCulture(event) {
     showMessage("Culture végétale enregistrée.", "success");
     if (status) status.textContent = "Culture enregistrée dans le registre AgriTech.";
   } catch (error) {
+    if (requestedOrganizationId !== organizationId ||
+        requestedDomain !== document.body.dataset.domain ||
+        requestedDomain !== "agronomy") return;
     console.error("Enregistrement de la culture végétale impossible :", error);
     showMessage("Enregistrement impossible : " + (error.message || "erreur inconnue"), "error");
     if (status) status.textContent = "Échec de l’enregistrement. Vérifiez le code unique et les références.";
@@ -6603,8 +6632,10 @@ function setupDomainWorkspaces() {
   const toolbarStatus = document.querySelector(".toolbar-status span:last-child");
   const heading = document.getElementById("domainHeading");
   const description = document.getElementById("domainDescription");
+  let workspaceSwitchRevision = 0;
   const setDomain = (domain, persist = true) => {
     const activeDomain = Object.hasOwn(modes, domain) ? domain : "agronomy";
+    const switchRevision = ++workspaceSwitchRevision;
     const config = modes[activeDomain];
     document.body.dataset.domain = activeDomain;
     buttons.forEach(button => button.setAttribute("aria-pressed", String(button.dataset.domainChoice === activeDomain)));
@@ -6613,9 +6644,26 @@ function setupDomainWorkspaces() {
     const cultureEntryTitle = document.getElementById("cultureEntryTitle");
     const strainLabel = document.getElementById("strainLabel");
     const cultureTypeLabel = document.getElementById("cultureTypeLabel");
-    if (cultureEntryTitle) cultureEntryTitle.textContent = activeDomain === "laboratory" ? "Nouvelle culture de laboratoire" : "Nouvelle culture fongique";
-    if (strainLabel?.firstChild) strainLabel.firstChild.textContent = activeDomain === "laboratory" ? "Souche / ressource biologique source" : "Souche fongique source";
-    if (cultureTypeLabel?.firstChild) cultureTypeLabel.firstChild.textContent = activeDomain === "laboratory" ? "Format de culture au laboratoire" : "Support / forme de culture";
+    const entryLabels = {
+      agronomy: {
+        cultureTitle: "Nouvelle culture agronomique",
+        strain: "Culture / ressource végétale source",
+        cultureType: "Type de culture agronomique"
+      },
+      mycology: {
+        cultureTitle: "Nouvelle culture fongique",
+        strain: "Souche fongique source",
+        cultureType: "Support / forme de culture"
+      },
+      laboratory: {
+        cultureTitle: "Nouvelle culture de laboratoire",
+        strain: "Souche / ressource biologique source",
+        cultureType: "Format de culture au laboratoire"
+      }
+    }[activeDomain];
+    if (cultureEntryTitle) cultureEntryTitle.textContent = entryLabels.cultureTitle;
+    if (strainLabel?.firstChild) strainLabel.firstChild.textContent = entryLabels.strain;
+    if (cultureTypeLabel?.firstChild) cultureTypeLabel.firstChild.textContent = entryLabels.cultureType;
     if (eyebrow) eyebrow.innerHTML = config.eyebrow.replace(" / ", ' <span class="eyebrow-separator">/</span> ');
     if (title) title.innerHTML = config.title;
     if (heroDescription) heroDescription.textContent = config.descriptionHero;
@@ -6631,6 +6679,69 @@ function setupDomainWorkspaces() {
     document.documentElement.dataset.domain = activeDomain;
     if (persist) {
       try { localStorage.setItem("baLabsCultureTrackerDomain", activeDomain); } catch (_) {}
+    }
+
+    // Switching workspace after login must update the actual modules and data
+    // selectors, not only the hero labels. Keep protected modules hidden while
+    // signed out; refresh domain-specific targets and histories for active users.
+    if (persist && organizationId) {
+      const plantCard = document.getElementById("plantCard");
+      if (activeDomain === "agronomy") {
+        hideElement(trackerCard);
+        hideElement(batchCard);
+        showElement(plantCard);
+      } else {
+        showElement(trackerCard);
+        showElement(batchCard);
+        hideElement(plantCard);
+      }
+      showElement(measurementCard);
+      showElement(document.getElementById("statisticsCard"));
+      showElement(document.getElementById("overviewCard"));
+
+      void (async () => {
+        try {
+          if (switchRevision !== workspaceSwitchRevision ||
+              activeDomain !== document.body.dataset.domain) return;
+          if (activeDomain === "agronomy") {
+            // Do not leave the previous biological workspace's targets selectable.
+            cultureOptions = [];
+            latestBatches = [];
+            renderMeasurementTargets();
+            renderStatisticsFilters();
+            await loadPlantCultures();
+            if (switchRevision !== workspaceSwitchRevision ||
+                activeDomain !== document.body.dataset.domain) return;
+          } else {
+            // cultures are scoped by metadata.domain in loadCultureOptions();
+            // reload them on every switch so mycology and lab don't reuse each
+            // other's cached target list.
+            await loadCultureOptions();
+            if (switchRevision !== workspaceSwitchRevision ||
+                activeDomain !== document.body.dataset.domain) return;
+            await loadLatestBatches();
+            if (switchRevision !== workspaceSwitchRevision ||
+                activeDomain !== document.body.dataset.domain) return;
+          }
+          renderMeasurementTargets();
+          renderStatisticsFilters();
+          await loadMeasurementReferences();
+          if (switchRevision !== workspaceSwitchRevision ||
+              activeDomain !== document.body.dataset.domain) return;
+          await Promise.all([
+            loadRecentMeasurements(),
+            loadRecentObservations()
+          ]);
+          if (switchRevision !== workspaceSwitchRevision ||
+              activeDomain !== document.body.dataset.domain) return;
+          updateOverview();
+        } catch (error) {
+          if (switchRevision !== workspaceSwitchRevision ||
+              activeDomain !== document.body.dataset.domain) return;
+          console.error("Actualisation de l’espace de travail impossible :", error);
+          showMessage("L’espace a changé, mais certaines données n’ont pas pu être actualisées. Utilisez Actualiser ou rechargez la page.", "warning");
+        }
+      })();
     }
   };
   buttons.forEach(button => button.addEventListener("click", () => setDomain(button.dataset.domainChoice)));

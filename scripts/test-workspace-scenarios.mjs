@@ -34,12 +34,15 @@ function extractFunction(source, name) {
   throw new Error("Could not extract " + name + "()");
 }
 
+const domainEngineSource = fs.readFileSync("batch-tracker/domain-engine.js", "utf8");
+
 function callHelper(name, args, domain) {
-  const source = extractFunction(engine, name);
-  return vm.runInNewContext(
-    `${source}; ${name}(...injected.args, injected.domain)`,
-    { injected: { args, domain }, document: { body: { dataset: { domain } } } }
-  );
+  const window = {};
+  vm.runInNewContext(domainEngineSource, { window });
+  const exportedName = name === "workspaceCultureTypes"
+    ? "filterCultureTypes"
+    : "filterMeasurementVariables";
+  return window.BALabsDomainEngine[exportedName](...args, domain);
 }
 
 function fakeElement(tag) {

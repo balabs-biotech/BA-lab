@@ -492,7 +492,16 @@
     ["Sentinel-2 : scènes disponibles et couverture nuageuse.","Sentinel-2: available scenes and cloud cover.","Sentinel-2: cenas disponíveis e cobertura de nuvens.","Sentinel-2: المشاهد المتاحة والغطاء السحابي."],
     ["Aucune scène Sentinel-2 ne couvre ce point à cette date. Essayez une date d’acquisition voisine.","No Sentinel-2 scene covers this point on that date. Try a nearby acquisition date.","Nenhuma cena Sentinel-2 cobre este ponto nessa data. Experimente uma data de aquisição próxima.","لا يغطي أي مشهد Sentinel-2 هذه النقطة في ذلك التاريخ. جرّب تاريخ اقتناء قريبًا."],
     ["L’indice UV est une mesure atmosphérique météo, pas une bande d’imagerie Sentinel-2.","The UV index is an atmospheric weather measure, not a Sentinel-2 imaging band.","O índice UV é uma medida meteorológica atmosférica, não uma banda de imagem Sentinel-2.","مؤشر UV قياس جوي للطقس وليس نطاق تصوير Sentinel-2."],
-    ["La météo affichée est historique : aucune prévision ni commande automatique d’irrigation.","Displayed weather is historical: no forecast or automatic irrigation control.","A meteorologia apresentada é histórica: sem previsão nem controlo automático da rega.","الطقس المعروض تاريخي: لا توجد توقعات أو تحكم آلي في الري."]
+    ["La météo affichée est historique : aucune prévision ni commande automatique d’irrigation.","Displayed weather is historical: no forecast or automatic irrigation control.","A meteorologia apresentada é histórica: sem previsão nem controlo automático da rega.","الطقس المعروض تاريخي: لا توجد توقعات أو تحكم آلي في الري."],
+    ["Nouvelle culture agronomique","New agronomic culture","Nova cultura agronómica","محصول نباتي جديد"],
+    ["Culture / ressource végétale source","Source plant culture / resource","Cultura / recurso vegetal de origem","المحصول / المورد النباتي المصدر"],
+    ["Type de culture agronomique","Agronomic culture type","Tipo de cultura agronómica","نوع المحصول الزراعي"],
+    ["Nouvelle culture fongique","New fungal culture","Nova cultura fúngica","مزرعة فطرية جديدة"],
+    ["Souche fongique source","Source fungal strain","Estirpe fúngica de origem","السلالة الفطرية المصدر"],
+    ["Support / forme de culture","Culture medium / format","Meio / formato de cultura","وسط الزراعة / شكلها"],
+    ["Nouvelle culture de laboratoire","New laboratory culture","Nova cultura laboratorial","مزرعة مختبرية جديدة"],
+    ["Souche / ressource biologique source","Source strain / biological resource","Estirpe / recurso biológico de origem","السلالة / المورد البيولوجي المصدر"],
+    ["Format de culture au laboratoire","Laboratory culture format","Formato de cultura laboratorial","صيغة الزراعة المختبرية"]
   ];
   for (const [fr, en, pt, ar] of supplementalCoverage) {
     dictionaries.en[fr] ||= en;
