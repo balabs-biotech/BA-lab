@@ -307,7 +307,7 @@ console.log("Protocol lookup tenant-snapshot guards passed.");
 
 
 // Tenant-scoped history, location and plant-register reads must retain the initiating organization.
-for (const name of ["loadRecentMeasurements", "loadRecentObservations", "loadBatchPlaceOptions", "loadPlantCultures"]) {
+for (const name of ["loadRecentMeasurements", "loadRecentObservations", "loadBatchPlaceOptions", "loadPlantCultures", "loadStrainOptions", "loadCultureOptions", "loadLatestBatches"]) {
   const handler = handlerSource(name);
   assert.match(handler, /const loadRevision = authStateRevision;/, `${name} must capture the initiating auth revision`);
   assert.match(handler, /const loadOrganizationId = organizationId;/, `${name} must capture the initiating organization`);
