@@ -42,6 +42,8 @@ assert.match(trackerSource, /async function loadPlantCultures\(\)[\s\S]*?loadOrg
   "plant registry must paginate instead of silently truncating at 300 records");
 assert.match(trackerSource, /async function loadOrganizationRowsInPages\([\s\S]*?const requestedOrganizationId = organizationId;[\s\S]*?\.eq\("organization_id", requestedOrganizationId\)[\s\S]*?if \(requestedOrganizationId !== organizationId\) return \[\];/,
   "paginated registry reads must stay bound to the organization captured at request start");
+assert.match(trackerSource, /await loadCultureOptions\(\);\s*if \(switchRevision !== workspaceSwitchRevision \|\|[\s\S]*?await loadLatestBatches\(\);\s*if \(switchRevision !== workspaceSwitchRevision \|\|[\s\S]*?await loadMeasurementReferences\(\);\s*if \(switchRevision !== workspaceSwitchRevision \|\|/,
+  "workspace refresh must revalidate its revision after each asynchronous loader before starting the next stage");
 assert.match(trackerSource, /async function loadRecentWorkspaceHistory\([\s\S]*?\.range\(offset, offset \+ pageSize - 1\)[\s\S]*?belongsToActiveWorkspace\(row, eventsById, requestedDomain[\s\S]*?visibleRows\.length >= displayLimit/,
   "measurement and observation histories must paginate before workspace filtering using the captured workspace");
 assert.match(trackerSource, /loadRecentWorkspaceHistory\(\s*"measurements"[\s\S]*?10\s*\)/,
