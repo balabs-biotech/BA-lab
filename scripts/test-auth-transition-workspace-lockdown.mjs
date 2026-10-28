@@ -18,7 +18,7 @@ for (let i = tracker.indexOf("{", helperStart); i < tracker.length; i += 1) {
 assert.ok(helperEnd > helperStart, "workspace cleanup helper must be complete");
 
 const listenerStart = tracker.indexOf("supabaseClient.auth.onAuthStateChange(");
-const startupMarker = tracker.indexOf("/* ============================================================\\n   DEMARRAGE", listenerStart);
+const startupMarker = tracker.indexOf("/* ============================================================\n   DEMARRAGE", listenerStart);
 assert.ok(listenerStart >= 0 && startupMarker > listenerStart, "auth listener must exist");
 const helperSource = tracker.slice(helperStart, helperEnd);
 const listenerSource = tracker.slice(listenerStart, startupMarker);
