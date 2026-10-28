@@ -312,7 +312,7 @@ function goHome(){miniView.hidden=true;mainView.hidden=false;mainView.classList.
 document.querySelectorAll('[data-lang]').forEach(b=>b.addEventListener('click',()=>setLanguage(b.dataset.lang)));document.querySelectorAll('[data-sphere]').forEach(b=>{b.addEventListener('click',()=>enterSphere(b.dataset.sphere));b.addEventListener('mouseenter',()=>applyFocus(b.dataset.sphere,true));b.addEventListener('mouseleave',()=>applyFocus(selected,false));b.addEventListener('focus',()=>applyFocus(b.dataset.sphere,true));b.addEventListener('blur',()=>applyFocus(selected,false));});homeBtn.addEventListener('click',goHome);openUniverse.addEventListener('click',toggleUniverse);mainView.addEventListener('pointerdown',beginOrbit);mainView.addEventListener('pointermove',moveOrbit);mainView.addEventListener('pointerup',endOrbit);mainView.addEventListener('pointercancel',endOrbit);window.addEventListener('resize',()=>{applyOrbit();drawMiniConnections()});
 setLanguage('fr');applyOrbit();
 </script>
-<script type="module" src="./constellation-3d.js?v=network-loop-links-20261028t"></script>
+<script type="module" src="./constellation-3d.js?v=network-loop-links-20261028u"></script>
 
 <style id="balabs-visual-refinement">
 /* BALabs visual refinement — editorial mineral / botanical system */
@@ -350,6 +350,12 @@ h1 span{color:#748b5e}
 .scenehead{background:linear-gradient(110deg,#2b4031f5,#26382bf5);border-bottom-color:#50674c;padding:17px 20px}
 .scenehead small{color:#b0c19f}
 .scenehead strong{font-size:13px;letter-spacing:.015em}
+#mainView.webgl-ready .webgl-focus{background:linear-gradient(145deg,#263d2fe8,#1c3026e8)!important;border:1px solid #a9c5a366!important;border-radius:14px!important;box-shadow:0 14px 32px #101a1233,inset 0 1px 0 #e0efd51a!important;backdrop-filter:blur(12px)!important;-webkit-backdrop-filter:blur(12px)!important;padding:12px!important}
+#mainView.webgl-ready .webgl-focus small{color:#c1d0bd}
+#mainView.webgl-ready .webgl-focus-meta{background:#a9c5a315;border-color:#a9c5a355;color:#d7e5d1}
+#mainView.webgl-ready .webgl-focus-links{gap:6px}
+#mainView.webgl-ready .webgl-focus-link{background:#3b5543d9;border-color:#77947a;color:#f0f5eb}
+@media(max-width:760px){#mainView.webgl-ready .webgl-focus{padding:10px!important;border-radius:12px!important}}
 .btn{border-color:#53674f;background:#29372e;color:#f4f2e8;border-radius:999px;padding:10px 15px;transition:transform .2s,background .2s,box-shadow .2s}
 .btn:hover{border-color:#b7c7a5;transform:translateY(-1px);box-shadow:0 5px 16px #0002}
 .btn.primary{background:#d6dfc8;color:#27352a;border-color:#d6dfc8}
