@@ -33,4 +33,30 @@ assert.match(init, /if \(initRevision !== authStateRevision\) return;\s*showElem
 assert.match(tracker, /function isCurrentWorkspaceRevision\(revision, expectedOrganizationId\)/,
   "tenant-aware revision helper must be available for guarded loaders");
 
+function getFunctionBlock(name) {
+  const start = tracker.indexOf(`async function ${name}(`);
+  assert.ok(start >= 0, `Missing async loader: ${name}`);
+  const next = tracker.slice(start + 1).search(/\n(?:async )?function /);
+  return tracker.slice(start, next >= 0 ? start + 1 + next : tracker.length);
+}
+
+for (const loader of [
+  "loadStrainOptions", "loadCultureOptions", "loadBatchPlaceOptions",
+  "loadPlantCultures", "syncPendingCultures", "loadLatestBatches",
+  "loadRecentMeasurements", "loadRecentObservations"
+]) {
+  const source = getFunctionBlock(loader);
+  assert.match(source, /const loadRevision = authStateRevision;/,
+    `${loader} must capture the auth revision before starting its request`);
+  assert.match(source, /isCurrentWorkspaceRevision\(loadRevision, loadOrganizationId\)/,
+    `${loader} must discard results from a superseded tenant`);
+}
+for (const loader of ["loadReferenceData", "loadQuantityUnitOptions", "loadMeasurementReferences"]) {
+  const source = getFunctionBlock(loader);
+  assert.match(source, /const loadRevision = authStateRevision;/,
+    `${loader} must capture the auth revision before starting its request`);
+  assert.match(source, /loadRevision !== authStateRevision/,
+    `${loader} must discard results from a superseded auth session`);
+}
+
 console.log("Auth initialization tenant-revision guards passed.");
