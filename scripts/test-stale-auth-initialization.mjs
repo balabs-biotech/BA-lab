@@ -26,7 +26,7 @@ const awaitedSteps = [
 ];
 for (const step of awaitedSteps) {
   const escaped = step.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  const pattern = new RegExp(`await ${escaped};\s*if \(initRevision !== authStateRevision\) return;`);
+  const pattern = new RegExp(String.raw`await ${escaped};\s*if \(initRevision !== authStateRevision\) return;`);
   assert.match(initializer, pattern, `stale initialization must stop after ${step}`);
 }
 
