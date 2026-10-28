@@ -782,6 +782,7 @@ function clearAuthenticatedWorkspaceState() {
   // by event handlers or a later partial initialization.
   cultureDetailRequestId += 1;
   biologicalLineageRequestId += 1;
+  plantCultureListRequestId += 1;
   const cultureDetailPanel = document.getElementById("cultureDetailPanel");
   if (cultureDetailPanel) {
     cultureDetailPanel.classList.add("hidden");
@@ -5939,6 +5940,7 @@ async function saveBiologicalOperation(event) {
 
 let cultureDetailRequestId = 0;
 let biologicalLineageRequestId = 0;
+let plantCultureListRequestId = 0;
 
 async function loadCultureDetail(cultureId) {
   const requestId = ++cultureDetailRequestId;
@@ -6657,6 +6659,7 @@ function renderPlantCultureList(rows) {
 }
 
 async function loadPlantCultures() {
+  const requestId = ++plantCultureListRequestId;
   const loadRevision = authStateRevision;
   const loadOrganizationId = organizationId;
   if (!loadOrganizationId) return;
@@ -6667,7 +6670,7 @@ async function loadPlantCultures() {
       .eq("organization_id", loadOrganizationId)
       .order("created_at", { ascending: false })
       .limit(300);
-    if (!isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
+    if (requestId !== plantCultureListRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
     if (error) throw error;
     renderPlantCultureList(data || []);
     plantCultureOptions = data || [];
