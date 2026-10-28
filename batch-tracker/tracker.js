@@ -4261,9 +4261,14 @@ async function getCultureProtocolVersionId(
 
 async function advanceBatch() {
 
+  const operationRevision = authStateRevision;
+  const operationOrganizationId = organizationId;
+  const operationBatchId = selectedBatchId;
+  const operationBatch = selectedBatch;
   if (
-    !selectedBatchId ||
-    !selectedBatch
+    !operationOrganizationId ||
+    !operationBatchId ||
+    !operationBatch
   ) {
 
     showMessage(
@@ -4277,7 +4282,7 @@ async function advanceBatch() {
 
 
   const expectedStage =
-    selectedBatch.current_stage;
+    operationBatch.current_stage;
 
 
   if (
@@ -4314,7 +4319,7 @@ async function advanceBatch() {
         {
 
           p_batch_id:
-            selectedBatchId,
+            operationBatchId,
 
           p_expected_stage:
             expectedStage
@@ -4322,7 +4327,7 @@ async function advanceBatch() {
         }
       );
 
-
+    if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId) || selectedBatchId !== operationBatchId) return;
     if (error) {
 
       throw new Error(
@@ -4352,13 +4357,14 @@ async function advanceBatch() {
     await loadLatestBatches();
 
     await loadBatch(
-      selectedBatchId
+      operationBatchId
     );
 
   }
 
   catch (error) {
 
+    if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
     console.error(
       "Avancement batch:",
       error
@@ -4389,7 +4395,10 @@ async function advanceBatch() {
 
 async function releaseBatch() {
 
-  if (!selectedBatchId) {
+  const operationRevision = authStateRevision;
+  const operationOrganizationId = organizationId;
+  const operationBatchId = selectedBatchId;
+  if (!operationOrganizationId || !operationBatchId) {
 
     showMessage(
       "Sélectionnez d'abord un batch.",
@@ -4419,12 +4428,12 @@ async function releaseBatch() {
         {
 
           p_batch_id:
-            selectedBatchId
+            operationBatchId
 
         }
       );
 
-
+    if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId) || selectedBatchId !== operationBatchId) return;
     if (error) {
 
       throw new Error(
@@ -4448,13 +4457,14 @@ async function releaseBatch() {
     await loadLatestBatches();
 
     await loadBatch(
-      selectedBatchId
+      operationBatchId
     );
 
   }
 
   catch (error) {
 
+    if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
     console.error(
       "Libération batch:",
       error
