@@ -513,3 +513,27 @@ assert.match(
   "session cleanup must invalidate pending plant registry refreshes",
 );
 console.log("Plant registry request-order guards passed.");
+
+
+// Location/environment option loads can overlap; stale errors must not clear newer options.
+const placeOptionsHandler = handlerSource("loadBatchPlaceOptions");
+assert.match(
+  tracker,
+  /let batchPlaceOptionsRequestId = 0;/,
+  "batch location options need a dedicated request identity",
+);
+assert.match(
+  placeOptionsHandler,
+  /const requestId = \+\+batchPlaceOptionsRequestId;/,
+  "each location/environment refresh must supersede earlier refreshes",
+);
+assert.ok(
+  (placeOptionsHandler.match(/requestId !== batchPlaceOptionsRequestId/g) || []).length >= 2,
+  "location/environment refresh must reject stale success and error paths",
+);
+assert.match(
+  tracker.slice(tracker.indexOf("function clearAuthenticatedWorkspaceState()"), tracker.indexOf("async function refreshAuthUI")),
+  /batchPlaceOptionsRequestId\s*\+=\s*1;/,
+  "session cleanup must invalidate pending location/environment loads",
+);
+console.log("Batch location/environment request-order guards passed.");
