@@ -26,6 +26,9 @@ let organizationId = null;
 let organization = null;
 
 let strainOptions = [];
+let strainOptionsRequestId = 0;
+let cultureOptionsRequestId = 0;
+let latestBatchesRequestId = 0;
 
 let referenceData = [];
 
@@ -784,6 +787,9 @@ function clearAuthenticatedWorkspaceState() {
   biologicalLineageRequestId += 1;
   plantCultureListRequestId += 1;
   batchPlaceOptionsRequestId += 1;
+  strainOptionsRequestId += 1;
+  cultureOptionsRequestId += 1;
+  latestBatchesRequestId += 1;
   const cultureDetailPanel = document.getElementById("cultureDetailPanel");
   if (cultureDetailPanel) {
     cultureDetailPanel.classList.add("hidden");
@@ -1128,6 +1134,7 @@ function setDefaultDate() {
    ============================================================ */
 
 async function loadStrainOptions() {
+  const requestId = ++strainOptionsRequestId;
   const loadRevision = authStateRevision;
   const loadOrganizationId = organizationId;
   if (!loadOrganizationId) {
@@ -1166,7 +1173,7 @@ async function loadStrainOptions() {
       );
 
 
-  if (!isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
+  if (requestId !== strainOptionsRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
 
   if (error) {
 
@@ -2223,6 +2230,7 @@ async function createCulture() {
    ============================================================ */
 
 async function loadCultureOptions() {
+  const requestId = ++cultureOptionsRequestId;
   const loadRevision = authStateRevision;
   const loadOrganizationId = organizationId;
   if (!loadOrganizationId) {
@@ -2256,7 +2264,7 @@ async function loadCultureOptions() {
       .limit(100);
 
 
-  if (!isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
+  if (requestId !== cultureOptionsRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
 
   if (error) {
 
@@ -2340,6 +2348,7 @@ async function loadCultureOptions() {
    ============================================================ */
 
 async function loadLatestBatches() {
+  const requestId = ++latestBatchesRequestId;
   const loadRevision = authStateRevision;
   const loadOrganizationId = organizationId;
   if (!loadOrganizationId) {
@@ -2381,7 +2390,7 @@ async function loadLatestBatches() {
       .limit(30);
 
 
-  if (!isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
+  if (requestId !== latestBatchesRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
 
   if (error) {
 
