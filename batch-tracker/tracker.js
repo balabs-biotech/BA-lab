@@ -2207,13 +2207,10 @@ async function createCulture() {
   }
 
   finally {
-
-    createButton.disabled =
-      false;
-
-    createButton.textContent =
-      "Créer la culture";
-
+    if (isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) {
+      createButton.disabled = false;
+      createButton.textContent = "Créer la culture";
+    }
   }
 
 }
@@ -4219,13 +4216,10 @@ async function createBatch() {
   }
 
   finally {
-
-    createBatchButton.disabled =
-      false;
-
-    createBatchButton.textContent =
-      "Créer le batch";
-
+    if (isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) {
+      createBatchButton.disabled = false;
+      createBatchButton.textContent = "Créer le batch";
+    }
   }
 
 }
@@ -4403,10 +4397,9 @@ async function advanceBatch() {
   }
 
   finally {
-
-    advanceBatchButton.disabled =
-      false;
-
+    if (isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) {
+      advanceBatchButton.disabled = false;
+    }
   }
 
 }
@@ -4503,13 +4496,10 @@ async function releaseBatch() {
   }
 
   finally {
-
-    releaseBatchButton.disabled =
-      false;
-
-    releaseBatchButton.textContent =
-      "Libérer le batch";
-
+    if (isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) {
+      releaseBatchButton.disabled = false;
+      releaseBatchButton.textContent = "Libérer le batch";
+    }
   }
 
 }
@@ -5217,8 +5207,10 @@ async function saveMeasurement() {
       showMessage(error.message || cultureWorkflowText("measureFailed"), "error");
     }
   } finally {
-    saveMeasurementButton.disabled = false;
-    saveMeasurementButton.textContent = cultureWorkflowText("saveMeasure");
+    if (isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) {
+      saveMeasurementButton.disabled = false;
+      saveMeasurementButton.textContent = cultureWorkflowText("saveMeasure");
+    }
   }
 }
 
@@ -5435,8 +5427,10 @@ async function saveObservation() {
       showMessage(error.message || cultureWorkflowText("observationFailed"), "error");
     }
   } finally {
-    saveObservationButton.disabled = false;
-    saveObservationButton.textContent = cultureWorkflowText("saveObservation");
+    if (isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) {
+      saveObservationButton.disabled = false;
+      saveObservationButton.textContent = cultureWorkflowText("saveObservation");
+    }
   }
 }
 
@@ -6743,8 +6737,10 @@ async function savePlantCulture(event) {
     showMessage("Enregistrement impossible : " + (error.message || "erreur inconnue"), "error");
     if (status) status.textContent = "Échec de l’enregistrement. Vérifiez le code unique et les références.";
   } finally {
-    button.disabled = false;
-    button.textContent = oldLabel;
+    if (isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) {
+      button.disabled = false;
+      button.textContent = oldLabel;
+    }
   }
 }
 
