@@ -26,6 +26,9 @@ let organizationId = null;
 let organization = null;
 
 let strainOptions = [];
+let strainOptionsRequestId = 0;
+let cultureOptionsRequestId = 0;
+let latestBatchesRequestId = 0;
 
 let referenceData = [];
 
@@ -47,6 +50,12 @@ let quantityUnitOptions = [];
 let batchLocationOptions = [];
 let batchEnvironmentOptions = [];
 let recentObservations = [];
+
+function isCurrentWorkspaceRevision(revision, expectedOrganizationId) {
+  return revision === authStateRevision &&
+    Boolean(expectedOrganizationId) &&
+    organizationId === expectedOrganizationId;
+}
 
 
 /* ============================================================
@@ -463,13 +472,8 @@ async function claimBALabs(session) {
   }
 
 
-  organization =
-    data.organization;
-
-  organizationId =
-    data.organization.id;
-
-
+  // The caller owns tenant-state mutation and checks its auth revision
+  // before committing this claim to the current workspace.
   return data;
 
 }
@@ -532,7 +536,7 @@ async function signIn() {
     }
 
 
-    await refreshAuthUI();
+    // SIGNED_IN is handled by onAuthStateChange; avoid a second concurrent initialization.
 
   }
 
@@ -641,8 +645,7 @@ async function signUp() {
       data.session
     ) {
 
-      await refreshAuthUI();
-
+      // SIGNED_IN is handled by onAuthStateChange; avoid a second concurrent initialization.
       return;
 
     }
@@ -776,6 +779,45 @@ function getSessionVerificationGuidance(error) {
   };
 }
 
+function clearAuthenticatedWorkspaceState() {
+  // Drop tenant-scoped state whenever the current session is absent or cannot
+  // be verified. Hiding the UI alone must not leave a previous tenant usable
+  // by event handlers or a later partial initialization.
+  cultureDetailRequestId += 1;
+  biologicalLineageRequestId += 1;
+  plantCultureListRequestId += 1;
+  batchPlaceOptionsRequestId += 1;
+  strainOptionsRequestId += 1;
+  cultureOptionsRequestId += 1;
+  latestBatchesRequestId += 1;
+  statisticsRequestId += 1;
+  const cultureDetailPanel = document.getElementById("cultureDetailPanel");
+  if (cultureDetailPanel) {
+    cultureDetailPanel.classList.add("hidden");
+    cultureDetailPanel.dataset.cultureId = "";
+  }
+  organizationId = null;
+  organization = null;
+  strainOptions = [];
+  referenceData = [];
+  cultureOptions = [];
+  plantCultureOptions = [];
+  latestBatches = [];
+  selectedBatchId = null;
+  selectedBatch = null;
+  measurementVariables = [];
+  measurementUnits = [];
+  quantityUnitOptions = [];
+  batchLocationOptions = [];
+  batchEnvironmentOptions = [];
+  recentObservations = [];
+  initializationWarnings = [];
+
+  if (recordHarvestButton) recordHarvestButton.disabled = true;
+  if (saveMeasurementButton) saveMeasurementButton.disabled = true;
+  if (saveObservationButton) saveObservationButton.disabled = true;
+}
+
 async function refreshAuthUI(revision = authStateRevision) {
 
   let session;
@@ -785,8 +827,9 @@ async function refreshAuthUI(revision = authStateRevision) {
   } catch (error) {
     if (revision !== authStateRevision) return;
 
-    // Do not leave a previously authenticated workspace visible when the
-    // current session cannot be verified because of a network/auth failure.
+    // Do not leave a previously authenticated workspace visible or usable
+    // when the current session cannot be verified because of a network/auth failure.
+    clearAuthenticatedWorkspaceState();
     hideElement(trackerCard);
     hideElement(batchCard);
     hideElement(document.getElementById("plantCard"));
@@ -806,6 +849,7 @@ async function refreshAuthUI(revision = authStateRevision) {
 
   if (!session) {
 
+    clearAuthenticatedWorkspaceState();
     hideElement(trackerCard);
     hideElement(batchCard);
     hideElement(document.getElementById("plantCard"));
@@ -881,6 +925,10 @@ async function initializeAuthenticatedTracker(
       await claimBALabs(session);
     if (initRevision !== authStateRevision) return;
 
+    // Commit the tenant context only after confirming this initialization is
+    // still current; an obsolete claim must never overwrite the active tenant.
+    organization = claim.organization;
+    organizationId = claim.organization.id;
 
     if (!organizationId) {
 
@@ -953,6 +1001,7 @@ async function initializeAuthenticatedTracker(
         if (initRevision !== authStateRevision) return;
       }
       catch (historyError) {
+        if (initRevision !== authStateRevision) return;
         console.error("Historique des mesures indisponible :", historyError);
         initializationWarnings.push("historique des mesures");
         measurementHistory.textContent = "Impossible de charger l’historique des mesures. L’enregistrement reste disponible.";
@@ -962,11 +1011,13 @@ async function initializeAuthenticatedTracker(
         if (initRevision !== authStateRevision) return;
       }
       catch (observationHistoryError) {
+        if (initRevision !== authStateRevision) return;
         console.error("Historique des observations indisponible :", observationHistoryError);
         initializationWarnings.push("historique des observations");
         observationHistory.textContent = "Impossible de charger l’historique des observations. L’enregistrement reste disponible.";
       }
     } catch (measurementError) {
+      if (initRevision !== authStateRevision) return;
       console.error("Initialisation du catalogue de mesures :", measurementError);
       initializationWarnings.push("catalogue des mesures");
       measurementHistory.textContent = "Le catalogue des mesures est indisponible ; les modules de culture et de production restent utilisables.";
@@ -1084,15 +1135,14 @@ function setDefaultDate() {
    ============================================================ */
 
 async function loadStrainOptions() {
-
-  if (!organizationId) {
-
+  const requestId = ++strainOptionsRequestId;
+  const loadRevision = authStateRevision;
+  const loadOrganizationId = organizationId;
+  if (!loadOrganizationId) {
     throw new Error(
       "Organisation absente avant chargement des souches."
     );
-
   }
-
 
   const {
     data,
@@ -1117,12 +1167,14 @@ async function loadStrainOptions() {
       `)
       .eq(
         "organization_id",
-        organizationId
+        loadOrganizationId
       )
       .order(
         "strain_code"
       );
 
+
+  if (requestId !== strainOptionsRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
 
   if (error) {
 
@@ -1214,6 +1266,8 @@ async function loadReferenceData() {
   }
 
 
+  const loadRevision = authStateRevision;
+
   const {
     data,
     error
@@ -1230,6 +1284,8 @@ async function loadReferenceData() {
         "code"
       );
 
+
+  if (loadRevision !== authStateRevision) return;
 
   if (error) {
 
@@ -1501,6 +1557,8 @@ function updateGenerationPreview() {
 async function getProtocolVersionId(
   protocolCode
 ) {
+  const loadRevision = authStateRevision;
+  const loadOrganizationId = organizationId;
 
   if (!protocolCode) {
 
@@ -1518,7 +1576,7 @@ async function getProtocolVersionId(
       .select("id")
       .eq(
         "organization_id",
-        organizationId
+        loadOrganizationId
       )
       .eq(
         "code",
@@ -1526,6 +1584,8 @@ async function getProtocolVersionId(
       )
       .maybeSingle();
 
+
+  if (!isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return null;
 
   if (protocolError) {
 
@@ -1554,7 +1614,7 @@ async function getProtocolVersionId(
       )
       .eq(
         "organization_id",
-        organizationId
+        loadOrganizationId
       )
       .eq(
         "protocol_id",
@@ -1568,6 +1628,8 @@ async function getProtocolVersionId(
       )
       .limit(1);
 
+
+  if (!isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return null;
 
   if (versionError) {
 
@@ -1625,7 +1687,9 @@ function setSyncStatus(
 
 
 async function syncPendingCultures() {
-  if (!organizationId) return;
+  const loadRevision = authStateRevision;
+  const loadOrganizationId = organizationId;
+  if (!loadOrganizationId) return;
 
   if (syncInProgress) return;
 
@@ -1643,10 +1707,12 @@ async function syncPendingCultures() {
     const { data: cultures, error } = await supabaseClient
       .from("cultures")
       .select("id, code")
-      .eq("organization_id", organizationId)
+      .eq("organization_id", loadOrganizationId)
       .in("notion_sync_status", ["pending", "error"])
       .order("created_at", { ascending: true })
       .limit(20);
+
+    if (!isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
 
     if (error) {
       console.error(
@@ -1667,12 +1733,15 @@ async function syncPendingCultures() {
     let lastError = "";
 
     for (const culture of cultures || []) {
+      if (!isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
       try {
         const { data, error: syncError } =
           await supabaseClient.functions.invoke(
             "sync-culture-to-notion",
             { body: { culture_id: culture.id } }
           );
+
+        if (!isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
 
         if (syncError || !data?.ok) {
           failed += 1;
@@ -1696,6 +1765,7 @@ async function syncPendingCultures() {
           );
         }
       } catch (err) {
+        if (!isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
         failed += 1;
 
         lastError =
@@ -1738,6 +1808,8 @@ async function syncPendingCultures() {
 async function createCulture() {
 
   clearMessage();
+  const operationRevision = authStateRevision;
+  const operationOrganizationId = organizationId;
 
 
   const materialId =
@@ -1815,6 +1887,7 @@ async function createCulture() {
   const session =
     await getCurrentSession();
 
+  if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
 
   if (!session) {
 
@@ -1849,11 +1922,12 @@ async function createCulture() {
       error: consentLookupError
     } = await consentTable
       .select("id")
-      .eq("organization_id", organizationId)
+      .eq("organization_id", operationOrganizationId)
       .eq("user_id", session.user.id)
       .eq("terms_version", "2026-10-09-v1")
       .maybeSingle();
 
+    if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
     if (consentLookupError) {
       throw new Error(
         `Impossible de vérifier le consentement : ${consentLookupError.message}`
@@ -1873,17 +1947,20 @@ async function createCulture() {
       // Conserver la date de première acceptation des conditions.
       const updateResult = await consentTable
         .update(consentValues)
+        .eq("organization_id", operationOrganizationId)
         .eq("id", existingConsent.id);
+      if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
       consentError = updateResult.error;
     } else {
       const insertResult = await consentTable
         .insert({
-          organization_id: organizationId,
+          organization_id: operationOrganizationId,
           user_id: session.user.id,
           terms_version: "2026-10-09-v1",
           terms_accepted_at: new Date().toISOString(),
           ...consentValues
         });
+      if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
       consentError = insertResult.error;
     }
 
@@ -1898,6 +1975,7 @@ async function createCulture() {
         protocolCode
       );
 
+    if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
 
     const {
       data,
@@ -1908,7 +1986,7 @@ async function createCulture() {
         {
 
           p_organization_id:
-            organizationId,
+            operationOrganizationId,
 
           p_code:
             cultureCode,
@@ -1951,6 +2029,7 @@ async function createCulture() {
       );
 
 
+    if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
     if (error) {
 
       throw new Error(
@@ -1979,6 +2058,7 @@ async function createCulture() {
             }
           );
 
+        if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
         if (syncError) {
           notionSyncMessage =
             `Culture enregistrée dans Supabase. Synchronisation Notion à vérifier : ${syncError.message}`;
@@ -1992,6 +2072,7 @@ async function createCulture() {
             }.`;
         }
       } catch (syncError) {
+        if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
         console.error("Synchronisation Notion:", syncError);
         notionSyncMessage =
           "Culture enregistrée dans Supabase, mais la synchronisation Notion a échoué. Vérifiez le statut dans Supabase.";
@@ -2136,13 +2217,10 @@ async function createCulture() {
   }
 
   finally {
-
-    createButton.disabled =
-      false;
-
-    createButton.textContent =
-      "Créer la culture";
-
+    if (isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) {
+      createButton.disabled = false;
+      createButton.textContent = "Créer la culture";
+    }
   }
 
 }
@@ -2153,13 +2231,12 @@ async function createCulture() {
    ============================================================ */
 
 async function loadCultureOptions() {
-
-  if (!organizationId) {
-
+  const requestId = ++cultureOptionsRequestId;
+  const loadRevision = authStateRevision;
+  const loadOrganizationId = organizationId;
+  if (!loadOrganizationId) {
     return;
-
   }
-
 
   const {
     data,
@@ -2177,7 +2254,7 @@ async function loadCultureOptions() {
       `)
       .eq(
         "organization_id",
-        organizationId
+        loadOrganizationId
       )
       .order(
         "created_at",
@@ -2187,6 +2264,8 @@ async function loadCultureOptions() {
       )
       .limit(100);
 
+
+  if (requestId !== cultureOptionsRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
 
   if (error) {
 
@@ -2270,13 +2349,12 @@ async function loadCultureOptions() {
    ============================================================ */
 
 async function loadLatestBatches() {
-
-  if (!organizationId) {
-
+  const requestId = ++latestBatchesRequestId;
+  const loadRevision = authStateRevision;
+  const loadOrganizationId = organizationId;
+  if (!loadOrganizationId) {
     return;
-
   }
-
 
   const {
     data,
@@ -2302,7 +2380,7 @@ async function loadLatestBatches() {
       `)
       .eq(
         "organization_id",
-        organizationId
+        loadOrganizationId
       )
       .order(
         "created_at",
@@ -2312,6 +2390,8 @@ async function loadLatestBatches() {
       )
       .limit(30);
 
+
+  if (requestId !== latestBatchesRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
 
   if (error) {
 
@@ -2362,7 +2442,12 @@ async function fetchAllComparisonPages(queryBuilder, pageSize = 1000) {
   }
 }
 
+let batchComparisonRequestId = 0;
+
 async function compareSelectedBatches() {
+  const comparisonRequestId = ++batchComparisonRequestId;
+  const loadRevision = authStateRevision;
+  const loadOrganizationId = organizationId;
   const select = document.getElementById("batchCompareSelect");
   const status = document.getElementById("batchCompareStatus");
   const results = document.getElementById("batchCompareResults");
@@ -2398,25 +2483,26 @@ async function compareSelectedBatches() {
     const [stageResult, cultureMeasurementResult, environmentMeasurementResult, cultureContextResult] = await Promise.all([
       supabaseClient.from("batch_stages")
         .select("batch_id,stage_code,status,sequence_no,started_at,completed_at")
-        .eq("organization_id", organizationId).in("batch_id", ids),
+        .eq("organization_id", loadOrganizationId).in("batch_id", ids),
       cultureIds.length
         ? fetchAllComparisonPages(supabaseClient.from("measurements")
             .select("id,culture_id,environment_id,variable_code,raw_value,raw_unit_code,normalized_value,normalized_unit_code,measured_at,quality_state,exclusion_reason")
-            .eq("organization_id", organizationId).in("culture_id", cultureIds)
+            .eq("organization_id", loadOrganizationId).in("culture_id", cultureIds)
             .order("measured_at", { ascending: false }).order("id", { ascending: true }))
         : Promise.resolve({data:[],error:null}),
       environmentIds.length
         ? fetchAllComparisonPages(supabaseClient.from("measurements")
             .select("id,culture_id,environment_id,variable_code,raw_value,raw_unit_code,normalized_value,normalized_unit_code,measured_at,quality_state,exclusion_reason")
-            .eq("organization_id", organizationId).in("environment_id", environmentIds)
+            .eq("organization_id", loadOrganizationId).in("environment_id", environmentIds)
             .order("measured_at", { ascending: false }).order("id", { ascending: true }))
         : Promise.resolve({data:[],error:null}),
       cultureIds.length
         ? supabaseClient.from("cultures")
             .select("id,experiment_id,experimental_unit_id")
-            .eq("organization_id", organizationId).in("id", cultureIds)
+            .eq("organization_id", loadOrganizationId).in("id", cultureIds)
         : Promise.resolve({data:[],error:null})
     ]);
+    if (comparisonRequestId !== batchComparisonRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
     if (stageResult.error) throw new Error("Chargement des étapes impossible : " + stageResult.error.message);
     if (cultureMeasurementResult.error) throw new Error("Chargement des mesures de culture impossible : " + cultureMeasurementResult.error.message);
     if (environmentMeasurementResult.error) throw new Error("Chargement des mesures d'environnement impossible : " + environmentMeasurementResult.error.message);
@@ -2427,9 +2513,10 @@ async function compareSelectedBatches() {
       unitIds.length
         ? supabaseClient.from("experimental_units")
             .select("id,experiment_id,unit_code,replicate_no,treatment_code")
-            .eq("organization_id", organizationId).in("id", unitIds)
+            .eq("organization_id", loadOrganizationId).in("id", unitIds)
         : Promise.resolve({data:[],error:null})
     ]);
+    if (comparisonRequestId !== batchComparisonRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
     if (unitResult.error) throw new Error("Chargement des unités expérimentales impossible : " + unitResult.error.message);
     const units = unitResult.data || [];
     const unitsById = new Map(units.map(row => [row.id, row]));
@@ -2440,8 +2527,9 @@ async function compareSelectedBatches() {
     const experimentResult = experimentIds.length
       ? await supabaseClient.from("experiments")
           .select("id,code,name")
-          .eq("organization_id", organizationId).in("id", experimentIds)
+          .eq("organization_id", loadOrganizationId).in("id", experimentIds)
       : {data:[],error:null};
+    if (comparisonRequestId !== batchComparisonRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
     if (experimentResult.error) throw new Error("Chargement des expériences impossible : " + experimentResult.error.message);
     const experimentsById = new Map((experimentResult.data || []).map(row => [row.id, row]));
     const contextsByCultureId = new Map(cultureContexts.map(row => {
@@ -2455,16 +2543,18 @@ async function compareSelectedBatches() {
     const observationCultureResult = cultureIds.length
       ? await fetchAllComparisonPages(supabaseClient.from("observations")
           .select("id,culture_id,experimental_unit_id,variable_code,value_text,observed_at,quality_state")
-          .eq("organization_id", organizationId).in("culture_id", cultureIds)
+          .eq("organization_id", loadOrganizationId).in("culture_id", cultureIds)
           .order("observed_at", { ascending: false }).order("id", { ascending: true }))
       : {data:[],error:null};
+    if (comparisonRequestId !== batchComparisonRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
     if (observationCultureResult.error) throw new Error("Chargement des observations de culture impossible : " + observationCultureResult.error.message);
     const observationUnitResult = unitIds.length
       ? await fetchAllComparisonPages(supabaseClient.from("observations")
           .select("id,culture_id,experimental_unit_id,variable_code,value_text,observed_at,quality_state")
-          .eq("organization_id", organizationId).in("experimental_unit_id", unitIds)
+          .eq("organization_id", loadOrganizationId).in("experimental_unit_id", unitIds)
           .order("observed_at", { ascending: false }).order("id", { ascending: true }))
       : {data:[],error:null};
+    if (comparisonRequestId !== batchComparisonRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
     if (observationUnitResult.error) throw new Error("Chargement des observations expérimentales impossible : " + observationUnitResult.error.message);
     const observationMap = new Map();
     [...(observationCultureResult.data || []), ...(observationUnitResult.data || [])].forEach(row => {
@@ -2604,9 +2694,10 @@ async function compareSelectedBatches() {
     ].filter(Boolean);
     status.textContent = statusParts.join(" ");
   } catch (error) {
+    if (comparisonRequestId !== batchComparisonRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
     status.textContent = error?.message || labels.impossible;
   } finally {
-    button.disabled = false;
+    if (comparisonRequestId === batchComparisonRequestId && isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) button.disabled = false;
   }
 }
 document.getElementById("compareBatchesButton")?.addEventListener("click", compareSelectedBatches);
@@ -2727,6 +2818,8 @@ async function loadBatch(
 
 
   const requestId = ++batchDetailRequestId;
+  const loadRevision = authStateRevision;
+  const loadOrganizationId = organizationId;
   selectedBatchId =
     batchId;
 
@@ -2764,7 +2857,7 @@ async function loadBatch(
       `)
       .eq(
         "organization_id",
-        organizationId
+        loadOrganizationId
       )
       .eq(
         "id",
@@ -2772,7 +2865,7 @@ async function loadBatch(
       )
       .single();
 
-  if (requestId !== batchDetailRequestId) return;
+  if (requestId !== batchDetailRequestId || loadRevision !== authStateRevision || organizationId !== loadOrganizationId) return;
 
   if (batchError) {
 
@@ -2810,7 +2903,7 @@ async function loadBatch(
       `)
       .eq(
         "organization_id",
-        organizationId
+        loadOrganizationId
       )
       .eq(
         "batch_id",
@@ -2820,7 +2913,7 @@ async function loadBatch(
         "sequence_no"
       );
 
-  if (requestId !== batchDetailRequestId) return;
+  if (requestId !== batchDetailRequestId || loadRevision !== authStateRevision || organizationId !== loadOrganizationId) return;
 
   if (stagesError) {
 
@@ -2855,7 +2948,7 @@ async function loadBatch(
       `)
       .eq(
         "organization_id",
-        organizationId
+        loadOrganizationId
       )
       .eq(
         "batch_id",
@@ -2865,7 +2958,7 @@ async function loadBatch(
         "check_code"
       );
 
-  if (requestId !== batchDetailRequestId) return;
+  if (requestId !== batchDetailRequestId || loadRevision !== authStateRevision || organizationId !== loadOrganizationId) return;
 
   if (qcError) {
 
@@ -2883,12 +2976,12 @@ async function loadBatch(
   const { data: batchEventsData, error: batchEventsError } = await supabaseClient
     .from("events")
     .select("id,event_type,occurred_at,payload,location_id,environment_id")
-    .eq("organization_id", organizationId)
+    .eq("organization_id", loadOrganizationId)
     .eq("batch_id", batchId)
     .order("occurred_at", { ascending: false })
     .limit(50);
 
-  if (requestId !== batchDetailRequestId) return;
+  if (requestId !== batchDetailRequestId || loadRevision !== authStateRevision || organizationId !== loadOrganizationId) return;
 
   renderBatchInfo(
     batch
@@ -2948,11 +3041,15 @@ function updateHarvestEntryState(batch, events) {
 }
 
 async function recordBatchHarvest() {
-  if (!organizationId || !selectedBatch || !selectedBatchId) {
+  const operationRevision = authStateRevision;
+  const operationOrganizationId = organizationId;
+  const operationBatchId = selectedBatchId;
+  const operationBatch = selectedBatch;
+  if (!operationOrganizationId || !operationBatch || !operationBatchId) {
     showMessage("Sélectionnez d’abord un lot.", "error");
     return;
   }
-  if (selectedBatch.current_stage !== "harvest" || selectedBatch.status !== "active") {
+  if (operationBatch.current_stage !== "harvest" || operationBatch.status !== "active") {
     showMessage("La récolte ne peut être enregistrée que pendant l’étape Récolte d’un lot ouvert.", "error");
     return;
   }
@@ -2969,25 +3066,28 @@ async function recordBatchHarvest() {
   recordHarvestButton.textContent = "Enregistrement…";
   try {
     const session = await getCurrentSession();
+    if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId) || selectedBatchId !== operationBatchId) return;
     if (!session) throw new Error("Session expirée. Reconnectez-vous.");
     const { data: unit, error: unitError } = await supabaseClient.from("units").select("code").eq("code", unitCode).maybeSingle();
+    if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId) || selectedBatchId !== operationBatchId) return;
     if (unitError) throw new Error("Vérification de l’unité impossible : " + unitError.message);
     if (!unit) throw new Error("Code d’unité inconnu. Utilisez un code déjà présent dans le référentiel des unités.");
     // events requires exactly one biological/material/sample/unit anchor in addition to batch_id.
-    const eventAnchor = selectedBatch.culture_id
-      ? { culture_id: selectedBatch.culture_id }
-      : selectedBatch.material_id
-        ? { material_id: selectedBatch.material_id }
+    const eventAnchor = operationBatch.culture_id
+      ? { culture_id: operationBatch.culture_id }
+      : operationBatch.material_id
+        ? { material_id: operationBatch.material_id }
         : null;
     if (!eventAnchor) {
       throw new Error("Ce lot doit être lié à une culture ou à un matériau pour enregistrer une récolte dans le journal biologique.");
     }
     const { data: eventId, error } = await supabaseClient.rpc("record_batch_harvest", {
-      p_batch_id: selectedBatch.id,
+      p_batch_id: operationBatch.id,
       p_quantity: quantity,
       p_unit_code: unit.code,
       p_note: note || null
     });
+    if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId) || selectedBatchId !== operationBatchId) return;
     if (error) throw new Error("Enregistrement de la récolte impossible : " + error.message);
     if (!eventId) throw new Error("La base n’a pas confirmé l’enregistrement de la récolte.");
     harvestQuantityInput.value = "";
@@ -2996,12 +3096,15 @@ async function recordBatchHarvest() {
     await loadBatch(selectedBatch.id);
     await loadLatestBatches();
   } catch (error) {
+    if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
     console.error("Enregistrement récolte :", error);
     showMessage(error?.message || "Enregistrement de la récolte impossible.", "error");
   } finally {
-    recordHarvestButton.textContent = originalLabel;
-    if (selectedBatch) {
-      recordHarvestButton.disabled = !(selectedBatch.current_stage === "harvest" && selectedBatch.status === "active");
+    if (isCurrentWorkspaceRevision(operationRevision, operationOrganizationId) && selectedBatchId === operationBatchId) {
+      recordHarvestButton.textContent = originalLabel;
+      if (selectedBatch && selectedBatch.id === operationBatchId) {
+        recordHarvestButton.disabled = !(selectedBatch.current_stage === "harvest" && selectedBatch.status === "active");
+      }
     }
   }
 }
@@ -3559,8 +3662,13 @@ async function saveQcCheck(
 
     qcSavesInFlight.delete(checkId);
 
-    // Après un enregistrement réussi la liste est re-rendue : l'ancien bouton n'est plus dans le DOM.
-    if (button && button.isConnected) {
+    // Ne jamais réactiver un contrôle appartenant à une session ou à une organisation obsolète.
+    if (
+      button &&
+      button.isConnected &&
+      isCurrentWorkspaceRevision(operationRevision, operationOrganizationId) &&
+      batchQcList.querySelector(`[data-qc-save="${CSS.escape(checkId)}"]`) === button
+    ) {
 
       button.disabled = false;
 
@@ -3577,7 +3685,9 @@ async function saveQcCheckNow(
   checkId
 ) {
 
-  if (!organizationId) {
+  const operationRevision = authStateRevision;
+  const operationOrganizationId = organizationId;
+  if (!operationOrganizationId) {
 
     return;
 
@@ -3606,6 +3716,7 @@ async function saveQcCheckNow(
   } =
     await supabaseClient.auth.getSession();
 
+  if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
 
   if (!sessionData.session) {
 
@@ -3645,7 +3756,7 @@ async function saveQcCheckNow(
       .update(update)
       .eq(
         "organization_id",
-        organizationId
+        operationOrganizationId
       )
       .eq(
         "id",
@@ -3653,6 +3764,7 @@ async function saveQcCheckNow(
       );
 
 
+  if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
   if (error) {
 
     showMessage(
@@ -3793,6 +3905,8 @@ function updateBatchActionState(
 async function createBatch() {
 
   clearMessage();
+  const operationRevision = authStateRevision;
+  const operationOrganizationId = organizationId;
 
 
   if (!organizationId) {
@@ -3936,6 +4050,7 @@ async function createBatch() {
       selectedCulture.id
     );
 
+  if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
 
   const selectedMaterialId =
     selectedCulture.material_id;
@@ -3959,7 +4074,7 @@ async function createBatch() {
         {
 
           p_organization_id:
-            organizationId,
+            operationOrganizationId,
 
           p_batch_code:
             batchCode,
@@ -4002,6 +4117,7 @@ async function createBatch() {
       );
 
 
+    if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
     if (error) {
 
       throw new Error(
@@ -4085,7 +4201,7 @@ async function createBatch() {
 
 
     await loadLatestBatches();
-
+    if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
 
     if (
       createdBatch &&
@@ -4095,6 +4211,7 @@ async function createBatch() {
       await loadBatch(
         createdBatch.id
       );
+      if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
 
     }
 
@@ -4102,6 +4219,7 @@ async function createBatch() {
 
   catch (error) {
 
+    if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
     console.error(
       "Création batch:",
       error
@@ -4117,13 +4235,10 @@ async function createBatch() {
   }
 
   finally {
-
-    createBatchButton.disabled =
-      false;
-
-    createBatchButton.textContent =
-      "Créer le batch";
-
+    if (isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) {
+      createBatchButton.disabled = false;
+      createBatchButton.textContent = "Créer le batch";
+    }
   }
 
 }
@@ -4136,6 +4251,8 @@ async function createBatch() {
 async function getCultureProtocolVersionId(
   cultureId
 ) {
+  const loadRevision = authStateRevision;
+  const loadOrganizationId = organizationId;
 
   const {
     data: culture,
@@ -4148,7 +4265,7 @@ async function getCultureProtocolVersionId(
       )
       .eq(
         "organization_id",
-        organizationId
+        loadOrganizationId
       )
       .eq(
         "id",
@@ -4156,6 +4273,8 @@ async function getCultureProtocolVersionId(
       )
       .single();
 
+
+  if (!isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return null;
 
   if (cultureError) {
 
@@ -4178,9 +4297,14 @@ async function getCultureProtocolVersionId(
 
 async function advanceBatch() {
 
+  const operationRevision = authStateRevision;
+  const operationOrganizationId = organizationId;
+  const operationBatchId = selectedBatchId;
+  const operationBatch = selectedBatch;
   if (
-    !selectedBatchId ||
-    !selectedBatch
+    !operationOrganizationId ||
+    !operationBatchId ||
+    !operationBatch
   ) {
 
     showMessage(
@@ -4194,7 +4318,7 @@ async function advanceBatch() {
 
 
   const expectedStage =
-    selectedBatch.current_stage;
+    operationBatch.current_stage;
 
 
   if (
@@ -4231,7 +4355,7 @@ async function advanceBatch() {
         {
 
           p_batch_id:
-            selectedBatchId,
+            operationBatchId,
 
           p_expected_stage:
             expectedStage
@@ -4239,7 +4363,7 @@ async function advanceBatch() {
         }
       );
 
-
+    if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId) || selectedBatchId !== operationBatchId) return;
     if (error) {
 
       throw new Error(
@@ -4269,13 +4393,14 @@ async function advanceBatch() {
     await loadLatestBatches();
 
     await loadBatch(
-      selectedBatchId
+      operationBatchId
     );
 
   }
 
   catch (error) {
 
+    if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
     console.error(
       "Avancement batch:",
       error
@@ -4291,10 +4416,9 @@ async function advanceBatch() {
   }
 
   finally {
-
-    advanceBatchButton.disabled =
-      false;
-
+    if (isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) {
+      advanceBatchButton.disabled = false;
+    }
   }
 
 }
@@ -4306,7 +4430,10 @@ async function advanceBatch() {
 
 async function releaseBatch() {
 
-  if (!selectedBatchId) {
+  const operationRevision = authStateRevision;
+  const operationOrganizationId = organizationId;
+  const operationBatchId = selectedBatchId;
+  if (!operationOrganizationId || !operationBatchId) {
 
     showMessage(
       "Sélectionnez d'abord un batch.",
@@ -4336,12 +4463,12 @@ async function releaseBatch() {
         {
 
           p_batch_id:
-            selectedBatchId
+            operationBatchId
 
         }
       );
 
-
+    if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId) || selectedBatchId !== operationBatchId) return;
     if (error) {
 
       throw new Error(
@@ -4365,13 +4492,14 @@ async function releaseBatch() {
     await loadLatestBatches();
 
     await loadBatch(
-      selectedBatchId
+      operationBatchId
     );
 
   }
 
   catch (error) {
 
+    if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
     console.error(
       "Libération batch:",
       error
@@ -4387,13 +4515,10 @@ async function releaseBatch() {
   }
 
   finally {
-
-    releaseBatchButton.disabled =
-      false;
-
-    releaseBatchButton.textContent =
-      "Libérer le batch";
-
+    if (isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) {
+      releaseBatchButton.disabled = false;
+      releaseBatchButton.textContent = "Libérer le batch";
+    }
   }
 
 }
@@ -4495,8 +4620,28 @@ supabaseClient.auth.onAuthStateChange(
     session
   ) => {
 
+    // init() explicitly verifies the initial session; handling INITIAL_SESSION here
+    // would start a second, competing reconciliation during page startup.
+    if (event === "INITIAL_SESSION") return;
+
     authStateRevision += 1;
     const revision = authStateRevision;
+
+    // Invalidate the previous tenant immediately on login/logout transitions.
+    // Waiting for getSession()/claimBALabs() must not leave the previous
+    // account's workspace visible during the reconciliation window.
+    if (event === "SIGNED_IN" || event === "SIGNED_OUT") {
+      clearAuthenticatedWorkspaceState();
+      hideElement(trackerCard);
+      hideElement(batchCard);
+      hideElement(document.getElementById("plantCard"));
+      hideElement(measurementCard);
+      hideElement(document.getElementById("statisticsCard"));
+      hideElement(document.getElementById("overviewCard"));
+      hideElement(resultCard);
+      hideElement(signOutButton);
+      authStatus.textContent = "Vérification de la session…";
+    }
 
     setTimeout(
       () => {
@@ -4563,6 +4708,7 @@ async function init() {
    ============================================================ */
 
 async function loadQuantityUnitOptions() {
+  const loadRevision = authStateRevision;
   const selects = [batchUnitInput, harvestUnitInput].filter(Boolean);
   for (const select of selects) {
     select.replaceChildren();
@@ -4577,6 +4723,7 @@ async function loadQuantityUnitOptions() {
       .from("units")
       .select("code,label,dimension")
       .order("code");
+    if (loadRevision !== authStateRevision) return;
     if (error) throw error;
 
     quantityUnitOptions = data || [];
@@ -4600,6 +4747,7 @@ async function loadQuantityUnitOptions() {
       }
     }
   } catch (error) {
+    if (loadRevision !== authStateRevision) return;
     console.error("Référentiel des unités indisponible :", error);
     initializationWarnings.push("unités");
     quantityUnitOptions = [];
@@ -4670,19 +4818,23 @@ function prepareMovementControls(batch) {
 }
 
 async function moveSelectedBatch() {
-  if (!organizationId || !selectedBatch || !selectedBatchId) {
+  const operationRevision = authStateRevision;
+  const operationOrganizationId = organizationId;
+  const operationBatchId = selectedBatchId;
+  const operationBatch = selectedBatch;
+  if (!operationOrganizationId || !operationBatch || !operationBatchId) {
     showMessage("Sélectionnez d’abord un lot.", "error");
     return;
   }
-  if (["released", "rejected", "aborted", "completed"].includes(selectedBatch.status)) {
+  if (["released", "rejected", "aborted", "completed"].includes(operationBatch.status)) {
     showMessage("Un lot clôturé ne peut pas être déplacé depuis ce formulaire.", "error");
     return;
   }
   const locationId = moveBatchLocationInput?.value || null;
   const environmentId = moveBatchEnvironmentInput?.value || null;
   const note = moveBatchNoteInput?.value.trim() || null;
-  const currentLocation = selectedBatch.location_id || null;
-  const currentEnvironment = selectedBatch.environment_id || null;
+  const currentLocation = operationBatch.location_id || null;
+  const currentEnvironment = operationBatch.environment_id || null;
   if (locationId === currentLocation && environmentId === currentEnvironment) {
     showMessage("Le nouvel emplacement et l’environnement sont identiques aux valeurs actuelles.", "error");
     return;
@@ -4692,23 +4844,28 @@ async function moveSelectedBatch() {
   moveBatchButton.textContent = "Enregistrement…";
   try {
     const { data, error } = await supabaseClient.rpc("move_batch_to_location", {
-      p_batch_id: selectedBatchId,
+      p_batch_id: operationBatchId,
       p_location_id: locationId,
       p_environment_id: environmentId,
       p_note: note
     });
+    if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId) || selectedBatchId !== operationBatchId) return;
     if (error) throw error;
     if (!data?.event_id) throw new Error("La RPC n’a pas confirmé la création de l’événement de déplacement.");
     if (moveBatchNoteInput) moveBatchNoteInput.value = "";
     await loadLatestBatches();
-    await loadBatch(selectedBatchId);
+    await loadBatch(operationBatchId);
+    if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
     showMessage("Déplacement enregistré dans la chronologie du lot.", "success");
   } catch (error) {
+    if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
     console.error("Déplacement du lot impossible:", error);
     showMessage("Déplacement impossible : " + (error.message || "erreur inconnue"), "error");
   } finally {
-    moveBatchButton.textContent = label;
-    if (selectedBatch) prepareMovementControls(selectedBatch);
+    if (isCurrentWorkspaceRevision(operationRevision, operationOrganizationId) && selectedBatchId === operationBatchId) {
+      moveBatchButton.textContent = label;
+      if (selectedBatch && selectedBatch.id === operationBatchId) prepareMovementControls(selectedBatch);
+    }
   }
 }
 
@@ -4734,15 +4891,21 @@ function renderBatchEnvironmentOptions() {
   batchEnvironmentInput.disabled = available.length === 0;
 }
 
+let batchPlaceOptionsRequestId = 0;
+
 async function loadBatchPlaceOptions() {
-  if (!organizationId || !batchLocationInput || !batchEnvironmentInput) return;
+  const requestId = ++batchPlaceOptionsRequestId;
+  const loadRevision = authStateRevision;
+  const loadOrganizationId = organizationId;
+  if (!loadOrganizationId || !batchLocationInput || !batchEnvironmentInput) return;
   batchLocationInput.disabled = true;
   batchEnvironmentInput.disabled = true;
   try {
     const [{ data: locations, error: locationsError }, { data: environments, error: environmentsError }] = await Promise.all([
-      supabaseClient.from("locations").select("id,code,name").eq("organization_id", organizationId).order("name"),
-      supabaseClient.from("environments").select("id,name,location_id").eq("organization_id", organizationId).order("name")
+      supabaseClient.from("locations").select("id,code,name").eq("organization_id", loadOrganizationId).order("name"),
+      supabaseClient.from("environments").select("id,name,location_id").eq("organization_id", loadOrganizationId).order("name")
     ]);
+    if (requestId !== batchPlaceOptionsRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
     if (locationsError) throw locationsError;
     if (environmentsError) throw environmentsError;
     batchLocationOptions = locations || [];
@@ -4761,6 +4924,7 @@ async function loadBatchPlaceOptions() {
     batchLocationInput.disabled = batchLocationOptions.length === 0;
     renderBatchEnvironmentOptions();
   } catch (error) {
+    if (requestId !== batchPlaceOptionsRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
     console.error("Référentiel des emplacements indisponible :", error);
     initializationWarnings.push("emplacements et environnements");
     batchLocationOptions = [];
@@ -4782,6 +4946,7 @@ moveBatchButton?.addEventListener("click", moveSelectedBatch);
    ============================================================ */
 
 async function loadMeasurementReferences() {
+  const loadRevision = authStateRevision;
   const [variableResult, unitResult] = await Promise.all([
     supabaseClient.from("variables")
       .select("code, label, dimension, canonical_unit_code, description")
@@ -4791,6 +4956,7 @@ async function loadMeasurementReferences() {
       .order("code")
   ]);
 
+  if (loadRevision !== authStateRevision) return;
   if (variableResult.error) {
     throw new Error(`Chargement des paramètres de mesure impossible : ${variableResult.error.message}`);
   }
@@ -4945,7 +5111,9 @@ function cultureWorkflowText(key) {
 }
 
 async function saveMeasurement() {
-  if (!organizationId) {
+  const operationRevision = authStateRevision;
+  const operationOrganizationId = organizationId;
+  if (!operationOrganizationId) {
     showMessage(cultureWorkflowText("organization"), "error");
     return;
   }
@@ -4975,6 +5143,7 @@ async function saveMeasurement() {
     showMessage("Impossible de vérifier votre session. Vérifiez la connexion puis réessayez. Aucune mesure n’a été enregistrée.", "error");
     return;
   }
+  if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
   if (!session) {
     showMessage(cultureWorkflowText("expired"), "error");
     return;
@@ -5014,7 +5183,7 @@ async function saveMeasurement() {
 
     const sameAsCanonical = variable.canonical_unit_code === unit.code;
     const eventPayload = {
-      organization_id: organizationId,
+      organization_id: operationOrganizationId,
       event_type: "measurement_recorded",
       occurred_at: measuredAt,
       actor_user_id: session.user.id,
@@ -5034,7 +5203,7 @@ async function saveMeasurement() {
       }
     };
     const measurementPayload = {
-      organization_id: organizationId,
+      organization_id: operationOrganizationId,
       variable_code: variable.code,
       raw_value: rawValue,
       raw_unit_code: unit.code,
@@ -5053,10 +5222,12 @@ async function saveMeasurement() {
         batch_id: batchId
       }
     };
+    if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
     const { error: recordError } = await supabaseClient.rpc("record_manual_measurement", {
       p_event: eventPayload,
       p_measurement: measurementPayload
     });
+    if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
     if (recordError) throw new Error(cultureWorkflowText("measureError") + recordError.message);
     measurementSaved = true;
 
@@ -5068,6 +5239,7 @@ async function saveMeasurement() {
     showMessage(cultureWorkflowText("measureSaved"), "success");
     await loadRecentMeasurements();
   } catch (error) {
+    if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
     console.error("Enregistrement mesure :", error);
     if (measurementSaved) {
       showMessage(cultureWorkflowText("measureRefresh"), "warning");
@@ -5075,8 +5247,10 @@ async function saveMeasurement() {
       showMessage(error.message || cultureWorkflowText("measureFailed"), "error");
     }
   } finally {
-    saveMeasurementButton.disabled = false;
-    saveMeasurementButton.textContent = cultureWorkflowText("saveMeasure");
+    if (isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) {
+      saveMeasurementButton.disabled = false;
+      saveMeasurementButton.textContent = cultureWorkflowText("saveMeasure");
+    }
   }
 }
 
@@ -5098,16 +5272,22 @@ function belongsToActiveWorkspace(record, eventsById = {}) {
   );
 }
 
+let measurementHistoryRequestId = 0;
+
 async function loadRecentMeasurements() {
-  if (!organizationId || !measurementHistory) return;
+  const requestId = ++measurementHistoryRequestId;
+  const loadRevision = authStateRevision;
+  const loadOrganizationId = organizationId;
+  if (!loadOrganizationId || !measurementHistory) return;
 
   const { data, error } = await supabaseClient
     .from("measurements")
     .select("id, variable_code, raw_value, raw_unit_code, normalized_value, normalized_unit_code, measured_at, method, instrument, culture_id, plant_culture_id, event_id, metadata")
-    .eq("organization_id", organizationId)
+    .eq("organization_id", loadOrganizationId)
     .order("measured_at", { ascending: false })
     .limit(1000);
 
+  if (requestId !== measurementHistoryRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
   if (error) throw new Error(`Chargement de l’historique des mesures impossible : ${error.message}`);
 
   const rows = data || [];
@@ -5117,12 +5297,14 @@ async function loadRecentMeasurements() {
     const { data: events, error: eventsError } = await supabaseClient
       .from("events")
       .select("id, batch_id, culture_id, plant_culture_id")
-      .eq("organization_id", organizationId)
+      .eq("organization_id", loadOrganizationId)
       .in("id", eventIds);
+    if (requestId !== measurementHistoryRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
     if (eventsError) console.warn("Détails des événements de mesure indisponibles :", eventsError.message);
     for (const event of events || []) eventsById[event.id] = event;
   }
 
+  if (requestId !== measurementHistoryRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
   const visibleRows = rows.filter(row => belongsToActiveWorkspace(row, eventsById)).slice(0, 10);
   if (!visibleRows.length) {
     measurementHistory.innerHTML = '<p class="muted">Aucune mesure enregistrée dans cet univers pour le moment.</p>';
@@ -5162,7 +5344,9 @@ async function loadRecentMeasurements() {
 
 
 async function saveObservation() {
-  if (!organizationId) {
+  const operationRevision = authStateRevision;
+  const operationOrganizationId = organizationId;
+  if (!operationOrganizationId) {
     showMessage(cultureWorkflowText("organization"), "error");
     return;
   }
@@ -5185,6 +5369,7 @@ async function saveObservation() {
     showMessage("Impossible de vérifier votre session. Vérifiez la connexion puis réessayez. Aucune observation n’a été enregistrée.", "error");
     return;
   }
+  if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
   if (!session) {
     showMessage(cultureWorkflowText("expired"), "error");
     return;
@@ -5225,7 +5410,7 @@ async function saveObservation() {
     }
 
     const eventPayload = {
-      organization_id: organizationId,
+      organization_id: operationOrganizationId,
       event_type: "observation_recorded",
       occurred_at: observedAt,
       actor_user_id: session.user.id,
@@ -5244,7 +5429,7 @@ async function saveObservation() {
       }
     };
     const observationPayload = {
-      organization_id: organizationId,
+      organization_id: operationOrganizationId,
       variable_code: variable.code,
       value_text: valueText,
       observed_at: observedAt,
@@ -5259,10 +5444,12 @@ async function saveObservation() {
         batch_id: batchId
       }
     };
+    if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
     const { error: recordError } = await supabaseClient.rpc("record_manual_observation", {
       p_event: eventPayload,
       p_observation: observationPayload
     });
+    if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
     if (recordError) throw new Error(cultureWorkflowText("observationError") + recordError.message);
     observationSaved = true;
     observationValueInput.value = "";
@@ -5272,6 +5459,7 @@ async function saveObservation() {
     showMessage(cultureWorkflowText("observationSaved"), "success");
     await loadRecentObservations();
   } catch (error) {
+    if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
     console.error("Enregistrement observation :", error);
     if (observationSaved) {
       showMessage(cultureWorkflowText("observationRefresh"), "warning");
@@ -5279,20 +5467,28 @@ async function saveObservation() {
       showMessage(error.message || cultureWorkflowText("observationFailed"), "error");
     }
   } finally {
-    saveObservationButton.disabled = false;
-    saveObservationButton.textContent = cultureWorkflowText("saveObservation");
+    if (isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) {
+      saveObservationButton.disabled = false;
+      saveObservationButton.textContent = cultureWorkflowText("saveObservation");
+    }
   }
 }
 
+let observationHistoryRequestId = 0;
+
 async function loadRecentObservations() {
-  if (!organizationId || !observationHistory) return;
+  const requestId = ++observationHistoryRequestId;
+  const loadRevision = authStateRevision;
+  const loadOrganizationId = organizationId;
+  if (!loadOrganizationId || !observationHistory) return;
 
   const query = await supabaseClient.from("observations")
     .select("id, variable_code, value_text, observed_at, culture_id, plant_culture_id, event_id, metadata")
-    .eq("organization_id", organizationId)
+    .eq("organization_id", loadOrganizationId)
     .order("observed_at", { ascending: false })
     .limit(1000);
 
+  if (requestId !== observationHistoryRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
   if (query.error) throw new Error("Chargement de l’historique des observations impossible : " + query.error.message);
   const observationRows = query.data || [];
   const eventIds = [...new Set(observationRows.map(row => row.event_id).filter(Boolean))];
@@ -5301,12 +5497,14 @@ async function loadRecentObservations() {
   if (eventIds.length) {
     const eventsResult = await supabaseClient.from("events")
       .select("id, batch_id, culture_id, plant_culture_id")
-      .eq("organization_id", organizationId)
+      .eq("organization_id", loadOrganizationId)
       .in("id", eventIds);
+    if (requestId !== observationHistoryRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
     if (eventsResult.error) console.warn("Détails des événements d’observation indisponibles :", eventsResult.error.message);
     for (const event of eventsResult.data || []) eventsById[event.id] = event;
   }
 
+  if (requestId !== observationHistoryRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
   recentObservations = observationRows.filter(row => belongsToActiveWorkspace(row, eventsById)).slice(0, 8);
   updateOverview();
   if (!recentObservations.length) {
@@ -5521,6 +5719,8 @@ let statisticsRequestId = 0;
 
 async function loadStatistics() {
   const requestId = ++statisticsRequestId;
+  const loadRevision = authStateRevision;
+  const loadOrganizationId = organizationId;
   const variableCode = document.getElementById("statisticsVariable").value;
   const domain = document.body.dataset.domain || "mycology";
   const selectedTargetId = document.getElementById("statisticsCulture").value;
@@ -5540,9 +5740,9 @@ async function loadStatistics() {
     ar: { login:"سجّل الدخول لتحليل بيانات مؤسستك.", variable:"اختر متغيرًا مقاسًا.", loading:"جارٍ تحميل القياسات من Supabase…", loadingData:"جارٍ تحميل البيانات…", buttonLoading:"جارٍ التحميل…", buttonAnalyze:"تحليل البيانات", loadedMeasurements:"القياسات المحمّلة", numericValues:"القيم الرقمية", comparableValues:"القيم القابلة للمقارنة", capped:"تطابق ١٬٠٠٠ قياس على الأقل عوامل التصفية. قد تكون النتائج مقتطعة؛ قلّص الفترة أو اختر مزرعة.", excluded:n=>n+" قيمة مستبعدة من الرسم لأن الوحدة غير قابلة للمقارنة. ", loaded:"تم تحميل البيانات من Supabase. النتائج وصفية.", empty:"لا توجد قياسات تطابق عوامل التصفية المحددة.", needTwo:"يلزم قياسان رقميان قابلان للمقارنة على الأقل لرسم الاتجاه. تبقى البيانات الخام متاحة أدناه.", unknownDate:"تاريخ غير معروف", measurementDate:"تاريخ القياس", unknownUnit:"وحدة غير معروفة", period:"الفترة المعروضة: ", noRows:"لا توجد قياسات لهذه العوامل.", limited:n=>"يقتصر العرض على أحدث ٢٠٠ قياس من أصل "+n+" قياسًا محمّلًا.", graphError:"تعذر إنشاء الرسم البياني.", unavailable:"البيانات غير متاحة.", loadError:"تعذر تحميل القياسات: ", cultureLinked:"مزرعة مرتبطة بالمعرّف", noCulture:"دفعة / هدف دون مزرعة مباشرة", unitMissing:"الوحدة غير محددة" }
   })[lang] || null;
   const L = tr || ({ fr: true }).fr && ({ login:"Connectez-vous pour analyser les données de votre organisation.", variable:"Sélectionnez une variable mesurée.", loading:"Chargement des mesures depuis Supabase…", loadingData:"Chargement des données…", buttonLoading:"Chargement…", buttonAnalyze:"Analyser les données", loadedMeasurements:"Mesures chargées", numericValues:"Valeurs numériques", comparableValues:"Valeurs comparables", capped:"Au moins 1 000 mesures correspondent aux filtres. Le résultat peut être tronqué ; réduisez la période ou sélectionnez une culture.", excluded:n=>n+" valeur(s) exclue(s) du graphique car l’unité n’est pas comparable. ", loaded:"Données chargées depuis Supabase. Les résultats sont descriptifs.", empty:"Aucune mesure ne correspond aux filtres sélectionnés.", needTwo:"Il faut au moins deux mesures numériques comparables pour tracer une évolution. Les données brutes restent consultables ci-dessous.", unknownDate:"Date inconnue", measurementDate:"Date de mesure", unknownUnit:"unité inconnue", period:"Période représentée : ", noRows:"Aucune mesure pour ces filtres.", limited:n=>"Affichage limité aux 200 mesures les plus récentes sur "+n+" chargées.", graphError:"Le graphique n’a pas pu être produit.", unavailable:"Données indisponibles.", loadError:"Impossible de charger les mesures : ", cultureLinked:"Culture liée par identifiant", noCulture:"Lot / cible sans culture directe", unitMissing:"Unité non renseignée" });
-  if (!organizationId) { status.textContent = L.login; return; }
-  if (!variableCode) { status.textContent = L.variable; return; }
   const button = document.getElementById("loadStatisticsButton");
+  if (!loadOrganizationId) { status.textContent = L.login; if (button && requestId === statisticsRequestId) { button.disabled = false; button.textContent = L.buttonAnalyze; } return; }
+  if (!variableCode) { status.textContent = L.variable; if (button && requestId === statisticsRequestId) { button.disabled = false; button.textContent = L.buttonAnalyze; } return; }
   button.disabled = true; button.textContent = L.buttonLoading;
   status.textContent = L.loading; chart.innerHTML = '<p class="muted">' + L.loadingData + '</p>'; summary.innerHTML = ""; tbody.innerHTML = "";
   try {
@@ -5551,30 +5751,30 @@ async function loadStatistics() {
     let noMatchingCultureBatchEvents = false;
     let noWorkspaceTargets = false;
     if (batchId) {
-      const {data: batchEvents, error: batchEventsError} = await supabaseClient.from("events").select("id").eq("organization_id", organizationId).eq("batch_id", batchId);
+      const {data: batchEvents, error: batchEventsError} = await supabaseClient.from("events").select("id").eq("organization_id", loadOrganizationId).eq("batch_id", batchId);
       if (batchEventsError) throw new Error("Chargement des événements du lot impossible : " + batchEventsError.message);
-      if (requestId !== statisticsRequestId) return;
+      if (requestId !== statisticsRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
       batchEventIds = (batchEvents || []).map(event => event.id);
     }
     if (cultureId) {
-      const {data: cultureBatches, error: cultureBatchesError} = await supabaseClient.from("batches").select("id").eq("organization_id", organizationId).eq("culture_id", cultureId).order("created_at", {ascending:false}).limit(1000);
+      const {data: cultureBatches, error: cultureBatchesError} = await supabaseClient.from("batches").select("id").eq("organization_id", loadOrganizationId).eq("culture_id", cultureId).order("created_at", {ascending:false}).limit(1000);
       if (cultureBatchesError) throw new Error("Chargement des lots liés à la culture impossible : " + cultureBatchesError.message);
-      if (requestId !== statisticsRequestId) return;
+      if (requestId !== statisticsRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
       const cultureBatchIds = (cultureBatches || []).map(batch => batch.id);
       const cultureEventQueries = [
-        supabaseClient.from("events").select("id").eq("organization_id", organizationId).eq("culture_id", cultureId)
+        supabaseClient.from("events").select("id").eq("organization_id", loadOrganizationId).eq("culture_id", cultureId)
       ];
       if (cultureBatchIds.length) {
-        cultureEventQueries.push(supabaseClient.from("events").select("id").eq("organization_id", organizationId).in("batch_id", cultureBatchIds));
+        cultureEventQueries.push(supabaseClient.from("events").select("id").eq("organization_id", loadOrganizationId).in("batch_id", cultureBatchIds));
       }
       const cultureEventResults = await Promise.all(cultureEventQueries);
-      if (requestId !== statisticsRequestId) return;
+      if (requestId !== statisticsRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
       for (const result of cultureEventResults) {
         if (result.error) throw new Error("Chargement des événements liés à la culture impossible : " + result.error.message);
       }
       cultureEventIds = [...new Set(cultureEventResults.flatMap(result => (result.data || []).map(event => event.id)))];
     }
-    let query = supabaseClient.from("measurements").select("id, variable_code, raw_value, raw_unit_code, normalized_value, normalized_unit_code, measured_at, method, culture_id, plant_culture_id, event_id, metadata").eq("organization_id", organizationId).eq("variable_code", variableCode).order("measured_at", {ascending:false}).limit(1000);
+    let query = supabaseClient.from("measurements").select("id, variable_code, raw_value, raw_unit_code, normalized_value, normalized_unit_code, measured_at, method, culture_id, plant_culture_id, event_id, metadata").eq("organization_id", loadOrganizationId).eq("variable_code", variableCode).order("measured_at", {ascending:false}).limit(1000);
     if (plantCultureId) {
       query = query.eq("plant_culture_id", plantCultureId);
     } else if (cultureId && batchId) {
@@ -5597,10 +5797,10 @@ async function loadStatistics() {
         const cultureIds = cultureOptions.map(culture => culture.id);
         const batchIds = domain === "laboratory" ? latestBatches.map(batch => batch.id) : [];
         const eventQueries = [];
-        if (cultureIds.length) eventQueries.push(supabaseClient.from("events").select("id").eq("organization_id", organizationId).in("culture_id", cultureIds));
-        if (batchIds.length) eventQueries.push(supabaseClient.from("events").select("id").eq("organization_id", organizationId).in("batch_id", batchIds));
+        if (cultureIds.length) eventQueries.push(supabaseClient.from("events").select("id").eq("organization_id", loadOrganizationId).in("culture_id", cultureIds));
+        if (batchIds.length) eventQueries.push(supabaseClient.from("events").select("id").eq("organization_id", loadOrganizationId).in("batch_id", batchIds));
         const eventResults = await Promise.all(eventQueries);
-        if (requestId !== statisticsRequestId) return;
+        if (requestId !== statisticsRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
         for (const result of eventResults) {
           if (result.error) throw new Error("Chargement du périmètre des statistiques impossible : " + result.error.message);
         }
@@ -5614,7 +5814,7 @@ async function loadStatistics() {
     }
     if (period !== "all") { const since = new Date(); since.setDate(since.getDate() - Number(period)); query = query.gte("measured_at", since.toISOString()); }
     const queryResult = noWorkspaceTargets || (batchId && !batchEventIds.length) || (cultureId && !cultureEventIds.length && batchId) || noMatchingCultureBatchEvents ? {data:[],error:null} : await query;
-    if (requestId !== statisticsRequestId) return;
+    if (requestId !== statisticsRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
     const {data,error} = queryResult; if (error) throw new Error(error.message);
     const rows = (data || []).slice().sort((a,b) => new Date(a.measured_at || 0).getTime() - new Date(b.measured_at || 0).getTime()), variable = measurementVariables.find(item => item.code === variableCode), cultureById = new Map(cultureOptions.map(culture => [culture.id,culture]));
     const prepared = rows.map(row => { const normalized = row.normalized_value !== null && row.normalized_value !== undefined && row.normalized_value !== "" && row.normalized_unit_code; const raw = normalized ? row.normalized_value : row.raw_value; const hasValue = raw !== null && raw !== undefined && raw !== "" && typeof raw !== "boolean"; return {...row, plotValue:hasValue ? Number(raw) : NaN, plotUnit:normalized ? row.normalized_unit_code : row.raw_unit_code, normalized:Boolean(normalized)}; }).filter(row => Number.isFinite(row.plotValue));
@@ -5656,8 +5856,8 @@ async function loadStatistics() {
     }
     if(!rows.length) tbody.innerHTML='<tr><td colspan="5">' + L.noRows + '</td></tr>';
     else { rows.slice().reverse().slice(0,200).forEach(row=>{const tr=document.createElement("tr"),culture=cultureById.get(row.culture_id),cells=[row.measured_at?new Date(row.measured_at).toLocaleString("fr-FR"):"Date inconnue",culture?.code||(row.culture_id?L.cultureLinked:L.noCulture),String(row.raw_value??"—"),row.raw_unit_code||"Unité non renseignée",row.method||"—"];cells.forEach(value=>{const td=document.createElement("td");td.textContent=value;tr.appendChild(td);});tbody.appendChild(tr);});if(rows.length>200){const tr=document.createElement("tr"),td=document.createElement("td");td.colSpan=5;td.textContent=L.limited(rows.length);tr.appendChild(td);tbody.appendChild(tr);}}
-  } catch(error) { if (requestId !== statisticsRequestId) return; console.error("Analyse des mesures impossible :",error); status.textContent=L.loadError+error.message; chart.innerHTML='<p class="muted">' + L.graphError + '</p>'; summary.innerHTML=""; tbody.innerHTML='<tr><td colspan="5">' + L.unavailable + '</td></tr>'; }
-  finally { if (requestId === statisticsRequestId) { button.disabled=false; button.textContent=L.buttonAnalyze; } }
+  } catch(error) { if (requestId !== statisticsRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return; console.error("Analyse des mesures impossible :",error); status.textContent=L.loadError+error.message; chart.innerHTML='<p class="muted">' + L.graphError + '</p>'; summary.innerHTML=""; tbody.innerHTML='<tr><td colspan="5">' + L.unavailable + '</td></tr>'; }
+  finally { if (requestId === statisticsRequestId && isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) { button.disabled=false; button.textContent=L.buttonAnalyze; } }
 }
 
 function biologicalWorkflowText(key, count = 0) {
@@ -5673,13 +5873,17 @@ function biologicalWorkflowText(key, count = 0) {
 }
 
 async function loadBiologicalLineage(cultureId) {
+  const requestId = ++biologicalLineageRequestId;
+  const loadRevision = authStateRevision;
+  const loadOrganizationId = organizationId;
   const target = document.getElementById('cultureLineage');
-  if (!target || !organizationId) return;
+  if (!target || !loadOrganizationId) return;
   target.textContent = biologicalWorkflowText("loading");
   try {
     const { data, error } = await supabaseClient.from('cultures')
       .select('id,code,culture_type,material_id,parent_culture_id,started_at,metadata')
-      .eq('organization_id', organizationId).order('created_at', { ascending: true }).limit(1000);
+      .eq('organization_id', loadOrganizationId).order('created_at', { ascending: true }).limit(1000);
+    if (requestId !== biologicalLineageRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
     if (error) throw error;
     const rows = data || [];
     const byId = new Map(rows.map(row => [row.id, row]));
@@ -5687,7 +5891,8 @@ async function loadBiologicalLineage(cultureId) {
     if (!current) { target.textContent = biologicalWorkflowText("missing"); return; }
     const { data: materials, error: materialError } = await supabaseClient.from('materials')
       .select('id,material_code,material_type,parent_material_id,generation,state,strain_id')
-      .eq('organization_id', organizationId).limit(2000);
+      .eq('organization_id', loadOrganizationId).limit(2000);
+    if (requestId !== biologicalLineageRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
     if (materialError) throw materialError;
     const materialById = new Map((materials || []).map(item => [item.id, item]));
     const materialChain = []; let materialId = current.material_id; let materialGuard = 0;
@@ -5710,11 +5915,13 @@ async function loadBiologicalLineage(cultureId) {
     if (descendants.length) makeGroup(biologicalWorkflowText("descendants") + ' (' + descendants.length + ')', descendants.map(row => ({ row, label: biologicalWorkflowText("generation") + (row.depth || 1) })));
     if (!ancestors.length && !descendants.length) { const p = document.createElement('p'); p.className = 'muted'; p.textContent = biologicalWorkflowText("noLineage"); target.appendChild(p); }
     if (rows.length >= 1000) { const note = document.createElement('p'); note.className = 'muted'; note.textContent = biologicalWorkflowText("partial"); target.appendChild(note); }
-  } catch (error) { target.textContent = biologicalWorkflowText("loadError") + (error.message || error); }
+  } catch (error) { if (requestId !== biologicalLineageRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return; target.textContent = biologicalWorkflowText("loadError") + (error.message || error); }
 }
 
 async function saveBiologicalOperation(event) {
   event.preventDefault();
+  const operationRevision = authStateRevision;
+  const operationOrganizationId = organizationId;
   const button = document.getElementById('saveBioOperation');
   const message = document.getElementById('bioOperationMessage');
   const cultureId = document.getElementById('cultureDetailPanel')?.dataset.cultureId;
@@ -5731,16 +5938,19 @@ async function saveBiologicalOperation(event) {
   button.disabled = true; button.textContent = biologicalWorkflowText("saving"); message.textContent = '';
   try {
     const { data, error } = await supabaseClient.rpc('record_biological_operation', {
-      p_organization_id: organizationId, p_parent_culture_id: cultureId, p_event_type: operationType,
+      p_organization_id: operationOrganizationId, p_parent_culture_id: cultureId, p_event_type: operationType,
       p_occurred_at: new Date(dateValue).toISOString(), p_note: note || null,
       p_details: { source: 'BA Labs Culture Tracker', interface_version: '3.0', conditions: conditions || null, outcome: outcome || null }, p_child_codes: childCodes
     });
+    if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
     if (error) throw error;
     const result = Array.isArray(data) ? data[0] : data;
     let notionSyncWarning = '';
     for (const child of (result?.children || [])) {
+      if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
       try {
         const { data: syncData, error: syncError } = await supabaseClient.functions.invoke('sync-culture-to-notion', { body: { culture_id: child.id } });
+        if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
         if (syncError || (syncData && syncData.ok === false)) notionSyncWarning = biologicalWorkflowText("syncWarning");
       } catch (syncError) { notionSyncWarning = biologicalWorkflowText("syncWarningShort"); }
     }
@@ -5749,21 +5959,30 @@ async function saveBiologicalOperation(event) {
     await loadCultureOptions();
     await loadCultureDetail(cultureId);
     await loadBiologicalLineage(cultureId);
-  } catch (error) { message.textContent = biologicalWorkflowText("failed") + (error.message || biologicalWorkflowText("notSaved")); }
-  finally { button.disabled = false; button.textContent = biologicalWorkflowText("save"); }
+  } catch (error) { if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return; message.textContent = biologicalWorkflowText("failed") + (error.message || biologicalWorkflowText("notSaved")); }
+  finally {
+    if (isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) {
+      button.disabled = false;
+      button.textContent = biologicalWorkflowText("save");
+    }
+  }
 }
 
 let cultureDetailRequestId = 0;
+let biologicalLineageRequestId = 0;
+let plantCultureListRequestId = 0;
 
 async function loadCultureDetail(cultureId) {
   const requestId = ++cultureDetailRequestId;
+  const loadRevision = authStateRevision;
+  const loadOrganizationId = organizationId;
   const culture = cultureOptions.find(item => item.id === cultureId);
   const panel = document.getElementById("cultureDetailPanel");
   const title = document.getElementById("cultureDetailTitle");
   const meta = document.getElementById("cultureDetailMeta");
   const summary = document.getElementById("cultureDetailSummary");
   const timeline = document.getElementById("cultureDetailTimeline");
-  if (!culture || !panel || !title || !meta || !summary || !timeline) return;
+  if (!loadOrganizationId || !culture || !panel || !title || !meta || !summary || !timeline) return;
 
   panel.dataset.cultureId = culture.id;
   loadBiologicalLineage(culture.id);
@@ -5794,29 +6013,29 @@ async function loadCultureDetail(cultureId) {
     const { data: cultureBatches, error: batchesError } = await supabaseClient
       .from("batches")
       .select("id, batch_code, name, batch_type, status, current_stage, started_at, completed_at")
-      .eq("organization_id", organizationId)
+      .eq("organization_id", loadOrganizationId)
       .eq("culture_id", culture.id)
       .order("created_at", { ascending: false })
       .limit(100);
     if (batchesError) throw new Error("Lots liés à la culture : " + batchesError.message);
-    if (requestId !== cultureDetailRequestId) return;
+    if (requestId !== cultureDetailRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
 
     const batches = cultureBatches || [];
     const batchIds = batches.map(batch => batch.id);
     const eventQueries = [
       supabaseClient.from("events").select("id, event_type, occurred_at, batch_id, payload")
-        .eq("organization_id", organizationId).eq("culture_id", culture.id)
+        .eq("organization_id", loadOrganizationId).eq("culture_id", culture.id)
         .order("occurred_at", { ascending: false }).limit(100)
     ];
     if (batchIds.length) {
       eventQueries.push(
         supabaseClient.from("events").select("id, event_type, occurred_at, batch_id, payload")
-          .eq("organization_id", organizationId).in("batch_id", batchIds)
+          .eq("organization_id", loadOrganizationId).in("batch_id", batchIds)
           .order("occurred_at", { ascending: false }).limit(100)
       );
     }
     const eventResults = await Promise.all(eventQueries);
-    if (requestId !== cultureDetailRequestId) return;
+    if (requestId !== cultureDetailRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
     for (const result of eventResults) {
       if (result.error) throw new Error("Événements : " + result.error.message);
     }
@@ -5826,30 +6045,30 @@ async function loadCultureDetail(cultureId) {
     const linkedEventIds = events.map(event => event.id);
     const measurementQueries = [
       supabaseClient.from("measurements").select("id, variable_code, raw_value, raw_unit_code, measured_at, event_id, metadata")
-        .eq("organization_id", organizationId).eq("culture_id", culture.id)
+        .eq("organization_id", loadOrganizationId).eq("culture_id", culture.id)
         .order("measured_at", { ascending: false }).limit(100)
     ];
     const observationQueries = [
       supabaseClient.from("observations").select("id, variable_code, value_text, observed_at, event_id, metadata")
-        .eq("organization_id", organizationId).eq("culture_id", culture.id)
+        .eq("organization_id", loadOrganizationId).eq("culture_id", culture.id)
         .order("observed_at", { ascending: false }).limit(100)
     ];
     if (linkedEventIds.length) {
       measurementQueries.push(
         supabaseClient.from("measurements").select("id, variable_code, raw_value, raw_unit_code, measured_at, event_id, metadata")
-          .eq("organization_id", organizationId).in("event_id", linkedEventIds)
+          .eq("organization_id", loadOrganizationId).in("event_id", linkedEventIds)
           .order("measured_at", { ascending: false }).limit(100)
       );
       observationQueries.push(
         supabaseClient.from("observations").select("id, variable_code, value_text, observed_at, event_id, metadata")
-          .eq("organization_id", organizationId).in("event_id", linkedEventIds)
+          .eq("organization_id", loadOrganizationId).in("event_id", linkedEventIds)
           .order("observed_at", { ascending: false }).limit(100)
       );
     }
     const [measurementResults, observationResults] = await Promise.all([
       Promise.all(measurementQueries), Promise.all(observationQueries)
     ]);
-    if (requestId !== cultureDetailRequestId) return;
+    if (requestId !== cultureDetailRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
     for (const result of measurementResults) {
       if (result.error) throw new Error("Mesures : " + result.error.message);
     }
@@ -5940,6 +6159,8 @@ async function loadCultureDetail(cultureId) {
         openBatch.textContent = "Ouvrir le lot";
         openBatch.setAttribute("aria-label", "Ouvrir le lot " + (batch.batch_code || batch.name || ""));
         openBatch.addEventListener("click", async () => {
+          if (!isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
+          if (panel.dataset.cultureId !== culture.id) return;
           activateWorkspaceModule("batchCard");
           document.getElementById("batchCard")?.scrollIntoView({
             block: "start",
@@ -5984,7 +6205,7 @@ async function loadCultureDetail(cultureId) {
     }
     panel.scrollIntoView({block:"start",behavior:window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth"});
   } catch (error) {
-    if (requestId !== cultureDetailRequestId) return;
+    if (requestId !== cultureDetailRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
     console.error("Chargement de la fiche culture :", error);
     timeline.innerHTML = "";
     const message = document.createElement("p");
@@ -6468,14 +6689,18 @@ function renderPlantCultureList(rows) {
 }
 
 async function loadPlantCultures() {
-  if (!organizationId) return;
+  const requestId = ++plantCultureListRequestId;
+  const loadRevision = authStateRevision;
+  const loadOrganizationId = organizationId;
+  if (!loadOrganizationId) return;
   const status = document.getElementById("plantCultureStatus");
   try {
     const { data, error } = await supabaseClient.from("plant_cultures")
       .select("id,code,crop_type,species_name,cultivar_name,quantity,unit_code,location_id,environment_id,substrate,started_at,status,notes")
-      .eq("organization_id", organizationId)
+      .eq("organization_id", loadOrganizationId)
       .order("created_at", { ascending: false })
       .limit(300);
+    if (requestId !== plantCultureListRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
     if (error) throw error;
     renderPlantCultureList(data || []);
     plantCultureOptions = data || [];
@@ -6483,6 +6708,7 @@ async function loadPlantCultures() {
     renderStatisticsFilters();
     if (status) status.textContent = "Registre végétal chargé depuis Supabase.";
   } catch (error) {
+    if (requestId !== plantCultureListRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
     console.error("Chargement du registre végétal impossible :", error);
     initializationWarnings.push("registre végétal");
     if (status) status.textContent = "Registre végétal indisponible : " + (error.message || "erreur inconnue");
@@ -6493,7 +6719,9 @@ async function loadPlantCultures() {
 
 async function savePlantCulture(event) {
   event.preventDefault();
-  if (!organizationId) {
+  const operationRevision = authStateRevision;
+  const operationOrganizationId = organizationId;
+  if (!operationOrganizationId) {
     showMessage("Organisation absente : reconnectez-vous avant d’enregistrer une culture végétale.", "error");
     return;
   }
@@ -6516,7 +6744,7 @@ async function savePlantCulture(event) {
   try {
     const startedValue = document.getElementById("plantStartedAt").value;
     const { error } = await supabaseClient.from("plant_cultures").insert({
-      organization_id: organizationId,
+      organization_id: operationOrganizationId,
       code,
       crop_type: cropType,
       species_name: crop.species,
@@ -6531,6 +6759,7 @@ async function savePlantCulture(event) {
       notes: document.getElementById("plantNotes").value.trim() || null,
       metadata: { source: "BA Labs CultureOps", domain: "agronomy", interface_version: "1.0" }
     });
+    if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
     if (error) throw error;
     form.reset();
     document.getElementById("plantQuantity").value = "1";
@@ -6546,15 +6775,19 @@ async function savePlantCulture(event) {
       plantEnvironment.appendChild(option);
     }
     await loadPlantCultures();
+    if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
     showMessage("Culture végétale enregistrée.", "success");
     if (status) status.textContent = "Culture enregistrée dans le registre AgriTech.";
   } catch (error) {
+    if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
     console.error("Enregistrement de la culture végétale impossible :", error);
     showMessage("Enregistrement impossible : " + (error.message || "erreur inconnue"), "error");
     if (status) status.textContent = "Échec de l’enregistrement. Vérifiez le code unique et les références.";
   } finally {
-    button.disabled = false;
-    button.textContent = oldLabel;
+    if (isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) {
+      button.disabled = false;
+      button.textContent = oldLabel;
+    }
   }
 }
 
@@ -6599,6 +6832,12 @@ function setupDomainWorkspaces() {
   const setDomain = (domain, persist = true) => {
     const activeDomain = Object.hasOwn(modes, domain) ? domain : "agronomy";
     const config = modes[activeDomain];
+    const previousDomain = document.body.dataset.domain;
+    if (previousDomain && previousDomain !== activeDomain) {
+      // A statistics request captures domain-specific filters. Ignore its
+      // response if the user switches workspaces before it completes.
+      statisticsRequestId += 1;
+    }
     document.body.dataset.domain = activeDomain;
     buttons.forEach(button => button.setAttribute("aria-pressed", String(button.dataset.domainChoice === activeDomain)));
     if (heading) heading.textContent = config.heading;
