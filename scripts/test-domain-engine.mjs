@@ -34,6 +34,8 @@ assert.match(trackerSource, /if \(stale \|\| requestedDomain !== \(document\.bod
   "stale measurement and observation requests must not overwrite the active workspace UI");
 assert.match(trackerSource, /async function loadMeasurementReferences\(\)[\s\S]*?const requestedDomain = document\.body\.dataset\.domain \|\| "mycology";[\s\S]*?const requestedOrganizationId = organizationId;[\s\S]*?requestedOrganizationId !== organizationId \|\|[\s\S]*?requestedDomain !== \(document\.body\.dataset\.domain \|\| "mycology"\)\) return;/,
   "late measurement reference responses must not overwrite selectors after an organization or workspace switch");
+assert.match(trackerSource, /async function loadMeasurementReferences\(\)[\s\S]*?catch \(error\) \{[\s\S]*?requestedOrganizationId !== organizationId \|\|[\s\S]*?throw error;/,
+  "late network-level measurement reference failures must be ignored after an organization or workspace switch");
 
 assert.match(trackerSource, /async function loadPlantCultures\(\)[\s\S]*?requestedOrganizationId !== organizationId \|\|[\s\S]*?requestedDomain !== document\.body\.dataset\.domain \|\|[\s\S]*?requestedDomain !== "agronomy"\) return;/,
   "late plant-registry responses must be discarded after leaving Green Tech");
