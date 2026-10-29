@@ -4329,10 +4329,12 @@ async function advanceBatch() {
   }
 
   finally {
-
-    advanceBatchButton.disabled =
-      false;
-
+    if (requestedAuthRevision === authStateRevision &&
+        requestedOrganizationId === organizationId &&
+        requestedDomain === (document.body.dataset.domain || "mycology") &&
+        requestedBatchId === selectedBatchId) {
+      advanceBatchButton.disabled = false;
+    }
   }
 
 }
@@ -4441,13 +4443,13 @@ async function releaseBatch() {
   }
 
   finally {
-
-    releaseBatchButton.disabled =
-      false;
-
-    releaseBatchButton.textContent =
-      "Libérer le batch";
-
+    if (requestedAuthRevision === authStateRevision &&
+        requestedOrganizationId === organizationId &&
+        requestedDomain === (document.body.dataset.domain || "mycology") &&
+        requestedBatchId === selectedBatchId) {
+      releaseBatchButton.disabled = false;
+      releaseBatchButton.textContent = "Libérer le batch";
+    }
   }
 
 }
@@ -4756,11 +4758,20 @@ async function moveSelectedBatch() {
     showMessage("Un lot clôturé ne peut pas être déplacé depuis ce formulaire.", "error");
     return;
   }
+  const requestedAuthRevision = authStateRevision;
+  const requestedOrganizationId = organizationId;
+  const requestedDomain = document.body.dataset.domain || "mycology";
+  const requestedBatchId = selectedBatchId;
+  const requestedBatch = selectedBatch;
+  const isCurrentOperation = () => requestedAuthRevision === authStateRevision &&
+    requestedOrganizationId === organizationId &&
+    requestedDomain === (document.body.dataset.domain || "mycology") &&
+    requestedBatchId === selectedBatchId;
   const locationId = moveBatchLocationInput?.value || null;
   const environmentId = moveBatchEnvironmentInput?.value || null;
   const note = moveBatchNoteInput?.value.trim() || null;
-  const currentLocation = selectedBatch.location_id || null;
-  const currentEnvironment = selectedBatch.environment_id || null;
+  const currentLocation = requestedBatch.location_id || null;
+  const currentEnvironment = requestedBatch.environment_id || null;
   if (locationId === currentLocation && environmentId === currentEnvironment) {
     showMessage("Le nouvel emplacement et l’environnement sont identiques aux valeurs actuelles.", "error");
     return;
@@ -4769,24 +4780,32 @@ async function moveSelectedBatch() {
   const label = moveBatchButton.textContent;
   moveBatchButton.textContent = "Enregistrement…";
   try {
+    if (!isCurrentOperation()) return;
     const { data, error } = await supabaseClient.rpc("move_batch_to_location", {
-      p_batch_id: selectedBatchId,
+      p_batch_id: requestedBatchId,
       p_location_id: locationId,
       p_environment_id: environmentId,
       p_note: note
     });
+    if (!isCurrentOperation()) return;
     if (error) throw error;
     if (!data?.event_id) throw new Error("La RPC n’a pas confirmé la création de l’événement de déplacement.");
+    if (!isCurrentOperation()) return;
     if (moveBatchNoteInput) moveBatchNoteInput.value = "";
     await loadLatestBatches();
-    await loadBatch(selectedBatchId);
+    if (!isCurrentOperation()) return;
+    await loadBatch(requestedBatchId);
+    if (!isCurrentOperation()) return;
     showMessage("Déplacement enregistré dans la chronologie du lot.", "success");
   } catch (error) {
+    if (!isCurrentOperation()) return;
     console.error("Déplacement du lot impossible:", error);
     showMessage("Déplacement impossible : " + (error.message || "erreur inconnue"), "error");
   } finally {
-    moveBatchButton.textContent = label;
-    if (selectedBatch) prepareMovementControls(selectedBatch);
+    if (isCurrentOperation()) {
+      moveBatchButton.textContent = label;
+      if (selectedBatch) prepareMovementControls(selectedBatch);
+    }
   }
 }
 
