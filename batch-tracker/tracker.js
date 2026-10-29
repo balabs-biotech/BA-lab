@@ -5904,7 +5904,8 @@ async function saveBiologicalOperation(event) {
   const requestedDomain = document.body.dataset.domain || "mycology";
   const isCurrentOperation = () => requestedAuthRevision === authStateRevision &&
     requestedOrganizationId === organizationId &&
-    requestedDomain === (document.body.dataset.domain || "mycology");
+    requestedDomain === (document.body.dataset.domain || "mycology") &&
+    document.getElementById('cultureDetailPanel')?.dataset.cultureId === cultureId;
   const button = document.getElementById('saveBioOperation');
   const message = document.getElementById('bioOperationMessage');
   const cultureId = document.getElementById('cultureDetailPanel')?.dataset.cultureId;
