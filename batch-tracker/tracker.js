@@ -2934,7 +2934,16 @@ async function recordBatchHarvest() {
     showMessage("Sélectionnez d’abord un lot.", "error");
     return;
   }
-  if (selectedBatch.current_stage !== "harvest" || selectedBatch.status !== "active") {
+  const requestedAuthRevision = authStateRevision;
+  const requestedOrganizationId = organizationId;
+  const requestedDomain = document.body.dataset.domain || "mycology";
+  const requestedBatchId = selectedBatchId;
+  const requestedBatch = selectedBatch;
+  const isCurrentOperation = () => requestedAuthRevision === authStateRevision &&
+    requestedOrganizationId === organizationId &&
+    requestedDomain === (document.body.dataset.domain || "mycology") &&
+    requestedBatchId === selectedBatchId;
+  if (requestedBatch.current_stage !== "harvest" || requestedBatch.status !== "active") {
     showMessage("La récolte ne peut être enregistrée que pendant l’étape Récolte d’un lot ouvert.", "error");
     return;
   }
@@ -2951,39 +2960,46 @@ async function recordBatchHarvest() {
   recordHarvestButton.textContent = "Enregistrement…";
   try {
     const session = await getCurrentSession();
+    if (!isCurrentOperation()) return;
     if (!session) throw new Error("Session expirée. Reconnectez-vous.");
     const { data: unit, error: unitError } = await supabaseClient.from("units").select("code").eq("code", unitCode).maybeSingle();
+    if (!isCurrentOperation()) return;
     if (unitError) throw new Error("Vérification de l’unité impossible : " + unitError.message);
     if (!unit) throw new Error("Code d’unité inconnu. Utilisez un code déjà présent dans le référentiel des unités.");
     // events requires exactly one biological/material/sample/unit anchor in addition to batch_id.
-    const eventAnchor = selectedBatch.culture_id
-      ? { culture_id: selectedBatch.culture_id }
-      : selectedBatch.material_id
-        ? { material_id: selectedBatch.material_id }
+    const eventAnchor = requestedBatch.culture_id
+      ? { culture_id: requestedBatch.culture_id }
+      : requestedBatch.material_id
+        ? { material_id: requestedBatch.material_id }
         : null;
     if (!eventAnchor) {
       throw new Error("Ce lot doit être lié à une culture ou à un matériau pour enregistrer une récolte dans le journal biologique.");
     }
+    if (!isCurrentOperation()) return;
     const { data: eventId, error } = await supabaseClient.rpc("record_batch_harvest", {
-      p_batch_id: selectedBatch.id,
+      p_batch_id: requestedBatchId,
       p_quantity: quantity,
       p_unit_code: unit.code,
       p_note: note || null
     });
+    if (!isCurrentOperation()) return;
     if (error) throw new Error("Enregistrement de la récolte impossible : " + error.message);
     if (!eventId) throw new Error("La base n’a pas confirmé l’enregistrement de la récolte.");
+    if (!isCurrentOperation()) return;
     harvestQuantityInput.value = "";
     harvestNoteInput.value = "";
     showMessage("Récolte enregistrée dans la chronologie du lot.", "success");
-    await loadBatch(selectedBatch.id);
+    await loadBatch(requestedBatchId);
+    if (!isCurrentOperation()) return;
     await loadLatestBatches();
   } catch (error) {
+    if (!isCurrentOperation()) return;
     console.error("Enregistrement récolte :", error);
     showMessage(error?.message || "Enregistrement de la récolte impossible.", "error");
   } finally {
-    recordHarvestButton.textContent = originalLabel;
-    if (selectedBatch) {
-      recordHarvestButton.disabled = !(selectedBatch.current_stage === "harvest" && selectedBatch.status === "active");
+    if (isCurrentOperation()) {
+      recordHarvestButton.textContent = originalLabel;
+      recordHarvestButton.disabled = !(selectedBatch && selectedBatch.current_stage === "harvest" && selectedBatch.status === "active");
     }
   }
 }
@@ -3509,6 +3525,10 @@ async function saveQcCheck(
   }
 
   qcSavesInFlight.add(checkId);
+  const requestedAuthRevision = authStateRevision;
+  const requestedOrganizationId = organizationId;
+  const requestedDomain = document.body.dataset.domain || "mycology";
+  const requestedBatchId = selectedBatchId;
 
   const button =
     batchQcList.querySelector(
@@ -3542,7 +3562,11 @@ async function saveQcCheck(
     qcSavesInFlight.delete(checkId);
 
     // Après un enregistrement réussi la liste est re-rendue : l'ancien bouton n'est plus dans le DOM.
-    if (button && button.isConnected) {
+    if (button && button.isConnected &&
+        requestedAuthRevision === authStateRevision &&
+        requestedOrganizationId === organizationId &&
+        requestedDomain === (document.body.dataset.domain || "mycology") &&
+        requestedBatchId === selectedBatchId) {
 
       button.disabled = false;
 
@@ -3559,12 +3583,16 @@ async function saveQcCheckNow(
   checkId
 ) {
 
-  if (!organizationId) {
+  if (!organizationId || !selectedBatchId) return;
 
-    return;
-
-  }
-
+  const requestedAuthRevision = authStateRevision;
+  const requestedOrganizationId = organizationId;
+  const requestedDomain = document.body.dataset.domain || "mycology";
+  const requestedBatchId = selectedBatchId;
+  const isCurrentOperation = () => requestedAuthRevision === authStateRevision &&
+    requestedOrganizationId === organizationId &&
+    requestedDomain === (document.body.dataset.domain || "mycology") &&
+    requestedBatchId === selectedBatchId;
 
   const select =
     batchQcList.querySelector(
@@ -3588,6 +3616,7 @@ async function saveQcCheckNow(
   } =
     await supabaseClient.auth.getSession();
 
+  if (!isCurrentOperation()) return;
 
   if (!sessionData.session) {
 
@@ -3627,13 +3656,15 @@ async function saveQcCheckNow(
       .update(update)
       .eq(
         "organization_id",
-        organizationId
+        requestedOrganizationId
       )
       .eq(
         "id",
         checkId
       );
 
+
+  if (!isCurrentOperation()) return;
 
   if (error) {
 
@@ -3653,7 +3684,7 @@ async function saveQcCheckNow(
 
 
   await loadBatch(
-    selectedBatchId
+    requestedBatchId
   );
 
 }
