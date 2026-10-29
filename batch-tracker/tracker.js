@@ -395,10 +395,14 @@ async function getCurrentSession() {
    CLAIM BA-LABS
    ============================================================ */
 
-async function claimBALabs() {
+async function claimBALabs(revision = authStateRevision) {
 
   const session =
     await getCurrentSession();
+
+  if (revision !== authStateRevision) {
+    throw new Error("Initialisation d’authentification obsolète.");
+  }
 
 
   if (!session) {
@@ -420,6 +424,10 @@ async function claimBALabs() {
         body: {}
       }
     );
+
+  if (revision !== authStateRevision) {
+    throw new Error("Initialisation d’authentification obsolète.");
+  }
 
 
   if (error) {
@@ -854,7 +862,9 @@ async function initializeAuthenticatedTracker(
 
 
     const claim =
-      await claimBALabs();
+      await claimBALabs(initRevision);
+
+    if (initRevision !== authStateRevision) return;
 
 
     if (!organizationId) {
@@ -879,14 +889,19 @@ async function initializeAuthenticatedTracker(
 
 
     await loadStrainOptions();
+    if (initRevision !== authStateRevision) return;
 
     await loadReferenceData();
+    if (initRevision !== authStateRevision) return;
 
     await loadCultureOptions();
+    if (initRevision !== authStateRevision) return;
 
     await loadQuantityUnitOptions();
+    if (initRevision !== authStateRevision) return;
 
     await loadBatchPlaceOptions();
+    if (initRevision !== authStateRevision) return;
 
     populatePlantLocationOptions();
     document.getElementById("plantLocation")?.dispatchEvent(new Event("change"));
@@ -895,23 +910,33 @@ async function initializeAuthenticatedTracker(
     // A plant-registry/RLS failure must not block authentication in those workspaces.
     if (document.body.dataset.domain === "agronomy") {
       await loadPlantCultures();
+      if (initRevision !== authStateRevision) return;
     }
 
     await syncPendingCultures();
+    if (initRevision !== authStateRevision) return;
 
     await loadLatestBatches();
+    if (initRevision !== authStateRevision) return;
 
     try {
       await loadMeasurementReferences();
+      if (initRevision !== authStateRevision) return;
       saveMeasurementButton.disabled = false;
       saveObservationButton.disabled = false;
-      try { await loadRecentMeasurements(); }
+      try {
+        await loadRecentMeasurements();
+        if (initRevision !== authStateRevision) return;
+      }
       catch (historyError) {
         console.error("Historique des mesures indisponible :", historyError);
         initializationWarnings.push("historique des mesures");
         measurementHistory.textContent = "Impossible de charger l’historique des mesures. L’enregistrement reste disponible.";
       }
-      try { await loadRecentObservations(); }
+      try {
+        await loadRecentObservations();
+        if (initRevision !== authStateRevision) return;
+      }
       catch (observationHistoryError) {
         console.error("Historique des observations indisponible :", observationHistoryError);
         initializationWarnings.push("historique des observations");
