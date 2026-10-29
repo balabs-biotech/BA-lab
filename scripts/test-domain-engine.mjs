@@ -43,6 +43,12 @@ assert.match(trackerSource, /async function initializeAuthenticatedTracker\([\s\
 
 assert.match(trackerSource, /async function loadPlantCultures\(\)[\s\S]*?requestedOrganizationId !== organizationId \|\|[\s\S]*?requestedDomain !== document\.body\.dataset\.domain \|\|[\s\S]*?requestedDomain !== "agronomy"\) return;/,
   "late plant-registry responses must be discarded after leaving Green Tech");
+
+assert.match(trackerSource, /async function saveMeasurement\(\)[\s\S]*?const requestedAuthRevision = authStateRevision;[\s\S]*?const requestedOrganizationId = organizationId;[\s\S]*?await getCurrentSession\(\);[\s\S]*?requestedAuthRevision !== authStateRevision[\s\S]*?organization_id: requestedOrganizationId,[\s\S]*?if \(recordError\) throw[\s\S]*?requestedAuthRevision !== authStateRevision/,
+  "measurement saves must remain bound to the submitting session, organization, and workspace across awaits");
+assert.match(trackerSource, /async function saveObservation\(\)[\s\S]*?const requestedAuthRevision = authStateRevision;[\s\S]*?const requestedOrganizationId = organizationId;[\s\S]*?await getCurrentSession\(\);[\s\S]*?requestedAuthRevision !== authStateRevision[\s\S]*?organization_id: requestedOrganizationId,[\s\S]*?if \(recordError\) throw[\s\S]*?requestedAuthRevision !== authStateRevision/,
+  "observation saves must remain bound to the submitting session, organization, and workspace across awaits");
+
 assert.match(trackerSource, /async function savePlantCulture\(event\)[\s\S]*?const requestedOrganizationId = organizationId;[\s\S]*?organization_id: requestedOrganizationId,[\s\S]*?if \(requestedOrganizationId !== organizationId \|\|[\s\S]*?requestedDomain !== "agronomy"\) return;[\s\S]*?form\.reset\(\);/,
   "plant culture saves must remain bound to the submitting organization and avoid resetting a different workspace after await");
 assert.match(trackerSource, /let workspaceSwitchRevision = 0;[\s\S]*?const switchRevision = \+\+workspaceSwitchRevision;[\s\S]*?switchRevision !== workspaceSwitchRevision/,
