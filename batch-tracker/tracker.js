@@ -1899,7 +1899,7 @@ async function createCulture() {
         {
 
           p_organization_id:
-            organizationId,
+            requestedOrganizationId,
 
           p_code:
             cultureCode,
@@ -3768,6 +3768,10 @@ async function createBatch() {
   }
 
 
+  const requestedAuthRevision = authStateRevision;
+  const requestedOrganizationId = organizationId;
+  const requestedDomain = document.body.dataset.domain || "mycology";
+
   const batchCode =
     batchCodeInput.value.trim();
 
@@ -3894,9 +3898,13 @@ async function createBatch() {
 
   const protocolVersionId =
     await getCultureProtocolVersionId(
-      selectedCulture.id
+      selectedCulture.id,
+      requestedOrganizationId
     );
 
+  if (requestedAuthRevision !== authStateRevision ||
+      requestedOrganizationId !== organizationId ||
+      requestedDomain !== (document.body.dataset.domain || "mycology")) return;
 
   const selectedMaterialId =
     selectedCulture.material_id;
@@ -3971,6 +3979,9 @@ async function createBatch() {
 
     }
 
+    if (requestedAuthRevision !== authStateRevision ||
+        requestedOrganizationId !== organizationId ||
+        requestedDomain !== (document.body.dataset.domain || "mycology")) return;
 
     const createdBatch =
       Array.isArray(data)
@@ -4047,16 +4058,12 @@ async function createBatch() {
 
     await loadLatestBatches();
 
+    if (requestedAuthRevision !== authStateRevision ||
+        requestedOrganizationId !== organizationId ||
+        requestedDomain !== (document.body.dataset.domain || "mycology")) return;
 
-    if (
-      createdBatch &&
-      createdBatch.id
-    ) {
-
-      await loadBatch(
-        createdBatch.id
-      );
-
+    if (createdBatch && createdBatch.id) {
+      await loadBatch(createdBatch.id);
     }
 
   }
@@ -4068,6 +4075,9 @@ async function createBatch() {
       error
     );
 
+    if (requestedAuthRevision !== authStateRevision ||
+        requestedOrganizationId !== organizationId ||
+        requestedDomain !== (document.body.dataset.domain || "mycology")) return;
 
     showMessage(
       error.message ||
@@ -4095,7 +4105,8 @@ async function createBatch() {
    ============================================================ */
 
 async function getCultureProtocolVersionId(
-  cultureId
+  cultureId,
+  requestedOrganizationId = organizationId
 ) {
 
   const {
@@ -4109,7 +4120,7 @@ async function getCultureProtocolVersionId(
       )
       .eq(
         "organization_id",
-        organizationId
+        requestedOrganizationId
       )
       .eq(
         "id",
