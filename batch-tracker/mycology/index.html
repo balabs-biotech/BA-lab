@@ -31,6 +31,12 @@
           script.onerror = () => {
             document.getElementById("workspace-root").innerHTML = "<main class='container'><p role='alert'>Le moteur de CultureOps n’a pas pu être chargé. Rechargez la page.</p></main>";
           };
+          script.onload = () => {
+            const assisted = document.createElement("script");
+            assisted.src = "../smart-entry.js?v=20261029-assisted-entry-1";
+            assisted.onerror = () => console.error("Le module de saisie assistée n’a pas pu être chargé.");
+            document.body.appendChild(assisted);
+          };
           document.body.appendChild(script);
         };
         i18nScript.onerror = () => {
