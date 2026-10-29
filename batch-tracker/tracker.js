@@ -4952,6 +4952,9 @@ async function saveMeasurement() {
     showMessage(cultureWorkflowText("organization"), "error");
     return;
   }
+  const requestedAuthRevision = authStateRevision;
+  const requestedOrganizationId = organizationId;
+  const requestedDomain = document.body.dataset.domain || "mycology";
 
   const targetValue = measurementTargetSelect.value;
   const variable = measurementVariables.find(item => item.code === measurementVariableSelect.value);
@@ -4981,10 +4984,16 @@ async function saveMeasurement() {
   try {
     session = await getCurrentSession();
   } catch (error) {
+    if (requestedAuthRevision !== authStateRevision ||
+        requestedOrganizationId !== organizationId ||
+        requestedDomain !== (document.body.dataset.domain || "mycology")) return;
     console.error("Vérification de session avant mesure impossible :", error);
     showMessage("Impossible de vérifier votre session. Vérifiez la connexion puis réessayez. Aucune mesure n’a été enregistrée.", "error");
     return;
   }
+  if (requestedAuthRevision !== authStateRevision ||
+      requestedOrganizationId !== organizationId ||
+      requestedDomain !== (document.body.dataset.domain || "mycology")) return;
   if (!session) {
     showMessage(cultureWorkflowText("expired"), "error");
     return;
@@ -5024,7 +5033,7 @@ async function saveMeasurement() {
 
     const sameAsCanonical = variable.canonical_unit_code === unit.code;
     const eventPayload = {
-      organization_id: organizationId,
+      organization_id: requestedOrganizationId,
       event_type: "measurement_recorded",
       occurred_at: measuredAt,
       actor_user_id: session.user.id,
@@ -5044,7 +5053,7 @@ async function saveMeasurement() {
       }
     };
     const measurementPayload = {
-      organization_id: organizationId,
+      organization_id: requestedOrganizationId,
       variable_code: variable.code,
       raw_value: rawValue,
       raw_unit_code: unit.code,
@@ -5069,6 +5078,9 @@ async function saveMeasurement() {
     });
     if (recordError) throw new Error(cultureWorkflowText("measureError") + recordError.message);
     measurementSaved = true;
+    if (requestedAuthRevision !== authStateRevision ||
+        requestedOrganizationId !== organizationId ||
+        requestedDomain !== (document.body.dataset.domain || "mycology")) return;
 
     measurementValueInput.value = "";
     measurementInstrumentInput.value = "";
@@ -5078,6 +5090,9 @@ async function saveMeasurement() {
     showMessage(cultureWorkflowText("measureSaved"), "success");
     await loadRecentMeasurements();
   } catch (error) {
+    if (requestedAuthRevision !== authStateRevision ||
+        requestedOrganizationId !== organizationId ||
+        requestedDomain !== (document.body.dataset.domain || "mycology")) return;
     console.error("Enregistrement mesure :", error);
     if (measurementSaved) {
       showMessage(cultureWorkflowText("measureRefresh"), "warning");
@@ -5225,6 +5240,9 @@ async function saveObservation() {
     showMessage(cultureWorkflowText("organization"), "error");
     return;
   }
+  const requestedAuthRevision = authStateRevision;
+  const requestedOrganizationId = organizationId;
+  const requestedDomain = document.body.dataset.domain || "mycology";
 
   const targetValue = measurementTargetSelect.value;
   const variable = measurementVariables.find(item => item.code === observationVariableSelect.value);
@@ -5247,10 +5265,16 @@ async function saveObservation() {
   try {
     session = await getCurrentSession();
   } catch (error) {
+    if (requestedAuthRevision !== authStateRevision ||
+        requestedOrganizationId !== organizationId ||
+        requestedDomain !== (document.body.dataset.domain || "mycology")) return;
     console.error("Vérification de session avant observation impossible :", error);
     showMessage("Impossible de vérifier votre session. Vérifiez la connexion puis réessayez. Aucune observation n’a été enregistrée.", "error");
     return;
   }
+  if (requestedAuthRevision !== authStateRevision ||
+      requestedOrganizationId !== organizationId ||
+      requestedDomain !== (document.body.dataset.domain || "mycology")) return;
   if (!session) {
     showMessage(cultureWorkflowText("expired"), "error");
     return;
@@ -5291,7 +5315,7 @@ async function saveObservation() {
     }
 
     const eventPayload = {
-      organization_id: organizationId,
+      organization_id: requestedOrganizationId,
       event_type: "observation_recorded",
       occurred_at: observedAt,
       actor_user_id: session.user.id,
@@ -5310,7 +5334,7 @@ async function saveObservation() {
       }
     };
     const observationPayload = {
-      organization_id: organizationId,
+      organization_id: requestedOrganizationId,
       variable_code: variable.code,
       value_text: valueText,
       observed_at: observedAt,
@@ -5331,6 +5355,9 @@ async function saveObservation() {
     });
     if (recordError) throw new Error(cultureWorkflowText("observationError") + recordError.message);
     observationSaved = true;
+    if (requestedAuthRevision !== authStateRevision ||
+        requestedOrganizationId !== organizationId ||
+        requestedDomain !== (document.body.dataset.domain || "mycology")) return;
     observationValueInput.value = "";
     observationMethodInput.value = "";
     observationInstrumentInput.value = "";
@@ -5338,6 +5365,9 @@ async function saveObservation() {
     showMessage(cultureWorkflowText("observationSaved"), "success");
     await loadRecentObservations();
   } catch (error) {
+    if (requestedAuthRevision !== authStateRevision ||
+        requestedOrganizationId !== organizationId ||
+        requestedDomain !== (document.body.dataset.domain || "mycology")) return;
     console.error("Enregistrement observation :", error);
     if (observationSaved) {
       showMessage(cultureWorkflowText("observationRefresh"), "warning");
