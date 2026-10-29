@@ -161,3 +161,13 @@ assert.match(trackerSource, /async function saveQcCheck\([\s\S]*?const requested
   "the QC action must not re-enable an old button after the authenticated workspace changes");
 assert.match(trackerSource, /async function recordBatchHarvest\(\)[\s\S]*?const requestedAuthRevision = authStateRevision;[\s\S]*?const requestedBatchId = selectedBatchId;[\s\S]*?requestedAuthRevision !== authStateRevision[\s\S]*?p_batch_id:\s*requestedBatchId[\s\S]*?finally[\s\S]*?requestedAuthRevision === authStateRevision/,
   "harvest recording must use the captured batch and suppress stale post-save UI updates");
+
+for (const [name, button] of [["advanceBatch", "advanceBatchButton"], ["releaseBatch", "releaseBatchButton"]]) {
+  const start = trackerSource.indexOf("async function " + name + "(");
+  const end = trackerSource.indexOf("\n\n/* ============================================================\n   " + (name === "advanceBatch" ? "LIBERATION DU BATCH" : "EVENEMENTS"), start + 20);
+  const block = trackerSource.slice(start, end < 0 ? trackerSource.length : end);
+  assert.match(block, new RegExp("finally\\s*\\{[\\s\\S]*?requestedAuthRevision === authStateRevision[\\s\\S]*?requestedOrganizationId === organizationId[\\s\\S]*?" + button + "\\.disabled = false"),
+    name + " must not re-enable its action after the selected batch or session changes");
+}
+assert.match(trackerSource, /async function moveSelectedBatch\(\)[\s\S]*?const requestedAuthRevision = authStateRevision;[\s\S]*?const requestedBatchId = selectedBatchId;[\s\S]*?p_batch_id: requestedBatchId[\s\S]*?requestedAuthRevision !== authStateRevision[\s\S]*?finally[\s\S]*?requestedAuthRevision === authStateRevision/,
+  "moving a batch must remain bound to the selected batch and suppress stale UI updates");
