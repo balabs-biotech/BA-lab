@@ -4919,7 +4919,7 @@ async function loadMeasurementReferences() {
   measurementVariables = variableResult.data || [];
   measurementUnits = unitResult.data || [];
 
-  const visibleVariables = window.BALabsDomainEngine.filterMeasurementVariables(measurementVariables);
+  const visibleVariables = workspaceMeasurementVariables(measurementVariables, document.body.dataset.domain || "mycology");
   measurementVariableSelect.innerHTML = "";
   const placeholder = document.createElement("option");
   placeholder.value = "";
