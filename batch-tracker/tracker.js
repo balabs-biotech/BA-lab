@@ -2260,7 +2260,8 @@ async function loadOrganizationRowsInPages(tableName, columns, errorLabel, pageS
 async function loadCultureOptions() {
 
   const loadRevision = authStateRevision;
-  if (!organizationId) {
+  const loadOrganizationId = organizationId;
+  if (!loadOrganizationId) {
 
     return;
 
@@ -2276,7 +2277,7 @@ async function loadCultureOptions() {
 
   // A slower response from a workspace we already left must not replace
   // the current workspace's culture registry.
-  if (loadRevision !== authStateRevision ||
+  if (!isCurrentWorkspaceRevision(loadRevision, loadOrganizationId) ||
       requestedOrganizationId !== organizationId ||
       requestedDomain !== document.body.dataset.domain) return;
 
@@ -2354,7 +2355,9 @@ async function loadCultureOptions() {
 
 async function loadLatestBatches() {
 
-  if (!organizationId) {
+  const loadRevision = authStateRevision;
+  const loadOrganizationId = organizationId;
+  if (!loadOrganizationId) {
 
     return;
 
@@ -2370,7 +2373,8 @@ async function loadLatestBatches() {
   );
 
   // Discard late responses after a workspace or organization change.
-  if (requestedOrganizationId !== organizationId ||
+  if (!isCurrentWorkspaceRevision(loadRevision, loadOrganizationId) ||
+      requestedOrganizationId !== organizationId ||
       requestedDomain !== document.body.dataset.domain) return;
 
   // A batch belongs to the workspace of its source culture. The schema
@@ -6581,7 +6585,9 @@ function renderPlantCultureList(rows) {
 }
 
 async function loadPlantCultures() {
-  if (!organizationId) return;
+  const loadRevision = authStateRevision;
+  const loadOrganizationId = organizationId;
+  if (!loadOrganizationId) return;
   const requestedOrganizationId = organizationId;
   const requestedDomain = document.body.dataset.domain;
   const status = document.getElementById("plantCultureStatus");
@@ -6591,7 +6597,8 @@ async function loadPlantCultures() {
       "id,code,crop_type,species_name,cultivar_name,quantity,unit_code,location_id,environment_id,substrate,started_at,status,notes",
       "Chargement du registre végétal impossible"
     );
-    if (requestedOrganizationId !== organizationId ||
+    if (!isCurrentWorkspaceRevision(loadRevision, loadOrganizationId) ||
+        requestedOrganizationId !== organizationId ||
         requestedDomain !== document.body.dataset.domain ||
         requestedDomain !== "agronomy") return;
     renderPlantCultureList(data || []);
@@ -6600,7 +6607,8 @@ async function loadPlantCultures() {
     renderStatisticsFilters();
     if (status) status.textContent = "Registre végétal chargé depuis Supabase.";
   } catch (error) {
-    if (requestedOrganizationId !== organizationId ||
+    if (!isCurrentWorkspaceRevision(loadRevision, loadOrganizationId) ||
+        requestedOrganizationId !== organizationId ||
         requestedDomain !== document.body.dataset.domain ||
         requestedDomain !== "agronomy") return;
     console.error("Chargement du registre végétal impossible :", error);
