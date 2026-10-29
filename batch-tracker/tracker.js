@@ -4744,16 +4744,25 @@ moveBatchButton?.addEventListener("click", moveSelectedBatch);
 async function loadMeasurementReferences() {
   const requestedDomain = document.body.dataset.domain || "mycology";
   const requestedOrganizationId = organizationId;
-  const [variableResult, unitResult] = await Promise.all([
-    supabaseClient.from("variables")
-      .select("code, label, dimension, canonical_unit_code, description")
-      .order("label"),
-    supabaseClient.from("units")
-      .select("code, label, dimension")
-      .order("code")
-  ]);
+  let variableResult;
+  let unitResult;
+  try {
+    [variableResult, unitResult] = await Promise.all([
+      supabaseClient.from("variables")
+        .select("code, label, dimension, canonical_unit_code, description")
+        .order("label"),
+      supabaseClient.from("units")
+        .select("code, label, dimension")
+        .order("code")
+    ]);
+  } catch (error) {
+    // Network-level rejections can also arrive after the user has switched context.
+    if (requestedOrganizationId !== organizationId ||
+        requestedDomain !== (document.body.dataset.domain || "mycology")) return;
+    throw error;
+  }
 
-  // Ignore late responses, including errors, after an organization or workspace switch.
+  // Ignore late responses, including returned errors, after an organization or workspace switch.
   if (requestedOrganizationId !== organizationId ||
       requestedDomain !== (document.body.dataset.domain || "mycology")) return;
 
