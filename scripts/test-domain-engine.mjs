@@ -138,3 +138,17 @@ assert.match(trackerSource, /async function createBatch\(\)[\s\S]*?const request
   "batch creation must use its captured organization and suppress stale post-save UI updates");
 assert.match(trackerSource, /async function getCultureProtocolVersionId\([\s\S]*?requestedOrganizationId = organizationId[\s\S]*?\.eq\(\s*"organization_id",\s*requestedOrganizationId\s*\)/,
   "protocol lookup must remain scoped to the organization that initiated batch creation");
+
+assert.match(trackerSource, /async function createCulture\(\)[\\s\\S]*?const requestedAuthRevision = authStateRevision;[\\s\\S]*?const requestedOrganizationId = organizationId;[\\s\\S]*?p_organization_id:\\s*requestedOrganizationId[\\s\\S]*?isCurrentOperation\(\)/,
+  "culture creation must remain bound to the initiating session and organization across awaits");
+for (const [name, button] of [["saveMeasurement", "saveMeasurementButton"], ["saveObservation", "saveObservationButton"], ["createBatch", "createBatchButton"]]) {
+  const start = trackerSource.indexOf(`async function ${name}(`);
+  const end = trackerSource.indexOf("\\nasync function ", start + 20);
+  const block = trackerSource.slice(start, end < 0 ? trackerSource.length : end);
+  assert.match(block, new RegExp(`finally\\s*\\{[\\s\\S]*?requestedAuthRevision === authStateRevision[\\s\\S]*?requestedOrganizationId === organizationId[\\s\\S]*?${button}\\.disabled = false`),
+    `${name} must not re-enable a write control after its session or workspace becomes stale`);
+}
+assert.match(trackerSource, /async function savePlantCulture\(event\)[\s\S]*?const requestedAuthRevision = authStateRevision[\s\S]*?finally \{[\s\S]*?requestedAuthRevision === authStateRevision/,
+  "plant culture save must not restore controls after an auth transition");
+assert.match(trackerSource, /async function saveBiologicalOperation\(event\)[\s\S]*?const requestedAuthRevision = authStateRevision[\s\S]*?p_organization_id: requestedOrganizationId[\s\S]*?finally \{[\s\S]*?requestedAuthRevision === authStateRevision/,
+  "biological lineage writes must remain bound to the initiating tenant and avoid stale UI updates");
