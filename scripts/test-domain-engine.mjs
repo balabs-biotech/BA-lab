@@ -132,3 +132,9 @@ assert.match(trackerSource, /async function advanceBatch\(\)[\s\S]*?const reques
   "advancing a batch must not refresh or report success in a newer auth session, workspace, or selected batch");
 assert.match(trackerSource, /async function releaseBatch\(\)[\s\S]*?const requestedAuthRevision = authStateRevision;[\s\S]*?const requestedOrganizationId = organizationId;[\s\S]*?const requestedDomain = document\.body\.dataset\.domain \|\| "mycology";[\s\S]*?const requestedBatchId = selectedBatchId;[\s\S]*?p_batch_id:\s*requestedBatchId[\s\S]*?requestedAuthRevision !== authStateRevision[\s\S]*?await loadLatestBatches\(\);[\s\S]*?requestedBatchId !== selectedBatchId\) return;[\s\S]*?await loadBatch\(requestedBatchId\)/,
   "releasing a batch must remain bound to the batch and workspace that initiated the action");
+
+
+assert.match(trackerSource, /async function createBatch\(\)[\s\S]*?const requestedAuthRevision = authStateRevision;[\s\S]*?const requestedOrganizationId = organizationId;[\s\S]*?await getCultureProtocolVersionId\([\s\S]*?requestedOrganizationId\)[\s\S]*?requestedAuthRevision !== authStateRevision[\s\S]*?p_organization_id:\s*requestedOrganizationId[\s\S]*?requestedDomain !== \(document\.body\.dataset\.domain \|\| "mycology"\)\) return;[\s\S]*?await loadLatestBatches\(\);[\s\S]*?requestedOrganizationId !== organizationId/,
+  "batch creation must use its captured organization and suppress stale post-save UI updates");
+assert.match(trackerSource, /async function getCultureProtocolVersionId\([\s\S]*?requestedOrganizationId = organizationId[\s\S]*?\.eq\(\s*"organization_id",\s*requestedOrganizationId\s*\)/,
+  "protocol lookup must remain scoped to the organization that initiated batch creation");
