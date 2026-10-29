@@ -1722,6 +1722,12 @@ async function syncPendingCultures() {
 async function createCulture() {
 
   clearMessage();
+  const requestedAuthRevision = authStateRevision;
+  const requestedOrganizationId = organizationId;
+  const requestedDomain = document.body.dataset.domain || "mycology";
+  const isCurrentOperation = () => requestedAuthRevision === authStateRevision &&
+    requestedOrganizationId === organizationId &&
+    requestedDomain === (document.body.dataset.domain || "mycology");
 
   if (document.body.dataset.domain === "agronomy") {
     showMessage(
@@ -1747,7 +1753,7 @@ async function createCulture() {
     startedAtInput.value;
 
 
-  if (!organizationId) {
+  if (!requestedOrganizationId) {
 
     showMessage(
       "Organisation BA-LABS absente. Rechargez la page et reconnectez-vous.",
@@ -1806,6 +1812,8 @@ async function createCulture() {
   const session =
     await getCurrentSession();
 
+  if (!isCurrentOperation()) return;
+
 
   if (!session) {
 
@@ -1840,10 +1848,12 @@ async function createCulture() {
       error: consentLookupError
     } = await consentTable
       .select("id")
-      .eq("organization_id", organizationId)
+      .eq("organization_id", requestedOrganizationId)
       .eq("user_id", session.user.id)
       .eq("terms_version", "2026-10-09-v1")
       .maybeSingle();
+
+    if (!isCurrentOperation()) return;
 
     if (consentLookupError) {
       throw new Error(
@@ -1878,6 +1888,8 @@ async function createCulture() {
       consentError = insertResult.error;
     }
 
+    if (!isCurrentOperation()) return;
+
     if (consentError) {
       throw new Error(
         `Impossible d’enregistrer votre choix de consentement : ${consentError.message}`
@@ -1889,6 +1901,8 @@ async function createCulture() {
         protocolCode
       );
 
+    if (!isCurrentOperation()) return;
+
 
     const {
       data,
@@ -1899,7 +1913,7 @@ async function createCulture() {
         {
 
           p_organization_id:
-            organizationId,
+            requestedOrganizationId,
 
           p_code:
             cultureCode,
@@ -1942,6 +1956,8 @@ async function createCulture() {
       );
 
 
+    if (!isCurrentOperation()) return;
+
     if (error) {
 
       throw new Error(
@@ -1970,6 +1986,8 @@ async function createCulture() {
             }
           );
 
+        if (!isCurrentOperation()) return;
+
         if (syncError) {
           notionSyncMessage =
             `Culture enregistrée dans Supabase. Synchronisation Notion à vérifier : ${syncError.message}`;
@@ -1991,6 +2009,8 @@ async function createCulture() {
       notionSyncMessage =
         "Culture enregistrée dans Supabase. L’identifiant de culture n’a pas été retourné ; la synchronisation Notion n’a pas été lancée.";
     }
+
+    if (!isCurrentOperation()) return;
 
     showElement(
       resultCard
@@ -2080,12 +2100,16 @@ async function createCulture() {
 
 
     await loadStrainOptions();
+    if (!isCurrentOperation()) return;
 
     await loadCultureOptions();
+    if (!isCurrentOperation()) return;
 
   }
 
   catch (error) {
+
+    if (!isCurrentOperation()) return;
 
     console.error(
       "Création culture:",
@@ -2127,13 +2151,10 @@ async function createCulture() {
   }
 
   finally {
-
-    createButton.disabled =
-      false;
-
-    createButton.textContent =
-      "Créer la culture";
-
+    if (isCurrentOperation()) {
+      createButton.disabled = false;
+      createButton.textContent = "Créer la culture";
+    }
   }
 
 }
@@ -4088,13 +4109,12 @@ async function createBatch() {
   }
 
   finally {
-
-    createBatchButton.disabled =
-      false;
-
-    createBatchButton.textContent =
-      "Créer le batch";
-
+    if (requestedAuthRevision === authStateRevision &&
+        requestedOrganizationId === organizationId &&
+        requestedDomain === (document.body.dataset.domain || "mycology")) {
+      createBatchButton.disabled = false;
+      createBatchButton.textContent = "Créer le batch";
+    }
   }
 
 }
@@ -5142,8 +5162,12 @@ async function saveMeasurement() {
       showMessage(error.message || cultureWorkflowText("measureFailed"), "error");
     }
   } finally {
-    saveMeasurementButton.disabled = false;
-    saveMeasurementButton.textContent = cultureWorkflowText("saveMeasure");
+    if (requestedAuthRevision === authStateRevision &&
+        requestedOrganizationId === organizationId &&
+        requestedDomain === (document.body.dataset.domain || "mycology")) {
+      saveMeasurementButton.disabled = false;
+      saveMeasurementButton.textContent = cultureWorkflowText("saveMeasure");
+    }
   }
 }
 
@@ -5417,8 +5441,12 @@ async function saveObservation() {
       showMessage(error.message || cultureWorkflowText("observationFailed"), "error");
     }
   } finally {
-    saveObservationButton.disabled = false;
-    saveObservationButton.textContent = cultureWorkflowText("saveObservation");
+    if (requestedAuthRevision === authStateRevision &&
+        requestedOrganizationId === organizationId &&
+        requestedDomain === (document.body.dataset.domain || "mycology")) {
+      saveObservationButton.disabled = false;
+      saveObservationButton.textContent = cultureWorkflowText("saveObservation");
+    }
   }
 }
 
@@ -5840,10 +5868,16 @@ async function loadBiologicalLineage(cultureId) {
 
 async function saveBiologicalOperation(event) {
   event.preventDefault();
+  const requestedAuthRevision = authStateRevision;
+  const requestedOrganizationId = organizationId;
+  const requestedDomain = document.body.dataset.domain || "mycology";
+  const isCurrentOperation = () => requestedAuthRevision === authStateRevision &&
+    requestedOrganizationId === organizationId &&
+    requestedDomain === (document.body.dataset.domain || "mycology");
   const button = document.getElementById('saveBioOperation');
   const message = document.getElementById('bioOperationMessage');
   const cultureId = document.getElementById('cultureDetailPanel')?.dataset.cultureId;
-  if (!cultureId || !organizationId) { message.textContent = biologicalWorkflowText("selectCulture"); return; }
+  if (!cultureId || !requestedOrganizationId) { message.textContent = biologicalWorkflowText("selectCulture"); return; }
   const operationType = document.getElementById('bioOperationType').value;
   const dateValue = document.getElementById('bioOperationDate').value;
   const note = document.getElementById('bioOperationNote').value.trim();
@@ -5855,27 +5889,39 @@ async function saveBiologicalOperation(event) {
   if (childCodes.length && !['repiquage','passage','transfert','division_aliquotes','changement_milieu','conservation'].includes(operationType)) { message.textContent = biologicalWorkflowText("invalidPropagation"); return; }
   button.disabled = true; button.textContent = biologicalWorkflowText("saving"); message.textContent = '';
   try {
+    if (!isCurrentOperation()) return;
     const { data, error } = await supabaseClient.rpc('record_biological_operation', {
-      p_organization_id: organizationId, p_parent_culture_id: cultureId, p_event_type: operationType,
+      p_organization_id: requestedOrganizationId, p_parent_culture_id: cultureId, p_event_type: operationType,
       p_occurred_at: new Date(dateValue).toISOString(), p_note: note || null,
       p_details: { source: 'BA Labs Culture Tracker', interface_version: '3.0', conditions: conditions || null, outcome: outcome || null }, p_child_codes: childCodes
     });
+    if (!isCurrentOperation()) return;
     if (error) throw error;
     const result = Array.isArray(data) ? data[0] : data;
     let notionSyncWarning = '';
     for (const child of (result?.children || [])) {
       try {
         const { data: syncData, error: syncError } = await supabaseClient.functions.invoke('sync-culture-to-notion', { body: { culture_id: child.id } });
+        if (!isCurrentOperation()) return;
         if (syncError || (syncData && syncData.ok === false)) notionSyncWarning = biologicalWorkflowText("syncWarning");
       } catch (syncError) { notionSyncWarning = biologicalWorkflowText("syncWarningShort"); }
     }
     document.getElementById('bioOperationNote').value = ''; document.getElementById('bioOperationConditions').value = ''; document.getElementById('bioOperationOutcome').value = ''; document.getElementById('bioChildCodes').value = '';
     message.textContent = biologicalWorkflowText("saved") + (result?.children?.length ? ' · ' + result.children.length + biologicalWorkflowText("childCreated") : '.') + notionSyncWarning;
     await loadCultureOptions();
+    if (!isCurrentOperation()) return;
     await loadCultureDetail(cultureId);
+    if (!isCurrentOperation()) return;
     await loadBiologicalLineage(cultureId);
-  } catch (error) { message.textContent = biologicalWorkflowText("failed") + (error.message || biologicalWorkflowText("notSaved")); }
-  finally { button.disabled = false; button.textContent = biologicalWorkflowText("save"); }
+  } catch (error) {
+    if (!isCurrentOperation()) return;
+    message.textContent = biologicalWorkflowText("failed") + (error.message || biologicalWorkflowText("notSaved"));
+  } finally {
+    if (isCurrentOperation()) {
+      button.disabled = false;
+      button.textContent = biologicalWorkflowText("save");
+    }
+  }
 }
 
 let cultureDetailRequestId = 0;
@@ -6629,6 +6675,7 @@ async function savePlantCulture(event) {
     showMessage("Organisation absente : reconnectez-vous avant d’enregistrer une culture végétale.", "error");
     return;
   }
+  const requestedAuthRevision = authStateRevision;
   const requestedOrganizationId = organizationId;
   const requestedDomain = document.body.dataset.domain;
   const form = document.getElementById("plantCultureForm");
@@ -6668,7 +6715,8 @@ async function savePlantCulture(event) {
     if (error) throw error;
     // A successful write belongs to the organization captured at submit time.
     // Do not reset or announce success inside a different workspace/session.
-    if (requestedOrganizationId !== organizationId ||
+    if (requestedAuthRevision !== authStateRevision ||
+        requestedOrganizationId !== organizationId ||
         requestedDomain !== document.body.dataset.domain ||
         requestedDomain !== "agronomy") return;
     form.reset();
@@ -6688,15 +6736,20 @@ async function savePlantCulture(event) {
     showMessage("Culture végétale enregistrée.", "success");
     if (status) status.textContent = "Culture enregistrée dans le registre AgriTech.";
   } catch (error) {
-    if (requestedOrganizationId !== organizationId ||
+    if (requestedAuthRevision !== authStateRevision ||
+        requestedOrganizationId !== organizationId ||
         requestedDomain !== document.body.dataset.domain ||
         requestedDomain !== "agronomy") return;
     console.error("Enregistrement de la culture végétale impossible :", error);
     showMessage("Enregistrement impossible : " + (error.message || "erreur inconnue"), "error");
     if (status) status.textContent = "Échec de l’enregistrement. Vérifiez le code unique et les références.";
   } finally {
-    button.disabled = false;
-    button.textContent = oldLabel;
+    if (requestedAuthRevision === authStateRevision &&
+        requestedOrganizationId === organizationId &&
+        requestedDomain === document.body.dataset.domain) {
+      button.disabled = false;
+      button.textContent = oldLabel;
+    }
   }
 }
 
