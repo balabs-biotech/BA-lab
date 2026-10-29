@@ -182,3 +182,12 @@ assert.equal(recordScenario({ plant_culture_id: "plant-1" }, {}, "mycology", [cu
 assert.equal(recordScenario({ event_id: "event-1" }, { "event-1": { batch_id: "batch-1" } }, "laboratory", [cultureRows[1]], plantRows, batchRows), true);
 assert.equal(recordScenario({ event_id: "event-1" }, { "event-1": { batch_id: "batch-1" } }, "mycology", [cultureRows[0]], plantRows, batchRows), false);
 console.log("✓ Scenario histories: plant, mycology and lab records stay within their own workspace");
+
+
+// Registry pagination and workspace-switch guards must remain in place.
+assert.match(engine, /async function loadOrganizationRowsInPages\(/);
+assert.match(engine, /\.range\(offset, offset \+ pageSize - 1\)/);
+assert.match(engine, /requestedOrganizationId !== organizationId/);
+assert.match(engine, /const visibleCultureIds = new Set\(requestedCultures\.map\(culture => culture\.id\)\)/);
+assert.match(engine, /requestedDomain !== document\.body\.dataset\.domain/);
+console.log("✓ Culture, batch and plant registries paginate and discard stale workspace responses");

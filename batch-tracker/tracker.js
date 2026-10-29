@@ -2235,53 +2235,53 @@ async function createCulture() {
    CULTURES DISPONIBLES POUR LES BATCHS
    ============================================================ */
 
+async function loadOrganizationRowsInPages(tableName, columns, errorLabel, pageSize = 250) {
+  const requestedOrganizationId = organizationId;
+  if (!requestedOrganizationId) return [];
+  const rows = [];
+  for (let offset = 0; ; offset += pageSize) {
+    const { data, error } = await supabaseClient
+      .from(tableName)
+      .select(columns)
+      .eq("organization_id", requestedOrganizationId)
+      .order("created_at", { ascending: false })
+      .order("id", { ascending: false })
+      .range(offset, offset + pageSize - 1);
+    if (error) throw new Error(`${errorLabel} : ${error.message}`);
+    if (requestedOrganizationId !== organizationId) return [];
+    const page = data || [];
+    rows.push(...page);
+    if (page.length < pageSize) break;
+  }
+  return rows;
+}
+
+
 async function loadCultureOptions() {
-  const requestId = ++cultureOptionsRequestId;
+
   const loadRevision = authStateRevision;
   const loadOrganizationId = organizationId;
   if (!loadOrganizationId) {
+
     return;
-  }
-
-  const {
-    data,
-    error
-  } =
-    await supabaseClient
-      .from("cultures")
-      .select(`
-        id,
-        code,
-        culture_type,
-        material_id,
-        started_at,
-        metadata
-      `)
-      .eq(
-        "organization_id",
-        loadOrganizationId
-      )
-      .order(
-        "created_at",
-        {
-          ascending: false
-        }
-      )
-      .limit(100);
-
-
-  if (requestId !== cultureOptionsRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
-
-  if (error) {
-
-    throw new Error(
-      `Chargement des cultures impossible : ${error.message}`
-    );
 
   }
 
+  const requestedDomain = document.body.dataset.domain;
+  const requestedOrganizationId = organizationId;
+  const data = await loadOrganizationRowsInPages(
+    "cultures",
+    "id, code, culture_type, material_id, started_at, metadata",
+    "Chargement des cultures impossible"
+  );
 
-  const activeDomain = document.body.dataset.domain;
+  // A slower response from a workspace we already left must not replace
+  // the current workspace's culture registry.
+  if (!isCurrentWorkspaceRevision(loadRevision, loadOrganizationId) ||
+      requestedOrganizationId !== organizationId ||
+      requestedDomain !== document.body.dataset.domain) return;
+
+  const activeDomain = requestedDomain;
   cultureOptions = (data || []).filter(culture => {
     if (activeDomain === "agronomy") return false;
     const recordDomain = culture.metadata?.domain;
@@ -2354,61 +2354,36 @@ async function loadCultureOptions() {
    ============================================================ */
 
 async function loadLatestBatches() {
-  const requestId = ++latestBatchesRequestId;
+
   const loadRevision = authStateRevision;
   const loadOrganizationId = organizationId;
   if (!loadOrganizationId) {
+
     return;
-  }
-
-  const {
-    data,
-    error
-  } =
-    await supabaseClient
-      .from("batches")
-      .select(`
-        id,
-        batch_code,
-        name,
-        batch_type,
-        status,
-        current_stage,
-        culture_id,
-        environment_id,
-        material_id,
-        planned_at,
-        quantity_planned,
-        quantity_actual,
-        quantity_unit_code,
-        created_at
-      `)
-      .eq(
-        "organization_id",
-        loadOrganizationId
-      )
-      .order(
-        "created_at",
-        {
-          ascending: false
-        }
-      )
-      .limit(30);
-
-
-  if (requestId !== latestBatchesRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
-
-  if (error) {
-
-    throw new Error(
-      `Chargement des batchs impossible : ${error.message}`
-    );
 
   }
 
+  const requestedDomain = document.body.dataset.domain;
+  const requestedOrganizationId = organizationId;
+  const requestedCultures = cultureOptions.slice();
+  const data = await loadOrganizationRowsInPages(
+    "batches",
+    "id, batch_code, name, batch_type, status, current_stage, culture_id, environment_id, material_id, planned_at, quantity_planned, quantity_actual, quantity_unit_code, created_at",
+    "Chargement des batchs impossible"
+  );
 
-  latestBatches =
-    data || [];
+  // Discard late responses after a workspace or organization change.
+  if (!isCurrentWorkspaceRevision(loadRevision, loadOrganizationId) ||
+      requestedOrganizationId !== organizationId ||
+      requestedDomain !== document.body.dataset.domain) return;
+
+  // A batch belongs to the workspace of its source culture. The schema
+  // has no authoritative domain column on batches, so use the already
+  // domain-scoped culture registry rather than guessing from batch_type.
+  const visibleCultureIds = new Set(requestedCultures.map(culture => culture.id));
+  latestBatches = (data || []).filter(batch =>
+    Boolean(batch.culture_id && visibleCultureIds.has(batch.culture_id))
+  );
 
   renderBatchComparisonOptions();
   renderBatchList();
@@ -6610,26 +6585,32 @@ function renderPlantCultureList(rows) {
 }
 
 async function loadPlantCultures() {
-  const requestId = ++plantCultureListRequestId;
   const loadRevision = authStateRevision;
   const loadOrganizationId = organizationId;
   if (!loadOrganizationId) return;
+  const requestedOrganizationId = organizationId;
+  const requestedDomain = document.body.dataset.domain;
   const status = document.getElementById("plantCultureStatus");
   try {
-    const { data, error } = await supabaseClient.from("plant_cultures")
-      .select("id,code,crop_type,species_name,cultivar_name,quantity,unit_code,location_id,environment_id,substrate,started_at,status,notes")
-      .eq("organization_id", loadOrganizationId)
-      .order("created_at", { ascending: false })
-      .limit(300);
-    if (requestId !== plantCultureListRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
-    if (error) throw error;
+    const data = await loadOrganizationRowsInPages(
+      "plant_cultures",
+      "id,code,crop_type,species_name,cultivar_name,quantity,unit_code,location_id,environment_id,substrate,started_at,status,notes",
+      "Chargement du registre végétal impossible"
+    );
+    if (!isCurrentWorkspaceRevision(loadRevision, loadOrganizationId) ||
+        requestedOrganizationId !== organizationId ||
+        requestedDomain !== document.body.dataset.domain ||
+        requestedDomain !== "agronomy") return;
     renderPlantCultureList(data || []);
     plantCultureOptions = data || [];
     renderMeasurementTargets();
     renderStatisticsFilters();
     if (status) status.textContent = "Registre végétal chargé depuis Supabase.";
   } catch (error) {
-    if (requestId !== plantCultureListRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
+    if (!isCurrentWorkspaceRevision(loadRevision, loadOrganizationId) ||
+        requestedOrganizationId !== organizationId ||
+        requestedDomain !== document.body.dataset.domain ||
+        requestedDomain !== "agronomy") return;
     console.error("Chargement du registre végétal impossible :", error);
     initializationWarnings.push("registre végétal");
     if (status) status.textContent = "Registre végétal indisponible : " + (error.message || "erreur inconnue");
