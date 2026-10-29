@@ -152,3 +152,10 @@ assert.match(trackerSource, /async function savePlantCulture\(event\)[\s\S]*?con
   "plant culture save must not restore controls after an auth transition");
 assert.match(trackerSource, /async function saveBiologicalOperation\(event\)[\s\S]*?const requestedAuthRevision = authStateRevision[\s\S]*?p_organization_id: requestedOrganizationId[\s\S]*?finally \{[\s\S]*?requestedAuthRevision === authStateRevision/,
   "biological lineage writes must remain bound to the initiating tenant and avoid stale UI updates");
+
+assert.match(trackerSource, /async function saveQcCheckNow\([\s\S]*?const requestedAuthRevision = authStateRevision;[\s\S]*?const requestedOrganizationId = organizationId;[\s\S]*?await supabaseClient\.auth\.getSession\(\);[\s\S]*?requestedAuthRevision !== authStateRevision[\s\S]*?\.eq\(\s*"organization_id",\s*requestedOrganizationId\s*\)[\s\S]*?await loadBatch\(\s*requestedBatchId\s*\)/,
+  "QC updates must remain bound to the initiating tenant and batch across session changes");
+assert.match(trackerSource, /async function saveQcCheck\([\s\S]*?const requestedAuthRevision = authStateRevision;[\s\S]*?finally[\s\S]*?requestedAuthRevision === authStateRevision[\s\S]*?button\.disabled = false/,
+  "the QC action must not re-enable an old button after the authenticated workspace changes");
+assert.match(trackerSource, /async function recordBatchHarvest\(\)[\s\S]*?const requestedAuthRevision = authStateRevision;[\s\S]*?const requestedBatchId = selectedBatchId;[\s\S]*?requestedAuthRevision !== authStateRevision[\s\S]*?p_batch_id:\s*requestedBatchId[\s\S]*?finally[\s\S]*?requestedAuthRevision === authStateRevision/,
+  "harvest recording must use the captured batch and suppress stale post-save UI updates");
