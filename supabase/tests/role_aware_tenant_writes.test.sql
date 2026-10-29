@@ -51,6 +51,22 @@ begin
   values (v_org, v_material, 'ROLE-CHECK-MATERIAL', v_material_type, v_strain)
   on conflict (organization_id, id) do nothing;
 
+  perform set_config('request.jwt.claim.sub', v_viewer::text, true);
+  if private.is_org_writer(v_org) then
+    raise exception 'FAIL: viewer was classified as a writer';
+  end if;
+
+  perform set_config('request.jwt.claim.sub', v_member::text, true);
+  if not private.is_org_writer(v_org) then
+    raise exception 'FAIL: member was not classified as a writer';
+  end if;
+
+  perform set_config('request.jwt.claim.sub', v_owner::text, true);
+  if not private.is_org_writer(v_org) then
+    raise exception 'FAIL: owner was not classified as a writer';
+  end if;
+
+  perform set_config('request.jwt.claim.sub', '', true);
   if private.is_org_writer(v_org) then
     raise exception 'FAIL: role check must not grant writes without an authenticated session';
   end if;
