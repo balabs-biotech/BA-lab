@@ -36,6 +36,10 @@ assert.match(trackerSource, /async function loadMeasurementReferences\(\)[\s\S]*
   "late measurement reference responses must not overwrite selectors after an organization or workspace switch");
 assert.match(trackerSource, /async function loadMeasurementReferences\(\)[\s\S]*?catch \(error\) \{[\s\S]*?requestedOrganizationId !== organizationId \|\|[\s\S]*?throw error;/,
   "late network-level measurement reference failures must be ignored after an organization or workspace switch");
+assert.match(trackerSource, /async function claimBALabs\(revision = authStateRevision\)[\s\S]*?await getCurrentSession\(\);[\s\S]*?revision !== authStateRevision[\s\S]*?await supabaseClient\.functions\.invoke\([\s\S]*?revision !== authStateRevision/,
+  "a stale authentication claim must not bind an organization after sign-out or a newer auth transition");
+assert.match(trackerSource, /async function initializeAuthenticatedTracker\([\s\S]*?await claimBALabs\(initRevision\);[\s\S]*?if \(initRevision !== authStateRevision\) return;[\s\S]*?await loadStrainOptions\(\);\s*if \(initRevision !== authStateRevision\) return;[\s\S]*?await loadReferenceData\(\);\s*if \(initRevision !== authStateRevision\) return;/,
+  "authentication initialization must stop after each awaited stage when a newer auth state supersedes it");
 
 assert.match(trackerSource, /async function loadPlantCultures\(\)[\s\S]*?requestedOrganizationId !== organizationId \|\|[\s\S]*?requestedDomain !== document\.body\.dataset\.domain \|\|[\s\S]*?requestedDomain !== "agronomy"\) return;/,
   "late plant-registry responses must be discarded after leaving Green Tech");
