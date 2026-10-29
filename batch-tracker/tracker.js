@@ -427,9 +427,22 @@ async function getCurrentSession() {
     await supabaseClient.auth.getSession();
 
   if (error) {
+    const message = String(error.message || error);
+
+    // A revoked/rotated refresh token can remain in browser storage after
+    // another tab or device has refreshed the session. Clear only this
+    // client's local session so the user can authenticate again safely.
+    if (/invalid refresh token|refresh token not found/i.test(message)) {
+      try {
+        const { error: cleanupError } = await supabaseClient.auth.signOut({ scope: "local" });
+        if (cleanupError) console.warn("Nettoyage de session locale :", cleanupError);
+      } catch (cleanupError) {
+        console.warn("Nettoyage de session locale :", cleanupError);
+      }
+      throw new Error("La session enregistrée sur cet appareil n’est plus valide. Reconnectez-vous avec votre adresse et votre mot de passe.");
+    }
 
     throw error;
-
   }
 
   return data.session;

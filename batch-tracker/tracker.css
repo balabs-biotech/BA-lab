@@ -1503,7 +1503,7 @@ body[data-domain="agronomy"] {
   accent-color: #b4f477;
 }
 body[data-domain="agronomy"] :is(
-  button, .primary-button, .culture-catalog-action,
+  button:not(.overview-shortcut):not(.quick-capture-tile):not(.statistics-filter-action):not(.secondary), .primary-button, .culture-catalog-action,
   .section-nav a[aria-current="page"], .domain-option[aria-pressed="true"]
 ) {
   background: #222f28 !important;
@@ -2707,4 +2707,170 @@ body[data-domain="agronomy"] #overviewCard .overview-metric-note { color: #c4d2c
 }
 @media (prefers-reduced-motion: reduce) {
   #overviewCard .overview-meter > span { transition: none; }
+}
+
+
+/* CultureOps contrast audit — semantic colors are defined once per workspace.
+   Primary controls meet WCAG AA for normal text; secondary controls use a
+   separate dark surface so button labels do not inherit low-contrast colors. */
+body[data-domain="agronomy"] {
+  --bg: #101714;
+  --surface: #1b2520;
+  --surface-2: #243129;
+  --border: #394b3e;
+  --border-strong: #596e5c;
+  --text: #e8eee7;
+  --muted: #b1bfb2;
+  --brand: #a9d68f;
+  --brand-hover: #bde5a5;
+  --focus: #b8e1a7;
+  --ok: #9bc48b;
+  --warn: #e5bd72;
+  --err: #ff9a91;
+  color: var(--text);
+  background: var(--bg);
+}
+body[data-domain="mycology"] {
+  --bg: #f7f1e9;
+  --surface: #fffaf4;
+  --surface-2: #eee1d4;
+  --border: #d7bba6;
+  --border-strong: #a94f1d;
+  --text: #35251d;
+  --muted: #755b4c;
+  --brand: #a94f1d;
+  --brand-hover: #853d16;
+  --focus: #853d16;
+  --ok: #315a38;
+  --warn: #854b1d;
+  --err: #8a2020;
+  color: var(--text);
+  background: var(--bg);
+}
+body[data-domain="laboratory"] {
+  --bg: #edf3f8;
+  --surface: #ffffff;
+  --surface-2: #e8f1f9;
+  --border: #c7d6e4;
+  --border-strong: #8ea8be;
+  --text: #183a59;
+  --muted: #476078;
+  --brand: #215b91;
+  --brand-hover: #174875;
+  --focus: #0a70c4;
+  --ok: #216b43;
+  --warn: #805000;
+  --err: #8a2020;
+  color: var(--text);
+  background: var(--bg);
+}
+
+/* Green Tech: light sage primary actions require dark text, not white text. */
+body[data-domain="agronomy"] :is(
+  button:not(.overview-shortcut):not(.quick-capture-tile):not(.statistics-filter-action):not(.secondary), .primary-button, .culture-catalog-action,
+  .section-nav a[aria-current="page"], .domain-option[aria-pressed="true"]
+):not(.secondary-button):not(.danger-button) {
+  background: #a9d68f !important;
+  background-image: none !important;
+  border-color: #a9d68f !important;
+  color: #142017 !important;
+  -webkit-text-fill-color: #142017 !important;
+}
+body[data-domain="agronomy"] :is(
+  button:not(.overview-shortcut):not(.quick-capture-tile):not(.statistics-filter-action):not(.secondary), .primary-button, .culture-catalog-action,
+  .section-nav a[aria-current="page"], .domain-option[aria-pressed="true"]
+):not(.secondary-button):not(.danger-button):hover:not(:disabled) {
+  background: #bde5a5 !important;
+  border-color: #bde5a5 !important;
+  color: #142017 !important;
+  -webkit-text-fill-color: #142017 !important;
+}
+body[data-domain="agronomy"] .secondary-button {
+  background: #36473b !important;
+  border-color: #596e5c !important;
+  color: #f1f5ef !important;
+  -webkit-text-fill-color: #f1f5ef !important;
+}
+body[data-domain="agronomy"] .secondary-button:hover:not(:disabled) {
+  background: #43584a !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+}
+
+/* Mycology: warm paper surfaces with readable terracotta action controls. */
+body[data-domain="mycology"] :is(
+  button:not(.overview-shortcut):not(.quick-capture-tile):not(.statistics-filter-action):not(.secondary), .primary-button, .culture-catalog-action,
+  .section-nav a[aria-current="page"], .domain-option[aria-pressed="true"]
+):not(.secondary-button):not(.danger-button) {
+  background: #a94f1d !important;
+  background-image: none !important;
+  border-color: #a94f1d !important;
+  color: #fff7ed !important;
+  -webkit-text-fill-color: #fff7ed !important;
+}
+body[data-domain="mycology"] :is(
+  button:not(.overview-shortcut):not(.quick-capture-tile):not(.statistics-filter-action):not(.secondary), .primary-button, .culture-catalog-action,
+  .section-nav a[aria-current="page"], .domain-option[aria-pressed="true"]
+):not(.secondary-button):not(.danger-button):hover:not(:disabled) {
+  background: #853d16 !important;
+  border-color: #853d16 !important;
+  color: #fff7ed !important;
+  -webkit-text-fill-color: #fff7ed !important;
+}
+body[data-domain="mycology"] .secondary-button {
+  background: #69422f !important;
+  border-color: #69422f !important;
+  color: #fff7ed !important;
+  -webkit-text-fill-color: #fff7ed !important;
+}
+
+/* Laboratory: blue actions and dark-blue secondary controls share one contrast rule. */
+body[data-domain="laboratory"] :is(
+  button:not(.overview-shortcut):not(.quick-capture-tile):not(.statistics-filter-action):not(.secondary), .primary-button, .culture-catalog-action,
+  .section-nav a[aria-current="page"], .domain-option[aria-pressed="true"]
+):not(.secondary-button):not(.danger-button) {
+  background: #215b91 !important;
+  background-image: none !important;
+  border-color: #215b91 !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+}
+body[data-domain="laboratory"] :is(
+  button:not(.overview-shortcut):not(.quick-capture-tile):not(.statistics-filter-action):not(.secondary), .primary-button, .culture-catalog-action,
+  .section-nav a[aria-current="page"], .domain-option[aria-pressed="true"]
+):not(.secondary-button):not(.danger-button):hover:not(:disabled) {
+  background: #174875 !important;
+  border-color: #174875 !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+}
+body[data-domain="laboratory"] .secondary-button {
+  background: #35546f !important;
+  border-color: #35546f !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+}
+
+/* Shared danger state, field hints, placeholders, and focus visibility. */
+body[data-domain] .danger-button {
+  background: #8a2020 !important;
+  border-color: #8a2020 !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+}
+body[data-domain="mycology"] :is(input, select, textarea)::placeholder {
+  color: #755b4c;
+  opacity: 1;
+}
+body[data-domain="laboratory"] :is(input, select, textarea)::placeholder {
+  color: #476078;
+  opacity: 1;
+}
+body[data-domain="agronomy"] :is(input, select, textarea)::placeholder {
+  color: #b1bfb2;
+  opacity: 1;
+}
+body[data-domain] :is(button, input, select, textarea, a, [tabindex]):focus-visible {
+  outline: 3px solid var(--focus) !important;
+  outline-offset: 3px;
 }
