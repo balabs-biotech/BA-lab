@@ -182,6 +182,41 @@
 
     <div class="section-kicker"><span>MODULE 02</span><span class="kicker-line"></span><span>RESSOURCES BIOLOGIQUES</span></div>
     <div class="entry-intro"><span class="entry-step-mark">01 / IDENTITÉ</span><h2 id="cultureEntryTitle">Nouvelle culture</h2><p class="muted">On commence par identifier la ressource. Les champs suivants apparaissent quand les informations de base sont renseignées.</p></div>
+    
+    <section id="smartEntryPanel" class="assisted-entry-panel" aria-labelledby="smartEntryTitle">
+      <div class="assisted-entry-heading">
+        <div><span class="entry-step-mark">SAISIE ASSISTÉE</span><h3 id="smartEntryTitle">Préremplir depuis un texte ou ChatGPT</h3></div>
+        <span class="assisted-entry-tag">Aucune sauvegarde automatique</span>
+      </div>
+      <p class="muted">Collez un texte structuré ou un objet JSON. Les champs reconnus seront préremplis dans le formulaire habituel ; vérifiez-les avant de créer la culture.</p>
+      <label for="smartEntrySource">Texte à interpréter</label>
+      <textarea id="smartEntrySource" rows="5" maxlength="12000" spellcheck="true" placeholder="Souche : Pleurotus ostreatus P80&#10;Code de culture : CULT-PO-P80-001&#10;Type de culture : culture sur grain&#10;Protocole : ...&#10;Date de démarrage : 2026-10-28T08:00"></textarea>
+      <div class="assisted-entry-actions">
+        <button id="smartEntryApply" type="button">Interpréter et préremplir</button>
+        <button id="smartEntryClear" type="button" class="secondary-button">Effacer</button>
+        <span id="smartEntryStatus" class="muted" role="status" aria-live="polite">Prêt. Rien n’est enregistré avant validation dans le formulaire principal.</span>
+      </div>
+      <details class="assisted-entry-help">
+        <summary>Format recommandé</summary>
+        <pre>{"strain":"Pleurotus ostreatus P80","cultureCode":"CULT-PO-P80-001","cultureType":"grain","protocol":"Protocole interne","startedAt":"2026-10-28T08:00","notes":"Observation ou contexte"}</pre>
+        <p class="muted">Les valeurs de listes doivent correspondre à une option existante. Le parseur ne contacte aucun modèle externe et ne remplace pas la validation biologique.</p>
+      </details>
+      <style>
+        .assisted-entry-panel{margin:20px 0 26px;padding:20px;border:1px solid var(--line,#303b34);border-radius:14px;background:var(--surface,#17201b)}
+        .assisted-entry-heading{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;flex-wrap:wrap}
+        .assisted-entry-heading h3{margin:5px 0 0;font-size:19px}
+        .assisted-entry-tag{padding:5px 9px;border:1px solid var(--line,#526657);border-radius:999px;color:var(--text,#d6e2d8);font-size:11px}
+        .assisted-entry-panel textarea{box-sizing:border-box;width:100%;min-height:112px;margin-top:7px;font:inherit}
+        .assisted-entry-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:12px}
+        #smartEntryStatus{flex:1 1 240px;font-size:12px}
+        #smartEntryStatus[data-state="error"]{color:#f0a59b}
+        #smartEntryStatus[data-state="success"]{color:#a8d4a5}
+        .assisted-entry-help{margin-top:12px;color:var(--muted,#a6b2a8);font-size:12px}
+        .assisted-entry-help pre{white-space:pre-wrap;overflow-wrap:anywhere;padding:12px;border-radius:8px;background:var(--surface-raised,#0d1110);color:var(--text,#d6e2d8)}
+        @media(max-width:600px){.assisted-entry-panel{padding:14px}.assisted-entry-actions{align-items:stretch}.assisted-entry-actions button{flex:1}}
+      </style>
+    </section>
+
     <div class="guided-entry-step" data-entry-step="1">
 
     <label for="strain" id="strainLabel">
