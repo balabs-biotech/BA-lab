@@ -4154,6 +4154,10 @@ async function advanceBatch() {
   }
 
 
+  const requestedAuthRevision = authStateRevision;
+  const requestedOrganizationId = organizationId;
+  const requestedDomain = document.body.dataset.domain || "mycology";
+  const requestedBatchId = selectedBatchId;
   const expectedStage =
     selectedBatch.current_stage;
 
@@ -4192,7 +4196,7 @@ async function advanceBatch() {
         {
 
           p_batch_id:
-            selectedBatchId,
+            requestedBatchId,
 
           p_expected_stage:
             expectedStage
@@ -4209,6 +4213,10 @@ async function advanceBatch() {
 
     }
 
+    if (requestedAuthRevision !== authStateRevision ||
+        requestedOrganizationId !== organizationId ||
+        requestedDomain !== (document.body.dataset.domain || "mycology") ||
+        requestedBatchId !== selectedBatchId) return;
 
     const advanced =
       Array.isArray(data)
@@ -4229,9 +4237,12 @@ async function advanceBatch() {
 
     await loadLatestBatches();
 
-    await loadBatch(
-      selectedBatchId
-    );
+    if (requestedAuthRevision !== authStateRevision ||
+        requestedOrganizationId !== organizationId ||
+        requestedDomain !== (document.body.dataset.domain || "mycology") ||
+        requestedBatchId !== selectedBatchId) return;
+
+    await loadBatch(requestedBatchId);
 
   }
 
@@ -4242,6 +4253,10 @@ async function advanceBatch() {
       error
     );
 
+    if (requestedAuthRevision !== authStateRevision ||
+        requestedOrganizationId !== organizationId ||
+        requestedDomain !== (document.body.dataset.domain || "mycology") ||
+        requestedBatchId !== selectedBatchId) return;
 
     showMessage(
       error.message ||
@@ -4279,6 +4294,11 @@ async function releaseBatch() {
   }
 
 
+  const requestedAuthRevision = authStateRevision;
+  const requestedOrganizationId = organizationId;
+  const requestedDomain = document.body.dataset.domain || "mycology";
+  const requestedBatchId = selectedBatchId;
+
   releaseBatchButton.disabled =
     true;
 
@@ -4297,7 +4317,7 @@ async function releaseBatch() {
         {
 
           p_batch_id:
-            selectedBatchId
+            requestedBatchId
 
         }
       );
@@ -4311,6 +4331,10 @@ async function releaseBatch() {
 
     }
 
+    if (requestedAuthRevision !== authStateRevision ||
+        requestedOrganizationId !== organizationId ||
+        requestedDomain !== (document.body.dataset.domain || "mycology") ||
+        requestedBatchId !== selectedBatchId) return;
 
     const released =
       Array.isArray(data)
@@ -4325,9 +4349,12 @@ async function releaseBatch() {
 
     await loadLatestBatches();
 
-    await loadBatch(
-      selectedBatchId
-    );
+    if (requestedAuthRevision !== authStateRevision ||
+        requestedOrganizationId !== organizationId ||
+        requestedDomain !== (document.body.dataset.domain || "mycology") ||
+        requestedBatchId !== selectedBatchId) return;
+
+    await loadBatch(requestedBatchId);
 
   }
 
@@ -4338,6 +4365,10 @@ async function releaseBatch() {
       error
     );
 
+    if (requestedAuthRevision !== authStateRevision ||
+        requestedOrganizationId !== organizationId ||
+        requestedDomain !== (document.body.dataset.domain || "mycology") ||
+        requestedBatchId !== selectedBatchId) return;
 
     showMessage(
       error.message ||
