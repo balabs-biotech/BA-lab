@@ -3928,7 +3928,7 @@ async function createBatch() {
         {
 
           p_organization_id:
-            organizationId,
+            requestedOrganizationId,
 
           p_batch_code:
             batchCode,
