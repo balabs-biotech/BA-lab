@@ -126,3 +126,9 @@ assert.match(trackerSource, /async function loadCultureOptions\(\)[\s\S]*?loadOr
   "culture loading must paginate before workspace filtering");
 assert.match(trackerSource, /async function loadLatestBatches\(\)[\s\S]*?loadOrganizationRowsInPages\(\s*"batches"/,
   "batch loading must paginate before source-culture filtering");
+
+
+assert.match(trackerSource, /async function advanceBatch\(\)[\s\S]*?const requestedAuthRevision = authStateRevision;[\s\S]*?const requestedOrganizationId = organizationId;[\s\S]*?const requestedDomain = document\.body\.dataset\.domain \|\| "mycology";[\s\S]*?const requestedBatchId = selectedBatchId;[\s\S]*?p_batch_id:\s*requestedBatchId[\s\S]*?requestedAuthRevision !== authStateRevision[\s\S]*?await loadLatestBatches\(\);[\s\S]*?requestedBatchId !== selectedBatchId\) return;[\s\S]*?await loadBatch\(requestedBatchId\)/,
+  "advancing a batch must not refresh or report success in a newer auth session, workspace, or selected batch");
+assert.match(trackerSource, /async function releaseBatch\(\)[\s\S]*?const requestedAuthRevision = authStateRevision;[\s\S]*?const requestedOrganizationId = organizationId;[\s\S]*?const requestedDomain = document\.body\.dataset\.domain \|\| "mycology";[\s\S]*?const requestedBatchId = selectedBatchId;[\s\S]*?p_batch_id:\s*requestedBatchId[\s\S]*?requestedAuthRevision !== authStateRevision[\s\S]*?await loadLatestBatches\(\);[\s\S]*?requestedBatchId !== selectedBatchId\) return;[\s\S]*?await loadBatch\(requestedBatchId\)/,
+  "releasing a batch must remain bound to the batch and workspace that initiated the action");
