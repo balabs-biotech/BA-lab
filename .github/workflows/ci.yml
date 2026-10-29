@@ -228,3 +228,5 @@ jobs:
         run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/audit_table_write_privileges.test.sql
       - name: Test environmental observation schema and access contract
         run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/environmental_observations_contract.test.sql
+      - name: Test role-aware tenant write authorization after replay
+        run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/role_aware_tenant_writes.test.sql
