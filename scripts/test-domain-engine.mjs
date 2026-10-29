@@ -134,7 +134,7 @@ assert.match(trackerSource, /async function releaseBatch\(\)[\s\S]*?const reques
   "releasing a batch must remain bound to the batch and workspace that initiated the action");
 
 
-assert.match(trackerSource, /async function createBatch\(\)[\s\S]*?const requestedAuthRevision = authStateRevision;[\s\S]*?const requestedOrganizationId = organizationId;[\s\S]*?await getCultureProtocolVersionId\([\s\S]*?requestedOrganizationId\)[\s\S]*?requestedAuthRevision !== authStateRevision[\s\S]*?p_organization_id:\s*requestedOrganizationId[\s\S]*?requestedDomain !== \(document\.body\.dataset\.domain \|\| "mycology"\)\) return;[\s\S]*?await loadLatestBatches\(\);[\s\S]*?requestedOrganizationId !== organizationId/,
+assert.match(trackerSource, /async function createBatch\(\)[\s\S]*?const requestedAuthRevision = authStateRevision;[\s\S]*?const requestedOrganizationId = organizationId;[\s\S]*?await getCultureProtocolVersionId\([\s\S]*?requestedOrganizationId\s*\)[\s\S]*?requestedAuthRevision !== authStateRevision[\s\S]*?p_organization_id:\s*requestedOrganizationId[\s\S]*?requestedDomain !== \(document\.body\.dataset\.domain \|\| "mycology"\)\) return;[\s\S]*?await loadLatestBatches\(\);[\s\S]*?requestedOrganizationId !== organizationId/,
   "batch creation must use its captured organization and suppress stale post-save UI updates");
 assert.match(trackerSource, /async function getCultureProtocolVersionId\([\s\S]*?requestedOrganizationId = organizationId[\s\S]*?\.eq\(\s*"organization_id",\s*requestedOrganizationId\s*\)/,
   "protocol lookup must remain scoped to the organization that initiated batch creation");
