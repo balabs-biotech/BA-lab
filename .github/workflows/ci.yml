@@ -87,6 +87,7 @@ jobs:
           node supabase/tests/copernicus-sentinel-catalogue.test.mjs
           node --check batch-tracker/environmental-data.js
           node scripts/check-i18n.mjs
+          node scripts/test-environmental-fallback.mjs
           node scripts/test-workspace-scenarios.mjs
           node scripts/test-auth-transition-workspace-lockdown.mjs
           node scripts/test-auth-init-tenant-revision-guards.mjs
