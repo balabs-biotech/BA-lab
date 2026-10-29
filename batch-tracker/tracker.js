@@ -2259,6 +2259,7 @@ async function loadOrganizationRowsInPages(tableName, columns, errorLabel, pageS
 
 async function loadCultureOptions() {
 
+  const loadRevision = authStateRevision;
   if (!organizationId) {
 
     return;
@@ -2275,7 +2276,8 @@ async function loadCultureOptions() {
 
   // A slower response from a workspace we already left must not replace
   // the current workspace's culture registry.
-  if (requestedOrganizationId !== organizationId ||
+  if (loadRevision !== authStateRevision ||
+      requestedOrganizationId !== organizationId ||
       requestedDomain !== document.body.dataset.domain) return;
 
   const activeDomain = requestedDomain;
