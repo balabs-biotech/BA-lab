@@ -54,7 +54,7 @@ if(root){
   };
   new MutationObserver(refreshSpatialUi).observe(document.documentElement,{attributes:true,attributeFilter:['lang']});
   refreshSpatialUi();
-  const material=(color,emissive=color)=>new THREE.MeshStandardMaterial({color,emissive,emissiveIntensity:.62,metalness:.12,roughness:.3});
+  const material=(color,emissive=color)=>new THREE.MeshStandardMaterial({color,emissive,emissiveIntensity:.48,metalness:.04,roughness:.56});
   // Tapered, softly shaded biological processes: broad at the origin and fine at the tip.
   // The taper is built into the mesh so branches read as living extensions, not hoses.
   const makeNeurite=(curve,color,radius=.016,opacity=.78,segments=20)=>{
@@ -70,7 +70,7 @@ if(root){
       }
     }
     positions.needsUpdate=true;geometry.computeVertexNormals();
-    const material=new THREE.MeshStandardMaterial({color,emissive:new THREE.Color(color).multiplyScalar(.10),emissiveIntensity:.28,roughness:.88,metalness:0,transparent:opacity<1,opacity,depthWrite:opacity>.8});
+    const material=new THREE.MeshStandardMaterial({color,emissive:new THREE.Color(color).multiplyScalar(.10),emissiveIntensity:.20,roughness:.94,metalness:0,transparent:opacity<1,opacity,depthWrite:opacity>.8});
     material.userData.baseOpacity=opacity;
     return new THREE.Mesh(geometry,material);
   };
@@ -86,12 +86,12 @@ if(root){
       renderer=new THREE.WebGLRenderer({antialias:true,alpha:true,powerPreference:'high-performance'});
       renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,window.innerWidth<=760?1.25:1.7));renderer.setClearColor(0x000000,0);renderer.outputColorSpace=THREE.SRGBColorSpace;
       stage.prepend(renderer.domElement);renderer.domElement.setAttribute('aria-label','Scène 3D BALabs');
-      scene=new THREE.Scene();scene.fog=new THREE.FogExp2(0x26382b,.012);worldGroup=new THREE.Group();scene.add(worldGroup);worldGroup.visible=false;
+      scene=new THREE.Scene();scene.fog=new THREE.FogExp2(0x30404b,.009);worldGroup=new THREE.Group();scene.add(worldGroup);worldGroup.visible=false;
       camera=new THREE.PerspectiveCamera(48,1,.1,100);raycaster=new THREE.Raycaster();mouse=new THREE.Vector2();
-      scene.add(new THREE.AmbientLight(0xc6d8ca,1.22));
-      const key=new THREE.PointLight(0x7eb8f0,38,30);key.position.set(0,5,6);scene.add(key);
-      const fill=new THREE.PointLight(0x82d5ad,30,26);fill.position.set(-6,-2,-4);scene.add(fill);
-      const warm=new THREE.PointLight(0xffa45e,18,18);warm.position.set(5,-3,4);scene.add(warm);
+      scene.add(new THREE.AmbientLight(0xd4e0e8,1.28));
+      const key=new THREE.PointLight(0x91bfe0,34,32);key.position.set(0,5,6);scene.add(key);
+      const fill=new THREE.PointLight(0x9acdb5,26,28);fill.position.set(-6,-2,-4);scene.add(fill);
+      const warm=new THREE.PointLight(0xe3aa7d,15,20);warm.position.set(5,-3,4);scene.add(warm);
       // No starfield, orbital rings or central planet: open directly on an irregular biological network.
       const pos={bio:[-1.1,2.35,.35],myco:[-2.65,1.05,.9],soil:[-.35,.85,-.85],lab:[-2.25,-.45,-.25],products:[1.15,.15,.85],iot:[2.75,1.35,-.35],work:[1.9,-1.35,-.7],learn:[-.15,-2.35,.3]};
       for(const id of ids){
