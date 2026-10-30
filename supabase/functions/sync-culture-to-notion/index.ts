@@ -140,6 +140,19 @@ Deno.serve(async (req: Request) => {
     cultureIdForError = allowedCulture.id;
     organizationIdForError = allowedCulture.organization_id;
 
+    // This function performs privileged writes with the service role. RLS read
+    // access alone is insufficient: viewers must not trigger external syncs.
+    const { data: membership, error: membershipError } = await userClient
+      .from("organization_members")
+      .select("role")
+      .eq("organization_id", allowedCulture.organization_id)
+      .eq("user_id", authData.user.id)
+      .maybeSingle();
+    if (membershipError || !membership ||
+        !["owner", "admin", "member"].includes(String(membership.role))) {
+      return json({ error: "Write permission required." }, 403);
+    }
+
     const { data: culture, error: cultureError } = await adminClient
       .from("cultures")
       .select("id, organization_id, code, culture_type, started_at, material_id, protocol_version_id, notion_page_id")

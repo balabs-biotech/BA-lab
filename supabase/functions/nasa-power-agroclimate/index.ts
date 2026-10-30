@@ -87,6 +87,20 @@ Deno.serve(async (req: Request) => {
       .eq("id", locationId)
       .maybeSingle();
     if (locationError || !location) return json(404, { error: "location_not_found_or_access_denied" });
+
+    // This endpoint persists observations through the service role. Require an
+    // explicit writer membership; location visibility by itself is read access.
+    const { data: membership, error: membershipError } = await userClient
+      .from("organization_members")
+      .select("role")
+      .eq("organization_id", location.organization_id)
+      .eq("user_id", authData.user.id)
+      .maybeSingle();
+    if (membershipError || !membership ||
+        !["owner", "admin", "member"].includes(String(membership.role))) {
+      return json(403, { error: "write_permission_required" });
+    }
+
     if (typeof location.latitude !== "number" || typeof location.longitude !== "number") {
       return json(422, { error: "location_coordinates_required" });
     }
