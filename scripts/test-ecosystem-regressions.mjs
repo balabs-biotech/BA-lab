@@ -13,7 +13,9 @@ assert.deepEqual(sceneDomains, expectedDomains, '3D domain registry must preserv
 const htmlDomains = [...html.matchAll(/<button[^>]*data-sphere="([^"]+)"/g)].map((match) => match[1]);
 assert.deepEqual(htmlDomains, expectedDomains, 'HTML navigation must preserve the same eight domains');
 
-assert.ok(scene.includes('let junctionPaths=[];'), 'Anastomosis relay paths must be declared in the shared init scope');
+const initFunctionIndex = scene.indexOf('function init(){');
+const junctionPathsDeclarationIndex = scene.indexOf('let junctionPaths=[];');
+assert.ok(junctionPathsDeclarationIndex >= 0 && junctionPathsDeclarationIndex < initFunctionIndex, 'Anastomosis relay paths must be declared outside init so the relay animator can access them');
 assert.ok(scene.includes('junctionPaths.length=0;'), 'Anastomosis paths must be reset before the scene graph is rebuilt');
 assert.ok(scene.includes('const makeNeurite'), 'Organic neurite geometry must remain present');
 assert.ok(scene.toLowerCase().includes('anastomosis'), 'Cross-domain mycelial junctions must remain present');
