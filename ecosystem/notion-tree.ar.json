@@ -1,0 +1,149 @@
+{
+  "version": 1,
+  "source": "Verified public Arabic pages linked from the Arabic BA Labs entry page",
+  "language": "ar",
+  "coverage": "first_level_only; page URLs verified from the Arabic public entry; nested children intentionally not inferred",
+  "domains": [
+    {
+      "id": "myco",
+      "title": "علم الفطريات",
+      "notionId": "40173152f171813ba690d5064844f54a",
+      "url": "https://app.notion.com/p/40173152f171813ba690d5064844f54a",
+      "children": [
+        {
+          "id": "ar-myco-resources",
+          "title": "الموارد الفطرية",
+          "notionId": "40173152f171814b88a0dbb38a75acdd",
+          "url": "https://app.notion.com/p/40173152f171814b88a0dbb38a75acdd",
+          "description": "صفحات مرجعية عن الموارد الفطرية والكائنات المزروعة والمدروسة.",
+          "children": []
+        },
+        {
+          "id": "ar-myco-applications",
+          "title": "التطبيقات الفطرية",
+          "notionId": "40173152f17181afb288feda1d2c3e5c",
+          "url": "https://app.notion.com/p/40173152f17181afb288feda1d2c3e5c",
+          "description": "تفاعلات الفطريات واستخداماتها ضمن التطبيقات البيولوجية.",
+          "children": []
+        },
+        {
+          "id": "ar-mycorrhizae",
+          "title": "الفطريات الجذرية والتفاعلات البيولوجية",
+          "notionId": "40173152f17181c6b3baf6efc7bb60bc",
+          "url": "https://app.notion.com/p/40173152f17181c6b3baf6efc7bb60bc",
+          "description": "العلاقات بين الفطريات والجذور والتفاعلات البيولوجية المرتبطة بها.",
+          "children": []
+        }
+      ]
+    },
+    {
+      "id": "bio",
+      "title": "التكنولوجيا الحيوية",
+      "notionId": "40173152f17181bc87b1c17830686007",
+      "url": "https://app.notion.com/p/40173152f17181bc87b1c17830686007",
+      "children": [
+        {
+          "id": "ar-bio-fermentation",
+          "title": "التخمير البيولوجي",
+          "notionId": "40173152f17181319400c0c68635241b",
+          "url": "https://app.notion.com/p/40173152f17181319400c0c68635241b",
+          "description": "عمليات التخمير وتحويل المواد الحيوية.",
+          "children": []
+        },
+        {
+          "id": "ar-bio-reactors",
+          "title": "المفاعلات الحيوية والعمليات الأولية",
+          "notionId": "40173152f17181c0af95d99c3e5e2908",
+          "url": "https://app.notion.com/p/40173152f17181c0af95d99c3e5e2908",
+          "description": "أنظمة الزراعة والعمليات التجريبية المرتبطة بها.",
+          "children": []
+        },
+        {
+          "id": "ar-bio-substrates",
+          "title": "الركائز والدعامات البيولوجية",
+          "notionId": "40173152f17181bb91b5d8326978d664",
+          "url": "https://app.notion.com/p/40173152f17181bb91b5d8326978d664",
+          "description": "مواد وأوساط داعمة للعمليات والأنظمة البيولوجية.",
+          "children": []
+        }
+      ]
+    },
+    {
+      "id": "soil",
+      "title": "التكنولوجيا الزراعية",
+      "notionId": "40173152f17181488cf8ec1851cddb56",
+      "url": "https://app.notion.com/p/40173152f17181488cf8ec1851cddb56",
+      "children": [
+        {
+          "id": "ar-soil-propagation",
+          "title": "الزراعة والإكثار",
+          "notionId": "40173152f1718101afcbdb364eb5d44a",
+          "url": "https://app.notion.com/p/40173152f1718101afcbdb364eb5d44a",
+          "description": "تقنيات الزراعة والإكثار ومتابعة الأنظمة التجريبية.",
+          "children": []
+        },
+        {
+          "id": "ar-soil-biostimulants",
+          "title": "المحفزات الحيوية والحلول البيولوجية",
+          "notionId": "40173152f17181849ca3e8e0b2475b37",
+          "url": "https://app.notion.com/p/40173152f17181849ca3e8e0b2475b37",
+          "description": "موارد وحلول بيولوجية قيد الدراسة والتوثيق.",
+          "children": []
+        },
+        {
+          "id": "ar-soil-microbes",
+          "title": "الكائنات الدقيقة ذات الأهمية الزراعية",
+          "notionId": "40173152f17181f18a55d7ba9a90a713",
+          "url": "https://app.notion.com/p/40173152f17181f18a55d7ba9a90a713",
+          "description": "كائنات دقيقة مرتبطة بالأنظمة والتطبيقات الزراعية.",
+          "children": []
+        }
+      ]
+    },
+    {
+      "id": "iot",
+      "title": "القياس والأتمتة",
+      "notionId": "40173152f17181bf9bcfee1773043585",
+      "url": "https://app.notion.com/p/40173152f17181bf9bcfee1773043585",
+      "children": []
+    },
+    {
+      "id": "lab",
+      "title": "المختبر",
+      "notionId": "40173152f1718187b28fd8c0a564c936",
+      "url": "https://app.notion.com/p/40173152f1718187b28fd8c0a564c936",
+      "children": []
+    },
+    {
+      "id": "products",
+      "title": "المنتجات والموارد البيولوجية",
+      "notionId": "40173152f171817d8608cafa8a118065",
+      "url": "https://app.notion.com/p/40173152f171817d8608cafa8a118065",
+      "children": []
+    },
+    {
+      "id": "work",
+      "title": "البحث والتطوير",
+      "notionId": "40173152f17181668ddef98b9e1ddec4",
+      "url": "https://app.notion.com/p/40173152f17181668ddef98b9e1ddec4",
+      "children": [
+        {
+          "id": "ar-work-documented",
+          "title": "الأعمال والإنجازات الموثقة",
+          "notionId": "40173152f171811aaac8db82b1c7a9fe",
+          "url": "https://app.notion.com/p/40173152f171811aaac8db82b1c7a9fe",
+          "description": "مشاريع وأعمال موثقة مع عرض حدود النتائج المتاحة.",
+          "children": []
+        },
+        {
+          "id": "ar-work-collaboration",
+          "title": "التعاون مع BA Labs",
+          "notionId": "40173152f171810fb42cfa5856ae0356",
+          "url": "https://app.notion.com/p/40173152f171810fb42cfa5856ae0356",
+          "description": "مسارات التعاون وتحديد احتياجات المشاريع.",
+          "children": []
+        }
+      ]
+    }
+  ]
+}
