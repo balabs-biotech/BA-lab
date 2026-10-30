@@ -21,7 +21,7 @@ assert.match(source, /readBoundedJson\(upstream\)/, "NASA response must be strea
 assert.match(source, /reader\.cancel\("provider_response_too_large"\)/, "oversized provider responses must be cancelled");
 assert.match(source, /locations_total: count \?\? null/, "response must expose the total location count");
 assert.match(source, /possibly_truncated: \(count \?\? 0\) > MAX_LOCATIONS_PER_RUN/, "response must flag unprocessed locations");
-assert.match(source, /AbortSignal\\.timeout\\(15000\\)/, "upstream requests must have a bounded timeout");
+assert.match(source, /AbortSignal\.timeout\(15000\)/, "upstream requests must have a bounded timeout");
 assert.match(source, /https:\/\/power\.larc\.nasa\.gov\/api\/temporal\/daily\/point/, "upstream host must be NASA POWER");
 assert.doesNotMatch(source, /Access-Control-Allow-Origin/, "cron endpoint must not enable browser CORS");
 console.log("PASS: NASA POWER scheduled-import security contract");
