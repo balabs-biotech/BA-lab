@@ -1022,6 +1022,23 @@ body{background:radial-gradient(ellipse at 50% 48%,#263d38 0%,#172526 43%,#10191
  .mini{padding:100px 14px 24px!important}
 }
 </style>
+<style id="balabs-spatial-hierarchy-2026">
+.scenehead:before{display:none!important;content:none!important}
+.scenehead{top:86px!important;left:clamp(18px,3vw,42px)!important;right:clamp(18px,3vw,42px)!important;justify-content:flex-start!important;min-height:34px!important}
+.scenehead>div{display:flex;align-items:center;gap:12px}
+.scenehead small{font-size:9px!important;letter-spacing:.2em!important;color:#c88a67!important}
+.scenehead strong{font-size:11px!important;color:#c1cec3!important;font-weight:500!important}
+#mainView.webgl-ready{height:calc(100svh - 76px)!important;min-height:560px!important}
+#mainView .webgl-stage{inset:0!important;min-height:100%!important}
+#mainView .webgl-stage .webgl-hint{background:rgba(18,31,31,.82)!important;border-color:#829c86!important;color:#e5e9dc!important}
+#mainView .webgl-stage .webgl-status{color:#c18b68!important}
+@media(max-width:760px){
+ .scenehead{top:72px!important;left:14px!important;right:14px!important}
+ .scenehead strong{font-size:9px!important;max-width:220px}
+ #mainView.webgl-ready{height:calc(100svh - 62px)!important;min-height:520px!important}
+ #mainView .webgl-stage{min-height:100%!important}
+}
+</style>
 </head>
 <body>
 <div class="wrap" id="app" dir="ltr">
