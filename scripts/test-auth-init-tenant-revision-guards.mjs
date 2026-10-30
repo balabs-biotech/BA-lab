@@ -184,7 +184,7 @@ assert.equal((lineage.match(/isCurrentWorkspaceRevision\(loadRevision, loadOrgan
 const cultureDetail = getFunctionBlock("loadCultureDetail");
 assert.match(cultureDetail, /const loadRevision = authStateRevision;/);
 assert.match(cultureDetail, /const loadOrganizationId = organizationId;/);
-assert.equal((cultureDetail.match(/requestId !== cultureDetailRequestId \|\| !isCurrentWorkspaceRevision\(loadRevision, loadOrganizationId\)/g) || []).length, 4,
+assert.equal((cultureDetail.match(/requestId !== cultureDetailRequestId \|\| !isCurrentWorkspaceRevision\(loadRevision, loadOrganizationId\)/g) || []).length, 5,
   "culture detail must reject stale responses and errors");
 
 const comparison = getFunctionBlock("compareSelectedBatches");
