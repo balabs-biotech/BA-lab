@@ -2777,8 +2777,10 @@ let batchDetailRequestId = 0;
 async function loadBatch(
   batchId
 ) {
+  const loadRevision = authStateRevision;
+  const loadOrganizationId = loadOrganizationId;
 
-  if (!organizationId) {
+  if (!loadOrganizationId) {
 
     return;
 
@@ -2823,7 +2825,7 @@ async function loadBatch(
       `)
       .eq(
         "organization_id",
-        organizationId
+        loadOrganizationId
       )
       .eq(
         "id",
@@ -2831,7 +2833,7 @@ async function loadBatch(
       )
       .single();
 
-  if (requestId !== batchDetailRequestId) return;
+  if (requestId !== batchDetailRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
 
   if (batchError) {
 
@@ -2869,7 +2871,7 @@ async function loadBatch(
       `)
       .eq(
         "organization_id",
-        organizationId
+        loadOrganizationId
       )
       .eq(
         "batch_id",
@@ -2879,7 +2881,7 @@ async function loadBatch(
         "sequence_no"
       );
 
-  if (requestId !== batchDetailRequestId) return;
+  if (requestId !== batchDetailRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
 
   if (stagesError) {
 
@@ -2914,7 +2916,7 @@ async function loadBatch(
       `)
       .eq(
         "organization_id",
-        organizationId
+        loadOrganizationId
       )
       .eq(
         "batch_id",
@@ -2924,7 +2926,7 @@ async function loadBatch(
         "check_code"
       );
 
-  if (requestId !== batchDetailRequestId) return;
+  if (requestId !== batchDetailRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
 
   if (qcError) {
 
@@ -2942,12 +2944,12 @@ async function loadBatch(
   const { data: batchEventsData, error: batchEventsError } = await supabaseClient
     .from("events")
     .select("id,event_type,occurred_at,payload,location_id,environment_id")
-    .eq("organization_id", organizationId)
+    .eq("organization_id", loadOrganizationId)
     .eq("batch_id", batchId)
     .order("occurred_at", { ascending: false })
     .limit(50);
 
-  if (requestId !== batchDetailRequestId) return;
+  if (requestId !== batchDetailRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
 
   renderBatchInfo(
     batch
@@ -3586,6 +3588,9 @@ const qcSavesInFlight =
 async function saveQcCheck(
   checkId
 ) {
+  const operationRevision = authStateRevision;
+  const operationOrganizationId = organizationId;
+
 
   if (qcSavesInFlight.has(checkId)) {
 
@@ -3620,14 +3625,17 @@ async function saveQcCheck(
       checkId
     );
 
-  }
+  } catch (error) {
+    if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
+    console.error("Enregistrement du contrôle qualité impossible :", error);
+    showMessage("Enregistrement QC impossible : " + (error.message || "erreur inconnue"), "error");
 
-  finally {
+  } finally {
 
     qcSavesInFlight.delete(checkId);
 
     // Après un enregistrement réussi la liste est re-rendue : l'ancien bouton n'est plus dans le DOM.
-    if (button && button.isConnected) {
+    if (isCurrentWorkspaceRevision(operationRevision, operationOrganizationId) && button && button.isConnected) {
 
       button.disabled = false;
 
@@ -3676,6 +3684,7 @@ async function saveQcCheckNow(
   } =
     await supabaseClient.auth.getSession();
 
+  if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
 
   if (!sessionData.session) {
 
