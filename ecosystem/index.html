@@ -494,6 +494,74 @@ body{background:radial-gradient(ellipse at 12% 0%,rgba(105,137,115,.34) 0%,trans
 .scene:before{opacity:.16;background-image:radial-gradient(rgba(220,238,222,.8) .65px,transparent .8px)}
 .mini{background:linear-gradient(180deg,rgba(190,211,194,.035),transparent 28%)}
 @media(max-width:760px){.aside{border-left-color:#71847a}.hero p{color:#d5dfd7}}
+
+/* Art direction: BA Labs as a biological research atlas, not a generic app UI. */
+:root{color-scheme:light;--bg:#e9e5da;--panel:#f1eee5;--ink:#172a31;--muted:#56666a;--line:#b9c2b8;--lime:#a8c77a;--bio:#8fbd82;--myco:#d98b52;--soil:#c6a06a;--lab:#6f9fbd;--products:#cf7561;--iot:#7f9da5;--work:#a28ab8;--learn:#c3b36f}
+html,body{background:#e9e5da;color:#172a31}
+body{background:radial-gradient(ellipse at 82% 4%,#d7d2c4 0%,transparent 34%),linear-gradient(135deg,#efede5 0%,#e6e2d7 52%,#e9e5da 100%);background-attachment:fixed}
+.wrap{max-width:1540px;padding:24px clamp(16px,4vw,58px) 38px}
+.top{border-bottom:1px solid #aeb9b1;padding-bottom:18px}
+.mark{width:38px;height:38px;border:1px solid #47636a;border-radius:50%;background:#18323a;color:#d9e7d7;box-shadow:none}
+.brand strong{color:#19333b;font-size:13px;letter-spacing:.23em}
+.brand small{color:#647477;font-size:9px;letter-spacing:.17em}
+.lang{background:transparent;border:1px solid #b5c0b8;border-radius:2px;color:#33484c}
+.lang:hover{background:#d8ded2;border-color:#718b79}
+.lang[aria-pressed=true]{background:#19343c;color:#f2f0e7;border-color:#19343c;box-shadow:none}
+.hero{padding:clamp(38px,6vw,78px) 0 34px;grid-template-columns:minmax(0,1.5fr) minmax(200px,.5fr);gap:56px}
+.eyebrow{color:#687f62;letter-spacing:.24em;font-size:10px}
+h1{color:#18323a;font-size:clamp(42px,6.3vw,84px);line-height:.92;letter-spacing:-.075em;margin:17px 0 20px}
+h1 span{color:#b66d43;text-shadow:none}
+.hero p{color:#526267;font-size:15px;line-height:1.85;max-width:620px}
+.aside{border-left:1px solid #879d8c;color:#617174;padding-left:22px;font-size:13px}
+.aside b{color:#1e3b42;font-size:15px}
+.scene{border:1px solid #314e54;border-radius:3px;background:#14272e;box-shadow:0 24px 60px #263b3b20}
+.scenehead{background:#1a343b;border-bottom:1px solid #36535a;padding:17px 22px}
+.scenehead small{color:#b1c5b4}
+.scenehead strong{color:#f0eee5;font-size:13px;letter-spacing:.015em}
+.cluster-key{background:#203a40;border-bottom:1px solid #3a5659;padding:15px 22px}
+.cluster-item b{color:#f0eee5;letter-spacing:.16em;font-size:9px}
+.cluster-item small{color:#b4c3bb}
+.cluster-foundations i{background:#a8c77a;color:#a8c77a}
+.cluster-applications i{background:#d58d61;color:#d58d61}
+.cluster-applications{border-left-color:#557075}
+.btn{border-radius:2px;background:#29474d;border-color:#668078;color:#f5f1e6}
+.btn.primary{background:#c2d19b;border-color:#c2d19b;color:#1a3035}
+#mainView.webgl-ready{background:radial-gradient(ellipse at 48% 45%,#294a50 0%,#1c363e 47%,#14272e 100%);border-color:#385a60;min-height:720px}
+#mainView .webgl-stage .webgl-status{color:#c2d19b}
+#mainView.webgl-ready .webgl-controls button{background:#203c43;border:1px solid #718b82;border-radius:2px;color:#f4f0e6;box-shadow:none}
+#mainView.webgl-ready .webgl-controls button:hover{background:#c2d19b;color:#1b3338;border-color:#c2d19b}
+#mainView.webgl-ready .webgl-hint{background:#1b353beF;border:1px solid #547078;border-radius:2px;color:#e9eee4;box-shadow:none}
+#mainView .webgl-stage .webgl-focus{border-left:2px solid #c2d19b!important;background:linear-gradient(90deg,#19343bdc,transparent)!important}
+#mainView .webgl-focus strong{color:#f2efe5}
+#mainView .webgl-focus-kicker{color:#c2d19b}
+#mainView .webgl-focus-meta{border-color:#6e8c83;color:#d5dfd3}
+#mainView .webgl-focus-link{background:#24444a;border-color:#55736d;border-radius:2px;color:#f2eee4}
+#mainView .webgl-focus-link:hover{background:#345b5d;border-color:#c2d19b}
+.webgl-network-legend{background:#1a363de8!important;border-color:#6c8580!important;border-radius:2px!important;color:#edf0e7!important}
+.under{gap:0;border-top:1px solid #aeb9b1;border-bottom:1px solid #aeb9b1}
+.tile{background:transparent;border:0;border-right:1px solid #c2c9bd;border-radius:0;padding:20px 18px 20px 0}
+.tile:last-child{border-right:0}
+.tile b{color:#203c42;font-size:12px}
+.tile p{color:#59696b;font-size:11px;line-height:1.75}
+.foot{color:#657477}
+.foot strong{color:#29464b}
+@media(max-width:760px){
+ .wrap{padding:14px 12px 26px}
+ .hero{padding:34px 3px 24px;gap:18px}
+ .hero p{font-size:13px}
+ .aside{border-left:2px solid #879d8c;padding-left:14px}
+ .scene{border-radius:2px}
+ .scenehead{padding:14px}
+ .cluster-key{padding:13px 14px}
+ #mainView.webgl-ready{min-height:640px}
+ #mainView .webgl-stage{min-height:640px}
+ .under{grid-template-columns:1fr 1fr}
+ .tile{padding:14px 10px 14px 0;border-bottom:1px solid #c2c9bd}
+ .tile:nth-child(2){border-right:0;padding-left:10px}
+ .tile:nth-child(4){border-right:0;padding-left:10px;border-bottom:0}
+ .tile:nth-child(3){border-bottom:0}
+}
+
 </style>
 </body>
 </html>
