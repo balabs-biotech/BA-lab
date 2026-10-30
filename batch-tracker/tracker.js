@@ -2971,11 +2971,9 @@ async function loadBatch(
       .eq("batch_id", batchId)
       .order("occurred_at", { ascending: false })
       .limit(50);
-    if (requestId !== batchDetailRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
     batchEventsData = batchEventsResult.data || [];
     batchEventsError = batchEventsResult.error;
   } catch (error) {
-    if (requestId !== batchDetailRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
     batchEventsError = error;
   }
 
