@@ -13,6 +13,39 @@ const corsHeaders = {
   "Access-Control-Expose-Headers": "X-Geo-Bounds, X-Image-Date, X-Image-Source, X-NDVI-Stats",
   "Vary": "Access-Control-Request-Headers",
 };
+const MAX_REQUEST_BYTES = 32 * 1024;
+const MAX_STAC_RESPONSE_BYTES = 2 * 1024 * 1024;
+
+async function readBoundedJson(input: Request | Response, maxBytes: number): Promise<any> {
+  const declaredLength = Number(input.headers.get("content-length") ?? 0);
+  if (Number.isFinite(declaredLength) && declaredLength > maxBytes) throw new Error("json_body_too_large");
+  if (!input.body) throw new Error("empty_json_body");
+  const reader = input.body.getReader();
+  const chunks: Uint8Array[] = [];
+  let total = 0;
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      total += value.byteLength;
+      if (total > maxBytes) {
+        await reader.cancel("json_body_too_large");
+        throw new Error("json_body_too_large");
+      }
+      chunks.push(value);
+    }
+  } finally {
+    reader.releaseLock();
+  }
+  const bytes = new Uint8Array(total);
+  let offset = 0;
+  for (const chunk of chunks) {
+    bytes.set(chunk, offset);
+    offset += chunk.byteLength;
+  }
+  return JSON.parse(new TextDecoder().decode(bytes));
+}
+
 const json = (status: number, body: Record<string, unknown>) => new Response(JSON.stringify(body), {
   status, headers: { ...corsHeaders, "Content-Type": "application/json; charset=utf-8", "Cache-Control": "no-store" },
 });
@@ -58,7 +91,15 @@ Deno.serve(async (req: Request) => {
     const { data: authData, error: authError } = await db.auth.getUser();
     if (authError || !authData.user) return json(401, { error: "invalid_session" });
     diagnosticStage = "parse_request";
-    const body = await req.json().catch(() => null);
+    let body: any;
+    try {
+      body = await readBoundedJson(req, MAX_REQUEST_BYTES);
+    } catch (bodyError) {
+      if (bodyError instanceof Error && bodyError.message === "json_body_too_large") {
+        return json(413, { error: "request_body_too_large", max_bytes: MAX_REQUEST_BYTES });
+      }
+      return json(400, { error: "invalid_json_body" });
+    }
     if (!body || typeof body !== "object" || Array.isArray(body)) return json(400, { error: "invalid_json_body" });
     const locationId = typeof body.location_id === "string" ? body.location_id : "";
     const date = body.date;
@@ -86,7 +127,13 @@ Deno.serve(async (req: Request) => {
     diagnosticStage = "search_stac";
     const searchResponse = await fetch(stac, { signal: AbortSignal.timeout(18000), headers: { Accept: "application/geo+json" } });
     if (!searchResponse.ok) return json(502, { error: "earth_search_catalogue_unavailable", upstream_status: searchResponse.status });
-    const searchData = await searchResponse.json();
+    let searchData: any;
+    try {
+      searchData = await readBoundedJson(searchResponse, MAX_STAC_RESPONSE_BYTES);
+    } catch (stacError) {
+      if (stacError instanceof Error && stacError.message === "json_body_too_large") return json(502, { error: "earth_search_catalogue_response_too_large" });
+      return json(502, { error: "earth_search_catalogue_invalid_json" });
+    }
     const features = Array.isArray(searchData?.features) ? searchData.features : [];
     if (!features.length) return json(404, { error: "no_sentinel2_scene_for_date", date, detail: "No Sentinel-2 L2A scene intersects this location on the selected date. Try a nearby acquisition date." });
 
