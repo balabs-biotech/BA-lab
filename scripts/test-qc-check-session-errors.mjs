@@ -10,11 +10,12 @@ const handler = tracker.slice(start, end);
 
 async function runSessionFailure({ stale = false } = {}) {
   const messages = [];
+  let currentRevision = 1;
   const context = {
     authStateRevision: 1,
     organizationId: "org-test",
     isCurrentWorkspaceRevision(revision, organizationId) {
-      return revision === this.authStateRevision && organizationId === this.organizationId;
+      return revision === currentRevision && organizationId === "org-test";
     },
     batchQcList: {
       querySelector() {
@@ -25,7 +26,10 @@ async function runSessionFailure({ stale = false } = {}) {
     supabaseClient: {
       auth: {
         async getSession() {
-          if (stale) context.authStateRevision = 2;
+          if (stale) {
+            currentRevision = 2;
+            context.authStateRevision = 2;
+          }
           throw new Error("Session provider unavailable");
         }
       }
