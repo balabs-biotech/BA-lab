@@ -968,6 +968,22 @@ h1 span{font-style:italic!important;color:var(--field-rust)!important}
  .top .lang{font-size:8px!important}
 }
 </style>
+
+<style id="balabs-mobile-hero-legibility-2026">
+/* Keep the microscopy image atmospheric on narrow screens, never competing with the headline. */
+@media(max-width:760px){
+ .hero:after{
+  right:-8%!important;top:18%!important;
+  width:68vw!important;height:260px!important;
+  opacity:.16!important;
+  background-position:center!important;
+  mask-image:linear-gradient(90deg,transparent 0%,rgba(0,0,0,.22) 28%,#000 76%)!important;
+  -webkit-mask-image:linear-gradient(90deg,transparent 0%,rgba(0,0,0,.22) 28%,#000 76%)!important;
+ }
+ .hero>div:first-child{position:relative!important;z-index:2!important}
+ .hero .aside{position:relative!important;z-index:2!important;background:linear-gradient(90deg,rgba(239,237,229,.88),rgba(239,237,229,.48))!important}
+}
+</style>
 </head>
 <body>
 <div class="wrap" id="app" dir="ltr">
