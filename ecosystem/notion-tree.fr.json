@@ -234,6 +234,13 @@
           "notionId": "3e273152f17181ec9ee4dcf0c18a2abc",
           "url": "https://app.notion.com/p/3e273152f17181ec9ee4dcf0c18a2abc",
           "description": "Architectures de fermentation modulaires étudiées comme outils de R&D ; les conceptions ne sont pas nécessairement construites ou validées."
+        },
+        {
+          "id": "soil-integrated-instrumentation",
+          "title": "Instrumentation intégrée",
+          "notionId": "3e273152f171818bae74c015daa192cd",
+          "url": "https://app.notion.com/p/3e273152f171818bae74c015daa192cd",
+          "description": "Relier les équipements, les capteurs, les données et les actions pour rendre les procédés biologiques observables."
         }
       ]
     },
@@ -249,6 +256,13 @@
           "notionId": "3e273152f171817a81d6f806b3804d6b",
           "url": "https://app.notion.com/p/3e273152f171817a81d6f806b3804d6b",
           "description": "Étude de la réponse des plantes aux supports, à l’eau et aux conditions de culture dans des systèmes expérimentaux."
+        },
+        {
+          "id": "lab-proposal",
+          "title": "Préparer une proposition de projet",
+          "notionId": "3e273152f171815cbaeac2d746fc9ede",
+          "url": "https://app.notion.com/p/3e273152f171815cbaeac2d746fc9ede",
+          "description": "Guide pour présenter un besoin, préciser le résultat recherché et préparer un échange autour d’une collaboration."
         }
       ]
     },
@@ -276,7 +290,16 @@
           "id": "work-documented",
           "title": "Travaux & réalisations documentés",
           "notionId": "3f273152f171815597b6c696402b42c0",
-          "url": "https://app.notion.com/p/3f273152f171815597b6c696402b42c0"
+          "url": "https://app.notion.com/p/3f273152f171815597b6c696402b42c0",
+          "children": [
+            {
+              "id": "work-evidence",
+              "title": "Ce qui est effectivement démontré",
+              "notionId": "3e973152f171816781fbf56674cfe55c",
+              "url": "https://app.notion.com/p/3e973152f171816781fbf56674cfe55c",
+              "description": "Repères de maturité et niveaux de preuve : distinguer hypothèse, conception, réalisation, observation, répétition et validation."
+            }
+          ]
         }
       ]
     }
