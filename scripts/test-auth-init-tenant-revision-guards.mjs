@@ -63,7 +63,7 @@ for (const loader of ["loadReferenceData", "loadQuantityUnitOptions", "loadMeasu
 function getMutationBlock(name) {
   const start = tracker.indexOf(`async function ${name}(`);
   assert.ok(start >= 0, `Missing mutation handler: ${name}`);
-  const next = tracker.slice(start + 1).search(/\\n(?:async )?function /);
+  const next = tracker.slice(start + 1).search(/\n(?:async )?function /);
   return tracker.slice(start, next >= 0 ? start + 1 + next : tracker.length);
 }
 
