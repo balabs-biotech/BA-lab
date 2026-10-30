@@ -1584,6 +1584,33 @@ h1 span{color:#b66d43;text-shadow:none}
  .scene{background:radial-gradient(ellipse at 50% 38%,#d0ddd6 0%,#afc2ba 58%,#879f9a 100%)}
  #mainView.webgl-ready{background:radial-gradient(ellipse at 50% 38%,#d7e2da 0%,#b8cbc2 55%,#8da7a0 100%)}
 }
+
+/* 2026-10-30 — Mineral editorial chrome: lift the surrounding interface, retain deep controls. */
+.scenehead{background:linear-gradient(112deg,rgba(236,242,233,.97),rgba(220,231,224,.97));border-bottom:1px solid #a7b9ae;color:#1c3b42}
+.scenehead strong{color:#1c3b42;letter-spacing:.025em}
+.scenehead small{color:#60776f}
+.cluster-key{background:linear-gradient(112deg,rgba(231,239,229,.96),rgba(216,229,222,.96));border-bottom:1px solid #a7b9ae}
+.cluster-item b{color:#25454a}
+.cluster-item small{color:#5e746d}
+.cluster-applications{border-top-color:#aabbb1}
+#mainView.webgl-ready{border-radius:0 0 18px 18px}
+.scenehead{border-radius:18px 18px 0 0}
+#mainView .webgl-stage{touch-action:none;overscroll-behavior:contain}
+#mainView .webgl-stage .webgl-controls button{width:40px;height:40px;border-radius:12px;border:1px solid #c6d7cd;background:rgba(25,53,59,.94);color:#f4f2e9;box-shadow:0 5px 16px rgba(25,53,59,.14);font-size:19px}
+#mainView .webgl-stage .webgl-controls button:active{transform:scale(.96)}
+#mainView .webgl-stage .webgl-controls button:focus-visible{outline:2px solid #9aaf8c;outline-offset:3px}
+#mainView .webgl-stage .webgl-status{background:rgba(242,246,239,.88);border:1px solid rgba(107,135,124,.35);border-radius:999px;padding:7px 11px;color:#23454a;box-shadow:0 5px 18px rgba(37,58,55,.08);backdrop-filter:blur(10px)}
+.webgl-network-legend{border-radius:999px!important;padding:9px 13px!important}
+@media(max-width:760px){
+ .scenehead{border-radius:14px 14px 0 0}
+ #mainView.webgl-ready{border-radius:0 0 14px 14px}
+ #mainView .webgl-stage .webgl-controls button{width:42px;height:42px}
+ #mainView .webgl-stage .webgl-status{max-width:calc(100% - 24px);font-size:9px;padding:6px 9px}
+ .webgl-network-legend{border-radius:12px!important;max-width:calc(100% - 18px)!important}
+}
+@media(prefers-reduced-motion:reduce){
+ #mainView .webgl-stage .webgl-controls button{transition:none!important}
+}
 </style>
 </body>
 </html>
