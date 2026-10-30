@@ -461,7 +461,7 @@ if(root){
           {edge:{curve:first.curve,relation:false,id:first.a,parentId:first.a},reverse:false},
           {edge:{curve:anastomosis,relation:true,aId:first.a,bId:second.b},reverse:false},
           {edge:{curve:second.curve,relation:false,id:second.b,parentId:second.b},reverse:true},
-          {edge:{curve:secondStem,relation:false,id:second.b,parentId:second.b},reverse:true}
+          {edge:{curve:secondStem,relation:false,id:second.b,parentId:second.b},reverse:false}
         ];
         pathSegments.forEach(segment=>segment.length=segment.edge.curve.getLength());
         // Split the anastomosis at its midpoint. Two daughter flows leave the
