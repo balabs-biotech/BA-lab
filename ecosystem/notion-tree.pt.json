@@ -2,7 +2,7 @@
   "version": 1,
   "source": "Verified public language-specific BA Labs pages from the corresponding public language entry and Notion page search",
   "language": "pt",
-  "coverage": "first_level_and_verified_topic_pages; deeper page hierarchy not inferred unless confirmed",
+  "coverage": "expanded_verified_topic_pages; only explicitly identified public pages are linked",
   "domains": [
     {
       "id": "myco",
@@ -16,14 +16,6 @@
           "notionId": "40173152f17181a99780d3ca1ee77cdb",
           "url": "https://app.notion.com/p/40173152f17181a99780d3ca1ee77cdb",
           "description": "Interações dos fungos e possíveis aplicações biológicas.",
-          "children": []
-        },
-        {
-          "id": "pt-myco-resources",
-          "title": "Recursos fúngicos",
-          "notionId": "40173152f171812fb8d5de62178f6aef",
-          "url": "https://app.notion.com/p/40173152f171812fb8d5de62178f6aef",
-          "description": "Páginas de referência sobre organismos e recursos fúngicos.",
           "children": []
         }
       ]
@@ -49,16 +41,7 @@
       "title": "Agrotecnologia",
       "notionId": "40173152f17181b9be7ae84e413092d5",
       "url": "https://app.notion.com/p/40173152f17181b9be7ae84e413092d5",
-      "children": [
-        {
-          "id": "pt-soil-agrotech",
-          "title": "Agrotecnologia",
-          "notionId": "40173152f17181b9be7ae84e413092d5",
-          "url": "https://app.notion.com/p/40173152f17181b9be7ae84e413092d5",
-          "description": "Tecnologias e abordagens aplicadas aos sistemas agrícolas.",
-          "children": []
-        }
-      ]
+      "children": []
     },
     {
       "id": "iot",
