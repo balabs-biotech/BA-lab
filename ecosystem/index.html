@@ -1583,6 +1583,56 @@ body{background:linear-gradient(180deg,#0b1214 0,#101a1b 44%,#eeeade 44%,#eeeade
   .editorial-feature .art-caption{font-size:8px}
 }
 
+
+
+/* 2026-10-30 — bridge editorial simplification: remove the last decorative line drawing */
+.universe-bridge{
+  display:block!important;
+  padding:clamp(58px,8vw,104px) clamp(24px,8vw,112px)!important;
+  background:#D1D0C5!important;
+  color:#111B1D!important;
+  border:0!important;
+  border-top:1px solid #9BA69D!important;
+}
+.universe-bridge .bridge-copy{
+  max-width:900px!important;
+  margin:0 auto!important;
+}
+.universe-bridge .bridge-kicker{
+  color:#99563F!important;
+  margin-bottom:22px!important;
+}
+.universe-bridge .bridge-copy h2{
+  max-width:760px!important;
+  color:#111B1D!important;
+  font-size:clamp(42px,6vw,76px)!important;
+  line-height:.99!important;
+}
+.universe-bridge .bridge-copy h2 em{color:#52645D!important}
+.universe-bridge .bridge-copy p{
+  max-width:590px!important;
+  color:#465650!important;
+  font-size:clamp(15px,1.3vw,17px)!important;
+  line-height:1.8!important;
+}
+.universe-bridge .bridge-action{
+  border-color:#52645D!important;
+  color:#111B1D!important;
+}
+.universe-bridge .bridge-action span{color:#99563F!important}
+.universe-bridge .bridge-action:hover{
+  background:#263B38!important;
+  border-color:#263B38!important;
+  color:#F0EEE5!important;
+}
+.universe-bridge .bridge-action:hover span{color:#D6A087!important}
+.universe-bridge .bridge-network{display:none!important}
+@media(max-width:760px){
+  .universe-bridge{padding:52px 22px!important}
+  .universe-bridge .bridge-copy h2{font-size:clamp(38px,10vw,56px)!important}
+  .universe-bridge .bridge-action{width:auto!important;max-width:100%;justify-content:space-between}
+}
+
 </style>
 </head>
 <body>
