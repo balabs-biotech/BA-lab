@@ -2809,7 +2809,15 @@ async function loadBatch(
   const requestId = ++batchDetailRequestId;
   selectedBatchId =
     batchId;
-
+  selectedBatch = null;
+  advanceBatchButton.disabled = true;
+  releaseBatchButton.disabled = true;
+  if (recordHarvestButton) recordHarvestButton.disabled = true;
+  if (moveBatchButton) moveBatchButton.disabled = true;
+  hideElement(batchInfo);
+  hideElement(batchStages);
+  hideElement(batchQc);
+  hideElement(batchEvents);
 
   clearMessage();
 
@@ -4447,7 +4455,7 @@ async function releaseBatch() {
   const operationOrganizationId = organizationId;
 
 
-  if (!selectedBatchId) {
+  if (!selectedBatchId || !selectedBatch) {
 
     showMessage(
       "Sélectionnez d'abord un batch.",
