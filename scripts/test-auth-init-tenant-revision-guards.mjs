@@ -195,4 +195,21 @@ assert.match(comparison, /if \(!isCurrentWorkspaceRevision\(operationRevision, o
 assert.match(comparison, /if \(isCurrentWorkspaceRevision\(operationRevision, operationOrganizationId\)\) button\.disabled = false;/,
   "batch comparison must not restore stale controls");
 
+
+const statistics = getFunctionBlock("loadStatistics");
+assert.match(statistics, /const loadRevision = authStateRevision;/,
+  "statistics must capture the auth revision before starting requests");
+assert.match(statistics, /const loadOrganizationId = organizationId;/,
+  "statistics must capture the organization ID before starting requests");
+assert.match(statistics, /if \(!loadOrganizationId\)/,
+  "statistics must reject a missing captured organization");
+assert.ok(!statistics.includes('.eq("organization_id", organizationId)'),
+  "statistics queries must use the captured organization ID");
+assert.ok((statistics.match(/isCurrentWorkspaceRevision\(loadRevision, loadOrganizationId\)/g) || []).length >= 6,
+  "statistics must reject stale workspace results at request, error and UI-restoration boundaries");
+assert.match(statistics, /domain !== \(document\.body\.dataset\.domain \|\| "mycology"\)/,
+  "statistics must discard results after a domain switch");
+assert.match(statistics, /isCurrentWorkspaceRevision\(loadRevision, loadOrganizationId\).*button\.disabled=false/s,
+  "statistics must not restore a stale workspace button");
+
 console.log("Auth initialization, tenant-write and finally revision guards passed.");
