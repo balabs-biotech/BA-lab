@@ -30,6 +30,41 @@ async function sha256Hex(value: string): Promise<string> {
   return Array.from(new Uint8Array(digest), (b) => b.toString(16).padStart(2, "0")).join("");
 }
 
+async function readBoundedBody(
+  req: Request,
+  maxBytes: number,
+): Promise<{ body: string } | { tooLarge: true } | { invalid: true }> {
+  if (!req.body) return { body: "" };
+  const reader = req.body.getReader();
+  const chunks: Uint8Array[] = [];
+  let totalBytes = 0;
+
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      totalBytes += value.byteLength;
+      if (totalBytes > maxBytes) {
+        await reader.cancel();
+        return { tooLarge: true };
+      }
+      chunks.push(value);
+    }
+  } catch {
+    return { invalid: true };
+  } finally {
+    reader.releaseLock();
+  }
+
+  const bytes = new Uint8Array(totalBytes);
+  let offset = 0;
+  for (const chunk of chunks) {
+    bytes.set(chunk, offset);
+    offset += chunk.byteLength;
+  }
+  return { body: new TextDecoder().decode(bytes) };
+}
+
 Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") return new Response(null, { status: 204, headers: corsHeaders });
   if (req.method !== "POST") return response(405, { error: "method_not_allowed" });
@@ -41,15 +76,10 @@ Deno.serve(async (req: Request) => {
   const declaredLength = Number(req.headers.get("content-length") ?? "0");
   if (declaredLength > 32_000) return response(413, { error: "payload_too_large" });
 
-  let raw: string;
-  try {
-    raw = await req.text();
-    if (new TextEncoder().encode(raw).byteLength > 32_000) {
-      return response(413, { error: "payload_too_large" });
-    }
-  } catch {
-    return response(400, { error: "invalid_body" });
-  }
+  const boundedBody = await readBoundedBody(req, 32_000);
+  if ("tooLarge" in boundedBody) return response(413, { error: "payload_too_large" });
+  if ("invalid" in boundedBody) return response(400, { error: "invalid_body" });
+  const raw = boundedBody.body;
 
   let body: any;
   try {
