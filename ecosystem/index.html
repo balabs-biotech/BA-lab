@@ -1161,6 +1161,33 @@ h1 span{font-style:italic!important;color:var(--field-rust)!important}
   .editorial-work .work-card,.editorial-work .work-media img{transition:none!important}
 }
 
+
+/* Customer experience flow: projects → interactive explorer → domain directory */
+#app > #chantiers{scroll-margin-top:76px}
+#app > #universe{
+ margin:0!important;
+ padding:clamp(28px,4vw,54px) clamp(14px,3vw,38px) 34px!important;
+ background:#17211f!important;
+ border-top:1px solid #52645d!important;
+ border-bottom:1px solid #52645d!important;
+}
+#app > #universe .scenehead{max-width:1440px;margin:0 auto;padding:8px 4px 18px!important;background:transparent!important;border:0!important}
+#app > #universe .scenehead small{color:#d6a087!important;font-size:10px!important;letter-spacing:.16em!important}
+#app > #universe .scenehead strong{color:#f0eee5!important;font-size:clamp(17px,2vw,23px)!important;font-weight:500!important}
+#app > #universe .cluster-key{max-width:1440px;margin:0 auto 14px;border:1px solid #40544a!important;border-radius:8px;background:#202c27!important}
+#app > #universe #mainView{max-width:1440px;margin:0 auto;border:1px solid #40544a!important;border-radius:10px;background:#111b1d!important}
+#app > #universes{scroll-margin-top:76px}
+#app > #universes .universe-index-heading{margin-bottom:36px}
+#app > #universes .universe-index-card{min-height:220px;border-radius:5px}
+#app > #universes .universe-index-card:focus-visible{outline:3px solid #b96b4d;outline-offset:3px}
+@media(max-width:760px){
+ #app > #universe{padding:24px 10px 26px!important}
+ #app > #universe .scenehead{padding:4px 4px 14px!important}
+ #app > #universe .cluster-key{margin-bottom:10px}
+ #app > #universe #mainView{border-radius:8px}
+ #app > #universes .universe-index-card{min-height:205px}
+}
+
 </style>
 <style>
 #mainView .webgl-focus-next{margin-top:5px;color:#829b80;font:600 9px/1.4 system-ui,sans-serif;letter-spacing:.09em;text-transform:uppercase}
@@ -2861,6 +2888,22 @@ function enterSphere(id,scroll=true){selected=id;const d=pages[id],tx=T[lang];if
 window.enterSphere=enterSphere;
 function goHome(){miniView.hidden=true;mainView.hidden=false;mainView.classList.add('universe-closed');mainView.classList.remove('universe-open','has-focus','dragging');document.getElementById('networkEdges')?.replaceChildren();homeBtn.hidden=true;sceneTitle.textContent=tr('sceneTitle');document.querySelectorAll('.sphere').forEach(s=>{s.classList.toggle('active',s.dataset.sphere===selected);s.classList.remove('focused')});applyOrbit()}
 document.querySelectorAll('[data-lang]').forEach(b=>b.addEventListener('click',()=>setLanguage(b.dataset.lang)));document.querySelectorAll('[data-sphere]').forEach(b=>{b.addEventListener('click',()=>enterSphere(b.dataset.sphere));b.addEventListener('mouseenter',()=>applyFocus(b.dataset.sphere,true));b.addEventListener('mouseleave',()=>applyFocus(selected,false));b.addEventListener('focus',()=>applyFocus(b.dataset.sphere,true));b.addEventListener('blur',()=>applyFocus(selected,false));});homeBtn.addEventListener('click',goHome);openUniverse.addEventListener('click',toggleUniverse);mainView.addEventListener('pointerdown',beginOrbit);mainView.addEventListener('pointermove',moveOrbit);mainView.addEventListener('pointerup',endOrbit);mainView.addEventListener('pointercancel',endOrbit);window.addEventListener('resize',()=>{applyOrbit();drawMiniConnections()});
+
+/* Customer journey: featured work → live 3D explorer → eight domains.
+   Reorder existing sections without rebuilding or reinitializing the explorer. */
+(()=>{
+ const app=document.getElementById('app');
+ const method=app?.querySelector('#demarche');
+ const bridge=app?.querySelector('.universe-bridge');
+ const work=app?.querySelector('#chantiers');
+ const scene=app?.querySelector('#universe');
+ const domains=app?.querySelector('#universes');
+ if(!app||!method||!bridge||!work||!scene||!domains)return;
+ app.insertBefore(method,work);
+ app.insertBefore(bridge,work);
+ app.insertBefore(scene,domains);
+})();
+
 setLanguage('fr');applyOrbit();
 </script>
 <script type="module" src="./constellation-3d.js?v=shared-relay-scope-20261030i"></script>
