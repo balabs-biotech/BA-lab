@@ -2813,8 +2813,8 @@ async function loadBatch(
 
   clearMessage();
 
-
-  const {
+  try {
+    const {
     data: batch,
     error: batchError
   } =
@@ -2864,10 +2864,6 @@ async function loadBatch(
     return;
 
   }
-
-
-  selectedBatch =
-    batch;
 
 
   const {
@@ -2970,6 +2966,8 @@ async function loadBatch(
 
   if (requestId !== batchDetailRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
 
+  selectedBatch = batch;
+
   renderBatchInfo(
     batch
   );
@@ -3005,6 +3003,11 @@ async function loadBatch(
     stages || [],
     qcChecks || []
   );
+  } catch (error) {
+    if (requestId !== batchDetailRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
+    console.error("Chargement du batch :", error);
+    showMessage(`Chargement du batch impossible : ${error?.message || "erreur réseau inconnue"}`, "error");
+  }
 
 }
 
