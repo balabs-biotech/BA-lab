@@ -101,17 +101,28 @@ if(root){
         const color=colors[id],p=new THREE.Vector3(...pos[id]).multiplyScalar(.98);
         // Neural soma: a compact, softly glowing junction, not a planet with an orbit.
         // Faceted, asymmetrical cell body: deliberately not a polished planet.
+        const cellProfiles={
+          bio:{scale:[1.08,.88,.94],freq:[8.5,7.2,3.1],base:.91,lobe:.11,groove:.17,power:5},
+          myco:{scale:[.94,.84,1.14],freq:[10.2,6.1,4.4],base:.90,lobe:.15,groove:.13,power:4},
+          soil:{scale:[.82,1.16,.91],freq:[6.4,9.1,5.2],base:.92,lobe:.13,groove:.19,power:3},
+          lab:{scale:[1.16,.78,.88],freq:[7.1,5.8,8.6],base:.94,lobe:.08,groove:.12,power:6},
+          products:{scale:[1.14,.91,.84],freq:[9.7,8.3,6.2],base:.90,lobe:.17,groove:.11,power:4},
+          iot:{scale:[.91,.92,1.13],freq:[12.1,7.4,5.7],base:.93,lobe:.07,groove:.20,power:7},
+          work:{scale:[1.19,.79,.91],freq:[6.8,10.4,4.1],base:.91,lobe:.12,groove:.15,power:5},
+          learn:{scale:[.86,1.13,.88],freq:[8.1,11.2,7.3],base:.92,lobe:.14,groove:.16,power:4}
+        };
+        const profile=cellProfiles[id],phase=ids.indexOf(id);
         const geo=new THREE.IcosahedronGeometry(.145,3),attr=geo.attributes.position;
-        // Sculpt a compact membrane with shallow grooves and attachment pits.
-        // The body is deliberately small: the branching membrane, not a round
-        // ball, defines the silhouette of each domain.
+        // Each domain has its own membrane proportions and surface rhythm:
+        // elongated hyphal, descending rhizosphere, flattened culture, angular
+        // instrument, connected specimen, project chain, or branching knowledge.
         for(let v=0;v<attr.count;v++){
           const x=attr.getX(v),y=attr.getY(v),z=attr.getZ(v);
           const n=new THREE.Vector3(x,y,z).normalize();
-          const lobes=Math.sin(n.x*8.5+n.z*3.1+ids.indexOf(id)*.7)*Math.cos(n.y*7.2-n.x*2.4);
-          const grooves=Math.pow(Math.max(0,Math.sin(n.x*5.1+n.y*4.7+n.z*6.3+ids.indexOf(id))),5);
-          const wave=.91+.11*lobes-.17*grooves;
-          attr.setXYZ(v,x*wave*1.03,y*wave*.88,z*wave*.94);
+          const lobes=Math.sin(n.x*profile.freq[0]+n.z*profile.freq[2]+phase*.7)*Math.cos(n.y*profile.freq[1]-n.x*2.4);
+          const grooves=Math.pow(Math.max(0,Math.sin(n.x*5.1+n.y*4.7+n.z*6.3+phase)),profile.power);
+          const wave=profile.base+profile.lobe*lobes-profile.groove*grooves;
+          attr.setXYZ(v,x*wave*profile.scale[0],y*wave*profile.scale[1],z*wave*profile.scale[2]);
         }
         geo.computeVertexNormals();
         const mat=new THREE.MeshStandardMaterial({color,emissive:new THREE.Color(color).multiplyScalar(.08),emissiveIntensity:.12,metalness:0,roughness:1,flatShading:true});
