@@ -11,6 +11,35 @@ const PARAMETERS = {
   RH2M: { variable: "relative_humidity_mean", unit: "%", resolution: 55000 },
   WS2M: { variable: "wind_speed_mean", unit: "m/s", resolution: 55000 },
 };
+const MAX_UPSTREAM_BYTES = 4 * 1024 * 1024;
+const MAX_LOCATIONS_PER_RUN = 100;
+const LOCATION_CONCURRENCY = 8;
+
+async function readBoundedJson(response: Response, maxBytes = MAX_UPSTREAM_BYTES): Promise<any> {
+  if (!response.body) throw new Error("empty_provider_response");
+  const reader = response.body.getReader();
+  const chunks: Uint8Array[] = [];
+  let total = 0;
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      total += value.byteLength;
+      if (total > maxBytes) {
+        await reader.cancel("provider_response_too_large");
+        throw new Error("provider_response_too_large");
+      }
+      chunks.push(value);
+    }
+  } finally {
+    reader.releaseLock();
+  }
+  const bytes = new Uint8Array(total);
+  let offset = 0;
+  for (const chunk of chunks) { bytes.set(chunk, offset); offset += chunk.byteLength; }
+  return JSON.parse(new TextDecoder().decode(bytes));
+}
+
 function response(status: number, body: Record<string, unknown>) {
   return new Response(JSON.stringify(body), { status, headers: cors });
 }
