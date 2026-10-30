@@ -304,6 +304,7 @@ console.log("✓ Culture creation: session lookup failures produce controlled fe
 // A session resolved after an authentication/workspace change must not start writes.
 const staleSessionMessages = [];
 let staleSessionRevision = 1;
+let staleSessionSessionCalls = 0;
 let staleSessionConsentLookups = 0;
 const staleSessionContext = {
   authStateRevision: staleSessionRevision,
@@ -321,6 +322,7 @@ const staleSessionContext = {
     return revision === staleSessionRevision && organizationId === "org-test";
   },
   getCurrentSession: async () => {
+    staleSessionSessionCalls++;
     staleSessionRevision = 2;
     staleSessionContext.authStateRevision = 2;
     return { user: { id: "user-test" } };
@@ -336,8 +338,11 @@ const staleSessionContext = {
 await assert.doesNotReject(
   vm.runInNewContext(`${createCultureSource}; createCulture()`, staleSessionContext)
 );
+assert.equal(staleSessionSessionCalls, 1, "the session race must be exercised");
 assert.equal(staleSessionConsentLookups, 0,
   "a stale session must be rejected before consent lookup or write");
+assert.equal(staleSessionContext.createButton.disabled, false,
+  "a stale operation must not leave the create button disabled");
 console.log("✓ Culture creation: a session resolved after workspace change cannot start writes");
 
 const batchProtocolSource = `async ${extractFunction(engine, "createBatch")}`;
