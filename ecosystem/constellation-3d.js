@@ -243,6 +243,49 @@ if(root){
             addProcess([top,top.clone().add(new THREE.Vector3(-.11,-.04,0)),neck,base.clone().add(new THREE.Vector3(-.14,.08,0)),base.clone().add(new THREE.Vector3(.14,.08,0)),neck.clone().add(new THREE.Vector3(.11,-.04,0)),top],.014,.82);
             addProcess([base.clone().add(new THREE.Vector3(-.12,.19,.02)),base.clone().add(new THREE.Vector3(0,.16,.02)),base.clone().add(new THREE.Vector3(.12,.19,.02))],.009,.72);
           }
+        }else if(id==='bio'){
+          // Applied biology: a membrane-like cell with uneven protrusions and internal bridges.
+          for(let k=0;k<5;k++){
+            const a=k*1.19+.2,dir=new THREE.Vector3(Math.cos(a),Math.sin(a)*.82,Math.sin(a*1.6)*.24);
+            const tip=p.clone().addScaledVector(dir,.92+(k%2)*.16),shoulder=p.clone().addScaledVector(dir,.48);
+            addProcess([p.clone().addScaledVector(dir,.12),shoulder,tip],.018,.86);
+            const side=new THREE.Vector3(-dir.y,dir.x,.12).normalize();
+            addProcess([shoulder,shoulder.clone().addScaledVector(side,.18),shoulder.clone().addScaledVector(side,.34).addScaledVector(dir,.08)],.009,.7);
+            addTerminal(tip,.024);
+          }
+          for(let k=0;k<3;k++){
+            const a=k*2.094,from=p.clone().add(new THREE.Vector3(Math.cos(a)*.35,Math.sin(a)*.3,.08)),to=p.clone().add(new THREE.Vector3(Math.cos(a+1.2)*.48,Math.sin(a+1.2)*.38,-.06));
+            addProcess([from,from.clone().lerp(to,.5).add(new THREE.Vector3(0,.13,.08)),to],.008,.56);
+          }
+        }else if(id==='work'){
+          // Applied projects: a branching process chain with visible checkpoints.
+          const stations=[-.72,-.24,.24,.72].map((x,k)=>p.clone().add(new THREE.Vector3(x,Math.sin(k*1.1)*.12,.02)));
+          for(let k=0;k<stations.length-1;k++){
+            const mid=stations[k].clone().lerp(stations[k+1],.5).add(new THREE.Vector3(0,.13,.08));
+            addProcess([stations[k],mid,stations[k+1]],.022,.9);
+            addTerminal(stations[k],.032);
+          }
+          addTerminal(stations[3],.04);
+          for(let k=0;k<3;k++){
+            const anchor=stations[k+1],up=anchor.clone().add(new THREE.Vector3(0,.36,.04)),down=anchor.clone().add(new THREE.Vector3(0,-.32,.04));
+            addProcess([anchor,anchor.clone().add(new THREE.Vector3(.02,.16,.06)),up],.011,.78);
+            addProcess([anchor,anchor.clone().add(new THREE.Vector3(-.02,-.14,.06)),down],.009,.66);
+          }
+        }else if(id==='learn'){
+          // Knowledge growth: a trunk that bifurcates into increasingly fine branches.
+          const trunk=p.clone().add(new THREE.Vector3(0,-.72,0)),crown=p.clone().add(new THREE.Vector3(0,.72,.02));
+          addProcess([trunk,p.clone().add(new THREE.Vector3(-.06,-.22,.03)),p.clone().add(new THREE.Vector3(.04,.22,.02)),crown],.027,.92);
+          for(let k=0;k<4;k++){
+            const y=-.36+k*.22,anchor=p.clone().add(new THREE.Vector3((k%2?-.03:.03),y,.02));
+            for(const sign of [-1,1]){
+              const end=anchor.clone().add(new THREE.Vector3(sign*(.38+k*.055),.25,.04));
+              const fork=anchor.clone().add(new THREE.Vector3(sign*.18,.12,.06));
+              addProcess([anchor,fork,end],.014-k*.001,.82);
+              const twig=end.clone().add(new THREE.Vector3(sign*.14,.12,.01));
+              addProcess([fork, fork.clone().add(new THREE.Vector3(sign*.1,.08,.02)),twig],.007,.64);
+              addTerminal(end,.018);
+            }
+          }
         }
         const hitMesh=new THREE.Mesh(new THREE.SphereGeometry(.34,16,14),new THREE.MeshBasicMaterial({color,transparent:true,opacity:.0001,depthWrite:false}));hitMesh.position.copy(p);hitMesh.userData={kind:'sphere',id};worldGroup.add(hitMesh);
 
