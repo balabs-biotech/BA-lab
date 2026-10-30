@@ -43,7 +43,7 @@ function builder(table: string, role: "user" | "admin") {
     }
     const row = db.cultures.find((c) => c.id === filters.id && (!("organization_id" in filters) || c.organization_id === filters.organization_id));
     const visible = role === "admin" || db.visible.includes(filters.id);
-    return { data: row && visible ? { ...row } : null, error: row && visible ? null : { message: "not found" };
+    return { data: row && visible ? { ...row } : null, error: row && visible ? null : { message: "not found" } };
   };
   const b: Json = {
     select: () => b,
