@@ -1431,6 +1431,15 @@ body[data-domain="agronomy"] {
   --ok: #b4f477 !important;
   accent-color: #b4f477;
 }
+body[data-domain="agronomy"] :is(
+  button:not(.overview-shortcut):not(.quick-capture-tile):not(.statistics-filter-action):not(.secondary), .primary-button, .culture-catalog-action,
+  .section-nav a[aria-current="page"]) {
+  background: #222f28 !important;
+  background-image: none !important;
+  border-color: #506657 !important;
+  color: #b4f477 !important;
+  box-shadow: none;
+}
 body[data-domain="agronomy"] :is(button, .primary-button, .culture-catalog-action):hover:not(:disabled) {
   background: #2b3a30 !important;
   border-color: #b4f477 !important;
@@ -2233,6 +2242,7 @@ body[data-domain="mycology"] .overview-observation {
 body[data-domain="mycology"] .culture-timeline-entry { border-left: 3px solid #a94f1d; }
 body[data-domain="mycology"] .statistics-summary-item strong { color: #853d16; }
 body[data-domain="mycology"] .statistics-table th { background: #eee1d4; }
+body[data-domain="mycology"] .stage.active { background: #f4e4d7; border-color: #a94f1d; }
 body[data-domain="mycology"] .progress-bar { background: #a94f1d; }
 body[data-domain="mycology"] .overview-observation strong { color: #35251d; }
 
@@ -2676,10 +2686,21 @@ body[data-domain="laboratory"] {
   background: var(--bg);
 }
 
-/* Green Tech: light sage primary actions require dark text{
+/* Green Tech: light sage primary actions require dark text, not white text. */
+body[data-domain="agronomy"] :is(
+  button:not(.overview-shortcut):not(.quick-capture-tile):not(.statistics-filter-action):not(.secondary), .primary-button, .culture-catalog-action,
+  .section-nav a[aria-current="page"]):not(.secondary-button):not(.danger-button) {
   background: #a9d68f !important;
   background-image: none !important;
   border-color: #a9d68f !important;
+  color: #142017 !important;
+  -webkit-text-fill-color: #142017 !important;
+}
+body[data-domain="agronomy"] :is(
+  button:not(.overview-shortcut):not(.quick-capture-tile):not(.statistics-filter-action):not(.secondary), .primary-button, .culture-catalog-action,
+  .section-nav a[aria-current="page"]):not(.secondary-button):not(.danger-button):hover:not(:disabled) {
+  background: #bde5a5 !important;
+  border-color: #bde5a5 !important;
   color: #142017 !important;
   -webkit-text-fill-color: #142017 !important;
 }
@@ -2694,11 +2715,49 @@ body[data-domain="agronomy"] .secondary-button:hover:not(:disabled) {
   color: #ffffff !important;
   -webkit-text-fill-color: #ffffff !important;
 }
+
+/* Mycology: warm paper surfaces with readable terracotta action controls. */
+body[data-domain="mycology"] :is(
+  button:not(.overview-shortcut):not(.quick-capture-tile):not(.statistics-filter-action):not(.secondary), .primary-button, .culture-catalog-action,
+  .section-nav a[aria-current="page"]):not(.secondary-button):not(.danger-button) {
+  background: #a94f1d !important;
+  background-image: none !important;
+  border-color: #a94f1d !important;
+  color: #fff7ed !important;
+  -webkit-text-fill-color: #fff7ed !important;
+}
+body[data-domain="mycology"] :is(
+  button:not(.overview-shortcut):not(.quick-capture-tile):not(.statistics-filter-action):not(.secondary), .primary-button, .culture-catalog-action,
+  .section-nav a[aria-current="page"]):not(.secondary-button):not(.danger-button):hover:not(:disabled) {
+  background: #853d16 !important;
+  border-color: #853d16 !important;
+  color: #fff7ed !important;
+  -webkit-text-fill-color: #fff7ed !important;
+}
 body[data-domain="mycology"] .secondary-button {
   background: #69422f !important;
   border-color: #69422f !important;
   color: #fff7ed !important;
   -webkit-text-fill-color: #fff7ed !important;
+}
+
+/* Laboratory: blue actions and dark-blue secondary controls share one contrast rule. */
+body[data-domain="laboratory"] :is(
+  button:not(.overview-shortcut):not(.quick-capture-tile):not(.statistics-filter-action):not(.secondary), .primary-button, .culture-catalog-action,
+  .section-nav a[aria-current="page"]):not(.secondary-button):not(.danger-button) {
+  background: #215b91 !important;
+  background-image: none !important;
+  border-color: #215b91 !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+}
+body[data-domain="laboratory"] :is(
+  button:not(.overview-shortcut):not(.quick-capture-tile):not(.statistics-filter-action):not(.secondary), .primary-button, .culture-catalog-action,
+  .section-nav a[aria-current="page"]):not(.secondary-button):not(.danger-button):hover:not(:disabled) {
+  background: #174875 !important;
+  border-color: #174875 !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
 }
 body[data-domain="laboratory"] .secondary-button {
   background: #35546f !important;
