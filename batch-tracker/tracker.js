@@ -1894,6 +1894,7 @@ async function createCulture() {
   try {
     session = await getCurrentSession();
   } catch (error) {
+    if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
     showMessage(
       error.message || "Impossible de vérifier votre session. Reconnectez-vous puis réessayez.",
       "error"
