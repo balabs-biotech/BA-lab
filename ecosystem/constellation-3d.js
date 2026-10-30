@@ -169,6 +169,81 @@ if(root){
             }
           }
         }
+
+        // Domain-specific tissue silhouettes: each discipline grows according to its own visual grammar.
+        const addProcess=(points3D,radius,opacity=.88)=>{
+          const curve=new THREE.CatmullRomCurve3(points3D);
+          const tube=makeNeurite(curve,color,radius,opacity,Math.max(16,points3D.length*7));
+          tube.userData={kind:'dendrite',id,process:'domain-morphology'};
+          worldGroup.add(tube);twigs.push(tube);return tube;
+        };
+        const addTerminal=(v,r=.027)=>{
+          const tip=new THREE.Mesh(new THREE.IcosahedronGeometry(r,1),new THREE.MeshStandardMaterial({color,emissive:new THREE.Color(color).multiplyScalar(.14),emissiveIntensity:.2,roughness:1}));
+          tip.position.copy(v);tip.userData={kind:'synapse',id,process:'domain-terminal'};worldGroup.add(tip);twigs.push(tip);
+        };
+        if(id==='myco'){
+          // Mycelium: repeated bifurcation, anastomosis loops and fine hyphal tips.
+          for(let branch=0;branch<7;branch++){
+            const a=branch*Math.PI*2/7,dir=new THREE.Vector3(Math.cos(a),Math.sin(a)*.72,Math.sin(a*1.7)*.55);
+            const p1=p.clone().addScaledVector(dir,.55),p2=p.clone().addScaledVector(dir.clone().add(new THREE.Vector3(Math.sin(a*2)*.3,.22*Math.cos(a),.1)).normalize(),1.02);
+            addProcess([p.clone(),p.clone().addScaledVector(dir,.24),p1,p2],.022,.9);
+            const side=new THREE.Vector3(-dir.y,dir.x,.18).normalize();
+            const tipA=p1.clone().addScaledVector(side,.28),tipB=p1.clone().addScaledVector(side,-.25);
+            addProcess([p1,p1.clone().addScaledVector(side,.12),tipA],.010,.78);
+            addProcess([p1,p1.clone().addScaledVector(side,-.1),tipB],.009,.76);
+            addTerminal(p2,.022);
+          }
+          for(let j=0;j<3;j++){
+            const a=j*2.094+.35, b=a+1.35;
+            const u=p.clone().add(new THREE.Vector3(Math.cos(a)*.64,Math.sin(a)*.5,.18));
+            const v=p.clone().add(new THREE.Vector3(Math.cos(b)*.64,Math.sin(b)*.5,-.12));
+            const mid=u.clone().lerp(v,.5).add(new THREE.Vector3(0,.18,.12));
+            addProcess([u,mid,v],.008,.55);
+          }
+        }else if(id==='soil'){
+          // Rhizosphere: a descending taproot with lateral roots and fine root hairs.
+          const down=new THREE.Vector3(.18,-1,.08).normalize();
+          const rootEnd=p.clone().addScaledVector(down,1.25);
+          addProcess([p,p.clone().addScaledVector(down,.35),rootEnd],.036,.95);
+          for(let branch=0;branch<6;branch++){
+            const t=.22+branch*.115,anchor=p.clone().lerp(rootEnd,t);
+            const side=new THREE.Vector3(Math.cos(branch*2.4),.12,Math.sin(branch*2.4)).normalize();
+            const tip=anchor.clone().addScaledVector(side,.55+(branch%3)*.12).addScaledVector(down,.12);
+            addProcess([anchor,anchor.clone().addScaledVector(side,.25).addScaledVector(down,.05),tip],.018,.86);
+            for(let fine=0;fine<2;fine++){
+              const start=anchor.clone().lerp(tip,.58+fine*.18),fTip=start.clone().addScaledVector(new THREE.Vector3(-side.z,.08,side.x).normalize(),.22);
+              addProcess([start,fTip],.007,.62);
+            }
+            addTerminal(tip,.02);
+          }
+        }else if(id==='iot'){
+          // Instrumentation: branching signal traces with clear junctions and short terminal contacts.
+          for(let branch=0;branch<5;branch++){
+            const y=(branch-2)*.19;
+            const a=p.clone().add(new THREE.Vector3(-.52,y,-.18)),b=p.clone().add(new THREE.Vector3(.62,y+.08,.18));
+            const mid1=a.clone().add(new THREE.Vector3(.22,0,0)),mid2=b.clone().add(new THREE.Vector3(-.2,0,0));
+            addProcess([a,mid1,mid1.clone().add(new THREE.Vector3(0,.08,.04)),mid2,b],.014,.92);
+            const junction=mid1.clone().add(new THREE.Vector3(.04,.08,.04));
+            addTerminal(junction,.032);
+            const branchEnd=junction.clone().add(new THREE.Vector3(.02,branch%2?.3:-.3,.06));
+            addProcess([junction,junction.clone().add(new THREE.Vector3(.02,.14,0)),branchEnd],.009,.78);
+          }
+        }else if(id==='lab'){
+          // Culture/lab: a vessel-like outline with a narrow neck and a growth medium base.
+          const left=[p.clone().add(new THREE.Vector3(-.42,.46,0)),p.clone().add(new THREE.Vector3(-.34,.12,0)),p.clone().add(new THREE.Vector3(-.48,-.35,0)),p.clone().add(new THREE.Vector3(-.3,-.55,0))];
+          const right=left.map(v=>new THREE.Vector3(2*p.x-v.x,v.y,v.z+.02));
+          addProcess(left,.019,.84);addProcess(right,.019,.84);
+          addProcess([p.clone().add(new THREE.Vector3(-.42,.46,0)),p.clone().add(new THREE.Vector3(-.2,.5,0)),p.clone().add(new THREE.Vector3(.2,.5,0)),p.clone().add(new THREE.Vector3(.42,.46,0))],.016,.82);
+          addProcess([p.clone().add(new THREE.Vector3(-.3,-.55,0)),p.clone().add(new THREE.Vector3(0,-.62,.02)),p.clone().add(new THREE.Vector3(.3,-.55,0))],.018,.88);
+          for(let k=0;k<4;k++){const q=p.clone().add(new THREE.Vector3(-.2+k*.13,-.38,.035));addTerminal(q,.018)}
+        }else if(id==='products'){
+          // Product cultures: several connected specimen/vessel outlines rather than a spherical cluster.
+          for(let vessel=0;vessel<3;vessel++){
+            const x=(vessel-1)*.34,top=p.clone().add(new THREE.Vector3(x,.48,0)),neck=p.clone().add(new THREE.Vector3(x,.28,.02)),base=p.clone().add(new THREE.Vector3(x,-.42,.02));
+            addProcess([top,top.clone().add(new THREE.Vector3(-.11,-.04,0)),neck,base.clone().add(new THREE.Vector3(-.14,.08,0)),base.clone().add(new THREE.Vector3(.14,.08,0)),neck.clone().add(new THREE.Vector3(.11,-.04,0)),top],.014,.82);
+            addProcess([base.clone().add(new THREE.Vector3(-.12,.19,.02)),base.clone().add(new THREE.Vector3(0,.16,.02)),base.clone().add(new THREE.Vector3(.12,.19,.02))],.009,.72);
+          }
+        }
         const hitMesh=new THREE.Mesh(new THREE.SphereGeometry(.34,16,14),new THREE.MeshBasicMaterial({color,transparent:true,opacity:.0001,depthWrite:false}));hitMesh.position.copy(p);hitMesh.userData={kind:'sphere',id};worldGroup.add(hitMesh);
 
         const label=makeLabel(labels[id].title,0xf5f7fa,25);label.position.set(p.x,p.y-.676,p.z+.104);label.scale.set(Math.min(3.45,Math.max(1.8,labels[id].title.length*.105)),.52,1);label.userData={kind:'label',id,labelText:labels[id].title};worldGroup.add(label);
