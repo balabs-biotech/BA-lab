@@ -247,3 +247,30 @@ assert.equal(
 assert.equal(statisticsPortuguese.login, "Inicie sessão para analisar os dados da sua organização.");
 assert.equal(statisticsPortuguese.buttonAnalyze, "Analisar dados");
 console.log("✓ Statistics translations use localized entries and a single French fallback");
+
+// A culture removed from the active registry must produce controlled feedback,
+// not an uncaught rejection from the batch-creation handler.
+const createBatchSource = `async ${extractFunction(engine, "createBatch")}`;
+const missingCultureMessages = [];
+const missingCultureContext = {
+  authStateRevision: 1,
+  organizationId: "org-test",
+  clearMessage() {},
+  showMessage(message, type) { missingCultureMessages.push({ message, type }); },
+  batchCodeInput: { value: "BATCH-TEST" },
+  batchNameInput: { value: "Test batch" },
+  batchTypeSelect: { value: "SPAWN" },
+  batchCultureSelect: { value: "culture-no-longer-listed" },
+  batchQuantityInput: { value: "" },
+  batchUnitInput: { value: "" },
+  cultureOptions: []
+};
+const missingCultureResult = vm.runInNewContext(
+  `${createBatchSource}; createBatch()`,
+  missingCultureContext
+);
+await assert.doesNotReject(missingCultureResult);
+assert.equal(missingCultureMessages.length, 1);
+assert.equal(missingCultureMessages[0].type, "error");
+assert.match(missingCultureMessages[0].message, /culture sélectionnée.*plus disponible/i);
+console.log("✓ Batch creation: missing source culture produces controlled feedback");
