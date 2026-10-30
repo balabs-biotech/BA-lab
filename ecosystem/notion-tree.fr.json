@@ -323,7 +323,8 @@
           "url": "https://app.notion.com/p/3e273152f1718144bb67d07e93c3aa2d",
           "description": "Découvrir les champs d’application de la mycologie, de la transformation de matières aux interactions biologiques, en distinguant les pistes scientifiques des solutions validées."
         }
-      ]
+      ],
+      "description": "Explorer les champignons cultivés ou étudiés par BA Labs, leurs ressources biologiques, leurs méthodes de multiplication et leurs applications."
     },
     {
       "id": "bio",
@@ -510,7 +511,8 @@
           "url": "https://app.notion.com/p/3e273152f17181f29500f85586dac04c",
           "description": "Expérimentation de systèmes de micropropagation végétale contrôlée, notamment l’architecture Twin Bottle, avec une attention portée à la reproductibilité, aux échanges gazeux et à l’environnement de culture."
         }
-      ]
+      ],
+      "description": "Découvrir les microorganismes d’intérêt agricole, les biostimulants, les substrats biologiques et les procédés de fermentation."
     },
     {
       "id": "iot",
@@ -539,7 +541,8 @@
           "url": "https://app.notion.com/p/3e273152f171811db9a6f46cc9959da4",
           "description": "Relier observations, mesures et enregistrements pour conserver le contexte des essais et comparer les résultats."
         }
-      ]
+      ],
+      "description": "Suivre les systèmes de mesure, les capteurs et l’automatisation appliqués aux cultures et aux expérimentations."
     },
     {
       "id": "soil",
@@ -582,7 +585,8 @@
           "url": "https://app.notion.com/p/3e273152f171818bae74c015daa192cd",
           "description": "Relier les équipements, les capteurs, les données et les actions pour rendre les procédés biologiques observables."
         }
-      ]
+      ],
+      "description": "Présenter les équipements, matériaux, substrats et procédés développés pour les essais agrotechniques et les prototypes."
     },
     {
       "id": "lab",
@@ -597,7 +601,8 @@
           "url": "https://app.notion.com/p/3e273152f171817a81d6f806b3804d6b",
           "description": "Étude de la réponse des plantes aux supports, à l’eau et aux conditions de culture dans des systèmes expérimentaux."
         }
-      ]
+      ],
+      "description": "Découvrir les espaces et démarches d’expérimentation, notamment les essais végétaux et les dispositifs de laboratoire."
     },
     {
       "id": "products",
@@ -640,7 +645,8 @@
           "url": "https://app.notion.com/p/3fb73152f171815da580d60596e9e8b0",
           "description": "Guide d’accompagnement accessible par QR pour comprendre et suivre les prototypes Myco Start et Myco Plate."
         }
-      ]
+      ],
+      "description": "Consulter les ressources biologiques, prototypes et produits présentés publiquement par BA Labs, avec leur niveau de maturité explicité."
     },
     {
       "id": "work",
@@ -699,7 +705,8 @@
           "description": "Présenter les compétences mobilisées par BA Labs, les limites actuelles et les expertises externes recherchées pour caractériser ou valider certains travaux.",
           "children": []
         }
-      ]
+      ],
+      "description": "Parcourir les travaux de recherche et développement, leur méthodologie, leurs essais, leurs itérations et les éléments effectivement documentés."
     }
   ],
   "notes": "The French public landing page lists the seven mapped roots. No separate public learning/resources root is linked there; do not invent one. The landing page also links to evidence and collaboration pages, which are not separate top-level universes. R&D root audit: added Methodologie R&D, Iteration & validation, and Equipe/expertise pages; moved Prototypes & essais and Mesure & reproductibilite to R&D branch; removed collaboration proposal page from laboratory branch because its actual parent is Collaborer avec BA Labs."
