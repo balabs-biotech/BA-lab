@@ -2,7 +2,7 @@
   "version": 1,
   "source": "Notion public workspace search, French branch; entries verified by page IDs and URLs",
   "language": "fr",
-  "coverage": "7_public_roots_identified; nested_public_pages_added_from_page_content",
+  "coverage": "7_public_roots_identified; nested_public_pages_verified_from_root_content; R&D branch expanded",
   "domains": [
     {
       "id": "myco",
@@ -192,20 +192,6 @@
           "notionId": "3e273152f171811db9a6f46cc9959da4",
           "url": "https://app.notion.com/p/3e273152f171811db9a6f46cc9959da4",
           "description": "Relier observations, mesures et enregistrements pour conserver le contexte des essais et comparer les résultats."
-        },
-        {
-          "id": "iot-measurement",
-          "title": "Mesure & reproductibilité",
-          "notionId": "3e273152f1718119b0f7eeeb897f206a",
-          "url": "https://app.notion.com/p/3e273152f1718119b0f7eeeb897f206a",
-          "description": "Définition des variables et des méthodes de mesure pour documenter les conditions et apprécier la reproductibilité."
-        },
-        {
-          "id": "iot-prototypes",
-          "title": "Prototypes & essais",
-          "notionId": "3e273152f1718174904bd0043fc5d976",
-          "url": "https://app.notion.com/p/3e273152f1718174904bd0043fc5d976",
-          "description": "Cycles de prototypage destinés à tester une hypothèse et produire des informations utiles à la suite du développement."
         }
       ]
     },
@@ -264,13 +250,6 @@
           "notionId": "3e273152f171817a81d6f806b3804d6b",
           "url": "https://app.notion.com/p/3e273152f171817a81d6f806b3804d6b",
           "description": "Étude de la réponse des plantes aux supports, à l’eau et aux conditions de culture dans des systèmes expérimentaux."
-        },
-        {
-          "id": "lab-proposal",
-          "title": "Préparer une proposition de projet",
-          "notionId": "3e273152f171815cbaeac2d746fc9ede",
-          "url": "https://app.notion.com/p/3e273152f171815cbaeac2d746fc9ede",
-          "description": "Guide pour présenter un besoin, préciser le résultat recherché et préparer un échange autour d’une collaboration."
         }
       ]
     },
@@ -338,9 +317,44 @@
             }
           ],
           "description": "Panorama des travaux appliqués documentés par BA Labs, avec distinction entre observations, réalisations et validations. Les limites et niveaux de preuve sont centralisés dans la page de référence dédiée."
+        },
+        {
+          "id": "iot-measurement",
+          "title": "Mesure & reproductibilité",
+          "notionId": "3e273152f1718119b0f7eeeb897f206a",
+          "url": "https://app.notion.com/p/3e273152f1718119b0f7eeeb897f206a",
+          "description": "Définition des variables et des méthodes de mesure pour documenter les conditions et apprécier la reproductibilité."
+        },
+        {
+          "id": "iot-prototypes",
+          "title": "Prototypes & essais",
+          "notionId": "3e273152f1718174904bd0043fc5d976",
+          "url": "https://app.notion.com/p/3e273152f1718174904bd0043fc5d976",
+          "description": "Cycles de prototypage destinés à tester une hypothèse et produire des informations utiles à la suite du développement."
+        },
+        {
+          "id": "work-methodology",
+          "title": "Méthodologie R&D",
+          "url": "https://app.notion.com/p/3e273152f17181ab88bfe456f838b011",
+          "description": "Définir une question, une hypothèse, des témoins et des mesures adaptées, puis relier les conclusions aux données et à leur niveau de preuve.",
+          "children": []
+        },
+        {
+          "id": "work-iteration",
+          "title": "Itération & validation",
+          "url": "https://app.notion.com/p/3e273152f17181b1a786db5143e19f53",
+          "description": "Suivre les écarts entre versions, comprendre les modifications et distinguer un essai exploratoire d’une validation fondée sur des critères définis.",
+          "children": []
+        },
+        {
+          "id": "work-team-expertise",
+          "title": "Équipe, expertise & réseau scientifique",
+          "url": "https://app.notion.com/p/3e973152f17181cba839c6eba742310b",
+          "description": "Présenter les compétences mobilisées par BA Labs, les limites actuelles et les expertises externes recherchées pour caractériser ou valider certains travaux.",
+          "children": []
         }
       ]
     }
   ],
-  "notes": "The French public landing page lists the seven mapped roots. No separate public learning/resources root is linked there; do not invent one. The landing page also links to evidence and collaboration pages, which are not separate top-level universes."
+  "notes": "The French public landing page lists the seven mapped roots. No separate public learning/resources root is linked there; do not invent one. The landing page also links to evidence and collaboration pages, which are not separate top-level universes. R&D root audit: added Methodologie R&D, Iteration & validation, and Equipe/expertise pages; moved Prototypes & essais and Mesure & reproductibilite to R&D branch; removed collaboration proposal page from laboratory branch because its actual parent is Collaborer avec BA Labs."
 }
