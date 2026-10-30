@@ -2168,4 +2168,102 @@ h1 span{
  .hero .aside b{color:#f2f2e9!important}
  .hero .aside:before{color:#e0a16b!important}
 }
+
+/* BA Labs — approved mineral palette / editorial 3D panel */
+:root{
+ --bal-petrol:#111B1D;
+ --bal-forest:#263B38;
+ --bal-copper:#B96B4D;
+ --bal-mineral:#D1D0C5;
+ --bg:var(--bal-petrol);
+ --panel:var(--bal-forest);
+ --ink:var(--bal-petrol);
+ --muted:#697773;
+ --line:#71817a;
+ --lime:#9aab91;
+}
+html{background:var(--bal-petrol)!important}
+body{
+ background:var(--bal-petrol)!important;
+ color:var(--bal-mineral)!important;
+}
+.wrap{background:transparent!important}
+.top{border-color:#263b38!important}
+.brand strong{color:var(--bal-petrol)!important}
+.brand small{color:#65736d!important}
+.lang{color:#53645f!important}
+.lang[aria-pressed=true]{color:var(--bal-petrol)!important;border-color:var(--bal-copper)!important}
+.hero{color:var(--bal-petrol)!important}
+.eyebrow{color:var(--bal-copper)!important}
+h1,h1 span{color:var(--bal-petrol)!important}
+h1 span{font-style:italic!important}
+.hero p,.aside{color:#5f6f69!important}
+.aside{border-color:var(--bal-copper)!important}
+.aside b{color:var(--bal-petrol)!important}
+.scene{
+ background:var(--bal-petrol)!important;
+ border:1px solid #52665f!important;
+ border-radius:2px!important;
+ box-shadow:0 24px 60px #111b1d26!important;
+}
+.scene:before{opacity:.10!important}
+.scene:after{display:none!important}
+.scenehead{
+ background:var(--bal-petrol)!important;
+ border-color:#52665f!important;
+}
+.scenehead small{color:var(--bal-copper)!important}
+.scenehead strong{color:var(--bal-mineral)!important}
+.btn{border-color:#82918a!important;color:var(--bal-mineral)!important}
+.btn.primary{background:var(--bal-copper)!important;border-color:var(--bal-copper)!important;color:#fff5ed!important}
+.cluster-key{
+ background:var(--bal-forest)!important;
+ border-color:#62766d!important;
+}
+.cluster-item b{color:#f0eee5!important}
+.cluster-item small{color:var(--bal-mineral)!important}
+.cluster-foundations i{background:#a9b99f!important;color:#a9b99f!important}
+.cluster-applications i{background:var(--bal-copper)!important;color:var(--bal-copper)!important}
+.view{
+ background:
+  radial-gradient(ellipse at 50% 46%,#34504a 0%,var(--bal-forest) 48%,var(--bal-petrol) 100%)!important;
+}
+.view:before{opacity:.17!important}
+.hub{box-shadow:0 0 0 12px #d1d0c50c,0 0 0 30px #d1d0c508,0 0 70px #b96b4d20!important}
+.network line{stroke:#d1d0c5!important;stroke-opacity:.28!important}
+.network line.bridge{stroke:var(--bal-copper)!important;stroke-opacity:.58!important}
+.webgl-controls button{background:#263b38eF!important;border-color:#819087!important;color:#f2eee4!important}
+.webgl-controls button:hover{border-color:var(--bal-copper)!important;background:#34504a!important}
+.webgl-hint{background:#263b38ed!important;border-color:#849187!important;color:var(--bal-mineral)!important}
+.webgl-status{color:var(--bal-mineral)!important}
+.mini{background:var(--bal-forest)!important;border-color:#6d8075!important}
+.miniintro .eyebrow,.miniintro:before{color:#d6a07d!important}
+.miniintro h2{color:#f1eee5!important}
+.miniintro p{color:var(--bal-mineral)!important}
+.mini-core{border-color:#d1d0c5!important}
+.linknode{border-color:#87958c!important}
+.linknode span{color:#d6a07d!important}
+.linknode b{color:#f1eee5!important}
+.linknode small{color:var(--bal-mineral)!important}
+.linknode:after{border-color:#8da095!important}
+.linknode:hover:after,.linknode:focus-visible:after{border-color:var(--bal-copper)!important}
+.sphere-hops strong{color:#d6a07d!important}
+.sphere-hop{border-color:#84958a!important;color:#f1eee5!important}
+.sphere-hop:hover{border-color:var(--bal-copper)!important}
+.resource-detail{background:#e9e5d9!important;color:var(--bal-petrol)!important}
+.resource-detail-kicker{color:var(--bal-copper)!important}
+.resource-open{background:var(--bal-copper)!important;color:#fff7ef!important}
+.under{border-color:#aab0a5!important}
+.tile{border-color:#b6b9ad!important}
+.tile:before{background:var(--bal-copper)!important}
+.tile b{color:var(--bal-petrol)!important}
+.tile p{color:#5e6e67!important}
+.foot{color:#68766e!important}
+.foot strong{color:var(--bal-copper)!important}
+@media(max-width:760px){
+ .scene{border-radius:2px!important;box-shadow:4px 5px 0 #b96b4d20!important}
+ .scenehead{background:var(--bal-petrol)!important}
+ .mini{background:var(--bal-forest)!important}
+}
+
 </style>
