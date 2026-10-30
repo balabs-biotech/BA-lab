@@ -2,7 +2,7 @@
   "version": 1,
   "source": "Verified public language-specific BA Labs pages from the corresponding public language entry and Notion page search",
   "language": "en",
-  "coverage": "first_level_and_verified_topic_pages; deeper page hierarchy not inferred unless confirmed",
+  "coverage": "expanded_verified_topic_pages; only explicitly identified public pages are linked",
   "domains": [
     {
       "id": "myco",
@@ -16,14 +16,6 @@
           "notionId": "40173152f17181969ca9ec1b3dfe5435",
           "url": "https://app.notion.com/p/40173152f17181969ca9ec1b3dfe5435",
           "description": "Explore fungal interactions and their practical biological applications.",
-          "children": []
-        },
-        {
-          "id": "en-myco-resources",
-          "title": "Fungal resources",
-          "notionId": "40173152f1718111a73ced2825985454",
-          "url": "https://app.notion.com/p/40173152f1718111a73ced2825985454",
-          "description": "Reference pages on fungal organisms, cultures and biological resources.",
           "children": []
         }
       ]
@@ -63,15 +55,15 @@
     {
       "id": "soil",
       "title": "Agrotechnology",
-      "notionId": "40173152f171817e918cc9c278aeca0d",
-      "url": "https://app.notion.com/p/40173152f171817e918cc9c278aeca0d",
+      "notionId": "40173152f1718100b468f740dbb40647",
+      "url": "https://app.notion.com/p/40173152f1718100b468f740dbb40647",
       "children": [
         {
           "id": "en-soil-microbes",
           "title": "Agricultural microorganisms",
           "notionId": "40173152f171817e918cc9c278aeca0d",
           "url": "https://app.notion.com/p/40173152f171817e918cc9c278aeca0d",
-          "description": "Microorganisms relevant to agricultural systems and biological interactions.",
+          "description": "Explore microorganisms associated with agricultural systems, including their roles and limits of current evidence.",
           "children": []
         }
       ]
@@ -96,6 +88,14 @@
           "notionId": "40273152f17181f896c7c040f4402212",
           "url": "https://app.notion.com/p/40273152f17181f896c7c040f4402212",
           "description": "Measurement practices that support repeatable observations.",
+          "children": []
+        },
+        {
+          "id": "en-iot-sensors",
+          "title": "Instrumentation and sensors",
+          "notionId": "40173152f17181aa843ace690303e7c8",
+          "url": "https://app.notion.com/p/40173152f17181aa843ace690303e7c8",
+          "description": "An introduction to the sensors and measurement tools used to observe biological and cultivation systems.",
           "children": []
         }
       ]
