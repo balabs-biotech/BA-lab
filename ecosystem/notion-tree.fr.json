@@ -277,6 +277,34 @@
           "title": "Catalogue public — Ressources publiables",
           "notionId": "d0fbe1d779344eb58bc240fe7876ae0e",
           "url": "https://app.notion.com/p/d0fbe1d779344eb58bc240fe7876ae0e"
+        },
+        {
+          "id": "products-wa-agar",
+          "title": "WA — gélose à l’eau prête à l’emploi",
+          "notionId": "3ec73152f17181988ae7daf20c2100d0",
+          "url": "https://app.notion.com/p/3ec73152f17181988ae7daf20c2100d0",
+          "description": "Support gélifié simple à base d’eau et d’agar, destiné à des usages de laboratoire et à l’expérimentation mycologique ; disponibilité à confirmer selon le lot."
+        },
+        {
+          "id": "products-myco-start",
+          "title": "Myco Start — prototype de kit de démarrage mycologique",
+          "notionId": "3ff73152f1718157b723ddd66e88e6b1",
+          "url": "https://app.notion.com/p/3ff73152f1718157b723ddd66e88e6b1",
+          "description": "Prototype pédagogique associant culture, support d’observation et documentation par QR ; ce concept n’est pas présenté comme un produit disponible à la vente."
+        },
+        {
+          "id": "products-myco-plate",
+          "title": "Myco Plate — prototype de kit d’observation sur gélose",
+          "notionId": "3ff73152f171817c8255e44fed840560",
+          "url": "https://app.notion.com/p/3ff73152f171817c8255e44fed840560",
+          "description": "Prototype centré sur l’observation d’une culture documentée ; une morphologie observée ne suffit pas à établir une identification certaine."
+        },
+        {
+          "id": "products-qr-guide",
+          "title": "Guide de démarrage Myco Start / Myco Plate",
+          "notionId": "3fb73152f171815da580d60596e9e8b0",
+          "url": "https://app.notion.com/p/3fb73152f171815da580d60596e9e8b0",
+          "description": "Guide d’accompagnement accessible par QR pour comprendre et suivre les prototypes Myco Start et Myco Plate."
         }
       ]
     },
