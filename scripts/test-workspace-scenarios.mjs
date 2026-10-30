@@ -300,7 +300,7 @@ assert.equal(cultureSessionMessages[0].type, "error");
 assert.match(cultureSessionMessages[0].message, /Session provider unavailable/);
 console.log("✓ Culture creation: session lookup failures produce controlled feedback");
 
-const createBatchSource = `async ${extractFunction(engine, "createBatch")}`;
+const batchProtocolSource = `async ${extractFunction(engine, "createBatch")}`;
 const batchProtocolMessages = [];
 const batchProtocolButton = { disabled: false, textContent: "Créer le batch" };
 const batchProtocolContext = {
@@ -321,7 +321,7 @@ const batchProtocolContext = {
   console
 };
 await assert.doesNotReject(
-  vm.runInNewContext(`${createBatchSource}; createBatch()`, batchProtocolContext)
+  vm.runInNewContext(`${batchProtocolSource}; createBatch()`, batchProtocolContext)
 );
 assert.equal(batchProtocolMessages.length, 1);
 assert.equal(batchProtocolMessages[0].type, "error");
