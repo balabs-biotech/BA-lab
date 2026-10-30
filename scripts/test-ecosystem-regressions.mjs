@@ -44,7 +44,7 @@ for (const domain of tree.domains) {
   };
   visit(domain);
 }
-assert.ok(scene.includes("notion-tree.fr.json"), '3D engine must load the Notion tree manifest');
+assert.ok(scene.includes("new URL('./notion-tree.'+lang+'.json'"), '3D engine must load a language-specific Notion tree manifest');
 assert.ok(scene.includes('const visit=(node,depth=0,parentId=domainTree.id'), '3D engine must recursively expand nested Notion pages');
 assert.ok(scene.includes('data-notion-tree-node="true"'), 'Manifest nodes must be injected into the 3D resource layer');
 assert.ok(scene.includes('parentId:a.dataset.parentId') && scene.includes('depth:Number(a.dataset.depth||0)'), '3D resource nodes must retain their hierarchy metadata');
