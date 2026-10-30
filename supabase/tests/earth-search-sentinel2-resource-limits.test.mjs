@@ -12,8 +12,7 @@ assert.match(source, /total \+= value\.byteLength/, "stream bytes must be counte
 assert.match(source, /reader\.cancel\("json_body_too_large"\)/, "oversized streams must be cancelled");
 assert.match(source, /reader\.releaseLock\(\)/, "stream lock must be released");
 assert.match(source, /readBoundedJson\(req, MAX_REQUEST_BYTES\)/, "incoming request must use the bounded reader");
-assert.match(source, /status_not_used/, "placeholder");
-assert.match(source, /request_body_too_large/, "oversized client requests must receive a 413 response");
+assert.match(source, /json\(413, \{ error: "request_body_too_large"/, "oversized client requests must receive a 413 response");
 assert.match(source, /readBoundedJson\(searchResponse, MAX_STAC_RESPONSE_BYTES\)/, "STAC response must use the bounded reader");
 assert.match(source, /earth_search_catalogue_response_too_large/, "oversized STAC responses must fail with a controlled 502");
 assert.doesNotMatch(source, /req\.json\(\)/, "unbounded request JSON parsing must not return");
