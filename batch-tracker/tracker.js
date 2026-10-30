@@ -2220,13 +2220,10 @@ async function createCulture() {
   }
 
   finally {
-
-    createButton.disabled =
-      false;
-
-    createButton.textContent =
-      "Créer la culture";
-
+    if (isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) {
+      createButton.disabled = false;
+      createButton.textContent = "Créer la culture";
+    }
   }
 
 }
@@ -3065,9 +3062,11 @@ async function recordBatchHarvest() {
     console.error("Enregistrement récolte :", error);
     showMessage(error?.message || "Enregistrement de la récolte impossible.", "error");
   } finally {
-    recordHarvestButton.textContent = originalLabel;
-    if (selectedBatch) {
-      recordHarvestButton.disabled = !(selectedBatch.current_stage === "harvest" && selectedBatch.status === "active");
+    if (isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) {
+      recordHarvestButton.textContent = originalLabel;
+      if (selectedBatch) {
+        recordHarvestButton.disabled = !(selectedBatch.current_stage === "harvest" && selectedBatch.status === "active");
+      }
     }
   }
 }
@@ -4194,13 +4193,10 @@ async function createBatch() {
   }
 
   finally {
-
-    createBatchButton.disabled =
-      false;
-
-    createBatchButton.textContent =
-      "Créer le batch";
-
+    if (isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) {
+      createBatchButton.disabled = false;
+      createBatchButton.textContent = "Créer le batch";
+    }
   }
 
 }
@@ -4373,10 +4369,9 @@ async function advanceBatch() {
   }
 
   finally {
-
-    advanceBatchButton.disabled =
-      false;
-
+    if (isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) {
+      advanceBatchButton.disabled = false;
+    }
   }
 
 }
@@ -4474,13 +4469,10 @@ async function releaseBatch() {
   }
 
   finally {
-
-    releaseBatchButton.disabled =
-      false;
-
-    releaseBatchButton.textContent =
-      "Libérer le batch";
-
+    if (isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) {
+      releaseBatchButton.disabled = false;
+      releaseBatchButton.textContent = "Libérer le batch";
+    }
   }
 
 }
@@ -4801,8 +4793,10 @@ async function moveSelectedBatch() {
     console.error("Déplacement du lot impossible:", error);
     showMessage("Déplacement impossible : " + (error.message || "erreur inconnue"), "error");
   } finally {
-    moveBatchButton.textContent = label;
-    if (selectedBatch) prepareMovementControls(selectedBatch);
+    if (isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) {
+      moveBatchButton.textContent = label;
+      if (selectedBatch) prepareMovementControls(selectedBatch);
+    }
   }
 }
 
@@ -5181,8 +5175,10 @@ async function saveMeasurement() {
       showMessage(error.message || cultureWorkflowText("measureFailed"), "error");
     }
   } finally {
-    saveMeasurementButton.disabled = false;
-    saveMeasurementButton.textContent = cultureWorkflowText("saveMeasure");
+    if (isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) {
+      saveMeasurementButton.disabled = false;
+      saveMeasurementButton.textContent = cultureWorkflowText("saveMeasure");
+    }
   }
 }
 
@@ -5396,8 +5392,10 @@ async function saveObservation() {
       showMessage(error.message || cultureWorkflowText("observationFailed"), "error");
     }
   } finally {
-    saveObservationButton.disabled = false;
-    saveObservationButton.textContent = cultureWorkflowText("saveObservation");
+    if (isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) {
+      saveObservationButton.disabled = false;
+      saveObservationButton.textContent = cultureWorkflowText("saveObservation");
+    }
   }
 }
 
@@ -5878,7 +5876,12 @@ async function saveBiologicalOperation(event) {
     await loadCultureDetail(cultureId);
     await loadBiologicalLineage(cultureId);
   } catch (error) { message.textContent = biologicalWorkflowText("failed") + (error.message || biologicalWorkflowText("notSaved")); }
-  finally { button.disabled = false; button.textContent = biologicalWorkflowText("save"); }
+  finally {
+    if (isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) {
+      button.disabled = false;
+      button.textContent = biologicalWorkflowText("save");
+    }
+  }
 }
 
 let cultureDetailRequestId = 0;
@@ -6697,8 +6700,10 @@ async function savePlantCulture(event) {
     showMessage("Enregistrement impossible : " + (error.message || "erreur inconnue"), "error");
     if (status) status.textContent = "Échec de l’enregistrement. Vérifiez le code unique et les références.";
   } finally {
-    button.disabled = false;
-    button.textContent = oldLabel;
+    if (isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) {
+      button.disabled = false;
+      button.textContent = oldLabel;
+    }
   }
 }
 
