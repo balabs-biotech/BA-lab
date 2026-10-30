@@ -5105,10 +5105,12 @@ async function saveMeasurement() {
   try {
     session = await getCurrentSession();
   } catch (error) {
+    if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
     console.error("Vérification de session avant mesure impossible :", error);
     showMessage("Impossible de vérifier votre session. Vérifiez la connexion puis réessayez. Aucune mesure n’a été enregistrée.", "error");
     return;
   }
+  if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
   if (!session) {
     showMessage(cultureWorkflowText("expired"), "error");
     return;
@@ -5329,10 +5331,12 @@ async function saveObservation() {
   try {
     session = await getCurrentSession();
   } catch (error) {
+    if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
     console.error("Vérification de session avant observation impossible :", error);
     showMessage("Impossible de vérifier votre session. Vérifiez la connexion puis réessayez. Aucune observation n’a été enregistrée.", "error");
     return;
   }
+  if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
   if (!session) {
     showMessage(cultureWorkflowText("expired"), "error");
     return;
