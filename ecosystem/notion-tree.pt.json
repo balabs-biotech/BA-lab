@@ -1,0 +1,159 @@
+{
+  "version": 1,
+  "source": "Verified public language-specific BA Labs pages from the corresponding public language entry and Notion page search",
+  "language": "pt",
+  "coverage": "first_level_and_verified_topic_pages; deeper page hierarchy not inferred unless confirmed",
+  "domains": [
+    {
+      "id": "myco",
+      "title": "Micologia",
+      "notionId": "40173152f171812fb8d5de62178f6aef",
+      "url": "https://app.notion.com/p/40173152f171812fb8d5de62178f6aef",
+      "children": [
+        {
+          "id": "pt-myco-applications",
+          "title": "Aplicações micológicas",
+          "notionId": "40173152f17181a99780d3ca1ee77cdb",
+          "url": "https://app.notion.com/p/40173152f17181a99780d3ca1ee77cdb",
+          "description": "Interações dos fungos e possíveis aplicações biológicas.",
+          "children": []
+        },
+        {
+          "id": "pt-myco-resources",
+          "title": "Recursos fúngicos",
+          "notionId": "40173152f171812fb8d5de62178f6aef",
+          "url": "https://app.notion.com/p/40173152f171812fb8d5de62178f6aef",
+          "description": "Páginas de referência sobre organismos e recursos fúngicos.",
+          "children": []
+        }
+      ]
+    },
+    {
+      "id": "bio",
+      "title": "Biotecnologia",
+      "notionId": "40173152f171811ba1f0f58fd7dd239d",
+      "url": "https://app.notion.com/p/40173152f171811ba1f0f58fd7dd239d",
+      "children": [
+        {
+          "id": "pt-bio-agro",
+          "title": "Microrganismos de interesse agrícola",
+          "notionId": "40173152f171814ca1cae513ca2f0427",
+          "url": "https://app.notion.com/p/40173152f171814ca1cae513ca2f0427",
+          "description": "Microrganismos associados aos sistemas e às interações agrícolas.",
+          "children": []
+        }
+      ]
+    },
+    {
+      "id": "soil",
+      "title": "Agrotecnologia",
+      "notionId": "40173152f17181b9be7ae84e413092d5",
+      "url": "https://app.notion.com/p/40173152f17181b9be7ae84e413092d5",
+      "children": [
+        {
+          "id": "pt-soil-agrotech",
+          "title": "Agrotecnologia",
+          "notionId": "40173152f17181b9be7ae84e413092d5",
+          "url": "https://app.notion.com/p/40173152f17181b9be7ae84e413092d5",
+          "description": "Tecnologias e abordagens aplicadas aos sistemas agrícolas.",
+          "children": []
+        }
+      ]
+    },
+    {
+      "id": "iot",
+      "title": "Instrumentação e automação",
+      "notionId": "40173152f17181e3a5a5d842245931a8",
+      "url": "https://app.notion.com/p/40173152f17181e3a5a5d842245931a8",
+      "children": [
+        {
+          "id": "pt-iot-automation",
+          "title": "Automação de culturas",
+          "notionId": "40173152f171816e9ba6c2ea34532049",
+          "url": "https://app.notion.com/p/40173152f171816e9ba6c2ea34532049",
+          "description": "Automação e acompanhamento de sistemas de cultivo.",
+          "children": []
+        },
+        {
+          "id": "pt-iot-sensors",
+          "title": "Instrumentação e sensores",
+          "notionId": "40173152f171811bb877f46a99d03912",
+          "url": "https://app.notion.com/p/40173152f171811bb877f46a99d03912",
+          "description": "Instrumentos e sensores para observação e medição.",
+          "children": []
+        }
+      ]
+    },
+    {
+      "id": "lab",
+      "title": "O laboratório",
+      "notionId": "40173152f17181798082ffafe45e245b",
+      "url": "https://app.notion.com/p/40173152f17181798082ffafe45e245b",
+      "children": []
+    },
+    {
+      "id": "products",
+      "title": "Produtos e recursos biológicos",
+      "notionId": "40173152f17181fcadf1cd543c83ed60",
+      "url": "https://app.notion.com/p/40173152f17181fcadf1cd543c83ed60",
+      "children": [
+        {
+          "id": "pt-products-wa",
+          "title": "WA — ágar-água pronto a usar",
+          "notionId": "40173152f1718141b796f246eb142532",
+          "url": "https://app.notion.com/p/40173152f1718141b796f246eb142532",
+          "description": "Recurso de ágar-água pronto a usar.",
+          "children": []
+        },
+        {
+          "id": "pt-products-myco-start",
+          "title": "Myco Start — protótipo de kit inicial de micologia",
+          "notionId": "40173152f17181a284b6ecc1cda6a13e",
+          "url": "https://app.notion.com/p/40173152f17181a284b6ecc1cda6a13e",
+          "description": "Página informativa do protótipo Myco Start.",
+          "children": []
+        },
+        {
+          "id": "pt-products-myco-plate",
+          "title": "Myco Plate — protótipo de kit de observação em ágar",
+          "notionId": "40173152f17181669030d583da31ce13",
+          "url": "https://app.notion.com/p/40173152f17181669030d583da31ce13",
+          "description": "Página informativa do protótipo Myco Plate.",
+          "children": []
+        },
+        {
+          "id": "pt-products-qr",
+          "title": "Guia de início por QR",
+          "notionId": "40173152f17181a6b4d7dbad1a72f900",
+          "url": "https://app.notion.com/p/40173152f17181a6b4d7dbad1a72f900",
+          "description": "Guia de início para os protótipos Myco Start e Myco Plate.",
+          "children": []
+        }
+      ]
+    },
+    {
+      "id": "work",
+      "title": "Investigação e desenvolvimento",
+      "notionId": "40173152f171818fb366e51fc9ba0f18",
+      "url": "https://app.notion.com/p/40173152f171818fb366e51fc9ba0f18",
+      "children": [
+        {
+          "id": "pt-work-evidence",
+          "title": "O que a evidência demonstra atualmente",
+          "notionId": "40173152f17181b08d08fdfb8e7eca54",
+          "url": "https://app.notion.com/p/40173152f17181b08d08fdfb8e7eca54",
+          "description": "Síntese do que os dados e observações atuais permitem concluir.",
+          "children": []
+        },
+        {
+          "id": "pt-work-collaborate",
+          "title": "Colaborar com a BA Labs",
+          "notionId": "40173152f17181f194deca033c534128",
+          "url": "https://app.notion.com/p/40173152f17181f194deca033c534128",
+          "description": "Como apresentar uma necessidade e preparar uma colaboração.",
+          "children": []
+        }
+      ]
+    }
+  ]
+}
