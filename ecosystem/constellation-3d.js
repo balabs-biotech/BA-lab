@@ -430,7 +430,7 @@ else if(root){
         const bend=.20+((ids.indexOf(a)+ids.indexOf(b))%3)*.075;
         const mid=pa.base.clone().lerp(pb.base,.5).addScaledVector(axis,bend);
         const curve=new THREE.QuadraticBezierCurve3(pa.base,mid,pb.base);
-        const signalColor=new THREE.Color(0xB96B4D);
+        const signalColor=new THREE.Color(0x78958A),pulseColor=new THREE.Color(0xB96B4D);
         const line=makeNeurite(curve,signalColor,.052,1,72);
         // Keep transverse pathways legible without letting them overpower the biological branches.
         line.material.emissive.copy(signalColor).multiplyScalar(.40);line.material.emissiveIntensity=.48;
@@ -468,8 +468,8 @@ else if(root){
             junction.position.copy(tip);junction.userData={kind:'synapse',id:a,relation:true,a,b};worldGroup.add(junction);
           }
         }
-        const pulse=new THREE.Mesh(new THREE.SphereGeometry(.052,16,14),new THREE.MeshBasicMaterial({color:signalColor,transparent:true,opacity:1,depthWrite:false,toneMapped:false}));pulse.userData={kind:'relation-signal',a,b};worldGroup.add(pulse);
-        const pulse2=new THREE.Mesh(new THREE.SphereGeometry(.027,12,10),new THREE.MeshBasicMaterial({color:signalColor,transparent:true,opacity:.86,depthWrite:false,toneMapped:false}));pulse2.userData={kind:'relation-signal',a,b,trail:true};worldGroup.add(pulse2);
+        const pulse=new THREE.Mesh(new THREE.SphereGeometry(.052,16,14),new THREE.MeshBasicMaterial({color:pulseColor,transparent:true,opacity:1,depthWrite:false,toneMapped:false}));pulse.userData={kind:'relation-signal',a,b};worldGroup.add(pulse);
+        const pulse2=new THREE.Mesh(new THREE.SphereGeometry(.027,12,10),new THREE.MeshBasicMaterial({color:pulseColor,transparent:true,opacity:.86,depthWrite:false,toneMapped:false}));pulse2.userData={kind:'relation-signal',a,b,trail:true};worldGroup.add(pulse2);
         edges.push({line,id:a,relation:true,aId:a,bId:b,a:pa.base.clone(),b:pb.base.clone(),pulse,pulse2,curve,phase:(ids.indexOf(a)+ids.indexOf(b))*.071})}
       // Turn nearby collateral tips from separate cross-links into shared
       // anastomoses. This is the key visual difference between a set of chords
