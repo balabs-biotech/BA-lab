@@ -427,3 +427,31 @@ assert.match(batchProtocolMessages[0].message, /Protocol lookup unavailable/);
 assert.equal(batchProtocolButton.disabled, false);
 assert.equal(batchProtocolButton.textContent, "Créer le batch");
 console.log("✓ Batch creation: protocol lookup failures produce controlled feedback");
+
+
+// Batch comparison must revalidate the workspace after each later async read
+// and before inserting results into the current workspace UI.
+const comparisonSource = `async ${extractFunction(engine, "compareSelectedBatches")}`;
+const comparisonAwaitAnchors = [
+  "const experimentResult = experimentIds.length",
+  "const observationCultureResult = cultureIds.length",
+  "const observationUnitResult = unitIds.length"
+];
+let previousComparisonGuard = comparisonSource.indexOf(
+  "if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;"
+);
+for (const anchor of comparisonAwaitAnchors) {
+  const awaitIndex = comparisonSource.indexOf(anchor);
+  assert.ok(awaitIndex >= 0, `comparison must retain async stage: ${anchor}`);
+  const guardIndex = comparisonSource.indexOf(
+    "if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;",
+    awaitIndex
+  );
+  assert.ok(guardIndex > awaitIndex,
+    `comparison must discard stale workspace after ${anchor}`);
+  previousComparisonGuard = guardIndex;
+}
+const comparisonRenderIndex = comparisonSource.indexOf("results.appendChild(table)");
+assert.ok(comparisonRenderIndex > previousComparisonGuard,
+  "comparison must validate workspace immediately before rendering results");
+console.log("✓ Batch comparison: stale async reads cannot render into another workspace");

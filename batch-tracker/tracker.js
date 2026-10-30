@@ -2515,6 +2515,7 @@ async function compareSelectedBatches() {
           .select("id,code,name")
           .eq("organization_id", operationOrganizationId).in("id", experimentIds)
       : {data:[],error:null};
+    if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
     if (experimentResult.error) throw new Error("Chargement des expériences impossible : " + experimentResult.error.message);
     const experimentsById = new Map((experimentResult.data || []).map(row => [row.id, row]));
     const contextsByCultureId = new Map(cultureContexts.map(row => {
@@ -2531,6 +2532,7 @@ async function compareSelectedBatches() {
           .eq("organization_id", operationOrganizationId).in("culture_id", cultureIds)
           .order("observed_at", { ascending: false }).order("id", { ascending: true }))
       : {data:[],error:null};
+    if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
     if (observationCultureResult.error) throw new Error("Chargement des observations de culture impossible : " + observationCultureResult.error.message);
     const observationUnitResult = unitIds.length
       ? await fetchAllComparisonPages(supabaseClient.from("observations")
@@ -2538,12 +2540,14 @@ async function compareSelectedBatches() {
           .eq("organization_id", operationOrganizationId).in("experimental_unit_id", unitIds)
           .order("observed_at", { ascending: false }).order("id", { ascending: true }))
       : {data:[],error:null};
+    if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
     if (observationUnitResult.error) throw new Error("Chargement des observations expérimentales impossible : " + observationUnitResult.error.message);
     const observationMap = new Map();
     [...(observationCultureResult.data || []), ...(observationUnitResult.data || [])].forEach(row => {
       if (row.id) observationMap.set(row.id, row);
     });
     const observations = [...observationMap.values()];
+    if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
     const stages = stageResult.data || [];
     const measurementMap = new Map();
     [...(cultureMeasurementResult.data || []), ...(environmentMeasurementResult.data || [])].forEach(row => {
