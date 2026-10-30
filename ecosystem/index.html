@@ -387,6 +387,135 @@ h1 span{color:var(--oxide)!important;font-style:italic}
 .foot strong{color:var(--oxide)!important;font:italic 18px Georgia,serif!important;letter-spacing:.08em!important}
 @media(max-width:760px){.wrap{padding:14px 15px 28px!important}.hero{padding:60px 0 48px!important;gap:20px!important}.hero:before{top:20px;font-size:8px}h1{font-size:clamp(54px,14vw,82px)!important;line-height:.86!important}.hero p{font-size:13px}.scene{box-shadow:5px 5px 0 #b956392b!important}.scenehead{padding:15px!important}.scenehead strong{font-size:16px!important}.cluster-key{padding:13px!important}.mini{padding:24px 16px!important}.miniintro h2{font-size:clamp(37px,11vw,52px)!important}.mini-map{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important}.linknode,.linknode:nth-of-type(2),.linknode:nth-of-type(7){min-height:128px!important;padding:14px 10px!important}.linknode b{font-size:17px!important}.resource-detail{padding:22px 16px!important}.tile b{font-size:20px!important}.tile p{font-size:10px!important}}
 
+
+/* ===== BALABS / living matter design system v2 =====
+   A tactile scientific field instrument: no generic card grid, no uniform pills. */
+:root{
+ --atlas-paper:#e8e2d3;--atlas-paper-light:#f2eddf;--atlas-ink:#1a3034;
+ --atlas-petrol:#142b30;--atlas-petrol-mid:#203c3d;--atlas-oxide:#b85b3c;
+ --atlas-copper:#c18b5c;--atlas-pollen:#d8b75f;--atlas-moss:#83977a;
+ --atlas-rule:#aeb2a3;--atlas-muted:#68766e;
+ --shape-organic:42% 58% 53% 47% / 48% 42% 58% 52%;
+}
+html,body{background:var(--atlas-paper)!important;color:var(--atlas-ink)!important}
+body{
+ background-image:radial-gradient(ellipse at 8% 12%,#b85b3c13,transparent 25%),radial-gradient(ellipse at 92% 42%,#6e8b7912,transparent 32%),linear-gradient(90deg,#1a303408 1px,transparent 1px),linear-gradient(#1a303408 1px,transparent 1px)!important;
+ background-size:auto,auto,38px 38px,38px 38px!important;background-attachment:fixed!important;
+}
+.wrap{max-width:1560px!important;padding:26px clamp(18px,5.5vw,88px) 54px!important}
+.top{min-height:72px!important;border-bottom:1px solid #8f9b8b!important;position:relative}
+.top:after{content:"FIELD SYSTEM  /  BAL–01";position:absolute;right:0;bottom:-20px;font:8px ui-monospace,monospace;letter-spacing:.18em;color:#8d735e}
+.mark{width:48px!important;height:48px!important;border-radius:38% 62% 48% 52% / 52% 43% 57% 48%!important;transform:rotate(-5deg);background:var(--atlas-oxide)!important;box-shadow:3px 4px 0 var(--atlas-ink)!important}
+.mark:after{border-radius:40% 60% 46% 54% / 50% 45% 55% 50%!important;transform:rotate(11deg)}
+.brand strong{font-size:14px!important;letter-spacing:.3em!important}
+.brand small{font:9px ui-monospace,monospace!important;letter-spacing:.08em!important}
+.tools{gap:7px!important}
+.lang{border:1px solid transparent!important;border-radius:40% 60% 48% 52% / 52% 45% 55% 48%!important;padding:9px 13px!important;background:#f7f1e51c!important;font:9px ui-monospace,monospace!important;transition:.2s}
+.lang[aria-pressed=true]{border-color:#b85b3c!important;background:#b85b3c12!important;color:#8f422e!important}
+.hero{padding:clamp(68px,10vw,140px) 0 clamp(52px,7vw,96px)!important;grid-template-columns:minmax(0,1.55fr) minmax(210px,.55fr)!important;gap:8vw!important}
+.hero:before{content:"A FIELD GUIDE TO APPLIED BIOLOGY";top:24px!important;font:9px ui-monospace,monospace!important;color:#8a715d!important;letter-spacing:.17em!important}
+.hero:after{height:1px!important;background:linear-gradient(90deg,var(--atlas-oxide),#aeb2a3 62%,transparent)!important;bottom:24px!important}
+.eyebrow{font:800 9px ui-monospace,monospace!important;letter-spacing:.24em!important;color:var(--atlas-oxide)!important}
+h1{font:400 clamp(62px,9.7vw,142px)/.79 Georgia,serif!important;letter-spacing:-.085em!important;max-width:1000px!important}
+h1 span{color:var(--atlas-oxide)!important;font-style:italic!important}
+.hero p{font:14px/1.9 ui-sans-serif,system-ui!important;max-width:570px!important;color:#53645d!important}
+.aside{border:0!important;border-left:1px solid var(--atlas-oxide)!important;padding:8px 0 8px 22px!important;position:relative;font:11px/1.9 ui-monospace,monospace!important;color:#5b6a62!important}
+.aside:before{content:"FIELD NOTE / 01";display:block;margin-bottom:16px;color:var(--atlas-oxide);font-size:8px;letter-spacing:.18em}
+.aside b{font:italic 400 27px/1.05 Georgia,serif!important;color:var(--atlas-ink)!important}
+.scene{border:1px solid #536c60!important;border-radius:44px 12px 48px 14px / 28px 16px 30px 14px!important;background:var(--atlas-petrol)!important;box-shadow:12px 14px 0 #b85b3c22,0 35px 75px #172c301b!important;overflow:hidden!important;position:relative}
+.scene:after{content:"";position:absolute;inset:9px;border:1px solid #d5c9a51b;border-radius:40px 9px 43px 10px;pointer-events:none;z-index:2}
+.scenehead{padding:22px clamp(18px,3vw,34px)!important;background:#11262b!important;border-bottom:1px solid #a4b59a55!important}
+.scenehead small{font:9px ui-monospace,monospace!important;letter-spacing:.2em!important;color:var(--atlas-pollen)!important}
+.scenehead strong{font:italic 400 21px Georgia,serif!important;color:#f1eadb!important}
+.btn{border-radius:40% 60% 47% 53% / 52% 45% 55% 48%!important;padding:12px 18px!important;font:9px ui-monospace,monospace!important;letter-spacing:.06em!important}
+.btn.primary{background:var(--atlas-oxide)!important;border-color:var(--atlas-oxide)!important}
+.cluster-key{padding:18px clamp(18px,3vw,34px)!important;background:#1d3838!important;border-bottom:1px solid #9aaa8a4a!important}
+.cluster-item i{width:5px!important;flex-basis:5px!important;height:30px!important;border-radius:60% 40% 60% 40%!important}
+.cluster-item b{font:9px ui-monospace,monospace!important;letter-spacing:.15em!important}
+.cluster-item small{font:9px/1.6 ui-monospace,monospace!important}
+.view{background:radial-gradient(ellipse at 50% 44%,#304d49 0%,#1b3537 48%,#142b30 82%)!important;min-height:clamp(650px,66vw,900px)!important}
+.view:before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.25;background:radial-gradient(ellipse at 50% 48%,transparent 0 34%,#d5c9a511 34.2%,transparent 34.5% 58%,#d5c9a50d 58.2%,transparent 58.5%)}
+.hub{border-radius:48% 52% 44% 56% / 53% 42% 58% 47%!important;background:radial-gradient(circle at 36% 29%,#e0c58b,#a67c56 42%,#34504a 76%)!important;border:1px solid #e8d4a3!important;box-shadow:0 0 0 10px #d8b75f14,0 0 0 27px #d8b75f09,0 0 75px #d8b75f2b!important}
+.hub:before,.hub:after{border-radius:49% 51% 43% 57% / 52% 44% 56% 48%!important}
+.hub strong{font:italic 400 clamp(34px,5vw,54px) Georgia,serif!important;color:#172c30!important}
+.hub small{font:8px ui-monospace,monospace!important;letter-spacing:.15em!important;color:#243a37!important}
+.sphere{border-radius:var(--shape-organic)!important;clip-path:none!important;outline:1px solid #e5ddc3!important;outline-offset:3px;box-shadow:inset -15px -17px 24px #071619aa,inset 6px 7px 17px #ffffff1d,0 14px 28px #06151966!important;transition:border-radius .6s,transform .35s,box-shadow .35s!important}
+.sphere:nth-of-type(3n){border-radius:56% 44% 62% 38% / 42% 58% 42% 58%!important}
+.sphere:nth-of-type(3n+1){border-radius:38% 62% 47% 53% / 58% 42% 58% 42%!important}
+.sphere .idx{font:italic 17px Georgia,serif!important;color:#f4d69c!important}
+.sphere b{font:600 12px/1.2 ui-sans-serif,system-ui!important;color:#fff5e6!important}
+.sphere small{font:8px ui-monospace,monospace!important;color:#d4dfd1!important}
+.sphere:hover,.sphere.active{transform:scale(1.055)!important;outline-color:#e0bd72!important;box-shadow:inset -15px -17px 24px #071619aa,0 0 0 8px #d8b75f1c,0 0 40px #d8b75f38!important}
+.network line{stroke:#d7ddc9!important;stroke-opacity:.34!important}.network line.bridge{stroke:#e0b56a!important;stroke-opacity:.55!important}
+.mini{position:relative!important;background:#1d3838!important;padding:clamp(30px,5vw,66px)!important;border-top:1px solid #b5c3a35c!important;overflow:hidden}
+.mini:before{content:"";position:absolute;right:-90px;top:-130px;width:360px;height:360px;border:1px solid #d8b75f24;border-radius:43% 57% 61% 39% / 48% 38% 62% 52%;transform:rotate(24deg);pointer-events:none}
+.mini:after{content:"02 / FIELD NOTES";position:absolute;right:clamp(22px,4vw,54px);bottom:22px;color:#c6b88d70;font:8px ui-monospace,monospace;letter-spacing:.2em;pointer-events:none}
+.miniintro{position:relative;z-index:1;border-bottom:1px solid #9eae9655!important;padding-bottom:26px!important;margin-bottom:28px!important}
+.miniintro:before{content:"SELECTED ECOSYSTEM";display:block;margin-bottom:14px;color:var(--atlas-pollen);font:8px ui-monospace,monospace;letter-spacing:.2em}
+.miniintro h2{font:italic 400 clamp(42px,6vw,78px)/.88 Georgia,serif!important;letter-spacing:-.06em!important;color:#f0eadc!important}
+.miniintro p{font:11px/1.85 ui-monospace,monospace!important;color:#c0cbbb!important;max-width:610px}
+#spherePage{border-radius:0!important;border-bottom:1px solid var(--atlas-pollen)!important;color:#f2d9a9!important}
+.mini-map{position:relative!important;z-index:1}
+.mini-core{border-radius:48% 52% 42% 58% / 53% 44% 56% 47%!important;background:radial-gradient(circle at 35% 27%,#e0c58b,#a27b58 46%,#1d3838 80%)!important;border:1px solid #e4cc99!important;box-shadow:0 0 0 9px #d8b75f17,0 0 0 24px #d8b75f09!important}
+.mini-core b{font:italic 400 21px Georgia,serif!important;color:#172c30!important}
+.mini-core small{font:8px ui-monospace,monospace!important;color:#243a37!important;letter-spacing:.1em}
+.linknode{position:relative!important;isolation:isolate;border:0!important;border-top:1px solid #a8b79c!important;border-radius:0 35% 0 18% / 0 16% 0 12%!important;background:linear-gradient(145deg,#29464270,#142b3030)!important;box-shadow:none!important;padding:18px 17px!important;overflow:visible!important;min-height:116px!important}
+.linknode:before{content:"";position:absolute;z-index:-1;inset:5px -3px -4px 4px;border:1px solid #c18b5c55;border-radius:55% 45% 42% 58% / 12% 20% 80% 88%;transform:rotate(-1.5deg);opacity:.75;pointer-events:none}
+.linknode:nth-child(odd):before{transform:rotate(1.7deg);border-radius:38% 62% 55% 45% / 20% 14% 86% 80%}
+.linknode span{font:8px ui-monospace,monospace!important;letter-spacing:.18em!important;color:#dfbd79!important}
+.linknode b{font:italic 400 clamp(18px,2vw,25px)/1.15 Georgia,serif!important;color:#f4eddf!important}
+.linknode small{font:9px/1.55 ui-monospace,monospace!important;color:#c0cdbf!important}
+.linknode:hover,.linknode:focus-visible{background:#b4c49b12!important;transform:translateY(-4px) rotate(-.4deg)!important;outline:0!important}
+.linknode:hover:before{border-color:#dfbd79;inset:1px -7px -7px 1px}
+.resource-detail{position:relative!important;border:0!important;border-radius:34% 8% 28% 5% / 8% 5% 10% 6%!important;background:var(--atlas-paper-light)!important;box-shadow:12px 12px 0 #b85b3c2b!important;padding:clamp(24px,4vw,48px)!important;overflow:visible!important}
+.resource-detail:before{content:"";position:absolute;inset:9px;border:1px solid #9ba38f;border-radius:30% 7% 24% 4% / 8% 5% 10% 6%;pointer-events:none}
+.resource-detail-orbit{border-radius:46% 54% 39% 61% / 57% 43% 57% 43%!important;border:1px solid var(--atlas-oxide)!important}
+.resource-detail h3{font:italic 400 clamp(30px,4vw,48px)/.98 Georgia,serif!important}
+.resource-detail-kicker{font:8px ui-monospace,monospace!important;letter-spacing:.2em!important}
+.resource-detail p{font:12px/1.9 ui-sans-serif,system-ui!important}
+.resource-open{border-radius:45% 55% 47% 53% / 54% 45% 55% 46%!important;background:var(--atlas-oxide)!important;padding:13px 19px!important}
+.resource-back{font:9px ui-monospace,monospace!important}
+.sphere-hops{border-top:1px solid #9aa992!important;padding-top:24px!important}
+.sphere-hops strong{font:8px ui-monospace,monospace!important;letter-spacing:.2em!important;color:var(--atlas-pollen)!important}
+.sphere-hop{border-radius:47% 53% 44% 56% / 54% 42% 58% 46%!important;border:1px solid #94a98f!important;background:#ffffff08!important;padding:10px 16px!important;font:9px ui-monospace,monospace!important}
+.under{margin:clamp(50px,7vw,100px) 0 0!important;border:0!important;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0!important;position:relative}
+.under:before{content:"THE BALABS APPROACH";position:absolute;top:-28px;left:0;font:8px ui-monospace,monospace;letter-spacing:.2em;color:var(--atlas-oxide)}
+.tile{position:relative!important;border:0!important;border-top:1px solid #aeb2a3!important;border-right:1px solid #aeb2a3!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;padding:28px 20px 32px 0!important}
+.tile:last-child{border-right:0!important}
+.tile:before{content:"";position:absolute;left:0;top:-2px;width:30px;height:3px;background:var(--atlas-oxide);border-radius:50%}
+.tile b{font:italic 400 25px Georgia,serif!important;color:var(--atlas-ink)!important}
+.tile p{font:11px/1.9 ui-sans-serif,system-ui!important;color:#64736a!important}
+.foot{margin-top:38px!important;padding:22px 0 0!important;border-top:1px solid #aeb2a3!important;color:#67746b!important;font:8px ui-monospace,monospace!important;letter-spacing:.17em!important}
+.foot strong{font:italic 21px Georgia,serif!important;color:var(--atlas-oxide)!important}
+.webgl-hint,.webgl-status{border-radius:var(--shape-organic)!important}
+.webgl-controls button{border-radius:42% 58% 48% 52% / 54% 42% 58% 46%!important}
+@media(max-width:760px){
+ .wrap{padding:16px 15px 34px!important}.top{min-height:58px!important}.top:after{font-size:7px;bottom:-16px}
+ .mark{width:39px!important;height:39px!important}.tools{gap:2px!important}.lang{padding:7px 8px!important;font-size:8px!important}
+ .hero{padding:62px 0 54px!important;grid-template-columns:1fr!important;gap:22px!important}
+ .hero:before{font-size:7px!important;top:22px!important}.hero:after{bottom:20px!important}
+ h1{font-size:clamp(55px,14vw,86px)!important;line-height:.84!important}
+ .hero p{font-size:13px!important}.aside{max-width:92%!important;padding-left:15px!important}
+ .scene{border-radius:29px 8px 34px 8px / 22px 10px 24px 9px!important;box-shadow:6px 8px 0 #b85b3c22!important}
+ .scene:after{inset:6px;border-radius:26px 6px 30px 6px}
+ .scenehead{padding:16px 17px!important}.scenehead strong{font-size:16px!important}
+ .cluster-key{padding:13px 16px!important;gap:10px!important}
+ .cluster-item b{font-size:8px!important}.cluster-item small{font-size:8px!important}
+ .view{min-height:690px!important}
+ .mini{padding:27px 16px 34px!important}.mini:after{font-size:7px;bottom:12px}
+ .miniintro{margin-bottom:20px!important}.miniintro h2{font-size:clamp(39px,11vw,56px)!important}
+ .mini-map{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:12px 9px!important}
+ .linknode,.linknode:nth-of-type(2),.linknode:nth-of-type(7){min-height:124px!important;padding:14px 10px!important}
+ .linknode b{font-size:16px!important}.linknode small{font-size:9px!important}
+ .resource-detail{border-radius:25% 7% 20% 4% / 5% 3% 7% 4%!important;padding:23px 18px!important}
+ .resource-detail:before{inset:6px;border-radius:24% 6% 19% 3% / 5% 3% 7% 4%}
+ .resource-detail-orbit{width:76px!important}
+ .under{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:0!important;margin-top:55px!important}
+ .tile{padding:20px 12px 22px 0!important}.tile:nth-child(2n){border-right:0!important;padding-left:12px!important}
+ .tile b{font-size:20px!important}.tile p{font-size:10px!important}
+}
+@media(prefers-reduced-motion:reduce){.sphere,.linknode,.lang{transition:none!important}}
+
 </style>
 <style>
 #mainView .webgl-focus-next{margin-top:5px;color:#829b80;font:600 9px/1.4 system-ui,sans-serif;letter-spacing:.09em;text-transform:uppercase}
