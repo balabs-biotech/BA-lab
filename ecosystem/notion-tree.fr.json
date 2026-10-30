@@ -168,31 +168,36 @@
           "id": "iot-sensors",
           "title": "Instrumentation & capteurs",
           "notionId": "3e273152f17181f58c57c93b4c8c790f",
-          "url": "https://app.notion.com/p/3e273152f17181f58c57c93b4c8c790f"
+          "url": "https://app.notion.com/p/3e273152f17181f58c57c93b4c8c790f",
+          "description": "Capteurs et microcontrôleurs envisagés pour suivre les paramètres des systèmes expérimentaux ; le déploiement opérationnel reste à distinguer des études."
         },
         {
           "id": "iot-automation",
           "title": "Automatisation des cultures",
           "notionId": "3e273152f171818a8ffff2585126f904",
-          "url": "https://app.notion.com/p/3e273152f171818a8ffff2585126f904"
+          "url": "https://app.notion.com/p/3e273152f171818a8ffff2585126f904",
+          "description": "Étude du pilotage des conditions de culture : renouvellement d’air, humidification, température et éclairage."
         },
         {
           "id": "iot-traceability",
           "title": "Traçabilité & données",
           "notionId": "3e273152f171811db9a6f46cc9959da4",
-          "url": "https://app.notion.com/p/3e273152f171811db9a6f46cc9959da4"
+          "url": "https://app.notion.com/p/3e273152f171811db9a6f46cc9959da4",
+          "description": "Relier observations, mesures et enregistrements pour conserver le contexte des essais et comparer les résultats."
         },
         {
           "id": "iot-measurement",
           "title": "Mesure & reproductibilité",
           "notionId": "3e273152f1718119b0f7eeeb897f206a",
-          "url": "https://app.notion.com/p/3e273152f1718119b0f7eeeb897f206a"
+          "url": "https://app.notion.com/p/3e273152f1718119b0f7eeeb897f206a",
+          "description": "Définition des variables et des méthodes de mesure pour documenter les conditions et apprécier la reproductibilité."
         },
         {
           "id": "iot-prototypes",
           "title": "Prototypes & essais",
           "notionId": "3e273152f1718174904bd0043fc5d976",
-          "url": "https://app.notion.com/p/3e273152f1718174904bd0043fc5d976"
+          "url": "https://app.notion.com/p/3e273152f1718174904bd0043fc5d976",
+          "description": "Cycles de prototypage destinés à tester une hypothèse et produire des informations utiles à la suite du développement."
         }
       ]
     },
@@ -206,25 +211,29 @@
           "id": "soil-equipment",
           "title": "Équipements expérimentaux",
           "notionId": "3e273152f1718167be9fc11cf0b00386",
-          "url": "https://app.notion.com/p/3e273152f1718167be9fc11cf0b00386"
+          "url": "https://app.notion.com/p/3e273152f1718167be9fc11cf0b00386",
+          "description": "Équipements conçus ou étudiés pour les besoins de recherche : fermentation, préparation des substrats, culture et instrumentation."
         },
         {
           "id": "soil-preparation",
           "title": "Préparation des substrats",
           "notionId": "3e273152f171812e9dd5f9df0b269046",
-          "url": "https://app.notion.com/p/3e273152f171812e9dd5f9df0b269046"
+          "url": "https://app.notion.com/p/3e273152f171812e9dd5f9df0b269046",
+          "description": "Préparation des supports biologiques selon leur granulométrie, leur humidité, leur structure et leur fonction expérimentale."
         },
         {
           "id": "soil-prototyping",
           "title": "Prototypage & fabrication",
           "notionId": "3e273152f17181ffa96cee6f70fb11e3",
-          "url": "https://app.notion.com/p/3e273152f17181ffa96cee6f70fb11e3"
+          "url": "https://app.notion.com/p/3e273152f17181ffa96cee6f70fb11e3",
+          "description": "Conception et adaptation de dispositifs, de l’idée initiale à la fabrication et aux essais lorsque le projet le permet."
         },
         {
           "id": "soil-fermenters",
           "title": "Fermenteurs & procédés pilotes",
           "notionId": "3e273152f17181ec9ee4dcf0c18a2abc",
-          "url": "https://app.notion.com/p/3e273152f17181ec9ee4dcf0c18a2abc"
+          "url": "https://app.notion.com/p/3e273152f17181ec9ee4dcf0c18a2abc",
+          "description": "Architectures de fermentation modulaires étudiées comme outils de R&D ; les conceptions ne sont pas nécessairement construites ou validées."
         }
       ]
     },
@@ -238,7 +247,8 @@
           "id": "lab-plant-experimentation",
           "title": "Expérimentation végétale",
           "notionId": "3e273152f171817a81d6f806b3804d6b",
-          "url": "https://app.notion.com/p/3e273152f171817a81d6f806b3804d6b"
+          "url": "https://app.notion.com/p/3e273152f171817a81d6f806b3804d6b",
+          "description": "Étude de la réponse des plantes aux supports, à l’eau et aux conditions de culture dans des systèmes expérimentaux."
         }
       ]
     },
