@@ -301,6 +301,38 @@ assert.match(cultureSessionMessages[0].message, /Session provider unavailable/);
 console.log("✓ Culture creation: session lookup failures produce controlled feedback");
 
 
+// A failed session lookup from a superseded auth revision must not show stale feedback.
+const staleSessionFailureMessages = [];
+let staleFailureRevision = 1;
+const staleSessionFailureContext = {
+  authStateRevision: staleFailureRevision,
+  organizationId: "org-test",
+  clearMessage() {},
+  showMessage(message, type) { staleSessionFailureMessages.push({ message, type }); },
+  strainSelect: { value: "strain-1" },
+  cultureCodeInput: { value: "CULTURE-STALE-ERROR", trim() { return this.value.trim(); } },
+  cultureTypeSelect: { value: "agar" },
+  protocolSelect: { value: "" },
+  startedAtInput: { value: "" },
+  termsAcceptedCheckbox: { checked: true, focus() {} },
+  isCurrentWorkspaceRevision(revision, organizationId) {
+    return revision === staleFailureRevision && organizationId === "org-test";
+  },
+  getCurrentSession: async () => {
+    staleFailureRevision = 2;
+    staleSessionFailureContext.authStateRevision = 2;
+    throw new Error("Old session lookup failed");
+  },
+  console
+};
+await assert.doesNotReject(
+  vm.runInNewContext(`${createCultureSource}; createCulture()`, staleSessionFailureContext)
+);
+assert.equal(staleSessionFailureMessages.length, 0,
+  "a stale session lookup failure must not show an error in the new workspace");
+console.log("✓ Culture creation: stale session lookup failures do not leak feedback across auth revisions");
+
+
 // A session resolved after an authentication/workspace change must not start writes.
 const staleSessionMessages = [];
 let staleSessionRevision = 1;
