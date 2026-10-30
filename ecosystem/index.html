@@ -1525,6 +1525,64 @@ body{background:linear-gradient(180deg,#0b1214 0,#101a1b 44%,#eeeade 44%,#eeeade
   .work-tag{margin-top:18px!important}
 }
 
+
+
+/* 2026-10-30 — real scientific photography in the editorial feature */
+.editorial-feature{
+  grid-template-columns:minmax(0,1fr) minmax(300px,.92fr)!important;
+  gap:clamp(34px,6vw,88px)!important;
+  overflow:hidden!important;
+}
+.editorial-feature .editorial-copy{grid-column:1;grid-row:1;max-width:680px!important}
+.editorial-feature .editorial-art-feature{
+  display:block!important;
+  grid-column:2;grid-row:1;
+  align-self:stretch;
+  min-height:360px;
+  width:100%;
+  max-width:640px;
+  margin-left:auto;
+  color:inherit;
+}
+.editorial-feature .feature-photo{
+  display:block;
+  width:100%;
+  height:100%;
+  min-height:360px;
+  max-height:510px;
+  object-fit:cover;
+  object-position:center;
+  border-radius:2px;
+  filter:none!important;
+}
+.editorial-feature .art-caption{
+  display:inline-block;
+  margin-top:12px;
+  color:#465650;
+  font:9px/1.6 ui-monospace,monospace;
+  letter-spacing:.08em;
+  text-decoration:none;
+  border-bottom:1px solid #9BA69D;
+}
+.editorial-feature .art-caption:hover{color:#99563F;border-color:#99563F}
+@media(max-width:760px){
+  .editorial-feature{grid-template-columns:1fr!important;gap:28px!important}
+  .editorial-feature .editorial-copy{grid-column:1;grid-row:1}
+  .editorial-feature .editorial-art-feature{
+    grid-column:1;grid-row:2;
+    min-height:0;
+    max-width:none;
+    margin:0;
+  }
+  .editorial-feature .feature-photo{
+    min-height:0;
+    height:auto;
+    aspect-ratio:4/3;
+    max-height:none;
+  }
+  .editorial-feature .art-caption{font-size:8px}
+}
+
 </style>
 </head>
 <body>
@@ -1534,26 +1592,9 @@ body{background:linear-gradient(180deg,#0b1214 0,#101a1b 44%,#eeeade 44%,#eeeade
 </section>
 
 <section class="editorial-feature" id="a-la-une" aria-label="Projet mis en avant">
-  <div class="editorial-art editorial-art-feature" aria-hidden="true">
-    <svg viewBox="0 0 620 430" role="img">
-      <g fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M311 383 C306 333 315 294 307 249 C302 219 281 190 253 169 C223 146 183 140 148 152 C116 163 96 191 93 220 C90 249 107 272 135 279 C162 286 190 271 198 247 C205 225 192 205 174 202 C159 200 145 210 145 224"/>
-        <path d="M309 383 C322 333 350 301 380 272 C413 241 449 222 481 226 C511 230 532 253 527 278 C523 302 498 315 476 306 C456 298 451 277 462 264"/>
-        <path d="M308 383 C286 345 263 319 232 300 C201 281 171 281 151 298 C132 315 137 340 157 349 C177 358 197 346 195 329"/>
-        <path d="M312 383 C337 351 367 335 402 330 C435 324 458 337 460 359 C462 378 443 391 425 382"/>
-        <path d="M311 384 C310 349 304 321 287 295 M312 384 C326 349 341 326 363 310"/>
-        <path d="M149 152 C139 124 149 97 171 82 C196 65 232 68 254 88 C269 102 276 123 270 143 C251 137 231 140 212 151"/>
-        <path d="M381 272 C373 244 385 215 408 197 C434 176 469 173 492 190 C509 203 517 219 513 236"/>
-        <path d="M152 298 C124 289 104 297 92 315 M195 329 C219 335 235 352 238 374 M476 306 C502 298 521 305 536 324 M425 382 C408 400 407 414 413 423"/>
-        <path d="M170 85 C178 105 196 116 217 116 M408 198 C426 215 450 222 475 217"/>
-        <path d="M110 183 C122 172 136 166 151 164 M495 190 C512 183 530 185 544 197"/>
-      </g>
-      <g fill="currentColor">
-        <circle cx="145" cy="224" r="4"/><circle cx="462" cy="264" r="4"/><circle cx="195" cy="329" r="4"/><circle cx="425" cy="382" r="4"/>
-        <circle cx="171" cy="82" r="3"/><circle cx="492" cy="190" r="3"/><circle cx="92" cy="315" r="3"/><circle cx="536" cy="324" r="3"/>
-      </g>
-    </svg>
-    <span class="art-caption">MYCELIUM / RÉSEAU DE CROISSANCE</span>
+  <div class="editorial-art editorial-art-feature">
+    <img class="feature-photo" src="https://upload.wikimedia.org/wikipedia/commons/3/31/Oyster_mushroom_%28Pleurotus_ostreatus%29_mycelium_in_petri_dish_on_coffee_grounds.JPG" alt="Mycélium de Pleurotus ostreatus se développant sur du marc de café dans une boîte de culture" loading="lazy" decoding="async">
+    <a class="art-caption" href="https://commons.wikimedia.org/wiki/File:Oyster_mushroom_(Pleurotus_ostreatus)_mycelium_in_petri_dish_on_coffee_grounds.JPG" target="_blank" rel="noopener">PLEUROTUS OSTREATUS / MARC DE CAFÉ · TOBI KELLNER · CC BY-SA 3.0</a>
   </div>
   <div class="editorial-copy">
     <div class="eyebrow" data-i18n="featureKicker">À LA UNE / MYCOLOGIE APPLIQUÉE</div>
