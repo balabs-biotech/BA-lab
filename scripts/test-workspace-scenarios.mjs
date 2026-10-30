@@ -208,15 +208,15 @@ assert.ok(setupEnd > setupStart, "workspace setup must be complete");
 const workspaceSetup = engine.slice(setupStart, setupEnd);
 assert.match(workspaceSetup, /let workspaceSwitchRevision = 0;/,
   "workspace switches need a monotonic revision");
-assert.match(workspaceSetup, /const switchRevision = \\+\\+workspaceSwitchRevision;/,
+assert.match(workspaceSetup, /const switchRevision = \+\+workspaceSwitchRevision;/,
   "each switch must supersede pending switches");
-assert.match(workspaceSetup, /if \\(persist && organizationId\\)/,
+assert.match(workspaceSetup, /if \(persist && organizationId\)/,
   "signed-in workspace changes must refresh data");
-assert.match(workspaceSetup, /cultureOptions = \\[\\];[\\s\\S]*?latestBatches = \\[\\];[\\s\\S]*?await loadPlantCultures\\(\\);/,
+assert.match(workspaceSetup, /cultureOptions = \[\];[\s\S]*?latestBatches = \[\];[\s\S]*?await loadPlantCultures\(\);/,
   "agronomy must clear biological caches and load plant records");
-assert.match(workspaceSetup, /await loadCultureOptions\\(\\);[\\s\\S]*?await loadLatestBatches\\(\\);/,
+assert.match(workspaceSetup, /await loadCultureOptions\(\);[\s\S]*?await loadLatestBatches\(\);/,
   "mycology and laboratory must reload their own cultures and batches");
-assert.match(workspaceSetup, /await loadMeasurementReferences\\(\\);[\\s\\S]*?loadRecentMeasurements\\(\\)[\\s\\S]*?loadRecentObservations\\(\\)/,
+assert.match(workspaceSetup, /await loadMeasurementReferences\(\);[\s\S]*?loadRecentMeasurements\(\)[\s\S]*?loadRecentObservations\(\)/,
   "measurement references and histories must follow the active workspace");
 assert.ok((workspaceSetup.match(/switchRevision !== workspaceSwitchRevision/g) || []).length >= 5,
   "every asynchronous boundary must reject an obsolete workspace switch");
