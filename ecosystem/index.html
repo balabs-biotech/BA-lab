@@ -1570,6 +1570,20 @@ h1 span{color:#b66d43;text-shadow:none}
  .tile:nth-child(3){border-bottom:0}
 }
 
+
+/* 2026-10-30 — Mineral daylight pass: brighten the 3D atlas without flattening its depth. */
+.scene{background:radial-gradient(ellipse at 50% 42%,#d2ded7 0%,#aebfb9 56%,#879d9b 100%);border-color:#829991;box-shadow:0 22px 58px rgba(37,58,55,.16),inset 0 0 80px rgba(255,255,255,.20)}
+#mainView.webgl-ready{background:radial-gradient(ellipse at 50% 42%,#d9e4dc 0%,#bdcec7 48%,#91aaa5 100%);border-color:#829991}
+#mainView .webgl-stage .webgl-status{color:#173b42;text-shadow:0 1px 0 rgba(255,255,255,.55)}
+#mainView .webgl-stage .webgl-hint{background:rgba(25,53,59,.94);border-color:#d4e0d5;color:#f4f2e9;box-shadow:0 8px 22px rgba(25,53,59,.18)}
+#mainView .webgl-stage .webgl-controls button{background:rgba(25,53,59,.94);border-color:#d4e0d5;color:#f4f2e9}
+#mainView .webgl-stage .webgl-controls button:hover{background:#c2d19b;color:#19343b;border-color:#19343b}
+#mainView .webgl-stage .webgl-focus{background:linear-gradient(145deg,rgba(25,53,59,.96),rgba(34,66,69,.90))!important;border-color:rgba(238,244,233,.65)!important;box-shadow:0 12px 34px rgba(25,53,59,.16)}
+.webgl-network-legend{background:rgba(25,53,59,.94)!important;border-color:#d4e0d5!important;color:#f4f2e9!important;box-shadow:0 8px 22px rgba(25,53,59,.18)!important}
+@media(max-width:760px){
+ .scene{background:radial-gradient(ellipse at 50% 38%,#d0ddd6 0%,#afc2ba 58%,#879f9a 100%)}
+ #mainView.webgl-ready{background:radial-gradient(ellipse at 50% 38%,#d7e2da 0%,#b8cbc2 55%,#8da7a0 100%)}
+}
 </style>
 </body>
 </html>
