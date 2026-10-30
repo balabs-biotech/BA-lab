@@ -116,9 +116,10 @@ for (const mutation of [
   "saveBiologicalOperation", "savePlantCulture"
 ]) {
   const source = getMutationBlock(mutation);
-  const catches = [...source.matchAll(/catch\s*\([^)]*\)\s*\{/g)];
+  const mutationBody = source.slice(0, source.indexOf("finally"));
+  const catches = [...mutationBody.matchAll(/catch\s*\([^)]*\)\s*\{/g)];
   assert.ok(catches.length, `${mutation} must handle mutation errors`);
-  const latestCatch = source.slice(catches[catches.length - 1].index);
+  const latestCatch = mutationBody.slice(catches[catches.length - 1].index);
   assert.match(latestCatch, /if \(!isCurrentWorkspaceRevision\(operationRevision, operationOrganizationId\)\) return;/,
     `${mutation} must suppress stale error UI after a workspace transition`);
 }
