@@ -172,6 +172,8 @@ jobs:
         run: node supabase/tests/sentinel-2-frontend-contract.test.mjs
       - name: Test NASA POWER scheduled-import security contract
         run: node supabase/tests/nasa-power-scheduled-import.test.mjs
+      - name: Test NASA POWER user-import writer authorization
+        run: node supabase/tests/nasa-power-agroclimate-writer-authorization.test.mjs
 
   supabase-migration-replay:
     runs-on: ubuntu-latest
