@@ -6778,7 +6778,9 @@ function setupDomainWorkspaces() {
   const toolbarStatus = document.querySelector(".toolbar-status span:last-child");
   const heading = document.getElementById("domainHeading");
   const description = document.getElementById("domainDescription");
+  let workspaceSwitchRevision = 0;
   const setDomain = (domain, persist = true) => {
+    const switchRevision = ++workspaceSwitchRevision;
     const activeDomain = Object.hasOwn(modes, domain) ? domain : "agronomy";
     const config = modes[activeDomain];
     document.body.dataset.domain = activeDomain;
@@ -6788,9 +6790,14 @@ function setupDomainWorkspaces() {
     const cultureEntryTitle = document.getElementById("cultureEntryTitle");
     const strainLabel = document.getElementById("strainLabel");
     const cultureTypeLabel = document.getElementById("cultureTypeLabel");
-    if (cultureEntryTitle) cultureEntryTitle.textContent = activeDomain === "laboratory" ? "Nouvelle culture de laboratoire" : "Nouvelle culture fongique";
-    if (strainLabel?.firstChild) strainLabel.firstChild.textContent = activeDomain === "laboratory" ? "Souche / ressource biologique source" : "Souche fongique source";
-    if (cultureTypeLabel?.firstChild) cultureTypeLabel.firstChild.textContent = activeDomain === "laboratory" ? "Format de culture au laboratoire" : "Support / forme de culture";
+    const entryLabels = {
+      agronomy: { cultureTitle: "Nouvelle culture agronomique", strain: "Culture / ressource végétale source", cultureType: "Type de culture agronomique" },
+      mycology: { cultureTitle: "Nouvelle culture fongique", strain: "Souche fongique source", cultureType: "Support / forme de culture" },
+      laboratory: { cultureTitle: "Nouvelle culture de laboratoire", strain: "Souche / ressource biologique source", cultureType: "Format de culture au laboratoire" }
+    }[activeDomain];
+    if (cultureEntryTitle) cultureEntryTitle.textContent = entryLabels.cultureTitle;
+    if (strainLabel?.firstChild) strainLabel.firstChild.textContent = entryLabels.strain;
+    if (cultureTypeLabel?.firstChild) cultureTypeLabel.firstChild.textContent = entryLabels.cultureType;
     if (eyebrow) eyebrow.innerHTML = config.eyebrow.replace(" / ", ' <span class="eyebrow-separator">/</span> ');
     if (title) title.innerHTML = config.title;
     if (heroDescription) heroDescription.textContent = config.descriptionHero;
@@ -6806,6 +6813,53 @@ function setupDomainWorkspaces() {
     document.documentElement.dataset.domain = activeDomain;
     if (persist) {
       try { localStorage.setItem("baLabsCultureTrackerDomain", activeDomain); } catch (_) {}
+    }
+
+    // A signed-in workspace switch must refresh its domain-scoped data, not only its labels.
+    if (persist && organizationId) {
+      const plantCard = document.getElementById("plantCard");
+      if (activeDomain === "agronomy") {
+        hideElement(trackerCard);
+        hideElement(batchCard);
+        showElement(plantCard);
+      } else {
+        showElement(trackerCard);
+        showElement(batchCard);
+        hideElement(plantCard);
+      }
+      showElement(measurementCard);
+      showElement(document.getElementById("statisticsCard"));
+      showElement(document.getElementById("overviewCard"));
+
+      void (async () => {
+        try {
+          if (switchRevision !== workspaceSwitchRevision || activeDomain !== document.body.dataset.domain) return;
+          if (activeDomain === "agronomy") {
+            cultureOptions = [];
+            latestBatches = [];
+            renderMeasurementTargets();
+            renderStatisticsFilters();
+            await loadPlantCultures();
+            if (switchRevision !== workspaceSwitchRevision || activeDomain !== document.body.dataset.domain) return;
+          } else {
+            await loadCultureOptions();
+            if (switchRevision !== workspaceSwitchRevision || activeDomain !== document.body.dataset.domain) return;
+            await loadLatestBatches();
+            if (switchRevision !== workspaceSwitchRevision || activeDomain !== document.body.dataset.domain) return;
+          }
+          renderMeasurementTargets();
+          renderStatisticsFilters();
+          await loadMeasurementReferences();
+          if (switchRevision !== workspaceSwitchRevision || activeDomain !== document.body.dataset.domain) return;
+          await Promise.all([loadRecentMeasurements(), loadRecentObservations()]);
+          if (switchRevision !== workspaceSwitchRevision || activeDomain !== document.body.dataset.domain) return;
+          updateOverview();
+        } catch (error) {
+          if (switchRevision !== workspaceSwitchRevision || activeDomain !== document.body.dataset.domain) return;
+          console.error("Actualisation de l’espace de travail impossible :", error);
+          showMessage("L’espace a changé, mais certaines données n’ont pas pu être actualisées. Utilisez Actualiser ou rechargez la page.", "warning");
+        }
+      })();
     }
   };
   buttons.forEach(button => button.addEventListener("click", () => setDomain(button.dataset.domainChoice)));
