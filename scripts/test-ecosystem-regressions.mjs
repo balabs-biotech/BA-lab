@@ -31,6 +31,24 @@ assert.ok(html.includes('class="linknode ln1" href="#"') && html.includes('targe
 assert.ok(html.includes('a.href=p[1]') && html.includes('a.onclick=null'), 'Domain resource links must preserve the exact page URL without intercepting navigation');
 assert.ok(scene.includes('legacy sphere fallback intentionally suppressed'), 'A WebGL failure must not silently revive legacy spheres');
 assert.ok(scene.includes('webgl-load-error-panel'), 'A 3D startup failure must provide a recovery message');
+const tree = JSON.parse(readFileSync('ecosystem/notion-tree.fr.json', 'utf8'));
+assert.equal(tree.version, 1, 'Notion tree manifest must use the supported schema version');
+assert.equal(tree.language, 'fr', 'The French tree manifest must identify its language');
+assert.ok(Array.isArray(tree.domains), 'Notion tree manifest must expose domain roots');
+for (const domain of tree.domains) {
+  assert.ok(expectedDomains.includes(domain.id), `Unknown domain in Notion tree: ${domain.id}`);
+  const visit = (node) => {
+    assert.ok(node.id && node.title && node.notionId && node.url, 'Every Notion node must have a stable ID, title, Notion ID and exact URL');
+    assert.match(node.url, /^https:\/\/app\.notion\.com\/p\/[a-f0-9]+$/i, 'Every Notion node must point to its exact public Notion page');
+    for (const child of node.children || []) visit(child);
+  };
+  visit(domain);
+}
+assert.ok(scene.includes("notion-tree.fr.json"), '3D engine must load the Notion tree manifest');
+assert.ok(scene.includes('const visit=(node,depth=0,parentId=domainTree.id'), '3D engine must recursively expand nested Notion pages');
+assert.ok(scene.includes('data-notion-tree-node="true"'), 'Manifest nodes must be injected into the 3D resource layer');
+assert.ok(scene.includes('parentId:a.dataset.parentId') && scene.includes('depth:Number(a.dataset.depth||0)'), '3D resource nodes must retain their hierarchy metadata');
+assert.ok(scene.includes('notionTreeReady.then('), '3D resource nodes must refresh when the manifest finishes loading');
 assert.ok(scene.includes('importThreeWithTimeout'), 'Three.js CDN loading must have a bounded timeout');
 assert.ok(scene.includes('timeoutMs=8000'), 'Three.js CDN fallback must not wait indefinitely');
 for (const host of ['cdn.jsdelivr.net', 'unpkg.com', 'esm.sh']) {
@@ -41,4 +59,4 @@ assert.match(html, /#mainView\.webgl-ready[^{]*\{[^}]*height:/, 'The WebGL stage
 assert.match(html, /constellation-3d\.js\?v=[^"'\s]+/, 'The 3D asset must use a cache-busting version');
 assert.ok(html.includes('.webgl-ready .sphere') || html.includes('.webgl-ready .network') || html.includes('.universe-closed .sphere'), 'Legacy presentation must be controlled explicitly when WebGL is active');
 
-console.log('Ecosystem regression checks passed: 8 domains, organic network, cross-domain signals, unified navigation, gateway state, fallback and cache version.');
+console.log('Ecosystem regression checks passed: 8 domains, organic network, Notion tree hierarchy, exact URLs, cross-domain signals, unified navigation, gateway state, fallback and cache version.');
