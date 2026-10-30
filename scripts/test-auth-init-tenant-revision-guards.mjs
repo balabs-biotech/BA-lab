@@ -109,4 +109,20 @@ for (const [mutation, pattern] of capturedOrganizationChecks) {
     `${mutation} must send the captured organization ID, not a mutable global value`);
 }
 
+
+for (const mutation of [
+  "createCulture", "createBatch", "recordBatchHarvest", "saveQcCheckNow",
+  "advanceBatch", "releaseBatch", "moveSelectedBatch"
+]) {
+  const source = getMutationBlock(mutation);
+  const writeMarker = mutation === "saveQcCheckNow"
+    ? '.from("batch_qc_checks")'
+    : "await supabaseClient.rpc(";
+  const writeStart = source.indexOf(writeMarker);
+  assert.ok(writeStart >= 0, `${mutation} must contain its database write`);
+  const afterWrite = source.slice(writeStart);
+  assert.match(afterWrite, /if \(!isCurrentWorkspaceRevision\(operationRevision, operationOrganizationId\)\) return;/,
+    `${mutation} must stop stale UI effects after its database write`);
+}
+
 console.log("Auth initialization and tenant-write revision guards passed.");
