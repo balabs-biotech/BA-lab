@@ -19,7 +19,7 @@ const OTHER_CULTURE = "21c7fbc8-b590-420b-87bf-3e2cd9ed4e49";
 
 type Json = Record<string, any>;
 let env: Record<string, string | undefined> = {};
-let db: { cultures: Json[]; visible: string[]; userOk: boolean; updateError?: string };
+let db: { cultures: Json[]; visible: string[]; userOk: boolean; membershipRole: string | null; updateError?: string };
 let lockBusy = false;
 let lockCalls: { name: string; args: Json }[] = [];
 let notion: (url: string, init: Json) => { status: number; body: Json };
@@ -37,9 +37,13 @@ function builder(table: string, role: "user" | "admin") {
       return { data: null, error: db.updateError ? { message: db.updateError } : null };
     }
     queries.push({ table, filters: { ...filters } });
+    if (table === "organization_members") {
+      const row = db.membershipRole ? { role: db.membershipRole } : null;
+      return { data: row, error: null };
+    }
     const row = db.cultures.find((c) => c.id === filters.id && (!("organization_id" in filters) || c.organization_id === filters.organization_id));
     const visible = role === "admin" || db.visible.includes(filters.id);
-    return { data: row && visible ? { ...row } : null, error: row && visible ? null : { message: "not found" } };
+    return { data: row && visible ? { ...row } : null, error: row && visible ? null : { message: "not found" };
   };
   const b: Json = {
     select: () => b,
@@ -91,7 +95,7 @@ function page(id: string, cultureId: string, dbId = DB_ID, extra: Json = {}) {
   };
 }
 
-function reset(overrides: { env?: Json; notion?: typeof notion; cultures?: Json[]; visible?: string[]; userOk?: boolean; updateError?: string; lockBusy?: boolean } = {}) {
+function reset(overrides: { env?: Json; notion?: typeof notion; cultures?: Json[]; visible?: string[]; userOk?: boolean; membershipRole?: string | null; updateError?: string; lockBusy?: boolean } = {}) {
   env = {
     SUPABASE_URL: "http://sb.test", SUPABASE_PUBLISHABLE_KEY: "pub", SUPABASE_SECRET_KEY: "svc",
     NOTION_API_KEY: "test-token-not-a-secret", NOTION_CULTURES_DATABASE_ID: DB_ID, ...(overrides.env ?? {}),
@@ -137,6 +141,10 @@ await test("session invalide : 401 et aucun appel Notion", async () => {
 await test("culture non visible par l'utilisateur (RLS) : 404, rien n'est écrit", async () => {
   reset({ visible: [] }); const r = await call();
   eq(r.status, 404, "status"); eq(notionCalls.length, 0, "notion calls"); eq(updates.length, 0, "updates");
+});
+await test("viewer peut lire la culture mais ne peut pas déclencher une synchronisation privilégiée", async () => {
+  reset({ membershipRole: "viewer" }); const r = await call();
+  eq(r.status, 403, "status"); eq(notionCalls.length, 0, "notion calls"); eq(updates.length, 0, "updates");
 });
 await test("secret de base Notion invalide : 503 sans appel Notion", async () => {
   reset({ env: { NOTION_CULTURES_DATABASE_ID: "pas-un-uuid" } }); const r = await call();
