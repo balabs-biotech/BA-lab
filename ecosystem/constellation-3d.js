@@ -1,13 +1,18 @@
-// Use a second CDN if the primary module host is unavailable on the visitor's network.
+// A stalled CDN must never block the entire public interface. Give each pinned
+// Three.js module host a bounded window, then move to the next one.
+const importThreeWithTimeout=(url,host,timeoutMs=8000)=>Promise.race([
+  import(url),
+  new Promise((_,reject)=>setTimeout(()=>reject(new Error(host+' did not respond within '+timeoutMs+' ms')),timeoutMs))
+]);
 let THREE;
 try{
-  THREE=await import('https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js');
+  THREE=await importThreeWithTimeout('https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js','jsDelivr');
 }catch(primaryImportError){
   try{
-    THREE=await import('https://unpkg.com/three@0.169.0/build/three.module.js');
+    THREE=await importThreeWithTimeout('https://unpkg.com/three@0.169.0/build/three.module.js','unpkg');
   }catch(secondaryImportError){
     try{
-      THREE=await import('https://esm.sh/three@0.169.0');
+      THREE=await importThreeWithTimeout('https://esm.sh/three@0.169.0','esm.sh');
     }catch(fallbackImportError){
       console.error('BALabs 3D engine could not be loaded from the available module hosts.',primaryImportError,secondaryImportError,fallbackImportError);
     }
@@ -122,6 +127,8 @@ else if(root){
     const tex=new THREE.CanvasTexture(cv);tex.colorSpace=THREE.SRGBColorSpace;
     const spr=new THREE.Sprite(new THREE.SpriteMaterial({map:tex,transparent:true,depthWrite:false,depthTest:false}));spr.scale.set(2.5,.62,1);spr.renderOrder=20;return spr;
   };
+  // Shared by the anastomosis builder and the relay animator below init().
+  let junctionPaths=[];
   function init(){
     try{
       renderer=new THREE.WebGLRenderer({antialias:true,alpha:true,powerPreference:'high-performance'});
@@ -412,7 +419,7 @@ else if(root){
         ['myco','learn'],['lab','learn'],['products','iot'],['soil','products']
       ];
       const mycelialTips=[];
-      const junctionPaths=[];
+      junctionPaths.length=0;
       for(const [a,b] of pairs){const pa=points.find(p=>p.id===a),pb=points.find(p=>p.id===b);if(!pa||!pb)continue;
         const delta=pb.base.clone().sub(pa.base);
         const axis=new THREE.Vector3().crossVectors(delta,new THREE.Vector3(.31,.87,.43)).normalize();
