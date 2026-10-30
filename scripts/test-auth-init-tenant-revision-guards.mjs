@@ -178,6 +178,9 @@ assert.equal((batchDetail.match(/if \(requestId !== batchDetailRequestId \|\| !i
 assert.match(batchDetail,
   /catch \(error\) \{\s*if \(requestId !== batchDetailRequestId \|\| !isCurrentWorkspaceRevision\(loadRevision, loadOrganizationId\)\) return;/,
   "batch detail loader must suppress errors from rejected requests after a workspace transition");
+assert.ok(batchDetail.indexOf("selectedBatch = batch;") > batchDetail.indexOf('from("batch_qc_checks")'),
+  "batch detail loader must commit the selected batch only after required detail reads complete");
+
 
 
 const lineage = getFunctionBlock("loadBiologicalLineage");
