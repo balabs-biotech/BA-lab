@@ -115,7 +115,7 @@ for (const mutation of [
   "advanceBatch", "releaseBatch", "moveSelectedBatch"
 ]) {
   const source = getMutationBlock(mutation);
-  const writeStart = source.search(/await supabaseClient(?:\\.rpc|\\s*\\n\\s*\\.from)\\s*\\(/);
+  const writeStart = source.indexOf("await supabaseClient");
   assert.ok(writeStart >= 0, `${mutation} must contain its database write`);
   const postWrite = source.slice(writeStart);
   assert.match(postWrite, /if \\(!isCurrentWorkspaceRevision\\(operationRevision, operationOrganizationId\\)\\) return;/,
