@@ -1029,8 +1029,84 @@ function applyFocus(id,on=true){if(!mainView.classList.contains('universe-open')
 function setLanguage(l){lang=l;document.documentElement.lang=l;app.dir=l==='ar'?'rtl':'ltr';document.querySelectorAll('[data-lang]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.lang===l)));document.querySelectorAll('[data-i18n]').forEach(el=>{const k=el.dataset.i18n;if(T[l][k]!==undefined)el.textContent=T[l][k]});document.querySelectorAll('[data-i18n-html]').forEach(el=>el.innerHTML=T[l][el.dataset.i18nHtml]);document.querySelectorAll('[data-sphere-title]').forEach(el=>el.textContent=T[l].sphere[el.dataset.sphereTitle][0]);document.querySelectorAll('[data-sphere-sub]').forEach(el=>el.textContent=T[l].sphere[el.dataset.sphereSub][1]);if(!miniView.hidden)enterSphere(selected,false)}
 function drawMiniConnections(){const map=document.getElementById('miniMap'),svg=document.getElementById('miniConnections'),group=document.getElementById('miniEdges');if(!map||!svg||!group||miniView.hidden)return;const r=map.getBoundingClientRect();if(!r.width||!r.height)return;svg.setAttribute('viewBox','0 0 '+r.width+' '+r.height);group.replaceChildren();const core=map.querySelector('.mini-core');if(!core)return;const center=el=>{const b=el.getBoundingClientRect();return{x:b.left-r.left+b.width/2,y:b.top-r.top+b.height/2}};const a=center(core);map.querySelectorAll('.linknode').forEach(node=>{const b=center(node),line=document.createElementNS('http://www.w3.org/2000/svg','line');line.setAttribute('x1',a.x);line.setAttribute('y1',a.y);line.setAttribute('x2',b.x);line.setAttribute('y2',b.y);group.appendChild(line)});}
 function renderSphereHops(id){const wrap=document.getElementById('sphereHops'),title=document.getElementById('sphereHopsTitle');if(!wrap||!title)return;title.textContent=T[lang].adjacentTitle;wrap.querySelectorAll('button').forEach(b=>b.remove());const seen=new Set();relatedPairs.forEach(([a,b])=>{let other=null;if(a===id)other=b;else if(b===id)other=a;if(!other||seen.has(other))return;seen.add(other);const node=document.querySelector('[data-sphere="'+other+'"]'),button=document.createElement('button');button.type='button';button.className='sphere-hop';button.style.setProperty('--c',getComputedStyle(node).getPropertyValue('--c').trim()||'var(--lime)');button.textContent=T[lang].sphere[other][0];button.addEventListener('click',()=>enterSphere(other));wrap.appendChild(button)});}
+const resourceExplanations={
+myco:{
+fr:[
+"Les ressources fongiques regroupent les organismes, souches et matières biologiques qui servent de point de départ aux cultures. Elles permettent de découvrir la diversité des champignons et les ressources mobilisables en mycologie appliquée.",
+"Le substrat est le milieu dans lequel le mycélium se développe. Sa composition, sa structure, son humidité et sa préparation influencent la colonisation : cette rubrique présente les relations entre matières premières et croissance fongique.",
+"Pleurotus rassemble des espèces cultivées étudiées pour leur capacité à coloniser différents substrats et à produire des fructifications. Explorez leurs caractéristiques, leurs besoins et les pistes de valorisation.",
+"Les applications mycologiques montrent comment les propriétés des champignons et du mycélium peuvent être mobilisées : transformation de matières organiques, procédés de culture, biomatériaux et autres pistes biologiques.",
+"Le catalogue rassemble les produits, cultures et ressources proposés par BA Labs. Chaque fiche permet de comprendre l’usage prévu, le contenu et les modalités d’accès à la ressource.",
+"Cette rubrique présente des travaux conduits ou documentés par BA Labs : questions étudiées, démarches expérimentales, observations et résultats partageables."
+],
+en:[
+"Fungal resources bring together organisms, strains and biological materials used as starting points for cultivation. Discover fungal diversity and the resources that support applied mycology.",
+"A substrate is the medium in which mycelium grows. Its composition, structure, moisture and preparation affect colonisation; this section explores how raw materials shape fungal growth.",
+"Pleurotus covers cultivated species known for colonising a range of substrates and producing fruiting bodies. Explore their traits, growth requirements and potential uses.",
+"Mycological applications show how fungal and mycelial properties can be put to work, from organic-matter processing and cultivation methods to biomaterials and other biological approaches.",
+"The catalogue brings together products, cultures and resources offered by BA Labs. Each page explains the intended use, contents and how to access the resource.",
+"This section presents work conducted or documented by BA Labs, including research questions, experimental approaches, observations and shareable findings."
+],
+ar:[
+"تجمع الموارد الفطرية الكائنات والسلالات والمواد البيولوجية التي تُستخدم نقطةَ انطلاق للزراعة. اكتشف تنوّع الفطريات والموارد التي تدعم علم الفطريات التطبيقي.",
+"الركيزة هي الوسط الذي ينمو فيه الميسيليوم. ويؤثر تركيبها وبنيتها ورطوبتها وطريقة تحضيرها في الاستعمار الفطري؛ تعرض هذه الصفحة علاقة المواد الأولية بنمو الفطريات.",
+"يشمل جنس Pleurotus أنواعاً مزروعة قادرة على استعمار ركائز مختلفة وإنتاج الأجسام الثمرية. تعرّف على خصائصها ومتطلبات نموها وإمكانات استعمالها.",
+"توضح التطبيقات الفطرية كيف يمكن الاستفادة من خصائص الفطريات والميسيليوم، مثل تحويل المواد العضوية وطرق الزراعة والمواد الحيوية ومسارات تطبيقية أخرى.",
+"يجمع الكتالوج المنتجات والمزارع والموارد التي تقدمها BA Labs. وتشرح كل صفحة الاستخدام المقصود والمحتوى وطريقة الوصول إلى المورد.",
+"يعرض هذا القسم الأعمال التي أنجزتها أو وثّقتها BA Labs، بما فيها أسئلة البحث والمناهج التجريبية والملاحظات والنتائج القابلة للمشاركة."
+],
+pt:[
+"Os recursos fúngicos reúnem organismos, estirpes e materiais biológicos que servem de ponto de partida para o cultivo. Descubra a diversidade dos fungos e os recursos usados na micologia aplicada.",
+"O substrato é o meio onde o micélio se desenvolve. A sua composição, estrutura, humidade e preparação influenciam a colonização; esta secção explora a relação entre matérias-primas e crescimento fúngico.",
+"Pleurotus inclui espécies cultivadas capazes de colonizar diferentes substratos e produzir corpos frutíferos. Explore as suas características, necessidades de crescimento e aplicações potenciais.",
+"As aplicações micológicas mostram como as propriedades dos fungos e do micélio podem ser aproveitadas: transformação de matéria orgânica, métodos de cultivo, biomateriais e outras abordagens biológicas.",
+"O catálogo reúne produtos, culturas e recursos disponibilizados pela BA Labs. Cada página explica a utilização prevista, o conteúdo e como aceder ao recurso.",
+"Esta secção apresenta trabalhos realizados ou documentados pela BA Labs: questões estudadas, abordagens experimentais, observações e resultados que podem ser partilhados."
+]
+}
+};
+function resourceDescription(id,index,title){
+ const langKey=lang==='ar'?'ar':lang==='pt'?'pt':lang==='en'?'en':'fr';
+ const exact=resourceExplanations[id]?.[langKey]?.[index];
+ if(exact)return exact;
+ const copy={
+ fr:[
+ "Cette rubrique présente les notions et ressources essentielles du domaine, avec des repères pour comprendre les organismes, les matières et les procédés concernés.",
+ "Explorez les principes et les méthodes qui relient les différentes composantes de ce domaine, ainsi que leurs conditions d’utilisation.",
+ "Découvrez des exemples concrets d’application et les questions scientifiques ou techniques qu’ils permettent d’explorer.",
+ "Retrouvez des fiches et ressources pour approfondir les méthodes, les observations et les connaissances utiles.",
+ "Cette page rassemble des projets documentés, leurs objectifs, les démarches suivies et les enseignements qui peuvent en être tirés.",
+ "Parcourez l’ensemble de la rubrique pour retrouver ses thèmes, ses ressources et ses contenus détaillés."
+ ],
+ en:[
+ "This section introduces the field’s key concepts and resources, helping visitors understand the organisms, materials and processes involved.",
+ "Explore the principles and methods that connect the different parts of this field, along with the conditions for using them.",
+ "Discover practical applications and the scientific or technical questions they help investigate.",
+ "Find reference sheets and resources for exploring useful methods, observations and knowledge in greater depth.",
+ "This page brings together documented projects, their goals, approaches and the lessons that can be drawn from them.",
+ "Explore the full section to find its themes, resources and detailed content."
+ ],
+ ar:[
+ "يعرض هذا القسم المفاهيم والموارد الأساسية في المجال، ويساعد الزائر على فهم الكائنات والمواد والعمليات المعنية.",
+ "اكتشف المبادئ والأساليب التي تربط مكوّنات هذا المجال، والظروف المناسبة لاستخدامها.",
+ "تعرّف على تطبيقات عملية والأسئلة العلمية أو التقنية التي تتيح دراستها.",
+ "تجد هنا بطاقات وموارد تساعد على التعمق في الأساليب والملاحظات والمعارف المفيدة.",
+ "تجمع هذه الصفحة المشاريع الموثقة وأهدافها ومناهج العمل والدروس المستخلصة منها.",
+ "استكشف القسم كاملاً للوصول إلى مواضيعه وموارده ومحتواه التفصيلي."
+ ],
+ pt:[
+ "Esta secção apresenta os conceitos e recursos essenciais da área, ajudando a compreender os organismos, materiais e processos envolvidos.",
+ "Explore os princípios e métodos que ligam as diferentes componentes desta área e as condições da sua utilização.",
+ "Descubra aplicações práticas e as questões científicas ou técnicas que permitem investigar.",
+ "Consulte fichas e recursos para aprofundar métodos, observações e conhecimentos úteis.",
+ "Esta página reúne projetos documentados, os seus objetivos, abordagens e aprendizagens.",
+ "Explore a secção completa para encontrar os seus temas, recursos e conteúdos detalhados."
+ ]
+ };
+ return (copy[langKey]||copy.fr)[Math.min(index,5)];
+}
 function showResource(index,title,url,description){const panel=document.getElementById('resourceDetail');document.getElementById('resourceDetailKicker').textContent=(lang==='fr'?'ÉTAPE 02 · EXPLORATION':lang==='en'?'STEP 02 · DISCOVERY':lang==='ar'?'الخطوة 02 · استكشاف':'ETAPA 02 · DESCOBERTA');document.getElementById('resourceDetailTitle').textContent=title;document.getElementById('resourceDetailText').textContent=description;const open=document.getElementById('resourceOpen');open.href=url;open.textContent=lang==='fr'?'Accéder à cette ressource ↗':lang==='en'?'Open this resource ↗':lang==='ar'?'فتح هذا المورد ↗':'Abrir este recurso ↗';document.getElementById('resourceBack').textContent=lang==='fr'?'← Retour aux thèmes':lang==='en'?'← Back to themes':lang==='ar'?'→ العودة إلى المواضيع':'← Voltar aos temas';panel.hidden=false;panel.scrollIntoView({behavior:'smooth',block:'center'});}document.getElementById('resourceBack').addEventListener('click',()=>{document.getElementById('resourceDetail').hidden=true;document.getElementById('miniMap').scrollIntoView({behavior:'smooth',block:'center'});});
-function enterSphere(id,scroll=true){selected=id;const d=pages[id],tx=T[lang];if(mainView.classList.contains('universe-closed'))toggleUniverse();mainView.hidden=false;miniView.hidden=false;homeBtn.hidden=false;sceneTitle.textContent=tx.sphere[id][0];document.getElementById('miniKicker').textContent=tx.tag+' '+String(['bio','myco','soil','lab','products','iot','work','learn'].indexOf(id)+1).padStart(2,'0');document.getElementById('miniTitle').textContent=tx.sphere[id][0];document.getElementById('miniDesc').textContent=tx.desc[id];document.getElementById('spherePage').textContent=lang==='fr'?'Parcourir les thèmes ↓':lang==='en'?'Browse themes ↓':lang==='ar'?'استكشف المواضيع ↓':'Explorar temas ↓';document.getElementById('spherePage').href='#miniMap';document.getElementById('resourceDetail').hidden=true;document.querySelector('.mini-map').style.setProperty('--sphere-color',getComputedStyle(document.querySelector('[data-sphere="'+id+'"]')).getPropertyValue('--c').trim()||'var(--lime)');const links=document.querySelectorAll('.linknode');const list=(localizedLinks[id]&&localizedLinks[id][lang])||((lang==='fr')?d.links:d.links.map((p,i)=>[tx.node[Math.min(i,5)],d[lang]||roots[lang]]));list.forEach((p,i)=>{const a=links[i];a.dataset.resourceIndex=String(i);a.dataset.resourceUrl=p[1];a.querySelector('span').textContent=String(i+1).padStart(2,'0')+' / '+(lang==='fr'?'THÈME':lang==='en'?'THEME':lang==='ar'?'موضوع':'TEMA');a.querySelector('b').textContent=p[0];a.querySelector('small').textContent=tx.nodeSub[i]||tx.nodeSub[5];a.onclick=(event)=>{event.preventDefault();showResource(i,p[0],p[1],a.querySelector('small').textContent)}});links[5].dataset.resourceUrl=d[lang]||roots[lang];links[5].querySelector('b').textContent=tx.full;links[5].querySelector('small').textContent=tx.nodeSub[5];links[5].onclick=(event)=>{event.preventDefault();showResource(5,tx.full,d[lang]||roots[lang],tx.nodeSub[5])};renderSphereHops(id);requestAnimationFrame(drawMiniConnections);document.querySelectorAll('.sphere').forEach(s=>s.classList.toggle('active',s.dataset.sphere===id));if(scroll)document.querySelector('.miniintro')?.scrollIntoView({behavior:'smooth',block:'start'})}
+function enterSphere(id,scroll=true){selected=id;const d=pages[id],tx=T[lang];if(mainView.classList.contains('universe-closed'))toggleUniverse();mainView.hidden=false;miniView.hidden=false;homeBtn.hidden=false;sceneTitle.textContent=tx.sphere[id][0];document.getElementById('miniKicker').textContent=tx.tag+' '+String(['bio','myco','soil','lab','products','iot','work','learn'].indexOf(id)+1).padStart(2,'0');document.getElementById('miniTitle').textContent=tx.sphere[id][0];document.getElementById('miniDesc').textContent=tx.desc[id];document.getElementById('spherePage').textContent=lang==='fr'?'Parcourir les thèmes ↓':lang==='en'?'Browse themes ↓':lang==='ar'?'استكشف المواضيع ↓':'Explorar temas ↓';document.getElementById('spherePage').href='#miniMap';document.getElementById('resourceDetail').hidden=true;document.querySelector('.mini-map').style.setProperty('--sphere-color',getComputedStyle(document.querySelector('[data-sphere="'+id+'"]')).getPropertyValue('--c').trim()||'var(--lime)');const links=document.querySelectorAll('.linknode');const list=(localizedLinks[id]&&localizedLinks[id][lang])||((lang==='fr')?d.links:d.links.map((p,i)=>[tx.node[Math.min(i,5)],d[lang]||roots[lang]]));list.forEach((p,i)=>{const a=links[i];a.dataset.resourceIndex=String(i);a.dataset.resourceUrl=p[1];a.querySelector('span').textContent=String(i+1).padStart(2,'0')+' / '+(lang==='fr'?'THÈME':lang==='en'?'THEME':lang==='ar'?'موضوع':'TEMA');a.querySelector('b').textContent=p[0];a.querySelector('small').textContent=tx.nodeSub[i]||tx.nodeSub[5];a.onclick=(event)=>{event.preventDefault();showResource(i,p[0],p[1],resourceDescription(id,i,p[0]))}});links[5].dataset.resourceUrl=d[lang]||roots[lang];links[5].querySelector('b').textContent=tx.full;links[5].querySelector('small').textContent=tx.nodeSub[5];links[5].onclick=(event)=>{event.preventDefault();showResource(5,tx.full,d[lang]||roots[lang],resourceDescription(id,5,tx.full))};renderSphereHops(id);requestAnimationFrame(drawMiniConnections);document.querySelectorAll('.sphere').forEach(s=>s.classList.toggle('active',s.dataset.sphere===id));if(scroll)document.querySelector('.miniintro')?.scrollIntoView({behavior:'smooth',block:'start'})}
 window.enterSphere=enterSphere;
 function goHome(){miniView.hidden=true;mainView.hidden=false;mainView.classList.add('universe-closed');mainView.classList.remove('universe-open','has-focus','dragging');document.getElementById('networkEdges')?.replaceChildren();homeBtn.hidden=true;sceneTitle.textContent=tr('sceneTitle');document.querySelectorAll('.sphere').forEach(s=>{s.classList.toggle('active',s.dataset.sphere===selected);s.classList.remove('focused')});applyOrbit()}
 document.querySelectorAll('[data-lang]').forEach(b=>b.addEventListener('click',()=>setLanguage(b.dataset.lang)));document.querySelectorAll('[data-sphere]').forEach(b=>{b.addEventListener('click',()=>enterSphere(b.dataset.sphere));b.addEventListener('mouseenter',()=>applyFocus(b.dataset.sphere,true));b.addEventListener('mouseleave',()=>applyFocus(selected,false));b.addEventListener('focus',()=>applyFocus(b.dataset.sphere,true));b.addEventListener('blur',()=>applyFocus(selected,false));});homeBtn.addEventListener('click',goHome);openUniverse.addEventListener('click',toggleUniverse);mainView.addEventListener('pointerdown',beginOrbit);mainView.addEventListener('pointermove',moveOrbit);mainView.addEventListener('pointerup',endOrbit);mainView.addEventListener('pointercancel',endOrbit);window.addEventListener('resize',()=>{applyOrbit();drawMiniConnections()});
