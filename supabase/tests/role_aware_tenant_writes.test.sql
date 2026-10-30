@@ -91,6 +91,40 @@ begin
   end;
 
   begin
+    perform public.record_manual_measurement(
+      jsonb_build_object('organization_id', '00000000-0000-0000-0000-0000000000a1',
+                         'event_type', 'measurement_recorded'),
+      jsonb_build_object('variable_code', 'viewer-test', 'raw_value', 1,
+                         'raw_unit_code', 'unit')
+    );
+    raise exception 'FAIL: viewer wrote a manual measurement';
+  exception when insufficient_privilege then
+    null;
+  end;
+
+  begin
+    perform public.record_manual_observation(
+      jsonb_build_object('organization_id', '00000000-0000-0000-0000-0000000000a1',
+                         'event_type', 'observation_recorded'),
+      jsonb_build_object('variable_code', 'viewer-test', 'value_text', 'must fail')
+    );
+    raise exception 'FAIL: viewer wrote a manual observation';
+  exception when insufficient_privilege then
+    null;
+  end;
+
+  begin
+    perform public.record_biological_operation(
+      '00000000-0000-0000-0000-0000000000a1',
+      '00000000-0000-0000-0000-0000000000d1',
+      'repiquage'
+    );
+    raise exception 'FAIL: viewer recorded a biological operation';
+  exception when insufficient_privilege then
+    null;
+  end;
+
+  begin
     perform public.create_batch_with_stages(
       '00000000-0000-0000-0000-0000000000a1',
       'VIEWER-BATCH-MUST-FAIL', 'Viewer batch', 'FORMULATION',
@@ -136,7 +170,10 @@ begin
     'public.advance_batch_stage(uuid,text)'::regprocedure,
     'public.release_batch(uuid)'::regprocedure,
     'public.move_batch_to_location(uuid,uuid,uuid,text)'::regprocedure,
-    'public.record_batch_harvest(uuid,numeric,text,text)'::regprocedure
+    'public.record_batch_harvest(uuid,numeric,text,text)'::regprocedure,
+    'public.record_manual_measurement(jsonb,jsonb)'::regprocedure,
+    'public.record_manual_observation(jsonb,jsonb)'::regprocedure,
+    'public.record_biological_operation(uuid,uuid,text,timestamptz,text,jsonb,text[])'::regprocedure
   ] loop
     select pg_get_functiondef(v_signature) into v_definition;
     if v_definition like '%private.is_org_member(%' then
