@@ -290,6 +290,9 @@ const cultureSessionContext = {
   protocolSelect: { value: "" },
   startedAtInput: { value: "" },
   termsAcceptedCheckbox: { checked: true, focus() {} },
+  isCurrentWorkspaceRevision(revision, organizationId) {
+    return revision === 1 && organizationId === "org-test";
+  },
   getCurrentSession: async () => { throw new Error("Session provider unavailable"); }
 };
 await assert.doesNotReject(
