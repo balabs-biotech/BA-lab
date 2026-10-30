@@ -27,26 +27,16 @@
               "title": "Autres champignons cultivés et étudiés",
               "notionId": "40073152f171813e9a83fb6e0a8c474a",
               "url": "https://app.notion.com/p/40073152f171813e9a83fb6e0a8c474a"
-            },
-            {
-              "id": "myco-resource-pleurotus",
-              "title": "Pleurotus — espèces et ressources cultivées",
-              "notionId": "40073152f17181d1822cfb0e92d55485",
-              "url": "https://app.notion.com/p/40073152f17181d1822cfb0e92d55485"
-            },
-            {
-              "id": "myco-resource-other-fungi",
-              "title": "Autres champignons cultivés et étudiés",
-              "notionId": "40073152f171813e9a83fb6e0a8c474a",
-              "url": "https://app.notion.com/p/40073152f171813e9a83fb6e0a8c474a"
             }
-          ]
+          ],
+          "description": "Panorama des champignons documentés par BA Labs : espèces étudiées, ressources de culture et groupes biologiques, avec des fiches dont le niveau de détail dépend des données disponibles."
         },
         {
           "id": "myco-culture",
           "title": "Culture & multiplication",
           "notionId": "3e273152f171817c82bdee3cf1c68bb8",
-          "url": "https://app.notion.com/p/3e273152f171817c82bdee3cf1c68bb8"
+          "url": "https://app.notion.com/p/3e273152f171817c82bdee3cf1c68bb8",
+          "description": "Du maintien des cultures à leur amplification et aux essais de fructification : les étapes sont suivies avec des contrôles avant chaque transfert."
         },
         {
           "id": "myco-interactions",
@@ -66,13 +56,15 @@
               "notionId": "3ff73152f17181159f8dfd6c430fba1d",
               "url": "https://app.notion.com/p/3ff73152f17181159f8dfd6c430fba1d"
             }
-          ]
+          ],
+          "description": "Explorer les interactions entre champignons, microorganismes et plantes, sans confondre intérêt scientifique général et symbiose déjà validée par BA Labs."
         },
         {
           "id": "myco-applications",
           "title": "Applications mycologiques",
           "notionId": "3e273152f1718144bb67d07e93c3aa2d",
-          "url": "https://app.notion.com/p/3e273152f1718144bb67d07e93c3aa2d"
+          "url": "https://app.notion.com/p/3e273152f1718144bb67d07e93c3aa2d",
+          "description": "Découvrir les champs d’application de la mycologie, de la transformation de matières aux interactions biologiques, en distinguant les pistes scientifiques des solutions validées."
         }
       ]
     },
@@ -130,7 +122,8 @@
               "notionId": "3ff73152f17181cf8346d696db59ae79",
               "url": "https://app.notion.com/p/3ff73152f17181cf8346d696db59ae79"
             }
-          ]
+          ],
+          "description": "Présentation des microorganismes étudiés par BA Labs, notamment Bacillus, Trichoderma et des ressources bactériennes ; l’intérêt dépend de la souche, du support et de l’usage étudié."
         },
         {
           "id": "bio-biostimulants",
