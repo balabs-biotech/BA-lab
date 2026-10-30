@@ -115,10 +115,13 @@ for (const mutation of [
   "advanceBatch", "releaseBatch", "moveSelectedBatch"
 ]) {
   const source = getMutationBlock(mutation);
-  const writeStart = source.indexOf("await supabaseClient");
+  const writeMarker = mutation === "saveQcCheckNow"
+    ? '.from("batch_qc_checks")'
+    : "await supabaseClient.rpc(";
+  const writeStart = source.indexOf(writeMarker);
   assert.ok(writeStart >= 0, `${mutation} must contain its database write`);
-  const postWrite = source.slice(writeStart);
-  assert.match(postWrite, /if \(!isCurrentWorkspaceRevision\(operationRevision, operationOrganizationId\)\) return;/,
+  const afterWrite = source.slice(writeStart);
+  assert.match(afterWrite, /if \(!isCurrentWorkspaceRevision\(operationRevision, operationOrganizationId\)\) return;/,
     `${mutation} must stop stale UI effects after its database write`);
 }
 
