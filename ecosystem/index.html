@@ -918,6 +918,249 @@ h1 span{font-style:italic!important;color:var(--field-rust)!important}
 .hero-action-secondary:hover{color:#fff;border-color:#B96B4D}
 @media(max-width:760px){.hero-actions{gap:12px;margin-top:22px}.hero-actions a{font-size:8px;letter-spacing:.08em}.hero-action-primary{padding:13px 12px}.hero-action-secondary{padding:12px 0}}
 @media(prefers-reduced-motion:reduce){.hero-actions a{transition:none}}
+
+/* Editorial refinement 02 — lighten the public reading experience.
+   Scope is intentionally limited to the editorial shell; the 3D explorer stays untouched. */
+.top{
+  background:#e9e8df!important;
+  border-bottom:1px solid #c2c8bd!important;
+}
+.brand strong{color:#111b1d!important}
+.brand small{color:#58665f!important}
+.mark{
+  background:#263b38!important;
+  color:#eeeade!important;
+  border:1px solid #b96b4d!important;
+  box-shadow:3px 3px 0 #b96b4d!important;
+}
+.tools{gap:8px!important}
+.lang{
+  background:#f4f1e8!important;
+  color:#263b38!important;
+  border:1px solid #b9c1b6!important;
+}
+.lang[aria-pressed=true]{
+  background:#263b38!important;
+  color:#eeeade!important;
+  border-color:#b96b4d!important;
+}
+.lang:hover{background:#b96b4d!important;color:#fff!important}
+.site-nav{
+  background:#263b38!important;
+  border-color:#52665d!important;
+}
+.site-nav a{color:#eeeade!important}
+.site-nav a:hover,.site-nav a:focus-visible{color:#fff!important}
+.hero{
+  position:relative!important;
+  isolation:isolate!important;
+  background:#e9e8df!important;
+  color:#111b1d!important;
+  border-bottom:1px solid #c2c8bd!important;
+}
+.hero:before{
+  content:""!important;
+  position:absolute!important;
+  z-index:-1!important;
+  inset:0!important;
+  background:linear-gradient(90deg,#e9e8dff7 0%,#e9e8dfe8 42%,#e9e8df8a 76%,#e9e8df35 100%)!important;
+  pointer-events:none!important;
+}
+.hero .hero-micrograph{
+  z-index:-2!important;
+  filter:grayscale(.72) contrast(1.04) brightness(.92)!important;
+  opacity:.58!important;
+}
+.hero .eyebrow{color:#99563f!important}
+.hero h1,.hero h1 span{color:#111b1d!important}
+.hero h1 span{font-style:italic!important;color:#526b5f!important}
+.hero p{color:#43534c!important}
+.hero .aside{
+  background:linear-gradient(145deg,#263b38,#182a27)!important;
+  border-left:2px solid #b96b4d!important;
+  color:#e9e8df!important;
+  box-shadow:0 18px 42px #111b1d22!important;
+}
+.hero .aside b{color:#fff!important}
+.hero-credit{color:#59665e!important}
+.hero-action-primary{box-shadow:0 7px 18px #111b1d18!important}
+.editorial-feature{box-shadow:0 18px 48px #111b1d0c!important}
+.editorial-work{border-top:1px solid #c3c9bf!important}
+.work-grid{box-shadow:0 14px 36px #111b1d0c!important}
+@media(max-width:760px){
+  .top{align-items:center!important;flex-wrap:wrap!important;gap:12px!important;padding:12px 10px!important}
+  .tools{justify-content:flex-start!important;width:100%!important}
+  .lang{padding:7px 10px!important;font-size:10px!important}
+  .site-nav{
+    justify-content:flex-start!important;
+    gap:18px!important;
+    overflow-x:auto!important;
+    overflow-y:hidden!important;
+    white-space:nowrap!important;
+    scrollbar-width:none!important;
+    -webkit-overflow-scrolling:touch!important;
+    padding:0 12px!important;
+  }
+  .site-nav::-webkit-scrollbar{display:none!important}
+  .site-nav a{flex:0 0 auto!important;font-size:9px!important;letter-spacing:.09em!important}
+  .hero{padding:48px 20px 34px!important;min-height:0!important}
+  .hero:before{background:linear-gradient(90deg,#e9e8dff5 0%,#e9e8dfdf 70%,#e9e8df9c 100%)!important}
+  .hero .hero-micrograph{opacity:.32!important;object-position:65% center!important}
+  .hero .aside{margin-top:10px!important;padding:16px 18px!important;border-left:2px solid #b96b4d!important}
+}
+@media(prefers-reduced-motion:reduce){
+  .site-nav a,.lang{transition:none!important}
+}
+
+
+/* Editorial refinement 03 — photographic domain cards.
+   Only the editorial work section is restyled; explorer/3D markup and scripts are untouched. */
+.editorial-work{
+  background:#e9e8df!important;
+  color:#111b1d!important;
+  border-top:1px solid #c4c9bf!important;
+}
+.editorial-work .work-heading h2{color:#111b1d!important}
+.editorial-work .work-heading h2 em{color:#52645d!important}
+.editorial-work .work-heading .eyebrow{color:#99563f!important}
+.editorial-work .work-heading>p{color:#465650!important}
+.editorial-work .work-grid{
+  grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  align-items:stretch!important;
+  gap:16px!important;
+  background:transparent!important;
+}
+.editorial-work .work-card,
+.editorial-work .work-myco,
+.editorial-work .work-soil,
+.editorial-work .work-iot{
+  position:relative!important;
+  display:flex!important;
+  flex-direction:column!important;
+  min-width:0!important;
+  padding:0 0 24px!important;
+  overflow:hidden!important;
+  background:#f3f0e7!important;
+  border:1px solid #c5cabe!important;
+  border-top:3px solid #b96b4d!important;
+  box-shadow:0 8px 24px #111b1d0b!important;
+  transition:transform .25s ease,box-shadow .25s ease,border-color .25s ease!important;
+}
+.editorial-work .work-soil{background:#e2e7dc!important;border-top-color:#788b72!important}
+.editorial-work .work-iot{background:#e1e8e7!important;border-top-color:#718f98!important}
+.editorial-work .work-card:hover{
+  transform:translateY(-5px)!important;
+  box-shadow:0 16px 34px #111b1d18!important;
+}
+.editorial-work .work-card:before,
+.editorial-work .work-card:after{display:none!important;content:none!important}
+.editorial-work .work-media{
+  order:0!important;
+  position:relative!important;
+  display:block!important;
+  width:100%!important;
+  margin:0 0 22px!important;
+  overflow:hidden!important;
+  background:#d1d0c5!important;
+}
+.editorial-work .work-media img{
+  display:block!important;
+  width:100%!important;
+  height:clamp(190px,19vw,270px)!important;
+  max-height:none!important;
+  object-fit:cover!important;
+  filter:none!important;
+  transition:transform .55s cubic-bezier(.2,.65,.25,1)!important;
+}
+.editorial-work .work-card:hover .work-media img{transform:scale(1.035)!important}
+.editorial-work .work-media figcaption{
+  min-height:29px!important;
+  padding:8px 18px 0!important;
+  color:#58665f!important;
+  font:8px/1.4 ui-monospace,monospace!important;
+  letter-spacing:.035em!important;
+}
+.editorial-work .work-media figcaption a{
+  color:inherit!important;
+  border-color:#aab4a9!important;
+}
+.editorial-work .work-card>.work-index,
+.editorial-work .work-card>h3,
+.editorial-work .work-card>p,
+.editorial-work .work-card>.work-tag,
+.editorial-work .work-card>.work-card-link,
+.editorial-work .work-card .work-topics{
+  margin-left:22px!important;
+  margin-right:22px!important;
+}
+.editorial-work .work-card>.work-index{
+  order:1!important;
+  margin-top:0!important;
+  margin-bottom:14px!important;
+  color:#99563f!important;
+}
+.editorial-work .work-soil>.work-index{color:#52694e!important}
+.editorial-work .work-iot>.work-index{color:#4e6b74!important}
+.editorial-work .work-card>h3{
+  order:2!important;
+  margin-top:0!important;
+  margin-bottom:12px!important;
+  color:#111b1d!important;
+}
+.editorial-work .work-card>p:not(.work-topics){
+  order:3!important;
+  color:#465650!important;
+}
+.editorial-work .work-card .work-topics{
+  order:4!important;
+  color:#52645d!important;
+  border-color:#c2c9bd!important;
+}
+.editorial-work .work-soil .work-topics{border-color:#aeb9a9!important}
+.editorial-work .work-iot .work-topics{border-color:#aab9b9!important}
+.editorial-work .work-card>.work-tag{
+  order:5!important;
+  margin-top:22px!important;
+  color:#99563f!important;
+  border-color:#c5cabe!important;
+}
+.editorial-work .work-soil>.work-tag{color:#52694e!important}
+.editorial-work .work-iot>.work-tag{color:#4e6b74!important}
+.editorial-work .work-card>.work-card-link{
+  order:6!important;
+  margin-top:auto!important;
+  padding-top:15px!important;
+  color:#111b1d!important;
+  border-color:#b9c1b6!important;
+}
+.editorial-work .work-card-link span{color:#99563f!important}
+.editorial-work .work-explore{
+  color:#111b1d!important;
+  border-color:#aab4a9!important;
+}
+.editorial-work .work-explore span{color:#99563f!important}
+@media(max-width:900px){
+  .editorial-work .work-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  .editorial-work .work-card:last-child{grid-column:1/-1}
+  .editorial-work .work-card:last-child .work-media img{height:250px!important}
+}
+@media(max-width:760px){
+  .editorial-work{padding:52px 20px!important}
+  .editorial-work .work-heading{grid-template-columns:1fr!important;gap:14px!important}
+  .editorial-work .work-grid{grid-template-columns:1fr!important;gap:16px!important}
+  .editorial-work .work-card:last-child{grid-column:auto!important}
+  .editorial-work .work-media img{height:auto!important;aspect-ratio:16/10!important;max-height:250px!important}
+  .editorial-work .work-card>.work-index,
+  .editorial-work .work-card>h3,
+  .editorial-work .work-card>p,
+  .editorial-work .work-card>.work-tag,
+  .editorial-work .work-card>.work-card-link,
+  .editorial-work .work-card .work-topics{margin-left:18px!important;margin-right:18px!important}
+}
+@media(prefers-reduced-motion:reduce){
+  .editorial-work .work-card,.editorial-work .work-media img{transition:none!important}
+}
+
 </style>
 <style>
 #mainView .webgl-focus-next{margin-top:5px;color:#829b80;font:600 9px/1.4 system-ui,sans-serif;letter-spacing:.09em;text-transform:uppercase}
@@ -1117,7 +1360,7 @@ body{background:radial-gradient(ellipse at 50% 8%,#1c302d 0%,#101a1b 45%,#080d0f
  background-image:
   linear-gradient(90deg,rgba(6,11,13,.97) 0%,rgba(6,11,13,.86) 35%,rgba(6,11,13,.28) 73%,rgba(6,11,13,.48) 100%),
   linear-gradient(0deg,#080d0f 0%,transparent 32%,rgba(5,9,10,.22) 100%),
-  url("https://upload.wikimedia.org/wikipedia/commons/7/7d/Bovine_Blastocyst.JPG")!important;
+  url("https://upload.wikimedia.org/wikipedia/commons/e/ee/Mycelium.JPG")!important;
  background-size:cover,cover,cover!important;background-position:center,center,65% 42%!important;
  filter:grayscale(1) contrast(1.25) brightness(.60)!important;opacity:.92!important;
  mask-image:linear-gradient(180deg,#000 0%,#000 72%,transparent 100%)!important;
@@ -1193,7 +1436,7 @@ body{background:linear-gradient(180deg,#0b1214 0,#101a1b 44%,#eeeade 44%,#eeeade
 .lang{border:1px solid #526457!important;border-radius:0!important;background:transparent!important;color:#dce5da!important;padding:8px 10px!important}
 .lang[aria-pressed=true]{background:#a8bd9b!important;color:#14221b!important;border-color:#a8bd9b!important}
 .hero{display:grid!important;position:relative!important;min-height:500px!important;max-height:720px!important;margin:0!important;padding:clamp(76px,11vw,145px) clamp(0px,3vw,44px) clamp(55px,8vw,100px)!important;grid-template-columns:minmax(0,1.2fr) minmax(210px,.55fr)!important;gap:clamp(24px,6vw,90px)!important;align-items:end!important;overflow:hidden!important;background:#0b1214!important}
-.hero:after{inset:0!important;top:0!important;right:0!important;bottom:0!important;left:0!important;width:auto!important;height:auto!important;z-index:0!important;background-image:linear-gradient(90deg,rgba(7,13,15,.96) 0%,rgba(7,13,15,.78) 44%,rgba(7,13,15,.24) 100%),linear-gradient(0deg,#0b1214 0%,transparent 36%),url("https://upload.wikimedia.org/wikipedia/commons/7/7d/Bovine_Blastocyst.JPG")!important;background-size:cover!important;background-position:center 42%!important;filter:grayscale(1) contrast(1.16) brightness(.74)!important;opacity:.94!important;mask-image:none!important;-webkit-mask-image:none!important}
+.hero:after{inset:0!important;top:0!important;right:0!important;bottom:0!important;left:0!important;width:auto!important;height:auto!important;z-index:0!important;background-image:linear-gradient(90deg,rgba(7,13,15,.96) 0%,rgba(7,13,15,.78) 44%,rgba(7,13,15,.24) 100%),linear-gradient(0deg,#0b1214 0%,transparent 36%),url("https://upload.wikimedia.org/wikipedia/commons/e/ee/Mycelium.JPG")!important;background-size:cover!important;background-position:center 42%!important;filter:grayscale(1) contrast(1.16) brightness(.74)!important;opacity:.94!important;mask-image:none!important;-webkit-mask-image:none!important}
 .hero:before{z-index:1!important;opacity:.36!important}
 .hero>div{z-index:2!important}
 .hero .eyebrow{color:#c8a27f!important}
@@ -1233,7 +1476,7 @@ body{background:linear-gradient(180deg,#0b1214 0,#101a1b 44%,#eeeade 44%,#eeeade
  .tools{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:4px!important;min-width:122px!important}
  .lang{padding:6px 7px!important;font-size:9px!important}
  .hero{min-height:590px!important;max-height:none!important;grid-template-columns:1fr!important;gap:22px!important;padding:126px 8px 56px!important}
- .hero:after{background-image:linear-gradient(90deg,rgba(7,13,15,.82),rgba(7,13,15,.45)),linear-gradient(0deg,#0b1214 0%,transparent 42%),url("https://upload.wikimedia.org/wikipedia/commons/7/7d/Bovine_Blastocyst.JPG")!important;background-position:center,center,60% center!important;filter:grayscale(1) contrast(1.12) brightness(.68)!important}
+ .hero:after{background-image:linear-gradient(90deg,rgba(7,13,15,.82),rgba(7,13,15,.45)),linear-gradient(0deg,#0b1214 0%,transparent 42%),url("https://upload.wikimedia.org/wikipedia/commons/e/ee/Mycelium.JPG")!important;background-position:center,center,60% center!important;filter:grayscale(1) contrast(1.12) brightness(.68)!important}
  .hero h1{font-size:clamp(48px,12.8vw,74px)!important;line-height:.94!important}
  .hero p{font-size:14px!important;max-width:94%!important}
  .hero .aside{max-width:88%!important;margin-left:auto!important;padding:11px 0 11px 14px!important}
@@ -1267,7 +1510,7 @@ body{background:linear-gradient(180deg,#0b1214 0,#101a1b 44%,#eeeade 44%,#eeeade
 .hero .aside{border-left-color:#B96B4D!important;background:linear-gradient(90deg,#111B1Dce,transparent)!important}
 .hero .aside b{color:#f2f0e7!important}
 .hero .eyebrow{color:#D39A7D!important}
-.hero:after{background-image:linear-gradient(90deg,rgba(17,27,29,.92) 0%,rgba(17,27,29,.72) 48%,rgba(17,27,29,.18) 100%),linear-gradient(0deg,#111B1D 0%,transparent 42%),url("https://upload.wikimedia.org/wikipedia/commons/7/7d/Bovine_Blastocyst.JPG")!important;filter:grayscale(1) contrast(1.12) brightness(.72)!important}
+.hero:after{background-image:linear-gradient(90deg,rgba(17,27,29,.92) 0%,rgba(17,27,29,.72) 48%,rgba(17,27,29,.18) 100%),linear-gradient(0deg,#111B1D 0%,transparent 42%),url("https://upload.wikimedia.org/wikipedia/commons/e/ee/Mycelium.JPG")!important;filter:grayscale(1) contrast(1.12) brightness(.72)!important}
 @media(max-width:760px){
  .hero{padding-top:108px!important}
  .hero p{color:#e0e3d9!important;text-shadow:0 1px 8px #111b1d!important}
@@ -1286,33 +1529,816 @@ body{background:linear-gradient(180deg,#0b1214 0,#101a1b 44%,#eeeade 44%,#eeeade
 #app section.hero .aside b,#app section.hero .aside span{color:#D1D0C5!important}
 </style>
 
+<style id="balabs-responsive-editorial-refinement">
+/* Responsive refinement: preserve editorial rhythm on tablets and touch screens. */
+@media (min-width:761px) and (max-width:1040px){
+  .work-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .work-card:last-child{grid-column:1/-1;min-height:300px}
+  .method-steps{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .method-steps li:nth-child(3){border-left:0;padding-left:0;border-top:1px solid #52665d}
+  .method-steps li:nth-child(4){border-top:1px solid #52665d}
+}
+@media(max-width:760px){
+  .site-nav{justify-content:flex-start!important;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;-webkit-overflow-scrolling:touch;scroll-snap-type:x proximity;padding-inline:16px!important}
+  .site-nav::-webkit-scrollbar{display:none}
+  .site-nav a{flex:0 0 auto;min-height:46px;display:flex;align-items:center;scroll-snap-align:start;white-space:nowrap;padding:13px 0 11px!important;font-size:9px!important;letter-spacing:.09em!important}
+  .editorial-feature,.editorial-about,.editorial-work,.editorial-method{scroll-margin-top:14px}
+  .work-card-link,.editorial-link,.work-explore{min-height:44px}
+}
+:where(a,button,[tabindex]):focus-visible{outline:2px solid #B96B4D;outline-offset:4px}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto!important}}
+
+
+/* 2026-10-30 — editorial clarity pass: remove decorative noise and blur.
+   Deliberately scoped to the editorial surface; the 3D explorer is not modified. */
+.hero .hero-micrograph{
+  filter:none!important;
+  opacity:.34!important;
+  mask-image:linear-gradient(90deg,transparent 0%,#000 24%,#000 78%,transparent 100%)!important;
+  -webkit-mask-image:linear-gradient(90deg,transparent 0%,#000 24%,#000 78%,transparent 100%)!important;
+}
+.hero{
+  background:linear-gradient(100deg,#111B1D 0%,#172725 58%,#263B38 100%)!important;
+}
+.hero .aside{
+  background:#263B38!important;
+  box-shadow:none!important;
+  backdrop-filter:none!important;
+}
+.editorial-feature{
+  background:#D1D0C5!important;
+  background-image:none!important;
+  color:#111B1D!important;
+}
+.editorial-feature:before,.editorial-feature:after,
+.editorial-about:before,.editorial-about:after{
+  filter:none!important;
+  opacity:.08!important;
+}
+.editorial-about{
+  background:#263B38!important;
+  background-image:none!important;
+}
+.editorial-work{
+  background:#172725!important;
+  color:#D1D0C5!important;
+  border-top:1px solid #52665D;
+  border-bottom:1px solid #52665D;
+}
+.work-heading .eyebrow{color:#D6A087!important}
+.work-heading h2{color:#F0EEE5!important}
+.work-heading>p{color:#C1CBC2!important}
+.work-grid{
+  gap:0!important;
+  background:#52665D!important;
+  border:1px solid #52665D!important;
+}
+.work-card,.work-myco,.work-soil,.work-iot{
+  background:#263B38!important;
+  color:#D1D0C5!important;
+  border-top:2px solid #B96B4D!important;
+  box-shadow:none!important;
+}
+.work-card:before,.work-card:after,
+.work-illustration:after{
+  content:none!important;
+  display:none!important;
+  background:none!important;
+  border:0!important;
+}
+.work-illustration{color:#D6A087!important}
+.work-illustration svg{filter:none!important;opacity:.82}
+.work-card h3,.work-soil h3,.work-iot h3{color:#F0EEE5!important}
+.work-card p,.work-soil p,.work-iot p{color:#D1D8CF!important}
+.work-index,.work-tag,.work-soil .work-tag{color:#D6A087!important}
+.work-tag,.work-soil .work-tag,.work-topics{border-color:#60746B!important}
+.work-myco .work-topics,.work-soil .work-topics,.work-iot .work-topics{color:#C7D0C7!important}
+.work-card-link,.work-iot .work-card-link{
+  color:#F0EEE5!important;
+  border-color:#60746B!important;
+}
+.work-explore{color:#F0EEE5!important;border-color:#60746B!important}
+.work-explore span,.work-card-link span{color:#D6A087!important}
+.editorial-method{
+  background:#D1D0C5!important;
+  color:#111B1D!important;
+}
+.method-top .eyebrow,.method-no{color:#99563F!important}
+.method-top h2,.method-steps b{color:#111B1D!important}
+.method-top h2 em{color:#52645D!important}
+.method-top>p,.method-steps p{color:#465650!important}
+.method-steps{border-color:#9BA69D!important}
+.method-steps li+li{border-color:#AEB7AE!important}
+@media(max-width:760px){
+  .hero .hero-micrograph{opacity:.22!important}
+  .editorial-work{background:#172725!important}
+  .work-card,.work-myco,.work-soil,.work-iot{background:#263B38!important}
+  .editorial-method{background:#D1D0C5!important}
+}
+
+
+
+/* 2026-10-30 — structural art direction: stop the repeated illustrated-board effect.
+   Remove ornamental line drawings; let typography, real imagery and whitespace carry the story.
+   The interactive 3D explorer and its scripts remain untouched. */
+.editorial-art,
+.work-illustration{display:none!important}
+.editorial-feature,
+.editorial-about,
+.editorial-work,
+.editorial-method,
+.universe-bridge{
+  filter:none!important;
+  backdrop-filter:none!important;
+  -webkit-backdrop-filter:none!important;
+  box-shadow:none!important;
+  background-image:none!important;
+}
+.editorial-feature{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) minmax(280px,.72fr)!important;
+  align-items:center!important;
+  gap:clamp(32px,7vw,110px)!important;
+  min-height:430px!important;
+  padding:clamp(64px,9vw,120px) clamp(24px,8vw,112px)!important;
+  background:#D1D0C5!important;
+  border:0!important;
+}
+.editorial-feature .editorial-copy{max-width:760px!important}
+.editorial-feature .editorial-copy h2{
+  max-width:760px!important;
+  font-size:clamp(42px,6.2vw,82px)!important;
+  line-height:.98!important;
+  letter-spacing:-.055em!important;
+}
+.editorial-feature .editorial-copy p{
+  max-width:560px!important;
+  font-size:clamp(15px,1.35vw,18px)!important;
+  line-height:1.8!important;
+}
+.editorial-feature .feature-status{margin:20px 0!important}
+.editorial-feature .editorial-link{display:inline-flex!important;margin-top:18px!important}
+.editorial-about{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr)!important;
+  min-height:0!important;
+  padding:clamp(62px,8vw,104px) clamp(24px,8vw,112px)!important;
+  background:#263B38!important;
+  border:0!important;
+}
+.editorial-about .about-copy{max-width:940px!important}
+.editorial-about .about-copy h2{
+  max-width:850px!important;
+  font-size:clamp(38px,5.5vw,72px)!important;
+  line-height:1.02!important;
+}
+.editorial-about .about-copy p{
+  max-width:690px!important;
+  font-size:clamp(15px,1.3vw,17px)!important;
+  line-height:1.85!important;
+}
+.editorial-work{
+  padding:clamp(64px,8vw,108px) clamp(24px,8vw,112px)!important;
+  background:#111B1D!important;
+  border:0!important;
+}
+.work-heading{margin-bottom:50px!important}
+.work-grid{
+  display:grid!important;
+  grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  gap:0!important;
+  max-width:1320px!important;
+  background:transparent!important;
+  border:0!important;
+  border-top:1px solid #60746B!important;
+  border-bottom:1px solid #60746B!important;
+}
+.work-card,.work-myco,.work-soil,.work-iot{
+  min-height:0!important;
+  padding:28px clamp(18px,2.4vw,34px) 30px!important;
+  background:transparent!important;
+  border:0!important;
+  border-top:0!important;
+  border-radius:0!important;
+  box-shadow:none!important;
+  transform:none!important;
+}
+.work-card+.work-card{border-left:1px solid #52665D!important}
+.work-card:before,.work-card:after{display:none!important;content:none!important}
+.work-index{display:block!important;margin-bottom:30px!important;color:#D6A087!important}
+.work-card h3,.work-soil h3,.work-iot h3{
+  font-size:clamp(22px,2.2vw,30px)!important;
+  line-height:1.1!important;
+  margin-bottom:14px!important;
+}
+.work-card p,.work-soil p,.work-iot p{
+  font-size:14px!important;
+  line-height:1.8!important;
+}
+.work-topics{font-size:9px!important;line-height:1.8!important}
+.work-tag{margin-top:28px!important}
+.editorial-method{border:0!important}
+.hero .hero-micrograph{
+  filter:none!important;
+  opacity:.26!important;
+}
+.editorial-feature *,
+.editorial-about *,
+.editorial-work *,
+.editorial-method *,
+.universe-bridge *{
+  text-shadow:none!important;
+}
+@media(max-width:760px){
+  .editorial-feature{
+    grid-template-columns:1fr!important;
+    min-height:0!important;
+    gap:18px!important;
+    padding:52px 22px!important;
+  }
+  .editorial-feature .editorial-copy h2{font-size:clamp(38px,10vw,58px)!important}
+  .editorial-about{padding:52px 22px!important}
+  .editorial-about .about-copy h2{font-size:clamp(36px,9vw,54px)!important}
+  .editorial-work{padding:54px 22px!important}
+  .work-heading{margin-bottom:28px!important}
+  .work-grid{grid-template-columns:1fr!important}
+  .work-card,.work-myco,.work-soil,.work-iot{padding:24px 0!important}
+  .work-card+.work-card{border-left:0!important;border-top:1px solid #52665D!important}
+  .work-index{margin-bottom:18px!important}
+  .work-tag{margin-top:18px!important}
+}
+
+
+
+/* 2026-10-30 — real scientific photography in the editorial feature */
+.editorial-feature{
+  grid-template-columns:minmax(0,1fr) minmax(300px,.92fr)!important;
+  gap:clamp(34px,6vw,88px)!important;
+  overflow:hidden!important;
+}
+.editorial-feature .editorial-copy{grid-column:1;grid-row:1;max-width:680px!important}
+.editorial-feature .editorial-art-feature{
+  display:block!important;
+  grid-column:2;grid-row:1;
+  align-self:stretch;
+  min-height:360px;
+  width:100%;
+  max-width:640px;
+  margin-left:auto;
+  color:inherit;
+}
+.editorial-feature .feature-photo{
+  display:block;
+  width:100%;
+  height:100%;
+  min-height:360px;
+  max-height:510px;
+  object-fit:cover;
+  object-position:center;
+  border-radius:2px;
+  filter:none!important;
+}
+.editorial-feature .art-caption{
+  display:inline-block;
+  margin-top:12px;
+  color:#465650;
+  font:9px/1.6 ui-monospace,monospace;
+  letter-spacing:.08em;
+  text-decoration:none;
+  border-bottom:1px solid #9BA69D;
+}
+.editorial-feature .art-caption:hover{color:#99563F;border-color:#99563F}
+@media(max-width:760px){
+  .editorial-feature{grid-template-columns:1fr!important;gap:28px!important}
+  .editorial-feature .editorial-copy{grid-column:1;grid-row:1}
+  .editorial-feature .editorial-art-feature{
+    grid-column:1;grid-row:2;
+    min-height:0;
+    max-width:none;
+    margin:0;
+  }
+  .editorial-feature .feature-photo{
+    min-height:0;
+    height:auto;
+    aspect-ratio:4/3;
+    max-height:none;
+  }
+  .editorial-feature .art-caption{font-size:8px}
+}
+
+
+
+/* 2026-10-30 — bridge editorial simplification: remove the last decorative line drawing */
+.universe-bridge{
+  display:block!important;
+  padding:clamp(58px,8vw,104px) clamp(24px,8vw,112px)!important;
+  background:#D1D0C5!important;
+  color:#111B1D!important;
+  border:0!important;
+  border-top:1px solid #9BA69D!important;
+}
+.universe-bridge .bridge-copy{
+  max-width:900px!important;
+  margin:0 auto!important;
+}
+.universe-bridge .bridge-kicker{
+  color:#99563F!important;
+  margin-bottom:22px!important;
+}
+.universe-bridge .bridge-copy h2{
+  max-width:760px!important;
+  color:#111B1D!important;
+  font-size:clamp(42px,6vw,76px)!important;
+  line-height:.99!important;
+}
+.universe-bridge .bridge-copy h2 em{color:#52645D!important}
+.universe-bridge .bridge-copy p{
+  max-width:590px!important;
+  color:#465650!important;
+  font-size:clamp(15px,1.3vw,17px)!important;
+  line-height:1.8!important;
+}
+.universe-bridge .bridge-action{
+  border-color:#52645D!important;
+  color:#111B1D!important;
+}
+.universe-bridge .bridge-action span{color:#99563F!important}
+.universe-bridge .bridge-action:hover{
+  background:#263B38!important;
+  border-color:#263B38!important;
+  color:#F0EEE5!important;
+}
+.universe-bridge .bridge-action:hover span{color:#D6A087!important}
+.universe-bridge .bridge-network{display:none!important}
+@media(max-width:760px){
+  .universe-bridge{padding:52px 22px!important}
+  .universe-bridge .bridge-copy h2{font-size:clamp(38px,10vw,56px)!important}
+  .universe-bridge .bridge-action{width:auto!important;max-width:100%;justify-content:space-between}
+}
+
+
+
+/* 2026-10-30 — work domains: three distinct, credited photographic subjects */
+.work-grid{
+  align-items:stretch!important;
+  background:transparent!important;
+  border:0!important;
+  column-gap:1px!important;
+  row-gap:1px!important;
+}
+.work-card,.work-myco,.work-soil,.work-iot{
+  display:flex!important;
+  flex-direction:column!important;
+  min-width:0!important;
+  padding:0 0 24px!important;
+  background:#263B38!important;
+  border:0!important;
+  border-top:2px solid #B96B4D!important;
+}
+.work-media{
+  display:flex!important;
+  flex-direction:column;
+  gap:0;
+  width:100%;
+  margin:0 0 22px!important;
+  background:#111B1D;
+}
+.work-media img{
+  display:block;
+  width:100%;
+  height:clamp(150px,17vw,230px);
+  object-fit:cover;
+  object-position:center;
+  filter:none!important;
+}
+.work-myco .work-media img{object-position:center 48%}
+.work-soil .work-media img{object-position:center 55%}
+.work-iot .work-media img{object-position:center 50%}
+.work-media figcaption{
+  min-height:27px;
+  padding:7px 14px 0;
+  color:#C1CBC2;
+  font:8px/1.4 ui-monospace,monospace;
+  letter-spacing:.035em;
+}
+.work-media figcaption a{color:inherit;text-decoration:none;border-bottom:1px solid #71837A}
+.work-media figcaption a:hover{color:#F0EEE5;border-color:#B96B4D}
+.work-card>.work-index,.work-card>h3,.work-card>p,.work-card>.work-tag,.work-card>.work-card-link{
+  margin-left:22px!important;
+  margin-right:22px!important;
+}
+.work-card>.work-index{margin-bottom:16px!important}
+.work-card>h3{margin-top:0!important}
+.work-card>.work-card-link{margin-top:auto!important;padding-top:16px!important}
+.work-card .work-topics{margin-left:22px!important;margin-right:22px!important}
+.work-illustration{display:none!important}
+@media(max-width:760px){
+  .work-grid{grid-template-columns:1fr!important;gap:16px!important}
+  .work-card,.work-myco,.work-soil,.work-iot{padding-bottom:22px!important}
+  .work-media{margin-bottom:18px!important}
+  .work-media img{height:auto;aspect-ratio:16/9;max-height:240px}
+  .work-card>.work-index,.work-card>h3,.work-card>p,.work-card>.work-tag,.work-card>.work-card-link,.work-card .work-topics{
+    margin-left:18px!important;margin-right:18px!important
+  }
+}
+
+
+
+/* 2026-10-30 — editorial rhythm and domain distinction */
+.editorial-feature,
+.editorial-about,
+.editorial-work,
+.editorial-method,
+.universe-bridge{
+  position:relative;
+  isolation:isolate;
+}
+.editorial-feature{padding-top:clamp(70px,9vw,122px)!important;padding-bottom:clamp(70px,9vw,122px)!important}
+.editorial-about{padding-top:clamp(68px,8vw,108px)!important;padding-bottom:clamp(68px,8vw,108px)!important}
+.editorial-work{
+  padding-top:clamp(70px,8vw,108px)!important;
+  padding-bottom:clamp(62px,7vw,94px)!important;
+  background:#111B1D!important;
+}
+.editorial-work .work-heading{
+  margin-bottom:clamp(30px,4vw,52px)!important;
+}
+.editorial-work .work-heading h2{color:#F0EEE5!important}
+.editorial-work .work-heading>p{color:#C1CBC2!important}
+.editorial-work .work-grid{
+  gap:12px!important;
+  background:transparent!important;
+  border:0!important;
+}
+.editorial-work .work-card{
+  padding:0 0 24px!important;
+  border-top:0!important;
+  border-bottom:1px solid #52665D!important;
+  background:#263B38!important;
+}
+.editorial-work .work-myco{background:#263B38!important}
+.editorial-work .work-soil{background:#304039!important}
+.editorial-work .work-iot{background:#223337!important}
+.editorial-work .work-myco:before,
+.editorial-work .work-soil:before,
+.editorial-work .work-iot:before{
+  content:"";
+  display:block;
+  height:3px;
+  width:100%;
+  background:#B96B4D;
+}
+.editorial-work .work-soil:before{background:#9BAE9F}
+.editorial-work .work-iot:before{background:#8FA8B0}
+.editorial-work .work-media{margin-top:0!important}
+.editorial-work .work-card>.work-index{color:#D6A087!important}
+.editorial-work .work-soil>.work-index{color:#B8CDBB!important}
+.editorial-work .work-iot>.work-index{color:#B2C8CF!important}
+.editorial-work .work-card h3{color:#F0EEE5!important}
+.editorial-work .work-card p{color:#D1D8CF!important}
+.editorial-work .work-card .work-topics{color:#D1D8CF!important;border-color:#71837A!important}
+.editorial-work .work-soil .work-topics{border-color:#8FA99A!important}
+.editorial-work .work-iot .work-topics{border-color:#829CA5!important}
+.editorial-work .work-card .work-tag{color:#D6A087!important}
+.editorial-work .work-soil .work-tag{color:#B8CDBB!important}
+.editorial-work .work-iot .work-tag{color:#B2C8CF!important}
+.editorial-work .work-card-link{color:#F0EEE5!important;border-color:#71837A!important}
+.editorial-work .work-explore{color:#F0EEE5!important;border-color:#71837A!important}
+.editorial-work .work-explore span{color:#D6A087!important}
+.editorial-method{
+  padding-top:clamp(68px,8vw,104px)!important;
+  padding-bottom:clamp(68px,8vw,104px)!important;
+  background:#D1D0C5!important;
+  color:#111B1D!important;
+}
+.editorial-method .method-top .eyebrow,
+.editorial-method .method-no{color:#99563F!important}
+.editorial-method .method-top h2,
+.editorial-method .method-steps b{color:#111B1D!important}
+.editorial-method .method-top h2 em{color:#52645D!important}
+.editorial-method .method-top>p,
+.editorial-method .method-steps p{color:#465650!important}
+.editorial-method .method-steps{border-color:#9BA69D!important}
+.editorial-method .method-steps li+li{border-color:#AEB7AE!important}
+.universe-bridge{
+  background:#263B38!important;
+  border:0!important;
+  padding-top:clamp(58px,7vw,88px)!important;
+  padding-bottom:clamp(58px,7vw,88px)!important;
+}
+.universe-bridge .bridge-kicker{color:#D6A087!important}
+.universe-bridge .bridge-copy h2{color:#F0EEE5!important}
+.universe-bridge .bridge-copy h2 em{color:#C1CBC2!important}
+.universe-bridge .bridge-copy p{color:#D1D8CF!important}
+.universe-bridge .bridge-action{color:#F0EEE5!important;border-color:#9BAEA4!important}
+.universe-bridge .bridge-action:hover{background:#B96B4D!important;border-color:#B96B4D!important}
+@media(max-width:760px){
+  .editorial-feature,.editorial-about,.editorial-work,.editorial-method,.universe-bridge{
+    padding-left:22px!important;padding-right:22px!important
+  }
+  .editorial-work .work-grid{grid-template-columns:1fr!important;gap:14px!important}
+  .editorial-work .work-card{padding-bottom:22px!important}
+  .editorial-method .method-steps{grid-template-columns:1fr 1fr!important}
+}
+@media(max-width:380px){
+  .editorial-method .method-steps{grid-template-columns:1fr!important}
+  .editorial-method .method-steps li,.editorial-method .method-steps li+li{
+    border-left:0!important;border-top:1px solid #AEB7AE!important;padding:16px 0!important
+  }
+  .editorial-method .method-steps li:first-child{border-top:0!important}
+}
+
+</style>
+<style>
+
+/* 2026-10-30 — applied visual direction: photographic editorial homepage */
+:root{--bg:#111B1D!important;--ink:#F0EEE5!important;--muted:#C1CBC2!important}
+html,body{background:#111B1D!important}
+.wrap{max-width:none!important;padding:0!important;background:#111B1D!important}
+.top{
+  min-height:74px!important;padding:12px clamp(22px,7vw,104px)!important;
+  border:0!important;background:#111B1D!important;
+}
+.brand .mark{border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;color:#D1D0C5!important;font-family:Georgia,serif!important;font-size:36px!important}
+.brand strong{font:500 18px/1 Georgia,serif!important;letter-spacing:.08em!important;color:#F0EEE5!important}
+.brand small{font:9px/1.4 ui-sans-serif,system-ui!important;letter-spacing:.12em!important;color:#AAB8AE!important}
+.tools{gap:5px!important}
+.lang{background:transparent!important;border:0!important;border-radius:0!important;color:#D1D8CF!important;padding:8px 9px!important}
+.lang[aria-pressed=true]{background:transparent!important;color:#D6A087!important;border-bottom:1px solid #D6A087!important}
+.site-nav{
+  min-height:42px!important;justify-content:center!important;gap:clamp(20px,4vw,58px)!important;
+  background:#111B1D!important;border:0!important;padding:0 22px 12px!important
+}
+.site-nav a{font:500 10px/1.2 ui-sans-serif,system-ui!important;letter-spacing:.04em!important;text-transform:none!important;color:#D1D8CF!important}
+.site-nav a:after{background:#D6A087!important}
+.hero{
+  min-height:430px!important;position:relative!important;isolation:isolate!important;
+  display:flex!important;align-items:center!important;grid-template-columns:none!important;
+  padding:clamp(54px,7vw,92px) clamp(22px,7.5vw,112px)!important;
+  overflow:hidden!important;border-top:1px solid #52665D!important;border-bottom:1px solid #52665D!important;
+  background:#111B1D!important
+}
+.hero .hero-micrograph{
+  position:absolute!important;z-index:-2!important;inset:0 0 0 auto!important;
+  width:69%!important;height:100%!important;object-fit:cover!important;object-position:center 48%!important;
+  opacity:.9!important;mask-image:linear-gradient(90deg,transparent 0%,#000 24%,#000 100%)!important;
+  -webkit-mask-image:linear-gradient(90deg,transparent 0%,#000 24%,#000 100%)!important
+}
+.hero:after{content:"";position:absolute;z-index:-1;inset:0;background:linear-gradient(90deg,#111B1D 0%,#111B1D 29%,#111b1de8 43%,#111b1d20 77%,#111b1d08 100%)!important;pointer-events:none}
+.hero>div:first-of-type{width:min(610px,58%)!important}
+.hero .eyebrow{color:#9CB7A6!important;font-size:9px!important;letter-spacing:.23em!important}
+.hero h1{font:500 clamp(42px,5.3vw,72px)/.98 Georgia,'Times New Roman',serif!important;letter-spacing:-.045em!important;color:#F0EEE5!important;max-width:650px!important}
+.hero h1 span{color:#D6A087!important}
+.hero p{max-width:510px!important;color:#D1D8CF!important;font-size:14px!important;line-height:1.75!important}
+.hero-actions{margin-top:26px!important}
+.hero-action-primary{border:1px solid #C1CBC2!important;border-radius:30px!important;background:transparent!important;color:#F0EEE5!important;padding:12px 18px!important}
+.hero-action-primary:hover{background:#B96B4D!important;border-color:#B96B4D!important}
+.hero-action-secondary{color:#E0E5DC!important}
+.hero .aside{
+  position:absolute!important;right:clamp(22px,7.5vw,112px)!important;bottom:22px!important;
+  width:min(340px,31%)!important;padding:12px 0 0 18px!important;
+  border-left:1px solid #D1D8CF88!important;background:transparent!important;
+  color:#E0E5DC!important;font-size:11px!important
+}
+.hero .aside b{color:#F0EEE5!important;font:500 16px/1.3 Georgia,serif!important}
+.hero .aside span{color:#D1D8CF!important}
+.hero-credit{position:absolute!important;right:clamp(22px,7.5vw,112px)!important;bottom:8px!important;color:#E0E5DC!important;font-size:8px!important}
+.editorial-feature{
+  display:grid!important;grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr)!important;
+  align-items:stretch!important;gap:0!important;min-height:420px!important;
+  padding:0!important;background:#D1D0C5!important;color:#111B1D!important
+}
+.editorial-feature .editorial-art-feature{
+  display:block!important;position:relative!important;min-height:420px!important;
+  width:100%!important;overflow:hidden!important
+}
+.editorial-feature .feature-photo{
+  display:block!important;width:100%!important;height:100%!important;min-height:420px!important;
+  object-fit:cover!important;object-position:center!important;filter:none!important;opacity:1!important
+}
+.editorial-feature .art-caption{
+  position:absolute!important;left:24px!important;bottom:16px!important;
+  color:#F0EEE5!important;background:#111B1Dba!important;padding:7px 10px!important;
+  font:8px/1.4 ui-monospace,monospace!important
+}
+.editorial-feature .editorial-copy{
+  align-self:center!important;max-width:650px!important;padding:clamp(38px,6vw,82px)!important
+}
+.editorial-feature .eyebrow{color:#99563F!important}
+.editorial-feature .feature-status{color:#52645D!important}
+.editorial-feature h2{font:500 clamp(36px,4.3vw,58px)/1.02 Georgia,serif!important;color:#111B1D!important}
+.editorial-feature p{color:#465650!important;font-size:15px!important}
+.editorial-feature .editorial-link{color:#111B1D!important}
+.editorial-about{
+  min-height:340px!important;display:grid!important;grid-template-columns:minmax(0,1fr)!important;
+  padding:clamp(54px,7vw,88px) clamp(22px,10vw,150px)!important;
+  background:#263B38!important;border:0!important
+}
+.editorial-about .about-copy{max-width:760px!important}
+.editorial-about .eyebrow{color:#D6A087!important}
+.editorial-about h2{font:500 clamp(36px,4.5vw,60px)/1.02 Georgia,serif!important;color:#F0EEE5!important}
+.editorial-about p{max-width:700px!important;color:#D1D8CF!important;font-size:15px!important}
+.editorial-about .editorial-link{color:#F0EEE5!important}
+.editorial-about .editorial-art-about{display:none!important}
+.editorial-work{
+  background:#D1D0C5!important;color:#111B1D!important;
+  padding:clamp(58px,7vw,88px) clamp(22px,7vw,104px)!important
+}
+.editorial-work .work-heading{max-width:1320px!important;margin:0 auto 34px!important}
+.editorial-work .work-heading h2{font:500 clamp(34px,4.2vw,56px)/1.02 Georgia,serif!important;color:#111B1D!important}
+.editorial-work .work-heading>p{color:#465650!important}
+.editorial-work .work-grid{max-width:1320px!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:14px!important;background:transparent!important;border:0!important}
+.editorial-work .work-card{
+  min-height:390px!important;padding:0 0 22px!important;border:0!important;border-radius:4px!important;
+  overflow:hidden!important;background:#18302C!important;color:#F0EEE5!important
+}
+.editorial-work .work-myco{background:#18302C!important}
+.editorial-work .work-soil{background:#304039!important}
+.editorial-work .work-iot{background:#193238!important}
+.editorial-work .work-card:before{display:none!important}
+.editorial-work .work-media{margin:0 0 18px!important;background:transparent!important}
+.editorial-work .work-media img{height:clamp(150px,16vw,220px)!important;object-fit:cover!important}
+.editorial-work .work-media figcaption{color:#D1D8CF!important}
+.editorial-work .work-card>.work-index{color:#D6A087!important;margin-top:17px!important}
+.editorial-work .work-card h3{color:#F0EEE5!important;font:500 24px/1.1 Georgia,serif!important}
+.editorial-work .work-card p{color:#E0E5DC!important;font-size:12px!important;line-height:1.65!important}
+.editorial-work .work-card .work-topics{color:#D1D8CF!important;border-color:#82968A!important}
+.editorial-work .work-card .work-tag{color:#D6A087!important}
+.editorial-work .work-card-link{color:#F0EEE5!important;border-color:#82968A!important}
+.editorial-work .work-explore{color:#111B1D!important;border-color:#52645D!important}
+.editorial-method{
+  background:#E7E6DC!important;color:#111B1D!important;
+  padding:clamp(54px,7vw,82px) clamp(22px,7vw,104px)!important
+}
+.editorial-method .method-top{max-width:1320px!important}
+.editorial-method .method-top .eyebrow{color:#99563F!important}
+.editorial-method .method-top h2{color:#111B1D!important;font:500 clamp(34px,4vw,52px)/1.02 Georgia,serif!important}
+.editorial-method .method-top h2 em{color:#52645D!important}
+.editorial-method .method-top>p,.editorial-method .method-steps p{color:#465650!important}
+.editorial-method .method-steps{max-width:1320px!important;border-color:#AEB7AE!important}
+.editorial-method .method-steps li+li{border-color:#AEB7AE!important}
+.editorial-method .method-steps b{color:#111B1D!important;font:500 20px Georgia,serif!important}
+.editorial-method .method-steps .method-no{background:#18302C!important;color:#F0EEE5!important}
+.universe-bridge{
+  background:#111B1D!important;color:#F0EEE5!important;
+  padding:clamp(54px,7vw,88px) clamp(22px,7vw,104px)!important;
+  border-top:1px solid #52665D!important
+}
+.universe-bridge .bridge-copy h2{font:500 clamp(36px,4.5vw,60px)/1.02 Georgia,serif!important}
+.universe-bridge .bridge-network{opacity:.92!important}
+@media(max-width:760px){
+ .top{padding:12px 18px!important;align-items:flex-start!important}
+ .brand strong{font-size:15px!important}
+ .tools{max-width:58%!important}
+ .lang{font-size:9px!important;padding:6px 5px!important}
+ .site-nav{overflow-x:auto!important;justify-content:flex-start!important;gap:22px!important;padding:0 18px 10px!important}
+ .site-nav a{white-space:nowrap!important;font-size:9px!important}
+ .hero{min-height:540px!important;align-items:flex-end!important;padding:210px 22px 76px!important}
+ .hero .hero-micrograph{width:100%!important;height:65%!important;inset:0 0 auto!important;object-position:center 42%!important;mask-image:linear-gradient(180deg,#000 0%,#000 58%,transparent 100%)!important;-webkit-mask-image:linear-gradient(180deg,#000 0%,#000 58%,transparent 100%)!important}
+ .hero:after{background:linear-gradient(0deg,#111B1D 0%,#111B1D 35%,#111b1d66 67%,transparent 100%)!important}
+ .hero>div:first-of-type{width:100%!important;position:relative!important;z-index:2!important}
+ .hero h1{font-size:clamp(38px,11vw,54px)!important}
+ .hero .aside{display:none!important}
+ .hero-credit{right:18px!important;bottom:8px!important;left:18px!important;font-size:7px!important}
+ .editorial-feature{grid-template-columns:1fr!important}
+ .editorial-feature .editorial-art-feature{min-height:260px!important;height:260px!important}
+ .editorial-feature .feature-photo{min-height:260px!important}
+ .editorial-feature .editorial-copy{padding:34px 24px 42px!important}
+ .editorial-about{padding:48px 24px!important}
+ .editorial-work{padding:48px 18px!important}
+ .editorial-work .work-grid{grid-template-columns:1fr!important;gap:16px!important}
+ .editorial-work .work-card{min-height:0!important}
+ .editorial-work .work-media img{height:210px!important}
+ .editorial-method{padding:48px 22px!important}
+ .editorial-method .method-steps{grid-template-columns:1fr 1fr!important}
+ .universe-bridge{padding:48px 22px!important}
+}
+@media(max-width:380px){
+ .editorial-method .method-steps{grid-template-columns:1fr!important}
+}
+
+</style>
+<style>
+
+/* 2026-10-30 — finishing pass: image-led cards, editorial alignment and RTL */
+.editorial-work .work-card{
+  position:relative!important;
+  border-radius:3px!important;
+  transition:transform .28s ease,box-shadow .28s ease!important;
+}
+.editorial-work .work-card:hover{
+  transform:translateY(-5px)!important;
+  box-shadow:0 18px 34px #111b1d24!important;
+}
+.editorial-work .work-card:focus-within{
+  outline:2px solid #B96B4D!important;outline-offset:3px!important
+}
+.editorial-work .work-media{
+  position:relative!important;overflow:hidden!important;
+}
+.editorial-work .work-media:after{
+  content:"";position:absolute;inset:55% 0 0;
+  background:linear-gradient(180deg,transparent,#111B1D55);
+  pointer-events:none;
+}
+.editorial-work .work-media img{
+  transition:transform .55s cubic-bezier(.2,.7,.2,1)!important;
+}
+.editorial-work .work-card:hover .work-media img{transform:scale(1.035)!important}
+.editorial-work .work-media figcaption{position:relative!important;z-index:1}
+.editorial-work .work-card>.work-index{
+  display:block!important;font:600 9px/1.4 ui-monospace,monospace!important;
+  letter-spacing:.16em!important
+}
+.editorial-work .work-card h3{
+  margin-bottom:10px!important;letter-spacing:-.025em!important
+}
+.editorial-work .work-card .work-topics{
+  margin-top:12px!important;padding-top:12px!important;
+  font:500 9px/1.65 ui-monospace,monospace!important;
+  letter-spacing:.025em!important
+}
+.editorial-work .work-card-link{
+  display:flex!important;align-items:center!important;justify-content:space-between!important;
+  margin-top:18px!important;padding-top:13px!important;
+  font:600 9px/1.4 ui-monospace,monospace!important;letter-spacing:.08em!important;
+  text-transform:uppercase!important
+}
+.editorial-method .method-steps li{
+  padding-top:24px!important;padding-bottom:24px!important
+}
+.editorial-method .method-no{
+  display:grid!important;place-items:center!important;
+  width:34px!important;height:34px!important;min-width:34px!important;
+  border-radius:50%!important;font:600 10px/1 ui-monospace,monospace!important
+}
+.universe-bridge .bridge-network{
+  width:min(100%,620px)!important;justify-self:end!important;
+  filter:none!important
+}
+@media(max-width:760px){
+  .editorial-work .work-card:hover{transform:none!important;box-shadow:none!important}
+  .editorial-work .work-card:hover .work-media img{transform:none!important}
+  .editorial-work .work-card-link{margin-top:14px!important}
+  .editorial-method .method-steps li{padding-top:18px!important;padding-bottom:18px!important}
+  .universe-bridge .bridge-network{justify-self:center!important;max-height:170px!important}
+}
+@media(prefers-reduced-motion:reduce){
+  .editorial-work .work-card,.editorial-work .work-media img{transition:none!important}
+  .editorial-work .work-card:hover{transform:none!important}
+}
+[dir="rtl"] .hero .aside{right:auto!important;left:clamp(22px,7.5vw,112px)!important;border-left:0!important;border-right:1px solid #D1D8CF88!important;padding:12px 18px 0 0!important}
+[dir="rtl"] .hero-credit{right:auto!important;left:clamp(22px,7.5vw,112px)!important}
+[dir="rtl"] .editorial-work .work-card-link{flex-direction:row-reverse!important}
+[dir="rtl"] .universe-bridge .bridge-network{justify-self:start!important}
+
+
+/* Editorial refinement 07 — brighten the first impression; keep the biology visible. */
+.hero{
+ background:linear-gradient(105deg,rgba(233,232,223,.98) 0%,rgba(233,232,223,.94) 42%,rgba(233,232,223,.76) 72%,rgba(38,59,56,.20) 100%)!important;
+ color:#111B1D!important;
+}
+.hero .hero-micrograph{
+ filter:grayscale(.72) contrast(1.02) brightness(.92)!important;
+ opacity:.36!important;
+}
+.hero:after{
+ background:linear-gradient(90deg,rgba(233,232,223,.12),rgba(233,232,223,.08))!important;
+}
+.hero .eyebrow{color:#99563f!important}
+.hero h1,.hero h1 span{color:#111B1D!important;text-shadow:none!important}
+.hero h1 span{color:#52645D!important}
+.hero p{color:#344740!important}
+.hero .aside{
+ background:rgba(38,59,56,.92)!important;
+ border-color:#B96B4D!important;
+ color:#e9e8df!important;
+}
+.hero .aside b{color:#F0EEE5!important}
+.hero-action-secondary{color:#263B38!important;border-color:#52645D!important}
+.hero-credit{color:#263B38!important;text-shadow:0 1px 3px #e9e8df!important}
+@media(max-width:760px){
+ .hero{background:linear-gradient(180deg,rgba(233,232,223,.22) 0%,rgba(233,232,223,.88) 34%,#e9e8df 70%)!important;color:#111B1D!important}
+ .hero .hero-micrograph{height:58%!important;filter:grayscale(.55) contrast(1.02) brightness(1.04)!important;opacity:.48!important}
+ .hero:after{background:linear-gradient(180deg,transparent 0%,rgba(233,232,223,.58) 32%,#e9e8df 72%)!important}
+ .hero .aside{display:none!important}
+ .hero h1,.hero h1 span{color:#111B1D!important}
+ .hero p{color:#344740!important}
+ .hero-action-secondary{color:#263B38!important}
+ .hero-credit{color:#263B38!important}
+}
+</style>
 </head>
 <body>
 <div class="wrap" id="app" dir="ltr">
 <header class="top"><div class="brand"><div class="mark" aria-hidden="true">Y</div><div><strong>BALABS</strong><small>Applied biotechnology · Sétif</small></div></div><div class="tools" aria-label="Language selector"><button class="lang" data-lang="fr" aria-pressed="true">🇫🇷 FR</button><button class="lang" data-lang="en" aria-pressed="false">🇬🇧 EN</button><button class="lang" data-lang="ar" aria-pressed="false">🇩🇿 العربية</button><button class="lang" data-lang="pt" aria-pressed="false">🇵🇹 PT</button></div></header><nav class="site-nav" aria-label="Navigation principale"><a href="#accueil" data-i18n="navHome">Accueil</a><a href="#a-la-une" data-i18n="navFeatured">À la une</a><a href="#a-propos" data-i18n="navAbout">À propos</a><a href="#chantiers" data-i18n="navWork">Chantiers</a><a href="#demarche" data-i18n="navMethod">Méthode</a><a href="#universe" data-i18n="navExplore">Explorer</a></nav>
-<section class="hero" id="accueil"><img class="hero-micrograph" src="https://upload.wikimedia.org/wikipedia/commons/7/7d/Bovine_Blastocyst.JPG" alt="Micrographie d’un blastocyste bovin observé au microscope"><div><div class="eyebrow" data-i18n="eyebrow">Un écosystème en mouvement</div><h1 data-i18n-html="headline">Entrer dans<br>l’univers <span>BALabs.</span></h1><p data-i18n="intro">Explore les grandes sphères de BALabs. Chaque domaine révèle un univers de thèmes, de projets et d’applications.</p><div class="hero-actions"><a class="hero-action-primary" href="#universe" data-i18n="heroExplore">Explorer les domaines <span aria-hidden="true">↗</span></a><a class="hero-action-secondary" href="#a-la-une" data-i18n="heroFeatured">Voir le projet à la une</a></div></div><div class="aside"><b data-i18n="asideTitle">La biologie comme point de départ.</b><span data-i18n="asideText">Des disciplines distinctes, reliées par la matière, les méthodes et les applications.</span></div><a class="hero-credit" href="https://commons.wikimedia.org/wiki/File:Bovine_Blastocyst.JPG" target="_blank" rel="noopener">MICROGRAPH / BOVINE BLASTOCYST · PANDAL00M · CC BY-SA 4.0</a>
+<section class="hero" id="accueil"><img class="hero-micrograph" src="https://upload.wikimedia.org/wikipedia/commons/e/ee/Mycelium.JPG" alt="Hyphes du champignon Podospora anserina observées en microscopie à fluorescence, grossissement 630×"><div><div class="eyebrow" data-i18n="eyebrow">Un écosystème en mouvement</div><h1 data-i18n-html="headline">Entrer dans<br>l’univers <span>BALabs.</span></h1><p data-i18n="intro">Explore les grandes sphères de BALabs. Chaque domaine révèle un univers de thèmes, de projets et d’applications.</p><div class="hero-actions"><a class="hero-action-primary" href="#universe" data-i18n="heroExplore">Explorer les domaines <span aria-hidden="true">↗</span></a><a class="hero-action-secondary" href="#a-la-une" data-i18n="heroFeatured">Voir le projet à la une</a></div></div><div class="aside"><b data-i18n="asideTitle">La biologie comme point de départ.</b><span data-i18n="asideText">Des disciplines distinctes, reliées par la matière, les méthodes et les applications.</span></div><a class="hero-credit" href="https://commons.wikimedia.org/wiki/File:Mycelium.JPG" target="_blank" rel="noopener">MICROGRAPH / PODOSPORA ANSERINA · CHRISTIAN SCHECKHUBER · CC BY-SA 4.0</a>
+</section>
 
 <section class="editorial-feature" id="a-la-une" aria-label="Projet mis en avant">
-  <div class="editorial-art editorial-art-feature" aria-hidden="true">
-    <svg viewBox="0 0 620 430" role="img">
-      <g fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M311 383 C306 333 315 294 307 249 C302 219 281 190 253 169 C223 146 183 140 148 152 C116 163 96 191 93 220 C90 249 107 272 135 279 C162 286 190 271 198 247 C205 225 192 205 174 202 C159 200 145 210 145 224"/>
-        <path d="M309 383 C322 333 350 301 380 272 C413 241 449 222 481 226 C511 230 532 253 527 278 C523 302 498 315 476 306 C456 298 451 277 462 264"/>
-        <path d="M308 383 C286 345 263 319 232 300 C201 281 171 281 151 298 C132 315 137 340 157 349 C177 358 197 346 195 329"/>
-        <path d="M312 383 C337 351 367 335 402 330 C435 324 458 337 460 359 C462 378 443 391 425 382"/>
-        <path d="M311 384 C310 349 304 321 287 295 M312 384 C326 349 341 326 363 310"/>
-        <path d="M149 152 C139 124 149 97 171 82 C196 65 232 68 254 88 C269 102 276 123 270 143 C251 137 231 140 212 151"/>
-        <path d="M381 272 C373 244 385 215 408 197 C434 176 469 173 492 190 C509 203 517 219 513 236"/>
-        <path d="M152 298 C124 289 104 297 92 315 M195 329 C219 335 235 352 238 374 M476 306 C502 298 521 305 536 324 M425 382 C408 400 407 414 413 423"/>
-        <path d="M170 85 C178 105 196 116 217 116 M408 198 C426 215 450 222 475 217"/>
-        <path d="M110 183 C122 172 136 166 151 164 M495 190 C512 183 530 185 544 197"/>
-      </g>
-      <g fill="currentColor">
-        <circle cx="145" cy="224" r="4"/><circle cx="462" cy="264" r="4"/><circle cx="195" cy="329" r="4"/><circle cx="425" cy="382" r="4"/>
-        <circle cx="171" cy="82" r="3"/><circle cx="492" cy="190" r="3"/><circle cx="92" cy="315" r="3"/><circle cx="536" cy="324" r="3"/>
-      </g>
-    </svg>
-    <span class="art-caption">MYCELIUM / RÉSEAU DE CROISSANCE</span>
+  <div class="editorial-art editorial-art-feature">
+    <img class="feature-photo" src="https://upload.wikimedia.org/wikipedia/commons/3/31/Oyster_mushroom_%28Pleurotus_ostreatus%29_mycelium_in_petri_dish_on_coffee_grounds.JPG" alt="Mycélium de Pleurotus ostreatus se développant sur du marc de café dans une boîte de culture" loading="lazy" decoding="async">
+    <a class="art-caption" href="https://commons.wikimedia.org/wiki/File:Oyster_mushroom_(Pleurotus_ostreatus)_mycelium_in_petri_dish_on_coffee_grounds.JPG" target="_blank" rel="noopener">PLEUROTUS OSTREATUS / MARC DE CAFÉ · TOBI KELLNER · CC BY-SA 3.0</a>
   </div>
   <div class="editorial-copy">
     <div class="eyebrow" data-i18n="featureKicker">À LA UNE / MYCOLOGIE APPLIQUÉE</div>
@@ -1363,25 +2389,37 @@ body{background:linear-gradient(180deg,#0b1214 0,#101a1b 44%,#eeeade 44%,#eeeade
   <div class="work-grid">
     <article class="work-card work-myco">
       <span class="work-index">01 / CULTURES</span>
-      <div class="work-illustration" aria-hidden="true"><svg viewBox="0 0 180 130"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M90 120V74M90 90C67 68 42 73 31 47M90 83C113 56 138 60 151 32M90 104C69 93 53 101 43 119M90 105C111 86 132 93 144 113M31 47C26 29 35 16 49 13M151 32C157 16 149 7 136 5M49 13C63 7 75 14 78 27M136 5C120 2 108 11 107 25"/><path d="M90 74C79 56 79 41 89 29M90 74C102 54 104 42 98 28"/></g><g fill="currentColor"><circle cx="49" cy="13" r="3"/><circle cx="136" cy="5" r="3"/><circle cx="31" cy="47" r="2.5"/><circle cx="151" cy="32" r="2.5"/><circle cx="43" cy="119" r="2.5"/><circle cx="144" cy="113" r="2.5"/></g></svg></div>
+      <figure class="work-media">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/0/0b/Pleurotus_ostreatus_on_agar.jpg" alt="Culture de Pleurotus ostreatus développant son mycélium sur milieu gélosé" loading="lazy" decoding="async">
+        <figcaption><a href="https://commons.wikimedia.org/wiki/File:Pleurotus_ostreatus_on_agar.jpg" target="_blank" rel="noopener">Michał Wadas · CC BY-SA 4.0</a></figcaption>
+      </figure>
       <h3 data-i18n="workMycoTitle">Cultures fongiques</h3>
       <p data-i18n="workMycoText">Observer les souches, développer les cultures et explorer les relations entre mycélium, substrats et matière organique.</p>
+      <p class="work-topics" data-i18n="workMycoTopics">Ressources fongiques · cultures &amp; multiplication · applications mycologiques</p>
       <span class="work-tag" data-i18n="workMycoTag">MYCOLOGIE APPLIQUÉE</span>
       <a class="work-card-link" data-work-page="myco" href="#" data-i18n="workOpenMyco">Découvrir le domaine <span aria-hidden="true">↗</span></a>
     </article>
     <article class="work-card work-soil">
       <span class="work-index">02 / MATIÈRES</span>
-      <div class="work-illustration" aria-hidden="true"><svg viewBox="0 0 180 130"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M22 39H158M31 48C40 60 48 71 56 91C63 108 69 117 78 124M56 48C65 65 77 75 90 86C101 96 105 109 106 124M90 48C87 67 92 78 108 91C124 104 131 113 134 124M133 48C124 62 121 73 124 88M22 39C32 24 47 17 63 20M158 39C148 23 132 17 116 20"/></g><g fill="currentColor"><circle cx="63" cy="20" r="3"/><circle cx="116" cy="20" r="3"/><circle cx="78" cy="124" r="2.5"/><circle cx="106" cy="124" r="2.5"/><circle cx="134" cy="124" r="2.5"/></g></svg></div>
+      <figure class="work-media">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b4/Organic_Compost.jpg/1280px-Organic_Compost.jpg" alt="Matière organique compostée, photographiée en gros plan" loading="lazy" decoding="async">
+        <figcaption><a href="https://commons.wikimedia.org/wiki/File:Organic_Compost.jpg" target="_blank" rel="noopener">Azorbli · CC BY-SA 4.0</a></figcaption>
+      </figure>
       <h3 data-i18n="workSoilTitle">TechnoSoil & biomatériaux</h3>
       <p data-i18n="workSoilText">Étudier les mélanges organiques, les substrats et les propriétés des matières pour imaginer de nouveaux usages.</p>
+      <p class="work-topics" data-i18n="workSoilTopics">Matières organiques · substrats · essais de culture</p>
       <span class="work-tag" data-i18n="workSoilTag">MATIÈRES & CIRCULARITÉ</span>
       <a class="work-card-link" data-work-page="soil" href="#" data-i18n="workOpenSoil">Découvrir le domaine <span aria-hidden="true">↗</span></a>
     </article>
     <article class="work-card work-iot">
       <span class="work-index">03 / INSTRUMENTATION</span>
-      <div class="work-illustration" aria-hidden="true"><svg viewBox="0 0 180 130"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="61" y="37" width="58" height="54" rx="2"/><path d="M73 51H107M73 62H97M73 73H103M90 37V20M90 91V111M61 64H39M119 64H141M39 64V43M141 64V85M90 20L83 27M90 20L97 27M90 111L83 104M90 111L97 104"/><circle cx="39" cy="36" r="7"/><circle cx="141" cy="92" r="7"/><circle cx="90" cy="13" r="5"/><circle cx="90" cy="118" r="5"/></g></svg></div>
+      <figure class="work-media">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/97/Data_logger.jpg/1024px-Data_logger.jpg" alt="Enregistreur de données portable mesurant la température et l’humidité relative" loading="lazy" decoding="async">
+        <figcaption><a href="https://commons.wikimedia.org/wiki/File:Data_logger.jpg" target="_blank" rel="noopener">Cjp24 · CC BY-SA 3.0</a></figcaption>
+      </figure>
       <h3 data-i18n="workIotTitle">Mesure & automatisation</h3>
       <p data-i18n="workIotText">Relier capteurs, acquisition de données et automatisation pour mieux suivre les environnements expérimentaux.</p>
+      <p class="work-topics" data-i18n="workIotTopics">Capteurs · instrumentation · automatisation</p>
       <span class="work-tag" data-i18n="workIotTag">INGÉNIERIE & IOT</span>
       <a class="work-card-link" data-work-page="iot" href="#" data-i18n="workOpenIot">Découvrir le domaine <span aria-hidden="true">↗</span></a>
     </article>
@@ -1404,6 +2442,29 @@ body{background:linear-gradient(180deg,#0b1214 0,#101a1b 44%,#eeeade 44%,#eeeade
   </ol>
 </section>
 
+<section class="universe-bridge" aria-label="Entrer dans l'explorateur BALabs">
+  <div class="bridge-copy">
+    <span class="bridge-kicker" data-i18n="bridgeKicker">05 / EXPLORATEUR INTERACTIF</span>
+    <h2 data-i18n-html="bridgeTitle">Des domaines<br><em>au réseau vivant.</em></h2>
+    <p data-i18n="bridgeText">Les disciplines ne sont pas isolées. Explore leurs connexions, ouvre un domaine et suis les liens vers ses ressources.</p>
+    <a href="#universe" class="bridge-action" data-i18n="bridgeAction">Entrer dans l’explorateur <span aria-hidden="true">↘</span></a>
+  </div>
+  <svg class="bridge-network" viewBox="0 0 620 260" fill="none" aria-hidden="true">
+    <g stroke="currentColor" stroke-width="1.2" opacity=".68">
+      <path d="M14 210C94 174 100 64 196 82S302 222 390 148 485 22 606 54"/>
+      <path d="M24 52C114 84 136 196 230 174S334 28 428 70 520 210 610 184"/>
+      <path d="M104 8C154 76 194 114 280 112S418 102 514 252"/>
+      <path d="M42 252C132 202 206 34 306 42S454 192 576 116"/>
+    </g>
+    <g fill="#B96B4D">
+      <circle cx="14" cy="210" r="4"/><circle cx="196" cy="82" r="4"/><circle cx="390" cy="148" r="4"/><circle cx="606" cy="54" r="4"/>
+    </g>
+    <g fill="#9BAEA4">
+      <circle cx="24" cy="52" r="3.5"/><circle cx="230" cy="174" r="3.5"/><circle cx="428" cy="70" r="3.5"/><circle cx="610" cy="184" r="3.5"/>
+    </g>
+  </svg>
+</section>
+
 <section class="scene" id="universe" aria-label="BALabs universe"><div class="scenehead"><div><small data-i18n="sceneKicker">01 / Univers BALabs</small><strong data-i18n="sceneTitle">Choisis une sphère pour entrer dans son monde.</strong></div><button class="btn" id="homeBtn" hidden data-i18n="backHome">← Retour à toutes les sphères</button></div>
 <div class="cluster-key" aria-label="Domain clusters"><div class="cluster-item cluster-foundations"><i aria-hidden="true"></i><span><b data-i18n="clusterBio">FONDEMENTS BIOLOGIQUES</b><small data-i18n="clusterBioSub">Biotechnologies · mycologie · TechnoSoil · R&D</small></span></div><div class="cluster-item cluster-applications"><i aria-hidden="true"></i><span><b data-i18n="clusterApply">APPLICATIONS &amp; TRANSMISSION</b><small data-i18n="clusterApplySub">Produits · ingénierie · projets · ressources</small></span></div></div><div class="view universe-closed" id="mainView">
 <svg class="network" id="sphereNetwork" aria-hidden="true" viewBox="0 0 1000 650" preserveAspectRatio="none"><g id="networkEdges"></g></svg><div class="galaxy"></div><div class="galaxy g2"></div><button class="hub" id="openUniverse" type="button" aria-label="Ouvrir les sphères BALabs"><div><strong>BA</strong><small data-i18n="coreLabel">NOYAU BALABS</small><span class="hubhint" data-i18n="hubHint">Cliquer pour explorer ↓</span></div></button>
@@ -1419,7 +2480,19 @@ body{background:linear-gradient(180deg,#0b1214 0,#101a1b 44%,#eeeade 44%,#eeeade
 <div class="mini" id="miniView" hidden><div class="miniintro"><div><div class="eyebrow" id="miniKicker">SPHÈRE 01</div><h2 id="miniTitle">Biotechnologies</h2><p id="miniDesc">Le monde des solutions biologiques appliquées.</p></div><a class="btn primary" id="spherePage" href="#miniMap">Parcourir les thèmes ↓</a></div><div class="mini-map" id="miniMap"><svg class="mini-connections" id="miniConnections" aria-hidden="true"><g id="miniEdges"></g></svg><div class="mini-ring"></div><div class="mini-core"><div><b data-i18n="miniCore">AXE CENTRAL</b><small data-i18n="miniCoreSub">AXE DU DOMAINE</small></div></div><button class="linknode ln1" type="button" data-resource-index="1"><span>01 / THÈME</span><b>Rubrique principale</b><small>Ouvrir la page</small></button><button class="linknode ln2" type="button" data-resource-index="2"><span>02 / THÈME</span><b>Thème associé</b><small>Ouvrir la page</small></button><button class="linknode ln3" type="button" data-resource-index="3"><span>03 / THÈME</span><b>Projet ou application</b><small>Ouvrir la page</small></button><button class="linknode ln4" type="button" data-resource-index="4"><span>04 / THÈME</span><b>Fiches & ressources</b><small>Ouvrir la page</small></button><button class="linknode ln5" type="button" data-resource-index="5"><span>05 / THÈME</span><b>Projets scientifiques</b><small>Ouvrir la page</small></button><button class="linknode ln6" type="button" data-resource-index="6"><span>06 / THÈME</span><b>Voir la rubrique complète ↗</b><small>Explorer les thèmes associés</small></button></div><div class="resource-detail" id="resourceDetail" hidden aria-live="polite"><div class="resource-detail-orbit" aria-hidden="true"></div><div class="resource-detail-copy"><span class="resource-detail-kicker" id="resourceDetailKicker">THÈME SÉLECTIONNÉ</span><h3 id="resourceDetailTitle"></h3><p id="resourceDetailText"></p><div class="resource-detail-actions"><button class="resource-back" id="resourceBack" type="button">← Retour aux thèmes</button><a class="resource-open" id="resourceOpen" href="#" target="_blank" rel="noopener noreferrer">Ouvrir cette ressource ↗</a></div></div></div><div class="sphere-hops" id="sphereHops" aria-label="Domaines connectés"><strong id="sphereHopsTitle">Domaines reliés</strong></div></div>
 </section>
 <section class="under" aria-label="Principes de BALabs"><div class="tile"><b data-i18n="tile1">Biologie d’abord</b><p data-i18n="tile1p">La technologie sert l’observation, les cultures et les procédés biologiques.</p></div><div class="tile"><b data-i18n="tile2">Des liens réels</b><p data-i18n="tile2p">Les sphères et les points renvoient vers les rubriques publiques existantes.</p></div><div class="tile"><b data-i18n="tile3">Multilingue natif</b><p data-i18n="tile3p">Français, anglais, arabe et portugais, avec interface adaptée au sens de lecture.</p></div><div class="tile"><b data-i18n="tile4">Explorer autrement</b><p data-i18n="tile4p">Découvre les liens entre les disciplines et leurs applications.</p></div></section>
-<footer class="foot"><span><strong>BALABS</strong> · Applied biotechnology</span><small class="asset-credit">Microscopy: Christian Scheckhuber · <a href="https://commons.wikimedia.org/wiki/File:Mycelium.JPG" target="_blank" rel="noopener">Mycelium, Podospora anserina (630×)</a> · <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener">CC BY-SA 4.0</a></small></footer>
+<footer class="foot" aria-label="Pied de page BALabs">
+  <div class="foot-brand">
+    <a class="foot-home" href="#accueil" aria-label="BALabs — retour en haut"><strong>BALABS</strong><span>Applied biotechnology · Sétif</span></a>
+    <small class="foot-note">Biology · Research · Applied technologies</small>
+  </div>
+  <nav class="foot-nav" aria-label="Navigation de pied de page">
+    <a href="#a-propos" data-i18n="navAbout">À propos</a>
+    <a href="#chantiers" data-i18n="navWork">Chantiers</a>
+    <a href="#demarche" data-i18n="navMethod">Méthode</a>
+    <a href="#universe" data-i18n="navExplore">Explorer</a>
+  </nav>
+  <small class="asset-credit">Microscopy: Christian Scheckhuber · <a href="https://commons.wikimedia.org/wiki/File:Mycelium.JPG" target="_blank" rel="noopener">Mycelium, Podospora anserina (630×)</a> · <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener">CC BY-SA 4.0</a></small>
+</footer>
 </div>
 <script>
 const roots={
@@ -1429,34 +2502,34 @@ ar:'https://app.notion.com/p/40173152f171815bbc8cc0370d162897',
 pt:'https://app.notion.com/p/40173152f171814fb8d1cc19807f7ca4'
 };
 const T={
-fr:{eyebrow:'Un écosystème en mouvement',headline:'Entrer dans<br>l’univers <span>BALabs.</span>',intro:'Explore les grandes sphères de BALabs. Chaque domaine révèle un univers de thèmes, de projets et d’applications.',asideTitle:'Un univers, plusieurs mondes.',asideText:'Explore les connexions entre les domaines.',navHome:"Accueil",navFeatured:"À la une",navAbout:"À propos",navWork:"Chantiers",workOpenMyco:"Découvrir la mycologie",workOpenSoil:"Explorer TechnoSoil",workOpenIot:"Voir l’instrumentation",navMethod:"Méthode",navExplore:"Explorer",heroExplore:"Explorer les domaines",heroFeatured:"Voir le projet à la une",featureKicker:"À LA UNE / MYCOLOGIE APPLIQUÉE",featureStatus:"AXE D’EXPLORATION · DÉMARCHE EN DÉVELOPPEMENT",featureTitle:"Le mycélium,<br><em>une matière vivante.</em>",featureText:"Des cultures fongiques aux substrats, la mycologie ouvre des pistes concrètes pour observer, expérimenter et valoriser la matière organique.",featureLink:"Explorer les domaines",aboutKicker:"À PROPOS / BA LABS",aboutTitle:"De la biologie<br>aux <em>technologies appliquées.</em>",aboutText:"BA Labs explore les liens entre biologie, mycologie, matériaux organiques et ingénierie. Une démarche expérimentale où l’observation du vivant guide la conception de méthodes, de cultures et de prototypes.",aboutLink:"Découvrir notre écosystème",workKicker:"03 / CHAMPS D’EXPLORATION",workTitle:"Des idées biologiques<br><em>aux applications concrètes.</em>",workIntro:"Trois axes illustrent la manière dont BA Labs relie observation du vivant, expérimentation et conception technique.",workMycoTitle:"Cultures fongiques",workMycoText:"Observer les souches, développer les cultures et explorer les relations entre mycélium, substrats et matière organique.",workMycoTag:"MYCOLOGIE APPLIQUÉE",workSoilTitle:"TechnoSoil & biomatériaux",workSoilText:"Étudier les mélanges organiques, les substrats et les propriétés des matières pour imaginer de nouveaux usages.",workSoilTag:"MATIÈRES & CIRCULARITÉ",workIotTitle:"Mesure & automatisation",workIotText:"Relier capteurs, acquisition de données et automatisation pour mieux suivre les environnements expérimentaux.",workIotTag:"INGÉNIERIE & IOT",workExplore:"Explorer les domaines associés",methodKicker:"04 / DÉMARCHE",methodTitle:"Comprendre le vivant.<br><em>Construire avec méthode.</em>",methodIntro:"Chaque piste commence par une question. Elle progresse par observation, expérimentation et documentation, avant d'envisager une application.",methodObserve:"Observer",methodObserveText:"Décrire un organisme, une matière ou un environnement et identifier ce qui mérite d'être étudié.",methodQuestion:"Formuler",methodQuestionText:"Définir une question de travail, des paramètres à suivre et un protocole adapté.",methodTest:"Expérimenter",methodTestText:"Réaliser des essais, consigner les observations et ajuster la démarche selon les résultats.",methodShare:"Documenter",methodShareText:"Organiser les connaissances et rendre les méthodes, limites et pistes d'application compréhensibles.", sceneKicker:'01 / Univers BALabs',sceneTitle:'Choisis une sphère pour entrer dans son monde.',clusterBio:'FONDEMENTS BIOLOGIQUES',clusterBioSub:'Biotechnologies · mycologie · TechnoSoil · R&D',clusterApply:'APPLICATIONS & TRANSMISSION',clusterApplySub:'Produits · ingénierie · projets · ressources',backHome:'← Retour à toutes les sphères',coreLabel:'NOYAU BALABS',hubHint:'Cliquer pour explorer ↓',hubHintOpen:'Constellation ouverte · choisis une sphère',miniCore:'AXE CENTRAL',miniCoreSub:'CŒUR DU DOMAINE',tile1:'Biologie d’abord',tile1p:'La technologie sert l’observation, les cultures et les procédés biologiques.',tile2:'Des liens réels',tile2p:'Les sphères et les points renvoient vers les rubriques publiques existantes.',tile3:'Multilingue natif',tile3p:'Français, anglais, arabe et portugais, avec interface adaptée au sens de lecture.',tile4:'Explorer autrement',tile4p:'Découvre les liens entre les disciplines et leurs applications.',footer:'Un univers vivant, des disciplines connectées.',open:'Explorer ce domaine ↗',detail:'Ouvrir la page',full:'Explorer le domaine ↗',sphere:{bio:['Biotechnologies','Microorganismes · bioprocédés'],myco:['Mycologie & cultures','Souches · mycélium · substrats'],soil:['TechnoSoil','Sols · eau · matière organique'],lab:['Laboratoire R&D','Protocoles · mesures · essais'],products:['Produits & ressources','Catalogue · fiches · kits'],iot:['Ingénierie & IoT','Capteurs · automatisation'],work:['Projets scientifiques','Recherche · essais · prototypes'],learn:['Ressources & transmission','Guides · documentation · partage']},desc:{bio:'Microorganismes utiles, bioprocédés et solutions biologiques appliquées.',myco:'Souches fongiques, cultures, mycélium et valorisation des substrats.',soil:'Un axe expérimental consacré aux sols, à l’eau et à la matière organique.',lab:'Protocoles, mesures, reproductibilité et qualification des résultats.',products:'Catalogue public, ressources biologiques, supports et kits.',iot:'Instrumentation, capteurs, automatisation et prototypes techniques.',work:'Projets scientifiques, essais et résultats sélectionnés pour une présentation publique.',learn:'Guides publics, fiches, méthodes et ressources de transmission.'},node:['Rubrique principale','Thème associé','Projet ou application','Fiches & ressources','Projets scientifiques','Voir la rubrique complète ↗'],nodeSub:['Accéder à la page principale','Explorer le thème lié','Découvrir les applications','Ouvrir les ressources associées','Explorer les projets présentés','Explorer les thèmes associés'],tag:'SPHÈRE',mainLink:'Rubrique principale',adjacentTitle:'Domaines reliés'},
-en:{eyebrow:'A living ecosystem',headline:'Enter the<br><span>BALabs</span> universe.',intro:'Explore the main BALabs domains. Each one opens a world of themes, projects and applications.',asideTitle:'One universe, many worlds.',asideText:'Explore the connections between the different fields.',navHome:"Home",navFeatured:"Featured",navAbout:"About",navWork:"Work areas",workOpenMyco:"Explore mycology",workOpenSoil:"Explore TechnoSoil",workOpenIot:"View instrumentation",navMethod:"Method",navExplore:"Explore",heroExplore:"Explore the domains",heroFeatured:"View the featured project",featureKicker:"FEATURED / APPLIED MYCOLOGY",featureStatus:"EXPLORATION AREA · WORK IN DEVELOPMENT",featureTitle:"Mycelium,<br><em>a living material.</em>",featureText:"From fungal cultures to substrates, mycology opens practical paths to observe, experiment and make better use of organic matter.",featureLink:"Explore the domains",aboutKicker:"ABOUT / BA LABS",aboutTitle:"From biology<br>to <em>applied technologies.</em>",aboutText:"BA Labs explores the connections between biology, mycology, organic materials and engineering. An experimental approach where observing living systems guides the development of methods, cultures and prototypes.",aboutLink:"Discover our ecosystem",workKicker:"03 / AREAS OF EXPLORATION",workTitle:"Biological ideas<br><em>put into practice.</em>",workIntro:"Three areas show how BA Labs connects the observation of living systems, experimentation and technical design.",workMycoTitle:"Fungal cultures",workMycoText:"Observe strains, develop cultures and explore the relationships between mycelium, substrates and organic matter.",workMycoTag:"APPLIED MYCOLOGY",workSoilTitle:"TechnoSoil & biomaterials",workSoilText:"Study organic blends, substrates and material properties to investigate new uses.",workSoilTag:"MATERIALS & CIRCULARITY",workIotTitle:"Measurement & automation",workIotText:"Connect sensors, data acquisition and automation to better monitor experimental environments.",workIotTag:"ENGINEERING & IOT",workExplore:"Explore related domains",methodKicker:"04 / APPROACH",methodTitle:"Understand living systems.<br><em>Build with method.</em>",methodIntro:"Every line of inquiry starts with a question. It advances through observation, experimentation and documentation before an application is considered.",methodObserve:"Observe",methodObserveText:"Describe an organism, material or environment and identify what is worth investigating.",methodQuestion:"Frame the question",methodQuestionText:"Define a working question, the parameters to monitor and a suitable protocol.",methodTest:"Experiment",methodTestText:"Run trials, record observations and adapt the approach in light of the results.",methodShare:"Document",methodShareText:"Organize knowledge and make methods, limitations and possible applications understandable.", sceneKicker:'01 / BALabs universe',sceneTitle:'Choose a sphere to enter its world.',clusterBio:'BIOLOGICAL FOUNDATIONS',clusterBioSub:'Biotechnology · mycology · TechnoSoil · R&D',clusterApply:'APPLICATION & KNOWLEDGE SHARING',clusterApplySub:'Products · engineering · projects · resources',backHome:'← Back to all spheres',coreLabel:'BALABS CORE',hubHint:'Click to explore ↓',hubHintOpen:'Constellation open · choose a sphere',miniCore:'CENTRAL AXIS',miniCoreSub:'DOMAIN CORE',tile1:'Biology first',tile1p:'Technology supports observation, cultures and biological processes.',tile2:'Real connections',tile2p:'Domains and nodes connect related themes and applications.',tile3:'Multilingual by design',tile3p:'French, English, Arabic and Portuguese, with correct reading direction.',tile4:'Explore further',tile4p:'Discover the links between disciplines and their applications.',footer:'A living universe of connected disciplines.',open:'Explore this field ↗',detail:'Open page',full:'Explore the field ↗',sphere:{bio:['Biotechnology','Microorganisms · bioprocesses'],myco:['Mycology & cultures','Strains · mycelium · substrates'],soil:['TechnoSoil','Soils · water · organic matter'],lab:['R&D laboratory','Protocols · measurements · trials'],products:['Products & resources','Catalogue · profiles · kits'],iot:['Engineering & IoT','Sensors · automation'],work:['Scientific projects','Research · trials · prototypes'],learn:['Resources & learning','Guides · documentation · sharing']},desc:{bio:'Useful microorganisms, bioprocesses and applied biological solutions.',myco:'Fungal strains, cultures, mycelium and substrate valorisation.',soil:'An experimental track focused on soils, water and organic matter.',lab:'Protocols, measurements, reproducibility and result qualification.',products:'Public catalogue, biological resources, cultivation materials and kits.',iot:'Instrumentation, sensors, automation and technical prototypes.',work:'Scientific projects, experiments and results selected for public presentation.',learn:'Public guides, fact sheets, methods and learning resources.'},node:['Main section','Related theme','Project or application','Profiles & resources','Scientific projects','Open full section ↗'],nodeSub:['Open the main page','Explore the related theme','Discover applications','Open related resources','Explore featured projects','Explore related themes'],tag:'SPHERE',mainLink:'Main section',adjacentTitle:'Connected spheres'},
-ar:{eyebrow:'منظومة حيوية متحركة',headline:'ادخل إلى<br><span>عالم BALabs.</span>',intro:'استكشف المجالات الرئيسية في BALabs. يفتح كل مجال عالماً من الموضوعات والمشاريع والتطبيقات.',asideTitle:'عالم واحد، مجالات متعددة.',asideText:'استكشف الروابط بين المجالات المختلفة.',navHome:"الرئيسية",navFeatured:"في الواجهة",navAbout:"من نحن",navWork:"مجالات العمل",workOpenMyco:"اكتشف علم الفطريات",workOpenSoil:"استكشف TechnoSoil",workOpenIot:"اكتشف أجهزة القياس",navMethod:"المنهجية",navExplore:"استكشف",heroExplore:"استكشف المجالات",heroFeatured:"شاهد المشروع المميز",featureKicker:"في الواجهة / علم الفطريات التطبيقي",featureStatus:"مجال استكشاف · العمل قيد التطوير",featureTitle:"الميسيليوم،<br><em>مادة حيّة.</em>",featureText:"من الزراعات الفطرية إلى الركائز، يفتح علم الفطريات مسارات عملية للملاحظة والتجريب وتثمين المادة العضوية.",featureLink:"استكشف المجالات",aboutKicker:"عن / BA LABS",aboutTitle:"من علم الأحياء<br>إلى <em>التقنيات التطبيقية.</em>",aboutText:"تستكشف BA Labs الروابط بين علم الأحياء والفطريات والمواد العضوية والهندسة. منهج تجريبي تقود فيه ملاحظة الكائنات الحية تطوير الأساليب والزراعات والنماذج الأولية.",aboutLink:"اكتشف منظومتنا",workKicker:"03 / مجالات الاستكشاف",workTitle:"أفكار بيولوجية<br><em>وتطبيقات عملية.</em>",workIntro:"توضح هذه المحاور الثلاثة كيف تربط BA Labs بين ملاحظة الكائنات الحية والتجريب والتصميم التقني.",workMycoTitle:"الزراعات الفطرية",workMycoText:"ملاحظة السلالات وتطوير الزراعات واستكشاف العلاقات بين الميسيليوم والركائز والمادة العضوية.",workMycoTag:"علم الفطريات التطبيقي",workSoilTitle:"TechnoSoil والمواد الحيوية",workSoilText:"دراسة الخلطات العضوية والركائز وخصائص المواد لاستكشاف استخدامات جديدة.",workSoilTag:"المواد والاقتصاد الدائري",workIotTitle:"القياس والأتمتة",workIotText:"ربط المستشعرات وجمع البيانات والأتمتة لمتابعة البيئات التجريبية بشكل أفضل.",workIotTag:"الهندسة وإنترنت الأشياء",workExplore:"استكشف المجالات المرتبطة",methodKicker:"04 / المنهجية",methodTitle:"فهم الكائنات الحية.<br><em>والبناء وفق منهج.</em>",methodIntro:"تبدأ كل فكرة بسؤال، ثم تتقدم عبر الملاحظة والتجريب والتوثيق قبل التفكير في تطبيق عملي.",methodObserve:"الملاحظة",methodObserveText:"وصف كائن حي أو مادة أو بيئة وتحديد ما يستحق الدراسة.",methodQuestion:"صياغة السؤال",methodQuestionText:"تحديد سؤال العمل والمعايير التي يجب متابعتها والبروتوكول المناسب.",methodTest:"التجريب",methodTestText:"إجراء التجارب وتسجيل الملاحظات وتعديل المنهج وفق النتائج.",methodShare:"التوثيق",methodShareText:"تنظيم المعارف وتوضيح الطرق والحدود ومسارات التطبيق الممكنة.", sceneKicker:'01 / عالم BALabs',sceneTitle:'اختر مجالاً للدخول إلى عالمه.',clusterBio:'الأسس البيولوجية',clusterBioSub:'التكنولوجيا الحيوية · الفطريات · TechnoSoil · البحث والتطوير',clusterApply:'التطبيقات ونقل المعرفة',clusterApplySub:'المنتجات · الهندسة · المشاريع · الموارد',backHome:'→ العودة إلى جميع المجالات',coreLabel:'نواة BALabs',hubHint:'اضغط لاستكشاف ↓',hubHintOpen:'الكوكبة مفتوحة · اختر مجالاً',miniCore:'المحور المركزي',miniCoreSub:'محور المجال',tile1:'البيولوجيا أولاً',tile1p:'تخدم التكنولوجيا الملاحظة والزراعات والعمليات البيولوجية.',tile2:'روابط فعلية',tile2p:'تربط المجالات والعُقد بين الموضوعات والتطبيقات ذات الصلة.',tile3:'تعدد اللغات من البداية',tile3p:'الفرنسية والإنجليزية والعربية والبرتغالية مع اتجاه قراءة مناسب.',tile4:'اكتشف الروابط',tile4p:'تعرّف على الصلات بين التخصصات وتطبيقاتها.',footer:'عالم حيّ يجمع مجالات مترابطة.',open:'استكشف هذا المجال ↗',detail:'افتح الصفحة',full:'استكشف المجال ↗',sphere:{bio:['التكنولوجيا الحيوية','كائنات دقيقة · عمليات حيوية'],myco:['الفطريات والزراعات','سلالات · ميسيليوم · ركائز'],soil:['TechnoSoil','تربة · ماء · مادة عضوية'],lab:['مختبر البحث والتطوير','بروتوكولات · قياسات · تجارب'],products:['المنتجات والموارد','كتالوج · بطاقات · أطقم'],iot:['الهندسة وإنترنت الأشياء','مستشعرات · أتمتة'],work:['المشاريع العلمية','تجارب · نتائج · نماذج'],learn:['الموارد ونقل المعرفة','أدلة · توثيق · مشاركة']},desc:{bio:'كائنات دقيقة مفيدة وعمليات حيوية وحلول بيولوجية تطبيقية.',myco:'سلالات فطرية وزراعات وميسيليوم وتثمين الركائز.',soil:'مسار تجريبي يركز على التربة والماء والمادة العضوية.',lab:'بروتوكولات وقياسات وقابلية التكرار وتقييم النتائج.',products:'كتالوج عام وموارد بيولوجية وركائز وأطقم.',iot:'أجهزة قياس ومستشعرات وأتمتة ونماذج تقنية.',work:'مشاريع علمية وتجارب ونتائج مختارة للعرض العام.',learn:'أدلة عامة وبطاقات وطرق وموارد تعليمية.'},node:['القسم الرئيسي','موضوع مرتبط','مشروع أو تطبيق','بطاقات وموارد','مشاريع علمية','افتح القسم الكامل ↗'],nodeSub:['افتح الصفحة الرئيسية','استكشف الموضوع المرتبط','اكتشف التطبيقات','افتح الموارد المرتبطة','استكشف المشاريع المعروضة','استكشف الموضوعات المرتبطة'],tag:'المجال',mainLink:'القسم الرئيسي',adjacentTitle:'مجالات مترابطة'},
-pt:{eyebrow:'Um ecossistema em movimento',headline:'Entre no<br>universo <span>BALabs.</span>',intro:'Explore os principais domínios da BALabs. Cada domínio abre um universo de temas, projetos e aplicações.',asideTitle:'Um universo, vários mundos.',asideText:'Explore as ligações entre as diferentes áreas.',navHome:"Início",navFeatured:"Em destaque",navAbout:"Sobre",navWork:"Áreas de trabalho",workOpenMyco:"Explorar a micologia",workOpenSoil:"Explorar TechnoSoil",workOpenIot:"Ver instrumentação",navMethod:"Método",navExplore:"Explorar",heroExplore:"Explorar os domínios",heroFeatured:"Ver o projeto em destaque",featureKicker:"EM DESTAQUE / MICOLOGIA APLICADA",featureStatus:"EIXO DE EXPLORAÇÃO · TRABALHO EM DESENVOLVIMENTO",featureTitle:"O micélio,<br><em>uma matéria viva.</em>",featureText:"Das culturas fúngicas aos substratos, a micologia abre caminhos práticos para observar, experimentar e valorizar a matéria orgânica.",featureLink:"Explorar os domínios",aboutKicker:"SOBRE / BA LABS",aboutTitle:"Da biologia<br>às <em>tecnologias aplicadas.</em>",aboutText:"A BA Labs explora as ligações entre biologia, micologia, materiais orgânicos e engenharia. Uma abordagem experimental em que a observação dos sistemas vivos orienta o desenvolvimento de métodos, culturas e protótipos.",aboutLink:"Descobrir o nosso ecossistema",workKicker:"03 / ÁREAS DE EXPLORAÇÃO",workTitle:"Ideias biológicas<br><em>em aplicações concretas.</em>",workIntro:"Três áreas mostram como a BA Labs liga a observação dos sistemas vivos, a experimentação e o desenvolvimento técnico.",workMycoTitle:"Culturas fúngicas",workMycoText:"Observar estirpes, desenvolver culturas e explorar as relações entre micélio, substratos e matéria orgânica.",workMycoTag:"MICOLOGIA APLICADA",workSoilTitle:"TechnoSoil e biomateriais",workSoilText:"Estudar misturas orgânicas, substratos e propriedades dos materiais para explorar novas utilizações.",workSoilTag:"MATERIAIS E CIRCULARIDADE",workIotTitle:"Medição e automação",workIotText:"Ligar sensores, aquisição de dados e automação para acompanhar melhor os ambientes experimentais.",workIotTag:"ENGENHARIA E IOT",workExplore:"Explorar domínios relacionados",methodKicker:"04 / ABORDAGEM",methodTitle:"Compreender os sistemas vivos.<br><em>Construir com método.</em>",methodIntro:"Cada linha de investigação começa com uma pergunta. Avança através da observação, experimentação e documentação antes de considerar uma aplicação.",methodObserve:"Observar",methodObserveText:"Descrever um organismo, material ou ambiente e identificar o que merece ser estudado.",methodQuestion:"Formular",methodQuestionText:"Definir uma pergunta de trabalho, os parâmetros a acompanhar e um protocolo adequado.",methodTest:"Experimentar",methodTestText:"Realizar ensaios, registar observações e ajustar a abordagem de acordo com os resultados.",methodShare:"Documentar",methodShareText:"Organizar o conhecimento e tornar compreensíveis os métodos, limites e possíveis aplicações.", sceneKicker:'01 / Universo BALabs',sceneTitle:'Escolha uma esfera para entrar no seu mundo.',clusterBio:'FUNDAMENTOS BIOLÓGICOS',clusterBioSub:'Biotecnologia · micologia · TechnoSoil · I&D',clusterApply:'APLICAÇÕES E PARTILHA DE CONHECIMENTO',clusterApplySub:'Produtos · engenharia · projetos · recursos',backHome:'← Voltar a todas as esferas',coreLabel:'NÚCLEO BALABS',hubHint:'Clique para explorar ↓',hubHintOpen:'Constelação aberta · escolha uma esfera',miniCore:'EIXO CENTRAL',miniCoreSub:'EIXO DO DOMÍNIO',tile1:'Biologia primeiro',tile1p:'A tecnologia apoia a observação, as culturas e os processos biológicos.',tile2:'Ligações reais',tile2p:'Os domínios e os nós ligam temas e aplicações relacionados.',tile3:'Multilingue desde o início',tile3p:'Francês, inglês, árabe e português, com direção de leitura adequada.',tile4:'Explorar de outra forma',tile4p:'Descubra as ligações entre disciplinas e as suas aplicações.',footer:'Um universo vivo de áreas interligadas.',open:'Explorar esta área ↗',detail:'Abrir página',full:'Explorar a área ↗',sphere:{bio:['Biotecnologia','Microrganismos · bioprocessos'],myco:['Micologia e culturas','Estirpes · micélio · substratos'],soil:['TechnoSoil','Solos · água · matéria orgânica'],lab:['Laboratório de I&D','Protocolos · medições · ensaios'],products:['Produtos e recursos','Catálogo · fichas · kits'],iot:['Engenharia e IoT','Sensores · automação'],work:['Projetos científicos','Investigação · ensaios · protótipos'],learn:['Recursos e aprendizagem','Guias · documentação · partilha']},desc:{bio:'Microrganismos úteis, bioprocessos e soluções biológicas aplicadas.',myco:'Estirpes fúngicas, culturas, micélio e valorização de substratos.',soil:'Uma linha experimental dedicada aos solos, à água e à matéria orgânica.',lab:'Protocolos, medições, reprodutibilidade e qualificação dos resultados.',products:'Catálogo público, recursos biológicos, suportes de cultivo e kits.',iot:'Instrumentação, sensores, automação e protótipos técnicos.',work:'Projetos científicos, ensaios e resultados selecionados para apresentação pública.',learn:'Guias públicos, fichas, métodos e recursos de aprendizagem.'},node:['Secção principal','Tema associado','Projeto ou aplicação','Fichas e recursos','Projetos científicos','Abrir secção completa ↗'],nodeSub:['Abrir a página principal','Explorar o tema associado','Descobrir aplicações','Abrir recursos associados','Explorar projetos apresentados','Explore os temas associados'],tag:'ESFERA',mainLink:'Secção principal',adjacentTitle:'Esferas relacionadas'}
+fr:{eyebrow:'Un écosystème en mouvement',headline:'Entrer dans<br>l’univers <span>BALabs.</span>',intro:'Explore les grandes sphères de BALabs. Chaque domaine révèle un univers de thèmes, de projets et d’applications.',asideTitle:'Un univers, plusieurs mondes.',asideText:'Explore les connexions entre les domaines.',navHome:"Accueil",navFeatured:"À la une",navAbout:"À propos",navWork:"Chantiers",workOpenMyco:"Découvrir la mycologie",workOpenSoil:"Explorer TechnoSoil",workOpenIot:"Voir l’instrumentation",navMethod:"Méthode",navExplore:"Explorer",heroExplore:"Explorer les domaines",heroFeatured:"Voir le projet à la une",featureKicker:"À LA UNE / MYCOLOGIE APPLIQUÉE",featureStatus:"AXE D’EXPLORATION · DÉMARCHE EN DÉVELOPPEMENT",featureTitle:"Le mycélium,<br><em>une matière vivante.</em>",featureText:"Des cultures fongiques aux substrats, la mycologie ouvre des pistes concrètes pour observer, expérimenter et valoriser la matière organique.",featureLink:"Explorer les domaines",aboutKicker:"À PROPOS / BA LABS",aboutTitle:"De la biologie<br>aux <em>technologies appliquées.</em>",aboutText:"BA Labs explore les liens entre biologie, mycologie, matériaux organiques et ingénierie. Une démarche expérimentale où l’observation du vivant guide la conception de méthodes, de cultures et de prototypes.",aboutLink:"Découvrir notre écosystème",workKicker:"03 / CHAMPS D’EXPLORATION",workTitle:"Des idées biologiques<br><em>aux applications concrètes.</em>",workIntro:"Trois axes illustrent la manière dont BA Labs relie observation du vivant, expérimentation et conception technique.",workMycoTitle:"Cultures fongiques",workMycoText:"Observer les souches, développer les cultures et explorer les relations entre mycélium, substrats et matière organique.",workMycoTopics:'Ressources fongiques · cultures & multiplication · applications mycologiques',workMycoTag:"MYCOLOGIE APPLIQUÉE",workSoilTitle:"TechnoSoil & biomatériaux",workSoilText:"Étudier les mélanges organiques, les substrats et les propriétés des matières pour imaginer de nouveaux usages.",workSoilTopics:'Matières organiques · substrats · essais de culture',workSoilTag:"MATIÈRES & CIRCULARITÉ",workIotTitle:"Mesure & automatisation",workIotText:"Relier capteurs, acquisition de données et automatisation pour mieux suivre les environnements expérimentaux.",workIotTopics:'Capteurs · instrumentation · automatisation',workIotTag:"INGÉNIERIE & IOT",workExplore:"Explorer les domaines associés",methodKicker:"04 / DÉMARCHE",methodTitle:"Comprendre le vivant.<br><em>Construire avec méthode.</em>",methodIntro:"Chaque piste commence par une question. Elle progresse par observation, expérimentation et documentation, avant d'envisager une application.",methodObserve:"Observer",methodObserveText:"Décrire un organisme, une matière ou un environnement et identifier ce qui mérite d'être étudié.",methodQuestion:"Formuler",methodQuestionText:"Définir une question de travail, des paramètres à suivre et un protocole adapté.",methodTest:"Expérimenter",methodTestText:"Réaliser des essais, consigner les observations et ajuster la démarche selon les résultats.",methodShare:"Documenter",methodShareText:"Organiser les connaissances et rendre les méthodes, limites et pistes d'application compréhensibles.",bridgeKicker:'05 / EXPLORATEUR INTERACTIF',bridgeTitle:'Des domaines<br><em>au réseau vivant.</em>',bridgeText:'Les disciplines ne sont pas isolées. Explore leurs connexions, ouvre un domaine et suis les liens vers ses ressources.',bridgeAction:'Entrer dans l’explorateur', sceneKicker:'01 / Univers BALabs',sceneTitle:'Choisis une sphère pour entrer dans son monde.',clusterBio:'FONDEMENTS BIOLOGIQUES',clusterBioSub:'Biotechnologies · mycologie · TechnoSoil · R&D',clusterApply:'APPLICATIONS & TRANSMISSION',clusterApplySub:'Produits · ingénierie · projets · ressources',backHome:'← Retour à toutes les sphères',coreLabel:'NOYAU BALABS',hubHint:'Cliquer pour explorer ↓',hubHintOpen:'Constellation ouverte · choisis une sphère',miniCore:'AXE CENTRAL',miniCoreSub:'CŒUR DU DOMAINE',tile1:'Biologie d’abord',tile1p:'La technologie sert l’observation, les cultures et les procédés biologiques.',tile2:'Des liens réels',tile2p:'Les sphères et les points renvoient vers les rubriques publiques existantes.',tile3:'Multilingue natif',tile3p:'Français, anglais, arabe et portugais, avec interface adaptée au sens de lecture.',tile4:'Explorer autrement',tile4p:'Découvre les liens entre les disciplines et leurs applications.',footer:'Un univers vivant, des disciplines connectées.',open:'Explorer ce domaine ↗',detail:'Ouvrir la page',full:'Explorer le domaine ↗',sphere:{bio:['Biotechnologies','Microorganismes · bioprocédés'],myco:['Mycologie & cultures','Souches · mycélium · substrats'],soil:['TechnoSoil','Sols · eau · matière organique'],lab:['Laboratoire R&D','Protocoles · mesures · essais'],products:['Produits & ressources','Catalogue · fiches · kits'],iot:['Ingénierie & IoT','Capteurs · automatisation'],work:['Projets scientifiques','Recherche · essais · prototypes'],learn:['Ressources & transmission','Guides · documentation · partage']},desc:{bio:'Microorganismes utiles, bioprocédés et solutions biologiques appliquées.',myco:'Souches fongiques, cultures, mycélium et valorisation des substrats.',soil:'Un axe expérimental consacré aux sols, à l’eau et à la matière organique.',lab:'Protocoles, mesures, reproductibilité et qualification des résultats.',products:'Catalogue public, ressources biologiques, supports et kits.',iot:'Instrumentation, capteurs, automatisation et prototypes techniques.',work:'Projets scientifiques, essais et résultats sélectionnés pour une présentation publique.',learn:'Guides publics, fiches, méthodes et ressources de transmission.'},node:['Rubrique principale','Thème associé','Projet ou application','Fiches & ressources','Projets scientifiques','Voir la rubrique complète ↗'],nodeSub:['Accéder à la page principale','Explorer le thème lié','Découvrir les applications','Ouvrir les ressources associées','Explorer les projets présentés','Explorer les thèmes associés'],tag:'SPHÈRE',mainLink:'Rubrique principale',adjacentTitle:'Domaines reliés'},
+en:{eyebrow:'A living ecosystem',headline:'Enter the<br><span>BALabs</span> universe.',intro:'Explore the main BALabs domains. Each one opens a world of themes, projects and applications.',asideTitle:'One universe, many worlds.',asideText:'Explore the connections between the different fields.',navHome:"Home",navFeatured:"Featured",navAbout:"About",navWork:"Work areas",workOpenMyco:"Explore mycology",workOpenSoil:"Explore TechnoSoil",workOpenIot:"View instrumentation",navMethod:"Method",navExplore:"Explore",heroExplore:"Explore the domains",heroFeatured:"View the featured project",featureKicker:"FEATURED / APPLIED MYCOLOGY",featureStatus:"EXPLORATION AREA · WORK IN DEVELOPMENT",featureTitle:"Mycelium,<br><em>a living material.</em>",featureText:"From fungal cultures to substrates, mycology opens practical paths to observe, experiment and make better use of organic matter.",featureLink:"Explore the domains",aboutKicker:"ABOUT / BA LABS",aboutTitle:"From biology<br>to <em>applied technologies.</em>",aboutText:"BA Labs explores the connections between biology, mycology, organic materials and engineering. An experimental approach where observing living systems guides the development of methods, cultures and prototypes.",aboutLink:"Discover our ecosystem",workKicker:"03 / AREAS OF EXPLORATION",workTitle:"Biological ideas<br><em>put into practice.</em>",workIntro:"Three areas show how BA Labs connects the observation of living systems, experimentation and technical design.",workMycoTitle:"Fungal cultures",workMycoText:"Observe strains, develop cultures and explore the relationships between mycelium, substrates and organic matter.",workMycoTopics:'Fungal resources · cultivation & propagation · mycological applications',workMycoTag:"APPLIED MYCOLOGY",workSoilTitle:"TechnoSoil & biomaterials",workSoilText:"Study organic blends, substrates and material properties to investigate new uses.",workSoilTopics:'Organic matter · substrates · cultivation trials',workSoilTag:"MATERIALS & CIRCULARITY",workIotTitle:"Measurement & automation",workIotText:"Connect sensors, data acquisition and automation to better monitor experimental environments.",workIotTopics:'Sensors · instrumentation · automation',workIotTag:"ENGINEERING & IOT",workExplore:"Explore related domains",methodKicker:"04 / APPROACH",methodTitle:"Understand living systems.<br><em>Build with method.</em>",methodIntro:"Every line of inquiry starts with a question. It advances through observation, experimentation and documentation before an application is considered.",methodObserve:"Observe",methodObserveText:"Describe an organism, material or environment and identify what is worth investigating.",methodQuestion:"Frame the question",methodQuestionText:"Define a working question, the parameters to monitor and a suitable protocol.",methodTest:"Experiment",methodTestText:"Run trials, record observations and adapt the approach in light of the results.",methodShare:"Document",methodShareText:"Organize knowledge and make methods, limitations and possible applications understandable.",bridgeKicker:'05 / INTERACTIVE EXPLORER',bridgeTitle:'From disciplines<br><em>to a living network.</em>',bridgeText:'The fields are not isolated. Explore their connections, open a domain and follow the links to its resources.',bridgeAction:'Enter the explorer', sceneKicker:'01 / BALabs universe',sceneTitle:'Choose a sphere to enter its world.',clusterBio:'BIOLOGICAL FOUNDATIONS',clusterBioSub:'Biotechnology · mycology · TechnoSoil · R&D',clusterApply:'APPLICATION & KNOWLEDGE SHARING',clusterApplySub:'Products · engineering · projects · resources',backHome:'← Back to all spheres',coreLabel:'BALABS CORE',hubHint:'Click to explore ↓',hubHintOpen:'Constellation open · choose a sphere',miniCore:'CENTRAL AXIS',miniCoreSub:'DOMAIN CORE',tile1:'Biology first',tile1p:'Technology supports observation, cultures and biological processes.',tile2:'Real connections',tile2p:'Domains and nodes connect related themes and applications.',tile3:'Multilingual by design',tile3p:'French, English, Arabic and Portuguese, with correct reading direction.',tile4:'Explore further',tile4p:'Discover the links between disciplines and their applications.',footer:'A living universe of connected disciplines.',open:'Explore this field ↗',detail:'Open page',full:'Explore the field ↗',sphere:{bio:['Biotechnology','Microorganisms · bioprocesses'],myco:['Mycology & cultures','Strains · mycelium · substrates'],soil:['TechnoSoil','Soils · water · organic matter'],lab:['R&D laboratory','Protocols · measurements · trials'],products:['Products & resources','Catalogue · profiles · kits'],iot:['Engineering & IoT','Sensors · automation'],work:['Scientific projects','Research · trials · prototypes'],learn:['Resources & learning','Guides · documentation · sharing']},desc:{bio:'Useful microorganisms, bioprocesses and applied biological solutions.',myco:'Fungal strains, cultures, mycelium and substrate valorisation.',soil:'An experimental track focused on soils, water and organic matter.',lab:'Protocols, measurements, reproducibility and result qualification.',products:'Public catalogue, biological resources, cultivation materials and kits.',iot:'Instrumentation, sensors, automation and technical prototypes.',work:'Scientific projects, experiments and results selected for public presentation.',learn:'Public guides, fact sheets, methods and learning resources.'},node:['Main section','Related theme','Project or application','Profiles & resources','Scientific projects','Open full section ↗'],nodeSub:['Open the main page','Explore the related theme','Discover applications','Open related resources','Explore featured projects','Explore related themes'],tag:'SPHERE',mainLink:'Main section',adjacentTitle:'Connected spheres'},
+ar:{eyebrow:"عالم حيّ راه يتطوّر",headline:"ادخل<br>لعالم <span>BALabs.</span>",intro:"اكتشف المجالات الرئيسية تاع BALabs. كل مجال يفتحلك عالم من المواضيع والمشاريع والتطبيقات.",asideTitle:"عالم واحد، ومجالات تكمل بعضها.",asideText:"شوف الروابط اللي تجمع بين هاذ المجالات.",navHome:"الرئيسية",navFeatured:"في الواجهة",navAbout:"على BA Labs",navWork:"المجالات",workOpenMyco:"اكتشف علم الفطريات",workOpenSoil:"استكشف TechnoSoil",workOpenIot:"شوف أنظمة القياس",navMethod:"المنهجية",navExplore:"استكشف",heroExplore:"اكتشف المجالات",heroFeatured:"شوف المشروع المختار",featureKicker:"في الواجهة / الفطريات التطبيقية",featureStatus:"محور للاستكشاف · الخدمة ما زالت تتطوّر",featureTitle:"الميسيليوم،<br><em>مادة حيّة.</em>",featureText:"من زراعة الفطريات حتى للركائز، يفتح علم الفطريات فرص عملية للملاحظة والتجريب واستغلال المادة العضوية.",featureLink:"استكشف المجالات",aboutKicker:"على BA LABS",aboutTitle:"من علم الأحياء<br>لـ <em>التقنيات التطبيقية.</em>",aboutText:"في BA Labs نستكشفو الروابط بين علم الأحياء والفطريات والمواد العضوية والهندسة. نعتمدو على التجربة والملاحظة باش نطوّرو طرق عمل وزراعات ونماذج أولية.",aboutLink:"اكتشف المنظومة تاعنا",workKicker:"03 / مجالات الاستكشاف",workTitle:"أفكار بيولوجية<br><em>تولي تطبيقات عملية.</em>",workIntro:"هاذ المحاور الثلاثة تبيّن كيفاش BA Labs تربط بين ملاحظة الكائنات الحية والتجريب والتصميم التقني.",workMycoTitle:"زراعات فطرية",workMycoText:"نلاحظو السلالات، نطوّرو الزراعات ونستكشفو العلاقة بين الميسيليوم والركائز والمادة العضوية.",workMycoTopics:'موارد فطرية · الزراعة والإكثار · تطبيقات فطرية',workMycoTag:"الفطريات التطبيقية",workSoilTitle:"TechnoSoil والمواد الحيوية",workSoilText:"ندرسو الخلطات العضوية والركائز وخصائص المواد باش نكتاشفو استعمالات جديدة.",workSoilTopics:'مواد عضوية · ركائز · تجارب الزراعة',workSoilTag:"المواد وإعادة التثمين",workIotTitle:"القياس والأتمتة",workIotText:"نربطو الحساسات بجمع البيانات والأتمتة باش نتابعو ظروف التجارب بشكل أحسن.",workIotTopics:'حساسات · أجهزة القياس · الأتمتة',workIotTag:"الهندسة وإنترنت الأشياء",workExplore:"استكشف المجالات المرتبطة",methodKicker:"04 / المنهجية",methodTitle:"نفهمو الكائنات الحية.<br><em>ونخدمو بمنهجية.</em>",methodIntro:"كل فكرة تبدأ بسؤال. من بعد نمشيو بالملاحظة والتجريب والتوثيق، وقبل ما نقترحو أي تطبيق لازم نفهمو النتائج.",methodObserve:"نلاحظو",methodObserveText:"نوصفو كائن حي ولا مادة ولا بيئة، ونحددو واش يستاهل الدراسة.",methodQuestion:"نصيغو السؤال",methodQuestionText:"نحددو سؤال العمل، المعايير اللي لازم نتابعوها والبروتوكول المناسب.",methodTest:"نجربو",methodTestText:"نديرو التجارب، نسجلو الملاحظات ونعدلو الطريقة حسب النتائج.",methodShare:"نوثّقو",methodShareText:"ننظمو المعارف ونوضحو الطرق والحدود والتطبيقات اللي ما زالت تحتاج للتأكد.",bridgeKicker:'05 / مستكشف تفاعلي',bridgeTitle:'من المجالات<br><em>إلى شبكة حيّة.</em>',bridgeText:'التخصصات ماشي معزولة على بعضها. استكشف الروابط، افتح مجال وتبع المسارات نحو موارده.',bridgeAction:'ادخل للمستكشف', sceneKicker:'01 / عالم BALabs',sceneTitle:'اختر مجالاً للدخول إلى عالمه.',clusterBio:'الأسس البيولوجية',clusterBioSub:'التكنولوجيا الحيوية · الفطريات · TechnoSoil · البحث والتطوير',clusterApply:'التطبيقات ونقل المعرفة',clusterApplySub:'المنتجات · الهندسة · المشاريع · الموارد',backHome:'→ العودة إلى جميع المجالات',coreLabel:'نواة BALabs',hubHint:'اضغط لاستكشاف ↓',hubHintOpen:'الكوكبة مفتوحة · اختر مجالاً',miniCore:'المحور المركزي',miniCoreSub:'محور المجال',tile1:'البيولوجيا أولاً',tile1p:'تخدم التكنولوجيا الملاحظة والزراعات والعمليات البيولوجية.',tile2:'روابط فعلية',tile2p:'تربط المجالات والعُقد بين الموضوعات والتطبيقات ذات الصلة.',tile3:'تعدد اللغات من البداية',tile3p:'الفرنسية والإنجليزية والعربية والبرتغالية مع اتجاه قراءة مناسب.',tile4:'اكتشف الروابط',tile4p:'تعرّف على الصلات بين التخصصات وتطبيقاتها.',footer:'عالم حيّ يجمع مجالات مترابطة.',open:'استكشف هذا المجال ↗',detail:'افتح الصفحة',full:'استكشف المجال ↗',sphere:{bio:['التكنولوجيا الحيوية','كائنات دقيقة · عمليات حيوية'],myco:['الفطريات والزراعات','سلالات · ميسيليوم · ركائز'],soil:['TechnoSoil','تربة · ماء · مادة عضوية'],lab:['مختبر البحث والتطوير','بروتوكولات · قياسات · تجارب'],products:['المنتجات والموارد','كتالوج · بطاقات · أطقم'],iot:['الهندسة وإنترنت الأشياء','مستشعرات · أتمتة'],work:['المشاريع العلمية','تجارب · نتائج · نماذج'],learn:['الموارد ونقل المعرفة','أدلة · توثيق · مشاركة']},desc:{bio:'كائنات دقيقة مفيدة وعمليات حيوية وحلول بيولوجية تطبيقية.',myco:'سلالات فطرية وزراعات وميسيليوم وتثمين الركائز.',soil:'مسار تجريبي يركز على التربة والماء والمادة العضوية.',lab:'بروتوكولات وقياسات وقابلية التكرار وتقييم النتائج.',products:'كتالوج عام وموارد بيولوجية وركائز وأطقم.',iot:'أجهزة قياس ومستشعرات وأتمتة ونماذج تقنية.',work:'مشاريع علمية وتجارب ونتائج مختارة للعرض العام.',learn:'أدلة عامة وبطاقات وطرق وموارد تعليمية.'},node:['القسم الرئيسي','موضوع مرتبط','مشروع أو تطبيق','بطاقات وموارد','مشاريع علمية','افتح القسم الكامل ↗'],nodeSub:['افتح الصفحة الرئيسية','استكشف الموضوع المرتبط','اكتشف التطبيقات','افتح الموارد المرتبطة','استكشف المشاريع المعروضة','استكشف الموضوعات المرتبطة'],tag:'المجال',mainLink:'القسم الرئيسي',adjacentTitle:'مجالات مترابطة'},
+pt:{eyebrow:'Um ecossistema em movimento',headline:'Entre no<br>universo <span>BALabs.</span>',intro:'Explore os principais domínios da BALabs. Cada domínio abre um universo de temas, projetos e aplicações.',asideTitle:'Um universo, vários mundos.',asideText:'Explore as ligações entre as diferentes áreas.',navHome:"Início",navFeatured:"Em destaque",navAbout:"Sobre",navWork:"Áreas de trabalho",workOpenMyco:"Explorar a micologia",workOpenSoil:"Explorar TechnoSoil",workOpenIot:"Ver instrumentação",navMethod:"Método",navExplore:"Explorar",heroExplore:"Explorar os domínios",heroFeatured:"Ver o projeto em destaque",featureKicker:"EM DESTAQUE / MICOLOGIA APLICADA",featureStatus:"EIXO DE EXPLORAÇÃO · TRABALHO EM DESENVOLVIMENTO",featureTitle:"O micélio,<br><em>uma matéria viva.</em>",featureText:"Das culturas fúngicas aos substratos, a micologia abre caminhos práticos para observar, experimentar e valorizar a matéria orgânica.",featureLink:"Explorar os domínios",aboutKicker:"SOBRE / BA LABS",aboutTitle:"Da biologia<br>às <em>tecnologias aplicadas.</em>",aboutText:"A BA Labs explora as ligações entre biologia, micologia, materiais orgânicos e engenharia. Uma abordagem experimental em que a observação dos sistemas vivos orienta o desenvolvimento de métodos, culturas e protótipos.",aboutLink:"Descobrir o nosso ecossistema",workKicker:"03 / ÁREAS DE EXPLORAÇÃO",workTitle:"Ideias biológicas<br><em>em aplicações concretas.</em>",workIntro:"Três áreas mostram como a BA Labs liga a observação dos sistemas vivos, a experimentação e o desenvolvimento técnico.",workMycoTitle:"Culturas fúngicas",workMycoText:"Observar estirpes, desenvolver culturas e explorar as relações entre micélio, substratos e matéria orgânica.",workMycoTopics:'Recursos fúngicos · cultivo e multiplicação · aplicações micológicas',workMycoTag:"MICOLOGIA APLICADA",workSoilTitle:"TechnoSoil e biomateriais",workSoilText:"Estudar misturas orgânicas, substratos e propriedades dos materiais para explorar novas utilizações.",workSoilTopics:'Matéria orgânica · substratos · ensaios de cultivo',workSoilTag:"MATERIAIS E CIRCULARIDADE",workIotTitle:"Medição e automação",workIotText:"Ligar sensores, aquisição de dados e automação para acompanhar melhor os ambientes experimentais.",workIotTopics:'Sensores · instrumentação · automação',workIotTag:"ENGENHARIA E IOT",workExplore:"Explorar domínios relacionados",methodKicker:"04 / ABORDAGEM",methodTitle:"Compreender os sistemas vivos.<br><em>Construir com método.</em>",methodIntro:"Cada linha de investigação começa com uma pergunta. Avança através da observação, experimentação e documentação antes de considerar uma aplicação.",methodObserve:"Observar",methodObserveText:"Descrever um organismo, material ou ambiente e identificar o que merece ser estudado.",methodQuestion:"Formular",methodQuestionText:"Definir uma pergunta de trabalho, os parâmetros a acompanhar e um protocolo adequado.",methodTest:"Experimentar",methodTestText:"Realizar ensaios, registar observações e ajustar a abordagem de acordo com os resultados.",methodShare:"Documentar",methodShareText:"Organizar o conhecimento e tornar compreensíveis os métodos, limites e possíveis aplicações.",bridgeKicker:'05 / EXPLORADOR INTERATIVO',bridgeTitle:'Das disciplinas<br><em>a uma rede viva.</em>',bridgeText:'As áreas não estão isoladas. Explore as ligações, abra um domínio e siga os caminhos até aos seus recursos.',bridgeAction:'Entrar no explorador', sceneKicker:'01 / Universo BALabs',sceneTitle:'Escolha uma esfera para entrar no seu mundo.',clusterBio:'FUNDAMENTOS BIOLÓGICOS',clusterBioSub:'Biotecnologia · micologia · TechnoSoil · I&D',clusterApply:'APLICAÇÕES E PARTILHA DE CONHECIMENTO',clusterApplySub:'Produtos · engenharia · projetos · recursos',backHome:'← Voltar a todas as esferas',coreLabel:'NÚCLEO BALABS',hubHint:'Clique para explorar ↓',hubHintOpen:'Constelação aberta · escolha uma esfera',miniCore:'EIXO CENTRAL',miniCoreSub:'EIXO DO DOMÍNIO',tile1:'Biologia primeiro',tile1p:'A tecnologia apoia a observação, as culturas e os processos biológicos.',tile2:'Ligações reais',tile2p:'Os domínios e os nós ligam temas e aplicações relacionados.',tile3:'Multilingue desde o início',tile3p:'Francês, inglês, árabe e português, com direção de leitura adequada.',tile4:'Explorar de outra forma',tile4p:'Descubra as ligações entre disciplinas e as suas aplicações.',footer:'Um universo vivo de áreas interligadas.',open:'Explorar esta área ↗',detail:'Abrir página',full:'Explorar a área ↗',sphere:{bio:['Biotecnologia','Microrganismos · bioprocessos'],myco:['Micologia e culturas','Estirpes · micélio · substratos'],soil:['TechnoSoil','Solos · água · matéria orgânica'],lab:['Laboratório de I&D','Protocolos · medições · ensaios'],products:['Produtos e recursos','Catálogo · fichas · kits'],iot:['Engenharia e IoT','Sensores · automação'],work:['Projetos científicos','Investigação · ensaios · protótipos'],learn:['Recursos e aprendizagem','Guias · documentação · partilha']},desc:{bio:'Microrganismos úteis, bioprocessos e soluções biológicas aplicadas.',myco:'Estirpes fúngicas, culturas, micélio e valorização de substratos.',soil:'Uma linha experimental dedicada aos solos, à água e à matéria orgânica.',lab:'Protocolos, medições, reprodutibilidade e qualificação dos resultados.',products:'Catálogo público, recursos biológicos, suportes de cultivo e kits.',iot:'Instrumentação, sensores, automação e protótipos técnicos.',work:'Projetos científicos, ensaios e resultados selecionados para apresentação pública.',learn:'Guias públicos, fichas, métodos e recursos de aprendizagem.'},node:['Secção principal','Tema associado','Projeto ou aplicação','Fichas e recursos','Projetos científicos','Abrir secção completa ↗'],nodeSub:['Abrir a página principal','Explorar o tema associado','Descobrir aplicações','Abrir recursos associados','Explorar projetos apresentados','Explore os temas associados'],tag:'ESFERA',mainLink:'Secção principal',adjacentTitle:'Esferas relacionadas'}
 };
 const pages={
-bio:{fr:'https://app.notion.com/p/3e273152f171814187cbd78d7b0a4a94',en:'https://app.notion.com/p/40173152f171819a90d9ffa3a191d09f',ar:'https://app.notion.com/p/40173152f17181bc87b1c17830686007',pt:roots.pt,links:[
+bio:{fr:'https://app.notion.com/p/3e273152f171814187cbd78d7b0a4a94',en:'https://app.notion.com/p/40173152f171819a90d9ffa3a191d09f',ar:'https://app.notion.com/p/40173152f17181bc87b1c17830686007',pt:'https://app.notion.com/p/40173152f1718120b45bf79f8e81120a',links:[
 ['Microorganismes d’intérêt agricole','https://app.notion.com/p/3e273152f171814187cbd78d7b0a4a94'],
 ['Biostimulants & solutions biologiques','https://app.notion.com/p/3e273152f17181218800c2a6011b054b'],
 ['Mycorhizes & interactions biologiques','https://app.notion.com/p/3e273152f17181c88bbbe98171594535'],
 ['Substrats & supports biologiques','https://app.notion.com/p/3e273152f17181e7ab61c84b44557e9c'],
 ['Biotechnologie','https://app.notion.com/p/3e273152f17181e9be91d6cccfea2383'],
 ['Projets scientifiques','https://app.notion.com/p/3f273152f171815597b6c696402b42c0']]},
-myco:{fr:'https://app.notion.com/p/3e273152f1718161b154d8b8fc50f063',en:'https://app.notion.com/p/40173152f1718111a73ced2825985454',ar:'https://app.notion.com/p/40173152f171814b88a0dbb38a75acdd',pt:'https://app.notion.com/p/40173152f1718111a73ced2825985454',links:[
+myco:{fr:'https://app.notion.com/p/3e273152f1718161b154d8b8fc50f063',en:'https://app.notion.com/p/40173152f1718111a73ced2825985454',ar:'https://app.notion.com/p/40173152f171814b88a0dbb38a75acdd',pt:'https://app.notion.com/p/40173152f171812fb8d5de62178f6aef',links:[
 ['Ressources fongiques','https://app.notion.com/p/3e273152f1718172bb0be5342cc16e0e'],
 ['Mycologie & substrats','https://app.notion.com/p/3f473152f171814e8d28d15d526b044e'],
 ['Pleurotus — ressources cultivées','https://app.notion.com/p/40073152f17181d1822cfb0e92d55485'],
 ['Applications mycologiques','https://app.notion.com/p/3e273152f1718144bb67d07e93c3aa2d'],
 ['Catalogue public','https://app.notion.com/p/d0fbe1d779344eb58bc240fe7876ae0e'],
 ['Projets scientifiques','https://app.notion.com/p/3f273152f171815597b6c696402b42c0']]},
-soil:{fr:'https://app.notion.com/p/3fa73152f17181969b28eff6283e3fb7',en:roots.en,ar:'https://app.notion.com/p/3fa73152f17181f49e89ec85231fb603',pt:roots.pt,links:[
-['TechnoSoil : cultiver autrement','https://app.notion.com/p/3fa73152f17181969b28eff6283e3fb7'],
-['Une plante dans TechnoSoil','https://app.notion.com/p/3fa73152f17181f49e89ec85231fb603'],
-['Pourquoi il faut un témoin','https://app.notion.com/p/3fa73152f17181c8b40beaeb4bdb9fab'],
+soil:{fr:'https://app.notion.com/p/3e273152f17181e7ab61c84b44557e9c',en:'https://app.notion.com/p/40173152f1718163b121c3693da2b15d',ar:'https://app.notion.com/p/40173152f17181bb91b5d8326978d664',pt:'https://app.notion.com/p/40173152f17181b780dcc20a20962afa',links:[
 ['Substrats & supports biologiques','https://app.notion.com/p/3e273152f17181e7ab61c84b44557e9c'],
-['Mesure & reproductibilité','https://app.notion.com/p/3e273152f1718119b0f7eeeb897f206a'],
-['Projets scientifiques','https://app.notion.com/p/3f273152f171815597b6c696402b42c0']]},
-lab:{fr:'https://app.notion.com/p/3e273152f17181e2aeaad4ed4ac3f230',en:roots.en,ar:roots.ar,pt:roots.pt,links:[
+['Biotechnologie','https://app.notion.com/p/3e273152f17181e9be91d6cccfea2383'],
+['Recherche & développement','https://app.notion.com/p/3e273152f17181d8b65af8f6b7de0b0b'],
+['Le laboratoire','https://app.notion.com/p/3e273152f17181e2aeaad4ed4ac3f230'],
+['Mycorhizes & interactions biologiques','https://app.notion.com/p/3e273152f17181c88bbbe98171594535'],
+['Microorganismes d’intérêt agricole','https://app.notion.com/p/3e273152f171814187cbd78d7b0a4a94']]},
+lab:{fr:'https://app.notion.com/p/3e273152f17181e2aeaad4ed4ac3f230',en:'https://app.notion.com/p/40173152f1718119b5dffffaa2245f27',ar:'https://app.notion.com/p/40173152f1718187b28fd8c0a564c936',pt:'https://app.notion.com/p/40173152f17181798082ffafe45e245b',links:[
 ['R&D','https://app.notion.com/p/3e273152f17181d8b65af8f6b7de0b0b'],
 ['Le laboratoire','https://app.notion.com/p/3e273152f17181e2aeaad4ed4ac3f230'],
 ['Prototypes & essais','https://app.notion.com/p/3e273152f1718174904bd0043fc5d976'],
@@ -1468,23 +2541,23 @@ products:{fr:'https://app.notion.com/p/3ec73152f1718125b1a7c58bc58ebcaa',en:'htt
 ['Biostimulants & solutions biologiques','https://app.notion.com/p/3e273152f17181218800c2a6011b054b'],
 ['Substrats & supports biologiques','https://app.notion.com/p/3e273152f17181e7ab61c84b44557e9c'],
 ['Catalogue public','https://app.notion.com/p/d0fbe1d779344eb58bc240fe7876ae0e'],
-['WA — culture agar','https://app.notion.com/p/40173152f17181ac95adf01e7b73173e'],
+['WA — gélose à l’eau','https://app.notion.com/p/3f473152f171812a814dd7b951786313'],
 ['MYCO-START','https://app.notion.com/p/40173152f171818d94c0c05bc8f79913']]},
-iot:{fr:'https://app.notion.com/p/3e273152f17181648633e723f99cb4ae',en:'https://app.notion.com/p/40173152f1718131a52bf254341ee60f',ar:roots.ar,pt:'https://app.notion.com/p/40173152f17181e3a5a5d842245931a8',links:[
+iot:{fr:'https://app.notion.com/p/3e273152f17181648633e723f99cb4ae',en:'https://app.notion.com/p/40173152f1718131a52bf254341ee60f',ar:'https://app.notion.com/p/40173152f17181bf9bcfee1773043585',pt:'https://app.notion.com/p/40173152f17181e3a5a5d842245931a8',links:[
 ['Instrumentation & automatisation','https://app.notion.com/p/3e273152f17181648633e723f99cb4ae'],
 ['Ingénierie & automatisation','https://app.notion.com/p/3f473152f171810596ebc921fa4780ec'],
 ['Instrumentation & capteurs','https://app.notion.com/p/3e273152f17181f58c57c93b4c8c790f'],
 ['Instrumentation intégrée','https://app.notion.com/p/3e273152f171818bae74c015daa192cd'],
-['Ce capteur va mesurer quoi ?','https://app.notion.com/p/3fa73152f17181adb1e8e6d3689e413d'],
+['Instrumentation & capteurs','https://app.notion.com/p/3e273152f17181f58c57c93b4c8c790f'],
 ['Projets scientifiques','https://app.notion.com/p/3f273152f171815597b6c696402b42c0']]},
-work:{fr:'https://app.notion.com/p/3f273152f171815597b6c696402b42c0',en:roots.en,ar:'https://app.notion.com/p/40173152f17181c7ab4ad1cdeac8d075',pt:roots.pt,links:[
+work:{fr:'https://app.notion.com/p/3f273152f171815597b6c696402b42c0',en:'https://app.notion.com/p/40173152f1718173ae6bc8cce9f0ba52',ar:'https://app.notion.com/p/40173152f17181c7ab4ad1cdeac8d075',pt:'https://app.notion.com/p/40173152f171817e90c1e145abcde4f2',links:[
 ['Travaux & réalisations documentés','https://app.notion.com/p/3f273152f171815597b6c696402b42c0'],
 ['Prototypes & essais','https://app.notion.com/p/3e273152f1718174904bd0043fc5d976'],
-['TechnoSoil : cultiver autrement','https://app.notion.com/p/3fa73152f17181969b28eff6283e3fb7'],
-['Pourquoi il faut un témoin','https://app.notion.com/p/3fa73152f17181c8b40beaeb4bdb9fab'],
+['Substrats & supports biologiques','https://app.notion.com/p/3e273152f17181e7ab61c84b44557e9c'],
+['Mesure & reproductibilité','https://app.notion.com/p/3e273152f1718119b0f7eeeb897f206a'],
 ['Collaborer avec BA Labs','https://app.notion.com/p/3e273152f17181a8bedae0bfd2452543'],
 ['Catalogue public','https://app.notion.com/p/d0fbe1d779344eb58bc240fe7876ae0e']]},
-learn:{fr:'https://app.notion.com/p/3e273152f1718172bb0be5342cc16e0e',en:'https://app.notion.com/p/40173152f1718111a73ced2825985454',ar:'https://app.notion.com/p/40173152f171814b88a0dbb38a75acdd',pt:roots.pt,links:[
+learn:{fr:'https://app.notion.com/p/3e273152f1718172bb0be5342cc16e0e',en:'https://app.notion.com/p/40173152f1718111a73ced2825985454',ar:'https://app.notion.com/p/40173152f171814b88a0dbb38a75acdd',pt:'https://app.notion.com/p/40173152f171812fb8d5de62178f6aef',links:[
 ['Ressources fongiques','https://app.notion.com/p/3e273152f1718172bb0be5342cc16e0e'],
 ['Catalogue public','https://app.notion.com/p/d0fbe1d779344eb58bc240fe7876ae0e'],
 ['Language pages — navigation','https://app.notion.com/p/40273152f17181408863ec705084e1b6'],
@@ -1507,25 +2580,25 @@ en:[['Fungal resources','https://app.notion.com/p/40173152f1718111a73ced28259854
 ar:[['الموارد الفطرية','https://app.notion.com/p/40173152f171814b88a0dbb38a75acdd'],['المنتجات والموارد البيولوجية','https://app.notion.com/p/40173152f171817d8608cafa8a118065'],['الأعمال والمشاريع الموثّقة','https://app.notion.com/p/40173152f17181c7ab4ad1cdeac8d075'],['علم الفطريات','https://app.notion.com/p/40173152f171813ba690d5064844f54a'],['التطبيقات الفطرية','https://app.notion.com/p/40173152f17181afb288feda1d2c3e5c'],['Pleurotus — الأنواع والموارد المزروعة','https://app.notion.com/p/40273152f1718104965acbf434612d39']],
 pt:[['Recursos fúngicos','https://app.notion.com/p/40173152f171812fb8d5de62178f6aef'],['Pleurotus — espécies e recursos cultivados','https://app.notion.com/p/40273152f17181f29a8efba7e0d87825'],['Produtos e recursos biológicos','https://app.notion.com/p/40173152f17181fcadf1cd543c83ed60'],['Trabalhos e realizações documentados','https://app.notion.com/p/40173152f171817e90c1e145abcde4f2'],['Aplicações micológicas','https://app.notion.com/p/40173152f17181a99780d3ca1ee77cdb'],['Micologia','https://app.notion.com/p/40173152f171814dad1adcd7559c7823']]},
 products:{
-en:[['Products & biological resources','https://app.notion.com/p/40173152f171812f813cf1b792d83281'],['Biostimulants and biological solutions','https://app.notion.com/p/40173152f17181cab354dd2c11933208'],['Biological substrates and carriers','https://app.notion.com/p/40173152f1718163b121c3693da2b15d'],['Fungal resources','https://app.notion.com/p/40173152f1718111a73ced2825985454'],['WA — English','https://app.notion.com/p/40173152f17181ac95adf01e7b73173e'],['Myco Start — mycology starter kit prototype','https://app.notion.com/p/40173152f171818d94c0c05bc8f79913']],
-ar:[['المنتجات والموارد البيولوجية','https://app.notion.com/p/40173152f171817d8608cafa8a118065'],['الموارد الفطرية','https://app.notion.com/p/40173152f171814b88a0dbb38a75acdd'],['WA — العربية','https://app.notion.com/p/40173152f17181d48bace944fe34ff4d'],['MYCO-START — العربية','https://app.notion.com/p/40173152f17181fc9b6cf123b893263f'],['Myco Plate — نموذج أولي','https://app.notion.com/p/40173152f17181aa8206f4337a7f67d5'],['Myco Start — نموذج أولي','https://app.notion.com/p/40173152f17181fdb34bf72c6ac036e9']],
-pt:[['Produtos e recursos biológicos','https://app.notion.com/p/40173152f17181fcadf1cd543c83ed60'],['Bioestimulantes e soluções biológicas','https://app.notion.com/p/40173152f17181189575de882d466325'],['Recursos fúngicos','https://app.notion.com/p/40173152f171812fb8d5de62178f6aef'],['WA — Português','https://app.notion.com/p/40173152f171811a92e9f8f85617d951'],['MYCO-START — Português','https://app.notion.com/p/40173152f17181fdad16ed065914f5bc'],['MYCO-PLATE — Português','https://app.notion.com/p/40173152f171812c8c66ebf1142a990d']]},
+en:[['Products & biological resources','https://app.notion.com/p/40173152f171812f813cf1b792d83281'],['Biostimulants and biological solutions','https://app.notion.com/p/40173152f17181cab354dd2c11933208'],['Biological substrates and carriers','https://app.notion.com/p/40173152f1718163b121c3693da2b15d'],['Fungal resources','https://app.notion.com/p/40173152f1718111a73ced2825985454'],['WA — Water Agar','https://app.notion.com/p/40173152f17181fc9d18ec817853e38d'],['Myco Start — mycology starter kit prototype','https://app.notion.com/p/40173152f171818d94c0c05bc8f79913']],
+ar:[['المنتجات والموارد البيولوجية','https://app.notion.com/p/40173152f171817d8608cafa8a118065'],['الموارد الفطرية','https://app.notion.com/p/40173152f171814b88a0dbb38a75acdd'],['WA — آغار الماء','https://app.notion.com/p/40173152f171817d966dd334a044b4e8'],['الزراعة والإكثار','https://app.notion.com/p/40173152f1718101afcbdb364eb5d44a'],['Myco Plate — نموذج أولي','https://app.notion.com/p/40173152f17181aa8206f4337a7f67d5'],['Myco Start — نموذج أولي','https://app.notion.com/p/40173152f17181fdb34bf72c6ac036e9']],
+pt:[['Produtos e recursos biológicos','https://app.notion.com/p/40173152f17181fcadf1cd543c83ed60'],['Bioestimulantes e soluções biológicas','https://app.notion.com/p/40173152f17181189575de882d466325'],['Recursos fúngicos','https://app.notion.com/p/40173152f171812fb8d5de62178f6aef'],['WA — ágar-água','https://app.notion.com/p/40173152f1718141b796f246eb142532'],['MYCO-START — Português','https://app.notion.com/p/40173152f17181a284b6ecc1cda6a13e'],['MYCO-PLATE — Português','https://app.notion.com/p/40173152f17181669030d583da31ce13']]},
 iot:{
-en:[['Instrumentation and automation','https://app.notion.com/p/40173152f1718131a52bf254341ee60f'],['Instrumentation and sensors','https://app.notion.com/p/40173152f17181aa843ace690303e7c8'],['Integrated instrumentation','https://app.notion.com/p/40173152f17181ce95cfcc669321cc1d'],['Experimental equipment','https://app.notion.com/p/40173152f17181c0955ef6b706891bfa'],['What will this sensor measure?','https://app.notion.com/p/3fa73152f17181adb1e8e6d3689e413d'],['Documented scientific work','https://app.notion.com/p/40173152f171812084fcc3e45ece4ec9']],
+en:[['Instrumentation and automation','https://app.notion.com/p/40173152f1718131a52bf254341ee60f'],['Instrumentation and sensors','https://app.notion.com/p/40173152f17181aa843ace690303e7c8'],['Integrated instrumentation','https://app.notion.com/p/40173152f17181ce95cfcc669321cc1d'],['Experimental equipment','https://app.notion.com/p/40173152f17181c0955ef6b706891bfa'],['Instrumentation and sensors','https://app.notion.com/p/40173152f17181aa843ace690303e7c8'],['Documented scientific work','https://app.notion.com/p/40173152f171812084fcc3e45ece4ec9']],
 pt:[['Instrumentação e automação','https://app.notion.com/p/40173152f17181e3a5a5d842245931a8'],['Instrumentação e sensores','https://app.notion.com/p/40173152f171811bb877f46a99d03912'],['Instrumentação integrada','https://app.notion.com/p/40173152f171819b8edfc928072a23a0'],['Automação de culturas','https://app.notion.com/p/40173152f171816e9ba6c2ea34532049'],['Agrotecnologia','https://app.notion.com/p/40173152f17181b9be7ae84e413092d5'],['Rastreabilidade e dados','https://app.notion.com/p/40173152f17181888deee64e2fcc1597']],
 ar:[['القياس والأتمتة','https://app.notion.com/p/40173152f17181bf9bcfee1773043585'],['القياس والمستشعرات','https://app.notion.com/p/40173152f1718187930fd89b1a619738'],['أتمتة الزراعات','https://app.notion.com/p/40173152f171812bb348fa458bf85443'],['التكنولوجيا الزراعية','https://app.notion.com/p/40173152f17181488cf8ec1851cddb56'],['التكنولوجيا الحيوية','https://app.notion.com/p/40173152f17181bc87b1c17830686007'],['البحث والتطوير','https://app.notion.com/p/40173152f17181668ddef98b9e1ddec4']]},
 work:{
-en:[['Research & development projects','https://app.notion.com/p/40173152f1718173ae6bc8cce9f0ba52'],['TechnoSoil — experimental design','https://app.notion.com/p/3e973152f17181cb9509c7b6801e9f28'],['TechnoSoil — validation plan','https://app.notion.com/p/40073152f1718168a3a1fcba6a9defce'],['A plant in TechnoSoil','https://app.notion.com/p/3fa73152f17181f49e89ec85231fb603'],['Biological substrates and carriers','https://app.notion.com/p/40173152f1718163b121c3693da2b15d'],['BA Labs — Applied biotechnology','https://app.notion.com/p/40173152f171815f9f01ea5fd1add73f']],
-pt:[['Projetos de investigação e desenvolvimento','https://app.notion.com/p/40173152f1718173ae6bc8cce9f0ba52'],['TechnoSoil — desenho experimental','https://app.notion.com/p/3e973152f17181cb9509c7b6801e9f28'],['TechnoSoil — plano de validação','https://app.notion.com/p/40073152f1718168a3a1fcba6a9defce'],['Uma planta em TechnoSoil','https://app.notion.com/p/3fa73152f17181f49e89ec85231fb603'],['Produtos e recursos biológicos','https://app.notion.com/p/40173152f17181fcadf1cd543c83ed60'],['BA Labs — Biotecnologia aplicada','https://app.notion.com/p/40173152f171811ba1f0f58fd7dd239d']],
-ar:[['مشاريع البحث والتطوير','https://app.notion.com/p/40173152f1718173ae6bc8cce9f0ba52'],['TechnoSoil — التصميم التجريبي','https://app.notion.com/p/3e973152f17181cb9509c7b6801e9f28'],['TechnoSoil — خطة التحقق','https://app.notion.com/p/40073152f1718168a3a1fcba6a9defce'],['نبات في TechnoSoil','https://app.notion.com/p/3fa73152f17181f49e89ec85231fb603'],['المنتجات والموارد البيولوجية','https://app.notion.com/p/40173152f171817d8608cafa8a118065'],['BA Labs','https://app.notion.com/p/40173152f17181eaaffbeb758d7dc175']]},
+en:[['Research & development projects','https://app.notion.com/p/40173152f1718173ae6bc8cce9f0ba52'],['Biological substrates and carriers','https://app.notion.com/p/40173152f1718163b121c3693da2b15d'],['Biotechnology','https://app.notion.com/p/40173152f171819a90d9ffa3a191d09f'],['The laboratory','https://app.notion.com/p/40173152f1718119b5dffffaa2245f27'],['Documented scientific work','https://app.notion.com/p/40173152f171812084fcc3e45ece4ec9'],['BA Labs — Applied biotechnology','https://app.notion.com/p/40173152f171815f9f01ea5fd1add73f']],
+pt:[['Projetos de investigação e desenvolvimento','https://app.notion.com/p/40173152f171810f95b9d36ac1b04533'],['Substratos e suportes biológicos','https://app.notion.com/p/40173152f17181b780dcc20a20962afa'],['Biotecnologia','https://app.notion.com/p/40173152f1718120b45bf79f8e81120a'],['O laboratório','https://app.notion.com/p/40173152f17181798082ffafe45e245b'],['Trabalhos e realizações documentados','https://app.notion.com/p/40173152f171817e90c1e145abcde4f2'],['BA Labs — Biotecnologia aplicada','https://app.notion.com/p/40173152f171811ba1f0f58fd7dd239d']],
+ar:[['مشاريع البحث والتطوير','https://app.notion.com/p/40173152f1718173ae6bc8cce9f0ba52'],['الركائز والدعامات البيولوجية','https://app.notion.com/p/40173152f17181bb91b5d8326978d664'],['التكنولوجيا الحيوية','https://app.notion.com/p/40173152f17181bc87b1c17830686007'],['المختبر','https://app.notion.com/p/40173152f1718187b28fd8c0a564c936'],['الأعمال والمشاريع الموثّقة','https://app.notion.com/p/40173152f17181c7ab4ad1cdeac8d075'],['BA Labs','https://app.notion.com/p/40173152f17181eaaffbeb758d7dc175']]},
 lab:{
 en:[['Research and development','https://app.notion.com/p/40173152f1718173ae6bc8cce9f0ba52'],['Instrumentation and automation','https://app.notion.com/p/40173152f1718131a52bf254341ee60f'],['Documented scientific work','https://app.notion.com/p/40173152f171812084fcc3e45ece4ec9'],['Biotechnology','https://app.notion.com/p/40173152f171819a90d9ffa3a191d09f'],['Experimental equipment','https://app.notion.com/p/40173152f17181c0955ef6b706891bfa'],['The laboratory','https://app.notion.com/p/40173152f1718119b5dffffaa2245f27']],
 pt:[['O laboratório','https://app.notion.com/p/40173152f17181798082ffafe45e245b'],['Instrumentação e sensores','https://app.notion.com/p/40173152f171811bb877f46a99d03912'],['Equipamentos experimentais','https://app.notion.com/p/40173152f171815692d6c55cd7032b94'],['Instrumentação integrada','https://app.notion.com/p/40173152f171819b8edfc928072a23a0'],['Rastreabilidade e dados','https://app.notion.com/p/40173152f17181888deee64e2fcc1597'],['Investigação e desenvolvimento','https://app.notion.com/p/40173152f171810f95b9d36ac1b04533']],
 ar:[['المختبر','https://app.notion.com/p/40173152f1718187b28fd8c0a564c936'],['البحث والتطوير','https://app.notion.com/p/40173152f17181668ddef98b9e1ddec4'],['القياس وقابلية التكرار','https://app.notion.com/p/40273152f171810f82d3fafb6e7003be'],['النماذج الأولية والتجارب','https://app.notion.com/p/40273152f17181b1bd80d6bd6f490e76'],['القياس والأتمتة','https://app.notion.com/p/40173152f17181bf9bcfee1773043585'],['منهجية البحث والتطوير','https://app.notion.com/p/40273152f1718172aabbe09bb712c3d1']]},
 soil:{
-en:[['TechnoSoil — experimental design','https://app.notion.com/p/3e973152f17181cb9509c7b6801e9f28'],['TechnoSoil — validation plan','https://app.notion.com/p/40073152f1718168a3a1fcba6a9defce'],['A plant in TechnoSoil','https://app.notion.com/p/3fa73152f17181f49e89ec85231fb603'],['Why a control matters','https://app.notion.com/p/3fa73152f17181c8b40beaeb4bdb9fab'],['Biological substrates and carriers','https://app.notion.com/p/40173152f1718163b121c3693da2b15d'],['Documented scientific work','https://app.notion.com/p/40173152f171812084fcc3e45ece4ec9']],
-ar:[['البحث والتطوير','https://app.notion.com/p/40173152f17181668ddef98b9e1ddec4'],['منهجية البحث والتطوير','https://app.notion.com/p/40273152f1718172aabbe09bb712c3d1'],['الركائز والدعامات البيولوجية','https://app.notion.com/p/40173152f17181bb91b5d8326978d664'],['التكنولوجيا الزراعية','https://app.notion.com/p/40173152f17181488cf8ec1851cddb56'],['القياس وقابلية التكرار','https://app.notion.com/p/40273152f171810f82d3fafb6e7003be'],['الأعمال والمشاريع الموثّقة','https://app.notion.com/p/40173152f17181c7ab4ad1cdeac8d075']],
-pt:[['Investigação e desenvolvimento','https://app.notion.com/p/40173152f171810f95b9d36ac1b04533'],['Experimentação vegetal','https://app.notion.com/p/40173152f17181339a48d9c5ddde6829'],['Substratos e suportes biológicos','https://app.notion.com/p/40173152f17181b780dcc20a20962afa'],['Trabalhos e realizações documentados','https://app.notion.com/p/40173152f171817e90c1e145abcde4f2'],['O laboratório','https://app.notion.com/p/40173152f17181798082ffafe45e245b'],['Agrotecnologia','https://app.notion.com/p/40173152f17181b9be7ae84e413092d5']]}
+en:[['Biological substrates and carriers','https://app.notion.com/p/40173152f1718163b121c3693da2b15d'],['Biotechnology','https://app.notion.com/p/40173152f171819a90d9ffa3a191d09f'],['Research & development','https://app.notion.com/p/40173152f1718173ae6bc8cce9f0ba52'],['The laboratory','https://app.notion.com/p/40173152f1718119b5dffffaa2245f27'],['Fungal resources','https://app.notion.com/p/40173152f1718111a73ced2825985454'],['Documented scientific work','https://app.notion.com/p/40173152f171812084fcc3e45ece4ec9']],
+ar:[['الركائز والدعامات البيولوجية','https://app.notion.com/p/40173152f17181bb91b5d8326978d664'],['التكنولوجيا الحيوية','https://app.notion.com/p/40173152f17181bc87b1c17830686007'],['البحث والتطوير','https://app.notion.com/p/40173152f17181668ddef98b9e1ddec4'],['المختبر','https://app.notion.com/p/40173152f1718187b28fd8c0a564c936'],['الموارد الفطرية','https://app.notion.com/p/40173152f171814b88a0dbb38a75acdd'],['الأعمال والمشاريع الموثّقة','https://app.notion.com/p/40173152f17181c7ab4ad1cdeac8d075']],
+pt:[['Substratos e suportes biológicos','https://app.notion.com/p/40173152f17181b780dcc20a20962afa'],['Biotecnologia','https://app.notion.com/p/40173152f1718120b45bf79f8e81120a'],['Investigação e desenvolvimento','https://app.notion.com/p/40173152f171810f95b9d36ac1b04533'],['O laboratório','https://app.notion.com/p/40173152f17181798082ffafe45e245b'],['Recursos fúngicos','https://app.notion.com/p/40173152f171812fb8d5de62178f6aef'],['Trabalhos e realizações documentados','https://app.notion.com/p/40173152f171817e90c1e145abcde4f2']]}
 };
 
 let lang='fr',selected='bio';
@@ -1563,61 +2636,30 @@ en:[
 "Fungal resources bring together organisms, strains and biological materials used as starting points for cultivation. Discover fungal diversity and the resources that support applied mycology.",
 "A substrate is the medium in which mycelium grows. Its composition, structure, moisture and preparation affect colonisation; this section explores how raw materials shape fungal growth.",
 "Pleurotus covers cultivated species known for colonising a range of substrates and producing fruiting bodies. Explore their traits, growth requirements and potential uses.",
-"Mycological applications show how fungal and mycelial properties can be put to work, from organic-matter processing and cultivation methods to biomaterials and other biological approaches.",
 "The catalogue brings together products, cultures and resources offered by BA Labs. Each page explains the intended use, contents and how to access the resource.",
-"This section presents work conducted or documented by BA Labs, including research questions, experimental approaches, observations and shareable findings."
+"This section presents work conducted or documented by BA Labs, including research questions, experimental approaches, observations and shareable findings.",
+"BA Labs connects applied biotechnology with biological resources, experimental work and practical development. This page introduces the organisation's broader scientific scope.",
+"Mycological applications show how fungal and mycelial properties can be put to work, from organic-matter processing and cultivation methods to biomaterials and other biological approaches."
 ],
 ar:[
 "تجمع الموارد الفطرية الكائنات والسلالات والمواد البيولوجية التي تُستخدم نقطةَ انطلاق للزراعة. اكتشف تنوّع الفطريات والموارد التي تدعم علم الفطريات التطبيقي.",
-"الركيزة هي الوسط الذي ينمو فيه الميسيليوم. ويؤثر تركيبها وبنيتها ورطوبتها وطريقة تحضيرها في الاستعمار الفطري؛ تعرض هذه الصفحة علاقة المواد الأولية بنمو الفطريات.",
-"يشمل جنس Pleurotus أنواعاً مزروعة قادرة على استعمار ركائز مختلفة وإنتاج الأجسام الثمرية. تعرّف على خصائصها ومتطلبات نموها وإمكانات استعمالها.",
-"توضح التطبيقات الفطرية كيف يمكن الاستفادة من خصائص الفطريات والميسيليوم، مثل تحويل المواد العضوية وطرق الزراعة والمواد الحيوية ومسارات تطبيقية أخرى.",
 "يجمع الكتالوج المنتجات والمزارع والموارد التي تقدمها BA Labs. وتشرح كل صفحة الاستخدام المقصود والمحتوى وطريقة الوصول إلى المورد.",
-"يعرض هذا القسم الأعمال التي أنجزتها أو وثّقتها BA Labs، بما فيها أسئلة البحث والمناهج التجريبية والملاحظات والنتائج القابلة للمشاركة."
+"يعرض هذا القسم الأعمال التي أنجزتها أو وثّقتها BA Labs، بما فيها أسئلة البحث والمناهج التجريبية والملاحظات والنتائج القابلة للمشاركة.",
+"يعرض علم الفطريات تنوع هذه الكائنات وبنيتها وطرق نموها وتصنيفها، ويشكّل الأساس العلمي لفهم التطبيقات الفطرية.",
+"توضح التطبيقات الفطرية كيف يمكن الاستفادة من خصائص الفطريات والميسيليوم، مثل تحويل المواد العضوية وطرق الزراعة والمواد الحيوية ومسارات تطبيقية أخرى.",
+"يشمل جنس Pleurotus أنواعاً مزروعة قادرة على استعمار ركائز مختلفة وإنتاج الأجسام الثمرية. تعرّف على خصائصها ومتطلبات نموها وإمكانات استعمالها."
 ],
 pt:[
 "Os recursos fúngicos reúnem organismos, estirpes e materiais biológicos que servem de ponto de partida para o cultivo. Descubra a diversidade dos fungos e os recursos usados na micologia aplicada.",
 "O substrato é o meio onde o micélio se desenvolve. A sua composição, estrutura, humidade e preparação influenciam a colonização; esta secção explora a relação entre matérias-primas e crescimento fúngico.",
 "Pleurotus inclui espécies cultivadas capazes de colonizar diferentes substratos e produzir corpos frutíferos. Explore as suas características, necessidades de crescimento e aplicações potenciais.",
-"As aplicações micológicas mostram como as propriedades dos fungos e do micélio podem ser aproveitadas: transformação de matéria orgânica, métodos de cultivo, biomateriais e outras abordagens biológicas.",
 "O catálogo reúne produtos, culturas e recursos disponibilizados pela BA Labs. Cada página explica a utilização prevista, o conteúdo e como aceder ao recurso.",
-"Esta secção apresenta trabalhos realizados ou documentados pela BA Labs: questões estudadas, abordagens experimentais, observações e resultados que podem ser partilhados."
+"Esta secção apresenta trabalhos realizados ou documentados pela BA Labs: questões estudadas, abordagens experimentais, observações e resultados que podem ser partilhados.",
+"As aplicações micológicas mostram como as propriedades dos fungos e do micélio podem ser aproveitadas: transformação de matéria orgânica, métodos de cultivo, biomateriais e outras abordagens biológicas.",
+"A micologia estuda a diversidade, estrutura, classificação e desenvolvimento dos fungos, fornecendo a base científica para compreender as suas aplicações."
 ]
 },
-soil:{
-fr:[
-"TechnoSoil explore une approche de substrat technique inspirée des sols vivants : associer matières organiques, fractions minérales et activité biologique pour concevoir un milieu fonctionnel. Cette page présente le concept et ses objectifs.",
-"Observer une plante dans TechnoSoil permet d’étudier ses réponses à un milieu de culture particulier : enracinement, vigueur, disponibilité de l’eau et évolution dans le temps. Les observations prennent leur sens lorsqu’elles sont comparées à un témoin.",
-"Un témoin sert de point de comparaison. Sans lui, il est difficile de distinguer l’effet du substrat, d’un traitement ou des conditions ambiantes des variations naturelles de la plante.",
-"Les substrats et supports biologiques sont les matrices dans lesquelles les organismes se développent ou interagissent. Leur porosité, leur rétention d’eau, leur stabilité et leur composition orientent les usages possibles.",
-"Mesurer, répéter et consigner les conditions permet de transformer une observation en résultat interprétable. Cette rubrique met l’accent sur les paramètres suivis, les témoins et la reproductibilité.",
-"Les projets scientifiques rassemblent les essais et développements menés autour des sols, des substrats et des systèmes biologiques, avec leurs objectifs, méthodes et observations."
-],
-en:[
-"TechnoSoil explores a technical growing medium inspired by living soils: combining organic matter, mineral fractions and biological activity to create a functional substrate. This page introduces the concept and its aims.",
-"Observing a plant in TechnoSoil helps investigate its response to a specific growing medium, including rooting, vigour, water availability and change over time. Observations become more meaningful when compared with a control.",
-"A control provides a reference for comparison. Without it, it is difficult to separate the effect of a substrate or treatment from natural plant variation and environmental conditions.",
-"Biological substrates and carriers are matrices in which organisms grow or interact. Their porosity, water retention, stability and composition shape their possible uses.",
-"Measurement, repetition and recording conditions turn observations into interpretable results. This section focuses on monitored parameters, controls and reproducibility.",
-"Scientific projects bring together trials and developments involving soils, substrates and biological systems, with their objectives, methods and observations."
-],
-ar:[
-"يستكشف TechnoSoil وسطاً تقنياً للزراعة مستوحى من التربة الحية، يجمع المادة العضوية والمكوّنات المعدنية والنشاط البيولوجي لتكوين وسط وظيفي. تعرض الصفحة الفكرة وأهدافها.",
-"تتيح متابعة نبات داخل TechnoSoil دراسة استجابته لوسط زراعي محدد، مثل نمو الجذور والحيوية وتوفر الماء والتغير مع الوقت. وتصبح الملاحظات أوضح عند مقارنتها بعينة شاهدة.",
-"توفر العينة الشاهدة مرجعاً للمقارنة. ومن دونها يصعب التمييز بين أثر الركيزة أو المعالجة وبين التغير الطبيعي للنبات والظروف المحيطة.",
-"الركائز والدعامات البيولوجية أوساط تنمو فيها الكائنات أو تتفاعل. وتحدد المسامية واحتفاظ الماء والثبات والتركيب مجالات استعمالها.",
-"يساعد القياس والتكرار وتسجيل الظروف على تحويل الملاحظة إلى نتيجة قابلة للتفسير. يركز هذا القسم على المعايير المتابعة والعينات الشاهدة وقابلية إعادة التجربة.",
-"تجمع المشاريع العلمية التجارب والتطويرات المتعلقة بالتربة والركائز والأنظمة البيولوجية، مع أهدافها وطرقها وملاحظاتها."
-],
-pt:[
-"A TechnoSoil explora um meio técnico de cultivo inspirado nos solos vivos: combina matéria orgânica, frações minerais e atividade biológica para criar um substrato funcional. Esta página apresenta o conceito e os seus objetivos.",
-"Observar uma planta na TechnoSoil permite estudar a sua resposta a um meio de cultivo específico: enraizamento, vigor, disponibilidade de água e evolução ao longo do tempo. A comparação com um controlo torna as observações mais úteis.",
-"Um controlo fornece uma referência de comparação. Sem ele, é difícil distinguir o efeito do substrato ou tratamento da variação natural da planta e das condições ambientais.",
-"Os substratos e suportes biológicos são matrizes onde os organismos crescem ou interagem. A porosidade, retenção de água, estabilidade e composição condicionam as suas utilizações.",
-"Medir, repetir e registar as condições permite transformar observações em resultados interpretáveis. Esta secção destaca parâmetros monitorizados, controlos e reprodutibilidade.",
-"Os projetos científicos reúnem ensaios e desenvolvimentos sobre solos, substratos e sistemas biológicos, com objetivos, métodos e observações."
-]
-},
+soil:{"fr":["Cette page présente les substrats et supports biologiques étudiés par BA Labs : composition, structure, porosité, eau disponible et compatibilité avec les organismes.","La biotechnologie appliquée relie organismes, activités biologiques et matières à des procédés concrets, avec des objectifs et des critères d’observation définis.","La rubrique Recherche & développement expose les questions étudiées, les démarches expérimentales et les conclusions qui peuvent être tirées des données disponibles.","Le laboratoire rassemble les domaines de travail, les moyens expérimentaux et les approches de suivi mobilisés par BA Labs.","Les mycorhizes illustrent les interactions entre champignons et racines. Les fonctions possibles doivent être distinguées des symbioses effectivement démontrées.","Les microorganismes d’intérêt agricole sont étudiés pour leurs interactions avec les plantes et les milieux. Les effets utiles nécessitent des essais adaptés et des témoins."],"en":["This page introduces the biological substrates and carriers studied by BA Labs, including composition, structure, porosity, water availability and organism compatibility.","Applied biotechnology connects organisms, biological activity and materials to practical processes, with explicit aims and observable criteria.","The Research & Development section describes research questions, experimental approaches and conclusions supported by the available data.","The laboratory section brings together BA Labs' areas of work, experimental capabilities and monitoring approaches.","Mycorrhizae illustrate interactions between fungi and plant roots. Potential functions must be distinguished from symbioses that have actually been demonstrated.","Agriculturally relevant microorganisms are studied for their interactions with plants and growing environments. Beneficial effects require appropriate trials and controls."],"ar":["تعرض هذه الصفحة الركائز والدعامات البيولوجية التي تدرسها BA Labs، بما في ذلك التركيب والبنية والمسامية وتوفر الماء ومدى ملاءمتها للكائنات الحية.","تربط التكنولوجيا الحيوية التطبيقية بين الكائنات الحية والنشاط البيولوجي والمواد من أجل تطوير عمليات عملية بأهداف ومعايير قابلة للملاحظة.","يعرض قسم البحث والتطوير الأسئلة المدروسة والمناهج التجريبية والاستنتاجات التي تدعمها البيانات المتاحة.","يجمع قسم المختبر مجالات عمل BA Labs والإمكانات التجريبية وطرق المتابعة والقياس.","توضح الفطريات الجذرية التفاعلات بين الفطريات وجذور النباتات. ويجب التمييز بين الوظائف المحتملة والتكافلات التي تم إثباتها فعلياً.","تُدرس الكائنات الدقيقة ذات الأهمية الزراعية لفهم تفاعلاتها مع النباتات وأوساط النمو. ويتطلب إثبات الفوائد تجارب مناسبة وعينات شاهدة."],"pt":["Esta página apresenta os substratos e suportes biológicos estudados pela BA Labs: composição, estrutura, porosidade, disponibilidade de água e compatibilidade com organismos.","A biotecnologia aplicada liga organismos, atividade biológica e materiais a processos concretos, com objetivos e critérios observáveis.","A área de Investigação e Desenvolvimento apresenta as questões estudadas, as abordagens experimentais e as conclusões sustentadas pelos dados disponíveis.","A secção do laboratório reúne as áreas de trabalho da BA Labs, as capacidades experimentais e as abordagens de monitorização.","As micorrizas ilustram as interações entre fungos e raízes das plantas. As funções possíveis devem distinguir-se das simbioses efetivamente demonstradas.","Os microrganismos de interesse agrícola são estudados pelas suas interações com plantas e meios de cultivo. Os efeitos benéficos exigem ensaios adequados e controlos."]},
 lab:{
 fr:[
 "La R&D transforme une question biologique ou technique en démarche expérimentale : formuler une hypothèse, choisir des paramètres, construire un protocole et analyser les résultats.",
@@ -1720,40 +2762,7 @@ pt:[
 "Os projetos de IoT e automação documentam os sistemas concebidos, os desafios encontrados e as soluções testadas no terreno."
 ]
 },
-work:{
-fr:[
-"Cette rubrique présente les travaux documentés de BA Labs : des questions concrètes, des essais et des réalisations qui montrent comment une idée devient une démarche vérifiable.",
-"Un prototype matérialise une hypothèse sous forme d’objet ou de système testable. Les essais servent à comprendre son fonctionnement, ses limites et les ajustements à apporter.",
-"TechnoSoil est une piste de recherche sur les milieux de culture et les interactions entre fractions organiques, minérales et biologiques. Les essais permettent d’observer le comportement du système plutôt que de se fier à son apparence.",
-"Un témoin permet de comparer une situation expérimentale à une référence. Il aide à attribuer les différences observées au facteur étudié plutôt qu’aux variations naturelles ou aux conditions extérieures.",
-"Collaborer avec BA Labs, c’est contribuer à une démarche appliquée : définir une question, partager des compétences ou des moyens, construire un essai et documenter les résultats.",
-"Le catalogue rassemble les ressources et produits qui peuvent accompagner certains projets, essais ou parcours de découverte."
-],
-en:[
-"This section presents documented BA Labs work: practical questions, trials and builds showing how an idea becomes a testable process.",
-"A prototype turns a hypothesis into an object or system that can be tested. Trials help reveal how it works, its limitations and the adjustments needed.",
-"TechnoSoil is an exploratory line of work on growing media and interactions between organic, mineral and biological fractions. Trials examine system behaviour rather than relying on appearance.",
-"A control compares an experimental condition with a reference. It helps attribute observed differences to the factor being studied rather than natural variation or external conditions.",
-"Collaborating with BA Labs means contributing to applied work: defining a question, sharing skills or resources, building a trial and documenting results.",
-"The catalogue brings together resources and products that may support projects, experiments or learning pathways."
-],
-ar:[
-"يعرض هذا القسم أعمال BA Labs الموثقة: أسئلة عملية وتجارب وإنجازات تبيّن كيف تتحول الفكرة إلى مسار قابل للاختبار.",
-"يجسّد النموذج الأولي فرضية في شكل جهاز أو نظام يمكن اختباره. وتساعد التجارب على فهم طريقة عمله وحدوده والتعديلات المطلوبة.",
-"يمثل TechnoSoil مساراً استكشافياً لدراسة أوساط الزراعة والتفاعلات بين المكونات العضوية والمعدنية والبيولوجية. وتهدف التجارب إلى ملاحظة سلوك النظام لا الاكتفاء بمظهره.",
-"تتيح العينة الشاهدة مقارنة الحالة التجريبية بمرجع. وتساعد على ربط الفروق بالعامل المدروس بدلاً من التغير الطبيعي أو الظروف الخارجية.",
-"التعاون مع BA Labs يعني المساهمة في عمل تطبيقي: تحديد سؤال، وتبادل المهارات أو الموارد، وبناء تجربة وتوثيق النتائج.",
-"يجمع الكتالوج الموارد والمنتجات التي يمكن أن تدعم بعض المشاريع أو التجارب أو مسارات التعلم."
-],
-pt:[
-"Esta secção apresenta trabalhos documentados da BA Labs: questões práticas, ensaios e realizações que mostram como uma ideia se transforma num processo verificável.",
-"Um protótipo materializa uma hipótese num objeto ou sistema testável. Os ensaios ajudam a compreender o funcionamento, os limites e os ajustes necessários.",
-"A TechnoSoil é uma linha exploratória sobre meios de cultivo e interações entre frações orgânicas, minerais e biológicas. Os ensaios observam o comportamento do sistema, não apenas a sua aparência.",
-"Um controlo permite comparar uma condição experimental com uma referência. Ajuda a atribuir diferenças ao fator estudado, e não à variação natural ou às condições externas.",
-"Colaborar com a BA Labs é contribuir para um trabalho aplicado: definir uma questão, partilhar competências ou recursos, construir um ensaio e documentar resultados.",
-"O catálogo reúne recursos e produtos que podem apoiar projetos, ensaios ou percursos de aprendizagem."
-]
-},
+work:{"fr":["Cette rubrique présente les travaux documentés de BA Labs : questions étudiées, démarches expérimentales, observations et conclusions proportionnées aux données disponibles.","Un prototype matérialise une hypothèse sous forme d’objet ou de système testable. Les essais servent à comprendre son fonctionnement, ses limites et les ajustements nécessaires.","Les substrats et supports biologiques sont étudiés selon leur composition, leur structure, leur porosité et leur capacité à accueillir des organismes dans des conditions définies.","La mesure et la reproductibilité reposent sur des paramètres définis, des méthodes cohérentes, des répétitions et des témoins adaptés à la question étudiée.","Collaborer avec BA Labs, c’est contribuer à une démarche appliquée : définir une question, partager des compétences ou des moyens, construire un essai et documenter les résultats.","La page d’accueil BA Labs présente l’approche générale du laboratoire et donne accès aux domaines publics de biotechnologie appliquée."],"en":["This section presents BA Labs' research and development work, including research questions, experimental approaches, observations and conclusions proportionate to the available evidence.","Biological substrates and carriers are studied through their composition, structure, porosity and ability to support organisms under defined conditions.","Applied biotechnology connects organisms, biological activity and materials to practical processes with explicit aims and observable criteria.","The laboratory brings together BA Labs' areas of work, experimental capabilities and approaches to preparation, measurement and monitoring.","Documented scientific work presents the questions, methods, observations and results that can be shared from BA Labs projects.","The BA Labs homepage introduces the laboratory's overall approach and links to its public applied-biotechnology domains."],"ar":["يعرض هذا القسم أعمال البحث والتطوير في BA Labs، بما فيها أسئلة البحث والمناهج التجريبية والملاحظات والاستنتاجات المتناسبة مع البيانات المتاحة.","تُدرس الركائز والدعامات البيولوجية من حيث تركيبها وبنيتها ومساميتها وقدرتها على دعم نمو الكائنات في ظروف محددة.","تربط التكنولوجيا الحيوية التطبيقية بين الكائنات الحية والنشاط البيولوجي والمواد من أجل تطوير عمليات عملية بأهداف ومعايير قابلة للملاحظة.","يجمع المختبر مجالات عمل BA Labs والإمكانات التجريبية وطرق التحضير والقياس والمتابعة.","تعرض الأعمال العلمية الموثقة الأسئلة والمناهج والملاحظات والنتائج التي يمكن مشاركتها من مشاريع BA Labs.","تقدم الصفحة الرئيسية لـ BA Labs نهج المختبر العام وتتيح الوصول إلى مجالات التكنولوجيا الحيوية التطبيقية المفتوحة للجمهور."],"pt":["Esta secção apresenta os projetos de investigação e desenvolvimento da BA Labs, incluindo questões estudadas, abordagens experimentais, observações e conclusões proporcionais aos dados disponíveis.","Os substratos e suportes biológicos são estudados pela sua composição, estrutura, porosidade e capacidade de suportar organismos em condições definidas.","A biotecnologia aplicada liga organismos, atividade biológica e materiais a processos concretos, com objetivos e critérios observáveis.","O laboratório reúne as áreas de trabalho da BA Labs, as capacidades experimentais e as abordagens de preparação, medição e monitorização.","Os trabalhos científicos documentados apresentam as questões, os métodos, as observações e os resultados que podem ser partilhados dos projetos da BA Labs.","A página inicial da BA Labs apresenta a abordagem geral do laboratório e dá acesso às áreas públicas de biotecnologia aplicada."]},
 learn:{
 fr:[
 "Les ressources fongiques permettent d’aborder les champignons par leurs formes, leurs cycles et leurs usages. Elles constituent un point d’entrée pour comprendre les organismes avant d’explorer les techniques de culture.",
@@ -2338,6 +3347,38 @@ h1 span{
 @media(prefers-reduced-motion:reduce){
  .linknode,.btn,.lang{transition:none!important}
 }
+
+/* Editorial refinement 06 — a deliberate, useful footer; no invented contact details. */
+#app > .foot{
+  display:grid!important;
+  grid-template-columns:minmax(220px,1fr) auto!important;
+  align-items:center!important;
+  gap:26px 42px!important;
+  margin:0 calc(-1 * clamp(12px,3vw,38px))!important;
+  padding:34px clamp(22px,4vw,52px) 28px!important;
+  border-top:1px solid #52645d!important;
+  background:#e9e8df!important;
+  color:#465650!important;
+}
+#app > .foot .foot-brand{display:flex!important;flex-direction:column!important;gap:8px!important}
+#app > .foot .foot-home{display:inline-flex!important;align-items:baseline!important;flex-wrap:wrap!important;gap:13px!important;width:max-content!important;max-width:100%!important;text-decoration:none!important}
+#app > .foot .foot-home strong{color:#263b38!important;font:700 13px/1.2 ui-sans-serif,system-ui,sans-serif!important;letter-spacing:.2em!important}
+#app > .foot .foot-home span{color:#52645d!important;font:500 10px/1.5 ui-sans-serif,system-ui,sans-serif!important}
+#app > .foot .foot-note{color:#7a847c!important;font:500 9px/1.5 ui-monospace,monospace!important;letter-spacing:.1em!important;text-transform:uppercase!important}
+#app > .foot .foot-nav{display:flex!important;align-items:center!important;justify-content:flex-end!important;flex-wrap:wrap!important;gap:10px 22px!important}
+#app > .foot .foot-nav a{color:#344b45!important;text-decoration:none!important;font:600 9px/1.5 ui-monospace,monospace!important;letter-spacing:.1em!important;text-transform:uppercase!important;transition:color .18s ease!important}
+#app > .foot .foot-nav a:hover{color:#99563f!important}
+#app > .foot .foot-nav a:focus-visible,#app > .foot .foot-home:focus-visible{outline:2px solid #b96b4d!important;outline-offset:4px!important}
+#app > .foot .asset-credit{grid-column:1/-1!important;padding-top:16px!important;border-top:1px solid #c4c9bf!important;color:#788078!important;font:400 9px/1.7 ui-sans-serif,system-ui,sans-serif!important}
+#app > .foot .asset-credit a{color:#52645d!important;text-underline-offset:3px!important}
+#app > .foot .asset-credit a:hover{color:#99563f!important}
+@media(max-width:760px){
+ #app > .foot{grid-template-columns:1fr!important;gap:20px!important;margin-inline:-12px!important;padding:28px 18px 22px!important}
+ #app > .foot .foot-nav{justify-content:flex-start!important;gap:12px 18px!important}
+ #app > .foot .foot-nav a{min-height:32px!important;display:inline-flex!important;align-items:center!important}
+ #app > .foot .asset-credit{padding-top:13px!important;font-size:8px!important}
+}
+@media(prefers-reduced-motion:reduce){#app > .foot .foot-nav a{transition:none!important}}
 </style>
 </body>
 </html>
@@ -2520,19 +3561,21 @@ html,body{background:var(--bal-petrol)!important;color:var(--bal-mineral)!import
 .work-heading h2 em{font-weight:400}
 .work-heading>p{font:400 15px/1.75 ui-sans-serif,system-ui,sans-serif;color:#56635d;max-width:420px;margin:0 0 4px}
 .work-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px;max-width:1320px;margin:0 auto;background:#aeb7ae;border:1px solid #aeb7ae}
-.work-card{position:relative;display:flex;flex-direction:column;min-height:370px;padding:26px clamp(18px,2.5vw,34px) 28px;background:#e9e8df;overflow:hidden}
-.work-index{font:600 9px/1.4 ui-monospace,monospace;letter-spacing:.16em;color:#7b8980}
-.work-illustration{height:136px;display:flex;align-items:center;justify-content:center;margin:12px 0 16px;color:#263B38}
+.work-card{position:relative;display:flex;flex-direction:column;min-height:390px;padding:26px clamp(18px,2.5vw,34px) 28px;background:#e9e8df;overflow:hidden;isolation:isolate;transition:background .35s ease,transform .35s ease}.work-card:before{content:"";position:absolute;z-index:-1;inset:0;opacity:.42;pointer-events:none}.work-card:after{content:"";position:absolute;z-index:-1;right:-58px;top:104px;width:210px;height:210px;border:1px solid currentColor;border-radius:50%;opacity:.12;pointer-events:none}.work-card:hover{transform:translateY(-4px)}
+.work-index{font:600 9px/1.4 ui-monospace,monospace;letter-spacing:.16em;color:#7b8980}.work-myco{border-top:3px solid #B96B4D}.work-soil{background:#d9ded3;border-top:3px solid #788b72}.work-iot{background:#263B38;border-top:3px solid #9baea4;color:#e9e8df}.work-iot .work-index{color:#b9c6bb}.work-iot h3{color:#f0eee5}.work-iot p{color:#d1d8cf}.work-iot .work-tag{border-color:#60746b;color:#d6a087}.work-iot .work-card-link{color:#f0eee5;border-color:#60746b}.work-myco:before{background-image:radial-gradient(circle at 18% 25%,#B96B4D18 0 1px,transparent 1.5px),radial-gradient(circle at 70% 55%,#263B3810 0 1px,transparent 1.5px);background-size:18px 18px,26px 26px}.work-soil:before{background:repeating-linear-gradient(165deg,transparent 0 17px,#788b7214 18px 19px,transparent 20px 34px)}.work-iot:before{background-image:linear-gradient(#d1d0c50b 1px,transparent 1px),linear-gradient(90deg,#d1d0c50b 1px,transparent 1px);background-size:22px 22px}
+.work-illustration{height:136px;display:flex;align-items:center;justify-content:center;margin:12px 0 16px;color:#263B38;position:relative}.work-illustration:after{content:"";position:absolute;inset:8px 18%;border-bottom:1px solid currentColor;opacity:.16}.work-soil .work-illustration{color:#52694e}.work-iot .work-illustration{color:#d6a087}.work-illustration svg{filter:drop-shadow(0 5px 8px #111b1d0c)}
 .work-illustration svg{height:100%;width:min(100%,210px)}
-.work-card h3{font:500 clamp(21px,2vw,27px)/1.1 Georgia,'Times New Roman',serif;letter-spacing:-.02em;margin:0 0 12px;color:#111B1D}
-.work-card p{font:400 13px/1.7 ui-sans-serif,system-ui,sans-serif;color:#56635d;margin:0 0 24px;max-width:390px}
-.work-tag{margin-top:auto;padding-top:16px;border-top:1px solid #c1c8c0;font:600 8px/1.4 ui-monospace,monospace;letter-spacing:.15em;color:#99563f}
+.work-card h3{font:500 clamp(21px,2vw,27px)/1.1 Georgia,'Times New Roman',serif;letter-spacing:-.02em;margin:0 0 12px;color:#111B1D}.work-soil h3{color:#263b38}
+.work-card p{font:400 13px/1.7 ui-sans-serif,system-ui,sans-serif;color:#56635d;margin:0 0 24px;max-width:390px}.work-soil p{color:#4e5c50}
+.work-tag{margin-top:auto;padding-top:16px;border-top:1px solid #c1c8c0;font:600 8px/1.4 ui-monospace,monospace;letter-spacing:.15em;color:#99563f}.work-soil .work-tag{color:#52694e;border-color:#aeb9a9}
 .work-explore{display:flex;align-items:center;justify-content:space-between;gap:20px;width:min(100%,1320px);margin:24px auto 0;padding:16px 0;border-bottom:1px solid #9eaaa1;color:#111B1D;text-decoration:none;font:600 10px/1.4 ui-monospace,monospace;letter-spacing:.15em;text-transform:uppercase}
 .work-explore span{font-size:18px;color:#B96B4D;transition:transform .2s ease}
 .work-explore:hover span{transform:translate(4px,-3px)}
 @media(max-width:760px){.editorial-work{padding:48px 20px}.work-heading{grid-template-columns:1fr;gap:16px;margin-bottom:26px}.work-heading>p{font-size:14px}.work-grid{grid-template-columns:1fr}.work-card{min-height:0;padding:22px 22px 24px}.work-illustration{height:112px;margin:8px 0 12px}.work-card p{max-width:none}.work-explore{font-size:9px}}
 @media(prefers-reduced-motion:reduce){.work-explore span{transition:none}}
 
+
+.universe-bridge{position:relative;display:grid;grid-template-columns:minmax(0,.85fr) minmax(320px,1.15fr);align-items:center;gap:clamp(24px,6vw,80px);padding:clamp(48px,7vw,86px) clamp(22px,6vw,82px);overflow:hidden;background:linear-gradient(115deg,#1c302d 0%,#172725 55%,#111b1d 100%);color:#d1d0c5;border-top:1px solid #71837a55;border-bottom:1px solid #71837a55}.bridge-copy{position:relative;z-index:1;max-width:590px}.bridge-kicker{display:block;margin-bottom:18px;color:#d6a087;font:600 9px/1.5 ui-monospace,monospace;letter-spacing:.2em}.bridge-copy h2{margin:0 0 18px;color:#f0eee5;font:500 clamp(34px,4.5vw,58px)/1.02 Georgia,'Times New Roman',serif;letter-spacing:-.04em}.bridge-copy h2 em{color:#c4d0c5;font-weight:400}.bridge-copy p{max-width:470px;margin:0 0 26px;color:#c1cbc2;font:400 14px/1.8 ui-sans-serif,system-ui,sans-serif}.bridge-action{display:inline-flex;align-items:center;gap:24px;min-height:46px;padding:0 17px;border:1px solid #9baea477;color:#f0eee5;text-decoration:none;font:600 9px/1.4 ui-monospace,monospace;letter-spacing:.14em;text-transform:uppercase;transition:background .25s,border-color .25s}.bridge-action:hover{background:#B96B4D;border-color:#B96B4D}.bridge-action span{color:#d6a087;font-size:17px}.bridge-network{width:100%;max-height:250px;overflow:visible;color:#9baea4;opacity:.82;filter:drop-shadow(0 0 8px #9baea422)}.bridge-network circle{animation:bridge-pulse 4s ease-in-out infinite alternate}.bridge-network circle:nth-of-type(even){animation-delay:1.7s}@keyframes bridge-pulse{from{opacity:.45}to{opacity:1}}@media(max-width:760px){.universe-bridge{grid-template-columns:1fr;gap:18px;padding:46px 20px 38px}.bridge-network{max-height:145px;width:100%}.bridge-copy p{font-size:13px}.bridge-action{width:100%;justify-content:space-between}}@media(prefers-reduced-motion:reduce){.bridge-network circle{animation:none}.bridge-action{transition:none}}
 
 .editorial-method{padding:clamp(52px,7vw,88px) clamp(22px,6vw,82px);background:#263B38;color:#D1D0C5}
 .method-top{display:grid;grid-template-columns:minmax(0,1fr) minmax(240px,.65fr);column-gap:46px;row-gap:18px;max-width:1320px;margin:0 auto 38px;align-items:end}
@@ -2550,5 +3593,221 @@ html,body{background:var(--bal-petrol)!important;color:var(--bal-mineral)!import
 @media(max-width:380px){.method-steps{grid-template-columns:1fr}.method-steps li,.method-steps li+li{padding:16px 0;border-left:0;border-top:1px solid #52665d;min-height:0}.method-steps li:first-child{border-top:0}}
 
 
+.work-topics{margin:13px 0 0!important;padding-top:11px;border-top:1px solid #aeb9b1;color:#596761;font:600 9px/1.7 ui-monospace,monospace!important;letter-spacing:.035em}.work-myco .work-topics{border-color:#c7b7a4}.work-soil .work-topics{border-color:#9cac9c}.work-iot .work-topics{border-color:#52665d;color:#d1d8cf}[dir="rtl"] .work-topics{text-align:right}@media(max-width:760px){.work-topics{font-size:8px!important;line-height:1.65!important}}
 .work-card-link{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:16px;padding:12px 0 0;border-top:1px solid #c1c8c0;color:#263B38;text-decoration:none;font:600 9px/1.5 ui-monospace,monospace;letter-spacing:.1em;text-transform:uppercase}.work-card-link span{font-size:16px;color:#B96B4D;transition:transform .2s ease}.work-card-link:hover span{transform:translate(3px,-3px)}[dir="rtl"] .work-card-link{flex-direction:row-reverse}@media(prefers-reduced-motion:reduce){.work-card-link span{transition:none}}
-.feature-status{display:flex;align-items:center;gap:9px;margin:18px 0 0;color:#B96B4D;font:600 9px/1.5 ui-monospace,monospace;letter-spacing:.13em;text-transform:uppercase}.feature-status .status-dot{width:6px;height:6px;flex:0 0 6px;border-radius:50%;background:#B96B4D;box-shadow:0 0 0 3px rgba(185,107,77,.14)}</style>
+.feature-status{display:flex;align-items:center;gap:9px;margin:18px 0 0;color:#B96B4D;font:600 9px/1.5 ui-monospace,monospace;letter-spacing:.13em;text-transform:uppercase}.feature-status .status-dot{width:6px;height:6px;flex:0 0 6px;border-radius:50%;background:#B96B4D;box-shadow:0 0 0 3px rgba(185,107,77,.14)}
+.site-nav a:focus-visible{outline:2px solid #D6A087;outline-offset:5px;border-radius:1px}
+.site-nav a:focus-visible:after{right:0}
+.site-nav a{scroll-margin-top:16px}
+@media(max-width:760px){.site-nav a:focus-visible{outline-offset:2px}}
+
+/* Editorial refinement 04 — about + method: clear editorial hierarchy, no decorative diagrams. */
+.editorial-about{
+  display:grid!important;
+  grid-template-columns:minmax(0,1.05fr) minmax(260px,.55fr)!important;
+  align-items:center!important;
+  gap:clamp(32px,8vw,120px)!important;
+  padding:clamp(76px,9vw,126px) clamp(24px,8vw,112px)!important;
+  background:#e9e8df!important;
+  color:#111b1d!important;
+  border-top:1px solid #c4c9bf!important;
+  border-bottom:1px solid #c4c9bf!important;
+}
+.editorial-about .about-copy{max-width:850px!important}
+.editorial-about .eyebrow{
+  margin-bottom:24px!important;
+  color:#99563f!important;
+  font:600 10px/1.5 ui-monospace,monospace!important;
+  letter-spacing:.19em!important;
+}
+.editorial-about h2{
+  max-width:820px!important;
+  margin:0 0 26px!important;
+  color:#111b1d!important;
+  font:500 clamp(42px,6.2vw,82px)/.99 Georgia,'Times New Roman',serif!important;
+  letter-spacing:-.052em!important;
+}
+.editorial-about h2 em{color:#52645d!important;font-weight:400!important}
+.editorial-about p{
+  max-width:650px!important;
+  margin:0 0 26px!important;
+  color:#465650!important;
+  font:400 clamp(15px,1.25vw,17px)/1.85 ui-sans-serif,system-ui,sans-serif!important;
+}
+.editorial-about .editorial-link{
+  display:inline-flex!important;
+  align-items:center!important;
+  gap:22px!important;
+  min-height:46px!important;
+  padding:0 0 8px!important;
+  color:#263b38!important;
+  border-bottom:1px solid #9ba69d!important;
+  font:600 10px/1.5 ui-monospace,monospace!important;
+  letter-spacing:.09em!important;
+  text-decoration:none!important;
+}
+.editorial-about .editorial-link span{color:#99563f!important;font-size:17px!important}
+.editorial-about .editorial-art-about{display:none!important}
+.editorial-about:after{
+  content:"BIOLOGY\A ×\A ENGINEERING";
+  white-space:pre;
+  justify-self:end;
+  align-self:center;
+  color:#263b38;
+  font:500 clamp(24px,3vw,42px)/1.35 Georgia,'Times New Roman',serif;
+  letter-spacing:-.035em;
+  opacity:.82;
+  border-left:1px solid #b96b4d;
+  padding:18px 0 18px clamp(20px,3vw,42px);
+}
+.editorial-method{
+  padding:clamp(72px,8vw,112px) clamp(24px,8vw,112px)!important;
+  background:#263b38!important;
+  color:#f0eee5!important;
+  border:0!important;
+}
+.editorial-method .method-top{
+  display:grid!important;
+  grid-template-columns:minmax(0,1.1fr) minmax(260px,.65fr)!important;
+  column-gap:clamp(28px,6vw,84px)!important;
+  row-gap:20px!important;
+  max-width:1320px!important;
+  margin:0 auto clamp(38px,5vw,62px)!important;
+  align-items:end!important;
+}
+.editorial-method .method-top .eyebrow{
+  color:#d6a087!important;
+  font:600 10px/1.5 ui-monospace,monospace!important;
+  letter-spacing:.19em!important;
+}
+.editorial-method .method-top h2{
+  color:#f0eee5!important;
+  font:500 clamp(38px,5.4vw,70px)/1 Georgia,'Times New Roman',serif!important;
+  letter-spacing:-.045em!important;
+}
+.editorial-method .method-top h2 em{color:#c1cbc2!important;font-weight:400!important}
+.editorial-method .method-top>p{
+  max-width:480px!important;
+  color:#d1d8cf!important;
+  font:400 15px/1.85 ui-sans-serif,system-ui,sans-serif!important;
+}
+.editorial-method .method-steps{
+  display:grid!important;
+  grid-template-columns:repeat(4,minmax(0,1fr))!important;
+  max-width:1320px!important;
+  margin:0 auto!important;
+  padding:0!important;
+  border-top:1px solid #71837a!important;
+  border-bottom:1px solid #71837a!important;
+}
+.editorial-method .method-steps li,
+.editorial-method .method-steps li+li{
+  min-width:0!important;
+  min-height:210px!important;
+  display:flex!important;
+  flex-direction:column!important;
+  justify-content:space-between!important;
+  gap:32px!important;
+  padding:22px 22px 24px 0!important;
+  border:0!important;
+}
+.editorial-method .method-steps li+li{padding-left:22px!important;border-left:1px solid #52665d!important}
+.editorial-method .method-no{
+  color:#d6a087!important;
+  font:600 11px/1.4 ui-monospace,monospace!important;
+  letter-spacing:.14em!important;
+}
+.editorial-method .method-steps b{
+  display:block!important;
+  margin-bottom:10px!important;
+  color:#f0eee5!important;
+  font:500 clamp(21px,2vw,27px)/1.15 Georgia,'Times New Roman',serif!important;
+}
+.editorial-method .method-steps p{
+  max-width:260px!important;
+  margin:0!important;
+  color:#c1cbc2!important;
+  font:400 13px/1.8 ui-sans-serif,system-ui,sans-serif!important;
+}
+@media(max-width:760px){
+  .editorial-about{
+    grid-template-columns:1fr!important;
+    gap:28px!important;
+    padding:54px 22px!important;
+  }
+  .editorial-about h2{font-size:clamp(39px,10vw,58px)!important}
+  .editorial-about:after{
+    justify-self:start!important;
+    font-size:22px!important;
+    padding:8px 0 8px 18px!important;
+  }
+  .editorial-method{padding:54px 22px!important}
+  .editorial-method .method-top{
+    grid-template-columns:1fr!important;
+    gap:16px!important;
+    margin-bottom:30px!important;
+  }
+  .editorial-method .method-top h2{font-size:clamp(38px,9vw,56px)!important}
+  .editorial-method .method-steps{grid-template-columns:1fr 1fr!important}
+  .editorial-method .method-steps li,
+  .editorial-method .method-steps li+li{
+    min-height:175px!important;
+    padding:18px 14px 20px 0!important;
+    gap:20px!important;
+  }
+  .editorial-method .method-steps li+li{padding-left:14px!important;border-left:1px solid #52665d!important}
+  .editorial-method .method-steps li:nth-child(3){border-left:0!important;padding-left:0!important;border-top:1px solid #52665d!important}
+  .editorial-method .method-steps li:nth-child(4){border-top:1px solid #52665d!important}
+}
+@media(max-width:380px){
+  .editorial-method .method-steps{grid-template-columns:1fr!important}
+  .editorial-method .method-steps li,
+  .editorial-method .method-steps li+li{
+    min-height:0!important;
+    padding:18px 0!important;
+    border-left:0!important;
+    border-top:1px solid #52665d!important;
+  }
+  .editorial-method .method-steps li:first-child{border-top:0!important}
+}
+
+
+/* Editorial refinement 05 — header, navigation and section rhythm.
+   Scoped to the editorial shell; the interactive 3D scene remains untouched. */
+#app > .top{position:relative!important;z-index:40!important;min-height:76px!important;padding:14px clamp(16px,3vw,34px)!important;margin-inline:calc(-1 * clamp(12px,3vw,38px))!important;border-bottom:1px solid #c4c9bf!important;background:#e9e8df!important;color:#111b1d!important}
+#app > .top .brand{gap:13px!important}
+#app > .top .brand strong{color:#263b38!important;font-size:13px!important;letter-spacing:.2em!important}
+#app > .top .brand small{color:#52645d!important;font-size:9px!important;letter-spacing:.12em!important}
+#app > .top .mark{width:42px!important;height:42px!important;border:1px solid #9ba69d!important;border-radius:12px!important;background:#263b38!important;color:#e9e8df!important;box-shadow:none!important}
+#app > .top .tools{gap:6px!important}
+#app > .top .lang{min-height:36px!important;padding:7px 10px!important;border:1px solid #c4c9bf!important;border-radius:3px!important;background:transparent!important;color:#465650!important;font-size:10px!important;letter-spacing:.04em!important;transition:background .18s ease,color .18s ease,border-color .18s ease!important}
+#app > .top .lang:hover{border-color:#52645d!important;background:#dfe2d8!important}
+#app > .top .lang[aria-pressed=true]{border-color:#263b38!important;background:#263b38!important;color:#f0eee5!important}
+#app > .top .lang:focus-visible{outline:2px solid #b96b4d!important;outline-offset:3px!important}
+#app > .site-nav{position:sticky!important;top:0!important;z-index:35!important;justify-content:space-between!important;gap:clamp(12px,2.2vw,32px)!important;min-height:54px!important;padding:0 clamp(16px,3vw,34px)!important;border-top:0!important;border-bottom:1px solid #52645d!important;background:rgba(17,27,29,.97)!important;box-shadow:0 8px 22px rgba(17,27,29,.09)!important;backdrop-filter:blur(12px)!important}
+#app > .site-nav a{min-height:54px!important;display:inline-flex!important;align-items:center!important;white-space:nowrap!important;padding:0 0 2px!important;color:#d1d0c5!important;font-size:9px!important;letter-spacing:.12em!important;opacity:.9!important}
+#app > .site-nav a:hover,#app > .site-nav a:focus-visible{color:#fff!important;opacity:1!important}
+#app > .site-nav a:after{bottom:9px!important;height:2px!important}
+#app > .site-nav a:focus-visible{outline:2px solid #d6a087!important;outline-offset:3px!important}
+#app > .site-nav a[href="#accueil"]{color:#f0eee5!important}
+#app > .site-nav a[href="#universe"]{color:#e1a58d!important}
+#app > .site-nav a[href="#universe"]:after{background:#d6a087!important}
+#app > .hero,#app > .editorial-feature,#app > .editorial-about,#app > .editorial-work,#app > .editorial-method,#app > .scene{scroll-margin-top:72px!important}
+#app > .editorial-feature,#app > .editorial-about{border-bottom:1px solid #c4c9bf!important}
+#app > .editorial-work,#app > .editorial-method{border-top:1px solid #52645d!important}
+#app > .universe-bridge{border-top:1px solid rgba(82,100,93,.42)!important}
+@media(max-width:760px){
+#app > .top{min-height:68px!important;gap:10px!important;padding:10px 12px!important;margin-inline:-12px!important}
+#app > .top .brand{gap:9px!important}#app > .top .mark{width:36px!important;height:36px!important}
+#app > .top .brand small{font-size:8px!important;letter-spacing:.07em!important}
+#app > .top .tools{gap:4px!important}#app > .top .lang{min-height:32px!important;padding:6px 7px!important;font-size:9px!important}
+#app > .site-nav{justify-content:flex-start!important;gap:22px!important;min-height:48px!important;margin-inline:-12px!important;padding:0 14px!important;overflow-x:auto!important;overflow-y:hidden!important;overscroll-behavior-x:contain!important;scrollbar-width:none!important;-webkit-overflow-scrolling:touch!important}
+#app > .site-nav::-webkit-scrollbar{display:none!important}
+#app > .site-nav a{flex:0 0 auto!important;min-height:48px!important;font-size:9px!important}
+#app > .site-nav a:after{bottom:7px!important}
+#app > .hero,#app > .editorial-feature,#app > .editorial-about,#app > .editorial-work,#app > .editorial-method,#app > .scene{scroll-margin-top:58px!important}
+}
+@media(max-width:390px){#app > .top{align-items:flex-start!important;flex-direction:column!important;padding:10px 14px!important}#app > .top .tools{width:100%!important;justify-content:flex-start!important}}
+@media(prefers-reduced-motion:reduce){#app > .top .lang{transition:none!important}#app > .site-nav{backdrop-filter:none!important}}
+
+</style>
