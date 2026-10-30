@@ -479,7 +479,7 @@ if(root){
         const forkB=[
           {edge:{curve:rightHalf,relation:true,aId:first.a,bId:second.b},reverse:false},
           {edge:{curve:second.curve,relation:false,id:second.b,parentId:second.b},reverse:true},
-          {edge:{curve:secondStem,relation:false,id:second.b,parentId:second.b},reverse:true}
+          {edge:{curve:secondStem,relation:false,id:second.b,parentId:second.b},reverse:false}
         ];
         for(const fork of [forkA,forkB])fork.forEach(segment=>segment.length=segment.edge.curve.getLength());
         junctionPaths.push({segments:pathSegments,totalLength:pathSegments.reduce((sum,segment)=>sum+segment.length,0),forkPaths:[forkA,forkB]});
