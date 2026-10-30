@@ -27,7 +27,7 @@ async function checkWorkingScene(name, viewport) {
     const root = document.querySelector('#mainView');
     return root?.classList.contains('webgl-ready') ||
       !!document.querySelector('.webgl-load-error-panel');
-  }, { timeout: 60000 });
+  }, undefined, { timeout: 60000 });
 
   assert.equal(
     await page.locator('.webgl-load-error-panel').count(),
@@ -70,7 +70,7 @@ async function checkWorkingScene(name, viewport) {
   const intro = page.locator('#mainView .webgl-intro');
   await intro.waitFor({ state: 'visible' });
   await intro.click();
-  await page.waitForFunction(() => document.querySelector('#mainView')?.classList.contains('universe-open'), { timeout: 5000 });
+  await page.waitForFunction(() => document.querySelector('#mainView')?.classList.contains('universe-open'), undefined, { timeout: 5000 });
   assert.equal(await intro.isVisible(), false, name + ': gateway overlay must leave the scene after entry');
   assert.ok(await canvas.isVisible(), name + ': the 3D canvas must remain visible after entering');
   await page.waitForTimeout(700);
