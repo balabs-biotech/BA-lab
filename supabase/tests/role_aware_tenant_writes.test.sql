@@ -91,6 +91,40 @@ begin
   end;
 
   begin
+    perform public.record_manual_measurement(
+      jsonb_build_object('organization_id', '00000000-0000-0000-0000-0000000000a1',
+                         'event_type', 'measurement_recorded'),
+      jsonb_build_object('variable_code', 'viewer-test', 'raw_value', 1,
+                         'raw_unit_code', 'unit')
+    );
+    raise exception 'FAIL: viewer wrote a manual measurement';
+  exception when insufficient_privilege then
+    null;
+  end;
+
+  begin
+    perform public.record_manual_observation(
+      jsonb_build_object('organization_id', '00000000-0000-0000-0000-0000000000a1',
+                         'event_type', 'observation_recorded'),
+      jsonb_build_object('variable_code', 'viewer-test', 'value_text', 'must fail')
+    );
+    raise exception 'FAIL: viewer wrote a manual observation';
+  exception when insufficient_privilege then
+    null;
+  end;
+
+  begin
+    perform public.record_biological_operation(
+      '00000000-0000-0000-0000-0000000000a1',
+      '00000000-0000-0000-0000-0000000000d1',
+      'repiquage'
+    );
+    raise exception 'FAIL: viewer recorded a biological operation';
+  exception when insufficient_privilege then
+    null;
+  end;
+
+  begin
     perform public.create_batch_with_stages(
       '00000000-0000-0000-0000-0000000000a1',
       'VIEWER-BATCH-MUST-FAIL', 'Viewer batch', 'FORMULATION',
