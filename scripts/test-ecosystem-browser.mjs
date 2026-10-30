@@ -20,14 +20,30 @@ const browser = await chromium.launch({
 async function checkWorkingScene(name, viewport) {
   const page = await browser.newPage({ viewport, deviceScaleFactor: 1 });
   const pageErrors = [];
+  const browserDiagnostics = [];
   page.on('pageerror', (error) => pageErrors.push(error.message));
+  page.on('console', (message) => { if (message.type() === 'error') browserDiagnostics.push('console: ' + message.text()); });
+  page.on('requestfailed', (request) => browserDiagnostics.push('request failed: ' + request.url() + ' — ' + (request.failure()?.errorText || 'unknown')));
   await page.goto(baseURL, { waitUntil: 'domcontentloaded', timeout: 30000 });
 
-  await page.waitForFunction(() => {
-    const root = document.querySelector('#mainView');
-    return root?.classList.contains('webgl-ready') ||
-      !!document.querySelector('.webgl-load-error-panel');
-  }, undefined, { timeout: 60000 });
+  try {
+    await page.waitForFunction(() => {
+      const root = document.querySelector('#mainView');
+      return root?.classList.contains('webgl-ready') ||
+        !!document.querySelector('.webgl-load-error-panel');
+    }, undefined, { timeout: 35000 });
+  } catch (error) {
+    const state = await page.evaluate(() => ({
+      readyState: document.readyState,
+      rootClass: document.querySelector('#mainView')?.className || null,
+      moduleScripts: [...document.querySelectorAll('script[type="module"]')].map((item) => item.src),
+      stageCount: document.querySelectorAll('#mainView .webgl-stage').length,
+      canvasCount: document.querySelectorAll('#mainView canvas').length,
+      failurePanelCount: document.querySelectorAll('.webgl-load-error-panel').length,
+    }));
+    throw new Error(name + ': 3D engine did not reach ready or failure state. ' +
+      JSON.stringify({ state, pageErrors, browserDiagnostics, cause: error.message }));
+  }
 
   assert.equal(
     await page.locator('.webgl-load-error-panel').count(),
@@ -81,6 +97,23 @@ async function checkWorkingScene(name, viewport) {
   await page.close();
 }
 
+async function checkPrimaryCdnFallback() {
+  const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+  await page.route('https://cdn.jsdelivr.net/**', (route) => route.abort());
+  await page.goto(baseURL, { waitUntil: 'domcontentloaded', timeout: 30000 });
+  await page.waitForFunction(() => {
+    const root = document.querySelector('#mainView');
+    return root?.classList.contains('webgl-ready') ||
+      !!document.querySelector('.webgl-load-error-panel');
+  }, undefined, { timeout: 35000 });
+  assert.equal(await page.locator('.webgl-load-error-panel').count(), 0,
+    'The pinned secondary CDN must start the 3D scene when jsDelivr is unavailable');
+  assert.ok(await page.locator('#mainView .webgl-stage canvas').isVisible(),
+    'The secondary CDN must create a visible 3D canvas');
+  console.log('CDN fallback: 3D scene started after jsDelivr was blocked');
+  await page.close();
+}
+
 async function checkFailureState() {
   const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
   for (const host of ['cdn.jsdelivr.net', 'unpkg.com', 'esm.sh']) {
@@ -105,6 +138,7 @@ async function checkFailureState() {
 try {
   await checkWorkingScene('desktop', { width: 1440, height: 1000 });
   await checkWorkingScene('mobile', { width: 390, height: 844 });
+  await checkPrimaryCdnFallback();
   await checkFailureState();
 } finally {
   await browser.close();
