@@ -157,6 +157,20 @@
           "url": "https://app.notion.com/p/3e273152f17181ec9ee4dcf0c18a2abc"
         }
       ]
+    },
+    {
+      "id": "lab",
+      "title": "LABORATOIRE & EXPÉRIMENTATION",
+      "notionId": "3e273152f17181e2aeaad4ed4ac3f230",
+      "url": "https://app.notion.com/p/3e273152f17181e2aeaad4ed4ac3f230",
+      "children": [
+        {
+          "id": "lab-plant-experimentation",
+          "title": "Expérimentation végétale",
+          "notionId": "3e273152f171817a81d6f806b3804d6b",
+          "url": "https://app.notion.com/p/3e273152f171817a81d6f806b3804d6b"
+        }
+      ]
     }
   ]
 }
