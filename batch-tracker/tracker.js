@@ -2422,6 +2422,8 @@ async function fetchAllComparisonPages(queryBuilder, pageSize = 1000) {
 }
 
 async function compareSelectedBatches() {
+  const operationRevision = authStateRevision;
+  const operationOrganizationId = organizationId;
   const select = document.getElementById("batchCompareSelect");
   const status = document.getElementById("batchCompareStatus");
   const results = document.getElementById("batchCompareResults");
@@ -2457,38 +2459,40 @@ async function compareSelectedBatches() {
     const [stageResult, cultureMeasurementResult, environmentMeasurementResult, cultureContextResult] = await Promise.all([
       supabaseClient.from("batch_stages")
         .select("batch_id,stage_code,status,sequence_no,started_at,completed_at")
-        .eq("organization_id", organizationId).in("batch_id", ids),
+        .eq("organization_id", operationOrganizationId).in("batch_id", ids),
       cultureIds.length
         ? fetchAllComparisonPages(supabaseClient.from("measurements")
             .select("id,culture_id,environment_id,variable_code,raw_value,raw_unit_code,normalized_value,normalized_unit_code,measured_at,quality_state,exclusion_reason")
-            .eq("organization_id", organizationId).in("culture_id", cultureIds)
+            .eq("organization_id", operationOrganizationId).in("culture_id", cultureIds)
             .order("measured_at", { ascending: false }).order("id", { ascending: true }))
         : Promise.resolve({data:[],error:null}),
       environmentIds.length
         ? fetchAllComparisonPages(supabaseClient.from("measurements")
             .select("id,culture_id,environment_id,variable_code,raw_value,raw_unit_code,normalized_value,normalized_unit_code,measured_at,quality_state,exclusion_reason")
-            .eq("organization_id", organizationId).in("environment_id", environmentIds)
+            .eq("organization_id", operationOrganizationId).in("environment_id", environmentIds)
             .order("measured_at", { ascending: false }).order("id", { ascending: true }))
         : Promise.resolve({data:[],error:null}),
       cultureIds.length
         ? supabaseClient.from("cultures")
             .select("id,experiment_id,experimental_unit_id")
-            .eq("organization_id", organizationId).in("id", cultureIds)
+            .eq("organization_id", operationOrganizationId).in("id", cultureIds)
         : Promise.resolve({data:[],error:null})
     ]);
     if (stageResult.error) throw new Error("Chargement des étapes impossible : " + stageResult.error.message);
     if (cultureMeasurementResult.error) throw new Error("Chargement des mesures de culture impossible : " + cultureMeasurementResult.error.message);
     if (environmentMeasurementResult.error) throw new Error("Chargement des mesures d'environnement impossible : " + environmentMeasurementResult.error.message);
     if (cultureContextResult.error) throw new Error("Chargement du contexte expérimental impossible : " + cultureContextResult.error.message);
+    if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
     const cultureContexts = cultureContextResult.data || [];
     const unitIds = [...new Set(cultureContexts.map(row => row.experimental_unit_id).filter(Boolean))];
     const [unitResult] = await Promise.all([
       unitIds.length
         ? supabaseClient.from("experimental_units")
             .select("id,experiment_id,unit_code,replicate_no,treatment_code")
-            .eq("organization_id", organizationId).in("id", unitIds)
+            .eq("organization_id", operationOrganizationId).in("id", unitIds)
         : Promise.resolve({data:[],error:null})
     ]);
+    if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
     if (unitResult.error) throw new Error("Chargement des unités expérimentales impossible : " + unitResult.error.message);
     const units = unitResult.data || [];
     const unitsById = new Map(units.map(row => [row.id, row]));
@@ -2499,7 +2503,7 @@ async function compareSelectedBatches() {
     const experimentResult = experimentIds.length
       ? await supabaseClient.from("experiments")
           .select("id,code,name")
-          .eq("organization_id", organizationId).in("id", experimentIds)
+          .eq("organization_id", operationOrganizationId).in("id", experimentIds)
       : {data:[],error:null};
     if (experimentResult.error) throw new Error("Chargement des expériences impossible : " + experimentResult.error.message);
     const experimentsById = new Map((experimentResult.data || []).map(row => [row.id, row]));
@@ -2514,14 +2518,14 @@ async function compareSelectedBatches() {
     const observationCultureResult = cultureIds.length
       ? await fetchAllComparisonPages(supabaseClient.from("observations")
           .select("id,culture_id,experimental_unit_id,variable_code,value_text,observed_at,quality_state")
-          .eq("organization_id", organizationId).in("culture_id", cultureIds)
+          .eq("organization_id", operationOrganizationId).in("culture_id", cultureIds)
           .order("observed_at", { ascending: false }).order("id", { ascending: true }))
       : {data:[],error:null};
     if (observationCultureResult.error) throw new Error("Chargement des observations de culture impossible : " + observationCultureResult.error.message);
     const observationUnitResult = unitIds.length
       ? await fetchAllComparisonPages(supabaseClient.from("observations")
           .select("id,culture_id,experimental_unit_id,variable_code,value_text,observed_at,quality_state")
-          .eq("organization_id", organizationId).in("experimental_unit_id", unitIds)
+          .eq("organization_id", operationOrganizationId).in("experimental_unit_id", unitIds)
           .order("observed_at", { ascending: false }).order("id", { ascending: true }))
       : {data:[],error:null};
     if (observationUnitResult.error) throw new Error("Chargement des observations expérimentales impossible : " + observationUnitResult.error.message);
@@ -2663,9 +2667,10 @@ async function compareSelectedBatches() {
     ].filter(Boolean);
     status.textContent = statusParts.join(" ");
   } catch (error) {
+    if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
     status.textContent = error?.message || labels.impossible;
   } finally {
-    button.disabled = false;
+    if (isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) button.disabled = false;
   }
 }
 document.getElementById("compareBatchesButton")?.addEventListener("click", compareSelectedBatches);
@@ -5812,21 +5817,25 @@ function biologicalWorkflowText(key, count = 0) {
 
 async function loadBiologicalLineage(cultureId) {
   const target = document.getElementById('cultureLineage');
-  if (!target || !organizationId) return;
+  const loadRevision = authStateRevision;
+  const loadOrganizationId = organizationId;
+  if (!target || !loadOrganizationId) return;
   target.textContent = biologicalWorkflowText("loading");
   try {
     const { data, error } = await supabaseClient.from('cultures')
       .select('id,code,culture_type,material_id,parent_culture_id,started_at,metadata')
-      .eq('organization_id', organizationId).order('created_at', { ascending: true }).limit(1000);
+      .eq('organization_id', loadOrganizationId).order('created_at', { ascending: true }).limit(1000);
     if (error) throw error;
+    if (!isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
     const rows = data || [];
     const byId = new Map(rows.map(row => [row.id, row]));
     const current = byId.get(cultureId);
     if (!current) { target.textContent = biologicalWorkflowText("missing"); return; }
     const { data: materials, error: materialError } = await supabaseClient.from('materials')
       .select('id,material_code,material_type,parent_material_id,generation,state,strain_id')
-      .eq('organization_id', organizationId).limit(2000);
+      .eq('organization_id', loadOrganizationId).limit(2000);
     if (materialError) throw materialError;
+    if (!isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
     const materialById = new Map((materials || []).map(item => [item.id, item]));
     const materialChain = []; let materialId = current.material_id; let materialGuard = 0;
     while (materialId && materialGuard++ < 50) { const material = materialById.get(materialId); if (!material) break; materialChain.unshift(material); materialId = material.parent_material_id; }
@@ -5848,7 +5857,7 @@ async function loadBiologicalLineage(cultureId) {
     if (descendants.length) makeGroup(biologicalWorkflowText("descendants") + ' (' + descendants.length + ')', descendants.map(row => ({ row, label: biologicalWorkflowText("generation") + (row.depth || 1) })));
     if (!ancestors.length && !descendants.length) { const p = document.createElement('p'); p.className = 'muted'; p.textContent = biologicalWorkflowText("noLineage"); target.appendChild(p); }
     if (rows.length >= 1000) { const note = document.createElement('p'); note.className = 'muted'; note.textContent = biologicalWorkflowText("partial"); target.appendChild(note); }
-  } catch (error) { target.textContent = biologicalWorkflowText("loadError") + (error.message || error); }
+  } catch (error) { if (!isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return; target.textContent = biologicalWorkflowText("loadError") + (error.message || error); }
 }
 
 async function saveBiologicalOperation(event) {
@@ -5906,6 +5915,8 @@ let cultureDetailRequestId = 0;
 
 async function loadCultureDetail(cultureId) {
   const requestId = ++cultureDetailRequestId;
+  const loadRevision = authStateRevision;
+  const loadOrganizationId = organizationId;
   const culture = cultureOptions.find(item => item.id === cultureId);
   const panel = document.getElementById("cultureDetailPanel");
   const title = document.getElementById("cultureDetailTitle");
@@ -5943,29 +5954,29 @@ async function loadCultureDetail(cultureId) {
     const { data: cultureBatches, error: batchesError } = await supabaseClient
       .from("batches")
       .select("id, batch_code, name, batch_type, status, current_stage, started_at, completed_at")
-      .eq("organization_id", organizationId)
+      .eq("organization_id", loadOrganizationId)
       .eq("culture_id", culture.id)
       .order("created_at", { ascending: false })
       .limit(100);
     if (batchesError) throw new Error("Lots liés à la culture : " + batchesError.message);
-    if (requestId !== cultureDetailRequestId) return;
+    if (requestId !== cultureDetailRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
 
     const batches = cultureBatches || [];
     const batchIds = batches.map(batch => batch.id);
     const eventQueries = [
       supabaseClient.from("events").select("id, event_type, occurred_at, batch_id, payload")
-        .eq("organization_id", organizationId).eq("culture_id", culture.id)
+        .eq("organization_id", loadOrganizationId).eq("culture_id", culture.id)
         .order("occurred_at", { ascending: false }).limit(100)
     ];
     if (batchIds.length) {
       eventQueries.push(
         supabaseClient.from("events").select("id, event_type, occurred_at, batch_id, payload")
-          .eq("organization_id", organizationId).in("batch_id", batchIds)
+          .eq("organization_id", loadOrganizationId).in("batch_id", batchIds)
           .order("occurred_at", { ascending: false }).limit(100)
       );
     }
     const eventResults = await Promise.all(eventQueries);
-    if (requestId !== cultureDetailRequestId) return;
+    if (requestId !== cultureDetailRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
     for (const result of eventResults) {
       if (result.error) throw new Error("Événements : " + result.error.message);
     }
@@ -5975,30 +5986,30 @@ async function loadCultureDetail(cultureId) {
     const linkedEventIds = events.map(event => event.id);
     const measurementQueries = [
       supabaseClient.from("measurements").select("id, variable_code, raw_value, raw_unit_code, measured_at, event_id, metadata")
-        .eq("organization_id", organizationId).eq("culture_id", culture.id)
+        .eq("organization_id", loadOrganizationId).eq("culture_id", culture.id)
         .order("measured_at", { ascending: false }).limit(100)
     ];
     const observationQueries = [
       supabaseClient.from("observations").select("id, variable_code, value_text, observed_at, event_id, metadata")
-        .eq("organization_id", organizationId).eq("culture_id", culture.id)
+        .eq("organization_id", loadOrganizationId).eq("culture_id", culture.id)
         .order("observed_at", { ascending: false }).limit(100)
     ];
     if (linkedEventIds.length) {
       measurementQueries.push(
         supabaseClient.from("measurements").select("id, variable_code, raw_value, raw_unit_code, measured_at, event_id, metadata")
-          .eq("organization_id", organizationId).in("event_id", linkedEventIds)
+          .eq("organization_id", loadOrganizationId).in("event_id", linkedEventIds)
           .order("measured_at", { ascending: false }).limit(100)
       );
       observationQueries.push(
         supabaseClient.from("observations").select("id, variable_code, value_text, observed_at, event_id, metadata")
-          .eq("organization_id", organizationId).in("event_id", linkedEventIds)
+          .eq("organization_id", loadOrganizationId).in("event_id", linkedEventIds)
           .order("observed_at", { ascending: false }).limit(100)
       );
     }
     const [measurementResults, observationResults] = await Promise.all([
       Promise.all(measurementQueries), Promise.all(observationQueries)
     ]);
-    if (requestId !== cultureDetailRequestId) return;
+    if (requestId !== cultureDetailRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
     for (const result of measurementResults) {
       if (result.error) throw new Error("Mesures : " + result.error.message);
     }
@@ -6133,7 +6144,8 @@ async function loadCultureDetail(cultureId) {
     }
     panel.scrollIntoView({block:"start",behavior:window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth"});
   } catch (error) {
-    if (requestId !== cultureDetailRequestId) return;
+    if (requestId !== cultureDetailRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
+    if (requestId !== cultureDetailRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
     console.error("Chargement de la fiche culture :", error);
     timeline.innerHTML = "";
     const message = document.createElement("p");
