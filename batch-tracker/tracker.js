@@ -6824,9 +6824,22 @@ function setupDomainWorkspaces() {
         showElement(plantCard);
       } else {
         showElement(trackerCard);
-        showElement(batchCard);
+        if (activeDomain === "laboratory") showElement(batchCard);
+        else hideElement(batchCard);
         hideElement(plantCard);
       }
+      document.querySelectorAll('.section-nav a[href="#trackerCard"], [data-workspace-target="trackerCard"]')
+        .forEach(element => { element.hidden = activeDomain === "agronomy"; });
+      document.querySelectorAll('.section-nav a[href="#plantCard"], [data-workspace-target="plantCard"]')
+        .forEach(element => { element.hidden = activeDomain !== "agronomy"; });
+      document.querySelectorAll('.section-nav a[href="#batchCard"], [data-workspace-target="batchCard"]')
+        .forEach(element => { element.hidden = activeDomain !== "laboratory"; });
+      document.querySelectorAll("[data-domain-nav='biological']")
+        .forEach(element => { element.hidden = activeDomain === "agronomy"; });
+      document.querySelectorAll("[data-domain-nav='agronomy']")
+        .forEach(element => { element.hidden = activeDomain !== "agronomy"; });
+      document.querySelector(".bio-operation-panel")?.classList.toggle("hidden", activeDomain === "agronomy");
+      document.querySelector(".bio-lineage-panel")?.classList.toggle("hidden", activeDomain === "agronomy");
       showElement(measurementCard);
       showElement(document.getElementById("statisticsCard"));
       showElement(document.getElementById("overviewCard"));
