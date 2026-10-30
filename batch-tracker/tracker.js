@@ -5156,6 +5156,7 @@ async function saveMeasurement() {
     });
     if (recordError) throw new Error(cultureWorkflowText("measureError") + recordError.message);
     measurementSaved = true;
+    if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
 
     measurementValueInput.value = "";
     measurementInstrumentInput.value = "";
@@ -5372,6 +5373,7 @@ async function saveObservation() {
     });
     if (recordError) throw new Error(cultureWorkflowText("observationError") + recordError.message);
     observationSaved = true;
+    if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
     observationValueInput.value = "";
     observationMethodInput.value = "";
     observationInstrumentInput.value = "";
@@ -5853,6 +5855,7 @@ async function saveBiologicalOperation(event) {
       p_details: { source: 'BA Labs Culture Tracker', interface_version: '3.0', conditions: conditions || null, outcome: outcome || null }, p_child_codes: childCodes
     });
     if (error) throw error;
+    if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
     const result = Array.isArray(data) ? data[0] : data;
     let notionSyncWarning = '';
     for (const child of (result?.children || [])) {
@@ -6664,6 +6667,7 @@ async function savePlantCulture(event) {
       metadata: { source: "BA Labs CultureOps", domain: "agronomy", interface_version: "1.0" }
     });
     if (error) throw error;
+    if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
     form.reset();
     document.getElementById("plantQuantity").value = "1";
     document.getElementById("plantStatus").value = "active";

@@ -82,6 +82,21 @@ for (const mutation of [
 }
 
 
+for (const [mutation, successMarker] of [
+  ["savePlantCulture", /if \(error\) throw error;/],
+  ["saveBiologicalOperation", /if \(error\) throw error;/],
+  ["saveMeasurement", /measurementSaved = true;/],
+  ["saveObservation", /observationSaved = true;/]
+]) {
+  const source = getMutationBlock(mutation);
+  const marker = source.match(successMarker);
+  assert.ok(marker, `${mutation} must expose its successful write boundary`);
+  const afterWrite = source.slice(marker.index + marker[0].length);
+  assert.match(afterWrite, /if \(!isCurrentWorkspaceRevision\(operationRevision, operationOrganizationId\)\) return;/,
+    `${mutation} must stop stale UI updates after a successful write`);
+}
+
+
 const capturedOrganizationChecks = [
   ["createCulture", /p_organization_id:\s*operationOrganizationId/],
   ["createBatch", /p_organization_id:\s*operationOrganizationId/],
