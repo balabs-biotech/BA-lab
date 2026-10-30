@@ -174,4 +174,25 @@ assert.match(batchDetail, /const loadOrganizationId = organizationId;/,
 assert.equal((batchDetail.match(/if \(requestId !== batchDetailRequestId \|\| !isCurrentWorkspaceRevision\(loadRevision, loadOrganizationId\)\) return;/g) || []).length, 4,
   "every batch detail request boundary must reject stale workspace results");
 
+
+const lineage = getFunctionBlock("loadBiologicalLineage");
+assert.match(lineage, /const loadRevision = authStateRevision;/);
+assert.match(lineage, /const loadOrganizationId = organizationId;/);
+assert.equal((lineage.match(/isCurrentWorkspaceRevision\(loadRevision, loadOrganizationId\)/g) || []).length, 3,
+  "lineage loader must guard both reads and stale error rendering");
+
+const cultureDetail = getFunctionBlock("loadCultureDetail");
+assert.match(cultureDetail, /const loadRevision = authStateRevision;/);
+assert.match(cultureDetail, /const loadOrganizationId = organizationId;/);
+assert.equal((cultureDetail.match(/requestId !== cultureDetailRequestId \|\| !isCurrentWorkspaceRevision\(loadRevision, loadOrganizationId\)/g) || []).length, 4,
+  "culture detail must reject stale responses and errors");
+
+const comparison = getFunctionBlock("compareSelectedBatches");
+assert.match(comparison, /const operationRevision = authStateRevision;/);
+assert.match(comparison, /const operationOrganizationId = organizationId;/);
+assert.match(comparison, /if \(!isCurrentWorkspaceRevision\(operationRevision, operationOrganizationId\)\) return;/,
+  "batch comparison must stop rendering after a workspace transition");
+assert.match(comparison, /if \(isCurrentWorkspaceRevision\(operationRevision, operationOrganizationId\)\) button\.disabled = false;/,
+  "batch comparison must not restore stale controls");
+
 console.log("Auth initialization, tenant-write and finally revision guards passed.");
