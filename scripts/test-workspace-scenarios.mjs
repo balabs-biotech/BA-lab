@@ -191,3 +191,42 @@ assert.match(engine, /requestedOrganizationId !== organizationId/);
 assert.match(engine, /const visibleCultureIds = new Set\(requestedCultures\.map\(culture => culture\.id\)\)/);
 assert.match(engine, /requestedDomain !== document\.body\.dataset\.domain/);
 console.log("✓ Culture, batch and plant registries paginate and discard stale workspace responses");
+
+
+// Switching between the three workspaces must refresh tenant-scoped data,
+// not merely replace the hero labels. A superseded switch must not render.
+const setupStart = engine.indexOf("function setupDomainWorkspaces()");
+assert.ok(setupStart >= 0, "workspace setup must exist");
+const setupOpen = engine.indexOf("{", setupStart);
+let setupDepth = 0;
+let setupEnd = -1;
+for (let i = setupOpen; i < engine.length; i++) {
+  if (engine[i] === "{") setupDepth++;
+  if (engine[i] === "}" && --setupDepth === 0) { setupEnd = i + 1; break; }
+}
+assert.ok(setupEnd > setupStart, "workspace setup must be complete");
+const workspaceSetup = engine.slice(setupStart, setupEnd);
+assert.match(workspaceSetup, /let workspaceSwitchRevision = 0;/,
+  "workspace switches need a monotonic revision");
+assert.match(workspaceSetup, /const switchRevision = \+\+workspaceSwitchRevision;/,
+  "each switch must supersede pending switches");
+assert.match(workspaceSetup, /if \(persist && organizationId\)/,
+  "signed-in workspace changes must refresh data");
+assert.match(workspaceSetup, /cultureOptions = \[\];[\s\S]*?latestBatches = \[\];[\s\S]*?await loadPlantCultures\(\);/,
+  "agronomy must clear biological caches and load plant records");
+assert.match(workspaceSetup, /await loadCultureOptions\(\);[\s\S]*?await loadLatestBatches\(\);/,
+  "mycology and laboratory must reload their own cultures and batches");
+assert.match(workspaceSetup, /await loadMeasurementReferences\(\);[\s\S]*?loadRecentMeasurements\(\)[\s\S]*?loadRecentObservations\(\)/,
+  "measurement references and histories must follow the active workspace");
+assert.ok((workspaceSetup.match(/switchRevision !== workspaceSwitchRevision/g) || []).length >= 5,
+  "every asynchronous boundary must reject an obsolete workspace switch");
+assert.match(workspaceSetup, /data-workspace-target="trackerCard"[\s\S]*?hidden = activeDomain === "agronomy"|querySelectorAll\('\.section-nav a\[href="#trackerCard"\]/,
+  "the biological culture navigation must follow the active domain");
+assert.match(workspaceSetup, /data-workspace-target="batchCard"[\s\S]*?hidden = activeDomain !== "laboratory"|querySelectorAll\('\.section-nav a\[href="#batchCard"\]/,
+  "batch navigation must only be visible in Laboratory");
+assert.match(workspaceSetup, /data-domain-nav='biological'[\s\S]*?hidden = activeDomain === "agronomy"/,
+  "biological navigation must be hidden in Green Tech and restored elsewhere");
+assert.match(workspaceSetup, /bio-operation-panel[\s\S]*?classList\.toggle\("hidden", activeDomain === "agronomy"\)/,
+  "biological operation panels must be restored when leaving Green Tech");
+
+console.log("✓ Scenario workspace switching: domain data refreshes and obsolete switches are discarded");
