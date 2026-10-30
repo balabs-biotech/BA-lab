@@ -87,9 +87,9 @@ if(root){
       renderer=new THREE.WebGLRenderer({antialias:true,alpha:true,powerPreference:'high-performance'});
       renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,window.innerWidth<=760?1.25:1.7));renderer.setClearColor(0x000000,0);renderer.outputColorSpace=THREE.SRGBColorSpace;
       stage.prepend(renderer.domElement);renderer.domElement.setAttribute('aria-label','Scène 3D BALabs');
-      scene=new THREE.Scene();scene.fog=new THREE.FogExp2(0x30404b,.009);worldGroup=new THREE.Group();scene.add(worldGroup);worldGroup.visible=false;
+      scene=new THREE.Scene();scene.fog=new THREE.FogExp2(0xb9c9c2,.0068);worldGroup=new THREE.Group();scene.add(worldGroup);worldGroup.visible=false;
       camera=new THREE.PerspectiveCamera(48,1,.1,100);raycaster=new THREE.Raycaster();mouse=new THREE.Vector2();
-      scene.add(new THREE.AmbientLight(0xd4e0e8,1.28));
+      scene.add(new THREE.AmbientLight(0xe3ece5,1.42));
       const key=new THREE.PointLight(0x91bfe0,34,32);key.position.set(0,5,6);scene.add(key);
       const fill=new THREE.PointLight(0x9acdb5,26,28);fill.position.set(-6,-2,-4);scene.add(fill);
       const warm=new THREE.PointLight(0xe3aa7d,15,20);warm.position.set(5,-3,4);scene.add(warm);
