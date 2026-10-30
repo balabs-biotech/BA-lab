@@ -1106,11 +1106,24 @@ body{background:radial-gradient(ellipse at 50% 8%,#1c302d 0%,#101a1b 45%,#080d0f
 }
 @media(prefers-reduced-motion:reduce){.hero:after{scroll-behavior:auto}}
 </style>
+<style id="balabs-micrograph-mobile-correction-2026">
+.hero{isolation:isolate!important}
+.hero .hero-micrograph{position:absolute!important;inset:0!important;z-index:-2!important;display:block!important;width:100%!important;height:100%!important;object-fit:cover!important;object-position:64% 42%!important;filter:grayscale(1) contrast(1.3) brightness(.72)!important;opacity:1!important;pointer-events:none!important}
+.hero:after{background-image:linear-gradient(90deg,rgba(6,11,13,.92) 0%,rgba(6,11,13,.70) 38%,rgba(6,11,13,.25) 78%,rgba(6,11,13,.42) 100%),linear-gradient(0deg,#080d0f 0%,transparent 34%,rgba(5,9,10,.12) 100%)!important;filter:none!important;opacity:1!important}
+.hero .aside{background:linear-gradient(90deg,rgba(8,13,15,.88),rgba(8,13,15,.30))!important;color:#c3cec6!important}
+.hero .aside b{color:#f2f0e8!important}
+@media(max-width:760px){
+ .hero .hero-micrograph{object-position:58% 46%!important;filter:grayscale(1) contrast(1.25) brightness(.82)!important}
+ .hero:after{background-image:linear-gradient(90deg,rgba(6,11,13,.82) 0%,rgba(6,11,13,.54) 52%,rgba(6,11,13,.30) 100%),linear-gradient(0deg,#080d0f 0%,transparent 38%,rgba(5,9,10,.12) 100%)!important}
+ .hero .aside{background:linear-gradient(90deg,rgba(8,13,15,.91),rgba(8,13,15,.66))!important;border-left-color:#d28a68!important}
+ .hero .aside b{color:#f2f0e8!important}
+}
+</style>
 </head>
 <body>
 <div class="wrap" id="app" dir="ltr">
 <header class="top"><div class="brand"><div class="mark" aria-hidden="true">Y</div><div><strong>BALABS</strong><small>Applied biotechnology · Sétif</small></div></div><div class="tools" aria-label="Language selector"><button class="lang" data-lang="fr" aria-pressed="true">🇫🇷 FR</button><button class="lang" data-lang="en" aria-pressed="false">🇬🇧 EN</button><button class="lang" data-lang="ar" aria-pressed="false">🇩🇿 العربية</button><button class="lang" data-lang="pt" aria-pressed="false">🇵🇹 PT</button></div></header>
-<section class="hero"><div><div class="eyebrow" data-i18n="eyebrow">Un écosystème en mouvement</div><h1 data-i18n-html="headline">Entrer dans<br>l’univers <span>BALabs.</span></h1><p data-i18n="intro">Explore les grandes sphères de BALabs. Chaque domaine révèle un univers de thèmes, de projets et d’applications.</p></div><div class="aside"><b data-i18n="asideTitle">La biologie comme point de départ.</b><span data-i18n="asideText">Des disciplines distinctes, reliées par la matière, les méthodes et les applications.</span></div></section><a class="hero-credit" href="https://commons.wikimedia.org/wiki/File:Bovine_Blastocyst.JPG" target="_blank" rel="noopener">MICROGRAPH / BOVINE BLASTOCYST · PANDAL00M · CC BY-SA 4.0</a>
+<section class="hero"><img class="hero-micrograph" src="https://upload.wikimedia.org/wikipedia/commons/7/7d/Bovine_Blastocyst.JPG" alt="Micrographie d’un blastocyste bovin observé au microscope"><div><div class="eyebrow" data-i18n="eyebrow">Un écosystème en mouvement</div><h1 data-i18n-html="headline">Entrer dans<br>l’univers <span>BALabs.</span></h1><p data-i18n="intro">Explore les grandes sphères de BALabs. Chaque domaine révèle un univers de thèmes, de projets et d’applications.</p></div><div class="aside"><b data-i18n="asideTitle">La biologie comme point de départ.</b><span data-i18n="asideText">Des disciplines distinctes, reliées par la matière, les méthodes et les applications.</span></div></section><a class="hero-credit" href="https://commons.wikimedia.org/wiki/File:Bovine_Blastocyst.JPG" target="_blank" rel="noopener">MICROGRAPH / BOVINE BLASTOCYST · PANDAL00M · CC BY-SA 4.0</a>
 <section class="scene" aria-label="BALabs universe"><div class="scenehead"><div><small data-i18n="sceneKicker">01 / Univers BALabs</small><strong data-i18n="sceneTitle">Choisis une sphère pour entrer dans son monde.</strong></div><button class="btn" id="homeBtn" hidden data-i18n="backHome">← Retour à toutes les sphères</button></div>
 <div class="cluster-key" aria-label="Domain clusters"><div class="cluster-item cluster-foundations"><i aria-hidden="true"></i><span><b data-i18n="clusterBio">FONDEMENTS BIOLOGIQUES</b><small data-i18n="clusterBioSub">Biotechnologies · mycologie · TechnoSoil · R&D</small></span></div><div class="cluster-item cluster-applications"><i aria-hidden="true"></i><span><b data-i18n="clusterApply">APPLICATIONS &amp; TRANSMISSION</b><small data-i18n="clusterApplySub">Produits · ingénierie · projets · ressources</small></span></div></div><div class="view universe-closed" id="mainView">
 <svg class="network" id="sphereNetwork" aria-hidden="true" viewBox="0 0 1000 650" preserveAspectRatio="none"><g id="networkEdges"></g></svg><div class="galaxy"></div><div class="galaxy g2"></div><button class="hub" id="openUniverse" type="button" aria-label="Ouvrir les sphères BALabs"><div><strong>BA</strong><small data-i18n="coreLabel">NOYAU BALABS</small><span class="hubhint" data-i18n="hubHint">Cliquer pour explorer ↓</span></div></button>
