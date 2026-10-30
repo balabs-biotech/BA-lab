@@ -907,6 +907,32 @@ h1 span{font-style:italic!important;color:var(--field-rust)!important}
 }
 @media(prefers-reduced-motion:reduce){.hero:after{transform:none!important}}
 </style>
+<style id="balabs-hero-microscopy-layer-2026">
+/* Microscopy layer: real Podospora anserina hyphae, fluorescent micrograph.
+   The original custom SVG remains as a local fallback if the remote image is unavailable. */
+.hero{isolation:isolate!important;position:relative!important}
+.hero:after{
+ z-index:0!important;right:-2%!important;top:10%!important;
+ width:clamp(300px,49vw,650px)!important;height:clamp(260px,40vw,500px)!important;
+ background-image:
+  url("https://upload.wikimedia.org/wikipedia/commons/thumb/e/ee/Mycelium.JPG/1280px-Mycelium.JPG"),
+  url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20420%20300%22%3E%3Cg%20fill%3D%22none%22%20stroke%3D%22%239ab79a%22%20stroke-width%3D%223.4%22%20stroke-linecap%3D%22round%22%20opacity%3D%22.9%22%3E%3Cpath%20d%3D%22M210%20151%20C180%20142%20166%20120%20145%20101%20S111%2067%2079%2053%20M145%20101%20C139%2076%20144%2055%20132%2030%20M145%20101%20C119%20111%2096%20108%2069%20121%20S38%20143%2016%20139%20M210%20151%20C177%20161%20155%20183%20132%20211%20S91%20239%2058%20263%20M210%20151%20C242%20139%20265%20114%20286%2091%20S325%2064%20355%2050%20M286%2091%20C288%2063%20306%2042%20326%2024%20M286%2091%20C316%2099%20341%2091%20373%20105%20S397%20124%20415%20120%20M210%20151%20C244%20166%20266%20190%20286%20216%20S327%20245%20360%20260%22%2F%3E%3C%2Fg%3E%3Cg%20fill%3D%22%23c58a59%22%3E%3Ccircle%20cx%3D%22210%22%20cy%3D%22151%22%20r%3D%229%22%2F%3E%3Ccircle%20cx%3D%2279%22%20cy%3D%2253%22%20r%3D%224%22%2F%3E%3Ccircle%20cx%3D%22355%22%20cy%3D%2250%22%20r%3D%224%22%2F%3E%3Ccircle%20cx%3D%22360%22%20cy%3D%22260%22%20r%3D%224%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E")!important;
+ background-position:center,center!important;
+ background-size:cover,contain!important;
+ background-repeat:no-repeat!important;
+ background-blend-mode:screen,normal!important;
+ opacity:.47!important;filter:saturate(.78) contrast(.94)!important;
+ transform:rotate(-3deg)!important;
+}
+.hero>div{position:relative!important;z-index:1!important}
+.asset-credit{display:block;margin-top:9px;color:#77766b;font:8px/1.5 ui-monospace,monospace;letter-spacing:.035em}
+.asset-credit a{color:#9a5038;text-decoration:underline;text-underline-offset:2px}
+@media(max-width:760px){
+ .hero:after{right:-8%!important;top:18%!important;width:78vw!important;height:300px!important;opacity:.35!important}
+ .asset-credit{font-size:7px}
+}
+@media(prefers-reduced-motion:reduce){.hero:after{transform:none!important}}
+</style>
 </head>
 <body>
 <div class="wrap" id="app" dir="ltr">
@@ -927,7 +953,7 @@ h1 span{font-style:italic!important;color:var(--field-rust)!important}
 <div class="mini" id="miniView" hidden><div class="miniintro"><div><div class="eyebrow" id="miniKicker">SPHÈRE 01</div><h2 id="miniTitle">Biotechnologies</h2><p id="miniDesc">Le monde des solutions biologiques appliquées.</p></div><a class="btn primary" id="spherePage" href="#miniMap">Parcourir les thèmes ↓</a></div><div class="mini-map" id="miniMap"><svg class="mini-connections" id="miniConnections" aria-hidden="true"><g id="miniEdges"></g></svg><div class="mini-ring"></div><div class="mini-core"><div><b data-i18n="miniCore">AXE CENTRAL</b><small data-i18n="miniCoreSub">AXE DU DOMAINE</small></div></div><button class="linknode ln1" type="button" data-resource-index="1"><span>01 / THÈME</span><b>Rubrique principale</b><small>Ouvrir la page</small></button><button class="linknode ln2" type="button" data-resource-index="2"><span>02 / THÈME</span><b>Thème associé</b><small>Ouvrir la page</small></button><button class="linknode ln3" type="button" data-resource-index="3"><span>03 / THÈME</span><b>Projet ou application</b><small>Ouvrir la page</small></button><button class="linknode ln4" type="button" data-resource-index="4"><span>04 / THÈME</span><b>Fiches & ressources</b><small>Ouvrir la page</small></button><button class="linknode ln5" type="button" data-resource-index="5"><span>05 / THÈME</span><b>Projets scientifiques</b><small>Ouvrir la page</small></button><button class="linknode ln6" type="button" data-resource-index="6"><span>06 / THÈME</span><b>Voir la rubrique complète ↗</b><small>Explorer les thèmes associés</small></button></div><div class="resource-detail" id="resourceDetail" hidden aria-live="polite"><div class="resource-detail-orbit" aria-hidden="true"></div><div class="resource-detail-copy"><span class="resource-detail-kicker" id="resourceDetailKicker">THÈME SÉLECTIONNÉ</span><h3 id="resourceDetailTitle"></h3><p id="resourceDetailText"></p><div class="resource-detail-actions"><button class="resource-back" id="resourceBack" type="button">← Retour aux thèmes</button><a class="resource-open" id="resourceOpen" href="#" target="_blank" rel="noopener noreferrer">Ouvrir cette ressource ↗</a></div></div></div><div class="sphere-hops" id="sphereHops" aria-label="Domaines connectés"><strong id="sphereHopsTitle">Domaines reliés</strong></div></div>
 </section>
 <section class="under" aria-label="Principes de BALabs"><div class="tile"><b data-i18n="tile1">Biologie d’abord</b><p data-i18n="tile1p">La technologie sert l’observation, les cultures et les procédés biologiques.</p></div><div class="tile"><b data-i18n="tile2">Des liens réels</b><p data-i18n="tile2p">Les sphères et les points renvoient vers les rubriques publiques existantes.</p></div><div class="tile"><b data-i18n="tile3">Multilingue natif</b><p data-i18n="tile3p">Français, anglais, arabe et portugais, avec interface adaptée au sens de lecture.</p></div><div class="tile"><b data-i18n="tile4">Explorer autrement</b><p data-i18n="tile4p">Découvre les liens entre les disciplines et leurs applications.</p></div></section>
-<footer class="foot"><span><strong>BALABS</strong> · Applied biotechnology</span></footer>
+<footer class="foot"><span><strong>BALABS</strong> · Applied biotechnology</span><small class="asset-credit">Microscopy: Christian Scheckhuber · <a href="https://commons.wikimedia.org/wiki/File:Mycelium.JPG" target="_blank" rel="noopener">Mycelium, Podospora anserina (630×)</a> · <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener">CC BY-SA 4.0</a></small></footer>
 </div>
 <script>
 const roots={
