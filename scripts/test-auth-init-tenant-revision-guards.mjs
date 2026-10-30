@@ -163,8 +163,10 @@ assert.match(qcWrapper, /if \(isCurrentWorkspaceRevision\(operationRevision, ope
   "QC wrapper must not restore a control from a previous workspace");
 
 const qcMutation = getFunctionBlock("saveQcCheckNow");
-assert.match(qcMutation, /await supabaseClient\.auth\.getSession\(\);\s*if \(!isCurrentWorkspaceRevision\(operationRevision, operationOrganizationId\)\) return;/,
-  "QC mutation must stop after a stale session lookup");
+assert.match(qcMutation, /try \{[\s\S]*?await supabaseClient\.auth\.getSession\(\);[\s\S]*?catch \(error\)[\s\S]*?if \(!isCurrentWorkspaceRevision\(operationRevision, operationOrganizationId\)\) return;/,
+  "QC mutation must handle rejected session lookups without leaking stale feedback");
+assert.match(qcMutation, /if \(!isCurrentWorkspaceRevision\(operationRevision, operationOrganizationId\)\) return;\s*if \(!sessionData\.session\)/,
+  "QC mutation must stop after a resolved stale session lookup");
 
 const batchDetail = getFunctionBlock("loadBatch");
 assert.match(batchDetail, /const loadRevision = authStateRevision;/,

@@ -3698,10 +3698,18 @@ async function saveQcCheckNow(
     select.value;
 
 
-  const {
-    data: sessionData
-  } =
-    await supabaseClient.auth.getSession();
+  let sessionData;
+  try {
+    const result = await supabaseClient.auth.getSession();
+    sessionData = result.data;
+  } catch (error) {
+    if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
+    showMessage(
+      `Vérification de la session impossible : ${error?.message || "erreur inconnue"}`,
+      "error"
+    );
+    return;
+  }
 
   if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
 
@@ -3736,20 +3744,23 @@ async function saveQcCheckNow(
 
 
   if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) throw new Error("Session ou espace de travail modifié pendant l’opération. Recommencez.");
-    const {
-    error
-  } =
-    await supabaseClient
+  let updateResult;
+  try {
+    updateResult = await supabaseClient
       .from("batch_qc_checks")
       .update(update)
-      .eq(
-        "organization_id",
-        operationOrganizationId
-      )
-      .eq(
-        "id",
-        checkId
-      );
+      .eq("organization_id", operationOrganizationId)
+      .eq("id", checkId);
+  } catch (error) {
+    if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
+    showMessage(
+      `Enregistrement QC impossible : ${error?.message || "erreur inconnue"}`,
+      "error"
+    );
+    return;
+  }
+
+  const { error } = updateResult;
 
 
   if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
