@@ -577,7 +577,7 @@ else if(root){
       if('ResizeObserver'in window){const stageResizeObserver=new ResizeObserver(()=>resize());stageResizeObserver.observe(stage)}
     }catch(e){stage.remove();show3DFailure();console.warn('BALabs WebGL unavailable; legacy sphere fallback intentionally suppressed.',e)}
   }
-  function overviewDistance(){return camera?.aspect<.78?16.5:camera?.aspect<1.05?15.5:14.5}
+  function overviewDistance(){return camera?.aspect<.78?16.5:camera?.aspect<1.05?13.2:11.8}
   function resize(){if(!renderer||!camera)return;const w=stage.clientWidth||640,h=stage.clientHeight||680;renderer.setPixelRatio(pixelRatio());renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();if(!selected)dist=overviewDistance();updateCamera()}
   function updateCamera(){if(!camera)return;if(scene?.fog)scene.fog.density=.0068*Math.pow(18.5/Math.max(18.5,dist),2);camera.position.set(cameraTarget.x+dist*Math.sin(phi)*Math.sin(theta),cameraTarget.y+dist*Math.cos(phi),cameraTarget.z+dist*Math.sin(phi)*Math.cos(theta));camera.lookAt(cameraTarget)}
   function easeInOut(t){return t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2}
