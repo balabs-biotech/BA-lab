@@ -1889,8 +1889,17 @@ async function createCulture() {
     return;
   }
 
-  const session =
-    await getCurrentSession();
+  let session;
+
+  try {
+    session = await getCurrentSession();
+  } catch (error) {
+    showMessage(
+      error.message || "Impossible de vérifier votre session. Reconnectez-vous puis réessayez.",
+      "error"
+    );
+    return;
+  }
 
 
   if (!session) {
@@ -4018,12 +4027,6 @@ async function createBatch() {
     return;
   }
 
-  const protocolVersionId =
-    await getCultureProtocolVersionId(
-      selectedCulture.id
-    );
-
-
   const selectedMaterialId =
     selectedCulture.material_id;
 
@@ -4038,6 +4041,14 @@ async function createBatch() {
   try {
 
     if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) throw new Error("Session ou espace de travail modifié pendant l’opération. Recommencez.");
+
+    const protocolVersionId =
+      await getCultureProtocolVersionId(
+        selectedCulture.id
+      );
+
+    if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) throw new Error("Session ou espace de travail modifié pendant l’opération. Recommencez.");
+
     const {
       data,
       error
