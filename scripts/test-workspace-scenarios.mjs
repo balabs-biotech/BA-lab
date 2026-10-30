@@ -230,3 +230,20 @@ assert.match(workspaceSetup, /bio-operation-panel[\s\S]*?classList\.toggle\("hid
   "biological operation panels must be restored when leaving Green Tech");
 
 console.log("✓ Scenario workspace switching: domain data refreshes and obsolete switches are discarded");
+
+
+// Statistics translations must use one canonical French fallback, not a duplicated dictionary.
+const statisticsTranslationsSource = extractFunction(engine, "getStatisticsTranslations");
+const statisticsFrenchFallback = vm.runInNewContext(
+  `${statisticsTranslationsSource}; getStatisticsTranslations("unknown")`
+);
+const statisticsPortuguese = vm.runInNewContext(
+  `${statisticsTranslationsSource}; getStatisticsTranslations("pt")`
+);
+assert.equal(
+  statisticsFrenchFallback.login,
+  "Connectez-vous pour analyser les données de votre organisation."
+);
+assert.equal(statisticsPortuguese.login, "Inicie sessão para analisar os dados da sua organização.");
+assert.equal(statisticsPortuguese.buttonAnalyze, "Analisar dados");
+console.log("✓ Statistics translations use localized entries and a single French fallback");
