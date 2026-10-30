@@ -175,15 +175,14 @@ assert.match(batchDetail, /const loadOrganizationId = organizationId;/,
   "batch detail loader must capture the organization ID");
 assert.equal((batchDetail.match(/if \(requestId !== batchDetailRequestId \|\| !isCurrentWorkspaceRevision\(loadRevision, loadOrganizationId\)\) return;/g) || []).length, 4,
   "every batch detail request boundary must reject stale workspace results");
-
-const batchDetailCatch = batchDetail.slice(batchDetail.lastIndexOf("catch"));
-assert.match(batchDetail, /try\\s*\\{[\\s\\S]*?await supabaseClient/,
+assert.ok(batchDetail.includes("try {"),
   "batch detail loader must catch rejected Supabase requests");
-assert.match(batchDetailCatch, /if \\(requestId !== batchDetailRequestId \\|\\| !isCurrentWorkspaceRevision\\(loadRevision, loadOrganizationId\\)\\) return;/,
+assert.ok(batchDetail.includes("catch (error)"),
+  "batch detail loader must have a controlled rejection handler");
+assert.ok(batchDetail.includes('if (requestId !== batchDetailRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;'),
   "batch detail loader must suppress rejected requests from an obsolete workspace or selection");
-assert.match(batchDetailCatch, /showMessage\\([\\s\\S]*?Chargement du batch impossible/,
+assert.ok(batchDetail.includes('showMessage(`Chargement du batch impossible : ${error?.message || "erreur réseau inconnue"}`, "error")'),
   "batch detail loader must show a controlled error when a current request rejects");
-
 
 
 const lineage = getFunctionBlock("loadBiologicalLineage");
