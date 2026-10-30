@@ -618,7 +618,6 @@
     }
     button:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 8px 18px rgba(23,62,44,.13); }
     button:focus-visible { outline: 3px solid rgba(83, 132, 92, .35); outline-offset: 3px; }
-    button:active:not(:disabled) { transform: translateY(0); }
     .secondary-button { background: #68786b; }
     .secondary-button:hover:not(:disabled) { background: #506453; }
     .info { padding: 15px 17px; border-radius: 13px; border-color: #dce6d8; background: #f6f9f2; }
@@ -2321,7 +2320,6 @@ body[data-domain="mycology"] .overview-observation {
 body[data-domain="mycology"] .culture-timeline-entry { border-left: 3px solid #a94f1d; }
 body[data-domain="mycology"] .statistics-summary-item strong { color: #853d16; }
 body[data-domain="mycology"] .statistics-table th { background: #eee1d4; }
-body[data-domain="mycology"] .stage.active { background: #f4e4d7; border-color: #a94f1d; }
 body[data-domain="mycology"] .progress-bar { background: #a94f1d; }
 body[data-domain="mycology"] .overview-observation strong { color: #35251d; }
 
