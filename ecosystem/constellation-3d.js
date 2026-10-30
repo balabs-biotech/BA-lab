@@ -615,7 +615,7 @@ else if(root){
   function flyTo(target,next){const start=new THREE.Vector3(cameraTarget.x,cameraTarget.y,cameraTarget.z);const end=target?target.position.clone():new THREE.Vector3(0,0,0);const direction=end.clone().sub(start);const side=new THREE.Vector3().crossVectors(direction,new THREE.Vector3(.31,.87,.43)).normalize();if(side.lengthSq()<.01)side.set(1,0,0);const lift=Math.min(1.15,.28+direction.length()*.075);const control=start.clone().lerp(end,.5).addScaledVector(side,lift).add(new THREE.Vector3(0,lift*.48,0));const path=new THREE.QuadraticBezierCurve3(start,control,end);transition={path,startDist:dist,endDist:target?2.65:overviewDistance(),at:performance.now(),duration:target?1280:1080,next};selected=target?.userData?.id||null;refreshFocus(selected);stage.classList.add('is-transitioning')}
   function clearResourceNodes(){if(resourceGroup){worldGroup.remove(resourceGroup);resourceGroup.traverse(o=>{o.geometry?.dispose();if(o.material){if(Array.isArray(o.material))o.material.forEach(m=>m.dispose());else o.material.dispose()}})}resourceGroup=null;resourceMeshes=[];resourceSignals=[]}
   function buildResourceNodes(id){clearResourceNodes();const mini=document.getElementById('miniView');if(!mini||mini.hidden)return;
-    const lang=(document.documentElement.lang||'fr').toLowerCase();
+    const lang=(document.documentElement.lang||'fr').toLowerCase().split('-')[0];
     notionTreeManifest=notionTreeManifests[lang]||notionTreeManifests[lang.split('-')[0]]||notionTreeManifests.fr||notionTreeManifest;
     const domainTree=notionTreeManifest?.domains?.find(domain=>domain.id===id)||null;
     let anchors=[...mini.querySelectorAll('.linknode')].filter(a=>a.href&&a.href!=='#'&&a.getAttribute('href')!=='#');
