@@ -171,6 +171,34 @@
           "url": "https://app.notion.com/p/3e273152f171817a81d6f806b3804d6b"
         }
       ]
+    },
+    {
+      "id": "products",
+      "title": "PRODUITS & RESSOURCES BIOLOGIQUES",
+      "notionId": "3ec73152f1718125b1a7c58bc58ebcaa",
+      "url": "https://app.notion.com/p/3ec73152f1718125b1a7c58bc58ebcaa",
+      "children": [
+        {
+          "id": "products-public-catalogue",
+          "title": "Catalogue public — Ressources publiables",
+          "notionId": "d0fbe1d779344eb58bc240fe7876ae0e",
+          "url": "https://app.notion.com/p/d0fbe1d779344eb58bc240fe7876ae0e"
+        }
+      ]
+    },
+    {
+      "id": "work",
+      "title": "RECHERCHE & DÉVELOPPEMENT",
+      "notionId": "3e273152f17181d8b65af8f6b7de0b0b",
+      "url": "https://app.notion.com/p/3e273152f17181d8b65af8f6b7de0b0b",
+      "children": [
+        {
+          "id": "work-documented",
+          "title": "Travaux & réalisations documentés",
+          "notionId": "3f273152f171815597b6c696402b42c0",
+          "url": "https://app.notion.com/p/3f273152f171815597b6c696402b42c0"
+        }
+      ]
     }
   ]
 }
