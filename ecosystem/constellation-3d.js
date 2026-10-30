@@ -21,7 +21,7 @@ try{
 
 let notionTreeManifest=null;
 const notionTreeManifests={};
-const notionTreeReady=Promise.all(['fr','ar'].map(async lang=>{try{const response=await fetch(new URL('./notion-tree.'+lang+'.json',import.meta.url),{cache:'no-cache'});if(!response.ok)throw new Error('HTTP '+response.status);const data=await response.json();if(data?.version===1&&data?.language===lang&&Array.isArray(data.domains))notionTreeManifests[lang]=data}catch(error){if(lang==='fr')console.warn('French Notion tree manifest unavailable.',error)}})).then(()=>{notionTreeManifest=notionTreeManifests[document.documentElement.lang]||notionTreeManifests.fr||null;return notionTreeManifests}).catch(error=>{console.warn('Notion tree manifests could not be loaded; using visible page links.',error);return notionTreeManifests});
+const notionTreeReady=Promise.all(['fr','ar','en','pt'].map(async lang=>{try{const response=await fetch(new URL('./notion-tree.'+lang+'.json',import.meta.url),{cache:'no-cache'});if(!response.ok)throw new Error('HTTP '+response.status);const data=await response.json();if(data?.version===1&&data?.language===lang&&Array.isArray(data.domains))notionTreeManifests[lang]=data}catch(error){if(lang==='fr')console.warn('French Notion tree manifest unavailable.',error)}})).then(()=>{notionTreeManifest=notionTreeManifests[document.documentElement.lang]||notionTreeManifests.fr||null;return notionTreeManifests}).catch(error=>{console.warn('Notion tree manifests could not be loaded; using visible page links.',error);return notionTreeManifests});
 const root=document.getElementById('mainView');
 const show3DFailure=()=>{
   if(!root)return;
