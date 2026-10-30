@@ -45,6 +45,22 @@ for (const domain of tree.domains) {
   visit(domain);
 }
 assert.ok(scene.includes("new URL('./notion-tree.'+lang+'.json'"), '3D engine must load a language-specific Notion tree manifest');
+for (const language of ['ar', 'en', 'pt']) {
+  const localizedTree = JSON.parse(readFileSync(`ecosystem/notion-tree.${language}.json`, 'utf8'));
+  assert.equal(localizedTree.version, 1, `The ${language} Notion tree must use the supported schema version`);
+  assert.equal(localizedTree.language, language, `The ${language} tree must identify its language`);
+  assert.ok(Array.isArray(localizedTree.domains), `The ${language} tree must expose domain roots`);
+  for (const domain of localizedTree.domains) {
+    assert.ok(expectedDomains.includes(domain.id), `Unknown ${language} domain: ${domain.id}`);
+    const visitLocalized = (node) => {
+      assert.ok(node.id && node.title && node.notionId && node.url, `Every ${language} Notion node must have an ID, title, Notion ID and URL`);
+      assert.match(node.url, /^https:\/\/app\.notion\.com\/p\/[a-f0-9]+$/i, `Every ${language} node must use an exact public Notion page URL`);
+      for (const child of node.children || []) visitLocalized(child);
+    };
+    visitLocalized(domain);
+  }
+}
+
 assert.ok(scene.includes('const visit=(node,depth=0,parentId=domainTree.id'), '3D engine must recursively expand nested Notion pages');
 assert.ok(scene.includes('data-notion-tree-node="true"'), 'Manifest nodes must be injected into the 3D resource layer');
 assert.ok(scene.includes('parentId:a.dataset.parentId') && scene.includes('depth:Number(a.dataset.depth||0)'), '3D resource nodes must retain their hierarchy metadata');
