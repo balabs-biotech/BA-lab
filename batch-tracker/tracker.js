@@ -3970,11 +3970,11 @@ async function createBatch() {
 
 
   if (!selectedCulture) {
-
-    throw new Error(
-      "La culture sélectionnée n'est plus disponible."
+    showMessage(
+      "La culture sélectionnée n'est plus disponible. Actualisez la liste des cultures puis réessayez.",
+      "error"
     );
-
+    return;
   }
 
 
