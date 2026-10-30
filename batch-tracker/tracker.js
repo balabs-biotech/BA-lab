@@ -2092,6 +2092,8 @@ async function createCulture() {
         "Culture enregistrée dans Supabase. L’identifiant de culture n’a pas été retourné ; la synchronisation Notion n’a pas été lancée.";
     }
 
+    if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
+
     showElement(
       resultCard
     );
