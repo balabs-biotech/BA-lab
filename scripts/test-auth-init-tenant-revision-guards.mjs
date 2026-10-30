@@ -173,8 +173,14 @@ assert.match(batchDetail, /const loadRevision = authStateRevision;/,
   "batch detail loader must capture the auth revision");
 assert.match(batchDetail, /const loadOrganizationId = organizationId;/,
   "batch detail loader must capture the organization ID");
-assert.equal((batchDetail.match(/if \(requestId !== batchDetailRequestId \|\| !isCurrentWorkspaceRevision\(loadRevision, loadOrganizationId\)\) return;/g) || []).length, 4,
-  "every batch detail request boundary must reject stale workspace results");
+assert.equal((batchDetail.match(/if \(requestId !== batchDetailRequestId \|\| !isCurrentWorkspaceRevision\(loadRevision, loadOrganizationId\)\) return;/g) || []).length, 5,
+  "four request boundaries and the loader error handler must reject stale workspace results");
+assert.match(batchDetail,
+  /catch \(error\) \{\s*if \(requestId !== batchDetailRequestId \|\| !isCurrentWorkspaceRevision\(loadRevision, loadOrganizationId\)\) return;/,
+  "batch detail loader must suppress errors from rejected requests after a workspace transition");
+assert.ok(batchDetail.indexOf("selectedBatch = batch;") > batchDetail.indexOf('from("batch_qc_checks")'),
+  "batch detail loader must commit the selected batch only after required detail reads complete");
+
 
 
 const lineage = getFunctionBlock("loadBiologicalLineage");

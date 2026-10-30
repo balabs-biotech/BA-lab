@@ -480,3 +480,23 @@ for (const [name, source] of [
     `${name} must reject a session resolved after a workspace transition`);
 }
 console.log("✓ Measurements and observations: stale session failures and resolutions are discarded");
+
+
+// Batch detail loading must handle rejected network requests without leaking
+// errors from an obsolete request into the active workspace. The event journal
+// is optional and must degrade independently from required batch data.
+const loadBatchStart = engine.indexOf("async function loadBatch(");
+const loadBatchEnd = engine.indexOf(
+  "\n}\n\n\n/* ============================================================\n   INFORMATIONS BATCH",
+  loadBatchStart
+) + 2;
+assert.ok(loadBatchStart >= 0 && loadBatchEnd > loadBatchStart,
+  "loadBatch handler must be present");
+const loadBatchSource = engine.slice(loadBatchStart, loadBatchEnd);
+assert.match(loadBatchSource,
+  /\n  \} catch \(error\) \{\s*if \(requestId !== batchDetailRequestId \|\| !isCurrentWorkspaceRevision\(loadRevision, loadOrganizationId\)\) return;[\s\S]*?showMessage\(/,
+  "rejected required batch detail requests must produce controlled feedback only for the current workspace");
+assert.match(loadBatchSource,
+  /let batchEventsData = \[\];[\s\S]*?catch \(error\) \{[\s\S]*?batchEventsError = error;/,
+  "an unavailable event journal must not abort the required batch detail view");
+console.log("✓ Batch detail: rejected requests are caught and stale feedback is discarded");
