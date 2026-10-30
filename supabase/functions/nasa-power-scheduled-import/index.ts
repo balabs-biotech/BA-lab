@@ -11,6 +11,35 @@ const PARAMETERS = {
   RH2M: { variable: "relative_humidity_mean", unit: "%", resolution: 55000 },
   WS2M: { variable: "wind_speed_mean", unit: "m/s", resolution: 55000 },
 };
+const MAX_UPSTREAM_BYTES = 4 * 1024 * 1024;
+const MAX_LOCATIONS_PER_RUN = 100;
+const LOCATION_CONCURRENCY = 16;
+
+async function readBoundedJson(response: Response, maxBytes = MAX_UPSTREAM_BYTES): Promise<any> {
+  if (!response.body) throw new Error("empty_provider_response");
+  const reader = response.body.getReader();
+  const chunks: Uint8Array[] = [];
+  let total = 0;
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      total += value.byteLength;
+      if (total > maxBytes) {
+        await reader.cancel("provider_response_too_large");
+        throw new Error("provider_response_too_large");
+      }
+      chunks.push(value);
+    }
+  } finally {
+    reader.releaseLock();
+  }
+  const bytes = new Uint8Array(total);
+  let offset = 0;
+  for (const chunk of chunks) { bytes.set(chunk, offset); offset += chunk.byteLength; }
+  return JSON.parse(new TextDecoder().decode(bytes));
+}
+
 function response(status: number, body: Record<string, unknown>) {
   return new Response(JSON.stringify(body), { status, headers: cors });
 }
@@ -32,14 +61,20 @@ Deno.serve(async (req: Request) => {
     const start = new Date(end.getTime() - 13 * 86400000);
     const fmt = (d: Date) => d.toISOString().slice(0, 10);
     const startDate = fmt(start), endDate = fmt(end);
-    const { data: locations, error: locationsError } = await db.from("locations")
-      .select("id,organization_id,name,latitude,longitude,coordinate_accuracy_m,coordinate_source")
+    const { data: locations, error: locationsError, count } = await db.from("locations")
+      .select("id,organization_id,name,latitude,longitude,coordinate_accuracy_m,coordinate_source", { count: "exact" })
       .not("latitude", "is", null).not("longitude", "is", null)
       .gte("latitude", -90).lte("latitude", 90).gte("longitude", -180).lte("longitude", 180)
-      .limit(100);
+      .order("id", { ascending: true })
+      .range(0, MAX_LOCATIONS_PER_RUN - 1);
     if (locationsError) throw new Error("locations_query_failed");
     const results: Record<string, unknown>[] = [];
-    for (const loc of locations ?? []) {
+    let nextIndex = 0;
+    const worker = async () => {
+      while (true) {
+        const index = nextIndex++;
+        if (index >= (locations ?? []).length) return;
+        const loc = locations![index];
       const sourceUrl = new URL("https://power.larc.nasa.gov/api/temporal/daily/point");
       sourceUrl.search = new URLSearchParams({
         parameters: Object.keys(PARAMETERS).join(","), community: "AG",
@@ -47,9 +82,9 @@ Deno.serve(async (req: Request) => {
         start: startDate.replaceAll("-", ""), end: endDate.replaceAll("-", ""), format: "JSON",
       }).toString();
       try {
-        const upstream = await fetch(sourceUrl, { signal: AbortSignal.timeout(25000) });
+        const upstream = await fetch(sourceUrl, { signal: AbortSignal.timeout(15000) });
         if (!upstream.ok) { results.push({ location_id: loc.id, ok: false, error: "nasa_power_http_" + upstream.status }); continue; }
-        const payload = await upstream.json();
+        const payload = await readBoundedJson(upstream);
         const series = payload?.properties?.parameter;
         if (!series || typeof series !== "object") { results.push({ location_id: loc.id, ok: false, error: "invalid_provider_response" }); continue; }
         const retrievedAt = new Date().toISOString();
@@ -86,8 +121,11 @@ Deno.serve(async (req: Request) => {
       } catch (e) {
         results.push({ location_id: loc.id, ok: false, error: e instanceof Error ? e.message : "unknown_error" });
       }
-    }
-    return response(200, { ok: results.every(r => r.ok === true), provider: "NASA POWER", range: { start: startDate, end: endDate }, locations_processed: results.length, results, note: "Daily gridded estimates; not local sensor measurements." });
+      }
+    };
+    await Promise.all(Array.from({ length: Math.min(LOCATION_CONCURRENCY, locations?.length ?? 0) }, () => worker()));
+    const truncated = (count ?? 0) > MAX_LOCATIONS_PER_RUN;
+    return response(200, { ok: results.every(r => r.ok === true) && !truncated, provider: "NASA POWER", range: { start: startDate, end: endDate }, locations_processed: results.length, locations_limit: MAX_LOCATIONS_PER_RUN, locations_total: count ?? null, possibly_truncated: (count ?? 0) > MAX_LOCATIONS_PER_RUN, results, note: "Daily gridded estimates; not local sensor measurements." });
   } catch (e) {
     console.error("[nasa-power-scheduled-import]", e instanceof Error ? e.message : "unknown_error");
     return response(500, { error: "scheduled_import_failed" });
