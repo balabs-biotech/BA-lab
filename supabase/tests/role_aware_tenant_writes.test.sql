@@ -136,7 +136,10 @@ begin
     'public.advance_batch_stage(uuid,text)'::regprocedure,
     'public.release_batch(uuid)'::regprocedure,
     'public.move_batch_to_location(uuid,uuid,uuid,text)'::regprocedure,
-    'public.record_batch_harvest(uuid,numeric,text,text)'::regprocedure
+    'public.record_batch_harvest(uuid,numeric,text,text)'::regprocedure,
+    'public.record_manual_measurement(jsonb,jsonb)'::regprocedure,
+    'public.record_manual_observation(jsonb,jsonb)'::regprocedure,
+    'public.record_biological_operation(uuid,uuid,text,timestamptz,text,jsonb,text[])'::regprocedure
   ] loop
     select pg_get_functiondef(v_signature) into v_definition;
     if v_definition like '%private.is_org_member(%' then
