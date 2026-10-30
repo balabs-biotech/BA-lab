@@ -173,8 +173,8 @@ assert.match(batchDetail, /const loadRevision = authStateRevision;/,
   "batch detail loader must capture the auth revision");
 assert.match(batchDetail, /const loadOrganizationId = organizationId;/,
   "batch detail loader must capture the organization ID");
-assert.equal((batchDetail.match(/if \(requestId !== batchDetailRequestId \|\| !isCurrentWorkspaceRevision\(loadRevision, loadOrganizationId\)\) return;/g) || []).length, 4,
-  "every batch detail request boundary must reject stale workspace results");
+assert.equal((batchDetail.match(/if \(requestId !== batchDetailRequestId \|\| !isCurrentWorkspaceRevision\(loadRevision, loadOrganizationId\)\) return;/g) || []).length, 5,
+  "the four batch detail requests and rejection handler must reject stale workspace results");
 assert.ok(batchDetail.includes("try {"),
   "batch detail loader must catch rejected Supabase requests");
 assert.ok(batchDetail.includes("catch (error)"),
