@@ -18,7 +18,7 @@ assert.ok(scene.toLowerCase().includes('anastomosis'), 'Cross-domain mycelial ju
 assert.ok(scene.includes('const relayRoutes'), 'Multi-domain signal routes must remain present');
 assert.ok(scene.includes('branchRelaySignals'), 'Branch signal animation must remain present');
 assert.ok(scene.includes('window.enterSphere(id,false)'), '3D selection must call the shared domain navigation');
-assert.ok(!scene.includes('document.querySelector(\'[data-sphere="\'+id+'"]\').click()'), '3D selection must not proxy-click the legacy DOM menu');
+assert.ok(!scene.includes("document.querySelector('[data-sphere=\"'+id+'\"]')?.click()") && !scene.includes("document.querySelector('[data-sphere=\"'+id+'\"]').click()"), '3D selection must not proxy-click the legacy DOM menu');
 
 assert.ok(scene.includes("root.classList.add('webgl-ready','universe-closed')"), 'The 3D scene must start in the single closed gateway state');
 assert.ok(scene.includes('worldGroup.scale.setScalar(closed?.34:1)'), 'Gateway and full universe must use one scaled 3D scene');
