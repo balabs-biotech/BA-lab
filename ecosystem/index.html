@@ -3692,4 +3692,43 @@ html,body{background:var(--bal-petrol)!important;color:var(--bal-mineral)!import
   .editorial-method .method-steps li:first-child{border-top:0!important}
 }
 
+
+/* Editorial refinement 05 — header, navigation and section rhythm.
+   Scoped to the editorial shell; the interactive 3D scene remains untouched. */
+#app > .top{position:relative!important;z-index:40!important;min-height:76px!important;padding:14px clamp(16px,3vw,34px)!important;margin-inline:calc(-1 * clamp(12px,3vw,38px))!important;border-bottom:1px solid #c4c9bf!important;background:#e9e8df!important;color:#111b1d!important}
+#app > .top .brand{gap:13px!important}
+#app > .top .brand strong{color:#263b38!important;font-size:13px!important;letter-spacing:.2em!important}
+#app > .top .brand small{color:#52645d!important;font-size:9px!important;letter-spacing:.12em!important}
+#app > .top .mark{width:42px!important;height:42px!important;border:1px solid #9ba69d!important;border-radius:12px!important;background:#263b38!important;color:#e9e8df!important;box-shadow:none!important}
+#app > .top .tools{gap:6px!important}
+#app > .top .lang{min-height:36px!important;padding:7px 10px!important;border:1px solid #c4c9bf!important;border-radius:3px!important;background:transparent!important;color:#465650!important;font-size:10px!important;letter-spacing:.04em!important;transition:background .18s ease,color .18s ease,border-color .18s ease!important}
+#app > .top .lang:hover{border-color:#52645d!important;background:#dfe2d8!important}
+#app > .top .lang[aria-pressed=true]{border-color:#263b38!important;background:#263b38!important;color:#f0eee5!important}
+#app > .top .lang:focus-visible{outline:2px solid #b96b4d!important;outline-offset:3px!important}
+#app > .site-nav{position:sticky!important;top:0!important;z-index:35!important;justify-content:space-between!important;gap:clamp(12px,2.2vw,32px)!important;min-height:54px!important;padding:0 clamp(16px,3vw,34px)!important;border-top:0!important;border-bottom:1px solid #52645d!important;background:rgba(17,27,29,.97)!important;box-shadow:0 8px 22px rgba(17,27,29,.09)!important;backdrop-filter:blur(12px)!important}
+#app > .site-nav a{min-height:54px!important;display:inline-flex!important;align-items:center!important;white-space:nowrap!important;padding:0 0 2px!important;color:#d1d0c5!important;font-size:9px!important;letter-spacing:.12em!important;opacity:.9!important}
+#app > .site-nav a:hover,#app > .site-nav a:focus-visible{color:#fff!important;opacity:1!important}
+#app > .site-nav a:after{bottom:9px!important;height:2px!important}
+#app > .site-nav a:focus-visible{outline:2px solid #d6a087!important;outline-offset:3px!important}
+#app > .site-nav a[href="#accueil"]{color:#f0eee5!important}
+#app > .site-nav a[href="#universe"]{color:#e1a58d!important}
+#app > .site-nav a[href="#universe"]:after{background:#d6a087!important}
+#app > .hero,#app > .editorial-feature,#app > .editorial-about,#app > .editorial-work,#app > .editorial-method,#app > .scene{scroll-margin-top:72px!important}
+#app > .editorial-feature,#app > .editorial-about{border-bottom:1px solid #c4c9bf!important}
+#app > .editorial-work,#app > .editorial-method{border-top:1px solid #52645d!important}
+#app > .universe-bridge{border-top:1px solid rgba(82,100,93,.42)!important}
+@media(max-width:760px){
+#app > .top{min-height:68px!important;gap:10px!important;padding:10px 12px!important;margin-inline:-12px!important}
+#app > .top .brand{gap:9px!important}#app > .top .mark{width:36px!important;height:36px!important}
+#app > .top .brand small{font-size:8px!important;letter-spacing:.07em!important}
+#app > .top .tools{gap:4px!important}#app > .top .lang{min-height:32px!important;padding:6px 7px!important;font-size:9px!important}
+#app > .site-nav{justify-content:flex-start!important;gap:22px!important;min-height:48px!important;margin-inline:-12px!important;padding:0 14px!important;overflow-x:auto!important;overflow-y:hidden!important;overscroll-behavior-x:contain!important;scrollbar-width:none!important;-webkit-overflow-scrolling:touch!important}
+#app > .site-nav::-webkit-scrollbar{display:none!important}
+#app > .site-nav a{flex:0 0 auto!important;min-height:48px!important;font-size:9px!important}
+#app > .site-nav a:after{bottom:7px!important}
+#app > .hero,#app > .editorial-feature,#app > .editorial-about,#app > .editorial-work,#app > .editorial-method,#app > .scene{scroll-margin-top:58px!important}
+}
+@media(max-width:390px){#app > .top{align-items:flex-start!important;flex-direction:column!important;padding:10px 14px!important}#app > .top .tools{width:100%!important;justify-content:flex-start!important}}
+@media(prefers-reduced-motion:reduce){#app > .top .lang{transition:none!important}#app > .site-nav{backdrop-filter:none!important}}
+
 </style>
