@@ -125,4 +125,18 @@ for (const mutation of [
     `${mutation} must stop stale UI effects after its database write`);
 }
 
-console.log("Auth initialization and tenant-write revision guards passed.");
+
+for (const mutation of [
+  "createCulture", "createBatch", "recordBatchHarvest", "advanceBatch",
+  "releaseBatch", "moveSelectedBatch", "savePlantCulture",
+  "saveBiologicalOperation", "saveMeasurement", "saveObservation"
+]) {
+  const source = getMutationBlock(mutation);
+  const finallyStart = source.lastIndexOf("finally");
+  assert.ok(finallyStart >= 0, `${mutation} must restore its UI state in finally`);
+  const finallyBlock = source.slice(finallyStart);
+  assert.match(finallyBlock, /if \(isCurrentWorkspaceRevision\(operationRevision, operationOrganizationId\)\)/,
+    `${mutation} must not restore stale UI controls after a workspace transition`);
+}
+
+console.log("Auth initialization, tenant-write and finally revision guards passed.");
