@@ -153,4 +153,25 @@ for (const mutation of [
     `${mutation} must not restore stale UI controls after a workspace transition`);
 }
 
+
+const qcWrapper = getFunctionBlock("saveQcCheck");
+assert.match(qcWrapper, /const operationRevision = authStateRevision;/,
+  "QC wrapper must capture the auth revision");
+assert.match(qcWrapper, /catch \(error\)[\s\S]*?if \(!isCurrentWorkspaceRevision\(operationRevision, operationOrganizationId\)\) return;/,
+  "QC wrapper must suppress stale error UI and handle rejected requests");
+assert.match(qcWrapper, /if \(isCurrentWorkspaceRevision\(operationRevision, operationOrganizationId\) && button && button\.isConnected\)/,
+  "QC wrapper must not restore a control from a previous workspace");
+
+const qcMutation = getFunctionBlock("saveQcCheckNow");
+assert.match(qcMutation, /await supabaseClient\.auth\.getSession\(\);\s*if \(!isCurrentWorkspaceRevision\(operationRevision, operationOrganizationId\)\) return;/,
+  "QC mutation must stop after a stale session lookup");
+
+const batchDetail = getFunctionBlock("loadBatch");
+assert.match(batchDetail, /const loadRevision = authStateRevision;/,
+  "batch detail loader must capture the auth revision");
+assert.match(batchDetail, /const loadOrganizationId = organizationId;/,
+  "batch detail loader must capture the organization ID");
+assert.equal((batchDetail.match(/if \(requestId !== batchDetailRequestId \|\| !isCurrentWorkspaceRevision\(loadRevision, loadOrganizationId\)\) return;/g) || []).length, 4,
+  "every batch detail request boundary must reject stale workspace results");
+
 console.log("Auth initialization, tenant-write and finally revision guards passed.");
