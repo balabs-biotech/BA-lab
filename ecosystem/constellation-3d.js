@@ -128,6 +128,8 @@ else if(root){
     const spr=new THREE.Sprite(new THREE.SpriteMaterial({map:tex,transparent:true,depthWrite:false,depthTest:false}));spr.scale.set(2.5,.62,1);spr.renderOrder=20;return spr;
   };
   function init(){
+    // Shared by the anastomosis builder inside try and the relay animator after it.
+    let junctionPaths=[];
     try{
       renderer=new THREE.WebGLRenderer({antialias:true,alpha:true,powerPreference:'high-performance'});
       renderer.setPixelRatio(pixelRatio());renderer.setClearColor(0x000000,0);renderer.outputColorSpace=THREE.SRGBColorSpace;
@@ -417,7 +419,7 @@ else if(root){
         ['myco','learn'],['lab','learn'],['products','iot'],['soil','products']
       ];
       const mycelialTips=[];
-      const junctionPaths=[];
+      junctionPaths.length=0;
       for(const [a,b] of pairs){const pa=points.find(p=>p.id===a),pb=points.find(p=>p.id===b);if(!pa||!pb)continue;
         const delta=pb.base.clone().sub(pa.base);
         const axis=new THREE.Vector3().crossVectors(delta,new THREE.Vector3(.31,.87,.43)).normalize();
