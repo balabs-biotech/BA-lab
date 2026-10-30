@@ -15,7 +15,28 @@ try{
 }
 
 const root=document.getElementById('mainView');
-if(root){
+const show3DFailure=()=>{
+  if(!root)return;
+  root.classList.remove('webgl-ready','universe-open','universe-closed');
+  root.classList.add('webgl-load-error');
+  root.querySelectorAll('.network,.galaxy,.hub,.sphere').forEach(el=>{el.style.display='none'});
+  root.querySelector('.webgl-load-error-panel')?.remove();
+  const lang=document.documentElement.lang||'fr';
+  const copy={
+    fr:{title:'Le réseau 3D ne peut pas démarrer',body:'Le moteur graphique n’a pas répondu. Réessaie le chargement pour retrouver l’univers interactif.',action:'RÉESSAYER'},
+    en:{title:'The 3D network could not start',body:'The graphics engine did not respond. Reload to try opening the interactive universe again.',action:'RETRY'},
+    ar:{title:'تعذّر تشغيل الشبكة ثلاثية الأبعاد',body:'لم يستجب محرك الرسوميات. أعد التحميل لمحاولة فتح العالم التفاعلي.',action:'إعادة المحاولة'},
+    pt:{title:'A rede 3D não iniciou',body:'O motor gráfico não respondeu. Recarregue para tentar abrir novamente o universo interativo.',action:'TENTAR NOVAMENTE'}
+  }[lang]||{title:'The 3D network could not start',body:'The graphics engine did not respond. Reload to try again.',action:'RETRY'};
+  const panel=document.createElement('div');panel.className='webgl-load-error-panel';
+  panel.style.cssText='position:relative;z-index:12;min-height:360px;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:32px 22px;text-align:center;color:#e8edf0;background:radial-gradient(ellipse at 50% 35%,#405a70 0%,#263d52 58%,#182b3b 100%);border-radius:18px;font-family:system-ui,sans-serif';
+  const title=document.createElement('strong');title.textContent=copy.title;title.style.cssText='font:500 clamp(20px,3vw,28px)/1.25 Georgia,serif;color:#f2e8d7';
+  const body=document.createElement('p');body.textContent=copy.body;body.style.cssText='max-width:390px;margin:0;color:#d1dce3;font-size:13px;line-height:1.7';
+  const retry=document.createElement('button');retry.type='button';retry.textContent=copy.action;retry.style.cssText='margin-top:8px;padding:11px 18px;border:1px solid #d2b17c;border-radius:999px;background:#172d3d;color:#f2dfbf;font:700 10px system-ui;letter-spacing:.12em;cursor:pointer';retry.addEventListener('click',()=>window.location.reload());
+  panel.append(title,body,retry);root.append(panel);
+};
+if(root&&!THREE){show3DFailure()}
+else if(root){
   const sphereEls=[...document.querySelectorAll('[data-sphere]')];
   const ids=['bio','myco','soil','lab','products','iot','work','learn'];
   const colors={bio:0x9bc58a,myco:0xe29a62,soil:0xd2b078,lab:0x78b2d0,products:0xd77b68,iot:0x83aeb2,work:0xb39bc9,learn:0xd3c27d};
@@ -540,7 +561,7 @@ if(root){
       document.addEventListener('visibilitychange',()=>{if(document.hidden){if(raf)cancelAnimationFrame(raf);raf=0}else if(renderer&&!raf){animate()}});
       const stageObserver=new IntersectionObserver(entries=>{const visible=entries.some(entry=>entry.isIntersecting);stageVisibility.visible=visible;if(!visible&&raf){cancelAnimationFrame(raf);raf=0}else if(visible&&!document.hidden&&renderer&&!raf){animate()}},{rootMargin:'120px 0px',threshold:0.01});stageObserver.observe(stage);
       if('ResizeObserver'in window){const stageResizeObserver=new ResizeObserver(()=>resize());stageResizeObserver.observe(stage)}
-    }catch(e){stage.remove();console.warn('BALabs WebGL unavailable; accessible HTML fallback retained.',e)}
+    }catch(e){stage.remove();show3DFailure();console.warn('BALabs WebGL unavailable; legacy sphere fallback intentionally suppressed.',e)}
   }
   function resize(){if(!renderer||!camera)return;const w=stage.clientWidth||640,h=stage.clientHeight||680;renderer.setPixelRatio(pixelRatio());renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();if(!selected)dist=camera.aspect<.78?12.4:camera.aspect<1.05?11:10.2;updateCamera()}
   function updateCamera(){if(!camera)return;camera.position.set(cameraTarget.x+dist*Math.sin(phi)*Math.sin(theta),cameraTarget.y+dist*Math.cos(phi),cameraTarget.z+dist*Math.sin(phi)*Math.cos(theta));camera.lookAt(cameraTarget)}
