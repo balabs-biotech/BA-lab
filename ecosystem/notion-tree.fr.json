@@ -337,21 +337,24 @@
           "title": "Méthodologie R&D",
           "url": "https://app.notion.com/p/3e273152f17181ab88bfe456f838b011",
           "description": "Définir une question, une hypothèse, des témoins et des mesures adaptées, puis relier les conclusions aux données et à leur niveau de preuve.",
-          "children": []
+          "children": [],
+          "notionId": "3e273152f17181ab88bfe456f838b011"
         },
         {
           "id": "work-iteration",
           "title": "Itération & validation",
           "url": "https://app.notion.com/p/3e273152f17181b1a786db5143e19f53",
           "description": "Suivre les écarts entre versions, comprendre les modifications et distinguer un essai exploratoire d’une validation fondée sur des critères définis.",
-          "children": []
+          "children": [],
+          "notionId": "3e273152f17181b1a786db5143e19f53"
         },
         {
           "id": "work-team-expertise",
           "title": "Équipe, expertise & réseau scientifique",
           "url": "https://app.notion.com/p/3e973152f17181cba839c6eba742310b",
           "description": "Présenter les compétences mobilisées par BA Labs, les limites actuelles et les expertises externes recherchées pour caractériser ou valider certains travaux.",
-          "children": []
+          "children": [],
+          "notionId": "3e973152f17181cba839c6eba742310b"
         }
       ]
     }
