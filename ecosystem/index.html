@@ -1286,6 +1286,25 @@ body{background:linear-gradient(180deg,#0b1214 0,#101a1b 44%,#eeeade 44%,#eeeade
 #app section.hero .aside b,#app section.hero .aside span{color:#D1D0C5!important}
 </style>
 
+<style id="balabs-responsive-editorial-refinement">
+/* Responsive refinement: preserve editorial rhythm on tablets and touch screens. */
+@media (min-width:761px) and (max-width:1040px){
+  .work-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .work-card:last-child{grid-column:1/-1;min-height:300px}
+  .method-steps{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .method-steps li:nth-child(3){border-left:0;padding-left:0;border-top:1px solid #52665d}
+  .method-steps li:nth-child(4){border-top:1px solid #52665d}
+}
+@media(max-width:760px){
+  .site-nav{justify-content:flex-start!important;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;-webkit-overflow-scrolling:touch;scroll-snap-type:x proximity;padding-inline:16px!important}
+  .site-nav::-webkit-scrollbar{display:none}
+  .site-nav a{flex:0 0 auto;min-height:46px;display:flex;align-items:center;scroll-snap-align:start;white-space:nowrap;padding:13px 0 11px!important;font-size:9px!important;letter-spacing:.09em!important}
+  .editorial-feature,.editorial-about,.editorial-work,.editorial-method{scroll-margin-top:14px}
+  .work-card-link,.editorial-link,.work-explore{min-height:44px}
+}
+:where(a,button,[tabindex]):focus-visible{outline:2px solid #B96B4D;outline-offset:4px}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto!important}}
+</style>
 </head>
 <body>
 <div class="wrap" id="app" dir="ltr">
