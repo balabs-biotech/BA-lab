@@ -1,0 +1,162 @@
+{
+  "version": 1,
+  "source": "Notion public workspace search, French branch; entries verified by page IDs and URLs",
+  "language": "fr",
+  "coverage": "partial_verified_inventory",
+  "domains": [
+    {
+      "id": "myco",
+      "title": "MYCOLOGIE",
+      "notionId": "3e273152f1718161b154d8b8fc50f063",
+      "url": "https://app.notion.com/p/3e273152f1718161b154d8b8fc50f063",
+      "children": [
+        {
+          "id": "myco-resources",
+          "title": "Ressources fongiques",
+          "notionId": "3e273152f1718172bb0be5342cc16e0e",
+          "url": "https://app.notion.com/p/3e273152f1718172bb0be5342cc16e0e",
+          "children": [
+            {
+              "id": "myco-pleurotus",
+              "title": "Pleurotus — espèces et ressources cultivées",
+              "notionId": "40073152f17181d1822cfb0e92d55485",
+              "url": "https://app.notion.com/p/40073152f17181d1822cfb0e92d55485"
+            },
+            {
+              "id": "myco-other-fungi",
+              "title": "Autres champignons cultivés et étudiés",
+              "notionId": "40073152f171813e9a83fb6e0a8c474a",
+              "url": "https://app.notion.com/p/40073152f171813e9a83fb6e0a8c474a"
+            }
+          ]
+        },
+        {
+          "id": "myco-culture",
+          "title": "Culture & multiplication",
+          "notionId": "3e273152f171817c82bdee3cf1c68bb8",
+          "url": "https://app.notion.com/p/3e273152f171817c82bdee3cf1c68bb8"
+        },
+        {
+          "id": "myco-interactions",
+          "title": "Mycorhizes & interactions biologiques",
+          "notionId": "3e273152f17181c88bbbe98171594535",
+          "url": "https://app.notion.com/p/3e273152f17181c88bbbe98171594535"
+        },
+        {
+          "id": "myco-applications",
+          "title": "Applications mycologiques",
+          "notionId": "3e273152f1718144bb67d07e93c3aa2d",
+          "url": "https://app.notion.com/p/3e273152f1718144bb67d07e93c3aa2d"
+        }
+      ]
+    },
+    {
+      "id": "bio",
+      "title": "BIOTECHNOLOGIE",
+      "notionId": "3e273152f17181e9be91d6cccfea2383",
+      "url": "https://app.notion.com/p/3e273152f17181e9be91d6cccfea2383",
+      "children": [
+        {
+          "id": "bio-microbes",
+          "title": "Microorganismes d'intérêt agricole",
+          "notionId": "3e273152f171814187cbd78d7b0a4a94",
+          "url": "https://app.notion.com/p/3e273152f171814187cbd78d7b0a4a94"
+        },
+        {
+          "id": "bio-biostimulants",
+          "title": "Biostimulants & solutions biologiques",
+          "notionId": "3e273152f17181218800c2a6011b054b",
+          "url": "https://app.notion.com/p/3e273152f17181218800c2a6011b054b"
+        },
+        {
+          "id": "bio-substrates",
+          "title": "Substrats & supports biologiques",
+          "notionId": "3e273152f17181e7ab61c84b44557e9c",
+          "url": "https://app.notion.com/p/3e273152f17181e7ab61c84b44557e9c"
+        },
+        {
+          "id": "bio-fermentation",
+          "title": "Fermentation biologique",
+          "notionId": "3e273152f17181929dcbe5581e2ebd48",
+          "url": "https://app.notion.com/p/3e273152f17181929dcbe5581e2ebd48"
+        },
+        {
+          "id": "bio-micropropagation",
+          "title": "Micropropagation végétale",
+          "notionId": "3e273152f17181f29500f85586dac04c",
+          "url": "https://app.notion.com/p/3e273152f17181f29500f85586dac04c"
+        }
+      ]
+    },
+    {
+      "id": "iot",
+      "title": "INSTRUMENTATION & AUTOMATISATION",
+      "notionId": "3e273152f17181648633e723f99cb4ae",
+      "url": "https://app.notion.com/p/3e273152f17181648633e723f99cb4ae",
+      "children": [
+        {
+          "id": "iot-sensors",
+          "title": "Instrumentation & capteurs",
+          "notionId": "3e273152f17181f58c57c93b4c8c790f",
+          "url": "https://app.notion.com/p/3e273152f17181f58c57c93b4c8c790f"
+        },
+        {
+          "id": "iot-automation",
+          "title": "Automatisation des cultures",
+          "notionId": "3e273152f171818a8ffff2585126f904",
+          "url": "https://app.notion.com/p/3e273152f171818a8ffff2585126f904"
+        },
+        {
+          "id": "iot-traceability",
+          "title": "Traçabilité & données",
+          "notionId": "3e273152f171811db9a6f46cc9959da4",
+          "url": "https://app.notion.com/p/3e273152f171811db9a6f46cc9959da4"
+        },
+        {
+          "id": "iot-measurement",
+          "title": "Mesure & reproductibilité",
+          "notionId": "3e273152f1718119b0f7eeeb897f206a",
+          "url": "https://app.notion.com/p/3e273152f1718119b0f7eeeb897f206a"
+        },
+        {
+          "id": "iot-prototypes",
+          "title": "Prototypes & essais",
+          "notionId": "3e273152f1718174904bd0043fc5d976",
+          "url": "https://app.notion.com/p/3e273152f1718174904bd0043fc5d976"
+        }
+      ]
+    },
+    {
+      "id": "soil",
+      "title": "AGROTECHNOLOGIE",
+      "notionId": "3e273152f17181fbab47da5f8d0e97ed",
+      "url": "https://app.notion.com/p/3e273152f17181fbab47da5f8d0e97ed",
+      "children": [
+        {
+          "id": "soil-equipment",
+          "title": "Équipements expérimentaux",
+          "notionId": "3e273152f1718167be9fc11cf0b00386",
+          "url": "https://app.notion.com/p/3e273152f1718167be9fc11cf0b00386"
+        },
+        {
+          "id": "soil-preparation",
+          "title": "Préparation des substrats",
+          "notionId": "3e273152f171812e9dd5f9df0b269046",
+          "url": "https://app.notion.com/p/3e273152f171812e9dd5f9df0b269046"
+        },
+        {
+          "id": "soil-prototyping",
+          "title": "Prototypage & fabrication",
+          "notionId": "3e273152f17181ffa96cee6f70fb11e3",
+          "url": "https://app.notion.com/p/3e273152f17181ffa96cee6f70fb11e3"
+        },
+        {
+          "id": "soil-fermenters",
+          "title": "Fermenteurs & procédés pilotes",
+          "notionId": "3e273152f17181ec9ee4dcf0c18a2abc",
+          "url": "https://app.notion.com/p/3e273152f17181ec9ee4dcf0c18a2abc"
+        }
+      ]
+    }
+  ]
+}
