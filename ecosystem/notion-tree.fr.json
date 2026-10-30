@@ -2,7 +2,7 @@
   "version": 1,
   "source": "Notion public workspace search, French branch; entries verified by page IDs and URLs",
   "language": "fr",
-  "coverage": "7_public_roots_identified_in_french_navigation; learn_not_present_in_french_landing_page",
+  "coverage": "7_public_roots_identified; nested_public_pages_added_from_page_content",
   "domains": [
     {
       "id": "myco",
@@ -27,6 +27,18 @@
               "title": "Autres champignons cultivés et étudiés",
               "notionId": "40073152f171813e9a83fb6e0a8c474a",
               "url": "https://app.notion.com/p/40073152f171813e9a83fb6e0a8c474a"
+            },
+            {
+              "id": "myco-resource-pleurotus",
+              "title": "Pleurotus — espèces et ressources cultivées",
+              "notionId": "40073152f17181d1822cfb0e92d55485",
+              "url": "https://app.notion.com/p/40073152f17181d1822cfb0e92d55485"
+            },
+            {
+              "id": "myco-resource-other-fungi",
+              "title": "Autres champignons cultivés et étudiés",
+              "notionId": "40073152f171813e9a83fb6e0a8c474a",
+              "url": "https://app.notion.com/p/40073152f171813e9a83fb6e0a8c474a"
             }
           ]
         },
@@ -40,7 +52,21 @@
           "id": "myco-interactions",
           "title": "Mycorhizes & interactions biologiques",
           "notionId": "3e273152f17181c88bbbe98171594535",
-          "url": "https://app.notion.com/p/3e273152f17181c88bbbe98171594535"
+          "url": "https://app.notion.com/p/3e273152f17181c88bbbe98171594535",
+          "children": [
+            {
+              "id": "myco-mycorrhiza-arbuscular",
+              "title": "Mycorhizes arbusculaires — ressources et fonctions",
+              "notionId": "3ff73152f17181eba5aed2b6ce33e4bc",
+              "url": "https://app.notion.com/p/3ff73152f17181eba5aed2b6ce33e4bc"
+            },
+            {
+              "id": "myco-mycorrhiza-ectomycorrhiza",
+              "title": "Ectomycorhizes — ressources et interactions avec les plantes",
+              "notionId": "3ff73152f17181159f8dfd6c430fba1d",
+              "url": "https://app.notion.com/p/3ff73152f17181159f8dfd6c430fba1d"
+            }
+          ]
         },
         {
           "id": "myco-applications",
@@ -60,7 +86,51 @@
           "id": "bio-microbes",
           "title": "Microorganismes d'intérêt agricole",
           "notionId": "3e273152f171814187cbd78d7b0a4a94",
-          "url": "https://app.notion.com/p/3e273152f171814187cbd78d7b0a4a94"
+          "url": "https://app.notion.com/p/3e273152f171814187cbd78d7b0a4a94",
+          "children": [
+            {
+              "id": "bio-organism-trichoderma-hamatum",
+              "title": "Trichoderma hamatum — fiche d’organisme",
+              "notionId": "3ff73152f171816bb083c55a9a51cd2b",
+              "url": "https://app.notion.com/p/3ff73152f171816bb083c55a9a51cd2b"
+            },
+            {
+              "id": "bio-organism-trichoderma-harzianum",
+              "title": "Trichoderma harzianum — fiche d’organisme",
+              "notionId": "3ff73152f17181a8871ffd7837a160df",
+              "url": "https://app.notion.com/p/3ff73152f17181a8871ffd7837a160df"
+            },
+            {
+              "id": "bio-organism-trichoderma-koningii",
+              "title": "Trichoderma koningii — fiche d’organisme",
+              "notionId": "3ff73152f1718169ab7dfe0417a63cbc",
+              "url": "https://app.notion.com/p/3ff73152f1718169ab7dfe0417a63cbc"
+            },
+            {
+              "id": "bio-organism-trichoderma-longibrachiatum",
+              "title": "Trichoderma longibrachiatum — fiche d’organisme",
+              "notionId": "3ff73152f17181598282ef83b40dbf7a",
+              "url": "https://app.notion.com/p/3ff73152f17181598282ef83b40dbf7a"
+            },
+            {
+              "id": "bio-organism-trichoderma-reesei",
+              "title": "Trichoderma reesei — fiche d’organisme",
+              "notionId": "3ff73152f1718184bcacee1fac9f6aba",
+              "url": "https://app.notion.com/p/3ff73152f1718184bcacee1fac9f6aba"
+            },
+            {
+              "id": "bio-organism-bacillus",
+              "title": "Bacillus — fiche de groupe bactérien d’intérêt agricole",
+              "notionId": "3ff73152f17181b299aad9ea7a7f8f37",
+              "url": "https://app.notion.com/p/3ff73152f17181b299aad9ea7a7f8f37"
+            },
+            {
+              "id": "bio-organism-pgpr",
+              "title": "PGPR — Bactéries associées aux racines et potentiel agronomique",
+              "notionId": "3ff73152f17181cf8346d696db59ae79",
+              "url": "https://app.notion.com/p/3ff73152f17181cf8346d696db59ae79"
+            }
+          ]
         },
         {
           "id": "bio-biostimulants",
