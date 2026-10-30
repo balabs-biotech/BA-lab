@@ -21,7 +21,8 @@
 @media(max-width:370px){.tools{gap:4px}.lang{padding:6px 7px;font-size:10px}.sphere{width:100%}.sphere b{font-size:10px}.sphere small{font-size:8px}.view{gap:7px;padding-inline:7px}}
 
 /* True 3D constellation layer */
-#mainView.webgl-ready{display:block!important;min-height:680px;padding:0;overflow:hidden;touch-action:pan-y}
+#mainView.webgl-ready{display:block!important;height:clamp(680px,68vw,820px);min-height:680px;padding:0;overflow:hidden;touch-action:pan-y}
+@media(max-width:760px){#mainView.webgl-ready{height:620px;min-height:620px}}
 #mainView.webgl-ready>.hub,#mainView.webgl-ready>.sphere,#mainView.webgl-ready>.network,#mainView.webgl-ready>.galaxy{display:none!important}
 #mainView .webgl-stage{position:absolute;inset:0;min-height:680px;z-index:2;touch-action:none}
 #mainView .webgl-stage:focus-visible{outline:2px solid #a9c5a3;outline-offset:-4px;border-radius:12px}
@@ -1320,7 +1321,7 @@ function goHome(){miniView.hidden=true;mainView.hidden=false;mainView.classList.
 document.querySelectorAll('[data-lang]').forEach(b=>b.addEventListener('click',()=>setLanguage(b.dataset.lang)));document.querySelectorAll('[data-sphere]').forEach(b=>{b.addEventListener('click',()=>enterSphere(b.dataset.sphere));b.addEventListener('mouseenter',()=>applyFocus(b.dataset.sphere,true));b.addEventListener('mouseleave',()=>applyFocus(selected,false));b.addEventListener('focus',()=>applyFocus(b.dataset.sphere,true));b.addEventListener('blur',()=>applyFocus(selected,false));});homeBtn.addEventListener('click',goHome);openUniverse.addEventListener('click',toggleUniverse);mainView.addEventListener('pointerdown',beginOrbit);mainView.addEventListener('pointermove',moveOrbit);mainView.addEventListener('pointerup',endOrbit);mainView.addEventListener('pointercancel',endOrbit);window.addEventListener('resize',()=>{applyOrbit();drawMiniConnections()});
 setLanguage('fr');applyOrbit();
 </script>
-<script type="module" src="./constellation-3d.js?v=scene-layer-fix-20261030b"></script>
+<script type="module" src="./constellation-3d.js?v=dual-cdn-neural-morph-20261030c"></script>
 
 <style id="balabs-visual-refinement">
 /* BALabs visual refinement — editorial mineral / botanical system */
