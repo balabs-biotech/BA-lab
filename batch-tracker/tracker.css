@@ -1017,23 +1017,9 @@ body[data-domain="mycology"] .guided-entry-step{border:2px solid var(--border-st
 body[data-domain="laboratory"] .guided-entry-step{background:#f3f8fd;border-color:#c9dbea}
 @media(max-width:600px){.guided-entry-step{padding:12px;margin:12px 0}.entry-intro p{font-size:12px}}
 
-/* Domain workspaces: one data platform, three purpose-built visual languages. */
-.domain-switcher{display:grid;grid-template-columns:minmax(190px,.72fr) minmax(0,2fr);gap:18px;align-items:center;margin:0 0 20px;padding:16px;border:1px solid var(--border);border-radius:16px;background:var(--surface);box-shadow:0 5px 20px rgba(20,40,28,.06)}
-.domain-switcher-copy{display:grid;gap:4px;min-width:0}
-.domain-overline{font:750 10px/1.4 ui-monospace,SFMono-Regular,Consolas,monospace;letter-spacing:.12em;color:var(--brand)}
-.domain-switcher-copy strong{font-size:16px;line-height:1.3;color:var(--text)}
-.domain-switcher-copy>span:last-child{font-size:12px;line-height:1.5;color:var(--muted)}
-.domain-options{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
-.domain-option{display:flex;align-items:center;gap:10px;min-width:0;min-height:64px;margin:0;padding:10px;text-align:left;border:1px solid var(--border-strong);border-radius:11px;background:var(--surface-2);color:var(--text);box-shadow:none}
-.domain-option:hover{background:var(--surface);border-color:var(--brand)}
-.domain-option[aria-pressed="true"]{border:2px solid var(--brand);background:var(--surface);box-shadow:inset 0 -3px 0 var(--brand)}
-.domain-option-icon{display:grid;place-items:center;width:34px;height:34px;flex:0 0 34px;border-radius:9px;background:var(--surface-2);color:var(--brand);font-size:20px;font-weight:800}
-.domain-option>span:last-child{display:grid;gap:3px;min-width:0}
-.domain-option strong{font-size:12px;line-height:1.3;color:inherit}
-.domain-option small{font-size:10px;line-height:1.35;color:var(--muted);font-weight:500}
-.domain-option:focus-visible{outline:3px solid var(--focus);outline-offset:3px}
+/* Domain workspaces: one data platform{display:grid;grid-template-columns:minmax(190px,.72fr) minmax(0,2fr);gap:18px;align-items:center;margin:0 0 20px;padding:16px;border:1px solid var(--border);border-radius:16px;background:var(--surface);box-shadow:0 5px 20px rgba(20,40,28,.06)}
 body[data-domain="agronomy"]{--bg:#101714;--surface:#19231e;--surface-2:#222f28;--border:#35483d;--border-strong:#506657;--text:#f1f5ef;--muted:#a6b5aa;--brand:#a7f36a;--brand-hover:#c2ff91;--focus:#a7f36a;--ok:#a7f36a;--warn:#f3b64b;color-scheme:dark;background:var(--bg)}
-body[data-domain="agronomy"] .app-toolbar,body[data-domain="agronomy"] .domain-switcher,body[data-domain="agronomy"] .card,body[data-domain="agronomy"] #contextPanel{background:var(--surface);border-color:var(--border);color:var(--text);box-shadow:0 8px 24px rgba(0,0,0,.17)}
+body[data-domain="agronomy"] .app-toolbar,body[data-domain="agronomy"] .card,body[data-domain="agronomy"] #contextPanel{background:var(--surface);border-color:var(--border);color:var(--text);box-shadow:0 8px 24px rgba(0,0,0,.17)}
 body[data-domain="agronomy"] .app-hero{background:linear-gradient(135deg,#192a21 0%,#101714 76%);border:1px solid #35483d;color:#f1f5ef}
 body[data-domain="agronomy"] .app-hero h1,body[data-domain="agronomy"] .app-hero h1 span{color:#f1f5ef}
 body[data-domain="agronomy"] .eyebrow,body[data-domain="agronomy"] .hero-description,body[data-domain="agronomy"] .hero-note small{color:#b6c8bb}
@@ -1050,17 +1036,12 @@ body[data-domain="agronomy"] .overview-metric,body[data-domain="agronomy"] .over
 body[data-domain="agronomy"] .overview-metric strong,body[data-domain="agronomy"] .overview-metric-label,body[data-domain="agronomy"] .overview-shortcuts h3{color:#f1f5ef}
 body[data-domain="agronomy"] .section-nav a{color:#d9e8dc}
 body[data-domain="agronomy"] .section-nav a[aria-current="page"]{background:#294638;border-color:#506657;color:#d7f6c1}
-body[data-domain="agronomy"] .domain-switcher-copy strong,body[data-domain="agronomy"] .domain-switcher-copy>span:last-child{color:var(--text)}
-body[data-domain="agronomy"] .domain-option{background:#202d25;color:#f1f5ef;border-color:#35483d}
-body[data-domain="agronomy"] .domain-option small{color:#b6c8bb}
-body[data-domain="agronomy"] .domain-option[aria-pressed="true"]{background:#294638;border-color:#a7f36a;box-shadow:inset 0 -3px 0 #a7f36a}
-body[data-domain="agronomy"] .domain-option-icon{background:#101714;color:#a7f36a}
 body[data-domain="agronomy"] .statistics-table th{background:#222f28;color:#c6d5c8}
 body[data-domain="agronomy"] .statistics-table td,body[data-domain="agronomy"] .culture-timeline-entry p{color:#e1e9e1;border-color:#35483d}
 body[data-domain="agronomy"] .quick-capture-tile{background:#19231e;border-color:#35483d;color:#f1f5ef}
 body[data-domain="agronomy"] .quick-capture-tile strong,body[data-domain="agronomy"] .quick-capture-tile small{color:#f1f5ef}
 body[data-domain="mycology"]{--bg:#f0eddf;--surface:#fffdf5;--surface-2:#e5e0d0;--border:#24251f;--border-strong:#24251f;--text:#20211c;--muted:#53544a;--brand:#a94f1d;--brand-hover:#853d16;--focus:#a94f1d;--ok:#315a28;--warn:#8b5a00;color-scheme:light;background:var(--bg);font-family:Arial,Helvetica,sans-serif}
-body[data-domain="mycology"] .app-toolbar,body[data-domain="mycology"] .domain-switcher,body[data-domain="mycology"] .card,body[data-domain="mycology"] #contextPanel{background:var(--surface);border:2px solid #20211c;border-radius:2px;box-shadow:4px 4px 0 #20211c;color:var(--text)}
+body[data-domain="mycology"] .app-toolbar,body[data-domain="mycology"] .card,body[data-domain="mycology"] #contextPanel{background:var(--surface);border:2px solid #20211c;border-radius:2px;box-shadow:4px 4px 0 #20211c;color:var(--text)}
 body[data-domain="mycology"] .app-hero{background:#20211c;border:2px solid #20211c;border-radius:2px;color:#fffdf5;box-shadow:6px 6px 0 #a94f1d}
 body[data-domain="mycology"] .app-hero h1,body[data-domain="mycology"] .app-hero h1 span{color:#fffdf5}
 body[data-domain="mycology"] .eyebrow,body[data-domain="mycology"] .hero-description{color:#e5e0d0}
@@ -1075,16 +1056,11 @@ body[data-domain="mycology"] .culture-catalog-action[data-culture-action="observ
 body[data-domain="mycology"] .culture-catalog-action[data-culture-action="measure"]{background:#fffdf5;color:#20211c;border-color:#20211c}
 body[data-domain="mycology"] .culture-catalog-action[data-culture-action="history"]{background:#20211c;color:#fffdf5;border-color:#20211c}
 body[data-domain="mycology"] .section-nav a[aria-current="page"]{background:#a94f1d;color:#20211c;border-color:#20211c;border-radius:2px}
-body[data-domain="mycology"] .domain-option{border:2px solid #20211c;border-radius:2px;background:#fffdf5;color:#20211c}
-body[data-domain="mycology"] .domain-option[aria-pressed="true"]{background:#a94f1d;box-shadow:4px 4px 0 #20211c}
-body[data-domain="mycology"] .domain-option-icon{background:#20211c;color:#a94f1d;border-radius:2px}
-body[data-domain="mycology"] .domain-overline{color:#20211c}
-body[data-domain="mycology"] .domain-switcher-copy strong,body[data-domain="mycology"] .domain-switcher-copy>span:last-child{color:#20211c}
 body[data-domain="mycology"] .overview-metric,body[data-domain="mycology"] .overview-activity,body[data-domain="mycology"] .overview-shortcuts{background:#fffdf5;border:2px solid #20211c;border-radius:2px;color:#20211c}
 body[data-domain="mycology"] .overview-metric strong,body[data-domain="mycology"] .overview-metric-label,body[data-domain="mycology"] .overview-shortcuts h3{color:#20211c}
 body[data-domain="mycology"] .statistics-table th{background:#e5e0d0;color:#20211c}
 body[data-domain="laboratory"]{--bg:#edf3f8;--surface:#fff;--surface-2:#f1f6fb;--border:#c7d6e4;--border-strong:#8ea8be;--text:#183a59;--muted:#476078;--brand:#215b91;--brand-hover:#174875;--focus:#0a70c4;--ok:#216b43;--warn:#8b5a00;color-scheme:light;background:var(--bg)}
-body[data-domain="laboratory"] .app-toolbar,body[data-domain="laboratory"] .domain-switcher,body[data-domain="laboratory"] .card,body[data-domain="laboratory"] #contextPanel{background:#fff;border-color:#c7d6e4;color:#183a59;box-shadow:0 3px 14px rgba(24,58,89,.06)}
+body[data-domain="laboratory"] .app-toolbar,body[data-domain="laboratory"] .card,body[data-domain="laboratory"] #contextPanel{background:#fff;border-color:#c7d6e4;color:#183a59;box-shadow:0 3px 14px rgba(24,58,89,.06)}
 body[data-domain="laboratory"] .app-hero{background:linear-gradient(135deg,#fff 0%,#e4eef7 100%);border:1px solid #c7d6e4;color:#183a59}
 body[data-domain="laboratory"] .app-hero h1,body[data-domain="laboratory"] .app-hero h1 span,body[data-domain="laboratory"] .card h2,body[data-domain="laboratory"] .card h3{color:#183a59}
 body[data-domain="laboratory"] .eyebrow,body[data-domain="laboratory"] .hero-description{color:#476078}
@@ -1096,17 +1072,12 @@ body[data-domain="laboratory"] .culture-catalog-meta span:first-child{background
 body[data-domain="laboratory"] .culture-catalog-action[data-culture-action="observe"]{background:#215b91;color:#fff;border-color:#215b91}
 body[data-domain="laboratory"] .culture-catalog-action[data-culture-action="measure"]{background:#e4eef7;color:#183a59;border-color:#c7d6e4}
 body[data-domain="laboratory"] .culture-catalog-action[data-culture-action="history"]{background:#fff;color:#215b91;border-color:#c7d6e4}
-body[data-domain="laboratory"] .domain-option{background:#f1f6fb;border-color:#c7d6e4;color:#183a59}
-body[data-domain="laboratory"] .domain-option[aria-pressed="true"]{background:#fff;border-color:#215b91;box-shadow:inset 0 -3px 0 #215b91}
-body[data-domain="laboratory"] .domain-option-icon{background:#e4eef7;color:#215b91}
-body[data-domain="laboratory"] .domain-overline{color:#215b91}
-body[data-domain="laboratory"] .domain-switcher-copy strong,body[data-domain="laboratory"] .domain-switcher-copy>span:last-child{color:#183a59}
 body[data-domain="laboratory"] .overview-metric,body[data-domain="laboratory"] .overview-activity,body[data-domain="laboratory"] .overview-shortcuts{background:#f7fafd;border-color:#c7d6e4;color:#183a59}
 body[data-domain="laboratory"] .overview-metric strong,body[data-domain="laboratory"] .overview-metric-label,body[data-domain="laboratory"] .overview-shortcuts h3{color:#183a59}
 body[data-domain="laboratory"] .section-nav a[aria-current="page"]{background:#e4eef7;border-color:#b6ccdf;color:#183a59}
-@media(max-width:900px){.domain-switcher{grid-template-columns:minmax(0,1fr)}.domain-options{grid-template-columns:repeat(3,minmax(0,1fr))}}
-@media(max-width:600px){.domain-switcher{padding:12px;gap:12px}.domain-options{grid-template-columns:minmax(0,1fr)}.domain-option{min-height:54px}.domain-option small{font-size:11px}.domain-option{padding:9px}}
-@media(prefers-reduced-motion:reduce){.domain-option{transition:none}}
+@media(max-width:900px){}
+@media(max-width:600px){}
+@media(prefers-reduced-motion:reduce){}
 
 
 /* Mycology palette repair: override every legacy fluorescent accent with terracotta. */
@@ -1129,16 +1100,12 @@ body[data-domain="mycology"] .hero-tags span,
 body[data-domain="mycology"] .hero-note {
   background:#f0dfd0; color:#56331f; border-color:#d7bba6;
 }
-body[data-domain="mycology"] .hero-art,
-body[data-domain="mycology"] .domain-option-icon {color:#a94f1d}
+body[data-domain="mycology"] .hero-art{color:#a94f1d}
 body[data-domain="mycology"] .culture-catalog-meta span:first-child,
 body[data-domain="mycology"] .culture-catalog-action[data-culture-action="observe"],
-body[data-domain="mycology"] .section-nav a[aria-current="page"],
-body[data-domain="mycology"] .domain-option[aria-pressed="true"] {
+body[data-domain="mycology"] .section-nav a[aria-current="page"]{
   background:#a94f1d; color:#fffaf4; border-color:#a94f1d;
 }
-body[data-domain="mycology"] .domain-option[aria-pressed="true"] {box-shadow:4px 4px 0 #d7bba6}
-body[data-domain="mycology"] .domain-option-icon {background:#f0dfd0}
 body[data-domain="mycology"] :is(input,select,textarea,button,a):focus-visible {outline-color:#a94f1d}
 body[data-domain="mycology"] .guided-entry-step {box-shadow:4px 4px 0 #d7bba6}
 
@@ -1225,7 +1192,6 @@ body[data-domain="agronomy"] {
   --warn: #e5bd72;
 }
 body[data-domain="agronomy"] .app-toolbar,
-body[data-domain="agronomy"] .domain-switcher,
 body[data-domain="agronomy"] .card,
 body[data-domain="agronomy"] #contextPanel {
   background: var(--surface);
@@ -1236,8 +1202,7 @@ body[data-domain="agronomy"] .app-hero {
   background: linear-gradient(135deg, #203328 0%, #131b16 82%);
   border-color: #3b5040;
 }
-body[data-domain="agronomy"] .hero-art,
-body[data-domain="agronomy"] .domain-option-icon { color: #a4c997; }
+body[data-domain="agronomy"] .hero-art{ color: #a4c997; }
 body[data-domain="agronomy"] .hero-tags span,
 body[data-domain="agronomy"] .hero-note {
   background: #293a2e;
@@ -1285,20 +1250,6 @@ body[data-domain="agronomy"] .culture-catalog-action[data-culture-action="measur
 body[data-domain="agronomy"] .section-nav a[aria-current="page"] {
   background: #304638;
   border-color: #596e5c;
-}
-body[data-domain="agronomy"] .domain-option {
-  background: #222f27;
-  color: var(--text);
-  border-color: #3b4e40;
-}
-body[data-domain="agronomy"] .domain-option[aria-pressed="true"] {
-  background: #304638;
-  border-color: #91b982;
-  box-shadow: inset 0 -3px 0 #91b982;
-}
-body[data-domain="agronomy"] .domain-option-icon {
-  background: #17221b;
-  color: #a4c997;
 }
 body[data-domain="agronomy"] .statistics-table th {
   background: #29382f;
@@ -1351,7 +1302,6 @@ body[data-domain="mycology"] {
   background: var(--bg);
 }
 body[data-domain="mycology"] .app-toolbar,
-body[data-domain="mycology"] .domain-switcher,
 body[data-domain="mycology"] .card,
 body[data-domain="mycology"] #contextPanel {
   background: var(--surface);
@@ -1380,8 +1330,7 @@ body[data-domain="mycology"] .hero-note {
   border: 1px solid #604b3b;
   border-radius: 10px;
 }
-body[data-domain="mycology"] .hero-art,
-body[data-domain="mycology"] .domain-option-icon { color: #d18d65; }
+body[data-domain="mycology"] .hero-art{ color: #d18d65; }
 body[data-domain="mycology"] .card h2,
 body[data-domain="mycology"] .card h3 {
   color: #f0e6dc;
@@ -1416,8 +1365,7 @@ body[data-domain="mycology"] .culture-catalog-meta span {
 }
 body[data-domain="mycology"] .culture-catalog-meta span:first-child,
 body[data-domain="mycology"] .culture-catalog-action[data-culture-action="observe"],
-body[data-domain="mycology"] .section-nav a[aria-current="page"],
-body[data-domain="mycology"] .domain-option[aria-pressed="true"] {
+body[data-domain="mycology"] .section-nav a[aria-current="page"]{
   background: #865337;
   color: #fff3e8;
   border-color: #a87554;
@@ -1438,24 +1386,6 @@ body[data-domain="mycology"] .culture-catalog-action[data-culture-action="histor
 }
 body[data-domain="mycology"] .section-nav a[aria-current="page"] {
   border-radius: 9px;
-}
-body[data-domain="mycology"] .domain-option {
-  border: 1px solid #4b4037;
-  border-radius: 12px;
-  background: #2a2521;
-  color: var(--text);
-}
-body[data-domain="mycology"] .domain-option[aria-pressed="true"] {
-  box-shadow: inset 0 -3px 0 #c17a52;
-}
-body[data-domain="mycology"] .domain-option-icon {
-  background: #382920;
-  border-radius: 9px;
-}
-body[data-domain="mycology"] .domain-overline,
-body[data-domain="mycology"] .domain-switcher-copy strong,
-body[data-domain="mycology"] .domain-switcher-copy>span:last-child {
-  color: var(--text);
 }
 body[data-domain="mycology"] .statistics-table th {
   background: #352c25;
@@ -1501,23 +1431,13 @@ body[data-domain="agronomy"] {
   --ok: #b4f477 !important;
   accent-color: #b4f477;
 }
-body[data-domain="agronomy"] :is(
-  button:not(.overview-shortcut):not(.quick-capture-tile):not(.statistics-filter-action):not(.secondary), .primary-button, .culture-catalog-action,
-  .section-nav a[aria-current="page"], .domain-option[aria-pressed="true"]
-) {
-  background: #222f28 !important;
-  background-image: none !important;
-  border-color: #506657 !important;
-  color: #b4f477 !important;
-  box-shadow: none;
-}
 body[data-domain="agronomy"] :is(button, .primary-button, .culture-catalog-action):hover:not(:disabled) {
   background: #2b3a30 !important;
   border-color: #b4f477 !important;
   color: #c8ff91 !important;
 }
 body[data-domain="agronomy"] :is(
-  .eyebrow, .hero-art, .section-kicker-label, .domain-overline, .domain-option-icon,
+  .eyebrow, .hero-art, .section-kicker-label,
   .culture-catalog-code, .culture-catalog-meta span:first-child,
   .statistics-summary-item strong, .statistics-table caption,
   .overview-metric strong, .overview-live, .shortcut-index, .culture-catalog-count,
@@ -1529,11 +1449,6 @@ body[data-domain="agronomy"] :is(.progress-bar, .overview-live span, .status-ind
   .status-dot, .live-dot) {
   background: #b4f477 !important;
   background-image: none !important;
-}
-body[data-domain="agronomy"] .domain-option[aria-pressed="true"] {
-  background: #222f28 !important;
-  border-color: #b4f477 !important;
-  box-shadow: inset 0 -3px 0 #b4f477 !important;
 }
 body[data-domain="agronomy"] :is(input, select, textarea, button, a):focus-visible {
   outline-color: #b4f477 !important;
@@ -1812,7 +1727,7 @@ body[data-domain="mycology"] .shortcut-index {
   background: #f3e8dc !important;
   border-color: #d7bba6 !important;
 }
-body[data-domain="mycology"] :is(button, .primary-button, .culture-catalog-action, .section-nav a[aria-current="page"], .domain-option[aria-pressed="true"]) {
+body[data-domain="mycology"] :is(button, .primary-button, .culture-catalog-action, .section-nav a[aria-current="page"]) {
   box-shadow: none;
 }
 body[data-domain="mycology"] :is(button, .primary-button):not(.secondary-button):not(.danger-button):not(.culture-catalog-action) {
@@ -2009,13 +1924,11 @@ textarea:focus-visible {
 }
 .batch-item,
 .overview-shortcut,
-.culture-catalog-action,
-.domain-option {
+.culture-catalog-action{
   transition: border-color .16s ease, background-color .16s ease, transform .16s ease;
 }
 .batch-item:hover,
-.overview-shortcut:hover,
-.domain-option:hover {
+.overview-shortcut:hover{
   border-color: var(--ui-accent);
 }
 .statistics-table {
@@ -2081,7 +1994,7 @@ textarea:focus-visible {
 }
 @media (prefers-reduced-motion: reduce) {
   .universe-home-link, .section-nav a, .batch-item, .overview-shortcut,
-  .culture-catalog-action, .domain-option { transition: none !important; }
+  .culture-catalog-action{ transition: none !important; }
 }
 
 
@@ -2763,23 +2676,10 @@ body[data-domain="laboratory"] {
   background: var(--bg);
 }
 
-/* Green Tech: light sage primary actions require dark text, not white text. */
-body[data-domain="agronomy"] :is(
-  button:not(.overview-shortcut):not(.quick-capture-tile):not(.statistics-filter-action):not(.secondary), .primary-button, .culture-catalog-action,
-  .section-nav a[aria-current="page"], .domain-option[aria-pressed="true"]
-):not(.secondary-button):not(.danger-button) {
+/* Green Tech: light sage primary actions require dark text{
   background: #a9d68f !important;
   background-image: none !important;
   border-color: #a9d68f !important;
-  color: #142017 !important;
-  -webkit-text-fill-color: #142017 !important;
-}
-body[data-domain="agronomy"] :is(
-  button:not(.overview-shortcut):not(.quick-capture-tile):not(.statistics-filter-action):not(.secondary), .primary-button, .culture-catalog-action,
-  .section-nav a[aria-current="page"], .domain-option[aria-pressed="true"]
-):not(.secondary-button):not(.danger-button):hover:not(:disabled) {
-  background: #bde5a5 !important;
-  border-color: #bde5a5 !important;
   color: #142017 !important;
   -webkit-text-fill-color: #142017 !important;
 }
@@ -2794,53 +2694,11 @@ body[data-domain="agronomy"] .secondary-button:hover:not(:disabled) {
   color: #ffffff !important;
   -webkit-text-fill-color: #ffffff !important;
 }
-
-/* Mycology: warm paper surfaces with readable terracotta action controls. */
-body[data-domain="mycology"] :is(
-  button:not(.overview-shortcut):not(.quick-capture-tile):not(.statistics-filter-action):not(.secondary), .primary-button, .culture-catalog-action,
-  .section-nav a[aria-current="page"], .domain-option[aria-pressed="true"]
-):not(.secondary-button):not(.danger-button) {
-  background: #a94f1d !important;
-  background-image: none !important;
-  border-color: #a94f1d !important;
-  color: #fff7ed !important;
-  -webkit-text-fill-color: #fff7ed !important;
-}
-body[data-domain="mycology"] :is(
-  button:not(.overview-shortcut):not(.quick-capture-tile):not(.statistics-filter-action):not(.secondary), .primary-button, .culture-catalog-action,
-  .section-nav a[aria-current="page"], .domain-option[aria-pressed="true"]
-):not(.secondary-button):not(.danger-button):hover:not(:disabled) {
-  background: #853d16 !important;
-  border-color: #853d16 !important;
-  color: #fff7ed !important;
-  -webkit-text-fill-color: #fff7ed !important;
-}
 body[data-domain="mycology"] .secondary-button {
   background: #69422f !important;
   border-color: #69422f !important;
   color: #fff7ed !important;
   -webkit-text-fill-color: #fff7ed !important;
-}
-
-/* Laboratory: blue actions and dark-blue secondary controls share one contrast rule. */
-body[data-domain="laboratory"] :is(
-  button:not(.overview-shortcut):not(.quick-capture-tile):not(.statistics-filter-action):not(.secondary), .primary-button, .culture-catalog-action,
-  .section-nav a[aria-current="page"], .domain-option[aria-pressed="true"]
-):not(.secondary-button):not(.danger-button) {
-  background: #215b91 !important;
-  background-image: none !important;
-  border-color: #215b91 !important;
-  color: #ffffff !important;
-  -webkit-text-fill-color: #ffffff !important;
-}
-body[data-domain="laboratory"] :is(
-  button:not(.overview-shortcut):not(.quick-capture-tile):not(.statistics-filter-action):not(.secondary), .primary-button, .culture-catalog-action,
-  .section-nav a[aria-current="page"], .domain-option[aria-pressed="true"]
-):not(.secondary-button):not(.danger-button):hover:not(:disabled) {
-  background: #174875 !important;
-  border-color: #174875 !important;
-  color: #ffffff !important;
-  -webkit-text-fill-color: #ffffff !important;
 }
 body[data-domain="laboratory"] .secondary-button {
   background: #35546f !important;
