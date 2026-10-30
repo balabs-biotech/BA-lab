@@ -2778,7 +2778,7 @@ async function loadBatch(
   batchId
 ) {
   const loadRevision = authStateRevision;
-  const loadOrganizationId = loadOrganizationId;
+  const loadOrganizationId = organizationId;
 
   if (!loadOrganizationId) {
 
