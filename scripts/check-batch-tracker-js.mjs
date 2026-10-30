@@ -21,6 +21,7 @@ if(template.includes('class="domain-switcher"'))throw new Error("Switcher remain
 if(!engine.includes("const modulesByDomain")||!engine.includes('domain !== "laboratory"'))throw new Error("Domain module scope missing");
 if(!/if \(document\.body\.dataset\.domain === "agronomy"\) \{[\s\S]*?await loadPlantCultures\(\);[\s\S]*?\}/.test(engine))throw new Error("Non-agronomy workspaces must not depend on plant registry loading during authentication");
 const css=fs.readFileSync("batch-tracker/tracker.css","utf8");
+for(const obsoleteSelector of [".domain-switcher",".domain-switcher-copy",".domain-overline",".domain-options",".domain-option",".domain-option-icon"]){if(css.includes(obsoleteSelector))throw new Error("Obsolete workspace-switcher CSS remains: "+obsoleteSelector);}
 if(!css.includes("--brand:#a94f1d")||!css.includes("--focus:#a94f1d"))throw new Error("Terracotta palette missing");
 if(!root.includes(".universe.myco{--accent:#a94f1d;"))throw new Error("Chooser mycology accent is still fluorescent");
 if(!template.includes('id="batchCompareSelect"')||!template.includes('id="batchCompareResults"'))throw new Error("Batch comparison UI missing");
