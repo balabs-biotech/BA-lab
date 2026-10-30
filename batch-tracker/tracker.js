@@ -2965,12 +2965,12 @@ async function loadBatch(
   let batchEventsError = null;
   try {
     const batchEventsResult = await supabaseClient
-    .from("events")
-    .select("id,event_type,occurred_at,payload,location_id,environment_id")
-    .eq("organization_id", loadOrganizationId)
-    .eq("batch_id", batchId)
-    .order("occurred_at", { ascending: false })
-    .limit(50);
+      .from("events")
+      .select("id,event_type,occurred_at,payload,location_id,environment_id")
+      .eq("organization_id", loadOrganizationId)
+      .eq("batch_id", batchId)
+      .order("occurred_at", { ascending: false })
+      .limit(50);
     if (requestId !== batchDetailRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
     batchEventsData = batchEventsResult.data || [];
     batchEventsError = batchEventsResult.error;
