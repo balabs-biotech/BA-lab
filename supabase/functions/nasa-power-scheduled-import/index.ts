@@ -13,7 +13,7 @@ const PARAMETERS = {
 };
 const MAX_UPSTREAM_BYTES = 4 * 1024 * 1024;
 const MAX_LOCATIONS_PER_RUN = 100;
-const LOCATION_CONCURRENCY = 8;
+const LOCATION_CONCURRENCY = 16;
 
 async function readBoundedJson(response: Response, maxBytes = MAX_UPSTREAM_BYTES): Promise<any> {
   if (!response.body) throw new Error("empty_provider_response");
@@ -82,7 +82,7 @@ Deno.serve(async (req: Request) => {
         start: startDate.replaceAll("-", ""), end: endDate.replaceAll("-", ""), format: "JSON",
       }).toString();
       try {
-        const upstream = await fetch(sourceUrl, { signal: AbortSignal.timeout(20000) });
+        const upstream = await fetch(sourceUrl, { signal: AbortSignal.timeout(15000) });
         if (!upstream.ok) { results.push({ location_id: loc.id, ok: false, error: "nasa_power_http_" + upstream.status }); continue; }
         const payload = await readBoundedJson(upstream);
         const series = payload?.properties?.parameter;
