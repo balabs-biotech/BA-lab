@@ -300,6 +300,46 @@ assert.equal(cultureSessionMessages[0].type, "error");
 assert.match(cultureSessionMessages[0].message, /Session provider unavailable/);
 console.log("✓ Culture creation: session lookup failures produce controlled feedback");
 
+
+// A session resolved after an authentication/workspace change must not start writes.
+const staleSessionMessages = [];
+let staleSessionRevision = 1;
+let staleSessionConsentLookups = 0;
+const staleSessionContext = {
+  authStateRevision: staleSessionRevision,
+  organizationId: "org-test",
+  clearMessage() {},
+  showMessage(message, type) { staleSessionMessages.push({ message, type }); },
+  strainSelect: { value: "strain-1" },
+  cultureCodeInput: { value: "CULTURE-STALE", trim() { return this.value.trim(); } },
+  cultureTypeSelect: { value: "agar" },
+  protocolSelect: { value: "" },
+  startedAtInput: { value: "" },
+  termsAcceptedCheckbox: { checked: true, focus() {} },
+  createButton: { disabled: false, textContent: "Créer la culture" },
+  isCurrentWorkspaceRevision(revision, organizationId) {
+    return revision === staleSessionRevision && organizationId === "org-test";
+  },
+  getCurrentSession: async () => {
+    staleSessionRevision = 2;
+    staleSessionContext.authStateRevision = 2;
+    return { user: { id: "user-test" } };
+  },
+  supabaseClient: {
+    from() {
+      staleSessionConsentLookups++;
+      throw new Error("A stale session must not write consent");
+    }
+  },
+  console
+};
+await assert.doesNotReject(
+  vm.runInNewContext(`${createCultureSource}; createCulture()`, staleSessionContext)
+);
+assert.equal(staleSessionConsentLookups, 0,
+  "a stale session must be rejected before consent lookup or write");
+console.log("✓ Culture creation: a session resolved after workspace change cannot start writes");
+
 const batchProtocolSource = `async ${extractFunction(engine, "createBatch")}`;
 const batchProtocolMessages = [];
 const batchProtocolButton = { disabled: false, textContent: "Créer le batch" };
