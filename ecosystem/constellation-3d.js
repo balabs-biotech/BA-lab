@@ -20,10 +20,8 @@ try{
 }
 
 let notionTreeManifest=null;
-const notionTreeReady=fetch(new URL('./notion-tree.fr.json',import.meta.url),{cache:'no-cache'})
-  .then(response=>{if(!response.ok)throw new Error('Notion tree manifest unavailable: '+response.status);return response.json()})
-  .then(data=>{if(data?.version===1&&data?.language==='fr'&&Array.isArray(data.domains))notionTreeManifest=data;return notionTreeManifest})
-  .catch(error=>{console.warn('BALabs Notion tree manifest could not be loaded; using visible page links.',error);return null});
+const notionTreeManifests={};
+const notionTreeReady=Promise.all(['fr','ar'].map(async lang=>{try{const response=await fetch(new URL('./notion-tree.'+lang+'.json',import.meta.url),{cache:'no-cache'});if(!response.ok)throw new Error('HTTP '+response.status);const data=await response.json();if(data?.version===1&&data?.language===lang&&Array.isArray(data.domains))notionTreeManifests[lang]=data}catch(error){if(lang==='fr')console.warn('French Notion tree manifest unavailable.',error)}})).then(()=>{notionTreeManifest=notionTreeManifests[document.documentElement.lang]||notionTreeManifests.fr||null;return notionTreeManifests}).catch(error=>{console.warn('Notion tree manifests could not be loaded; using visible page links.',error);return notionTreeManifests});
 const root=document.getElementById('mainView');
 const show3DFailure=()=>{
   if(!root)return;
@@ -617,7 +615,8 @@ else if(root){
   function clearResourceNodes(){if(resourceGroup){worldGroup.remove(resourceGroup);resourceGroup.traverse(o=>{o.geometry?.dispose();if(o.material){if(Array.isArray(o.material))o.material.forEach(m=>m.dispose());else o.material.dispose()}})}resourceGroup=null;resourceMeshes=[];resourceSignals=[]}
   function buildResourceNodes(id){clearResourceNodes();const mini=document.getElementById('miniView');if(!mini||mini.hidden)return;
     const lang=(document.documentElement.lang||'fr').toLowerCase();
-    const domainTree=lang.startsWith('fr')?notionTreeManifest?.domains?.find(domain=>domain.id===id):null;
+    notionTreeManifest=notionTreeManifests[lang]||notionTreeManifests[lang.split('-')[0]]||notionTreeManifests.fr||notionTreeManifest;
+    const domainTree=notionTreeManifest?.domains?.find(domain=>domain.id===id)||null;
     let anchors=[...mini.querySelectorAll('.linknode')].filter(a=>a.href&&a.href!=='#'&&a.getAttribute('href')!=='#');
     if(domainTree){
       mini.querySelectorAll('[data-notion-tree-node="true"]').forEach(node=>node.remove());
