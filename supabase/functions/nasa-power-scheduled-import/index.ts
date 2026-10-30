@@ -124,7 +124,7 @@ Deno.serve(async (req: Request) => {
       }
     };
     await Promise.all(Array.from({ length: Math.min(LOCATION_CONCURRENCY, locations?.length ?? 0) }, () => worker()));
-    const truncated = (locations?.length ?? 0) === MAX_LOCATIONS_PER_RUN && (locationsError === null);
+    const truncated = (count ?? 0) > MAX_LOCATIONS_PER_RUN;
     return response(200, { ok: results.every(r => r.ok === true) && !truncated, provider: "NASA POWER", range: { start: startDate, end: endDate }, locations_processed: results.length, locations_limit: MAX_LOCATIONS_PER_RUN, locations_total: count ?? null, possibly_truncated: (count ?? 0) > MAX_LOCATIONS_PER_RUN, results, note: "Daily gridded estimates; not local sensor measurements." });
   } catch (e) {
     console.error("[nasa-power-scheduled-import]", e instanceof Error ? e.message : "unknown_error");
