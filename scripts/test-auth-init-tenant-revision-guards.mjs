@@ -118,7 +118,7 @@ for (const mutation of [
   const writeStart = source.indexOf("await supabaseClient");
   assert.ok(writeStart >= 0, `${mutation} must contain its database write`);
   const postWrite = source.slice(writeStart);
-  assert.match(postWrite, /if \\(!isCurrentWorkspaceRevision\\(operationRevision, operationOrganizationId\\)\\) return;/,
+  assert.match(postWrite, /if \(!isCurrentWorkspaceRevision\(operationRevision, operationOrganizationId\)\) return;/,
     `${mutation} must stop stale UI effects after its database write`);
 }
 
