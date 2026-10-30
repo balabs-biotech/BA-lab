@@ -1901,6 +1901,7 @@ async function createCulture() {
     return;
   }
 
+  if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
 
   if (!session) {
 
