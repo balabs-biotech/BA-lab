@@ -189,22 +189,22 @@ if(root){
           const pulse2=new THREE.Mesh(new THREE.SphereGeometry(.03,12,10),new THREE.MeshBasicMaterial({color,transparent:true,opacity:.9,depthWrite:false,toneMapped:false}));pulse2.userData={kind:'signal',id};worldGroup.add(pulse2);
           edges.push({line,id,parentId:parentNode.id,a:origin,b:p.clone(),pulse,pulse2,phase:ids.indexOf(id)*.13,curve:path});
           // Side branches break the impression of straight spokes and form dendritic junctions.
-          for(let branch=0;branch<3;branch++){
+          for(let branch=0;branch<5;branch++){
             const seed=ids.indexOf(id)*2.17+branch*1.91;
-            const t=.29+branch*.205,anchor=path.getPoint(t),tangent=path.getTangent(t);
+            const t=[.17,.34,.51,.68,.84][branch],anchor=path.getPoint(t),tangent=path.getTangent(t);
             const side=new THREE.Vector3(-tangent.y+Math.sin(seed)*.28,tangent.x+Math.cos(seed*.7)*.22,Math.sin(seed+1.3)*.8).normalize();
-            const reach=.22+((ids.indexOf(id)+branch*3)%4)*.055;
+            const reach=.27+((ids.indexOf(id)+branch*3)%4)*.065;
             const end=anchor.clone().addScaledVector(side,reach).addScaledVector(tangent,.09+Math.sin(seed)*.055);
             const control=anchor.clone().addScaledVector(side,reach*(.38+((branch+1)%3)*.12)).addScaledVector(tangent,.035*Math.cos(seed));
             const branchCurve=new THREE.QuadraticBezierCurve3(anchor,control,end);
             const branchLine=makeNeurite(branchCurve,color,.017+((branch+ids.indexOf(id))%3)*.0025,.86,20);
             branchLine.userData={kind:'dendrite',id};worldGroup.add(branchLine);
             // Fine secondary offshoots make the axon read as branching tissue, not plumbing.
-            if(branch!==1){
+            {
               const u=.56, junction=branchCurve.getPoint(u), tangent2=branchCurve.getTangent(u);
               const sign=branch===0?1:-1;
               const twigSide=new THREE.Vector3(-tangent2.y*sign+Math.cos(seed)*.25,tangent2.x*sign+Math.sin(seed*.8)*.22,Math.cos(seed+2)*.75).normalize();
-              const tip=junction.clone().addScaledVector(twigSide,.105+((ids.indexOf(id)+branch)%3)*.025).addScaledVector(tangent2,.055);
+              const tip=junction.clone().addScaledVector(twigSide,.13+((ids.indexOf(id)+branch)%3)*.035).addScaledVector(tangent2,.055);
               const twigCurve=new THREE.QuadraticBezierCurve3(junction,junction.clone().addScaledVector(twigSide,.06).addScaledVector(tangent2,.025),tip);
               const twig=makeNeurite(twigCurve,color,.0105,.72,14);
               twig.userData={kind:'dendrite',id};worldGroup.add(twig);
