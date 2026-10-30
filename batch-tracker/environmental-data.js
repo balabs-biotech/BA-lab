@@ -112,6 +112,15 @@
     if(nav && !document.getElementById("envNav")) { const a=node("a",{href:"#environmentalCard",id:"envNav"},"Contexte environnemental"); nav.append(a); }
 
     let satelliteLeafletMap=null, satelliteMarker=null, satelliteGridCircle=null, selectedSentinelSceneDate=null, selectedSentinelDisplayMode="ndvi";
+    let environmentalAuthRevision=0, environmentalSelectionRevision=0, environmentalRowsRequest=0, environmentalSatelliteRequest=0;
+    db.auth.onAuthStateChange(()=>{environmentalAuthRevision+=1;});
+    function isCurrentEnvironmentRequest(authRevision,selectionRevision,locationId){
+      return authRevision===environmentalAuthRevision &&
+        selectionRevision===environmentalSelectionRevision &&
+        location.value===locationId &&
+        document.body.dataset.domain==="agronomy";
+    }
+
     let satelliteNDVILayer=null, satelliteTrueColorLayer=null, satelliteSentinelNDVILayer=null, satelliteSentinelObjectUrl=null, satelliteLayerControl=null, leafletPromise=null;
     function loadLeaflet(){
       if(window.L)return Promise.resolve(window.L);
@@ -528,6 +537,9 @@
       });
     }
     async function loadRows(){
+      const authRevision=environmentalAuthRevision, selectionRevision=environmentalSelectionRevision, requestId=++environmentalRowsRequest, locationId=location.value;
+      const current=()=>requestId===environmentalRowsRequest&&isCurrentEnvironmentRequest(authRevision,selectionRevision,locationId);
+      if(!locationId)return;
       results.replaceChildren();
       const columns="observed_at,variable_code,value,unit_code,provider_code,quality_flag";
       let data=[];
@@ -535,11 +547,13 @@
       const pageSize=1000;
       while(true){
         const {data:page,error}=await db.from("environmental_observations").select(columns).eq("location_id",location.value).eq("data_family","weather").gte("observed_at",from.value+"T00:00:00Z").lte("observed_at",to.value+"T23:59:59Z").order("observed_at",{ascending:false}).range(offset,offset+pageSize-1);
+        if(!current())return;
         if(error){results.textContent="Historique indisponible : "+error.message;summary.replaceChildren(node("p",{class:"muted"},"Impossible de calculer les indicateurs météo."));return;}
         data=data.concat(page||[]);
         if(!page||page.length<pageSize)break;
         offset+=pageSize;
       }
+      if(!current())return;
       renderClimateSummary(data);
       renderVariableCoverage(data);
       renderAgroSynthesis(data);
@@ -554,6 +568,8 @@
       table.append(tbody);results.append(table);
     }
     async function searchSatellite(){
+      const authRevision=environmentalAuthRevision, selectionRevision=environmentalSelectionRevision, requestId=++environmentalSatelliteRequest, locationId=location.value;
+      const current=()=>requestId===environmentalSatelliteRequest&&isCurrentEnvironmentRequest(authRevision,selectionRevision,locationId);
       if(!location.value||!from.value||!to.value||from.value>to.value){satelliteMapStatus.textContent="Site satellite non configuré.";return;}
       const days=(Date.parse(to.value)-Date.parse(from.value))/86400000+1;
       if(days>180){satelliteMapStatus.textContent="Période satellite trop longue.";return;}
@@ -561,10 +577,12 @@
       satelliteMapStatus.textContent="Recherche de la dernière image satellite…";
       try{
         // Search the open AWS Earth Search catalogue first; Copernicus is a fallback.
-        let {data,error}=await db.functions.invoke("earth-search-sentinel2-catalogue",{body:{location_id:location.value,start_date:from.value,end_date:to.value,limit:10,max_cloud_cover:60}});
+        let {data,error}=await db.functions.invoke("earth-search-sentinel2-catalogue",{body:{location_id:locationId,start_date:from.value,end_date:to.value,limit:10,max_cloud_cover:60}});
+        if(!current())return;
         let catalogueSource="Earth Search / AWS Open Data (sans OAuth)";
         if(error||!data?.ok||!Array.isArray(data?.scenes)||data.scenes.length===0){
-          const fallback=await db.functions.invoke("copernicus-sentinel-catalogue",{body:{location_id:location.value,start_date:from.value,end_date:to.value,limit:10,max_cloud_cover:60}});
+          const fallback=await db.functions.invoke("copernicus-sentinel-catalogue",{body:{location_id:locationId,start_date:from.value,end_date:to.value,limit:10,max_cloud_cover:60}});
+          if(!current())return;
           if(!fallback.error&&fallback.data?.ok&&Array.isArray(fallback.data?.scenes)&&fallback.data.scenes.length){
             data=fallback.data;error=null;catalogueSource="Copernicus Data Space (secours)";
           }
@@ -595,14 +613,16 @@
         }
         satelliteMapStatus.textContent="Image Sentinel-2 · "+sceneDate+" · calcul en cours…";
         const currentNDVI=await showSentinelNDVI(sceneDate,"ndvi");
+        if(!current())return;
         const previousScene=rankedScenes.find(scene=>Number(scene.cloud_cover_percent)<=30&&String(scene.acquired_at||"").slice(0,10)<sceneDate);
         const previousDate=previousScene?String(previousScene.acquired_at).slice(0,10):"";
         const previousNDVI=previousDate?await fetchNDVIStats(previousDate):null;
+        if(!current())return;
         renderVegetationChart([previousNDVI,currentNDVI]);
-      }catch(e){satelliteMapStatus.textContent="Recherche satellite indisponible.";}
-      finally{satelliteButton.disabled=false;}
+      }catch(e){if(current())satelliteMapStatus.textContent="Recherche satellite indisponible.";}
+      finally{if(current())satelliteButton.disabled=false;}
     }
-    location.addEventListener("change",()=>{try{localStorage.setItem("ba-labs-active-environment-location",location.value);}catch(_){} satelliteResults.replaceChildren();selectLocation().then(()=>{if(location.value){loadRows();if(lat.value!==""&&lon.value!=="")searchSatellite();else satelliteMapStatus.textContent="Coordonnées du site manquantes.";}});});
+    location.addEventListener("change",()=>{environmentalSelectionRevision+=1;environmentalRowsRequest+=1;environmentalSatelliteRequest+=1;try{localStorage.setItem("ba-labs-active-environment-location",location.value);}catch(_){} satelliteResults.replaceChildren();selectLocation().then(()=>{if(location.value){loadRows();if(lat.value!==""&&lon.value!=="")searchSatellite();else satelliteMapStatus.textContent="Coordonnées du site manquantes.";}});});
     from.addEventListener("change",()=>location.value&&loadRows());
     to.addEventListener("change",()=>{if(location.value){loadRows();updateSatelliteMap();}});
     save.addEventListener("click",async()=>{
