@@ -104,6 +104,7 @@ function reset(overrides: { env?: Json; notion?: typeof notion; cultures?: Json[
     cultures: overrides.cultures ?? [{ id: CULTURE, organization_id: ORG, code: "cult-p80-g1", culture_type: "mycelium", notion_page_id: null }],
     visible: overrides.visible ?? [CULTURE],
     userOk: overrides.userOk ?? true,
+    membershipRole: overrides.membershipRole === undefined ? "member" : overrides.membershipRole,
     updateError: overrides.updateError,
   };
   lockBusy = overrides.lockBusy ?? false;
