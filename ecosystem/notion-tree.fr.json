@@ -20,13 +20,15 @@
               "id": "myco-pleurotus",
               "title": "Pleurotus — espèces et ressources cultivées",
               "notionId": "40073152f17181d1822cfb0e92d55485",
-              "url": "https://app.notion.com/p/40073152f17181d1822cfb0e92d55485"
+              "url": "https://app.notion.com/p/40073152f17181d1822cfb0e92d55485",
+              "description": "Collection de fiches sur les pleurotes, distinguant les repères biologiques des ressources et désignations de culture. Un nom de travail ne suffit pas à confirmer l’identité ni les performances d’une souche."
             },
             {
               "id": "myco-other-fungi",
               "title": "Autres champignons cultivés et étudiés",
               "notionId": "40073152f171813e9a83fb6e0a8c474a",
-              "url": "https://app.notion.com/p/40073152f171813e9a83fb6e0a8c474a"
+              "url": "https://app.notion.com/p/40073152f171813e9a83fb6e0a8c474a",
+              "description": "Fiches consacrées à d’autres champignons étudiés ou cultivés, avec des repères biologiques et des informations générales. Cette collection ne constitue pas un inventaire de cultures validées ou disponibles."
             }
           ],
           "description": "Panorama des champignons documentés par BA Labs : espèces étudiées, ressources de culture et groupes biologiques, avec des fiches dont le niveau de détail dépend des données disponibles."
@@ -48,13 +50,15 @@
               "id": "myco-mycorrhiza-arbuscular",
               "title": "Mycorhizes arbusculaires — ressources et fonctions",
               "notionId": "3ff73152f17181eba5aed2b6ce33e4bc",
-              "url": "https://app.notion.com/p/3ff73152f17181eba5aed2b6ce33e4bc"
+              "url": "https://app.notion.com/p/3ff73152f17181eba5aed2b6ce33e4bc",
+              "description": "Présentation des mycorhizes arbusculaires, associations entre champignons du sol et racines de nombreuses plantes, ainsi que des groupes décrits dans la littérature et de leurs fonctions écologiques."
             },
             {
               "id": "myco-mycorrhiza-ectomycorrhiza",
               "title": "Ectomycorhizes — ressources et interactions avec les plantes",
               "notionId": "3ff73152f17181159f8dfd6c430fba1d",
-              "url": "https://app.notion.com/p/3ff73152f17181159f8dfd6c430fba1d"
+              "url": "https://app.notion.com/p/3ff73152f17181159f8dfd6c430fba1d",
+              "description": "Explorer les ectomycorhizes, associations entre certains champignons et les racines d’arbres compatibles. Les partenaires et les échanges biologiques dépendent de l’espèce fongique et de l’hôte."
             }
           ],
           "description": "Explorer les interactions entre champignons, microorganismes et plantes, sans confondre intérêt scientifique général et symbiose déjà validée par BA Labs."
@@ -84,43 +88,50 @@
               "id": "bio-organism-trichoderma-hamatum",
               "title": "Trichoderma hamatum — fiche d’organisme",
               "notionId": "3ff73152f171816bb083c55a9a51cd2b",
-              "url": "https://app.notion.com/p/3ff73152f171816bb083c55a9a51cd2b"
+              "url": "https://app.notion.com/p/3ff73152f171816bb083c55a9a51cd2b",
+              "description": "Fiche de Trichoderma hamatum : champignon filamenteux étudié pour ses interactions avec les microorganismes et les plantes. Les caractéristiques observées dépendent de la souche et de son environnement."
             },
             {
               "id": "bio-organism-trichoderma-harzianum",
               "title": "Trichoderma harzianum — fiche d’organisme",
               "notionId": "3ff73152f17181a8871ffd7837a160df",
-              "url": "https://app.notion.com/p/3ff73152f17181a8871ffd7837a160df"
+              "url": "https://app.notion.com/p/3ff73152f17181a8871ffd7837a160df",
+              "description": "Fiche de Trichoderma harzianum, espèce de champignon filamenteux dont certaines souches sont étudiées pour leurs interactions biologiques. Le nom d’espèce ne prédit pas à lui seul les propriétés d’une ressource."
             },
             {
               "id": "bio-organism-trichoderma-koningii",
               "title": "Trichoderma koningii — fiche d’organisme",
               "notionId": "3ff73152f1718169ab7dfe0417a63cbc",
-              "url": "https://app.notion.com/p/3ff73152f1718169ab7dfe0417a63cbc"
+              "url": "https://app.notion.com/p/3ff73152f1718169ab7dfe0417a63cbc",
+              "description": "Repères sur Trichoderma koningii, champignon filamenteux présent dans les environnements terrestres et étudié notamment pour ses enzymes et ses interactions microbiennes."
             },
             {
               "id": "bio-organism-trichoderma-longibrachiatum",
               "title": "Trichoderma longibrachiatum — fiche d’organisme",
               "notionId": "3ff73152f17181598282ef83b40dbf7a",
-              "url": "https://app.notion.com/p/3ff73152f17181598282ef83b40dbf7a"
+              "url": "https://app.notion.com/p/3ff73152f17181598282ef83b40dbf7a",
+              "description": "Fiche de Trichoderma longibrachiatum, champignon filamenteux connu pour sa production d’enzymes extracellulaires et étudié dans des contextes de transformation de biomasse."
             },
             {
               "id": "bio-organism-trichoderma-reesei",
               "title": "Trichoderma reesei — fiche d’organisme",
               "notionId": "3ff73152f1718184bcacee1fac9f6aba",
-              "url": "https://app.notion.com/p/3ff73152f1718184bcacee1fac9f6aba"
+              "url": "https://app.notion.com/p/3ff73152f1718184bcacee1fac9f6aba",
+              "description": "Fiche de Trichoderma reesei, organisme de référence en biotechnologie industrielle pour ses enzymes impliquées dans la dégradation de composants de la biomasse végétale."
             },
             {
               "id": "bio-organism-bacillus",
               "title": "Bacillus — fiche de groupe bactérien d’intérêt agricole",
               "notionId": "3ff73152f17181b299aad9ea7a7f8f37",
-              "url": "https://app.notion.com/p/3ff73152f17181b299aad9ea7a7f8f37"
+              "url": "https://app.notion.com/p/3ff73152f17181b299aad9ea7a7f8f37",
+              "description": "Présentation du genre Bacillus : un groupe bactérien diversifié dont certaines espèces et souches sont étudiées pour leurs métabolites et leurs interactions avec les plantes. Les propriétés ne sont pas universelles au genre."
             },
             {
               "id": "bio-organism-pgpr",
               "title": "PGPR — Bactéries associées aux racines et potentiel agronomique",
               "notionId": "3ff73152f17181cf8346d696db59ae79",
-              "url": "https://app.notion.com/p/3ff73152f17181cf8346d696db59ae79"
+              "url": "https://app.notion.com/p/3ff73152f17181cf8346d696db59ae79",
+              "description": "Présentation des PGPR, bactéries associées à la rhizosphère pouvant contribuer, selon la souche et les conditions, à la nutrition et aux interactions racinaires des plantes."
             }
           ],
           "description": "Présentation des microorganismes étudiés par BA Labs, notamment Bacillus, Trichoderma et des ressources bactériennes ; l’intérêt dépend de la souche, du support et de l’usage étudié."
@@ -129,25 +140,29 @@
           "id": "bio-biostimulants",
           "title": "Biostimulants & solutions biologiques",
           "notionId": "3e273152f17181218800c2a6011b054b",
-          "url": "https://app.notion.com/p/3e273152f17181218800c2a6011b054b"
+          "url": "https://app.notion.com/p/3e273152f17181218800c2a6011b054b",
+          "description": "Axe de recherche sur les solutions biologiques destinées aux systèmes agricoles, combinant selon les essais microorganismes, matières organiques et supports. Les formulations expérimentales ne sont pas présentées comme des produits validés."
         },
         {
           "id": "bio-substrates",
           "title": "Substrats & supports biologiques",
           "notionId": "3e273152f17181e7ab61c84b44557e9c",
-          "url": "https://app.notion.com/p/3e273152f17181e7ab61c84b44557e9c"
+          "url": "https://app.notion.com/p/3e273152f17181e7ab61c84b44557e9c",
+          "description": "Étude des substrats comme systèmes biologiques : composition, structure, humidité et microbiote influencent la colonisation et les transformations. Les supports sont suivis de leur préparation à leur application."
         },
         {
           "id": "bio-fermentation",
           "title": "Fermentation biologique",
           "notionId": "3e273152f17181929dcbe5581e2ebd48",
-          "url": "https://app.notion.com/p/3e273152f17181929dcbe5581e2ebd48"
+          "url": "https://app.notion.com/p/3e273152f17181929dcbe5581e2ebd48",
+          "description": "Travaux sur les cultures liquides et les procédés de fermentation : formulation, inoculation, suivi des variables, récolte et caractérisation. Une culture liquide n’est pas automatiquement un procédé fermentaire maîtrisé."
         },
         {
           "id": "bio-micropropagation",
           "title": "Micropropagation végétale",
           "notionId": "3e273152f17181f29500f85586dac04c",
-          "url": "https://app.notion.com/p/3e273152f17181f29500f85586dac04c"
+          "url": "https://app.notion.com/p/3e273152f17181f29500f85586dac04c",
+          "description": "Expérimentation de systèmes de micropropagation végétale contrôlée, notamment l’architecture Twin Bottle, avec une attention portée à la reproductibilité, aux échanges gazeux et à l’environnement de culture."
         }
       ]
     },
@@ -269,7 +284,8 @@
           "id": "products-public-catalogue",
           "title": "Catalogue public — Ressources publiables",
           "notionId": "d0fbe1d779344eb58bc240fe7876ae0e",
-          "url": "https://app.notion.com/p/d0fbe1d779344eb58bc240fe7876ae0e"
+          "url": "https://app.notion.com/p/d0fbe1d779344eb58bc240fe7876ae0e",
+          "description": "Point d’entrée du catalogue public : ressources et produits dont les informations sont destinées aux visiteurs. Les prototypes, essais et références disponibles doivent rester clairement distingués."
         },
         {
           "id": "products-wa-agar",
@@ -320,7 +336,8 @@
               "url": "https://app.notion.com/p/3e973152f171816781fbf56674cfe55c",
               "description": "Repères de maturité et niveaux de preuve : distinguer hypothèse, conception, réalisation, observation, répétition et validation."
             }
-          ]
+          ],
+          "description": "Panorama des travaux appliqués documentés par BA Labs, avec distinction entre observations, réalisations et validations. Les limites et niveaux de preuve sont centralisés dans la page de référence dédiée."
         }
       ]
     }
