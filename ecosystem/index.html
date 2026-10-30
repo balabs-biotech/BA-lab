@@ -1304,6 +1304,95 @@ body{background:linear-gradient(180deg,#0b1214 0,#101a1b 44%,#eeeade 44%,#eeeade
 }
 :where(a,button,[tabindex]):focus-visible{outline:2px solid #B96B4D;outline-offset:4px}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto!important}}
+
+
+/* 2026-10-30 — editorial clarity pass: remove decorative noise and blur.
+   Deliberately scoped to the editorial surface; the 3D explorer is not modified. */
+.hero .hero-micrograph{
+  filter:none!important;
+  opacity:.34!important;
+  mask-image:linear-gradient(90deg,transparent 0%,#000 24%,#000 78%,transparent 100%)!important;
+  -webkit-mask-image:linear-gradient(90deg,transparent 0%,#000 24%,#000 78%,transparent 100%)!important;
+}
+.hero{
+  background:linear-gradient(100deg,#111B1D 0%,#172725 58%,#263B38 100%)!important;
+}
+.hero .aside{
+  background:#263B38!important;
+  box-shadow:none!important;
+  backdrop-filter:none!important;
+}
+.editorial-feature{
+  background:#D1D0C5!important;
+  background-image:none!important;
+  color:#111B1D!important;
+}
+.editorial-feature:before,.editorial-feature:after,
+.editorial-about:before,.editorial-about:after{
+  filter:none!important;
+  opacity:.08!important;
+}
+.editorial-about{
+  background:#263B38!important;
+  background-image:none!important;
+}
+.editorial-work{
+  background:#172725!important;
+  color:#D1D0C5!important;
+  border-top:1px solid #52665D;
+  border-bottom:1px solid #52665D;
+}
+.work-heading .eyebrow{color:#D6A087!important}
+.work-heading h2{color:#F0EEE5!important}
+.work-heading>p{color:#C1CBC2!important}
+.work-grid{
+  gap:0!important;
+  background:#52665D!important;
+  border:1px solid #52665D!important;
+}
+.work-card,.work-myco,.work-soil,.work-iot{
+  background:#263B38!important;
+  color:#D1D0C5!important;
+  border-top:2px solid #B96B4D!important;
+  box-shadow:none!important;
+}
+.work-card:before,.work-card:after,
+.work-illustration:after{
+  content:none!important;
+  display:none!important;
+  background:none!important;
+  border:0!important;
+}
+.work-illustration{color:#D6A087!important}
+.work-illustration svg{filter:none!important;opacity:.82}
+.work-card h3,.work-soil h3,.work-iot h3{color:#F0EEE5!important}
+.work-card p,.work-soil p,.work-iot p{color:#D1D8CF!important}
+.work-index,.work-tag,.work-soil .work-tag{color:#D6A087!important}
+.work-tag,.work-soil .work-tag,.work-topics{border-color:#60746B!important}
+.work-myco .work-topics,.work-soil .work-topics,.work-iot .work-topics{color:#C7D0C7!important}
+.work-card-link,.work-iot .work-card-link{
+  color:#F0EEE5!important;
+  border-color:#60746B!important;
+}
+.work-explore{color:#F0EEE5!important;border-color:#60746B!important}
+.work-explore span,.work-card-link span{color:#D6A087!important}
+.editorial-method{
+  background:#D1D0C5!important;
+  color:#111B1D!important;
+}
+.method-top .eyebrow,.method-no{color:#99563F!important}
+.method-top h2,.method-steps b{color:#111B1D!important}
+.method-top h2 em{color:#52645D!important}
+.method-top>p,.method-steps p{color:#465650!important}
+.method-steps{border-color:#9BA69D!important}
+.method-steps li+li{border-color:#AEB7AE!important}
+@media(max-width:760px){
+  .hero .hero-micrograph{opacity:.22!important}
+  .editorial-work{background:#172725!important}
+  .work-card,.work-myco,.work-soil,.work-iot{background:#263B38!important}
+  .editorial-method{background:#D1D0C5!important}
+}
+
 </style>
 </head>
 <body>
