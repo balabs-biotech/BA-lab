@@ -21,7 +21,100 @@
               "title": "Pleurotus — espèces et ressources cultivées",
               "notionId": "40073152f17181d1822cfb0e92d55485",
               "url": "https://app.notion.com/p/40073152f17181d1822cfb0e92d55485",
-              "description": "Collection de fiches sur les pleurotes, distinguant les repères biologiques des ressources et désignations de culture. Un nom de travail ne suffit pas à confirmer l’identité ni les performances d’une souche."
+              "description": "Collection de fiches sur les pleurotes, distinguant les repères biologiques des ressources et désignations de culture. Un nom de travail ne suffit pas à confirmer l’identité ni les performances d’une souche.",
+              "children": [
+                {
+                  "id": "myco-pleurotus-pulmonarius",
+                  "title": "Pleurotus pulmonarius — fiche d’espèce et de culture",
+                  "url": "https://app.notion.com/p/3ff73152f171815ca2ddf33dde2867af",
+                  "description": "Fiche publique présentant cette espèce ou désignation de culture, avec les informations biologiques et observations documentées.",
+                  "children": []
+                },
+                {
+                  "id": "myco-pleurotus-eryngii",
+                  "title": "Pleurotus eryngii et hybrides — fiche de groupe",
+                  "url": "https://app.notion.com/p/3ff73152f171818fb8b5ef5f5bfe213a",
+                  "description": "Fiche publique présentant cette espèce ou désignation de culture, avec les informations biologiques et observations documentées.",
+                  "children": []
+                },
+                {
+                  "id": "myco-pleurotus-ostreatus",
+                  "title": "Pleurotus ostreatus — fiche d’espèce",
+                  "url": "https://app.notion.com/p/3ff73152f171816d90dde48a5915618e",
+                  "description": "Fiche publique présentant cette espèce ou désignation de culture, avec les informations biologiques et observations documentées.",
+                  "children": []
+                },
+                {
+                  "id": "myco-pleurotus-citrinopileatus",
+                  "title": "Pleurotus citrinopileatus — fiche d’organisme",
+                  "url": "https://app.notion.com/p/3ff73152f171813b9db9ddf09a4c0bb1",
+                  "description": "Fiche publique présentant cette espèce ou désignation de culture, avec les informations biologiques et observations documentées.",
+                  "children": []
+                },
+                {
+                  "id": "myco-pleurotus-djamor",
+                  "title": "Pleurotus djamor — fiche d’organisme",
+                  "url": "https://app.notion.com/p/3ff73152f171815596ddffb6fbabb467",
+                  "description": "Fiche publique présentant cette espèce ou désignation de culture, avec les informations biologiques et observations documentées.",
+                  "children": []
+                },
+                {
+                  "id": "myco-black-pearl",
+                  "title": "Black Pearl — fiche de ressource Pleurotus",
+                  "url": "https://app.notion.com/p/3ff73152f171815083e9e3a819eb005c",
+                  "description": "Fiche publique présentant cette espèce ou désignation de culture, avec les informations biologiques et observations documentées.",
+                  "children": []
+                },
+                {
+                  "id": "myco-pearl",
+                  "title": "Pearl — fiche de ressource Pleurotus",
+                  "url": "https://app.notion.com/p/3ff73152f17181c0bf2fdefe3726ec43",
+                  "description": "Fiche publique présentant cette espèce ou désignation de culture, avec les informations biologiques et observations documentées.",
+                  "children": []
+                },
+                {
+                  "id": "myco-hk35",
+                  "title": "HK35 — fiche d’organisme et de souche",
+                  "url": "https://app.notion.com/p/3ff73152f17181459207cec1627433c0",
+                  "description": "Fiche publique présentant cette espèce ou désignation de culture, avec les informations biologiques et observations documentées.",
+                  "children": []
+                },
+                {
+                  "id": "myco-p80",
+                  "title": "P80 — fiche d’organisme et de désignation de souche",
+                  "url": "https://app.notion.com/p/3ff73152f171818dabb0ca917c6dd0d7",
+                  "description": "Fiche publique présentant cette espèce ou désignation de culture, avec les informations biologiques et observations documentées.",
+                  "children": []
+                },
+                {
+                  "id": "myco-kryos",
+                  "title": "KRYOS — fiche de ressource fongique",
+                  "url": "https://app.notion.com/p/3ff73152f171813a8ac2e365d2c30e6f",
+                  "description": "Fiche publique présentant cette espèce ou désignation de culture, avec les informations biologiques et observations documentées.",
+                  "children": []
+                },
+                {
+                  "id": "myco-g8",
+                  "title": "G8 — fiche de ressource fongique",
+                  "url": "https://app.notion.com/p/3ff73152f1718194884efac715b1a7b0",
+                  "description": "Fiche publique présentant cette espèce ou désignation de culture, avec les informations biologiques et observations documentées.",
+                  "children": []
+                },
+                {
+                  "id": "myco-blue-oyster",
+                  "title": "Blue Oyster — fiche de ressource fongique",
+                  "url": "https://app.notion.com/p/3ff73152f17181968231d8bd264a3ac0",
+                  "description": "Fiche publique présentant cette espèce ou désignation de culture, avec les informations biologiques et observations documentées.",
+                  "children": []
+                },
+                {
+                  "id": "myco-gris-americain",
+                  "title": "Gris américain — fiche de ressource fongique",
+                  "url": "https://app.notion.com/p/3ff73152f17181a5b3bed6dde948b760",
+                  "description": "Fiche publique présentant cette espèce ou désignation de culture, avec les informations biologiques et observations documentées.",
+                  "children": []
+                }
+              ]
             },
             {
               "id": "myco-other-fungi",
