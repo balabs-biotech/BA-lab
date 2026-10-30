@@ -4,7 +4,7 @@ const root=document.getElementById('mainView');
 if(root){
   const sphereEls=[...document.querySelectorAll('[data-sphere]')];
   const ids=['bio','myco','soil','lab','products','iot','work','learn'];
-  const colors={bio:0x9fbea1,myco:0xc98b52,soil:0xbd936b,lab:0x829fba,products:0xc18b76,iot:0x9eabb7,work:0x9b8fa7,learn:0xb4b9a0};
+  const colors={bio:0x9bc58a,myco:0xe29a62,soil:0xd2b078,lab:0x78b2d0,products:0xd77b68,iot:0x83aeb2,work:0xb39bc9,learn:0xd3c27d};
   const labels=Object.fromEntries(sphereEls.map(el=>[el.dataset.sphere,{title:el.querySelector('b')?.textContent||el.dataset.sphere,sub:el.querySelector('small')?.textContent||''}]));
   const stage=document.createElement('div');stage.className='webgl-stage';stage.setAttribute('role','application');stage.setAttribute('aria-label','Constellation 3D interactive BALabs');stage.tabIndex=0;
   const hint=document.createElement('div');hint.className='webgl-hint';hint.id='webgl-navigation-hint';stage.setAttribute('aria-describedby',hint.id);const hintText={fr:'GLISSER POUR TOURNER · PINCER POUR ZOOMER · TOUCHER UN UNIVERS',en:'DRAG TO ROTATE · PINCH TO ZOOM · TAP A WORLD',ar:'اسحب للتدوير · اقرص للتكبير · المس عالماً',pt:'ARRASTE PARA RODAR · USE DOIS DEDOS PARA AMPLIAR · TOQUE NUM UNIVERSO'};const refreshHint=()=>{hint.textContent=hintText[document.documentElement.lang]||hintText.fr};refreshHint();new MutationObserver(refreshHint).observe(document.documentElement,{attributes:true,attributeFilter:['lang']});
@@ -98,7 +98,7 @@ if(root){
         const color=colors[id],p=new THREE.Vector3(...pos[id]).multiplyScalar(.98);
         // Neural soma: a compact, softly glowing junction, not a planet with an orbit.
         // Faceted, asymmetrical cell body: deliberately not a polished planet.
-        const geo=new THREE.IcosahedronGeometry(.1105,3),attr=geo.attributes.position;
+        const geo=new THREE.IcosahedronGeometry(.145,3),attr=geo.attributes.position;
         // Sculpt a compact membrane with shallow grooves and attachment pits.
         // The body is deliberately small: the branching membrane, not a round
         // ball, defines the silhouette of each domain.
@@ -168,7 +168,7 @@ if(root){
             }
           }
         }
-        const hitMesh=new THREE.Mesh(new THREE.SphereGeometry(.273,14,12),new THREE.MeshBasicMaterial({color,transparent:true,opacity:.0001,depthWrite:false}));hitMesh.position.copy(p);hitMesh.userData={kind:'sphere',id};worldGroup.add(hitMesh);
+        const hitMesh=new THREE.Mesh(new THREE.SphereGeometry(.34,16,14),new THREE.MeshBasicMaterial({color,transparent:true,opacity:.0001,depthWrite:false}));hitMesh.position.copy(p);hitMesh.userData={kind:'sphere',id};worldGroup.add(hitMesh);
 
         const label=makeLabel(labels[id].title,0xf5f7fa,25);label.position.set(p.x,p.y-.676,p.z+.104);label.scale.set(Math.min(3.45,Math.max(1.8,labels[id].title.length*.105)),.52,1);label.userData={kind:'label',id,labelText:labels[id].title};worldGroup.add(label);
         const node={id,mesh,hitMesh,label,base:p,color,twigs};points.push(node);
@@ -183,7 +183,7 @@ if(root){
           const direction=new THREE.Vector3().crossVectors(origin.clone().add(new THREE.Vector3(.001,.002,.003)),p.clone().add(new THREE.Vector3(.013,.007,.019))).normalize();
           const bend=midpoint.addScaledVector(direction,.28+(ids.indexOf(id)%3)*.07).add(new THREE.Vector3(Math.sin(ids.indexOf(id)*1.7)*.15,Math.cos(ids.indexOf(id)*1.3)*.12,Math.cos(ids.indexOf(id)*1.1)*.16));
           const path=new THREE.QuadraticBezierCurve3(origin,bend,p);
-          const line=makeNeurite(path,color,.052,1,52);line.userData={kind:'edge',id};worldGroup.add(line);
+          const line=makeNeurite(path,color,.066,1,64);line.userData={kind:'edge',id};worldGroup.add(line);
           const pulse=new THREE.Mesh(new THREE.IcosahedronGeometry(.047,1),new THREE.MeshBasicMaterial({color,transparent:true,opacity:1,depthWrite:false,toneMapped:false}));
           pulse.userData={kind:'signal',id};worldGroup.add(pulse);
           const pulse2=new THREE.Mesh(new THREE.SphereGeometry(.03,12,10),new THREE.MeshBasicMaterial({color,transparent:true,opacity:.9,depthWrite:false,toneMapped:false}));pulse2.userData={kind:'signal',id};worldGroup.add(pulse2);
@@ -197,7 +197,7 @@ if(root){
             const end=anchor.clone().addScaledVector(side,reach).addScaledVector(tangent,.09+Math.sin(seed)*.055);
             const control=anchor.clone().addScaledVector(side,reach*(.38+((branch+1)%3)*.12)).addScaledVector(tangent,.035*Math.cos(seed));
             const branchCurve=new THREE.QuadraticBezierCurve3(anchor,control,end);
-            const branchLine=makeNeurite(branchCurve,color,.012+((branch+ids.indexOf(id))%3)*.002,.72,17);
+            const branchLine=makeNeurite(branchCurve,color,.017+((branch+ids.indexOf(id))%3)*.0025,.86,20);
             branchLine.userData={kind:'dendrite',id};worldGroup.add(branchLine);
             // Fine secondary offshoots make the axon read as branching tissue, not plumbing.
             if(branch!==1){
@@ -206,7 +206,7 @@ if(root){
               const twigSide=new THREE.Vector3(-tangent2.y*sign+Math.cos(seed)*.25,tangent2.x*sign+Math.sin(seed*.8)*.22,Math.cos(seed+2)*.75).normalize();
               const tip=junction.clone().addScaledVector(twigSide,.105+((ids.indexOf(id)+branch)%3)*.025).addScaledVector(tangent2,.055);
               const twigCurve=new THREE.QuadraticBezierCurve3(junction,junction.clone().addScaledVector(twigSide,.06).addScaledVector(tangent2,.025),tip);
-              const twig=makeNeurite(twigCurve,color,.008,.58,11);
+              const twig=makeNeurite(twigCurve,color,.0105,.72,14);
               twig.userData={kind:'dendrite',id};worldGroup.add(twig);
             }
             const terminal=new THREE.Mesh(new THREE.IcosahedronGeometry(.022,1),new THREE.MeshStandardMaterial({color,emissive:new THREE.Color(color).multiplyScalar(.12),emissiveIntensity:.18,roughness:1}));
@@ -245,7 +245,7 @@ if(root){
         const mid=pa.base.clone().lerp(pb.base,.5).addScaledVector(axis,bend);
         const curve=new THREE.QuadraticBezierCurve3(pa.base,mid,pb.base);
         const signalColor=new THREE.Color(colors[a]).lerp(new THREE.Color(colors[b]),.5);
-        const line=makeNeurite(curve,signalColor,.038,.92,64);
+        const line=makeNeurite(curve,signalColor,.052,1,72);
         // Keep transverse pathways legible without letting them overpower the biological branches.
         line.material.emissive.copy(signalColor).multiplyScalar(.40);line.material.emissiveIntensity=.48;
         line.userData={kind:'relation',a,b};worldGroup.add(line);
@@ -261,7 +261,7 @@ if(root){
           mycelialTips.push({point:tip.clone(),a,b,branch});
           const control=anchor.clone().addScaledVector(side,reach*.55).addScaledVector(tangent,.035*Math.sin(seed));
           const offshoot=new THREE.QuadraticBezierCurve3(anchor,control,tip);
-          const twig=makeNeurite(offshoot,signalColor,.016,.86,22);
+          const twig=makeNeurite(offshoot,signalColor,.021,.94,26);
           twig.material.emissive.copy(signalColor).multiplyScalar(.24);twig.material.emissiveIntensity=.34;
           twig.userData={kind:'dendrite',id:a,relation:true,a,b};worldGroup.add(twig);
           if(branch===0){
@@ -269,7 +269,7 @@ if(root){
             junction.position.copy(tip);junction.userData={kind:'synapse',id:a,relation:true,a,b};worldGroup.add(junction);
           }
         }
-        const pulse=new THREE.Mesh(new THREE.SphereGeometry(.043,14,12),new THREE.MeshBasicMaterial({color:signalColor,transparent:true,opacity:1,depthWrite:false,toneMapped:false}));pulse.userData={kind:'relation-signal',a,b};worldGroup.add(pulse);
+        const pulse=new THREE.Mesh(new THREE.SphereGeometry(.052,16,14),new THREE.MeshBasicMaterial({color:signalColor,transparent:true,opacity:1,depthWrite:false,toneMapped:false}));pulse.userData={kind:'relation-signal',a,b};worldGroup.add(pulse);
         const pulse2=new THREE.Mesh(new THREE.SphereGeometry(.027,12,10),new THREE.MeshBasicMaterial({color:signalColor,transparent:true,opacity:.86,depthWrite:false,toneMapped:false}));pulse2.userData={kind:'relation-signal',a,b,trail:true};worldGroup.add(pulse2);
         edges.push({line,id:a,relation:true,aId:a,bId:b,a:pa.base.clone(),b:pb.base.clone(),pulse,pulse2,curve,phase:(ids.indexOf(a)+ids.indexOf(b))*.071})}
       // Turn nearby collateral tips from separate cross-links into shared
@@ -300,7 +300,7 @@ if(root){
         ));
         const anastomosis=new THREE.QuadraticBezierCurve3(first.point,bend,second.point);
         const mix=new THREE.Color(colors[first.a]).lerp(new THREE.Color(colors[second.b]),.5);
-        const connector=makeNeurite(anastomosis,mix,.014,.72,20);
+        const connector=makeNeurite(anastomosis,mix,.019,.88,24);
         connector.material.emissive.copy(mix).multiplyScalar(.18);connector.material.emissiveIntensity=.28;
         connector.userData={kind:'dendrite',id:first.a,relation:true,a:first.a,b:second.b};
         worldGroup.add(connector);
