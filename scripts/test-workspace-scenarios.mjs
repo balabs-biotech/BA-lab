@@ -494,8 +494,8 @@ assert.ok(loadBatchStart >= 0 && loadBatchEnd > loadBatchStart,
   "loadBatch handler must be present");
 const loadBatchSource = engine.slice(loadBatchStart, loadBatchEnd);
 assert.match(loadBatchSource,
-  /catch \(error\) \{[\s\S]*?requestId !== batchDetailRequestId \|\| !isCurrentWorkspaceRevision\(loadRevision, loadOrganizationId\)\) return;[\s\S]*?showMessage\(/,
-  "rejected batch detail requests must produce controlled feedback only for the current workspace");
+  /\n  \} catch \(error\) \{\s*if \(requestId !== batchDetailRequestId \|\| !isCurrentWorkspaceRevision\(loadRevision, loadOrganizationId\)\) return;[\s\S]*?showMessage\(/,
+  "rejected required batch detail requests must produce controlled feedback only for the current workspace");
 assert.match(loadBatchSource,
   /let batchEventsData = \[\];[\s\S]*?catch \(error\) \{[\s\S]*?batchEventsError = error;/,
   "an unavailable event journal must not abort the required batch detail view");
