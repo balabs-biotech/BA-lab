@@ -44,7 +44,7 @@ if(root&&!THREE){show3DFailure()}
 else if(root){
   const sphereEls=[...document.querySelectorAll('[data-sphere]')];
   const ids=['bio','myco','soil','lab','products','iot','work','learn'];
-  const colors={bio:0x9bc58a,myco:0xe29a62,soil:0xd2b078,lab:0x78b2d0,products:0xd77b68,iot:0x83aeb2,work:0xb39bc9,learn:0xd3c27d};
+  const colors={bio:0x58786b,myco:0x6f8977,soil:0x7d8975,lab:0x536f70,products:0x8b7468,iot:0x66827e,work:0x7c8178,learn:0x8c846d};
   const labels=Object.fromEntries(sphereEls.map(el=>[el.dataset.sphere,{title:el.querySelector('b')?.textContent||el.dataset.sphere,sub:el.querySelector('small')?.textContent||''}]));
   const stage=document.createElement('div');stage.className='webgl-stage';stage.setAttribute('role','application');stage.setAttribute('aria-label','Constellation 3D interactive BALabs');stage.tabIndex=0;
   const hint=document.createElement('div');hint.className='webgl-hint';hint.id='webgl-navigation-hint';stage.setAttribute('aria-describedby',hint.id);const hintText={fr:'GLISSER POUR TOURNER · PINCER POUR ZOOMER · TOUCHER UN UNIVERS',en:'DRAG TO ROTATE · PINCH TO ZOOM · TAP A WORLD',ar:'اسحب للتدوير · اقرص للتكبير · المس عالماً',pt:'ARRASTE PARA RODAR · USE DOIS DEDOS PARA AMPLIAR · TOQUE NUM UNIVERSO'};const refreshHint=()=>{hint.textContent=hintText[document.documentElement.lang]||hintText.fr};refreshHint();new MutationObserver(refreshHint).observe(document.documentElement,{attributes:true,attributeFilter:['lang']});
@@ -64,7 +64,7 @@ else if(root){
   introStyle.textContent+='.webgl-intro{background:radial-gradient(ellipse at 50% 42%,#344e67a8 0%,#243b5288 48%,#172a38a0 100%)!important;backdrop-filter:blur(4px) saturate(1.08);gap:15px}.webgl-intro-orb{display:none!important}.webgl-intro-orb{width:clamp(138px,22vw,194px);border-radius:42% 58% 49% 51% / 55% 43% 57% 45%;background:radial-gradient(circle at 32% 27%,#d8c18b4a,#6f9fc32b 38%,#203a5470 72%,#142234b8);box-shadow:inset -18px -16px 36px #0006,inset 9px 8px 26px #e1f2ff20,0 0 0 9px #d4ad5310,0 0 44px #83b8df2b}.webgl-intro-orb:before{inset:10%;border-radius:58% 42% 62% 38%;transform:rotate(32deg) scaleX(.76);border-color:#b8d6a77a}.webgl-intro-orb:after{inset:1%;border-radius:44% 56% 39% 61%;transform:rotate(-31deg) scaleY(.68);border-color:#d99b6a66}.webgl-intro>strong{color:#f2eee2;text-shadow:0 2px 20px #0b1a2a99}.webgl-intro-copy{color:#dbe6e9}.webgl-intro-cta{margin-top:4px;border:1px solid #c8d8d366;border-radius:999px;padding:10px 16px;background:#152b3a55;color:#f1dfc1}.webgl-intro-cta b{color:#e0a16b}.webgl-intro:hover .webgl-intro-cta{background:#31516a88;border-color:#d8c18b}';
   // Entry gateway: keep the BA mark visible and prevent navigation labels from stacking over the brand.
   introStyle.textContent+='.webgl-intro{z-index:20!important;gap:clamp(10px,2.2vh,18px)!important;padding:clamp(18px,4vh,34px) 18px!important;overflow:auto}.webgl-intro-orb{display:grid!important;flex:0 0 auto;width:clamp(132px,22vw,194px)!important;max-width:46vw;max-height:30vh;aspect-ratio:1}.webgl-intro-orb b{display:block!important;line-height:1!important}.webgl-intro>strong{display:block!important;flex:0 0 auto;line-height:1.15!important;margin:0!important}.webgl-intro-kicker,.webgl-intro-copy,.webgl-intro-cta{position:relative;display:block;flex:0 0 auto;max-width:min(100%,420px);overflow-wrap:anywhere}.webgl-intro-copy{line-height:1.55!important;margin:0!important}.webgl-intro-cta{line-height:1.4!important;white-space:normal}.webgl-intro-orb i{display:block}.webgl-intro-orb b{position:relative;z-index:1}#mainView.webgl-ready.universe-closed .webgl-stage>.webgl-hint,#mainView.webgl-ready.universe-closed .webgl-stage>.webgl-status,#mainView.webgl-ready.universe-closed .webgl-stage>.webgl-controls,#mainView.webgl-ready.universe-closed .webgl-stage>.webgl-network-legend{display:none!important}#mainView.webgl-ready.universe-closed .webgl-stage>.webgl-intro{display:flex!important}#mainView.webgl-ready.universe-open .webgl-stage>.webgl-intro{display:none!important}@media(max-width:520px){.webgl-intro{gap:12px!important}.webgl-intro-orb{width:clamp(124px,38vw,164px)!important;max-width:44vw;max-height:25vh}.webgl-intro>strong{font-size:clamp(26px,8vw,34px)!important}.webgl-intro-copy{font-size:12px!important}.webgl-intro-cta{font-size:9px!important;padding:9px 12px!important}}';
-  introStyle.textContent+='@media(max-width:520px){.webgl-network-legend{bottom:82px!important;left:9px;right:9px;max-width:calc(100% - 18px);justify-content:center}.webgl-status{left:12px!important;right:12px!important;bottom:47px!important;max-width:calc(100% - 24px);text-align:center}.webgl-hint{left:12px!important;right:12px!important;bottom:10px!important;max-width:calc(100% - 24px);text-align:center}}';
+  introStyle.textContent+='@media(max-width:520px){.webgl-network-legend{bottom:82px!important;left:9px;right:9px;max-width:calc(100% - 18px);justify-content:center}.webgl-status{left:12px!important;right:12px!important;bottom:47px!important;max-width:calc(100% - 24px);text-align:center}.webgl-hint{left:12px!important;right:12px!important;bottom:10px!important;max-width:calc(100% - 24px);text-align:center}}';\n  introStyle.textContent+=' .webgl-intro{background:radial-gradient(ellipse at 50% 38%,#263B38 0%,#172729 54%,#111B1D 100%)!important;color:#D1D0C5!important}.webgl-intro-kicker,.webgl-intro-copy{color:#D1D0C5!important}.webgl-intro-orb{border-color:#78958a!important;background:radial-gradient(circle at 34% 28%,#78958a55,#263B3838 42%,#111B1D 78%)!important;box-shadow:inset -18px -16px 36px #080f10aa,inset 9px 8px 26px #d1d0c51a,0 0 0 9px #B96B4D12,0 0 44px #263B3844!important}.webgl-intro-orb:before{border-color:#D1D0C555!important}.webgl-intro-orb:after{border-color:#B96B4D88!important}.webgl-intro-orb i{background:#B96B4D!important;box-shadow:0 0 14px 3px #B96B4D88!important}.webgl-intro-orb i:nth-child(3){background:#D1D0C5!important}.webgl-intro-orb b{color:#D1D0C5!important}.webgl-intro-cta{border-color:#B96B4D!important;color:#D1D0C5!important;background:#263B3833!important}.webgl-intro-cta b{color:#B96B4D!important}.webgl-network-legend{background:#111B1D!important;border-color:#526b62!important;color:#D1D0C5!important}.webgl-network-legend i{background:#78958a!important}.webgl-network-legend .legend-cross,.webgl-network-legend .legend-signal{background:#B96B4D!important;box-shadow:0 0 8px #B96B4D88!important}.webgl-hint,.webgl-status{color:#D1D0C5!important}.webgl-hint{background:#111B1D!important;border-color:#526b62!important}.webgl-controls button{background:#263B38!important;border-color:#607b70!important;color:#D1D0C5!important}.webgl-controls button:hover{border-color:#B96B4D!important;background:#314a44!important}';
   stage.append(hint,status,controls,networkLegend,introStyle,intro);root.append(stage);
   let renderer,scene,camera,raycaster,mouse,core,points=[],edges=[],tissuePickables=[],stars,dragging=false,moved=false,lastX=0,lastY=0,theta=.25,phi=1.18,dist=10.2,selected=null,raf=0,worldGroup,hovered=null,transition=null,cameraTarget=new THREE.Vector3(),resourceGroup=null,resourceMeshes=[],resourceSignals=[],rotateVX=0,rotateVY=0,pointers=new Map(),pinchDistance=0;
   const stageVisibility={visible:true};
@@ -126,7 +126,7 @@ else if(root){
   const makeLabel=(text,color,size=26)=>{
     const cv=document.createElement('canvas'),ctx=cv.getContext('2d');cv.width=512;cv.height=128;
     ctx.clearRect(0,0,512,128);ctx.font='800 '+size+'px system-ui, sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';
-    const label=text.slice(0,34);ctx.lineJoin='round';ctx.lineWidth=8;ctx.strokeStyle='rgba(7,12,16,.96)';ctx.strokeText(label,256,64,490);ctx.shadowColor='rgba(0,0,0,.95)';ctx.shadowBlur=14;ctx.shadowOffsetY=2;ctx.fillStyle='#f5f7fa';ctx.fillText(label,256,64,490);
+    const label=text.slice(0,34);ctx.lineJoin='round';ctx.lineWidth=8;ctx.strokeStyle='rgba(7,12,16,.96)';ctx.strokeText(label,256,64,490);ctx.shadowColor='rgba(0,0,0,.95)';ctx.shadowBlur=14;ctx.shadowOffsetY=2;ctx.fillStyle='#D1D0C5';ctx.fillText(label,256,64,490);
     const tex=new THREE.CanvasTexture(cv);tex.colorSpace=THREE.SRGBColorSpace;
     const spr=new THREE.Sprite(new THREE.SpriteMaterial({map:tex,transparent:true,depthWrite:false,depthTest:false}));spr.scale.set(2.5,.62,1);spr.renderOrder=20;return spr;
   };
@@ -137,12 +137,12 @@ else if(root){
       renderer=new THREE.WebGLRenderer({antialias:true,alpha:true,powerPreference:'high-performance'});
       renderer.setPixelRatio(pixelRatio());renderer.setClearColor(0x000000,0);renderer.outputColorSpace=THREE.SRGBColorSpace;
       stage.prepend(renderer.domElement);renderer.domElement.setAttribute('aria-label','Scène 3D BALabs');
-      scene=new THREE.Scene();scene.fog=new THREE.FogExp2(0xb9c9c2,.0068);worldGroup=new THREE.Group();scene.add(worldGroup);worldGroup.visible=false;
+      scene=new THREE.Scene();scene.fog=new THREE.FogExp2(0x111b1d,.0068);worldGroup=new THREE.Group();scene.add(worldGroup);worldGroup.visible=false;
       camera=new THREE.PerspectiveCamera(48,1,.1,100);raycaster=new THREE.Raycaster();mouse=new THREE.Vector2();
-      scene.add(new THREE.AmbientLight(0xe3ece5,1.42));
-      const key=new THREE.PointLight(0x91bfe0,34,32);key.position.set(0,5,6);scene.add(key);
-      const fill=new THREE.PointLight(0x9acdb5,26,28);fill.position.set(-6,-2,-4);scene.add(fill);
-      const warm=new THREE.PointLight(0xe3aa7d,15,20);warm.position.set(5,-3,4);scene.add(warm);
+      scene.add(new THREE.AmbientLight(0xd1d0c5,1.18));
+      const key=new THREE.PointLight(0x78958a,25,32);key.position.set(0,5,6);scene.add(key);
+      const fill=new THREE.PointLight(0x52766b,20,28);fill.position.set(-6,-2,-4);scene.add(fill);
+      const warm=new THREE.PointLight(0xb96b4d,13,20);warm.position.set(5,-3,4);scene.add(warm);
       // No starfield, orbital rings or central planet: open directly on an irregular biological network.
       const pos={bio:[-1.1,2.35,.35],myco:[-2.65,1.05,.9],soil:[-.35,.85,-.85],lab:[-2.25,-.45,-.25],products:[1.15,.15,.85],iot:[2.75,1.35,-.35],work:[1.9,-1.35,-.7],learn:[-.15,-2.35,.3]};
       for(const id of ids){
@@ -429,7 +429,7 @@ else if(root){
         const bend=.20+((ids.indexOf(a)+ids.indexOf(b))%3)*.075;
         const mid=pa.base.clone().lerp(pb.base,.5).addScaledVector(axis,bend);
         const curve=new THREE.QuadraticBezierCurve3(pa.base,mid,pb.base);
-        const signalColor=new THREE.Color(colors[a]).lerp(new THREE.Color(colors[b]),.5);
+        const signalColor=new THREE.Color(0xB96B4D);
         const line=makeNeurite(curve,signalColor,.052,1,72);
         // Keep transverse pathways legible without letting them overpower the biological branches.
         line.material.emissive.copy(signalColor).multiplyScalar(.40);line.material.emissiveIntensity=.48;
@@ -687,7 +687,7 @@ else if(root){
         const curve=new THREE.QuadraticBezierCurve3(node.p,mid,target.base);
         const bridge=makeNeurite(curve,target.color,.014,.56,28);
         bridge.userData={kind:'resource-domain-link',id:otherId,sourceId:id,targetId:otherId,resource:node.meta.titleClean,resourceUrl:node.meta.url.href};resourceGroup.add(bridge);
-        const pulse=new THREE.Mesh(new THREE.SphereGeometry(.019,10,8),new THREE.MeshBasicMaterial({color:0xe1f4d9,transparent:true,opacity:.9,depthWrite:false,toneMapped:false}));
+        const pulse=new THREE.Mesh(new THREE.SphereGeometry(.019,10,8),new THREE.MeshBasicMaterial({color:0xB96B4D,transparent:true,opacity:.9,depthWrite:false,toneMapped:false}));
         pulse.userData.kind='resource-signal';resourceGroup.add(pulse);
         resourceSignals.push({mesh:pulse,curve,sourceId:parent.id,targetId:otherId,resourceUrl:node.meta.url.href,offset:(nodes.indexOf(node)+ids.indexOf(otherId))*.113,speed:.105+(ids.indexOf(otherId)%3)*.018});
       }
@@ -738,7 +738,7 @@ else if(root){
       const curve=new THREE.QuadraticBezierCurve3(a.p,mid,b.p);
       const line=makeNeurite(curve,color,.012,.66,22);
       line.userData={kind:'resource-relation',id,sourceId:id,targetId:id,a:a.mesh.userData.title,b:b.mesh.userData.title,aUrl:a.meta.url.href,bUrl:b.meta.url.href};resourceGroup.add(line);
-      const pulse=new THREE.Mesh(new THREE.SphereGeometry(.028,12,10),new THREE.MeshBasicMaterial({color:0xe1f4d9,transparent:true,opacity:.98,depthWrite:false,toneMapped:false}));
+      const pulse=new THREE.Mesh(new THREE.SphereGeometry(.028,12,10),new THREE.MeshBasicMaterial({color:0xB96B4D,transparent:true,opacity:.98,depthWrite:false,toneMapped:false}));
       pulse.userData.kind='resource-signal';resourceGroup.add(pulse);
       resourceSignals.push({mesh:pulse,curve,sourceId:id,targetId:id,sourceUrl:a.meta.url.href,targetUrl:b.meta.url.href,offset:(i+j)*.137,speed:.12+((i+j)%3)*.018});
       resourceDegree[i]++;resourceDegree[j]++;resourceLinkCount++;
@@ -787,9 +787,9 @@ else if(root){
     }
     // Never animate a misleading partial journey: every hop must exist in the graph.
     if(segments.length===route.length-1){
-      const mesh=new THREE.Mesh(new THREE.SphereGeometry(.052,16,12),new THREE.MeshBasicMaterial({color:0xe1f4d9,transparent:true,opacity:1,depthWrite:false,toneMapped:false}));
+      const mesh=new THREE.Mesh(new THREE.SphereGeometry(.052,16,12),new THREE.MeshBasicMaterial({color:0xB96B4D,transparent:true,opacity:1,depthWrite:false,toneMapped:false}));
       mesh.userData={kind:'relay-signal'};worldGroup.add(mesh);
-      const trail=new THREE.Mesh(new THREE.SphereGeometry(.03,14,10),new THREE.MeshBasicMaterial({color:0xb7dfbd,transparent:true,opacity:1,depthWrite:false,toneMapped:false}));
+      const trail=new THREE.Mesh(new THREE.SphereGeometry(.03,14,10),new THREE.MeshBasicMaterial({color:0xD1D0C5,transparent:true,opacity:1,depthWrite:false,toneMapped:false}));
       trail.userData={kind:'relay-signal',trail:true};worldGroup.add(trail);
       const totalLength=segments.reduce((sum,segment)=>sum+segment.length,0);
       // Keep signal velocity consistent in world space: longer routes take proportionally longer to complete instead of racing through more distance.
@@ -812,8 +812,8 @@ else if(root){
   const branchRelaySignals=[];
   for(const path of junctionPaths.slice(0,6)){
     for(const fork of path.forkPaths){
-      const mesh=new THREE.Mesh(new THREE.SphereGeometry(.029,12,10),new THREE.MeshBasicMaterial({color:0xeaf5df,transparent:true,opacity:.9,depthWrite:false,toneMapped:false}));
-      const trail=new THREE.Mesh(new THREE.SphereGeometry(.016,10,8),new THREE.MeshBasicMaterial({color:0xc7e4cf,transparent:true,opacity:.72,depthWrite:false,toneMapped:false}));
+      const mesh=new THREE.Mesh(new THREE.SphereGeometry(.029,12,10),new THREE.MeshBasicMaterial({color:0xD1D0C5,transparent:true,opacity:.9,depthWrite:false,toneMapped:false}));
+      const trail=new THREE.Mesh(new THREE.SphereGeometry(.016,10,8),new THREE.MeshBasicMaterial({color:0xB96B4D,transparent:true,opacity:.72,depthWrite:false,toneMapped:false}));
       mesh.userData={kind:'junction-relay'};trail.userData={kind:'junction-relay',trail:true};worldGroup.add(mesh,trail);
       const totalLength=fork.reduce((sum,segment)=>sum+segment.length,0);
       branchRelaySignals.push({mesh,trail,segments:fork,totalLength,offset:branchRelaySignals.length*.137,speed:.82/Math.max(totalLength,.1)});
