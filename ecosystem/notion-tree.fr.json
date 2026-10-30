@@ -121,7 +121,79 @@
               "title": "Autres champignons cultivés et étudiés",
               "notionId": "40073152f171813e9a83fb6e0a8c474a",
               "url": "https://app.notion.com/p/40073152f171813e9a83fb6e0a8c474a",
-              "description": "Fiches consacrées à d’autres champignons étudiés ou cultivés, avec des repères biologiques et des informations générales. Cette collection ne constitue pas un inventaire de cultures validées ou disponibles."
+              "description": "Fiches consacrées à d’autres champignons étudiés ou cultivés, avec des repères biologiques et des informations générales. Cette collection ne constitue pas un inventaire de cultures validées ou disponibles.",
+              "children": [
+                {
+                  "id": "myco-cyclocybe-aegerita",
+                  "title": "Cyclocybe aegerita — pioppino",
+                  "url": "https://app.notion.com/p/3ff73152f1718140a6d4d2672707d967",
+                  "description": "Fiche publique présentant cet organisme, ses caractéristiques biologiques et les informations documentées dans la ressource BA Labs.",
+                  "children": []
+                },
+                {
+                  "id": "myco-calocybe-indica",
+                  "title": "Calocybe indica — fiche d’organisme",
+                  "url": "https://app.notion.com/p/3ff73152f17181bbafe6ffb981cc68ed",
+                  "description": "Fiche publique présentant cet organisme, ses caractéristiques biologiques et les informations documentées dans la ressource BA Labs.",
+                  "children": []
+                },
+                {
+                  "id": "myco-hericium",
+                  "title": "Hericium erinaceus — fiche d’organisme",
+                  "url": "https://app.notion.com/p/3ff73152f171810ab288c3d50adad635",
+                  "description": "Fiche publique présentant cet organisme, ses caractéristiques biologiques et les informations documentées dans la ressource BA Labs.",
+                  "children": []
+                },
+                {
+                  "id": "myco-hypsizygus-marmoreus",
+                  "title": "Hypsizygus marmoreus — fiche d’organisme",
+                  "url": "https://app.notion.com/p/3ff73152f1718145b728e0e4cb20c47a",
+                  "description": "Fiche publique présentant cet organisme, ses caractéristiques biologiques et les informations documentées dans la ressource BA Labs.",
+                  "children": []
+                },
+                {
+                  "id": "myco-hypsizygus-ulmarius",
+                  "title": "Hypsizygus ulmarius — fiche d’organisme",
+                  "url": "https://app.notion.com/p/3ff73152f17181dcbae7e4a31063446d",
+                  "description": "Fiche publique présentant cet organisme, ses caractéristiques biologiques et les informations documentées dans la ressource BA Labs.",
+                  "children": []
+                },
+                {
+                  "id": "myco-lentinula",
+                  "title": "Lentinula edodes — fiche d’organisme",
+                  "url": "https://app.notion.com/p/3ff73152f17181838799c6fff6e6a000",
+                  "description": "Fiche publique présentant cet organisme, ses caractéristiques biologiques et les informations documentées dans la ressource BA Labs.",
+                  "children": []
+                },
+                {
+                  "id": "myco-pholiota",
+                  "title": "Pholiota adiposa — fiche d’organisme",
+                  "url": "https://app.notion.com/p/3ff73152f1718150b3cfe46e10cef81b",
+                  "description": "Fiche publique présentant cet organisme, ses caractéristiques biologiques et les informations documentées dans la ressource BA Labs.",
+                  "children": []
+                },
+                {
+                  "id": "myco-cordyceps",
+                  "title": "Cordyceps militaris — fiche d’organisme",
+                  "url": "https://app.notion.com/p/3ff73152f17181aab3d8f24bc6723d91",
+                  "description": "Fiche publique présentant cet organisme, ses caractéristiques biologiques et les informations documentées dans la ressource BA Labs.",
+                  "children": []
+                },
+                {
+                  "id": "myco-ganoderma",
+                  "title": "Ganoderma lucidum — fiche d’organisme",
+                  "url": "https://app.notion.com/p/3ff73152f17181078f1fee88bd1285ab",
+                  "description": "Fiche publique présentant cet organisme, ses caractéristiques biologiques et les informations documentées dans la ressource BA Labs.",
+                  "children": []
+                },
+                {
+                  "id": "myco-trametes",
+                  "title": "Trametes versicolor — fiche d’organisme",
+                  "url": "https://app.notion.com/p/3ff73152f17181bba125c931edbe9ed2",
+                  "description": "Fiche publique présentant cet organisme, ses caractéristiques biologiques et les informations documentées dans la ressource BA Labs.",
+                  "children": []
+                }
+              ]
             }
           ],
           "description": "Panorama des champignons documentés par BA Labs : espèces étudiées, ressources de culture et groupes biologiques, avec des fiches dont le niveau de détail dépend des données disponibles."
@@ -144,14 +216,102 @@
               "title": "Mycorhizes arbusculaires — ressources et fonctions",
               "notionId": "3ff73152f17181eba5aed2b6ce33e4bc",
               "url": "https://app.notion.com/p/3ff73152f17181eba5aed2b6ce33e4bc",
-              "description": "Présentation des mycorhizes arbusculaires, associations entre champignons du sol et racines de nombreuses plantes, ainsi que des groupes décrits dans la littérature et de leurs fonctions écologiques."
+              "description": "Présentation des mycorhizes arbusculaires, associations entre champignons du sol et racines de nombreuses plantes, ainsi que des groupes décrits dans la littérature et de leurs fonctions écologiques.",
+              "children": [
+                {
+                  "id": "myco-glomus-aggregatum",
+                  "title": "Glomus aggregatum — fiche d’organisme",
+                  "url": "https://app.notion.com/p/3ff73152f17181dca6e9d584df538610",
+                  "description": "Fiche publique présentant cet organisme, ses caractéristiques biologiques et les informations documentées dans la ressource BA Labs.",
+                  "children": []
+                },
+                {
+                  "id": "myco-glomus-brasilianum",
+                  "title": "Glomus brasilianum — fiche d’organisme",
+                  "url": "https://app.notion.com/p/3ff73152f171816c872beb066a12e306",
+                  "description": "Fiche publique présentant cet organisme, ses caractéristiques biologiques et les informations documentées dans la ressource BA Labs.",
+                  "children": []
+                },
+                {
+                  "id": "myco-rhizophagus-clarus",
+                  "title": "Rhizophagus clarus (Glomus clarum) — fiche d’organisme",
+                  "url": "https://app.notion.com/p/3ff73152f17181199b36de40107de93f",
+                  "description": "Fiche publique présentant cet organisme, ses caractéristiques biologiques et les informations documentées dans la ressource BA Labs.",
+                  "children": []
+                },
+                {
+                  "id": "myco-glomus-deserticola",
+                  "title": "Glomus deserticola — fiche d’organisme",
+                  "url": "https://app.notion.com/p/3ff73152f1718150a4d7c6bb7f631272",
+                  "description": "Fiche publique présentant cet organisme, ses caractéristiques biologiques et les informations documentées dans la ressource BA Labs.",
+                  "children": []
+                },
+                {
+                  "id": "myco-rhizophagus-irregularis",
+                  "title": "Rhizophagus irregularis (Glomus intraradices) — fiche d’organisme",
+                  "url": "https://app.notion.com/p/3ff73152f17181e39c44fa9dec667564",
+                  "description": "Fiche publique présentant cet organisme, ses caractéristiques biologiques et les informations documentées dans la ressource BA Labs.",
+                  "children": []
+                },
+                {
+                  "id": "myco-glomus-monosporus",
+                  "title": "Glomus monosporus — fiche d’organisme",
+                  "url": "https://app.notion.com/p/3ff73152f17181f9900af49c9f0b4459",
+                  "description": "Fiche publique présentant cet organisme, ses caractéristiques biologiques et les informations documentées dans la ressource BA Labs.",
+                  "children": []
+                },
+                {
+                  "id": "myco-funneliformis-mosseae",
+                  "title": "Funneliformis mosseae (Glomus mosseae) — fiche d’organisme",
+                  "url": "https://app.notion.com/p/3ff73152f171815eb37ac1ddef7c4a7e",
+                  "description": "Fiche publique présentant cet organisme, ses caractéristiques biologiques et les informations documentées dans la ressource BA Labs.",
+                  "children": []
+                },
+                {
+                  "id": "myco-gigaspora-margarita",
+                  "title": "Gigaspora margarita — fiche d’organisme",
+                  "url": "https://app.notion.com/p/3ff73152f171815aa813c468b29031f4",
+                  "description": "Fiche publique présentant cet organisme, ses caractéristiques biologiques et les informations documentées dans la ressource BA Labs.",
+                  "children": []
+                }
+              ]
             },
             {
               "id": "myco-mycorrhiza-ectomycorrhiza",
               "title": "Ectomycorhizes — ressources et interactions avec les plantes",
               "notionId": "3ff73152f17181159f8dfd6c430fba1d",
               "url": "https://app.notion.com/p/3ff73152f17181159f8dfd6c430fba1d",
-              "description": "Explorer les ectomycorhizes, associations entre certains champignons et les racines d’arbres compatibles. Les partenaires et les échanges biologiques dépendent de l’espèce fongique et de l’hôte."
+              "description": "Explorer les ectomycorhizes, associations entre certains champignons et les racines d’arbres compatibles. Les partenaires et les échanges biologiques dépendent de l’espèce fongique et de l’hôte.",
+              "children": [
+                {
+                  "id": "myco-laccaria-laccata",
+                  "title": "Laccaria laccata — fiche d’organisme",
+                  "url": "https://app.notion.com/p/3ff73152f17181968208f00df0ebb5ce",
+                  "description": "Fiche publique présentant cet organisme, ses caractéristiques biologiques et les informations documentées dans la ressource BA Labs.",
+                  "children": []
+                },
+                {
+                  "id": "myco-pisolithus",
+                  "title": "Pisolithus tinctorius — fiche d’organisme",
+                  "url": "https://app.notion.com/p/3ff73152f171815684deceff4daf850e",
+                  "description": "Fiche publique présentant cet organisme, ses caractéristiques biologiques et les informations documentées dans la ressource BA Labs.",
+                  "children": []
+                },
+                {
+                  "id": "myco-rhizopogon",
+                  "title": "Rhizopogon spp. — fiche de groupe ectomycorhizien",
+                  "url": "https://app.notion.com/p/3ff73152f17181be958bf33cfdbb4ea2",
+                  "description": "Fiche publique présentant cet organisme, ses caractéristiques biologiques et les informations documentées dans la ressource BA Labs.",
+                  "children": []
+                },
+                {
+                  "id": "myco-scleroderma",
+                  "title": "Scleroderma spp. — fiche de groupe ectomycorhizien",
+                  "url": "https://app.notion.com/p/3ff73152f171816e93f5e62e70f77969",
+                  "description": "Fiche publique présentant cet organisme, ses caractéristiques biologiques et les informations documentées dans la ressource BA Labs.",
+                  "children": []
+                }
+              ]
             }
           ],
           "description": "Explorer les interactions entre champignons, microorganismes et plantes, sans confondre intérêt scientifique général et symbiose déjà validée par BA Labs."
