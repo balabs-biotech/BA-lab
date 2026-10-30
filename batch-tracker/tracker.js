@@ -2867,9 +2867,6 @@ async function loadBatch(
   }
 
 
-  selectedBatch =
-    batch;
-
 
   const {
     data: stages,
@@ -2978,6 +2975,8 @@ async function loadBatch(
   }
 
   if (requestId !== batchDetailRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
+
+  selectedBatch = batch;
 
   renderBatchInfo(
     batch
