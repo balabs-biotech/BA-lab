@@ -301,6 +301,24 @@ assert.match(cultureSessionMessages[0].message, /Session provider unavailable/);
 console.log("✓ Culture creation: session lookup failures produce controlled feedback");
 
 
+// A tenant switch during the optional Notion sync must not render old-tenant data.
+const cultureSyncCallIndex = createCultureSource.indexOf('"sync-culture-to-notion"');
+const cultureSyncGuardIndex = createCultureSource.indexOf(
+  'if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;',
+  cultureSyncCallIndex
+);
+const cultureSuccessRenderIndex = createCultureSource.indexOf(
+  'showElement(\n      resultCard',
+  cultureSyncCallIndex
+);
+assert.ok(cultureSyncCallIndex >= 0, "culture Notion sync call must remain present");
+assert.ok(cultureSyncGuardIndex > cultureSyncCallIndex,
+  "culture creation must re-check workspace revision after Notion sync");
+assert.ok(cultureSuccessRenderIndex > cultureSyncGuardIndex,
+  "stale culture result must be discarded before success UI is rendered");
+console.log("✓ Culture creation: stale Notion sync results cannot render in another workspace");
+
+
 // A session resolved after an authentication/workspace change must not start writes.
 const staleSessionMessages = [];
 let staleSessionRevision = 1;
