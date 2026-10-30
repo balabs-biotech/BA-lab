@@ -2813,6 +2813,7 @@ async function loadBatch(
 
   clearMessage();
 
+  try {
 
   const {
     data: batch,
@@ -2960,13 +2961,23 @@ async function loadBatch(
 
   // Le journal est en lecture seule : il réutilise les événements déjà reliés au lot.
   // Une indisponibilité du journal ne doit pas empêcher l'accès aux étapes ou au QC.
-  const { data: batchEventsData, error: batchEventsError } = await supabaseClient
+  let batchEventsData = [];
+  let batchEventsError = null;
+  try {
+    const batchEventsResult = await supabaseClient
     .from("events")
     .select("id,event_type,occurred_at,payload,location_id,environment_id")
     .eq("organization_id", loadOrganizationId)
     .eq("batch_id", batchId)
     .order("occurred_at", { ascending: false })
     .limit(50);
+    if (requestId !== batchDetailRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
+    batchEventsData = batchEventsResult.data || [];
+    batchEventsError = batchEventsResult.error;
+  } catch (error) {
+    if (requestId !== batchDetailRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
+    batchEventsError = error;
+  }
 
   if (requestId !== batchDetailRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
 
@@ -3006,6 +3017,14 @@ async function loadBatch(
     qcChecks || []
   );
 
+  } catch (error) {
+    if (requestId !== batchDetailRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
+    console.error("Chargement du lot :", error);
+    showMessage(
+      `Chargement du lot impossible : ${error?.message || "erreur réseau inconnue"}`,
+      "error"
+    );
+  }
 }
 
 
