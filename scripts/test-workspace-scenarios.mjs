@@ -455,3 +455,28 @@ const comparisonRenderIndex = comparisonSource.indexOf("results.appendChild(tabl
 assert.ok(comparisonRenderIndex > previousComparisonGuard,
   "comparison must validate workspace immediately before rendering results");
 console.log("✓ Batch comparison: stale async reads cannot render into another workspace");
+
+
+// Manual measurement and observation flows must reject stale session results.
+const measurementStart = engine.indexOf("async function saveMeasurement() {");
+const measurementEnd = engine.indexOf("\n}\n\nfunction belongsToActiveWorkspace", measurementStart) + 2;
+assert.ok(measurementStart >= 0 && measurementEnd > measurementStart,
+  "saveMeasurement handler must be present");
+const measurementSource = engine.slice(measurementStart, measurementEnd);
+const observationStart = engine.indexOf("async function saveObservation() {");
+const observationEnd = engine.indexOf("\n}\n\nasync function loadRecentObservations", observationStart) + 2;
+assert.ok(observationStart >= 0 && observationEnd > observationStart,
+  "saveObservation handler must be present");
+const observationSource = engine.slice(observationStart, observationEnd);
+for (const [name, source] of [
+  ["measurement", measurementSource],
+  ["observation", observationSource]
+]) {
+  assert.match(source,
+    /catch \(error\) \{\s*if \(!isCurrentWorkspaceRevision\(operationRevision, operationOrganizationId\)\) return;/,
+    `${name} session failures from an obsolete workspace must not display errors`);
+  assert.match(source,
+    /if \(!isCurrentWorkspaceRevision\(operationRevision, operationOrganizationId\)\) return;\s*if \(!session\)/,
+    `${name} must reject a session resolved after a workspace transition`);
+}
+console.log("✓ Measurements and observations: stale session failures and resolutions are discarded");
