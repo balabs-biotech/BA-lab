@@ -61,8 +61,8 @@ Deno.serve(async (req: Request) => {
     const start = new Date(end.getTime() - 13 * 86400000);
     const fmt = (d: Date) => d.toISOString().slice(0, 10);
     const startDate = fmt(start), endDate = fmt(end);
-    const { data: locations, error: locationsError } = await db.from("locations")
-      .select("id,organization_id,name,latitude,longitude,coordinate_accuracy_m,coordinate_source")
+    const { data: locations, error: locationsError, count } = await db.from("locations")
+      .select("id,organization_id,name,latitude,longitude,coordinate_accuracy_m,coordinate_source", { count: "exact" })
       .not("latitude", "is", null).not("longitude", "is", null)
       .gte("latitude", -90).lte("latitude", 90).gte("longitude", -180).lte("longitude", 180)
       .order("id", { ascending: true })
@@ -124,8 +124,8 @@ Deno.serve(async (req: Request) => {
       }
     };
     await Promise.all(Array.from({ length: Math.min(LOCATION_CONCURRENCY, locations?.length ?? 0) }, () => worker()));
-    const truncated = (locations?.length ?? 0) === MAX_LOCATIONS_PER_RUN;
-    return response(200, { ok: results.every(r => r.ok === true) && !truncated, provider: "NASA POWER", range: { start: startDate, end: endDate }, locations_processed: results.length, locations_limit: MAX_LOCATIONS_PER_RUN, possibly_truncated: truncated, results, note: "Daily gridded estimates; not local sensor measurements." });
+    const truncated = (locations?.length ?? 0) === MAX_LOCATIONS_PER_RUN && (locationsError === null);
+    return response(200, { ok: results.every(r => r.ok === true) && !truncated, provider: "NASA POWER", range: { start: startDate, end: endDate }, locations_processed: results.length, locations_limit: MAX_LOCATIONS_PER_RUN, locations_total: count ?? null, possibly_truncated: (count ?? 0) > MAX_LOCATIONS_PER_RUN, results, note: "Daily gridded estimates; not local sensor measurements." });
   } catch (e) {
     console.error("[nasa-power-scheduled-import]", e instanceof Error ? e.message : "unknown_error");
     return response(500, { error: "scheduled_import_failed" });
