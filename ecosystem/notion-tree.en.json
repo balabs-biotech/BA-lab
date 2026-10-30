@@ -1,0 +1,175 @@
+{
+  "version": 1,
+  "source": "Verified public language-specific BA Labs pages from the corresponding public language entry and Notion page search",
+  "language": "en",
+  "coverage": "first_level_and_verified_topic_pages; deeper page hierarchy not inferred unless confirmed",
+  "domains": [
+    {
+      "id": "myco",
+      "title": "Mycology",
+      "notionId": "40173152f1718111a73ced2825985454",
+      "url": "https://app.notion.com/p/40173152f1718111a73ced2825985454",
+      "children": [
+        {
+          "id": "en-myco-applications",
+          "title": "Mycological applications",
+          "notionId": "40173152f17181969ca9ec1b3dfe5435",
+          "url": "https://app.notion.com/p/40173152f17181969ca9ec1b3dfe5435",
+          "description": "Explore fungal interactions and their practical biological applications.",
+          "children": []
+        },
+        {
+          "id": "en-myco-resources",
+          "title": "Fungal resources",
+          "notionId": "40173152f1718111a73ced2825985454",
+          "url": "https://app.notion.com/p/40173152f1718111a73ced2825985454",
+          "description": "Reference pages on fungal organisms, cultures and biological resources.",
+          "children": []
+        }
+      ]
+    },
+    {
+      "id": "bio",
+      "title": "Biotechnology",
+      "notionId": "40173152f171819a90d9ffa3a191d09f",
+      "url": "https://app.notion.com/p/40173152f171819a90d9ffa3a191d09f",
+      "children": [
+        {
+          "id": "en-bio-fermentation",
+          "title": "Biological fermentation",
+          "notionId": "40173152f17181e999cfc4e456ec0f6d",
+          "url": "https://app.notion.com/p/40173152f17181e999cfc4e456ec0f6d",
+          "description": "Biological fermentation processes and their operating principles.",
+          "children": []
+        },
+        {
+          "id": "en-bio-substrates",
+          "title": "Biological substrates and carriers",
+          "notionId": "40173152f1718163b121c3693da2b15d",
+          "url": "https://app.notion.com/p/40173152f1718163b121c3693da2b15d",
+          "description": "Materials and carriers used in biological systems and experiments.",
+          "children": []
+        },
+        {
+          "id": "en-bio-biostimulants",
+          "title": "Biostimulants and biological solutions",
+          "notionId": "40173152f17181cab354dd2c11933208",
+          "url": "https://app.notion.com/p/40173152f17181cab354dd2c11933208",
+          "description": "Biological solutions and biostimulant approaches under study.",
+          "children": []
+        }
+      ]
+    },
+    {
+      "id": "soil",
+      "title": "Agrotechnology",
+      "notionId": "40173152f171817e918cc9c278aeca0d",
+      "url": "https://app.notion.com/p/40173152f171817e918cc9c278aeca0d",
+      "children": [
+        {
+          "id": "en-soil-microbes",
+          "title": "Agricultural microorganisms",
+          "notionId": "40173152f171817e918cc9c278aeca0d",
+          "url": "https://app.notion.com/p/40173152f171817e918cc9c278aeca0d",
+          "description": "Microorganisms relevant to agricultural systems and biological interactions.",
+          "children": []
+        }
+      ]
+    },
+    {
+      "id": "iot",
+      "title": "Instrumentation and automation",
+      "notionId": "40173152f1718131a52bf254341ee60f",
+      "url": "https://app.notion.com/p/40173152f1718131a52bf254341ee60f",
+      "children": [
+        {
+          "id": "en-iot-culture-automation",
+          "title": "Culture automation",
+          "notionId": "40173152f17181e1a740df2496d50736",
+          "url": "https://app.notion.com/p/40173152f17181e1a740df2496d50736",
+          "description": "Automation concepts for monitoring and managing cultivation systems.",
+          "children": []
+        },
+        {
+          "id": "en-iot-measurement",
+          "title": "Measurement and reproducibility",
+          "notionId": "40273152f17181f896c7c040f4402212",
+          "url": "https://app.notion.com/p/40273152f17181f896c7c040f4402212",
+          "description": "Measurement practices that support repeatable observations.",
+          "children": []
+        }
+      ]
+    },
+    {
+      "id": "lab",
+      "title": "The laboratory",
+      "notionId": "40173152f1718119b5dffffaa2245f27",
+      "url": "https://app.notion.com/p/40173152f1718119b5dffffaa2245f27",
+      "children": []
+    },
+    {
+      "id": "products",
+      "title": "Products and biological resources",
+      "notionId": "40173152f171812f813cf1b792d83281",
+      "url": "https://app.notion.com/p/40173152f171812f813cf1b792d83281",
+      "children": [
+        {
+          "id": "en-products-wa",
+          "title": "WA — Water Agar, ready to use",
+          "notionId": "40173152f17181fc9d18ec817853e38d",
+          "url": "https://app.notion.com/p/40173152f17181fc9d18ec817853e38d",
+          "description": "A ready-to-use water agar resource page.",
+          "children": []
+        },
+        {
+          "id": "en-products-myco-start",
+          "title": "Myco Start — mycology starter kit prototype",
+          "notionId": "40173152f171818d94c0c05bc8f79913",
+          "url": "https://app.notion.com/p/40173152f171818d94c0c05bc8f79913",
+          "description": "An informational prototype page for the Myco Start kit.",
+          "children": []
+        },
+        {
+          "id": "en-products-myco-plate",
+          "title": "Myco Plate — agar observation kit prototype",
+          "notionId": "40173152f17181cc9e4cd79348617514",
+          "url": "https://app.notion.com/p/40173152f17181cc9e4cd79348617514",
+          "description": "An informational prototype page for the Myco Plate kit.",
+          "children": []
+        },
+        {
+          "id": "en-products-qr",
+          "title": "QR quick-start guide",
+          "notionId": "40173152f17181829e83c268007aed91",
+          "url": "https://app.notion.com/p/40173152f17181829e83c268007aed91",
+          "description": "A quick-start guide for the Myco Start and Myco Plate prototypes.",
+          "children": []
+        }
+      ]
+    },
+    {
+      "id": "work",
+      "title": "Research and development",
+      "notionId": "40173152f171812084fcc3e45ece4ec9",
+      "url": "https://app.notion.com/p/40173152f171812084fcc3e45ece4ec9",
+      "children": [
+        {
+          "id": "en-work-evidence",
+          "title": "What the evidence currently supports",
+          "notionId": "40173152f17181e99831c9e40fb8e614",
+          "url": "https://app.notion.com/p/40173152f17181e99831c9e40fb8e614",
+          "description": "A review of what current observations and evidence do—and do not—support.",
+          "children": []
+        },
+        {
+          "id": "en-work-collaborate",
+          "title": "Collaborate with BA Labs",
+          "notionId": "40173152f1718118ac1ad58358720ae4",
+          "url": "https://app.notion.com/p/40173152f1718118ac1ad58358720ae4",
+          "description": "Ways to frame a project need and explore collaboration.",
+          "children": []
+        }
+      ]
+    }
+  ]
+}
