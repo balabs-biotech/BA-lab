@@ -1,13 +1,18 @@
-// Use a second CDN if the primary module host is unavailable on the visitor's network.
+// A stalled CDN must never block the entire public interface. Give each pinned
+// Three.js module host a bounded window, then move to the next one.
+const importThreeWithTimeout=(url,host,timeoutMs=8000)=>Promise.race([
+  import(url),
+  new Promise((_,reject)=>setTimeout(()=>reject(new Error(host+' did not respond within '+timeoutMs+' ms')),timeoutMs))
+]);
 let THREE;
 try{
-  THREE=await import('https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js');
+  THREE=await importThreeWithTimeout('https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js','jsDelivr');
 }catch(primaryImportError){
   try{
-    THREE=await import('https://unpkg.com/three@0.169.0/build/three.module.js');
+    THREE=await importThreeWithTimeout('https://unpkg.com/three@0.169.0/build/three.module.js','unpkg');
   }catch(secondaryImportError){
     try{
-      THREE=await import('https://esm.sh/three@0.169.0');
+      THREE=await importThreeWithTimeout('https://esm.sh/three@0.169.0','esm.sh');
     }catch(fallbackImportError){
       console.error('BALabs 3D engine could not be loaded from the available module hosts.',primaryImportError,secondaryImportError,fallbackImportError);
     }
