@@ -2032,6 +2032,7 @@ async function createCulture() {
 
         }
       );
+    if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
 
 
     if (error) {
@@ -3052,6 +3053,7 @@ async function recordBatchHarvest() {
       p_unit_code: unit.code,
       p_note: note || null
     });
+    if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
     if (error) throw new Error("Enregistrement de la récolte impossible : " + error.message);
     if (!eventId) throw new Error("La base n’a pas confirmé l’enregistrement de la récolte.");
     harvestQuantityInput.value = "";
@@ -3721,6 +3723,8 @@ async function saveQcCheckNow(
       );
 
 
+  if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
+
   if (error) {
 
     showMessage(
@@ -4072,6 +4076,7 @@ async function createBatch() {
 
         }
       );
+    if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
 
 
     if (error) {
@@ -4314,6 +4319,7 @@ async function advanceBatch() {
 
         }
       );
+    if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
 
 
     if (error) {
@@ -4420,6 +4426,7 @@ async function releaseBatch() {
 
         }
       );
+    if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
 
 
     if (error) {
@@ -4783,6 +4790,7 @@ async function moveSelectedBatch() {
       p_environment_id: environmentId,
       p_note: note
     });
+    if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
     if (error) throw error;
     if (!data?.event_id) throw new Error("La RPC n’a pas confirmé la création de l’événement de déplacement.");
     if (moveBatchNoteInput) moveBatchNoteInput.value = "";
