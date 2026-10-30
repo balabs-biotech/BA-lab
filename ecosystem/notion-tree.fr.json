@@ -2,7 +2,7 @@
   "version": 1,
   "source": "Notion public workspace search, French branch; entries verified by page IDs and URLs",
   "language": "fr",
-  "coverage": "partial_verified_inventory",
+  "coverage": "7_public_roots_identified_in_french_navigation; learn_not_present_in_french_landing_page",
   "domains": [
     {
       "id": "myco",
@@ -200,5 +200,6 @@
         }
       ]
     }
-  ]
+  ],
+  "notes": "The French public landing page lists the seven mapped roots. No separate public learning/resources root is linked there; do not invent one. The landing page also links to evidence and collaboration pages, which are not separate top-level universes."
 }
