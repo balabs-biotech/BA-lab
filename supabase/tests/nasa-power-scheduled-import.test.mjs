@@ -14,7 +14,7 @@ assert.ok(locationQuery > verifier, "locations must not be queried before the se
 assert.match(source, /if \(verifyError \|\| verified !== true\) return response\(401/, "failed secret verification must stop processing");
 assert.match(source, /MAX_LOCATIONS_PER_RUN = 100/, "scheduled import must have a hard location cap");
 assert.match(source, /\.range\(0, MAX_LOCATIONS_PER_RUN - 1\)/, "location query must use an explicit bounded range");
-assert.match(source, /LOCATION_CONCURRENCY = 8/, "location processing must use bounded concurrency");
+assert.match(source, /LOCATION_CONCURRENCY = 16/, "location processing must use bounded concurrency");
 assert.match(source, /Promise\.all\(Array\.from\(\{ length: Math\.min\(LOCATION_CONCURRENCY/, "workers must be bounded by the configured concurrency");
 assert.match(source, /MAX_UPSTREAM_BYTES = 4 \* 1024 \* 1024/, "NASA response size must be capped");
 assert.match(source, /readBoundedJson\(upstream\)/, "NASA response must be streamed through the bounded reader");
