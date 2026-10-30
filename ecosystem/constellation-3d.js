@@ -251,12 +251,12 @@ if(root){
         line.userData={kind:'relation',a,b};worldGroup.add(line);
         // Cross-links branch like mycelial cords / axonal collaterals instead of
         // appearing as plain geometric chords. Each offshoot ends in a small junction.
-        for(let branch=0;branch<3;branch++){
+        for(let branch=0;branch<5;branch++){
           const seed=(ids.indexOf(a)+1)*1.73+(ids.indexOf(b)+1)*.91+branch*2.4;
-          const t=[0.27,0.51,0.74][branch];
+          const t=[0.18,0.34,0.51,0.68,0.84][branch];
           const anchor=curve.getPoint(t),tangent=curve.getTangent(t);
           const side=new THREE.Vector3(-tangent.y+Math.sin(seed)*.35,tangent.x+Math.cos(seed*.8)*.28,Math.sin(seed+1.1)*.85).normalize();
-          const reach=.20+((ids.indexOf(a)+ids.indexOf(b)+branch)%3)*.055;
+          const reach=.24+((ids.indexOf(a)+ids.indexOf(b)+branch)%4)*.065;
           const tip=anchor.clone().addScaledVector(side,reach).addScaledVector(tangent,(branch===0?1:-1)*.075);
           mycelialTips.push({point:tip.clone(),a,b,branch});
           const control=anchor.clone().addScaledVector(side,reach*.55).addScaledVector(tangent,.035*Math.sin(seed));
@@ -264,8 +264,8 @@ if(root){
           const twig=makeNeurite(offshoot,signalColor,.021,.94,26);
           twig.material.emissive.copy(signalColor).multiplyScalar(.24);twig.material.emissiveIntensity=.34;
           twig.userData={kind:'dendrite',id:a,relation:true,a,b};worldGroup.add(twig);
-          if(branch===0){
-            const junction=new THREE.Mesh(new THREE.IcosahedronGeometry(.018,1),new THREE.MeshStandardMaterial({color:signalColor,emissive:signalColor,emissiveIntensity:.22,roughness:1}));
+          if(branch===0||branch===3){
+            const junction=new THREE.Mesh(new THREE.IcosahedronGeometry(.021,1),new THREE.MeshStandardMaterial({color:signalColor,emissive:signalColor,emissiveIntensity:.22,roughness:1}));
             junction.position.copy(tip);junction.userData={kind:'synapse',id:a,relation:true,a,b};worldGroup.add(junction);
           }
         }
@@ -279,7 +279,7 @@ if(root){
       let joinCount=0;
       for(let i=0;i<mycelialTips.length;i++){
         const first=mycelialTips[i];
-        let best=-1,bestDistance=1.05;
+        let best=-1,bestDistance=1.32;
         for(let j=i+1;j<mycelialTips.length;j++){
           const second=mycelialTips[j];
           if(first.a===second.a&&first.b===second.b)continue;
@@ -319,7 +319,7 @@ if(root){
         worldGroup.add(signal);
         edges.push({line:connector,id:first.a,relation:true,anastomosis:true,aId:first.a,bId:second.b,a:first.point.clone(),b:second.point.clone(),pulse:signal,curve:anastomosis,phase:(i+best)*.093});
         joinCount++;
-        if(joinCount>=12)break;
+        if(joinCount>=32)break;
       }
       root.classList.add('webgl-ready','universe-open');root.classList.remove('universe-closed');worldGroup.visible=true;new MutationObserver(()=>{if(worldGroup)worldGroup.visible=!root.classList.contains('universe-closed');if(root.classList.contains('universe-closed'))clearResourceNodes()}).observe(root,{attributes:true,attributeFilter:['class']});
       const textObserver=new MutationObserver(()=>refreshLabels());sphereEls.forEach(el=>{const b=el.querySelector('b');if(b)textObserver.observe(b,{childList:true,characterData:true,subtree:true})});
