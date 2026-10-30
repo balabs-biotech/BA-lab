@@ -264,6 +264,19 @@ if(root){
           const twig=makeNeurite(offshoot,signalColor,.021,.94,26);
           twig.material.emissive.copy(signalColor).multiplyScalar(.24);twig.material.emissiveIntensity=.34;
           twig.userData={kind:'dendrite',id:a,relation:true,a,b};worldGroup.add(twig);
+          // Fine secondary hypha: each collateral gives rise to another
+          // independent branch, so the network reads as tissue, not a comb.
+          const secondaryU=.58,secondaryAnchor=offshoot.getPoint(secondaryU),secondaryTangent=offshoot.getTangent(secondaryU);
+          const secondarySide=new THREE.Vector3(-secondaryTangent.y+Math.cos(seed*1.4)*.42,secondaryTangent.x+Math.sin(seed*.9)*.34,Math.cos(seed+2.7)*.92).normalize();
+          const secondaryTip=secondaryAnchor.clone().addScaledVector(secondarySide,.17+((branch+ids.indexOf(a))%3)*.045).addScaledVector(secondaryTangent,.045);
+          const secondaryControl=secondaryAnchor.clone().addScaledVector(secondarySide,.095).addScaledVector(secondaryTangent,.025);
+          const secondaryCurve=new THREE.QuadraticBezierCurve3(secondaryAnchor,secondaryControl,secondaryTip);
+          const secondaryTwig=makeNeurite(secondaryCurve,signalColor,.0125,.84,18);
+          secondaryTwig.material.emissive.copy(signalColor).multiplyScalar(.2);secondaryTwig.material.emissiveIntensity=.26;
+          secondaryTwig.userData={kind:'dendrite',id:a,relation:true,a,b};worldGroup.add(secondaryTwig);
+          mycelialTips.push({point:secondaryTip.clone(),a,b,branch:branch+10});
+          const secondaryJunction=new THREE.Mesh(new THREE.IcosahedronGeometry(.014,1),new THREE.MeshStandardMaterial({color:signalColor,emissive:signalColor,emissiveIntensity:.18,roughness:1}));
+          secondaryJunction.position.copy(secondaryTip);secondaryJunction.userData={kind:'synapse',id:a,relation:true,a,b};worldGroup.add(secondaryJunction);
           if(branch===0||branch===3){
             const junction=new THREE.Mesh(new THREE.IcosahedronGeometry(.021,1),new THREE.MeshStandardMaterial({color:signalColor,emissive:signalColor,emissiveIntensity:.22,roughness:1}));
             junction.position.copy(tip);junction.userData={kind:'synapse',id:a,relation:true,a,b};worldGroup.add(junction);
@@ -275,12 +288,14 @@ if(root){
       // Turn nearby collateral tips from separate cross-links into shared
       // anastomoses. This is the key visual difference between a set of chords
       // and a continuous mycelial/neural mesh.
-      const joinedTips=new Set();
+      const joinedTips=new Set(),usedTipIndices=new Set();
       let joinCount=0;
       for(let i=0;i<mycelialTips.length;i++){
+        if(usedTipIndices.has(i))continue;
         const first=mycelialTips[i];
-        let best=-1,bestDistance=1.32;
+        let best=-1,bestDistance=1.18;
         for(let j=i+1;j<mycelialTips.length;j++){
+          if(usedTipIndices.has(j))continue;
           const second=mycelialTips[j];
           if(first.a===second.a&&first.b===second.b)continue;
           const key=[first.a,first.b,second.a,second.b].join(':');
@@ -290,6 +305,7 @@ if(root){
         }
         if(best<0)continue;
         const second=mycelialTips[best];
+        usedTipIndices.add(i);usedTipIndices.add(best);
         const key=[first.a,first.b,second.a,second.b].join(':');
         joinedTips.add(key);
         const delta=second.point.clone().sub(first.point);
@@ -319,7 +335,7 @@ if(root){
         worldGroup.add(signal);
         edges.push({line:connector,id:first.a,relation:true,anastomosis:true,aId:first.a,bId:second.b,a:first.point.clone(),b:second.point.clone(),pulse:signal,curve:anastomosis,phase:(i+best)*.093});
         joinCount++;
-        if(joinCount>=32)break;
+        if(joinCount>=48)break;
       }
       root.classList.add('webgl-ready','universe-open');root.classList.remove('universe-closed');worldGroup.visible=true;new MutationObserver(()=>{if(worldGroup)worldGroup.visible=!root.classList.contains('universe-closed');if(root.classList.contains('universe-closed'))clearResourceNodes()}).observe(root,{attributes:true,attributeFilter:['class']});
       const textObserver=new MutationObserver(()=>refreshLabels());sphereEls.forEach(el=>{const b=el.querySelector('b');if(b)textObserver.observe(b,{childList:true,characterData:true,subtree:true})});
