@@ -2179,6 +2179,7 @@ async function createCulture() {
   }
 
   catch (error) {
+    if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
 
     console.error(
       "Création culture:",
@@ -3059,6 +3060,7 @@ async function recordBatchHarvest() {
     await loadBatch(selectedBatch.id);
     await loadLatestBatches();
   } catch (error) {
+    if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
     console.error("Enregistrement récolte :", error);
     showMessage(error?.message || "Enregistrement de la récolte impossible.", "error");
   } finally {
@@ -4177,6 +4179,7 @@ async function createBatch() {
   }
 
   catch (error) {
+    if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
 
     console.error(
       "Création batch:",
@@ -4353,6 +4356,7 @@ async function advanceBatch() {
   }
 
   catch (error) {
+    if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
 
     console.error(
       "Avancement batch:",
@@ -4453,6 +4457,7 @@ async function releaseBatch() {
   }
 
   catch (error) {
+    if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
 
     console.error(
       "Libération batch:",
@@ -4790,6 +4795,7 @@ async function moveSelectedBatch() {
     await loadBatch(selectedBatchId);
     showMessage("Déplacement enregistré dans la chronologie du lot.", "success");
   } catch (error) {
+    if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
     console.error("Déplacement du lot impossible:", error);
     showMessage("Déplacement impossible : " + (error.message || "erreur inconnue"), "error");
   } finally {
@@ -5168,6 +5174,7 @@ async function saveMeasurement() {
     showMessage(cultureWorkflowText("measureSaved"), "success");
     await loadRecentMeasurements();
   } catch (error) {
+    if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
     console.error("Enregistrement mesure :", error);
     if (measurementSaved) {
       showMessage(cultureWorkflowText("measureRefresh"), "warning");
@@ -5385,6 +5392,7 @@ async function saveObservation() {
     showMessage(cultureWorkflowText("observationSaved"), "success");
     await loadRecentObservations();
   } catch (error) {
+    if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
     console.error("Enregistrement observation :", error);
     if (observationSaved) {
       showMessage(cultureWorkflowText("observationRefresh"), "warning");
@@ -5875,7 +5883,8 @@ async function saveBiologicalOperation(event) {
     await loadCultureOptions();
     await loadCultureDetail(cultureId);
     await loadBiologicalLineage(cultureId);
-  } catch (error) { message.textContent = biologicalWorkflowText("failed") + (error.message || biologicalWorkflowText("notSaved")); }
+  } catch (error) {
+    if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return; message.textContent = biologicalWorkflowText("failed") + (error.message || biologicalWorkflowText("notSaved")); }
   finally {
     if (isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) {
       button.disabled = false;
@@ -6696,6 +6705,7 @@ async function savePlantCulture(event) {
     showMessage("Culture végétale enregistrée.", "success");
     if (status) status.textContent = "Culture enregistrée dans le registre AgriTech.";
   } catch (error) {
+    if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
     console.error("Enregistrement de la culture végétale impossible :", error);
     showMessage("Enregistrement impossible : " + (error.message || "erreur inconnue"), "error");
     if (status) status.textContent = "Échec de l’enregistrement. Vérifiez le code unique et les références.";

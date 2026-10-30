@@ -111,6 +111,20 @@ for (const [mutation, pattern] of capturedOrganizationChecks) {
 
 
 for (const mutation of [
+  "createCulture", "createBatch", "recordBatchHarvest", "advanceBatch",
+  "releaseBatch", "moveSelectedBatch", "saveMeasurement", "saveObservation",
+  "saveBiologicalOperation", "savePlantCulture"
+]) {
+  const source = getMutationBlock(mutation);
+  const mutationBody = source.slice(0, source.indexOf("finally"));
+  const catches = [...mutationBody.matchAll(/catch\s*\([^)]*\)\s*\{/g)];
+  assert.ok(catches.length, `${mutation} must handle mutation errors`);
+  const latestCatch = mutationBody.slice(catches[catches.length - 1].index);
+  assert.match(latestCatch, /if \(!isCurrentWorkspaceRevision\(operationRevision, operationOrganizationId\)\) return;/,
+    `${mutation} must suppress stale error UI after a workspace transition`);
+}
+
+for (const mutation of [
   "createCulture", "createBatch", "recordBatchHarvest", "saveQcCheckNow",
   "advanceBatch", "releaseBatch", "moveSelectedBatch"
 ]) {
