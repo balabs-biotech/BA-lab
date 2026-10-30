@@ -2292,6 +2292,41 @@ html,body{background:#111B1D!important}
 [dir="rtl"] .editorial-work .work-card-link{flex-direction:row-reverse!important}
 [dir="rtl"] .universe-bridge .bridge-network{justify-self:start!important}
 
+
+/* Editorial refinement 07 — brighten the first impression; keep the biology visible. */
+.hero{
+ background:linear-gradient(105deg,rgba(233,232,223,.98) 0%,rgba(233,232,223,.94) 42%,rgba(233,232,223,.76) 72%,rgba(38,59,56,.20) 100%)!important;
+ color:#111B1D!important;
+}
+.hero .hero-micrograph{
+ filter:grayscale(.72) contrast(1.02) brightness(.92)!important;
+ opacity:.36!important;
+}
+.hero:after{
+ background:linear-gradient(90deg,rgba(233,232,223,.12),rgba(233,232,223,.08))!important;
+}
+.hero .eyebrow{color:#99563f!important}
+.hero h1,.hero h1 span{color:#111B1D!important;text-shadow:none!important}
+.hero h1 span{color:#52645D!important}
+.hero p{color:#344740!important}
+.hero .aside{
+ background:rgba(38,59,56,.92)!important;
+ border-color:#B96B4D!important;
+ color:#e9e8df!important;
+}
+.hero .aside b{color:#F0EEE5!important}
+.hero-action-secondary{color:#263B38!important;border-color:#52645D!important}
+.hero-credit{color:#263B38!important;text-shadow:0 1px 3px #e9e8df!important}
+@media(max-width:760px){
+ .hero{background:linear-gradient(180deg,rgba(233,232,223,.22) 0%,rgba(233,232,223,.88) 34%,#e9e8df 70%)!important;color:#111B1D!important}
+ .hero .hero-micrograph{height:58%!important;filter:grayscale(.55) contrast(1.02) brightness(1.04)!important;opacity:.48!important}
+ .hero:after{background:linear-gradient(180deg,transparent 0%,rgba(233,232,223,.58) 32%,#e9e8df 72%)!important}
+ .hero .aside{display:none!important}
+ .hero h1,.hero h1 span{color:#111B1D!important}
+ .hero p{color:#344740!important}
+ .hero-action-secondary{color:#263B38!important}
+ .hero-credit{color:#263B38!important}
+}
 </style>
 </head>
 <body>
