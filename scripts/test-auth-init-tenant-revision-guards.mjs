@@ -176,6 +176,15 @@ assert.match(batchDetail, /const loadOrganizationId = organizationId;/,
 assert.equal((batchDetail.match(/if \(requestId !== batchDetailRequestId \|\| !isCurrentWorkspaceRevision\(loadRevision, loadOrganizationId\)\) return;/g) || []).length, 4,
   "every batch detail request boundary must reject stale workspace results");
 
+const batchDetailCatch = batchDetail.slice(batchDetail.lastIndexOf("catch"));
+assert.match(batchDetail, /try\\s*\\{[\\s\\S]*?await supabaseClient/,
+  "batch detail loader must catch rejected Supabase requests");
+assert.match(batchDetailCatch, /if \\(requestId !== batchDetailRequestId \\|\\| !isCurrentWorkspaceRevision\\(loadRevision, loadOrganizationId\\)\\) return;/,
+  "batch detail loader must suppress rejected requests from an obsolete workspace or selection");
+assert.match(batchDetailCatch, /showMessage\\([\\s\\S]*?Chargement du batch impossible/,
+  "batch detail loader must show a controlled error when a current request rejects");
+
+
 
 const lineage = getFunctionBlock("loadBiologicalLineage");
 assert.match(lineage, /const loadRevision = authStateRevision;/);
