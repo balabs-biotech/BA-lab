@@ -274,3 +274,58 @@ assert.equal(missingCultureMessages.length, 1);
 assert.equal(missingCultureMessages[0].type, "error");
 assert.match(missingCultureMessages[0].message, /culture sélectionnée.*plus disponible/i);
 console.log("✓ Batch creation: missing source culture produces controlled feedback");
+
+// Session and protocol lookups in creation handlers must surface controlled
+// feedback instead of rejecting before their main try/catch blocks.
+const createCultureSource = `async ${extractFunction(engine, "createCulture")}`;
+const cultureSessionMessages = [];
+const cultureSessionContext = {
+  authStateRevision: 1,
+  organizationId: "org-test",
+  clearMessage() {},
+  showMessage(message, type) { cultureSessionMessages.push({ message, type }); },
+  strainSelect: { value: "strain-1" },
+  cultureCodeInput: { value: "CULTURE-TEST", trim() { return this.value.trim(); } },
+  cultureTypeSelect: { value: "agar" },
+  protocolSelect: { value: "" },
+  startedAtInput: { value: "" },
+  termsAcceptedCheckbox: { checked: true, focus() {} },
+  getCurrentSession: async () => { throw new Error("Session provider unavailable"); }
+};
+await assert.doesNotReject(
+  vm.runInNewContext(`${createCultureSource}; createCulture()`, cultureSessionContext)
+);
+assert.equal(cultureSessionMessages.length, 1);
+assert.equal(cultureSessionMessages[0].type, "error");
+assert.match(cultureSessionMessages[0].message, /Session provider unavailable/);
+console.log("✓ Culture creation: session lookup failures produce controlled feedback");
+
+const batchProtocolSource = `async ${extractFunction(engine, "createBatch")}`;
+const batchProtocolMessages = [];
+const batchProtocolButton = { disabled: false, textContent: "Créer le batch" };
+const batchProtocolContext = {
+  authStateRevision: 1,
+  organizationId: "org-test",
+  clearMessage() {},
+  showMessage(message, type) { batchProtocolMessages.push({ message, type }); },
+  batchCodeInput: { value: "BATCH-TEST" },
+  batchNameInput: { value: "Test batch" },
+  batchTypeSelect: { value: "SPAWN" },
+  batchCultureSelect: { value: "culture-1" },
+  batchQuantityInput: { value: "" },
+  batchUnitInput: { value: "" },
+  cultureOptions: [{ id: "culture-1", material_id: "material-1" }],
+  getCultureProtocolVersionId: async () => { throw new Error("Protocol lookup unavailable"); },
+  isCurrentWorkspaceRevision: () => true,
+  createBatchButton: batchProtocolButton,
+  console
+};
+await assert.doesNotReject(
+  vm.runInNewContext(`${batchProtocolSource}; createBatch()`, batchProtocolContext)
+);
+assert.equal(batchProtocolMessages.length, 1);
+assert.equal(batchProtocolMessages[0].type, "error");
+assert.match(batchProtocolMessages[0].message, /Protocol lookup unavailable/);
+assert.equal(batchProtocolButton.disabled, false);
+assert.equal(batchProtocolButton.textContent, "Créer le batch");
+console.log("✓ Batch creation: protocol lookup failures produce controlled feedback");
