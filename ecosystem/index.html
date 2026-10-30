@@ -386,6 +386,46 @@ h1 span{color:#748b5e}
  .tile:hover,.lang:hover,.btn:hover{transform:none!important}
  .webgl-intro-orb{animation:none!important}
 }
+
+</style>
+<style id="balabs-readable-3d-navigation">
+/* Readability pass: solid high-contrast text surfaces for the 3D navigation. */
+#mainView.webgl-ready .webgl-focus{
+  width:min(320px,52%)!important;padding:16px 17px!important;gap:8px!important;
+  background:rgba(17,29,22,.97)!important;border:1px solid #a8c69a!important;
+  border-radius:15px!important;box-shadow:0 14px 36px rgba(0,0,0,.48),inset 0 1px rgba(255,255,255,.08)!important;
+  -webkit-backdrop-filter:blur(16px)!important;backdrop-filter:blur(16px)!important;
+}
+#mainView .webgl-focus-kicker{color:#d2e8bd!important;font-size:10px!important;line-height:1.5!important;letter-spacing:.15em!important}
+#mainView .webgl-focus strong{color:#fff!important;font-size:clamp(17px,1.7vw,21px)!important;line-height:1.25!important}
+#mainView .webgl-focus small{color:#e0e9df!important;font-size:12px!important;line-height:1.55!important}
+#mainView .webgl-focus-meta{color:#e3efdc!important;background:#344b39!important;border:1px solid #789574!important;font-size:11px!important;line-height:1.5!important;padding:5px 8px!important}
+#mainView .webgl-focus-next{color:#d2e8bd!important;font-size:10px!important;line-height:1.5!important}
+#mainView .webgl-focus-links{gap:7px!important;max-height:190px!important}
+#mainView .webgl-focus-link{background:#2b4232!important;border:1px solid #779675!important;color:#fff!important;padding:9px 11px!important;border-radius:10px!important;font-size:12px!important;line-height:1.4!important}
+#mainView .webgl-focus-link span{color:#fff!important;font-size:12px!important;line-height:1.4!important}
+#mainView .webgl-focus-reason{color:#dce8d9!important;font-size:11px!important;line-height:1.45!important;opacity:1!important}
+#mainView .webgl-focus-link:hover,#mainView .webgl-focus-link:focus-visible{background:#405b45!important;border-color:#d2e8bd!important;color:#fff!important}
+#mainView .webgl-stage .webgl-hint{background:rgba(15,25,19,.96)!important;border:1px solid #9ab58e!important;color:#fff!important;font-size:11px!important;font-weight:700!important;letter-spacing:.035em!important;line-height:1.55!important;text-shadow:none!important;box-shadow:0 8px 24px rgba(0,0,0,.45)!important;padding:10px 13px!important}
+#mainView .webgl-stage .webgl-status{color:#f0f7e9!important;background:rgba(15,25,19,.94)!important;border:1px solid #789574!important;border-radius:8px!important;padding:7px 9px!important;font-size:10px!important;line-height:1.45!important;letter-spacing:.08em!important;text-shadow:none!important}
+.miniintro p{color:#3e4d42!important;font-size:14px!important;line-height:1.7!important}
+.linknode small{color:#d8e3d7!important;font-size:11px!important;line-height:1.5!important}
+.linknode span{font-size:9px!important}
+@media(max-width:760px){
+ #mainView.webgl-ready .webgl-focus{left:10px!important;top:10px!important;width:min(286px,calc(100% - 78px))!important;max-height:calc(100% - 116px)!important;padding:12px!important;gap:7px!important}
+ #mainView .webgl-focus strong{font-size:17px!important}
+ #mainView .webgl-focus small{font-size:12px!important}
+ #mainView .webgl-focus-links{max-height:170px!important;gap:6px!important}
+ #mainView .webgl-focus-link{padding:8px 9px!important}
+ #mainView .webgl-focus-reason{font-size:11px!important}
+ #mainView .webgl-stage .webgl-hint{max-width:calc(100% - 24px)!important;bottom:12px!important;font-size:10px!important;padding:9px 11px!important}
+ #mainView .webgl-stage .webgl-status{right:10px!important;bottom:58px!important;max-width:45%!important;font-size:9px!important}
+}
+@media(max-width:370px){
+ #mainView.webgl-ready .webgl-focus{width:calc(100% - 72px)!important;padding:10px!important}
+ #mainView .webgl-focus-link{font-size:11px!important}
+ #mainView .webgl-focus-reason{font-size:10px!important}
+}
 </style>
 
 </body>
