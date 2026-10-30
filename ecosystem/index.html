@@ -1393,6 +1393,138 @@ body{background:linear-gradient(180deg,#0b1214 0,#101a1b 44%,#eeeade 44%,#eeeade
   .editorial-method{background:#D1D0C5!important}
 }
 
+
+
+/* 2026-10-30 — structural art direction: stop the repeated illustrated-board effect.
+   Remove ornamental line drawings; let typography, real imagery and whitespace carry the story.
+   The interactive 3D explorer and its scripts remain untouched. */
+.editorial-art,
+.work-illustration{display:none!important}
+.editorial-feature,
+.editorial-about,
+.editorial-work,
+.editorial-method,
+.universe-bridge{
+  filter:none!important;
+  backdrop-filter:none!important;
+  -webkit-backdrop-filter:none!important;
+  box-shadow:none!important;
+  background-image:none!important;
+}
+.editorial-feature{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) minmax(280px,.72fr)!important;
+  align-items:center!important;
+  gap:clamp(32px,7vw,110px)!important;
+  min-height:430px!important;
+  padding:clamp(64px,9vw,120px) clamp(24px,8vw,112px)!important;
+  background:#D1D0C5!important;
+  border:0!important;
+}
+.editorial-feature .editorial-copy{max-width:760px!important}
+.editorial-feature .editorial-copy h2{
+  max-width:760px!important;
+  font-size:clamp(42px,6.2vw,82px)!important;
+  line-height:.98!important;
+  letter-spacing:-.055em!important;
+}
+.editorial-feature .editorial-copy p{
+  max-width:560px!important;
+  font-size:clamp(15px,1.35vw,18px)!important;
+  line-height:1.8!important;
+}
+.editorial-feature .feature-status{margin:20px 0!important}
+.editorial-feature .editorial-link{display:inline-flex!important;margin-top:18px!important}
+.editorial-about{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr)!important;
+  min-height:0!important;
+  padding:clamp(62px,8vw,104px) clamp(24px,8vw,112px)!important;
+  background:#263B38!important;
+  border:0!important;
+}
+.editorial-about .about-copy{max-width:940px!important}
+.editorial-about .about-copy h2{
+  max-width:850px!important;
+  font-size:clamp(38px,5.5vw,72px)!important;
+  line-height:1.02!important;
+}
+.editorial-about .about-copy p{
+  max-width:690px!important;
+  font-size:clamp(15px,1.3vw,17px)!important;
+  line-height:1.85!important;
+}
+.editorial-work{
+  padding:clamp(64px,8vw,108px) clamp(24px,8vw,112px)!important;
+  background:#111B1D!important;
+  border:0!important;
+}
+.work-heading{margin-bottom:50px!important}
+.work-grid{
+  display:grid!important;
+  grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  gap:0!important;
+  max-width:1320px!important;
+  background:transparent!important;
+  border:0!important;
+  border-top:1px solid #60746B!important;
+  border-bottom:1px solid #60746B!important;
+}
+.work-card,.work-myco,.work-soil,.work-iot{
+  min-height:0!important;
+  padding:28px clamp(18px,2.4vw,34px) 30px!important;
+  background:transparent!important;
+  border:0!important;
+  border-top:0!important;
+  border-radius:0!important;
+  box-shadow:none!important;
+  transform:none!important;
+}
+.work-card+.work-card{border-left:1px solid #52665D!important}
+.work-card:before,.work-card:after{display:none!important;content:none!important}
+.work-index{display:block!important;margin-bottom:30px!important;color:#D6A087!important}
+.work-card h3,.work-soil h3,.work-iot h3{
+  font-size:clamp(22px,2.2vw,30px)!important;
+  line-height:1.1!important;
+  margin-bottom:14px!important;
+}
+.work-card p,.work-soil p,.work-iot p{
+  font-size:14px!important;
+  line-height:1.8!important;
+}
+.work-topics{font-size:9px!important;line-height:1.8!important}
+.work-tag{margin-top:28px!important}
+.editorial-method{border:0!important}
+.hero .hero-micrograph{
+  filter:none!important;
+  opacity:.26!important;
+}
+.editorial-feature *,
+.editorial-about *,
+.editorial-work *,
+.editorial-method *,
+.universe-bridge *{
+  text-shadow:none!important;
+}
+@media(max-width:760px){
+  .editorial-feature{
+    grid-template-columns:1fr!important;
+    min-height:0!important;
+    gap:18px!important;
+    padding:52px 22px!important;
+  }
+  .editorial-feature .editorial-copy h2{font-size:clamp(38px,10vw,58px)!important}
+  .editorial-about{padding:52px 22px!important}
+  .editorial-about .about-copy h2{font-size:clamp(36px,9vw,54px)!important}
+  .editorial-work{padding:54px 22px!important}
+  .work-heading{margin-bottom:28px!important}
+  .work-grid{grid-template-columns:1fr!important}
+  .work-card,.work-myco,.work-soil,.work-iot{padding:24px 0!important}
+  .work-card+.work-card{border-left:0!important;border-top:1px solid #52665D!important}
+  .work-index{margin-bottom:18px!important}
+  .work-tag{margin-top:18px!important}
+}
+
 </style>
 </head>
 <body>
