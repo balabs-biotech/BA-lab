@@ -97,6 +97,8 @@ for (const language of ['ar', 'en', 'pt']) {
   }
 }
 
+assert.ok(scene.includes("if(!rootPage?.children?.length)"), 'A language with no mapped child pages must show a transparent empty-state in the selected domain panel');
+assert.ok(scene.includes('Aucune page de branche n’est encore reliée à cet univers dans cette langue.') && scene.includes('No branch pages are linked to this world in this language yet.') && scene.includes('لا توجد صفحات فروع مرتبطة بهذا العالم بهذه اللغة حتى الآن.') && scene.includes('Ainda não há páginas de ramificação ligadas a este universo neste idioma.'), 'Empty branch state must be localized for French, English, Arabic and Portuguese');
 assert.ok(scene.includes('const visit=(node,depth=0,parentId=domainTree.id'), '3D engine must recursively expand nested Notion pages');
 assert.ok(scene.includes('data-notion-tree-node="true"'), 'Manifest nodes must be injected into the 3D resource layer');
 assert.ok(scene.includes('parentId:a.dataset.parentId') && scene.includes('depth:Number(a.dataset.depth||0)'), '3D resource nodes must retain their hierarchy metadata');
