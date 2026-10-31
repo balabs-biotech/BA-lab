@@ -17,6 +17,46 @@
           "url": "https://app.notion.com/p/40173152f17181a99780d3ca1ee77cdb",
           "description": "Interações dos fungos e possíveis aplicações biológicas.",
           "children": []
+        },
+        {
+          "id": "pt-myco-pleurotus-library",
+          "title": "Pleurotus — espécies e recursos cultivados",
+          "notionId": "40273152f17181f29a8efba7e0d87825",
+          "description": "Coleção que distingue fichas de espécies de registos de recursos e designações de cultura, sem presumir identidade ou disponibilidade.",
+          "url": "https://app.notion.com/p/40273152f17181f29a8efba7e0d87825",
+          "children": []
+        },
+        {
+          "id": "pt-myco-culture-propagation",
+          "title": "Cultura e propagação",
+          "notionId": "40173152f171811f89bddf90ecd97465",
+          "description": "Percurso da cultura fúngica: isolamento, purificação, expansão, preparação de inóculo, incubação e ensaios de frutificação.",
+          "url": "https://app.notion.com/p/40173152f171811f89bddf90ecd97465",
+          "children": []
+        },
+        {
+          "id": "pt-myco-other-fungi",
+          "title": "Outros fungos estudados e cultivados",
+          "notionId": "40273152f17181ec9770df8a5a662720",
+          "description": "Fichas de outros fungos de interesse para cultivo ou estudo biológico, sem os apresentar como culturas validadas ou disponíveis.",
+          "url": "https://app.notion.com/p/40273152f17181ec9770df8a5a662720",
+          "children": []
+        },
+        {
+          "id": "pt-myco-mycorrhiza",
+          "title": "Micorrizas e interações biológicas",
+          "notionId": "40173152f1718134a778d4c8d405ca62",
+          "description": "Interações entre fungos, microrganismos e plantas, incluindo temas de investigação sobre micorrizas.",
+          "url": "https://app.notion.com/p/40173152f1718134a778d4c8d405ca62",
+          "children": []
+        },
+        {
+          "id": "pt-myco-glomus",
+          "title": "Glomus brasilianum — ficha do organismo",
+          "notionId": "40173152f17181dcb1b3cd27efc9e6ba",
+          "description": "Referência a um fungo micorrízico arbuscular; esporos, hifas e estruturas radiculares são relevantes para a sua caracterização.",
+          "url": "https://app.notion.com/p/40173152f17181dcb1b3cd27efc9e6ba",
+          "children": []
         }
       ]
     },
@@ -33,6 +73,14 @@
           "url": "https://app.notion.com/p/40173152f171814ca1cae513ca2f0427",
           "description": "Microrganismos associados aos sistemas e às interações agrícolas.",
           "children": []
+        },
+        {
+          "id": "pt-bio-substrates",
+          "title": "Substratos e suportes biológicos",
+          "notionId": "40173152f17181b780dcc20a20962afa",
+          "description": "Como a estrutura, a água, a composição e a microbiota dos suportes condicionam a colonização e os ensaios biológicos.",
+          "url": "https://app.notion.com/p/40173152f17181b780dcc20a20962afa",
+          "children": []
         }
       ]
     },
@@ -41,7 +89,16 @@
       "title": "Agrotecnologia",
       "notionId": "40173152f17181b9be7ae84e413092d5",
       "url": "https://app.notion.com/p/40173152f17181b9be7ae84e413092d5",
-      "children": []
+      "children": [
+        {
+          "id": "pt-soil-fermenters",
+          "title": "Fermentadores e processos-piloto",
+          "notionId": "40173152f17181f19424c0aee1e7a863",
+          "description": "Conceitos de fermentadores modulares e processos-piloto em desenvolvimento, distinguindo desenhos de equipamentos construídos e validados.",
+          "url": "https://app.notion.com/p/40173152f17181f19424c0aee1e7a863",
+          "children": []
+        }
+      ]
     },
     {
       "id": "iot",
@@ -72,7 +129,16 @@
       "title": "O laboratório",
       "notionId": "40173152f17181798082ffafe45e245b",
       "url": "https://app.notion.com/p/40173152f17181798082ffafe45e245b",
-      "children": []
+      "children": [
+        {
+          "id": "pt-lab-plant-experimentation",
+          "title": "Experimentação vegetal",
+          "notionId": "40173152f17181339a48d9c5ddde6829",
+          "description": "Ensaios que acompanham a resposta das plantas aos suportes de cultivo, à água e às condições de estufa.",
+          "url": "https://app.notion.com/p/40173152f17181339a48d9c5ddde6829",
+          "children": []
+        }
+      ]
     },
     {
       "id": "products",
@@ -134,6 +200,22 @@
           "notionId": "40173152f17181f194deca033c534128",
           "url": "https://app.notion.com/p/40173152f17181f194deca033c534128",
           "description": "Como apresentar uma necessidade e preparar uma colaboração.",
+          "children": []
+        },
+        {
+          "id": "pt-work-measurement",
+          "title": "Medição e reprodutibilidade",
+          "notionId": "40273152f1718150b2beccb7c12d0792",
+          "description": "Princípios para registar variáveis, instrumentos, unidades e condições, tornando os ensaios comparáveis.",
+          "url": "https://app.notion.com/p/40273152f1718150b2beccb7c12d0792",
+          "children": []
+        },
+        {
+          "id": "pt-work-prototypes",
+          "title": "Protótipos e ensaios",
+          "notionId": "40273152f17181ed8c23f8efa76a2587",
+          "description": "Como transformar hipóteses biológicas ou técnicas em protótipos e ciclos de ensaio documentados.",
+          "url": "https://app.notion.com/p/40273152f17181ed8c23f8efa76a2587",
           "children": []
         }
       ]
