@@ -132,7 +132,7 @@ else if(root){
     ctx.clearRect(0,0,512,128);ctx.font='800 '+size+'px system-ui, sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';
     const label=text.slice(0,34);ctx.lineJoin='round';ctx.lineWidth=8;ctx.strokeStyle='rgba(7,12,16,.96)';ctx.strokeText(label,256,64,490);ctx.shadowColor='rgba(0,0,0,.95)';ctx.shadowBlur=14;ctx.shadowOffsetY=2;ctx.fillStyle='#D1D0C5';ctx.fillText(label,256,64,490);
     const tex=new THREE.CanvasTexture(cv);tex.colorSpace=THREE.SRGBColorSpace;
-    const spr=new THREE.Sprite(new THREE.SpriteMaterial({map:tex,transparent:true,depthWrite:false,depthTest:false}));spr.scale.set(2.5,.62,1);spr.renderOrder=20;return spr;
+    const spr=new THREE.Sprite(new THREE.SpriteMaterial({map:tex,transparent:true,depthWrite:false,depthTest:false}));spr.scale.set(3.05,.76,1);spr.renderOrder=20;return spr;
   };
   // Shared by the anastomosis builder and the relay animator below init().
   let junctionPaths=[];
@@ -193,7 +193,7 @@ else if(root){
         const axonSide=new THREE.Vector3().crossVectors(axonDir,new THREE.Vector3(.31,.87,.43)).normalize();
         const axonMid=axonStart.clone().lerp(axonEnd,.52).addScaledVector(axonSide,.10);
         const axonCurve=new THREE.QuadraticBezierCurve3(axonStart,axonMid,axonEnd);
-        const axon=makeNeurite(axonCurve,color,.052,1,34);
+        const axon=makeNeurite(axonCurve,color,.036,.94,34);
         axon.userData={kind:'dendrite',id,process:'axon'};worldGroup.add(axon);twigs.push(axon);
         // Terminal axon collaterals branch only near the far end.
         for(let b=0;b<2;b++){
@@ -220,7 +220,7 @@ else if(root){
           const side=new THREE.Vector3().crossVectors(dir,polarity).normalize();
           const mid=start.clone().lerp(end,.46).addScaledVector(side,(k%2?-.11:.12));
           const curve=new THREE.QuadraticBezierCurve3(start,mid,end);
-          const dendrite=makeNeurite(curve,color,.047,.98,22);
+          const dendrite=makeNeurite(curve,color,.033,.92,22);
           dendrite.userData={kind:'dendrite',id,process:'dendrite'};worldGroup.add(dendrite);twigs.push(dendrite);
           for(let forkIndex=0;forkIndex<2;forkIndex++){
             const u=forkIndex===0?.58:.78,junction=curve.getPoint(u),tangent=curve.getTangent(u);
@@ -371,7 +371,7 @@ else if(root){
           const direction=new THREE.Vector3().crossVectors(origin.clone().add(new THREE.Vector3(.001,.002,.003)),p.clone().add(new THREE.Vector3(.013,.007,.019))).normalize();
           const bend=midpoint.addScaledVector(direction,.28+(ids.indexOf(id)%3)*.07).add(new THREE.Vector3(Math.sin(ids.indexOf(id)*1.7)*.15,Math.cos(ids.indexOf(id)*1.3)*.12,Math.cos(ids.indexOf(id)*1.1)*.16));
           const path=new THREE.QuadraticBezierCurve3(origin,bend,p);
-          const line=makeNeurite(path,color,.066,1,64);line.userData={kind:'edge',id};worldGroup.add(line);
+          const line=makeNeurite(path,color,.044,.94,64);line.userData={kind:'edge',id};worldGroup.add(line);
           const pulse=new THREE.Mesh(new THREE.IcosahedronGeometry(.047,1),new THREE.MeshBasicMaterial({color,transparent:true,opacity:1,depthWrite:false,toneMapped:false}));
           pulse.userData={kind:'signal',id};worldGroup.add(pulse);
           const pulse2=new THREE.Mesh(new THREE.SphereGeometry(.03,12,10),new THREE.MeshBasicMaterial({color,transparent:true,opacity:.9,depthWrite:false,toneMapped:false}));pulse2.userData={kind:'signal',id};worldGroup.add(pulse2);
@@ -434,7 +434,7 @@ else if(root){
         const mid=pa.base.clone().lerp(pb.base,.5).addScaledVector(axis,bend);
         const curve=new THREE.QuadraticBezierCurve3(pa.base,mid,pb.base);
         const signalColor=new THREE.Color(0x78958A),pulseColor=new THREE.Color(0xB96B4D);
-        const line=makeNeurite(curve,signalColor,.052,1,72);
+        const line=makeNeurite(curve,signalColor,.034,.92,72);
         // Keep transverse pathways legible without letting them overpower the biological branches.
         line.material.emissive.copy(signalColor).multiplyScalar(.40);line.material.emissiveIntensity=.48;
         line.userData={kind:'relation',a,b};worldGroup.add(line);
