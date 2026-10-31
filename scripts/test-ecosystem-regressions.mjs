@@ -45,6 +45,32 @@ for (const domain of tree.domains) {
   visit(domain);
 }
 assert.ok(scene.includes("new URL('./notion-tree.'+lang+'.json'"), '3D engine must load a language-specific Notion tree manifest');
+const curatedMatch = scene.match(/const curatedByLanguage=\{([\s\S]*?)\n      \};/);
+assert.ok(curatedMatch, 'Learning universe must define language-specific curated resources');
+const curatedIds = {};
+for (const line of curatedMatch[1].split('\n')) {
+  const entry = line.match(/^\s*(fr|ar|en|pt):\[(.*?)\]/);
+  if (entry) curatedIds[entry[1]] = [...entry[2].matchAll(/'([^']+)'/g)].map((match) => match[1]);
+}
+for (const language of ['fr', 'ar', 'en', 'pt']) {
+  const localizedTree = JSON.parse(readFileSync(`ecosystem/notion-tree.${language}.json`, 'utf8'));
+  const nodes = [];
+  const collect = (node, parent = null) => {
+    nodes.push({ ...node, parent });
+    for (const child of node.children || []) collect(child, node);
+  };
+  localizedTree.domains.forEach((domain) => collect(domain));
+  const urls = nodes.map((node) => node.url);
+  assert.equal(new Set(urls).size, urls.length, `The ${language} tree must not duplicate Notion page URLs`);
+  for (const node of nodes) {
+    assert.equal(node.notionId.toLowerCase(), node.url.split('/').pop().toLowerCase(), `The ${language} Notion ID and URL must match for ${node.id}`);
+    if (node.parent) assert.notEqual(node.url, node.parent.url, `The ${language} child ${node.id} must not link back to its parent page`);
+  }
+  const ids = new Set(nodes.map((node) => node.id));
+  assert.ok(curatedIds[language]?.length === 8, `The ${language} learning collection must contain eight curated resources`);
+  for (const id of curatedIds[language]) assert.ok(ids.has(id), `Missing ${language} learning resource: ${id}`);
+}
+
 for (const language of ['ar', 'en', 'pt']) {
   const localizedTree = JSON.parse(readFileSync(`ecosystem/notion-tree.${language}.json`, 'utf8'));
   assert.equal(localizedTree.version, 1, `The ${language} Notion tree must use the supported schema version`);
