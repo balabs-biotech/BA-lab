@@ -132,6 +132,9 @@ assert.ok(scene.includes('else if(routeTrail[routeTrail.length-1]!==targetId)rou
 assert.ok(scene.includes('if(existing>=0)routeTrail=routeTrail.slice(0,existing+1)'), 'Returning to an earlier domain must truncate the route instead of creating a loop');
 assert.ok(scene.includes('routeIndex=routeActive&&e.relation?routeTrail.findIndex((id,index)=>index<routeTrail.length-1&&((id===e.aId&&routeTrail[index+1]===e.bId)||(id===e.bId&&routeTrail[index+1]===e.aId))):-1,routeEdge=routeIndex>=0'), 'Only connections belonging to the visited multi-hop trail should receive route emphasis');
 assert.ok(scene.includes('const reverse=routeEdge?routeTrail[routeIndex]===e.bId:'), 'Cross-domain signal pulses must preserve direction along every segment of the multi-hop trail');
+assert.ok(scene.includes('selectedBranchPath=new Set([obj.userData.nodeId]);let ancestorId=obj.userData.parentId;while(ancestorId&&ancestorId!==obj.userData.sourceId)'), 'Selecting a Notion branch must reconstruct its complete ancestor chain in the 3D tree');
+assert.ok(scene.includes('selectedBranchPath.has(obj.userData.nodeId)||selectedBranchPath.has(obj.userData.targetId)'), 'The selected branch and each ancestor must remain visually emphasized');
+assert.ok(scene.includes("['resource-spoke','resource','resource-label'].includes(kind)&&!onSelectedPath"), 'Unrelated sibling branches must be softened without being removed from the scene');
 assert.ok(scene.includes('routeTrail=[];flyTo(null'), 'Returning to the overview must clear the previous multi-hop route');
 assert.ok(scene.includes('const ringSize=12,ring=siblings>ringSize?Math.floor(siblingIndex/ringSize):0') && scene.includes('2.45+ring*1.25'), 'Large branch families must spread across concentric organic rings instead of colliding on one circle');
 assert.ok(scene.includes('siblings>ringSize?1.28:1.95'), 'Dense branch families must use narrower labels to reduce overlap');
