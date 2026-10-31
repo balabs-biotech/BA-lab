@@ -25,7 +25,7 @@ assert.ok(scene.includes('window.enterSphere(id,false)'), '3D selection must cal
 assert.ok(!scene.includes("document.querySelector('[data-sphere=\"'+id+'\"]')?.click()") && !scene.includes("document.querySelector('[data-sphere=\"'+id+'\"]').click()"), '3D selection must not proxy-click the legacy DOM menu');
 
 assert.ok(scene.includes("root.classList.add('webgl-ready','universe-closed')"), 'The 3D scene must start in the single closed gateway state');
-assert.ok(scene.includes('worldGroup.scale.setScalar(closed?.72:(camera?.aspect<.78?1:1.18))'), 'Gateway and full universe must use one responsive scaled 3D scene with a readable overview scale');
+assert.ok(scene.includes('worldGroup.scale.set(closed?.72:(camera?.aspect<.78?.88:1.18),closed?.72:(camera?.aspect<.78?1.12:1.18),closed?.72:(camera?.aspect<.78?1:1.18))'), 'Gateway and full universe must use one responsive scaled 3D scene with a readable overview scale');
 assert.ok(scene.includes('THREE.MathUtils.clamp(dist+delta*.012,3.2,120)'), '3D wheel navigation must support a long-range overview zoom');
 assert.ok(html.includes('class="linknode ln1" href="#"') && html.includes('target="_blank"'), 'Domain resource nodes must be real links that open their matching Notion pages');
 assert.ok(html.includes('a.href=p[1]') && html.includes('a.onclick=null'), 'Domain resource links must preserve the exact page URL without intercepting navigation');
