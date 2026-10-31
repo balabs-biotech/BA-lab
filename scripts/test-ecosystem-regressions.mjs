@@ -137,4 +137,7 @@ assert.ok(scene.includes('selectedBranchPath.has(obj.userData.nodeId)||selectedB
 assert.ok(scene.includes("['resource-spoke','resource','resource-label'].includes(kind)&&!onSelectedPath"), 'Unrelated sibling branches must be softened without being removed from the scene');
 assert.ok(scene.includes('routeTrail=[];flyTo(null'), 'Returning to the overview must clear the previous multi-hop route');
 assert.ok(scene.includes('const ringSize=12,ring=siblings>ringSize?Math.floor(siblingIndex/ringSize):0') && scene.includes('2.45+ring*1.25'), 'Large branch families must spread across concentric organic rings instead of colliding on one circle');
+assert.ok(scene.includes('depth===1?(siblings>ringSize?2.45+ring*1.25:2.75):depth===2?1.9:1.55'), 'Branch levels 1, 2 and 3 must occupy progressively separated spatial layers');
+assert.ok(scene.includes('new THREE.Color(color).lerp(new THREE.Color(0xB96B4D),Math.min(.32,Math.max(0,(depth-1)*.16)))'), 'Deeper branch levels must receive a restrained copper tint while retaining their domain identity');
+assert.ok(scene.includes('depth===1?.18:depth===2?.135:.105'), 'Branch node size must distinguish primary, secondary and tertiary levels');
 assert.ok(scene.includes('siblings>ringSize?1.28:1.95'), 'Dense branch families must use narrower labels to reduce overlap');
