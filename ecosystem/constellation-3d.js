@@ -47,7 +47,8 @@ if(root&&!THREE){show3DFailure()}
 else if(root){
   const sphereEls=[...document.querySelectorAll('[data-sphere]')];
   const ids=['bio','myco','soil','lab','products','iot','work','learn'];
-  const colors={bio:0x58786b,myco:0x6f8977,soil:0x7d8975,lab:0x536f70,products:0x8b7468,iot:0x66827e,work:0x7c8178,learn:0x8c846d};
+  // Lift the mineral palette one step in luminance: distinct cell identities, still restrained and non-neon.
+  const colors={bio:0x78a58f,myco:0xa58cc4,soil:0xc19a70,lab:0x6f9fae,products:0xc78370,iot:0x79a9a3,work:0xa69aae,learn:0xb6b68a};
   const labels=Object.fromEntries(sphereEls.map(el=>[el.dataset.sphere,{title:el.querySelector('b')?.textContent||el.dataset.sphere,sub:el.querySelector('small')?.textContent||''}]));
   const stage=document.createElement('div');stage.className='webgl-stage';stage.setAttribute('role','application');stage.setAttribute('aria-label','Constellation 3D interactive BALabs');stage.tabIndex=0;
   const hint=document.createElement('div');hint.className='webgl-hint';hint.id='webgl-navigation-hint';stage.setAttribute('aria-describedby',hint.id);const hintText={fr:'GLISSER POUR TOURNER · PINCER POUR ZOOMER · TOUCHER UN UNIVERS',en:'DRAG TO ROTATE · PINCH TO ZOOM · TAP A WORLD',ar:'اسحب للتدوير · اقرص للتكبير · المس عالماً',pt:'ARRASTE PARA RODAR · USE DOIS DEDOS PARA AMPLIAR · TOQUE NUM UNIVERSO'};const refreshHint=()=>{hint.textContent=hintText[document.documentElement.lang]||hintText.fr};refreshHint();new MutationObserver(refreshHint).observe(document.documentElement,{attributes:true,attributeFilter:['lang']});
@@ -143,7 +144,7 @@ else if(root){
       stage.prepend(renderer.domElement);renderer.domElement.setAttribute('aria-label','Scène 3D BALabs');
       scene=new THREE.Scene();scene.fog=new THREE.FogExp2(0x111b1d,.0068);worldGroup=new THREE.Group();scene.add(worldGroup);worldGroup.visible=false;
       camera=new THREE.PerspectiveCamera(48,1,.1,420);raycaster=new THREE.Raycaster();mouse=new THREE.Vector2();
-      scene.add(new THREE.AmbientLight(0xd1d0c5,1.18));
+      scene.add(new THREE.AmbientLight(0xdce4dc,1.28));
       const key=new THREE.PointLight(0x78958a,25,32);key.position.set(0,5,6);scene.add(key);
       const fill=new THREE.PointLight(0x52766b,20,28);fill.position.set(-6,-2,-4);scene.add(fill);
       const warm=new THREE.PointLight(0xb96b4d,13,20);warm.position.set(5,-3,4);scene.add(warm);
