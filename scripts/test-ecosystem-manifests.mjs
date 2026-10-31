@@ -29,8 +29,9 @@ for (const language of expectedLanguages) {
     assert.match(node.url || '', /^https:\/\/app\.notion\.com\/p\/[a-f0-9]{32}$/, trail + ': invalid public Notion URL');
     assert.ok(!urls.has(node.url), trail + ': duplicate Notion URL ' + node.url);
     urls.add(node.url);
-    assert.ok(Array.isArray(node.children), trail + ': children must be an array');
-    for (const child of node.children) visit(child, trail);
+    const children = node.children ?? [];
+    assert.ok(Array.isArray(children), trail + ': children must be an array when present');
+    for (const child of children) visit(child, trail);
   };
 
   for (const domain of manifest.domains) visit(domain);
