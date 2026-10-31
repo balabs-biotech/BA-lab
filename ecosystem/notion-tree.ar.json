@@ -32,6 +32,38 @@
               "url": "https://app.notion.com/p/40173152f17181afb288feda1d2c3e5c",
               "description": "مجالات علمية تُدرس فيها الفطريات ووظائفها، مع التمييز بين البحث والتطبيقات المثبتة.",
               "children": []
+            },
+            {
+              "id": "ar-pleurotus-pulmonarius",
+              "title": "Pleurotus pulmonarius — بطاقة النوع والزراعة",
+              "notionId": "40273152f17181c48525e7bb8ab81f2a",
+              "url": "https://app.notion.com/p/40273152f17181c48525e7bb8ab81f2a",
+              "description": "نوع من فطر المحار يُعرض ضمن الموارد المزروعة، مع معلومات تعريفية وزراعية مرتبطة به.",
+              "children": []
+            },
+            {
+              "id": "ar-pleurotus-citrinopileatus",
+              "title": "Pleurotus citrinopileatus — بطاقة الكائن",
+              "notionId": "40173152f171816cbdbff911ab858ee1",
+              "url": "https://app.notion.com/p/40173152f171816cbdbff911ab858ee1",
+              "description": "نوع من فطر المحار الأصفر؛ تعرض البطاقة خصائصه ومعلومات زراعته.",
+              "children": []
+            },
+            {
+              "id": "ar-pleurotus-eryngii",
+              "title": "Pleurotus eryngii والهجن — بطاقة المجموعة",
+              "notionId": "40173152f17181759edbf2beb5b2ba78",
+              "url": "https://app.notion.com/p/40173152f17181759edbf2beb5b2ba78",
+              "description": "مجموعة فطرية تشمل Pleurotus eryngii والهجن المرتبطة به.",
+              "children": []
+            },
+            {
+              "id": "ar-scleroderma",
+              "title": "Scleroderma spp. — مجموعة الفطريات الجذرية الخارجية",
+              "notionId": "40273152f17181d4aa96c4d6aac56b26",
+              "url": "https://app.notion.com/p/40273152f17181d4aa96c4d6aac56b26",
+              "description": "مجموعة من الفطريات الجذرية الخارجية، تُعرض ضمن الموارد الفطرية.",
+              "children": []
             }
           ]
         },
@@ -41,7 +73,56 @@
           "notionId": "40173152f17181c6b3baf6efc7bb60bc",
           "url": "https://app.notion.com/p/40173152f17181c6b3baf6efc7bb60bc",
           "description": "العلاقات بين الفطريات والجذور والتفاعلات البيولوجية المرتبطة بها.",
-          "children": []
+          "children": [
+            {
+              "id": "ar-rhizophagus-clarus",
+              "title": "Rhizophagus clarus (Glomus clarum) — بطاقة الكائن",
+              "notionId": "40173152f17181719006ef281004f5b9",
+              "url": "https://app.notion.com/p/40173152f17181719006ef281004f5b9",
+              "description": "فطر جذري تكافلي؛ تتناول البطاقة علاقته بالجذور وسياقه الزراعي.",
+              "children": []
+            },
+            {
+              "id": "ar-funneliformis-mosseae",
+              "title": "Funneliformis mosseae (Glomus mosseae) — بطاقة الكائن",
+              "notionId": "40173152f171815b98f8e23d75ce30dc",
+              "url": "https://app.notion.com/p/40173152f171815b98f8e23d75ce30dc",
+              "description": "فطر جذري تكافلي من مجموعة الفطريات الشجيرية، مرتبط بتفاعلات الجذور.",
+              "children": []
+            },
+            {
+              "id": "ar-pisolithus",
+              "title": "Pisolithus tinctorius — بطاقة الكائن",
+              "notionId": "40173152f171816294f4e4279f59b3f0",
+              "url": "https://app.notion.com/p/40173152f171816294f4e4279f59b3f0",
+              "description": "فطر جذري خارجي يرتبط بجذور بعض النباتات، ويُدرس ضمن التفاعلات بين الفطر والنبات.",
+              "children": []
+            },
+            {
+              "id": "ar-glomus-brasilianum",
+              "title": "Glomus brasilianum — بطاقة الكائن",
+              "notionId": "40173152f1718130a2f3ecb93f2b4bb2",
+              "url": "https://app.notion.com/p/40173152f1718130a2f3ecb93f2b4bb2",
+              "description": "بطاقة تعريف لفطر جذري ضمن مجموعة الفطريات الشجيرية.",
+              "children": []
+            },
+            {
+              "id": "ar-laccaria",
+              "title": "Laccaria laccata — بطاقة الكائن",
+              "notionId": "40173152f1718181af4ece2b3f17309a",
+              "url": "https://app.notion.com/p/40173152f1718181af4ece2b3f17309a",
+              "description": "فطر جذري خارجي؛ تعرض البطاقة علاقته بالنباتات المضيفة وسياقه البيئي.",
+              "children": []
+            },
+            {
+              "id": "ar-scleroderma",
+              "title": "Scleroderma spp. — مجموعة الفطريات الجذرية الخارجية",
+              "notionId": "40273152f17181d4aa96c4d6aac56b26",
+              "url": "https://app.notion.com/p/40273152f17181d4aa96c4d6aac56b26",
+              "description": "مجموعة من الفطريات الجذرية الخارجية؛ تعرض البطاقة خصائص المجموعة وعلاقاتها النباتية.",
+              "children": []
+            }
+          ]
         }
       ]
     },
@@ -105,7 +186,88 @@
           "notionId": "40173152f17181f18a55d7ba9a90a713",
           "url": "https://app.notion.com/p/40173152f17181f18a55d7ba9a90a713",
           "description": "كائنات دقيقة مرتبطة بالأنظمة والتطبيقات الزراعية.",
-          "children": []
+          "children": [
+            {
+              "id": "ar-trichoderma-longibrachiatum",
+              "title": "Trichoderma longibrachiatum — بطاقة الكائن",
+              "notionId": "40173152f1718120b071ca4a09a1de9a",
+              "url": "https://app.notion.com/p/40173152f1718120b071ca4a09a1de9a",
+              "description": "فطر دقيق من جنس Trichoderma، يُعرض ضمن الكائنات الدقيقة ذات الأهمية الزراعية.",
+              "children": []
+            },
+            {
+              "id": "ar-pgpr",
+              "title": "PGPR — بكتيريا مرتبطة بالجذور وإمكانات زراعية",
+              "notionId": "40273152f17181ea94edc6e07de079dd",
+              "url": "https://app.notion.com/p/40273152f17181ea94edc6e07de079dd",
+              "description": "مجموعة بكتيرية مرتبطة بمنطقة الجذور؛ تُدرس إمكاناتها في دعم نمو النبات.",
+              "children": []
+            },
+            {
+              "id": "ar-trichoderma-reesei",
+              "title": "Trichoderma reesei — بطاقة الكائن",
+              "notionId": "40173152f17181759965c75910ed327a",
+              "url": "https://app.notion.com/p/40173152f17181759965c75910ed327a",
+              "description": "نوع من Trichoderma معروف بإنتاج إنزيمات تحلل المواد النباتية.",
+              "children": []
+            },
+            {
+              "id": "ar-trichoderma-harzianum",
+              "title": "Trichoderma harzianum — بطاقة الكائن",
+              "notionId": "40173152f17181109ea9ca848fad3e23",
+              "url": "https://app.notion.com/p/40173152f17181109ea9ca848fad3e23",
+              "description": "نوع من Trichoderma يُدرس في سياق التفاعلات الميكروبية والتطبيقات الزراعية.",
+              "children": []
+            },
+            {
+              "id": "ar-trichoderma-hamatum",
+              "title": "Trichoderma hamatum — بطاقة الكائن",
+              "notionId": "40173152f17181df824fe38fd115c15d",
+              "url": "https://app.notion.com/p/40173152f17181df824fe38fd115c15d",
+              "description": "نوع من Trichoderma مرتبط بالتربة والبيئات الجذرية.",
+              "children": []
+            },
+            {
+              "id": "ar-cytobacillus-firmus",
+              "title": "Cytobacillus firmus (سابقًا Bacillus firmus) — بطاقة الكائن",
+              "notionId": "40173152f17181188254c7c123a1ec73",
+              "url": "https://app.notion.com/p/40173152f17181188254c7c123a1ec73",
+              "description": "بكتيريا عصوية كانت تُصنف ضمن Bacillus؛ تعرض البطاقة هويتها التصنيفية وسياقها الزراعي.",
+              "children": []
+            },
+            {
+              "id": "ar-bacillus-amyloliquefaciens",
+              "title": "Bacillus amyloliquefaciens — بطاقة الكائن",
+              "notionId": "40173152f17181da84cde85c873d85d3",
+              "url": "https://app.notion.com/p/40173152f17181da84cde85c873d85d3",
+              "description": "بكتيريا مرتبطة بالتربة والنبات، تُدرس ضمن الكائنات ذات الإمكانات الزراعية.",
+              "children": []
+            },
+            {
+              "id": "ar-bacillus-subtilis",
+              "title": "Bacillus subtilis — بطاقة الكائن",
+              "notionId": "40173152f1718131ad7fdb24233c647e",
+              "url": "https://app.notion.com/p/40173152f1718131ad7fdb24233c647e",
+              "description": "بكتيريا شائعة في التربة؛ تتناول البطاقة خصائصها واستخداماتها البحثية.",
+              "children": []
+            },
+            {
+              "id": "ar-sporosarcina-pasteurii",
+              "title": "Sporosarcina pasteurii — بطاقة الكائن",
+              "notionId": "40173152f1718103b7c9fcc5c06ef302",
+              "url": "https://app.notion.com/p/40173152f1718103b7c9fcc5c06ef302",
+              "description": "بكتيريا معروفة بقدرتها على تحفيز ترسيب كربونات الكالسيوم في ظروف مناسبة.",
+              "children": []
+            },
+            {
+              "id": "ar-brevibacillus-brevis",
+              "title": "Brevibacillus brevis — بطاقة الكائن",
+              "notionId": "40173152f17181bb96d4f63211d5641f",
+              "url": "https://app.notion.com/p/40173152f17181bb96d4f63211d5641f",
+              "description": "بكتيريا عصوية تُعرض ضمن موارد الأحياء الدقيقة ذات الأهمية الزراعية.",
+              "children": []
+            }
+          ]
         },
         {
           "id": "ar-soil-equipment",
