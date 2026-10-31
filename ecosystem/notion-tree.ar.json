@@ -177,6 +177,14 @@
               "url": "https://app.notion.com/p/40273152f17181329255c2052485c6c0",
               "description": "مجموعة من الفطريات الجذرية الخارجية المرتبطة بجذور النباتات.",
               "children": []
+            },
+            {
+              "id": "ar-other-fungi",
+              "title": "فطريات أخرى مدروسة أو مزروعة",
+              "notionId": "40273152f171817dafeae0d07ecb305f",
+              "url": "https://app.notion.com/p/40273152f171817dafeae0d07ecb305f",
+              "description": "مجموعة بطاقات لفطريات أخرى تدرسها BA Labs أو توثق مواردها، دون افتراض أن كل نوع متوفر كمزرعة موصوفة.",
+              "children": []
             }
           ]
         },
@@ -265,6 +273,22 @@
               "notionId": "40173152f17181deb719fcea5367afe1",
               "url": "https://app.notion.com/p/40173152f17181deb719fcea5367afe1",
               "description": "بطاقة تعريف لفطر جذري ضمن مجموعة Glomus.",
+              "children": []
+            },
+            {
+              "id": "ar-arbuscular-resources",
+              "title": "الفطريات الجذرية الشجيرية — الموارد والوظائف",
+              "notionId": "40273152f171813fb16ac5000499acfd",
+              "url": "https://app.notion.com/p/40273152f171813fb16ac5000499acfd",
+              "description": "مدخل إلى الفطريات الجذرية الشجيرية ووظائفها البيولوجية المحتملة وعلاقتها بجذور النباتات.",
+              "children": []
+            },
+            {
+              "id": "ar-ectomycorrhizal-resources",
+              "title": "الفطريات الجذرية الخارجية — الموارد والتفاعلات مع النباتات",
+              "notionId": "40273152f17181e59ab3feebe521aa71",
+              "url": "https://app.notion.com/p/40273152f17181e59ab3feebe521aa71",
+              "description": "مدخل إلى الفطريات الجذرية الخارجية وتفاعلاتها مع النباتات المضيفة والسياق البيئي.",
               "children": []
             }
           ]
@@ -477,21 +501,88 @@
       "title": "القياس والأتمتة",
       "notionId": "40173152f17181bf9bcfee1773043585",
       "url": "https://app.notion.com/p/40173152f17181bf9bcfee1773043585",
-      "children": []
+      "children": [
+        {
+          "id": "ar-iot-sensors",
+          "title": "القياس والمستشعرات",
+          "notionId": "40173152f1718187930fd89b1a619738",
+          "url": "https://app.notion.com/p/40173152f1718187930fd89b1a619738",
+          "description": "يعرض القياسات اليدوية والمستشعرات ومسار جمع البيانات، مع توضيح ما هو قائم وما يزال قيد التطوير.",
+          "children": []
+        },
+        {
+          "id": "ar-iot-automation",
+          "title": "أتمتة الزراعات",
+          "notionId": "40173152f171812bb348fa458bf85443",
+          "url": "https://app.notion.com/p/40173152f171812bb348fa458bf85443",
+          "description": "يشرح اتجاه أتمتة التهوية والرطوبة والحرارة والإضاءة، مع التنبيه إلى أن حلقات التحكم ما تزال قيد التطوير والتحقق.",
+          "children": []
+        },
+        {
+          "id": "ar-iot-traceability",
+          "title": "التتبع والبيانات",
+          "notionId": "40173152f1718101b2c1f56cd9b8c8c4",
+          "url": "https://app.notion.com/p/40173152f1718101b2c1f56cd9b8c8c4",
+          "description": "يربط بيانات الدفعات والملاحظات والظروف التجريبية لتسهيل المقارنة والتفسير.",
+          "children": []
+        }
+      ]
     },
     {
       "id": "lab",
       "title": "المختبر",
       "notionId": "40173152f1718187b28fd8c0a564c936",
       "url": "https://app.notion.com/p/40173152f1718187b28fd8c0a564c936",
-      "children": []
+      "children": [
+        {
+          "id": "ar-lab-plant-experimentation",
+          "title": "التجارب النباتية",
+          "notionId": "40173152f1718185a9e8c2972ec186f3",
+          "url": "https://app.notion.com/p/40173152f1718185a9e8c2972ec186f3",
+          "description": "يعرض تجارب النباتات ضمن بيئة المختبر والدفيئة، مع توثيق الظروف والملاحظات وحدود النتائج.",
+          "children": []
+        }
+      ]
     },
     {
       "id": "products",
       "title": "المنتجات والموارد البيولوجية",
       "notionId": "40173152f171817d8608cafa8a118065",
       "url": "https://app.notion.com/p/40173152f171817d8608cafa8a118065",
-      "children": []
+      "children": [
+        {
+          "id": "ar-product-wa",
+          "title": "WA — آغار الماء الجاهز للاستخدام",
+          "notionId": "40173152f171817d966dd334a044b4e8",
+          "url": "https://app.notion.com/p/40173152f171817d966dd334a044b4e8",
+          "description": "وسط هلامي فقير بالمغذيات لبعض بروتوكولات الملاحظة؛ النمو المرئي وحده لا يثبت الهوية أو النقاوة أو الأداء.",
+          "children": []
+        },
+        {
+          "id": "ar-product-myco-start",
+          "title": "Myco Start — نموذج أولي لطقم بدء زراعة الفطريات",
+          "notionId": "40173152f17181fdb34bf72c6ac036e9",
+          "url": "https://app.notion.com/p/40173152f17181fdb34bf72c6ac036e9",
+          "description": "نموذج أولي تعليمي قيد التقييم؛ المحتوى النهائي وفحوصات الجودة لم تُحسم بعد.",
+          "children": []
+        },
+        {
+          "id": "ar-product-myco-plate",
+          "title": "Myco Plate — نموذج أولي لطقم الملاحظة على وسط هلامي",
+          "notionId": "40173152f17181aa8206f4337a7f67d5",
+          "url": "https://app.notion.com/p/40173152f17181aa8206f4337a7f67d5",
+          "description": "مفهوم أولي لطقم ملاحظة فطرية؛ ما تزال مواصفات الوسط والمورد وتتبع الدفعة قيد الاستكمال.",
+          "children": []
+        },
+        {
+          "id": "ar-product-qr-guide",
+          "title": "دليل البدء عبر QR — Myco Start / Myco Plate",
+          "notionId": "40173152f171810bb1afe68cfc91ee7c",
+          "url": "https://app.notion.com/p/40173152f171810bb1afe68cfc91ee7c",
+          "description": "دليل وصول سريع يرافق نماذج Myco Start وMyco Plate ويوجه المستخدم إلى تعليمات البدء.",
+          "children": []
+        }
+      ]
     },
     {
       "id": "work",
