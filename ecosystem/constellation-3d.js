@@ -251,7 +251,7 @@ else if(root){
         };
         if(id==='myco'){
           // Mycelium: repeated bifurcation, anastomosis loops and fine hyphal tips.
-          for(let branch=0;branch<5;branch++){
+          for(let branch=0;branch<2;branch++){
             const a=branch*Math.PI*2/7,dir=new THREE.Vector3(Math.cos(a),Math.sin(a)*.72,Math.sin(a*1.7)*.55);
             const p1=p.clone().addScaledVector(dir,.55),p2=p.clone().addScaledVector(dir.clone().add(new THREE.Vector3(Math.sin(a*2)*.3,.22*Math.cos(a),.1)).normalize(),1.02);
             addProcess([p.clone(),p.clone().addScaledVector(dir,.24),p1,p2],.022,.9);
@@ -261,7 +261,7 @@ else if(root){
             addProcess([p1,p1.clone().addScaledVector(side,-.1),tipB],.009,.76);
             addTerminal(p2,.022);
           }
-          for(let j=0;j<3;j++){
+          for(let j=0;j<2;j++){
             const a=j*2.094+.35, b=a+1.35;
             const u=p.clone().add(new THREE.Vector3(Math.cos(a)*.64,Math.sin(a)*.5,.18));
             const v=p.clone().add(new THREE.Vector3(Math.cos(b)*.64,Math.sin(b)*.5,-.12));
@@ -273,7 +273,7 @@ else if(root){
           const down=new THREE.Vector3(.18,-1,.08).normalize();
           const rootEnd=p.clone().addScaledVector(down,1.25);
           addProcess([p,p.clone().addScaledVector(down,.35),rootEnd],.036,.95);
-          for(let branch=0;branch<4;branch++){
+          for(let branch=0;branch<3;branch++){
             const t=.22+branch*.115,anchor=p.clone().lerp(rootEnd,t);
             const side=new THREE.Vector3(Math.cos(branch*2.4),.12,Math.sin(branch*2.4)).normalize();
             const tip=anchor.clone().addScaledVector(side,.55+(branch%3)*.12).addScaledVector(down,.12);
@@ -376,7 +376,7 @@ else if(root){
           const pulse2=new THREE.Mesh(new THREE.SphereGeometry(.03,12,10),new THREE.MeshBasicMaterial({color,transparent:true,opacity:.9,depthWrite:false,toneMapped:false}));pulse2.userData={kind:'signal',id};worldGroup.add(pulse2);
           edges.push({line,id,parentId:parentNode.id,a:origin,b:p.clone(),pulse,pulse2,phase:ids.indexOf(id)*.13,curve:path});
           // Side branches break the impression of straight spokes and form dendritic junctions.
-          for(let branch=0;branch<5;branch++){
+          for(let branch=0;branch<2;branch++){
             const seed=ids.indexOf(id)*2.17+branch*1.91;
             const t=.56,anchor=path.getPoint(t),tangent=path.getTangent(t);
             const side=new THREE.Vector3(-tangent.y+Math.sin(seed)*.28,tangent.x+Math.cos(seed*.7)*.22,Math.sin(seed+1.3)*.8).normalize();
@@ -544,7 +544,7 @@ else if(root){
         joinCount++;
         if(joinCount>=48)break;
       }
-      root.classList.add('webgl-ready','universe-closed');root.classList.remove('universe-open');worldGroup.visible=true;worldGroup.scale.setScalar(.72);new MutationObserver(()=>{const closed=root.classList.contains('universe-closed');if(worldGroup){worldGroup.visible=true;worldGroup.scale.set(closed?.72:(camera?.aspect<.78?.88:1.18),closed?.72:(camera?.aspect<.78?1.12:1.18),closed?.72:(camera?.aspect<.78?1:1.18))}if(closed){clearResourceNodes();intro.style.display='flex';intro.style.opacity='1';intro.style.transform='';intro.disabled=false;intro.classList.remove('is-opening')}}).observe(root,{attributes:true,attributeFilter:['class']});
+      root.classList.add('webgl-ready','universe-closed');root.classList.remove('universe-open');worldGroup.visible=true;worldGroup.scale.setScalar(.72);new MutationObserver(()=>{const closed=root.classList.contains('universe-closed');if(worldGroup){worldGroup.visible=true;worldGroup.scale.set(closed?.72:(camera?.aspect<.78?1.16:1.18),closed?.72:(camera?.aspect<.78?1.28:1.18),closed?.72:(camera?.aspect<.78?1.08:1.18))}if(closed){clearResourceNodes();intro.style.display='flex';intro.style.opacity='1';intro.style.transform='';intro.disabled=false;intro.classList.remove('is-opening')}}).observe(root,{attributes:true,attributeFilter:['class']});
       const textObserver=new MutationObserver(()=>refreshLabels());sphereEls.forEach(el=>{const b=el.querySelector('b');if(b)textObserver.observe(b,{childList:true,characterData:true,subtree:true})});
       tissuePickables=points.flatMap(p=>p.twigs);resize();bind();animate();
       document.addEventListener('visibilitychange',()=>{if(document.hidden){if(raf)cancelAnimationFrame(raf);raf=0}else if(renderer&&!raf){animate()}});
@@ -552,7 +552,7 @@ else if(root){
       if('ResizeObserver'in window){const stageResizeObserver=new ResizeObserver(()=>resize());stageResizeObserver.observe(stage)}
     }catch(e){stage.remove();show3DFailure();console.warn('BALabs WebGL unavailable; legacy sphere fallback intentionally suppressed.',e)}
   }
-  function overviewDistance(){return camera?.aspect<.78?10.9:camera?.aspect<1.05?12.1:11.8}
+  function overviewDistance(){return camera?.aspect<.78?8.4:camera?.aspect<1.05?10.2:11.8}
   function resize(){if(!renderer||!camera)return;const w=stage.clientWidth||640,h=stage.clientHeight||680;renderer.setPixelRatio(pixelRatio());renderer.setSize(w,h,false);camera.aspect=w/h;camera.fov=camera.aspect>1.2?38:60;camera.updateProjectionMatrix();if(!selected)dist=overviewDistance();updateCamera()}
   function updateCamera(){if(!camera)return;if(scene?.fog)scene.fog.density=.0068*Math.pow(18.5/Math.max(18.5,dist),2);camera.position.set(cameraTarget.x+dist*Math.sin(phi)*Math.sin(theta),cameraTarget.y+dist*Math.cos(phi),cameraTarget.z+dist*Math.sin(phi)*Math.cos(theta));camera.lookAt(cameraTarget)}
   function easeInOut(t){return t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2}
