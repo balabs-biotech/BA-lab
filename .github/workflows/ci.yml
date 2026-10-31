@@ -249,6 +249,8 @@ jobs:
           node-version: "22"
       - name: Check BA Labs 3D ecosystem invariants
         run: node scripts/test-ecosystem-regressions.mjs
+      - name: Validate all four public Notion language trees
+        run: node scripts/test-ecosystem-manifests.mjs
       - name: Parse 3D scene as an ES module
         run: node --check --input-type=module < ecosystem/constellation-3d.js
 
