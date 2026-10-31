@@ -357,7 +357,7 @@ else if(root){
         }
         const hitMesh=new THREE.Mesh(new THREE.SphereGeometry(.34,16,14),new THREE.MeshBasicMaterial({color,transparent:true,opacity:.0001,depthWrite:false}));hitMesh.position.copy(p);hitMesh.userData={kind:'sphere',id};worldGroup.add(hitMesh);
 
-        const label=makeLabel(labels[id].title,0xf5f7fa,25);label.position.set(p.x,p.y-.676,p.z+.104);label.scale.set(Math.min(3.85,Math.max(2.05,labels[id].title.length*.12)),.59,1);label.userData={kind:'label',id,labelText:labels[id].title};worldGroup.add(label);
+        const label=makeLabel(labels[id].title,0xf5f7fa,29);label.position.set(p.x,p.y-.676,p.z+.104);label.scale.set(Math.min(4.25,Math.max(2.25,labels[id].title.length*.135)),.67,1);label.userData={kind:'label',id,labelText:labels[id].title};worldGroup.add(label);
         const node={id,mesh,hitMesh,label,base:p,color,twigs};points.push(node);
         // A root soma has no artificial central-hub connection. Every other axon
         // links to its actual biological parent in the graph.
@@ -544,7 +544,7 @@ else if(root){
         joinCount++;
         if(joinCount>=48)break;
       }
-      root.classList.add('webgl-ready','universe-closed');root.classList.remove('universe-open');worldGroup.visible=true;worldGroup.scale.setScalar(.72);new MutationObserver(()=>{const closed=root.classList.contains('universe-closed');if(worldGroup){worldGroup.visible=true;worldGroup.scale.set(closed?.72:(camera?.aspect<.78?.84:1.18),closed?.72:(camera?.aspect<.78?1.22:1.18),closed?.72:(camera?.aspect<.78?1.04:1.18))}if(closed){clearResourceNodes();intro.style.display='flex';intro.style.opacity='1';intro.style.transform='';intro.disabled=false;intro.classList.remove('is-opening')}}).observe(root,{attributes:true,attributeFilter:['class']});
+      root.classList.add('webgl-ready','universe-closed');root.classList.remove('universe-open');worldGroup.visible=true;worldGroup.scale.setScalar(.72);new MutationObserver(()=>{const closed=root.classList.contains('universe-closed');if(worldGroup){worldGroup.visible=true;worldGroup.scale.set(closed?.72:(camera?.aspect<.78?.98:1.32),closed?.72:(camera?.aspect<.78?1.18:1.32),closed?.72:(camera?.aspect<.78?1.02:1.32))}if(closed){clearResourceNodes();intro.style.display='flex';intro.style.opacity='1';intro.style.transform='';intro.disabled=false;intro.classList.remove('is-opening')}}).observe(root,{attributes:true,attributeFilter:['class']});
       const textObserver=new MutationObserver(()=>refreshLabels());sphereEls.forEach(el=>{const b=el.querySelector('b');if(b)textObserver.observe(b,{childList:true,characterData:true,subtree:true})});
       tissuePickables=points.flatMap(p=>p.twigs);resize();bind();animate();
       document.addEventListener('visibilitychange',()=>{if(document.hidden){if(raf)cancelAnimationFrame(raf);raf=0}else if(renderer&&!raf){animate()}});
@@ -552,7 +552,7 @@ else if(root){
       if('ResizeObserver'in window){const stageResizeObserver=new ResizeObserver(()=>resize());stageResizeObserver.observe(stage)}
     }catch(e){stage.remove();show3DFailure();console.warn('BALabs WebGL unavailable; legacy sphere fallback intentionally suppressed.',e)}
   }
-  function overviewDistance(){return camera?.aspect<.78?9.2:camera?.aspect<1.05?10.5:11.8}
+  function overviewDistance(){return camera?.aspect<.78?8.8:camera?.aspect<1.05?10.2:11}
   function resize(){if(!renderer||!camera)return;const w=stage.clientWidth||640,h=stage.clientHeight||680;renderer.setPixelRatio(pixelRatio());renderer.setSize(w,h,false);camera.aspect=w/h;camera.fov=camera.aspect>1.2?38:60;camera.updateProjectionMatrix();if(!selected)dist=overviewDistance();updateCamera()}
   function updateCamera(){if(!camera)return;if(scene?.fog)scene.fog.density=.0068*Math.pow(18.5/Math.max(18.5,dist),2);camera.position.set(cameraTarget.x+dist*Math.sin(phi)*Math.sin(theta),cameraTarget.y+dist*Math.cos(phi),cameraTarget.z+dist*Math.sin(phi)*Math.cos(theta));camera.lookAt(cameraTarget)}
   function easeInOut(t){return t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2}
