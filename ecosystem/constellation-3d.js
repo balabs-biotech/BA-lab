@@ -433,15 +433,15 @@ else if(root){
         const mid=pa.base.clone().lerp(pb.base,.5).addScaledVector(axis,bend);
         const curve=new THREE.QuadraticBezierCurve3(pa.base,mid,pb.base);
         const signalColor=new THREE.Color(0x78958A),pulseColor=new THREE.Color(0xB96B4D);
-        const line=makeNeurite(curve,signalColor,.034,.92,72);
+        const line=makeNeurite(curve,signalColor,.019,.66,72);
         // Keep transverse pathways legible without letting them overpower the biological branches.
         line.material.emissive.copy(signalColor).multiplyScalar(.40);line.material.emissiveIntensity=.48;
         line.userData={kind:'relation',a,b};worldGroup.add(line);
         // Cross-links branch like mycelial cords / axonal collaterals instead of
         // appearing as plain geometric chords. Each offshoot ends in a small junction.
-        for(let branch=0;branch<2;branch++){
+        for(let branch=0;branch<1;branch++){
           const seed=(ids.indexOf(a)+1)*1.73+(ids.indexOf(b)+1)*.91+branch*2.4;
-          const t=[0.28,0.72][branch];
+          const t=.52;
           const anchor=curve.getPoint(t),tangent=curve.getTangent(t);
           const side=new THREE.Vector3(-tangent.y+Math.sin(seed)*.35,tangent.x+Math.cos(seed*.8)*.28,Math.sin(seed+1.1)*.85).normalize();
           const reach=.24+((ids.indexOf(a)+ids.indexOf(b)+branch)%4)*.065;
@@ -449,7 +449,7 @@ else if(root){
           const control=anchor.clone().addScaledVector(side,reach*.55).addScaledVector(tangent,.035*Math.sin(seed));
           const offshoot=new THREE.QuadraticBezierCurve3(anchor,control,tip);
           mycelialTips.push({point:tip.clone(),tangent:offshoot.getTangent(1).normalize(),curve:offshoot,parentCurve:curve,anchorT:t,a,b,branch});
-          const twig=makeNeurite(offshoot,signalColor,.021,.94,26);
+          const twig=makeNeurite(offshoot,signalColor,.011,.62,22);
           twig.material.emissive.copy(signalColor).multiplyScalar(.24);twig.material.emissiveIntensity=.34;
           twig.userData={kind:'dendrite',id:a,relation:true,a,b};worldGroup.add(twig);
           if(branch===0){
@@ -563,7 +563,7 @@ else if(root){
       if('ResizeObserver'in window){const stageResizeObserver=new ResizeObserver(()=>resize());stageResizeObserver.observe(stage)}
     }catch(e){stage.remove();show3DFailure();console.warn('BALabs WebGL unavailable; legacy sphere fallback intentionally suppressed.',e)}
   }
-  function overviewDistance(){return camera?.aspect<.78?12.2:camera?.aspect<1.05?12.8:11.8}
+  function overviewDistance(){return camera?.aspect<.78?10.9:camera?.aspect<1.05?12.1:11.8}
   function resize(){if(!renderer||!camera)return;const w=stage.clientWidth||640,h=stage.clientHeight||680;renderer.setPixelRatio(pixelRatio());renderer.setSize(w,h,false);camera.aspect=w/h;camera.fov=camera.aspect>1.2?38:48;camera.updateProjectionMatrix();if(!selected)dist=overviewDistance();updateCamera()}
   function updateCamera(){if(!camera)return;if(scene?.fog)scene.fog.density=.0068*Math.pow(18.5/Math.max(18.5,dist),2);camera.position.set(cameraTarget.x+dist*Math.sin(phi)*Math.sin(theta),cameraTarget.y+dist*Math.cos(phi),cameraTarget.z+dist*Math.sin(phi)*Math.cos(theta));camera.lookAt(cameraTarget)}
   function easeInOut(t){return t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2}
