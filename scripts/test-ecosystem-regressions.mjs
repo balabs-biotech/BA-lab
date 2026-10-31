@@ -120,3 +120,7 @@ assert.match(html, /constellation-3d\.js\?v=[^"'\s]+/, 'The 3D asset must use a 
 assert.ok(html.includes('.webgl-ready .sphere') || html.includes('.webgl-ready .network') || html.includes('.universe-closed .sphere'), 'Legacy presentation must be controlled explicitly when WebGL is active');
 
 console.log('Ecosystem regression checks passed: 8 domains, organic network, Notion tree hierarchy, exact URLs, cross-domain signals, unified navigation, gateway state, fallback and cache version.');
+
+assert.ok(scene.includes('function domainViewDistance(id)') && scene.includes('const rings=Math.max(1,Math.ceil(maxSiblings/12))'), 'Selected domains must adapt camera distance to their actual branch count and hierarchy');
+assert.ok(scene.includes('const ringSize=12,ring=siblings>ringSize?Math.floor(siblingIndex/ringSize):0') && scene.includes('2.45+ring*1.25'), 'Large branch families must spread across concentric organic rings instead of colliding on one circle');
+assert.ok(scene.includes('siblings>ringSize?1.28:1.95'), 'Dense branch families must use narrower labels to reduce overlap');
