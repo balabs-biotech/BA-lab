@@ -101,6 +101,8 @@ assert.ok(scene.includes('const visit=(node,depth=0,parentId=domainTree.id'), '3
 assert.ok(scene.includes('data-notion-tree-node="true"'), 'Manifest nodes must be injected into the 3D resource layer');
 assert.ok(scene.includes('parentId:a.dataset.parentId') && scene.includes('depth:Number(a.dataset.depth||0)'), '3D resource nodes must retain their hierarchy metadata');
 assert.ok(scene.includes('notionTreeReady.then('), '3D resource nodes must refresh when the manifest finishes loading');
+assert.ok(scene.includes("const resourceHit=hits.find(hit=>hit.object.userData?.kind==='resource'||hit.object.userData?.kind==='resource-label')"), 'Clickable Notion branches must take priority over decorative neurites and domain geometry during raycasting');
+assert.ok(scene.includes('return resourceHit?[resourceHit,...hits.filter(hit=>hit!==resourceHit)]:hits'), 'A branch hit must be selected even when a decorative object is closer to the camera');
 assert.ok(scene.includes('importThreeWithTimeout'), 'Three.js CDN loading must have a bounded timeout');
 assert.ok(scene.includes('timeoutMs=8000'), 'Three.js CDN fallback must not wait indefinitely');
 for (const host of ['cdn.jsdelivr.net', 'unpkg.com', 'esm.sh']) {
