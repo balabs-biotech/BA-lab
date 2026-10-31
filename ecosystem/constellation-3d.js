@@ -148,7 +148,7 @@ else if(root){
       const fill=new THREE.PointLight(0x52766b,20,28);fill.position.set(-6,-2,-4);scene.add(fill);
       const warm=new THREE.PointLight(0xb96b4d,13,20);warm.position.set(5,-3,4);scene.add(warm);
       // No starfield, orbital rings or central planet: open directly on an irregular biological network.
-      const pos={bio:[-1.1,2.35,.35],myco:[-2.65,1.05,.9],soil:[-.35,.85,-.85],lab:[-2.25,-.45,-.25],products:[1.15,.15,.85],iot:[2.75,1.35,-.35],work:[1.9,-1.35,-.7],learn:[-.15,-2.35,.3]};
+      const pos={bio:[0,2.65,.15],myco:[-2.35,1.05,.65],soil:[-2.05,-.95,.15],lab:[-.15,.55,-.85],products:[.05,-1.15,.75],iot:[2.45,.85,-.35],work:[2.05,-1.25,-.55],learn:[-.15,-2.85,.2]};
       for(const id of ids){
         const color=colors[id],p=new THREE.Vector3(...pos[id]).multiplyScalar(.98);
         // Neural soma: a compact, softly glowing junction, not a planet with an orbit.
