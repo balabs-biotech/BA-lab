@@ -19,6 +19,14 @@ assert.ok(junctionPathsDeclarationIndex >= 0 && junctionPathsDeclarationIndex < 
 assert.ok(scene.includes('junctionPaths.length=0;'), 'Anastomosis paths must be reset before the scene graph is rebuilt');
 assert.ok(scene.includes('const makeNeurite'), 'Organic neurite geometry must remain present');
 assert.ok(scene.toLowerCase().includes('anastomosis'), 'Cross-domain mycelial junctions must remain present');
+const pairBlock = scene.match(/const pairs=\[([\s\S]*?)\n      \];/);
+assert.ok(pairBlock, 'The 3D network must declare its cross-domain topology');
+const relationPairs = [...pairBlock[1].matchAll(/\['(bio|myco|soil|lab|products|iot|work|learn)','(bio|myco|soil|lab|products|iot|work|learn)'\]/g)].map((match) => [match[1], match[2]]);
+assert.equal(relationPairs.length, 8, 'Cross-domain topology must remain sparse and legible');
+const topology = new Set(relationPairs.map(([a, b]) => [a, b].sort().join(':')));
+for (const edge of [['bio','myco'],['myco','soil'],['soil','lab'],['lab','iot'],['lab','products'],['products','work'],['work','iot'],['products','learn']]) {
+  assert.ok(topology.has(edge.slice().sort().join(':')), `Missing local network connection: ${edge.join(' → ')}`);
+}
 assert.ok(scene.includes('const relayRoutes'), 'Multi-domain signal routes must remain present');
 assert.ok(scene.includes('branchRelaySignals'), 'Branch signal animation must remain present');
 assert.ok(scene.includes('window.enterSphere(id,false)'), '3D selection must call the shared domain navigation');
