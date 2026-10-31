@@ -407,12 +407,11 @@ else if(root){
       // R&D-to-application and soil-to-project pathways, not decorative all-to-all links.
       // Sparse, meaningful cross-links: avoid the dense mesh of decorative all-to-all chords.
       const pairs=[
-        // One clear path per useful relationship; parent-child axons remain visible.
-        // The eight domains form a connected network without a decorative hairball.
-        ['bio','soil'],['bio','lab'],['myco','products'],
-        ['soil','iot'],['soil','work'],['lab','products'],
-        ['lab','iot'],['myco','work'],['products','learn'],
-        ['iot','learn'],['work','learn']
+        // Local links follow the visible spatial neighbourhood: no long chords across the centre.
+        // The connected loop stays legible while every domain remains reachable.
+        ['bio','myco'],['myco','soil'],['soil','lab'],
+        ['lab','iot'],['lab','products'],['products','work'],
+        ['work','iot'],['products','learn']
       ];
       const mycelialTips=[];
       junctionPaths.length=0;
@@ -788,18 +787,10 @@ else if(root){
   function pick(e){if(transition)return;const hits=hitTest(e);if(!hits.length)return;const obj=hits[0].object;if(obj.userData.kind==='resource'||obj.userData.kind==='resource-label'){const rawUrl=obj.userData.url;if(typeof rawUrl!=='string'||!rawUrl.trim())return;let targetUrl;try{targetUrl=new URL(rawUrl,window.location.href)}catch{return}if(targetUrl.protocol!=='https:'&&targetUrl.protocol!=='http:')return;selectedResource={sourceId:obj.userData.sourceId,url:targetUrl.href,title:obj.userData.title,path:obj.userData.path,description:obj.userData.description,depth:obj.userData.depth};refreshFocus(obj.userData.sourceId);return}if(obj.userData.kind==='sphere'||obj.userData.kind==='label'||obj.userData.kind==='dendrite'||obj.userData.kind==='synapse'){const id=obj.userData.id,node=points.find(p=>p.id===id);if(!node)return;clearResourceNodes();selectedResource=null;stage.dataset.hoverResource='';stage.classList.remove('resource-hover');hovered=null;selected=id;refreshFocus(id);flyTo(node.mesh,()=>{if(typeof window.enterSphere==='function')window.enterSphere(id,false);requestAnimationFrame(()=>requestAnimationFrame(()=>buildResourceNodes(id)));notionTreeReady.then(()=>{if(notionTreeManifest&&selected===id&&document.getElementById('miniView')&&!document.getElementById('miniView').hidden)buildResourceNodes(id)});stage.classList.remove('is-transitioning')})}}
   // Relay pulses traverse several universes in sequence, making the network read as one living system.
   const relayRoutes=[
-    ['bio','lab','products','iot'],
-    ['myco','soil','work','lab','learn'],
-    ['bio','myco','soil','products','work'],
-    ['iot','products','soil','lab','learn'],
-    // A visible feedback loop connecting biological output, productization and instrumentation.
-    ['bio','products','work','iot','learn'],
-    // Complementary routes expose links that are easy to miss in the primary circulation.
-    ['bio','soil','iot','work'],
-    ['myco','lab','learn','products'],
-    ['soil','lab','iot','products'],
-    // Close the loop from culture monitoring through project execution back to biology.
-    ['myco','iot','work','bio','lab']
+    ['bio','myco','soil','lab','products','learn'],
+    ['myco','soil','lab','iot','work','products'],
+    ['soil','lab','products','work','iot'],
+    ['lab','iot','work','products','learn']
   ];
   const relaySignals=[];
   for(const route of relayRoutes){
