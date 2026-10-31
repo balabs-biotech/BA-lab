@@ -2910,7 +2910,7 @@ document.querySelectorAll('[data-lang]').forEach(b=>b.addEventListener('click',(
 
 setLanguage('fr');applyOrbit();
 </script>
-<script type="module" src="./constellation-3d.js?v=network-composition-20261031"></script>
+<script type="module" src="./constellation-3d.js?v=axon-hierarchy-mobile-20261031"></script>
 
 <style id="balabs-visual-refinement">
 /* BALabs visual refinement — editorial mineral / botanical system */
@@ -4014,4 +4014,18 @@ html,body{background:var(--bal-petrol)!important;color:var(--bal-mineral)!import
 
 </style>
 
-<style id="notion-node-navigation-fix">.linknode{display:block;text-decoration:none;cursor:pointer}.linknode[hidden]{display:none!important}.linknode:focus-visible{outline:3px solid #B96B4D;outline-offset:4px}.linknode small{pointer-events:none}#spherePage{text-decoration:none}</style>
+<style id="notion-node-navigation-fix">.linknode{display:block;text-decoration:none;cursor:pointer}.linknode[hidden]{display:none!important}.linknode:focus-visible{outline:3px solid #B96B4D;outline-offset:4px}.linknode small{pointer-events:none}#spherePage{text-decoration:none}
+/* Final spatial UI override: neutral geometry must win over legacy organic theme. */
+#mainView.webgl-ready .webgl-stage .webgl-hint,
+#mainView.webgl-ready .webgl-stage .webgl-status{
+  border-radius:8px!important;
+}
+@media(max-width:760px){
+  #mainView.webgl-ready .webgl-stage .webgl-hint{
+    left:12px!important;right:12px!important;bottom:12px!important;
+    max-width:none!important;width:auto!important;
+    border-radius:8px!important;padding:8px 10px!important;
+    text-align:center!important;font-size:9px!important;
+  }
+}
+</style>
