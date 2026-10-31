@@ -196,8 +196,8 @@ else if(root){
         const axon=makeNeurite(axonCurve,color,.017,.48,34);
         axon.userData={kind:'dendrite',id,process:'axon'};worldGroup.add(axon);twigs.push(axon);
         // Terminal axon collaterals branch only near the far end.
-        for(let b=0;b<2;b++){
-          const u=.76+b*.12,anchor=axonCurve.getPoint(u),tangent=axonCurve.getTangent(u);
+        for(let b=0;b<1;b++){
+          const u=.82,anchor=axonCurve.getPoint(u),tangent=axonCurve.getTangent(u);
           const side=new THREE.Vector3().crossVectors(tangent,axonSide).normalize().multiplyScalar(b===0?1:-1);
           const tip=anchor.clone().addScaledVector(side,.234).addScaledVector(tangent,.13);
           const collateral=new THREE.QuadraticBezierCurve3(anchor,anchor.clone().addScaledVector(side,.10),tip);
@@ -209,8 +209,7 @@ else if(root){
         const dendriteDirs=[
           polarity.clone().negate().addScaledVector(axonSide,.78).add(new THREE.Vector3(.04,.12,-.08)).normalize(),
           polarity.clone().negate().addScaledVector(axonSide,-.66).add(new THREE.Vector3(-.12,.03,.11)).normalize(),
-          axonSide.clone().addScaledVector(polarity,-.28).normalize(),
-          axonSide.clone().negate().addScaledVector(polarity,-.18).normalize()
+
         ];
         for(let k=0;k<dendriteDirs.length;k++){
           const dir=dendriteDirs[k];
@@ -222,7 +221,7 @@ else if(root){
           const curve=new THREE.QuadraticBezierCurve3(start,mid,end);
           const dendrite=makeNeurite(curve,color,.015,.50,22);
           dendrite.userData={kind:'dendrite',id,process:'dendrite'};worldGroup.add(dendrite);twigs.push(dendrite);
-          for(let forkIndex=0;forkIndex<2;forkIndex++){
+          for(let forkIndex=0;forkIndex<1;forkIndex++){
             const u=forkIndex===0?.58:.78,junction=curve.getPoint(u),tangent=curve.getTangent(u);
             const sign=forkIndex===0?1:-1;
             const forkSide=side.clone().multiplyScalar(sign*(k%2?-1:1));
@@ -440,9 +439,9 @@ else if(root){
         line.userData={kind:'relation',a,b};worldGroup.add(line);
         // Cross-links branch like mycelial cords / axonal collaterals instead of
         // appearing as plain geometric chords. Each offshoot ends in a small junction.
-        for(let branch=0;branch<5;branch++){
+        for(let branch=0;branch<2;branch++){
           const seed=(ids.indexOf(a)+1)*1.73+(ids.indexOf(b)+1)*.91+branch*2.4;
-          const t=[0.18,0.34,0.51,0.68,0.84][branch];
+          const t=[0.28,0.72][branch];
           const anchor=curve.getPoint(t),tangent=curve.getTangent(t);
           const side=new THREE.Vector3(-tangent.y+Math.sin(seed)*.35,tangent.x+Math.cos(seed*.8)*.28,Math.sin(seed+1.1)*.85).normalize();
           const reach=.24+((ids.indexOf(a)+ids.indexOf(b)+branch)%4)*.065;
@@ -453,20 +452,7 @@ else if(root){
           const twig=makeNeurite(offshoot,signalColor,.021,.94,26);
           twig.material.emissive.copy(signalColor).multiplyScalar(.24);twig.material.emissiveIntensity=.34;
           twig.userData={kind:'dendrite',id:a,relation:true,a,b};worldGroup.add(twig);
-          // Fine secondary hypha: each collateral gives rise to another
-          // independent branch, so the network reads as tissue, not a comb.
-          const secondaryU=.58,secondaryAnchor=offshoot.getPoint(secondaryU),secondaryTangent=offshoot.getTangent(secondaryU);
-          const secondarySide=new THREE.Vector3(-secondaryTangent.y+Math.cos(seed*1.4)*.42,secondaryTangent.x+Math.sin(seed*.9)*.34,Math.cos(seed+2.7)*.92).normalize();
-          const secondaryTip=secondaryAnchor.clone().addScaledVector(secondarySide,.17+((branch+ids.indexOf(a))%3)*.045).addScaledVector(secondaryTangent,.045);
-          const secondaryControl=secondaryAnchor.clone().addScaledVector(secondarySide,.095).addScaledVector(secondaryTangent,.025);
-          const secondaryCurve=new THREE.QuadraticBezierCurve3(secondaryAnchor,secondaryControl,secondaryTip);
-          const secondaryTwig=makeNeurite(secondaryCurve,signalColor,.0125,.84,18);
-          secondaryTwig.material.emissive.copy(signalColor).multiplyScalar(.2);secondaryTwig.material.emissiveIntensity=.26;
-          secondaryTwig.userData={kind:'dendrite',id:a,relation:true,a,b};worldGroup.add(secondaryTwig);
-          mycelialTips.push({point:secondaryTip.clone(),tangent:secondaryCurve.getTangent(1).normalize(),a,b,branch:branch+10});
-          const secondaryJunction=new THREE.Mesh(new THREE.IcosahedronGeometry(.014,1),new THREE.MeshStandardMaterial({color:signalColor,emissive:signalColor,emissiveIntensity:.18,roughness:1}));
-          secondaryJunction.position.copy(secondaryTip);secondaryJunction.userData={kind:'synapse',id:a,relation:true,a,b};worldGroup.add(secondaryJunction);
-          if(branch===0||branch===3){
+          if(branch===0){
             const junction=new THREE.Mesh(new THREE.IcosahedronGeometry(.021,1),new THREE.MeshStandardMaterial({color:signalColor,emissive:signalColor,emissiveIntensity:.22,roughness:1}));
             junction.position.copy(tip);junction.userData={kind:'synapse',id:a,relation:true,a,b};worldGroup.add(junction);
           }
@@ -577,7 +563,7 @@ else if(root){
       if('ResizeObserver'in window){const stageResizeObserver=new ResizeObserver(()=>resize());stageResizeObserver.observe(stage)}
     }catch(e){stage.remove();show3DFailure();console.warn('BALabs WebGL unavailable; legacy sphere fallback intentionally suppressed.',e)}
   }
-  function overviewDistance(){return camera?.aspect<.78?13.8:camera?.aspect<1.05?13.2:11.8}
+  function overviewDistance(){return camera?.aspect<.78?12.2:camera?.aspect<1.05?12.8:11.8}
   function resize(){if(!renderer||!camera)return;const w=stage.clientWidth||640,h=stage.clientHeight||680;renderer.setPixelRatio(pixelRatio());renderer.setSize(w,h,false);camera.aspect=w/h;camera.fov=camera.aspect>1.2?38:48;camera.updateProjectionMatrix();if(!selected)dist=overviewDistance();updateCamera()}
   function updateCamera(){if(!camera)return;if(scene?.fog)scene.fog.density=.0068*Math.pow(18.5/Math.max(18.5,dist),2);camera.position.set(cameraTarget.x+dist*Math.sin(phi)*Math.sin(theta),cameraTarget.y+dist*Math.cos(phi),cameraTarget.z+dist*Math.sin(phi)*Math.cos(theta));camera.lookAt(cameraTarget)}
   function easeInOut(t){return t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2}
