@@ -407,22 +407,12 @@ else if(root){
       // R&D-to-application and soil-to-project pathways, not decorative all-to-all links.
       // Sparse, meaningful cross-links: avoid the dense mesh of decorative all-to-all chords.
       const pairs=[
-        // Cross-links only: parent-child axons are already drawn above.
-        // Each link represents a real feedback loop between BA Labs workstreams.
-        ['bio','soil'],['bio','lab'],['soil','lab'],
-        ['lab','products'],['lab','work'],['soil','work'],['bio','learn'],
-        ['iot','learn'],['myco','products'],['soil','iot'],['soil','learn'],
-        ['lab','iot'],['products','learn'],['work','learn'],
-        ['bio','iot'],['myco','work'],
-        // Additional cross-domain loops only. Parent-child axons already cover
-        // bio→myco, myco→soil, myco→lab and products→work; repeating them here
-        // creates doubled lines that look like accidental overdraw, not richer links.
-        ['bio','products'],['iot','work'],
-        // Culture monitoring connects mycology to instrumentation; project execution
-        // links biological experimentation back to the operational workflow.
-        ['myco','iot'],['bio','work'],
-        // Close the knowledge loop: protocols, cultivation practice and instrumented products feed learning back into R&D.
-        ['myco','learn'],['lab','learn'],['products','iot'],['soil','products']
+        // One clear path per useful relationship; parent-child axons remain visible.
+        // The eight domains form a connected network without a decorative hairball.
+        ['bio','soil'],['bio','lab'],['myco','products'],
+        ['soil','iot'],['soil','work'],['lab','products'],
+        ['lab','iot'],['myco','work'],['products','learn'],
+        ['iot','learn'],['work','learn']
       ];
       const mycelialTips=[];
       junctionPaths.length=0;
@@ -555,7 +545,7 @@ else if(root){
         joinCount++;
         if(joinCount>=48)break;
       }
-      root.classList.add('webgl-ready','universe-closed');root.classList.remove('universe-open');worldGroup.visible=true;worldGroup.scale.setScalar(.72);new MutationObserver(()=>{const closed=root.classList.contains('universe-closed');if(worldGroup){worldGroup.visible=true;worldGroup.scale.setScalar(closed?.72:(camera?.aspect<.78?1:1.18))}if(closed){clearResourceNodes();intro.style.display='flex';intro.style.opacity='1';intro.style.transform='';intro.disabled=false;intro.classList.remove('is-opening')}}).observe(root,{attributes:true,attributeFilter:['class']});
+      root.classList.add('webgl-ready','universe-closed');root.classList.remove('universe-open');worldGroup.visible=true;worldGroup.scale.setScalar(.72);new MutationObserver(()=>{const closed=root.classList.contains('universe-closed');if(worldGroup){worldGroup.visible=true;worldGroup.scale.setScalar(closed?.72:(camera?.aspect<.78?.88:1.18))}if(closed){clearResourceNodes();intro.style.display='flex';intro.style.opacity='1';intro.style.transform='';intro.disabled=false;intro.classList.remove('is-opening')}}).observe(root,{attributes:true,attributeFilter:['class']});
       const textObserver=new MutationObserver(()=>refreshLabels());sphereEls.forEach(el=>{const b=el.querySelector('b');if(b)textObserver.observe(b,{childList:true,characterData:true,subtree:true})});
       tissuePickables=points.flatMap(p=>p.twigs);resize();bind();animate();
       document.addEventListener('visibilitychange',()=>{if(document.hidden){if(raf)cancelAnimationFrame(raf);raf=0}else if(renderer&&!raf){animate()}});
@@ -564,7 +554,7 @@ else if(root){
     }catch(e){stage.remove();show3DFailure();console.warn('BALabs WebGL unavailable; legacy sphere fallback intentionally suppressed.',e)}
   }
   function overviewDistance(){return camera?.aspect<.78?10.9:camera?.aspect<1.05?12.1:11.8}
-  function resize(){if(!renderer||!camera)return;const w=stage.clientWidth||640,h=stage.clientHeight||680;renderer.setPixelRatio(pixelRatio());renderer.setSize(w,h,false);camera.aspect=w/h;camera.fov=camera.aspect>1.2?38:48;camera.updateProjectionMatrix();if(!selected)dist=overviewDistance();updateCamera()}
+  function resize(){if(!renderer||!camera)return;const w=stage.clientWidth||640,h=stage.clientHeight||680;renderer.setPixelRatio(pixelRatio());renderer.setSize(w,h,false);camera.aspect=w/h;camera.fov=camera.aspect>1.2?38:(camera.aspect<.78?58:48);camera.updateProjectionMatrix();if(!selected)dist=overviewDistance();updateCamera()}
   function updateCamera(){if(!camera)return;if(scene?.fog)scene.fog.density=.0068*Math.pow(18.5/Math.max(18.5,dist),2);camera.position.set(cameraTarget.x+dist*Math.sin(phi)*Math.sin(theta),cameraTarget.y+dist*Math.cos(phi),cameraTarget.z+dist*Math.sin(phi)*Math.cos(theta));camera.lookAt(cameraTarget)}
   function easeInOut(t){return t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2}
   function refreshFocus(id){const p=points.find(item=>item.id===id);const lang=(document.documentElement.lang||'fr').toLowerCase().split('-')[0];const activeManifest=notionTreeManifests[lang]||notionTreeManifests.fr||notionTreeManifest;const rootPage=activeManifest?.domains?.find(domain=>domain.id===id);if(selectedResource&&selectedResource.sourceId===id){focusPanel.hidden=false;focusPanel.style.display='flex';focusPanel.classList.add('has-world');focusPanel.innerHTML='';const kicker=document.createElement('span');kicker.className='webgl-focus-kicker';kicker.textContent=({fr:'RESSOURCE · '+(selectedResource.depth>1?'SOUS-BRANCHE':'BRANCHE'),en:'RESOURCE · '+(selectedResource.depth>1?'SUB-BRANCH':'BRANCH'),ar:'مورد · '+(selectedResource.depth>1?'فرع فرعي':'فرع'),pt:'RECURSO · '+(selectedResource.depth>1?'SUB-RAMO':'RAMO')}[lang]||'RESOURCE');const title=document.createElement('strong');title.textContent=selectedResource.title||'';const path=document.createElement('small');path.textContent=selectedResource.path||'';const description=document.createElement('small');description.className='webgl-focus-reason';description.textContent=selectedResource.description||({fr:'Cette page approfondit ce thème.',en:'This page explores the topic in more detail.',ar:'تتناول هذه الصفحة الموضوع بمزيد من التفصيل.',pt:'Esta página aprofunda este tema.'}[lang]||'');description.style.cssText='display:block;white-space:normal;line-height:1.55;margin-top:5px';const actions=document.createElement('div');actions.className='webgl-focus-links';const open=document.createElement('button');open.type='button';open.className='webgl-focus-link';open.dataset.resourceOpen='true';open.textContent=({fr:'Ouvrir la page Notion ↗',en:'Open Notion page ↗',ar:'فتح صفحة Notion ↗',pt:'Abrir página Notion ↗'}[lang]||'Open page ↗');const back=document.createElement('button');back.type='button';back.className='webgl-focus-link';back.dataset.resourceClear='true';back.textContent=({fr:'← Retour à l’univers',en:'← Back to this world',ar:'→ العودة إلى هذا العالم',pt:'← Voltar ao universo'}[lang]||'← Back');actions.append(open,back);focusPanel.append(kicker,title,path,description,actions);return}const copy={fr:{index:'INDEX SPATIAL · 08 UNIVERS',home:'Choisis un univers pour explorer ses connexions.',links:'Connexions',structural:'structure',transverse:'transversales',next:'Explorer aussi'},en:{index:'SPATIAL INDEX · 08 WORLDS',home:'Choose a world to explore its connections.',links:'Connections',structural:'structural',transverse:'cross-domain',next:'Explore next'},ar:{index:'الفهرس المكاني · ٨ عوالم',home:'اختر عالماً لاستكشاف الروابط بينه وبين العوالم الأخرى.',links:'روابط',structural:'بنيوية',transverse:'عابرة للمجالات',next:'استكشف أيضاً'},pt:{index:'ÍNDICE ESPACIAL · 08 UNIVERSOS',home:'Escolha um universo para explorar as suas ligações.',links:'Ligações',structural:'estruturais',transverse:'transversais',next:'Explorar também'}}[lang]||{index:'SPATIAL INDEX · 08 WORLDS',home:'Choose a world to explore its connections.',links:'Connections',next:'Explore next'};if(!p){focusPanel.hidden=true;focusPanel.style.display='none';focusPanel.classList.remove('has-world');focusPanel.innerHTML='';return}focusPanel.hidden=false;focusPanel.style.display='flex';const related=[...new Set(edges.filter(edge=>edge.relation&&!edge.anastomosis?(edge.aId===id||edge.bId===id):( !edge.anastomosis&&(edge.id===id||edge.parentId===id))).map(edge=>edge.relation?(edge.aId===id?edge.bId:edge.aId):(edge.id===id?edge.parentId:edge.id)))];
