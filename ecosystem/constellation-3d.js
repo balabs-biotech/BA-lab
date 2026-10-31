@@ -193,7 +193,7 @@ else if(root){
         const axonSide=new THREE.Vector3().crossVectors(axonDir,new THREE.Vector3(.31,.87,.43)).normalize();
         const axonMid=axonStart.clone().lerp(axonEnd,.52).addScaledVector(axonSide,.10);
         const axonCurve=new THREE.QuadraticBezierCurve3(axonStart,axonMid,axonEnd);
-        const axon=makeNeurite(axonCurve,color,.036,.94,34);
+        const axon=makeNeurite(axonCurve,color,.025,.76,34);
         axon.userData={kind:'dendrite',id,process:'axon'};worldGroup.add(axon);twigs.push(axon);
         // Terminal axon collaterals branch only near the far end.
         for(let b=0;b<2;b++){
@@ -220,7 +220,7 @@ else if(root){
           const side=new THREE.Vector3().crossVectors(dir,polarity).normalize();
           const mid=start.clone().lerp(end,.46).addScaledVector(side,(k%2?-.11:.12));
           const curve=new THREE.QuadraticBezierCurve3(start,mid,end);
-          const dendrite=makeNeurite(curve,color,.033,.92,22);
+          const dendrite=makeNeurite(curve,color,.023,.76,22);
           dendrite.userData={kind:'dendrite',id,process:'dendrite'};worldGroup.add(dendrite);twigs.push(dendrite);
           for(let forkIndex=0;forkIndex<2;forkIndex++){
             const u=forkIndex===0?.58:.78,junction=curve.getPoint(u),tangent=curve.getTangent(u);
@@ -228,7 +228,7 @@ else if(root){
             const forkSide=side.clone().multiplyScalar(sign*(k%2?-1:1));
             const tip=junction.clone().addScaledVector(forkSide,.221+((k+forkIndex)%2)*.0585).addScaledVector(tangent,.09);
             const forkCurve=new THREE.QuadraticBezierCurve3(junction,junction.clone().addScaledVector(forkSide,.09).addScaledVector(tangent,.035),tip);
-            const fork=makeNeurite(forkCurve,color,.0182,.84,15);
+            const fork=makeNeurite(forkCurve,color,.014,.76,15);
             fork.userData={kind:'dendrite',id,process:'dendritic-branch'};worldGroup.add(fork);twigs.push(fork);
             if(forkIndex===0){
               const terminal=tip.clone().addScaledVector(forkSide,.075).addScaledVector(tangent,.04);
@@ -540,7 +540,7 @@ else if(root){
         for(const fork of [forkA,forkB])fork.forEach(segment=>segment.length=segment.edge.curve.getLength());
         junctionPaths.push({segments:pathSegments,totalLength:pathSegments.reduce((sum,segment)=>sum+segment.length,0),forkPaths:[forkA,forkB]});
         const mix=new THREE.Color(colors[first.a]).lerp(new THREE.Color(colors[second.b]),.5);
-        const connector=makeNeurite(anastomosis,mix,.019,.88,24);
+        const connector=makeNeurite(anastomosis,mix,.014,.74,24);
         connector.material.emissive.copy(mix).multiplyScalar(.18);connector.material.emissiveIntensity=.28;
         connector.userData={kind:'dendrite',id:first.a,relation:true,a:first.a,b:second.b};
         worldGroup.add(connector);
