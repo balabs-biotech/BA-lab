@@ -87,6 +87,30 @@
                   "url": "https://app.notion.com/p/40273152f171816fa456d1aa82646617",
                   "description": "بطاقة مورد فطري من مجموعة موارد Pleurotus المزروعة.",
                   "children": []
+                },
+                {
+                  "id": "ar-pearl-strain",
+                  "title": "Pearl — بطاقة مورد من Pleurotus",
+                  "notionId": "40273152f171811a8404f8443efc81d8",
+                  "url": "https://app.notion.com/p/40273152f171811a8404f8443efc81d8",
+                  "description": "بطاقة مورد محدد من Pleurotus؛ يُحفظ اسم المورد كما ورد في صفحة Notion.",
+                  "children": []
+                },
+                {
+                  "id": "ar-g8-strain",
+                  "title": "G8 — بطاقة مورد فطري",
+                  "notionId": "40273152f17181aab889f0631ab0cc98",
+                  "url": "https://app.notion.com/p/40273152f17181aab889f0631ab0cc98",
+                  "description": "بطاقة مورد فطري محدد؛ يُحفظ الرمز G8 للتتبع دون افتراض هوية تصنيفية إضافية.",
+                  "children": []
+                },
+                {
+                  "id": "ar-blue-oyster-strain",
+                  "title": "Blue Oyster — بطاقة مورد فطري",
+                  "notionId": "40273152f1718145ae5dd1c02fbcd786",
+                  "url": "https://app.notion.com/p/40273152f1718145ae5dd1c02fbcd786",
+                  "description": "بطاقة مورد فطري مرتبط بفرع Pleurotus؛ الاسم هنا تسمية المورد كما وثقتها الصفحة.",
+                  "children": []
                 }
               ]
             },
@@ -184,6 +208,22 @@
               "notionId": "40273152f171817dafeae0d07ecb305f",
               "url": "https://app.notion.com/p/40273152f171817dafeae0d07ecb305f",
               "description": "مجموعة بطاقات لفطريات أخرى تدرسها BA Labs أو توثق مواردها، دون افتراض أن كل نوع متوفر كمزرعة موصوفة.",
+              "children": []
+            },
+            {
+              "id": "ar-hypsizygus-ulmarius",
+              "title": "Hypsizygus ulmarius — بطاقة الكائن",
+              "notionId": "40173152f17181338fe8f9fe77d8554a",
+              "url": "https://app.notion.com/p/40173152f17181338fe8f9fe77d8554a",
+              "description": "نوع فطري من جنس Hypsizygus؛ تعرض البطاقة هويته وخصائصه البيولوجية.",
+              "children": []
+            },
+            {
+              "id": "ar-hypsizygus-marmoreus",
+              "title": "Hypsizygus marmoreus — بطاقة الكائن",
+              "notionId": "40173152f17181549a76c71217f7337d",
+              "url": "https://app.notion.com/p/40173152f17181549a76c71217f7337d",
+              "description": "نوع فطري من جنس Hypsizygus؛ تعرض البطاقة معلومات تعريفية عنه.",
               "children": []
             }
           ]
@@ -458,6 +498,62 @@
               "notionId": "40173152f17181ce9d76c79fec99a67f",
               "url": "https://app.notion.com/p/40173152f17181ce9d76c79fec99a67f",
               "description": "بكتيريا كانت تُصنف ضمن Bacillus؛ تعرض البطاقة اسمها التصنيفي الحالي والسابق.",
+              "children": []
+            },
+            {
+              "id": "ar-paenibacillus-polymyxa",
+              "title": "Paenibacillus polymyxa — بطاقة الكائن",
+              "notionId": "40173152f171813b8dd2d2a28282d661",
+              "url": "https://app.notion.com/p/40173152f171813b8dd2d2a28282d661",
+              "description": "بكتيريا من جنس Paenibacillus؛ تعرض البطاقة خصائصها وسياقها ضمن الأحياء الدقيقة الزراعية.",
+              "children": []
+            },
+            {
+              "id": "ar-niallia-circulans",
+              "title": "Niallia circulans (سابقًا Bacillus circulans) — بطاقة الكائن",
+              "notionId": "40173152f17181019675eb8f5f6e282c",
+              "url": "https://app.notion.com/p/40173152f17181019675eb8f5f6e282c",
+              "description": "بكتيريا تغير اسمها التصنيفي من Bacillus circulans إلى Niallia circulans؛ تحفظ البطاقة الاسمين للتتبع.",
+              "children": []
+            },
+            {
+              "id": "ar-bacillus-mycoides",
+              "title": "Bacillus mycoides — بطاقة الكائن",
+              "notionId": "40173152f171812e80aff56d0694de10",
+              "url": "https://app.notion.com/p/40173152f171812e80aff56d0694de10",
+              "description": "نوع بكتيري من مجموعة Bacillus؛ تعرض البطاقة تعريف الكائن وسياقه الزراعي.",
+              "children": []
+            },
+            {
+              "id": "ar-priestia-megaterium",
+              "title": "Priestia megaterium (سابقًا Bacillus megaterium) — بطاقة الكائن",
+              "notionId": "40173152f1718179a9d6de4419b2c147",
+              "url": "https://app.notion.com/p/40173152f1718179a9d6de4419b2c147",
+              "description": "بكتيريا عُرفت سابقًا باسم Bacillus megaterium؛ تُحفظ التسمية السابقة لتسهيل تتبع المراجع.",
+              "children": []
+            },
+            {
+              "id": "ar-brevibacillus-laterosporus",
+              "title": "Brevibacillus laterosporus (سابقًا Bacillus laterosporus) — بطاقة الكائن",
+              "notionId": "40173152f1718135a2cdcc4ee2d0115e",
+              "url": "https://app.notion.com/p/40173152f1718135a2cdcc4ee2d0115e",
+              "description": "بكتيريا عصوية كانت تُدرج ضمن Bacillus؛ تعرض البطاقة الاسم التصنيفي الحالي والسابق.",
+              "children": []
+            },
+            {
+              "id": "ar-virgibacillus-halodenitrificans",
+              "title": "Virgibacillus halodenitrificans (سابقًا Bacillus halodenitrificans) — بطاقة الكائن",
+              "notionId": "40173152f17181a9b323f0f17bdb0323",
+              "url": "https://app.notion.com/p/40173152f17181a9b323f0f17bdb0323",
+              "description": "بكتيريا من جنس Virgibacillus؛ تحفظ البطاقة الاسم السابق لتسهيل البحث والتتبع.",
+              "children": []
+            },
+            {
+              "id": "ar-bacillus-group",
+              "title": "Bacillus — مجموعة بكتيرية ذات أهمية زراعية",
+              "notionId": "40273152f171814c8521e59c95c9709e",
+              "url": "https://app.notion.com/p/40273152f171814c8521e59c95c9709e",
+              "description": "مدخل يجمع مجموعة بكتيرية ذات أهمية زراعية، مع التمييز بين مستوى المجموعة وبطاقات الأنواع.",
               "children": []
             }
           ]
