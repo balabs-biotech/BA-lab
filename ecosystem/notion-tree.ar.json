@@ -2,7 +2,7 @@
   "version": 1,
   "source": "Verified public Arabic pages linked from the Arabic BA Labs entry page",
   "language": "ar",
-  "coverage": "first_level_only; page URLs verified from the Arabic public entry; nested children intentionally not inferred",
+  "coverage": "nested_public_pages_verified_from_arabic_parent_content_and_notion_paths; linked pages organized by verified parent; no unverified pages inferred",
   "domains": [
     {
       "id": "myco",
@@ -16,15 +16,24 @@
           "notionId": "40173152f171814b88a0dbb38a75acdd",
           "url": "https://app.notion.com/p/40173152f171814b88a0dbb38a75acdd",
           "description": "صفحات مرجعية عن الموارد الفطرية والكائنات المزروعة والمدروسة.",
-          "children": []
-        },
-        {
-          "id": "ar-myco-applications",
-          "title": "التطبيقات الفطرية",
-          "notionId": "40173152f17181afb288feda1d2c3e5c",
-          "url": "https://app.notion.com/p/40173152f17181afb288feda1d2c3e5c",
-          "description": "تفاعلات الفطريات واستخداماتها ضمن التطبيقات البيولوجية.",
-          "children": []
+          "children": [
+            {
+              "id": "ar-soil-propagation",
+              "title": "الزراعة والإكثار",
+              "notionId": "40173152f1718101afcbdb364eb5d44a",
+              "url": "https://app.notion.com/p/40173152f1718101afcbdb364eb5d44a",
+              "description": "تحضير الدعامات والتلقيح والحضانة ومتابعة الزراعات الفطرية.",
+              "children": []
+            },
+            {
+              "id": "ar-myco-applications",
+              "title": "التطبيقات الفطرية",
+              "notionId": "40173152f17181afb288feda1d2c3e5c",
+              "url": "https://app.notion.com/p/40173152f17181afb288feda1d2c3e5c",
+              "description": "مجالات علمية تُدرس فيها الفطريات ووظائفها، مع التمييز بين البحث والتطبيقات المثبتة.",
+              "children": []
+            }
+          ]
         },
         {
           "id": "ar-mycorrhizae",
@@ -65,6 +74,14 @@
           "url": "https://app.notion.com/p/40173152f17181bb91b5d8326978d664",
           "description": "مواد وأوساط داعمة للعمليات والأنظمة البيولوجية.",
           "children": []
+        },
+        {
+          "id": "ar-bio-micropropagation",
+          "title": "الإكثار الدقيق للنباتات",
+          "notionId": "40173152f171819797b1c99f4bdefd2c",
+          "url": "https://app.notion.com/p/40173152f171819797b1c99f4bdefd2c",
+          "description": "تقنيات الإكثار النباتي الدقيق ومراحل التحضير والمتابعة.",
+          "children": []
         }
       ]
     },
@@ -74,14 +91,6 @@
       "notionId": "40173152f17181488cf8ec1851cddb56",
       "url": "https://app.notion.com/p/40173152f17181488cf8ec1851cddb56",
       "children": [
-        {
-          "id": "ar-soil-propagation",
-          "title": "الزراعة والإكثار",
-          "notionId": "40173152f1718101afcbdb364eb5d44a",
-          "url": "https://app.notion.com/p/40173152f1718101afcbdb364eb5d44a",
-          "description": "تقنيات الزراعة والإكثار ومتابعة الأنظمة التجريبية.",
-          "children": []
-        },
         {
           "id": "ar-soil-biostimulants",
           "title": "المحفزات الحيوية والحلول البيولوجية",
@@ -96,6 +105,38 @@
           "notionId": "40173152f17181f18a55d7ba9a90a713",
           "url": "https://app.notion.com/p/40173152f17181f18a55d7ba9a90a713",
           "description": "كائنات دقيقة مرتبطة بالأنظمة والتطبيقات الزراعية.",
+          "children": []
+        },
+        {
+          "id": "ar-soil-equipment",
+          "title": "المعدات التجريبية",
+          "notionId": "40173152f17181808451e8fe7c9931e1",
+          "url": "https://app.notion.com/p/40173152f17181808451e8fe7c9931e1",
+          "description": "معدات البحث والتجريب وأنظمة الزراعة والتخمير والقياس، مع توضيح مرحلة التطوير.",
+          "children": []
+        },
+        {
+          "id": "ar-soil-substrate-preparation",
+          "title": "تحضير الركائز",
+          "notionId": "40173152f1718117a1b5d73ad90a1951",
+          "url": "https://app.notion.com/p/40173152f1718117a1b5d73ad90a1951",
+          "description": "تحضير الدعامات الزراعية وتوثيق المواد الخام والمعالجة والرطوبة والبنية.",
+          "children": []
+        },
+        {
+          "id": "ar-soil-prototyping",
+          "title": "النمذجة الأولية والتصنيع",
+          "notionId": "40173152f1718145a405d8ce78d45516",
+          "url": "https://app.notion.com/p/40173152f1718145a405d8ce78d45516",
+          "description": "تحويل الحاجة التجريبية إلى تصميم أو جهاز أولي ثم اختباره بحسب مرحلة المشروع.",
+          "children": []
+        },
+        {
+          "id": "ar-soil-embedded-measurement",
+          "title": "القياس المدمج",
+          "notionId": "40173152f1718137aee3c9cab4a9bbdf",
+          "url": "https://app.notion.com/p/40173152f1718137aee3c9cab4a9bbdf",
+          "description": "دمج المستشعرات والقياس في المعدات وربط البيانات بسياق التشغيل والتحقق.",
           "children": []
         }
       ]
@@ -141,6 +182,46 @@
           "notionId": "40173152f171810fb42cfa5856ae0356",
           "url": "https://app.notion.com/p/40173152f171810fb42cfa5856ae0356",
           "description": "مسارات التعاون وتحديد احتياجات المشاريع.",
+          "children": []
+        },
+        {
+          "id": "ar-work-methodology",
+          "title": "منهجية البحث والتطوير",
+          "notionId": "40273152f1718172aabbe09bb712c3d1",
+          "url": "https://app.notion.com/p/40273152f1718172aabbe09bb712c3d1",
+          "description": "صياغة الأسئلة والفرضيات وتصميم المقارنات وفق مستوى الأدلة المتاح.",
+          "children": []
+        },
+        {
+          "id": "ar-work-prototypes",
+          "title": "النماذج الأولية والتجارب",
+          "notionId": "40273152f17181b1bd80d6bd6f490e76",
+          "url": "https://app.notion.com/p/40273152f17181b1bd80d6bd6f490e76",
+          "description": "اختبار الفرضيات البيولوجية والتقنية عبر نماذج أولية وتجارب قابلة للتوثيق.",
+          "children": []
+        },
+        {
+          "id": "ar-work-measurement",
+          "title": "القياس وقابلية التكرار",
+          "notionId": "40273152f171810f82d3fafb6e7003be",
+          "url": "https://app.notion.com/p/40273152f171810f82d3fafb6e7003be",
+          "description": "اختيار المتغيرات وتوثيق الظروف ومقارنة النتائج وتحسين قابلية التكرار.",
+          "children": []
+        },
+        {
+          "id": "ar-work-validation",
+          "title": "التكرار والتحقق",
+          "notionId": "40273152f17181b1b609e3d7bf74b712",
+          "url": "https://app.notion.com/p/40273152f17181b1b609e3d7bf74b712",
+          "description": "تحليل الانحرافات وتحسين العمليات مع التمييز بين النتيجة الأولية والتحقق.",
+          "children": []
+        },
+        {
+          "id": "ar-work-network",
+          "title": "الخبرات والشبكة العلمية",
+          "notionId": "40273152f17181ceb6a0ce339a9df585",
+          "url": "https://app.notion.com/p/40273152f17181ceb6a0ce339a9df585",
+          "description": "عرض القدرات الحالية ومجالات الخبرة الخارجية المطلوبة للتوصيف والتحقق.",
           "children": []
         }
       ]
