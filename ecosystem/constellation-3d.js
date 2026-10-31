@@ -261,7 +261,7 @@ else if(root){
             addProcess([p1,p1.clone().addScaledVector(side,-.1),tipB],.009,.76);
             addTerminal(p2,.022);
           }
-          for(let j=0;j<2;j++){
+          for(let j=0;j<1;j++){
             const a=j*2.094+.35, b=a+1.35;
             const u=p.clone().add(new THREE.Vector3(Math.cos(a)*.64,Math.sin(a)*.5,.18));
             const v=p.clone().add(new THREE.Vector3(Math.cos(b)*.64,Math.sin(b)*.5,-.12));
@@ -273,7 +273,7 @@ else if(root){
           const down=new THREE.Vector3(.18,-1,.08).normalize();
           const rootEnd=p.clone().addScaledVector(down,1.25);
           addProcess([p,p.clone().addScaledVector(down,.35),rootEnd],.036,.95);
-          for(let branch=0;branch<3;branch++){
+          for(let branch=0;branch<2;branch++){
             const t=.22+branch*.115,anchor=p.clone().lerp(rootEnd,t);
             const side=new THREE.Vector3(Math.cos(branch*2.4),.12,Math.sin(branch*2.4)).normalize();
             const tip=anchor.clone().addScaledVector(side,.55+(branch%3)*.12).addScaledVector(down,.12);
@@ -303,17 +303,17 @@ else if(root){
           addProcess(left,.019,.84);addProcess(right,.019,.84);
           addProcess([p.clone().add(new THREE.Vector3(-.42,.46,0)),p.clone().add(new THREE.Vector3(-.2,.5,0)),p.clone().add(new THREE.Vector3(.2,.5,0)),p.clone().add(new THREE.Vector3(.42,.46,0))],.016,.82);
           addProcess([p.clone().add(new THREE.Vector3(-.3,-.55,0)),p.clone().add(new THREE.Vector3(0,-.62,.02)),p.clone().add(new THREE.Vector3(.3,-.55,0))],.018,.88);
-          for(let k=0;k<4;k++){const q=p.clone().add(new THREE.Vector3(-.2+k*.13,-.38,.035));addTerminal(q,.018)}
+          for(let k=0;k<2;k++){const q=p.clone().add(new THREE.Vector3(-.2+k*.13,-.38,.035));addTerminal(q,.018)}
         }else if(id==='products'){
           // Product cultures: several connected specimen/vessel outlines rather than a spherical cluster.
-          for(let vessel=0;vessel<3;vessel++){
+          for(let vessel=0;vessel<2;vessel++){
             const x=(vessel-1)*.34,top=p.clone().add(new THREE.Vector3(x,.48,0)),neck=p.clone().add(new THREE.Vector3(x,.28,.02)),base=p.clone().add(new THREE.Vector3(x,-.42,.02));
             addProcess([top,top.clone().add(new THREE.Vector3(-.11,-.04,0)),neck,base.clone().add(new THREE.Vector3(-.14,.08,0)),base.clone().add(new THREE.Vector3(.14,.08,0)),neck.clone().add(new THREE.Vector3(.11,-.04,0)),top],.014,.82);
             addProcess([base.clone().add(new THREE.Vector3(-.12,.19,.02)),base.clone().add(new THREE.Vector3(0,.16,.02)),base.clone().add(new THREE.Vector3(.12,.19,.02))],.009,.72);
           }
         }else if(id==='bio'){
           // Applied biology: a membrane-like cell with uneven protrusions and internal bridges.
-          for(let k=0;k<4;k++){
+          for(let k=0;k<3;k++){
             const a=k*1.19+.2,dir=new THREE.Vector3(Math.cos(a),Math.sin(a)*.82,Math.sin(a*1.6)*.24);
             const tip=p.clone().addScaledVector(dir,.92+(k%2)*.16),shoulder=p.clone().addScaledVector(dir,.48);
             addProcess([p.clone().addScaledVector(dir,.12),shoulder,tip],.018,.86);
@@ -544,7 +544,7 @@ else if(root){
         joinCount++;
         if(joinCount>=48)break;
       }
-      root.classList.add('webgl-ready','universe-closed');root.classList.remove('universe-open');worldGroup.visible=true;worldGroup.scale.setScalar(.72);new MutationObserver(()=>{const closed=root.classList.contains('universe-closed');if(worldGroup){worldGroup.visible=true;worldGroup.scale.set(closed?.72:(camera?.aspect<.78?1.16:1.18),closed?.72:(camera?.aspect<.78?1.28:1.18),closed?.72:(camera?.aspect<.78?1.08:1.18))}if(closed){clearResourceNodes();intro.style.display='flex';intro.style.opacity='1';intro.style.transform='';intro.disabled=false;intro.classList.remove('is-opening')}}).observe(root,{attributes:true,attributeFilter:['class']});
+      root.classList.add('webgl-ready','universe-closed');root.classList.remove('universe-open');worldGroup.visible=true;worldGroup.scale.setScalar(.72);new MutationObserver(()=>{const closed=root.classList.contains('universe-closed');if(worldGroup){worldGroup.visible=true;worldGroup.scale.set(closed?.72:(camera?.aspect<.78?.84:1.18),closed?.72:(camera?.aspect<.78?1.22:1.18),closed?.72:(camera?.aspect<.78?1.04:1.18))}if(closed){clearResourceNodes();intro.style.display='flex';intro.style.opacity='1';intro.style.transform='';intro.disabled=false;intro.classList.remove('is-opening')}}).observe(root,{attributes:true,attributeFilter:['class']});
       const textObserver=new MutationObserver(()=>refreshLabels());sphereEls.forEach(el=>{const b=el.querySelector('b');if(b)textObserver.observe(b,{childList:true,characterData:true,subtree:true})});
       tissuePickables=points.flatMap(p=>p.twigs);resize();bind();animate();
       document.addEventListener('visibilitychange',()=>{if(document.hidden){if(raf)cancelAnimationFrame(raf);raf=0}else if(renderer&&!raf){animate()}});
@@ -552,7 +552,7 @@ else if(root){
       if('ResizeObserver'in window){const stageResizeObserver=new ResizeObserver(()=>resize());stageResizeObserver.observe(stage)}
     }catch(e){stage.remove();show3DFailure();console.warn('BALabs WebGL unavailable; legacy sphere fallback intentionally suppressed.',e)}
   }
-  function overviewDistance(){return camera?.aspect<.78?8.4:camera?.aspect<1.05?10.2:11.8}
+  function overviewDistance(){return camera?.aspect<.78?9.2:camera?.aspect<1.05?10.5:11.8}
   function resize(){if(!renderer||!camera)return;const w=stage.clientWidth||640,h=stage.clientHeight||680;renderer.setPixelRatio(pixelRatio());renderer.setSize(w,h,false);camera.aspect=w/h;camera.fov=camera.aspect>1.2?38:60;camera.updateProjectionMatrix();if(!selected)dist=overviewDistance();updateCamera()}
   function updateCamera(){if(!camera)return;if(scene?.fog)scene.fog.density=.0068*Math.pow(18.5/Math.max(18.5,dist),2);camera.position.set(cameraTarget.x+dist*Math.sin(phi)*Math.sin(theta),cameraTarget.y+dist*Math.cos(phi),cameraTarget.z+dist*Math.sin(phi)*Math.cos(theta));camera.lookAt(cameraTarget)}
   function easeInOut(t){return t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2}
