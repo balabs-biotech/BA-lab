@@ -251,7 +251,7 @@ else if(root){
         };
         if(id==='myco'){
           // Mycelium: repeated bifurcation, anastomosis loops and fine hyphal tips.
-          for(let branch=0;branch<7;branch++){
+          for(let branch=0;branch<5;branch++){
             const a=branch*Math.PI*2/7,dir=new THREE.Vector3(Math.cos(a),Math.sin(a)*.72,Math.sin(a*1.7)*.55);
             const p1=p.clone().addScaledVector(dir,.55),p2=p.clone().addScaledVector(dir.clone().add(new THREE.Vector3(Math.sin(a*2)*.3,.22*Math.cos(a),.1)).normalize(),1.02);
             addProcess([p.clone(),p.clone().addScaledVector(dir,.24),p1,p2],.022,.9);
@@ -273,7 +273,7 @@ else if(root){
           const down=new THREE.Vector3(.18,-1,.08).normalize();
           const rootEnd=p.clone().addScaledVector(down,1.25);
           addProcess([p,p.clone().addScaledVector(down,.35),rootEnd],.036,.95);
-          for(let branch=0;branch<6;branch++){
+          for(let branch=0;branch<4;branch++){
             const t=.22+branch*.115,anchor=p.clone().lerp(rootEnd,t);
             const side=new THREE.Vector3(Math.cos(branch*2.4),.12,Math.sin(branch*2.4)).normalize();
             const tip=anchor.clone().addScaledVector(side,.55+(branch%3)*.12).addScaledVector(down,.12);
@@ -286,7 +286,7 @@ else if(root){
           }
         }else if(id==='iot'){
           // Instrumentation: branching signal traces with clear junctions and short terminal contacts.
-          for(let branch=0;branch<2;branch++){
+          for(let branch=0;branch<1;branch++){
             const y=(branch-2)*.19;
             const a=p.clone().add(new THREE.Vector3(-.52,y,-.18)),b=p.clone().add(new THREE.Vector3(.62,y+.08,.18));
             const mid1=a.clone().add(new THREE.Vector3(.22,0,0)),mid2=b.clone().add(new THREE.Vector3(-.2,0,0));
@@ -313,7 +313,7 @@ else if(root){
           }
         }else if(id==='bio'){
           // Applied biology: a membrane-like cell with uneven protrusions and internal bridges.
-          for(let k=0;k<5;k++){
+          for(let k=0;k<4;k++){
             const a=k*1.19+.2,dir=new THREE.Vector3(Math.cos(a),Math.sin(a)*.82,Math.sin(a*1.6)*.24);
             const tip=p.clone().addScaledVector(dir,.92+(k%2)*.16),shoulder=p.clone().addScaledVector(dir,.48);
             addProcess([p.clone().addScaledVector(dir,.12),shoulder,tip],.018,.86);
@@ -378,7 +378,7 @@ else if(root){
           // Side branches break the impression of straight spokes and form dendritic junctions.
           for(let branch=0;branch<5;branch++){
             const seed=ids.indexOf(id)*2.17+branch*1.91;
-            const t=[.34,.72][branch],anchor=path.getPoint(t),tangent=path.getTangent(t);
+            const t=.56,anchor=path.getPoint(t),tangent=path.getTangent(t);
             const side=new THREE.Vector3(-tangent.y+Math.sin(seed)*.28,tangent.x+Math.cos(seed*.7)*.22,Math.sin(seed+1.3)*.8).normalize();
             const reach=.27+((ids.indexOf(id)+branch*3)%4)*.065;
             const end=anchor.clone().addScaledVector(side,reach).addScaledVector(tangent,.09+Math.sin(seed)*.055);
@@ -393,7 +393,7 @@ else if(root){
               const twigSide=new THREE.Vector3(-tangent2.y*sign+Math.cos(seed)*.25,tangent2.x*sign+Math.sin(seed*.8)*.22,Math.cos(seed+2)*.75).normalize();
               const tip=junction.clone().addScaledVector(twigSide,.13+((ids.indexOf(id)+branch)%3)*.035).addScaledVector(tangent2,.055);
               const twigCurve=new THREE.QuadraticBezierCurve3(junction,junction.clone().addScaledVector(twigSide,.06).addScaledVector(tangent2,.025),tip);
-              const twig=makeNeurite(twigCurve,color,.0065,.54,14);
+              const twig=makeNeurite(twigCurve,color,.0055,.42,14);
               twig.userData={kind:'dendrite',id};worldGroup.add(twig);
             }
             const terminal=new THREE.Mesh(new THREE.IcosahedronGeometry(.022,1),new THREE.MeshStandardMaterial({color,emissive:new THREE.Color(color).multiplyScalar(.12),emissiveIntensity:.18,roughness:1}));
@@ -554,7 +554,7 @@ else if(root){
     }catch(e){stage.remove();show3DFailure();console.warn('BALabs WebGL unavailable; legacy sphere fallback intentionally suppressed.',e)}
   }
   function overviewDistance(){return camera?.aspect<.78?10.9:camera?.aspect<1.05?12.1:11.8}
-  function resize(){if(!renderer||!camera)return;const w=stage.clientWidth||640,h=stage.clientHeight||680;renderer.setPixelRatio(pixelRatio());renderer.setSize(w,h,false);camera.aspect=w/h;camera.fov=camera.aspect>1.2?38:48;camera.updateProjectionMatrix();if(!selected)dist=overviewDistance();updateCamera()}
+  function resize(){if(!renderer||!camera)return;const w=stage.clientWidth||640,h=stage.clientHeight||680;renderer.setPixelRatio(pixelRatio());renderer.setSize(w,h,false);camera.aspect=w/h;camera.fov=camera.aspect>1.2?38:60;camera.updateProjectionMatrix();if(!selected)dist=overviewDistance();updateCamera()}
   function updateCamera(){if(!camera)return;if(scene?.fog)scene.fog.density=.0068*Math.pow(18.5/Math.max(18.5,dist),2);camera.position.set(cameraTarget.x+dist*Math.sin(phi)*Math.sin(theta),cameraTarget.y+dist*Math.cos(phi),cameraTarget.z+dist*Math.sin(phi)*Math.cos(theta));camera.lookAt(cameraTarget)}
   function easeInOut(t){return t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2}
   function refreshFocus(id){const p=points.find(item=>item.id===id);const lang=(document.documentElement.lang||'fr').toLowerCase().split('-')[0];const activeManifest=notionTreeManifests[lang]||notionTreeManifests.fr||notionTreeManifest;const rootPage=activeManifest?.domains?.find(domain=>domain.id===id);if(selectedResource&&selectedResource.sourceId===id){focusPanel.hidden=false;focusPanel.style.display='flex';focusPanel.classList.add('has-world');focusPanel.innerHTML='';const kicker=document.createElement('span');kicker.className='webgl-focus-kicker';kicker.textContent=({fr:'RESSOURCE · '+(selectedResource.depth>1?'SOUS-BRANCHE':'BRANCHE'),en:'RESOURCE · '+(selectedResource.depth>1?'SUB-BRANCH':'BRANCH'),ar:'مورد · '+(selectedResource.depth>1?'فرع فرعي':'فرع'),pt:'RECURSO · '+(selectedResource.depth>1?'SUB-RAMO':'RAMO')}[lang]||'RESOURCE');const title=document.createElement('strong');title.textContent=selectedResource.title||'';const path=document.createElement('small');path.textContent=selectedResource.path||'';const description=document.createElement('small');description.className='webgl-focus-reason';description.textContent=selectedResource.description||({fr:'Cette page approfondit ce thème.',en:'This page explores the topic in more detail.',ar:'تتناول هذه الصفحة الموضوع بمزيد من التفصيل.',pt:'Esta página aprofunda este tema.'}[lang]||'');description.style.cssText='display:block;white-space:normal;line-height:1.55;margin-top:5px';const actions=document.createElement('div');actions.className='webgl-focus-links';const open=document.createElement('button');open.type='button';open.className='webgl-focus-link';open.dataset.resourceOpen='true';open.textContent=({fr:'Ouvrir la page Notion ↗',en:'Open Notion page ↗',ar:'فتح صفحة Notion ↗',pt:'Abrir página Notion ↗'}[lang]||'Open page ↗');const back=document.createElement('button');back.type='button';back.className='webgl-focus-link';back.dataset.resourceClear='true';back.textContent=({fr:'← Retour à l’univers',en:'← Back to this world',ar:'→ العودة إلى هذا العالم',pt:'← Voltar ao universo'}[lang]||'← Back');actions.append(open,back);focusPanel.append(kicker,title,path,description,actions);return}const copy={fr:{index:'INDEX SPATIAL · 08 UNIVERS',home:'Choisis un univers pour explorer ses connexions.',links:'Connexions',structural:'structure',transverse:'transversales',next:'Explorer aussi'},en:{index:'SPATIAL INDEX · 08 WORLDS',home:'Choose a world to explore its connections.',links:'Connections',structural:'structural',transverse:'cross-domain',next:'Explore next'},ar:{index:'الفهرس المكاني · ٨ عوالم',home:'اختر عالماً لاستكشاف الروابط بينه وبين العوالم الأخرى.',links:'روابط',structural:'بنيوية',transverse:'عابرة للمجالات',next:'استكشف أيضاً'},pt:{index:'ÍNDICE ESPACIAL · 08 UNIVERSOS',home:'Escolha um universo para explorar as suas ligações.',links:'Ligações',structural:'estruturais',transverse:'transversais',next:'Explorar também'}}[lang]||{index:'SPATIAL INDEX · 08 WORLDS',home:'Choose a world to explore its connections.',links:'Connections',next:'Explore next'};if(!p){focusPanel.hidden=true;focusPanel.style.display='none';focusPanel.classList.remove('has-world');focusPanel.innerHTML='';return}focusPanel.hidden=false;focusPanel.style.display='flex';const related=[...new Set(edges.filter(edge=>edge.relation&&!edge.anastomosis?(edge.aId===id||edge.bId===id):( !edge.anastomosis&&(edge.id===id||edge.parentId===id))).map(edge=>edge.relation?(edge.aId===id?edge.bId:edge.aId):(edge.id===id?edge.parentId:edge.id)))];
