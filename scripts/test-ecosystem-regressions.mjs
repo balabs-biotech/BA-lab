@@ -33,9 +33,9 @@ assert.ok(scene.includes('window.enterSphere(id,false)'), '3D selection must cal
 assert.ok(!scene.includes("document.querySelector('[data-sphere=\"'+id+'\"]')?.click()") && !scene.includes("document.querySelector('[data-sphere=\"'+id+'\"]').click()"), '3D selection must not proxy-click the legacy DOM menu');
 
 assert.ok(scene.includes("root.classList.add('webgl-ready','universe-closed')"), 'The 3D scene must start in the single closed gateway state');
-assert.ok(scene.includes('worldGroup.scale.set(closed?.72:(camera?.aspect<.78?1.16:1.18),closed?.72:(camera?.aspect<.78?1.28:1.18),closed?.72:(camera?.aspect<.78?1.08:1.18))'), 'Gateway and full universe must use one responsive scaled 3D scene with a readable mobile scale');
+assert.ok(scene.includes('worldGroup.scale.set(closed?.72:(camera?.aspect<.78?.84:1.18),closed?.72:(camera?.aspect<.78?1.22:1.18),closed?.72:(camera?.aspect<.78?1.04:1.18))'), 'Gateway and full universe must use one responsive scaled 3D scene with a readable mobile scale');
 assert.ok(scene.includes('THREE.MathUtils.clamp(dist+delta*.012,3.2,120)'), '3D wheel navigation must support a long-range overview zoom');
-assert.ok(scene.includes('return camera?.aspect<.78?8.4:camera?.aspect<1.05?10.2:11.8'), 'Mobile overview must frame the network at a useful initial scale while preserving long-range zoom');
+assert.ok(scene.includes('return camera?.aspect<.78?9.2:camera?.aspect<1.05?10.5:11.8'), 'Mobile overview must frame the network at a useful initial scale while preserving long-range zoom');
 assert.ok(html.includes('class="linknode ln1" href="#"') && html.includes('target="_blank"'), 'Domain resource nodes must be real links that open their matching Notion pages');
 assert.ok(html.includes('a.href=p[1]') && html.includes('a.onclick=null'), 'Domain resource links must preserve the exact page URL without intercepting navigation');
 assert.ok(scene.includes('legacy sphere fallback intentionally suppressed'), 'A WebGL failure must not silently revive legacy spheres');
