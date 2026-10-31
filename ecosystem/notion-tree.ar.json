@@ -177,6 +177,22 @@
               "url": "https://app.notion.com/p/40273152f17181329255c2052485c6c0",
               "description": "مجموعة من الفطريات الجذرية الخارجية المرتبطة بجذور النباتات.",
               "children": []
+            },
+            {
+              "id": "ar-pleurotus-kryos",
+              "title": "KRYOS — بطاقة مورد فطري",
+              "notionId": "40273152f17181b7a8e4d792b6abc95b",
+              "url": "https://app.notion.com/p/40273152f17181b7a8e4d792b6abc95b",
+              "description": "بطاقة مورد فطري مرتبط بفرع Pleurotus.",
+              "children": []
+            },
+            {
+              "id": "ar-pleurotus-gris-americain",
+              "title": "Gris américain — بطاقة مورد فطري",
+              "notionId": "40273152f171816fa456d1aa82646617",
+              "url": "https://app.notion.com/p/40273152f171816fa456d1aa82646617",
+              "description": "بطاقة مورد فطري مرتبط بفرع Pleurotus.",
+              "children": []
             }
           ]
         },
@@ -265,6 +281,22 @@
               "notionId": "40173152f17181deb719fcea5367afe1",
               "url": "https://app.notion.com/p/40173152f17181deb719fcea5367afe1",
               "description": "بطاقة تعريف لفطر جذري ضمن مجموعة Glomus.",
+              "children": []
+            },
+            {
+              "id": "ar-rhizopogon",
+              "title": "Rhizopogon spp. — مجموعة الفطريات الجذرية الخارجية",
+              "notionId": "40273152f17181329255c2052485c6c0",
+              "url": "https://app.notion.com/p/40273152f17181329255c2052485c6c0",
+              "description": "مجموعة من الفطريات الجذرية الخارجية؛ تعرض البطاقة سياقها البيئي وعلاقاتها النباتية.",
+              "children": []
+            },
+            {
+              "id": "ar-scleroderma-ref",
+              "title": "Scleroderma spp. — مجموعة الفطريات الجذرية الخارجية",
+              "notionId": "40273152f17181d4aa96c4d6aac56b26",
+              "url": "https://app.notion.com/p/40273152f17181d4aa96c4d6aac56b26",
+              "description": "مجموعة فطرية خارجية الجذور، مدرجة ضمن التفاعلات الجذرية.",
               "children": []
             }
           ]
@@ -426,6 +458,14 @@
               "notionId": "40173152f171819da84dd8d982a9e6be",
               "url": "https://app.notion.com/p/40173152f171819da84dd8d982a9e6be",
               "description": "بكتيريا من جنس Bacillus، تعرض البطاقة خصائصها وسياقها الزراعي.",
+              "children": []
+            },
+            {
+              "id": "ar-weizmannia-coagulans",
+              "title": "Weizmannia coagulans (سابقًا Bacillus coagulans) — بطاقة الكائن",
+              "notionId": "40173152f17181ce9d76c79fec99a67f",
+              "url": "https://app.notion.com/p/40173152f17181ce9d76c79fec99a67f",
+              "description": "بكتيريا كانت تُصنف ضمن Bacillus؛ تعرض البطاقة اسمها التصنيفي الحالي والسابق.",
               "children": []
             }
           ]
