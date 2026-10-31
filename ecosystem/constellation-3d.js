@@ -286,7 +286,7 @@ else if(root){
           }
         }else if(id==='iot'){
           // Instrumentation: branching signal traces with clear junctions and short terminal contacts.
-          for(let branch=0;branch<5;branch++){
+          for(let branch=0;branch<2;branch++){
             const y=(branch-2)*.19;
             const a=p.clone().add(new THREE.Vector3(-.52,y,-.18)),b=p.clone().add(new THREE.Vector3(.62,y+.08,.18));
             const mid1=a.clone().add(new THREE.Vector3(.22,0,0)),mid2=b.clone().add(new THREE.Vector3(-.2,0,0));
@@ -370,7 +370,7 @@ else if(root){
           const direction=new THREE.Vector3().crossVectors(origin.clone().add(new THREE.Vector3(.001,.002,.003)),p.clone().add(new THREE.Vector3(.013,.007,.019))).normalize();
           const bend=midpoint.addScaledVector(direction,.28+(ids.indexOf(id)%3)*.07).add(new THREE.Vector3(Math.sin(ids.indexOf(id)*1.7)*.15,Math.cos(ids.indexOf(id)*1.3)*.12,Math.cos(ids.indexOf(id)*1.1)*.16));
           const path=new THREE.QuadraticBezierCurve3(origin,bend,p);
-          const line=makeNeurite(path,color,.044,.94,64);line.userData={kind:'edge',id};worldGroup.add(line);
+          const line=makeNeurite(path,color,.027,.78,64);line.userData={kind:'edge',id};worldGroup.add(line);
           const pulse=new THREE.Mesh(new THREE.IcosahedronGeometry(.047,1),new THREE.MeshBasicMaterial({color,transparent:true,opacity:1,depthWrite:false,toneMapped:false}));
           pulse.userData={kind:'signal',id};worldGroup.add(pulse);
           const pulse2=new THREE.Mesh(new THREE.SphereGeometry(.03,12,10),new THREE.MeshBasicMaterial({color,transparent:true,opacity:.9,depthWrite:false,toneMapped:false}));pulse2.userData={kind:'signal',id};worldGroup.add(pulse2);
@@ -378,13 +378,13 @@ else if(root){
           // Side branches break the impression of straight spokes and form dendritic junctions.
           for(let branch=0;branch<5;branch++){
             const seed=ids.indexOf(id)*2.17+branch*1.91;
-            const t=[.17,.34,.51,.68,.84][branch],anchor=path.getPoint(t),tangent=path.getTangent(t);
+            const t=[.34,.72][branch],anchor=path.getPoint(t),tangent=path.getTangent(t);
             const side=new THREE.Vector3(-tangent.y+Math.sin(seed)*.28,tangent.x+Math.cos(seed*.7)*.22,Math.sin(seed+1.3)*.8).normalize();
             const reach=.27+((ids.indexOf(id)+branch*3)%4)*.065;
             const end=anchor.clone().addScaledVector(side,reach).addScaledVector(tangent,.09+Math.sin(seed)*.055);
             const control=anchor.clone().addScaledVector(side,reach*(.38+((branch+1)%3)*.12)).addScaledVector(tangent,.035*Math.cos(seed));
             const branchCurve=new THREE.QuadraticBezierCurve3(anchor,control,end);
-            const branchLine=makeNeurite(branchCurve,color,.017+((branch+ids.indexOf(id))%3)*.0025,.86,20);
+            const branchLine=makeNeurite(branchCurve,color,.011+((branch+ids.indexOf(id))%2)*.0015,.68,20);
             branchLine.userData={kind:'dendrite',id};worldGroup.add(branchLine);
             // Fine secondary offshoots make the axon read as branching tissue, not plumbing.
             {
@@ -393,7 +393,7 @@ else if(root){
               const twigSide=new THREE.Vector3(-tangent2.y*sign+Math.cos(seed)*.25,tangent2.x*sign+Math.sin(seed*.8)*.22,Math.cos(seed+2)*.75).normalize();
               const tip=junction.clone().addScaledVector(twigSide,.13+((ids.indexOf(id)+branch)%3)*.035).addScaledVector(tangent2,.055);
               const twigCurve=new THREE.QuadraticBezierCurve3(junction,junction.clone().addScaledVector(twigSide,.06).addScaledVector(tangent2,.025),tip);
-              const twig=makeNeurite(twigCurve,color,.0105,.72,14);
+              const twig=makeNeurite(twigCurve,color,.0065,.54,14);
               twig.userData={kind:'dendrite',id};worldGroup.add(twig);
             }
             const terminal=new THREE.Mesh(new THREE.IcosahedronGeometry(.022,1),new THREE.MeshStandardMaterial({color,emissive:new THREE.Color(color).multiplyScalar(.12),emissiveIntensity:.18,roughness:1}));
