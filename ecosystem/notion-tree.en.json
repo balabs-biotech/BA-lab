@@ -17,6 +17,22 @@
           "url": "https://app.notion.com/p/40173152f17181969ca9ec1b3dfe5435",
           "description": "Explore fungal interactions and their practical biological applications.",
           "children": []
+        },
+        {
+          "id": "en-myco-pleurotus-library",
+          "title": "Pleurotus — cultivated species and resources",
+          "notionId": "40273152f17181eba1bbcaf1b1d491d6",
+          "description": "A guide separating general species profiles from working culture designations, with clear limits on identity and availability.",
+          "url": "https://app.notion.com/p/40273152f17181eba1bbcaf1b1d491d6",
+          "children": []
+        },
+        {
+          "id": "en-myco-pulmonarius",
+          "title": "Pleurotus pulmonarius — species and cultivation profile",
+          "notionId": "40273152f171811fa874e6b3a698e462",
+          "description": "A species profile covering its fan-shaped fruit bodies, saprotrophic lifestyle and tendency to fruit in warmer conditions.",
+          "url": "https://app.notion.com/p/40273152f171811fa874e6b3a698e462",
+          "children": []
         }
       ]
     },
@@ -105,7 +121,16 @@
       "title": "The laboratory",
       "notionId": "40173152f1718119b5dffffaa2245f27",
       "url": "https://app.notion.com/p/40173152f1718119b5dffffaa2245f27",
-      "children": []
+      "children": [
+        {
+          "id": "en-lab-plant-experimentation",
+          "title": "Plant experimentation",
+          "notionId": "40173152f171817baccbf47fd8616785",
+          "description": "Greenhouse trials exploring plant responses to growing matrices, water availability and experimental interventions.",
+          "url": "https://app.notion.com/p/40173152f171817baccbf47fd8616785",
+          "children": []
+        }
+      ]
     },
     {
       "id": "products",
