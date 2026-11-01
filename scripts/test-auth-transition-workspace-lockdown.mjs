@@ -76,16 +76,79 @@ queued.shift()();
 assert.equal(refreshes, 1);
 
 authCallback("TOKEN_REFRESHED", { user: { id: "new-user" } });
+assert.equal(context.authStateRevision, 1, "refreshing the same user's access token must not invalidate the workspace revision");
+assert.equal(queued.length, 0, "a same-user token refresh must not schedule a full workspace reconciliation");
+assert.equal(refreshes, 1, "a same-user token refresh must not reload tenant data");
+
+authCallback("SIGNED_OUT", null);
+assert.equal(context.organizationId, null, "logout must invalidate organization immediately");
 assert.equal(context.authStateRevision, 2);
 assert.equal(queued.length, 1);
 queued.shift()();
 assert.equal(refreshes, 2);
 
-authCallback("SIGNED_OUT", null);
-assert.equal(context.organizationId, null, "logout must invalidate organization immediately");
-assert.equal(context.authStateRevision, 3);
-assert.equal(queued.length, 1);
-queued.shift()();
-assert.equal(refreshes, 3);
-
 console.log("Auth transition workspace lockdown regression passed.");
+
+
+// A successful sign-out must clear every tenant-scoped cache through the same
+// cleanup path used by auth-state transitions. A failed sign-out must preserve it.
+const signOutStart = tracker.indexOf("async function signOut()");
+const authUiMarker = tracker.indexOf("/* ============================================================\n   AUTH UI", signOutStart);
+assert.ok(signOutStart >= 0 && authUiMarker > signOutStart, "signOut function must exist");
+const signOutSource = tracker.slice(signOutStart, authUiMarker);
+
+function createSignOutContext(signOutError = null) {
+  return {
+    organizationId: "tenant-old",
+    organization: { id: "tenant-old" },
+    strainOptions: ["old"], referenceData: ["old"], cultureOptions: ["old"],
+    plantCultureOptions: ["old"], latestBatches: ["old"],
+    selectedBatchId: "old-batch", selectedBatch: { id: "old-batch" },
+    measurementVariables: ["old"], measurementUnits: ["old"],
+    quantityUnitOptions: ["old"], batchLocationOptions: ["old"],
+    batchEnvironmentOptions: ["old"], recentObservations: ["old"],
+    initializationWarnings: ["old"],
+    recordHarvestButton: { disabled: false },
+    saveMeasurementButton: { disabled: false },
+    saveObservationButton: { disabled: false },
+    harvestQuantityInput: { value: "12" },
+    harvestUnitInput: { value: "kg" },
+    harvestNoteInput: { value: "old note" },
+    harvestStatus: { textContent: "old status" },
+    trackerCard: { id: "tracker" }, batchCard: { id: "batch" },
+    measurementCard: { id: "measurements" }, resultCard: { id: "results" },
+    signOutButton: { id: "signout" }, authStatus: { textContent: "old auth" },
+    document: { getElementById() { return null; } },
+    hideElement() {},
+    clearMessage() {},
+    showMessage() {},
+    supabaseClient: { auth: { async signOut() { return { error: signOutError }; } } },
+    authStateRevision: 0,
+    console
+  };
+}
+
+const successfulSignOut = createSignOutContext();
+vm.runInNewContext(helperSource, successfulSignOut, { filename: "workspace-cleanup.js" });
+vm.runInNewContext(signOutSource, successfulSignOut, { filename: "sign-out.js" });
+await successfulSignOut.signOut();
+for (const key of [
+  "organizationId", "organization", "strainOptions", "referenceData",
+  "cultureOptions", "plantCultureOptions", "latestBatches",
+  "selectedBatchId", "selectedBatch", "measurementVariables",
+  "measurementUnits", "quantityUnitOptions", "batchLocationOptions",
+  "batchEnvironmentOptions", "recentObservations", "initializationWarnings"
+]) {
+  assert.ok(
+    successfulSignOut[key] === null || (Array.isArray(successfulSignOut[key]) && successfulSignOut[key].length === 0),
+    "successful sign-out must clear tenant-scoped state: " + key
+  );
+}
+assert.equal(successfulSignOut.harvestQuantityInput.value, "", "successful sign-out clears harvest form values");
+
+const failedSignOut = createSignOutContext(new Error("network unavailable"));
+vm.runInNewContext(helperSource, failedSignOut, { filename: "workspace-cleanup.js" });
+vm.runInNewContext(signOutSource, failedSignOut, { filename: "sign-out.js" });
+await failedSignOut.signOut();
+assert.equal(failedSignOut.organizationId, "tenant-old", "failed sign-out must preserve the active tenant context");
+assert.deepEqual(Array.from(failedSignOut.plantCultureOptions), ["old"], "failed sign-out must preserve tenant caches");

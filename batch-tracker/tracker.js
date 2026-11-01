@@ -15,6 +15,8 @@ const supabaseClient =
     SUPABASE_URL,
     SUPABASE_PUBLISHABLE_KEY
   );
+// Feature modules must share the authenticated client and its session lifecycle.
+window.BA_LABS_SUPABASE_CLIENT = supabaseClient;
 
 
 /* ============================================================
@@ -762,23 +764,16 @@ async function signOut() {
 
 
   authStateRevision += 1;
-  organizationId = null;
-  organization = null;
-  strainOptions = [];
-  referenceData = [];
-  cultureOptions = [];
-  latestBatches = [];
-  selectedBatchId = null;
-  selectedBatch = null;
+  clearAuthenticatedWorkspaceState();
   if (harvestQuantityInput) harvestQuantityInput.value = "";
   if (harvestUnitInput) harvestUnitInput.value = "";
   if (harvestNoteInput) harvestNoteInput.value = "";
-  if (recordHarvestButton) recordHarvestButton.disabled = true;
   if (harvestStatus) harvestStatus.textContent = "Connectez-vous et sélectionnez un lot à l’étape Récolte.";
 
 
   hideElement(trackerCard);
   hideElement(batchCard);
+  hideElement(document.getElementById("plantCard"));
   hideElement(measurementCard);
   hideElement(document.getElementById("statisticsCard"));
   hideElement(document.getElementById("overviewCard"));
@@ -4638,6 +4633,11 @@ supabaseClient.auth.onAuthStateChange(
 
     // init() owns the initial session check; don't race it with INITIAL_SESSION.
     if (event === "INITIAL_SESSION") return;
+
+    // Supabase emits TOKEN_REFRESHED for the same authenticated user. The
+    // client already owns the refreshed access token; invalidating the
+    // workspace revision here would restart every tenant-scoped data loader.
+    if (event === "TOKEN_REFRESHED") return;
 
     authStateRevision += 1;
     const revision = authStateRevision;

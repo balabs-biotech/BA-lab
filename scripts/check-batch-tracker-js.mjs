@@ -13,8 +13,9 @@ const routes=[
 ];
 for(const r of routes){
  const html=fs.readFileSync(r.file,"utf8");
- if(!html.includes(`window.BA_LABS_DOMAIN = "${r.domain}"`))throw new Error("Wrong domain: "+r.file);
- if(!/fetch\("\.\.\/workspace\.html(?:\?v=[^"]*)?"\)/.test(html)||!/script\.src = "\.\.\/tracker\.js(?:\?v=[^"]*)?"/.test(html))throw new Error("Shared engine missing: "+r.file);
+ if(!html.includes(`<body data-domain="${r.domain}">`))throw new Error("Wrong domain: "+r.file);
+ if(!html.includes('src="../workspace-bootstrap.js?v='))throw new Error("Shared workspace bootstrap missing: "+r.file);
+ if(/fetch\("\.\.\/workspace\.html/.test(html)||/script\.src = "\.\.\/tracker\.js/.test(html))throw new Error("Private startup sequence remains in "+r.file);
  if(!root.includes(`href="${r.url}"`))throw new Error("Root link missing: "+r.url);
 }
 if(template.includes('class="domain-switcher"'))throw new Error("Switcher remains inside workspace");
@@ -219,7 +220,8 @@ const authUiStart=engine.indexOf("/* ===========================================
 if(signOutStart<0||authUiStart<0)throw new Error("Could not isolate signOut for session-failure regression guard");
 const signOutBlock=engine.slice(signOutStart,authUiStart);
 if(!signOutBlock.includes("const { error } = await supabaseClient.auth.signOut()")||!signOutBlock.includes("if (error)")||!signOutBlock.includes("Déconnexion impossible")||!signOutBlock.includes("return;"))throw new Error("Sign-out failure must be surfaced without clearing authenticated state");
-if(signOutBlock.indexOf("return;")>signOutBlock.indexOf("organizationId = null"))throw new Error("Sign-out failure return must precede local session-state reset");
+if(!signOutBlock.includes("clearAuthenticatedWorkspaceState();"))throw new Error("Successful sign-out must clear all tenant-scoped state through the shared cleanup helper");
+if(signOutBlock.indexOf("return;")>signOutBlock.indexOf("clearAuthenticatedWorkspaceState();"))throw new Error("Sign-out failure return must precede shared tenant-state cleanup");
 console.log("✓ Sign-out checks Supabase's returned error and preserves local state when logout fails");
 
 if(!engine.includes("let authStateRevision = 0;"))throw new Error("Auth revision guard is missing");

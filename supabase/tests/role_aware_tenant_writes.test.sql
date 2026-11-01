@@ -79,7 +79,23 @@ grant select, insert on public.strains to authenticated;
 begin;
 set local role authenticated;
 select set_config('request.jwt.claim.sub', '00000000-0000-0000-0000-0000000000b1', true);
-do $$
+
+-- Viewer is read-only, not blind: it must still see rows in its own organization.
+do $viewer_read$
+declare
+  v_visible_count integer;
+begin
+  select count(*) into v_visible_count
+  from public.strains
+  where organization_id = '00000000-0000-0000-0000-0000000000a1';
+
+  if v_visible_count < 1 then
+    raise exception 'FAIL: viewer cannot read strains from its own organization';
+  end if;
+end
+$viewer_read$;
+
+do $viewer_write$
 begin
   begin
     insert into public.strains(organization_id, organism_id, strain_code)
@@ -139,7 +155,7 @@ begin
     end if;
   end;
 end
-$$;
+$viewer_write$;
 rollback;
 
 -- A member must retain intended data-write and batch-creation capabilities.
