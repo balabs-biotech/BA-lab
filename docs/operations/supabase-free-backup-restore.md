@@ -42,6 +42,21 @@ The capture exposed source drift that must be resolved before a disaster deploym
 - Four tracked functions differed from their deployed source at capture time: `sync-culture-to-notion`, `nasa-power-agroclimate`, `copernicus-sentinel-catalogue`, and `earth-search-sentinel2-ndvi-preview`.
 - Only `iot-ingest` and `nasa-power-scheduled-import` matched their deployed source exactly.
 
+
+The deployed inventory at capture time was:
+
+| Function | Deployed version | Supabase JWT verification |
+|---|---:|---|
+| `claim-ba-labs` | 9 | Enabled |
+| `sync-culture-to-notion` | 13 | Enabled |
+| `iot-ingest` | 2 | Disabled — device-token authentication in handler |
+| `nasa-power-agroclimate` | 6 | Enabled |
+| `nasa-power-scheduled-import` | 4 | Disabled — Vault-backed cron secret in handler |
+| `copernicus-sentinel-catalogue` | 8 | Enabled |
+| `sentinel-2-ndvi-preview` | 1 | Enabled |
+| `earth-search-sentinel2-catalogue` | 1 | Enabled |
+| `earth-search-sentinel2-ndvi-preview` | 5 | Enabled |
+
 The deployed snapshot is a recovery/reference artifact, not a deployment instruction. Compare it with `supabase/functions/`, choose the intended canonical source, and run tests before deploying. Never place Edge Function secrets or Vault values in this repository. The snapshot contains source code only; project secrets must be inventoried separately by secret name and re-entered securely in a target project.
 
 ## Requirements
