@@ -107,7 +107,7 @@ assert.ok(scene.includes('notionTreeReady.then('), '3D resource nodes must refre
 assert.ok(scene.includes('nearestOnScreen=(objects)=>') && scene.includes("object.userData?.kind==='resource-label'&&object.userData?.sourceId===selected"), 'Selected-domain branch labels must have stable screen-space pick targets');
 assert.ok(scene.includes('new THREE.SphereGeometry(.72,12,10)') && scene.includes('resourceMeshes.push(hitProxy)'), 'Every 3D resource branch must expose an invisible touch target');
 assert.ok(scene.includes('const nearestDomain=nearestOnScreen(points.flatMap(point=>[point.hitMesh,point.label]))'), 'Domain cells must remain clickable after long-range zoom');
-assert.ok(scene.includes('return pickableHit?[pickableHit,...hits.filter(hit=>hit!==pickableHit)]:hits'), 'The nearest semantic node or branch must be selected ahead of decorative geometry');
+assert.ok(scene.includes('if(pickableHit)return [pickableHit,...hits.filter(hit=>hit!==pickableHit)]'), 'The nearest semantic node or branch must be selected ahead of decorative geometry');
 assert.ok(scene.includes("document.addEventListener('pointerup',e=>{if(!pointers.has(e.pointerId))return;") && scene.includes('lastPointerMoved=true;pick(e)},true)'), 'A tap must invoke 3D picking from the document capture phase even when pointer capture retargets events');
 assert.ok(scene.includes("document.addEventListener('click',e=>{") && !scene.includes('if(e.detail>0)pick(e)'), 'The synthetic click after pointer release must not pick a second time');
 assert.ok(scene.includes('Math.hypot(dx,dy)>10'), 'Small touch jitter must not be mistaken for a camera drag');
