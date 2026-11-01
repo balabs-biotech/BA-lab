@@ -12,11 +12,11 @@ for (const [domain, path] of entryPages) {
   const html = fs.readFileSync(path, "utf8");
   assert.match(html, new RegExp(`<body[^>]*data-domain=["']${domain}["']`, "i"),
     `${domain} must declare its workspace domain on body`);
-  assert.match(html, /workspace-bootstrap\\.js/,
+  assert.match(html, /workspace-bootstrap\.js/,
     `${domain} must delegate startup to the shared workspace bootstrap`);
-  assert.doesNotMatch(html, /fetch\\(["']\\.\\.\\/workspace\\.html/,
+  assert.doesNotMatch(html, /fetch\(["']\.\.\/workspace\.html/,
     `${domain} must not keep a private workspace-loading sequence`);
-  assert.doesNotMatch(html, /createElement\\(["']script["']\\)/,
+  assert.doesNotMatch(html, /createElement\(["']script["']\)/,
     `${domain} must not inject its own startup scripts`);
 }
 
@@ -68,13 +68,13 @@ for (const [domain, specialized] of [
   assert.match(run.root.innerHTML, /workspace/);
   const scriptEvents = run.events.filter(event => event.startsWith("script:"));
   assert.equal(scriptEvents.length, 3);
-  assert.match(scriptEvents[0], /i18n\\.js/);
-  assert.match(scriptEvents[1], /tracker\\.js/);
+  assert.match(scriptEvents[0], /i18n\.js/);
+  assert.match(scriptEvents[1], /tracker\.js/);
   assert.match(scriptEvents[2], new RegExp(specialized));
   if (domain === "agronomy") {
-    assert.ok(!scriptEvents.some(event => /smart-entry\\.js/.test(event)));
+    assert.ok(!scriptEvents.some(event => /smart-entry\.js/.test(event)));
   } else {
-    assert.ok(!scriptEvents.some(event => /environmental-data\\.js/.test(event)));
+    assert.ok(!scriptEvents.some(event => /environmental-data\.js/.test(event)));
   }
 }
 
