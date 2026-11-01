@@ -151,12 +151,15 @@ async function checkWorkingScene(name, viewport) {
     }, id);
     assert.ok(projected && Math.abs(projected.ndc.x) < .92 && Math.abs(projected.ndc.y) < .92,
       name + ': ' + id + ' must remain inside the selectable viewport');
+    await page.mouse.move(projected.x, projected.y);
+    await page.waitForFunction((targetId) => document.querySelector('#mainView .webgl-stage')?.dataset.hoverWorld === targetId, id, { timeout: 5000 });
     await page.mouse.click(projected.x, projected.y);
-    await page.waitForFunction((targetId) => {
+    await page.waitForFunction((targetId) => document.querySelector('#mainView .webgl-stage')?.dataset.selectedWorld === targetId, id, { timeout: 5000 });
+    await page.waitForFunction(() => {
       const panel = document.querySelector('#mainView .webgl-focus');
       return panel && !panel.hidden && panel.classList.contains('has-world') &&
         panel.querySelector('strong')?.textContent?.trim().length > 0;
-    }, id, { timeout: 5000 });
+    }, undefined, { timeout: 5000 });
     const selectedTitle = await page.locator('#mainView .webgl-focus strong').first().textContent();
     assert.ok(selectedTitle && selectedTitle.trim().length > 0,
       name + ': ' + id + ' must resolve to a readable domain detail');
