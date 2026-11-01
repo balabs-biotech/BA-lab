@@ -155,7 +155,7 @@ begin
     end if;
   end;
 end
-$$;
+$viewer_write$;
 rollback;
 
 -- A member must retain intended data-write and batch-creation capabilities.
