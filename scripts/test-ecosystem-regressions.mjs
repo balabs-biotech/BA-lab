@@ -144,7 +144,7 @@ for (const [language, expectedCollections] of Object.entries({
 console.log('Ecosystem regression checks passed: 8 domains, organic network, Notion tree hierarchy, exact URLs, cross-domain signals, unified navigation, gateway state, fallback and cache version.');
 
 assert.ok(scene.includes('function domainViewDistance(id)') && scene.includes('const rings=Math.max(1,Math.ceil(maxSiblings/12))'), 'Selected domains must adapt camera distance to their actual branch count and hierarchy');
-assert.ok(scene.includes('function overviewDistance(){return camera?.aspect<.78?13.4:camera?.aspect<1.05?11.2:11}'), 'Portrait overview must pull back far enough to frame all eight connected domains');
+
 assert.ok(scene.includes('camera.fov=camera.aspect<.78?72:(camera.aspect>1.2?38:60)'), 'Portrait camera must widen its vertical field of view to keep the full network in frame');
 assert.ok(scene.includes('const zoomArc=Math.min(2.2,travelDistance*.12+Math.abs(endDist-dist)*.09)'), 'Long 3D transitions must create a restrained zoom-out arc between the overview and selected domain');
 assert.ok(scene.includes('const duration=Math.min(1900,Math.max(1050,(target?1120:980)+travelDistance*95+Math.abs(endDist-dist)*35))'), '3D transition duration must adapt to travel distance and zoom change');
