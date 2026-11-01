@@ -122,6 +122,10 @@ assert.ok(html.includes('.webgl-ready .sphere') || html.includes('.webgl-ready .
 console.log('Ecosystem regression checks passed: 8 domains, organic network, Notion tree hierarchy, exact URLs, cross-domain signals, unified navigation, gateway state, fallback and cache version.');
 
 assert.ok(scene.includes('window.enterSphere(id,false,true)'), '3D domain selection must request spatial-only navigation without revealing the legacy 2D index');
+const resourcePick = scene.slice(scene.indexOf("if(obj.userData.kind==='resource'||obj.userData.kind==='resource-label')"), scene.indexOf("if(obj.userData.kind==='sphere'||obj.userData.kind==='label'||obj.userData.kind==='dendrite'||obj.userData.kind==='synapse')"));
+assert.ok(resourcePick.includes('refreshFocus(obj.userData.sourceId)'), 'Selecting a Notion branch must show its in-scene details');
+assert.ok(!resourcePick.includes('window.open(') && !resourcePick.includes('window.location.assign('), 'Selecting a Notion branch must not immediately leave the 3D experience');
+assert.ok(scene.includes("open.dataset.resourceOpen='true'"), 'Opening a Notion page must remain an explicit action in the resource panel');
 assert.ok(scene.includes('window.enterSphere(targetId,false,true)'), 'Related-domain panel navigation must also stay in spatial-only mode');
 assert.ok(!scene.includes('window.enterSphere(targetId,false)'), 'No 3D navigation path may re-enable the legacy 2D index');
 assert.ok(html.includes('function enterSphere(id,scroll=true,spatial3D=false)'), 'Shared domain navigation must distinguish 3D entry from legacy 2D entry');
