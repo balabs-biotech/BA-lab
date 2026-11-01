@@ -82,6 +82,16 @@ async function checkWorkingScene(name, viewport) {
   );
   assert.equal(legacyVisible, 0, name + ': old HTML spheres must not appear over the WebGL scene');
 
+  if (viewport.width <= 760) {
+    const hintRect = await page.locator('#mainView .webgl-stage .webgl-hint').evaluate((el) => {
+      const rect = el.getBoundingClientRect();
+      const stageRect = el.parentElement.getBoundingClientRect();
+      return { top: rect.top, bottom: rect.bottom, stageTop: stageRect.top, stageHeight: stageRect.height };
+    });
+    assert.ok(hintRect.top - hintRect.stageTop < hintRect.stageHeight * 0.35,
+      name + ': mobile navigation hint must stay above the lower network branches');
+  }
+
   await page.screenshot({ path: outputDir + '/' + name + '-gateway.png', fullPage: false });
   const intro = page.locator('#mainView .webgl-intro');
   await intro.waitFor({ state: 'visible' });
