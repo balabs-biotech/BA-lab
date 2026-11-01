@@ -15,6 +15,8 @@ const supabaseClient =
     SUPABASE_URL,
     SUPABASE_PUBLISHABLE_KEY
   );
+// Feature modules must share the authenticated client and its session lifecycle.
+window.BA_LABS_SUPABASE_CLIENT = supabaseClient;
 
 
 /* ============================================================
