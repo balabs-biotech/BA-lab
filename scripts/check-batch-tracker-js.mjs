@@ -220,7 +220,8 @@ const authUiStart=engine.indexOf("/* ===========================================
 if(signOutStart<0||authUiStart<0)throw new Error("Could not isolate signOut for session-failure regression guard");
 const signOutBlock=engine.slice(signOutStart,authUiStart);
 if(!signOutBlock.includes("const { error } = await supabaseClient.auth.signOut()")||!signOutBlock.includes("if (error)")||!signOutBlock.includes("Déconnexion impossible")||!signOutBlock.includes("return;"))throw new Error("Sign-out failure must be surfaced without clearing authenticated state");
-if(signOutBlock.indexOf("return;")>signOutBlock.indexOf("organizationId = null"))throw new Error("Sign-out failure return must precede local session-state reset");
+if(!signOutBlock.includes("clearAuthenticatedWorkspaceState();"))throw new Error("Successful sign-out must clear all tenant-scoped state through the shared cleanup helper");
+if(signOutBlock.indexOf("return;")>signOutBlock.indexOf("clearAuthenticatedWorkspaceState();"))throw new Error("Sign-out failure return must precede shared tenant-state cleanup");
 console.log("✓ Sign-out checks Supabase's returned error and preserves local state when logout fails");
 
 if(!engine.includes("let authStateRevision = 0;"))throw new Error("Auth revision guard is missing");
