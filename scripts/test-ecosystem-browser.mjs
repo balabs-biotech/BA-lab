@@ -107,6 +107,9 @@ async function checkWorkingScene(name, viewport) {
     worldChildren: Number(el.dataset.worldChildren || 0),
     cameraDistance: Number(el.dataset.cameraDistance || 0),
     cameraAspect: Number(el.dataset.cameraAspect || 0),
+    drawCalls: Number(el.dataset.drawCalls || 0),
+    triangles: Number(el.dataset.triangles || 0),
+    glError: Number(el.dataset.glError || 0),
     position: getComputedStyle(el).position,
     zIndex: getComputedStyle(el).zIndex,
     opacity: getComputedStyle(el).opacity,
@@ -115,6 +118,8 @@ async function checkWorkingScene(name, viewport) {
   assert.equal(renderState.worldVisible, 'true', name + ': 3D network group must be visible after entering the universe');
   assert.ok(renderState.worldChildren > 0, name + ': 3D network group must contain rendered objects');
   assert.ok(renderState.cameraDistance > 0 && renderState.cameraAspect > 0, name + ': camera dimensions must be valid');
+  assert.ok(renderState.drawCalls > 0 && renderState.triangles > 0, name + ': WebGL must submit visible mesh geometry');
+  assert.equal(renderState.glError, 0, name + ': WebGL context reported a graphics error');
   if (viewport.width <= 760) console.log(name + ': mobile render diagnostics', JSON.stringify(renderState));
   await page.screenshot({ path: outputDir + '/' + name + '-universe.png', fullPage: false });
 
