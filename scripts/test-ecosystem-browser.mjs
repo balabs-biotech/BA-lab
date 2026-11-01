@@ -98,7 +98,7 @@ async function checkWorkingScene(name, viewport) {
     const mini = document.querySelector('#miniView');
     return mini?.classList.contains('spatial-source-only') &&
       getComputedStyle(mini).display === 'none';
-  }, undefined, { timeout: 8000 }).catch(async error => { throw new Error('3D domain tap did not enter its domain: ' + JSON.stringify(await page.evaluate(() => window.__BALABS_3D_E2E__())) + ' — ' + error.message); });
+  }, undefined, { timeout: 8000 }).catch(async error => { throw new Error('3D domain tap did not enter its domain: ' + JSON.stringify(await page.evaluate(() => ({probe:window.__BALABS_3D_E2E__(),lastPick:window.__BALABS_3D_LAST_PICK__}))) + ' — ' + error.message); });
   assert.ok(await canvas.isVisible(), name + ': entering a 3D domain must keep the WebGL canvas visible');
   assert.equal(await page.locator('#miniView.spatial-source-only').count(), 1,
     name + ': the legacy index must remain a hidden data source during 3D navigation');
