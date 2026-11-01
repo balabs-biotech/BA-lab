@@ -35,7 +35,7 @@ for (const fn of manifest.functions) {
   const path = new URL(fn.name + "/index.ts", root);
   const source = await readFile(path, "utf8");
   const gitObject = createHash("sha1")
-    .update(`blob ${Buffer.byteLength(source, "utf8")}\\0`, "utf8")
+    .update(`blob ${Buffer.byteLength(source, "utf8")}\0`, "utf8")
     .update(source, "utf8")
     .digest("hex");
   assert.equal(gitObject, fn.git_blob_sha, fn.name + " snapshot Git blob checksum mismatch");
