@@ -7,6 +7,7 @@ const [source, entry, i18n] = await Promise.all([
   readFile(new URL("../../batch-tracker/i18n.js", import.meta.url), "utf8"),
 ]);
 const checks = [
+
   ["loads the satellite panel immediately after the Green Tech hero", /hero\.parentNode\.insertBefore\(panel,hero\.nextSibling\)/],
   ["restores the last used location automatically", /localStorage\.getItem\("ba-labs-active-environment-location"\)/],
   ["automatically selects a configured location when no previous site exists", /const preferred=saved\|\|data\.find/],
@@ -31,6 +32,8 @@ const checks = [
   ["labels partial rainfall totals explicitly", /Cumul partiel · /],
   ["calculates agronomic coverage against calendar days, including missing days", /windowStart=Math\.max\(firstDay,lastDay-6\*86400000\)[\s\S]*?windowObservations/],
  ];
+assert.doesNotMatch(entry, /smart-entry\.js/, "Green Tech must not load the biological smart-entry adapter");
+assert.match(entry, /script\.onload = \(\) => \{[\s\S]*?environmental-data\.js/, "loads the environmental module directly after the shared tracker");
 assert.match(entry, /environmental-data\.js\?v=20261027-sentinel-fallback-fix-1/, "uses a cache-busted environmental module path");
 assert.match(entry, /i18n\.js\?v=[^"]+/, "uses a cache-busted localization module path");
 assert.match(i18n, /Lecture agronomique/, "contains localized agronomic synthesis labels");
