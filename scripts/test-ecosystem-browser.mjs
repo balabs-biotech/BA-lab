@@ -159,7 +159,7 @@ async function checkWorkingScene(name, viewport) {
       throw new Error(name + ': precise hover failed for ' + id + ': ' + JSON.stringify({ projected, hitState }) + '; ' + error.message);
     }
     await page.mouse.click(projected.x, projected.y);
-    await page.waitForFunction((targetId) => document.querySelector('#mainView .webgl-stage')?.dataset.selectedWorld === targetId, id, { timeout: 5000 });
+    try { await page.waitForFunction((targetId) => document.querySelector('#mainView .webgl-stage')?.dataset.selectedWorld === targetId, id, { timeout: 5000 }); } catch (error) { const clickState = await stage.evaluate(el => ({ selectedWorld:el.dataset.selectedWorld, lastClick:el.dataset.lastClick, clickMoved:el.dataset.clickMoved, clickTarget:el.dataset.clickTarget, clickSelected:el.dataset.clickSelected, lastHitKind:el.dataset.lastHitKind, lastHitId:el.dataset.lastHitId, lastPointer:el.dataset.lastPointer })); throw new Error(name + ': click selection failed for ' + id + ': ' + JSON.stringify({ projected, clickState }) + '; ' + error.message); }
     await page.waitForFunction(() => {
       const panel = document.querySelector('#mainView .webgl-focus');
       return panel && !panel.hidden && panel.classList.contains('has-world') &&
