@@ -37,7 +37,7 @@ assert.ok(scene.includes('worldGroup.scale.setScalar(closed?.72:(camera?.aspect<
 assert.ok(scene.includes('THREE.MathUtils.clamp(dist+delta*.012,3.2,120)'), '3D wheel navigation must support a long-range overview zoom');
 assert.ok(scene.includes('makeLabel(labels[id].title,0xf5f7fa,29)') && scene.includes('label.scale.set(Math.min(4.25,Math.max(2.25,labels[id].title.length*.135)),.67,1)'), 'Domain labels must remain prominent at overview scale');
 assert.ok(scene.includes('function overviewDistance(){return camera?.aspect<.78?11.2:camera?.aspect<1.05?11.2:11}'), 'Portrait overview must keep the enlarged network readable while framing all eight connected domains');
-assert.ok(scene.includes('camera.fov=camera.aspect<.78?72:(camera.aspect>1.2?38:60)'), 'Portrait camera must widen its vertical field of view to keep the full network in frame');
+assert.ok(scene.includes('camera.fov=camera.aspect<.78?72:(camera.aspect>1.2?48:60)'), 'Portrait camera must widen its vertical field of view to keep the full network in frame');
 assert.ok(html.includes('class="linknode ln1" href="#"') && html.includes('target="_blank"'), 'Domain resource nodes must be real links that open their matching Notion pages');
 assert.ok(html.includes('a.href=p[1]') && html.includes('a.onclick=null'), 'Domain resource links must preserve the exact page URL without intercepting navigation');
 assert.ok(scene.includes('legacy sphere fallback intentionally suppressed'), 'A WebGL failure must not silently revive legacy spheres');
@@ -145,7 +145,7 @@ console.log('Ecosystem regression checks passed: 8 domains, organic network, Not
 
 assert.ok(scene.includes('function domainViewDistance(id)') && scene.includes('const rings=Math.max(1,Math.ceil(maxSiblings/12))'), 'Selected domains must adapt camera distance to their actual branch count and hierarchy');
 
-assert.ok(scene.includes('camera.fov=camera.aspect<.78?72:(camera.aspect>1.2?38:60)'), 'Portrait camera must widen its vertical field of view to keep the full network in frame');
+assert.ok(scene.includes('camera.fov=camera.aspect<.78?72:(camera.aspect>1.2?48:60)'), 'Portrait camera must widen its vertical field of view to keep the full network in frame');
 assert.ok(scene.includes('const zoomArc=Math.min(2.2,travelDistance*.12+Math.abs(endDist-dist)*.09)'), 'Long 3D transitions must create a restrained zoom-out arc between the overview and selected domain');
 assert.ok(scene.includes('const duration=Math.min(1900,Math.max(1050,(target?1120:980)+travelDistance*95+Math.abs(endDist-dist)*35))'), '3D transition duration must adapt to travel distance and zoom change');
 assert.ok(scene.includes('Math.sin(Math.PI*e)*transition.zoomArc'), 'The camera zoom arc must ease out and return smoothly during the transition');
