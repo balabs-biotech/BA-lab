@@ -35,7 +35,14 @@ Current Storage usage is zero, so there are no existing object files to export. 
 
 Auth users are not recoverable from these SQL files. In a disaster recovery, recreate/invite users and require password resets or account recovery. Do not assume password hashes or active sessions can be restored.
 
-Edge Function source should remain version-controlled in `supabase/functions/`; project secrets must be inventoried and re-entered securely in the target project. Never place secrets in this repository or in a backup manifest.
+Edge Function source and deployment state require a separate repository snapshot; they are not part of the PostgreSQL SQL dump. A read-only capture of all nine active production functions is stored in `supabase/deployed-functions-snapshot/`, with exact source, deployed version, `verify_jwt` setting, and checksums in `manifest.json`.
+
+The capture exposed source drift that must be resolved before a disaster deployment:
+- Three deployed functions were absent from the `main` source tree: `claim-ba-labs`, `sentinel-2-ndvi-preview`, and `earth-search-sentinel2-catalogue`.
+- Four tracked functions differed from their deployed source at capture time: `sync-culture-to-notion`, `nasa-power-agroclimate`, `copernicus-sentinel-catalogue`, and `earth-search-sentinel2-ndvi-preview`.
+- Only `iot-ingest` and `nasa-power-scheduled-import` matched their deployed source exactly.
+
+The deployed snapshot is a recovery/reference artifact, not a deployment instruction. Compare it with `supabase/functions/`, choose the intended canonical source, and run tests before deploying. Never place Edge Function secrets or Vault values in this repository. The snapshot contains source code only; project secrets must be inventoried separately by secret name and re-entered securely in a target project.
 
 ## Requirements
 
