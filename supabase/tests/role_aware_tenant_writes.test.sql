@@ -81,7 +81,7 @@ set local role authenticated;
 select set_config('request.jwt.claim.sub', '00000000-0000-0000-0000-0000000000b1', true);
 
 -- Viewer is read-only, not blind: it must still see rows in its own organization.
-do $
+do $viewer_read$
 declare
   v_visible_count integer;
 begin
@@ -93,7 +93,7 @@ begin
     raise exception 'FAIL: viewer cannot read strains from its own organization';
   end if;
 end
-$;
+$viewer_read$;
 
 do $
 begin
