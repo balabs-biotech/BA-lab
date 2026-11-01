@@ -103,7 +103,8 @@ assert.ok(scene.includes('const visit=(node,depth=0,parentId=domainTree.id'), '3
 assert.ok(scene.includes('data-notion-tree-node="true"'), 'Manifest nodes must be injected into the 3D resource layer');
 assert.ok(scene.includes('parentId:a.dataset.parentId') && scene.includes('depth:Number(a.dataset.depth||0)'), '3D resource nodes must retain their hierarchy metadata');
 assert.ok(scene.includes('notionTreeReady.then('), '3D resource nodes must refresh when the manifest finishes loading');
-assert.ok(scene.includes("const pickableHit=hits.find(hit=>['resource','resource-label','sphere','label','dendrite','synapse'].includes(hit.object.userData?.kind))"), 'Clickable Notion branches and semantic 3D nodes must take priority over decorative geometry during raycasting');
+assert.ok(scene.includes("const resourceHit=selected?hits.find(hit=>['resource','resource-label'].includes(hit.object.userData?.kind)&&hit.object.userData?.sourceId===selected):null"), 'Resources belonging to the selected domain must take priority over its sphere during raycasting');
+assert.ok(scene.includes('new THREE.SphereGeometry(.48,12,10)') && scene.includes('resourceMeshes.push(hitProxy)'), 'Every 3D resource branch must expose a generous invisible touch target');
 assert.ok(scene.includes('return pickableHit?[pickableHit,...hits.filter(hit=>hit!==pickableHit)]:hits'), 'The nearest semantic node or branch must be selected ahead of decorative geometry');
 assert.ok(scene.includes("document.addEventListener('pointerup',e=>{if(!pointers.has(e.pointerId))return;") && scene.includes('lastPointerMoved=true;pick(e)},true)'), 'A tap must invoke 3D picking from the document capture phase even when pointer capture retargets events');
 assert.ok(scene.includes("document.addEventListener('click',e=>{") && !scene.includes('if(e.detail>0)pick(e)'), 'The synthetic click after pointer release must not pick a second time');
