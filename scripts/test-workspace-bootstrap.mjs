@@ -71,7 +71,7 @@ for (const [domain, specialized] of [
   const scriptEvents = run.events.filter(event => event.startsWith("script:"));
   assert.equal(scriptEvents.length, 3);
   assert.match(scriptEvents[0], /i18n\.js/);
-  assert.match(scriptEvents[1], /tracker\\.js\\?v=20261101-auth-session-stability-1/);
+  assert.equal(scriptEvents[1], "script:../tracker.js?v=20261101-auth-session-stability-1");
   assert.match(scriptEvents[2], new RegExp(specialized));
   if (domain === "agronomy") {
     assert.ok(!scriptEvents.some(event => /smart-entry\.js/.test(event)));
