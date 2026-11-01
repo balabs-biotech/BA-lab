@@ -95,7 +95,7 @@ begin
 end
 $viewer_read$;
 
-do $
+do $viewer_write$
 begin
   begin
     insert into public.strains(organization_id, organism_id, strain_code)
