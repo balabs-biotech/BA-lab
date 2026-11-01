@@ -27,6 +27,10 @@ assert.match(catalogue, /cloud < 0 \|\| cloud > 100/);
 assert.match(catalogue, /AbortSignal\.timeout\(20000\)/);
 assert.match(catalogue, /earth-search\.aws\.element84\.com/);
 assert.doesNotMatch(catalogue, /serviceKey|adminClient/);
+assert.match(catalogue, /MAX_REQUEST_BYTES\s*=\s*32\s*\*\s*1024/);
+assert.match(catalogue, /MAX_STAC_RESPONSE_BYTES\s*=\s*2\s*\*\s*1024\s*\*\s*1024/);
+assert.match(catalogue, /readBoundedJson\(req, MAX_REQUEST_BYTES\)/);
+assert.match(catalogue, /readBoundedJson\(upstream, MAX_STAC_RESPONSE_BYTES\)/);
 
 console.log("✓ Restored active Edge Function sources match the exact captured deployed baselines");
 console.log("✓ BA-LABS bootstrap remains authenticated and restricted to the intended admin account");
