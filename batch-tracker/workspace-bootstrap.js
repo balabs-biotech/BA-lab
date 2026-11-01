@@ -67,7 +67,7 @@
     }
 
     try {
-      await loadScript("../tracker.js?v=20261026-core-refresh-1", "engine");
+      await loadScript("../tracker.js?v=20261101-auth-session-stability-1", "engine");
     } catch {
       showStartupError(
         "Moteur indisponible",
