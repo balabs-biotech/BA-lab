@@ -227,6 +227,8 @@ jobs:
           psql -At -v ON_ERROR_STOP=1 -X -q -c "select to_regclass('public.cultures'), to_regclass('public.batches'), to_regclass('public.culture_data_consents')" | grep -q 'cultures'
       - name: Verify plant culture client privileges after replay
         run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/plant_cultures_privilege_contract.test.sql
+      - name: Verify future public table default privileges after replay
+        run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/public_table_default_privileges.test.sql
       - name: Verify atomic manual-write RPC security contract after replay
         run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/manual_write_rpc_security_contract.test.sql
       - name: Verify batch harvest RPC security contract after replay
