@@ -107,7 +107,9 @@ assert.ok(scene.includes('notionTreeReady.then('), '3D resource nodes must refre
 assert.ok(scene.includes("const resourceHit=hits.find(hit=>hit.object.userData?.kind==='resource'||hit.object.userData?.kind==='resource-label')"), 'Clickable Notion branches must take priority over decorative neurites and domain geometry during raycasting');
 assert.ok(scene.includes('if(resourceHit)return[resourceHit,...hits.filter(hit=>hit!==resourceHit)]'), 'A branch hit must be selected even when a decorative object is closer to the camera');
 assert.ok(scene.includes('const pickRadius=Math.max(24,Math.min(38,r.width*.045))'), 'Domain picking must retain a precise screen-space fallback when the ray misses a small soma');
-assert.ok(scene.includes("stage.addEventListener('click',e=>{if(e.target.closest('.webgl-controls,.webgl-focus')||moved)return;pick(e)})"), 'A native stationary click must trigger the 3D picking handler after gesture tracking');
+assert.ok(scene.includes('if(!wasMoved){lastPointerPickAt=performance.now();pick(e)}'), 'A stationary pointer release must trigger the 3D picking handler after gesture tracking');
+assert.ok(scene.includes('performance.now()-lastPointerPickAt<350'), 'The native click fallback must be deduplicated after pointerup selection');
+assert.ok(scene.includes("stage.addEventListener('click',e=>") && scene.includes('pick(e);stage.dataset.clickSelected=stage.dataset.selectedWorld||\'\''), 'A native stationary click must retain a fallback picking handler');
 assert.ok(scene.includes("kind:'resource-label'"), 'The visible title of each Notion branch must be independently clickable');
 assert.ok(scene.includes("window.open(targetUrl.href,'_blank')"), 'Selecting a 3D branch must open its exact Notion URL in a new tab');
 assert.ok(scene.includes("targetUrl.protocol!=='https:'&&targetUrl.protocol!=='http:'"), '3D branch navigation must reject non-web URL schemes');
