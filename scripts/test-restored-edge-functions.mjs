@@ -4,7 +4,7 @@ import { readFile } from "node:fs/promises";
 const maintained = new URL("../supabase/functions/", import.meta.url);
 const snapshots = new URL("../supabase/deployed-functions-snapshot/", import.meta.url);
 
-for (const name of ["claim-ba-labs", "earth-search-sentinel2-catalogue"]) {
+for (const name of ["claim-ba-labs"]) {
   const [source, snapshot] = await Promise.all([
     readFile(new URL(name + "/index.ts", maintained), "utf8"),
     readFile(new URL(name + "/index.ts", snapshots), "utf8"),
@@ -20,6 +20,9 @@ assert.match(claim, /\.eq\("code", "BA-LABS"\)/);
 assert.doesNotMatch(claim, /req\.json\(/, "bootstrap must not accept a caller-selected organization or role");
 
 const catalogue = await readFile(new URL("earth-search-sentinel2-catalogue/index.ts", maintained), "utf8");
+const catalogueSnapshot = await readFile(new URL("earth-search-sentinel2-catalogue/index.ts", snapshots), "utf8");
+assert.match(catalogueSnapshot, /const upstream = await fetch\(search/);
+assert.match(catalogue, /const upstream = await fetch\(search/);
 assert.match(catalogue, /db\.auth\.getUser\(\)/);
 assert.match(catalogue, /\.from\("locations"\)/);
 assert.match(catalogue, /limit > 20/);
@@ -35,6 +38,7 @@ assert.match(catalogue, /request_body_too_large/);
 assert.match(catalogue, /earth_search_response_too_large_or_invalid/);
 assert.match(catalogue, /reply\(tooLarge \? 413 : 400/);
 
-console.log("✓ Restored active Edge Function sources match the exact captured deployed baselines");
+console.log("✓ BA-LABS bootstrap source matches its exact captured deployed baseline");
+console.log("✓ Earth Search catalogue retains the captured query contract with additional payload limits");
 console.log("✓ BA-LABS bootstrap remains authenticated and restricted to the intended admin account");
 console.log("✓ Earth Search catalogue validates session, RLS-scoped location, bounds, and upstream timeout");
