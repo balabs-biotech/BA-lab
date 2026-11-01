@@ -35,6 +35,7 @@ assert.ok(!scene.includes("document.querySelector('[data-sphere=\"'+id+'\"]')?.c
 assert.ok(scene.includes("root.classList.add('webgl-ready','universe-closed')"), 'The 3D scene must start in the single closed gateway state');
 assert.ok(scene.includes('worldGroup.scale.set(closed?.72:(camera?.aspect<.78?.98:1.32),closed?.72:(camera?.aspect<.78?1.18:1.32),closed?.72:(camera?.aspect<.78?1.02:1.32))'), 'Gateway and full universe must use one responsive scaled 3D scene with a readable mobile scale');
 assert.ok(scene.includes('THREE.MathUtils.clamp(dist+delta*.012,3.2,120)'), '3D wheel navigation must support a long-range overview zoom');
+assert.ok(scene.includes('if(!cameraSized&&!selected)dist=overviewDistance();cameraSized=true;'), 'Responsive resizing must preserve the user zoom after the initial camera setup');
 assert.ok(scene.includes('makeLabel(labels[id].title,0xf5f7fa,29)') && scene.includes('label.scale.set(Math.min(4.25,Math.max(2.25,labels[id].title.length*.135)),.67,1)'), 'Domain labels must remain prominent at overview scale');
 assert.ok(scene.includes('return camera?.aspect<.78?8.8:camera?.aspect<1.05?10.2:11'), 'Mobile overview must frame the network at a useful initial scale while preserving long-range zoom');
 assert.ok(html.includes('class="linknode ln1" href="#"') && html.includes('target="_blank"'), 'Domain resource nodes must be real links that open their matching Notion pages');
@@ -103,7 +104,9 @@ assert.ok(scene.includes('const visit=(node,depth=0,parentId=domainTree.id'), '3
 assert.ok(scene.includes('data-notion-tree-node="true"'), 'Manifest nodes must be injected into the 3D resource layer');
 assert.ok(scene.includes('parentId:a.dataset.parentId') && scene.includes('depth:Number(a.dataset.depth||0)'), '3D resource nodes must retain their hierarchy metadata');
 assert.ok(scene.includes('notionTreeReady.then('), '3D resource nodes must refresh when the manifest finishes loading');
-assert.ok(scene.includes("const pickableHit=hits.find(hit=>['resource','resource-label','sphere','label','dendrite','synapse'].includes(hit.object.userData?.kind))"), 'Clickable Notion branches and semantic 3D nodes must take priority over decorative geometry during raycasting');
+assert.ok(scene.includes('nearestOnScreen=(objects)=>') && scene.includes("object.userData?.kind==='resource-label'&&object.userData?.sourceId===selected"), 'Selected-domain branch labels must have stable screen-space pick targets');
+assert.ok(scene.includes('new THREE.SphereGeometry(.72,12,10)') && scene.includes('resourceMeshes.push(hitProxy)'), 'Every 3D resource branch must expose an invisible touch target');
+assert.ok(scene.includes('const nearestDomain=nearestOnScreen(points.flatMap(point=>[point.hitMesh,point.label]))'), 'Domain cells must remain clickable after long-range zoom');
 assert.ok(scene.includes('return pickableHit?[pickableHit,...hits.filter(hit=>hit!==pickableHit)]:hits'), 'The nearest semantic node or branch must be selected ahead of decorative geometry');
 assert.ok(scene.includes("document.addEventListener('pointerup',e=>{if(!pointers.has(e.pointerId))return;") && scene.includes('lastPointerMoved=true;pick(e)},true)'), 'A tap must invoke 3D picking from the document capture phase even when pointer capture retargets events');
 assert.ok(scene.includes("document.addEventListener('click',e=>{") && !scene.includes('if(e.detail>0)pick(e)'), 'The synthetic click after pointer release must not pick a second time');
