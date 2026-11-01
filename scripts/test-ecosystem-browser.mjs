@@ -109,10 +109,10 @@ async function checkWorkingScene(name, viewport) {
     for (const [dx, dy] of [[0, 0], [0, -18], [18, 0], [-18, 0], [0, 18]]) {
       await page.mouse.click(point.x + dx, point.y + dy);
       await page.waitForTimeout(180);
-      selectedId = await activeWorld.getAttribute('data-world-id');
+      selectedId = await page.evaluate(() => document.querySelector('#mainView .webgl-focus-kicker')?.dataset.worldId || null);
       if (selectedId === id) break;
     }
-    assert.equal(selectedId, id, name + ': real WebGL canvas click did not select ' + id + ' (selected ' + selectedId + ')');
+    assert.equal(selectedId, id, name + ': real WebGL canvas click did not select ' + id + ' at ' + JSON.stringify(point) + ' (selected ' + selectedId + ')');
     visited.add(id);
     const connectionCount = await page.locator('#mainView .webgl-focus-link[data-world]').count();
     assert.ok(connectionCount > 0, name + ': selected world ' + id + ' has no visible navigation connections');
