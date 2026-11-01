@@ -119,6 +119,27 @@ assert.match(html, /#mainView\.webgl-ready[^{]*\{[^}]*height:/, 'The WebGL stage
 assert.match(html, /constellation-3d\.js\?v=[^"'\s]+/, 'The 3D asset must use a cache-busting version');
 assert.ok(html.includes('.webgl-ready .sphere') || html.includes('.webgl-ready .network') || html.includes('.universe-closed .sphere'), 'Legacy presentation must be controlled explicitly when WebGL is active');
 
+for (const [language, expectedCollections] of Object.entries({
+  en: { 'en-myco-pleurotus-library': 13, 'en-myco-other-fungi': 10, 'en-myco-mycorrhizae': 12 },
+  pt: { 'pt-myco-pleurotus-library': 13, 'pt-myco-other-fungi': 10, 'pt-myco-mycorrhiza': 12 },
+})) {
+  const localizedTree = JSON.parse(readFileSync(`ecosystem/notion-tree.${language}.json`, 'utf8'));
+  const mycology = localizedTree.domains.find((domain) => domain.id === 'myco');
+  assert.ok(mycology, `The ${language} tree must preserve the mycology domain`);
+  const nodes = [];
+  const collect = (node) => { nodes.push(node); for (const child of node.children || []) collect(child); };
+  collect(mycology);
+  for (const [collectionId, minimumChildren] of Object.entries(expectedCollections)) {
+    const collection = nodes.find((node) => node.id === collectionId);
+    assert.ok(collection, `Missing ${language} mycology collection: ${collectionId}`);
+    assert.ok((collection.children || []).length >= minimumChildren, `The ${language} collection ${collectionId} lost mapped Notion branches`);
+  }
+  const required = language === 'en'
+    ? ['en-myco-pulmonarius']
+    : ['pt-myco-glomus-brasilianum'];
+  for (const id of required) assert.ok(nodes.some((node) => node.id === id), `Missing required ${language} organism page: ${id}`);
+}
+
 console.log('Ecosystem regression checks passed: 8 domains, organic network, Notion tree hierarchy, exact URLs, cross-domain signals, unified navigation, gateway state, fallback and cache version.');
 
 assert.ok(scene.includes('function domainViewDistance(id)') && scene.includes('const rings=Math.max(1,Math.ceil(maxSiblings/12))'), 'Selected domains must adapt camera distance to their actual branch count and hierarchy');
