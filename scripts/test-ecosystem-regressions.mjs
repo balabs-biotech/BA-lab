@@ -33,10 +33,10 @@ assert.ok(scene.includes('window.enterSphere(id,false)'), '3D selection must cal
 assert.ok(!scene.includes("document.querySelector('[data-sphere=\"'+id+'\"]')?.click()") && !scene.includes("document.querySelector('[data-sphere=\"'+id+'\"]').click()"), '3D selection must not proxy-click the legacy DOM menu');
 
 assert.ok(scene.includes("root.classList.add('webgl-ready','universe-closed')"), 'The 3D scene must start in the single closed gateway state');
-assert.ok(scene.includes('worldGroup.scale.set(closed?.72:(camera?.aspect<.78?.98:1.32),closed?.72:(camera?.aspect<.78?1.18:1.32),closed?.72:(camera?.aspect<.78?1.02:1.32))'), 'Gateway and full universe must use one responsive scaled 3D scene with a readable mobile scale');
+assert.ok(scene.includes('worldGroup.scale.setScalar(closed?.72:(camera?.aspect<.78?1.4:1.32))'), 'Gateway and full universe must use one responsive scaled 3D scene with a readable mobile scale');
 assert.ok(scene.includes('THREE.MathUtils.clamp(dist+delta*.012,3.2,120)'), '3D wheel navigation must support a long-range overview zoom');
 assert.ok(scene.includes('makeLabel(labels[id].title,0xf5f7fa,29)') && scene.includes('label.scale.set(Math.min(4.25,Math.max(2.25,labels[id].title.length*.135)),.67,1)'), 'Domain labels must remain prominent at overview scale');
-assert.ok(scene.includes('function overviewDistance(){return camera?.aspect<.78?13.4:camera?.aspect<1.05?11.2:11}'), 'Portrait overview must pull back far enough to frame all eight connected domains');
+assert.ok(scene.includes('function overviewDistance(){return camera?.aspect<.78?11.2:camera?.aspect<1.05?11.2:11}'), 'Portrait overview must keep the enlarged network readable while framing all eight connected domains');
 assert.ok(scene.includes('camera.fov=camera.aspect<.78?72:(camera.aspect>1.2?38:60)'), 'Portrait camera must widen its vertical field of view to keep the full network in frame');
 assert.ok(html.includes('class="linknode ln1" href="#"') && html.includes('target="_blank"'), 'Domain resource nodes must be real links that open their matching Notion pages');
 assert.ok(html.includes('a.href=p[1]') && html.includes('a.onclick=null'), 'Domain resource links must preserve the exact page URL without intercepting navigation');
