@@ -121,6 +121,12 @@ assert.ok(html.includes('.webgl-ready .sphere') || html.includes('.webgl-ready .
 
 console.log('Ecosystem regression checks passed: 8 domains, organic network, Notion tree hierarchy, exact URLs, cross-domain signals, unified navigation, gateway state, fallback and cache version.');
 
+assert.ok(scene.includes('window.enterSphere(id,false,true)'), '3D domain selection must request spatial-only navigation without revealing the legacy 2D index');
+assert.ok(html.includes('function enterSphere(id,scroll=true,spatial3D=false)'), 'Shared domain navigation must distinguish 3D entry from legacy 2D entry');
+assert.ok(html.includes("miniView.classList.toggle('spatial-source-only',spatial3D)"), 'The legacy mini-view must remain a hidden data source while 3D navigation is active');
+assert.ok(html.includes("miniView.classList.remove('spatial-source-only')"), 'Returning home must restore the normal mini-view state');
+assert.ok(html.includes("enterSphere(selected,false,miniView.classList.contains('spatial-source-only'))"), 'Language changes must preserve the active 3D-only navigation mode');
+assert.ok(html.includes('#miniView.spatial-source-only{display:none!important}'), 'The legacy 2D index must not overlay the 3D branch navigation');
 assert.ok(scene.includes('function domainViewDistance(id)') && scene.includes('const rings=Math.max(1,Math.ceil(maxSiblings/12))'), 'Selected domains must adapt camera distance to their actual branch count and hierarchy');
 assert.ok(scene.includes('const zoomArc=Math.min(2.2,travelDistance*.12+Math.abs(endDist-dist)*.09)'), 'Long 3D transitions must create a restrained zoom-out arc between the overview and selected domain');
 assert.ok(scene.includes('const duration=Math.min(1900,Math.max(1050,(target?1120:980)+travelDistance*95+Math.abs(endDist-dist)*35))'), '3D transition duration must adapt to travel distance and zoom change');
