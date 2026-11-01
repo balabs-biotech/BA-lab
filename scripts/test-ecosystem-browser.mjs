@@ -152,7 +152,12 @@ async function checkWorkingScene(name, viewport) {
     assert.ok(projected && Math.abs(projected.ndc.x) < .92 && Math.abs(projected.ndc.y) < .92,
       name + ': ' + id + ' must remain inside the selectable viewport');
     await page.mouse.move(projected.x, projected.y);
-    await page.waitForFunction((targetId) => document.querySelector('#mainView .webgl-stage')?.dataset.hoverWorld === targetId, id, { timeout: 5000 });
+    try {
+      await page.waitForFunction((targetId) => document.querySelector('#mainView .webgl-stage')?.dataset.hoverWorld === targetId, id, { timeout: 5000 });
+    } catch (error) {
+      const hitState = await stage.evaluate(el => ({ hoverWorld: el.dataset.hoverWorld, lastHitKind: el.dataset.lastHitKind, lastHitId: el.dataset.lastHitId, lastPointer: el.dataset.lastPointer, rect: (() => { const r=el.getBoundingClientRect(); return {x:r.x,y:r.y,width:r.width,height:r.height}; })() }));
+      throw new Error(name + ': precise hover failed for ' + id + ': ' + JSON.stringify({ projected, hitState }) + '; ' + error.message);
+    }
     await page.mouse.click(projected.x, projected.y);
     await page.waitForFunction((targetId) => document.querySelector('#mainView .webgl-stage')?.dataset.selectedWorld === targetId, id, { timeout: 5000 });
     await page.waitForFunction(() => {
