@@ -33,10 +33,11 @@ assert.ok(scene.includes('window.enterSphere(id,false)'), '3D selection must cal
 assert.ok(!scene.includes("document.querySelector('[data-sphere=\"'+id+'\"]')?.click()") && !scene.includes("document.querySelector('[data-sphere=\"'+id+'\"]').click()"), '3D selection must not proxy-click the legacy DOM menu');
 
 assert.ok(scene.includes("root.classList.add('webgl-ready','universe-closed')"), 'The 3D scene must start in the single closed gateway state');
-assert.ok(scene.includes('worldGroup.scale.set(closed?.72:(camera?.aspect<.78?.98:1.32),closed?.72:(camera?.aspect<.78?1.18:1.32),closed?.72:(camera?.aspect<.78?1.02:1.32))'), 'Gateway and full universe must use one responsive scaled 3D scene with a readable mobile scale');
+assert.ok(scene.includes('worldGroup.scale.setScalar(closed?.72:(camera?.aspect<.78?1.4:1.32))'), 'Gateway and full universe must use one responsive scaled 3D scene with a readable mobile scale');
 assert.ok(scene.includes('THREE.MathUtils.clamp(dist+delta*.012,3.2,120)'), '3D wheel navigation must support a long-range overview zoom');
 assert.ok(scene.includes('makeLabel(labels[id].title,0xf5f7fa,29)') && scene.includes('label.scale.set(Math.min(4.25,Math.max(2.25,labels[id].title.length*.135)),.67,1)'), 'Domain labels must remain prominent at overview scale');
-assert.ok(scene.includes('return camera?.aspect<.78?8.8:camera?.aspect<1.05?10.2:11'), 'Mobile overview must frame the network at a useful initial scale while preserving long-range zoom');
+assert.ok(scene.includes('function overviewDistance(){return camera?.aspect<.78?11.2:camera?.aspect<1.05?11.2:11}'), 'Portrait overview must keep the enlarged network readable while framing all eight connected domains');
+assert.ok(scene.includes('camera.fov=camera.aspect<.78?72:(camera.aspect>1.2?48:60)'), 'Portrait camera must widen its vertical field of view to keep the full network in frame');
 assert.ok(html.includes('class="linknode ln1" href="#"') && html.includes('target="_blank"'), 'Domain resource nodes must be real links that open their matching Notion pages');
 assert.ok(html.includes('a.href=p[1]') && html.includes('a.onclick=null'), 'Domain resource links must preserve the exact page URL without intercepting navigation');
 assert.ok(scene.includes('legacy sphere fallback intentionally suppressed'), 'A WebGL failure must not silently revive legacy spheres');
@@ -104,8 +105,11 @@ assert.ok(scene.includes('data-notion-tree-node="true"'), 'Manifest nodes must b
 assert.ok(scene.includes('parentId:a.dataset.parentId') && scene.includes('depth:Number(a.dataset.depth||0)'), '3D resource nodes must retain their hierarchy metadata');
 assert.ok(scene.includes('notionTreeReady.then('), '3D resource nodes must refresh when the manifest finishes loading');
 assert.ok(scene.includes("const resourceHit=hits.find(hit=>hit.object.userData?.kind==='resource'||hit.object.userData?.kind==='resource-label')"), 'Clickable Notion branches must take priority over decorative neurites and domain geometry during raycasting');
-assert.ok(scene.includes('return resourceHit?[resourceHit,...hits.filter(hit=>hit!==resourceHit)]:hits'), 'A branch hit must be selected even when a decorative object is closer to the camera');
-assert.ok(scene.includes("if(!moved)pick(e)"), 'A stationary pointer release must trigger the 3D picking handler');
+assert.ok(scene.includes('if(resourceHit)return[resourceHit,...hits.filter(hit=>hit!==resourceHit)]'), 'A branch hit must be selected even when a decorative object is closer to the camera');
+assert.ok(scene.includes('const pickRadius=Math.max(24,Math.min(38,r.width*.045))'), 'Domain picking must retain a precise screen-space fallback when the ray misses a small soma');
+assert.ok(scene.includes('if(!wasMoved){lastPointerPickAt=performance.now();pick(e)}'), 'A stationary pointer release must trigger the 3D picking handler after gesture tracking');
+assert.ok(scene.includes('performance.now()-lastPointerPickAt<350'), 'The native click fallback must be deduplicated after pointerup selection');
+assert.ok(scene.includes("stage.addEventListener('click',e=>") && scene.includes('pick(e);stage.dataset.clickSelected=stage.dataset.selectedWorld||\'\''), 'A native stationary click must retain a fallback picking handler');
 assert.ok(scene.includes("kind:'resource-label'"), 'The visible title of each Notion branch must be independently clickable');
 assert.ok(scene.includes("window.open(targetUrl.href,'_blank')"), 'Selecting a 3D branch must open its exact Notion URL in a new tab');
 assert.ok(scene.includes("targetUrl.protocol!=='https:'&&targetUrl.protocol!=='http:'"), '3D branch navigation must reject non-web URL schemes');
@@ -119,9 +123,32 @@ assert.match(html, /#mainView\.webgl-ready[^{]*\{[^}]*height:/, 'The WebGL stage
 assert.match(html, /constellation-3d\.js\?v=[^"'\s]+/, 'The 3D asset must use a cache-busting version');
 assert.ok(html.includes('.webgl-ready .sphere') || html.includes('.webgl-ready .network') || html.includes('.universe-closed .sphere'), 'Legacy presentation must be controlled explicitly when WebGL is active');
 
+for (const [language, expectedCollections] of Object.entries({
+  en: { 'en-myco-pleurotus-library': 13, 'en-myco-other-fungi': 10, 'en-myco-mycorrhizae': 12 },
+  pt: { 'pt-myco-pleurotus-library': 13, 'pt-myco-other-fungi': 10, 'pt-myco-mycorrhiza': 12 },
+})) {
+  const localizedTree = JSON.parse(readFileSync(`ecosystem/notion-tree.${language}.json`, 'utf8'));
+  const mycology = localizedTree.domains.find((domain) => domain.id === 'myco');
+  assert.ok(mycology, `The ${language} tree must preserve the mycology domain`);
+  const nodes = [];
+  const collect = (node) => { nodes.push(node); for (const child of node.children || []) collect(child); };
+  collect(mycology);
+  for (const [collectionId, minimumChildren] of Object.entries(expectedCollections)) {
+    const collection = nodes.find((node) => node.id === collectionId);
+    assert.ok(collection, `Missing ${language} mycology collection: ${collectionId}`);
+    assert.ok((collection.children || []).length >= minimumChildren, `The ${language} collection ${collectionId} lost mapped Notion branches`);
+  }
+  const required = language === 'en'
+    ? ['en-myco-pulmonarius']
+    : ['pt-myco-glomus-brasilianum'];
+  for (const id of required) assert.ok(nodes.some((node) => node.id === id), `Missing required ${language} organism page: ${id}`);
+}
+
 console.log('Ecosystem regression checks passed: 8 domains, organic network, Notion tree hierarchy, exact URLs, cross-domain signals, unified navigation, gateway state, fallback and cache version.');
 
 assert.ok(scene.includes('function domainViewDistance(id)') && scene.includes('const rings=Math.max(1,Math.ceil(maxSiblings/12))'), 'Selected domains must adapt camera distance to their actual branch count and hierarchy');
+
+assert.ok(scene.includes('camera.fov=camera.aspect<.78?72:(camera.aspect>1.2?48:60)'), 'Portrait camera must widen its vertical field of view to keep the full network in frame');
 assert.ok(scene.includes('const zoomArc=Math.min(2.2,travelDistance*.12+Math.abs(endDist-dist)*.09)'), 'Long 3D transitions must create a restrained zoom-out arc between the overview and selected domain');
 assert.ok(scene.includes('const duration=Math.min(1900,Math.max(1050,(target?1120:980)+travelDistance*95+Math.abs(endDist-dist)*35))'), '3D transition duration must adapt to travel distance and zoom change');
 assert.ok(scene.includes('Math.sin(Math.PI*e)*transition.zoomArc'), 'The camera zoom arc must ease out and return smoothly during the transition');

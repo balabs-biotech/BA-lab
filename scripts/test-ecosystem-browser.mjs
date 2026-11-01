@@ -56,6 +56,7 @@ async function checkWorkingScene(name, viewport) {
   assert.ok(await root.evaluate((el) => el.classList.contains('universe-closed')), name + ': gateway must be the initial state');
 
   const canvas = page.locator('#mainView .webgl-stage canvas');
+  const stage = page.locator('#mainView .webgl-stage');
   await canvas.waitFor({ state: 'visible', timeout: 15000 });
   const canvasState = await canvas.evaluate((el) => {
     const rect = el.getBoundingClientRect();
@@ -82,6 +83,16 @@ async function checkWorkingScene(name, viewport) {
   );
   assert.equal(legacyVisible, 0, name + ': old HTML spheres must not appear over the WebGL scene');
 
+  if (viewport.width <= 760) {
+    const hintRect = await page.locator('#mainView .webgl-stage .webgl-hint').evaluate((el) => {
+      const rect = el.getBoundingClientRect();
+      const stageRect = el.parentElement.getBoundingClientRect();
+      return { top: rect.top, bottom: rect.bottom, stageTop: stageRect.top, stageHeight: stageRect.height };
+    });
+    assert.ok(hintRect.top - hintRect.stageTop < hintRect.stageHeight * 0.35,
+      name + ': mobile navigation hint must stay above the lower network branches');
+  }
+
   await page.screenshot({ path: outputDir + '/' + name + '-gateway.png', fullPage: false });
   const intro = page.locator('#mainView .webgl-intro');
   await intro.waitFor({ state: 'visible' });
@@ -89,7 +100,78 @@ async function checkWorkingScene(name, viewport) {
   await page.waitForFunction(() => document.querySelector('#mainView')?.classList.contains('universe-open'), undefined, { timeout: 5000 });
   assert.equal(await intro.isVisible(), false, name + ': gateway overlay must leave the scene after entry');
   assert.ok(await canvas.isVisible(), name + ': the 3D canvas must remain visible after entering');
-  await page.waitForTimeout(700);
+  // Let the longest camera transition finish before judging the rendered overview.
+  await page.waitForTimeout(2200);
+  const renderState = await canvas.evaluate((el) => ({
+    frames: Number(el.dataset.renderFrame || 0),
+    worldVisible: el.dataset.worldVisible,
+    worldChildren: Number(el.dataset.worldChildren || 0),
+    cameraDistance: Number(el.dataset.cameraDistance || 0),
+    cameraAspect: Number(el.dataset.cameraAspect || 0),
+    drawCalls: Number(el.dataset.drawCalls || 0),
+    triangles: Number(el.dataset.triangles || 0),
+    glError: Number(el.dataset.glError || 0),
+    projectedRoots: JSON.parse(el.dataset.projectedRoots || '[]'),
+    pixelProbe: JSON.parse(el.dataset.pixelProbe || '{}'),
+    canvasRect: (() => { const r=el.getBoundingClientRect(); return {x:r.x,y:r.y,width:r.width,height:r.height,bufferWidth:el.width,bufferHeight:el.height}; })(),
+    stageRect: (() => { const r=el.parentElement.getBoundingClientRect(); return {x:r.x,y:r.y,width:r.width,height:r.height}; })(),
+    position: getComputedStyle(el).position,
+    zIndex: getComputedStyle(el).zIndex,
+    opacity: getComputedStyle(el).opacity,
+  }));
+  assert.ok(renderState.frames > 0, name + ': WebGL animation loop did not render any frames');
+  assert.equal(renderState.worldVisible, 'true', name + ': 3D network group must be visible after entering the universe');
+  assert.ok(renderState.worldChildren > 0, name + ': 3D network group must contain rendered objects');
+  assert.ok(renderState.cameraDistance > 0 && renderState.cameraAspect > 0, name + ': camera dimensions must be valid');
+  assert.ok(renderState.drawCalls > 0 && renderState.triangles > 0, name + ': WebGL must submit visible mesh geometry');
+  assert.equal(renderState.glError, 0, name + ': WebGL context reported a graphics error');
+  assert.ok(renderState.pixelProbe.sampled > 0, name + ': WebGL canvas pixel probe did not run');
+  if (viewport.width <= 760) console.log(name + ': mobile render diagnostics', JSON.stringify(renderState));
+  // Precision picking contract: every root domain must be independently selectable
+  // from its projected screen position, not merely visible in the overview.
+  const rootNames = {
+    bio: /bio|biolog|biology|biologia|الأحياء/i,
+    myco: /myco|champignon|fung|micolog|فطر/i,
+    soil: /soil|sol|substrat|التربة/i,
+    lab: /lab|laboratoire|laboratory|laboratório|مختبر/i,
+    products: /product|produit|kit|produção|منتج/i,
+    iot: /iot|automatis|automation|automação|إنترنت/i,
+    work: /work|projet|project|trabalho|عمل/i,
+    learn: /learn|formation|education|apprentissage|aprendizagem|تعلم/i,
+  };
+  for (const id of ['bio','myco','soil','lab','products','iot','work','learn']) {
+    if (await root.locator('.webgl-focus.has-world').count()) {
+      await page.locator('#mainView .webgl-controls button[data-camera="reset"]').click();
+      await page.waitForTimeout(1500);
+    }
+    const projected = await canvas.evaluate((el, targetId) => {
+      const roots = JSON.parse(el.dataset.projectedRoots || '[]');
+      const root = roots.find(item => item.id === targetId);
+      const rect = el.getBoundingClientRect();
+      return root ? { x: rect.left + (root.x + 1) * .5 * rect.width, y: rect.top + (1 - root.y) * .5 * rect.height, ndc: root } : null;
+    }, id);
+    assert.ok(projected && Math.abs(projected.ndc.x) < .92 && Math.abs(projected.ndc.y) < .92,
+      name + ': ' + id + ' must remain inside the selectable viewport');
+    await page.mouse.move(projected.x, projected.y);
+    try {
+      await page.waitForFunction((targetId) => document.querySelector('#mainView .webgl-stage')?.dataset.hoverWorld === targetId, id, { timeout: 5000 });
+    } catch (error) {
+      const hitState = await stage.evaluate(el => ({ hoverWorld: el.dataset.hoverWorld, lastHitKind: el.dataset.lastHitKind, lastHitId: el.dataset.lastHitId, lastPointer: el.dataset.lastPointer, rect: (() => { const r=el.getBoundingClientRect(); return {x:r.x,y:r.y,width:r.width,height:r.height}; })() }));
+      throw new Error(name + ': precise hover failed for ' + id + ': ' + JSON.stringify({ projected, hitState }) + '; ' + error.message);
+    }
+    await page.mouse.click(projected.x, projected.y);
+    try { await page.waitForFunction((targetId) => document.querySelector('#mainView .webgl-stage')?.dataset.selectedWorld === targetId, id, { timeout: 5000 }); } catch (error) { const clickState = await stage.evaluate(el => ({ selectedWorld:el.dataset.selectedWorld, stagePointerDownTarget:el.dataset.stagePointerDownTarget, stagePointerDownClass:el.dataset.stagePointerDownClass, stagePointerDownAt:el.dataset.stagePointerDownAt, stagePointerDownPath:el.dataset.stagePointerDownPath, clickMoved:el.dataset.clickMoved, clickTarget:el.dataset.clickTarget, clickSelected:el.dataset.clickSelected, pointerUpTarget:el.dataset.pointerUpTarget, pointerUpTracked:el.dataset.pointerUpTracked, pointerUpMoved:el.dataset.pointerUpMoved, pointerUpPicked:el.dataset.pointerUpPicked, documentClickTarget:el.dataset.documentClickTarget, documentClickClass:el.dataset.documentClickClass, documentClickBlocked:el.dataset.documentClickBlocked, documentClickPicked:el.dataset.documentClickPicked, introState:(()=>{const n=document.querySelector('#mainView .webgl-intro');if(!n)return null;const s=getComputedStyle(n);return {display:s.display,visibility:s.visibility,pointerEvents:s.pointerEvents,inlineDisplay:n.style.display,inert:n.inert,ariaHidden:n.getAttribute('aria-hidden'),parentClass:n.parentElement?.className,rootClass:document.querySelector('#mainView')?.className,elementAtPoint:(document.elementFromPoint(Number(el.dataset.lastPointer?.split(',')[0]||0),Number(el.dataset.lastPointer?.split(',')[1]||0))?.className||document.elementFromPoint(Number(el.dataset.lastPointer?.split(',')[0]||0),Number(el.dataset.lastPointer?.split(',')[1]||0))?.tagName)};})(), lastHitKind:el.dataset.lastHitKind, lastHitId:el.dataset.lastHitId, pickHitCount:el.dataset.pickHitCount, pickHitKind:el.dataset.pickHitKind, pickHitId:el.dataset.pickHitId, pickTransition:el.dataset.pickTransition, pickNodeFound:el.dataset.pickNodeFound, pickBranch:el.dataset.pickBranch, pickBeforeSelect:el.dataset.pickBeforeSelect, lastPointer:el.dataset.lastPointer })); throw new Error(name + ': click selection failed for ' + id + ': ' + JSON.stringify({ projected, clickState }) + '; ' + error.message); }
+    await page.waitForFunction(() => {
+      const panel = document.querySelector('#mainView .webgl-focus');
+      return panel && !panel.hidden && panel.classList.contains('has-world') &&
+        panel.querySelector('strong')?.textContent?.trim().length > 0;
+    }, undefined, { timeout: 5000 });
+    const selectedTitle = await page.locator('#mainView .webgl-focus strong').first().textContent();
+    assert.ok(selectedTitle && selectedTitle.trim().length > 0,
+      name + ': ' + id + ' must resolve to a readable domain detail');
+    console.log(name + ': precision root selection', id, selectedTitle.trim());
+  }
+  await canvas.screenshot({ path: outputDir + '/' + name + '-canvas.png' });
   await page.screenshot({ path: outputDir + '/' + name + '-universe.png', fullPage: false });
 
   assert.deepEqual(pageErrors, [], name + ': uncaught browser errors detected');
