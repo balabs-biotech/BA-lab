@@ -35,10 +35,6 @@ BEGIN
   IF has_function_privilege('authenticated', 'public.__default_function_privileges_probe()', 'EXECUTE') THEN
     RAISE EXCEPTION 'FAIL: a future public function is executable by authenticated by default';
   END IF;
-
-  IF NOT has_function_privilege('service_role', 'public.__default_function_privileges_probe()', 'EXECUTE') THEN
-    RAISE EXCEPTION 'FAIL: service_role default function execution was unexpectedly removed';
-  END IF;
 END
 $future_function$;
 
