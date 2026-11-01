@@ -92,6 +92,7 @@ jobs:
           node --check batch-tracker/environmental-data.js
           node scripts/check-i18n.mjs
           node scripts/test-deployed-edge-function-snapshot.mjs
+          node scripts/test-restored-edge-functions.mjs
           node scripts/test-environmental-fallback.mjs
           node scripts/test-workspace-scenarios.mjs
           node scripts/test-qc-check-session-errors.mjs
