@@ -108,3 +108,19 @@ assert.equal(unknownDomain.events.length, 0);
 
 console.log("✓ Failed engine loads stop startup with visible feedback");
 console.log("✓ Unknown domains are rejected before loading workspace scripts");
+
+const missingTranslations = await runWorkspace("laboratory", {
+  failScript: "../i18n.js?v=20261026-core-refresh-1"
+});
+assert.equal(missingTranslations.result, false);
+assert.match(missingTranslations.root.innerHTML, /Traductions indisponibles/);
+assert.equal(missingTranslations.events.filter(event => event.startsWith("script:")).length, 1);
+
+const missingWorkspaceModule = await runWorkspace("agronomy", {
+  failScript: "../environmental-data.js?v=20261027-sentinel-fallback-fix-1"
+});
+assert.equal(missingWorkspaceModule.result, false);
+assert.match(missingWorkspaceModule.root.innerHTML, /Module de l’espace indisponible/);
+assert.equal(missingWorkspaceModule.events.filter(event => event.startsWith("script:")).length, 3);
+
+console.log("✓ Translation and workspace-specific module failures stop startup with explicit feedback");
