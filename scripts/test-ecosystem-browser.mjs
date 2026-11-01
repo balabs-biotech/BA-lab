@@ -110,6 +110,7 @@ async function checkWorkingScene(name, viewport) {
     drawCalls: Number(el.dataset.drawCalls || 0),
     triangles: Number(el.dataset.triangles || 0),
     glError: Number(el.dataset.glError || 0),
+    projectedRoots: JSON.parse(el.dataset.projectedRoots || '[]'),
     position: getComputedStyle(el).position,
     zIndex: getComputedStyle(el).zIndex,
     opacity: getComputedStyle(el).opacity,
