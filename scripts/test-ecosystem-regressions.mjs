@@ -105,7 +105,8 @@ assert.ok(scene.includes('data-notion-tree-node="true"'), 'Manifest nodes must b
 assert.ok(scene.includes('parentId:a.dataset.parentId') && scene.includes('depth:Number(a.dataset.depth||0)'), '3D resource nodes must retain their hierarchy metadata');
 assert.ok(scene.includes('notionTreeReady.then('), '3D resource nodes must refresh when the manifest finishes loading');
 assert.ok(scene.includes("const resourceHit=hits.find(hit=>hit.object.userData?.kind==='resource'||hit.object.userData?.kind==='resource-label')"), 'Clickable Notion branches must take priority over decorative neurites and domain geometry during raycasting');
-assert.ok(scene.includes('return resourceHit?[resourceHit,...hits.filter(hit=>hit!==resourceHit)]:hits'), 'A branch hit must be selected even when a decorative object is closer to the camera');
+assert.ok(scene.includes('if(resourceHit)return[resourceHit,...hits.filter(hit=>hit!==resourceHit)]'), 'A branch hit must be selected even when a decorative object is closer to the camera');
+assert.ok(scene.includes('const pickRadius=Math.max(24,Math.min(38,r.width*.045))'), 'Domain picking must retain a precise screen-space fallback when the ray misses a small soma');
 assert.ok(scene.includes("if(!moved)pick(e)"), 'A stationary pointer release must trigger the 3D picking handler');
 assert.ok(scene.includes("kind:'resource-label'"), 'The visible title of each Notion branch must be independently clickable');
 assert.ok(scene.includes("window.open(targetUrl.href,'_blank')"), 'Selecting a 3D branch must open its exact Notion URL in a new tab');
