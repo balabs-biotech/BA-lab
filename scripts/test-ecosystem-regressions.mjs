@@ -126,6 +126,7 @@ const resourcePick = scene.slice(scene.indexOf("if(obj.userData.kind==='resource
 assert.ok(resourcePick.includes('refreshFocus(obj.userData.sourceId)'), 'Selecting a Notion branch must show its in-scene details');
 assert.ok(!resourcePick.includes('window.open(') && !resourcePick.includes('window.location.assign('), 'Selecting a Notion branch must not immediately leave the 3D experience');
 assert.ok(scene.includes("open.dataset.resourceOpen='true'"), 'Opening a Notion page must remain an explicit action in the resource panel');
+assert.ok(scene.includes('stage.append(hint,status,controls,focusPanel,networkLegend,introStyle,intro)'), 'The interactive focus panel must be mounted in the 3D stage so resource actions are visible and clickable');
 assert.ok(scene.includes('window.enterSphere(targetId,false,true)'), 'Related-domain panel navigation must also stay in spatial-only mode');
 assert.ok(!scene.includes('window.enterSphere(targetId,false)'), 'No 3D navigation path may re-enable the legacy 2D index');
 assert.ok(html.includes('function enterSphere(id,scroll=true,spatial3D=false)'), 'Shared domain navigation must distinguish 3D entry from legacy 2D entry');
