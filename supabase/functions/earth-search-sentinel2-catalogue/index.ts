@@ -3,6 +3,9 @@
 // Uses Element84 Earth Search (public AWS Open Data COG catalogue); no Copernicus OAuth secrets.
 import { createClient } from "npm:@supabase/supabase-js@2";
 
+const MAX_REQUEST_BYTES = 32 * 1024;
+const MAX_STAC_RESPONSE_BYTES = 2 * 1024 * 1024;
+
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, apikey, content-type, x-client-info",
@@ -14,6 +17,36 @@ const reply = (status: number, body: Record<string, unknown>) =>
     status,
     headers: { ...corsHeaders, "Content-Type": "application/json; charset=utf-8", "Cache-Control": "no-store" },
   });
+async function readBoundedJson(input: Request | Response, maxBytes: number): Promise<any> {
+  const declaredLength = Number(input.headers.get("content-length") ?? 0);
+  if (Number.isFinite(declaredLength) && declaredLength > maxBytes) throw new Error("json_body_too_large");
+  if (!input.body) throw new Error("empty_json_body");
+  const reader = input.body.getReader();
+  const chunks: Uint8Array[] = [];
+  let total = 0;
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      total += value.byteLength;
+      if (total > maxBytes) {
+        await reader.cancel("json_body_too_large");
+        throw new Error("json_body_too_large");
+      }
+      chunks.push(value);
+    }
+  } finally {
+    reader.releaseLock();
+  }
+  const bytes = new Uint8Array(total);
+  let offset = 0;
+  for (const chunk of chunks) {
+    bytes.set(chunk, offset);
+    offset += chunk.byteLength;
+  }
+  return JSON.parse(new TextDecoder().decode(bytes));
+}
+
 const validDate = (v: unknown): v is string => {
   if (typeof v !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(v)) return false;
   const d = new Date(v + "T00:00:00Z");
@@ -36,7 +69,13 @@ Deno.serve(async (req: Request) => {
   try {
     const { data: userData, error: authError } = await db.auth.getUser();
     if (authError || !userData.user) return reply(401, { error: "invalid_session" });
-    const body = await req.json().catch(() => null);
+    let body: any;
+    try {
+      body = await readBoundedJson(req, MAX_REQUEST_BYTES);
+    } catch (error) {
+      const tooLarge = error instanceof Error && error.message === "json_body_too_large";
+      return reply(tooLarge ? 413 : 400, { error: tooLarge ? "request_body_too_large" : "invalid_json_body" });
+    }
     if (!body || typeof body !== "object" || Array.isArray(body)) return reply(400, { error: "invalid_json_body" });
     const locationId = typeof body.location_id === "string" ? body.location_id : "";
     const start = body.start_date;
@@ -74,7 +113,12 @@ Deno.serve(async (req: Request) => {
       console.error("[earth-search-sentinel2-catalogue] STAC status", upstream.status);
       return reply(502, { error: "earth_search_catalogue_unavailable", upstream_status: upstream.status });
     }
-    const payload = await upstream.json();
+    let payload: any;
+    try {
+      payload = await readBoundedJson(upstream, MAX_STAC_RESPONSE_BYTES);
+    } catch {
+      return reply(502, { error: "earth_search_response_too_large_or_invalid" });
+    }
     if (!Array.isArray(payload?.features)) return reply(502, { error: "earth_search_response_invalid" });
     const scenes = payload.features.map((f: Record<string, any>) => {
       const p = f.properties ?? {};
