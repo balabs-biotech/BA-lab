@@ -18,7 +18,7 @@ docker info >/dev/null 2>&1 || {
 }
 
 if [[ ! "$SUPABASE_PROJECT_REF" =~ ^[a-z0-9]{20}$ ]]; then
-  printf 'Invalid Supabase project ref; expected 20 lowercase alphanumeric characters.\\n' >&2
+  printf 'Invalid Supabase project ref; expected 20 lowercase alphanumeric characters.\n' >&2
   exit 1
 fi
 
@@ -28,7 +28,7 @@ project_backup_root="$backup_root/$SUPABASE_PROJECT_REF"
 backup_dir="$project_backup_root/$timestamp"
 mkdir -p "$project_backup_root"
 if ! mkdir -m 700 "$backup_dir"; then
-  printf 'Backup destination already exists or cannot be created: %s\\n' "$backup_dir" >&2
+  printf 'Backup destination already exists or cannot be created: %s\n' "$backup_dir" >&2
   exit 1
 fi
 
