@@ -114,7 +114,7 @@ async function checkWorkingScene(name, viewport) {
   await page.waitForFunction(() => {
     const panel = document.querySelector('.webgl-focus');
     return panel && !panel.hidden && panel.querySelector('[data-resource-open]') && panel.querySelector('[data-resource-clear]');
-  }, undefined, { timeout: 8000 });
+  }, undefined, { timeout: 8000 }).catch(async error => { throw new Error('3D resource tap did not open its Notion panel: ' + JSON.stringify(await page.evaluate(() => ({probe:window.__BALABS_3D_E2E__?.(),lastPick:window.__BALABS_3D_LAST_PICK__,pickTrace:window.__BALABS_3D_PICK_TRACE__,clicks:window.__BALABS_3D_E2E_CLICKS,focus:document.querySelector('.webgl-focus')?.outerHTML?.slice(0,1200)}))) + ' — ' + error.message); });
   assert.ok(await page.locator('.webgl-focus [data-resource-open]').isVisible(), name + ': clicking a 3D branch must reveal its Notion action');
   assert.ok(await page.locator('.webgl-focus [data-resource-clear]').isVisible(), name + ': selected branch must offer an in-scene return action');
   await page.locator('.webgl-focus [data-resource-clear]').click({force:true});
