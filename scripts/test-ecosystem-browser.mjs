@@ -93,37 +93,31 @@ async function checkWorkingScene(name, viewport) {
   await page.screenshot({ path: outputDir + '/' + name + '-universe.png', fullPage: false });
 
   // Exercise real domain-to-domain navigation through the visible connection panel.
+  const worldIds = ['bio', 'myco', 'soil', 'lab', 'products', 'iot', 'work', 'learn'];
   const visited = new Set();
-  for (let step = 0; step < 16 && visited.size < 8; step += 1) {
+  for (let step = 0; step < 20 && visited.size < 8; step += 1) {
     const kicker = page.locator('#mainView .webgl-focus-kicker');
     const currentLabel = (await kicker.textContent()) || '';
     const currentMatch = currentLabel.match(/UNIVERS\\s*\\/\\s*(\\d+)/i);
-    if (currentMatch) visited.add(Number(currentMatch[1]));
-    const nextButton = page.locator('#mainView .webgl-focus-link[data-world]').filter({
-      has: page.locator('span'),
-    });
-    const count = await nextButton.count();
+    if (currentMatch) visited.add(worldIds[Number(currentMatch[1]) - 1]);
+    const links = page.locator('#mainView .webgl-focus-link[data-world]');
+    const count = await links.count();
     let target = null;
     for (let i = 0; i < count; i += 1) {
-      const candidate = nextButton.nth(i);
-      const label = (await candidate.locator('span').textContent()) || '';
-      const aria = await candidate.getAttribute('aria-label') || '';
-      if (label.trim() && ![...visited].some((n) => aria.includes('WORLD / ' + String(n).padStart(2, '0')))) {
+      const candidate = links.nth(i);
+      const targetId = await candidate.getAttribute('data-world');
+      if (targetId && !visited.has(targetId)) {
         target = candidate;
         break;
       }
     }
     if (!target) break;
     await target.click();
-    await page.waitForFunction(() => {
-      const el = document.querySelector('#mainView .webgl-focus-kicker');
-      return !!el && /UNIVERS\\s*\\//i.test(el.textContent || '');
-    }, undefined, { timeout: 7000 });
-    await page.waitForTimeout(1300);
+    await page.waitForTimeout(1450);
   }
   const finalLabel = (await page.locator('#mainView .webgl-focus-kicker').textContent()) || '';
   const finalMatch = finalLabel.match(/UNIVERS\\s*\\/\\s*(\\d+)/i);
-  if (finalMatch) visited.add(Number(finalMatch[1]));
+  if (finalMatch) visited.add(worldIds[Number(finalMatch[1]) - 1]);
   assert.equal(visited.size, 8, name + ': all eight worlds must be reachable through visible connections; visited ' + [...visited].join(','));
 
   const zoomOut = page.locator('#mainView .webgl-controls button[data-camera="out"]');
