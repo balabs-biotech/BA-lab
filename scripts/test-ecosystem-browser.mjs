@@ -89,6 +89,7 @@ async function checkWorkingScene(name, viewport) {
   await page.waitForFunction(() => document.querySelector('#mainView')?.classList.contains('universe-open'), undefined, { timeout: 5000 });
   assert.equal(await intro.isVisible(), false, name + ': gateway overlay must leave the scene after entry');
   assert.ok(await canvas.isVisible(), name + ': the 3D canvas must remain visible after entering');
+  await page.waitForFunction(() => !document.querySelector('#mainView .webgl-stage')?.classList.contains('is-transitioning'), undefined, { timeout: 8000 });
 
   await page.waitForFunction(() => !!window.__BALABS_3D_E2E__()?.domainTarget, undefined, { timeout: 8000 });
   const domainTarget = await page.evaluate(() => window.__BALABS_3D_E2E__().domainTarget);
@@ -103,6 +104,7 @@ async function checkWorkingScene(name, viewport) {
     name + ': the legacy index must remain a hidden data source during 3D navigation');
   assert.equal(await page.locator('#miniView.spatial-source-only .linknode:visible').count(), 0,
     name + ': no legacy 2D links may overlay the 3D scene');
+  await page.waitForFunction(() => !document.querySelector('#mainView .webgl-stage')?.classList.contains('is-transitioning'), undefined, { timeout: 8000 });
   await page.waitForFunction(() => typeof window.__BALABS_3D_E2E__ === 'function', undefined, { timeout: 5000 });
   await page.waitForFunction(() => (window.__BALABS_3D_E2E__()?.visible || 0) > 0, undefined, { timeout: 15000 }).catch(async error => { throw new Error('No 3D branch is visible for a real tap: ' + JSON.stringify(await page.evaluate(() => window.__BALABS_3D_E2E__())) + ' — ' + error.message); });
   const branchTarget = await page.evaluate(() => window.__BALABS_3D_E2E__().target);
