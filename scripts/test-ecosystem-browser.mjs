@@ -105,8 +105,8 @@ async function checkWorkingScene(name, viewport) {
   assert.equal(await page.locator('#miniView.spatial-source-only .linknode:visible').count(), 0,
     name + ': no legacy 2D links may overlay the 3D scene');
   await page.waitForFunction(() => typeof window.__BALABS_3D_E2E__ === 'function', undefined, { timeout: 5000 });
-  await page.waitForFunction(() => !!window.__BALABS_3D_E2E__(), undefined, { timeout: 15000 });
-  const branchTarget = await page.evaluate(() => window.__BALABS_3D_E2E__());
+  await page.waitForFunction(() => (window.__BALABS_3D_E2E__()?.visible || 0) > 0, undefined, { timeout: 15000 }).catch(async error => { throw new Error('No 3D branch is visible for a real tap: ' + JSON.stringify(await page.evaluate(() => window.__BALABS_3D_E2E__())) + ' — ' + error.message); });
+  const branchTarget = await page.evaluate(() => window.__BALABS_3D_E2E__().target);
   await page.mouse.click(branchTarget.x, branchTarget.y);
   await page.waitForFunction(() => {
     const panel = document.querySelector('.webgl-focus');
