@@ -40,7 +40,7 @@ async function runWorkspace(domain, options = {}) {
     getElementById(id) { return id === "workspace-root" ? root : null; },
     createElement(tag) {
       assert.equal(tag, "script");
-      return { src: "", onload: null, onerror: null };
+      return { src: "", onload: null, onerror: null, dataset: {} };
     }
   };
   const window = {
@@ -52,8 +52,10 @@ async function runWorkspace(domain, options = {}) {
     if (options.failFetch) return { ok: false, text: async () => "" };
     return { ok: true, text: async () => "<main>workspace</main>" };
   };
-  vm.runInNewContext(source, { window, document, fetch, console });
+  vm.runInNewContext(source, { window, document, fetch, console, queueMicrotask });
   const result = await window.BA_LABS_WORKSPACE_BOOTSTRAP.ready;
+  const duplicateStartResult = await window.BA_LABS_WORKSPACE_BOOTSTRAP.start();
+  assert.equal(duplicateStartResult, result);
   return { events, root, window, result };
 }
 
@@ -91,3 +93,18 @@ assert.equal(missingWorkspace.events.filter(event => event.startsWith("script:")
 console.log("✓ All three CultureOps entry pages delegate startup to the shared bootstrap");
 console.log("✓ Workspace identity and module isolation are preserved");
 console.log("✓ Missing Supabase or workspace HTML produces a visible startup error");
+
+const missingTracker = await runWorkspace("mycology", {
+  failScript: "../tracker.js?v=20261026-core-refresh-1"
+});
+assert.equal(missingTracker.result, false);
+assert.match(missingTracker.root.innerHTML, /role="alert"/);
+assert.equal(missingTracker.events.filter(event => event.startsWith("script:")).length, 2);
+
+const unknownDomain = await runWorkspace("unknown");
+assert.equal(unknownDomain.result, false);
+assert.match(unknownDomain.root.innerHTML, /Espace inconnu/);
+assert.equal(unknownDomain.events.length, 0);
+
+console.log("✓ Failed engine loads stop startup with visible feedback");
+console.log("✓ Unknown domains are rejected before loading workspace scripts");
