@@ -50,7 +50,7 @@ Set credentials only in the local shell environment. Do not paste connection str
 ```bash
 export SUPABASE_PROJECT_REF="your-project-ref"
 export SUPABASE_DB_URL="postgresql://..."
-./scripts/backup-supabase-free.sh
+bash scripts/backup-supabase-free.sh
 unset SUPABASE_DB_URL
 ```
 
