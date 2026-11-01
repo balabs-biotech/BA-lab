@@ -34,13 +34,11 @@ The maintained source contains an explicit role check before using privileged se
 - allows only `owner`, `admin`, or `member`;
 - returns HTTP 403 otherwise.
 
-The deployed snapshot does not contain this check. The live function therefore does not have this specific writer-role gate at the captured version. Treat this as a high-priority authorization discrepancy and review the complete handler path before any release.
+The deployed snapshot still validates the caller's session and uses an RLS-scoped query to confirm access to the requested culture before loading it with the service role. What is missing is the additional explicit writer-role gate. Consequently, a user with read access (including a viewer) may be able to trigger the privileged external Notion synchronization for an accessible culture. Treat this as a high-priority authorization discrepancy, but not as an unauthenticated endpoint.
 
 ### 2. `nasa-power-agroclimate` — deployed version 6
 
-The maintained source checks the authenticated caller's membership in the location's organization and permits only `owner`, `admin`, or `member` before persisting observations through the service role. The deployed snapshot lacks that explicit check.
-
-This is a high-priority authorization discrepancy. Verify all read/write paths and the relationship between the requested location and organization before preparing a controlled deployment.
+The maintained source checks the authenticated caller's membership in the location's organization and permits only `owner`, `admin`, or `member` before persisting observations through the service role. The deployed snapshot still validates the caller's session and uses an RLS-scoped query to resolve an accessible location. What is missing is the explicit writer-role gate before the privileged persistence path. A viewer with location visibility may therefore be able to trigger an operation intended for writers. Treat this as a high-priority authorization discrepancy, but not as an unauthenticated endpoint. Verify all read/write paths and the relationship between the requested location and organization before preparing a controlled deployment.
 
 ### 3. `earth-search-sentinel2-ndvi-preview` — deployed version 5
 
