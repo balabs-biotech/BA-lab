@@ -15,6 +15,7 @@ for (const [label, required] of [
   ["stale response guard", "requestId === cultureLineageRequestId"],
   ["workspace guard", "isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)"],
   ["culture pagination", '.range(offset, offset + pageSize - 1)'],
+  ["stable page ordering", '.order("id", { ascending: true })'],
   ["bounded pagination", "const maxRows = 10000"],
   ["material pagination", '"materials"'],
   ["truncation warning", "culturePage.truncated || materialPage.truncated"],
