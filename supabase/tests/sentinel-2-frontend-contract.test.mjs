@@ -1,9 +1,10 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 
-const [source, entry, i18n] = await Promise.all([
+const [source, entry, bootstrap, i18n] = await Promise.all([
   readFile(new URL("../../batch-tracker/environmental-data.js", import.meta.url), "utf8"),
   readFile(new URL("../../batch-tracker/green-tech/index.html", import.meta.url), "utf8"),
+  readFile(new URL("../../batch-tracker/workspace-bootstrap.js", import.meta.url), "utf8"),
   readFile(new URL("../../batch-tracker/i18n.js", import.meta.url), "utf8"),
 ]);
 const checks = [
@@ -32,10 +33,10 @@ const checks = [
   ["labels partial rainfall totals explicitly", /Cumul partiel · /],
   ["calculates agronomic coverage against calendar days, including missing days", /windowStart=Math\.max\(firstDay,lastDay-6\*86400000\)[\s\S]*?windowObservations/],
  ];
+assert.match(entry, /workspace-bootstrap\.js/, "Green Tech delegates startup to the shared bootstrap");
 assert.doesNotMatch(entry, /smart-entry\.js/, "Green Tech must not load the biological smart-entry adapter");
-assert.match(entry, /script\.onload = \(\) => \{[\s\S]*?environmental-data\.js/, "loads the environmental module directly after the shared tracker");
-assert.match(entry, /environmental-data\.js\?v=20261027-sentinel-fallback-fix-1/, "uses a cache-busted environmental module path");
-assert.match(entry, /i18n\.js\?v=[^"]+/, "uses a cache-busted localization module path");
+assert.match(bootstrap, /agronomy:\s*"\.\.\/environmental-data\.js\?v=20261027-sentinel-fallback-fix-1"/, "loads the environmental module directly after the shared tracker");
+assert.match(bootstrap, /i18n\.js\?v=[^"]+/, "uses a cache-busted localization module path");
 assert.match(i18n, /Lecture agronomique/, "contains localized agronomic synthesis labels");
 assert.match(i18n, /Vegetation trend \(NDVI\)/, "contains localized satellite chart labels");
 assert.match(i18n, /Qualidade dos dados:/, "contains localized data-quality diagnostics in Portuguese");
