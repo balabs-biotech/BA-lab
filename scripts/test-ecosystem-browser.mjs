@@ -91,6 +91,17 @@ async function checkWorkingScene(name, viewport) {
   assert.ok(await canvas.isVisible(), name + ': the 3D canvas must remain visible after entering');
   await page.waitForFunction(() => !document.querySelector('#mainView .webgl-stage')?.classList.contains('is-transitioning'), undefined, { timeout: 8000 });
 
+  const distanceBeforeZoom = await page.evaluate(() => window.__BALABS_3D_E2E__().cameraDistance);
+  await page.locator('.webgl-controls [data-camera="out"]').click();
+  await page.waitForFunction((before) => window.__BALABS_3D_E2E__().cameraDistance > before * 1.15, distanceBeforeZoom, { timeout: 3000 });
+  const distanceAfterZoom = await page.evaluate(() => window.__BALABS_3D_E2E__().cameraDistance);
+  await page.setViewportSize({ width: viewport.width + 24, height: viewport.height + 18 });
+  await page.waitForTimeout(150);
+  const distanceAfterResize = await page.evaluate(() => window.__BALABS_3D_E2E__().cameraDistance);
+  assert.ok(Math.abs(distanceAfterResize - distanceAfterZoom) < 0.01,
+    name + ': responsive resize must not snap the camera back to overview distance');
+  await page.setViewportSize(viewport);
+
   await page.waitForFunction(() => !!window.__BALABS_3D_E2E__()?.domainTarget, undefined, { timeout: 8000 });
   const domainTarget = await page.evaluate(() => window.__BALABS_3D_E2E__().domainTarget);
   const hitSurface = await page.evaluate(({x,y}) => { const stage=document.querySelector('.webgl-stage'), canvas=stage?.querySelector('canvas'), rect=el=>{const r=el?.getBoundingClientRect();return r?{x:r.x,y:r.y,width:r.width,height:r.height}:null};return{stage:rect(stage),canvas:rect(canvas),stagePointer:stage&&getComputedStyle(stage).pointerEvents,canvasPointer:canvas&&getComputedStyle(canvas).pointerEvents,element:document.elementFromPoint(x,y)?.tagName,elementClass:document.elementFromPoint(x,y)?.className,main:rect(document.querySelector('#mainView'))}; }, domainTarget);
