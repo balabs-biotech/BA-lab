@@ -170,7 +170,7 @@
         return;
       }
       if (event === "SIGNED_IN") {
-        loadEnvironmentForAuthenticatedSession().catch(error => {
+        Promise.resolve().then(() => loadEnvironmentForAuthenticatedSession()).catch(error => {
           console.error("Réinitialisation GreenTech après connexion impossible :", error);
           status.textContent = "Impossible de recharger les données de l’espace. Actualisez la page.";
         });
@@ -359,9 +359,12 @@
       }
     }
     async function loadLocations() {
+      const authRevision = environmentalAuthRevision;
       const {data,error}=await db.from("locations").select("id,code,name,latitude,longitude,coordinate_accuracy_m,coordinate_source").order("name");
+      if (authRevision !== environmentalAuthRevision || document.body.dataset.domain !== "agronomy") return;
       if(error){satelliteMapStatus.textContent="Sites indisponibles.";return;}
-      data.forEach(x=>location.append(node("option",{value:x.id},x.code?x.name+" ("+x.code+")":x.name)));
+      location.replaceChildren(node("option",{value:""},"Choisir un emplacement…"));
+      (data || []).forEach(x=>location.append(node("option",{value:x.id},x.code?x.name+" ("+x.code+")":x.name)));
       let savedId="";try{savedId=localStorage.getItem("ba-labs-active-environment-location")||"";}catch(_){}
       const saved=data.find(x=>x.id===savedId&&x.latitude!=null&&x.longitude!=null);
       const preferred=saved||data.find(x=>x.latitude!=null&&x.longitude!=null&&Number.isFinite(Number(x.latitude))&&Number.isFinite(Number(x.longitude)))||data[0];
@@ -370,8 +373,12 @@
       if(!location.value) await updateSatelliteMap();
     }
     async function selectLocation(){
-      if(!location.value){lat.value="";lon.value="";accuracy.value="";await updateSatelliteMap();return;}
-      const {data}=await db.from("locations").select("latitude,longitude,coordinate_accuracy_m,coordinate_source").eq("id",location.value).maybeSingle();
+      const authRevision = environmentalAuthRevision;
+      const selectionRevision = environmentalSelectionRevision;
+      const locationId = location.value;
+      if(!locationId){lat.value="";lon.value="";accuracy.value="";await updateSatelliteMap();return;}
+      const {data}=await db.from("locations").select("latitude,longitude,coordinate_accuracy_m,coordinate_source").eq("id",locationId).maybeSingle();
+      if(authRevision !== environmentalAuthRevision || selectionRevision !== environmentalSelectionRevision || location.value !== locationId) return;
       if(!data)return;
       lat.value=data.latitude??""; lon.value=data.longitude??""; accuracy.value=data.coordinate_accuracy_m??"";
       if(data.coordinate_source && [...source.options].some(o=>o.value===data.coordinate_source))source.value=data.coordinate_source;
@@ -700,10 +707,15 @@
       if(!location.value||!from.value||!to.value||from.value>to.value){status.textContent="Choisissez un emplacement et une période valide.";return;}
       const days=(Date.parse(to.value)-Date.parse(from.value))/86400000+1;
       if(days>366){status.textContent="La période maximale est de 366 jours.";return;}
+      const authRevision = environmentalAuthRevision;
+      const selectionRevision = environmentalSelectionRevision;
+      const locationId = location.value;
+      const current = () => isCurrentEnvironmentRequest(authRevision, selectionRevision, locationId);
       run.disabled=true; refresh.disabled=true;
       status.textContent=forceRefresh?"Actualisation forcée en cours…":"Collecte en cours…";
       try{
-        const {data,error}=await db.functions.invoke("nasa-power-agroclimate",{body:{location_id:location.value,start_date:from.value,end_date:to.value,refresh:forceRefresh}});
+        const {data,error}=await db.functions.invoke("nasa-power-agroclimate",{body:{location_id:locationId,start_date:from.value,end_date:to.value,refresh:forceRefresh}});
+        if (!current()) return;
         if(error){status.textContent="Échec de la collecte météo : "+await functionErrorMessage(error);return;}
         if(data?.ok){
           const detail=data.cached
@@ -717,8 +729,8 @@
           status.textContent="Import refusé : "+(data?.error||"réponse invalide");
         }
         await loadRows();
-      }catch(error){status.textContent="Échec de la collecte : "+(error?.message||"erreur inconnue");}
-      finally{run.disabled=false;refresh.disabled=false;}
+      }catch(error){if(current())status.textContent="Échec de la collecte : "+(error?.message||"erreur inconnue");}
+      finally{if(current()){run.disabled=false;refresh.disabled=false;}}
     }
     run.addEventListener("click",()=>importWeather(false));
     refresh.addEventListener("click",()=>importWeather(true));
