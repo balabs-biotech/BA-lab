@@ -5904,6 +5904,7 @@ async function loadBiologicalLineage(cultureId) {
           .select(columns)
           .eq("organization_id", loadOrganizationId)
           .order("created_at", { ascending: true })
+          .order("id", { ascending: true })
           .range(offset, offset + pageSize - 1);
         if (error) throw error;
         if (!isCurrentRequest()) return { rows: [], truncated: false };
