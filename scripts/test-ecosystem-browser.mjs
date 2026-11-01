@@ -169,7 +169,7 @@ async function checkWorkingScene(name, viewport) {
     const focusState = await stage.evaluate(el => { const panel=el.querySelector('.webgl-focus'); return {focusRenderError:el.dataset.focusRenderError||'', panel:panel?{hidden:panel.hidden,display:getComputedStyle(panel).display,className:panel.className,text:panel.textContent,html:panel.innerHTML.slice(0,1200)}:null}; });
     const selectedTitle = await page.locator('#mainView .webgl-focus strong').first().textContent().catch(()=>null);
     assert.ok(selectedTitle && selectedTitle.trim().length > 0,
-      name + ': ' + id + ' must resolve to a readable domain detail');
+      name + ': ' + id + ' must resolve to a readable domain detail; focus=' + JSON.stringify(focusState));
     console.log(name + ': precision root selection', id, selectedTitle.trim());
   }
   await canvas.screenshot({ path: outputDir + '/' + name + '-canvas.png' });
