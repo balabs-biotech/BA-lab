@@ -88,6 +88,7 @@ jobs:
           node --check batch-tracker/environmental-data.js
           node scripts/check-i18n.mjs
           node scripts/test-environmental-fallback.mjs
+          node scripts/test-environmental-auth-isolation.mjs
           node scripts/test-workspace-scenarios.mjs
           node scripts/test-workspace-bootstrap.mjs
           node scripts/test-qc-check-session-errors.mjs
