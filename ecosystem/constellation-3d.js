@@ -88,7 +88,7 @@ else if(root){
   intro.addEventListener('pointerdown',e=>e.stopPropagation());
   intro.addEventListener('pointerup',e=>e.stopPropagation());
   intro.addEventListener('pointercancel',e=>e.stopPropagation());
-  intro.addEventListener('click',e=>{e.stopPropagation();intro.classList.add('is-opening');intro.disabled=true;intro.style.transition='opacity .55s ease,transform .55s ease';intro.style.opacity='0';intro.style.transform='scale(1.035)';window.setTimeout(()=>{intro.style.display='none';intro.style.opacity='';intro.style.transform='';intro.classList.remove('is-opening');intro.disabled=false;root.classList.remove('universe-closed');root.classList.add('universe-open');if(worldGroup)worldGroup.visible=true;selected=null;hovered=null;stage.dataset.selectedWorld='';stage.dataset.hoverWorld='';cameraTarget.set(0,0,0);dist=overviewDistance();theta=.25;phi=1.18;updateCamera();refreshFocus(null);},480);});
+  intro.addEventListener('click',e=>{e.stopPropagation();intro.classList.add('is-opening');intro.disabled=true;intro.style.transition='opacity .55s ease,transform .55s ease';intro.style.opacity='0';intro.style.transform='scale(1.035)';intro.style.pointerEvents='none';window.setTimeout(()=>{intro.style.display='none';intro.style.opacity='';intro.style.transform='';intro.classList.remove('is-opening');intro.disabled=false;root.classList.remove('universe-closed');root.classList.add('universe-open');if(worldGroup)worldGroup.visible=true;selected=null;hovered=null;stage.dataset.selectedWorld='';stage.dataset.hoverWorld='';cameraTarget.set(0,0,0);dist=overviewDistance();theta=.25;phi=1.18;updateCamera();refreshFocus(null);},480);});
   const refreshSpatialUi=()=>{
     const lang=document.documentElement.lang||'fr';
     const copy=spatialUiCopy[lang]||spatialUiCopy.fr;
@@ -545,7 +545,7 @@ else if(root){
         joinCount++;
         if(joinCount>=48)break;
       }
-      root.classList.add('webgl-ready','universe-closed');root.classList.remove('universe-open');worldGroup.visible=true;worldGroup.scale.setScalar(.72);new MutationObserver(()=>{const closed=root.classList.contains('universe-closed');if(worldGroup){worldGroup.visible=true;worldGroup.scale.setScalar(closed?.72:(camera?.aspect<.78?1.4:1.32))}if(closed){clearResourceNodes();intro.style.display='flex';intro.style.opacity='1';intro.style.transform='';intro.disabled=false;intro.classList.remove('is-opening')}}).observe(root,{attributes:true,attributeFilter:['class']});
+      root.classList.add('webgl-ready','universe-closed');root.classList.remove('universe-open');worldGroup.visible=true;worldGroup.scale.setScalar(.72);new MutationObserver(()=>{const closed=root.classList.contains('universe-closed');if(worldGroup){worldGroup.visible=true;worldGroup.scale.setScalar(closed?.72:(camera?.aspect<.78?1.4:1.32))}if(closed){clearResourceNodes();intro.style.display='flex';intro.style.opacity='1';intro.style.transform='';intro.style.pointerEvents='auto';intro.disabled=false;intro.classList.remove('is-opening')}}).observe(root,{attributes:true,attributeFilter:['class']});
       const textObserver=new MutationObserver(()=>refreshLabels());sphereEls.forEach(el=>{const b=el.querySelector('b');if(b)textObserver.observe(b,{childList:true,characterData:true,subtree:true})});
       tissuePickables=points.flatMap(p=>p.twigs);resize();bind();animate();
       document.addEventListener('visibilitychange',()=>{if(document.hidden){if(raf)cancelAnimationFrame(raf);raf=0}else if(renderer&&!raf){animate()}});
