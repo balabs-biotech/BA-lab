@@ -112,6 +112,8 @@ async function checkWorkingScene(name, viewport) {
     glError: Number(el.dataset.glError || 0),
     projectedRoots: JSON.parse(el.dataset.projectedRoots || '[]'),
     pixelProbe: JSON.parse(el.dataset.pixelProbe || '{}'),
+    canvasRect: (() => { const r=el.getBoundingClientRect(); return {x:r.x,y:r.y,width:r.width,height:r.height,bufferWidth:el.width,bufferHeight:el.height}; })(),
+    stageRect: (() => { const r=el.parentElement.getBoundingClientRect(); return {x:r.x,y:r.y,width:r.width,height:r.height}; })(),
     position: getComputedStyle(el).position,
     zIndex: getComputedStyle(el).zIndex,
     opacity: getComputedStyle(el).opacity,
@@ -124,6 +126,7 @@ async function checkWorkingScene(name, viewport) {
   assert.equal(renderState.glError, 0, name + ': WebGL context reported a graphics error');
   assert.ok(renderState.pixelProbe.sampled > 0, name + ': WebGL canvas pixel probe did not run');
   if (viewport.width <= 760) console.log(name + ': mobile render diagnostics', JSON.stringify(renderState));
+  await canvas.screenshot({ path: outputDir + '/' + name + '-canvas.png' });
   await page.screenshot({ path: outputDir + '/' + name + '-universe.png', fullPage: false });
 
   assert.deepEqual(pageErrors, [], name + ': uncaught browser errors detected');
