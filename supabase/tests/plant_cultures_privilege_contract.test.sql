@@ -2,12 +2,19 @@
 -- RLS does not protect TRUNCATE, so client roles must not hold that privilege.
 \set ON_ERROR_STOP on
 
-DO $assertions$
+DO $precondition$
 BEGIN
   IF to_regclass('public.plant_cultures') IS NULL THEN
     RAISE EXCEPTION 'FAIL: public.plant_cultures is missing';
   END IF;
+END
+$precondition$;
 
+-- Reproduce the broad default grants present on Supabase-created public tables.
+GRANT ALL PRIVILEGES ON TABLE public.plant_cultures TO anon, authenticated;
+
+DO $assertions$
+BEGIN
   IF has_table_privilege('anon', 'public.plant_cultures', 'SELECT')
      OR has_table_privilege('anon', 'public.plant_cultures', 'INSERT')
      OR has_table_privilege('anon', 'public.plant_cultures', 'UPDATE')
