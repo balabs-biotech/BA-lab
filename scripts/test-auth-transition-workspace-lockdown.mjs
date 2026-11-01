@@ -94,7 +94,7 @@ console.log("Auth transition workspace lockdown regression passed.");
 // A successful sign-out must clear every tenant-scoped cache through the same
 // cleanup path used by auth-state transitions. A failed sign-out must preserve it.
 const signOutStart = tracker.indexOf("async function signOut()");
-const authUiMarker = tracker.indexOf("/* ============================================================\\n   AUTH UI", signOutStart);
+const authUiMarker = tracker.indexOf("/* ============================================================\n   AUTH UI", signOutStart);
 assert.ok(signOutStart >= 0 && authUiMarker > signOutStart, "signOut function must exist");
 const signOutSource = tracker.slice(signOutStart, authUiMarker);
 
