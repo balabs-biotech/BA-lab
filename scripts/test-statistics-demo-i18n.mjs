@@ -3,19 +3,21 @@ import assert from "node:assert/strict";
 
 const source = fs.readFileSync("batch-tracker/tracker.js", "utf8");
 const translations = source.slice(source.indexOf("function getStatisticsTranslations"), source.indexOf("let statisticsRequestId"));
-const blocks = {
-  fr: translations.match(/fr: \{([\s\S]*?)\n    \},/)[1],
-  en: translations.match(/en: \{([\s\S]*?)\n    \},/)[1],
-  pt: translations.match(/pt: \{([\s\S]*?)\n    \},/)[1],
-  ar: translations.match(/ar: \{([\s\S]*?)\n  \};/)[1]
-};
+function languageBlock(language) {
+  const start = translations.indexOf(language + ": {");
+  assert.notEqual(start, -1, "missing translation block: " + language);
+  const end = language === "ar" ? translations.indexOf("\n  };", start) : translations.indexOf("},", start);
+  assert.notEqual(end, -1, "unterminated translation block: " + language);
+  return translations.slice(start, end);
+}
 const keys = [
   "demoTitleAgronomy", "demoMetricAgronomy",
   "demoTitleMycology", "demoMetricMycology",
   "demoTitleLaboratory", "demoMetricLaboratory",
   "demoAxis", "demoPoint", "demoNotice"
 ];
-for (const [language, block] of Object.entries(blocks)) {
+for (const language of ["fr", "en", "pt", "ar"]) {
+  const block = languageBlock(language);
   for (const key of keys) assert.ok(block.includes(key), language + " must translate " + key);
 }
 assert.ok(source.includes('title:L["demoTitle"+(demoDomain === "agronomy"'),
