@@ -26,6 +26,14 @@
           "description": "Species profiles and named culture resources. Resource designations do not by themselves establish verified strain identity.",
           "children": [
             {
+              "id": "en-myco-pulmonarius",
+              "title": "Pleurotus pulmonarius — species and cultivation profile",
+              "notionId": "40273152f171811fa874e6b3a698e462",
+              "url": "https://app.notion.com/p/40273152f171811fa874e6b3a698e462",
+              "description": "Species biology and general cultivation context.",
+              "children": []
+            },
+            {
               "id": "en-myco-eryngii",
               "title": "Pleurotus eryngii and hybrids",
               "notionId": "40173152f17181cf84ebf5cec4d862b5",
