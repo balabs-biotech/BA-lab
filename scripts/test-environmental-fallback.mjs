@@ -2,6 +2,14 @@ import fs from "node:fs";
 import assert from "node:assert/strict";
 
 const source = fs.readFileSync("batch-tracker/environmental-data.js", "utf8");
+const tracker = fs.readFileSync("batch-tracker/tracker.js", "utf8");
+assert.match(tracker, /window\.BA_LABS_SUPABASE_CLIENT\s*=\s*supabaseClient/,
+  "the shared tracker must expose its authenticated Supabase client for feature modules");
+assert.match(source, /const db = window\.BA_LABS_SUPABASE_CLIENT;/,
+  "Green Tech environmental features must reuse the authenticated tracker client");
+assert.doesNotMatch(source, /window\.supabase\.createClient\s*\(/,
+  "Green Tech environmental features must not create a second auth client");
+
 new Function(source);
 
 assert.ok(source.includes("earth-search-sentinel2-ndvi-preview"), "Public Earth Search preview must remain the primary Sentinel-2 renderer");
