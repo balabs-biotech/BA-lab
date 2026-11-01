@@ -105,8 +105,8 @@ assert.ok(scene.includes('parentId:a.dataset.parentId') && scene.includes('depth
 assert.ok(scene.includes('notionTreeReady.then('), '3D resource nodes must refresh when the manifest finishes loading');
 assert.ok(scene.includes("const pickableHit=hits.find(hit=>['resource','resource-label','sphere','label','dendrite','synapse'].includes(hit.object.userData?.kind))"), 'Clickable Notion branches and semantic 3D nodes must take priority over decorative geometry during raycasting');
 assert.ok(scene.includes('return pickableHit?[pickableHit,...hits.filter(hit=>hit!==pickableHit)]:hits'), 'The nearest semantic node or branch must be selected ahead of decorative geometry');
-assert.ok(scene.includes("stage.addEventListener('pointerup',e=>{if(!pointers.has(e.pointerId))return;end(e);") && scene.includes('lastPointerMoved=true;pick(e)'), 'A tap must invoke 3D picking on pointer release even when the browser retargets its click');
-assert.ok(scene.includes("stage.addEventListener('click',e=>{") && !scene.includes('if(e.detail>0)pick(e)'), 'The synthetic click after pointer release must not pick a second time');
+assert.ok(scene.includes("document.addEventListener('pointerup',e=>{if(!pointers.has(e.pointerId))return;") && scene.includes('lastPointerMoved=true;pick(e)},true)'), 'A tap must invoke 3D picking from the document capture phase even when pointer capture retargets events');
+assert.ok(scene.includes("document.addEventListener('click',e=>{") && !scene.includes('if(e.detail>0)pick(e)'), 'The synthetic click after pointer release must not pick a second time');
 assert.ok(scene.includes('Math.hypot(dx,dy)>10'), 'Small touch jitter must not be mistaken for a camera drag');
 assert.ok(scene.includes("['resource','resource-label','sphere','label','dendrite','synapse'].includes(hit.object.userData?.kind)"), 'Semantic 3D nodes must take picking priority over decorative geometry');
 assert.ok(scene.includes('lastPointerMoved=moved'), 'Pointer release must preserve drag suppression for the following click event');
