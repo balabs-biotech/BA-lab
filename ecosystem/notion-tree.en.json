@@ -22,17 +22,300 @@
           "id": "en-myco-pleurotus-library",
           "title": "Pleurotus — cultivated species and resources",
           "notionId": "40273152f17181eba1bbcaf1b1d491d6",
-          "description": "A guide separating general species profiles from working culture designations, with clear limits on identity and availability.",
           "url": "https://app.notion.com/p/40273152f17181eba1bbcaf1b1d491d6",
-          "children": []
+          "description": "Species profiles and named culture resources. Resource designations do not by themselves establish verified strain identity.",
+          "children": [
+            {
+              "id": "en-myco-eryngii",
+              "title": "Pleurotus eryngii and hybrids",
+              "notionId": "40173152f17181cf84ebf5cec4d862b5",
+              "url": "https://app.notion.com/p/40173152f17181cf84ebf5cec4d862b5",
+              "description": "King oyster and related hybrid group.",
+              "children": []
+            },
+            {
+              "id": "en-myco-ostreatus",
+              "title": "Pleurotus ostreatus",
+              "notionId": "40173152f17181a09927dbfa42313fb1",
+              "url": "https://app.notion.com/p/40173152f17181a09927dbfa42313fb1",
+              "description": "Oyster mushroom species profile.",
+              "children": []
+            },
+            {
+              "id": "en-myco-citrinopileatus",
+              "title": "Pleurotus citrinopileatus",
+              "notionId": "40173152f17181529b77e0a789852bdb",
+              "url": "https://app.notion.com/p/40173152f17181529b77e0a789852bdb",
+              "description": "Golden oyster mushroom profile.",
+              "children": []
+            },
+            {
+              "id": "en-myco-djamor",
+              "title": "Pleurotus djamor",
+              "notionId": "40173152f17181fc9e5ff9eedfc03e5a",
+              "url": "https://app.notion.com/p/40173152f17181fc9e5ff9eedfc03e5a",
+              "description": "Pink oyster mushroom profile.",
+              "children": []
+            },
+            {
+              "id": "en-myco-black-pearl",
+              "title": "Black Pearl",
+              "notionId": "40273152f171816b8f27de982a5465bb",
+              "url": "https://app.notion.com/p/40273152f171816b8f27de982a5465bb",
+              "description": "Pleurotus resource profile.",
+              "children": []
+            },
+            {
+              "id": "en-myco-pearl",
+              "title": "Pearl",
+              "notionId": "40273152f1718115ba8ac3f20c54c9e1",
+              "url": "https://app.notion.com/p/40273152f1718115ba8ac3f20c54c9e1",
+              "description": "Pleurotus resource profile.",
+              "children": []
+            },
+            {
+              "id": "en-myco-kryos",
+              "title": "KRYOS",
+              "notionId": "40273152f1718122a4ffe38cdf1f5070",
+              "url": "https://app.notion.com/p/40273152f1718122a4ffe38cdf1f5070",
+              "description": "Fungal resource designation.",
+              "children": []
+            },
+            {
+              "id": "en-myco-g8",
+              "title": "G8",
+              "notionId": "40273152f171817493cfd58b6c68c3ab",
+              "url": "https://app.notion.com/p/40273152f171817493cfd58b6c68c3ab",
+              "description": "Fungal resource designation.",
+              "children": []
+            },
+            {
+              "id": "en-myco-blue-oyster",
+              "title": "Blue Oyster",
+              "notionId": "40273152f1718189959bf206778c5aa8",
+              "url": "https://app.notion.com/p/40273152f1718189959bf206778c5aa8",
+              "description": "Fungal resource designation.",
+              "children": []
+            },
+            {
+              "id": "en-myco-gris-americain",
+              "title": "Gris américain",
+              "notionId": "40273152f17181ecb48fd5c53d52e73e",
+              "url": "https://app.notion.com/p/40273152f17181ecb48fd5c53d52e73e",
+              "description": "Fungal resource designation.",
+              "children": []
+            },
+            {
+              "id": "en-myco-hk35",
+              "title": "HK35",
+              "notionId": "40173152f17181c0b7e5d16be113aac8",
+              "url": "https://app.notion.com/p/40173152f17181c0b7e5d16be113aac8",
+              "description": "Resource profile; designation alone does not establish strain identity.",
+              "children": []
+            },
+            {
+              "id": "en-myco-p80",
+              "title": "P80",
+              "notionId": "40173152f171819da739f5a7c5a9c5dc",
+              "url": "https://app.notion.com/p/40173152f171819da739f5a7c5a9c5dc",
+              "description": "Resource profile; designation alone does not establish strain identity.",
+              "children": []
+            }
+          ]
         },
         {
-          "id": "en-myco-pulmonarius",
-          "title": "Pleurotus pulmonarius — species and cultivation profile",
-          "notionId": "40273152f171811fa874e6b3a698e462",
-          "description": "A species profile covering its fan-shaped fruit bodies, saprotrophic lifestyle and tendency to fruit in warmer conditions.",
-          "url": "https://app.notion.com/p/40273152f171811fa874e6b3a698e462",
-          "children": []
+          "id": "en-myco-other-fungi",
+          "title": "Other fungi studied and cultivated",
+          "notionId": "40273152f171812aad80e9a88edf1be6",
+          "url": "https://app.notion.com/p/40273152f171812aad80e9a88edf1be6",
+          "description": "Profiles beyond oyster mushrooms, including cultivated species and other biological interests.",
+          "children": [
+            {
+              "id": "en-myco-cyclocybe",
+              "title": "Cyclocybe aegerita — pioppino",
+              "notionId": "40273152f17181819b2bf666639beafd",
+              "url": "https://app.notion.com/p/40273152f17181819b2bf666639beafd",
+              "description": "Cultivated edible mushroom profile.",
+              "children": []
+            },
+            {
+              "id": "en-myco-calocybe",
+              "title": "Calocybe indica",
+              "notionId": "40173152f17181849109f54544cab02e",
+              "url": "https://app.notion.com/p/40173152f17181849109f54544cab02e",
+              "description": "Organism profile.",
+              "children": []
+            },
+            {
+              "id": "en-myco-hericium",
+              "title": "Hericium erinaceus",
+              "notionId": "40173152f17181ff9794c5dec3d4d002",
+              "url": "https://app.notion.com/p/40173152f17181ff9794c5dec3d4d002",
+              "description": "Lion's mane mushroom profile.",
+              "children": []
+            },
+            {
+              "id": "en-myco-hypsizygus-marmoreus",
+              "title": "Hypsizygus marmoreus",
+              "notionId": "40173152f17181e2b898ddd9686d5e38",
+              "url": "https://app.notion.com/p/40173152f17181e2b898ddd9686d5e38",
+              "description": "Organism profile.",
+              "children": []
+            },
+            {
+              "id": "en-myco-hypsizygus-ulmarius",
+              "title": "Hypsizygus ulmarius",
+              "notionId": "40173152f17181db803af24eb2e753e0",
+              "url": "https://app.notion.com/p/40173152f17181db803af24eb2e753e0",
+              "description": "Organism profile.",
+              "children": []
+            },
+            {
+              "id": "en-myco-lentinula",
+              "title": "Lentinula edodes",
+              "notionId": "40173152f1718146bb43e975d85f2dfa",
+              "url": "https://app.notion.com/p/40173152f1718146bb43e975d85f2dfa",
+              "description": "Shiitake profile.",
+              "children": []
+            },
+            {
+              "id": "en-myco-pholiota",
+              "title": "Pholiota adiposa",
+              "notionId": "40173152f17181b7b351dc05b274a6f0",
+              "url": "https://app.notion.com/p/40173152f17181b7b351dc05b274a6f0",
+              "description": "Organism profile.",
+              "children": []
+            },
+            {
+              "id": "en-myco-cordyceps",
+              "title": "Cordyceps militaris",
+              "notionId": "40173152f171813da4f3e1dc287ee91a",
+              "url": "https://app.notion.com/p/40173152f171813da4f3e1dc287ee91a",
+              "description": "Organism profile.",
+              "children": []
+            },
+            {
+              "id": "en-myco-ganoderma",
+              "title": "Ganoderma lucidum",
+              "notionId": "40173152f17181c4b39ae27901d04d36",
+              "url": "https://app.notion.com/p/40173152f17181c4b39ae27901d04d36",
+              "description": "Organism profile.",
+              "children": []
+            },
+            {
+              "id": "en-myco-trametes",
+              "title": "Trametes versicolor",
+              "notionId": "40173152f171816098cdd2477a5b970c",
+              "url": "https://app.notion.com/p/40173152f171816098cdd2477a5b970c",
+              "description": "Organism profile.",
+              "children": []
+            }
+          ]
+        },
+        {
+          "id": "en-myco-mycorrhizae",
+          "title": "Mycorrhizae and plant interactions",
+          "notionId": "40173152f1718101965cc766e3d7e27f",
+          "url": "https://app.notion.com/p/40173152f1718101965cc766e3d7e27f",
+          "description": "Scientific context for fungal associations with plant roots; these pages do not certify validated BA Labs symbioses.",
+          "children": [
+            {
+              "id": "en-myco-arbuscular",
+              "title": "Arbuscular mycorrhizae",
+              "notionId": "40273152f171810d92ffe6dfe8330a17",
+              "url": "https://app.notion.com/p/40273152f171810d92ffe6dfe8330a17",
+              "description": "Structures and biological functions.",
+              "children": []
+            },
+            {
+              "id": "en-myco-ectomycorrhizae",
+              "title": "Ectomycorrhizae",
+              "notionId": "40273152f17181a4aa7ccbe56cf01500",
+              "url": "https://app.notion.com/p/40273152f17181a4aa7ccbe56cf01500",
+              "description": "Associations and plant interactions.",
+              "children": []
+            },
+            {
+              "id": "en-myco-gigaspora",
+              "title": "Gigaspora margarita",
+              "notionId": "40173152f171811c9d91ca85d7d6f89f",
+              "url": "https://app.notion.com/p/40173152f171811c9d91ca85d7d6f89f",
+              "description": "Arbuscular mycorrhizal fungus profile.",
+              "children": []
+            },
+            {
+              "id": "en-myco-glomus-deserticola",
+              "title": "Glomus deserticola",
+              "notionId": "40173152f17181f9a2fcd3594708e9e9",
+              "url": "https://app.notion.com/p/40173152f17181f9a2fcd3594708e9e9",
+              "description": "Arbuscular mycorrhizal fungus profile.",
+              "children": []
+            },
+            {
+              "id": "en-myco-rhizophagus-irregularis",
+              "title": "Rhizophagus irregularis",
+              "notionId": "40173152f17181a7bcd1e4d69f31ea96",
+              "url": "https://app.notion.com/p/40173152f17181a7bcd1e4d69f31ea96",
+              "description": "Arbuscular mycorrhizal fungus profile.",
+              "children": []
+            },
+            {
+              "id": "en-myco-funneliformis",
+              "title": "Funneliformis mosseae",
+              "notionId": "40173152f171819a87acdc9dff6133da",
+              "url": "https://app.notion.com/p/40173152f171819a87acdc9dff6133da",
+              "description": "Arbuscular mycorrhizal fungus profile.",
+              "children": []
+            },
+            {
+              "id": "en-myco-pisolithus",
+              "title": "Pisolithus tinctorius",
+              "notionId": "40173152f171815f9edcca973aa6968a",
+              "url": "https://app.notion.com/p/40173152f171815f9edcca973aa6968a",
+              "description": "Ectomycorrhizal fungus profile.",
+              "children": []
+            },
+            {
+              "id": "en-myco-glomus-monosporus",
+              "title": "Glomus monosporus",
+              "notionId": "40173152f171810296caef43036c77ec",
+              "url": "https://app.notion.com/p/40173152f171810296caef43036c77ec",
+              "description": "Arbuscular mycorrhizal fungus profile.",
+              "children": []
+            },
+            {
+              "id": "en-myco-glomus-aggregatum",
+              "title": "Glomus aggregatum",
+              "notionId": "40173152f171819bbb4ad4228587c985",
+              "url": "https://app.notion.com/p/40173152f171819bbb4ad4228587c985",
+              "description": "Arbuscular mycorrhizal fungus profile.",
+              "children": []
+            },
+            {
+              "id": "en-myco-glomus-brasilianum",
+              "title": "Glomus brasilianum",
+              "notionId": "40173152f171816eac93cd00f0450047",
+              "url": "https://app.notion.com/p/40173152f171816eac93cd00f0450047",
+              "description": "Arbuscular mycorrhizal fungus profile.",
+              "children": []
+            },
+            {
+              "id": "en-myco-laccaria",
+              "title": "Laccaria laccata",
+              "notionId": "40173152f171811ca07df731eed807fe",
+              "url": "https://app.notion.com/p/40173152f171811ca07df731eed807fe",
+              "description": "Ectomycorrhizal fungus profile.",
+              "children": []
+            },
+            {
+              "id": "en-myco-rhizophagus-clarus",
+              "title": "Rhizophagus clarus",
+              "notionId": "40173152f1718167bc04d6a36e0c2802",
+              "url": "https://app.notion.com/p/40173152f1718167bc04d6a36e0c2802",
+              "description": "Arbuscular mycorrhizal fungus profile.",
+              "children": []
+            }
+          ]
         }
       ]
     },
