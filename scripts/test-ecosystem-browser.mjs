@@ -92,40 +92,56 @@ async function checkWorkingScene(name, viewport) {
   await page.waitForTimeout(700);
   await page.screenshot({ path: outputDir + '/' + name + '-universe.png', fullPage: false });
 
-  // Exercise real domain-to-domain navigation through the visible connection panel.
-  const worldIds = ['bio', 'myco', 'soil', 'lab', 'products', 'iot', 'work', 'learn'];
+  // Traverse the actual connection graph with depth-first navigation.
   const visited = new Set();
-  for (let step = 0; step < 20 && visited.size < 8; step += 1) {
-    const kicker = page.locator('#mainView .webgl-focus-kicker');
-    const currentLabel = (await kicker.textContent()) || '';
-    const currentMatch = currentLabel.match(/UNIVERS\\s*\\/\\s*(\\d+)/i);
-    if (currentMatch) visited.add(worldIds[Number(currentMatch[1]) - 1]);
+  const path = [];
+  const activeWorld = page.locator('#mainView .webgl-focus-kicker');
+  const waitForWorld = async (id) => page.waitForFunction(
+    (expected) => document.querySelector('#mainView .webgl-focus-kicker')?.dataset.worldId === expected,
+    id,
+    { timeout: 8000 },
+  );
+  const initialWorld = await activeWorld.getAttribute('data-world-id');
+  assert.ok(initialWorld, name + ': entering the 3D network must select a domain');
+  visited.add(initialWorld);
+  path.push(initialWorld);
+
+  for (let step = 0; step < 24 && visited.size < 8; step += 1) {
+    const current = path[path.length - 1];
     const links = page.locator('#mainView .webgl-focus-link[data-world]');
     const count = await links.count();
-    let target = null;
+    let next = null;
     for (let i = 0; i < count; i += 1) {
       const candidate = links.nth(i);
       const targetId = await candidate.getAttribute('data-world');
       if (targetId && !visited.has(targetId)) {
-        target = candidate;
+        next = { button: candidate, id: targetId };
         break;
       }
     }
-    if (!target) break;
-    await target.click();
-    await page.waitForTimeout(1450);
+    if (next) {
+      await next.button.click();
+      await waitForWorld(next.id);
+      visited.add(next.id);
+      path.push(next.id);
+      continue;
+    }
+    if (path.length <= 1) break;
+    const parent = path[path.length - 2];
+    const backLink = links.locator('[data-world="' + parent + '"]');
+    await backLink.click();
+    await waitForWorld(parent);
+    path.pop();
   }
-  const finalLabel = (await page.locator('#mainView .webgl-focus-kicker').textContent()) || '';
-  const finalMatch = finalLabel.match(/UNIVERS\\s*\\/\\s*(\\d+)/i);
-  if (finalMatch) visited.add(worldIds[Number(finalMatch[1]) - 1]);
-  assert.equal(visited.size, 8, name + ': all eight worlds must be reachable through visible connections; visited ' + [...visited].join(','));
+  assert.deepEqual([...visited].sort(), ['bio', 'iot', 'lab', 'learn', 'myco', 'products', 'soil', 'work'].sort(),
+    name + ': every one of the eight domains must be reachable through the real connection graph');
 
   const zoomOut = page.locator('#mainView .webgl-controls button[data-camera="out"]');
   await zoomOut.click();
   await page.waitForFunction(() => {
     const el = document.querySelector('#mainView .webgl-focus-kicker');
-    return !!el && /INDEX SPATIAL/i.test(el.textContent || '');
-  }, undefined, { timeout: 7000 });
+    return !!el && !el.dataset.worldId && /INDEX SPATIAL/i.test(el.textContent || '');
+  }, undefined, { timeout: 8000 });
   assert.ok(await canvas.isVisible(), name + ': return to network overview must preserve the 3D canvas');
 
   assert.deepEqual(pageErrors, [], name + ': uncaught browser errors detected');
