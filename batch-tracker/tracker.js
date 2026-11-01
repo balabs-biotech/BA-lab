@@ -762,23 +762,16 @@ async function signOut() {
 
 
   authStateRevision += 1;
-  organizationId = null;
-  organization = null;
-  strainOptions = [];
-  referenceData = [];
-  cultureOptions = [];
-  latestBatches = [];
-  selectedBatchId = null;
-  selectedBatch = null;
+  clearAuthenticatedWorkspaceState();
   if (harvestQuantityInput) harvestQuantityInput.value = "";
   if (harvestUnitInput) harvestUnitInput.value = "";
   if (harvestNoteInput) harvestNoteInput.value = "";
-  if (recordHarvestButton) recordHarvestButton.disabled = true;
   if (harvestStatus) harvestStatus.textContent = "Connectez-vous et sélectionnez un lot à l’étape Récolte.";
 
 
   hideElement(trackerCard);
   hideElement(batchCard);
+  hideElement(document.getElementById("plantCard"));
   hideElement(measurementCard);
   hideElement(document.getElementById("statisticsCard"));
   hideElement(document.getElementById("overviewCard"));
