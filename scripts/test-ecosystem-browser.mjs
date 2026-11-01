@@ -90,15 +90,14 @@ async function checkWorkingScene(name, viewport) {
   assert.equal(await intro.isVisible(), false, name + ': gateway overlay must leave the scene after entry');
   assert.ok(await canvas.isVisible(), name + ': the 3D canvas must remain visible after entering');
 
-  await page.evaluate(() => {
-    if (typeof window.enterSphere !== 'function') throw new Error('Shared domain navigation is unavailable');
-    window.enterSphere('bio', false, true);
-  });
+  await page.waitForFunction(() => !!window.__BALABS_3D_E2E__()?.domainTarget, undefined, { timeout: 8000 });
+  const domainTarget = await page.evaluate(() => window.__BALABS_3D_E2E__().domainTarget);
+  await page.mouse.click(domainTarget.x, domainTarget.y);
   await page.waitForFunction(() => {
     const mini = document.querySelector('#miniView');
     return mini?.classList.contains('spatial-source-only') &&
       getComputedStyle(mini).display === 'none';
-  }, undefined, { timeout: 5000 });
+  }, undefined, { timeout: 8000 });
   assert.ok(await canvas.isVisible(), name + ': entering a 3D domain must keep the WebGL canvas visible');
   assert.equal(await page.locator('#miniView.spatial-source-only').count(), 1,
     name + ': the legacy index must remain a hidden data source during 3D navigation');
