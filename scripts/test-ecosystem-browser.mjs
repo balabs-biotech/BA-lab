@@ -101,6 +101,21 @@ async function checkWorkingScene(name, viewport) {
   assert.ok(await canvas.isVisible(), name + ': the 3D canvas must remain visible after entering');
   // Let the longest camera transition finish before judging the rendered overview.
   await page.waitForTimeout(2200);
+  const renderState = await canvas.evaluate((el) => ({
+    frames: Number(el.dataset.renderFrame || 0),
+    worldVisible: el.dataset.worldVisible,
+    worldChildren: Number(el.dataset.worldChildren || 0),
+    cameraDistance: Number(el.dataset.cameraDistance || 0),
+    cameraAspect: Number(el.dataset.cameraAspect || 0),
+    position: getComputedStyle(el).position,
+    zIndex: getComputedStyle(el).zIndex,
+    opacity: getComputedStyle(el).opacity,
+  }));
+  assert.ok(renderState.frames > 0, name + ': WebGL animation loop did not render any frames');
+  assert.equal(renderState.worldVisible, 'true', name + ': 3D network group must be visible after entering the universe');
+  assert.ok(renderState.worldChildren > 0, name + ': 3D network group must contain rendered objects');
+  assert.ok(renderState.cameraDistance > 0 && renderState.cameraAspect > 0, name + ': camera dimensions must be valid');
+  if (viewport.width <= 760) console.log(name + ': mobile render diagnostics', JSON.stringify(renderState));
   await page.screenshot({ path: outputDir + '/' + name + '-universe.png', fullPage: false });
 
   assert.deepEqual(pageErrors, [], name + ': uncaught browser errors detected');
