@@ -88,7 +88,7 @@ else if(root){
   intro.addEventListener('pointerdown',e=>e.stopPropagation());
   intro.addEventListener('pointerup',e=>e.stopPropagation());
   intro.addEventListener('pointercancel',e=>e.stopPropagation());
-  intro.addEventListener('click',e=>{e.stopPropagation();intro.classList.add('is-opening');intro.disabled=true;intro.style.transition='opacity .55s ease,transform .55s ease';intro.style.opacity='0';intro.style.transform='scale(1.035)';intro.style.pointerEvents='none';intro.style.display='none';intro.style.visibility='hidden';intro.inert=true;intro.setAttribute('aria-hidden','true');root.classList.remove('universe-closed');root.classList.add('universe-open');window.setTimeout(()=>{intro.style.opacity='';intro.style.transform='';intro.classList.remove('is-opening');intro.disabled=false;if(worldGroup)worldGroup.visible=true;},480);});
+  intro.addEventListener('click',e=>{e.stopPropagation();intro.classList.add('is-opening');intro.disabled=true;intro.style.transition='opacity .55s ease,transform .55s ease';intro.style.opacity='0';intro.style.transform='scale(1.035)';intro.style.pointerEvents='none';intro.style.display='none';intro.style.visibility='hidden';intro.inert=true;intro.setAttribute('aria-hidden','true');root.classList.remove('universe-closed');root.classList.add('universe-open');window.setTimeout(()=>{intro.remove();if(worldGroup)worldGroup.visible=true;},520);});
   const refreshSpatialUi=()=>{
     const lang=document.documentElement.lang||'fr';
     const copy=spatialUiCopy[lang]||spatialUiCopy.fr;
