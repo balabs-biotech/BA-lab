@@ -17,10 +17,20 @@ docker info >/dev/null 2>&1 || {
   exit 1
 }
 
+if [[ ! "$SUPABASE_PROJECT_REF" =~ ^[a-z0-9]{20}$ ]]; then
+  printf 'Invalid Supabase project ref; expected 20 lowercase alphanumeric characters.\\n' >&2
+  exit 1
+fi
+
 timestamp="$(date -u +%Y%m%dT%H%M%SZ)"
 backup_root="${BACKUP_ROOT:-$HOME/ba-labs-backups/supabase}"
-backup_dir="$backup_root/$SUPABASE_PROJECT_REF/$timestamp"
-mkdir -p "$backup_dir"
+project_backup_root="$backup_root/$SUPABASE_PROJECT_REF"
+backup_dir="$project_backup_root/$timestamp"
+mkdir -p "$project_backup_root"
+if ! mkdir -m 700 "$backup_dir"; then
+  printf 'Backup destination already exists or cannot be created: %s\\n' "$backup_dir" >&2
+  exit 1
+fi
 
 printf 'Creating BA Labs Supabase logical backup: %s\n' "$backup_dir"
 printf 'Project ref: %s\n' "$SUPABASE_PROJECT_REF"
