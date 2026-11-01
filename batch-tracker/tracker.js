@@ -5883,27 +5883,51 @@ function biologicalWorkflowText(key, count = 0) {
 }
 
 async function loadBiologicalLineage(cultureId) {
+  const requestId = ++cultureLineageRequestId;
   const target = document.getElementById('cultureLineage');
   const loadRevision = authStateRevision;
   const loadOrganizationId = organizationId;
   if (!target || !loadOrganizationId) return;
+  target.dataset.cultureId = cultureId;
+  const isCurrentRequest = () =>
+    requestId === cultureLineageRequestId &&
+    target.dataset.cultureId === cultureId &&
+    isCurrentWorkspaceRevision(loadRevision, loadOrganizationId);
   target.textContent = biologicalWorkflowText("loading");
   try {
-    const { data, error } = await supabaseClient.from('cultures')
-      .select('id,code,culture_type,material_id,parent_culture_id,started_at,metadata')
-      .eq('organization_id', loadOrganizationId).order('created_at', { ascending: true }).limit(1000);
-    if (error) throw error;
-    if (!isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
-    const rows = data || [];
+    const pageSize = 1000;
+    const maxRows = 10000;
+    const loadPages = async (table, columns) => {
+      const rows = [];
+      for (let offset = 0; offset < maxRows; offset += pageSize) {
+        const { data, error } = await supabaseClient.from(table)
+          .select(columns)
+          .eq("organization_id", loadOrganizationId)
+          .order("created_at", { ascending: true })
+          .range(offset, offset + pageSize - 1);
+        if (error) throw error;
+        if (!isCurrentRequest()) return { rows: [], truncated: false };
+        rows.push(...(data || []));
+        if (!data || data.length < pageSize) return { rows, truncated: false };
+      }
+      return { rows, truncated: true };
+    };
+    const culturePage = await loadPages(
+      "cultures",
+      "id,code,culture_type,material_id,parent_culture_id,started_at,metadata"
+    );
+    if (!isCurrentRequest()) return;
+    const rows = culturePage.rows;
     const byId = new Map(rows.map(row => [row.id, row]));
     const current = byId.get(cultureId);
     if (!current) { target.textContent = biologicalWorkflowText("missing"); return; }
-    const { data: materials, error: materialError } = await supabaseClient.from('materials')
-      .select('id,material_code,material_type,parent_material_id,generation,state,strain_id')
-      .eq('organization_id', loadOrganizationId).limit(2000);
-    if (materialError) throw materialError;
-    if (!isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
-    const materialById = new Map((materials || []).map(item => [item.id, item]));
+    const materialPage = await loadPages(
+      "materials",
+      "id,material_code,material_type,parent_material_id,generation,state,strain_id"
+    );
+    if (!isCurrentRequest()) return;
+    const materials = materialPage.rows;
+    const materialById = new Map(materials.map(item => [item.id, item]));
     const materialChain = []; let materialId = current.material_id; let materialGuard = 0;
     while (materialId && materialGuard++ < 50) { const material = materialById.get(materialId); if (!material) break; materialChain.unshift(material); materialId = material.parent_material_id; }
     const ancestors = []; let parentId = current.parent_culture_id; let guard = 0;
@@ -5923,8 +5947,13 @@ async function loadBiologicalLineage(cultureId) {
     makeGroup(biologicalWorkflowText("selected"), [{ row: current, label: biologicalWorkflowText("openSheet") }]);
     if (descendants.length) makeGroup(biologicalWorkflowText("descendants") + ' (' + descendants.length + ')', descendants.map(row => ({ row, label: biologicalWorkflowText("generation") + (row.depth || 1) })));
     if (!ancestors.length && !descendants.length) { const p = document.createElement('p'); p.className = 'muted'; p.textContent = biologicalWorkflowText("noLineage"); target.appendChild(p); }
-    if (rows.length >= 1000) { const note = document.createElement('p'); note.className = 'muted'; note.textContent = biologicalWorkflowText("partial"); target.appendChild(note); }
-  } catch (error) { if (!isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return; target.textContent = biologicalWorkflowText("loadError") + (error.message || error); }
+    if (culturePage.truncated || materialPage.truncated) {
+      const note = document.createElement('p');
+      note.className = 'muted';
+      note.textContent = biologicalWorkflowText("partial") + " (limite de sécurité : " + maxRows + " enregistrements par table).";
+      target.appendChild(note);
+    }
+  } catch (error) { if (!isCurrentRequest()) return; target.textContent = biologicalWorkflowText("loadError") + (error.message || error); }
 }
 
 async function saveBiologicalOperation(event) {
@@ -5979,6 +6008,7 @@ async function saveBiologicalOperation(event) {
 }
 
 let cultureDetailRequestId = 0;
+let cultureLineageRequestId = 0;
 
 async function loadCultureDetail(cultureId) {
   const requestId = ++cultureDetailRequestId;
