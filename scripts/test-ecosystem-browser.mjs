@@ -107,9 +107,27 @@ async function checkWorkingScene(name, viewport) {
       name + ': missing or clipped projected screen coordinate for ' + id + ': ' + JSON.stringify(point));
     const hitInfo = await page.evaluate((worldId) => window.__BALABS_3D_TEST__?.hitAt(worldId), id);
     await page.mouse.click(point.x, point.y);
-    await page.waitForFunction((worldId) =>
-      document.querySelector('#mainView .webgl-focus-kicker')?.dataset.worldId === worldId,
-      id, { timeout: 8000 });
+    try {
+      await page.waitForFunction((worldId) =>
+        document.querySelector('#mainView .webgl-focus-kicker')?.dataset.worldId === worldId,
+        id, { timeout: 8000 });
+    } catch (error) {
+      const diagnostic = await page.evaluate((worldId) => ({
+        expected: worldId,
+        kicker: document.querySelector('#mainView .webgl-focus-kicker')?.dataset.worldId || null,
+        focusText: document.querySelector('#mainView .webgl-focus')?.innerText?.slice(0, 500) || null,
+        stageClasses: document.querySelector('#mainView .webgl-stage')?.className || null,
+        events: window.__BALABS_3D_TEST__ ? {
+          pointerdown: window.__BALABS_3D_TEST__.pointerdown || 0,
+          pointerup: window.__BALABS_3D_TEST__.pointerup || 0,
+          pick: window.__BALABS_3D_TEST__.pick || 0,
+          lastPick: window.__BALABS_3D_TEST__.lastPick || null,
+          hits: window.__BALABS_3D_TEST__.hitAt(worldId)
+        } : null
+      }), id);
+      await page.screenshot({ path: outputDir + '/' + name + '-selection-failure-' + id + '.png', fullPage: false });
+      throw new Error(name + ': selection timeout ' + JSON.stringify({ point, diagnostic }) + '; ' + error.message);
+    }
     await page.waitForFunction(() => !document.querySelector('#mainView .webgl-stage')?.classList.contains('is-transitioning'),
       undefined, { timeout: 8000 });
     const selectedId = await page.evaluate(() => document.querySelector('#mainView .webgl-focus-kicker')?.dataset.worldId || null);
