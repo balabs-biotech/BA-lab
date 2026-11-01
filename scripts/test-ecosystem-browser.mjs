@@ -106,25 +106,25 @@ async function checkWorkingScene(name, viewport) {
     assert.ok(point && Number.isFinite(point.x) && Number.isFinite(point.y) && point.z >= -1 && point.z <= 1,
       name + ': missing or clipped projected screen coordinate for ' + id + ': ' + JSON.stringify(point));
     const hitInfo = await page.evaluate((worldId) => window.__BALABS_3D_TEST__?.hitAt(worldId), id);
-    let selectedId = null;
-    for (const [dx, dy] of [[0, 0], [0, -18], [18, 0], [-18, 0], [0, 18]]) {
-      await page.waitForFunction(() => !document.querySelector('#mainView .webgl-stage')?.classList.contains('is-transitioning'),
-        undefined, { timeout: 8000 });
-      await page.mouse.click(point.x + dx, point.y + dy);
-      try {
-        await page.waitForFunction((worldId) =>
-          document.querySelector('#mainView .webgl-focus-kicker')?.dataset.worldId === worldId &&
-          !document.querySelector('#mainView .webgl-stage')?.classList.contains('is-transitioning'),
-          id, { timeout: 5000 });
-      } catch {}
-      selectedId = await page.evaluate(() => document.querySelector('#mainView .webgl-focus-kicker')?.dataset.worldId || null);
-      if (selectedId === id) break;
-    }
+    await page.mouse.click(point.x, point.y);
+    await page.waitForFunction((worldId) =>
+      document.querySelector('#mainView .webgl-focus-kicker')?.dataset.worldId === worldId,
+      id, { timeout: 8000 });
+    await page.waitForFunction(() => !document.querySelector('#mainView .webgl-stage')?.classList.contains('is-transitioning'),
+      undefined, { timeout: 8000 });
+    const selectedId = await page.evaluate(() => document.querySelector('#mainView .webgl-focus-kicker')?.dataset.worldId || null);
     const eventInfo = await page.evaluate(() => ({pointerdown:window.__BALABS_3D_TEST__?.pointerdown||0,pointerup:window.__BALABS_3D_TEST__?.pointerup||0,pick:window.__BALABS_3D_TEST__?.pick||0,lastPick:window.__BALABS_3D_TEST__?.lastPick||null}));
     assert.equal(selectedId, id, name + ': real WebGL canvas click did not select ' + id + ' at ' + JSON.stringify(point) + ' (raycast ' + JSON.stringify(hitInfo) + ', events ' + JSON.stringify(eventInfo) + ', selected ' + selectedId + ')');
     visited.add(id);
     const connectionCount = await page.locator('#mainView .webgl-focus-link[data-world]').count();
     assert.ok(connectionCount > 0, name + ': selected world ' + id + ' has no visible navigation connections');
+    if (id !== worldIds[worldIds.length - 1]) {
+      await page.locator('#mainView .webgl-controls button[data-camera="out"]').click();
+      await page.waitForFunction(() => {
+        const el = document.querySelector('#mainView .webgl-focus-kicker');
+        return !!el && !el.dataset.worldId && /INDEX SPATIAL/i.test(el.textContent || '');
+      }, undefined, { timeout: 8000 });
+    }
   }
   assert.equal(visited.size, 8, name + ': all eight 3D cells must be selectable by pointer');
 
