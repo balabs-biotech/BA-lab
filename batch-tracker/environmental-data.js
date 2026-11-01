@@ -114,7 +114,68 @@
 
     let satelliteLeafletMap=null, satelliteMarker=null, satelliteGridCircle=null, selectedSentinelSceneDate=null, selectedSentinelDisplayMode="ndvi";
     let environmentalAuthRevision=0, environmentalSelectionRevision=0, environmentalRowsRequest=0, environmentalSatelliteRequest=0;
-    db.auth.onAuthStateChange(()=>{environmentalAuthRevision+=1;});
+    function clearEnvironmentWorkspace() {
+      environmentalAuthRevision += 1;
+      environmentalSelectionRevision += 1;
+      environmentalRowsRequest += 1;
+      environmentalSatelliteRequest += 1;
+      panel.classList.add("hidden");
+      location.replaceChildren(node("option",{value:""},"Choisir un emplacement…"));
+      lat.value = "";
+      lon.value = "";
+      accuracy.value = "";
+      results.replaceChildren();
+      summary.replaceChildren();
+      weatherCharts.replaceChildren();
+      agroSynthesisPanel.replaceChildren(node("h3",{},"Lecture agronomique"));
+      vegetationChart.replaceChildren(
+        node("h3",{},"Évolution de la végétation (NDVI)"),
+        node("p",{class:"muted"},"Comparaison automatique des dernières scènes Sentinel-2 disponibles.")
+      );
+      uvComparisonPanel.replaceChildren();
+      satelliteResults.replaceChildren();
+      satelliteMapStatus.textContent = "Connectez-vous à CultureOps pour accéder aux emplacements de votre organisation.";
+      selectedSentinelSceneDate = null;
+      if (satelliteSentinelObjectUrl) {
+        URL.revokeObjectURL(satelliteSentinelObjectUrl);
+        satelliteSentinelObjectUrl = null;
+      }
+      if (satelliteLeafletMap) {
+        satelliteLeafletMap.remove();
+        satelliteLeafletMap = null;
+      }
+      satelliteMarker = null;
+      satelliteGridCircle = null;
+      satelliteNDVILayer = null;
+      satelliteTrueColorLayer = null;
+      satelliteSentinelNDVILayer = null;
+      satelliteLayerControl = null;
+    }
+
+    async function loadEnvironmentForAuthenticatedSession() {
+      clearEnvironmentWorkspace();
+      panel.classList.remove("hidden");
+      await loadLocations();
+      if (location.value) {
+        await importWeather(false);
+        if (lat.value !== "" && lon.value !== "") await searchSatellite();
+        else satelliteMapStatus.textContent = "Coordonnées du site manquantes.";
+      }
+    }
+
+    db.auth.onAuthStateChange((event, session) => {
+      if (event === "INITIAL_SESSION" || event === "TOKEN_REFRESHED") return;
+      if (event === "SIGNED_OUT" || !session) {
+        clearEnvironmentWorkspace();
+        return;
+      }
+      if (event === "SIGNED_IN") {
+        loadEnvironmentForAuthenticatedSession().catch(error => {
+          console.error("Réinitialisation GreenTech après connexion impossible :", error);
+          status.textContent = "Impossible de recharger les données de l’espace. Actualisez la page.";
+        });
+      }
+    });
     function isCurrentEnvironmentRequest(authRevision,selectionRevision,locationId){
       return authRevision===environmentalAuthRevision &&
         selectionRevision===environmentalSelectionRevision &&
@@ -681,13 +742,16 @@
     satelliteViewControls.append(regionalTrueColorButton,regionalNDVIButton);
     const {data: authState}=await db.auth.getSession();
     if(!authState?.session){
-      status.textContent="Connectez-vous à CultureOps pour accéder aux emplacements de votre organisation.";
-      db.auth.onAuthStateChange((_event,session)=>{if(session){panel.classList.remove("hidden");loadLocations().then(()=>{if(location.value){importWeather(false);if(lat.value!==""&&lon.value!=="")searchSatellite();else satelliteMapStatus.textContent="Coordonnées du site manquantes.";}});}});
+      clearEnvironmentWorkspace();
       return;
     }
     panel.classList.remove("hidden");
     await loadLocations();
-    if(location.value){importWeather(false);if(lat.value!==""&&lon.value!=="")searchSatellite();else satelliteMapStatus.textContent="Coordonnées du site manquantes.";}
+    if(location.value){
+      await importWeather(false);
+      if(lat.value!==""&&lon.value!=="") await searchSatellite();
+      else satelliteMapStatus.textContent="Coordonnées du site manquantes.";
+    }
   }
   const watch=new MutationObserver(()=>{if(document.getElementById("plantCard")){watch.disconnect();init().catch(e=>console.error("Environmental context",e));}});
   watch.observe(document.getElementById("workspace-root")||document.body,{childList:true,subtree:true});
