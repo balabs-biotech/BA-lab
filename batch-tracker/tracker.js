@@ -4634,6 +4634,11 @@ supabaseClient.auth.onAuthStateChange(
     // init() owns the initial session check; don't race it with INITIAL_SESSION.
     if (event === "INITIAL_SESSION") return;
 
+    // Supabase emits TOKEN_REFRESHED for the same authenticated user. The
+    // client already owns the refreshed access token; invalidating the
+    // workspace revision here would restart every tenant-scoped data loader.
+    if (event === "TOKEN_REFRESHED") return;
+
     authStateRevision += 1;
     const revision = authStateRevision;
 
