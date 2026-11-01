@@ -790,11 +790,20 @@ else if(root){
         screenPoint(id){
           const point=points.find(item=>item.id===id);
           if(!point||!renderer)return null;
+          point.mesh.updateWorldMatrix(true,false);
+          camera.updateMatrixWorld(true);
           const position=new THREE.Vector3();
-          point.mesh.getWorldPosition(position);
+          point.hitMesh.getWorldPosition(position);
           position.project(camera);
           const rect=renderer.domElement.getBoundingClientRect();
-          return {x:rect.left+(position.x+1)*.5*rect.width,y:rect.top+(-position.y+1)*.5*rect.height};
+          return {x:rect.left+(position.x+1)*.5*rect.width,y:rect.top+(-position.y+1)*.5*rect.height,z:position.z};
+        },
+        hitAt(id){
+          const point=this.screenPoint(id);
+          if(!point)return null;
+          const hits=hitTest({clientX:point.x,clientY:point.y});
+          const first=hits[0]?.object;
+          return first?{kind:first.userData?.kind||null,id:first.userData?.id||null,distance:hits[0].distance}:null;
         }
       };
     }
