@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import fs from "node:fs";
+import vm from "node:vm";
 
 const entryPages = [
   ["mycology", "batch-tracker/mycology/index.html"],
@@ -11,13 +12,82 @@ for (const [domain, path] of entryPages) {
   const html = fs.readFileSync(path, "utf8");
   assert.match(html, new RegExp(`<body[^>]*data-domain=["']${domain}["']`, "i"),
     `${domain} must declare its workspace domain on body`);
-  assert.match(html, /workspace-bootstrap\.js/,
+  assert.match(html, /workspace-bootstrap\\.js/,
     `${domain} must delegate startup to the shared workspace bootstrap`);
-  assert.doesNotMatch(html, /fetch\(["']\.\.\/workspace\.html/,
+  assert.doesNotMatch(html, /fetch\\(["']\\.\\.\\/workspace\\.html/,
     `${domain} must not keep a private workspace-loading sequence`);
-  assert.doesNotMatch(html, /createElement\(["']script["']\)/,
+  assert.doesNotMatch(html, /createElement\\(["']script["']\\)/,
     `${domain} must not inject its own startup scripts`);
 }
 
+const source = fs.readFileSync("batch-tracker/workspace-bootstrap.js", "utf8");
+
+async function runWorkspace(domain, options = {}) {
+  const events = [];
+  const root = { innerHTML: "" };
+  const body = {
+    dataset: { domain },
+    appendChild(script) {
+      events.push(`script:${script.src}`);
+      queueMicrotask(() => options.failScript === script.src
+        ? script.onerror?.()
+        : script.onload?.());
+      return script;
+    }
+  };
+  const document = {
+    body,
+    getElementById(id) { return id === "workspace-root" ? root : null; },
+    createElement(tag) {
+      assert.equal(tag, "script");
+      return { src: "", onload: null, onerror: null };
+    }
+  };
+  const window = {
+    supabase: options.noSupabase ? null : { createClient() {} },
+    BA_LABS_DOMAIN: null
+  };
+  const fetch = async path => {
+    events.push(`fetch:${path}`);
+    if (options.failFetch) return { ok: false, text: async () => "" };
+    return { ok: true, text: async () => "<main>workspace</main>" };
+  };
+  vm.runInNewContext(source, { window, document, fetch, console });
+  const result = await window.BA_LABS_WORKSPACE_BOOTSTRAP.ready;
+  return { events, root, window, result };
+}
+
+for (const [domain, specialized] of [
+  ["mycology", "smart-entry.js"],
+  ["laboratory", "smart-entry.js"],
+  ["agronomy", "environmental-data.js"],
+]) {
+  const run = await runWorkspace(domain);
+  assert.equal(run.result, true, `${domain} startup should succeed`);
+  assert.equal(run.window.BA_LABS_DOMAIN, domain);
+  assert.match(run.root.innerHTML, /workspace/);
+  const scriptEvents = run.events.filter(event => event.startsWith("script:"));
+  assert.equal(scriptEvents.length, 3);
+  assert.match(scriptEvents[0], /i18n\\.js/);
+  assert.match(scriptEvents[1], /tracker\\.js/);
+  assert.match(scriptEvents[2], new RegExp(specialized));
+  if (domain === "agronomy") {
+    assert.ok(!scriptEvents.some(event => /smart-entry\\.js/.test(event)));
+  } else {
+    assert.ok(!scriptEvents.some(event => /environmental-data\\.js/.test(event)));
+  }
+}
+
+const missingSupabase = await runWorkspace("mycology", { noSupabase: true });
+assert.equal(missingSupabase.result, false);
+assert.match(missingSupabase.root.innerHTML, /role="alert"/);
+assert.equal(missingSupabase.events.length, 0);
+
+const missingWorkspace = await runWorkspace("laboratory", { failFetch: true });
+assert.equal(missingWorkspace.result, false);
+assert.match(missingWorkspace.root.innerHTML, /role="alert"/);
+assert.equal(missingWorkspace.events.filter(event => event.startsWith("script:")).length, 0);
+
 console.log("✓ All three CultureOps entry pages delegate startup to the shared bootstrap");
-console.log("✓ Workspace identity remains declared per entry page");
+console.log("✓ Workspace identity and module isolation are preserved");
+console.log("✓ Missing Supabase or workspace HTML produces a visible startup error");
