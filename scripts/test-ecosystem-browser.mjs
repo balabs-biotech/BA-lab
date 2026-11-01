@@ -113,7 +113,7 @@ async function checkWorkingScene(name, viewport) {
       selectedId = await page.evaluate(() => document.querySelector('#mainView .webgl-focus-kicker')?.dataset.worldId || null);
       if (selectedId === id) break;
     }
-    const eventInfo = await page.evaluate(() => ({pointerdown:window.__BALABS_3D_TEST__?.pointerdown||0,pointerup:window.__BALABS_3D_TEST__?.pointerup||0,pick:window.__BALABS_3D_TEST__?.pick||0}));
+    const eventInfo = await page.evaluate(() => ({pointerdown:window.__BALABS_3D_TEST__?.pointerdown||0,pointerup:window.__BALABS_3D_TEST__?.pointerup||0,pick:window.__BALABS_3D_TEST__?.pick||0,lastPick:window.__BALABS_3D_TEST__?.lastPick||null}));
     assert.equal(selectedId, id, name + ': real WebGL canvas click did not select ' + id + ' at ' + JSON.stringify(point) + ' (raycast ' + JSON.stringify(hitInfo) + ', events ' + JSON.stringify(eventInfo) + ', selected ' + selectedId + ')');
     visited.add(id);
     const connectionCount = await page.locator('#mainView .webgl-focus-link[data-world]').count();
