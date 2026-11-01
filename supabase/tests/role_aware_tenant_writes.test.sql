@@ -186,4 +186,160 @@ begin
 end
 $$;
 
-select '✓ role-aware tenant write regression tests passed' as result;
+
+
+-- Two-organization RLS boundary: a member of organization A must not read,
+-- insert, update, delete, or reassign rows owned by organization B.
+-- This runs after the full migration replay in disposable CI PostgreSQL only.
+grant select, insert, update, delete on public.strains to authenticated;
+
+do $
+begin
+  insert into public.organizations(id, code, name)
+  values (
+    '00000000-0000-0000-0000-0000000000a2',
+    'TENANT-ISOLATION-B',
+    'Tenant isolation organization B'
+  )
+  on conflict (id) do nothing;
+
+  insert into auth.users(id)
+  values ('00000000-0000-0000-0000-0000000000b4')
+  on conflict (id) do nothing;
+
+  insert into public.organization_members(organization_id, user_id, role)
+  values (
+    '00000000-0000-0000-0000-0000000000a2',
+    '00000000-0000-0000-0000-0000000000b4',
+    'owner'
+  )
+  on conflict (organization_id, user_id) do update set role = excluded.role;
+
+  insert into public.strains(
+    organization_id, id, organism_id, strain_code
+  ) values (
+    '00000000-0000-0000-0000-0000000000a2',
+    '00000000-0000-0000-0000-0000000000d2',
+    '00000000-0000-0000-0000-0000000000c1',
+    'TENANT-B-PRIVATE-STRAIN'
+  )
+  on conflict (organization_id, id) do nothing;
+end
+$;
+
+-- Organization A member: only A rows are visible. Foreign writes must either
+-- affect zero rows (UPDATE/DELETE filtered by USING) or raise RLS violation
+-- (INSERT / changing the tenant key, rejected by WITH CHECK).
+begin;
+set local role authenticated;
+select set_config('request.jwt.claim.sub', '00000000-0000-0000-0000-0000000000b2', true);
+do $
+declare
+  v_visible_a integer;
+  v_visible_b integer;
+  v_affected integer;
+  v_own_strain uuid := '00000000-0000-0000-0000-0000000000d1';
+begin
+  select count(*) into v_visible_a
+  from public.strains
+  where organization_id = '00000000-0000-0000-0000-0000000000a1';
+  select count(*) into v_visible_b
+  from public.strains
+  where organization_id = '00000000-0000-0000-0000-0000000000a2';
+
+  if v_visible_a < 1 then
+    raise exception 'FAIL: organization A member cannot read own tenant rows';
+  end if;
+  if v_visible_b <> 0 then
+    raise exception 'FAIL: organization A member can read organization B rows';
+  end if;
+
+  update public.strains
+  set strain_code = 'CROSS-ORG-UPDATE-MUST-NOT-APPLY'
+  where organization_id = '00000000-0000-0000-0000-0000000000a2';
+  get diagnostics v_affected = row_count;
+  if v_affected <> 0 then
+    raise exception 'FAIL: organization A updated % organization B rows', v_affected;
+  end if;
+
+  delete from public.strains
+  where organization_id = '00000000-0000-0000-0000-0000000000a2';
+  get diagnostics v_affected = row_count;
+  if v_affected <> 0 then
+    raise exception 'FAIL: organization A deleted % organization B rows', v_affected;
+  end if;
+
+  begin
+    insert into public.strains(
+      organization_id, organism_id, strain_code
+    ) values (
+      '00000000-0000-0000-0000-0000000000a2',
+      '00000000-0000-0000-0000-0000000000c1',
+      'CROSS-ORG-INSERT-MUST-FAIL'
+    );
+    raise exception 'FAIL: organization A inserted a row into organization B';
+  exception when insufficient_privilege then
+    null;
+  end;
+
+  begin
+    update public.strains
+    set organization_id = '00000000-0000-0000-0000-0000000000a2'
+    where organization_id = '00000000-0000-0000-0000-0000000000a1'
+      and id = v_own_strain;
+    raise exception 'FAIL: organization A reassigned its row into organization B';
+  exception when insufficient_privilege then
+    null;
+  end;
+end
+$;
+rollback;
+
+-- Verify from organization B's identity that the boundary is symmetric.
+begin;
+set local role authenticated;
+select set_config('request.jwt.claim.sub', '00000000-0000-0000-0000-0000000000b4', true);
+do $
+declare
+  v_visible_a integer;
+  v_visible_b integer;
+begin
+  select count(*) into v_visible_a
+  from public.strains
+  where organization_id = '00000000-0000-0000-0000-0000000000a1';
+  select count(*) into v_visible_b
+  from public.strains
+  where organization_id = '00000000-0000-0000-0000-0000000000a2';
+
+  if v_visible_a <> 0 then
+    raise exception 'FAIL: organization B member can read organization A rows';
+  end if;
+  if v_visible_b <> 1 then
+    raise exception 'FAIL: organization B member cannot read its own fixture row';
+  end if;
+end
+$;
+rollback;
+
+-- Superuser-side assertion: denied writes did not mutate or remove foreign data.
+do $
+begin
+  if not exists (
+    select 1 from public.strains
+    where organization_id = '00000000-0000-0000-0000-0000000000a2'
+      and id = '00000000-0000-0000-0000-0000000000d2'
+      and strain_code = 'TENANT-B-PRIVATE-STRAIN'
+  ) then
+    raise exception 'FAIL: organization B fixture row was changed or deleted';
+  end if;
+  if not exists (
+    select 1 from public.strains
+    where organization_id = '00000000-0000-0000-0000-0000000000a1'
+      and id = '00000000-0000-0000-0000-0000000000d1'
+  ) then
+    raise exception 'FAIL: organization A fixture row disappeared';
+  end if;
+end
+$;
+
+select '✓ role-aware tenant writes and two-organization RLS isolation tests passed' as result;
