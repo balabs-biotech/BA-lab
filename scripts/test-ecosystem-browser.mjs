@@ -144,6 +144,10 @@ async function checkWorkingScene(name, viewport) {
       await page.locator('#mainView .webgl-controls button[data-camera="reset"]').click();
       await page.waitForTimeout(1500);
     }
+    // Showing the selected domain also reveals its Notion branch panel below the scene.
+    // Bring the actual canvas back into the viewport before measuring projected hit points.
+    await canvas.scrollIntoViewIfNeeded();
+    await page.waitForTimeout(120);
     const projected = await canvas.evaluate((el, targetId) => {
       const roots = JSON.parse(el.dataset.projectedRoots || '[]');
       const root = roots.find(item => item.id === targetId);
