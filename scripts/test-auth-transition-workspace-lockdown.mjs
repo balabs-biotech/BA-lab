@@ -124,6 +124,7 @@ function createSignOutContext(signOutError = null) {
     clearMessage() {},
     showMessage(message) { this.lastMessage = message; },
     supabaseClient: { auth: { async signOut() { return { error: signOutError }; } } },
+    authStateRevision: 0,
     console
   };
 }
