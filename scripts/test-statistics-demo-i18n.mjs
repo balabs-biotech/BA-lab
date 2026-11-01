@@ -30,6 +30,12 @@ assert.ok(source.includes("axis.textContent=L.demoAxis"),
   "synthetic chart axis must use the selected language");
 assert.ok(source.includes("note.textContent=L.demoNotice"),
   "synthetic data disclosure must use the selected language");
+assert.ok(source.includes('domain === "mycology" ? "#a94f1d" : domain === "agronomy" ? "#65b982" : "#215b91"'),
+  "real measurement chart lines must follow the workspace color palette");
+assert.ok(source.includes('const chartLocale = lang === "ar" ? "ar-DZ"'),
+  "measurement chart dates must follow the selected language");
+assert.ok(source.includes('svg.setAttribute("aria-label",L.chartEvolution+'),
+  "measurement chart accessibility label must be localized");
 assert.ok(source.includes("Non mesuré, non enregistré et jamais mélangé"),
   "French disclosure must explicitly distinguish synthetic and organization data");
 assert.ok(source.includes("Not measured, not stored, and never mixed"),
