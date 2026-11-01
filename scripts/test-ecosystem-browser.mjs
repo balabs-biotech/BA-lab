@@ -99,7 +99,8 @@ async function checkWorkingScene(name, viewport) {
   await page.waitForFunction(() => document.querySelector('#mainView')?.classList.contains('universe-open'), undefined, { timeout: 5000 });
   assert.equal(await intro.isVisible(), false, name + ': gateway overlay must leave the scene after entry');
   assert.ok(await canvas.isVisible(), name + ': the 3D canvas must remain visible after entering');
-  await page.waitForTimeout(700);
+  // Let the longest camera transition finish before judging the rendered overview.
+  await page.waitForTimeout(2200);
   await page.screenshot({ path: outputDir + '/' + name + '-universe.png', fullPage: false });
 
   assert.deepEqual(pageErrors, [], name + ': uncaught browser errors detected');
