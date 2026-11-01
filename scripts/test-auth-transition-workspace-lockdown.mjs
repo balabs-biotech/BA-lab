@@ -122,7 +122,7 @@ function createSignOutContext(signOutError = null) {
     document: { getElementById() { return null; } },
     hideElement() {},
     clearMessage() {},
-    showMessage(message) { this.lastMessage = message; },
+    showMessage() {},
     supabaseClient: { auth: { async signOut() { return { error: signOutError }; } } },
     authStateRevision: 0,
     console
