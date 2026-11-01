@@ -126,6 +126,42 @@ async function checkWorkingScene(name, viewport) {
   assert.equal(renderState.glError, 0, name + ': WebGL context reported a graphics error');
   assert.ok(renderState.pixelProbe.sampled > 0, name + ': WebGL canvas pixel probe did not run');
   if (viewport.width <= 760) console.log(name + ': mobile render diagnostics', JSON.stringify(renderState));
+  // Precision picking contract: every root domain must be independently selectable
+  // from its projected screen position, not merely visible in the overview.
+  const rootNames = {
+    bio: /bio|biolog|biology|biologia|الأحياء/i,
+    myco: /myco|champignon|fung|micolog|فطر/i,
+    soil: /soil|sol|substrat|التربة/i,
+    lab: /lab|laboratoire|laboratory|laboratório|مختبر/i,
+    products: /product|produit|kit|produção|منتج/i,
+    iot: /iot|automatis|automation|automação|إنترنت/i,
+    work: /work|projet|project|trabalho|عمل/i,
+    learn: /learn|formation|education|apprentissage|aprendizagem|تعلم/i,
+  };
+  for (const id of ['bio','myco','soil','lab','products','iot','work','learn']) {
+    if (await root.locator('.webgl-focus.has-world').count()) {
+      await page.locator('#mainView .webgl-controls button[data-camera="reset"]').click();
+      await page.waitForTimeout(1500);
+    }
+    const projected = await canvas.evaluate((el, targetId) => {
+      const roots = JSON.parse(el.dataset.projectedRoots || '[]');
+      const root = roots.find(item => item.id === targetId);
+      const rect = el.getBoundingClientRect();
+      return root ? { x: rect.left + (root.x + 1) * .5 * rect.width, y: rect.top + (1 - root.y) * .5 * rect.height, ndc: root } : null;
+    }, id);
+    assert.ok(projected && Math.abs(projected.ndc.x) < .92 && Math.abs(projected.ndc.y) < .92,
+      name + ': ' + id + ' must remain inside the selectable viewport');
+    await page.mouse.click(projected.x, projected.y);
+    await page.waitForFunction((targetId) => {
+      const panel = document.querySelector('#mainView .webgl-focus');
+      return panel && !panel.hidden && panel.classList.contains('has-world') &&
+        panel.querySelector('strong')?.textContent?.trim().length > 0;
+    }, id, { timeout: 5000 });
+    const selectedTitle = await page.locator('#mainView .webgl-focus strong').first().textContent();
+    assert.ok(selectedTitle && selectedTitle.trim().length > 0,
+      name + ': ' + id + ' must resolve to a readable domain detail');
+    console.log(name + ': precision root selection', id, selectedTitle.trim());
+  }
   await canvas.screenshot({ path: outputDir + '/' + name + '-canvas.png' });
   await page.screenshot({ path: outputDir + '/' + name + '-universe.png', fullPage: false });
 
