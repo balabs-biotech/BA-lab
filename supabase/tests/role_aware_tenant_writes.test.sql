@@ -224,6 +224,18 @@ begin
     'TENANT-B-PRIVATE-STRAIN'
   )
   on conflict (organization_id, id) do nothing;
+
+  insert into public.plant_cultures(
+    organization_id, id, code, crop_type, species_name, cultivar_name
+  ) values (
+    '00000000-0000-0000-0000-0000000000a2',
+    '00000000-0000-0000-0000-0000000000d3',
+    'TENANT-B-PLANT-CULTURE',
+    'test',
+    'Testus isolation',
+    'Private cultivar B'
+  )
+  on conflict (organization_id, id) do nothing;
 end
 $tenant$;
 
@@ -237,6 +249,7 @@ do $tenant$
 declare
   v_visible_a integer;
   v_visible_b integer;
+  v_plant_b integer;
   v_affected integer;
   v_own_strain uuid := '00000000-0000-0000-0000-0000000000d1';
 begin
@@ -253,6 +266,41 @@ begin
   if v_visible_b <> 0 then
     raise exception 'FAIL: organization A member can read organization B rows';
   end if;
+
+  select count(*) into v_plant_b
+  from public.plant_cultures
+  where organization_id = '00000000-0000-0000-0000-0000000000a2';
+  if v_plant_b <> 0 then
+    raise exception 'FAIL: organization A member can read organization B plant cultures';
+  end if;
+
+  update public.plant_cultures
+  set notes = 'CROSS-ORG-UPDATE-MUST-NOT-APPLY'
+  where organization_id = '00000000-0000-0000-0000-0000000000a2';
+  get diagnostics v_affected = row_count;
+  if v_affected <> 0 then
+    raise exception 'FAIL: organization A updated % organization B plant cultures', v_affected;
+  end if;
+
+  delete from public.plant_cultures
+  where organization_id = '00000000-0000-0000-0000-0000000000a2';
+  get diagnostics v_affected = row_count;
+  if v_affected <> 0 then
+    raise exception 'FAIL: organization A deleted % organization B plant cultures', v_affected;
+  end if;
+
+  begin
+    insert into public.plant_cultures(
+      organization_id, code, crop_type, species_name, cultivar_name
+    ) values (
+      '00000000-0000-0000-0000-0000000000a2',
+      'CROSS-ORG-PLANT-INSERT-MUST-FAIL',
+      'test', 'Testus isolation', 'Must be rejected'
+    );
+    raise exception 'FAIL: organization A inserted a plant culture into organization B';
+  exception when insufficient_privilege then
+    null;
+  end;
 
   update public.strains
   set strain_code = 'CROSS-ORG-UPDATE-MUST-NOT-APPLY'
@@ -303,6 +351,8 @@ do $tenant$
 declare
   v_visible_a integer;
   v_visible_b integer;
+  v_plant_a integer;
+  v_plant_b integer;
 begin
   select count(*) into v_visible_a
   from public.strains
@@ -316,6 +366,16 @@ begin
   end if;
   if v_visible_b <> 1 then
     raise exception 'FAIL: organization B member cannot read its own fixture row';
+  end if;
+
+  select count(*) into v_plant_a
+  from public.plant_cultures
+  where organization_id = '00000000-0000-0000-0000-0000000000a1';
+  select count(*) into v_plant_b
+  from public.plant_cultures
+  where organization_id = '00000000-0000-0000-0000-0000000000a2';
+  if v_plant_a <> 0 or v_plant_b <> 1 then
+    raise exception 'FAIL: organization B plant-culture visibility boundary failed (A=%, B=%)', v_plant_a, v_plant_b;
   end if;
 end
 $tenant$;
@@ -338,6 +398,14 @@ begin
       and id = '00000000-0000-0000-0000-0000000000d1'
   ) then
     raise exception 'FAIL: organization A fixture row disappeared';
+  end if;
+  if not exists (
+    select 1 from public.plant_cultures
+    where organization_id = '00000000-0000-0000-0000-0000000000a2'
+      and id = '00000000-0000-0000-0000-0000000000d3'
+      and code = 'TENANT-B-PLANT-CULTURE'
+  ) then
+    raise exception 'FAIL: organization B plant-culture fixture was changed or deleted';
   end if;
 end
 $tenant$;
