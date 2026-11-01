@@ -122,6 +122,8 @@ assert.ok(html.includes('.webgl-ready .sphere') || html.includes('.webgl-ready .
 console.log('Ecosystem regression checks passed: 8 domains, organic network, Notion tree hierarchy, exact URLs, cross-domain signals, unified navigation, gateway state, fallback and cache version.');
 
 assert.ok(scene.includes('window.enterSphere(id,false,true)'), '3D domain selection must request spatial-only navigation without revealing the legacy 2D index');
+assert.ok(scene.includes('window.enterSphere(targetId,false,true)'), 'Related-domain panel navigation must also stay in spatial-only mode');
+assert.ok(!scene.includes('window.enterSphere(targetId,false)'), 'No 3D navigation path may re-enable the legacy 2D index');
 assert.ok(html.includes('function enterSphere(id,scroll=true,spatial3D=false)'), 'Shared domain navigation must distinguish 3D entry from legacy 2D entry');
 assert.ok(html.includes("miniView.classList.toggle('spatial-source-only',spatial3D)"), 'The legacy mini-view must remain a hidden data source while 3D navigation is active');
 assert.ok(html.includes("miniView.classList.remove('spatial-source-only')"), 'Returning home must restore the normal mini-view state');
