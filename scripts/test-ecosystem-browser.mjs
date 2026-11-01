@@ -24,7 +24,9 @@ async function checkWorkingScene(name, viewport) {
   page.on('pageerror', (error) => pageErrors.push(error.message));
   page.on('console', (message) => { if (message.type() === 'error') browserDiagnostics.push('console: ' + message.text()); });
   page.on('requestfailed', (request) => browserDiagnostics.push('request failed: ' + request.url() + ' — ' + (request.failure()?.errorText || 'unknown')));
-  await page.goto(baseURL, { waitUntil: 'domcontentloaded', timeout: 30000 });
+  const testURL = new URL(baseURL);
+  testURL.searchParams.set('test3d', '1');
+  await page.goto(testURL.toString(), { waitUntil: 'domcontentloaded', timeout: 30000 });
 
   try {
     await page.waitForFunction(() => {
@@ -91,6 +93,74 @@ async function checkWorkingScene(name, viewport) {
   assert.ok(await canvas.isVisible(), name + ': the 3D canvas must remain visible after entering');
   await page.waitForTimeout(700);
   await page.screenshot({ path: outputDir + '/' + name + '-universe.png', fullPage: false });
+
+  // Click the projected center of every 3D cell on the real canvas.
+  // The test probe only supplies screen coordinates; picking remains the production raycaster.
+  const worldIds = ['bio', 'myco', 'soil', 'lab', 'products', 'iot', 'work', 'learn'];
+  const visited = new Set();
+  const activeWorld = page.locator('#mainView .webgl-focus-kicker');
+  for (const id of worldIds) {
+    await page.waitForFunction(() => !document.querySelector('#mainView .webgl-stage')?.classList.contains('is-transitioning'),
+      undefined, { timeout: 8000 });
+    const point = await page.evaluate((worldId) => window.__BALABS_3D_TEST__?.screenPoint(worldId), id);
+    assert.ok(point && Number.isFinite(point.x) && Number.isFinite(point.y) && point.z >= -1 && point.z <= 1,
+      name + ': missing or clipped projected screen coordinate for ' + id + ': ' + JSON.stringify(point));
+    const hitInfo = await page.evaluate((worldId) => window.__BALABS_3D_TEST__?.hitAt(worldId), id);
+    await page.mouse.click(point.x, point.y);
+    try {
+      await page.waitForFunction((worldId) =>
+        document.querySelector('#mainView .webgl-focus-kicker')?.dataset.worldId === worldId,
+        id, { timeout: 8000 });
+    } catch (error) {
+      const diagnostic = await page.evaluate((worldId) => ({
+        expected: worldId,
+        kicker: document.querySelector('#mainView .webgl-focus-kicker')?.dataset.worldId || null,
+        focusText: document.querySelector('#mainView .webgl-focus')?.innerText?.slice(0, 500) || null,
+        stageClasses: document.querySelector('#mainView .webgl-stage')?.className || null,
+        events: window.__BALABS_3D_TEST__ ? {
+          pointerdown: window.__BALABS_3D_TEST__.pointerdown || 0,
+          pointerup: window.__BALABS_3D_TEST__.pointerup || 0,
+          pick: window.__BALABS_3D_TEST__.pick || 0,
+          lastPick: window.__BALABS_3D_TEST__.lastPick || null,
+          hits: window.__BALABS_3D_TEST__.hitAt(worldId)
+        } : null
+      }), id);
+      await page.screenshot({ path: outputDir + '/' + name + '-selection-failure-' + id + '.png', fullPage: false });
+      throw new Error(name + ': selection timeout ' + JSON.stringify({ point, diagnostic }) + '; ' + error.message);
+    }
+    await page.waitForFunction(() => !document.querySelector('#mainView .webgl-stage')?.classList.contains('is-transitioning'),
+      undefined, { timeout: 8000 });
+    const selectedId = await page.evaluate(() => document.querySelector('#mainView .webgl-focus-kicker')?.dataset.worldId || null);
+    const eventInfo = await page.evaluate(() => ({pointerdown:window.__BALABS_3D_TEST__?.pointerdown||0,pointerup:window.__BALABS_3D_TEST__?.pointerup||0,pick:window.__BALABS_3D_TEST__?.pick||0,lastPick:window.__BALABS_3D_TEST__?.lastPick||null}));
+    assert.equal(selectedId, id, name + ': real WebGL canvas click did not select ' + id + ' at ' + JSON.stringify(point) + ' (raycast ' + JSON.stringify(hitInfo) + ', events ' + JSON.stringify(eventInfo) + ', selected ' + selectedId + ')');
+    visited.add(id);
+    const connectionCount = await page.locator('#mainView .webgl-focus-link[data-world]').count();
+    assert.ok(connectionCount > 0, name + ': selected world ' + id + ' has no visible navigation connections');
+    if (id !== worldIds[worldIds.length - 1]) {
+      await page.locator('#mainView .webgl-controls button[data-camera="out"]').click();
+      await page.waitForFunction(() => {
+        const el = document.querySelector('#mainView .webgl-focus-kicker');
+        return !!el && !el.dataset.worldId && /INDEX SPATIAL/i.test(el.textContent || '');
+      }, undefined, { timeout: 8000 });
+    }
+  }
+  assert.equal(visited.size, 8, name + ': all eight 3D cells must be selectable by pointer');
+
+  // Verify a connection-panel transition also changes the selected world.
+  const connection = page.locator('#mainView .webgl-focus-link[data-world]').first();
+  const connectionTarget = await connection.getAttribute('data-world');
+  assert.ok(connectionTarget, name + ': selected world has no clickable related domain');
+  await connection.click();
+  await page.waitForFunction((id) => document.querySelector('#mainView .webgl-focus-kicker')?.dataset.worldId === id,
+    connectionTarget, { timeout: 8000 });
+
+  const zoomOut = page.locator('#mainView .webgl-controls button[data-camera="out"]');
+  await zoomOut.click();
+  await page.waitForFunction(() => {
+    const el = document.querySelector('#mainView .webgl-focus-kicker');
+    return !!el && !el.dataset.worldId && /INDEX SPATIAL/i.test(el.textContent || '');
+  }, undefined, { timeout: 8000 });
+  assert.ok(await canvas.isVisible(), name + ': return to network overview must preserve the 3D canvas');
 
   assert.deepEqual(pageErrors, [], name + ': uncaught browser errors detected');
   console.log(name + ': WebGL started, legacy spheres hidden, gateway entered successfully', JSON.stringify(canvasState));
