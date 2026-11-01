@@ -24,7 +24,7 @@ async function checkWorkingScene(name, viewport) {
   page.on('pageerror', (error) => pageErrors.push(error.message));
   page.on('console', (message) => { if (message.type() === 'error') browserDiagnostics.push('console: ' + message.text()); });
   page.on('requestfailed', (request) => browserDiagnostics.push('request failed: ' + request.url() + ' — ' + (request.failure()?.errorText || 'unknown')));
-  await page.goto(baseURL, { waitUntil: 'domcontentloaded', timeout: 30000 });
+  const testURL = new URL(baseURL);\n  testURL.searchParams.set('test3d', '1');\n  await page.goto(testURL.toString(), { waitUntil: 'domcontentloaded', timeout: 30000 });
 
   try {
     await page.waitForFunction(() => {
@@ -92,49 +92,38 @@ async function checkWorkingScene(name, viewport) {
   await page.waitForTimeout(700);
   await page.screenshot({ path: outputDir + '/' + name + '-universe.png', fullPage: false });
 
-  // Traverse the actual connection graph with depth-first navigation.
+  // Click the projected center of every 3D cell on the real canvas.
+  // The test probe only supplies screen coordinates; picking remains the production raycaster.
+  const worldIds = ['bio', 'myco', 'soil', 'lab', 'products', 'iot', 'work', 'learn'];
   const visited = new Set();
-  const path = [];
   const activeWorld = page.locator('#mainView .webgl-focus-kicker');
-  const waitForWorld = async (id) => page.waitForFunction(
-    (expected) => document.querySelector('#mainView .webgl-focus-kicker')?.dataset.worldId === expected,
-    id,
-    { timeout: 8000 },
-  );
-  const initialWorld = await activeWorld.getAttribute('data-world-id');
-  assert.ok(initialWorld, name + ': entering the 3D network must select a domain');
-  visited.add(initialWorld);
-  path.push(initialWorld);
-
-  for (let step = 0; step < 24 && visited.size < 8; step += 1) {
-    const current = path[path.length - 1];
-    const links = page.locator('#mainView .webgl-focus-link[data-world]');
-    const count = await links.count();
-    let next = null;
-    for (let i = 0; i < count; i += 1) {
-      const candidate = links.nth(i);
-      const targetId = await candidate.getAttribute('data-world');
-      if (targetId && !visited.has(targetId)) {
-        next = { button: candidate, id: targetId };
-        break;
-      }
+  for (const id of worldIds) {
+    await page.waitForFunction(() => !document.querySelector('#mainView .webgl-stage')?.classList.contains('is-transitioning'),
+      undefined, { timeout: 8000 });
+    const point = await page.evaluate((worldId) => window.__BALABS_3D_TEST__?.screenPoint(worldId), id);
+    assert.ok(point && Number.isFinite(point.x) && Number.isFinite(point.y),
+      name + ': missing projected screen coordinate for ' + id);
+    let selectedId = null;
+    for (const [dx, dy] of [[0, 0], [0, -18], [18, 0], [-18, 0], [0, 18]]) {
+      await page.mouse.click(point.x + dx, point.y + dy);
+      await page.waitForTimeout(180);
+      selectedId = await activeWorld.getAttribute('data-world-id');
+      if (selectedId === id) break;
     }
-    if (next) {
-      await next.button.click();
-      await waitForWorld(next.id);
-      visited.add(next.id);
-      path.push(next.id);
-      continue;
-    }
-    if (path.length <= 1) break;
-    const parent = path[path.length - 2];
-    const backLink = links.locator('[data-world="' + parent + '"]');
-    await backLink.click();
-    await waitForWorld(parent);
-    path.pop();
+    assert.equal(selectedId, id, name + ': real WebGL canvas click did not select ' + id + ' (selected ' + selectedId + ')');
+    visited.add(id);
+    const connectionCount = await page.locator('#mainView .webgl-focus-link[data-world]').count();
+    assert.ok(connectionCount > 0, name + ': selected world ' + id + ' has no visible navigation connections');
   }
-  assert.deepEqual([...visited].sort(), ['bio', 'iot', 'lab', 'learn', 'myco', 'products', 'soil', 'work'].sort(),
-    name + ': every one of the eight domains must be reachable through the real connection graph');
+  assert.equal(visited.size, 8, name + ': all eight 3D cells must be selectable by pointer');
+
+  // Verify a connection-panel transition also changes the selected world.
+  const connection = page.locator('#mainView .webgl-focus-link[data-world]').first();
+  const connectionTarget = await connection.getAttribute('data-world');
+  assert.ok(connectionTarget, name + ': selected world has no clickable related domain');
+  await connection.click();
+  await page.waitForFunction((id) => document.querySelector('#mainView .webgl-focus-kicker')?.dataset.worldId === id,
+    connectionTarget, { timeout: 8000 });
 
   const zoomOut = page.locator('#mainView .webgl-controls button[data-camera="out"]');
   await zoomOut.click();
