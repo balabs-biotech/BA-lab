@@ -15,6 +15,8 @@ const corsHeaders = {
 };
 const MAX_REQUEST_BYTES = 32 * 1024;
 const MAX_STAC_RESPONSE_BYTES = 2 * 1024 * 1024;
+const MAX_RASTER_WINDOW_PIXELS = 2_000_000;
+const MAX_SCL_WINDOW_PIXELS = 1_000_000;
 
 async function readBoundedJson(input: Request | Response, maxBytes: number): Promise<any> {
   const declaredLength = Number(input.headers.get("content-length") ?? 0);
@@ -200,15 +202,26 @@ Deno.serve(async (req: Request) => {
       const y1 = clamp(Math.ceil(Math.max(rowA, rowB)), y0 + 1, height);
       return { window: [x0, y0, x1, y1] as [number, number, number, number], originX, originY, resX, resY };
     };
+    const windowDimensions = (rasterWindow: any) => ({
+      width: rasterWindow.window[2] - rasterWindow.window[0],
+      height: rasterWindow.window[3] - rasterWindow.window[1],
+    });
+    const validWindow = (rasterWindow: any, maxPixels: number, minDimension = 2) => {
+      const { width, height } = windowDimensions(rasterWindow);
+      return width >= minDimension && height >= minDimension && width * height <= maxPixels;
+    };
     const redWin = makeWindow(redImage);
     const nirWin = makeWindow(nirImage);
     const greenWin = greenImage ? makeWindow(greenImage) : null;
     const blueWin = blueImage ? makeWindow(blueImage) : null;
-    const redWidth = redWin.window[2] - redWin.window[0], redHeight = redWin.window[3] - redWin.window[1];
-    const nirWidth = nirWin.window[2] - nirWin.window[0], nirHeight = nirWin.window[3] - nirWin.window[1];
-    if (redWidth < 2 || redHeight < 2 || nirWidth < 2 || nirHeight < 2 || redWidth * redHeight > 2_000_000 || nirWidth * nirHeight > 2_000_000) {
+    if (!validWindow(redWin, MAX_RASTER_WINDOW_PIXELS) ||
+        !validWindow(nirWin, MAX_RASTER_WINDOW_PIXELS) ||
+        (greenWin !== null && !validWindow(greenWin, MAX_RASTER_WINDOW_PIXELS)) ||
+        (blueWin !== null && !validWindow(blueWin, MAX_RASTER_WINDOW_PIXELS))) {
       return json(422, { error: "raster_window_invalid_or_too_large" });
     }
+    const { width: redWidth, height: redHeight } = windowDimensions(redWin);
+    const { width: nirWidth, height: nirHeight } = windowDimensions(nirWin);
     diagnosticStage = "read_raster_windows";
     const [redRaster, nirRaster, greenRaster, blueRaster] = await Promise.all([
       redImage.readRasters({ window: redWin.window, samples: [0], interleave: true }),
@@ -225,9 +238,10 @@ Deno.serve(async (req: Request) => {
         const sclTif = await fromUrl(sclUrl, { allowFullFile: false });
         const sclImage = await sclTif.getImage();
         sclWin = makeWindow(sclImage);
-        sclWidth = sclWin.window[2] - sclWin.window[0];
-        sclHeight = sclWin.window[3] - sclWin.window[1];
-        if (sclWidth > 0 && sclHeight > 0 && sclWidth * sclHeight <= 1_000_000) {
+        const sclDimensions = windowDimensions(sclWin);
+        sclWidth = sclDimensions.width;
+        sclHeight = sclDimensions.height;
+        if (validWindow(sclWin, MAX_SCL_WINDOW_PIXELS, 1)) {
           sclRaster = await sclImage.readRasters({ window: sclWin.window, samples: [0], interleave: true });
           cloudMaskApplied = true;
         }
@@ -276,9 +290,11 @@ Deno.serve(async (req: Request) => {
           const c = palette(ndvi);
           png.data[i] = c[0]; png.data[i + 1] = c[1]; png.data[i + 2] = c[2]; png.data[i + 3] = c[3];
         } else {
-          const gx = Math.min((greenWin!.window[2] - greenWin!.window[0]) - 1, Math.floor(px * (greenWin!.window[2] - greenWin!.window[0]) / width));
-          const gy = Math.min((greenWin!.window[3] - greenWin!.window[1]) - 1, Math.floor(py * (greenWin!.window[3] - greenWin!.window[1]) / height));
-          const green = Number((greenRaster as any)[gy * (greenWin!.window[2] - greenWin!.window[0]) + gx]);
+          const greenWidth = greenWin!.window[2] - greenWin!.window[0];
+          const greenHeight = greenWin!.window[3] - greenWin!.window[1];
+          const gx = Math.min(greenWidth - 1, Math.floor(px * greenWidth / width));
+          const gy = Math.min(greenHeight - 1, Math.floor(py * greenHeight / height));
+          const green = Number((greenRaster as any)[gy * greenWidth + gx]);
           const blue = displayMode === "true_color" ? Number((blueRaster as any)[Math.min((blueWin!.window[3]-blueWin!.window[1])-1,Math.floor(py*(blueWin!.window[3]-blueWin!.window[1])/height)) * (blueWin!.window[2]-blueWin!.window[0]) + Math.min((blueWin!.window[2]-blueWin!.window[0])-1,Math.floor(px*(blueWin!.window[2]-blueWin!.window[0])/width))]) : green;
           const stretch = (v: number) => Math.round(255 * Math.pow(clamp(v / 3500, 0, 1), 0.72));
           const rgb = displayMode === "true_color" ? [stretch(red), stretch(green), stretch(blue)] : [stretch(nir), stretch(red), stretch(green)];

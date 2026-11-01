@@ -61,6 +61,8 @@ jobs:
       - name: Verify critical files exist
         run: |
           [ -f README.md ] && echo "✓ README.md" || exit 1
+          [ -f scripts/backup-supabase-free.sh ] && echo "✓ Supabase backup script" || exit 1
+          [ -f docs/operations/supabase-free-backup-restore.md ] && echo "✓ Supabase backup runbook" || exit 1
           [ -f LICENSE ] && echo "✓ LICENSE" || exit 1
           [ -f firmware/README.md ] && echo "✓ firmware/README.md" || exit 1
           [ -f hardware/README.md ] && echo "✓ hardware/README.md" || exit 1
@@ -68,6 +70,8 @@ jobs:
           [ -d firmware/src/climate_node ] && echo "✓ firmware/src/climate_node/" || exit 1
           [ -d firmware/src/irrigation_node ] && echo "✓ firmware/src/irrigation_node/" || exit 1
           [ -f firmware/test/test_control_logic.cpp ] && echo "✓ firmware/test/test_control_logic.cpp" || exit 1
+      - name: Validate Supabase backup script syntax
+        run: bash -n scripts/backup-supabase-free.sh
       - name: Verify LICENSES directory
         run: |
           [ -f LICENSES/README.md ] && echo "✓ LICENSES/README.md" || exit 1
@@ -87,6 +91,8 @@ jobs:
           node supabase/tests/copernicus-sentinel-catalogue.test.mjs
           node --check batch-tracker/environmental-data.js
           node scripts/check-i18n.mjs
+          node scripts/test-deployed-edge-function-snapshot.mjs
+          node scripts/test-restored-edge-functions.mjs
           node scripts/test-environmental-fallback.mjs
           node scripts/test-workspace-scenarios.mjs
           node scripts/test-qc-check-session-errors.mjs
