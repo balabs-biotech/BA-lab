@@ -34,8 +34,11 @@ for (const fn of manifest.functions) {
   assert.deepEqual(fn.files, ["index.ts"], fn.name + " snapshot file inventory changed; review before accepting");
   const path = new URL(fn.name + "/index.ts", root);
   const source = await readFile(path, "utf8");
-  const digest = createHash("sha256").update(source, "utf8").digest("hex");
-  assert.equal(digest, fn.sha256, fn.name + " snapshot checksum mismatch");
+  const gitObject = createHash("sha1")
+    .update(`blob ${Buffer.byteLength(source, "utf8")}\\0`, "utf8")
+    .update(source, "utf8")
+    .digest("hex");
+  assert.equal(gitObject, fn.git_blob_sha, fn.name + " snapshot Git blob checksum mismatch");
 }
 
 const byName = Object.fromEntries(manifest.functions.map(fn => [fn.name, fn]));
