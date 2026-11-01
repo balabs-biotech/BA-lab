@@ -107,6 +107,7 @@ assert.ok(scene.includes("const resourceHit=hits.find(hit=>hit.object.userData?.
 assert.ok(scene.includes('return resourceHit?[resourceHit,...hits.filter(hit=>hit!==resourceHit)]:hits'), 'A branch hit must be selected even when a decorative object is closer to the camera');
 assert.ok(scene.includes("stage.addEventListener('click',e=>{if(e.target.closest('.webgl-controls,.webgl-focus,.webgl-intro'))return;if(lastPointerMoved){lastPointerMoved=false;return}if(e.detail>0)pick(e)})"), 'A real click or tap must invoke 3D picking, independently of pointer capture release');
 assert.ok(scene.includes('Math.hypot(dx,dy)>10'), 'Small touch jitter must not be mistaken for a camera drag');
+assert.ok(scene.includes("['resource','resource-label','sphere','label','dendrite','synapse'].includes(hit.object.userData?.kind)"), 'Semantic 3D nodes must take picking priority over decorative geometry');
 assert.ok(scene.includes('lastPointerMoved=moved'), 'Pointer release must preserve drag suppression for the following click event');
 assert.ok(scene.includes("kind:'resource-label'"), 'The visible title of each Notion branch must be independently clickable');
 assert.ok(scene.includes("if(openResource&&selectedResource?.url){window.open(selectedResource.url,'_blank','noopener,noreferrer');return}"), 'The explicit Notion action must open the selected branch URL in a new tab');
