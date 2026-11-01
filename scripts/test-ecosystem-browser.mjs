@@ -24,7 +24,7 @@ async function checkWorkingScene(name, viewport) {
   page.on('pageerror', (error) => pageErrors.push(error.message));
   page.on('console', (message) => { if (message.type() === 'error') browserDiagnostics.push('console: ' + message.text()); });
   page.on('requestfailed', (request) => browserDiagnostics.push('request failed: ' + request.url() + ' — ' + (request.failure()?.errorText || 'unknown')));
-  await page.goto(baseURL, { waitUntil: 'domcontentloaded', timeout: 30000 });
+  await page.goto(baseURL + (baseURL.includes('?') ? '&' : '?') + 'e2e=1', { waitUntil: 'domcontentloaded', timeout: 30000 });
 
   try {
     await page.waitForFunction(() => {
@@ -104,7 +104,18 @@ async function checkWorkingScene(name, viewport) {
     name + ': the legacy index must remain a hidden data source during 3D navigation');
   assert.equal(await page.locator('#miniView.spatial-source-only .linknode:visible').count(), 0,
     name + ': no legacy 2D links may overlay the 3D scene');
-  await page.waitForTimeout(700);
+  await page.waitForFunction(() => typeof window.__BALABS_3D_E2E__ === 'function', undefined, { timeout: 5000 });
+  await page.waitForFunction(() => !!window.__BALABS_3D_E2E__(), undefined, { timeout: 15000 });
+  const branchTarget = await page.evaluate(() => window.__BALABS_3D_E2E__());
+  await page.mouse.click(branchTarget.x, branchTarget.y);
+  await page.waitForFunction(() => {
+    const panel = document.querySelector('.webgl-focus');
+    return panel && !panel.hidden && panel.querySelector('[data-resource-open]') && panel.querySelector('[data-resource-clear]');
+  }, undefined, { timeout: 8000 });
+  assert.ok(await page.locator('.webgl-focus [data-resource-open]').isVisible(), name + ': clicking a 3D branch must reveal its Notion action');
+  assert.ok(await page.locator('.webgl-focus [data-resource-clear]').isVisible(), name + ': selected branch must offer an in-scene return action');
+  await page.locator('.webgl-focus [data-resource-clear]').click();
+  await page.waitForFunction(() => document.querySelector('.webgl-focus')?.hidden, undefined, { timeout: 5000 });
   await page.screenshot({ path: outputDir + '/' + name + '-universe.png', fullPage: false });
 
   assert.deepEqual(pageErrors, [], name + ': uncaught browser errors detected');
