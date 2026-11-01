@@ -181,6 +181,25 @@ assert.match(batchDetail,
 assert.ok(batchDetail.indexOf("selectedBatch = batch;") > batchDetail.indexOf('from("batch_qc_checks")'),
   "batch detail loader must commit the selected batch only after required detail reads complete");
 
+assert.ok(
+  batchDetail.indexOf("selectedBatch = null;") >= 0 &&
+  batchDetail.indexOf("selectedBatch = null;") < batchDetail.indexOf("await supabaseClient"),
+  "starting a new batch load must invalidate the previous selection before network reads");
+assert.ok(
+  batchDetail.indexOf("advanceBatchButton.disabled = true;") >= 0 &&
+  batchDetail.indexOf("advanceBatchButton.disabled = true;") < batchDetail.indexOf("await supabaseClient") &&
+  batchDetail.indexOf("releaseBatchButton.disabled = true;") >= 0 &&
+  batchDetail.indexOf("releaseBatchButton.disabled = true;") < batchDetail.indexOf("await supabaseClient"),
+  "batch mutation actions must be disabled before a new detail request starts");
+for (const panel of ["batchInfo", "batchStages", "batchQc", "batchEvents"]) {
+  assert.ok(batchDetail.includes(`hideElement(${panel});`),
+    `previous ${panel} must be hidden while another batch is loading`);
+}
+const releaseBatch = getFunctionBlock("releaseBatch");
+assert.ok(
+  releaseBatch.includes("!selectedBatchId") && releaseBatch.includes("!selectedBatch"),
+  "batch release must require a fully loaded selected batch, not only a pending batch ID");
+
 
 
 const lineage = getFunctionBlock("loadBiologicalLineage");

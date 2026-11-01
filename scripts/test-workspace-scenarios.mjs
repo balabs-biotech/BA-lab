@@ -500,3 +500,16 @@ assert.match(loadBatchSource,
   /let batchEventsData = \[\];[\s\S]*?catch \(error\) \{[\s\S]*?batchEventsError = error;/,
   "an unavailable event journal must not abort the required batch detail view");
 console.log("✓ Batch detail: rejected requests are caught and stale feedback is discarded");
+
+
+// Manual measurement-history reload failures must not surface in a workspace
+// that replaced the one which initiated the request.
+const reloadListenerStart = engine.indexOf('reloadMeasurementsButton.addEventListener("click"');
+const reloadListenerEnd = engine.indexOf("\n\n  document", reloadListenerStart);
+assert.ok(reloadListenerStart >= 0 && reloadListenerEnd > reloadListenerStart,
+  "manual measurement-history reload listener must be present");
+const reloadListener = engine.slice(reloadListenerStart, reloadListenerEnd);
+assert.match(reloadListener,
+  /const operationRevision = authStateRevision;[\s\S]*?const operationOrganizationId = organizationId;[\s\S]*?loadRecentMeasurements\(\)\.catch\(error => \{[\s\S]*?if \(!isCurrentWorkspaceRevision\(operationRevision, operationOrganizationId\)\) return;[\s\S]*?showMessage\(error\.message, "error"\);/,
+  "measurement-history reload errors must be discarded after a workspace transition");
+console.log("✓ Measurement history reload: stale errors are discarded");

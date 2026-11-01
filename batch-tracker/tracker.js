@@ -2809,7 +2809,15 @@ async function loadBatch(
   const requestId = ++batchDetailRequestId;
   selectedBatchId =
     batchId;
-
+  selectedBatch = null;
+  advanceBatchButton.disabled = true;
+  releaseBatchButton.disabled = true;
+  if (recordHarvestButton) recordHarvestButton.disabled = true;
+  if (moveBatchButton) moveBatchButton.disabled = true;
+  hideElement(batchInfo);
+  hideElement(batchStages);
+  hideElement(batchQc);
+  hideElement(batchEvents);
 
   clearMessage();
 
@@ -4447,7 +4455,7 @@ async function releaseBatch() {
   const operationOrganizationId = organizationId;
 
 
-  if (!selectedBatchId) {
+  if (!selectedBatchId || !selectedBatch) {
 
     showMessage(
       "Sélectionnez d'abord un batch.",
@@ -6476,7 +6484,14 @@ function setupUiEnhancements() {
   measurementVariableSelect.addEventListener("change", updateMeasurementUnits);
   saveMeasurementButton.addEventListener("click", saveMeasurement);
   saveObservationButton.addEventListener("click", saveObservation);
-  reloadMeasurementsButton.addEventListener("click", () => loadRecentMeasurements().catch(error => showMessage(error.message, "error")));
+  reloadMeasurementsButton.addEventListener("click", () => {
+    const operationRevision = authStateRevision;
+    const operationOrganizationId = organizationId;
+    loadRecentMeasurements().catch(error => {
+      if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
+      showMessage(error.message, "error");
+    });
+  });
 
   document
     .getElementById("retrySyncButton")
