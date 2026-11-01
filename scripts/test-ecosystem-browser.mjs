@@ -103,8 +103,9 @@ async function checkWorkingScene(name, viewport) {
     await page.waitForFunction(() => !document.querySelector('#mainView .webgl-stage')?.classList.contains('is-transitioning'),
       undefined, { timeout: 8000 });
     const point = await page.evaluate((worldId) => window.__BALABS_3D_TEST__?.screenPoint(worldId), id);
-    assert.ok(point && Number.isFinite(point.x) && Number.isFinite(point.y),
-      name + ': missing projected screen coordinate for ' + id);
+    assert.ok(point && Number.isFinite(point.x) && Number.isFinite(point.y) && point.z >= -1 && point.z <= 1,
+      name + ': missing or clipped projected screen coordinate for ' + id + ': ' + JSON.stringify(point));
+    const hitInfo = await page.evaluate((worldId) => window.__BALABS_3D_TEST__?.hitAt(worldId), id);
     let selectedId = null;
     for (const [dx, dy] of [[0, 0], [0, -18], [18, 0], [-18, 0], [0, 18]]) {
       await page.mouse.click(point.x + dx, point.y + dy);
@@ -112,7 +113,7 @@ async function checkWorkingScene(name, viewport) {
       selectedId = await page.evaluate(() => document.querySelector('#mainView .webgl-focus-kicker')?.dataset.worldId || null);
       if (selectedId === id) break;
     }
-    assert.equal(selectedId, id, name + ': real WebGL canvas click did not select ' + id + ' at ' + JSON.stringify(point) + ' (selected ' + selectedId + ')');
+    assert.equal(selectedId, id, name + ': real WebGL canvas click did not select ' + id + ' at ' + JSON.stringify(point) + ' (raycast ' + JSON.stringify(hitInfo) + ', selected ' + selectedId + ')');
     visited.add(id);
     const connectionCount = await page.locator('#mainView .webgl-focus-link[data-world]').count();
     assert.ok(connectionCount > 0, name + ': selected world ' + id + ' has no visible navigation connections');
