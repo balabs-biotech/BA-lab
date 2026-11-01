@@ -76,17 +76,16 @@ queued.shift()();
 assert.equal(refreshes, 1);
 
 authCallback("TOKEN_REFRESHED", { user: { id: "new-user" } });
+assert.equal(context.authStateRevision, 1, "refreshing the same user's access token must not invalidate the workspace revision");
+assert.equal(queued.length, 0, "a same-user token refresh must not schedule a full workspace reconciliation");
+assert.equal(refreshes, 1, "a same-user token refresh must not reload tenant data");
+
+authCallback("SIGNED_OUT", null);
+assert.equal(context.organizationId, null, "logout must invalidate organization immediately");
 assert.equal(context.authStateRevision, 2);
 assert.equal(queued.length, 1);
 queued.shift()();
 assert.equal(refreshes, 2);
-
-authCallback("SIGNED_OUT", null);
-assert.equal(context.organizationId, null, "logout must invalidate organization immediately");
-assert.equal(context.authStateRevision, 3);
-assert.equal(queued.length, 1);
-queued.shift()();
-assert.equal(refreshes, 3);
 
 console.log("Auth transition workspace lockdown regression passed.");
 
