@@ -11,11 +11,11 @@ for (const [language, label] of [
 ]) {
   const block = translations.slice(translations.indexOf(language + ":"), translations.indexOf("},", translations.indexOf(language + ":")));
   assert.ok(block.includes(label), language + " must translate synthetic-chart disclosure");
-  for (const key of ["demoTitle", "demoMetric", "demoAxis", "demoPoint"]) {
+  for (const key of ["demoTitle", "demoMetric", "demoAxis", "demoPoint", "demoTitleAgronomy", "demoMetricAgronomy", "demoTitleMycology", "demoMetricMycology", "demoTitleLaboratory", "demoMetricLaboratory"]) {
     assert.ok(block.includes(key), language + " must translate " + key);
   }
 }
-assert.match(source, /title:L\.demoTitle, metric:L\.demoMetric/,
+assert.match(source, /title:L\["demoTitle"\+\(demoDomain === "agronomy"/,\n  "each workspace must use its own localized synthetic chart title");\nassert.match(source, /metric:L\["demoMetric"\+\(demoDomain === "agronomy"/,\n  "each workspace must use its own localized synthetic chart metric");\nassert.match(source, /title:L\.demoTitle, metric:L\.demoMetric/,
   "synthetic chart title and metric must use the selected language");
 assert.match(source, /pointTitle\.textContent=L\.demoPoint/,
   "synthetic chart point labels must use the selected language");
