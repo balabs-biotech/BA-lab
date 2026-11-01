@@ -103,8 +103,8 @@ assert.ok(scene.includes('const visit=(node,depth=0,parentId=domainTree.id'), '3
 assert.ok(scene.includes('data-notion-tree-node="true"'), 'Manifest nodes must be injected into the 3D resource layer');
 assert.ok(scene.includes('parentId:a.dataset.parentId') && scene.includes('depth:Number(a.dataset.depth||0)'), '3D resource nodes must retain their hierarchy metadata');
 assert.ok(scene.includes('notionTreeReady.then('), '3D resource nodes must refresh when the manifest finishes loading');
-assert.ok(scene.includes("const resourceHit=hits.find(hit=>hit.object.userData?.kind==='resource'||hit.object.userData?.kind==='resource-label')"), 'Clickable Notion branches must take priority over decorative neurites and domain geometry during raycasting');
-assert.ok(scene.includes('return resourceHit?[resourceHit,...hits.filter(hit=>hit!==resourceHit)]:hits'), 'A branch hit must be selected even when a decorative object is closer to the camera');
+assert.ok(scene.includes("const pickableHit=hits.find(hit=>['resource','resource-label','sphere','label','dendrite','synapse'].includes(hit.object.userData?.kind))"), 'Clickable Notion branches and semantic 3D nodes must take priority over decorative geometry during raycasting');
+assert.ok(scene.includes('return pickableHit?[pickableHit,...hits.filter(hit=>hit!==pickableHit)]:hits'), 'The nearest semantic node or branch must be selected ahead of decorative geometry');
 assert.ok(scene.includes("stage.addEventListener('click',e=>{if(e.target.closest('.webgl-controls,.webgl-focus,.webgl-intro'))return;if(lastPointerMoved){lastPointerMoved=false;return}if(e.detail>0)pick(e)})"), 'A real click or tap must invoke 3D picking, independently of pointer capture release');
 assert.ok(scene.includes('Math.hypot(dx,dy)>10'), 'Small touch jitter must not be mistaken for a camera drag');
 assert.ok(scene.includes("['resource','resource-label','sphere','label','dendrite','synapse'].includes(hit.object.userData?.kind)"), 'Semantic 3D nodes must take picking priority over decorative geometry');
