@@ -21,6 +21,17 @@ for (const [domain, path] of entryPages) {
 }
 
 const source = fs.readFileSync("batch-tracker/workspace-bootstrap.js", "utf8");
+const trackerSource = fs.readFileSync("batch-tracker/tracker.js", "utf8");
+const environmentalSource = fs.readFileSync("batch-tracker/environmental-data.js", "utf8");
+
+assert.match(trackerSource, /window\.BA_LABS_SUPABASE_CLIENT\s*=\s*supabaseClient/,
+  "the shared tracker must expose its authenticated Supabase client");
+assert.match(environmentalSource, /const db\s*=\s*window\.BA_LABS_SUPABASE_CLIENT/,
+  "Green Tech must reuse the shared authenticated Supabase client");
+assert.doesNotMatch(environmentalSource, /supabase\.createClient\s*\(/,
+  "Green Tech must not create an isolated Supabase client");
+
+console.log("✓ Green Tech reuses the single authenticated Supabase client");
 
 async function runWorkspace(domain, options = {}) {
   const events = [];
