@@ -93,13 +93,14 @@ async function checkWorkingScene(name, viewport) {
 
   await page.waitForFunction(() => !!window.__BALABS_3D_E2E__()?.domainTarget, undefined, { timeout: 8000 });
   const domainTarget = await page.evaluate(() => window.__BALABS_3D_E2E__().domainTarget);
+  const hitSurface = await page.evaluate(({x,y}) => { const stage=document.querySelector('.webgl-stage'), canvas=stage?.querySelector('canvas'), rect=el=>{const r=el?.getBoundingClientRect();return r?{x:r.x,y:r.y,width:r.width,height:r.height}:null};return{stage:rect(stage),canvas:rect(canvas),stagePointer:stage&&getComputedStyle(stage).pointerEvents,canvasPointer:canvas&&getComputedStyle(canvas).pointerEvents,element:document.elementFromPoint(x,y)?.tagName,elementClass:document.elementFromPoint(x,y)?.className,main:rect(document.querySelector('#mainView'))}; }, domainTarget);
   await page.evaluate(() => document.addEventListener('click', event => { window.__BALABS_3D_DOCUMENT_CLICK__ = {tag:event.target?.tagName, id:event.target?.id, className:typeof event.target?.className==='string'?event.target.className:'', stage:!!event.target?.closest?.('.webgl-stage'), x:event.clientX, y:event.clientY}; }, true));
   await page.mouse.click(domainTarget.x, domainTarget.y);
   await page.waitForFunction(() => {
     const mini = document.querySelector('#miniView');
     return mini?.classList.contains('spatial-source-only') &&
       getComputedStyle(mini).display === 'none';
-  }, undefined, { timeout: 8000 }).catch(async error => { throw new Error('3D domain tap did not enter its domain: ' + JSON.stringify(await page.evaluate(() => ({probe:window.__BALABS_3D_E2E__(),lastPick:window.__BALABS_3D_LAST_PICK__,documentClick:window.__BALABS_3D_DOCUMENT_CLICK__}))) + ' — ' + error.message); });
+  }, undefined, { timeout: 8000 }).catch(async error => { throw new Error('3D domain tap did not enter its domain: ' + JSON.stringify(await page.evaluate(() => ({probe:window.__BALABS_3D_E2E__(),lastPick:window.__BALABS_3D_LAST_PICK__,documentClick:window.__BALABS_3D_DOCUMENT_CLICK__,hitSurface}))) + ' — ' + error.message); });
   assert.ok(await canvas.isVisible(), name + ': entering a 3D domain must keep the WebGL canvas visible');
   assert.equal(await page.locator('#miniView.spatial-source-only').count(), 1,
     name + ': the legacy index must remain a hidden data source during 3D navigation');
