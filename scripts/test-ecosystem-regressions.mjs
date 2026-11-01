@@ -29,7 +29,7 @@ for (const edge of [['bio','myco'],['myco','soil'],['soil','lab'],['lab','iot'],
 }
 assert.ok(scene.includes('const relayRoutes'), 'Multi-domain signal routes must remain present');
 assert.ok(scene.includes('branchRelaySignals'), 'Branch signal animation must remain present');
-assert.ok(scene.includes('window.enterSphere(id,false)'), '3D selection must call the shared domain navigation');
+assert.ok(scene.includes('window.enterSphere(id,false,true)'), '3D selection must call the shared domain navigation in spatial-only mode');
 assert.ok(!scene.includes("document.querySelector('[data-sphere=\"'+id+'\"]')?.click()") && !scene.includes("document.querySelector('[data-sphere=\"'+id+'\"]').click()"), '3D selection must not proxy-click the legacy DOM menu');
 
 assert.ok(scene.includes("root.classList.add('webgl-ready','universe-closed')"), 'The 3D scene must start in the single closed gateway state');
@@ -107,7 +107,7 @@ assert.ok(scene.includes("const resourceHit=hits.find(hit=>hit.object.userData?.
 assert.ok(scene.includes('return resourceHit?[resourceHit,...hits.filter(hit=>hit!==resourceHit)]:hits'), 'A branch hit must be selected even when a decorative object is closer to the camera');
 assert.ok(scene.includes("if(!moved)pick(e)"), 'A stationary pointer release must trigger the 3D picking handler');
 assert.ok(scene.includes("kind:'resource-label'"), 'The visible title of each Notion branch must be independently clickable');
-assert.ok(scene.includes("window.open(targetUrl.href,'_blank')"), 'Selecting a 3D branch must open its exact Notion URL in a new tab');
+assert.ok(scene.includes("if(openResource&&selectedResource?.url){window.open(selectedResource.url,'_blank','noopener,noreferrer');return}"), 'The explicit Notion action must open the selected branch URL in a new tab');
 assert.ok(scene.includes("targetUrl.protocol!=='https:'&&targetUrl.protocol!=='http:'"), '3D branch navigation must reject non-web URL schemes');
 assert.ok(scene.includes('importThreeWithTimeout'), 'Three.js CDN loading must have a bounded timeout');
 assert.ok(scene.includes('timeoutMs=8000'), 'Three.js CDN fallback must not wait indefinitely');
@@ -121,12 +121,24 @@ assert.ok(html.includes('.webgl-ready .sphere') || html.includes('.webgl-ready .
 
 console.log('Ecosystem regression checks passed: 8 domains, organic network, Notion tree hierarchy, exact URLs, cross-domain signals, unified navigation, gateway state, fallback and cache version.');
 
+assert.ok(scene.includes('window.enterSphere(id,false,true)'), '3D domain selection must request spatial-only navigation without revealing the legacy 2D index');
+const resourcePick = scene.slice(scene.indexOf("if(obj.userData.kind==='resource'||obj.userData.kind==='resource-label')"), scene.indexOf("if(obj.userData.kind==='sphere'||obj.userData.kind==='label'||obj.userData.kind==='dendrite'||obj.userData.kind==='synapse')"));
+assert.ok(resourcePick.includes('refreshFocus(obj.userData.sourceId)'), 'Selecting a Notion branch must show its in-scene details');
+assert.ok(!resourcePick.includes('window.open(') && !resourcePick.includes('window.location.assign('), 'Selecting a Notion branch must not immediately leave the 3D experience');
+assert.ok(scene.includes("open.dataset.resourceOpen='true'"), 'Opening a Notion page must remain an explicit action in the resource panel');
+assert.ok(scene.includes('window.enterSphere(targetId,false,true)'), 'Related-domain panel navigation must also stay in spatial-only mode');
+assert.ok(!scene.includes('window.enterSphere(targetId,false)'), 'No 3D navigation path may re-enable the legacy 2D index');
+assert.ok(html.includes('function enterSphere(id,scroll=true,spatial3D=false)'), 'Shared domain navigation must distinguish 3D entry from legacy 2D entry');
+assert.ok(html.includes("miniView.classList.toggle('spatial-source-only',spatial3D)"), 'The legacy mini-view must remain a hidden data source while 3D navigation is active');
+assert.ok(html.includes("miniView.classList.remove('spatial-source-only')"), 'Returning home must restore the normal mini-view state');
+assert.ok(html.includes("enterSphere(selected,false,miniView.classList.contains('spatial-source-only'))"), 'Language changes must preserve the active 3D-only navigation mode');
+assert.ok(html.includes('#miniView.spatial-source-only{display:none!important}'), 'The legacy 2D index must not overlay the 3D branch navigation');
 assert.ok(scene.includes('function domainViewDistance(id)') && scene.includes('const rings=Math.max(1,Math.ceil(maxSiblings/12))'), 'Selected domains must adapt camera distance to their actual branch count and hierarchy');
 assert.ok(scene.includes('const zoomArc=Math.min(2.2,travelDistance*.12+Math.abs(endDist-dist)*.09)'), 'Long 3D transitions must create a restrained zoom-out arc between the overview and selected domain');
 assert.ok(scene.includes('const duration=Math.min(1900,Math.max(1050,(target?1120:980)+travelDistance*95+Math.abs(endDist-dist)*35))'), '3D transition duration must adapt to travel distance and zoom change');
 assert.ok(scene.includes('Math.sin(Math.PI*e)*transition.zoomArc'), 'The camera zoom arc must ease out and return smoothly during the transition');
 assert.ok(scene.includes("const b=e.target.closest('button[data-world]');if(b){const targetId=b.dataset.world,node=points.find(point=>point.id===targetId),sourceId=selected;if(!node)return;if(sourceId){if(!routeTrail.length)routeTrail=[sourceId];const existing=routeTrail.indexOf(targetId);"), 'Cross-domain links must resolve their target, append it to the current route and clear the previous branch selection');
-assert.ok(scene.includes("flyTo(node.mesh,()=>{if(typeof window.enterSphere==='function')window.enterSphere(targetId,false);requestAnimationFrame(()=>requestAnimationFrame(()=>buildResourceNodes(targetId)))"), 'Cross-domain navigation must fly the camera to the destination before opening its branch map');
+assert.ok(scene.includes("flyTo(node.mesh,()=>{if(typeof window.enterSphere==='function')window.enterSphere(targetId,false,true);requestAnimationFrame(()=>requestAnimationFrame(()=>buildResourceNodes(targetId)))"), 'Cross-domain navigation must fly the camera to the destination in spatial-only mode before opening its branch map');
 assert.ok(scene.includes("notionTreeReady.then(()=>{if(notionTreeManifest&&selected===targetId"), 'Cross-domain navigation must also populate branches when the localized Notion manifest finishes loading');
 assert.ok(scene.includes('else if(routeTrail[routeTrail.length-1]!==targetId)routeTrail.push(targetId)'), 'Cross-domain navigation must append successive domains to a persistent multi-hop trail');
 assert.ok(scene.includes('if(existing>=0)routeTrail=routeTrail.slice(0,existing+1)'), 'Returning to an earlier domain must truncate the route instead of creating a loop');
