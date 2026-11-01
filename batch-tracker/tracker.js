@@ -16,6 +16,9 @@ const supabaseClient =
     SUPABASE_PUBLISHABLE_KEY
   );
 
+// Feature modules share the authenticated client and its session lifecycle.
+window.BA_LABS_SUPABASE_CLIENT = supabaseClient;
+
 
 /* ============================================================
    ETAT GLOBAL
