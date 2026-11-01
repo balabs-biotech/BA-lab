@@ -56,6 +56,7 @@ async function checkWorkingScene(name, viewport) {
   assert.ok(await root.evaluate((el) => el.classList.contains('universe-closed')), name + ': gateway must be the initial state');
 
   const canvas = page.locator('#mainView .webgl-stage canvas');
+  const stage = page.locator('#mainView .webgl-stage');
   await canvas.waitFor({ state: 'visible', timeout: 15000 });
   const canvasState = await canvas.evaluate((el) => {
     const rect = el.getBoundingClientRect();
