@@ -64,6 +64,24 @@ assert.match(claim, /auth\.getUser\(\)/);
 assert.match(claim, /ba\.labs\.redev@gmail\.com/);
 assert.match(claim, /role: "owner"/);
 
+// Maintained source must retain the security hardening missing from the captured
+// production versions. These assertions prevent accidental regression in main.
+const maintainedRoot = new URL("../supabase/functions/", import.meta.url);
+const notionSync = await readFile(new URL("sync-culture-to-notion/index.ts", maintainedRoot), "utf8");
+assert.match(notionSync, /userClient\.auth\.getUser\(\)/);
+assert.match(notionSync, /organization_members/);
+assert.match(notionSync, /Write permission required/);
+
+const agroclimate = await readFile(new URL("nasa-power-agroclimate/index.ts", maintainedRoot), "utf8");
+assert.match(agroclimate, /userClient\.auth\.getUser\(\)/);
+assert.match(agroclimate, /organization_members/);
+assert.match(agroclimate, /write_permission_required/);
+
+const ndvi = await readFile(new URL("earth-search-sentinel2-ndvi-preview/index.ts", maintainedRoot), "utf8");
+assert.match(ndvi, /MAX_REQUEST_BYTES\s*=\s*32\s*\*\s*1024/);
+assert.match(ndvi, /MAX_STAC_RESPONSE_BYTES\s*=\s*2\s*\*\s*1024\s*\*\s*1024/);
+assert.match(ndvi, /readBoundedJson/);
+
 console.log("✓ All 9 deployed Supabase Edge Functions are snapshotted with exact source hashes and auth settings");
 console.log("✓ Both JWT-disabled endpoints retain their independent device-token or cron-secret authentication");
 console.log("✓ BA-LABS organization bootstrap remains restricted to the verified admin account");
