@@ -4,10 +4,10 @@ import assert from "node:assert/strict";
 const source = fs.readFileSync("batch-tracker/tracker.js", "utf8");
 const translations = source.slice(source.indexOf("function getStatisticsTranslations"), source.indexOf("let statisticsRequestId"));
 const blocks = {
-  fr: translations.match(/fr: \\{([\\s\\S]*?)\\n    \\},/)[1],
-  en: translations.match(/en: \\{([\\s\\S]*?)\\n    \\},/)[1],
-  pt: translations.match(/pt: \\{([\\s\\S]*?)\\n    \\},/)[1],
-  ar: translations.match(/ar: \\{([\\s\\S]*?)\\n  \\};/)[1]
+  fr: translations.match(/fr: \{([\s\S]*?)\n    \},/)[1],
+  en: translations.match(/en: \{([\s\S]*?)\n    \},/)[1],
+  pt: translations.match(/pt: \{([\s\S]*?)\n    \},/)[1],
+  ar: translations.match(/ar: \{([\s\S]*?)\n  \};/)[1]
 };
 const keys = [
   "demoTitleAgronomy", "demoMetricAgronomy",
