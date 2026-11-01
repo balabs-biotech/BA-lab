@@ -206,9 +206,9 @@ Deno.serve(async (req: Request) => {
       width: rasterWindow.window[2] - rasterWindow.window[0],
       height: rasterWindow.window[3] - rasterWindow.window[1],
     });
-    const validWindow = (rasterWindow: any, maxPixels: number, minPixels = 4) => {
+    const validWindow = (rasterWindow: any, maxPixels: number, minDimension = 2) => {
       const { width, height } = windowDimensions(rasterWindow);
-      return width > 0 && height > 0 && width * height >= minPixels && width * height <= maxPixels;
+      return width >= minDimension && height >= minDimension && width * height <= maxPixels;
     };
     const redWin = makeWindow(redImage);
     const nirWin = makeWindow(nirImage);
