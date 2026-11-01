@@ -31,6 +31,9 @@ assert.match(catalogue, /MAX_REQUEST_BYTES\s*=\s*32\s*\*\s*1024/);
 assert.match(catalogue, /MAX_STAC_RESPONSE_BYTES\s*=\s*2\s*\*\s*1024\s*\*\s*1024/);
 assert.match(catalogue, /readBoundedJson\(req, MAX_REQUEST_BYTES\)/);
 assert.match(catalogue, /readBoundedJson\(upstream, MAX_STAC_RESPONSE_BYTES\)/);
+assert.match(catalogue, /request_body_too_large/);
+assert.match(catalogue, /earth_search_response_too_large_or_invalid/);
+assert.match(catalogue, /reply\(tooLarge \? 413 : 400/);
 
 console.log("✓ Restored active Edge Function sources match the exact captured deployed baselines");
 console.log("✓ BA-LABS bootstrap remains authenticated and restricted to the intended admin account");
