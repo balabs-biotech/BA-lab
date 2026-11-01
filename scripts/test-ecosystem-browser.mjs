@@ -118,7 +118,7 @@ async function checkWorkingScene(name, viewport) {
   assert.ok(await page.locator('.webgl-focus [data-resource-open]').isVisible(), name + ': clicking a 3D branch must reveal its Notion action');
   assert.ok(await page.locator('.webgl-focus [data-resource-clear]').isVisible(), name + ': selected branch must offer an in-scene return action');
   await page.locator('.webgl-focus [data-resource-clear]').click({force:true});
-  await page.waitForFunction(() => document.querySelector('.webgl-focus')?.hidden, undefined, { timeout: 5000 });
+  await page.waitForFunction(() => { const panel=document.querySelector('.webgl-focus'); return panel && !panel.hidden && panel.classList.contains('has-world') && !panel.querySelector('[data-resource-open]'); }, undefined, { timeout: 5000 });
   await page.screenshot({ path: outputDir + '/' + name + '-universe.png', fullPage: false });
 
   assert.deepEqual(pageErrors, [], name + ': uncaught browser errors detected');
