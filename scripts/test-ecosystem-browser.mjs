@@ -24,7 +24,9 @@ async function checkWorkingScene(name, viewport) {
   page.on('pageerror', (error) => pageErrors.push(error.message));
   page.on('console', (message) => { if (message.type() === 'error') browserDiagnostics.push('console: ' + message.text()); });
   page.on('requestfailed', (request) => browserDiagnostics.push('request failed: ' + request.url() + ' — ' + (request.failure()?.errorText || 'unknown')));
-  const testURL = new URL(baseURL);\n  testURL.searchParams.set('test3d', '1');\n  await page.goto(testURL.toString(), { waitUntil: 'domcontentloaded', timeout: 30000 });
+  const testURL = new URL(baseURL);
+  testURL.searchParams.set('test3d', '1');
+  await page.goto(testURL.toString(), { waitUntil: 'domcontentloaded', timeout: 30000 });
 
   try {
     await page.waitForFunction(() => {
