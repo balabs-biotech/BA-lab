@@ -4,17 +4,30 @@ Capture date: 2026-11-01
 Project: `axcouwiodqsauwnsiotn`  
 Scope: read-only comparison of the deployed Edge Function source with the maintained `main` source tree.
 
-## Summary
+## Summary at original capture
 
-All 9 deployed function bundles were captured in `supabase/deployed-functions-snapshot/` and checked against their manifest Git blob hashes. The comparison found:
+All 9 deployed function bundles were captured in `supabase/deployed-functions-snapshot/` and checked against their manifest Git blob hashes. At that capture point, the comparison found:
 
 - 3 deployed functions with no corresponding directory in `main`.
-- 4 functions whose maintained source differs from the deployed source.
+- 4 functions whose maintained source differed from the deployed source.
 - 2 functions whose source matched exactly at capture time.
 
-This is source drift, not evidence that a deployment should happen immediately. The deployed snapshot and the maintained source have different roles: one preserves the live state; the other is the candidate future state.
+This is source drift, not evidence that a deployment should happen immediately. The deployed snapshot preserves a point-in-time live state; it is not automatically the current deployment state.
 
-## Functions absent from main
+## Follow-up live verification — 2026-11-01
+
+A subsequent read-only Supabase check retrieved the current deployed function inventory and source for the two authorization discrepancies below.
+
+| Function | Current deployed version | `verify_jwt` | Current source compared with maintained source |
+|---|---:|---:|---|
+| `sync-culture-to-notion` | 14 | true | Matches; writer-role gate is deployed |
+| `nasa-power-agroclimate` | 7 | true | Matches; writer-role gate is deployed |
+
+Both live sources contain the explicit organization-membership check for `owner`, `admin`, or `member`, returning HTTP 403 for viewers and unknown roles before privileged service-role operations. The old deployed versions 13 and 6 in the immutable capture predate these deployments. **The two writer-role findings below are resolved in the currently deployed versions.**
+
+This follow-up was read-only. No function was deployed or modified during the check.
+
+## Functions absent from main at original capture
 
 | Function | Deployed version | `verify_jwt` |
 |---|---:|---|
@@ -22,25 +35,11 @@ This is source drift, not evidence that a deployment should happen immediately. 
 | `sentinel-2-ndvi-preview` | 1 | true |
 | `earth-search-sentinel2-catalogue` | 1 | true |
 
-Action: decide whether each function is still required. If yes, restore it to the maintained source tree with tests and documented secrets/config dependencies. If obsolete, document its retirement plan before disabling it. Do not infer that an absent source directory means a function is unused.
+The first and third have since been restored to the maintained source tree. `sentinel-2-ndvi-preview` remains snapshot-only. Do not infer that an absent source directory means a function is unused.
 
-## Tracked source differs from production
+## Remaining tracked source differences from the original capture
 
-### 1. `sync-culture-to-notion` — deployed version 13
-
-The maintained source contains an explicit role check before using privileged service-role writes:
-- resolves the caller with `userClient.auth.getUser()`;
-- reads the caller's organization membership;
-- allows only `owner`, `admin`, or `member`;
-- returns HTTP 403 otherwise.
-
-The deployed snapshot still validates the caller's session and uses an RLS-scoped query to confirm access to the requested culture before loading it with the service role. What is missing is the additional explicit writer-role gate. Consequently, a user with read access (including a viewer) may be able to trigger the privileged external Notion synchronization for an accessible culture. Treat this as a high-priority authorization discrepancy, but not as an unauthenticated endpoint.
-
-### 2. `nasa-power-agroclimate` — deployed version 6
-
-The maintained source checks the authenticated caller's membership in the location's organization and permits only `owner`, `admin`, or `member` before persisting observations through the service role. The deployed snapshot still validates the caller's session and uses an RLS-scoped query to resolve an accessible location. What is missing is the explicit writer-role gate before the privileged persistence path. A viewer with location visibility may therefore be able to trigger an operation intended for writers. Treat this as a high-priority authorization discrepancy, but not as an unauthenticated endpoint. Verify all read/write paths and the relationship between the requested location and organization before preparing a controlled deployment.
-
-### 3. `earth-search-sentinel2-ndvi-preview` — deployed version 5
+### 1. `earth-search-sentinel2-ndvi-preview` — deployed version 5
 
 The maintained source adds bounded JSON parsing:
 - request body limit: 32 KiB;
@@ -49,11 +48,11 @@ The maintained source adds bounded JSON parsing:
 
 The deployed snapshot uses direct `req.json()` and `searchResponse.json()` parsing in the corresponding paths. This is a resource-exhaustion / input-size hardening gap, not evidence of a confirmed exploit.
 
-### 4. `copernicus-sentinel-catalogue` — deployed version 8
+### 2. `copernicus-sentinel-catalogue` — deployed version 8
 
 The deployed source has a broader CORS allow-headers list and adds `Vary: Access-Control-Request-Headers`. The maintained source has a narrower allow-headers list. This may be an intentional simplification or a browser compatibility regression; compare actual frontend request headers before choosing the canonical version.
 
-## Exact matches at capture time
+## Exact matches at original capture time
 
 - `iot-ingest` — version 2; custom device-token validation; `verify_jwt=false`.
 - `nasa-power-scheduled-import` — version 4; Vault-backed cron-secret validation; `verify_jwt=false`.
@@ -62,12 +61,12 @@ Their JWT-disabled settings are intentional only while the corresponding in-hand
 
 ## Recommended reconciliation order
 
-1. Review and prioritize the two missing writer-role gates in the deployed Notion sync and NASA agroclimate functions.
-2. Review the NDVI request/response bounds and prepare resource-limit tests.
-3. Resolve the Copernicus CORS behavior with browser request evidence.
-4. Recover the three missing function sources and identify their runtime dependencies.
-5. Build a controlled release plan with per-function tests, rollback source, and explicit approval before any production deployment.
+1. Review the NDVI request/response bounds and prepare resource-limit tests.
+2. Resolve the Copernicus CORS behavior with browser request evidence.
+3. Keep the three formerly missing function sources and their runtime dependencies documented.
+4. Refresh the point-in-time deployed-function snapshot whenever another controlled capture is performed.
+5. Require per-function tests, rollback source, and explicit approval before any production deployment.
 
 ## Production safety
 
-This audit was read-only. No Edge Function was deployed, disabled, or changed. Do not deploy all four maintained versions as a batch: each discrepancy needs its own review and regression validation.
+The original capture and follow-up verification were read-only. No Edge Function was deployed, disabled, or changed during these audits. Do not deploy all maintained versions as a batch: each remaining discrepancy needs its own review and regression validation.
