@@ -88,11 +88,16 @@ jobs:
           node --check batch-tracker/environmental-data.js
           node scripts/check-i18n.mjs
           node scripts/test-environmental-fallback.mjs
+          node scripts/test-environmental-auth-isolation.mjs
+          node scripts/test-mycology-visual-contract.mjs
+          node scripts/test-statistics-demo-i18n.mjs
           node scripts/test-workspace-scenarios.mjs
+          node scripts/test-workspace-bootstrap.mjs
           node scripts/test-qc-check-session-errors.mjs
           node scripts/test-smart-entry.mjs
           node scripts/test-auth-transition-workspace-lockdown.mjs
           node scripts/test-auth-init-tenant-revision-guards.mjs
+          node scripts/test-biological-lineage-loader.mjs
           [ -f batch-tracker/index.html ] && echo "✓ batch-tracker/index.html exists" || exit 1
           [ -f batch-tracker/README.md ] && echo "✓ batch-tracker/README.md exists" || exit 1
           [ -f batch-tracker/supabase/README.md ] && echo "✓ batch-tracker/supabase/README.md exists" || exit 1
