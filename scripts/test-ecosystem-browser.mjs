@@ -108,8 +108,15 @@ async function checkWorkingScene(name, viewport) {
     const hitInfo = await page.evaluate((worldId) => window.__BALABS_3D_TEST__?.hitAt(worldId), id);
     let selectedId = null;
     for (const [dx, dy] of [[0, 0], [0, -18], [18, 0], [-18, 0], [0, 18]]) {
+      await page.waitForFunction(() => !document.querySelector('#mainView .webgl-stage')?.classList.contains('is-transitioning'),
+        undefined, { timeout: 8000 });
       await page.mouse.click(point.x + dx, point.y + dy);
-      await page.waitForTimeout(180);
+      try {
+        await page.waitForFunction((worldId) =>
+          document.querySelector('#mainView .webgl-focus-kicker')?.dataset.worldId === worldId &&
+          !document.querySelector('#mainView .webgl-stage')?.classList.contains('is-transitioning'),
+          id, { timeout: 5000 });
+      } catch {}
       selectedId = await page.evaluate(() => document.querySelector('#mainView .webgl-focus-kicker')?.dataset.worldId || null);
       if (selectedId === id) break;
     }
