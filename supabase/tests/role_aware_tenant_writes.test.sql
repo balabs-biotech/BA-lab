@@ -193,7 +193,7 @@ $$;
 -- This runs after the full migration replay in disposable CI PostgreSQL only.
 grant select, insert, update, delete on public.strains to authenticated;
 
-do $
+do $tenant$
 begin
   insert into public.organizations(id, code, name)
   values (
@@ -225,7 +225,7 @@ begin
   )
   on conflict (organization_id, id) do nothing;
 end
-$;
+$tenant$;
 
 -- Organization A member: only A rows are visible. Foreign writes must either
 -- affect zero rows (UPDATE/DELETE filtered by USING) or raise RLS violation
@@ -233,7 +233,7 @@ $;
 begin;
 set local role authenticated;
 select set_config('request.jwt.claim.sub', '00000000-0000-0000-0000-0000000000b2', true);
-do $
+do $tenant$
 declare
   v_visible_a integer;
   v_visible_b integer;
@@ -292,14 +292,14 @@ begin
     null;
   end;
 end
-$;
+$tenant$;
 rollback;
 
 -- Verify from organization B's identity that the boundary is symmetric.
 begin;
 set local role authenticated;
 select set_config('request.jwt.claim.sub', '00000000-0000-0000-0000-0000000000b4', true);
-do $
+do $tenant$
 declare
   v_visible_a integer;
   v_visible_b integer;
@@ -318,11 +318,11 @@ begin
     raise exception 'FAIL: organization B member cannot read its own fixture row';
   end if;
 end
-$;
+$tenant$;
 rollback;
 
 -- Superuser-side assertion: denied writes did not mutate or remove foreign data.
-do $
+do $tenant$
 begin
   if not exists (
     select 1 from public.strains
@@ -340,6 +340,6 @@ begin
     raise exception 'FAIL: organization A fixture row disappeared';
   end if;
 end
-$;
+$tenant$;
 
 select '✓ role-aware tenant writes and two-organization RLS isolation tests passed' as result;
