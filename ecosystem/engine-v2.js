@@ -41,6 +41,7 @@ const t = key => (COPY[LANG()] || COPY.fr)[key] || COPY.fr[key];
 
 let THREE, renderer, scene, camera, raycaster, pointer, stage, panel, hint, intro, status;
 let world, cells = new Map(), pickables = [], resourceObjects = [], edges = [], signalPoints = [];
+let resourceHitTargets = new Map();
 let nav, currentNode = null, currentAnchor = null, navigationStack = [];
 let selected = null, selectedBranch = null, manifest = null, transition = null;
 let distance = 13.5, theta = .22, phi = 1.27, target = null, targetGoal = null;
@@ -214,8 +215,8 @@ function addResourceHitTarget(label) {
  stage.append(button);resourceHitTargets.set(label,button);
 }
 function syncResourceHitTargets() {
- if(!renderer||!camera||!stage)return;const rect=renderer.domElement.getBoundingClientRect(),width=rect.width,height=rect.height;
- for(const [label,button] of resourceHitTargets){const p=label.getWorldPosition(new THREE.Vector3()).project(camera),x=(p.x+1)*width/2,y=(1-p.y)*height/2,visible=p.z>-1&&p.z<1&&x>=0&&x<=width&&y>=0&&y<=height;button.hidden=!visible;if(visible){button.style.left=x+'px';button.style.top=y+'px';}}
+ if(!renderer||!camera||!stage)return;const rect=renderer.domElement.getBoundingClientRect(),stageRect=stage.getBoundingClientRect(),width=rect.width,height=rect.height;
+ for(const [label,button] of resourceHitTargets){const p=label.getWorldPosition(new THREE.Vector3()).project(camera),x=(p.x+1)*width/2,y=(1-p.y)*height/2,visible=p.z>-1&&p.z<1&&x>=0&&x<=width&&y>=0&&y<=height;button.hidden=!visible;if(visible){button.style.left=(rect.left-stageRect.left+x)+'px';button.style.top=(rect.top-stageRect.top+y)+'px';}}
 }
 function renderPath() {
   if(!nav)return;nav.replaceChildren();
