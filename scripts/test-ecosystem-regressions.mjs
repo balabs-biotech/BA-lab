@@ -30,17 +30,22 @@ assert.ok(engine.includes('function smoothCamera('), 'Domain navigation must use
 assert.ok(engine.includes('function goOverview()'), 'The user must be able to return to the overview');
 assert.ok(engine.includes('function enterDomain(id)'), 'Domain entry must be implemented in the new engine');
 assert.ok(engine.includes('Prefer the nearest visible semantic target in screen space'), 'Cell and branch taps must resolve by nearest visible screen target');
-assert.ok(engine.includes('if(selected&&distance>10.4){goOverview();return}'), 'Mobile pinch zoom-out must return from a domain to the overview');
-assert.ok(engine.includes('if(selected&&e.deltaY>0&&nextDistance>10.4){goOverview();return}'), 'Desktop wheel zoom-out must return from a domain to the overview');
+assert.ok(engine.includes('if(selected&&distance>9.5){goBackLevel();return}'), 'Mobile pinch zoom-out must return one folder level at a time');
+assert.ok(engine.includes('if(selected&&e.deltaY>0&&nextDistance>9.5){goBackLevel();return}'), 'Desktop wheel zoom-out must return one folder level at a time');
 assert.ok(!engine.includes('const bg=new THREE.BufferGeometry()'), 'The opening network must avoid decorative starfield geometry');
 
 assert.ok(engine.includes("fetch('./notion-tree.'+LANG()+'.json'"), 'The engine must load the active language Notion tree');
-assert.ok(engine.includes('function flattenTree('), 'Notion page hierarchy must be preserved as nested branches');
-assert.ok(engine.includes('new THREE.SphereGeometry(.46,12,10)'), 'Every resource branch must have a generous touch target');
-assert.ok(engine.includes('function openResource(item)'), 'Branch selection must open an in-scene details panel');
-assert.ok(engine.includes("open.dataset.resourceOpen='true'"), 'The Notion link must be an explicit action, not an automatic redirect');
-assert.ok(engine.includes("back.dataset.resourceClear='true'"), 'The selected branch must offer an in-scene return action');
-assert.ok(engine.includes('btn.dataset.world=other'), 'Related domains must remain navigable from the focus panel');
+assert.ok(engine.includes('const children=currentNode.children||[]'), 'Only the immediate children of the current Notion folder must be rendered');
+assert.ok(engine.includes('function navigateToStack(index)'), 'Breadcrumbs must navigate to previously visited folder levels');
+assert.ok(engine.includes('function goBackLevel()'), 'The previous-level control must navigate up the Notion hierarchy');
+assert.ok(engine.includes("nav.className='webgl-path'"), 'The scene must use compact spatial breadcrumbs instead of a resource table');
+assert.ok(engine.includes('new THREE.SphereGeometry(.34,12,10)'), 'Every resource branch must have a generous touch target');
+assert.ok(engine.includes('function openResource(item)'), 'Branch selection must drill into folders or open terminal pages');
+assert.ok(engine.includes("if(data.children?.length){navigationStack.push"), 'Folders with children must open a deeper spatial level');
+assert.ok(engine.includes("if(data.url){window.open(data.url"), 'Terminal pages must open their corresponding Notion page');
+assert.ok(!engine.includes("open.dataset.resourceOpen='true'"), 'The obsolete resource details panel must not be used for navigation');
+assert.ok(engine.includes("data-camera=\"back\""), 'The scene must expose a direct previous-level control');
+assert.ok(engine.includes('renderPath()'), 'The active folder path must remain visible in the scene');
 assert.ok(engine.includes('window.enterSphere(id,false,true)'), 'Domain selection must synchronize the hidden Notion content source');
 assert.ok(engine.includes('window.__BALABS_3D_E2E__'), 'The browser smoke test must be able to inspect the live scene');
 
