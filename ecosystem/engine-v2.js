@@ -56,6 +56,8 @@ function addStyles() {
     #mainView.webgl-ready>.hub,#mainView.webgl-ready>.sphere,#mainView.webgl-ready>.network,#mainView.webgl-ready>.galaxy{display:none!important}
     #mainView .webgl-stage{position:absolute;inset:0;z-index:4;min-height:100%;touch-action:none;overflow:hidden}
     #mainView .webgl-stage canvas{display:block;width:100%;height:100%;outline:none;touch-action:none}
+    #mainView .webgl-hit-target{position:absolute;z-index:7;width:52px;height:52px;min-width:44px;min-height:44px;padding:0;border:0;border-radius:50%;background:transparent;color:transparent;opacity:.001;pointer-events:auto;touch-action:manipulation;transform:translate(-50%,-50%);cursor:pointer}
+    #mainView .webgl-hit-target:focus-visible{opacity:.24;outline:2px solid #d1d0c5;background:#b96b4d33}
     #mainView .webgl-stage .webgl-hint{position:absolute;left:16px;bottom:14px;z-index:8;padding:9px 12px;border:1px solid #78958a66;border-radius:999px;background:#142321d9;color:#e5e9df;font:600 9px/1.4 system-ui;letter-spacing:.08em;pointer-events:none;backdrop-filter:blur(12px)}
     #mainView .webgl-stage .webgl-status{position:absolute;right:16px;bottom:17px;z-index:8;color:#c2cfc5;font:600 9px system-ui;letter-spacing:.12em;pointer-events:none}
     #mainView .webgl-controls{position:absolute;right:14px;top:14px;z-index:16;display:flex;gap:6px}
@@ -200,11 +202,21 @@ function smoothCamera(to,distTo,duration=950,done) {
 }
 
 function clearResources() {
+  for(const button of resourceHitTargets.values())button.remove();resourceHitTargets.clear();
   for(const item of resourceObjects){world.remove(item);item.traverse?.(o=>{o.geometry?.dispose();if(o.material){if(Array.isArray(o.material))o.material.forEach(m=>m.dispose());else mDispose(o.material)}});if(item.geometry)item.geometry.dispose();if(item.material)mDispose(item.material)}
   resourceObjects=[];pickables=pickables.filter(o=>o.userData?.kind!=='resource'&&o.userData?.kind!=='resource-label');selectedBranch=null;
 }
 function mDispose(material){material?.map?.dispose();material?.dispose?.()}
-function makeResourceLabel(item,color,depth=0) { const size=depth===0?15:depth===1?12:10;const label=makeLabel(item.title,color,size);const scale=depth===0?2:depth===1?1.35:.9;label.scale.set(scale,depth===0?.44:depth===1?.32:.22,1);label.userData={...item,kind:'resource-label'};return label; }
+function makeResourceLabel(item,color,depth=0) { const size=depth===0?15:depth===1?12:10;const label=makeLabel(item.title,color,size);const scale=depth===0?2:depth===1?1.35:.9;label.scale.set(scale,depth===0?.44:depth===1?.32:.22,1);label.userData={...item,kind:'resource-label'};addResourceHitTarget(label);return label; }
+function addResourceHitTarget(label) {
+ const button=document.createElement('button');button.type='button';button.className='webgl-hit-target';button.setAttribute('aria-label',(label.userData.hasChildren?'Ouvrir le dossier : ':'Ouvrir la page : ')+label.userData.title);button.title=label.userData.title;
+ button.addEventListener('click',event=>{event.preventDefault();event.stopPropagation();lastPickAt=performance.now();openResource(label.userData)});
+ stage.append(button);resourceHitTargets.set(label,button);
+}
+function syncResourceHitTargets() {
+ if(!renderer||!camera||!stage)return;const rect=renderer.domElement.getBoundingClientRect(),width=rect.width,height=rect.height;
+ for(const [label,button] of resourceHitTargets){const p=label.getWorldPosition(new THREE.Vector3()).project(camera),x=(p.x+1)*width/2,y=(1-p.y)*height/2,visible=p.z>-1&&p.z<1&&x>=0&&x<=width&&y>=0&&y<=height;button.hidden=!visible;if(visible){button.style.left=x+'px';button.style.top=y+'px';}}
+}
 function renderPath() {
   if(!nav)return;nav.replaceChildren();
   const crumbs=[{title:t('overview'),action:goOverview}];
@@ -368,6 +380,7 @@ function animate(now=0) {
     for(const item of signalPoints){const p=item.curve.getPoint((now*.000075+item.offset)%1);item.pulse.position.copy(p)}
     for(const [id,item] of cells){const phase=now*.0006+IDS.indexOf(id)*.7;const pulse=1+Math.sin(phase)*.012;item.soma.scale.set((id==='soil'?.62:.56)*pulse,(id==='lab'?.48:id==='myco'?.66:.61)*pulse,(id==='myco'?.66:.55)*pulse);item.group.rotation.y=Math.sin(phase*.6)*.018}
   }
+  syncResourceHitTargets();
   renderer.render(scene,camera);
 }
 
