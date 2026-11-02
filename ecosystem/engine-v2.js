@@ -239,7 +239,7 @@ function buildResources(id,parentNode=null,anchor=null) {
     const hasChildren=!!item.children?.length;
     const color=baseColor.clone().lerp(accent,Math.min(.34,depth*.12+(index%3)*.025));
     const radius=depth===0?(hasChildren?.135:.105):depth===1?(hasChildren?.085:.065):.043;
-    item.position=pos.clone();
+    item.position=pos.clone();item.parentNode=parent;
     const data={kind:'resource',...item,sourceId:id,position:pos.clone(),hasChildren,depth,parentNode:parent};
     const node=new THREE.Mesh(new THREE.IcosahedronGeometry(radius,1),new THREE.MeshStandardMaterial({color,emissive:color,emissiveIntensity:depth===0?.42:.24,roughness:.48,metalness:.04,transparent:depth===2,opacity:depth===2?.78:1}));
     node.position.copy(pos);node.userData=data;world.add(node);resourceObjects.push(node);pickables.push(node);
