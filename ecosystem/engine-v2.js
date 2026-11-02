@@ -266,8 +266,10 @@ function setupUI() {
   document.getElementById('homeBtn')?.addEventListener('click',()=>{if(selected)goOverview()});
   document.addEventListener('keydown',e=>{if(e.key==='Escape'&&selected)goBackLevel()});
   stage.addEventListener('wheel',e=>{if(e.target.closest('.webgl-controls,.webgl-focus'))return;e.preventDefault();const nextDistance=THREE.MathUtils.clamp(distance+e.deltaY*.012,3.5,42);if(selected&&e.deltaY>0&&nextDistance>9.5){goBackLevel();return}distance=nextDistance;cameraPosition()},{passive:false});
-  stage.addEventListener('pointerdown',onPointerDown);
-  stage.addEventListener('pointermove',onPointerMove);
+  // Capture pointer sequences at document level: mobile browsers can retarget
+  // a canvas pointer during touch/pointer capture, bypassing stage listeners.
+  document.addEventListener('pointerdown',onPointerDown,true);
+  document.addEventListener('pointermove',onPointerMove,true);
   document.addEventListener('pointerup',onPointerUp,true);
   stage.addEventListener('pointercancel',onPointerCancel);
   // Explicit touch fallback for mobile browsers that do not deliver a complete
