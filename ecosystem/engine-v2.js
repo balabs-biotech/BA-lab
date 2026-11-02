@@ -1,4 +1,4 @@
-// BA Labs 3D Engine v2 — clean interaction core.
+// BA Labs 3D Engine v2 — continuous mycelium navigation; domain colonies are filamentary, never solid spheres.
 // The legacy HTML remains the content source; this module owns all spatial navigation.
 const importThree = async () => {
   const sources = [
@@ -20,7 +20,7 @@ const importThree = async () => {
 
 const ROOT = document.getElementById('mainView');
 const IDS = ['bio','myco','soil','lab','products','iot','work','learn'];
-const COLORS = { bio:0x79a991, myco:0xa88fc3, soil:0xc19b73, lab:0x80aeb8, products:0xc88773, iot:0x7eaaa3, work:0xa99dbb, learn:0xb5b58d };
+const COLORS = { bio:0x78998a, myco:0x9b806d, soil:0x8d9b78, lab:0x829b9d, products:0xb96b4d, iot:0x789c91, work:0xa47c67, learn:0xb1aa8e };
 const POS = {
   bio:[0,2.55,0], myco:[-2.35,1.05,.35], soil:[-2.15,-1.05,-.1], lab:[-.05,.35,-.7],
   products:[.2,-1.35,.55], iot:[2.45,.85,-.25], work:[2.15,-1.25,-.45], learn:[-.15,-2.8,.1],
@@ -137,31 +137,36 @@ function createWorld() {
   for(const id of IDS){
     const color=COLORS[id],pos=new THREE.Vector3(...POS[id]);
     const group=new THREE.Group();group.position.copy(pos);group.userData={id,kind:'domain'};
-    const soma=new THREE.Mesh(makeCellGeometry(id),new THREE.MeshStandardMaterial({color,roughness:.42,metalness:.08,emissive:color,emissiveIntensity:.21}));
-    soma.scale.set(id==='soil'?.62:.56,id==='lab'?.48:.61,id==='myco'?.66:.55);
-    soma.material.transparent=true;soma.material.opacity=.84;
-    const nucleus=new THREE.Mesh(new THREE.SphereGeometry(.19,18,14),new THREE.MeshStandardMaterial({color:0xe4e4cf,roughness:.3,metalness:.05,emissive:color,emissiveIntensity:.28,transparent:true,opacity:.88}));
-    nucleus.position.set(.04,.02,.08);group.add(nucleus);
+    // A domain is a branching mycelial colony, not a solid planet-like blob.
+    const soma=new THREE.Mesh(makeCellGeometry(id),new THREE.MeshStandardMaterial({color,roughness:.68,metalness:0,emissive:color,emissiveIntensity:.12}));
+    soma.scale.set(.19,.15,.17);soma.material.transparent=true;soma.material.opacity=.72;
     soma.userData={id,kind:'domain'};group.add(soma);
-    const glow=new THREE.Mesh(new THREE.SphereGeometry(1.18,24,18),new THREE.MeshBasicMaterial({color,transparent:true,opacity:.035,side:THREE.BackSide,depthWrite:false}));
-    glow.scale.copy(soma.scale);group.add(glow);
-    const label=makeLabel(LABELS[id]?.title||id, color, 17);label.position.set(0,-.94,0);label.scale.set(2.55,.52,1);label.userData={id,kind:'domain-label'};group.add(label);
-    const hit=new THREE.Mesh(new THREE.SphereGeometry(.96,16,12),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));hit.userData={id,kind:'domain'};group.add(hit);
+    const nucleus=new THREE.Mesh(new THREE.SphereGeometry(.065,12,10),new THREE.MeshStandardMaterial({color:0xd1d0c5,roughness:.72,emissive:color,emissiveIntensity:.12,transparent:true,opacity:.72}));
+    nucleus.position.set(.025,.015,.035);group.add(nucleus);
+    const label=makeLabel(LABELS[id]?.title||id, color, 17);label.position.set(0,-1.42,0);label.scale.set(2.65,.54,1);label.userData={id,kind:'domain-label'};group.add(label);
+    // Invisible selection volume remains generous for touch, while visible geometry stays filamentary.
+    const hit=new THREE.Mesh(new THREE.SphereGeometry(1.12,16,12),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));hit.userData={id,kind:'domain'};group.add(hit);
     world.add(group);cells.set(id,{group,soma,label,hit,position:pos,color});
     pickables.push(soma,hit,label);
-    for(let j=0;j<11;j++){
-      const a=j/11*Math.PI*2+IDS.indexOf(id)*.31;
-      const start=new THREE.Vector3(Math.cos(a)*.34,Math.sin(a)*.32,Math.sin(a*1.7)*.05);
-      const reach=1.05+(j%4)*.19;
-      const end=new THREE.Vector3(Math.cos(a)*reach,Math.sin(a)*reach*.78,Math.sin(a*1.7)*.42);
-      const mid=start.clone().lerp(end,.52).add(new THREE.Vector3(Math.cos(a+1)*.22,Math.sin(a+1)*.2,.18));
+    const branches=14;
+    for(let j=0;j<branches;j++){
+      const a=j/branches*Math.PI*2+IDS.indexOf(id)*.31;
+      const reach=1.0+(j%4)*.24;
+      const start=new THREE.Vector3(Math.cos(a)*.10,Math.sin(a)*.09,Math.sin(a*1.7)*.035);
+      const end=new THREE.Vector3(Math.cos(a)*reach,Math.sin(a)*reach*.76,Math.sin(a*1.7)*.34);
+      const mid=start.clone().lerp(end,.52).add(new THREE.Vector3(Math.cos(a+1)*.18,Math.sin(a+1)*.16,.13));
       const curve=new THREE.CatmullRomCurve3([start,mid,end]);
-      const neurite=new THREE.Mesh(new THREE.TubeGeometry(curve,20,.012,5,false),new THREE.MeshStandardMaterial({color,emissive:color,emissiveIntensity:.48,transparent:true,opacity:.72}));
+      const thickness=.0065+(j%3)*.0014;
+      const neurite=new THREE.Mesh(new THREE.TubeGeometry(curve,28,thickness,5,false),new THREE.MeshStandardMaterial({color,emissive:color,emissiveIntensity:.28,transparent:true,opacity:.76,roughness:.7}));
       neurite.userData={id,kind:'neurite'};group.add(neurite);
-      const forkStart=curve.getPoint(.58),forkEnd=forkStart.clone().add(new THREE.Vector3(Math.cos(a+.48)*.48,Math.sin(a+.48)*.38,.13));
-      const forkCurve=new THREE.CatmullRomCurve3([forkStart,forkStart.clone().lerp(forkEnd,.55).add(new THREE.Vector3(0,.08,.08)),forkEnd]);
-      const fork=new THREE.Mesh(new THREE.TubeGeometry(forkCurve,12,.007,4,false),new THREE.MeshStandardMaterial({color,emissive:color,emissiveIntensity:.4,transparent:true,opacity:.58}));group.add(fork);
-      const tip=new THREE.Mesh(new THREE.SphereGeometry(.022,7,5),new THREE.MeshBasicMaterial({color}));tip.position.copy(end);group.add(tip);
+      for(let fork=0;fork<2;fork++){
+        const at=curve.getPoint(.48+fork*.22),side=fork===0?-1:1;
+        const forkEnd=at.clone().add(new THREE.Vector3(Math.cos(a+side*.72)*(.34+(j%3)*.08),Math.sin(a+side*.72)*(.28+(j%2)*.07),.07));
+        const forkCurve=new THREE.CatmullRomCurve3([at,at.clone().lerp(forkEnd,.55).add(new THREE.Vector3(0,.035,.035)),forkEnd]);
+        group.add(new THREE.Mesh(new THREE.TubeGeometry(forkCurve,14,.0038,4,false),new THREE.MeshStandardMaterial({color,emissive:color,emissiveIntensity:.22,transparent:true,opacity:.52,roughness:.8})));
+      }
+      const tip=new THREE.Mesh(new THREE.SphereGeometry(.026+(j%3)*.006,8,6),new THREE.MeshStandardMaterial({color,roughness:.75,emissive:color,emissiveIntensity:.18}));
+      tip.position.copy(end);group.add(tip);
     }
   }
   LINKS.forEach(([a,b],index)=>{
@@ -236,8 +241,8 @@ function buildResources(id,parentNode=null,anchor=null) {
  clearResources();const domain=manifest?.domains?.find(d=>d.id===id);if(!domain)return;currentNode=parentNode||domain;currentAnchor=(anchor||cells.get(id).position).clone();const children=currentNode.children||[];renderPath();if(!children.length){status.textContent=(currentNode.title||domain.title).toUpperCase();return}
  const baseColor=new THREE.Color(COLORS[id]),accent=new THREE.Color(0xb96b4d);
  const filament=(pts,color,radius,opacity)=>{const curve=new THREE.CatmullRomCurve3(pts),mesh=new THREE.Mesh(new THREE.TubeGeometry(curve,18,radius,4,false),new THREE.MeshStandardMaterial({color,emissive:color,emissiveIntensity:.18,transparent:true,opacity,roughness:.65}));world.add(mesh);resourceObjects.push(mesh);return curve};
- const maxDepth=2;
- const drawNode=(item,pos,depth,parent,angle,index)=>{const has=!!item.children?.length,color=baseColor.clone().lerp(accent,Math.min(.34,depth*.12+(index%3)*.025)),radius=depth===0?(has?.135:.105):depth===1?(has?.085:.065):.043;item.position=pos.clone();item.parentNode=parent;const data={kind:'resource',...item,sourceId:id,position:pos.clone(),hasChildren:has,depth,parentNode:parent};const node=new THREE.Mesh(new THREE.IcosahedronGeometry(radius,1),new THREE.MeshStandardMaterial({color,emissive:color,emissiveIntensity:depth===0?.42:.24,roughness:.48,metalness:.04,transparent:depth===2,opacity:depth===2?.78:1}));node.position.copy(pos);node.userData=data;world.add(node);resourceObjects.push(node);pickables.push(node);const hitRadius=depth===0?.32:depth===1?.25:.19;const hit=new THREE.Mesh(new THREE.SphereGeometry(hitRadius,10,8),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));hit.position.copy(pos);hit.userData=data;world.add(hit);resourceObjects.push(hit);pickables.push(hit);if(depth<2){const l=makeResourceLabel(data,color,depth);l.position.copy(pos).add(new THREE.Vector3(0,depth===0?-.28:-.19,.025));world.add(l);resourceObjects.push(l);pickables.push(l)}const pp=parent===currentNode?currentAnchor:(parent.position||currentAnchor),mid=pp.clone().lerp(pos,.52).add(new THREE.Vector3(0,.12+depth*.035,.12)),curve=filament([pp.clone(),mid,pos.clone()],color,depth===0?.012:depth===1?.007:.004,depth===0?.66:depth===1?.52:.38);if(depth<2)for(let f=0;f<2;f++){const at=curve.getPoint(.46+f*.2),sgn=f===0?-1:1,tip=at.clone().add(new THREE.Vector3(Math.cos(angle+sgn*.8)*(.24-depth*.045),Math.sin(angle+sgn*.8)*(.2-depth*.04),.045));filament([at,at.clone().lerp(tip,.55).add(new THREE.Vector3(0,.045,.025)),tip],color,.0035-depth*.0006,.28)}if(depth>=maxDepth||!has)return;const kids=item.children||[],spread=Math.min(1.2,.32+kids.length*.105);kids.forEach((child,childIndex)=>{const frac=kids.length===1?0:(childIndex/(kids.length-1)-.5),childAngle=angle+frac*spread*2+(childIndex%2?-.08:.08),dist=depth===0?.88+Math.min(.25,kids.length*.018):.48,childPos=pos.clone().add(new THREE.Vector3(Math.cos(childAngle)*dist,Math.sin(childAngle)*dist*.82+((childIndex%3)-1)*.035,.04+(childIndex%2)*.035));drawNode(child,childPos,depth+1,item,childAngle,childIndex)});
+ const maxDepth=2; // Each view shows folders and terminal pages; deeper folders open as the next spatial layer.
+ const drawNode=(item,pos,depth,parent,angle,index)=>{const has=!!item.children?.length,color=baseColor.clone().lerp(accent,Math.min(.34,depth*.12+(index%3)*.025)),radius=depth===0?(has?.135:.105):depth===1?(has?.085:.065):.043;item.position=pos.clone();item.parentNode=parent;const data={kind:'resource',...item,sourceId:id,position:pos.clone(),hasChildren:has,depth,parentNode:parent};const node=new THREE.Mesh(new THREE.IcosahedronGeometry(radius,1),new THREE.MeshStandardMaterial({color,emissive:color,emissiveIntensity:depth===0?.42:.24,roughness:.48,metalness:.04,transparent:depth===2,opacity:depth===2?.78:1}));node.position.copy(pos);node.userData=data;world.add(node);resourceObjects.push(node);pickables.push(node);const hitRadius=depth===0?.32:depth===1?.25:.19;const hit=new THREE.Mesh(new THREE.SphereGeometry(hitRadius,10,8),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));hit.position.copy(pos);hit.userData=data;world.add(hit);resourceObjects.push(hit);pickables.push(hit);const l=makeResourceLabel(data,color,depth);l.position.copy(pos).add(new THREE.Vector3(0,depth===0?-.28:depth===1?-.22:-.16,.025));world.add(l);resourceObjects.push(l);pickables.push(l);const pp=parent===currentNode?currentAnchor:(parent.position||currentAnchor),mid=pp.clone().lerp(pos,.52).add(new THREE.Vector3(0,.12+depth*.035,.12)),curve=filament([pp.clone(),mid,pos.clone()],color,depth===0?.012:depth===1?.007:.004,depth===0?.66:depth===1?.52:.38);if(depth<2)for(let f=0;f<2;f++){const at=curve.getPoint(.46+f*.2),sgn=f===0?-1:1,tip=at.clone().add(new THREE.Vector3(Math.cos(angle+sgn*.8)*(.24-depth*.045),Math.sin(angle+sgn*.8)*(.2-depth*.04),.045));filament([at,at.clone().lerp(tip,.55).add(new THREE.Vector3(0,.045,.025)),tip],color,.0035-depth*.0006,.28)}if(depth>=maxDepth||!has)return;const kids=item.children||[],spread=Math.min(1.2,.32+kids.length*.105);kids.forEach((child,childIndex)=>{const frac=kids.length===1?0:(childIndex/(kids.length-1)-.5),childAngle=angle+frac*spread*2+(childIndex%2?-.08:.08),dist=depth===0?.98+Math.min(.42,kids.length*.025):Math.max(.68,Math.min(1.38,.58+kids.length*.055)),childPos=pos.clone().add(new THREE.Vector3(Math.cos(childAngle)*dist,Math.sin(childAngle)*dist*.82+((childIndex%3)-1)*.035,.04+(childIndex%2)*.035));drawNode(child,childPos,depth+1,item,childAngle,childIndex)});
  // Anastomoses: sibling branches reconnect into a mesh instead of ending as a radial tree.
  if(kids.length>1){
    const bridgeColor=color.clone().lerp(accent,.22);
