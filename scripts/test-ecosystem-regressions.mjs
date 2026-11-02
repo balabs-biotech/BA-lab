@@ -35,7 +35,9 @@ assert.ok(engine.includes('if(selected&&e.deltaY>0&&nextDistance>9.5){goBackLeve
 assert.ok(!engine.includes('const bg=new THREE.BufferGeometry()'), 'The opening network must avoid decorative starfield geometry');
 
 assert.ok(engine.includes("fetch('./notion-tree.'+LANG()+'.json'"), 'The engine must load the active language Notion tree');
-assert.ok(engine.includes('const children=currentNode.children||[]'), 'Only the immediate children of the current Notion folder must be rendered');
+assert.ok(engine.includes('const maxDepth=2'), 'The spatial graph must preview multiple nested Notion levels');
+assert.ok(engine.includes('const drawNode=(item,pos,depth,parent,angle,index)=>'), 'Every rendered node must preserve its position in the real Notion hierarchy');
+assert.ok(engine.includes('drawNode(child,childPos,depth+1,item,childAngle,childIndex)'), 'Nested folders and pages must be drawn recursively');
 assert.ok(engine.includes('function navigateToStack(index)'), 'Breadcrumbs must navigate to previously visited folder levels');
 assert.ok(engine.includes('function goBackLevel()'), 'The previous-level control must navigate up the Notion hierarchy');
 assert.ok(engine.includes("nav.className='webgl-path'"), 'The scene must use compact spatial breadcrumbs instead of a resource table');
