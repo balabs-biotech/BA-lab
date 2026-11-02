@@ -204,9 +204,12 @@ function clearResources() {
   resourceObjects=[];pickables=pickables.filter(o=>o.userData?.kind!=='resource'&&o.userData?.kind!=='resource-label');selectedBranch=null;
 }
 function mDispose(material){material?.map?.dispose();material?.dispose?.()}
-function makeResourceLabel(item,color) {
-  const label=makeLabel(item.title,color,item.children?.length?15:13);
-  label.scale.set(item.children?.length?2.2:1.9,.46,1);label.userData={kind:'resource-label',...item};return label;
+function makeResourceLabel(item,color,depth=0) {
+  const size=depth===0?15:depth===1?12:10;
+  const label=makeLabel(item.title,color,size);
+  const scale=depth===0?2.0:depth===1?1.35:.9;
+  label.scale.set(scale,depth===0?.44:depth===1?.32:.22,1);
+  label.userData={kind:'resource-label',...item};return label;
 }
 function renderPath() {
   if(!nav)return;nav.replaceChildren();
@@ -226,29 +229,70 @@ function buildResources(id,parentNode=null,anchor=null) {
   currentNode=parentNode||domain;currentAnchor=(anchor||cells.get(id).position).clone();
   const children=currentNode.children||[];renderPath();
   if(!children.length){status.textContent=(currentNode.title||domain.title).toUpperCase();return}
-  const count=children.length,golden=Math.PI*(3-Math.sqrt(5));
+  const baseColor=new THREE.Color(COLORS[id]),accent=new THREE.Color(0xb96b4d);
+  const maxDepth=2;
+  const addFilament=(points,color,radius,opacity)=>{
+    const curve=new THREE.CatmullRomCurve3(points);
+    const mesh=new THREE.Mesh(new THREE.TubeGeometry(curve,18,radius,4,false),new THREE.MeshStandardMaterial({color,emissive:color,emissiveIntensity:.18,transparent:true,opacity,roughness:.65}));
+    world.add(mesh);resourceObjects.push(mesh);return curve;
+  };
+  const drawNode=(item,pos,depth,parent,angle,index)=>{
+    const hasChildren=!!item.children?.length;
+    const tint=Math.min(.34,depth*.12+(index%3)*.025);
+    const color=baseColor.clone().lerp(accent,tint);
+    const radius=depth===0?(hasChildren?.135:.105):depth===1?(hasChildren?.085:.065):.043;
+    item.position=pos.clone();
+    const data={kind:'resource',...item,sourceId:id,position:pos.clone(),hasChildren,depth,parentNode:parent};
+    const node=new THREE.Mesh(new THREE.IcosahedronGeometry(radius,1),new THREE.MeshStandardMaterial({color,emissive:color,emissiveIntensity:depth===0?.42:.24,roughness:.48,metalness:.04,transparent:depth===2,opacity:depth===2?.78:1}));
+    node.position.copy(pos);node.userData=data;world.add(node);resourceObjects.push(node);pickables.push(node);
+    const hitRadius=depth===0?.32:depth===1?.25:.19;
+    const hit=new THREE.Mesh(new THREE.SphereGeometry(hitRadius,10,8),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));
+    hit.position.copy(pos);hit.userData=data;world.add(hit);resourceObjects.push(hit);pickables.push(hit);
+    if(depth<2){
+      const label=makeResourceLabel(data,color,depth);
+      label.position.copy(pos).add(new THREE.Vector3(0,depth===0?-.28:-.19,.025));
+      world.add(label);resourceObjects.push(label);pickables.push(label);
+    }
+    const parentPos=parent===currentNode?currentAnchor:(parent.position||currentAnchor);
+    const mid=parentPos.clone().lerp(pos,.52).add(new THREE.Vector3(0,.12+depth*.035,.12));
+    const curve=addFilament([parentPos.clone(),mid,pos.clone()],color,depth===0?.012:depth===1?.007:.004,depth===0?.66:depth===1?.52:.38);
+    if(depth<2){
+      for(let fork=0;fork<2;fork++){
+        const at=curve.getPoint(.46+fork*.2),sign=fork===0?-1:1;
+        const tip=at.clone().add(new THREE.Vector3(Math.cos(angle+sign*.8)*(.24-depth*.045),Math.sin(angle+sign*.8)*(.2-depth*.04),.045));
+        addFilament([at,at.clone().lerp(tip,.55).add(new THREE.Vector3(0,.045,.025)),tip],color,.0035-depth*.0006,.28);
+      }
+    }
+    if(depth>=maxDepth||!hasChildren)return;
+    const descendants=item.children||[],spread=Math.min(1.2,.32+descendants.length*.105);
+    descendants.forEach((child,childIndex)=>{
+      const fraction=descendants.length===1?0:(childIndex/(descendants.length-1)-.5);
+      const childAngle=angle+fraction*spread*2+(childIndex%2?-.08:.08);
+      const distance=depth===0?(.88+Math.min(.25,descendants.length*.018)):.48;
+      const childPos=pos.clone().add(new THREE.Vector3(Math.cos(childAngle)*distance,Math.sin(childAngle)*distance*.82+((childIndex%3)-1)*.035,.04+((childIndex%2)*.035)));
+      drawNode(child,childPos,depth+1,item,childAngle,childIndex);
+    });
+  };
   children.forEach((item,index)=>{
-    const angle=index*golden-Math.PI/2,ring=Math.floor(Math.sqrt(index+1));
-    const radius=2.0+ring*.38+Math.min(1.15,count*.022);
-    const pos=currentAnchor.clone().add(new THREE.Vector3(Math.cos(angle)*radius,Math.sin(angle)*radius*.78+((index%3)-1)*.14,Math.sin(angle*1.7)*.48));
-    const color=new THREE.Color(COLORS[id]).lerp(new THREE.Color(0xb96b4d),Math.min(.3,index/Math.max(1,count-1)*.24));
-    const hasChildren=!!item.children?.length,nodeRadius=hasChildren?.12:.075;
-    const node=new THREE.Mesh(new THREE.IcosahedronGeometry(nodeRadius,2),new THREE.MeshStandardMaterial({color,emissive:color,emissiveIntensity:hasChildren?.5:.27,roughness:.4,metalness:.08}));
-    node.position.copy(pos);node.userData={kind:'resource',...item,sourceId:id,position:pos,hasChildren};world.add(node);resourceObjects.push(node);pickables.push(node);
-    const hit=new THREE.Mesh(new THREE.SphereGeometry(.34,12,10),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));
-    hit.position.copy(pos);hit.userData={kind:'resource',...item,sourceId:id,position:pos,hasChildren};world.add(hit);resourceObjects.push(hit);pickables.push(hit);
-    const label=makeResourceLabel({...item,sourceId:id,position:pos,hasChildren},color);label.position.copy(pos).add(new THREE.Vector3(0,-.3,.04));world.add(label);resourceObjects.push(label);pickables.push(label);
-    const mid=currentAnchor.clone().lerp(pos,.52).add(new THREE.Vector3(0,0,.3));
-    const curve=new THREE.CatmullRomCurve3([currentAnchor.clone(),mid,pos.clone()]);
-    const branch=new THREE.Mesh(new THREE.TubeGeometry(curve,24,.012,5,false),new THREE.MeshStandardMaterial({color,emissive:color,emissiveIntensity:.22,transparent:true,opacity:.58}));
-    world.add(branch);resourceObjects.push(branch);
-    for(let fork=0;fork<2;fork++){const at=curve.getPoint(.48+fork*.18),tip=at.clone().add(new THREE.Vector3(Math.cos(angle+fork)*.32,Math.sin(angle+fork)*.25,.1));const twig=new THREE.CatmullRomCurve3([at,at.clone().lerp(tip,.55).add(new THREE.Vector3(0,.05,.06)),tip]);const filament=new THREE.Mesh(new THREE.TubeGeometry(twig,10,.0045,4,false),new THREE.MeshBasicMaterial({color,transparent:true,opacity:.34}));world.add(filament);resourceObjects.push(filament)}
+    const angle=(index/Math.max(1,children.length))*Math.PI*2-Math.PI/2+(index%2)*.11;
+    const radius=2.15+(index%3)*.16;
+    const pos=currentAnchor.clone().add(new THREE.Vector3(Math.cos(angle)*radius,Math.sin(angle)*radius*.78,Math.sin(angle*1.6)*.34));
+    drawNode(item,pos,0,currentNode,angle,index);
   });
   status.textContent=(currentNode.title||domain.title).toUpperCase()+' · '+children.length+' '+t('children').toUpperCase();
 }
 function openResource(item) {
   const data=item.userData||item;
-  if(data.children?.length){navigationStack.push({node:currentNode,anchor:currentAnchor.clone()});currentNode=data;currentAnchor=data.position.clone();smoothCamera(currentAnchor,6.1,720,()=>buildResources(selected,currentNode,currentAnchor));return}
+  if(data.children?.length){
+    const ancestors=[];let parent=data.parentNode;
+    while(parent&&parent!==currentNode){ancestors.unshift(parent);parent=parent.parentNode}
+    if(parent===currentNode){
+      navigationStack.push({node:currentNode,anchor:currentAnchor.clone()});
+      for(const ancestor of ancestors)navigationStack.push({node:ancestor,anchor:ancestor.position.clone()});
+    }
+    currentNode=data;currentAnchor=data.position.clone();
+    smoothCamera(currentAnchor,6.1,720,()=>buildResources(selected,currentNode,currentAnchor));return;
+  }
   if(data.url){window.open(data.url,'_blank','noopener');return}
   status.textContent=data.title||'';
 }
