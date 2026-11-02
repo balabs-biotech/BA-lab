@@ -373,33 +373,32 @@ function onLostCapture(e){if(pointers.has(e.pointerId)){pointers.delete(e.pointe
 function pickAt(x,y) {
   const rect=renderer.domElement.getBoundingClientRect();
   camera.updateMatrixWorld(true);world.updateMatrixWorld(true);
-  // In overview, choose the domain whose visible screen position is closest
-  // to the tap. Ray intersections can otherwise select a neighbouring cell.
+  const screenPoint=obj=>{
+    const p=obj.getWorldPosition(new THREE.Vector3()).project(camera);
+    if(p.z<-1||p.z>1)return{x:Infinity,y:Infinity,d:Infinity};
+    const sx=rect.left+(p.x+1)*rect.width/2,sy=rect.top+(1-p.y)*rect.height/2;
+    return{x:sx,y:sy,d:Math.hypot(sx-x,sy-y)};
+  };
   if(!selected){
-    let nearestDomain=null,nearestDomainDistance=Infinity;
-    for(const [id,item] of cells){
-      const p=item.hit.getWorldPosition(new THREE.Vector3()).project(camera);
-      const sx=rect.left+(p.x+1)*rect.width/2,sy=rect.top+(1-p.y)*rect.height/2;
-      const d=Math.hypot(sx-x,sy-y);
-      if(p.z>-1&&p.z<1&&d<nearestDomainDistance){nearestDomain=item;nearestDomainDistance=d}
-    }
-    if(nearestDomain&&nearestDomainDistance<(window.innerWidth<760?62:82)){enterDomain(nearestDomain.group.userData.id);return}
+    let nearest=null,nearestDistance=Infinity;
+    for(const item of cells.values()){const p=screenPoint(item.hit);if(p.d<nearestDistance){nearest=item;nearestDistance=p.d}}
+    if(nearest&&nearestDistance<(window.innerWidth<760?72:88)){enterDomain(nearest.group.userData.id);return}
+    return;
   }
-  pointer.x=((x-rect.left)/rect.width)*2-1;pointer.y=-((y-rect.top)/rect.height)*2+1;
-  raycaster.setFromCamera(pointer,camera);
-  // Hit the actual label under the pointer first. A nearest-label heuristic can
-  // steal a tap from an adjacent folder when two long titles overlap visually.
-  if(selected){
-    const labels=resourceObjects.filter(o=>o.userData?.kind==='resource-label');
-    const labelHit=raycaster.intersectObjects(labels,false)[0];
-    if(labelHit){if(window.__BALABS_3D_E2E__)window.__BALABS_3D_LAST_PICK__={title:labelHit.object.userData.title,kind:labelHit.object.userData.kind,children:labelHit.object.userData.children?.length||0,distance:0};openResource(labelHit.object.userData);return}
+  // The active folder owns all taps while inside a universe: never let an
+  // overlapping neighbouring universe steal a branch selection.
+  const labels=resourceObjects.filter(o=>o.userData?.kind==='resource-label');
+  let nearestLabel=null,nearestLabelDistance=Infinity;
+  for(const label of labels){const p=screenPoint(label);if(p.d<nearestLabelDistance){nearestLabel=label;nearestLabelDistance=p.d}}
+  if(nearestLabel&&nearestLabelDistance<(window.innerWidth<760?104:118)){
+    if(window.__BALABS_3D_E2E__)window.__BALABS_3D_LAST_PICK__={title:nearestLabel.userData.title,kind:nearestLabel.userData.kind,children:nearestLabel.userData.children?.length||0,distance:nearestLabelDistance};
+    openResource(nearestLabel.userData);return;
   }
-  const hits=raycaster.intersectObjects(pickables,false);
-  const hit=hits.find(h=>['resource','resource-label','domain','domain-label'].includes(h.object.userData?.kind));
-  if(!hit)return;
-  const data=hit.object.userData;
-  if(data.kind==='resource'||data.kind==='resource-label'){openResource(data);return}
-  if(data.kind==='domain'||data.kind==='domain-label')enterDomain(data.id);
+  let nearestNode=null,nearestNodeDistance=Infinity;
+  for(const node of resourceObjects.filter(o=>o.userData?.kind==='resource'&&o.userData.depth>0)){
+    const p=screenPoint(node);if(p.d<nearestNodeDistance){nearestNode=node;nearestNodeDistance=p.d}
+  }
+  if(nearestNode&&nearestNodeDistance<(window.innerWidth<760?48:56)){openResource(nearestNode.userData);return}
 }
 
 function animate(now=0) {
