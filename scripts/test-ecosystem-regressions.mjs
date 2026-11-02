@@ -41,9 +41,10 @@ assert.ok(engine.includes('drawNode(child,childPos,depth+1,item,childAngle,child
 assert.ok(engine.includes('function navigateToStack(index)'), 'Breadcrumbs must navigate to previously visited folder levels');
 assert.ok(engine.includes('function goBackLevel()'), 'The previous-level control must navigate up the Notion hierarchy');
 assert.ok(engine.includes("nav.className='webgl-path'"), 'The scene must use compact spatial breadcrumbs instead of a resource table');
-assert.ok(engine.includes('new THREE.SphereGeometry(.34,12,10)'), 'Every resource branch must have a generous touch target');
+assert.ok(engine.includes('const hitRadius=depth===0?.32:depth===1?.25:.19'), 'Every hierarchy depth must keep a generous touch target');
 assert.ok(engine.includes('function openResource(item)'), 'Branch selection must drill into folders or open terminal pages');
-assert.ok(engine.includes("if(data.children?.length){navigationStack.push"), 'Folders with children must open a deeper spatial level');
+assert.ok(engine.includes("if(data.children?.length){"), 'Folders with children must open a deeper spatial level');
+assert.ok(engine.includes('const ancestors=[];let parent=data.parentNode'), 'Directly selected nested folders must preserve every ancestor in the breadcrumb stack');
 assert.ok(engine.includes("if(data.url){window.open(data.url"), 'Terminal pages must open their corresponding Notion page');
 assert.ok(!engine.includes("open.dataset.resourceOpen='true'"), 'The obsolete resource details panel must not be used for navigation');
 assert.ok(engine.includes("data-camera=\"back\""), 'The scene must expose a direct previous-level control');
