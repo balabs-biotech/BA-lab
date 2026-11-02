@@ -18,7 +18,7 @@ const browser = await chromium.launch({
 });
 
 async function checkWorkingScene(name, viewport) {
-  const page = await browser.newPage({ viewport, deviceScaleFactor: 1 });
+  const page = await browser.newPage({ viewport, deviceScaleFactor: 1, isMobile: name === 'mobile', hasTouch: name === 'mobile' });
   const pageErrors = [];
   const browserDiagnostics = [];
   page.on('pageerror', (error) => pageErrors.push(error.message));
@@ -95,7 +95,7 @@ async function checkWorkingScene(name, viewport) {
   const domainTarget = await page.evaluate(() => window.__BALABS_3D_E2E__().domainTarget);
   const hitSurface = await page.evaluate(({x,y}) => { const stage=document.querySelector('.webgl-stage'), canvas=stage?.querySelector('canvas'), rect=el=>{const r=el?.getBoundingClientRect();return r?{x:r.x,y:r.y,width:r.width,height:r.height}:null};return{stage:rect(stage),canvas:rect(canvas),stagePointer:stage&&getComputedStyle(stage).pointerEvents,canvasPointer:canvas&&getComputedStyle(canvas).pointerEvents,element:document.elementFromPoint(x,y)?.tagName,elementClass:document.elementFromPoint(x,y)?.className,main:rect(document.querySelector('#mainView'))}; }, domainTarget);
   await page.evaluate(() => document.addEventListener('click', event => { window.__BALABS_3D_DOCUMENT_CLICK__ = {tag:event.target?.tagName, id:event.target?.id, className:typeof event.target?.className==='string'?event.target.className:'', stage:!!event.target?.closest?.('.webgl-stage'), x:event.clientX, y:event.clientY}; }, true));
-  await page.mouse.click(domainTarget.x, domainTarget.y);
+  if (name === 'mobile') await page.touchscreen.tap(domainTarget.x, domainTarget.y); else await page.mouse.click(domainTarget.x, domainTarget.y);
   await page.waitForFunction(() => {
     const mini = document.querySelector('#miniView');
     return mini?.classList.contains('spatial-source-only') &&
@@ -110,15 +110,19 @@ async function checkWorkingScene(name, viewport) {
   await page.waitForFunction(() => typeof window.__BALABS_3D_E2E__ === 'function', undefined, { timeout: 5000 });
   await page.waitForFunction(() => (window.__BALABS_3D_E2E__()?.visible || 0) > 0, undefined, { timeout: 15000 }).catch(async error => { throw new Error('No 3D branch is visible for a real tap: ' + JSON.stringify(await page.evaluate(() => window.__BALABS_3D_E2E__())) + ' — ' + error.message); });
   const branchTarget = await page.evaluate(() => window.__BALABS_3D_E2E__().target);
-  await page.mouse.click(branchTarget.x, branchTarget.y);
+  if (name === 'mobile') await page.touchscreen.tap(branchTarget.x, branchTarget.y); else await page.mouse.click(branchTarget.x, branchTarget.y);
   await page.waitForFunction(() => {
     const panel = document.querySelector('.webgl-focus');
     return panel && !panel.hidden && panel.querySelector('[data-resource-open]') && panel.querySelector('[data-resource-clear]');
-  }, undefined, { timeout: 8000 });
+  }, undefined, { timeout: 8000 }).catch(async error => { throw new Error('3D resource tap did not open its Notion panel: ' + JSON.stringify(await page.evaluate(() => ({probe:window.__BALABS_3D_E2E__?.(),lastPick:window.__BALABS_3D_LAST_PICK__,pickTrace:window.__BALABS_3D_PICK_TRACE__,clicks:window.__BALABS_3D_E2E_CLICKS,focus:document.querySelector('.webgl-focus')?.outerHTML?.slice(0,1200)}))) + ' — ' + error.message); });
   assert.ok(await page.locator('.webgl-focus [data-resource-open]').isVisible(), name + ': clicking a 3D branch must reveal its Notion action');
   assert.ok(await page.locator('.webgl-focus [data-resource-clear]').isVisible(), name + ': selected branch must offer an in-scene return action');
   await page.locator('.webgl-focus [data-resource-clear]').click({force:true});
   await page.waitForFunction(() => { const panel=document.querySelector('.webgl-focus'); return panel && !panel.hidden && panel.classList.contains('has-world') && !panel.querySelector('[data-resource-open]'); }, undefined, { timeout: 5000 });
+  if (name === 'mobile') await page.locator('.webgl-controls [data-camera="out"]').click();
+  else await canvas.dispatchEvent('wheel', { deltaY: 350, bubbles: true, cancelable: true });
+  await page.waitForFunction(() => window.__BALABS_3D_E2E__()?.selected === null && document.querySelector('#miniView')?.hidden,
+    undefined, { timeout: 8000 }).catch(async error => { throw new Error(name + ': zooming out must return from the selected domain to the overview: ' + JSON.stringify(await page.evaluate(() => window.__BALABS_3D_E2E__())) + ' — ' + error.message); });
   await page.screenshot({ path: outputDir + '/' + name + '-universe.png', fullPage: false });
 
   assert.deepEqual(pageErrors, [], name + ': uncaught browser errors detected');
