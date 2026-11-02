@@ -137,7 +137,7 @@ function createWorld() {
     const glow=new THREE.Mesh(new THREE.SphereGeometry(1.12,24,18),new THREE.MeshBasicMaterial({color,transparent:true,opacity:.055,side:THREE.BackSide,depthWrite:false}));
     glow.scale.copy(soma.scale);group.add(glow);
     const label=makeLabel(LABELS[id]?.title||id, color, 19);label.position.set(0,-1.28,0);label.scale.set(3.1,.65,1);label.userData={id,kind:'domain-label'};group.add(label);
-    const hit=new THREE.Mesh(new THREE.SphereGeometry(1.3,16,12),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));hit.userData={id,kind:'domain'};group.add(hit);
+    const hit=new THREE.Mesh(new THREE.SphereGeometry(.96,16,12),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));hit.userData={id,kind:'domain'};group.add(hit);
     world.add(group);cells.set(id,{group,soma,label,hit,position:pos,color});
     pickables.push(soma,hit,label);
     for(let j=0;j<7;j++){
@@ -340,7 +340,21 @@ function onPointerUp(e) {
 function onPointerCancel(){pointers.clear();dragging=false;moved=true;pinchStart=0;lastPointer=null}
 function onLostCapture(e){if(pointers.has(e.pointerId)){pointers.delete(e.pointerId);if(!pointers.size){dragging=false;lastPointer=null}}}
 function pickAt(x,y) {
-  const rect=renderer.domElement.getBoundingClientRect();pointer.x=((x-rect.left)/rect.width)*2-1;pointer.y=-((y-rect.top)/rect.height)*2+1;
+  const rect=renderer.domElement.getBoundingClientRect();
+  camera.updateMatrixWorld(true);world.updateMatrixWorld(true);
+  const projectDistance=obj=>{const p=obj.getWorldPosition(new THREE.Vector3()).project(camera);if(p.z<-1||p.z>1)return Infinity;const sx=rect.left+(p.x+1)*rect.width/2,sy=rect.top+(1-p.y)*rect.height/2;return Math.hypot(sx-x,sy-y)};
+  // Prefer the nearest visible semantic target in screen space. This avoids
+  // overlapping 3D hit volumes stealing taps from neighbouring cells.
+  if(selected){
+    const branchLabels=resourceObjects.filter(o=>o.userData?.kind==='resource-label');
+    let nearest=null,nearestDistance=Infinity;
+    for(const label of branchLabels){const d=projectDistance(label);if(d<nearestDistance){nearest=label;nearestDistance=d}}
+    if(nearest&&nearestDistance<(window.innerWidth<760?92:112)){openResource(nearest.userData);return}
+  }
+  let nearestDomain=null,nearestDomainDistance=Infinity;
+  for(const [id,item] of cells){const d=projectDistance(item.hit);if(d<nearestDomainDistance){nearestDomain=item;nearestDomainDistance=d}}
+  if(nearestDomain&&nearestDomainDistance<(window.innerWidth<760?62:82)){enterDomain(nearestDomain.group.userData.id);return}
+  pointer.x=((x-rect.left)/rect.width)*2-1;pointer.y=-((y-rect.top)/rect.height)*2+1;
   raycaster.setFromCamera(pointer,camera);
   const hits=raycaster.intersectObjects(pickables,false);
   const hit=hits.find(h=>['resource','resource-label','domain','domain-label'].includes(h.object.userData?.kind));
