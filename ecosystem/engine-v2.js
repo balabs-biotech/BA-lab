@@ -373,6 +373,18 @@ function onLostCapture(e){if(pointers.has(e.pointerId)){pointers.delete(e.pointe
 function pickAt(x,y) {
   const rect=renderer.domElement.getBoundingClientRect();
   camera.updateMatrixWorld(true);world.updateMatrixWorld(true);
+  // In overview, choose the domain whose visible screen position is closest
+  // to the tap. Ray intersections can otherwise select a neighbouring cell.
+  if(!selected){
+    let nearestDomain=null,nearestDomainDistance=Infinity;
+    for(const [id,item] of cells){
+      const p=item.hit.getWorldPosition(new THREE.Vector3()).project(camera);
+      const sx=rect.left+(p.x+1)*rect.width/2,sy=rect.top+(1-p.y)*rect.height/2;
+      const d=Math.hypot(sx-x,sy-y);
+      if(p.z>-1&&p.z<1&&d<nearestDomainDistance){nearestDomain=item;nearestDomainDistance=d}
+    }
+    if(nearestDomain&&nearestDomainDistance<(window.innerWidth<760?62:82)){enterDomain(nearestDomain.group.userData.id);return}
+  }
   pointer.x=((x-rect.left)/rect.width)*2-1;pointer.y=-((y-rect.top)/rect.height)*2+1;
   raycaster.setFromCamera(pointer,camera);
   // Hit the actual label under the pointer first. A nearest-label heuristic can
@@ -384,16 +396,10 @@ function pickAt(x,y) {
   }
   const hits=raycaster.intersectObjects(pickables,false);
   const hit=hits.find(h=>['resource','resource-label','domain','domain-label'].includes(h.object.userData?.kind));
-  if(hit){
-    const data=hit.object.userData;
-    if(data.kind==='resource'||data.kind==='resource-label'){openResource(data);return}
-    if(data.kind==='domain'||data.kind==='domain-label'){enterDomain(data.id);return}
-  }
-  if(!selected){
-    let nearestDomain=null,nearestDomainDistance=Infinity;
-    for(const [id,item] of cells){const p=item.hit.getWorldPosition(new THREE.Vector3()).project(camera);const sx=rect.left+(p.x+1)*rect.width/2,sy=rect.top+(1-p.y)*rect.height/2,d=Math.hypot(sx-x,sy-y);if(p.z>-1&&p.z<1&&d<nearestDomainDistance){nearestDomain=item;nearestDomainDistance=d}}
-    if(nearestDomain&&nearestDomainDistance<(window.innerWidth<760?62:82)){enterDomain(nearestDomain.group.userData.id);return}
-  }
+  if(!hit)return;
+  const data=hit.object.userData;
+  if(data.kind==='resource'||data.kind==='resource-label'){openResource(data);return}
+  if(data.kind==='domain'||data.kind==='domain-label')enterDomain(data.id);
 }
 
 function animate(now=0) {
