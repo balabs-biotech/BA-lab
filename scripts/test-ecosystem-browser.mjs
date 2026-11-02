@@ -126,12 +126,12 @@ async function checkWorkingScene(name, viewport) {
       continue;
     }
     assert.ok(branchTarget.url, name + ': terminal branch must carry its Notion destination');
-    const popupPromise = page.waitForEvent('popup', { timeout: 10000 });
+    const popupPromise = page.context().waitForEvent('page', { timeout: 10000 });
     if (name === 'mobile') await page.touchscreen.tap(branchTarget.x, branchTarget.y);
     else await page.mouse.click(branchTarget.x, branchTarget.y);
     const popup = await popupPromise;
     await popup.waitForLoadState('domcontentloaded', { timeout: 12000 }).catch(() => {});
-    assert.match(popup.url(), /notion\\.(so|site|com)/i, name + ': terminal branch must open its Notion page');
+    assert.match(popup.url(), /notion\.(so|site|com)/i, name + ': terminal branch must open its Notion page');
     await popup.close();
     openedNotion = true;
     break;
