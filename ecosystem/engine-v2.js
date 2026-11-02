@@ -260,8 +260,7 @@ function showDomainPanel(id,message='') {if(message)status.textContent=message;r
 function enterDomain(id) {
   if(!cells.has(id))return;selected=id;selectedBranch=null;opened=true;navigationStack=[];currentNode=manifest?.domains?.find(d=>d.id===id)||null;currentAnchor=cells.get(id).position.clone();
   intro.hidden=true;nav.hidden=false;ROOT.classList.remove('universe-closed');ROOT.classList.add('universe-open');panel.hidden=true;panel.replaceChildren();
-  const mini=document.getElementById('miniView');if(mini){mini.hidden=true;mini.classList.remove('spatial-source-only')}
-  const homeButton=document.getElementById('homeBtn');if(homeButton)homeButton.hidden=true;
+  if(typeof window.enterSphere==='function')window.enterSphere(id,false,true); // Populate the hidden legacy content source only; the old engine no longer owns #mainView events.
   smoothCamera(cells.get(id).position,7.5,900,()=>buildResources(id));
 }
 function goBackLevel() {
