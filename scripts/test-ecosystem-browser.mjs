@@ -114,13 +114,14 @@ async function checkWorkingScene(name, viewport) {
   for (let level = 0; level < 8; level++) {
     await page.waitForFunction(() => (window.__BALABS_3D_E2E__()?.visible || 0) > 0, undefined, { timeout: 12000 });
     const probe = await page.evaluate(() => window.__BALABS_3D_E2E__());
+    assert.ok(probe.visibleDepths?.includes(1), name + ': nested Notion subfolders must be visible as a second spatial depth');
     const branchTarget = probe.target;
     assert.ok(branchTarget, name + ': no spatial folder/page target was found');
     if (branchTarget.hasChildren) {
       const depthBefore = probe.depth;
       if (name === 'mobile') await page.touchscreen.tap(branchTarget.x, branchTarget.y);
       else await page.mouse.click(branchTarget.x, branchTarget.y);
-      await page.waitForFunction((before) => (window.__BALABS_3D_E2E__()?.depth || 0) > before, depthBefore, { timeout: 8000 });
+      await page.waitForFunction((before) => (window.__BALABS_3D_E2E__()?.depth || 0) > before, depthBefore, { timeout: 8000 }).catch(async error => { throw new Error(name + ': nested branch tap did not advance. ' + JSON.stringify(await page.evaluate(() => window.__BALABS_3D_E2E__())) + ' — ' + error.message); });
       navigated = true;
       await page.waitForFunction(() => !document.querySelector('#mainView .webgl-stage')?.classList.contains('is-transitioning'), undefined, { timeout: 8000 });
       continue;
