@@ -286,7 +286,7 @@ function goOverview() {
 }
 function showFailure(error) {
   console.error('BA Labs clean 3D engine failed',error);
-  ROOT.classList.remove('webgl-ready','universe-open','universe-closed');ROOT.classList.add('webgl-load-error');
+  ROOT.classList.remove('webgl-ready','universe-open','universe-closed');ROOT.classList.add('webgl-load-error');ROOT.querySelectorAll('.network,.galaxy,.hub,.sphere').forEach(el=>el.style.display='none');
   const p=document.createElement('div');p.className='webgl-load-error-panel';p.style.cssText='min-height:380px;display:grid;place-items:center;padding:30px;text-align:center;color:#e8eee8;background:#172321;border-radius:18px';
   const inner=document.createElement('div');const title=document.createElement('strong');title.textContent=LANG()==='fr'?'Le réseau 3D ne peut pas démarrer':'The 3D network could not start';const retry=document.createElement('button');retry.textContent='↻';retry.addEventListener('click',()=>location.reload());inner.append(title,document.createElement('br'),retry);p.append(inner);ROOT.append(p);
 }
