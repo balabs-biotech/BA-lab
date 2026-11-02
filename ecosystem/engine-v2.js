@@ -39,7 +39,7 @@ const COPY = {
 };
 const t = key => (COPY[LANG()] || COPY.fr)[key] || COPY.fr[key];
 
-let THREE, renderer, scene, camera, raycaster, pointer, stage, panel, hint, intro;
+let THREE, renderer, scene, camera, raycaster, pointer, stage, panel, hint, intro, status;
 let world, cells = new Map(), pickables = [], resourceObjects = [], edges = [], signalPoints = [];
 let selected = null, selectedBranch = null, manifest = null, transition = null;
 let distance = 13.5, theta = .22, phi = 1.27, target = null, targetGoal = null;
@@ -253,7 +253,7 @@ function openResource(item) {
   const path=document.createElement('small');path.textContent=item.path||item.title;
   const desc=document.createElement('small');desc.textContent=item.description||'';
   const actions=document.createElement('div');actions.className='webgl-focus-actions';
-  const open=document.createElement('a');open.dataset.resourceOpen='true';open.href=item.url;open.target='_blank';open.rel='noopener noreferrer';open.dataset.resourceOpen='true';open.textContent=t('openPage');
+  const open=document.createElement('a');open.dataset.resourceOpen='true';open.href=item.url;open.target='_blank';open.rel='noopener noreferrer';open.textContent=t('openPage');
   const back=document.createElement('button');back.type='button';back.dataset.resourceClear='true';back.textContent=t('back');back.addEventListener('click',()=>showDomainPanel(selected));
   actions.append(open,back);panel.append(kicker,title,path);if(item.description)panel.append(desc);panel.append(actions);
 }
@@ -294,7 +294,7 @@ function showFailure(error) {
 function setupUI() {
   stage=document.createElement('div');stage.className='webgl-stage';stage.tabIndex=0;stage.setAttribute('role','application');stage.setAttribute('aria-label','BA Labs interactive biological network');
   hint=document.createElement('div');hint.className='webgl-hint';hint.textContent=t('hint');
-  const status=document.createElement('div');status.className='webgl-status';status.textContent='BALABS / LIVING NETWORK';window.__BALABS_3D_STATUS=status;
+  status=document.createElement('div');status.className='webgl-status';status.textContent='BALABS / LIVING NETWORK';window.__BALABS_3D_STATUS=status;
   panel=document.createElement('section');panel.className='webgl-focus';panel.hidden=true;panel.setAttribute('aria-live','polite');
   const controls=document.createElement('div');controls.className='webgl-controls';controls.innerHTML='<button type="button" data-camera="out" aria-label="Zoom arrière">−</button><button type="button" data-camera="in" aria-label="Zoom avant">+</button><button type="button" data-camera="reset" aria-label="Recentrer">⌖</button>';
   intro=document.createElement('button');intro.type='button';intro.className='webgl-intro';intro.innerHTML='<span class="webgl-intro-card"><span class="webgl-intro-orb"><b>BA</b></span><span class="webgl-intro-copy">BALABS · APPLIED BIOTECHNOLOGY</span><span class="webgl-intro-cta">'+t('open')+'</span></span>';
