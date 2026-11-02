@@ -51,6 +51,9 @@ assert.ok(!engine.includes("open.dataset.resourceOpen='true'"), 'The obsolete re
 assert.ok(engine.includes("data-camera=\"back\""), 'The scene must expose a direct previous-level control');
 assert.ok(engine.includes('renderPath()'), 'The active folder path must remain visible in the scene');
 assert.ok(engine.includes('window.enterSphere(id,false,true)'), 'Domain selection must synchronize the hidden Notion content source');
+assert.ok(!html.includes("mainView.addEventListener('pointerdown',beginOrbit)"), 'Legacy orbit input must not compete with the clean engine');
+assert.ok(!html.includes("openUniverse.addEventListener('click',toggleUniverse)"), 'Legacy hub navigation must not compete with the clean engine');
+assert.ok(html.includes('if(!spatial3D&&mainView.classList.contains(\'universe-closed\'))toggleUniverse()'), 'The hidden content source must not change the new engine scene state');
 assert.ok(engine.includes('window.__BALABS_3D_E2E__'), 'The browser smoke test must be able to inspect the live scene');
 
 console.log('Clean 3D engine regression checks passed: eight domains, mycelial topology, animated signals, stable camera, desktop/mobile controls, hierarchical Notion branches and explicit page actions.');
