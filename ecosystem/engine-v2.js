@@ -70,7 +70,7 @@ function addStyles() {
     #mainView .webgl-focus button:hover,#mainView .webgl-focus a:hover{border-color:#c2d1c2;background:#354e43}
     #mainView .webgl-focus .webgl-focus-link{display:flex;justify-content:space-between;gap:12px;width:100%;margin-top:6px;text-align:left}
     #mainView .webgl-focus .webgl-focus-link span{color:#bdc9c0;font-weight:400}
-    #mainView .webgl-intro{position:absolute;inset:0;z-index:10;display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse at 50% 45%,#263b38c9 0%,#142120a8 62%,#111a1ddd 100%);cursor:pointer}
+    #mainView .webgl-intro{position:absolute;inset:0;z-index:10;width:100%;height:100%;border:0;padding:0;color:inherit;font:inherit;display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse at 50% 45%,#263b38c9 0%,#142120a8 62%,#111a1ddd 100%);cursor:pointer}
     #mainView .webgl-intro[hidden]{display:none!important}
     #mainView .webgl-intro-card{display:flex;flex-direction:column;align-items:center;gap:15px;text-align:center;padding:24px;max-width:340px}
     #mainView .webgl-intro-orb{width:116px;height:116px;border:1px solid #91aa9a;border-radius:50%;display:grid;place-items:center;background:radial-gradient(circle at 35% 28%,#a2b9a044,#293f3a88 60%,#121d1c);box-shadow:inset -16px -12px 28px #07100e88,0 0 0 10px #b96b4d0c,0 0 45px #9db7a333}
