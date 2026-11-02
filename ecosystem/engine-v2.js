@@ -41,6 +41,7 @@ const t = key => (COPY[LANG()] || COPY.fr)[key] || COPY.fr[key];
 
 let THREE, renderer, scene, camera, raycaster, pointer, stage, panel, hint, intro, status;
 let world, cells = new Map(), pickables = [], resourceObjects = [], edges = [], signalPoints = [];
+let nav, currentNode = null, currentAnchor = null, navigationStack = [];
 let selected = null, selectedBranch = null, manifest = null, transition = null;
 let distance = 13.5, theta = .22, phi = 1.27, target = null, targetGoal = null;
 let opened = false, raf = 0, lastFrame = 0, dragging = false, moved = false, dragGesture = false;
@@ -60,6 +61,11 @@ function addStyles() {
     #mainView .webgl-controls{position:absolute;right:14px;top:14px;z-index:12;display:flex;gap:6px}
     #mainView .webgl-controls button{width:38px;height:38px;border:1px solid #7b948766;border-radius:12px;background:#172724e8;color:#e5e9df;font:500 21px/1 system-ui;cursor:pointer;backdrop-filter:blur(12px)}
     #mainView .webgl-controls button:hover{background:#344a42;border-color:#b6c8b7}
+    #mainView .webgl-path{position:absolute;left:16px;top:14px;z-index:14;display:flex;align-items:center;gap:5px;max-width:calc(100% - 120px);overflow-x:auto;padding:7px 9px;border:1px solid #78958a66;border-radius:12px;background:#142321e8;backdrop-filter:blur(14px);color:#e8eee7;font:600 10px system-ui;white-space:nowrap}
+    #mainView .webgl-path button{border:0;background:transparent;color:#dce8dc;padding:4px 5px;border-radius:6px;font:inherit;cursor:pointer}
+    #mainView .webgl-path button:hover{background:#385044}
+    #mainView .webgl-path .sep{color:#8fa99a}
+    #mainView .webgl-path .current{color:#c8dcae}
     #mainView .webgl-focus{position:absolute;left:16px;top:16px;z-index:12;width:min(310px,calc(100% - 92px));max-height:calc(100% - 108px);overflow:auto;padding:17px;border:1px solid #78958a66;border-radius:17px;background:linear-gradient(145deg,#1b2928f2,#10191bf2);box-shadow:0 18px 48px #0006;backdrop-filter:blur(16px);color:#edf0e9}
     #mainView .webgl-focus[hidden]{display:none!important}
     #mainView .webgl-focus-kicker{display:block;color:#b3c5b5;font:700 9px system-ui;letter-spacing:.17em;margin-bottom:8px}
@@ -78,7 +84,7 @@ function addStyles() {
     #mainView .webgl-intro-copy{color:#d6ded6;font:600 10px system-ui;letter-spacing:.17em}
     #mainView .webgl-intro-cta{border:1px solid #9eb7a2;border-radius:999px;padding:12px 17px;color:#f1f2e9;background:#21342edb;font:700 10px system-ui;letter-spacing:.1em}
     #mainView .webgl-stage.is-transitioning{cursor:progress}
-    @media(max-width:600px){#mainView .webgl-hint{left:9px;bottom:10px;max-width:calc(100% - 130px);font-size:7px;letter-spacing:.02em}#mainView .webgl-status{right:9px;bottom:12px;font-size:7px}#mainView .webgl-focus{left:9px;top:9px;padding:13px;width:min(270px,calc(100% - 78px))}#mainView .webgl-controls{right:9px;top:9px;gap:4px}#mainView .webgl-controls button{width:34px;height:34px}}
+    @media(max-width:600px){#mainView .webgl-path{left:9px;top:52px;max-width:calc(100% - 78px);font-size:9px}#mainView .webgl-hint{left:9px;bottom:10px;max-width:calc(100% - 130px);font-size:7px;letter-spacing:.02em}#mainView .webgl-status{right:9px;bottom:12px;font-size:7px}#mainView .webgl-focus{left:9px;top:9px;padding:13px;width:min(270px,calc(100% - 78px))}#mainView .webgl-controls{right:9px;top:9px;gap:4px}#mainView .webgl-controls button{width:34px;height:34px}}
   `;
   document.head.append(style);
 }
@@ -275,14 +281,15 @@ function setupUI() {
   hint=document.createElement('div');hint.className='webgl-hint';hint.textContent=t('hint');
   status=document.createElement('div');status.className='webgl-status';status.textContent='BALABS / LIVING NETWORK';window.__BALABS_3D_STATUS=status;
   panel=document.createElement('section');panel.className='webgl-focus';panel.hidden=true;panel.setAttribute('aria-live','polite');
-  const controls=document.createElement('div');controls.className='webgl-controls';controls.innerHTML='<button type="button" data-camera="out" aria-label="Zoom arrière">−</button><button type="button" data-camera="in" aria-label="Zoom avant">+</button><button type="button" data-camera="reset" aria-label="Recentrer">⌖</button>';
+  nav=document.createElement('nav');nav.className='webgl-path';nav.setAttribute('aria-label','Navigation dans les dossiers');nav.hidden=true;
+  const controls=document.createElement('div');controls.className='webgl-controls';controls.innerHTML='<button type="button" data-camera="back" aria-label="Niveau précédent">‹</button><button type="button" data-camera="out" aria-label="Zoom arrière">−</button><button type="button" data-camera="in" aria-label="Zoom avant">+</button><button type="button" data-camera="reset" aria-label="Recentrer">⌖</button>';
   intro=document.createElement('button');intro.type='button';intro.className='webgl-intro';intro.innerHTML='<span class="webgl-intro-card"><span class="webgl-intro-orb"><b>BA</b></span><span class="webgl-intro-copy">BALABS · APPLIED BIOTECHNOLOGY</span><span class="webgl-intro-cta">'+t('open')+'</span></span>';
-  intro.addEventListener('click',()=>{opened=true;intro.hidden=true;ROOT.classList.remove('universe-closed');ROOT.classList.add('universe-open');status.textContent='BALABS / LIVING NETWORK'});
-  controls.addEventListener('click',e=>{const action=e.target.closest('button')?.dataset.camera;if(action==='in')distance=Math.max(3.5,distance*.82);if(action==='out'){if(selected){goOverview();return}distance=Math.min(42,distance*1.2)}if(action==='reset'){goOverview();return}cameraPosition()});
-  stage.append(hint,status,controls,panel,intro);ROOT.append(stage);
+  intro.addEventListener('click',()=>{opened=true;intro.hidden=true;nav.hidden=false;ROOT.classList.remove('universe-closed');ROOT.classList.add('universe-open');status.textContent='BALABS / LIVING NETWORK'});
+  controls.addEventListener('click',e=>{const action=e.target.closest('button')?.dataset.camera;if(action==='back'){goBackLevel();return}if(action==='in')distance=Math.max(3.5,distance*.82);if(action==='out'){if(selected){goOverview();return}distance=Math.min(42,distance*1.2)}if(action==='reset'){goOverview();return}cameraPosition()});
+  stage.append(hint,status,controls,nav,panel,intro);ROOT.append(stage);
   document.getElementById('homeBtn')?.addEventListener('click',()=>{if(selected)goOverview()});
-  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&selected)goOverview()});
-  stage.addEventListener('wheel',e=>{if(e.target.closest('.webgl-controls,.webgl-focus'))return;e.preventDefault();const nextDistance=THREE.MathUtils.clamp(distance+e.deltaY*.012,3.5,42);if(selected&&e.deltaY>0&&nextDistance>10.4){goOverview();return}distance=nextDistance;cameraPosition()},{passive:false});
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&selected)goBackLevel()});
+  stage.addEventListener('wheel',e=>{if(e.target.closest('.webgl-controls,.webgl-focus'))return;e.preventDefault();const nextDistance=THREE.MathUtils.clamp(distance+e.deltaY*.012,3.5,42);if(selected&&e.deltaY>0&&nextDistance>9.5){goBackLevel();return}distance=nextDistance;cameraPosition()},{passive:false});
   stage.addEventListener('pointerdown',onPointerDown);
   stage.addEventListener('pointermove',onPointerMove);
   document.addEventListener('pointerup',onPointerUp,true);
@@ -300,7 +307,7 @@ function onPointerDown(e) {
 }
 function onPointerMove(e) {
   if(pointers.has(e.pointerId))pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
-  if(pointers.size>=2){const p=[...pointers.values()],d=Math.hypot(p[0].x-p[1].x,p[0].y-p[1].y);if(pinchStart)distance=THREE.MathUtils.clamp(distance-(d-pinchStart)*.035,3.5,42);pinchStart=d;moved=true;if(selected&&distance>10.4){goOverview();return}cameraPosition();return}
+  if(pointers.size>=2){const p=[...pointers.values()],d=Math.hypot(p[0].x-p[1].x,p[0].y-p[1].y);if(pinchStart)distance=THREE.MathUtils.clamp(distance-(d-pinchStart)*.035,3.5,42);pinchStart=d;moved=true;if(selected&&distance>9.5){goBackLevel();return}cameraPosition();return}
   if(!dragging||!lastPointer)return;
   const dx=e.clientX-lastPointer.x,dy=e.clientY-lastPointer.y;
   if(Math.hypot(dx,dy)>7){moved=true;dragGesture=true}
@@ -367,7 +374,7 @@ async function init() {
     stage.prepend(renderer.domElement);renderer.domElement.setAttribute('aria-label','BA Labs 3D network canvas');
     scene=new THREE.Scene();camera=new THREE.PerspectiveCamera(46,1,.1,180);raycaster=new THREE.Raycaster();pointer=new THREE.Vector2();target=new THREE.Vector3();
     createWorld();resize();cameraInitialized=true;
-    const loadManifest=()=>fetch('./notion-tree.'+LANG()+'.json',{cache:'no-cache'}).then(r=>r.ok?r.json():null).then(data=>{if(data?.version===1&&Array.isArray(data.domains)){manifest=data;if(selected&&!transition)buildResources(selected)}}).catch(()=>{});loadManifest();new MutationObserver(()=>{hint.textContent=t('hint');loadManifest()}).observe(document.documentElement,{attributes:true,attributeFilter:['lang']});
+    const loadManifest=()=>fetch('./notion-tree.'+LANG()+'.json',{cache:'no-cache'}).then(r=>r.ok?r.json():null).then(data=>{if(data?.version===1&&Array.isArray(data.domains)){manifest=data;if(selected&&!transition)buildResources(selected,currentNode,currentAnchor)}}).catch(()=>{});loadManifest();new MutationObserver(()=>{hint.textContent=t('hint');loadManifest()}).observe(document.documentElement,{attributes:true,attributeFilter:['lang']});
     window.__BALABS_3D_E2E__=()=>{
       const rect=renderer.domElement.getBoundingClientRect();
       const project=obj=>{const p=obj.getWorldPosition(new THREE.Vector3()).project(camera);return{x:rect.left+(p.x+1)*rect.width/2,y:rect.top+(1-p.y)*rect.height/2,z:p.z,title:obj.userData.title||obj.userData.id}};
@@ -377,7 +384,7 @@ async function init() {
       const tappable=branches.filter(p=>{const el=document.elementFromPoint(p.x,p.y);return el===renderer.domElement||renderer.domElement.contains(el)});
       const targetBranch=(tappable.length?tappable:branches).sort((a,b)=>Math.hypot(a.x-center.x,a.y-center.y)-Math.hypot(b.x-center.x,b.y-center.y))[0]||null;
       const domain=cells.get('bio'),domainTarget=domain?project(domain.hit):null;
-      return{count:resourceObjects.filter(o=>o.userData?.kind==='resource-label').length,visible:branches.length,target:targetBranch,domainTarget:domainTarget&&inside(domainTarget)?domainTarget:null,miniHidden:!!document.getElementById('miniView')?.hidden,transitioning:!!transition,selected,clickCount:window.__BALABS_3D_E2E_CLICKS||0,pointerDowns:window.__BALABS_3D_POINTERDOWN||0,pointerUps:window.__BALABS_3D_POINTERUP||0,pickCalls:window.__BALABS_3D_PICK_CALLS||0};
+      return{count:resourceObjects.filter(o=>o.userData?.kind==='resource-label').length,visible:branches.length,target:targetBranch,domainTarget:domainTarget&&inside(domainTarget)?domainTarget:null,miniHidden:!!document.getElementById('miniView')?.hidden,transitioning:!!transition,selected,currentTitle:currentNode?.title||null,depth:navigationStack.length,childCount:currentNode?.children?.length||0,clickCount:window.__BALABS_3D_E2E_CLICKS||0,pointerDowns:window.__BALABS_3D_POINTERDOWN||0,pointerUps:window.__BALABS_3D_POINTERUP||0,pickCalls:window.__BALABS_3D_PICK_CALLS||0};
     };
     animate();
   } catch(error){showFailure(error)}
