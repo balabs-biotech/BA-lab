@@ -377,7 +377,7 @@ async function init() {
     const loadManifest=()=>fetch('./notion-tree.'+LANG()+'.json',{cache:'no-cache'}).then(r=>r.ok?r.json():null).then(data=>{if(data?.version===1&&Array.isArray(data.domains)){manifest=data;if(selected&&!transition)buildResources(selected,currentNode,currentAnchor)}}).catch(()=>{});loadManifest();new MutationObserver(()=>{hint.textContent=t('hint');loadManifest()}).observe(document.documentElement,{attributes:true,attributeFilter:['lang']});
     window.__BALABS_3D_E2E__=()=>{
       const rect=renderer.domElement.getBoundingClientRect();
-      const project=obj=>{const p=obj.getWorldPosition(new THREE.Vector3()).project(camera);return{x:rect.left+(p.x+1)*rect.width/2,y:rect.top+(1-p.y)*rect.height/2,z:p.z,title:obj.userData.title||obj.userData.id}};
+      const project=obj=>{const p=obj.getWorldPosition(new THREE.Vector3()).project(camera);return{x:rect.left+(p.x+1)*rect.width/2,y:rect.top+(1-p.y)*rect.height/2,z:p.z,title:obj.userData.title||obj.userData.id,hasChildren:!!obj.userData.hasChildren,url:obj.userData.url||null}};
       const inside=p=>p.z>-1&&p.z<1&&p.x>=rect.left&&p.x<=rect.right&&p.y>=rect.top&&p.y<=rect.bottom;
       const branches=resourceObjects.filter(o=>o.userData?.kind==='resource-label').map(project).filter(inside);
       const center={x:rect.left+rect.width/2,y:rect.top+rect.height/2};
