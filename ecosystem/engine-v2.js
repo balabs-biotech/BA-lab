@@ -253,7 +253,7 @@ function openResource(item) {
   const path=document.createElement('small');path.textContent=item.path||item.title;
   const desc=document.createElement('small');desc.textContent=item.description||'';
   const actions=document.createElement('div');actions.className='webgl-focus-actions';
-  const open=document.createElement('a');open.href=item.url;open.target='_blank';open.rel='noopener noreferrer';open.dataset.resourceOpen='true';open.textContent=t('openPage');
+  const open=document.createElement('a');open.dataset.resourceOpen='true';open.href=item.url;open.target='_blank';open.rel='noopener noreferrer';open.dataset.resourceOpen='true';open.textContent=t('openPage');
   const back=document.createElement('button');back.type='button';back.dataset.resourceClear='true';back.textContent=t('back');back.addEventListener('click',()=>showDomainPanel(selected));
   actions.append(open,back);panel.append(kicker,title,path);if(item.description)panel.append(desc);panel.append(actions);
 }
