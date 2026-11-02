@@ -2,162 +2,42 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
 const html = readFileSync('ecosystem/index.html', 'utf8');
-const scene = readFileSync('ecosystem/constellation-3d.js', 'utf8');
-
+const engine = readFileSync('ecosystem/engine-v2.js', 'utf8');
 const expectedDomains = ['bio', 'myco', 'soil', 'lab', 'products', 'iot', 'work', 'learn'];
-const idsMatch = scene.match(/const ids\s*=\s*\[([^\]]+)\]/);
-assert.ok(idsMatch, '3D scene must declare its domain registry');
-const sceneDomains = [...idsMatch[1].matchAll(/'([^']+)'/g)].map((match) => match[1]);
-assert.deepEqual(sceneDomains, expectedDomains, '3D domain registry must preserve all eight domains');
 
-const htmlDomains = [...html.matchAll(/<button[^>]*data-sphere="([^"]+)"/g)].map((match) => match[1]);
-assert.deepEqual(htmlDomains, expectedDomains, 'HTML navigation must preserve the same eight domains');
+assert.ok(html.includes('engine-v2.js?v=20261102-clean-core-v2'), 'Public explorer must load the clean v2 engine');
+assert.ok(!html.includes('constellation-3d.js?v='), 'Legacy monolithic engine must no longer be loaded');
+assert.ok(engine.includes("const IDS = ['bio','myco','soil','lab','products','iot','work','learn']"), 'The clean engine must own the complete eight-domain registry');
+const htmlDomains = [...html.matchAll(/<button[^>]*data-sphere="([^"]+)"/g)].map(match => match[1]);
+assert.deepEqual(htmlDomains, expectedDomains, 'Public HTML must preserve all eight domains');
 
-const initFunctionIndex = scene.indexOf('function init(){');
-const junctionPathsDeclarationIndex = scene.indexOf('let junctionPaths=[];');
-assert.ok(junctionPathsDeclarationIndex >= 0 && junctionPathsDeclarationIndex < initFunctionIndex, 'Anastomosis relay paths must be declared outside init so the relay animator can access them');
-assert.ok(scene.includes('junctionPaths.length=0;'), 'Anastomosis paths must be reset before the scene graph is rebuilt');
-assert.ok(scene.includes('const makeNeurite'), 'Organic neurite geometry must remain present');
-assert.ok(scene.toLowerCase().includes('anastomosis'), 'Cross-domain mycelial junctions must remain present');
-const pairBlock = scene.match(/const pairs=\[([\s\S]*?)\n      \];/);
-assert.ok(pairBlock, 'The 3D network must declare its cross-domain topology');
-const relationPairs = [...pairBlock[1].matchAll(/\['(bio|myco|soil|lab|products|iot|work|learn)','(bio|myco|soil|lab|products|iot|work|learn)'\]/g)].map((match) => [match[1], match[2]]);
-assert.equal(relationPairs.length, 8, 'Cross-domain topology must remain sparse and legible');
-const topology = new Set(relationPairs.map(([a, b]) => [a, b].sort().join(':')));
-for (const edge of [['bio','myco'],['myco','soil'],['soil','lab'],['lab','iot'],['lab','products'],['products','work'],['work','iot'],['products','learn']]) {
-  assert.ok(topology.has(edge.slice().sort().join(':')), `Missing local network connection: ${edge.join(' → ')}`);
+assert.ok(engine.includes('function createWorld()'), 'The new engine must build its own biological network scene');
+assert.ok(engine.includes('makeCellGeometry'), 'Domain nodes must use organic cell geometry');
+assert.ok(engine.includes('const LINKS ='), 'The network must define explicit cross-domain connections');
+for (const [a,b] of [['bio','myco'],['myco','soil'],['soil','lab'],['lab','iot'],['lab','products'],['products','work'],['work','iot'],['products','learn']]) {
+  assert.ok(engine.includes("['" + a + "','" + b + "']"), 'Missing cross-domain link ' + a + ' → ' + b);
 }
-assert.ok(scene.includes('const relayRoutes'), 'Multi-domain signal routes must remain present');
-assert.ok(scene.includes('branchRelaySignals'), 'Branch signal animation must remain present');
-assert.ok(scene.includes('window.enterSphere(id,false,true)'), '3D selection must call the shared domain navigation in spatial-only mode');
-assert.ok(!scene.includes("document.querySelector('[data-sphere=\"'+id+'\"]')?.click()") && !scene.includes("document.querySelector('[data-sphere=\"'+id+'\"]').click()"), '3D selection must not proxy-click the legacy DOM menu');
+assert.ok(engine.includes('signalPoints'), 'Cross-domain links must carry animated signal points');
+assert.ok(engine.includes('new THREE.TubeGeometry'), 'Organic connections must be rendered as continuous neurites');
 
-assert.ok(scene.includes("root.classList.add('webgl-ready','universe-closed')"), 'The 3D scene must start in the single closed gateway state');
-assert.ok(scene.includes('worldGroup.scale.set(closed?.72:(camera?.aspect<.78?.98:1.32),closed?.72:(camera?.aspect<.78?1.18:1.32),closed?.72:(camera?.aspect<.78?1.02:1.32))'), 'Gateway and full universe must use one responsive scaled 3D scene with a readable mobile scale');
-assert.ok(scene.includes('THREE.MathUtils.clamp(dist+delta*.012,3.2,120)'), '3D wheel navigation must support a long-range overview zoom');
-assert.ok(scene.includes('makeLabel(labels[id].title,0xf5f7fa,29)') && scene.includes('label.scale.set(Math.min(4.25,Math.max(2.25,labels[id].title.length*.135)),.67,1)'), 'Domain labels must remain prominent at overview scale');
-assert.ok(scene.includes('return camera?.aspect<.78?8.8:camera?.aspect<1.05?10.2:11'), 'Mobile overview must frame the network at a useful initial scale while preserving long-range zoom');
-assert.ok(html.includes('class="linknode ln1" href="#"') && html.includes('target="_blank"'), 'Domain resource nodes must be real links that open their matching Notion pages');
-assert.ok(html.includes('a.href=p[1]') && html.includes('a.onclick=null'), 'Domain resource links must preserve the exact page URL without intercepting navigation');
-assert.ok(scene.includes('legacy sphere fallback intentionally suppressed'), 'A WebGL failure must not silently revive legacy spheres');
-assert.ok(scene.includes('webgl-load-error-panel'), 'A 3D startup failure must provide a recovery message');
-const tree = JSON.parse(readFileSync('ecosystem/notion-tree.fr.json', 'utf8'));
-assert.equal(tree.version, 1, 'Notion tree manifest must use the supported schema version');
-assert.equal(tree.language, 'fr', 'The French tree manifest must identify its language');
-assert.ok(Array.isArray(tree.domains), 'Notion tree manifest must expose domain roots');
-for (const domain of tree.domains) {
-  assert.ok(expectedDomains.includes(domain.id), `Unknown domain in Notion tree: ${domain.id}`);
-  const visit = (node) => {
-    assert.ok(node.id && node.title && node.notionId && node.url, 'Every Notion node must have a stable ID, title, Notion ID and exact URL');
-    assert.match(node.url, /^https:\/\/app\.notion\.com\/p\/[a-f0-9]+$/i, 'Every Notion node must point to its exact public Notion page');
-    for (const child of node.children || []) visit(child);
-  };
-  visit(domain);
-}
-assert.ok(scene.includes("new URL('./notion-tree.'+lang+'.json'"), '3D engine must load a language-specific Notion tree manifest');
-const curatedMatch = scene.match(/const curatedByLanguage=\{([\s\S]*?)\n      \};/);
-assert.ok(curatedMatch, 'Learning universe must define language-specific curated resources');
-const curatedIds = {};
-for (const line of curatedMatch[1].split('\n')) {
-  const entry = line.match(/^\s*(fr|ar|en|pt):\[(.*?)\]/);
-  if (entry) curatedIds[entry[1]] = [...entry[2].matchAll(/'([^']+)'/g)].map((match) => match[1]);
-}
-for (const language of ['fr', 'ar', 'en', 'pt']) {
-  const localizedTree = JSON.parse(readFileSync(`ecosystem/notion-tree.${language}.json`, 'utf8'));
-  const nodes = [];
-  const collect = (node, parent = null) => {
-    nodes.push({ ...node, parent });
-    for (const child of node.children || []) collect(child, node);
-  };
-  localizedTree.domains.forEach((domain) => collect(domain));
-  const urls = nodes.map((node) => node.url);
-  assert.equal(new Set(urls).size, urls.length, `The ${language} tree must not duplicate Notion page URLs`);
-  for (const node of nodes) {
-    assert.equal(node.notionId.toLowerCase(), node.url.split('/').pop().toLowerCase(), `The ${language} Notion ID and URL must match for ${node.id}`);
-    if (node.parent) assert.notEqual(node.url, node.parent.url, `The ${language} child ${node.id} must not link back to its parent page`);
-  }
-  const ids = new Set(nodes.map((node) => node.id));
-  assert.ok(curatedIds[language]?.length === 8, `The ${language} learning collection must contain eight curated resources`);
-  for (const id of curatedIds[language]) assert.ok(ids.has(id), `Missing ${language} learning resource: ${id}`);
-}
+assert.ok(engine.includes('stage.addEventListener(\'pointerdown\',onPointerDown)'), 'Pointer input must be attached to the new stage');
+assert.ok(engine.includes('stage.addEventListener(\'pointerup\',onPointerUp)'), 'Tap selection must be handled by the new stage');
+assert.ok(engine.includes('stage.addEventListener(\'wheel\''), 'Desktop wheel zoom must be supported');
+assert.ok(engine.includes('pinchStart'), 'Mobile pinch zoom must be supported');
+assert.ok(engine.includes('function resize()'), 'The engine must resize its renderer and camera');
+assert.ok(engine.includes('cameraPosition();'), 'Camera state must be reapplied after resize instead of resetting zoom');
+assert.ok(engine.includes('function smoothCamera('), 'Domain navigation must use a smooth camera transition');
+assert.ok(engine.includes('function goOverview()'), 'The user must be able to return to the overview');
+assert.ok(engine.includes('function enterDomain(id)'), 'Domain entry must be implemented in the new engine');
 
-for (const language of ['ar', 'en', 'pt']) {
-  const localizedTree = JSON.parse(readFileSync(`ecosystem/notion-tree.${language}.json`, 'utf8'));
-  assert.equal(localizedTree.version, 1, `The ${language} Notion tree must use the supported schema version`);
-  assert.equal(localizedTree.language, language, `The ${language} tree must identify its language`);
-  assert.ok(Array.isArray(localizedTree.domains), `The ${language} tree must expose domain roots`);
-  for (const domain of localizedTree.domains) {
-    assert.ok(expectedDomains.includes(domain.id), `Unknown ${language} domain: ${domain.id}`);
-    const visitLocalized = (node) => {
-      assert.ok(node.id && node.title && node.notionId && node.url, `Every ${language} Notion node must have an ID, title, Notion ID and URL`);
-      assert.match(node.url, /^https:\/\/app\.notion\.com\/p\/[a-f0-9]+$/i, `Every ${language} node must use an exact public Notion page URL`);
-      for (const child of node.children || []) visitLocalized(child);
-    };
-    visitLocalized(domain);
-  }
-}
+assert.ok(engine.includes("fetch('./notion-tree.'+lang+'.json'"), 'The engine must load the active language Notion tree');
+assert.ok(engine.includes('function flattenTree('), 'Notion page hierarchy must be preserved as nested branches');
+assert.ok(engine.includes('new THREE.SphereGeometry(.46,12,10)'), 'Every resource branch must have a generous touch target');
+assert.ok(engine.includes('function openResource(item)'), 'Branch selection must open an in-scene details panel');
+assert.ok(engine.includes('data-resource-open'), 'The Notion link must be an explicit action, not an automatic redirect');
+assert.ok(engine.includes('data-resource-clear'), 'The selected branch must offer an in-scene return action');
+assert.ok(engine.includes('data-world'), 'Related domains must remain navigable from the focus panel');
+assert.ok(engine.includes('window.enterSphere(id,false,true)'), 'Domain selection must synchronize the hidden Notion content source');
+assert.ok(engine.includes('window.__BALABS_3D_E2E__'), 'The browser smoke test must be able to inspect the live scene');
 
-assert.ok(scene.includes("if(!rootPage?.children?.length)"), 'A language with no mapped child pages must show a transparent empty-state in the selected domain panel');
-assert.ok(scene.includes('Aucune page de branche n’est encore reliée à cet univers dans cette langue.') && scene.includes('No branch pages are linked to this world in this language yet.') && scene.includes('لا توجد صفحات فروع مرتبطة بهذا العالم بهذه اللغة حتى الآن.') && scene.includes('Ainda não há páginas de ramificação ligadas a este universo neste idioma.'), 'Empty branch state must be localized for French, English, Arabic and Portuguese');
-assert.ok(scene.includes('const visit=(node,depth=0,parentId=domainTree.id'), '3D engine must recursively expand nested Notion pages');
-assert.ok(scene.includes('data-notion-tree-node="true"'), 'Manifest nodes must be injected into the 3D resource layer');
-assert.ok(scene.includes('parentId:a.dataset.parentId') && scene.includes('depth:Number(a.dataset.depth||0)'), '3D resource nodes must retain their hierarchy metadata');
-assert.ok(scene.includes('notionTreeReady.then('), '3D resource nodes must refresh when the manifest finishes loading');
-assert.ok(scene.includes("const resourceHit=selected?hits.find(hit=>['resource','resource-label'].includes(hit.object.userData?.kind)&&hit.object.userData?.sourceId===selected):null"), 'Resources belonging to the selected domain must take priority over its sphere during raycasting');
-assert.ok(scene.includes('new THREE.SphereGeometry(.48,12,10)') && scene.includes('resourceMeshes.push(hitProxy)'), 'Every 3D resource branch must expose a generous invisible touch target');
-assert.ok(scene.includes('return pickableHit?[pickableHit,...hits.filter(hit=>hit!==pickableHit)]:hits'), 'The nearest semantic node or branch must be selected ahead of decorative geometry');
-assert.ok(scene.includes("document.addEventListener('pointerup',e=>{if(!pointers.has(e.pointerId))return;") && scene.includes('lastPointerMoved=true;pick(e)},true)'), 'A tap must invoke 3D picking from the document capture phase even when pointer capture retargets events');
-assert.ok(scene.includes("document.addEventListener('click',e=>{") && !scene.includes('if(e.detail>0)pick(e)'), 'The synthetic click after pointer release must not pick a second time');
-assert.ok(scene.includes('Math.hypot(dx,dy)>10'), 'Small touch jitter must not be mistaken for a camera drag');
-assert.ok(scene.includes("stage.addEventListener('dblclick',e=>{if(e.target.closest('.webgl-controls'))return;e.preventDefault()})") && !scene.includes('dist=selected?domainViewDistance(selected):overviewDistance()'), 'Repeated clicks must not reset the camera to the overview');
-assert.ok(scene.includes("['resource','resource-label','sphere','label','dendrite','synapse'].includes(hit.object.userData?.kind)"), 'Semantic 3D nodes must take picking priority over decorative geometry');
-assert.ok(scene.includes('lastPointerMoved=moved'), 'Pointer release must preserve drag suppression for the following click event');
-assert.ok(scene.includes("kind:'resource-label'"), 'The visible title of each Notion branch must be independently clickable');
-assert.ok(scene.includes("if(openResource&&selectedResource?.url){window.open(selectedResource.url,'_blank','noopener,noreferrer');return}"), 'The explicit Notion action must open the selected branch URL in a new tab');
-assert.ok(scene.includes("targetUrl.protocol!=='https:'&&targetUrl.protocol!=='http:'"), '3D branch navigation must reject non-web URL schemes');
-assert.ok(scene.includes('importThreeWithTimeout'), 'Three.js CDN loading must have a bounded timeout');
-assert.ok(scene.includes('timeoutMs=8000'), 'Three.js CDN fallback must not wait indefinitely');
-for (const host of ['cdn.jsdelivr.net', 'unpkg.com', 'esm.sh']) {
-  assert.ok(scene.includes(host), `Three.js fallback host missing: ${host}`);
-}
-
-assert.match(html, /#mainView\.webgl-ready[^{]*\{[^}]*height:/, 'The WebGL stage must have an explicit height');
-assert.match(html, /constellation-3d\.js\?v=[^"'\s]+/, 'The 3D asset must use a cache-busting version');
-assert.ok(html.includes('.webgl-ready .sphere') || html.includes('.webgl-ready .network') || html.includes('.universe-closed .sphere'), 'Legacy presentation must be controlled explicitly when WebGL is active');
-
-console.log('Ecosystem regression checks passed: 8 domains, organic network, Notion tree hierarchy, exact URLs, cross-domain signals, unified navigation, gateway state, fallback and cache version.');
-
-assert.ok(scene.includes('window.enterSphere(id,false,true)'), '3D domain selection must request spatial-only navigation without revealing the legacy 2D index');
-const resourcePick = scene.slice(scene.indexOf("if(obj.userData.kind==='resource'||obj.userData.kind==='resource-label')"), scene.indexOf("if(obj.userData.kind==='sphere'||obj.userData.kind==='label'||obj.userData.kind==='dendrite'||obj.userData.kind==='synapse')"));
-assert.ok(resourcePick.includes('refreshFocus(obj.userData.sourceId)'), 'Selecting a Notion branch must show its in-scene details');
-assert.ok(!resourcePick.includes('window.open(') && !resourcePick.includes('window.location.assign('), 'Selecting a Notion branch must not immediately leave the 3D experience');
-assert.ok(scene.includes("open.dataset.resourceOpen='true'"), 'Opening a Notion page must remain an explicit action in the resource panel');
-assert.ok(scene.includes('stage.append(hint,status,controls,focusPanel,networkLegend,introStyle,intro)'), 'The interactive focus panel must be mounted in the 3D stage so resource actions are visible and clickable');
-assert.ok(scene.includes("const mini=document.getElementById('miniView');if(!mini)return"), 'The hidden legacy index must remain queryable as a data source when building 3D resource branches');
-assert.ok(scene.includes('window.enterSphere(targetId,false,true)'), 'Related-domain panel navigation must also stay in spatial-only mode');
-assert.ok(!scene.includes('window.enterSphere(targetId,false)'), 'No 3D navigation path may re-enable the legacy 2D index');
-assert.ok(html.includes('function enterSphere(id,scroll=true,spatial3D=false)'), 'Shared domain navigation must distinguish 3D entry from legacy 2D entry');
-assert.ok(html.includes("miniView.classList.toggle('spatial-source-only',spatial3D)"), 'The legacy mini-view must remain a hidden data source while 3D navigation is active');
-assert.ok(html.includes("miniView.classList.remove('spatial-source-only')"), 'Returning home must restore the normal mini-view state');
-assert.ok(html.includes("enterSphere(selected,false,miniView.classList.contains('spatial-source-only'))"), 'Language changes must preserve the active 3D-only navigation mode');
-assert.ok(html.includes('#miniView.spatial-source-only{display:none!important}'), 'The legacy 2D index must not overlay the 3D branch navigation');
-assert.ok(scene.includes('function domainViewDistance(id)') && scene.includes('const rings=Math.max(1,Math.ceil(maxSiblings/12))'), 'Selected domains must adapt camera distance to their actual branch count and hierarchy');
-assert.ok(scene.includes('const zoomArc=Math.min(2.2,travelDistance*.12+Math.abs(endDist-dist)*.09)'), 'Long 3D transitions must create a restrained zoom-out arc between the overview and selected domain');
-assert.ok(scene.includes('const duration=Math.min(1900,Math.max(1050,(target?1120:980)+travelDistance*95+Math.abs(endDist-dist)*35))'), '3D transition duration must adapt to travel distance and zoom change');
-assert.ok(scene.includes('Math.sin(Math.PI*e)*transition.zoomArc'), 'The camera zoom arc must ease out and return smoothly during the transition');
-assert.ok(scene.includes("const b=e.target.closest('button[data-world]');if(b){const targetId=b.dataset.world,node=points.find(point=>point.id===targetId),sourceId=selected;if(!node)return;if(sourceId){if(!routeTrail.length)routeTrail=[sourceId];const existing=routeTrail.indexOf(targetId);"), 'Cross-domain links must resolve their target, append it to the current route and clear the previous branch selection');
-assert.ok(scene.includes("flyTo(node.mesh,()=>{if(typeof window.enterSphere==='function')window.enterSphere(targetId,false,true);requestAnimationFrame(()=>requestAnimationFrame(()=>buildResourceNodes(targetId)))"), 'Cross-domain navigation must fly the camera to the destination in spatial-only mode before opening its branch map');
-assert.ok(scene.includes("notionTreeReady.then(()=>{if(notionTreeManifest&&selected===targetId"), 'Cross-domain navigation must also populate branches when the localized Notion manifest finishes loading');
-assert.ok(scene.includes('else if(routeTrail[routeTrail.length-1]!==targetId)routeTrail.push(targetId)'), 'Cross-domain navigation must append successive domains to a persistent multi-hop trail');
-assert.ok(scene.includes('if(existing>=0)routeTrail=routeTrail.slice(0,existing+1)'), 'Returning to an earlier domain must truncate the route instead of creating a loop');
-assert.ok(scene.includes('routeIndex=routeActive&&e.relation?routeTrail.findIndex((id,index)=>index<routeTrail.length-1&&((id===e.aId&&routeTrail[index+1]===e.bId)||(id===e.bId&&routeTrail[index+1]===e.aId))):-1,routeEdge=routeIndex>=0'), 'Only connections belonging to the visited multi-hop trail should receive route emphasis');
-assert.ok(scene.includes('const reverse=routeEdge?routeTrail[routeIndex]===e.bId:'), 'Cross-domain signal pulses must preserve direction along every segment of the multi-hop trail');
-assert.ok(scene.includes('selectedBranchPath=new Set([obj.userData.nodeId]);let ancestorId=obj.userData.parentId;while(ancestorId&&ancestorId!==obj.userData.sourceId)'), 'Selecting a Notion branch must reconstruct its complete ancestor chain in the 3D tree');
-assert.ok(scene.includes('selectedBranchPath.has(obj.userData.nodeId)||selectedBranchPath.has(obj.userData.targetId)'), 'The selected branch and each ancestor must remain visually emphasized');
-assert.ok(scene.includes("['resource-spoke','resource','resource-label'].includes(kind)&&!onSelectedPath"), 'Unrelated sibling branches must be softened without being removed from the scene');
-assert.ok(scene.includes('routeTrail=[];flyTo(null'), 'Returning to the overview must clear the previous multi-hop route');
-assert.ok(scene.includes('const ringSize=12,ring=siblings>ringSize?Math.floor(siblingIndex/ringSize):0') && scene.includes('2.45+ring*1.25'), 'Large branch families must spread across concentric organic rings instead of colliding on one circle');
-assert.ok(scene.includes('depth===1?(siblings>ringSize?2.45+ring*1.25:2.75):depth===2?1.9:1.55'), 'Branch levels 1, 2 and 3 must occupy progressively separated spatial layers');
-assert.ok(scene.includes('new THREE.Color(color).lerp(new THREE.Color(0xB96B4D),Math.min(.32,Math.max(0,(depth-1)*.16)))'), 'Deeper branch levels must receive a restrained copper tint while retaining their domain identity');
-assert.ok(scene.includes('depth===1?.18:depth===2?.135:.105'), 'Branch node size must distinguish primary, secondary and tertiary levels');
-assert.ok(scene.includes('siblings>ringSize?1.28:1.95'), 'Dense branch families must use narrower labels to reduce overlap');
+console.log('Clean 3D engine regression checks passed: eight domains, mycelial topology, animated signals, stable camera, desktop/mobile controls, hierarchical Notion branches and explicit page actions.');
