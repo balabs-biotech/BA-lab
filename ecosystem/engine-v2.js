@@ -195,95 +195,70 @@ function smoothCamera(to,distTo,duration=950,done) {
 
 function clearResources() {
   for(const item of resourceObjects){world.remove(item);item.traverse?.(o=>{o.geometry?.dispose();if(o.material){if(Array.isArray(o.material))o.material.forEach(m=>m.dispose());else mDispose(o.material)}});if(item.geometry)item.geometry.dispose();if(item.material)mDispose(item.material)}
-  resourceObjects=[];pickables=pickables.filter(o=>o.userData?.kind!=='resource'&&o.userData?.kind!=='resource-label');
-  selectedBranch=null;
+  resourceObjects=[];pickables=pickables.filter(o=>o.userData?.kind!=='resource'&&o.userData?.kind!=='resource-label');selectedBranch=null;
 }
 function mDispose(material){material?.map?.dispose();material?.dispose?.()}
-
-function flattenTree(node,parent,depth,path,out) {
-  (node.children||[]).forEach(child=>{
-    const next=[...path,child.title];
-    out.push({...child,parentId:parent,depth,path:next.join(' / ')});
-    flattenTree(child,child.id,depth+1,next,out);
-  });
-}
 function makeResourceLabel(item,color) {
-  const label=makeLabel(item.title,color,item.depth===1?16:13);
-  label.scale.set(item.depth===1?2.4:2,.52,1);
-  label.userData={kind:'resource-label',...item};
-  return label;
+  const label=makeLabel(item.title,color,item.children?.length?15:13);
+  label.scale.set(item.children?.length?2.2:1.9,.46,1);label.userData={kind:'resource-label',...item};return label;
 }
-function buildResources(id) {
-  clearResources();
-  const domain=manifest?.domains?.find(d=>d.id===id);
-  if(!domain){showDomainPanel(id);return}
-  const flat=[];flattenTree(domain,domain.id,0,[domain.title],flat);
-  if(!flat.length){showDomainPanel(id,t('empty'));return}
-  const root=cells.get(id).position;
-  const childrenByParent=new Map();
-  flat.forEach(item=>{const list=childrenByParent.get(item.parentId)||[];list.push(item);childrenByParent.set(item.parentId,list)});
-  const positions=new Map([[domain.id,root.clone()]]);
-  const visit=(parentId,level,baseAngle,spread)=>{
-    const list=childrenByParent.get(parentId)||[];
-    list.forEach((item,index)=>{
-      const angle=baseAngle-spread/2+(index+.5)*spread/Math.max(1,list.length);
-      const ring=Math.floor(index/11),slot=index%11;
-      const radius=level===1?2.55+ring*.95:level===2?1.75:1.35;
-      const parent=positions.get(parentId)||root;
-      const pos=parent.clone().add(new THREE.Vector3(Math.cos(angle)*radius,Math.sin(angle)*radius*.76,Math.sin(angle*1.8+level)*.28));
-      positions.set(item.id,pos);
-      const col=new THREE.Color(COLORS[id]).lerp(new THREE.Color(0xb96b4d),Math.min(.28,(level-1)*.12));
-      const radiusNode=level===1?.16:level===2?.12:.09;
-      const mesh=new THREE.Mesh(new THREE.IcosahedronGeometry(radiusNode,1),new THREE.MeshStandardMaterial({color:col,emissive:col,emissiveIntensity:.55,roughness:.38}));
-      mesh.position.copy(pos);mesh.userData={kind:'resource',...item,sourceId:id};world.add(mesh);resourceObjects.push(mesh);pickables.push(mesh);
-      const hit=new THREE.Mesh(new THREE.SphereGeometry(.46,12,10),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));
-      hit.position.copy(pos);hit.userData={kind:'resource',...item,sourceId:id};world.add(hit);resourceObjects.push(hit);pickables.push(hit);
-      const label=makeResourceLabel({...item,sourceId:id},col);label.position.copy(pos).add(new THREE.Vector3(0,-.35,.02));world.add(label);resourceObjects.push(label);pickables.push(label);
-      const parentPos=parent.clone(),curve=new THREE.QuadraticBezierCurve3(parentPos,parentPos.clone().lerp(pos,.5).add(new THREE.Vector3(0,0,.15)),pos.clone());
-      const branch=new THREE.Mesh(new THREE.TubeGeometry(curve,16,.009,4,false),new THREE.MeshBasicMaterial({color:col,transparent:true,opacity:.52}));
-      world.add(branch);resourceObjects.push(branch);
-      if(level<3)visit(item.id,level+1,angle,Math.min(Math.PI*.95,spread/Math.max(1,list.length)*1.5));
-    });
-  };
-  visit(domain.id,1,-Math.PI/2,Math.PI*2);
-  showDomainPanel(id);
+function renderPath() {
+  if(!nav)return;nav.replaceChildren();
+  const crumbs=[{title:t('overview'),action:goOverview}];
+  if(selected)crumbs.push({title:LABELS[selected]?.title||selected,action:()=>{navigationStack=[];currentNode=manifest?.domains?.find(d=>d.id===selected)||null;currentAnchor=cells.get(selected).position.clone();buildResources(selected);smoothCamera(currentAnchor,7.5,650)}});
+  navigationStack.forEach((entry,index)=>crumbs.push({title:entry.node.title,action:()=>navigateToStack(index)}));
+  if(currentNode&&currentNode!==manifest?.domains?.find(d=>d.id===selected))crumbs.push({title:currentNode.title});
+  crumbs.forEach((crumb,index)=>{if(index){const sep=document.createElement('span');sep.className='sep';sep.textContent='›';nav.append(sep)}const b=document.createElement('button');b.type='button';b.textContent=crumb.title;if(index===crumbs.length-1)b.className='current';else b.addEventListener('click',crumb.action);nav.append(b)});
 }
-
+function navigateToStack(index) {
+  const entry=navigationStack[index];if(!entry)return;
+  navigationStack=navigationStack.slice(0,index);currentNode=entry.node;currentAnchor=entry.anchor.clone();
+  buildResources(selected,currentNode,currentAnchor);smoothCamera(currentAnchor,6.2,650);
+}
+function buildResources(id,parentNode=null,anchor=null) {
+  clearResources();const domain=manifest?.domains?.find(d=>d.id===id);if(!domain)return;
+  currentNode=parentNode||domain;currentAnchor=(anchor||cells.get(id).position).clone();
+  const children=currentNode.children||[];renderPath();
+  if(!children.length){status.textContent=(currentNode.title||domain.title).toUpperCase();return}
+  const count=children.length,golden=Math.PI*(3-Math.sqrt(5));
+  children.forEach((item,index)=>{
+    const angle=index*golden-Math.PI/2,ring=Math.floor(Math.sqrt(index+1));
+    const radius=2.0+ring*.38+Math.min(1.15,count*.022);
+    const pos=currentAnchor.clone().add(new THREE.Vector3(Math.cos(angle)*radius,Math.sin(angle)*radius*.78+((index%3)-1)*.14,Math.sin(angle*1.7)*.48));
+    const color=new THREE.Color(COLORS[id]).lerp(new THREE.Color(0xb96b4d),Math.min(.3,index/Math.max(1,count-1)*.24));
+    const hasChildren=!!item.children?.length,nodeRadius=hasChildren?.12:.075;
+    const node=new THREE.Mesh(new THREE.IcosahedronGeometry(nodeRadius,2),new THREE.MeshStandardMaterial({color,emissive:color,emissiveIntensity:hasChildren?.5:.27,roughness:.4,metalness:.08}));
+    node.position.copy(pos);node.userData={kind:'resource',...item,sourceId:id,position:pos,hasChildren};world.add(node);resourceObjects.push(node);pickables.push(node);
+    const hit=new THREE.Mesh(new THREE.SphereGeometry(.34,12,10),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));
+    hit.position.copy(pos);hit.userData={kind:'resource',...item,sourceId:id,position:pos,hasChildren};world.add(hit);resourceObjects.push(hit);pickables.push(hit);
+    const label=makeResourceLabel({...item,sourceId:id,position:pos,hasChildren},color);label.position.copy(pos).add(new THREE.Vector3(0,-.3,.04));world.add(label);resourceObjects.push(label);pickables.push(label);
+    const mid=currentAnchor.clone().lerp(pos,.52).add(new THREE.Vector3(0,0,.3));
+    const curve=new THREE.CatmullRomCurve3([currentAnchor.clone(),mid,pos.clone()]);
+    const branch=new THREE.Mesh(new THREE.TubeGeometry(curve,24,.012,5,false),new THREE.MeshStandardMaterial({color,emissive:color,emissiveIntensity:.22,transparent:true,opacity:.58}));
+    world.add(branch);resourceObjects.push(branch);
+    for(let fork=0;fork<2;fork++){const at=curve.getPoint(.48+fork*.18),tip=at.clone().add(new THREE.Vector3(Math.cos(angle+fork)*.32,Math.sin(angle+fork)*.25,.1));const twig=new THREE.CatmullRomCurve3([at,at.clone().lerp(tip,.55).add(new THREE.Vector3(0,.05,.06)),tip]);const filament=new THREE.Mesh(new THREE.TubeGeometry(twig,10,.0045,4,false),new THREE.MeshBasicMaterial({color,transparent:true,opacity:.34}));world.add(filament);resourceObjects.push(filament)}
+  });
+  status.textContent=(currentNode.title||domain.title).toUpperCase()+' · '+children.length+' '+t('children').toUpperCase();
+}
 function openResource(item) {
-  selectedBranch=item;
-  panel.hidden=false;panel.classList.add('has-world');panel.replaceChildren();
-  const kicker=document.createElement('span');kicker.className='webgl-focus-kicker';kicker.textContent=t('resource');
-  const title=document.createElement('strong');title.textContent=item.title;
-  const path=document.createElement('small');path.textContent=item.path||item.title;
-  const desc=document.createElement('small');desc.textContent=item.description||'';
-  const actions=document.createElement('div');actions.className='webgl-focus-actions';
-  const open=document.createElement('a');open.dataset.resourceOpen='true';open.href=item.url;open.target='_blank';open.rel='noopener noreferrer';open.textContent=t('openPage');
-  const back=document.createElement('button');back.type='button';back.dataset.resourceClear='true';back.textContent=t('back');back.addEventListener('click',()=>showDomainPanel(selected));
-  actions.append(open,back);panel.append(kicker,title,path);if(item.description)panel.append(desc);panel.append(actions);
+  const data=item.userData||item;
+  if(data.children?.length){navigationStack.push({node:currentNode,anchor:currentAnchor.clone()});currentNode=data;currentAnchor=data.position.clone();smoothCamera(currentAnchor,6.1,720,()=>buildResources(selected,currentNode,currentAnchor));return}
+  if(data.url){window.open(data.url,'_blank','noopener');return}
+  status.textContent=data.title||'';
 }
-function showDomainPanel(id,message='') {
-  const meta=LABELS[id]||{title:id,sub:''};panel.hidden=false;panel.classList.add('has-world');panel.replaceChildren();
-  const kicker=document.createElement('span');kicker.className='webgl-focus-kicker';kicker.textContent=t('domain');
-  const title=document.createElement('strong');title.textContent=meta.title;
-  const desc=document.createElement('small');desc.textContent=message||meta.sub;
-  const actions=document.createElement('div');actions.className='webgl-focus-actions';
-  const home=document.createElement('button');home.type='button';home.dataset.resourceClear='true';home.textContent=t('home');home.addEventListener('click',goOverview);actions.append(home);
-  panel.append(kicker,title,desc);
-  const related=LINKS.filter(([a,b])=>a===id||b===id).map(([a,b])=>a===id?b:a);
-  if(related.length){const sub=document.createElement('span');sub.className='webgl-focus-kicker';sub.style.marginTop='14px';sub.textContent=t('related');panel.append(sub);
-    related.forEach(other=>{const btn=document.createElement('button');btn.type='button';btn.className='webgl-focus-link';btn.dataset.world=other;btn.innerHTML='<span></span><b>↗</b>';btn.querySelector('span').textContent=LABELS[other]?.title||other;btn.addEventListener('click',()=>enterDomain(other));panel.append(btn)})}
-  panel.append(actions);
-}
+function showDomainPanel(id,message='') {if(message)status.textContent=message;renderPath()}
 function enterDomain(id) {
-  if(!cells.has(id))return;
-  selected=id;selectedBranch=null;opened=true;intro.hidden=true;ROOT.classList.remove('universe-closed');ROOT.classList.add('universe-open');
-  panel.hidden=true;panel.replaceChildren();
+  if(!cells.has(id))return;selected=id;selectedBranch=null;opened=true;navigationStack=[];currentNode=manifest?.domains?.find(d=>d.id===id)||null;currentAnchor=cells.get(id).position.clone();
+  intro.hidden=true;nav.hidden=false;ROOT.classList.remove('universe-closed');ROOT.classList.add('universe-open');panel.hidden=true;panel.replaceChildren();
   if(typeof window.enterSphere==='function')window.enterSphere(id,false,true);
-  const pos=cells.get(id).position;
-  smoothCamera(pos,7.5,900,()=>{buildResources(id);status.textContent=(LABELS[id]?.title||id).toUpperCase()+' · BA LABS'});
+  smoothCamera(cells.get(id).position,7.5,900,()=>buildResources(id));
+}
+function goBackLevel() {
+  if(navigationStack.length){const previous=navigationStack.pop();currentNode=previous.node;currentAnchor=previous.anchor.clone();smoothCamera(currentAnchor,6.2,650,()=>buildResources(selected,currentNode,currentAnchor));return}
+  if(selected)goOverview();
 }
 function goOverview() {
-  selected=null;selectedBranch=null;clearResources();panel.hidden=true;panel.replaceChildren();
+  selected=null;selectedBranch=null;navigationStack=[];currentNode=null;currentAnchor=null;clearResources();nav?.replaceChildren();nav.hidden=true;panel.hidden=true;panel.replaceChildren();
   if(typeof document.getElementById('homeBtn')?.click==='function')document.getElementById('homeBtn').click();
   else {const mini=document.getElementById('miniView');mini?.classList.remove('spatial-source-only');if(mini)mini.hidden=true}
   smoothCamera(new THREE.Vector3(0,0,0),13.5,850,()=>{status.textContent='BALABS / LIVING NETWORK'});
