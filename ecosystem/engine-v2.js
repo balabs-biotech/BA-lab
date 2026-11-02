@@ -306,7 +306,7 @@ function setupUI() {
   stage.addEventListener('wheel',e=>{if(e.target.closest('.webgl-controls,.webgl-focus'))return;e.preventDefault();distance=THREE.MathUtils.clamp(distance+e.deltaY*.012,3.5,42);cameraPosition()},{passive:false});
   stage.addEventListener('pointerdown',onPointerDown);
   stage.addEventListener('pointermove',onPointerMove);
-  stage.addEventListener('pointerup',onPointerUp);
+  document.addEventListener('pointerup',onPointerUp,true);
   stage.addEventListener('pointercancel',onPointerCancel);
   stage.addEventListener('lostpointercapture',onLostCapture);
   stage.addEventListener('contextmenu',e=>e.preventDefault());
