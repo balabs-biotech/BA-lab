@@ -21,7 +21,7 @@ assert.ok(engine.includes('signalPoints'), 'Cross-domain links must carry animat
 assert.ok(engine.includes('new THREE.TubeGeometry'), 'Organic connections must be rendered as continuous neurites');
 
 assert.ok(engine.includes('stage.addEventListener(\'pointerdown\',onPointerDown)'), 'Pointer input must be attached to the new stage');
-assert.ok(engine.includes('stage.addEventListener(\'pointerup\',onPointerUp)'), 'Tap selection must be handled by the new stage');
+assert.ok(engine.includes("document.addEventListener('pointerup',onPointerUp,true)"), 'Tap selection must be captured at document level');
 assert.ok(engine.includes('stage.addEventListener(\'wheel\''), 'Desktop wheel zoom must be supported');
 assert.ok(engine.includes('pinchStart'), 'Mobile pinch zoom must be supported');
 assert.ok(engine.includes('function resize()'), 'The engine must resize its renderer and camera');
