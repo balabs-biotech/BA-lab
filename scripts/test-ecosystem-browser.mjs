@@ -109,20 +109,42 @@ async function checkWorkingScene(name, viewport) {
   await page.waitForFunction(() => !document.querySelector('#mainView .webgl-stage')?.classList.contains('is-transitioning'), undefined, { timeout: 8000 });
   await page.waitForFunction(() => typeof window.__BALABS_3D_E2E__ === 'function', undefined, { timeout: 5000 });
   await page.waitForFunction(() => (window.__BALABS_3D_E2E__()?.visible || 0) > 0, undefined, { timeout: 15000 }).catch(async error => { throw new Error('No 3D branch is visible for a real tap: ' + JSON.stringify(await page.evaluate(() => window.__BALABS_3D_E2E__())) + ' — ' + error.message); });
-  const branchTarget = await page.evaluate(() => window.__BALABS_3D_E2E__().target);
-  if (name === 'mobile') await page.touchscreen.tap(branchTarget.x, branchTarget.y); else await page.mouse.click(branchTarget.x, branchTarget.y);
-  await page.waitForFunction(() => {
-    const panel = document.querySelector('.webgl-focus');
-    return panel && !panel.hidden && panel.querySelector('[data-resource-open]') && panel.querySelector('[data-resource-clear]');
-  }, undefined, { timeout: 8000 }).catch(async error => { throw new Error('3D resource tap did not open its Notion panel: ' + JSON.stringify(await page.evaluate(() => ({probe:window.__BALABS_3D_E2E__?.(),lastPick:window.__BALABS_3D_LAST_PICK__,pickTrace:window.__BALABS_3D_PICK_TRACE__,clicks:window.__BALABS_3D_E2E_CLICKS,focus:document.querySelector('.webgl-focus')?.outerHTML?.slice(0,1200)}))) + ' — ' + error.message); });
-  assert.ok(await page.locator('.webgl-focus [data-resource-open]').isVisible(), name + ': clicking a 3D branch must reveal its Notion action');
-  assert.ok(await page.locator('.webgl-focus [data-resource-clear]').isVisible(), name + ': selected branch must offer an in-scene return action');
-  await page.locator('.webgl-focus [data-resource-clear]').click({force:true});
-  await page.waitForFunction(() => { const panel=document.querySelector('.webgl-focus'); return panel && !panel.hidden && panel.classList.contains('has-world') && !panel.querySelector('[data-resource-open]'); }, undefined, { timeout: 5000 });
-  if (name === 'mobile') await page.locator('.webgl-controls [data-camera="out"]').click();
-  else await canvas.dispatchEvent('wheel', { deltaY: 350, bubbles: true, cancelable: true });
+  let navigated = false;
+  let openedNotion = false;
+  for (let level = 0; level < 8; level++) {
+    await page.waitForFunction(() => (window.__BALABS_3D_E2E__()?.visible || 0) > 0, undefined, { timeout: 12000 });
+    const probe = await page.evaluate(() => window.__BALABS_3D_E2E__());
+    const branchTarget = probe.target;
+    assert.ok(branchTarget, name + ': no spatial folder/page target was found');
+    if (branchTarget.hasChildren) {
+      const depthBefore = probe.depth;
+      if (name === 'mobile') await page.touchscreen.tap(branchTarget.x, branchTarget.y);
+      else await page.mouse.click(branchTarget.x, branchTarget.y);
+      await page.waitForFunction((before) => (window.__BALABS_3D_E2E__()?.depth || 0) > before, depthBefore, { timeout: 8000 });
+      navigated = true;
+      await page.waitForFunction(() => !document.querySelector('#mainView .webgl-stage')?.classList.contains('is-transitioning'), undefined, { timeout: 8000 });
+      continue;
+    }
+    assert.ok(branchTarget.url, name + ': terminal branch must carry its Notion destination');
+    const popupPromise = page.waitForEvent('popup', { timeout: 10000 });
+    if (name === 'mobile') await page.touchscreen.tap(branchTarget.x, branchTarget.y);
+    else await page.mouse.click(branchTarget.x, branchTarget.y);
+    const popup = await popupPromise;
+    await popup.waitForLoadState('domcontentloaded', { timeout: 12000 }).catch(() => {});
+    assert.match(popup.url(), /notion\\.(so|site|com)/i, name + ': terminal branch must open its Notion page');
+    await popup.close();
+    openedNotion = true;
+    break;
+  }
+  assert.ok(navigated, name + ': tapping a folder must reveal a deeper spatial level');
+  assert.ok(openedNotion, name + ': tapping a terminal page must open Notion');
+  const depthBeforeBack = await page.evaluate(() => window.__BALABS_3D_E2E__()?.depth || 0);
+  assert.ok(depthBeforeBack > 0, name + ': nested navigation depth was not retained');
+  await page.locator('.webgl-controls [data-camera="back"]').click();
+  await page.waitForFunction((before) => (window.__BALABS_3D_E2E__()?.depth || 0) < before, depthBeforeBack, { timeout: 8000 });
+  await page.locator('.webgl-controls [data-camera="back"]').click();
   await page.waitForFunction(() => window.__BALABS_3D_E2E__()?.selected === null && document.querySelector('#miniView')?.hidden,
-    undefined, { timeout: 8000 }).catch(async error => { throw new Error(name + ': zooming out must return from the selected domain to the overview: ' + JSON.stringify(await page.evaluate(() => window.__BALABS_3D_E2E__())) + ' — ' + error.message); });
+    undefined, { timeout: 8000 }).catch(async error => { throw new Error(name + ': returning through the hierarchy must reach the overview: ' + JSON.stringify(await page.evaluate(() => window.__BALABS_3D_E2E__())) + ' — ' + error.message); });
   await page.screenshot({ path: outputDir + '/' + name + '-universe.png', fullPage: false });
 
   assert.deepEqual(pageErrors, [], name + ': uncaught browser errors detected');
