@@ -283,6 +283,7 @@ function buildResources(id,parentNode=null,anchor=null) {
 }
 function openResource(item) {
   const data=item.userData||item;
+  if(window.__BALABS_3D_E2E__)window.__BALABS_3D_LAST_OPEN__={title:data.title,kind:data.kind,children:data.children?.length||0,parent:data.parentNode?.title||null,depth:data.depth,stackBefore:navigationStack.length};
   if(data.children?.length){
     const ancestors=[];let parent=data.parentNode;
     while(parent&&parent!==currentNode){ancestors.unshift(parent);parent=parent.parentNode}
@@ -379,7 +380,7 @@ function pickAt(x,y) {
     const branchLabels=resourceObjects.filter(o=>o.userData?.kind==='resource-label');
     let nearest=null,nearestDistance=Infinity;
     for(const label of branchLabels){const d=projectDistance(label);if(d<nearestDistance){nearest=label;nearestDistance=d}}
-    if(nearest&&nearestDistance<(window.innerWidth<760?92:112)){openResource(nearest.userData);return}
+    if(nearest&&nearestDistance<(window.innerWidth<760?92:112)){if(window.__BALABS_3D_E2E__)window.__BALABS_3D_LAST_PICK__={title:nearest.userData.title,kind:nearest.userData.kind,children:nearest.userData.children?.length||0,distance:nearestDistance};openResource(nearest.userData);return}
   }
   let nearestDomain=null,nearestDomainDistance=Infinity;
   for(const [id,item] of cells){const d=projectDistance(item.hit);if(d<nearestDomainDistance){nearestDomain=item;nearestDomainDistance=d}}
@@ -428,7 +429,7 @@ async function init() {
       const tappable=branches.filter(p=>{const el=document.elementFromPoint(p.x,p.y);return el===renderer.domElement||renderer.domElement.contains(el)});
       const targetBranch=(tappable.length?tappable:branches).sort((a,b)=>Math.hypot(a.x-center.x,a.y-center.y)-Math.hypot(b.x-center.x,b.y-center.y))[0]||null;
       const domain=cells.get('bio'),domainTarget=domain?project(domain.hit):null;
-      return{count:resourceObjects.filter(o=>o.userData?.kind==='resource-label').length,visible:branches.length,visibleDepths:[...new Set(resourceObjects.filter(o=>o.userData?.kind==='resource-label').map(o=>o.userData.depth??0))].sort(),target:targetBranch,domainTarget:domainTarget&&inside(domainTarget)?domainTarget:null,miniHidden:!!document.getElementById('miniView')?.hidden,transitioning:!!transition,selected,currentTitle:currentNode?.title||null,depth:navigationStack.length,childCount:currentNode?.children?.length||0,clickCount:window.__BALABS_3D_E2E_CLICKS||0,pointerDowns:window.__BALABS_3D_POINTERDOWN||0,pointerUps:window.__BALABS_3D_POINTERUP||0,pickCalls:window.__BALABS_3D_PICK_CALLS||0};
+      return{count:resourceObjects.filter(o=>o.userData?.kind==='resource-label').length,visible:branches.length,visibleDepths:[...new Set(resourceObjects.filter(o=>o.userData?.kind==='resource-label').map(o=>o.userData.depth??0))].sort(),target:targetBranch,domainTarget:domainTarget&&inside(domainTarget)?domainTarget:null,lastPick:window.__BALABS_3D_LAST_PICK__||null,lastOpen:window.__BALABS_3D_LAST_OPEN__||null,miniHidden:!!document.getElementById('miniView')?.hidden,transitioning:!!transition,selected,currentTitle:currentNode?.title||null,depth:navigationStack.length,childCount:currentNode?.children?.length||0,clickCount:window.__BALABS_3D_E2E_CLICKS||0,pointerDowns:window.__BALABS_3D_POINTERDOWN||0,pointerUps:window.__BALABS_3D_POINTERUP||0,pickCalls:window.__BALABS_3D_PICK_CALLS||0};
     };
     animate();
   } catch(error){showFailure(error)}
