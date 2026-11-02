@@ -34,8 +34,8 @@ assert.ok(engine.includes("fetch('./notion-tree.'+lang+'.json'"), 'The engine mu
 assert.ok(engine.includes('function flattenTree('), 'Notion page hierarchy must be preserved as nested branches');
 assert.ok(engine.includes('new THREE.SphereGeometry(.46,12,10)'), 'Every resource branch must have a generous touch target');
 assert.ok(engine.includes('function openResource(item)'), 'Branch selection must open an in-scene details panel');
-assert.ok(engine.includes('data-resource-open'), 'The Notion link must be an explicit action, not an automatic redirect');
-assert.ok(engine.includes('data-resource-clear'), 'The selected branch must offer an in-scene return action');
+assert.ok(engine.includes("open.dataset.resourceOpen='true'"), 'The Notion link must be an explicit action, not an automatic redirect');
+assert.ok(engine.includes("back.dataset.resourceClear='true'"), 'The selected branch must offer an in-scene return action');
 assert.ok(engine.includes('data-world'), 'Related domains must remain navigable from the focus panel');
 assert.ok(engine.includes('window.enterSphere(id,false,true)'), 'Domain selection must synchronize the hidden Notion content source');
 assert.ok(engine.includes('window.__BALABS_3D_E2E__'), 'The browser smoke test must be able to inspect the live scene');
