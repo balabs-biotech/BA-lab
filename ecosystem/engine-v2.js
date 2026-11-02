@@ -124,10 +124,6 @@ function createWorld() {
   const key=new THREE.PointLight(0xa6c1ad,24,35);key.position.set(0,7,8);scene.add(key);
   const warm=new THREE.PointLight(0xb96b4d,9,26);warm.position.set(7,-3,3);scene.add(warm);
   const fill=new THREE.PointLight(0x78958a,15,32);fill.position.set(-7,-2,-5);scene.add(fill);
-  const bg=new THREE.BufferGeometry(), bgPoints=[];
-  for(let i=0;i<520;i++){const r=18+Math.random()*30,a=Math.random()*Math.PI*2,b=(Math.random()-.5)*Math.PI;bgPoints.push(Math.cos(a)*Math.cos(b)*r,Math.sin(b)*r*.65,Math.sin(a)*Math.cos(b)*r)}
-  bg.setAttribute('position',new THREE.Float32BufferAttribute(bgPoints,3));
-  const dust=new THREE.Points(bg,new THREE.PointsMaterial({color:0xa9b8aa,size:.035,transparent:true,opacity:.32,depthWrite:false}));world.add(dust);
   for(const id of IDS){
     const color=COLORS[id],pos=new THREE.Vector3(...POS[id]);
     const group=new THREE.Group();group.position.copy(pos);group.userData={id,kind:'domain'};
@@ -303,7 +299,7 @@ function setupUI() {
   stage.append(hint,status,controls,panel,intro);ROOT.append(stage);
   document.getElementById('homeBtn')?.addEventListener('click',()=>{if(selected)goOverview()});
   document.addEventListener('keydown',e=>{if(e.key==='Escape'&&selected)goOverview()});
-  stage.addEventListener('wheel',e=>{if(e.target.closest('.webgl-controls,.webgl-focus'))return;e.preventDefault();distance=THREE.MathUtils.clamp(distance+e.deltaY*.012,3.5,42);cameraPosition()},{passive:false});
+  stage.addEventListener('wheel',e=>{if(e.target.closest('.webgl-controls,.webgl-focus'))return;e.preventDefault();const nextDistance=THREE.MathUtils.clamp(distance+e.deltaY*.012,3.5,42);if(selected&&e.deltaY>0&&nextDistance>10.4){goOverview();return}distance=nextDistance;cameraPosition()},{passive:false});
   stage.addEventListener('pointerdown',onPointerDown);
   stage.addEventListener('pointermove',onPointerMove);
   document.addEventListener('pointerup',onPointerUp,true);
@@ -321,7 +317,7 @@ function onPointerDown(e) {
 }
 function onPointerMove(e) {
   if(pointers.has(e.pointerId))pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
-  if(pointers.size>=2){const p=[...pointers.values()],d=Math.hypot(p[0].x-p[1].x,p[0].y-p[1].y);if(pinchStart)distance=THREE.MathUtils.clamp(distance-(d-pinchStart)*.035,3.5,42);pinchStart=d;moved=true;cameraPosition();return}
+  if(pointers.size>=2){const p=[...pointers.values()],d=Math.hypot(p[0].x-p[1].x,p[0].y-p[1].y);if(pinchStart)distance=THREE.MathUtils.clamp(distance-(d-pinchStart)*.035,3.5,42);pinchStart=d;moved=true;if(selected&&distance>10.4){goOverview();return}cameraPosition();return}
   if(!dragging||!lastPointer)return;
   const dx=e.clientX-lastPointer.x,dy=e.clientY-lastPointer.y;
   if(Math.hypot(dx,dy)>7){moved=true;dragGesture=true}
