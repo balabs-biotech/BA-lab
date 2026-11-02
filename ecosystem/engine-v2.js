@@ -61,7 +61,7 @@ function addStyles() {
     #mainView .webgl-controls{position:absolute;right:14px;top:14px;z-index:16;display:flex;gap:6px}
     #mainView .webgl-controls button{width:38px;height:38px;border:1px solid #7b948766;border-radius:12px;background:#172724e8;color:#e5e9df;font:500 21px/1 system-ui;cursor:pointer;backdrop-filter:blur(12px)}
     #mainView .webgl-controls button:hover{background:#344a42;border-color:#b6c8b7}
-    #mainView .webgl-path{position:absolute;left:16px;top:14px;z-index:14;display:flex;align-items:center;gap:5px;max-width:min(560px,calc(100% - 120px));overflow-x:auto;padding:7px 9px;border:1px solid #78958a66;border-radius:12px;background:#142321e8;backdrop-filter:blur(14px);color:#e8eee7;font:600 10px system-ui;white-space:nowrap}
+    #mainView .webgl-path{position:absolute;left:16px;top:60px;z-index:14;display:flex;align-items:center;gap:5px;max-width:min(560px,calc(100% - 210px));overflow-x:auto;padding:7px 9px;border:1px solid #78958a66;border-radius:12px;background:#142321e8;backdrop-filter:blur(14px);color:#e8eee7;font:600 10px system-ui;white-space:nowrap}
     #mainView .webgl-path button{border:0;background:transparent;color:#dce8dc;padding:4px 5px;border-radius:6px;font:inherit;cursor:pointer}
     #mainView .webgl-path button:hover{background:#385044}
     #mainView .webgl-path .sep{color:#8fa99a}
