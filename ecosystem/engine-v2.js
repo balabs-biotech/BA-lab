@@ -281,17 +281,21 @@ function setupUI() {
   document.getElementById('homeBtn')?.addEventListener('click',()=>{if(selected)goOverview()});
   document.addEventListener('keydown',e=>{if(e.key==='Escape'&&selected)goBackLevel()});
   stage.addEventListener('wheel',e=>{if(e.target.closest('.webgl-controls,.webgl-focus'))return;e.preventDefault();const nextDistance=THREE.MathUtils.clamp(distance+e.deltaY*.012,3.5,42);if(selected&&e.deltaY>0&&nextDistance>9.5){goBackLevel();return}distance=nextDistance;cameraPosition()},{passive:false});
-  // Capture pointer sequences at document level: mobile browsers can retarget
-  // a canvas pointer during touch/pointer capture, bypassing stage listeners.
-  document.addEventListener('pointerdown',onPointerDown,true);
-  document.addEventListener('pointermove',onPointerMove,true);
+  // Pointer input belongs to the stage so mouse, pen and touch-generated
+  // pointer events follow the same path. Keep the document-level pointer-up
+  // capture as a safety net for browsers that retarget capture during a drag.
+  stage.addEventListener('pointerdown',onPointerDown);
+  stage.addEventListener('pointermove',onPointerMove);
+  stage.addEventListener('pointerup',onPointerUp);
   document.addEventListener('pointerup',onPointerUp,true);
   stage.addEventListener('pointercancel',onPointerCancel);
-  // Explicit touch fallback for mobile browsers that do not deliver a complete
-  // pointer sequence to the canvas after pointer capture.
+  // Direct stage touch fallback for mobile browsers that omit pointer events.
   let touchFallback=null;
-  document.addEventListener('touchstart',e=>{if(e.touches.length===1){const p=e.touches[0];touchFallback={x:p.clientX,y:p.clientY,at:performance.now()}}},{passive:true,capture:true});
-  document.addEventListener('touchend',e=>{if(!touchFallback)return;const p=e.changedTouches[0],start=touchFallback;touchFallback=null;if(!p||Math.hypot(p.clientX-start.x,p.clientY-start.y)>12)return;if(performance.now()-lastPickAt>450)pickAt(p.clientX,p.clientY)},{passive:true,capture:true});
+  const rememberTouch=e=>{if(e.touches.length===1){const p=e.touches[0];touchFallback={x:p.clientX,y:p.clientY,at:performance.now()}}};
+  const finishTouch=e=>{if(!touchFallback)return;const p=e.changedTouches[0],start=touchFallback;touchFallback=null;if(!p||Math.hypot(p.clientX-start.x,p.clientY-start.y)>12)return;if(performance.now()-lastPickAt>450)pickAt(p.clientX,p.clientY)};
+  stage.addEventListener('touchstart',rememberTouch,{passive:true});
+  stage.addEventListener('touchend',finishTouch,{passive:true});
+  stage.addEventListener('touchcancel',()=>{touchFallback=null},{passive:true});
 
   document.addEventListener('click',e=>{if(!e.detail||dragGesture||!renderer)return;if(e.target.closest?.('.webgl-controls,.webgl-focus,.webgl-intro'))return;const r=renderer.domElement.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)return;if(performance.now()-lastPickAt>450)pickAt(e.clientX,e.clientY)},true);
   stage.addEventListener('lostpointercapture',onLostCapture);
@@ -319,12 +323,13 @@ function onPointerUp(e) {
   if(!wasPointer)return;
   if(pointers.size){moved=true;return}
   dragging=false;
-  if(!moved&&!transition&&!e.target.closest('.webgl-controls,.webgl-focus,.webgl-intro'))pickAt(e.clientX,e.clientY);
+  if(!moved&&!transition&&performance.now()-lastPickAt>450&&!e.target.closest('.webgl-controls,.webgl-focus,.webgl-intro'))pickAt(e.clientX,e.clientY);
   lastPointer=null;
 }
 function onPointerCancel(){pointers.clear();dragging=false;moved=true;pinchStart=0;lastPointer=null}
 function onLostCapture(e){if(pointers.has(e.pointerId)){pointers.delete(e.pointerId);if(!pointers.size){dragging=false;lastPointer=null}}}
 function pickAt(x,y) {
+  lastPickAt=performance.now();
   const rect=renderer.domElement.getBoundingClientRect();
   camera.updateMatrixWorld(true);world.updateMatrixWorld(true);
   const screenPoint=obj=>{
