@@ -30,7 +30,7 @@ assert.ok(engine.includes('function smoothCamera('), 'Domain navigation must use
 assert.ok(engine.includes('function goOverview()'), 'The user must be able to return to the overview');
 assert.ok(engine.includes('function enterDomain(id)'), 'Domain entry must be implemented in the new engine');
 
-assert.ok(engine.includes("fetch('./notion-tree.'+lang+'.json'"), 'The engine must load the active language Notion tree');
+assert.ok(engine.includes("fetch('./notion-tree.'+LANG()+'.json'"), 'The engine must load the active language Notion tree');
 assert.ok(engine.includes('function flattenTree('), 'Notion page hierarchy must be preserved as nested branches');
 assert.ok(engine.includes('new THREE.SphereGeometry(.46,12,10)'), 'Every resource branch must have a generous touch target');
 assert.ok(engine.includes('function openResource(item)'), 'Branch selection must open an in-scene details panel');
