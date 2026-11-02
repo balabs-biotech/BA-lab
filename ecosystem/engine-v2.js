@@ -45,7 +45,7 @@ let selected = null, selectedBranch = null, manifest = null, transition = null;
 let distance = 13.5, theta = .22, phi = 1.27, target = null, targetGoal = null;
 let opened = false, raf = 0, lastFrame = 0, dragging = false, moved = false, dragGesture = false;
 let lastPointer = null, pointers = new Map(), pinchStart = 0, pinchDistance = 0, hoverId = null;
-let canvasRect = null, cameraInitialized = false;
+let canvasRect = null, cameraInitialized = false, lastPickAt = 0;
 
 function addStyles() {
   const style = document.createElement('style');
@@ -307,7 +307,7 @@ function setupUI() {
   stage.addEventListener('pointerdown',onPointerDown);
   stage.addEventListener('pointermove',onPointerMove);
   document.addEventListener('pointerup',onPointerUp,true);
-  stage.addEventListener('pointercancel',onPointerCancel);
+  stage.addEventListener('pointercancel',onPointerCancel);\n  document.addEventListener('click',e=>{if(!e.detail||moved||!renderer)return;if(e.target.closest?.('.webgl-controls,.webgl-focus,.webgl-intro'))return;const r=renderer.domElement.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)return;if(performance.now()-lastPickAt>450)pickAt(e.clientX,e.clientY)},true);
   stage.addEventListener('lostpointercapture',onLostCapture);
   stage.addEventListener('contextmenu',e=>e.preventDefault());
   window.addEventListener('resize',resize);
@@ -382,7 +382,7 @@ async function init() {
       const center={x:rect.left+rect.width/2,y:rect.top+rect.height/2};
       const targetBranch=branches.sort((a,b)=>Math.hypot(a.x-center.x,a.y-center.y)-Math.hypot(b.x-center.x,b.y-center.y))[0]||null;
       const domain=cells.get('bio'),domainTarget=domain?project(domain.hit):null;
-      return{count:resourceObjects.filter(o=>o.userData?.kind==='resource-label').length,visible:branches.length,target:targetBranch,domainTarget:domainTarget&&inside(domainTarget)?domainTarget:null,miniHidden:!!document.getElementById('miniView')?.hidden,transitioning:!!transition,selected,clickCount:window.__BALABS_3D_E2E_CLICKS||0};
+      return{count:resourceObjects.filter(o=>o.userData?.kind==='resource-label').length,visible:branches.length,target:targetBranch,domainTarget:domainTarget&&inside(domainTarget)?domainTarget:null,miniHidden:!!document.getElementById('miniView')?.hidden,transitioning:!!transition,selected,clickCount:window.__BALABS_3D_E2E_CLICKS||0,pointerDowns:window.__BALABS_3D_POINTERDOWN||0,pointerUps:window.__BALABS_3D_POINTERUP||0,pickCalls:window.__BALABS_3D_PICK_CALLS||0};
     };
     animate();
   } catch(error){showFailure(error)}
