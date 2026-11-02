@@ -353,7 +353,7 @@ function animate(now=0) {
   raf=requestAnimationFrame(animate);
   const dt=Math.min(.05,(now-lastFrame)/1000||0);lastFrame=now;
   if(world){
-    world.rotation.y+=dt*.018;
+    // Keep domain anchors world-stable; only cells pulse, so pointer targets never drift.
     for(const item of signalPoints){const p=item.curve.getPoint((now*.000075+item.offset)%1);item.pulse.position.copy(p)}
     for(const [id,item] of cells){const phase=now*.0006+IDS.indexOf(id)*.7;item.soma.scale.setScalar(.98+Math.sin(phase)*.018);item.group.rotation.y=Math.sin(phase*.6)*.035}
   }
