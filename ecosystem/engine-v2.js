@@ -230,6 +230,235 @@ function buildResources(id,parentNode=null,anchor=null) {
   const children=currentNode.children||[];renderPath();
   if(!children.length){status.textContent=(currentNode.title||domain.title).toUpperCase();return}
   const baseColor=new THREE.Color(COLORS[id]),accent=new THREE.Color(0xb96b4d);
+  const addFilament=(points,color,radius,opacity)=>{
+    const curve=new THREE.CatmullRomCurve3(points);
+    const mesh=new THREE.Mesh(new THREE.TubeGeometry(curve,18,radius,4,false),new THREE.MeshStandardMaterial({color,emissive:color,emissiveIntensity:.18,transparent:true,opacity,roughness:.65}));
+    world.add(mesh);resourceObjects.push(mesh);return curve;
+  };
+  const drawNode=(item,pos,depth,parent,angle,index)=>{
+    const hasChildren=!!item.children?.length;
+    const color=baseColor.clone().lerp(accent,Math.min(.34,depth*.12+(index%3)*.025));
+    const radius=depth===0?(hasChildren?.135:.105):depth===1?(hasChildren?.085:.065):.043;
+    item.position=pos.clone();
+    const data={kind:'resource',...item,sourceId:id,position:pos.clone(),hasChildren,depth,parentNode:parent};
+    const node=new THREE.Mesh(new THREE.IcosahedronGeometry(radius,1),new THREE.MeshStandardMaterial({color,emissive:color,emissiveIntensity:depth===0?.42:.24,roughness:.48,metalness:.04,transparent:depth===2,opacity:depth===2?.78:1}));
+    node.position.copy(pos);node.userData=data;world.add(node);resourceObjects.push(node);pickables.push(node);
+    const hit=new THREE.Mesh(new THREE.SphereGeometry(depth===0?.32:depth===1?.25:.19,10,8),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));
+    hit.position.copy(pos);hit.userData=data;world.add(hit);resourceObjects.push(hit);pickables.push(hit);
+    if(depth<2){
+      const label=makeResourceLabel(data,color,depth);label.position.copy(pos).add(new THREE.Vector3(0,depth===0?-.28:-.19,.025));
+      world.add(label);resourceObjects.push(label);pickables.push(label);
+    }
+    const parentPos=parent===currentNode?currentAnchor:(parent.position||currentAnchor);
+    const mid=parentPos.clone().lerp(pos,.52).add(new THREE.Vector3(0,.12+depth*.035,.12));
+    const curve=addFilament([parentPos.clone(),mid,pos.clone()],color,depth===0?.012:depth===1?.007:.004,depth===0?.66:depth===1?.52:.38);
+    if(depth<2)for(let fork=0;fork<2;fork++){
+      const at=curve.getPoint(.46+fork*.2),sign=fork===0?-1:1;
+      const tip=at.clone().add(new THREE.Vector3(Math.cos(angle+sign*.8)*(.24-depth*.045),Math.sin(angle+sign*.8)*(.2-depth*.04),.045));
+      addFilament([at,at.clone().lerp(tip,.55).add(new THREE.Vector3(0,.045,.025)),tip],color,.0035-depth*.0006,.28);
+    }
+    if(depth>=2||!hasChildren)return;
+    const descendants=item.children||[],spread=Math.min(1.2,.32+descendants.length*.105);
+    descendants.forEach((child,childIndex)=>{
+      const fraction=descendants.length===1?0:(childIndex/(descendants.length-1)-.5);
+      const childAngle=angle+fraction*spread*2+(childIndex%2?-.08:.08);
+      const distance=depth===0?(.88+Math.min(.25,descendants.length*.018)):.48;
+      const childPos=pos.clone().add(new THREE.Vector3(Math.cos(childAngle)*distance,Math.sin(childAngle)*distance*.82+((childIndex%3)-1)*.035,.04+((childIndex%2)*.035)));
+      drawNode(child,childPos,depth+1,item,childAngle,childIndex);
+    });
+  };
+  children.forEach((item,index)=>{
+    const angle=(index/Math.max(1,children.length))*Math.PI*2-Math.PI/2+(index%2)*.11;
+    const radius=2.15+(index%3)*.16;
+    const pos=currentAnchor.clone().add(new THREE.Vector3(Math.cos(angle)*radius,Math.sin(angle)*radius*.78,Math.sin(angle*1.6)*.34));
+    drawNode(item,pos,0,currentNode,angle,index);
+  });
+  status.textContent=(currentNode.title||domain.title).toUpperCase()+' · '+children.length+' '+t('children').toUpperCase();
+}
+function openResource(item) {
+  const data=item.userData||item;
+  if(data.children?.length){
+    const ancestors=[];let parent=data.parentNode;
+    while(parent&&parent!==currentNode){ancestors.unshift(parent);parent=parent.parentNode}
+    if(parent===currentNode){
+      navigationStack.push({node:currentNode,anchor:currentAnchor.clone()});
+      for(const ancestor of ancestors)navigationStack.push({node:ancestor,anchor:ancestor.position.clone()});
+    }
+    currentNode=data;currentAnchor=data.position.clone();
+    smoothCamera(currentAnchor,6.1,720,()=>buildResources(selected,currentNode,currentAnchor));return;
+  }
+  if(data.url){window.open(data.url,'_blank','noopener');return}
+  status.textContent=data.title||'';
+}
+function showDomainPanel(id,message='') {if(message)status.textContent=message;renderPath()}
+function enterDomain(id) {
+  if(!cells.has(id))return;selected=id;selectedBranch=null;opened=true;navigationStack=[];currentNode=manifest?.domains?.find(d=>d.id===id)||null;currentAnchor=cells.get(id).position.clone();
+  intro.hidden=true;nav.hidden=false;ROOT.classList.remove('universe-closed');ROOT.classList.add('universe-open');panel.hidden=true;panel.replaceChildren();
+  if(typeof window.enterSphere==='function')window.enterSphere(id,false,true);
+  smoothCamera(cells.get(id).position,7.5,900,()=>buildResources(id));
+}
+function goBackLevel() {
+  if(navigationStack.length){const previous=navigationStack.pop();currentNode=previous.node;currentAnchor=previous.anchor.clone();smoothCamera(currentAnchor,6.2,650,()=>buildResources(selected,currentNode,currentAnchor));return}
+  if(selected)goOverview();
+}
+function goOverview() {
+  selected=null;selectedBranch=null;navigationStack=[];currentNode=null;currentAnchor=null;clearResources();nav?.replaceChildren();nav.hidden=true;panel.hidden=true;panel.replaceChildren();
+  if(typeof document.getElementById('homeBtn')?.click==='function')document.getElementById('homeBtn').click();
+  else {const mini=document.getElementById('miniView');mini?.classList.remove('spatial-source-only');if(mini)mini.hidden=true}
+  smoothCamera(new THREE.Vector3(0,0,0),13.5,850,()=>{status.textContent='BALABS / LIVING NETWORK'});
+}
+function showFailure(error) {
+  console.error('BA Labs clean 3D engine failed',error);
+  ROOT.classList.remove('webgl-ready','universe-open','universe-closed');ROOT.classList.add('webgl-load-error');ROOT.querySelectorAll('.network,.galaxy,.hub,.sphere').forEach(el=>el.style.display='none');
+  const p=document.createElement('div');p.className='webgl-load-error-panel';p.style.cssText='min-height:380px;display:grid;place-items:center;padding:30px;text-align:center;color:#e8eee8;background:#172321;border-radius:18px';
+  const inner=document.createElement('div');const title=document.createElement('strong');title.textContent=LANG()==='fr'?'Le réseau 3D ne peut pas démarrer':'The 3D network could not start';const retry=document.createElement('button');retry.textContent='↻';retry.addEventListener('click',()=>location.reload());inner.append(title,document.createElement('br'),retry);p.append(inner);ROOT.append(p);
+}
+
+function setupUI() {
+  stage=document.createElement('div');stage.className='webgl-stage';stage.tabIndex=0;stage.setAttribute('role','application');stage.setAttribute('aria-label','BA Labs interactive biological network');
+  hint=document.createElement('div');hint.className='webgl-hint';hint.textContent=t('hint');
+  status=document.createElement('div');status.className='webgl-status';status.textContent='BALABS / LIVING NETWORK';window.__BALABS_3D_STATUS=status;
+  panel=document.createElement('section');panel.className='webgl-focus';panel.hidden=true;panel.setAttribute('aria-live','polite');
+  nav=document.createElement('nav');nav.className='webgl-path';nav.setAttribute('aria-label','Navigation dans les dossiers');nav.hidden=true;
+  const controls=document.createElement('div');controls.className='webgl-controls';controls.innerHTML='<button type="button" data-camera="back" aria-label="Niveau précédent">‹</button><button type="button" data-camera="out" aria-label="Zoom arrière">−</button><button type="button" data-camera="in" aria-label="Zoom avant">+</button><button type="button" data-camera="reset" aria-label="Recentrer">⌖</button>';
+  intro=document.createElement('button');intro.type='button';intro.className='webgl-intro';intro.innerHTML='<span class="webgl-intro-card"><span class="webgl-intro-orb"><b>BA</b></span><span class="webgl-intro-copy">BALABS · APPLIED BIOTECHNOLOGY</span><span class="webgl-intro-cta">'+t('open')+'</span></span>';
+  intro.addEventListener('click',()=>{opened=true;intro.hidden=true;nav.hidden=false;ROOT.classList.remove('universe-closed');ROOT.classList.add('universe-open');status.textContent='BALABS / LIVING NETWORK'});
+  controls.addEventListener('click',e=>{const action=e.target.closest('button')?.dataset.camera;if(action==='back'){goBackLevel();return}if(action==='in')distance=Math.max(3.5,distance*.82);if(action==='out'){if(selected){goOverview();return}distance=Math.min(42,distance*1.2)}if(action==='reset'){goOverview();return}cameraPosition()});
+  stage.append(hint,status,controls,nav,panel,intro);ROOT.append(stage);
+  document.getElementById('homeBtn')?.addEventListener('click',()=>{if(selected)goOverview()});
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&selected)goBackLevel()});
+  stage.addEventListener('wheel',e=>{if(e.target.closest('.webgl-controls,.webgl-focus'))return;e.preventDefault();const nextDistance=THREE.MathUtils.clamp(distance+e.deltaY*.012,3.5,42);if(selected&&e.deltaY>0&&nextDistance>9.5){goBackLevel();return}distance=nextDistance;cameraPosition()},{passive:false});
+  stage.addEventListener('pointerdown',onPointerDown);
+  stage.addEventListener('pointermove',onPointerMove);
+  document.addEventListener('pointerup',onPointerUp,true);
+  stage.addEventListener('pointercancel',onPointerCancel);
+  document.addEventListener('click',e=>{if(!e.detail||moved||!renderer)return;if(e.target.closest?.('.webgl-controls,.webgl-focus,.webgl-intro'))return;const r=renderer.domElement.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)return;if(performance.now()-lastPickAt>450)pickAt(e.clientX,e.clientY)},true);
+  stage.addEventListener('lostpointercapture',onLostCapture);
+  stage.addEventListener('contextmenu',e=>e.preventDefault());
+  window.addEventListener('resize',resize);
+}
+function onPointerDown(e) {
+  if(e.target.closest('.webgl-controls,.webgl-focus,.webgl-intro'))return;
+  pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});stage.setPointerCapture?.(e.pointerId);
+  if(pointers.size===2){const p=[...pointers.values()];pinchStart=Math.hypot(p[0].x-p[1].x,p[0].y-p[1].y);dragging=true;moved=true;return}
+  dragging=true;moved=false;dragGesture=false;lastPointer={x:e.clientX,y:e.clientY};
+}
+function onPointerMove(e) {
+  if(pointers.has(e.pointerId))pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
+  if(pointers.size>=2){const p=[...pointers.values()],d=Math.hypot(p[0].x-p[1].x,p[0].y-p[1].y);if(pinchStart)distance=THREE.MathUtils.clamp(distance-(d-pinchStart)*.035,3.5,42);pinchStart=d;moved=true;if(selected&&distance>9.5){goBackLevel();return}cameraPosition();return}
+  if(!dragging||!lastPointer)return;
+  const dx=e.clientX-lastPointer.x,dy=e.clientY-lastPointer.y;
+  if(Math.hypot(dx,dy)>7){moved=true;dragGesture=true}
+  if(dragGesture){theta-=dx*.0045;phi=THREE.MathUtils.clamp(phi+dy*.0045,.35,2.78);cameraPosition()}
+  lastPointer={x:e.clientX,y:e.clientY};
+}
+function onPointerUp(e) {
+  const wasPointer=pointers.has(e.pointerId);pointers.delete(e.pointerId);
+  if(pointers.size<2)pinchStart=0;
+  if(!wasPointer)return;
+  if(pointers.size){moved=true;return}
+  dragging=false;
+  if(!moved&&!transition&&!e.target.closest('.webgl-controls,.webgl-focus,.webgl-intro'))pickAt(e.clientX,e.clientY);
+  lastPointer=null;
+}
+function onPointerCancel(){pointers.clear();dragging=false;moved=true;pinchStart=0;lastPointer=null}
+function onLostCapture(e){if(pointers.has(e.pointerId)){pointers.delete(e.pointerId);if(!pointers.size){dragging=false;lastPointer=null}}}
+function pickAt(x,y) {
+  const rect=renderer.domElement.getBoundingClientRect();
+  camera.updateMatrixWorld(true);world.updateMatrixWorld(true);
+  const screenPoint=obj=>{
+    const p=obj.getWorldPosition(new THREE.Vector3()).project(camera);
+    if(p.z<-1||p.z>1)return{x:Infinity,y:Infinity,d:Infinity};
+    const sx=rect.left+(p.x+1)*rect.width/2,sy=rect.top+(1-p.y)*rect.height/2;
+    return{x:sx,y:sy,d:Math.hypot(sx-x,sy-y)};
+  };
+  if(!selected){
+    let nearest=null,nearestDistance=Infinity;
+    for(const item of cells.values()){const p=screenPoint(item.hit);if(p.d<nearestDistance){nearest=item;nearestDistance=p.d}}
+    if(nearest&&nearestDistance<(window.innerWidth<760?72:88)){enterDomain(nearest.group.userData.id);return}
+    return;
+  }
+  // The active folder owns all taps while inside a universe: never let an
+  // overlapping neighbouring universe steal a branch selection.
+  const labels=resourceObjects.filter(o=>o.userData?.kind==='resource-label');
+  let nearestLabel=null,nearestLabelDistance=Infinity;
+  for(const label of labels){const p=screenPoint(label);if(p.d<nearestLabelDistance){nearestLabel=label;nearestLabelDistance=p.d}}
+  if(nearestLabel&&nearestLabelDistance<(window.innerWidth<760?104:118)){
+    if(window.__BALABS_3D_E2E__)window.__BALABS_3D_LAST_PICK__={title:nearestLabel.userData.title,kind:nearestLabel.userData.kind,children:nearestLabel.userData.children?.length||0,distance:nearestLabelDistance};
+    openResource(nearestLabel.userData);return;
+  }
+  let nearestNode=null,nearestNodeDistance=Infinity;
+  for(const node of resourceObjects.filter(o=>o.userData?.kind==='resource'&&o.userData.depth>0)){
+    const p=screenPoint(node);if(p.d<nearestNodeDistance){nearestNode=node;nearestNodeDistance=p.d}
+  }
+  if(nearestNode&&nearestNodeDistance<(window.innerWidth<760?48:56)){openResource(nearestNode.userData);return}
+}
+
+function animate(now=0) {
+  raf=requestAnimationFrame(animate);
+  const dt=Math.min(.05,(now-lastFrame)/1000||0);lastFrame=now;
+  if(world){
+    // Keep domain anchors world-stable; only cells pulse, so pointer targets never drift.
+    for(const item of signalPoints){const p=item.curve.getPoint((now*.000075+item.offset)%1);item.pulse.position.copy(p)}
+    for(const [id,item] of cells){const phase=now*.0006+IDS.indexOf(id)*.7;const pulse=1+Math.sin(phase)*.012;item.soma.scale.set((id==='soil'?.62:.56)*pulse,(id==='lab'?.48:id==='myco'?.66:.61)*pulse,(id==='myco'?.66:.55)*pulse);item.group.rotation.y=Math.sin(phase*.6)*.018}
+  }
+  renderer.render(scene,camera);
+}
+
+async function init() {
+  try {
+    if(!ROOT)throw new Error('Missing #mainView');
+    THREE=await importThree();
+    addStyles();
+    ROOT.classList.add('webgl-ready','universe-closed');ROOT.classList.remove('universe-open','webgl-load-error');
+    ROOT.querySelectorAll('.hub,.sphere,.network,.galaxy').forEach(el=>el.style.display='none');
+    setupUI();
+    renderer=new THREE.WebGLRenderer({antialias:true,alpha:true,powerPreference:'high-performance'});
+    renderer.setPixelRatio(Math.min(devicePixelRatio||1,1.5));renderer.setClearColor(0x000000,0);renderer.outputColorSpace=THREE.SRGBColorSpace;
+    stage.prepend(renderer.domElement);renderer.domElement.setAttribute('aria-label','BA Labs 3D network canvas');
+    scene=new THREE.Scene();camera=new THREE.PerspectiveCamera(46,1,.1,180);raycaster=new THREE.Raycaster();pointer=new THREE.Vector2();target=new THREE.Vector3();
+    createWorld();resize();cameraInitialized=true;
+    const loadManifest=()=>fetch('./notion-tree.'+LANG()+'.json',{cache:'no-cache'}).then(r=>r.ok?r.json():null).then(data=>{if(data?.version===1&&Array.isArray(data.domains)){manifest=data;if(selected&&!transition)buildResources(selected,currentNode,currentAnchor)}}).catch(()=>{});loadManifest();new MutationObserver(()=>{hint.textContent=t('hint');loadManifest()}).observe(document.documentElement,{attributes:true,attributeFilter:['lang']});
+    window.__BALABS_3D_E2E__=()=>{
+      const rect=renderer.domElement.getBoundingClientRect();
+      const project=obj=>{const p=obj.getWorldPosition(new THREE.Vector3()).project(camera);return{x:rect.left+(p.x+1)*rect.width/2,y:rect.top+(1-p.y)*rect.height/2,z:p.z,title:obj.userData.title||obj.userData.id,hasChildren:!!obj.userData.hasChildren,depth:obj.userData.depth??0,url:obj.userData.url||null}};
+      const inside=p=>p.z>-1&&p.z<1&&p.x>=rect.left&&p.x<=rect.right&&p.y>=rect.top&&p.y<=rect.bottom;
+      const branches=resourceObjects.filter(o=>o.userData?.kind==='resource-label').map(project).filter(inside);
+      const center={x:rect.left+rect.width/2,y:rect.top+rect.height/2};
+      const tappable=branches.filter(p=>{const el=document.elementFromPoint(p.x,p.y);return el===renderer.domElement||renderer.domElement.contains(el)});
+      const targetBranch=(tappable.length?tappable:branches).sort((a,b)=>Math.hypot(a.x-center.x,a.y-center.y)-Math.hypot(b.x-center.x,b.y-center.y))[0]||null;
+      const domain=cells.get('bio'),domainTarget=domain?project(domain.hit):null;
+      return{count:resourceObjects.filter(o=>o.userData?.kind==='resource-label').length,visible:branches.length,visibleDepths:[...new Set(resourceObjects.filter(o=>o.userData?.kind==='resource').map(o=>o.userData.depth??0))].sort(),target:targetBranch,domainTarget:domainTarget&&inside(domainTarget)?domainTarget:null,lastPick:window.__BALABS_3D_LAST_PICK__||null,lastOpen:window.__BALABS_3D_LAST_OPEN__||null,miniHidden:!!document.getElementById('miniView')?.hidden,transitioning:!!transition,selected,currentTitle:currentNode?.title||null,depth:navigationStack.length,childCount:currentNode?.children?.length||0,clickCount:window.__BALABS_3D_E2E_CLICKS||0,pointerDowns:window.__BALABS_3D_POINTERDOWN||0,pointerUps:window.__BALABS_3D_POINTERUP||0,pickCalls:window.__BALABS_3D_PICK_CALLS||0};
+    };
+    animate();
+  } catch(error){showFailure(error)}
+}
+init();function makeResourceLabel(item,color,depth=0) {
+  const size=depth===0?15:depth===1?12:10;
+  const label=makeLabel(item.title,color,size);
+  const scale=depth===0?2.0:depth===1?1.35:.9;
+  label.scale.set(scale,depth===0?.44:depth===1?.32:.22,1);
+  label.userData={kind:'resource-label',...item};return label;
+}
+function renderPath() {
+  if(!nav)return;nav.replaceChildren();
+  const crumbs=[{title:t('overview'),action:goOverview}];
+  if(selected)crumbs.push({title:LABELS[selected]?.title||selected,action:()=>{navigationStack=[];currentNode=manifest?.domains?.find(d=>d.id===selected)||null;currentAnchor=cells.get(selected).position.clone();buildResources(selected);smoothCamera(currentAnchor,7.5,650)}});
+  navigationStack.slice(1).forEach((entry,index)=>crumbs.push({title:entry.node.title,action:()=>navigateToStack(index+1)}));
+  if(currentNode&&currentNode!==manifest?.domains?.find(d=>d.id===selected))crumbs.push({title:currentNode.title});
+  crumbs.forEach((crumb,index)=>{if(index){const sep=document.createElement('span');sep.className='sep';sep.textContent='›';nav.append(sep)}const b=document.createElement('button');b.type='button';b.textContent=crumb.title;if(index===crumbs.length-1)b.className='current';else b.addEventListener('click',crumb.action);nav.append(b)});
+}
+function navigateToStack(index) {
+  const entry=navigationStack[index];if(!entry)return;
+  navigationStack=navigationStack.slice(0,index);currentNode=entry.node;currentAnchor=entry.anchor.clone();
+  buildResources(selected,currentNode,currentAnchor);smoothCamera(currentAnchor,6.2,650);
+}
+function buildResources(id,parentNode=null,anchor=null) {
+  clearResources();const domain=manifest?.domains?.find(d=>d.id===id);if(!domain)return;
+  currentNode=parentNode||domain;currentAnchor=(anchor||cells.get(id).position).clone();
+  const children=currentNode.children||[];renderPath();
+  if(!children.length){status.textContent=(currentNode.title||domain.title).toUpperCase();return}
+  const baseColor=new THREE.Color(COLORS[id]),accent=new THREE.Color(0xb96b4d);
   const maxDepth=2;
   const addFilament=(points,color,radius,opacity)=>{
     const curve=new THREE.CatmullRomCurve3(points);
