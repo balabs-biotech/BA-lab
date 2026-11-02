@@ -58,10 +58,10 @@ function addStyles() {
     #mainView .webgl-stage canvas{display:block;width:100%;height:100%;outline:none;touch-action:none}
     #mainView .webgl-stage .webgl-hint{position:absolute;left:16px;bottom:14px;z-index:8;padding:9px 12px;border:1px solid #78958a66;border-radius:999px;background:#142321d9;color:#e5e9df;font:600 9px/1.4 system-ui;letter-spacing:.08em;pointer-events:none;backdrop-filter:blur(12px)}
     #mainView .webgl-stage .webgl-status{position:absolute;right:16px;bottom:17px;z-index:8;color:#c2cfc5;font:600 9px system-ui;letter-spacing:.12em;pointer-events:none}
-    #mainView .webgl-controls{position:absolute;right:14px;top:14px;z-index:12;display:flex;gap:6px}
+    #mainView .webgl-controls{position:absolute;right:14px;top:14px;z-index:16;display:flex;gap:6px}
     #mainView .webgl-controls button{width:38px;height:38px;border:1px solid #7b948766;border-radius:12px;background:#172724e8;color:#e5e9df;font:500 21px/1 system-ui;cursor:pointer;backdrop-filter:blur(12px)}
     #mainView .webgl-controls button:hover{background:#344a42;border-color:#b6c8b7}
-    #mainView .webgl-path{position:absolute;left:16px;top:14px;z-index:14;display:flex;align-items:center;gap:5px;max-width:calc(100% - 120px);overflow-x:auto;padding:7px 9px;border:1px solid #78958a66;border-radius:12px;background:#142321e8;backdrop-filter:blur(14px);color:#e8eee7;font:600 10px system-ui;white-space:nowrap}
+    #mainView .webgl-path{position:absolute;left:16px;top:14px;z-index:14;display:flex;align-items:center;gap:5px;max-width:min(560px,calc(100% - 120px));overflow-x:auto;padding:7px 9px;border:1px solid #78958a66;border-radius:12px;background:#142321e8;backdrop-filter:blur(14px);color:#e8eee7;font:600 10px system-ui;white-space:nowrap}
     #mainView .webgl-path button{border:0;background:transparent;color:#dce8dc;padding:4px 5px;border-radius:6px;font:inherit;cursor:pointer}
     #mainView .webgl-path button:hover{background:#385044}
     #mainView .webgl-path .sep{color:#8fa99a}
@@ -84,7 +84,7 @@ function addStyles() {
     #mainView .webgl-intro-copy{color:#d6ded6;font:600 10px system-ui;letter-spacing:.17em}
     #mainView .webgl-intro-cta{border:1px solid #9eb7a2;border-radius:999px;padding:12px 17px;color:#f1f2e9;background:#21342edb;font:700 10px system-ui;letter-spacing:.1em}
     #mainView .webgl-stage.is-transitioning{cursor:progress}
-    @media(max-width:600px){#mainView .webgl-path{left:9px;top:52px;max-width:calc(100% - 78px);font-size:9px}#mainView .webgl-hint{left:9px;bottom:10px;max-width:calc(100% - 130px);font-size:7px;letter-spacing:.02em}#mainView .webgl-status{right:9px;bottom:12px;font-size:7px}#mainView .webgl-focus{left:9px;top:9px;padding:13px;width:min(270px,calc(100% - 78px))}#mainView .webgl-controls{right:9px;top:9px;gap:4px}#mainView .webgl-controls button{width:34px;height:34px}}
+    @media(max-width:600px){#mainView .webgl-path{left:9px;top:52px;max-width:min(260px,calc(100% - 78px));font-size:9px}#mainView .webgl-hint{left:9px;bottom:10px;max-width:calc(100% - 130px);font-size:7px;letter-spacing:.02em}#mainView .webgl-status{right:9px;bottom:12px;font-size:7px}#mainView .webgl-focus{left:9px;top:9px;padding:13px;width:min(270px,calc(100% - 78px))}#mainView .webgl-controls{right:9px;top:9px;gap:4px}#mainView .webgl-controls button{width:34px;height:34px}}
   `;
   document.head.append(style);
 }
