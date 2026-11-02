@@ -4153,3 +4153,10 @@ html,body{background:var(--bal-petrol)!important;color:var(--bal-mineral)!import
   }
 }
 </style>
+
+<style id="webgl-canvas-through-focus">
+/* Keep the scene directly tappable beneath the informational overlay;
+   the overlay's own action buttons remain interactive. */
+#mainView.webgl-ready .webgl-focus{pointer-events:none!important}
+#mainView.webgl-ready .webgl-focus button{pointer-events:auto!important}
+</style>
