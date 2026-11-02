@@ -270,6 +270,12 @@ function setupUI() {
   stage.addEventListener('pointermove',onPointerMove);
   document.addEventListener('pointerup',onPointerUp,true);
   stage.addEventListener('pointercancel',onPointerCancel);
+  // Explicit touch fallback for mobile browsers that do not deliver a complete
+  // pointer sequence to the canvas after pointer capture.
+  let touchFallback=null;
+  stage.addEventListener('touchstart',e=>{if(e.touches.length===1){const p=e.touches[0];touchFallback={x:p.clientX,y:p.clientY,at:performance.now()}}},{passive:true});
+  stage.addEventListener('touchend',e=>{if(!touchFallback)return;const p=e.changedTouches[0],start=touchFallback;touchFallback=null;if(!p||Math.hypot(p.clientX-start.x,p.clientY-start.y)>12)return;if(performance.now()-lastPickAt>450)pickAt(p.clientX,p.clientY)},{passive:true});
+
   document.addEventListener('click',e=>{if(!e.detail||moved||!renderer)return;if(e.target.closest?.('.webgl-controls,.webgl-focus,.webgl-intro'))return;const r=renderer.domElement.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)return;if(performance.now()-lastPickAt>450)pickAt(e.clientX,e.clientY)},true);
   stage.addEventListener('lostpointercapture',onLostCapture);
   stage.addEventListener('contextmenu',e=>e.preventDefault());
