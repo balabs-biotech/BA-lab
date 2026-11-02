@@ -421,14 +421,14 @@ async function init() {
     const loadManifest=()=>fetch('./notion-tree.'+LANG()+'.json',{cache:'no-cache'}).then(r=>r.ok?r.json():null).then(data=>{if(data?.version===1&&Array.isArray(data.domains)){manifest=data;if(selected&&!transition)buildResources(selected,currentNode,currentAnchor)}}).catch(()=>{});loadManifest();new MutationObserver(()=>{hint.textContent=t('hint');loadManifest()}).observe(document.documentElement,{attributes:true,attributeFilter:['lang']});
     window.__BALABS_3D_E2E__=()=>{
       const rect=renderer.domElement.getBoundingClientRect();
-      const project=obj=>{const p=obj.getWorldPosition(new THREE.Vector3()).project(camera);return{x:rect.left+(p.x+1)*rect.width/2,y:rect.top+(1-p.y)*rect.height/2,z:p.z,title:obj.userData.title||obj.userData.id,hasChildren:!!obj.userData.hasChildren,url:obj.userData.url||null}};
+      const project=obj=>{const p=obj.getWorldPosition(new THREE.Vector3()).project(camera);return{x:rect.left+(p.x+1)*rect.width/2,y:rect.top+(1-p.y)*rect.height/2,z:p.z,title:obj.userData.title||obj.userData.id,hasChildren:!!obj.userData.hasChildren,depth:obj.userData.depth??0,url:obj.userData.url||null}};
       const inside=p=>p.z>-1&&p.z<1&&p.x>=rect.left&&p.x<=rect.right&&p.y>=rect.top&&p.y<=rect.bottom;
       const branches=resourceObjects.filter(o=>o.userData?.kind==='resource-label').map(project).filter(inside);
       const center={x:rect.left+rect.width/2,y:rect.top+rect.height/2};
       const tappable=branches.filter(p=>{const el=document.elementFromPoint(p.x,p.y);return el===renderer.domElement||renderer.domElement.contains(el)});
       const targetBranch=(tappable.length?tappable:branches).sort((a,b)=>Math.hypot(a.x-center.x,a.y-center.y)-Math.hypot(b.x-center.x,b.y-center.y))[0]||null;
       const domain=cells.get('bio'),domainTarget=domain?project(domain.hit):null;
-      return{count:resourceObjects.filter(o=>o.userData?.kind==='resource-label').length,visible:branches.length,target:targetBranch,domainTarget:domainTarget&&inside(domainTarget)?domainTarget:null,miniHidden:!!document.getElementById('miniView')?.hidden,transitioning:!!transition,selected,currentTitle:currentNode?.title||null,depth:navigationStack.length,childCount:currentNode?.children?.length||0,clickCount:window.__BALABS_3D_E2E_CLICKS||0,pointerDowns:window.__BALABS_3D_POINTERDOWN||0,pointerUps:window.__BALABS_3D_POINTERUP||0,pickCalls:window.__BALABS_3D_PICK_CALLS||0};
+      return{count:resourceObjects.filter(o=>o.userData?.kind==='resource-label').length,visible:branches.length,visibleDepths:[...new Set(resourceObjects.filter(o=>o.userData?.kind==='resource-label').map(o=>o.userData.depth??0))].sort(),target:targetBranch,domainTarget:domainTarget&&inside(domainTarget)?domainTarget:null,miniHidden:!!document.getElementById('miniView')?.hidden,transitioning:!!transition,selected,currentTitle:currentNode?.title||null,depth:navigationStack.length,childCount:currentNode?.children?.length||0,clickCount:window.__BALABS_3D_E2E_CLICKS||0,pointerDowns:window.__BALABS_3D_POINTERDOWN||0,pointerUps:window.__BALABS_3D_POINTERUP||0,pickCalls:window.__BALABS_3D_PICK_CALLS||0};
     };
     animate();
   } catch(error){showFailure(error)}
