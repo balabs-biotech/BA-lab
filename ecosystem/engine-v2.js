@@ -209,7 +209,7 @@ function makeResourceLabel(item,color,depth=0) {
   const label=makeLabel(item.title,color,size);
   const scale=depth===0?2.0:depth===1?1.35:.9;
   label.scale.set(scale,depth===0?.44:depth===1?.32:.22,1);
-  label.userData={kind:'resource-label',...item};return label;
+  label.userData={...item,kind:'resource-label'};return label;
 }
 function renderPath() {
   if(!nav)return;nav.replaceChildren();
