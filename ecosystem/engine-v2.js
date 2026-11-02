@@ -260,7 +260,8 @@ function showDomainPanel(id,message='') {if(message)status.textContent=message;r
 function enterDomain(id) {
   if(!cells.has(id))return;selected=id;selectedBranch=null;opened=true;navigationStack=[];currentNode=manifest?.domains?.find(d=>d.id===id)||null;currentAnchor=cells.get(id).position.clone();
   intro.hidden=true;nav.hidden=false;ROOT.classList.remove('universe-closed');ROOT.classList.add('universe-open');panel.hidden=true;panel.replaceChildren();
-  if(typeof window.enterSphere==='function')window.enterSphere(id,false,true);
+  const mini=document.getElementById('miniView');if(mini){mini.hidden=true;mini.classList.remove('spatial-source-only')}
+  const homeButton=document.getElementById('homeBtn');if(homeButton)homeButton.hidden=true;
   smoothCamera(cells.get(id).position,7.5,900,()=>buildResources(id));
 }
 function goBackLevel() {
@@ -269,8 +270,8 @@ function goBackLevel() {
 }
 function goOverview() {
   selected=null;selectedBranch=null;navigationStack=[];currentNode=null;currentAnchor=null;clearResources();nav?.replaceChildren();nav.hidden=true;panel.hidden=true;panel.replaceChildren();
-  if(typeof document.getElementById('homeBtn')?.click==='function')document.getElementById('homeBtn').click();
-  else {const mini=document.getElementById('miniView');mini?.classList.remove('spatial-source-only');if(mini)mini.hidden=true}
+  const mini=document.getElementById('miniView');if(mini){mini.hidden=true;mini.classList.remove('spatial-source-only')}
+  const homeButton=document.getElementById('homeBtn');if(homeButton)homeButton.hidden=true;
   smoothCamera(new THREE.Vector3(0,0,0),13.5,850,()=>{status.textContent='BALABS / LIVING NETWORK'});
 }
 function showFailure(error) {
