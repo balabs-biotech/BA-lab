@@ -29,7 +29,8 @@ assert.ok(engine.includes('cameraPosition();'), 'Camera state must be reapplied 
 assert.ok(engine.includes('function smoothCamera('), 'Domain navigation must use a smooth camera transition');
 assert.ok(engine.includes('function goOverview()'), 'The user must be able to return to the overview');
 assert.ok(engine.includes('function enterDomain(id)'), 'Domain entry must be implemented in the new engine');
-assert.ok(engine.includes('Prefer the nearest visible semantic target in screen space'), 'Cell and branch taps must resolve by nearest visible screen target');
+assert.ok(engine.includes('Hit the actual label under the pointer first'), 'Branch taps must resolve the exact label under the pointer instead of a nearby overlapping label');
+assert.ok(engine.includes('raycaster.intersectObjects(labels,false)[0]'), 'Nested folder selection must use actual pointer geometry for labels');
 assert.ok(engine.includes('if(selected&&distance>9.5){goBackLevel();return}'), 'Mobile pinch zoom-out must return one folder level at a time');
 assert.ok(engine.includes('if(selected&&e.deltaY>0&&nextDistance>9.5){goBackLevel();return}'), 'Desktop wheel zoom-out must return one folder level at a time');
 assert.ok(!engine.includes('const bg=new THREE.BufferGeometry()'), 'The opening network must avoid decorative starfield geometry');
