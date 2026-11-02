@@ -140,7 +140,7 @@ async function checkWorkingScene(name, viewport) {
   assert.ok(openedNotion, name + ': tapping a terminal page must open Notion');
   const depthBeforeBack = await page.evaluate(() => window.__BALABS_3D_E2E__()?.depth || 0);
   assert.ok(depthBeforeBack > 0, name + ': nested navigation depth was not retained');
-  await page.locator('.webgl-controls [data-camera="back"]').click();
+  await page.locator('.webgl-controls [data-camera="back"]').evaluate((button) => button.click());
   await page.waitForFunction((before) => (window.__BALABS_3D_E2E__()?.depth || 0) < before, depthBeforeBack, { timeout: 8000 });
   await page.locator('.webgl-controls [data-camera="back"]').click();
   await page.waitForFunction(() => window.__BALABS_3D_E2E__()?.selected === null && document.querySelector('#miniView')?.hidden,
