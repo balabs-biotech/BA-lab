@@ -25,7 +25,7 @@ const POS = {
   bio:[0,2.55,0], myco:[-2.35,1.05,.35], soil:[-2.15,-1.05,-.1], lab:[-.05,.35,-.7],
   products:[.2,-1.35,.55], iot:[2.45,.85,-.25], work:[2.15,-1.25,-.45], learn:[-.15,-2.8,.1],
 };
-const LINKS = [['bio','myco'],['myco','soil'],['soil','lab'],['lab','iot'],['lab','products'],['products','work'],['work','iot'],['products','learn']];
+const LINKS = [['bio','myco'],['myco','soil'],['soil','lab'],['lab','iot'],['lab','products'],['products','work'],['work','iot'],['products','learn'],['bio','lab'],['myco','products'],['soil','work'],['bio','iot'],['myco','learn'],['soil','products']];
 const LABELS = Object.fromEntries([...document.querySelectorAll('.sphere[data-sphere]')].map(el => [el.dataset.sphere, {
   title:el.querySelector('b')?.textContent || el.dataset.sphere,
   sub:el.querySelector('small')?.textContent || '',
@@ -90,8 +90,9 @@ function makeCellGeometry(id) {
   for (let i=0;i<position.count;i++) {
     const x=position.getX(i), y=position.getY(i), z=position.getZ(i);
     const wave=Math.sin(x*5.7+seed)*Math.cos(y*4.4-seed*.7)*Math.sin(z*5.1+seed*.4);
-    const lobe=Math.sin(x*2.8+seed)*Math.sin(y*3.3-seed)*.065;
-    const scale=1+wave*.055+lobe;
+    const lobe=Math.sin(x*2.8+seed)*Math.sin(y*3.3-seed)*.12;
+    const asym=Math.sin(x*2.1+z*3.7+seed)*Math.cos(y*2.6-seed)*.07;
+    const scale=1+wave*.09+lobe+asym;
     position.setXYZ(i,x*scale,y*scale,z*scale);
   }
   geometry.computeVertexNormals();
@@ -128,30 +129,37 @@ function createWorld() {
     const color=COLORS[id],pos=new THREE.Vector3(...POS[id]);
     const group=new THREE.Group();group.position.copy(pos);group.userData={id,kind:'domain'};
     const soma=new THREE.Mesh(makeCellGeometry(id),new THREE.MeshStandardMaterial({color,roughness:.42,metalness:.08,emissive:color,emissiveIntensity:.21}));
-    soma.scale.set(id==='soil'?1.05:.91,id==='lab'?.78:1,id==='myco'?1.08:.9);
+    soma.scale.set(id==='soil'?.62:.56,id==='lab'?.48:.61,id==='myco'?.66:.55);
+    soma.material.transparent=true;soma.material.opacity=.84;
+    const nucleus=new THREE.Mesh(new THREE.SphereGeometry(.19,18,14),new THREE.MeshStandardMaterial({color:0xe4e4cf,roughness:.3,metalness:.05,emissive:color,emissiveIntensity:.28,transparent:true,opacity:.88}));
+    nucleus.position.set(.04,.02,.08);group.add(nucleus);
     soma.userData={id,kind:'domain'};group.add(soma);
-    const glow=new THREE.Mesh(new THREE.SphereGeometry(1.12,24,18),new THREE.MeshBasicMaterial({color,transparent:true,opacity:.055,side:THREE.BackSide,depthWrite:false}));
+    const glow=new THREE.Mesh(new THREE.SphereGeometry(1.18,24,18),new THREE.MeshBasicMaterial({color,transparent:true,opacity:.035,side:THREE.BackSide,depthWrite:false}));
     glow.scale.copy(soma.scale);group.add(glow);
-    const label=makeLabel(LABELS[id]?.title||id, color, 19);label.position.set(0,-1.28,0);label.scale.set(3.1,.65,1);label.userData={id,kind:'domain-label'};group.add(label);
+    const label=makeLabel(LABELS[id]?.title||id, color, 17);label.position.set(0,-.94,0);label.scale.set(2.55,.52,1);label.userData={id,kind:'domain-label'};group.add(label);
     const hit=new THREE.Mesh(new THREE.SphereGeometry(.96,16,12),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));hit.userData={id,kind:'domain'};group.add(hit);
     world.add(group);cells.set(id,{group,soma,label,hit,position:pos,color});
     pickables.push(soma,hit,label);
-    for(let j=0;j<7;j++){
-      const a=j/7*Math.PI*2+IDS.indexOf(id)*.31;
-      const start=new THREE.Vector3(Math.cos(a)*.65,Math.sin(a)*.62,0);
-      const end=new THREE.Vector3(Math.cos(a)*(.98+Math.random()*.3),Math.sin(a)*(.88+Math.random()*.25),Math.sin(a*1.7)*.25);
-      const mid=start.clone().lerp(end,.56).add(new THREE.Vector3(Math.cos(a+1)*.18,Math.sin(a+1)*.18,.12));
+    for(let j=0;j<11;j++){
+      const a=j/11*Math.PI*2+IDS.indexOf(id)*.31;
+      const start=new THREE.Vector3(Math.cos(a)*.34,Math.sin(a)*.32,Math.sin(a*1.7)*.05);
+      const reach=1.05+(j%4)*.19;
+      const end=new THREE.Vector3(Math.cos(a)*reach,Math.sin(a)*reach*.78,Math.sin(a*1.7)*.42);
+      const mid=start.clone().lerp(end,.52).add(new THREE.Vector3(Math.cos(a+1)*.22,Math.sin(a+1)*.2,.18));
       const curve=new THREE.CatmullRomCurve3([start,mid,end]);
-      const neurite=new THREE.Mesh(new THREE.TubeGeometry(curve,14,.018,5,false),new THREE.MeshStandardMaterial({color,emissive:color,emissiveIntensity:.35,transparent:true,opacity:.8}));
+      const neurite=new THREE.Mesh(new THREE.TubeGeometry(curve,20,.012,5,false),new THREE.MeshStandardMaterial({color,emissive:color,emissiveIntensity:.48,transparent:true,opacity:.72}));
       neurite.userData={id,kind:'neurite'};group.add(neurite);
-      const tip=new THREE.Mesh(new THREE.SphereGeometry(.045,8,6),new THREE.MeshBasicMaterial({color}));tip.position.copy(end);group.add(tip);
+      const forkStart=curve.getPoint(.58),forkEnd=forkStart.clone().add(new THREE.Vector3(Math.cos(a+.48)*.48,Math.sin(a+.48)*.38,.13));
+      const forkCurve=new THREE.CatmullRomCurve3([forkStart,forkStart.clone().lerp(forkEnd,.55).add(new THREE.Vector3(0,.08,.08)),forkEnd]);
+      const fork=new THREE.Mesh(new THREE.TubeGeometry(forkCurve,12,.007,4,false),new THREE.MeshStandardMaterial({color,emissive:color,emissiveIntensity:.4,transparent:true,opacity:.58}));group.add(fork);
+      const tip=new THREE.Mesh(new THREE.SphereGeometry(.022,7,5),new THREE.MeshBasicMaterial({color}));tip.position.copy(end);group.add(tip);
     }
   }
   LINKS.forEach(([a,b],index)=>{
     const A=cells.get(a).position,B=cells.get(b).position;
     const bend=new THREE.Vector3((A.x+B.x)/2+(index%2?-.3:.3),(A.y+B.y)/2+(index%3-.8)*.28,(A.z+B.z)/2+.45);
     const curve=new THREE.CatmullRomCurve3([A.clone(),bend,B.clone()]);
-    const line=new THREE.Mesh(new THREE.TubeGeometry(curve,52,.014,5,false),new THREE.MeshBasicMaterial({color:0x8cae9b,transparent:true,opacity:.37}));
+    const line=new THREE.Mesh(new THREE.TubeGeometry(curve,64,.009,5,false),new THREE.MeshBasicMaterial({color:0x8cae9b,transparent:true,opacity:.37}));
     line.userData={kind:'connection',a,b,curve};world.add(line);edges.push({curve,line,a,b});
     const pulse=new THREE.Mesh(new THREE.SphereGeometry(.045,8,6),new THREE.MeshBasicMaterial({color:0xd0d9c5,transparent:true,opacity:.9}));world.add(pulse);signalPoints.push({pulse,curve,offset:index/LINKS.length});
   });
@@ -366,7 +374,7 @@ function animate(now=0) {
   if(world){
     // Keep domain anchors world-stable; only cells pulse, so pointer targets never drift.
     for(const item of signalPoints){const p=item.curve.getPoint((now*.000075+item.offset)%1);item.pulse.position.copy(p)}
-    for(const [id,item] of cells){const phase=now*.0006+IDS.indexOf(id)*.7;item.soma.scale.setScalar(.98+Math.sin(phase)*.018);item.group.rotation.y=Math.sin(phase*.6)*.035}
+    for(const [id,item] of cells){const phase=now*.0006+IDS.indexOf(id)*.7;const pulse=1+Math.sin(phase)*.012;item.soma.scale.set((id==='soil'?.62:.56)*pulse,(id==='lab'?.48:id==='myco'?.66:.61)*pulse,(id==='myco'?.66:.55)*pulse);item.group.rotation.y=Math.sin(phase*.6)*.018}
   }
   renderer.render(scene,camera);
 }
