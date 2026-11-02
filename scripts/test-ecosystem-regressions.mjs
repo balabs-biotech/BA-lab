@@ -36,7 +36,7 @@ assert.ok(engine.includes('new THREE.SphereGeometry(.46,12,10)'), 'Every resourc
 assert.ok(engine.includes('function openResource(item)'), 'Branch selection must open an in-scene details panel');
 assert.ok(engine.includes("open.dataset.resourceOpen='true'"), 'The Notion link must be an explicit action, not an automatic redirect');
 assert.ok(engine.includes("back.dataset.resourceClear='true'"), 'The selected branch must offer an in-scene return action');
-assert.ok(engine.includes('data-world'), 'Related domains must remain navigable from the focus panel');
+assert.ok(engine.includes('btn.dataset.world=other'), 'Related domains must remain navigable from the focus panel');
 assert.ok(engine.includes('window.enterSphere(id,false,true)'), 'Domain selection must synchronize the hidden Notion content source');
 assert.ok(engine.includes('window.__BALABS_3D_E2E__'), 'The browser smoke test must be able to inspect the live scene');
 
