@@ -119,6 +119,10 @@ async function checkWorkingScene(name, viewport) {
   assert.ok(await page.locator('.webgl-focus [data-resource-clear]').isVisible(), name + ': selected branch must offer an in-scene return action');
   await page.locator('.webgl-focus [data-resource-clear]').click({force:true});
   await page.waitForFunction(() => { const panel=document.querySelector('.webgl-focus'); return panel && !panel.hidden && panel.classList.contains('has-world') && !panel.querySelector('[data-resource-open]'); }, undefined, { timeout: 5000 });
+  if (name === 'mobile') await page.locator('.webgl-controls [data-camera="out"]').click();
+  else await canvas.dispatchEvent('wheel', { deltaY: 350, bubbles: true, cancelable: true });
+  await page.waitForFunction(() => window.__BALABS_3D_E2E__()?.selected === null && document.querySelector('#miniView')?.hidden,
+    undefined, { timeout: 8000 }).catch(async error => { throw new Error(name + ': zooming out must return from the selected domain to the overview: ' + JSON.stringify(await page.evaluate(() => window.__BALABS_3D_E2E__())) + ' — ' + error.message); });
   await page.screenshot({ path: outputDir + '/' + name + '-universe.png', fullPage: false });
 
   assert.deepEqual(pageErrors, [], name + ': uncaught browser errors detected');
