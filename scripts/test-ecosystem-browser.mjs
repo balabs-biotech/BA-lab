@@ -122,7 +122,7 @@ async function checkWorkingScene(name, viewport) {
       const depthBefore = probe.depth;
       if (name === 'mobile') await page.touchscreen.tap(branchTarget.x, branchTarget.y);
       else await page.mouse.click(branchTarget.x, branchTarget.y);
-      await page.waitForFunction((before) => (window.__BALABS_3D_E2E__()?.depth || 0) > before, depthBefore, { timeout: 8000 }).catch(async error => { throw new Error(name + ': nested branch tap did not advance. ' + JSON.stringify(await page.evaluate(() => window.__BALABS_3D_E2E__())) + ' — ' + error.message); });
+      await page.waitForFunction((before) => (window.__BALABS_3D_E2E__()?.depth || 0) > before, depthBefore, { timeout: 8000 }).catch(async error => { throw new Error(name + ': nested branch tap did not advance. ' + JSON.stringify({probe:await page.evaluate(() => window.__BALABS_3D_E2E__()),branchSurface}) + ' — ' + error.message); });
       navigated = true;
       await page.waitForFunction(() => !document.querySelector('#mainView .webgl-stage')?.classList.contains('is-transitioning'), undefined, { timeout: 8000 });
       continue;
