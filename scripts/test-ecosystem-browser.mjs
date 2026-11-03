@@ -117,6 +117,7 @@ async function checkWorkingScene(name, viewport) {
     if (level === 0) assert.ok(probe.visibleDepths?.includes(1), name + ': nested Notion subfolders must be visible as a second spatial depth');
     const branchTarget = probe.target;
     assert.ok(branchTarget, name + ': no spatial folder/page target was found');
+    const branchSurface = await page.evaluate(({x,y}) => { const el=document.elementFromPoint(x,y), button=el?.closest?.('.webgl-hit-target'); const describe=node=>node?{tag:node.tagName,id:node.id,className:typeof node.className==='string'?node.className:'',pointerEvents:getComputedStyle(node).pointerEvents,display:getComputedStyle(node).display,hidden:node.hidden,rect:(()=>{const r=node.getBoundingClientRect();return{x:r.x,y:r.y,width:r.width,height:r.height}})()}:null; return {top:describe(el),button:describe(button),stage:describe(document.querySelector('.webgl-stage'))}; }, branchTarget);
     if (branchTarget.hasChildren) {
       const depthBefore = probe.depth;
       if (name === 'mobile') await page.touchscreen.tap(branchTarget.x, branchTarget.y);
