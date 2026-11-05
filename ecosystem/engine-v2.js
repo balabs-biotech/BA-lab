@@ -216,7 +216,7 @@ function mDispose(material){material?.map?.dispose();material?.dispose?.()}
 function makeResourceLabel(item,color,depth=0) { const size=depth===0?15:depth===1?12:10;const label=makeLabel(item.title,color,size);const scale=depth===0?2:depth===1?1.35:.9;label.scale.set(scale,depth===0?.44:depth===1?.32:.22,1);label.userData={...item,kind:'resource-label'};addResourceHitTarget(label);return label; }
 function addResourceHitTarget(label) {
  const button=document.createElement('button');button.type='button';button.className='webgl-hit-target';button.setAttribute('aria-label',(label.userData.hasChildren?'Ouvrir le dossier : ':'Ouvrir la page : ')+label.userData.title);button.title=label.userData.title;
- button.addEventListener('touchend',event=>{event.preventDefault();event.stopPropagation();button.dataset.touchActivated='1';lastPickAt=performance.now();openResource(label.userData)},{passive:false});
+ button.addEventListener('pointerup',event=>{if(event.pointerType!=='touch')return;event.preventDefault();event.stopPropagation();button.dataset.touchActivated='1';lastPickAt=performance.now();openResource(label.userData)});
  button.addEventListener('click',event=>{event.preventDefault();event.stopPropagation();if(button.dataset.touchActivated){delete button.dataset.touchActivated;return}lastPickAt=performance.now();openResource(label.userData)});
  document.body.append(button);resourceHitTargets.set(label,button);
 }
