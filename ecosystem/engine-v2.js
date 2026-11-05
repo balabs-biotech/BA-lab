@@ -216,7 +216,7 @@ function mDispose(material){material?.map?.dispose();material?.dispose?.()}
 function makeResourceLabel(item,color,depth=0) { const size=depth===0?15:depth===1?12:10;const label=makeLabel(item.title,color,size);const scale=depth===0?2:depth===1?1.35:.9;label.scale.set(scale,depth===0?.44:depth===1?.32:.22,1);label.userData={...item,kind:'resource-label'};addResourceHitTarget(label);return label; }
 function addResourceHitTarget(label) {
  const button=document.createElement('button');button.type='button';button.className='webgl-hit-target';button.setAttribute('aria-label',(label.userData.hasChildren?'Ouvrir le dossier : ':'Ouvrir la page : ')+label.userData.title);button.title=label.userData.title;
- button.addEventListener('pointerup',event=>{if(event.pointerType!=='touch')return;event.preventDefault();event.stopPropagation();button.dataset.touchActivated='1';lastPickAt=performance.now();openResource(label.userData)});
+ button.addEventListener('pointerup',event=>{if(event.pointerType!=='touch')return;event.preventDefault();event.stopPropagation();if(performance.now()-lastPickAt<300)return;button.dataset.touchActivated='1';lastPickAt=performance.now();openResource(label.userData)});
  button.addEventListener('click',event=>{event.preventDefault();event.stopPropagation();if(button.dataset.touchActivated){delete button.dataset.touchActivated;return}lastPickAt=performance.now();openResource(label.userData)});
  document.body.append(button);resourceHitTargets.set(label,button);
 }
@@ -312,7 +312,7 @@ function setupUI() {
   let touchFallback=null;
   const rememberTouch=e=>{if(e.touches.length===1){const p=e.touches[0];touchFallback={x:p.clientX,y:p.clientY,at:performance.now()}}};
   const finishTouch=e=>{if(e.target.closest?.('.webgl-hit-target')){touchFallback=null;return}if(!touchFallback)return;const p=e.changedTouches[0],start=touchFallback;touchFallback=null;if(!p||Math.hypot(p.clientX-start.x,p.clientY-start.y)>12)return;if(performance.now()-lastPickAt>450)pickAt(p.clientX,p.clientY)};
-  stage.addEventListener('touchstart',rememberTouch,{passive:true});
+  // The hit targets live on document.body, outside the stage. Capture native touchend here because some mobile Chromium builds do not dispatch pointer events to fixed body children.\n  document.addEventListener('touchend',e=>{const button=e.target.closest?.('.webgl-hit-target');if(!button)return;e.preventDefault();if(performance.now()-lastPickAt<300)return;const label=[...resourceHitTargets.entries()].find(([,target])=>target===button)?.[0];if(!label)return;button.dataset.touchActivated='1';lastPickAt=performance.now();openResource(label.userData)},{capture:true,passive:false});\n  stage.addEventListener('touchstart',rememberTouch,{passive:true});
   stage.addEventListener('touchend',finishTouch,{passive:true});
   stage.addEventListener('touchcancel',()=>{touchFallback=null},{passive:true});
 
