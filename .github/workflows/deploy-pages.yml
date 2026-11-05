@@ -7,6 +7,7 @@ on:
       - 'index.html'
       - 'batch-tracker/**'
       - 'ecosystem/**'
+      - 'ecosystem-preview/**'
       - '.github/workflows/deploy-pages.yml'
   workflow_dispatch:
 
@@ -28,10 +29,11 @@ jobs:
 
       - name: Prepare static site
         run: |
-          mkdir -p _site/batch-tracker _site/ecosystem
+          mkdir -p _site/batch-tracker _site/ecosystem _site/ecosystem-preview
           cp index.html _site/index.html
           cp -R batch-tracker/. _site/batch-tracker/
           cp -R ecosystem/. _site/ecosystem/
+          cp -R ecosystem-preview/. _site/ecosystem-preview/
           touch _site/.nojekyll
 
       - name: Upload Pages artifact
