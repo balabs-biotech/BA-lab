@@ -243,7 +243,14 @@ function navigateToStack(index) {
   buildResources(selected,currentNode,currentAnchor);smoothCamera(currentAnchor,6.2,650);
 }
 function buildResources(id,parentNode=null,anchor=null) {
- clearResources();const domain=manifest?.domains?.find(d=>d.id===id);if(!domain)return;currentNode=parentNode||domain;currentAnchor=(anchor||cells.get(id).position).clone();const children=currentNode.children||[];renderPath();if(!children.length){status.textContent=(currentNode.title||domain.title).toUpperCase();return}
+ clearResources();const domain=manifest?.domains?.find(d=>d.id===id);
+ if(!domain){
+   // The eighth public universe is reserved in the 3D taxonomy, but its Notion page
+   // cannot be linked until the workspace permits creating it. Never fabricate a URL.
+   if(id==='learn'&&!parentNode){currentNode={id:'learn',title:'RESSOURCES & TRANSMISSION',children:[]};currentAnchor=(anchor||cells.get(id)?.position||new THREE.Vector3()).clone();renderPath();status.textContent='RESSOURCES & TRANSMISSION · DOWNLOADING';}
+   return;
+ }
+ currentNode=parentNode||domain;currentAnchor=(anchor||cells.get(id).position).clone();const children=currentNode.children||[];renderPath();if(!children.length){status.textContent=(currentNode.title||domain.title).toUpperCase();return}
  const baseColor=new THREE.Color(COLORS[id]),accent=new THREE.Color(0xb96b4d);
  const filament=(pts,color,radius,opacity)=>{const curve=new THREE.CatmullRomCurve3(pts),mesh=new THREE.Mesh(new THREE.TubeGeometry(curve,18,radius,4,false),new THREE.MeshStandardMaterial({color,emissive:color,emissiveIntensity:.18,transparent:true,opacity,roughness:.65}));world.add(mesh);resourceObjects.push(mesh);return curve};
  const maxDepth=2; // Each view shows folders and terminal pages; deeper folders open as the next spatial layer.
