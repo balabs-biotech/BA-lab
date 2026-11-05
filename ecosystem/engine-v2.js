@@ -1,4 +1,4 @@
-// BA Labs 3D Engine v2 — clean interaction core.
+// BA Labs 3D Engine v2 — continuous mycelium navigation; domain colonies are filamentary, never solid spheres.
 // The legacy HTML remains the content source; this module owns all spatial navigation.
 const importThree = async () => {
   const sources = [
@@ -20,7 +20,7 @@ const importThree = async () => {
 
 const ROOT = document.getElementById('mainView');
 const IDS = ['bio','myco','soil','lab','products','iot','work','learn'];
-const COLORS = { bio:0x79a991, myco:0xa88fc3, soil:0xc19b73, lab:0x80aeb8, products:0xc88773, iot:0x7eaaa3, work:0xa99dbb, learn:0xb5b58d };
+const COLORS = { bio:0x78998a, myco:0x9b806d, soil:0x8d9b78, lab:0x829b9d, products:0xb96b4d, iot:0x789c91, work:0xa47c67, learn:0xb1aa8e };
 const POS = {
   bio:[0,2.55,0], myco:[-2.35,1.05,.35], soil:[-2.15,-1.05,-.1], lab:[-.05,.35,-.7],
   products:[.2,-1.35,.55], iot:[2.45,.85,-.25], work:[2.15,-1.25,-.45], learn:[-.15,-2.8,.1],
@@ -57,8 +57,8 @@ function addStyles() {
     #mainView.webgl-ready>.hub,#mainView.webgl-ready>.sphere,#mainView.webgl-ready>.network,#mainView.webgl-ready>.galaxy{display:none!important}
     #mainView .webgl-stage{position:absolute;inset:0;z-index:4;min-height:100%;touch-action:none;overflow:hidden}
     #mainView .webgl-stage canvas{display:block;width:100%;height:100%;outline:none;touch-action:none}
-    #mainView .webgl-hit-target{position:absolute!important;z-index:30!important;width:76px;height:76px;min-width:64px;min-height:64px;padding:0;border:0;border-radius:50%;background:transparent;color:transparent;opacity:.015;pointer-events:auto!important;touch-action:manipulation;transform:translate(-50%,-50%);cursor:pointer;-webkit-tap-highlight-color:transparent}
-    #mainView .webgl-hit-target:focus-visible{opacity:.24;outline:2px solid #d1d0c5;background:#b96b4d33}
+    body > .webgl-hit-target{position:fixed!important;z-index:30!important;width:76px;height:76px;min-width:64px;min-height:64px;padding:0;border:0;border-radius:50%;background:transparent;color:transparent;opacity:.015;pointer-events:auto!important;touch-action:manipulation;transform:translate(-50%,-50%);cursor:pointer;-webkit-tap-highlight-color:transparent}
+    body > .webgl-hit-target:focus-visible{opacity:.24;outline:2px solid #d1d0c5;background:#b96b4d33}
     #mainView .webgl-stage .webgl-hint{position:absolute;left:16px;bottom:14px;z-index:8;padding:9px 12px;border:1px solid #78958a66;border-radius:999px;background:#142321d9;color:#e5e9df;font:600 9px/1.4 system-ui;letter-spacing:.08em;pointer-events:none;backdrop-filter:blur(12px)}
     #mainView .webgl-stage .webgl-status{position:absolute;right:16px;bottom:17px;z-index:8;color:#c2cfc5;font:600 9px system-ui;letter-spacing:.12em;pointer-events:none}
     #mainView .webgl-controls{position:absolute;right:14px;top:14px;z-index:16;display:flex;gap:6px}
@@ -137,31 +137,41 @@ function createWorld() {
   for(const id of IDS){
     const color=COLORS[id],pos=new THREE.Vector3(...POS[id]);
     const group=new THREE.Group();group.position.copy(pos);group.userData={id,kind:'domain'};
-    const soma=new THREE.Mesh(makeCellGeometry(id),new THREE.MeshStandardMaterial({color,roughness:.42,metalness:.08,emissive:color,emissiveIntensity:.21}));
-    soma.scale.set(id==='soil'?.62:.56,id==='lab'?.48:.61,id==='myco'?.66:.55);
-    soma.material.transparent=true;soma.material.opacity=.84;
-    const nucleus=new THREE.Mesh(new THREE.SphereGeometry(.19,18,14),new THREE.MeshStandardMaterial({color:0xe4e4cf,roughness:.3,metalness:.05,emissive:color,emissiveIntensity:.28,transparent:true,opacity:.88}));
-    nucleus.position.set(.04,.02,.08);group.add(nucleus);
-    soma.userData={id,kind:'domain'};group.add(soma);
-    const glow=new THREE.Mesh(new THREE.SphereGeometry(1.18,24,18),new THREE.MeshBasicMaterial({color,transparent:true,opacity:.035,side:THREE.BackSide,depthWrite:false}));
-    glow.scale.copy(soma.scale);group.add(glow);
-    const label=makeLabel(LABELS[id]?.title||id, color, 17);label.position.set(0,-.94,0);label.scale.set(2.55,.52,1);label.userData={id,kind:'domain-label'};group.add(label);
-    const hit=new THREE.Mesh(new THREE.SphereGeometry(.96,16,12),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));hit.userData={id,kind:'domain'};group.add(hit);
+    // The colony centre is an open hyphal junction, never a solid cell/planet.
+    const soma=new THREE.Group();soma.userData={id,kind:'domain'};group.add(soma);
+    for(let strand=0;strand<7;strand++){
+      const a=strand/7*Math.PI*2+IDS.indexOf(id)*.23;
+      const start=new THREE.Vector3(Math.cos(a)*.025,Math.sin(a)*.025,-.045);
+      const end=new THREE.Vector3(Math.cos(a+.72)*.19,Math.sin(a+.72)*.16,.075+(strand%3)*.025);
+      const mid=start.clone().lerp(end,.52).add(new THREE.Vector3(0,.025,.035));
+      const curve=new THREE.CatmullRomCurve3([start,mid,end]);
+      const strandMesh=new THREE.Mesh(new THREE.TubeGeometry(curve,16,.0045,4,false),new THREE.MeshStandardMaterial({color,emissive:color,emissiveIntensity:.28,transparent:true,opacity:.8,roughness:.8}));
+      soma.add(strandMesh);
+    }
+    const label=makeLabel(LABELS[id]?.title||id, color, 17);label.position.set(0,-1.42,0);label.scale.set(2.65,.54,1);label.userData={id,kind:'domain-label'};group.add(label);
+    // Invisible selection volume remains generous for touch, while visible geometry stays filamentary.
+    const hit=new THREE.Mesh(new THREE.SphereGeometry(1.12,16,12),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));hit.userData={id,kind:'domain'};group.add(hit);
     world.add(group);cells.set(id,{group,soma,label,hit,position:pos,color});
     pickables.push(soma,hit,label);
-    for(let j=0;j<11;j++){
-      const a=j/11*Math.PI*2+IDS.indexOf(id)*.31;
-      const start=new THREE.Vector3(Math.cos(a)*.34,Math.sin(a)*.32,Math.sin(a*1.7)*.05);
-      const reach=1.05+(j%4)*.19;
-      const end=new THREE.Vector3(Math.cos(a)*reach,Math.sin(a)*reach*.78,Math.sin(a*1.7)*.42);
-      const mid=start.clone().lerp(end,.52).add(new THREE.Vector3(Math.cos(a+1)*.22,Math.sin(a+1)*.2,.18));
+    const branches=14;
+    for(let j=0;j<branches;j++){
+      const a=j/branches*Math.PI*2+IDS.indexOf(id)*.31;
+      const reach=1.0+(j%4)*.24;
+      const start=new THREE.Vector3(Math.cos(a)*.10,Math.sin(a)*.09,Math.sin(a*1.7)*.035);
+      const end=new THREE.Vector3(Math.cos(a)*reach,Math.sin(a)*reach*.76,Math.sin(a*1.7)*.34);
+      const mid=start.clone().lerp(end,.52).add(new THREE.Vector3(Math.cos(a+1)*.18,Math.sin(a+1)*.16,.13));
       const curve=new THREE.CatmullRomCurve3([start,mid,end]);
-      const neurite=new THREE.Mesh(new THREE.TubeGeometry(curve,20,.012,5,false),new THREE.MeshStandardMaterial({color,emissive:color,emissiveIntensity:.48,transparent:true,opacity:.72}));
+      const thickness=.0065+(j%3)*.0014;
+      const neurite=new THREE.Mesh(new THREE.TubeGeometry(curve,28,thickness,5,false),new THREE.MeshStandardMaterial({color,emissive:color,emissiveIntensity:.28,transparent:true,opacity:.76,roughness:.7}));
       neurite.userData={id,kind:'neurite'};group.add(neurite);
-      const forkStart=curve.getPoint(.58),forkEnd=forkStart.clone().add(new THREE.Vector3(Math.cos(a+.48)*.48,Math.sin(a+.48)*.38,.13));
-      const forkCurve=new THREE.CatmullRomCurve3([forkStart,forkStart.clone().lerp(forkEnd,.55).add(new THREE.Vector3(0,.08,.08)),forkEnd]);
-      const fork=new THREE.Mesh(new THREE.TubeGeometry(forkCurve,12,.007,4,false),new THREE.MeshStandardMaterial({color,emissive:color,emissiveIntensity:.4,transparent:true,opacity:.58}));group.add(fork);
-      const tip=new THREE.Mesh(new THREE.SphereGeometry(.022,7,5),new THREE.MeshBasicMaterial({color}));tip.position.copy(end);group.add(tip);
+      for(let fork=0;fork<2;fork++){
+        const at=curve.getPoint(.48+fork*.22),side=fork===0?-1:1;
+        const forkEnd=at.clone().add(new THREE.Vector3(Math.cos(a+side*.72)*(.34+(j%3)*.08),Math.sin(a+side*.72)*(.28+(j%2)*.07),.07));
+        const forkCurve=new THREE.CatmullRomCurve3([at,at.clone().lerp(forkEnd,.55).add(new THREE.Vector3(0,.035,.035)),forkEnd]);
+        group.add(new THREE.Mesh(new THREE.TubeGeometry(forkCurve,14,.0038,4,false),new THREE.MeshStandardMaterial({color,emissive:color,emissiveIntensity:.22,transparent:true,opacity:.52,roughness:.8})));
+      }
+      const tip=new THREE.Mesh(new THREE.SphereGeometry(.026+(j%3)*.006,8,6),new THREE.MeshStandardMaterial({color,roughness:.75,emissive:color,emissiveIntensity:.18}));
+      tip.position.copy(end);group.add(tip);
     }
   }
   LINKS.forEach(([a,b],index)=>{
@@ -211,13 +221,13 @@ function mDispose(material){material?.map?.dispose();material?.dispose?.()}
 function makeResourceLabel(item,color,depth=0) { const size=depth===0?15:depth===1?12:10;const label=makeLabel(item.title,color,size);const scale=depth===0?2:depth===1?1.35:.9;label.scale.set(scale,depth===0?.44:depth===1?.32:.22,1);label.userData={...item,kind:'resource-label'};addResourceHitTarget(label);return label; }
 function addResourceHitTarget(label) {
  const button=document.createElement('button');button.type='button';button.className='webgl-hit-target';button.setAttribute('aria-label',(label.userData.hasChildren?'Ouvrir le dossier : ':'Ouvrir la page : ')+label.userData.title);button.title=label.userData.title;
- button.addEventListener('touchend',event=>{event.preventDefault();event.stopPropagation();button.dataset.touchActivated='1';lastPickAt=performance.now();openResource(label.userData)},{passive:false});
+ button.addEventListener('pointerup',event=>{if(event.pointerType!=='touch')return;event.preventDefault();event.stopPropagation();if(performance.now()-lastPickAt<300)return;button.dataset.touchActivated='1';lastPickAt=performance.now();openResource(label.userData)});
  button.addEventListener('click',event=>{event.preventDefault();event.stopPropagation();if(button.dataset.touchActivated){delete button.dataset.touchActivated;return}lastPickAt=performance.now();openResource(label.userData)});
- stage.append(button);resourceHitTargets.set(label,button);
+ document.body.append(button);resourceHitTargets.set(label,button);
 }
 function syncResourceHitTargets() {
- if(!renderer||!camera||!stage)return;const rect=renderer.domElement.getBoundingClientRect(),stageRect=stage.getBoundingClientRect(),width=rect.width,height=rect.height;
- for(const [label,button] of resourceHitTargets){const p=label.getWorldPosition(new THREE.Vector3()).project(camera),x=(p.x+1)*width/2,y=(1-p.y)*height/2,visible=p.z>-1&&p.z<1&&x>=0&&x<=width&&y>=0&&y<=height;button.hidden=!visible;if(visible){button.style.left=(rect.left-stageRect.left+x)+'px';button.style.top=(rect.top-stageRect.top+y)+'px';}}
+ if(!renderer||!camera||!stage)return;const rect=renderer.domElement.getBoundingClientRect(),width=rect.width,height=rect.height;
+ for(const [label,button] of resourceHitTargets){const p=label.getWorldPosition(new THREE.Vector3()).project(camera),x=(p.x+1)*width/2,y=(1-p.y)*height/2,visible=p.z>-1&&p.z<1&&x>=0&&x<=width&&y>=0&&y<=height;button.hidden=!visible;if(visible){button.style.left=(rect.left+x)+'px';button.style.top=(rect.top+y)+'px';}}
 }
 function renderPath() {
   if(!nav)return;nav.replaceChildren();
@@ -233,11 +243,21 @@ function navigateToStack(index) {
   buildResources(selected,currentNode,currentAnchor);smoothCamera(currentAnchor,6.2,650);
 }
 function buildResources(id,parentNode=null,anchor=null) {
- clearResources();const domain=manifest?.domains?.find(d=>d.id===id);if(!domain)return;currentNode=parentNode||domain;currentAnchor=(anchor||cells.get(id).position).clone();const children=currentNode.children||[];renderPath();if(!children.length){status.textContent=(currentNode.title||domain.title).toUpperCase();return}
+ clearResources();const domain=manifest?.domains?.find(d=>d.id===id);
+ if(!domain){
+   // The eighth public universe is reserved in the 3D taxonomy, but its Notion page
+   // cannot be linked until the workspace permits creating it. Never fabricate a URL.
+   if(id==='learn'&&!parentNode){currentNode={id:'learn',title:'RESSOURCES & TRANSMISSION',children:[]};currentAnchor=(anchor||cells.get(id)?.position||new THREE.Vector3()).clone();renderPath();status.textContent='RESSOURCES & TRANSMISSION · DOWNLOADING';}
+   return;
+ }
+ currentNode=parentNode||domain;currentAnchor=(anchor||cells.get(id).position).clone();const children=currentNode.children||[];renderPath();if(!children.length){status.textContent=(currentNode.title||domain.title).toUpperCase();return}
  const baseColor=new THREE.Color(COLORS[id]),accent=new THREE.Color(0xb96b4d);
  const filament=(pts,color,radius,opacity)=>{const curve=new THREE.CatmullRomCurve3(pts),mesh=new THREE.Mesh(new THREE.TubeGeometry(curve,18,radius,4,false),new THREE.MeshStandardMaterial({color,emissive:color,emissiveIntensity:.18,transparent:true,opacity,roughness:.65}));world.add(mesh);resourceObjects.push(mesh);return curve};
- const maxDepth=2;
- const drawNode=(item,pos,depth,parent,angle,index)=>{const has=!!item.children?.length,color=baseColor.clone().lerp(accent,Math.min(.34,depth*.12+(index%3)*.025)),radius=depth===0?(has?.135:.105):depth===1?(has?.085:.065):.043;item.position=pos.clone();item.parentNode=parent;const data={kind:'resource',...item,sourceId:id,position:pos.clone(),hasChildren:has,depth,parentNode:parent};const node=new THREE.Mesh(new THREE.IcosahedronGeometry(radius,1),new THREE.MeshStandardMaterial({color,emissive:color,emissiveIntensity:depth===0?.42:.24,roughness:.48,metalness:.04,transparent:depth===2,opacity:depth===2?.78:1}));node.position.copy(pos);node.userData=data;world.add(node);resourceObjects.push(node);pickables.push(node);const hitRadius=depth===0?.32:depth===1?.25:.19;const hit=new THREE.Mesh(new THREE.SphereGeometry(hitRadius,10,8),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));hit.position.copy(pos);hit.userData=data;world.add(hit);resourceObjects.push(hit);pickables.push(hit);if(depth<2){const l=makeResourceLabel(data,color,depth);l.position.copy(pos).add(new THREE.Vector3(0,depth===0?-.28:-.19,.025));world.add(l);resourceObjects.push(l);pickables.push(l)}const pp=parent===currentNode?currentAnchor:(parent.position||currentAnchor),mid=pp.clone().lerp(pos,.52).add(new THREE.Vector3(0,.12+depth*.035,.12)),curve=filament([pp.clone(),mid,pos.clone()],color,depth===0?.012:depth===1?.007:.004,depth===0?.66:depth===1?.52:.38);if(depth<2)for(let f=0;f<2;f++){const at=curve.getPoint(.46+f*.2),sgn=f===0?-1:1,tip=at.clone().add(new THREE.Vector3(Math.cos(angle+sgn*.8)*(.24-depth*.045),Math.sin(angle+sgn*.8)*(.2-depth*.04),.045));filament([at,at.clone().lerp(tip,.55).add(new THREE.Vector3(0,.045,.025)),tip],color,.0035-depth*.0006,.28)}if(depth>=maxDepth||!has)return;const kids=item.children||[],spread=Math.min(1.2,.32+kids.length*.105);kids.forEach((child,childIndex)=>{const frac=kids.length===1?0:(childIndex/(kids.length-1)-.5),childAngle=angle+frac*spread*2+(childIndex%2?-.08:.08),dist=depth===0?.88+Math.min(.25,kids.length*.018):.48,childPos=pos.clone().add(new THREE.Vector3(Math.cos(childAngle)*dist,Math.sin(childAngle)*dist*.82+((childIndex%3)-1)*.035,.04+(childIndex%2)*.035));drawNode(child,childPos,depth+1,item,childAngle,childIndex)});
+ const maxDepth=2; // Each view shows folders and terminal pages; deeper folders open as the next spatial layer.
+ const drawNode=(item,pos,depth,parent,angle,index)=>{const has=!!item.children?.length,color=baseColor.clone().lerp(accent,Math.min(.34,depth*.12+(index%3)*.025)),radius=depth===0?(has?.135:.105):depth===1?(has?.085:.065):.043;item.position=pos.clone();item.parentNode=parent;const data={kind:'resource',...item,sourceId:id,position:pos.clone(),hasChildren:has,depth,parentNode:parent};const hitRadius=depth===0?.32:depth===1?.25:.19;const hit=new THREE.Mesh(new THREE.SphereGeometry(hitRadius,10,8),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));hit.position.copy(pos);hit.userData=data;world.add(hit);resourceObjects.push(hit);pickables.push(hit);
+ // Represent each folder/page as a living hyphal junction: fine branching strands, no bead-like node.
+ const junction=new THREE.Group();junction.position.copy(pos);junction.userData=data;world.add(junction);resourceObjects.push(junction);
+ for(let arm=0;arm<5;arm++){const a=arm/5*Math.PI*2+depth*.37+index*.19,reach=radius*(2.3+(arm%3)*.55),start=new THREE.Vector3(0,0,0),end=new THREE.Vector3(Math.cos(a)*reach,Math.sin(a)*reach*.82,Math.sin(a*1.7)*reach*.5),mid=start.clone().lerp(end,.56).add(new THREE.Vector3(0,.018,.018));const curveArm=new THREE.CatmullRomCurve3([start,mid,end]);const filamentArm=new THREE.Mesh(new THREE.TubeGeometry(curveArm,10,Math.max(.0025,radius*.055),4,false),new THREE.MeshStandardMaterial({color,emissive:color,emissiveIntensity:.3,transparent:true,opacity:.72,roughness:.78}));junction.add(filamentArm);}const l=makeResourceLabel(data,color,depth);l.position.copy(pos).add(new THREE.Vector3(0,depth===0?-.28:depth===1?-.22:-.16,.025));world.add(l);resourceObjects.push(l);pickables.push(l);const pp=parent===currentNode?currentAnchor:(parent.position||currentAnchor),mid=pp.clone().lerp(pos,.52).add(new THREE.Vector3(0,.12+depth*.035,.12)),curve=filament([pp.clone(),mid,pos.clone()],color,depth===0?.012:depth===1?.007:.004,depth===0?.66:depth===1?.52:.38);if(depth<2)for(let f=0;f<2;f++){const at=curve.getPoint(.46+f*.2),sgn=f===0?-1:1,tip=at.clone().add(new THREE.Vector3(Math.cos(angle+sgn*.8)*(.24-depth*.045),Math.sin(angle+sgn*.8)*(.2-depth*.04),.045));filament([at,at.clone().lerp(tip,.55).add(new THREE.Vector3(0,.045,.025)),tip],color,.0035-depth*.0006,.28)}if(depth>=maxDepth||!has)return;const kids=item.children||[],spread=Math.min(1.2,.32+kids.length*.105);kids.forEach((child,childIndex)=>{const frac=kids.length===1?0:(childIndex/(kids.length-1)-.5),childAngle=angle+frac*spread*2+(childIndex%2?-.08:.08),dist=depth===0?.98+Math.min(.42,kids.length*.025):Math.max(.68,Math.min(1.38,.58+kids.length*.055)),childPos=pos.clone().add(new THREE.Vector3(Math.cos(childAngle)*dist,Math.sin(childAngle)*dist*.82+((childIndex%3)-1)*.035,.04+(childIndex%2)*.035));drawNode(child,childPos,depth+1,item,childAngle,childIndex)});
  // Anastomoses: sibling branches reconnect into a mesh instead of ending as a radial tree.
  if(kids.length>1){
    const bridgeColor=color.clone().lerp(accent,.22);
@@ -307,6 +327,8 @@ function setupUI() {
   let touchFallback=null;
   const rememberTouch=e=>{if(e.touches.length===1){const p=e.touches[0];touchFallback={x:p.clientX,y:p.clientY,at:performance.now()}}};
   const finishTouch=e=>{if(e.target.closest?.('.webgl-hit-target')){touchFallback=null;return}if(!touchFallback)return;const p=e.changedTouches[0],start=touchFallback;touchFallback=null;if(!p||Math.hypot(p.clientX-start.x,p.clientY-start.y)>12)return;if(performance.now()-lastPickAt>450)pickAt(p.clientX,p.clientY)};
+  // The hit targets live on document.body, outside the stage. Capture native touchend here because some mobile Chromium builds do not dispatch pointer events to fixed body children.
+  document.addEventListener('touchend',e=>{const button=e.target.closest?.('.webgl-hit-target');if(!button)return;e.preventDefault();if(performance.now()-lastPickAt<300)return;const label=[...resourceHitTargets.entries()].find(([,target])=>target===button)?.[0];if(!label)return;button.dataset.touchActivated='1';lastPickAt=performance.now();openResource(label.userData)},{capture:true,passive:false});
   stage.addEventListener('touchstart',rememberTouch,{passive:true});
   stage.addEventListener('touchend',finishTouch,{passive:true});
   stage.addEventListener('touchcancel',()=>{touchFallback=null},{passive:true});
@@ -404,10 +426,14 @@ async function init() {
       const rect=renderer.domElement.getBoundingClientRect();
       const project=obj=>{const p=obj.getWorldPosition(new THREE.Vector3()).project(camera);return{x:rect.left+(p.x+1)*rect.width/2,y:rect.top+(1-p.y)*rect.height/2,z:p.z,title:obj.userData.title||obj.userData.id,hasChildren:!!obj.userData.hasChildren,depth:obj.userData.depth??0,url:obj.userData.url||null}};
       const inside=p=>p.z>-1&&p.z<1&&p.x>=rect.left&&p.x<=rect.right&&p.y>=rect.top&&p.y<=rect.bottom;
-      const branches=resourceObjects.filter(o=>o.userData?.kind==='resource-label').map(project).filter(inside);
+      const branches=resourceObjects.filter(o=>o.userData?.kind==='resource-label').map(label=>{
+        const projected=project(label),button=resourceHitTargets.get(label);
+        if(!button||button.hidden)return null;
+        const hit=button.getBoundingClientRect();
+        return {...projected,x:hit.left+hit.width/2,y:hit.top+hit.height/2,hitTarget:true};
+      }).filter(p=>p&&p.z>-1&&p.z<1&&p.x>=rect.left&&p.x<=rect.right&&p.y>=rect.top&&p.y<=rect.bottom);
       const center={x:rect.left+rect.width/2,y:rect.top+rect.height/2};
-      const tappable=branches.filter(p=>{const el=document.elementFromPoint(p.x,p.y);return el?.classList?.contains('webgl-hit-target')||el===renderer.domElement||renderer.domElement.contains(el)});
-      const targetBranch=(tappable.length?tappable:branches).sort((a,b)=>Math.hypot(a.x-center.x,a.y-center.y)-Math.hypot(b.x-center.x,b.y-center.y))[0]||null;
+      const targetBranch=branches.sort((a,b)=>Number(b.hasChildren)-Number(a.hasChildren)||Math.hypot(a.x-center.x,a.y-center.y)-Math.hypot(b.x-center.x,b.y-center.y))[0]||null;
       const domain=cells.get('bio'),domainTarget=domain?project(domain.hit):null;
       return{count:resourceObjects.filter(o=>o.userData?.kind==='resource-label').length,visible:branches.length,visibleDepths:[...new Set(resourceObjects.filter(o=>o.userData?.kind==='resource').map(o=>o.userData.depth??0))].sort(),target:targetBranch,domainTarget:domainTarget&&inside(domainTarget)?domainTarget:null,lastPick:window.__BALABS_3D_LAST_PICK__||null,lastOpen:window.__BALABS_3D_LAST_OPEN__||null,miniHidden:!!document.getElementById('miniView')?.hidden,transitioning:!!transition,selected,currentTitle:currentNode?.title||null,depth:navigationStack.length,childCount:currentNode?.children?.length||0,clickCount:window.__BALABS_3D_E2E_CLICKS||0,pointerDowns:window.__BALABS_3D_POINTERDOWN||0,pointerUps:window.__BALABS_3D_POINTERUP||0,pickCalls:window.__BALABS_3D_PICK_CALLS||0};
     };
