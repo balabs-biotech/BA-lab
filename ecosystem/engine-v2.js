@@ -218,7 +218,7 @@ function addResourceHitTarget(label) {
  const button=document.createElement('button');button.type='button';button.className='webgl-hit-target';button.setAttribute('aria-label',(label.userData.hasChildren?'Ouvrir le dossier : ':'Ouvrir la page : ')+label.userData.title);button.title=label.userData.title;
  button.addEventListener('touchend',event=>{event.preventDefault();event.stopPropagation();button.dataset.touchActivated='1';lastPickAt=performance.now();openResource(label.userData)},{passive:false});
  button.addEventListener('click',event=>{event.preventDefault();event.stopPropagation();if(button.dataset.touchActivated){delete button.dataset.touchActivated;return}lastPickAt=performance.now();openResource(label.userData)});
- stage.append(button);resourceHitTargets.set(label,button);
+ document.body.append(button);resourceHitTargets.set(label,button);
 }
 function syncResourceHitTargets() {
  if(!renderer||!camera||!stage)return;const rect=renderer.domElement.getBoundingClientRect(),width=rect.width,height=rect.height;
