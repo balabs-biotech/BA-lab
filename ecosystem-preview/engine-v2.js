@@ -57,7 +57,7 @@ function addStyles() {
     #mainView.webgl-ready>.hub,#mainView.webgl-ready>.sphere,#mainView.webgl-ready>.network,#mainView.webgl-ready>.galaxy{display:none!important}
     #mainView .webgl-stage{position:absolute;inset:0;z-index:4;min-height:100%;touch-action:none;overflow:hidden}
     #mainView .webgl-stage canvas{display:block;width:100%;height:100%;outline:none;touch-action:none}
-    body > .webgl-hit-target{position:fixed!important;z-index:30!important;width:76px;height:76px;min-width:64px;min-height:64px;padding:0;border:0;border-radius:50%;background:transparent;color:transparent;opacity:.015;pointer-events:auto!important;touch-action:manipulation;transform:translate(-50%,-50%);cursor:pointer;-webkit-tap-highlight-color:transparent}
+    #mainView .webgl-stage .webgl-hit-target{position:absolute;z-index:30;width:76px;height:76px;min-width:64px;min-height:64px;padding:0;border:0;border-radius:50%;background:transparent;color:transparent;opacity:.015;pointer-events:auto;touch-action:manipulation;transform:translate(-50%,-50%);cursor:pointer;-webkit-tap-highlight-color:transparent}
     body > .webgl-hit-target:focus-visible{opacity:.24;outline:2px solid #d1d0c5;background:#b96b4d33}
     #mainView .webgl-stage .webgl-hint{position:absolute;left:16px;bottom:14px;z-index:8;padding:9px 12px;border:1px solid #78958a66;border-radius:999px;background:#142321d9;color:#e5e9df;font:600 9px/1.4 system-ui;letter-spacing:.08em;pointer-events:none;backdrop-filter:blur(12px)}
     #mainView .webgl-stage .webgl-status{position:absolute;right:16px;bottom:17px;z-index:8;color:#c2cfc5;font:600 9px system-ui;letter-spacing:.12em;pointer-events:none}
@@ -224,18 +224,32 @@ function clearResources() {
 function mDispose(material){material?.map?.dispose();material?.dispose?.()}
 function makeResourceLabel(item,color,depth=0) { const size=depth===0?15:depth===1?12:10;const label=makeLabel(item.title,color,size);const scale=depth===0?2:depth===1?1.35:.9;label.scale.set(scale,depth===0?.44:depth===1?.32:.22,1);label.userData={...item,kind:'resource-label'};addResourceHitTarget(label);return label; }
 function addResourceHitTarget(label) {
- const button=document.createElement('button');button.type='button';button.className='webgl-hit-target';button.setAttribute('aria-label',(label.userData.hasChildren?'Ouvrir le dossier : ':'Ouvrir la page : ')+label.userData.title);button.title=label.userData.title;button.style.cssText='position:fixed;width:48px;height:48px;padding:0;margin:0;border:0;border-radius:50%;background:transparent;opacity:.001;z-index:30;pointer-events:auto;touch-action:manipulation;transform:translate(-50%,-50%);';
+ const button=document.createElement('button');button.type='button';button.className='webgl-hit-target';button.setAttribute('aria-label',(label.userData.hasChildren?'Ouvrir le dossier : ':'Ouvrir la page : ')+label.userData.title);button.title=label.userData.title;button.style.cssText='position:absolute;width:48px;height:48px;padding:0;margin:0;border:0;border-radius:50%;background:transparent;opacity:.001;z-index:30;pointer-events:auto;touch-action:manipulation;transform:translate(-50%,-50%);';
  const activate=event=>{event.preventDefault();event.stopPropagation();if(button.dataset.touchActivated)return;button.dataset.touchActivated='1';lastPickAt=performance.now();openResource(label.userData)};
  button.addEventListener('pointerup',event=>{if(event.pointerType==='touch')activate(event)});
  // Fixed hit targets sit outside the WebGL stage; handle native touch directly on
  // the target because some mobile browsers retarget pointer events during capture.
  button.addEventListener('touchend',activate,{passive:false});
  button.addEventListener('click',event=>{event.preventDefault();event.stopPropagation();if(button.dataset.touchActivated){delete button.dataset.touchActivated;return}lastPickAt=performance.now();openResource(label.userData)});
- document.body.append(button);resourceHitTargets.set(label,button);
+ stage.append(button);resourceHitTargets.set(label,button);
 }
 function syncResourceHitTargets() {
- if(!renderer||!camera||!stage)return;const rect=renderer.domElement.getBoundingClientRect(),width=rect.width,height=rect.height,edge=42,viewport=window.visualViewport,viewLeft=viewport?.offsetLeft||0,viewTop=viewport?.offsetTop||0,viewWidth=Math.min(window.innerWidth,viewport?.width||window.innerWidth),viewHeight=Math.min(window.innerHeight,document.documentElement.clientHeight||window.innerHeight,viewport?.height||window.innerHeight),viewRight=viewLeft+viewWidth,viewBottom=viewTop+viewHeight,minX=Math.max(viewLeft+edge,rect.left+edge),maxX=Math.min(viewRight-edge,rect.right-edge),minY=Math.max(viewTop+edge,rect.top+edge),maxY=Math.min(viewBottom-edge,rect.bottom-edge);
- for(const [label,button] of resourceHitTargets){const p=label.getWorldPosition(new THREE.Vector3()).project(camera),rawX=rect.left+(p.x+1)*width/2,rawY=rect.top+(1-p.y)*height/2,visible=p.z>-1&&p.z<1&&rawX>=rect.left&&rawX<=rect.right&&rawY>=rect.top&&rawY<=rect.bottom,x=Math.max(minX,Math.min(maxX,rawX)),y=Math.max(minY,Math.min(maxY,rawY));button.hidden=!visible||maxX<minX||maxY<minY;if(visible&&!button.hidden){button.style.left=x+'px';button.style.top=y+'px';}}
+ if(!renderer||!camera||!stage)return;
+ const rect=renderer.domElement.getBoundingClientRect(),width=rect.width,height=rect.height,edge=42,viewport=window.visualViewport,
+ viewLeft=viewport?.offsetLeft||0,viewTop=viewport?.offsetTop||0,
+ viewWidth=Math.min(window.innerWidth,viewport?.width||window.innerWidth),
+ viewHeight=Math.min(window.innerHeight,document.documentElement.clientHeight||window.innerHeight,viewport?.height||window.innerHeight),
+ viewRight=viewLeft+viewWidth,viewBottom=viewTop+viewHeight,
+ minX=Math.max(viewLeft+edge,rect.left+edge),maxX=Math.min(viewRight-edge,rect.right-edge),
+ minY=Math.max(viewTop+edge,rect.top+edge),maxY=Math.min(viewBottom-edge,rect.bottom-edge);
+ for(const [label,button] of resourceHitTargets){
+  const p=label.getWorldPosition(new THREE.Vector3()).project(camera),
+  rawX=rect.left+(p.x+1)*width/2,rawY=rect.top+(1-p.y)*height/2,
+  visible=p.z>-1&&p.z<1&&rawX>=rect.left&&rawX<=rect.right&&rawY>=rect.top&&rawY<=rect.bottom,
+  x=Math.max(minX,Math.min(maxX,rawX)),y=Math.max(minY,Math.min(maxY,rawY));
+  button.hidden=!visible||maxX<minX||maxY<minY;
+  if(visible&&!button.hidden){button.style.left=(x-rect.left)+'px';button.style.top=(y-rect.top)+'px';}
+ }
 }
 function renderPath() {
   if(!nav)return;nav.replaceChildren();
