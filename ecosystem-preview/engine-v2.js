@@ -325,7 +325,8 @@ function setupUI() {
   stage.addEventListener('pointerdown',onPointerDown);
   stage.addEventListener('pointermove',onPointerMove);
   stage.addEventListener('pointerup',onPointerUp);
-  document.addEventListener('pointerup',onPointerUp,true);
+  // Pointer-up is handled once on the stage; a capture-phase document listener
+  // previously consumed the pointer before the stage could perform hit-testing.
   stage.addEventListener('pointercancel',onPointerCancel);
   // Direct stage touch fallback for mobile browsers that omit pointer events.
   let touchFallback=null;
