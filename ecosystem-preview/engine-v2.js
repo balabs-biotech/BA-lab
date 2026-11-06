@@ -234,8 +234,8 @@ function addResourceHitTarget(label) {
  document.body.append(button);resourceHitTargets.set(label,button);
 }
 function syncResourceHitTargets() {
- if(!renderer||!camera||!stage)return;const rect=renderer.domElement.getBoundingClientRect(),width=rect.width,height=rect.height,edge=42,viewport=window.visualViewport,visibleWidth=viewport?.width||window.innerWidth,visibleHeight=viewport?.height||window.innerHeight,minX=Math.max(edge,-rect.left+edge),maxX=Math.min(width-edge,visibleWidth-rect.left-edge),minY=Math.max(edge,-rect.top+edge),maxY=Math.min(height-edge,visibleHeight-rect.top-edge);
- for(const [label,button] of resourceHitTargets){const p=label.getWorldPosition(new THREE.Vector3()).project(camera),rawX=(p.x+1)*width/2,rawY=(1-p.y)*height/2,visible=p.z>-1&&p.z<1&&rawX>=0&&rawX<=width&&rawY>=0&&rawY<=height,x=Math.max(minX,Math.min(maxX,rawX)),y=Math.max(minY,Math.min(maxY,rawY));button.hidden=!visible||maxX<minX||maxY<minY;if(visible&&!button.hidden){button.style.left=(rect.left+x)+'px';button.style.top=(rect.top+y)+'px';}}
+ if(!renderer||!camera||!stage)return;const rect=renderer.domElement.getBoundingClientRect(),width=rect.width,height=rect.height,edge=42,viewport=window.visualViewport,viewLeft=viewport?.offsetLeft||0,viewTop=viewport?.offsetTop||0,viewRight=viewLeft+(viewport?.width||window.innerWidth),viewBottom=viewTop+(viewport?.height||window.innerHeight),minX=Math.max(viewLeft+edge,rect.left+edge),maxX=Math.min(viewRight-edge,rect.right-edge),minY=Math.max(viewTop+edge,rect.top+edge),maxY=Math.min(viewBottom-edge,rect.bottom-edge);
+ for(const [label,button] of resourceHitTargets){const p=label.getWorldPosition(new THREE.Vector3()).project(camera),rawX=rect.left+(p.x+1)*width/2,rawY=rect.top+(1-p.y)*height/2,visible=p.z>-1&&p.z<1&&rawX>=rect.left&&rawX<=rect.right&&rawY>=rect.top&&rawY<=rect.bottom,x=Math.max(minX,Math.min(maxX,rawX)),y=Math.max(minY,Math.min(maxY,rawY));button.hidden=!visible||maxX<minX||maxY<minY;if(visible&&!button.hidden){button.style.left=x+'px';button.style.top=y+'px';}}
 }
 function renderPath() {
   if(!nav)return;nav.replaceChildren();
