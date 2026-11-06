@@ -234,8 +234,8 @@ function addResourceHitTarget(label) {
  document.body.append(button);resourceHitTargets.set(label,button);
 }
 function syncResourceHitTargets() {
- if(!renderer||!camera||!stage)return;const rect=renderer.domElement.getBoundingClientRect(),width=rect.width,height=rect.height,edge=42;
- for(const [label,button] of resourceHitTargets){const p=label.getWorldPosition(new THREE.Vector3()).project(camera),rawX=(p.x+1)*width/2,rawY=(1-p.y)*height/2,visible=p.z>-1&&p.z<1&&rawX>=0&&rawX<=width&&rawY>=0&&rawY<=height,x=Math.max(edge,Math.min(width-edge,rawX)),y=Math.max(edge,Math.min(height-edge,rawY));button.hidden=!visible;if(visible){button.style.left=(rect.left+x)+'px';button.style.top=(rect.top+y)+'px';}}
+ if(!renderer||!camera||!stage)return;const rect=renderer.domElement.getBoundingClientRect(),width=rect.width,height=rect.height,edge=42,minX=Math.max(edge,-rect.left+edge),maxX=Math.min(width-edge,window.innerWidth-rect.left-edge),minY=Math.max(edge,-rect.top+edge),maxY=Math.min(height-edge,window.innerHeight-rect.top-edge);
+ for(const [label,button] of resourceHitTargets){const p=label.getWorldPosition(new THREE.Vector3()).project(camera),rawX=(p.x+1)*width/2,rawY=(1-p.y)*height/2,visible=p.z>-1&&p.z<1&&rawX>=0&&rawX<=width&&rawY>=0&&rawY<=height,x=Math.max(minX,Math.min(maxX,rawX)),y=Math.max(minY,Math.min(maxY,rawY));button.hidden=!visible||maxX<minX||maxY<minY;if(visible&&!button.hidden){button.style.left=(rect.left+x)+'px';button.style.top=(rect.top+y)+'px';}}
 }
 function renderPath() {
   if(!nav)return;nav.replaceChildren();
