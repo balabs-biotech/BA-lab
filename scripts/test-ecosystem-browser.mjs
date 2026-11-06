@@ -120,8 +120,10 @@ async function checkWorkingScene(name, viewport) {
     assert.ok(branchTarget, name + ': no spatial folder/page target was found');
     if (branchTarget.hasChildren) {
       const depthBefore = probe.depth;
-      if (name === 'mobile') await page.touchscreen.tap(branchTarget.x, branchTarget.y);
-      else await page.mouse.click(branchTarget.x, branchTarget.y);
+      const branchButton = page.locator('.webgl-hit-target').filter({ has: page.locator('text=' + branchTarget.title) });
+      const exactBranchButton = page.locator('.webgl-hit-target[title="' + branchTarget.title.replaceAll('\\','\\\\').replaceAll('"','\\"') + '"]');
+      if (name === 'mobile') { const rect = await exactBranchButton.boundingBox(); assert.ok(rect, name + ': nested hit target has no visible box'); await page.touchscreen.tap(rect.x + rect.width / 2, rect.y + rect.height / 2); }
+      else await exactBranchButton.click();
       await page.waitForFunction((before) => (window.__BALABS_3D_E2E__()?.depth || 0) > before, depthBefore, { timeout: 8000 }).catch(async error => { throw new Error(name + ': nested branch tap did not advance. ' + JSON.stringify(await page.evaluate((title) => { const b=[...document.querySelectorAll('.webgl-hit-target')].find(x=>x.title===title); const r=b?.getBoundingClientRect(); const x=r?r.left+r.width/2:0,y=r?r.top+r.height/2:0,e=document.elementFromPoint(x,y); return {events:window.__BALABS_3D_TARGET_EVENTS__,documentClick:window.__BALABS_3D_DOCUMENT_CLICK__,probe:window.__BALABS_3D_E2E__(),viewport:{innerWidth,innerHeight,clientWidth:document.documentElement.clientWidth,clientHeight:document.documentElement.clientHeight},stage:(()=>{const q=document.querySelector('.webgl-stage')?.getBoundingClientRect();return q&&{x:q.x,y:q.y,width:q.width,height:q.height}})(),button:b&&{hidden:b.hidden,inline:{left:b.style.left,top:b.style.top},rect:r&&{x:r.x,y:r.y,width:r.width,height:r.height},computed:{position:getComputedStyle(b).position,zIndex:getComputedStyle(b).zIndex,pointerEvents:getComputedStyle(b).pointerEvents}},element:{tag:e?.tagName,className:typeof e?.className==='string'?e.className:'',isTarget:e===b}}; }, branchTarget.title)) + ' — ' + error.message); });
       navigated = true;
       await page.waitForFunction(() => !document.querySelector('#mainView .webgl-stage')?.classList.contains('is-transitioning'), undefined, { timeout: 8000 });
@@ -129,8 +131,9 @@ async function checkWorkingScene(name, viewport) {
     }
     assert.ok(branchTarget.url, name + ': terminal branch must carry its Notion destination');
     const popupPromise = page.context().waitForEvent('page', { timeout: 10000 });
-    if (name === 'mobile') await page.touchscreen.tap(branchTarget.x, branchTarget.y);
-    else await page.mouse.click(branchTarget.x, branchTarget.y);
+    const terminalButton = page.locator('.webgl-hit-target[title="' + branchTarget.title.replaceAll('\\','\\\\').replaceAll('"','\\"') + '"]');
+    if (name === 'mobile') { const rect = await terminalButton.boundingBox(); assert.ok(rect, name + ': terminal hit target has no visible box'); await page.touchscreen.tap(rect.x + rect.width / 2, rect.y + rect.height / 2); }
+    else await terminalButton.click();
     const popup = await popupPromise;
     await popup.waitForLoadState('domcontentloaded', { timeout: 12000 }).catch(() => {});
     assert.match(popup.url(), /notion\.(so|site|com)/i, name + ': terminal branch must open its Notion page');
