@@ -224,7 +224,7 @@ function clearResources() {
 function mDispose(material){material?.map?.dispose();material?.dispose?.()}
 function makeResourceLabel(item,color,depth=0) { const size=depth===0?15:depth===1?12:10;const label=makeLabel(item.title,color,size);const scale=depth===0?2:depth===1?1.35:.9;label.scale.set(scale,depth===0?.44:depth===1?.32:.22,1);label.userData={...item,kind:'resource-label'};addResourceHitTarget(label);return label; }
 function addResourceHitTarget(label) {
- const button=document.createElement('button');button.type='button';button.className='webgl-hit-target';button.setAttribute('aria-label',(label.userData.hasChildren?'Ouvrir le dossier : ':'Ouvrir la page : ')+label.userData.title);button.title=label.userData.title;
+ const button=document.createElement('button');button.type='button';button.className='webgl-hit-target';button.setAttribute('aria-label',(label.userData.hasChildren?'Ouvrir le dossier : ':'Ouvrir la page : ')+label.userData.title);button.title=label.userData.title;button.style.cssText='position:fixed;width:48px;height:48px;padding:0;margin:0;border:0;border-radius:50%;background:transparent;opacity:.001;z-index:30;pointer-events:auto;touch-action:manipulation;transform:translate(-50%,-50%);';
  const activate=event=>{event.preventDefault();event.stopPropagation();if(button.dataset.touchActivated)return;button.dataset.touchActivated='1';lastPickAt=performance.now();openResource(label.userData)};
  button.addEventListener('pointerup',event=>{if(event.pointerType==='touch')activate(event)});
  // Fixed hit targets sit outside the WebGL stage; handle native touch directly on
@@ -234,8 +234,8 @@ function addResourceHitTarget(label) {
  document.body.append(button);resourceHitTargets.set(label,button);
 }
 function syncResourceHitTargets() {
- if(!renderer||!camera||!stage)return;const rect=renderer.domElement.getBoundingClientRect(),width=rect.width,height=rect.height;
- for(const [label,button] of resourceHitTargets){const p=label.getWorldPosition(new THREE.Vector3()).project(camera),x=(p.x+1)*width/2,y=(1-p.y)*height/2,visible=p.z>-1&&p.z<1&&x>=0&&x<=width&&y>=0&&y<=height;button.hidden=!visible;if(visible){button.style.left=(rect.left+x)+'px';button.style.top=(rect.top+y)+'px';}}
+ if(!renderer||!camera||!stage)return;const rect=renderer.domElement.getBoundingClientRect(),width=rect.width,height=rect.height,edge=26;
+ for(const [label,button] of resourceHitTargets){const p=label.getWorldPosition(new THREE.Vector3()).project(camera),rawX=(p.x+1)*width/2,rawY=(1-p.y)*height/2,visible=p.z>-1&&p.z<1&&rawX>=0&&rawX<=width&&rawY>=0&&rawY<=height,x=Math.max(edge,Math.min(width-edge,rawX)),y=Math.max(edge,Math.min(height-edge,rawY));button.hidden=!visible;if(visible){button.style.left=(rect.left+x)+'px';button.style.top=(rect.top+y)+'px';}}
 }
 function renderPath() {
   if(!nav)return;nav.replaceChildren();
