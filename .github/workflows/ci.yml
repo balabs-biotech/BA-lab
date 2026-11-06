@@ -288,3 +288,27 @@ jobs:
           path: artifacts/3d-browser-smoke/
           if-no-files-found: ignore
           retention-days: 14
+      - name: Serve isolated mycelium preview locally
+        run: |
+          python3 -m http.server 8766 --directory ecosystem-preview > /tmp/balabs-preview-server.log 2>&1 &
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent http://127.0.0.1:8766/ > /dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/balabs-preview-server.log
+          exit 1
+      - name: Test isolated preview on desktop and mobile
+        run: node scripts/test-ecosystem-browser.mjs
+        env:
+          BALABS_SITE_URL: http://127.0.0.1:8766/
+          BALABS_BROWSER_ARTIFACT_DIR: artifacts/3d-browser-smoke-preview
+      - name: Upload preview browser screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: balabs-mycelium-preview-browser-smoke
+          path: artifacts/3d-browser-smoke-preview/
+          if-no-files-found: ignore
+          retention-days: 14
