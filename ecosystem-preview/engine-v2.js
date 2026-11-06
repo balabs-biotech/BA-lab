@@ -248,7 +248,7 @@ function syncResourceHitTargets() {
   visible=p.z>-1&&p.z<1&&rawX>=rect.left&&rawX<=rect.right&&rawY>=rect.top&&rawY<=rect.bottom,
   x=Math.max(minX,Math.min(maxX,rawX)),y=Math.max(minY,Math.min(maxY,rawY));
   button.hidden=!visible||maxX<minX||maxY<minY;
-  if(visible&&!button.hidden){button.style.left=(x-rect.left)+'px';button.style.top=(y-rect.top)+'px';}
+  if(visible&&!button.hidden){button.style.left=(x-rect.left)+'px';button.style.top=(y-rect.top)+'px';button.style.zIndex=String(1000-Math.round((p.z+1)*500));}
  }
 }
 function renderPath() {
