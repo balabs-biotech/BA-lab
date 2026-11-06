@@ -3,7 +3,7 @@ import { mkdir } from 'node:fs/promises';
 import { chromium } from 'playwright';
 
 const baseURL = process.env.BALABS_SITE_URL || 'http://127.0.0.1:8765/';
-const outputDir = 'artifacts/3d-browser-smoke';
+const outputDir = process.env.BALABS_BROWSER_ARTIFACT_DIR || 'artifacts/3d-browser-smoke';
 await mkdir(outputDir, { recursive: true });
 
 const browser = await chromium.launch({
