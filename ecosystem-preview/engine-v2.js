@@ -350,7 +350,10 @@ function setupUI() {
   let touchFallback=null;
   const rememberTouch=e=>{if(e.touches.length===1){const p=e.touches[0];touchFallback={x:p.clientX,y:p.clientY,at:performance.now()}}};
   const finishTouch=e=>{if(e.target.closest?.('.webgl-hit-target')){touchFallback=null;return}if(!touchFallback)return;const p=e.changedTouches[0],start=touchFallback;touchFallback=null;if(!p||Math.hypot(p.clientX-start.x,p.clientY-start.y)>12)return;if(performance.now()-lastPickAt>120)pickAt(p.clientX,p.clientY)};
-  // The hit targets live on document.body, outside the stage. Capture native touchend here because some mobile Chromium builds do not dispatch pointer events to fixed body children.
+  // Hit targets can receive browser-retargeted pointer events while sitting outside the stage.
+  // Capture pointerup at document level so mobile Chromium cannot bypass the stage handler.
+  document.addEventListener('pointerup',e=>{const button=e.target.closest?.('.webgl-hit-target');if(!button||e.pointerType!=='touch'||button.dataset.touchActivated)return;const label=[...resourceHitTargets.entries()].find(([,target])=>target===button)?.[0];if(!label||performance.now()-lastPickAt<120)return;e.preventDefault();button.dataset.touchActivated='1';lastPickAt=performance.now();openResource(label.userData)},{capture:true});
+  // Capture native touchend as a fallback for mobile browsers that omit pointer events.
   document.addEventListener('touchend',e=>{const button=e.target.closest?.('.webgl-hit-target');if(!button)return;e.preventDefault();if(performance.now()-lastPickAt<120)return;const label=[...resourceHitTargets.entries()].find(([,target])=>target===button)?.[0];if(!label)return;button.dataset.touchActivated='1';lastPickAt=performance.now();openResource(label.userData)},{capture:true,passive:false});
   stage.addEventListener('touchstart',rememberTouch,{passive:true});
   stage.addEventListener('touchend',finishTouch,{passive:true});
