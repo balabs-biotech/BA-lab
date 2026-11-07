@@ -35,14 +35,6 @@
               "children": []
             },
             {
-              "id": "pt-myco-mycorrhiza",
-              "title": "Micorrizas e interações biológicas",
-              "notionId": "40173152f1718134a778d4c8d405ca62",
-              "description": "Interações entre fungos, microrganismos e plantas, incluindo temas de investigação sobre micorrizas.",
-              "url": "https://app.notion.com/p/40173152f1718134a778d4c8d405ca62",
-              "children": []
-            },
-            {
               "id": "pt-myco-glomus",
               "title": "Glomus brasilianum — ficha do organismo",
               "notionId": "40173152f17181dcb1b3cd27efc9e6ba",
@@ -141,7 +133,8 @@
           "url": "https://app.notion.com/p/40173152f17181f19424c0aee1e7a863",
           "children": []
         }
-      ]
+      ],
+      "notionParentId": "hub"
     },
     {
       "id": "iot",
@@ -165,7 +158,8 @@
           "description": "Instrumentos e sensores para observação e medição.",
           "children": []
         }
-      ]
+      ],
+      "notionParentId": "hub"
     },
     {
       "id": "lab",
@@ -181,7 +175,8 @@
           "url": "https://app.notion.com/p/40173152f17181339a48d9c5ddde6829",
           "children": []
         }
-      ]
+      ],
+      "notionParentId": "hub"
     },
     {
       "id": "products",
@@ -221,7 +216,8 @@
           "description": "Guia de início para os protótipos Myco Start e Myco Plate.",
           "children": []
         }
-      ]
+      ],
+      "notionParentId": "language"
     },
     {
       "id": "work",
@@ -261,14 +257,16 @@
           "url": "https://app.notion.com/p/40273152f17181ed8c23f8efa76a2587",
           "children": []
         }
-      ]
+      ],
+      "notionParentId": "language"
     },
     {
       "id": "learn",
       "title": "Recursos e transmissão",
       "description": "Universo previsto para recursos de aprendizagem, protocolos de transmissão e partilha pública de conhecimento. A respetiva secção Notion ainda não foi criada.",
       "status": "planned",
-      "children": []
+      "children": [],
+      "notionParentId": "hub"
     }
   ],
   "hub": {
