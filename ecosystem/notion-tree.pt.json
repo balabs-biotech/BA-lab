@@ -2,60 +2,78 @@
   "version": 1,
   "source": "Verified public language-specific BA Labs pages from the corresponding public language entry and Notion page search",
   "language": "pt",
-  "coverage": "expanded_verified_topic_pages; only explicitly identified public pages are linked",
+  "coverage": "expanded_verified_topic_pages; only explicitly identified public pages are linked_eight_universes_including_planned_resources_transmission",
   "domains": [
     {
       "id": "myco",
       "title": "Micologia",
-      "notionId": "40173152f171812fb8d5de62178f6aef",
-      "url": "https://app.notion.com/p/40173152f171812fb8d5de62178f6aef",
+      "notionId": "40173152f171814dad1adcd7559c7823",
+      "url": "https://app.notion.com/p/40173152f171814dad1adcd7559c7823",
+      "description": "Fungos, suportes de cultivo, interações biológicas e aplicações documentadas.",
+      "notionParentId": "hub",
       "children": [
         {
-          "id": "pt-myco-applications",
-          "title": "Aplicações micológicas",
-          "notionId": "40173152f17181a99780d3ca1ee77cdb",
-          "url": "https://app.notion.com/p/40173152f17181a99780d3ca1ee77cdb",
-          "description": "Interações dos fungos e possíveis aplicações biológicas.",
-          "children": []
-        },
-        {
-          "id": "pt-myco-pleurotus-library",
-          "title": "Pleurotus — espécies e recursos cultivados",
-          "notionId": "40273152f17181f29a8efba7e0d87825",
-          "description": "Coleção que distingue fichas de espécies de registos de recursos e designações de cultura, sem presumir identidade ou disponibilidade.",
-          "url": "https://app.notion.com/p/40273152f17181f29a8efba7e0d87825",
-          "children": []
+          "id": "myco",
+          "title": "Recursos fúngicos",
+          "notionId": "40173152f171812fb8d5de62178f6aef",
+          "url": "https://app.notion.com/p/40173152f171812fb8d5de62178f6aef",
+          "children": [
+            {
+              "id": "pt-myco-pleurotus-library",
+              "title": "Pleurotus — espécies e recursos cultivados",
+              "notionId": "40273152f17181f29a8efba7e0d87825",
+              "description": "Coleção que distingue fichas de espécies de registos de recursos e designações de cultura, sem presumir identidade ou disponibilidade.",
+              "url": "https://app.notion.com/p/40273152f17181f29a8efba7e0d87825",
+              "children": []
+            },
+            {
+              "id": "pt-myco-other-fungi",
+              "title": "Outros fungos estudados e cultivados",
+              "notionId": "40273152f17181ec9770df8a5a662720",
+              "description": "Fichas de outros fungos de interesse para cultivo ou estudo biológico, sem os apresentar como culturas validadas ou disponíveis.",
+              "url": "https://app.notion.com/p/40273152f17181ec9770df8a5a662720",
+              "children": []
+            },
+            {
+              "id": "pt-myco-mycorrhiza",
+              "title": "Micorrizas e interações biológicas",
+              "notionId": "40173152f1718134a778d4c8d405ca62",
+              "description": "Interações entre fungos, microrganismos e plantas, incluindo temas de investigação sobre micorrizas.",
+              "url": "https://app.notion.com/p/40173152f1718134a778d4c8d405ca62",
+              "children": []
+            },
+            {
+              "id": "pt-myco-glomus",
+              "title": "Glomus brasilianum — ficha do organismo",
+              "notionId": "40173152f17181dcb1b3cd27efc9e6ba",
+              "description": "Referência a um fungo micorrízico arbuscular; esporos, hifas e estruturas radiculares são relevantes para a sua caracterização.",
+              "url": "https://app.notion.com/p/40173152f17181dcb1b3cd27efc9e6ba",
+              "children": []
+            }
+          ]
         },
         {
           "id": "pt-myco-culture-propagation",
           "title": "Cultura e propagação",
           "notionId": "40173152f171811f89bddf90ecd97465",
-          "description": "Percurso da cultura fúngica: isolamento, purificação, expansão, preparação de inóculo, incubação e ensaios de frutificação.",
           "url": "https://app.notion.com/p/40173152f171811f89bddf90ecd97465",
+          "description": "Preparação de suportes, inoculação, incubação e acompanhamento das culturas.",
           "children": []
         },
         {
-          "id": "pt-myco-other-fungi",
-          "title": "Outros fungos estudados e cultivados",
-          "notionId": "40273152f17181ec9770df8a5a662720",
-          "description": "Fichas de outros fungos de interesse para cultivo ou estudo biológico, sem os apresentar como culturas validadas ou disponíveis.",
-          "url": "https://app.notion.com/p/40273152f17181ec9770df8a5a662720",
-          "children": []
-        },
-        {
-          "id": "pt-myco-mycorrhiza",
+          "id": "pt-myco-mycorrhizae",
           "title": "Micorrizas e interações biológicas",
           "notionId": "40173152f1718134a778d4c8d405ca62",
-          "description": "Interações entre fungos, microrganismos e plantas, incluindo temas de investigação sobre micorrizas.",
           "url": "https://app.notion.com/p/40173152f1718134a778d4c8d405ca62",
+          "description": "Relações entre fungos, plantas e outros organismos.",
           "children": []
         },
         {
-          "id": "pt-myco-glomus",
-          "title": "Glomus brasilianum — ficha do organismo",
-          "notionId": "40173152f17181dcb1b3cd27efc9e6ba",
-          "description": "Referência a um fungo micorrízico arbuscular; esporos, hifas e estruturas radiculares são relevantes para a sua caracterização.",
-          "url": "https://app.notion.com/p/40173152f17181dcb1b3cd27efc9e6ba",
+          "id": "pt-myco-applications",
+          "title": "Aplicações micológicas",
+          "notionId": "40173152f17181a99780d3ca1ee77cdb",
+          "url": "https://app.notion.com/p/40173152f17181a99780d3ca1ee77cdb",
+          "description": "Campos científicos onde se estudam fungos e as suas funções.",
           "children": []
         }
       ]
@@ -63,8 +81,8 @@
     {
       "id": "bio",
       "title": "Biotecnologia",
-      "notionId": "40173152f171811ba1f0f58fd7dd239d",
-      "url": "https://app.notion.com/p/40173152f171811ba1f0f58fd7dd239d",
+      "notionId": "40173152f1718120b45bf79f8e81120a",
+      "url": "https://app.notion.com/p/40173152f1718120b45bf79f8e81120a",
       "children": [
         {
           "id": "pt-bio-agro",
@@ -81,8 +99,33 @@
           "description": "Como a estrutura, a água, a composição e a microbiota dos suportes condicionam a colonização e os ensaios biológicos.",
           "url": "https://app.notion.com/p/40173152f17181b780dcc20a20962afa",
           "children": []
+        },
+        {
+          "id": "pt-bio-fermentation",
+          "title": "Fermentação biológica",
+          "notionId": "40173152f17181f4ba7fe948f52041fc",
+          "url": "https://app.notion.com/p/40173152f17181f4ba7fe948f52041fc",
+          "description": "Processos de fermentação biológica e respetivos parâmetros.",
+          "children": []
+        },
+        {
+          "id": "pt-bio-biostimulants",
+          "title": "Bioestimulantes e soluções biológicas",
+          "notionId": "40173152f17181189575de882d466325",
+          "url": "https://app.notion.com/p/40173152f17181189575de882d466325",
+          "description": "Preparações biológicas e abordagens de bioestimulação em estudo.",
+          "children": []
+        },
+        {
+          "id": "pt-bio-micropropagation",
+          "title": "Micropropagação vegetal",
+          "notionId": "40173152f17181298875d43ad3c7c0fd",
+          "url": "https://app.notion.com/p/40173152f17181298875d43ad3c7c0fd",
+          "description": "Técnicas de propagação vegetal in vitro.",
+          "children": []
         }
-      ]
+      ],
+      "notionParentId": "hub"
     },
     {
       "id": "soil",
@@ -219,6 +262,19 @@
           "children": []
         }
       ]
+    },
+    {
+      "id": "learn",
+      "title": "Recursos e transmissão",
+      "description": "Universo previsto para recursos de aprendizagem, protocolos de transmissão e partilha pública de conhecimento. A respetiva secção Notion ainda não foi criada.",
+      "status": "planned",
+      "children": []
     }
-  ]
+  ],
+  "hub": {
+    "title": "BA Labs — Biotecnologia aplicada",
+    "notionId": "40173152f171811ba1f0f58fd7dd239d",
+    "url": "https://app.notion.com/p/40173152f171811ba1f0f58fd7dd239d",
+    "parentId": "language"
+  }
 }
