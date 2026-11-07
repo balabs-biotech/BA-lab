@@ -63,7 +63,7 @@ assert.ok(engine.includes('function smoothCamera('), 'Domain navigation must use
 assert.ok(engine.includes('function goOverview()'), 'The user must be able to return to the overview');
 assert.ok(engine.includes('function enterDomain(id)'), 'Domain entry must be implemented in the new engine');
 assert.ok(engine.includes('The active folder owns all taps while inside a universe'), 'A selected universe must not let adjacent domains steal folder taps');
-assert.ok(engine.includes('nearestLabelDistance<(window.innerWidth<760?104:118)'), 'Folder taps must resolve against the visible labels of the active hierarchy');
+assert.ok(engine.includes('nearestLabelDistance<(window.innerWidth<760?58:70)'), 'Folder taps must resolve against the visible labels of the active hierarchy without stealing adjacent branches');
 assert.ok(engine.includes('if(selected&&distance>9.5){goBackLevel();return}'), 'Mobile pinch zoom-out must return one folder level at a time');
 assert.ok(engine.includes('if(selected&&e.deltaY>0&&nextDistance>9.5){goBackLevel();return}'), 'Desktop wheel zoom-out must return one folder level at a time');
 assert.ok(!engine.includes('const bg=new THREE.BufferGeometry()'), 'The opening network must avoid decorative starfield geometry');
@@ -78,6 +78,7 @@ assert.ok(engine.includes('function goBackLevel()'), 'The previous-level control
 assert.ok(engine.includes("nav.className='webgl-path'"), 'The scene must use compact spatial breadcrumbs instead of a resource table');
 assert.ok(engine.includes('const hitRadius=depth===0?.32:depth===1?.25:.19'), 'Every hierarchy depth must keep a generous touch target');
 assert.ok(engine.includes('function openResource(item)'), 'Branch selection must drill into folders or open terminal pages');
+assert.ok(engine.includes('nearestLabelDistance<(window.innerWidth<760?58:70)'), 'Mobile and desktop label hit radii must stay narrow enough to avoid selecting adjacent branches');
 assert.ok(engine.includes("if(data.children?.length){"), 'Folders with children must open a deeper spatial level');
 assert.ok(engine.includes('const ancestors=[];let parent=data.parentNode'), 'Directly selected nested folders must preserve every ancestor in the breadcrumb stack');
 assert.ok(engine.includes("if(data.url){window.open(data.url"), 'Terminal pages must open their corresponding Notion page');
