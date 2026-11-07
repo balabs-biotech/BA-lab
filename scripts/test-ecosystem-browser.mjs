@@ -26,7 +26,7 @@ async function tapSpatialTarget(page, name, x, y) {
     x: window.visualViewport?.offsetLeft || 0,
     y: window.visualViewport?.offsetTop || 0,
   }));
-  return page.touchscreen.tap(x + offset.x, y + offset.y);
+  return page.touchscreen.tap(x - offset.x, y - offset.y);
 }
 
 async function checkWorkingScene(name, viewport) {
