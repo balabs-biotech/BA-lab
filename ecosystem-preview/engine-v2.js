@@ -243,6 +243,10 @@ function syncResourceHitTargets() {
  minX=Math.max(viewLeft+edge,rect.left+edge),maxX=Math.min(viewRight-edge,rect.right-edge),
  minY=Math.max(viewTop+edge,rect.top+edge),maxY=Math.min(viewBottom-edge,rect.bottom-edge);
  for(const [label,button] of resourceHitTargets){
+  // Transparent label buttons must never intercept pointer hit-testing: overlapping
+  // 76px targets can otherwise steal taps from the actual projected branch.
+  // The WebGL canvas performs the authoritative ray-pick for mouse and touch.
+  button.style.setProperty('pointer-events','none','important');
   const p=label.getWorldPosition(new THREE.Vector3()).project(camera),
   rawX=rect.left+(p.x+1)*width/2,rawY=rect.top+(1-p.y)*height/2,
   visible=p.z>-1&&p.z<1&&rawX>=rect.left&&rawX<=rect.right&&rawY>=rect.top&&rawY<=rect.bottom,
@@ -350,11 +354,7 @@ function setupUI() {
   let touchFallback=null;
   const rememberTouch=e=>{if(e.touches.length===1){const p=e.touches[0];touchFallback={x:p.clientX,y:p.clientY,at:performance.now()}}};
   const finishTouch=e=>{if(e.target.closest?.('.webgl-hit-target')){touchFallback=null;return}if(!touchFallback)return;const p=e.changedTouches[0],start=touchFallback;touchFallback=null;if(!p||Math.hypot(p.clientX-start.x,p.clientY-start.y)>12)return;if(performance.now()-lastPickAt>120)pickAt(p.clientX,p.clientY)};
-  // Hit targets can receive browser-retargeted pointer events while sitting outside the stage.
-  // Capture pointerup at document level so mobile Chromium cannot bypass the stage handler.
-  document.addEventListener('pointerup',e=>{const button=e.target.closest?.('.webgl-hit-target');if(!button||e.pointerType!=='touch'||button.dataset.touchActivated)return;const label=[...resourceHitTargets.entries()].find(([,target])=>target===button)?.[0];if(!label||performance.now()-lastPickAt<120)return;e.preventDefault();button.dataset.touchActivated='1';lastPickAt=performance.now();openResource(label.userData)},{capture:true});
-  // Capture native touchend as a fallback for mobile browsers that omit pointer events.
-  document.addEventListener('touchend',e=>{const button=e.target.closest?.('.webgl-hit-target');if(!button)return;e.preventDefault();if(performance.now()-lastPickAt<120)return;const label=[...resourceHitTargets.entries()].find(([,target])=>target===button)?.[0];if(!label)return;button.dataset.touchActivated='1';lastPickAt=performance.now();openResource(label.userData)},{capture:true,passive:false});
+  // Spatial pointer selection is handled exclusively by the WebGL canvas ray-pick.
   stage.addEventListener('touchstart',rememberTouch,{passive:true});
   stage.addEventListener('touchend',finishTouch,{passive:true});
   stage.addEventListener('touchcancel',()=>{touchFallback=null},{passive:true});
