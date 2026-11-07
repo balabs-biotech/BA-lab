@@ -349,14 +349,14 @@ function setupUI() {
   // Direct stage touch fallback for mobile browsers that omit pointer events.
   let touchFallback=null;
   const rememberTouch=e=>{if(e.touches.length===1){const p=e.touches[0];touchFallback={x:p.clientX,y:p.clientY,at:performance.now()}}};
-  const finishTouch=e=>{if(e.target.closest?.('.webgl-hit-target')){touchFallback=null;return}if(!touchFallback)return;const p=e.changedTouches[0],start=touchFallback;touchFallback=null;if(!p||Math.hypot(p.clientX-start.x,p.clientY-start.y)>12)return;if(performance.now()-lastPickAt>450)pickAt(p.clientX,p.clientY)};
+  const finishTouch=e=>{if(e.target.closest?.('.webgl-hit-target')){touchFallback=null;return}if(!touchFallback)return;const p=e.changedTouches[0],start=touchFallback;touchFallback=null;if(!p||Math.hypot(p.clientX-start.x,p.clientY-start.y)>12)return;if(performance.now()-lastPickAt>120)pickAt(p.clientX,p.clientY)};
   // The hit targets live on document.body, outside the stage. Capture native touchend here because some mobile Chromium builds do not dispatch pointer events to fixed body children.
-  document.addEventListener('touchend',e=>{const button=e.target.closest?.('.webgl-hit-target');if(!button)return;e.preventDefault();if(performance.now()-lastPickAt<300)return;const label=[...resourceHitTargets.entries()].find(([,target])=>target===button)?.[0];if(!label)return;button.dataset.touchActivated='1';lastPickAt=performance.now();openResource(label.userData)},{capture:true,passive:false});
+  document.addEventListener('touchend',e=>{const button=e.target.closest?.('.webgl-hit-target');if(!button)return;e.preventDefault();if(performance.now()-lastPickAt<120)return;const label=[...resourceHitTargets.entries()].find(([,target])=>target===button)?.[0];if(!label)return;button.dataset.touchActivated='1';lastPickAt=performance.now();openResource(label.userData)},{capture:true,passive:false});
   stage.addEventListener('touchstart',rememberTouch,{passive:true});
   stage.addEventListener('touchend',finishTouch,{passive:true});
   stage.addEventListener('touchcancel',()=>{touchFallback=null},{passive:true});
 
-  document.addEventListener('click',e=>{if(!e.detail||dragGesture||!renderer)return;if(e.target.closest?.('.webgl-controls,.webgl-focus,.webgl-intro'))return;const r=renderer.domElement.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)return;if(performance.now()-lastPickAt>450)pickAt(e.clientX,e.clientY)},true);
+  document.addEventListener('click',e=>{if(!e.detail||dragGesture||!renderer)return;if(e.target.closest?.('.webgl-controls,.webgl-focus,.webgl-intro'))return;const r=renderer.domElement.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)return;if(performance.now()-lastPickAt>120)pickAt(e.clientX,e.clientY)},true);
   stage.addEventListener('lostpointercapture',onLostCapture);
   stage.addEventListener('contextmenu',e=>e.preventDefault());
   window.addEventListener('resize',resize);
@@ -382,7 +382,7 @@ function onPointerUp(e) {
   if(!wasPointer)return;
   if(pointers.size){moved=true;return}
   dragging=false;
-  if(!moved&&!transition&&performance.now()-lastPickAt>450&&!e.target.closest('.webgl-controls,.webgl-focus,.webgl-intro'))pickAt(e.clientX,e.clientY);
+  if(!moved&&!transition&&performance.now()-lastPickAt>120&&!e.target.closest('.webgl-controls,.webgl-focus,.webgl-intro'))pickAt(e.clientX,e.clientY);
   lastPointer=null;
 }
 function onPointerCancel(){pointers.clear();dragging=false;moved=true;pinchStart=0;lastPointer=null}
