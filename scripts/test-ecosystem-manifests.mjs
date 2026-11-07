@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 
 const expectedLanguages = ['fr', 'ar', 'en', 'pt'];
-const expectedDomainIds = ['myco', 'bio', 'soil', 'iot', 'lab', 'products', 'work'];
+const expectedDomainIds = ['myco', 'bio', 'soil', 'iot', 'lab', 'products', 'work', 'learn'];
 
 for (const language of expectedLanguages) {
   const path = new URL('../ecosystem/notion-tree.' + language + '.json', import.meta.url);
