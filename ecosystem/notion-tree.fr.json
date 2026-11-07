@@ -2,7 +2,7 @@
   "version": 1,
   "source": "Notion public workspace search, French branch; entries verified by page IDs and URLs",
   "language": "fr",
-  "coverage": "7_public_roots_identified; nested_public_pages_verified_from_root_content; R&D branch expanded",
+  "coverage": "7_public_roots_identified; nested_public_pages_verified_from_root_content; R&D branch expanded_eight_universes_including_planned_resources_transmission",
   "domains": [
     {
       "id": "myco",
@@ -758,7 +758,15 @@
         }
       ],
       "description": "Parcourir les travaux de recherche et développement, leur méthodologie, leurs essais, leurs itérations et les éléments effectivement documentés."
+    },
+    {
+      "id": "learn",
+      "title": "RESSOURCES & TRANSMISSION",
+      "description": "Univers prévu pour les ressources pédagogiques, les protocoles de transmission et le partage public des connaissances. La branche Notion correspondante reste à créer.",
+      "status": "planned",
+      "children": []
     }
   ],
-  "notes": "The French public landing page lists the seven mapped roots. No separate public learning/resources root is linked there; do not invent one. The landing page also links to evidence and collaboration pages, which are not separate top-level universes. R&D root audit: added Methodologie R&D, Iteration & validation, and Equipe/expertise pages; moved Prototypes & essais and Mesure & reproductibilite to R&D branch; removed collaboration proposal page from laboratory branch because its actual parent is Collaborer avec BA Labs."
+  "notes": "The French public landing page lists the seven mapped roots. No separate public learning/resources root is linked there; do not invent one. The landing page also links to evidence and collaboration pages, which are not separate top-level universes. R&D root audit: added Methodologie R&D, Iteration & validation, and Equipe/expertise pages; moved Prototypes & essais and Mesure & reproductibilite to R&D branch; removed collaboration proposal page from laboratory branch because its actual parent is Collaborer avec BA Labs.",
+  "hub": null
 }
