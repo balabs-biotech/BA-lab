@@ -224,13 +224,9 @@ function clearResources() {
 function mDispose(material){material?.map?.dispose();material?.dispose?.()}
 function makeResourceLabel(item,color,depth=0) { const size=depth===0?15:depth===1?12:10;const label=makeLabel(item.title,color,size);const scale=depth===0?2:depth===1?1.35:.9;label.scale.set(scale,depth===0?.44:depth===1?.32:.22,1);label.userData={...item,kind:'resource-label'};addResourceHitTarget(label);return label; }
 function addResourceHitTarget(label) {
- const button=document.createElement('button');button.type='button';button.className='webgl-hit-target';button.setAttribute('aria-label',(label.userData.hasChildren?'Ouvrir le dossier : ':'Ouvrir la page : ')+label.userData.title);button.title=label.userData.title;button.style.cssText='position:absolute;width:48px;height:48px;padding:0;margin:0;border:0;border-radius:50%;background:transparent;opacity:.001;z-index:30;pointer-events:none!important;touch-action:manipulation;transform:translate(-50%,-50%);';
- const activate=event=>{event.preventDefault();event.stopPropagation();if(button.dataset.touchActivated)return;button.dataset.touchActivated='1';lastPickAt=performance.now();openResource(label.userData)};
- button.addEventListener('pointerup',event=>{if(event.pointerType==='touch')activate(event)});
- // Pointer input is handled by the canvas ray-pick. These transparent buttons
- // remain available to keyboard activation but never compete for touch hit-testing.
- button.addEventListener('touchend',activate,{passive:false});
- button.addEventListener('click',event=>{event.preventDefault();event.stopPropagation();if(button.dataset.touchActivated){delete button.dataset.touchActivated;return}lastPickAt=performance.now();openResource(label.userData)});
+ const button=document.createElement('button');button.type='button';button.className='webgl-hit-target';button.setAttribute('aria-label',(label.userData.hasChildren?'Ouvrir le dossier : ':'Ouvrir la page : ')+label.userData.title);button.title=label.userData.title;button.style.cssText='position:absolute;width:48px;height:48px;padding:0;margin:0;border:0;border-radius:50%;background:transparent;opacity:0;z-index:30;pointer-events:none!important;display:none!important;touch-action:none;transform:translate(-50%,-50%);';
+ // Kept only as a semantic/debug representation for the E2E probe. It must
+ // never own pointer, touch, or click events; the WebGL stage is authoritative.
  stage.append(button);resourceHitTargets.set(label,button);
 }
 function syncResourceHitTargets() {
