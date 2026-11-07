@@ -377,6 +377,20 @@ function onPointerMove(e) {
   lastPointer={x:e.clientX,y:e.clientY};
 }
 function onPointerUp(e) {
+  // Some mobile Chromium versions retarget a tap to the transparent spatial
+  // label even though the canvas owns pointer input. The down handler ignores
+  // that label, so resolve its pointer-up explicitly instead of dropping it.
+  const hitButton=e.target.closest?.('.webgl-hit-target');
+  if(hitButton&&e.pointerType==='touch'){
+    const label=[...resourceHitTargets.entries()].find(([,target])=>target===hitButton)?.[0];
+    if(label&&performance.now()-lastPickAt>120){
+      hitButton.dataset.touchActivated='1';
+      lastPickAt=performance.now();
+      openResource(label.userData);
+    }
+    pointers.delete(e.pointerId);
+    return;
+  }
   const wasPointer=pointers.has(e.pointerId);pointers.delete(e.pointerId);
   if(pointers.size<2)pinchStart=0;
   if(!wasPointer)return;
