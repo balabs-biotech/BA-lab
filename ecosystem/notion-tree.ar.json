@@ -2,7 +2,7 @@
   "version": 1,
   "source": "Verified public Arabic pages linked from the Arabic BA Labs entry page",
   "language": "ar",
-  "coverage": "nested_public_pages_verified_from_arabic_parent_content_and_notion_paths; linked pages organized by verified parent; no unverified pages inferred",
+  "coverage": "nested_public_pages_verified_from_arabic_parent_content_and_notion_paths; linked pages organized by verified parent; no unverified pages inferred_eight_universes_including_planned_resources_transmission",
   "domains": [
     {
       "id": "myco",
@@ -990,6 +990,14 @@
         }
       ],
       "description": "مشاريع BA Labs وأعمال البحث والتطوير: النماذج التجريبية، النتائج الموثقة، وفرص التعاون."
+    },
+    {
+      "id": "learn",
+      "title": "الموارد ونقل المعرفة",
+      "description": "فضاء مخصص مستقبلاً لموارد التعلم وبروتوكولات نقل المعرفة ومشاركتها. لم يُنشأ فرع Notion الخاص به بعد.",
+      "status": "planned",
+      "children": []
     }
-  ]
+  ],
+  "hub": null
 }

@@ -2,36 +2,62 @@
   "version": 1,
   "source": "Verified public language-specific BA Labs pages from the corresponding public language entry and Notion page search",
   "language": "en",
-  "coverage": "expanded_verified_topic_pages; only explicitly identified public pages are linked",
+  "coverage": "expanded_verified_topic_pages; only explicitly identified public pages are linked_eight_universes_including_planned_resources_transmission",
   "domains": [
     {
       "id": "myco",
       "title": "Mycology",
-      "notionId": "40173152f1718111a73ced2825985454",
-      "url": "https://app.notion.com/p/40173152f1718111a73ced2825985454",
+      "notionId": "40173152f17181019838de83de8173f3",
+      "url": "https://app.notion.com/p/40173152f17181019838de83de8173f3",
+      "description": "Fungi, cultivation supports, biological interactions and documented applications.",
+      "notionParentId": "hub",
       "children": [
+        {
+          "id": "en-myco-fungal-resources",
+          "title": "Fungal resources",
+          "notionId": "40173152f1718111a73ced2825985454",
+          "url": "https://app.notion.com/p/40173152f1718111a73ced2825985454",
+          "children": [
+            {
+              "id": "en-myco-pleurotus-library",
+              "title": "Pleurotus — cultivated species and resources",
+              "notionId": "40273152f17181eba1bbcaf1b1d491d6",
+              "description": "A guide separating general species profiles from working culture designations, with clear limits on identity and availability.",
+              "url": "https://app.notion.com/p/40273152f17181eba1bbcaf1b1d491d6",
+              "children": []
+            },
+            {
+              "id": "en-myco-pulmonarius",
+              "title": "Pleurotus pulmonarius — species and cultivation profile",
+              "notionId": "40273152f171811fa874e6b3a698e462",
+              "description": "A species profile covering its fan-shaped fruit bodies, saprotrophic lifestyle and tendency to fruit in warmer conditions.",
+              "url": "https://app.notion.com/p/40273152f171811fa874e6b3a698e462",
+              "children": []
+            }
+          ]
+        },
+        {
+          "id": "en-myco-culture-propagation",
+          "title": "Culture and propagation",
+          "notionId": "40173152f17181478c7bd4091e648053",
+          "url": "https://app.notion.com/p/40173152f17181478c7bd4091e648053",
+          "description": "Support preparation, inoculation, incubation and culture monitoring.",
+          "children": []
+        },
+        {
+          "id": "en-myco-mycorrhizae",
+          "title": "Mycorrhizae and biological interactions",
+          "notionId": "40173152f1718101965cc766e3d7e27f",
+          "url": "https://app.notion.com/p/40173152f1718101965cc766e3d7e27f",
+          "description": "Biological relationships among fungi, plants and other organisms.",
+          "children": []
+        },
         {
           "id": "en-myco-applications",
           "title": "Mycological applications",
           "notionId": "40173152f17181969ca9ec1b3dfe5435",
           "url": "https://app.notion.com/p/40173152f17181969ca9ec1b3dfe5435",
-          "description": "Explore fungal interactions and their practical biological applications.",
-          "children": []
-        },
-        {
-          "id": "en-myco-pleurotus-library",
-          "title": "Pleurotus — cultivated species and resources",
-          "notionId": "40273152f17181eba1bbcaf1b1d491d6",
-          "description": "A guide separating general species profiles from working culture designations, with clear limits on identity and availability.",
-          "url": "https://app.notion.com/p/40273152f17181eba1bbcaf1b1d491d6",
-          "children": []
-        },
-        {
-          "id": "en-myco-pulmonarius",
-          "title": "Pleurotus pulmonarius — species and cultivation profile",
-          "notionId": "40273152f171811fa874e6b3a698e462",
-          "description": "A species profile covering its fan-shaped fruit bodies, saprotrophic lifestyle and tendency to fruit in warmer conditions.",
-          "url": "https://app.notion.com/p/40273152f171811fa874e6b3a698e462",
+          "description": "Scientific fields where fungi and their functions are studied.",
           "children": []
         }
       ]
@@ -66,7 +92,8 @@
           "description": "Biological solutions and biostimulant approaches under study.",
           "children": []
         }
-      ]
+      ],
+      "notionParentId": "hub"
     },
     {
       "id": "soil",
@@ -82,7 +109,8 @@
           "description": "Explore microorganisms associated with agricultural systems, including their roles and limits of current evidence.",
           "children": []
         }
-      ]
+      ],
+      "notionParentId": "hub"
     },
     {
       "id": "iot",
@@ -114,7 +142,8 @@
           "description": "An introduction to the sensors and measurement tools used to observe biological and cultivation systems.",
           "children": []
         }
-      ]
+      ],
+      "notionParentId": "hub"
     },
     {
       "id": "lab",
@@ -130,7 +159,8 @@
           "url": "https://app.notion.com/p/40173152f171817baccbf47fd8616785",
           "children": []
         }
-      ]
+      ],
+      "notionParentId": "hub"
     },
     {
       "id": "products",
@@ -170,7 +200,8 @@
           "description": "A quick-start guide for the Myco Start and Myco Plate prototypes.",
           "children": []
         }
-      ]
+      ],
+      "notionParentId": "language"
     },
     {
       "id": "work",
@@ -194,7 +225,21 @@
           "description": "Ways to frame a project need and explore collaboration.",
           "children": []
         }
-      ]
+      ],
+      "notionParentId": "language"
+    },
+    {
+      "id": "learn",
+      "title": "Resources & knowledge transfer",
+      "description": "Planned universe for learning resources, protocols for transmission and public knowledge-sharing. Its Notion branch has not yet been created.",
+      "status": "planned",
+      "children": []
     }
-  ]
+  ],
+  "hub": {
+    "title": "BA Labs — Applied biotechnology",
+    "notionId": "40173152f171815f9f01ea5fd1add73f",
+    "url": "https://app.notion.com/p/40173152f171815f9f01ea5fd1add73f",
+    "parentId": "language"
+  }
 }

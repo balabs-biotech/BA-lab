@@ -11,6 +11,39 @@ assert.ok(engine.includes("const IDS = ['bio','myco','soil','lab','products','io
 const htmlDomains = [...html.matchAll(/<button[^>]*data-sphere="([^"]+)"/g)].map(match => match[1]);
 assert.deepEqual(htmlDomains, expectedDomains, 'Public HTML must preserve all eight domains');
 
+for (const language of ['fr', 'ar', 'en', 'pt']) {
+  const tree = JSON.parse(readFileSync('ecosystem/notion-tree.' + language + '.json', 'utf8'));
+  assert.deepEqual(tree.domains.map(domain => domain.id).sort(), [...expectedDomains].sort(), language + ' manifest must expose all eight universes');
+  const planned = tree.domains.find(domain => domain.id === 'learn');
+  assert.equal(planned.status, 'planned', language + ' knowledge-transfer universe must remain an explicit planned branch');
+  assert.ok(!planned.url && !planned.notionId, language + ' planned branch must not invent a Notion destination');
+  for (const domain of tree.domains.filter(item => item.id !== 'learn')) {
+    assert.ok(domain.notionId && domain.url === 'https://app.notion.com/p/' + domain.notionId, language + ' domain ' + domain.id + ' must point to its matching Notion page');
+  }
+  const seen = new Set();
+  const walk = nodes => nodes.forEach(node => {
+    if (node.notionId) {
+      assert.ok(!seen.has(node.notionId), language + ' manifest must not duplicate Notion page ' + node.notionId);
+      seen.add(node.notionId);
+    }
+    walk(node.children || []);
+  });
+  walk(tree.domains);
+}
+const enTree = JSON.parse(readFileSync('ecosystem/notion-tree.en.json', 'utf8'));
+const ptTree = JSON.parse(readFileSync('ecosystem/notion-tree.pt.json', 'utf8'));
+for (const [language, tree, mycologyId, fungalId] of [
+  ['en', enTree, '40173152f17181019838de83de8173f3', '40173152f1718111a73ced2825985454'],
+  ['pt', ptTree, '40173152f171814dad1adcd7559c7823', '40173152f171812fb8d5de62178f6aef'],
+]) {
+  const mycology = tree.domains.find(domain => domain.id === 'myco');
+  assert.equal(mycology.notionId, mycologyId, language + ' mycology universe must start at the actual Mycology parent page');
+  assert.ok(mycology.children.some(child => child.notionId === fungalId), language + ' Fungal resources must be nested under Mycology');
+  assert.equal(mycology.notionParentId, 'hub', language + ' mycology page must retain its verified BA Labs hub parent');
+  assert.equal(tree.hub?.parentId, 'language', language + ' BA Labs hub must retain its language-root parent');
+}
+assert.equal(ptTree.domains.find(domain => domain.id === 'bio').notionId, '40173152f1718120b45bf79f8e81120a', 'Portuguese biotechnology universe must point to the actual Biotecnologia page, not its parent hub');
+
 assert.ok(engine.includes('function createWorld()'), 'The new engine must build its own biological network scene');
 assert.ok(engine.includes('makeCellGeometry'), 'Domain nodes must use organic cell geometry');
 assert.ok(engine.includes('const LINKS ='), 'The network must define explicit cross-domain connections');
