@@ -210,14 +210,10 @@ function clearResources() {
 function mDispose(material){material?.map?.dispose();material?.dispose?.()}
 function makeResourceLabel(item,color,depth=0) { const size=depth===0?15:depth===1?12:10;const label=makeLabel(item.title,color,size);const scale=depth===0?2:depth===1?1.35:.9;label.scale.set(scale,depth===0?.44:depth===1?.32:.22,1);label.userData={...item,kind:'resource-label'};addResourceHitTarget(label);return label; }
 function addResourceHitTarget(label) {
- const button=document.createElement('button');button.type='button';button.className='webgl-hit-target';button.setAttribute('aria-label',(label.userData.hasChildren?'Ouvrir le dossier : ':'Ouvrir la page : ')+label.userData.title);button.title=label.userData.title;
- button.addEventListener('touchend',event=>{event.preventDefault();event.stopPropagation();button.dataset.touchActivated='1';lastPickAt=performance.now();openResource(label.userData)},{passive:false});
- button.addEventListener('click',event=>{event.preventDefault();event.stopPropagation();if(button.dataset.touchActivated){delete button.dataset.touchActivated;return}lastPickAt=performance.now();openResource(label.userData)});
- stage.append(button);resourceHitTargets.set(label,button);
+ // Labels are visual WebGL objects, never transparent DOM hit targets.
 }
 function syncResourceHitTargets() {
- if(!renderer||!camera||!stage)return;const rect=renderer.domElement.getBoundingClientRect(),stageRect=stage.getBoundingClientRect(),width=rect.width,height=rect.height;
- for(const [label,button] of resourceHitTargets){const p=label.getWorldPosition(new THREE.Vector3()).project(camera),x=(p.x+1)*width/2,y=(1-p.y)*height/2,visible=p.z>-1&&p.z<1&&x>=0&&x<=width&&y>=0&&y<=height;button.hidden=!visible;if(visible){button.style.left=(rect.left-stageRect.left+x)+'px';button.style.top=(rect.top-stageRect.top+y)+'px';}}
+ // Canvas ray-picking is the only pointer-selection path.
 }
 function renderPath() {
   if(!nav)return;nav.replaceChildren();
@@ -406,8 +402,7 @@ async function init() {
       const inside=p=>p.z>-1&&p.z<1&&p.x>=rect.left&&p.x<=rect.right&&p.y>=rect.top&&p.y<=rect.bottom;
       const branches=resourceObjects.filter(o=>o.userData?.kind==='resource-label').map(project).filter(inside);
       const center={x:rect.left+rect.width/2,y:rect.top+rect.height/2};
-      const tappable=branches.filter(p=>{const el=document.elementFromPoint(p.x,p.y);return el?.classList?.contains('webgl-hit-target')||el===renderer.domElement||renderer.domElement.contains(el)});
-      const targetBranch=(tappable.length?tappable:branches).sort((a,b)=>Math.hypot(a.x-center.x,a.y-center.y)-Math.hypot(b.x-center.x,b.y-center.y))[0]||null;
+      const targetBranch=branches.sort((a,b)=>Number(b.hasChildren)-Number(a.hasChildren)||Math.hypot(a.x-center.x,a.y-center.y)-Math.hypot(b.x-center.x,b.y-center.y))[0]||null;
       const domain=cells.get('bio'),domainTarget=domain?project(domain.hit):null;
       return{count:resourceObjects.filter(o=>o.userData?.kind==='resource-label').length,visible:branches.length,visibleDepths:[...new Set(resourceObjects.filter(o=>o.userData?.kind==='resource').map(o=>o.userData.depth??0))].sort(),target:targetBranch,domainTarget:domainTarget&&inside(domainTarget)?domainTarget:null,lastPick:window.__BALABS_3D_LAST_PICK__||null,lastOpen:window.__BALABS_3D_LAST_OPEN__||null,miniHidden:!!document.getElementById('miniView')?.hidden,transitioning:!!transition,selected,currentTitle:currentNode?.title||null,depth:navigationStack.length,childCount:currentNode?.children?.length||0,clickCount:window.__BALABS_3D_E2E_CLICKS||0,pointerDowns:window.__BALABS_3D_POINTERDOWN||0,pointerUps:window.__BALABS_3D_POINTERUP||0,pickCalls:window.__BALABS_3D_PICK_CALLS||0};
     };
