@@ -78,6 +78,7 @@ assert.ok(engine.includes('function goBackLevel()'), 'The previous-level control
 assert.ok(engine.includes("nav.className='webgl-path'"), 'The scene must use compact spatial breadcrumbs instead of a resource table');
 assert.ok(engine.includes('const hitRadius=depth===0?.32:depth===1?.25:.19'), 'Every hierarchy depth must keep a generous touch target');
 assert.ok(engine.includes('function openResource(item)'), 'Branch selection must drill into folders or open terminal pages');
+assert.ok(engine.includes('nearestLabelDistance<(window.innerWidth<760?58:70)'), 'Mobile and desktop label hit radii must stay narrow enough to avoid selecting adjacent branches');
 assert.ok(engine.includes("if(data.children?.length){"), 'Folders with children must open a deeper spatial level');
 assert.ok(engine.includes('const ancestors=[];let parent=data.parentNode'), 'Directly selected nested folders must preserve every ancestor in the breadcrumb stack');
 assert.ok(engine.includes("if(data.url){window.open(data.url"), 'Terminal pages must open their corresponding Notion page');
