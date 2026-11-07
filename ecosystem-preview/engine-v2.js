@@ -110,16 +110,17 @@ function makeCellGeometry(id) {
 
 function makeLabel(text, color, size=16) {
   const canvas=document.createElement('canvas'), ctx=canvas.getContext('2d');
-  canvas.width=1024; canvas.height=256;
+  // Render labels at high texture resolution: zoom enlarges sprites, not glyph detail.
+  canvas.width=2048; canvas.height=512;
   ctx.clearRect(0,0,canvas.width,canvas.height);
-  ctx.font='600 '+size+'px Inter,system-ui,sans-serif';
+  ctx.font='650 '+(size*2.5)+'px Inter,system-ui,sans-serif';
   ctx.textAlign='center';ctx.textBaseline='middle';
-  ctx.shadowColor='#07110f';ctx.shadowBlur=15;ctx.fillStyle='#f0f2e9';
+  ctx.shadowColor='#07110f';ctx.shadowBlur=22;ctx.fillStyle='#f4f5ed';
   const words=String(text).split(/\s+/);let lines=[],line='';
-  for(const word of words){const next=line?line+' '+word:word;if(ctx.measureText(next).width>930&&line){lines.push(line);line=word}else line=next}
+  for(const word of words){const next=line?line+' '+word:word;if(ctx.measureText(next).width>1880&&line){lines.push(line);line=word}else line=next}
   if(line)lines.push(line);
-  const shown=lines.slice(0,2),lineHeight=48,start=128-(shown.length-1)*lineHeight/2;
-  shown.forEach((part,i)=>ctx.fillText(part,512,start+i*lineHeight));
+  const shown=lines.slice(0,2),lineHeight=104,start=256-(shown.length-1)*lineHeight/2;
+  shown.forEach((part,i)=>ctx.fillText(part,1024,start+i*lineHeight));
   const texture=new THREE.CanvasTexture(canvas);texture.colorSpace=THREE.SRGBColorSpace;
   const material=new THREE.SpriteMaterial({map:texture,transparent:true,depthWrite:false,depthTest:false});
   const sprite=new THREE.Sprite(material);sprite.scale.set(2.3,.58,1);sprite.userData.labelText=text;
@@ -152,7 +153,7 @@ function createWorld() {
       const strandMesh=new THREE.Mesh(new THREE.TubeGeometry(curve,16,.0045,4,false),new THREE.MeshStandardMaterial({color,emissive:color,emissiveIntensity:.28,transparent:true,opacity:.8,roughness:.8}));
       soma.add(strandMesh);
     }
-    const label=makeLabel(LABELS[id]?.title||id, color, 17);label.position.set(0,-1.42,0);label.scale.set(2.65,.54,1);label.userData={id,kind:'domain-label'};group.add(label);
+    const label=makeLabel(LABELS[id]?.title||id, color, 17);label.position.set(0,-1.42,0);label.scale.set(2.8,.66,1);label.userData={id,kind:'domain-label'};group.add(label);
     // Invisible selection volume remains generous for touch, while visible geometry stays filamentary.
     const hit=new THREE.Mesh(new THREE.SphereGeometry(1.12,16,12),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));hit.userData={id,kind:'domain'};group.add(hit);
     world.add(group);cells.set(id,{group,soma,label,hit,position:pos,color});
@@ -222,7 +223,7 @@ function clearResources() {
   resourceObjects=[];pickables=pickables.filter(o=>o.userData?.kind!=='resource'&&o.userData?.kind!=='resource-label');selectedBranch=null;
 }
 function mDispose(material){material?.map?.dispose();material?.dispose?.()}
-function makeResourceLabel(item,color,depth=0) { const size=depth===0?15:depth===1?12:10;const label=makeLabel(item.title,color,size);const scale=depth===0?2:depth===1?1.35:.9;label.scale.set(scale,depth===0?.44:depth===1?.32:.22,1);label.userData={...item,kind:'resource-label'};addResourceHitTarget(label);return label; }
+function makeResourceLabel(item,color,depth=0) { const size=depth===0?18:depth===1?16:14;const label=makeLabel(item.title,color,size);const scale=depth===0?2.55:depth===1?1.95:1.5;label.scale.set(scale,depth===0?.58:depth===1?.48:.38,1);label.userData={...item,kind:'resource-label'};addResourceHitTarget(label);return label; }
 function addResourceHitTarget(label) {
  // Spatial labels are rendered only in WebGL. Do not create transparent DOM
  // hit areas: mobile browsers can hit-test stale/overlapping buttons instead
