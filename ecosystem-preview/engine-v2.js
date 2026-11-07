@@ -246,7 +246,7 @@ function syncResourceHitTargets() {
   // Transparent label buttons must never intercept pointer hit-testing: overlapping
   // 76px targets can otherwise steal taps from the actual projected branch.
   // The WebGL canvas performs the authoritative ray-pick for mouse and touch.
-  button.style.setProperty('pointer-events','none','important');
+  button.style.setProperty('display','none','important');
   const p=label.getWorldPosition(new THREE.Vector3()).project(camera),
   rawX=rect.left+(p.x+1)*width/2,rawY=rect.top+(1-p.y)*height/2,
   visible=p.z>-1&&p.z<1&&rawX>=rect.left&&rawX<=rect.right&&rawY>=rect.top&&rawY<=rect.bottom,
@@ -380,20 +380,6 @@ function onPointerMove(e) {
   lastPointer={x:e.clientX,y:e.clientY};
 }
 function onPointerUp(e) {
-  // Some mobile Chromium versions retarget a tap to the transparent spatial
-  // label even though the canvas owns pointer input. The down handler ignores
-  // that label, so resolve its pointer-up explicitly instead of dropping it.
-  const hitButton=e.target.closest?.('.webgl-hit-target');
-  if(hitButton&&e.pointerType==='touch'){
-    const label=[...resourceHitTargets.entries()].find(([,target])=>target===hitButton)?.[0];
-    if(label&&performance.now()-lastPickAt>120){
-      hitButton.dataset.touchActivated='1';
-      lastPickAt=performance.now();
-      openResource(label.userData);
-    }
-    pointers.delete(e.pointerId);
-    return;
-  }
   const wasPointer=pointers.has(e.pointerId);pointers.delete(e.pointerId);
   if(pointers.size<2)pinchStart=0;
   if(!wasPointer)return;
