@@ -224,32 +224,12 @@ function clearResources() {
 function mDispose(material){material?.map?.dispose();material?.dispose?.()}
 function makeResourceLabel(item,color,depth=0) { const size=depth===0?15:depth===1?12:10;const label=makeLabel(item.title,color,size);const scale=depth===0?2:depth===1?1.35:.9;label.scale.set(scale,depth===0?.44:depth===1?.32:.22,1);label.userData={...item,kind:'resource-label'};addResourceHitTarget(label);return label; }
 function addResourceHitTarget(label) {
- const button=document.createElement('button');button.type='button';button.className='webgl-hit-target';button.setAttribute('aria-label',(label.userData.hasChildren?'Ouvrir le dossier : ':'Ouvrir la page : ')+label.userData.title);button.title=label.userData.title;button.style.cssText='position:absolute;width:48px;height:48px;padding:0;margin:0;border:0;border-radius:50%;background:transparent;opacity:0;z-index:30;pointer-events:none!important;display:none!important;touch-action:none;transform:translate(-50%,-50%);';
- // Kept only as a semantic/debug representation for the E2E probe. It must
- // never own pointer, touch, or click events; the WebGL stage is authoritative.
- stage.append(button);resourceHitTargets.set(label,button);
+ // Spatial labels are rendered only in WebGL. Do not create transparent DOM
+ // hit areas: mobile browsers can hit-test stale/overlapping buttons instead
+ // of the canvas, even when CSS attempts to disable pointer events.
 }
 function syncResourceHitTargets() {
- if(!renderer||!camera||!stage)return;
- const rect=renderer.domElement.getBoundingClientRect(),width=rect.width,height=rect.height,edge=42,viewport=window.visualViewport,
- viewLeft=viewport?.offsetLeft||0,viewTop=viewport?.offsetTop||0,
- viewWidth=Math.min(window.innerWidth,viewport?.width||window.innerWidth),
- viewHeight=Math.min(window.innerHeight,document.documentElement.clientHeight||window.innerHeight,viewport?.height||window.innerHeight),
- viewRight=viewLeft+viewWidth,viewBottom=viewTop+viewHeight,
- minX=Math.max(viewLeft+edge,rect.left+edge),maxX=Math.min(viewRight-edge,rect.right-edge),
- minY=Math.max(viewTop+edge,rect.top+edge),maxY=Math.min(viewBottom-edge,rect.bottom-edge);
- for(const [label,button] of resourceHitTargets){
-  // Transparent label buttons must never intercept pointer hit-testing: overlapping
-  // 76px targets can otherwise steal taps from the actual projected branch.
-  // The WebGL canvas performs the authoritative ray-pick for mouse and touch.
-  button.style.setProperty('display','none','important');
-  const p=label.getWorldPosition(new THREE.Vector3()).project(camera),
-  rawX=rect.left+(p.x+1)*width/2,rawY=rect.top+(1-p.y)*height/2,
-  visible=p.z>-1&&p.z<1&&rawX>=rect.left&&rawX<=rect.right&&rawY>=rect.top&&rawY<=rect.bottom,
-  x=Math.max(minX,Math.min(maxX,rawX)),y=Math.max(minY,Math.min(maxY,rawY));
-  button.hidden=!visible||maxX<minX||maxY<minY;
-  if(visible&&!button.hidden){button.style.left=(x-rect.left)+'px';button.style.top=(y-rect.top)+'px';}
- }
+ // Kept as an animation-loop hook; selection is exclusively canvas ray-picking.
 }
 function renderPath() {
   if(!nav)return;nav.replaceChildren();
@@ -450,12 +430,9 @@ async function init() {
       const rect=renderer.domElement.getBoundingClientRect();
       const project=obj=>{const p=obj.getWorldPosition(new THREE.Vector3()).project(camera);return{x:rect.left+(p.x+1)*rect.width/2,y:rect.top+(1-p.y)*rect.height/2,z:p.z,title:obj.userData.title||obj.userData.id,hasChildren:!!obj.userData.hasChildren,depth:obj.userData.depth??0,url:obj.userData.url||null}};
       const inside=p=>p.z>-1&&p.z<1&&p.x>=rect.left&&p.x<=rect.right&&p.y>=rect.top&&p.y<=rect.bottom;
-      const branches=resourceObjects.filter(o=>o.userData?.kind==='resource-label').map(label=>{
-        const projected=project(label),button=resourceHitTargets.get(label);
-        if(!button||button.hidden)return null;
-        const hit=button.getBoundingClientRect();
-        return {...projected,hitTarget:true,hitRect:{x:hit.x,y:hit.y,width:hit.width,height:hit.height}};
-      }).filter(p=>p&&p.z>-1&&p.z<1&&p.x>=rect.left&&p.x<=rect.right&&p.y>=rect.top&&p.y<=rect.bottom);
+      const branches=resourceObjects.filter(o=>o.userData?.kind==='resource-label')
+        .map(project)
+        .filter(p=>p&&p.z>-1&&p.z<1&&p.x>=rect.left&&p.x<=rect.right&&p.y>=rect.top&&p.y<=rect.bottom);
       const center={x:rect.left+rect.width/2,y:rect.top+rect.height/2};
       const targetBranch=branches.sort((a,b)=>Number(b.hasChildren)-Number(a.hasChildren)||Math.hypot(a.x-center.x,a.y-center.y)-Math.hypot(b.x-center.x,b.y-center.y))[0]||null;
       const domain=cells.get('bio'),domainTarget=domain?project(domain.hit):null;
