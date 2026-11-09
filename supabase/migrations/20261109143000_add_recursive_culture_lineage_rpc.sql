@@ -148,7 +148,7 @@ begin
            d.id, d.code, d.culture_type, d.material_id,
            m.material_code, m.material_type, m.generation, m.state,
            d.parent_culture_id, m.parent_material_id, d.started_at,
-           d.total_count > (v_offset + v_limit), d.total_count, d.total_count > (v_offset + v_limit)
+           false, d.total_count, d.total_count > (v_offset + v_limit)
       from ranked_descendants d
       left join public.materials m
         on m.organization_id = p_organization_id and m.id = d.material_id
