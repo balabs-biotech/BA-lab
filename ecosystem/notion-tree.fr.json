@@ -762,9 +762,33 @@
     {
       "id": "learn",
       "title": "RESSOURCES & TRANSMISSION",
-      "description": "Univers prévu pour les ressources pédagogiques, les protocoles de transmission et le partage public des connaissances. La branche Notion correspondante reste à créer.",
-      "status": "planned",
-      "children": []
+      "description": "Ressources publiques pour parcourir les travaux documentés, comprendre les limites des preuves et découvrir les modalités de collaboration.",
+      "children": [
+        {
+          "id": "learn-work",
+          "title": "Travaux & réalisations documentés",
+          "url": "https://app.notion.com/p/3f273152f171815597b6c696402b42c0",
+          "children": []
+        },
+        {
+          "id": "learn-evidence",
+          "title": "Ce qui est effectivement démontré",
+          "url": "https://app.notion.com/p/3e973152f171816781fbf56674cfe55c",
+          "children": []
+        },
+        {
+          "id": "learn-catalogue",
+          "title": "Catalogue public — ressources biologiques",
+          "url": "https://app.notion.com/p/3ec73152f1718125b1a7c58bc58ebcaa",
+          "children": []
+        },
+        {
+          "id": "learn-collaborate",
+          "title": "Collaborer avec BA Labs",
+          "url": "https://app.notion.com/p/3e273152f17181a8bedae0bfd2452543",
+          "children": []
+        }
+      ]
     }
   ],
   "notes": "The French public landing page lists the seven mapped roots. No separate public learning/resources root is linked there; do not invent one. The landing page also links to evidence and collaboration pages, which are not separate top-level universes. R&D root audit: added Methodologie R&D, Iteration & validation, and Equipe/expertise pages; moved Prototypes & essais and Mesure & reproductibilite to R&D branch; removed collaboration proposal page from laboratory branch because its actual parent is Collaborer avec BA Labs.",

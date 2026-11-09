@@ -26,9 +26,12 @@ for (const language of expectedLanguages) {
     assert.ok(!ids.has(node.id), trail + ': duplicate node id ' + node.id);
     ids.add(node.id);
     assert.ok(typeof node.title === 'string' && node.title.trim(), trail + ': missing localized title');
-    if (node.status === 'planned') {
-      assert.equal(node.id, 'learn', trail + ': only the planned knowledge-transfer universe may omit a Notion page');
-      assert.ok(!node.url && !node.notionId, trail + ': planned placeholder must not invent a Notion destination');
+    if (node.id === 'learn') {
+      assert.ok(!node.url && !node.notionId, trail + ': knowledge-transfer hub must not invent a parent Notion destination');
+      assert.equal(node.children?.length, 4, trail + ': knowledge-transfer hub must expose four public resource links');
+    } else if (node.id.startsWith('learn-')) {
+      assert.match(node.url || '', /^https:\/\/app\.notion\.com\/p\/[a-f0-9]{32}$/, trail + ': invalid cross-linked public Notion URL');
+      assert.ok(!node.notionId, trail + ': cross-domain links must not duplicate source-page identifiers');
     } else {
       assert.match(node.url || '', /^https:\/\/app\.notion\.com\/p\/[a-f0-9]{32}$/, trail + ': invalid public Notion URL');
       assert.equal(node.url, 'https://app.notion.com/p/' + node.notionId, trail + ': Notion URL and page ID must match');
