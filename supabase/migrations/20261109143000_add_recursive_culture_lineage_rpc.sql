@@ -23,6 +23,7 @@ returns table (
   material_type text,
   material_generation integer,
   material_state text,
+  material_relationship_type text,
   parent_culture_id uuid,
   parent_material_id uuid,
   started_at timestamptz,
@@ -104,7 +105,7 @@ begin
   ),
   material_ancestors as (
     select m.id, m.material_code, m.material_type, m.parent_material_id,
-           m.generation, m.state, 1::integer as depth,
+           m.generation, m.state, rel.relationship_type, 1::integer as depth,
            array[current_material.id, m.id]::uuid[] as path
       from target t
       join public.materials current_material
@@ -113,14 +114,22 @@ begin
       join public.materials m
         on m.organization_id = t.organization_id
        and m.id = current_material.parent_material_id
+      left join public.material_relationships rel
+        on rel.organization_id = t.organization_id
+       and rel.parent_material_id = m.id
+       and rel.child_material_id = current_material.id
     union all
     select parent.id, parent.material_code, parent.material_type,
            parent.parent_material_id, parent.generation, parent.state,
-           ma.depth + 1, ma.path || parent.id
+           rel.relationship_type, ma.depth + 1, ma.path || parent.id
       from material_ancestors ma
       join public.materials parent
         on parent.organization_id = p_organization_id
        and parent.id = ma.parent_material_id
+      left join public.material_relationships rel
+        on rel.organization_id = p_organization_id
+       and rel.parent_material_id = parent.id
+       and rel.child_material_id = ma.id
      where ma.depth < 250
        and not parent.id = any(ma.path)
   ),
@@ -128,7 +137,8 @@ begin
     select 1 as sort_group, 'ancestor'::text as relation, a.depth,
            a.id as culture_id, a.code as culture_code, a.culture_type,
            a.material_id, m.material_code, m.material_type, m.generation as material_generation,
-           m.state as material_state, a.parent_culture_id, m.parent_material_id,
+           m.state as material_state, null::text as material_relationship_type,
+           a.parent_culture_id, m.parent_material_id,
            a.started_at, false as truncated, 0::bigint as descendant_total, false as has_more
       from ancestors a
       left join public.materials m
@@ -136,7 +146,7 @@ begin
     union all
     select 2, 'current'::text, 0,
            t.id, t.code, t.culture_type, t.material_id,
-           m.material_code, m.material_type, m.generation, m.state,
+           m.material_code, m.material_type, m.generation, m.state, null::text,
            t.parent_culture_id, m.parent_material_id, t.started_at, false,
            stats.total_count, stats.total_count > (v_offset + v_limit)
       from target t
@@ -146,7 +156,7 @@ begin
     union all
     select 3, 'descendant'::text, d.depth,
            d.id, d.code, d.culture_type, d.material_id,
-           m.material_code, m.material_type, m.generation, m.state,
+           m.material_code, m.material_type, m.generation, m.state, null::text,
            d.parent_culture_id, m.parent_material_id, d.started_at,
            false, stats.total_count, stats.total_count > (v_offset + v_limit)
       from ranked_descendants d
@@ -157,13 +167,13 @@ begin
     union all
     select 4, 'material_ancestor'::text, ma.depth,
            null::uuid, null::text, null::text, ma.id,
-           ma.material_code, ma.material_type, ma.generation, ma.state,
+           ma.material_code, ma.material_type, ma.generation, ma.state, ma.relationship_type,
            null::uuid, ma.parent_material_id, null::timestamptz, false, 0::bigint, false
       from material_ancestors ma
     union all
     select 5, 'ancestor_truncated'::text, 250,
            null::uuid, null::text, null::text, null::uuid,
-           null::text, null::text, null::integer, null,
+           null::text, null::text, null::integer, null, null::text,
            null::uuid, null::uuid, null::timestamptz, true, 0::bigint, false
      where exists (
        select 1 from ancestors a
@@ -193,7 +203,8 @@ begin
   )
   select r.relation, r.depth, r.culture_id, r.culture_code, r.culture_type,
          r.material_id, r.material_code, r.material_type, r.material_generation,
-         r.material_state, r.parent_culture_id, r.parent_material_id,
+         r.material_state, r.material_relationship_type,
+         r.parent_culture_id, r.parent_material_id,
          r.started_at, r.truncated, r.descendant_total, r.has_more
     from result_rows r
    order by r.sort_group, r.depth, r.culture_code nulls last;
