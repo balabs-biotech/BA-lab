@@ -138,7 +138,7 @@ assert.match(workspace, /id="generationComparisonOptions"/,
   'culture comparison must expose a mobile-friendly checkbox list');
 assert.match(source, /checkbox\.type\s*=\s*["']checkbox["']/,
   'culture comparison options must be selectable with accessible checkboxes');
-assert.match(source, /selectedCultureIds\.length\s*>=\s*4/,
+assert.match(source, /selectedCultureIds\.length\s*>\s*4/,
   'culture comparison must prevent selecting more than four cultures in the UI');
 
 assert.match(workspace, /id="compareCultureGenerationsButton"/,
@@ -151,8 +151,8 @@ assert.doesNotMatch(source, /compareCultureGenerations\.requestId/,
   'workspace cleanup must not depend on a function scoped to another script context');
 assert.match(source, /compareCultureGenerationsButton.*addEventListener\("click", compareCultureGenerations\)/,
   'generation comparison action must be connected to its handler');
-assert.match(source, /generationComparisonCultures.*addEventListener\(["']change["']/,
-  'changing the selected cultures must invalidate any in-flight comparison report');
+assert.match(source, /checkbox\.addEventListener\(["']change["']/,
+  'changing a selected culture checkbox must invalidate any in-flight comparison report');
 assert.match(source, /generationComparisonResults\.__generationComparisonRequestId = \(generationComparisonResults\.__generationComparisonRequestId \|\| 0\) \+ 1/,
   'opening another culture detail must invalidate a pending comparison for the previous selection');
 
