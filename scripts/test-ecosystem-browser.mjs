@@ -101,7 +101,7 @@ async function checkWorkingScene(name, viewport) {
   const domainTarget = await page.evaluate(() => window.__BALABS_3D_E2E__().domainTarget);
   const hitSurface = await page.evaluate(({x,y}) => { const stage=document.querySelector('.webgl-stage'), canvas=stage?.querySelector('canvas'), rect=el=>{const r=el?.getBoundingClientRect();return r?{x:r.x,y:r.y,width:r.width,height:r.height}:null};return{stage:rect(stage),canvas:rect(canvas),stagePointer:stage&&getComputedStyle(stage).pointerEvents,canvasPointer:canvas&&getComputedStyle(canvas).pointerEvents,element:document.elementFromPoint(x,y)?.tagName,elementClass:document.elementFromPoint(x,y)?.className,main:rect(document.querySelector('#mainView'))}; }, domainTarget);
   await page.evaluate(() => document.addEventListener('click', event => { window.__BALABS_3D_DOCUMENT_CLICK__ = {tag:event.target?.tagName, id:event.target?.id, className:typeof event.target?.className==='string'?event.target.className:'', stage:!!event.target?.closest?.('.webgl-stage'), x:event.clientX, y:event.clientY}; }, true));
-  await tapSpatialTarget(page, name, domainTarget.x, domainTarget.y, '.webgl-domain-target');
+  await tapSpatialTarget(page, name, domainTarget.x, domainTarget.y, '.webgl-domain-target[title='+JSON.stringify(domainTarget.title)+']');
   assert.equal(await page.evaluate(() => document.activeElement === document.querySelector('#mainView .webgl-stage canvas')),
     true, name + ': pointer interaction must focus the 3D canvas so keyboard navigation is immediately available');
   await page.waitForFunction(() => {
