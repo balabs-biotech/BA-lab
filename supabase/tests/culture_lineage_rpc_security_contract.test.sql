@@ -8,7 +8,7 @@ declare
   v_search_path text;
 begin
   v_signature := to_regprocedure(
-    'public.get_culture_lineage(uuid,uuid)'
+    'public.get_culture_lineage(uuid,uuid,integer)'
   );
   if v_signature is null then
     raise exception 'FAIL: recursive culture lineage RPC is missing';
