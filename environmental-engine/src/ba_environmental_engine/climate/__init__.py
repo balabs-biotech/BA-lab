@@ -1,0 +1,1 @@
+"""Descriptive climate indicator calculations."""
