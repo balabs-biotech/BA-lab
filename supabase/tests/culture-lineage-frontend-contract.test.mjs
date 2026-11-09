@@ -16,6 +16,18 @@ assert.match(loader, /p_culture_id:\s*cultureId/,
   'lineage RPC must receive the selected culture');
 assert.match(loader, /p_limit:\s*200/,
   'lineage RPC must request an explicit bounded descendant result');
+assert.match(loader, /p_offset:\s*offset/,
+  'lineage RPC must request the selected descendant page');
+assert.match(loader, /current\.has_more === true/,
+  'lineage UI must use server pagination metadata');
+assert.match(loader, /loadBiologicalLineage\(cultureId, offset \+ 200\)/,
+  'lineage UI must load the next page without resetting the selected culture');
+assert.match(loader, /target\.__lineageRows/,
+  'lineage UI must preserve previously loaded descendants when appending a page');
+assert.match(migration, /p_offset integer default 0/,
+  'lineage RPC must expose an offset parameter');
+assert.match(migration, /d\.row_number > v_offset and d\.row_number <= \(v_offset \+ v_limit\)/,
+  'lineage RPC must return a bounded descendant page');
 assert.doesNotMatch(loader, /\.from\(['"]cultures['"]\)|\.from\(['"]materials['"]\)/,
   'lineage loader must not fetch whole tenant culture or material tables');
 assert.match(loader, /relation === 'ancestor'/);
