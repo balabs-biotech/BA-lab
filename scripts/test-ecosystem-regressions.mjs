@@ -3,6 +3,7 @@ import { readFileSync } from 'node:fs';
 
 const html = readFileSync('ecosystem/index.html', 'utf8');
 const engine = readFileSync('ecosystem/engine-v2.js', 'utf8');
+const previewEngine = readFileSync('ecosystem-preview/engine-v2.js', 'utf8');
 const expectedDomains = ['bio', 'myco', 'soil', 'lab', 'products', 'iot', 'work', 'learn'];
 
 assert.ok(html.includes('engine-v2.js?v=20261102-clean-core-v2'), 'Public explorer must load the clean v2 engine');
@@ -51,6 +52,8 @@ assert.equal(ptTree.domains.find(domain => domain.id === 'bio').notionId, '40173
 assert.ok(engine.includes('function createWorld()'), 'The new engine must build its own biological network scene');
 assert.ok(engine.includes("ctx.font='700 '+(size*4)+'px Inter,system-ui,sans-serif'"), '3D labels must use enlarged, heavier glyphs that remain readable when zoomed');
 assert.ok(engine.includes('lineHeight=142'), 'Multi-line 3D labels must retain sufficient vertical spacing at the larger font size');
+assert.ok(previewEngine.includes("ctx.font='700 '+(size*4)+'px Inter,system-ui,sans-serif'"), 'Preview 3D labels must use the same enlarged, heavier glyphs');
+assert.ok(previewEngine.includes('lineHeight=142'), 'Preview multiline labels must use matching vertical spacing');
 assert.ok(engine.includes("const soma=new THREE.Group();soma.userData={id,kind:'domain'};group.add(soma);"), 'Domain centres must remain open mycelial junctions rather than solid cell bodies');
 assert.ok(engine.includes('Sparse background hyphae connect the field'), 'The overview must contain fine background mycelial connections');
 assert.ok(engine.includes('for(let j=0;j<14;j++)'), 'Domain branches must retain dense radial connectivity');
