@@ -93,6 +93,7 @@ assert.ok(engine.includes('label.userData.denseRoot?19'), 'Dense root labels mus
 assert.ok(engine.includes('rootCount>16?(window.innerWidth<760?20.5:11.5):7.5'), 'Dense folders must fit the initial camera framing on mobile and desktop');
 assert.ok(previewEngine.includes('children.length>16') && previewEngine.includes('Math.sqrt((k+.5)/children.length)'), 'Preview must use the same dense-folder layout as the public explorer');
 assert.ok(previewEngine.includes('const maxDepth=3'), 'Preview and public engines must expose the same deepest Notion level');
+assert.ok(previewEngine.includes('nearestLabelDistance<(window.innerWidth<760?58:70)'), 'Preview branch hit radius must match the public engine on mobile and desktop');
 for (const language of ['fr', 'ar', 'en', 'pt']) {
   const tree = JSON.parse(readFileSync('ecosystem/notion-tree.' + language + '.json', 'utf8'));
   let deepest = 0;
