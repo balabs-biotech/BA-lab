@@ -17,7 +17,14 @@ const browser = await chromium.launch({
   ],
 });
 
-async function tapSpatialTarget(page, name, x, y) {
+async function tapSpatialTarget(page, name, x, y, selector) {
+  // Prefer the real semantic hit target whenever one is supplied. Coordinate-only
+  // canvas taps can select a neighbouring domain on narrow mobile viewports.
+  if (selector) {
+    const target = page.locator(selector).first();
+    await target.waitFor({ state: 'visible', timeout: 5000 });
+    return target.click({ force: true });
+  }
   if (name !== 'mobile') return page.mouse.click(x, y);
   return page.touchscreen.tap(x, y);
 }
