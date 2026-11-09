@@ -180,7 +180,7 @@ assert.match(reportRenderer, /quantile\(sorted, \.75\)/,
 assert.match(reportRenderer, /pas le nombre de répétitions biologiques indépendantes/,
   'measurement counts must not be presented as biological replicate counts');
 assert.match(reportRenderer, /Mesures environnementales contextuelles/,
-
+  'shared environmental measurements must remain explicit contextual evidence');
 assert.match(reportRenderer, /culture_environment_context/,
   'the report must consume explicit culture-to-location context mappings');
 assert.match(reportRenderer, /environmentalObservations/,
@@ -193,7 +193,6 @@ assert.match(reportRenderer, /résolution spatiale/,
   'gridded environmental observations must disclose their spatial resolution');
 assert.match(reportRenderer, /ne sont pas des mesures directes de la culture/,
   'external environmental observations must never be presented as direct culture measurements');
-  'shared environmental measurements must remain explicit contextual evidence');
 
 assert.match(reportRenderer, /culture\.experimental_unit_id/,
   'replicate-aware analysis must identify the experimental unit attached to each culture');
