@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs';
 
 const source = readFileSync('batch-tracker/tracker.js', 'utf8');
 const migration = readFileSync('supabase/migrations/20261109143000_add_recursive_culture_lineage_rpc.sql', 'utf8');
-const start = source.indexOf('async function loadBiologicalLineage(cultureId) {');
+const start = source.indexOf('async function loadBiologicalLineage(cultureId, offset = 0) {');
 const end = source.indexOf('\nlet pendingBiologicalOperationKey', start);
 assert.ok(start >= 0 && end > start, 'lineage loader must remain a named, bounded function');
 
