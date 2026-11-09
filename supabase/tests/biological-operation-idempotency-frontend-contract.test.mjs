@@ -7,7 +7,7 @@ const end = source.indexOf('\nfunction ', start);
 assert.ok(start >= 0 && end > start, 'biological operation writer must remain a named function');
 
 const writer = source.slice(start, end);
-assert.match(writer, /getManualWriteIdempotencyKey\\(\\s*[\"']biological-operation[\"']/,
+assert.match(writer, /getManualWriteIdempotencyKey\(\s*["']biological-operation["']/,
   'biological operation retries must reuse the durable session-scoped idempotency key helper');
 assert.match(writer, /p_idempotency_key:\s*idempotencyKey/,
   'the durable key must be sent to the atomic biological operation RPC');
