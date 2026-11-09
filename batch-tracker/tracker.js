@@ -6212,7 +6212,6 @@ async function loadCultureDetail(cultureId) {
     if (requestId !== cultureDetailRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
 
     const batches = cultureBatches || [];
-    const batchIds = batches.map(batch => batch.id);
     const { data: eventHistory, error: eventHistoryError } = await supabaseClient.rpc("get_culture_event_history", {
       p_organization_id: loadOrganizationId,
       p_culture_id: culture.id,
@@ -6362,7 +6361,7 @@ async function loadCultureDetail(cultureId) {
       });
       timeline.appendChild(batchSection);
     }
-    if (events.length === 100 || measurements.length >= 100 || observations.length >= 100 || batches.length === 100) {
+    if (events.length === 100 || eventHistory?.some(row => row.has_more === true) || measurements.length >= 100 || observations.length >= 100 || batches.length === 100) {
       const limitNotice = document.createElement("p");
       limitNotice.className = "info warning";
       limitNotice.textContent = "Historique partiel : au moins une catégorie atteint sa limite de chargement. Certaines données anciennes peuvent ne pas apparaître ici.";
