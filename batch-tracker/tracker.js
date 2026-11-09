@@ -6254,10 +6254,12 @@ async function loadMoreCultureEventHistory(cultureId, offset, button) {
       }));
       if (!linkedMeasurements.length && !linkedObservations.length) entries.push({
         date: event.occurred_at,
-        type: (event.source_relation === "creation_operation" ? "Opération de création · " : "") +
+        type: (event.source_relation === "creation_operation" ? "Opération de création · " :
+          event.source_relation === "descendant_culture" ? "Création d’une culture fille · " : "") +
           String(event.event_type || "Événement").replaceAll("_", " "),
         detail: [
-          event.source_relation === "creation_operation" ? "Opération à l’origine de cette culture" : null,
+          event.source_relation === "creation_operation" ? "Opération à l’origine de cette culture" :
+          event.source_relation === "descendant_culture" ? "Culture fille créée depuis cette culture par génération directe" : null,
           event.payload?.parent_culture_code ? "Culture parent : " + event.payload.parent_culture_code : null,
           event.payload?.material_code ? "Matériel : " + event.payload.material_code : null,
           event.payload?.note,
@@ -6436,10 +6438,12 @@ async function loadCultureDetail(cultureId) {
       }));
       if (!linkedMeasurements.length && !linkedObservations.length) entries.push({
         date: event.occurred_at,
-        type: (event.source_relation === "creation_operation" ? "Opération de création · " : "") +
+        type: (event.source_relation === "creation_operation" ? "Opération de création · " :
+          event.source_relation === "descendant_culture" ? "Création d’une culture fille · " : "") +
           String(event.event_type || "Événement").replaceAll("_", " "),
         detail: [
-          event.source_relation === "creation_operation" ? "Opération à l’origine de cette culture" : null,
+          event.source_relation === "creation_operation" ? "Opération à l’origine de cette culture" :
+          event.source_relation === "descendant_culture" ? "Culture fille créée depuis cette culture par génération directe" : null,
           event.payload?.parent_culture_code ? "Culture parent : " + event.payload.parent_culture_code : null,
           event.payload?.material_code ? "Matériel : " + event.payload.material_code : null,
           event.payload?.note,
