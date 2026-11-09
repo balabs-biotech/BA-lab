@@ -252,7 +252,7 @@ function syncResourceHitTargets() {
  if(!_hitWorld)_hitWorld=new THREE.Vector3();
  camera.updateMatrixWorld(true);world?.updateMatrixWorld(true);
  const rect=renderer.domElement.getBoundingClientRect(),stageRect=stage.getBoundingClientRect();
- const place=(object,button)=>{object.getWorldPosition(_hitWorld);const p=_hitWorld.clone().project(camera);button.style.setProperty('z-index','99999','important');const visible=p.z>-1&&p.z<1&&p.x>=-1.12&&p.x<=1.12&&p.y>=-1.12&&p.y<=1.12;button.hidden=!visible;button.style.display=visible?'block':'none';if(!visible)return;button.style.left=(rect.left+(p.x+1)*rect.width/2-stageRect.left)+'px';button.style.top=(rect.top+(1-p.y)*rect.height/2-stageRect.top)+'px'};
+ const place=(object,button)=>{object.getWorldPosition(_hitWorld);const p=_hitWorld.clone().project(camera);button.style.setProperty('z-index',String(Math.round(1000-(p.z+1)*400)+(button.dataset.hasChildren==='true'?1:0)),'important');const visible=p.z>-1&&p.z<1&&p.x>=-1.12&&p.x<=1.12&&p.y>=-1.12&&p.y<=1.12;button.hidden=!visible;button.style.display=visible?'block':'none';if(!visible)return;button.style.left=(rect.left+(p.x+1)*rect.width/2-stageRect.left)+'px';button.style.top=(rect.top+(1-p.y)*rect.height/2-stageRect.top)+'px'};
  for(const {object,button} of domainHitTargets.values()){place(object,button);button.hidden=!opened||!!selected||button.hidden}
  for(const [label,button] of resourceHitTargets)place(label,button);
 }
