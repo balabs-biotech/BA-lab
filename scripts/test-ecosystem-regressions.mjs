@@ -6,7 +6,7 @@ const engine = readFileSync('ecosystem/engine-v2.js', 'utf8');
 const previewEngine = readFileSync('ecosystem-preview/engine-v2.js', 'utf8');
 const expectedDomains = ['bio', 'myco', 'soil', 'lab', 'products', 'iot', 'work', 'learn'];
 
-assert.ok(html.includes('engine-v2.js?v=20261109-screen-space-labels-v1'), 'Public explorer must load the cache-busted screen-space label engine');
+assert.ok(html.includes('engine-v2.js?v=20261109-depth-three-branches-v1'), 'Public explorer must load the cache-busted screen-space label engine');
 assert.ok(engine.includes('function syncLabelScales()') && engine.includes('cameraDistance*projection*targetPixels'), '3D labels must keep a stable screen-space size across zoom levels');
 assert.ok(!html.includes('constellation-3d.js?v='), 'Legacy monolithic engine must no longer be loaded');
 assert.ok(engine.includes("const IDS = ['bio','myco','soil','lab','products','iot','work','learn']"), 'The clean engine must own the complete eight-domain registry');
@@ -87,7 +87,15 @@ assert.ok(engine.includes('if(selected&&e.deltaY>0&&nextDistance>9.5){goBackLeve
 assert.ok(!engine.includes('const bg=new THREE.BufferGeometry()'), 'The opening network must avoid decorative starfield geometry');
 
 assert.ok(engine.includes("fetch('./notion-tree.'+LANG()+'.json'"), 'The engine must load the active language Notion tree');
-assert.ok(engine.includes('const maxDepth=2'), 'The spatial graph must preview multiple nested Notion levels');
+assert.ok(engine.includes('const maxDepth=3'), 'The spatial graph must expose the deepest real Notion folders and pages');
+assert.ok(previewEngine.includes('const maxDepth=3'), 'Preview and public engines must expose the same deepest Notion level');
+for (const language of ['fr', 'ar', 'en', 'pt']) {
+  const tree = JSON.parse(readFileSync('ecosystem/notion-tree.' + language + '.json', 'utf8'));
+  let deepest = 0;
+  const inspectDepth = (nodes, depth) => nodes.forEach(node => { deepest = Math.max(deepest, depth); inspectDepth(node.children || [], depth + 1); });
+  inspectDepth(tree.domains, 0);
+  assert.ok(deepest <= 3, language + ' manifest depth must remain visible in the 3D engine');
+}
 assert.ok(engine.includes('const drawNode=(item,pos,depth,parent,angle,index)=>'), 'Every rendered node must preserve its position in the real Notion hierarchy');
 assert.ok(engine.includes("const l=makeResourceLabel(data,color,depth);"), 'Every visible hierarchy depth, including depth two, must display its folder or page label');
 assert.ok(engine.includes('drawNode(child,childPos,depth+1,item,childAngle,childIndex)'), 'Nested folders and pages must be drawn recursively');
