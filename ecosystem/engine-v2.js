@@ -411,13 +411,17 @@ function syncLabelScales() {
   if(!labelWorldPosition)labelWorldPosition=new THREE.Vector3();
   const viewportHeight=Math.max(1,renderer.domElement.clientHeight);
   const projection=2*Math.tan(THREE.MathUtils.degToRad(camera.fov*.5))/viewportHeight;
+  // Perspective size depends on camera-space Z, not Euclidean distance.
+  // Using the latter made labels near the screen edges subtly oversized.
+  camera.updateMatrixWorld();
   const apply=label=>{
     if(!label?.userData?.kind?.endsWith('label'))return;
     label.getWorldPosition(labelWorldPosition);
-    const cameraDistance=Math.max(.1,camera.position.distanceTo(labelWorldPosition));
+    labelWorldPosition.applyMatrix4(camera.matrixWorldInverse);
+    const cameraSpaceDepth=Math.max(.1,Math.abs(labelWorldPosition.z));
     const depth=label.userData.depth||0;
     const targetPixels=label.userData.kind==='domain-label'?25:Math.max(17,23-depth*2);
-    const worldHeight=cameraDistance*projection*targetPixels;
+    const worldHeight=cameraSpaceDepth*projection*targetPixels;
     label.scale.set(worldHeight*4.25,worldHeight,1);
   };
   for(const item of cells.values())apply(item.label);
