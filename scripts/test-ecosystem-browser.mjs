@@ -151,13 +151,15 @@ async function checkWorkingScene(name, viewport) {
         assert.equal(depthAfterZoom, nestedDepth,
           name + ': camera zoom-out must not change the selected hierarchy level');
         zoomOutChecked = true;
-        await page.waitForFunction(() => !document.querySelector('#mainView .webgl-stage')?.classList.contains('is-transitioning'), undefined, { timeout: 8000 });
-        const parentTarget = await page.evaluate(() => window.__BALABS_3D_E2E__()?.target || null);
-        assert.ok(parentTarget?.hasChildren, name + ': parent view must expose the folder again after zoom-out');
-        await tapSpatialTarget(page, name, parentTarget.x, parentTarget.y);
-        await page.waitForFunction((previous) => (window.__BALABS_3D_E2E__()?.depth || 0) > previous,
-          parentDepth, { timeout: 8000 });
-        await page.waitForFunction(() => !document.querySelector('#mainView .webgl-stage')?.classList.contains('is-transitioning'), undefined, { timeout: 8000 });
+        const distanceAfterZoomOut = await page.evaluate(() => window.__BALABS_3D_E2E__()?.cameraDistance || 0);
+        await page.locator('.webgl-controls [data-camera="in"]').evaluate((button) => button.click());
+        await page.waitForFunction((previous) => {
+          const state = window.__BALABS_3D_E2E__();
+          return state && state.cameraDistance < previous && state.depth === nestedDepth;
+        }, distanceAfterZoomOut, { timeout: 8000 });
+        const depthAfterZoomIn = await page.evaluate(() => window.__BALABS_3D_E2E__()?.depth || 0);
+        assert.equal(depthAfterZoomIn, nestedDepth,
+          name + ': camera zoom-in must not change the selected hierarchy level');
       }
       continue;
     }
