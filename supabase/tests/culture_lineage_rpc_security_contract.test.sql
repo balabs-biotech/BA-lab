@@ -33,7 +33,11 @@ begin
 
   if not has_function_privilege('authenticated', v_signature, 'EXECUTE')
      or has_function_privilege('anon', v_signature, 'EXECUTE')
-     or has_function_privilege('PUBLIC', v_signature, 'EXECUTE') then
+     or exists (
+       select 1
+         from aclexplode(coalesce(v_proc.proacl, acldefault('f', v_proc.proowner))) a
+        where a.grantee = 0 and a.privilege_type = 'EXECUTE'
+     ) then
     raise exception 'FAIL: lineage RPC execute grants are incorrect';
   end if;
 end
