@@ -14,9 +14,13 @@ assert.deepEqual(htmlDomains, expectedDomains, 'Public HTML must preserve all ei
 for (const language of ['fr', 'ar', 'en', 'pt']) {
   const tree = JSON.parse(readFileSync('ecosystem/notion-tree.' + language + '.json', 'utf8'));
   assert.deepEqual(tree.domains.map(domain => domain.id).sort(), [...expectedDomains].sort(), language + ' manifest must expose all eight universes');
-  const planned = tree.domains.find(domain => domain.id === 'learn');
-  assert.equal(planned.status, 'planned', language + ' knowledge-transfer universe must remain an explicit planned branch');
-  assert.ok(!planned.url && !planned.notionId, language + ' planned branch must not invent a Notion destination');
+  const knowledgeHub = tree.domains.find(domain => domain.id === 'learn');
+  assert.ok(!knowledgeHub.url && !knowledgeHub.notionId, language + ' knowledge-transfer hub must not invent a parent Notion destination');
+  assert.equal(knowledgeHub.children?.length, 4, language + ' knowledge-transfer universe must expose four public resource links');
+  for (const resource of knowledgeHub.children) {
+    assert.ok(/^https:\/\/app\\.notion\\.com\/p\/[a-f0-9]{32}$/.test(resource.url), language + ' knowledge resource must use a verified Notion page URL');
+    assert.ok(!resource.notionId, language + ' cross-domain resource links must not duplicate source-page identifiers');
+  }
   for (const domain of tree.domains.filter(item => item.id !== 'learn')) {
     assert.ok(domain.notionId && domain.url === 'https://app.notion.com/p/' + domain.notionId, language + ' domain ' + domain.id + ' must point to its matching Notion page');
   }
