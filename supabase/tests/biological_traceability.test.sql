@@ -530,9 +530,24 @@ begin
         on e.organization_id = p_organization_id
        and e.material_id = t.material_id
     union all
+    -- A culture created through create_culture_with_generation records its
+    -- own culture_created event. Surface that event in its biological parent's
+    -- history as well, even though this path does not emit descendant_created.
+    select e.id, e.event_type, e.occurred_at, e.actor_user_id,
+           e.culture_id, e.material_id, e.batch_id, 'descendant_culture'::text,
+           e.payload, 3
+      from target t
+      join public.cultures child
+        on child.organization_id = p_organization_id
+       and child.parent_culture_id = t.id
+      join public.events e
+        on e.organization_id = p_organization_id
+       and e.culture_id = child.id
+       and e.event_type = 'culture_created'
+    union all
     select operation.id, operation.event_type, operation.occurred_at,
            operation.actor_user_id, operation.culture_id, operation.material_id,
-           operation.batch_id, 'creation_operation'::text, operation.payload, 3
+           operation.batch_id, 'creation_operation'::text, operation.payload, 4
       from target t
       join public.events child_event
         on child_event.organization_id = p_organization_id
@@ -544,7 +559,7 @@ begin
     union all
     select e.id, e.event_type, e.occurred_at, e.actor_user_id,
            e.culture_id, e.material_id, e.batch_id, 'batch'::text,
-           e.payload, 4
+           e.payload, 5
       from public.batches b
       join public.events e
         on e.organization_id = p_organization_id
@@ -597,6 +612,48 @@ begin
   select id into child_id from public.cultures
    where organization_id='00000000-0000-0000-0000-0000000000a1'
      and code='CHILD-A';
+
+  -- The legacy/manual culture-generation RPC writes culture_created on the
+  -- child, but does not write descendant_created or link the event to parent.
+  -- Parent history must still expose that creation event.
+  insert into public.materials(
+    organization_id, material_code, material_type, parent_material_id,
+    state, generation, metadata
+  )
+  select '00000000-0000-0000-0000-0000000000a1', 'MAT-HISTORY-DIRECT-CHILD',
+         'culture_derived', material_id, 'active', 2,
+         '{"generation_method":"culture_propagation"}'::jsonb
+    from public.cultures
+   where organization_id='00000000-0000-0000-0000-0000000000a1'
+     and code='PARENT-001';
+  insert into public.cultures(
+    organization_id, code, culture_type, material_id, parent_culture_id
+  )
+  select '00000000-0000-0000-0000-0000000000a1', 'HISTORY-DIRECT-CHILD',
+         p.culture_type, m.id, p.id
+    from public.cultures p
+    join public.materials m
+      on m.organization_id=p.organization_id
+     and m.material_code='MAT-HISTORY-DIRECT-CHILD'
+   where p.organization_id='00000000-0000-0000-0000-0000000000a1'
+     and p.code='PARENT-001';
+  insert into public.events(
+    organization_id, event_type, occurred_at, culture_id, payload
+  )
+  select c.organization_id, 'culture_created', now(), c.id,
+         '{"generation":2,"creation_path":"create_culture_with_generation"}'::jsonb
+    from public.cultures c
+   where c.organization_id='00000000-0000-0000-0000-0000000000a1'
+     and c.code='HISTORY-DIRECT-CHILD';
+
+  if (select count(*) from public.get_culture_event_history(
+        '00000000-0000-0000-0000-0000000000a1',
+        (select id from public.cultures where organization_id='00000000-0000-0000-0000-0000000000a1' and code='PARENT-001'),
+        100, 0
+      ) where source_relation='descendant_culture'
+          and event_type='culture_created') <> 1 then
+    raise exception 'FAIL: parent history omitted a directly generated child culture event';
+  end if;
 
   insert into public.batches(organization_id, culture_id)
   values ('00000000-0000-0000-0000-0000000000a1', child_id);
