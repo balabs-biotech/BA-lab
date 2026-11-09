@@ -23,6 +23,11 @@ async function tapSpatialTarget(page, name, x, y, selector) {
   if (selector) {
     const target = page.locator(selector).first();
     await target.waitFor({ state: 'visible', timeout: 5000 });
+    if (name === 'mobile') {
+      const rect = await target.boundingBox();
+      assert.ok(rect, name + ': branch dock target must have a real visible touch area');
+      return page.touchscreen.tap(rect.x + rect.width / 2, rect.y + rect.height / 2);
+    }
     return target.click();
   }
   if (name !== 'mobile') return page.mouse.click(x, y);
@@ -123,6 +128,8 @@ async function checkWorkingScene(name, viewport) {
   await page.waitForFunction(() => !document.querySelector('#mainView .webgl-stage')?.classList.contains('is-transitioning'), undefined, { timeout: 8000 });
   await page.waitForFunction(() => typeof window.__BALABS_3D_E2E__ === 'function', undefined, { timeout: 5000 });
   await page.waitForFunction(() => (window.__BALABS_3D_E2E__()?.visible || 0) > 0, undefined, { timeout: 15000 }).catch(async error => { throw new Error('No 3D branch is visible for a real tap: ' + JSON.stringify(await page.evaluate(() => window.__BALABS_3D_E2E__())) + ' — ' + error.message); });
+  await page.waitForFunction(() => { const dock=document.querySelector('.webgl-branch-dock'); return dock && !dock.hidden && dock.querySelectorAll('.webgl-branch-item').length>0; }, undefined, { timeout: 8000 });
+  assert.ok(await page.locator('.webgl-branch-dock .webgl-branch-item').count() > 0, name + ': current hierarchy level must expose visible, selectable branches');
   await page.evaluate(() => { window.__BALABS_3D_TARGET_EVENTS__=[]; for (const type of ['pointerdown','pointerup','click','touchend']) document.addEventListener(type,event=>{if(event.target?.closest?.('.webgl-hit-target,.webgl-branch-item'))window.__BALABS_3D_TARGET_EVENTS__.push({type,target:event.target.title||event.target.tagName,pointerType:event.pointerType||null,x:event.clientX??null,y:event.clientY??null})},true); });
   await page.evaluate(() => { window.__BALABS_3D_TARGET_EVENTS__=[]; window.__BALABS_3D_DOCUMENT_CLICK__=null; });
   let navigated = false;
