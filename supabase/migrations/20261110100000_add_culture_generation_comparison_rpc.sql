@@ -100,7 +100,10 @@ begin
            l.latitude,
            l.longitude,
            l.coordinate_accuracy_m,
-           l.coordinate_source
+           l.coordinate_source,
+           'culture_environment'::text as context_relation,
+           null::uuid as batch_id,
+           null::text as batch_code
       from selected s
       left join public.environments e
         on e.organization_id = s.organization_id
@@ -108,28 +111,61 @@ begin
       left join public.locations l
         on l.organization_id = s.organization_id
        and l.id = e.location_id
-    union
+    union all
     select distinct s.id as culture_id,
            e.id as environment_id,
            e.name as environment_name,
-           coalesce(b.location_id, e.location_id) as location_id,
+           e.location_id,
            l.code as location_code,
            l.name as location_name,
            l.location_type,
            l.latitude,
            l.longitude,
            l.coordinate_accuracy_m,
-           l.coordinate_source
+           l.coordinate_source,
+           'linked_batch_environment'::text as context_relation,
+           b.id as batch_id,
+           b.batch_code
       from selected s
       join public.batches b
         on b.organization_id = s.organization_id
        and (b.culture_id = s.id or b.material_id = s.material_id)
-      left join public.environments e
+      join public.environments e
         on e.organization_id = b.organization_id
        and e.id = b.environment_id
-      left join public.locations l
+      join public.locations l
+        on l.organization_id = e.organization_id
+       and l.id = e.location_id
+    union all
+    select distinct s.id as culture_id,
+           null::uuid as environment_id,
+           null::text as environment_name,
+           b.location_id,
+           l.code as location_code,
+           l.name as location_name,
+           l.location_type,
+           l.latitude,
+           l.longitude,
+           l.coordinate_accuracy_m,
+           l.coordinate_source,
+           'linked_batch_location'::text as context_relation,
+           b.id as batch_id,
+           b.batch_code
+      from selected s
+      join public.batches b
+        on b.organization_id = s.organization_id
+       and (b.culture_id = s.id or b.material_id = s.material_id)
+      join public.locations l
         on l.organization_id = b.organization_id
-       and l.id = coalesce(b.location_id, e.location_id)
+       and l.id = b.location_id
+     where b.location_id is not null
+       and not exists (
+         select 1
+           from public.environments be
+          where be.organization_id = b.organization_id
+            and be.id = b.environment_id
+            and be.location_id = b.location_id
+       )
   ),
   selected_experiments as (
     select distinct experiment_id as id
