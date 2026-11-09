@@ -90,7 +90,7 @@ assert.match(historyPagination, /p_offset:\s*offset/,
   'event history pagination must request the selected offset');
 assert.match(historyPagination, /isCurrentWorkspaceRevision\(loadRevision, loadOrganizationId\)/,
   'event history pagination must reject stale workspace responses');
-assert.match(detailLoader, /history\.has_more === true/,
+assert.match(detailLoader, /historyHasMore/ ,
   'culture timeline must expose a next-page control when the server reports more events');
 
 console.log('PASS: CultureOps lineage and event history UI use bounded tenant RPCs');
