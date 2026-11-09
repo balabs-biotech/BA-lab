@@ -128,7 +128,7 @@ assert.ok(engine.includes('const ancestors=[];let parent=data.parentNode'), 'Dir
 assert.ok(engine.includes("if(data.url){window.open(data.url"), 'Terminal pages must open their corresponding Notion page');
 assert.ok(!engine.includes("open.dataset.resourceOpen='true'"), 'The obsolete resource details panel must not be used for navigation');
 assert.ok(engine.includes("data-camera=\"back\""), 'The scene must expose a direct previous-level control');
-assert.ok(engine.includes("if(action==='out')distance=Math.min(60,distance*1.28)"), 'Zoom-out control must preserve the active hierarchy and allow continuous camera travel');
+assert.ok(engine.includes("if(action==='out')zoomTargetDistance=Math.min(60,zoomTargetDistance*1.28)"), 'Zoom-out control must preserve the active hierarchy and allow continuous camera travel');
 assert.ok(engine.includes('renderPath()'), 'The active folder path must remain visible in the scene');
 assert.ok(engine.includes('window.enterSphere(id,false,true)'), 'Domain selection must synchronize the hidden Notion content source');
 assert.ok(!html.includes("mainView.addEventListener('pointerdown',beginOrbit)"), 'Legacy orbit input must not compete with the clean engine');
