@@ -19,6 +19,92 @@
           "url": "https://app.notion.com/p/40173152f171812fb8d5de62178f6aef",
           "children": [
             {
+              "id": "pt-myco-pleurotus-library",
+              "title": "Pleurotus — espécies e recursos cultivados",
+              "notionId": "40273152f17181f29a8efba7e0d87825",
+              "url": "https://app.notion.com/p/40273152f17181f29a8efba7e0d87825",
+              "children": [
+                {
+                  "id": "pt-pleurotus-40273152f17181e69641f29ec2925807",
+                  "title": "Black Pearl — perfil de recurso Pleurotus",
+                  "notionId": "40273152f17181e69641f29ec2925807",
+                  "url": "https://app.notion.com/p/40273152f17181e69641f29ec2925807"
+                },
+                {
+                  "id": "pt-pleurotus-40273152f1718104aa82d39ea5634cbf",
+                  "title": "Pearl — perfil de recurso Pleurotus",
+                  "notionId": "40273152f1718104aa82d39ea5634cbf",
+                  "url": "https://app.notion.com/p/40273152f1718104aa82d39ea5634cbf"
+                },
+                {
+                  "id": "pt-pleurotus-40273152f1718119a89bfcdee40969aa",
+                  "title": "KRYOS — perfil de recurso fúngico",
+                  "notionId": "40273152f1718119a89bfcdee40969aa",
+                  "url": "https://app.notion.com/p/40273152f1718119a89bfcdee40969aa"
+                },
+                {
+                  "id": "pt-pleurotus-40273152f17181839d37c01a7453ded8",
+                  "title": "G8 — perfil de recurso fúngico",
+                  "notionId": "40273152f17181839d37c01a7453ded8",
+                  "url": "https://app.notion.com/p/40273152f17181839d37c01a7453ded8"
+                },
+                {
+                  "id": "pt-pleurotus-40273152f17181109a20f7dbed24a5c1",
+                  "title": "Blue Oyster — perfil de recurso fúngico",
+                  "notionId": "40273152f17181109a20f7dbed24a5c1",
+                  "url": "https://app.notion.com/p/40273152f17181109a20f7dbed24a5c1"
+                },
+                {
+                  "id": "pt-pleurotus-40273152f17181a1ac41c6b2e83a8fa1",
+                  "title": "Gris américain — perfil de recurso fúngico",
+                  "notionId": "40273152f17181a1ac41c6b2e83a8fa1",
+                  "url": "https://app.notion.com/p/40273152f17181a1ac41c6b2e83a8fa1"
+                },
+                {
+                  "id": "pt-pleurotus-40273152f1718185862ec2926a91f721",
+                  "title": "Pleurotus pulmonarius",
+                  "notionId": "40273152f1718185862ec2926a91f721",
+                  "url": "https://app.notion.com/p/40273152f1718185862ec2926a91f721"
+                },
+                {
+                  "id": "pt-pleurotus-40173152f171817d8b8acbf34382eb07",
+                  "title": "Pleurotus eryngii",
+                  "notionId": "40173152f171817d8b8acbf34382eb07",
+                  "url": "https://app.notion.com/p/40173152f171817d8b8acbf34382eb07"
+                },
+                {
+                  "id": "pt-pleurotus-40173152f1718185b8ffcdb50b2d8d1d",
+                  "title": "Pleurotus ostreatus",
+                  "notionId": "40173152f1718185b8ffcdb50b2d8d1d",
+                  "url": "https://app.notion.com/p/40173152f1718185b8ffcdb50b2d8d1d"
+                },
+                {
+                  "id": "pt-pleurotus-40173152f1718100862be142bdd4824b",
+                  "title": "Pleurotus citrinopileatus",
+                  "notionId": "40173152f1718100862be142bdd4824b",
+                  "url": "https://app.notion.com/p/40173152f1718100862be142bdd4824b"
+                },
+                {
+                  "id": "pt-pleurotus-40173152f171816c9898d836c4e587eb",
+                  "title": "Pleurotus djamor",
+                  "notionId": "40173152f171816c9898d836c4e587eb",
+                  "url": "https://app.notion.com/p/40173152f171816c9898d836c4e587eb"
+                },
+                {
+                  "id": "pt-pleurotus-40173152f17181629641f663cb8abcd3",
+                  "title": "HK35 — perfil de estirpe e recurso",
+                  "notionId": "40173152f17181629641f663cb8abcd3",
+                  "url": "https://app.notion.com/p/40173152f17181629641f663cb8abcd3"
+                },
+                {
+                  "id": "pt-pleurotus-40173152f1718194a960d2011187b860",
+                  "title": "P80 — perfil de estirpe e recurso",
+                  "notionId": "40173152f1718194a960d2011187b860",
+                  "url": "https://app.notion.com/p/40173152f1718194a960d2011187b860"
+                }
+              ]
+            },
+            {
               "id": "pt-myco-other-fungi",
               "title": "Outros fungos estudados e cultivados",
               "notionId": "40273152f17181ec9770df8a5a662720",
@@ -112,7 +198,7 @@
           "children": [
             {
               "id": "pt-mycorrhizae-40273152f17181028a17ff4bc311aed2",
-              "title": "Arbuscular mycorrhizae",
+              "title": "Micorrizas arbusculares — recursos e funções",
               "notionId": "40273152f17181028a17ff4bc311aed2",
               "url": "https://app.notion.com/p/40273152f17181028a17ff4bc311aed2",
               "children": [
@@ -168,7 +254,7 @@
             },
             {
               "id": "pt-mycorrhizae-40273152f17181dc83dfe15afb255af0",
-              "title": "Ectomycorrhizae",
+              "title": "Ectomicorrizas — recursos e interações com plantas",
               "notionId": "40273152f17181dc83dfe15afb255af0",
               "url": "https://app.notion.com/p/40273152f17181dc83dfe15afb255af0",
               "children": [
