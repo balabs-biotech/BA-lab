@@ -176,7 +176,7 @@ begin
       from public.results r
      where r.organization_id = p_organization_id
        and (r.experimental_unit_id in (select id from selected_units)
-         or r.experiment_id in (select id from selected_experiments))
+         or (r.experimental_unit_id is null and r.experiment_id in (select id from selected_experiments)))
      order by r.created_at desc, r.id
      limit 500
   ),
@@ -215,7 +215,7 @@ begin
       (select count(*) from public.results r
         where r.organization_id = p_organization_id
           and (r.experimental_unit_id in (select id from selected_units)
-            or r.experiment_id in (select id from selected_experiments))) as result_count
+            or (r.experimental_unit_id is null and r.experiment_id in (select id from selected_experiments)))) as result_count
   )
   select jsonb_build_object(
     'schema_version', 1,
@@ -262,6 +262,7 @@ begin
       'measurements_without_normalized_value', (
         select count(*) from public.measurements m
          where m.organization_id = p_organization_id
+           and m.quality_state <> 'excluded'
            and m.normalized_value is null
            and (m.culture_id = any(v_ids)
              or (m.culture_id is null and m.environment_id in (select id from selected_envs)))
