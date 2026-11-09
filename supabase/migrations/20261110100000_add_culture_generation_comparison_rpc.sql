@@ -81,6 +81,13 @@ begin
       join selected_envs se on se.id = e.id
      where e.organization_id = p_organization_id
        and e.location_id is not null
+    union
+    select distinct b.location_id
+      from public.batches b
+     where b.organization_id = p_organization_id
+       and b.location_id is not null
+       and (b.culture_id = any(v_ids)
+         or b.material_id in (select material_id from selected))
   ),
   selected_experiments as (
     select distinct experiment_id as id
