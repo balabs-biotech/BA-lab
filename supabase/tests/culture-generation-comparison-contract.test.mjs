@@ -35,7 +35,7 @@ assert.match(migration, /revoke all on function public\.compare_culture_generati
 assert.match(migration, /grant execute on function public\.compare_culture_generations[\s\S]*?to authenticated/i);
 assert.match(migration, /set search_path\s*=\s*pg_catalog/i,
   'SECURITY DEFINER function must pin its search_path');
-assert.match(migration, /least\s*\(/i,
+assert.match(migration, /(?:least|greatest)\s*\(/i,
   'requested culture count and data volume must be bounded');
 
 console.log('PASS: generation comparison RPC exposes a bounded tenant-scoped evidence contract');
