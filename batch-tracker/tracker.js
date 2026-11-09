@@ -7068,6 +7068,11 @@ function renderGenerationComparisonReport(report) {
       " · Cultures associées : " + [...location.cultures].join(", ") +
       " · Source : " + series.provider + " / " + series.dataset +
       " · " + resolutionLabel +
+      " · précision déclarée des coordonnées : " +
+      (location.coordinateAccuracy == null
+        ? "non renseignée"
+        : "±" + environmentalFormat(location.coordinateAccuracy) + " m") +
+      " · origine des coordonnées : " + (location.coordinateSource || "non renseignée") +
       " · Qualité source : " + series.quality;
     environmentalContextSection.appendChild(provenance);
 
