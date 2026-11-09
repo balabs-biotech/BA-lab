@@ -59,4 +59,7 @@ assert.match(migration, /set search_path\s*=\s*pg_catalog/i,
 assert.match(migration, /v_requested_count < 2 or v_requested_count > 4/i,
   'requested culture count and data volume must be bounded');
 
+assert.match(migration, /join public\.batches b[\s\S]*?b\.culture_id = s\.id or b\.material_id = s\.material_id/i,
+  'culture context must include locations reached through linked production batches');
+
 console.log('PASS: generation comparison RPC exposes a bounded tenant-scoped evidence contract');
