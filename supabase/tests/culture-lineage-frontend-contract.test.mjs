@@ -231,7 +231,16 @@ assert.match(reportRenderer, /date non exploitable/,
   'measurements without a valid timestamp must be disclosed rather than silently ordered');
 assert.match(reportRenderer, /unités comparables uniquement/,
   'time series must remain separated by culture, variable and unit');
-
+assert.match(reportRenderer, /createElementNS\("http:\/\/www\.w3\.org\/2000\/svg", "svg"\)/,
+  'each temporal series must render a native SVG chart without a third-party dependency');
+assert.match(reportRenderer, /setAttribute\("role", "img"\)/,
+  'temporal charts must expose an accessible image role');
+assert.match(reportRenderer, /setAttribute\("aria-label"/,
+  'temporal charts must have a descriptive accessible label');
+assert.match(reportRenderer, /firstTime|lastTime/,
+  'chart horizontal positions must represent actual elapsed time');
+assert.match(reportRenderer, /polyline\.setAttribute\("points"/,
+  'temporal charts must connect the recorded observations');
 
 assert.match(reportRenderer, /surveillance temporelle/,
   'time series must include an operational monitoring summary');
