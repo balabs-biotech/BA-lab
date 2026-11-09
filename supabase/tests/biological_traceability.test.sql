@@ -160,7 +160,7 @@ begin
 end
 $material_edge$;
 reset role;
-\\i supabase/migrations/20261109210000_harden_biological_lineage_cycle_guards.sql
+\i supabase/migrations/20261109210000_harden_biological_lineage_cycle_guards.sql
 select set_config('request.jwt.claim.sub','00000000-0000-0000-0000-0000000000b1',false);
 set role authenticated;
 do $lineage_cycle_guard$
