@@ -370,3 +370,80 @@ end
 $lineage$;
 reset role;
 select 'PASS: recursive lineage ancestors, descendants, material provenance, truncation and tenant isolation' as test_result;
+
+
+-- Event history must include events attached to the selected culture and the
+-- operation event that created it, even though that operation is attached to
+-- the parent culture.
+\\i supabase/migrations/20261109190000_add_culture_event_history_rpc.sql
+set role authenticated;
+do $culture_history$
+declare
+  child_id uuid;
+  operation_count integer;
+  descendant_count integer;
+  total_count bigint;
+  has_more boolean;
+  first_event uuid;
+  second_event uuid;
+  caught boolean := false;
+begin
+  select id into child_id from public.cultures
+   where organization_id='00000000-0000-0000-0000-0000000000a1'
+     and code='CHILD-A';
+
+  select count(*) into operation_count
+    from public.get_culture_event_history(
+      '00000000-0000-0000-0000-0000000000a1', child_id, 100, 0
+    )
+   where source_relation='creation_operation'
+     and event_type='division_aliquotes';
+  if operation_count <> 1 then
+    raise exception 'FAIL: culture history omitted the operation event that created this culture';
+  end if;
+
+  select count(*) into descendant_count
+    from public.get_culture_event_history(
+      '00000000-0000-0000-0000-0000000000a1', child_id, 100, 0
+    )
+   where source_relation='culture'
+     and event_type='descendant_created';
+  if descendant_count <> 1 then
+    raise exception 'FAIL: culture history omitted its own descendant-created event';
+  end if;
+
+  select total_rows, has_more into total_count, has_more
+    from public.get_culture_event_history(
+      '00000000-0000-0000-0000-0000000000a1', child_id, 1, 0
+    ) limit 1;
+  if total_count < 2 or has_more is distinct from true then
+    raise exception 'FAIL: event history pagination metadata is incorrect';
+  end if;
+
+  select event_id into first_event
+    from public.get_culture_event_history(
+      '00000000-0000-0000-0000-0000000000a1', child_id, 1, 0
+    ) limit 1;
+  select event_id into second_event
+    from public.get_culture_event_history(
+      '00000000-0000-0000-0000-0000000000a1', child_id, 1, 1
+    ) limit 1;
+  if first_event is null or second_event is null or first_event=second_event then
+    raise exception 'FAIL: event history pages are missing or duplicate an event';
+  end if;
+
+  begin
+    perform * from public.get_culture_event_history(
+      '00000000-0000-0000-0000-0000000000a2',
+      (select id from public.cultures where organization_id='00000000-0000-0000-0000-0000000000a2' and code='OTHER-ORG-001'),
+      100, 0
+    );
+  exception when insufficient_privilege then caught := true;
+  end;
+  if not caught then
+    raise exception 'FAIL: culture event history allowed cross-organization reads';
+  end if;
+end
+$culture_history$;
+reset role;
+select 'PASS: culture event history includes source operation, culture events, pagination and tenant isolation' as test_result;
