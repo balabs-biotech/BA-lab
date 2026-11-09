@@ -8,7 +8,7 @@ const previewEngine = readFileSync('ecosystem-preview/engine-v2.js', 'utf8');
 const expectedDomains = ['bio', 'myco', 'soil', 'lab', 'products', 'iot', 'work', 'learn'];
 
 assert.ok(html.includes('engine-v2.js?v=20261109-clickable-network-v14'), 'Public explorer must load the cache-busted screen-space label engine');
-assert.ok(previewHtml.includes('engine-v2.js?v=20261109-clickable-network-v15'), 'Preview must load the matching cache-busted label engine');
+assert.ok(previewHtml.includes('engine-v2.js?v=20261109-clickable-network-v16'), 'Preview must load the matching cache-busted label engine');
 assert.ok(engine.includes('function syncLabelScales()') && engine.includes('cameraDistance*projection*targetPixels'), '3D labels must keep a stable screen-space size across zoom levels');
 assert.ok(engine.includes('resourceHitTargets.set(label,element)'), 'Public branch labels must have real DOM hit targets');
 assert.ok(engine.includes('domainHitTargets.set(id,{object:hit,button:domainButton})'), 'Public universes must have real clickable hit targets');
@@ -100,7 +100,7 @@ assert.ok(!engine.includes('const bg=new THREE.BufferGeometry()'), 'The opening 
 assert.ok(engine.includes("fetch('./notion-tree.'+LANG()+'.json'"), 'The engine must load the active language Notion tree');
 assert.ok(engine.includes('const maxDepth=3'), 'The spatial graph must expose the deepest real Notion folders and pages');
 assert.ok(engine.includes('children.length>16') && engine.includes('Math.sqrt((k+.5)/children.length)'), 'Dense folders must use a spread-out phyllotaxis layout instead of one crowded ring');
-assert.ok(engine.includes('label.userData.denseRoot?30') && engine.includes("element.dataset.depth=String(data.depth||0)") && engine.includes('12000-Number(button.dataset.depth||0)*1000'), 'Dense root labels must use a readable compact screen-space size');
+assert.ok(engine.includes('label.userData.denseRoot?(compact?38:44)') && engine.includes("ctx.font='700 '+(size*14)+'px") && engine.includes("element.dataset.depth=String(data.depth||0)") && engine.includes('12000-Number(button.dataset.depth||0)*1000'), 'Dense root labels must use a readable compact screen-space size');
 assert.ok(engine.includes('rootCount>16?(window.innerWidth<760?20.5:11.5):7.5'), 'Dense folders must fit the initial camera framing on mobile and desktop');
 assert.ok(previewEngine.includes('children.length>16') && previewEngine.includes('Math.sqrt((k+.5)/children.length)'), 'Preview must use the same dense-folder layout as the public explorer');
 assert.ok(previewEngine.includes('const maxDepth=3'), 'Preview and public engines must expose the same deepest Notion level');
