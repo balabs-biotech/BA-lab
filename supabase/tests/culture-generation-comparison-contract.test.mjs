@@ -30,6 +30,15 @@ assert.match(migration, /parent_material_id/i, 'material provenance must be repr
 assert.match(migration, /generation/i, 'material generation metadata must be represented');
 assert.match(migration, /observed_at/i, 'qualitative observations must retain their timestamp');
 assert.match(migration, /environmental_observations/i, 'weather and satellite observations must remain a distinct evidence family');
+assert.match(migration, /culture_environment_context as \(/i,
+  'comparison must expose the exact environment and location context associated with each selected culture');
+assert.match(migration, /'culture_environment_context'/i,
+  'the evidence bundle must return culture-to-environment location mappings');
+assert.match(migration, /location_code|location_name/i,
+  'environment context must identify the recorded location without guessing from coordinates');
+assert.match(migration, /coordinate_accuracy_m/i,
+  'location coordinate uncertainty must be preserved in contextual evidence');
+
 assert.match(migration, /experimental_unit_id in \(select id from selected_units\)/i, 'events attached to experimental units must be included');
 assert.match(migration, /environmental_truncated/i, 'environmental evidence truncation must be explicit');
 assert.match(migration, /when e\.experimental_unit_id in \(select id from selected_units\) then 'experimental_unit'/i,
