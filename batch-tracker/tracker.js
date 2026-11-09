@@ -6802,7 +6802,7 @@ function renderGenerationComparisonReport(report) {
   timeSeriesSection.appendChild(timeSeriesTitle);
   const timeSeriesNote = document.createElement("p");
   timeSeriesNote.className = "muted";
-  timeSeriesNote.textContent = "Séries séparées par culture, variable, unité et état qualité : unités comparables uniquement. Chaque variation est calculée par rapport au relevé chronologiquement précédent. Les relevés environnementaux partagés restent hors de ces séries.";
+  timeSeriesNote.textContent = "Séries séparées par culture, variable, unité et état qualité : unités comparables uniquement. La variation depuis le relevé précédent est calculée dans l'ordre chronologique. Les relevés environnementaux partagés restent hors de ces séries.";
   timeSeriesSection.appendChild(timeSeriesNote);
 
   const timeSeriesFormat = value => new Intl.NumberFormat(undefined, {
