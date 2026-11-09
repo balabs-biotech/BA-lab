@@ -5904,31 +5904,44 @@ async function loadStatistics() {
 function biologicalWorkflowText(key, count = 0) {
   const lang = window.BALabsI18n?.language || "fr";
   const messages = {
-    fr: { loading:"Chargement de la filiation…", missing:"Culture introuvable dans cette organisation.", open:"Ouvrir la fiche de culture ", noCode:"sans code", typeMissing:"type non renseigné", materialOrigin:"Origine matérielle (de la souche source au matériel actuel)", materialNoCode:"Matériel sans code", unknownType:"type inconnu", generation:"génération ", parents:"Cultures parentes", selected:"Culture sélectionnée", openSheet:"Fiche ouverte", parentCulture:"Culture parente", descendants:"Descendants", noLineage:"Aucun ascendant ou descendant enregistré dans les fiches de culture. L’origine matérielle initiale reste indiquée par l’identifiant matériel de la fiche.", partial:"Filiation partielle : limite de résultats ou profondeur maximale de 250 niveaux atteinte.", loadError:"Impossible de charger la filiation : ", selectCulture:"Sélectionnez une culture avant d’enregistrer.", dateRequired:"Indiquez la date de l’opération.", childLimit:"Maximum : 12 descendants par opération.", invalidPropagation:"Cette opération ne peut pas créer de descendants. Retirez les codes ou choisissez une opération de propagation.", saving:"Enregistrement…", syncWarning:" La filiation est enregistrée dans Supabase ; vérifiez la synchronisation Notion des descendants.", syncWarningShort:" La filiation est enregistrée dans Supabase ; synchronisation Notion à vérifier.", saved:"Opération enregistrée", childCreated:" descendant(s) créé(s).", failed:"Échec : ", notSaved:"opération non enregistrée", save:"Enregistrer l’opération" },
-    en: { loading:"Loading lineage…", missing:"Culture not found in this organization.", open:"Open culture record ", noCode:"no code", typeMissing:"type not specified", materialOrigin:"Material origin (from source strain to current material)", materialNoCode:"Material without a code", unknownType:"unknown type", generation:"generation ", parents:"Parent cultures", selected:"Selected culture", openSheet:"Open record", parentCulture:"Parent culture", descendants:"Descendants", noLineage:"No ancestors or descendants are recorded in the culture records. The initial material origin remains indicated by the record's material ID.", partial:"Partial lineage: the result limit or maximum depth of 250 levels was reached.", loadError:"Could not load lineage: ", selectCulture:"Select a culture before saving.", dateRequired:"Enter the operation date.", childLimit:"Maximum: 12 descendants per operation.", invalidPropagation:"This operation cannot create descendants. Remove the codes or choose a propagation operation.", saving:"Saving…", syncWarning:" Lineage is saved in Supabase; check Notion synchronization for descendants.", syncWarningShort:" Lineage is saved in Supabase; verify Notion synchronization.", saved:"Operation saved", childCreated:" descendant(s) created.", failed:"Failed: ", notSaved:"operation not saved", save:"Save operation" },
-    pt: { loading:"A carregar a filiação…", missing:"Cultura não encontrada nesta organização.", open:"Abrir ficha da cultura ", noCode:"sem código", typeMissing:"tipo não indicado", materialOrigin:"Origem material (da estirpe de origem ao material atual)", materialNoCode:"Material sem código", unknownType:"tipo desconhecido", generation:"geração ", parents:"Culturas progenitoras", selected:"Cultura selecionada", openSheet:"Ficha aberta", parentCulture:"Cultura progenitora", descendants:"Descendentes", noLineage:"Não há ascendentes ou descendentes registados nas fichas de cultura. A origem material inicial continua indicada pelo identificador do material.", partial:"Filiação parcial: foi atingido o limite de resultados ou a profundidade máxima de 250 níveis.", loadError:"Não foi possível carregar a filiação: ", selectCulture:"Selecione uma cultura antes de guardar.", dateRequired:"Indique a data da operação.", childLimit:"Máximo: 12 descendentes por operação.", invalidPropagation:"Esta operação não pode criar descendentes. Remova os códigos ou escolha uma operação de propagação.", saving:"A guardar…", syncWarning:" A filiação está guardada no Supabase; verifique a sincronização dos descendentes com o Notion.", syncWarningShort:" A filiação está guardada no Supabase; verifique a sincronização com o Notion.", saved:"Operação guardada", childCreated:" descendente(s) criado(s).", failed:"Falha: ", notSaved:"operação não guardada", save:"Guardar operação" },
-    ar: { loading:"جارٍ تحميل النسب…", missing:"الثقافة غير موجودة في هذه المؤسسة.", open:"فتح سجل المزرعة ", noCode:"بلا رمز", typeMissing:"النوع غير محدد", materialOrigin:"أصل المادة (من السلالة المصدر إلى المادة الحالية)", materialNoCode:"مادة بلا رمز", unknownType:"نوع غير معروف", generation:"الجيل ", parents:"المزارع الأم", selected:"المزرعة المحددة", openSheet:"السجل المفتوح", parentCulture:"المزرعة الأم", descendants:"الفروع", noLineage:"لا توجد أسلاف أو فروع مسجلة في سجلات المزارع. يظل أصل المادة الأولي موضحًا بمعرّف المادة في السجل.", partial:"النسب جزئي: تم بلوغ حد النتائج أو العمق الأقصى البالغ 250 مستوى.", loadError:"تعذّر تحميل النسب: ", selectCulture:"حدد مزرعة قبل الحفظ.", dateRequired:"أدخل تاريخ العملية.", childLimit:"الحد الأقصى 12 فرعًا لكل عملية.", invalidPropagation:"لا يمكن لهذه العملية إنشاء فروع. احذف الرموز أو اختر عملية إكثار.", saving:"جارٍ الحفظ…", syncWarning:" تم حفظ النسب في Supabase؛ تحقق من مزامنة الفروع مع Notion.", syncWarningShort:" تم حفظ النسب في Supabase؛ تحقق من المزامنة مع Notion.", saved:"تم حفظ العملية", childCreated:" فرع/فروع تم إنشاؤها.", failed:"فشل: ", notSaved:"لم تُحفظ العملية", save:"حفظ العملية" }
+    fr: { loading:"Chargement de la filiation…", missing:"Culture introuvable dans cette organisation.", open:"Ouvrir la fiche de culture ", noCode:"sans code", typeMissing:"type non renseigné", materialOrigin:"Origine matérielle (de la souche source au matériel actuel)", materialNoCode:"Matériel sans code", unknownType:"type inconnu", generation:"génération ", parents:"Cultures parentes", selected:"Culture sélectionnée", openSheet:"Fiche ouverte", parentCulture:"Culture parente", descendants:"Descendants", noLineage:"Aucun ascendant ou descendant enregistré dans les fiches de culture. L’origine matérielle initiale reste indiquée par l’identifiant matériel de la fiche.", partial:"Filiation partielle : limite de résultats ou profondeur maximale de 250 niveaux atteinte.", loadError:"Impossible de charger la filiation : ", selectCulture:"Sélectionnez une culture avant d’enregistrer.", dateRequired:"Indiquez la date de l’opération.", childLimit:"Maximum : 12 descendants par opération.", invalidPropagation:"Cette opération ne peut pas créer de descendants. Retirez les codes ou choisissez une opération de propagation.", saving:"Enregistrement…", syncWarning:" La filiation est enregistrée dans Supabase ; vérifiez la synchronisation Notion des descendants.", syncWarningShort:" La filiation est enregistrée dans Supabase ; synchronisation Notion à vérifier.", saved:"Opération enregistrée", childCreated:" descendant(s) créé(s).", failed:"Échec : ", notSaved:"opération non enregistrée", save:"Enregistrer l’opération", loadMore:"Charger 200 descendants supplémentaires", loadingMore:"Chargement…" },
+    en: { loading:"Loading lineage…", missing:"Culture not found in this organization.", open:"Open culture record ", noCode:"no code", typeMissing:"type not specified", materialOrigin:"Material origin (from source strain to current material)", materialNoCode:"Material without a code", unknownType:"unknown type", generation:"generation ", parents:"Parent cultures", selected:"Selected culture", openSheet:"Open record", parentCulture:"Parent culture", descendants:"Descendants", noLineage:"No ancestors or descendants are recorded in the culture records. The initial material origin remains indicated by the record's material ID.", partial:"Partial lineage: the result limit or maximum depth of 250 levels was reached.", loadError:"Could not load lineage: ", selectCulture:"Select a culture before saving.", dateRequired:"Enter the operation date.", childLimit:"Maximum: 12 descendants per operation.", invalidPropagation:"This operation cannot create descendants. Remove the codes or choose a propagation operation.", saving:"Saving…", syncWarning:" Lineage is saved in Supabase; check Notion synchronization for descendants.", syncWarningShort:" Lineage is saved in Supabase; verify Notion synchronization.", saved:"Operation saved", childCreated:" descendant(s) created.", failed:"Failed: ", notSaved:"operation not saved", save:"Save operation", loadMore:"Load 200 more descendants", loadingMore:"Loading…" },
+    pt: { loading:"A carregar a filiação…", missing:"Cultura não encontrada nesta organização.", open:"Abrir ficha da cultura ", noCode:"sem código", typeMissing:"tipo não indicado", materialOrigin:"Origem material (da estirpe de origem ao material atual)", materialNoCode:"Material sem código", unknownType:"tipo desconhecido", generation:"geração ", parents:"Culturas progenitoras", selected:"Cultura selecionada", openSheet:"Ficha aberta", parentCulture:"Cultura progenitora", descendants:"Descendentes", noLineage:"Não há ascendentes ou descendentes registados nas fichas de cultura. A origem material inicial continua indicada pelo identificador do material.", partial:"Filiação parcial: foi atingido o limite de resultados ou a profundidade máxima de 250 níveis.", loadError:"Não foi possível carregar a filiação: ", selectCulture:"Selecione uma cultura antes de guardar.", dateRequired:"Indique a data da operação.", childLimit:"Máximo: 12 descendentes por operação.", invalidPropagation:"Esta operação não pode criar descendentes. Remova os códigos ou escolha uma operação de propagação.", saving:"A guardar…", syncWarning:" A filiação está guardada no Supabase; verifique a sincronização dos descendentes com o Notion.", syncWarningShort:" A filiação está guardada no Supabase; verifique a sincronização com o Notion.", saved:"Operação guardada", childCreated:" descendente(s) criado(s).", failed:"Falha: ", notSaved:"operação não guardada", save:"Guardar operação", loadMore:"Carregar mais 200 descendentes", loadingMore:"A carregar…" },
+    ar: { loading:"جارٍ تحميل النسب…", missing:"الثقافة غير موجودة في هذه المؤسسة.", open:"فتح سجل المزرعة ", noCode:"بلا رمز", typeMissing:"النوع غير محدد", materialOrigin:"أصل المادة (من السلالة المصدر إلى المادة الحالية)", materialNoCode:"مادة بلا رمز", unknownType:"نوع غير معروف", generation:"الجيل ", parents:"المزارع الأم", selected:"المزرعة المحددة", openSheet:"السجل المفتوح", parentCulture:"المزرعة الأم", descendants:"الفروع", noLineage:"لا توجد أسلاف أو فروع مسجلة في سجلات المزارع. يظل أصل المادة الأولي موضحًا بمعرّف المادة في السجل.", partial:"النسب جزئي: تم بلوغ حد النتائج أو العمق الأقصى البالغ 250 مستوى.", loadError:"تعذّر تحميل النسب: ", selectCulture:"حدد مزرعة قبل الحفظ.", dateRequired:"أدخل تاريخ العملية.", childLimit:"الحد الأقصى 12 فرعًا لكل عملية.", invalidPropagation:"لا يمكن لهذه العملية إنشاء فروع. احذف الرموز أو اختر عملية إكثار.", saving:"جارٍ الحفظ…", syncWarning:" تم حفظ النسب في Supabase؛ تحقق من مزامنة الفروع مع Notion.", syncWarningShort:" تم حفظ النسب في Supabase؛ تحقق من المزامنة مع Notion.", saved:"تم حفظ العملية", childCreated:" فرع/فروع تم إنشاؤها.", failed:"فشل: ", notSaved:"لم تُحفظ العملية", save:"حفظ العملية", loadMore:"تحميل 200 فرع إضافي", loadingMore:"جارٍ التحميل…" }
   };
   const selected = (messages[lang] || messages.fr)[key];
   return typeof selected === "function" ? selected(count) : (selected ?? messages.fr[key] ?? key);
 }
 
-async function loadBiologicalLineage(cultureId) {
+async function loadBiologicalLineage(cultureId, offset = 0) {
   const target = document.getElementById('cultureLineage');
   const loadRevision = authStateRevision;
   const loadOrganizationId = organizationId;
   if (!target || !loadOrganizationId) return;
-  target.textContent = biologicalWorkflowText("loading");
+  if (offset === 0) {
+    target.__lineageRows = [];
+    target.textContent = biologicalWorkflowText("loading");
+  }
   try {
     const { data, error } = await supabaseClient.rpc('get_culture_lineage', {
       p_organization_id: loadOrganizationId,
       p_culture_id: cultureId,
-      p_limit: 200
+      p_limit: 200,
+      p_offset: offset
     });
     if (error) throw error;
     if (!isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
 
-    const rows = data || [];
+    const pageRows = data || [];
+    const previousRows = Array.isArray(target.__lineageRows) ? target.__lineageRows : [];
+    const rows = offset === 0
+      ? pageRows
+      : [
+          ...pageRows.filter(row => row.relation !== 'descendant'),
+          ...previousRows.filter(row => row.relation === 'descendant'),
+          ...pageRows.filter(row => row.relation === 'descendant')
+        ];
+    target.__lineageRows = rows;
     const current = rows.find(row => row.relation === 'current');
     if (!current) { target.textContent = biologicalWorkflowText("missing"); return; }
 
@@ -5967,6 +5980,8 @@ async function loadBiologicalLineage(cultureId) {
       }] : [])
     ];
     const isTruncated = rows.some(row => row.truncated === true);
+    const hasMore = current.has_more === true;
+    const descendantTotal = Number(current.descendant_total || 0);
 
     const renderNode = (row, label) => {
       const node = document.createElement('button');
@@ -6043,7 +6058,7 @@ async function loadBiologicalLineage(cultureId) {
       row: toCultureRecord(current), label: biologicalWorkflowText("openSheet")
     }]);
     if (descendants.length) {
-      makeGroup(biologicalWorkflowText("descendants") + ' (' + descendants.length + ')',
+      makeGroup(biologicalWorkflowText("descendants") + ' (' + descendants.length + '/' + descendantTotal + ')',
         descendants.map(row => ({ row, label: biologicalWorkflowText("generation") + row.depth })));
     }
     if (!ancestors.length && !descendants.length) {
@@ -6057,6 +6072,18 @@ async function loadBiologicalLineage(cultureId) {
       note.className = 'muted';
       note.textContent = biologicalWorkflowText("partial");
       target.appendChild(note);
+    }
+    if (hasMore) {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'culture-lineage-load-more';
+      button.textContent = biologicalWorkflowText("loadMore");
+      button.addEventListener('click', () => {
+        button.disabled = true;
+        button.textContent = biologicalWorkflowText("loadingMore");
+        loadBiologicalLineage(cultureId, offset + 200);
+      }, { once: true });
+      target.appendChild(button);
     }
   } catch (error) {
     if (!isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
