@@ -6523,9 +6523,8 @@ async function loadCultureDetail(cultureId) {
       loadMoreButton.type = "button";
       loadMoreButton.className = "culture-catalog-action";
       loadMoreButton.textContent = "Charger 100 événements plus anciens";
-      loadMoreButton.addEventListener("click", () =>
-        loadMoreCultureEventHistory(culture.id, events.length, loadMoreButton)
-      );
+      loadMoreButton.onclick = () =>
+        loadMoreCultureEventHistory(culture.id, events.length, loadMoreButton);
       timeline.appendChild(loadMoreButton);
     }
     panel.scrollIntoView({block:"start",behavior:window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth"});
