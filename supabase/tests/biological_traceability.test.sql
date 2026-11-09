@@ -160,9 +160,58 @@ begin
 end
 $material_edge$;
 reset role;
+\\i supabase/migrations/20261109210000_harden_biological_lineage_cycle_guards.sql
 select set_config('request.jwt.claim.sub','00000000-0000-0000-0000-0000000000b1',false);
 set role authenticated;
-do $$
+do $lineage_cycle_guard$
+declare
+  root_culture uuid;
+  child_culture uuid;
+  root_material uuid;
+  derived_material uuid;
+  caught boolean;
+begin
+  select id into root_culture from public.cultures
+   where organization_id='00000000-0000-0000-0000-0000000000a1' and code='PARENT-001';
+  insert into public.cultures(organization_id,code,culture_type,material_id,parent_culture_id)
+  select organization_id,'CYCLE-CHILD','agar',material_id,root_culture
+    from public.cultures where organization_id='00000000-0000-0000-0000-0000000000a1' and id=root_culture
+  returning id into child_culture;
+
+  caught := false;
+  begin
+    update public.cultures set parent_culture_id=child_culture
+     where organization_id='00000000-0000-0000-0000-0000000000a1' and id=root_culture;
+  exception when check_violation then
+    if sqlerrm='culture_lineage_cycle_detected' then caught := true; else raise; end if;
+  end;
+  if not caught then raise exception 'FAIL: direct culture reparenting created a lineage cycle'; end if;
+  if (select parent_culture_id from public.cultures where organization_id='00000000-0000-0000-0000-0000000000a1' and id=root_culture) is not null then
+    raise exception 'FAIL: rejected culture reparenting changed the stored parent';
+  end if;
+  delete from public.cultures where organization_id='00000000-0000-0000-0000-0000000000a1' and id=child_culture;
+
+  select id into root_material from public.materials
+   where organization_id='00000000-0000-0000-0000-0000000000a1' and material_code='MAT-ALT-PARENT';
+  select id into derived_material from public.materials
+   where organization_id='00000000-0000-0000-0000-0000000000a1' and material_code='MAT-DIRECT-DERIVATION';
+  caught := false;
+  begin
+    update public.materials set parent_material_id=derived_material
+     where organization_id='00000000-0000-0000-0000-0000000000a1' and id=root_material;
+  exception when check_violation then
+    if sqlerrm='material_lineage_cycle_detected' then caught := true; else raise; end if;
+  end;
+  if not caught then raise exception 'FAIL: direct material reparenting created a lineage cycle'; end if;
+  if (select parent_material_id from public.materials where organization_id='00000000-0000-0000-0000-0000000000a1' and id=root_material) is not null then
+    raise exception 'FAIL: rejected material reparenting changed the stored parent';
+  end if;
+end
+$lineage_cycle_guard$;
+reset role;
+select set_config('request.jwt.claim.sub','00000000-0000-0000-0000-0000000000b1',false);
+set role authenticated;
+do $
 declare result jsonb; parent_id uuid; child_id uuid; v_child_material_id uuid; event_count integer; caught boolean;
 begin
   select id into parent_id from public.cultures where organization_id='00000000-0000-0000-0000-0000000000a1' and code='PARENT-001';
