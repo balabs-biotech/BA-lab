@@ -2,7 +2,7 @@
   "version": 1,
   "source": "Verified public language-specific BA Labs pages from the corresponding public language entry and Notion page search",
   "language": "en",
-  "coverage": "expanded_verified_topic_pages; only explicitly identified public pages are linked_eight_universes_including_planned_resources_transmission",
+  "coverage": "Expanded using verified links from the matching public-language Notion pages; every added node points to an existing linked page.",
   "domains": [
     {
       "id": "myco",
@@ -22,17 +22,161 @@
               "id": "en-myco-pleurotus-library",
               "title": "Pleurotus — cultivated species and resources",
               "notionId": "40273152f17181eba1bbcaf1b1d491d6",
-              "description": "A guide separating general species profiles from working culture designations, with clear limits on identity and availability.",
               "url": "https://app.notion.com/p/40273152f17181eba1bbcaf1b1d491d6",
-              "children": []
+              "children": [
+                {
+                  "id": "en-pleurotus-40273152f171816b8f27de982a5465bb",
+                  "title": "Black Pearl — Pleurotus resource profile",
+                  "notionId": "40273152f171816b8f27de982a5465bb",
+                  "url": "https://app.notion.com/p/40273152f171816b8f27de982a5465bb"
+                },
+                {
+                  "id": "en-pleurotus-40273152f1718115ba8ac3f20c54c9e1",
+                  "title": "Pearl — Pleurotus resource profile",
+                  "notionId": "40273152f1718115ba8ac3f20c54c9e1",
+                  "url": "https://app.notion.com/p/40273152f1718115ba8ac3f20c54c9e1"
+                },
+                {
+                  "id": "en-pleurotus-40273152f1718122a4ffe38cdf1f5070",
+                  "title": "KRYOS — fungal resource profile",
+                  "notionId": "40273152f1718122a4ffe38cdf1f5070",
+                  "url": "https://app.notion.com/p/40273152f1718122a4ffe38cdf1f5070"
+                },
+                {
+                  "id": "en-pleurotus-40273152f171817493cfd58b6c68c3ab",
+                  "title": "G8 — fungal resource profile",
+                  "notionId": "40273152f171817493cfd58b6c68c3ab",
+                  "url": "https://app.notion.com/p/40273152f171817493cfd58b6c68c3ab"
+                },
+                {
+                  "id": "en-pleurotus-40273152f1718189959bf206778c5aa8",
+                  "title": "Blue Oyster — fungal resource profile",
+                  "notionId": "40273152f1718189959bf206778c5aa8",
+                  "url": "https://app.notion.com/p/40273152f1718189959bf206778c5aa8"
+                },
+                {
+                  "id": "en-pleurotus-40273152f17181ecb48fd5c53d52e73e",
+                  "title": "Gris américain — fungal resource profile",
+                  "notionId": "40273152f17181ecb48fd5c53d52e73e",
+                  "url": "https://app.notion.com/p/40273152f17181ecb48fd5c53d52e73e"
+                },
+                {
+                  "id": "en-pleurotus-40273152f171811fa874e6b3a698e462",
+                  "title": "Pleurotus pulmonarius",
+                  "notionId": "40273152f171811fa874e6b3a698e462",
+                  "url": "https://app.notion.com/p/40273152f171811fa874e6b3a698e462"
+                },
+                {
+                  "id": "en-pleurotus-40173152f17181cf84ebf5cec4d862b5",
+                  "title": "Pleurotus eryngii",
+                  "notionId": "40173152f17181cf84ebf5cec4d862b5",
+                  "url": "https://app.notion.com/p/40173152f17181cf84ebf5cec4d862b5"
+                },
+                {
+                  "id": "en-pleurotus-40173152f17181a09927dbfa42313fb1",
+                  "title": "Pleurotus ostreatus",
+                  "notionId": "40173152f17181a09927dbfa42313fb1",
+                  "url": "https://app.notion.com/p/40173152f17181a09927dbfa42313fb1"
+                },
+                {
+                  "id": "en-pleurotus-40173152f17181529b77e0a789852bdb",
+                  "title": "Pleurotus citrinopileatus",
+                  "notionId": "40173152f17181529b77e0a789852bdb",
+                  "url": "https://app.notion.com/p/40173152f17181529b77e0a789852bdb"
+                },
+                {
+                  "id": "en-pleurotus-40173152f17181fc9e5ff9eedfc03e5a",
+                  "title": "Pleurotus djamor",
+                  "notionId": "40173152f17181fc9e5ff9eedfc03e5a",
+                  "url": "https://app.notion.com/p/40173152f17181fc9e5ff9eedfc03e5a"
+                },
+                {
+                  "id": "en-pleurotus-40173152f17181c0b7e5d16be113aac8",
+                  "title": "HK35 — strain and resource profile",
+                  "notionId": "40173152f17181c0b7e5d16be113aac8",
+                  "url": "https://app.notion.com/p/40173152f17181c0b7e5d16be113aac8"
+                },
+                {
+                  "id": "en-pleurotus-40173152f171819da739f5a7c5a9c5dc",
+                  "title": "P80 — strain and resource profile",
+                  "notionId": "40173152f171819da739f5a7c5a9c5dc",
+                  "url": "https://app.notion.com/p/40173152f171819da739f5a7c5a9c5dc"
+                }
+              ]
             },
             {
-              "id": "en-myco-pulmonarius",
-              "title": "Pleurotus pulmonarius — species and cultivation profile",
-              "notionId": "40273152f171811fa874e6b3a698e462",
-              "description": "A species profile covering its fan-shaped fruit bodies, saprotrophic lifestyle and tendency to fruit in warmer conditions.",
-              "url": "https://app.notion.com/p/40273152f171811fa874e6b3a698e462",
-              "children": []
+              "id": "en-other-fungi-40273152f171812aad80e9a88edf1be6",
+              "title": "Other fungi studied and cultivated",
+              "notionId": "40273152f171812aad80e9a88edf1be6",
+              "url": "https://app.notion.com/p/40273152f171812aad80e9a88edf1be6",
+              "children": [
+                {
+                  "id": "en-other-fungi-40173152f17181849109f54544cab02e",
+                  "title": "Calocybe indica — organism profile",
+                  "notionId": "40173152f17181849109f54544cab02e",
+                  "url": "https://app.notion.com/p/40173152f17181849109f54544cab02e"
+                },
+                {
+                  "id": "en-other-fungi-40173152f17181c4b39ae27901d04d36",
+                  "title": "Ganoderma lucidum — organism profile",
+                  "notionId": "40173152f17181c4b39ae27901d04d36",
+                  "url": "https://app.notion.com/p/40173152f17181c4b39ae27901d04d36"
+                },
+                {
+                  "id": "en-other-fungi-40173152f17181ff9794c5dec3d4d002",
+                  "title": "Hericium erinaceus — organism profile",
+                  "notionId": "40173152f17181ff9794c5dec3d4d002",
+                  "url": "https://app.notion.com/p/40173152f17181ff9794c5dec3d4d002"
+                },
+                {
+                  "id": "en-other-fungi-40173152f171813da4f3e1dc287ee91a",
+                  "title": "Cordyceps militaris — organism profile",
+                  "notionId": "40173152f171813da4f3e1dc287ee91a",
+                  "url": "https://app.notion.com/p/40173152f171813da4f3e1dc287ee91a"
+                },
+                {
+                  "id": "en-other-fungi-40173152f1718146bb43e975d85f2dfa",
+                  "title": "Lentinula edodes — organism profile",
+                  "notionId": "40173152f1718146bb43e975d85f2dfa",
+                  "url": "https://app.notion.com/p/40173152f1718146bb43e975d85f2dfa"
+                },
+                {
+                  "id": "en-other-fungi-40173152f17181b7b351dc05b274a6f0",
+                  "title": "Pholiota adiposa — organism profile",
+                  "notionId": "40173152f17181b7b351dc05b274a6f0",
+                  "url": "https://app.notion.com/p/40173152f17181b7b351dc05b274a6f0"
+                },
+                {
+                  "id": "en-other-fungi-40173152f171816098cdd2477a5b970c",
+                  "title": "Trametes versicolor — organism profile",
+                  "notionId": "40173152f171816098cdd2477a5b970c",
+                  "url": "https://app.notion.com/p/40173152f171816098cdd2477a5b970c"
+                },
+                {
+                  "id": "en-other-fungi-40173152f17181db803af24eb2e753e0",
+                  "title": "Hypsizygus ulmarius — organism profile",
+                  "notionId": "40173152f17181db803af24eb2e753e0",
+                  "url": "https://app.notion.com/p/40173152f17181db803af24eb2e753e0"
+                },
+                {
+                  "id": "en-other-fungi-40173152f17181e2b898ddd9686d5e38",
+                  "title": "Hypsizygus marmoreus — organism profile",
+                  "notionId": "40173152f17181e2b898ddd9686d5e38",
+                  "url": "https://app.notion.com/p/40173152f17181e2b898ddd9686d5e38"
+                },
+                {
+                  "id": "en-other-fungi-40273152f171810e8544ed23af43d1ac",
+                  "title": "Rhizopogon spp. — ectomycorrhizal group profile",
+                  "notionId": "40273152f171810e8544ed23af43d1ac",
+                  "url": "https://app.notion.com/p/40273152f171810e8544ed23af43d1ac"
+                },
+                {
+                  "id": "en-other-fungi-40273152f171819a9502cb49b4793a0b",
+                  "title": "Scleroderma spp. — ectomycorrhizal group profile",
+                  "notionId": "40273152f171819a9502cb49b4793a0b",
+                  "url": "https://app.notion.com/p/40273152f171819a9502cb49b4793a0b"
+                }
+              ]
             }
           ]
         },
@@ -50,7 +194,84 @@
           "notionId": "40173152f1718101965cc766e3d7e27f",
           "url": "https://app.notion.com/p/40173152f1718101965cc766e3d7e27f",
           "description": "Biological relationships among fungi, plants and other organisms.",
-          "children": []
+          "children": [
+            {
+              "id": "en-mycorrhizae-40273152f171810d92ffe6dfe8330a17",
+              "title": "Arbuscular mycorrhizae",
+              "notionId": "40273152f171810d92ffe6dfe8330a17",
+              "url": "https://app.notion.com/p/40273152f171810d92ffe6dfe8330a17",
+              "children": [
+                {
+                  "id": "en-arbuscular-40173152f171811c9d91ca85d7d6f89f",
+                  "title": "Gigaspora margarita — organism profile",
+                  "notionId": "40173152f171811c9d91ca85d7d6f89f",
+                  "url": "https://app.notion.com/p/40173152f171811c9d91ca85d7d6f89f"
+                },
+                {
+                  "id": "en-arbuscular-40173152f17181f9a2fcd3594708e9e9",
+                  "title": "Glomus deserticola — organism profile",
+                  "notionId": "40173152f17181f9a2fcd3594708e9e9",
+                  "url": "https://app.notion.com/p/40173152f17181f9a2fcd3594708e9e9"
+                },
+                {
+                  "id": "en-arbuscular-40173152f17181a7bcd1e4d69f31ea96",
+                  "title": "Rhizophagus irregularis (Glomus intraradices) — organism profile",
+                  "notionId": "40173152f17181a7bcd1e4d69f31ea96",
+                  "url": "https://app.notion.com/p/40173152f17181a7bcd1e4d69f31ea96"
+                },
+                {
+                  "id": "en-arbuscular-40173152f171819a87acdc9dff6133da",
+                  "title": "Funneliformis mosseae (Glomus mosseae) — organism profile",
+                  "notionId": "40173152f171819a87acdc9dff6133da",
+                  "url": "https://app.notion.com/p/40173152f171819a87acdc9dff6133da"
+                },
+                {
+                  "id": "en-arbuscular-40173152f171810296caef43036c77ec",
+                  "title": "Glomus monosporus — organism profile",
+                  "notionId": "40173152f171810296caef43036c77ec",
+                  "url": "https://app.notion.com/p/40173152f171810296caef43036c77ec"
+                },
+                {
+                  "id": "en-arbuscular-40173152f171819bbb4ad4228587c985",
+                  "title": "Glomus aggregatum — organism profile",
+                  "notionId": "40173152f171819bbb4ad4228587c985",
+                  "url": "https://app.notion.com/p/40173152f171819bbb4ad4228587c985"
+                },
+                {
+                  "id": "en-arbuscular-40173152f171816eac93cd00f0450047",
+                  "title": "Glomus brasilianum — organism profile",
+                  "notionId": "40173152f171816eac93cd00f0450047",
+                  "url": "https://app.notion.com/p/40173152f171816eac93cd00f0450047"
+                },
+                {
+                  "id": "en-arbuscular-40173152f1718167bc04d6a36e0c2802",
+                  "title": "Rhizophagus clarus (Glomus clarum) — organism profile",
+                  "notionId": "40173152f1718167bc04d6a36e0c2802",
+                  "url": "https://app.notion.com/p/40173152f1718167bc04d6a36e0c2802"
+                }
+              ]
+            },
+            {
+              "id": "en-mycorrhizae-40273152f17181a4aa7ccbe56cf01500",
+              "title": "Ectomycorrhizae",
+              "notionId": "40273152f17181a4aa7ccbe56cf01500",
+              "url": "https://app.notion.com/p/40273152f17181a4aa7ccbe56cf01500",
+              "children": [
+                {
+                  "id": "en-ectomycorrhizae-40173152f171815f9edcca973aa6968a",
+                  "title": "Pisolithus tinctorius — organism profile",
+                  "notionId": "40173152f171815f9edcca973aa6968a",
+                  "url": "https://app.notion.com/p/40173152f171815f9edcca973aa6968a"
+                },
+                {
+                  "id": "en-ectomycorrhizae-40173152f171811ca07df731eed807fe",
+                  "title": "Laccaria laccata — organism profile",
+                  "notionId": "40173152f171811ca07df731eed807fe",
+                  "url": "https://app.notion.com/p/40173152f171811ca07df731eed807fe"
+                }
+              ]
+            }
+          ]
         },
         {
           "id": "en-myco-applications",
@@ -91,6 +312,140 @@
           "url": "https://app.notion.com/p/40173152f17181cab354dd2c11933208",
           "description": "Biological solutions and biostimulant approaches under study.",
           "children": []
+        },
+        {
+          "id": "en-microorganisms-40173152f171817e918cc9c278aeca0d",
+          "title": "Microorganisms of agricultural interest",
+          "notionId": "40173152f171817e918cc9c278aeca0d",
+          "url": "https://app.notion.com/p/40173152f171817e918cc9c278aeca0d",
+          "children": [
+            {
+              "id": "en-microbe-40173152f17181d7ac44ef9a249eadc7",
+              "title": "Trichoderma harzianum — organism profile",
+              "notionId": "40173152f17181d7ac44ef9a249eadc7",
+              "url": "https://app.notion.com/p/40173152f17181d7ac44ef9a249eadc7"
+            },
+            {
+              "id": "en-microbe-40173152f17181208f61ff2a36170d25",
+              "title": "Bacillus subtilis — organism profile",
+              "notionId": "40173152f17181208f61ff2a36170d25",
+              "url": "https://app.notion.com/p/40173152f17181208f61ff2a36170d25"
+            },
+            {
+              "id": "en-microbe-40173152f171818ba78ef2028d5f05ee",
+              "title": "Trichoderma reesei — organism profile",
+              "notionId": "40173152f171818ba78ef2028d5f05ee",
+              "url": "https://app.notion.com/p/40173152f171818ba78ef2028d5f05ee"
+            },
+            {
+              "id": "en-microbe-40173152f17181e08c0ee7eea5842caf",
+              "title": "Trichoderma hamatum — organism profile",
+              "notionId": "40173152f17181e08c0ee7eea5842caf",
+              "url": "https://app.notion.com/p/40173152f17181e08c0ee7eea5842caf"
+            },
+            {
+              "id": "en-microbe-40173152f17181b38251df2cae51e2c4",
+              "title": "Trichoderma koningii — organism profile",
+              "notionId": "40173152f17181b38251df2cae51e2c4",
+              "url": "https://app.notion.com/p/40173152f17181b38251df2cae51e2c4"
+            },
+            {
+              "id": "en-microbe-40173152f17181e7876cf8919257e0fa",
+              "title": "Trichoderma longibrachiatum — organism profile",
+              "notionId": "40173152f17181e7876cf8919257e0fa",
+              "url": "https://app.notion.com/p/40173152f17181e7876cf8919257e0fa"
+            },
+            {
+              "id": "en-microbe-40173152f171815188dad807b1d45973",
+              "title": "Bacillus amyloliquefaciens — organism profile",
+              "notionId": "40173152f171815188dad807b1d45973",
+              "url": "https://app.notion.com/p/40173152f171815188dad807b1d45973"
+            },
+            {
+              "id": "en-microbe-40173152f1718133ac83e2af140828a7",
+              "title": "Bacillus licheniformis — organism profile",
+              "notionId": "40173152f1718133ac83e2af140828a7",
+              "url": "https://app.notion.com/p/40173152f1718133ac83e2af140828a7"
+            },
+            {
+              "id": "en-microbe-40173152f1718182b807d5a6182cc097",
+              "title": "Bacillus mycoides — organism profile",
+              "notionId": "40173152f1718182b807d5a6182cc097",
+              "url": "https://app.notion.com/p/40173152f1718182b807d5a6182cc097"
+            },
+            {
+              "id": "en-microbe-40173152f1718170ad53cac18633c7e7",
+              "title": "Brevibacillus brevis — organism profile",
+              "notionId": "40173152f1718170ad53cac18633c7e7",
+              "url": "https://app.notion.com/p/40173152f1718170ad53cac18633c7e7"
+            },
+            {
+              "id": "en-microbe-40173152f1718116a861c3de9d19bda7",
+              "title": "Paenibacillus polymyxa — organism profile",
+              "notionId": "40173152f1718116a861c3de9d19bda7",
+              "url": "https://app.notion.com/p/40173152f1718116a861c3de9d19bda7"
+            },
+            {
+              "id": "en-microbe-40173152f1718164960bf418b89a46f7",
+              "title": "Sporosarcina pasteurii — organism profile",
+              "notionId": "40173152f1718164960bf418b89a46f7",
+              "url": "https://app.notion.com/p/40173152f1718164960bf418b89a46f7"
+            },
+            {
+              "id": "en-microbe-40173152f17181c1b1f0da7dddb27aca",
+              "title": "Niallia circulans (formerly Bacillus circulans) — organism profile",
+              "notionId": "40173152f17181c1b1f0da7dddb27aca",
+              "url": "https://app.notion.com/p/40173152f17181c1b1f0da7dddb27aca"
+            },
+            {
+              "id": "en-microbe-40173152f1718133b778fbb9eac22b61",
+              "title": "Cytobacillus firmus (formerly Bacillus firmus) — organism profile",
+              "notionId": "40173152f1718133b778fbb9eac22b61",
+              "url": "https://app.notion.com/p/40173152f1718133b778fbb9eac22b61"
+            },
+            {
+              "id": "en-microbe-40173152f17181aabb89f476513379e3",
+              "title": "Priestia megaterium (formerly Bacillus megaterium) — organism profile",
+              "notionId": "40173152f17181aabb89f476513379e3",
+              "url": "https://app.notion.com/p/40173152f17181aabb89f476513379e3"
+            },
+            {
+              "id": "en-microbe-40173152f1718123a8c4ec1ab55812c2",
+              "title": "Weizmannia coagulans (formerly Bacillus coagulans) — organism profile",
+              "notionId": "40173152f1718123a8c4ec1ab55812c2",
+              "url": "https://app.notion.com/p/40173152f1718123a8c4ec1ab55812c2"
+            },
+            {
+              "id": "en-microbe-40173152f171813b87bcf8fa7c7a145e",
+              "title": "Brevibacillus laterosporus (formerly Bacillus laterosporus) — organism profile",
+              "notionId": "40173152f171813b87bcf8fa7c7a145e",
+              "url": "https://app.notion.com/p/40173152f171813b87bcf8fa7c7a145e"
+            },
+            {
+              "id": "en-microbe-40173152f171816f95c4dced8d66e65b",
+              "title": "Virgibacillus halodenitrificans (formerly Bacillus halodenitrificans) — organism profile",
+              "notionId": "40173152f171816f95c4dced8d66e65b",
+              "url": "https://app.notion.com/p/40173152f171816f95c4dced8d66e65b"
+            },
+            {
+              "id": "en-microbe-40273152f17181c4b968f2476c0b6679",
+              "title": "Bacillus — bacterial group of agricultural interest",
+              "notionId": "40273152f17181c4b968f2476c0b6679",
+              "url": "https://app.notion.com/p/40273152f17181c4b968f2476c0b6679"
+            },
+            {
+              "id": "en-microbe-40273152f17181b087d9dd5adad64ada",
+              "title": "PGPR — Root-associated bacteria and agronomic potential",
+              "notionId": "40273152f17181b087d9dd5adad64ada",
+              "url": "https://app.notion.com/p/40273152f17181b087d9dd5adad64ada"
+            }
+          ]
+        },
+        {
+          "id": "en-bio-40173152f17181e1aa6eebe9f6c26c46",
+          "title": "Plant micropropagation",
+          "notionId": "40173152f17181e1aa6eebe9f6c26c46",
+          "url": "https://app.notion.com/p/40173152f17181e1aa6eebe9f6c26c46"
         }
       ],
       "notionParentId": "hub"
@@ -102,12 +457,34 @@
       "url": "https://app.notion.com/p/40173152f1718100b468f740dbb40647",
       "children": [
         {
-          "id": "en-soil-microbes",
-          "title": "Agricultural microorganisms",
-          "notionId": "40173152f171817e918cc9c278aeca0d",
-          "url": "https://app.notion.com/p/40173152f171817e918cc9c278aeca0d",
-          "description": "Explore microorganisms associated with agricultural systems, including their roles and limits of current evidence.",
-          "children": []
+          "id": "en-soil-40173152f17181c0955ef6b706891bfa",
+          "title": "Experimental equipment",
+          "notionId": "40173152f17181c0955ef6b706891bfa",
+          "url": "https://app.notion.com/p/40173152f17181c0955ef6b706891bfa"
+        },
+        {
+          "id": "en-soil-40173152f171818bbe4adc44550b7913",
+          "title": "Fermenters and pilot processes",
+          "notionId": "40173152f171818bbe4adc44550b7913",
+          "url": "https://app.notion.com/p/40173152f171818bbe4adc44550b7913"
+        },
+        {
+          "id": "en-soil-40173152f171818daed1d22deb38a624",
+          "title": "Substrate preparation",
+          "notionId": "40173152f171818daed1d22deb38a624",
+          "url": "https://app.notion.com/p/40173152f171818daed1d22deb38a624"
+        },
+        {
+          "id": "en-soil-40173152f171813da2e3dafa7265dc6a",
+          "title": "Prototyping and fabrication",
+          "notionId": "40173152f171813da2e3dafa7265dc6a",
+          "url": "https://app.notion.com/p/40173152f171813da2e3dafa7265dc6a"
+        },
+        {
+          "id": "en-soil-40173152f17181ce95cfcc669321cc1d",
+          "title": "Integrated instrumentation",
+          "notionId": "40173152f17181ce95cfcc669321cc1d",
+          "url": "https://app.notion.com/p/40173152f17181ce95cfcc669321cc1d"
         }
       ],
       "notionParentId": "hub"
