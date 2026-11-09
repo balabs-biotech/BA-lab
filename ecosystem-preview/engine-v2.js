@@ -446,7 +446,6 @@ function pickAt(x,y) {
 
 // Labels use screen-space sizing: zoom changes the scene, not the reading size.
 // The camera distance is measured per label so nested branches remain equally legible.
-let labelWorldPosition=null;
 function syncLabelScales() {
   if(!renderer||!camera)return;
   if(!labelWorldPosition)labelWorldPosition=new THREE.Vector3();
