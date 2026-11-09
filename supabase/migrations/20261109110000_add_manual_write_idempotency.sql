@@ -281,7 +281,9 @@ begin
 end;
 $$;
 
+revoke all on function public.record_manual_measurement(jsonb, jsonb) from public, anon, authenticated;
 revoke all on function public.record_manual_measurement(jsonb, jsonb, uuid) from public, anon;
+revoke all on function public.record_manual_observation(jsonb, jsonb) from public, anon, authenticated;
 revoke all on function public.record_manual_observation(jsonb, jsonb, uuid) from public, anon;
 grant execute on function public.record_manual_measurement(jsonb, jsonb, uuid) to authenticated;
 grant execute on function public.record_manual_observation(jsonb, jsonb, uuid) to authenticated;
