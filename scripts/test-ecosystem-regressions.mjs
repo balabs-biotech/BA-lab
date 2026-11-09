@@ -67,6 +67,8 @@ for (const [a,b] of [['bio','myco'],['myco','soil'],['soil','lab'],['lab','iot']
 }
 assert.ok(engine.includes('signalPoints'), 'Cross-domain links must carry animated signal points');
 assert.ok(engine.includes('new THREE.TubeGeometry'), 'Organic connections must be rendered as continuous neurites');
+assert.ok(engine.includes('Represent each folder/page as a living hyphal junction') && engine.includes('junction.add(filamentArm)'), 'Public branch nodes must be rendered as branching hyphal junctions, not bead-like solids');
+assert.ok(previewEngine.includes('Represent each folder/page as a living hyphal junction') && previewEngine.includes('junction.add(filamentArm)'), 'Preview branch nodes must use the same hyphal-junction visual language');
 
 assert.ok(engine.includes('stage.addEventListener(\'pointerdown\',onPointerDown)'), 'Pointer input must be attached to the new stage');
 assert.ok(engine.includes("document.addEventListener('pointerup',onPointerUp,true)"), 'Tap selection must be captured at document level');
