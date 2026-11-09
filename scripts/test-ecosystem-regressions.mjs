@@ -10,10 +10,10 @@ const expectedDomains = ['bio', 'myco', 'soil', 'lab', 'products', 'iot', 'work'
 assert.ok(html.includes('engine-v2.js?v=20261109-clickable-network-v7'), 'Public explorer must load the cache-busted screen-space label engine');
 assert.ok(previewHtml.includes('engine-v2.js?v=20261109-clickable-network-v7'), 'Preview must load the matching cache-busted label engine');
 assert.ok(engine.includes('function syncLabelScales()') && engine.includes('cameraDistance*projection*targetPixels'), '3D labels must keep a stable screen-space size across zoom levels');
-assert.ok(engine.includes('resourceHitTargets.set(label,button)'), 'Public branch labels must have real DOM hit targets');
+assert.ok(engine.includes('resourceHitTargets.set(label,element)'), 'Public branch labels must have real DOM hit targets');
 assert.ok(engine.includes('domainHitTargets.set(id,{object:hit,button:domainButton})'), 'Public universes must have real clickable hit targets');
 assert.ok(engine.includes('button.style.left=') && engine.includes('function syncResourceHitTargets()'), 'Public hit targets must follow projected 3D positions during camera motion');
-assert.ok(previewEngine.includes('resourceHitTargets.set(label,button)') && previewEngine.includes('domainHitTargets.set(id,{object:hit,button:domainButton})'), 'Preview universes and branches must use the same real DOM hit targets');
+assert.ok(previewEngine.includes('resourceHitTargets.set(label,element)') && previewEngine.includes('domainHitTargets.set(id,{object:hit,button:domainButton})'), 'Preview universes and branches must use the same real DOM hit targets');
 assert.ok(engine.includes('let distance = 13.5, zoomTargetDistance = 13.5') && engine.includes('const blend=1-Math.exp(-dt*13)'), 'Public camera zoom must ease smoothly toward its target instead of stepping instantly');
 assert.ok(previewEngine.includes('let distance = 13.5, zoomTargetDistance = 13.5') && previewEngine.includes('const blend=1-Math.exp(-dt*13)'), 'Preview camera zoom must use the same smooth easing');
 assert.ok(previewEngine.includes('function syncLabelScales()') && previewEngine.includes('cameraDistance*projection*targetPixels') && previewEngine.includes('syncLabelScales();'), 'Preview labels must keep the same stable screen-space size across zoom levels');
