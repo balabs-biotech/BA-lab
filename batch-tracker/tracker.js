@@ -6425,6 +6425,118 @@ function renderGenerationComparisonReport(report) {
     new Date(report.generated_at || Date.now()).toLocaleString();
   target.appendChild(heading);
 
+  // Descriptive summaries use culture-linked measurements only. Shared
+  // environmental readings remain contextual and are never attributed to a culture.
+  const measurementRows = Array.isArray(report.measurements) ? report.measurements : [];
+  const cultureMeasurementRows = measurementRows.filter(row =>
+    row.source_relation === "culture" && row.culture_id
+  );
+  const environmentalMeasurementRows = measurementRows.filter(row =>
+    row.source_relation === "environment" || !row.culture_id
+  );
+  const measurementGroups = new Map();
+  let excludedMeasurements = 0;
+  let nonNumericMeasurements = 0;
+  cultureMeasurementRows.forEach(row => {
+    if (row.quality_state === "excluded") {
+      excludedMeasurements += 1;
+      return;
+    }
+    const rawValue = row.normalized_value ?? row.raw_value;
+    const numericValue = rawValue == null ? NaN : Number(rawValue);
+    if (!Number.isFinite(numericValue)) {
+      nonNumericMeasurements += 1;
+      return;
+    }
+    const unit = row.normalized_value != null
+      ? (row.normalized_unit_code || "unité normalisée non renseignée")
+      : (row.raw_unit_code || "unité brute non renseignée");
+    const key = [row.culture_id, row.variable_code || "variable inconnue", unit,
+      row.quality_state || "qualité non renseignée"].join("||");
+    if (!measurementGroups.has(key)) {
+      measurementGroups.set(key, {
+        cultureId: row.culture_id,
+        variable: row.variable_code || "Variable inconnue",
+        unit,
+        quality: row.quality_state || "non renseignée",
+        values: []
+      });
+    }
+    measurementGroups.get(key).values.push(numericValue);
+  });
+
+  const statsSection = document.createElement("section");
+  statsSection.className = "generation-comparison-section";
+  const statsTitle = document.createElement("h5");
+  statsTitle.textContent = "Synthèse statistique descriptive";
+  statsSection.appendChild(statsTitle);
+  const statsNote = document.createElement("p");
+  statsNote.className = "muted";
+  statsNote.textContent = "Calculs séparés par culture, variable, unité et état qualité. n représente le nombre de mesures enregistrées, pas le nombre de répétitions biologiques indépendantes.";
+  statsSection.appendChild(statsNote);
+
+  if (measurementGroups.size) {
+    const statsTable = document.createElement("table");
+    statsTable.className = "statistics-table";
+    const statsHead = document.createElement("thead");
+    const statsHeaderRow = document.createElement("tr");
+    ["Culture", "Variable", "Unité", "Qualité", "n mesures", "Moyenne", "Médiane", "Q1–Q3", "Min–max"]
+      .forEach(label => {
+        const th = document.createElement("th");
+        th.textContent = label;
+        statsHeaderRow.appendChild(th);
+      });
+    statsHead.appendChild(statsHeaderRow);
+    statsTable.appendChild(statsHead);
+    const statsBody = document.createElement("tbody");
+    const fmt = value => new Intl.NumberFormat(undefined, {maximumSignificantDigits: 5}).format(value);
+    const quantile = (sorted, probability) => {
+      const position = (sorted.length - 1) * probability;
+      const lower = Math.floor(position);
+      const upper = Math.ceil(position);
+      return lower === upper ? sorted[lower] :
+        sorted[lower] + (sorted[upper] - sorted[lower]) * (position - lower);
+    };
+    [...measurementGroups.values()].sort((a, b) =>
+      String(cultureCodes.get(a.cultureId) || a.cultureId).localeCompare(String(cultureCodes.get(b.cultureId) || b.cultureId)) ||
+      a.variable.localeCompare(b.variable) || a.unit.localeCompare(b.unit)
+    ).forEach(group => {
+      const sorted = group.values.slice().sort((a, b) => a - b);
+      const mean = sorted.reduce((sum, value) => sum + value, 0) / sorted.length;
+      const cells = [
+        cultureCodes.get(group.cultureId) || group.cultureId,
+        group.variable, group.unit, group.quality, String(sorted.length),
+        fmt(mean), fmt(quantile(sorted, .5)),
+        fmt(quantile(sorted, .25)) + "–" + fmt(quantile(sorted, .75)),
+        fmt(sorted[0]) + "–" + fmt(sorted[sorted.length - 1])
+      ];
+      const tr = document.createElement("tr");
+      cells.forEach(value => {
+        const td = document.createElement("td");
+        td.textContent = value;
+        tr.appendChild(td);
+      });
+      statsBody.appendChild(tr);
+    });
+    statsTable.appendChild(statsBody);
+    statsSection.appendChild(statsTable);
+  } else {
+    const emptyStats = document.createElement("p");
+    emptyStats.className = "muted";
+    emptyStats.textContent = "Aucune mesure quantitative liée directement aux cultures sélectionnées ne permet un calcul statistique.";
+    statsSection.appendChild(emptyStats);
+  }
+
+  const qualityNote = document.createElement("p");
+  qualityNote.className = "muted";
+  qualityNote.textContent =
+    "Mesures culturelles exclues : " + excludedMeasurements +
+    " · Valeurs absentes ou non numériques : " + nonNumericMeasurements +
+    " · Mesures environnementales contextuelles : " + environmentalMeasurementRows.length +
+    ". Les mesures environnementales partagées ne sont pas intégrées aux statistiques propres aux cultures.";
+  statsSection.appendChild(qualityNote);
+  target.appendChild(statsSection);
+
   sections.forEach(([key, title]) => {
     const rows = Array.isArray(report[key]) ? report[key] : [];
     const section = document.createElement("section");
