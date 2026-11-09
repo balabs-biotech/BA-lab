@@ -195,7 +195,7 @@ select 'PASS: biological operation idempotency, duplicate suppression and payloa
 -- bounded descendant results, and organization isolation.
 \i supabase/migrations/20261109143000_add_recursive_culture_lineage_rpc.sql
 set role authenticated;
-do $
+do $lineage$
 declare
   parent_id uuid;
   child_id uuid;
@@ -253,6 +253,6 @@ begin
     raise exception 'FAIL: lineage RPC allowed cross-organization reads';
   end if;
 end
-$;
+$lineage$;
 reset role;
 select 'PASS: recursive lineage ancestors, descendants, material provenance, truncation and tenant isolation' as test_result;
