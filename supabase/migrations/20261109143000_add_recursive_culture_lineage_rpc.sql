@@ -96,8 +96,7 @@ begin
   ),
   ranked_descendants as (
     select d.*,
-           row_number() over (order by d.depth, d.id) as row_number,
-           count(*) over () as total_count
+           row_number() over (order by d.depth, d.id) as row_number
       from descendants d
   ),
   descendant_stats as (
@@ -149,8 +148,9 @@ begin
            d.id, d.code, d.culture_type, d.material_id,
            m.material_code, m.material_type, m.generation, m.state,
            d.parent_culture_id, m.parent_material_id, d.started_at,
-           false, d.total_count, d.total_count > (v_offset + v_limit)
+           false, stats.total_count, stats.total_count > (v_offset + v_limit)
       from ranked_descendants d
+      cross join descendant_stats stats
       left join public.materials m
         on m.organization_id = p_organization_id and m.id = d.material_id
      where d.row_number > v_offset and d.row_number <= (v_offset + v_limit)
