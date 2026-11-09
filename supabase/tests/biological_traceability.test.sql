@@ -204,6 +204,7 @@ declare
   was_truncated boolean;
   page_one_code text;
   page_two_code text;
+  page_three_code text;
   total_descendants bigint;
   has_next_page boolean;
   caught boolean := false;
@@ -252,7 +253,7 @@ begin
       '00000000-0000-0000-0000-0000000000a1', parent_id, 1, 0
     )
    where relation='descendant';
-  if page_one_code is null or total_descendants <> 2 or has_next_page is distinct from true then
+  if page_one_code is null or total_descendants <> 3 or has_next_page is distinct from true then
     raise exception 'FAIL: first lineage page metadata is incorrect';
   end if;
 
@@ -266,9 +267,19 @@ begin
     raise exception 'FAIL: second lineage page is missing or duplicates page one';
   end if;
 
+  select culture_code
+    into page_three_code
+    from public.get_culture_lineage(
+      '00000000-0000-0000-0000-0000000000a1', parent_id, 1, 2
+    )
+   where relation='descendant';
+  if page_three_code is null or page_three_code in (page_one_code, page_two_code) then
+    raise exception 'FAIL: third lineage page is missing or duplicates an earlier page';
+  end if;
+
   select has_more into has_next_page
     from public.get_culture_lineage(
-      '00000000-0000-0000-0000-0000000000a1', parent_id, 1, 1
+      '00000000-0000-0000-0000-0000000000a1', parent_id, 1, 2
     )
    where relation='current';
   if has_next_page is distinct from false then
