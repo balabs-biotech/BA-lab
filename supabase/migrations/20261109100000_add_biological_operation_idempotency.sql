@@ -12,7 +12,7 @@ create table private.operation_idempotency_receipts (
 );
 
 alter table private.operation_idempotency_receipts enable row level security;
-revoke all on table private.operation_idempotency_receipts from public, anon, authenticated, service_role;
+revoke all on table private.operation_idempotency_receipts from public, anon, authenticated;
 
 -- Traçabilité biologique de bout en bout : opérations et descendants atomiques.
 create or replace function public.record_biological_operation(
