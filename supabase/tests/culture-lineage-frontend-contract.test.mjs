@@ -132,6 +132,15 @@ assert.doesNotMatch(comparison, /innerHTML/,
   'generation comparison report must use safe DOM construction rather than injecting HTML');
 assert.match(workspace, /id="generationComparisonCultures"/,
   'culture detail must expose the generation selection control');
+assert.match(workspace, /id="generationComparisonSearch"/,
+  'culture comparison must provide a search control rather than an unfiltered native multi-select');
+assert.match(workspace, /id="generationComparisonOptions"/,
+  'culture comparison must expose a mobile-friendly checkbox list');
+assert.match(source, /checkbox\.type\s*=\s*["']checkbox["']/,
+  'culture comparison options must be selectable with accessible checkboxes');
+assert.match(source, /selectedCultureIds\.length\s*>=\s*4/,
+  'culture comparison must prevent selecting more than four cultures in the UI');
+
 assert.match(workspace, /id="compareCultureGenerationsButton"/,
   'culture detail must expose the comparison action');
 assert.match(workspace, /id="generationComparisonResults"/,
