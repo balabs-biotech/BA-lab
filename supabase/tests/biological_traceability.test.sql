@@ -207,6 +207,7 @@ declare
   page_three_code text;
   total_descendants bigint;
   has_next_page boolean;
+  material_relationship text;
   caught boolean := false;
 begin
   select id into parent_id from public.cultures
@@ -238,6 +239,12 @@ begin
    where relation='material_ancestor' and material_code='MAT-PARENT';
   if row_count <> 1 then
     raise exception 'FAIL: lineage RPC did not return material provenance';
+  end if;
+  select material_relationship_type into material_relationship
+    from public.get_culture_lineage('00000000-0000-0000-0000-0000000000a1', child_id)
+   where relation='material_ancestor' and material_code='MAT-PARENT';
+  if material_relationship is distinct from 'division_aliquotes' then
+    raise exception 'FAIL: material lineage did not expose the typed relationship';
   end if;
 
   select has_more into was_truncated
