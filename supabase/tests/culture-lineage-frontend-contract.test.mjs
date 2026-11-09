@@ -182,6 +182,24 @@ assert.match(reportRenderer, /pas le nombre de répétitions biologiques indépe
 assert.match(reportRenderer, /Mesures environnementales contextuelles/,
   'shared environmental measurements must remain explicit contextual evidence');
 
+assert.match(reportRenderer, /culture\.experimental_unit_id/,
+  'replicate-aware analysis must identify the experimental unit attached to each culture');
+assert.match(reportRenderer, /culture\.experiment_id/,
+  'independent-unit comparisons must remain scoped to a common experiment');
+assert.match(reportRenderer, /culture\.treatment_code/,
+  'independent-unit comparisons must keep treatment cohorts separate');
+assert.match(reportRenderer, /unitMeasurements/,
+  'repeated readings must be collapsed within each experimental unit before cohort comparison');
+assert.match(reportRenderer, /cohort\.units\.length >= 2/,
+  'replicate comparisons must require at least two distinct experimental units');
+assert.match(reportRenderer, /Médiane des unités/,
+  'replicate summaries must report unit-level medians');
+assert.match(reportRenderer, /Aucune p-value ni conclusion causale/,
+  'the current descriptive engine must not imply unsupported statistical inference');
+assert.match(reportRenderer, /Mesures non rattachées à une unité expérimentale identifiable/,
+  'measurements without an identifiable experimental unit must be disclosed');
+
+
 
 
 console.log('PASS: CultureOps lineage, event history and generation comparison use bounded tenant RPCs');
