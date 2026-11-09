@@ -161,7 +161,7 @@ function createWorld() {
     // Invisible selection volume remains generous for touch, while visible geometry stays filamentary.
     const hit=new THREE.Mesh(new THREE.SphereGeometry(1.12,16,12),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));hit.userData={id,kind:'domain'};group.add(hit);
     world.add(group);cells.set(id,{group,soma,label,hit,position:pos,color});
-    const domainButton=document.createElement('button');domainButton.type='button';domainButton.className='webgl-hit-target webgl-domain-target';domainButton.setAttribute('aria-label',(LABELS[id]?.title||id)+' — '+t('domain'));domainButton.title=LABELS[id]?.title||id;domainButton.style.width='116px';domainButton.style.height='116px';domainButton.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();if(!selected)enterDomain(id)});stage.append(domainButton);domainHitTargets.set(id,{object:hit,button:domainButton});
+    const domainButton=document.createElement('button');domainButton.type='button';domainButton.className='webgl-hit-target webgl-domain-target';domainButton.setAttribute('aria-label',(LABELS[id]?.title||id)+' — '+t('domain'));domainButton.title=LABELS[id]?.title||id;domainButton.style.width='116px';domainButton.style.height='116px';domainButton.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();renderer?.domElement?.focus({preventScroll:true});if(!selected)enterDomain(id)});stage.append(domainButton);domainHitTargets.set(id,{object:hit,button:domainButton});
     pickables.push(soma,hit,label);
     const branches=14;
     for(let j=0;j<branches;j++){
@@ -230,7 +230,7 @@ function clearResources() {
 function mDispose(material){material?.map?.dispose();material?.dispose?.()}
 function makeResourceLabel(item,color,depth=0) { const size=depth===0?18:depth===1?16:14;const label=makeLabel(item.title,color,size);const scale=depth===0?2.55:depth===1?1.95:1.5;label.scale.set(scale,depth===0?.58:depth===1?.48:.38,1);label.userData={...item,kind:'resource-label'};addResourceHitTarget(label);return label; }
 function addResourceHitTarget(label) {
- const button=document.createElement('button');button.type='button';button.className='webgl-hit-target webgl-resource-target';button.setAttribute('aria-label',(label.userData.title||label.userData.name||'Branche')+(label.userData.children?.length?' — ouvrir le dossier':' — ouvrir la page'));button.title=label.userData.title||label.userData.name||'';button.style.width=label.userData.depth===0?'112px':label.userData.depth===1?'92px':'78px';button.style.height=label.userData.depth===0?'54px':'46px';button.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();openResource(label.userData)});stage.append(button);resourceHitTargets.set(label,button);
+ const button=document.createElement('button');button.type='button';button.className='webgl-hit-target webgl-resource-target';button.setAttribute('aria-label',(label.userData.title||label.userData.name||'Branche')+(label.userData.children?.length?' — ouvrir le dossier':' — ouvrir la page'));button.title=label.userData.title||label.userData.name||'';button.style.width=label.userData.depth===0?'112px':label.userData.depth===1?'92px':'78px';button.style.height=label.userData.depth===0?'54px':'46px';button.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();renderer?.domElement?.focus({preventScroll:true});openResource(label.userData)});stage.append(button);resourceHitTargets.set(label,button);
 }
 function syncLabelScales() {
   if(!renderer||!camera)return;
