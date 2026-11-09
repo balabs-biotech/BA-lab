@@ -18,7 +18,7 @@ for (const language of ['fr', 'ar', 'en', 'pt']) {
   assert.ok(!knowledgeHub.url && !knowledgeHub.notionId, language + ' knowledge-transfer hub must not invent a parent Notion destination');
   assert.equal(knowledgeHub.children?.length, 4, language + ' knowledge-transfer universe must expose four public resource links');
   for (const resource of knowledgeHub.children) {
-    assert.ok(/^https:\/\/app\\.notion\\.com\/p\/[a-f0-9]{32}$/.test(resource.url), language + ' knowledge resource must use a verified Notion page URL');
+    assert.ok(/^https:\/\/app\.notion\.com\/p\/[a-f0-9]{32}$/.test(resource.url), language + ' knowledge resource must use a verified Notion page URL');
     assert.ok(!resource.notionId, language + ' cross-domain resource links must not duplicate source-page identifiers');
   }
   for (const domain of tree.domains.filter(item => item.id !== 'learn')) {
