@@ -3,6 +3,7 @@ import { readFileSync } from 'node:fs';
 
 const source = readFileSync('batch-tracker/tracker.js', 'utf8');
 const migration = readFileSync('supabase/migrations/20261109143000_add_recursive_culture_lineage_rpc.sql', 'utf8');
+const workspace = readFileSync('batch-tracker/workspace.html', 'utf8');
 const start = source.indexOf('async function loadBiologicalLineage(cultureId, offset = 0) {');
 const end = source.indexOf('\nasync function saveBiologicalOperation(event) {', start);
 assert.ok(start >= 0 && end > start, 'lineage loader must remain a named, bounded function');
@@ -109,4 +110,33 @@ assert.match(historyPagination, /isCurrentWorkspaceRevision\(loadRevision, loadO
 assert.match(detailLoader, /historyHasMore/ ,
   'culture timeline must expose a next-page control when the server reports more events');
 
-console.log('PASS: CultureOps lineage and event history UI use bounded tenant RPCs');
+
+const compareStart = source.indexOf('async function compareCultureGenerations() {');
+const compareEnd = source.indexOf('\nasync function loadCultureDetail(cultureId) {', compareStart);
+assert.ok(compareStart >= 0 && compareEnd > compareStart,
+  'generation comparison must remain a named asynchronous operation');
+const comparison = source.slice(compareStart, compareEnd);
+assert.match(comparison, /supabaseClient\.rpc\("compare_culture_generations"/,
+  'generation comparison must call the dedicated database RPC');
+assert.match(comparison, /p_organization_id:\s*orgId/,
+  'generation comparison must be tenant scoped');
+assert.match(comparison, /p_culture_ids:\s*cultureIds/,
+  'generation comparison must pass the explicit selected culture IDs');
+assert.match(comparison, /cultureIds\.length < 2 \|\| cultureIds\.length > 4/,
+  'generation comparison must enforce the two-to-four culture selection');
+assert.match(comparison, /isCurrentWorkspaceRevision\(revision, orgId\)/,
+  'generation comparison must reject stale workspace responses');
+assert.match(comparison, /renderGenerationComparisonReport\(data \|\| \{\}\)/,
+  'generation comparison must render the structured evidence response');
+assert.doesNotMatch(comparison, /innerHTML/,
+  'generation comparison report must use safe DOM construction rather than injecting HTML');
+assert.match(workspace, /id="generationComparisonCultures"/,
+  'culture detail must expose the generation selection control');
+assert.match(workspace, /id="compareCultureGenerationsButton"/,
+  'culture detail must expose the comparison action');
+assert.match(workspace, /id="generationComparisonResults"/,
+  'culture detail must expose the comparison report region');
+assert.match(source, /compareCultureGenerationsButton.*addEventListener\("click", compareCultureGenerations\)/,
+  'generation comparison action must be connected to its handler');
+
+console.log('PASS: CultureOps lineage, event history and generation comparison use bounded tenant RPCs');
