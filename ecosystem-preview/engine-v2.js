@@ -230,24 +230,18 @@ function clearResources() {
 function mDispose(material){material?.map?.dispose();material?.dispose?.()}
 function makeResourceLabel(item,color,depth=0) { const size=depth===0?18:depth===1?16:14;const label=makeLabel(item.title,color,size);const scale=depth===0?2.55:depth===1?1.95:1.5;label.scale.set(scale,depth===0?.58:depth===1?.48:.38,1);label.userData={...item,kind:'resource-label'};addResourceHitTarget(label);return label; }
 function addResourceHitTarget(label) {
- const button=document.createElement('button');button.type='button';button.className='webgl-hit-target webgl-resource-target';button.setAttribute('aria-label',(label.userData.title||label.userData.name||'Branche')+(label.userData.children?.length?' — ouvrir le dossier':' — ouvrir la page'));button.title=label.userData.title||label.userData.name||'';button.dataset.hasChildren=String(!!label.userData.children?.length);button.dataset.resourceUrl=label.userData.url||'';button.style.width=label.userData.depth===0?'76px':label.userData.depth===1?'68px':'60px';button.style.height=label.userData.depth===0?'36px':label.userData.depth===1?'32px':'28px';button.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();renderer?.domElement?.focus({preventScroll:true});openResource(label.userData)});stage.append(button);resourceHitTargets.set(label,button);
-}
-function syncLabelScales() {
-  if(!renderer||!camera)return;
-  if(!labelWorldPosition)labelWorldPosition=new THREE.Vector3();
-  const viewportHeight=Math.max(1,renderer.domElement.clientHeight);
-  const projection=2*Math.tan(THREE.MathUtils.degToRad(camera.fov*.5))/viewportHeight;
-  const apply=label=>{
-    if(!label?.userData?.kind?.endsWith('label'))return;
-    label.getWorldPosition(labelWorldPosition);
-    const cameraDistance=Math.max(.1,camera.position.distanceTo(labelWorldPosition));
-    const depth=label.userData.depth||0;
-    const targetPixels=label.userData.kind==='domain-label'?25:label.userData.denseRoot?19:Math.max(17,23-depth*2);
-    const worldHeight=cameraDistance*projection*targetPixels;
-    label.scale.set(worldHeight*4.25,worldHeight,1);
-  };
-  for(const item of cells.values())apply(item.label);
-  for(const item of resourceObjects)if(item.userData?.kind==='resource-label')apply(item);
+ const data=label.userData||{},hasChildren=!!data.children?.length;
+ const element=document.createElement(hasChildren?'button':'a');
+ if(hasChildren){element.type='button';element.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();renderer?.domElement?.focus({preventScroll:true});openResource(data)});}
+ else {element.href=data.url||'#';element.target='_blank';element.rel='noopener noreferrer';element.addEventListener('click',e=>{if(!data.url)e.preventDefault();});}
+ element.className='webgl-hit-target webgl-resource-target';
+ element.setAttribute('aria-label',(data.title||data.name||'Branche')+(hasChildren?' — ouvrir le dossier':' — ouvrir la page'));
+ element.title=data.title||data.name||'';
+ element.dataset.hasChildren=String(hasChildren);
+ element.dataset.resourceUrl=data.url||'';
+ element.style.width=data.depth===0?'76px':data.depth===1?'68px':'60px';
+ element.style.height=data.depth===0?'36px':data.depth===1?'32px':'28px';
+ stage.append(element);resourceHitTargets.set(label,element);
 }
 function syncResourceHitTargets() {
  if(!renderer||!camera||!stage)return;
