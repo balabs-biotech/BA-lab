@@ -5,6 +5,7 @@ declare
   v_old_signature regprocedure :=
     'public.create_culture_with_generation(uuid,text,text,uuid,uuid,uuid,uuid,uuid,uuid,timestamp with time zone,jsonb)'::regprocedure;
   v_proc record;
+  v_old_proc record;
   v_definition text;
 begin
   select p.prosecdef, p.proconfig, p.proacl, p.proowner, pg_get_functiondef(p.oid) as definition
@@ -29,6 +30,12 @@ begin
   end if;
   if has_function_privilege('authenticated', v_old_signature, 'EXECUTE') then
     raise exception 'FAIL: authenticated clients can bypass the idempotent culture-generation RPC';
+  end if;
+  select p.prosecdef, p.proconfig into v_old_proc
+    from pg_proc p where p.oid = v_old_signature;
+  if not v_old_proc.prosecdef
+     or not ('search_path=pg_catalog' = any(coalesce(v_old_proc.proconfig, array[]::text[]))) then
+    raise exception 'FAIL: internal culture-generation write primitive must be SECURITY DEFINER with a pinned search_path';
   end if;
 
   v_definition := lower(v_proc.definition);
