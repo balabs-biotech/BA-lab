@@ -246,6 +246,8 @@ assert.match(reportRenderer, /surveillance temporelle/,
   'time series must include an operational monitoring summary');
 assert.match(reportRenderer, /minimum de 5 relevés/,
   'candidate trend and rupture detection must disclose its minimum observation count');
+assert.match(reportRenderer, /9 relevés.*tendance monotone|tendance monotone.*9 relevés/i,
+  'the UI must disclose that monotone trend candidates require nine observations, not five');
 assert.match(reportRenderer, /tendance monotone candidate/,
   'the monitor must flag sustained monotone sequences as candidates');
 assert.match(reportRenderer, /rupture candidate/,
