@@ -87,6 +87,38 @@ create policy cultures_org on public.cultures to authenticated using(private.is_
 create policy relationships_org on public.material_relationships to authenticated using(private.is_org_member(organization_id)) with check(private.is_org_member(organization_id));
 create policy events_org on public.events to authenticated using(private.is_org_member(organization_id)) with check(private.is_org_member(organization_id));
 \i supabase/migrations/20261022021957_biological_traceability_v1.sql
+\\i supabase/migrations/20261109170000_sync_material_parent_relationships.sql
+set role authenticated;
+do $material_edge$
+declare
+  parent_id uuid;
+  derived_id uuid;
+  edge_type text;
+begin
+  select id into parent_id from public.materials
+   where organization_id='00000000-0000-0000-0000-0000000000a1'
+     and material_code='MAT-PARENT';
+  insert into public.materials(
+    organization_id, material_code, material_type, strain_id,
+    parent_material_id, state, generation, metadata
+  )
+  select '00000000-0000-0000-0000-0000000000a1', 'MAT-DIRECT-DERIVATION',
+         'culture_derived', strain_id, parent_id, 'active', 1,
+         '{"generation_method":"culture_propagation"}'::jsonb
+    from public.materials
+   where organization_id='00000000-0000-0000-0000-0000000000a1'
+     and id=parent_id
+  returning id into derived_id;
+  select relationship_type into edge_type
+    from public.material_relationships
+   where organization_id='00000000-0000-0000-0000-0000000000a1'
+     and parent_material_id=parent_id and child_material_id=derived_id;
+  if edge_type is distinct from 'culture_propagation' then
+    raise exception 'FAIL: material insert did not create its typed parent relationship';
+  end if;
+end
+$material_edge$;
+reset role;
 select set_config('request.jwt.claim.sub','00000000-0000-0000-0000-0000000000b1',false);
 set role authenticated;
 do $$
