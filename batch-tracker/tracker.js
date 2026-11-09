@@ -5968,7 +5968,8 @@ async function loadBiologicalLineage(cultureId, offset = 0) {
         material_code: row.material_code,
         material_type: row.material_type,
         generation: row.material_generation,
-        state: row.material_state
+        state: row.material_state,
+        relationship_type: row.material_relationship_type
       }));
     const materialChain = [
       ...materialAncestors,
@@ -6041,7 +6042,8 @@ async function loadBiologicalLineage(cultureId, offset = 0) {
         const small = document.createElement('small');
         small.textContent = (material.material_type || biologicalWorkflowText("unknownType")) +
           (material.generation == null ? '' : ' · ' + biologicalWorkflowText("generation") + material.generation) +
-          (material.state ? ' · ' + material.state : '');
+          (material.state ? ' · ' + material.state : '') +
+          (material.relationship_type ? ' · ' + material.relationship_type : '');
         node.append(strong, small);
         list.appendChild(node);
       });
