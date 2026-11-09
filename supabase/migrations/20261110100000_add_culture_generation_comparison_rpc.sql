@@ -242,7 +242,8 @@ begin
           and (e.culture_id = any(v_ids)
             or e.material_id in (select id from selected_materials)
             or e.batch_id in (select id from selected_batches)
-            or (e.culture_id is null and e.material_id is null
+            or e.experimental_unit_id in (select id from selected_units)
+            or (e.culture_id is null and e.material_id is null and e.experimental_unit_id is null
                 and e.environment_id in (select id from selected_envs)))) as event_count,
       (select count(*) from public.batches b
         where b.organization_id = p_organization_id
