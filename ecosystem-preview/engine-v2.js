@@ -442,6 +442,28 @@ function pickAt(x,y) {
   if(nearestNode&&nearestNodeDistance<(window.innerWidth<760?48:56)){openResource(nearestNode.userData);return}
 }
 
+// Labels use screen-space sizing: zoom changes the scene, not the reading size.
+// The camera distance is measured per label so nested branches remain equally legible.
+let labelWorldPosition=null;
+function syncLabelScales() {
+  if(!renderer||!camera)return;
+  if(!labelWorldPosition)labelWorldPosition=new THREE.Vector3();
+  const viewportHeight=Math.max(1,renderer.domElement.clientHeight);
+  const projection=2*Math.tan(THREE.MathUtils.degToRad(camera.fov*.5))/viewportHeight;
+  const apply=label=>{
+    if(!label?.userData?.kind?.endsWith('label'))return;
+    label.getWorldPosition(labelWorldPosition);
+    const cameraDistance=Math.max(.1,camera.position.distanceTo(labelWorldPosition));
+    const depth=label.userData.depth||0;
+    const targetPixels=label.userData.kind==='domain-label'?25:label.userData.denseRoot?19:Math.max(17,23-depth*2);
+    const worldHeight=cameraDistance*projection*targetPixels;
+    label.scale.set(worldHeight*4.25,worldHeight,1);
+  };
+  for(const item of cells.values())apply(item.label);
+  for(const item of resourceObjects)if(item.userData?.kind==='resource-label')apply(item);
+}
+
+
 function animate(now=0) {
   raf=requestAnimationFrame(animate);
   const dt=Math.min(.05,(now-lastFrame)/1000||0);lastFrame=now;
