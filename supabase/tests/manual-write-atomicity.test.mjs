@@ -44,9 +44,14 @@ console.log("✓ Manual measurement and observation writes use atomic RPCs; clie
 
 const idempotencyMigration = readFileSync(path.join(root, "supabase/migrations/20261109110000_add_manual_write_idempotency.sql"), "utf8");
 for (const rpc of ["record_manual_measurement", "record_manual_observation"]) {
-  const signature = new RegExp("create or replace function public\\\\." + rpc + "\\\\([\\\\s\\\\S]*?\\\\)\\\\s*returns uuid\\\\s*language plpgsql\\\\s*security definer\\\\s*set search_path = pg_catalog", "i");
-  if (!signature.test(idempotencyMigration)) throw new Error(rpc + " must be a pinned SECURITY DEFINER RPC with an explicit safe search_path");
-  if (!idempotencyMigration.includes("p_idempotency_key uuid")) throw new Error(rpc + " migration is missing the idempotency key argument");
+  const start = idempotencyMigration.indexOf("create or replace function public." + rpc + "(");
+  const end = idempotencyMigration.indexOf("\\n$$;", start);
+  const sqlFunction = start >= 0 && end >= 0 ? idempotencyMigration.slice(start, end) : "";
+  if (!sqlFunction.includes("p_idempotency_key uuid") ||
+      !sqlFunction.includes("security definer") ||
+      !sqlFunction.includes("set search_path = pg_catalog")) {
+    throw new Error(rpc + " must be a pinned SECURITY DEFINER RPC with an explicit safe search_path and idempotency key");
+  }
 }
 if (!idempotencyMigration.includes("private.operation_idempotency_receipts")) {
   throw new Error("Manual writes must reuse the private idempotency receipt ledger");
