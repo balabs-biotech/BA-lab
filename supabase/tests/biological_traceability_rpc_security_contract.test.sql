@@ -82,4 +82,16 @@ begin
 end
 $block$;
 
+do $legacy$
+begin
+  if has_function_privilege(
+    'authenticated',
+    'public.record_biological_operation(uuid,uuid,text,timestamp with time zone,text,jsonb,text[])'::regprocedure,
+    'EXECUTE'
+  ) then
+    raise exception 'FAIL: legacy non-idempotent biological RPC overload remains executable';
+  end if;
+end
+$legacy$;
+
 select 'biological traceability RPC privilege contract passed' as result;
