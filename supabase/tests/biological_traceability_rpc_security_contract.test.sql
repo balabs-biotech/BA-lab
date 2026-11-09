@@ -44,7 +44,7 @@ end
 $$;
 
 
-do $
+do $block$
 declare
   v_signature regprocedure := 'public.record_biological_operation(uuid,uuid,text,uuid,timestamp with time zone,text,jsonb,text[])'::regprocedure;
   v_proc record;
@@ -80,6 +80,6 @@ begin
     raise exception 'FAIL: idempotency receipt table must have RLS enabled';
   end if;
 end
-$;
+$block$;
 
 select 'biological traceability RPC privilege contract passed' as result;
