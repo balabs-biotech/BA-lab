@@ -320,6 +320,7 @@ function showFailure(error) {
 
 function setupUI() {
   stage=document.createElement('div');stage.className='webgl-stage';stage.tabIndex=0;stage.setAttribute('role','application');stage.setAttribute('aria-label','BA Labs interactive biological network');
+   stage.addEventListener('click',e=>{if(e.target.closest?.('.webgl-hit-target'))stage.focus({preventScroll:true})},true);
   hint=document.createElement('div');hint.className='webgl-hint';hint.textContent=t('hint');
   status=document.createElement('div');status.className='webgl-status';status.textContent='BALABS / LIVING NETWORK';window.__BALABS_3D_STATUS=status;
   panel=document.createElement('section');panel.className='webgl-focus';panel.hidden=true;panel.setAttribute('aria-live','polite');
