@@ -55,10 +55,17 @@ create table public.material_relationships(
   foreign key(organization_id,parent_material_id) references public.materials(organization_id,id),
   foreign key(organization_id,child_material_id) references public.materials(organization_id,id)
 );
+create table public.batches(
+  organization_id uuid not null,
+  id uuid not null default gen_random_uuid(),
+  culture_id uuid not null,
+  primary key(organization_id,id),
+  foreign key(organization_id,culture_id) references public.cultures(organization_id,id)
+);
 create table public.events(
   organization_id uuid not null references public.organizations(id), id uuid not null default gen_random_uuid(), event_type text not null,
   occurred_at timestamptz not null, actor_user_id uuid references auth.users(id), culture_id uuid, material_id uuid,
-  sample_id uuid, experimental_unit_id uuid, payload jsonb not null default '{}'::jsonb, created_at timestamptz not null default now(),
+  sample_id uuid, experimental_unit_id uuid, batch_id uuid, payload jsonb not null default '{}'::jsonb, created_at timestamptz not null default now(),
   check(num_nonnulls(culture_id,material_id,sample_id,experimental_unit_id)=1),
   foreign key(organization_id,culture_id) references public.cultures(organization_id,id)
 );
@@ -392,6 +399,15 @@ begin
    where organization_id='00000000-0000-0000-0000-0000000000a1'
      and code='CHILD-A';
 
+  insert into public.batches(organization_id, culture_id)
+  values ('00000000-0000-0000-0000-0000000000a1', child_id);
+  insert into public.events(organization_id, event_type, occurred_at, batch_id, payload)
+  select '00000000-0000-0000-0000-0000000000a1', 'batch_started', now(),
+         b.id, '{"stage":"inoculation"}'::jsonb
+    from public.batches b
+   where b.organization_id='00000000-0000-0000-0000-0000000000a1'
+     and b.culture_id=child_id;
+
   select count(*) into operation_count
     from public.get_culture_event_history(
       '00000000-0000-0000-0000-0000000000a1', child_id, 100, 0
@@ -410,6 +426,15 @@ begin
      and event_type='descendant_created';
   if descendant_count <> 1 then
     raise exception 'FAIL: culture history omitted its own descendant-created event';
+  end if;
+
+  select count(*) into descendant_count
+    from public.get_culture_event_history(
+      '00000000-0000-0000-0000-0000000000a1', child_id, 100, 0
+    )
+   where source_relation='batch' and event_type='batch_started';
+  if descendant_count <> 1 then
+    raise exception 'FAIL: culture history omitted an event from a linked production batch';
   end if;
 
   select total_rows, has_more into total_count, has_more
