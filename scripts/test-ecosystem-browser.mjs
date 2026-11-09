@@ -153,10 +153,10 @@ async function checkWorkingScene(name, viewport) {
         zoomOutChecked = true;
         const distanceAfterZoomOut = await page.evaluate(() => window.__BALABS_3D_E2E__()?.cameraDistance || 0);
         await page.locator('.webgl-controls [data-camera="in"]').evaluate((button) => button.click());
-        await page.waitForFunction((previous) => {
+        await page.waitForFunction(({ previous, expectedDepth }) => {
           const state = window.__BALABS_3D_E2E__();
-          return state && state.cameraDistance < previous && state.depth === nestedDepth;
-        }, distanceAfterZoomOut, { timeout: 8000 });
+          return state && state.cameraDistance < previous && state.depth === expectedDepth;
+        }, { previous: distanceAfterZoomOut, expectedDepth: nestedDepth }, { timeout: 8000 });
         const depthAfterZoomIn = await page.evaluate(() => window.__BALABS_3D_E2E__()?.depth || 0);
         assert.equal(depthAfterZoomIn, nestedDepth,
           name + ': camera zoom-in must not change the selected hierarchy level');
