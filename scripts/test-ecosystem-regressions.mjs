@@ -68,6 +68,8 @@ assert.ok(engine.includes('stage.addEventListener(\'pointerdown\',onPointerDown)
 assert.ok(engine.includes("document.addEventListener('pointerup',onPointerUp,true)"), 'Tap selection must be captured at document level');
 assert.ok(engine.includes('stage.addEventListener(\'wheel\''), 'Desktop wheel zoom must be supported');
 assert.ok(engine.includes("stage.setAttribute('aria-keyshortcuts','ArrowUp ArrowDown ArrowLeft ArrowRight + - Escape Backspace Home')"), 'The 3D stage must advertise keyboard navigation shortcuts');
+assert.ok(engine.includes("renderer.domElement.setAttribute('tabindex','0')"), 'The 3D canvas must be keyboard focusable');
+assert.ok(engine.includes("canvas:focus-visible{outline:2px solid #d1d0c5"), 'Keyboard focus must be visibly indicated on the 3D canvas');
 assert.ok(engine.includes("if(key==='ArrowLeft')theta-=.12"), 'Keyboard arrows must rotate and navigate the 3D view');
 assert.ok(engine.includes("else if(key==='Home'){goOverview();return}"), 'The Home key must return to the network overview');
 assert.ok(previewEngine.includes("stage.setAttribute('aria-keyshortcuts','ArrowUp ArrowDown ArrowLeft ArrowRight + - Escape Backspace Home')"), 'Preview engine must expose the same keyboard navigation');
