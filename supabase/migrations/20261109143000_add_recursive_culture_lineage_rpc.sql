@@ -178,7 +178,7 @@ begin
     select 6, 'material_ancestor_truncated'::text, 250,
            null::uuid, null::text, null::text, null::uuid,
            null::text, null::text, null::integer, null,
-           null::uuid, null::uuid, null::timestamptz, true
+           null::uuid, null::uuid, null::timestamptz, true, 0::bigint, false
      where exists (
        select 1 from material_ancestors ma
         where ma.depth = 250
