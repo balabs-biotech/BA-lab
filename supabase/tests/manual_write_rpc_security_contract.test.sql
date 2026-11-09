@@ -51,6 +51,11 @@ begin
     end if;
   end loop;
 
+  if has_function_privilege('authenticated', 'public.record_manual_measurement(jsonb,jsonb)'::regprocedure, 'EXECUTE')
+     or has_function_privilege('authenticated', 'public.record_manual_observation(jsonb,jsonb)'::regprocedure, 'EXECUTE') then
+    raise exception 'FAIL: legacy non-idempotent manual write RPC overloads remain executable';
+  end if;
+
   if not exists (
     select 1
       from pg_constraint c
