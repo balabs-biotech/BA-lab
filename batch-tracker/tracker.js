@@ -1990,56 +1990,39 @@ async function createCulture() {
 
 
     if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) throw new Error("Session ou espace de travail modifié pendant l’opération. Recommencez.");
-    const {
-      data,
-      error
-    } =
-      await supabaseClient.rpc(
-        "create_culture_with_generation",
-        {
-
-          p_organization_id:
-            operationOrganizationId,
-
-          p_code:
-            cultureCode,
-
-          p_culture_type:
-            cultureType,
-
-          p_parent_material_id:
-            materialId,
-
-          p_parent_culture_id:
-            null,
-
-          p_protocol_version_id:
-            protocolVersionId,
-
-          p_environment_id:
-            null,
-
-          p_experiment_id:
-            null,
-
-          p_experimental_unit_id:
-            null,
-
-          p_started_at:
-            startedAt
-              ? new Date(
-                  startedAt
-                ).toISOString()
-              : null,
-
-          p_metadata: {
-            source: "BA Labs Culture Tracker",
-            interface_version: "2.0",
-            domain: document.body.dataset.domain === "laboratory" ? "laboratory" : "mycology"
-          }
-
-        }
-      );
+    const cultureGenerationPayload = {
+      p_organization_id: operationOrganizationId,
+      p_code: cultureCode,
+      p_culture_type: cultureType,
+      p_parent_material_id: materialId,
+      p_parent_culture_id: null,
+      p_protocol_version_id: protocolVersionId,
+      p_environment_id: null,
+      p_experiment_id: null,
+      p_experimental_unit_id: null,
+      p_started_at: startedAt ? new Date(startedAt).toISOString() : null,
+      p_metadata: {
+        source: "BA Labs Culture Tracker",
+        interface_version: "2.0",
+        domain: document.body.dataset.domain === "laboratory" ? "laboratory" : "mycology"
+      }
+    };
+    const cultureGenerationKey = await getManualWriteIdempotencyKey(
+      "culture-generation",
+      cultureGenerationPayload
+    );
+    if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) {
+      throw new Error("Session ou espace de travail modifié pendant l’opération. Recommencez.");
+    }
+    const { data, error } = await supabaseClient.rpc(
+      "create_culture_with_generation_idempotent",
+      {
+        ...cultureGenerationPayload,
+        p_idempotency_key: cultureGenerationKey
+      }
+    );
+    if (error) throw new Error(error.message);
+    clearManualWriteIdempotencyKey("culture-generation");
     if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
 
 
