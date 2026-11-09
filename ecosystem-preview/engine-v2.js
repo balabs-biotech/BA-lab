@@ -161,7 +161,7 @@ function createWorld() {
     // Invisible selection volume remains generous for touch, while visible geometry stays filamentary.
     const hit=new THREE.Mesh(new THREE.SphereGeometry(1.12,16,12),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));hit.userData={id,kind:'domain'};group.add(hit);
     world.add(group);cells.set(id,{group,soma,label,hit,position:pos,color});
-    const domainButton=document.createElement('button');domainButton.type='button';domainButton.className='webgl-hit-target webgl-domain-target';domainButton.setAttribute('aria-label',(LABELS[id]?.title||id)+' — '+t('domain'));domainButton.title=LABELS[id]?.title||id;domainButton.dataset.domainId=id;domainButton.style.width='116px';domainButton.style.height='116px';domainButton.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();renderer?.domElement?.focus({preventScroll:true});if(!selected)enterDomain(id)});stage.append(domainButton);domainHitTargets.set(id,{object:hit,button:domainButton});
+    const domainButton=document.createElement('button');domainButton.type='button';domainButton.className='webgl-hit-target webgl-domain-target';domainButton.setAttribute('aria-label',(LABELS[id]?.title||id)+' — '+t('domain'));domainButton.title=LABELS[id]?.title||id;domainButton.dataset.domainId=id;domainButton.style.width='116px';domainButton.style.height='116px';domainButton.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();stage?.focus({preventScroll:true});if(!selected)enterDomain(id)});stage.append(domainButton);domainHitTargets.set(id,{object:hit,button:domainButton});
     pickables.push(soma,hit,label);
     const branches=14;
     for(let j=0;j<branches;j++){
@@ -232,7 +232,7 @@ function makeResourceLabel(item,color,depth=0) { const size=depth===0?18:depth==
 function addResourceHitTarget(label) {
  const data=label.userData||{},hasChildren=!!data.children?.length;
  const element=document.createElement(hasChildren?'button':'a');
- if(hasChildren){element.type='button';element.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();renderer?.domElement?.focus({preventScroll:true});openResource(data)});}
+ if(hasChildren){element.type='button';element.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();stage?.focus({preventScroll:true});openResource(data)});}
  else {element.href=data.url||'#';element.target='_blank';element.rel='noopener noreferrer';element.addEventListener('click',e=>{if(!data.url)e.preventDefault();});}
  element.className='webgl-hit-target webgl-resource-target';
  element.style.setProperty('z-index',hasChildren?'99999':'1','important');
@@ -387,7 +387,7 @@ function onPointerDown(e) {
   // canvas gesture: retain the pointer and resolve the tap from screen coords.
   if(e.target.closest('.webgl-controls,.webgl-focus,.webgl-intro'))return;
   // Keep keyboard navigation immediately available after mouse, pen or touch.
-  renderer?.domElement?.focus({preventScroll:true});
+  stage?.focus({preventScroll:true});
   pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});stage.setPointerCapture?.(e.pointerId);
   if(pointers.size===2){const p=[...pointers.values()];pinchStart=Math.hypot(p[0].x-p[1].x,p[0].y-p[1].y);dragging=true;moved=true;return}
   dragging=true;moved=false;dragGesture=false;lastPointer={x:e.clientX,y:e.clientY};
