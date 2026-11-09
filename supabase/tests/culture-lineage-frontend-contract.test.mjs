@@ -156,5 +156,32 @@ assert.match(source, /checkbox\.addEventListener\(["']change["']/,
 assert.match(source, /generationComparisonResults\.__generationComparisonRequestId = \(generationComparisonResults\.__generationComparisonRequestId \|\| 0\) \+ 1/,
   'opening another culture detail must invalidate a pending comparison for the previous selection');
 
+const reportStart = source.indexOf('function renderGenerationComparisonReport(report) {');
+const reportEnd = source.indexOf('\nasync function compareCultureGenerations() {', reportStart);
+assert.ok(reportStart >= 0 && reportEnd > reportStart,
+  'generation comparison report renderer must remain independently testable');
+const reportRenderer = source.slice(reportStart, reportEnd);
+assert.match(reportRenderer, /source_relation === "culture" && row\.culture_id/,
+  'descriptive statistics must use culture-linked measurements only');
+assert.match(reportRenderer, /source_relation === "environment" \|\| !row\.culture_id/,
+  'environmental measurements must remain separately identified as context');
+assert.match(reportRenderer, /normalized_value \?\? row\.raw_value/,
+  'statistics must prefer normalized values and preserve raw fallback');
+assert.match(reportRenderer, /normalized_unit_code|raw_unit_code/,
+  'statistics must keep measurements separated by their actual unit');
+assert.match(reportRenderer, /quality_state === "excluded"/,
+  'excluded measurements must not enter descriptive statistics');
+assert.match(reportRenderer, /quantile\(sorted, \.5\)/,
+  'generation comparison must calculate the median');
+assert.match(reportRenderer, /quantile\(sorted, \.25\)/,
+  'generation comparison must calculate the first quartile');
+assert.match(reportRenderer, /quantile\(sorted, \.75\)/,
+  'generation comparison must calculate the third quartile');
+assert.match(reportRenderer, /pas le nombre de répétitions biologiques indépendantes/,
+  'measurement counts must not be presented as biological replicate counts');
+assert.match(reportRenderer, /Mesures environnementales contextuelles/,
+  'shared environmental measurements must remain explicit contextual evidence');
+
+
 
 console.log('PASS: CultureOps lineage, event history and generation comparison use bounded tenant RPCs');
