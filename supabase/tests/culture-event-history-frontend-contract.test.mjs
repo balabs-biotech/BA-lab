@@ -20,6 +20,10 @@ assert.doesNotMatch(loader, /\.from\(["']events["']\)/,
   'culture detail must not read the events table directly');
 assert.match(loader, /source_relation === "creation_operation"/,
   'culture detail must label the operation that created a descendant');
+assert.match(loader, /source_relation === "descendant_culture"/,
+  'culture detail must distinguish direct child-culture generation events');
+assert.match(paginationLoader, /source_relation === "descendant_culture"/,
+  'paginated history must preserve the direct child-culture source label');
 assert.match(loader, /eventHistory\?\.some\(row => row\.has_more === true\)/,
   'culture detail must surface server-reported partial event history');
 const paginationStart = source.indexOf('async function loadMoreCultureEventHistory(');
