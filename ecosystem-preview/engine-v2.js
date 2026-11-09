@@ -48,6 +48,7 @@ let distance = 13.5, theta = .22, phi = 1.27, target = null, targetGoal = null;
 let opened = false, raf = 0, lastFrame = 0, dragging = false, moved = false, dragGesture = false;
 let lastPointer = null, pointers = new Map(), pinchStart = 0, pinchDistance = 0, hoverId = null;
 let canvasRect = null, cameraInitialized = false, lastPickAt = 0;
+let labelWorldPosition = null;
 
 function addStyles() {
   const style = document.createElement('style');
@@ -230,6 +231,23 @@ function addResourceHitTarget(label) {
  // Spatial labels are rendered only in WebGL. Do not create transparent DOM
  // hit areas: mobile browsers can hit-test stale/overlapping buttons instead
  // of the canvas, even when CSS attempts to disable pointer events.
+}
+function syncLabelScales() {
+  if(!renderer||!camera)return;
+  if(!labelWorldPosition)labelWorldPosition=new THREE.Vector3();
+  const viewportHeight=Math.max(1,renderer.domElement.clientHeight);
+  const projection=2*Math.tan(THREE.MathUtils.degToRad(camera.fov*.5))/viewportHeight;
+  const apply=label=>{
+    if(!label?.userData?.kind?.endsWith('label'))return;
+    label.getWorldPosition(labelWorldPosition);
+    const cameraDistance=Math.max(.1,camera.position.distanceTo(labelWorldPosition));
+    const depth=label.userData.depth||0;
+    const targetPixels=label.userData.kind==='domain-label'?25:label.userData.denseRoot?19:Math.max(17,23-depth*2);
+    const worldHeight=cameraDistance*projection*targetPixels;
+    label.scale.set(worldHeight*4.25,worldHeight,1);
+  };
+  for(const item of cells.values())apply(item.label);
+  for(const item of resourceObjects)if(item.userData?.kind==='resource-label')apply(item);
 }
 function syncResourceHitTargets() {
  // Kept as an animation-loop hook; selection is exclusively canvas ray-picking.
@@ -432,6 +450,7 @@ function animate(now=0) {
     for(const item of signalPoints){const p=item.curve.getPoint((now*.000075+item.offset)%1);item.pulse.position.copy(p)}
     for(const [id,item] of cells){const phase=now*.0006+IDS.indexOf(id)*.7;const pulse=1+Math.sin(phase)*.012;item.soma.scale.set((id==='soil'?.62:.56)*pulse,(id==='lab'?.48:id==='myco'?.66:.61)*pulse,(id==='myco'?.66:.55)*pulse);item.group.rotation.y=Math.sin(phase*.6)*.018}
   }
+  syncLabelScales();
   syncResourceHitTargets();
   renderer.render(scene,camera);
 }
