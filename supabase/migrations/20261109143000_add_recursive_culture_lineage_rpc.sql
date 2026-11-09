@@ -114,10 +114,13 @@ begin
       join public.materials m
         on m.organization_id = t.organization_id
        and m.id = current_material.parent_material_id
-      left join public.material_relationships rel
-        on rel.organization_id = t.organization_id
-       and rel.parent_material_id = m.id
-       and rel.child_material_id = current_material.id
+      left join lateral (
+        select string_agg(distinct rel.relationship_type, ', ' order by rel.relationship_type) as relationship_type
+          from public.material_relationships rel
+         where rel.organization_id = t.organization_id
+           and rel.parent_material_id = m.id
+           and rel.child_material_id = current_material.id
+      ) rel on true
     union all
     select parent.id, parent.material_code, parent.material_type,
            parent.parent_material_id, parent.generation, parent.state,
@@ -126,10 +129,13 @@ begin
       join public.materials parent
         on parent.organization_id = p_organization_id
        and parent.id = ma.parent_material_id
-      left join public.material_relationships rel
-        on rel.organization_id = p_organization_id
-       and rel.parent_material_id = parent.id
-       and rel.child_material_id = ma.id
+      left join lateral (
+        select string_agg(distinct rel.relationship_type, ', ' order by rel.relationship_type) as relationship_type
+          from public.material_relationships rel
+         where rel.organization_id = p_organization_id
+           and rel.parent_material_id = parent.id
+           and rel.child_material_id = ma.id
+      ) rel on true
      where ma.depth < 250
        and not parent.id = any(ma.path)
   ),
@@ -188,7 +194,7 @@ begin
     union all
     select 6, 'material_ancestor_truncated'::text, 250,
            null::uuid, null::text, null::text, null::uuid,
-           null::text, null::text, null::integer, null,
+           null::text, null::text, null::integer, null, null::text,
            null::uuid, null::uuid, null::timestamptz, true, 0::bigint, false
      where exists (
        select 1 from material_ancestors ma
