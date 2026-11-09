@@ -89,7 +89,9 @@ function clearAuthenticatedWorkspaceState() {
     generationComparisonResults.__generationComparisonRequestId = (generationComparisonResults.__generationComparisonRequestId || 0) + 1;
     generationComparisonResults.replaceChildren();
   }
-  document.getElementById("generationComparisonCultures")?.replaceChildren();
+  document.getElementById("generationComparisonOptions")?.replaceChildren();
+  const generationComparisonSearch = document.getElementById("generationComparisonSearch");
+  if (generationComparisonSearch) generationComparisonSearch.value = "";
   const generationComparisonStatus = document.getElementById("generationComparisonStatus");
   if (generationComparisonStatus) generationComparisonStatus.textContent = "Connectez-vous pour comparer les générations.";
   const generationComparisonButton = document.getElementById("compareCultureGenerationsButton");
@@ -6313,20 +6315,70 @@ async function loadMoreCultureEventHistory(cultureId, offset, button) {
   }
 }
 
+function invalidateGenerationComparison(message = "Sélection modifiée. Relancez la comparaison pour actualiser le rapport.") {
+  const results = document.getElementById("generationComparisonResults");
+  if (results) {
+    results.__generationComparisonRequestId = (results.__generationComparisonRequestId || 0) + 1;
+    results.replaceChildren();
+  }
+  const button = document.getElementById("compareCultureGenerationsButton");
+  if (button) button.disabled = false;
+  const status = document.getElementById("generationComparisonStatus");
+  if (status) status.textContent = message;
+}
+
+function filterGenerationComparisonOptions() {
+  const search = document.getElementById("generationComparisonSearch");
+  const options = document.getElementById("generationComparisonOptions");
+  if (!search || !options) return;
+  const query = search.value.trim().toLocaleLowerCase("fr");
+  options.querySelectorAll("[data-culture-option]").forEach(label => {
+    label.hidden = query !== "" && !label.dataset.search.includes(query);
+  });
+}
+
 function populateGenerationComparisonOptions(currentCultureId) {
-  const select = document.getElementById("generationComparisonCultures");
-  if (!select) return;
-  select.replaceChildren();
+  const options = document.getElementById("generationComparisonOptions");
+  const search = document.getElementById("generationComparisonSearch");
+  if (!options) return;
+  options.replaceChildren();
+  if (search) search.value = "";
+
   cultureOptions
     .slice()
-    .sort((a, b) => String(a.code || "").localeCompare(String(b.code || "")))
+    .sort((a, b) => String(a.code || "").localeCompare(String(b.code || ""), "fr"))
     .forEach(culture => {
-      const option = document.createElement("option");
-      option.value = culture.id;
-      option.textContent = (culture.code || "Culture sans code") + " — " + (culture.culture_type || "type non renseigné");
-      option.selected = culture.id === currentCultureId;
-      select.appendChild(option);
+      const label = document.createElement("label");
+      label.className = "generation-comparison-option";
+      label.dataset.cultureOption = "true";
+      label.dataset.search = [culture.code || "", culture.culture_type || "", culture.id || ""]
+        .join(" ").toLocaleLowerCase("fr");
+
+      const checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+      checkbox.value = culture.id;
+      checkbox.checked = culture.id === currentCultureId;
+      checkbox.addEventListener("change", () => {
+        const selectedCultureIds = options.querySelectorAll("input[type=checkbox]:checked");
+        if (selectedCultureIds.length > 4) {
+          checkbox.checked = false;
+          const status = document.getElementById("generationComparisonStatus");
+          if (status) status.textContent = "Quatre cultures maximum. Décochez une culture avant d’en ajouter une autre.";
+          return;
+        }
+        invalidateGenerationComparison(
+          selectedCultureIds.length + " culture(s) sélectionnée(s). " +
+          (selectedCultureIds.length < 2 ? "Ajoutez au moins une autre culture." : "Relancez la comparaison pour actualiser le rapport.")
+        );
+      });
+
+      const text = document.createElement("span");
+      text.textContent = (culture.code || "Culture sans code") + " — " +
+        (culture.culture_type || "type non renseigné");
+      label.append(checkbox, text);
+      options.appendChild(label);
     });
+  filterGenerationComparisonOptions();
 }
 
 function renderGenerationComparisonReport(report) {
@@ -6442,11 +6494,11 @@ async function compareCultureGenerations() {
   const revision = authStateRevision;
   const orgId = organizationId;
   const panel = document.getElementById("cultureDetailPanel");
-  const select = document.getElementById("generationComparisonCultures");
+  const options = document.getElementById("generationComparisonOptions");
   const button = document.getElementById("compareCultureGenerationsButton");
   const status = document.getElementById("generationComparisonStatus");
-  if (!panel || !select || !button || !status || !orgId) return;
-  const cultureIds = [...select.selectedOptions].map(option => option.value);
+  if (!panel || !options || !button || !status || !orgId) return;
+  const cultureIds = [...options.querySelectorAll("input[type=checkbox]:checked")].map(option => option.value);
   const selectedDetailCultureId = panel.dataset.cultureId;
   if (cultureIds.length < 2 || cultureIds.length > 4) {
     status.textContent = "Sélectionnez entre 2 et 4 cultures.";
@@ -7002,19 +7054,11 @@ function setupUiEnhancements() {
   document.getElementById("cultureTypeFilter")?.addEventListener("change", renderCultureCatalog);
   document.getElementById("bioOperationForm")?.addEventListener("submit", saveBiologicalOperation);
   document.getElementById("compareCultureGenerationsButton")?.addEventListener("click", compareCultureGenerations);
-  document.getElementById("generationComparisonCultures")?.addEventListener("change", () => {
-    const results = document.getElementById("generationComparisonResults");
-    if (results) {
-      results.__generationComparisonRequestId = (results.__generationComparisonRequestId || 0) + 1;
-      results.replaceChildren();
-    }
-    const button = document.getElementById("compareCultureGenerationsButton");
-    if (button) button.disabled = false;
-    const status = document.getElementById("generationComparisonStatus");
-    if (status) status.textContent = "Sélection modifiée. Relancez la comparaison pour actualiser le rapport.";
-  });
+  document.getElementById("generationComparisonSearch")?.addEventListener("input", filterGenerationComparisonOptions);
+
   document.getElementById("bioOperationDate")?.setAttribute("value", new Date().toISOString().slice(0,16));
   document.getElementById("closeCultureDetail")?.addEventListener("click", () => {
+    invalidateGenerationComparison("Comparaison fermée.");
     document.getElementById("cultureDetailPanel")?.classList.add("hidden");
   });
 
