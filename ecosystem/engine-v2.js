@@ -303,7 +303,21 @@ function setupUI() {
   controls.addEventListener('click',e=>{const action=e.target.closest('button')?.dataset.camera;if(action==='back'){goBackLevel();return}if(action==='in')distance=Math.max(3.5,distance*.82);if(action==='out'){if(selected){goBackLevel();return}distance=Math.min(42,distance*1.2)}if(action==='reset'){goOverview();return}cameraPosition()});
   stage.append(hint,status,controls,nav,panel,intro);ROOT.append(stage);
   document.getElementById('homeBtn')?.addEventListener('click',()=>{if(selected)goOverview()});
-  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&selected)goBackLevel()});
+  stage.setAttribute('aria-keyshortcuts','ArrowUp ArrowDown ArrowLeft ArrowRight + - Escape Backspace Home');
+  stage.addEventListener('keydown',e=>{
+    if(e.target!==stage&&e.target!==renderer?.domElement)return;
+    const key=e.key;
+    if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','+','=','-','_','Escape','Backspace','Home'].includes(key))e.preventDefault();
+    if(key==='ArrowLeft')theta-=.12;
+    else if(key==='ArrowRight')theta+=.12;
+    else if(key==='ArrowUp')phi=THREE.MathUtils.clamp(phi-.10,.35,2.78);
+    else if(key==='ArrowDown')phi=THREE.MathUtils.clamp(phi+.10,.35,2.78);
+    else if(key==='+'||key==='=')distance=Math.max(3.5,distance*.86);
+    else if(key==='-'||key==='_'){const next=Math.min(42,distance*1.16);if(selected&&next>9.5){goBackLevel();return}distance=next}
+    else if(key==='Escape'||key==='Backspace'){if(selected)goBackLevel();return}
+    else if(key==='Home'){goOverview();return}
+    cameraPosition();
+  });
   stage.addEventListener('wheel',e=>{if(e.target.closest('.webgl-controls,.webgl-focus'))return;e.preventDefault();const nextDistance=THREE.MathUtils.clamp(distance+e.deltaY*.012,3.5,42);if(selected&&e.deltaY>0&&nextDistance>9.5){goBackLevel();return}distance=nextDistance;cameraPosition()},{passive:false});
   // Pointer input belongs to the stage so mouse, pen and touch-generated
   // pointer events follow the same path. Keep the document-level pointer-up
