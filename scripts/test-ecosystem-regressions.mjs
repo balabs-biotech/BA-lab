@@ -7,8 +7,8 @@ const engine = readFileSync('ecosystem/engine-v2.js', 'utf8');
 const previewEngine = readFileSync('ecosystem-preview/engine-v2.js', 'utf8');
 const expectedDomains = ['bio', 'myco', 'soil', 'lab', 'products', 'iot', 'work', 'learn'];
 
-assert.ok(html.includes('engine-v2.js?v=20261109-continuous-deep-zoom-v2'), 'Public explorer must load the cache-busted screen-space label engine');
-assert.ok(previewHtml.includes('engine-v2.js?v=20261109-continuous-deep-zoom-v2'), 'Preview must load the matching cache-busted label engine');
+assert.ok(html.includes('engine-v2.js?v=20261109-mycelial-junctions-v3'), 'Public explorer must load the cache-busted screen-space label engine');
+assert.ok(previewHtml.includes('engine-v2.js?v=20261109-mycelial-junctions-v3'), 'Preview must load the matching cache-busted label engine');
 assert.ok(engine.includes('function syncLabelScales()') && engine.includes('cameraDistance*projection*targetPixels'), '3D labels must keep a stable screen-space size across zoom levels');
 assert.ok(previewEngine.includes('function syncLabelScales()') && previewEngine.includes('cameraDistance*projection*targetPixels') && previewEngine.includes('syncLabelScales();'), 'Preview labels must keep the same stable screen-space size across zoom levels');
 assert.ok(!html.includes('constellation-3d.js?v='), 'Legacy monolithic engine must no longer be loaded');
@@ -67,6 +67,8 @@ for (const [a,b] of [['bio','myco'],['myco','soil'],['soil','lab'],['lab','iot']
 }
 assert.ok(engine.includes('signalPoints'), 'Cross-domain links must carry animated signal points');
 assert.ok(engine.includes('new THREE.TubeGeometry'), 'Organic connections must be rendered as continuous neurites');
+assert.ok(engine.includes('Represent each folder/page as a living hyphal junction') && engine.includes('junction.add(filamentArm)'), 'Public branch nodes must be rendered as branching hyphal junctions, not bead-like solids');
+assert.ok(previewEngine.includes('Represent each folder/page as a living hyphal junction') && previewEngine.includes('junction.add(filamentArm)'), 'Preview branch nodes must use the same hyphal-junction visual language');
 
 assert.ok(engine.includes('stage.addEventListener(\'pointerdown\',onPointerDown)'), 'Pointer input must be attached to the new stage');
 assert.ok(engine.includes("document.addEventListener('pointerup',onPointerUp,true)"), 'Tap selection must be captured at document level');
