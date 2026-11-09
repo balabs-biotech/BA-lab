@@ -44,7 +44,7 @@ let world, cells = new Map(), pickables = [], resourceObjects = [], edges = [], 
 let resourceHitTargets = new Map();
 let nav, currentNode = null, currentAnchor = null, navigationStack = [];
 let selected = null, selectedBranch = null, manifest = null, transition = null;
-let distance = 13.5, theta = .22, phi = 1.27, target = null, targetGoal = null;
+let distance = 13.5, zoomTargetDistance = 13.5, theta = .22, phi = 1.27, target = null, targetGoal = null;
 let opened = false, raf = 0, lastFrame = 0, dragging = false, moved = false, dragGesture = false;
 let lastPointer = null, pointers = new Map(), pinchStart = 0, pinchDistance = 0, hoverId = null;
 let canvasRect = null, cameraInitialized = false, lastPickAt = 0;
@@ -210,7 +210,7 @@ function smoothCamera(to,distTo,duration=950,done) {
   transition={frame:0};
   const step=now=>{
     const raw=Math.min(1,(now-started)/duration),e=raw<.5?4*raw*raw*raw:1-Math.pow(-2*raw+2,3)/2;
-    target=from.clone().lerp(end,e);distance=fromDist+(distTo-fromDist)*e;
+    target=from.clone().lerp(end,e);distance=fromDist+(distTo-fromDist)*e;zoomTargetDistance=distance;
     cameraPosition();
     if(raw<1)transition.frame=requestAnimationFrame(step);
     else{transition=null;stage.classList.remove('is-transitioning');targetGoal=null;done?.()}
@@ -305,7 +305,7 @@ function setupUI() {
   const controls=document.createElement('div');controls.className='webgl-controls';controls.innerHTML='<button type="button" data-camera="back" aria-label="Niveau précédent">‹</button><button type="button" data-camera="out" aria-label="Zoom arrière">−</button><button type="button" data-camera="in" aria-label="Zoom avant">+</button><button type="button" data-camera="reset" aria-label="Recentrer">⌖</button>';
   intro=document.createElement('button');intro.type='button';intro.className='webgl-intro';intro.innerHTML='<span class="webgl-intro-card"><span class="webgl-intro-orb"><b>BA</b></span><span class="webgl-intro-copy">BALABS · APPLIED BIOTECHNOLOGY</span><span class="webgl-intro-cta">'+t('open')+'</span></span>';
   intro.addEventListener('click',()=>{opened=true;intro.hidden=true;nav.hidden=false;ROOT.classList.remove('universe-closed');ROOT.classList.add('universe-open');status.textContent='BALABS / LIVING NETWORK'});
-  controls.addEventListener('click',e=>{const action=e.target.closest('button')?.dataset.camera;if(action==='back'){goBackLevel();return}if(action==='in')distance=Math.max(1.25,distance*.72);if(action==='out')distance=Math.min(60,distance*1.28);if(action==='reset'){goOverview();return}cameraPosition()});
+  controls.addEventListener('click',e=>{const action=e.target.closest('button')?.dataset.camera;if(action==='back'){goBackLevel();return}if(action==='in')zoomTargetDistance=Math.max(1.25,zoomTargetDistance*.72);if(action==='out')zoomTargetDistance=Math.min(60,zoomTargetDistance*1.28);if(action==='reset'){goOverview();return}cameraPosition()});
   stage.append(hint,status,controls,nav,panel,intro);ROOT.append(stage);
   document.getElementById('homeBtn')?.addEventListener('click',()=>{if(selected)goOverview()});
   stage.setAttribute('aria-keyshortcuts','ArrowUp ArrowDown ArrowLeft ArrowRight + - Escape Backspace Home');
@@ -317,13 +317,13 @@ function setupUI() {
     else if(key==='ArrowRight')theta+=.12;
     else if(key==='ArrowUp')phi=THREE.MathUtils.clamp(phi-.10,.35,2.78);
     else if(key==='ArrowDown')phi=THREE.MathUtils.clamp(phi+.10,.35,2.78);
-    else if(key==='+'||key==='=')distance=Math.max(1.25,distance*.72);
-    else if(key==='-'||key==='_'){const next=Math.min(60,distance*1.28);distance=next}
+    else if(key==='+'||key==='=')zoomTargetDistance=Math.max(1.25,zoomTargetDistance*.72);
+    else if(key==='-'||key==='_')zoomTargetDistance=Math.min(60,zoomTargetDistance*1.28);
     else if(key==='Escape'||key==='Backspace'){if(selected)goBackLevel();return}
     else if(key==='Home'){goOverview();return}
     cameraPosition();
   });
-  stage.addEventListener('wheel',e=>{if(e.target.closest('.webgl-controls,.webgl-focus'))return;e.preventDefault();const nextDistance=THREE.MathUtils.clamp(distance*Math.exp(e.deltaY*.0016),1.25,60);distance=nextDistance;cameraPosition()},{passive:false});
+  stage.addEventListener('wheel',e=>{if(e.target.closest('.webgl-controls,.webgl-focus'))return;e.preventDefault();zoomTargetDistance=THREE.MathUtils.clamp(zoomTargetDistance*Math.exp(e.deltaY*.0016),1.25,60);},{passive:false});
   // Pointer input belongs to the stage so mouse, pen and touch-generated
   // pointer events follow the same path. Keep the document-level pointer-up
   // capture as a safety net for browsers that retarget capture during a drag.
@@ -355,7 +355,7 @@ function onPointerDown(e) {
 }
 function onPointerMove(e) {
   if(pointers.has(e.pointerId))pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
-  if(pointers.size>=2){const p=[...pointers.values()],d=Math.hypot(p[0].x-p[1].x,p[0].y-p[1].y);if(pinchStart)distance=THREE.MathUtils.clamp(distance*Math.exp((pinchStart-d)*.006),1.25,60);pinchStart=d;moved=true;cameraPosition();return}
+  if(pointers.size>=2){const p=[...pointers.values()],d=Math.hypot(p[0].x-p[1].x,p[0].y-p[1].y);if(pinchStart)zoomTargetDistance=THREE.MathUtils.clamp(zoomTargetDistance*Math.exp((pinchStart-d)*.006),1.25,60);pinchStart=d;moved=true;return}
   if(!dragging||!lastPointer)return;
   const dx=e.clientX-lastPointer.x,dy=e.clientY-lastPointer.y;
   if(Math.hypot(dx,dy)>7){moved=true;dragGesture=true}
@@ -430,6 +430,7 @@ function syncLabelScales() {
 function animate(now=0) {
   raf=requestAnimationFrame(animate);
   const dt=Math.min(.05,(now-lastFrame)/1000||0);lastFrame=now;
+  if(!transition){const blend=1-Math.exp(-dt*13);const nextDistance=distance+(zoomTargetDistance-distance)*blend;if(Math.abs(nextDistance-distance)>.0001){distance=nextDistance;cameraPosition()}else distance=zoomTargetDistance;}
   if(world){
     // Keep domain anchors world-stable; only cells pulse, so pointer targets never drift.
     for(const item of signalPoints){const p=item.curve.getPoint((now*.000075+item.offset)%1);item.pulse.position.copy(p)}
