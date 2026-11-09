@@ -108,7 +108,8 @@ begin
     select b.id
       from public.batches b
      where b.organization_id = p_organization_id
-       and b.culture_id = any(v_ids)
+       and (b.culture_id = any(v_ids)
+         or b.material_id in (select id from selected_materials))
   ),
   culture_rows as (
     select s.*,
@@ -171,11 +172,12 @@ begin
   ),
   event_rows as (
     select e.id, e.event_type, e.occurred_at, e.culture_id, e.material_id,
-           e.batch_id, e.environment_id, e.payload,
+           e.batch_id, e.experimental_unit_id, e.environment_id, e.payload,
            case
              when e.culture_id = any(v_ids) then 'culture'
              when e.material_id in (select id from selected_materials) then 'material'
              when e.batch_id in (select id from selected_batches) then 'batch'
+             when e.experimental_unit_id in (select id from selected_units) then 'experimental_unit'
              else 'environment'
            end as source_relation
       from public.events e
