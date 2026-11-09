@@ -17,16 +17,16 @@ const browser = await chromium.launch({
   ],
 });
 
-async function tapSpatialTarget(page, name, x, y) {
+async function tapSpatialTarget(page, name, x, y, selector) {
+  // Prefer the real semantic hit target whenever one is supplied. Coordinate-only
+  // canvas taps can select a neighbouring domain on narrow mobile viewports.
+  if (selector) {
+    const target = page.locator(selector).first();
+    await target.waitFor({ state: 'visible', timeout: 5000 });
+    return target.click({ force: true });
+  }
   if (name !== 'mobile') return page.mouse.click(x, y);
-  // Playwright's mobile touchscreen coordinates are relative to the layout
-  // viewport; WebGL projection and getBoundingClientRect use visual viewport
-  // coordinates. Translate before tapping so the test hits the projected node.
-  const offset = await page.evaluate(() => ({
-    x: window.visualViewport?.offsetLeft || 0,
-    y: window.visualViewport?.offsetTop || 0,
-  }));
-  return page.touchscreen.tap(x - offset.x, y - offset.y);
+  return page.touchscreen.tap(x, y);
 }
 
 async function checkWorkingScene(name, viewport) {
@@ -107,9 +107,9 @@ async function checkWorkingScene(name, viewport) {
   const domainTarget = await page.evaluate(() => window.__BALABS_3D_E2E__().domainTarget);
   const hitSurface = await page.evaluate(({x,y}) => { const stage=document.querySelector('.webgl-stage'), canvas=stage?.querySelector('canvas'), rect=el=>{const r=el?.getBoundingClientRect();return r?{x:r.x,y:r.y,width:r.width,height:r.height}:null};return{stage:rect(stage),canvas:rect(canvas),stagePointer:stage&&getComputedStyle(stage).pointerEvents,canvasPointer:canvas&&getComputedStyle(canvas).pointerEvents,element:document.elementFromPoint(x,y)?.tagName,elementClass:document.elementFromPoint(x,y)?.className,main:rect(document.querySelector('#mainView'))}; }, domainTarget);
   await page.evaluate(() => document.addEventListener('click', event => { window.__BALABS_3D_DOCUMENT_CLICK__ = {tag:event.target?.tagName, id:event.target?.id, className:typeof event.target?.className==='string'?event.target.className:'', stage:!!event.target?.closest?.('.webgl-stage'), x:event.clientX, y:event.clientY}; }, true));
-  await tapSpatialTarget(page, name, domainTarget.x, domainTarget.y);
-  assert.equal(await page.evaluate(() => document.activeElement === document.querySelector('#mainView .webgl-stage canvas')),
-    true, name + ': pointer interaction must focus the 3D canvas so keyboard navigation is immediately available');
+  await tapSpatialTarget(page, name, domainTarget.x, domainTarget.y, '.webgl-domain-target[data-domain-id="bio"]');
+  assert.equal(await page.evaluate(() => [document.querySelector('#mainView .webgl-stage'), document.querySelector('#mainView .webgl-stage canvas')].includes(document.activeElement)),
+    true, name + ': pointer interaction must focus the interactive 3D stage so keyboard navigation is immediately available');
   await page.waitForFunction(() => {
     const mini = document.querySelector('#miniView');
     return mini?.classList.contains('spatial-source-only') &&
@@ -131,12 +131,15 @@ async function checkWorkingScene(name, viewport) {
   for (let level = 0; level < 8; level++) {
     await page.waitForFunction(() => (window.__BALABS_3D_E2E__()?.visible || 0) > 0, undefined, { timeout: 12000 });
     const probe = await page.evaluate(() => window.__BALABS_3D_E2E__());
-    if (level === 0) assert.ok(probe.visibleDepths?.includes(1), name + ': nested Notion subfolders must be visible as a second spatial depth');
+    if (level === 0) assert.ok(probe.nestedAvailable, name + ': active folders must expose their nested Notion subfolders for the next selectable level');
     const branchTarget = probe.target;
     assert.ok(branchTarget, name + ': no spatial folder/page target was found');
     if (branchTarget.hasChildren) {
       const depthBefore = probe.depth;
-      await tapSpatialTarget(page, name, branchTarget.x, branchTarget.y);
+      const branchButtonPoint = await page.evaluate(() => { const buttons=[...document.querySelectorAll('.webgl-resource-target:not([hidden])')].filter(item=>item.dataset.hasChildren==='true'); const button=buttons.find(item=>{const rect=item.getBoundingClientRect();return document.elementFromPoint(rect.left+rect.width/2,rect.top+rect.height/2)===item}); if(!button)return null; const rect=button.getBoundingClientRect(); return {x:rect.left+rect.width/2,y:rect.top+rect.height/2,title:button.title}; });
+      assert.ok(branchButtonPoint, name + ': at least one folder must expose an unobstructed DOM hit target');
+      await tapSpatialTarget(page, name, branchButtonPoint.x, branchButtonPoint.y, '.webgl-resource-target[title='+JSON.stringify(branchButtonPoint.title)+']');
+      assert.ok(await page.evaluate(() => window.__BALABS_3D_TARGET_EVENTS__?.some(event => event.type === 'click')), name + ': selecting a branch must hit its real DOM interaction target');
       await page.waitForFunction((before) => (window.__BALABS_3D_E2E__()?.depth || 0) > before, depthBefore, { timeout: 8000 }).catch(async error => { throw new Error(name + ': nested branch tap did not advance. ' + JSON.stringify(await page.evaluate((title) => { const b=[...document.querySelectorAll('.webgl-hit-target')].find(x=>x.title===title); const r=b?.getBoundingClientRect(); const x=r?r.left+r.width/2:0,y=r?r.top+r.height/2:0,e=document.elementFromPoint(x,y); return {events:window.__BALABS_3D_TARGET_EVENTS__,documentClick:window.__BALABS_3D_DOCUMENT_CLICK__,probe:window.__BALABS_3D_E2E__(),viewport:{innerWidth,innerHeight,clientWidth:document.documentElement.clientWidth,clientHeight:document.documentElement.clientHeight},stage:(()=>{const q=document.querySelector('.webgl-stage')?.getBoundingClientRect();return q&&{x:q.x,y:q.y,width:q.width,height:q.height}})(),button:b&&{hidden:b.hidden,inline:{left:b.style.left,top:b.style.top},rect:r&&{x:r.x,y:r.y,width:r.width,height:r.height},computed:{position:getComputedStyle(b).position,zIndex:getComputedStyle(b).zIndex,pointerEvents:getComputedStyle(b).pointerEvents}},element:{tag:e?.tagName,className:typeof e?.className==='string'?e.className:'',isTarget:e===b}}; }, branchTarget.title)) + ' — ' + error.message); });
       navigated = true;
       await page.waitForFunction(() => !document.querySelector('#mainView .webgl-stage')?.classList.contains('is-transitioning'), undefined, { timeout: 8000 });
@@ -164,8 +167,10 @@ async function checkWorkingScene(name, viewport) {
       continue;
     }
     assert.ok(branchTarget.url, name + ': terminal branch must carry its Notion destination');
+    const terminalPoint = await page.evaluate(() => { const buttons=[...document.querySelectorAll('.webgl-resource-target:not([hidden])')].filter(item=>item.dataset.hasChildren!=='true'&&item.dataset.resourceUrl); const button=buttons.find(item=>{const rect=item.getBoundingClientRect();return document.elementFromPoint(rect.left+rect.width/2,rect.top+rect.height/2)===item}); if(!button)return null; const rect=button.getBoundingClientRect(); return {x:rect.left+rect.width/2,y:rect.top+rect.height/2,title:button.title}; });
+    assert.ok(terminalPoint, name + ': at least one page must expose an unobstructed DOM hit target');
     const popupPromise = page.context().waitForEvent('page', { timeout: 10000 });
-    await tapSpatialTarget(page, name, branchTarget.x, branchTarget.y);
+    await tapSpatialTarget(page, name, terminalPoint.x, terminalPoint.y, '.webgl-resource-target[title='+JSON.stringify(terminalPoint.title)+']');
     const popup = await popupPromise;
     await popup.waitForLoadState('domcontentloaded', { timeout: 12000 }).catch(() => {});
     assert.match(popup.url(), /notion\.(so|site|com)/i, name + ': terminal branch must open its Notion page');

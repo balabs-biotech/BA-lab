@@ -7,9 +7,15 @@ const engine = readFileSync('ecosystem/engine-v2.js', 'utf8');
 const previewEngine = readFileSync('ecosystem-preview/engine-v2.js', 'utf8');
 const expectedDomains = ['bio', 'myco', 'soil', 'lab', 'products', 'iot', 'work', 'learn'];
 
-assert.ok(html.includes('engine-v2.js?v=20261109-mycelial-junctions-v3'), 'Public explorer must load the cache-busted screen-space label engine');
-assert.ok(previewHtml.includes('engine-v2.js?v=20261109-mycelial-junctions-v3'), 'Preview must load the matching cache-busted label engine');
+assert.ok(html.includes('engine-v2.js?v=20261109-clickable-network-v24'), 'Public explorer must load the cache-busted screen-space label engine');
+assert.ok(previewHtml.includes('engine-v2.js?v=20261109-clickable-network-v25'), 'Preview must load the matching cache-busted label engine');
 assert.ok(engine.includes('function syncLabelScales()') && engine.includes('cameraDistance*projection*targetPixels'), '3D labels must keep a stable screen-space size across zoom levels');
+assert.ok(engine.includes('resourceHitTargets.set(label,element)'), 'Public branch labels must have real DOM hit targets');
+assert.ok(engine.includes('domainHitTargets.set(id,{object:hit,button:domainButton})'), 'Public universes must have real clickable hit targets');
+assert.ok(engine.includes('button.style.left=') && engine.includes('function syncResourceHitTargets()'), 'Public hit targets must follow projected 3D positions during camera motion');
+assert.ok(previewEngine.includes('resourceHitTargets.set(label,element)') && previewEngine.includes('domainHitTargets.set(id,{object:hit,button:domainButton})'), 'Preview universes and branches must use the same real DOM hit targets');
+assert.ok(engine.includes('let distance = 13.5, zoomTargetDistance = 13.5') && engine.includes('const blend=1-Math.exp(-dt*13)'), 'Public camera zoom must ease smoothly toward its target instead of stepping instantly');
+assert.ok(previewEngine.includes('let distance = 13.5, zoomTargetDistance = 13.5') && previewEngine.includes('const blend=1-Math.exp(-dt*13)'), 'Preview camera zoom must use the same smooth easing');
 assert.ok(previewEngine.includes('function syncLabelScales()') && previewEngine.includes('cameraDistance*projection*targetPixels') && previewEngine.includes('syncLabelScales();'), 'Preview labels must keep the same stable screen-space size across zoom levels');
 assert.ok(!html.includes('constellation-3d.js?v='), 'Legacy monolithic engine must no longer be loaded');
 assert.ok(engine.includes("const IDS = ['bio','myco','soil','lab','products','iot','work','learn']"), 'The clean engine must own the complete eight-domain registry');
@@ -54,10 +60,14 @@ for (const [language, tree, mycologyId, fungalId] of [
 assert.equal(ptTree.domains.find(domain => domain.id === 'bio').notionId, '40173152f1718120b45bf79f8e81120a', 'Portuguese biotechnology universe must point to the actual Biotecnologia page, not its parent hub');
 
 assert.ok(engine.includes('function createWorld()'), 'The new engine must build its own biological network scene');
-assert.ok(engine.includes("ctx.font='700 '+(size*4)+'px Inter,system-ui,sans-serif'"), '3D labels must use enlarged, heavier glyphs that remain readable when zoomed');
-assert.ok(engine.includes('lineHeight=142'), 'Multi-line 3D labels must retain sufficient vertical spacing at the larger font size');
-assert.ok(previewEngine.includes("ctx.font='700 '+(size*4)+'px Inter,system-ui,sans-serif'"), 'Preview 3D labels must use the same enlarged, heavier glyphs');
-assert.ok(previewEngine.includes('lineHeight=142'), 'Preview multiline labels must use matching vertical spacing');
+assert.ok(engine.includes("ctx.font='700 '+(size*14)+'px Inter,system-ui,sans-serif'"), '3D labels must use enlarged, heavier glyphs that remain readable when zoomed');
+assert.ok(engine.includes('lineHeight=210'), 'Multi-line 3D labels must retain sufficient vertical spacing at the larger font size');
+assert.ok(previewEngine.includes("ctx.font='700 '+(size*14)+'px Inter,system-ui,sans-serif'"), 'Preview 3D labels must use the same enlarged, heavier glyphs');
+assert.ok(previewEngine.includes('lineHeight=210'), 'Preview multiline labels must use matching vertical spacing');
+assert.ok(engine.includes("e.target.closest('.webgl-controls,.webgl-focus,.webgl-intro,.webgl-hit-target')"), 'Public branch controls must keep native click dispatch outside stage pointer capture');
+assert.ok(previewEngine.includes("e.target.closest('.webgl-hit-target,.webgl-controls,.webgl-focus,.webgl-intro')"), 'Preview branch controls must keep native click dispatch outside stage pointer capture');
+assert.ok(engine.includes("button.style.display=visible?'block':'none'"), 'Public offscreen hit targets must not intercept branch clicks');
+assert.ok(previewEngine.includes("button.style.display=visible?'block':'none'"), 'Preview offscreen hit targets must not intercept branch clicks');
 assert.ok(engine.includes("const soma=new THREE.Group();soma.userData={id,kind:'domain'};group.add(soma);"), 'Domain centres must remain open mycelial junctions rather than solid cell bodies');
 assert.ok(engine.includes('Sparse background hyphae connect the field'), 'The overview must contain fine background mycelial connections');
 assert.ok(engine.includes('for(let j=0;j<14;j++)'), 'Domain branches must retain dense radial connectivity');
@@ -87,18 +97,18 @@ assert.ok(engine.includes('function goOverview()'), 'The user must be able to re
 assert.ok(engine.includes('function enterDomain(id)'), 'Domain entry must be implemented in the new engine');
 assert.ok(engine.includes('The active folder owns all taps while inside a universe'), 'A selected universe must not let adjacent domains steal folder taps');
 assert.ok(engine.includes('nearestLabelDistance<(window.innerWidth<760?58:70)'), 'Folder taps must resolve against the visible labels of the active hierarchy without stealing adjacent branches');
-assert.ok(engine.includes('THREE.MathUtils.clamp(distance*Math.exp((pinchStart-d)*.006),1.25,60)'), 'Mobile pinch must zoom continuously through the full depth range without forcing hierarchy changes');
-assert.ok(engine.includes('THREE.MathUtils.clamp(distance*Math.exp(e.deltaY*.0016),1.25,60)'), 'Desktop wheel zoom must be exponential and continuous through the full depth range');
+assert.ok(engine.includes('THREE.MathUtils.clamp(zoomTargetDistance*Math.exp((pinchStart-d)*.006),1.25,60)'), 'Mobile pinch must zoom continuously through the full depth range without forcing hierarchy changes');
+assert.ok(engine.includes('THREE.MathUtils.clamp(zoomTargetDistance*Math.exp(e.deltaY*.0016),1.25,60)'), 'Desktop wheel zoom must be exponential and continuous through the full depth range');
 assert.ok(!engine.includes('const bg=new THREE.BufferGeometry()'), 'The opening network must avoid decorative starfield geometry');
 
 assert.ok(engine.includes("fetch('./notion-tree.'+LANG()+'.json'"), 'The engine must load the active language Notion tree');
 assert.ok(engine.includes('const maxDepth=3'), 'The spatial graph must expose the deepest real Notion folders and pages');
 assert.ok(engine.includes('children.length>16') && engine.includes('Math.sqrt((k+.5)/children.length)'), 'Dense folders must use a spread-out phyllotaxis layout instead of one crowded ring');
-assert.ok(engine.includes('label.userData.denseRoot?19'), 'Dense root labels must use a readable compact screen-space size');
+assert.ok(engine.includes('label.userData.denseRoot?(compact?38:44)') && engine.includes("ctx.font='700 '+(size*14)+'px") && engine.includes("element.dataset.depth=String(data.depth||0)") && engine.includes('const occupied=[]') && engine.includes('const obstacles=') && engine.includes('12000+Math.round((1-item.p.z)*100)'), 'Dense root labels must use a readable compact screen-space size');
 assert.ok(engine.includes('rootCount>16?(window.innerWidth<760?20.5:11.5):7.5'), 'Dense folders must fit the initial camera framing on mobile and desktop');
 assert.ok(previewEngine.includes('children.length>16') && previewEngine.includes('Math.sqrt((k+.5)/children.length)'), 'Preview must use the same dense-folder layout as the public explorer');
 assert.ok(previewEngine.includes('const maxDepth=3'), 'Preview and public engines must expose the same deepest Notion level');
-assert.ok(engine.includes('THREE.MathUtils.clamp(distance*Math.exp(e.deltaY*.0016),1.25,60)') && previewEngine.includes('THREE.MathUtils.clamp(distance*Math.exp(e.deltaY*.0016),1.25,60)'), 'Public and preview explorers must share continuous deep zoom behavior');
+assert.ok(engine.includes('THREE.MathUtils.clamp(zoomTargetDistance*Math.exp(e.deltaY*.0016),1.25,60)') && previewEngine.includes('THREE.MathUtils.clamp(zoomTargetDistance*Math.exp(e.deltaY*.0016),1.25,60)'), 'Public and preview explorers must share continuous deep zoom behavior');
 assert.ok(!engine.includes('distance>9.5') && !previewEngine.includes('distance>9.5'), 'Zooming out must never unexpectedly pop the user to another hierarchy level');
 assert.ok(previewEngine.includes('nearestLabelDistance<(window.innerWidth<760?58:70)'), 'Preview branch hit radius must match the public engine on mobile and desktop');
 for (const language of ['fr', 'ar', 'en', 'pt']) {
@@ -122,7 +132,7 @@ assert.ok(engine.includes('const ancestors=[];let parent=data.parentNode'), 'Dir
 assert.ok(engine.includes("if(data.url){window.open(data.url"), 'Terminal pages must open their corresponding Notion page');
 assert.ok(!engine.includes("open.dataset.resourceOpen='true'"), 'The obsolete resource details panel must not be used for navigation');
 assert.ok(engine.includes("data-camera=\"back\""), 'The scene must expose a direct previous-level control');
-assert.ok(engine.includes("if(action==='out')distance=Math.min(60,distance*1.28)"), 'Zoom-out control must preserve the active hierarchy and allow continuous camera travel');
+assert.ok(engine.includes("if(action==='out')zoomTargetDistance=Math.min(60,zoomTargetDistance*1.28)"), 'Zoom-out control must preserve the active hierarchy and allow continuous camera travel');
 assert.ok(engine.includes('renderPath()'), 'The active folder path must remain visible in the scene');
 assert.ok(engine.includes('window.enterSphere(id,false,true)'), 'Domain selection must synchronize the hidden Notion content source');
 assert.ok(!html.includes("mainView.addEventListener('pointerdown',beginOrbit)"), 'Legacy orbit input must not compete with the clean engine');

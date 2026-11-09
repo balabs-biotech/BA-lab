@@ -41,13 +41,14 @@ const t = key => (COPY[LANG()] || COPY.fr)[key] || COPY.fr[key];
 
 let THREE, renderer, scene, camera, raycaster, pointer, stage, panel, hint, intro, status;
 let world, cells = new Map(), pickables = [], resourceObjects = [], edges = [], signalPoints = [];
-let resourceHitTargets = new Map();
+let resourceHitTargets = new Map(), domainHitTargets = new Map();
 let nav, currentNode = null, currentAnchor = null, navigationStack = [];
 let selected = null, selectedBranch = null, manifest = null, transition = null;
-let distance = 13.5, theta = .22, phi = 1.27, target = null, targetGoal = null;
+let distance = 13.5, zoomTargetDistance = 13.5, theta = .22, phi = 1.27, target = null, targetGoal = null;
 let opened = false, raf = 0, lastFrame = 0, dragging = false, moved = false, dragGesture = false;
 let lastPointer = null, pointers = new Map(), pinchStart = 0, pinchDistance = 0, hoverId = null;
 let canvasRect = null, cameraInitialized = false, lastPickAt = 0;
+let _hitWorld = null;
 let labelWorldPosition = null;
 
 function addStyles() {
@@ -58,7 +59,7 @@ function addStyles() {
     #mainView.webgl-ready>.hub,#mainView.webgl-ready>.sphere,#mainView.webgl-ready>.network,#mainView.webgl-ready>.galaxy{display:none!important}
     #mainView .webgl-stage{position:absolute;inset:0;z-index:4;min-height:100%;touch-action:none;overflow:hidden}
     #mainView .webgl-stage canvas{display:block;width:100%;height:100%;outline:none;touch-action:none}
-    #mainView .webgl-stage .webgl-hit-target{position:absolute;z-index:30;width:76px;height:76px;min-width:64px;min-height:64px;padding:0;border:0;border-radius:50%;background:transparent;color:transparent;opacity:.015;pointer-events:none!important;touch-action:manipulation;transform:translate(-50%,-50%);cursor:pointer;-webkit-tap-highlight-color:transparent}
+    #mainView .webgl-stage .webgl-hit-target{position:absolute;z-index:30;width:76px;height:76px;min-width:64px;min-height:64px;padding:0;border:0;border-radius:50%;background:transparent;color:transparent;opacity:.015;pointer-events:auto!important;touch-action:manipulation;transform:translate(-50%,-50%);cursor:pointer;-webkit-tap-highlight-color:transparent}
     body > .webgl-hit-target:focus-visible{opacity:.24;outline:2px solid #d1d0c5;background:#b96b4d33}
     #mainView .webgl-stage .webgl-hint{position:absolute;left:16px;bottom:14px;z-index:8;padding:9px 12px;border:1px solid #78958a66;border-radius:999px;background:#142321d9;color:#e5e9df;font:600 9px/1.4 system-ui;letter-spacing:.08em;pointer-events:none;backdrop-filter:blur(12px)}
     #mainView .webgl-stage .webgl-status{position:absolute;right:16px;bottom:17px;z-index:8;color:#c2cfc5;font:600 9px system-ui;letter-spacing:.12em;pointer-events:none}
@@ -114,7 +115,7 @@ function makeLabel(text, color, size=16) {
   // Render labels at high texture resolution: zoom enlarges sprites, not glyph detail.
   canvas.width=2048; canvas.height=512;
   ctx.clearRect(0,0,canvas.width,canvas.height);
-  ctx.font='700 '+(size*4)+'px Inter,system-ui,sans-serif';
+  ctx.font='700 '+(size*14)+'px Inter,system-ui,sans-serif';
   ctx.textAlign='center';ctx.textBaseline='middle';
   // A firm dark keyline keeps pale glyphs readable over bright hyphae at every zoom level.
   ctx.lineJoin='round';ctx.lineWidth=30;ctx.strokeStyle='rgba(7,17,15,.96)';
@@ -122,7 +123,7 @@ function makeLabel(text, color, size=16) {
   const words=String(text).split(/\s+/);let lines=[],line='';
   for(const word of words){const next=line?line+' '+word:word;if(ctx.measureText(next).width>1880&&line){lines.push(line);line=word}else line=next}
   if(line)lines.push(line);
-  const shown=lines.slice(0,2),lineHeight=142,start=256-(shown.length-1)*lineHeight/2;
+  const shown=lines.slice(0,2),lineHeight=210,start=256-(shown.length-1)*lineHeight/2;
   shown.forEach((part,i)=>{const y=start+i*lineHeight;ctx.strokeText(part,1024,y);ctx.fillText(part,1024,y)});
   const texture=new THREE.CanvasTexture(canvas);texture.colorSpace=THREE.SRGBColorSpace;
   const material=new THREE.SpriteMaterial({map:texture,transparent:true,depthWrite:false,depthTest:false});
@@ -160,6 +161,7 @@ function createWorld() {
     // Invisible selection volume remains generous for touch, while visible geometry stays filamentary.
     const hit=new THREE.Mesh(new THREE.SphereGeometry(1.12,16,12),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));hit.userData={id,kind:'domain'};group.add(hit);
     world.add(group);cells.set(id,{group,soma,label,hit,position:pos,color});
+    const domainButton=document.createElement('button');domainButton.type='button';domainButton.className='webgl-hit-target webgl-domain-target';domainButton.setAttribute('aria-label',(LABELS[id]?.title||id)+' — '+t('domain'));domainButton.title=LABELS[id]?.title||id;domainButton.dataset.domainId=id;domainButton.style.width='116px';domainButton.style.height='116px';domainButton.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();stage?.focus({preventScroll:true});if(!selected)enterDomain(id)});stage.append(domainButton);domainHitTargets.set(id,{object:hit,button:domainButton});
     pickables.push(soma,hit,label);
     const branches=14;
     for(let j=0;j<branches;j++){
@@ -212,7 +214,7 @@ function smoothCamera(to,distTo,duration=950,done) {
   transition={frame:0};
   const step=now=>{
     const raw=Math.min(1,(now-started)/duration),e=raw<.5?4*raw*raw*raw:1-Math.pow(-2*raw+2,3)/2;
-    target=from.clone().lerp(end,e);distance=fromDist+(distTo-fromDist)*e;
+    target=from.clone().lerp(end,e);distance=fromDist+(distTo-fromDist)*e;zoomTargetDistance=distance;
     cameraPosition();
     if(raw<1)transition.frame=requestAnimationFrame(step);
     else{transition=null;stage.classList.remove('is-transitioning');targetGoal=null;done?.()}
@@ -226,31 +228,84 @@ function clearResources() {
   resourceObjects=[];pickables=pickables.filter(o=>o.userData?.kind!=='resource'&&o.userData?.kind!=='resource-label');selectedBranch=null;
 }
 function mDispose(material){material?.map?.dispose();material?.dispose?.()}
-function makeResourceLabel(item,color,depth=0) { const size=depth===0?18:depth===1?16:14;const label=makeLabel(item.title,color,size);const scale=depth===0?2.55:depth===1?1.95:1.5;label.scale.set(scale,depth===0?.58:depth===1?.48:.38,1);label.userData={...item,kind:'resource-label'};addResourceHitTarget(label);return label; }
-function addResourceHitTarget(label) {
- // Spatial labels are rendered only in WebGL. Do not create transparent DOM
- // hit areas: mobile browsers can hit-test stale/overlapping buttons instead
- // of the canvas, even when CSS attempts to disable pointer events.
+function makeResourceLabel(item,color,depth=0) {
+ const size=depth===0?18:depth===1?16:14,label=makeLabel(item.title,color,size);
+ const scale=depth===0?3.35:depth===1?2.9:2.5;
+ label.scale.set(scale,depth===0?.86:depth===1?.76:.68,1);
+ label.userData={...item,kind:'resource-label'};label.visible=depth===0;addResourceHitTarget(label);return label;
 }
-function syncLabelScales() {
-  if(!renderer||!camera)return;
-  if(!labelWorldPosition)labelWorldPosition=new THREE.Vector3();
-  const viewportHeight=Math.max(1,renderer.domElement.clientHeight);
-  const projection=2*Math.tan(THREE.MathUtils.degToRad(camera.fov*.5))/viewportHeight;
-  const apply=label=>{
-    if(!label?.userData?.kind?.endsWith('label'))return;
-    label.getWorldPosition(labelWorldPosition);
-    const cameraDistance=Math.max(.1,camera.position.distanceTo(labelWorldPosition));
-    const depth=label.userData.depth||0;
-    const targetPixels=label.userData.kind==='domain-label'?25:label.userData.denseRoot?19:Math.max(17,23-depth*2);
-    const worldHeight=cameraDistance*projection*targetPixels;
-    label.scale.set(worldHeight*4.25,worldHeight,1);
-  };
-  for(const item of cells.values())apply(item.label);
-  for(const item of resourceObjects)if(item.userData?.kind==='resource-label')apply(item);
+function addResourceHitTarget(label) {
+ const data=label.userData||{},hasChildren=!!data.children?.length;
+ const element=document.createElement(hasChildren?'button':'a');
+ if(hasChildren){element.type='button';element.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();stage?.focus({preventScroll:true});openResource(data)});}
+ else {element.href=data.url||'#';element.target='_blank';element.rel='noopener noreferrer';element.addEventListener('click',e=>{if(!data.url)e.preventDefault();});}
+ element.className='webgl-hit-target webgl-resource-target';
+ element.textContent=data.title||data.name||'Ouvrir';
+ const compact=window.innerWidth<760;
+ const width=Math.min(compact?210:280,Math.max(compact?128:150,String(element.textContent).length*(compact?7.4:8.5)+32));
+ Object.assign(element.style,{display:'block',opacity:'1',visibility:'visible',color:'#f4f5ed',background:'rgba(13,25,23,.96)',border:'1px solid rgba(185,107,77,.9)',borderRadius:'10px',boxShadow:'0 5px 18px rgba(0,0,0,.55)',font:'750 '+(compact?'16px':'18px')+'/1.2 system-ui,sans-serif',textAlign:'center',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis',padding:'0 11px',width:width+'px',height:compact?'50px':'52px',minWidth:compact?'128px':'150px',maxWidth:compact?'210px':'280px',pointerEvents:'auto',touchAction:'manipulation',transform:'translate(-50%,-50%)',cursor:'pointer'});
+ element.setAttribute('aria-label',(data.title||data.name||'Branche')+(hasChildren?' — ouvrir le dossier':' — ouvrir la page'));
+ element.title=data.title||data.name||'';
+ element.dataset.hasChildren=String(hasChildren);element.dataset.depth=String(data.depth||0);element.dataset.resourceUrl=data.url||'';
+ stage.append(element);resourceHitTargets.set(label,element);
 }
 function syncResourceHitTargets() {
- // Kept as an animation-loop hook; selection is exclusively canvas ray-picking.
+ if(!renderer||!camera||!stage)return;
+ if(!_hitWorld)_hitWorld=new THREE.Vector3();
+ camera.updateMatrixWorld(true);world?.updateMatrixWorld(true);
+ const rect=renderer.domElement.getBoundingClientRect(),stageRect=stage.getBoundingClientRect();
+ const projected=[];
+ const project=(object,button)=>{
+  object.getWorldPosition(_hitWorld);const p=_hitWorld.clone().project(camera);
+  const depth=Number(button.dataset.depth||0),visible=depth===0&&p.z>-1&&p.z<1&&p.x>=-1.12&&p.x<=1.12&&p.y>=-1.12&&p.y<=1.12;
+  button.hidden=!visible;button.style.display=visible?'block':'none';
+  if(!visible)return;
+  projected.push({object,button,p,x:rect.left+(p.x+1)*rect.width/2-stageRect.left,y:rect.top+(1-p.y)*rect.height/2-stageRect.top,depth});
+ };
+ for(const {object,button} of domainHitTargets.values()){project(object,button);button.hidden=!opened||!!selected||button.hidden}
+ for(const [label,button] of resourceHitTargets)project(label,button);
+ // Place labels in screen space, not directly on top of one another. This is
+ // especially important on narrow mobile screens where projected branches cluster.
+ projected.sort((a,b)=>a.p.z-b.p.z);
+ const occupied=[];
+ const obstacles=[...stage.querySelectorAll('.webgl-controls,.webgl-status,.webgl-path,.webgl-focus,.webgl-intro')]
+  .filter(el=>!el.hidden&&getComputedStyle(el).display!=='none')
+  .map(el=>{const r=el.getBoundingClientRect();return {l:r.left-stageRect.left,t:r.top-stageRect.top,r:r.right-stageRect.left,b:r.bottom-stageRect.top}});
+ const overlaps=(a,b)=>a.l<b.r+8&&a.r>b.l-8&&a.t<b.b+8&&a.b>b.t-8;
+ const offsets=[[0,0],[1,0],[-1,0],[0,1],[0,-1],[1,1],[-1,1],[1,-1],[-1,-1],[2,0],[-2,0],[0,2],[0,-2]];
+ for(const item of projected){
+  const {button}=item,columns=stageRect.width<560?2:3,slotWidth=stageRect.width/columns;button.style.maxWidth=Math.max(128,slotWidth-12)+'px';button.style.width=Math.min(button.offsetWidth||150,slotWidth-12)+'px';const w=button.offsetWidth||150,h=button.offsetHeight||50;
+  const sx=Math.max(w/2+6,Math.min(stageRect.width-w/2-6,item.x)),sy=Math.max(h/2+6,Math.min(stageRect.height-h/2-6,item.y));
+  const stepX=w/2+12,stepY=h/2+12;
+  let chosen=null;
+  for(const [ox,oy] of offsets){
+   const cx=Math.max(w/2+6,Math.min(stageRect.width-w/2-6,sx+ox*stepX));
+   const cy=Math.max(h/2+6,Math.min(stageRect.height-h/2-6,sy+oy*stepY));
+   const box={l:cx-w/2,t:cy-h/2,r:cx+w/2,b:cy+h/2};
+   if(!occupied.some(r=>overlaps(box,r))&&!obstacles.some(r=>overlaps(box,r))){chosen={cx,cy,box};break}
+  }
+  if(!chosen){
+   // On narrow screens, clustered branches can project to the same pixels.
+   // Fall back to a compact, collision-free screen-space index so every folder
+   // remains visible and directly tappable instead of stacking invisible buttons.
+   const columns=stageRect.width<560?2:3,slotWidth=stageRect.width/columns;
+   const rows=Math.max(2,Math.ceil(projected.length/columns));
+   const candidates=[];
+   for(let row=0;row<rows;row++)for(let col=0;col<columns;col++){
+    const cx=slotWidth*(col+.5),cy=stageRect.height*(.28+row*.44/Math.max(1,rows-1));
+    const box={l:cx-w/2,t:cy-h/2,r:cx+w/2,b:cy+h/2};
+    if(box.l>=4&&box.r<=stageRect.width-4&&box.t>=4&&box.b<=stageRect.height-4)candidates.push({cx,cy,box});
+   }
+   chosen=candidates.find(candidate=>!occupied.some(r=>overlaps(candidate.box,r))&&!obstacles.some(r=>overlaps(candidate.box,r)))||null;
+   if(!chosen){
+    const cx=Math.max(w/2+4,Math.min(stageRect.width-w/2-4,sx)),cy=Math.max(h/2+4,Math.min(stageRect.height-h/2-4,sy));
+    chosen={cx,cy,box:{l:cx-w/2,t:cy-h/2,r:cx+w/2,b:cy+h/2}};
+   }
+  }
+  occupied.push(chosen.box);
+  button.style.setProperty('z-index',String(12000+Math.round((1-item.p.z)*100)),'important');
+  button.style.left=chosen.cx+'px';button.style.top=chosen.cy+'px';
+ }
 }
 function renderPath() {
   if(!nav)return;nav.replaceChildren();
@@ -280,7 +335,7 @@ function buildResources(id,parentNode=null,anchor=null) {
  const drawNode=(item,pos,depth,parent,angle,index)=>{const has=!!item.children?.length,color=baseColor.clone().lerp(accent,Math.min(.34,depth*.12+(index%3)*.025)),radius=depth===0?(has?.135:.105):depth===1?(has?.085:.065):.043;item.position=pos.clone();item.parentNode=parent;const data={kind:'resource',...item,sourceId:id,position:pos.clone(),hasChildren:has,depth,parentNode:parent,denseRoot:depth===0&&children.length>16};const hitRadius=depth===0?.32:depth===1?.25:.19;const hit=new THREE.Mesh(new THREE.SphereGeometry(hitRadius,10,8),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));hit.position.copy(pos);hit.userData=data;world.add(hit);resourceObjects.push(hit);pickables.push(hit);
  // Represent each folder/page as a living hyphal junction: fine branching strands, no bead-like node.
  const junction=new THREE.Group();junction.position.copy(pos);junction.userData=data;world.add(junction);resourceObjects.push(junction);
- for(let arm=0;arm<5;arm++){const a=arm/5*Math.PI*2+depth*.37+index*.19,reach=radius*(2.3+(arm%3)*.55),start=new THREE.Vector3(0,0,0),end=new THREE.Vector3(Math.cos(a)*reach,Math.sin(a)*reach*.82,Math.sin(a*1.7)*reach*.5),mid=start.clone().lerp(end,.56).add(new THREE.Vector3(0,.018,.018));const curveArm=new THREE.CatmullRomCurve3([start,mid,end]);const filamentArm=new THREE.Mesh(new THREE.TubeGeometry(curveArm,10,Math.max(.0025,radius*.055),4,false),new THREE.MeshStandardMaterial({color,emissive:color,emissiveIntensity:.3,transparent:true,opacity:.72,roughness:.78}));junction.add(filamentArm);}const l=makeResourceLabel(data,color,depth);l.position.copy(pos).add(new THREE.Vector3(0,depth===0?-.28:depth===1?-.22:-.16,.025));world.add(l);resourceObjects.push(l);pickables.push(l);const pp=parent===currentNode?currentAnchor:(parent.position||currentAnchor),mid=pp.clone().lerp(pos,.52).add(new THREE.Vector3(0,.12+depth*.035,.12)),curve=filament([pp.clone(),mid,pos.clone()],color,depth===0?.012:depth===1?.007:.004,depth===0?.66:depth===1?.52:.38);if(depth<2)for(let f=0;f<2;f++){const at=curve.getPoint(.46+f*.2),sgn=f===0?-1:1,tip=at.clone().add(new THREE.Vector3(Math.cos(angle+sgn*.8)*(.24-depth*.045),Math.sin(angle+sgn*.8)*(.2-depth*.04),.045));filament([at,at.clone().lerp(tip,.55).add(new THREE.Vector3(0,.045,.025)),tip],color,.0035-depth*.0006,.28)}if(depth>=maxDepth||!has)return;const kids=item.children||[],spread=Math.min(1.2,.32+kids.length*.105);kids.forEach((child,childIndex)=>{const frac=kids.length===1?0:(childIndex/(kids.length-1)-.5),childAngle=angle+frac*spread*2+(childIndex%2?-.08:.08),dist=depth===0?.98+Math.min(.42,kids.length*.025):Math.max(.68,Math.min(1.38,.58+kids.length*.055)),childPos=pos.clone().add(new THREE.Vector3(Math.cos(childAngle)*dist,Math.sin(childAngle)*dist*.82+((childIndex%3)-1)*.035,.04+(childIndex%2)*.035));drawNode(child,childPos,depth+1,item,childAngle,childIndex)});
+ for(let arm=0;arm<5;arm++){const a=arm/5*Math.PI*2+depth*.37+index*.19,reach=radius*(2.3+(arm%3)*.55),start=new THREE.Vector3(0,0,0),end=new THREE.Vector3(Math.cos(a)*reach,Math.sin(a)*reach*.82,Math.sin(a*1.7)*reach*.5),mid=start.clone().lerp(end,.56).add(new THREE.Vector3(0,.018,.018));const curveArm=new THREE.CatmullRomCurve3([start,mid,end]);const filamentArm=new THREE.Mesh(new THREE.TubeGeometry(curveArm,10,Math.max(.0025,radius*.055),4,false),new THREE.MeshStandardMaterial({color,emissive:color,emissiveIntensity:.3,transparent:true,opacity:.72,roughness:.78}));junction.add(filamentArm);}const l=makeResourceLabel(data,color,depth);l.position.copy(pos).add(new THREE.Vector3(0,depth===0?-.28:depth===1?-.22:-.16,.025));world.add(l);resourceObjects.push(l);pickables.push(l);const pp=parent===currentNode?currentAnchor:(parent.position||currentAnchor),mid=pp.clone().lerp(pos,.52).add(new THREE.Vector3(0,.12+depth*.035,.12)),curve=filament([pp.clone(),mid,pos.clone()],color,depth===0?.012:depth===1?.007:.004,depth===0?.66:depth===1?.52:.38);if(depth<2)for(let f=0;f<2;f++){const at=curve.getPoint(.46+f*.2),sgn=f===0?-1:1,tip=at.clone().add(new THREE.Vector3(Math.cos(angle+sgn*.8)*(.24-depth*.045),Math.sin(angle+sgn*.8)*(.2-depth*.04),.045));filament([at,at.clone().lerp(tip,.55).add(new THREE.Vector3(0,.045,.025)),tip],color,.0035-depth*.0006,.28)}if(depth>=maxDepth||!has)return;const kids=item.children||[],spread=Math.min(1.2,.32+kids.length*.105);kids.forEach((child,childIndex)=>{const frac=kids.length===1?0:(childIndex/(kids.length-1)-.5),childAngle=angle+frac*spread*2+(childIndex%2?-.08:.08),dist=depth===0?1.3+Math.min(.45,kids.length*.045):Math.max(.95,Math.min(1.5,.8+kids.length*.04)),childPos=pos.clone().add(new THREE.Vector3(Math.cos(childAngle)*dist,Math.sin(childAngle)*dist*.82+((childIndex%3)-1)*.035,.04+(childIndex%2)*.035));drawNode(child,childPos,depth+1,item,childAngle,childIndex)});
  // Anastomoses: sibling branches reconnect into a mesh instead of ending as a radial tree.
  if(kids.length>1){
    const bridgeColor=color.clone().lerp(accent,.22);
@@ -326,6 +381,7 @@ function showFailure(error) {
 
 function setupUI() {
   stage=document.createElement('div');stage.className='webgl-stage';stage.tabIndex=0;stage.setAttribute('role','application');stage.setAttribute('aria-label','BA Labs interactive biological network');
+   stage.addEventListener('click',e=>{if(e.target.closest?.('.webgl-hit-target'))stage.focus({preventScroll:true})},true);
   hint=document.createElement('div');hint.className='webgl-hint';hint.textContent=t('hint');
   status=document.createElement('div');status.className='webgl-status';status.textContent='BALABS / LIVING NETWORK';window.__BALABS_3D_STATUS=status;
   panel=document.createElement('section');panel.className='webgl-focus';panel.hidden=true;panel.setAttribute('aria-live','polite');
@@ -333,7 +389,7 @@ function setupUI() {
   const controls=document.createElement('div');controls.className='webgl-controls';controls.innerHTML='<button type="button" data-camera="back" aria-label="Niveau précédent">‹</button><button type="button" data-camera="out" aria-label="Zoom arrière">−</button><button type="button" data-camera="in" aria-label="Zoom avant">+</button><button type="button" data-camera="reset" aria-label="Recentrer">⌖</button>';
   intro=document.createElement('button');intro.type='button';intro.className='webgl-intro';intro.innerHTML='<span class="webgl-intro-card"><span class="webgl-intro-orb"><b>BA</b></span><span class="webgl-intro-copy">BALABS · APPLIED BIOTECHNOLOGY</span><span class="webgl-intro-cta">'+t('open')+'</span></span>';
   intro.addEventListener('click',()=>{opened=true;intro.hidden=true;nav.hidden=false;ROOT.classList.remove('universe-closed');ROOT.classList.add('universe-open');status.textContent='BALABS / LIVING NETWORK'});
-  controls.addEventListener('click',e=>{const action=e.target.closest('button')?.dataset.camera;if(action==='back'){goBackLevel();return}if(action==='in')distance=Math.max(1.25,distance*.72);if(action==='out')distance=Math.min(60,distance*1.28);if(action==='reset'){goOverview();return}cameraPosition()});
+  controls.addEventListener('click',e=>{const action=e.target.closest('button')?.dataset.camera;if(action==='back'){goBackLevel();return}if(action==='in')zoomTargetDistance=Math.max(1.25,zoomTargetDistance*.72);if(action==='out')zoomTargetDistance=Math.min(60,zoomTargetDistance*1.28);if(action==='reset'){goOverview();return}cameraPosition()});
   stage.append(hint,status,controls,nav,panel,intro);ROOT.append(stage);
   document.getElementById('homeBtn')?.addEventListener('click',()=>{if(selected)goOverview()});
   stage.setAttribute('aria-keyshortcuts','ArrowUp ArrowDown ArrowLeft ArrowRight + - Escape Backspace Home');
@@ -345,13 +401,13 @@ function setupUI() {
     else if(key==='ArrowRight')theta+=.12;
     else if(key==='ArrowUp')phi=THREE.MathUtils.clamp(phi-.10,.35,2.78);
     else if(key==='ArrowDown')phi=THREE.MathUtils.clamp(phi+.10,.35,2.78);
-    else if(key==='+'||key==='=')distance=Math.max(1.25,distance*.72);
-    else if(key==='-'||key==='_'){const next=Math.min(60,distance*1.28);distance=next}
+    else if(key==='+'||key==='=')zoomTargetDistance=Math.max(1.25,zoomTargetDistance*.72);
+    else if(key==='-'||key==='_')zoomTargetDistance=Math.min(60,zoomTargetDistance*1.28);
     else if(key==='Escape'||key==='Backspace'){if(selected)goBackLevel();return}
     else if(key==='Home'){goOverview();return}
     cameraPosition();
   });
-  stage.addEventListener('wheel',e=>{if(e.target.closest('.webgl-controls,.webgl-focus'))return;e.preventDefault();const nextDistance=THREE.MathUtils.clamp(distance*Math.exp(e.deltaY*.0016),1.25,60);distance=nextDistance;cameraPosition()},{passive:false});
+  stage.addEventListener('wheel',e=>{if(e.target.closest('.webgl-controls,.webgl-focus'))return;e.preventDefault();zoomTargetDistance=THREE.MathUtils.clamp(zoomTargetDistance*Math.exp(e.deltaY*.0016),1.25,60);},{passive:false});
   // Pointer input belongs to the stage so mouse, pen and touch-generated
   // pointer events follow the same path. Keep the document-level pointer-up
   // capture as a safety net for browsers that retarget capture during a drag.
@@ -375,24 +431,24 @@ function setupUI() {
   // so resolve that pointer-up at document capture using the same projected
   // screen coordinates as canvas picking.
   document.addEventListener('pointerup',e=>{if(e.pointerType!=='touch'||stage.contains(e.target)||!e.target.closest?.('.webgl-hit-target'))return;if(transition||performance.now()-lastPickAt<=120)return;pickAt(e.clientX,e.clientY)},true);
-  document.addEventListener('click',e=>{if(!e.detail||dragGesture||!renderer)return;if(e.target.closest?.('.webgl-controls,.webgl-focus,.webgl-intro'))return;const r=renderer.domElement.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)return;if(performance.now()-lastPickAt>120)pickAt(e.clientX,e.clientY)},true);
+  document.addEventListener('click',e=>{if(!e.detail||dragGesture||!renderer)return;if(e.target.closest?.('.webgl-controls,.webgl-focus,.webgl-intro,.webgl-hit-target'))return;const r=renderer.domElement.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)return;if(performance.now()-lastPickAt>120)pickAt(e.clientX,e.clientY)},true);
   stage.addEventListener('lostpointercapture',onLostCapture);
   stage.addEventListener('contextmenu',e=>e.preventDefault());
   window.addEventListener('resize',resize);
 }
 function onPointerDown(e) {
-  // A stale/overlapping transparent accessibility target must not cancel the
-  // canvas gesture: retain the pointer and resolve the tap from screen coords.
-  if(e.target.closest('.webgl-controls,.webgl-focus,.webgl-intro'))return;
+  // Let real DOM branch/domain controls receive their native click. Pointer capture
+  // on the stage retargets pointerup and can suppress the button's click entirely.
+  if(e.target.closest('.webgl-hit-target,.webgl-controls,.webgl-focus,.webgl-intro'))return;
   // Keep keyboard navigation immediately available after mouse, pen or touch.
-  renderer?.domElement?.focus({preventScroll:true});
+  stage?.focus({preventScroll:true});
   pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});stage.setPointerCapture?.(e.pointerId);
   if(pointers.size===2){const p=[...pointers.values()];pinchStart=Math.hypot(p[0].x-p[1].x,p[0].y-p[1].y);dragging=true;moved=true;return}
   dragging=true;moved=false;dragGesture=false;lastPointer={x:e.clientX,y:e.clientY};
 }
 function onPointerMove(e) {
   if(pointers.has(e.pointerId))pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
-  if(pointers.size>=2){const p=[...pointers.values()],d=Math.hypot(p[0].x-p[1].x,p[0].y-p[1].y);if(pinchStart)distance=THREE.MathUtils.clamp(distance*Math.exp((pinchStart-d)*.006),1.25,60);pinchStart=d;moved=true;cameraPosition();return}
+  if(pointers.size>=2){const p=[...pointers.values()],d=Math.hypot(p[0].x-p[1].x,p[0].y-p[1].y);if(pinchStart)zoomTargetDistance=THREE.MathUtils.clamp(zoomTargetDistance*Math.exp((pinchStart-d)*.006),1.25,60);pinchStart=d;moved=true;return}
   if(!dragging||!lastPointer)return;
   const dx=e.clientX-lastPointer.x,dy=e.clientY-lastPointer.y;
   if(Math.hypot(dx,dy)>7){moved=true;dragGesture=true}
@@ -442,9 +498,31 @@ function pickAt(x,y) {
   if(nearestNode&&nearestNodeDistance<(window.innerWidth<760?48:56)){openResource(nearestNode.userData);return}
 }
 
+// Labels use screen-space sizing: zoom changes the scene, not the reading size.
+// The camera distance is measured per label so nested branches remain equally legible.
+function syncLabelScales() {
+  if(!renderer||!camera)return;
+  if(!labelWorldPosition)labelWorldPosition=new THREE.Vector3();
+  const viewportHeight=Math.max(1,renderer.domElement.clientHeight);
+  const projection=2*Math.tan(THREE.MathUtils.degToRad(camera.fov*.5))/viewportHeight;
+  const apply=label=>{
+    if(!label?.userData?.kind?.endsWith('label'))return;
+    label.getWorldPosition(labelWorldPosition);
+    const cameraDistance=Math.max(.1,camera.position.distanceTo(labelWorldPosition));
+    const depth=label.userData.depth||0;
+    const compact=window.innerWidth<760;const targetPixels=label.userData.kind==='domain-label'?(compact?42:50):label.userData.denseRoot?(compact?38:44):Math.max(compact?34:40,(compact?44:50)-depth*2);
+    const worldHeight=cameraDistance*projection*targetPixels;
+    label.scale.set(worldHeight*4.25,worldHeight,1);
+  };
+  for(const item of cells.values())apply(item.label);
+  for(const item of resourceObjects)if(item.userData?.kind==='resource-label')apply(item);
+}
+
+
 function animate(now=0) {
   raf=requestAnimationFrame(animate);
   const dt=Math.min(.05,(now-lastFrame)/1000||0);lastFrame=now;
+  if(!transition){const blend=1-Math.exp(-dt*13);const nextDistance=distance+(zoomTargetDistance-distance)*blend;if(Math.abs(nextDistance-distance)>.0001){distance=nextDistance;cameraPosition()}else distance=zoomTargetDistance;}
   if(world){
     // Keep domain anchors world-stable; only cells pulse, so pointer targets never drift.
     for(const item of signalPoints){const p=item.curve.getPoint((now*.000075+item.offset)%1);item.pulse.position.copy(p)}
@@ -475,11 +553,11 @@ async function init() {
       const inside=p=>p.z>-1&&p.z<1&&p.x>=rect.left&&p.x<=rect.right&&p.y>=rect.top&&p.y<=rect.bottom;
       const branches=resourceObjects.filter(o=>o.userData?.kind==='resource-label')
         .map(project)
-        .filter(p=>p&&p.z>-1&&p.z<1&&p.x>=rect.left&&p.x<=rect.right&&p.y>=rect.top&&p.y<=rect.bottom);
+        .filter(p=>p&&p.depth===0&&p.z>-1&&p.z<1&&p.x>=rect.left&&p.x<=rect.right&&p.y>=rect.top&&p.y<=rect.bottom);
       const center={x:rect.left+rect.width/2,y:rect.top+rect.height/2};
       const targetBranch=branches.sort((a,b)=>Number(b.hasChildren)-Number(a.hasChildren)||Math.hypot(a.x-center.x,a.y-center.y)-Math.hypot(b.x-center.x,b.y-center.y))[0]||null;
       const domain=cells.get('bio'),domainTarget=domain?project(domain.hit):null;
-      return{count:resourceObjects.filter(o=>o.userData?.kind==='resource-label').length,visible:branches.length,visibleDepths:[...new Set(resourceObjects.filter(o=>o.userData?.kind==='resource').map(o=>o.userData.depth??0))].sort(),target:targetBranch,domainTarget:domainTarget&&inside(domainTarget)?domainTarget:null,lastPick:window.__BALABS_3D_LAST_PICK__||null,lastOpen:window.__BALABS_3D_LAST_OPEN__||null,miniHidden:!!document.getElementById('miniView')?.hidden,transitioning:!!transition,selected,currentTitle:currentNode?.title||null,depth:navigationStack.length,childCount:currentNode?.children?.length||0,clickCount:window.__BALABS_3D_E2E_CLICKS||0,cameraDistance:distance,pointerDowns:window.__BALABS_3D_POINTERDOWN||0,pointerUps:window.__BALABS_3D_POINTERUP||0,pickCalls:window.__BALABS_3D_PICK_CALLS||0};
+      return{count:resourceObjects.filter(o=>o.userData?.kind==='resource-label').length,visible:branches.length,nestedAvailable:resourceObjects.some(o=>o.userData?.kind==='resource'&&o.userData.depth===0&&o.userData.children?.length),visibleDepths:[...new Set(resourceObjects.filter(o=>o.userData?.kind==='resource').map(o=>o.userData.depth??0))].sort(),target:targetBranch,domainTarget:domainTarget&&inside(domainTarget)?domainTarget:null,lastPick:window.__BALABS_3D_LAST_PICK__||null,lastOpen:window.__BALABS_3D_LAST_OPEN__||null,miniHidden:!!document.getElementById('miniView')?.hidden,transitioning:!!transition,selected,currentTitle:currentNode?.title||null,depth:navigationStack.length,childCount:currentNode?.children?.length||0,clickCount:window.__BALABS_3D_E2E_CLICKS||0,cameraDistance:distance,pointerDowns:window.__BALABS_3D_POINTERDOWN||0,pointerUps:window.__BALABS_3D_POINTERUP||0,pickCalls:window.__BALABS_3D_PICK_CALLS||0};
     };
     animate();
   } catch(error){showFailure(error)}
