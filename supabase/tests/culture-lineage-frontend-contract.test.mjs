@@ -37,6 +37,10 @@ assert.doesNotMatch(loader, /\.from\(['"]cultures['"]\)|\.from\(['"]materials['"
 assert.match(loader, /relation === 'ancestor'/);
 assert.match(loader, /relation === 'descendant'/);
 assert.match(loader, /relation === 'material_ancestor'/);
+assert.match(loader, /material_relationship_type/,
+  'material provenance UI must expose the typed relationship between materials');
+assert.match(migration, /material_relationships/,
+  'lineage RPC must read the canonical typed material relationship records');
 assert.match(loader, /row\.truncated/,
   'partial results must be visibly signalled instead of silently presented as complete');
 assert.match(loader, /rows\.some\(row => row\.truncated === true\)/,
