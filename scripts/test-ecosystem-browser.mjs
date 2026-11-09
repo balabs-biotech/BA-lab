@@ -151,8 +151,17 @@ async function checkWorkingScene(name, viewport) {
   }
   assert.ok(navigated, name + ': tapping a folder must reveal a deeper spatial level');
   assert.ok(openedNotion, name + ': tapping a terminal page must open Notion');
-  const depthBeforeBack = await page.evaluate(() => window.__BALABS_3D_E2E__()?.depth || 0);
-  assert.ok(depthBeforeBack > 0, name + ': nested navigation depth was not retained');
+  const depthBeforeZoomOut = await page.evaluate(() => window.__BALABS_3D_E2E__()?.depth || 0);
+  assert.ok(depthBeforeZoomOut > 0, name + ': nested navigation depth was not retained before zoom-out');
+  await page.locator('.webgl-controls [data-camera="out"]').evaluate((button) => button.click());
+  await page.waitForFunction((previous) => {
+    const probe = window.__BALABS_3D_E2E__();
+    return (probe?.depth || 0) < previous;
+  }, depthBeforeZoomOut, { timeout: 8000 });
+  const depthAfterZoomOut = await page.evaluate(() => window.__BALABS_3D_E2E__()?.depth || 0);
+  assert.equal(depthAfterZoomOut, depthBeforeZoomOut - 1,
+    name + ': the zoom-out control must return exactly one hierarchy level');
+  const depthBeforeBack = depthAfterZoomOut;
   for (let step = 0; step <= depthBeforeBack; step++) {
     const before = await page.evaluate(() => window.__BALABS_3D_E2E__()?.depth || 0);
     await page.locator('.webgl-controls [data-camera="back"]').evaluate((button) => button.click());
