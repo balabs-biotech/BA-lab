@@ -24,7 +24,10 @@ create table public.organizations(id uuid primary key);
 create table public.organization_members(organization_id uuid not null, user_id uuid not null, primary key(organization_id,user_id));
 create or replace function private.is_org_member(p_org uuid) returns boolean
   language sql stable security definer set search_path = pg_catalog, public
-  as $$ select exists(select 1 from public.organization_members m where m.organization_id=p_org and m.user_id=auth.uid()) $$;
+  as $ select exists(select 1 from public.organization_members m where m.organization_id=p_org and m.user_id=auth.uid()) $;
+create or replace function private.is_org_writer(p_org uuid) returns boolean
+  language sql stable security definer set search_path = pg_catalog, public
+  as $ select exists(select 1 from public.organization_members m where m.organization_id=p_org and m.user_id=auth.uid()) $;
 create table public.material_types(code text primary key);
 create table public.culture_types(code text primary key);
 create table public.strains(organization_id uuid not null, id uuid not null default gen_random_uuid(), primary key(organization_id,id));
@@ -138,13 +141,13 @@ begin
 
   first_result := public.record_biological_operation(
     '00000000-0000-0000-0000-0000000000a1', parent_id, 'repiquage',
-    fixed_time, 'idempotency test', '{"conditions":"agar 24C"}'::jsonb,
-    array['IDEMP-CHILD-A'], request_key
+    request_key, fixed_time, 'idempotency test', '{"conditions":"agar 24C"}'::jsonb,
+    array['IDEMP-CHILD-A']
   );
   retry_result := public.record_biological_operation(
     '00000000-0000-0000-0000-0000000000a1', parent_id, 'repiquage',
-    fixed_time, 'idempotency test', '{"conditions":"agar 24C"}'::jsonb,
-    array['IDEMP-CHILD-A'], request_key
+    request_key, fixed_time, 'idempotency test', '{"conditions":"agar 24C"}'::jsonb,
+    array['IDEMP-CHILD-A']
   );
 
   if first_result is distinct from retry_result then
@@ -165,8 +168,8 @@ begin
   begin
     perform public.record_biological_operation(
       '00000000-0000-0000-0000-0000000000a1', parent_id, 'repiquage',
-      fixed_time, 'different request with same key', '{"conditions":"agar 24C"}'::jsonb,
-      array['IDEMP-CHILD-A'], request_key
+      request_key, fixed_time, 'different request with same key', '{"conditions":"agar 24C"}'::jsonb,
+      array['IDEMP-CHILD-A']
     );
   exception when others then
     if sqlerrm = 'idempotency_key_reused_with_different_payload' then
