@@ -364,6 +364,8 @@ function onPointerDown(e) {
   // A stale/overlapping transparent accessibility target must not cancel the
   // canvas gesture: retain the pointer and resolve the tap from screen coords.
   if(e.target.closest('.webgl-controls,.webgl-focus,.webgl-intro'))return;
+  // Keep keyboard navigation immediately available after mouse, pen or touch.
+  renderer?.domElement?.focus({preventScroll:true});
   pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});stage.setPointerCapture?.(e.pointerId);
   if(pointers.size===2){const p=[...pointers.values()];pinchStart=Math.hypot(p[0].x-p[1].x,p[0].y-p[1].y);dragging=true;moved=true;return}
   dragging=true;moved=false;dragGesture=false;lastPointer={x:e.clientX,y:e.clientY};
