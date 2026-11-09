@@ -32,6 +32,14 @@ assert.match(migration, /observed_at/i, 'qualitative observations must retain th
 assert.match(migration, /environmental_observations/i, 'weather and satellite observations must remain a distinct evidence family');
 assert.match(migration, /experimental_unit_id in \(select id from selected_units\)/i, 'events attached to experimental units must be included');
 assert.match(migration, /environmental_truncated/i, 'environmental evidence truncation must be explicit');
+assert.match(migration, /when e\.experimental_unit_id in \(select id from selected_units\) then 'experimental_unit'/i,
+  'events linked to selected experimental units must retain their true source relation');
+assert.match(migration, /select b\.id[\s\S]*?b\.culture_id = any\(v_ids\)[\s\S]*?b\.material_id in \(select id from selected_materials\)/i,
+  'batches linked through selected materials must be included in the comparison');
+const eventCountSection = migration.match(/\(select count\(\*\) from public\.events e[\s\S]*?\) as event_count/i)?.[0] || '';
+assert.match(eventCountSection, /e\.experimental_unit_id in \(select id from selected_units\)/i,
+  'event completeness counts must include experimental-unit events');
+
 assert.match(migration, /measured_at/i, 'quantitative measurements must retain their timestamp');
 assert.match(migration, /organization_id\s*=\s*p_organization_id/i,
   'every source read must be organization-scoped');
