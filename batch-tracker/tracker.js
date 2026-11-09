@@ -6163,6 +6163,17 @@ async function saveBiologicalOperation(event) {
 
 let cultureDetailRequestId = 0;
 
+function sortCultureEventTimelineEntries(timeline, beforeElement = null) {
+  const entries = [...timeline.querySelectorAll('[data-culture-event-entry="true"]')];
+  entries.sort((a, b) => {
+    const aTime = Number(a.dataset.sortTimestamp) || 0;
+    const bTime = Number(b.dataset.sortTimestamp) || 0;
+    return bTime - aTime;
+  });
+  entries.forEach(entry => timeline.insertBefore(entry, beforeElement));
+}
+
+
 async function loadMoreCultureEventHistory(cultureId, offset, button) {
   const requestId = ++cultureDetailRequestId;
   const loadRevision = authStateRevision;
@@ -6260,6 +6271,8 @@ async function loadMoreCultureEventHistory(cultureId, offset, button) {
     for (const entry of entries) {
       const article = document.createElement("article");
       article.className = "culture-timeline-entry";
+      article.dataset.cultureEventEntry = "true";
+      article.dataset.sortTimestamp = String(new Date(entry.date || 0).getTime() || 0);
       const date = document.createElement("time");
       date.className = "culture-timeline-date";
       date.textContent = entry.date ? new Date(entry.date).toLocaleString("fr-FR") : "Date inconnue";
@@ -6272,6 +6285,7 @@ async function loadMoreCultureEventHistory(cultureId, offset, button) {
       article.append(date, content);
       timeline.insertBefore(article, button);
     }
+    sortCultureEventTimelineEntries(timeline, button);
 
     const historyHasMore = history?.some(row => row.has_more === true);
     if (historyHasMore) {
@@ -6504,6 +6518,8 @@ async function loadCultureDetail(cultureId) {
       entries.forEach(entry => {
         const article = document.createElement("article");
         article.className = "culture-timeline-entry";
+        article.dataset.cultureEventEntry = "true";
+        article.dataset.sortTimestamp = String(new Date(entry.date || 0).getTime() || 0);
         const date = document.createElement("time");
         date.className = "culture-timeline-date";
         date.textContent = entry.date ? new Date(entry.date).toLocaleString("fr-FR") : "Date inconnue";
@@ -6516,6 +6532,7 @@ async function loadCultureDetail(cultureId) {
         article.append(date, content);
         timeline.appendChild(article);
       });
+      sortCultureEventTimelineEntries(timeline);
     }
     const historyHasMore = eventHistory?.some(row => row.has_more === true) === true;
     if (historyHasMore) {
