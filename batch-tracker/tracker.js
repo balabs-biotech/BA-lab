@@ -84,9 +84,12 @@ function clearAuthenticatedWorkspaceState() {
     cultureDetailPanel.classList.add("hidden");
     cultureDetailPanel.dataset.cultureId = "";
   }
-  compareCultureGenerations.requestId = (compareCultureGenerations.requestId || 0) + 1;
+  const generationComparisonResults = document.getElementById("generationComparisonResults");
+  if (generationComparisonResults) {
+    generationComparisonResults.__generationComparisonRequestId = (generationComparisonResults.__generationComparisonRequestId || 0) + 1;
+    generationComparisonResults.replaceChildren();
+  }
   document.getElementById("generationComparisonCultures")?.replaceChildren();
-  document.getElementById("generationComparisonResults")?.replaceChildren();
   const generationComparisonStatus = document.getElementById("generationComparisonStatus");
   if (generationComparisonStatus) generationComparisonStatus.textContent = "Connectez-vous pour comparer les générations.";
 
@@ -6430,16 +6433,17 @@ function renderGenerationComparisonReport(report) {
 }
 
 async function compareCultureGenerations() {
-  const requestId = (compareCultureGenerations.requestId || 0) + 1;
-  compareCultureGenerations.requestId = requestId;
+  const results = document.getElementById("generationComparisonResults");
+  if (!results) return;
+  const requestId = (results.__generationComparisonRequestId || 0) + 1;
+  results.__generationComparisonRequestId = requestId;
   const revision = authStateRevision;
   const orgId = organizationId;
   const panel = document.getElementById("cultureDetailPanel");
   const select = document.getElementById("generationComparisonCultures");
   const button = document.getElementById("compareCultureGenerationsButton");
   const status = document.getElementById("generationComparisonStatus");
-  const results = document.getElementById("generationComparisonResults");
-  if (!panel || !select || !button || !status || !results || !orgId) return;
+  if (!panel || !select || !button || !status || !orgId) return;
   const cultureIds = [...select.selectedOptions].map(option => option.value);
   const selectedDetailCultureId = panel.dataset.cultureId;
   if (cultureIds.length < 2 || cultureIds.length > 4) {
@@ -6455,7 +6459,7 @@ async function compareCultureGenerations() {
       p_culture_ids: cultureIds
     });
     if (error) throw error;
-    if (requestId !== compareCultureGenerations.requestId ||
+    if (requestId !== results.__generationComparisonRequestId ||
         !isCurrentWorkspaceRevision(revision, orgId) ||
         panel.dataset.cultureId !== selectedDetailCultureId) return;
     renderGenerationComparisonReport(data || {});
@@ -6466,7 +6470,7 @@ async function compareCultureGenerations() {
     console.error("Comparaison intergénérationnelle :", error);
     status.textContent = "Impossible de construire le rapport : " + (error.message || "erreur inconnue");
   } finally {
-    if (requestId === compareCultureGenerations.requestId) button.disabled = false;
+    if (requestId === results.__generationComparisonRequestId) button.disabled = false;
   }
 }
 
