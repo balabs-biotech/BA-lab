@@ -6880,6 +6880,102 @@ function renderGenerationComparisonReport(report) {
   }
   target.appendChild(timeSeriesSection);
 
+  // Monitoring is descriptive: sustained direction and robust deviations
+  // are candidates for review, never automatic biological diagnoses.
+  const monitoringSection = document.createElement("section");
+  monitoringSection.className = "generation-comparison-section";
+  const monitoringTitle = document.createElement("h5");
+  monitoringTitle.textContent = "Surveillance temporelle";
+  monitoringSection.appendChild(monitoringTitle);
+  const monitoringNote = document.createElement("p");
+  monitoringNote.className = "muted";
+  monitoringNote.textContent = "Repérage descriptif sur séries chronologiques comparables. Les candidats nécessitent une vérification du protocole, des conditions de mesure et du cahier de laboratoire. Minimum de 5 relevés par série ; aucun seuil biologique universel n'est supposé.";
+  monitoringSection.appendChild(monitoringNote);
+
+  let monitoringSeriesCount = 0;
+  let trendCandidates = 0;
+  let ruptureCandidates = 0;
+  const medianOf = values => {
+    const sorted = values.slice().sort((a, b) => a - b);
+    if (!sorted.length) return NaN;
+    const middle = Math.floor(sorted.length / 2);
+    return sorted.length % 2 ? sorted[middle] :
+      (sorted[middle - 1] + sorted[middle]) / 2;
+  };
+  sortedTimeSeries.forEach(series => {
+    if (series.points.length < 5) {
+      const insufficient = document.createElement("p");
+      insufficient.className = "muted";
+      insufficient.textContent = series.culture + " / " + series.variable +
+        " : minimum de 5 relevés requis pour la surveillance (actuel : " +
+        series.points.length + ").";
+      monitoringSection.appendChild(insufficient);
+      return;
+    }
+    monitoringSeriesCount += 1;
+    const values = series.points.map(point => point.value);
+    const recent = values.slice(-5);
+    const deltas = recent.slice(1).map((value, index) => value - recent[index]);
+    const increasing = deltas.every(delta => delta > 0);
+    const decreasing = deltas.every(delta => delta < 0);
+    const baseline = values.slice(-9, -5);
+    if (baseline.length === 4 && (increasing || decreasing)) {
+      const baselineMedian = medianOf(baseline);
+      const deviations = baseline.map(value => Math.abs(value - baselineMedian));
+      const mad = medianOf(deviations);
+      const netChange = Math.abs(recent[4] - recent[0]);
+      const threshold = mad === 0 ? 0 : 3 * mad;
+      if (netChange > threshold) {
+        trendCandidates += 1;
+        const item = document.createElement("p");
+        item.textContent = series.culture + " / " + series.variable +
+          " : tendance monotone candidate (" + (increasing ? "hausse" : "baisse") +
+          ") sur 5 relevés · variation nette " +
+          timeSeriesFormat(recent[4] - recent[0]) + " " + series.unit +
+          " · référence MAD " + timeSeriesFormat(mad) + ".";
+        monitoringSection.appendChild(item);
+      }
+    }
+
+    const previousValues = values.slice(-5, -1);
+    const currentValue = values[values.length - 1];
+    const baselineMedian = medianOf(previousValues);
+    const mad = medianOf(previousValues.map(value => Math.abs(value - baselineMedian)));
+    const deviation = Math.abs(currentValue - baselineMedian);
+    const ruptureThreshold = mad === 0 ? 0 : 3 * mad;
+    if (deviation > ruptureThreshold) {
+      ruptureCandidates += 1;
+      const item = document.createElement("p");
+      item.textContent = series.culture + " / " + series.variable +
+        " : rupture candidate au dernier relevé · valeur " +
+        timeSeriesFormat(currentValue) + " " + series.unit +
+        " · médiane des 4 relevés précédents " +
+        timeSeriesFormat(baselineMedian) + " · MAD " +
+        timeSeriesFormat(mad) + ".";
+      monitoringSection.appendChild(item);
+    }
+  });
+
+  if (!monitoringSeriesCount) {
+    const empty = document.createElement("p");
+    empty.className = "muted";
+    empty.textContent = "Aucune série ne comporte au moins 5 relevés valides pour activer la surveillance temporelle.";
+    monitoringSection.appendChild(empty);
+  } else if (!trendCandidates && !ruptureCandidates) {
+    const empty = document.createElement("p");
+    empty.className = "muted";
+    empty.textContent = "Aucune tendance monotone ou rupture candidate détectée dans les séries évaluables.";
+    monitoringSection.appendChild(empty);
+  }
+  const monitoringSummary = document.createElement("p");
+  monitoringSummary.className = "muted";
+  monitoringSummary.textContent = monitoringSeriesCount +
+    " série(s) surveillée(s) · " + trendCandidates +
+    " tendance(s) monotone(s) candidate(s) · " + ruptureCandidates +
+    " rupture(s) candidate(s). Ce repérage ne modifie pas les mesures et ne constitue pas un diagnostic biologique.";
+  monitoringSection.appendChild(monitoringSummary);
+  target.appendChild(monitoringSection);
+
   sections.forEach(([key, title]) => {
     const rows = Array.isArray(report[key]) ? report[key] : [];
     const section = document.createElement("section");
