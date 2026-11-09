@@ -6967,7 +6967,7 @@ function renderGenerationComparisonReport(report) {
   monitoringSection.appendChild(monitoringTitle);
   const monitoringNote = document.createElement("p");
   monitoringNote.className = "muted";
-  monitoringNote.textContent = "Repérage descriptif sur séries chronologiques comparables. Les candidats nécessitent une vérification du protocole, des conditions de mesure et du cahier de laboratoire. Minimum de 5 relevés par série ; aucun seuil biologique universel n'est supposé.";
+  monitoringNote.textContent = "Repérage descriptif sur séries chronologiques comparables. Une rupture candidate nécessite 5 relevés (4 de référence + le dernier). Une tendance monotone candidate nécessite 9 relevés (4 de référence + 5 récents). Les candidats nécessitent une vérification du protocole, des conditions de mesure et du cahier de laboratoire ; aucun seuil biologique universel n'est supposé.";
   monitoringSection.appendChild(monitoringNote);
 
   let monitoringSeriesCount = 0;
@@ -6997,6 +6997,14 @@ function renderGenerationComparisonReport(report) {
     const increasing = deltas.every(delta => delta > 0);
     const decreasing = deltas.every(delta => delta < 0);
     const baseline = values.slice(-9, -5);
+    if (baseline.length < 4) {
+      const note = document.createElement("p");
+      note.className = "muted";
+      note.textContent = series.culture + " / " + series.variable +
+        " : tendance monotone non évaluée — 9 relevés requis (actuel : " +
+        series.points.length + ").";
+      monitoringSection.appendChild(note);
+    }
     if (baseline.length === 4 && (increasing || decreasing)) {
       const baselineMedian = medianOf(baseline);
       const deviations = baseline.map(value => Math.abs(value - baselineMedian));
@@ -7064,7 +7072,7 @@ function renderGenerationComparisonReport(report) {
   const monitoringSummary = document.createElement("p");
   monitoringSummary.className = "muted";
   monitoringSummary.textContent = monitoringSeriesCount +
-    " série(s) surveillée(s) · " + trendCandidates +
+    " série(s) avec au moins 5 relevés · " + trendCandidates +
     " tendance(s) monotone(s) candidate(s) · " + ruptureCandidates +
     " rupture(s) candidate(s). Ce repérage ne modifie pas les mesures et ne constitue pas un diagnostic biologique.";
   monitoringSection.appendChild(monitoringSummary);
