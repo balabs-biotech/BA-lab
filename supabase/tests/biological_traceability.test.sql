@@ -87,6 +87,7 @@ create policy cultures_org on public.cultures to authenticated using(private.is_
 create policy relationships_org on public.material_relationships to authenticated using(private.is_org_member(organization_id)) with check(private.is_org_member(organization_id));
 create policy events_org on public.events to authenticated using(private.is_org_member(organization_id)) with check(private.is_org_member(organization_id));
 \i supabase/migrations/20261022021957_biological_traceability_v1.sql
+select set_config('request.jwt.claim.sub','00000000-0000-0000-0000-0000000000b1',false);
 \i supabase/migrations/20261109170000_sync_material_parent_relationships.sql
 set role authenticated;
 do $material_edge$
