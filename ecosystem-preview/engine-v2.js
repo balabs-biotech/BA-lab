@@ -274,7 +274,7 @@ function syncResourceHitTargets() {
  const overlaps=(a,b)=>a.l<b.r+8&&a.r>b.l-8&&a.t<b.b+8&&a.b>b.t-8;
  const offsets=[[0,0],[1,0],[-1,0],[0,1],[0,-1],[1,1],[-1,1],[1,-1],[-1,-1],[2,0],[-2,0],[0,2],[0,-2]];
  for(const item of projected){
-  const {button}=item,w=button.offsetWidth||150,h=button.offsetHeight||50;
+  const {button}=item,columns=stageRect.width<560?2:3,slotWidth=stageRect.width/columns;button.style.maxWidth=Math.max(128,slotWidth-12)+'px';button.style.width=Math.min(button.offsetWidth||150,slotWidth-12)+'px';const w=button.offsetWidth||150,h=button.offsetHeight||50;
   const sx=Math.max(w/2+6,Math.min(stageRect.width-w/2-6,item.x)),sy=Math.max(h/2+6,Math.min(stageRect.height-h/2-6,item.y));
   const stepX=w/2+12,stepY=h/2+12;
   let chosen=null;
@@ -284,7 +284,24 @@ function syncResourceHitTargets() {
    const box={l:cx-w/2,t:cy-h/2,r:cx+w/2,b:cy+h/2};
    if(!occupied.some(r=>overlaps(box,r))&&!obstacles.some(r=>overlaps(box,r))){chosen={cx,cy,box};break}
   }
-  if(!chosen){const cx=sx,cy=sy;chosen={cx,cy,box:{l:cx-w/2,t:cy-h/2,r:cx+w/2,b:cy+h/2}}}
+  if(!chosen){
+   // On narrow screens, clustered branches can project to the same pixels.
+   // Fall back to a compact, collision-free screen-space index so every folder
+   // remains visible and directly tappable instead of stacking invisible buttons.
+   const columns=stageRect.width<560?2:3,slotWidth=stageRect.width/columns;
+   const rows=Math.max(2,Math.ceil(projected.length/columns));
+   const candidates=[];
+   for(let row=0;row<rows;row++)for(let col=0;col<columns;col++){
+    const cx=slotWidth*(col+.5),cy=stageRect.height*(.28+row*.44/Math.max(1,rows-1));
+    const box={l:cx-w/2,t:cy-h/2,r:cx+w/2,b:cy+h/2};
+    if(box.l>=4&&box.r<=stageRect.width-4&&box.t>=4&&box.b<=stageRect.height-4)candidates.push({cx,cy,box});
+   }
+   chosen=candidates.find(candidate=>!occupied.some(r=>overlaps(candidate.box,r))&&!obstacles.some(r=>overlaps(candidate.box,r)))||null;
+   if(!chosen){
+    const cx=Math.max(w/2+4,Math.min(stageRect.width-w/2-4,sx)),cy=Math.max(h/2+4,Math.min(stageRect.height-h/2-4,sy));
+    chosen={cx,cy,box:{l:cx-w/2,t:cy-h/2,r:cx+w/2,b:cy+h/2}};
+   }
+  }
   occupied.push(chosen.box);
   button.style.setProperty('z-index',String(12000+Math.round((1-item.p.z)*100)),'important');
   button.style.left=chosen.cx+'px';button.style.top=chosen.cy+'px';
