@@ -22,6 +22,7 @@ returns table (
   actor_user_id uuid,
   culture_id uuid,
   material_id uuid,
+  batch_id uuid,
   source_relation text,
   payload jsonb,
   total_rows bigint,
@@ -57,7 +58,7 @@ begin
   ),
   candidates as (
     select e.id, e.event_type, e.occurred_at, e.actor_user_id,
-           e.culture_id, e.material_id, 'culture'::text as source_relation,
+           e.culture_id, e.material_id, e.batch_id, 'culture'::text as source_relation,
            e.payload, 1 as priority
       from target t
       join public.events e
@@ -65,7 +66,7 @@ begin
        and e.culture_id = t.id
     union all
     select e.id, e.event_type, e.occurred_at, e.actor_user_id,
-           e.culture_id, e.material_id, 'material'::text,
+           e.culture_id, e.material_id, e.batch_id, 'material'::text,
            e.payload, 2
       from target t
       join public.events e
@@ -74,7 +75,7 @@ begin
     union all
     select operation.id, operation.event_type, operation.occurred_at,
            operation.actor_user_id, operation.culture_id, operation.material_id,
-           'creation_operation'::text, operation.payload, 3
+           operation.batch_id, 'creation_operation'::text, operation.payload, 3
       from target t
       join public.events child_event
         on child_event.organization_id = p_organization_id
@@ -83,11 +84,21 @@ begin
       join public.events operation
         on operation.organization_id = p_organization_id
        and operation.id::text = child_event.payload ->> 'operation_event_id'
+    union all
+    select e.id, e.event_type, e.occurred_at, e.actor_user_id,
+           e.culture_id, e.material_id, e.batch_id, 'batch'::text,
+           e.payload, 4
+      from public.batches b
+      join public.events e
+        on e.organization_id = p_organization_id
+       and e.batch_id = b.id
+     where b.organization_id = p_organization_id
+       and b.culture_id = p_culture_id
   ),
   unique_events as (
     select distinct on (c.id)
            c.id, c.event_type, c.occurred_at, c.actor_user_id,
-           c.culture_id, c.material_id, c.source_relation, c.payload
+           c.culture_id, c.material_id, c.batch_id, c.source_relation, c.payload
       from candidates c
      order by c.id, c.priority
   ),
@@ -100,7 +111,7 @@ begin
     select count(*)::bigint as total_rows from unique_events
   )
   select r.id, r.event_type, r.occurred_at, r.actor_user_id,
-         r.culture_id, r.material_id, r.source_relation, r.payload,
+         r.culture_id, r.material_id, r.batch_id, r.source_relation, r.payload,
          stats.total_rows, stats.total_rows > (v_offset + v_limit)
     from ranked r
     cross join stats
