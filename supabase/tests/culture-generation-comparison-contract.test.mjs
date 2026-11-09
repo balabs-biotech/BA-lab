@@ -61,5 +61,13 @@ assert.match(migration, /v_requested_count < 2 or v_requested_count > 4/i,
 
 assert.match(migration, /join public\.batches b[\s\S]*?b\.culture_id = s\.id or b\.material_id = s\.material_id/i,
   'culture context must include locations reached through linked production batches');
+assert.match(migration, /'culture_environment'::text as context_relation/i,
+  'direct culture environment context must retain its source relation');
+assert.match(migration, /'linked_batch_environment'::text as context_relation/i,
+  'batch environment context must be distinguishable from direct culture context');
+assert.match(migration, /'linked_batch_location'::text as context_relation/i,
+  'explicit batch locations must remain distinguishable from environment locations');
+assert.match(migration, /b\.id as batch_id[\s\S]*?b\.batch_code/i,
+  'batch-derived context must preserve the originating batch identity');
 
 console.log('PASS: generation comparison RPC exposes a bounded tenant-scoped evidence contract');
