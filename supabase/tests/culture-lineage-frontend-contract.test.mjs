@@ -216,4 +216,20 @@ assert.match(reportRenderer, /effectif insuffisant pour le repérage IQR/,
 assert.match(reportRenderer, /Aucune mesure atypique n'est exclue automatiquement/,
   'candidate flags must never silently exclude source measurements');
 
+
+assert.match(reportRenderer, /timeSeriesGroups/,
+  'the report must build culture-specific chronological measurement series');
+assert.match(reportRenderer, /measured_at/,
+  'time-series ordering must use the recorded measurement timestamp');
+assert.match(reportRenderer, /Évolution temporelle des mesures/,
+  'the report must render a dedicated temporal evolution section');
+assert.match(reportRenderer, /variation depuis le relevé précédent/,
+  'each time-series point must expose its change from the previous reading');
+assert.match(reportRenderer, /variation en % non calculable/,
+  'percentage change must be withheld when the previous value is zero');
+assert.match(reportRenderer, /date non exploitable/,
+  'measurements without a valid timestamp must be disclosed rather than silently ordered');
+assert.match(reportRenderer, /unités comparables uniquement/,
+  'time series must remain separated by culture, variable and unit');
+
 console.log('PASS: CultureOps lineage, event history and generation comparison use bounded tenant RPCs');
