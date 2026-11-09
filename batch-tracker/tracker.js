@@ -5110,6 +5110,37 @@ function cultureWorkflowText(key) {
   return (messages[lang] || messages.fr)[key] || messages.fr[key] || key;
 }
 
+const pendingManualWriteKeys = new Map();
+
+async function getManualWriteIdempotencyKey(scope, payload) {
+  const storageKey = `ba-labs:pending-write:${organizationId}:${scope}`;
+  const serialized = JSON.stringify(payload);
+  let fingerprint = serialized;
+  if (globalThis.crypto?.subtle && globalThis.TextEncoder) {
+    const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(serialized));
+    fingerprint = Array.from(new Uint8Array(digest), byte => byte.toString(16).padStart(2, "0")).join("");
+  }
+
+  let stored = pendingManualWriteKeys.get(storageKey);
+  try {
+    const persisted = JSON.parse(sessionStorage.getItem(storageKey) || "null");
+    if (persisted?.fingerprint === fingerprint && persisted?.key) stored = persisted;
+  } catch {}
+
+  if (stored?.fingerprint === fingerprint && stored?.key) return stored.key;
+
+  const next = { fingerprint, key: crypto.randomUUID() };
+  pendingManualWriteKeys.set(storageKey, next);
+  try { sessionStorage.setItem(storageKey, JSON.stringify(next)); } catch {}
+  return next.key;
+}
+
+function clearManualWriteIdempotencyKey(scope) {
+  const storageKey = `ba-labs:pending-write:${organizationId}:${scope}`;
+  pendingManualWriteKeys.delete(storageKey);
+  try { sessionStorage.removeItem(storageKey); } catch {}
+}
+
 async function saveMeasurement() {
   const operationRevision = authStateRevision;
   const operationOrganizationId = organizationId;
@@ -5225,11 +5256,14 @@ async function saveMeasurement() {
       }
     };
     if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) throw new Error("Session ou espace de travail modifié pendant l’opération. Recommencez.");
+    const idempotencyKey = await getManualWriteIdempotencyKey("measurement", { event: eventPayload, measurement: measurementPayload });
     const { error: recordError } = await supabaseClient.rpc("record_manual_measurement", {
       p_event: eventPayload,
-      p_measurement: measurementPayload
+      p_measurement: measurementPayload,
+      p_idempotency_key: idempotencyKey
     });
     if (recordError) throw new Error(cultureWorkflowText("measureError") + recordError.message);
+    clearManualWriteIdempotencyKey("measurement");
     measurementSaved = true;
     if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
 
@@ -5447,11 +5481,14 @@ async function saveObservation() {
       }
     };
     if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) throw new Error("Session ou espace de travail modifié pendant l’opération. Recommencez.");
+    const idempotencyKey = await getManualWriteIdempotencyKey("observation", { event: eventPayload, observation: observationPayload });
     const { error: recordError } = await supabaseClient.rpc("record_manual_observation", {
       p_event: eventPayload,
-      p_observation: observationPayload
+      p_observation: observationPayload,
+      p_idempotency_key: idempotencyKey
     });
     if (recordError) throw new Error(cultureWorkflowText("observationError") + recordError.message);
+    clearManualWriteIdempotencyKey("observation");
     observationSaved = true;
     if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
     observationValueInput.value = "";
