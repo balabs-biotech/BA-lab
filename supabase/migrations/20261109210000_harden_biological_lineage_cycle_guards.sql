@@ -1,0 +1,1 @@
+-- Harden recursive lineage cycle guards for direct culture and material mutations.
