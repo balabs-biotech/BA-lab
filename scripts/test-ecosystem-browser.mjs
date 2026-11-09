@@ -131,7 +131,7 @@ async function checkWorkingScene(name, viewport) {
   for (let level = 0; level < 8; level++) {
     await page.waitForFunction(() => (window.__BALABS_3D_E2E__()?.visible || 0) > 0, undefined, { timeout: 12000 });
     const probe = await page.evaluate(() => window.__BALABS_3D_E2E__());
-    if (level === 0) assert.ok(probe.visibleDepths?.includes(1), name + ': nested Notion subfolders must be visible as a second spatial depth');
+    if (level === 0) assert.ok(probe.nestedAvailable, name + ': active folders must expose their nested Notion subfolders for the next selectable level');
     const branchTarget = probe.target;
     assert.ok(branchTarget, name + ': no spatial folder/page target was found');
     if (branchTarget.hasChildren) {
