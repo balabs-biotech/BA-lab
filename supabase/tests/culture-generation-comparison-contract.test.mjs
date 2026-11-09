@@ -16,11 +16,12 @@ assert.match(migration, /private\.is_org_member\(p_organization_id\)/i,
   'comparison must enforce active tenant membership');
 assert.match(migration, /jsonb_build_object\s*\([\s\S]*?'schema_version'/i,
   'response must carry an explicit schema version');
-for (const key of ['cultures', 'lineage', 'measurements', 'observations', 'events', 'batches', 'data_quality']) {
+for (const key of ['cultures', 'lineage', 'measurements', 'observations', 'events', 'batches', 'results', 'data_quality']) {
   assert.match(migration, new RegExp(`'${key}'`, 'i'), `response must expose ${key}`);
 }
 assert.match(migration, /quality_state/i, 'measurement and observation quality states must be preserved');
 assert.match(migration, /normalized_value/i, 'normalized and raw measurements must both remain available');
+assert.match(migration, /measurements_without_normalized_value/i, 'raw-only measurements must not be mislabelled as missing numeric values');
 assert.match(migration, /raw_unit_code/i, 'raw measurement units must remain available');
 assert.match(migration, /normalized_unit_code/i, 'normalized measurement units must remain available');
 assert.match(migration, /exclusion_reason/i, 'excluded measurements must retain their exclusion reason');
