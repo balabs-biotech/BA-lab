@@ -7002,16 +7002,24 @@ function renderGenerationComparisonReport(report) {
       const deviations = baseline.map(value => Math.abs(value - baselineMedian));
       const mad = medianOf(deviations);
       const netChange = Math.abs(recent[4] - recent[0]);
-      const threshold = mad === 0 ? 0 : 3 * mad;
-      if (netChange > threshold) {
-        trendCandidates += 1;
-        const item = document.createElement("p");
-        item.textContent = series.culture + " / " + series.variable +
-          " : tendance monotone candidate (" + (increasing ? "hausse" : "baisse") +
-          ") sur 5 relevés · variation nette " +
-          timeSeriesFormat(recent[4] - recent[0]) + " " + series.unit +
-          " · référence MAD " + timeSeriesFormat(mad) + ".";
-        monitoringSection.appendChild(item);
+      if (mad > 0) {
+        const threshold = 3 * mad;
+        if (netChange > threshold) {
+          trendCandidates += 1;
+          const item = document.createElement("p");
+          item.textContent = series.culture + " / " + series.variable +
+            " : tendance monotone candidate (" + (increasing ? "hausse" : "baisse") +
+            ") sur 5 relevés · variation nette " +
+            timeSeriesFormat(recent[4] - recent[0]) + " " + series.unit +
+            " · référence MAD " + timeSeriesFormat(mad) + ".";
+          monitoringSection.appendChild(item);
+        }
+      } else {
+        const note = document.createElement("p");
+        note.className = "muted";
+        note.textContent = series.culture + " / " + series.variable +
+          " : tendance non qualifiée par MAD (MAD nul sur la référence ; seuil robuste non estimable sans tolérance de protocole).";
+        monitoringSection.appendChild(note);
       }
     }
 
@@ -7020,17 +7028,25 @@ function renderGenerationComparisonReport(report) {
     const baselineMedian = medianOf(previousValues);
     const mad = medianOf(previousValues.map(value => Math.abs(value - baselineMedian)));
     const deviation = Math.abs(currentValue - baselineMedian);
-    const ruptureThreshold = mad === 0 ? 0 : 3 * mad;
-    if (deviation > ruptureThreshold) {
-      ruptureCandidates += 1;
-      const item = document.createElement("p");
-      item.textContent = series.culture + " / " + series.variable +
-        " : rupture candidate au dernier relevé · valeur " +
-        timeSeriesFormat(currentValue) + " " + series.unit +
-        " · médiane des 4 relevés précédents " +
-        timeSeriesFormat(baselineMedian) + " · MAD " +
-        timeSeriesFormat(mad) + ".";
-      monitoringSection.appendChild(item);
+    if (mad > 0) {
+      const ruptureThreshold = 3 * mad;
+      if (deviation > ruptureThreshold) {
+        ruptureCandidates += 1;
+        const item = document.createElement("p");
+        item.textContent = series.culture + " / " + series.variable +
+          " : rupture candidate au dernier relevé · valeur " +
+          timeSeriesFormat(currentValue) + " " + series.unit +
+          " · médiane des 4 relevés précédents " +
+          timeSeriesFormat(baselineMedian) + " · MAD " +
+          timeSeriesFormat(mad) + ".";
+        monitoringSection.appendChild(item);
+      }
+    } else {
+      const note = document.createElement("p");
+      note.className = "muted";
+      note.textContent = series.culture + " / " + series.variable +
+        " : rupture non qualifiée par MAD (MAD nul sur la référence ; seuil robuste non estimable sans tolérance de protocole).";
+      monitoringSection.appendChild(note);
     }
   });
 
