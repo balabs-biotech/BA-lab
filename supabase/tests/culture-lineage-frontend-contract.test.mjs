@@ -54,4 +54,27 @@ assert.match(migration, /a\.depth = 250/,
 assert.match(migration, /ma\.depth = 250/,
   'material ancestor depth boundary must be checked');
 
-console.log('PASS: CultureOps lineage UI uses bounded recursive tenant RPC');
+
+const detailStart = source.indexOf('async function loadCultureDetail(cultureId) {');
+const detailEnd = source.indexOf('\nfunction updateOverview()', detailStart);
+assert.ok(detailStart >= 0 && detailEnd > detailStart,
+  'culture detail loader must remain a named function');
+const detailLoader = source.slice(detailStart, detailEnd);
+assert.match(detailLoader, /supabaseClient\.rpc\(["']get_culture_event_history["']/,
+  'culture detail must read events through the tenant-scoped history RPC');
+assert.match(detailLoader, /p_organization_id:\s*loadOrganizationId/,
+  'event history RPC must receive the active organization');
+assert.match(detailLoader, /p_culture_id:\s*culture\.id/,
+  'event history RPC must receive the selected culture');
+assert.match(detailLoader, /p_limit:\s*100/,
+  'event history reads must remain bounded');
+assert.match(detailLoader, /p_offset:\s*0/,
+  'event history must explicitly select its first page');
+assert.match(detailLoader, /row\.source_relation/,
+  'timeline must preserve the origin relation of each event');
+assert.match(detailLoader, /row\.event_id/,
+  'timeline must use stable event identifiers returned by the RPC');
+assert.match(detailLoader, /isCurrentWorkspaceRevision\(loadRevision, loadOrganizationId\)/,
+  'event history responses must remain protected against stale workspace reads');
+
+console.log('PASS: CultureOps lineage and event history UI use bounded tenant RPCs');
