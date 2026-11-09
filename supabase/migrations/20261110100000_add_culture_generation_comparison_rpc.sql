@@ -44,7 +44,7 @@ begin
     raise exception 'culture_not_found_or_not_in_organization' using errcode = 'P0002';
   end if;
 
-  with selected as (
+  with recursive selected as (
     select c.organization_id, c.id, c.code, c.culture_type, c.material_id,
            c.parent_culture_id, c.experiment_id, c.experimental_unit_id,
            c.protocol_version_id, c.environment_id, c.started_at, c.created_at,
