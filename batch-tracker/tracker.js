@@ -5977,7 +5977,8 @@ async function loadBiologicalLineage(cultureId, offset = 0) {
         material_code: current.material_code,
         material_type: current.material_type,
         generation: current.material_generation,
-        state: current.material_state
+        state: current.material_state,
+        relationship_type: null
       }] : [])
     ];
     const isTruncated = rows.some(row => row.truncated === true);
