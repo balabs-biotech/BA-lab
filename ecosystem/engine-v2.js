@@ -56,7 +56,7 @@ function addStyles() {
     @media(max-width:760px){#mainView.webgl-ready{height:640px;min-height:640px}}
     #mainView.webgl-ready>.hub,#mainView.webgl-ready>.sphere,#mainView.webgl-ready>.network,#mainView.webgl-ready>.galaxy{display:none!important}
     #mainView .webgl-stage{position:absolute;inset:0;z-index:4;min-height:100%;touch-action:none;overflow:hidden}
-    #mainView .webgl-stage canvas{display:block;width:100%;height:100%;outline:none;touch-action:none}
+    #mainView .webgl-stage canvas{display:block;width:100%;height:100%;outline:none;touch-action:none}#mainView .webgl-stage canvas:focus-visible{outline:2px solid #d1d0c5;outline-offset:-4px}
     #mainView .webgl-hit-target{position:absolute!important;z-index:30!important;width:76px;height:76px;min-width:64px;min-height:64px;padding:0;border:0;border-radius:50%;background:transparent;color:transparent;opacity:.015;pointer-events:auto!important;touch-action:manipulation;transform:translate(-50%,-50%);cursor:pointer;-webkit-tap-highlight-color:transparent}
     #mainView .webgl-hit-target:focus-visible{opacity:.24;outline:2px solid #d1d0c5;background:#b96b4d33}
     #mainView .webgl-stage .webgl-hint{position:absolute;left:16px;bottom:14px;z-index:8;padding:9px 12px;border:1px solid #78958a66;border-radius:999px;background:#142321d9;color:#e5e9df;font:600 9px/1.4 system-ui;letter-spacing:.08em;pointer-events:none;backdrop-filter:blur(12px)}
@@ -421,7 +421,7 @@ async function init() {
     setupUI();
     renderer=new THREE.WebGLRenderer({antialias:true,alpha:true,powerPreference:'high-performance'});
     renderer.setPixelRatio(Math.min(devicePixelRatio||1,1.5));renderer.setClearColor(0x000000,0);renderer.outputColorSpace=THREE.SRGBColorSpace;
-    stage.prepend(renderer.domElement);renderer.domElement.setAttribute('aria-label','BA Labs 3D network canvas');
+    stage.prepend(renderer.domElement);renderer.domElement.setAttribute('tabindex','0');renderer.domElement.setAttribute('role','application');renderer.domElement.setAttribute('aria-label','BA Labs 3D network. Use arrow keys to rotate, plus and minus to zoom, Escape to go back, and Home for overview.');
     scene=new THREE.Scene();camera=new THREE.PerspectiveCamera(46,1,.1,180);raycaster=new THREE.Raycaster();pointer=new THREE.Vector2();target=new THREE.Vector3();
     createWorld();resize();cameraInitialized=true;
     const loadManifest=()=>fetch('./notion-tree.'+LANG()+'.json',{cache:'no-cache'}).then(r=>r.ok?r.json():null).then(data=>{if(data?.version===1&&Array.isArray(data.domains)){manifest=data;if(selected&&!transition)buildResources(selected,currentNode,currentAnchor)}}).catch(()=>{});loadManifest();new MutationObserver(()=>{hint.textContent=t('hint');loadManifest()}).observe(document.documentElement,{attributes:true,attributeFilter:['lang']});
