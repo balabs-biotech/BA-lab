@@ -44,6 +44,8 @@ assert.match(migration, /creation_operation/,
   'event history must expose the operation that created a descendant');
 assert.match(migration, /descendant_created/,
   'event history must resolve descendant creation links');
+assert.match(migration, /descendant_culture/,
+  'parent history must include direct culture-generation events from child cultures');
 assert.match(migration, /events_org_culture_time_idx/,
   'event history must have a culture/time index');
 assert.match(migration, /'batch'::text/,
