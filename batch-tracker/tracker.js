@@ -5902,9 +5902,14 @@ async function loadBiologicalLineage(cultureId, offset = 0) {
   const loadOrganizationId = organizationId;
   if (!target || !loadOrganizationId) return;
   if (offset === 0) {
+    target.__lineageRequestId = (target.__lineageRequestId || 0) + 1;
+    target.__lineageCultureId = cultureId;
     target.__lineageRows = [];
     target.textContent = biologicalWorkflowText("loading");
+  } else if (target.__lineageCultureId !== cultureId) {
+    return;
   }
+  const lineageRequestId = target.__lineageRequestId;
   try {
     const { data, error } = await supabaseClient.rpc('get_culture_lineage', {
       p_organization_id: loadOrganizationId,
@@ -5914,6 +5919,8 @@ async function loadBiologicalLineage(cultureId, offset = 0) {
     });
     if (error) throw error;
     if (!isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
+    if (lineageRequestId !== target.__lineageRequestId ||
+        target.__lineageCultureId !== cultureId) return;
 
     const pageRows = data || [];
     const previousRows = Array.isArray(target.__lineageRows) ? target.__lineageRows : [];
@@ -6078,6 +6085,8 @@ async function loadBiologicalLineage(cultureId, offset = 0) {
     }
   } catch (error) {
     if (!isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
+    if (lineageRequestId !== target.__lineageRequestId ||
+        target.__lineageCultureId !== cultureId) return;
     target.textContent = biologicalWorkflowText("loadError") + (error.message || error);
   }
 }
