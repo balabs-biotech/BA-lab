@@ -7,7 +7,7 @@ declare
   v_proc record;
   v_definition text;
 begin
-  select p.prosecdef, p.proconfig, pg_get_functiondef(p.oid) as definition
+  select p.prosecdef, p.proconfig, p.proacl, p.proowner, pg_get_functiondef(p.oid) as definition
     into v_proc
     from pg_proc p
    where p.oid = v_signature;
@@ -20,7 +20,11 @@ begin
   end if;
   if not has_function_privilege('authenticated', v_signature, 'EXECUTE')
      or has_function_privilege('anon', v_signature, 'EXECUTE')
-     or has_function_privilege('public', v_signature, 'EXECUTE') then
+     or exists (
+       select 1
+         from aclexplode(coalesce(v_proc.proacl, acldefault('f', v_proc.proowner))) acl
+        where acl.grantee = 0 and acl.privilege_type = 'EXECUTE'
+     ) then
     raise exception 'FAIL: idempotent culture-generation RPC grants are not least-privilege';
   end if;
   if has_function_privilege('authenticated', v_old_signature, 'EXECUTE') then
