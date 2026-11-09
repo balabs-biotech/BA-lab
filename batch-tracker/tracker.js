@@ -6303,6 +6303,167 @@ async function loadMoreCultureEventHistory(cultureId, offset, button) {
   }
 }
 
+function populateGenerationComparisonOptions(currentCultureId) {
+  const select = document.getElementById("generationComparisonCultures");
+  if (!select) return;
+  select.replaceChildren();
+  cultureOptions
+    .slice()
+    .sort((a, b) => String(a.code || "").localeCompare(String(b.code || "")))
+    .forEach(culture => {
+      const option = document.createElement("option");
+      option.value = culture.id;
+      option.textContent = (culture.code || "Culture sans code") + " — " + (culture.culture_type || "type non renseigné");
+      option.selected = culture.id === currentCultureId;
+      select.appendChild(option);
+    });
+}
+
+function renderGenerationComparisonReport(report) {
+  const target = document.getElementById("generationComparisonResults");
+  if (!target) return;
+  target.replaceChildren();
+
+  const cultureCodes = new Map((report.cultures || []).map(c => [c.id, c.code || c.id]));
+  const sections = [
+    ["cultures", "Cultures sélectionnées"],
+    ["lineage", "Filiation et générations"],
+    ["measurements", "Mesures quantitatives"],
+    ["observations", "Observations qualitatives"],
+    ["events", "Opérations et événements"],
+    ["batches", "Lots de production"],
+    ["results", "Résultats expérimentaux"],
+    ["environmental_observations", "Données environnementales"]
+  ];
+  const fieldLabels = {
+    culture_id:"Culture", selected_culture_id:"Culture suivie", ancestor_culture_id:"Ancêtre",
+    parent_culture_id:"Culture parente", depth:"Profondeur", code:"Code",
+    culture_type:"Type", started_at:"Démarrage", material_code:"Matériel",
+    variable_code:"Variable", raw_value:"Valeur brute", raw_unit_code:"Unité brute",
+    normalized_value:"Valeur normalisée", normalized_unit_code:"Unité normalisée",
+    measured_at:"Mesuré le", observed_at:"Observé le", value_text:"Observation",
+    quality_state:"Qualité", exclusion_reason:"Motif d’exclusion", event_type:"Événement",
+    occurred_at:"Date", source_relation:"Origine", batch_code:"Code lot", status:"Statut",
+    current_stage:"Étape", quantity_actual:"Quantité réelle", quantity_unit_code:"Unité",
+    result_type:"Type de résultat", value:"Résultat", data_family:"Famille",
+    provider_code:"Fournisseur", dataset_code:"Jeu de données", unit_code:"Unité",
+    spatial_resolution_m:"Résolution spatiale", quality_flag:"Indicateur qualité",
+    experiment_code:"Expérience", experiment_name:"Nom expérience",
+    protocol_version:"Version protocole", generation:"Génération"
+  };
+  const format = value => {
+    if (value === null || value === undefined || value === "") return "Non renseigné";
+    if (typeof value === "object") return JSON.stringify(value);
+    return String(value);
+  };
+  const heading = document.createElement("p");
+  heading.className = "muted";
+  heading.textContent = "Rapport v" + (report.schema_version || "?") + " · " +
+    (report.cultures || []).length + " cultures · " +
+    new Date(report.generated_at || Date.now()).toLocaleString();
+  target.appendChild(heading);
+
+  sections.forEach(([key, title]) => {
+    const rows = Array.isArray(report[key]) ? report[key] : [];
+    const section = document.createElement("section");
+    section.className = "generation-comparison-section";
+    const h = document.createElement("h5");
+    h.textContent = title + " (" + rows.length + ")";
+    section.appendChild(h);
+    if (!rows.length) {
+      const empty = document.createElement("p");
+      empty.className = "muted";
+      empty.textContent = "Aucune donnée enregistrée pour cette catégorie.";
+      section.appendChild(empty);
+    } else {
+      rows.forEach((row, index) => {
+        const details = document.createElement("details");
+        details.className = "generation-comparison-record";
+        const summary = document.createElement("summary");
+        const identity = row.code || row.culture_code || row.batch_code ||
+          row.variable_code || row.event_type || row.result_type || row.dataset_code ||
+          row.material_code || ("Enregistrement " + (index + 1));
+        summary.textContent = format(identity);
+        details.appendChild(summary);
+        const dl = document.createElement("dl");
+        Object.entries(row).forEach(([field, value]) => {
+          if (field === "organization_id" || field === "id" || value === null || value === undefined) return;
+          const dt = document.createElement("dt");
+          dt.textContent = fieldLabels[field] || field.replaceAll("_", " ");
+          const dd = document.createElement("dd");
+          if (field === "culture_id" || field === "selected_culture_id" ||
+              field === "ancestor_culture_id" || field === "parent_culture_id") {
+            dd.textContent = cultureCodes.get(value) || format(value);
+          } else {
+            dd.textContent = format(value);
+          }
+          dl.append(dt, dd);
+        });
+        details.appendChild(dl);
+        section.appendChild(details);
+      });
+    }
+    target.appendChild(section);
+  });
+
+  const quality = report.data_quality || {};
+  const qualitySection = document.createElement("section");
+  qualitySection.className = "generation-comparison-quality";
+  const qualityTitle = document.createElement("h5");
+  qualityTitle.textContent = "Complétude et qualité des données";
+  qualitySection.appendChild(qualityTitle);
+  const qualityList = document.createElement("dl");
+  Object.entries(quality).forEach(([key, value]) => {
+    const dt = document.createElement("dt");
+    dt.textContent = key.replaceAll("_", " ");
+    const dd = document.createElement("dd");
+    dd.textContent = format(value);
+    qualityList.append(dt, dd);
+  });
+  qualitySection.appendChild(qualityList);
+  target.appendChild(qualitySection);
+}
+
+async function compareCultureGenerations() {
+  const requestId = (compareCultureGenerations.requestId || 0) + 1;
+  compareCultureGenerations.requestId = requestId;
+  const revision = authStateRevision;
+  const orgId = organizationId;
+  const panel = document.getElementById("cultureDetailPanel");
+  const select = document.getElementById("generationComparisonCultures");
+  const button = document.getElementById("compareCultureGenerationsButton");
+  const status = document.getElementById("generationComparisonStatus");
+  const results = document.getElementById("generationComparisonResults");
+  if (!panel || !select || !button || !status || !results || !orgId) return;
+  const cultureIds = [...select.selectedOptions].map(option => option.value);
+  if (cultureIds.length < 2 || cultureIds.length > 4) {
+    status.textContent = "Sélectionnez entre 2 et 4 cultures.";
+    return;
+  }
+  button.disabled = true;
+  status.textContent = "Construction du rapport comparatif…";
+  results.replaceChildren();
+  try {
+    const { data, error } = await supabaseClient.rpc("compare_culture_generations", {
+      p_organization_id: orgId,
+      p_culture_ids: cultureIds
+    });
+    if (error) throw error;
+    if (requestId !== compareCultureGenerations.requestId ||
+        !isCurrentWorkspaceRevision(revision, orgId) ||
+        panel.dataset.cultureId !== cultureIds.find(id => id === panel.dataset.cultureId)) return;
+    renderGenerationComparisonReport(data || {});
+    status.textContent = "Rapport comparatif chargé. Les résultats sont descriptifs et les limites de données sont indiquées ci-dessous.";
+  } catch (error) {
+    if (requestId !== compareCultureGenerations.requestId ||
+        !isCurrentWorkspaceRevision(revision, orgId)) return;
+    console.error("Comparaison intergénérationnelle :", error);
+    status.textContent = "Impossible de construire le rapport : " + (error.message || "erreur inconnue");
+  } finally {
+    if (requestId === compareCultureGenerations.requestId) button.disabled = false;
+  }
+}
+
 async function loadCultureDetail(cultureId) {
   const requestId = ++cultureDetailRequestId;
   const loadRevision = authStateRevision;
@@ -6316,6 +6477,9 @@ async function loadCultureDetail(cultureId) {
   if (!culture || !panel || !title || !meta || !summary || !timeline) return;
 
   panel.dataset.cultureId = culture.id;
+  populateGenerationComparisonOptions(culture.id);
+  document.getElementById("generationComparisonStatus").textContent = "Choisissez au moins une autre culture pour comparer les générations.";
+  document.getElementById("generationComparisonResults").replaceChildren();
   loadBiologicalLineage(culture.id);
   panel.classList.remove("hidden");
   title.textContent = culture.code || "Culture sans code";
