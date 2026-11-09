@@ -49,7 +49,9 @@ for (const [language, tree, mycologyId, fungalId] of [
 assert.equal(ptTree.domains.find(domain => domain.id === 'bio').notionId, '40173152f1718120b45bf79f8e81120a', 'Portuguese biotechnology universe must point to the actual Biotecnologia page, not its parent hub');
 
 assert.ok(engine.includes('function createWorld()'), 'The new engine must build its own biological network scene');
-assert.ok(engine.includes('makeCellGeometry'), 'Domain nodes must use organic cell geometry');
+assert.ok(engine.includes("const soma=new THREE.Group();soma.userData={id,kind:'domain'};group.add(soma);"), 'Domain centres must remain open mycelial junctions rather than solid cell bodies');
+assert.ok(engine.includes('Sparse background hyphae connect the field'), 'The overview must contain fine background mycelial connections');
+assert.ok(engine.includes('for(let j=0;j<14;j++)'), 'Domain branches must retain dense radial connectivity');
 assert.ok(engine.includes('const LINKS ='), 'The network must define explicit cross-domain connections');
 for (const [a,b] of [['bio','myco'],['myco','soil'],['soil','lab'],['lab','iot'],['lab','products'],['products','work'],['work','iot'],['products','learn']]) {
   assert.ok(engine.includes("['" + a + "','" + b + "']"), 'Missing cross-domain link ' + a + ' → ' + b);
