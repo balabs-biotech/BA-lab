@@ -5917,13 +5917,18 @@ async function loadBiologicalLineage(cultureId, offset = 0) {
 
     const pageRows = data || [];
     const previousRows = Array.isArray(target.__lineageRows) ? target.__lineageRows : [];
-    const rows = offset === 0
-      ? pageRows
-      : [
-          ...pageRows.filter(row => row.relation !== 'descendant'),
-          ...previousRows.filter(row => row.relation === 'descendant'),
-          ...pageRows.filter(row => row.relation === 'descendant')
-        ];
+    const lineageRowKey = row => {
+      if (row.culture_id) return `${row.relation}:culture:${row.culture_id}`;
+      if (row.relation === 'material_ancestor' && row.material_id) {
+        return `material_ancestor:material:${row.material_id}`;
+      }
+      return `${row.relation}:depth:${row.depth ?? 0}`;
+    };
+    const lineageRowsByKey = new Map();
+    [...previousRows, ...pageRows].forEach(row => {
+      lineageRowsByKey.set(lineageRowKey(row), row);
+    });
+    const rows = Array.from(lineageRowsByKey.values());
     target.__lineageRows = rows;
     const current = rows.find(row => row.relation === 'current');
     if (!current) { target.textContent = biologicalWorkflowText("missing"); return; }
