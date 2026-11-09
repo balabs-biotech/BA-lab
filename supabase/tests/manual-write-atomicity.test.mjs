@@ -45,7 +45,7 @@ console.log("✓ Manual measurement and observation writes use atomic RPCs; clie
 const idempotencyMigration = readFileSync(path.join(root, "supabase/migrations/20261109110000_add_manual_write_idempotency.sql"), "utf8");
 for (const rpc of ["record_manual_measurement", "record_manual_observation"]) {
   const start = idempotencyMigration.indexOf("create or replace function public." + rpc + "(");
-  const end = idempotencyMigration.indexOf("$;", start);
+  const end = idempotencyMigration.indexOf("$$;", start);
   const sqlFunction = start >= 0 && end >= 0 ? idempotencyMigration.slice(start, end) : "";
   if (!sqlFunction.includes("p_idempotency_key uuid") ||
       !sqlFunction.includes("security definer") ||
