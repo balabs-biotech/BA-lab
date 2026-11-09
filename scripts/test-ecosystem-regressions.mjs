@@ -85,8 +85,8 @@ assert.ok(engine.includes('function goOverview()'), 'The user must be able to re
 assert.ok(engine.includes('function enterDomain(id)'), 'Domain entry must be implemented in the new engine');
 assert.ok(engine.includes('The active folder owns all taps while inside a universe'), 'A selected universe must not let adjacent domains steal folder taps');
 assert.ok(engine.includes('nearestLabelDistance<(window.innerWidth<760?58:70)'), 'Folder taps must resolve against the visible labels of the active hierarchy without stealing adjacent branches');
-assert.ok(engine.includes('if(selected&&distance>9.5){goBackLevel();return}'), 'Mobile pinch zoom-out must return one folder level at a time');
-assert.ok(engine.includes('if(selected&&e.deltaY>0&&nextDistance>9.5){goBackLevel();return}'), 'Desktop wheel zoom-out must return one folder level at a time');
+assert.ok(engine.includes('THREE.MathUtils.clamp(distance*Math.exp((pinchStart-d)*.006),1.25,60)'), 'Mobile pinch must zoom continuously through the full depth range without forcing hierarchy changes');
+assert.ok(engine.includes('THREE.MathUtils.clamp(distance*Math.exp(e.deltaY*.0016),1.25,60)'), 'Desktop wheel zoom must be exponential and continuous through the full depth range');
 assert.ok(!engine.includes('const bg=new THREE.BufferGeometry()'), 'The opening network must avoid decorative starfield geometry');
 
 assert.ok(engine.includes("fetch('./notion-tree.'+LANG()+'.json'"), 'The engine must load the active language Notion tree');
@@ -96,6 +96,8 @@ assert.ok(engine.includes('label.userData.denseRoot?19'), 'Dense root labels mus
 assert.ok(engine.includes('rootCount>16?(window.innerWidth<760?20.5:11.5):7.5'), 'Dense folders must fit the initial camera framing on mobile and desktop');
 assert.ok(previewEngine.includes('children.length>16') && previewEngine.includes('Math.sqrt((k+.5)/children.length)'), 'Preview must use the same dense-folder layout as the public explorer');
 assert.ok(previewEngine.includes('const maxDepth=3'), 'Preview and public engines must expose the same deepest Notion level');
+assert.ok(engine.includes('THREE.MathUtils.clamp(distance*Math.exp(e.deltaY*.0016),1.25,60)') && previewEngine.includes('THREE.MathUtils.clamp(distance*Math.exp(e.deltaY*.0016),1.25,60)'), 'Public and preview explorers must share continuous deep zoom behavior');
+assert.ok(!engine.includes('distance>9.5') && !previewEngine.includes('distance>9.5'), 'Zooming out must never unexpectedly pop the user to another hierarchy level');
 assert.ok(previewEngine.includes('nearestLabelDistance<(window.innerWidth<760?58:70)'), 'Preview branch hit radius must match the public engine on mobile and desktop');
 for (const language of ['fr', 'ar', 'en', 'pt']) {
   const tree = JSON.parse(readFileSync('ecosystem/notion-tree.' + language + '.json', 'utf8'));
@@ -118,7 +120,7 @@ assert.ok(engine.includes('const ancestors=[];let parent=data.parentNode'), 'Dir
 assert.ok(engine.includes("if(data.url){window.open(data.url"), 'Terminal pages must open their corresponding Notion page');
 assert.ok(!engine.includes("open.dataset.resourceOpen='true'"), 'The obsolete resource details panel must not be used for navigation');
 assert.ok(engine.includes("data-camera=\"back\""), 'The scene must expose a direct previous-level control');
-assert.ok(engine.includes("if(action==='out'){if(selected){goBackLevel();return}"), 'Zooming out inside a universe must return to the parent level instead of resetting the overview');
+assert.ok(engine.includes("if(action==='out')distance=Math.min(60,distance*1.28)"), 'Zoom-out control must preserve the active hierarchy and allow continuous camera travel');
 assert.ok(engine.includes('renderPath()'), 'The active folder path must remain visible in the scene');
 assert.ok(engine.includes('window.enterSphere(id,false,true)'), 'Domain selection must synchronize the hidden Notion content source');
 assert.ok(!html.includes("mainView.addEventListener('pointerdown',beginOrbit)"), 'Legacy orbit input must not compete with the clean engine');
