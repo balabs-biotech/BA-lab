@@ -27,8 +27,8 @@ const paginationEnd = source.indexOf('async function loadCultureDetail(cultureId
 const paginationLoader = source.slice(paginationStart, paginationEnd);
 assert.match(source, /function sortCultureEventTimelineEntries\(timeline, beforeElement = null\)/,
   'timeline must have a shared chronological sorter');
-assert.match(loader, /data\.cultureEventEntry = "true"/,
-  'initial event entries must be identifiable for global sorting');
+assert.match(source, /data\.cultureEventEntry = "true"/,
+  'initial and paginated event entries must be identifiable for global sorting');
 assert.match(loader, /sortCultureEventTimelineEntries\(timeline\)/,
   'initial event entries must be sorted after rendering');
 assert.match(paginationLoader, /data\.cultureEventEntry = "true"/,
