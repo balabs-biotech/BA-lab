@@ -405,9 +405,10 @@ function pickAt(x,y) {
 
 // Labels use screen-space sizing: zoom changes the scene, not the reading size.
 // The camera distance is measured per label so nested branches remain equally legible.
-const labelWorldPosition=new THREE.Vector3();
+let labelWorldPosition=null;
 function syncLabelScales() {
   if(!renderer||!camera)return;
+  if(!labelWorldPosition)labelWorldPosition=new THREE.Vector3();
   const viewportHeight=Math.max(1,renderer.domElement.clientHeight);
   const projection=2*Math.tan(THREE.MathUtils.degToRad(camera.fov*.5))/viewportHeight;
   const apply=label=>{
