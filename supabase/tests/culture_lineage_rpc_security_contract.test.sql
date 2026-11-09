@@ -31,6 +31,15 @@ begin
     raise exception 'FAIL: lineage RPC search_path must be pg_catalog: %', v_search_path;
   end if;
 
+  if not exists (
+    select 1 from pg_indexes
+     where schemaname = 'public'
+       and tablename = 'cultures'
+       and indexname = 'cultures_org_parent_idx'
+  ) then
+    raise exception 'FAIL: organization-scoped culture parent index is missing';
+  end if;
+
   if not has_function_privilege('authenticated', v_signature, 'EXECUTE')
      or has_function_privilege('anon', v_signature, 'EXECUTE')
      or exists (
