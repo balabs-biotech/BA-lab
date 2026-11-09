@@ -114,7 +114,7 @@ function makeLabel(text, color, size=16) {
   // Render labels at high texture resolution: zoom enlarges sprites, not glyph detail.
   canvas.width=2048; canvas.height=512;
   ctx.clearRect(0,0,canvas.width,canvas.height);
-  ctx.font='700 '+(size*4)+'px Inter,system-ui,sans-serif';
+  ctx.font='700 '+(size*14)+'px Inter,system-ui,sans-serif';
   ctx.textAlign='center';ctx.textBaseline='middle';
   // A firm dark keyline keeps pale glyphs readable over bright hyphae at every zoom level.
   ctx.lineJoin='round';ctx.lineWidth=30;ctx.strokeStyle='rgba(7,17,15,.96)';
@@ -122,7 +122,7 @@ function makeLabel(text, color, size=16) {
   const words=String(text).split(/\s+/);let lines=[],line='';
   for(const word of words){const next=line?line+' '+word:word;if(ctx.measureText(next).width>1880&&line){lines.push(line);line=word}else line=next}
   if(line)lines.push(line);
-  const shown=lines.slice(0,2),lineHeight=142,start=256-(shown.length-1)*lineHeight/2;
+  const shown=lines.slice(0,2),lineHeight=210,start=256-(shown.length-1)*lineHeight/2;
   shown.forEach((part,i)=>{const y=start+i*lineHeight;ctx.strokeText(part,1024,y);ctx.fillText(part,1024,y)});
   const texture=new THREE.CanvasTexture(canvas);texture.colorSpace=THREE.SRGBColorSpace;
   const material=new THREE.SpriteMaterial({map:texture,transparent:true,depthWrite:false,depthTest:false});
@@ -441,7 +441,7 @@ function syncLabelScales() {
     label.getWorldPosition(labelWorldPosition);
     const cameraDistance=Math.max(.1,camera.position.distanceTo(labelWorldPosition));
     const depth=label.userData.depth||0;
-    const targetPixels=label.userData.kind==='domain-label'?34:label.userData.denseRoot?30:Math.max(27,32-depth*2);
+    const compact=window.innerWidth<760;const targetPixels=label.userData.kind==='domain-label'?(compact?42:50):label.userData.denseRoot?(compact?38:44):Math.max(compact?34:40,(compact?44:50)-depth*2);
     const worldHeight=cameraDistance*projection*targetPixels;
     label.scale.set(worldHeight*4.25,worldHeight,1);
   };
