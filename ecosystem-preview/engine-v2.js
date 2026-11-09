@@ -454,7 +454,7 @@ function setupUI() {
   // so resolve that pointer-up at document capture using the same projected
   // screen coordinates as canvas picking.
   document.addEventListener('pointerup',e=>{if(e.pointerType!=='touch'||stage.contains(e.target)||!e.target.closest?.('.webgl-hit-target'))return;if(transition||performance.now()-lastPickAt<=120)return;pickAt(e.clientX,e.clientY)},true);
-  document.addEventListener('click',e=>{if(!e.detail||dragGesture||!renderer)return;if(e.target.closest?.('.webgl-controls,.webgl-focus,.webgl-intro,.webgl-hit-target'))return;const r=renderer.domElement.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)return;if(performance.now()-lastPickAt>120)pickAt(e.clientX,e.clientY)},true);
+  document.addEventListener('click',e=>{if(!e.detail||dragGesture||!renderer)return;if(e.target.closest?.('.webgl-controls,.webgl-focus,.webgl-intro,.webgl-hit-target,.webgl-branch-dock'))return;const r=renderer.domElement.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)return;if(performance.now()-lastPickAt>120)pickAt(e.clientX,e.clientY)},true);
   stage.addEventListener('lostpointercapture',onLostCapture);
   stage.addEventListener('contextmenu',e=>e.preventDefault());
   window.addEventListener('resize',resize);
