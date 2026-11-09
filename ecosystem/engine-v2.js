@@ -228,14 +228,14 @@ function clearResources() {
 function mDispose(material){material?.map?.dispose();material?.dispose?.()}
 function makeResourceLabel(item,color,depth=0) { const size=depth===0?18:depth===1?16:14;const label=makeLabel(item.title,color,size);const scale=depth===0?2.55:depth===1?1.95:1.5;label.scale.set(scale,depth===0?.58:depth===1?.48:.38,1);label.userData={...item,kind:'resource-label'};addResourceHitTarget(label);return label; }
 function addResourceHitTarget(label) {
- const button=document.createElement('button');button.type='button';button.className='webgl-hit-target webgl-resource-target';button.setAttribute('aria-label',(label.userData.title||label.userData.name||'Branche')+(label.userData.children?.length?' — ouvrir le dossier':' — ouvrir la page'));button.title=label.userData.title||label.userData.name||'';button.style.width=label.userData.depth===0?'112px':label.userData.depth===1?'92px':'78px';button.style.height=label.userData.depth===0?'54px':'46px';button.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();renderer?.domElement?.focus({preventScroll:true});openResource(label.userData)});stage.append(button);resourceHitTargets.set(label,button);
+ const button=document.createElement('button');button.type='button';button.className='webgl-hit-target webgl-resource-target';button.setAttribute('aria-label',(label.userData.title||label.userData.name||'Branche')+(label.userData.children?.length?' — ouvrir le dossier':' — ouvrir la page'));button.title=label.userData.title||label.userData.name||'';button.dataset.hasChildren=String(!!label.userData.children?.length);button.dataset.resourceUrl=label.userData.url||'';button.style.width=label.userData.depth===0?'112px':label.userData.depth===1?'92px':'78px';button.style.height=label.userData.depth===0?'54px':'46px';button.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();renderer?.domElement?.focus({preventScroll:true});openResource(label.userData)});stage.append(button);resourceHitTargets.set(label,button);
 }
 function syncResourceHitTargets() {
  if(!renderer||!camera||!stage)return;
  if(!_hitWorld)_hitWorld=new THREE.Vector3();
  camera.updateMatrixWorld(true);world?.updateMatrixWorld(true);
  const rect=renderer.domElement.getBoundingClientRect(),stageRect=stage.getBoundingClientRect();
- const place=(object,button)=>{object.getWorldPosition(_hitWorld);const p=_hitWorld.clone().project(camera);const visible=p.z>-1&&p.z<1&&p.x>=-1.12&&p.x<=1.12&&p.y>=-1.12&&p.y<=1.12;button.hidden=!visible;if(!visible)return;button.style.left=(rect.left+(p.x+1)*rect.width/2-stageRect.left)+'px';button.style.top=(rect.top+(1-p.y)*rect.height/2-stageRect.top)+'px'};
+ const place=(object,button)=>{object.getWorldPosition(_hitWorld);const p=_hitWorld.clone().project(camera);button.style.zIndex=String(Math.round(1000-(p.z+1)*400));const visible=p.z>-1&&p.z<1&&p.x>=-1.12&&p.x<=1.12&&p.y>=-1.12&&p.y<=1.12;button.hidden=!visible;if(!visible)return;button.style.left=(rect.left+(p.x+1)*rect.width/2-stageRect.left)+'px';button.style.top=(rect.top+(1-p.y)*rect.height/2-stageRect.top)+'px'};
  for(const {object,button} of domainHitTargets.values()){place(object,button);button.hidden=!opened||!!selected||button.hidden}
  for(const [label,button] of resourceHitTargets)place(label,button);
 }
