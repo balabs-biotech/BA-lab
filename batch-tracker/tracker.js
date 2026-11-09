@@ -5966,7 +5966,7 @@ async function loadBiologicalLineage(cultureId) {
         state: current.material_state
       }] : [])
     ];
-    const isTruncated = descendants.some(row => row.truncated);
+    const isTruncated = rows.some(row => row.relation === 'descendant' && row.truncated);
 
     const renderNode = (row, label) => {
       const node = document.createElement('button');
