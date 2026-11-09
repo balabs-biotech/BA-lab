@@ -16,7 +16,7 @@ assert.match(migration, /private\.is_org_member\(p_organization_id\)/i,
   'comparison must enforce active tenant membership');
 assert.match(migration, /jsonb_build_object\s*\([\s\S]*?'schema_version'/i,
   'response must carry an explicit schema version');
-for (const key of ['cultures', 'lineage', 'measurements', 'observations', 'events', 'batches', 'results', 'data_quality']) {
+for (const key of ['cultures', 'lineage', 'measurements', 'observations', 'events', 'batches', 'results', 'environmental_observations', 'data_quality']) {
   assert.match(migration, new RegExp(`'${key}'`, 'i'), `response must expose ${key}`);
 }
 assert.match(migration, /quality_state/i, 'measurement and observation quality states must be preserved');
@@ -29,6 +29,9 @@ assert.match(migration, /parent_culture_id/i, 'culture parent relationships must
 assert.match(migration, /parent_material_id/i, 'material provenance must be represented');
 assert.match(migration, /generation/i, 'material generation metadata must be represented');
 assert.match(migration, /observed_at/i, 'qualitative observations must retain their timestamp');
+assert.match(migration, /environmental_observations/i, 'weather and satellite observations must remain a distinct evidence family');
+assert.match(migration, /experimental_unit_id in \(select id from selected_units\)/i, 'events attached to experimental units must be included');
+assert.match(migration, /environmental_truncated/i, 'environmental evidence truncation must be explicit');
 assert.match(migration, /measured_at/i, 'quantitative measurements must retain their timestamp');
 assert.match(migration, /organization_id\s*=\s*p_organization_id/i,
   'every source read must be organization-scoped');
