@@ -6757,6 +6757,129 @@ function renderGenerationComparisonReport(report) {
   anomalySection.appendChild(anomalySafetyNote);
   target.appendChild(anomalySection);
 
+  // Chronological culture series: never merge different cultures, variables,
+  // units or quality states; shared environmental readings stay contextual.
+  const timeSeriesGroups = new Map();
+  let measurementsWithInvalidTime = 0;
+  cultureMeasurementRows.forEach(row => {
+    if (row.quality_state === "excluded") return;
+    const rawValue = row.normalized_value ?? row.raw_value;
+    const value = rawValue == null ? NaN : Number(rawValue);
+    if (!Number.isFinite(value)) return;
+    const timestamp = row.measured_at ? Date.parse(row.measured_at) : NaN;
+    if (!Number.isFinite(timestamp)) {
+      measurementsWithInvalidTime += 1;
+      return;
+    }
+    const unit = row.normalized_value != null
+      ? (row.normalized_unit_code || "unité normalisée non renseignée")
+      : (row.raw_unit_code || "unité brute non renseignée");
+    const quality = row.quality_state || "qualité non renseignée";
+    const cultureId = row.culture_id;
+    const variable = row.variable_code || "variable inconnue";
+    const key = [cultureId, variable, unit, quality].join("||");
+    if (!timeSeriesGroups.has(key)) {
+      timeSeriesGroups.set(key, {
+        cultureId,
+        culture: cultureCodes.get(cultureId) || cultureId,
+        variable,
+        unit,
+        quality,
+        points: []
+      });
+    }
+    timeSeriesGroups.get(key).points.push({
+      id: row.id || "",
+      timestamp,
+      value
+    });
+  });
+
+  const timeSeriesSection = document.createElement("section");
+  timeSeriesSection.className = "generation-comparison-section";
+  const timeSeriesTitle = document.createElement("h5");
+  timeSeriesTitle.textContent = "Évolution temporelle des mesures";
+  timeSeriesSection.appendChild(timeSeriesTitle);
+  const timeSeriesNote = document.createElement("p");
+  timeSeriesNote.className = "muted";
+  timeSeriesNote.textContent = "Séries séparées par culture, variable, unité et état qualité : unités comparables uniquement. Chaque variation est calculée par rapport au relevé chronologiquement précédent. Les relevés environnementaux partagés restent hors de ces séries.";
+  timeSeriesSection.appendChild(timeSeriesNote);
+
+  const timeSeriesFormat = value => new Intl.NumberFormat(undefined, {
+    maximumSignificantDigits: 5
+  }).format(value);
+  const sortedTimeSeries = [...timeSeriesGroups.values()].sort((a, b) =>
+    String(a.culture).localeCompare(String(b.culture)) ||
+    a.variable.localeCompare(b.variable) || a.unit.localeCompare(b.unit)
+  );
+  sortedTimeSeries.forEach(series => {
+    series.points.sort((a, b) => a.timestamp - b.timestamp ||
+      String(a.id).localeCompare(String(b.id)));
+    const heading = document.createElement("h6");
+    heading.textContent = series.culture + " · " + series.variable +
+      " · " + series.unit + " · " + series.quality +
+      " · " + series.points.length + " relevé(s)";
+    timeSeriesSection.appendChild(heading);
+
+    const table = document.createElement("table");
+    table.className = "statistics-table";
+    const head = document.createElement("thead");
+    const headerRow = document.createElement("tr");
+    ["Date", "Valeur", "Variation depuis le relevé précédent", "Variation (%)", "Délai"]
+      .forEach(label => {
+        const th = document.createElement("th");
+        th.textContent = label;
+        headerRow.appendChild(th);
+      });
+    head.appendChild(headerRow);
+    table.appendChild(head);
+    const body = document.createElement("tbody");
+    series.points.forEach((point, index) => {
+      const previous = index > 0 ? series.points[index - 1] : null;
+      const delta = previous ? point.value - previous.value : null;
+      const percent = previous && previous.value !== 0
+        ? (delta / Math.abs(previous.value)) * 100
+        : null;
+      const elapsedDays = previous
+        ? (point.timestamp - previous.timestamp) / 86400000
+        : null;
+      const cells = [
+        new Date(point.timestamp).toLocaleString(),
+        timeSeriesFormat(point.value) + " " + series.unit,
+        previous ? (delta > 0 ? "+" : "") + timeSeriesFormat(delta) + " " + series.unit : "—",
+        previous
+          ? (percent == null ? "variation en % non calculable (valeur précédente nulle)"
+            : (percent > 0 ? "+" : "") + timeSeriesFormat(percent) + " %")
+          : "—",
+        previous ? timeSeriesFormat(elapsedDays) + " jour(s)" : "Premier relevé"
+      ];
+      const rowElement = document.createElement("tr");
+      cells.forEach(value => {
+        const cell = document.createElement("td");
+        cell.textContent = value;
+        rowElement.appendChild(cell);
+      });
+      body.appendChild(rowElement);
+    });
+    table.appendChild(body);
+    timeSeriesSection.appendChild(table);
+  });
+
+  if (!sortedTimeSeries.length) {
+    const empty = document.createElement("p");
+    empty.className = "muted";
+    empty.textContent = "Aucune série chronologique exploitable pour les cultures sélectionnées.";
+    timeSeriesSection.appendChild(empty);
+  }
+  if (measurementsWithInvalidTime) {
+    const invalidTimeNote = document.createElement("p");
+    invalidTimeNote.className = "muted";
+    invalidTimeNote.textContent = measurementsWithInvalidTime +
+      " mesure(s) numérique(s) ignorée(s) dans les séries : date non exploitable.";
+    timeSeriesSection.appendChild(invalidTimeNote);
+  }
+  target.appendChild(timeSeriesSection);
+
   sections.forEach(([key, title]) => {
     const rows = Array.isArray(report[key]) ? report[key] : [];
     const section = document.createElement("section");
