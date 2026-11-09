@@ -135,34 +135,47 @@ function createWorld() {
   const key=new THREE.PointLight(0xa6c1ad,24,35);key.position.set(0,7,8);scene.add(key);
   const warm=new THREE.PointLight(0xb96b4d,9,26);warm.position.set(7,-3,3);scene.add(warm);
   const fill=new THREE.PointLight(0x78958a,15,32);fill.position.set(-7,-2,-5);scene.add(fill);
+  // Sparse background hyphae connect the field without forming panels or solid spheres.
+  let fieldSeed=81273;const fieldRand=()=>{fieldSeed=(fieldSeed*16807)%2147483647;return(fieldSeed-1)/2147483646};
+  const fieldPalette=[0x263b38,0xb96b4d,0xd1d0c5,0x78958a];
+  for(let i=0;i<58;i++){const start=new THREE.Vector3(-5+fieldRand()*10,-4+fieldRand()*8,-3.5+fieldRand()*7),end=start.clone().add(new THREE.Vector3((fieldRand()-.5)*3.2,(fieldRand()-.5)*2.8,(fieldRand()-.5)*1.8)),mid=start.clone().lerp(end,.5).add(new THREE.Vector3((fieldRand()-.5)*.8,(fieldRand()-.5)*.8,(fieldRand()-.5)*.5)),curve=new THREE.CatmullRomCurve3([start,mid,end]),color=fieldPalette[Math.floor(fieldRand()*fieldPalette.length)];world.add(new THREE.Mesh(new THREE.TubeGeometry(curve,18,.0018+fieldRand()*.002,3,false),new THREE.MeshBasicMaterial({color,transparent:true,opacity:.10+fieldRand()*.14,depthWrite:false})));if(i%2===0){const at=curve.getPoint(.48),tip=at.clone().add(new THREE.Vector3((fieldRand()-.5)*1.5,(fieldRand()-.5)*1.5,(fieldRand()-.5)*.8)),fork=new THREE.CatmullRomCurve3([at,at.clone().lerp(tip,.5).add(new THREE.Vector3(0,.05,.03)),tip]);world.add(new THREE.Mesh(new THREE.TubeGeometry(fork,12,.0016,3,false),new THREE.MeshBasicMaterial({color,transparent:true,opacity:.12,depthWrite:false})));}}
   for(const id of IDS){
     const color=COLORS[id],pos=new THREE.Vector3(...POS[id]);
     const group=new THREE.Group();group.position.copy(pos);group.userData={id,kind:'domain'};
-    const soma=new THREE.Mesh(makeCellGeometry(id),new THREE.MeshStandardMaterial({color,roughness:.42,metalness:.08,emissive:color,emissiveIntensity:.21}));
-    soma.scale.set(id==='soil'?.62:.56,id==='lab'?.48:.61,id==='myco'?.66:.55);
-    soma.material.transparent=true;soma.material.opacity=.84;
-    const nucleus=new THREE.Mesh(new THREE.SphereGeometry(.19,18,14),new THREE.MeshStandardMaterial({color:0xe4e4cf,roughness:.3,metalness:.05,emissive:color,emissiveIntensity:.28,transparent:true,opacity:.88}));
-    nucleus.position.set(.04,.02,.08);group.add(nucleus);
-    soma.userData={id,kind:'domain'};group.add(soma);
+    // Open hyphal junction: the identity node is a branching intersection, not a solid cell.
+    const soma=new THREE.Group();soma.userData={id,kind:'domain'};group.add(soma);
+    for(let strand=0;strand<7;strand++){
+      const a=strand/7*Math.PI*2+IDS.indexOf(id)*.23;
+      const start=new THREE.Vector3(Math.cos(a)*.025,Math.sin(a)*.025,-.045);
+      const end=new THREE.Vector3(Math.cos(a+.72)*.19,Math.sin(a+.72)*.16,.075+(strand%3)*.025);
+      const mid=start.clone().lerp(end,.52).add(new THREE.Vector3(0,.025,.035));
+      const curve=new THREE.CatmullRomCurve3([start,mid,end]);
+      const strandMesh=new THREE.Mesh(new THREE.TubeGeometry(curve,16,.0045,4,false),new THREE.MeshStandardMaterial({color,emissive:color,emissiveIntensity:.28,transparent:true,opacity:.8,roughness:.8}));
+      soma.add(strandMesh);
+    }
     const glow=new THREE.Mesh(new THREE.SphereGeometry(1.18,24,18),new THREE.MeshBasicMaterial({color,transparent:true,opacity:.035,side:THREE.BackSide,depthWrite:false}));
     glow.scale.copy(soma.scale);group.add(glow);
     const label=makeLabel(LABELS[id]?.title||id, color, 17);label.position.set(0,-.94,0);label.scale.set(2.8,.66,1);label.userData={id,kind:'domain-label'};group.add(label);
     const hit=new THREE.Mesh(new THREE.SphereGeometry(.96,16,12),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));hit.userData={id,kind:'domain'};group.add(hit);
     world.add(group);cells.set(id,{group,soma,label,hit,position:pos,color});
     pickables.push(soma,hit,label);
-    for(let j=0;j<11;j++){
-      const a=j/11*Math.PI*2+IDS.indexOf(id)*.31;
-      const start=new THREE.Vector3(Math.cos(a)*.34,Math.sin(a)*.32,Math.sin(a*1.7)*.05);
-      const reach=1.05+(j%4)*.19;
-      const end=new THREE.Vector3(Math.cos(a)*reach,Math.sin(a)*reach*.78,Math.sin(a*1.7)*.42);
-      const mid=start.clone().lerp(end,.52).add(new THREE.Vector3(Math.cos(a+1)*.22,Math.sin(a+1)*.2,.18));
+    for(let j=0;j<14;j++){
+      const a=j/14*Math.PI*2+IDS.indexOf(id)*.31;
+      const start=new THREE.Vector3(Math.cos(a)*.10,Math.sin(a)*.09,Math.sin(a*1.7)*.035);
+      const reach=1.0+(j%4)*.24;
+      const end=new THREE.Vector3(Math.cos(a)*reach,Math.sin(a)*reach*.76,Math.sin(a*1.7)*.34);
+      const mid=start.clone().lerp(end,.52).add(new THREE.Vector3(Math.cos(a+1)*.18,Math.sin(a+1)*.16,.13));
       const curve=new THREE.CatmullRomCurve3([start,mid,end]);
-      const neurite=new THREE.Mesh(new THREE.TubeGeometry(curve,20,.012,5,false),new THREE.MeshStandardMaterial({color,emissive:color,emissiveIntensity:.48,transparent:true,opacity:.72}));
+      const neurite=new THREE.Mesh(new THREE.TubeGeometry(curve,28,.0065+(j%3)*.0014,5,false),new THREE.MeshStandardMaterial({color,emissive:color,emissiveIntensity:.28,transparent:true,opacity:.76,roughness:.7}));
       neurite.userData={id,kind:'neurite'};group.add(neurite);
-      const forkStart=curve.getPoint(.58),forkEnd=forkStart.clone().add(new THREE.Vector3(Math.cos(a+.48)*.48,Math.sin(a+.48)*.38,.13));
-      const forkCurve=new THREE.CatmullRomCurve3([forkStart,forkStart.clone().lerp(forkEnd,.55).add(new THREE.Vector3(0,.08,.08)),forkEnd]);
-      const fork=new THREE.Mesh(new THREE.TubeGeometry(forkCurve,12,.007,4,false),new THREE.MeshStandardMaterial({color,emissive:color,emissiveIntensity:.4,transparent:true,opacity:.58}));group.add(fork);
-      const tip=new THREE.Mesh(new THREE.SphereGeometry(.022,7,5),new THREE.MeshBasicMaterial({color}));tip.position.copy(end);group.add(tip);
+      for(let fork=0;fork<2;fork++){
+        const at=curve.getPoint(.48+fork*.22),side=fork===0?-1:1;
+        const forkEnd=at.clone().add(new THREE.Vector3(Math.cos(a+side*.72)*(.34+(j%3)*.08),Math.sin(a+side*.72)*(.28+(j%2)*.07),.07));
+        const forkCurve=new THREE.CatmullRomCurve3([at,at.clone().lerp(forkEnd,.55).add(new THREE.Vector3(0,.035,.035)),forkEnd]);
+        group.add(new THREE.Mesh(new THREE.TubeGeometry(forkCurve,14,.0038,4,false),new THREE.MeshStandardMaterial({color,emissive:color,emissiveIntensity:.22,transparent:true,opacity:.52,roughness:.8})));
+      }
+      const tip=new THREE.Mesh(new THREE.SphereGeometry(.026+(j%3)*.006,8,6),new THREE.MeshStandardMaterial({color,roughness:.75,emissive:color,emissiveIntensity:.18}));
+      tip.position.copy(end);group.add(tip);
     }
   }
   LINKS.forEach(([a,b],index)=>{
