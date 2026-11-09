@@ -6683,6 +6683,80 @@ function renderGenerationComparisonReport(report) {
   replicateSection.appendChild(replicateLimit);
   target.appendChild(replicateSection);
 
+  // Candidate anomaly flags are descriptive only and operate on unit medians.
+  const anomalySection = document.createElement("section");
+  anomalySection.className = "generation-comparison-section";
+  const anomalyTitle = document.createElement("h5");
+  anomalyTitle.textContent = "Repérage descriptif des valeurs atypiques";
+  anomalySection.appendChild(anomalyTitle);
+  const anomalyNote = document.createElement("p");
+  anomalyNote.className = "muted";
+  anomalyNote.textContent = "Repérage par bornes de Tukey (1,5 × IQR) sur les médianes des unités expérimentales. Un signalement est une piste de vérification, pas une preuve d'erreur ni un motif d'exclusion.";
+  anomalySection.appendChild(anomalyNote);
+
+  const anomalyEligibleCohorts = eligibleCohorts.filter(cohort => cohort.units.length >= 4);
+  const insufficientAnomalyCohorts = eligibleCohorts.filter(cohort => cohort.units.length < 4);
+  insufficientAnomalyCohorts.forEach(cohort => {
+    const note = document.createElement("p");
+    note.className = "muted";
+    note.textContent = cohort.experiment + " / " + cohort.treatment + " / " +
+      cohort.variable + " : effectif insuffisant pour le repérage IQR (n = " +
+      cohort.units.length + " unités distinctes ; minimum = 4).";
+    anomalySection.appendChild(note);
+  });
+
+  let flaggedAnomalies = 0;
+  const anomalyFormat = value => new Intl.NumberFormat(undefined, {
+    maximumSignificantDigits: 5
+  }).format(value);
+  const anomalyQuantile = (sorted, probability) => {
+    const position = (sorted.length - 1) * probability;
+    const lower = Math.floor(position);
+    const upper = Math.ceil(position);
+    return lower === upper ? sorted[lower] :
+      sorted[lower] + (sorted[upper] - sorted[lower]) * (position - lower);
+  };
+  anomalyEligibleCohorts.forEach(cohort => {
+    const values = cohort.units.map(unit => unit.median).sort((a, b) => a - b);
+    const q1 = anomalyQuantile(values, .25);
+    const q3 = anomalyQuantile(values, .75);
+    const iqr = q3 - q1;
+    const lowerFence = q1 - 1.5 * iqr;
+    const upperFence = q3 + 1.5 * iqr;
+    cohort.units.forEach(unit => {
+      if (unit.median < lowerFence || unit.median > upperFence) {
+        flaggedAnomalies += 1;
+        const candidate = document.createElement("p");
+        candidate.textContent = cohort.experiment + " / " + cohort.treatment +
+          " / " + cohort.variable + " : valeur atypique candidate — à vérifier · unité " +
+          unit.unitCode + " · médiane " + anomalyFormat(unit.median) + " " + cohort.unit +
+          " · bornes IQR " + anomalyFormat(lowerFence) + " à " + anomalyFormat(upperFence);
+        anomalySection.appendChild(candidate);
+      }
+    });
+  });
+  if (!eligibleCohorts.length) {
+    const empty = document.createElement("p");
+    empty.className = "muted";
+    empty.textContent = "Aucun groupe avec au moins deux unités expérimentales distinctes ne permet ce repérage.";
+    anomalySection.appendChild(empty);
+  } else if (!anomalyEligibleCohorts.length) {
+    const empty = document.createElement("p");
+    empty.className = "muted";
+    empty.textContent = "Aucun groupe n'atteint l'effectif minimal de quatre unités distinctes pour le repérage IQR.";
+    anomalySection.appendChild(empty);
+  } else if (!flaggedAnomalies) {
+    const empty = document.createElement("p");
+    empty.className = "muted";
+    empty.textContent = "Aucune médiane d'unité ne dépasse les bornes IQR dans les groupes évaluables.";
+    anomalySection.appendChild(empty);
+  }
+  const anomalySafetyNote = document.createElement("p");
+  anomalySafetyNote.className = "muted";
+  anomalySafetyNote.textContent = "Aucune mesure atypique n'est exclue automatiquement. Vérifier le cahier de laboratoire, le protocole, les unités et la saisie avant toute interprétation.";
+  anomalySection.appendChild(anomalySafetyNote);
+  target.appendChild(anomalySection);
+
   sections.forEach(([key, title]) => {
     const rows = Array.isArray(report[key]) ? report[key] : [];
     const section = document.createElement("section");
