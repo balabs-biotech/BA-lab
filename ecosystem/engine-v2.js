@@ -228,6 +228,8 @@ function clearResources() {
 function mDispose(material){material?.map?.dispose();material?.dispose?.()}
 function makeResourceLabel(item,color,depth=0) {
  const size=depth===0?18:depth===1?16:14,label=makeLabel(item.title,color,size);
+ const scale=depth===0?3.35:depth===1?2.9:2.5;
+ label.scale.set(scale,depth===0?.86:depth===1?.76:.68,1);
  label.userData={...item,kind:'resource-label'};addResourceHitTarget(label);return label;
 }
 function addResourceHitTarget(label) {
@@ -236,11 +238,13 @@ function addResourceHitTarget(label) {
  if(hasChildren){element.type='button';element.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();stage?.focus({preventScroll:true});openResource(data)});}
  else {element.href=data.url||'#';element.target='_blank';element.rel='noopener noreferrer';element.addEventListener('click',e=>{if(!data.url)e.preventDefault();});}
  element.className='webgl-hit-target webgl-resource-target';
+ element.textContent=data.title||data.name||'Ouvrir';
+ const compact=window.innerWidth<760;
+ const width=Math.min(compact?210:280,Math.max(compact?128:150,String(element.textContent).length*(compact?7.4:8.5)+32));
+ Object.assign(element.style,{display:'block',opacity:'1',visibility:'visible',color:'#f4f5ed',background:'rgba(13,25,23,.96)',border:'1px solid rgba(185,107,77,.9)',borderRadius:'10px',boxShadow:'0 5px 18px rgba(0,0,0,.55)',font:'750 '+(compact?'14px':'16px')+'/1.2 system-ui,sans-serif',textAlign:'center',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis',padding:'0 11px',width:width+'px',height:compact?'46px':'48px',minWidth:compact?'128px':'150px',maxWidth:compact?'210px':'280px',pointerEvents:'auto',touchAction:'manipulation',transform:'translate(-50%,-50%)',cursor:'pointer'});
  element.setAttribute('aria-label',(data.title||data.name||'Branche')+(hasChildren?' — ouvrir le dossier':' — ouvrir la page'));
  element.title=data.title||data.name||'';
  element.dataset.hasChildren=String(hasChildren);element.dataset.depth=String(data.depth||0);element.dataset.resourceUrl=data.url||'';
- element.style.width=data.depth===0?'82px':data.depth===1?'72px':'64px';
- element.style.height=data.depth===0?'76px':'68px';
  stage.append(element);resourceHitTargets.set(label,element);
 }
 function syncResourceHitTargets() {
@@ -248,7 +252,7 @@ function syncResourceHitTargets() {
  if(!_hitWorld)_hitWorld=new THREE.Vector3();
  camera.updateMatrixWorld(true);world?.updateMatrixWorld(true);
  const rect=renderer.domElement.getBoundingClientRect(),stageRect=stage.getBoundingClientRect();
- const place=(object,button)=>{object.getWorldPosition(_hitWorld);const p=_hitWorld.clone().project(camera);button.style.setProperty('z-index',String(Math.round(12000-Number(button.dataset.depth||0)*1000+(1000-(p.z+1)*400))),'important');const visible=p.z>-1&&p.z<1&&p.x>=-1.12&&p.x<=1.12&&p.y>=-1.12&&p.y<=1.12;button.hidden=!visible;if(!visible)return;button.style.left=(rect.left+(p.x+1)*rect.width/2-stageRect.left)+'px';button.style.top=(rect.top+(1-p.y)*rect.height/2-stageRect.top)+'px'};
+ const place=(object,button)=>{object.getWorldPosition(_hitWorld);const p=_hitWorld.clone().project(camera);button.style.setProperty('z-index',String(Math.round(20000-Number(button.dataset.depth||0)*1000+(1000-(p.z+1)*400))),'important');const visible=p.z>-1&&p.z<1&&p.x>=-1.12&&p.x<=1.12&&p.y>=-1.12&&p.y<=1.12;button.hidden=!visible;if(!visible)return;button.style.left=(rect.left+(p.x+1)*rect.width/2-stageRect.left)+'px';button.style.top=(rect.top+(1-p.y)*rect.height/2-stageRect.top)+'px'};
  for(const {object,button} of domainHitTargets.values()){place(object,button);button.hidden=!opened||!!selected||button.hidden}
  for(const [label,button] of resourceHitTargets)place(label,button);
 }
