@@ -239,6 +239,7 @@ jobs:
         run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/sensitive_rpc_search_path_contract.test.sql
       - name: Verify recursive culture lineage RPC security contract after replay
         run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/culture_lineage_rpc_security_contract.test.sql
+        run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/culture_generation_comparison_rpc_security_contract.test.sql
       - name: Verify culture event history RPC security contract after replay
         run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/culture_event_history_rpc_security_contract.test.sql
       - name: Verify idempotent culture generation RPC security contract after replay
