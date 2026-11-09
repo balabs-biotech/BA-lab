@@ -28,6 +28,10 @@ assert.match(migration, /p_offset integer default 0/,
   'lineage RPC must expose an offset parameter');
 assert.match(migration, /d\.row_number > v_offset and d\.row_number <= \(v_offset \+ v_limit\)/,
   'lineage RPC must return a bounded descendant page');
+assert.doesNotMatch(migration, /count\(\*\)\s+over\s*\(\)/i,
+  'lineage RPC must not calculate the same full descendant count in a window and aggregate');
+assert.match(migration, /descendant_stats as \([\s\S]*?count\(\*\)::bigint as total_count from descendants/i,
+  'lineage RPC must calculate the exact descendant total in one aggregate');
 assert.doesNotMatch(loader, /\.from\(['"]cultures['"]\)|\.from\(['"]materials['"]\)/,
   'lineage loader must not fetch whole tenant culture or material tables');
 assert.match(loader, /relation === 'ancestor'/);
