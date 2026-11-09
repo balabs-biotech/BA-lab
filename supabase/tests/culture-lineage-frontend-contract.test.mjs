@@ -189,6 +189,14 @@ assert.match(reportRenderer, /Contexte environnemental par lieu/,
   'the report must render a dedicated location-linked environmental section');
 assert.match(reportRenderer, /location_id/,
   'environmental observations must be matched only to the recorded location');
+assert.match(reportRenderer, /contextRelations/,
+  'environmental context must preserve whether it came from the culture or a linked batch');
+assert.match(reportRenderer, /batchCodes/,
+  'environmental context must retain the production batch identifiers that supplied the location');
+assert.match(reportRenderer, /Lots liés/,
+  'the report must visibly disclose the linked production batches behind contextual observations');
+assert.match(reportRenderer, /environnement déclaré sur la culture/,
+  'the UI must distinguish a culture-declared environment from a batch-derived location');
 assert.match(reportRenderer, /résolution spatiale/,
   'gridded environmental observations must disclose their spatial resolution');
 assert.match(reportRenderer, /ne sont pas des mesures directes de la culture/,
