@@ -375,7 +375,7 @@ select 'PASS: recursive lineage ancestors, descendants, material provenance, tru
 -- Event history must include events attached to the selected culture and the
 -- operation event that created it, even though that operation is attached to
 -- the parent culture.
-\\i supabase/migrations/20261109190000_add_culture_event_history_rpc.sql
+\i supabase/migrations/20261109190000_add_culture_event_history_rpc.sql
 set role authenticated;
 do $culture_history$
 declare
