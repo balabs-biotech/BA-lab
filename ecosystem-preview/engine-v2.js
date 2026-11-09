@@ -459,7 +459,7 @@ function syncLabelScales() {
     label.getWorldPosition(labelWorldPosition);
     const cameraDistance=Math.max(.1,camera.position.distanceTo(labelWorldPosition));
     const depth=label.userData.depth||0;
-    const targetPixels=label.userData.kind==='domain-label'?25:label.userData.denseRoot?19:Math.max(17,23-depth*2);
+    const targetPixels=label.userData.kind==='domain-label'?32:label.userData.denseRoot?26:Math.max(24,29-depth*2);
     const worldHeight=cameraDistance*projection*targetPixels;
     label.scale.set(worldHeight*4.25,worldHeight,1);
   };
