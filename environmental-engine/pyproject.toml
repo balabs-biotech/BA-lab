@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ba-environmental-engine"
+version = "0.1.0"
+description = "Traceable environmental indicators for BA Labs CultureOps"
+requires-python = ">=3.10"
+dependencies = [
+  "pydantic>=2.7,<3",
+  "numpy>=1.26,<3",
+  "pandas>=2.2,<3",
+]
+
+[project.optional-dependencies]
+api = ["fastapi>=0.110,<1", "uvicorn[standard]>=0.29,<1"]
+dev = ["pytest>=8,<9", "httpx>=0.27,<1", "ruff>=0.4,<1"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+addopts = "-ra"
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
