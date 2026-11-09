@@ -22,6 +22,20 @@ assert.match(loader, /source_relation === "creation_operation"/,
   'culture detail must label the operation that created a descendant');
 assert.match(loader, /eventHistory\?\.some\(row => row\.has_more === true\)/,
   'culture detail must surface server-reported partial event history');
+const paginationStart = source.indexOf('async function loadMoreCultureEventHistory(');
+const paginationEnd = source.indexOf('async function loadCultureDetail(cultureId) {', paginationStart);
+const paginationLoader = source.slice(paginationStart, paginationEnd);
+assert.match(source, /function sortCultureEventTimelineEntries\(timeline, beforeElement = null\)/,
+  'timeline must have a shared chronological sorter');
+assert.match(loader, /data\.cultureEventEntry = "true"/,
+  'initial event entries must be identifiable for global sorting');
+assert.match(loader, /sortCultureEventTimelineEntries\(timeline\)/,
+  'initial event entries must be sorted after rendering');
+assert.match(paginationLoader, /data\.cultureEventEntry = "true"/,
+  'paginated event entries must be identifiable for global sorting');
+assert.match(paginationLoader, /sortCultureEventTimelineEntries\(timeline, button\)/,
+  'new pages must be merged into global chronological order without moving the pagination control');
+
 assert.match(migration, /security definer/i, 'event history RPC must be security definer');
 assert.match(migration, /set search_path = pg_catalog/i, 'event history RPC must pin search_path');
 assert.match(migration, /private\.is_org_member\(p_organization_id\)/,
