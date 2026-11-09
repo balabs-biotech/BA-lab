@@ -6987,12 +6987,16 @@ function renderGenerationComparisonReport(report) {
         coordinateAccuracy: context.coordinate_accuracy_m,
         coordinateSource: context.coordinate_source,
         environments: new Set(),
-        cultures: new Set()
+        cultures: new Set(),
+        contextRelations: new Set(),
+        batchCodes: new Set()
       });
     }
     const locationContext = contextsByLocation.get(context.location_id);
     locationContext.cultures.add(cultureCodes.get(context.culture_id) || context.culture_id);
     if (context.environment_name) locationContext.environments.add(context.environment_name);
+    if (context.context_relation) locationContext.contextRelations.add(context.context_relation);
+    if (context.batch_code) locationContext.batchCodes.add(context.batch_code);
   });
 
   const environmentalSeriesGroups = new Map();
@@ -7066,6 +7070,13 @@ function renderGenerationComparisonReport(report) {
       : "résolution spatiale : " + environmentalFormat(series.resolution) + " m";
     provenance.textContent = "Lieu : " + location.locationName +
       " · Cultures associées : " + [...location.cultures].join(", ") +
+      " · Lien de contexte : " + ([...location.contextRelations].map(relation => ({
+        culture_environment: "environnement déclaré sur la culture",
+        linked_batch_environment: "environnement d'un lot lié",
+        linked_batch_location: "lieu déclaré sur un lot lié"
+      })[relation] || relation).join(", ") || "origine non précisée") +
+      (location.batchCodes.size ? " · Lots liés : " + [...location.batchCodes].join(", ") : "") +
+      " · Environnements : " + ([...location.environments].join(", ") || "non renseigné") +
       " · Source : " + series.provider + " / " + series.dataset +
       " · " + resolutionLabel +
       " · précision déclarée des coordonnées : " +
