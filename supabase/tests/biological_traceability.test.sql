@@ -24,10 +24,10 @@ create table public.organizations(id uuid primary key);
 create table public.organization_members(organization_id uuid not null, user_id uuid not null, primary key(organization_id,user_id));
 create or replace function private.is_org_member(p_org uuid) returns boolean
   language sql stable security definer set search_path = pg_catalog, public
-  as $ select exists(select 1 from public.organization_members m where m.organization_id=p_org and m.user_id=auth.uid()) $;
+  as $writer$ select exists(select 1 from public.organization_members m where m.organization_id=p_org and m.user_id=auth.uid()) $writer$;
 create or replace function private.is_org_writer(p_org uuid) returns boolean
   language sql stable security definer set search_path = pg_catalog, public
-  as $ select exists(select 1 from public.organization_members m where m.organization_id=p_org and m.user_id=auth.uid()) $;
+  as $writer$ select exists(select 1 from public.organization_members m where m.organization_id=p_org and m.user_id=auth.uid()) $writer$;
 create table public.material_types(code text primary key);
 create table public.culture_types(code text primary key);
 create table public.strains(organization_id uuid not null, id uuid not null default gen_random_uuid(), primary key(organization_id,id));
