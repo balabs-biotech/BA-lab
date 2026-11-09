@@ -125,6 +125,7 @@ async function checkWorkingScene(name, viewport) {
   await page.evaluate(() => { window.__BALABS_3D_TARGET_EVENTS__=[]; window.__BALABS_3D_DOCUMENT_CLICK__=null; });
   let navigated = false;
   let openedNotion = false;
+  let zoomOutChecked = false;
   for (let level = 0; level < 8; level++) {
     await page.waitForFunction(() => (window.__BALABS_3D_E2E__()?.visible || 0) > 0, undefined, { timeout: 12000 });
     const probe = await page.evaluate(() => window.__BALABS_3D_E2E__());
@@ -137,6 +138,24 @@ async function checkWorkingScene(name, viewport) {
       await page.waitForFunction((before) => (window.__BALABS_3D_E2E__()?.depth || 0) > before, depthBefore, { timeout: 8000 }).catch(async error => { throw new Error(name + ': nested branch tap did not advance. ' + JSON.stringify(await page.evaluate((title) => { const b=[...document.querySelectorAll('.webgl-hit-target')].find(x=>x.title===title); const r=b?.getBoundingClientRect(); const x=r?r.left+r.width/2:0,y=r?r.top+r.height/2:0,e=document.elementFromPoint(x,y); return {events:window.__BALABS_3D_TARGET_EVENTS__,documentClick:window.__BALABS_3D_DOCUMENT_CLICK__,probe:window.__BALABS_3D_E2E__(),viewport:{innerWidth,innerHeight,clientWidth:document.documentElement.clientWidth,clientHeight:document.documentElement.clientHeight},stage:(()=>{const q=document.querySelector('.webgl-stage')?.getBoundingClientRect();return q&&{x:q.x,y:q.y,width:q.width,height:q.height}})(),button:b&&{hidden:b.hidden,inline:{left:b.style.left,top:b.style.top},rect:r&&{x:r.x,y:r.y,width:r.width,height:r.height},computed:{position:getComputedStyle(b).position,zIndex:getComputedStyle(b).zIndex,pointerEvents:getComputedStyle(b).pointerEvents}},element:{tag:e?.tagName,className:typeof e?.className==='string'?e.className:'',isTarget:e===b}}; }, branchTarget.title)) + ' — ' + error.message); });
       navigated = true;
       await page.waitForFunction(() => !document.querySelector('#mainView .webgl-stage')?.classList.contains('is-transitioning'), undefined, { timeout: 8000 });
+      if (!zoomOutChecked) {
+        const nestedDepth = await page.evaluate(() => window.__BALABS_3D_E2E__()?.depth || 0);
+        assert.ok(nestedDepth > 0, name + ': nested depth must be available before testing zoom-out');
+        await page.locator('.webgl-controls [data-camera="out"]').evaluate((button) => button.click());
+        await page.waitForFunction((previous) => (window.__BALABS_3D_E2E__()?.depth || 0) < previous,
+          nestedDepth, { timeout: 8000 });
+        const parentDepth = await page.evaluate(() => window.__BALABS_3D_E2E__()?.depth || 0);
+        assert.equal(parentDepth, nestedDepth - 1,
+          name + ': zoom-out must return exactly one hierarchy level');
+        zoomOutChecked = true;
+        await page.waitForFunction(() => !document.querySelector('#mainView .webgl-stage')?.classList.contains('is-transitioning'), undefined, { timeout: 8000 });
+        const parentTarget = await page.evaluate(() => window.__BALABS_3D_E2E__()?.target || null);
+        assert.ok(parentTarget?.hasChildren, name + ': parent view must expose the folder again after zoom-out');
+        await tapSpatialTarget(page, name, parentTarget.x, parentTarget.y);
+        await page.waitForFunction((previous) => (window.__BALABS_3D_E2E__()?.depth || 0) > previous,
+          parentDepth, { timeout: 8000 });
+        await page.waitForFunction(() => !document.querySelector('#mainView .webgl-stage')?.classList.contains('is-transitioning'), undefined, { timeout: 8000 });
+      }
       continue;
     }
     assert.ok(branchTarget.url, name + ': terminal branch must carry its Notion destination');
@@ -151,17 +170,8 @@ async function checkWorkingScene(name, viewport) {
   }
   assert.ok(navigated, name + ': tapping a folder must reveal a deeper spatial level');
   assert.ok(openedNotion, name + ': tapping a terminal page must open Notion');
-  const depthBeforeZoomOut = await page.evaluate(() => window.__BALABS_3D_E2E__()?.depth || 0);
-  assert.ok(depthBeforeZoomOut > 0, name + ': nested navigation depth was not retained before zoom-out');
-  await page.locator('.webgl-controls [data-camera="out"]').evaluate((button) => button.click());
-  await page.waitForFunction((previous) => {
-    const probe = window.__BALABS_3D_E2E__();
-    return (probe?.depth || 0) < previous;
-  }, depthBeforeZoomOut, { timeout: 8000 });
-  const depthAfterZoomOut = await page.evaluate(() => window.__BALABS_3D_E2E__()?.depth || 0);
-  assert.equal(depthAfterZoomOut, depthBeforeZoomOut - 1,
-    name + ': the zoom-out control must return exactly one hierarchy level');
-  const depthBeforeBack = depthAfterZoomOut;
+  assert.ok(zoomOutChecked, name + ': zoom-out control was not exercised at a nested level');
+  const depthBeforeBack = await page.evaluate(() => window.__BALABS_3D_E2E__()?.depth || 0);
   for (let step = 0; step <= depthBeforeBack; step++) {
     const before = await page.evaluate(() => window.__BALABS_3D_E2E__()?.depth || 0);
     await page.locator('.webgl-controls [data-camera="back"]').evaluate((button) => button.click());
