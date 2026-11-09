@@ -127,3 +127,14 @@ assert.ok(html.includes('if(!spatial3D&&mainView.classList.contains(\'universe-c
 assert.ok(engine.includes('window.__BALABS_3D_E2E__'), 'The browser smoke test must be able to inspect the live scene');
 
 console.log('Clean 3D engine regression checks passed: eight domains, mycelial topology, animated signals, stable camera, desktop/mobile controls, hierarchical Notion branches and explicit page actions.');
+
+
+for (const language of ['fr', 'ar', 'en', 'pt']) {
+  const publicTree = JSON.parse(readFileSync('ecosystem/notion-tree.' + language + '.json', 'utf8'));
+  const previewTree = JSON.parse(readFileSync('ecosystem-preview/notion-tree.' + language + '.json', 'utf8'));
+  assert.deepEqual(
+    previewTree.domains,
+    publicTree.domains,
+    language + ' preview hierarchy and Notion destinations must exactly match the public site',
+  );
+}
