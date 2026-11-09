@@ -6436,6 +6436,7 @@ async function compareCultureGenerations() {
   const results = document.getElementById("generationComparisonResults");
   if (!panel || !select || !button || !status || !results || !orgId) return;
   const cultureIds = [...select.selectedOptions].map(option => option.value);
+  const selectedDetailCultureId = panel.dataset.cultureId;
   if (cultureIds.length < 2 || cultureIds.length > 4) {
     status.textContent = "Sélectionnez entre 2 et 4 cultures.";
     return;
@@ -6451,7 +6452,7 @@ async function compareCultureGenerations() {
     if (error) throw error;
     if (requestId !== compareCultureGenerations.requestId ||
         !isCurrentWorkspaceRevision(revision, orgId) ||
-        panel.dataset.cultureId !== cultureIds.find(id => id === panel.dataset.cultureId)) return;
+        panel.dataset.cultureId !== selectedDetailCultureId) return;
     renderGenerationComparisonReport(data || {});
     status.textContent = "Rapport comparatif chargé. Les résultats sont descriptifs et les limites de données sont indiquées ci-dessous.";
   } catch (error) {
