@@ -77,4 +77,20 @@ assert.match(detailLoader, /row\.event_id/,
 assert.match(detailLoader, /isCurrentWorkspaceRevision\(loadRevision, loadOrganizationId\)/,
   'event history responses must remain protected against stale workspace reads');
 
+
+const historyPaginationStart = source.indexOf('async function loadMoreCultureEventHistory(');
+assert.ok(historyPaginationStart >= 0,
+  'culture event history must expose an explicit next-page loader');
+const historyPaginationEnd = source.indexOf('\nfunction ', historyPaginationStart);
+const historyPagination = source.slice(historyPaginationStart,
+  historyPaginationEnd > historyPaginationStart ? historyPaginationEnd : undefined);
+assert.match(historyPagination, /get_culture_event_history/,
+  'event history pagination must use the same tenant-scoped RPC');
+assert.match(historyPagination, /p_offset:\s*offset/,
+  'event history pagination must request the selected offset');
+assert.match(historyPagination, /isCurrentWorkspaceRevision\(loadRevision, loadOrganizationId\)/,
+  'event history pagination must reject stale workspace responses');
+assert.match(detailLoader, /history\.has_more === true/,
+  'culture timeline must expose a next-page control when the server reports more events');
+
 console.log('PASS: CultureOps lineage and event history UI use bounded tenant RPCs');
