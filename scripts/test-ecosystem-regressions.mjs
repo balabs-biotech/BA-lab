@@ -60,8 +60,8 @@ for (const [language, tree, mycologyId, fungalId] of [
 assert.equal(ptTree.domains.find(domain => domain.id === 'bio').notionId, '40173152f1718120b45bf79f8e81120a', 'Portuguese biotechnology universe must point to the actual Biotecnologia page, not its parent hub');
 
 assert.ok(engine.includes('function createWorld()'), 'The new engine must build its own biological network scene');
-assert.ok(engine.includes("ctx.font='700 '+(size*4)+'px Inter,system-ui,sans-serif'"), '3D labels must use enlarged, heavier glyphs that remain readable when zoomed');
-assert.ok(engine.includes('lineHeight=142'), 'Multi-line 3D labels must retain sufficient vertical spacing at the larger font size');
+assert.ok(engine.includes("ctx.font='700 '+(size*14)+'px Inter,system-ui,sans-serif'"), '3D labels must use enlarged, heavier glyphs that remain readable when zoomed');
+assert.ok(engine.includes('lineHeight=210'), 'Multi-line 3D labels must retain sufficient vertical spacing at the larger font size');
 assert.ok(previewEngine.includes("ctx.font='700 '+(size*4)+'px Inter,system-ui,sans-serif'"), 'Preview 3D labels must use the same enlarged, heavier glyphs');
 assert.ok(previewEngine.includes('lineHeight=142'), 'Preview multiline labels must use matching vertical spacing');
 assert.ok(engine.includes("const soma=new THREE.Group();soma.userData={id,kind:'domain'};group.add(soma);"), 'Domain centres must remain open mycelial junctions rather than solid cell bodies');
