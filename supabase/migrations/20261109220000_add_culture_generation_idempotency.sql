@@ -126,3 +126,9 @@ grant execute on function public.create_culture_with_generation_idempotent(
 revoke all on function public.create_culture_with_generation(
   uuid, text, text, uuid, uuid, uuid, uuid, uuid, uuid, timestamptz, jsonb
 ) from public, anon, authenticated;
+-- This legacy implementation is now an internal write primitive, callable only
+-- by the SECURITY DEFINER idempotent wrapper (same owner). Pin its search path
+-- before allowing it to execute with owner privileges.
+alter function public.create_culture_with_generation(
+  uuid, text, text, uuid, uuid, uuid, uuid, uuid, uuid, timestamptz, jsonb
+) security definer set search_path = pg_catalog;
