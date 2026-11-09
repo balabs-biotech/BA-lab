@@ -2,7 +2,7 @@
   "version": 1,
   "source": "Verified public Arabic pages linked from the Arabic BA Labs entry page",
   "language": "ar",
-  "coverage": "nested_public_pages_verified_from_arabic_parent_content_and_notion_paths; linked pages organized by verified parent; no unverified pages inferred",
+  "coverage": "nested_public_pages_verified_from_arabic_parent_content_and_notion_paths; linked pages organized by verified parent; no unverified pages inferred_eight_universes_including_planned_resources_transmission",
   "domains": [
     {
       "id": "myco",
@@ -990,6 +990,38 @@
         }
       ],
       "description": "مشاريع BA Labs وأعمال البحث والتطوير: النماذج التجريبية، النتائج الموثقة، وفرص التعاون."
+    },
+    {
+      "id": "learn",
+      "title": "الموارد ونقل المعرفة",
+      "description": "موارد عامة لاستكشاف الأعمال الموثّقة وفهم حدود الأدلة والتعرّف على طرق التعاون مع BA Labs.",
+      "children": [
+        {
+          "id": "learn-work",
+          "title": "الأعمال والمشاريع الموثّقة",
+          "url": "https://app.notion.com/p/40173152f17181c7ab4ad1cdeac8d075",
+          "children": []
+        },
+        {
+          "id": "learn-evidence",
+          "title": "ما الذي تدعمه الأدلة حاليًا؟",
+          "url": "https://app.notion.com/p/40173152f17181eb86f6f623452f9f5d",
+          "children": []
+        },
+        {
+          "id": "learn-catalogue",
+          "title": "الفهرس العام — الموارد البيولوجية",
+          "url": "https://app.notion.com/p/40173152f171817d8608cafa8a118065",
+          "children": []
+        },
+        {
+          "id": "learn-collaborate",
+          "title": "التعاون مع BA Labs",
+          "url": "https://app.notion.com/p/40173152f17181598fc7f2f5a3e64e8a",
+          "children": []
+        }
+      ]
     }
-  ]
+  ],
+  "hub": null
 }
