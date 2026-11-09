@@ -89,6 +89,26 @@ begin
        and (b.culture_id = any(v_ids)
          or b.material_id in (select material_id from selected))
   ),
+  culture_environment_context as (
+    select s.id as culture_id,
+           e.id as environment_id,
+           e.name as environment_name,
+           e.location_id,
+           l.code as location_code,
+           l.name as location_name,
+           l.location_type,
+           l.latitude,
+           l.longitude,
+           l.coordinate_accuracy_m,
+           l.coordinate_source
+      from selected s
+      left join public.environments e
+        on e.organization_id = s.organization_id
+       and e.id = s.environment_id
+      left join public.locations l
+        on l.organization_id = s.organization_id
+       and l.id = e.location_id
+  ),
   selected_experiments as (
     select distinct experiment_id as id
       from selected
@@ -275,6 +295,7 @@ begin
     'events', coalesce((select jsonb_agg(to_jsonb(e) order by e.occurred_at desc, e.id) from event_rows e), '[]'::jsonb),
     'batches', coalesce((select jsonb_agg(to_jsonb(b) order by b.started_at nulls last, b.id) from batch_rows b), '[]'::jsonb),
     'results', coalesce((select jsonb_agg(to_jsonb(r) order by r.created_at desc, r.id) from result_rows r), '[]'::jsonb),
+    'culture_environment_context', coalesce((select jsonb_agg(to_jsonb(ec) order by ec.culture_id) from culture_environment_context ec), '[]'::jsonb),
     'environmental_observations', coalesce((select jsonb_agg(to_jsonb(eo) order by eo.observed_at desc, eo.id) from environmental_rows eo), '[]'::jsonb),
     'data_quality', jsonb_build_object(
       'measurement_total', counts.measurement_count,
