@@ -73,9 +73,24 @@ begin
         on e.organization_id = p_organization_id
        and e.material_id = t.material_id
     union all
+    -- A culture created through create_culture_with_generation records its
+    -- own culture_created event. Surface that event in its biological parent's
+    -- history as well, even though this path does not emit descendant_created.
+    select e.id, e.event_type, e.occurred_at, e.actor_user_id,
+           e.culture_id, e.material_id, e.batch_id, 'descendant_culture'::text,
+           e.payload, 3
+      from target t
+      join public.cultures child
+        on child.organization_id = p_organization_id
+       and child.parent_culture_id = t.id
+      join public.events e
+        on e.organization_id = p_organization_id
+       and e.culture_id = child.id
+       and e.event_type = 'culture_created'
+    union all
     select operation.id, operation.event_type, operation.occurred_at,
            operation.actor_user_id, operation.culture_id, operation.material_id,
-           operation.batch_id, 'creation_operation'::text, operation.payload, 3
+           operation.batch_id, 'creation_operation'::text, operation.payload, 4
       from target t
       join public.events child_event
         on child_event.organization_id = p_organization_id
@@ -87,7 +102,7 @@ begin
     union all
     select e.id, e.event_type, e.occurred_at, e.actor_user_id,
            e.culture_id, e.material_id, e.batch_id, 'batch'::text,
-           e.payload, 4
+           e.payload, 5
       from public.batches b
       join public.events e
         on e.organization_id = p_organization_id
