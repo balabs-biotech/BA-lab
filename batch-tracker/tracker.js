@@ -6163,6 +6163,132 @@ async function saveBiologicalOperation(event) {
 
 let cultureDetailRequestId = 0;
 
+async function loadMoreCultureEventHistory(cultureId, offset, button) {
+  const requestId = ++cultureDetailRequestId;
+  const loadRevision = authStateRevision;
+  const loadOrganizationId = organizationId;
+  const panel = document.getElementById("cultureDetailPanel");
+  const timeline = document.getElementById("cultureDetailTimeline");
+  if (!panel || !timeline || panel.dataset.cultureId !== cultureId) return;
+
+  button.disabled = true;
+  button.textContent = "Chargement des événements…";
+  try {
+    const { data: history, error: historyError } = await supabaseClient.rpc("get_culture_event_history", {
+      p_organization_id: loadOrganizationId,
+      p_culture_id: cultureId,
+      p_limit: 100,
+      p_offset: offset
+    });
+    if (historyError) throw new Error(historyError.message);
+    if (requestId !== cultureDetailRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
+
+    const events = (history || []).map(row => ({
+      id: row.event_id,
+      event_type: row.event_type,
+      occurred_at: row.occurred_at,
+      batch_id: row.batch_id,
+      source_relation: row.source_relation,
+      payload: row.payload
+    }));
+    const eventIds = events.map(event => event.id);
+    let measurements = [];
+    let observations = [];
+    if (eventIds.length) {
+      const [measurementResult, observationResult] = await Promise.all([
+        supabaseClient.from("measurements")
+          .select("id, variable_code, raw_value, raw_unit_code, measured_at, event_id, metadata")
+          .eq("organization_id", loadOrganizationId).in("event_id", eventIds)
+          .order("measured_at", { ascending: false }).limit(100),
+        supabaseClient.from("observations")
+          .select("id, variable_code, value_text, observed_at, event_id, metadata")
+          .eq("organization_id", loadOrganizationId).in("event_id", eventIds)
+          .order("observed_at", { ascending: false }).limit(100)
+      ]);
+      if (measurementResult.error) throw new Error("Mesures : " + measurementResult.error.message);
+      if (observationResult.error) throw new Error("Observations : " + observationResult.error.message);
+      measurements = measurementResult.data || [];
+      observations = observationResult.data || [];
+    }
+    if (requestId !== cultureDetailRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
+
+    const measurementsByEvent = new Map();
+    const observationsByEvent = new Map();
+    for (const row of measurements) {
+      if (!row.event_id) continue;
+      if (!measurementsByEvent.has(row.event_id)) measurementsByEvent.set(row.event_id, []);
+      measurementsByEvent.get(row.event_id).push(row);
+    }
+    for (const row of observations) {
+      if (!row.event_id) continue;
+      if (!observationsByEvent.has(row.event_id)) observationsByEvent.set(row.event_id, []);
+      observationsByEvent.get(row.event_id).push(row);
+    }
+    const variableLabel = code => measurementVariables.find(item => item.code === code)?.label || code || "Donnée";
+    const entries = [];
+    for (const event of events) {
+      const linkedMeasurements = measurementsByEvent.get(event.id) || [];
+      const linkedObservations = observationsByEvent.get(event.id) || [];
+      linkedMeasurements.forEach(row => entries.push({
+        date: row.measured_at || event.occurred_at,
+        type: "Mesure · " + variableLabel(row.variable_code),
+        detail: String(row.raw_value ?? "Valeur absente") + " " + (row.raw_unit_code || "") +
+          (row.metadata?.note ? " — " + row.metadata.note : "")
+      }));
+      linkedObservations.forEach(row => entries.push({
+        date: row.observed_at || event.occurred_at,
+        type: "Observation · " + variableLabel(row.variable_code),
+        detail: (row.value_text || "Sans description") +
+          (row.metadata?.note ? " — " + row.metadata.note : "")
+      }));
+      if (!linkedMeasurements.length && !linkedObservations.length) entries.push({
+        date: event.occurred_at,
+        type: (event.source_relation === "creation_operation" ? "Opération de création · " : "") +
+          String(event.event_type || "Événement").replaceAll("_", " "),
+        detail: [
+          event.source_relation === "creation_operation" ? "Opération à l’origine de cette culture" : null,
+          event.payload?.parent_culture_code ? "Culture parent : " + event.payload.parent_culture_code : null,
+          event.payload?.material_code ? "Matériel : " + event.payload.material_code : null,
+          event.payload?.note,
+          event.payload?.details?.conditions ? "Conditions : " + event.payload.details.conditions : null,
+          event.payload?.details?.outcome ? "Résultat : " + String(event.payload.details.outcome).replaceAll("_", " ") : null,
+          event.payload?.description
+        ].filter(Boolean).join(" — ") || "Événement de traçabilité."
+      });
+    }
+    entries.sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
+    for (const entry of entries) {
+      const article = document.createElement("article");
+      article.className = "culture-timeline-entry";
+      const date = document.createElement("time");
+      date.className = "culture-timeline-date";
+      date.textContent = entry.date ? new Date(entry.date).toLocaleString("fr-FR") : "Date inconnue";
+      const content = document.createElement("div");
+      const heading = document.createElement("strong");
+      heading.textContent = entry.type;
+      const description = document.createElement("p");
+      description.textContent = String(entry.detail || "Aucun détail enregistré");
+      content.append(heading, description);
+      article.append(date, content);
+      timeline.insertBefore(article, button);
+    }
+
+    const historyHasMore = history?.some(row => row.has_more === true);
+    if (historyHasMore) {
+      button.disabled = false;
+      button.textContent = "Charger 100 événements plus anciens";
+      button.onclick = () => loadMoreCultureEventHistory(cultureId, offset + 100, button);
+    } else {
+      button.remove();
+    }
+  } catch (error) {
+    if (requestId !== cultureDetailRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
+    console.error("Chargement de la suite de l’historique :", error);
+    button.disabled = false;
+    button.textContent = "Réessayer de charger les événements";
+  }
+}
+
 async function loadCultureDetail(cultureId) {
   const requestId = ++cultureDetailRequestId;
   const loadRevision = authStateRevision;
@@ -6323,7 +6449,7 @@ async function loadCultureDetail(cultureId) {
     entries.sort((a,b) => new Date(b.date || 0) - new Date(a.date || 0));
 
     const fields = summary.querySelectorAll(".culture-detail-field strong");
-    if (fields[4]) fields[4].textContent = String(events.length);
+    if (fields[4]) fields[4].textContent = String(eventHistory?.[0]?.total_rows ?? events.length);
     if (fields[5]) fields[5].textContent = String(measurements.length + observations.length);
     timeline.innerHTML = "";
     if (batches.length) {
@@ -6361,7 +6487,7 @@ async function loadCultureDetail(cultureId) {
       });
       timeline.appendChild(batchSection);
     }
-    if (events.length === 100 || eventHistory?.some(row => row.has_more === true) || measurements.length >= 100 || observations.length >= 100 || batches.length === 100) {
+    if (measurements.length >= 100 || observations.length >= 100 || batches.length === 100) {
       const limitNotice = document.createElement("p");
       limitNotice.className = "info warning";
       limitNotice.textContent = "Historique partiel : au moins une catégorie atteint sa limite de chargement. Certaines données anciennes peuvent ne pas apparaître ici.";
@@ -6390,6 +6516,17 @@ async function loadCultureDetail(cultureId) {
         article.append(date, content);
         timeline.appendChild(article);
       });
+    }
+    const history = eventHistory?.[0];
+    if (history?.has_more === true) {
+      const loadMoreButton = document.createElement("button");
+      loadMoreButton.type = "button";
+      loadMoreButton.className = "culture-catalog-action";
+      loadMoreButton.textContent = "Charger 100 événements plus anciens";
+      loadMoreButton.addEventListener("click", () =>
+        loadMoreCultureEventHistory(culture.id, events.length, loadMoreButton)
+      );
+      timeline.appendChild(loadMoreButton);
     }
     panel.scrollIntoView({block:"start",behavior:window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth"});
   } catch (error) {
