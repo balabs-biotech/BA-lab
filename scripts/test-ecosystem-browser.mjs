@@ -142,13 +142,14 @@ async function checkWorkingScene(name, viewport) {
       await page.waitForFunction(() => !document.querySelector('#mainView .webgl-stage')?.classList.contains('is-transitioning'), undefined, { timeout: 8000 });
       if (!zoomOutChecked) {
         const nestedDepth = await page.evaluate(() => window.__BALABS_3D_E2E__()?.depth || 0);
+        const cameraDistance = await page.evaluate(() => window.__BALABS_3D_E2E__()?.cameraDistance || 0);
         assert.ok(nestedDepth > 0, name + ': nested depth must be available before testing zoom-out');
         await page.locator('.webgl-controls [data-camera="out"]').evaluate((button) => button.click());
-        await page.waitForFunction((previous) => (window.__BALABS_3D_E2E__()?.depth || 0) < previous,
-          nestedDepth, { timeout: 8000 });
-        const parentDepth = await page.evaluate(() => window.__BALABS_3D_E2E__()?.depth || 0);
-        assert.equal(parentDepth, nestedDepth - 1,
-          name + ': zoom-out must return exactly one hierarchy level');
+        await page.waitForFunction((previous) => (window.__BALABS_3D_E2E__()?.cameraDistance || 0) > previous,
+          cameraDistance, { timeout: 8000 });
+        const depthAfterZoom = await page.evaluate(() => window.__BALABS_3D_E2E__()?.depth || 0);
+        assert.equal(depthAfterZoom, nestedDepth,
+          name + ': camera zoom-out must not change the selected hierarchy level');
         zoomOutChecked = true;
         await page.waitForFunction(() => !document.querySelector('#mainView .webgl-stage')?.classList.contains('is-transitioning'), undefined, { timeout: 8000 });
         const parentTarget = await page.evaluate(() => window.__BALABS_3D_E2E__()?.target || null);
