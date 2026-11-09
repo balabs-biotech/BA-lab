@@ -54,4 +54,20 @@ assert.match(migration, /events_org_culture_time_idx/,
   'event history must have a culture/time index');
 assert.match(migration, /'batch'::text/,
   'event history must preserve events associated with production batches');
+const createStart = source.indexOf('async function createCulture() {');
+const createEnd = source.indexOf('/* ============================================================', createStart);
+assert.ok(createStart >= 0 && createEnd > createStart,
+  'culture creation must remain a bounded named workflow');
+const createLoader = source.slice(createStart, createEnd);
+assert.match(createLoader, /getManualWriteIdempotencyKey\(\s*"culture-generation"/,
+  'culture creation must persist an idempotency key for retry safety');
+assert.match(createLoader, /create_culture_with_generation_idempotent/,
+  'culture creation must call the idempotent RPC');
+assert.match(createLoader, /p_idempotency_key:\s*cultureGenerationKey/,
+  'culture creation must send its persisted idempotency key');
+assert.match(createLoader, /clearManualWriteIdempotencyKey\("culture-generation"\)/,
+  'successful culture creation must clear the pending idempotency receipt key');
+assert.doesNotMatch(createLoader, /rpc\(\s*"create_culture_with_generation"/,
+  'culture creation must not call the legacy non-idempotent RPC');
+
 console.log('PASS: CultureOps event history UI uses bounded tenant RPC');
