@@ -6958,6 +6958,248 @@ function renderGenerationComparisonReport(report) {
   }
   target.appendChild(timeSeriesSection);
 
+  // External environmental data is matched by the explicit culture -> environment
+  // -> location mapping returned by the tenant-scoped comparison RPC. It is never
+  // merged into culture measurements or described as a direct culture reading.
+  const environmentalContextSection = document.createElement("section");
+  environmentalContextSection.className = "generation-comparison-section";
+  const environmentalContextTitle = document.createElement("h5");
+  environmentalContextTitle.textContent = "Contexte environnemental par lieu";
+  environmentalContextSection.appendChild(environmentalContextTitle);
+  const environmentalContextNote = document.createElement("p");
+  environmentalContextNote.className = "muted";
+  environmentalContextNote.textContent = "Les séries ci-dessous sont des données environnementales externes associées au lieu enregistré de chaque culture. Elles ne sont pas des mesures directes de la culture. Les données météo ou satellitaires à maille spatiale décrivent un contexte géographique, pas nécessairement le microclimat du contenant, de la serre ou de la salle.";
+  environmentalContextSection.appendChild(environmentalContextNote);
+
+  const cultureEnvironmentContext = Array.isArray(report.culture_environment_context)
+    ? report.culture_environment_context : [];
+  const environmentalObservations = Array.isArray(report.environmental_observations)
+    ? report.environmental_observations : [];
+  const contextsByLocation = new Map();
+  cultureEnvironmentContext.forEach(context => {
+    if (!context.location_id) return;
+    if (!contextsByLocation.has(context.location_id)) {
+      contextsByLocation.set(context.location_id, {
+        locationCode: context.location_code || context.location_name || context.location_id,
+        locationName: context.location_name || "Lieu sans nom",
+        latitude: context.latitude,
+        longitude: context.longitude,
+        coordinateAccuracy: context.coordinate_accuracy_m,
+        coordinateSource: context.coordinate_source,
+        environments: new Set(),
+        cultures: new Set()
+      });
+    }
+    const locationContext = contextsByLocation.get(context.location_id);
+    locationContext.cultures.add(cultureCodes.get(context.culture_id) || context.culture_id);
+    if (context.environment_name) locationContext.environments.add(context.environment_name);
+  });
+
+  const environmentalSeriesGroups = new Map();
+  let environmentalRowsWithoutNumericValue = 0;
+  let environmentalRowsWithoutTime = 0;
+  environmentalObservations.forEach(row => {
+    if (!row.location_id || !contextsByLocation.has(row.location_id)) return;
+    const value = row.value == null ? NaN : Number(row.value);
+    const timestamp = row.observed_at ? Date.parse(row.observed_at) : NaN;
+    if (!Number.isFinite(value)) {
+      environmentalRowsWithoutNumericValue += 1;
+      return;
+    }
+    if (!Number.isFinite(timestamp)) {
+      environmentalRowsWithoutTime += 1;
+      return;
+    }
+    const key = [
+      row.location_id, row.data_family || "famille inconnue",
+      row.provider_code || "source inconnue", row.dataset_code || "jeu inconnu",
+      row.variable_code || "variable inconnue", row.unit_code || "unité non renseignée",
+      row.quality_flag || "qualité non renseignée"
+    ].join("||");
+    if (!environmentalSeriesGroups.has(key)) {
+      environmentalSeriesGroups.set(key, {
+        locationId: row.location_id,
+        dataFamily: row.data_family || "famille inconnue",
+        provider: row.provider_code || "source inconnue",
+        dataset: row.dataset_code || "jeu inconnu",
+        variable: row.variable_code || "variable inconnue",
+        unit: row.unit_code || "unité non renseignée",
+        quality: row.quality_flag || "qualité non renseignée",
+        resolution: row.spatial_resolution_m,
+        points: []
+      });
+    }
+    environmentalSeriesGroups.get(key).points.push({
+      id: row.id || "",
+      timestamp,
+      value,
+      retrievedAt: row.retrieved_at || null,
+      sourceUrl: row.source_url || null
+    });
+  });
+
+  const environmentalFormat = value => new Intl.NumberFormat(undefined, {
+    maximumSignificantDigits: 5
+  }).format(value);
+  const locationsWithObservations = new Set();
+  [...environmentalSeriesGroups.values()].sort((a, b) =>
+    String(contextsByLocation.get(a.locationId)?.locationCode || "").localeCompare(
+      String(contextsByLocation.get(b.locationId)?.locationCode || "")
+    ) || a.variable.localeCompare(b.variable)
+  ).forEach(series => {
+    series.points.sort((a, b) => a.timestamp - b.timestamp ||
+      String(a.id).localeCompare(String(b.id)));
+    const location = contextsByLocation.get(series.locationId);
+    if (!location) return;
+    locationsWithObservations.add(series.locationId);
+
+    const heading = document.createElement("h6");
+    heading.textContent = location.locationCode + " — " + series.variable +
+      " · " + series.unit + " · " + series.dataFamily +
+      " · " + series.points.length + " observation(s)";
+    environmentalContextSection.appendChild(heading);
+
+    const provenance = document.createElement("p");
+    provenance.className = "muted";
+    const resolutionLabel = series.resolution == null
+      ? "résolution spatiale non renseignée"
+      : "résolution spatiale : " + environmentalFormat(series.resolution) + " m";
+    provenance.textContent = "Lieu : " + location.locationName +
+      " · Cultures associées : " + [...location.cultures].join(", ") +
+      " · Source : " + series.provider + " / " + series.dataset +
+      " · " + resolutionLabel +
+      " · Qualité source : " + series.quality;
+    environmentalContextSection.appendChild(provenance);
+
+    const latestPoints = series.points.slice(-20).reverse();
+    const table = document.createElement("table");
+    table.className = "statistics-table";
+    const head = document.createElement("thead");
+    const headerRow = document.createElement("tr");
+    ["Date d'observation", "Valeur", "Récupérée le", "Source"].forEach(label => {
+      const th = document.createElement("th");
+      th.textContent = label;
+      headerRow.appendChild(th);
+    });
+    head.appendChild(headerRow);
+    table.appendChild(head);
+    const body = document.createElement("tbody");
+    latestPoints.forEach(point => {
+      const cells = [
+        new Date(point.timestamp).toLocaleString(),
+        environmentalFormat(point.value) + " " + series.unit,
+        point.retrievedAt ? new Date(point.retrievedAt).toLocaleString() : "Non renseignée",
+        point.sourceUrl || series.provider
+      ];
+      const rowElement = document.createElement("tr");
+      cells.forEach(value => {
+        const cell = document.createElement("td");
+        cell.textContent = value;
+        rowElement.appendChild(cell);
+      });
+      body.appendChild(rowElement);
+    });
+    table.appendChild(body);
+    environmentalContextSection.appendChild(table);
+    if (series.points.length > 20) {
+      const truncationNote = document.createElement("p");
+      truncationNote.className = "muted";
+      truncationNote.textContent = "Tableau limité aux 20 observations les plus récentes ; le graphique conserve les " +
+        series.points.length + " observations retournées.";
+      environmentalContextSection.appendChild(truncationNote);
+    }
+
+    const chart = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    chart.setAttribute("viewBox", "0 0 720 160");
+    chart.setAttribute("role", "img");
+    chart.setAttribute("aria-label", "Contexte environnemental du lieu " +
+      location.locationCode + " : " + series.variable + ", " +
+      series.points.length + " observations");
+    chart.setAttribute("preserveAspectRatio", "xMidYMid meet");
+    chart.style.width = "100%";
+    chart.style.height = "auto";
+    chart.style.maxHeight = "190px";
+    const chartTitle = document.createElementNS("http://www.w3.org/2000/svg", "title");
+    chartTitle.textContent = "Contexte environnemental — " + location.locationCode +
+      " — " + series.variable;
+    chart.appendChild(chartTitle);
+    const values = series.points.map(point => point.value);
+    const minValue = Math.min(...values);
+    const maxValue = Math.max(...values);
+    const padding = maxValue === minValue
+      ? Math.max(Math.abs(maxValue) * 0.05, 1)
+      : (maxValue - minValue) * 0.08;
+    const left = 54, right = 690, top = 14, bottom = 118;
+    const firstTime = series.points[0].timestamp;
+    const lastTime = series.points[series.points.length - 1].timestamp;
+    const xFor = point => lastTime === firstTime ? (left + right) / 2 :
+      left + ((point.timestamp - firstTime) / (lastTime - firstTime)) * (right - left);
+    const yFor = value => bottom - ((value - (minValue - padding)) /
+      ((maxValue + padding) - (minValue - padding))) * (bottom - top);
+    const axis = document.createElementNS("http://www.w3.org/2000/svg", "path");
+    axis.setAttribute("d", "M " + left + " " + top + " V " + bottom + " H " + right);
+    axis.setAttribute("fill", "none");
+    axis.setAttribute("stroke", "currentColor");
+    axis.setAttribute("stroke-opacity", "0.45");
+    chart.appendChild(axis);
+    const polyline = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
+    polyline.setAttribute("points", series.points.map(point =>
+      xFor(point) + "," + yFor(point.value)
+    ).join(" "));
+    polyline.setAttribute("fill", "none");
+    polyline.setAttribute("stroke", "currentColor");
+    polyline.setAttribute("stroke-width", "2.5");
+    polyline.setAttribute("stroke-linejoin", "round");
+    polyline.setAttribute("stroke-linecap", "round");
+    chart.appendChild(polyline);
+    const startLabel = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    startLabel.setAttribute("x", String(left));
+    startLabel.setAttribute("y", "145");
+    startLabel.setAttribute("font-size", "11");
+    startLabel.textContent = new Date(firstTime).toLocaleDateString();
+    chart.appendChild(startLabel);
+    const endLabel = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    endLabel.setAttribute("x", String(right));
+    endLabel.setAttribute("y", "145");
+    endLabel.setAttribute("text-anchor", "end");
+    endLabel.setAttribute("font-size", "11");
+    endLabel.textContent = new Date(lastTime).toLocaleDateString();
+    chart.appendChild(endLabel);
+    environmentalContextSection.appendChild(chart);
+  });
+
+  contextsByLocation.forEach((location, locationId) => {
+    if (locationsWithObservations.has(locationId)) return;
+    const empty = document.createElement("p");
+    empty.className = "muted";
+    empty.textContent = location.locationCode +
+      " : aucune observation environnementale retournée pour ce lieu dans le périmètre disponible.";
+    environmentalContextSection.appendChild(empty);
+  });
+  const contextsWithoutLocation = cultureEnvironmentContext.filter(context => !context.location_id);
+  if (contextsWithoutLocation.length) {
+    const missingLocation = document.createElement("p");
+    missingLocation.className = "muted";
+    missingLocation.textContent = contextsWithoutLocation.length +
+      " environnement(s) de culture sans lieu géographique associé : aucune donnée externe ne leur est attribuée.";
+    environmentalContextSection.appendChild(missingLocation);
+  }
+  if (!cultureEnvironmentContext.length) {
+    const noContext = document.createElement("p");
+    noContext.className = "muted";
+    noContext.textContent = "Aucun environnement explicitement associé aux cultures sélectionnées. Aucune donnée météo ou satellite ne peut être rapprochée sans lien de lieu enregistré.";
+    environmentalContextSection.appendChild(noContext);
+  }
+  if (environmentalRowsWithoutNumericValue || environmentalRowsWithoutTime) {
+    const quality = document.createElement("p");
+    quality.className = "muted";
+    quality.textContent = "Observations environnementales non représentées : " +
+      environmentalRowsWithoutNumericValue + " valeur(s) absente(s) ou non numérique(s), " +
+      environmentalRowsWithoutTime + " date(s) inexploitable(s).";
+    environmentalContextSection.appendChild(quality);
+  }
+  target.appendChild(environmentalContextSection);
+
   // Monitoring is descriptive: sustained direction and robust deviations
   // are candidates for review, never automatic biological diagnoses.
   const monitoringSection = document.createElement("section");
