@@ -148,6 +148,36 @@ begin
            ma.material_code, ma.material_type, ma.generation, ma.state,
            null::uuid, ma.parent_material_id, null::timestamptz, false
       from material_ancestors ma
+    union all
+    select 5, 'ancestor_truncated'::text, 250,
+           null::uuid, null::text, null::text, null::uuid,
+           null::text, null::text, null::integer, null::public.material_state,
+           null::uuid, null::uuid, null::timestamptz, true
+     where exists (
+       select 1 from ancestors a
+        where a.depth = 250
+          and a.parent_culture_id is not null
+          and exists (
+            select 1 from public.cultures parent
+             where parent.organization_id = p_organization_id
+               and parent.id = a.parent_culture_id
+          )
+     )
+    union all
+    select 6, 'material_ancestor_truncated'::text, 250,
+           null::uuid, null::text, null::text, null::uuid,
+           null::text, null::text, null::integer, null::public.material_state,
+           null::uuid, null::uuid, null::timestamptz, true
+     where exists (
+       select 1 from material_ancestors ma
+        where ma.depth = 250
+          and ma.parent_material_id is not null
+          and exists (
+            select 1 from public.materials parent
+             where parent.organization_id = p_organization_id
+               and parent.id = ma.parent_material_id
+          )
+     )
   )
   select r.relation, r.depth, r.culture_id, r.culture_code, r.culture_type,
          r.material_id, r.material_code, r.material_type, r.material_generation,
