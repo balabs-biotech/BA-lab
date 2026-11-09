@@ -85,6 +85,7 @@ jobs:
         run: |
           node scripts/check-batch-tracker-js.mjs
           node supabase/tests/culture-lineage-frontend-contract.test.mjs
+          node supabase/tests/culture-generation-comparison-contract.test.mjs
           node supabase/tests/biological-operation-idempotency-frontend-contract.test.mjs
           node supabase/tests/culture-event-history-frontend-contract.test.mjs
           node supabase/tests/copernicus-sentinel-catalogue.test.mjs
