@@ -41,13 +41,14 @@ const t = key => (COPY[LANG()] || COPY.fr)[key] || COPY.fr[key];
 
 let THREE, renderer, scene, camera, raycaster, pointer, stage, panel, hint, intro, status;
 let world, cells = new Map(), pickables = [], resourceObjects = [], edges = [], signalPoints = [];
-let resourceHitTargets = new Map();
+let resourceHitTargets = new Map(), domainHitTargets = new Map();
 let nav, currentNode = null, currentAnchor = null, navigationStack = [];
 let selected = null, selectedBranch = null, manifest = null, transition = null;
 let distance = 13.5, zoomTargetDistance = 13.5, theta = .22, phi = 1.27, target = null, targetGoal = null;
 let opened = false, raf = 0, lastFrame = 0, dragging = false, moved = false, dragGesture = false;
 let lastPointer = null, pointers = new Map(), pinchStart = 0, pinchDistance = 0, hoverId = null;
 let canvasRect = null, cameraInitialized = false, lastPickAt = 0;
+const _hitWorld = new THREE.Vector3();
 
 function addStyles() {
   const style = document.createElement('style');
@@ -160,6 +161,7 @@ function createWorld() {
     const label=makeLabel(LABELS[id]?.title||id, color, 17);label.position.set(0,-.94,0);label.scale.set(2.8,.66,1);label.userData={id,kind:'domain-label'};group.add(label);
     const hit=new THREE.Mesh(new THREE.SphereGeometry(.96,16,12),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));hit.userData={id,kind:'domain'};group.add(hit);
     world.add(group);cells.set(id,{group,soma,label,hit,position:pos,color});
+    const domainButton=document.createElement('button');domainButton.type='button';domainButton.className='webgl-hit-target webgl-domain-target';domainButton.setAttribute('aria-label',(LABELS[id]?.title||id)+' — '+t('domain'));domainButton.title=LABELS[id]?.title||id;domainButton.style.width='116px';domainButton.style.height='116px';domainButton.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();if(!selected)enterDomain(id)});stage.append(domainButton);domainHitTargets.set(id,{object:hit,button:domainButton});
     pickables.push(soma,hit,label);
     for(let j=0;j<14;j++){
       const a=j/14*Math.PI*2+IDS.indexOf(id)*.31;
@@ -226,10 +228,14 @@ function clearResources() {
 function mDispose(material){material?.map?.dispose();material?.dispose?.()}
 function makeResourceLabel(item,color,depth=0) { const size=depth===0?18:depth===1?16:14;const label=makeLabel(item.title,color,size);const scale=depth===0?2.55:depth===1?1.95:1.5;label.scale.set(scale,depth===0?.58:depth===1?.48:.38,1);label.userData={...item,kind:'resource-label'};addResourceHitTarget(label);return label; }
 function addResourceHitTarget(label) {
- // Labels are visual WebGL objects, never transparent DOM hit targets.
+ const button=document.createElement('button');button.type='button';button.className='webgl-hit-target webgl-resource-target';button.setAttribute('aria-label',(label.userData.title||label.userData.name||'Branche')+(label.userData.children?.length?' — ouvrir le dossier':' — ouvrir la page'));button.title=label.userData.title||label.userData.name||'';button.style.width=label.userData.depth===0?'112px':label.userData.depth===1?'92px':'78px';button.style.height=label.userData.depth===0?'54px':'46px';button.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();openResource(label.userData)});stage.append(button);resourceHitTargets.set(label,button);
 }
 function syncResourceHitTargets() {
- // Canvas ray-picking is the only pointer-selection path.
+ if(!renderer||!camera||!stage)return;
+ const rect=renderer.domElement.getBoundingClientRect(),stageRect=stage.getBoundingClientRect();
+ const place=(object,button)=>{object.getWorldPosition(_hitWorld);const p=_hitWorld.clone().project(camera);const visible=p.z>-1&&p.z<1&&p.x>=-1.12&&p.x<=1.12&&p.y>=-1.12&&p.y<=1.12;button.hidden=!visible;if(!visible)return;button.style.left=(rect.left+(p.x+1)*rect.width/2-stageRect.left)+'px';button.style.top=(rect.top+(1-p.y)*rect.height/2-stageRect.top)+'px'};
+ for(const {object,button} of domainHitTargets.values()){button.hidden=!opened||!!selected;place(object,button)}
+ for(const [label,button] of resourceHitTargets)place(label,button);
 }
 function renderPath() {
   if(!nav)return;nav.replaceChildren();
@@ -340,7 +346,7 @@ function setupUI() {
   stage.addEventListener('touchend',finishTouch,{passive:true});
   stage.addEventListener('touchcancel',()=>{touchFallback=null},{passive:true});
 
-  document.addEventListener('click',e=>{if(!e.detail||dragGesture||!renderer)return;if(e.target.closest?.('.webgl-controls,.webgl-focus,.webgl-intro'))return;const r=renderer.domElement.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)return;if(performance.now()-lastPickAt>450)pickAt(e.clientX,e.clientY)},true);
+  document.addEventListener('click',e=>{if(!e.detail||dragGesture||!renderer)return;if(e.target.closest?.('.webgl-controls,.webgl-focus,.webgl-intro,.webgl-hit-target'))return;const r=renderer.domElement.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)return;if(performance.now()-lastPickAt>450)pickAt(e.clientX,e.clientY)},true);
   stage.addEventListener('lostpointercapture',onLostCapture);
   stage.addEventListener('contextmenu',e=>e.preventDefault());
   window.addEventListener('resize',resize);
