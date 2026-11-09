@@ -239,11 +239,11 @@ begin
     raise exception 'FAIL: lineage RPC did not return material provenance';
   end if;
 
-  select bool_or(truncated) into was_truncated
-    from public.get_culture_lineage('00000000-0000-0000-0000-0000000000a1', parent_id, 1)
-   where relation='descendant';
+  select has_more into was_truncated
+    from public.get_culture_lineage('00000000-0000-0000-0000-0000000000a1', parent_id, 1, 0)
+   where relation='current';
   if was_truncated is distinct from true then
-    raise exception 'FAIL: lineage RPC did not flag bounded descendant results';
+    raise exception 'FAIL: lineage RPC did not advertise the next descendant page';
   end if;
 
   select culture_code, descendant_total, has_more
