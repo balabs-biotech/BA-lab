@@ -48,7 +48,7 @@ let distance = 13.5, zoomTargetDistance = 13.5, theta = .22, phi = 1.27, target 
 let opened = false, raf = 0, lastFrame = 0, dragging = false, moved = false, dragGesture = false;
 let lastPointer = null, pointers = new Map(), pinchStart = 0, pinchDistance = 0, hoverId = null;
 let canvasRect = null, cameraInitialized = false, lastPickAt = 0;
-const _hitWorld = new THREE.Vector3();
+let _hitWorld = null;
 
 function addStyles() {
   const style = document.createElement('style');
@@ -232,9 +232,10 @@ function addResourceHitTarget(label) {
 }
 function syncResourceHitTargets() {
  if(!renderer||!camera||!stage)return;
+ if(!_hitWorld)_hitWorld=new THREE.Vector3();
  const rect=renderer.domElement.getBoundingClientRect(),stageRect=stage.getBoundingClientRect();
  const place=(object,button)=>{object.getWorldPosition(_hitWorld);const p=_hitWorld.clone().project(camera);const visible=p.z>-1&&p.z<1&&p.x>=-1.12&&p.x<=1.12&&p.y>=-1.12&&p.y<=1.12;button.hidden=!visible;if(!visible)return;button.style.left=(rect.left+(p.x+1)*rect.width/2-stageRect.left)+'px';button.style.top=(rect.top+(1-p.y)*rect.height/2-stageRect.top)+'px'};
- for(const {object,button} of domainHitTargets.values()){button.hidden=!opened||!!selected;place(object,button)}
+ for(const {object,button} of domainHitTargets.values()){place(object,button);button.hidden=!opened||!!selected||button.hidden}
  for(const [label,button] of resourceHitTargets)place(label,button);
 }
 function renderPath() {
