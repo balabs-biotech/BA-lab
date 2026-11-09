@@ -250,6 +250,10 @@ assert.match(reportRenderer, /tendance monotone candidate/,
   'the monitor must flag sustained monotone sequences as candidates');
 assert.match(reportRenderer, /rupture candidate/,
   'the monitor must flag abrupt deviations from a prior rolling baseline');
+assert.match(reportRenderer, /if \(mad > 0\)/,
+  'zero MAD must not silently become a zero-width alert threshold');
+assert.match(reportRenderer, /MAD nul|MAD égal à zéro|MAD est nul/i,
+  'zero-MAD baselines must disclose that no robust threshold can be inferred');
 assert.match(reportRenderer, /MAD/,
   'abrupt deviations must use a robust median absolute deviation baseline');
 assert.match(reportRenderer, /ne modifie pas les mesures/,
