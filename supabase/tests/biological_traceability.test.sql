@@ -171,6 +171,27 @@ declare
   derived_material uuid;
   caught boolean;
 begin
+  if not exists (
+    select 1 from pg_catalog.pg_proc p
+     where p.oid='private.prevent_material_cycle()'::regprocedure
+       and not p.prosecdef
+       and p.proconfig @> array['search_path=pg_catalog']
+  ) then
+    raise exception 'FAIL: material cycle trigger function security contract is invalid';
+  end if;
+  if not exists (
+    select 1 from pg_catalog.pg_proc p
+     where p.oid='private.prevent_culture_cycle()'::regprocedure
+       and not p.prosecdef
+       and p.proconfig @> array['search_path=pg_catalog']
+  ) then
+    raise exception 'FAIL: culture cycle trigger function security contract is invalid';
+  end if;
+  if has_function_privilege('authenticated','private.prevent_material_cycle()','execute')
+     or has_function_privilege('authenticated','private.prevent_culture_cycle()','execute') then
+    raise exception 'FAIL: authenticated can execute private lineage trigger functions directly';
+  end if;
+
   select id into root_culture from public.cultures
    where organization_id='00000000-0000-0000-0000-0000000000a1' and code='PARENT-001';
   insert into public.cultures(organization_id,code,culture_type,material_id,parent_culture_id)
