@@ -9,8 +9,8 @@ declare
   v_setting text;
 begin
   foreach v_signature in array array[
-    'public.record_manual_measurement(jsonb,jsonb)'::regprocedure,
-    'public.record_manual_observation(jsonb,jsonb)'::regprocedure
+    'public.record_manual_measurement(jsonb,jsonb,uuid)'::regprocedure,
+    'public.record_manual_observation(jsonb,jsonb,uuid)'::regprocedure
   ] loop
     select p.prosecdef, p.proconfig, p.proacl, p.proowner
       into v_proc
