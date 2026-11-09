@@ -93,6 +93,7 @@ do $material_edge$
 declare
   parent_id uuid;
   derived_id uuid;
+  alternate_parent_id uuid;
   edge_type text;
 begin
   select id into parent_id from public.materials
@@ -115,6 +116,35 @@ begin
      and parent_material_id=parent_id and child_material_id=derived_id;
   if edge_type is distinct from 'culture_propagation' then
     raise exception 'FAIL: material insert did not create its typed parent relationship';
+  end if;
+
+  insert into public.materials(
+    organization_id, material_code, material_type, state, generation
+  ) values (
+    '00000000-0000-0000-0000-0000000000a1', 'MAT-ALT-PARENT',
+    'strain', 'active', 0
+  ) returning id into alternate_parent_id;
+
+  update public.materials
+     set parent_material_id = alternate_parent_id
+   where organization_id='00000000-0000-0000-0000-0000000000a1'
+     and id=derived_id;
+
+  if exists (
+    select 1 from public.material_relationships
+     where organization_id='00000000-0000-0000-0000-0000000000a1'
+       and parent_material_id=parent_id and child_material_id=derived_id
+       and relationship_type='culture_propagation'
+  ) then
+    raise exception 'FAIL: reparenting left a stale typed material edge';
+  end if;
+  if not exists (
+    select 1 from public.material_relationships
+     where organization_id='00000000-0000-0000-0000-0000000000a1'
+       and parent_material_id=alternate_parent_id and child_material_id=derived_id
+       and relationship_type='culture_propagation'
+  ) then
+    raise exception 'FAIL: reparenting did not create the new typed material edge';
   end if;
 end
 $material_edge$;
