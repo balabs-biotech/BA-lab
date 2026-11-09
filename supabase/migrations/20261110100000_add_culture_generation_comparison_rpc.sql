@@ -90,7 +90,7 @@ begin
          or b.material_id in (select material_id from selected))
   ),
   culture_environment_context as (
-    select s.id as culture_id,
+    select distinct s.id as culture_id,
            e.id as environment_id,
            e.name as environment_name,
            e.location_id,
@@ -108,6 +108,28 @@ begin
       left join public.locations l
         on l.organization_id = s.organization_id
        and l.id = e.location_id
+    union
+    select distinct s.id as culture_id,
+           e.id as environment_id,
+           e.name as environment_name,
+           coalesce(b.location_id, e.location_id) as location_id,
+           l.code as location_code,
+           l.name as location_name,
+           l.location_type,
+           l.latitude,
+           l.longitude,
+           l.coordinate_accuracy_m,
+           l.coordinate_source
+      from selected s
+      join public.batches b
+        on b.organization_id = s.organization_id
+       and (b.culture_id = s.id or b.material_id = s.material_id)
+      left join public.environments e
+        on e.organization_id = b.organization_id
+       and e.id = b.environment_id
+      left join public.locations l
+        on l.organization_id = b.organization_id
+       and l.id = coalesce(b.location_id, e.location_id)
   ),
   selected_experiments as (
     select distinct experiment_id as id
