@@ -6489,9 +6489,15 @@ async function loadCultureDetail(cultureId) {
   if (!culture || !panel || !title || !meta || !summary || !timeline) return;
 
   panel.dataset.cultureId = culture.id;
+  const comparisonResults = document.getElementById("generationComparisonResults");
+  if (comparisonResults) {
+    comparisonResults.__generationComparisonRequestId = (comparisonResults.__generationComparisonRequestId || 0) + 1;
+    comparisonResults.replaceChildren();
+  }
+  const comparisonButton = document.getElementById("compareCultureGenerationsButton");
+  if (comparisonButton) comparisonButton.disabled = false;
   populateGenerationComparisonOptions(culture.id);
   document.getElementById("generationComparisonStatus").textContent = "Choisissez au moins une autre culture pour comparer les générations.";
-  document.getElementById("generationComparisonResults").replaceChildren();
   loadBiologicalLineage(culture.id);
   panel.classList.remove("hidden");
   title.textContent = culture.code || "Culture sans code";
@@ -6996,6 +7002,17 @@ function setupUiEnhancements() {
   document.getElementById("cultureTypeFilter")?.addEventListener("change", renderCultureCatalog);
   document.getElementById("bioOperationForm")?.addEventListener("submit", saveBiologicalOperation);
   document.getElementById("compareCultureGenerationsButton")?.addEventListener("click", compareCultureGenerations);
+  document.getElementById("generationComparisonCultures")?.addEventListener("change", () => {
+    const results = document.getElementById("generationComparisonResults");
+    if (results) {
+      results.__generationComparisonRequestId = (results.__generationComparisonRequestId || 0) + 1;
+      results.replaceChildren();
+    }
+    const button = document.getElementById("compareCultureGenerationsButton");
+    if (button) button.disabled = false;
+    const status = document.getElementById("generationComparisonStatus");
+    if (status) status.textContent = "Sélection modifiée. Relancez la comparaison pour actualiser le rapport.";
+  });
   document.getElementById("bioOperationDate")?.setAttribute("value", new Date().toISOString().slice(0,16));
   document.getElementById("closeCultureDetail")?.addEventListener("click", () => {
     document.getElementById("cultureDetailPanel")?.classList.add("hidden");
