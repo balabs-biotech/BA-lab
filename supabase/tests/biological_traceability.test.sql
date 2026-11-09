@@ -211,7 +211,7 @@ $lineage_cycle_guard$;
 reset role;
 select set_config('request.jwt.claim.sub','00000000-0000-0000-0000-0000000000b1',false);
 set role authenticated;
-do $
+do $existing_operation$
 declare result jsonb; parent_id uuid; child_id uuid; v_child_material_id uuid; event_count integer; caught boolean;
 begin
   select id into parent_id from public.cultures where organization_id='00000000-0000-0000-0000-0000000000a1' and code='PARENT-001';
@@ -237,7 +237,7 @@ begin
   if not caught then raise exception 'FAIL: duplicate child code was accepted'; end if;
   if exists(select 1 from public.cultures where organization_id='00000000-0000-0000-0000-0000000000a1' and code='CROSS-ORG-CHILD') then raise exception 'FAIL: cross-org child was created'; end if;
   if has_function_privilege('anon','public.record_biological_operation(uuid,uuid,text,timestamptz,text,jsonb,text[])','execute') then raise exception 'FAIL: anon can execute biological operation RPC'; end if;
-end $$;
+end $existing_operation$;
 reset role;
 select 'PASS: biological traceability runtime, lineage, RLS boundary, input validation and grants' as test_result;
 
