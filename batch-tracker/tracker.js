@@ -6213,26 +6213,22 @@ async function loadCultureDetail(cultureId) {
 
     const batches = cultureBatches || [];
     const batchIds = batches.map(batch => batch.id);
-    const eventQueries = [
-      supabaseClient.from("events").select("id, event_type, occurred_at, batch_id, payload")
-        .eq("organization_id", loadOrganizationId).eq("culture_id", culture.id)
-        .order("occurred_at", { ascending: false }).limit(100)
-    ];
-    if (batchIds.length) {
-      eventQueries.push(
-        supabaseClient.from("events").select("id, event_type, occurred_at, batch_id, payload")
-          .eq("organization_id", loadOrganizationId).in("batch_id", batchIds)
-          .order("occurred_at", { ascending: false }).limit(100)
-      );
-    }
-    const eventResults = await Promise.all(eventQueries);
+    const { data: eventHistory, error: eventHistoryError } = await supabaseClient.rpc("get_culture_event_history", {
+      p_organization_id: loadOrganizationId,
+      p_culture_id: culture.id,
+      p_limit: 100,
+      p_offset: 0
+    });
+    if (eventHistoryError) throw new Error("Événements : " + eventHistoryError.message);
     if (requestId !== cultureDetailRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
-    for (const result of eventResults) {
-      if (result.error) throw new Error("Événements : " + result.error.message);
-    }
-    const eventsById = new Map();
-    eventResults.forEach(result => (result.data || []).forEach(event => eventsById.set(event.id, event)));
-    const events = [...eventsById.values()].sort((a, b) => new Date(b.occurred_at || 0) - new Date(a.occurred_at || 0));
+    const events = (eventHistory || []).map(row => ({
+      id: row.event_id,
+      event_type: row.event_type,
+      occurred_at: row.occurred_at,
+      batch_id: row.batch_id,
+      source_relation: row.source_relation,
+      payload: row.payload
+    }));
     const linkedEventIds = events.map(event => event.id);
     const measurementQueries = [
       supabaseClient.from("measurements").select("id, variable_code, raw_value, raw_unit_code, measured_at, event_id, metadata")
@@ -6301,8 +6297,12 @@ async function loadCultureDetail(cultureId) {
       }));
       if (!linkedMeasurements.length && !linkedObservations.length) entries.push({
         date: event.occurred_at,
-        type: String(event.event_type || "Événement").replaceAll("_", " "),
+        type: (event.source_relation === "creation_operation" ? "Opération de création · " : "") +
+          String(event.event_type || "Événement").replaceAll("_", " "),
         detail: [
+          event.source_relation === "creation_operation" ? "Opération à l’origine de cette culture" : null,
+          event.payload?.parent_culture_code ? "Culture parent : " + event.payload.parent_culture_code : null,
+          event.payload?.material_code ? "Matériel : " + event.payload.material_code : null,
           event.payload?.note,
           event.payload?.details?.conditions ? "Conditions : " + event.payload.details.conditions : null,
           event.payload?.details?.outcome ? "Résultat : " + String(event.payload.details.outcome).replaceAll("_", " ") : null,
