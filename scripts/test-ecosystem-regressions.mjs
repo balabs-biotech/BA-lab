@@ -6,7 +6,7 @@ const engine = readFileSync('ecosystem/engine-v2.js', 'utf8');
 const previewEngine = readFileSync('ecosystem-preview/engine-v2.js', 'utf8');
 const expectedDomains = ['bio', 'myco', 'soil', 'lab', 'products', 'iot', 'work', 'learn'];
 
-assert.ok(html.includes('engine-v2.js?v=20261109-depth-three-branches-v1'), 'Public explorer must load the cache-busted screen-space label engine');
+assert.ok(html.includes('engine-v2.js?v=20261109-dense-branches-layout-v1'), 'Public explorer must load the cache-busted screen-space label engine');
 assert.ok(engine.includes('function syncLabelScales()') && engine.includes('cameraDistance*projection*targetPixels'), '3D labels must keep a stable screen-space size across zoom levels');
 assert.ok(!html.includes('constellation-3d.js?v='), 'Legacy monolithic engine must no longer be loaded');
 assert.ok(engine.includes("const IDS = ['bio','myco','soil','lab','products','iot','work','learn']"), 'The clean engine must own the complete eight-domain registry');
@@ -88,6 +88,10 @@ assert.ok(!engine.includes('const bg=new THREE.BufferGeometry()'), 'The opening 
 
 assert.ok(engine.includes("fetch('./notion-tree.'+LANG()+'.json'"), 'The engine must load the active language Notion tree');
 assert.ok(engine.includes('const maxDepth=3'), 'The spatial graph must expose the deepest real Notion folders and pages');
+assert.ok(engine.includes('children.length>16') && engine.includes('Math.sqrt((k+.5)/children.length)'), 'Dense folders must use a spread-out phyllotaxis layout instead of one crowded ring');
+assert.ok(engine.includes('label.userData.denseRoot?19'), 'Dense root labels must use a readable compact screen-space size');
+assert.ok(engine.includes('rootCount>16?(window.innerWidth<760?20.5:11.5):7.5'), 'Dense folders must fit the initial camera framing on mobile and desktop');
+assert.ok(previewEngine.includes('children.length>16') && previewEngine.includes('Math.sqrt((k+.5)/children.length)'), 'Preview must use the same dense-folder layout as the public explorer');
 assert.ok(previewEngine.includes('const maxDepth=3'), 'Preview and public engines must expose the same deepest Notion level');
 for (const language of ['fr', 'ar', 'en', 'pt']) {
   const tree = JSON.parse(readFileSync('ecosystem/notion-tree.' + language + '.json', 'utf8'));
