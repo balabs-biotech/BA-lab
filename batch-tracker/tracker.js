@@ -84,6 +84,11 @@ function clearAuthenticatedWorkspaceState() {
     cultureDetailPanel.classList.add("hidden");
     cultureDetailPanel.dataset.cultureId = "";
   }
+  compareCultureGenerations.requestId = (compareCultureGenerations.requestId || 0) + 1;
+  document.getElementById("generationComparisonCultures")?.replaceChildren();
+  document.getElementById("generationComparisonResults")?.replaceChildren();
+  const generationComparisonStatus = document.getElementById("generationComparisonStatus");
+  if (generationComparisonStatus) generationComparisonStatus.textContent = "Connectez-vous pour comparer les générations.";
 
   if (recordHarvestButton) recordHarvestButton.disabled = true;
   if (saveMeasurementButton) saveMeasurementButton.disabled = true;
