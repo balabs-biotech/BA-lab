@@ -115,12 +115,14 @@ function makeLabel(text, color, size=16) {
   ctx.clearRect(0,0,canvas.width,canvas.height);
   ctx.font='700 '+(size*4)+'px Inter,system-ui,sans-serif';
   ctx.textAlign='center';ctx.textBaseline='middle';
-  ctx.shadowColor='#07110f';ctx.shadowBlur=22;ctx.fillStyle='#f4f5ed';
+  // A firm dark keyline keeps pale glyphs readable over bright hyphae at every zoom level.
+  ctx.lineJoin='round';ctx.lineWidth=30;ctx.strokeStyle='rgba(7,17,15,.96)';
+  ctx.shadowColor='#07110f';ctx.shadowBlur=18;ctx.fillStyle='#f4f5ed';
   const words=String(text).split(/\s+/);let lines=[],line='';
   for(const word of words){const next=line?line+' '+word:word;if(ctx.measureText(next).width>1880&&line){lines.push(line);line=word}else line=next}
   if(line)lines.push(line);
   const shown=lines.slice(0,2),lineHeight=142,start=256-(shown.length-1)*lineHeight/2;
-  shown.forEach((part,i)=>ctx.fillText(part,1024,start+i*lineHeight));
+  shown.forEach((part,i)=>{const y=start+i*lineHeight;ctx.strokeText(part,1024,y);ctx.fillText(part,1024,y)});
   const texture=new THREE.CanvasTexture(canvas);texture.colorSpace=THREE.SRGBColorSpace;
   const material=new THREE.SpriteMaterial({map:texture,transparent:true,depthWrite:false,depthTest:false});
   const sprite=new THREE.Sprite(material);sprite.scale.set(2.3,.58,1);sprite.userData.labelText=text;
