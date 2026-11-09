@@ -6863,6 +6863,84 @@ function renderGenerationComparisonReport(report) {
     });
     table.appendChild(body);
     timeSeriesSection.appendChild(table);
+
+    // Accessible, dependency-free SVG plot. X is elapsed time (not row index),
+    // so irregular sampling intervals remain visually honest.
+    const chart = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    chart.setAttribute("viewBox", "0 0 720 190");
+    chart.setAttribute("role", "img");
+    chart.setAttribute("aria-label", "Graphique temporel : " + series.culture + ", " +
+      series.variable + ", " + series.points.length + " relevés");
+    chart.setAttribute("preserveAspectRatio", "xMidYMid meet");
+    chart.style.width = "100%";
+    chart.style.height = "auto";
+    chart.style.maxHeight = "220px";
+    const chartTitle = document.createElementNS("http://www.w3.org/2000/svg", "title");
+    chartTitle.textContent = "Évolution de " + series.variable + " — " + series.culture;
+    chart.appendChild(chartTitle);
+    const chartDescription = document.createElementNS("http://www.w3.org/2000/svg", "desc");
+    chartDescription.textContent = "Valeurs mesurées dans le temps, unité " + series.unit +
+      ". Les valeurs exactes et dates figurent dans le tableau accessible adjacent.";
+    chart.appendChild(chartDescription);
+    const chartLeft = 54;
+    const chartRight = 690;
+    const chartTop = 18;
+    const chartBottom = 145;
+    const values = series.points.map(point => point.value);
+    const minValue = Math.min(...values);
+    const maxValue = Math.max(...values);
+    const valuePadding = maxValue === minValue
+      ? Math.max(Math.abs(maxValue) * 0.05, 1)
+      : (maxValue - minValue) * 0.08;
+    const yMin = minValue - valuePadding;
+    const yMax = maxValue + valuePadding;
+    const firstTime = series.points[0].timestamp;
+    const lastTime = series.points[series.points.length - 1].timestamp;
+    const xFor = point => lastTime === firstTime
+      ? (chartLeft + chartRight) / 2
+      : chartLeft + ((point.timestamp - firstTime) / (lastTime - firstTime)) *
+        (chartRight - chartLeft);
+    const yFor = value => chartBottom - ((value - yMin) / (yMax - yMin)) *
+      (chartBottom - chartTop);
+    const axis = document.createElementNS("http://www.w3.org/2000/svg", "path");
+    axis.setAttribute("d", "M " + chartLeft + " " + chartTop + " V " +
+      chartBottom + " H " + chartRight);
+    axis.setAttribute("fill", "none");
+    axis.setAttribute("stroke", "currentColor");
+    axis.setAttribute("stroke-opacity", "0.45");
+    chart.appendChild(axis);
+    const polyline = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
+    polyline.setAttribute("points", series.points.map(point =>
+      xFor(point) + "," + yFor(point.value)
+    ).join(" "));
+    polyline.setAttribute("fill", "none");
+    polyline.setAttribute("stroke", "currentColor");
+    polyline.setAttribute("stroke-width", "2.5");
+    polyline.setAttribute("stroke-linejoin", "round");
+    polyline.setAttribute("stroke-linecap", "round");
+    chart.appendChild(polyline);
+    series.points.forEach(point => {
+      const marker = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+      marker.setAttribute("cx", String(xFor(point)));
+      marker.setAttribute("cy", String(yFor(point.value)));
+      marker.setAttribute("r", "4");
+      marker.setAttribute("fill", "currentColor");
+      chart.appendChild(marker);
+    });
+    const startLabel = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    startLabel.setAttribute("x", String(chartLeft));
+    startLabel.setAttribute("y", "174");
+    startLabel.setAttribute("font-size", "11");
+    startLabel.textContent = new Date(firstTime).toLocaleDateString();
+    chart.appendChild(startLabel);
+    const endLabel = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    endLabel.setAttribute("x", String(chartRight));
+    endLabel.setAttribute("y", "174");
+    endLabel.setAttribute("text-anchor", "end");
+    endLabel.setAttribute("font-size", "11");
+    endLabel.textContent = new Date(lastTime).toLocaleDateString();
+    chart.appendChild(endLabel);
+    timeSeriesSection.appendChild(chart);
   });
 
   if (!sortedTimeSeries.length) {
