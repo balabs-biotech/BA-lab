@@ -6077,9 +6077,6 @@ async function loadBiologicalLineage(cultureId, offset = 0) {
   }
 }
 
-let pendingBiologicalOperationKey = null;
-let pendingBiologicalOperationFingerprint = null;
-
 async function saveBiologicalOperation(event) {
   const operationRevision = authStateRevision;
   const operationOrganizationId = organizationId;
@@ -6100,26 +6097,30 @@ async function saveBiologicalOperation(event) {
   if (childCodes.length && !['repiquage','passage','transfert','division_aliquotes','changement_milieu','conservation'].includes(operationType)) { message.textContent = biologicalWorkflowText("invalidPropagation"); return; }
   const occurredAt = new Date(dateValue).toISOString();
   const details = { source: 'BA Labs Culture Tracker', interface_version: '3.0', conditions: conditions || null, outcome: outcome || null };
-  const requestFingerprint = JSON.stringify({
-    organizationId: operationOrganizationId, cultureId, operationType, occurredAt,
-    note: note || null, details, childCodes
-  });
-  if (!pendingBiologicalOperationKey || pendingBiologicalOperationFingerprint !== requestFingerprint) {
-    pendingBiologicalOperationKey = crypto.randomUUID();
-    pendingBiologicalOperationFingerprint = requestFingerprint;
-  }
+  const biologicalOperationPayload = {
+    organization_id: operationOrganizationId,
+    parent_culture_id: cultureId,
+    event_type: operationType,
+    occurred_at: occurredAt,
+    note: note || null,
+    details,
+    child_codes: childCodes
+  };
+  const idempotencyKey = await getManualWriteIdempotencyKey(
+    "biological-operation",
+    biologicalOperationPayload
+  );
   button.disabled = true; button.textContent = biologicalWorkflowText("saving"); message.textContent = '';
   try {
     if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) throw new Error("Session ou espace de travail modifié pendant l’opération. Recommencez.");
     const { data, error } = await supabaseClient.rpc('record_biological_operation', {
       p_organization_id: operationOrganizationId, p_parent_culture_id: cultureId, p_event_type: operationType,
-      p_idempotency_key: pendingBiologicalOperationKey,
+      p_idempotency_key: idempotencyKey,
       p_occurred_at: occurredAt, p_note: note || null,
       p_details: details, p_child_codes: childCodes
     });
     if (error) throw error;
-    pendingBiologicalOperationKey = null;
-    pendingBiologicalOperationFingerprint = null;
+    clearManualWriteIdempotencyKey("biological-operation");
     if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
     const result = Array.isArray(data) ? data[0] : data;
     let notionSyncWarning = '';
