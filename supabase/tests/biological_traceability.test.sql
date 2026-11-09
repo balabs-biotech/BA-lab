@@ -121,7 +121,7 @@ select 'PASS: biological traceability runtime, lineage, RLS boundary, input vali
 
 -- Idempotency regression: a retry after an unknown client outcome must return
 -- the original result without creating another operation or descendant.
-\\i supabase/migrations/20261109100000_add_biological_operation_idempotency.sql
+\i supabase/migrations/20261109100000_add_biological_operation_idempotency.sql
 set role authenticated;
 do $$
 declare
