@@ -254,9 +254,41 @@ function syncResourceHitTargets() {
  if(!_hitWorld)_hitWorld=new THREE.Vector3();
  camera.updateMatrixWorld(true);world?.updateMatrixWorld(true);
  const rect=renderer.domElement.getBoundingClientRect(),stageRect=stage.getBoundingClientRect();
- const place=(object,button)=>{object.getWorldPosition(_hitWorld);const p=_hitWorld.clone().project(camera);button.style.setProperty('z-index',String(Math.round(1000-(p.z+1)*400)+(button.dataset.hasChildren==='true'?1:0)),'important');const levelVisible=Number(button.dataset.depth||0)===0;const visible=levelVisible&&p.z>-1&&p.z<1&&p.x>=-1.12&&p.x<=1.12&&p.y>=-1.12&&p.y<=1.12;button.hidden=!visible;button.style.display=visible?'block':'none';if(!visible)return;button.style.left=(rect.left+(p.x+1)*rect.width/2-stageRect.left)+'px';button.style.top=(rect.top+(1-p.y)*rect.height/2-stageRect.top)+'px'};
- for(const {object,button} of domainHitTargets.values()){place(object,button);button.hidden=!opened||!!selected||button.hidden}
- for(const [label,button] of resourceHitTargets)place(label,button);
+ const projected=[];
+ const project=(object,button)=>{
+  object.getWorldPosition(_hitWorld);const p=_hitWorld.clone().project(camera);
+  const depth=Number(button.dataset.depth||0),visible=depth===0&&p.z>-1&&p.z<1&&p.x>=-1.12&&p.x<=1.12&&p.y>=-1.12&&p.y<=1.12;
+  button.hidden=!visible;button.style.display=visible?'block':'none';
+  if(!visible)return;
+  projected.push({object,button,p,x:rect.left+(p.x+1)*rect.width/2-stageRect.left,y:rect.top+(1-p.y)*rect.height/2-stageRect.top,depth});
+ };
+ for(const {object,button} of domainHitTargets.values()){project(object,button);button.hidden=!opened||!!selected||button.hidden}
+ for(const [label,button] of resourceHitTargets)project(label,button);
+ // Place labels in screen space, not directly on top of one another. This is
+ // especially important on narrow mobile screens where projected branches cluster.
+ projected.sort((a,b)=>a.p.z-b.p.z);
+ const occupied=[];
+ const obstacles=[...stage.querySelectorAll('.webgl-controls,.webgl-status,.webgl-path,.webgl-focus,.webgl-intro')]
+  .filter(el=>!el.hidden&&getComputedStyle(el).display!=='none')
+  .map(el=>{const r=el.getBoundingClientRect();return {l:r.left-stageRect.left,t:r.top-stageRect.top,r:r.right-stageRect.left,b:r.bottom-stageRect.top}});
+ const overlaps=(a,b)=>a.l<b.r+8&&a.r>b.l-8&&a.t<b.b+8&&a.b>b.t-8;
+ const offsets=[[0,0],[1,0],[-1,0],[0,1],[0,-1],[1,1],[-1,1],[1,-1],[-1,-1],[2,0],[-2,0],[0,2],[0,-2]];
+ for(const item of projected){
+  const {button}=item,w=button.offsetWidth||150,h=button.offsetHeight||50;
+  const sx=Math.max(w/2+6,Math.min(stageRect.width-w/2-6,item.x)),sy=Math.max(h/2+6,Math.min(stageRect.height-h/2-6,item.y));
+  const stepX=w/2+12,stepY=h/2+12;
+  let chosen=null;
+  for(const [ox,oy] of offsets){
+   const cx=Math.max(w/2+6,Math.min(stageRect.width-w/2-6,sx+ox*stepX));
+   const cy=Math.max(h/2+6,Math.min(stageRect.height-h/2-6,sy+oy*stepY));
+   const box={l:cx-w/2,t:cy-h/2,r:cx+w/2,b:cy+h/2};
+   if(!occupied.some(r=>overlaps(box,r))&&!obstacles.some(r=>overlaps(box,r))){chosen={cx,cy,box};break}
+  }
+  if(!chosen){const cx=sx,cy=sy;chosen={cx,cy,box:{l:cx-w/2,t:cy-h/2,r:cx+w/2,b:cy+h/2}}}
+  occupied.push(chosen.box);
+  button.style.setProperty('z-index',String(12000+Math.round((1-item.p.z)*100)),'important');
+  button.style.left=chosen.cx+'px';button.style.top=chosen.cy+'px';
+ }
 }
 function renderPath() {
   if(!nav)return;nav.replaceChildren();
