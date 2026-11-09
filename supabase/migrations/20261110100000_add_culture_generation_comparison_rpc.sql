@@ -68,6 +68,17 @@ begin
       from selected
      where environment_id is not null
   ),
+  selected_experiments as (
+    select distinct experiment_id as id
+      from selected
+     where experiment_id is not null
+    union
+    select distinct eu.experiment_id
+      from public.experimental_units eu
+      join selected s on s.organization_id = eu.organization_id
+                     and s.experimental_unit_id = eu.id
+     where eu.organization_id = p_organization_id
+  ),
   selected_materials as (
     select distinct material_id as id
       from selected
@@ -158,6 +169,17 @@ begin
      order by e.occurred_at desc, e.id
      limit 500
   ),
+  result_rows as (
+    select r.id, r.experiment_id, r.experimental_unit_id, r.code,
+           r.result_type, r.value, r.quality_state, r.created_at,
+           case when r.experimental_unit_id is not null then 'experimental_unit' else 'experiment' end as source_relation
+      from public.results r
+     where r.organization_id = p_organization_id
+       and (r.experimental_unit_id in (select id from selected_units)
+         or r.experiment_id in (select id from selected_experiments))
+     order by r.created_at desc, r.id
+     limit 500
+  ),
   batch_rows as (
     select b.id, b.batch_code, b.name, b.batch_type, b.status,
            b.current_stage, b.culture_id, b.material_id, b.environment_id,
@@ -189,7 +211,11 @@ begin
                 and e.environment_id in (select id from selected_envs)))) as event_count,
       (select count(*) from public.batches b
         where b.organization_id = p_organization_id
-          and (b.culture_id = any(v_ids) or b.material_id in (select id from selected_materials))) as batch_count
+          and (b.culture_id = any(v_ids) or b.material_id in (select id from selected_materials))) as batch_count,
+      (select count(*) from public.results r
+        where r.organization_id = p_organization_id
+          and (r.experimental_unit_id in (select id from selected_units)
+            or r.experiment_id in (select id from selected_experiments))) as result_count
   )
   select jsonb_build_object(
     'schema_version', 1,
@@ -209,6 +235,7 @@ begin
     'observations', coalesce((select jsonb_agg(to_jsonb(o) order by o.observed_at desc, o.id) from observation_rows o), '[]'::jsonb),
     'events', coalesce((select jsonb_agg(to_jsonb(e) order by e.occurred_at desc, e.id) from event_rows e), '[]'::jsonb),
     'batches', coalesce((select jsonb_agg(to_jsonb(b) order by b.started_at nulls last, b.id) from batch_rows b), '[]'::jsonb),
+    'results', coalesce((select jsonb_agg(to_jsonb(r) order by r.created_at desc, r.id) from result_rows r), '[]'::jsonb),
     'data_quality', jsonb_build_object(
       'measurement_total', counts.measurement_count,
       'measurement_returned', (select count(*) from measurement_rows),
@@ -222,6 +249,9 @@ begin
       'batch_total', counts.batch_count,
       'batch_returned', (select count(*) from batch_rows),
       'batch_truncated', counts.batch_count > 200,
+      'result_total', counts.result_count,
+      'result_returned', (select count(*) from result_rows),
+      'result_truncated', counts.result_count > 500,
       'excluded_measurements', (
         select count(*) from public.measurements m
          where m.organization_id = p_organization_id
@@ -229,7 +259,7 @@ begin
            and (m.culture_id = any(v_ids)
              or (m.culture_id is null and m.environment_id in (select id from selected_envs)))
       ),
-      'missing_numeric_values', (
+      'measurements_without_normalized_value', (
         select count(*) from public.measurements m
          where m.organization_id = p_organization_id
            and m.normalized_value is null
