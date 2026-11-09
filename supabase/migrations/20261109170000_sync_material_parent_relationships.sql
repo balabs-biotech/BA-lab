@@ -1,0 +1,2 @@
+-- Synchronize typed material lineage edges with canonical materials.parent_material_id.
+-- Implementation intentionally pending the regression test in this commit.
