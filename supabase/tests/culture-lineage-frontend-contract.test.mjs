@@ -202,4 +202,18 @@ assert.match(reportRenderer, /Mesures non rattachées à une unité expérimenta
 
 
 
+
+assert.match(reportRenderer, /anomalyEligibleCohorts/,
+  'the comparison report must expose a dedicated candidate-anomaly analysis');
+assert.match(reportRenderer, /cohort\.units\.length >= 4/,
+  'IQR candidate flags must require at least four distinct experimental units');
+assert.match(reportRenderer, /1\.5 \* iqr|1\.5\s*\*\s*iqr/i,
+  'candidate anomalies must use the conventional 1.5-IQR descriptive fence');
+assert.match(reportRenderer, /valeur atypique candidate — à vérifier/,
+  'flagged values must be labelled as candidates requiring review');
+assert.match(reportRenderer, /effectif insuffisant pour le repérage IQR/,
+  'cohorts below four units must explicitly report insufficient sample size');
+assert.match(reportRenderer, /Aucune mesure atypique n'est exclue automatiquement/,
+  'candidate flags must never silently exclude source measurements');
+
 console.log('PASS: CultureOps lineage, event history and generation comparison use bounded tenant RPCs');
