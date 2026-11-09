@@ -200,12 +200,11 @@ assert.match(reportRenderer, /environnement déclaré sur la culture/,
 assert.match(reportRenderer, /résolution spatiale/,
   'gridded environmental observations must disclose their spatial resolution');
 assert.match(reportRenderer, /ne sont pas des mesures directes de la culture/,
-
+  'external environmental observations must never be presented as direct culture measurements');
 assert.match(reportRenderer, /environmental_truncated/,
   'the environmental context panel must read the RPC truncation flag');
 assert.match(reportRenderer, /observations environnementales retournées/,
   'the UI must disclose when the 500-row environmental evidence cap omits history');
-  'external environmental observations must never be presented as direct culture measurements');
 
 assert.match(reportRenderer, /culture\.experimental_unit_id/,
   'replicate-aware analysis must identify the experimental unit attached to each culture');
