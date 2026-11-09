@@ -136,8 +136,8 @@ async function checkWorkingScene(name, viewport) {
     assert.ok(branchTarget, name + ': no spatial folder/page target was found');
     if (branchTarget.hasChildren) {
       const depthBefore = probe.depth;
-      const branchButtonPoint = await page.evaluate((title) => { const button=[...document.querySelectorAll('.webgl-resource-target')].find(item=>item.title===title&&!item.hidden); if(!button)return null; const rect=button.getBoundingClientRect(); return {x:rect.left+rect.width/2,y:rect.top+rect.height/2,width:rect.width,height:rect.height}; }, branchTarget.title);
-      assert.ok(branchButtonPoint, name + ': projected branch must expose a visible DOM hit target');
+      const branchButtonPoint = await page.evaluate(() => { const buttons=[...document.querySelectorAll('.webgl-resource-target:not([hidden])')].filter(item=>item.dataset.hasChildren==='true'); const button=buttons.find(item=>{const rect=item.getBoundingClientRect();return document.elementFromPoint(rect.left+rect.width/2,rect.top+rect.height/2)===item}); if(!button)return null; const rect=button.getBoundingClientRect(); return {x:rect.left+rect.width/2,y:rect.top+rect.height/2,title:button.title}; });
+      assert.ok(branchButtonPoint, name + ': at least one folder must expose an unobstructed DOM hit target');
       await tapSpatialTarget(page, name, branchButtonPoint.x, branchButtonPoint.y);
       assert.ok(await page.evaluate(() => window.__BALABS_3D_TARGET_EVENTS__?.some(event => event.type === 'click')), name + ': selecting a branch must hit its real DOM interaction target');
       await page.waitForFunction((before) => (window.__BALABS_3D_E2E__()?.depth || 0) > before, depthBefore, { timeout: 8000 }).catch(async error => { throw new Error(name + ': nested branch tap did not advance. ' + JSON.stringify(await page.evaluate((title) => { const b=[...document.querySelectorAll('.webgl-hit-target')].find(x=>x.title===title); const r=b?.getBoundingClientRect(); const x=r?r.left+r.width/2:0,y=r?r.top+r.height/2:0,e=document.elementFromPoint(x,y); return {events:window.__BALABS_3D_TARGET_EVENTS__,documentClick:window.__BALABS_3D_DOCUMENT_CLICK__,probe:window.__BALABS_3D_E2E__(),viewport:{innerWidth,innerHeight,clientWidth:document.documentElement.clientWidth,clientHeight:document.documentElement.clientHeight},stage:(()=>{const q=document.querySelector('.webgl-stage')?.getBoundingClientRect();return q&&{x:q.x,y:q.y,width:q.width,height:q.height}})(),button:b&&{hidden:b.hidden,inline:{left:b.style.left,top:b.style.top},rect:r&&{x:r.x,y:r.y,width:r.width,height:r.height},computed:{position:getComputedStyle(b).position,zIndex:getComputedStyle(b).zIndex,pointerEvents:getComputedStyle(b).pointerEvents}},element:{tag:e?.tagName,className:typeof e?.className==='string'?e.className:'',isTarget:e===b}}; }, branchTarget.title)) + ' — ' + error.message); });
@@ -167,8 +167,10 @@ async function checkWorkingScene(name, viewport) {
       continue;
     }
     assert.ok(branchTarget.url, name + ': terminal branch must carry its Notion destination');
+    const terminalPoint = await page.evaluate(() => { const buttons=[...document.querySelectorAll('.webgl-resource-target:not([hidden])')].filter(item=>item.dataset.hasChildren!=='true'&&item.dataset.resourceUrl); const button=buttons.find(item=>{const rect=item.getBoundingClientRect();return document.elementFromPoint(rect.left+rect.width/2,rect.top+rect.height/2)===item}); if(!button)return null; const rect=button.getBoundingClientRect(); return {x:rect.left+rect.width/2,y:rect.top+rect.height/2,title:button.title}; });
+    assert.ok(terminalPoint, name + ': at least one page must expose an unobstructed DOM hit target');
     const popupPromise = page.context().waitForEvent('page', { timeout: 10000 });
-    await tapSpatialTarget(page, name, branchTarget.x, branchTarget.y);
+    await tapSpatialTarget(page, name, terminalPoint.x, terminalPoint.y);
     const popup = await popupPromise;
     await popup.waitForLoadState('domcontentloaded', { timeout: 12000 }).catch(() => {});
     assert.match(popup.url(), /notion\.(so|site|com)/i, name + ': terminal branch must open its Notion page');
