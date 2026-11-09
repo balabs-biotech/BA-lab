@@ -6537,6 +6537,152 @@ function renderGenerationComparisonReport(report) {
   statsSection.appendChild(qualityNote);
   target.appendChild(statsSection);
 
+  // Replicate-aware comparison: collapse repeated readings within each
+  // experimental unit first, then compare independent units within a cohort.
+  const cultureMetadata = new Map((report.cultures || []).map(culture =>
+    [culture.id, culture]
+  ));
+  const unitMeasurements = new Map();
+  let measurementsWithoutExperimentalUnit = 0;
+  cultureMeasurementRows.forEach(row => {
+    if (row.quality_state === "excluded") return;
+    const culture = cultureMetadata.get(row.culture_id);
+    if (!culture?.experimental_unit_id || !culture?.experiment_id) {
+      measurementsWithoutExperimentalUnit += 1;
+      return;
+    }
+    const numericValue = Number(row.normalized_value ?? row.raw_value);
+    if (!Number.isFinite(numericValue)) return;
+    const unit = row.normalized_value != null
+      ? (row.normalized_unit_code || "unité normalisée non renseignée")
+      : (row.raw_unit_code || "unité brute non renseignée");
+    const treatment = culture.treatment_code || "traitement non renseigné";
+    const quality = row.quality_state || "qualité non renseignée";
+    const cohortKey = [
+      culture.experiment_id, treatment, row.variable_code || "variable inconnue",
+      unit, quality
+    ].join("||");
+    const unitKey = [cohortKey, culture.experimental_unit_id].join("||");
+    if (!unitMeasurements.has(unitKey)) {
+      unitMeasurements.set(unitKey, {
+        cohortKey,
+        experiment: culture.experiment_code || culture.experiment_id,
+        treatment,
+        variable: row.variable_code || "Variable inconnue",
+        unit,
+        quality,
+        unitId: culture.experimental_unit_id,
+        unitCode: culture.unit_code || culture.replicate_no || culture.experimental_unit_id,
+        cultureCodes: new Set(),
+        values: []
+      });
+    }
+    const unitGroup = unitMeasurements.get(unitKey);
+    unitGroup.values.push(numericValue);
+    unitGroup.cultureCodes.add(culture.code || culture.id);
+  });
+
+  const cohorts = new Map();
+  unitMeasurements.forEach(unitGroup => {
+    if (!cohorts.has(unitGroup.cohortKey)) {
+      cohorts.set(unitGroup.cohortKey, {
+        experiment: unitGroup.experiment,
+        treatment: unitGroup.treatment,
+        variable: unitGroup.variable,
+        unit: unitGroup.unit,
+        quality: unitGroup.quality,
+        units: []
+      });
+    }
+    const sortedValues = unitGroup.values.slice().sort((a, b) => a - b);
+    const median = sortedValues.length % 2
+      ? sortedValues[(sortedValues.length - 1) / 2]
+      : (sortedValues[sortedValues.length / 2 - 1] + sortedValues[sortedValues.length / 2]) / 2;
+    cohorts.get(unitGroup.cohortKey).units.push({
+      unitId: unitGroup.unitId,
+      unitCode: unitGroup.unitCode,
+      median,
+      measurementCount: sortedValues.length,
+      cultureCount: unitGroup.cultureCodes.size
+    });
+  });
+
+  const replicateSection = document.createElement("section");
+  replicateSection.className = "generation-comparison-section";
+  const replicateTitle = document.createElement("h5");
+  replicateTitle.textContent = "Comparaison par unités expérimentales indépendantes";
+  replicateSection.appendChild(replicateTitle);
+  const replicateNote = document.createElement("p");
+  replicateNote.className = "muted";
+  replicateNote.textContent = "Les mesures répétées d'une même unité sont d'abord résumées par leur médiane. Les statistiques suivantes portent sur les médianes des unités expérimentales, jamais sur le nombre brut de mesures. Les groupes sans expérience ou unité identifiée sont exclus de cette comparaison.";
+  replicateSection.appendChild(replicateNote);
+
+  const eligibleCohorts = [...cohorts.values()]
+    .filter(cohort => cohort.units.length >= 2)
+    .sort((a, b) => a.experiment.localeCompare(b.experiment) ||
+      a.treatment.localeCompare(b.treatment) || a.variable.localeCompare(b.variable));
+  if (eligibleCohorts.length) {
+    const replicateTable = document.createElement("table");
+    replicateTable.className = "statistics-table";
+    const replicateHead = document.createElement("thead");
+    const replicateHeader = document.createElement("tr");
+    ["Expérience", "Traitement", "Variable", "Unité", "n unités indépendantes",
+      "Moyenne des médianes", "Médiane des unités", "Étendue des unités"]
+      .forEach(label => {
+        const th = document.createElement("th");
+        th.textContent = label;
+        replicateHeader.appendChild(th);
+      });
+    replicateHead.appendChild(replicateHeader);
+    replicateTable.appendChild(replicateHead);
+    const replicateBody = document.createElement("tbody");
+    const replicateFmt = value => new Intl.NumberFormat(undefined, {
+      maximumSignificantDigits: 5
+    }).format(value);
+    eligibleCohorts.forEach(cohort => {
+      const values = cohort.units.map(unit => unit.median).sort((a, b) => a - b);
+      const mean = values.reduce((sum, value) => sum + value, 0) / values.length;
+      const middle = values.length % 2
+        ? values[(values.length - 1) / 2]
+        : (values[values.length / 2 - 1] + values[values.length / 2]) / 2;
+      const cells = [
+        cohort.experiment, cohort.treatment, cohort.variable, cohort.unit,
+        String(values.length), replicateFmt(mean), replicateFmt(middle),
+        replicateFmt(values[0]) + "–" + replicateFmt(values[values.length - 1])
+      ];
+      const tr = document.createElement("tr");
+      cells.forEach(value => {
+        const td = document.createElement("td");
+        td.textContent = value;
+        tr.appendChild(td);
+      });
+      replicateBody.appendChild(tr);
+    });
+    replicateTable.appendChild(replicateBody);
+    replicateSection.appendChild(replicateTable);
+
+    const cohortDetails = document.createElement("p");
+    cohortDetails.className = "muted";
+    cohortDetails.textContent = eligibleCohorts.map(cohort =>
+      cohort.experiment + " / " + cohort.treatment + " / " + cohort.variable +
+      " : " + cohort.units.map(unit =>
+        String(unit.unitCode) + " (" + unit.measurementCount + " mesures)"
+      ).join(", ")
+    ).join(" · ");
+    replicateSection.appendChild(cohortDetails);
+  } else {
+    const noReplicates = document.createElement("p");
+    noReplicates.className = "muted";
+    noReplicates.textContent = "Aucun groupe ne possède au moins deux unités expérimentales distinctes avec une expérience identifiée. Les données restent consultables dans la synthèse descriptive, mais aucune comparaison de répétitions indépendantes n'est calculée.";
+    replicateSection.appendChild(noReplicates);
+  }
+  const replicateLimit = document.createElement("p");
+  replicateLimit.className = "muted";
+  replicateLimit.textContent = "Mesures non rattachées à une unité expérimentale identifiable : " +
+    measurementsWithoutExperimentalUnit + ". Aucune p-value ni conclusion causale n'est calculée à ce stade.";
+  replicateSection.appendChild(replicateLimit);
+  target.appendChild(replicateSection);
+
   sections.forEach(([key, title]) => {
     const rows = Array.isArray(report[key]) ? report[key] : [];
     const section = document.createElement("section");
