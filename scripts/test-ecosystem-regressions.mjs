@@ -7,7 +7,8 @@ const previewEngine = readFileSync('ecosystem-preview/engine-v2.js', 'utf8');
 const expectedDomains = ['bio', 'myco', 'soil', 'lab', 'products', 'iot', 'work', 'learn'];
 
 assert.ok(html.includes('engine-v2.js?v=20261109-screen-space-labels-v1'), 'Public explorer must load the cache-busted screen-space label engine');
-assert.ok(engine.includes('function syncLabelScales()') && engine.includes('cameraDistance*projection*targetPixels'), '3D labels must keep a stable screen-space size across zoom levels');
+assert.ok(engine.includes('function syncLabelScales()') && engine.includes('cameraSpaceDepth*projection*targetPixels'), '3D labels must keep a stable screen-space size across zoom levels');
+assert.ok(engine.includes('labelWorldPosition.applyMatrix4(camera.matrixWorldInverse)') && engine.includes('camera.updateMatrixWorld()'), '3D label sizing must use camera-space depth for accurate perspective projection at screen edges');
 assert.ok(!html.includes('constellation-3d.js?v='), 'Legacy monolithic engine must no longer be loaded');
 assert.ok(engine.includes("const IDS = ['bio','myco','soil','lab','products','iot','work','learn']"), 'The clean engine must own the complete eight-domain registry');
 const htmlDomains = [...html.matchAll(/<button[^>]*data-sphere="([^"]+)"/g)].map(match => match[1]);
