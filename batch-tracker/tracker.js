@@ -92,6 +92,8 @@ function clearAuthenticatedWorkspaceState() {
   document.getElementById("generationComparisonCultures")?.replaceChildren();
   const generationComparisonStatus = document.getElementById("generationComparisonStatus");
   if (generationComparisonStatus) generationComparisonStatus.textContent = "Connectez-vous pour comparer les générations.";
+  const generationComparisonButton = document.getElementById("compareCultureGenerationsButton");
+  if (generationComparisonButton) generationComparisonButton.disabled = false;
 
   if (recordHarvestButton) recordHarvestButton.disabled = true;
   if (saveMeasurementButton) saveMeasurementButton.disabled = true;
@@ -6465,7 +6467,7 @@ async function compareCultureGenerations() {
     renderGenerationComparisonReport(data || {});
     status.textContent = "Rapport comparatif chargé. Les résultats sont descriptifs et les limites de données sont indiquées ci-dessous.";
   } catch (error) {
-    if (requestId !== compareCultureGenerations.requestId ||
+    if (requestId !== results.__generationComparisonRequestId ||
         !isCurrentWorkspaceRevision(revision, orgId)) return;
     console.error("Comparaison intergénérationnelle :", error);
     status.textContent = "Impossible de construire le rapport : " + (error.message || "erreur inconnue");
