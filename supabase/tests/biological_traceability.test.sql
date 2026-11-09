@@ -519,7 +519,7 @@ declare
   operation_count integer;
   descendant_count integer;
   total_count bigint;
-  has_more boolean;
+  has_more_flag boolean;
   first_event uuid;
   second_event uuid;
   caught boolean := false;
@@ -566,11 +566,11 @@ begin
     raise exception 'FAIL: culture history omitted an event from a linked production batch';
   end if;
 
-  select total_rows, has_more into total_count, has_more
+  select h.total_rows, h.has_more into total_count, has_more_flag
     from public.get_culture_event_history(
       '00000000-0000-0000-0000-0000000000a1', child_id, 1, 0
-    ) limit 1;
-  if total_count < 2 or has_more is distinct from true then
+    ) h limit 1;
+  if total_count < 2 or has_more_flag is distinct from true then
     raise exception 'FAIL: event history pagination metadata is incorrect';
   end if;
 
