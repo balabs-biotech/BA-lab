@@ -18,6 +18,14 @@ assert.match(loader, /p_limit:\s*200/,
   'lineage RPC must request an explicit bounded descendant result');
 assert.match(loader, /p_offset:\s*offset/,
   'lineage RPC must request the selected descendant page');
+assert.match(loader, /target\.__lineageRequestId/,
+  'lineage reads must maintain a per-target request revision');
+assert.match(loader, /target\.__lineageCultureId/,
+  'lineage reads must be bound to the currently selected culture');
+assert.match(loader, /lineageRequestId !== target\.__lineageRequestId/,
+  'late lineage responses must be discarded after a newer culture selection');
+assert.match(loader, /target\.__lineageCultureId !== cultureId/,
+  'pagination must not append rows to a different selected culture');
 assert.match(loader, /current\.has_more === true/,
   'lineage UI must use server pagination metadata');
 assert.match(loader, /loadBiologicalLineage\(cultureId, offset \+ 200\)/,
