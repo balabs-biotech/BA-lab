@@ -142,5 +142,10 @@ assert.doesNotMatch(source, /compareCultureGenerations\.requestId/,
   'workspace cleanup must not depend on a function scoped to another script context');
 assert.match(source, /compareCultureGenerationsButton.*addEventListener\("click", compareCultureGenerations\)/,
   'generation comparison action must be connected to its handler');
+assert.match(source, /generationComparisonCultures.*addEventListener\(["']change["']/,
+  'changing the selected cultures must invalidate any in-flight comparison report');
+assert.match(source, /generationComparisonResults\.__generationComparisonRequestId = \(generationComparisonResults\.__generationComparisonRequestId \|\| 0\) \+ 1/,
+  'opening another culture detail must invalidate a pending comparison for the previous selection');
+
 
 console.log('PASS: CultureOps lineage, event history and generation comparison use bounded tenant RPCs');
