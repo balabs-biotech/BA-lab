@@ -413,7 +413,7 @@ function pickAt(x,y) {
   const labels=resourceObjects.filter(o=>o.userData?.kind==='resource-label');
   let nearestLabel=null,nearestLabelDistance=Infinity;
   for(const label of labels){const p=screenPoint(label);if(p.d<nearestLabelDistance){nearestLabel=label;nearestLabelDistance=p.d}}
-  if(nearestLabel&&nearestLabelDistance<(window.innerWidth<760?104:118)){
+  if(nearestLabel&&nearestLabelDistance<(window.innerWidth<760?58:70)){
     if(window.__BALABS_3D_E2E__)window.__BALABS_3D_LAST_PICK__={title:nearestLabel.userData.title,kind:nearestLabel.userData.kind,children:nearestLabel.userData.children?.length||0,distance:nearestLabelDistance};
     openResource(nearestLabel.userData);return;
   }
