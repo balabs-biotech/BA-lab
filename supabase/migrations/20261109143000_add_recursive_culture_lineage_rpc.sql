@@ -3,10 +3,13 @@
 create index if not exists cultures_org_parent_idx
   on public.cultures(organization_id, parent_culture_id);
 
-create or replace function public.get_culture_lineage(
+drop function if exists public.get_culture_lineage(uuid, uuid, integer);
+
+create function public.get_culture_lineage(
   p_organization_id uuid,
   p_culture_id uuid,
-  p_limit integer default 1000
+  p_limit integer default 200,
+  p_offset integer default 0
 )
 returns table (
   relation text,
@@ -22,7 +25,9 @@ returns table (
   parent_culture_id uuid,
   parent_material_id uuid,
   started_at timestamptz,
-  truncated boolean
+  truncated boolean,
+  descendant_total bigint,
+  has_more boolean
 )
 language plpgsql
 stable
@@ -30,7 +35,8 @@ security definer
 set search_path = pg_catalog
 as $function$
 declare
-  v_limit integer := greatest(1, least(coalesce(p_limit, 1000), 5000));
+  v_limit integer := greatest(1, least(coalesce(p_limit, 200), 5000));
+  v_offset integer := greatest(0, least(coalesce(p_offset, 0), 1000000));
 begin
   if auth.uid() is null or not private.is_org_member(p_organization_id) then
     raise exception 'organization_access_denied' using errcode = '42501';
@@ -93,6 +99,9 @@ begin
            count(*) over () as total_count
       from descendants d
   ),
+  descendant_stats as (
+    select count(*)::bigint as total_count from descendants
+  ),
   material_ancestors as (
     select m.id, m.material_code, m.material_type, m.parent_material_id,
            m.generation, m.state, 1::integer as depth,
@@ -120,7 +129,7 @@ begin
            a.id as culture_id, a.code as culture_code, a.culture_type,
            a.material_id, m.material_code, m.material_type, m.generation as material_generation,
            m.state as material_state, a.parent_culture_id, m.parent_material_id,
-           a.started_at, false as truncated
+           a.started_at, false as truncated, 0::bigint as descendant_total, false as has_more
       from ancestors a
       left join public.materials m
         on m.organization_id = p_organization_id and m.id = a.material_id
@@ -128,8 +137,10 @@ begin
     select 2, 'current'::text, 0,
            t.id, t.code, t.culture_type, t.material_id,
            m.material_code, m.material_type, m.generation, m.state,
-           t.parent_culture_id, m.parent_material_id, t.started_at, false
+           t.parent_culture_id, m.parent_material_id, t.started_at, false,
+           stats.total_count, stats.total_count > (v_offset + v_limit)
       from target t
+      cross join descendant_stats stats
       left join public.materials m
         on m.organization_id = t.organization_id and m.id = t.material_id
     union all
@@ -137,22 +148,22 @@ begin
            d.id, d.code, d.culture_type, d.material_id,
            m.material_code, m.material_type, m.generation, m.state,
            d.parent_culture_id, m.parent_material_id, d.started_at,
-           d.total_count > v_limit
+           d.total_count > (v_offset + v_limit), d.total_count, d.total_count > (v_offset + v_limit)
       from ranked_descendants d
       left join public.materials m
         on m.organization_id = p_organization_id and m.id = d.material_id
-     where d.row_number <= v_limit
+     where d.row_number > v_offset and d.row_number <= (v_offset + v_limit)
     union all
     select 4, 'material_ancestor'::text, ma.depth,
            null::uuid, null::text, null::text, ma.id,
            ma.material_code, ma.material_type, ma.generation, ma.state,
-           null::uuid, ma.parent_material_id, null::timestamptz, false
+           null::uuid, ma.parent_material_id, null::timestamptz, false, 0::bigint, false
       from material_ancestors ma
     union all
     select 5, 'ancestor_truncated'::text, 250,
            null::uuid, null::text, null::text, null::uuid,
            null::text, null::text, null::integer, null,
-           null::uuid, null::uuid, null::timestamptz, true
+           null::uuid, null::uuid, null::timestamptz, true, 0::bigint, false
      where exists (
        select 1 from ancestors a
         where a.depth = 250
@@ -182,11 +193,11 @@ begin
   select r.relation, r.depth, r.culture_id, r.culture_code, r.culture_type,
          r.material_id, r.material_code, r.material_type, r.material_generation,
          r.material_state, r.parent_culture_id, r.parent_material_id,
-         r.started_at, r.truncated
+         r.started_at, r.truncated, r.descendant_total, r.has_more
     from result_rows r
    order by r.sort_group, r.depth, r.culture_code nulls last;
 end;
 $function$;
 
-revoke all on function public.get_culture_lineage(uuid, uuid, integer) from public, anon, authenticated;
-grant execute on function public.get_culture_lineage(uuid, uuid, integer) to authenticated;
+revoke all on function public.get_culture_lineage(uuid, uuid, integer, integer) from public, anon, authenticated;
+grant execute on function public.get_culture_lineage(uuid, uuid, integer, integer) to authenticated;
