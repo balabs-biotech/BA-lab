@@ -7,7 +7,7 @@ const engine = readFileSync('ecosystem/engine-v2.js', 'utf8');
 const previewEngine = readFileSync('ecosystem-preview/engine-v2.js', 'utf8');
 const expectedDomains = ['bio', 'myco', 'soil', 'lab', 'products', 'iot', 'work', 'learn'];
 
-assert.ok(html.includes('engine-v2.js?v=20261109-clickable-network-v10'), 'Public explorer must load the cache-busted screen-space label engine');
+assert.ok(html.includes('engine-v2.js?v=20261109-clickable-network-v11'), 'Public explorer must load the cache-busted screen-space label engine');
 assert.ok(previewHtml.includes('engine-v2.js?v=20261109-clickable-network-v11'), 'Preview must load the matching cache-busted label engine');
 assert.ok(engine.includes('function syncLabelScales()') && engine.includes('cameraDistance*projection*targetPixels'), '3D labels must keep a stable screen-space size across zoom levels');
 assert.ok(engine.includes('resourceHitTargets.set(label,element)'), 'Public branch labels must have real DOM hit targets');
