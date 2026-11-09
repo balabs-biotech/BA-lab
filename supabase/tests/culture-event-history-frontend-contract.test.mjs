@@ -27,11 +27,11 @@ const paginationEnd = source.indexOf('async function loadCultureDetail(cultureId
 const paginationLoader = source.slice(paginationStart, paginationEnd);
 assert.match(source, /function sortCultureEventTimelineEntries\(timeline, beforeElement = null\)/,
   'timeline must have a shared chronological sorter');
-assert.match(source, /data\.cultureEventEntry = "true"/,
+assert.match(source, /dataset\.cultureEventEntry = "true"/,
   'initial and paginated event entries must be identifiable for global sorting');
 assert.match(loader, /sortCultureEventTimelineEntries\(timeline\)/,
   'initial event entries must be sorted after rendering');
-assert.match(paginationLoader, /data\.cultureEventEntry = "true"/,
+assert.match(paginationLoader, /dataset\.cultureEventEntry = "true"/,
   'paginated event entries must be identifiable for global sorting');
 assert.match(paginationLoader, /sortCultureEventTimelineEntries\(timeline, button\)/,
   'new pages must be merged into global chronological order without moving the pagination control');
