@@ -190,3 +190,69 @@ begin
 end $$;
 reset role;
 select 'PASS: biological operation idempotency, duplicate suppression and payload conflict rejection' as test_result;
+
+-- Recursive lineage read RPC: ancestor, descendant, material provenance,
+-- bounded descendant results, and organization isolation.
+\i supabase/migrations/20261109143000_add_recursive_culture_lineage_rpc.sql
+set role authenticated;
+do $
+declare
+  parent_id uuid;
+  child_id uuid;
+  other_org_culture_id uuid;
+  row_count integer;
+  was_truncated boolean;
+  caught boolean := false;
+begin
+  select id into parent_id from public.cultures
+   where organization_id='00000000-0000-0000-0000-0000000000a1'
+     and code='PARENT-001';
+  select id into child_id from public.cultures
+   where organization_id='00000000-0000-0000-0000-0000000000a1'
+     and code='CHILD-A';
+  select id into other_org_culture_id from public.cultures
+   where organization_id='00000000-0000-0000-0000-0000000000a2'
+     and code='OTHER-ORG-001';
+
+  select count(*) into row_count
+    from public.get_culture_lineage('00000000-0000-0000-0000-0000000000a1', child_id)
+   where relation='ancestor' and culture_code='PARENT-001';
+  if row_count <> 1 then
+    raise exception 'FAIL: lineage RPC did not return the biological ancestor';
+  end if;
+
+  select count(*) into row_count
+    from public.get_culture_lineage('00000000-0000-0000-0000-0000000000a1', parent_id)
+   where relation='descendant' and culture_code='CHILD-A';
+  if row_count <> 1 then
+    raise exception 'FAIL: lineage RPC did not return a biological descendant';
+  end if;
+
+  select count(*) into row_count
+    from public.get_culture_lineage('00000000-0000-0000-0000-0000000000a1', child_id)
+   where relation='material_ancestor' and material_code='MAT-PARENT';
+  if row_count <> 1 then
+    raise exception 'FAIL: lineage RPC did not return material provenance';
+  end if;
+
+  select bool_or(truncated) into was_truncated
+    from public.get_culture_lineage('00000000-0000-0000-0000-0000000000a1', parent_id, 1)
+   where relation='descendant';
+  if was_truncated is distinct from true then
+    raise exception 'FAIL: lineage RPC did not flag bounded descendant results';
+  end if;
+
+  begin
+    perform * from public.get_culture_lineage(
+      '00000000-0000-0000-0000-0000000000a2', other_org_culture_id
+    );
+  exception when insufficient_privilege then
+    caught := true;
+  end;
+  if not caught then
+    raise exception 'FAIL: lineage RPC allowed cross-organization reads';
+  end if;
+end
+$;
+reset role;
+select 'PASS: recursive lineage ancestors, descendants, material provenance, truncation and tenant isolation' as test_result;
