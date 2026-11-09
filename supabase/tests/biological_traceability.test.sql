@@ -202,6 +202,10 @@ declare
   other_org_culture_id uuid;
   row_count integer;
   was_truncated boolean;
+  page_one_code text;
+  page_two_code text;
+  total_descendants bigint;
+  has_next_page boolean;
   caught boolean := false;
 begin
   select id into parent_id from public.cultures
@@ -240,6 +244,35 @@ begin
    where relation='descendant';
   if was_truncated is distinct from true then
     raise exception 'FAIL: lineage RPC did not flag bounded descendant results';
+  end if;
+
+  select culture_code, descendant_total, has_more
+    into page_one_code, total_descendants, has_next_page
+    from public.get_culture_lineage(
+      '00000000-0000-0000-0000-0000000000a1', parent_id, 1, 0
+    )
+   where relation='descendant';
+  if page_one_code is null or total_descendants <> 2 or has_next_page is distinct from true then
+    raise exception 'FAIL: first lineage page metadata is incorrect';
+  end if;
+
+  select culture_code
+    into page_two_code
+    from public.get_culture_lineage(
+      '00000000-0000-0000-0000-0000000000a1', parent_id, 1, 1
+    )
+   where relation='descendant';
+  if page_two_code is null or page_two_code = page_one_code then
+    raise exception 'FAIL: second lineage page is missing or duplicates page one';
+  end if;
+
+  select has_more into has_next_page
+    from public.get_culture_lineage(
+      '00000000-0000-0000-0000-0000000000a1', parent_id, 1, 1
+    )
+   where relation='current';
+  if has_next_page is distinct from false then
+    raise exception 'FAIL: final lineage page incorrectly advertises another page';
   end if;
 
   begin
