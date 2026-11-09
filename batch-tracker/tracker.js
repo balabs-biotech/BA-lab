@@ -6518,7 +6518,7 @@ async function loadCultureDetail(cultureId) {
       });
     }
     const history = eventHistory?.[0];
-    if (history?.has_more === true) {
+    if (history && history.has_more === true) {
       const loadMoreButton = document.createElement("button");
       loadMoreButton.type = "button";
       loadMoreButton.className = "culture-catalog-action";
