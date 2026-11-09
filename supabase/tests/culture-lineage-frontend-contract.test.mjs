@@ -232,4 +232,18 @@ assert.match(reportRenderer, /date non exploitable/,
 assert.match(reportRenderer, /unités comparables uniquement/,
   'time series must remain separated by culture, variable and unit');
 
+
+assert.match(reportRenderer, /surveillance temporelle/,
+  'time series must include an operational monitoring summary');
+assert.match(reportRenderer, /minimum de 5 relevés/,
+  'candidate trend and rupture detection must disclose its minimum observation count');
+assert.match(reportRenderer, /tendance monotone candidate/,
+  'the monitor must flag sustained monotone sequences as candidates');
+assert.match(reportRenderer, /rupture candidate/,
+  'the monitor must flag abrupt deviations from a prior rolling baseline');
+assert.match(reportRenderer, /MAD/,
+  'abrupt deviations must use a robust median absolute deviation baseline');
+assert.match(reportRenderer, /ne modifie pas les mesures/,
+  'monitoring must never alter source measurements');
+
 console.log('PASS: CultureOps lineage, event history and generation comparison use bounded tenant RPCs');
