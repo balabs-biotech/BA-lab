@@ -19,11 +19,11 @@ create or replace function public.record_biological_operation(
   p_organization_id uuid,
   p_parent_culture_id uuid,
   p_event_type text,
+  p_idempotency_key uuid,
   p_occurred_at timestamptz default now(),
   p_note text default null,
   p_details jsonb default '{}'::jsonb,
-  p_child_codes text[] default array[]::text[],
-  p_idempotency_key uuid
+  p_child_codes text[] default array[]::text[]
 )
 returns jsonb
 language plpgsql
@@ -161,5 +161,5 @@ begin
   return v_response;
 end;
 $function$;
-revoke all on function public.record_biological_operation(uuid,uuid,text,timestamptz,text,jsonb,text[],uuid) from public, anon;
-grant execute on function public.record_biological_operation(uuid,uuid,text,timestamptz,text,jsonb,text[],uuid) to authenticated;
+revoke all on function public.record_biological_operation(uuid,uuid,text,uuid,timestamptz,text,jsonb,text[]) from public, anon;
+grant execute on function public.record_biological_operation(uuid,uuid,text,uuid,timestamptz,text,jsonb,text[]) to authenticated;
