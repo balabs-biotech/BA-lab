@@ -26,7 +26,9 @@ assert.match(loader, /target\.__lineageRows/,
   'lineage UI must preserve previously loaded descendants when appending a page');
 assert.match(loader, /const lineageRowKey = row =>/,
   'lineage pages must define a stable identity for every row type');
-assert.match(loader, /new Map\(\[\.\.\.previousRows, \.\.\.pageRows\]\.map\(row => \[lineageRowKey\(row\), row\]\)\)/,
+assert.match(loader, /const lineageRowsByKey = new Map\(\)/,
+  'lineage pagination must merge through a keyed collection');
+assert.match(loader, /lineageRowsByKey\.set\(lineageRowKey\(row\), row\)/,
   'lineage pagination must merge by stable row identity instead of duplicating current, ancestor and material rows');
 assert.match(loader, /Array\.from\(lineageRowsByKey\.values\(\)\)/,
   'lineage pagination must render the deduplicated merged rows');
