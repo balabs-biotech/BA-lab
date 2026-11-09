@@ -151,7 +151,7 @@ begin
     union all
     select 5, 'ancestor_truncated'::text, 250,
            null::uuid, null::text, null::text, null::uuid,
-           null::text, null::text, null::integer, null::public.material_state,
+           null::text, null::text, null::integer, null,
            null::uuid, null::uuid, null::timestamptz, true
      where exists (
        select 1 from ancestors a
@@ -166,7 +166,7 @@ begin
     union all
     select 6, 'material_ancestor_truncated'::text, 250,
            null::uuid, null::text, null::text, null::uuid,
-           null::text, null::text, null::integer, null::public.material_state,
+           null::text, null::text, null::integer, null,
            null::uuid, null::uuid, null::timestamptz, true
      where exists (
        select 1 from material_ancestors ma
