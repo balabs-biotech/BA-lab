@@ -392,7 +392,7 @@ function setupUI() {
   intro.addEventListener('click',()=>{opened=true;intro.hidden=true;nav.hidden=false;ROOT.classList.remove('universe-closed');ROOT.classList.add('universe-open');status.textContent='BALABS / LIVING NETWORK'});
   controls.addEventListener('click',e=>{const action=e.target.closest('button')?.dataset.camera;if(action==='back'){goBackLevel();return}if(action==='in')zoomTargetDistance=Math.max(1.25,zoomTargetDistance*.72);if(action==='out')zoomTargetDistance=Math.min(60,zoomTargetDistance*1.28);if(action==='reset'){goOverview();return}cameraPosition()});
   stage.append(hint,status,controls,nav,panel,intro);ROOT.append(stage);
-  branchDock=document.createElement('nav');branchDock.className='webgl-branch-dock';branchDock.setAttribute('aria-label','Branches et sous-branches');branchDock.hidden=true;ROOT.append(branchDock);
+  branchDock=document.createElement('nav');branchDock.className='webgl-branch-dock';branchDock.setAttribute('aria-label','Branches et sous-branches');branchDock.hidden=true;stage.append(branchDock);
   document.getElementById('homeBtn')?.addEventListener('click',()=>{if(selected)goOverview()});
   stage.setAttribute('aria-keyshortcuts','ArrowUp ArrowDown ArrowLeft ArrowRight + - Escape Backspace Home');
   stage.addEventListener('keydown',e=>{
