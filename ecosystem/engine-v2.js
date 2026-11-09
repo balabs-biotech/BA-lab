@@ -113,13 +113,13 @@ function makeLabel(text, color, size=16) {
   // Render labels at high texture resolution: zoom enlarges sprites, not glyph detail.
   canvas.width=2048; canvas.height=512;
   ctx.clearRect(0,0,canvas.width,canvas.height);
-  ctx.font='650 '+(size*2.5)+'px Inter,system-ui,sans-serif';
+  ctx.font='700 '+(size*4)+'px Inter,system-ui,sans-serif';
   ctx.textAlign='center';ctx.textBaseline='middle';
   ctx.shadowColor='#07110f';ctx.shadowBlur=22;ctx.fillStyle='#f4f5ed';
   const words=String(text).split(/\s+/);let lines=[],line='';
   for(const word of words){const next=line?line+' '+word:word;if(ctx.measureText(next).width>1880&&line){lines.push(line);line=word}else line=next}
   if(line)lines.push(line);
-  const shown=lines.slice(0,2),lineHeight=104,start=256-(shown.length-1)*lineHeight/2;
+  const shown=lines.slice(0,2),lineHeight=142,start=256-(shown.length-1)*lineHeight/2;
   shown.forEach((part,i)=>ctx.fillText(part,1024,start+i*lineHeight));
   const texture=new THREE.CanvasTexture(canvas);texture.colorSpace=THREE.SRGBColorSpace;
   const material=new THREE.SpriteMaterial({map:texture,transparent:true,depthWrite:false,depthTest:false});
