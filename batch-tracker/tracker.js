@@ -6610,11 +6610,11 @@ function renderGenerationComparisonReport(report) {
   const replicateSection = document.createElement("section");
   replicateSection.className = "generation-comparison-section";
   const replicateTitle = document.createElement("h5");
-  replicateTitle.textContent = "Comparaison par unités expérimentales indépendantes";
+  replicateTitle.textContent = "Comparaison par unités expérimentales";
   replicateSection.appendChild(replicateTitle);
   const replicateNote = document.createElement("p");
   replicateNote.className = "muted";
-  replicateNote.textContent = "Les mesures répétées d'une même unité sont d'abord résumées par leur médiane. Les statistiques suivantes portent sur les médianes des unités expérimentales, jamais sur le nombre brut de mesures. Les groupes sans expérience ou unité identifiée sont exclus de cette comparaison.";
+  replicateNote.textContent = "Les mesures répétées d'une même unité sont d'abord résumées par leur médiane. Les statistiques portent ensuite sur les médianes des unités expérimentales distinctes, jamais sur le nombre brut de mesures. Le caractère biologiquement indépendant de ces unités doit être confirmé par le protocole : il n'est pas déduit automatiquement. Les groupes sans expérience ou unité identifiée sont exclus.";
   replicateSection.appendChild(replicateNote);
 
   const eligibleCohorts = [...cohorts.values()]
@@ -6626,7 +6626,7 @@ function renderGenerationComparisonReport(report) {
     replicateTable.className = "statistics-table";
     const replicateHead = document.createElement("thead");
     const replicateHeader = document.createElement("tr");
-    ["Expérience", "Traitement", "Variable", "Unité", "n unités indépendantes",
+    ["Expérience", "Traitement", "Variable", "Unité", "n unités distinctes",
       "Moyenne des médianes", "Médiane des unités", "Étendue des unités"]
       .forEach(label => {
         const th = document.createElement("th");
