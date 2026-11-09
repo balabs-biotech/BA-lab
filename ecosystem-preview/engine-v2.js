@@ -42,7 +42,7 @@ const t = key => (COPY[LANG()] || COPY.fr)[key] || COPY.fr[key];
 let THREE, renderer, scene, camera, raycaster, pointer, stage, panel, hint, intro, status;
 let world, cells = new Map(), pickables = [], resourceObjects = [], edges = [], signalPoints = [];
 let resourceHitTargets = new Map(), domainHitTargets = new Map();
-let nav, currentNode = null, currentAnchor = null, navigationStack = [];
+let nav, branchDock, currentNode = null, currentAnchor = null, navigationStack = [];
 let selected = null, selectedBranch = null, manifest = null, transition = null;
 let distance = 13.5, zoomTargetDistance = 13.5, theta = .22, phi = 1.27, target = null, targetGoal = null;
 let opened = false, raf = 0, lastFrame = 0, dragging = false, moved = false, dragGesture = false;
@@ -88,6 +88,13 @@ function addStyles() {
     #mainView .webgl-intro-orb b{font:700 33px system-ui;letter-spacing:-.1em;color:#e1e7dc}
     #mainView .webgl-intro-copy{color:#d6ded6;font:600 10px system-ui;letter-spacing:.17em}
     #mainView .webgl-intro-cta{border:1px solid #9eb7a2;border-radius:999px;padding:12px 17px;color:#f1f2e9;background:#21342edb;font:700 10px system-ui;letter-spacing:.1em}
+    #mainView .webgl-branch-dock{position:absolute;left:clamp(10px,2vw,24px);right:clamp(10px,2vw,24px);bottom:48px;z-index:22;display:flex;flex-wrap:wrap;justify-content:center;align-content:flex-start;gap:8px;max-height:178px;overflow:auto;padding:10px 12px;border:1px solid #78958a88;border-radius:16px;background:linear-gradient(145deg,#142321ed,#10191bf0);box-shadow:0 12px 34px #0007;backdrop-filter:blur(14px);scrollbar-width:thin}
+    #mainView .webgl-branch-dock[hidden]{display:none!important}
+    #mainView .webgl-branch-dock .webgl-branch-item{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;max-width:min(320px,100%);padding:9px 14px;border:1px solid #78958a99;border-radius:12px;background:#263b38;color:#f2f2e9;font:650 15px/1.25 system-ui,sans-serif;text-align:left;text-decoration:none;cursor:pointer;touch-action:manipulation}
+    #mainView .webgl-branch-dock .webgl-branch-item[data-has-children="true"]:after{content:'›';color:#d69a7f;font-size:21px;line-height:1}
+    #mainView .webgl-branch-dock .webgl-branch-item:hover,#mainView .webgl-branch-dock .webgl-branch-item:focus-visible{background:#385044;border-color:#d1d0c5;outline:2px solid #d1d0c5;outline-offset:2px}
+    #mainView .webgl-branch-dock .webgl-branch-item[aria-current="page"]{background:#4a3a32;border-color:#b96b4d}
+    @media(max-width:600px){#mainView .webgl-branch-dock{left:8px;right:8px;bottom:46px;gap:6px;max-height:190px;padding:8px}#mainView .webgl-branch-dock .webgl-branch-item{flex:1 1 calc(50% - 6px);min-width:0;max-width:none;min-height:46px;padding:9px 10px;font-size:14px}}
     #mainView .webgl-stage.is-transitioning{cursor:progress}
     @media(max-width:600px){#mainView .webgl-path{left:9px;top:52px;max-width:min(260px,calc(100% - 78px));font-size:9px}#mainView .webgl-hint{left:9px;bottom:10px;max-width:calc(100% - 130px);font-size:7px;letter-spacing:.02em}#mainView .webgl-status{right:9px;bottom:12px;font-size:7px}#mainView .webgl-focus{left:9px;top:9px;padding:13px;width:min(270px,calc(100% - 78px))}#mainView .webgl-controls{right:9px;top:9px;gap:4px}#mainView .webgl-controls button{width:34px;height:34px}}
   `;
@@ -307,8 +314,23 @@ function syncResourceHitTargets() {
   button.style.left=chosen.cx+'px';button.style.top=chosen.cy+'px';
  }
 }
+function renderBranchDock() {
+  if(!branchDock)return;branchDock.replaceChildren();
+  const children=currentNode?.children||[];branchDock.hidden=!selected||children.length===0;
+  if(!selected||!children.length)return;
+  children.forEach((item,index)=>{
+    const hasChildren=!!item.children?.length,hasUrl=!!item.url;
+    const el=document.createElement(!hasChildren&&hasUrl?'a':'button');
+    if(el.tagName==='BUTTON'){el.type='button';el.addEventListener('click',event=>{event.preventDefault();openResource(item)})}
+    else{el.href=item.url;el.target='_blank';el.rel='noopener noreferrer'}
+    el.className='webgl-branch-item';el.textContent=item.title||item.name||('Branche '+(index+1));
+    el.title=item.title||item.name||'';el.dataset.hasChildren=String(hasChildren);el.dataset.resourceUrl=item.url||'';
+    el.setAttribute('aria-label',(item.title||item.name||'Branche')+(hasChildren?' — ouvrir les sous-branches':hasUrl?' — ouvrir la page':' — consulter'));
+    branchDock.append(el);
+  });
+}
 function renderPath() {
-  if(!nav)return;nav.replaceChildren();
+  if(!nav)return;nav.replaceChildren();renderBranchDock();
   const crumbs=[{title:t('overview'),action:goOverview}];
   if(selected)crumbs.push({title:LABELS[selected]?.title||selected,action:()=>{navigationStack=[];currentNode=manifest?.domains?.find(d=>d.id===selected)||null;currentAnchor=cells.get(selected).position.clone();buildResources(selected);smoothCamera(currentAnchor,7.5,650)}});
   navigationStack.slice(1).forEach((entry,index)=>crumbs.push({title:entry.node.title,action:()=>navigateToStack(index+1)}));
@@ -367,7 +389,7 @@ function goBackLevel() {
   if(selected)goOverview();
 }
 function goOverview() {
-  selected=null;selectedBranch=null;navigationStack=[];currentNode=null;currentAnchor=null;clearResources();nav?.replaceChildren();nav.hidden=true;panel.hidden=true;panel.replaceChildren();
+  selected=null;selectedBranch=null;navigationStack=[];currentNode=null;currentAnchor=null;clearResources();nav?.replaceChildren();nav.hidden=true;if(branchDock){branchDock.replaceChildren();branchDock.hidden=true}panel.hidden=true;panel.replaceChildren();
   const mini=document.getElementById('miniView');if(mini){mini.hidden=true;mini.classList.remove('spatial-source-only')}
   const homeButton=document.getElementById('homeBtn');if(homeButton)homeButton.hidden=true;
   smoothCamera(new THREE.Vector3(0,0,0),13.5,850,()=>{status.textContent='BALABS / LIVING NETWORK'});
@@ -391,6 +413,7 @@ function setupUI() {
   intro.addEventListener('click',()=>{opened=true;intro.hidden=true;nav.hidden=false;ROOT.classList.remove('universe-closed');ROOT.classList.add('universe-open');status.textContent='BALABS / LIVING NETWORK'});
   controls.addEventListener('click',e=>{const action=e.target.closest('button')?.dataset.camera;if(action==='back'){goBackLevel();return}if(action==='in')zoomTargetDistance=Math.max(1.25,zoomTargetDistance*.72);if(action==='out')zoomTargetDistance=Math.min(60,zoomTargetDistance*1.28);if(action==='reset'){goOverview();return}cameraPosition()});
   stage.append(hint,status,controls,nav,panel,intro);ROOT.append(stage);
+  branchDock=document.createElement('nav');branchDock.className='webgl-branch-dock';branchDock.setAttribute('aria-label','Branches et sous-branches');branchDock.hidden=true;ROOT.append(branchDock);
   document.getElementById('homeBtn')?.addEventListener('click',()=>{if(selected)goOverview()});
   stage.setAttribute('aria-keyshortcuts','ArrowUp ArrowDown ArrowLeft ArrowRight + - Escape Backspace Home');
   stage.addEventListener('keydown',e=>{
