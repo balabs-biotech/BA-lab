@@ -67,6 +67,20 @@ begin
     select distinct environment_id as id
       from selected
      where environment_id is not null
+    union
+    select distinct b.environment_id
+      from public.batches b
+      join selected s on s.organization_id = b.organization_id
+     where b.organization_id = p_organization_id
+       and b.environment_id is not null
+       and (b.culture_id = any(v_ids) or b.material_id in (select material_id from selected))
+  ),
+  selected_locations as (
+    select distinct e.location_id as id
+      from public.environments e
+      join selected_envs se on se.id = e.id
+     where e.organization_id = p_organization_id
+       and e.location_id is not null
   ),
   selected_experiments as (
     select distinct experiment_id as id
@@ -163,7 +177,8 @@ begin
          e.culture_id = any(v_ids)
          or e.material_id in (select id from selected_materials)
          or e.batch_id in (select id from selected_batches)
-         or (e.culture_id is null and e.material_id is null
+         or e.experimental_unit_id in (select id from selected_units)
+         or (e.culture_id is null and e.material_id is null and e.experimental_unit_id is null
              and e.environment_id in (select id from selected_envs))
        )
      order by e.occurred_at desc, e.id
@@ -178,6 +193,17 @@ begin
        and (r.experimental_unit_id in (select id from selected_units)
          or (r.experimental_unit_id is null and r.experiment_id in (select id from selected_experiments)))
      order by r.created_at desc, r.id
+     limit 500
+  ),
+  environmental_rows as (
+    select eo.id, eo.location_id, eo.data_family, eo.provider_code,
+           eo.dataset_code, eo.variable_code, eo.value, eo.unit_code,
+           eo.observed_at, eo.retrieved_at, eo.spatial_resolution_m,
+           eo.quality_flag, eo.source_url, eo.metadata
+      from public.environmental_observations eo
+     where eo.organization_id = p_organization_id
+       and eo.location_id in (select id from selected_locations)
+     order by eo.observed_at desc, eo.id
      limit 500
   ),
   batch_rows as (
@@ -212,6 +238,9 @@ begin
       (select count(*) from public.batches b
         where b.organization_id = p_organization_id
           and (b.culture_id = any(v_ids) or b.material_id in (select id from selected_materials))) as batch_count,
+      (select count(*) from public.environmental_observations eo
+        where eo.organization_id = p_organization_id
+          and eo.location_id in (select id from selected_locations)) as environmental_count,
       (select count(*) from public.results r
         where r.organization_id = p_organization_id
           and (r.experimental_unit_id in (select id from selected_units)
@@ -236,6 +265,7 @@ begin
     'events', coalesce((select jsonb_agg(to_jsonb(e) order by e.occurred_at desc, e.id) from event_rows e), '[]'::jsonb),
     'batches', coalesce((select jsonb_agg(to_jsonb(b) order by b.started_at nulls last, b.id) from batch_rows b), '[]'::jsonb),
     'results', coalesce((select jsonb_agg(to_jsonb(r) order by r.created_at desc, r.id) from result_rows r), '[]'::jsonb),
+    'environmental_observations', coalesce((select jsonb_agg(to_jsonb(eo) order by eo.observed_at desc, eo.id) from environmental_rows eo), '[]'::jsonb),
     'data_quality', jsonb_build_object(
       'measurement_total', counts.measurement_count,
       'measurement_returned', (select count(*) from measurement_rows),
@@ -252,6 +282,9 @@ begin
       'result_total', counts.result_count,
       'result_returned', (select count(*) from result_rows),
       'result_truncated', counts.result_count > 500,
+      'environmental_total', counts.environmental_count,
+      'environmental_returned', (select count(*) from environmental_rows),
+      'environmental_truncated', counts.environmental_count > 500,
       'excluded_measurements', (
         select count(*) from public.measurements m
          where m.organization_id = p_organization_id
