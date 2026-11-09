@@ -136,6 +136,10 @@ assert.match(workspace, /id="compareCultureGenerationsButton"/,
   'culture detail must expose the comparison action');
 assert.match(workspace, /id="generationComparisonResults"/,
   'culture detail must expose the comparison report region');
+assert.match(source, /__generationComparisonRequestId/,
+  'comparison requests must use DOM-scoped revisions so auth cleanup can invalidate them safely');
+assert.doesNotMatch(source, /compareCultureGenerations\.requestId/,
+  'workspace cleanup must not depend on a function scoped to another script context');
 assert.match(source, /compareCultureGenerationsButton.*addEventListener\("click", compareCultureGenerations\)/,
   'generation comparison action must be connected to its handler');
 
