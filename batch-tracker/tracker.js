@@ -6984,6 +6984,7 @@ function setupUiEnhancements() {
   document.getElementById("cultureSearch")?.addEventListener("input", renderCultureCatalog);
   document.getElementById("cultureTypeFilter")?.addEventListener("change", renderCultureCatalog);
   document.getElementById("bioOperationForm")?.addEventListener("submit", saveBiologicalOperation);
+  document.getElementById("compareCultureGenerationsButton")?.addEventListener("click", compareCultureGenerations);
   document.getElementById("bioOperationDate")?.setAttribute("value", new Date().toISOString().slice(0,16));
   document.getElementById("closeCultureDetail")?.addEventListener("click", () => {
     document.getElementById("cultureDetailPanel")?.classList.add("hidden");
