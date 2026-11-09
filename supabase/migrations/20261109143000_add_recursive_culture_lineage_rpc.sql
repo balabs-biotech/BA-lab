@@ -4,6 +4,7 @@ create index if not exists cultures_org_parent_idx
   on public.cultures(organization_id, parent_culture_id);
 
 drop function if exists public.get_culture_lineage(uuid, uuid, integer);
+drop function if exists public.get_culture_lineage(uuid, uuid, integer, integer);
 
 create function public.get_culture_lineage(
   p_organization_id uuid,
