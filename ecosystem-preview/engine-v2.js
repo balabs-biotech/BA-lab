@@ -230,7 +230,7 @@ function clearResources() {
 function mDispose(material){material?.map?.dispose();material?.dispose?.()}
 function makeResourceLabel(item,color,depth=0) {
  const size=depth===0?18:depth===1?16:14,label=makeLabel(item.title,color,size);
- label.userData={...item,kind:'resource-label'};label.visible=false;addResourceHitTarget(label);return label;
+ label.userData={...item,kind:'resource-label'};addResourceHitTarget(label);return label;
 }
 function addResourceHitTarget(label) {
  const data=label.userData||{},hasChildren=!!data.children?.length;
@@ -238,13 +238,11 @@ function addResourceHitTarget(label) {
  if(hasChildren){element.type='button';element.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();stage?.focus({preventScroll:true});openResource(data)});}
  else {element.href=data.url||'#';element.target='_blank';element.rel='noopener noreferrer';element.addEventListener('click',e=>{if(!data.url)e.preventDefault();});}
  element.className='webgl-hit-target webgl-resource-target';
- element.textContent=data.title||data.name||'Ouvrir';
- const compact=window.innerWidth<760;
- const width=Math.min(compact?190:250,Math.max(compact?118:132,String(element.textContent).length*(compact?7.1:8.1)+30));
- Object.assign(element.style,{display:'block',opacity:'1',color:'#f1f3eb',background:'rgba(15,27,25,.94)',border:'1px solid rgba(185,107,77,.78)',borderRadius:'10px',boxShadow:'0 5px 18px rgba(0,0,0,.42)',font:'650 '+(compact?'13px':'15px')+'/1.25 system-ui,sans-serif',letterSpacing:'0',textAlign:'center',textOverflow:'ellipsis',whiteSpace:'nowrap',overflow:'hidden',padding:'0 10px',width:width+'px',height:compact?'44px':'46px',minWidth:compact?'118px':'132px',maxWidth:compact?'190px':'250px',pointerEvents:'auto',touchAction:'manipulation'});
  element.setAttribute('aria-label',(data.title||data.name||'Branche')+(hasChildren?' — ouvrir le dossier':' — ouvrir la page'));
  element.title=data.title||data.name||'';
- element.dataset.hasChildren=String(hasChildren);element.dataset.resourceUrl=data.url||'';
+ element.dataset.hasChildren=String(hasChildren);element.dataset.depth=String(data.depth||0);element.dataset.resourceUrl=data.url||'';
+ element.style.width=data.depth===0?'82px':data.depth===1?'72px':'64px';
+ element.style.height=data.depth===0?'76px':'68px';
  stage.append(element);resourceHitTargets.set(label,element);
 }
 function syncResourceHitTargets() {
@@ -252,7 +250,7 @@ function syncResourceHitTargets() {
  if(!_hitWorld)_hitWorld=new THREE.Vector3();
  camera.updateMatrixWorld(true);world?.updateMatrixWorld(true);
  const rect=renderer.domElement.getBoundingClientRect(),stageRect=stage.getBoundingClientRect();
- const place=(object,button)=>{object.getWorldPosition(_hitWorld);const p=_hitWorld.clone().project(camera);button.style.setProperty('z-index',String(Math.round(1000-(p.z+1)*400)+(button.dataset.hasChildren==='true'?1:0)),'important');const visible=p.z>-1&&p.z<1&&p.x>=-1.12&&p.x<=1.12&&p.y>=-1.12&&p.y<=1.12;button.hidden=!visible;if(!visible)return;button.style.left=(rect.left+(p.x+1)*rect.width/2-stageRect.left)+'px';button.style.top=(rect.top+(1-p.y)*rect.height/2-stageRect.top)+'px'};
+ const place=(object,button)=>{object.getWorldPosition(_hitWorld);const p=_hitWorld.clone().project(camera);button.style.setProperty('z-index',String(Math.round(12000-Number(button.dataset.depth||0)*1000+(1000-(p.z+1)*400))),'important');const visible=p.z>-1&&p.z<1&&p.x>=-1.12&&p.x<=1.12&&p.y>=-1.12&&p.y<=1.12;button.hidden=!visible;if(!visible)return;button.style.left=(rect.left+(p.x+1)*rect.width/2-stageRect.left)+'px';button.style.top=(rect.top+(1-p.y)*rect.height/2-stageRect.top)+'px'};
  for(const {object,button} of domainHitTargets.values()){place(object,button);button.hidden=!opened||!!selected||button.hidden}
  for(const [label,button] of resourceHitTargets)place(label,button);
 }
@@ -284,7 +282,7 @@ function buildResources(id,parentNode=null,anchor=null) {
  const drawNode=(item,pos,depth,parent,angle,index)=>{const has=!!item.children?.length,color=baseColor.clone().lerp(accent,Math.min(.34,depth*.12+(index%3)*.025)),radius=depth===0?(has?.135:.105):depth===1?(has?.085:.065):.043;item.position=pos.clone();item.parentNode=parent;const data={kind:'resource',...item,sourceId:id,position:pos.clone(),hasChildren:has,depth,parentNode:parent,denseRoot:depth===0&&children.length>16};const hitRadius=depth===0?.32:depth===1?.25:.19;const hit=new THREE.Mesh(new THREE.SphereGeometry(hitRadius,10,8),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));hit.position.copy(pos);hit.userData=data;world.add(hit);resourceObjects.push(hit);pickables.push(hit);
  // Represent each folder/page as a living hyphal junction: fine branching strands, no bead-like node.
  const junction=new THREE.Group();junction.position.copy(pos);junction.userData=data;world.add(junction);resourceObjects.push(junction);
- for(let arm=0;arm<5;arm++){const a=arm/5*Math.PI*2+depth*.37+index*.19,reach=radius*(2.3+(arm%3)*.55),start=new THREE.Vector3(0,0,0),end=new THREE.Vector3(Math.cos(a)*reach,Math.sin(a)*reach*.82,Math.sin(a*1.7)*reach*.5),mid=start.clone().lerp(end,.56).add(new THREE.Vector3(0,.018,.018));const curveArm=new THREE.CatmullRomCurve3([start,mid,end]);const filamentArm=new THREE.Mesh(new THREE.TubeGeometry(curveArm,10,Math.max(.0025,radius*.055),4,false),new THREE.MeshStandardMaterial({color,emissive:color,emissiveIntensity:.3,transparent:true,opacity:.72,roughness:.78}));junction.add(filamentArm);}const l=makeResourceLabel(data,color,depth);l.position.copy(pos).add(new THREE.Vector3(0,depth===0?-.28:depth===1?-.22:-.16,.025));world.add(l);resourceObjects.push(l);pickables.push(l);const pp=parent===currentNode?currentAnchor:(parent.position||currentAnchor),mid=pp.clone().lerp(pos,.52).add(new THREE.Vector3(0,.12+depth*.035,.12)),curve=filament([pp.clone(),mid,pos.clone()],color,depth===0?.012:depth===1?.007:.004,depth===0?.66:depth===1?.52:.38);if(depth<2)for(let f=0;f<2;f++){const at=curve.getPoint(.46+f*.2),sgn=f===0?-1:1,tip=at.clone().add(new THREE.Vector3(Math.cos(angle+sgn*.8)*(.24-depth*.045),Math.sin(angle+sgn*.8)*(.2-depth*.04),.045));filament([at,at.clone().lerp(tip,.55).add(new THREE.Vector3(0,.045,.025)),tip],color,.0035-depth*.0006,.28)}if(depth>=maxDepth||!has)return;const kids=item.children||[],spread=Math.min(1.2,.32+kids.length*.105);kids.forEach((child,childIndex)=>{const frac=kids.length===1?0:(childIndex/(kids.length-1)-.5),childAngle=angle+frac*spread*2+(childIndex%2?-.08:.08),dist=depth===0?.98+Math.min(.42,kids.length*.025):Math.max(.68,Math.min(1.38,.58+kids.length*.055)),childPos=pos.clone().add(new THREE.Vector3(Math.cos(childAngle)*dist,Math.sin(childAngle)*dist*.82+((childIndex%3)-1)*.035,.04+(childIndex%2)*.035));drawNode(child,childPos,depth+1,item,childAngle,childIndex)});
+ for(let arm=0;arm<5;arm++){const a=arm/5*Math.PI*2+depth*.37+index*.19,reach=radius*(2.3+(arm%3)*.55),start=new THREE.Vector3(0,0,0),end=new THREE.Vector3(Math.cos(a)*reach,Math.sin(a)*reach*.82,Math.sin(a*1.7)*reach*.5),mid=start.clone().lerp(end,.56).add(new THREE.Vector3(0,.018,.018));const curveArm=new THREE.CatmullRomCurve3([start,mid,end]);const filamentArm=new THREE.Mesh(new THREE.TubeGeometry(curveArm,10,Math.max(.0025,radius*.055),4,false),new THREE.MeshStandardMaterial({color,emissive:color,emissiveIntensity:.3,transparent:true,opacity:.72,roughness:.78}));junction.add(filamentArm);}const l=makeResourceLabel(data,color,depth);l.position.copy(pos).add(new THREE.Vector3(0,depth===0?-.28:depth===1?-.22:-.16,.025));world.add(l);resourceObjects.push(l);pickables.push(l);const pp=parent===currentNode?currentAnchor:(parent.position||currentAnchor),mid=pp.clone().lerp(pos,.52).add(new THREE.Vector3(0,.12+depth*.035,.12)),curve=filament([pp.clone(),mid,pos.clone()],color,depth===0?.012:depth===1?.007:.004,depth===0?.66:depth===1?.52:.38);if(depth<2)for(let f=0;f<2;f++){const at=curve.getPoint(.46+f*.2),sgn=f===0?-1:1,tip=at.clone().add(new THREE.Vector3(Math.cos(angle+sgn*.8)*(.24-depth*.045),Math.sin(angle+sgn*.8)*(.2-depth*.04),.045));filament([at,at.clone().lerp(tip,.55).add(new THREE.Vector3(0,.045,.025)),tip],color,.0035-depth*.0006,.28)}if(depth>=maxDepth||!has)return;const kids=item.children||[],spread=Math.min(1.2,.32+kids.length*.105);kids.forEach((child,childIndex)=>{const frac=kids.length===1?0:(childIndex/(kids.length-1)-.5),childAngle=angle+frac*spread*2+(childIndex%2?-.08:.08),dist=depth===0?1.3+Math.min(.45,kids.length*.045):Math.max(.95,Math.min(1.5,.8+kids.length*.04)),childPos=pos.clone().add(new THREE.Vector3(Math.cos(childAngle)*dist,Math.sin(childAngle)*dist*.82+((childIndex%3)-1)*.035,.04+(childIndex%2)*.035));drawNode(child,childPos,depth+1,item,childAngle,childIndex)});
  // Anastomoses: sibling branches reconnect into a mesh instead of ending as a radial tree.
  if(kids.length>1){
    const bridgeColor=color.clone().lerp(accent,.22);
@@ -459,7 +457,7 @@ function syncLabelScales() {
     label.getWorldPosition(labelWorldPosition);
     const cameraDistance=Math.max(.1,camera.position.distanceTo(labelWorldPosition));
     const depth=label.userData.depth||0;
-    const targetPixels=label.userData.kind==='domain-label'?32:label.userData.denseRoot?26:Math.max(24,29-depth*2);
+    const targetPixels=label.userData.kind==='domain-label'?34:label.userData.denseRoot?30:Math.max(27,32-depth*2);
     const worldHeight=cameraDistance*projection*targetPixels;
     label.scale.set(worldHeight*4.25,worldHeight,1);
   };
