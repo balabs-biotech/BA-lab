@@ -18,7 +18,11 @@ const browser = await chromium.launch({
 });
 
 async function tapSpatialTarget(page, name, x, y, selector) {
-  if (name === 'mobile' && selector) return page.locator(selector).tap({timeout:8000});
+  if (selector) {
+    const target = page.locator(selector);
+    if (name === 'mobile') return target.tap({timeout:8000});
+    return target.click({timeout:8000});
+  }
   if (name !== 'mobile') return page.mouse.click(x, y);
   return page.touchscreen.tap(x, y);
 }
