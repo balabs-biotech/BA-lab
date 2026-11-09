@@ -84,15 +84,17 @@ insert into public.cultures(organization_id,code,culture_type,material_id) value
 grant usage on schema public, private, auth to authenticated, anon;
 grant execute on function auth.uid() to authenticated, anon;
 grant select on public.organization_members to authenticated, anon;
-grant select,insert,update,delete on public.material_types,public.culture_types,public.organizations,public.strains,public.materials,public.cultures,public.material_relationships,public.events to authenticated,anon;
+grant select,insert,update,delete on public.material_types,public.culture_types,public.organizations,public.strains,public.materials,public.cultures,public.material_relationships,public.events,public.batches to authenticated,anon;
 alter table public.materials enable row level security;
 alter table public.cultures enable row level security;
 alter table public.material_relationships enable row level security;
 alter table public.events enable row level security;
+alter table public.batches enable row level security;
 create policy materials_org on public.materials to authenticated using(private.is_org_member(organization_id)) with check(private.is_org_member(organization_id));
 create policy cultures_org on public.cultures to authenticated using(private.is_org_member(organization_id)) with check(private.is_org_member(organization_id));
 create policy relationships_org on public.material_relationships to authenticated using(private.is_org_member(organization_id)) with check(private.is_org_member(organization_id));
 create policy events_org on public.events to authenticated using(private.is_org_member(organization_id)) with check(private.is_org_member(organization_id));
+create policy batches_org on public.batches to authenticated using(private.is_org_member(organization_id)) with check(private.is_org_member(organization_id));
 \i supabase/migrations/20261022021957_biological_traceability_v1.sql
 select set_config('request.jwt.claim.sub','00000000-0000-0000-0000-0000000000b1',false);
 \i supabase/migrations/20261109170000_sync_material_parent_relationships.sql
