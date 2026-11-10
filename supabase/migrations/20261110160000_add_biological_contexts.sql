@@ -136,3 +136,36 @@ create trigger biological_contexts_environment_location_guard
   execute function private.validate_biological_context_environment();
 
 revoke all on function private.validate_biological_context_environment() from public, anon, authenticated;
+
+-- Once a biological context references an environment, its physical location is
+-- part of the historical binding and cannot be silently changed or cleared.
+create or replace function private.guard_environment_location_with_biological_contexts()
+returns trigger
+language plpgsql
+security invoker
+set search_path = pg_catalog, public
+as $$
+begin
+  if new.location_id is distinct from old.location_id
+     and exists (
+       select 1
+         from public.biological_contexts bc
+        where bc.organization_id = old.organization_id
+          and bc.environment_id = old.id
+     ) then
+    raise exception 'environment_location_locked_by_biological_contexts'
+      using errcode = '23514';
+  end if;
+  return new;
+end;
+$$;
+
+drop trigger if exists environments_biological_context_location_guard
+  on public.environments;
+create trigger environments_biological_context_location_guard
+  before update of location_id
+  on public.environments
+  for each row
+  execute function private.guard_environment_location_with_biological_contexts();
+
+revoke all on function private.guard_environment_location_with_biological_contexts() from public, anon, authenticated;
