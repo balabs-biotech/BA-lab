@@ -67,6 +67,23 @@ def calculate_daily_reference_indicators(
     if any(not isinstance(row, NormalizedEnvironmentalObservation) for row in rows):
         raise ValueError("all inputs must be normalized environmental observations")
 
+    latitude = (
+        float(latitude_deg)
+        if isinstance(latitude_deg, (int, float)) and not isinstance(latitude_deg, bool)
+        and isfinite(latitude_deg)
+        else None
+    )
+    altitude = (
+        float(altitude_m)
+        if isinstance(altitude_m, (int, float)) and not isinstance(altitude_m, bool)
+        and isfinite(altitude_m)
+        else None
+    )
+    if latitude is None or not -90.0 <= latitude <= 90.0:
+        raise ValueError("latitude_deg must be a finite value between -90 and 90")
+    if altitude is None or not -500.0 <= altitude <= 9000.0:
+        raise ValueError("altitude_m must be a finite value between -500 and 9000")
+
     first = rows[0]
     if first.data_family != "weather":
         raise ValueError("daily FAO-56 indicators require weather observations")
@@ -141,8 +158,8 @@ def calculate_daily_reference_indicators(
             observed_date=first.observed_date,
             organization_id=first.organization_id,
             location_id=first.location_id,
-            latitude_deg=latitude_deg,
-            altitude_m=altitude_m,
+            latitude_deg=latitude,
+            altitude_m=altitude,
             status="insufficient_data",
             source_observation_ids=source_ids,
             source_variable_codes=source_variables,
@@ -166,9 +183,9 @@ def calculate_daily_reference_indicators(
         relative_humidity_mean_percent=relative_humidity,
     )
     net_radiation = calculate_fao56_net_radiation(
-        latitude_deg=latitude_deg,
+        latitude_deg=latitude,
         day_of_year=first.observed_date.timetuple().tm_yday,
-        altitude_m=altitude_m,
+        altitude_m=altitude,
         solar_radiation_mj_m2_day=solar_radiation,
         temperature_max_c=temperature_max,
         temperature_min_c=temperature_min,
@@ -180,7 +197,7 @@ def calculate_daily_reference_indicators(
         temperature_min_c=temperature_min,
         wind_speed_2m_m_s=wind_speed,
         net_radiation_mj_m2_day=net_radiation.net_radiation_mj_m2_day,
-        altitude_m=altitude_m,
+        altitude_m=altitude,
         relative_humidity_mean_percent=relative_humidity,
     )
 
@@ -188,8 +205,8 @@ def calculate_daily_reference_indicators(
         observed_date=first.observed_date,
         organization_id=first.organization_id,
         location_id=first.location_id,
-        latitude_deg=latitude_deg,
-        altitude_m=altitude_m,
+        latitude_deg=latitude,
+        altitude_m=altitude,
         status="available",
         source_observation_ids=source_ids,
         source_variable_codes=source_variables,
