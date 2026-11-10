@@ -20,7 +20,7 @@ const importThree = async () => {
 
 const ROOT = document.getElementById('mainView');
 const IDS = ['bio','myco','soil','lab','products','iot','work','learn'];
-const COLORS = { bio:0x78998a, myco:0x9b806d, soil:0x8d9b78, lab:0x829b9d, products:0xb96b4d, iot:0x789c91, work:0xa47c67, learn:0xb1aa8e };
+const COLORS = { bio:0x79a991, myco:0xa88fc3, soil:0xc19b73, lab:0x80aeb8, products:0xc88773, iot:0x7eaaa3, work:0xa99dbb, learn:0xb5b58d };
 const POS = {
   bio:[0,2.55,0], myco:[-2.35,1.05,.35], soil:[-2.15,-1.05,-.1], lab:[-.05,.35,-.7],
   products:[.2,-1.35,.55], iot:[2.45,.85,-.25], work:[2.15,-1.25,-.45], learn:[-.15,-2.8,.1],
@@ -140,15 +140,15 @@ function makeLabel(text, color, size=16) {
 
 function createWorld() {
   scene=new THREE.Scene();
-  scene.fog=new THREE.FogExp2(0x071522,.0065);
+  scene.fog=new THREE.FogExp2(0x172321,.009);
   world=new THREE.Group();scene.add(world);
   scene.add(new THREE.AmbientLight(0xdce6df,1.65));
-  const key=new THREE.PointLight(0x58c9e8,31,42);key.position.set(0,7,8);scene.add(key);
+  const key=new THREE.PointLight(0xa6c1ad,24,35);key.position.set(0,7,8);scene.add(key);
   const warm=new THREE.PointLight(0xb96b4d,9,26);warm.position.set(7,-3,3);scene.add(warm);
-  const fill=new THREE.PointLight(0x36b8a8,23,38);fill.position.set(-7,-2,-5);scene.add(fill);
-  // Fine background hyphae add depth and interconnect the colonies visually.
+  const fill=new THREE.PointLight(0x78958a,15,32);fill.position.set(-7,-2,-5);scene.add(fill);
+  // Sparse background hyphae connect the field without forming panels or solid spheres.
   let fieldSeed=81273;const fieldRand=()=>{fieldSeed=(fieldSeed*16807)%2147483647;return(fieldSeed-1)/2147483646};
-  const fieldPalette=[0x43c5df,0x42b9aa,0x83d6a1,0x719fe0,0xb96b4d];
+  const fieldPalette=[0x263b38,0xb96b4d,0xd1d0c5,0x78958a];
   for(let i=0;i<58;i++){const start=new THREE.Vector3(-5+fieldRand()*10,-4+fieldRand()*8,-3.5+fieldRand()*7),end=start.clone().add(new THREE.Vector3((fieldRand()-.5)*3.2,(fieldRand()-.5)*2.8,(fieldRand()-.5)*1.8)),mid=start.clone().lerp(end,.5).add(new THREE.Vector3((fieldRand()-.5)*.8,(fieldRand()-.5)*.8,(fieldRand()-.5)*.5)),curve=new THREE.CatmullRomCurve3([start,mid,end]),color=fieldPalette[Math.floor(fieldRand()*fieldPalette.length)];world.add(new THREE.Mesh(new THREE.TubeGeometry(curve,18,.0018+fieldRand()*.002,3,false),new THREE.MeshBasicMaterial({color,transparent:true,opacity:.10+fieldRand()*.14,depthWrite:false})));if(i%2===0){const at=curve.getPoint(.48),tip=at.clone().add(new THREE.Vector3((fieldRand()-.5)*1.5,(fieldRand()-.5)*1.5,(fieldRand()-.5)*.8)),fork=new THREE.CatmullRomCurve3([at,at.clone().lerp(tip,.5).add(new THREE.Vector3(0,.05,.03)),tip]);world.add(new THREE.Mesh(new THREE.TubeGeometry(fork,12,.0016,3,false),new THREE.MeshBasicMaterial({color,transparent:true,opacity:.12,depthWrite:false})))}}
   for(const id of IDS){
     const color=COLORS[id],pos=new THREE.Vector3(...POS[id]);
@@ -170,8 +170,7 @@ function createWorld() {
     world.add(group);cells.set(id,{group,soma,label,hit,position:pos,color});
     const domainButton=document.createElement('button');domainButton.type='button';domainButton.className='webgl-hit-target webgl-domain-target';domainButton.setAttribute('aria-label',(LABELS[id]?.title||id)+' — '+t('domain'));domainButton.title=LABELS[id]?.title||id;domainButton.dataset.domainId=id;domainButton.style.width='116px';domainButton.style.height='116px';domainButton.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();stage?.focus({preventScroll:true});if(!selected)enterDomain(id)});stage.append(domainButton);domainHitTargets.set(id,{object:hit,button:domainButton});
     pickables.push(soma,hit,label);
-    const branches=14;
-    for(let j=0;j<branches;j++){
+    for(let j=0;j<14;j++){
       const a=j/branches*Math.PI*2+IDS.indexOf(id)*.31;
       const reach=1.0+(j%4)*.24;
       const start=new THREE.Vector3(Math.cos(a)*.10,Math.sin(a)*.09,Math.sin(a*1.7)*.035);
