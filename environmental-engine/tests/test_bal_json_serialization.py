@@ -1,3 +1,4 @@
+from dataclasses import replace
 from datetime import date, datetime, timezone
 from uuid import uuid4
 
@@ -169,6 +170,21 @@ def test_mixed_tenant_observations_are_rejected():
 
 def test_rolling_indicator_preserves_coverage_and_does_not_invent_lineage():
     rows = observations_for()
+    temperature_row = next(
+        row for row in rows if row.variable_code == "air_temperature_mean"
+    )
+    for day in (
+        date(2026, 10, 26), date(2026, 10, 27), date(2026, 10, 28),
+        date(2026, 10, 29), date(2026, 10, 31),
+    ):
+        rows.append(
+            replace(
+                temperature_row,
+                source_observation_id=uuid4(),
+                observed_at=datetime(day.year, day.month, day.day, tzinfo=timezone.utc),
+                observed_date=day,
+            )
+        )
     coverage = DailyCoverage(
         start=date(2026, 10, 26),
         end=date(2026, 11, 1),
