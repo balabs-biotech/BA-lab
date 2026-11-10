@@ -379,7 +379,48 @@
       list.append(item);
     });
     section.append(list);
-    if (lineage.truncated) section.append(element("p", "signals-empty", "Affichage limité à 100 cultures ; la lignée peut continuer au-delà."));
+
+    if (lineage.materials && lineage.materials.length) {
+      section.append(element("h4", "", "Généalogie des matériaux"));
+      const materialList = element("ol", "signal-lineage-list");
+      const materialMap = new Map(lineage.materials.map(material => [material.id, material]));
+      const relationMap = new Map((lineage.relationships || []).map(relation => [relation.child_material_id, relation]));
+      lineage.materials.slice().sort((left, right) =>
+        (left.generation ?? Number.MAX_SAFE_INTEGER) - (right.generation ?? Number.MAX_SAFE_INTEGER)
+      ).forEach(material => {
+        const item = element("li", "");
+        const strain = material.strain || {};
+        const organism = strain.organism || {};
+        const parentMaterial = materialMap.get(material.parent_material_id);
+        const relation = relationMap.get(material.id);
+        const detail = [
+          material.material_type,
+          material.generation === null || material.generation === undefined ? null : "G" + material.generation,
+          material.state,
+          parentMaterial ? "Dérivé de " + parentMaterial.material_code : material.parent_material_id ? "Matériau parent hors périmètre" : "Matériau source"
+        ].filter(Boolean).join(" · ");
+        item.append(element("strong", "", material.material_code || "Matériau sans code"));
+        item.append(element("small", "", [detail, relation?.relationship_type ? "Relation : " + relation.relationship_type : null].filter(Boolean).join(" · ")));
+        if (strain.strain_code || strain.designation || organism.scientific_name) {
+          item.append(element("small", "signal-lineage-batches", "Souche : " + [
+            strain.strain_code || strain.designation, organism.scientific_name,
+            strain.origin ? "Origine : " + strain.origin : null,
+            strain.supplier ? "Fournisseur : " + strain.supplier : null
+          ].filter(Boolean).join(" · ")));
+        }
+        const linkedBatches = lineage.batches.filter(batch => batch.material_id === material.id);
+        if (linkedBatches.length) item.append(element("small", "signal-lineage-batches", "Lots matière : " +
+          linkedBatches.map(batch => [batch.batch_code, batch.status, batch.current_stage].filter(Boolean).join(" / ")).join(", ")));
+        lineage.events.filter(event => event.material_id === material.id).forEach(event => {
+          const payload = event.payload || {};
+          item.append(element("small", "signal-lineage-event",
+            dateLabel(event.occurred_at) + " · " + (payload.operation || payload.operation_type || event.event_type)));
+        });
+        materialList.append(item);
+      });
+      section.append(materialList);
+    }
+    if (lineage.truncated) section.append(element("p", "signals-empty", "Affichage limité aux plafonds de généalogie ; la lignée peut continuer au-delà."));
     return section;
   }
 
