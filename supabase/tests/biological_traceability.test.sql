@@ -409,7 +409,7 @@ begin
     raise exception 'FAIL: identical experimental-result retry did not return original response';
   end if;
   result_id := (first_result->>'result_id')::uuid;
-  v_event_id := (first_result->>'v_event_id')::uuid;
+  v_event_id := (first_result->>'event_id')::uuid;
   if (select count(*) from public.results r
        where organization_id='00000000-0000-0000-0000-0000000000a1'
          and r.id=result_id and r.experiment_id=(select experiment_id from public.experimental_units where id=unit_id)
