@@ -107,7 +107,7 @@
     const temporal = Array.isArray(payload.temporal_screening?.assessments) ? payload.temporal_screening.assessments : [];
     const signals = Array.isArray(payload.domain_interpretation?.signals) ? payload.domain_interpretation.signals : [];
     const summary = node("div", "sensor-summary");
-    [["Observations", analysis.total_observations ?? 0], ["Séries", series.length], ["Écarts temporels", temporal.filter(item => item.status !== "normal").length], ["Signaux biologiques", signals.length]].forEach(([label, value]) => {
+    [["Observations", analysis.total_observations ?? 0], ["Séries", series.length], ["Écarts temporels", payload.temporal_screening?.status === "completed" ? temporal.filter(item => item.status !== "normal").length : "Non demandé"], ["Signaux biologiques", signals.length]].forEach(([label, value]) => {
       const metric = node("article", "sensor-metric");
       metric.append(node("span", "", label), node("strong", "", String(value)));
       summary.append(metric);
