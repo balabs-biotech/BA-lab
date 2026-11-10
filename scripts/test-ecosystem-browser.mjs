@@ -174,7 +174,12 @@ async function checkWorkingScene(name, viewport) {
   let zoomOutChecked = false;
   for (let level = 0; level < 8; level++) {
     await page.waitForFunction(() => (window.__BALABS_3D_E2E__()?.visible || 0) > 0, undefined, { timeout: 12000 });
-    const probe = await page.evaluate(() => window.__BALABS_3D_E2E__());
+    let probe = await page.evaluate(() => window.__BALABS_3D_E2E__());
+    if (!probe.visible) {
+      await page.locator('.webgl-controls [data-camera="out"]').evaluate(button => button.click());
+      await page.waitForFunction(() => (window.__BALABS_3D_E2E__()?.visible || 0) > 0, undefined, { timeout: 12000 });
+      probe = await page.evaluate(() => window.__BALABS_3D_E2E__());
+    }
     if (level === 0) assert.ok(probe.nestedAvailable, name + ': active folders must expose their nested Notion subfolders for the next selectable level');
     const branchTarget = probe.target;
     assert.ok(branchTarget, name + ': no spatial folder/page target was found');
