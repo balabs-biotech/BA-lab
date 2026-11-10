@@ -60,7 +60,24 @@ async function checkTwoFingerPan(page, name) {
   assert.ok(moved > 0.02, name + ': dragging with two fingers must pan the complete 3D map without changing hierarchy');
   const state = await page.evaluate(() => window.__BALABS_3D_E2E__());
   assert.ok(state?.selected === 'bio', name + ': two-finger panning must not change the selected universe');
-  console.log(name + ': two-finger map pan moved camera target', { before, after });
+  // Restore the original camera target so subsequent visibility and tap tests
+  // exercise the same centered scene rather than an intentionally panned empty area.
+  const restore = await page.context().newCDPSession(page);
+  await restore.send('Input.dispatchTouchEvent', {
+    type: 'touchStart',
+    touchPoints: [{ x: x + 26, y: y + 8, id: 1 }, { x: x + 94, y: y + 8, id: 2 }],
+  });
+  await restore.send('Input.dispatchTouchEvent', {
+    type: 'touchMove',
+    touchPoints: [{ x: x - 34, y, id: 1 }, { x: x + 34, y, id: 2 }],
+  });
+  await restore.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+  await restore.detach();
+  await page.waitForFunction((origin) => {
+    const target = window.__BALABS_3D_E2E__()?.cameraTarget;
+    return target && Math.hypot(target.x-origin.x,target.y-origin.y,target.z-origin.z)<0.08;
+  }, before, { timeout: 8000 });
+  console.log(name + ': two-finger map pan moved and restored camera target', { before, after });
 }
 
 async function checkWorkingScene(name, viewport) {
