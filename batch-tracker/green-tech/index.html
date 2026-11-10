@@ -38,6 +38,10 @@
             environmental.src = "../environmental-data.js?v=20261027-sentinel-fallback-fix-1";
             environmental.onerror = () => console.error("Le module de contexte environnemental n’a pas pu être chargé.");
             document.body.appendChild(environmental);
+            const alerts = document.createElement("script");
+            alerts.src = "../biological-alerts.js?v=20261110-alert-inbox-1";
+            alerts.onerror = () => console.error("Le centre des alertes biologiques n’a pas pu être chargé.");
+            document.body.appendChild(alerts);
           };
           document.body.appendChild(script);
         };
