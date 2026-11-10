@@ -242,3 +242,9 @@ revoke insert, update, delete, truncate
   on table public.experiments, public.experimental_units
   from public, anon, authenticated;
 grant select on table public.experiments, public.experimental_units to authenticated;
+
+-- Provenance is an audit record, not a client-editable annotation.
+revoke insert, update, delete, truncate
+  on table public.provenance
+  from public, anon, authenticated;
+grant select on table public.provenance to authenticated;
