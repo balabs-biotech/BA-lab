@@ -170,12 +170,13 @@ function createWorld() {
     world.add(group);cells.set(id,{group,soma,label,hit,position:pos,color});
     const domainButton=document.createElement('button');domainButton.type='button';domainButton.className='webgl-hit-target webgl-domain-target';domainButton.setAttribute('aria-label',(LABELS[id]?.title||id)+' — '+t('domain'));domainButton.title=LABELS[id]?.title||id;domainButton.dataset.domainId=id;domainButton.style.width='116px';domainButton.style.height='116px';domainButton.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();stage?.focus({preventScroll:true});if(!selected)enterDomain(id)});stage.append(domainButton);domainHitTargets.set(id,{object:hit,button:domainButton});
     pickables.push(soma,hit,label);
-    const branches=14;
+    const branches=14,branchTips=[];
     for(let j=0;j<branches;j++){
       const a=j/branches*Math.PI*2+IDS.indexOf(id)*.31;
       const reach=1.0+(j%4)*.24;
       const start=new THREE.Vector3(Math.cos(a)*.10,Math.sin(a)*.09,Math.sin(a*1.7)*.035);
       const end=new THREE.Vector3(Math.cos(a)*reach,Math.sin(a)*reach*.76,Math.sin(a*1.7)*.34);
+      branchTips.push(end.clone());
       const mid=start.clone().lerp(end,.52).add(new THREE.Vector3(Math.cos(a+1)*.18,Math.sin(a+1)*.16,.13));
       const curve=new THREE.CatmullRomCurve3([start,mid,end]);
       const thickness=.0065+(j%3)*.0014;
@@ -189,6 +190,13 @@ function createWorld() {
       }
       const tip=new THREE.Mesh(new THREE.SphereGeometry(.026+(j%3)*.006,8,6),new THREE.MeshStandardMaterial({color,roughness:.75,emissive:color,emissiveIntensity:.18}));
       tip.position.copy(end);group.add(tip);
+    }
+    // Anastomoses: neighboring hyphae reconnect into a mesh instead of isolated radial spokes.
+    for(let j=0;j<8;j++){
+      const A=branchTips[(j*2)%branches],B=branchTips[(j*2+3)%branches];
+      const mid=A.clone().lerp(B,.5).multiplyScalar(.91).add(new THREE.Vector3(0,.035,(j%2?-.08:.08)));
+      const bridge=new THREE.CatmullRomCurve3([A.clone(),mid,B.clone()]);
+      group.add(new THREE.Mesh(new THREE.TubeGeometry(bridge,24,.0028,4,false),new THREE.MeshStandardMaterial({color,emissive:color,emissiveIntensity:.16,transparent:true,opacity:.30,depthWrite:false,roughness:.9})));
     }
   }
   LINKS.forEach(([a,b],index)=>{
