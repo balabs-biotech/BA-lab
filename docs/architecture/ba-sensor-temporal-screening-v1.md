@@ -50,3 +50,22 @@ This module is deliberately separate from the existing daily NASA POWER
 calendar-window screen. It does not use FAO-56. The next layer can convert
 these source-linked assessments into domain signals only after a persisted
 biological context and a versioned domain profile have been resolved.
+
+## API exposure
+
+The private endpoint `POST /v1/analyses/sensors` can optionally execute this
+screen when all three explicit settings are supplied:
+
+- `temporal_window_seconds`
+- `temporal_minimum_history`
+- `temporal_threshold`
+
+Partial configuration is rejected. The response exposes a separate
+`temporal_screening` object; descriptive series statistics remain unchanged.
+Assessments are returned only for the requested local-calendar analysis
+window. Earlier readings inside the same versioned profile's validity period
+are available as causal baseline history, while readings outside that profile
+validity window are excluded before normalization.
+
+The Supabase gateway bounds the history window to 30 days, fetches enough
+historical rows for the requested window, and still applies the 5,000-row cap.
