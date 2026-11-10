@@ -32,7 +32,11 @@ def build_temporal_findings(
         if item.observed_date in seen_dates:
             raise ValueError("temporal assessments must contain unique dates")
         seen_dates.add(item.observed_date)
-        source_ids = list(source_observation_ids_by_date.get(item.observed_date, ()))
+        if item.observed_date not in source_observation_ids_by_date:
+            raise ValueError("source observation IDs are required for every assessment date")
+        source_ids = list(source_observation_ids_by_date[item.observed_date])
+        if not source_ids:
+            raise ValueError("at least one source observation ID is required per finding")
         if len(source_ids) != len(set(source_ids)):
             raise ValueError("source observation IDs must be unique per finding")
         finding_id = uuid5(
