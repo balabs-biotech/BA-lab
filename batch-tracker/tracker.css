@@ -2819,7 +2819,7 @@ body[data-domain] :is(button, input, select, textarea, a, [tabindex]):focus-visi
 }
 #biologicalSignalsCard .signal-item[data-severity="critical"] { border-left-color:#b3261e; }
 #biologicalSignalsCard .signal-item[data-severity="high"] { border-left-color:#b66a21; }
-#biologicalSignalsCard .signal-item[data-severity="medium"] { border-left-color:#b18b37; }
+#biologicalSignalsCard .signal-item[data-severity="moderate"] { border-left-color:#b18b37; }
 #biologicalSignalsCard .signal-item-header { align-items:flex-start; }
 #biologicalSignalsCard .signal-title-group { display:flex; align-items:center; flex-wrap:wrap; gap:8px 12px; min-width:0; }
 #biologicalSignalsCard .signal-title-group h3 { margin:0; font-size:16px; overflow-wrap:anywhere; }
