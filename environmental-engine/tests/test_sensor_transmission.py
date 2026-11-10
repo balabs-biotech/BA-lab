@@ -43,7 +43,7 @@ def assess(receipts):
 
 
 def test_regular_receipts_are_normal_and_keep_receipt_lineage():
-    rows = [receipt(1, 0), receipt(2, 1), receipt(3, 2), receipt(4, 3)]
+    rows = [receipt(1, 7), receipt(2, 8), receipt(3, 9), receipt(4, 10)]
     result = assess(rows)
     assert result.status == "normal"
     assert result.receipt_count == 4
@@ -53,7 +53,7 @@ def test_regular_receipts_are_normal_and_keep_receipt_lineage():
 
 
 def test_large_interior_gap_is_irregular():
-    result = assess([receipt(1, 0), receipt(2, 1), receipt(3, 5), receipt(4, 6)])
+    result = assess([receipt(1, 0), receipt(2, 1), receipt(3, 5), receipt(4, 6), receipt(5, 10)])
     assert result.status == "irregular"
     assert result.gap_count == 1
     assert result.maximum_gap_seconds == 240
