@@ -1,6 +1,6 @@
 # Biological context persistence and CultureOps entity mapping
 
-**Status:** Architecture decision record — approved for implementation planning, not yet a database migration  
+**Status:** Implemented on feature branch; database migration and integration validation pending  
 **Scope:** Environmental Intelligence Engine biological context persistence  
 **Branch:** `feat/environmental-source-contract-v1`
 
@@ -80,13 +80,14 @@ The persisted row's `location_id` should be derived from the linked environment 
 - No default biological thresholds or recommendations.
 - No production migration, schema mutation, or deployment in this decision record.
 
-## Next implementation sequence
+## Remaining implementation sequence
 
-1. Add a typed database-subject resolver for culture vs plant culture, enforcing tenant ownership and domain compatibility.
-2. Add migration and SQL tests for the time-bounded association table, composite tenant foreign keys, CHECK constraints, RLS and role-aware write policy.
-3. Add repository/service persistence adapters that translate database rows to/from the existing Python `BiologicalContext` contract.
-4. Add integration tests for tenant isolation, historical validity, subject deletion behavior, environment mismatch, and round-trip mapping.
-5. Only then connect the persisted context to domain interpretation and the GreenTech/Mycology/Lab interfaces.
+1. Validate the migration and SQL contract test against a disposable PostgreSQL/Supabase test database.
+2. Execute the Python test suite on the current feature-branch HEAD and resolve any failures.
+3. Add a real Supabase integration test for RLS, tenant isolation, PostgREST relation shape, and CRUD behavior using test-only credentials.
+4. Connect the orchestration function to the authenticated application boundary (Edge Function/API), without moving tenant authorization into the scientific engine.
+5. Define versioned environment-profile persistence for timezone, origin, sensor metadata, profile code, and profile version before claiming full environment-context round-trip parity.
+6. Only after validation, plan production migration and staged GreenTech/Mycology/Lab UI integration.
 
 
 ## Implementation status — 2026-11-10
@@ -140,3 +141,31 @@ when none is valid, returns the single valid context when exactly one matches,
 and raises an explicit ambiguity error when multiple validity intervals overlap.
 The database does not silently choose a context or impose a global exclusion
 constraint at this stage; overlapping records remain visible for correction.
+
+
+### Persisted interpretation orchestration — 2026-11-10
+
+The interpretation service now exposes
+`interpret_persisted_analysis_for_subject`. It accepts a BALAnalysis, an
+explicit DomainProfile, a repository implementing the small read-only
+`BiologicalContextRepository` protocol, an EnvironmentContext, and a subject
+UUID.
+
+Resolution behavior is intentionally strict:
+
+- Query by analysis tenant, profile domain, and subject ID.
+- Ignore contexts outside the analysis date window.
+- Fail if no context overlaps the analysis window.
+- Fail if more than one context overlaps it.
+- Fail if the single context does not cover the entire analysis window.
+- Pass the resolved context through the existing tenant/location/environment,
+  domain, and temporal validation before evaluating domain rules.
+
+This avoids interpreting a multi-day analysis against a context that was only
+valid for part of the period, or silently choosing between overlapping records.
+The engine remains independent of the Supabase SDK: the application injects
+the repository implementation after authenticating and authorizing the caller.
+
+Four orchestration tests were added for successful resolution, missing context,
+partial validity coverage, and overlapping contexts. These tests are written
+but remain unexecuted on the current branch HEAD.
