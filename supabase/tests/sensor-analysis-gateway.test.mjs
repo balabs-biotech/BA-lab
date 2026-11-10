@@ -10,7 +10,7 @@ const profileRead = source.indexOf('.from("environment_context_profiles")');
 const measurementRead = source.indexOf('.from("measurements")');
 const engineCall = source.indexOf('new URL("/v1/analyses/sensors", engineUrl)');
 
-assert.match(source, /Bearer\\s\+\(\.\+\)/, "caller must present a bearer JWT");
+assert.match(source, /startsWith\("bearer "\)/, "caller must present a bearer JWT");
 assert.ok(jwt >= 0 && environmentRead > jwt, "JWT verification must precede RLS environment lookup");
 assert.ok(membershipRead > environmentRead, "organization membership must be checked after RLS environment lookup");
 assert.ok(profileRead > membershipRead, "service-role profile reads must follow membership authorization");
