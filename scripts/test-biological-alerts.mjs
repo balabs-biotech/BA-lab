@@ -8,6 +8,8 @@ const tracker = read("batch-tracker/tracker.js");
 const styles = read("batch-tracker/tracker.css");
 const locales = read("batch-tracker/i18n.js");
 const lineageIndexMigration = read("supabase/migrations/20261110220000_add_material_relationship_reverse_index.sql");
+const mixtureMigration = read("supabase/migrations/20261110230000_add_atomic_multi_source_material_creation.sql");
+const traceabilityRuntimeTest = read("supabase/tests/biological_traceability.test.sql");
 
 for (const entry of [
   "batch-tracker/mycology/index.html",
@@ -82,6 +84,18 @@ assert.match(moduleSource, /Relations entrantes :/);
 assert.match(moduleSource, /Lots matière :/);
 assert.match(lineageIndexMigration, /material_relationships_org_child_idx/);
 assert.match(lineageIndexMigration, /organization_id, child_material_id, parent_material_id/);
+assert.match(mixtureMigration, /create or replace function public\.create_biological_material_mixture/);
+assert.match(mixtureMigration, /cardinality\(p_source_material_ids\) < 2/);
+assert.match(mixtureMigration, /material_mixture_sources_must_be_unique/);
+assert.match(mixtureMigration, /material_mixture_source_not_found/);
+assert.match(mixtureMigration, /order by m\.id\s+for update/);
+assert.match(mixtureMigration, /insert into public\.material_relationships/);
+assert.match(mixtureMigration, /insert into public\.events/);
+assert.match(mixtureMigration, /grant execute on function public\.create_biological_material_mixture/);
+assert.match(traceabilityRuntimeTest, /create_biological_material_mixture/);
+assert.match(traceabilityRuntimeTest, /consortium must persist two parent edges/);
+assert.match(traceabilityRuntimeTest, /cross-tenant mixture source was accepted/);
+assert.match(traceabilityRuntimeTest, /multiple strains into one strain_id/);
 assert.match(moduleSource, /payload\.operation/);
 assert.match(moduleSource, /\.in\("culture_id", cultureIds\)/);
 assert.match(moduleSource, /\.limit\(100\)/);
