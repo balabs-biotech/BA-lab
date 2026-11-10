@@ -41,6 +41,17 @@ The adapter retains the provider's daily-local-solar-time declaration and
 extracts the source date from metadata. A date mismatch or timezone-naive
 timestamp is rejected.
 
+## Normalized source contract
+
+The adapter returns the provider-neutral `NormalizedEnvironmentalObservation` model from `ba_environmental_engine.sources.models`. In addition to canonical and original values/units, the model retains:
+
+- `data_family` (NASA POWER daily rows must be `weather`);
+- `spatial_resolution_m` when supplied, validated as a positive finite number;
+- the complete provider `metadata` object as `source_metadata`;
+- source row, organization and location identifiers.
+
+Future provider adapters must return this same normalized model. Provider-specific parsing stays inside each adapter; calculations consume the normalized model and do not branch on provider names. No speculative adapter protocol or direct provider client is introduced until a second provider is implemented.
+
 ## Quality and duplicate policy
 
 - Provider estimates remain labelled by their original quality flag.
