@@ -181,7 +181,7 @@ $;
 
 reset role;
 
-do $
+do $$
 declare
   v_event_id uuid := current_setting('test.manual_measurement_event_id')::uuid;
   v_measurement_unit_id uuid;
