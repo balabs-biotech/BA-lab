@@ -214,6 +214,9 @@ def test_biological_context_is_bound_to_environment_and_enriches_domain_rules():
     )
 
     assert result.matched_findings == 1
+    assert result.signals[0].biological_context_id == biological.context_id
+    assert result.signals[0].biological_subject_id == biological.subject_id
+    assert result.signals[0].environment_context_id == environment.context_id
     assert result.signals[0].context_tags >= {
         "season:winter",
         "stage:fruiting",
