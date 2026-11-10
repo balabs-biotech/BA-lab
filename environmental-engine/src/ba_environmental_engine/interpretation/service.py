@@ -132,13 +132,14 @@ def interpret_analysis_for_biological_context(
 class BiologicalContextRepository(Protocol):
     """Read-only repository surface required by persisted interpretation."""
 
-    def list_for_subject(
+    def list_overlapping_scope(
         self,
         *,
         organization_id: str,
         domain: BiologicalDomain,
         subject_id: str,
-        on_date: str | None = None,
+        from_date: str,
+        to_date: str,
     ) -> tuple[BiologicalContext, ...]: ...
 
 
@@ -156,16 +157,12 @@ def interpret_persisted_analysis_for_subject(
     one interpretation must not silently combine multiple biological regimes.
     """
     domain = BiologicalDomain(profile.module)
-    contexts = repository.list_for_subject(
+    overlapping = repository.list_overlapping_scope(
         organization_id=str(analysis.scope.organization_id),
         domain=domain,
         subject_id=str(subject_id),
-    )
-    overlapping = tuple(
-        context
-        for context in contexts
-        if context.valid_from <= analysis.scope.to_date
-        and (context.valid_to is None or context.valid_to >= analysis.scope.from_date)
+        from_date=analysis.scope.from_date.isoformat(),
+        to_date=analysis.scope.to_date.isoformat(),
     )
     if not overlapping:
         raise LookupError(
