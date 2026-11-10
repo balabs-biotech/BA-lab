@@ -31,7 +31,9 @@ alter table public.experimental_units
 
 alter table public.cultures
   drop constraint if exists cultures_experiment_id_fkey,
-  drop constraint if exists cultures_experimental_unit_id_fkey;
+  drop constraint if exists cultures_experimental_unit_id_fkey,
+  drop constraint if exists cultures_organization_id_experiment_id_fkey,
+  drop constraint if exists cultures_organization_id_experimental_unit_id_fkey;
 
 alter table public.cultures
   add constraint cultures_experimental_context_pair_check
