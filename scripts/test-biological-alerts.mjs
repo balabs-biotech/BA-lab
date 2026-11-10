@@ -41,6 +41,7 @@ assert.match(moduleSource, /temporal_window_seconds/);
 
 assert.match(moduleSource, /\.rpc\("set_biological_signal_status"/);
 assert.match(moduleSource, /balabs:organization-context/);
+assert.match(moduleSource, /if \(!state\.organizationId\) \{\s*state\.rows = \[\];\s*state\.offset = 0;\s*state\.hasMore = false;/, "missing tenant context must clear stale pagination state");
 assert.match(moduleSource, /new MutationObserver/);
 assert.match(moduleSource, /node\.textContent = text/);
 assert.match(tracker, /window\.BALabsGetOrganizationId = \(\) => organizationId/);
