@@ -105,9 +105,10 @@
     }
     const series = Array.isArray(analysis.series) ? analysis.series : [];
     const temporal = Array.isArray(payload.temporal_screening?.assessments) ? payload.temporal_screening.assessments : [];
+    const flatlines = Array.isArray(payload.instrument_health?.flatline_diagnostics?.assessments) ? payload.instrument_health.flatline_diagnostics.assessments : [];
     const signals = Array.isArray(payload.domain_interpretation?.signals) ? payload.domain_interpretation.signals : [];
     const summary = node("div", "sensor-summary");
-    [["Observations", analysis.total_observations ?? 0], ["Séries", series.length], ["Lectures suspectes", payload.temporal_screening?.status === "completed" ? temporal.filter(item => item.status === "suspect").length : "Non demandé"], ["Signaux biologiques", signals.length]].forEach(([label, value]) => {
+    [["Observations", analysis.total_observations ?? 0], ["Séries", series.length], ["Lectures suspectes", payload.temporal_screening?.status === "completed" ? temporal.filter(item => item.status === "suspect").length : "Non demandé"], ["Alertes instrumentales", payload.instrument_health?.flatline_diagnostics?.status === "completed" ? flatlines.filter(item => item.status === "suspected").length : "Non demandé"], ["Signaux biologiques", signals.length]].forEach(([label, value]) => {
       const metric = node("article", "sensor-metric");
       metric.append(node("span", "", label), node("strong", "", String(value)));
       summary.append(metric);
@@ -152,6 +153,18 @@
       temporal.forEach(item => details.append(node("p", "", [item.variable_code, item.status, item.observed_value, item.unit_code, item.observed_at, item.history_count === undefined ? null : "historique n=" + item.history_count, item.robust_z_score == null ? null : "z robuste=" + Number(item.robust_z_score).toFixed(2)].filter(value => value !== undefined && value !== null).join(" · "))));
       output.append(details);
     }
+    if (payload.instrument_health?.flatline_diagnostics?.status === "completed") {
+      const details = node("details", "sensor-detail");
+      details.append(node("summary", "", "Fiabilité instrumentale — répétitions exactes (" + flatlines.length + " capteur(s)/variable(s))"));
+      flatlines.forEach(item => details.append(node("p", "", [
+        item.variable_code, item.status,
+        "plus longue séquence=" + (item.longest_repeated_run ?? 0),
+        item.longest_repeated_duration_seconds == null ? null : "durée=" + Math.round(item.longest_repeated_duration_seconds) + " s",
+        "observations utilisables=" + (item.observation_count ?? 0)
+      ].filter(value => value !== undefined && value !== null).join(" · "))));
+      details.append(node("p", "sensor-notice", "Une séquence identique est un indice instrumental à examiner, pas un diagnostic de panne ni une anomalie biologique."));
+      output.append(details);
+    }
     if (signals.length) {
       const details = node("details", "sensor-detail");
       details.append(node("summary", "", "Signaux biologiques interprétés (" + signals.length + ")"));
@@ -181,13 +194,32 @@
       const temporalWindowMinutes = $("sensorTemporalWindowMinutes").value.trim();
       const temporalMinimumHistory = $("sensorTemporalMinimumHistory").value.trim();
       const temporalThreshold = $("sensorTemporalThreshold").value.trim();
+      const flatlineMinimumObservations = $("sensorFlatlineMinimumObservations").value.trim();
+      const flatlineMinimumDurationSeconds = $("sensorFlatlineMinimumDurationSeconds").value.trim();
+      const flatlineValues = [flatlineMinimumObservations, flatlineMinimumDurationSeconds];
+      const flatlineRequested = flatlineValues.some(value => value !== "");
+      if (flatlineRequested && flatlineValues.some(value => value === "")) {
+        status("Pour activer le dépistage des répétitions exactes, renseignez ensemble le nombre minimal de lectures et la durée minimale.", true);
+        return;
+      }
+      const body = { environment_id: environmentId, start_date: startDate, end_date: endDate, subject_id: subjectId };
+      if (flatlineRequested) {
+        const minimumObservations = Number(flatlineMinimumObservations);
+        const minimumDurationSeconds = Number(flatlineMinimumDurationSeconds);
+        if (!Number.isSafeInteger(minimumObservations) || minimumObservations < 2 ||
+            !Number.isSafeInteger(minimumDurationSeconds) || minimumDurationSeconds <= 0) {
+          status("Réglages de fiabilité invalides : au moins 2 lectures identiques et une durée entière positive en secondes.", true);
+          return;
+        }
+        body.flatline_minimum_repeated_observations = minimumObservations;
+        body.flatline_minimum_duration_seconds = minimumDurationSeconds;
+      }
       const temporalValues = [temporalWindowMinutes, temporalMinimumHistory, temporalThreshold];
       const temporalRequested = temporalValues.some(value => value !== "");
       if (temporalRequested && temporalValues.some(value => value === "")) {
         status("Pour activer le dépistage temporel, renseignez ensemble la fenêtre, le minimum historique et le seuil robuste.", true);
         return;
       }
-      const body = { environment_id: environmentId, start_date: startDate, end_date: endDate, subject_id: subjectId };
       if (expectedIntervalMinutes !== "") {
         const minutes = Number(expectedIntervalMinutes);
         if (!Number.isSafeInteger(minutes) || minutes <= 0 || minutes > 1440) {
