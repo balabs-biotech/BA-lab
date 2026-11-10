@@ -362,8 +362,8 @@ def build_bal_analysis(
 
     output.sort(key=lambda item: (item.period.from_date, item.code))
     summaries = _source_summaries(rows, used_variables)
-    finding_dates = [item.observed_date for item in anomaly_findings]
-    if len(finding_dates) != len(set((item.finding_id for item in anomaly_findings))):
+    finding_ids = [item.finding_id for item in anomaly_findings]
+    if len(finding_ids) != len(set(finding_ids)):
         raise ValueError("anomaly finding IDs must be unique")
     if any(not scope_from <= item.observed_date <= scope_to for item in anomaly_findings):
         raise ValueError("anomaly finding date must be contained within analysis scope")
