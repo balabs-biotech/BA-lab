@@ -57,3 +57,6 @@ assert.match(source, /adminClient\s*\.from\("biological_signals"\)[\s\S]*?\.upse
 assert.match(source, /domain_profile_code:[\s\S]*?environment_profile_code:/, "persisted signals must retain both immutable profile version identifiers");
 assert.match(source, /source_observation_ids:[\s\S]*?context_tags:/, "persisted signals must retain observation provenance and biological context tags");
 assert.match(source, /biological_signal_persistence_failed/, "persistence failure must not be reported as a successful durable alert");
+
+assert.match(source, /analysis_method: "environmental_daily"/, "NASA POWER signals must retain their daily climate analysis method");
+assert.match(source, /analysis_evidence: signal\.evidence \?\? \{\}/, "environmental signal evidence must be persisted");
