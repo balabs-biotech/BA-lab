@@ -174,3 +174,28 @@ def test_sensor_interpretation_does_not_claim_full_coverage_without_declared_cad
     )
     assert result.matched_findings == 1
     assert result.signals[0].finding_status == "indeterminate"
+
+
+def test_sensor_interpretation_marks_coverage_indeterminate_when_no_cadence_was_declared():
+    analysis = make_analysis(availability=None)
+    profile = DomainProfile(
+        profile_id="lab-sensor-unknown-coverage",
+        module="lab",
+        version="1.0.0",
+        rules=(InterpretationRule(
+            rule_id="coverage-unknown",
+            variable_code="air_temperature",
+            finding_status="indeterminate",
+            signal_code="sensor_coverage_unknown",
+            severity="info",
+            message_code="sensor_expected_interval_not_configured",
+        ),),
+    )
+    result = interpret_sensor_analysis(
+        analysis,
+        profile,
+        source_analysis_id=uuid4(),
+        observed_date=date(2026, 11, 10),
+    )
+    assert result.matched_findings == 1
+    assert result.signals[0].finding_status == "indeterminate"
