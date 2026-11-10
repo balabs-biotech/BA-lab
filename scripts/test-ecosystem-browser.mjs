@@ -21,7 +21,7 @@ async function tapSpatialTarget(page, name, x, y, selector) {
   // Prefer the real semantic hit target whenever one is supplied. Coordinate-only
   // canvas taps can select a neighbouring domain on narrow mobile viewports.
   if (selector) {
-    const target = page.locator(selector).first();
+    const target = (typeof selector === 'string' ? page.locator(selector) : selector).first();
     await target.waitFor({ state: 'visible', timeout: 5000 });
     if (name === 'mobile') {
       await target.scrollIntoViewIfNeeded();
@@ -160,8 +160,10 @@ async function checkWorkingScene(name, viewport) {
   await page.waitForFunction(() => typeof window.__BALABS_3D_E2E__ === 'function', undefined, { timeout: 5000 });
   await checkTwoFingerPan(page, name);
   await page.waitForFunction(() => (window.__BALABS_3D_E2E__()?.visible || 0) > 0, undefined, { timeout: 15000 }).catch(async error => { throw new Error('No 3D branch is visible for a real tap: ' + JSON.stringify(await page.evaluate(() => window.__BALABS_3D_E2E__())) + ' — ' + error.message); });
-  await page.waitForFunction(() => { const dock=document.querySelector('.webgl-branch-dock'); return dock && !dock.hidden && dock.querySelectorAll('.webgl-branch-item').length>0; }, undefined, { timeout: 8000 });
-  assert.ok(await page.locator('.webgl-branch-dock .webgl-branch-item').count() > 0, name + ': current hierarchy level must expose visible, selectable branches');
+  await page.waitForFunction(() => [...document.querySelectorAll('.webgl-resource-target[data-has-children="true"]')].some(button=>!button.hidden&&getComputedStyle(button).display!=='none'), undefined, { timeout: 8000 });
+  assert.ok(await page.locator('.webgl-resource-target[data-has-children="true"]').count() > 0, name + ': current hierarchy level must expose directly selectable map labels');
+  const dockState = await page.evaluate(() => ({hidden:document.querySelector('.webgl-branch-dock')?.hidden,items:document.querySelectorAll('.webgl-branch-dock .webgl-branch-item').length}));
+  assert.ok(dockState.hidden && dockState.items===0, name + ': no branch index may cover the 3D map');
   await page.evaluate(() => { window.__BALABS_3D_TARGET_EVENTS__=[]; for (const type of ['pointerdown','pointerup','click','touchend']) document.addEventListener(type,event=>{if(event.target?.closest?.('.webgl-hit-target,.webgl-branch-item'))window.__BALABS_3D_TARGET_EVENTS__.push({type,target:event.target.title||event.target.tagName,pointerType:event.pointerType||null,x:event.clientX??null,y:event.clientY??null})},true); });
   await page.evaluate(() => { window.__BALABS_3D_TARGET_EVENTS__=[]; window.__BALABS_3D_DOCUMENT_CLICK__=null; });
   await page.evaluate(() => { window.__BALABS_3D_E2E_CLICKS=0; window.__BALABS_3D_LAST_OPEN__=null; window.__BALABS_3D_LAST_OPEN_ERROR__=null; });
@@ -176,32 +178,31 @@ async function checkWorkingScene(name, viewport) {
     assert.ok(branchTarget, name + ': no spatial folder/page target was found');
     if (branchTarget.hasChildren) {
       const depthBefore = probe.depth;
-      const branchButtonPoint = await page.evaluate(() => { const buttons=[...document.querySelectorAll('.webgl-branch-dock .webgl-branch-item[data-has-children="true"]')]; const button=buttons.find(item=>{const rect=item.getBoundingClientRect();return rect.width>0&&rect.height>0}); if(!button)return null; const rect=button.getBoundingClientRect(); return {x:rect.left+rect.width/2,y:rect.top+rect.height/2,title:button.title,index:button.dataset.branchIndex}; });
+      const branchButtonPoint = await page.evaluate(() => { const buttons=[...document.querySelectorAll('.webgl-resource-target[data-has-children="true"]')]; const button=buttons.find(item=>{const rect=item.getBoundingClientRect();return !item.hidden&&getComputedStyle(item).display!=='none'&&rect.width>=40&&rect.height>=40}); if(!button)return null; const rect=button.getBoundingClientRect(); return {x:rect.left+rect.width/2,y:rect.top+rect.height/2,title:button.title,index:buttons.indexOf(button)}; });
       assert.ok(branchButtonPoint, name + ': at least one folder must expose an unobstructed DOM hit target');
       const beforeActivation = await page.evaluate(() => ({clicks:window.__BALABS_3D_E2E_CLICKS||0,picks:window.__BALABS_3D_E2E__()?.pickCalls||0}));
       const clicksBefore = beforeActivation.clicks;
-      await tapSpatialTarget(page, name, branchButtonPoint.x, branchButtonPoint.y, '.webgl-branch-dock .webgl-branch-item[data-branch-index="'+branchButtonPoint.index+'"]');
+      await tapSpatialTarget(page, name, branchButtonPoint.x, branchButtonPoint.y, page.locator('.webgl-resource-target[data-has-children="true"]').nth(branchButtonPoint.index));
       await page.waitForFunction(({title,before}) => { const probe=window.__BALABS_3D_E2E__?.(); return window.__BALABS_3D_LAST_OPEN__?.title===title && (window.__BALABS_3D_E2E_CLICKS||0)>before && probe?.currentTitle===title && probe.childCount>0; }, {title:branchButtonPoint.title,before:clicksBefore}, { timeout: 8000 }).catch(async error => { throw new Error(name + ': selecting a branch did not activate the intended folder. ' + JSON.stringify(await page.evaluate(() => ({probe:window.__BALABS_3D_E2E__(),lastOpen:window.__BALABS_3D_LAST_OPEN__,clicks:window.__BALABS_3D_E2E_CLICKS,trace:window.__BALABS_3D_NAV_TRACE__,events:window.__BALABS_3D_TARGET_EVENTS__})) ) + ' expected=' + JSON.stringify({title:branchButtonPoint.title,before:beforeActivation}) + ' — ' + error.message); });
       await page.waitForTimeout(250);
       const activation = await page.evaluate(() => ({clicks:window.__BALABS_3D_E2E_CLICKS||0,last:window.__BALABS_3D_LAST_OPEN__,events:window.__BALABS_3D_TARGET_EVENTS__||[]}));
       assert.equal(activation.clicks, clicksBefore+1, name + ': one finger tap must activate a branch exactly once');
       assert.equal(await page.evaluate(() => window.__BALABS_3D_E2E__()?.pickCalls||0), beforeActivation.picks, name + ': a branch tap must not also trigger a spatial canvas selection');
       if(name==='mobile')assert.ok(activation.events.some(event=>event.type==='pointerup'&&event.target===branchButtonPoint.title), name + ': mobile branch selection must be handled on touch pointer release');
-      const childDockState = await page.evaluate(() => { const dock=document.querySelector('.webgl-branch-dock'),probe=window.__BALABS_3D_E2E__(); return {hidden:dock?.hidden,display:dock&&getComputedStyle(dock).display,items:dock?.querySelectorAll('.webgl-branch-item').length,childCount:probe?.childCount,titles:[...(dock?.querySelectorAll('.webgl-branch-item')||[])].map(button=>button.title)}; });
-      assert.ok(childDockState && !childDockState.hidden && childDockState.items===childDockState.childCount && childDockState.items>0,
-        name + ': selecting a branch must replace the dock with its actual child branches. ' + JSON.stringify(childDockState));
+      const childLabelState = await page.evaluate(() => { const probe=window.__BALABS_3D_E2E__(); const targets=[...document.querySelectorAll('.webgl-resource-target')]; return {childCount:probe?.childCount,created:targets.length,visible:targets.filter(button=>!button.hidden&&getComputedStyle(button).display!=='none').length,dockHidden:document.querySelector('.webgl-branch-dock')?.hidden}; });
+      assert.ok(childLabelState && childLabelState.dockHidden && childLabelState.created>=childLabelState.childCount && childLabelState.visible>0,
+        name + ': selecting a branch must expose its children directly on the map, without a dock. ' + JSON.stringify(childLabelState));
       navigated = true;
       await page.waitForFunction(() => !document.querySelector('#mainView .webgl-stage')?.classList.contains('is-transitioning'), undefined, { timeout: 8000 });
       // Children of the opened folder are depth 0; depth 1 is the next generation, not a prerequisite.
       const visibleLabelState = await page.evaluate(() => window.__BALABS_3D_E2E__());
       assert.deepEqual(visibleLabelState?.visibleLabelDepths || [], [0], name + ': branch navigation must show only its immediate children until the next zoom level');
-      assert.equal(visibleLabelState?.visibleLabelCountsByDepth?.[0] || 0, childDockState.childCount,
-        name + ': every immediate child must have its own visible text label at the branch navigation zoom. ' + JSON.stringify({childCount:childDockState.childCount,visibleCounts:visibleLabelState?.visibleLabelCountsByDepth}));
+      assert.equal(visibleLabelState?.visibleLabelCountsByDepth?.[0] || 0, childLabelState.childCount,
+        name + ': every immediate child must have its own visible text label at the branch navigation zoom. ' + JSON.stringify({childCount:childLabelState.childCount,visibleCounts:visibleLabelState?.visibleLabelCountsByDepth}));
       const domLabelState = await page.evaluate(() => ({created:document.querySelectorAll('.webgl-resource-target').length,visible:[...document.querySelectorAll('.webgl-resource-target')].filter(button=>!button.hidden&&getComputedStyle(button).display!=='none').length}));
-      assert.ok(domLabelState.created >= childDockState.childCount && domLabelState.visible > 0,
+      assert.ok(domLabelState.created >= childLabelState.childCount && domLabelState.visible > 0,
         name + ': branch labels must have real, visible DOM text targets. ' + JSON.stringify(domLabelState));
-      const dockWhiteSpace = await page.locator('.webgl-branch-dock .webgl-branch-item').first().evaluate(el => getComputedStyle(el).whiteSpace);
-      assert.equal(dockWhiteSpace, 'nowrap', name + ': long dock titles must stay on one line and not cover the map');
+      assert.ok(await page.locator('.webgl-branch-dock').evaluate(el=>el.hidden), name + ': branch dock must remain hidden so the map stays unobstructed');
       await page.screenshot({ path: outputDir + '/' + name + '-branch-labels.png', fullPage: false });
       if (!zoomOutChecked) {
         const nestedDepth = await page.evaluate(() => window.__BALABS_3D_E2E__()?.depth || 0);
