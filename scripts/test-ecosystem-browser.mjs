@@ -206,7 +206,7 @@ async function checkWorkingScene(name, viewport) {
       assert.ok(domLabelState.created >= childLabelState.childCount && domLabelState.visible > 0,
         name + ': branch labels must have real, visible DOM text targets. ' + JSON.stringify(domLabelState));
       assert.ok(await page.locator('.webgl-branch-dock').evaluate(el=>el.hidden), name + ': branch dock must remain hidden so the map stays unobstructed');
-      await page.screenshot({ path: outputDir + '/' + name + '-branch-labels.png', fullPage: false });
+      await page.screenshot({ path: outputDir + '/' + name + '-branch-labels-v74.png', fullPage: false });
       if (!zoomOutChecked) {
         const nestedDepth = await page.evaluate(() => window.__BALABS_3D_E2E__()?.depth || 0);
         const cameraDistance = await page.evaluate(() => window.__BALABS_3D_E2E__()?.cameraDistance || 0);
