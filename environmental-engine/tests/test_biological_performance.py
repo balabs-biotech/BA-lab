@@ -4,7 +4,7 @@ import pytest
 
 from ba_environmental_engine.indicators.biological_performance import (
     BiologicalMeasurement,
-    analyze_growth_rate,
+    analyze_extent_growth_rate,
 )
 
 
@@ -32,7 +32,7 @@ def measurement(
 
 
 def analyze(records, *, accepted={"validated"}, variable="root_length"):
-    return analyze_growth_rate(
+    return analyze_extent_growth_rate(
         records,
         organization_id="org-1",
         subject_id="culture-1",
@@ -47,7 +47,7 @@ def test_growth_rate_is_derived_from_two_quality_accepted_points_with_provenance
     assert result.value == pytest.approx(4.0)
     assert result.unit_code == "mm/day"
     assert result.source_record_ids == ("m1", "m2")
-    assert result.formula_code == "net_growth_rate"
+    assert result.formula_code == "net_extent_rate"
     assert result.formula_version == "1.0.0"
 
 
