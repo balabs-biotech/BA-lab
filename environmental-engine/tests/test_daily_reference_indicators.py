@@ -19,7 +19,7 @@ REQUIRED = {
 }
 
 
-def make_observation(variable_code, value, unit, **changes):
+def make_observation(variable_code, value, canonical_unit, **changes):
     now = datetime(2026, 6, 21, 12, tzinfo=timezone.utc)
     fields = dict(
         source_observation_id=uuid4(),
@@ -31,9 +31,9 @@ def make_observation(variable_code, value, unit, **changes):
         source_parameter=variable_code,
         variable_code=variable_code,
         value=value,
-        unit=unit,
+        unit=canonical_unit,
         source_value=value,
-        source_unit=unit,
+        source_unit=canonical_unit,
         observed_at=now,
         observed_date=date(2026, 6, 21),
         retrieved_at=now,
@@ -130,13 +130,16 @@ def test_rejects_duplicate_required_variable_instead_of_choosing_one():
 def test_rejects_mixed_or_noncanonical_daily_sources(changes):
     rows = complete_observations()
     first = rows[0]
+    overrides = {
+        "organization_id": first.organization_id,
+        "location_id": first.location_id,
+    }
+    overrides.update(changes)
     rows[0] = make_observation(
         first.variable_code,
         first.value,
         first.unit,
-        organization_id=first.organization_id,
-        location_id=first.location_id,
-        **changes,
+        **overrides,
     )
     with pytest.raises(ValueError):
         calculate_daily_reference_indicators(rows, latitude_deg=45.0, altitude_m=100.0)
