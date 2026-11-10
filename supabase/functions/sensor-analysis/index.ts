@@ -144,6 +144,11 @@ Deno.serve(async (req: Request) => {
     if (dayCount > MAX_DAYS || Date.parse(toDate + "T00:00:00Z") > Date.now() + 86_400_000) {
       return reply(422, { error: "date_range_exceeds_supported_scope" });
     }
+    const subjectId = body.subject_id;
+    if (subjectId !== undefined && (typeof subjectId !== "string" || !UUID_RE.test(subjectId))) {
+      return reply(400, { error: "subject_id_must_be_a_valid_uuid" });
+    }
+
     const expectedInterval = body.expected_interval_seconds;
     if (expectedInterval !== undefined &&
         (!Number.isSafeInteger(expectedInterval) || expectedInterval <= 0)) {
@@ -234,6 +239,107 @@ Deno.serve(async (req: Request) => {
       .filter((id: unknown): id is string => typeof id === "string" && UUID_RE.test(id)))];
     if (!sensorIds.length) return reply(422, { error: "sensor_profile_has_no_bound_devices" });
 
+    let biologicalInterpretationPayload: Record<string, unknown> | undefined;
+    if (subjectId !== undefined) {
+      const { data: contexts, error: contextError } = await adminClient
+        .from("biological_contexts")
+        .select(
+          "id,organization_id,domain,culture_id,plant_culture_id,environment_id,organism_kind,taxon_code,strain_code,cultivar_code,culture_stage,substrate_code,production_system,context_tags,valid_from,valid_to," +
+          "environment:environments!biological_contexts_environment_fk(id,location_id)",
+        )
+        .eq("organization_id", profile.organization_id)
+        .eq("environment_id", environmentId)
+        .or(`culture_id.eq.${subjectId},plant_culture_id.eq.${subjectId}`)
+        .lte("valid_from", fromDate)
+        .or(`valid_to.is.null,valid_to.gte.${toDate}`)
+        .order("valid_from", { ascending: false })
+        .limit(2);
+      if (contextError) {
+        console.error("[sensor-analysis] Biological context lookup failed", contextError.message);
+        return reply(500, { error: "biological_context_lookup_failed" });
+      }
+      if (!contexts?.length) return reply(422, { error: "biological_context_unavailable_for_subject_and_scope" });
+      if (contexts.length !== 1) return reply(422, { error: "ambiguous_biological_context_for_subject_and_scope" });
+
+      const biological = contexts[0];
+      const resolvedSubjectId = biological.culture_id ?? biological.plant_culture_id;
+      const biologicalLocationId = biological.environment?.location_id;
+      if (
+        resolvedSubjectId !== subjectId ||
+        biological.organization_id !== profile.organization_id ||
+        biological.environment_id !== environmentId ||
+        biologicalLocationId !== locationId ||
+        biological.valid_from > fromDate ||
+        (biological.valid_to && biological.valid_to < toDate)
+      ) {
+        return reply(422, { error: "biological_context_binding_or_validity_mismatch" });
+      }
+
+      const { data: domainProfiles, error: domainProfileError } = await adminClient
+        .from("domain_interpretation_profiles")
+        .select("id,organization_id,domain,profile_code,profile_version,rules,valid_from,valid_to,status")
+        .eq("organization_id", profile.organization_id)
+        .eq("domain", biological.domain)
+        .in("status", ["active", "retired"])
+        .lte("valid_from", fromDate)
+        .or(`valid_to.is.null,valid_to.gte.${toDate}`)
+        .order("valid_from", { ascending: false })
+        .limit(2);
+      if (domainProfileError) {
+        console.error("[sensor-analysis] Domain profile lookup failed", domainProfileError.message);
+        return reply(500, { error: "domain_interpretation_profile_lookup_failed" });
+      }
+      if (!domainProfiles?.length) return reply(422, { error: "domain_interpretation_profile_unavailable" });
+      if (domainProfiles.length !== 1) return reply(422, { error: "ambiguous_domain_interpretation_profile" });
+      const domainProfile = domainProfiles[0];
+      if (
+        domainProfile.domain !== biological.domain ||
+        domainProfile.valid_from > fromDate ||
+        (domainProfile.valid_to && domainProfile.valid_to < toDate)
+      ) {
+        return reply(422, { error: "domain_interpretation_profile_scope_mismatch" });
+      }
+
+      biologicalInterpretationPayload = {
+        biological_context: {
+          context_id: biological.id,
+          subject_id: resolvedSubjectId,
+          organization_id: biological.organization_id,
+          location_id: biologicalLocationId,
+          environment_context_id: biological.environment_id,
+          domain: biological.domain,
+          organism_kind: biological.organism_kind,
+          taxon_code: biological.taxon_code,
+          strain_code: biological.strain_code,
+          cultivar_code: biological.cultivar_code,
+          culture_stage: biological.culture_stage,
+          substrate_code: biological.substrate_code,
+          production_system: biological.production_system,
+          context_tags: biological.context_tags ?? [],
+          valid_from: biological.valid_from,
+          valid_to: biological.valid_to,
+        },
+        environment_context: {
+          context_id: environmentId,
+          organization_id: profile.organization_id,
+          location_id: locationId,
+          context_type: profile.context_type,
+          label: profile.label,
+          timezone: profile.timezone,
+          origin: profile.origin,
+          sensor_ids: sensorIds,
+          profile_code: profile.profile_code,
+          profile_version: profile.profile_version,
+        },
+        domain_profile: {
+          profile_id: domainProfile.profile_code,
+          module: domainProfile.domain,
+          version: domainProfile.profile_version,
+          rules: domainProfile.rules ?? [],
+        },
+      };
+    }
+
     // Query with a one-day UTC guard band on both sides. The engine applies the
     // exact local-calendar window using the profile IANA timezone.
     const historyGuardDays = temporalWindowSeconds === undefined
@@ -307,6 +413,7 @@ Deno.serve(async (req: Request) => {
         temporal_window_seconds: temporalWindowSeconds,
         temporal_minimum_history: temporalMinimumHistory,
         temporal_threshold: temporalThreshold,
+        biological_interpretation: biologicalInterpretationPayload,
         measurements: sensorMeasurements,
       }),
       signal: AbortSignal.timeout(60_000),
