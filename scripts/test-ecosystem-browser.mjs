@@ -179,7 +179,7 @@ async function checkWorkingScene(name, viewport) {
     if (branchTarget.hasChildren) {
       const depthBefore = probe.depth;
       const branchButtonPoint = await page.evaluate(() => { const buttons=[...document.querySelectorAll('.webgl-resource-target[data-has-children="true"]')]; const button=buttons.find(item=>{const rect=item.getBoundingClientRect();return !item.hidden&&getComputedStyle(item).display!=='none'&&rect.width>=40&&rect.height>=40}); if(!button)return null; const rect=button.getBoundingClientRect(); return {x:rect.left+rect.width/2,y:rect.top+rect.height/2,title:button.title,index:buttons.indexOf(button)}; });
-      assert.ok(branchButtonPoint, name + ': at least one folder must expose an unobstructed DOM hit target');
+      assert.ok(branchButtonPoint, name + ': at least one folder must expose an unobstructed DOM hit target. ' + JSON.stringify(await page.evaluate(() => ({probe:window.__BALABS_3D_E2E__(),targets:[...document.querySelectorAll('.webgl-resource-target')].map(button=>({title:button.title,hasChildren:button.dataset.hasChildren,depth:button.dataset.depth,hidden:button.hidden,display:getComputedStyle(button).display,rect:(()=>{const r=button.getBoundingClientRect();return{w:r.width,h:r.height,x:r.x,y:r.y}})()}))}))));
       const beforeActivation = await page.evaluate(() => ({clicks:window.__BALABS_3D_E2E_CLICKS||0,picks:window.__BALABS_3D_E2E__()?.pickCalls||0}));
       const clicksBefore = beforeActivation.clicks;
       await tapSpatialTarget(page, name, branchButtonPoint.x, branchButtonPoint.y, page.locator('.webgl-resource-target[data-has-children="true"]').nth(branchButtonPoint.index));
