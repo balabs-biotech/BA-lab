@@ -66,9 +66,9 @@ create table public.batches(
   primary key(organization_id,id),
   foreign key(organization_id,culture_id) references public.cultures(organization_id,id)
 );
-do $ begin
+do $fixture$ begin
   create type public.quality_state as enum ('raw','controlled','validated','excluded');
-exception when duplicate_object then null; end $;
+exception when duplicate_object then null; end $fixture$;
 create table public.experiments(
   organization_id uuid not null references public.organizations(id),
   id uuid not null default gen_random_uuid(),
