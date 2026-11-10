@@ -120,10 +120,32 @@ def test_daily_result_serializes_with_exact_source_lineage_and_gridded_quality()
     ]
     assert analysis.indicators[0].value == 12.5
     assert analysis.indicators[1].unit == "mm/day"
-    inputs = analysis.indicators[0].inputs
-    assert {str(item.source_observation_ids[0]) for item in inputs} == {
-        str(row.source_observation_id) for row in rows
+    net_radiation = analysis.indicators[0]
+    et0 = analysis.indicators[1]
+    assert {item.variable_code for item in net_radiation.inputs} == {
+        "air_temperature_max",
+        "air_temperature_min",
+        "solar_radiation_all_sky",
+        "relative_humidity_mean",
     }
+    assert {
+        source_id
+        for item in net_radiation.inputs
+        for source_id in item.source_observation_ids
+    } == {
+        row.source_observation_id
+        for row in rows
+        if row.variable_code in {
+            "air_temperature_max",
+            "air_temperature_min",
+            "solar_radiation_all_sky",
+            "relative_humidity_mean",
+        }
+    }
+    assert {item.variable_code for item in et0.inputs} == set(VARIABLES)
+    assert {
+        source_id for item in et0.inputs for source_id in item.source_observation_ids
+    } == {row.source_observation_id for row in rows}
     assert analysis.source_summary[0].quality_class == "gridded_estimate"
     assert "cloudiness_ratio_clamped_low" in analysis.indicators[0].quality.flags
     assert "private_note" not in analysis.model_dump_json()
