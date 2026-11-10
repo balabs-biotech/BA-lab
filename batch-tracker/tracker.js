@@ -1914,8 +1914,9 @@ async function createCulture() {
     return;
   }
 
-  const selectedExperimentId = globalThis.document?.getElementById("cultureExperimentId")?.value || "";
-  const selectedExperimentalUnitId = globalThis.document?.getElementById("cultureExperimentalUnitId")?.value || "";
+  const cultureExperimentDocument = typeof document !== "undefined" ? document : null;
+  const selectedExperimentId = cultureExperimentDocument?.getElementById("cultureExperimentId")?.value || "";
+  const selectedExperimentalUnitId = cultureExperimentDocument?.getElementById("cultureExperimentalUnitId")?.value || "";
   if (Boolean(selectedExperimentId) !== Boolean(selectedExperimentalUnitId)) {
     showMessage("Pour rattacher une culture à une expérience, sélectionnez à la fois l’expérience et son unité expérimentale.", "error");
     return;
