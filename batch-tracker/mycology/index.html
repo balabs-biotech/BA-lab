@@ -40,6 +40,10 @@
             alerts.src = "../biological-alerts.js?v=20261110-alert-inbox-1";
             alerts.onerror = () => console.error("Le centre des alertes biologiques n’a pas pu être chargé.");
             document.body.appendChild(alerts);
+            const sensorPanel = document.createElement("script");
+            sensorPanel.src = "../environmental-sensor-panel.js?v=20261111-sensor-panel-1";
+            sensorPanel.onerror = () => console.error("Le module d’analyse des capteurs n’a pas pu être chargé ; les autres modules restent disponibles.");
+            document.body.appendChild(sensorPanel);
           };
           document.body.appendChild(script);
         };
