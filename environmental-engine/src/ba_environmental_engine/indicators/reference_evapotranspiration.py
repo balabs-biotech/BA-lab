@@ -59,6 +59,8 @@ def atmospheric_pressure_from_altitude_kpa(altitude_m: float) -> float:
 
 def _actual_vapor_pressure(
     *,
+    temperature_max_c: float,
+    temperature_min_c: float,
     saturation_min_kpa: float,
     saturation_max_kpa: float,
     actual_vapor_pressure_kpa: float | None,
@@ -93,12 +95,8 @@ def _actual_vapor_pressure(
         actual = saturation_vapor_pressure_kpa(dew_point_temperature_c)
     elif humidity_mean:
         actual = actual_vapor_pressure_from_mean_rh(
-            temperature_max_c=(
-                (saturation_max_kpa, saturation_min_kpa)
-            )[0],
-            temperature_min_c=(
-                (saturation_max_kpa, saturation_min_kpa)
-            )[1],
+            temperature_max_c=temperature_max_c,
+            temperature_min_c=temperature_min_c,
             relative_humidity_mean_percent=relative_humidity_mean_percent,
         )
     else:
@@ -200,6 +198,8 @@ def calculate_fao56_et0(
     saturation_max = saturation_vapor_pressure_kpa(t_max)
     saturation_mean = (saturation_min + saturation_max) / 2.0
     actual = _actual_vapor_pressure(
+        temperature_max_c=t_max,
+        temperature_min_c=t_min,
         saturation_min_kpa=saturation_min,
         saturation_max_kpa=saturation_max,
         actual_vapor_pressure_kpa=actual_vapor_pressure_kpa,
