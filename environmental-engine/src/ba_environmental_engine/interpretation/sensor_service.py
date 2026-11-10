@@ -50,8 +50,6 @@ def interpret_sensor_analysis(
     for summary in analysis.series:
         finding_status = _finding_status(summary)
         observed_value = summary.mean
-        if observed_value is None:
-            observed_value = 0.0
 
         for rule in profile.rules:
             if rule.variable_code != summary.variable_code:
