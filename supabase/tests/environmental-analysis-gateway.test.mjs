@@ -43,6 +43,8 @@ assert.match(source, /overlappingContexts/, "partial context windows must be dis
 
 assert.match(source, /environment_profile_unavailable/, "missing environment profiles must be explicit");
 assert.match(source, /domain_profile_unavailable/, "missing domain profiles must be explicit");
+assert.match(source, /environmentProfile\.origin !== "weather_provider"[\s\S]*environmentProfile\.context_type !== "outdoor"/, "NASA POWER gridded weather must not be interpreted as greenhouse or sensor measurements");
+assert.match(source, /environment_source_mismatch/, "source/context mismatches must have an explicit non-fatal status");
 assert.match(source, /enginePayload\.biological_interpretation\s*=\s*interpretationResolution\.payload/, "only server-resolved profile data may be forwarded to the private engine");
 assert.match(source, /interpretation_status:\s*interpretationResolution\.status\s*===\s*"ready"/, "the gateway must preserve explicit interpretation status");
 
