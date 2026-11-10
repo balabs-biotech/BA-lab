@@ -34,15 +34,23 @@ resolution and provider metadata. Provider adapters return the shared
 ```bash
 python -m venv .venv
 . .venv/bin/activate
-python -m pip install -e ".[dev]"
+python -m pip install -e ".[dev,api]"
 pytest
+
+# Start the private API locally (requires BA_ENVIRONMENTAL_ENGINE_API_KEY)
+uvicorn ba_environmental_engine.api.app:app --host 127.0.0.1 --port 8000
 ```
 
 Python 3.10+; CPU-only.
 
+## Private service API
+
+The optional FastAPI boundary exposes `GET /health` and `POST /v1/analyses`. Configure `BA_ENVIRONMENTAL_ENGINE_API_KEY` in the runtime secret manager before starting the service. Keep the API behind private ingress; never expose the internal key to CultureOps clients. The Supabase Edge Function must authenticate the user and enforce organization/location authorization before forwarding normalized observations.
+
 ## Architecture contracts
 
 - `docs/architecture/ba-environmental-execution-service-v1.md`: execution service entrypoint, orchestration sequence, scientific boundaries and application integration responsibilities.
+- `docs/architecture/ba-environmental-private-api-v1.md`: private FastAPI boundary, service authentication, tenant trust boundary and synchronous request/response contract.
 - `docs/architecture/ba-environmental-intelligence-contract-v1.md`: engine boundaries and data flow.
 - `docs/architecture/ba-environmental-unit-registry-v1.md`: canonical units and conversion conventions.
 - `docs/architecture/ba-nasa-power-adapter-v1.md`: provider mapping and daily time semantics.
