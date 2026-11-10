@@ -34,6 +34,8 @@ assert.match(moduleSource, /loadHistory\("biological_subject_id"/);
 assert.match(moduleSource, /loadHistory\("environment_id"/);
 assert.match(moduleSource, /\.eq\(kind, id\)/);
 assert.match(moduleSource, /\.limit\(50\)/);
+assert.match(moduleSource, /signalsHistoryStatus/);
+assert.match(moduleSource, /scrollIntoView/);
 assert.match(moduleSource, /state\.historyRequest/);
 assert.match(moduleSource, /signalsHistoryClose/);
 assert.match(moduleSource, /signalsSeverityFilter/);
@@ -67,7 +69,12 @@ for (const phrase of [
   "Environnement",
   "Méthode d’analyse",
   "Anomalie temporelle IoT (MAD robuste)",
-  "Score robuste"
+  "Score robuste",
+  "Historique du sujet",
+  "Historique de l’environnement",
+  "Chargement de l’historique…",
+  "Aucun historique disponible pour ce contexte.",
+  "Fermer"
 ]) {
   assert.ok(locales.includes(phrase), `Missing i18n coverage for: ${phrase}`);
 }
