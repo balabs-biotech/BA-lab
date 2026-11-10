@@ -765,6 +765,7 @@ async function signOut() {
 
   authStateRevision += 1;
   organizationId = null;
+  window.dispatchEvent(new CustomEvent('balabs:organization-context', { detail: { organizationId: null } }));
   organization = null;
   strainOptions = [];
   referenceData = [];
