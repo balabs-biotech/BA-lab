@@ -15,6 +15,7 @@ The engine foundation provides:
 - a traceable air vapor-pressure deficit (VPD) calculation from temperature and relative humidity;
 - FAO-56 daily net radiation (Ra, Rso, Rns, Rnl, Rn) with solar-geometry and cloudiness diagnostics;
 - FAO-56 daily reference grass evapotranspiration (ET0), with explicit pressure/altitude and vapour-pressure inputs;
+- a provider-neutral daily pipeline joining normalized weather observations to net radiation and ET0 with source-ID lineage and explicit missing-data states;
 - period-level VPD summaries with explicit above-threshold duration and sampling-gap exclusions;
 - versioned environment context metadata separating outdoor, greenhouse, fruiting-chamber and laboratory observations;
 - sensor descriptors and measurement contracts with source-observation and formula lineage.
@@ -47,4 +48,5 @@ for the provider mapping and daily time semantics, and
 `docs/architecture/ba-environment-context-v1.md` for environment context identity and origin rules, and
 `docs/architecture/ba-sensor-measurement-lineage-v1.md` for sensor and observation lineage. and
 `docs/architecture/ba-fao56-reference-evapotranspiration-v1.md` for the daily FAO-56 ET0 contract. and
-`docs/architecture/ba-fao56-net-radiation-v1.md` for daily solar and net-radiation calculations.
+`docs/architecture/ba-fao56-net-radiation-v1.md` for daily solar and net-radiation calculations. and
+`docs/architecture/ba-daily-reference-indicators-pipeline-v1.md` for the normalized source-to-indicator pipeline.
