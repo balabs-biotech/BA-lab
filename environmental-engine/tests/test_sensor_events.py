@@ -99,3 +99,46 @@ def test_rule_profile_rejects_duplicate_rule_ids():
         assert "unique" in str(exc)
     else:
         raise AssertionError("duplicate rule IDs must be rejected")
+
+
+def test_unaccepted_quality_observation_breaks_a_sustained_run():
+    start = datetime(2026, 11, 10, 9, tzinfo=timezone.utc)
+    rows = tuple(
+        normalize_iot_measurement_row(joined_row(
+            measured_at=start + timedelta(seconds=index * 60),
+            raw_value=value,
+            quality_state=quality,
+        ))
+        for index, (value, quality) in enumerate([
+            (29.0, "validated"),
+            (30.0, "raw"),
+            (31.0, "validated"),
+        ])
+    )
+    result = detect_sensor_events(
+        rows,
+        profile(),
+        context_tags=frozenset({"stage:fruiting"}),
+    )
+    assert result.events == ()
+
+
+def test_event_detector_rejects_unit_mismatch_instead_of_converting():
+    envelopes = tuple(
+        normalize_iot_measurement_row(joined_row(
+            raw_unit_code="K",
+            canonical_unit_code="K",
+            measured_at=datetime(2026, 11, 10, 9, tzinfo=timezone.utc),
+            quality_state="validated",
+        )),
+    )
+    try:
+        detect_sensor_events(
+            envelopes,
+            profile(),
+            context_tags=frozenset({"stage:fruiting"}),
+        )
+    except ValueError as exc:
+        assert "does not match event rule unit" in str(exc)
+    else:
+        raise AssertionError("unit mismatch must be rejected")
