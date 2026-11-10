@@ -23,7 +23,7 @@
     sensor_temporal: "Anomalie temporelle IoT (MAD robuste)"
   };
   const PAGE_SIZE = 100;
-  const state = { userId: null, organizationId: null, domain: null, rows: [], filter: "active", request: 0, offset: 0, hasMore: false, loading: false };
+  const state = { userId: null, organizationId: null, domain: null, rows: [], filter: "active", severity: "all", method: "all", variable: "", request: 0, offset: 0, hasMore: false, loading: false };
   const root = document.getElementById("biologicalSignalsCard");
   if (!root) return;
 
@@ -58,9 +58,12 @@
     $("signalsTotalCount").textContent = String(state.rows.length);
 
     const visible = state.rows.filter(row => {
-      if (state.filter === "active") return row.signal_status === "open" || row.signal_status === "acknowledged";
-      if (state.filter === "resolved") return row.signal_status === "resolved";
-      if (state.filter === "dismissed") return row.signal_status === "dismissed";
+      if (state.filter === "active" && !["open", "acknowledged"].includes(row.signal_status)) return false;
+      if (state.filter === "resolved" && row.signal_status !== "resolved") return false;
+      if (state.filter === "dismissed" && row.signal_status !== "dismissed") return false;
+      if (state.severity !== "all" && row.severity !== state.severity) return false;
+      if (state.method !== "all" && row.analysis_method !== state.method) return false;
+      if (state.variable && !(row.variable_code || "").toLowerCase().includes(state.variable)) return false;
       return true;
     });
     const loadMore = $("signalsLoadMore");
@@ -226,6 +229,18 @@
 
   $("signalsFilter").addEventListener("change", event => {
     state.filter = event.target.value;
+    render();
+  });
+  $("signalsSeverityFilter").addEventListener("change", event => {
+    state.severity = event.target.value;
+    render();
+  });
+  $("signalsMethodFilter").addEventListener("change", event => {
+    state.method = event.target.value;
+    render();
+  });
+  $("signalsVariableFilter").addEventListener("input", event => {
+    state.variable = event.target.value.trim().toLowerCase();
     render();
   });
   $("signalsRefresh").addEventListener("click", () => loadSignals());
