@@ -1914,8 +1914,8 @@ async function createCulture() {
     return;
   }
 
-  const selectedExperimentId = cultureExperimentSelect?.value || "";
-  const selectedExperimentalUnitId = cultureExperimentalUnitSelect?.value || "";
+  const selectedExperimentId = document.getElementById("cultureExperimentId")?.value || "";
+  const selectedExperimentalUnitId = document.getElementById("cultureExperimentalUnitId")?.value || "";
   if (Boolean(selectedExperimentId) !== Boolean(selectedExperimentalUnitId)) {
     showMessage("Pour rattacher une culture à une expérience, sélectionnez à la fois l’expérience et son unité expérimentale.", "error");
     return;
