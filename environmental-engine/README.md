@@ -20,7 +20,8 @@ The engine foundation provides:
 - a provider-neutral daily pipeline joining normalized weather observations to net radiation and ET0 with source-ID lineage and explicit missing-data states;
 - period-level VPD summaries with explicit above-threshold duration and sampling-gap exclusions;
 - versioned environment context metadata separating outdoor, greenhouse, fruiting-chamber and laboratory observations;
-- sensor descriptors and measurement contracts with source-observation and formula lineage.
+- sensor descriptors and measurement contracts with source-observation and formula lineage;
+- a configurable domain-interpretation layer routing traceable findings to Mycology, GreenTech or Lab profiles, with explicit context tags and no implicit biological thresholds or recommendations.
 
 Derived values remain distinct from source observations. The engine does not
 write calculated values back as sensor measurements. A strict NASA POWER daily-row
@@ -50,6 +51,7 @@ The optional FastAPI boundary exposes `GET /health`, `POST /v1/analyses` for tru
 ## Architecture contracts
 
 - `docs/architecture/ba-environmental-execution-service-v1.md`: execution service entrypoint, orchestration sequence, scientific boundaries and application integration responsibilities.
+- `docs/architecture/ba-domain-interpretation-framework-v1.md`: configurable domain profiles, context-tag matching, traceable signals and biological validation boundaries.
 - `docs/architecture/ba-environmental-private-api-v1.md`: private FastAPI boundary, service authentication, tenant trust boundary and synchronous request/response contract.
 - `docs/architecture/ba-environmental-intelligence-contract-v1.md`: engine boundaries and data flow.
 - `docs/architecture/ba-environmental-unit-registry-v1.md`: canonical units and conversion conventions.
