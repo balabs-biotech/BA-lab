@@ -13,6 +13,7 @@ The engine foundation provides:
 - trailing robust temporal anomaly screening with explicit insufficient-history and zero-MAD states;
 - seasonal historical reference screening that compares only with prior years;
 - a traceable air vapor-pressure deficit (VPD) calculation from temperature and relative humidity;
+- FAO-56 daily net radiation (Ra, Rso, Rns, Rnl, Rn) with solar-geometry and cloudiness diagnostics;
 - FAO-56 daily reference grass evapotranspiration (ET0), with explicit pressure/altitude and vapour-pressure inputs;
 - period-level VPD summaries with explicit above-threshold duration and sampling-gap exclusions;
 - versioned environment context metadata separating outdoor, greenhouse, fruiting-chamber and laboratory observations;
@@ -45,4 +46,5 @@ for the provider mapping and daily time semantics, and
 `docs/architecture/ba-vpd-period-aggregation-v1.md` for period aggregation semantics, and
 `docs/architecture/ba-environment-context-v1.md` for environment context identity and origin rules, and
 `docs/architecture/ba-sensor-measurement-lineage-v1.md` for sensor and observation lineage. and
-`docs/architecture/ba-fao56-reference-evapotranspiration-v1.md` for the daily FAO-56 ET0 contract.
+`docs/architecture/ba-fao56-reference-evapotranspiration-v1.md` for the daily FAO-56 ET0 contract. and
+`docs/architecture/ba-fao56-net-radiation-v1.md` for daily solar and net-radiation calculations.
