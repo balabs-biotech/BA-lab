@@ -8,12 +8,16 @@ from ba_environmental_engine.indicators.biological_performance import (
 )
 
 
+def unit_variable(unit):
+    return "root_length" if unit in {"mm", "cm"} else "shoot_length"
+
+
 def measurement(record_id, days, value, *, unit="mm", quality="validated", subject="culture-1", organization="org-1"):
     return BiologicalMeasurement(
         source_record_id=record_id,
         organization_id=organization,
         subject_id=subject,
-        metric_code="growth_extent",
+        variable_code=unit_variable(unit),
         value=value,
         canonical_unit_code=unit,
         measured_at=datetime(2026, 1, 1, tzinfo=timezone.utc) + timedelta(days=days),
@@ -24,7 +28,7 @@ def measurement(record_id, days, value, *, unit="mm", quality="validated", subje
 def test_growth_rate_is_derived_from_two_quality_accepted_points_with_provenance():
     result = analyze_growth_rate(
         [measurement("m1", 0, 4), measurement("m2", 3, 16)],
-        organization_id="org-1", subject_id="culture-1", accepted_quality_states={"validated"},
+        organization_id="org-1", subject_id="culture-1", variable_code="root_length", accepted_quality_states={"validated"},
     )
     assert result.status == "calculated"
     assert result.value == pytest.approx(4.0)
@@ -72,7 +76,7 @@ def test_growth_rate_rejects_duplicate_source_ids():
 
 def test_measurement_contract_rejects_naive_timestamps_and_nonfinite_values():
     with pytest.raises(ValueError, match="timezone"):
-        BiologicalMeasurement("m1", "org-1", "culture-1", "growth_extent", 1, "mm", datetime(2026, 1, 1), "validated")
+        BiologicalMeasurement("m1", "org-1", "culture-1", "root_length", 1, "mm", datetime(2026, 1, 1), "validated")
     with pytest.raises(ValueError, match="finite"):
         measurement("m2", 1, float("nan"))
 
@@ -90,7 +94,7 @@ def test_database_quality_states_match_enum_and_excluded_ids_are_traced():
     result = analyze_growth_rate(
         [measurement("m1", 0, 4), measurement("m2", 3, 16, quality="excluded")],
         organization_id="org-1", subject_id="culture-1",
-        accepted_quality_states={"raw", "controlled", "validated", "excluded"},
+        variable_code="root_length", accepted_quality_states={"raw", "controlled", "validated", "excluded"},
     )
     assert result.source_record_ids == ("m1",)
     assert result.excluded_source_record_ids == ("m2",)
