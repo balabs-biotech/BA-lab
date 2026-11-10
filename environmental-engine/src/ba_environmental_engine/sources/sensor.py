@@ -91,7 +91,7 @@ def normalize_iot_measurement_row(row: dict[str, Any]) -> SensorMeasurementEnvel
     if not isinstance(metadata, dict) or metadata.get("source") != "iot":
         raise ValueError("measurement is not identified as an IoT source row")
 
-    if row.get("profile_origin") != "sensor" or row.get("profile_status") != "active":
+    if row.get("profile_origin") != "sensor" or row.get("profile_status") not in {"active", "retired"}:
         raise ValueError("measurement requires an active sensor-origin environment profile")
     if row.get("profile_sensor_bound") is not True:
         raise ValueError("device is not bound to the selected environment profile")
