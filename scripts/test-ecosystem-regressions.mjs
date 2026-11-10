@@ -7,9 +7,9 @@ const engine = readFileSync('ecosystem/engine-v2.js', 'utf8');
 const previewEngine = readFileSync('ecosystem-preview/engine-v2.js', 'utf8');
 const expectedDomains = ['bio', 'myco', 'soil', 'lab', 'products', 'iot', 'work', 'learn'];
 
-assert.ok(html.includes('engine-v2.js?v=20261110-clean-labels-v57'), 'Public explorer must load the cache-busted screen-space label engine');
-assert.ok(previewHtml.includes('engine-v2.js?v=20261110-clean-labels-v57'), 'Preview must load the matching cache-busted label engine');
-assert.ok(engine.includes('function syncLabelScales()') && engine.includes('cameraDistance*projection*targetPixels'), '3D labels must keep a stable screen-space size across zoom levels');
+assert.ok(html.includes('engine-v2.js?v=20261110-zoom-responsive-labels-v58'), 'Public explorer must load the cache-busted screen-space label engine');
+assert.ok(previewHtml.includes('engine-v2.js?v=20261110-zoom-responsive-labels-v58'), 'Preview must load the matching cache-busted label engine');
+assert.ok(engine.includes('function labelTargetPixels(label)') && previewEngine.includes('function labelTargetPixels(label)') && engine.includes('Math.pow(THREE.MathUtils.clamp(distance/13.5,.3,1.18),.68)') && previewEngine.includes('Math.pow(THREE.MathUtils.clamp(distance/13.5,.3,1.18),.68)') && engine.includes('return base*zoomScale') && previewEngine.includes('return base*zoomScale'), '3D labels must shrink smoothly as the camera zooms in while retaining a readable minimum');
 assert.ok(engine.includes('resourceHitTargets.set(label,element)'), 'Public branch labels must have real DOM hit targets');
 assert.ok(engine.includes('domainHitTargets.set(id,{object:hit,button:domainButton})'), 'Public universes must have real clickable hit targets');
 assert.ok(engine.includes('button.style.left=') && engine.includes('function syncResourceHitTargets()'), 'Public hit targets must follow projected 3D positions during camera motion');
