@@ -420,7 +420,64 @@ Deno.serve(async (req: Request) => {
         ? (result.domain_interpretation ?? null)
         : null,
     };
-    return reply(200, { ok: true, analysis: analysisResult });
+
+    let signalPersistenceStatus = "not_requested";
+    const signals = Array.isArray(analysisResult.domain_interpretation?.signals)
+      ? analysisResult.domain_interpretation.signals
+      : [];
+    if (interpretationResolution.status === "ready" && signals.length > 0) {
+      const biological = interpretationResolution.payload!.biological_context as Record<string, any>;
+      const environment = interpretationResolution.payload!.environment_context as Record<string, any>;
+      const domainProfile = interpretationResolution.payload!.domain_profile as Record<string, any>;
+      const signalRows = signals.map((signal: Record<string, any>) => ({
+        organization_id: location.organization_id,
+        signal_id: signal.signal_id,
+        domain: biological.domain,
+        signal_code: signal.signal_code,
+        severity: signal.severity,
+        message_code: signal.message_code,
+        recommendation_code: signal.recommendation_code ?? null,
+        rule_id: signal.rule_id,
+        source_analysis_id: signal.source_analysis_id ?? analysisResult.analysis_id,
+        source_finding_id: signal.source_finding_id,
+        biological_context_id: signal.biological_context_id ?? biological.context_id,
+        biological_subject_id: signal.biological_subject_id ?? biological.subject_id,
+        environment_id: signal.environment_context_id ?? environment.context_id,
+        domain_profile_code: domainProfile.profile_id,
+        domain_profile_version: domainProfile.version,
+        environment_profile_code: environment.profile_code,
+        environment_profile_version: environment.profile_version,
+        variable_code: signal.variable_code,
+        observed_date: signal.observed_date,
+        observed_value: signal.observed_value ?? null,
+        unit: signal.unit,
+        finding_status: signal.finding_status,
+        source_observation_ids: signal.source_observation_ids ?? [],
+        context_tags: signal.context_tags ?? [],
+      }));
+
+      const { error: signalPersistenceError } = await adminClient
+        .from("biological_signals")
+        .upsert(signalRows, {
+          onConflict: "organization_id,source_analysis_id,source_finding_id,rule_id,biological_context_id,domain_profile_code,domain_profile_version,environment_profile_code,environment_profile_version",
+          ignoreDuplicates: true,
+        });
+      if (signalPersistenceError) {
+        console.error("[environmental-analysis] Biological signal persistence failed", signalPersistenceError.message);
+        return reply(500, { error: "biological_signal_persistence_failed" });
+      }
+      signalPersistenceStatus = "persisted";
+    } else if (interpretationResolution.status === "ready") {
+      signalPersistenceStatus = "no_signals";
+    }
+
+    return reply(200, {
+      ok: true,
+      analysis: {
+        ...analysisResult,
+        signal_persistence_status: signalPersistenceStatus,
+      },
+    });
   } catch (error) {
     const message = error instanceof Error ? error.message : "unknown_error";
     console.error("[environmental-analysis] Request failed", message);
