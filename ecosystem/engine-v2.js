@@ -250,7 +250,7 @@ function visibleResourceLabelDepth() {
  // Keep the current branches named, then reveal each deeper layer as the user zooms in.
  if(distance<=4.8)return 3;
  if(distance<=5.6)return 2;
- if(distance<=7.2)return 1;
+ if(distance<=6.4)return 1;
  return 0;
 }
 function makeResourceLabel(item,color,depth=0) {
