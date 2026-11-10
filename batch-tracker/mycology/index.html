@@ -36,6 +36,10 @@
             assisted.src = "../smart-entry.js?v=20261029-assisted-entry-1";
             assisted.onerror = () => console.error("Le module de saisie assistée n’a pas pu être chargé.");
             document.body.appendChild(assisted);
+            const alerts = document.createElement("script");
+            alerts.src = "../biological-alerts.js?v=20261110-alert-inbox-1";
+            alerts.onerror = () => console.error("Le centre des alertes biologiques n’a pas pu être chargé.");
+            document.body.appendChild(alerts);
           };
           document.body.appendChild(script);
         };
