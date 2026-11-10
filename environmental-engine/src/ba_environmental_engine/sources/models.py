@@ -38,7 +38,7 @@ class NormalizedEnvironmentalObservation:
 
 @dataclass(frozen=True, slots=True)
 class DuplicateSourceKey:
-    key: tuple[str, str, str, str, str]
+    key: tuple[str, str, str, str, str, str]
     count: int
 
 
@@ -47,14 +47,15 @@ def find_duplicate_source_keys(rows: list[dict[str, Any]]) -> list[DuplicateSour
 
     Rows are reported, never collapsed or silently discarded.
     """
-    counts: dict[tuple[str, str, str, str, str], int] = {}
+    counts: dict[tuple[str, str, str, str, str, str], int] = {}
     for row in rows:
         key = (
             str(row.get("organization_id", "")),
             str(row.get("location_id", "")),
             str(row.get("provider_code", "")),
             str(row.get("dataset_code", "")),
-            str(row.get("variable_code", "")) + "|" + str(row.get("observed_at", "")),
+            str(row.get("variable_code", "")),
+            str(row.get("observed_at", "")),
         )
         counts[key] = counts.get(key, 0) + 1
     return [
