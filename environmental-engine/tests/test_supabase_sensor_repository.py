@@ -154,7 +154,7 @@ def test_repository_rejects_profile_missing_or_outside_scope():
     })
     repository = SupabaseSensorMeasurementRepository(client)
     import pytest
-    with pytest.raises(LookupError, match="no sensor environment profile"):
+    with pytest.raises(LookupError, match="does not cover"):
         repository.list_for_scope(
             organization_id=org,
             environment_id=env,
