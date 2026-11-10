@@ -41,11 +41,16 @@ series are rejected rather than counted twice.
 
 ## Current integration boundary
 
-The event detector is currently a pure Python module accepting already
-normalized `SensorMeasurementEnvelope` objects. It is not yet wired into the
-private FastAPI route or the Edge Function. Profile persistence, approval
-workflow, effective-date resolution and durable event storage remain separate
-integration tasks.
+The detector is a pure Python module accepting normalized
+`SensorMeasurementEnvelope` objects. The application use case
+`run_sensor_event_analysis` now loads a tenant/environment-scoped date range
+through the existing read-only sensor repository, checks returned tenant and
+environment identities, applies the profile timezone window, and invokes the
+detector with an injected trusted profile.
+
+It is not yet wired into the private FastAPI route or the Edge Function.
+Profile persistence, approval workflow, effective-date resolution and durable
+event storage remain separate integration tasks.
 
 ## Safety and operational requirements for the next phase
 
