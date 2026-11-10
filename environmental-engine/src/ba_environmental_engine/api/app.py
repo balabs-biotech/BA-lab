@@ -187,6 +187,15 @@ def _analysis_with_optional_interpretation(
         environment_context = EnvironmentContext.model_validate(
             payload["environment_context"]
         )
+        # This endpoint analyzes NASA POWER gridded weather. Do not let a
+        # sensor-backed greenhouse/lab profile relabel those outdoor estimates.
+        if (
+            environment_context.origin.value != "weather_provider"
+            or environment_context.context_type.value != "outdoor"
+        ):
+            raise ValueError(
+                "NASA POWER analysis requires an outdoor weather-provider context"
+            )
         domain_profile = DomainProfile.model_validate(payload["domain_profile"])
         interpretation = interpret_analysis_for_biological_context(
             analysis,
