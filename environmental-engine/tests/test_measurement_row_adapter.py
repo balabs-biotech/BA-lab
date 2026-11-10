@@ -66,7 +66,7 @@ def test_adapter_uses_raw_value_if_normalized_unit_is_not_canonical():
     assert result.value_source == "raw"
 
 
-def test_adapter_rejects_measurement_without_exactly_one_subject_link():
+def test_adapter_rejects_measurement_without_a_resolvable_subject():
     with pytest.raises(ValueError, match="exactly one"):
         measurement_row_to_biological_measurement(
             source_row(culture_id=None),
@@ -74,12 +74,23 @@ def test_adapter_rejects_measurement_without_exactly_one_subject_link():
         )
 
 
-def test_adapter_rejects_ambiguous_multiple_subject_links():
-    with pytest.raises(ValueError, match="exactly one"):
+def test_adapter_rejects_multiple_primary_subject_links():
+    with pytest.raises(ValueError, match="multiple primary"):
         measurement_row_to_biological_measurement(
-            source_row(sample_id="sample-1"),
+            source_row(plant_culture_id="plant-culture-1"),
             variable_registry={"root_length": "mm"},
         )
+
+
+def test_adapter_prefers_culture_subject_while_preserving_sample_link():
+    result = measurement_row_to_biological_measurement(
+        source_row(sample_id="sample-1", experimental_unit_id="unit-1"),
+        variable_registry={"root_length": "mm"},
+    )
+    assert result.subject_type == "culture"
+    assert result.subject_id == "culture-1"
+    assert result.sample_id == "sample-1"
+    assert result.experimental_unit_id == "unit-1"
 
 
 def test_adapter_rejects_values_that_cannot_be_proven_to_use_canonical_unit():
