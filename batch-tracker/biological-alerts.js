@@ -74,7 +74,7 @@
         element("h3", "signal-code", row.signal_code || row.message_code || "Signal biologique")
       );
       header.append(title, element("span", "signal-state", labels[row.signal_status] || row.signal_status));
-      const detail = element("p", "signal-message", row.message_code || "Interprétation enregistrée par le moteur biologique.");
+      const detail = element("p", "signal-message", row.message_code ? "Code du message : " + row.message_code : "Interprétation enregistrée par le moteur biologique.");
       const metadata = element("dl", "signal-metadata");
       const pairs = [
         ["Variable", row.variable_code],
@@ -84,6 +84,7 @@
         ["Contexte biologique", row.biological_context_id],
         ["Environnement", row.environment_id],
         ["Règle", row.rule_id],
+        ["Code du message", row.message_code],
         ["Recommandation", row.recommendation_code],
         ["Profil biologique", row.domain_profile_code && row.domain_profile_version ? row.domain_profile_code + " / v" + row.domain_profile_version : null],
         ["Profil environnemental", row.environment_profile_code && row.environment_profile_version ? row.environment_profile_code + " / v" + row.environment_profile_version : null],
@@ -223,6 +224,8 @@
     if (nextDomain === previousDomain) return;
     previousDomain = nextDomain;
     state.domain = domainByWorkspace[nextDomain] || null;
+    state.rows = [];
+    render();
     if (state.domain && state.organizationId) void loadSignals();
   }).observe(document.body, { attributes: true, attributeFilter: ["data-domain"] });
 
