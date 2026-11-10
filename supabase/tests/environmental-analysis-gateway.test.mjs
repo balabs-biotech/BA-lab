@@ -46,6 +46,7 @@ assert.match(source, /domain_profile_unavailable/, "missing domain profiles must
 assert.match(source, /environmentProfile\.origin !== "weather_provider"[\s\S]*environmentProfile\.context_type !== "outdoor"/, "NASA POWER gridded weather must not be interpreted as greenhouse or sensor measurements");
 assert.match(source, /environment_source_mismatch/, "source/context mismatches must have an explicit non-fatal status");
 assert.match(source, /enginePayload\.biological_interpretation\s*=\s*interpretationResolution\.payload/, "only server-resolved profile data may be forwarded to the private engine");
+assert.match(source, /environment_context:\s*\{[\s\S]*?context_id:\s*environmentProfile\.environment_id/, "the engine context identity must reference environments.id, not the profile-version row ID");
 assert.match(source, /interpretation_status:\s*interpretationResolution\.status\s*===\s*"ready"/, "the gateway must preserve explicit interpretation status");
 
 console.log("PASS: environmental analysis gateway security contract");
