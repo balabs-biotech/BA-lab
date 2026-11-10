@@ -63,12 +63,12 @@ def test_environment_profile_record_builds_engine_context():
     record = make_environment_profile()
     context = environment_context_from_record(record)
 
-    assert context.context_id == record["id"]
-    assert context.organization_id == record["organization_id"]
-    assert context.location_id == record["environment"]["location_id"]
+    assert str(context.context_id) == record["id"]
+    assert str(context.organization_id) == record["organization_id"]
+    assert str(context.location_id) == record["environment"]["location_id"]
     assert context.context_type is EnvironmentType.FRUITING_CHAMBER
     assert context.origin is ObservationOrigin.SENSOR
-    assert context.sensor_ids == [record["sensors"][0]["sensor_id"]]
+    assert [str(sensor_id) for sensor_id in context.sensor_ids] == [record["sensors"][0]["sensor_id"]]
     assert context.profile_code == "fruiting-room"
     assert context.profile_version == "1.2.0"
 
