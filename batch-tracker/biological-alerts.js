@@ -228,49 +228,109 @@
   }
 
   async function resolveCultureLineage(cultureId, organizationId) {
-    const columns = "id,code,culture_type,parent_culture_id,started_at,material:materials(material_code,generation,strain:strains(strain_code,designation,organism:organisms(scientific_name)))";
-    const [currentResult, childrenResult] = await Promise.all([
-      client.from("cultures").select(columns)
-        .eq("organization_id", organizationId).eq("id", cultureId).maybeSingle(),
-      client.from("cultures").select(columns)
-        .eq("organization_id", organizationId).eq("parent_culture_id", cultureId)
-        .order("started_at", { ascending: true }).limit(50)
-    ]);
-    if (currentResult.error || !currentResult.data) return { cultures: [], batches: [], unavailable: true };
-    const current = currentResult.data;
-    let parent = null;
-    if (current.parent_culture_id) {
-      const parentResult = await client.from("cultures").select(columns)
-        .eq("organization_id", organizationId).eq("id", current.parent_culture_id).maybeSingle();
-      if (!parentResult.error) parent = parentResult.data;
+    const columns = "id,code,culture_type,parent_culture_id,started_at,created_at,material:materials(material_code,generation,strain:strains(strain_code,designation,organism:organisms(scientific_name)))";
+    const MAX_ANCESTORS = 8;
+    const MAX_DESCENDANT_DEPTH = 5;
+    const MAX_CULTURES = 100;
+    const seen = new Set();
+    const byId = new Map();
+    let current = null;
+    const currentResult = await client.from("cultures").select(columns)
+      .eq("organization_id", organizationId).eq("id", cultureId).maybeSingle();
+    if (currentResult.error || !currentResult.data) return { cultures: [], batches: [], events: [], unavailable: true };
+    current = currentResult.data;
+    byId.set(current.id, current);
+    seen.add(current.id);
+
+    // Walk the parent chain, bounded and tenant-scoped.
+    let cursor = current;
+    for (let depth = 0; depth < MAX_ANCESTORS && cursor.parent_culture_id && byId.size < MAX_CULTURES; depth++) {
+      const parentId = cursor.parent_culture_id;
+      if (seen.has(parentId)) break;
+      const result = await client.from("cultures").select(columns)
+        .eq("organization_id", organizationId).eq("id", parentId).maybeSingle();
+      if (result.error || !result.data) break;
+      cursor = result.data;
+      seen.add(cursor.id);
+      byId.set(cursor.id, cursor);
     }
-    const cultures = [parent, current, ...(childrenResult.data || [])].filter(Boolean);
-    const cultureIds = [...new Set(cultures.map(item => item.id))];
-    const batchResult = await client.from("batches")
-      .select("batch_code,name,status,current_stage,culture_id")
-      .eq("organization_id", organizationId).in("culture_id", cultureIds)
-      .order("created_at", { ascending: false }).limit(100);
-    return { cultures, batches: batchResult.error ? [] : (batchResult.data || []), unavailable: false };
+
+    // Walk descendants breadth-first; one batched query per generation, not N+1.
+    let frontier = [current.id];
+    for (let depth = 0; depth < MAX_DESCENDANT_DEPTH && frontier.length && byId.size < MAX_CULTURES; depth++) {
+      const room = MAX_CULTURES - byId.size;
+      const result = await client.from("cultures").select(columns)
+        .eq("organization_id", organizationId).in("parent_culture_id", frontier)
+        .order("started_at", { ascending: true }).limit(Math.min(room, 100));
+      if (result.error) break;
+      const next = [];
+      for (const child of result.data || []) {
+        if (seen.has(child.id) || byId.size >= MAX_CULTURES) continue;
+        seen.add(child.id);
+        byId.set(child.id, child);
+        next.push(child.id);
+      }
+      frontier = next;
+    }
+
+    const cultures = [...byId.values()].sort((a, b) => {
+      const ga = Number.isFinite(a.material?.generation) ? a.material.generation : Number.MAX_SAFE_INTEGER;
+      const gb = Number.isFinite(b.material?.generation) ? b.material.generation : Number.MAX_SAFE_INTEGER;
+      return ga - gb || String(a.started_at || a.created_at || "").localeCompare(String(b.started_at || b.created_at || ""));
+    });
+    const cultureIds = cultures.map(item => item.id);
+    const [batchResult, eventResult] = await Promise.all([
+      client.from("batches").select("batch_code,name,status,current_stage,culture_id")
+        .eq("organization_id", organizationId).in("culture_id", cultureIds)
+        .order("created_at", { ascending: false }).limit(100),
+      client.from("events").select("id,event_type,occurred_at,culture_id,payload")
+        .eq("organization_id", organizationId).in("culture_id", cultureIds)
+        .order("occurred_at", { ascending: true }).limit(200)
+    ]);
+    return {
+      cultures,
+      batches: batchResult.error ? [] : (batchResult.data || []),
+      events: eventResult.error ? [] : (eventResult.data || []),
+      unavailable: false,
+      truncated: byId.size >= MAX_CULTURES
+    };
   }
 
   function renderCultureLineage(lineage, currentCultureId) {
     if (!lineage || lineage.unavailable || !lineage.cultures.length) return null;
     const section = element("section", "signal-lineage");
-    section.append(element("h4", "", "Lignée de culture"));
+    section.append(element("h4", "", "Généalogie biologique"));
     const list = element("ol", "signal-lineage-list");
     lineage.cultures.forEach(culture => {
       const item = element("li", culture.id === currentCultureId ? "is-current" : "");
       const material = culture.material || {};
       const strain = material.strain || {};
       const organism = strain.organism || {};
+      const parent = lineage.cultures.find(candidate => candidate.id === culture.parent_culture_id);
       const title = [culture.code, culture.id === currentCultureId ? "Culture consultée" : null].filter(Boolean).join(" — ");
-      const detail = [culture.culture_type, material.material_code, strain.strain_code || strain.designation, organism.scientific_name, material.generation === null || material.generation === undefined ? null : "G" + material.generation].filter(Boolean).join(" · ");
+      const detail = [
+        culture.culture_type,
+        material.material_code,
+        strain.strain_code || strain.designation,
+        organism.scientific_name,
+        material.generation === null || material.generation === undefined ? null : "G" + material.generation,
+        parent ? "Issue de " + parent.code : culture.parent_culture_id ? "Parent hors périmètre chargé" : "Origine de lignée"
+      ].filter(Boolean).join(" · ");
       item.append(element("strong", "", title), element("small", "", detail || "Informations complémentaires indisponibles"));
       const linkedBatches = lineage.batches.filter(batch => batch.culture_id === culture.id);
       if (linkedBatches.length) item.append(element("small", "signal-lineage-batches", "Lots : " + linkedBatches.map(batch => [batch.batch_code, batch.status, batch.current_stage].filter(Boolean).join(" / ")).join(", ")));
+      const operations = lineage.events.filter(event => event.culture_id === culture.id);
+      operations.forEach(event => {
+        const payload = event.payload || {};
+        const operation = payload.operation_type || event.event_type;
+        const childCodes = Array.isArray(payload.child_codes) ? payload.child_codes.join(", ") : "";
+        item.append(element("small", "signal-lineage-event",
+          dateLabel(event.occurred_at) + " · " + operation + (childCodes ? " · Descendants : " + childCodes : "")));
+      });
       list.append(item);
     });
     section.append(list);
+    if (lineage.truncated) section.append(element("p", "signals-empty", "Affichage limité à 100 cultures ; la lignée peut continuer au-delà."));
     return section;
   }
 
