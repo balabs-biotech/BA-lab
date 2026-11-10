@@ -291,3 +291,8 @@ if(!engine.includes('from("experimental_units")')||!engine.includes('unit_code,r
 if(!engine.includes('isCurrentWorkspaceRevision(revision, orgId)'))throw new Error("Experiment registry does not guard tenant/session transitions");
 if(!template.includes('id="experimentRegistryList"')||!template.includes('id="experimentRegistryStatus"'))throw new Error("Experiment registry list/status region is missing");
 console.log("✓ Atomic experimental registry form, unit rows and tenant-safe read model are wired");
+
+if(!template.includes('id="cultureExperimentId"')||!template.includes('id="cultureExperimentalUnitId"'))throw new Error("Culture-to-experiment assignment selectors are missing");
+if(!engine.includes("populateCultureExperimentOptions")||!engine.includes("p_experiment_id: selectedExperimentId || null")||!engine.includes("p_experimental_unit_id: selectedExperimentalUnitId || null"))throw new Error("Culture creation does not persist the selected experimental context");
+if(!engine.includes("Boolean(selectedExperimentId) !== Boolean(selectedExperimentalUnitId)"))throw new Error("Culture creation does not reject an incomplete experiment/unit pair");
+console.log("✓ Culture creation can be linked to an experiment and its exact experimental unit");
