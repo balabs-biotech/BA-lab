@@ -69,7 +69,7 @@ class DomainSignal(InterpretationModel):
     source_observation_ids: tuple[UUID, ...]
     variable_code: str
     observed_date: date
-    observed_value: float
+    observed_value: float | None = None
     unit: str
     finding_status: FindingStatus
     context_tags: frozenset[str] = frozenset()
