@@ -190,7 +190,10 @@ async function checkWorkingScene(name, viewport) {
   let openedNotion = false;
   let zoomOutChecked = false;
   for (let level = 0; level < 8; level++) {
-    await page.waitForFunction(() => (window.__BALABS_3D_E2E__()?.visible || 0) > 0, undefined, { timeout: 12000 });
+    await page.waitForFunction(() => {
+      const probe = window.__BALABS_3D_E2E__?.();
+      return probe && !document.querySelector('#mainView .webgl-stage')?.classList.contains('is-transitioning');
+    }, undefined, { timeout: 12000 });
     let probe = await page.evaluate(() => window.__BALABS_3D_E2E__());
     if (!probe.visible) {
       await page.locator('.webgl-controls [data-camera="out"]').evaluate(button => button.click());
