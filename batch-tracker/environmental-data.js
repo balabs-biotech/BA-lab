@@ -76,6 +76,13 @@
     location.style.cssText="width:100%;min-height:42px;";
     form.append(locationControl,field("Du","envFrom",from),field("Au","envTo",to),run,coordinates);
     const satelliteHint=node("p",{class:"muted"},"Sentinel-2 : scènes disponibles et couverture nuageuse. L’image ne constitue pas à elle seule un diagnostic de culture.");
+    const altitude=node("input",{id:"envAltitude",type:"number",min:"-500",max:"9000",step:"1",placeholder:"Altitude vérifiée en mètres"});
+    const altitudeSave=node("button",{type:"button"},"Enregistrer l’altitude");
+    const analysisPanel=node("section",{id:"environmentalAnalysisPanel",class:"card","aria-live":"polite"});
+    const analysisButton=node("button",{type:"button"},"Lancer l’analyse climatique FAO-56");
+    const analysisStatus=node("p",{class:"muted","aria-live":"polite"},"Analyse calculée à partir des observations météo NASA POWER déjà importées. L’altitude doit être vérifiée.");
+    const analysisResults=node("div",{id:"environmentalAnalysisResults",class:"overview-observations"});
+    analysisPanel.append(node("h3",{},"Analyse environnementale"),node("p",{class:"muted"},"Indicateurs climatiques FAO-56 et agrégations temporelles, avec couverture et provenance des données."),field("Altitude du site (m, au-dessus du niveau moyen de la mer)","envAltitude",altitude),altitudeSave,analysisButton,analysisStatus,analysisResults);
     const satelliteMapPanel=node("section",{class:"card",id:"satelliteColorMapPanel"});
     satelliteMapPanel.append(node("h3",{},"Carte satellite"));
     const satelliteMapStatus=node("p",{class:"muted","aria-live":"polite"},"Chargement de l’image satellite…");
@@ -104,7 +111,7 @@
     [satelliteMapLegend,satelliteModeHelp,satelliteNDVILegend,sentinelHighResNote,sentinelHighResLink,satelliteViewControls].forEach(el=>el.style.display="none");
     satelliteMapPanel.querySelector("h3").textContent="Carte satellite";
     satelliteMapPanel.append(locationControl,satelliteMapStatus,satelliteMap);
-    panel.append(satelliteMapPanel,vegetationChart,agroSynthesisPanel,weatherCharts,uvComparisonPanel);
+    panel.append(satelliteMapPanel,analysisPanel,vegetationChart,agroSynthesisPanel,weatherCharts,uvComparisonPanel);
     const hero=document.querySelector(".app-hero");
     if(hero?.parentNode) hero.parentNode.insertBefore(panel,hero.nextSibling);
     else plant.parentNode.insertBefore(panel,plant);
@@ -297,7 +304,7 @@
       }
     }
     async function loadLocations() {
-      const {data,error}=await db.from("locations").select("id,code,name,latitude,longitude,coordinate_accuracy_m,coordinate_source").order("name");
+      const {data,error}=await db.from("locations").select("id,code,name,latitude,longitude,altitude_m,coordinate_accuracy_m,coordinate_source").order("name");
       if(error){satelliteMapStatus.textContent="Sites indisponibles.";return;}
       data.forEach(x=>location.append(node("option",{value:x.id},x.code?x.name+" ("+x.code+")":x.name)));
       let savedId="";try{savedId=localStorage.getItem("ba-labs-active-environment-location")||"";}catch(_){}
@@ -308,10 +315,10 @@
       if(!location.value) await updateSatelliteMap();
     }
     async function selectLocation(){
-      if(!location.value){lat.value="";lon.value="";accuracy.value="";await updateSatelliteMap();return;}
-      const {data}=await db.from("locations").select("latitude,longitude,coordinate_accuracy_m,coordinate_source").eq("id",location.value).maybeSingle();
+      if(!location.value){lat.value="";lon.value="";altitude.value="";accuracy.value="";await updateSatelliteMap();return;}
+      const {data}=await db.from("locations").select("latitude,longitude,altitude_m,coordinate_accuracy_m,coordinate_source").eq("id",location.value).maybeSingle();
       if(!data)return;
-      lat.value=data.latitude??""; lon.value=data.longitude??""; accuracy.value=data.coordinate_accuracy_m??"";
+      lat.value=data.latitude??""; lon.value=data.longitude??""; altitude.value=data.altitude_m??""; accuracy.value=data.coordinate_accuracy_m??"";
       if(data.coordinate_source && [...source.options].some(o=>o.value===data.coordinate_source))source.value=data.coordinate_source;
       await updateSatelliteMap();
     }
@@ -634,15 +641,67 @@
       status.textContent=error?"Échec de l’enregistrement : "+error.message:"Coordonnées enregistrées.";
       if(!error)updateSatelliteMap();
     });
+    altitudeSave.addEventListener("click",async()=>{
+      if(!location.value){analysisStatus.textContent="Choisissez un emplacement.";return;}
+      if(altitude.value===""){analysisStatus.textContent="Saisissez une altitude vérifiée avant l’enregistrement.";return;}
+      const value=Number(altitude.value);
+      if(!Number.isFinite(value)||value < -500||value>9000){analysisStatus.textContent="Altitude invalide : la plage autorisée est de -500 à 9 000 mètres.";return;}
+      altitudeSave.disabled=true;
+      analysisStatus.textContent="Enregistrement de l’altitude…";
+      const {error}=await db.from("locations").update({altitude_m:value}).eq("id",location.value);
+      analysisStatus.textContent=error?"Échec de l’enregistrement de l’altitude : "+error.message:"Altitude enregistrée. Vérifiez qu’elle correspond à une source topographique fiable.";
+      altitudeSave.disabled=false;
+    });
+    analysisButton.addEventListener("click",async()=>{
+      if(!location.value||!from.value||!to.value||from.value>to.value){analysisStatus.textContent="Choisissez un emplacement et une période valide.";return;}
+      if(altitude.value===""){analysisStatus.textContent="Renseignez et enregistrez d’abord l’altitude vérifiée du site.";return;}
+      analysisButton.disabled=true;
+      analysisStatus.textContent="Vérification du cache météo et calcul des indicateurs…";
+      analysisResults.replaceChildren();
+      try{
+        const {data:site,error:siteError}=await db.from("locations").select("altitude_m").eq("id",location.value).maybeSingle();
+        if(siteError)throw new Error("Impossible de vérifier l’altitude enregistrée : "+siteError.message);
+        if(site?.altitude_m===null||site?.altitude_m===undefined||Number(site.altitude_m)!==Number(altitude.value)){
+          throw new Error("L’altitude affichée n’est pas encore enregistrée pour cet emplacement. Enregistrez-la avant l’analyse.");
+        }
+        const weatherReady=await importWeather(false);
+        if(!weatherReady)throw new Error("La collecte ou la vérification du cache météo a échoué : "+status.textContent);
+        const {data,error}=await db.functions.invoke("environmental-analysis",{body:{location_id:location.value,start_date:from.value,end_date:to.value}});
+        if(error)throw new Error(await functionErrorMessage(error));
+        if(!data?.ok||!data.analysis)throw new Error(data?.error||"Réponse d’analyse invalide.");
+        const analysis=data.analysis;
+        analysisStatus.textContent="Analyse terminée · contrat "+(analysis.contract_version||"BAL-JSON")+" · "+(analysis.engine?.version||"version moteur inconnue");
+        const indicators=Array.isArray(analysis.indicators)?analysis.indicators:[];
+        if(!indicators.length)analysisResults.append(node("p",{class:"muted"},"Aucun indicateur disponible pour cette période."));
+        indicators.forEach(indicator=>{
+          const card=node("article",{class:"card"});
+          const value=indicator.value===null||indicator.value===undefined?"Données insuffisantes":Number(indicator.value).toFixed(2)+" "+(indicator.unit||"");
+          const coverage=indicator.coverage?Math.round(Number(indicator.coverage.ratio||0)*100)+" % ("+indicator.coverage.observed+"/"+indicator.coverage.expected+")":"Couverture non fournie";
+          card.append(node("h4",{},indicator.label||indicator.code||"Indicateur"),node("p",{},value),node("p",{class:"muted"},"Couverture : "+coverage),node("p",{class:"muted"},"Qualité : "+(indicator.quality?.class||"non précisée")+" · Statut : "+(indicator.status||"inconnu")),node("p",{class:"muted"},"Période : "+(indicator.period?.from||"—")+" → "+(indicator.period?.to||"—")));
+          analysisResults.append(card);
+        });
+        (analysis.source_summary||[]).forEach(source=>{
+          analysisResults.append(node("p",{class:"muted"},"Source : "+source.provider_code+" / "+source.dataset_code+" · "+source.observations_count+" observations · "+source.quality_class+" · "+(source.spatial_resolution_m===null?"résolution non précisée":source.spatial_resolution_m+" m")));
+        });
+        if(Array.isArray(analysis.warnings)&&analysis.warnings.length){
+          const warnings=node("details");
+          warnings.append(node("summary",{},"Avertissements scientifiques ("+analysis.warnings.length+")"));
+          analysis.warnings.forEach(w=>warnings.append(node("p",{class:"muted"},String(w))));
+          analysisResults.append(warnings);
+        }
+      }catch(error){
+        analysisStatus.textContent="Analyse indisponible : "+(error?.message||"erreur inconnue");
+      }finally{analysisButton.disabled=false;}
+    });
     async function importWeather(forceRefresh=false){
-      if(!location.value||!from.value||!to.value||from.value>to.value){status.textContent="Choisissez un emplacement et une période valide.";return;}
+      if(!location.value||!from.value||!to.value||from.value>to.value){status.textContent="Choisissez un emplacement et une période valide.";return false;}
       const days=(Date.parse(to.value)-Date.parse(from.value))/86400000+1;
-      if(days>366){status.textContent="La période maximale est de 366 jours.";return;}
+      if(days>366){status.textContent="La période maximale est de 366 jours.";return false;}
       run.disabled=true; refresh.disabled=true;
       status.textContent=forceRefresh?"Actualisation forcée en cours…":"Collecte en cours…";
       try{
         const {data,error}=await db.functions.invoke("nasa-power-agroclimate",{body:{location_id:location.value,start_date:from.value,end_date:to.value,refresh:forceRefresh}});
-        if(error){status.textContent="Échec de la collecte météo : "+await functionErrorMessage(error);return;}
+        if(error){status.textContent="Échec de la collecte météo : "+await functionErrorMessage(error);return false;}
         if(data?.ok){
           const detail=data.cached
             ? "Cache réutilisé ; "+(data.variables_checked??0)+" variables principales vérifiées."
@@ -654,8 +713,10 @@
         }else{
           status.textContent="Import refusé : "+(data?.error||"réponse invalide");
         }
+        if(!data?.ok)return false;
         await loadRows();
-      }catch(error){status.textContent="Échec de la collecte : "+(error?.message||"erreur inconnue");}
+        return true;
+      }catch(error){status.textContent="Échec de la collecte : "+(error?.message||"erreur inconnue");return false;}
       finally{run.disabled=false;refresh.disabled=false;}
     }
     run.addEventListener("click",()=>importWeather(false));
