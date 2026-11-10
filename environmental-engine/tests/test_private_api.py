@@ -253,7 +253,8 @@ def test_nasa_power_endpoint_normalizes_persisted_rows_and_preserves_provenance(
     body = response.json()
     assert body["contract_version"] == "1.0.0"
     et0 = next(item for item in body["indicators"] if item["code"] == "reference_et0_fao56_daily")
-    assert len(et0["source_observation_ids"]) == 6
+    source_ids = {source_id for item in et0["inputs"] for source_id in item["source_observation_ids"]}
+    assert len(source_ids) == 6
 
 
 def test_nasa_power_endpoint_rejects_forged_provider_parameter_mapping():
