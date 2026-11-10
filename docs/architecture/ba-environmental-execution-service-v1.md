@@ -3,7 +3,8 @@
 ## Purpose
 
 The execution service is the provider-neutral orchestration boundary for one
-environmental analysis. It coordinates existing calculation modules and
+environmental analysis. It coordinates daily FAO-56 calculations, optional
+rolling climate summaries and univariate temporal anomaly screening, then
 returns a validated BAL-JSON v1 envelope.
 
 It is not an API server, data collector, scheduler, database repository, or
@@ -17,62 +18,62 @@ Python import:
 from ba_environmental_engine import run_environmental_analysis
 ```
 
-The service accepts:
-
-- normalized environmental observations;
-- analysis UUID and timezone-aware generation timestamp;
-- engine version;
-- organization/location scope dates (tenant and location identity are read
-  from the normalized observations);
-- latitude and altitude required by FAO-56 calculations;
-- optional explicit rolling aggregation methods, windows, and minimum coverage.
+The service accepts normalized environmental observations, an analysis UUID,
+timezone-aware generation timestamp, engine version, date scope, latitude and
+altitude. Optional rolling aggregation methods, windows and coverage can be
+provided. Temporal screening defaults to all weather variables and can be
+restricted with `temporal_variables`; pass an empty tuple to disable it.
+Window, minimum history, calendar coverage and robust-score threshold are
+configurable.
 
 It returns a validated `BALAnalysis` object. Callers can serialize it with
 Pydantic's `model_dump(mode="json", by_alias=True)`.
 
 ## Execution sequence
 
-1. Validate non-empty normalized input and requested date scope.
-2. Group weather observations by observation date.
-3. Calculate daily FAO-56 net radiation and reference ET0 independently for
-   each date through the existing daily calculation module.
-4. If rolling methods are explicitly supplied, construct variable/date series
-   and calculate the requested windows using the existing coverage engine.
-5. Reject duplicate variable/date observations for configured rolling
-   variables; do not choose one source silently.
-6. Pass observations and calculation results to the BAL-JSON serializer.
-7. Return the schema-validated analysis envelope.
+1. Validate normalized input and requested date scope.
+2. Group weather observations by observation date and calculate daily FAO-56
+   net radiation and reference ET0.
+3. Build one ordered daily series per weather variable, enforcing one value
+   per variable/date and one canonical unit per variable.
+4. Run the robust calendar-window temporal screen independently for each
+   selected variable.
+5. Convert each assessment into a versioned BAL-JSON finding with deterministic
+   finding ID and exact source-observation lineage.
+6. If rolling methods are explicitly supplied, calculate requested windows
+   using the existing coverage engine.
+7. Validate indicators, findings, provenance and source summaries in BAL-JSON.
 
 ## Scientific and data-integrity rules
 
 - No interpolation, gap filling, or silent outlier deletion.
-- No implicit aggregation method selection. The caller must explicitly choose
-  mean, sum, min, or max for each rolling variable.
-- Canonical units and source coherence remain enforced by the calculation
-  modules.
+- No implicit rolling aggregation method selection.
+- Temporal screening is univariate; variables and units are never pooled.
+- Current observations are excluded from their own historical baseline.
+- Insufficient history, insufficient calendar coverage and zero-MAD baselines
+  remain explicit statuses, not fabricated normal/anomalous conclusions.
+- Each finding must reference source observations matching its date, variable,
+  unit and value.
+- A finding is a statistical signal, not a biological diagnosis or
+  recommendation.
 - Tenant/location consistency and observation lineage remain enforced by the
   serializer.
-- Missing daily inputs remain explicit insufficient-data results.
+- Missing daily FAO-56 inputs remain explicit insufficient-data results.
 - The service does not make external network requests or persist data.
 
 ## Isolation and failure behavior
 
 The service is a single execution boundary, not yet a plugin runtime. A failure
-in one calculation currently fails that analysis request; it does not mutate
+in a calculation currently fails that analysis request; it does not mutate
 source observations or persist partial output. Future independent indicator
 families should be added behind separate calculation adapters and explicit
 failure policies rather than broad exception suppression.
 
 ## Application integration boundary
 
-A future FastAPI or Supabase-facing adapter may:
-- authenticate the caller;
-- authorize organization/location access;
-- load normalized observations from a repository;
-- call this service;
-- persist the validated result and audit metadata;
-- return the BAL-JSON response.
-
-Those responsibilities must remain outside this package. The engine must never
-receive Supabase service-role credentials or perform tenant authorization by
-trusting caller-supplied UUIDs.
+A future FastAPI or Supabase-facing adapter may authenticate the caller,
+authorize organization/location access, load normalized observations, call
+this service, persist the validated result and audit metadata, and return
+BAL-JSON. Those responsibilities remain outside this package. The engine must
+never receive Supabase service-role credentials or trust caller-supplied UUIDs
+as proof of tenant authorization.
