@@ -109,6 +109,9 @@ begin
 end
 $$;
 
+select set_config('test.variable_code', (select code from public.variables order by code limit 1), true);
+select set_config('test.unit_code', (select code from public.units order by code limit 1), true);
+
 set local role authenticated;
 select set_config('request.jwt.claim.sub', '00000000-0000-0000-0000-0000000000f2', true);
 
@@ -120,11 +123,9 @@ declare
   v_measurement_payload jsonb;
   v_event_id uuid;
   v_retry_event_id uuid;
-  v_measurement_unit_id uuid;
-  v_event_unit_id uuid;
 begin
-  select code into v_variable_code from public.variables order by code limit 1;
-  select code into v_unit_code from public.units order by code limit 1;
+  v_variable_code := current_setting('test.variable_code');
+  v_unit_code := current_setting('test.unit_code');
   if v_variable_code is null or v_unit_code is null then
     raise exception 'Test prerequisites missing: variables or units seed';
   end if;
@@ -159,21 +160,7 @@ begin
     raise exception 'FAIL: idempotent measurement retry returned a different event';
   end if;
 
-  select m.experimental_unit_id
-    into v_measurement_unit_id
-    from public.measurements m
-   where m.organization_id = '00000000-0000-0000-0000-0000000000f1'
-     and m.event_id = v_event_id;
-  select e.experimental_unit_id
-    into v_event_unit_id
-    from public.events e
-   where e.organization_id = '00000000-0000-0000-0000-0000000000f1'
-     and e.id = v_event_id;
-
-  if v_measurement_unit_id is distinct from '00000000-0000-0000-0000-0000000000f7'::uuid
-     or v_event_unit_id is distinct from '00000000-0000-0000-0000-0000000000f7'::uuid then
-    raise exception 'FAIL: manual measurement or traceability event lost the culture experimental unit';
-  end if;
+  perform set_config('test.manual_measurement_event_id', v_event_id::text, true);
 
   begin
     perform public.record_manual_measurement(
@@ -190,7 +177,33 @@ begin
     end if;
   end;
 end
-$$;
+$;
+
+reset role;
+
+do $
+declare
+  v_event_id uuid := current_setting('test.manual_measurement_event_id')::uuid;
+  v_measurement_unit_id uuid;
+  v_event_unit_id uuid;
+begin
+  select m.experimental_unit_id
+    into v_measurement_unit_id
+    from public.measurements m
+   where m.organization_id = '00000000-0000-0000-0000-0000000000f1'
+     and m.event_id = v_event_id;
+  select e.experimental_unit_id
+    into v_event_unit_id
+    from public.events e
+   where e.organization_id = '00000000-0000-0000-0000-0000000000f1'
+     and e.id = v_event_id;
+
+  if v_measurement_unit_id is distinct from '00000000-0000-0000-0000-0000000000f7'::uuid
+     or v_event_unit_id is distinct from '00000000-0000-0000-0000-0000000000f7'::uuid then
+    raise exception 'FAIL: manual measurement or traceability event lost the culture experimental unit';
+  end if;
+end
+$;
 
 rollback;
 
