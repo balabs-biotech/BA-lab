@@ -50,6 +50,14 @@ begin
     raise exception 'material_mixture_result_code_required';
   end if;
 
+  -- Lock source rows in a stable order before reading state/generation.
+  perform m.id
+    from public.materials m
+   where m.organization_id = p_organization_id
+     and m.id = any(p_source_material_ids)
+   order by m.id
+   for update;
+
   select count(*), count(*) filter (where m.state = 'active'),
          coalesce(max(m.generation), 0),
          case
@@ -70,14 +78,6 @@ begin
   if v_active_count <> v_source_count then
     raise exception 'material_mixture_sources_must_be_active';
   end if;
-
-  -- Lock source rows in a stable order to avoid deadlocks between concurrent mixtures.
-  perform m.id
-    from public.materials m
-   where m.organization_id = p_organization_id
-     and m.id = any(p_source_material_ids)
-   order by m.id
-   for update;
 
   v_material_code := 'MAT-' || regexp_replace(upper(btrim(p_result_code)), '[^A-Z0-9_-]+', '-', 'g');
   while exists (
