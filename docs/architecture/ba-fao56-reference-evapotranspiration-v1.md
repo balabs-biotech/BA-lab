@@ -36,7 +36,8 @@ Required:
 - exactly one of station atmospheric pressure (kPa) or station altitude (m);
 - exactly one actual-vapour-pressure source:
   - direct actual vapour pressure (kPa);
-  - both daily RH minimum and maximum (%), using the FAO-56 RH-extremes equation;
+  - mean daily relative humidity (%), using the FAO-56 mean-RH method;
+- both daily RH minimum and maximum (%), using the FAO-56 RH-extremes equation;
   - dew-point temperature (°C).
 
 Optional:
