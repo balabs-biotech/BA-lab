@@ -55,17 +55,20 @@ def aggregate_vpd_period(
     does not exceed maximum_gap_hours. The mean/min/max are sample statistics,
     not time-weighted estimates.
     """
-    for name, value in (
-        ("threshold_kpa", threshold_kpa),
-        ("maximum_gap_hours", maximum_gap_hours),
+    if (
+        isinstance(threshold_kpa, bool)
+        or not isinstance(threshold_kpa, (int, float))
+        or not isfinite(threshold_kpa)
+        or threshold_kpa < 0
     ):
-        if (
-            isinstance(value, bool)
-            or not isinstance(value, (int, float))
-            or not isfinite(value)
-            or value <= 0
-        ):
-            raise ValueError(f"{name} must be a finite positive number")
+        raise ValueError("threshold_kpa must be a finite non-negative number")
+    if (
+        isinstance(maximum_gap_hours, bool)
+        or not isinstance(maximum_gap_hours, (int, float))
+        or not isfinite(maximum_gap_hours)
+        or maximum_gap_hours <= 0
+    ):
+        raise ValueError("maximum_gap_hours must be a finite positive number")
 
     rows = list(observations)
     if not rows:
