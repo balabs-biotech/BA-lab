@@ -151,3 +151,20 @@ def test_negative_et0_is_retained_and_flagged_not_clamped():
     )
     assert result.reference_evapotranspiration_mm_day < 0
     assert "negative_reference_et_review_energy_balance_inputs" in result.diagnostics
+
+
+def test_derives_actual_vapor_pressure_from_mean_relative_humidity():
+    result = calculate_fao56_et0(
+        temperature_mean_c=20.0,
+        temperature_max_c=25.0,
+        temperature_min_c=15.0,
+        wind_speed_2m_m_s=2.0,
+        net_radiation_mj_m2_day=10.0,
+        altitude_m=988.0,
+        relative_humidity_mean_percent=60.0,
+    )
+    expected_saturation = (
+        saturation_vapor_pressure_kpa(15.0)
+        + saturation_vapor_pressure_kpa(25.0)
+    ) / 2.0
+    assert result.actual_vapor_pressure_kpa == pytest.approx(expected_saturation * 0.6)
