@@ -6,6 +6,7 @@ from ba_environmental_engine.sources.models import (
     find_duplicate_source_keys,
 )
 from ba_environmental_engine.sources.nasa_power import normalize_nasa_power_observation
+from ba_environmental_engine.sources.supabase_sensor import SupabaseSensorMeasurementRepository
 from ba_environmental_engine.sources.sensor import (
     SensorMeasurementEnvelope,
     normalize_iot_measurement_row,
@@ -15,6 +16,7 @@ __all__ = [
     "DuplicateSourceKey",
     "NormalizedEnvironmentalObservation",
     "SensorMeasurementEnvelope",
+    "SupabaseSensorMeasurementRepository",
     "find_duplicate_source_keys",
     "normalize_iot_measurement_row",
     "normalize_nasa_power_observation",
