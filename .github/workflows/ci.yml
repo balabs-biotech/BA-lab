@@ -245,6 +245,8 @@ jobs:
         run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/culture_event_history_rpc_security_contract.test.sql
       - name: Verify idempotent culture generation RPC security contract after replay
         run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/culture_generation_idempotency_security_contract.test.sql
+      - name: Verify experimental result RPC security contract after replay
+        run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/experimental_result_rpc_security_contract.test.sql
       - name: Verify append-only audit table privileges after replay
         run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/audit_table_write_privileges.test.sql
       - name: Test environmental observation schema and access contract
