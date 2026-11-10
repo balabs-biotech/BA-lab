@@ -104,6 +104,12 @@ begin
     raise exception 'FAIL: anonymous profile access must remain disabled';
   end if;
 
+  if not has_table_privilege('service_role', 'public.environment_context_profiles', 'SELECT')
+     or not has_table_privilege('service_role', 'public.domain_interpretation_profiles', 'SELECT')
+     or not has_table_privilege('service_role', 'public.environment_context_profile_sensors', 'SELECT') then
+    raise exception 'FAIL: server-side profile resolution requires explicit service_role SELECT';
+  end if;
+
   insert into public.organizations(id, code, name)
   values (v_org, 'PROFILE-' || replace(v_org::text, '-', ''), 'Profile registry contract');
   insert into public.locations(organization_id, id, code, name, latitude, longitude)
