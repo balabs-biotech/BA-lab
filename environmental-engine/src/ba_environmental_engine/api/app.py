@@ -21,6 +21,7 @@ from ba_environmental_engine.contexts.biological import BiologicalContext
 from ba_environmental_engine.contexts.environment import EnvironmentContext
 from ba_environmental_engine.interpretation.models import DomainProfile
 from ba_environmental_engine.interpretation.service import interpret_analysis_for_biological_context
+from ba_environmental_engine.interpretation.sensor_service import interpret_sensor_analysis_for_biological_context
 
 from ba_environmental_engine import __version__
 from ba_environmental_engine.climate.aggregation import AggregationMethod
@@ -152,6 +153,7 @@ class SensorAnalysisRequest(APIModel):
     temporal_window_seconds: StrictInt | None = Field(default=None, gt=0)
     temporal_minimum_history: StrictInt | None = Field(default=None, gt=0)
     temporal_threshold: StrictFloat | None = Field(default=None, gt=0)
+    biological_interpretation: dict[str, Any] | None = None
     measurements: list[dict[str, Any]] = Field(min_length=1, max_length=5000)
 
     @model_validator(mode="after")
@@ -392,11 +394,51 @@ def create_app(engine_api_key: str | None = None) -> FastAPI:
                     "status": "completed",
                     "assessments": jsonable_encoder(scoped_assessments),
                 }
+            interpretation_status = "not_requested"
+            domain_interpretation = None
+            if request.biological_interpretation is not None:
+                try:
+                    biological_context = BiologicalContext.model_validate(
+                        request.biological_interpretation["biological_context"]
+                    )
+                    environment_context = EnvironmentContext.model_validate(
+                        request.biological_interpretation["environment_context"]
+                    )
+                    domain_profile = DomainProfile.model_validate(
+                        request.biological_interpretation["domain_profile"]
+                    )
+                    if (
+                        environment_context.context_id != request.environment_id
+                        or environment_context.organization_id != request.organization_id
+                        or environment_context.timezone != request.profile_timezone
+                    ):
+                        raise ValueError("resolved sensor environment profile does not match request scope")
+                    if any(
+                        envelope.measurement.location_id != environment_context.location_id
+                        for envelope in envelopes
+                    ):
+                        raise ValueError("sensor measurements do not match the resolved environment location")
+                    interpretation = interpret_sensor_analysis_for_biological_context(
+                        analysis,
+                        domain_profile,
+                        biological_context,
+                        environment_context,
+                        source_analysis_id=request.analysis_id,
+                        from_date=request.from_date,
+                        to_date=request.to_date,
+                    )
+                    interpretation_status = "interpreted"
+                    domain_interpretation = jsonable_encoder(interpretation)
+                except (KeyError, TypeError, ValueError, ValidationError):
+                    interpretation_status = "context_invalid"
+
             return {
                 "analysis_id": str(request.analysis_id),
                 "source": "iot_sensor",
                 "analysis": analysis,
                 "temporal_screening": temporal_screening,
+                "interpretation_status": interpretation_status,
+                "domain_interpretation": domain_interpretation,
             }
         except (ValueError, LookupError) as exc:
             raise HTTPException(status_code=422, detail=str(exc)) from exc
