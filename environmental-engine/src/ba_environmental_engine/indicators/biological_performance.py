@@ -16,6 +16,7 @@ class BiologicalMeasurement:
     source_record_id: str
     organization_id: str
     subject_id: str
+    subject_type: str
     variable_code: str
     value: float
     canonical_unit_code: str
@@ -33,6 +34,7 @@ class BiologicalMeasurement:
             "source_record_id",
             "organization_id",
             "subject_id",
+            "subject_type",
             "variable_code",
             "canonical_unit_code",
             "quality_state",
@@ -76,6 +78,7 @@ def analyze_extent_growth_rate(
     *,
     organization_id: str,
     subject_id: str,
+    subject_type: str,
     variable_code: str,
     accepted_quality_states: set[str] | frozenset[str],
 ) -> BiologicalPerformanceResult:
@@ -89,6 +92,8 @@ def analyze_extent_growth_rate(
         raise ValueError("organization_id must not be empty")
     if not subject_id.strip():
         raise ValueError("subject_id must not be empty")
+    if subject_type not in {"culture", "plant_culture", "sample", "experimental_unit"}:
+        raise ValueError("subject_type must identify a supported biological subject")
     if not variable_code.strip():
         raise ValueError("variable_code must not be empty")
     if not accepted_quality_states or not accepted_quality_states.issubset(QUALITY_STATES):
@@ -100,6 +105,7 @@ def analyze_extent_growth_rate(
         if (
             item.organization_id == organization_id
             and item.subject_id == subject_id
+            and item.subject_type == subject_type
             and item.variable_code == variable_code
         )
     ]
