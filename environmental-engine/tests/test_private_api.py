@@ -390,3 +390,100 @@ def test_nasa_power_interpretation_rejects_sensor_profile_without_relabeling_cli
     assert body["domain_interpretation"] is None
     assert len(body["indicators"]) == 2
     assert len(body["findings"]) == 6
+
+
+def sensor_payload():
+    organization_id = str(uuid4())
+    environment_id = str(uuid4())
+    location_id = str(uuid4())
+    sensor_id = str(uuid4())
+    rows = []
+    for index, value in enumerate((20.0, 22.0)):
+        observation_id = str(uuid4())
+        rows.append({
+            "id": observation_id,
+            "organization_id": organization_id,
+            "environment_id": environment_id,
+            "iot_device_id": sensor_id,
+            "variable_code": "air_temperature",
+            "raw_value": value,
+            "raw_unit_code": "degC",
+            "normalized_value": None,
+            "normalized_unit_code": None,
+            "measured_at": f"2026-03-01T0{index}:00:00+00:00",
+            "method": "digital_probe",
+            "instrument": "probe-01",
+            "quality_state": "validated",
+            "exclusion_reason": None,
+            "metadata": {"source": "iot"},
+            "device_organization_id": organization_id,
+            "device_environment_id": environment_id,
+            "environment_organization_id": organization_id,
+            "location_id": location_id,
+            "device_code": "sensor-01",
+            "device_type": "environmental",
+            "canonical_unit_code": "degC",
+            "profile_origin": "sensor",
+            "profile_status": "active",
+            "profile_valid_from": "2026-03-01",
+            "profile_valid_to": "2026-03-31",
+            "profile_timezone": "Africa/Algiers",
+            "profile_sensor_bound": True,
+        })
+    return {
+        "analysis_id": str(uuid4()),
+        "organization_id": organization_id,
+        "environment_id": environment_id,
+        "from_date": "2026-03-01",
+        "to_date": "2026-03-01",
+        "profile_timezone": "Africa/Algiers",
+        "expected_interval_seconds": 3600,
+        "measurements": rows,
+    }
+
+
+def test_sensor_analysis_endpoint_requires_internal_key():
+    client = TestClient(create_app(engine_api_key="test-secret"))
+    response = client.post("/v1/analyses/sensors", json=sensor_payload())
+    assert response.status_code == 401
+
+
+def test_sensor_analysis_endpoint_returns_separate_iot_result():
+    client = TestClient(create_app(engine_api_key="test-secret"))
+    response = client.post(
+        "/v1/analyses/sensors",
+        json=sensor_payload(),
+        headers={"X-BA-Engine-Key": "test-secret"},
+    )
+    assert response.status_code == 200, response.text
+    body = response.json()
+    assert body["source"] == "iot_sensor"
+    assert body["analysis"]["total_observations"] == 2
+    assert body["analysis"]["series"][0]["variable_code"] == "air_temperature"
+    assert body["analysis"]["series"][0]["mean"] == 21.0
+
+
+def test_sensor_analysis_endpoint_rejects_cross_environment_measurement():
+    request = sensor_payload()
+    request["measurements"][0]["environment_id"] = str(uuid4())
+    client = TestClient(create_app(engine_api_key="test-secret"))
+    response = client.post(
+        "/v1/analyses/sensors",
+        json=request,
+        headers={"X-BA-Engine-Key": "test-secret"},
+    )
+    assert response.status_code == 422
+    assert "requested environment" in str(response.json()["detail"])
+
+
+def test_sensor_analysis_endpoint_rejects_non_iot_provenance():
+    request = sensor_payload()
+    request["measurements"][0]["metadata"]["source"] = "NASA_POWER"
+    client = TestClient(create_app(engine_api_key="test-secret"))
+    response = client.post(
+        "/v1/analyses/sensors",
+        json=request,
+        headers={"X-BA-Engine-Key": "test-secret"},
+    )
+    assert response.status_code == 422
+    assert "IoT source row" in str(response.json()["detail"])
