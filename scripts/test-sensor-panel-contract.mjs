@@ -32,4 +32,8 @@ assert.match(workspace, /id="sensorTemporalWindowMinutes"/, "workspace must expo
 assert.match(workspace, /id="sensorTemporalMinimumHistory"/, "workspace must expose the minimum history control");
 assert.match(workspace, /id="sensorTemporalThreshold"/, "workspace must expose the robust threshold control");
 
-console.log("PASS: sensor analysis UI integration and temporal screening contract");
+assert.match(panel, /"Exclues"/, "series table must expose excluded observation counts");
+assert.match(panel, /"Ruptures"/, "series table must expose cadence gap counts");
+assert.match(panel, /item\.maximum_gap_seconds/, "series table must expose maximum observed gap");
+assert.match(panel, /item\.quality_counts/, "panel must expose quality-state distribution");
+console.log("PASS: sensor analysis UI integration, temporal screening, and quality diagnostics contract");
