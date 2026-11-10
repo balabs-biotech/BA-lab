@@ -5,6 +5,7 @@ Python calculation core for traceable environmental indicators used by CultureOp
 ## Current milestone
 
 The engine foundation provides:
+- a provider-neutral execution service exposed as `run_environmental_analysis`, coordinating daily FAO-56 calculations, optional explicitly configured rolling windows, and validated BAL-JSON output;
 - daily coverage assessment without interpolation;
 - deterministic daily aggregation with explicit coverage thresholds;
 - rolling 7/14/30/90-day descriptive climate indicators with per-variable coverage;
@@ -41,6 +42,7 @@ Python 3.10+; CPU-only.
 
 ## Architecture contracts
 
+- `docs/architecture/ba-environmental-execution-service-v1.md`: execution service entrypoint, orchestration sequence, scientific boundaries and application integration responsibilities.
 - `docs/architecture/ba-environmental-intelligence-contract-v1.md`: engine boundaries and data flow.
 - `docs/architecture/ba-environmental-unit-registry-v1.md`: canonical units and conversion conventions.
 - `docs/architecture/ba-nasa-power-adapter-v1.md`: provider mapping and daily time semantics.
