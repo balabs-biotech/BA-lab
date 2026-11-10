@@ -60,6 +60,28 @@ begin
   end if;
 
   if not exists (
+    select 1 from pg_attribute
+     where attrelid = v_table and attname = 'analysis_method' and not attisdropped
+  ) or not exists (
+    select 1 from pg_attribute
+     where attrelid = v_table and attname = 'analysis_evidence' and not attisdropped
+  ) then
+    raise exception 'FAIL: signal analysis method and evidence must be persisted';
+  end if;
+
+  if not exists (
+    select 1 from pg_constraint
+     where conrelid = v_table
+       and conname = 'biological_signals_analysis_method_check'
+  ) or not exists (
+    select 1 from pg_constraint
+     where conrelid = v_table
+       and conname = 'biological_signals_analysis_evidence_check'
+  ) then
+    raise exception 'FAIL: signal analysis method and evidence must be constrained';
+  end if;
+
+  if not exists (
     select 1 from pg_constraint
      where conrelid = v_table
        and conname = 'biological_signals_observation_ids_array_check'
