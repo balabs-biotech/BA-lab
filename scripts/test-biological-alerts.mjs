@@ -29,6 +29,8 @@ assert.match(moduleSource, /new MutationObserver/);
 assert.match(moduleSource, /node\.textContent = text/);
 assert.match(tracker, /window\.BALabsGetOrganizationId = \(\) => organizationId/);
 assert.match(tracker, /balabs:organization-context/);
+assert.match(tracker, /window\.BALabsSupabaseClient = supabaseClient/);
+assert.match(tracker, /userId: session\.user\.id/);
 assert.match(styles, /#biologicalSignalsCard/);
 
 for (const phrase of [
