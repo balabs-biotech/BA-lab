@@ -413,7 +413,7 @@ begin
   if (select count(*) from public.results
        where organization_id='00000000-0000-0000-0000-0000000000a1'
          and id=result_id and experiment_id=(select experiment_id from public.experimental_units where id=unit_id)
-         and experimental_unit_id=unit_id and code='RES-001'
+         and experimental_unit_id=unit_id and event_id=event_id and code='RES-001'
          and result_type='growth_assessment'
          and value='{"colony_diameter_mm":42.5,"replicate":"REP-01"}'::jsonb
          and quality_state='raw') <> 1 then
