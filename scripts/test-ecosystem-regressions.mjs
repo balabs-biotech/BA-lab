@@ -82,7 +82,7 @@ assert.ok(engine.includes("button.style.display=visible?'block':'none'"), 'Publi
 assert.ok(previewEngine.includes("button.style.display=visible?'block':'none'"), 'Preview offscreen hit targets must not intercept branch clicks');
 assert.ok(engine.includes("const soma=new THREE.Group();soma.userData={id,kind:'domain'};group.add(soma);"), 'Domain centres must remain open mycelial junctions rather than solid cell bodies');
 assert.ok(engine.includes('Sparse background hyphae connect the field'), 'The overview must contain fine background mycelial connections');
-assert.ok(engine.includes('for(let j=0;j<14;j++)'), 'Domain branches must retain dense radial connectivity');
+assert.ok(engine.includes('const branches=14;') && engine.includes('for(let j=0;j<branches;j++)'), 'Domain branches must retain dense radial connectivity');
 assert.ok(engine.includes('const LINKS ='), 'The network must define explicit cross-domain connections');
 for (const [a,b] of [['bio','myco'],['myco','soil'],['soil','lab'],['lab','iot'],['lab','products'],['products','work'],['work','iot'],['products','learn']]) {
   assert.ok(engine.includes("['" + a + "','" + b + "']"), 'Missing cross-domain link ' + a + ' → ' + b);
