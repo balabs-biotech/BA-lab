@@ -19,8 +19,11 @@ Each rule matches all of the following:
 - every required context tag.
 
 A match emits a typed `DomainSignal` containing profile and rule versions,
-severity, stable signal ID, message/recommendation codes, and complete
-source-finding and source-observation lineage.
+severity, stable signal ID, message/recommendation codes, biological context,
+subject and environment IDs when bound, and complete source-finding and
+source-observation lineage. The stable signal ID includes the biological
+context ID so one finding interpreted in two cultivation contexts does not
+collide.
 
 Context tags are explicit inputs. Examples of possible future tags include
 `stage:fruiting`, `crop:tomato`, or `substrate:straw`; the engine does not
