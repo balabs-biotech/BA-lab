@@ -125,9 +125,19 @@ create table public.domain_interpretation_profiles (
   constraint domain_interpretation_profiles_validity_check
     check (valid_to is null or valid_to >= valid_from),
   constraint domain_interpretation_profiles_rules_array_check
-    check (jsonb_typeof(rules) = 'array' and jsonb_array_length(rules) <= 500),
+    check (
+      case when jsonb_typeof(rules) = 'array'
+        then jsonb_array_length(rules) <= 500
+        else false
+      end
+    ),
   constraint domain_interpretation_profiles_rules_objects_check
-    check (not jsonb_path_exists(rules, '$[*] ? (@.type() != "object")'))
+    check (
+      case when jsonb_typeof(rules) = 'array'
+        then not jsonb_path_exists(rules, '$[*] ? (@.type() != "object")')
+        else false
+      end
+    )
 );
 
 create unique index domain_interpretation_profiles_one_active_per_domain_idx
