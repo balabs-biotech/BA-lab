@@ -86,6 +86,8 @@ def normalize_nasa_power_observation(
     if not isinstance(metadata, dict):
         raise ValueError("metadata must be an object")
     parameter_code = metadata.get("source_parameter")
+    if not isinstance(parameter_code, str):
+        raise ValueError("metadata.source_parameter must be a string")
     parameter = NASA_POWER_DAILY_PARAMETERS.get(parameter_code)
     if parameter is None:
         raise ValueError("unsupported or missing NASA POWER source_parameter")
