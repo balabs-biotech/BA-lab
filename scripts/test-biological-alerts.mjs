@@ -19,10 +19,13 @@ for (const entry of [
 assert.match(workspace, /id="biologicalSignalsCard"/);
 assert.match(workspace, /href="#biologicalSignalsCard"/);
 assert.match(workspace, /id="signalsFilter"/);
+assert.match(workspace, /id="signalsLoadMore"/);
 assert.match(moduleSource, /\.from\("biological_signals"\)/);
 assert.match(moduleSource, /\.eq\("organization_id", state\.organizationId\)/);
 assert.match(moduleSource, /\.eq\("domain", state\.domain\)/);
-assert.match(moduleSource, /\.limit\(100\)/);
+assert.match(moduleSource, /\.range\(pageOffset, pageOffset \+ PAGE_SIZE - 1\)/);
+assert.match(moduleSource, /signalsLoadMore/);
+assert.match(moduleSource, /state\.hasMore = page\.length === PAGE_SIZE/);
 assert.match(moduleSource, /analysis_method,analysis_evidence/);
 assert.match(moduleSource, /robust_z_score/);
 assert.match(moduleSource, /temporal_window_seconds/);
