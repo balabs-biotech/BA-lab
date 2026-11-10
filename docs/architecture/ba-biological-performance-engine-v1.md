@@ -20,7 +20,7 @@ The result retains:
 - formula code and version;
 - inclusive measurement period;
 - accepted and excluded record counts;
-- canonical input unit carried through as unit per day.
+- canonical input canonical unit carried through as unit per day.
 
 ## Evidence and quality boundaries
 
