@@ -89,6 +89,7 @@ class IndicatorMethod(ContractModel):
 class IndicatorInput(ContractModel):
     variable_code: str = Field(min_length=1, max_length=120)
     unit: str = Field(min_length=1, max_length=40)
+    source_observation_ids: list[UUID] = Field(default_factory=list)
 
 
 class Indicator(ContractModel):
