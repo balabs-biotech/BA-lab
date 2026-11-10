@@ -27,6 +27,19 @@ function addDays(value: string, amount: number): string {
   return date.toISOString().slice(0, 10);
 }
 
+function localCalendarDate(value: string, timezone: string): string {
+  const instant = new Date(value);
+  if (!Number.isFinite(instant.getTime())) throw new Error("invalid_measurement_timestamp");
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: timezone,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(instant);
+  const fields = Object.fromEntries(parts.map((part) => [part.type, part.value]));
+  return `${fields.year}-${fields.month}-${fields.day}`;
+}
+
 function readBoundedJson(req: Request, maxBytes: number): Promise<unknown> {
   return new Promise(async (resolve, reject) => {
     const declared = Number(req.headers.get("content-length") ?? "0");
@@ -251,7 +264,18 @@ Deno.serve(async (req: Request) => {
     if (!rows?.length) return reply(422, { error: "no_sensor_measurements_in_scope" });
     if (rows.length > MAX_ROWS) return reply(422, { error: "sensor_observation_limit_reached_narrow_date_range" });
 
-    const sensorMeasurements = rows.map((row: any) => ({
+    // A historical screening guard band may cross the profile's validity dates.
+    // Keep only readings whose local calendar date belongs to this exact profile.
+    const profileScopedRows = rows.filter((row: any) => {
+      const localDate = localCalendarDate(row.measured_at, profile.timezone);
+      return localDate >= profile.valid_from &&
+        (profile.valid_to === null || localDate <= profile.valid_to);
+    });
+    if (!profileScopedRows.length) {
+      return reply(422, { error: "no_sensor_measurements_in_profile_validity" });
+    }
+
+    const sensorMeasurements = profileScopedRows.map((row: any) => ({
       ...row,
       device_organization_id: row.device?.organization_id,
       device_environment_id: row.device?.environment_id,
