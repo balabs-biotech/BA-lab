@@ -22,6 +22,9 @@ def interpret_findings(
     profile: DomainProfile,
     *,
     context_tags: frozenset[str] = frozenset(),
+    biological_context_id: UUID | None = None,
+    biological_subject_id: UUID | None = None,
+    environment_context_id: UUID | None = None,
 ) -> DomainInterpretation:
     """Evaluate findings against one explicitly supplied domain profile.
 
@@ -57,6 +60,9 @@ def interpret_findings(
                     recommendation_code=rule.recommendation_code,
                     source_analysis_id=analysis.analysis_id,
                     source_finding_id=finding.finding_id,
+                    biological_context_id=biological_context_id,
+                    biological_subject_id=biological_subject_id,
+                    environment_context_id=environment_context_id,
                     source_observation_ids=tuple(finding.source_observation_ids),
                     variable_code=finding.variable_code,
                     observed_date=finding.observed_date,
@@ -115,4 +121,7 @@ def interpret_analysis_for_biological_context(
         analysis,
         profile,
         context_tags=frozenset(context_tags),
+        biological_context_id=biological_context.context_id,
+        biological_subject_id=biological_context.subject_id,
+        environment_context_id=environment_context.context_id,
     )
