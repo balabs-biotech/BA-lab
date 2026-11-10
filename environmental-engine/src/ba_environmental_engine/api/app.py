@@ -15,7 +15,7 @@ from uuid import UUID
 
 from fastapi import Depends, FastAPI, Header, HTTPException, status
 from fastapi.encoders import jsonable_encoder
-from pydantic import BaseModel, ConfigDict, Field, StrictInt, ValidationError, model_validator
+from pydantic import BaseModel, ConfigDict, Field, StrictBool, StrictInt, ValidationError, model_validator
 
 from ba_environmental_engine.contexts.biological import BiologicalContext
 from ba_environmental_engine.contexts.environment import EnvironmentContext
@@ -29,6 +29,11 @@ from ba_environmental_engine.execution import run_environmental_analysis, run_se
 from ba_environmental_engine.sources.sensor import normalize_iot_measurement_row
 from ba_environmental_engine.sources.sensor_temporal import assess_sensor_temporal_anomalies
 from ba_environmental_engine.quality.sensor_health import assess_sensor_flatlines
+from ba_environmental_engine.quality.sensor_transmission import (
+    SensorDeviceTransmission,
+    SensorTransmissionReceipt,
+    assess_sensor_transmissions,
+)
 from ba_environmental_engine.sources.models import NormalizedEnvironmentalObservation
 from ba_environmental_engine.sources.nasa_power import normalize_nasa_power_observation
 
@@ -143,6 +148,41 @@ class PersistedAnalysisRequest(APIModel):
 
 
 
+class SensorTransmissionDeviceInput(APIModel):
+    device_id: UUID
+    device_code: str = Field(min_length=1, max_length=100)
+    enabled: StrictBool
+    created_at: datetime
+    profile_bound: StrictBool
+    expected_from: datetime
+    expected_to: datetime | None = None
+
+    @model_validator(mode="after")
+    def validate_device_timestamps(self) -> SensorTransmissionDeviceInput:
+        for name, value in (
+            ("created_at", self.created_at),
+            ("expected_from", self.expected_from),
+            ("expected_to", self.expected_to),
+        ):
+            if value is not None and (value.tzinfo is None or value.utcoffset() is None):
+                raise ValueError(f"transmission device {name} must include a timezone")
+        if self.expected_to is not None and self.expected_to <= self.expected_from:
+            raise ValueError("transmission device expected_to must be after expected_from")
+        return self
+
+
+class SensorTransmissionReceiptInput(APIModel):
+    receipt_id: UUID
+    device_id: UUID
+    received_at: datetime
+
+    @model_validator(mode="after")
+    def validate_receipt_timestamp(self) -> SensorTransmissionReceiptInput:
+        if self.received_at.tzinfo is None or self.received_at.utcoffset() is None:
+            raise ValueError("transmission receipt received_at must include a timezone")
+        return self
+
+
 class SensorAnalysisRequest(APIModel):
     analysis_id: UUID
     organization_id: UUID
@@ -156,6 +196,11 @@ class SensorAnalysisRequest(APIModel):
     temporal_threshold: float | None = Field(default=None, gt=0)
     flatline_minimum_repeated_observations: StrictInt | None = Field(default=None, ge=2)
     flatline_minimum_duration_seconds: StrictInt | None = Field(default=None, gt=0)
+    transmission_expected_interval_seconds: StrictInt | None = Field(default=None, gt=0)
+    transmission_gap_tolerance_factor: float | None = Field(default=None, gt=1)
+    transmission_current_window: StrictBool = False
+    transmission_devices: list[SensorTransmissionDeviceInput] | None = Field(default=None, max_length=100)
+    transmission_receipts: list[SensorTransmissionReceiptInput] | None = Field(default=None, max_length=5000)
     biological_interpretation: dict[str, Any] | None = None
     measurements: list[dict[str, Any]] = Field(min_length=1, max_length=5000)
 
@@ -182,6 +227,27 @@ class SensorAnalysisRequest(APIModel):
             value is not None for value in flatline_options
         ):
             raise ValueError("flatline diagnostic parameters must be supplied together")
+        transmission_options = (
+            self.transmission_expected_interval_seconds,
+            self.transmission_gap_tolerance_factor,
+            self.transmission_devices,
+            self.transmission_receipts,
+        )
+        if any(value is not None for value in transmission_options) and not all(
+            value is not None for value in transmission_options
+        ):
+            raise ValueError("transmission diagnostics policy, devices and receipts must be supplied together")
+        if self.transmission_devices is not None:
+            if not self.transmission_devices:
+                raise ValueError("transmission diagnostics require at least one profile-bound device")
+            device_ids = [item.device_id for item in self.transmission_devices]
+            if len(device_ids) != len(set(device_ids)):
+                raise ValueError("transmission device IDs must be unique")
+            known_device_ids = set(device_ids)
+            if any(item.device_id not in known_device_ids for item in self.transmission_receipts or []):
+                raise ValueError("every transmission receipt must reference a supplied device")
+        elif self.transmission_current_window:
+            raise ValueError("transmission_current_window requires transmission diagnostics")
         for row in self.measurements:
             if row.get("organization_id") != str(self.organization_id):
                 raise ValueError("every sensor measurement must match the requested organization")
@@ -422,6 +488,52 @@ def create_app(engine_api_key: str | None = None) -> FastAPI:
                     "status": "completed",
                     "assessments": jsonable_encoder(flatline_assessments),
                 }
+            transmission_diagnostics = {"status": "not_requested", "assessments": []}
+            if request.transmission_expected_interval_seconds is not None:
+                profile_zone = ZoneInfo(request.profile_timezone)
+                evaluation_start = datetime.combine(
+                    request.from_date, time.min, tzinfo=profile_zone
+                ).astimezone(timezone.utc)
+                evaluation_end = datetime.combine(
+                    request.to_date + timedelta(days=1),
+                    time.min,
+                    tzinfo=profile_zone,
+                ).astimezone(timezone.utc)
+                device_inputs = tuple(
+                    SensorDeviceTransmission(
+                        device_id=item.device_id,
+                        device_code=item.device_code,
+                        enabled=item.enabled,
+                        created_at=item.created_at,
+                        profile_bound=item.profile_bound,
+                        expected_from=item.expected_from,
+                        expected_to=item.expected_to,
+                    )
+                    for item in request.transmission_devices or []
+                )
+                receipt_inputs = tuple(
+                    SensorTransmissionReceipt(
+                        receipt_id=item.receipt_id,
+                        device_id=item.device_id,
+                        received_at=item.received_at,
+                    )
+                    for item in request.transmission_receipts or []
+                )
+                assessments = assess_sensor_transmissions(
+                    device_inputs,
+                    receipt_inputs,
+                    evaluation_start=evaluation_start,
+                    evaluation_end=evaluation_end,
+                    evaluated_at=datetime.now(timezone.utc),
+                    expected_interval_seconds=request.transmission_expected_interval_seconds,
+                    gap_tolerance_factor=request.transmission_gap_tolerance_factor,
+                    current_window=request.transmission_current_window,
+                )
+                transmission_diagnostics = {
+                    "status": "completed",
+                    "assessments": jsonable_encoder(assessments),
+                }
+
             interpretation_status = "not_requested"
             domain_interpretation = None
             if request.biological_interpretation is not None:
@@ -475,7 +587,10 @@ def create_app(engine_api_key: str | None = None) -> FastAPI:
                 "source": "iot_sensor",
                 "analysis": analysis,
                 "temporal_screening": temporal_screening,
-                "instrument_health": {"flatline_diagnostics": flatline_diagnostics},
+                "instrument_health": {
+                    "flatline_diagnostics": flatline_diagnostics,
+                    "transmission_diagnostics": transmission_diagnostics,
+                },
                 "interpretation_status": interpretation_status,
                 "domain_interpretation": domain_interpretation,
             }
