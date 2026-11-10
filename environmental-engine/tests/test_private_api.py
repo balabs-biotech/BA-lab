@@ -501,7 +501,7 @@ def test_sensor_analysis_endpoint_can_return_causal_temporal_screening():
         request["measurements"].append(row)
     request["temporal_window_seconds"] = 9 * 60 * 60
     request["temporal_minimum_history"] = 7
-    request["temporal_threshold"] = 3.5
+    request["temporal_threshold"] = 3
     client = TestClient(create_app(engine_api_key="test-secret"))
 
     response = client.post(
