@@ -202,3 +202,30 @@ def test_rolling_indicator_preserves_coverage_and_does_not_invent_lineage():
     assert item.value is None
     assert item.coverage.observed == 6
     assert item.inputs[0].source_observation_ids == []
+
+
+def test_observations_outside_analysis_scope_are_rejected():
+    rows = observations_for(day=date(2026, 10, 31))
+    with pytest.raises(ValueError, match="contained within analysis scope"):
+        build_bal_analysis(
+            observations=rows,
+            analysis_id=uuid4(),
+            generated_at=datetime(2026, 11, 2, tzinfo=timezone.utc),
+            engine_version="0.1.0",
+            scope_from=date(2026, 11, 1),
+            scope_to=date(2026, 11, 1),
+        )
+
+
+def test_duplicate_source_observation_ids_are_rejected():
+    rows = observations_for()
+    rows.append(rows[0])
+    with pytest.raises(ValueError, match="duplicate source observation IDs"):
+        build_bal_analysis(
+            observations=rows,
+            analysis_id=uuid4(),
+            generated_at=datetime(2026, 11, 2, tzinfo=timezone.utc),
+            engine_version="0.1.0",
+            scope_from=date(2026, 11, 1),
+            scope_to=date(2026, 11, 1),
+        )
