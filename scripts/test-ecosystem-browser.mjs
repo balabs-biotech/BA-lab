@@ -266,6 +266,13 @@ async function checkWorkingScene(name, viewport) {
         const depthAfterZoomIn = await page.evaluate(() => window.__BALABS_3D_E2E__()?.depth || 0);
         assert.equal(depthAfterZoomIn, nestedDepth,
           name + ': camera zoom-in must not change the selected hierarchy level');
+        // Restore the navigation framing after checking the next generation; otherwise
+        // the following hierarchy iteration starts zoomed into a layer with no descendants.
+        for (let restore = 0; restore < 4 && (await page.evaluate(() => window.__BALABS_3D_E2E__()?.cameraDistance || 0)) < 5.6; restore++) {
+          await page.locator('.webgl-controls [data-camera="out"]').evaluate(button => button.click());
+          await page.waitForTimeout(180);
+        }
+        await page.waitForFunction(() => (window.__BALABS_3D_E2E__()?.cameraDistance || 0) >= 5.6 && window.__BALABS_3D_E2E__()?.visibleLabelDepths?.includes(0), undefined, { timeout: 8000 });
       }
       continue;
     }
