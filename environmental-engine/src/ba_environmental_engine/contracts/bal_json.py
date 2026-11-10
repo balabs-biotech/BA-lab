@@ -113,6 +113,31 @@ class Indicator(ContractModel):
         return self
 
 
+class AnomalyFinding(ContractModel):
+    """A statistical signal, not a biological diagnosis or recommendation."""
+
+    finding_id: UUID
+    variable_code: str = Field(min_length=1, max_length=120)
+    unit: str = Field(min_length=1, max_length=40)
+    observed_date: date
+    observed_value: float
+    status: Literal[
+        "normal",
+        "suspect",
+        "insufficient_history",
+        "insufficient_coverage",
+        "indeterminate",
+    ]
+    baseline_median: float | None
+    baseline_mad: float | None
+    robust_z_score: float | None
+    history_count: int = Field(ge=0)
+    coverage_ratio: float = Field(ge=0, le=1)
+    flags: list[str] = Field(default_factory=list)
+    method: IndicatorMethod
+    source_observation_ids: list[UUID] = Field(default_factory=list)
+
+
 class BALAnalysis(ContractModel):
     contract_version: Literal["1.0.0"]
     engine: EngineIdentity
@@ -121,12 +146,16 @@ class BALAnalysis(ContractModel):
     scope: AnalysisScope
     source_summary: list[SourceSummary]
     indicators: list[Indicator]
+    findings: list[AnomalyFinding] = Field(default_factory=list)
     warnings: list[str] = Field(default_factory=list)
 
     @model_validator(mode="after")
     def validate_envelope(self):
         if self.generated_at.tzinfo is None or self.generated_at.utcoffset() is None:
             raise ValueError("generated_at must include a timezone")
+        for finding in self.findings:
+            if not self.scope.from_date <= finding.observed_date <= self.scope.to_date:
+                raise ValueError("anomaly finding date must be contained within analysis scope")
         for indicator in self.indicators:
             if (
                 indicator.period.from_date < self.scope.from_date
