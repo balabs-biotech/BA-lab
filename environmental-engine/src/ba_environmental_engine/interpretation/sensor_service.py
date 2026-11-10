@@ -111,7 +111,7 @@ def interpret_sensor_analysis(
     zone = ZoneInfo(profile_timezone)
     parameters = temporal_parameters or {}
     for assessment in temporal_assessments:
-        if assessment.status == "normal":
+        if assessment.status in ("normal", "insufficient_history"):
             continue
         for rule in profile.rules:
             if rule.variable_code != assessment.variable_code:
