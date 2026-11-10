@@ -110,6 +110,15 @@ class FakeQuery:
         self.operations.append(("order", key, desc))
         return self
 
+    def lte(self, key, value):
+        self.filters.append((key, "<=", value))
+        return self
+
+    def or_(self, expression):
+        self.operations.append(("or", expression))
+        return self
+
+
     def insert(self, value):
         self.operations.append(("insert", value))
         return self
@@ -208,3 +217,27 @@ def test_repository_rejects_overlapping_contexts_instead_of_choosing_arbitrarily
             subject_id=first["culture_id"],
             on_date="2026-11-10",
         )
+
+
+def test_repository_queries_only_contexts_overlapping_analysis_scope():
+    from ba_environmental_engine.contexts.persistence import (
+        SupabaseBiologicalContextRepository,
+    )
+
+    record = make_record("mycology")
+    client = FakeSupabase([record])
+    repository = SupabaseBiologicalContextRepository(client)
+
+    result = repository.list_overlapping_scope(
+        organization_id=record["organization_id"],
+        domain=BiologicalDomain.MYCOLOGY,
+        subject_id=record["culture_id"],
+        from_date="2026-11-01",
+        to_date="2026-11-30",
+    )
+
+    assert len(result) == 1
+    assert ("organization_id", record["organization_id"]) in client.query.filters
+    assert ("culture_id", record["culture_id"]) in client.query.filters
+    assert ("valid_from", "<=", "2026-11-30") in client.query.filters
+    assert ("or", "valid_to.is.null,valid_to.gte.2026-11-01") in client.query.operations
