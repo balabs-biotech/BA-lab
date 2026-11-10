@@ -67,17 +67,24 @@ def assess_seasonal_reference(
             raise ValueError("observation value must be finite and numeric")
         previous_date = row.observed_date
 
+    by_seasonal_day: dict[int, list[tuple[int, float]]] = {}
+    for historical in rows:
+        day = _seasonal_day(historical.observed_date)
+        by_seasonal_day.setdefault(day, []).append(
+            (historical.observed_date.year, float(historical.value))
+        )
+
     results: list[SeasonalAssessment] = []
     for row in rows:
         target_day = _seasonal_day(row.observed_date)
         candidates: list[tuple[int, float]] = []
-        for historical in rows:
-            if historical.observed_date.year >= row.observed_date.year:
-                continue
-            distance = abs(_seasonal_day(historical.observed_date) - target_day)
-            circular_distance = min(distance, 366 - distance)
-            if circular_distance <= half_window_days:
-                candidates.append((historical.observed_date.year, float(historical.value)))
+        for offset in range(-half_window_days, half_window_days + 1):
+            seasonal_day = ((target_day - 1 + offset) % 366) + 1
+            candidates.extend(
+                (year, value)
+                for year, value in by_seasonal_day.get(seasonal_day, [])
+                if year < row.observed_date.year
+            )
 
         years = tuple(sorted({year for year, _ in candidates}))
         if len(years) < minimum_years:
