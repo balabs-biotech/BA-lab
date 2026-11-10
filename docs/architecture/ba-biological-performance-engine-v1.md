@@ -25,7 +25,8 @@ The result retains:
 - formula code and version;
 - measurement period;
 - accepted and excluded record counts;
-- canonical output unit per day.
+- canonical output unit per day;
+- whether each input value came from the raw or normalized database pair, plus its source unit.
 
 ## Evidence and quality boundaries
 
