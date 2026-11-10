@@ -70,3 +70,25 @@ def saturation_vapor_pressure_kpa(temperature_c: float) -> float:
     return 0.6108 * exp(
         (17.27 * float(temperature_c)) / (float(temperature_c) + 237.3)
     )
+
+
+def actual_vapor_pressure_from_mean_rh(
+    *,
+    temperature_max_c: float,
+    temperature_min_c: float,
+    relative_humidity_mean_percent: float,
+) -> float:
+    """Estimate daily actual vapour pressure from FAO-56 mean RH (Eq. 19)."""
+    saturation_max = saturation_vapor_pressure_kpa(temperature_max_c)
+    saturation_min = saturation_vapor_pressure_kpa(temperature_min_c)
+    if temperature_min_c > temperature_max_c:
+        raise ValueError("temperature_min_c must be on or below temperature_max_c")
+    if (
+        isinstance(relative_humidity_mean_percent, bool)
+        or not isinstance(relative_humidity_mean_percent, (int, float))
+        or not isfinite(relative_humidity_mean_percent)
+        or not 0.0 <= relative_humidity_mean_percent <= 100.0
+    ):
+        raise ValueError("relative_humidity_mean_percent must be between 0 and 100")
+    mean_saturation = (saturation_max + saturation_min) / 2.0
+    return mean_saturation * (float(relative_humidity_mean_percent) / 100.0)
