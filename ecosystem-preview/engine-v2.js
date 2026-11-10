@@ -32,21 +32,21 @@ const LABELS = Object.fromEntries([...document.querySelectorAll('.sphere[data-sp
 }]));
 const LANG = () => (document.documentElement.lang || 'fr').toLowerCase().split('-')[0];
 const COPY = {
-  fr:{hint:'FAITES GLISSER POUR TOURNER · PINCEZ POUR ZOOMER · TOUCHEZ UNE CELLULE',open:'ENTRER DANS LE RÉSEAU',home:'Vue d’ensemble',zoomIn:'Zoom avant',zoomOut:'Zoom arrière',reset:'Recentrer',domain:'DOMAINE',resource:'BRANCHE DU RÉSEAU',openPage:'Ouvrir la page Notion ↗',back:'← Retour au domaine',related:'CONNEXIONS',empty:'Aucune branche publique trouvée pour ce domaine.',loading:'Chargement du réseau…',overview:'Vue d’ensemble',children:'sous-dossiers'},
-  en:{hint:'DRAG TO ROTATE · PINCH TO ZOOM · TAP A CELL',open:'ENTER THE NETWORK',home:'Overview',zoomIn:'Zoom in',zoomOut:'Zoom out',reset:'Recenter',domain:'DOMAIN',resource:'NETWORK BRANCH',openPage:'Open Notion page ↗',back:'← Back to domain',related:'CONNECTIONS',empty:'No public branches found for this domain.',loading:'Loading network…'},
-  ar:{hint:'اسحب للتدوير · اقرص للتكبير · المس خلية',open:'ادخل إلى الشبكة',home:'نظرة عامة',zoomIn:'تكبير',zoomOut:'تصغير',reset:'إعادة التمركز',domain:'المجال',resource:'فرع الشبكة',openPage:'فتح صفحة Notion ↗',back:'→ العودة إلى المجال',related:'الروابط',empty:'لا توجد فروع عامة لهذا المجال.',loading:'جارٍ تحميل الشبكة…'},
-  pt:{hint:'ARRASTE PARA RODAR · PINÇA PARA AMPLIAR · TOQUE NUMA CÉLULA',open:'ENTRAR NA REDE',home:'Visão geral',zoomIn:'Aproximar',zoomOut:'Afastar',reset:'Recentralizar',domain:'DOMÍNIO',resource:'RAMO DA REDE',openPage:'Abrir página Notion ↗',back:'← Voltar ao domínio',related:'LIGAÇÕES',empty:'Não foram encontrados ramos públicos.',loading:'A carregar a rede…'},
+  fr:{hint:'1 DOIGT : TOURNER · 2 DOIGTS : DÉPLACER · PINCER : ZOOMER',open:'ENTRER DANS LE RÉSEAU',home:'Vue d’ensemble',zoomIn:'Zoom avant',zoomOut:'Zoom arrière',reset:'Recentrer',domain:'DOMAINE',resource:'BRANCHE DU RÉSEAU',openPage:'Ouvrir la page Notion ↗',back:'← Retour au domaine',related:'CONNEXIONS',empty:'Aucune branche publique trouvée pour ce domaine.',loading:'Chargement du réseau…',overview:'Vue d’ensemble',children:'sous-dossiers'},
+  en:{hint:'1 FINGER: ROTATE · 2 FINGERS: PAN · PINCH: ZOOM',open:'ENTER THE NETWORK',home:'Overview',zoomIn:'Zoom in',zoomOut:'Zoom out',reset:'Recenter',domain:'DOMAIN',resource:'NETWORK BRANCH',openPage:'Open Notion page ↗',back:'← Back to domain',related:'CONNECTIONS',empty:'No public branches found for this domain.',loading:'Loading network…'},
+  ar:{hint:'إصبع واحد: تدوير · إصبعان: تحريك · ضمّ الأصابع: تكبير',open:'ادخل إلى الشبكة',home:'نظرة عامة',zoomIn:'تكبير',zoomOut:'تصغير',reset:'إعادة التمركز',domain:'المجال',resource:'فرع الشبكة',openPage:'فتح صفحة Notion ↗',back:'→ العودة إلى المجال',related:'الروابط',empty:'لا توجد فروع عامة لهذا المجال.',loading:'جارٍ تحميل الشبكة…'},
+  pt:{hint:'1 DEDO: RODAR · 2 DEDOS: MOVER · PINÇA: ZOOM',open:'ENTRAR NA REDE',home:'Visão geral',zoomIn:'Aproximar',zoomOut:'Afastar',reset:'Recentralizar',domain:'DOMÍNIO',resource:'RAMO DA REDE',openPage:'Abrir página Notion ↗',back:'← Voltar ao domínio',related:'LIGAÇÕES',empty:'Não foram encontrados ramos públicos.',loading:'A carregar a rede…'},
 };
 const t = key => (COPY[LANG()] || COPY.fr)[key] || COPY.fr[key];
 
 let THREE, renderer, scene, camera, raycaster, pointer, stage, panel, hint, intro, status;
 let world, cells = new Map(), pickables = [], resourceObjects = [], edges = [], signalPoints = [];
 let resourceHitTargets = new Map(), domainHitTargets = new Map();
-let nav, currentNode = null, currentAnchor = null, navigationStack = [];
+let nav, branchDock, currentNode = null, currentAnchor = null, navigationStack = [];
 let selected = null, selectedBranch = null, manifest = null, transition = null;
 let distance = 13.5, zoomTargetDistance = 13.5, theta = .22, phi = 1.27, target = null, targetGoal = null;
 let opened = false, raf = 0, lastFrame = 0, dragging = false, moved = false, dragGesture = false;
-let lastPointer = null, pointers = new Map(), pinchStart = 0, pinchDistance = 0, hoverId = null;
+let lastPointer = null, pointers = new Map(), pinchStart = 0, pinchDistance = 0, pinchCenter = null, hoverId = null , lastBranchTouchActivationAt = 0;
 let canvasRect = null, cameraInitialized = false, lastPickAt = 0;
 let _hitWorld = null;
 let labelWorldPosition = null;
@@ -61,7 +61,7 @@ function addStyles() {
     #mainView .webgl-stage canvas{display:block;width:100%;height:100%;outline:none;touch-action:none}
     #mainView .webgl-stage .webgl-hit-target{position:absolute;z-index:30;width:76px;height:76px;min-width:64px;min-height:64px;padding:0;border:0;border-radius:50%;background:transparent;color:transparent;opacity:.015;pointer-events:auto!important;touch-action:manipulation;transform:translate(-50%,-50%);cursor:pointer;-webkit-tap-highlight-color:transparent}
     body > .webgl-hit-target:focus-visible{opacity:.24;outline:2px solid #d1d0c5;background:#b96b4d33}
-    #mainView .webgl-stage .webgl-hint{position:absolute;left:16px;bottom:14px;z-index:8;padding:9px 12px;border:1px solid #78958a66;border-radius:999px;background:#142321d9;color:#e5e9df;font:600 9px/1.4 system-ui;letter-spacing:.08em;pointer-events:none;backdrop-filter:blur(12px)}
+    #mainView .webgl-stage .webgl-hint{position:absolute;left:16px;bottom:14px;z-index:8;padding:9px 12px;max-width:calc(100% - 32px);white-space:normal;border:1px solid #78958a66;border-radius:999px;background:#142321d9;color:#e5e9df;font:600 9px/1.4 system-ui;letter-spacing:.08em;pointer-events:none;backdrop-filter:blur(12px)}
     #mainView .webgl-stage .webgl-status{position:absolute;right:16px;bottom:17px;z-index:8;color:#c2cfc5;font:600 9px system-ui;letter-spacing:.12em;pointer-events:none}
     #mainView .webgl-controls{position:absolute;right:14px;top:14px;z-index:16;display:flex;gap:6px}
     #mainView .webgl-controls button{width:38px;height:38px;border:1px solid #7b948766;border-radius:12px;background:#172724e8;color:#e5e9df;font:500 21px/1 system-ui;cursor:pointer;backdrop-filter:blur(12px)}
@@ -88,6 +88,13 @@ function addStyles() {
     #mainView .webgl-intro-orb b{font:700 33px system-ui;letter-spacing:-.1em;color:#e1e7dc}
     #mainView .webgl-intro-copy{color:#d6ded6;font:600 10px system-ui;letter-spacing:.17em}
     #mainView .webgl-intro-cta{border:1px solid #9eb7a2;border-radius:999px;padding:12px 17px;color:#f1f2e9;background:#21342edb;font:700 10px system-ui;letter-spacing:.1em}
+    #mainView .webgl-branch-dock{touch-action:pan-y;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;position:absolute;left:clamp(10px,2vw,24px);right:clamp(10px,2vw,24px);bottom:48px;z-index:2147483647!important;display:flex;flex-wrap:wrap;justify-content:center;align-content:flex-start;gap:8px;max-height:178px;overflow:auto;padding:10px 12px;border:1px solid #78958a88;border-radius:16px;background:linear-gradient(145deg,#142321ed,#10191bf0);box-shadow:0 12px 34px #0007;backdrop-filter:blur(14px);scrollbar-width:thin}
+    #mainView .webgl-branch-dock[hidden]{display:none!important}
+    #mainView .webgl-branch-dock .webgl-branch-item{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;max-width:min(320px,100%);padding:9px 14px;border:1px solid #78958a99;border-radius:12px;background:#263b38;color:#f2f2e9;font:650 15px/1.25 system-ui,sans-serif;text-align:left;text-decoration:none;cursor:pointer;touch-action:manipulation}
+    #mainView .webgl-branch-dock .webgl-branch-item[data-has-children="true"]:after{content:'›';color:#d69a7f;font-size:21px;line-height:1}
+    #mainView .webgl-branch-dock .webgl-branch-item:hover,#mainView .webgl-branch-dock .webgl-branch-item:focus-visible{background:#385044;border-color:#d1d0c5;outline:2px solid #d1d0c5;outline-offset:2px}
+    #mainView .webgl-branch-dock .webgl-branch-item[aria-current="page"]{background:#4a3a32;border-color:#b96b4d}
+    @media(max-width:600px){#mainView .webgl-branch-dock{left:8px;right:8px;bottom:46px;gap:6px;max-height:190px;padding:8px}#mainView .webgl-branch-dock .webgl-branch-item{flex:1 1 calc(50% - 6px);min-width:0;max-width:none;min-height:46px;padding:9px 10px;font-size:14px}}
     #mainView .webgl-stage.is-transitioning{cursor:progress}
     @media(max-width:600px){#mainView .webgl-path{left:9px;top:52px;max-width:min(260px,calc(100% - 78px));font-size:9px}#mainView .webgl-hint{left:9px;bottom:10px;max-width:calc(100% - 130px);font-size:7px;letter-spacing:.02em}#mainView .webgl-status{right:9px;bottom:12px;font-size:7px}#mainView .webgl-focus{left:9px;top:9px;padding:13px;width:min(270px,calc(100% - 78px))}#mainView .webgl-controls{right:9px;top:9px;gap:4px}#mainView .webgl-controls button{width:34px;height:34px}}
   `;
@@ -200,6 +207,17 @@ function cameraPosition() {
   camera.lookAt(c);
 }
 function setCameraTarget(v) { target=v.clone();cameraPosition(); }
+function panCameraByPixels(dx,dy) {
+  if(!camera||!stage||!target)return;
+  camera.updateMatrixWorld(true);
+  const right=new THREE.Vector3().setFromMatrixColumn(camera.matrixWorld,0);
+  const up=new THREE.Vector3().setFromMatrixColumn(camera.matrixWorld,1);
+  const height=Math.max(1,stage.clientHeight);
+  const worldPerPixel=2*distance*Math.tan(THREE.MathUtils.degToRad(camera.fov*.5))/height;
+  target.addScaledVector(right,-dx*worldPerPixel);
+  target.addScaledVector(up,dy*worldPerPixel);
+  cameraPosition();
+}
 function resize() {
   if(!renderer||!camera||!stage)return;
   const w=Math.max(1,stage.clientWidth),h=Math.max(1,stage.clientHeight);
@@ -307,8 +325,48 @@ function syncResourceHitTargets() {
   button.style.left=chosen.cx+'px';button.style.top=chosen.cy+'px';
  }
 }
+function renderBranchDock() {
+  if(!branchDock)return;branchDock.replaceChildren();
+  const children=currentNode?.children||[];branchDock.hidden=!selected||children.length===0;
+  if(!selected||!children.length)return;
+  children.forEach((item,index)=>{
+    const hasChildren=!!item.children?.length,hasUrl=!!item.url;
+    const el=document.createElement(!hasChildren&&hasUrl?'a':'button');
+    if(el.tagName==='BUTTON'){
+      el.type='button';
+      const activate=(event,source)=>{
+        event?.preventDefault?.();event?.stopPropagation?.();
+        const spatial=resourceObjects.find(object=>object.userData?.kind==='resource'&&object.userData?.sourceItem===item)?.userData;
+        window.__BALABS_3D_LAST_OPEN__={title:item.title||item.name||'',source,resolved:!!spatial,hasPosition:!!spatial?.position,hasChildren:!!spatial?.children?.length};
+        if(source==='touch-pointerup')lastBranchTouchActivationAt=performance.now();
+        window.__BALABS_3D_E2E_CLICKS=(window.__BALABS_3D_E2E_CLICKS||0)+1;
+        try{openResource(item);window.__BALABS_3D_LAST_OPEN_ERROR__=null}
+        catch(error){window.__BALABS_3D_LAST_OPEN_ERROR__={message:error?.message||String(error),stack:error?.stack||''}}
+      };
+      // Mobile browsers can synthesize a click inconsistently after multi-touch
+      // gestures. Activate on the touch pointer release, then suppress its
+      // compatibility click; mouse and keyboard continue through click.
+      el.addEventListener('pointerup',event=>{
+        if(event.pointerType!=='touch')return;
+        el.dataset.touchActivatedAt=String(performance.now());
+        activate(event,'touch-pointerup');
+      });
+      el.addEventListener('click',event=>{
+        const touchAt=Number(el.dataset.touchActivatedAt||0);
+        if(performance.now()-lastBranchTouchActivationAt<800){event.preventDefault();event.stopImmediatePropagation();return;}
+        if(touchAt&&performance.now()-touchAt<800){event.preventDefault();event.stopPropagation();return}
+        activate(event,event.detail===0?'keyboard':'click');
+      });
+    }
+    else{el.href=item.url;el.target='_blank';el.rel='noopener noreferrer'}
+    el.className='webgl-branch-item';el.textContent=item.title||item.name||('Branche '+(index+1));
+    el.title=item.title||item.name||'';el.dataset.branchIndex=String(index);el.dataset.hasChildren=String(hasChildren);el.dataset.resourceUrl=item.url||'';
+    el.setAttribute('aria-label',(item.title||item.name||'Branche')+(hasChildren?' — ouvrir les sous-branches':hasUrl?' — ouvrir la page':' — consulter'));
+    branchDock.append(el);
+  });
+}
 function renderPath() {
-  if(!nav)return;nav.replaceChildren();
+  if(!nav)return;nav.replaceChildren();renderBranchDock();
   const crumbs=[{title:t('overview'),action:goOverview}];
   if(selected)crumbs.push({title:LABELS[selected]?.title||selected,action:()=>{navigationStack=[];currentNode=manifest?.domains?.find(d=>d.id===selected)||null;currentAnchor=cells.get(selected).position.clone();buildResources(selected);smoothCamera(currentAnchor,7.5,650)}});
   navigationStack.slice(1).forEach((entry,index)=>crumbs.push({title:entry.node.title,action:()=>navigateToStack(index+1)}));
@@ -332,7 +390,7 @@ function buildResources(id,parentNode=null,anchor=null) {
  const baseColor=new THREE.Color(COLORS[id]),accent=new THREE.Color(0xb96b4d);
  const filament=(pts,color,radius,opacity)=>{const curve=new THREE.CatmullRomCurve3(pts),mesh=new THREE.Mesh(new THREE.TubeGeometry(curve,18,radius,4,false),new THREE.MeshStandardMaterial({color,emissive:color,emissiveIntensity:.18,transparent:true,opacity,roughness:.65}));world.add(mesh);resourceObjects.push(mesh);return curve};
  const maxDepth=3; // Keep preview hierarchy depth aligned with the public language manifests.
- const drawNode=(item,pos,depth,parent,angle,index)=>{const has=!!item.children?.length,color=baseColor.clone().lerp(accent,Math.min(.34,depth*.12+(index%3)*.025)),radius=depth===0?(has?.135:.105):depth===1?(has?.085:.065):.043;item.position=pos.clone();item.parentNode=parent;const data={kind:'resource',...item,sourceId:id,position:pos.clone(),hasChildren:has,depth,parentNode:parent,denseRoot:depth===0&&children.length>16};const hitRadius=depth===0?.32:depth===1?.25:.19;const hit=new THREE.Mesh(new THREE.SphereGeometry(hitRadius,10,8),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));hit.position.copy(pos);hit.userData=data;world.add(hit);resourceObjects.push(hit);pickables.push(hit);
+ const drawNode=(item,pos,depth,parent,angle,index)=>{const has=!!item.children?.length,color=baseColor.clone().lerp(accent,Math.min(.34,depth*.12+(index%3)*.025)),radius=depth===0?(has?.135:.105):depth===1?(has?.085:.065):.043;item.position=pos.clone();item.parentNode=parent;const data={kind:'resource',...item,sourceItem:item,sourceId:id,position:pos.clone(),hasChildren:has,depth,parentNode:parent,denseRoot:depth===0&&children.length>16};const hitRadius=depth===0?.32:depth===1?.25:.19;const hit=new THREE.Mesh(new THREE.SphereGeometry(hitRadius,10,8),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));hit.position.copy(pos);hit.userData=data;world.add(hit);resourceObjects.push(hit);pickables.push(hit);
  // Represent each folder/page as a living hyphal junction: fine branching strands, no bead-like node.
  const junction=new THREE.Group();junction.position.copy(pos);junction.userData=data;world.add(junction);resourceObjects.push(junction);
  for(let arm=0;arm<5;arm++){const a=arm/5*Math.PI*2+depth*.37+index*.19,reach=radius*(2.3+(arm%3)*.55),start=new THREE.Vector3(0,0,0),end=new THREE.Vector3(Math.cos(a)*reach,Math.sin(a)*reach*.82,Math.sin(a*1.7)*reach*.5),mid=start.clone().lerp(end,.56).add(new THREE.Vector3(0,.018,.018));const curveArm=new THREE.CatmullRomCurve3([start,mid,end]);const filamentArm=new THREE.Mesh(new THREE.TubeGeometry(curveArm,10,Math.max(.0025,radius*.055),4,false),new THREE.MeshStandardMaterial({color,emissive:color,emissiveIntensity:.3,transparent:true,opacity:.72,roughness:.78}));junction.add(filamentArm);}const l=makeResourceLabel(data,color,depth);l.position.copy(pos).add(new THREE.Vector3(0,depth===0?-.28:depth===1?-.22:-.16,.025));world.add(l);resourceObjects.push(l);pickables.push(l);const pp=parent===currentNode?currentAnchor:(parent.position||currentAnchor),mid=pp.clone().lerp(pos,.52).add(new THREE.Vector3(0,.12+depth*.035,.12)),curve=filament([pp.clone(),mid,pos.clone()],color,depth===0?.012:depth===1?.007:.004,depth===0?.66:depth===1?.52:.38);if(depth<2)for(let f=0;f<2;f++){const at=curve.getPoint(.46+f*.2),sgn=f===0?-1:1,tip=at.clone().add(new THREE.Vector3(Math.cos(angle+sgn*.8)*(.24-depth*.045),Math.sin(angle+sgn*.8)*(.2-depth*.04),.045));filament([at,at.clone().lerp(tip,.55).add(new THREE.Vector3(0,.045,.025)),tip],color,.0035-depth*.0006,.28)}if(depth>=maxDepth||!has)return;const kids=item.children||[],spread=Math.min(1.2,.32+kids.length*.105);kids.forEach((child,childIndex)=>{const frac=kids.length===1?0:(childIndex/(kids.length-1)-.5),childAngle=angle+frac*spread*2+(childIndex%2?-.08:.08),dist=depth===0?1.3+Math.min(.45,kids.length*.045):Math.max(.95,Math.min(1.5,.8+kids.length*.04)),childPos=pos.clone().add(new THREE.Vector3(Math.cos(childAngle)*dist,Math.sin(childAngle)*dist*.82+((childIndex%3)-1)*.035,.04+(childIndex%2)*.035));drawNode(child,childPos,depth+1,item,childAngle,childIndex)});
@@ -354,7 +412,27 @@ function buildResources(id,parentNode=null,anchor=null) {
  if(children.length>16){const golden=Math.PI*(3-Math.sqrt(5)),mobile=window.innerWidth<760,outer=mobile?3.55:4.35;children.forEach((item,k)=>{const ang=-Math.PI/2+k*golden,rad=1.35+outer*Math.sqrt((k+.5)/children.length),p=currentAnchor.clone().add(new THREE.Vector3(Math.cos(ang)*rad,Math.sin(ang)*rad,.18*Math.sin(k*1.7)));drawNode(item,p,0,currentNode,ang,k)});}else{children.forEach((item,k)=>{const ang=k/Math.max(1,children.length)*Math.PI*2-Math.PI/2+(k%2)*.11,rad=2.15+(k%3)*.16,p=currentAnchor.clone().add(new THREE.Vector3(Math.cos(ang)*rad,Math.sin(ang)*rad*.78,Math.sin(ang*1.6)*.34));drawNode(item,p,0,currentNode,ang,k)});}
  status.textContent=(currentNode.title||domain.title).toUpperCase()+' · '+children.length+' '+t('children').toUpperCase();
 }
-function openResource(item) { const data=item.userData||item;if(data.children?.length){const ancestors=[];let parent=data.parentNode;while(parent&&parent!==currentNode){ancestors.unshift(parent);parent=parent.parentNode}if(parent===currentNode){navigationStack.push({node:currentNode,anchor:currentAnchor.clone()});for(const ancestor of ancestors)navigationStack.push({node:ancestor,anchor:ancestor.position.clone()})}currentNode=data;currentAnchor=data.position.clone();smoothCamera(currentAnchor,6.1,720,()=>buildResources(selected,currentNode,currentAnchor));return}if(data.url){window.open(data.url,'_blank','noopener');return}status.textContent=data.title||'';}
+// Resolve raw Notion nodes to their positioned 3D counterparts before camera navigation.
+function openResource(item) {
+ let data=item?.userData||item;
+ const raw=data,spatial=resourceObjects.find(object=>object.userData?.kind==='resource'&&(object.userData.sourceItem===data||object.userData===data))?.userData;
+ if(spatial)data=spatial;
+ const before={title:currentNode?.title||null,depth:navigationStack.length,children:currentNode?.children?.length||0};
+ if(data.children?.length){
+  const previousNode=currentNode,previousAnchor=currentAnchor?.clone()||new THREE.Vector3();
+  navigationStack.push({node:previousNode,anchor:previousAnchor});
+  let parent=data.parentNode;const ancestors=[];
+  while(parent&&parent!==previousNode){ancestors.unshift(parent);parent=parent.parentNode}
+  if(parent===previousNode){for(const ancestor of ancestors)navigationStack.push({node:ancestor,anchor:ancestor.position.clone()})}
+  currentNode=data;currentAnchor=data.position.clone();renderPath();
+  const trace={rawTitle:raw?.title||raw?.name||null,resolved:!!spatial,parentMatches:parent===previousNode,before,after:{title:currentNode?.title||null,depth:navigationStack.length,children:currentNode?.children?.length||0},position:!!currentAnchor,error:null};
+  window.__BALABS_3D_NAV_TRACE__=trace;
+  smoothCamera(currentAnchor,6.1,720,()=>{try{buildResources(selected,data,currentAnchor);trace.afterBuild={title:currentNode?.title||null,depth:navigationStack.length,children:currentNode?.children?.length||0}}catch(error){trace.error={message:error?.message||String(error),stack:error?.stack||''};window.__BALABS_3D_LAST_OPEN_ERROR__=trace.error}});
+  return;
+ }
+ if(data.url){window.open(data.url,'_blank','noopener');return}
+ status.textContent=data.title||'';
+}
 function showDomainPanel(id,message='') {if(message)status.textContent=message;renderPath()}
 function enterDomain(id) {
   if(!cells.has(id))return;selected=id;selectedBranch=null;opened=true;navigationStack=[];currentNode=manifest?.domains?.find(d=>d.id===id)||null;currentAnchor=cells.get(id).position.clone();
@@ -367,7 +445,7 @@ function goBackLevel() {
   if(selected)goOverview();
 }
 function goOverview() {
-  selected=null;selectedBranch=null;navigationStack=[];currentNode=null;currentAnchor=null;clearResources();nav?.replaceChildren();nav.hidden=true;panel.hidden=true;panel.replaceChildren();
+  selected=null;selectedBranch=null;navigationStack=[];currentNode=null;currentAnchor=null;clearResources();nav?.replaceChildren();nav.hidden=true;if(branchDock){branchDock.replaceChildren();branchDock.hidden=true}panel.hidden=true;panel.replaceChildren();
   const mini=document.getElementById('miniView');if(mini){mini.hidden=true;mini.classList.remove('spatial-source-only')}
   const homeButton=document.getElementById('homeBtn');if(homeButton)homeButton.hidden=true;
   smoothCamera(new THREE.Vector3(0,0,0),13.5,850,()=>{status.textContent='BALABS / LIVING NETWORK'});
@@ -391,6 +469,7 @@ function setupUI() {
   intro.addEventListener('click',()=>{opened=true;intro.hidden=true;nav.hidden=false;ROOT.classList.remove('universe-closed');ROOT.classList.add('universe-open');status.textContent='BALABS / LIVING NETWORK'});
   controls.addEventListener('click',e=>{const action=e.target.closest('button')?.dataset.camera;if(action==='back'){goBackLevel();return}if(action==='in')zoomTargetDistance=Math.max(1.25,zoomTargetDistance*.72);if(action==='out')zoomTargetDistance=Math.min(60,zoomTargetDistance*1.28);if(action==='reset'){goOverview();return}cameraPosition()});
   stage.append(hint,status,controls,nav,panel,intro);ROOT.append(stage);
+  branchDock=document.createElement('nav');branchDock.className='webgl-branch-dock';branchDock.setAttribute('aria-label','Branches et sous-branches');branchDock.hidden=true;ROOT.append(branchDock);
   document.getElementById('homeBtn')?.addEventListener('click',()=>{if(selected)goOverview()});
   stage.setAttribute('aria-keyshortcuts','ArrowUp ArrowDown ArrowLeft ArrowRight + - Escape Backspace Home');
   stage.addEventListener('keydown',e=>{
@@ -420,7 +499,7 @@ function setupUI() {
   // Direct stage touch fallback for mobile browsers that omit pointer events.
   let touchFallback=null;
   const rememberTouch=e=>{if(e.touches.length===1){const p=e.touches[0];touchFallback={x:p.clientX,y:p.clientY,at:performance.now()}}};
-  const finishTouch=e=>{if(e.target.closest?.('.webgl-hit-target')){touchFallback=null;return}if(!touchFallback)return;const p=e.changedTouches[0],start=touchFallback;touchFallback=null;if(!p||Math.hypot(p.clientX-start.x,p.clientY-start.y)>12)return;if(performance.now()-lastPickAt>120)pickAt(p.clientX,p.clientY)};
+  const finishTouch=e=>{if(e.target.closest?.('.webgl-hit-target,.webgl-branch-dock')){touchFallback=null;return}if(!touchFallback)return;const p=e.changedTouches[0],start=touchFallback;touchFallback=null;if(!p||Math.hypot(p.clientX-start.x,p.clientY-start.y)>12)return;if(performance.now()-lastPickAt>120)pickAt(p.clientX,p.clientY)};
   // Spatial pointer selection is handled exclusively by the WebGL canvas ray-pick.
   stage.addEventListener('touchstart',rememberTouch,{passive:true});
   stage.addEventListener('touchend',finishTouch,{passive:true});
@@ -431,24 +510,36 @@ function setupUI() {
   // so resolve that pointer-up at document capture using the same projected
   // screen coordinates as canvas picking.
   document.addEventListener('pointerup',e=>{if(e.pointerType!=='touch'||stage.contains(e.target)||!e.target.closest?.('.webgl-hit-target'))return;if(transition||performance.now()-lastPickAt<=120)return;pickAt(e.clientX,e.clientY)},true);
-  document.addEventListener('click',e=>{if(!e.detail||dragGesture||!renderer)return;if(e.target.closest?.('.webgl-controls,.webgl-focus,.webgl-intro,.webgl-hit-target'))return;const r=renderer.domElement.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)return;if(performance.now()-lastPickAt>120)pickAt(e.clientX,e.clientY)},true);
+  document.addEventListener('click',e=>{if(performance.now()-lastBranchTouchActivationAt<800){e.preventDefault();e.stopImmediatePropagation();return;}if(!e.detail||dragGesture||!renderer)return;if(e.target.closest?.('.webgl-controls,.webgl-focus,.webgl-intro,.webgl-hit-target,.webgl-branch-dock'))return;const r=renderer.domElement.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)return;if(performance.now()-lastPickAt>120)pickAt(e.clientX,e.clientY)},true);
   stage.addEventListener('lostpointercapture',onLostCapture);
   stage.addEventListener('contextmenu',e=>e.preventDefault());
   window.addEventListener('resize',resize);
 }
 function onPointerDown(e) {
-  // Let real DOM branch/domain controls receive their native click. Pointer capture
-  // on the stage retargets pointerup and can suppress the button's click entirely.
-  if(e.target.closest('.webgl-hit-target,.webgl-controls,.webgl-focus,.webgl-intro'))return;
-  // Keep keyboard navigation immediately available after mouse, pen or touch.
+  if(e.target.closest('.webgl-controls,.webgl-focus,.webgl-intro,.webgl-hit-target,.webgl-branch-dock'))return;
   stage?.focus({preventScroll:true});
-  pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});stage.setPointerCapture?.(e.pointerId);
-  if(pointers.size===2){const p=[...pointers.values()];pinchStart=Math.hypot(p[0].x-p[1].x,p[0].y-p[1].y);dragging=true;moved=true;return}
+  pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
+  stage.setPointerCapture?.(e.pointerId);
+  if(pointers.size>=2){
+    const p=[...pointers.values()];
+    pinchStart=Math.hypot(p[0].x-p[1].x,p[0].y-p[1].y);
+    pinchCenter={x:p.reduce((sum,v)=>sum+v.x,0)/p.length,y:p.reduce((sum,v)=>sum+v.y,0)/p.length};
+    dragging=true;moved=true;dragGesture=true;lastPointer=null;return;
+  }
   dragging=true;moved=false;dragGesture=false;lastPointer={x:e.clientX,y:e.clientY};
 }
 function onPointerMove(e) {
   if(pointers.has(e.pointerId))pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
-  if(pointers.size>=2){const p=[...pointers.values()],d=Math.hypot(p[0].x-p[1].x,p[0].y-p[1].y);if(pinchStart)zoomTargetDistance=THREE.MathUtils.clamp(zoomTargetDistance*Math.exp((pinchStart-d)*.006),1.25,60);pinchStart=d;moved=true;return}
+  if(pointers.size>=2){
+    const p=[...pointers.values()],d=Math.hypot(p[0].x-p[1].x,p[0].y-p[1].y);
+    const center={x:p.reduce((sum,v)=>sum+v.x,0)/p.length,y:p.reduce((sum,v)=>sum+v.y,0)/p.length};
+    if(pinchCenter){
+      const dx=center.x-pinchCenter.x,dy=center.y-pinchCenter.y;
+      if(Math.hypot(dx,dy)>0)panCameraByPixels(dx,dy);
+    }
+    if(pinchStart)zoomTargetDistance=THREE.MathUtils.clamp(zoomTargetDistance*Math.exp((pinchStart-d)*.006),1.25,60);
+    pinchStart=d;pinchCenter=center;moved=true;dragGesture=true;return;
+  }
   if(!dragging||!lastPointer)return;
   const dx=e.clientX-lastPointer.x,dy=e.clientY-lastPointer.y;
   if(Math.hypot(dx,dy)>7){moved=true;dragGesture=true}
@@ -457,14 +548,17 @@ function onPointerMove(e) {
 }
 function onPointerUp(e) {
   const wasPointer=pointers.has(e.pointerId);pointers.delete(e.pointerId);
-  if(pointers.size<2)pinchStart=0;
+  if(pointers.size<2){pinchStart=0;pinchCenter=null}
   if(!wasPointer)return;
-  if(pointers.size){moved=true;return}
+  if(pointers.size){
+    moved=true;dragging=true;
+    const remaining=[...pointers.values()][0];lastPointer={x:remaining.x,y:remaining.y};
+    return;
+  }
   dragging=false;
   if(!moved&&!transition&&performance.now()-lastPickAt>120&&!e.target.closest('.webgl-controls,.webgl-focus,.webgl-intro'))pickAt(e.clientX,e.clientY);
   lastPointer=null;
-}
-function onPointerCancel(){pointers.clear();dragging=false;moved=true;pinchStart=0;lastPointer=null}
+}function onPointerCancel(){pointers.clear();dragging=false;moved=true;pinchStart=0;pinchCenter=null;lastPointer=null}
 function onLostCapture(e){if(pointers.has(e.pointerId)){pointers.delete(e.pointerId);if(!pointers.size){dragging=false;lastPointer=null}}}
 function pickAt(x,y) {
   lastPickAt=performance.now();
@@ -557,7 +651,7 @@ async function init() {
       const center={x:rect.left+rect.width/2,y:rect.top+rect.height/2};
       const targetBranch=branches.sort((a,b)=>Number(b.hasChildren)-Number(a.hasChildren)||Math.hypot(a.x-center.x,a.y-center.y)-Math.hypot(b.x-center.x,b.y-center.y))[0]||null;
       const domain=cells.get('bio'),domainTarget=domain?project(domain.hit):null;
-      return{count:resourceObjects.filter(o=>o.userData?.kind==='resource-label').length,visible:branches.length,nestedAvailable:resourceObjects.some(o=>o.userData?.kind==='resource'&&o.userData.depth===0&&o.userData.children?.length),visibleDepths:[...new Set(resourceObjects.filter(o=>o.userData?.kind==='resource').map(o=>o.userData.depth??0))].sort(),target:targetBranch,domainTarget:domainTarget&&inside(domainTarget)?domainTarget:null,lastPick:window.__BALABS_3D_LAST_PICK__||null,lastOpen:window.__BALABS_3D_LAST_OPEN__||null,miniHidden:!!document.getElementById('miniView')?.hidden,transitioning:!!transition,selected,currentTitle:currentNode?.title||null,depth:navigationStack.length,childCount:currentNode?.children?.length||0,clickCount:window.__BALABS_3D_E2E_CLICKS||0,cameraDistance:distance,pointerDowns:window.__BALABS_3D_POINTERDOWN||0,pointerUps:window.__BALABS_3D_POINTERUP||0,pickCalls:window.__BALABS_3D_PICK_CALLS||0};
+      return{count:resourceObjects.filter(o=>o.userData?.kind==='resource-label').length,visible:branches.length,nestedAvailable:resourceObjects.some(o=>o.userData?.kind==='resource'&&o.userData.depth===0&&o.userData.children?.length),visibleDepths:[...new Set(resourceObjects.filter(o=>o.userData?.kind==='resource').map(o=>o.userData.depth??0))].sort(),target:targetBranch,domainTarget:domainTarget&&inside(domainTarget)?domainTarget:null,lastPick:window.__BALABS_3D_LAST_PICK__||null,lastOpen:window.__BALABS_3D_LAST_OPEN__||null,lastOpenError:window.__BALABS_3D_LAST_OPEN_ERROR__||null,navTrace:window.__BALABS_3D_NAV_TRACE__||null,miniHidden:!!document.getElementById('miniView')?.hidden,transitioning:!!transition,selected,currentTitle:currentNode?.title||null,depth:navigationStack.length,childCount:currentNode?.children?.length||0,clickCount:window.__BALABS_3D_E2E_CLICKS||0,cameraDistance:distance,cameraTarget:{x:target.x,y:target.y,z:target.z},pointerDowns:window.__BALABS_3D_POINTERDOWN||0,pointerUps:window.__BALABS_3D_POINTERUP||0,pickCalls:window.__BALABS_3D_PICK_CALLS||0};
     };
     animate();
   } catch(error){showFailure(error)}
