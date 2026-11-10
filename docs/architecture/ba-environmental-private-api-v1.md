@@ -62,3 +62,25 @@ If later satellite processing or multi-location jobs exceed the synchronous requ
 - Enforce request-body size, concurrency and timeout limits at ingress.
 - Log correlation IDs, duration and error class; do not log the internal key or raw observation payloads.
 - Keep persistence, authorization, scheduling and provider network access outside the scientific calculation package.
+
+
+## Supabase Edge Function gateway
+
+The environmental-analysis Edge Function is the authenticated CultureOps entry point:
+
+- The caller supplies only location_id, start_date and end_date.
+- The function validates the Supabase JWT with auth.getUser().
+- A user-scoped RLS query confirms that the caller can read the selected location.
+- A second user-scoped membership query confirms active organization membership; viewer membership is sufficient because analysis is read-only.
+- Coordinates and metadata.altitude_m are read from the authorized location record. Missing altitude is a hard validation error; the gateway does not invent elevation.
+- Only then does the function use the server-side Supabase secret to read persisted NASA POWER observations for that exact organization, location and date range.
+- The gateway calls POST /v1/analyses/nasa-power with the private engine key and returns the BAL-JSON analysis.
+
+Required Edge Function secrets:
+
+- BA_ENVIRONMENTAL_ENGINE_URL: private or otherwise access-controlled base URL of the FastAPI service.
+- BA_ENVIRONMENTAL_ENGINE_API_KEY: same secret configured as BA_ENVIRONMENTAL_ENGINE_API_KEY in the engine runtime.
+
+The Edge Function also requires the standard Supabase URL, publishable/anon key and server-side secret key. Do not place the engine key in frontend environment variables. Keep the FastAPI ingress restricted to the Edge Function's service network where possible; the shared key is defense in depth, not a replacement for network isolation.
+
+The gateway is read-only and does not persist analyses. Its first version supports the persisted NASA POWER daily dataset only. Sentinel-2 remains a separate catalogue/remote-sensing pipeline and is not mixed into FAO-56 climate calculations.
