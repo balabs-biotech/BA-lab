@@ -286,6 +286,7 @@ const experimentPanel=template.slice(template.indexOf('id="experimentRegistryCar
 if(!experimentPanel.includes('id="experimentSetupForm"')||!experimentPanel.includes('id="experimentUnitRows"')||!experimentPanel.includes('id="addExperimentUnitButton"'))throw new Error("Experimental registry setup form is missing");
 if(!engine.includes('async function createExperimentWithUnits')||!engine.includes('rpc("create_experiment_with_units"'))throw new Error("Experiment setup is not persisted through the atomic RPC");
 if(!engine.includes('p_occurred_at: occurredAt')||!engine.includes('p_idempotency_key: idempotencyKey'))throw new Error("Experiment setup RPC is missing explicit timestamp or idempotency key");
+if(!engine.includes("pendingExperimentOccurredAt || (pendingExperimentOccurredAt = new Date().toISOString())")||!engine.includes("pendingExperimentOccurredAt = null"))throw new Error("Experiment retries do not preserve the original timestamp for idempotency");
 if(!engine.includes('from("experimental_units")')||!engine.includes('unit_code,replicate_no,treatment_code'))throw new Error("Experimental unit registry read model is missing");
 if(!engine.includes('isCurrentWorkspaceRevision(revision, orgId)'))throw new Error("Experiment registry does not guard tenant/session transitions");
 if(!template.includes('id="experimentRegistryList"')||!template.includes('id="experimentRegistryStatus"'))throw new Error("Experiment registry list/status region is missing");
