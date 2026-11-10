@@ -6,6 +6,7 @@ biological identity, stage, substrate, or recommendations from sensor data.
 
 from datetime import date
 from enum import Enum
+from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
@@ -34,11 +35,11 @@ class BiologicalContext(BaseModel):
 
     model_config = ConfigDict(extra="forbid", frozen=True)
 
-    context_id: str
-    subject_id: str
-    organization_id: str
-    location_id: str
-    environment_context_id: str
+    context_id: UUID
+    subject_id: UUID
+    organization_id: UUID
+    location_id: UUID
+    environment_context_id: UUID
     domain: BiologicalDomain
     organism_kind: OrganismKind
     taxon_code: str | None = Field(default=None, min_length=1, max_length=120)
@@ -50,19 +51,6 @@ class BiologicalContext(BaseModel):
     context_tags: frozenset[str] = frozenset()
     valid_from: date
     valid_to: date | None = None
-
-    @field_validator(
-        "context_id",
-        "subject_id",
-        "organization_id",
-        "location_id",
-        "environment_context_id",
-    )
-    @classmethod
-    def identifiers_are_nonempty(cls, value: str) -> str:
-        if not value.strip():
-            raise ValueError("identifiers must not be empty")
-        return value
 
     @field_validator("context_tags")
     @classmethod
@@ -104,7 +92,7 @@ def validate_biological_context_for_analysis(
     if (
         biological_context.organization_id != environment_context.organization_id
         or biological_context.location_id != environment_context.location_id
-        or biological_context.environment_context_id != str(environment_context.context_id)
+        or biological_context.environment_context_id != environment_context.context_id
     ):
         raise ValueError("biological and environmental context organization and location binding must match")
     if (
