@@ -12,7 +12,7 @@ The engine foundation provides:
 - BAL-JSON v1 schema validation;
 - explicit climate-variable unit normalization with original-unit provenance;
 - variable-specific plausibility screening that flags suspect values without modifying them;
-- trailing robust temporal anomaly screening with calendar-window coverage, explicit insufficient-history and zero-MAD states;
+- trailing robust temporal anomaly screening with calendar-window coverage, explicit insufficient-history and zero-MAD states; the execution service now serializes its results as provenance-checked BAL-JSON findings by variable;
 - seasonal historical reference screening that compares only with prior years;
 - a traceable air vapor-pressure deficit (VPD) calculation from temperature and relative humidity;
 - FAO-56 daily net radiation (Ra, Rso, Rns, Rnl, Rn) with solar-geometry and cloudiness diagnostics;
