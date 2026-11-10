@@ -7,6 +7,7 @@ insufficient data, insufficient coverage, or normal availability.
 from __future__ import annotations
 
 from datetime import date
+from zoneinfo import ZoneInfo
 from uuid import UUID, uuid5
 
 from ba_environmental_engine.contexts.biological import BiologicalContext
@@ -17,6 +18,7 @@ from ba_environmental_engine.interpretation.models import (
     DomainSignal,
 )
 from ba_environmental_engine.sources.sensor_analysis import SensorAnalysis
+from ba_environmental_engine.sources.sensor_temporal import SensorTemporalAssessment
 
 _SENSOR_SIGNAL_NAMESPACE = UUID("f31c5e16-7d4d-4d1d-bf43-ff76d9eebd5a")
 
@@ -41,6 +43,9 @@ def interpret_sensor_analysis(
     biological_context_id: UUID | None = None,
     biological_subject_id: UUID | None = None,
     environment_context_id: UUID | None = None,
+    temporal_assessments: tuple[SensorTemporalAssessment, ...] = (),
+    profile_timezone: str = "UTC",
+    temporal_parameters: dict[str, int | float] | None = None,
 ) -> DomainInterpretation:
     """Apply explicit domain rules to quality-aware sensor series summaries.
 
@@ -100,6 +105,69 @@ def interpret_sensor_analysis(
             )
             matched.add((source_finding_id, rule.rule_id))
 
+    # Temporal deviations are statistical findings, not biological diagnoses.
+    # A signal is emitted only when the persisted domain profile explicitly
+    # routes the assessment status for this variable and biological context.
+    zone = ZoneInfo(profile_timezone)
+    parameters = temporal_parameters or {}
+    for assessment in temporal_assessments:
+        for rule in profile.rules:
+            if rule.variable_code != assessment.variable_code:
+                continue
+            if rule.finding_status != assessment.status:
+                continue
+            if not rule.required_context_tags.issubset(context_tags):
+                continue
+
+            source_finding_id = uuid5(
+                _SENSOR_SIGNAL_NAMESPACE,
+                f"{source_analysis_id}:temporal:{assessment.observation_id}:"
+                f"{assessment.variable_code}:{assessment.status}",
+            )
+            signal_id = uuid5(
+                _SENSOR_SIGNAL_NAMESPACE,
+                f"{source_finding_id}:{profile.profile_id}:{profile.version}:"
+                f"{rule.rule_id}:{biological_context_id or 'none'}",
+            )
+            evidence = {
+                "assessment_type": "causal_robust_temporal_screen",
+                "sensor_id": str(assessment.sensor_id),
+                "observed_at": assessment.observed_at.isoformat(),
+                "flags": list(assessment.flags),
+                "baseline_median": assessment.baseline_median,
+                "baseline_mad": assessment.baseline_mad,
+                "robust_z_score": assessment.robust_z_score,
+                "history_count": assessment.history_count,
+                **parameters,
+            }
+            signals.append(
+                DomainSignal(
+                    signal_id=signal_id,
+                    profile_id=profile.profile_id,
+                    profile_version=profile.version,
+                    module=profile.module,
+                    rule_id=rule.rule_id,
+                    signal_code=rule.signal_code,
+                    severity=rule.severity,
+                    message_code=rule.message_code,
+                    recommendation_code=rule.recommendation_code,
+                    source_analysis_id=source_analysis_id,
+                    source_finding_id=source_finding_id,
+                    biological_context_id=biological_context_id,
+                    biological_subject_id=biological_subject_id,
+                    environment_context_id=environment_context_id,
+                    source_observation_ids=(assessment.observation_id,),
+                    variable_code=assessment.variable_code,
+                    observed_date=assessment.observed_at.astimezone(zone).date(),
+                    observed_value=assessment.observed_value,
+                    unit=assessment.unit_code,
+                    finding_status=assessment.status,
+                    context_tags=context_tags,
+                    evidence=evidence,
+                )
+            )
+            matched.add((source_finding_id, rule.rule_id))
+
     return DomainInterpretation(
         profile_id=profile.profile_id,
         profile_version=profile.version,
@@ -120,6 +188,8 @@ def interpret_sensor_analysis_for_biological_context(
     source_analysis_id: UUID,
     from_date: date,
     to_date: date,
+    temporal_assessments: tuple[SensorTemporalAssessment, ...] = (),
+    temporal_parameters: dict[str, int | float] | None = None,
 ) -> DomainInterpretation:
     """Validate persisted biological/environment bindings before sensor interpretation."""
     if profile.module != biological_context.domain.value:
@@ -143,6 +213,15 @@ def interpret_sensor_analysis_for_biological_context(
     analyzed_sensor_ids = {series.sensor_id for series in analysis.series}
     if not analyzed_sensor_ids.issubset(configured_sensor_ids):
         raise ValueError("sensor analysis contains a device outside the resolved environment profile")
+    assessment_sensor_ids = {item.sensor_id for item in temporal_assessments}
+    if not assessment_sensor_ids.issubset(configured_sensor_ids):
+        raise ValueError("temporal assessment contains a device outside the resolved environment profile")
+    profile_zone = ZoneInfo(environment_context.timezone)
+    if any(
+        not from_date <= item.observed_at.astimezone(profile_zone).date() <= to_date
+        for item in temporal_assessments
+    ):
+        raise ValueError("temporal assessment falls outside the biological context date scope")
 
     context_tags = set(biological_context.context_tags)
     context_tags.add(f"stage:{biological_context.culture_stage}")
@@ -166,4 +245,7 @@ def interpret_sensor_analysis_for_biological_context(
         biological_context_id=biological_context.context_id,
         biological_subject_id=biological_context.subject_id,
         environment_context_id=environment_context.context_id,
+        temporal_assessments=temporal_assessments,
+        profile_timezone=environment_context.timezone,
+        temporal_parameters=temporal_parameters,
     )
