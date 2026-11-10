@@ -44,7 +44,7 @@ let world, cells = new Map(), pickables = [], resourceObjects = [], edges = [], 
 let resourceHitTargets = new Map(), domainHitTargets = new Map();
 let nav, branchDock, currentNode = null, currentAnchor = null, navigationStack = [];
 let selected = null, selectedBranch = null, manifest = null, transition = null;
-let distance = 13.5, zoomTargetDistance = 13.5, theta = .22, phi = 1.27, target = null, targetGoal = null;
+let distance = 17.5, zoomTargetDistance = 17.5, theta = .22, phi = 1.27, target = null, targetGoal = null;
 let opened = false, raf = 0, lastFrame = 0, dragging = false, moved = false, dragGesture = false;
 let lastPointer = null, pointers = new Map(), pinchStart = 0, pinchDistance = 0, pinchCenter = null, hoverId = null , lastBranchTouchActivationAt = 0;
 let canvasRect = null, cameraInitialized = false, lastPickAt = 0;
@@ -151,7 +151,7 @@ function createWorld() {
   const fieldPalette=[0x43c5df,0x42b9aa,0x83d6a1,0x719fe0,0xb96b4d];
   for(let i=0;i<58;i++){const start=new THREE.Vector3(-5+fieldRand()*10,-4+fieldRand()*8,-3.5+fieldRand()*7),end=start.clone().add(new THREE.Vector3((fieldRand()-.5)*3.2,(fieldRand()-.5)*2.8,(fieldRand()-.5)*1.8)),mid=start.clone().lerp(end,.5).add(new THREE.Vector3((fieldRand()-.5)*.8,(fieldRand()-.5)*.8,(fieldRand()-.5)*.5)),curve=new THREE.CatmullRomCurve3([start,mid,end]),color=fieldPalette[Math.floor(fieldRand()*fieldPalette.length)];world.add(new THREE.Mesh(new THREE.TubeGeometry(curve,18,.0018+fieldRand()*.002,3,false),new THREE.MeshBasicMaterial({color,transparent:true,opacity:.10+fieldRand()*.14,depthWrite:false})));if(i%2===0){const at=curve.getPoint(.48),tip=at.clone().add(new THREE.Vector3((fieldRand()-.5)*1.5,(fieldRand()-.5)*1.5,(fieldRand()-.5)*.8)),fork=new THREE.CatmullRomCurve3([at,at.clone().lerp(tip,.5).add(new THREE.Vector3(0,.05,.03)),tip]);world.add(new THREE.Mesh(new THREE.TubeGeometry(fork,12,.0016,3,false),new THREE.MeshBasicMaterial({color,transparent:true,opacity:.12,depthWrite:false})))}}
   for(const id of IDS){
-    const color=COLORS[id],pos=new THREE.Vector3(...POS[id]);
+    const color=COLORS[id],pos=new THREE.Vector3(...POS[id]).multiplyScalar(1.38);
     const group=new THREE.Group();group.position.copy(pos);group.userData={id,kind:'domain'};
     // The colony centre is an open hyphal junction, never a solid cell/planet.
     const soma=new THREE.Group();soma.userData={id,kind:'domain'};group.add(soma);
@@ -248,13 +248,13 @@ function clearResources() {
 function mDispose(material){material?.map?.dispose();material?.dispose?.()}
 function visibleResourceLabelDepth() {
  // Hysteresis prevents labels flickering when pinch/scroll settles on a zoom boundary.
- const thresholds=[5.5,4.8,4.2],margin=.14;
+ const thresholds=[5.9,5.1,4.5],margin=.14;
  while(activeResourceLabelDepth<3&&distance<=thresholds[activeResourceLabelDepth]-margin)activeResourceLabelDepth++;
  while(activeResourceLabelDepth>0&&distance>thresholds[activeResourceLabelDepth-1]+margin)activeResourceLabelDepth--;
  return activeResourceLabelDepth;
 }
 function makeResourceLabel(item,color,depth=0) {
- const size=depth===0?18:depth===1?16:14,label=makeLabel(item.title,color,size);label.material.opacity=0;
+ const size=depth===0?20:depth===1?18:16,label=makeLabel(item.title,color,size);label.material.opacity=0;
  const scale=depth===0?3.35:depth===1?2.9:2.5;
  label.scale.set(scale,depth===0?.86:depth===1?.76:.68,1);
  label.userData={...item,kind:'resource-label'};label.visible=depth===visibleResourceLabelDepth();addResourceHitTarget(label);return label;
@@ -268,7 +268,7 @@ function addResourceHitTarget(label) {
  element.textContent=data.title||data.name||'Ouvrir';
  const compact=window.innerWidth<760;
  const width=Math.min(compact?210:280,Math.max(compact?128:150,String(element.textContent).length*(compact?7.4:8.5)+32));
- Object.assign(element.style,{display:'block',opacity:'1',visibility:'visible',color:'#f4f5ed',background:'transparent',border:'0',borderRadius:'0',boxShadow:'none',textDecoration:'none',font:'700 '+(compact?'14px':'16px')+'/1.2 system-ui,sans-serif',textAlign:'center',whiteSpace:'normal',overflow:'visible',textOverflow:'clip',textShadow:'0 1px 3px #07110f,0 2px 8px #07110f,1px 0 3px #07110f,-1px 0 3px #07110f',padding:'3px 5px',width:width+'px',height:'auto',minHeight:'44px',maxHeight:'68px',minWidth:compact?'112px':'130px',maxWidth:compact?'210px':'280px',pointerEvents:'auto',touchAction:'manipulation',transform:'translate(-50%,-50%)',cursor:'pointer'});
+ Object.assign(element.style,{display:'block',opacity:'1',visibility:'visible',color:'#f4f5ed',background:'transparent',border:'0',borderRadius:'0',boxShadow:'none',textDecoration:'none',font:'700 '+(compact?'15px':'17px')+'/1.2 system-ui,sans-serif',textAlign:'center',whiteSpace:'normal',overflow:'visible',textOverflow:'clip',textShadow:'0 1px 3px #07110f,0 2px 8px #07110f,1px 0 3px #07110f,-1px 0 3px #07110f',padding:'3px 5px',width:width+'px',height:'auto',minHeight:'44px',maxHeight:'68px',minWidth:compact?'112px':'130px',maxWidth:compact?'210px':'280px',pointerEvents:'auto',touchAction:'manipulation',transform:'translate(-50%,-50%)',cursor:'pointer'});
  element.setAttribute('aria-label',(data.title||data.name||'Branche')+(hasChildren?' — ouvrir le dossier':' — ouvrir la page'));
  element.title=data.title||data.name||'';
  element.dataset.hasChildren=String(hasChildren);element.dataset.depth=String(data.depth||0);element.dataset.resourceUrl=data.url||'';
@@ -297,7 +297,7 @@ function syncResourceHitTargets() {
   .filter(el=>!el.hidden&&getComputedStyle(el).display!=='none')
   .map(el=>{const r=el.getBoundingClientRect();return {l:r.left-stageRect.left,t:r.top-stageRect.top,r:r.right-stageRect.left,b:r.bottom-stageRect.top}});
  const overlaps=(a,b)=>a.l<b.r+8&&a.r>b.l-8&&a.t<b.b+8&&a.b>b.t-8;
- const offsets=[[0,0]];for(let ring=1;ring<=2;ring++){const steps=ring*12;for(let step=0;step<steps;step++){const angle=step/steps*Math.PI*2;offsets.push([Math.cos(angle)*ring,Math.sin(angle)*ring]);}}
+ const offsets=[[0,0]];for(let ring=1;ring<=3;ring++){const steps=ring*12;for(let step=0;step<steps;step++){const angle=step/steps*Math.PI*2;offsets.push([Math.cos(angle)*ring,Math.sin(angle)*ring]);}}
  for(const item of projected){
   const {button}=item,columns=stageRect.width<380?2:3,slotWidth=stageRect.width/columns;button.style.maxWidth=Math.max(128,slotWidth-12)+'px';button.style.width=Math.min(button.offsetWidth||150,slotWidth-12)+'px';const w=button.offsetWidth||150,h=button.offsetHeight||50;
   const sx=Math.max(w/2+6,Math.min(stageRect.width-w/2-6,item.x)),sy=Math.max(h/2+6,Math.min(stageRect.height-h/2-6,item.y));
@@ -361,7 +361,7 @@ function buildResources(id,parentNode=null,anchor=null) {
  const drawNode=(item,pos,depth,parent,angle,index)=>{const has=!!item.children?.length,color=baseColor.clone().lerp(accent,Math.min(.34,depth*.12+(index%3)*.025)),radius=depth===0?(has?.135:.105):depth===1?(has?.085:.065):.043;item.position=pos.clone();item.parentNode=parent;const displayTitle=[item.title,item.name,item.label,item.id].map(value=>String(value??'').trim()).find(Boolean)||('Branche '+(index+1));const data={kind:'resource',...item,title:displayTitle,sourceItem:item,sourceId:id,position:pos.clone(),hasChildren:has,depth,parentNode:parent,denseRoot:depth===0&&children.length>16};const hitRadius=depth===0?.32:depth===1?.25:.19;const hit=new THREE.Mesh(new THREE.SphereGeometry(hitRadius,10,8),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));hit.position.copy(pos);hit.userData=data;world.add(hit);resourceObjects.push(hit);pickables.push(hit);
  // Represent each folder/page as a living hyphal junction: fine branching strands, no bead-like node.
  const junction=new THREE.Group();junction.position.copy(pos);junction.userData=data;world.add(junction);resourceObjects.push(junction);
- for(let arm=0;arm<5;arm++){const a=arm/5*Math.PI*2+depth*.37+index*.19,reach=radius*(2.3+(arm%3)*.55),start=new THREE.Vector3(0,0,0),end=new THREE.Vector3(Math.cos(a)*reach,Math.sin(a)*reach*.82,Math.sin(a*1.7)*reach*.5),mid=start.clone().lerp(end,.56).add(new THREE.Vector3(0,.018,.018));const curveArm=new THREE.CatmullRomCurve3([start,mid,end]);const filamentArm=new THREE.Mesh(new THREE.TubeGeometry(curveArm,10,Math.max(.0025,radius*.055),4,false),new THREE.MeshStandardMaterial({color,emissive:color,emissiveIntensity:.3,transparent:true,opacity:.72,roughness:.78}));junction.add(filamentArm);}const l=makeResourceLabel(data,color,depth);l.position.copy(pos).add(new THREE.Vector3(0,depth===0?-.28:depth===1?-.22:-.16,.025));world.add(l);resourceObjects.push(l);pickables.push(l);const pp=parent===currentNode?currentAnchor:(parent.position||currentAnchor),mid=pp.clone().lerp(pos,.52).add(new THREE.Vector3(0,.12+depth*.035,.12)),curve=filament([pp.clone(),mid,pos.clone()],color,depth===0?.012:depth===1?.007:.004,depth===0?.66:depth===1?.52:.38);if(depth<2)for(let f=0;f<2;f++){const at=curve.getPoint(.46+f*.2),sgn=f===0?-1:1,tip=at.clone().add(new THREE.Vector3(Math.cos(angle+sgn*.8)*(.24-depth*.045),Math.sin(angle+sgn*.8)*(.2-depth*.04),.045));filament([at,at.clone().lerp(tip,.55).add(new THREE.Vector3(0,.045,.025)),tip],color,.0035-depth*.0006,.28)}if(depth>=maxDepth||!has)return;const kids=item.children||[],spread=Math.min(1.2,.32+kids.length*.105);kids.forEach((child,childIndex)=>{const frac=kids.length===1?0:(childIndex/(kids.length-1)-.5),childAngle=angle+frac*spread*2+(childIndex%2?-.08:.08),dist=depth===0?1.3+Math.min(.45,kids.length*.045):Math.max(.95,Math.min(1.5,.8+kids.length*.04)),childPos=pos.clone().add(new THREE.Vector3(Math.cos(childAngle)*dist,Math.sin(childAngle)*dist*.82+((childIndex%3)-1)*.035,.04+(childIndex%2)*.035));drawNode(child,childPos,depth+1,item,childAngle,childIndex)});
+ for(let arm=0;arm<5;arm++){const a=arm/5*Math.PI*2+depth*.37+index*.19,reach=radius*(2.3+(arm%3)*.55),start=new THREE.Vector3(0,0,0),end=new THREE.Vector3(Math.cos(a)*reach,Math.sin(a)*reach*.82,Math.sin(a*1.7)*reach*.5),mid=start.clone().lerp(end,.56).add(new THREE.Vector3(0,.018,.018));const curveArm=new THREE.CatmullRomCurve3([start,mid,end]);const filamentArm=new THREE.Mesh(new THREE.TubeGeometry(curveArm,10,Math.max(.0025,radius*.055),4,false),new THREE.MeshStandardMaterial({color,emissive:color,emissiveIntensity:.3,transparent:true,opacity:.72,roughness:.78}));junction.add(filamentArm);}const l=makeResourceLabel(data,color,depth);l.position.copy(pos).add(new THREE.Vector3(0,depth===0?-.28:depth===1?-.22:-.16,.025));world.add(l);resourceObjects.push(l);pickables.push(l);const pp=parent===currentNode?currentAnchor:(parent.position||currentAnchor),mid=pp.clone().lerp(pos,.52).add(new THREE.Vector3(0,.12+depth*.035,.12)),curve=filament([pp.clone(),mid,pos.clone()],color,depth===0?.012:depth===1?.007:.004,depth===0?.66:depth===1?.52:.38);if(depth<2)for(let f=0;f<2;f++){const at=curve.getPoint(.46+f*.2),sgn=f===0?-1:1,tip=at.clone().add(new THREE.Vector3(Math.cos(angle+sgn*.8)*(.24-depth*.045),Math.sin(angle+sgn*.8)*(.2-depth*.04),.045));filament([at,at.clone().lerp(tip,.55).add(new THREE.Vector3(0,.045,.025)),tip],color,.0035-depth*.0006,.28)}if(depth>=maxDepth||!has)return;const kids=item.children||[],spread=Math.min(1.2,.32+kids.length*.105);kids.forEach((child,childIndex)=>{const frac=kids.length===1?0:(childIndex/(kids.length-1)-.5),childAngle=angle+frac*spread*2+(childIndex%2?-.08:.08),dist=depth===0?1.65+Math.min(.55,kids.length*.055):Math.max(1.3,Math.min(1.9,1.15+kids.length*.055)),childPos=pos.clone().add(new THREE.Vector3(Math.cos(childAngle)*dist,Math.sin(childAngle)*dist*.82+((childIndex%3)-1)*.035,.04+(childIndex%2)*.035));drawNode(child,childPos,depth+1,item,childAngle,childIndex)});
  // Anastomoses: sibling branches reconnect into a mesh instead of ending as a radial tree.
  if(kids.length>1){
    const bridgeColor=color.clone().lerp(accent,.22);
@@ -416,7 +416,7 @@ function goOverview() {
   selected=null;selectedBranch=null;navigationStack=[];currentNode=null;currentAnchor=null;if(status)status.hidden=false;clearResources();nav?.replaceChildren();nav.hidden=true;if(branchDock){branchDock.replaceChildren();branchDock.hidden=true}panel.hidden=true;panel.replaceChildren();
   const mini=document.getElementById('miniView');if(mini){mini.hidden=true;mini.classList.remove('spatial-source-only')}
   const homeButton=document.getElementById('homeBtn');if(homeButton)homeButton.hidden=true;
-  smoothCamera(new THREE.Vector3(0,0,0),13.5,850,()=>{status.textContent='BALABS / LIVING NETWORK'});
+  smoothCamera(new THREE.Vector3(0,0,0),17.5,850,()=>{status.textContent='BALABS / LIVING NETWORK'});
 }
 function showFailure(error) {
   console.error('BA Labs clean 3D engine failed',error);
