@@ -187,11 +187,18 @@ def build_bal_analysis(
             raise ValueError("daily calculation variable lineage does not match source rows")
         used_variables.update(result.source_variable_codes)
 
-        coverage = IndicatorCoverage(
-            expected=len(_DAILY_INPUTS),
-            observed=len(result.source_variable_codes),
-            ratio=len(result.source_variable_codes) / len(_DAILY_INPUTS),
-        )
+        def build_coverage(input_definitions: tuple[tuple[str, str], ...]) -> IndicatorCoverage:
+            expected = len(input_definitions)
+            observed = sum(1 for variable, _unit in input_definitions if variable in selected_by_variable)
+            return IndicatorCoverage(
+                expected=expected,
+                observed=observed,
+                ratio=observed / expected,
+            )
+
+        net_radiation_coverage = build_coverage(_NET_RADIATION_INPUTS)
+        et0_coverage = build_coverage(_DAILY_INPUTS)
+
         def build_inputs(input_definitions: tuple[tuple[str, str], ...]) -> list[IndicatorInput]:
             return [
                 IndicatorInput(
@@ -217,8 +224,17 @@ def build_bal_analysis(
         ]
         net_radiation_inputs = build_inputs(_NET_RADIATION_INPUTS)
         et0_inputs = build_inputs(_DAILY_INPUTS)
-        net_radiation_quality = _indicator_quality(net_radiation_rows, result.diagnostics)
-        et0_quality = _indicator_quality(et0_rows, result.diagnostics)
+        # An unavailable formula can have zero usable inputs (for example, a
+        # daily row containing only wind speed). Retain the source's quality
+        # class as context and make the absence of formula inputs explicit.
+        net_radiation_quality = _indicator_quality(
+            net_radiation_rows or result_rows,
+            result.diagnostics + (("NO_AVAILABLE_FORMULA_INPUTS",) if not net_radiation_rows else ()),
+        )
+        et0_quality = _indicator_quality(
+            et0_rows or result_rows,
+            result.diagnostics + (("NO_AVAILABLE_FORMULA_INPUTS",) if not et0_rows else ()),
+        )
         if result.status == "insufficient_data":
             for variable in result.missing_variables:
                 warnings.add(f"INSUFFICIENT_DAILY_INPUT:{result.observed_date.isoformat()}:{variable}")
@@ -243,7 +259,7 @@ def build_bal_analysis(
                            "aggregation": "daily"}
                     ),
                     status=net_status,
-                    coverage=coverage,
+                    coverage=net_radiation_coverage,
                     quality=net_radiation_quality,
                     method=IndicatorMethod(
                         name="fao56_net_radiation",
@@ -261,7 +277,7 @@ def build_bal_analysis(
                            "aggregation": "daily"}
                     ),
                     status=et0_status,
-                    coverage=coverage,
+                    coverage=et0_coverage,
                     quality=et0_quality,
                     method=IndicatorMethod(
                         name="fao56_penman_monteith",
