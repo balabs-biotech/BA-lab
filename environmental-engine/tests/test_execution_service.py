@@ -29,7 +29,11 @@ def observations_for_days(count=1):
             observed_date.year, observed_date.month, observed_date.day, 12,
             tzinfo=timezone.utc,
         )
-        for variable, (value, unit) in VALUES.items():
+        for variable, (base_value, unit) in VALUES.items():
+            value = base_value + offset if variable in (
+                "air_temperature_mean",
+                "air_temperature_max",
+            ) else base_value
             rows.append(
                 NormalizedEnvironmentalObservation(
                     source_observation_id=uuid4(),
@@ -40,7 +44,7 @@ def observations_for_days(count=1):
                     dataset_code="POWER_DAILY_AGRO",
                     source_parameter=variable,
                     variable_code=variable,
-                    value=value + offset if variable == "air_temperature_mean" else value,
+                    value=value,
                     unit=unit,
                     source_value=value,
                     source_unit=unit,
