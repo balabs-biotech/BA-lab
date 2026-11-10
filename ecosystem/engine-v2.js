@@ -547,7 +547,7 @@ function pickAt(x,y) {
   // The active folder owns all taps while inside a universe: never let an
   // overlapping neighbouring universe steal a branch selection.
   const activeDepth=visibleResourceLabelDepth();
-  const labels=resourceObjects.filter(o=>o.userData?.kind==='resource-label'&&o.visible&&(o.userData.depth||0)===activeDepth);
+  const labels=resourceObjects.filter(o=>o.userData?.kind==='resource-label'&&o.visible&&!resourceHitTargets.get(o)?.hidden&&(o.userData.depth||0)===activeDepth);
   let nearestLabel=null,nearestLabelDistance=Infinity;
   for(const label of labels){const p=screenPoint(label);if(p.d<nearestLabelDistance){nearestLabel=label;nearestLabelDistance=p.d}}
   if(nearestLabel&&nearestLabelDistance<(window.innerWidth<760?58:70)){
