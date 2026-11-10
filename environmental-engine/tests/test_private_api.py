@@ -103,3 +103,27 @@ def test_private_api_fails_closed_when_secret_is_not_configured():
         headers={"X-BA-Engine-Key": "anything"},
     )
     assert response.status_code == 503
+
+
+def test_private_analysis_endpoint_rejects_boolean_rolling_window():
+    request = payload()
+    request["rolling_windows"] = [True]
+    client = TestClient(create_app(engine_api_key="test-secret"))
+    response = client.post(
+        "/v1/analyses",
+        json=request,
+        headers={"X-BA-Engine-Key": "test-secret"},
+    )
+    assert response.status_code == 422
+
+
+def test_private_analysis_endpoint_bounds_rolling_window_count():
+    request = payload()
+    request["rolling_windows"] = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+    client = TestClient(create_app(engine_api_key="test-secret"))
+    response = client.post(
+        "/v1/analyses",
+        json=request,
+        headers={"X-BA-Engine-Key": "test-secret"},
+    )
+    assert response.status_code == 422
