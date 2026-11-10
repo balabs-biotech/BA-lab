@@ -139,6 +139,20 @@ def build_bal_analysis(
     if any(not scope_from <= row.observed_date <= scope_to for row in rows):
         raise ValueError("observations must be contained within analysis scope")
 
+    if not daily_results and not rolling_results:
+        raise ValueError("at least one daily or rolling indicator result is required")
+
+    daily_dates = [result.observed_date for result in daily_results]
+    if len(daily_dates) != len(set(daily_dates)):
+        raise ValueError("daily indicator results must contain at most one result per date")
+
+    rolling_keys = [
+        (result.variable_code, result.window_days, result.period_start, result.period_end)
+        for result in rolling_results
+    ]
+    if len(rolling_keys) != len(set(rolling_keys)):
+        raise ValueError("duplicate rolling indicator results are not allowed")
+
     used_variables: set[str] = set()
     output: list[Indicator] = []
     warnings: set[str] = set()
@@ -241,11 +255,29 @@ def build_bal_analysis(
             raise ValueError(f"rolling indicator {result.variable_code} must declare a unit")
         if result.period_start < scope_from or result.period_end > scope_to:
             raise ValueError("rolling indicator period must be contained within analysis scope")
+        if (result.period_end - result.period_start).days + 1 != result.window_days:
+            raise ValueError("rolling indicator period length must equal window_days")
+        coverage = aggregation.coverage
+        if (
+            coverage.start != result.period_start
+            or coverage.end != result.period_end
+            or coverage.expected != result.window_days
+        ):
+            raise ValueError("rolling indicator coverage must match its declared period")
         variable_rows = [
             row for row in rows
             if row.variable_code == result.variable_code
             and result.period_start <= row.observed_date <= result.period_end
         ]
+        observed_dates = {row.observed_date for row in variable_rows}
+        if len(observed_dates) != coverage.observed:
+            raise ValueError(
+                "rolling indicator source observations do not match reported coverage"
+            )
+        if not variable_rows:
+            raise ValueError(
+                "rolling indicator must be supported by source observations in its period"
+            )
         used_variables.add(result.variable_code)
         output.append(
             Indicator(
@@ -261,13 +293,22 @@ def build_bal_analysis(
                 ),
                 status=aggregation.status,
                 coverage=IndicatorCoverage(
-                    expected=aggregation.coverage.expected,
-                    observed=aggregation.coverage.observed,
-                    ratio=aggregation.coverage.ratio,
+                    expected=coverage.expected,
+                    observed=coverage.observed,
+                    ratio=coverage.ratio,
                 ),
                 quality=_indicator_quality(variable_rows),
                 method=IndicatorMethod(name=aggregation.method, version="rolling_daily_v1"),
-                inputs=[IndicatorInput(variable_code=result.variable_code, unit=aggregation.unit)],
+                inputs=[
+                    IndicatorInput(
+                        variable_code=result.variable_code,
+                        unit=aggregation.unit,
+                        source_observation_ids=sorted(
+                            (row.source_observation_id for row in variable_rows),
+                            key=str,
+                        ),
+                    )
+                ],
             )
         )
         if aggregation.status == "insufficient_data":
