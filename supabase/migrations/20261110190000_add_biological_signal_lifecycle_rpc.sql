@@ -34,7 +34,7 @@ as $$
 declare
   v_current_status text;
 begin
-  if p_status not in ('open', 'acknowledged', 'resolved', 'dismissed') then
+  if p_status is null or p_status not in ('open', 'acknowledged', 'resolved', 'dismissed') then
     raise exception 'invalid_biological_signal_status'
       using errcode = '23514';
   end if;
