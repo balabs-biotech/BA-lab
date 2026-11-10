@@ -23,13 +23,25 @@ class BiologicalMeasurement:
     unit_code: str
     measured_at: datetime
     quality_state: str
-    batch_id: str | None = None
+    sample_id: str | None = None
+    experimental_unit_id: str | None = None
+    event_id: str | None = None
+    result_id: str | None = None
+    method: str | None = None
+    instrument: str | None = None
 
     def __post_init__(self) -> None:
-        for field_name in ("source_record_id", "organization_id", "subject_id", "metric_code", "unit_code", "quality_state"):
+        for field_name in (
+            "source_record_id", "organization_id", "subject_id",
+            "metric_code", "unit_code", "quality_state",
+        ):
             if not getattr(self, field_name).strip():
                 raise ValueError(f"{field_name} must not be empty")
-        if isinstance(self.value, bool) or not isinstance(self.value, (int, float)) or not isfinite(self.value):
+        if (
+            isinstance(self.value, bool)
+            or not isinstance(self.value, (int, float))
+            or not isfinite(self.value)
+        ):
             raise ValueError("measurement value must be finite and numeric")
         if self.measured_at.tzinfo is None or self.measured_at.utcoffset() is None:
             raise ValueError("measured_at must include a valid timezone")
@@ -74,7 +86,11 @@ def analyze_growth_rate(
 
     relevant = [
         item for item in measurements
-        if item.organization_id == organization_id and item.subject_id == subject_id and item.metric_code == "growth_extent"
+        if (
+            item.organization_id == organization_id
+            and item.subject_id == subject_id
+            and item.metric_code == "growth_extent"
+        )
     ]
     source_ids = [item.source_record_id for item in relevant]
     if len(source_ids) != len(set(source_ids)):
