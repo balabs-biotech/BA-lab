@@ -136,6 +136,15 @@ async function checkWorkingScene(name, viewport) {
     assert.ok(branchTarget, name + ': no spatial folder/page target was found');
     if (branchTarget.hasChildren) {
       const depthBefore = probe.depth;
+      // The resource labels are projected on the next animation frame after
+      // hierarchy creation. Wait for the screen-space controls to be positioned
+      // before evaluating their real DOM hit targets.
+      await page.waitForFunction(() => [...document.querySelectorAll('.webgl-resource-target:not([hidden])')]
+        .some(item => {
+          const rect = item.getBoundingClientRect();
+          if (rect.width <= 0 || rect.height <= 0 || rect.left < 0 || rect.top < 0) return false;
+          return document.elementFromPoint(rect.left + rect.width / 2, rect.top + rect.height / 2) === item;
+        }), undefined, { timeout: 8000 });
       const branchButtonPoint = await page.evaluate(() => { const buttons=[...document.querySelectorAll('.webgl-resource-target:not([hidden])')].filter(item=>item.dataset.hasChildren==='true'); const button=buttons.find(item=>{const rect=item.getBoundingClientRect();return document.elementFromPoint(rect.left+rect.width/2,rect.top+rect.height/2)===item}); if(!button)return null; const rect=button.getBoundingClientRect(); return {x:rect.left+rect.width/2,y:rect.top+rect.height/2,title:button.title}; });
       assert.ok(
         branchButtonPoint,
