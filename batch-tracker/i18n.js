@@ -698,6 +698,19 @@
     ["Échec de l’enregistrement. Vérifiez le code unique et les références.","Save failed. Check the unique code and references.","Falha ao guardar. Verifique o código único e as referências.","فشل الحفظ. تحقق من الرمز الفريد والمراجع."],
     ["LABORATORY / EXPERIMENTAL LOG","LABORATORY / EXPERIMENTAL LOG","LABORATÓRIO / REGISTO EXPERIMENTAL","المختبر / السجل التجريبي"]
   ];
+    ["Historique du sujet","Subject history","Histórico do sujeito","سجل الموضوع"],
+    ["Historique de l’environnement","Environment history","Histórico do ambiente","سجل البيئة"],
+    ["Historique — ","History — ","Histórico — ","السجل — "],
+    ["Sujet biologique","Biological subject","Sujeito biológico","الموضوع البيولوجي"],
+    ["Environnement","Environment","Ambiente","البيئة"],
+    ["Chargement de l’historique…","Loading history…","A carregar o histórico…","جارٍ تحميل السجل…"],
+    ["Impossible de charger cet historique. Vérifiez les droits d’accès et la connexion.","Could not load this history. Check access rights and your connection.","Não foi possível carregar este histórico. Verifique as permissões e a ligação.","تعذر تحميل هذا السجل. تحقق من صلاحيات الوصول والاتصال."],
+    ["Aucun historique disponible pour ce contexte.","No history is available for this context.","Não existe histórico disponível para este contexto.","لا يتوفر سجل لهذا السياق."],
+    ["50 événements affichés au maximum.","Showing up to 50 events.","A mostrar até 50 eventos.","يتم عرض 50 حدثًا كحد أقصى."],
+    ["événement(s) dans cet historique.","event(s) in this history.","evento(s) neste histórico.","حدث في هذا السجل."],
+    ["Fermer","Close","Fechar","إغلاق"],
+    ["Historique biologique","Biological history","Histórico biológico","السجل البيولوجي"],
+    ["Sélectionnez un sujet ou un environnement.","Select a subject or environment.","Selecione um sujeito ou ambiente.","اختر موضوعًا أو بيئة."]
   for (const [fr, en, pt, ar] of supplementalCoverage) {
     dictionaries.en[fr] ||= en;
     dictionaries.pt[fr] ||= pt;
