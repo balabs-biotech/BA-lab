@@ -207,7 +207,7 @@ def build_bal_analysis(
                     quality=quality,
                     method=IndicatorMethod(
                         name="fao56_net_radiation",
-                        version="fao56_daily_net_radiation_v1",
+                        version=result.net_radiation.formula_profile if result.net_radiation is not None else "fao56_daily_net_radiation_v1",
                     ),
                     inputs=inputs,
                 ),
@@ -225,7 +225,7 @@ def build_bal_analysis(
                     quality=quality,
                     method=IndicatorMethod(
                         name="fao56_penman_monteith",
-                        version="fao56_penman_monteith_daily_v1",
+                        version=result.et0.formula_profile if result.et0 is not None else "fao56_penman_monteith_daily_v1",
                     ),
                     inputs=inputs,
                 ),
