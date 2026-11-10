@@ -100,7 +100,7 @@ class AnalysisRequest(APIModel):
 
 def create_app(engine_api_key: str | None = None) -> FastAPI:
     """Create the private API; inject a key explicitly in tests or use the env."""
-    configured_key = engine_api_key or os.getenv("BA_ENVIRONMENTAL_ENGINE_API_KEY")
+    configured_key = (\n        engine_api_key\n        if engine_api_key is not None\n        else os.getenv("BA_ENVIRONMENTAL_ENGINE_API_KEY")\n    )
     app = FastAPI(
         title="BA Labs Environmental Engine",
         version=__version__,
