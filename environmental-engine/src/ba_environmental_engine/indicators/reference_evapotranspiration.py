@@ -9,7 +9,10 @@ net radiation from solar radiation.
 from dataclasses import dataclass
 from math import isfinite
 
-from ba_environmental_engine.indicators.vapor_pressure import saturation_vapor_pressure_kpa
+from ba_environmental_engine.indicators.vapor_pressure import (
+    actual_vapor_pressure_from_mean_rh,
+    saturation_vapor_pressure_kpa,
+)
 
 
 FORMULA_PROFILE = "fao56_penman_monteith_daily_v1"
@@ -89,13 +92,15 @@ def _actual_vapor_pressure(
     elif dew_point:
         actual = saturation_vapor_pressure_kpa(dew_point_temperature_c)
     elif humidity_mean:
-        rh_mean = _finite_number(
-            "relative_humidity_mean_percent", relative_humidity_mean_percent
+        actual = actual_vapor_pressure_from_mean_rh(
+            temperature_max_c=(
+                (saturation_max_kpa, saturation_min_kpa)
+            )[0],
+            temperature_min_c=(
+                (saturation_max_kpa, saturation_min_kpa)
+            )[1],
+            relative_humidity_mean_percent=relative_humidity_mean_percent,
         )
-        if not 0.0 <= rh_mean <= 100.0:
-            raise ValueError("relative_humidity_mean_percent must be between 0 and 100")
-        saturation_mean = (saturation_min_kpa + saturation_max_kpa) / 2.0
-        actual = saturation_mean * (rh_mean / 100.0)
     else:
         if (
             relative_humidity_min_percent is None
