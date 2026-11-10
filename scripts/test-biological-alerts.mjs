@@ -66,7 +66,7 @@ assert.match(moduleSource, /\.in\("parent_material_id", materialFrontier\)/);
 assert.match(moduleSource, /\.in\("id", ids\)/);
 assert.match(moduleSource, /\.from\("material_relationships"\)/);
 assert.match(moduleSource, /\.in\("material_id", materialIds\)/);
-assert.match(moduleSource, /strain: strains/);
+assert.match(moduleSource, /strain:strains/);
 assert.match(moduleSource, /Généalogie des matériaux/);
 assert.match(moduleSource, /Souche :/);
 assert.match(moduleSource, /Lots matière :/);
