@@ -232,7 +232,8 @@ def test_biological_context_cannot_be_interpreted_by_another_domain_profile():
         context_type=EnvironmentType.FRUITING_CHAMBER,
         label="Chambre Pleurotus",
         timezone="Africa/Algiers",
-        origin=ObservationOrigin.WEATHER_PROVIDER,
+        origin=ObservationOrigin.SENSOR,
+        sensor_ids=[uuid4()],
         profile_code="ba_fruiting_room",
         profile_version="1.0.0",
     )
