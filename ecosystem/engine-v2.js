@@ -254,7 +254,7 @@ function visibleResourceLabelDepth() {
  return 0;
 }
 function makeResourceLabel(item,color,depth=0) {
- const size=depth===0?18:depth===1?16:14,label=makeLabel(item.title,color,size);
+ const size=depth===0?18:depth===1?16:14,label=makeLabel(item.title,color,size);label.material.opacity=0;
  const scale=depth===0?3.35:depth===1?2.9:2.5;
  label.scale.set(scale,depth===0?.86:depth===1?.76:.68,1);
  label.userData={...item,kind:'resource-label'};label.visible=depth<=visibleResourceLabelDepth();addResourceHitTarget(label);return label;
@@ -268,7 +268,7 @@ function addResourceHitTarget(label) {
  element.textContent=data.title||data.name||'Ouvrir';
  const compact=window.innerWidth<760;
  const width=Math.min(compact?210:280,Math.max(compact?128:150,String(element.textContent).length*(compact?7.4:8.5)+32));
- Object.assign(element.style,{display:'block',opacity:'1',visibility:'visible',color:'#f4f5ed',background:'transparent',border:'0',borderRadius:'0',boxShadow:'none',font:'700 '+(compact?'14px':'16px')+'/1.2 system-ui,sans-serif',textAlign:'center',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis',textShadow:'0 1px 3px #07110f,0 2px 8px #07110f,1px 0 3px #07110f,-1px 0 3px #07110f',padding:'3px 5px',width:width+'px',height:compact?'36px':'38px',minWidth:compact?'112px':'130px',maxWidth:compact?'210px':'280px',pointerEvents:'auto',touchAction:'manipulation',transform:'translate(-50%,-50%)',cursor:'pointer'});
+ Object.assign(element.style,{display:'block',opacity:'1',visibility:'visible',color:'#f4f5ed',background:'transparent',border:'0',borderRadius:'0',boxShadow:'none',textDecoration:'none',font:'700 '+(compact?'14px':'16px')+'/1.2 system-ui,sans-serif',textAlign:'center',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis',textShadow:'0 1px 3px #07110f,0 2px 8px #07110f,1px 0 3px #07110f,-1px 0 3px #07110f',padding:'3px 5px',width:width+'px',height:compact?'36px':'38px',minWidth:compact?'112px':'130px',maxWidth:compact?'210px':'280px',pointerEvents:'auto',touchAction:'manipulation',transform:'translate(-50%,-50%)',cursor:'pointer'});
  element.setAttribute('aria-label',(data.title||data.name||'Branche')+(hasChildren?' — ouvrir le dossier':' — ouvrir la page'));
  element.title=data.title||data.name||'';
  element.dataset.hasChildren=String(hasChildren);element.dataset.depth=String(data.depth||0);element.dataset.resourceUrl=data.url||'';
