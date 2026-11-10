@@ -653,7 +653,14 @@
     ["Renseignez le code, le nom et au moins une unité avec un code.","Enter the code, name and at least one unit with a code.","Introduza o código, o nome e pelo menos uma unidade com código.","أدخل الرمز والاسم ووحدة واحدة على الأقل برمز."],
     ["Une expérience doit conserver au moins une unité.","An experiment must retain at least one unit.","Uma experiência deve manter pelo menos uma unidade.","يجب أن تحتوي التجربة على وحدة واحدة على الأقل."],
     ["Pour rattacher une culture à une expérience, sélectionnez à la fois l’expérience et son unité expérimentale.","To link a culture to an experiment, select both the experiment and its experimental unit.","Para associar uma cultura a uma experiência, selecione a experiência e a respetiva unidade experimental.","لربط مستنبت بتجربة، اختر التجربة ووحدتها التجريبية معًا."],
-    ["Culture","Culture","Cultura","المستنبت"]
+    ["Culture","Culture","Cultura","المستنبت"],
+    ["Code unité","Unit code","Código da unidade","رمز الوحدة"],
+    ["Retirer","Remove","Remover","إزالة"],
+    ["Témoin / T1","Control / T1","Controlo / T1","الشاهد / T1"],
+    ["Unités : ","Units: ","Unidades: ","الوحدات: "],
+    ["Expérience et unités enregistrées.","Experiment and units saved.","Experiência e unidades guardadas.","تم حفظ التجربة والوحدات."],
+    ["Registre indisponible : ","Registry unavailable: ","Registo indisponível: ","السجل غير متاح: "],
+    ["Création impossible : ","Could not create: ","Não foi possível criar: ","تعذّر الإنشاء: "]
   ];
   for (const [fr, en, pt, ar] of supplementalCoverage) {
     dictionaries.en[fr] ||= en;
