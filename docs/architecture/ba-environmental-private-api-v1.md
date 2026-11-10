@@ -72,7 +72,7 @@ The environmental-analysis Edge Function is the authenticated CultureOps entry p
 - The function validates the Supabase JWT with auth.getUser().
 - A user-scoped RLS query confirms that the caller can read the selected location.
 - A second user-scoped membership query confirms active organization membership; viewer membership is sufficient because analysis is read-only.
-- Coordinates and metadata.altitude_m are read from the authorized location record. Missing altitude is a hard validation error; the gateway does not invent elevation.
+- Coordinates and the explicit locations.altitude_m field are read from the authorized location record. Missing altitude is a hard validation error; the gateway does not invent elevation. The nullable column is introduced by migration 20261110120600 and must be populated from a verified site elevation.
 - Only then does the function use the server-side Supabase secret to read persisted NASA POWER observations for that exact organization, location and date range.
 - The gateway calls POST /v1/analyses/nasa-power with the private engine key and returns the BAL-JSON analysis.
 
