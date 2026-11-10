@@ -147,12 +147,13 @@ def _resolve_persisted_biological_context(
     analysis: BALAnalysis,
     repository: BiologicalContextRepository,
     *,
+    domain: BiologicalDomain,
     subject_id: UUID,
 ) -> BiologicalContext:
     """Resolve one persisted biological context covering the complete analysis window."""
     overlapping = repository.list_overlapping_scope(
         organization_id=str(analysis.scope.organization_id),
-        domain=BiologicalDomain.MYCOLOGY,
+        domain=domain,
         subject_id=str(subject_id),
         from_date=analysis.scope.from_date.isoformat(),
         to_date=analysis.scope.to_date.isoformat(),
@@ -190,7 +191,10 @@ def interpret_persisted_analysis_for_subject(
 ) -> DomainInterpretation:
     """Interpret against one persisted biological context and supplied profiles."""
     context = _resolve_persisted_biological_context(
-        analysis, repository, subject_id=subject_id
+        analysis,
+        repository,
+        domain=BiologicalDomain(profile.module),
+        subject_id=subject_id,
     )
     return interpret_analysis_for_biological_context(
         analysis,
@@ -227,6 +231,7 @@ def interpret_persisted_analysis_with_profiles(
     biological_repository: BiologicalContextRepository,
     profile_repository: EnvironmentalProfileRepository,
     *,
+    domain: BiologicalDomain,
     subject_id: UUID,
 ) -> DomainInterpretation:
     """Resolve all persisted context/profile versions, then interpret one analysis.
@@ -236,7 +241,10 @@ def interpret_persisted_analysis_with_profiles(
     choose a different tenant, location, profile version, or rule set.
     """
     context = _resolve_persisted_biological_context(
-        analysis, biological_repository, subject_id=subject_id
+        analysis,
+        biological_repository,
+        domain=domain,
+        subject_id=subject_id,
     )
     organization_id = str(analysis.scope.organization_id)
     from_date = analysis.scope.from_date.isoformat()
