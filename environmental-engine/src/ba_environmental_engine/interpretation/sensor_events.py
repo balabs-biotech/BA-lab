@@ -28,7 +28,7 @@ class SensorEventRule(SensorEventModel):
     variable_code: str = Field(min_length=1, max_length=120)
     unit_code: str = Field(min_length=1, max_length=40)
     operator: Literal["above", "at_or_above", "below", "at_or_below"]
-    threshold: float
+    threshold: float = Field(allow_inf_nan=False)
     minimum_observations: int = Field(default=1, ge=1, le=100_000)
     minimum_duration_seconds: int = Field(default=0, ge=0, le=31_536_000)
     maximum_gap_seconds: int | None = Field(default=None, ge=1, le=31_536_000)
@@ -123,6 +123,16 @@ def detect_sensor_events(
     rows = tuple(envelopes)
     events: list[SensorEvent] = []
     evaluated: set[tuple[UUID, str]] = set()
+    seen_observations: set[tuple[UUID, str, datetime]] = set()
+
+    for envelope in rows:
+        measurement = envelope.measurement
+        if measurement.sensor_id is None:
+            continue
+        key = (measurement.sensor_id, measurement.variable_code, measurement.observed_at)
+        if key in seen_observations:
+            raise ValueError("duplicate sensor/variable observations at the same timestamp")
+        seen_observations.add(key)
 
     for rule in profile.rules:
         groups: dict[tuple[UUID, str], list[_Point]] = {}
