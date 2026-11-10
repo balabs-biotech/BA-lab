@@ -35,7 +35,6 @@ create table public.biological_signals (
   signal_status text not null default 'open'
     check (signal_status in ('open', 'acknowledged', 'resolved', 'dismissed')),
   first_seen_at timestamptz not null default now(),
-  last_seen_at timestamptz not null default now(),
   acknowledged_at timestamptz,
   resolved_at timestamptz,
   primary key (organization_id, signal_id),
