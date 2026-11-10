@@ -74,6 +74,8 @@ create table public.experiments(
   organization_id uuid not null references public.organizations(id),
   id uuid not null default gen_random_uuid(),
   code text not null,
+  name text not null default '',
+  design jsonb not null default '{}'::jsonb,
   primary key(organization_id,id),
   unique(organization_id,code)
 );
@@ -82,6 +84,9 @@ create table public.experimental_units(
   id uuid not null default gen_random_uuid(),
   experiment_id uuid not null,
   unit_code text not null,
+  replicate_no integer,
+  treatment_code text,
+  metadata jsonb not null default '{}'::jsonb,
   primary key(organization_id,id),
   unique(organization_id,experiment_id,unit_code),
   foreign key(organization_id,experiment_id) references public.experiments(organization_id,id)
@@ -104,6 +109,20 @@ create table public.results(
   unique(organization_id,code),
   foreign key(organization_id,experiment_id) references public.experiments(organization_id,id),
   foreign key(organization_id,experimental_unit_id) references public.experimental_units(organization_id,id)
+);
+create table public.provenance(
+  organization_id uuid not null references public.organizations(id),
+  id uuid not null default gen_random_uuid(),
+  target_type text not null,
+  target_id uuid not null,
+  action text not null,
+  actor_user_id uuid references auth.users(id),
+  occurred_at timestamptz not null default now(),
+  source_type text,
+  source_id text,
+  method text,
+  context jsonb not null default '{}'::jsonb,
+  primary key(organization_id,id)
 );
 create table public.events(
   organization_id uuid not null references public.organizations(id), id uuid not null default gen_random_uuid(), event_type text not null,
@@ -381,6 +400,153 @@ select 'PASS: biological traceability runtime, lineage, RLS boundary, input vali
 -- Idempotency regression: a retry after an unknown client outcome must return
 -- the original result without creating another operation or descendant.
 \i supabase/migrations/20261109100000_add_biological_operation_idempotency.sql
+\i supabase/migrations/20261111120000_create_experiment_with_units_rpc.sql
+-- Experiment setup is atomic, idempotent and append-traceable.
+set role authenticated;
+do $experiment_setup$
+declare
+  first_response jsonb;
+  retry_response jsonb;
+  caught boolean := false;
+  request_key uuid := '00000000-0000-0000-0000-0000000000c5';
+  fixed_time timestamptz := '2026-11-10T09:00:00Z';
+begin
+  if to_regprocedure('public.create_experiment_with_units(uuid,text,text,jsonb,jsonb,uuid,timestamptz)') is null then
+    raise exception 'FAIL: atomic experiment setup RPC is missing';
+  end if;
+  first_response := public.create_experiment_with_units(
+    '00000000-0000-0000-0000-0000000000a1',
+    'EXP-RESULT-001',
+    'Experiment setup regression',
+    '{"objective":"compare two treatments"}'::jsonb,
+    '[
+      {"unit_code":"REP-01","replicate_no":1,"treatment_code":"control","metadata":{"replicate":"A"}},
+      {"unit_code":"REP-02","replicate_no":2,"treatment_code":"treatment","metadata":{"replicate":"B"}}
+    ]'::jsonb,
+    request_key,
+    fixed_time
+  );
+  retry_response := public.create_experiment_with_units(
+    '00000000-0000-0000-0000-0000000000a1',
+    'EXP-RESULT-001',
+    'Experiment setup regression',
+    '{"objective":"compare two treatments"}'::jsonb,
+    '[
+      {"unit_code":"REP-01","replicate_no":1,"treatment_code":"control","metadata":{"replicate":"A"}},
+      {"unit_code":"REP-02","replicate_no":2,"treatment_code":"treatment","metadata":{"replicate":"B"}}
+    ]'::jsonb,
+    request_key,
+    fixed_time
+  );
+  if first_response is distinct from retry_response then
+    raise exception 'FAIL: identical experiment setup retry did not return the original response';
+  end if;
+  if (select count(*) from public.experiments
+       where organization_id='00000000-0000-0000-0000-0000000000a1'
+         and code='EXP-RESULT-001' and name='Experiment setup regression'
+         and design->>'objective'='compare two treatments') <> 1 then
+    raise exception 'FAIL: experiment setup did not persist exactly one experiment';
+  end if;
+  if (select count(*) from public.experimental_units
+       where organization_id='00000000-0000-0000-0000-0000000000a1'
+         and experiment_id=(first_response->>'experiment_id')::uuid) <> 2 then
+    raise exception 'FAIL: experiment setup did not persist both experimental units';
+  end if;
+  if (select count(*) from public.provenance
+       where organization_id='00000000-0000-0000-0000-0000000000a1'
+         and target_type='experiment'
+         and target_id=(first_response->>'experiment_id')::uuid
+         and action='created') <> 1 then
+    raise exception 'FAIL: experiment creation provenance is missing';
+  end if;
+  if (select count(*) from public.events
+       where organization_id='00000000-0000-0000-0000-0000000000a1'
+         and event_type='experimental_unit_created'
+         and experimental_unit_id in (
+           select id from public.experimental_units
+            where organization_id='00000000-0000-0000-0000-0000000000a1'
+              and experiment_id=(first_response->>'experiment_id')::uuid
+         )) <> 2 then
+    raise exception 'FAIL: experimental unit creation events are missing';
+  end if;
+  begin
+    perform public.create_experiment_with_units(
+      '00000000-0000-0000-0000-0000000000a1',
+      'EXP-RESULT-001',
+      'Different payload',
+      '{"objective":"compare two treatments"}'::jsonb,
+      '[{"unit_code":"REP-01"}]'::jsonb,
+      request_key,
+      fixed_time
+    );
+  exception when others then
+    if sqlerrm='idempotency_key_reused_with_different_payload' then caught := true;
+    else raise; end if;
+  end;
+  if not caught then
+    raise exception 'FAIL: experiment setup accepted a changed payload with the same idempotency key';
+  end if;
+  caught := false;
+  begin
+    perform public.create_experiment_with_units(
+      '00000000-0000-0000-0000-0000000000a2',
+      'EXP-CROSS-ORG',
+      'Unauthorized experiment',
+      '{}'::jsonb,
+      '[{"unit_code":"UNIT-01"}]'::jsonb,
+      '00000000-0000-0000-0000-0000000000c6',
+      fixed_time
+    );
+  exception when insufficient_privilege then caught := true;
+  end;
+  if not caught then raise exception 'FAIL: cross-organization experiment creation was allowed'; end if;
+  caught := false;
+  begin
+    perform public.create_experiment_with_units(
+      '00000000-0000-0000-0000-0000000000a1',
+      'EXP-EMPTY-UNITS',
+      'Invalid experiment',
+      '{}'::jsonb,
+      '[]'::jsonb,
+      '00000000-0000-0000-0000-0000000000c7',
+      fixed_time
+    );
+  exception when others then
+    if sqlerrm='experiment_units_required' then caught := true;
+    else raise; end if;
+  end;
+  if not caught then raise exception 'FAIL: empty experiment unit list was accepted'; end if;
+  if has_table_privilege('authenticated','public.experiments','INSERT')
+     or has_table_privilege('authenticated','public.experiments','UPDATE')
+     or has_table_privilege('authenticated','public.experiments','DELETE')
+     or has_table_privilege('authenticated','public.experiments','TRUNCATE')
+     or has_table_privilege('authenticated','public.experimental_units','INSERT')
+     or has_table_privilege('authenticated','public.experimental_units','UPDATE')
+     or has_table_privilege('authenticated','public.experimental_units','DELETE')
+     or has_table_privilege('authenticated','public.experimental_units','TRUNCATE')
+     or has_table_privilege('authenticated','public.provenance','INSERT')
+     or has_table_privilege('authenticated','public.provenance','UPDATE')
+     or has_table_privilege('authenticated','public.provenance','DELETE')
+     or has_table_privilege('authenticated','public.provenance','TRUNCATE') then
+    raise exception 'FAIL: authenticated retains direct experiment or experimental-unit mutation privileges';
+  end if;
+  if not has_function_privilege('authenticated','public.create_experiment_with_units(uuid,text,text,jsonb,jsonb,uuid,timestamp with time zone)','EXECUTE')
+     or has_function_privilege('anon','public.create_experiment_with_units(uuid,text,text,jsonb,jsonb,uuid,timestamp with time zone)','EXECUTE') then
+    raise exception 'FAIL: experiment setup RPC execution grants are incorrect';
+  end if;
+  if not exists (
+    select 1 from pg_catalog.pg_proc p
+     where p.oid='public.create_experiment_with_units(uuid,text,text,jsonb,jsonb,uuid,timestamp with time zone)'::regprocedure
+       and p.prosecdef
+       and p.proconfig @> array['search_path=pg_catalog']
+  ) then
+    raise exception 'FAIL: experiment setup RPC must be SECURITY DEFINER with a pinned search_path';
+  end if;
+end
+$experiment_setup$;
+reset role;
+select 'PASS: atomic experiment and unit setup, idempotency, provenance, tenant isolation and write grants' as test_result;
+
 \i supabase/migrations/20261110120000_record_experiment_result_rpc.sql
 set role authenticated;
 do $$
@@ -452,12 +618,6 @@ reset role;
 select 'PASS: biological operation idempotency, duplicate suppression and payload conflict rejection' as test_result;
 
 -- Structured experimental result writes are atomic, tenant-bound and idempotent.
-insert into public.experiments(organization_id,code)
-values ('00000000-0000-0000-0000-0000000000a1','EXP-RESULT-001');
-insert into public.experimental_units(organization_id,experiment_id,unit_code)
-select organization_id,id,'REP-01' from public.experiments
- where organization_id='00000000-0000-0000-0000-0000000000a1'
-   and code='EXP-RESULT-001';
 set role authenticated;
 do $experiment_result$
 declare
