@@ -159,6 +159,8 @@ async function checkWorkingScene(name, viewport) {
   await page.waitForFunction(() => !document.querySelector('#mainView .webgl-stage')?.classList.contains('is-transitioning'), undefined, { timeout: 8000 });
   await page.waitForFunction(() => typeof window.__BALABS_3D_E2E__ === 'function', undefined, { timeout: 5000 });
   await checkTwoFingerPan(page, name);
+  await page.locator('.webgl-controls [data-camera="out"]').evaluate(button => button.click());
+  await page.waitForFunction(() => window.__BALABS_3D_E2E__()?.visibleLabelDepths?.includes(0), undefined, { timeout: 8000 });
   await page.waitForFunction(() => (window.__BALABS_3D_E2E__()?.visible || 0) > 0, undefined, { timeout: 15000 }).catch(async error => { throw new Error('No 3D branch is visible for a real tap: ' + JSON.stringify(await page.evaluate(() => window.__BALABS_3D_E2E__())) + ' — ' + error.message); });
   await page.waitForFunction(() => [...document.querySelectorAll('.webgl-resource-target[data-has-children="true"]')].some(button=>!button.hidden&&getComputedStyle(button).display!=='none'), undefined, { timeout: 8000 });
   assert.ok(await page.locator('.webgl-resource-target[data-has-children="true"]').count() > 0, name + ': current hierarchy level must expose directly selectable map labels');
