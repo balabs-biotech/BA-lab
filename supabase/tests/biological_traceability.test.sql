@@ -131,42 +131,44 @@ grant select on public.organization_members to authenticated, anon;
 grant select,insert,update,delete on public.material_types,public.culture_types,public.organizations,public.strains,public.materials,public.cultures,public.material_relationships,public.events,public.batches to authenticated,anon;
 grant select,insert,update,delete on public.experiments,public.experimental_units,public.results to authenticated,anon;
 
+\i supabase/migrations/20261111100000_enforce_culture_experimental_context.sql
+
 -- Regression contract: a culture's experiment must be the experiment that owns its unit.
 select set_config('request.jwt.claim.sub','00000000-0000-0000-0000-0000000000b1',false);
 do $experimental_context_integrity$
 declare
-  experiment_a uuid;
-  experiment_b uuid;
-  unit_a uuid;
-  unit_b uuid;
-  culture_id uuid;
+  v_experiment_a uuid;
+  v_experiment_b uuid;
+  v_unit_a uuid;
+  v_unit_b uuid;
+  v_culture_id uuid;
   caught boolean := false;
 begin
   insert into public.experiments(organization_id,code)
   values ('00000000-0000-0000-0000-0000000000a1','EXP-CONTEXT-A')
-  returning id into experiment_a;
+  returning id into v_experiment_a;
   insert into public.experiments(organization_id,code)
   values ('00000000-0000-0000-0000-0000000000a1','EXP-CONTEXT-B')
-  returning id into experiment_b;
+  returning id into v_experiment_b;
   insert into public.experimental_units(organization_id,experiment_id,unit_code)
-  values ('00000000-0000-0000-0000-0000000000a1',experiment_a,'UNIT-A')
-  returning id into unit_a;
+  values ('00000000-0000-0000-0000-0000000000a1',v_experiment_a,'UNIT-A')
+  returning id into v_unit_a;
   insert into public.experimental_units(organization_id,experiment_id,unit_code)
-  values ('00000000-0000-0000-0000-0000000000a1',experiment_b,'UNIT-B')
-  returning id into unit_b;
+  values ('00000000-0000-0000-0000-0000000000a1',v_experiment_b,'UNIT-B')
+  returning id into v_unit_b;
 
   insert into public.cultures(organization_id,code,culture_type,material_id,experiment_id,experimental_unit_id)
   select '00000000-0000-0000-0000-0000000000a1','EXP-CONTEXT-CULTURE','agar',m.id,experiment_a,unit_a
     from public.materials m
    where m.organization_id='00000000-0000-0000-0000-0000000000a1'
      and m.material_code='MAT-PARENT'
-  returning id into culture_id;
+  returning id into v_culture_id;
 
   begin
     update public.cultures
-       set experimental_unit_id=unit_b
+       set experimental_unit_id=v_unit_b
      where organization_id='00000000-0000-0000-0000-0000000000a1'
-       and id=culture_id;
+       and id=v_culture_id;
   exception when foreign_key_violation then caught := true;
   end;
   if not caught then
@@ -187,7 +189,7 @@ begin
 
   delete from public.experimental_units
    where organization_id='00000000-0000-0000-0000-0000000000a1'
-     and id=unit_a;
+     and id=v_unit_a;
   if exists (
     select 1 from public.cultures
      where organization_id='00000000-0000-0000-0000-0000000000a1'
