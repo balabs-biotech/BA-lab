@@ -44,6 +44,10 @@ assert.match(moduleSource, /\.limit\(10\)/);
 assert.match(moduleSource, /resolveHistoryIdentity\(kind, id\)/);
 assert.match(moduleSource, /identity\.title/);
 assert.match(moduleSource, /identity\.subtitle/);
+assert.doesNotMatch(moduleSource, /\["Sujet biologique", row\.biological_subject_id\]/);
+assert.doesNotMatch(moduleSource, /\["Contexte biologique", row\.biological_context_id\]/);
+assert.doesNotMatch(moduleSource, /\["Environnement", row\.environment_id\]/);
+
 
 assert.match(moduleSource, /\.eq\(kind, id\)/);
 assert.match(moduleSource, /\.limit\(50\)/);
