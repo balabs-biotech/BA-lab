@@ -28,6 +28,8 @@ def measurement(
         variable_code=variable,
         value=value,
         canonical_unit_code=unit,
+        source_unit_code=unit,
+        value_source="normalized",
         measured_at=datetime(2026, 1, 1, tzinfo=timezone.utc) + timedelta(days=days),
         quality_state=quality,
     )
@@ -88,8 +90,10 @@ def test_growth_rate_rejects_duplicate_source_ids():
 def test_measurement_contract_rejects_naive_timestamps_and_nonfinite_values():
     with pytest.raises(ValueError, match="timezone"):
         BiologicalMeasurement(
-            "m1", "org-1", "culture-1", "culture", "root_length", 1, "mm",
-            datetime(2026, 1, 1), "validated",
+            source_record_id="m1", organization_id="org-1", subject_id="culture-1",
+            subject_type="culture", variable_code="root_length", value=1,
+            canonical_unit_code="mm", source_unit_code="mm", value_source="normalized",
+            measured_at=datetime(2026, 1, 1), quality_state="validated",
         )
     with pytest.raises(ValueError, match="finite"):
         measurement("m2", 1, float("nan"))
