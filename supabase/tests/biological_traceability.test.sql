@@ -193,7 +193,7 @@ begin
   if exists (
     select 1 from public.cultures
      where organization_id='00000000-0000-0000-0000-0000000000a1'
-       and id=culture_id
+       and id=v_culture_id
        and (experiment_id is not null or experimental_unit_id is not null)
   ) then
     raise exception 'FAIL: deleting an experimental unit left a dangling culture experiment reference';
