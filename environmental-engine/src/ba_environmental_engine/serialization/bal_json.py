@@ -361,7 +361,6 @@ def build_bal_analysis(
             )
 
     output.sort(key=lambda item: (item.period.from_date, item.code))
-    summaries = _source_summaries(rows, used_variables)
     finding_ids = [item.finding_id for item in anomaly_findings]
     if len(finding_ids) != len(set(finding_ids)):
         raise ValueError("anomaly finding IDs must be unique")
@@ -384,6 +383,8 @@ def build_bal_analysis(
                 raise ValueError("anomaly finding source observations must match its date, variable, unit and value")
             finding_rows.append(source_row)
         used_variables.add(finding.variable_code)
+
+    summaries = _source_summaries(rows, used_variables)
 
     return BALAnalysis(
         contract_version="1.0.0",
