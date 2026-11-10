@@ -1,7 +1,7 @@
 from datetime import date, datetime, timedelta, timezone
 from uuid import uuid4
 
-from ba_environmental_engine.contexts.biological import BiologicalContext
+from ba_environmental_engine.contexts.biological import BiologicalContext, BiologicalDomain
 from ba_environmental_engine.contexts.environment import EnvironmentContext, EnvironmentType, ObservationOrigin
 from ba_environmental_engine.execution import run_environmental_analysis
 from ba_environmental_engine.interpretation import (\n    interpret_findings,\n    interpret_analysis_for_biological_context,\n    interpret_persisted_analysis_for_subject,\n)
@@ -347,10 +347,7 @@ def test_persisted_context_repository_is_connected_to_interpretation():
     assert result.evaluated_findings == len(analysis.findings)
     assert repository.last_query == (
         str(analysis.scope.organization_id),
-        __import__(
-            "ba_environmental_engine.contexts.biological",
-            fromlist=["BiologicalDomain"],
-        ).BiologicalDomain.MYCOLOGY,
+        BiologicalDomain.MYCOLOGY,
         str(context.subject_id),
     )
 
@@ -378,7 +375,6 @@ def test_persisted_interpretation_rejects_context_covering_only_part_of_scope():
 
 
 def test_persisted_interpretation_rejects_multiple_overlapping_contexts():
-    from copy import deepcopy
     import pytest
 
     analysis = make_analysis()
