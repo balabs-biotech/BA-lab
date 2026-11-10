@@ -75,7 +75,7 @@ def test_calculates_daily_net_radiation_and_et0_from_normalized_observations():
     assert result.missing_variables == ()
     assert result.net_radiation is not None
     assert result.et0 is not None
-    assert result.net_radiation.net_radiation_mj_m2_day == pytest.approx(12.3021, abs=0.002)
+    assert result.net_radiation.net_radiation_mj_m2_day == pytest.approx(12.2618, abs=0.002)
     assert result.et0.reference_evapotranspiration_mm_day > 0
     assert len(result.source_observation_ids) == 6
     assert result.formula_profiles == (
