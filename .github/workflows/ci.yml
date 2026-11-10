@@ -106,6 +106,8 @@ jobs:
           node scripts/check-batch-tracker-js.mjs
           node --check batch-tracker/biological-alerts.js
           node scripts/test-biological-alerts.mjs
+          node --check batch-tracker/environmental-sensor-panel.js
+          node scripts/test-sensor-panel-contract.mjs
           node supabase/tests/copernicus-sentinel-catalogue.test.mjs
           node --check batch-tracker/environmental-data.js
           node scripts/check-i18n.mjs
