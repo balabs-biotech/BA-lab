@@ -47,11 +47,11 @@ def interpret_sensor_analysis(
     profile_timezone: str = "UTC",
     temporal_parameters: dict[str, int | float] | None = None,
 ) -> DomainInterpretation:
-    """Apply explicit domain rules to quality-aware sensor series summaries.
+    """Route sensor-series and causal temporal findings through explicit domain rules.
 
-    Numeric values are not compared against hidden thresholds. Rules can route
-    normal or data-quality findings by variable and biological context. Future
-    threshold/event detectors must remain separate and explicitly versioned.
+    The temporal screen is statistical, not a biological threshold. A temporal
+    assessment becomes a domain signal only when a persisted profile explicitly
+    matches its variable, finding status, and biological context.
     """
     signals: list[DomainSignal] = []
     matched: set[tuple[UUID, str]] = set()
@@ -111,6 +111,8 @@ def interpret_sensor_analysis(
     zone = ZoneInfo(profile_timezone)
     parameters = temporal_parameters or {}
     for assessment in temporal_assessments:
+        if assessment.status == "normal":
+            continue
         for rule in profile.rules:
             if rule.variable_code != assessment.variable_code:
                 continue
@@ -173,7 +175,7 @@ def interpret_sensor_analysis(
         profile_version=profile.version,
         module=profile.module,
         signals=tuple(signals),
-        evaluated_findings=len(analysis.series),
+        evaluated_findings=len(analysis.series) + len(temporal_assessments),
         matched_findings=len({signal.source_finding_id for signal in signals}),
     )
 
