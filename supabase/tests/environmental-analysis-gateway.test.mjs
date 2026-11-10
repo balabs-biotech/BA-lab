@@ -16,7 +16,9 @@ assert.ok(observationRead > membershipRead, "service-role observation read must 
 assert.match(source, /\.eq\("organization_id", location\.organization_id\)[\s\S]*?\.eq\("location_id", location\.id\)/, "privileged observation query must be tenant- and location-scoped");
 assert.ok(engineCall > observationRead, "private engine may only be called after authorized observation retrieval");
 assert.match(source, /X-BA-Engine-Key": engineKey/, "private engine key must be sent server-to-server");
-assert.doesNotMatch(source, /Access-Control-Allow-Origin": "\*"/, "wildcard CORS must not be added to the authenticated gateway without a deliberate policy");
+assert.doesNotMatch(source, /Access-Control-Allow-Origin": "\*"/, "wildcard CORS must not be added to the authenticated gateway");
+assert.match(source, /BA_ENVIRONMENTAL_ALLOWED_ORIGINS/, "browser origins must be explicitly allowlisted");
+assert.match(source, /allowedOrigins\.has\(origin\)/, "unlisted browser origins must be rejected");
 assert.match(source, /readJsonBounded\(req, 16_000\)/, "request body must have a hard byte limit");
 assert.match(source, /AbortSignal\.timeout\(60_000\)/, "engine call must have a bounded timeout");
 assert.match(source, /altitude_m/, "verified location altitude must be required");
