@@ -194,7 +194,7 @@ async function checkWorkingScene(name, viewport) {
       await page.waitForFunction(() => !document.querySelector('#mainView .webgl-stage')?.classList.contains('is-transitioning'), undefined, { timeout: 8000 });
       // Children of the opened folder are depth 0; depth 1 is the next generation, not a prerequisite.
       const visibleLabelState = await page.evaluate(() => window.__BALABS_3D_E2E__());
-      assert.ok(visibleLabelState?.visibleLabelDepths?.includes(0), name + ': immediate sub-branches must have visible labels');
+      assert.deepEqual(visibleLabelState?.visibleLabelDepths || [], [0], name + ': branch navigation must show only its immediate children until the next zoom level');
       assert.equal(visibleLabelState?.visibleLabelCountsByDepth?.[0] || 0, childDockState.childCount,
         name + ': every immediate child must have its own visible text label at the branch navigation zoom. ' + JSON.stringify({childCount:childDockState.childCount,visibleCounts:visibleLabelState?.visibleLabelCountsByDepth}));
       const domLabelState = await page.evaluate(() => ({created:document.querySelectorAll('.webgl-resource-target').length,visible:[...document.querySelectorAll('.webgl-resource-target')].filter(button=>!button.hidden&&getComputedStyle(button).display!=='none').length}));
@@ -228,6 +228,10 @@ async function checkWorkingScene(name, viewport) {
           labelPixelsAfterZoomOut, { timeout: 8000 });
         const labelPixelsAfterZoomIn = await page.evaluate(() => window.__BALABS_3D_E2E__()?.labelPixels?.domain || 0);
         assert.ok(labelPixelsAfterZoomIn < labelPixelsAfterZoomOut, name + ': labels must shrink when zooming in');
+        await page.locator('.webgl-controls [data-camera="in"]').evaluate((button) => button.click());
+        await page.waitForFunction(() => window.__BALABS_3D_E2E__()?.visibleLabelDepths?.includes(1), undefined, { timeout: 8000 });
+        const nextGenerationLabels = await page.evaluate(() => window.__BALABS_3D_E2E__()?.visibleLabelCountsByDepth?.[1] || 0);
+        assert.ok(nextGenerationLabels > 0, name + ': the next hierarchy generation must appear after one further zoom step');
         const depthAfterZoomIn = await page.evaluate(() => window.__BALABS_3D_E2E__()?.depth || 0);
         assert.equal(depthAfterZoomIn, nestedDepth,
           name + ': camera zoom-in must not change the selected hierarchy level');
