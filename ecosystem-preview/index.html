@@ -4211,4 +4211,28 @@ html,body{background:var(--bal-petrol)!important;color:var(--bal-mineral)!import
   #mainView.webgl-ready .webgl-focus{padding:5px 0!important;border-radius:0!important}
   #mainView.webgl-ready .webgl-stage .webgl-hint{padding:3px 0!important;text-align:left!important}
 }
+
+/* Keep actions discoverable without turning them into button tiles. */
+#mainView.webgl-ready .webgl-focus .webgl-focus-actions button,
+#mainView.webgl-ready .webgl-focus .webgl-focus-actions a{
+  border:0!important;border-bottom:1px solid #78958a66!important;
+  border-radius:0!important;background:transparent!important;box-shadow:none!important;
+  padding:7px 3px!important;color:#e7e9df!important;
+}
+#mainView.webgl-ready .webgl-focus .webgl-focus-actions button:hover,
+#mainView.webgl-ready .webgl-focus .webgl-focus-actions a:hover{
+  border-color:#b96b4d!important;color:#fff!important;
+}
+#mainView.webgl-ready .webgl-controls button{
+  border:0!important;border-radius:0!important;background:transparent!important;
+  box-shadow:none!important;backdrop-filter:none!important;color:#d1d0c5!important;
+}
+#mainView.webgl-ready .webgl-controls button:hover,
+#mainView.webgl-ready .webgl-controls button:focus-visible{
+  background:transparent!important;color:#fff!important;outline:1px solid #b96b4d!important;
+}
+#mainView.webgl-ready .webgl-intro-cta{
+  border:0!important;border-bottom:1px solid #b96b4d!important;border-radius:0!important;
+  background:transparent!important;box-shadow:none!important;padding:9px 3px!important;
+}
 </style>
