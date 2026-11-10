@@ -16,21 +16,9 @@ The Edge Function accepts optional `domain` and `subject_id` fields together wit
 
 **Source boundary:** the current `/nasa-power` analysis is a gridded outdoor-weather analysis. Its biological interpretation is therefore allowed only when the resolved environment profile is `origin: weather_provider` and `context_type: outdoor`. A greenhouse or laboratory sensor profile is rejected with `environment_source_mismatch`; the climate analysis remains available. Sensor-backed greenhouse/lab interpretation requires a separate sensor-observation analysis path and must not reuse NASA POWER values as if they were in-situ readings.
 
-The current `EnvironmentContext` model requires:
+The `EnvironmentContext.context_id` is the physical `environments.id`, because `biological_contexts.environment_id` references that table. The versioned profile row has its own separate primary key; it is represented in the engine by `profile_code` and `profile_version`, not by replacing the physical environment identity.
 
-- context/environment UUID;
-- organization and physical location UUIDs;
-- context type and label;
-- IANA timezone;
-- observation origin;
-- sensor IDs when origin is `sensor`;
-- environment profile code and version.
-
-The existing `environments` table has `location_id`, `name`, and generic `metadata`. The current `biological_contexts` migration does not define a typed, versioned source for all required environment-context fields.
-
-The interpretation engine requires an explicit `DomainProfile` with a module, profile ID, version, and rules. No authoritative persisted profile registry or approved domain rule set was found in the inspected application boundary. The engine deliberately contains no default biological thresholds or recommendations.
-
-Consequently, the Edge Function loads the environment and domain profiles from the versioned registries. It does not manufacture either profile and does not accept arbitrary client-supplied rules as trusted policy.
+The profile registry supplies context type, label, IANA timezone, observation origin, sensor bindings, and version. The Edge Function loads the environment and domain profiles from these registries. It does not manufacture either profile and does not accept arbitrary client-supplied rules as trusted policy.
 
 ## Request contract implemented on the feature branch
 
@@ -75,7 +63,7 @@ This is repository work only. The migration has not been applied to the live BAL
 
 The engine now has a read-only `SupabaseEnvironmentalProfileRepository` adapter. It resolves only active or retired versions whose effective interval covers the complete analysis window. It joins the physical environment location and normalized sensor bindings, then validates them through the existing Pydantic `EnvironmentContext` contract.
 
-The `domain_profile_from_record` mapper validates each persisted JSON rule against `InterpretationRule`; the resulting `DomainProfile` is therefore typed before evaluation.
+The `domain_profile_from_record` mapper validates each persisted JSON rule against `InterpretationRule`; the resulting `DomainProfile` is therefore typed before evaluation. The `EnvironmentContext.context_id` maps to `environment_context_profiles.environment_id` (the physical environment FK), not `environment_context_profiles.id` (the versioned profile row PK). This is required for the biological-context/environment binding check.
 
 The `interpret_persisted_analysis_with_profiles` orchestration function now resolves, in order:
 
@@ -88,15 +76,15 @@ The application supplies only the requested domain and subject identifier. It do
 
 The adapter is database-client agnostic and receives an already-authenticated Supabase client. It does not import the Supabase SDK, read credentials, or perform authentication. Unit tests cover its row mapping, tenant/date filters, missing and ambiguous profile handling, and the end-to-end interpretation resolver; these tests have been added but have not yet been executed.
 
-## Required persistence before end-to-end interpretation
+## Remaining requirements before production activation
 
-Before enabling the target contract, define and migrate:
+Before enabling this path in production:
 
-- a verified deployment and SQL replay of the environment-context profile registry;
-- approved domain-profile content for Mycology, GreenTech, and Lab, entered and reviewed by BA Labs rather than seeded as assumed scientific defaults;
-- tenant-scoped foreign keys and RLS policies;
-- uniqueness rules preventing two active profile versions for the same scope;
-- audit/provenance fields recording which environment profile and domain profile version produced each interpretation.
+- validate and replay the new migrations against a PostgreSQL/Supabase test project; the live BALabs project has not been migrated;
+- enter and review approved domain-profile content for Mycology, GreenTech, and Lab rather than seeding assumed scientific defaults;
+- verify tenant-scoped foreign keys and RLS policies with real authenticated and service-role requests;
+- retain the environment and domain profile codes/versions in each emitted signal and durable analysis record;
+- add mocked Edge Function integration tests and run all relevant suites on the exact PR head.
 
 Do not put domain thresholds directly in the Edge Function. Do not make the Python scientific engine responsible for JWT validation or Supabase credentials.
 
@@ -109,7 +97,7 @@ The response preserves the existing BAL-JSON keys (`indicators`, `findings`, `so
 - `interpretation_status`;
 - `domain_interpretation` (null when no valid interpretation is produced).
 
-Invalid context payloads produce `context_invalid` while preserving the climate analysis. The Edge Function handles missing or ambiguous persisted rows before calling the engine and supplies explicit statuses including `context_unavailable`, `ambiguous_context`, `context_does_not_cover_scope`, `environment_profile_unavailable`, `ambiguous_environment_profile`, `domain_profile_unavailable`, and `ambiguous_domain_profile`. No client-selected profile version or rule set is accepted.
+Invalid context payloads produce `context_invalid` while preserving the climate analysis. The Edge Function handles missing or ambiguous persisted rows before calling the engine and supplies explicit statuses including `context_unavailable`, `ambiguous_context`, `context_does_not_cover_scope`, `environment_profile_unavailable`, `ambiguous_environment_profile`, `domain_profile_unavailable`, `ambiguous_domain_profile`, and `environment_source_mismatch`. The latter prevents NASA POWER gridded outdoor estimates from being interpreted as in-situ greenhouse or laboratory sensor readings. No client-selected profile version or rule set is accepted.
 
 ## Required integration tests
 
