@@ -93,6 +93,8 @@ create policy biological_contexts_delete
   using (private.is_org_writer(organization_id));
 
 grant select, insert, update, delete on public.biological_contexts to authenticated;
+-- The authenticated Edge Function gateway reads this table after explicit JWT and tenant checks.
+grant select on public.biological_contexts to service_role;
 
 comment on table public.biological_contexts is
   'Time-bounded biological operating context linked to existing CultureOps culture or plant_culture and environment records.';
