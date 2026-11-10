@@ -271,3 +271,99 @@ def test_nasa_power_endpoint_rejects_forged_provider_parameter_mapping():
         headers={"X-BA-Engine-Key": "test-secret"},
     )
     assert response.status_code == 422
+
+
+def biological_interpretation_payload(request):
+    scope = request["scope"]
+    organization_id = scope["organization_id"]
+    location_id = scope["location_id"]
+    environment_id = str(uuid4())
+    return {
+        "biological_context": {
+            "context_id": str(uuid4()),
+            "subject_id": str(uuid4()),
+            "organization_id": organization_id,
+            "location_id": location_id,
+            "environment_context_id": environment_id,
+            "domain": "greentech",
+            "organism_kind": "plant",
+            "taxon_code": "solanum_lycopersicum",
+            "cultivar_code": "yellow_pear",
+            "culture_stage": "fruiting",
+            "production_system": "greenhouse",
+            "context_tags": ["production:protected"],
+            "valid_from": "2026-11-01",
+            "valid_to": "2026-11-01",
+        },
+        "environment_context": {
+            "context_id": environment_id,
+            "organization_id": organization_id,
+            "location_id": location_id,
+            "context_type": "greenhouse",
+            "label": "Serre BA Labs",
+            "timezone": "Africa/Algiers",
+            "origin": "weather_provider",
+            "sensor_ids": [],
+            "profile_code": "ba_outdoor_weather",
+            "profile_version": "1.0.0",
+        },
+        "domain_profile": {
+            "profile_id": "greentech-default",
+            "module": "greentech",
+            "version": "1.0.0",
+            "rules": [{
+                "rule_id": "temperature-history-review",
+                "variable_code": "air_temperature_mean",
+                "finding_status": "insufficient_history",
+                "required_context_tags": ["stage:fruiting"],
+                "signal_code": "review_environmental_history",
+                "severity": "info",
+                "message_code": "environmental_history_incomplete",
+                "recommendation_code": None,
+            }],
+        },
+    }
+
+
+def test_nasa_power_api_returns_domain_interpretation_as_sibling_without_mutating_climate_findings():
+    request = nasa_power_payload()
+    request["biological_interpretation"] = biological_interpretation_payload(request)
+    client = TestClient(create_app(engine_api_key="test-secret"))
+
+    response = client.post(
+        "/v1/analyses/nasa-power",
+        json=request,
+        headers={"X-BA-Engine-Key": "test-secret"},
+    )
+
+    assert response.status_code == 200, response.text
+    body = response.json()
+    assert body["interpretation_status"] == "interpreted"
+    assert body["domain_interpretation"]["module"] == "greentech"
+    assert body["domain_interpretation"]["matched_findings"] == 1
+    assert body["domain_interpretation"]["signals"][0]["biological_subject_id"] == (
+        request["biological_interpretation"]["biological_context"]["subject_id"]
+    )
+    assert len(body["findings"]) == 6
+    assert {finding["status"] for finding in body["findings"]} == {"insufficient_history"}
+
+
+def test_nasa_power_api_keeps_climate_analysis_when_biological_context_is_invalid():
+    request = nasa_power_payload()
+    interpretation = biological_interpretation_payload(request)
+    interpretation["biological_context"]["location_id"] = str(uuid4())
+    request["biological_interpretation"] = interpretation
+    client = TestClient(create_app(engine_api_key="test-secret"))
+
+    response = client.post(
+        "/v1/analyses/nasa-power",
+        json=request,
+        headers={"X-BA-Engine-Key": "test-secret"},
+    )
+
+    assert response.status_code == 200, response.text
+    body = response.json()
+    assert body["interpretation_status"] == "context_invalid"
+    assert body["domain_interpretation"] is None
+    assert len(body["indicators"]) == 2
+    assert len(body["findings"]) == 6
