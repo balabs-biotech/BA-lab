@@ -36,4 +36,9 @@ assert.match(source, /temporal_minimum_history: temporalMinimumHistory/, "explic
 assert.match(source, /temporal_threshold: temporalThreshold/, "explicit robust threshold must be forwarded");
 assert.match(source, /temporal_screening_parameters_must_be_supplied_together_and_positive/, "partial temporal configuration must be rejected");
 
+assert.match(source, /MAX_TEMPORAL_WINDOW_SECONDS/, "temporal history request must be bounded");
+assert.match(source, /Math\.ceil\(temporalWindowSeconds \/ 86_400\)/, "gateway must retrieve enough prior history");
+assert.match(source, /localCalendarDate\(row\.measured_at, profile\.timezone\)/, "profile validity must use local calendar dates");
+assert.match(source, /profileScopedRows/, "only measurements valid under the resolved profile may be forwarded");
+
 console.log("PASS: sensor analysis gateway security contract");
