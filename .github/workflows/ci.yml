@@ -263,6 +263,8 @@ jobs:
         run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/environmental_observations_contract.test.sql
       - name: Test role-aware tenant write authorization after replay
         run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/role_aware_tenant_writes.test.sql
+      - name: Test biological context persistence contract after replay
+        run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/biological_contexts_contract.test.sql
 
   ecosystem-regression:
     runs-on: ubuntu-latest
@@ -336,3 +338,24 @@ jobs:
           path: artifacts/3d-browser-smoke-preview/
           if-no-files-found: ignore
           retention-days: 14
+
+  environmental-engine-tests:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install Environmental Engine and test dependencies
+        run: |
+          cd environmental-engine
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+      - name: Run Environmental Engine tests
+        run: |
+          cd environmental-engine
+          pytest -q
