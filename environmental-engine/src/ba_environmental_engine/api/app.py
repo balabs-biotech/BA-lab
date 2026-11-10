@@ -13,7 +13,12 @@ from typing import Annotated, Any, Literal
 from uuid import UUID
 
 from fastapi import Depends, FastAPI, Header, HTTPException, status
-from pydantic import BaseModel, ConfigDict, Field, StrictInt, model_validator
+from pydantic import BaseModel, ConfigDict, Field, StrictInt, ValidationError, model_validator
+
+from ba_environmental_engine.contexts.biological import BiologicalContext
+from ba_environmental_engine.contexts.environment import EnvironmentContext
+from ba_environmental_engine.interpretation.models import DomainProfile
+from ba_environmental_engine.interpretation.service import interpret_analysis_for_biological_context
 
 from ba_environmental_engine import __version__
 from ba_environmental_engine.climate.aggregation import AggregationMethod
@@ -114,6 +119,7 @@ class PersistedAnalysisRequest(APIModel):
     rolling_methods: dict[str, AggregationMethod] | None = Field(default=None, max_length=40)
     rolling_windows: tuple[StrictInt, ...] = Field(default=(7, 14, 30, 90), min_length=1, max_length=8)
     minimum_rolling_coverage: float = Field(default=1.0, gt=0, le=1)
+    biological_interpretation: dict[str, Any] | None = None
 
     @model_validator(mode="after")
     def validate_observation_scope(self) -> PersistedAnalysisRequest:
@@ -153,6 +159,53 @@ class AnalysisRequest(APIModel):
         if len(set(self.rolling_windows)) != len(self.rolling_windows):
             raise ValueError("rolling_windows must not contain duplicates")
         return self
+
+
+
+def _analysis_with_optional_interpretation(
+    analysis: Any,
+    payload: dict[str, Any] | None,
+) -> dict[str, Any]:
+    """Attach a separately typed interpretation without failing climate analysis.
+
+    The gateway resolves tenant-scoped records. This private API validates their
+    domain contracts and bindings, but never accepts caller-defined rule logic
+    outside the persisted profile payload supplied by that gateway.
+    """
+    response = analysis.model_dump(mode="json")
+    if payload is None:
+        response.update(
+            interpretation_status="not_requested",
+            domain_interpretation=None,
+        )
+        return response
+
+    try:
+        biological_context = BiologicalContext.model_validate(
+            payload["biological_context"]
+        )
+        environment_context = EnvironmentContext.model_validate(
+            payload["environment_context"]
+        )
+        domain_profile = DomainProfile.model_validate(payload["domain_profile"])
+        interpretation = interpret_analysis_for_biological_context(
+            analysis,
+            domain_profile,
+            biological_context,
+            environment_context,
+        )
+    except (KeyError, TypeError, ValueError, ValidationError):
+        response.update(
+            interpretation_status="context_invalid",
+            domain_interpretation=None,
+        )
+        return response
+
+    response.update(
+        interpretation_status="interpreted",
+        domain_interpretation=interpretation.model_dump(mode="json"),
+    )
+    return response
 
 
 def create_app(engine_api_key: str | None = None) -> FastAPI:
@@ -214,7 +267,7 @@ def create_app(engine_api_key: str | None = None) -> FastAPI:
                 row.to_nasa_power_domain()
                 for row in request.observations
             ]
-            return run_environmental_analysis(
+            analysis = run_environmental_analysis(
                 observations=normalized,
                 analysis_id=request.analysis_id,
                 generated_at=datetime.now(timezone.utc),
@@ -226,6 +279,10 @@ def create_app(engine_api_key: str | None = None) -> FastAPI:
                 rolling_methods=request.rolling_methods,
                 rolling_windows=request.rolling_windows,
                 minimum_rolling_coverage=request.minimum_rolling_coverage,
+            )
+            return _analysis_with_optional_interpretation(
+                analysis,
+                request.biological_interpretation,
             )
         except ValueError as exc:
             raise HTTPException(status_code=422, detail=str(exc)) from exc
