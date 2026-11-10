@@ -16,6 +16,7 @@ from typing import Iterable
 class BiologicalMeasurement:
     """One numeric biological observation with its source and quality state."""
     source_record_id: str
+    organization_id: str
     subject_id: str
     metric_code: str
     value: float
@@ -25,7 +26,7 @@ class BiologicalMeasurement:
     batch_id: str | None = None
 
     def __post_init__(self) -> None:
-        for field_name in ("source_record_id", "subject_id", "metric_code", "unit_code", "quality_state"):
+        for field_name in ("source_record_id", "organization_id", "subject_id", "metric_code", "unit_code", "quality_state"):
             if not getattr(self, field_name).strip():
                 raise ValueError(f"{field_name} must not be empty")
         if isinstance(self.value, bool) or not isinstance(self.value, (int, float)) or not isfinite(self.value):
@@ -54,6 +55,7 @@ class BiologicalPerformanceResult:
 def analyze_growth_rate(
     measurements: Iterable[BiologicalMeasurement],
     *,
+    organization_id: str,
     subject_id: str,
     accepted_quality_states: set[str] | frozenset[str],
 ) -> BiologicalPerformanceResult:
@@ -63,6 +65,8 @@ def analyze_growth_rate(
     caller supplies admissible quality states. Only growth_extent records for
     the requested subject are considered.
     """
+    if not organization_id.strip():
+        raise ValueError("organization_id must not be empty")
     if not subject_id.strip():
         raise ValueError("subject_id must not be empty")
     if not accepted_quality_states or any(not state.strip() for state in accepted_quality_states):
@@ -70,7 +74,7 @@ def analyze_growth_rate(
 
     relevant = [
         item for item in measurements
-        if item.subject_id == subject_id and item.metric_code == "growth_extent"
+        if item.organization_id == organization_id and item.subject_id == subject_id and item.metric_code == "growth_extent"
     ]
     source_ids = [item.source_record_id for item in relevant]
     if len(source_ids) != len(set(source_ids)):
