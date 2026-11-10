@@ -327,18 +327,21 @@
     }
     async function loadPlantCultures(){
       const selected=plantCulture.value;
+      const requestedLocationId=location.value;
       plantCulture.replaceChildren(node("option",{value:""},"Analyse climatique uniquement"));
-      if(!location.value)return;
-      const {data:environments,error:environmentError}=await db.from("environments").select("id").eq("location_id",location.value);
+      if(!requestedLocationId)return;
+      const {data:environments,error:environmentError}=await db.from("environments").select("id").eq("location_id",requestedLocationId);
+      if(location.value!==requestedLocationId)return;
       if(environmentError){analysisStatus.textContent="Cultures végétales indisponibles ; l’analyse climatique reste utilisable.";return;}
       const environmentIds=(environments||[]).map(row=>row.id).filter(Boolean);
       let query=db.from("plant_cultures").select("id,code,species_name,cultivar_name,status,location_id,environment_id").eq("status","active");
       if(environmentIds.length){
-        query=query.or("location_id.eq."+location.value+",environment_id.in.("+environmentIds.join(",")+")");
+        query=query.or("location_id.eq."+requestedLocationId+",environment_id.in.("+environmentIds.join(",")+")");
       }else{
-        query=query.eq("location_id",location.value);
+        query=query.eq("location_id",requestedLocationId);
       }
       const {data,error}=await query.order("code");
+      if(location.value!==requestedLocationId)return;
       if(error){analysisStatus.textContent="Cultures végétales indisponibles ; l’analyse climatique reste utilisable.";return;}
       (data||[]).forEach(row=>{
         const label=[row.code,row.species_name,row.cultivar_name].filter(Boolean).join(" · ");
