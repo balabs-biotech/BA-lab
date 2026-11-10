@@ -469,6 +469,36 @@
       if (!eventsByMaterial.has(event.material_id)) eventsByMaterial.set(event.material_id, []);
       eventsByMaterial.get(event.material_id).push(event);
     });
+    const evidence = lineage?.evidence || {};
+    const measurements = Array.isArray(evidence.measurements) ? evidence.measurements : [];
+    const observations = Array.isArray(evidence.observations) ? evidence.observations : [];
+    const biologicalSignals = Array.isArray(evidence.biological_signals) ? evidence.biological_signals : [];
+    const environmentalObservations = Array.isArray(evidence.environmental_observations) ? evidence.environmental_observations : [];
+    const cultures = Array.isArray(lineage?.cultures) ? lineage.cultures : [];
+    const getCultureEvidence = cultureId => {
+      const cultureEvents = events.filter(event => event.culture_id === cultureId);
+      const cultureEventIds = new Set(cultureEvents.map(event => event.id));
+      const locations = new Map(cultureEvents.filter(event => event.location_id).map(event => [event.location_id, cultureEvents
+        .filter(candidate => candidate.location_id === event.location_id)]));
+      const environmentalContext = [];
+      locations.forEach((locationEvents, locationId) => {
+        const matching = environmentalObservations.filter(item => item.location_id === locationId &&
+          locationEvents.some(event => {
+            const delta = Math.abs(new Date(item.observed_at).getTime() - new Date(event.occurred_at).getTime());
+            return Number.isFinite(delta) && delta <= 86400000;
+          }));
+        matching.forEach(item => environmentalContext.push({ ...item, association_type: "temporal_location_context" }));
+      });
+      return {
+        culture_id: cultureId,
+        measurements: measurements.filter(item => item.culture_id === cultureId || (item.event_id && cultureEventIds.has(item.event_id))),
+        observations: observations.filter(item => item.culture_id === cultureId || (item.event_id && cultureEventIds.has(item.event_id))),
+        biological_signals: biologicalSignals.filter(item => item.biological_subject_id === cultureId),
+        events: cultureEvents,
+        environmental_context: environmentalContext,
+        environmental_context_is_causal: false
+      };
+    };
     const traverse = (startId, adjacency, endpointField, maxNodes = 150) => {
       const visited = new Set([startId]);
       const queue = [startId];
@@ -508,6 +538,7 @@
         descendants: descendantIds.map(id => materialById.get(id)).filter(Boolean),
         strains: [...strainMap.values()],
         events: relatedEvents,
+        culture_evidence: cultures.filter(culture => relatedIds.includes(culture.material?.id)).map(culture => getCultureEvidence(culture.id)),
         unresolved_material_ids: unresolved,
         truncated: ancestorIds.length + descendantIds.length >= 298
       };
@@ -517,13 +548,17 @@
     );
     const summarize = () => ({
       material_count: materials.length,
+      measurement_count: measurements.length,
+      observation_count: observations.length,
+      biological_signal_count: biologicalSignals.length,
+      environmental_context_count: environmentalObservations.length,
       relationship_count: edgeKeys.size,
       event_count: events.length,
       root_count: materials.filter(material => !(incoming.get(material.id) || []).length && !material.parent_material_id).length,
       multi_parent_count: materials.filter(material => (incoming.get(material.id) || []).length > 1).length,
       unresolved_parent_count: [...incoming.values()].flat().filter(edge => !materialById.has(edge.parent_material_id)).length
     });
-    return { traceMaterial, findMaterialsByStrain, summarize };
+    return { traceMaterial, findMaterialsByStrain, getCultureEvidence, summarize };
   }
 
   window.BALabsBiologicalProvenance = {
@@ -539,6 +574,11 @@
     section.append(element("p", "signal-lineage-batches",
       provenanceSummary.material_count + " matériaux · " + provenanceSummary.relationship_count + " relations · " +
       provenanceSummary.event_count + " événements · " + provenanceSummary.multi_parent_count + " matériau(x) multi-source"));
+    section.append(element("h4", "", "Preuves expérimentales associées"));
+    section.append(element("p", "signal-lineage-batches",
+      provenanceSummary.measurement_count + " mesures · " + provenanceSummary.observation_count + " observations · " +
+      provenanceSummary.biological_signal_count + " signaux biologiques · " +
+      provenanceSummary.environmental_context_count + " relevés environnementaux chargés"));
     const list = element("ol", "signal-lineage-list");
     lineage.cultures.forEach(culture => {
       const item = element("li", culture.id === currentCultureId ? "is-current" : "");
@@ -558,6 +598,16 @@
       item.append(element("strong", "", title), element("small", "", detail || "Informations complémentaires indisponibles"));
       const linkedBatches = lineage.batches.filter(batch => batch.culture_id === culture.id);
       if (linkedBatches.length) item.append(element("small", "signal-lineage-batches", "Lots : " + linkedBatches.map(batch => [batch.batch_code, batch.status, batch.current_stage].filter(Boolean).join(" / ")).join(", ")));
+      const cultureEvidence = provenanceIndex.getCultureEvidence(culture.id);
+      const evidenceParts = [
+        cultureEvidence.measurements.length ? cultureEvidence.measurements.length + " mesure(s)" : null,
+        cultureEvidence.observations.length ? cultureEvidence.observations.length + " observation(s)" : null,
+        cultureEvidence.biological_signals.length ? cultureEvidence.biological_signals.length + " signal(aux)" : null,
+        cultureEvidence.environmental_context.length ? cultureEvidence.environmental_context.length + " relevé(s) environnemental(aux) contextualisé(s)" : null
+      ].filter(Boolean);
+      if (evidenceParts.length) item.append(element("small", "signal-lineage-batches", "Preuves associées : " + evidenceParts.join(" · ")));
+      if (cultureEvidence.environmental_context.length) item.append(element("small", "signal-lineage-event",
+        "Contexte environnemental temporel et géographique uniquement — aucune causalité établie"));
       const operations = lineage.events.filter(event => event.culture_id === culture.id);
       operations.forEach(event => {
         const payload = event.payload || {};
