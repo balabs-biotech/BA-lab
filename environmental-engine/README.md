@@ -4,9 +4,14 @@ Python calculation core for traceable environmental indicators used by CultureOp
 
 ## Current milestone
 
-The first implementation slice establishes daily time-series coverage assessment.
-It deliberately does not interpolate missing observations or write derived values
-back as sensor measurements.
+The engine foundation provides:
+- daily coverage assessment without interpolation;
+- deterministic daily aggregation with explicit coverage thresholds;
+- BAL-JSON v1 schema validation;
+- explicit climate-variable unit normalization with original-unit provenance.
+
+Derived values remain distinct from source observations. The engine does not
+write calculated values back as sensor measurements.
 
 ## Setup
 
@@ -17,4 +22,6 @@ python -m pip install -e ".[dev]"
 pytest
 ```
 
-Python 3.10+; CPU-only.
+Python 3.10+; CPU-only. See
+`docs/architecture/ba-environmental-unit-registry-v1.md` for canonical units
+and conversion conventions.
