@@ -2896,3 +2896,7 @@ body[data-domain] :is(button, input, select, textarea, a, [tabindex]):focus-visi
 .experiment-registry-item p{margin:.45rem 0}
 .experiment-unit-summary{display:flex;flex-wrap:wrap;gap:.4rem 1.2rem;margin:.5rem 0 0;padding-left:1.2rem;font-size:.88rem}
 @media(max-width:680px){.experiment-registry-heading,.experiment-unit-heading{align-items:stretch;flex-direction:column}.experiment-unit-row{grid-template-columns:1fr 1fr}.experiment-unit-row label:first-child{grid-column:1/-1}.experiment-unit-row button{justify-self:start}.experiment-setup-actions{align-items:stretch;flex-direction:column}}
+
+.culture-experiment-context{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.7rem;margin:.9rem 0;padding:1rem;border:1px solid var(--border,#d9d4ca);border-radius:12px;background:var(--surface-soft,#faf8f4)}
+.culture-experiment-context>div{display:grid;gap:.3rem}.culture-experiment-context select{width:100%;min-width:0}.culture-experiment-context p{grid-column:1/-1;margin:0}
+@media(max-width:600px){.culture-experiment-context{grid-template-columns:1fr}}
