@@ -300,7 +300,7 @@ const createCultureStart=engine.indexOf("async function createCulture()");
 const createCultureEnd=engine.indexOf("CULTURES DISPONIBLES POUR LES BATCHS",createCultureStart);
 const createCultureBody=engine.slice(createCultureStart,createCultureEnd);
 if(createCultureBody.includes("cultureExperimentSelect?.value")||createCultureBody.includes("cultureExperimentalUnitSelect?.value"))throw new Error("Culture creation must not depend on unbound DOM globals in isolated workflow tests");
-if(!createCultureBody.includes('cultureExperimentDocument?.getElementById("cultureExperimentId")')||!createCultureBody.includes('cultureExperimentDocument?.getElementById("cultureExperimentalUnitId")'))throw new Error("Culture experiment selectors must be resolved safely from the active document");
+if(!createCultureBody.includes('globalThis.document?.getElementById("cultureExperimentId")')||!createCultureBody.includes('globalThis.document?.getElementById("cultureExperimentalUnitId")'))throw new Error("Culture experiment selectors must be resolved safely from the active document");
 
 const cultureCreateStart=engine.indexOf("async function createCulture()");
 const cultureCreateEnd=engine.indexOf("CULTURES DISPONIBLES POUR LES BATCHS",cultureCreateStart);
