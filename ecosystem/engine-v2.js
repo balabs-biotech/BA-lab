@@ -170,7 +170,8 @@ function createWorld() {
     world.add(group);cells.set(id,{group,soma,label,hit,position:pos,color});
     const domainButton=document.createElement('button');domainButton.type='button';domainButton.className='webgl-hit-target webgl-domain-target';domainButton.setAttribute('aria-label',(LABELS[id]?.title||id)+' — '+t('domain'));domainButton.title=LABELS[id]?.title||id;domainButton.dataset.domainId=id;domainButton.style.width='116px';domainButton.style.height='116px';domainButton.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();stage?.focus({preventScroll:true});if(!selected)enterDomain(id)});stage.append(domainButton);domainHitTargets.set(id,{object:hit,button:domainButton});
     pickables.push(soma,hit,label);
-    for(let j=0;j<14;j++){
+    const branches=14;
+    for(let j=0;j<branches;j++){
       const a=j/branches*Math.PI*2+IDS.indexOf(id)*.31;
       const reach=1.0+(j%4)*.24;
       const start=new THREE.Vector3(Math.cos(a)*.10,Math.sin(a)*.09,Math.sin(a*1.7)*.035);
