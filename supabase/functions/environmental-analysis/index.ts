@@ -63,6 +63,148 @@ async function readJsonBounded(req: Request, maxBytes: number): Promise<unknown>
   }
 }
 
+
+
+type InterpretationResolution = {
+  status: string;
+  payload?: Record<string, unknown>;
+};
+
+async function resolveBiologicalInterpretation(
+  adminClient: any,
+  organizationId: string,
+  locationId: string,
+  domain: "mycology" | "greentech" | "lab",
+  subjectId: string,
+  startDate: string,
+  endDate: string,
+): Promise<InterpretationResolution> {
+  const subjectColumn = domain === "greentech" ? "plant_culture_id" : "culture_id";
+  const { data: contexts, error: contextError } = await adminClient
+    .from("biological_contexts")
+    .select("*,environment:environments!biological_contexts_environment_fk(location_id)")
+    .eq("organization_id", organizationId)
+    .eq("domain", domain)
+    .eq(subjectColumn, subjectId)
+    .lte("valid_from", endDate)
+    .or(`valid_to.is.null,valid_to.gte.${startDate}`)
+    .order("valid_from", { ascending: false })
+    .limit(2);
+
+  if (contextError) {
+    console.error("[environmental-analysis] Biological context lookup failed", contextError.message);
+    return { status: "context_lookup_failed" };
+  }
+  if (!contexts?.length) return { status: "context_unavailable" };
+  if (contexts.length > 1) return { status: "ambiguous_context" };
+
+  const context = contexts[0];
+  if (context.valid_from > startDate ||
+      (context.valid_to !== null && context.valid_to < endDate)) {
+    return { status: "context_does_not_cover_scope" };
+  }
+  const contextLocationId = context.environment?.location_id;
+  if (!contextLocationId || contextLocationId !== locationId) {
+    return { status: "context_environment_mismatch" };
+  }
+
+  const { data: environmentProfiles, error: environmentProfileError } = await adminClient
+    .from("environment_context_profiles")
+    .select(
+      "*,environment:environments!environment_context_profiles_environment_fk(location_id)," +
+      "sensors:environment_context_profile_sensors!environment_context_profile_sensors_profile_fk(sensor_id)",
+    )
+    .eq("organization_id", organizationId)
+    .eq("environment_id", context.environment_id)
+    .in("status", ["active", "retired"])
+    .lte("valid_from", startDate)
+    .or(`valid_to.is.null,valid_to.gte.${endDate}`)
+    .order("valid_from", { ascending: false })
+    .limit(2);
+
+  if (environmentProfileError) {
+    console.error("[environmental-analysis] Environment profile lookup failed", environmentProfileError.message);
+    return { status: "profile_lookup_failed" };
+  }
+  if (!environmentProfiles?.length) return { status: "environment_profile_unavailable" };
+  if (environmentProfiles.length > 1) return { status: "ambiguous_environment_profile" };
+
+  const environmentProfile = environmentProfiles[0];
+  if (environmentProfile.valid_from > startDate ||
+      (environmentProfile.valid_to !== null && environmentProfile.valid_to < endDate)) {
+    return { status: "environment_profile_unavailable" };
+  }
+  if (environmentProfile.environment?.location_id !== locationId) {
+    return { status: "environment_profile_location_mismatch" };
+  }
+
+  const { data: domainProfiles, error: domainProfileError } = await adminClient
+    .from("domain_interpretation_profiles")
+    .select("id,organization_id,domain,profile_code,profile_version,rules,status,valid_from,valid_to")
+    .eq("organization_id", organizationId)
+    .eq("domain", domain)
+    .in("status", ["active", "retired"])
+    .lte("valid_from", startDate)
+    .or(`valid_to.is.null,valid_to.gte.${endDate}`)
+    .order("valid_from", { ascending: false })
+    .limit(2);
+
+  if (domainProfileError) {
+    console.error("[environmental-analysis] Domain profile lookup failed", domainProfileError.message);
+    return { status: "profile_lookup_failed" };
+  }
+  if (!domainProfiles?.length) return { status: "domain_profile_unavailable" };
+  if (domainProfiles.length > 1) return { status: "ambiguous_domain_profile" };
+
+  const domainProfile = domainProfiles[0];
+  if (domainProfile.valid_from > startDate ||
+      (domainProfile.valid_to !== null && domainProfile.valid_to < endDate)) {
+    return { status: "domain_profile_unavailable" };
+  }
+
+  return {
+    status: "ready",
+    payload: {
+      biological_context: {
+        context_id: context.id,
+        subject_id: domain === "greentech" ? context.plant_culture_id : context.culture_id,
+        organization_id: context.organization_id,
+        location_id: contextLocationId,
+        environment_context_id: context.environment_id,
+        domain: context.domain,
+        organism_kind: context.organism_kind,
+        taxon_code: context.taxon_code,
+        strain_code: context.strain_code,
+        cultivar_code: context.cultivar_code,
+        culture_stage: context.culture_stage,
+        substrate_code: context.substrate_code,
+        production_system: context.production_system,
+        context_tags: context.context_tags ?? [],
+        valid_from: context.valid_from,
+        valid_to: context.valid_to,
+      },
+      environment_context: {
+        context_id: environmentProfile.id,
+        organization_id: environmentProfile.organization_id,
+        location_id: environmentProfile.environment.location_id,
+        context_type: environmentProfile.context_type,
+        label: environmentProfile.label,
+        timezone: environmentProfile.timezone,
+        origin: environmentProfile.origin,
+        sensor_ids: (environmentProfile.sensors ?? []).map((sensor: { sensor_id: string }) => sensor.sensor_id),
+        profile_code: environmentProfile.profile_code,
+        profile_version: environmentProfile.profile_version,
+      },
+      domain_profile: {
+        profile_id: domainProfile.profile_code,
+        module: domainProfile.domain,
+        version: domainProfile.profile_version,
+        rules: domainProfile.rules,
+      },
+    },
+  };
+}
+
 Deno.serve(async (req: Request) => {
   const origin = req.headers.get("origin");
   const allowedOrigins = new Set(
@@ -130,6 +272,17 @@ Deno.serve(async (req: Request) => {
     if (!validDate(startDate) || !validDate(endDate) || startDate > endDate) {
       return reply(400, { error: "valid_start_date_and_end_date_required" });
     }
+    const hasDomain = body.domain !== undefined && body.domain !== null;
+    const hasSubject = body.subject_id !== undefined && body.subject_id !== null;
+    if (hasDomain !== hasSubject) {
+      return reply(400, { error: "domain_and_subject_id_must_be_provided_together" });
+    }
+    if (hasDomain && !["mycology", "greentech", "lab"].includes(String(body.domain))) {
+      return reply(422, { error: "unsupported_biological_domain" });
+    }
+    if (hasSubject && (typeof body.subject_id !== "string" || !body.subject_id.trim())) {
+      return reply(400, { error: "valid_subject_id_required" });
+    }
     const dayCount = Math.floor((Date.parse(endDate + "T00:00:00Z") -
       Date.parse(startDate + "T00:00:00Z")) / DAY_MS) + 1;
     if (dayCount > MAX_DAYS || Date.parse(endDate + "T00:00:00Z") > Date.now() + DAY_MS) {
@@ -154,6 +307,19 @@ Deno.serve(async (req: Request) => {
     if (membershipError || !membership ||
         !["owner", "admin", "member", "viewer"].includes(String(membership.role))) {
       return reply(403, { error: "organization_membership_required" });
+    }
+
+    let interpretationResolution: InterpretationResolution = { status: "not_requested" };
+    if (hasDomain && hasSubject) {
+      interpretationResolution = await resolveBiologicalInterpretation(
+        adminClient,
+        location.organization_id,
+        location.id,
+        body.domain as "mycology" | "greentech" | "lab",
+        body.subject_id.trim(),
+        startDate,
+        endDate,
+      );
     }
 
     if (typeof location.latitude !== "number" || typeof location.longitude !== "number" ||
@@ -188,24 +354,28 @@ Deno.serve(async (req: Request) => {
     if (rows.length >= MAX_OBSERVATIONS) return reply(422, { error: "observation_limit_reached_narrow_date_range" });
 
     const engineEndpoint = new URL("/v1/analyses/nasa-power", engineUrl);
+    const enginePayload: Record<string, unknown> = {
+      analysis_id: crypto.randomUUID(),
+      scope: {
+        organization_id: location.organization_id,
+        location_id: location.id,
+        from: startDate,
+        to: endDate,
+      },
+      latitude_deg: location.latitude,
+      altitude_m: altitude,
+      observations: rows,
+    };
+    if (interpretationResolution.payload) {
+      enginePayload.biological_interpretation = interpretationResolution.payload;
+    }
     const engineResponse = await fetch(engineEndpoint, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         "X-BA-Engine-Key": engineKey,
       },
-      body: JSON.stringify({
-        analysis_id: crypto.randomUUID(),
-        scope: {
-          organization_id: location.organization_id,
-          location_id: location.id,
-          from: startDate,
-          to: endDate,
-        },
-        latitude_deg: location.latitude,
-        altitude_m: altitude,
-        observations: rows,
-      }),
+      body: JSON.stringify(enginePayload),
       signal: AbortSignal.timeout(60_000),
     });
     if (!engineResponse.ok) {
@@ -215,7 +385,16 @@ Deno.serve(async (req: Request) => {
       return reply(502, { error: "environmental_engine_unavailable" });
     }
     const result = await engineResponse.json();
-    return reply(200, { ok: true, analysis: result });
+    const analysisResult = {
+      ...result,
+      interpretation_status: interpretationResolution.status === "ready"
+        ? (result.interpretation_status ?? "context_invalid")
+        : interpretationResolution.status,
+      domain_interpretation: interpretationResolution.status === "ready"
+        ? (result.domain_interpretation ?? null)
+        : null,
+    };
+    return reply(200, { ok: true, analysis: analysisResult });
   } catch (error) {
     const message = error instanceof Error ? error.message : "unknown_error";
     console.error("[environmental-analysis] Request failed", message);
