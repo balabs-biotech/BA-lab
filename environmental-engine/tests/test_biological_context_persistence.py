@@ -4,6 +4,7 @@ import pytest
 
 from ba_environmental_engine.contexts.biological import (
     BiologicalContext,
+    BiologicalDomain,
 )
 from ba_environmental_engine.contexts.persistence import (
     biological_context_from_record,
