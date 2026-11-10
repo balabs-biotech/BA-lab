@@ -168,7 +168,7 @@ def test_mixed_tenant_observations_are_rejected():
         )
 
 
-def test_rolling_indicator_preserves_coverage_and_does_not_invent_lineage():
+def test_rolling_indicator_preserves_coverage_and_exact_source_lineage():
     rows = observations_for()
     temperature_row = next(
         row for row in rows if row.variable_code == "air_temperature_mean"
