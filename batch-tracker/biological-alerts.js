@@ -207,6 +207,8 @@
     state.userId = session?.user?.id || null;
     state.organizationId = window.BALabsGetOrganizationId?.() || null;
     state.rows = [];
+    state.offset = 0;
+    state.hasMore = false;
     if (!state.userId) {
       root.classList.add("hidden");
       return;
@@ -267,6 +269,8 @@
     root.classList.remove("hidden");
     if (!state.organizationId) {
       state.rows = [];
+      state.offset = 0;
+      state.hasMore = false;
       render();
       notify("En attente du rattachement à l’organisation BA-LABS…");
       return;
