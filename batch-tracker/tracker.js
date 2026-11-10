@@ -83,6 +83,7 @@ function clearAuthenticatedWorkspaceState() {
   pendingExperimentOccurredAt = null;
 
   hideElement(document.getElementById("cultureExperimentContext"));
+  hideElement(experimentRegistryCard);
   const cultureDetailPanel = document.getElementById("cultureDetailPanel");
   if (cultureDetailPanel) {
     cultureDetailPanel.classList.add("hidden");
@@ -962,6 +963,7 @@ async function initializeAuthenticatedTracker(
 
     if (document.body.dataset.domain === "laboratory") {
       showElement(document.getElementById("cultureExperimentContext"));
+      showElement(experimentRegistryCard);
       setInitializationStage("chargement du registre expérimental");
       await loadExperimentRegistry();
       if (initRevision !== authStateRevision) return;
