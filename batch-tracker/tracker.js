@@ -2304,6 +2304,7 @@ async function loadCultureOptions() {
   });
 
   renderCultureCatalog();
+  void refreshMaterialMixtureSources(loadRevision, loadOrganizationId, requestedDomain);
   renderMeasurementTargets();
   renderStatisticsFilters();
   updateOverview();
@@ -5926,6 +5927,123 @@ async function loadBiologicalLineage(cultureId) {
   } catch (error) { if (!isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return; target.textContent = biologicalWorkflowText("loadError") + (error.message || error); }
 }
 
+let materialMixtureRequestId = 0;
+let materialMixtureSourceRows = [];
+
+async function refreshMaterialMixtureSources(expectedRevision = authStateRevision, expectedOrganizationId = organizationId, expectedDomain = document.body.dataset.domain) {
+  const panel = document.getElementById("materialMixturePanel");
+  const select = document.getElementById("mixtureSources");
+  const preview = document.getElementById("mixturePreview");
+  if (!panel || !select || !preview) return;
+  const requestId = ++materialMixtureRequestId;
+  const domain = expectedDomain || "mycology";
+  panel.classList.toggle("hidden", domain === "agronomy");
+  select.replaceChildren();
+  materialMixtureSourceRows = [];
+  if (domain === "agronomy" || !expectedOrganizationId) return;
+  const cultureMaterialIds = [...new Set(cultureOptions.map(row => row.material_id).filter(Boolean))];
+  if (!cultureMaterialIds.length) {
+    const option = document.createElement("option"); option.disabled = true; option.textContent = "Aucun matériau rattaché aux cultures de cet univers."; select.append(option);
+    return;
+  }
+  try {
+    const { data, error } = await supabaseClient.from("materials")
+      .select("id,material_code,material_type,generation,state,strain_id")
+      .eq("organization_id", expectedOrganizationId)
+      .in("id", cultureMaterialIds)
+      .eq("state", "active")
+      .order("material_code", { ascending: true });
+    if (error) throw error;
+    if (requestId !== materialMixtureRequestId || !isCurrentWorkspaceRevision(expectedRevision, expectedOrganizationId) || domain !== document.body.dataset.domain) return;
+    const strainByMaterial = new Map((strainOptions || []).filter(row => row.material_id).map(row => [row.material_id, row]));
+    materialMixtureSourceRows = (data || []).map(material => {
+      const strain = strainByMaterial.get(material.id);
+      return { ...material, strainLabel: strain ? [strain.strain_code, strain.strain_designation, strain.scientific_name].filter(Boolean).join(" · ") : (material.strain_id || "Souche non renseignée") };
+    });
+    if (!materialMixtureSourceRows.length) {
+      const option = document.createElement("option"); option.disabled = true; option.textContent = "Aucun matériau actif admissible dans cet univers."; select.append(option);
+      return;
+    }
+    for (const material of materialMixtureSourceRows) {
+      const option = document.createElement("option");
+      option.value = material.id;
+      option.textContent = [material.material_code || "Sans code", material.material_type || "type inconnu", material.strainLabel, material.generation == null ? null : "G" + material.generation].filter(Boolean).join(" — ");
+      select.append(option);
+    }
+    renderMaterialMixturePreview();
+  } catch (error) {
+    if (requestId !== materialMixtureRequestId || !isCurrentWorkspaceRevision(expectedRevision, expectedOrganizationId)) return;
+    const option = document.createElement("option"); option.disabled = true; option.textContent = "Chargement impossible : " + (error.message || error); select.append(option);
+    preview.textContent = "Le catalogue des matériaux n’a pas pu être chargé.";
+  }
+}
+
+function renderMaterialMixturePreview() {
+  const select = document.getElementById("mixtureSources");
+  const preview = document.getElementById("mixturePreview");
+  if (!select || !preview) return;
+  const selected = new Set([...select.selectedOptions].map(option => option.value));
+  const rows = materialMixtureSourceRows.filter(row => selected.has(row.id));
+  preview.replaceChildren();
+  if (!rows.length) {
+    const p = document.createElement("p"); p.className = "muted"; p.textContent = "Sélectionnez au moins deux matériaux pour afficher leur provenance connue."; preview.append(p); return;
+  }
+  const heading = document.createElement("strong"); heading.textContent = rows.length + " matériau(x) sélectionné(s)"; preview.append(heading);
+  const list = document.createElement("ul");
+  rows.forEach(row => {
+    const item = document.createElement("li");
+    item.textContent = (row.material_code || "Sans code") + " · " + row.strainLabel + (row.generation == null ? "" : " · G" + row.generation);
+    list.append(item);
+  });
+  preview.append(list);
+}
+
+async function saveMaterialMixture(event) {
+  event.preventDefault();
+  const form = document.getElementById("materialMixtureForm");
+  const button = document.getElementById("saveMaterialMixture");
+  const message = document.getElementById("mixtureMessage");
+  const operationRevision = authStateRevision;
+  const operationOrganizationId = organizationId;
+  const operationDomain = document.body.dataset.domain || "mycology";
+  const selectedIds = [...new Set([...document.getElementById("mixtureSources").selectedOptions].map(option => option.value))];
+  const allowedIds = new Set(materialMixtureSourceRows.map(row => row.id));
+  const eventType = document.getElementById("mixtureOperation").value;
+  const resultCode = document.getElementById("mixtureResultCode").value.trim();
+  const dateValue = document.getElementById("mixtureDate").value;
+  const note = document.getElementById("mixtureNote").value.trim();
+  if (!operationOrganizationId || operationDomain === "agronomy") { message.textContent = "Cet univers ne prend pas en charge les mélanges biologiques."; return; }
+  if (selectedIds.length < 2 || selectedIds.length > 12 || selectedIds.some(id => !allowedIds.has(id))) { message.textContent = "Sélectionnez entre 2 et 12 matériaux actifs de la liste de cet univers."; return; }
+  if (!resultCode || !dateValue) { message.textContent = "Le code du matériau et la date sont obligatoires."; return; }
+  button.disabled = true; message.textContent = ""; message.dataset.state = "info";
+  try {
+    if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId) || operationDomain !== document.body.dataset.domain) throw new Error("L’univers ou la session a changé. Rechargez le formulaire.");
+    const { data, error } = await supabaseClient.rpc("create_biological_material_mixture", {
+      p_organization_id: operationOrganizationId,
+      p_source_material_ids: selectedIds,
+      p_event_type: eventType,
+      p_result_code: resultCode,
+      p_occurred_at: new Date(dateValue).toISOString(),
+      p_note: note || null,
+      p_details: { source: "BA Labs CultureOps", interface_version: "1.0", domain: operationDomain, source_material_count: selectedIds.length }
+    });
+    if (error) throw error;
+    if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId) || operationDomain !== document.body.dataset.domain) return;
+    const result = Array.isArray(data) ? data[0] : data;
+    message.dataset.state = "success";
+    message.textContent = "Matériau composé créé : " + (result?.material_code || resultCode) + ". Les sources et l’événement sont enregistrés dans le graphe de provenance.";
+    form.reset();
+    const now = new Date(); now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+    document.getElementById("mixtureDate").value = now.toISOString().slice(0,16);
+    await refreshMaterialMixtureSources(operationRevision, operationOrganizationId, operationDomain);
+  } catch (error) {
+    if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId) || operationDomain !== document.body.dataset.domain) return;
+    message.dataset.state = "error"; message.textContent = "Création impossible : " + (error.message || error);
+  } finally {
+    if (isCurrentWorkspaceRevision(operationRevision, operationOrganizationId) && operationDomain === document.body.dataset.domain) button.disabled = false;
+  }
+}
+
 async function saveBiologicalOperation(event) {
   const operationRevision = authStateRevision;
   const operationOrganizationId = organizationId;
@@ -6953,6 +7071,9 @@ setupDomainWorkspaces();
 setupPlantRegistry();
 setupProgressiveCultureEntry();
 setupBioOperationFormGuidance();
+document.getElementById("materialMixtureForm")?.addEventListener("submit", saveMaterialMixture);
+document.getElementById("mixtureSources")?.addEventListener("change", renderMaterialMixturePreview);
+(() => { const date = document.getElementById("mixtureDate"); if (!date) return; const now = new Date(); now.setMinutes(now.getMinutes() - now.getTimezoneOffset()); date.value = now.toISOString().slice(0,16); })();
 
 
 /* Only operations that can create descendants expose descendant-code entry. */
