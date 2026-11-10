@@ -5404,6 +5404,7 @@ async function saveMeasurement() {
     let cultureId = null;
     let batchId = null;
     let plantCultureId = null;
+    let experimentalUnitId = null;
     let environmentId = null;
     let locationId = null;
     const [targetType, targetId] = targetValue.split(":");
@@ -5412,6 +5413,7 @@ async function saveMeasurement() {
       const culture = cultureOptions.find(item => item.id === targetId);
       if (!culture) throw new Error(cultureWorkflowText("cultureMissing"));
       cultureId = culture.id;
+      experimentalUnitId = culture.experimental_unit_id || null;
     } else if (targetType === "plant") {
       const plant = plantCultureOptions.find(item => item.id === targetId);
       if (!plant) throw new Error("L’unité végétale sélectionnée n’est plus disponible.");
@@ -5423,6 +5425,9 @@ async function saveMeasurement() {
       if (!batch) throw new Error(cultureWorkflowText("batchMissing"));
       batchId = batch.id;
       cultureId = batch.culture_id || null;
+      experimentalUnitId = cultureId
+        ? cultureOptions.find(item => item.id === cultureId)?.experimental_unit_id || null
+        : null;
 
     } else {
       throw new Error(cultureWorkflowText("invalidTarget"));
@@ -5461,6 +5466,7 @@ async function saveMeasurement() {
       instrument: measurementInstrumentInput.value.trim() || null,
       culture_id: cultureId,
       plant_culture_id: plantCultureId,
+      experimental_unit_id: experimentalUnitId,
       environment_id: environmentId,
       metadata: {
         source: "batch-tracker-manual",
@@ -5530,7 +5536,7 @@ async function loadRecentMeasurements() {
 
   const { data, error } = await supabaseClient
     .from("measurements")
-    .select("id, variable_code, raw_value, raw_unit_code, normalized_value, normalized_unit_code, measured_at, method, instrument, culture_id, plant_culture_id, event_id, metadata")
+    .select("id, variable_code, raw_value, raw_unit_code, normalized_value, normalized_unit_code, measured_at, method, instrument, culture_id, plant_culture_id, experimental_unit_id, event_id, metadata")
     .eq("organization_id", loadOrganizationId)
     .order("measured_at", { ascending: false })
     .limit(1000);
@@ -5553,6 +5559,24 @@ async function loadRecentMeasurements() {
   }
 
   if (requestId !== measurementHistoryRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
+
+  const experimentalUnitIds = [...new Set(rows.map(row => row.experimental_unit_id).filter(Boolean))];
+  const experimentalUnitsById = {};
+  if (experimentalUnitIds.length) {
+    const { data: experimentalUnits, error: experimentalUnitsError } = await supabaseClient
+      .from("experimental_units")
+      .select("id, unit_code, replicate_no, treatment_code")
+      .eq("organization_id", loadOrganizationId)
+      .in("id", experimentalUnitIds);
+    if (requestId !== measurementHistoryRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
+    if (experimentalUnitsError) {
+      console.warn("Détails des unités expérimentales indisponibles :", experimentalUnitsError.message);
+    } else {
+      for (const unit of experimentalUnits || []) experimentalUnitsById[unit.id] = unit;
+    }
+  }
+
+  if (requestId !== measurementHistoryRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
   const visibleRows = rows.filter(row => belongsToActiveWorkspace(row, eventsById)).slice(0, 10);
   if (!visibleRows.length) {
     measurementHistory.innerHTML = '<p class="muted">Aucune mesure enregistrée dans cet univers pour le moment.</p>';
@@ -5565,6 +5589,12 @@ async function loadRecentMeasurements() {
     const batchId = row.event_id ? eventsById[row.event_id]?.batch_id : null;
     const batch = batchId ? latestBatches.find(item => item.id === batchId) : null;
     const plant = plantCultureOptions.find(item => item.id === row.plant_culture_id);
+    const experimentalUnit = row.experimental_unit_id
+      ? experimentalUnitsById[row.experimental_unit_id]
+      : null;
+    const experimentalUnitContext = experimentalUnit
+      ? ` · Unité ${escapeHtml(experimentalUnit.unit_code)}${experimentalUnit.treatment_code ? " · " + escapeHtml(experimentalUnit.treatment_code) : ""}${experimentalUnit.replicate_no ? " · R" + escapeHtml(experimentalUnit.replicate_no) : ""}`
+      : "";
     const target = plant
       ? `AgriTech · ${escapeHtml(plant.code)} · ${escapeHtml(plant.cultivar_name || plant.crop_type)}`
       : batch
@@ -5580,7 +5610,7 @@ async function loadRecentMeasurements() {
       <article class="measurement-entry">
         <div>
           <strong>${escapeHtml(variable?.label || row.variable_code)}</strong>
-          <div class="measurement-meta">${target}${method}${instrument}</div>
+          <div class="measurement-meta">${target}${experimentalUnitContext}${method}${instrument}</div>
           ${note}
         </div>
         <div class="measurement-value">${escapeHtml(row.raw_value)} <span class="measurement-meta">${escapeHtml(row.raw_unit_code)}</span></div>
