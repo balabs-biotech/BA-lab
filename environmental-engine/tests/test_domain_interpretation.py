@@ -1,8 +1,10 @@
 from datetime import date, datetime, timedelta, timezone
 from uuid import uuid4
 
+from ba_environmental_engine.contexts.biological import BiologicalContext
+from ba_environmental_engine.contexts.environment import EnvironmentContext, EnvironmentType, ObservationOrigin
 from ba_environmental_engine.execution import run_environmental_analysis
-from ba_environmental_engine.interpretation import interpret_findings
+from ba_environmental_engine.interpretation import interpret_findings, interpret_analysis_for_biological_context
 from ba_environmental_engine.interpretation.models import (
     DomainProfile,
     InterpretationRule,
@@ -148,3 +150,112 @@ def test_domain_profile_ids_are_stable_for_same_inputs():
     second = interpret_findings(analysis, profile)
 
     assert first.signals[0].signal_id == second.signals[0].signal_id
+
+
+
+def test_biological_context_is_bound_to_environment_and_enriches_domain_rules():
+    analysis = make_analysis()
+    environment = EnvironmentContext(
+        context_id=uuid4(),
+        organization_id=analysis.scope.organization_id,
+        location_id=analysis.scope.location_id,
+        context_type=EnvironmentType.FRUITING_CHAMBER,
+        label="Chambre Pleurotus",
+        timezone="Africa/Algiers",
+        origin=ObservationOrigin.WEATHER_PROVIDER,
+        profile_code="ba_fruiting_room",
+        profile_version="1.0.0",
+    )
+    biological = BiologicalContext(
+        context_id=uuid4(),
+        subject_id=uuid4(),
+        organization_id=analysis.scope.organization_id,
+        location_id=analysis.scope.location_id,
+        environment_context_id=environment.context_id,
+        domain="mycology",
+        organism_kind="fungus",
+        taxon_code="pleurotus_ostreatus",
+        strain_code="BA-P80",
+        culture_stage="fruiting",
+        substrate_code="wheat_straw",
+        production_system="fruiting_chamber",
+        context_tags=frozenset({"season:winter"}),
+        valid_from=analysis.scope.from_date,
+        valid_to=analysis.scope.to_date,
+    )
+    profile = DomainProfile(
+        profile_id="mycology-pleurotus-v1",
+        module="mycology",
+        version="1.0.0",
+        rules=(
+            InterpretationRule(
+                rule_id="fruiting-temperature-review",
+                variable_code="air_temperature_mean",
+                finding_status="suspect",
+                required_context_tags=frozenset({
+                    "stage:fruiting",
+                    "strain:BA-P80",
+                    "substrate:wheat_straw",
+                    "system:fruiting_chamber",
+                }),
+                signal_code="environmental_review",
+                severity="high",
+                message_code="review_fruiting_temperature",
+            ),
+        ),
+    )
+
+    result = interpret_analysis_for_biological_context(
+        analysis,
+        profile,
+        biological,
+        environment,
+    )
+
+    assert result.matched_findings == 1
+    assert result.signals[0].context_tags >= {
+        "season:winter",
+        "stage:fruiting",
+        "strain:BA-P80",
+        "substrate:wheat_straw",
+        "system:fruiting_chamber",
+    }
+
+
+def test_biological_context_cannot_be_interpreted_by_another_domain_profile():
+    analysis = make_analysis()
+    environment = EnvironmentContext(
+        context_id=uuid4(),
+        organization_id=analysis.scope.organization_id,
+        location_id=analysis.scope.location_id,
+        context_type=EnvironmentType.FRUITING_CHAMBER,
+        label="Chambre Pleurotus",
+        timezone="Africa/Algiers",
+        origin=ObservationOrigin.WEATHER_PROVIDER,
+        profile_code="ba_fruiting_room",
+        profile_version="1.0.0",
+    )
+    biological = BiologicalContext(
+        context_id=uuid4(),
+        subject_id=uuid4(),
+        organization_id=analysis.scope.organization_id,
+        location_id=analysis.scope.location_id,
+        environment_context_id=environment.context_id,
+        domain="mycology",
+        organism_kind="fungus",
+        taxon_code="pleurotus_ostreatus",
+        strain_code="BA-P80",
+        culture_stage="fruiting",
+        production_system="fruiting_chamber",
+        valid_from=analysis.scope.from_date,
+    )
+    profile = DomainProfile(
+        profile_id="greentech-v1",
+        module="greentech",
+        version="1.0.0",
+        rules=(),
+    )
+
+    import pytest
+    with pytest.raises(ValueError, match="profile module must match biological context domain"):
+        interpret_analysis_for_biological_context(analysis, profile, biological, environment)
