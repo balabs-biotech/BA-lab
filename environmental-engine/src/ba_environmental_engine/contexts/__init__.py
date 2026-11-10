@@ -17,6 +17,11 @@ from ba_environmental_engine.contexts.measurement import (
     MeasurementOrigin,
     SensorDescriptor,
 )
+from ba_environmental_engine.contexts.profile_persistence import (
+    SupabaseEnvironmentalProfileRepository,
+    domain_profile_from_record,
+    environment_context_from_record,
+)
 from ba_environmental_engine.contexts.persistence import (
     SupabaseBiologicalContextRepository,
     biological_context_from_record,
@@ -31,6 +36,9 @@ __all__ = [
     "biological_context_from_record",
     "biological_context_to_record",
     "SupabaseBiologicalContextRepository",
+    "SupabaseEnvironmentalProfileRepository",
+    "domain_profile_from_record",
+    "environment_context_from_record",
     "CalibrationStatus",
     "EnvironmentalMeasurement",
     "EnvironmentContext",
