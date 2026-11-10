@@ -388,7 +388,7 @@ declare
   first_result jsonb;
   retry_result jsonb;
   result_id uuid;
-  event_id uuid;
+  v_event_id uuid;
   caught boolean := false;
   unit_id uuid;
   request_key uuid := '00000000-0000-0000-0000-0000000000c2';
@@ -409,19 +409,19 @@ begin
     raise exception 'FAIL: identical experimental-result retry did not return original response';
   end if;
   result_id := (first_result->>'result_id')::uuid;
-  event_id := (first_result->>'event_id')::uuid;
-  if (select count(*) from public.results
+  v_event_id := (first_result->>'v_event_id')::uuid;
+  if (select count(*) from public.results r
        where organization_id='00000000-0000-0000-0000-0000000000a1'
-         and id=result_id and experiment_id=(select experiment_id from public.experimental_units where id=unit_id)
-         and experimental_unit_id=unit_id and event_id=event_id and code='RES-001'
-         and result_type='growth_assessment'
-         and value='{"colony_diameter_mm":42.5,"replicate":"REP-01"}'::jsonb
-         and quality_state='raw') <> 1 then
+         and r.id=result_id and r.experiment_id=(select experiment_id from public.experimental_units where id=unit_id)
+         and r.experimental_unit_id=unit_id and r.event_id=v_event_id and r.code='RES-001'
+         and r.result_type='growth_assessment'
+         and r.value='{"colony_diameter_mm":42.5,"replicate":"REP-01"}'::jsonb
+         and r.quality_state='raw') <> 1 then
     raise exception 'FAIL: structured experimental result was not persisted with experiment and unit provenance';
   end if;
   if (select count(*) from public.events
        where organization_id='00000000-0000-0000-0000-0000000000a1'
-         and id=event_id and event_type='experiment_result_recorded'
+         and id=v_event_id and event_type='experiment_result_recorded'
          and experimental_unit_id=unit_id and payload->>'result_id'=result_id::text) <> 1 then
     raise exception 'FAIL: result traceability event is missing or disconnected';
   end if;
