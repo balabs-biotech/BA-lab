@@ -86,8 +86,8 @@ async function resolveBiologicalInterpretation(
     .eq("organization_id", organizationId)
     .eq("domain", domain)
     .eq(subjectColumn, subjectId)
-    .lte("valid_from", endDate)
-    .or(`valid_to.is.null,valid_to.gte.${startDate}`)
+    .lte("valid_from", startDate)
+    .or(`valid_to.is.null,valid_to.gte.${endDate}`)
     .order("valid_from", { ascending: false })
     .limit(2);
 
@@ -95,14 +95,31 @@ async function resolveBiologicalInterpretation(
     console.error("[environmental-analysis] Biological context lookup failed", contextError.message);
     return { status: "context_lookup_failed" };
   }
-  if (!contexts?.length) return { status: "context_unavailable" };
+  if (!contexts?.length) {
+    // Distinguish an unknown subject from a context that covers only part of
+    // the requested window. Neither case may produce a biological signal.
+    const { data: overlappingContexts, error: overlapError } = await adminClient
+      .from("biological_contexts")
+      .select("id")
+      .eq("organization_id", organizationId)
+      .eq("domain", domain)
+      .eq(subjectColumn, subjectId)
+      .lte("valid_from", endDate)
+      .or(`valid_to.is.null,valid_to.gte.${startDate}`)
+      .limit(1);
+    if (overlapError) {
+      console.error("[environmental-analysis] Biological context overlap lookup failed", overlapError.message);
+      return { status: "context_lookup_failed" };
+    }
+    return {
+      status: overlappingContexts?.length
+        ? "context_does_not_cover_scope"
+        : "context_unavailable",
+    };
+  }
   if (contexts.length > 1) return { status: "ambiguous_context" };
 
   const context = contexts[0];
-  if (context.valid_from > startDate ||
-      (context.valid_to !== null && context.valid_to < endDate)) {
-    return { status: "context_does_not_cover_scope" };
-  }
   const contextLocationId = context.environment?.location_id;
   if (!contextLocationId || contextLocationId !== locationId) {
     return { status: "context_environment_mismatch" };
