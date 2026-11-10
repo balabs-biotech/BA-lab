@@ -143,23 +143,16 @@ class BiologicalContextRepository(Protocol):
     ) -> tuple[BiologicalContext, ...]: ...
 
 
-def interpret_persisted_analysis_for_subject(
+def _resolve_persisted_biological_context(
     analysis: BALAnalysis,
-    profile: DomainProfile,
     repository: BiologicalContextRepository,
-    environment_context: EnvironmentContext,
     *,
     subject_id: UUID,
-) -> DomainInterpretation:
-    """Resolve one persisted context covering the complete analysis window.
-
-    A context that only overlaps part of the analysis window is insufficient:
-    one interpretation must not silently combine multiple biological regimes.
-    """
-    domain = BiologicalDomain(profile.module)
+) -> BiologicalContext:
+    """Resolve one persisted biological context covering the complete analysis window."""
     overlapping = repository.list_overlapping_scope(
         organization_id=str(analysis.scope.organization_id),
-        domain=domain,
+        domain=BiologicalDomain.MYCOLOGY,
         subject_id=str(subject_id),
         from_date=analysis.scope.from_date.isoformat(),
         to_date=analysis.scope.to_date.isoformat(),
@@ -184,6 +177,83 @@ def interpret_persisted_analysis_for_subject(
         raise ValueError(
             "one biological context must cover the complete analysis scope"
         )
+    return context
+
+
+def interpret_persisted_analysis_for_subject(
+    analysis: BALAnalysis,
+    profile: DomainProfile,
+    repository: BiologicalContextRepository,
+    environment_context: EnvironmentContext,
+    *,
+    subject_id: UUID,
+) -> DomainInterpretation:
+    """Interpret against one persisted biological context and supplied profiles."""
+    context = _resolve_persisted_biological_context(
+        analysis, repository, subject_id=subject_id
+    )
+    return interpret_analysis_for_biological_context(
+        analysis,
+        profile,
+        context,
+        environment_context,
+    )
+
+
+class EnvironmentalProfileRepository(Protocol):
+    """Read-only profile resolver required by persisted interpretation."""
+
+    def get_environment_profile_for_scope(
+        self,
+        *,
+        organization_id: str,
+        environment_id: str,
+        from_date: str,
+        to_date: str,
+    ) -> EnvironmentContext: ...
+
+    def get_domain_profile_for_scope(
+        self,
+        *,
+        organization_id: str,
+        domain: BiologicalDomain,
+        from_date: str,
+        to_date: str,
+    ) -> DomainProfile: ...
+
+
+def interpret_persisted_analysis_with_profiles(
+    analysis: BALAnalysis,
+    biological_repository: BiologicalContextRepository,
+    profile_repository: EnvironmentalProfileRepository,
+    *,
+    subject_id: UUID,
+) -> DomainInterpretation:
+    """Resolve all persisted context/profile versions, then interpret one analysis.
+
+    Domain selection comes from the persisted biological context. Environment
+    selection comes from that context's environment reference. The client cannot
+    choose a different tenant, location, profile version, or rule set.
+    """
+    context = _resolve_persisted_biological_context(
+        analysis, biological_repository, subject_id=subject_id
+    )
+    organization_id = str(analysis.scope.organization_id)
+    from_date = analysis.scope.from_date.isoformat()
+    to_date = analysis.scope.to_date.isoformat()
+
+    environment_context = profile_repository.get_environment_profile_for_scope(
+        organization_id=organization_id,
+        environment_id=str(context.environment_context_id),
+        from_date=from_date,
+        to_date=to_date,
+    )
+    profile = profile_repository.get_domain_profile_for_scope(
+        organization_id=organization_id,
+        domain=context.domain,
+        from_date=from_date,
+        to_date=to_date,
+    )
 
     return interpret_analysis_for_biological_context(
         analysis,
