@@ -166,7 +166,7 @@ def test_repository_resolves_environment_profile_for_full_analysis_window():
         to_date="2026-11-30",
     )
 
-    assert context.context_id == record["id"]
+    assert str(context.context_id) == record["id"]
     query = client.queries[0][1]
     assert ("organization_id", "eq", record["organization_id"]) in query.filters
     assert ("environment_id", "eq", record["environment_id"]) in query.filters
@@ -228,7 +228,11 @@ def test_repository_rejects_missing_profile(method, table, kwargs):
 
 def test_repository_rejects_ambiguous_profiles():
     first = make_domain_profile()
-    second = make_domain_profile(id=str(uuid4()), profile_code="mycology-alt")
+    second = make_domain_profile(
+        id=str(uuid4()),
+        organization_id=first["organization_id"],
+        profile_code="mycology-alt",
+    )
     client = FakeSupabase({"domain_interpretation_profiles": [first, second]})
     repository = SupabaseEnvironmentalProfileRepository(client)
 
