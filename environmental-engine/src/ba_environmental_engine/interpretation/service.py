@@ -59,7 +59,7 @@ def interpret_findings(
                     source_finding_id=finding.finding_id,
                     source_observation_ids=tuple(finding.source_observation_ids),
                     variable_code=finding.variable_code,
-                    observed_date=finding.observed_date.isoformat(),
+                    observed_date=finding.observed_date,
                     observed_value=finding.observed_value,
                     unit=finding.unit,
                     finding_status=finding.status,
