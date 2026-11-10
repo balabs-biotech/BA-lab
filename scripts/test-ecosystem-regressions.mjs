@@ -137,7 +137,7 @@ assert.ok(engine.includes('const hitRadius=depth===0?.32:depth===1?.25:.19'), 'E
 assert.ok(engine.includes('function openResource(item)'), 'Branch selection must drill into folders or open terminal pages');
 assert.ok(engine.includes('nearestLabelDistance<(window.innerWidth<760?58:70)'), 'Mobile and desktop label hit radii must stay narrow enough to avoid selecting adjacent branches');
 assert.ok(engine.includes("if(data.children?.length){"), 'Folders with children must open a deeper spatial level');
-assert.ok(engine.includes('const ancestors=[];let parent=data.parentNode'), 'Directly selected nested folders must preserve every ancestor in the breadcrumb stack');
+assert.ok(engine.includes('let parent=data.parentNode;const ancestors=[];while(parent&&parent!==previousNode)'), 'Directly selected nested folders must preserve every ancestor in the breadcrumb stack');
 assert.ok(engine.includes("if(data.url){window.open(data.url"), 'Terminal pages must open their corresponding Notion page');
 assert.ok(!engine.includes("open.dataset.resourceOpen='true'"), 'The obsolete resource details panel must not be used for navigation');
 assert.ok(engine.includes("data-camera=\"back\""), 'The scene must expose a direct previous-level control');
