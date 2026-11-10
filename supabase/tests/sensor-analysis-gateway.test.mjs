@@ -53,4 +53,9 @@ assert.match(source, /analysis_evidence: signal\.evidence \?\? \{\}/, "sensor si
 assert.match(source, /biological_signal_persistence_failed/, "failed persistence must not be reported as a successful analysis");
 assert.match(source, /signal_persistence_status: signalPersistenceStatus/, "gateway response must expose persistence status");
 
-console.log("PASS: sensor analysis gateway security contract");
+
+assert.match(source, /flatline_minimum_repeated_observations: flatlineMinimumObservations/, "explicit flatline observation policy must be forwarded");
+assert.match(source, /flatline_minimum_duration_seconds: flatlineMinimumDurationSeconds/, "explicit flatline duration policy must be forwarded");
+assert.match(source, /flatline_diagnostic_parameters_must_be_supplied_together_and_within_limits/, "partial or out-of-range flatline configuration must be rejected");
+assert.match(source, /flatlineMinimumObservations > MAX_ROWS/, "flatline observation count must not exceed the measurement cap");
+console.log("PASS: sensor analysis gateway security and instrument-health contract");
