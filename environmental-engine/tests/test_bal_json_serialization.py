@@ -170,6 +170,11 @@ def test_incomplete_daily_result_serializes_null_and_missing_variable_warning():
     assert et0.status == "insufficient_data"
     assert et0.coverage.expected == 6
     assert et0.coverage.observed == 5
+    net_radiation = next(
+        item for item in analysis.indicators if item.code == "net_radiation_fao56_daily"
+    )
+    assert net_radiation.coverage.expected == 4
+    assert net_radiation.coverage.observed == 4
     assert any("wind_speed_mean" in warning for warning in analysis.warnings)
 
 
@@ -319,3 +324,33 @@ def test_empty_analysis_is_rejected():
             scope_from=date(2026, 11, 1),
             scope_to=date(2026, 11, 1),
         )
+
+
+
+def test_insufficient_daily_result_with_only_wind_input_keeps_valid_quality_and_coverage():
+    rows = observations_for(variables={
+        "wind_speed_mean": VARIABLES["wind_speed_mean"],
+    })
+    result = daily_result(rows, status="insufficient_data")
+    analysis = build_bal_analysis(
+        observations=rows,
+        daily_indicators=[result],
+        analysis_id=uuid4(),
+        generated_at=datetime(2026, 11, 2, tzinfo=timezone.utc),
+        engine_version="0.1.0",
+        scope_from=date(2026, 11, 1),
+        scope_to=date(2026, 11, 1),
+    )
+
+    net_radiation = next(
+        item for item in analysis.indicators if item.code == "net_radiation_fao56_daily"
+    )
+    et0 = next(
+        item for item in analysis.indicators if item.code == "reference_et0_fao56_daily"
+    )
+    assert net_radiation.status == "insufficient_data"
+    assert net_radiation.coverage.expected == 4
+    assert net_radiation.coverage.observed == 0
+    assert "NO_AVAILABLE_FORMULA_INPUTS" in net_radiation.quality.flags
+    assert et0.coverage.expected == 6
+    assert et0.coverage.observed == 1
