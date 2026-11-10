@@ -404,6 +404,7 @@
     const events = [...eventsById.values()].sort((x, y) => String(x.occurred_at).localeCompare(String(y.occurred_at)));
     const locationIds = [...new Set(events.map(event => event.location_id).filter(Boolean))];
     let environmentalObservations = [];
+    let environmentalAvailable = false;
     if (locationIds.length) {
       const eventTimes = events.map(event => new Date(event.occurred_at).getTime()).filter(Number.isFinite);
       const from = eventTimes.length ? new Date(Math.min(...eventTimes) - 86400000).toISOString() : null;
@@ -414,16 +415,28 @@
         .order("observed_at", { ascending: true }).limit(500);
       if (from && to) query = query.gte("observed_at", from).lte("observed_at", to);
       const environmentalResult = await query;
-      if (!environmentalResult.error) environmentalObservations = environmentalResult.data || [];
+      environmentalAvailable = !environmentalResult.error;
+      if (environmentalAvailable) environmentalObservations = environmentalResult.data || [];
     }
     const measurements = measurementResult.error ? [] : (measurementResult.data || []);
     const observations = observationResult.error ? [] : (observationResult.data || []);
     const biologicalSignals = signalResult.error ? [] : (signalResult.data || []);
+    const resultIds = [...new Set(measurements.map(item => item.result_id).filter(Boolean))];
+    let experimentalResults = [];
+    let resultsAvailable = resultIds.length > 0;
+    if (resultIds.length) {
+      const resultQuery = await client.from("results")
+        .select("id,code,result_type,value,quality_state,experiment_id,experimental_unit_id,created_at")
+        .eq("organization_id", organizationId).in("id", resultIds).limit(200);
+      resultsAvailable = !resultQuery.error;
+      if (resultsAvailable) experimentalResults = resultQuery.data || [];
+    }
     const evidenceAvailability = {
       measurements: !measurementResult.error,
       observations: !observationResult.error,
       biological_signals: !signalResult.error,
-      environmental_observations: locationIds.length > 0
+      experimental_results: resultsAvailable,
+      environmental_observations: environmentalAvailable
     };
     return {
       cultures,
@@ -431,7 +444,7 @@
       relationships,
       batches: batchResult.error ? [] : (batchResult.data || []),
       events,
-      evidence: { measurements, observations, biological_signals: biologicalSignals, environmental_observations: environmentalObservations },
+      evidence: { measurements, observations, biological_signals: biologicalSignals, experimental_results: experimentalResults, environmental_observations: environmentalObservations },
       evidenceAvailability,
       unavailable: false,
       truncated: byId.size >= MAX_CULTURES || materialById.size >= MAX_MATERIALS || relationshipByKey.size >= MAX_RELATIONSHIPS ||
@@ -474,6 +487,7 @@
     const observations = Array.isArray(evidence.observations) ? evidence.observations : [];
     const biologicalSignals = Array.isArray(evidence.biological_signals) ? evidence.biological_signals : [];
     const environmentalObservations = Array.isArray(evidence.environmental_observations) ? evidence.environmental_observations : [];
+    const experimentalResults = Array.isArray(evidence.experimental_results) ? evidence.experimental_results : [];
     const cultures = Array.isArray(lineage?.cultures) ? lineage.cultures : [];
     const getCultureEvidence = cultureId => {
       const cultureEvents = events.filter(event => event.culture_id === cultureId);
@@ -494,6 +508,7 @@
         measurements: measurements.filter(item => item.culture_id === cultureId || (item.event_id && cultureEventIds.has(item.event_id))),
         observations: observations.filter(item => item.culture_id === cultureId || (item.event_id && cultureEventIds.has(item.event_id))),
         biological_signals: biologicalSignals.filter(item => item.biological_subject_id === cultureId),
+        experimental_results: experimentalResults.filter(result => measurements.some(item => item.culture_id === cultureId && item.result_id === result.id)),
         events: cultureEvents,
         environmental_context: environmentalContext,
         environmental_context_is_causal: false
@@ -551,6 +566,7 @@
       measurement_count: measurements.length,
       observation_count: observations.length,
       biological_signal_count: biologicalSignals.length,
+      experimental_result_count: experimentalResults.length,
       environmental_context_count: environmentalObservations.length,
       relationship_count: edgeKeys.size,
       event_count: events.length,
@@ -603,6 +619,7 @@
         cultureEvidence.measurements.length ? cultureEvidence.measurements.length + " mesure(s)" : null,
         cultureEvidence.observations.length ? cultureEvidence.observations.length + " observation(s)" : null,
         cultureEvidence.biological_signals.length ? cultureEvidence.biological_signals.length + " signal(aux)" : null,
+        cultureEvidence.experimental_results.length ? cultureEvidence.experimental_results.length + " résultat(s) expérimental(aux)" : null,
         cultureEvidence.environmental_context.length ? cultureEvidence.environmental_context.length + " relevé(s) environnemental(aux) contextualisé(s)" : null
       ].filter(Boolean);
       if (evidenceParts.length) item.append(element("small", "signal-lineage-batches", "Preuves associées : " + evidenceParts.join(" · ")));
