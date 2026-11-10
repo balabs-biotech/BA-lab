@@ -290,6 +290,9 @@ const cultureSessionContext = {
   protocolSelect: { value: "" },
   startedAtInput: { value: "" },
   termsAcceptedCheckbox: { checked: true, focus() {} },
+  cultureExperimentSelect: { value: "" },
+  cultureExperimentalUnitSelect: { value: "" },
+  document: { getElementById() { return null; }, body: { dataset: { domain: "laboratory" } } },
   isCurrentWorkspaceRevision(revision, organizationId) {
     return revision === 1 && organizationId === "org-test";
   },

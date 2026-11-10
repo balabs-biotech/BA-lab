@@ -78,7 +78,12 @@ function clearAuthenticatedWorkspaceState() {
   batchEnvironmentOptions = [];
   recentObservations = [];
   initializationWarnings = [];
+  experimentRegistryRows = [];
+  experimentalUnitRegistryRows = [];
+  pendingExperimentOccurredAt = null;
 
+  hideElement(document.getElementById("cultureExperimentContext"));
+  hideElement(document.getElementById("experimentRegistryCard"));
   const cultureDetailPanel = document.getElementById("cultureDetailPanel");
   if (cultureDetailPanel) {
     cultureDetailPanel.classList.add("hidden");
@@ -231,6 +236,8 @@ const cultureTypeSelect =
 
 const protocolSelect =
   document.getElementById("protocol");
+const cultureExperimentSelect = document.getElementById("cultureExperimentId");
+const cultureExperimentalUnitSelect = document.getElementById("cultureExperimentalUnitId");
 
 const startedAtInput =
   document.getElementById("startedAt");
@@ -953,6 +960,14 @@ async function initializeAuthenticatedTracker(
     setInitializationStage("chargement des cultures");
     await loadCultureOptions();
     if (initRevision !== authStateRevision) return;
+
+    if (document.body.dataset.domain === "laboratory") {
+      showElement(document.getElementById("cultureExperimentContext"));
+      showElement(experimentRegistryCard);
+      setInitializationStage("chargement du registre expérimental");
+      await loadExperimentRegistry();
+      if (initRevision !== authStateRevision) return;
+    }
 
     setInitializationStage("chargement des unités");
     await loadQuantityUnitOptions();
@@ -1901,6 +1916,13 @@ async function createCulture() {
     return;
   }
 
+  const selectedExperimentId = globalThis.document?.getElementById("cultureExperimentId")?.value || "";
+  const selectedExperimentalUnitId = globalThis.document?.getElementById("cultureExperimentalUnitId")?.value || "";
+  if (Boolean(selectedExperimentId) !== Boolean(selectedExperimentalUnitId)) {
+    showMessage("Pour rattacher une culture à une expérience, sélectionnez à la fois l’expérience et son unité expérimentale.", "error");
+    return;
+  }
+
   let session;
 
   try {
@@ -2010,8 +2032,8 @@ async function createCulture() {
       p_parent_culture_id: null,
       p_protocol_version_id: protocolVersionId,
       p_environment_id: null,
-      p_experiment_id: null,
-      p_experimental_unit_id: null,
+      p_experiment_id: selectedExperimentId || null,
+      p_experimental_unit_id: selectedExperimentalUnitId || null,
       p_started_at: startedAt ? new Date(startedAt).toISOString() : null,
       p_metadata: {
         source: "BA Labs Culture Tracker",
@@ -5136,6 +5158,203 @@ function clearManualWriteIdempotencyKey(scope) {
   try { sessionStorage.removeItem(storageKey); } catch {}
 }
 
+
+/* ============================================================
+   REGISTRE EXPÉRIMENTAL — LABORATORY
+   ============================================================ */
+
+const experimentRegistryCard = document.getElementById("experimentRegistryCard");
+const experimentSetupForm = document.getElementById("experimentSetupForm");
+const experimentUnitRows = document.getElementById("experimentUnitRows");
+const experimentRegistryList = document.getElementById("experimentRegistryList");
+const experimentRegistryStatus = document.getElementById("experimentRegistryStatus");
+let experimentUnitRowSequence = 0;
+let pendingExperimentOccurredAt = null;
+let experimentRegistryRows = [];
+let experimentalUnitRegistryRows = [];
+
+function addExperimentUnitRow(values = {}) {
+  if (!experimentUnitRows || experimentUnitRows.children.length >= 200) return;
+  const row = document.createElement("div");
+  row.className = "experiment-unit-row";
+  row.dataset.rowId = String(++experimentUnitRowSequence);
+  row.innerHTML = `
+    <label>Code unité<input name="unit_code" maxlength="120" required value="${escapeHtml(values.unit_code || "")}" placeholder="EXP-01-U01"></label>
+    <label>Traitement<input name="treatment_code" maxlength="120" value="${escapeHtml(values.treatment_code || "")}" placeholder="Témoin / T1"></label>
+    <label>Répétition<input name="replicate_no" type="number" min="1" step="1" value="${escapeHtml(values.replicate_no ?? "")}" placeholder="1"></label>
+    <button type="button" class="secondary-button small-button" data-remove-experiment-unit aria-label="Supprimer cette unité">Retirer</button>
+  `;
+  experimentUnitRows.appendChild(row);
+}
+
+
+function populateCultureExperimentOptions() {
+  if (!cultureExperimentSelect || !cultureExperimentalUnitSelect) return;
+  const selectedExperimentId = cultureExperimentSelect.value;
+  cultureExperimentSelect.replaceChildren(new Option("Aucune expérience", ""));
+  for (const experiment of experimentRegistryRows) {
+    cultureExperimentSelect.add(new Option(`${experiment.code} — ${experiment.name}`, experiment.id));
+  }
+  if (experimentRegistryRows.some(item => item.id === selectedExperimentId)) cultureExperimentSelect.value = selectedExperimentId;
+  populateCultureExperimentalUnitOptions();
+}
+
+function populateCultureExperimentalUnitOptions() {
+  if (!cultureExperimentSelect || !cultureExperimentalUnitSelect) return;
+  const experimentId = cultureExperimentSelect.value;
+  const previousUnitId = cultureExperimentalUnitSelect.value;
+  cultureExperimentalUnitSelect.replaceChildren(new Option("Aucune unité", ""));
+  for (const unit of experimentalUnitRegistryRows.filter(item => item.experiment_id === experimentId)) {
+    const details = [unit.treatment_code, unit.replicate_no ? `R${unit.replicate_no}` : null].filter(Boolean).join(" · ");
+    cultureExperimentalUnitSelect.add(new Option(`${unit.unit_code}${details ? " — " + details : ""}`, unit.id));
+  }
+  cultureExperimentalUnitSelect.disabled = !experimentId;
+  if ([...cultureExperimentalUnitSelect.options].some(option => option.value === previousUnitId)) cultureExperimentalUnitSelect.value = previousUnitId;
+}
+
+cultureExperimentSelect?.addEventListener("change", populateCultureExperimentalUnitOptions);
+
+function renderExperimentRegistry(experiments, units) {
+  if (!experimentRegistryList) return;
+  experimentRegistryList.replaceChildren();
+  if (!experiments.length) {
+    const empty = document.createElement("p");
+    empty.className = "muted";
+    empty.textContent = "Aucune expérience enregistrée dans cette organisation.";
+    experimentRegistryList.appendChild(empty);
+    return;
+  }
+  const unitsByExperiment = new Map();
+  for (const unit of units) {
+    const rows = unitsByExperiment.get(unit.experiment_id) || [];
+    rows.push(unit);
+    unitsByExperiment.set(unit.experiment_id, rows);
+  }
+  for (const experiment of experiments) {
+    const card = document.createElement("article");
+    card.className = "experiment-registry-item";
+    const heading = document.createElement("div");
+    heading.className = "experiment-registry-item-heading";
+    const title = document.createElement("h4");
+    title.textContent = `${experiment.code} — ${experiment.name}`;
+    const count = document.createElement("span");
+    count.className = "culture-catalog-count";
+    const experimentUnits = unitsByExperiment.get(experiment.id) || [];
+    count.textContent = `Unités : ${experimentUnits.length}`;
+    heading.append(title, count);
+    const detail = document.createElement("p");
+    detail.className = "muted";
+    const design = experiment.design || {};
+    detail.textContent = [design.objective, design.method].filter(Boolean).join(" · ") || "Plan expérimental non détaillé.";
+    const list = document.createElement("ul");
+    list.className = "experiment-unit-summary";
+    for (const unit of experimentUnits) {
+      const item = document.createElement("li");
+      const repeat = unit.replicate_no ? ` · répétition ${unit.replicate_no}` : "";
+      const treatment = unit.treatment_code ? ` · ${unit.treatment_code}` : "";
+      item.textContent = `${unit.unit_code}${treatment}${repeat}`;
+      list.appendChild(item);
+    }
+    card.append(heading, detail, list);
+    experimentRegistryList.appendChild(card);
+  }
+}
+
+async function loadExperimentRegistry() {
+  const revision = authStateRevision;
+  const orgId = organizationId;
+  if (!orgId || document.body.dataset.domain !== "laboratory") return;
+  if (experimentRegistryStatus) experimentRegistryStatus.textContent = "Chargement du registre expérimental…";
+  try {
+    const [experimentResult, unitResult] = await Promise.all([
+      supabaseClient.from("experiments").select("id,code,name,design,created_at").eq("organization_id", orgId).order("created_at", { ascending: false }),
+      supabaseClient.from("experimental_units").select("id,experiment_id,unit_code,replicate_no,treatment_code,created_at").eq("organization_id", orgId).order("created_at", { ascending: true })
+    ]);
+    if (experimentResult.error) throw experimentResult.error;
+    if (unitResult.error) throw unitResult.error;
+    if (!isCurrentWorkspaceRevision(revision, orgId)) return;
+    experimentRegistryRows = experimentResult.data || [];
+    experimentalUnitRegistryRows = unitResult.data || [];
+    populateCultureExperimentOptions();
+    renderExperimentRegistry(experimentRegistryRows, experimentalUnitRegistryRows);
+    if (experimentRegistryStatus) experimentRegistryStatus.textContent = "Registre expérimental chargé.";
+  } catch (error) {
+    if (!isCurrentWorkspaceRevision(revision, orgId)) return;
+    console.error("Registre expérimental :", error);
+    if (experimentRegistryStatus) experimentRegistryStatus.textContent = "Registre indisponible : " + (error.message || "erreur inconnue");
+  }
+}
+
+async function createExperimentWithUnits(event) {
+  event.preventDefault();
+  const revision = authStateRevision;
+  const orgId = organizationId;
+  if (!orgId || !isCurrentWorkspaceRevision(revision, orgId)) return;
+  const formData = new FormData(experimentSetupForm);
+  const code = String(formData.get("experiment_code") || "").trim();
+  const name = String(formData.get("experiment_name") || "").trim();
+  const objective = String(formData.get("experiment_objective") || "").trim();
+  const method = String(formData.get("experiment_method") || "").trim();
+  const units = [...experimentUnitRows.querySelectorAll(".experiment-unit-row")].map(row => ({
+    unit_code: row.querySelector('[name="unit_code"]').value.trim(),
+    treatment_code: row.querySelector('[name="treatment_code"]').value.trim() || null,
+    replicate_no: row.querySelector('[name="replicate_no"]').value.trim() || null,
+    metadata: {}
+  }));
+  if (!code || !name || !units.length || units.some(unit => !unit.unit_code)) {
+    if (experimentRegistryStatus) experimentRegistryStatus.textContent = "Renseignez le code, le nom et au moins une unité avec un code.";
+    return;
+  }
+  const occurredAt = pendingExperimentOccurredAt || (pendingExperimentOccurredAt = new Date().toISOString());
+  const payload = {
+    p_organization_id: orgId,
+    p_code: code,
+    p_name: name,
+    p_design: { objective, method, design_type: "user_defined" },
+    p_units: units,
+    p_occurred_at: occurredAt
+  };
+  const button = experimentSetupForm.querySelector('[type="submit"]');
+  button.disabled = true;
+  if (experimentRegistryStatus) experimentRegistryStatus.textContent = "Enregistrement atomique de l’expérience et de ses unités…";
+  try {
+    const idempotencyKey = await getManualWriteIdempotencyKey("experiment-setup", payload);
+    if (!isCurrentWorkspaceRevision(revision, orgId)) return;
+    const { data, error } = await supabaseClient.rpc("create_experiment_with_units", {
+      ...payload,
+      p_idempotency_key: idempotencyKey
+    });
+    if (error) throw error;
+    if (!isCurrentWorkspaceRevision(revision, orgId)) return;
+    clearManualWriteIdempotencyKey("experiment-setup");
+    pendingExperimentOccurredAt = null;
+    experimentSetupForm.reset();
+    experimentUnitRows.replaceChildren();
+    addExperimentUnitRow();
+    if (experimentRegistryStatus) experimentRegistryStatus.textContent = "Expérience et unités enregistrées.";
+    await loadExperimentRegistry();
+  } catch (error) {
+    if (!isCurrentWorkspaceRevision(revision, orgId)) return;
+    console.error("Création de l’expérience :", error);
+    if (experimentRegistryStatus) experimentRegistryStatus.textContent = "Création impossible : " + (error.message || "erreur inconnue") + ". Réessayez sans modifier les données pour conserver l’idempotence.";
+  } finally {
+    if (isCurrentWorkspaceRevision(revision, orgId) && button) button.disabled = false;
+  }
+}
+
+experimentSetupForm?.addEventListener("submit", createExperimentWithUnits);
+document.getElementById("addExperimentUnitButton")?.addEventListener("click", () => addExperimentUnitRow());
+experimentUnitRows?.addEventListener("click", event => {
+  const removeButton = event.target.closest("[data-remove-experiment-unit]");
+  if (!removeButton) return;
+  const rows = experimentUnitRows.querySelectorAll(".experiment-unit-row");
+  if (rows.length <= 1) {
+    if (experimentRegistryStatus) experimentRegistryStatus.textContent = "Une expérience doit conserver au moins une unité.";
+    return;
+  }
+  removeButton.closest(".experiment-unit-row").remove();
+});
+
 async function saveMeasurement() {
   const operationRevision = authStateRevision;
   const operationOrganizationId = organizationId;
@@ -5185,6 +5404,7 @@ async function saveMeasurement() {
     let cultureId = null;
     let batchId = null;
     let plantCultureId = null;
+    let experimentalUnitId = null;
     let environmentId = null;
     let locationId = null;
     const [targetType, targetId] = targetValue.split(":");
@@ -5193,6 +5413,7 @@ async function saveMeasurement() {
       const culture = cultureOptions.find(item => item.id === targetId);
       if (!culture) throw new Error(cultureWorkflowText("cultureMissing"));
       cultureId = culture.id;
+      experimentalUnitId = culture.experimental_unit_id || null;
     } else if (targetType === "plant") {
       const plant = plantCultureOptions.find(item => item.id === targetId);
       if (!plant) throw new Error("L’unité végétale sélectionnée n’est plus disponible.");
@@ -5204,6 +5425,9 @@ async function saveMeasurement() {
       if (!batch) throw new Error(cultureWorkflowText("batchMissing"));
       batchId = batch.id;
       cultureId = batch.culture_id || null;
+      experimentalUnitId = cultureId
+        ? cultureOptions.find(item => item.id === cultureId)?.experimental_unit_id || null
+        : null;
 
     } else {
       throw new Error(cultureWorkflowText("invalidTarget"));
@@ -5242,6 +5466,7 @@ async function saveMeasurement() {
       instrument: measurementInstrumentInput.value.trim() || null,
       culture_id: cultureId,
       plant_culture_id: plantCultureId,
+      experimental_unit_id: experimentalUnitId,
       environment_id: environmentId,
       metadata: {
         source: "batch-tracker-manual",
@@ -5311,7 +5536,7 @@ async function loadRecentMeasurements() {
 
   const { data, error } = await supabaseClient
     .from("measurements")
-    .select("id, variable_code, raw_value, raw_unit_code, normalized_value, normalized_unit_code, measured_at, method, instrument, culture_id, plant_culture_id, event_id, metadata")
+    .select("id, variable_code, raw_value, raw_unit_code, normalized_value, normalized_unit_code, measured_at, method, instrument, culture_id, plant_culture_id, experimental_unit_id, event_id, metadata")
     .eq("organization_id", loadOrganizationId)
     .order("measured_at", { ascending: false })
     .limit(1000);
@@ -5334,7 +5559,25 @@ async function loadRecentMeasurements() {
   }
 
   if (requestId !== measurementHistoryRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
+
   const visibleRows = rows.filter(row => belongsToActiveWorkspace(row, eventsById)).slice(0, 10);
+  const experimentalUnitIds = [...new Set(visibleRows.map(row => row.experimental_unit_id).filter(Boolean))];
+  const experimentalUnitsById = {};
+  if (experimentalUnitIds.length) {
+    const { data: experimentalUnits, error: experimentalUnitsError } = await supabaseClient
+      .from("experimental_units")
+      .select("id, unit_code, replicate_no, treatment_code")
+      .eq("organization_id", loadOrganizationId)
+      .in("id", experimentalUnitIds);
+    if (requestId !== measurementHistoryRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
+    if (experimentalUnitsError) {
+      console.warn("Détails des unités expérimentales indisponibles :", experimentalUnitsError.message);
+    } else {
+      for (const unit of experimentalUnits || []) experimentalUnitsById[unit.id] = unit;
+    }
+  }
+
+  if (requestId !== measurementHistoryRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
   if (!visibleRows.length) {
     measurementHistory.innerHTML = '<p class="muted">Aucune mesure enregistrée dans cet univers pour le moment.</p>';
     return;
@@ -5346,6 +5589,12 @@ async function loadRecentMeasurements() {
     const batchId = row.event_id ? eventsById[row.event_id]?.batch_id : null;
     const batch = batchId ? latestBatches.find(item => item.id === batchId) : null;
     const plant = plantCultureOptions.find(item => item.id === row.plant_culture_id);
+    const experimentalUnit = row.experimental_unit_id
+      ? experimentalUnitsById[row.experimental_unit_id]
+      : null;
+    const experimentalUnitContext = experimentalUnit
+      ? ` · Unité ${escapeHtml(experimentalUnit.unit_code)}${experimentalUnit.treatment_code ? " · " + escapeHtml(experimentalUnit.treatment_code) : ""}${experimentalUnit.replicate_no ? " · R" + escapeHtml(experimentalUnit.replicate_no) : ""}`
+      : "";
     const target = plant
       ? `AgriTech · ${escapeHtml(plant.code)} · ${escapeHtml(plant.cultivar_name || plant.crop_type)}`
       : batch
@@ -5361,7 +5610,7 @@ async function loadRecentMeasurements() {
       <article class="measurement-entry">
         <div>
           <strong>${escapeHtml(variable?.label || row.variable_code)}</strong>
-          <div class="measurement-meta">${target}${method}${instrument}</div>
+          <div class="measurement-meta">${target}${experimentalUnitContext}${method}${instrument}</div>
           ${note}
         </div>
         <div class="measurement-value">${escapeHtml(row.raw_value)} <span class="measurement-meta">${escapeHtml(row.raw_unit_code)}</span></div>

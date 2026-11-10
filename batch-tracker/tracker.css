@@ -2875,3 +2875,28 @@ body[data-domain] :is(button, input, select, textarea, a, [tabindex]):focus-visi
   outline: 3px solid var(--focus) !important;
   outline-offset: 3px;
 }
+
+/* Experimental registry */
+.experiment-registry{margin:1.5rem 0 2rem;padding:clamp(1rem,2.5vw,1.6rem);border:1px solid var(--border,#d9d4ca);border-radius:16px;background:var(--surface,#fff)}
+.experiment-registry-heading,.experiment-unit-heading,.experiment-registry-item-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:1rem}
+.experiment-registry-heading h3{margin:.35rem 0}.experiment-registry-tag{flex:none;padding:.35rem .65rem;border-radius:999px;background:var(--surface-soft,#f3eee7);font-size:.75rem;font-weight:700;letter-spacing:.04em}
+.experiment-setup-form{display:grid;gap:1rem;margin-top:1.2rem}
+.experiment-setup-form .grid{margin:0}
+.experiment-setup-form textarea{width:100%;resize:vertical}
+.experiment-unit-heading{align-items:center;margin-top:.25rem}.experiment-unit-heading h4{margin:0}.experiment-unit-heading p{margin:.2rem 0}
+.experiment-unit-rows{display:grid;gap:.65rem}
+.experiment-unit-row{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr) minmax(5rem,.55fr) auto;align-items:end;gap:.65rem;padding:.8rem;border:1px solid var(--border,#d9d4ca);border-radius:12px;background:var(--surface-soft,#faf8f4)}
+.experiment-unit-row label{display:grid;gap:.3rem;font-size:.82rem;font-weight:600}
+.experiment-unit-row input{min-width:0;width:100%}
+.experiment-setup-actions{display:flex;align-items:center;gap:1rem;flex-wrap:wrap}
+.experiment-setup-actions p{flex:1 1 18rem;margin:0}
+.experiment-registry-list{display:grid;gap:.75rem;margin-top:.7rem}
+.experiment-registry-item{padding:1rem;border:1px solid var(--border,#d9d4ca);border-radius:12px}
+.experiment-registry-item h4{margin:0;font-size:1rem}
+.experiment-registry-item p{margin:.45rem 0}
+.experiment-unit-summary{display:flex;flex-wrap:wrap;gap:.4rem 1.2rem;margin:.5rem 0 0;padding-left:1.2rem;font-size:.88rem}
+@media(max-width:680px){.experiment-registry-heading,.experiment-unit-heading{align-items:stretch;flex-direction:column}.experiment-unit-row{grid-template-columns:1fr 1fr}.experiment-unit-row label:first-child{grid-column:1/-1}.experiment-unit-row button{justify-self:start}.experiment-setup-actions{align-items:stretch;flex-direction:column}}
+
+.culture-experiment-context{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.7rem;margin:.9rem 0;padding:1rem;border:1px solid var(--border,#d9d4ca);border-radius:12px;background:var(--surface-soft,#faf8f4)}
+.culture-experiment-context>div{display:grid;gap:.3rem}.culture-experiment-context select{width:100%;min-width:0}.culture-experiment-context p{grid-column:1/-1;margin:0}
+@media(max-width:600px){.culture-experiment-context{grid-template-columns:1fr}}

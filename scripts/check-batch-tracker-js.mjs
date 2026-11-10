@@ -281,3 +281,30 @@ console.log("✓ Tracker uses RPC-backed writes for events, measurements and obs
 // Experimental results must be visible from the culture detail that owns their unit.
 if(!engine.includes('from("results")')||!engine.includes('.eq("experimental_unit_id", culture.experimental_unit_id)'))throw new Error("Structured experimental results are not loaded for culture experimental units");
 if(!engine.includes("result_type")||!engine.includes("quality_state")||!engine.includes("result.value"))throw new Error("Experimental result type, quality state and structured value are not rendered");
+
+const experimentPanel=template.slice(template.indexOf('id="experimentRegistryCard"'));
+if(!experimentPanel.includes('id="experimentSetupForm"')||!experimentPanel.includes('id="experimentUnitRows"')||!experimentPanel.includes('id="addExperimentUnitButton"'))throw new Error("Experimental registry setup form is missing");
+if(!engine.includes('async function createExperimentWithUnits')||!engine.includes('rpc("create_experiment_with_units"'))throw new Error("Experiment setup is not persisted through the atomic RPC");
+if(!engine.includes('p_occurred_at: occurredAt')||!engine.includes('p_idempotency_key: idempotencyKey'))throw new Error("Experiment setup RPC is missing explicit timestamp or idempotency key");
+if(!engine.includes("pendingExperimentOccurredAt || (pendingExperimentOccurredAt = new Date().toISOString())")||!engine.includes("pendingExperimentOccurredAt = null"))throw new Error("Experiment retries do not preserve the original timestamp for idempotency");
+if(!engine.includes('from("experimental_units")')||!engine.includes('unit_code,replicate_no,treatment_code'))throw new Error("Experimental unit registry read model is missing");
+if(!engine.includes('isCurrentWorkspaceRevision(revision, orgId)'))throw new Error("Experiment registry does not guard tenant/session transitions");
+if(!template.includes('id="experimentRegistryList"')||!template.includes('id="experimentRegistryStatus"'))throw new Error("Experiment registry list/status region is missing");
+if(!template.includes('class="experiment-registry hidden" id="experimentRegistryCard"')||!engine.includes("showElement(experimentRegistryCard)")||!(engine.includes("hideElement(experimentRegistryCard)")||engine.includes('hideElement(document.getElementById("experimentRegistryCard"))')))throw new Error("Experimental registry must only appear in the laboratory workspace");
+console.log("✓ Atomic experimental registry form, unit rows and tenant-safe read model are wired");
+
+if(!template.includes('id="cultureExperimentId"')||!template.includes('id="cultureExperimentalUnitId"'))throw new Error("Culture-to-experiment assignment selectors are missing");
+if(!engine.includes("populateCultureExperimentOptions")||!engine.includes("p_experiment_id: selectedExperimentId || null")||!engine.includes("p_experimental_unit_id: selectedExperimentalUnitId || null"))throw new Error("Culture creation does not persist the selected experimental context");
+if(!engine.includes("Boolean(selectedExperimentId) !== Boolean(selectedExperimentalUnitId)"))throw new Error("Culture creation does not reject an incomplete experiment/unit pair");
+
+const createCultureStart=engine.indexOf("async function createCulture()");
+const createCultureEnd=engine.indexOf("CULTURES DISPONIBLES POUR LES BATCHS",createCultureStart);
+const createCultureBody=engine.slice(createCultureStart,createCultureEnd);
+if(createCultureBody.includes("cultureExperimentSelect?.value")||createCultureBody.includes("cultureExperimentalUnitSelect?.value"))throw new Error("Culture creation must not depend on unbound DOM globals in isolated workflow tests");
+if(!createCultureBody.includes('globalThis.document?.getElementById("cultureExperimentId")')||!createCultureBody.includes('globalThis.document?.getElementById("cultureExperimentalUnitId")'))throw new Error("Culture experiment selectors must be resolved safely from the active document");
+
+const cultureCreateStart=engine.indexOf("async function createCulture()");
+const cultureCreateEnd=engine.indexOf("CULTURES DISPONIBLES POUR LES BATCHS",cultureCreateStart);
+const cultureCreateCode=engine.slice(cultureCreateStart,cultureCreateEnd);
+if(cultureCreateCode.indexOf("Boolean(selectedExperimentId) !== Boolean(selectedExperimentalUnitId)")>cultureCreateCode.indexOf("const consentTable"))throw new Error("Invalid experiment/unit pairs must be rejected before writing consent records");
+console.log("✓ Culture creation can be linked to an experiment and its exact experimental unit");

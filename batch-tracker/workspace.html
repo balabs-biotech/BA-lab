@@ -181,6 +181,37 @@
   >
 
     <div class="section-kicker"><span>MODULE 02</span><span class="kicker-line"></span><span>RESSOURCES BIOLOGIQUES</span></div>
+
+    <section class="experiment-registry hidden" id="experimentRegistryCard" aria-labelledby="experimentRegistryTitle">
+      <div class="experiment-registry-heading">
+        <div><span class="entry-step-mark">REGISTRE SCIENTIFIQUE</span><h3 id="experimentRegistryTitle">Expériences & unités expérimentales</h3>
+        <p class="muted">Définissez le protocole, les traitements et les répétitions avant d’y rattacher les cultures. L’enregistrement de l’expérience et de toutes ses unités est atomique.</p></div>
+        <span class="experiment-registry-tag">Laboratory</span>
+      </div>
+      <form id="experimentSetupForm" class="experiment-setup-form">
+        <div class="grid">
+          <div><label for="experimentCode">Code expérience *</label><input id="experimentCode" name="experiment_code" maxlength="120" required placeholder="EXP-2026-001"></div>
+          <div><label for="experimentName">Nom de l’expérience *</label><input id="experimentName" name="experiment_name" maxlength="200" required placeholder="Comparaison de milieux de culture"></div>
+        </div>
+        <div class="grid">
+          <div><label for="experimentObjective">Objectif</label><textarea id="experimentObjective" name="experiment_objective" rows="2" maxlength="2000" placeholder="Question scientifique étudiée"></textarea></div>
+          <div><label for="experimentMethod">Méthode / protocole</label><textarea id="experimentMethod" name="experiment_method" rows="2" maxlength="2000" placeholder="Conditions, variables et méthode"></textarea></div>
+        </div>
+        <div class="experiment-unit-heading"><div><h4>Unités expérimentales</h4><p class="muted">Une ligne par unité réelle. Le code doit être unique dans cette expérience.</p></div><button id="addExperimentUnitButton" type="button" class="secondary-button small-button">+ Ajouter une unité</button></div>
+        <div id="experimentUnitRows" class="experiment-unit-rows">
+          <div class="experiment-unit-row">
+            <label>Code unité<input name="unit_code" maxlength="120" required placeholder="EXP-2026-001-U01"></label>
+            <label>Traitement<input name="treatment_code" maxlength="120" placeholder="Témoin / T1"></label>
+            <label>Répétition<input name="replicate_no" type="number" min="1" step="1" placeholder="1"></label>
+            <button type="button" class="secondary-button small-button" data-remove-experiment-unit aria-label="Supprimer cette unité">Retirer</button>
+          </div>
+        </div>
+        <div class="experiment-setup-actions"><button type="submit">Créer l’expérience et ses unités</button><p id="experimentRegistryStatus" class="muted" role="status" aria-live="polite">Les données seront enregistrées dans Supabase avec un événement de traçabilité et une provenance.</p></div>
+      </form>
+      <div class="overview-section-heading"><h4>Registre des expériences</h4></div>
+      <div id="experimentRegistryList" class="experiment-registry-list" aria-live="polite"><p class="muted">Connectez-vous à l’espace laboratoire pour charger les expériences.</p></div>
+    </section>
+
     <div class="entry-intro"><span class="entry-step-mark">01 / IDENTITÉ</span><h2 id="cultureEntryTitle">Nouvelle culture</h2><p class="muted">On commence par identifier la ressource. Les champs suivants apparaissent quand les informations de base sont renseignées.</p></div>
     
     <section id="smartEntryPanel" class="assisted-entry-panel" aria-labelledby="smartEntryTitle">
@@ -291,6 +322,12 @@
 
     </div>
 
+
+    <div id="cultureExperimentContext" class="culture-experiment-context hidden">
+      <div><label for="cultureExperimentId">Expérience (facultatif)</label><select id="cultureExperimentId"><option value="">Aucune expérience</option></select></div>
+      <div><label for="cultureExperimentalUnitId">Unité expérimentale</label><select id="cultureExperimentalUnitId" disabled><option value="">Sélectionnez d’abord une expérience</option></select></div>
+      <p class="muted">Le rattachement relie la culture à une unité précise, à son traitement et à sa répétition. L’association est contrôlée par la base de données.</p>
+    </div>
 
     <label for="startedAt">
       Date de démarrage

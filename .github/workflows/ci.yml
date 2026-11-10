@@ -253,6 +253,8 @@ jobs:
         run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/environmental_observations_contract.test.sql
       - name: Test role-aware tenant write authorization after replay
         run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/role_aware_tenant_writes.test.sql
+      - name: Verify manual measurement experimental-unit lineage after replay
+        run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/manual_measurement_experimental_unit_lineage.test.sql
 
   ecosystem-regression:
     runs-on: ubuntu-latest
