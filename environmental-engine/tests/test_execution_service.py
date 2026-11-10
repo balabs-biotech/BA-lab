@@ -136,3 +136,56 @@ def test_execution_service_rejects_rolling_window_larger_than_scope():
     rows = observations_for_days()
     with pytest.raises(ValueError, match="full length of every rolling window"):
         run(rows, rolling_methods={"air_temperature_mean": "mean"})
+
+
+
+def test_execution_service_integrates_temporal_screening_and_preserves_source_lineage():
+    rows = observations_for_days(8)
+    target = next(
+        row for row in rows
+        if row.variable_code == "air_temperature_mean"
+        and row.observed_date == date(2026, 11, 1)
+    )
+    rows[rows.index(target)] = replace(target, value=80.0, source_value=80.0)
+    result = run_environmental_analysis(
+        observations=rows,
+        analysis_id=uuid4(),
+        generated_at=datetime(2026, 11, 2, tzinfo=timezone.utc),
+        engine_version="0.1.0",
+        scope_from=min(row.observed_date for row in rows),
+        scope_to=max(row.observed_date for row in rows),
+        latitude_deg=36.19,
+        altitude_m=1000.0,
+        temporal_variables=("air_temperature_mean",),
+        temporal_window=7,
+        temporal_minimum_history=7,
+        temporal_minimum_coverage=1.0,
+    )
+
+    assert len(result.findings) == 8
+    finding = result.findings[-1]
+    assert finding.variable_code == "air_temperature_mean"
+    assert finding.observed_date == date(2026, 11, 1)
+    assert finding.observed_value == 80.0
+    assert finding.status == "suspect"
+    assert finding.source_observation_ids == [target.source_observation_id]
+
+
+def test_execution_service_temporal_screening_is_configurable_and_can_be_disabled():
+    rows = observations_for_days(2)
+    default_result = run(rows)
+    assert default_result.findings
+    assert all(item.status == "insufficient_history" for item in default_result.findings)
+
+    disabled_result = run_environmental_analysis(
+        observations=rows,
+        analysis_id=uuid4(),
+        generated_at=datetime(2026, 11, 2, tzinfo=timezone.utc),
+        engine_version="0.1.0",
+        scope_from=min(row.observed_date for row in rows),
+        scope_to=max(row.observed_date for row in rows),
+        latitude_deg=36.19,
+        altitude_m=1000.0,
+        temporal_variables=(),
+    )
+    assert disabled_result.findings == []
