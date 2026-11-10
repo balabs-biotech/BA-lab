@@ -154,23 +154,11 @@
     await loadSignals();
   }
 
-  async function resolveOrganization(userId) {
-    const { data, error } = await client
-      .from("organization_members")
-      .select("organization_id")
-      .eq("user_id", userId)
-      .limit(2);
-    if (error) throw error;
-    if (!data || data.length !== 1) {
-      throw new Error(data?.length > 1 ? "multiple_organizations" : "organization_membership_missing");
-    }
-    return data[0].organization_id;
-  }
 
   async function applySession(session) {
     state.request++;
     state.userId = session?.user?.id || null;
-    state.organizationId = null;
+    state.organizationId = window.BALabsGetOrganizationId?.() || null;
     state.rows = [];
     if (!state.userId) {
       root.classList.add("hidden");
@@ -179,8 +167,11 @@
     try {
       state.domain = domainByWorkspace[document.body.dataset.domain] || null;
       if (!state.domain) throw new Error("unsupported_workspace_domain");
-      state.organizationId = await resolveOrganization(state.userId);
       root.classList.remove("hidden");
+      if (!state.organizationId) {
+        notify("En attente du rattachement à l’organisation BA-LABS…");
+        return;
+      }
       await loadSignals();
     } catch (error) {
       console.error("[CultureOps signals] Workspace initialization failed", error);
@@ -200,6 +191,18 @@
     // Defer SDK calls until the auth callback has returned.
     setTimeout(() => applySession(session), 0);
   });
+  window.addEventListener("balabs:organization-context", event => {
+    state.organizationId = event.detail?.organizationId || null;
+    if (state.userId && state.organizationId) void loadSignals();
+  });
+  let previousDomain = document.body.dataset.domain;
+  new MutationObserver(() => {
+    const nextDomain = document.body.dataset.domain;
+    if (nextDomain === previousDomain) return;
+    previousDomain = nextDomain;
+    state.domain = domainByWorkspace[nextDomain] || null;
+    if (state.domain && state.organizationId) void loadSignals();
+  }).observe(document.body, { attributes: true, attributeFilter: ["data-domain"] });
 
   window.BALabsBiologicalSignals = {
     refresh: loadSignals,
