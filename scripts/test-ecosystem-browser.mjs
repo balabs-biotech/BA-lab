@@ -195,10 +195,16 @@ async function checkWorkingScene(name, viewport) {
       if (!zoomOutChecked) {
         const nestedDepth = await page.evaluate(() => window.__BALABS_3D_E2E__()?.depth || 0);
         const cameraDistance = await page.evaluate(() => window.__BALABS_3D_E2E__()?.cameraDistance || 0);
+        const labelPixelsBeforeZoomOut = await page.evaluate(() => window.__BALABS_3D_E2E__()?.labelPixels?.domain || 0);
         assert.ok(nestedDepth > 0, name + ': nested depth must be available before testing zoom-out');
+        assert.ok(labelPixelsBeforeZoomOut > 18, name + ': labels must retain a readable minimum size at nested levels');
         await page.locator('.webgl-controls [data-camera="out"]').evaluate((button) => button.click());
         await page.waitForFunction((previous) => (window.__BALABS_3D_E2E__()?.cameraDistance || 0) > previous,
           cameraDistance, { timeout: 8000 });
+        await page.waitForFunction((previous) => (window.__BALABS_3D_E2E__()?.labelPixels?.domain || 0) > previous,
+          labelPixelsBeforeZoomOut, { timeout: 8000 });
+        const labelPixelsAfterZoomOut = await page.evaluate(() => window.__BALABS_3D_E2E__()?.labelPixels?.domain || 0);
+        assert.ok(labelPixelsAfterZoomOut > labelPixelsBeforeZoomOut, name + ': labels must grow when zooming out');
         const depthAfterZoom = await page.evaluate(() => window.__BALABS_3D_E2E__()?.depth || 0);
         assert.equal(depthAfterZoom, nestedDepth,
           name + ': camera zoom-out must not change the selected hierarchy level');
@@ -209,6 +215,10 @@ async function checkWorkingScene(name, viewport) {
           const state = window.__BALABS_3D_E2E__();
           return state && state.cameraDistance < previous && state.depth === expectedDepth;
         }, { previous: distanceAfterZoomOut, expectedDepth: nestedDepth }, { timeout: 8000 });
+        await page.waitForFunction((previous) => (window.__BALABS_3D_E2E__()?.labelPixels?.domain || Infinity) < previous,
+          labelPixelsAfterZoomOut, { timeout: 8000 });
+        const labelPixelsAfterZoomIn = await page.evaluate(() => window.__BALABS_3D_E2E__()?.labelPixels?.domain || 0);
+        assert.ok(labelPixelsAfterZoomIn < labelPixelsAfterZoomOut, name + ': labels must shrink when zooming in');
         const depthAfterZoomIn = await page.evaluate(() => window.__BALABS_3D_E2E__()?.depth || 0);
         assert.equal(depthAfterZoomIn, nestedDepth,
           name + ': camera zoom-in must not change the selected hierarchy level');
