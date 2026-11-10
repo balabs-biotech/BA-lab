@@ -200,6 +200,8 @@ async function checkWorkingScene(name, viewport) {
       const domLabelState = await page.evaluate(() => ({created:document.querySelectorAll('.webgl-resource-target').length,visible:[...document.querySelectorAll('.webgl-resource-target')].filter(button=>!button.hidden&&getComputedStyle(button).display!=='none').length}));
       assert.ok(domLabelState.created >= childDockState.childCount && domLabelState.visible > 0,
         name + ': branch labels must have real, visible DOM text targets. ' + JSON.stringify(domLabelState));
+      const dockWhiteSpace = await page.locator('.webgl-branch-dock .webgl-branch-item').first().evaluate(el => getComputedStyle(el).whiteSpace);
+      assert.equal(dockWhiteSpace, 'nowrap', name + ': long dock titles must stay on one line and not cover the map');
       await page.screenshot({ path: outputDir + '/' + name + '-branch-labels.png', fullPage: false });
       if (!zoomOutChecked) {
         const nestedDepth = await page.evaluate(() => window.__BALABS_3D_E2E__()?.depth || 0);
