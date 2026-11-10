@@ -2890,3 +2890,24 @@ body[data-domain] :is(button, input, select, textarea, a, [tabindex]):focus-visi
 #biologicalSignalsCard .signal-lineage-list .signal-lineage-batches { color:var(--text); }
 
 #biologicalSignalsCard .signal-lineage-list .signal-lineage-event { padding-left:8px; border-left:1px solid var(--border-strong); }
+
+
+/* Isolated IoT sensor analysis module */
+#sensorAnalysisCard .sensor-controls { margin-top:16px; }
+#sensorAnalysisCard .sensor-actions { display:flex; justify-content:flex-start; margin:14px 0; }
+#sensorAnalysisCard .sensor-summary { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px; margin:14px 0; }
+#sensorAnalysisCard .sensor-metric { display:grid; gap:6px; padding:13px; border:1px solid var(--border); border-radius:10px; background:var(--surface-2); }
+#sensorAnalysisCard .sensor-metric span { color:var(--muted); font-size:11px; }
+#sensorAnalysisCard .sensor-metric strong { font-size:22px; font-variant-numeric:tabular-nums; }
+#sensorAnalysisCard .sensor-notice { padding:11px 13px; border-left:3px solid var(--accent); background:var(--surface-2); border-radius:0 8px 8px 0; font-size:12px; }
+#sensorAnalysisCard .sensor-series-table { width:100%; border-collapse:collapse; margin:12px 0; font-size:12px; }
+#sensorAnalysisCard .sensor-series-table th,
+#sensorAnalysisCard .sensor-series-table td { padding:9px 8px; border-bottom:1px solid var(--border); text-align:left; overflow-wrap:anywhere; }
+#sensorAnalysisCard .sensor-series-table th { color:var(--muted); font-weight:600; }
+#sensorAnalysisCard .sensor-detail { margin:10px 0; padding:11px 13px; border:1px solid var(--border); border-radius:9px; }
+#sensorAnalysisCard .sensor-detail summary { cursor:pointer; font-size:12px; font-weight:600; }
+#sensorAnalysisCard .sensor-detail p { font-size:12px; overflow-wrap:anywhere; }
+@media (max-width:700px) {
+  #sensorAnalysisCard .sensor-summary { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  #sensorAnalysisCard .sensor-series-table { display:block; overflow-x:auto; white-space:nowrap; }
+}
