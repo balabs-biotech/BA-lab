@@ -519,17 +519,28 @@ begin
   if has_table_privilege('authenticated','public.experiments','INSERT')
      or has_table_privilege('authenticated','public.experiments','UPDATE')
      or has_table_privilege('authenticated','public.experiments','DELETE')
+     or has_table_privilege('authenticated','public.experiments','TRUNCATE')
      or has_table_privilege('authenticated','public.experimental_units','INSERT')
      or has_table_privilege('authenticated','public.experimental_units','UPDATE')
      or has_table_privilege('authenticated','public.experimental_units','DELETE')
+     or has_table_privilege('authenticated','public.experimental_units','TRUNCATE')
      or has_table_privilege('authenticated','public.provenance','INSERT')
      or has_table_privilege('authenticated','public.provenance','UPDATE')
      or has_table_privilege('authenticated','public.provenance','DELETE')
      or has_table_privilege('authenticated','public.provenance','TRUNCATE') then
     raise exception 'FAIL: authenticated retains direct experiment or experimental-unit mutation privileges';
   end if;
-  if not has_function_privilege('authenticated','public.create_experiment_with_units(uuid,text,text,jsonb,jsonb,uuid,timestamp with time zone)','EXECUTE') then
-    raise exception 'FAIL: authenticated cannot execute experiment setup RPC';
+  if not has_function_privilege('authenticated','public.create_experiment_with_units(uuid,text,text,jsonb,jsonb,uuid,timestamp with time zone)','EXECUTE')
+     or has_function_privilege('anon','public.create_experiment_with_units(uuid,text,text,jsonb,jsonb,uuid,timestamp with time zone)','EXECUTE') then
+    raise exception 'FAIL: experiment setup RPC execution grants are incorrect';
+  end if;
+  if not exists (
+    select 1 from pg_catalog.pg_proc p
+     where p.oid='public.create_experiment_with_units(uuid,text,text,jsonb,jsonb,uuid,timestamp with time zone)'::regprocedure
+       and p.prosecdef
+       and p.proconfig @> array['search_path=pg_catalog']
+  ) then
+    raise exception 'FAIL: experiment setup RPC must be SECURITY DEFINER with a pinned search_path';
   end if;
 end
 $experiment_setup$;
