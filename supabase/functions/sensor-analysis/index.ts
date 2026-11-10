@@ -12,6 +12,7 @@ const HEADERS = {
 };
 const MAX_DAYS = 366;
 const MAX_ROWS = 5_000;
+const MAX_TEMPORAL_WINDOW_SECONDS = 30 * 24 * 60 * 60;
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 function validDate(value: unknown): value is string {
@@ -145,6 +146,7 @@ Deno.serve(async (req: Request) => {
     if (temporalOptions.some((value) => value !== undefined)) {
       if (
         !Number.isSafeInteger(temporalWindowSeconds) || temporalWindowSeconds <= 0 ||
+        temporalWindowSeconds > MAX_TEMPORAL_WINDOW_SECONDS ||
         !Number.isSafeInteger(temporalMinimumHistory) || temporalMinimumHistory <= 0 ||
         typeof temporalThreshold !== "number" || !Number.isFinite(temporalThreshold) ||
         temporalThreshold <= 0
@@ -221,7 +223,10 @@ Deno.serve(async (req: Request) => {
 
     // Query with a one-day UTC guard band on both sides. The engine applies the
     // exact local-calendar window using the profile IANA timezone.
-    const queryFrom = addDays(fromDate, -1) + "T00:00:00.000Z";
+    const historyGuardDays = temporalWindowSeconds === undefined
+      ? 1
+      : Math.ceil(temporalWindowSeconds / 86_400) + 1;
+    const queryFrom = addDays(fromDate, -historyGuardDays) + "T00:00:00.000Z";
     const queryTo = addDays(toDate, 2) + "T00:00:00.000Z";
     const { data: rows, error: rowsError } = await adminClient
       .from("measurements")
