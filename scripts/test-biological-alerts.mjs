@@ -44,6 +44,18 @@ assert.match(moduleSource, /\.limit\(10\)/);
 assert.match(moduleSource, /resolveHistoryIdentity\(kind, id\)/);
 assert.match(moduleSource, /identity\.title/);
 assert.match(moduleSource, /identity\.subtitle/);
+assert.match(moduleSource, /async function resolveCultureLineage/);
+assert.match(moduleSource, /parent_culture_id/);
+assert.match(moduleSource, /\.eq\("parent_culture_id", cultureId\)/);
+assert.match(moduleSource, /\.in\("culture_id", cultureIds\)/);
+assert.match(moduleSource, /\.limit\(100\)/);
+assert.match(moduleSource, /function renderCultureLineage/);
+assert.match(moduleSource, /"Lignée de culture"/);
+assert.match(moduleSource, /signal-lineage-batches/);
+assert.match(moduleSource, /request !== state\.historyRequest/);
+assert.match(styles, /signal-lineage-list/);
+assert.match(styles, /signal-lineage-batches/);
+
 assert.doesNotMatch(moduleSource, /\["Sujet biologique", row\.biological_subject_id\]/);
 assert.doesNotMatch(moduleSource, /\["Contexte biologique", row\.biological_context_id\]/);
 assert.doesNotMatch(moduleSource, /\["Environnement", row\.environment_id\]/);
