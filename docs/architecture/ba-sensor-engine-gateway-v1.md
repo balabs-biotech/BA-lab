@@ -49,8 +49,14 @@ weather-analysis endpoint.
 
 ## Current limitation
 
-This first operational route returns sensor diagnostics and descriptive
-statistics only. It does not yet resolve a biological context or call the
-domain interpretation service. That is the next integration layer; it must
-remain non-fatal and source-aware. The route has not been deployed, and the
+The route returns sensor diagnostics and descriptive statistics. An optional
+causal temporal screen can also be requested by supplying all three explicit
+settings: `temporal_window_seconds`, `temporal_minimum_history`, and
+`temporal_threshold`. The gateway retrieves a bounded historical guard band,
+then excludes readings outside the selected profile's local-calendar validity.
+The screen returns assessments only inside the requested analysis dates.
+
+The gateway does not yet resolve a persisted biological context or call the
+domain interpretation service. That remains the next integration layer; it
+must be non-fatal and source-aware. The route has not been deployed, and the
 PostgREST relationship names still require verification against a live schema.
