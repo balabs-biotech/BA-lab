@@ -286,8 +286,8 @@
     $("signalsHistoryList").replaceChildren(element("p", "signals-empty", "Chargement de l’historique…"));
     panel.scrollIntoView({ behavior: "smooth", block: "start" });
     const identity = await resolveHistoryIdentity(kind, id, organizationId, domain);
-    const lineage = kind === "biological_subject_id" && state.domain !== "greentech"
-      ? await resolveCultureLineage(id)
+    const lineage = kind === "biological_subject_id" && domain !== "greentech"
+      ? await resolveCultureLineage(id, organizationId)
       : null;
     if (request !== state.historyRequest) return;
     $("signalsHistoryTitle").textContent = "Historique — " + identity.title;
