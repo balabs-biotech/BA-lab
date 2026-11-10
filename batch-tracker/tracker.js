@@ -84,6 +84,18 @@ function clearAuthenticatedWorkspaceState() {
     cultureDetailPanel.classList.add("hidden");
     cultureDetailPanel.dataset.cultureId = "";
   }
+  const generationComparisonResults = document.getElementById("generationComparisonResults");
+  if (generationComparisonResults) {
+    generationComparisonResults.__generationComparisonRequestId = (generationComparisonResults.__generationComparisonRequestId || 0) + 1;
+    generationComparisonResults.replaceChildren();
+  }
+  document.getElementById("generationComparisonOptions")?.replaceChildren();
+  const generationComparisonSearch = document.getElementById("generationComparisonSearch");
+  if (generationComparisonSearch) generationComparisonSearch.value = "";
+  const generationComparisonStatus = document.getElementById("generationComparisonStatus");
+  if (generationComparisonStatus) generationComparisonStatus.textContent = "Connectez-vous pour comparer les générations.";
+  const generationComparisonButton = document.getElementById("compareCultureGenerationsButton");
+  if (generationComparisonButton) generationComparisonButton.disabled = false;
 
   if (recordHarvestButton) recordHarvestButton.disabled = true;
   if (saveMeasurementButton) saveMeasurementButton.disabled = true;
@@ -1990,56 +2002,39 @@ async function createCulture() {
 
 
     if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) throw new Error("Session ou espace de travail modifié pendant l’opération. Recommencez.");
-    const {
-      data,
-      error
-    } =
-      await supabaseClient.rpc(
-        "create_culture_with_generation",
-        {
-
-          p_organization_id:
-            operationOrganizationId,
-
-          p_code:
-            cultureCode,
-
-          p_culture_type:
-            cultureType,
-
-          p_parent_material_id:
-            materialId,
-
-          p_parent_culture_id:
-            null,
-
-          p_protocol_version_id:
-            protocolVersionId,
-
-          p_environment_id:
-            null,
-
-          p_experiment_id:
-            null,
-
-          p_experimental_unit_id:
-            null,
-
-          p_started_at:
-            startedAt
-              ? new Date(
-                  startedAt
-                ).toISOString()
-              : null,
-
-          p_metadata: {
-            source: "BA Labs Culture Tracker",
-            interface_version: "2.0",
-            domain: document.body.dataset.domain === "laboratory" ? "laboratory" : "mycology"
-          }
-
-        }
-      );
+    const cultureGenerationPayload = {
+      p_organization_id: operationOrganizationId,
+      p_code: cultureCode,
+      p_culture_type: cultureType,
+      p_parent_material_id: materialId,
+      p_parent_culture_id: null,
+      p_protocol_version_id: protocolVersionId,
+      p_environment_id: null,
+      p_experiment_id: null,
+      p_experimental_unit_id: null,
+      p_started_at: startedAt ? new Date(startedAt).toISOString() : null,
+      p_metadata: {
+        source: "BA Labs Culture Tracker",
+        interface_version: "2.0",
+        domain: document.body.dataset.domain === "laboratory" ? "laboratory" : "mycology"
+      }
+    };
+    const cultureGenerationKey = await getManualWriteIdempotencyKey(
+      "culture-generation",
+      cultureGenerationPayload
+    );
+    if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) {
+      throw new Error("Session ou espace de travail modifié pendant l’opération. Recommencez.");
+    }
+    const { data, error } = await supabaseClient.rpc(
+      "create_culture_with_generation_idempotent",
+      {
+        ...cultureGenerationPayload,
+        p_idempotency_key: cultureGenerationKey
+      }
+    );
+    if (error) throw new Error(error.message);
+    clearManualWriteIdempotencyKey("culture-generation");
     if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
 
 
@@ -5904,62 +5899,209 @@ async function loadStatistics() {
 function biologicalWorkflowText(key, count = 0) {
   const lang = window.BALabsI18n?.language || "fr";
   const messages = {
-    fr: { loading:"Chargement de la filiation…", missing:"Culture absente du périmètre chargé.", open:"Ouvrir la fiche de culture ", noCode:"sans code", typeMissing:"type non renseigné", materialOrigin:"Origine matérielle (de la souche source au matériel actuel)", materialNoCode:"Matériel sans code", unknownType:"type inconnu", generation:"génération ", parents:"Cultures parentes", selected:"Culture sélectionnée", openSheet:"Fiche ouverte", parentCulture:"Culture parente", descendants:"Descendants", noLineage:"Aucun ascendant ou descendant enregistré dans les fiches de culture. L’origine matérielle initiale reste indiquée par l’identifiant matériel de la fiche.", partial:"Filiation partielle : limite de 1 000 cultures atteinte.", loadError:"Impossible de charger la filiation : ", selectCulture:"Sélectionnez une culture avant d’enregistrer.", dateRequired:"Indiquez la date de l’opération.", childLimit:"Maximum : 12 descendants par opération.", invalidPropagation:"Cette opération ne peut pas créer de descendants. Retirez les codes ou choisissez une opération de propagation.", saving:"Enregistrement…", syncWarning:" La filiation est enregistrée dans Supabase ; vérifiez la synchronisation Notion des descendants.", syncWarningShort:" La filiation est enregistrée dans Supabase ; synchronisation Notion à vérifier.", saved:"Opération enregistrée", childCreated:" descendant(s) créé(s).", failed:"Échec : ", notSaved:"opération non enregistrée", save:"Enregistrer l’opération" },
-    en: { loading:"Loading lineage…", missing:"Culture is outside the loaded scope.", open:"Open culture record ", noCode:"no code", typeMissing:"type not specified", materialOrigin:"Material origin (from source strain to current material)", materialNoCode:"Material without a code", unknownType:"unknown type", generation:"generation ", parents:"Parent cultures", selected:"Selected culture", openSheet:"Open record", parentCulture:"Parent culture", descendants:"Descendants", noLineage:"No ancestors or descendants are recorded in the culture records. The initial material origin remains indicated by the record's material ID.", partial:"Partial lineage: the 1,000-culture limit was reached.", loadError:"Could not load lineage: ", selectCulture:"Select a culture before saving.", dateRequired:"Enter the operation date.", childLimit:"Maximum: 12 descendants per operation.", invalidPropagation:"This operation cannot create descendants. Remove the codes or choose a propagation operation.", saving:"Saving…", syncWarning:" Lineage is saved in Supabase; check Notion synchronization for descendants.", syncWarningShort:" Lineage is saved in Supabase; verify Notion synchronization.", saved:"Operation saved", childCreated:" descendant(s) created.", failed:"Failed: ", notSaved:"operation not saved", save:"Save operation" },
-    pt: { loading:"A carregar a filiação…", missing:"A cultura não está no âmbito carregado.", open:"Abrir ficha da cultura ", noCode:"sem código", typeMissing:"tipo não indicado", materialOrigin:"Origem material (da estirpe de origem ao material atual)", materialNoCode:"Material sem código", unknownType:"tipo desconhecido", generation:"geração ", parents:"Culturas progenitoras", selected:"Cultura selecionada", openSheet:"Ficha aberta", parentCulture:"Cultura progenitora", descendants:"Descendentes", noLineage:"Não há ascendentes ou descendentes registados nas fichas de cultura. A origem material inicial continua indicada pelo identificador do material.", partial:"Filiação parcial: foi atingido o limite de 1 000 culturas.", loadError:"Não foi possível carregar a filiação: ", selectCulture:"Selecione uma cultura antes de guardar.", dateRequired:"Indique a data da operação.", childLimit:"Máximo: 12 descendentes por operação.", invalidPropagation:"Esta operação não pode criar descendentes. Remova os códigos ou escolha uma operação de propagação.", saving:"A guardar…", syncWarning:" A filiação está guardada no Supabase; verifique a sincronização dos descendentes com o Notion.", syncWarningShort:" A filiação está guardada no Supabase; verifique a sincronização com o Notion.", saved:"Operação guardada", childCreated:" descendente(s) criado(s).", failed:"Falha: ", notSaved:"operação não guardada", save:"Guardar operação" },
-    ar: { loading:"جارٍ تحميل النسب…", missing:"المزرعة خارج نطاق البيانات المحمّلة.", open:"فتح سجل المزرعة ", noCode:"بلا رمز", typeMissing:"النوع غير محدد", materialOrigin:"أصل المادة (من السلالة المصدر إلى المادة الحالية)", materialNoCode:"مادة بلا رمز", unknownType:"نوع غير معروف", generation:"الجيل ", parents:"المزارع الأم", selected:"المزرعة المحددة", openSheet:"السجل المفتوح", parentCulture:"المزرعة الأم", descendants:"الفروع", noLineage:"لا توجد أسلاف أو فروع مسجلة في سجلات المزارع. يظل أصل المادة الأولي موضحًا بمعرّف المادة في السجل.", partial:"النسب جزئي: تم بلوغ حد 1000 مزرعة.", loadError:"تعذّر تحميل النسب: ", selectCulture:"حدد مزرعة قبل الحفظ.", dateRequired:"أدخل تاريخ العملية.", childLimit:"الحد الأقصى 12 فرعًا لكل عملية.", invalidPropagation:"لا يمكن لهذه العملية إنشاء فروع. احذف الرموز أو اختر عملية إكثار.", saving:"جارٍ الحفظ…", syncWarning:" تم حفظ النسب في Supabase؛ تحقق من مزامنة الفروع مع Notion.", syncWarningShort:" تم حفظ النسب في Supabase؛ تحقق من المزامنة مع Notion.", saved:"تم حفظ العملية", childCreated:" فرع/فروع تم إنشاؤها.", failed:"فشل: ", notSaved:"لم تُحفظ العملية", save:"حفظ العملية" }
+    fr: { loading:"Chargement de la filiation…", missing:"Culture introuvable dans cette organisation.", open:"Ouvrir la fiche de culture ", noCode:"sans code", typeMissing:"type non renseigné", materialOrigin:"Origine matérielle (de la souche source au matériel actuel)", materialNoCode:"Matériel sans code", unknownType:"type inconnu", generation:"génération ", parents:"Cultures parentes", selected:"Culture sélectionnée", openSheet:"Fiche ouverte", parentCulture:"Culture parente", descendants:"Descendants", noLineage:"Aucun ascendant ou descendant enregistré dans les fiches de culture. L’origine matérielle initiale reste indiquée par l’identifiant matériel de la fiche.", partial:"Filiation partielle : limite de résultats ou profondeur maximale de 250 niveaux atteinte.", loadError:"Impossible de charger la filiation : ", selectCulture:"Sélectionnez une culture avant d’enregistrer.", dateRequired:"Indiquez la date de l’opération.", childLimit:"Maximum : 12 descendants par opération.", invalidPropagation:"Cette opération ne peut pas créer de descendants. Retirez les codes ou choisissez une opération de propagation.", saving:"Enregistrement…", syncWarning:" La filiation est enregistrée dans Supabase ; vérifiez la synchronisation Notion des descendants.", syncWarningShort:" La filiation est enregistrée dans Supabase ; synchronisation Notion à vérifier.", saved:"Opération enregistrée", childCreated:" descendant(s) créé(s).", failed:"Échec : ", notSaved:"opération non enregistrée", save:"Enregistrer l’opération", loadMore:"Charger 200 descendants supplémentaires", loadingMore:"Chargement…" },
+    en: { loading:"Loading lineage…", missing:"Culture not found in this organization.", open:"Open culture record ", noCode:"no code", typeMissing:"type not specified", materialOrigin:"Material origin (from source strain to current material)", materialNoCode:"Material without a code", unknownType:"unknown type", generation:"generation ", parents:"Parent cultures", selected:"Selected culture", openSheet:"Open record", parentCulture:"Parent culture", descendants:"Descendants", noLineage:"No ancestors or descendants are recorded in the culture records. The initial material origin remains indicated by the record's material ID.", partial:"Partial lineage: the result limit or maximum depth of 250 levels was reached.", loadError:"Could not load lineage: ", selectCulture:"Select a culture before saving.", dateRequired:"Enter the operation date.", childLimit:"Maximum: 12 descendants per operation.", invalidPropagation:"This operation cannot create descendants. Remove the codes or choose a propagation operation.", saving:"Saving…", syncWarning:" Lineage is saved in Supabase; check Notion synchronization for descendants.", syncWarningShort:" Lineage is saved in Supabase; verify Notion synchronization.", saved:"Operation saved", childCreated:" descendant(s) created.", failed:"Failed: ", notSaved:"operation not saved", save:"Save operation", loadMore:"Load 200 more descendants", loadingMore:"Loading…" },
+    pt: { loading:"A carregar a filiação…", missing:"Cultura não encontrada nesta organização.", open:"Abrir ficha da cultura ", noCode:"sem código", typeMissing:"tipo não indicado", materialOrigin:"Origem material (da estirpe de origem ao material atual)", materialNoCode:"Material sem código", unknownType:"tipo desconhecido", generation:"geração ", parents:"Culturas progenitoras", selected:"Cultura selecionada", openSheet:"Ficha aberta", parentCulture:"Cultura progenitora", descendants:"Descendentes", noLineage:"Não há ascendentes ou descendentes registados nas fichas de cultura. A origem material inicial continua indicada pelo identificador do material.", partial:"Filiação parcial: foi atingido o limite de resultados ou a profundidade máxima de 250 níveis.", loadError:"Não foi possível carregar a filiação: ", selectCulture:"Selecione uma cultura antes de guardar.", dateRequired:"Indique a data da operação.", childLimit:"Máximo: 12 descendentes por operação.", invalidPropagation:"Esta operação não pode criar descendentes. Remova os códigos ou escolha uma operação de propagação.", saving:"A guardar…", syncWarning:" A filiação está guardada no Supabase; verifique a sincronização dos descendentes com o Notion.", syncWarningShort:" A filiação está guardada no Supabase; verifique a sincronização com o Notion.", saved:"Operação guardada", childCreated:" descendente(s) criado(s).", failed:"Falha: ", notSaved:"operação não guardada", save:"Guardar operação", loadMore:"Carregar mais 200 descendentes", loadingMore:"A carregar…" },
+    ar: { loading:"جارٍ تحميل النسب…", missing:"الثقافة غير موجودة في هذه المؤسسة.", open:"فتح سجل المزرعة ", noCode:"بلا رمز", typeMissing:"النوع غير محدد", materialOrigin:"أصل المادة (من السلالة المصدر إلى المادة الحالية)", materialNoCode:"مادة بلا رمز", unknownType:"نوع غير معروف", generation:"الجيل ", parents:"المزارع الأم", selected:"المزرعة المحددة", openSheet:"السجل المفتوح", parentCulture:"المزرعة الأم", descendants:"الفروع", noLineage:"لا توجد أسلاف أو فروع مسجلة في سجلات المزارع. يظل أصل المادة الأولي موضحًا بمعرّف المادة في السجل.", partial:"النسب جزئي: تم بلوغ حد النتائج أو العمق الأقصى البالغ 250 مستوى.", loadError:"تعذّر تحميل النسب: ", selectCulture:"حدد مزرعة قبل الحفظ.", dateRequired:"أدخل تاريخ العملية.", childLimit:"الحد الأقصى 12 فرعًا لكل عملية.", invalidPropagation:"لا يمكن لهذه العملية إنشاء فروع. احذف الرموز أو اختر عملية إكثار.", saving:"جارٍ الحفظ…", syncWarning:" تم حفظ النسب في Supabase؛ تحقق من مزامنة الفروع مع Notion.", syncWarningShort:" تم حفظ النسب في Supabase؛ تحقق من المزامنة مع Notion.", saved:"تم حفظ العملية", childCreated:" فرع/فروع تم إنشاؤها.", failed:"فشل: ", notSaved:"لم تُحفظ العملية", save:"حفظ العملية", loadMore:"تحميل 200 فرع إضافي", loadingMore:"جارٍ التحميل…" }
   };
   const selected = (messages[lang] || messages.fr)[key];
   return typeof selected === "function" ? selected(count) : (selected ?? messages.fr[key] ?? key);
 }
 
-async function loadBiologicalLineage(cultureId) {
+async function loadBiologicalLineage(cultureId, offset = 0) {
   const target = document.getElementById('cultureLineage');
   const loadRevision = authStateRevision;
   const loadOrganizationId = organizationId;
   if (!target || !loadOrganizationId) return;
-  target.textContent = biologicalWorkflowText("loading");
+  if (offset === 0) {
+    target.__lineageRequestId = (target.__lineageRequestId || 0) + 1;
+    target.__lineageCultureId = cultureId;
+    target.__lineageRows = [];
+    target.textContent = biologicalWorkflowText("loading");
+  } else if (target.__lineageCultureId !== cultureId) {
+    return;
+  }
+  const lineageRequestId = target.__lineageRequestId;
   try {
-    const { data, error } = await supabaseClient.from('cultures')
-      .select('id,code,culture_type,material_id,parent_culture_id,started_at,metadata')
-      .eq('organization_id', loadOrganizationId).order('created_at', { ascending: true }).limit(1000);
+    const { data, error } = await supabaseClient.rpc('get_culture_lineage', {
+      p_organization_id: loadOrganizationId,
+      p_culture_id: cultureId,
+      p_limit: 200,
+      p_offset: offset
+    });
     if (error) throw error;
     if (!isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
-    const rows = data || [];
-    const byId = new Map(rows.map(row => [row.id, row]));
-    const current = byId.get(cultureId);
-    if (!current) { target.textContent = biologicalWorkflowText("missing"); return; }
-    const { data: materials, error: materialError } = await supabaseClient.from('materials')
-      .select('id,material_code,material_type,parent_material_id,generation,state,strain_id')
-      .eq('organization_id', loadOrganizationId).limit(2000);
-    if (materialError) throw materialError;
-    if (!isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
-    const materialById = new Map((materials || []).map(item => [item.id, item]));
-    const materialChain = []; let materialId = current.material_id; let materialGuard = 0;
-    while (materialId && materialGuard++ < 50) { const material = materialById.get(materialId); if (!material) break; materialChain.unshift(material); materialId = material.parent_material_id; }
-    const ancestors = []; let parentId = current.parent_culture_id; let guard = 0;
-    while (parentId && guard++ < 50) { const parent = byId.get(parentId); if (!parent) break; ancestors.unshift(parent); parentId = parent.parent_culture_id; }
-    const descendants = []; const queue = [{ id: current.id, depth: 0 }]; const visited = new Set([current.id]);
-    while (queue.length && descendants.length < 200) { const node = queue.shift(); for (const child of rows.filter(row => row.parent_culture_id === node.id)) { if (visited.has(child.id)) continue; visited.add(child.id); descendants.push({ ...child, depth: node.depth + 1 }); queue.push({ id: child.id, depth: node.depth + 1 }); } }
-    const renderNode = (row, label) => { const node = document.createElement('button'); node.type = 'button'; node.className = 'culture-lineage-node'; node.addEventListener('click', () => loadCultureDetail(row.id)); node.setAttribute('aria-label', biologicalWorkflowText("open") + (row.code || biologicalWorkflowText("noCode"))); const strong = document.createElement('strong'); strong.textContent = row.code || 'Culture sans code'; const small = document.createElement('small'); small.textContent = label + ' · ' + (row.culture_type || biologicalWorkflowText("typeMissing")); node.append(strong, small); return node; };
-    target.replaceChildren();
-    const makeGroup = (title, items) => { const section = document.createElement('section'); const heading = document.createElement('p'); heading.className = 'muted'; heading.textContent = title; section.appendChild(heading); const list = document.createElement('div'); list.className = 'culture-lineage-list'; items.forEach((item, index) => { if (index) { const arrow = document.createElement('span'); arrow.className = 'culture-lineage-arrow'; arrow.textContent = '→'; list.appendChild(arrow); } list.appendChild(renderNode(item.row, item.label)); }); section.appendChild(list); target.appendChild(section); };
-    if (materialChain.length) {
-      const section = document.createElement('section'); const heading = document.createElement('p'); heading.className = 'muted'; heading.textContent = biologicalWorkflowText("materialOrigin"); section.appendChild(heading);
-      const list = document.createElement('div'); list.className = 'culture-lineage-list';
-      materialChain.forEach((material, index) => { if (index) { const arrow = document.createElement('span'); arrow.className = 'culture-lineage-arrow'; arrow.textContent = '→'; list.appendChild(arrow); } const node = document.createElement('div'); node.className = 'culture-lineage-node'; const strong = document.createElement('strong'); strong.textContent = material.material_code || biologicalWorkflowText("materialNoCode"); const small = document.createElement('small'); small.textContent = (material.material_type || biologicalWorkflowText("unknownType")) + (material.generation == null ? '' : ' · ' + biologicalWorkflowText("generation") + material.generation) + (material.state ? ' · ' + material.state : ''); node.append(strong,small); list.appendChild(node); });
-      section.appendChild(list); target.appendChild(section);
-    }
-    if (ancestors.length) makeGroup(biologicalWorkflowText("parents"), ancestors.map(row => ({ row, label: biologicalWorkflowText("parentCulture") })));
-    makeGroup(biologicalWorkflowText("selected"), [{ row: current, label: biologicalWorkflowText("openSheet") }]);
-    if (descendants.length) makeGroup(biologicalWorkflowText("descendants") + ' (' + descendants.length + ')', descendants.map(row => ({ row, label: biologicalWorkflowText("generation") + (row.depth || 1) })));
-    if (!ancestors.length && !descendants.length) { const p = document.createElement('p'); p.className = 'muted'; p.textContent = biologicalWorkflowText("noLineage"); target.appendChild(p); }
-    if (rows.length >= 1000) { const note = document.createElement('p'); note.className = 'muted'; note.textContent = biologicalWorkflowText("partial"); target.appendChild(note); }
-  } catch (error) { if (!isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return; target.textContent = biologicalWorkflowText("loadError") + (error.message || error); }
-}
+    if (lineageRequestId !== target.__lineageRequestId ||
+        target.__lineageCultureId !== cultureId) return;
 
-let pendingBiologicalOperationKey = null;
-let pendingBiologicalOperationFingerprint = null;
+    const pageRows = data || [];
+    const previousRows = Array.isArray(target.__lineageRows) ? target.__lineageRows : [];
+    const lineageRowKey = row => {
+      if (row.culture_id) return `${row.relation}:culture:${row.culture_id}`;
+      if (row.relation === 'material_ancestor' && row.material_id) {
+        return `material_ancestor:material:${row.material_id}`;
+      }
+      return `${row.relation}:depth:${row.depth ?? 0}`;
+    };
+    const lineageRowsByKey = new Map();
+    [...previousRows, ...pageRows].forEach(row => {
+      lineageRowsByKey.set(lineageRowKey(row), row);
+    });
+    const rows = Array.from(lineageRowsByKey.values());
+    target.__lineageRows = rows;
+    const current = rows.find(row => row.relation === 'current');
+    if (!current) { target.textContent = biologicalWorkflowText("missing"); return; }
+
+    const toCultureRecord = row => ({
+      id: row.culture_id,
+      code: row.culture_code,
+      culture_type: row.culture_type,
+      material_id: row.material_id,
+      parent_culture_id: row.parent_culture_id,
+      started_at: row.started_at
+    });
+    const ancestors = rows
+      .filter(row => row.relation === 'ancestor')
+      .sort((a, b) => b.depth - a.depth)
+      .map(toCultureRecord);
+    const descendants = rows
+      .filter(row => row.relation === 'descendant')
+      .sort((a, b) => a.depth - b.depth || String(a.culture_code || '').localeCompare(String(b.culture_code || '')))
+      .map(row => ({ ...toCultureRecord(row), depth: row.depth }));
+    const materialAncestors = rows
+      .filter(row => row.relation === 'material_ancestor')
+      .sort((a, b) => b.depth - a.depth)
+      .map(row => ({
+        material_code: row.material_code,
+        material_type: row.material_type,
+        generation: row.material_generation,
+        state: row.material_state,
+        relationship_type: row.material_relationship_type
+      }));
+    const materialChain = [
+      ...materialAncestors,
+      ...(current.material_id ? [{
+        material_code: current.material_code,
+        material_type: current.material_type,
+        generation: current.material_generation,
+        state: current.material_state,
+        relationship_type: null
+      }] : [])
+    ];
+    const isTruncated = rows.some(row => row.truncated === true);
+    const hasMore = current.has_more === true;
+    const descendantTotal = Number(current.descendant_total || 0);
+
+    const renderNode = (row, label) => {
+      const node = document.createElement('button');
+      node.type = 'button';
+      node.className = 'culture-lineage-node';
+      node.addEventListener('click', () => loadCultureDetail(row.id));
+      node.setAttribute('aria-label', biologicalWorkflowText("open") + (row.code || biologicalWorkflowText("noCode")));
+      const strong = document.createElement('strong');
+      strong.textContent = row.code || 'Culture sans code';
+      const small = document.createElement('small');
+      small.textContent = label + ' · ' + (row.culture_type || biologicalWorkflowText("typeMissing"));
+      node.append(strong, small);
+      return node;
+    };
+
+    target.replaceChildren();
+    const makeGroup = (title, items) => {
+      const section = document.createElement('section');
+      const heading = document.createElement('p');
+      heading.className = 'muted';
+      heading.textContent = title;
+      section.appendChild(heading);
+      const list = document.createElement('div');
+      list.className = 'culture-lineage-list';
+      items.forEach((item, index) => {
+        if (index) {
+          const arrow = document.createElement('span');
+          arrow.className = 'culture-lineage-arrow';
+          arrow.textContent = '→';
+          list.appendChild(arrow);
+        }
+        list.appendChild(renderNode(item.row, item.label));
+      });
+      section.appendChild(list);
+      target.appendChild(section);
+    };
+
+    if (materialChain.length) {
+      const section = document.createElement('section');
+      const heading = document.createElement('p');
+      heading.className = 'muted';
+      heading.textContent = biologicalWorkflowText("materialOrigin");
+      section.appendChild(heading);
+      const list = document.createElement('div');
+      list.className = 'culture-lineage-list';
+      materialChain.forEach((material, index) => {
+        if (index) {
+          const arrow = document.createElement('span');
+          arrow.className = 'culture-lineage-arrow';
+          arrow.textContent = '→';
+          list.appendChild(arrow);
+        }
+        const node = document.createElement('div');
+        node.className = 'culture-lineage-node';
+        const strong = document.createElement('strong');
+        strong.textContent = material.material_code || biologicalWorkflowText("materialNoCode");
+        const small = document.createElement('small');
+        small.textContent = (material.material_type || biologicalWorkflowText("unknownType")) +
+          (material.generation == null ? '' : ' · ' + biologicalWorkflowText("generation") + material.generation) +
+          (material.state ? ' · ' + material.state : '') +
+          (material.relationship_type ? ' · ' + material.relationship_type : '');
+        node.append(strong, small);
+        list.appendChild(node);
+      });
+      section.appendChild(list);
+      target.appendChild(section);
+    }
+
+    if (ancestors.length) {
+      makeGroup(biologicalWorkflowText("parents"), ancestors.map(row => ({
+        row, label: biologicalWorkflowText("parentCulture")
+      })));
+    }
+    makeGroup(biologicalWorkflowText("selected"), [{
+      row: toCultureRecord(current), label: biologicalWorkflowText("openSheet")
+    }]);
+    if (descendants.length) {
+      makeGroup(biologicalWorkflowText("descendants") + ' (' + descendants.length + '/' + descendantTotal + ')',
+        descendants.map(row => ({ row, label: biologicalWorkflowText("generation") + row.depth })));
+    }
+    if (!ancestors.length && !descendants.length) {
+      const p = document.createElement('p');
+      p.className = 'muted';
+      p.textContent = biologicalWorkflowText("noLineage");
+      target.appendChild(p);
+    }
+    if (isTruncated) {
+      const note = document.createElement('p');
+      note.className = 'muted';
+      note.textContent = biologicalWorkflowText("partial");
+      target.appendChild(note);
+    }
+    if (hasMore) {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'culture-lineage-load-more';
+      button.textContent = biologicalWorkflowText("loadMore");
+      button.addEventListener('click', () => {
+        button.disabled = true;
+        button.textContent = biologicalWorkflowText("loadingMore");
+        loadBiologicalLineage(cultureId, offset + 200);
+      }, { once: true });
+      target.appendChild(button);
+    }
+  } catch (error) {
+    if (!isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
+    if (lineageRequestId !== target.__lineageRequestId ||
+        target.__lineageCultureId !== cultureId) return;
+    target.textContent = biologicalWorkflowText("loadError") + (error.message || error);
+  }
+}
 
 async function saveBiologicalOperation(event) {
   const operationRevision = authStateRevision;
@@ -5981,26 +6123,30 @@ async function saveBiologicalOperation(event) {
   if (childCodes.length && !['repiquage','passage','transfert','division_aliquotes','changement_milieu','conservation'].includes(operationType)) { message.textContent = biologicalWorkflowText("invalidPropagation"); return; }
   const occurredAt = new Date(dateValue).toISOString();
   const details = { source: 'BA Labs Culture Tracker', interface_version: '3.0', conditions: conditions || null, outcome: outcome || null };
-  const requestFingerprint = JSON.stringify({
-    organizationId: operationOrganizationId, cultureId, operationType, occurredAt,
-    note: note || null, details, childCodes
-  });
-  if (!pendingBiologicalOperationKey || pendingBiologicalOperationFingerprint !== requestFingerprint) {
-    pendingBiologicalOperationKey = crypto.randomUUID();
-    pendingBiologicalOperationFingerprint = requestFingerprint;
-  }
+  const biologicalOperationPayload = {
+    organization_id: operationOrganizationId,
+    parent_culture_id: cultureId,
+    event_type: operationType,
+    occurred_at: occurredAt,
+    note: note || null,
+    details,
+    child_codes: childCodes
+  };
+  const idempotencyKey = await getManualWriteIdempotencyKey(
+    "biological-operation",
+    biologicalOperationPayload
+  );
   button.disabled = true; button.textContent = biologicalWorkflowText("saving"); message.textContent = '';
   try {
     if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) throw new Error("Session ou espace de travail modifié pendant l’opération. Recommencez.");
     const { data, error } = await supabaseClient.rpc('record_biological_operation', {
       p_organization_id: operationOrganizationId, p_parent_culture_id: cultureId, p_event_type: operationType,
-      p_idempotency_key: pendingBiologicalOperationKey,
+      p_idempotency_key: idempotencyKey,
       p_occurred_at: occurredAt, p_note: note || null,
       p_details: details, p_child_codes: childCodes
     });
     if (error) throw error;
-    pendingBiologicalOperationKey = null;
-    pendingBiologicalOperationFingerprint = null;
+    clearManualWriteIdempotencyKey("biological-operation");
     if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
     const result = Array.isArray(data) ? data[0] : data;
     let notionSyncWarning = '';
@@ -6027,6 +6173,1284 @@ async function saveBiologicalOperation(event) {
 
 let cultureDetailRequestId = 0;
 
+function sortCultureEventTimelineEntries(timeline, beforeElement = null) {
+  const entries = [...timeline.querySelectorAll('[data-culture-event-entry="true"]')];
+  entries.sort((a, b) => {
+    const aTime = Number(a.dataset.sortTimestamp) || 0;
+    const bTime = Number(b.dataset.sortTimestamp) || 0;
+    return bTime - aTime;
+  });
+  entries.forEach(entry => timeline.insertBefore(entry, beforeElement));
+}
+
+
+async function loadMoreCultureEventHistory(cultureId, offset, button) {
+  const requestId = ++cultureDetailRequestId;
+  const loadRevision = authStateRevision;
+  const loadOrganizationId = organizationId;
+  const panel = document.getElementById("cultureDetailPanel");
+  const timeline = document.getElementById("cultureDetailTimeline");
+  if (!panel || !timeline || panel.dataset.cultureId !== cultureId) return;
+
+  button.disabled = true;
+  button.textContent = "Chargement des événements…";
+  try {
+    const { data: history, error: historyError } = await supabaseClient.rpc("get_culture_event_history", {
+      p_organization_id: loadOrganizationId,
+      p_culture_id: cultureId,
+      p_limit: 100,
+      p_offset: offset
+    });
+    if (historyError) throw new Error(historyError.message);
+    if (requestId !== cultureDetailRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
+
+    const events = (history || []).map(row => ({
+      id: row.event_id,
+      event_type: row.event_type,
+      occurred_at: row.occurred_at,
+      batch_id: row.batch_id,
+      source_relation: row.source_relation,
+      payload: row.payload
+    }));
+    const eventIds = events.map(event => event.id);
+    let measurements = [];
+    let observations = [];
+    if (eventIds.length) {
+      const [measurementResult, observationResult] = await Promise.all([
+        supabaseClient.from("measurements")
+          .select("id, variable_code, raw_value, raw_unit_code, measured_at, event_id, metadata")
+          .eq("organization_id", loadOrganizationId).in("event_id", eventIds)
+          .order("measured_at", { ascending: false }).limit(100),
+        supabaseClient.from("observations")
+          .select("id, variable_code, value_text, observed_at, event_id, metadata")
+          .eq("organization_id", loadOrganizationId).in("event_id", eventIds)
+          .order("observed_at", { ascending: false }).limit(100)
+      ]);
+      if (measurementResult.error) throw new Error("Mesures : " + measurementResult.error.message);
+      if (observationResult.error) throw new Error("Observations : " + observationResult.error.message);
+      measurements = measurementResult.data || [];
+      observations = observationResult.data || [];
+    }
+    if (requestId !== cultureDetailRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
+
+    const measurementsByEvent = new Map();
+    const observationsByEvent = new Map();
+    for (const row of measurements) {
+      if (!row.event_id) continue;
+      if (!measurementsByEvent.has(row.event_id)) measurementsByEvent.set(row.event_id, []);
+      measurementsByEvent.get(row.event_id).push(row);
+    }
+    for (const row of observations) {
+      if (!row.event_id) continue;
+      if (!observationsByEvent.has(row.event_id)) observationsByEvent.set(row.event_id, []);
+      observationsByEvent.get(row.event_id).push(row);
+    }
+    const variableLabel = code => measurementVariables.find(item => item.code === code)?.label || code || "Donnée";
+    const entries = [];
+    for (const event of events) {
+      const linkedMeasurements = measurementsByEvent.get(event.id) || [];
+      const linkedObservations = observationsByEvent.get(event.id) || [];
+      linkedMeasurements.forEach(row => entries.push({
+        date: row.measured_at || event.occurred_at,
+        type: "Mesure · " + variableLabel(row.variable_code),
+        detail: String(row.raw_value ?? "Valeur absente") + " " + (row.raw_unit_code || "") +
+          (row.metadata?.note ? " — " + row.metadata.note : "")
+      }));
+      linkedObservations.forEach(row => entries.push({
+        date: row.observed_at || event.occurred_at,
+        type: "Observation · " + variableLabel(row.variable_code),
+        detail: (row.value_text || "Sans description") +
+          (row.metadata?.note ? " — " + row.metadata.note : "")
+      }));
+      if (!linkedMeasurements.length && !linkedObservations.length) entries.push({
+        date: event.occurred_at,
+        type: (event.source_relation === "creation_operation" ? "Opération de création · " :
+          event.source_relation === "descendant_culture" ? "Création d’une culture fille · " : "") +
+          String(event.event_type || "Événement").replaceAll("_", " "),
+        detail: [
+          event.source_relation === "creation_operation" ? "Opération à l’origine de cette culture" :
+          event.source_relation === "descendant_culture" ? "Culture fille créée depuis cette culture par génération directe" : null,
+          event.payload?.parent_culture_code ? "Culture parent : " + event.payload.parent_culture_code : null,
+          event.payload?.material_code ? "Matériel : " + event.payload.material_code : null,
+          event.payload?.note,
+          event.payload?.details?.conditions ? "Conditions : " + event.payload.details.conditions : null,
+          event.payload?.details?.outcome ? "Résultat : " + String(event.payload.details.outcome).replaceAll("_", " ") : null,
+          event.payload?.description
+        ].filter(Boolean).join(" — ") || "Événement de traçabilité."
+      });
+    }
+    entries.sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
+    for (const entry of entries) {
+      const article = document.createElement("article");
+      article.className = "culture-timeline-entry";
+      article.dataset.cultureEventEntry = "true";
+      article.dataset.sortTimestamp = String(new Date(entry.date || 0).getTime() || 0);
+      const date = document.createElement("time");
+      date.className = "culture-timeline-date";
+      date.textContent = entry.date ? new Date(entry.date).toLocaleString("fr-FR") : "Date inconnue";
+      const content = document.createElement("div");
+      const heading = document.createElement("strong");
+      heading.textContent = entry.type;
+      const description = document.createElement("p");
+      description.textContent = String(entry.detail || "Aucun détail enregistré");
+      content.append(heading, description);
+      article.append(date, content);
+      timeline.insertBefore(article, button);
+    }
+    sortCultureEventTimelineEntries(timeline, button);
+
+    const historyHasMore = history?.some(row => row.has_more === true);
+    if (historyHasMore) {
+      button.disabled = false;
+      button.textContent = "Charger 100 événements plus anciens";
+      button.onclick = () => loadMoreCultureEventHistory(cultureId, offset + 100, button);
+    } else {
+      button.remove();
+    }
+  } catch (error) {
+    if (requestId !== cultureDetailRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
+    console.error("Chargement de la suite de l’historique :", error);
+    button.disabled = false;
+    button.textContent = "Réessayer de charger les événements";
+  }
+}
+
+function invalidateGenerationComparison(message = "Sélection modifiée. Relancez la comparaison pour actualiser le rapport.") {
+  const results = document.getElementById("generationComparisonResults");
+  if (results) {
+    results.__generationComparisonRequestId = (results.__generationComparisonRequestId || 0) + 1;
+    results.replaceChildren();
+  }
+  const button = document.getElementById("compareCultureGenerationsButton");
+  if (button) button.disabled = false;
+  const status = document.getElementById("generationComparisonStatus");
+  if (status) status.textContent = message;
+}
+
+function filterGenerationComparisonOptions() {
+  const search = document.getElementById("generationComparisonSearch");
+  const options = document.getElementById("generationComparisonOptions");
+  if (!search || !options) return;
+  const query = search.value.trim().toLocaleLowerCase("fr");
+  options.querySelectorAll("[data-culture-option]").forEach(label => {
+    label.hidden = query !== "" && !label.dataset.search.includes(query);
+  });
+}
+
+function populateGenerationComparisonOptions(currentCultureId) {
+  const options = document.getElementById("generationComparisonOptions");
+  const search = document.getElementById("generationComparisonSearch");
+  if (!options) return;
+  options.replaceChildren();
+  if (search) search.value = "";
+
+  cultureOptions
+    .slice()
+    .sort((a, b) => String(a.code || "").localeCompare(String(b.code || ""), "fr"))
+    .forEach(culture => {
+      const label = document.createElement("label");
+      label.className = "generation-comparison-option";
+      label.dataset.cultureOption = "true";
+      label.dataset.search = [culture.code || "", culture.culture_type || "", culture.id || ""]
+        .join(" ").toLocaleLowerCase("fr");
+
+      const checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+      checkbox.value = culture.id;
+      checkbox.checked = culture.id === currentCultureId;
+      checkbox.addEventListener("change", () => {
+        const selectedCultureIds = options.querySelectorAll("input[type=checkbox]:checked");
+        if (selectedCultureIds.length > 4) {
+          checkbox.checked = false;
+          const status = document.getElementById("generationComparisonStatus");
+          if (status) status.textContent = "Quatre cultures maximum. Décochez une culture avant d’en ajouter une autre.";
+          return;
+        }
+        invalidateGenerationComparison(
+          selectedCultureIds.length + " culture(s) sélectionnée(s). " +
+          (selectedCultureIds.length < 2 ? "Ajoutez au moins une autre culture." : "Relancez la comparaison pour actualiser le rapport.")
+        );
+      });
+
+      const text = document.createElement("span");
+      text.textContent = (culture.code || "Culture sans code") + " — " +
+        (culture.culture_type || "type non renseigné");
+      label.append(checkbox, text);
+      options.appendChild(label);
+    });
+  filterGenerationComparisonOptions();
+}
+
+function renderGenerationComparisonReport(report) {
+  const target = document.getElementById("generationComparisonResults");
+  if (!target) return;
+  target.replaceChildren();
+
+  const cultureCodes = new Map((report.cultures || []).map(c => [c.id, c.code || c.id]));
+  const sections = [
+    ["cultures", "Cultures sélectionnées"],
+    ["lineage", "Filiation et générations"],
+    ["measurements", "Mesures quantitatives"],
+    ["observations", "Observations qualitatives"],
+    ["events", "Opérations et événements"],
+    ["batches", "Lots de production"],
+    ["results", "Résultats expérimentaux"],
+    ["environmental_observations", "Données environnementales"]
+  ];
+  const fieldLabels = {
+    culture_id:"Culture", selected_culture_id:"Culture suivie", ancestor_culture_id:"Ancêtre",
+    parent_culture_id:"Culture parente", depth:"Profondeur", code:"Code",
+    culture_type:"Type", started_at:"Démarrage", material_code:"Matériel",
+    variable_code:"Variable", raw_value:"Valeur brute", raw_unit_code:"Unité brute",
+    normalized_value:"Valeur normalisée", normalized_unit_code:"Unité normalisée",
+    measured_at:"Mesuré le", observed_at:"Observé le", value_text:"Observation",
+    quality_state:"Qualité", exclusion_reason:"Motif d’exclusion", event_type:"Événement",
+    occurred_at:"Date", source_relation:"Origine", batch_code:"Code lot", status:"Statut",
+    current_stage:"Étape", quantity_actual:"Quantité réelle", quantity_unit_code:"Unité",
+    result_type:"Type de résultat", value:"Résultat", data_family:"Famille",
+    provider_code:"Fournisseur", dataset_code:"Jeu de données", unit_code:"Unité",
+    spatial_resolution_m:"Résolution spatiale", quality_flag:"Indicateur qualité",
+    experiment_code:"Expérience", experiment_name:"Nom expérience",
+    protocol_version:"Version protocole", generation:"Génération"
+  };
+  const format = value => {
+    if (value === null || value === undefined || value === "") return "Non renseigné";
+    if (typeof value === "object") return JSON.stringify(value);
+    return String(value);
+  };
+  const heading = document.createElement("p");
+  heading.className = "muted";
+  heading.textContent = "Rapport v" + (report.schema_version || "?") + " · " +
+    (report.cultures || []).length + " cultures · " +
+    new Date(report.generated_at || Date.now()).toLocaleString();
+  target.appendChild(heading);
+
+  // Descriptive summaries use culture-linked measurements only. Shared
+  // environmental readings remain contextual and are never attributed to a culture.
+  const measurementRows = Array.isArray(report.measurements) ? report.measurements : [];
+  const cultureMeasurementRows = measurementRows.filter(row =>
+    row.source_relation === "culture" && row.culture_id
+  );
+  const environmentalMeasurementRows = measurementRows.filter(row =>
+    row.source_relation === "environment" || !row.culture_id
+  );
+  const measurementGroups = new Map();
+  let excludedMeasurements = 0;
+  let nonNumericMeasurements = 0;
+  cultureMeasurementRows.forEach(row => {
+    if (row.quality_state === "excluded") {
+      excludedMeasurements += 1;
+      return;
+    }
+    const rawValue = row.normalized_value ?? row.raw_value;
+    const numericValue = rawValue == null ? NaN : Number(rawValue);
+    if (!Number.isFinite(numericValue)) {
+      nonNumericMeasurements += 1;
+      return;
+    }
+    const unit = row.normalized_value != null
+      ? (row.normalized_unit_code || "unité normalisée non renseignée")
+      : (row.raw_unit_code || "unité brute non renseignée");
+    const key = [row.culture_id, row.variable_code || "variable inconnue", unit,
+      row.quality_state || "qualité non renseignée"].join("||");
+    if (!measurementGroups.has(key)) {
+      measurementGroups.set(key, {
+        cultureId: row.culture_id,
+        variable: row.variable_code || "Variable inconnue",
+        unit,
+        quality: row.quality_state || "non renseignée",
+        values: []
+      });
+    }
+    measurementGroups.get(key).values.push(numericValue);
+  });
+
+  const statsSection = document.createElement("section");
+  statsSection.className = "generation-comparison-section";
+  const statsTitle = document.createElement("h5");
+  statsTitle.textContent = "Synthèse statistique descriptive";
+  statsSection.appendChild(statsTitle);
+  const statsNote = document.createElement("p");
+  statsNote.className = "muted";
+  statsNote.textContent = "Calculs séparés par culture, variable, unité et état qualité. n représente le nombre de mesures enregistrées, pas le nombre de répétitions biologiques indépendantes.";
+  statsSection.appendChild(statsNote);
+
+  if (measurementGroups.size) {
+    const statsTable = document.createElement("table");
+    statsTable.className = "statistics-table";
+    const statsHead = document.createElement("thead");
+    const statsHeaderRow = document.createElement("tr");
+    ["Culture", "Variable", "Unité", "Qualité", "n mesures", "Moyenne", "Médiane", "Q1–Q3", "Min–max"]
+      .forEach(label => {
+        const th = document.createElement("th");
+        th.textContent = label;
+        statsHeaderRow.appendChild(th);
+      });
+    statsHead.appendChild(statsHeaderRow);
+    statsTable.appendChild(statsHead);
+    const statsBody = document.createElement("tbody");
+    const fmt = value => new Intl.NumberFormat(undefined, {maximumSignificantDigits: 5}).format(value);
+    const quantile = (sorted, probability) => {
+      const position = (sorted.length - 1) * probability;
+      const lower = Math.floor(position);
+      const upper = Math.ceil(position);
+      return lower === upper ? sorted[lower] :
+        sorted[lower] + (sorted[upper] - sorted[lower]) * (position - lower);
+    };
+    [...measurementGroups.values()].sort((a, b) =>
+      String(cultureCodes.get(a.cultureId) || a.cultureId).localeCompare(String(cultureCodes.get(b.cultureId) || b.cultureId)) ||
+      a.variable.localeCompare(b.variable) || a.unit.localeCompare(b.unit)
+    ).forEach(group => {
+      const sorted = group.values.slice().sort((a, b) => a - b);
+      const mean = sorted.reduce((sum, value) => sum + value, 0) / sorted.length;
+      const cells = [
+        cultureCodes.get(group.cultureId) || group.cultureId,
+        group.variable, group.unit, group.quality, String(sorted.length),
+        fmt(mean), fmt(quantile(sorted, .5)),
+        fmt(quantile(sorted, .25)) + "–" + fmt(quantile(sorted, .75)),
+        fmt(sorted[0]) + "–" + fmt(sorted[sorted.length - 1])
+      ];
+      const tr = document.createElement("tr");
+      cells.forEach(value => {
+        const td = document.createElement("td");
+        td.textContent = value;
+        tr.appendChild(td);
+      });
+      statsBody.appendChild(tr);
+    });
+    statsTable.appendChild(statsBody);
+    statsSection.appendChild(statsTable);
+  } else {
+    const emptyStats = document.createElement("p");
+    emptyStats.className = "muted";
+    emptyStats.textContent = "Aucune mesure quantitative liée directement aux cultures sélectionnées ne permet un calcul statistique.";
+    statsSection.appendChild(emptyStats);
+  }
+
+  const qualityNote = document.createElement("p");
+  qualityNote.className = "muted";
+  qualityNote.textContent =
+    "Mesures culturelles exclues : " + excludedMeasurements +
+    " · Valeurs absentes ou non numériques : " + nonNumericMeasurements +
+    " · Mesures environnementales contextuelles : " + environmentalMeasurementRows.length +
+    ". Les mesures environnementales partagées ne sont pas intégrées aux statistiques propres aux cultures.";
+  statsSection.appendChild(qualityNote);
+  target.appendChild(statsSection);
+
+  // Replicate-aware comparison: collapse repeated readings within each
+  // experimental unit first, then compare independent units within a cohort.
+  const cultureMetadata = new Map((report.cultures || []).map(culture =>
+    [culture.id, culture]
+  ));
+  const unitMeasurements = new Map();
+  let measurementsWithoutExperimentalUnit = 0;
+  cultureMeasurementRows.forEach(row => {
+    if (row.quality_state === "excluded") return;
+    const culture = cultureMetadata.get(row.culture_id);
+    if (!culture?.experimental_unit_id || !culture?.experiment_id) {
+      measurementsWithoutExperimentalUnit += 1;
+      return;
+    }
+    const numericValue = Number(row.normalized_value ?? row.raw_value);
+    if (!Number.isFinite(numericValue)) return;
+    const unit = row.normalized_value != null
+      ? (row.normalized_unit_code || "unité normalisée non renseignée")
+      : (row.raw_unit_code || "unité brute non renseignée");
+    const treatment = culture.treatment_code || "traitement non renseigné";
+    const quality = row.quality_state || "qualité non renseignée";
+    const cohortKey = [
+      culture.experiment_id, treatment, row.variable_code || "variable inconnue",
+      unit, quality
+    ].join("||");
+    const unitKey = [cohortKey, culture.experimental_unit_id].join("||");
+    if (!unitMeasurements.has(unitKey)) {
+      unitMeasurements.set(unitKey, {
+        cohortKey,
+        experiment: culture.experiment_code || culture.experiment_id,
+        treatment,
+        variable: row.variable_code || "Variable inconnue",
+        unit,
+        quality,
+        unitId: culture.experimental_unit_id,
+        unitCode: culture.unit_code || culture.replicate_no || culture.experimental_unit_id,
+        cultureCodes: new Set(),
+        values: []
+      });
+    }
+    const unitGroup = unitMeasurements.get(unitKey);
+    unitGroup.values.push(numericValue);
+    unitGroup.cultureCodes.add(culture.code || culture.id);
+  });
+
+  const cohorts = new Map();
+  unitMeasurements.forEach(unitGroup => {
+    if (!cohorts.has(unitGroup.cohortKey)) {
+      cohorts.set(unitGroup.cohortKey, {
+        experiment: unitGroup.experiment,
+        treatment: unitGroup.treatment,
+        variable: unitGroup.variable,
+        unit: unitGroup.unit,
+        quality: unitGroup.quality,
+        units: []
+      });
+    }
+    const sortedValues = unitGroup.values.slice().sort((a, b) => a - b);
+    const median = sortedValues.length % 2
+      ? sortedValues[(sortedValues.length - 1) / 2]
+      : (sortedValues[sortedValues.length / 2 - 1] + sortedValues[sortedValues.length / 2]) / 2;
+    cohorts.get(unitGroup.cohortKey).units.push({
+      unitId: unitGroup.unitId,
+      unitCode: unitGroup.unitCode,
+      median,
+      measurementCount: sortedValues.length,
+      cultureCount: unitGroup.cultureCodes.size
+    });
+  });
+
+  const replicateSection = document.createElement("section");
+  replicateSection.className = "generation-comparison-section";
+  const replicateTitle = document.createElement("h5");
+  replicateTitle.textContent = "Comparaison par unités expérimentales";
+  replicateSection.appendChild(replicateTitle);
+  const replicateNote = document.createElement("p");
+  replicateNote.className = "muted";
+  replicateNote.textContent = "Les mesures répétées d'une même unité sont d'abord résumées par leur médiane. Les statistiques portent ensuite sur les médianes des unités expérimentales distinctes, jamais sur le nombre brut de mesures. Le caractère biologiquement indépendant de ces unités doit être confirmé par le protocole : il n'est pas déduit automatiquement. Les groupes sans expérience ou unité identifiée sont exclus.";
+  replicateSection.appendChild(replicateNote);
+
+  const eligibleCohorts = [...cohorts.values()]
+    .filter(cohort => cohort.units.length >= 2)
+    .sort((a, b) => a.experiment.localeCompare(b.experiment) ||
+      a.treatment.localeCompare(b.treatment) || a.variable.localeCompare(b.variable));
+  if (eligibleCohorts.length) {
+    const replicateTable = document.createElement("table");
+    replicateTable.className = "statistics-table";
+    const replicateHead = document.createElement("thead");
+    const replicateHeader = document.createElement("tr");
+    ["Expérience", "Traitement", "Variable", "Unité", "n unités distinctes",
+      "Moyenne des médianes", "Médiane des unités", "Étendue des unités"]
+      .forEach(label => {
+        const th = document.createElement("th");
+        th.textContent = label;
+        replicateHeader.appendChild(th);
+      });
+    replicateHead.appendChild(replicateHeader);
+    replicateTable.appendChild(replicateHead);
+    const replicateBody = document.createElement("tbody");
+    const replicateFmt = value => new Intl.NumberFormat(undefined, {
+      maximumSignificantDigits: 5
+    }).format(value);
+    eligibleCohorts.forEach(cohort => {
+      const values = cohort.units.map(unit => unit.median).sort((a, b) => a - b);
+      const mean = values.reduce((sum, value) => sum + value, 0) / values.length;
+      const middle = values.length % 2
+        ? values[(values.length - 1) / 2]
+        : (values[values.length / 2 - 1] + values[values.length / 2]) / 2;
+      const cells = [
+        cohort.experiment, cohort.treatment, cohort.variable, cohort.unit,
+        String(values.length), replicateFmt(mean), replicateFmt(middle),
+        replicateFmt(values[0]) + "–" + replicateFmt(values[values.length - 1])
+      ];
+      const tr = document.createElement("tr");
+      cells.forEach(value => {
+        const td = document.createElement("td");
+        td.textContent = value;
+        tr.appendChild(td);
+      });
+      replicateBody.appendChild(tr);
+    });
+    replicateTable.appendChild(replicateBody);
+    replicateSection.appendChild(replicateTable);
+
+    const cohortDetails = document.createElement("p");
+    cohortDetails.className = "muted";
+    cohortDetails.textContent = eligibleCohorts.map(cohort =>
+      cohort.experiment + " / " + cohort.treatment + " / " + cohort.variable +
+      " : " + cohort.units.map(unit =>
+        String(unit.unitCode) + " (" + unit.measurementCount + " mesures)"
+      ).join(", ")
+    ).join(" · ");
+    replicateSection.appendChild(cohortDetails);
+  } else {
+    const noReplicates = document.createElement("p");
+    noReplicates.className = "muted";
+    noReplicates.textContent = "Aucun groupe ne possède au moins deux unités expérimentales distinctes avec une expérience identifiée. Les données restent consultables dans la synthèse descriptive, mais aucune comparaison de répétitions indépendantes n'est calculée.";
+    replicateSection.appendChild(noReplicates);
+  }
+  const replicateLimit = document.createElement("p");
+  replicateLimit.className = "muted";
+  replicateLimit.textContent = "Mesures non rattachées à une unité expérimentale identifiable : " +
+    measurementsWithoutExperimentalUnit + ". Aucune p-value ni conclusion causale n'est calculée à ce stade.";
+  replicateSection.appendChild(replicateLimit);
+  target.appendChild(replicateSection);
+
+  // Candidate anomaly flags are descriptive only and operate on unit medians.
+  const anomalySection = document.createElement("section");
+  anomalySection.className = "generation-comparison-section";
+  const anomalyTitle = document.createElement("h5");
+  anomalyTitle.textContent = "Repérage descriptif des valeurs atypiques";
+  anomalySection.appendChild(anomalyTitle);
+  const anomalyNote = document.createElement("p");
+  anomalyNote.className = "muted";
+  anomalyNote.textContent = "Repérage par bornes de Tukey (1,5 × IQR) sur les médianes des unités expérimentales. Un signalement est une piste de vérification, pas une preuve d'erreur ni un motif d'exclusion.";
+  anomalySection.appendChild(anomalyNote);
+
+  const anomalyEligibleCohorts = eligibleCohorts.filter(cohort => cohort.units.length >= 4);
+  const insufficientAnomalyCohorts = eligibleCohorts.filter(cohort => cohort.units.length < 4);
+  insufficientAnomalyCohorts.forEach(cohort => {
+    const note = document.createElement("p");
+    note.className = "muted";
+    note.textContent = cohort.experiment + " / " + cohort.treatment + " / " +
+      cohort.variable + " : effectif insuffisant pour le repérage IQR (n = " +
+      cohort.units.length + " unités distinctes ; minimum = 4).";
+    anomalySection.appendChild(note);
+  });
+
+  let flaggedAnomalies = 0;
+  const anomalyFormat = value => new Intl.NumberFormat(undefined, {
+    maximumSignificantDigits: 5
+  }).format(value);
+  const anomalyQuantile = (sorted, probability) => {
+    const position = (sorted.length - 1) * probability;
+    const lower = Math.floor(position);
+    const upper = Math.ceil(position);
+    return lower === upper ? sorted[lower] :
+      sorted[lower] + (sorted[upper] - sorted[lower]) * (position - lower);
+  };
+  anomalyEligibleCohorts.forEach(cohort => {
+    const values = cohort.units.map(unit => unit.median).sort((a, b) => a - b);
+    const q1 = anomalyQuantile(values, .25);
+    const q3 = anomalyQuantile(values, .75);
+    const iqr = q3 - q1;
+    const lowerFence = q1 - 1.5 * iqr;
+    const upperFence = q3 + 1.5 * iqr;
+    cohort.units.forEach(unit => {
+      if (unit.median < lowerFence || unit.median > upperFence) {
+        flaggedAnomalies += 1;
+        const candidate = document.createElement("p");
+        candidate.textContent = cohort.experiment + " / " + cohort.treatment +
+          " / " + cohort.variable + " : valeur atypique candidate — à vérifier · unité " +
+          unit.unitCode + " · médiane " + anomalyFormat(unit.median) + " " + cohort.unit +
+          " · bornes IQR " + anomalyFormat(lowerFence) + " à " + anomalyFormat(upperFence);
+        anomalySection.appendChild(candidate);
+      }
+    });
+  });
+  if (!eligibleCohorts.length) {
+    const empty = document.createElement("p");
+    empty.className = "muted";
+    empty.textContent = "Aucun groupe avec au moins deux unités expérimentales distinctes ne permet ce repérage.";
+    anomalySection.appendChild(empty);
+  } else if (!anomalyEligibleCohorts.length) {
+    const empty = document.createElement("p");
+    empty.className = "muted";
+    empty.textContent = "Aucun groupe n'atteint l'effectif minimal de quatre unités distinctes pour le repérage IQR.";
+    anomalySection.appendChild(empty);
+  } else if (!flaggedAnomalies) {
+    const empty = document.createElement("p");
+    empty.className = "muted";
+    empty.textContent = "Aucune médiane d'unité ne dépasse les bornes IQR dans les groupes évaluables.";
+    anomalySection.appendChild(empty);
+  }
+  const anomalySafetyNote = document.createElement("p");
+  anomalySafetyNote.className = "muted";
+  anomalySafetyNote.textContent = "Aucune mesure atypique n'est exclue automatiquement. Vérifier le cahier de laboratoire, le protocole, les unités et la saisie avant toute interprétation.";
+  anomalySection.appendChild(anomalySafetyNote);
+  target.appendChild(anomalySection);
+
+  // Chronological culture series: never merge different cultures, variables,
+  // units or quality states; shared environmental readings stay contextual.
+  const timeSeriesGroups = new Map();
+  let measurementsWithInvalidTime = 0;
+  cultureMeasurementRows.forEach(row => {
+    if (row.quality_state === "excluded") return;
+    const rawValue = row.normalized_value ?? row.raw_value;
+    const value = rawValue == null ? NaN : Number(rawValue);
+    if (!Number.isFinite(value)) return;
+    const timestamp = row.measured_at ? Date.parse(row.measured_at) : NaN;
+    if (!Number.isFinite(timestamp)) {
+      measurementsWithInvalidTime += 1;
+      return;
+    }
+    const unit = row.normalized_value != null
+      ? (row.normalized_unit_code || "unité normalisée non renseignée")
+      : (row.raw_unit_code || "unité brute non renseignée");
+    const quality = row.quality_state || "qualité non renseignée";
+    const cultureId = row.culture_id;
+    const variable = row.variable_code || "variable inconnue";
+    const key = [cultureId, variable, unit, quality].join("||");
+    if (!timeSeriesGroups.has(key)) {
+      timeSeriesGroups.set(key, {
+        cultureId,
+        culture: cultureCodes.get(cultureId) || cultureId,
+        variable,
+        unit,
+        quality,
+        points: []
+      });
+    }
+    timeSeriesGroups.get(key).points.push({
+      id: row.id || "",
+      timestamp,
+      value
+    });
+  });
+
+  const timeSeriesSection = document.createElement("section");
+  timeSeriesSection.className = "generation-comparison-section";
+  const timeSeriesTitle = document.createElement("h5");
+  timeSeriesTitle.textContent = "Évolution temporelle des mesures";
+  timeSeriesSection.appendChild(timeSeriesTitle);
+  const timeSeriesNote = document.createElement("p");
+  timeSeriesNote.className = "muted";
+  timeSeriesNote.textContent = "Séries séparées par culture, variable, unité et état qualité : unités comparables uniquement. La variation depuis le relevé précédent est calculée dans l'ordre chronologique. Les relevés environnementaux partagés restent hors de ces séries.";
+  timeSeriesSection.appendChild(timeSeriesNote);
+
+  const timeSeriesFormat = value => new Intl.NumberFormat(undefined, {
+    maximumSignificantDigits: 5
+  }).format(value);
+  const sortedTimeSeries = [...timeSeriesGroups.values()].sort((a, b) =>
+    String(a.culture).localeCompare(String(b.culture)) ||
+    a.variable.localeCompare(b.variable) || a.unit.localeCompare(b.unit)
+  );
+  sortedTimeSeries.forEach(series => {
+    series.points.sort((a, b) => a.timestamp - b.timestamp ||
+      String(a.id).localeCompare(String(b.id)));
+    const heading = document.createElement("h6");
+    heading.textContent = series.culture + " · " + series.variable +
+      " · " + series.unit + " · " + series.quality +
+      " · " + series.points.length + " relevé(s)";
+    timeSeriesSection.appendChild(heading);
+
+    const table = document.createElement("table");
+    table.className = "statistics-table";
+    const head = document.createElement("thead");
+    const headerRow = document.createElement("tr");
+    ["Date", "Valeur", "Variation depuis le relevé précédent", "Variation (%)", "Délai"]
+      .forEach(label => {
+        const th = document.createElement("th");
+        th.textContent = label;
+        headerRow.appendChild(th);
+      });
+    head.appendChild(headerRow);
+    table.appendChild(head);
+    const body = document.createElement("tbody");
+    series.points.forEach((point, index) => {
+      const previous = index > 0 ? series.points[index - 1] : null;
+      const delta = previous ? point.value - previous.value : null;
+      const percent = previous && previous.value !== 0
+        ? (delta / Math.abs(previous.value)) * 100
+        : null;
+      const elapsedDays = previous
+        ? (point.timestamp - previous.timestamp) / 86400000
+        : null;
+      const cells = [
+        new Date(point.timestamp).toLocaleString(),
+        timeSeriesFormat(point.value) + " " + series.unit,
+        previous ? (delta > 0 ? "+" : "") + timeSeriesFormat(delta) + " " + series.unit : "—",
+        previous
+          ? (percent == null ? "variation en % non calculable (valeur précédente nulle)"
+            : (percent > 0 ? "+" : "") + timeSeriesFormat(percent) + " %")
+          : "—",
+        previous ? timeSeriesFormat(elapsedDays) + " jour(s)" : "Premier relevé"
+      ];
+      const rowElement = document.createElement("tr");
+      cells.forEach(value => {
+        const cell = document.createElement("td");
+        cell.textContent = value;
+        rowElement.appendChild(cell);
+      });
+      body.appendChild(rowElement);
+    });
+    table.appendChild(body);
+    timeSeriesSection.appendChild(table);
+
+    // Accessible, dependency-free SVG plot. X is elapsed time (not row index),
+    // so irregular sampling intervals remain visually honest.
+    const chart = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    chart.setAttribute("viewBox", "0 0 720 190");
+    chart.setAttribute("role", "img");
+    chart.setAttribute("aria-label", "Graphique temporel : " + series.culture + ", " +
+      series.variable + ", " + series.points.length + " relevés");
+    chart.setAttribute("preserveAspectRatio", "xMidYMid meet");
+    chart.style.width = "100%";
+    chart.style.height = "auto";
+    chart.style.maxHeight = "220px";
+    const chartTitle = document.createElementNS("http://www.w3.org/2000/svg", "title");
+    chartTitle.textContent = "Évolution de " + series.variable + " — " + series.culture;
+    chart.appendChild(chartTitle);
+    const chartDescription = document.createElementNS("http://www.w3.org/2000/svg", "desc");
+    chartDescription.textContent = "Valeurs mesurées dans le temps, unité " + series.unit +
+      ". Les valeurs exactes et dates figurent dans le tableau accessible adjacent.";
+    chart.appendChild(chartDescription);
+    const chartLeft = 54;
+    const chartRight = 690;
+    const chartTop = 18;
+    const chartBottom = 145;
+    const values = series.points.map(point => point.value);
+    const minValue = Math.min(...values);
+    const maxValue = Math.max(...values);
+    const valuePadding = maxValue === minValue
+      ? Math.max(Math.abs(maxValue) * 0.05, 1)
+      : (maxValue - minValue) * 0.08;
+    const yMin = minValue - valuePadding;
+    const yMax = maxValue + valuePadding;
+    const firstTime = series.points[0].timestamp;
+    const lastTime = series.points[series.points.length - 1].timestamp;
+    const xFor = point => lastTime === firstTime
+      ? (chartLeft + chartRight) / 2
+      : chartLeft + ((point.timestamp - firstTime) / (lastTime - firstTime)) *
+        (chartRight - chartLeft);
+    const yFor = value => chartBottom - ((value - yMin) / (yMax - yMin)) *
+      (chartBottom - chartTop);
+    const axis = document.createElementNS("http://www.w3.org/2000/svg", "path");
+    axis.setAttribute("d", "M " + chartLeft + " " + chartTop + " V " +
+      chartBottom + " H " + chartRight);
+    axis.setAttribute("fill", "none");
+    axis.setAttribute("stroke", "currentColor");
+    axis.setAttribute("stroke-opacity", "0.45");
+    chart.appendChild(axis);
+    const polyline = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
+    polyline.setAttribute("points", series.points.map(point =>
+      xFor(point) + "," + yFor(point.value)
+    ).join(" "));
+    polyline.setAttribute("fill", "none");
+    polyline.setAttribute("stroke", "currentColor");
+    polyline.setAttribute("stroke-width", "2.5");
+    polyline.setAttribute("stroke-linejoin", "round");
+    polyline.setAttribute("stroke-linecap", "round");
+    chart.appendChild(polyline);
+    series.points.forEach(point => {
+      const marker = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+      marker.setAttribute("cx", String(xFor(point)));
+      marker.setAttribute("cy", String(yFor(point.value)));
+      marker.setAttribute("r", "4");
+      marker.setAttribute("fill", "currentColor");
+      chart.appendChild(marker);
+    });
+    const startLabel = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    startLabel.setAttribute("x", String(chartLeft));
+    startLabel.setAttribute("y", "174");
+    startLabel.setAttribute("font-size", "11");
+    startLabel.textContent = new Date(firstTime).toLocaleDateString();
+    chart.appendChild(startLabel);
+    const endLabel = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    endLabel.setAttribute("x", String(chartRight));
+    endLabel.setAttribute("y", "174");
+    endLabel.setAttribute("text-anchor", "end");
+    endLabel.setAttribute("font-size", "11");
+    endLabel.textContent = new Date(lastTime).toLocaleDateString();
+    chart.appendChild(endLabel);
+    timeSeriesSection.appendChild(chart);
+  });
+
+  if (!sortedTimeSeries.length) {
+    const empty = document.createElement("p");
+    empty.className = "muted";
+    empty.textContent = "Aucune série chronologique exploitable pour les cultures sélectionnées.";
+    timeSeriesSection.appendChild(empty);
+  }
+  if (measurementsWithInvalidTime) {
+    const invalidTimeNote = document.createElement("p");
+    invalidTimeNote.className = "muted";
+    invalidTimeNote.textContent = measurementsWithInvalidTime +
+      " mesure(s) numérique(s) ignorée(s) dans les séries : date non exploitable.";
+    timeSeriesSection.appendChild(invalidTimeNote);
+  }
+  target.appendChild(timeSeriesSection);
+
+  // External environmental data is matched by the explicit culture -> environment
+  // -> location mapping returned by the tenant-scoped comparison RPC. It is never
+  // merged into culture measurements or described as a direct culture reading.
+  const environmentalContextSection = document.createElement("section");
+  environmentalContextSection.className = "generation-comparison-section";
+  const environmentalContextTitle = document.createElement("h5");
+  environmentalContextTitle.textContent = "Contexte environnemental par lieu";
+  environmentalContextSection.appendChild(environmentalContextTitle);
+  const environmentalContextNote = document.createElement("p");
+  environmentalContextNote.className = "muted";
+  environmentalContextNote.textContent = "Les séries ci-dessous sont des données environnementales externes associées au lieu enregistré de chaque culture. Elles ne sont pas des mesures directes de la culture. Les données météo ou satellitaires à maille spatiale décrivent un contexte géographique, pas nécessairement le microclimat du contenant, de la serre ou de la salle.";
+  environmentalContextSection.appendChild(environmentalContextNote);
+
+  const cultureEnvironmentContext = Array.isArray(report.culture_environment_context)
+    ? report.culture_environment_context : [];
+  const environmentalObservations = Array.isArray(report.environmental_observations)
+    ? report.environmental_observations : [];
+  const contextsByLocation = new Map();
+  cultureEnvironmentContext.forEach(context => {
+    if (!context.location_id) return;
+    if (!contextsByLocation.has(context.location_id)) {
+      contextsByLocation.set(context.location_id, {
+        locationCode: context.location_code || context.location_name || context.location_id,
+        locationName: context.location_name || "Lieu sans nom",
+        latitude: context.latitude,
+        longitude: context.longitude,
+        coordinateAccuracy: context.coordinate_accuracy_m,
+        coordinateSource: context.coordinate_source,
+        environments: new Set(),
+        cultures: new Set(),
+        contextRelations: new Set(),
+        batchCodes: new Set()
+      });
+    }
+    const locationContext = contextsByLocation.get(context.location_id);
+    locationContext.cultures.add(cultureCodes.get(context.culture_id) || context.culture_id);
+    if (context.environment_name) locationContext.environments.add(context.environment_name);
+    if (context.context_relation) locationContext.contextRelations.add(context.context_relation);
+    if (context.batch_code) locationContext.batchCodes.add(context.batch_code);
+  });
+
+  const environmentalSeriesGroups = new Map();
+  let environmentalRowsWithoutNumericValue = 0;
+  let environmentalRowsWithoutTime = 0;
+  environmentalObservations.forEach(row => {
+    if (!row.location_id || !contextsByLocation.has(row.location_id)) return;
+    const value = row.value == null ? NaN : Number(row.value);
+    const timestamp = row.observed_at ? Date.parse(row.observed_at) : NaN;
+    if (!Number.isFinite(value)) {
+      environmentalRowsWithoutNumericValue += 1;
+      return;
+    }
+    if (!Number.isFinite(timestamp)) {
+      environmentalRowsWithoutTime += 1;
+      return;
+    }
+    const key = [
+      row.location_id, row.data_family || "famille inconnue",
+      row.provider_code || "source inconnue", row.dataset_code || "jeu inconnu",
+      row.variable_code || "variable inconnue", row.unit_code || "unité non renseignée",
+      row.quality_flag || "qualité non renseignée"
+    ].join("||");
+    if (!environmentalSeriesGroups.has(key)) {
+      environmentalSeriesGroups.set(key, {
+        locationId: row.location_id,
+        dataFamily: row.data_family || "famille inconnue",
+        provider: row.provider_code || "source inconnue",
+        dataset: row.dataset_code || "jeu inconnu",
+        variable: row.variable_code || "variable inconnue",
+        unit: row.unit_code || "unité non renseignée",
+        quality: row.quality_flag || "qualité non renseignée",
+        resolution: row.spatial_resolution_m,
+        points: []
+      });
+    }
+    environmentalSeriesGroups.get(key).points.push({
+      id: row.id || "",
+      timestamp,
+      value,
+      retrievedAt: row.retrieved_at || null,
+      sourceUrl: row.source_url || null
+    });
+  });
+
+  const environmentalFormat = value => new Intl.NumberFormat(undefined, {
+    maximumSignificantDigits: 5
+  }).format(value);
+  const locationsWithObservations = new Set();
+  [...environmentalSeriesGroups.values()].sort((a, b) =>
+    String(contextsByLocation.get(a.locationId)?.locationCode || "").localeCompare(
+      String(contextsByLocation.get(b.locationId)?.locationCode || "")
+    ) || a.variable.localeCompare(b.variable)
+  ).forEach(series => {
+    series.points.sort((a, b) => a.timestamp - b.timestamp ||
+      String(a.id).localeCompare(String(b.id)));
+    const location = contextsByLocation.get(series.locationId);
+    if (!location) return;
+    locationsWithObservations.add(series.locationId);
+
+    const heading = document.createElement("h6");
+    heading.textContent = location.locationCode + " — " + series.variable +
+      " · " + series.unit + " · " + series.dataFamily +
+      " · " + series.points.length + " observation(s)";
+    environmentalContextSection.appendChild(heading);
+
+    const provenance = document.createElement("p");
+    provenance.className = "muted";
+    const resolutionLabel = series.resolution == null
+      ? "résolution spatiale non renseignée"
+      : "résolution spatiale : " + environmentalFormat(series.resolution) + " m";
+    provenance.textContent = "Lieu : " + location.locationName +
+      " · Cultures associées : " + [...location.cultures].join(", ") +
+      " · Lien de contexte : " + ([...location.contextRelations].map(relation => ({
+        culture_environment: "environnement déclaré sur la culture",
+        linked_batch_environment: "environnement d'un lot lié",
+        linked_batch_location: "lieu déclaré sur un lot lié"
+      })[relation] || relation).join(", ") || "origine non précisée") +
+      (location.batchCodes.size ? " · Lots liés : " + [...location.batchCodes].join(", ") : "") +
+      " · Environnements : " + ([...location.environments].join(", ") || "non renseigné") +
+      " · Source : " + series.provider + " / " + series.dataset +
+      " · " + resolutionLabel +
+      " · précision déclarée des coordonnées : " +
+      (location.coordinateAccuracy == null
+        ? "non renseignée"
+        : "±" + environmentalFormat(location.coordinateAccuracy) + " m") +
+      " · origine des coordonnées : " + (location.coordinateSource || "non renseignée") +
+      " · Qualité source : " + series.quality;
+    environmentalContextSection.appendChild(provenance);
+
+    const latestPoints = series.points.slice(-20).reverse();
+    const table = document.createElement("table");
+    table.className = "statistics-table";
+    const head = document.createElement("thead");
+    const headerRow = document.createElement("tr");
+    ["Date d'observation", "Valeur", "Récupérée le", "Source"].forEach(label => {
+      const th = document.createElement("th");
+      th.textContent = label;
+      headerRow.appendChild(th);
+    });
+    head.appendChild(headerRow);
+    table.appendChild(head);
+    const body = document.createElement("tbody");
+    latestPoints.forEach(point => {
+      const cells = [
+        new Date(point.timestamp).toLocaleString(),
+        environmentalFormat(point.value) + " " + series.unit,
+        point.retrievedAt ? new Date(point.retrievedAt).toLocaleString() : "Non renseignée",
+        point.sourceUrl || series.provider
+      ];
+      const rowElement = document.createElement("tr");
+      cells.forEach(value => {
+        const cell = document.createElement("td");
+        cell.textContent = value;
+        rowElement.appendChild(cell);
+      });
+      body.appendChild(rowElement);
+    });
+    table.appendChild(body);
+    environmentalContextSection.appendChild(table);
+    if (series.points.length > 20) {
+      const truncationNote = document.createElement("p");
+      truncationNote.className = "muted";
+      truncationNote.textContent = "Tableau limité aux 20 observations les plus récentes ; le graphique conserve les " +
+        series.points.length + " observations retournées.";
+      environmentalContextSection.appendChild(truncationNote);
+    }
+
+    const chart = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    chart.setAttribute("viewBox", "0 0 720 160");
+    chart.setAttribute("role", "img");
+    chart.setAttribute("aria-label", "Contexte environnemental du lieu " +
+      location.locationCode + " : " + series.variable + ", " +
+      series.points.length + " observations");
+    chart.setAttribute("preserveAspectRatio", "xMidYMid meet");
+    chart.style.width = "100%";
+    chart.style.height = "auto";
+    chart.style.maxHeight = "190px";
+    const chartTitle = document.createElementNS("http://www.w3.org/2000/svg", "title");
+    chartTitle.textContent = "Contexte environnemental — " + location.locationCode +
+      " — " + series.variable;
+    chart.appendChild(chartTitle);
+    const values = series.points.map(point => point.value);
+    const minValue = Math.min(...values);
+    const maxValue = Math.max(...values);
+    const padding = maxValue === minValue
+      ? Math.max(Math.abs(maxValue) * 0.05, 1)
+      : (maxValue - minValue) * 0.08;
+    const left = 54, right = 690, top = 14, bottom = 118;
+    const firstTime = series.points[0].timestamp;
+    const lastTime = series.points[series.points.length - 1].timestamp;
+    const xFor = point => lastTime === firstTime ? (left + right) / 2 :
+      left + ((point.timestamp - firstTime) / (lastTime - firstTime)) * (right - left);
+    const yFor = value => bottom - ((value - (minValue - padding)) /
+      ((maxValue + padding) - (minValue - padding))) * (bottom - top);
+    const axis = document.createElementNS("http://www.w3.org/2000/svg", "path");
+    axis.setAttribute("d", "M " + left + " " + top + " V " + bottom + " H " + right);
+    axis.setAttribute("fill", "none");
+    axis.setAttribute("stroke", "currentColor");
+    axis.setAttribute("stroke-opacity", "0.45");
+    chart.appendChild(axis);
+    const polyline = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
+    polyline.setAttribute("points", series.points.map(point =>
+      xFor(point) + "," + yFor(point.value)
+    ).join(" "));
+    polyline.setAttribute("fill", "none");
+    polyline.setAttribute("stroke", "currentColor");
+    polyline.setAttribute("stroke-width", "2.5");
+    polyline.setAttribute("stroke-linejoin", "round");
+    polyline.setAttribute("stroke-linecap", "round");
+    chart.appendChild(polyline);
+    const startLabel = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    startLabel.setAttribute("x", String(left));
+    startLabel.setAttribute("y", "145");
+    startLabel.setAttribute("font-size", "11");
+    startLabel.textContent = new Date(firstTime).toLocaleDateString();
+    chart.appendChild(startLabel);
+    const endLabel = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    endLabel.setAttribute("x", String(right));
+    endLabel.setAttribute("y", "145");
+    endLabel.setAttribute("text-anchor", "end");
+    endLabel.setAttribute("font-size", "11");
+    endLabel.textContent = new Date(lastTime).toLocaleDateString();
+    chart.appendChild(endLabel);
+    environmentalContextSection.appendChild(chart);
+  });
+
+  contextsByLocation.forEach((location, locationId) => {
+    if (locationsWithObservations.has(locationId)) return;
+    const empty = document.createElement("p");
+    empty.className = "muted";
+    empty.textContent = location.locationCode +
+      " : aucune observation environnementale retournée pour ce lieu dans le périmètre disponible.";
+    environmentalContextSection.appendChild(empty);
+  });
+  const contextsWithoutLocation = cultureEnvironmentContext.filter(context => !context.location_id);
+  if (contextsWithoutLocation.length) {
+    const missingLocation = document.createElement("p");
+    missingLocation.className = "muted";
+    missingLocation.textContent = contextsWithoutLocation.length +
+      " environnement(s) de culture sans lieu géographique associé : aucune donnée externe ne leur est attribuée.";
+    environmentalContextSection.appendChild(missingLocation);
+  }
+  if (!cultureEnvironmentContext.length) {
+    const noContext = document.createElement("p");
+    noContext.className = "muted";
+    noContext.textContent = "Aucun environnement explicitement associé aux cultures sélectionnées. Aucune donnée météo ou satellite ne peut être rapprochée sans lien de lieu enregistré.";
+    environmentalContextSection.appendChild(noContext);
+  }
+  if (environmentalRowsWithoutNumericValue || environmentalRowsWithoutTime) {
+    const quality = document.createElement("p");
+    quality.className = "muted";
+    quality.textContent = "Observations environnementales non représentées : " +
+      environmentalRowsWithoutNumericValue + " valeur(s) absente(s) ou non numérique(s), " +
+      environmentalRowsWithoutTime + " date(s) inexploitable(s).";
+    environmentalContextSection.appendChild(quality);
+  }
+  const environmentalQuality = report.data_quality || {};
+  if (environmentalQuality.environmental_truncated === true) {
+    const truncationWarning = document.createElement("p");
+    truncationWarning.className = "muted";
+    truncationWarning.textContent =
+      "Historique environnemental partiel : " +
+      (environmentalQuality.environmental_returned ?? environmentalObservations.length) +
+      " observations environnementales retournées sur " +
+      (environmentalQuality.environmental_total ?? "un total inconnu") +
+      ". La limite de 500 observations est atteinte ; les données plus anciennes ne figurent pas dans ce rapport.";
+    environmentalContextSection.appendChild(truncationWarning);
+  }
+  target.appendChild(environmentalContextSection);
+
+  // Monitoring is descriptive: sustained direction and robust deviations
+  // are candidates for review, never automatic biological diagnoses.
+  const monitoringSection = document.createElement("section");
+  monitoringSection.className = "generation-comparison-section";
+  const monitoringTitle = document.createElement("h5");
+  monitoringTitle.textContent = "Surveillance temporelle";
+  monitoringSection.appendChild(monitoringTitle);
+  const monitoringNote = document.createElement("p");
+  monitoringNote.className = "muted";
+  monitoringNote.textContent = "Repérage descriptif sur séries chronologiques comparables. Une rupture candidate nécessite 5 relevés (4 de référence + le dernier). Une tendance monotone candidate nécessite 9 relevés (4 de référence + 5 récents). Les candidats nécessitent une vérification du protocole, des conditions de mesure et du cahier de laboratoire ; aucun seuil biologique universel n'est supposé.";
+  monitoringSection.appendChild(monitoringNote);
+
+  let monitoringSeriesCount = 0;
+  let trendCandidates = 0;
+  let ruptureCandidates = 0;
+  const medianOf = values => {
+    const sorted = values.slice().sort((a, b) => a - b);
+    if (!sorted.length) return NaN;
+    const middle = Math.floor(sorted.length / 2);
+    return sorted.length % 2 ? sorted[middle] :
+      (sorted[middle - 1] + sorted[middle]) / 2;
+  };
+  sortedTimeSeries.forEach(series => {
+    if (series.points.length < 5) {
+      const insufficient = document.createElement("p");
+      insufficient.className = "muted";
+      insufficient.textContent = series.culture + " / " + series.variable +
+        " : minimum de 5 relevés requis pour la surveillance (actuel : " +
+        series.points.length + ").";
+      monitoringSection.appendChild(insufficient);
+      return;
+    }
+    monitoringSeriesCount += 1;
+    const values = series.points.map(point => point.value);
+    const recent = values.slice(-5);
+    const deltas = recent.slice(1).map((value, index) => value - recent[index]);
+    const increasing = deltas.every(delta => delta > 0);
+    const decreasing = deltas.every(delta => delta < 0);
+    const baseline = values.slice(-9, -5);
+    if (baseline.length < 4) {
+      const note = document.createElement("p");
+      note.className = "muted";
+      note.textContent = series.culture + " / " + series.variable +
+        " : tendance monotone non évaluée — 9 relevés requis (actuel : " +
+        series.points.length + ").";
+      monitoringSection.appendChild(note);
+    }
+    if (baseline.length === 4 && (increasing || decreasing)) {
+      const baselineMedian = medianOf(baseline);
+      const deviations = baseline.map(value => Math.abs(value - baselineMedian));
+      const mad = medianOf(deviations);
+      const netChange = Math.abs(recent[4] - recent[0]);
+      if (mad > 0) {
+        const threshold = 3 * mad;
+        if (netChange > threshold) {
+          trendCandidates += 1;
+          const item = document.createElement("p");
+          item.textContent = series.culture + " / " + series.variable +
+            " : tendance monotone candidate (" + (increasing ? "hausse" : "baisse") +
+            ") sur 5 relevés · variation nette " +
+            timeSeriesFormat(recent[4] - recent[0]) + " " + series.unit +
+            " · référence MAD " + timeSeriesFormat(mad) + ".";
+          monitoringSection.appendChild(item);
+        }
+      } else {
+        const note = document.createElement("p");
+        note.className = "muted";
+        note.textContent = series.culture + " / " + series.variable +
+          " : tendance non qualifiée par MAD (MAD nul sur la référence ; seuil robuste non estimable sans tolérance de protocole).";
+        monitoringSection.appendChild(note);
+      }
+    }
+
+    const previousValues = values.slice(-5, -1);
+    const currentValue = values[values.length - 1];
+    const baselineMedian = medianOf(previousValues);
+    const mad = medianOf(previousValues.map(value => Math.abs(value - baselineMedian)));
+    const deviation = Math.abs(currentValue - baselineMedian);
+    if (mad > 0) {
+      const ruptureThreshold = 3 * mad;
+      if (deviation > ruptureThreshold) {
+        ruptureCandidates += 1;
+        const item = document.createElement("p");
+        item.textContent = series.culture + " / " + series.variable +
+          " : rupture candidate au dernier relevé · valeur " +
+          timeSeriesFormat(currentValue) + " " + series.unit +
+          " · médiane des 4 relevés précédents " +
+          timeSeriesFormat(baselineMedian) + " · MAD " +
+          timeSeriesFormat(mad) + ".";
+        monitoringSection.appendChild(item);
+      }
+    } else {
+      const note = document.createElement("p");
+      note.className = "muted";
+      note.textContent = series.culture + " / " + series.variable +
+        " : rupture non qualifiée par MAD (MAD nul sur la référence ; seuil robuste non estimable sans tolérance de protocole).";
+      monitoringSection.appendChild(note);
+    }
+  });
+
+  if (!monitoringSeriesCount) {
+    const empty = document.createElement("p");
+    empty.className = "muted";
+    empty.textContent = "Aucune série ne comporte au moins 5 relevés valides pour activer la surveillance temporelle.";
+    monitoringSection.appendChild(empty);
+  } else if (!trendCandidates && !ruptureCandidates) {
+    const empty = document.createElement("p");
+    empty.className = "muted";
+    empty.textContent = "Aucune tendance monotone ou rupture candidate détectée dans les séries évaluables.";
+    monitoringSection.appendChild(empty);
+  }
+  const monitoringSummary = document.createElement("p");
+  monitoringSummary.className = "muted";
+  monitoringSummary.textContent = monitoringSeriesCount +
+    " série(s) avec au moins 5 relevés · " + trendCandidates +
+    " tendance(s) monotone(s) candidate(s) · " + ruptureCandidates +
+    " rupture(s) candidate(s). Ce repérage ne modifie pas les mesures et ne constitue pas un diagnostic biologique.";
+  monitoringSection.appendChild(monitoringSummary);
+  target.appendChild(monitoringSection);
+
+  sections.forEach(([key, title]) => {
+    const rows = Array.isArray(report[key]) ? report[key] : [];
+    const section = document.createElement("section");
+    section.className = "generation-comparison-section";
+    const h = document.createElement("h5");
+    h.textContent = title + " (" + rows.length + ")";
+    section.appendChild(h);
+    if (!rows.length) {
+      const empty = document.createElement("p");
+      empty.className = "muted";
+      empty.textContent = "Aucune donnée enregistrée pour cette catégorie.";
+      section.appendChild(empty);
+    } else {
+      rows.forEach((row, index) => {
+        const details = document.createElement("details");
+        details.className = "generation-comparison-record";
+        const summary = document.createElement("summary");
+        const identity = row.code || row.culture_code || row.batch_code ||
+          row.variable_code || row.event_type || row.result_type || row.dataset_code ||
+          row.material_code || ("Enregistrement " + (index + 1));
+        summary.textContent = format(identity);
+        details.appendChild(summary);
+        const dl = document.createElement("dl");
+        Object.entries(row).forEach(([field, value]) => {
+          if (field === "organization_id" || field === "id" || value === null || value === undefined) return;
+          const dt = document.createElement("dt");
+          dt.textContent = fieldLabels[field] || field.replaceAll("_", " ");
+          const dd = document.createElement("dd");
+          if (field === "culture_id" || field === "selected_culture_id" ||
+              field === "ancestor_culture_id" || field === "parent_culture_id") {
+            dd.textContent = cultureCodes.get(value) || format(value);
+          } else {
+            dd.textContent = format(value);
+          }
+          dl.append(dt, dd);
+        });
+        details.appendChild(dl);
+        section.appendChild(details);
+      });
+    }
+    target.appendChild(section);
+  });
+
+  const quality = report.data_quality || {};
+  const qualitySection = document.createElement("section");
+  qualitySection.className = "generation-comparison-quality";
+  const qualityTitle = document.createElement("h5");
+  qualityTitle.textContent = "Complétude et qualité des données";
+  qualitySection.appendChild(qualityTitle);
+  const qualityList = document.createElement("dl");
+  Object.entries(quality).forEach(([key, value]) => {
+    const dt = document.createElement("dt");
+    dt.textContent = key.replaceAll("_", " ");
+    const dd = document.createElement("dd");
+    dd.textContent = format(value);
+    qualityList.append(dt, dd);
+  });
+  qualitySection.appendChild(qualityList);
+  target.appendChild(qualitySection);
+}
+
+async function compareCultureGenerations() {
+  const results = document.getElementById("generationComparisonResults");
+  if (!results) return;
+  const requestId = (results.__generationComparisonRequestId || 0) + 1;
+  results.__generationComparisonRequestId = requestId;
+  const revision = authStateRevision;
+  const orgId = organizationId;
+  const panel = document.getElementById("cultureDetailPanel");
+  const options = document.getElementById("generationComparisonOptions");
+  const button = document.getElementById("compareCultureGenerationsButton");
+  const status = document.getElementById("generationComparisonStatus");
+  if (!panel || !options || !button || !status || !orgId) return;
+  const cultureIds = [...options.querySelectorAll("input[type=checkbox]:checked")].map(option => option.value);
+  const selectedDetailCultureId = panel.dataset.cultureId;
+  if (cultureIds.length < 2 || cultureIds.length > 4) {
+    status.textContent = "Sélectionnez entre 2 et 4 cultures.";
+    return;
+  }
+  button.disabled = true;
+  status.textContent = "Construction du rapport comparatif…";
+  results.replaceChildren();
+  try {
+    const { data, error } = await supabaseClient.rpc("compare_culture_generations", {
+      p_organization_id: orgId,
+      p_culture_ids: cultureIds
+    });
+    if (error) throw error;
+    if (requestId !== results.__generationComparisonRequestId ||
+        !isCurrentWorkspaceRevision(revision, orgId) ||
+        panel.dataset.cultureId !== selectedDetailCultureId) return;
+    renderGenerationComparisonReport(data || {});
+    status.textContent = "Rapport comparatif chargé. Les résultats sont descriptifs et les limites de données sont indiquées ci-dessous.";
+  } catch (error) {
+    if (requestId !== results.__generationComparisonRequestId ||
+        !isCurrentWorkspaceRevision(revision, orgId)) return;
+    console.error("Comparaison intergénérationnelle :", error);
+    status.textContent = "Impossible de construire le rapport : " + (error.message || "erreur inconnue");
+  } finally {
+    if (requestId === results.__generationComparisonRequestId) button.disabled = false;
+  }
+}
+
 async function loadCultureDetail(cultureId) {
   const requestId = ++cultureDetailRequestId;
   const loadRevision = authStateRevision;
@@ -6040,6 +7464,15 @@ async function loadCultureDetail(cultureId) {
   if (!culture || !panel || !title || !meta || !summary || !timeline) return;
 
   panel.dataset.cultureId = culture.id;
+  const comparisonResults = document.getElementById("generationComparisonResults");
+  if (comparisonResults) {
+    comparisonResults.__generationComparisonRequestId = (comparisonResults.__generationComparisonRequestId || 0) + 1;
+    comparisonResults.replaceChildren();
+  }
+  const comparisonButton = document.getElementById("compareCultureGenerationsButton");
+  if (comparisonButton) comparisonButton.disabled = false;
+  populateGenerationComparisonOptions(culture.id);
+  document.getElementById("generationComparisonStatus").textContent = "Choisissez au moins une autre culture pour comparer les générations.";
   loadBiologicalLineage(culture.id);
   panel.classList.remove("hidden");
   title.textContent = culture.code || "Culture sans code";
@@ -6076,27 +7509,22 @@ async function loadCultureDetail(cultureId) {
     if (requestId !== cultureDetailRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
 
     const batches = cultureBatches || [];
-    const batchIds = batches.map(batch => batch.id);
-    const eventQueries = [
-      supabaseClient.from("events").select("id, event_type, occurred_at, batch_id, payload")
-        .eq("organization_id", loadOrganizationId).eq("culture_id", culture.id)
-        .order("occurred_at", { ascending: false }).limit(100)
-    ];
-    if (batchIds.length) {
-      eventQueries.push(
-        supabaseClient.from("events").select("id, event_type, occurred_at, batch_id, payload")
-          .eq("organization_id", loadOrganizationId).in("batch_id", batchIds)
-          .order("occurred_at", { ascending: false }).limit(100)
-      );
-    }
-    const eventResults = await Promise.all(eventQueries);
+    const { data: eventHistory, error: eventHistoryError } = await supabaseClient.rpc("get_culture_event_history", {
+      p_organization_id: loadOrganizationId,
+      p_culture_id: culture.id,
+      p_limit: 100,
+      p_offset: 0
+    });
+    if (eventHistoryError) throw new Error("Événements : " + eventHistoryError.message);
     if (requestId !== cultureDetailRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
-    for (const result of eventResults) {
-      if (result.error) throw new Error("Événements : " + result.error.message);
-    }
-    const eventsById = new Map();
-    eventResults.forEach(result => (result.data || []).forEach(event => eventsById.set(event.id, event)));
-    const events = [...eventsById.values()].sort((a, b) => new Date(b.occurred_at || 0) - new Date(a.occurred_at || 0));
+    const events = (eventHistory || []).map(row => ({
+      id: row.event_id,
+      event_type: row.event_type,
+      occurred_at: row.occurred_at,
+      batch_id: row.batch_id,
+      source_relation: row.source_relation,
+      payload: row.payload
+    }));
     const linkedEventIds = events.map(event => event.id);
     const measurementQueries = [
       supabaseClient.from("measurements").select("id, variable_code, raw_value, raw_unit_code, measured_at, event_id, metadata")
@@ -6165,8 +7593,14 @@ async function loadCultureDetail(cultureId) {
       }));
       if (!linkedMeasurements.length && !linkedObservations.length) entries.push({
         date: event.occurred_at,
-        type: String(event.event_type || "Événement").replaceAll("_", " "),
+        type: (event.source_relation === "creation_operation" ? "Opération de création · " :
+          event.source_relation === "descendant_culture" ? "Création d’une culture fille · " : "") +
+          String(event.event_type || "Événement").replaceAll("_", " "),
         detail: [
+          event.source_relation === "creation_operation" ? "Opération à l’origine de cette culture" :
+          event.source_relation === "descendant_culture" ? "Culture fille créée depuis cette culture par génération directe" : null,
+          event.payload?.parent_culture_code ? "Culture parent : " + event.payload.parent_culture_code : null,
+          event.payload?.material_code ? "Matériel : " + event.payload.material_code : null,
           event.payload?.note,
           event.payload?.details?.conditions ? "Conditions : " + event.payload.details.conditions : null,
           event.payload?.details?.outcome ? "Résultat : " + String(event.payload.details.outcome).replaceAll("_", " ") : null,
@@ -6188,7 +7622,7 @@ async function loadCultureDetail(cultureId) {
     entries.sort((a,b) => new Date(b.date || 0) - new Date(a.date || 0));
 
     const fields = summary.querySelectorAll(".culture-detail-field strong");
-    if (fields[4]) fields[4].textContent = String(events.length);
+    if (fields[4]) fields[4].textContent = String(eventHistory?.[0]?.total_rows ?? events.length);
     if (fields[5]) fields[5].textContent = String(measurements.length + observations.length);
     timeline.innerHTML = "";
     if (batches.length) {
@@ -6226,7 +7660,7 @@ async function loadCultureDetail(cultureId) {
       });
       timeline.appendChild(batchSection);
     }
-    if (events.length === 100 || measurements.length >= 100 || observations.length >= 100 || batches.length === 100) {
+    if (measurements.length >= 100 || observations.length >= 100 || batches.length === 100) {
       const limitNotice = document.createElement("p");
       limitNotice.className = "info warning";
       limitNotice.textContent = "Historique partiel : au moins une catégorie atteint sa limite de chargement. Certaines données anciennes peuvent ne pas apparaître ici.";
@@ -6243,6 +7677,8 @@ async function loadCultureDetail(cultureId) {
       entries.forEach(entry => {
         const article = document.createElement("article");
         article.className = "culture-timeline-entry";
+        article.dataset.cultureEventEntry = "true";
+        article.dataset.sortTimestamp = String(new Date(entry.date || 0).getTime() || 0);
         const date = document.createElement("time");
         date.className = "culture-timeline-date";
         date.textContent = entry.date ? new Date(entry.date).toLocaleString("fr-FR") : "Date inconnue";
@@ -6255,6 +7691,17 @@ async function loadCultureDetail(cultureId) {
         article.append(date, content);
         timeline.appendChild(article);
       });
+      sortCultureEventTimelineEntries(timeline);
+    }
+    const historyHasMore = eventHistory?.some(row => row.has_more === true) === true;
+    if (historyHasMore) {
+      const loadMoreButton = document.createElement("button");
+      loadMoreButton.type = "button";
+      loadMoreButton.className = "culture-catalog-action";
+      loadMoreButton.textContent = "Charger 100 événements plus anciens";
+      loadMoreButton.onclick = () =>
+        loadMoreCultureEventHistory(culture.id, events.length, loadMoreButton);
+      timeline.appendChild(loadMoreButton);
     }
     panel.scrollIntoView({block:"start",behavior:window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth"});
   } catch (error) {
@@ -6529,8 +7976,12 @@ function setupUiEnhancements() {
   document.getElementById("cultureSearch")?.addEventListener("input", renderCultureCatalog);
   document.getElementById("cultureTypeFilter")?.addEventListener("change", renderCultureCatalog);
   document.getElementById("bioOperationForm")?.addEventListener("submit", saveBiologicalOperation);
+  document.getElementById("compareCultureGenerationsButton")?.addEventListener("click", compareCultureGenerations);
+  document.getElementById("generationComparisonSearch")?.addEventListener("input", filterGenerationComparisonOptions);
+
   document.getElementById("bioOperationDate")?.setAttribute("value", new Date().toISOString().slice(0,16));
   document.getElementById("closeCultureDetail")?.addEventListener("click", () => {
+    invalidateGenerationComparison("Comparaison fermée.");
     document.getElementById("cultureDetailPanel")?.classList.add("hidden");
   });
 

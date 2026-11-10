@@ -394,6 +394,19 @@
 <div class="bio-operation-wide"><button id="saveBioOperation" type="submit">Enregistrer l’opération</button><p id="bioOperationMessage" class="muted" aria-live="polite"></p></div>
 </form></section>
 <section class="bio-lineage-panel" aria-labelledby="bioLineageTitle"><h4 id="bioLineageTitle">Filiation biologique</h4><div id="cultureLineage" class="culture-lineage"><p class="muted">Chargement de la filiation…</p></div></section>
+<section class="bio-lineage-panel generation-comparison-panel" aria-labelledby="generationComparisonTitle">
+  <h4 id="generationComparisonTitle">Comparer les générations</h4>
+  <p class="muted">Sélectionnez de 2 à 4 cultures. Le rapport rassemble les données enregistrées sans déduire de causalité ni transformer les données manquantes en zéros.</p>
+  <label for="generationComparisonSearch">Rechercher une culture</label>
+  <input id="generationComparisonSearch" type="search" autocomplete="off" placeholder="Code, type ou identifiant…">
+  <div id="generationComparisonCultures" class="generation-comparison-picker">
+    <div id="generationComparisonOptions" role="group" aria-label="Cultures à comparer"></div>
+  </div>
+  <small id="generationComparisonHint" class="muted">La culture actuellement ouverte est présélectionnée. Cochez 1 à 3 cultures supplémentaires (maximum 4 au total).</small>
+  <button id="compareCultureGenerationsButton" type="button">Construire le rapport comparatif</button>
+  <p id="generationComparisonStatus" class="muted" role="status" aria-live="polite">Choisissez les cultures puis lancez la comparaison.</p>
+  <div id="generationComparisonResults" class="generation-comparison-results"></div>
+</section>
 <h4>Chronologie complète</h4>
         <div id="cultureDetailTimeline" class="culture-detail-timeline"><p class="muted">Sélectionnez une culture pour charger son historique.</p></div>
       </section>

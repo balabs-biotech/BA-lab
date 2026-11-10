@@ -84,6 +84,10 @@ jobs:
       - name: Check batch-tracker structure
         run: |
           node scripts/check-batch-tracker-js.mjs
+          node supabase/tests/culture-lineage-frontend-contract.test.mjs
+          node supabase/tests/culture-generation-comparison-contract.test.mjs
+          node supabase/tests/biological-operation-idempotency-frontend-contract.test.mjs
+          node supabase/tests/culture-event-history-frontend-contract.test.mjs
           node supabase/tests/copernicus-sentinel-catalogue.test.mjs
           node --check batch-tracker/environmental-data.js
           node scripts/check-i18n.mjs
@@ -233,6 +237,14 @@ jobs:
         run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/iot_ingestion_idempotency_contract.test.sql
       - name: Verify sensitive RPC search-path contracts after replay
         run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/sensitive_rpc_search_path_contract.test.sql
+      - name: Verify recursive culture lineage RPC security contract after replay
+        run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/culture_lineage_rpc_security_contract.test.sql
+      - name: Verify culture generation comparison RPC security contract after replay
+        run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/culture_generation_comparison_rpc_security_contract.test.sql
+      - name: Verify culture event history RPC security contract after replay
+        run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/culture_event_history_rpc_security_contract.test.sql
+      - name: Verify idempotent culture generation RPC security contract after replay
+        run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/culture_generation_idempotency_security_contract.test.sql
       - name: Verify append-only audit table privileges after replay
         run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/audit_table_write_privileges.test.sql
       - name: Test environmental observation schema and access contract
