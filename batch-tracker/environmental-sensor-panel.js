@@ -135,6 +135,16 @@
       });
       table.append(head, body);
       output.append(table);
+      const qualityRows = series.filter(item => item.quality_counts && Object.keys(item.quality_counts).length);
+      if (qualityRows.length) {
+        const qualityDetails = node("details", "sensor-detail");
+        qualityDetails.append(node("summary", "", "Répartition de la qualité des mesures"));
+        qualityRows.forEach(item => {
+          const counts = Object.entries(item.quality_counts).map(([quality, count]) => quality + " : " + count).join(" · ");
+          qualityDetails.append(node("p", "", [item.variable_code, counts].filter(Boolean).join(" — ")));
+        });
+        output.append(qualityDetails);
+      }
     }
     if (temporal.length) {
       const details = node("details", "sensor-detail");
