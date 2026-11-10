@@ -295,4 +295,8 @@ console.log("✓ Atomic experimental registry form, unit rows and tenant-safe re
 if(!template.includes('id="cultureExperimentId"')||!template.includes('id="cultureExperimentalUnitId"'))throw new Error("Culture-to-experiment assignment selectors are missing");
 if(!engine.includes("populateCultureExperimentOptions")||!engine.includes("p_experiment_id: selectedExperimentId || null")||!engine.includes("p_experimental_unit_id: selectedExperimentalUnitId || null"))throw new Error("Culture creation does not persist the selected experimental context");
 if(!engine.includes("Boolean(selectedExperimentId) !== Boolean(selectedExperimentalUnitId)"))throw new Error("Culture creation does not reject an incomplete experiment/unit pair");
+const cultureCreateStart=engine.indexOf("async function createCulture()");
+const cultureCreateEnd=engine.indexOf("CULTURES DISPONIBLES POUR LES BATCHS",cultureCreateStart);
+const cultureCreateCode=engine.slice(cultureCreateStart,cultureCreateEnd);
+if(cultureCreateCode.indexOf("Boolean(selectedExperimentId) !== Boolean(selectedExperimentalUnitId)")>cultureCreateCode.indexOf("const consentTable"))throw new Error("Invalid experiment/unit pairs must be rejected before writing consent records");
 console.log("✓ Culture creation can be linked to an experiment and its exact experimental unit");
