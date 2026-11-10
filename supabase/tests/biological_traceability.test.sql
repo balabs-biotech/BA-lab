@@ -87,7 +87,7 @@ create policy events_org on public.events to authenticated using(private.is_org_
 select set_config('request.jwt.claim.sub','00000000-0000-0000-0000-0000000000b1',false);
 set role authenticated;
 do $$
-declare result jsonb; parent_id uuid; child_id uuid; v_child_material_id uuid; event_count integer; caught boolean;
+declare result jsonb; mix_result jsonb; parent_id uuid; child_id uuid; v_child_material_id uuid; mixed_material_id uuid; source_material_ids uuid[]; event_count integer; parent_count integer; caught boolean;
 begin
   select id into parent_id from public.cultures where organization_id='00000000-0000-0000-0000-0000000000a1' and code='PARENT-001';
   result := public.record_biological_operation('00000000-0000-0000-0000-0000000000a1',parent_id,'division_aliquotes',now(),'test transaction','{"conditions":"agar 24C","outcome":"en_cours"}'::jsonb,array['CHILD-A','CHILD-B']);
@@ -110,6 +110,47 @@ begin
   begin perform public.record_biological_operation('00000000-0000-0000-0000-0000000000a1',parent_id,'repiquage',now(),null,'{}'::jsonb,array['CHILD-A']);
   exception when others then if sqlerrm like 'culture_code_already_exists:%' then caught := true; else raise; end if; end;
   if not caught then raise exception 'FAIL: duplicate child code was accepted'; end if;
+
+  -- A consortium assembly must preserve both source materials as incoming graph edges.
+  insert into public.strains(organization_id,id) values
+    ('00000000-0000-0000-0000-0000000000a1','00000000-0000-0000-0000-0000000000c1'),
+    ('00000000-0000-0000-0000-0000000000a1','00000000-0000-0000-0000-0000000000c2');
+  update public.materials set strain_id='00000000-0000-0000-0000-0000000000c1'
+    where organization_id='00000000-0000-0000-0000-0000000000a1' and material_code='MAT-PARENT';
+  insert into public.materials(organization_id,material_code,material_type,strain_id,state,generation)
+    values ('00000000-0000-0000-0000-0000000000a1','MAT-CONSORTIUM-B','strain',
+      '00000000-0000-0000-0000-0000000000c2','active',2);
+  select array_agg(id order by material_code) into source_material_ids
+    from public.materials where organization_id='00000000-0000-0000-0000-0000000000a1'
+      and material_code in ('MAT-PARENT','MAT-CONSORTIUM-B');
+  mix_result := public.create_biological_material_mixture(
+    '00000000-0000-0000-0000-0000000000a1',source_material_ids,
+    'consortium_assembly','MIX-CONSORTIUM-001',now(),'test consortium',
+    '{"purpose":"multi-strain inoculum"}'::jsonb
+  );
+  mixed_material_id := (mix_result->>'material_id')::uuid;
+  if jsonb_array_length(mix_result->'components') <> 2 then
+    raise exception 'FAIL: consortium RPC must return both components';
+  end if;
+  select count(*) into parent_count from public.material_relationships
+    where organization_id='00000000-0000-0000-0000-0000000000a1'
+      and child_material_id=mixed_material_id and relationship_type='consortium_assembly';
+  if parent_count <> 2 then raise exception 'FAIL: consortium must persist two parent edges, got %',parent_count; end if;
+  if exists(select 1 from public.materials where organization_id='00000000-0000-0000-0000-0000000000a1'
+      and id=mixed_material_id and strain_id is not null) then
+    raise exception 'FAIL: mixed material must not collapse multiple strains into one strain_id';
+  end if;
+  if not exists(select 1 from public.events where organization_id='00000000-0000-0000-0000-0000000000a1'
+      and material_id=mixed_material_id and event_type='consortium_assembly'
+      and payload->'source_material_ids' is not null) then
+    raise exception 'FAIL: consortium event provenance missing';
+  end if;
+  if exists(select 1 from public.material_relationships r
+      join public.materials p on p.organization_id=r.organization_id and p.id=r.parent_material_id
+      where r.organization_id='00000000-0000-0000-0000-0000000000a1'
+        and r.child_material_id=mixed_material_id and p.organization_id<>'00000000-0000-0000-0000-0000000000a1') then
+    raise exception 'FAIL: cross-tenant material parent edge detected';
+  end if;
   if exists(select 1 from public.cultures where organization_id='00000000-0000-0000-0000-0000000000a1' and code='CROSS-ORG-CHILD') then raise exception 'FAIL: cross-org child was created'; end if;
   if has_function_privilege('anon','public.record_biological_operation(uuid,uuid,text,timestamptz,text,jsonb,text[])','execute') then raise exception 'FAIL: anon can execute biological operation RPC'; end if;
 end $$;
