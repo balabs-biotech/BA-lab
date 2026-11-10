@@ -191,6 +191,9 @@ set search_path = pg_catalog, public
 as $$
 begin
   if tg_op = 'DELETE' then
+    if pg_trigger_depth() > 1 then
+      return old;
+    end if;
     if old.status <> 'draft' then
       raise exception 'published_environmental_profile_is_immutable'
         using errcode = '23514';
@@ -321,7 +324,13 @@ begin
      and p.id = v_profile_id
      and p.environment_id = v_environment_id;
 
-  if not found or v_status <> 'draft' or v_origin <> 'sensor' then
+  if not found then
+    if tg_op = 'DELETE' then return old; end if;
+    raise exception 'environment_profile_sensor_binding_requires_existing_profile'
+      using errcode = '23514';
+  end if;
+
+  if v_status <> 'draft' or v_origin <> 'sensor' then
     raise exception 'environment_profile_sensor_binding_requires_sensor_draft'
       using errcode = '23514';
   end if;
