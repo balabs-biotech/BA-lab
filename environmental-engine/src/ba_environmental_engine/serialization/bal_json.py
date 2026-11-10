@@ -46,7 +46,7 @@ def _indicator_quality(rows: list[NormalizedEnvironmentalObservation],
     flags.update(diagnostics)
     if any(row.provider_code == "NASA_POWER" for row in rows):
         flags.add("GRIDDED_ESTIMATE")
-    return IndicatorQuality(quality_class=quality_class, flags=sorted(flags))
+    return IndicatorQuality(**{"class": quality_class, "flags": sorted(flags)})
 
 
 def _rolling_indicator_code(variable_code: str, method: str, window_days: int) -> str:
