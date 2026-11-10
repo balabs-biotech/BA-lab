@@ -46,7 +46,7 @@ let nav, branchDock, currentNode = null, currentAnchor = null, navigationStack =
 let selected = null, selectedBranch = null, manifest = null, transition = null;
 let distance = 13.5, zoomTargetDistance = 13.5, theta = .22, phi = 1.27, target = null, targetGoal = null;
 let opened = false, raf = 0, lastFrame = 0, dragging = false, moved = false, dragGesture = false;
-let lastPointer = null, pointers = new Map(), pinchStart = 0, pinchDistance = 0, pinchCenter = null, hoverId = null;
+let lastPointer = null, pointers = new Map(), pinchStart = 0, pinchDistance = 0, pinchCenter = null, hoverId = null , lastBranchTouchActivationAt = 0;
 let canvasRect = null, cameraInitialized = false, lastPickAt = 0;
 let _hitWorld = null;
 
@@ -324,6 +324,7 @@ function renderBranchDock() {
         event?.preventDefault?.();event?.stopPropagation?.();
         const spatial=resourceObjects.find(object=>object.userData?.kind==='resource'&&object.userData?.sourceItem===item)?.userData;
         window.__BALABS_3D_LAST_OPEN__={title:item.title||item.name||'',source,resolved:!!spatial,hasPosition:!!spatial?.position,hasChildren:!!spatial?.children?.length};
+        if(source==='touch-pointerup')lastBranchTouchActivationAt=performance.now();
         window.__BALABS_3D_E2E_CLICKS=(window.__BALABS_3D_E2E_CLICKS||0)+1;
         try{openResource(item);window.__BALABS_3D_LAST_OPEN_ERROR__=null}
         catch(error){window.__BALABS_3D_LAST_OPEN_ERROR__={message:error?.message||String(error),stack:error?.stack||''}}
@@ -480,7 +481,7 @@ function setupUI() {
   stage.addEventListener('touchend',finishTouch,{passive:true});
   stage.addEventListener('touchcancel',()=>{touchFallback=null},{passive:true});
 
-  document.addEventListener('click',e=>{if(!e.detail||dragGesture||!renderer)return;if(e.target.closest?.('.webgl-controls,.webgl-focus,.webgl-intro,.webgl-hit-target,.webgl-branch-dock'))return;const r=renderer.domElement.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)return;if(performance.now()-lastPickAt>450)pickAt(e.clientX,e.clientY)},true);
+  document.addEventListener('click',e=>{if(performance.now()-lastBranchTouchActivationAt<800)return;if(!e.detail||dragGesture||!renderer)return;if(e.target.closest?.('.webgl-controls,.webgl-focus,.webgl-intro,.webgl-hit-target,.webgl-branch-dock'))return;const r=renderer.domElement.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)return;if(performance.now()-lastPickAt>450)pickAt(e.clientX,e.clientY)},true);
   stage.addEventListener('lostpointercapture',onLostCapture);
   stage.addEventListener('contextmenu',e=>e.preventDefault());
   window.addEventListener('resize',resize);
