@@ -461,6 +461,7 @@ def test_sensor_analysis_endpoint_returns_separate_iot_result():
     assert body["analysis"]["total_observations"] == 2
     assert body["analysis"]["series"][0]["variable_code"] == "air_temperature"
     assert body["analysis"]["series"][0]["mean"] == 21.0
+    assert body["instrument_health"]["flatline_diagnostics"]["status"] == "not_requested"
 
 
 def test_sensor_analysis_endpoint_rejects_cross_environment_measurement():
