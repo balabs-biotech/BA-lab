@@ -175,3 +175,156 @@ end
 $;
 
 select '✓ biological context persistence contract checks passed' as result;
+
+
+-- Exercise biological-context RLS with real authenticated roles and two tenants.
+-- This runs after full migration replay on disposable PostgreSQL 17.
+grant usage on schema auth, private, public to authenticated;
+grant execute on function auth.uid() to authenticated;
+
+do $$
+declare
+  v_org_a uuid := '00000000-0000-0000-0000-0000000000a1';
+  v_org_b uuid := '00000000-0000-0000-0000-0000000000a2';
+  v_viewer uuid := '00000000-0000-0000-0000-0000000000b1';
+  v_writer uuid := '00000000-0000-0000-0000-0000000000b2';
+  v_location_a uuid := '00000000-0000-0000-0000-0000000000c1';
+  v_location_b uuid := '00000000-0000-0000-0000-0000000000c2';
+  v_environment_a uuid := '00000000-0000-0000-0000-0000000000d1';
+  v_environment_b uuid := '00000000-0000-0000-0000-0000000000d2';
+  v_plant_a uuid := '00000000-0000-0000-0000-0000000000e1';
+  v_plant_b uuid := '00000000-0000-0000-0000-0000000000e2';
+  v_context_a uuid := '00000000-0000-0000-0000-0000000000f1';
+  v_context_b uuid := '00000000-0000-0000-0000-0000000000f2';
+begin
+  insert into public.organizations(id, code, name)
+  values
+    (v_org_a, 'BIOCTX-RLS-A', 'Biological context RLS A'),
+    (v_org_b, 'BIOCTX-RLS-B', 'Biological context RLS B')
+  on conflict (id) do nothing;
+
+  insert into auth.users(id) values (v_viewer), (v_writer)
+  on conflict (id) do nothing;
+
+  insert into public.organization_members(organization_id, user_id, role)
+  values
+    (v_org_a, v_viewer, 'viewer'),
+    (v_org_a, v_writer, 'member')
+  on conflict (organization_id, user_id) do update set role = excluded.role;
+
+  insert into public.locations(organization_id, id, code, name)
+  values
+    (v_org_a, v_location_a, 'BIOCTX-RLS-LOC-A', 'RLS location A'),
+    (v_org_b, v_location_b, 'BIOCTX-RLS-LOC-B', 'RLS location B')
+  on conflict (organization_id, id) do nothing;
+
+  insert into public.environments(organization_id, id, location_id, name)
+  values
+    (v_org_a, v_environment_a, v_location_a, 'RLS environment A'),
+    (v_org_b, v_environment_b, v_location_b, 'RLS environment B')
+  on conflict (organization_id, id) do nothing;
+
+  insert into public.plant_cultures(
+    organization_id, id, code, crop_type, species_name, cultivar_name, environment_id
+  ) values
+    (v_org_a, v_plant_a, 'BIOCTX-RLS-PLANT-A', 'tomato',
+     'Solanum lycopersicum', 'Yellow Pear', v_environment_a),
+    (v_org_b, v_plant_b, 'BIOCTX-RLS-PLANT-B', 'tomato',
+     'Solanum lycopersicum', 'Marmande', v_environment_b)
+  on conflict (organization_id, id) do nothing;
+
+  insert into public.biological_contexts(
+    organization_id, id, domain, plant_culture_id, environment_id,
+    organism_kind, culture_stage, production_system, valid_from
+  ) values
+    (v_org_a, v_context_a, 'greentech', v_plant_a, v_environment_a,
+     'plant', 'vegetative', 'greenhouse', date '2026-11-01'),
+    (v_org_b, v_context_b, 'greentech', v_plant_b, v_environment_b,
+     'plant', 'vegetative', 'greenhouse', date '2026-11-01')
+  on conflict (organization_id, id) do nothing;
+end
+$$;
+
+-- Viewer can read only its own tenant and cannot create a biological context.
+begin;
+set local role authenticated;
+select set_config('request.jwt.claim.sub', '00000000-0000-0000-0000-0000000000b1', true);
+do $$
+declare
+  v_visible integer;
+begin
+  select count(*) into v_visible from public.biological_contexts;
+  if v_visible <> 1 then
+    raise exception 'FAIL: viewer must see exactly its own tenant biological context, got %', v_visible;
+  end if;
+
+  begin
+    insert into public.biological_contexts(
+      organization_id, domain, plant_culture_id, environment_id,
+      organism_kind, culture_stage, production_system, valid_from
+    ) values (
+      '00000000-0000-0000-0000-0000000000a1', 'greentech',
+      '00000000-0000-0000-0000-0000000000e1',
+      '00000000-0000-0000-0000-0000000000d1',
+      'plant', 'fruiting', 'greenhouse', date '2026-11-10'
+    );
+    raise exception 'FAIL: viewer created a biological context';
+  exception when insufficient_privilege then
+    null;
+  end;
+
+  begin
+    insert into public.biological_contexts(
+      organization_id, domain, plant_culture_id, environment_id,
+      organism_kind, culture_stage, production_system, valid_from
+    ) values (
+      '00000000-0000-0000-0000-0000000000a2', 'greentech',
+      '00000000-0000-0000-0000-0000000000e2',
+      '00000000-0000-0000-0000-0000000000d2',
+      'plant', 'fruiting', 'greenhouse', date '2026-11-10'
+    );
+    raise exception 'FAIL: viewer wrote into another tenant';
+  exception when insufficient_privilege then
+    null;
+  end;
+end
+$$;
+rollback;
+
+-- A member can write within its tenant but cannot cross the tenant boundary.
+begin;
+set local role authenticated;
+select set_config('request.jwt.claim.sub', '00000000-0000-0000-0000-0000000000b2', true);
+insert into public.biological_contexts(
+  organization_id, domain, plant_culture_id, environment_id,
+  organism_kind, culture_stage, production_system, valid_from
+) values (
+  '00000000-0000-0000-0000-0000000000a1', 'greentech',
+  '00000000-0000-0000-0000-0000000000e1',
+  '00000000-0000-0000-0000-0000000000d1',
+  'plant', 'fruiting', 'greenhouse', date '2026-11-10'
+);
+
+do $$
+begin
+  if (select count(*) from public.biological_contexts) <> 2 then
+    raise exception 'FAIL: organization member did not retain intended write access';
+  end if;
+
+  begin
+    insert into public.biological_contexts(
+      organization_id, domain, plant_culture_id, environment_id,
+      organism_kind, culture_stage, production_system, valid_from
+    ) values (
+      '00000000-0000-0000-0000-0000000000a2', 'greentech',
+      '00000000-0000-0000-0000-0000000000e2',
+      '00000000-0000-0000-0000-0000000000d2',
+      'plant', 'fruiting', 'greenhouse', date '2026-11-10'
+    );
+    raise exception 'FAIL: member wrote into another tenant';
+  exception when insufficient_privilege then
+    null;
+  end;
+end
+$$;
+commit;
