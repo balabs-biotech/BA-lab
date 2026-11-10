@@ -443,7 +443,7 @@ function setupUI() {
   // Direct stage touch fallback for mobile browsers that omit pointer events.
   let touchFallback=null;
   const rememberTouch=e=>{if(e.touches.length===1){const p=e.touches[0];touchFallback={x:p.clientX,y:p.clientY,at:performance.now()}}};
-  const finishTouch=e=>{if(e.target.closest?.('.webgl-hit-target')){touchFallback=null;return}if(!touchFallback)return;const p=e.changedTouches[0],start=touchFallback;touchFallback=null;if(!p||Math.hypot(p.clientX-start.x,p.clientY-start.y)>12)return;if(performance.now()-lastPickAt>120)pickAt(p.clientX,p.clientY)};
+  const finishTouch=e=>{if(e.target.closest?.('.webgl-hit-target,.webgl-branch-dock')){touchFallback=null;return}if(!touchFallback)return;const p=e.changedTouches[0],start=touchFallback;touchFallback=null;if(!p||Math.hypot(p.clientX-start.x,p.clientY-start.y)>12)return;if(performance.now()-lastPickAt>120)pickAt(p.clientX,p.clientY)};
   // Spatial pointer selection is handled exclusively by the WebGL canvas ray-pick.
   stage.addEventListener('touchstart',rememberTouch,{passive:true});
   stage.addEventListener('touchend',finishTouch,{passive:true});
@@ -462,7 +462,7 @@ function setupUI() {
 function onPointerDown(e) {
   // Let real DOM branch/domain controls receive their native click. Pointer capture
   // on the stage retargets pointerup and can suppress the button's click entirely.
-  if(e.target.closest('.webgl-hit-target,.webgl-controls,.webgl-focus,.webgl-intro'))return;
+  if(e.target.closest('.webgl-hit-target,.webgl-controls,.webgl-focus,.webgl-intro,.webgl-branch-dock'))return;
   // Keep keyboard navigation immediately available after mouse, pen or touch.
   stage?.focus({preventScroll:true});
   pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});stage.setPointerCapture?.(e.pointerId);
