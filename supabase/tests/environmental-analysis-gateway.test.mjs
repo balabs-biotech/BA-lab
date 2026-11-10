@@ -35,6 +35,10 @@ assert.ok(observationRead > domainProfileRead, "optional interpretation resoluti
 assert.match(source, /domain_and_subject_id_must_be_provided_together/, "domain and subject must be an atomic optional request pair");
 assert.match(source, /ambiguous_context/, "overlapping biological contexts must fail closed for interpretation");
 assert.match(source, /context_does_not_cover_scope/, "a context must cover the complete analysis window");
+
+assert.match(source, /\.lte\("valid_from", startDate\)/, "resolved profiles must start no later than the analysis window");
+assert.match(source, /valid_to\.gte\.\$\{endDate\}/, "resolved profiles must remain valid through the end of the analysis window");
+
 assert.match(source, /environment_profile_unavailable/, "missing environment profiles must be explicit");
 assert.match(source, /domain_profile_unavailable/, "missing domain profiles must be explicit");
 assert.match(source, /enginePayload\.biological_interpretation\s*=\s*interpretationResolution\.payload/, "only server-resolved profile data may be forwarded to the private engine");
