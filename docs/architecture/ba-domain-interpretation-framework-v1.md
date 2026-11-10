@@ -49,3 +49,29 @@ evaluated independently for each biological module.
 - No biological validation of thresholds or recommendations.
 - No cross-variable causal model or growth-stage model.
 - No automated action execution.
+
+
+## Biological context binding
+
+The `contexts.biological` package represents a biological subject in a
+specific cultivation or experimental context. It carries stable subject,
+organization, location and environment-context IDs; domain and organism kind;
+optional taxon, strain, cultivar and substrate codes; culture stage; production
+system; explicit context tags; and a validity interval.
+
+A biological context is not inferred from weather observations. It must be
+registered by the application or supplied by a trusted workflow.
+
+`validate_biological_context_for_analysis` checks tenant, location,
+environment-context identity and overlap between the context validity interval
+and the analysis date scope.
+
+`interpret_analysis_for_biological_context` is the integrated public entry
+point. It rejects a profile whose module differs from the biological domain,
+validates the environment binding, and adds explicit tags such as
+`stage:fruiting`, `strain:BA-P80`, `substrate:wheat_straw` and
+`system:fruiting_chamber` to the profile evaluation.
+
+The binding is intentionally one biological context to one environment
+context. When a biological batch moves between rooms or systems, create
+separate time-bounded context records rather than rewriting its history.
