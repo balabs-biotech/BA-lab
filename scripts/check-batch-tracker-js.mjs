@@ -295,6 +295,13 @@ console.log("✓ Atomic experimental registry form, unit rows and tenant-safe re
 if(!template.includes('id="cultureExperimentId"')||!template.includes('id="cultureExperimentalUnitId"'))throw new Error("Culture-to-experiment assignment selectors are missing");
 if(!engine.includes("populateCultureExperimentOptions")||!engine.includes("p_experiment_id: selectedExperimentId || null")||!engine.includes("p_experimental_unit_id: selectedExperimentalUnitId || null"))throw new Error("Culture creation does not persist the selected experimental context");
 if(!engine.includes("Boolean(selectedExperimentId) !== Boolean(selectedExperimentalUnitId)"))throw new Error("Culture creation does not reject an incomplete experiment/unit pair");
+
+const createCultureStart=engine.indexOf("async function createCulture()");
+const createCultureEnd=engine.indexOf("CULTURES DISPONIBLES POUR LES BATCHS",createCultureStart);
+const createCultureBody=engine.slice(createCultureStart,createCultureEnd);
+if(createCultureBody.includes("cultureExperimentSelect?.value")||createCultureBody.includes("cultureExperimentalUnitSelect?.value"))throw new Error("Culture creation must not depend on unbound DOM globals in isolated workflow tests");
+if(!createCultureBody.includes('globalThis.document?.getElementById("cultureExperimentId")')||!createCultureBody.includes('globalThis.document?.getElementById("cultureExperimentalUnitId")'))throw new Error("Culture experiment selectors must be resolved safely from the active document");
+
 const cultureCreateStart=engine.indexOf("async function createCulture()");
 const cultureCreateEnd=engine.indexOf("CULTURES DISPONIBLES POUR LES BATCHS",cultureCreateStart);
 const cultureCreateCode=engine.slice(cultureCreateStart,cultureCreateEnd);
