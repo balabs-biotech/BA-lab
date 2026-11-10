@@ -151,10 +151,7 @@ def test_repository_scopes_reads_by_tenant_and_subject_and_filters_validity():
 
     contexts = repository.list_for_subject(
         organization_id=record["organization_id"],
-        domain=__import__(
-            "ba_environmental_engine.contexts.biological",
-            fromlist=["BiologicalDomain"],
-        ).BiologicalDomain.GREENTECH,
+         domain=BiologicalDomain.GREENTECH,
         subject_id=record["plant_culture_id"],
         on_date="2026-11-10",
     )
