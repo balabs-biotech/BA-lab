@@ -271,6 +271,8 @@ jobs:
         run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/environmental_profile_registries_contract.test.sql
       - name: Test persisted biological signal events after replay
         run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/biological_signals_contract.test.sql
+      - name: Test biological signal lifecycle authorization after replay
+        run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/biological_signal_lifecycle.test.sql
 
   ecosystem-regression:
     runs-on: ubuntu-latest
