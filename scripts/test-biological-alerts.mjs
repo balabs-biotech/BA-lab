@@ -129,6 +129,10 @@ assert.match(moduleSource, /from\("measurements"\)/);
 assert.match(moduleSource, /from\("observations"\)/);
 assert.match(moduleSource, /from\("environmental_observations"\)/);
 assert.match(moduleSource, /from\("biological_signals"\)/);
+assert.match(moduleSource, /from\("results"\)/);
+assert.match(moduleSource, /experimental_results/);
+assert.match(moduleSource, /experimental_result_count/);
+
 assert.match(moduleSource, /getCultureEvidence/);
 assert.match(moduleSource, /temporal_location_context/);
 assert.match(moduleSource, /environmental_context_is_causal: false/);
