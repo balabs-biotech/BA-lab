@@ -282,16 +282,23 @@ class InMemoryBiologicalContextRepository:
         self.contexts = tuple(contexts)
         self.last_query = None
 
-    def list_for_subject(
-        self, *, organization_id, domain, subject_id, on_date=None
+    def list_overlapping_scope(
+        self, *, organization_id, domain, subject_id, from_date, to_date
     ):
-        self.last_query = (organization_id, domain, subject_id)
+        self.last_query = (
+            organization_id, domain, subject_id, from_date, to_date
+        )
         return tuple(
             context
             for context in self.contexts
             if str(context.organization_id) == organization_id
             and context.domain == domain
             and str(context.subject_id) == subject_id
+            and context.valid_from.isoformat() <= to_date
+            and (
+                context.valid_to is None
+                or context.valid_to.isoformat() >= from_date
+            )
         )
 
 
@@ -353,6 +360,8 @@ def test_persisted_context_repository_is_connected_to_interpretation():
         str(analysis.scope.organization_id),
         BiologicalDomain.MYCOLOGY,
         str(context.subject_id),
+        analysis.scope.from_date.isoformat(),
+        analysis.scope.to_date.isoformat(),
     )
 
 
