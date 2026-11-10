@@ -321,7 +321,7 @@ function renderBranchDock() {
   children.forEach((item,index)=>{
     const hasChildren=!!item.children?.length,hasUrl=!!item.url;
     const el=document.createElement(!hasChildren&&hasUrl?'a':'button');
-    if(el.tagName==='BUTTON'){el.type='button';el.addEventListener('click',event=>{event.preventDefault();event.stopPropagation();openResource(item)})}
+    if(el.tagName==='BUTTON'){el.type='button';el.addEventListener('click',event=>{event.preventDefault();event.stopPropagation();const spatial=resourceObjects.find(object=>object.userData?.kind==='resource'&&object.userData?.sourceItem===item)?.userData;window.__BALABS_3D_LAST_OPEN__={title:item.title||item.name||'',resolved:!!spatial,hasPosition:!!spatial?.position,hasChildren:!!spatial?.children?.length};window.__BALABS_3D_E2E_CLICKS=(window.__BALABS_3D_E2E_CLICKS||0)+1;openResource(spatial||item)})}
     else{el.href=item.url;el.target='_blank';el.rel='noopener noreferrer'}
     el.className='webgl-branch-item';el.textContent=item.title||item.name||('Branche '+(index+1));
     el.title=item.title||item.name||'';el.dataset.hasChildren=String(hasChildren);el.dataset.resourceUrl=item.url||'';
