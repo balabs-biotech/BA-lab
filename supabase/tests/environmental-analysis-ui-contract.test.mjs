@@ -28,9 +28,9 @@ assert.match(source, /analysis\.interpretation_status/, "the UI must expose the 
 assert.match(source, /analysis\.domain_interpretation/, "the UI must render the domain interpretation separately from climate findings");
 assert.match(source, /L’analyse climatique reste disponible/, "missing or invalid biological context must not hide climate analysis");
 
-console.log("PASS: Green Tech environmental analysis UI contract");
-
 assert.match(source, /analysis\.findings/, "temporal findings must be consumed by the Green Tech UI");
 assert.match(source, /Signaux statistiques/, "the UI must label statistical findings separately from biological diagnoses");
 assert.match(source, /robust_z_score/, "suspect findings must expose their robust score");
 assert.match(source, /insufficient_history/, "the UI must distinguish insufficient history from normal results");
+
+console.log("PASS: Green Tech environmental analysis UI contract");
