@@ -7214,6 +7214,18 @@ function renderGenerationComparisonReport(report) {
       environmentalRowsWithoutTime + " date(s) inexploitable(s).";
     environmentalContextSection.appendChild(quality);
   }
+  const environmentalQuality = report.data_quality || {};
+  if (environmentalQuality.environmental_truncated === true) {
+    const truncationWarning = document.createElement("p");
+    truncationWarning.className = "muted";
+    truncationWarning.textContent =
+      "Historique environnemental partiel : " +
+      (environmentalQuality.environmental_returned ?? environmentalObservations.length) +
+      " observations environnementales retournées sur " +
+      (environmentalQuality.environmental_total ?? "un total inconnu") +
+      ". La limite de 500 observations est atteinte ; les données plus anciennes ne figurent pas dans ce rapport.";
+    environmentalContextSection.appendChild(truncationWarning);
+  }
   target.appendChild(environmentalContextSection);
 
   // Monitoring is descriptive: sustained direction and robust deviations
