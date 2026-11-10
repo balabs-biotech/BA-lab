@@ -63,6 +63,40 @@ create table public.batches(
   primary key(organization_id,id),
   foreign key(organization_id,culture_id) references public.cultures(organization_id,id)
 );
+do $ begin
+  create type public.quality_state as enum ('raw','controlled','validated','excluded');
+exception when duplicate_object then null; end $;
+create table public.experiments(
+  organization_id uuid not null references public.organizations(id),
+  id uuid not null default gen_random_uuid(),
+  code text not null,
+  primary key(organization_id,id),
+  unique(organization_id,code)
+);
+create table public.experimental_units(
+  organization_id uuid not null,
+  id uuid not null default gen_random_uuid(),
+  experiment_id uuid not null,
+  unit_code text not null,
+  primary key(organization_id,id),
+  unique(organization_id,experiment_id,unit_code),
+  foreign key(organization_id,experiment_id) references public.experiments(organization_id,id)
+);
+create table public.results(
+  organization_id uuid not null references public.organizations(id),
+  id uuid not null default gen_random_uuid(),
+  experiment_id uuid,
+  experimental_unit_id uuid,
+  code text not null,
+  result_type text,
+  value jsonb not null default '{}'::jsonb,
+  quality_state public.quality_state not null default 'raw',
+  created_at timestamptz not null default now(),
+  primary key(organization_id,id),
+  unique(organization_id,code),
+  foreign key(organization_id,experiment_id) references public.experiments(organization_id,id),
+  foreign key(organization_id,experimental_unit_id) references public.experimental_units(organization_id,id)
+);
 create table public.events(
   organization_id uuid not null references public.organizations(id), id uuid not null default gen_random_uuid(), event_type text not null,
   occurred_at timestamptz not null, actor_user_id uuid references auth.users(id), culture_id uuid, material_id uuid,
@@ -86,16 +120,19 @@ grant usage on schema public, private, auth to authenticated, anon;
 grant execute on function auth.uid() to authenticated, anon;
 grant select on public.organization_members to authenticated, anon;
 grant select,insert,update,delete on public.material_types,public.culture_types,public.organizations,public.strains,public.materials,public.cultures,public.material_relationships,public.events,public.batches to authenticated,anon;
+grant select,insert,update,delete on public.experiments,public.experimental_units,public.results to authenticated,anon;
 alter table public.materials enable row level security;
 alter table public.cultures enable row level security;
 alter table public.material_relationships enable row level security;
 alter table public.events enable row level security;
 alter table public.batches enable row level security;
+alter table public.results enable row level security;
 create policy materials_org on public.materials to authenticated using(private.is_org_member(organization_id)) with check(private.is_org_member(organization_id));
 create policy cultures_org on public.cultures to authenticated using(private.is_org_member(organization_id)) with check(private.is_org_member(organization_id));
 create policy relationships_org on public.material_relationships to authenticated using(private.is_org_member(organization_id)) with check(private.is_org_member(organization_id));
 create policy events_org on public.events to authenticated using(private.is_org_member(organization_id)) with check(private.is_org_member(organization_id));
 create policy batches_org on public.batches to authenticated using(private.is_org_member(organization_id)) with check(private.is_org_member(organization_id));
+create policy results_org on public.results to authenticated using(private.is_org_member(organization_id)) with check(private.is_org_member(organization_id));
 \i supabase/migrations/20261022021957_biological_traceability_v1.sql
 select set_config('request.jwt.claim.sub','00000000-0000-0000-0000-0000000000b1',false);
 \i supabase/migrations/20261109170000_sync_material_parent_relationships.sql
@@ -265,6 +302,7 @@ select 'PASS: biological traceability runtime, lineage, RLS boundary, input vali
 -- Idempotency regression: a retry after an unknown client outcome must return
 -- the original result without creating another operation or descendant.
 \i supabase/migrations/20261109100000_add_biological_operation_idempotency.sql
+\i supabase/migrations/20261110120000_record_experiment_result_rpc.sql
 set role authenticated;
 do $$
 declare
@@ -333,6 +371,92 @@ begin
 end $$;
 reset role;
 select 'PASS: biological operation idempotency, duplicate suppression and payload conflict rejection' as test_result;
+
+-- Structured experimental result writes are atomic, tenant-bound and idempotent.
+insert into public.experiments(organization_id,code)
+values ('00000000-0000-0000-0000-0000000000a1','EXP-RESULT-001');
+insert into public.experimental_units(organization_id,experiment_id,unit_code)
+select organization_id,id,'REP-01' from public.experiments
+ where organization_id='00000000-0000-0000-0000-0000000000a1'
+   and code='EXP-RESULT-001';
+set role authenticated;
+do $experiment_result$
+declare
+  first_result jsonb;
+  retry_result jsonb;
+  result_id uuid;
+  event_id uuid;
+  caught boolean := false;
+  unit_id uuid;
+  request_key uuid := '00000000-0000-0000-0000-0000000000c2';
+  fixed_time timestamptz := '2026-11-10T10:00:00Z';
+begin
+  select id into unit_id from public.experimental_units
+   where organization_id='00000000-0000-0000-0000-0000000000a1'
+     and unit_code='REP-01';
+  first_result := public.record_experiment_result(
+    '00000000-0000-0000-0000-0000000000a1',unit_id,'RES-001','growth_assessment',
+    '{"colony_diameter_mm":42.5,"replicate":"REP-01"}'::jsonb,'raw',request_key,fixed_time
+  );
+  retry_result := public.record_experiment_result(
+    '00000000-0000-0000-0000-0000000000a1',unit_id,'RES-001','growth_assessment',
+    '{"colony_diameter_mm":42.5,"replicate":"REP-01"}'::jsonb,'raw',request_key,fixed_time
+  );
+  if first_result is distinct from retry_result then
+    raise exception 'FAIL: identical experimental-result retry did not return original response';
+  end if;
+  result_id := (first_result->>'result_id')::uuid;
+  event_id := (first_result->>'event_id')::uuid;
+  if (select count(*) from public.results
+       where organization_id='00000000-0000-0000-0000-0000000000a1'
+         and id=result_id and experiment_id=(select experiment_id from public.experimental_units where id=unit_id)
+         and experimental_unit_id=unit_id and code='RES-001'
+         and result_type='growth_assessment'
+         and value='{"colony_diameter_mm":42.5,"replicate":"REP-01"}'::jsonb
+         and quality_state='raw') <> 1 then
+    raise exception 'FAIL: structured experimental result was not persisted with experiment and unit provenance';
+  end if;
+  if (select count(*) from public.events
+       where organization_id='00000000-0000-0000-0000-0000000000a1'
+         and id=event_id and event_type='experiment_result_recorded'
+         and experimental_unit_id=unit_id and payload->>'result_id'=result_id::text) <> 1 then
+    raise exception 'FAIL: result traceability event is missing or disconnected';
+  end if;
+  begin
+    perform public.record_experiment_result(
+      '00000000-0000-0000-0000-0000000000a1',unit_id,'RES-001','growth_assessment',
+      '{"colony_diameter_mm":43}'::jsonb,'raw',request_key,fixed_time
+    );
+  exception when others then
+    if sqlerrm='idempotency_key_reused_with_different_payload' then caught := true;
+    else raise; end if;
+  end;
+  if not caught then raise exception 'FAIL: changed payload reused an experimental-result idempotency key'; end if;
+  caught := false;
+  begin
+    perform public.record_experiment_result(
+      '00000000-0000-0000-0000-0000000000a2',unit_id,'RES-CROSS-ORG','growth_assessment',
+      '{"value":1}'::jsonb,'raw','00000000-0000-0000-0000-0000000000c3',fixed_time
+    );
+  exception when insufficient_privilege then caught := true;
+  end;
+  if not caught then raise exception 'FAIL: cross-organization experimental result write was allowed'; end if;
+  caught := false;
+  begin
+    perform public.record_experiment_result(
+      '00000000-0000-0000-0000-0000000000a1',unit_id,'RES-INVALID','growth_assessment',
+      '42'::jsonb,'raw','00000000-0000-0000-0000-0000000000c4',fixed_time
+    );
+  exception when others then
+    if sqlerrm='experimental_result_value_must_be_json_object' then caught := true;
+    else raise; end if;
+  end;
+  if not caught then raise exception 'FAIL: non-object experimental result payload was accepted'; end if;
+end
+$experiment_result$;
+reset role;
+select 'PASS: structured experimental results, atomic event linkage, idempotency and tenant isolation' as test_result;
+
 
 -- Recursive lineage read RPC: ancestor, descendant, material provenance,
 -- bounded descendant results, and organization isolation.
