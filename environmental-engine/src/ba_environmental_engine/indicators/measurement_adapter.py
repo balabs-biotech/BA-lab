@@ -12,9 +12,11 @@ from ba_environmental_engine.indicators.biological_performance import (
 )
 
 
-_SUBJECT_LINKS = {
+_PRIMARY_SUBJECT_LINKS = {
     "culture_id": "culture",
     "plant_culture_id": "plant_culture",
+}
+_FALLBACK_SUBJECT_LINKS = {
     "sample_id": "sample",
     "experimental_unit_id": "experimental_unit",
 }
@@ -63,14 +65,24 @@ def measurement_row_to_biological_measurement(
     if not isinstance(canonical_unit, str) or not canonical_unit.strip():
         raise ValueError("variable_code is missing from the variable registry")
 
-    subject_links = [
+    primary_links = [
         (field, row.get(field))
-        for field in _SUBJECT_LINKS
+        for field in _PRIMARY_SUBJECT_LINKS
         if row.get(field) is not None
     ]
-    if len(subject_links) != 1:
-        raise ValueError("measurement must reference exactly one biological subject link")
-    subject_field, subject_id = subject_links[0]
+    if len(primary_links) > 1:
+        raise ValueError("measurement cannot reference multiple primary biological subjects")
+    if primary_links:
+        subject_field, subject_id = primary_links[0]
+    else:
+        fallback_links = [
+            (field, row.get(field))
+            for field in _FALLBACK_SUBJECT_LINKS
+            if row.get(field) is not None
+        ]
+        if len(fallback_links) != 1:
+            raise ValueError("measurement must resolve to exactly one biological subject")
+        subject_field, subject_id = fallback_links[0]
 
     normalized_value = row.get("normalized_value")
     normalized_unit = row.get("normalized_unit_code")
@@ -94,7 +106,7 @@ def measurement_row_to_biological_measurement(
         source_record_id=source_record_id,
         organization_id=organization_id,
         subject_id=str(subject_id),
-        subject_type=_SUBJECT_LINKS[subject_field],
+        subject_type=(_PRIMARY_SUBJECT_LINKS | _FALLBACK_SUBJECT_LINKS)[subject_field],
         variable_code=variable_code,
         value=value,
         canonical_unit_code=canonical_unit,
