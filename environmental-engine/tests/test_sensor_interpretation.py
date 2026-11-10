@@ -109,3 +109,28 @@ def test_sensor_interpretation_does_not_invent_biological_threshold_events():
         observed_date=date(2026, 11, 10),
     )
     assert result.signals == ()
+
+
+def test_insufficient_history_signal_does_not_fabricate_zero_measurement():
+    analysis = make_analysis(status="insufficient_data")
+    profile = DomainProfile(
+        profile_id="lab-history-v1",
+        module="lab",
+        version="1.0.0",
+        rules=(InterpretationRule(
+            rule_id="history-review",
+            variable_code="air_temperature",
+            finding_status="insufficient_history",
+            signal_code="sensor_history_insufficient",
+            severity="moderate",
+            message_code="sensor_history_insufficient",
+        ),),
+    )
+    result = interpret_sensor_analysis(
+        analysis,
+        profile,
+        source_analysis_id=uuid4(),
+        observed_date=date(2026, 11, 10),
+    )
+    assert result.matched_findings == 1
+    assert result.signals[0].observed_value is None
