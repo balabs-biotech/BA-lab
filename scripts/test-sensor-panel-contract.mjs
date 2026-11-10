@@ -36,4 +36,11 @@ assert.match(panel, /"Exclues"/, "series table must expose excluded observation 
 assert.match(panel, /"Ruptures"/, "series table must expose cadence gap counts");
 assert.match(panel, /item\.maximum_gap_seconds/, "series table must expose maximum observed gap");
 assert.match(panel, /item\.quality_counts/, "panel must expose quality-state distribution");
-console.log("PASS: sensor analysis UI integration, temporal screening, and quality diagnostics contract");
+
+assert.match(panel, /instrument_health\?\.flatline_diagnostics/, "panel must render instrument-health diagnostics independently");
+assert.match(panel, /flatline_minimum_repeated_observations = minimumObservations/, "UI must forward the explicit flatline observation policy");
+assert.match(panel, /flatline_minimum_duration_seconds = minimumDurationSeconds/, "UI must forward the explicit flatline duration policy");
+assert.match(panel, /flatlineValues\.some\(value => value === ""\)/, "partial flatline policy must be rejected in the UI");
+assert.match(workspace, /id="sensorFlatlineMinimumObservations"/, "workspace must expose the repeated-reading threshold");
+assert.match(workspace, /id="sensorFlatlineMinimumDurationSeconds"/, "workspace must expose the repeated-reading duration");
+console.log("PASS: sensor analysis UI integration, temporal screening, quality diagnostics, and instrument-health contract");
