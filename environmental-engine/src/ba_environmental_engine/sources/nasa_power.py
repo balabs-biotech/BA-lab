@@ -3,9 +3,14 @@
 from dataclasses import dataclass
 from datetime import date, datetime
 from math import isfinite
-from typing import Any, Iterable
+from typing import Any
 from uuid import UUID
 
+from ba_environmental_engine.sources.models import (
+    DuplicateSourceKey,
+    NormalizedEnvironmentalObservation,
+    find_duplicate_source_keys,
+)
 from ba_environmental_engine.units.registry import canonicalize_variable_value
 
 
@@ -14,33 +19,6 @@ class NASAParameter:
     variable_code: str
     provider_unit: str
     conversion_unit: str
-
-
-@dataclass(frozen=True, slots=True)
-class NormalizedEnvironmentalObservation:
-    source_observation_id: UUID
-    organization_id: UUID
-    location_id: UUID
-    provider_code: str
-    dataset_code: str
-    source_parameter: str
-    variable_code: str
-    value: float
-    unit: str
-    source_value: float
-    source_unit: str
-    observed_at: datetime
-    observed_date: date
-    retrieved_at: datetime
-    quality_flag: str | None
-    source_url: str | None
-    source_time_standard: str
-
-
-@dataclass(frozen=True, slots=True)
-class DuplicateSourceKey:
-    key: tuple[str, str, str, str, str]
-    count: int
 
 
 # The daily suffix is part of the provider's quantity semantics. For the
@@ -82,9 +60,20 @@ def normalize_nasa_power_observation(
     if row.get("dataset_code") != "POWER_DAILY_AGRO":
         raise ValueError("unsupported dataset_code")
 
+    if row.get("data_family") != "weather":
+        raise ValueError("NASA POWER daily adapter only accepts weather observations")
     metadata = row.get("metadata")
     if not isinstance(metadata, dict):
         raise ValueError("metadata must be an object")
+    spatial_resolution = row.get("spatial_resolution_m")
+    if spatial_resolution is not None:
+        if (
+            isinstance(spatial_resolution, bool)
+            or not isinstance(spatial_resolution, (int, float))
+            or not isfinite(spatial_resolution)
+            or spatial_resolution <= 0
+        ):
+            raise ValueError("spatial_resolution_m must be a positive finite number or null")
     parameter_code = metadata.get("source_parameter")
     if not isinstance(parameter_code, str):
         raise ValueError("metadata.source_parameter must be a string")
@@ -141,6 +130,7 @@ def normalize_nasa_power_observation(
         source_observation_id=source_id,
         organization_id=organization_id,
         location_id=location_id,
+        data_family="weather",
         provider_code="NASA_POWER",
         dataset_code="POWER_DAILY_AGRO",
         source_parameter=parameter_code,
@@ -152,28 +142,9 @@ def normalize_nasa_power_observation(
         observed_at=observed_at,
         observed_date=observed_date,
         retrieved_at=retrieved_at,
+        spatial_resolution_m=float(spatial_resolution) if spatial_resolution is not None else None,
         quality_flag=quality_flag,
         source_url=source_url,
         source_time_standard=time_standard,
+        source_metadata=dict(metadata),
     )
-
-
-def find_duplicate_source_keys(
-    rows: Iterable[dict[str, Any]],
-) -> list[DuplicateSourceKey]:
-    """Report repeated database conflict keys; never drop or merge input rows."""
-    counts: dict[tuple[str, str, str, str, str], int] = {}
-    for row in rows:
-        key = (
-            str(row.get("organization_id", "")),
-            str(row.get("location_id", "")),
-            str(row.get("provider_code", "")),
-            str(row.get("dataset_code", "")),
-            str(row.get("variable_code", "")) + "|" + str(row.get("observed_at", "")),
-        )
-        counts[key] = counts.get(key, 0) + 1
-    return [
-        DuplicateSourceKey(key=key, count=count)
-        for key, count in sorted(counts.items())
-        if count > 1
-    ]
