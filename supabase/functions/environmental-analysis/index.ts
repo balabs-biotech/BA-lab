@@ -454,6 +454,8 @@ Deno.serve(async (req: Request) => {
         finding_status: signal.finding_status,
         source_observation_ids: signal.source_observation_ids ?? [],
         context_tags: signal.context_tags ?? [],
+        analysis_method: "environmental_daily",
+        analysis_evidence: signal.evidence ?? {},
       }));
 
       const { error: signalPersistenceError } = await adminClient
