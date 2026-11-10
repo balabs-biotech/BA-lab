@@ -53,6 +53,16 @@ begin
     where tgrelid = v_domain_table
       and tgname = 'domain_interpretation_profiles_version_guard'
       and not tgisinternal
+  ) or not exists (
+    select 1 from pg_trigger
+    where tgrelid = v_env_table
+      and tgname = 'environment_context_profiles_validate'
+      and not tgisinternal
+  ) or not exists (
+    select 1 from pg_trigger
+    where tgrelid = v_domain_table
+      and tgname = 'domain_interpretation_profiles_validate'
+      and not tgisinternal
   ) then
     raise exception 'FAIL: immutable version lifecycle triggers are missing';
   end if;
@@ -154,7 +164,7 @@ begin
       '[]'::jsonb, date '2026-01-01', 'active'
     );
     raise exception 'FAIL: a second active domain profile was accepted';
-  exception when unique_violation then
+  exception when check_violation or unique_violation then
     null;
   end;
 
