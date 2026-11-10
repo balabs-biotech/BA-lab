@@ -19,6 +19,15 @@ assert.match(source, /indicator\.coverage/, "indicator coverage must be rendered
 assert.match(source, /indicator\.quality/, "indicator quality must be rendered");
 assert.match(source, /analysis\.source_summary/, "source provenance summary must be rendered");
 assert.match(source, /analysis\.warnings/, "scientific warnings must be visible");
+
+assert.match(source, /id:"envPlantCulture"/, "Green Tech must expose an optional plant-culture context selector");
+assert.match(source, /from\("plant_cultures"\)/, "the selector must load persisted plant subjects under RLS");
+assert.match(source, /analysisRequest\.domain="greentech"/, "selected plant subjects must request GreenTech interpretation");
+assert.match(source, /analysisRequest\.subject_id=plantCulture\.value/, "the selected plant subject ID must be sent to the gateway");
+assert.match(source, /analysis\.interpretation_status/, "the UI must expose the independent interpretation status");
+assert.match(source, /analysis\.domain_interpretation/, "the UI must render the domain interpretation separately from climate findings");
+assert.match(source, /L’analyse climatique reste disponible/, "missing or invalid biological context must not hide climate analysis");
+
 console.log("PASS: Green Tech environmental analysis UI contract");
 
 assert.match(source, /analysis\.findings/, "temporal findings must be consumed by the Green Tech UI");
