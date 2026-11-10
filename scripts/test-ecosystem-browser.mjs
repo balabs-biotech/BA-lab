@@ -24,9 +24,10 @@ async function tapSpatialTarget(page, name, x, y, selector) {
     const target = page.locator(selector).first();
     await target.waitFor({ state: 'visible', timeout: 5000 });
     if (name === 'mobile') {
+      await target.scrollIntoViewIfNeeded();
       const rect = await target.boundingBox();
-      assert.ok(rect, name + ': branch dock target must have a real visible touch area');
-      return page.touchscreen.tap(rect.x + rect.width / 2, rect.y + rect.height / 2);
+      assert.ok(rect && rect.width >= 40 && rect.height >= 40, name + ': branch dock target must have a real touch area after scrolling it into view');
+      return target.tap({ timeout: 5000 });
     }
     return target.click();
   }
