@@ -76,13 +76,15 @@
     location.style.cssText="width:100%;min-height:42px;";
     form.append(locationControl,field("Du","envFrom",from),field("Au","envTo",to),run,coordinates);
     const satelliteHint=node("p",{class:"muted"},"Sentinel-2 : scènes disponibles et couverture nuageuse. L’image ne constitue pas à elle seule un diagnostic de culture.");
+    const plantCulture=node("select",{id:"envPlantCulture"});
+    plantCulture.append(node("option",{value:""},"Analyse climatique uniquement"));
     const altitude=node("input",{id:"envAltitude",type:"number",min:"-500",max:"9000",step:"1",placeholder:"Altitude vérifiée en mètres"});
     const altitudeSave=node("button",{type:"button"},"Enregistrer l’altitude");
     const analysisPanel=node("section",{id:"environmentalAnalysisPanel",class:"card","aria-live":"polite"});
     const analysisButton=node("button",{type:"button"},"Lancer l’analyse climatique FAO-56");
     const analysisStatus=node("p",{class:"muted","aria-live":"polite"},"Analyse calculée à partir des observations météo NASA POWER déjà importées. L’altitude doit être vérifiée.");
     const analysisResults=node("div",{id:"environmentalAnalysisResults",class:"overview-observations"});
-    analysisPanel.append(node("h3",{},"Analyse environnementale"),node("p",{class:"muted"},"Indicateurs climatiques FAO-56 et agrégations temporelles, avec couverture et provenance des données."),field("Altitude du site (m, au-dessus du niveau moyen de la mer)","envAltitude",altitude),altitudeSave,analysisButton,analysisStatus,analysisResults);
+    analysisPanel.append(node("h3",{},"Analyse environnementale"),node("p",{class:"muted"},"Indicateurs climatiques FAO-56 et agrégations temporelles, avec couverture et provenance des données."),field("Culture végétale à contextualiser (facultatif)","envPlantCulture",plantCulture),field("Altitude du site (m, au-dessus du niveau moyen de la mer)","envAltitude",altitude),altitudeSave,analysisButton,analysisStatus,analysisResults);
     const satelliteMapPanel=node("section",{class:"card",id:"satelliteColorMapPanel"});
     satelliteMapPanel.append(node("h3",{},"Carte satellite"));
     const satelliteMapStatus=node("p",{class:"muted","aria-live":"polite"},"Chargement de l’image satellite…");
@@ -315,12 +317,34 @@
       if(!location.value) await updateSatelliteMap();
     }
     async function selectLocation(){
-      if(!location.value){lat.value="";lon.value="";altitude.value="";accuracy.value="";await updateSatelliteMap();return;}
+      if(!location.value){lat.value="";lon.value="";altitude.value="";accuracy.value="";await loadPlantCultures();await updateSatelliteMap();return;}
       const {data}=await db.from("locations").select("latitude,longitude,altitude_m,coordinate_accuracy_m,coordinate_source").eq("id",location.value).maybeSingle();
       if(!data)return;
       lat.value=data.latitude??""; lon.value=data.longitude??""; altitude.value=data.altitude_m??""; accuracy.value=data.coordinate_accuracy_m??"";
       if(data.coordinate_source && [...source.options].some(o=>o.value===data.coordinate_source))source.value=data.coordinate_source;
+      await loadPlantCultures();
       await updateSatelliteMap();
+    }
+    async function loadPlantCultures(){
+      const selected=plantCulture.value;
+      plantCulture.replaceChildren(node("option",{value:""},"Analyse climatique uniquement"));
+      if(!location.value)return;
+      const {data:environments,error:environmentError}=await db.from("environments").select("id").eq("location_id",location.value);
+      if(environmentError){analysisStatus.textContent="Cultures végétales indisponibles ; l’analyse climatique reste utilisable.";return;}
+      const environmentIds=(environments||[]).map(row=>row.id).filter(Boolean);
+      let query=db.from("plant_cultures").select("id,code,species_name,cultivar_name,status,location_id,environment_id").eq("status","active");
+      if(environmentIds.length){
+        query=query.or("location_id.eq."+location.value+",environment_id.in.("+environmentIds.join(",")+")");
+      }else{
+        query=query.eq("location_id",location.value);
+      }
+      const {data,error}=await query.order("code");
+      if(error){analysisStatus.textContent="Cultures végétales indisponibles ; l’analyse climatique reste utilisable.";return;}
+      (data||[]).forEach(row=>{
+        const label=[row.code,row.species_name,row.cultivar_name].filter(Boolean).join(" · ");
+        plantCulture.append(node("option",{value:row.id},label||"Culture végétale"));
+      });
+      if(selected && [...plantCulture.options].some(option=>option.value===selected))plantCulture.value=selected;
     }
     function renderAgroSynthesis(data){
       agroSynthesisPanel.replaceChildren(node("h3",{},"Lecture agronomique"));
@@ -666,11 +690,32 @@
         }
         const weatherReady=await importWeather(false);
         if(!weatherReady)throw new Error("La collecte ou la vérification du cache météo a échoué : "+status.textContent);
-        const {data,error}=await db.functions.invoke("environmental-analysis",{body:{location_id:location.value,start_date:from.value,end_date:to.value}});
+        const analysisRequest={location_id:location.value,start_date:from.value,end_date:to.value};
+        if(plantCulture.value){analysisRequest.domain="greentech";analysisRequest.subject_id=plantCulture.value;}
+        const {data,error}=await db.functions.invoke("environmental-analysis",{body:analysisRequest});
         if(error)throw new Error(await functionErrorMessage(error));
         if(!data?.ok||!data.analysis)throw new Error(data?.error||"Réponse d’analyse invalide.");
         const analysis=data.analysis;
         analysisStatus.textContent="Analyse terminée · contrat "+(analysis.contract_version||"BAL-JSON")+" · "+(analysis.engine?.version||"version moteur inconnue");
+        const interpretationStatus=analysis.interpretation_status||"not_requested";
+        if(interpretationStatus!=="not_requested"){
+          const interpretationPanel=node("section",{class:"card","aria-live":"polite"});
+          interpretationPanel.append(node("h4",{},"Interprétation contextuelle · GreenTech"));
+          if(interpretationStatus==="interpreted"&&analysis.domain_interpretation){
+            const interpretation=analysis.domain_interpretation;
+            interpretationPanel.append(
+              node("p",{}, "Profil : "+interpretation.profile_id+" · version "+interpretation.profile_version),
+              node("p",{}, interpretation.matched_findings+" signal(aux) contextualisé(s) sur "+interpretation.evaluated_findings+" anomalie(s) évaluée(s).")
+            );
+            (interpretation.signals||[]).forEach(signal=>{
+              interpretationPanel.append(node("p",{},(signal.signal_code||"signal")+" · "+(signal.severity||"severity non définie")+" · "+(signal.message_code||"message non défini")));
+            });
+            if(!interpretation.signals?.length)interpretationPanel.append(node("p",{class:"muted"},"Aucune règle du profil actif ne correspond aux signaux statistiques de cette période."));
+          }else{
+            interpretationPanel.append(node("p",{class:"muted"},"Interprétation non produite ("+interpretationStatus+"). L’analyse climatique reste disponible."));
+          }
+          analysisResults.append(interpretationPanel);
+        }
         const indicators=Array.isArray(analysis.indicators)?analysis.indicators:[];
         if(!indicators.length)analysisResults.append(node("p",{class:"muted"},"Aucun indicateur disponible pour cette période."));
         indicators.forEach(indicator=>{
