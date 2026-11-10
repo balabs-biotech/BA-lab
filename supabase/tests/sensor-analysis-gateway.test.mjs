@@ -40,4 +40,10 @@ assert.match(source, /Math\.ceil\(temporalWindowSeconds \/ 86_400\)/, "gateway m
 assert.match(source, /localCalendarDate\(row\.measured_at, profile\.timezone\)/, "profile validity must use local calendar dates");
 assert.match(source, /profileScopedRows/, "only measurements valid under the resolved profile may be forwarded");
 
+assert.match(source, /subject_id_must_be_a_valid_uuid/, "biological subject binding must be UUID-validated");
+assert.match(source, /\.from\("biological_contexts"\)/, "gateway must resolve a persisted biological context");
+assert.match(source, /\.from\("domain_interpretation_profiles"\)/, "gateway must resolve a versioned domain profile");
+assert.match(source, /biologicalInterpretationPayload/, "resolved biological context and domain profile must be forwarded");
+assert.match(source, /biological_contexts_environment_fk/, "biological context must use the explicit environment relationship");
+
 console.log("PASS: sensor analysis gateway security contract");
