@@ -5,6 +5,7 @@ species-, crop-, strain-, substrate-, or laboratory-specific thresholds.
 """
 
 from datetime import date
+from typing import Any
 from typing import Literal
 from uuid import UUID
 
@@ -73,6 +74,7 @@ class DomainSignal(InterpretationModel):
     unit: str
     finding_status: FindingStatus
     context_tags: frozenset[str] = frozenset()
+    evidence: dict[str, Any] = Field(default_factory=dict)
 
 
 class DomainInterpretation(InterpretationModel):
