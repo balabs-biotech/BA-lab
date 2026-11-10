@@ -279,5 +279,5 @@ console.log("✓ Tracker uses RPC-backed writes for events, measurements and obs
 
 
 // Experimental results must be visible from the culture detail that owns their unit.
-if(!engine.includes('from("results")')||!engine.includes('in("experimental_unit_id", unitIds)'))throw new Error("Structured experimental results are not loaded for culture experimental units");
+if(!engine.includes('from("results")')||!engine.includes('.eq("experimental_unit_id", culture.experimental_unit_id)'))throw new Error("Structured experimental results are not loaded for culture experimental units");
 if(!engine.includes("result_type")||!engine.includes("quality_state")||!engine.includes("result.value"))throw new Error("Experimental result type, quality state and structured value are not rendered");
