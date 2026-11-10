@@ -63,6 +63,9 @@ class DomainSignal(InterpretationModel):
     recommendation_code: str | None
     source_analysis_id: UUID
     source_finding_id: UUID
+    biological_context_id: UUID | None = None
+    biological_subject_id: UUID | None = None
+    environment_context_id: UUID | None = None
     source_observation_ids: tuple[UUID, ...]
     variable_code: str
     observed_date: date
