@@ -318,7 +318,30 @@ function renderBranchDock() {
   children.forEach((item,index)=>{
     const hasChildren=!!item.children?.length,hasUrl=!!item.url;
     const el=document.createElement(!hasChildren&&hasUrl?'a':'button');
-    if(el.tagName==='BUTTON'){el.type='button';el.addEventListener('click',event=>{event.preventDefault();event.stopPropagation();const spatial=resourceObjects.find(object=>object.userData?.kind==='resource'&&object.userData?.sourceItem===item)?.userData;window.__BALABS_3D_LAST_OPEN__={title:item.title||item.name||'',resolved:!!spatial,hasPosition:!!spatial?.position,hasChildren:!!spatial?.children?.length};window.__BALABS_3D_E2E_CLICKS=(window.__BALABS_3D_E2E_CLICKS||0)+1;try{openResource(item);window.__BALABS_3D_LAST_OPEN_ERROR__=null}catch(error){window.__BALABS_3D_LAST_OPEN_ERROR__={message:error?.message||String(error),stack:error?.stack||''}}})}
+    if(el.tagName==='BUTTON'){
+      el.type='button';
+      const activate=(event,source)=>{
+        event?.preventDefault?.();event?.stopPropagation?.();
+        const spatial=resourceObjects.find(object=>object.userData?.kind==='resource'&&object.userData?.sourceItem===item)?.userData;
+        window.__BALABS_3D_LAST_OPEN__={title:item.title||item.name||'',source,resolved:!!spatial,hasPosition:!!spatial?.position,hasChildren:!!spatial?.children?.length};
+        window.__BALABS_3D_E2E_CLICKS=(window.__BALABS_3D_E2E_CLICKS||0)+1;
+        try{openResource(item);window.__BALABS_3D_LAST_OPEN_ERROR__=null}
+        catch(error){window.__BALABS_3D_LAST_OPEN_ERROR__={message:error?.message||String(error),stack:error?.stack||''}}
+      };
+      // Mobile browsers can synthesize a click inconsistently after multi-touch
+      // gestures. Activate on the touch pointer release, then suppress its
+      // compatibility click; mouse and keyboard continue through click.
+      el.addEventListener('pointerup',event=>{
+        if(event.pointerType!=='touch')return;
+        el.dataset.touchActivatedAt=String(performance.now());
+        activate(event,'touch-pointerup');
+      });
+      el.addEventListener('click',event=>{
+        const touchAt=Number(el.dataset.touchActivatedAt||0);
+        if(touchAt&&performance.now()-touchAt<800){event.preventDefault();event.stopPropagation();return}
+        activate(event,event.detail===0?'keyboard':'click');
+      });
+    }
     else{el.href=item.url;el.target='_blank';el.rel='noopener noreferrer'}
     el.className='webgl-branch-item';el.textContent=item.title||item.name||('Branche '+(index+1));
     el.title=item.title||item.name||'';el.dataset.hasChildren=String(hasChildren);el.dataset.resourceUrl=item.url||'';
