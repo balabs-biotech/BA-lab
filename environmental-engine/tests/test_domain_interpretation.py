@@ -162,7 +162,8 @@ def test_biological_context_is_bound_to_environment_and_enriches_domain_rules():
         context_type=EnvironmentType.FRUITING_CHAMBER,
         label="Chambre Pleurotus",
         timezone="Africa/Algiers",
-        origin=ObservationOrigin.WEATHER_PROVIDER,
+        origin=ObservationOrigin.SENSOR,
+        sensor_ids=[uuid4()],
         profile_code="ba_fruiting_room",
         profile_version="1.0.0",
     )
