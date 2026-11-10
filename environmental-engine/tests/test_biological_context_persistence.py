@@ -84,3 +84,105 @@ def test_database_record_rejects_domain_subject_mismatch():
 
     with pytest.raises(ValueError, match="does not match"):
         biological_context_from_record(record)
+
+
+class FakeResponse:
+    def __init__(self, data):
+        self.data = data
+
+
+class FakeQuery:
+    def __init__(self, data):
+        self.data = data
+        self.filters = []
+        self.operations = []
+
+    def select(self, value):
+        self.operations.append(("select", value))
+        return self
+
+    def eq(self, key, value):
+        self.filters.append((key, value))
+        return self
+
+    def order(self, key, desc=False):
+        self.operations.append(("order", key, desc))
+        return self
+
+    def insert(self, value):
+        self.operations.append(("insert", value))
+        return self
+
+    def update(self, value):
+        self.operations.append(("update", value))
+        return self
+
+    def maybe_single(self):
+        self.operations.append(("maybe_single",))
+        return self
+
+    def single(self):
+        self.operations.append(("single",))
+        return self
+
+    def execute(self):
+        return FakeResponse(self.data)
+
+
+class FakeSupabase:
+    def __init__(self, data):
+        self.data = data
+        self.query = None
+
+    def table(self, name):
+        assert name == "biological_contexts"
+        self.query = FakeQuery(self.data)
+        return self.query
+
+
+def test_repository_scopes_reads_by_tenant_and_subject_and_filters_validity():
+    from ba_environmental_engine.contexts.persistence import (
+        SupabaseBiologicalContextRepository,
+    )
+
+    record = make_record("greentech")
+    client = FakeSupabase([record])
+    repository = SupabaseBiologicalContextRepository(client)
+
+    contexts = repository.list_for_subject(
+        organization_id=record["organization_id"],
+        domain=__import__(
+            "ba_environmental_engine.contexts.biological",
+            fromlist=["BiologicalDomain"],
+        ).BiologicalDomain.GREENTECH,
+        subject_id=record["plant_culture_id"],
+        on_date="2026-11-10",
+    )
+
+    assert len(contexts) == 1
+    assert ("organization_id", record["organization_id"]) in client.query.filters
+    assert ("plant_culture_id", record["plant_culture_id"]) in client.query.filters
+    assert ("domain", "greentech") in client.query.filters
+    select = next(op[1] for op in client.query.operations if op[0] == "select")
+    assert "biological_contexts_environment_fk" in select
+
+
+def test_repository_update_never_allows_tenant_or_primary_key_reassignment():
+    from ba_environmental_engine.contexts.persistence import (
+        SupabaseBiologicalContextRepository,
+    )
+
+    record = make_record("mycology")
+    client = FakeSupabase(record)
+    repository = SupabaseBiologicalContextRepository(client)
+    context = biological_context_from_record(record)
+
+    repository.update(context)
+
+    update_payload = next(
+        op[1] for op in client.query.operations if op[0] == "update"
+    )
+    assert "organization_id" not in update_payload
+    assert "id" not in update_payload
+    assert ("organization_id", record["organization_id"]) in client.query.filters
+    assert ("id", record["id"]) in client.query.filters
