@@ -12,8 +12,18 @@ from test_sensor_adapter import joined_row
 
 def make_envelopes(values, *, quality="validated", interval_seconds=60):
     start = datetime(2026, 11, 10, 9, tzinfo=timezone.utc)
+    base = joined_row()
+    shared_scope = {
+        key: base[key]
+        for key in (
+            "organization_id", "device_organization_id",
+            "environment_organization_id", "environment_id",
+            "device_environment_id", "location_id", "iot_device_id",
+        )
+    }
     return tuple(
         normalize_iot_measurement_row(joined_row(
+            **shared_scope,
             measured_at=start + timedelta(seconds=index * interval_seconds),
             raw_value=value,
             quality_state=quality,
@@ -103,8 +113,18 @@ def test_rule_profile_rejects_duplicate_rule_ids():
 
 def test_unaccepted_quality_observation_breaks_a_sustained_run():
     start = datetime(2026, 11, 10, 9, tzinfo=timezone.utc)
+    base = joined_row()
+    shared_scope = {
+        key: base[key]
+        for key in (
+            "organization_id", "device_organization_id",
+            "environment_organization_id", "environment_id",
+            "device_environment_id", "location_id", "iot_device_id",
+        )
+    }
     rows = tuple(
         normalize_iot_measurement_row(joined_row(
+            **shared_scope,
             measured_at=start + timedelta(seconds=index * 60),
             raw_value=value,
             quality_state=quality,
