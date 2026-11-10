@@ -248,16 +248,16 @@ function clearResources() {
 function mDispose(material){material?.map?.dispose();material?.dispose?.()}
 function visibleResourceLabelDepth() {
  // Keep the current branches named, then reveal each deeper layer as the user zooms in.
- if(distance<=4.8)return 3;
- if(distance<=5.6)return 2;
- if(distance<=6.4)return 1;
+ if(distance<=4.2)return 3;
+ if(distance<=4.8)return 2;
+ if(distance<=5.5)return 1;
  return 0;
 }
 function makeResourceLabel(item,color,depth=0) {
  const size=depth===0?18:depth===1?16:14,label=makeLabel(item.title,color,size);label.material.opacity=0;
  const scale=depth===0?3.35:depth===1?2.9:2.5;
  label.scale.set(scale,depth===0?.86:depth===1?.76:.68,1);
- label.userData={...item,kind:'resource-label'};label.visible=depth<=visibleResourceLabelDepth();addResourceHitTarget(label);return label;
+ label.userData={...item,kind:'resource-label'};label.visible=depth===visibleResourceLabelDepth();addResourceHitTarget(label);return label;
 }
 function addResourceHitTarget(label) {
  const data=label.userData||{},hasChildren=!!data.children?.length;
@@ -282,7 +282,7 @@ function syncResourceHitTargets() {
  const projected=[];
  const project=(object,button)=>{
   object.getWorldPosition(_hitWorld);const p=_hitWorld.clone().project(camera);
-  const depth=Number(button.dataset.depth||0),visible=depth<=visibleResourceLabelDepth()&&p.z>-1&&p.z<1&&p.x>=-1.12&&p.x<=1.12&&p.y>=-1.12&&p.y<=1.12;
+  const depth=Number(button.dataset.depth||0),visible=depth===visibleResourceLabelDepth()&&p.z>-1&&p.z<1&&p.x>=-1.12&&p.x<=1.12&&p.y>=-1.12&&p.y<=1.12;
   button.hidden=!visible;button.style.display=visible?'block':'none';
   if(!visible)return;
   projected.push({object,button,p,x:rect.left+(p.x+1)*rect.width/2-stageRect.left,y:rect.top+(1-p.y)*rect.height/2-stageRect.top,depth});
@@ -469,7 +469,7 @@ function setupUI() {
   const controls=document.createElement('div');controls.className='webgl-controls';controls.innerHTML='<button type="button" data-camera="back" aria-label="Niveau précédent">‹</button><button type="button" data-camera="out" aria-label="Zoom arrière">−</button><button type="button" data-camera="in" aria-label="Zoom avant">+</button><button type="button" data-camera="reset" aria-label="Recentrer">⌖</button>';
   intro=document.createElement('button');intro.type='button';intro.className='webgl-intro';intro.innerHTML='<span class="webgl-intro-card"><span class="webgl-intro-orb"><b>BA</b></span><span class="webgl-intro-copy">BALABS · APPLIED BIOTECHNOLOGY</span><span class="webgl-intro-cta">'+t('open')+'</span></span>';
   intro.addEventListener('click',()=>{opened=true;intro.hidden=true;nav.hidden=false;ROOT.classList.remove('universe-closed');ROOT.classList.add('universe-open');status.textContent='BALABS / LIVING NETWORK'});
-  controls.addEventListener('click',e=>{const action=e.target.closest('button')?.dataset.camera;if(action==='back'){goBackLevel();return}if(action==='in')zoomTargetDistance=Math.max(1.25,zoomTargetDistance*.72);if(action==='out')zoomTargetDistance=Math.min(60,zoomTargetDistance*1.28);if(action==='reset'){goOverview();return}cameraPosition()});
+  controls.addEventListener('click',e=>{const action=e.target.closest('button')?.dataset.camera;if(action==='back'){goBackLevel();return}if(action==='in')zoomTargetDistance=Math.max(1.25,zoomTargetDistance*.86);if(action==='out')zoomTargetDistance=Math.min(60,zoomTargetDistance*1.16);if(action==='reset'){goOverview();return}cameraPosition()});
   stage.append(hint,status,controls,nav,panel,intro);ROOT.append(stage);
   branchDock=document.createElement('nav');branchDock.className='webgl-branch-dock';branchDock.setAttribute('aria-label','Branches et sous-branches');branchDock.hidden=true;ROOT.append(branchDock);
   document.getElementById('homeBtn')?.addEventListener('click',()=>{if(selected)goOverview()});
@@ -482,8 +482,8 @@ function setupUI() {
     else if(key==='ArrowRight')theta+=.12;
     else if(key==='ArrowUp')phi=THREE.MathUtils.clamp(phi-.10,.35,2.78);
     else if(key==='ArrowDown')phi=THREE.MathUtils.clamp(phi+.10,.35,2.78);
-    else if(key==='+'||key==='=')zoomTargetDistance=Math.max(1.25,zoomTargetDistance*.72);
-    else if(key==='-'||key==='_')zoomTargetDistance=Math.min(60,zoomTargetDistance*1.28);
+    else if(key==='+'||key==='=')zoomTargetDistance=Math.max(1.25,zoomTargetDistance*.86);
+    else if(key==='-'||key==='_')zoomTargetDistance=Math.min(60,zoomTargetDistance*1.16);
     else if(key==='Escape'||key==='Backspace'){if(selected)goBackLevel();return}
     else if(key==='Home'){goOverview();return}
     cameraPosition();
@@ -610,7 +610,7 @@ function syncLabelScales() {
   const projection=2*Math.tan(THREE.MathUtils.degToRad(camera.fov*.5))/viewportHeight;
   const apply=label=>{
     if(!label?.userData?.kind?.endsWith('label'))return;
-    if(label.userData.kind==='resource-label')label.visible=(label.userData.depth||0)<=visibleResourceLabelDepth();
+    if(label.userData.kind==='resource-label')label.visible=(label.userData.depth||0)===visibleResourceLabelDepth();
     label.getWorldPosition(labelWorldPosition);
     const cameraDistance=Math.max(.1,camera.position.distanceTo(labelWorldPosition));
     const targetPixels=labelTargetPixels(label);
