@@ -2848,3 +2848,6 @@ body[data-domain] :is(button, input, select, textarea, a, [tabindex]):focus-visi
   #biologicalSignalsCard .signal-actions { width:100%; }
   #biologicalSignalsCard .signal-actions button { flex:1 1 auto; }
 }
+
+#biologicalSignalsCard #signalsLoadMore { margin:14px auto 0; display:block; }
+#biologicalSignalsCard #signalsLoadMore.hidden { display:none; }
