@@ -170,15 +170,15 @@ function createWorld() {
     world.add(group);cells.set(id,{group,soma,label,hit,position:pos,color});
     const domainButton=document.createElement('button');domainButton.type='button';domainButton.className='webgl-hit-target webgl-domain-target';domainButton.setAttribute('aria-label',(LABELS[id]?.title||id)+' — '+t('domain'));domainButton.title=LABELS[id]?.title||id;domainButton.dataset.domainId=id;domainButton.style.width='116px';domainButton.style.height='116px';domainButton.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();stage?.focus({preventScroll:true});if(!selected)enterDomain(id)});stage.append(domainButton);domainHitTargets.set(id,{object:hit,button:domainButton});
     pickables.push(soma,hit,label);
-    const branches=14,branchTips=[];
+    const branches=14,branchTips=[],branchCurves=[];
     for(let j=0;j<branches;j++){
-      const a=j/branches*Math.PI*2+IDS.indexOf(id)*.31;
+      const seed=IDS.indexOf(id)+1,a=j/branches*Math.PI*2+seed*.31+Math.sin(j*2.37+seed)*.19+Math.cos(j*1.61-seed)*.11;
       const reach=1.0+(j%4)*.24;
       const start=new THREE.Vector3(Math.cos(a)*.10,Math.sin(a)*.09,Math.sin(a*1.7)*.035);
       const end=new THREE.Vector3(Math.cos(a)*reach,Math.sin(a)*reach*.76,Math.sin(a*1.7)*.34);
       branchTips.push(end.clone());
       const mid=start.clone().lerp(end,.52).add(new THREE.Vector3(Math.cos(a+1)*.18,Math.sin(a+1)*.16,.13));
-      const curve=new THREE.CatmullRomCurve3([start,mid,end]);
+      const curve=new THREE.CatmullRomCurve3([start,mid,end]);branchCurves.push(curve);
       const thickness=.0065+(j%3)*.0014;
       const neurite=new THREE.Mesh(new THREE.TubeGeometry(curve,28,thickness,5,false),new THREE.MeshStandardMaterial({color,emissive:color,emissiveIntensity:.28,transparent:true,opacity:.76,roughness:.7}));
       neurite.userData={id,kind:'neurite'};group.add(neurite);
@@ -192,6 +192,13 @@ function createWorld() {
       tip.position.copy(end);group.add(tip);
     }
     // Anastomoses: neighboring hyphae reconnect into a mesh instead of isolated radial spokes.
+    // Mid-branch bridges create a true reticulum, not a starburst joined only at its tips.
+    for(let j=0;j<12;j++){
+      const A=branchCurves[j%branches].getPoint(.48+(j%3)*.08),B=branchCurves[(j*5+3)%branches].getPoint(.52+((j+1)%3)*.07);
+      const mid=A.clone().lerp(B,.5).add(new THREE.Vector3(Math.sin(j*1.7)*.12,Math.cos(j*1.3)*.12,(j%2?-.10:.10)));
+      const bridge=new THREE.CatmullRomCurve3([A,mid,B]);
+      group.add(new THREE.Mesh(new THREE.TubeGeometry(bridge,20,.0032,4,false),new THREE.MeshStandardMaterial({color,emissive:color,emissiveIntensity:.18,transparent:true,opacity:.38,depthWrite:false,roughness:.9})));
+    }
     for(let j=0;j<8;j++){
       const A=branchTips[(j*2)%branches],B=branchTips[(j*2+3)%branches];
       const mid=A.clone().lerp(B,.5).multiplyScalar(.91).add(new THREE.Vector3(0,.035,(j%2?-.08:.08)));
