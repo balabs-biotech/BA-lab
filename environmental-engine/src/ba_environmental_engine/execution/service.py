@@ -7,7 +7,7 @@ and application boundaries outside the calculation engine.
 
 from collections import defaultdict
 from datetime import date, datetime
-from typing import Mapping
+from typing import Iterable, Mapping
 from uuid import UUID
 
 from ba_environmental_engine.climate.aggregation import AggregationMethod
@@ -15,6 +15,7 @@ from ba_environmental_engine.climate.daily_reference import (
     calculate_daily_reference_indicators,
 )
 from ba_environmental_engine.climate.windows import calculate_rolling_climate_indicators
+from ba_environmental_engine.contracts.bal_json import BALAnalysis
 from ba_environmental_engine.serialization.bal_json import build_bal_analysis
 from ba_environmental_engine.sources.models import NormalizedEnvironmentalObservation
 
@@ -24,7 +25,7 @@ _DEFAULT_ROLLING_WINDOWS = (7, 14, 30, 90)
 
 def run_environmental_analysis(
     *,
-    observations: list[NormalizedEnvironmentalObservation] | tuple[NormalizedEnvironmentalObservation, ...],
+    observations: Iterable[NormalizedEnvironmentalObservation],
     analysis_id: UUID,
     generated_at: datetime,
     engine_version: str,
@@ -35,7 +36,7 @@ def run_environmental_analysis(
     rolling_methods: Mapping[str, AggregationMethod] | None = None,
     rolling_windows: tuple[int, ...] = _DEFAULT_ROLLING_WINDOWS,
     minimum_rolling_coverage: float = 1.0,
-):
+) -> BALAnalysis:
     """Run daily FAO-56 and optional rolling indicators, then build BAL-JSON.
 
     Daily FAO-56 inputs are grouped by observation date. The daily calculator
@@ -87,6 +88,18 @@ def run_environmental_analysis(
 
     rolling_results = []
     if rolling_methods:
+        if not rolling_windows or any(
+            isinstance(days, bool) or not isinstance(days, int) or days <= 0
+            for days in rolling_windows
+        ):
+            raise ValueError("rolling_windows must contain positive integers")
+        if len(set(rolling_windows)) != len(rolling_windows):
+            raise ValueError("rolling_windows must not contain duplicates")
+        available_scope_days = (scope_to - scope_from).days + 1
+        if max(rolling_windows) > available_scope_days:
+            raise ValueError(
+                "requested scope must contain the full length of every rolling window"
+            )
         if set(rolling_methods) != set(weather_by_variable):
             missing = sorted(set(rolling_methods) - set(weather_by_variable))
             raise ValueError(
