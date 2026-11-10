@@ -532,3 +532,96 @@ def test_sensor_analysis_endpoint_requires_complete_temporal_screening_configura
 
     assert response.status_code == 422
     assert "must be supplied together" in str(response.json()["detail"])
+
+
+def sensor_biological_interpretation_payload(request):
+    row = request["measurements"][0]
+    return {
+        "biological_context": {
+            "context_id": str(uuid4()),
+            "subject_id": str(uuid4()),
+            "organization_id": request["organization_id"],
+            "location_id": row["location_id"],
+            "environment_context_id": request["environment_id"],
+            "domain": "mycology",
+            "organism_kind": "fungus",
+            "taxon_code": "pleurotus_ostreatus",
+            "strain_code": "HK35",
+            "culture_stage": "fruiting",
+            "production_system": "fruiting_chamber",
+            "context_tags": ["production:protected"],
+            "valid_from": request["from_date"],
+            "valid_to": request["to_date"],
+        },
+        "environment_context": {
+            "context_id": request["environment_id"],
+            "organization_id": request["organization_id"],
+            "location_id": row["location_id"],
+            "context_type": "fruiting_chamber",
+            "label": "Mycology fruiting room",
+            "timezone": request["profile_timezone"],
+            "origin": "sensor",
+            "sensor_ids": [row["iot_device_id"]],
+            "profile_code": "mycology-fruiting-room",
+            "profile_version": "1.2.0",
+        },
+        "domain_profile": {
+            "profile_id": "mycology-sensor-v1",
+            "module": "mycology",
+            "version": "1.0.0",
+            "rules": [{
+                "rule_id": "coverage-review",
+                "variable_code": "air_temperature",
+                "finding_status": "insufficient_coverage",
+                "required_context_tags": ["stage:fruiting"],
+                "signal_code": "sensor_coverage_review",
+                "severity": "moderate",
+                "message_code": "sensor_coverage_insufficient",
+                "recommendation_code": None,
+            }],
+        },
+    }
+
+
+def test_sensor_analysis_api_interprets_with_validated_biological_context():
+    request = sensor_payload()
+    request["biological_interpretation"] = sensor_biological_interpretation_payload(request)
+    client = TestClient(create_app(engine_api_key="test-secret"))
+
+    response = client.post(
+        "/v1/analyses/sensors",
+        json=request,
+        headers={"X-BA-Engine-Key": "test-secret"},
+    )
+
+    assert response.status_code == 200, response.text
+    body = response.json()
+    assert body["interpretation_status"] == "interpreted"
+    interpretation = body["domain_interpretation"]
+    assert interpretation["module"] == "mycology"
+    assert interpretation["matched_findings"] == 1
+    signal = interpretation["signals"][0]
+    assert signal["finding_status"] == "insufficient_coverage"
+    assert signal["biological_context_id"] == request["biological_interpretation"]["biological_context"]["context_id"]
+    assert signal["environment_context_id"] == request["environment_id"]
+    assert len(signal["source_observation_ids"]) == 2
+
+
+def test_sensor_analysis_api_keeps_sensor_result_when_biological_context_is_invalid():
+    request = sensor_payload()
+    interpretation = sensor_biological_interpretation_payload(request)
+    interpretation["biological_context"]["environment_context_id"] = str(uuid4())
+    request["biological_interpretation"] = interpretation
+    client = TestClient(create_app(engine_api_key="test-secret"))
+
+    response = client.post(
+        "/v1/analyses/sensors",
+        json=request,
+        headers={"X-BA-Engine-Key": "test-secret"},
+    )
+
+    assert response.status_code == 200, response.text
+    body = response.json()
+    assert body["interpretation_status"] == "context_invalid"
+    assert body["domain_interpretation"] is None
+    assert body["analysis"]["total_observations"] == 2
