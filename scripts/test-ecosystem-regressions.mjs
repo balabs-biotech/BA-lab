@@ -7,8 +7,8 @@ const engine = readFileSync('ecosystem/engine-v2.js', 'utf8');
 const previewEngine = readFileSync('ecosystem-preview/engine-v2.js', 'utf8');
 const expectedDomains = ['bio', 'myco', 'soil', 'lab', 'products', 'iot', 'work', 'learn'];
 
-assert.ok(html.includes('engine-v2.js?v=20261110-clean-labels-v56'), 'Public explorer must load the cache-busted screen-space label engine');
-assert.ok(previewHtml.includes('engine-v2.js?v=20261110-clean-labels-v56'), 'Preview must load the matching cache-busted label engine');
+assert.ok(html.includes('engine-v2.js?v=20261110-clean-labels-v57'), 'Public explorer must load the cache-busted screen-space label engine');
+assert.ok(previewHtml.includes('engine-v2.js?v=20261110-clean-labels-v57'), 'Preview must load the matching cache-busted label engine');
 assert.ok(engine.includes('function syncLabelScales()') && engine.includes('cameraDistance*projection*targetPixels'), '3D labels must keep a stable screen-space size across zoom levels');
 assert.ok(engine.includes('resourceHitTargets.set(label,element)'), 'Public branch labels must have real DOM hit targets');
 assert.ok(engine.includes('domainHitTargets.set(id,{object:hit,button:domainButton})'), 'Public universes must have real clickable hit targets');
@@ -85,6 +85,9 @@ assert.ok(engine.includes('Sparse background hyphae connect the field'), 'The ov
 assert.ok(engine.includes('const branches=14;') && engine.includes('for(let j=0;j<branches;j++)'), 'Domain branches must retain dense radial connectivity');
 assert.ok(engine.includes("background:'transparent'") && engine.includes("boxShadow:'none'") && previewEngine.includes("background:'transparent'") && previewEngine.includes("boxShadow:'none'"), 'Floating branch labels must stay frameless instead of covering the mycelium with popup cards');
 assert.ok(engine.includes('flex-wrap:nowrap') && previewEngine.includes('flex-wrap:nowrap') && engine.includes('overflow-x:auto') && previewEngine.includes('overflow-x:auto'), 'Branch navigation must stay in a compact horizontal strip instead of a large popup grid');
+assert.ok(engine.includes("background:'transparent',border:'0',borderRadius:'0',boxShadow:'none'") && previewEngine.includes("background:'transparent',border:'0',borderRadius:'0',boxShadow:'none'"), 'Floating branch labels must remain frameless');
+assert.ok(html.includes('balabs-minimal-3d-overlays') && previewHtml.includes('balabs-minimal-3d-overlays'), 'Public and preview interfaces must suppress stacked popup frames consistently');
+
 assert.ok(engine.includes('const LINKS ='), 'The network must define explicit cross-domain connections');
 for (const [a,b] of [['bio','myco'],['myco','soil'],['soil','lab'],['lab','iot'],['lab','products'],['products','work'],['work','iot'],['products','learn']]) {
   assert.ok(engine.includes("['" + a + "','" + b + "']"), 'Missing cross-domain link ' + a + ' → ' + b);
