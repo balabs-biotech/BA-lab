@@ -204,6 +204,24 @@ begin
     null;
   end;
 
+  insert into public.environment_context_profiles(
+    organization_id, environment_id, profile_code, profile_version,
+    context_type, label, timezone, origin, valid_from, status
+  ) values (
+    v_org, v_environment, 'OVERLAPPING-VERSION', '1.0.0',
+    'greenhouse', 'Overlapping profile', 'Africa/Algiers', 'manual',
+    current_date, 'draft'
+  );
+
+  begin
+    update public.environment_context_profiles
+       set status = 'active'
+     where organization_id = v_org and profile_code = 'OVERLAPPING-VERSION';
+    raise exception 'FAIL: overlapping published environment profile was accepted';
+  exception when check_violation then
+    null;
+  end;
+
   insert into public.domain_interpretation_profiles(
     organization_id, id, domain, profile_code, profile_version,
     rules, valid_from, status
