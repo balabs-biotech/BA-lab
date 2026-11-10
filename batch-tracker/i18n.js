@@ -234,7 +234,6 @@
     ["Registre mycologique","Mycology register","Registo micológico","السجل الفطري"],
     ["Suivi expérimental","Experimental tracking","Acompanhamento experimental","المتابعة التجريبية"],
     ["Serre, substrats, irrigation, climat et croissance.","Greenhouse, substrates, irrigation, climate, and growth.","Estufa, substratos, rega, clima e crescimento.","الدفيئة والركائز والري والمناخ والنمو."],
-    ["Culture","Culture","Cultura","المستنبت"],
     ["supervision agronomique","agronomic monitoring","monitorização agronómica","المراقبة الزراعية"],
     ["Souches","Strains","Estirpes","السلالات"],
     ["Générations","Generations","Gerações","الأجيال"],
