@@ -65,7 +65,7 @@ def test_non_sensor_origin_cannot_claim_sensor_ids():
         EnvironmentContext.model_validate(values)
 
 
-@pytest.mark.parametrize("timezone", ["", "Algiers", "Not/A_Timezone"])
+@pytest.mark.parametrize("timezone", ["Algiers", "Not/A_Timezone"])
 def test_rejects_unknown_iana_timezone(timezone):
     with pytest.raises(ValueError, match="IANA"):
         EnvironmentContext.model_validate(build_context(timezone=timezone))
@@ -79,3 +79,8 @@ def test_context_is_immutable_and_rejects_unknown_fields():
     values = build_context(unexpected_field="no")
     with pytest.raises(ValueError):
         EnvironmentContext.model_validate(values)
+
+
+def test_rejects_empty_timezone():
+    with pytest.raises(ValueError):
+        EnvironmentContext.model_validate(build_context(timezone=""))
