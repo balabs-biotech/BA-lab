@@ -71,7 +71,7 @@ class BiologicalPerformanceResult:
     reason: str | None = None
 
 
-def analyze_growth_rate(
+def analyze_extent_growth_rate(
     measurements: Iterable[BiologicalMeasurement],
     *,
     organization_id: str,
@@ -79,7 +79,7 @@ def analyze_growth_rate(
     variable_code: str,
     accepted_quality_states: set[str] | frozenset[str],
 ) -> BiologicalPerformanceResult:
-    """Calculate first-to-last growth extent per elapsed day for one tenant/subject.
+    """Calculate first-to-last linear extent change per elapsed day for one tenant/subject.
 
     Values must already use the variable's canonical unit. This function does
     not convert units or choose a quality policy. The caller supplies the
@@ -123,12 +123,12 @@ def analyze_growth_rate(
     def insufficient(reason: str) -> BiologicalPerformanceResult:
         return BiologicalPerformanceResult(
             status="insufficient_evidence",
-            metric_code="growth_rate",
+            metric_code="extent_growth_rate",
             value=None,
             unit_code=None,
             source_record_ids=tuple(item.source_record_id for item in accepted),
             excluded_source_record_ids=excluded,
-            formula_code="net_growth_rate",
+            formula_code="net_extent_rate",
             formula_version="1.0.0",
             period_start=accepted[0].measured_at if accepted else None,
             period_end=accepted[-1].measured_at if accepted else None,
@@ -151,12 +151,12 @@ def analyze_growth_rate(
 
     return BiologicalPerformanceResult(
         status="calculated",
-        metric_code="growth_rate",
+        metric_code="extent_growth_rate",
         value=(last.value - first.value) / (elapsed_seconds / 86400),
         unit_code=f"{first.canonical_unit_code}/day",
         source_record_ids=tuple(item.source_record_id for item in accepted),
         excluded_source_record_ids=excluded,
-        formula_code="net_growth_rate",
+        formula_code="net_extent_rate",
         formula_version="1.0.0",
         period_start=first.measured_at,
         period_end=last.measured_at,
