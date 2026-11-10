@@ -27,7 +27,7 @@ def test_sensor_temporal_screen_flags_outlier_against_past_only_history():
 
 def test_sensor_temporal_screen_does_not_use_current_or_future_values_as_history():
     rows = [envelope(index * 60, value) for index, value in enumerate(
-        (10, 11, 12, 13, 14, 15, 16, 17)
+        (10, 11, 12, 13, 14, 15, 16, 100)
     )]
     results = assess_sensor_temporal_anomalies(
         rows,
