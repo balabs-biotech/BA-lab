@@ -80,6 +80,10 @@ def test_private_analysis_endpoint_returns_validated_bal_analysis():
         "net_radiation_fao56_daily",
         "reference_et0_fao56_daily",
     }
+    assert len(body["findings"]) == len(VALUES)
+    assert all(item["status"] == "insufficient_history" for item in body["findings"])
+    assert all(len(item["source_observation_ids"]) == 1 for item in body["findings"])
+    assert set(body["source_summary"][0]["variables"]) == set(VALUES)
 
 
 def test_private_analysis_endpoint_rejects_cross_tenant_observation():
