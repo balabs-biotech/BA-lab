@@ -7,6 +7,7 @@ const workspace = read("batch-tracker/workspace.html");
 const tracker = read("batch-tracker/tracker.js");
 const styles = read("batch-tracker/tracker.css");
 const locales = read("batch-tracker/i18n.js");
+const lineageIndexMigration = read("supabase/migrations/20261110220000_add_material_relationship_reverse_index.sql");
 
 for (const entry of [
   "batch-tracker/mycology/index.html",
@@ -77,6 +78,8 @@ assert.match(moduleSource, /strain:strains/);
 assert.match(moduleSource, /Généalogie des matériaux/);
 assert.match(moduleSource, /Relations entrantes :/);
 assert.match(moduleSource, /Lots matière :/);
+assert.match(lineageIndexMigration, /material_relationships_org_child_idx/);
+assert.match(lineageIndexMigration, /organization_id, child_material_id, parent_material_id/);
 assert.match(moduleSource, /payload\.operation/);
 assert.match(moduleSource, /\.in\("culture_id", cultureIds\)/);
 assert.match(moduleSource, /\.limit\(100\)/);
