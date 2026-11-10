@@ -9,15 +9,19 @@ declare
   v_location uuid := gen_random_uuid();
   v_environment uuid := gen_random_uuid();
   v_env_profile uuid := gen_random_uuid();
+  v_sensor_profile uuid := gen_random_uuid();
+  v_sensor_id uuid := gen_random_uuid();
   v_domain_profile uuid := gen_random_uuid();
   v_policy_count integer;
 begin
-  if v_env_table is null or v_domain_table is null then
+  if v_env_table is null or v_domain_table is null
+     or to_regclass('public.environment_context_profile_sensors') is null then
     raise exception 'FAIL: both versioned profile registries must exist';
   end if;
 
   if not (select relrowsecurity from pg_class where oid = v_env_table)
-     or not (select relrowsecurity from pg_class where oid = v_domain_table) then
+     or not (select relrowsecurity from pg_class where oid = v_domain_table)
+     or not (select relrowsecurity from pg_class where oid = 'public.environment_context_profile_sensors'::regclass) then
     raise exception 'FAIL: profile registries must have RLS enabled';
   end if;
 
@@ -95,7 +99,8 @@ begin
   end if;
 
   if has_table_privilege('anon', 'public.environment_context_profiles', 'SELECT')
-     or has_table_privilege('anon', 'public.domain_interpretation_profiles', 'SELECT') then
+     or has_table_privilege('anon', 'public.domain_interpretation_profiles', 'SELECT')
+     or has_table_privilege('anon', 'public.environment_context_profile_sensors', 'SELECT') then
     raise exception 'FAIL: anonymous profile access must remain disabled';
   end if;
 
@@ -108,11 +113,11 @@ begin
 
   insert into public.environment_context_profiles(
     organization_id, id, environment_id, profile_code, profile_version,
-    context_type, label, timezone, origin, sensor_ids,
+    context_type, label, timezone, origin,
     valid_from, status
   ) values (
     v_org, v_env_profile, v_environment, 'OUTDOOR-BASE', '1.0.0',
-    'outdoor', 'Outdoor site', 'Africa/Algiers', 'weather_provider', '{}',
+    'outdoor', 'Outdoor site', 'Africa/Algiers', 'weather_provider',
     date '2026-01-01', 'draft'
   );
 
@@ -132,6 +137,60 @@ begin
   update public.environment_context_profiles
      set status = 'retired'
    where organization_id = v_org and id = v_env_profile;
+
+  if not exists (
+    select 1 from pg_constraint
+    where conrelid = 'public.environment_context_profile_sensors'::regclass
+      and conname = 'environment_context_profile_sensors_device_fk'
+  ) or not exists (
+    select 1 from pg_trigger
+    where tgrelid = 'public.environment_context_profile_sensors'::regclass
+      and tgname = 'environment_context_profile_sensors_guard'
+      and not tgisinternal
+  ) then
+    raise exception 'FAIL: sensor bindings need tenant/environment foreign keys and lifecycle guard';
+  end if;
+
+  insert into public.iot_devices(
+    id, organization_id, environment_id, device_code, device_type, token_sha256
+  ) values (
+    v_sensor_id, v_org, v_environment, 'PROFILE-SENSOR', 'climate', repeat('a', 64)
+  );
+
+  insert into public.environment_context_profiles(
+    organization_id, id, environment_id, profile_code, profile_version,
+    context_type, label, timezone, origin, valid_from, status
+  ) values (
+    v_org, v_sensor_profile, v_environment, 'GREENHOUSE-SENSORS', '1.0.0',
+    'greenhouse', 'Greenhouse sensors', 'Africa/Algiers', 'sensor',
+    date '2026-11-11', 'draft'
+  );
+
+  begin
+    update public.environment_context_profiles
+       set status = 'active'
+     where organization_id = v_org and id = v_sensor_profile;
+    raise exception 'FAIL: sensor profile activated without a sensor binding';
+  exception when check_violation then
+    null;
+  end;
+
+  insert into public.environment_context_profile_sensors(
+    organization_id, profile_id, environment_id, sensor_id
+  ) values (v_org, v_sensor_profile, v_environment, v_sensor_id);
+
+  update public.environment_context_profiles
+     set status = 'active'
+   where organization_id = v_org and id = v_sensor_profile;
+
+  begin
+    delete from public.environment_context_profile_sensors
+     where organization_id = v_org and profile_id = v_sensor_profile
+       and sensor_id = v_sensor_id;
+    raise exception 'FAIL: active sensor profile binding was mutable';
+  exception when check_violation then
+    null;
+  end;
 
   insert into public.domain_interpretation_profiles(
     organization_id, id, domain, profile_code, profile_version,
