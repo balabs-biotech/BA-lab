@@ -16,7 +16,7 @@
     resolved: "Résolue",
     dismissed: "Écartée"
   };
-  const severityLabels = { critical: "Critique", high: "Élevée", medium: "Modérée", low: "Faible", info: "Information" };
+  const severityLabels = { critical: "Critique", high: "Élevée", moderate: "Modérée", low: "Faible", info: "Information" };
   const state = { userId: null, organizationId: null, domain: null, rows: [], filter: "active", request: 0 };
   const root = document.getElementById("biologicalSignalsCard");
   if (!root) return;
@@ -193,7 +193,13 @@
   });
   window.addEventListener("balabs:organization-context", event => {
     state.organizationId = event.detail?.organizationId || null;
-    if (state.userId && state.organizationId) void loadSignals();
+    if (!state.organizationId) {
+      state.rows = [];
+      render();
+      if (state.userId) notify("En attente du rattachement à l’organisation BA-LABS…");
+      return;
+    }
+    if (state.userId) void loadSignals();
   });
   let previousDomain = document.body.dataset.domain;
   new MutationObserver(() => {
