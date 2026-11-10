@@ -50,3 +50,10 @@ assert.match(source, /environment_context:\s*\{[\s\S]*?context_id:\s*environment
 assert.match(source, /interpretation_status:\s*interpretationResolution\.status\s*===\s*"ready"/, "the gateway must preserve explicit interpretation status");
 
 console.log("PASS: environmental analysis gateway security contract");
+
+const signalPersistence = source.indexOf('.from("biological_signals")');
+assert.ok(signalPersistence > engineCall, "engine-generated signals must only be persisted after the private engine responds");
+assert.match(source, /adminClient\s*\.from\("biological_signals"\)[\s\S]*?\.upsert\(/, "signal persistence must use the trusted service-role client and idempotent upsert");
+assert.match(source, /domain_profile_code:[\s\S]*?environment_profile_code:/, "persisted signals must retain both immutable profile version identifiers");
+assert.match(source, /source_observation_ids:[\s\S]*?context_tags:/, "persisted signals must retain observation provenance and biological context tags");
+assert.match(source, /biological_signal_persistence_failed/, "persistence failure must not be reported as a successful durable alert");
