@@ -39,6 +39,7 @@ def test_growth_rate_is_derived_from_two_quality_accepted_points_with_provenance
 def test_growth_rate_reports_insufficient_evidence_instead_of_fabricating_a_value():
     result = analyze_growth_rate(
         [measurement("m1", 0, 4)],
+        organization_id="org-1",
         subject_id="culture-1",
         accepted_quality_states={"verified"},
     )
@@ -51,6 +52,7 @@ def test_growth_rate_rejects_mixed_units_instead_of_comparing_them():
     with pytest.raises(ValueError, match="same unit"):
         analyze_growth_rate(
             [measurement("m1", 0, 4, unit="mm"), measurement("m2", 3, 1.6, unit="cm")],
+        organization_id="org-1",
             subject_id="culture-1",
             accepted_quality_states={"verified"},
         )
@@ -59,6 +61,7 @@ def test_growth_rate_rejects_mixed_units_instead_of_comparing_them():
 def test_growth_rate_excludes_quality_states_not_explicitly_accepted():
     result = analyze_growth_rate(
         [measurement("m1", 0, 4, quality="verified"), measurement("m2", 3, 16, quality="excluded")],
+        organization_id="org-1",
         subject_id="culture-1",
         accepted_quality_states={"verified"},
     )
@@ -71,6 +74,7 @@ def test_growth_rate_rejects_duplicate_source_ids():
     with pytest.raises(ValueError, match="unique"):
         analyze_growth_rate(
             [measurement("m1", 0, 4), measurement("m1", 3, 16)],
+        organization_id="org-1",
             subject_id="culture-1",
             accepted_quality_states={"verified"},
         )
@@ -90,6 +94,7 @@ def test_growth_rate_ignores_other_subjects_and_other_metric_codes():
     )
     result = analyze_growth_rate(
         [measurement("m1", 0, 4), measurement("m2", 2, 10), unrelated],
+        organization_id="org-1",
         subject_id="culture-1",
         accepted_quality_states={"verified"},
     )
