@@ -184,3 +184,27 @@ def test_repository_update_never_allows_tenant_or_primary_key_reassignment():
     assert "id" not in update_payload
     assert ("organization_id", record["organization_id"]) in client.query.filters
     assert ("id", record["id"]) in client.query.filters
+
+
+def test_repository_rejects_overlapping_contexts_instead_of_choosing_arbitrarily():
+    from copy import deepcopy
+
+    from ba_environmental_engine.contexts.persistence import (
+        SupabaseBiologicalContextRepository,
+    )
+
+    first = make_record("mycology")
+    second = deepcopy(first)
+    second["id"] = str(uuid4())
+    second["valid_from"] = "2026-11-01"
+    second["valid_to"] = "2026-11-20"
+    client = FakeSupabase([first, second])
+    repository = SupabaseBiologicalContextRepository(client)
+
+    with pytest.raises(ValueError, match="multiple biological contexts overlap"):
+        repository.get_for_subject_on_date(
+            organization_id=first["organization_id"],
+            domain=BiologicalDomain.MYCOLOGY,
+            subject_id=first["culture_id"],
+            on_date="2026-11-10",
+        )
