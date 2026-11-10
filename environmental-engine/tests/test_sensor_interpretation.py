@@ -134,3 +134,44 @@ def test_insufficient_history_signal_does_not_fabricate_zero_measurement():
     )
     assert result.matched_findings == 1
     assert result.signals[0].observed_value is None
+
+
+def test_sensor_interpretation_does_not_claim_full_coverage_without_declared_cadence():
+    analysis = make_analysis()
+    summary = analysis.series[0]
+    analysis = SensorAnalysis(
+        from_at=analysis.from_at,
+        to_at_exclusive=analysis.to_at_exclusive,
+        total_observations=analysis.total_observations,
+        excluded_observations=analysis.excluded_observations,
+        series=(SensorSeriesSummary(
+            **{
+                **summary.__dict__,
+                "expected_count": None,
+                "availability_ratio": None,
+                "gap_count": None,
+                "maximum_gap_seconds": None,
+            }
+        ),),
+    )
+    profile = DomainProfile(
+        profile_id="lab-cadence-unknown-v1",
+        module="lab",
+        version="1.0.0",
+        rules=(InterpretationRule(
+            rule_id="cadence-unknown",
+            variable_code="air_temperature",
+            finding_status="indeterminate",
+            signal_code="sensor_coverage_unknown",
+            severity="info",
+            message_code="sensor_sampling_interval_not_declared",
+        ),),
+    )
+    result = interpret_sensor_analysis(
+        analysis,
+        profile,
+        source_analysis_id=uuid4(),
+        observed_date=date(2026, 11, 10),
+    )
+    assert result.matched_findings == 1
+    assert result.signals[0].finding_status == "indeterminate"
