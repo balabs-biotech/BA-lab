@@ -204,13 +204,13 @@
     if (domain === "greentech") {
       const { data } = await client.from("plant_cultures")
         .select("code,crop_type,species_name,cultivar_name,status")
-        .eq("organization_id", state.organizationId).eq("id", id).maybeSingle();
+        .eq("organization_id", organizationId).eq("id", id).maybeSingle();
       return { title: data?.code || "Culture végétale", subtitle: [data?.species_name, data?.cultivar_name, data?.crop_type, data?.status].filter(Boolean).join(" · ") };
     }
     const [cultureResult, batchResult] = await Promise.all([
       client.from("cultures")
         .select("code,culture_type,material:materials(material_code,strain:strains(strain_code,designation,organism:organisms(scientific_name)))")
-        .eq("organization_id", state.organizationId).eq("id", id).maybeSingle(),
+        .eq("organization_id", organizationId).eq("id", id).maybeSingle(),
       client.from("batches")
         .select("batch_code,name,status,current_stage")
         .eq("organization_id", organizationId).eq("culture_id", id)
@@ -322,7 +322,7 @@
       const operations = lineage.events.filter(event => event.culture_id === culture.id);
       operations.forEach(event => {
         const payload = event.payload || {};
-        const operation = payload.operation_type || event.event_type;
+        const operation = payload.operation || payload.operation_type || event.event_type;
         const childCodes = Array.isArray(payload.child_codes) ? payload.child_codes.join(", ") : "";
         item.append(element("small", "signal-lineage-event",
           dateLabel(event.occurred_at) + " · " + operation + (childCodes ? " · Descendants : " + childCodes : "")));
