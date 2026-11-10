@@ -44,7 +44,7 @@ let world, cells = new Map(), pickables = [], resourceObjects = [], edges = [], 
 let resourceHitTargets = new Map(), domainHitTargets = new Map();
 let nav, branchDock, currentNode = null, currentAnchor = null, navigationStack = [];
 let selected = null, selectedBranch = null, manifest = null, transition = null;
-let distance = 17.5, zoomTargetDistance = 17.5, theta = .22, phi = 1.27, target = null, targetGoal = null;
+let distance = 19.5, zoomTargetDistance = 19.5, theta = .22, phi = 1.27, target = null, targetGoal = null;
 let opened = false, raf = 0, lastFrame = 0, dragging = false, moved = false, dragGesture = false;
 let lastPointer = null, pointers = new Map(), pinchStart = 0, pinchDistance = 0, pinchCenter = null, hoverId = null , lastBranchTouchActivationAt = 0;
 let canvasRect = null, cameraInitialized = false, lastPickAt = 0;
@@ -151,7 +151,7 @@ function createWorld() {
   const fieldPalette=[0x263b38,0xb96b4d,0xd1d0c5,0x78958a];
   for(let i=0;i<58;i++){const start=new THREE.Vector3(-5+fieldRand()*10,-4+fieldRand()*8,-3.5+fieldRand()*7),end=start.clone().add(new THREE.Vector3((fieldRand()-.5)*3.2,(fieldRand()-.5)*2.8,(fieldRand()-.5)*1.8)),mid=start.clone().lerp(end,.5).add(new THREE.Vector3((fieldRand()-.5)*.8,(fieldRand()-.5)*.8,(fieldRand()-.5)*.5)),curve=new THREE.CatmullRomCurve3([start,mid,end]),color=fieldPalette[Math.floor(fieldRand()*fieldPalette.length)];world.add(new THREE.Mesh(new THREE.TubeGeometry(curve,18,.0018+fieldRand()*.002,3,false),new THREE.MeshBasicMaterial({color,transparent:true,opacity:.10+fieldRand()*.14,depthWrite:false})));if(i%2===0){const at=curve.getPoint(.48),tip=at.clone().add(new THREE.Vector3((fieldRand()-.5)*1.5,(fieldRand()-.5)*1.5,(fieldRand()-.5)*.8)),fork=new THREE.CatmullRomCurve3([at,at.clone().lerp(tip,.5).add(new THREE.Vector3(0,.05,.03)),tip]);world.add(new THREE.Mesh(new THREE.TubeGeometry(fork,12,.0016,3,false),new THREE.MeshBasicMaterial({color,transparent:true,opacity:.12,depthWrite:false})))}}
   for(const id of IDS){
-    const color=COLORS[id],pos=new THREE.Vector3(...POS[id]).multiplyScalar(1.38);
+    const color=COLORS[id],pos=new THREE.Vector3(...POS[id]).multiplyScalar(1.62);
     const group=new THREE.Group();group.position.copy(pos);group.userData={id,kind:'domain'};
     // The colony centre is an open hyphal junction, never a solid cell/planet.
     const soma=new THREE.Group();soma.userData={id,kind:'domain'};group.add(soma);
@@ -416,7 +416,7 @@ function goOverview() {
   selected=null;selectedBranch=null;navigationStack=[];currentNode=null;currentAnchor=null;if(status)status.hidden=false;clearResources();nav?.replaceChildren();nav.hidden=true;if(branchDock){branchDock.replaceChildren();branchDock.hidden=true}panel.hidden=true;panel.replaceChildren();
   const mini=document.getElementById('miniView');if(mini){mini.hidden=true;mini.classList.remove('spatial-source-only')}
   const homeButton=document.getElementById('homeBtn');if(homeButton)homeButton.hidden=true;
-  smoothCamera(new THREE.Vector3(0,0,0),17.5,850,()=>{status.textContent='BALABS / LIVING NETWORK'});
+  smoothCamera(new THREE.Vector3(0,0,0),19.5,850,()=>{status.textContent='BALABS / LIVING NETWORK'});
 }
 function showFailure(error) {
   console.error('BA Labs clean 3D engine failed',error);
