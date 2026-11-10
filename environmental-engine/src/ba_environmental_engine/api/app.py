@@ -8,13 +8,14 @@ from __future__ import annotations
 
 import os
 import secrets
-from datetime import date, datetime, timezone
+from datetime import date, datetime, time, timedelta, timezone
 from typing import Annotated, Any, Literal
+from zoneinfo import ZoneInfo
 from uuid import UUID
 
 from fastapi import Depends, FastAPI, Header, HTTPException, status
 from fastapi.encoders import jsonable_encoder
-from pydantic import BaseModel, ConfigDict, Field, StrictInt, ValidationError, model_validator
+from pydantic import BaseModel, ConfigDict, Field, StrictFloat, StrictInt, ValidationError, model_validator
 
 from ba_environmental_engine.contexts.biological import BiologicalContext
 from ba_environmental_engine.contexts.environment import EnvironmentContext
@@ -150,7 +151,7 @@ class SensorAnalysisRequest(APIModel):
     expected_interval_seconds: StrictInt | None = Field(default=None, gt=0)
     temporal_window_seconds: StrictInt | None = Field(default=None, gt=0)
     temporal_minimum_history: StrictInt | None = Field(default=None, gt=0)
-    temporal_threshold: float | None = Field(default=None, gt=0)
+    temporal_threshold: StrictFloat | None = Field(default=None, gt=0)
     measurements: list[dict[str, Any]] = Field(min_length=1, max_length=5000)
 
     @model_validator(mode="after")
@@ -368,15 +369,28 @@ def create_app(engine_api_key: str | None = None) -> FastAPI:
             )
             temporal_screening = {"status": "not_requested", "assessments": []}
             if request.temporal_window_seconds is not None:
+                profile_zone = ZoneInfo(request.profile_timezone)
+                evaluation_start = datetime.combine(
+                    request.from_date, time.min, tzinfo=profile_zone
+                ).astimezone(timezone.utc)
+                evaluation_end = datetime.combine(
+                    request.to_date + timedelta(days=1),
+                    time.min,
+                    tzinfo=profile_zone,
+                ).astimezone(timezone.utc)
                 assessments = assess_sensor_temporal_anomalies(
                     envelopes,
                     window_seconds=request.temporal_window_seconds,
                     minimum_history=request.temporal_minimum_history,
                     threshold=request.temporal_threshold,
                 )
+                scoped_assessments = tuple(
+                    item for item in assessments
+                    if evaluation_start <= item.observed_at < evaluation_end
+                )
                 temporal_screening = {
                     "status": "completed",
-                    "assessments": jsonable_encoder(assessments),
+                    "assessments": jsonable_encoder(scoped_assessments),
                 }
             return {
                 "analysis_id": str(request.analysis_id),
