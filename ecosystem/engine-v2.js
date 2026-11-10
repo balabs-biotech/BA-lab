@@ -267,8 +267,8 @@ function addResourceHitTarget(label) {
  element.className='webgl-hit-target webgl-resource-target';
  element.textContent=data.title||data.name||'Ouvrir';
  const compact=window.innerWidth<760;
- const width=Math.min(compact?210:280,Math.max(compact?128:150,String(element.textContent).length*(compact?7.4:8.5)+32));
- Object.assign(element.style,{display:'block',opacity:'1',visibility:'visible',color:'#f4f5ed',background:'transparent',border:'0',borderRadius:'0',boxShadow:'none',textDecoration:'none',font:'700 '+(compact?'15px':'17px')+'/1.2 system-ui,sans-serif',textAlign:'center',whiteSpace:'normal',overflow:'visible',textOverflow:'clip',textShadow:'0 1px 3px #07110f,0 2px 8px #07110f,1px 0 3px #07110f,-1px 0 3px #07110f',padding:'3px 5px',width:width+'px',height:'auto',minHeight:'44px',maxHeight:'68px',minWidth:compact?'112px':'130px',maxWidth:compact?'210px':'280px',pointerEvents:'auto',touchAction:'manipulation',transform:'translate(-50%,-50%)',cursor:'pointer'});
+ const width=Math.min(compact?184:220,Math.max(compact?120:140,String(element.textContent).length*(compact?6.1:6.7)+24));
+ Object.assign(element.style,{display:'-webkit-box',WebkitBoxOrient:'vertical',WebkitLineClamp:'3',boxSizing:'border-box',opacity:'1',visibility:'visible',color:'#f4f5ed',background:'transparent',border:'0',borderRadius:'0',boxShadow:'none',textDecoration:'none',font:'650 '+(compact?'12px':'13px')+'/1.18 system-ui,sans-serif',textAlign:'center',whiteSpace:'normal',overflow:'hidden',textOverflow:'ellipsis',textShadow:'0 1px 3px #07110f,0 2px 8px #07110f,1px 0 3px #07110f,-1px 0 3px #07110f',padding:'2px 4px',width:width+'px',height:'auto',minHeight:'40px',maxHeight:'50px',minWidth:compact?'112px':'130px',maxWidth:compact?'184px':'220px',pointerEvents:'auto',touchAction:'manipulation',transform:'translate(-50%,-50%)',cursor:'pointer'});
  element.setAttribute('aria-label',(data.title||data.name||'Branche')+(hasChildren?' — ouvrir le dossier':' — ouvrir la page'));
  element.title=data.title||data.name||'';
  element.dataset.hasChildren=String(hasChildren);element.dataset.depth=String(data.depth||0);element.dataset.resourceUrl=data.url||'';
