@@ -6,9 +6,10 @@ joins and selecting an active sensor profile; this adapter verifies that evidenc
 from __future__ import annotations
 
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 from typing import Any
 from uuid import UUID
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 from ba_environmental_engine.contexts.measurement import (
     EnvironmentalMeasurement,
@@ -51,12 +52,25 @@ def _timestamp(value: Any) -> datetime:
     return value.astimezone(timezone.utc)
 
 
+def _profile_date(value: Any, field: str) -> date | None:
+    if value is None:
+        return None
+    if isinstance(value, datetime):
+        raise ValueError(f"{field} must be a calendar date, not a timestamp")
+    if isinstance(value, date):
+        return value
+    if isinstance(value, str):
+        try:
+            return date.fromisoformat(value)
+        except ValueError as exc:
+            raise ValueError(f"{field} must be an ISO calendar date") from exc
+    raise ValueError(f"{field} must be a calendar date")
+
+
 def normalize_iot_measurement_row(row: dict[str, Any]) -> SensorMeasurementEnvelope:
     """Validate and normalize one joined measurement/device/environment/profile row.
 
-    Required join aliases: device_organization_id, device_environment_id,
-    environment_organization_id, location_id, profile_origin, profile_status,
-    profile_valid_from, profile_valid_to and profile_sensor_bound.
+    Profile validity columns are SQL DATE values and are evaluated in profile timezone.
     """
     if not isinstance(row, dict):
         raise ValueError("measurement row must be an object")
@@ -83,16 +97,20 @@ def normalize_iot_measurement_row(row: dict[str, Any]) -> SensorMeasurementEnvel
         raise ValueError("device is not bound to the selected environment profile")
 
     observed_at = _timestamp(row.get("measured_at"))
-    valid_from = row.get("profile_valid_from")
-    valid_to = row.get("profile_valid_to")
-    if valid_from is not None:
-        start = _timestamp(valid_from)
-        if observed_at < start:
-            raise ValueError("measurement falls before the sensor profile validity window")
-    if valid_to is not None:
-        end = _timestamp(valid_to)
-        if observed_at > end:
-            raise ValueError("measurement falls after the sensor profile validity window")
+    profile_timezone = row.get("profile_timezone")
+    if not isinstance(profile_timezone, str) or not profile_timezone:
+        raise ValueError("profile_timezone is required")
+    try:
+        local_observed_date = observed_at.astimezone(ZoneInfo(profile_timezone)).date()
+    except (ZoneInfoNotFoundError, ValueError) as exc:
+        raise ValueError("profile_timezone must be a valid IANA timezone") from exc
+
+    valid_from = _profile_date(row.get("profile_valid_from"), "profile_valid_from")
+    valid_to = _profile_date(row.get("profile_valid_to"), "profile_valid_to")
+    if valid_from is not None and local_observed_date < valid_from:
+        raise ValueError("measurement falls before the sensor profile validity window")
+    if valid_to is not None and local_observed_date > valid_to:
+        raise ValueError("measurement falls after the sensor profile validity window")
 
     normalized_value = row.get("normalized_value")
     normalized_unit = row.get("normalized_unit_code")
@@ -121,8 +139,9 @@ def normalize_iot_measurement_row(row: dict[str, Any]) -> SensorMeasurementEnvel
     if not isinstance(device_type, str) or not device_type.strip():
         raise ValueError("device_type is required")
 
+    observation_id = _uuid(row, "id")
     measurement = EnvironmentalMeasurement.model_validate({
-        "observation_id": _uuid(row, "id"),
+        "observation_id": observation_id,
         "organization_id": organization_id,
         "location_id": location_id,
         "context_id": environment_id,
@@ -132,7 +151,7 @@ def normalize_iot_measurement_row(row: dict[str, Any]) -> SensorMeasurementEnvel
         "value": value,
         "unit_code": unit,
         "observed_at": observed_at,
-        "source_observation_ids": [_uuid(row, "id")],
+        "source_observation_ids": [observation_id],
     })
 
     return SensorMeasurementEnvelope(
