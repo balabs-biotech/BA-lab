@@ -97,6 +97,7 @@ class _Point:
     observed_at: datetime
     value: float
     observation_id: UUID
+    quality_state: str
 
 
 def _matches(value: float, operator: str, threshold: float) -> bool:
@@ -141,9 +142,10 @@ def detect_sensor_events(
             if measurement.variable_code != rule.variable_code:
                 continue
             if measurement.unit_code != rule.unit_code:
-                continue
-            if envelope.quality_state not in rule.accepted_quality_states:
-                continue
+                raise ValueError(
+                    f"sensor variable {rule.variable_code} unit {measurement.unit_code} "
+                    f"does not match event rule unit {rule.unit_code}"
+                )
             if not rule.required_context_tags.issubset(context_tags):
                 continue
             if measurement.origin.value != "sensor" or measurement.sensor_id is None:
@@ -153,6 +155,7 @@ def detect_sensor_events(
                 observed_at=measurement.observed_at,
                 value=measurement.value,
                 observation_id=measurement.observation_id,
+                quality_state=envelope.quality_state,
             ))
 
         for (sensor_id, variable_code), points in groups.items():
@@ -198,6 +201,10 @@ def detect_sensor_events(
                 ))
 
             for point in points:
+                if point.quality_state not in rule.accepted_quality_states:
+                    flush()
+                    run.clear()
+                    continue
                 if not _matches(point.value, rule.operator, rule.threshold):
                     flush()
                     run.clear()
