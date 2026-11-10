@@ -1,5 +1,3 @@
-from datetime import datetime, timezone
-
 import pytest
 
 from ba_environmental_engine.indicators.measurement_adapter import (
