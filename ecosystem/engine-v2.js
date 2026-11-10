@@ -287,7 +287,7 @@ function syncResourceHitTargets() {
   if(!visible)return;
   projected.push({object,button,p,x:rect.left+(p.x+1)*rect.width/2-stageRect.left,y:rect.top+(1-p.y)*rect.height/2-stageRect.top,depth});
  };
- for(const {object,button} of domainHitTargets.values()){project(object,button);button.hidden=!opened||!!selected||button.hidden}
+ for(const {object,button} of domainHitTargets.values()){if(!opened||!!selected){button.hidden=true;button.style.display='none';continue;}project(object,button)}
  for(const [label,button] of resourceHitTargets)project(label,button);
  // Place labels in screen space, not directly on top of one another. This is
  // especially important on narrow mobile screens where projected branches cluster.
@@ -297,9 +297,9 @@ function syncResourceHitTargets() {
   .filter(el=>!el.hidden&&getComputedStyle(el).display!=='none')
   .map(el=>{const r=el.getBoundingClientRect();return {l:r.left-stageRect.left,t:r.top-stageRect.top,r:r.right-stageRect.left,b:r.bottom-stageRect.top}});
  const overlaps=(a,b)=>a.l<b.r+8&&a.r>b.l-8&&a.t<b.b+8&&a.b>b.t-8;
- const offsets=[[0,0],[1,0],[-1,0],[0,1],[0,-1],[1,1],[-1,1],[1,-1],[-1,-1],[2,0],[-2,0],[0,2],[0,-2]];
+ const offsets=[[0,0]];for(let ring=1;ring<=4;ring++){const steps=ring*8;for(let step=0;step<steps;step++){const angle=step/steps*Math.PI*2;offsets.push([Math.cos(angle)*ring,Math.sin(angle)*ring]);}}
  for(const item of projected){
-  const {button}=item,columns=stageRect.width<560?2:3,slotWidth=stageRect.width/columns;button.style.maxWidth=Math.max(128,slotWidth-12)+'px';button.style.width=Math.min(button.offsetWidth||150,slotWidth-12)+'px';const w=button.offsetWidth||150,h=button.offsetHeight||50;
+  const {button}=item,columns=stageRect.width<380?2:3,slotWidth=stageRect.width/columns;button.style.maxWidth=Math.max(128,slotWidth-12)+'px';button.style.width=Math.min(button.offsetWidth||150,slotWidth-12)+'px';const w=button.offsetWidth||150,h=button.offsetHeight||50;
   const sx=Math.max(w/2+6,Math.min(stageRect.width-w/2-6,item.x)),sy=Math.max(h/2+6,Math.min(stageRect.height-h/2-6,item.y));
   const stepX=w/2+12,stepY=h/2+12;
   let chosen=null;
@@ -310,22 +310,17 @@ function syncResourceHitTargets() {
    if(!occupied.some(r=>overlaps(box,r))&&!obstacles.some(r=>overlaps(box,r))){chosen={cx,cy,box};break}
   }
   if(!chosen){
-   // On narrow screens, clustered branches can project to the same pixels.
-   // Fall back to a compact, collision-free screen-space index so every folder
-   // remains visible and directly tappable instead of stacking invisible buttons.
-   const columns=stageRect.width<560?2:3,slotWidth=stageRect.width/columns;
-   const rows=Math.max(2,Math.ceil(projected.length/columns));
-   const candidates=[];
-   for(let row=0;row<rows;row++)for(let col=0;col<columns;col++){
-    const cx=slotWidth*(col+.5),cy=stageRect.height*(.28+row*.44/Math.max(1,rows-1));
+   // Keep the label anchored near its own projected branch. If the viewport is
+   // genuinely saturated, prefer the least-overlapping nearby position rather
+   // than moving every label into a detached screen-space index.
+   const candidates=offsets.map(([ox,oy])=>{
+    const cx=Math.max(w/2+6,Math.min(stageRect.width-w/2-6,sx+ox*stepX));
+    const cy=Math.max(h/2+6,Math.min(stageRect.height-h/2-6,sy+oy*stepY));
     const box={l:cx-w/2,t:cy-h/2,r:cx+w/2,b:cy+h/2};
-    if(box.l>=4&&box.r<=stageRect.width-4&&box.t>=4&&box.b<=stageRect.height-4)candidates.push({cx,cy,box});
-   }
-   chosen=candidates.find(candidate=>!occupied.some(r=>overlaps(candidate.box,r))&&!obstacles.some(r=>overlaps(candidate.box,r)))||null;
-   if(!chosen){
-    const cx=Math.max(w/2+4,Math.min(stageRect.width-w/2-4,sx)),cy=Math.max(h/2+4,Math.min(stageRect.height-h/2-4,sy));
-    chosen={cx,cy,box:{l:cx-w/2,t:cy-h/2,r:cx+w/2,b:cy+h/2}};
-   }
+    const conflicts=occupied.filter(r=>overlaps(box,r)).length+obstacles.filter(r=>overlaps(box,r)).length;
+    return{cx,cy,box,conflicts,displacement:Math.hypot(cx-sx,cy-sy)};
+   }).sort((a,b)=>a.conflicts-b.conflicts||a.displacement-b.displacement);
+   chosen=candidates[0]||{cx:sx,cy:sy,box:{l:sx-w/2,t:sy-h/2,r:sx+w/2,b:sy+h/2}};
   }
   occupied.push(chosen.box);
   button.style.setProperty('z-index',String(12000+Math.round((1-item.p.z)*100)),'important');
