@@ -45,6 +45,12 @@ assert.match(moduleSource, /resolveHistoryIdentity\(kind, id\)/);
 assert.match(moduleSource, /identity\.title/);
 assert.match(moduleSource, /identity\.subtitle/);
 assert.match(moduleSource, /async function resolveCultureLineage/);
+assert.match(moduleSource, /async function resolveCultureLineage\(cultureId, organizationId\)/);
+assert.match(moduleSource, /resolveCultureLineage\(id, organizationId\)/);
+assert.match(moduleSource, /kind === "biological_subject_id" && domain !== "greentech"/);
+assert.match(moduleSource, /resolveHistoryIdentity\(kind, id, organizationId, domain\)/);
+assert.match(moduleSource, /\.eq\("organization_id", organizationId\)\.eq\("domain", domain\)\.eq\(kind, id\)/);
+
 assert.match(moduleSource, /parent_culture_id/);
 assert.match(moduleSource, /\.eq\("parent_culture_id", cultureId\)/);
 assert.match(moduleSource, /\.in\("culture_id", cultureIds\)/);
