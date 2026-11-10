@@ -15,6 +15,8 @@ def source_row(**overrides):
         "location_id": "b08a9c31-7fd8-4e6c-9b84-2e99d0f1a003",
         "provider_code": "NASA_POWER",
         "dataset_code": "POWER_DAILY_AGRO",
+        "data_family": "weather",
+        "spatial_resolution_m": 55_000,
         "variable_code": "precipitation_corrected",
         "value": 12.5,
         "unit_code": "mm/day",
