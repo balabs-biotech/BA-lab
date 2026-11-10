@@ -625,3 +625,52 @@ def test_sensor_analysis_api_keeps_sensor_result_when_biological_context_is_inva
     assert body["interpretation_status"] == "context_invalid"
     assert body["domain_interpretation"] is None
     assert body["analysis"]["total_observations"] == 2
+
+
+def test_sensor_temporal_suspect_is_routed_through_versioned_biological_profile():
+    request = sensor_payload()
+    template = request["measurements"][0]
+    request["measurements"] = []
+    for index, value in enumerate((10, 11, 12, 13, 14, 15, 16, 17, 100)):
+        row = dict(template)
+        row["id"] = str(uuid4())
+        row["raw_value"] = value
+        row["measured_at"] = f"2026-03-01T{index:02d}:00:00+00:00"
+        request["measurements"].append(row)
+    request["temporal_window_seconds"] = 9 * 60 * 60
+    request["temporal_minimum_history"] = 7
+    request["temporal_threshold"] = 3.5
+
+    interpretation = sensor_biological_interpretation_payload(request)
+    interpretation["domain_profile"]["rules"] = [{
+        "rule_id": "fruiting-temperature-deviation",
+        "variable_code": "air_temperature",
+        "finding_status": "suspect",
+        "required_context_tags": ["stage:fruiting"],
+        "signal_code": "temperature_deviation_review",
+        "severity": "high",
+        "message_code": "temperature_deviation_review",
+        "recommendation_code": "review_fruiting_conditions",
+    }]
+    request["biological_interpretation"] = interpretation
+    client = TestClient(create_app(engine_api_key="test-secret"))
+
+    response = client.post(
+        "/v1/analyses/sensors",
+        json=request,
+        headers={"X-BA-Engine-Key": "test-secret"},
+    )
+
+    assert response.status_code == 200, response.text
+    body = response.json()
+    assert body["temporal_screening"]["assessments"][-1]["status"] == "suspect"
+    signals = body["domain_interpretation"]["signals"]
+    assert len(signals) == 1
+    signal = signals[0]
+    assert signal["signal_code"] == "temperature_deviation_review"
+    assert signal["finding_status"] == "suspect"
+    assert signal["observed_value"] == 100
+    assert signal["source_observation_ids"] == [request["measurements"][-1]["id"]]
+    assert signal["evidence"]["assessment_type"] == "causal_robust_temporal_screen"
+    assert signal["evidence"]["robust_z_score"] > 3.5
+    assert signal["evidence"]["temporal_window_seconds"] == 9 * 60 * 60
