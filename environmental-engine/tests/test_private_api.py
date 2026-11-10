@@ -487,3 +487,48 @@ def test_sensor_analysis_endpoint_rejects_non_iot_provenance():
     )
     assert response.status_code == 422
     assert "IoT source row" in str(response.json()["detail"])
+
+
+def test_sensor_analysis_endpoint_can_return_causal_temporal_screening():
+    request = sensor_payload()
+    template = request["measurements"][0]
+    request["measurements"] = []
+    for index, value in enumerate((10, 11, 12, 13, 14, 15, 16, 17, 100)):
+        row = dict(template)
+        row["id"] = str(uuid4())
+        row["raw_value"] = value
+        row["measured_at"] = f"2026-03-01T{index:02d}:00:00+00:00"
+        request["measurements"].append(row)
+    request["temporal_window_seconds"] = 9 * 60 * 60
+    request["temporal_minimum_history"] = 7
+    request["temporal_threshold"] = 3.5
+    client = TestClient(create_app(engine_api_key="test-secret"))
+
+    response = client.post(
+        "/v1/analyses/sensors",
+        json=request,
+        headers={"X-BA-Engine-Key": "test-secret"},
+    )
+
+    assert response.status_code == 200, response.text
+    body = response.json()
+    assert body["temporal_screening"]["status"] == "completed"
+    final = body["temporal_screening"]["assessments"][-1]
+    assert final["status"] == "suspect"
+    assert final["history_count"] == 8
+    assert final["observation_id"] == request["measurements"][-1]["id"]
+
+
+def test_sensor_analysis_endpoint_requires_complete_temporal_screening_configuration():
+    request = sensor_payload()
+    request["temporal_window_seconds"] = 3600
+    client = TestClient(create_app(engine_api_key="test-secret"))
+
+    response = client.post(
+        "/v1/analyses/sensors",
+        json=request,
+        headers={"X-BA-Engine-Key": "test-secret"},
+    )
+
+    assert response.status_code == 422
+    assert "must be supplied together" in str(response.json()["detail"])
