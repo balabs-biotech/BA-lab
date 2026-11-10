@@ -542,3 +542,27 @@ def test_persisted_profile_orchestrator_does_not_fallback_when_domain_profile_mi
             domain=BiologicalDomain.MYCOLOGY,
             subject_id=biological.subject_id,
         )
+
+
+def test_biological_context_must_cover_the_complete_analysis_scope():
+    import pytest
+
+    analysis = make_analysis()
+    biological, environment = make_persisted_context_for_analysis(
+        analysis,
+        valid_from=analysis.scope.from_date + timedelta(days=1),
+    )
+    profile = DomainProfile(
+        profile_id="mycology-full-window-v1",
+        module="mycology",
+        version="1.0.0",
+        rules=(),
+    )
+
+    with pytest.raises(ValueError, match="cover the complete analysis scope"):
+        interpret_analysis_for_biological_context(
+            analysis,
+            profile,
+            biological,
+            environment,
+        )
