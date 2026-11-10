@@ -32,10 +32,10 @@ const LABELS = Object.fromEntries([...document.querySelectorAll('.sphere[data-sp
 }]));
 const LANG = () => (document.documentElement.lang || 'fr').toLowerCase().split('-')[0];
 const COPY = {
-  fr:{hint:'FAITES GLISSER POUR TOURNER · PINCEZ POUR ZOOMER · TOUCHEZ UNE CELLULE',open:'ENTRER DANS LE RÉSEAU',home:'Vue d’ensemble',zoomIn:'Zoom avant',zoomOut:'Zoom arrière',reset:'Recentrer',domain:'DOMAINE',resource:'BRANCHE DU RÉSEAU',openPage:'Ouvrir la page Notion ↗',back:'← Retour au domaine',related:'CONNEXIONS',empty:'Aucune branche publique trouvée pour ce domaine.',loading:'Chargement du réseau…',overview:'Vue d’ensemble',children:'sous-dossiers'},
-  en:{hint:'DRAG TO ROTATE · PINCH TO ZOOM · TAP A CELL',open:'ENTER THE NETWORK',home:'Overview',zoomIn:'Zoom in',zoomOut:'Zoom out',reset:'Recenter',domain:'DOMAIN',resource:'NETWORK BRANCH',openPage:'Open Notion page ↗',back:'← Back to domain',related:'CONNECTIONS',empty:'No public branches found for this domain.',loading:'Loading network…'},
-  ar:{hint:'اسحب للتدوير · اقرص للتكبير · المس خلية',open:'ادخل إلى الشبكة',home:'نظرة عامة',zoomIn:'تكبير',zoomOut:'تصغير',reset:'إعادة التمركز',domain:'المجال',resource:'فرع الشبكة',openPage:'فتح صفحة Notion ↗',back:'→ العودة إلى المجال',related:'الروابط',empty:'لا توجد فروع عامة لهذا المجال.',loading:'جارٍ تحميل الشبكة…'},
-  pt:{hint:'ARRASTE PARA RODAR · PINÇA PARA AMPLIAR · TOQUE NUMA CÉLULA',open:'ENTRAR NA REDE',home:'Visão geral',zoomIn:'Aproximar',zoomOut:'Afastar',reset:'Recentralizar',domain:'DOMÍNIO',resource:'RAMO DA REDE',openPage:'Abrir página Notion ↗',back:'← Voltar ao domínio',related:'LIGAÇÕES',empty:'Não foram encontrados ramos públicos.',loading:'A carregar a rede…'},
+  fr:{hint:'1 DOIGT : TOURNER · 2 DOIGTS : DÉPLACER LA CARTE · PINCER : ZOOMER · TOUCHER : SÉLECTIONNER',open:'ENTRER DANS LE RÉSEAU',home:'Vue d’ensemble',zoomIn:'Zoom avant',zoomOut:'Zoom arrière',reset:'Recentrer',domain:'DOMAINE',resource:'BRANCHE DU RÉSEAU',openPage:'Ouvrir la page Notion ↗',back:'← Retour au domaine',related:'CONNEXIONS',empty:'Aucune branche publique trouvée pour ce domaine.',loading:'Chargement du réseau…',overview:'Vue d’ensemble',children:'sous-dossiers'},
+  en:{hint:'1 FINGER: ROTATE · 2 FINGERS: MOVE MAP · PINCH: ZOOM · TAP TO SELECT',open:'ENTER THE NETWORK',home:'Overview',zoomIn:'Zoom in',zoomOut:'Zoom out',reset:'Recenter',domain:'DOMAIN',resource:'NETWORK BRANCH',openPage:'Open Notion page ↗',back:'← Back to domain',related:'CONNECTIONS',empty:'No public branches found for this domain.',loading:'Loading network…'},
+  ar:{hint:'إصبع واحد: تدوير · إصبعان: تحريك الخريطة · ضمّ الأصابع: تكبير · المس للاختيار',open:'ادخل إلى الشبكة',home:'نظرة عامة',zoomIn:'تكبير',zoomOut:'تصغير',reset:'إعادة التمركز',domain:'المجال',resource:'فرع الشبكة',openPage:'فتح صفحة Notion ↗',back:'→ العودة إلى المجال',related:'الروابط',empty:'لا توجد فروع عامة لهذا المجال.',loading:'جارٍ تحميل الشبكة…'},
+  pt:{hint:'1 DEDO: RODAR · 2 DEDOS: MOVER O MAPA · PINÇA: ZOOM · TOQUE PARA SELECIONAR',open:'ENTRAR NA REDE',home:'Visão geral',zoomIn:'Aproximar',zoomOut:'Afastar',reset:'Recentralizar',domain:'DOMÍNIO',resource:'RAMO DA REDE',openPage:'Abrir página Notion ↗',back:'← Voltar ao domínio',related:'LIGAÇÕES',empty:'Não foram encontrados ramos públicos.',loading:'A carregar a rede…'},
 };
 const t = key => (COPY[LANG()] || COPY.fr)[key] || COPY.fr[key];
 
@@ -46,7 +46,7 @@ let nav, branchDock, currentNode = null, currentAnchor = null, navigationStack =
 let selected = null, selectedBranch = null, manifest = null, transition = null;
 let distance = 13.5, zoomTargetDistance = 13.5, theta = .22, phi = 1.27, target = null, targetGoal = null;
 let opened = false, raf = 0, lastFrame = 0, dragging = false, moved = false, dragGesture = false;
-let lastPointer = null, pointers = new Map(), pinchStart = 0, pinchDistance = 0, hoverId = null;
+let lastPointer = null, pointers = new Map(), pinchStart = 0, pinchDistance = 0, pinchCenter = null, hoverId = null;
 let canvasRect = null, cameraInitialized = false, lastPickAt = 0;
 let _hitWorld = null;
 let labelWorldPosition = null;
@@ -207,6 +207,17 @@ function cameraPosition() {
   camera.lookAt(c);
 }
 function setCameraTarget(v) { target=v.clone();cameraPosition(); }
+function panCameraByPixels(dx,dy) {
+  if(!camera||!stage||!target)return;
+  camera.updateMatrixWorld(true);
+  const right=new THREE.Vector3().setFromMatrixColumn(camera.matrixWorld,0);
+  const up=new THREE.Vector3().setFromMatrixColumn(camera.matrixWorld,1);
+  const height=Math.max(1,stage.clientHeight);
+  const worldPerPixel=2*distance*Math.tan(THREE.MathUtils.degToRad(camera.fov*.5))/height;
+  target.addScaledVector(right,-dx*worldPerPixel);
+  target.addScaledVector(up,dy*worldPerPixel);
+  cameraPosition();
+}
 function resize() {
   if(!renderer||!camera||!stage)return;
   const w=Math.max(1,stage.clientWidth),h=Math.max(1,stage.clientHeight);
@@ -480,18 +491,30 @@ function setupUI() {
   window.addEventListener('resize',resize);
 }
 function onPointerDown(e) {
-  // Let real DOM branch/domain controls receive their native click. Pointer capture
-  // on the stage retargets pointerup and can suppress the button's click entirely.
-  if(e.target.closest('.webgl-hit-target,.webgl-controls,.webgl-focus,.webgl-intro,.webgl-branch-dock'))return;
-  // Keep keyboard navigation immediately available after mouse, pen or touch.
+  if(e.target.closest('.webgl-controls,.webgl-focus,.webgl-intro,.webgl-hit-target,.webgl-branch-dock'))return;
   stage?.focus({preventScroll:true});
-  pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});stage.setPointerCapture?.(e.pointerId);
-  if(pointers.size===2){const p=[...pointers.values()];pinchStart=Math.hypot(p[0].x-p[1].x,p[0].y-p[1].y);dragging=true;moved=true;return}
+  pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
+  stage.setPointerCapture?.(e.pointerId);
+  if(pointers.size>=2){
+    const p=[...pointers.values()];
+    pinchStart=Math.hypot(p[0].x-p[1].x,p[0].y-p[1].y);
+    pinchCenter={x:p.reduce((sum,v)=>sum+v.x,0)/p.length,y:p.reduce((sum,v)=>sum+v.y,0)/p.length};
+    dragging=true;moved=true;dragGesture=true;lastPointer=null;return;
+  }
   dragging=true;moved=false;dragGesture=false;lastPointer={x:e.clientX,y:e.clientY};
 }
 function onPointerMove(e) {
   if(pointers.has(e.pointerId))pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
-  if(pointers.size>=2){const p=[...pointers.values()],d=Math.hypot(p[0].x-p[1].x,p[0].y-p[1].y);if(pinchStart)zoomTargetDistance=THREE.MathUtils.clamp(zoomTargetDistance*Math.exp((pinchStart-d)*.006),1.25,60);pinchStart=d;moved=true;return}
+  if(pointers.size>=2){
+    const p=[...pointers.values()],d=Math.hypot(p[0].x-p[1].x,p[0].y-p[1].y);
+    const center={x:p.reduce((sum,v)=>sum+v.x,0)/p.length,y:p.reduce((sum,v)=>sum+v.y,0)/p.length};
+    if(pinchCenter){
+      const dx=center.x-pinchCenter.x,dy=center.y-pinchCenter.y;
+      if(Math.hypot(dx,dy)>0)panCameraByPixels(dx,dy);
+    }
+    if(pinchStart)zoomTargetDistance=THREE.MathUtils.clamp(zoomTargetDistance*Math.exp((pinchStart-d)*.006),1.25,60);
+    pinchStart=d;pinchCenter=center;moved=true;dragGesture=true;return;
+  }
   if(!dragging||!lastPointer)return;
   const dx=e.clientX-lastPointer.x,dy=e.clientY-lastPointer.y;
   if(Math.hypot(dx,dy)>7){moved=true;dragGesture=true}
@@ -500,14 +523,17 @@ function onPointerMove(e) {
 }
 function onPointerUp(e) {
   const wasPointer=pointers.has(e.pointerId);pointers.delete(e.pointerId);
-  if(pointers.size<2)pinchStart=0;
+  if(pointers.size<2){pinchStart=0;pinchCenter=null}
   if(!wasPointer)return;
-  if(pointers.size){moved=true;return}
+  if(pointers.size){
+    moved=true;dragging=true;
+    const remaining=[...pointers.values()][0];lastPointer={x:remaining.x,y:remaining.y};
+    return;
+  }
   dragging=false;
   if(!moved&&!transition&&performance.now()-lastPickAt>120&&!e.target.closest('.webgl-controls,.webgl-focus,.webgl-intro'))pickAt(e.clientX,e.clientY);
   lastPointer=null;
-}
-function onPointerCancel(){pointers.clear();dragging=false;moved=true;pinchStart=0;lastPointer=null}
+}function onPointerCancel(){pointers.clear();dragging=false;moved=true;pinchStart=0;pinchCenter=null;lastPointer=null}
 function onLostCapture(e){if(pointers.has(e.pointerId)){pointers.delete(e.pointerId);if(!pointers.size){dragging=false;lastPointer=null}}}
 function pickAt(x,y) {
   lastPickAt=performance.now();
