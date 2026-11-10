@@ -246,11 +246,18 @@ function clearResources() {
   resourceObjects=[];pickables=pickables.filter(o=>o.userData?.kind!=='resource'&&o.userData?.kind!=='resource-label');selectedBranch=null;
 }
 function mDispose(material){material?.map?.dispose();material?.dispose?.()}
+function visibleResourceLabelDepth() {
+ // Keep the current branches named, then reveal each deeper layer as the user zooms in.
+ if(distance<=4.8)return 3;
+ if(distance<=5.6)return 2;
+ if(distance<=7.2)return 1;
+ return 0;
+}
 function makeResourceLabel(item,color,depth=0) {
  const size=depth===0?18:depth===1?16:14,label=makeLabel(item.title,color,size);
  const scale=depth===0?3.35:depth===1?2.9:2.5;
  label.scale.set(scale,depth===0?.86:depth===1?.76:.68,1);
- label.userData={...item,kind:'resource-label'};label.visible=depth===0;addResourceHitTarget(label);return label;
+ label.userData={...item,kind:'resource-label'};label.visible=depth<=visibleResourceLabelDepth();addResourceHitTarget(label);return label;
 }
 function addResourceHitTarget(label) {
  const data=label.userData||{},hasChildren=!!data.children?.length;
@@ -275,7 +282,7 @@ function syncResourceHitTargets() {
  const projected=[];
  const project=(object,button)=>{
   object.getWorldPosition(_hitWorld);const p=_hitWorld.clone().project(camera);
-  const depth=Number(button.dataset.depth||0),visible=depth===0&&p.z>-1&&p.z<1&&p.x>=-1.12&&p.x<=1.12&&p.y>=-1.12&&p.y<=1.12;
+  const depth=Number(button.dataset.depth||0),visible=depth<=visibleResourceLabelDepth()&&p.z>-1&&p.z<1&&p.x>=-1.12&&p.x<=1.12&&p.y>=-1.12&&p.y<=1.12;
   button.hidden=!visible;button.style.display=visible?'block':'none';
   if(!visible)return;
   projected.push({object,button,p,x:rect.left+(p.x+1)*rect.width/2-stageRect.left,y:rect.top+(1-p.y)*rect.height/2-stageRect.top,depth});
@@ -608,6 +615,7 @@ function syncLabelScales() {
   const projection=2*Math.tan(THREE.MathUtils.degToRad(camera.fov*.5))/viewportHeight;
   const apply=label=>{
     if(!label?.userData?.kind?.endsWith('label'))return;
+    if(label.userData.kind==='resource-label')label.visible=(label.userData.depth||0)<=visibleResourceLabelDepth();
     label.getWorldPosition(labelWorldPosition);
     const cameraDistance=Math.max(.1,camera.position.distanceTo(labelWorldPosition));
     const targetPixels=labelTargetPixels(label);
@@ -658,7 +666,7 @@ async function init() {
       const targetBranch=branches.sort((a,b)=>Number(b.hasChildren)-Number(a.hasChildren)||Math.hypot(a.x-center.x,a.y-center.y)-Math.hypot(b.x-center.x,b.y-center.y))[0]||null;
       const domain=cells.get('bio'),domainTarget=domain?project(domain.hit):null;
       const domainLabelPixels=domain?labelTargetPixels(domain.label):0;
-      return{count:resourceObjects.filter(o=>o.userData?.kind==='resource-label').length,visible:branches.length,nestedAvailable:resourceObjects.some(o=>o.userData?.kind==='resource'&&o.userData.depth===0&&o.userData.children?.length),visibleDepths:[...new Set(resourceObjects.filter(o=>o.userData?.kind==='resource').map(o=>o.userData.depth??0))].sort(),target:targetBranch,domainTarget:domainTarget&&inside(domainTarget)?domainTarget:null,lastPick:window.__BALABS_3D_LAST_PICK__||null,lastOpen:window.__BALABS_3D_LAST_OPEN__||null,lastOpenError:window.__BALABS_3D_LAST_OPEN_ERROR__||null,navTrace:window.__BALABS_3D_NAV_TRACE__||null,miniHidden:!!document.getElementById('miniView')?.hidden,transitioning:!!transition,selected,currentTitle:currentNode?.title||null,depth:navigationStack.length,childCount:currentNode?.children?.length||0,clickCount:window.__BALABS_3D_E2E_CLICKS||0,cameraDistance:distance,labelPixels:{domain:domainLabelPixels},cameraTarget:{x:target.x,y:target.y,z:target.z},pointerDowns:window.__BALABS_3D_POINTERDOWN||0,pointerUps:window.__BALABS_3D_POINTERUP||0,pickCalls:window.__BALABS_3D_PICK_CALLS||0};
+      return{count:resourceObjects.filter(o=>o.userData?.kind==='resource-label').length,visible:branches.length,nestedAvailable:resourceObjects.some(o=>o.userData?.kind==='resource'&&o.userData.depth===0&&o.userData.children?.length),visibleDepths:[...new Set(resourceObjects.filter(o=>o.userData?.kind==='resource').map(o=>o.userData.depth??0))].sort(),visibleLabelDepths:[...new Set(resourceObjects.filter(o=>o.userData?.kind==='resource-label'&&o.visible).map(o=>o.userData.depth??0))].sort(),visibleLabelCount:resourceObjects.filter(o=>o.userData?.kind==='resource-label'&&o.visible).length,target:targetBranch,domainTarget:domainTarget&&inside(domainTarget)?domainTarget:null,lastPick:window.__BALABS_3D_LAST_PICK__||null,lastOpen:window.__BALABS_3D_LAST_OPEN__||null,lastOpenError:window.__BALABS_3D_LAST_OPEN_ERROR__||null,navTrace:window.__BALABS_3D_NAV_TRACE__||null,miniHidden:!!document.getElementById('miniView')?.hidden,transitioning:!!transition,selected,currentTitle:currentNode?.title||null,depth:navigationStack.length,childCount:currentNode?.children?.length||0,clickCount:window.__BALABS_3D_E2E_CLICKS||0,cameraDistance:distance,labelPixels:{domain:domainLabelPixels},cameraTarget:{x:target.x,y:target.y,z:target.z},pointerDowns:window.__BALABS_3D_POINTERDOWN||0,pointerUps:window.__BALABS_3D_POINTERUP||0,pickCalls:window.__BALABS_3D_PICK_CALLS||0};
     };
     animate();
   } catch(error){showFailure(error)}
