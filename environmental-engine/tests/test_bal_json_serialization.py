@@ -201,7 +201,10 @@ def test_rolling_indicator_preserves_coverage_and_does_not_invent_lineage():
     assert item.status == "insufficient_data"
     assert item.value is None
     assert item.coverage.observed == 6
-    assert item.inputs[0].source_observation_ids == []
+    assert item.inputs[0].source_observation_ids == [
+        row.source_observation_id for row in rows
+        if row.variable_code == "air_temperature_mean"
+    ]
 
 
 def test_observations_outside_analysis_scope_are_rejected():
@@ -221,6 +224,52 @@ def test_duplicate_source_observation_ids_are_rejected():
     rows = observations_for()
     rows.append(rows[0])
     with pytest.raises(ValueError, match="duplicate source observation IDs"):
+        build_bal_analysis(
+            observations=rows,
+            analysis_id=uuid4(),
+            generated_at=datetime(2026, 11, 2, tzinfo=timezone.utc),
+            engine_version="0.1.0",
+            scope_from=date(2026, 11, 1),
+            scope_to=date(2026, 11, 1),
+        )
+
+
+def test_rolling_result_rejects_coverage_for_a_different_window():
+    rows = observations_for()
+    coverage = DailyCoverage(
+        start=date(2026, 10, 25),
+        end=date(2026, 11, 1),
+        expected=8,
+        observed=6,
+        ratio=6 / 8,
+        available=False,
+        missing_dates=[date(2026, 10, 25), date(2026, 10, 30)],
+    )
+    rolling = ClimateWindowIndicator(
+        variable_code="air_temperature_mean",
+        window_days=7,
+        period_start=date(2026, 10, 26),
+        period_end=date(2026, 11, 1),
+        aggregation=DailyAggregation(
+            value=None, unit="degC", status="insufficient_data",
+            method="mean", coverage=coverage,
+        ),
+    )
+    with pytest.raises(ValueError, match="coverage must match its declared period"):
+        build_bal_analysis(
+            observations=rows,
+            rolling_indicators=[rolling],
+            analysis_id=uuid4(),
+            generated_at=datetime(2026, 11, 2, tzinfo=timezone.utc),
+            engine_version="0.1.0",
+            scope_from=date(2026, 10, 26),
+            scope_to=date(2026, 11, 1),
+        )
+
+
+def test_empty_analysis_is_rejected():
+    rows = observations_for()
+    with pytest.raises(ValueError, match="at least one daily or rolling indicator"):
         build_bal_analysis(
             observations=rows,
             analysis_id=uuid4(),
