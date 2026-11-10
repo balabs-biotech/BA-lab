@@ -152,7 +152,7 @@ class SensorAnalysisRequest(APIModel):
     expected_interval_seconds: StrictInt | None = Field(default=None, gt=0)
     temporal_window_seconds: StrictInt | None = Field(default=None, gt=0)
     temporal_minimum_history: StrictInt | None = Field(default=None, gt=0)
-    temporal_threshold: StrictFloat | None = Field(default=None, gt=0)
+    temporal_threshold: float | None = Field(default=None, gt=0)
     biological_interpretation: dict[str, Any] | None = None
     measurements: list[dict[str, Any]] = Field(min_length=1, max_length=5000)
 
