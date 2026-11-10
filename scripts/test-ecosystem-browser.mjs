@@ -174,12 +174,14 @@ async function checkWorkingScene(name, viewport) {
       const depthBefore = probe.depth;
       const branchButtonPoint = await page.evaluate(() => { const buttons=[...document.querySelectorAll('.webgl-branch-dock .webgl-branch-item[data-has-children="true"]')]; const button=buttons.find(item=>{const rect=item.getBoundingClientRect();return rect.width>0&&rect.height>0}); if(!button)return null; const rect=button.getBoundingClientRect(); return {x:rect.left+rect.width/2,y:rect.top+rect.height/2,title:button.title,index:button.dataset.branchIndex}; });
       assert.ok(branchButtonPoint, name + ': at least one folder must expose an unobstructed DOM hit target');
-      const clicksBefore = await page.evaluate(() => window.__BALABS_3D_E2E_CLICKS||0);
+      const beforeActivation = await page.evaluate(() => ({clicks:window.__BALABS_3D_E2E_CLICKS||0,picks:window.__BALABS_3D_E2E__()?.pickCalls||0}));
+      const clicksBefore = beforeActivation.clicks;
       await tapSpatialTarget(page, name, branchButtonPoint.x, branchButtonPoint.y, '.webgl-branch-dock .webgl-branch-item[data-branch-index="'+branchButtonPoint.index+'"]');
       await page.waitForFunction(({title,before}) => { const probe=window.__BALABS_3D_E2E__?.(); return window.__BALABS_3D_LAST_OPEN__?.title===title && (window.__BALABS_3D_E2E_CLICKS||0)>before && probe?.currentTitle===title && probe.childCount>0; }, {title:branchButtonPoint.title,before:clicksBefore}, { timeout: 8000 }).catch(async error => { throw new Error(name + ': selecting a branch did not activate the intended folder. ' + JSON.stringify(await page.evaluate(() => ({probe:window.__BALABS_3D_E2E__(),lastOpen:window.__BALABS_3D_LAST_OPEN__,clicks:window.__BALABS_3D_E2E_CLICKS,trace:window.__BALABS_3D_NAV_TRACE__,events:window.__BALABS_3D_TARGET_EVENTS__})) ) + ' — ' + error.message); });
       await page.waitForTimeout(250);
       const activation = await page.evaluate(() => ({clicks:window.__BALABS_3D_E2E_CLICKS||0,last:window.__BALABS_3D_LAST_OPEN__,events:window.__BALABS_3D_TARGET_EVENTS__||[]}));
       assert.equal(activation.clicks, clicksBefore+1, name + ': one finger tap must activate a branch exactly once');
+      assert.equal(await page.evaluate(() => window.__BALABS_3D_E2E__()?.pickCalls||0), beforeActivation.picks, name + ': a branch tap must not also trigger a spatial canvas selection');
       if(name==='mobile')assert.ok(activation.events.some(event=>event.type==='pointerup'&&event.target===branchButtonPoint.title), name + ': mobile branch selection must be handled on touch pointer release');
       const childDockState = await page.evaluate(() => { const dock=document.querySelector('.webgl-branch-dock'),probe=window.__BALABS_3D_E2E__(); return {hidden:dock?.hidden,display:dock&&getComputedStyle(dock).display,items:dock?.querySelectorAll('.webgl-branch-item').length,childCount:probe?.childCount,titles:[...(dock?.querySelectorAll('.webgl-branch-item')||[])].map(button=>button.title)}; });
       assert.ok(childDockState && !childDockState.hidden && childDockState.items===childDockState.childCount && childDockState.items>0,
