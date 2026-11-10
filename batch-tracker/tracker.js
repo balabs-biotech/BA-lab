@@ -954,6 +954,12 @@ async function initializeAuthenticatedTracker(
     await loadCultureOptions();
     if (initRevision !== authStateRevision) return;
 
+    if (document.body.dataset.domain === "laboratory") {
+      setInitializationStage("chargement du registre expérimental");
+      await loadExperimentRegistry();
+      if (initRevision !== authStateRevision) return;
+    }
+
     setInitializationStage("chargement des unités");
     await loadQuantityUnitOptions();
     if (initRevision !== authStateRevision) return;
@@ -5135,6 +5141,169 @@ function clearManualWriteIdempotencyKey(scope) {
   pendingManualWriteKeys.delete(storageKey);
   try { sessionStorage.removeItem(storageKey); } catch {}
 }
+
+
+/* ============================================================
+   REGISTRE EXPÉRIMENTAL — LABORATORY
+   ============================================================ */
+
+const experimentRegistryCard = document.getElementById("experimentRegistryCard");
+const experimentSetupForm = document.getElementById("experimentSetupForm");
+const experimentUnitRows = document.getElementById("experimentUnitRows");
+const experimentRegistryList = document.getElementById("experimentRegistryList");
+const experimentRegistryStatus = document.getElementById("experimentRegistryStatus");
+let experimentUnitRowSequence = 0;
+
+function addExperimentUnitRow(values = {}) {
+  if (!experimentUnitRows || experimentUnitRows.children.length >= 200) return;
+  const row = document.createElement("div");
+  row.className = "experiment-unit-row";
+  row.dataset.rowId = String(++experimentUnitRowSequence);
+  row.innerHTML = `
+    <label>Code unité<input name="unit_code" maxlength="120" required value="${escapeHtml(values.unit_code || "")}" placeholder="EXP-01-U01"></label>
+    <label>Traitement<input name="treatment_code" maxlength="120" value="${escapeHtml(values.treatment_code || "")}" placeholder="Témoin / T1"></label>
+    <label>Répétition<input name="replicate_no" type="number" min="1" step="1" value="${escapeHtml(values.replicate_no ?? "")}" placeholder="1"></label>
+    <button type="button" class="secondary-button small-button" data-remove-experiment-unit aria-label="Supprimer cette unité">Retirer</button>
+  `;
+  experimentUnitRows.appendChild(row);
+}
+
+function renderExperimentRegistry(experiments, units) {
+  if (!experimentRegistryList) return;
+  experimentRegistryList.replaceChildren();
+  if (!experiments.length) {
+    const empty = document.createElement("p");
+    empty.className = "muted";
+    empty.textContent = "Aucune expérience enregistrée dans cette organisation.";
+    experimentRegistryList.appendChild(empty);
+    return;
+  }
+  const unitsByExperiment = new Map();
+  for (const unit of units) {
+    const rows = unitsByExperiment.get(unit.experiment_id) || [];
+    rows.push(unit);
+    unitsByExperiment.set(unit.experiment_id, rows);
+  }
+  for (const experiment of experiments) {
+    const card = document.createElement("article");
+    card.className = "experiment-registry-item";
+    const heading = document.createElement("div");
+    heading.className = "experiment-registry-item-heading";
+    const title = document.createElement("h4");
+    title.textContent = `${experiment.code} — ${experiment.name}`;
+    const count = document.createElement("span");
+    count.className = "culture-catalog-count";
+    const experimentUnits = unitsByExperiment.get(experiment.id) || [];
+    count.textContent = `${experimentUnits.length} unité(s)`;
+    heading.append(title, count);
+    const detail = document.createElement("p");
+    detail.className = "muted";
+    const design = experiment.design || {};
+    detail.textContent = [design.objective, design.method].filter(Boolean).join(" · ") || "Plan expérimental non détaillé.";
+    const list = document.createElement("ul");
+    list.className = "experiment-unit-summary";
+    for (const unit of experimentUnits) {
+      const item = document.createElement("li");
+      const repeat = unit.replicate_no ? ` · répétition ${unit.replicate_no}` : "";
+      const treatment = unit.treatment_code ? ` · ${unit.treatment_code}` : "";
+      item.textContent = `${unit.unit_code}${treatment}${repeat}`;
+      list.appendChild(item);
+    }
+    card.append(heading, detail, list);
+    experimentRegistryList.appendChild(card);
+  }
+}
+
+async function loadExperimentRegistry() {
+  const revision = authStateRevision;
+  const orgId = organizationId;
+  if (!orgId || document.body.dataset.domain !== "laboratory") return;
+  if (experimentRegistryStatus) experimentRegistryStatus.textContent = "Chargement du registre expérimental…";
+  try {
+    const [experimentResult, unitResult] = await Promise.all([
+      supabaseClient.from("experiments").select("id,code,name,design,created_at").eq("organization_id", orgId).order("created_at", { ascending: false }),
+      supabaseClient.from("experimental_units").select("id,experiment_id,unit_code,replicate_no,treatment_code,created_at").eq("organization_id", orgId).order("created_at", { ascending: true })
+    ]);
+    if (experimentResult.error) throw experimentResult.error;
+    if (unitResult.error) throw unitResult.error;
+    if (!isCurrentWorkspaceRevision(revision, orgId)) return;
+    renderExperimentRegistry(experimentResult.data || [], unitResult.data || []);
+    if (experimentRegistryStatus) experimentRegistryStatus.textContent = `${(experimentResult.data || []).length} expérience(s) · ${(unitResult.data || []).length} unité(s) chargée(s).`;
+  } catch (error) {
+    if (!isCurrentWorkspaceRevision(revision, orgId)) return;
+    console.error("Registre expérimental :", error);
+    if (experimentRegistryStatus) experimentRegistryStatus.textContent = "Registre indisponible : " + (error.message || "erreur inconnue");
+  }
+}
+
+async function createExperimentWithUnits(event) {
+  event.preventDefault();
+  const revision = authStateRevision;
+  const orgId = organizationId;
+  if (!orgId || !isCurrentWorkspaceRevision(revision, orgId)) return;
+  const formData = new FormData(experimentSetupForm);
+  const code = String(formData.get("experiment_code") || "").trim();
+  const name = String(formData.get("experiment_name") || "").trim();
+  const objective = String(formData.get("experiment_objective") || "").trim();
+  const method = String(formData.get("experiment_method") || "").trim();
+  const units = [...experimentUnitRows.querySelectorAll(".experiment-unit-row")].map(row => ({
+    unit_code: row.querySelector('[name="unit_code"]').value.trim(),
+    treatment_code: row.querySelector('[name="treatment_code"]').value.trim() || null,
+    replicate_no: row.querySelector('[name="replicate_no"]').value.trim() || null,
+    metadata: {}
+  }));
+  if (!code || !name || !units.length || units.some(unit => !unit.unit_code)) {
+    if (experimentRegistryStatus) experimentRegistryStatus.textContent = "Renseignez le code, le nom et au moins une unité avec un code.";
+    return;
+  }
+  const occurredAt = new Date().toISOString();
+  const payload = {
+    p_organization_id: orgId,
+    p_code: code,
+    p_name: name,
+    p_design: { objective, method, design_type: "user_defined" },
+    p_units: units,
+    p_occurred_at: occurredAt
+  };
+  const button = experimentSetupForm.querySelector('[type="submit"]');
+  button.disabled = true;
+  if (experimentRegistryStatus) experimentRegistryStatus.textContent = "Enregistrement atomique de l’expérience et de ses unités…";
+  try {
+    const idempotencyKey = await getManualWriteIdempotencyKey("experiment-setup", payload);
+    if (!isCurrentWorkspaceRevision(revision, orgId)) return;
+    const { data, error } = await supabaseClient.rpc("create_experiment_with_units", {
+      ...payload,
+      p_idempotency_key: idempotencyKey
+    });
+    if (error) throw error;
+    if (!isCurrentWorkspaceRevision(revision, orgId)) return;
+    clearManualWriteIdempotencyKey("experiment-setup");
+    experimentSetupForm.reset();
+    experimentUnitRows.replaceChildren();
+    addExperimentUnitRow();
+    if (experimentRegistryStatus) experimentRegistryStatus.textContent = `Expérience ${data?.code || code} enregistrée avec ${data?.unit_count ?? units.length} unité(s).`;
+    await loadExperimentRegistry();
+  } catch (error) {
+    if (!isCurrentWorkspaceRevision(revision, orgId)) return;
+    console.error("Création de l’expérience :", error);
+    if (experimentRegistryStatus) experimentRegistryStatus.textContent = "Création impossible : " + (error.message || "erreur inconnue") + ". Réessayez sans modifier les données pour conserver l’idempotence.";
+  } finally {
+    if (isCurrentWorkspaceRevision(revision, orgId) && button) button.disabled = false;
+  }
+}
+
+experimentSetupForm?.addEventListener("submit", createExperimentWithUnits);
+document.getElementById("addExperimentUnitButton")?.addEventListener("click", () => addExperimentUnitRow());
+experimentUnitRows?.addEventListener("click", event => {
+  const removeButton = event.target.closest("[data-remove-experiment-unit]");
+  if (!removeButton) return;
+  const rows = experimentUnitRows.querySelectorAll(".experiment-unit-row");
+  if (rows.length <= 1) {
+    if (experimentRegistryStatus) experimentRegistryStatus.textContent = "Une expérience doit conserver au moins une unité.";
+    return;
+  }
+  removeButton.closest(".experiment-unit-row").remove();
+});
 
 async function saveMeasurement() {
   const operationRevision = authStateRevision;
