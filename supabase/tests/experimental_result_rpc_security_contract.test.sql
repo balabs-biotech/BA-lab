@@ -1,5 +1,5 @@
 -- Verify the experimental-result write RPC after a full migration replay.
-do $contract$$
+do $contract$
 declare
   v_signature regprocedure :=
     'public.record_experiment_result(uuid,uuid,text,text,jsonb,text,uuid,timestamp with time zone)'::regprocedure;
