@@ -232,6 +232,9 @@ async function checkWorkingScene(name, viewport) {
         await page.waitForFunction(() => window.__BALABS_3D_E2E__()?.visibleLabelDepths?.includes(1), undefined, { timeout: 8000 });
         const nextGenerationLabels = await page.evaluate(() => window.__BALABS_3D_E2E__()?.visibleLabelCountsByDepth?.[1] || 0);
         assert.ok(nextGenerationLabels > 0, name + ': the next hierarchy generation must appear after one further zoom step');
+        const nextGenerationState = await page.evaluate(() => window.__BALABS_3D_E2E__());
+        assert.deepEqual(nextGenerationState?.visibleLabelDepths || [], [1], name + ': zooming into sub-branches must replace, not stack, the previous generation labels');
+        assert.equal(nextGenerationState?.visibleLabelCountsByDepth?.[0] || 0, 0, name + ': parent-generation labels must clear when child labels appear');
         const depthAfterZoomIn = await page.evaluate(() => window.__BALABS_3D_E2E__()?.depth || 0);
         assert.equal(depthAfterZoomIn, nestedDepth,
           name + ': camera zoom-in must not change the selected hierarchy level');
