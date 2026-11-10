@@ -1,3 +1,4 @@
+from dataclasses import replace
 from datetime import date, datetime, timedelta, timezone
 from uuid import uuid4
 
@@ -121,15 +122,7 @@ def test_execution_service_rejects_observations_outside_requested_scope():
 
 def test_execution_service_requires_weather_observations():
     rows = observations_for_days()
-    satellite_rows = [
-        NormalizedEnvironmentalObservation(
-            **{
-                **row.__dict__,
-                "data_family": "satellite",
-            }
-        )
-        for row in rows
-    ]
+    satellite_rows = [replace(row, data_family="satellite") for row in rows]
 
     with pytest.raises(ValueError, match="at least one weather observation"):
         run(satellite_rows)
