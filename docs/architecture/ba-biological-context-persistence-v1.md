@@ -133,3 +133,10 @@ defense-in-depth, not a replacement for RLS.
 Mock-client tests cover tenant/subject filters, validity filtering, explicit
 relationship selection, and immutable tenant/primary-key fields during update.
 They are written but have not been executed in this environment.
+
+
+The repository also exposes `get_for_subject_on_date`. It returns no context
+when none is valid, returns the single valid context when exactly one matches,
+and raises an explicit ambiguity error when multiple validity intervals overlap.
+The database does not silently choose a context or impose a global exclusion
+constraint at this stage; overlapping records remain visible for correction.
