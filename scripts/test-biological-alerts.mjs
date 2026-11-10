@@ -26,6 +26,7 @@ assert.match(moduleSource, /\.eq\("domain", state\.domain\)/);
 assert.match(moduleSource, /\.range\(pageOffset, pageOffset \+ PAGE_SIZE - 1\)/);
 assert.match(moduleSource, /signalsLoadMore/);
 assert.match(moduleSource, /state\.hasMore = page\.length === PAGE_SIZE/);
+assert.match(moduleSource, /if \(error\)[\s\S]*?render\(\);[\s\S]*?Impossible de charger les signaux/, "failed reads must restore pagination controls");
 assert.match(moduleSource, /analysis_method,analysis_evidence/);
 assert.match(moduleSource, /robust_z_score/);
 assert.match(moduleSource, /temporal_window_seconds/);
