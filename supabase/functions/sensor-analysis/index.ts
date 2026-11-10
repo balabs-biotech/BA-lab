@@ -136,6 +136,23 @@ Deno.serve(async (req: Request) => {
       return reply(422, { error: "expected_interval_seconds_must_be_positive_integer" });
     }
 
+    const temporalWindowSeconds = body.temporal_window_seconds;
+    const temporalMinimumHistory = body.temporal_minimum_history;
+    const temporalThreshold = body.temporal_threshold;
+    const temporalOptions = [
+      temporalWindowSeconds, temporalMinimumHistory, temporalThreshold,
+    ];
+    if (temporalOptions.some((value) => value !== undefined)) {
+      if (
+        !Number.isSafeInteger(temporalWindowSeconds) || temporalWindowSeconds <= 0 ||
+        !Number.isSafeInteger(temporalMinimumHistory) || temporalMinimumHistory <= 0 ||
+        typeof temporalThreshold !== "number" || !Number.isFinite(temporalThreshold) ||
+        temporalThreshold <= 0
+      ) {
+        return reply(422, { error: "temporal_screening_parameters_must_be_supplied_together_and_positive" });
+      }
+    }
+
     // RLS-scoped environment lookup and membership check precede every service-role read.
     const { data: authorizedEnvironment, error: environmentError } = await userClient
       .from("environments")
@@ -258,6 +275,9 @@ Deno.serve(async (req: Request) => {
         to_date: toDate,
         profile_timezone: profile.timezone,
         expected_interval_seconds: expectedInterval,
+        temporal_window_seconds: temporalWindowSeconds,
+        temporal_minimum_history: temporalMinimumHistory,
+        temporal_threshold: temporalThreshold,
         measurements: sensorMeasurements,
       }),
       signal: AbortSignal.timeout(60_000),
