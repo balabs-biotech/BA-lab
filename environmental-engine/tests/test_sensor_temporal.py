@@ -1,14 +1,10 @@
-from datetime import datetime, timedelta, timezone
-
-from ba_environmental_engine.sources.sensor import SensorMeasurementEnvelope
-from ba_environmental_engine.sources.sensor_analysis import summarize_sensor_measurements
 from ba_environmental_engine.sources.sensor_temporal import assess_sensor_temporal_anomalies
 
 from test_sensor_analysis import envelope
 
 
 def test_sensor_temporal_screen_flags_outlier_against_past_only_history():
-    rows = [envelope(index * 60, value) for index, value in enumerate(
+    rows = [envelope(index, value) for index, value in enumerate(
         (10, 11, 12, 13, 14, 15, 16, 17, 100)
     )]
     results = assess_sensor_temporal_anomalies(
@@ -44,8 +40,8 @@ def test_sensor_temporal_screen_excludes_quality_excluded_rows_from_baseline():
         envelope(0, 10), envelope(60, 11), envelope(120, 12),
         envelope(180, 13), envelope(240, 14), envelope(300, 15),
         envelope(360, 16), envelope(420, 17),
-        envelope(450, 999, quality="excluded"),
-        envelope(480, 18),
+        envelope(8, 999, quality="excluded"),
+        envelope(9, 18),
     ]
     results = assess_sensor_temporal_anomalies(
         rows,
