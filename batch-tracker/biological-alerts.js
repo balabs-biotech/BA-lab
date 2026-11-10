@@ -85,7 +85,7 @@
         ["Environnement", row.environment_id],
         ["Règle", row.rule_id],
         ["Code du message", row.message_code],
-        ["Recommandation", row.recommendation_code],
+        ["Code recommandation", row.recommendation_code],
         ["Profil biologique", row.domain_profile_code && row.domain_profile_version ? row.domain_profile_code + " / v" + row.domain_profile_version : null],
         ["Profil environnemental", row.environment_profile_code && row.environment_profile_version ? row.environment_profile_code + " / v" + row.environment_profile_version : null],
         ["Analyse source", row.source_analysis_id],
