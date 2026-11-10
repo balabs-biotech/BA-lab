@@ -7,6 +7,7 @@ Python calculation core for traceable environmental indicators used by CultureOp
 The engine foundation provides:
 - daily coverage assessment without interpolation;
 - deterministic daily aggregation with explicit coverage thresholds;
+- rolling 7/14/30/90-day descriptive climate indicators with per-variable coverage;
 - BAL-JSON v1 schema validation;
 - explicit climate-variable unit normalization with original-unit provenance;
 - variable-specific plausibility screening that flags suspect values without modifying them;
@@ -36,17 +37,21 @@ python -m pip install -e ".[dev]"
 pytest
 ```
 
-Python 3.10+; CPU-only. See
-`docs/architecture/ba-environmental-unit-registry-v1.md` for canonical units
-and conversion conventions, and `docs/architecture/ba-nasa-power-adapter-v1.md`
-for the provider mapping and daily time semantics, and
-`docs/architecture/ba-environmental-quality-screening-v1.md` for screening rules, and
-`docs/architecture/ba-environmental-temporal-screening-v1.md` for temporal anomaly semantics, and
-`docs/architecture/ba-environmental-seasonal-reference-v1.md` for seasonal reference semantics, and
-`docs/architecture/ba-vapor-pressure-deficit-v1.md` for the VPD formula and interpretation limits, and
-`docs/architecture/ba-vpd-period-aggregation-v1.md` for period aggregation semantics, and
-`docs/architecture/ba-environment-context-v1.md` for environment context identity and origin rules, and
-`docs/architecture/ba-sensor-measurement-lineage-v1.md` for sensor and observation lineage. and
-`docs/architecture/ba-fao56-reference-evapotranspiration-v1.md` for the daily FAO-56 ET0 contract. and
-`docs/architecture/ba-fao56-net-radiation-v1.md` for daily solar and net-radiation calculations. and
-`docs/architecture/ba-daily-reference-indicators-pipeline-v1.md` for the normalized source-to-indicator pipeline.
+Python 3.10+; CPU-only.
+
+## Architecture contracts
+
+- `docs/architecture/ba-environmental-intelligence-contract-v1.md`: engine boundaries and data flow.
+- `docs/architecture/ba-environmental-unit-registry-v1.md`: canonical units and conversion conventions.
+- `docs/architecture/ba-nasa-power-adapter-v1.md`: provider mapping and daily time semantics.
+- `docs/architecture/ba-environmental-quality-screening-v1.md`: plausibility and quality screening.
+- `docs/architecture/ba-environmental-temporal-screening-v1.md`: temporal anomaly semantics.
+- `docs/architecture/ba-environmental-seasonal-reference-v1.md`: seasonal reference semantics.
+- `docs/architecture/ba-vapor-pressure-deficit-v1.md`: VPD formula and interpretation limits.
+- `docs/architecture/ba-vpd-period-aggregation-v1.md`: VPD period aggregation semantics.
+- `docs/architecture/ba-rolling-climate-indicators-v1.md`: rolling climate windows and coverage semantics.
+- `docs/architecture/ba-environment-context-v1.md`: environment context identity and origin rules.
+- `docs/architecture/ba-sensor-measurement-lineage-v1.md`: sensor and observation lineage.
+- `docs/architecture/ba-fao56-reference-evapotranspiration-v1.md`: daily FAO-56 ET0 contract.
+- `docs/architecture/ba-fao56-net-radiation-v1.md`: daily solar and net-radiation calculations.
+- `docs/architecture/ba-daily-reference-indicators-pipeline-v1.md`: normalized source-to-indicator pipeline.
