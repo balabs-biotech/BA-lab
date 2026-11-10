@@ -291,7 +291,7 @@ function syncResourceHitTargets() {
  for(const [label,button] of resourceHitTargets)project(label,button);
  // Place labels in screen space, not directly on top of one another. This is
  // especially important on narrow mobile screens where projected branches cluster.
- projected.sort((a,b)=>a.p.z-b.p.z);
+ projected.sort((a,b)=>Number(b.button.dataset.hasChildren==='true')-Number(a.button.dataset.hasChildren==='true')||a.p.z-b.p.z);
  const occupied=[];
  const obstacles=[...ROOT.querySelectorAll('.webgl-controls,.webgl-status,.webgl-path,.webgl-focus,.webgl-intro,.webgl-branch-dock')]
   .filter(el=>!el.hidden&&getComputedStyle(el).display!=='none')
