@@ -267,7 +267,7 @@
       entry.append(heading, detail, element("small", "", "Règle : " + (item.rule_id || "—") + " · Détecté : " + dateLabel(item.first_seen_at)));
       list.append(entry);
     });
-    $("signalsHistoryStatus").textContent = data.length === 50 ? "50 événements affichés au maximum." : data.length + " événement(s) dans cet historique.";
+    $("signalsHistoryStatus").textContent = [identity.subtitle, data.length === 50 ? "50 événements affichés au maximum." : data.length + " événement(s) dans cet historique."].filter(Boolean).join(" · ");
   }
 
   $("signalsHistoryClose").addEventListener("click", () => {
