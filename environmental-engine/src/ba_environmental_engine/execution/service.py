@@ -44,12 +44,16 @@ def run_environmental_analysis(
     temporal_minimum_coverage: float = 0.6,
     temporal_threshold: float = 3.5,
 ) -> BALAnalysis:
-    """Run daily FAO-56 and optional rolling indicators, then build BAL-JSON.
+    """Run daily FAO-56, optional rolling indicators and temporal screening.
 
-    Daily FAO-56 inputs are grouped by observation date. The daily calculator
-    remains responsible for validating source coherence and canonical units.
-    Rolling methods are explicit caller policy: this service never guesses
+    Weather observations are grouped by date for daily FAO-56 calculations and
+    by variable for independent temporal screening. Temporal screening defaults
+    to every weather variable; callers may select a subset or pass an empty
+    tuple to disable it. Every finding retains exact source-observation lineage.
+
+    Rolling methods remain explicit caller policy: this service never guesses
     whether a variable should be averaged, summed, minimized, or maximized.
+    The service performs no network I/O, persistence, interpolation or auth.
     """
     rows = list(observations)
     if not rows:
