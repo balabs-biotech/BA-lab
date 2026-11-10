@@ -78,23 +78,18 @@ def daily_result(rows, status="available"):
 
 def test_daily_result_serializes_with_exact_source_lineage_and_gridded_quality():
     rows = observations_for()
-    result = daily_result(rows)
-    result = DailyReferenceIndicators(
-        **{
-            **result.__dict__,
-        }
-    ) if hasattr(result, "__dict__") else result
-    # Supply typed calculation outputs without re-running the scientific formulas.
+    base = daily_result(rows)
+    # Supply calculation-result values without re-running the scientific formulas.
     from types import SimpleNamespace
     result = DailyReferenceIndicators(
-        observed_date=result.observed_date,
-        organization_id=result.organization_id,
-        location_id=result.location_id,
-        latitude_deg=result.latitude_deg,
-        altitude_m=result.altitude_m,
+        observed_date=base.observed_date,
+        organization_id=base.organization_id,
+        location_id=base.location_id,
+        latitude_deg=base.latitude_deg,
+        altitude_m=base.altitude_m,
         status="available",
-        source_observation_ids=result.source_observation_ids,
-        source_variable_codes=result.source_variable_codes,
+        source_observation_ids=base.source_observation_ids,
+        source_variable_codes=base.source_variable_codes,
         missing_variables=(),
         net_radiation=SimpleNamespace(
             net_radiation_mj_m2_day=12.5,
