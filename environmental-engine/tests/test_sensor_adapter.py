@@ -9,17 +9,15 @@ from ba_environmental_engine.sources.sensor import normalize_iot_measurement_row
 def joined_row(**overrides):
     organization_id = uuid4()
     environment_id = uuid4()
-    device_id = uuid4()
-    observation_id = uuid4()
     row = {
-        "id": observation_id,
+        "id": uuid4(),
         "organization_id": organization_id,
         "device_organization_id": organization_id,
         "environment_organization_id": organization_id,
         "environment_id": environment_id,
         "device_environment_id": environment_id,
         "location_id": uuid4(),
-        "iot_device_id": device_id,
+        "iot_device_id": uuid4(),
         "variable_code": "temperature",
         "raw_value": 23.5,
         "raw_unit_code": "degC",
@@ -36,7 +34,8 @@ def joined_row(**overrides):
         "device_type": "esp32",
         "profile_origin": "sensor",
         "profile_status": "active",
-        "profile_valid_from": "2026-01-01T00:00:00+00:00",
+        "profile_timezone": "Africa/Algiers",
+        "profile_valid_from": "2026-01-01",
         "profile_valid_to": None,
         "profile_sensor_bound": True,
     }
@@ -45,9 +44,10 @@ def joined_row(**overrides):
 
 
 def test_maps_existing_iot_measurement_to_sensor_contract():
-    result = normalize_iot_measurement_row(joined_row())
-    assert result.measurement.context_id == joined_row()["environment_id"]
-    assert result.measurement.sensor_id == joined_row()["iot_device_id"]
+    row = joined_row()
+    result = normalize_iot_measurement_row(row)
+    assert result.measurement.context_id == row["environment_id"]
+    assert result.measurement.sensor_id == row["iot_device_id"]
     assert result.measurement.value == 23.5
     assert result.measurement.unit_code == "degC"
     assert result.quality_state == "raw"
@@ -81,17 +81,15 @@ def test_rejects_device_not_bound_to_active_sensor_profile():
         normalize_iot_measurement_row(joined_row(profile_status="retired"))
 
 
-def test_rejects_measurement_outside_profile_validity():
+def test_rejects_measurement_outside_profile_calendar_validity():
     with pytest.raises(ValueError, match="before"):
-        normalize_iot_measurement_row(
-            joined_row(profile_valid_from="2026-12-01T00:00:00+00:00")
-        )
+        normalize_iot_measurement_row(joined_row(profile_valid_from="2026-12-01"))
+    with pytest.raises(ValueError, match="after"):
+        normalize_iot_measurement_row(joined_row(profile_valid_to="2026-11-09"))
 
 
 def test_preserves_quality_and_requires_exclusion_reason():
-    result = normalize_iot_measurement_row(
-        joined_row(quality_state="validated")
-    )
+    result = normalize_iot_measurement_row(joined_row(quality_state="validated"))
     assert result.quality_state == "validated"
     with pytest.raises(ValueError, match="exclusion_reason"):
         normalize_iot_measurement_row(
