@@ -167,6 +167,7 @@
     state.loading = false;
     if (error) {
       console.error("[CultureOps signals] Read failed", error.message);
+      render();
       notify("Impossible de charger les signaux. Vérifiez les droits d’accès et la connexion.", true);
       return;
     }
