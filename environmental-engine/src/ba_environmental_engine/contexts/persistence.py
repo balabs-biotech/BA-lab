@@ -85,3 +85,105 @@ def biological_context_to_record(context: BiologicalContext) -> dict[str, Any]:
         "valid_from": context.valid_from.isoformat(),
         "valid_to": context.valid_to.isoformat() if context.valid_to else None,
     }
+
+class SupabaseBiologicalContextRepository:
+    """Small PostgREST adapter for persisted biological contexts.
+
+    The Supabase client is injected by the application boundary. This package
+    does not create clients, read credentials, or own authentication. Tenant
+    filtering is explicit even though PostgreSQL RLS remains authoritative.
+    """
+
+    _SELECT = (
+        "*,environment:environments!biological_contexts_environment_fk(location_id)"
+    )
+
+    def __init__(self, client: Any):
+        self._client = client
+
+    @staticmethod
+    def _data(response: Any) -> Any:
+        if not hasattr(response, "data"):
+            raise RuntimeError("Supabase response does not expose data")
+        return response.data
+
+    def get_by_id(
+        self, *, organization_id: str, context_id: str
+    ) -> BiologicalContext | None:
+        response = (
+            self._client.table("biological_contexts")
+            .select(self._SELECT)
+            .eq("organization_id", organization_id)
+            .eq("id", context_id)
+            .maybe_single()
+            .execute()
+        )
+        record = self._data(response)
+        return biological_context_from_record(record) if record else None
+
+    def list_for_subject(
+        self,
+        *,
+        organization_id: str,
+        domain: BiologicalDomain,
+        subject_id: str,
+        on_date: str | None = None,
+    ) -> tuple[BiologicalContext, ...]:
+        subject_column = (
+            "plant_culture_id"
+            if domain is BiologicalDomain.GREENTECH
+            else "culture_id"
+        )
+        response = (
+            self._client.table("biological_contexts")
+            .select(self._SELECT)
+            .eq("organization_id", organization_id)
+            .eq("domain", domain.value)
+            .eq(subject_column, subject_id)
+            .order("valid_from", desc=True)
+            .execute()
+        )
+        records = self._data(response) or []
+        contexts = tuple(biological_context_from_record(row) for row in records)
+        if on_date is None:
+            return contexts
+        from datetime import date
+
+        target_date = date.fromisoformat(on_date)
+        return tuple(
+            context
+            for context in contexts
+            if context.valid_from <= target_date
+            and (context.valid_to is None or target_date <= context.valid_to)
+        )
+
+    def create(self, context: BiologicalContext) -> BiologicalContext:
+        response = (
+            self._client.table("biological_contexts")
+            .insert(biological_context_to_record(context))
+            .select(self._SELECT)
+            .single()
+            .execute()
+        )
+        record = self._data(response)
+        if not record:
+            raise RuntimeError("Supabase insert returned no biological context")
+        return biological_context_from_record(record)
+
+    def update(self, context: BiologicalContext) -> BiologicalContext:
+        record = biological_context_to_record(context)
+        record.pop("id")
+        record.pop("organization_id")
+        response = (
+            self._client.table("biological_contexts")
+            .update(record)
+            .eq("organization_id", str(context.organization_id))
+            .eq("id", str(context.context_id))
+            .select(self._SELECT)
+            .maybe_single()
+            .execute()
+        )
+        updated = self._data(response)
+        if not updated:
+            raise LookupError("biological context was not found or is not writable")
+        return biological_context_from_record(updated)
