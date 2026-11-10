@@ -22,6 +22,7 @@ const supabaseClient =
    ============================================================ */
 
 let organizationId = null;
+window.BALabsGetOrganizationId = () => organizationId;
 
 let organization = null;
 
@@ -63,6 +64,7 @@ function isCurrentWorkspaceRevision(revision, expectedOrganizationId) {
 function clearAuthenticatedWorkspaceState() {
   // Remove the previous tenant context before an auth transition can yield.
   organizationId = null;
+  window.dispatchEvent(new CustomEvent('balabs:organization-context', { detail: { organizationId: null } }));
   organization = null;
   strainOptions = [];
   referenceData = [];
@@ -908,6 +910,7 @@ async function initializeAuthenticatedTracker(
     // still current; an obsolete claim must never overwrite the active tenant.
     organization = claim.organization;
     organizationId = claim.organization.id;
+    window.dispatchEvent(new CustomEvent('balabs:organization-context', { detail: { organizationId } }));
 
     if (!organizationId) {
 
