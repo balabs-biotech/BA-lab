@@ -16,6 +16,8 @@ from ba_environmental_engine.climate.daily_reference import (
 )
 from ba_environmental_engine.climate.windows import calculate_rolling_climate_indicators
 from ba_environmental_engine.contracts.bal_json import BALAnalysis
+from ba_environmental_engine.quality.findings import build_temporal_findings
+from ba_environmental_engine.quality.temporal import DailyObservation, assess_temporal_anomalies
 from ba_environmental_engine.serialization.bal_json import build_bal_analysis
 from ba_environmental_engine.sources.models import NormalizedEnvironmentalObservation
 
@@ -36,6 +38,11 @@ def run_environmental_analysis(
     rolling_methods: Mapping[str, AggregationMethod] | None = None,
     rolling_windows: tuple[int, ...] = _DEFAULT_ROLLING_WINDOWS,
     minimum_rolling_coverage: float = 1.0,
+    temporal_variables: tuple[str, ...] | None = None,
+    temporal_window: int = 30,
+    temporal_minimum_history: int = 7,
+    temporal_minimum_coverage: float = 0.6,
+    temporal_threshold: float = 3.5,
 ) -> BALAnalysis:
     """Run daily FAO-56 and optional rolling indicators, then build BAL-JSON.
 
@@ -62,17 +69,16 @@ def run_environmental_analysis(
         if row.data_family != "weather":
             continue
         weather_by_date[row.observed_date].append(row)
-        if rolling_methods and row.variable_code in rolling_methods:
-            if row.observed_date in weather_by_variable[row.variable_code]:
-                raise ValueError(
-                    "rolling analysis requires at most one observation per variable and date"
-                )
-            previous_unit = units_by_variable.setdefault(row.variable_code, row.unit)
-            if previous_unit != row.unit:
-                raise ValueError(
-                    f"rolling variable {row.variable_code} has inconsistent canonical units"
-                )
-            weather_by_variable[row.variable_code][row.observed_date] = row.value
+        if row.observed_date in weather_by_variable[row.variable_code]:
+            raise ValueError(
+                "temporal and rolling analysis require at most one observation per variable and date"
+            )
+        previous_unit = units_by_variable.setdefault(row.variable_code, row.unit)
+        if previous_unit != row.unit:
+            raise ValueError(
+                f"weather variable {row.variable_code} has inconsistent canonical units"
+            )
+        weather_by_variable[row.variable_code][row.observed_date] = row.value
 
     if not weather_by_date:
         raise ValueError("at least one weather observation is required")
@@ -115,10 +121,56 @@ def run_environmental_analysis(
             units=units_by_variable,
         )
 
+    selected_temporal_variables = (
+        tuple(sorted(weather_by_variable))
+        if temporal_variables is None
+        else tuple(temporal_variables)
+    )
+    if len(set(selected_temporal_variables)) != len(selected_temporal_variables):
+        raise ValueError("temporal_variables must not contain duplicates")
+    unknown_temporal_variables = sorted(
+        set(selected_temporal_variables) - set(weather_by_variable)
+    )
+    if unknown_temporal_variables:
+        raise ValueError(
+            "temporal screening variables require weather observations: "
+            + ", ".join(unknown_temporal_variables)
+        )
+
+    temporal_findings = []
+    for variable_code in selected_temporal_variables:
+        dated_values = weather_by_variable[variable_code]
+        ordered_dates = sorted(dated_values)
+        assessments = assess_temporal_anomalies(
+            [
+                DailyObservation(observed_date=day, value=dated_values[day])
+                for day in ordered_dates
+            ],
+            window=temporal_window,
+            minimum_history=temporal_minimum_history,
+            minimum_coverage_ratio=temporal_minimum_coverage,
+            threshold=temporal_threshold,
+        )
+        source_ids_by_date = {
+            row.observed_date: [row.source_observation_id]
+            for row in rows
+            if row.data_family == "weather" and row.variable_code == variable_code
+        }
+        temporal_findings.extend(
+            build_temporal_findings(
+                analysis_id=analysis_id,
+                variable_code=variable_code,
+                unit=units_by_variable[variable_code],
+                assessments=assessments,
+                source_observation_ids_by_date=source_ids_by_date,
+            )
+        )
+
     return build_bal_analysis(
         observations=rows,
         daily_indicators=daily_results,
         rolling_indicators=rolling_results,
+        findings=temporal_findings,
         analysis_id=analysis_id,
         generated_at=generated_at,
         engine_version=engine_version,
