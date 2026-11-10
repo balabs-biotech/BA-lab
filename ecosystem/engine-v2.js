@@ -262,7 +262,7 @@ function makeResourceLabel(item,color,depth=0) {
 function addResourceHitTarget(label) {
  const data=label.userData||{},hasChildren=!!data.children?.length;
  const element=document.createElement(hasChildren?'button':'a');
- if(hasChildren){element.type='button';element.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();stage?.focus({preventScroll:true});window.__BALABS_3D_E2E_CLICKS=(window.__BALABS_3D_E2E_CLICKS||0)+1;window.__BALABS_3D_LAST_OPEN__={title:data.title||data.name||'',source:'resource-label',resolved:true,hasPosition:!!data.position,hasChildren:!!data.children?.length};try{openResource(data);window.__BALABS_3D_LAST_OPEN_ERROR__=null}catch(error){window.__BALABS_3D_LAST_OPEN_ERROR__={message:error?.message||String(error),stack:error?.stack||''}}});}
+ if(hasChildren){element.type='button';element.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();stage?.focus({preventScroll:true});window.__BALABS_3D_E2E_CLICKS=(window.__BALABS_3D_E2E_CLICKS||0)+1;window.__BALABS_3D_LAST_OPEN__={title:data.title||data.name||'',source:'resource-label',resolved:!!data.sourceItem,hasPosition:!!data.position,hasChildren:!!data.children?.length};try{openResource(data);window.__BALABS_3D_LAST_OPEN_ERROR__=null}catch(error){window.__BALABS_3D_LAST_OPEN_ERROR__={message:error?.message||String(error),stack:error?.stack||''}}});}
  else {element.href=data.url||'#';element.target='_blank';element.rel='noopener noreferrer';element.addEventListener('click',e=>{if(!data.url)e.preventDefault();});}
  element.className='webgl-hit-target webgl-resource-target';
  element.textContent=data.title||data.name||'Ouvrir';
@@ -380,7 +380,7 @@ function buildResources(id,parentNode=null,anchor=null) {
 // Resolve raw Notion nodes to their positioned 3D counterparts before camera navigation.
 function openResource(item) {
  let data=item?.userData||item;
- const raw=data,spatial=resourceObjects.find(object=>object.userData?.kind==='resource'&&(object.userData.sourceItem===data||object.userData===data))?.userData;
+ const raw=data,source=data?.sourceItem||data,spatial=resourceObjects.find(object=>object.userData?.kind==='resource'&&(object.userData.sourceItem===source||object.userData===source))?.userData;
  if(spatial)data=spatial;
  const before={title:currentNode?.title||null,depth:navigationStack.length,children:currentNode?.children?.length||0};
  if(data.children?.length){
