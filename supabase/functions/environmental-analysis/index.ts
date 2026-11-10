@@ -4,15 +4,13 @@
 // The engine secret is never returned to the caller or sent to a browser.
 import { createClient } from "npm:@supabase/supabase-js@2";
 
-const headers = {
-  "Access-Control-Allow-Origin": "*",
+const baseHeaders = {
   "Access-Control-Allow-Headers": "authorization, apikey, content-type, x-client-info",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
   "Content-Type": "application/json; charset=utf-8",
   "Cache-Control": "no-store",
+  "Vary": "Origin",
 };
-const reply = (status: number, body: Record<string, unknown>) =>
-  new Response(JSON.stringify(body), { status, headers });
 const DAY_MS = 86_400_000;
 const MAX_DAYS = 366;
 const MAX_OBSERVATIONS = 5_000;
@@ -66,12 +64,28 @@ async function readJsonBounded(req: Request, maxBytes: number): Promise<unknown>
 }
 
 Deno.serve(async (req: Request) => {
+  const origin = req.headers.get("origin");
+  const allowedOrigins = new Set(
+    (Deno.env.get("BA_ENVIRONMENTAL_ALLOWED_ORIGINS") ?? "")
+      .split(",").map((value) => value.trim()).filter(Boolean),
+  );
+  if (origin && !allowedOrigins.has(origin)) {
+    return new Response(JSON.stringify({ error: "origin_not_allowed" }), {
+      status: 403,
+      headers: { ...baseHeaders },
+    });
+  }
+  const headers = new Headers(baseHeaders);
+  if (origin) headers.set("Access-Control-Allow-Origin", origin);
+  const reply = (status: number, body: Record<string, unknown>) =>
+    new Response(JSON.stringify(body), { status, headers });
+
   if (req.method === "OPTIONS") return new Response(null, { status: 204, headers });
   if (req.method !== "POST") return reply(405, { error: "method_not_allowed" });
 
   const authorization = req.headers.get("authorization");
   if (!authorization) return reply(401, { error: "authentication_required" });
-  const bearer = /^Bearer\\s+(.+)$/i.exec(authorization);
+  const bearer = /^Bearer\s+(.+)$/i.exec(authorization);
   const accessToken = bearer?.[1]?.trim();
   if (!accessToken) return reply(401, { error: "bearer_token_required" });
 
