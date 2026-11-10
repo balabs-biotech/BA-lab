@@ -91,4 +91,65 @@ begin
 end
 $$;
 
+
+-- Exercise the location guard with a real tenant/environment/plant subject.
+do $
+declare
+  v_org uuid := gen_random_uuid();
+  v_location uuid := gen_random_uuid();
+  v_environment uuid := gen_random_uuid();
+  v_plant_culture uuid := gen_random_uuid();
+  v_context uuid := gen_random_uuid();
+begin
+  insert into public.organizations(id, code, name)
+  values (v_org, 'BIOCTX-' || replace(v_org::text, '-', ''), 'Biological context contract');
+
+  insert into public.environments(organization_id, id, location_id, name)
+  values (v_org, v_environment, null, 'Environment without location');
+
+  insert into public.plant_cultures(
+    organization_id, id, code, crop_type, species_name, cultivar_name, environment_id
+  ) values (
+    v_org, v_plant_culture, 'BIOCTX-PLANT', 'tomato', 'Solanum lycopersicum',
+    'Yellow Pear', v_environment
+  );
+
+  begin
+    insert into public.biological_contexts(
+      organization_id, id, domain, plant_culture_id, environment_id,
+      organism_kind, culture_stage, production_system, valid_from
+    ) values (
+      v_org, v_context, 'greentech', v_plant_culture, v_environment,
+      'plant', 'vegetative', 'greenhouse', date '2026-11-01'
+    );
+    raise exception 'FAIL: context accepted an environment without a physical location';
+  exception when check_violation then
+    null;
+  end;
+
+  insert into public.locations(organization_id, id, code, name)
+  values (v_org, v_location, 'BIOCTX-LOC', 'Biological context location');
+
+  update public.environments
+     set location_id = v_location
+   where organization_id = v_org and id = v_environment;
+
+  insert into public.biological_contexts(
+    organization_id, id, domain, plant_culture_id, environment_id,
+    organism_kind, culture_stage, production_system, context_tags, valid_from, valid_to
+  ) values (
+    v_org, v_context, 'greentech', v_plant_culture, v_environment,
+    'plant', 'vegetative', 'greenhouse', '["trial:one"]'::jsonb,
+    date '2026-11-01', date '2026-11-30'
+  );
+
+  if not exists (
+    select 1 from public.biological_contexts
+    where organization_id = v_org and id = v_context
+  ) then
+    raise exception 'FAIL: valid biological context was not persisted';
+  end if;
+end
+$;
+
 select '✓ biological context persistence contract checks passed' as result;
