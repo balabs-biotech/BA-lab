@@ -179,6 +179,15 @@ async function resolveBiologicalInterpretation(
     return { status: "domain_profile_unavailable" };
   }
 
+  // This endpoint consumes NASA POWER gridded outdoor weather, not in-situ
+  // greenhouse or laboratory sensor measurements.
+  if (
+    environmentProfile.origin !== "weather_provider" ||
+    environmentProfile.context_type !== "outdoor"
+  ) {
+    return { status: "environment_source_mismatch" };
+  }
+
   return {
     status: "ready",
     payload: {
