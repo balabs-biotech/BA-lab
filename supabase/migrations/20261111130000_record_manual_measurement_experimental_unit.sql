@@ -132,7 +132,7 @@ begin
 
   insert into public.events (
     organization_id, event_type, occurred_at, actor_user_id,
-    culture_id, material_id, plant_culture_id, experimental_unit_id,
+    culture_id, material_id, plant_culture_id,
     environment_id, location_id, batch_id, payload
   ) values (
     v_org_id,
@@ -142,7 +142,6 @@ begin
     nullif(p_event->>'culture_id', '')::uuid,
     v_material_id,
     nullif(p_event->>'plant_culture_id', '')::uuid,
-    v_experimental_unit_id,
     coalesce(nullif(p_event->>'environment_id', '')::uuid, nullif(p_measurement->>'environment_id', '')::uuid, v_batch_environment_id),
     coalesce(nullif(p_event->>'location_id', '')::uuid, v_batch_location_id),
     nullif(p_event->>'batch_id', '')::uuid,
