@@ -127,3 +127,80 @@ def test_private_analysis_endpoint_bounds_rolling_window_count():
         headers={"X-BA-Engine-Key": "test-secret"},
     )
     assert response.status_code == 422
+
+
+def persisted_nasa_payload():
+    request = payload()
+    raw_parameters = {
+        "air_temperature_mean": ("T2M", 20.0, "degC"),
+        "air_temperature_max": ("T2M_MAX", 25.0, "degC"),
+        "air_temperature_min": ("T2M_MIN", 15.0, "degC"),
+        "wind_speed_mean": ("WS2M", 2.0, "m/s"),
+        "solar_radiation_all_sky": ("ALLSKY_SFC_SW_DWN", 20.0 / 3.6, "kWh/m2/day"),
+        "relative_humidity_mean": ("RH2M", 60.0, "%"),
+    }
+    rows = []
+    for variable, (parameter, value, unit) in raw_parameters.items():
+        rows.append({
+            "id": str(uuid4()),
+            "organization_id": request["scope"]["organization_id"],
+            "location_id": request["scope"]["location_id"],
+            "data_family": "weather",
+            "provider_code": "NASA_POWER",
+            "dataset_code": "POWER_DAILY_AGRO",
+            "variable_code": variable,
+            "value": value,
+            "unit_code": unit,
+            "observed_at": "2026-11-01T12:00:00+00:00",
+            "retrieved_at": "2026-11-01T14:00:00+00:00",
+            "spatial_resolution_m": 55000.0,
+            "quality_flag": "gridded_estimate",
+            "source_url": "https://power.larc.nasa.gov/",
+            "metadata": {
+                "source_parameter": parameter,
+                "source_date": "2026-11-01",
+                "source_time_standard": "NASA POWER daily local solar time",
+            },
+        })
+    request["observations"] = rows
+    return request
+
+
+def test_nasa_power_api_normalizes_persisted_rows_and_preserves_lineage():
+    client = TestClient(create_app(engine_api_key="test-secret"))
+    response = client.post(
+        "/v1/analyses/nasa-power",
+        json=persisted_nasa_payload(),
+        headers={"X-BA-Engine-Key": "test-secret"},
+    )
+    assert response.status_code == 200, response.text
+    body = response.json()
+    net_radiation = next(
+        item for item in body["indicators"] if item["code"] == "net_radiation_fao56_daily"
+    )
+    solar_input = next(
+        item for item in net_radiation["inputs"]
+        if item["variable_code"] == "solar_radiation_all_sky"
+    )
+    assert solar_input["unit"] == "MJ/m2"
+    assert len(solar_input["source_observation_ids"]) == 1
+    assert body["source_summary"][0]["provider_code"] == "NASA_POWER"
+
+
+def test_nasa_power_api_rejects_unknown_source_parameter():
+    request = persisted_nasa_payload()
+    request["observations"][0]["metadata"]["source_parameter"] = "UNRECOGNIZED"
+    client = TestClient(create_app(engine_api_key="test-secret"))
+    response = client.post(
+        "/v1/analyses/nasa-power",
+        json=request,
+        headers={"X-BA-Engine-Key": "test-secret"},
+    )
+    assert response.status_code == 422
+    assert "unsupported or missing NASA POWER source_parameter" in str(response.json()["detail"])
+
+
+def test_nasa_power_api_requires_internal_key():
+    client = TestClient(create_app(engine_api_key="test-secret"))
+    response = client.post("/v1/analyses/nasa-power", json=persisted_nasa_payload())
+    assert response.status_code == 401
