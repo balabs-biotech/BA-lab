@@ -199,6 +199,8 @@ jobs:
         run: node supabase/tests/nasa-power-agroclimate-writer-authorization.test.mjs
       - name: Test authenticated environmental analysis gateway security contract
         run: node supabase/tests/environmental-analysis-gateway.test.mjs
+      - name: Test Green Tech environmental analysis UI contract
+        run: node supabase/tests/environmental-analysis-ui-contract.test.mjs
       - name: Test IoT ingestion bounded-body and device-auth security contract
         run: node supabase/tests/iot-ingest-security.test.mjs
 
