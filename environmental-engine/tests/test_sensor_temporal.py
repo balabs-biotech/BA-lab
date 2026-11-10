@@ -22,7 +22,7 @@ def test_sensor_temporal_screen_flags_outlier_against_past_only_history():
 
 
 def test_sensor_temporal_screen_does_not_use_current_or_future_values_as_history():
-    rows = [envelope(index * 60, value) for index, value in enumerate(
+    rows = [envelope(index, value) for index, value in enumerate(
         (10, 11, 12, 13, 14, 15, 16, 100)
     )]
     results = assess_sensor_temporal_anomalies(
@@ -37,9 +37,9 @@ def test_sensor_temporal_screen_does_not_use_current_or_future_values_as_history
 
 def test_sensor_temporal_screen_excludes_quality_excluded_rows_from_baseline():
     rows = [
-        envelope(0, 10), envelope(60, 11), envelope(120, 12),
-        envelope(180, 13), envelope(240, 14), envelope(300, 15),
-        envelope(360, 16), envelope(420, 17),
+        envelope(0, 10), envelope(1, 11), envelope(2, 12),
+        envelope(3, 13), envelope(4, 14), envelope(5, 15),
+        envelope(6, 16), envelope(7, 17),
         envelope(8, 999, quality="excluded"),
         envelope(9, 18),
     ]
