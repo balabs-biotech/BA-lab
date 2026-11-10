@@ -12,6 +12,7 @@
     <div class="toolbar-divider" aria-hidden="true"></div>
     <nav class="section-nav" aria-label="Navigation des modules">
       <a href="#overviewCard"><span class="nav-number">01</span> Vue générale</a>
+      <a href="#biologicalSignalsCard"><span class="nav-number">02</span> Alertes biologiques</a>
       <a href="#trackerCard" data-domain-nav="biological"><span class="nav-number">02</span> Cultures biologiques</a>
       <a href="#plantCard" data-domain-nav="agronomy"><span class="nav-number">02</span> Cultures végétales</a>
       <a href="#batchCard"><span class="nav-number">03</span> Lots</a>
@@ -91,6 +92,32 @@
       </aside>
     </div>
     <p class="overview-footnote">Cette vue ne calcule pas encore de statistiques analytiques. Toute analyse doit sélectionner une variable, une unité, une période et des lots comparables.</p>
+  </section>
+
+  <section class="card hidden" id="biologicalSignalsCard" aria-labelledby="signalsTitle">
+    <div class="section-kicker"><span>MODULE 06</span><span class="kicker-line"></span><span>INTELLIGENCE BIOLOGIQUE</span></div>
+    <div class="signals-heading">
+      <div><h2 id="signalsTitle">Centre des alertes biologiques</h2>
+        <p class="muted">Signaux interprétés par les moteurs BA Labs, associés à leur contexte biologique et à leurs observations sources.</p></div>
+      <button id="signalsRefresh" class="secondary-button" type="button">Actualiser</button>
+    </div>
+    <div class="signals-summary" aria-label="Synthèse des alertes">
+      <article><span>Alertes actives</span><strong id="signalsActiveCount">0</strong></article>
+      <article><span>Critiques actives</span><strong id="signalsCriticalCount">0</strong></article>
+      <article><span>Signaux chargés</span><strong id="signalsTotalCount">0</strong></article>
+    </div>
+    <div class="signals-toolbar">
+      <label for="signalsFilter">Afficher</label>
+      <select id="signalsFilter">
+        <option value="active">Alertes actives</option>
+        <option value="resolved">Résolues</option>
+        <option value="dismissed">Écartées</option>
+        <option value="all">Tous les états</option>
+      </select>
+    </div>
+    <p id="signalsStatus" class="signals-status" role="status" aria-live="polite">En attente de la session.</p>
+    <div id="signalsList" class="signals-list" aria-live="polite"></div>
+    <p class="signals-footnote">Les signaux sont générés par le moteur d’interprétation. Leur état opérationnel peut être modifié par les membres autorisés ; les données scientifiques et leur provenance restent en lecture seule.</p>
   </section>
 
   <!-- ======================================================
