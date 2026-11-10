@@ -71,6 +71,9 @@ Deno.serve(async (req: Request) => {
 
   const authorization = req.headers.get("authorization");
   if (!authorization) return reply(401, { error: "authentication_required" });
+  const bearer = /^Bearer\\s+(.+)$/i.exec(authorization);
+  const accessToken = bearer?.[1]?.trim();
+  if (!accessToken) return reply(401, { error: "bearer_token_required" });
 
   const supabaseUrl = Deno.env.get("SUPABASE_URL");
   const publishableKey = Deno.env.get("SUPABASE_PUBLISHABLE_KEY") ?? Deno.env.get("SUPABASE_ANON_KEY");
@@ -83,7 +86,7 @@ Deno.serve(async (req: Request) => {
   }
 
   const userClient = createClient(supabaseUrl, publishableKey, {
-    global: { headers: { Authorization: authorization } },
+    global: { headers: { Authorization: `Bearer ${accessToken}` } },
     auth: { persistSession: false, autoRefreshToken: false },
   });
   const adminClient = createClient(supabaseUrl, serviceKey, {
@@ -91,7 +94,9 @@ Deno.serve(async (req: Request) => {
   });
 
   try {
-    const { data: authData, error: authError } = await userClient.auth.getUser();
+    // Pass the JWT explicitly: with persistSession=false there is no local session
+    // for getUser() to recover, even though the REST client has a global header.
+    const { data: authData, error: authError } = await userClient.auth.getUser(accessToken);
     if (authError || !authData.user) return reply(401, { error: "invalid_session" });
 
     let body: any;
