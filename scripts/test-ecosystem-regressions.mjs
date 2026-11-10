@@ -57,6 +57,38 @@ for (const language of ['fr', 'ar', 'en', 'pt']) {
   });
   walk(tree.domains);
 }
+for (const [language, tree, ids] of [
+  ['en', JSON.parse(readFileSync('ecosystem/notion-tree.en.json', 'utf8')), {
+    fungal: '40173152f1718111a73ced2825985454', pleurotus: '40273152f17181eba1bbcaf1b1d491d6',
+    other: '40273152f171812aad80e9a88edf1be6', mycorrhizae: '40173152f1718101965cc766e3d7e27f',
+    microbes: '40173152f171817e918cc9c278aeca0d'
+  }],
+  ['pt', JSON.parse(readFileSync('ecosystem/notion-tree.pt.json', 'utf8')), {
+    fungal: '40173152f171812fb8d5de62178f6aef', pleurotus: '40273152f17181f29a8efba7e0d87825',
+    other: '40273152f17181ec9770df8a5a662720', mycorrhizae: '40173152f1718134a778d4c8d405ca62',
+    microbes: '40173152f171814ca1cae513ca2f0427'
+  }]
+]) {
+  const find = (nodes, id) => nodes.find(node => node.notionId === id);
+  const count = nodes => nodes.reduce((sum, node) => sum + 1 + count(node.children || []), 0);
+  const maxDepth = (nodes, depth = 0) => nodes.reduce((max, node) => Math.max(max, depth, maxDepth(node.children || [], depth + 1)), 0);
+  const myco = tree.domains.find(domain => domain.id === 'myco');
+  const fungal = find(myco.children, ids.fungal);
+  assert.ok(fungal, language + ' fungal resources page must be present');
+  const pleurotus = find(fungal.children, ids.pleurotus);
+  assert.equal(pleurotus?.children?.length, 13, language + ' Pleurotus branch must expose all 13 verified species and culture resources');
+  const other = find(fungal.children, ids.other);
+  assert.ok((other?.children?.length || 0) >= 10, language + ' other fungi branch must expose its verified organism pages');
+  const mycorrhizae = find(myco.children, ids.mycorrhizae);
+  assert.equal(mycorrhizae?.children?.length, 2, language + ' mycorrhizae branch must expose arbuscular and ectomycorrhizal sub-branches');
+  assert.ok(mycorrhizae.children.every(node => (node.children || []).length >= 2), language + ' mycorrhizae sub-branches must expose their verified organism pages');
+  const microbes = find(tree.domains.find(domain => domain.id === 'bio').children, ids.microbes);
+  assert.ok((microbes?.children?.length || 0) >= 20, language + ' agricultural microorganism branch must expose its verified organism profiles');
+  assert.equal(tree.domains.find(domain => domain.id === 'soil').children?.length, 5, language + ' agrotechnology branch must expose its five verified resource pages');
+  assert.ok(count(tree.domains) >= 75, language + ' language tree must retain the expanded public resource network');
+  assert.ok(maxDepth(tree.domains) >= 3, language + ' language tree must preserve deep navigation levels');
+}
+
 const enTree = JSON.parse(readFileSync('ecosystem/notion-tree.en.json', 'utf8'));
 const ptTree = JSON.parse(readFileSync('ecosystem/notion-tree.pt.json', 'utf8'));
 for (const [language, tree, mycologyId, fungalId] of [
