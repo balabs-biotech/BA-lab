@@ -5560,7 +5560,8 @@ async function loadRecentMeasurements() {
 
   if (requestId !== measurementHistoryRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
 
-  const experimentalUnitIds = [...new Set(rows.map(row => row.experimental_unit_id).filter(Boolean))];
+  const visibleRows = rows.filter(row => belongsToActiveWorkspace(row, eventsById)).slice(0, 10);
+  const experimentalUnitIds = [...new Set(visibleRows.map(row => row.experimental_unit_id).filter(Boolean))];
   const experimentalUnitsById = {};
   if (experimentalUnitIds.length) {
     const { data: experimentalUnits, error: experimentalUnitsError } = await supabaseClient
@@ -5577,7 +5578,6 @@ async function loadRecentMeasurements() {
   }
 
   if (requestId !== measurementHistoryRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
-  const visibleRows = rows.filter(row => belongsToActiveWorkspace(row, eventsById)).slice(0, 10);
   if (!visibleRows.length) {
     measurementHistory.innerHTML = '<p class="muted">Aucune mesure enregistrée dans cet univers pour le moment.</p>';
     return;
