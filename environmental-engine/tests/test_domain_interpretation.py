@@ -4,7 +4,11 @@ from uuid import uuid4
 from ba_environmental_engine.contexts.biological import BiologicalContext, BiologicalDomain
 from ba_environmental_engine.contexts.environment import EnvironmentContext, EnvironmentType, ObservationOrigin
 from ba_environmental_engine.execution import run_environmental_analysis
-from ba_environmental_engine.interpretation import (\n    interpret_findings,\n    interpret_analysis_for_biological_context,\n    interpret_persisted_analysis_for_subject,\n)
+from ba_environmental_engine.interpretation import (
+    interpret_findings,
+    interpret_analysis_for_biological_context,
+    interpret_persisted_analysis_for_subject,
+)
 from ba_environmental_engine.interpretation.models import (
     DomainProfile,
     InterpretationRule,
