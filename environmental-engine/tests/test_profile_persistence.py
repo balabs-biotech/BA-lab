@@ -63,7 +63,7 @@ def test_environment_profile_record_builds_engine_context():
     record = make_environment_profile()
     context = environment_context_from_record(record)
 
-    assert str(context.context_id) == record["id"]
+    assert str(context.context_id) == record["environment_id"]
     assert str(context.organization_id) == record["organization_id"]
     assert str(context.location_id) == record["environment"]["location_id"]
     assert context.context_type is EnvironmentType.FRUITING_CHAMBER
@@ -166,7 +166,7 @@ def test_repository_resolves_environment_profile_for_full_analysis_window():
         to_date="2026-11-30",
     )
 
-    assert str(context.context_id) == record["id"]
+    assert str(context.context_id) == record["environment_id"]
     query = client.queries[0][1]
     assert ("organization_id", "eq", record["organization_id"]) in query.filters
     assert ("environment_id", "eq", record["environment_id"]) in query.filters
