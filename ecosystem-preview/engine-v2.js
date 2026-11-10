@@ -94,7 +94,7 @@ function addStyles() {
     #mainView .webgl-branch-dock .webgl-branch-item[data-has-children="true"]:after{content:'›';color:#d69a7f;font-size:21px;line-height:1}
     #mainView .webgl-branch-dock .webgl-branch-item:hover,#mainView .webgl-branch-dock .webgl-branch-item:focus-visible{background:#385044;border-color:#d1d0c5;outline:2px solid #d1d0c5;outline-offset:2px}
     #mainView .webgl-branch-dock .webgl-branch-item[aria-current="page"]{background:transparent;color:#d99a7d;text-decoration:underline;text-decoration-color:#b96b4d;text-decoration-thickness:2px;text-underline-offset:5px}
-    @media(max-width:600px){#mainView .webgl-branch-dock{left:8px;right:8px;bottom:46px;height:50px;max-height:50px;gap:5px;padding:5px 7px}#mainView .webgl-branch-dock .webgl-branch-item{flex:0 0 auto;min-width:0;max-width:190px;min-height:38px;padding:7px 9px;font-size:13px}}
+    @media(max-width:600px){#mainView .webgl-branch-dock{left:8px;right:8px;bottom:46px;height:50px;max-height:50px;gap:5px;padding:5px 7px}#mainView .webgl-branch-dock .webgl-branch-item{flex:0 0 auto;min-width:0;max-width:190px;min-height:44px;padding:7px 9px;font-size:13px}}
     #mainView .webgl-stage.is-transitioning{cursor:progress}
     @media(max-width:600px){#mainView .webgl-path{left:9px;top:52px;max-width:min(260px,calc(100% - 78px));font-size:9px}#mainView .webgl-hint{left:9px;bottom:10px;max-width:calc(100% - 130px);font-size:7px;letter-spacing:.02em}#mainView .webgl-status{right:9px;bottom:12px;font-size:7px}#mainView .webgl-focus{left:9px;top:9px;padding:13px;width:min(270px,calc(100% - 78px))}#mainView .webgl-controls{right:9px;top:9px;gap:4px}#mainView .webgl-controls button{width:34px;height:34px}}
   `;
