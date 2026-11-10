@@ -13,7 +13,7 @@ from typing import Annotated, Any, Literal
 from uuid import UUID
 
 from fastapi import Depends, FastAPI, Header, HTTPException, status
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import BaseModel, ConfigDict, Field, StrictInt, model_validator
 
 from ba_environmental_engine import __version__
 from ba_environmental_engine.climate.aggregation import AggregationMethod
@@ -79,8 +79,8 @@ class AnalysisRequest(APIModel):
     latitude_deg: float = Field(ge=-90, le=90)
     altitude_m: float = Field(ge=-500, le=9000)
     observations: list[ObservationInput] = Field(min_length=1, max_length=5000)
-    rolling_methods: dict[str, AggregationMethod] | None = None
-    rolling_windows: tuple[int, ...] = (7, 14, 30, 90)
+    rolling_methods: dict[str, AggregationMethod] | None = Field(default=None, max_length=40)
+    rolling_windows: tuple[StrictInt, ...] = Field(default=(7, 14, 30, 90), min_length=1, max_length=8)
     minimum_rolling_coverage: float = Field(default=1.0, gt=0, le=1)
 
     @model_validator(mode="after")
