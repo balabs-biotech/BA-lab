@@ -1,4 +1,5 @@
 from datetime import datetime, timezone, date
+from dataclasses import replace
 from uuid import uuid4
 
 from ba_environmental_engine.interpretation import interpret_sensor_analysis
@@ -144,14 +145,12 @@ def test_sensor_interpretation_does_not_claim_full_coverage_without_declared_cad
         to_at_exclusive=analysis.to_at_exclusive,
         total_observations=analysis.total_observations,
         excluded_observations=analysis.excluded_observations,
-        series=(SensorSeriesSummary(
-            **{
-                **summary.__dict__,
-                "expected_count": None,
-                "availability_ratio": None,
-                "gap_count": None,
-                "maximum_gap_seconds": None,
-            }
+        series=(replace(
+            summary,
+            expected_count=None,
+            availability_ratio=None,
+            gap_count=None,
+            maximum_gap_seconds=None,
         ),),
     )
     profile = DomainProfile(
