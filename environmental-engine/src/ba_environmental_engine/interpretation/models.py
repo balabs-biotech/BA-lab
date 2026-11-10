@@ -4,6 +4,7 @@ Rules are supplied by a domain profile. This package deliberately ships no
 species-, crop-, strain-, substrate-, or laboratory-specific thresholds.
 """
 
+from datetime import date
 from typing import Literal
 from uuid import UUID
 
@@ -64,7 +65,7 @@ class DomainSignal(InterpretationModel):
     source_finding_id: UUID
     source_observation_ids: tuple[UUID, ...]
     variable_code: str
-    observed_date: str
+    observed_date: date
     observed_value: float
     unit: str
     finding_status: FindingStatus
