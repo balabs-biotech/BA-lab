@@ -49,6 +49,16 @@ def _indicator_quality(rows: list[NormalizedEnvironmentalObservation],
     return IndicatorQuality(quality_class=quality_class, flags=sorted(flags))
 
 
+def _rolling_indicator_code(variable_code: str, method: str, window_days: int) -> str:
+    """Map canonical variables to stable public indicator codes."""
+    base_codes = {
+        ("precipitation_corrected", "sum"): "precipitation_sum",
+        ("solar_radiation_all_sky", "sum"): "solar_radiation_sum",
+    }
+    base = base_codes.get((variable_code, method), variable_code)
+    return f"{base}_{window_days}d"
+
+
 def _source_summaries(
     observations: list[NormalizedEnvironmentalObservation],
     consumed_variables: set[str],
@@ -237,7 +247,9 @@ def build_bal_analysis(
         used_variables.add(result.variable_code)
         output.append(
             Indicator(
-                code=f"{result.variable_code}_{aggregation.method}_{result.window_days}d",
+                code=_rolling_indicator_code(
+                    result.variable_code, aggregation.method, result.window_days
+                ),
                 label=f"{result.variable_code} {aggregation.method} over {result.window_days} days",
                 value=aggregation.value,
                 unit=aggregation.unit,
