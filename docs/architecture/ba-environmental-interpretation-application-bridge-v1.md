@@ -2,7 +2,7 @@
 
 ## Status
 
-Partial implementation on the feature branch; not deployed. The Edge Function and private FastAPI boundary now support optional, server-resolved biological interpretation. The GreenTech client still sends only location and date fields, so it does not yet request a subject-specific interpretation.
+Partial implementation on the feature branch; not deployed. The Edge Function and private FastAPI boundary support optional, server-resolved biological interpretation. The GreenTech client now exposes an optional active plant-culture selector and sends `domain: "greentech"` plus `subject_id` when a subject is selected. The default remains climate-only.
 
 Current request path:
 
@@ -12,7 +12,7 @@ Climate analysis remains independent. If the client does not send both `domain` 
 
 ## Remaining client integration gap
 
-The Edge Function now accepts optional `domain` and `subject_id` fields together with `location_id`, `start_date`, and `end_date`. It resolves the biological subject only inside the caller's authorized organization. The current GreenTech client has not yet been extended with a subject selector and still sends only location and date fields.
+The Edge Function accepts optional `domain` and `subject_id` fields together with `location_id`, `start_date`, and `end_date`. The GreenTech client loads active plant cultures associated with the selected location (directly or through an environment) under caller RLS. When one is selected, it sends the subject identifier and GreenTech domain; otherwise it requests climate-only analysis. Mycology and Lab client selectors remain to be integrated.
 
 The current `EnvironmentContext` model requires:
 
@@ -131,7 +131,7 @@ Invalid context payloads produce `context_invalid` while preserving the climate 
 3. Private FastAPI request/response contract: implemented with optional Pydantic validation and climate-preserving failure behavior.
 4. Python API tests: added for successful interpretation and invalid-context isolation; not executed.
 5. Add Edge Function integration tests with mocked Supabase and engine boundaries.
-6. Add a GreenTech subject selector and send `domain` + `subject_id`; then extend the same contract to Mycology and Lab.
+6. GreenTech subject selector and optional request fields: implemented. Extend the same subject-selection contract to Mycology and Lab.
 7. Validate SQL/RLS against a real Supabase test database and run Python, Deno, SQL migration replay, and repository CI on the exact PR head.
 
 No deployment, production data mutation, merge, or automatic profile seeding is part of this design step.
