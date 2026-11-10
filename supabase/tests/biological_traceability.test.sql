@@ -46,6 +46,7 @@ create table public.materials(
 create table public.cultures(
   organization_id uuid not null references public.organizations(id), id uuid not null default gen_random_uuid(), code text not null,
   culture_type text not null references public.culture_types(code), material_id uuid not null, parent_culture_id uuid,
+  experiment_id uuid, experimental_unit_id uuid,
   started_at timestamptz, metadata jsonb not null default '{}'::jsonb, created_at timestamptz not null default now(),
   primary key(organization_id,id), unique(organization_id,code),
   foreign key(organization_id,material_id) references public.materials(organization_id,id),
@@ -85,6 +86,10 @@ create table public.experimental_units(
   unique(organization_id,experiment_id,unit_code),
   foreign key(organization_id,experiment_id) references public.experiments(organization_id,id)
 );
+alter table public.cultures add constraint cultures_experiment_id_fkey
+  foreign key(organization_id,experiment_id) references public.experiments(organization_id,id) on delete set null;
+alter table public.cultures add constraint cultures_experimental_unit_id_fkey
+  foreign key(organization_id,experimental_unit_id) references public.experimental_units(organization_id,id) on delete set null;
 create table public.results(
   organization_id uuid not null references public.organizations(id),
   id uuid not null default gen_random_uuid(),
@@ -125,6 +130,74 @@ grant execute on function auth.uid() to authenticated, anon;
 grant select on public.organization_members to authenticated, anon;
 grant select,insert,update,delete on public.material_types,public.culture_types,public.organizations,public.strains,public.materials,public.cultures,public.material_relationships,public.events,public.batches to authenticated,anon;
 grant select,insert,update,delete on public.experiments,public.experimental_units,public.results to authenticated,anon;
+
+-- Regression contract: a culture's experiment must be the experiment that owns its unit.
+select set_config('request.jwt.claim.sub','00000000-0000-0000-0000-0000000000b1',false);
+do $experimental_context_integrity$
+declare
+  experiment_a uuid;
+  experiment_b uuid;
+  unit_a uuid;
+  unit_b uuid;
+  culture_id uuid;
+  caught boolean := false;
+begin
+  insert into public.experiments(organization_id,code)
+  values ('00000000-0000-0000-0000-0000000000a1','EXP-CONTEXT-A')
+  returning id into experiment_a;
+  insert into public.experiments(organization_id,code)
+  values ('00000000-0000-0000-0000-0000000000a1','EXP-CONTEXT-B')
+  returning id into experiment_b;
+  insert into public.experimental_units(organization_id,experiment_id,unit_code)
+  values ('00000000-0000-0000-0000-0000000000a1',experiment_a,'UNIT-A')
+  returning id into unit_a;
+  insert into public.experimental_units(organization_id,experiment_id,unit_code)
+  values ('00000000-0000-0000-0000-0000000000a1',experiment_b,'UNIT-B')
+  returning id into unit_b;
+
+  insert into public.cultures(organization_id,code,culture_type,material_id,experiment_id,experimental_unit_id)
+  select '00000000-0000-0000-0000-0000000000a1','EXP-CONTEXT-CULTURE','agar',m.id,experiment_a,unit_a
+    from public.materials m
+   where m.organization_id='00000000-0000-0000-0000-0000000000a1'
+     and m.material_code='MAT-PARENT'
+  returning id into culture_id;
+
+  begin
+    update public.cultures
+       set experimental_unit_id=unit_b
+     where organization_id='00000000-0000-0000-0000-0000000000a1'
+       and id=culture_id;
+  exception when foreign_key_violation then caught := true;
+  end;
+  if not caught then
+    raise exception 'FAIL: culture accepted an experimental unit owned by another experiment';
+  end if;
+
+  caught := false;
+  begin
+    update public.cultures
+       set experimental_unit_id=null
+     where organization_id='00000000-0000-0000-0000-0000000000a1'
+       and id=culture_id;
+  exception when check_violation then caught := true;
+  end;
+  if not caught then
+    raise exception 'FAIL: culture accepted an experiment without its experimental unit';
+  end if;
+
+  delete from public.experimental_units
+   where organization_id='00000000-0000-0000-0000-0000000000a1'
+     and id=unit_a;
+  if exists (
+    select 1 from public.cultures
+     where organization_id='00000000-0000-0000-0000-0000000000a1'
+       and id=culture_id
+       and (experiment_id is not null or experimental_unit_id is not null)
+  ) then
+    raise exception 'FAIL: deleting an experimental unit left a dangling culture experiment reference';
+  end if;
+end
+$experimental_context_integrity$;
 alter table public.materials enable row level security;
 alter table public.cultures enable row level security;
 alter table public.material_relationships enable row level security;
