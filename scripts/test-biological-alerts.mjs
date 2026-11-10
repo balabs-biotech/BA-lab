@@ -23,11 +23,19 @@ assert.match(workspace, /id="signalsSeverityFilter"/);
 assert.match(workspace, /id="signalsMethodFilter"/);
 assert.match(workspace, /id="signalsVariableFilter"/);
 assert.match(workspace, /id="signalsLoadMore"/);
+assert.match(workspace, /id="signalsHistory"/);
+assert.match(workspace, /id="signalsHistoryList"/);
 assert.match(moduleSource, /\.from\("biological_signals"\)/);
 assert.match(moduleSource, /\.eq\("organization_id", state\.organizationId\)/);
 assert.match(moduleSource, /\.eq\("domain", state\.domain\)/);
 assert.match(moduleSource, /\.range\(pageOffset, pageOffset \+ PAGE_SIZE - 1\)/);
 assert.match(moduleSource, /signalsLoadMore/);
+assert.match(moduleSource, /loadHistory\("biological_subject_id"/);
+assert.match(moduleSource, /loadHistory\("environment_id"/);
+assert.match(moduleSource, /\.eq\(kind, id\)/);
+assert.match(moduleSource, /\.limit\(50\)/);
+assert.match(moduleSource, /state\.historyRequest/);
+assert.match(moduleSource, /signalsHistoryClose/);
 assert.match(moduleSource, /signalsSeverityFilter/);
 assert.match(moduleSource, /signalsMethodFilter/);
 assert.match(moduleSource, /signalsVariableFilter/);
@@ -49,6 +57,7 @@ assert.match(tracker, /balabs:organization-context/);
 assert.match(tracker, /window\.BALabsSupabaseClient = supabaseClient/);
 assert.match(tracker, /userId: session\.user\.id/);
 assert.match(styles, /#biologicalSignalsCard/);
+assert.match(styles, /signal-history-entry/);
 
 for (const phrase of [
   "Centre des alertes biologiques",
