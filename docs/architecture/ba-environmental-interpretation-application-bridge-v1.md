@@ -2,17 +2,17 @@
 
 ## Status
 
-Design boundary only. This document does not claim that persisted biological interpretation is wired into the deployed application.
+Partial implementation on the feature branch; not deployed. The Edge Function and private FastAPI boundary now support optional, server-resolved biological interpretation. The GreenTech client still sends only location and date fields, so it does not yet request a subject-specific interpretation.
 
-The current request path is:
+Current request path:
 
-`CultureOps client -> Supabase Edge Function -> authenticated tenant/location checks -> environmental_observations read -> private FastAPI /v1/analyses/nasa-power -> BAL-JSON climate analysis`.
+`CultureOps client -> Supabase Edge Function -> JWT / tenant / location checks -> optional biological-context + profile resolution -> environmental_observations read -> private FastAPI /v1/analyses/nasa-power -> BAL-JSON climate analysis + optional domain interpretation`.
 
-The Python package also contains a persisted biological-context repository and an interpretation orchestrator, but the HTTP boundary does not call them yet.
+Climate analysis remains independent. If the client does not send both `domain` and `subject_id`, the gateway returns `interpretation_status: "not_requested"`.
 
-## Verified integration gap
+## Remaining client integration gap
 
-The current Edge Function accepts `location_id`, `start_date`, and `end_date`. It does not accept a biological subject or domain. It therefore cannot resolve the applicable row from `biological_contexts`.
+The Edge Function now accepts optional `domain` and `subject_id` fields together with `location_id`, `start_date`, and `end_date`. It resolves the biological subject only inside the caller's authorized organization. The current GreenTech client has not yet been extended with a subject selector and still sends only location and date fields.
 
 The current `EnvironmentContext` model requires:
 
@@ -28,13 +28,13 @@ The existing `environments` table has `location_id`, `name`, and generic `metada
 
 The interpretation engine requires an explicit `DomainProfile` with a module, profile ID, version, and rules. No authoritative persisted profile registry or approved domain rule set was found in the inspected application boundary. The engine deliberately contains no default biological thresholds or recommendations.
 
-Consequently, the Edge Function must not manufacture an EnvironmentContext or DomainProfile from guessed values, and it must not accept arbitrary client-supplied rules as trusted policy.
+Consequently, the Edge Function loads the environment and domain profiles from the versioned registries. It does not manufacture either profile and does not accept arbitrary client-supplied rules as trusted policy.
 
-## Target request contract
+## Request contract implemented on the feature branch
 
-The client should continue to identify the analysis scope and the biological subject; it should not submit trusted scientific rules.
+The client identifies the analysis scope and, optionally, the biological subject; it never submits trusted scientific rules.
 
-Proposed client fields:
+Accepted client fields:
 
 - `location_id`
 - `start_date`
@@ -46,12 +46,12 @@ The Edge Function must:
 
 1. Validate the caller JWT and organization membership.
 2. Resolve the location under caller RLS and verify the requested subject belongs to the same organization and requested domain.
-3. Load the unique biological context whose validity interval covers the complete analysis window. Zero matches means no biological interpretation; multiple matches or partial coverage must fail closed for interpretation.
+3. Load the unique biological context whose validity interval covers the complete analysis window. Zero matches, multiple matches, or partial coverage prevent interpretation only.
 4. Resolve a versioned environment-context profile linked to the selected environment.
-5. Resolve an approved, immutable domain-interpretation profile for the requested domain and version.
-6. Load quality-screened environmental observations within the tenant/location/date scope.
-7. Call the private engine with the climate-analysis input plus the resolved, server-loaded context and profile.
-8. Return climate indicators/findings separately from domain interpretation signals, preserving their distinct epistemic status.
+5. Resolve a versioned domain-interpretation profile for the requested domain and complete date window.
+6. Load environmental observations within the tenant/location/date scope.
+7. Call the private engine with climate input plus the server-resolved context and profile.
+8. Return climate indicators/findings unchanged, with `domain_interpretation` and `interpretation_status` as sibling fields.
 
 The service-role client may only be used after caller authentication and authorization. All service-role queries must include explicit organization and resource filters. RLS remains enabled for user-facing access.
 
@@ -100,17 +100,14 @@ Do not put domain thresholds directly in the Edge Function. Do not make the Pyth
 
 ## Engine API changes
 
-The private API should expose a typed interpretation envelope rather than untyped dictionaries. The envelope should include:
+The private API now accepts an optional `biological_interpretation` object on `/v1/analyses/nasa-power`. The object contains three server-resolved records: `biological_context`, `environment_context`, and `domain_profile`. FastAPI validates each against its Pydantic domain model and checks tenant, location, environment, domain, and temporal bindings before evaluation.
 
-- the BAL-JSON climate analysis result;
-- the resolved biological context;
-- the resolved environment context;
-- the resolved domain profile;
-- the resulting domain interpretation.
+The response preserves the existing BAL-JSON keys (`indicators`, `findings`, `source_summary`, and `warnings`) and adds sibling fields:
 
-The API must validate that all organization, location, domain, subject, and date references agree before evaluating rules. A mismatch is a 422 contract error. Missing or ambiguous persisted context must never silently fall back to an unbound interpretation.
+- `interpretation_status`;
+- `domain_interpretation` (null when no valid interpretation is produced).
 
-Climate analysis remains useful when no biological context is available. In that case, return the climate result and an explicit `interpretation_status: "not_requested" | "context_unavailable"`; do not invent biological conclusions.
+Invalid context payloads produce `context_invalid` while preserving the climate analysis. The Edge Function handles missing or ambiguous persisted rows before calling the engine and supplies explicit statuses including `context_unavailable`, `ambiguous_context`, `context_does_not_cover_scope`, `environment_profile_unavailable`, `ambiguous_environment_profile`, `domain_profile_unavailable`, and `ambiguous_domain_profile`. No client-selected profile version or rule set is accepted.
 
 ## Required integration tests
 
@@ -129,12 +126,12 @@ Climate analysis remains useful when no biological context is available. In that
 
 ## Implementation sequence
 
-1. Agree and migrate the two versioned registries.
-2. Add read-only server-side resolvers to the Edge Function.
-3. Extend the private FastAPI request/response contracts.
-4. Add end-to-end tests with mocked Supabase and engine boundaries.
-5. Validate SQL/RLS against a real Supabase test database.
-6. Run Python, Deno, SQL migration replay, and repository CI on the exact PR head.
-7. Only then enable the UI to request biological interpretation.
+1. Versioned profile registries and normalized sensor bindings: implemented in migrations and SQL contract tests; not applied to live Supabase.
+2. Edge Function resolvers for biological context, environment profile, and domain profile: implemented on the feature branch; Deno tests still required.
+3. Private FastAPI request/response contract: implemented with optional Pydantic validation and climate-preserving failure behavior.
+4. Python API tests: added for successful interpretation and invalid-context isolation; not executed.
+5. Add Edge Function integration tests with mocked Supabase and engine boundaries.
+6. Add a GreenTech subject selector and send `domain` + `subject_id`; then extend the same contract to Mycology and Lab.
+7. Validate SQL/RLS against a real Supabase test database and run Python, Deno, SQL migration replay, and repository CI on the exact PR head.
 
 No deployment, production data mutation, merge, or automatic profile seeding is part of this design step.
