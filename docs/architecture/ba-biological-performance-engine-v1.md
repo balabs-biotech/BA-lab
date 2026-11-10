@@ -11,7 +11,7 @@ query Supabase, infer biological identity, or apply hidden quality policy.
 ### Net growth rate
 
 For one organization and biological subject, use the earliest and latest
-admissible `growth_extent` observations:
+admissible observations for one explicitly selected `variable_code` (for example, `root_length` or `shoot_length`):
 
 `(last_value - first_value) / elapsed_days`
 
@@ -52,7 +52,7 @@ The current `measurements` table provides organization and record IDs,
 A database adapter must:
 1. scope reads by `organization_id`;
 2. resolve the subject from exactly one supported biological subject link;
-3. map the approved variable code to the internal `growth_extent` metric;
+3. pass the selected `variable_code` explicitly; do not invent a `growth_extent` database variable;
 4. verify canonical units against the variable registry;
 5. preserve sample, experimental-unit, event, result, method, and instrument
    provenance;
