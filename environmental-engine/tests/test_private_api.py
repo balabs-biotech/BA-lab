@@ -204,3 +204,65 @@ def test_nasa_power_api_requires_internal_key():
     client = TestClient(create_app(engine_api_key="test-secret"))
     response = client.post("/v1/analyses/nasa-power", json=persisted_nasa_payload())
     assert response.status_code == 401
+
+
+def nasa_power_payload():
+    request = payload()
+    request["observations"] = []
+    parameters = {
+        "T2M": ("air_temperature_mean", 20.0, "degC"),
+        "T2M_MAX": ("air_temperature_max", 25.0, "degC"),
+        "T2M_MIN": ("air_temperature_min", 15.0, "degC"),
+        "WS2M": ("wind_speed_mean", 2.0, "m/s"),
+        "ALLSKY_SFC_SW_DWN": ("solar_radiation_all_sky", 5.0, "kWh/m2/day"),
+        "RH2M": ("relative_humidity_mean", 60.0, "%"),
+    }
+    for parameter, (variable, value, unit) in parameters.items():
+        request["observations"].append({
+            "id": str(uuid4()),
+            "organization_id": request["scope"]["organization_id"],
+            "location_id": request["scope"]["location_id"],
+            "data_family": "weather",
+            "provider_code": "NASA_POWER",
+            "dataset_code": "POWER_DAILY_AGRO",
+            "variable_code": variable,
+            "value": value,
+            "unit_code": unit,
+            "observed_at": "2026-11-01T12:00:00+00:00",
+            "retrieved_at": "2026-11-01T14:00:00+00:00",
+            "spatial_resolution_m": 55000.0,
+            "quality_flag": None,
+            "source_url": "https://power.larc.nasa.gov/",
+            "metadata": {
+                "source_parameter": parameter,
+                "source_date": "2026-11-01",
+                "source_time_standard": "NASA POWER daily local solar time",
+            },
+        })
+    return request
+
+
+def test_nasa_power_endpoint_normalizes_persisted_rows_and_preserves_provenance():
+    client = TestClient(create_app(engine_api_key="test-secret"))
+    response = client.post(
+        "/v1/analyses/nasa-power",
+        json=nasa_power_payload(),
+        headers={"X-BA-Engine-Key": "test-secret"},
+    )
+    assert response.status_code == 200, response.text
+    body = response.json()
+    assert body["contract_version"] == "1.0.0"
+    et0 = next(item for item in body["indicators"] if item["code"] == "reference_et0_fao56_daily")
+    assert len(et0["source_observation_ids"]) == 6
+
+
+def test_nasa_power_endpoint_rejects_forged_provider_parameter_mapping():
+    request = nasa_power_payload()
+    request["observations"][0]["metadata"]["source_parameter"] = "T2M_MAX"
+    client = TestClient(create_app(engine_api_key="test-secret"))
+    response = client.post(
+        "/v1/analyses/nasa-power",
+        json=request,
+        headers={"X-BA-Engine-Key": "test-secret"},
+    )
+    assert response.status_code == 422
