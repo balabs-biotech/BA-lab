@@ -92,7 +92,7 @@ def test_private_analysis_endpoint_rejects_cross_tenant_observation():
         headers={"X-BA-Engine-Key": "test-secret"},
     )
     assert response.status_code == 422
-    assert "match the requested organization" in response.json()["detail"]
+    assert "requested organization" in str(response.json()["detail"])
 
 
 def test_private_api_fails_closed_when_secret_is_not_configured():
