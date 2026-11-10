@@ -8,6 +8,9 @@ end $$;
 create schema if not exists auth;
 create schema if not exists private;
 -- The preceding SQL tests share this disposable database; clear only fixture tables.
+drop table if exists public.results cascade;
+drop table if exists public.experimental_units cascade;
+drop table if exists public.experiments cascade;
 drop table if exists public.batches cascade;
 drop table if exists public.events cascade;
 drop table if exists public.material_relationships cascade;
