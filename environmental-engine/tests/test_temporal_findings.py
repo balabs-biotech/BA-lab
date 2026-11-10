@@ -58,3 +58,25 @@ def test_temporal_findings_reject_duplicate_source_ids_and_dates():
             assessments=[assessments[0], assessments[0]],
             source_observation_ids_by_date={},
         )
+
+
+
+def test_temporal_findings_require_source_lineage_for_each_date():
+    day = date(2026, 1, 1)
+    assessment = assess_temporal_anomalies([DailyObservation(day, 10.0)])
+    with pytest.raises(ValueError, match="required for every assessment date"):
+        build_temporal_findings(
+            analysis_id=uuid4(),
+            variable_code="air_temperature_mean",
+            unit="degC",
+            assessments=assessment,
+            source_observation_ids_by_date={},
+        )
+    with pytest.raises(ValueError, match="at least one source observation ID"):
+        build_temporal_findings(
+            analysis_id=uuid4(),
+            variable_code="air_temperature_mean",
+            unit="degC",
+            assessments=assessment,
+            source_observation_ids_by_date={day: []},
+        )
