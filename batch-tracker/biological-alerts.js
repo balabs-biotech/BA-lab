@@ -228,7 +228,7 @@
   }
 
   async function resolveCultureLineage(cultureId, organizationId) {
-    const columns = "id,code,culture_type,parent_culture_id,started_at,created_at,material:materials(material_code,generation,strain:strains(strain_code,designation,organism:organisms(scientific_name)))";
+    const columns = "id,code,culture_type,parent_culture_id,started_at,created_at,material:materials(id,material_code,material_type,parent_material_id,strain_id,generation,state,metadata,strain:strains(id,strain_code,designation,origin,supplier,source_description,organism:organisms(scientific_name)))";
     const MAX_ANCESTORS = 8;
     const MAX_DESCENDANT_DEPTH = 5;
     const MAX_CULTURES = 100;
@@ -237,7 +237,7 @@
     let current = null;
     const currentResult = await client.from("cultures").select(columns)
       .eq("organization_id", organizationId).eq("id", cultureId).maybeSingle();
-    if (currentResult.error || !currentResult.data) return { cultures: [], batches: [], events: [], unavailable: true };
+    if (currentResult.error || !currentResult.data) return { cultures: [], materials: [], relationships: [], batches: [], events: [], unavailable: true };
     current = currentResult.data;
     byId.set(current.id, current);
     seen.add(current.id);
@@ -279,20 +279,69 @@
       return ga - gb || String(a.started_at || a.created_at || "").localeCompare(String(b.started_at || b.created_at || ""));
     });
     const cultureIds = cultures.map(item => item.id);
-    const [batchResult, eventResult] = await Promise.all([
-      client.from("batches").select("batch_code,name,status,current_stage,culture_id")
-        .eq("organization_id", organizationId).in("culture_id", cultureIds)
+    const materialById = new Map();
+    const materialSeen = new Set();
+    const initialMaterialIds = cultures.map(item => item.material?.id).filter(Boolean);
+    let materialFrontier = [...new Set(initialMaterialIds)];
+    const MAX_MATERIAL_DEPTH = 8;
+    const MAX_MATERIALS = 150;
+    // Material ancestry and descendants are independent of culture ancestry.
+    for (let depth = 0; depth < MAX_MATERIAL_DEPTH && materialFrontier.length && materialById.size < MAX_MATERIALS; depth++) {
+      const room = MAX_MATERIALS - materialById.size;
+      const ids = materialFrontier.filter(id => !materialSeen.has(id)).slice(0, room);
+      if (!ids.length) break;
+      ids.forEach(id => materialSeen.add(id));
+      const result = await client.from("materials")
+        .select("id,material_code,material_type,parent_material_id,strain_id,generation,state,metadata,strain:strains(id,strain_code,designation,origin,supplier,source_description,organism:organisms(scientific_name))")
+        .eq("organization_id", organizationId).in("id", ids);
+      if (result.error) break;
+      const rows = result.data || [];
+      rows.forEach(row => materialById.set(row.id, row));
+      materialFrontier = rows.map(row => row.parent_material_id).filter(id => id && !materialSeen.has(id));
+    }
+    // Expand descendants from every material already linked to the culture family.
+    materialFrontier = [...new Set(initialMaterialIds)];
+    for (let depth = 0; depth < 5 && materialFrontier.length && materialById.size < MAX_MATERIALS; depth++) {
+      const room = MAX_MATERIALS - materialById.size;
+      const result = await client.from("materials")
+        .select("id,material_code,material_type,parent_material_id,strain_id,generation,state,metadata,strain:strains(id,strain_code,designation,origin,supplier,source_description,organism:organisms(scientific_name))")
+        .eq("organization_id", organizationId).in("parent_material_id", materialFrontier)
+        .order("created_at", { ascending: true }).limit(Math.min(room, 100));
+      if (result.error) break;
+      const next = [];
+      for (const row of result.data || []) {
+        if (materialSeen.has(row.id) || materialById.has(row.id) || materialById.size >= MAX_MATERIALS) continue;
+        materialSeen.add(row.id);
+        materialById.set(row.id, row);
+        next.push(row.id);
+      }
+      materialFrontier = next;
+    }
+    const materialIds = [...materialById.keys()];
+    const [batchResult, cultureEventResult, materialEventResult, relationshipResult] = await Promise.all([
+      client.from("batches").select("batch_code,name,status,current_stage,culture_id,material_id")
+        .eq("organization_id", organizationId)
+        .or("culture_id.in.(" + cultureIds.join(",") + "),material_id.in.(" + materialIds.join(",") + ")")
         .order("created_at", { ascending: false }).limit(100),
-      client.from("events").select("id,event_type,occurred_at,culture_id,payload")
+      client.from("events").select("id,event_type,occurred_at,culture_id,material_id,payload")
         .eq("organization_id", organizationId).in("culture_id", cultureIds)
-        .order("occurred_at", { ascending: true }).limit(200)
+        .order("occurred_at", { ascending: true }).limit(200),
+      client.from("events").select("id,event_type,occurred_at,culture_id,material_id,payload")
+        .eq("organization_id", organizationId).in("material_id", materialIds)
+        .order("occurred_at", { ascending: true }).limit(200),
+      client.from("material_relationships").select("parent_material_id,child_material_id,relationship_type,created_at")
+        .eq("organization_id", organizationId).in("parent_material_id", materialIds).limit(300)
     ]);
+    const eventsById = new Map();
+    [...(cultureEventResult.data || []), ...(materialEventResult.data || [])].forEach(event => eventsById.set(event.id, event));
     return {
       cultures,
+      materials: [...materialById.values()],
+      relationships: relationshipResult.error ? [] : (relationshipResult.data || []),
       batches: batchResult.error ? [] : (batchResult.data || []),
-      events: eventResult.error ? [] : (eventResult.data || []),
+      events: [...eventsById.values()].sort((x, y) => String(x.occurred_at).localeCompare(String(y.occurred_at))),
       unavailable: false,
-      truncated: byId.size >= MAX_CULTURES
+      truncated: byId.size >= MAX_CULTURES || materialById.size >= MAX_MATERIALS
     };
   }
 
