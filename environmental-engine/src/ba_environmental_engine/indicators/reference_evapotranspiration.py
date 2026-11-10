@@ -7,7 +7,9 @@ net radiation from solar radiation.
 """
 
 from dataclasses import dataclass
-from math import exp, isfinite
+from math import isfinite
+
+from ba_environmental_engine.indicators.vapor_pressure import saturation_vapor_pressure_kpa
 
 
 FORMULA_PROFILE = "fao56_penman_monteith_daily_v1"
@@ -39,14 +41,6 @@ def _finite_number(name: str, value: float) -> float:
     ):
         raise ValueError(f"{name} must be a finite numeric value")
     return float(value)
-
-
-def saturation_vapor_pressure_kpa(temperature_c: float) -> float:
-    """Saturation vapour pressure in kPa using the FAO-56 Tetens equation."""
-    temperature = _finite_number("temperature_c", temperature_c)
-    if temperature <= -237.3:
-        raise ValueError("temperature_c is outside the valid FAO-56 formula domain")
-    return 0.6108 * exp((17.27 * temperature) / (temperature + 237.3))
 
 
 def atmospheric_pressure_from_altitude_kpa(altitude_m: float) -> float:
