@@ -1,5 +1,5 @@
 -- Verify the experimental-result write RPC after a full migration replay.
-do $$
+do $contract$$
 declare
   v_signature regprocedure :=
     'public.record_experiment_result(uuid,uuid,text,text,jsonb,text,uuid,timestamp with time zone)'::regprocedure;
@@ -44,5 +44,5 @@ begin
     raise exception 'FAIL: clients can bypass the validated experimental-result RPC';
   end if;
 end
-$$;
+$contract$;
 select 'PASS: experimental-result RPC security, idempotency and append-only result writes' as test_result;
