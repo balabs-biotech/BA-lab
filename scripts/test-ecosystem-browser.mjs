@@ -197,6 +197,7 @@ async function checkWorkingScene(name, viewport) {
       assert.ok(visibleLabelState?.visibleLabelDepths?.includes(0), name + ': immediate sub-branches must have visible labels');
       assert.equal(visibleLabelState?.visibleLabelCountsByDepth?.[0] || 0, childDockState.childCount,
         name + ': every immediate child must have its own visible text label at the branch navigation zoom. ' + JSON.stringify({childCount:childDockState.childCount,visibleCounts:visibleLabelState?.visibleLabelCountsByDepth}));
+      await page.screenshot({ path: outputDir + '/' + name + '-branch-labels.png', fullPage: false });
       if (!zoomOutChecked) {
         const nestedDepth = await page.evaluate(() => window.__BALABS_3D_E2E__()?.depth || 0);
         const cameraDistance = await page.evaluate(() => window.__BALABS_3D_E2E__()?.cameraDistance || 0);
