@@ -674,3 +674,50 @@ def test_sensor_temporal_suspect_is_routed_through_versioned_biological_profile(
     assert signal["evidence"]["assessment_type"] == "causal_robust_temporal_screen"
     assert signal["evidence"]["robust_z_score"] > 3.5
     assert signal["evidence"]["temporal_window_seconds"] == 9 * 60 * 60
+
+
+
+def test_sensor_api_exposes_flatline_diagnostics_separately_from_biological_interpretation():
+    request = sensor_payload()
+    template = request["measurements"][0]
+    request["measurements"] = []
+    for index in range(3):
+        row = dict(template)
+        row["id"] = str(uuid4())
+        row["raw_value"] = 20.0
+        row["measured_at"] = f"2026-03-01T{index:02d}:00:00+00:00"
+        request["measurements"].append(row)
+    request["flatline_minimum_repeated_observations"] = 3
+    request["flatline_minimum_duration_seconds"] = 7200
+
+    client = TestClient(create_app(engine_api_key="test-secret"))
+    response = client.post(
+        "/v1/analyses/sensors",
+        json=request,
+        headers={"X-BA-Engine-Key": "test-secret"},
+    )
+
+    assert response.status_code == 200, response.text
+    body = response.json()
+    assert body["instrument_health"]["flatline_diagnostics"]["status"] == "completed"
+    assessment = body["instrument_health"]["flatline_diagnostics"]["assessments"][0]
+    assert assessment["status"] == "suspected"
+    assert assessment["longest_repeated_run"] == 3
+    assert assessment["longest_repeated_duration_seconds"] == 7200
+    assert body["interpretation_status"] == "not_requested"
+    assert body["analysis"]["total_observations"] == 3
+
+
+def test_sensor_api_rejects_partial_flatline_policy():
+    request = sensor_payload()
+    request["flatline_minimum_repeated_observations"] = 3
+
+    client = TestClient(create_app(engine_api_key="test-secret"))
+    response = client.post(
+        "/v1/analyses/sensors",
+        json=request,
+        headers={"X-BA-Engine-Key": "test-secret"},
+    )
+
+    assert response.status_code == 422
+    assert "flatline diagnostic parameters must be supplied together" in str(response.json()["detail"])
