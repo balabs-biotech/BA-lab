@@ -281,3 +281,12 @@ console.log("✓ Tracker uses RPC-backed writes for events, measurements and obs
 // Experimental results must be visible from the culture detail that owns their unit.
 if(!engine.includes('from("results")')||!engine.includes('.eq("experimental_unit_id", culture.experimental_unit_id)'))throw new Error("Structured experimental results are not loaded for culture experimental units");
 if(!engine.includes("result_type")||!engine.includes("quality_state")||!engine.includes("result.value"))throw new Error("Experimental result type, quality state and structured value are not rendered");
+
+const experimentPanel=template.slice(template.indexOf('id="experimentRegistryCard"'));
+if(!experimentPanel.includes('id="experimentSetupForm"')||!experimentPanel.includes('id="experimentUnitRows"')||!experimentPanel.includes('id="addExperimentUnitButton"'))throw new Error("Experimental registry setup form is missing");
+if(!engine.includes('async function createExperimentWithUnits')||!engine.includes('rpc("create_experiment_with_units"'))throw new Error("Experiment setup is not persisted through the atomic RPC");
+if(!engine.includes('p_occurred_at: occurredAt')||!engine.includes('p_idempotency_key: idempotencyKey'))throw new Error("Experiment setup RPC is missing explicit timestamp or idempotency key");
+if(!engine.includes('from("experimental_units")')||!engine.includes('unit_code,replicate_no,treatment_code'))throw new Error("Experimental unit registry read model is missing");
+if(!engine.includes('isCurrentWorkspaceRevision(revision, orgId)'))throw new Error("Experiment registry does not guard tenant/session transitions");
+if(!template.includes('id="experimentRegistryList"')||!template.includes('id="experimentRegistryStatus"'))throw new Error("Experiment registry list/status region is missing");
+console.log("✓ Atomic experimental registry form, unit rows and tenant-safe read model are wired");
