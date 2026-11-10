@@ -227,6 +227,53 @@
     };
   }
 
+  async function resolveCultureLineage(cultureId) {
+    const columns = "id,code,culture_type,parent_culture_id,started_at,material:materials(material_code,generation,strain:strains(strain_code,designation,organism:organisms(scientific_name)))";
+    const [currentResult, childrenResult] = await Promise.all([
+      client.from("cultures").select(columns)
+        .eq("organization_id", state.organizationId).eq("id", cultureId).maybeSingle(),
+      client.from("cultures").select(columns)
+        .eq("organization_id", state.organizationId).eq("parent_culture_id", cultureId)
+        .order("started_at", { ascending: true }).limit(50)
+    ]);
+    if (currentResult.error || !currentResult.data) return { cultures: [], batches: [], unavailable: true };
+    const current = currentResult.data;
+    let parent = null;
+    if (current.parent_culture_id) {
+      const parentResult = await client.from("cultures").select(columns)
+        .eq("organization_id", state.organizationId).eq("id", current.parent_culture_id).maybeSingle();
+      if (!parentResult.error) parent = parentResult.data;
+    }
+    const cultures = [parent, current, ...(childrenResult.data || [])].filter(Boolean);
+    const cultureIds = [...new Set(cultures.map(item => item.id))];
+    const batchResult = await client.from("batches")
+      .select("batch_code,name,status,current_stage,culture_id")
+      .eq("organization_id", state.organizationId).in("culture_id", cultureIds)
+      .order("created_at", { ascending: false }).limit(100);
+    return { cultures, batches: batchResult.error ? [] : (batchResult.data || []), unavailable: false };
+  }
+
+  function renderCultureLineage(lineage, currentCultureId) {
+    if (!lineage || lineage.unavailable || !lineage.cultures.length) return null;
+    const section = element("section", "signal-lineage");
+    section.append(element("h4", "", "Lignée de culture"));
+    const list = element("ol", "signal-lineage-list");
+    lineage.cultures.forEach(culture => {
+      const item = element("li", culture.id === currentCultureId ? "is-current" : "");
+      const material = culture.material || {};
+      const strain = material.strain || {};
+      const organism = strain.organism || {};
+      const title = [culture.code, culture.id === currentCultureId ? "Culture consultée" : null].filter(Boolean).join(" — ");
+      const detail = [culture.culture_type, material.material_code, strain.strain_code || strain.designation, organism.scientific_name, material.generation === null || material.generation === undefined ? null : "G" + material.generation].filter(Boolean).join(" · ");
+      item.append(element("strong", "", title), element("small", "", detail || "Informations complémentaires indisponibles"));
+      const linkedBatches = lineage.batches.filter(batch => batch.culture_id === culture.id);
+      if (linkedBatches.length) item.append(element("small", "signal-lineage-batches", "Lots : " + linkedBatches.map(batch => [batch.batch_code, batch.status, batch.current_stage].filter(Boolean).join(" / ")).join(", ")));
+      list.append(item);
+    });
+    section.append(list);
+    return section;
+  }
+
   async function loadHistory(kind, id, label) {
     if (!state.userId || !state.organizationId || !state.domain || !["biological_subject_id", "environment_id"].includes(kind)) return;
     const request = ++state.historyRequest;
@@ -237,6 +284,9 @@
     $("signalsHistoryList").replaceChildren(element("p", "signals-empty", "Chargement de l’historique…"));
     panel.scrollIntoView({ behavior: "smooth", block: "start" });
     const identity = await resolveHistoryIdentity(kind, id);
+    const lineage = kind === "biological_subject_id" && state.domain !== "greentech"
+      ? await resolveCultureLineage(id)
+      : null;
     if (request !== state.historyRequest) return;
     $("signalsHistoryTitle").textContent = "Historique — " + identity.title;
     $("signalsHistoryStatus").textContent = identity.subtitle || "Objet métier associé";
@@ -247,6 +297,8 @@
     if (request !== state.historyRequest) return;
     const list = $("signalsHistoryList");
     list.replaceChildren();
+    const lineageNode = renderCultureLineage(lineage, id);
+    if (lineageNode) list.append(lineageNode);
     if (error) {
       console.error("[CultureOps signals] History read failed", error.message);
       list.append(element("p", "signals-empty", "Impossible de charger cet historique. Vérifiez les droits d’accès et la connexion."));
