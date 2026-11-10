@@ -293,7 +293,7 @@ function syncResourceHitTargets() {
  // especially important on narrow mobile screens where projected branches cluster.
  projected.sort((a,b)=>a.p.z-b.p.z);
  const occupied=[];
- const obstacles=[...stage.querySelectorAll('.webgl-controls,.webgl-status,.webgl-path,.webgl-focus,.webgl-intro,.webgl-branch-dock')]
+ const obstacles=[...ROOT.querySelectorAll('.webgl-controls,.webgl-status,.webgl-path,.webgl-focus,.webgl-intro,.webgl-branch-dock')]
   .filter(el=>!el.hidden&&getComputedStyle(el).display!=='none')
   .map(el=>{const r=el.getBoundingClientRect();return {l:r.left-stageRect.left,t:r.top-stageRect.top,r:r.right-stageRect.left,b:r.bottom-stageRect.top}});
  const overlaps=(a,b)=>a.l<b.r+8&&a.r>b.l-8&&a.t<b.b+8&&a.b>b.t-8;
