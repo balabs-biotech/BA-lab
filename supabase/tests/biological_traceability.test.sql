@@ -104,6 +104,7 @@ create table public.events(
   organization_id uuid not null references public.organizations(id), id uuid not null default gen_random_uuid(), event_type text not null,
   occurred_at timestamptz not null, actor_user_id uuid references auth.users(id), culture_id uuid, material_id uuid,
   sample_id uuid, experimental_unit_id uuid, batch_id uuid, payload jsonb not null default '{}'::jsonb, created_at timestamptz not null default now(),
+  primary key(organization_id,id),
   check(num_nonnulls(culture_id,material_id,sample_id,experimental_unit_id)=1),
   foreign key(organization_id,culture_id) references public.cultures(organization_id,id)
 );
