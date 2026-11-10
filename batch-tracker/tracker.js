@@ -71,6 +71,7 @@ function clearAuthenticatedWorkspaceState() {
   referenceData = [];
   cultureOptions = [];
   plantCultureOptions = [];
+  resetMaterialMixtureSources();
   latestBatches = [];
   selectedBatchId = null;
   selectedBatch = null;
@@ -771,6 +772,7 @@ async function signOut() {
   strainOptions = [];
   referenceData = [];
   cultureOptions = [];
+  resetMaterialMixtureSources();
   latestBatches = [];
   selectedBatchId = null;
   selectedBatch = null;
@@ -5927,6 +5929,17 @@ async function loadBiologicalLineage(cultureId) {
   } catch (error) { if (!isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return; target.textContent = biologicalWorkflowText("loadError") + (error.message || error); }
 }
 
+function resetMaterialMixtureSources() {
+  materialMixtureRequestId += 1;
+  materialMixtureSourceRows = [];
+  const panel = document.getElementById("materialMixturePanel");
+  const select = document.getElementById("mixtureSources");
+  const preview = document.getElementById("mixturePreview");
+  if (panel) panel.classList.add("hidden");
+  if (select) select.replaceChildren();
+  if (preview) preview.textContent = "Connectez-vous et ouvrez un univers biologique pour charger les matériaux.";
+}
+
 let materialMixtureRequestId = 0;
 let materialMixtureSourceRows = [];
 
@@ -7038,6 +7051,7 @@ function setupDomainWorkspaces() {
           if (switchRevision !== workspaceSwitchRevision || activeDomain !== document.body.dataset.domain) return;
           if (activeDomain === "agronomy") {
             cultureOptions = [];
+            resetMaterialMixtureSources();
             latestBatches = [];
             renderMeasurementTargets();
             renderStatisticsFilters();
