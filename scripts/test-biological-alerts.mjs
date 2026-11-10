@@ -56,6 +56,7 @@ assert.match(moduleSource, /\.in\("parent_culture_id", frontier\)/);
 assert.match(moduleSource, /MAX_ANCESTORS = 8/);
 assert.match(moduleSource, /MAX_DESCENDANT_DEPTH = 5/);
 assert.match(moduleSource, /MAX_CULTURES = 100/);
+assert.match(moduleSource, /let frontier = \[cursor\.id\]/);
 assert.match(moduleSource, /seen\.has\(child\.id\)/);
 assert.match(moduleSource, /\.from\("events"\)/);
 assert.match(moduleSource, /\.in\("culture_id", cultureIds\)/);
