@@ -189,6 +189,7 @@ async function checkWorkingScene(name, viewport) {
       assert.equal(activation.clicks, clicksBefore+1, name + ': one finger tap must activate a branch exactly once');
       assert.equal(await page.evaluate(() => window.__BALABS_3D_E2E__()?.pickCalls||0), beforeActivation.picks, name + ': a branch tap must not also trigger a spatial canvas selection');
       if(name==='mobile')assert.ok(activation.events.some(event=>event.type==='pointerup'&&event.target===branchButtonPoint.title), name + ': mobile branch selection must be handled on touch pointer release');
+      await page.waitForFunction(() => !document.querySelector('#mainView .webgl-stage')?.classList.contains('is-transitioning'), undefined, { timeout: 8000 });
       const childLabelState = await page.evaluate(() => { const probe=window.__BALABS_3D_E2E__(); const targets=[...document.querySelectorAll('.webgl-resource-target')]; return {childCount:probe?.childCount,created:targets.length,visible:targets.filter(button=>!button.hidden&&getComputedStyle(button).display!=='none').length,dockHidden:document.querySelector('.webgl-branch-dock')?.hidden}; });
       assert.ok(childLabelState && childLabelState.dockHidden && childLabelState.created>=childLabelState.childCount && childLabelState.visible>0,
         name + ': selecting a branch must expose its children directly on the map, without a dock. ' + JSON.stringify(childLabelState));
