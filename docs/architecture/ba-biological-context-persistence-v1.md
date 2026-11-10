@@ -87,3 +87,23 @@ The persisted row's `location_id` should be derived from the linked environment 
 3. Add repository/service persistence adapters that translate database rows to/from the existing Python `BiologicalContext` contract.
 4. Add integration tests for tenant isolation, historical validity, subject deletion behavior, environment mismatch, and round-trip mapping.
 5. Only then connect the persisted context to domain interpretation and the GreenTech/Mycology/Lab interfaces.
+
+
+## Implementation status — 2026-11-10
+
+The first persistence slice is now present on the feature branch:
+
+- Migration: `supabase/migrations/20261110160000_add_biological_contexts.sql`.
+- SQL contract test: `supabase/tests/biological_contexts_contract.test.sql`.
+- Python row mapper: `environmental-engine/src/ba_environmental_engine/contexts/persistence.py`.
+- Python mapper tests: `environmental-engine/tests/test_biological_context_persistence.py`.
+
+The SQL table stores either `culture_id` or `plant_culture_id`, plus `environment_id`. It does not duplicate `location_id`; an insert/update trigger rejects environments without a physical location. Tenant-scoped composite foreign keys enforce subject and environment ownership. Reads require organization membership; writes require the existing `private.is_org_writer` policy, so viewer accounts remain read-only.
+
+The Python mapper accepts a row with the PostgREST relation alias `environment` containing `location_id`. It maps the typed database subject FK to the model's `subject_id` and resolves the model's `location_id` from that joined environment. The reverse mapper emits database columns only and deliberately omits the derived location and generic subject ID.
+
+CI was extended to:
+- replay the migration chain and execute the biological-context SQL contract test;
+- run the Environmental Engine pytest suite on Python 3.10 and 3.12.
+
+**Validation state:** these tests have been added to CI but have not yet been observed running on the latest branch commit. No migration has been applied to the production Supabase project.
