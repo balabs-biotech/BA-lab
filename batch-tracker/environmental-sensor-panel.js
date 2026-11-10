@@ -124,12 +124,12 @@
       const table = node("table", "sensor-series-table");
       const head = node("thead");
       const header = node("tr");
-      ["Variable", "n utilisable", "Moyenne", "Min–max", "Couverture", "État"].forEach(label => header.append(node("th", "", label)));
+      ["Variable", "n utilisable", "Exclues", "Moyenne", "Min–max", "Couverture", "Ruptures", "Écart max", "État"].forEach(label => header.append(node("th", "", label)));
       head.append(header);
       const body = node("tbody");
       series.forEach(item => {
         const row = node("tr");
-        const values = [item.variable_code, item.usable_count ?? "—", item.mean ?? "—", item.minimum == null || item.maximum == null ? "—" : item.minimum + " – " + item.maximum, item.availability_ratio == null ? "Non déterminée" : Math.round(item.availability_ratio * 100) + "%", item.status || "—"];
+        const values = [item.variable_code, item.usable_count ?? "—", item.excluded_count ?? 0, item.mean ?? "—", item.minimum == null || item.maximum == null ? "—" : item.minimum + " – " + item.maximum, item.availability_ratio == null ? "Non déterminée" : Math.round(item.availability_ratio * 100) + "%", item.gap_count == null ? "Non déterminées" : item.gap_count, item.maximum_gap_seconds == null ? "—" : Math.round(item.maximum_gap_seconds) + " s", item.status || "—"];
         values.forEach(value => row.append(node("td", "", String(value))));
         body.append(row);
       });
