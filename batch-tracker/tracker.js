@@ -5233,7 +5233,7 @@ function renderExperimentRegistry(experiments, units) {
     const count = document.createElement("span");
     count.className = "culture-catalog-count";
     const experimentUnits = unitsByExperiment.get(experiment.id) || [];
-    count.textContent = `${experimentUnits.length} unité(s)`;
+    count.textContent = `Unités : ${experimentUnits.length}`;
     heading.append(title, count);
     const detail = document.createElement("p");
     detail.className = "muted";
@@ -5270,7 +5270,7 @@ async function loadExperimentRegistry() {
     experimentalUnitRegistryRows = unitResult.data || [];
     populateCultureExperimentOptions();
     renderExperimentRegistry(experimentRegistryRows, experimentalUnitRegistryRows);
-    if (experimentRegistryStatus) experimentRegistryStatus.textContent = `${(experimentResult.data || []).length} expérience(s) · ${(unitResult.data || []).length} unité(s) chargée(s).`;
+    if (experimentRegistryStatus) experimentRegistryStatus.textContent = "Registre expérimental chargé.";
   } catch (error) {
     if (!isCurrentWorkspaceRevision(revision, orgId)) return;
     console.error("Registre expérimental :", error);
@@ -5324,7 +5324,7 @@ async function createExperimentWithUnits(event) {
     experimentSetupForm.reset();
     experimentUnitRows.replaceChildren();
     addExperimentUnitRow();
-    if (experimentRegistryStatus) experimentRegistryStatus.textContent = `Expérience ${data?.code || code} enregistrée avec ${data?.unit_count ?? units.length} unité(s).`;
+    if (experimentRegistryStatus) experimentRegistryStatus.textContent = "Expérience et unités enregistrées.";
     await loadExperimentRegistry();
   } catch (error) {
     if (!isCurrentWorkspaceRevision(revision, orgId)) return;
