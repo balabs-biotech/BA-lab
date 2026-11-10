@@ -10,7 +10,7 @@ query Supabase, infer biological identity, or apply hidden quality policy.
 
 ### Net growth rate
 
-For one biological subject, use the earliest and latest admissible
+For one organization and biological subject, use the earliest and latest admissible
 `growth_extent` observations:
 
 `(last_value - first_value) / elapsed_days`
@@ -27,7 +27,7 @@ The result retains:
 - The caller must explicitly supply accepted quality states. The calculation
   module does not assume the database enum or treat `raw`, `verified`, or
   other states as admissible by default.
-- Records from other subjects and other metric codes are ignored.
+- Records from other organizations, subjects, and metric codes are ignored.
 - Duplicate source IDs are rejected.
 - Mixed units are rejected; no implicit unit conversion is performed.
 - Timestamps must be timezone-aware.
