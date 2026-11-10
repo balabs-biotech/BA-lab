@@ -192,6 +192,8 @@ async function checkWorkingScene(name, viewport) {
         name + ': selecting a branch must replace the dock with its actual child branches. ' + JSON.stringify(childDockState));
       navigated = true;
       await page.waitForFunction(() => !document.querySelector('#mainView .webgl-stage')?.classList.contains('is-transitioning'), undefined, { timeout: 8000 });
+      const visibleLabelState = await page.evaluate(() => window.__BALABS_3D_E2E__()?.visibleLabelDepths || []);
+      assert.ok(visibleLabelState.includes(0) && visibleLabelState.includes(1), name + ': at the branch navigation zoom, every immediate sub-branch must have a visible text label');
       if (!zoomOutChecked) {
         const nestedDepth = await page.evaluate(() => window.__BALABS_3D_E2E__()?.depth || 0);
         const cameraDistance = await page.evaluate(() => window.__BALABS_3D_E2E__()?.cameraDistance || 0);
