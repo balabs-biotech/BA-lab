@@ -269,6 +269,8 @@ jobs:
         run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/biological_contexts_contract.test.sql
       - name: Test versioned environmental profile registries after replay
         run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/environmental_profile_registries_contract.test.sql
+      - name: Test persisted biological signal events after replay
+        run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/biological_signals_contract.test.sql
 
   ecosystem-regression:
     runs-on: ubuntu-latest
