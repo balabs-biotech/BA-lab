@@ -24,3 +24,11 @@ assert.match(tracker, /target === "#sensorAnalysisCard"/, "sensor panel navigati
 assert.match(mycology, /environmental-sensor-panel\.js/, "Mycology must load the independent sensor panel");
 assert.match(laboratory, /environmental-sensor-panel\.js/, "Laboratory must load the independent sensor panel");
 console.log("PASS: sensor analysis UI integration contract");
+assert.match(panel, /temporal_window_seconds = windowMinutes \\* 60/, "UI minutes must convert to the backend's seconds contract");
+assert.match(panel, /temporal_minimum_history = minimumHistory/, "UI must forward the explicit minimum history");
+assert.match(panel, /temporal_threshold = threshold/, "UI must forward the robust threshold");
+assert.match(panel, /temporalValues\\.some\\(value => value === ""\\)/, "partial temporal configuration must be rejected in the UI");
+assert.match(panel, /item\\.status === "suspect"/, "only statistically suspect readings count as suspected deviations");
+assert.match(workspace, /id="sensorTemporalWindowMinutes"/, "workspace must expose the optional temporal window");
+assert.match(workspace, /id="sensorTemporalMinimumHistory"/, "workspace must expose the minimum history control");
+assert.match(workspace, /id="sensorTemporalThreshold"/, "workspace must expose the robust threshold control");
