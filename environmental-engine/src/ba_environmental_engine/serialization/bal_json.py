@@ -268,7 +268,8 @@ def build_bal_analysis(
             raise ValueError("rolling indicator coverage must match its declared period")
         variable_rows = [
             row for row in rows
-            if row.variable_code == result.variable_code
+            if row.data_family == "weather"
+            and row.variable_code == result.variable_code
             and result.period_start <= row.observed_date <= result.period_end
         ]
         observed_dates = {row.observed_date for row in variable_rows}
