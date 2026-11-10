@@ -248,10 +248,10 @@ async function checkWorkingScene(name, viewport) {
       continue;
     }
     assert.ok(branchTarget.url, name + ': terminal branch must carry its Notion destination');
-    const terminalPoint = await page.evaluate(() => { const buttons=[...document.querySelectorAll('.webgl-branch-dock .webgl-branch-item[data-has-children="false"][data-resource-url]')]; const button=buttons.find(item=>{const rect=item.getBoundingClientRect();return rect.width>0&&rect.height>0}); if(!button)return null; const rect=button.getBoundingClientRect(); return {x:rect.left+rect.width/2,y:rect.top+rect.height/2,title:button.title}; });
+    const terminalPoint = await page.evaluate(() => { const buttons=[...document.querySelectorAll('.webgl-resource-target[data-has-children="false"][data-resource-url]')]; const button=buttons.find(item=>{const rect=item.getBoundingClientRect();return !item.hidden&&getComputedStyle(item).display!=='none'&&rect.width>=40&&rect.height>=40}); if(!button)return null; const rect=button.getBoundingClientRect(); return {x:rect.left+rect.width/2,y:rect.top+rect.height/2,title:button.title,index:buttons.indexOf(button)}; });
     assert.ok(terminalPoint, name + ': at least one page must expose an unobstructed DOM hit target');
     const popupPromise = page.context().waitForEvent('page', { timeout: 10000 });
-    await tapSpatialTarget(page, name, terminalPoint.x, terminalPoint.y, '.webgl-branch-dock .webgl-branch-item[title='+JSON.stringify(terminalPoint.title)+']');
+    await tapSpatialTarget(page, name, terminalPoint.x, terminalPoint.y, page.locator('.webgl-resource-target[data-has-children="false"][data-resource-url]').nth(terminalPoint.index));
     const popup = await popupPromise;
     await popup.waitForLoadState('domcontentloaded', { timeout: 12000 }).catch(() => {});
     assert.match(popup.url(), /notion\.(so|site|com)/i, name + ': terminal branch must open its Notion page');
