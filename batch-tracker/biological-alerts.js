@@ -317,8 +317,58 @@
       }
       materialFrontier = next;
     }
+    // Expand the explicit material graph in both directions. The relationship table
+    // supports multiple parents; parent_material_id remains a legacy single-parent edge.
+    const MAX_RELATIONSHIP_DEPTH = 5;
+    const MAX_RELATIONSHIPS = 300;
+    const relationshipByKey = new Map();
+    let relationshipFrontier = [...materialById.keys()];
+    const relationshipSeen = new Set(relationshipFrontier);
+    for (let depth = 0; depth < MAX_RELATIONSHIP_DEPTH && relationshipFrontier.length && materialById.size < MAX_MATERIALS; depth++) {
+      const ids = relationshipFrontier.slice(0, 100);
+      const result = await client.from("material_relationships")
+        .select("parent_material_id,child_material_id,relationship_type,created_at")
+        .eq("organization_id", organizationId)
+        .or("parent_material_id.in.(" + ids.join(",") + "),child_material_id.in.(" + ids.join(",") + ")")
+        .limit(MAX_RELATIONSHIPS);
+      if (result.error) break;
+      const nextIds = new Set();
+      for (const edge of result.data || []) {
+        const key = [edge.parent_material_id, edge.child_material_id, edge.relationship_type].join(":");
+        relationshipByKey.set(key, edge);
+        for (const endpointId of [edge.parent_material_id, edge.child_material_id]) {
+          if (!materialById.has(endpointId) && materialById.size + nextIds.size < MAX_MATERIALS) nextIds.add(endpointId);
+        }
+      }
+      const hydrateIds = [...nextIds];
+      if (hydrateIds.length) {
+        const hydrated = await client.from("materials")
+          .select("id,material_code,material_type,parent_material_id,strain_id,generation,state,metadata,strain:strains(id,strain_code,designation,origin,supplier,source_description,organism:organisms(scientific_name))")
+          .eq("organization_id", organizationId).in("id", hydrateIds);
+        if (!hydrated.error) (hydrated.data || []).forEach(material => materialById.set(material.id, material));
+      }
+      relationshipFrontier = hydrateIds.filter(id => !relationshipSeen.has(id));
+      relationshipFrontier.forEach(id => relationshipSeen.add(id));
+    }
     const materialIds = [...materialById.keys()];
-    const [batchResult, cultureEventResult, materialEventResult, relationshipResult] = await Promise.all([
+    // Keep legacy parent pointers visible even when no explicit edge row exists.
+    for (const material of materialById.values()) {
+      if (!material.parent_material_id) continue;
+      const keyPrefix = material.parent_material_id + ":" + material.id + ":";
+      if (![...relationshipByKey.keys()].some(key => key.startsWith(keyPrefix))) {
+        const parent = materialById.get(material.parent_material_id);
+        relationshipByKey.set(keyPrefix + "parent_material_id", {
+          parent_material_id: material.parent_material_id,
+          child_material_id: material.id,
+          relationship_type: "parent_material_id",
+          created_at: null,
+          legacy_pointer: true,
+          parent_material_code: parent?.material_code || null
+        });
+      }
+    }
+    const relationships = [...relationshipByKey.values()].slice(0, MAX_RELATIONSHIPS);
+    const [batchResult, cultureEventResult, materialEventResult] = await Promise.all([
       client.from("batches").select("batch_code,name,status,current_stage,culture_id,material_id")
         .eq("organization_id", organizationId)
         .or("culture_id.in.(" + cultureIds.join(",") + "),material_id.in.(" + materialIds.join(",") + ")")
@@ -328,20 +378,18 @@
         .order("occurred_at", { ascending: true }).limit(200),
       client.from("events").select("id,event_type,occurred_at,culture_id,material_id,payload")
         .eq("organization_id", organizationId).in("material_id", materialIds)
-        .order("occurred_at", { ascending: true }).limit(200),
-      client.from("material_relationships").select("parent_material_id,child_material_id,relationship_type,created_at")
-        .eq("organization_id", organizationId).in("parent_material_id", materialIds).limit(300)
+        .order("occurred_at", { ascending: true }).limit(200)
     ]);
     const eventsById = new Map();
     [...(cultureEventResult.data || []), ...(materialEventResult.data || [])].forEach(event => eventsById.set(event.id, event));
     return {
       cultures,
       materials: [...materialById.values()],
-      relationships: relationshipResult.error ? [] : (relationshipResult.data || []),
+      relationships,
       batches: batchResult.error ? [] : (batchResult.data || []),
       events: [...eventsById.values()].sort((x, y) => String(x.occurred_at).localeCompare(String(y.occurred_at))),
       unavailable: false,
-      truncated: byId.size >= MAX_CULTURES || materialById.size >= MAX_MATERIALS
+      truncated: byId.size >= MAX_CULTURES || materialById.size >= MAX_MATERIALS || relationshipByKey.size >= MAX_RELATIONSHIPS
     };
   }
 
@@ -384,29 +432,51 @@
       section.append(element("h4", "", "Généalogie des matériaux"));
       const materialList = element("ol", "signal-lineage-list");
       const materialMap = new Map(lineage.materials.map(material => [material.id, material]));
-      const relationMap = new Map((lineage.relationships || []).map(relation => [relation.child_material_id, relation]));
+      const incomingByChild = new Map();
+      (lineage.relationships || []).forEach(edge => {
+        if (!incomingByChild.has(edge.child_material_id)) incomingByChild.set(edge.child_material_id, []);
+        incomingByChild.get(edge.child_material_id).push(edge);
+      });
       lineage.materials.slice().sort((left, right) =>
         (left.generation ?? Number.MAX_SAFE_INTEGER) - (right.generation ?? Number.MAX_SAFE_INTEGER)
       ).forEach(material => {
         const item = element("li", "");
         const strain = material.strain || {};
         const organism = strain.organism || {};
-        const parentMaterial = materialMap.get(material.parent_material_id);
-        const relation = relationMap.get(material.id);
+        const incoming = incomingByChild.get(material.id) || [];
+        const parentIds = new Set(incoming.map(edge => edge.parent_material_id));
+        if (material.parent_material_id) parentIds.add(material.parent_material_id);
+        const parents = [...parentIds].map(id => materialMap.get(id)).filter(Boolean);
+        const missingParentCount = parentIds.size - parents.length;
         const detail = [
           material.material_type,
           material.generation === null || material.generation === undefined ? null : "G" + material.generation,
           material.state,
-          parentMaterial ? "Dérivé de " + parentMaterial.material_code : material.parent_material_id ? "Matériau parent hors périmètre" : "Matériau source"
+          parents.length ? parents.map(parent => parent.material_code || "Matériau sans code").join(" + ") : parentIds.size || material.parent_material_id ? "Parent(s) hors périmètre chargé" : "Matériau source"
         ].filter(Boolean).join(" · ");
         item.append(element("strong", "", material.material_code || "Matériau sans code"));
-        item.append(element("small", "", [detail, relation?.relationship_type ? "Relation : " + relation.relationship_type : null].filter(Boolean).join(" · ")));
-        if (strain.strain_code || strain.designation || organism.scientific_name) {
-          item.append(element("small", "signal-lineage-batches", "Souche : " + [
-            strain.strain_code || strain.designation, organism.scientific_name,
-            strain.origin ? "Origine : " + strain.origin : null,
-            strain.supplier ? "Fournisseur : " + strain.supplier : null
-          ].filter(Boolean).join(" · ")));
+        item.append(element("small", "", detail));
+        const relationLabels = incoming.map(edge => {
+          const parent = materialMap.get(edge.parent_material_id);
+          return (parent?.material_code || "Parent hors périmètre") + " → " + (edge.relationship_type || "relation");
+        });
+        if (relationLabels.length) item.append(element("small", "signal-lineage-event", "Relations entrantes : " + relationLabels.join(" ; ")));
+        if (missingParentCount) item.append(element("small", "signal-lineage-event", missingParentCount + " parent(s) non résolu(s) dans le périmètre chargé"));
+        const inheritedStrains = new Map();
+        [material, ...parents].forEach(source => {
+          const sourceStrain = source.strain || {};
+          const sourceOrganism = sourceStrain.organism || {};
+          const label = [sourceStrain.strain_code || sourceStrain.designation, sourceOrganism.scientific_name].filter(Boolean).join(" — ");
+          if (label) inheritedStrains.set(source.strain_id || sourceStrain.id || label, {
+            label,
+            origin: sourceStrain.origin,
+            supplier: sourceStrain.supplier
+          });
+        });
+        if (inheritedStrains.size) {
+          item.append(element("small", "signal-lineage-batches", "Souches contributrices : " + [...inheritedStrains.values()].map(source =>
+            [source.label, source.origin ? "Origine : " + source.origin : null, source.supplier ? "Fournisseur : " + source.supplier : null].filter(Boolean).join(" · ")
+          ).join(" ; ")));
         }
         const linkedBatches = lineage.batches.filter(batch => batch.material_id === material.id);
         if (linkedBatches.length) item.append(element("small", "signal-lineage-batches", "Lots matière : " +
