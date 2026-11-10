@@ -217,10 +217,13 @@ def test_rolling_indicator_preserves_coverage_and_does_not_invent_lineage():
     assert item.status == "insufficient_data"
     assert item.value is None
     assert item.coverage.observed == 6
-    assert item.inputs[0].source_observation_ids == [
-        row.source_observation_id for row in rows
-        if row.variable_code == "air_temperature_mean"
-    ]
+    assert item.inputs[0].source_observation_ids == sorted(
+        (
+            row.source_observation_id for row in rows
+            if row.variable_code == "air_temperature_mean"
+        ),
+        key=str,
+    )
 
 
 def test_observations_outside_analysis_scope_are_rejected():
