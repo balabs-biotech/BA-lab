@@ -1,8 +1,8 @@
-"""Persistence mapping between CultureOps rows and biological context contracts.
+"""CultureOps row mapping and injected PostgREST persistence adapter.
 
-This module is intentionally database-client agnostic. Supabase/PostgREST access
-stays at the application boundary; these functions only validate and translate
-the stable row contract.
+The row mappers are pure. The repository uses a duck-typed, already-authenticated
+client supplied by the application boundary; it imports no Supabase SDK and does
+not create clients, manage credentials, or own authentication.
 """
 
 from collections.abc import Mapping
