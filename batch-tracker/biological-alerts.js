@@ -256,7 +256,7 @@
     }
 
     // Walk descendants breadth-first; one batched query per generation, not N+1.
-    let frontier = [current.id];
+    let frontier = [cursor.id];
     for (let depth = 0; depth < MAX_DESCENDANT_DEPTH && frontier.length && byId.size < MAX_CULTURES; depth++) {
       const room = MAX_CULTURES - byId.size;
       const result = await client.from("cultures").select(columns)
