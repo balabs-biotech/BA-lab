@@ -521,7 +521,11 @@ begin
      or has_table_privilege('authenticated','public.experiments','DELETE')
      or has_table_privilege('authenticated','public.experimental_units','INSERT')
      or has_table_privilege('authenticated','public.experimental_units','UPDATE')
-     or has_table_privilege('authenticated','public.experimental_units','DELETE') then
+     or has_table_privilege('authenticated','public.experimental_units','DELETE')
+     or has_table_privilege('authenticated','public.provenance','INSERT')
+     or has_table_privilege('authenticated','public.provenance','UPDATE')
+     or has_table_privilege('authenticated','public.provenance','DELETE')
+     or has_table_privilege('authenticated','public.provenance','TRUNCATE') then
     raise exception 'FAIL: authenticated retains direct experiment or experimental-unit mutation privileges';
   end if;
   if not has_function_privilege('authenticated','public.create_experiment_with_units(uuid,text,text,jsonb,jsonb,uuid,timestamp with time zone)','EXECUTE') then
