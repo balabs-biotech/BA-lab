@@ -193,15 +193,15 @@
     notify(state.rows.length + " signal(aux) chargé(s)." + (state.hasMore ? " D’autres signaux sont disponibles." : ""));
   }
 
-  async function resolveHistoryIdentity(kind, id) {
+  async function resolveHistoryIdentity(kind, id, organizationId, domain) {
     if (kind === "environment_id") {
       const { data } = await client.from("environments")
         .select("name,location:locations(name,code)")
-        .eq("organization_id", state.organizationId).eq("id", id).maybeSingle();
+        .eq("organization_id", organizationId).eq("id", id).maybeSingle();
       const location = data?.location;
       return { title: data?.name || "Environnement", subtitle: location ? "Site : " + (location.name || location.code) : "Environnement de production" };
     }
-    if (state.domain === "greentech") {
+    if (domain === "greentech") {
       const { data } = await client.from("plant_cultures")
         .select("code,crop_type,species_name,cultivar_name,status")
         .eq("organization_id", state.organizationId).eq("id", id).maybeSingle();
@@ -213,7 +213,7 @@
         .eq("organization_id", state.organizationId).eq("id", id).maybeSingle(),
       client.from("batches")
         .select("batch_code,name,status,current_stage")
-        .eq("organization_id", state.organizationId).eq("culture_id", id)
+        .eq("organization_id", organizationId).eq("culture_id", id)
         .order("created_at", { ascending: false }).limit(10)
     ]);
     const culture = cultureResult.data;
@@ -227,13 +227,13 @@
     };
   }
 
-  async function resolveCultureLineage(cultureId) {
+  async function resolveCultureLineage(cultureId, organizationId) {
     const columns = "id,code,culture_type,parent_culture_id,started_at,material:materials(material_code,generation,strain:strains(strain_code,designation,organism:organisms(scientific_name)))";
     const [currentResult, childrenResult] = await Promise.all([
       client.from("cultures").select(columns)
-        .eq("organization_id", state.organizationId).eq("id", cultureId).maybeSingle(),
+        .eq("organization_id", organizationId).eq("id", cultureId).maybeSingle(),
       client.from("cultures").select(columns)
-        .eq("organization_id", state.organizationId).eq("parent_culture_id", cultureId)
+        .eq("organization_id", organizationId).eq("parent_culture_id", cultureId)
         .order("started_at", { ascending: true }).limit(50)
     ]);
     if (currentResult.error || !currentResult.data) return { cultures: [], batches: [], unavailable: true };
@@ -241,14 +241,14 @@
     let parent = null;
     if (current.parent_culture_id) {
       const parentResult = await client.from("cultures").select(columns)
-        .eq("organization_id", state.organizationId).eq("id", current.parent_culture_id).maybeSingle();
+        .eq("organization_id", organizationId).eq("id", current.parent_culture_id).maybeSingle();
       if (!parentResult.error) parent = parentResult.data;
     }
     const cultures = [parent, current, ...(childrenResult.data || [])].filter(Boolean);
     const cultureIds = [...new Set(cultures.map(item => item.id))];
     const batchResult = await client.from("batches")
       .select("batch_code,name,status,current_stage,culture_id")
-      .eq("organization_id", state.organizationId).in("culture_id", cultureIds)
+      .eq("organization_id", organizationId).in("culture_id", cultureIds)
       .order("created_at", { ascending: false }).limit(100);
     return { cultures, batches: batchResult.error ? [] : (batchResult.data || []), unavailable: false };
   }
@@ -277,13 +277,15 @@
   async function loadHistory(kind, id, label) {
     if (!state.userId || !state.organizationId || !state.domain || !["biological_subject_id", "environment_id"].includes(kind)) return;
     const request = ++state.historyRequest;
+    const organizationId = state.organizationId;
+    const domain = state.domain;
     const panel = $("signalsHistory");
     panel.classList.remove("hidden");
     $("signalsHistoryTitle").textContent = "Historique — " + label;
     $("signalsHistoryStatus").textContent = "Résolution de l’objet biologique…";
     $("signalsHistoryList").replaceChildren(element("p", "signals-empty", "Chargement de l’historique…"));
     panel.scrollIntoView({ behavior: "smooth", block: "start" });
-    const identity = await resolveHistoryIdentity(kind, id);
+    const identity = await resolveHistoryIdentity(kind, id, organizationId, domain);
     const lineage = kind === "biological_subject_id" && state.domain !== "greentech"
       ? await resolveCultureLineage(id)
       : null;
@@ -292,7 +294,7 @@
     $("signalsHistoryStatus").textContent = identity.subtitle || "Objet métier associé";
     const { data, error } = await client.from("biological_signals")
       .select("signal_id,signal_code,severity,variable_code,observed_date,observed_value,unit,analysis_method,signal_status,first_seen_at,rule_id")
-      .eq("organization_id", state.organizationId).eq("domain", state.domain).eq(kind, id)
+      .eq("organization_id", organizationId).eq("domain", domain).eq(kind, id)
       .order("observed_date", { ascending: false }).order("first_seen_at", { ascending: false }).limit(50);
     if (request !== state.historyRequest) return;
     const list = $("signalsHistoryList");
