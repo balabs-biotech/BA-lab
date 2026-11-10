@@ -141,6 +141,21 @@ begin
     if sqlerrm='material_mixture_sources_must_be_unique' then caught := true; else raise; end if;
   end;
   if not caught then raise exception 'FAIL: duplicate mixture sources were accepted'; end if;
+  caught := false;
+  begin
+    perform public.create_biological_material_mixture(
+      '00000000-0000-0000-0000-0000000000a1',
+      array[source_material_ids[1],
+        (select id from public.materials where organization_id='00000000-0000-0000-0000-0000000000a2' and material_code='MAT-OTHER-ORG')],
+      'mixing','CROSS-TENANT-MIX',now(),null,'{}'::jsonb
+    );
+  exception when others then
+    if sqlerrm='material_mixture_source_not_found' then caught := true; else raise; end if;
+  end;
+  if not caught then raise exception 'FAIL: cross-tenant mixture source was accepted'; end if;
+  if has_function_privilege('anon','public.create_biological_material_mixture(uuid,uuid[],text,text,timestamptz,text,jsonb)','execute') then
+    raise exception 'FAIL: anon can execute material mixture RPC';
+  end if;
   if jsonb_array_length(mix_result->'components') <> 2 then
     raise exception 'FAIL: consortium RPC must return both components';
   end if;
