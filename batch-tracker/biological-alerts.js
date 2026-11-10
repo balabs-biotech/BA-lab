@@ -17,6 +17,11 @@
     dismissed: "Écartée"
   };
   const severityLabels = { critical: "Critique", high: "Élevée", moderate: "Modérée", low: "Faible", info: "Information" };
+  const methodLabels = {
+    environmental_daily: "Climat quotidien (source externe)",
+    sensor_series: "Résumé de série IoT",
+    sensor_temporal: "Anomalie temporelle IoT (MAD robuste)"
+  };
   const state = { userId: null, organizationId: null, domain: null, rows: [], filter: "active", request: 0 };
   const root = document.getElementById("biologicalSignalsCard");
   if (!root) return;
@@ -90,7 +95,16 @@
         ["Profil environnemental", row.environment_profile_code && row.environment_profile_version ? row.environment_profile_code + " / v" + row.environment_profile_version : null],
         ["Analyse source", row.source_analysis_id],
         ["Constat source", row.source_finding_id],
-        ["Observations sources", Array.isArray(row.source_observation_ids) && row.source_observation_ids.length ? row.source_observation_ids.join(", ") : null]
+        ["Observations sources", Array.isArray(row.source_observation_ids) && row.source_observation_ids.length ? row.source_observation_ids.join(", ") : null],
+        ["Méthode d’analyse", methodLabels[row.analysis_method] || row.analysis_method],
+        ["Médiane de référence", Number.isFinite(row.analysis_evidence?.baseline_median) ? String(row.analysis_evidence.baseline_median) + (row.unit ? " " + row.unit : "") : null],
+        ["MAD de référence", Number.isFinite(row.analysis_evidence?.baseline_mad) ? String(row.analysis_evidence.baseline_mad) + (row.unit ? " " + row.unit : "") : null],
+        ["Score robuste", Number.isFinite(row.analysis_evidence?.robust_z_score) ? String(row.analysis_evidence.robust_z_score) : null],
+        ["Historique utilisé", Number.isInteger(row.analysis_evidence?.history_count) ? String(row.analysis_evidence.history_count) : null],
+        ["Fenêtre temporelle", Number.isInteger(row.analysis_evidence?.temporal_window_seconds) ? String(row.analysis_evidence.temporal_window_seconds) + " s" : null],
+        ["Historique minimum", Number.isInteger(row.analysis_evidence?.temporal_minimum_history) ? String(row.analysis_evidence.temporal_minimum_history) : null],
+        ["Seuil statistique", Number.isFinite(row.analysis_evidence?.temporal_threshold) ? String(row.analysis_evidence.temporal_threshold) : null],
+        ["Indicateurs statistiques", Array.isArray(row.analysis_evidence?.flags) && row.analysis_evidence.flags.length ? row.analysis_evidence.flags.join(", ") : null]
       ];
       pairs.filter(([, value]) => value).forEach(([term, value]) => {
         metadata.append(element("dt", "", term), element("dd", "", String(value)));
@@ -129,7 +143,7 @@
     notify("Chargement des signaux biologiques…");
     const { data, error } = await client
       .from("biological_signals")
-      .select("signal_id,domain,signal_code,severity,message_code,recommendation_code,rule_id,source_analysis_id,source_finding_id,biological_context_id,biological_subject_id,environment_id,domain_profile_code,domain_profile_version,environment_profile_code,environment_profile_version,source_observation_ids,variable_code,observed_date,observed_value,unit,signal_status,first_seen_at,acknowledged_at,resolved_at,dismissed_at")
+      .select("signal_id,domain,signal_code,severity,message_code,recommendation_code,rule_id,source_analysis_id,source_finding_id,biological_context_id,biological_subject_id,environment_id,domain_profile_code,domain_profile_version,environment_profile_code,environment_profile_version,source_observation_ids,variable_code,observed_date,observed_value,unit,analysis_method,analysis_evidence,signal_status,first_seen_at,acknowledged_at,resolved_at,dismissed_at")
       .eq("organization_id", state.organizationId)
       .eq("domain", state.domain)
       .order("first_seen_at", { ascending: false })
