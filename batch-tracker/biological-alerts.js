@@ -80,8 +80,16 @@
         ["Variable", row.variable_code],
         ["Observation", row.observed_value === null || row.observed_value === undefined ? null : String(row.observed_value) + (row.unit ? " " + row.unit : "")],
         ["Date", row.observed_date || null],
-        ["Contexte", row.biological_subject_id || row.biological_context_id],
-        ["Règle", row.rule_id]
+        ["Sujet biologique", row.biological_subject_id],
+        ["Contexte biologique", row.biological_context_id],
+        ["Environnement", row.environment_id],
+        ["Règle", row.rule_id],
+        ["Recommandation", row.recommendation_code],
+        ["Profil biologique", row.domain_profile_code && row.domain_profile_version ? row.domain_profile_code + " / v" + row.domain_profile_version : null],
+        ["Profil environnemental", row.environment_profile_code && row.environment_profile_version ? row.environment_profile_code + " / v" + row.environment_profile_version : null],
+        ["Analyse source", row.source_analysis_id],
+        ["Constat source", row.source_finding_id],
+        ["Observations sources", Array.isArray(row.source_observation_ids) && row.source_observation_ids.length ? row.source_observation_ids.join(", ") : null]
       ];
       pairs.filter(([, value]) => value).forEach(([term, value]) => {
         metadata.append(element("dt", "", term), element("dd", "", String(value)));
@@ -120,7 +128,7 @@
     notify("Chargement des signaux biologiques…");
     const { data, error } = await client
       .from("biological_signals")
-      .select("signal_id,domain,signal_code,severity,message_code,recommendation_code,rule_id,biological_context_id,biological_subject_id,variable_code,observed_date,observed_value,unit,signal_status,first_seen_at,acknowledged_at,resolved_at,dismissed_at")
+      .select("signal_id,domain,signal_code,severity,message_code,recommendation_code,rule_id,source_analysis_id,source_finding_id,biological_context_id,biological_subject_id,environment_id,domain_profile_code,domain_profile_version,environment_profile_code,environment_profile_version,source_observation_ids,variable_code,observed_date,observed_value,unit,signal_status,first_seen_at,acknowledged_at,resolved_at,dismissed_at")
       .eq("organization_id", state.organizationId)
       .eq("domain", state.domain)
       .order("first_seen_at", { ascending: false })
