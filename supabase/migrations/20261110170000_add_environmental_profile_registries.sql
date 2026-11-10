@@ -22,7 +22,7 @@ create table public.environment_context_profiles (
   primary key (organization_id, id),
   constraint environment_context_profiles_environment_fk
     foreign key (organization_id, environment_id)
-    references public.environments (organization_id, id) on delete restrict,
+    references public.environments (organization_id, id) on delete cascade,
   constraint environment_context_profiles_version_key
     unique (organization_id, environment_id, profile_code, profile_version),
   constraint environment_context_profiles_sensor_parent_key
@@ -39,6 +39,38 @@ create table public.environment_context_profiles (
 alter table public.iot_devices
   add constraint iot_devices_org_environment_id_key
   unique (organization_id, environment_id, id);
+
+-- Preserve the physical location binding once either a biological context
+-- or a versioned environment profile depends on it.
+create or replace function private.guard_environment_location_with_biological_contexts()
+returns trigger
+language plpgsql
+security invoker
+set search_path = pg_catalog, public
+as $
+begin
+  if new.location_id is distinct from old.location_id
+     and (
+       exists (
+         select 1 from public.biological_contexts bc
+          where bc.organization_id = old.organization_id
+            and bc.environment_id = old.id
+       )
+       or exists (
+         select 1 from public.environment_context_profiles ep
+          where ep.organization_id = old.organization_id
+            and ep.environment_id = old.id
+       )
+     ) then
+    raise exception 'environment_location_locked_by_persisted_contexts'
+      using errcode = '23514';
+  end if;
+  return new;
+end;
+$;
+
+revoke all on function private.guard_environment_location_with_biological_contexts()
+  from public, anon, authenticated;
 
 create table public.environment_context_profile_sensors (
   organization_id uuid not null,
