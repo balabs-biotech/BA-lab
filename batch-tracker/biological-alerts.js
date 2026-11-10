@@ -5,7 +5,7 @@
   "use strict";
   if (!window.supabase || !window.supabase.createClient) return;
 
-  const client = window.supabase.createClient(
+  const client = window.BALabsSupabaseClient || window.supabase.createClient(
     "https://axcouwiodqsauwnsiotn.supabase.co",
     "sb_publishable_8H4XRh8V07Hlo0WwdfOXwg_2RXRX992"
   );
