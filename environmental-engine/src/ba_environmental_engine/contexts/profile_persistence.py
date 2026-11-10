@@ -43,7 +43,8 @@ def environment_context_from_record(
         raise ValueError("only activated environment profile versions can be resolved")
 
     return EnvironmentContext(
-        context_id=record["id"],
+        # Biological contexts reference environments.id, not the profile-version row id.
+        context_id=record["environment_id"],
         organization_id=record["organization_id"],
         location_id=environment["location_id"],
         context_type=EnvironmentType(record["context_type"]),
