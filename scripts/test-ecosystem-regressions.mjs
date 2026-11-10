@@ -87,6 +87,7 @@ assert.ok(engine.includes("background:'transparent'") && engine.includes("boxSha
 assert.ok(engine.includes('flex-wrap:nowrap') && previewEngine.includes('flex-wrap:nowrap') && engine.includes('overflow-x:auto') && previewEngine.includes('overflow-x:auto'), 'Branch navigation must stay in a compact horizontal strip instead of a large popup grid');
 assert.ok(engine.includes("background:'transparent',border:'0',borderRadius:'0',boxShadow:'none'") && previewEngine.includes("background:'transparent',border:'0',borderRadius:'0',boxShadow:'none'"), 'Floating branch labels must remain frameless');
 assert.ok(html.includes('balabs-minimal-3d-overlays') && previewHtml.includes('balabs-minimal-3d-overlays'), 'Public and preview interfaces must suppress stacked popup frames consistently');
+assert.ok(html.includes('.webgl-focus .webgl-focus-actions button') && html.includes('.webgl-controls button') && previewHtml.includes('.webgl-intro-cta'), 'Focus actions, zoom controls and intro CTA must not render as framed tiles');
 
 assert.ok(engine.includes('const LINKS ='), 'The network must define explicit cross-domain connections');
 for (const [a,b] of [['bio','myco'],['myco','soil'],['soil','lab'],['lab','iot'],['lab','products'],['products','work'],['work','iot'],['products','learn']]) {
