@@ -328,6 +328,7 @@ function syncResourceHitTargets() {
  }
 }
 function renderBranchDock() {
+  // Spatial branch labels are the only visible navigator; keep the legacy dock inert.
   if(!branchDock)return;branchDock.replaceChildren();branchDock.hidden=true;
 }
 function renderPath() {
