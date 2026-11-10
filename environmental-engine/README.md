@@ -14,7 +14,7 @@ The engine foundation provides:
 - seasonal historical reference screening that compares only with prior years;
 - a traceable air vapor-pressure deficit (VPD) calculation from temperature and relative humidity;
 - period-level VPD summaries with explicit above-threshold duration and sampling-gap exclusions;
-- versioned environment context metadata separating outdoor, greenhouse, fruiting-chamber and laboratory observations.
+- versioned environment context metadata separating outdoor, greenhouse, fruiting-chamber and laboratory observations;\n- sensor descriptors and measurement contracts with source-observation and formula lineage.
 
 Derived values remain distinct from source observations. The engine does not
 write calculated values back as sensor measurements. A strict NASA POWER daily-row
@@ -39,4 +39,4 @@ for the provider mapping and daily time semantics, and
 `docs/architecture/ba-environmental-seasonal-reference-v1.md` for seasonal reference semantics, and
 `docs/architecture/ba-vapor-pressure-deficit-v1.md` for the VPD formula and interpretation limits, and
 `docs/architecture/ba-vpd-period-aggregation-v1.md` for period aggregation semantics, and
-`docs/architecture/ba-environment-context-v1.md` for environment context identity and origin rules.
+`docs/architecture/ba-environment-context-v1.md` for environment context identity and origin rules, and\n`docs/architecture/ba-sensor-measurement-lineage-v1.md` for sensor and observation lineage.
