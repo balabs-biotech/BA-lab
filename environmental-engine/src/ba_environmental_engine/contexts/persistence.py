@@ -157,6 +157,37 @@ class SupabaseBiologicalContextRepository:
             and (context.valid_to is None or target_date <= context.valid_to)
         )
 
+    def list_overlapping_scope(
+        self,
+        *,
+        organization_id: str,
+        domain: BiologicalDomain,
+        subject_id: str,
+        from_date: str,
+        to_date: str,
+    ) -> tuple[BiologicalContext, ...]:
+        """Fetch only contexts whose validity interval intersects a date scope."""
+        if to_date < from_date:
+            raise ValueError("scope to_date must be on or after from_date")
+        subject_column = (
+            "plant_culture_id"
+            if domain is BiologicalDomain.GREENTECH
+            else "culture_id"
+        )
+        response = (
+            self._client.table("biological_contexts")
+            .select(self._SELECT)
+            .eq("organization_id", organization_id)
+            .eq("domain", domain.value)
+            .eq(subject_column, subject_id)
+            .lte("valid_from", to_date)
+            .or_(f"valid_to.is.null,valid_to.gte.{from_date}")
+            .order("valid_from", desc=True)
+            .execute()
+        )
+        records = self._data(response) or []
+        return tuple(biological_context_from_record(row) for row in records)
+
     def get_for_subject_on_date(
         self,
         *,
