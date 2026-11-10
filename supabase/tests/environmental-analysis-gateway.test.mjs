@@ -27,7 +27,8 @@ const biologicalContextRead = source.indexOf('.from("biological_contexts")');
 const environmentProfileRead = source.indexOf('.from("environment_context_profiles")');
 const domainProfileRead = source.indexOf('.from("domain_interpretation_profiles")');
 
-assert.ok(biologicalContextRead > membershipRead, "biological context resolution must happen after caller membership authorization");
+const interpretationResolutionCall = source.indexOf("interpretationResolution = await resolveBiologicalInterpretation");
+assert.ok(interpretationResolutionCall > membershipRead, "biological context resolution must happen after caller membership authorization");
 assert.ok(environmentProfileRead > biologicalContextRead, "environment profile must be resolved from the selected biological context");
 assert.ok(domainProfileRead > environmentProfileRead, "domain rules must be loaded from the persisted versioned registry");
 assert.ok(observationRead > domainProfileRead, "optional interpretation resolution must not bypass the existing observation authorization sequence");
@@ -37,6 +38,6 @@ assert.match(source, /context_does_not_cover_scope/, "a context must cover the c
 assert.match(source, /environment_profile_unavailable/, "missing environment profiles must be explicit");
 assert.match(source, /domain_profile_unavailable/, "missing domain profiles must be explicit");
 assert.match(source, /enginePayload\.biological_interpretation\s*=\s*interpretationResolution\.payload/, "only server-resolved profile data may be forwarded to the private engine");
-assert.match(source, /interpretation_status:\s*interpretationResolution\.status/, "the gateway must preserve explicit interpretation status");
+assert.match(source, /interpretation_status:\s*interpretationResolution\.status\s*===\s*"ready"/, "the gateway must preserve explicit interpretation status");
 
 console.log("PASS: environmental analysis gateway security contract");
