@@ -358,7 +358,7 @@ function renderBranchDock() {
     }
     else{el.href=item.url;el.target='_blank';el.rel='noopener noreferrer'}
     el.className='webgl-branch-item';el.textContent=item.title||item.name||('Branche '+(index+1));
-    el.title=item.title||item.name||'';el.dataset.hasChildren=String(hasChildren);el.dataset.resourceUrl=item.url||'';
+    el.title=item.title||item.name||'';el.dataset.branchIndex=String(index);el.dataset.hasChildren=String(hasChildren);el.dataset.resourceUrl=item.url||'';
     el.setAttribute('aria-label',(item.title||item.name||'Branche')+(hasChildren?' — ouvrir les sous-branches':hasUrl?' — ouvrir la page':' — consulter'));
     branchDock.append(el);
   });
