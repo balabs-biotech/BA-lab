@@ -55,6 +55,15 @@ begin
   end if;
 
   if not exists (
+    select 1 from pg_trigger
+    where tgrelid = v_table
+      and tgname = 'biological_contexts_environment_location_guard'
+      and not tgisinternal
+  ) then
+    raise exception 'FAIL: environment-to-location guard trigger is missing';
+  end if;
+
+  if not exists (
     select 1 from pg_policies
     where schemaname = 'public' and tablename = 'biological_contexts'
       and policyname = 'biological_contexts_select'
