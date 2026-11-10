@@ -592,8 +592,15 @@ function pickAt(x,y) {
   if(nearestNode&&nearestNodeDistance<(window.innerWidth<760?48:56)){openResource(nearestNode.userData);return}
 }
 
-// Labels use screen-space sizing: zoom changes the scene, not the reading size.
-// The camera distance is measured per label so nested branches remain equally legible.
+// Labels breathe with camera zoom: prominent at the overview, quieter inside the network.
+// A small minimum keeps branch names readable on phones and at deep navigation levels.
+function labelTargetPixels(label) {
+  const compact=window.innerWidth<760;
+  const depth=label?.userData?.depth||0;
+  const base=label?.userData?.kind==='domain-label'?(compact?42:50):label?.userData?.denseRoot?(compact?38:44):Math.max(compact?34:40,(compact?44:50)-depth*2);
+  const zoomScale=THREE.MathUtils.clamp(Math.pow(THREE.MathUtils.clamp(distance/13.5,.3,1.18),.68),.52,1.12);
+  return base*zoomScale;
+}
 function syncLabelScales() {
   if(!renderer||!camera)return;
   if(!labelWorldPosition)labelWorldPosition=new THREE.Vector3();
@@ -603,8 +610,7 @@ function syncLabelScales() {
     if(!label?.userData?.kind?.endsWith('label'))return;
     label.getWorldPosition(labelWorldPosition);
     const cameraDistance=Math.max(.1,camera.position.distanceTo(labelWorldPosition));
-    const depth=label.userData.depth||0;
-    const compact=window.innerWidth<760;const targetPixels=label.userData.kind==='domain-label'?(compact?42:50):label.userData.denseRoot?(compact?38:44):Math.max(compact?34:40,(compact?44:50)-depth*2);
+    const targetPixels=labelTargetPixels(label);
     const worldHeight=cameraDistance*projection*targetPixels;
     label.scale.set(worldHeight*4.25,worldHeight,1);
   };
