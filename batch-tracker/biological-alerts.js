@@ -510,8 +510,22 @@
           linkedBatches.map(batch => [batch.batch_code, batch.status, batch.current_stage].filter(Boolean).join(" / ")).join(", ")));
         lineage.events.filter(event => event.material_id === material.id).forEach(event => {
           const payload = event.payload || {};
+          const operationLabel = payload.operation || payload.operation_type || event.event_type;
           item.append(element("small", "signal-lineage-event",
-            dateLabel(event.occurred_at) + " · " + (payload.operation || payload.operation_type || event.event_type)));
+            dateLabel(event.occurred_at) + " · " + operationLabel));
+          const sourceIds = Array.isArray(payload.source_material_ids) ? payload.source_material_ids : [];
+          if (sourceIds.length) {
+            const sourceLabels = sourceIds.map(sourceId => {
+              const source = materialMap.get(sourceId);
+              return source?.material_code || ("Source non résolue (" + String(sourceId).slice(0, 8) + ")");
+            });
+            item.append(element("small", "signal-lineage-batches",
+              "Matériaux composants (" + sourceIds.length + ") : " + sourceLabels.join(" + ")));
+          }
+          const note = typeof payload.note === "string" ? payload.note.trim() : "";
+          if (note) item.append(element("small", "signal-lineage-event", "Note de préparation : " + note));
+          const details = payload.details && typeof payload.details === "object" ? payload.details : {};
+          if (details.domain) item.append(element("small", "signal-lineage-event", "Univers d’origine : " + details.domain));
         });
         materialList.append(item);
       });
