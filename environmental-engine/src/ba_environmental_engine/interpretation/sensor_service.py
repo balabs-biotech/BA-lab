@@ -9,6 +9,8 @@ from __future__ import annotations
 from datetime import date
 from uuid import UUID, uuid5
 
+from ba_environmental_engine.contexts.biological import BiologicalContext
+from ba_environmental_engine.contexts.environment import EnvironmentContext, ObservationOrigin
 from ba_environmental_engine.interpretation.models import (
     DomainInterpretation,
     DomainProfile,
@@ -105,4 +107,63 @@ def interpret_sensor_analysis(
         signals=tuple(signals),
         evaluated_findings=len(analysis.series),
         matched_findings=len({signal.source_finding_id for signal in signals}),
+    )
+
+
+
+def interpret_sensor_analysis_for_biological_context(
+    analysis: SensorAnalysis,
+    profile: DomainProfile,
+    biological_context: BiologicalContext,
+    environment_context: EnvironmentContext,
+    *,
+    source_analysis_id: UUID,
+    from_date: date,
+    to_date: date,
+) -> DomainInterpretation:
+    """Validate persisted biological/environment bindings before sensor interpretation."""
+    if profile.module != biological_context.domain.value:
+        raise ValueError("domain profile module must match biological context domain")
+    if environment_context.origin is not ObservationOrigin.SENSOR:
+        raise ValueError("sensor interpretation requires a sensor-origin environment profile")
+    if (
+        biological_context.organization_id != environment_context.organization_id
+        or biological_context.location_id != environment_context.location_id
+        or biological_context.environment_context_id != environment_context.context_id
+    ):
+        raise ValueError("biological and sensor environment context bindings must match")
+    if biological_context.valid_from > from_date or (
+        biological_context.valid_to is not None and biological_context.valid_to < to_date
+    ):
+        raise ValueError("biological context must cover the complete sensor analysis scope")
+    if to_date < from_date:
+        raise ValueError("sensor analysis to_date must be on or after from_date")
+
+    configured_sensor_ids = set(environment_context.sensor_ids)
+    analyzed_sensor_ids = {series.sensor_id for series in analysis.series}
+    if not analyzed_sensor_ids.issubset(configured_sensor_ids):
+        raise ValueError("sensor analysis contains a device outside the resolved environment profile")
+
+    context_tags = set(biological_context.context_tags)
+    context_tags.add(f"stage:{biological_context.culture_stage}")
+    context_tags.add(f"organism:{biological_context.organism_kind.value}")
+    context_tags.add(f"system:{biological_context.production_system}")
+    if biological_context.taxon_code:
+        context_tags.add(f"taxon:{biological_context.taxon_code}")
+    if biological_context.strain_code:
+        context_tags.add(f"strain:{biological_context.strain_code}")
+    if biological_context.cultivar_code:
+        context_tags.add(f"cultivar:{biological_context.cultivar_code}")
+    if biological_context.substrate_code:
+        context_tags.add(f"substrate:{biological_context.substrate_code}")
+
+    return interpret_sensor_analysis(
+        analysis,
+        profile,
+        source_analysis_id=source_analysis_id,
+        observed_date=to_date,
+        context_tags=frozenset(context_tags),
+        biological_context_id=biological_context.context_id,
+        biological_subject_id=biological_context.subject_id,
+        environment_context_id=environment_context.context_id,
     )
