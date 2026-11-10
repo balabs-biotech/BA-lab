@@ -19,8 +19,8 @@ def test_fao56_daily_example_with_explicit_vapor_pressures():
         actual_vapor_pressure_kpa=1.313,
     )
 
-    assert result.reference_evapotranspiration_mm_day == pytest.approx(2.952, abs=0.002)
-    assert result.saturation_vapor_pressure_kpa == pytest.approx(1.982, abs=0.02)
+    assert result.reference_evapotranspiration_mm_day == pytest.approx(2.980, abs=0.002)
+    assert result.saturation_vapor_pressure_kpa == pytest.approx(1.9975, abs=0.002)
     assert result.actual_vapor_pressure_kpa == pytest.approx(1.313)
     assert result.formula_profile == "fao56_penman_monteith_daily_v1"
 
