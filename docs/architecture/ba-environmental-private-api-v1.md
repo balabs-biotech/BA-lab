@@ -81,6 +81,6 @@ Required Edge Function secrets:
 - BA_ENVIRONMENTAL_ENGINE_URL: private or otherwise access-controlled base URL of the FastAPI service.
 - BA_ENVIRONMENTAL_ENGINE_API_KEY: same secret configured as BA_ENVIRONMENTAL_ENGINE_API_KEY in the engine runtime.
 
-The Edge Function also requires the standard Supabase URL, publishable/anon key and server-side secret key. Do not place the engine key in frontend environment variables. Keep the FastAPI ingress restricted to the Edge Function's service network where possible; the shared key is defense in depth, not a replacement for network isolation.
+The Edge Function also requires the standard Supabase URL, publishable/anon key and server-side secret key. Set BA_ENVIRONMENTAL_ALLOWED_ORIGINS to a comma-separated exact allowlist of the deployed CultureOps origins. Browser origins not on this list are rejected; non-browser service requests without an Origin header remain supported. Wildcard CORS is intentionally disabled. Do not place the engine key in frontend environment variables. Keep the FastAPI ingress restricted to the Edge Function's service network where possible; the shared key is defense in depth, not a replacement for network isolation.
 
 The gateway is read-only and does not persist analyses. Its first version supports the persisted NASA POWER daily dataset only. Sentinel-2 remains a separate catalogue/remote-sensing pipeline and is not mixed into FAO-56 climate calculations.
