@@ -705,9 +705,10 @@
           });
           const otherStatuses=Object.entries(counts).filter(([status])=>status!=="suspect"&&status!=="normal");
           if(otherStatuses.length){
+            const statusLabels={insufficient_history:"Historique insuffisant",insufficient_coverage:"Couverture insuffisante",indeterminate:"Résultat indéterminé"};
             const details=node("details");
             details.append(node("summary",{},"Limites de couverture et d’historique"));
-            otherStatuses.forEach(([status,count])=>details.append(node("p",{class:"muted"},status+" : "+count)));
+            otherStatuses.forEach(([status,count])=>details.append(node("p",{class:"muted"},(statusLabels[status]||status)+" : "+count)));
             signalPanel.append(details);
           }
           analysisResults.append(signalPanel);
