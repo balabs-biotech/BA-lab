@@ -44,16 +44,16 @@ def test_interpolates_threshold_crossing_linearly():
 def test_rejects_naive_timestamps_duplicate_times_and_invalid_values():
     naive = [VPDObservation(datetime(2026, 6, 1), 1.0)]
     with pytest.raises(ValueError, match="timezone"):
-        aggregate_vpd_period(naive)
+        aggregate_vpd_period(naive, threshold_kpa=1.0)
 
     duplicate = observations([1.0, 2.0])
     duplicate[1] = VPDObservation(duplicate[0].observed_at, 2.0)
     with pytest.raises(ValueError, match="strictly increasing"):
-        aggregate_vpd_period(duplicate)
+        aggregate_vpd_period(duplicate, threshold_kpa=1.0)
 
     invalid = [VPDObservation(datetime(2026, 6, 1, tzinfo=timezone.utc), float("nan"))]
     with pytest.raises(ValueError, match="finite"):
-        aggregate_vpd_period(invalid)
+        aggregate_vpd_period(invalid, threshold_kpa=1.0)
 
 
 def test_rejects_invalid_threshold_and_gap():
@@ -61,4 +61,4 @@ def test_rejects_invalid_threshold_and_gap():
     with pytest.raises(ValueError):
         aggregate_vpd_period(rows, threshold_kpa=-1.0)
     with pytest.raises(ValueError):
-        aggregate_vpd_period(rows, maximum_gap_hours=0.0)
+        aggregate_vpd_period(rows, threshold_kpa=1.0, maximum_gap_hours=0.0)
