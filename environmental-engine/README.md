@@ -11,7 +11,9 @@ The engine foundation provides:
 - explicit climate-variable unit normalization with original-unit provenance.
 
 Derived values remain distinct from source observations. The engine does not
-write calculated values back as sensor measurements.
+write calculated values back as sensor measurements. A strict NASA POWER daily-row
+adapter maps the versioned provider parameters to canonical variables while
+preserving source-row identity, original units, timestamps and quality flags.
 
 ## Setup
 
@@ -24,4 +26,5 @@ pytest
 
 Python 3.10+; CPU-only. See
 `docs/architecture/ba-environmental-unit-registry-v1.md` for canonical units
-and conversion conventions.
+and conversion conventions, and `docs/architecture/ba-nasa-power-adapter-v1.md`
+for the provider mapping and daily time semantics.
