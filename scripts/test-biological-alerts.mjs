@@ -122,6 +122,16 @@ assert.match(moduleSource, /Matériaux composants/);
 assert.match(moduleSource, /Source non résolue/);
 assert.match(moduleSource, /Note de préparation/);
 assert.match(moduleSource, /Univers d’origine/);
+assert.match(moduleSource, /function buildBiologicalProvenanceIndex\(lineage\)/);
+assert.match(moduleSource, /window\.BALabsBiologicalProvenance/);
+assert.match(moduleSource, /traceMaterial/);
+assert.match(moduleSource, /findMaterialsByStrain/);
+assert.match(moduleSource, /unresolved_material_ids/);
+assert.match(moduleSource, /multi_parent_count/);
+assert.match(moduleSource, /const traverse = \(startId, adjacency, endpointField, maxNodes = 150\)/);
+assert.match(moduleSource, /edgeKeys\.has\(key\)/);
+assert.match(moduleSource, /relatedEvents/);
+
 
 assert.match(moduleSource, /signal-lineage-batches/);
 assert.match(moduleSource, /request !== state\.historyRequest/);
