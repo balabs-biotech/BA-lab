@@ -40,6 +40,8 @@ def _quality_class(row: NormalizedEnvironmentalObservation) -> str:
 
 def _indicator_quality(rows: list[NormalizedEnvironmentalObservation],
                        diagnostics: Iterable[str] = ()) -> IndicatorQuality:
+    if not rows:
+        raise ValueError("each indicator must be supported by at least one source observation")
     classes = {_quality_class(row) for row in rows}
     quality_class = next(iter(classes)) if len(classes) == 1 else "mixed"
     flags = {flag for row in rows if row.quality_flag for flag in [row.quality_flag]}
