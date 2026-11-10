@@ -34,6 +34,10 @@ Each row must have a timezone-aware timestamp whose calendar date matches its ob
 
 Extra weather variables may be present but are not consumed by this indicator pipeline. Their own calculations remain separate modules.
 
+## Quality-screening boundary
+
+The pipeline validates schema, identity, units and numerical domains. It does not interpret provider-specific quality flags or replace the Environmental Engine quality-screening modules. The caller must apply the configured plausibility/quality policy before submitting observations; source flags and original observations remain preserved for audit.
+
 ## Missing data
 
 If one or more required variables are absent, the pipeline returns `status=insufficient_data`, lists the missing variable codes and preserves the IDs of available required inputs. No interpolation, imputation, synthetic defaults or partial ET0 calculation occurs.
