@@ -154,6 +154,7 @@
     ["Analyse source","Source analysis","Análise de origem","تحليل المصدر"],
     ["Constat source","Source finding","Constatação de origem","نتيجة المصدر"],
     ["Observations sources","Source observations","Observações de origem","ملاحظات المصدر"],
+    ["Code du message","Message code","Código da mensagem","رمز الرسالة"],
     ["Détecté : ","Detected: ","Detetado: ","تم الكشف: "],
     ["Prendre en compte","Acknowledge","Reconhecer","الإقرار"],
     ["Résoudre","Resolve","Resolver","حل"],
