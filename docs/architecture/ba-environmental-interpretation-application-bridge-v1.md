@@ -55,12 +55,26 @@ The Edge Function must:
 
 The service-role client may only be used after caller authentication and authorization. All service-role queries must include explicit organization and resource filters. RLS remains enabled for user-facing access.
 
+## Implemented persistence contract on the feature branch
+
+The feature branch now defines two tenant-scoped registries and one normalized sensor-binding table:
+
+- `environment_context_profiles`: one active profile per environment, with context type, label, IANA timezone, observation origin, version, and effective date interval.
+- `environment_context_profile_sensors`: normalized sensor membership, protected by composite foreign keys to both the environment profile and the exact tenant/environment/device tuple. This avoids storing unvalidated sensor UUID arrays.
+- `domain_interpretation_profiles`: one active interpretation profile per organization and domain, with a versioned JSON rules array matching the Python `InterpretationRule` contract.
+
+Lifecycle is `draft -> active -> retired`. Drafts can be edited or deleted. Activation stamps the version; active content cannot be edited or deleted. Retirement closes the effective interval and preserves the original content. Overlapping published validity intervals are rejected. No default domain rules or biological thresholds are seeded.
+
+The SQL contract test covers RLS, anonymous-role denial, tenant/environment sensor binding, activation requirements, immutable published content, retirement, active-profile uniqueness, and JSON rule shape. It is wired into the migration-replay CI job.
+
+This is repository work only. The migration has not been applied to the live BALabs Supabase project, and the SQL contract test has not yet been executed on a PostgreSQL runner.
+
 ## Required persistence before end-to-end interpretation
 
 Before enabling the target contract, define and migrate:
 
-- a versioned environment-context profile registry covering every field required by `EnvironmentContext`;
-- an immutable domain-profile registry containing approved rule sets, profile versions, and activation state;
+- a verified deployment and SQL replay of the environment-context profile registry;
+- approved domain-profile content for Mycology, GreenTech, and Lab, entered and reviewed by BA Labs rather than seeded as assumed scientific defaults;
 - tenant-scoped foreign keys and RLS policies;
 - uniqueness rules preventing two active profile versions for the same scope;
 - audit/provenance fields recording which environment profile and domain profile version produced each interpretation.
