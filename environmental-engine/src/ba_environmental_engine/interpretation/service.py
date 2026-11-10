@@ -3,6 +3,11 @@
 from uuid import UUID, uuid5
 
 from ba_environmental_engine.contracts.bal_json import BALAnalysis
+from ba_environmental_engine.contexts.biological import (
+    BiologicalContext,
+    validate_biological_context_for_analysis,
+)
+from ba_environmental_engine.contexts.environment import EnvironmentContext
 from ba_environmental_engine.interpretation.models import (
     DomainInterpretation,
     DomainProfile,
@@ -69,4 +74,45 @@ def interpret_findings(
         signals=tuple(signals),
         evaluated_findings=len(analysis.findings),
         matched_findings=len({signal.source_finding_id for signal in signals}),
+    )
+
+
+
+def interpret_analysis_for_biological_context(
+    analysis: BALAnalysis,
+    profile: DomainProfile,
+    biological_context: BiologicalContext,
+    environment_context: EnvironmentContext,
+) -> DomainInterpretation:
+    """Interpret findings using an explicitly bound biological cultivation context.
+
+    The context must match the analysis tenant, location, environment and time
+    scope. Only declared biological metadata is promoted to rule-match tags.
+    """
+    if profile.module != biological_context.domain.value:
+        raise ValueError("profile module must match biological context domain")
+
+    validate_biological_context_for_analysis(
+        biological_context,
+        environment_context,
+        analysis.scope,
+    )
+
+    context_tags = set(biological_context.context_tags)
+    context_tags.add(f"stage:{biological_context.culture_stage}")
+    context_tags.add(f"organism:{biological_context.organism_kind.value}")
+    context_tags.add(f"system:{biological_context.production_system}")
+    if biological_context.taxon_code:
+        context_tags.add(f"taxon:{biological_context.taxon_code}")
+    if biological_context.strain_code:
+        context_tags.add(f"strain:{biological_context.strain_code}")
+    if biological_context.cultivar_code:
+        context_tags.add(f"cultivar:{biological_context.cultivar_code}")
+    if biological_context.substrate_code:
+        context_tags.add(f"substrate:{biological_context.substrate_code}")
+
+    return interpret_findings(
+        analysis,
+        profile,
+        context_tags=frozenset(context_tags),
     )
