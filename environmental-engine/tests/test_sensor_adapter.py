@@ -78,7 +78,7 @@ def test_rejects_device_not_bound_to_active_sensor_profile():
     with pytest.raises(ValueError, match="not bound"):
         normalize_iot_measurement_row(joined_row(profile_sensor_bound=False))
     with pytest.raises(ValueError, match="active sensor-origin"):
-        normalize_iot_measurement_row(joined_row(profile_status="retired"))
+        normalize_iot_measurement_row(joined_row(profile_status="draft"))
 
 
 def test_rejects_measurement_outside_profile_calendar_validity():
@@ -110,3 +110,10 @@ def test_uses_measurement_id_as_source_lineage():
     row = joined_row()
     result = normalize_iot_measurement_row(row)
     assert result.measurement.source_observation_ids == [row["id"]]
+
+
+def test_accepts_retired_profile_for_historical_measurements_inside_validity():
+    result = normalize_iot_measurement_row(
+        joined_row(profile_status="retired", profile_valid_to="2026-11-10")
+    )
+    assert result.measurement.value == 23.5
