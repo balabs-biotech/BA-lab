@@ -31,4 +31,9 @@ assert.match(source, /BA_ENVIRONMENTAL_ALLOWED_ORIGINS/, "browser origins must b
 assert.doesNotMatch(source, /Access-Control-Allow-Origin": "\*"/, "wildcard CORS must not be used");
 assert.match(source, /MAX_ROWS \+ 1/, "measurement retrieval must detect truncation beyond the hard cap");
 
+assert.match(source, /temporal_window_seconds: temporalWindowSeconds/, "explicit temporal window must be forwarded");
+assert.match(source, /temporal_minimum_history: temporalMinimumHistory/, "explicit minimum history must be forwarded");
+assert.match(source, /temporal_threshold: temporalThreshold/, "explicit robust threshold must be forwarded");
+assert.match(source, /temporal_screening_parameters_must_be_supplied_together_and_positive/, "partial temporal configuration must be rejected");
+
 console.log("PASS: sensor analysis gateway security contract");
