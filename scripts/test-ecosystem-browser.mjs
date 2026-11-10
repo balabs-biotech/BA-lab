@@ -91,10 +91,12 @@ async function checkWorkingScene(name, viewport) {
       JSON.stringify({ state, pageErrors, browserDiagnostics, cause: error.message }));
   }
 
+  const failureCount = await page.locator('.webgl-load-error-panel').count();
   assert.equal(
-    await page.locator('.webgl-load-error-panel').count(),
+    failureCount,
     0,
-    name + ': the 3D engine must start instead of showing the failure state',
+    name + ': the 3D engine must start instead of showing the failure state. ' +
+      JSON.stringify({ pageErrors, browserDiagnostics, failureText: failureCount ? await page.locator('.webgl-load-error-panel').innerText() : null }),
   );
   const root = page.locator('#mainView');
   await root.waitFor({ state: 'visible' });
