@@ -84,6 +84,7 @@ create policy cultures_org on public.cultures to authenticated using(private.is_
 create policy relationships_org on public.material_relationships to authenticated using(private.is_org_member(organization_id)) with check(private.is_org_member(organization_id));
 create policy events_org on public.events to authenticated using(private.is_org_member(organization_id)) with check(private.is_org_member(organization_id));
 \i supabase/migrations/20261022021957_biological_traceability_v1.sql
+\i supabase/migrations/20261110230000_add_atomic_multi_source_material_creation.sql
 select set_config('request.jwt.claim.sub','00000000-0000-0000-0000-0000000000b1',false);
 set role authenticated;
 do $$
@@ -129,6 +130,17 @@ begin
     '{"purpose":"multi-strain inoculum"}'::jsonb
   );
   mixed_material_id := (mix_result->>'material_id')::uuid;
+  caught := false;
+  begin
+    perform public.create_biological_material_mixture(
+      '00000000-0000-0000-0000-0000000000a1',
+      array[source_material_ids[1],source_material_ids[1]],
+      'mixing','DUPLICATE-SOURCES',now(),null,'{}'::jsonb
+    );
+  exception when others then
+    if sqlerrm='material_mixture_sources_must_be_unique' then caught := true; else raise; end if;
+  end;
+  if not caught then raise exception 'FAIL: duplicate mixture sources were accepted'; end if;
   if jsonb_array_length(mix_result->'components') <> 2 then
     raise exception 'FAIL: consortium RPC must return both components';
   end if;
