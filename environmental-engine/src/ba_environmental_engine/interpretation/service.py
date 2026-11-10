@@ -236,9 +236,10 @@ def interpret_persisted_analysis_with_profiles(
 ) -> DomainInterpretation:
     """Resolve all persisted context/profile versions, then interpret one analysis.
 
-    Domain selection comes from the persisted biological context. Environment
-    selection comes from that context's environment reference. The client cannot
-    choose a different tenant, location, profile version, or rule set.
+    The requested domain only scopes the biological-context lookup. The resolved
+    persisted context determines which domain profile is loaded; its environment
+    reference determines the environment profile. The client cannot choose a
+    profile version or submit a rule set.
     """
     context = _resolve_persisted_biological_context(
         analysis,
