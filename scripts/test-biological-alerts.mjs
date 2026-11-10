@@ -117,6 +117,12 @@ assert.match(moduleSource, /\.in\("culture_id", cultureIds\)/);
 assert.match(moduleSource, /\.limit\(100\)/);
 assert.match(moduleSource, /function renderCultureLineage/);
 assert.match(moduleSource, /"Généalogie biologique"/);
+assert.match(moduleSource, /payload\.source_material_ids/);
+assert.match(moduleSource, /Matériaux composants/);
+assert.match(moduleSource, /Source non résolue/);
+assert.match(moduleSource, /Note de préparation/);
+assert.match(moduleSource, /Univers d’origine/);
+
 assert.match(moduleSource, /signal-lineage-batches/);
 assert.match(moduleSource, /request !== state\.historyRequest/);
 assert.match(styles, /signal-lineage-list/);
