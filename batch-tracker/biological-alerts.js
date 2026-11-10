@@ -350,6 +350,16 @@
       relationshipFrontier = hydrateIds.filter(id => !relationshipSeen.has(id));
       relationshipFrontier.forEach(id => relationshipSeen.add(id));
     }
+    // Hydrate any legacy parent pointer not represented by an explicit relationship row.
+    const unresolvedLegacyParents = [...new Set([...materialById.values()]
+      .map(material => material.parent_material_id)
+      .filter(id => id && !materialById.has(id)))].slice(0, MAX_MATERIALS - materialById.size);
+    if (unresolvedLegacyParents.length) {
+      const legacyParents = await client.from("materials")
+        .select("id,material_code,material_type,parent_material_id,strain_id,generation,state,metadata,strain:strains(id,strain_code,designation,origin,supplier,source_description,organism:organisms(scientific_name))")
+        .eq("organization_id", organizationId).in("id", unresolvedLegacyParents);
+      if (!legacyParents.error) (legacyParents.data || []).forEach(material => materialById.set(material.id, material));
+    }
     const materialIds = [...materialById.keys()];
     // Keep legacy parent pointers visible even when no explicit edge row exists.
     for (const material of materialById.values()) {
