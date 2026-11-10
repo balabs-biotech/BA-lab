@@ -10,7 +10,8 @@ The engine foundation provides:
 - BAL-JSON v1 schema validation;
 - explicit climate-variable unit normalization with original-unit provenance;
 - variable-specific plausibility screening that flags suspect values without modifying them;
-- trailing robust temporal anomaly screening with explicit insufficient-history and zero-MAD states.
+- trailing robust temporal anomaly screening with explicit insufficient-history and zero-MAD states;
+- seasonal historical reference screening that compares only with prior years.
 
 Derived values remain distinct from source observations. The engine does not
 write calculated values back as sensor measurements. A strict NASA POWER daily-row
@@ -31,4 +32,5 @@ Python 3.10+; CPU-only. See
 and conversion conventions, and `docs/architecture/ba-nasa-power-adapter-v1.md`
 for the provider mapping and daily time semantics, and
 `docs/architecture/ba-environmental-quality-screening-v1.md` for screening rules, and
-`docs/architecture/ba-environmental-temporal-screening-v1.md` for temporal anomaly semantics.
+`docs/architecture/ba-environmental-temporal-screening-v1.md` for temporal anomaly semantics, and
+`docs/architecture/ba-environmental-seasonal-reference-v1.md` for seasonal reference semantics.
