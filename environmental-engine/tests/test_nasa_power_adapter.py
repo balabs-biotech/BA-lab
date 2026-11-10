@@ -87,3 +87,39 @@ def test_rejects_duplicate_source_keys_without_silently_collapsing_rows():
 
     assert len(duplicates) == 1
     assert duplicates[0].count == 2
+
+
+def test_normalized_observation_retains_provider_independent_context():
+    row = source_row(
+        data_family="weather",
+        spatial_resolution_m=55_000,
+        metadata={
+            "source_parameter": "PRECTOTCORR",
+            "source_date": "2026-10-19",
+            "source_time_standard": "NASA POWER daily local solar time",
+            "coordinate_source": "user_confirmed",
+            "coordinate_accuracy_m": 25,
+        },
+    )
+
+    result = normalize_nasa_power_observation(row)
+
+    assert result.data_family == "weather"
+    assert result.spatial_resolution_m == 55_000
+    assert result.source_metadata["coordinate_source"] == "user_confirmed"
+    assert result.source_metadata["coordinate_accuracy_m"] == 25
+
+
+@pytest.mark.parametrize(
+    "changes",
+    [
+        {"data_family": "satellite"},
+        {"data_family": "unknown"},
+        {"spatial_resolution_m": 0},
+        {"spatial_resolution_m": -1},
+        {"spatial_resolution_m": float("inf")},
+    ],
+)
+def test_rejects_invalid_nasa_source_context(changes):
+    with pytest.raises(ValueError):
+        normalize_nasa_power_observation(source_row(**changes))
