@@ -107,7 +107,7 @@
     const temporal = Array.isArray(payload.temporal_screening?.assessments) ? payload.temporal_screening.assessments : [];
     const signals = Array.isArray(payload.domain_interpretation?.signals) ? payload.domain_interpretation.signals : [];
     const summary = node("div", "sensor-summary");
-    [["Observations", analysis.total_observations ?? 0], ["Séries", series.length], ["Écarts temporels", payload.temporal_screening?.status === "completed" ? temporal.filter(item => item.status !== "normal").length : "Non demandé"], ["Signaux biologiques", signals.length]].forEach(([label, value]) => {
+    [["Observations", analysis.total_observations ?? 0], ["Séries", series.length], ["Lectures suspectes", payload.temporal_screening?.status === "completed" ? temporal.filter(item => item.status === "suspect").length : "Non demandé"], ["Signaux biologiques", signals.length]].forEach(([label, value]) => {
       const metric = node("article", "sensor-metric");
       metric.append(node("span", "", label), node("strong", "", String(value)));
       summary.append(metric);
@@ -139,7 +139,7 @@
     if (temporal.length) {
       const details = node("details", "sensor-detail");
       details.append(node("summary", "", "Détails du dépistage temporel (" + temporal.length + ")"));
-      temporal.forEach(item => details.append(node("p", "", [item.variable_code, item.status, item.observed_value, item.unit_code, item.observed_at].filter(value => value !== undefined && value !== null).join(" · "))));
+      temporal.forEach(item => details.append(node("p", "", [item.variable_code, item.status, item.observed_value, item.unit_code, item.observed_at, item.history_count === undefined ? null : "historique n=" + item.history_count, item.robust_z_score == null ? null : "z robuste=" + Number(item.robust_z_score).toFixed(2)].filter(value => value !== undefined && value !== null).join(" · "))));
       output.append(details);
     }
     if (signals.length) {
@@ -167,9 +167,40 @@
     clearResults();
     status("Analyse des mesures IoT en cours…");
     try {
-      const { data, error } = await client.functions.invoke("sensor-analysis", {
-        body: { environment_id: environmentId, start_date: startDate, end_date: endDate, subject_id: subjectId }
-      });
+      const expectedIntervalMinutes = $("sensorExpectedIntervalMinutes").value.trim();
+      const temporalWindowMinutes = $("sensorTemporalWindowMinutes").value.trim();
+      const temporalMinimumHistory = $("sensorTemporalMinimumHistory").value.trim();
+      const temporalThreshold = $("sensorTemporalThreshold").value.trim();
+      const temporalValues = [temporalWindowMinutes, temporalMinimumHistory, temporalThreshold];
+      const temporalRequested = temporalValues.some(value => value !== "");
+      if (temporalRequested && temporalValues.some(value => value === "")) {
+        status("Pour activer le dépistage temporel, renseignez ensemble la fenêtre, le minimum historique et le seuil robuste.", true);
+        return;
+      }
+      const body = { environment_id: environmentId, start_date: startDate, end_date: endDate, subject_id: subjectId };
+      if (expectedIntervalMinutes !== "") {
+        const minutes = Number(expectedIntervalMinutes);
+        if (!Number.isSafeInteger(minutes) || minutes <= 0 || minutes > 1440) {
+          status("L’intervalle d’échantillonnage attendu doit être un nombre entier de minutes, entre 1 et 1 440.", true);
+          return;
+        }
+        body.expected_interval_seconds = minutes * 60;
+      }
+      if (temporalRequested) {
+        const windowMinutes = Number(temporalWindowMinutes);
+        const minimumHistory = Number(temporalMinimumHistory);
+        const threshold = Number(temporalThreshold);
+        if (!Number.isSafeInteger(windowMinutes) || windowMinutes <= 0 || windowMinutes > 43200 ||
+            !Number.isSafeInteger(minimumHistory) || minimumHistory <= 0 ||
+            !Number.isFinite(threshold) || threshold <= 0) {
+          status("Réglages invalides : fenêtre de 1 à 43 200 minutes, minimum entier positif et seuil robuste positif.", true);
+          return;
+        }
+        body.temporal_window_seconds = windowMinutes * 60;
+        body.temporal_minimum_history = minimumHistory;
+        body.temporal_threshold = threshold;
+      }
+      const { data, error } = await client.functions.invoke("sensor-analysis", { body });
       if (revision !== state.requestRevision) return;
       if (error || !data?.ok) {
         const code = data?.error || error?.message || "sensor_analysis_failed";
