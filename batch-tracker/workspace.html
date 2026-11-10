@@ -147,6 +147,23 @@
     <p class="signals-footnote">Les compteurs portent sur les signaux actuellement chargés. Le chargement est paginé par blocs de 100. Les signaux sont générés par le moteur d’interprétation. Leur état opérationnel peut être modifié par les membres autorisés ; les données scientifiques et leur provenance restent en lecture seule.</p>
   </section>
 
+
+  <section class="card hidden" id="sensorAnalysisCard" aria-labelledby="sensorAnalysisTitle">
+    <div class="section-kicker"><span>MODULE 07</span><span class="kicker-line"></span><span>TÉLÉMÉTRIE &amp; ENVIRONNEMENTS</span></div>
+    <div class="signals-heading"><div><h2 id="sensorAnalysisTitle">Analyse des capteurs</h2>
+      <p class="muted">Analyse indépendante des mesures IoT liées à un environnement physique. Les résultats conservent leur provenance et leur couverture.</p></div></div>
+    <div class="grid sensor-controls">
+      <div><label for="sensorEnvironment">Environnement</label><select id="sensorEnvironment"><option value="">Connexion requise</option></select></div>
+      <div><label for="sensorSubject">Contexte biologique (facultatif)</label><select id="sensorSubject"><option value="">Analyse environnementale seule</option></select></div>
+      <div><label for="sensorStartDate">Du</label><input id="sensorStartDate" type="date"></div>
+      <div><label for="sensorEndDate">Au</label><input id="sensorEndDate" type="date"></div>
+    </div>
+    <div class="sensor-actions"><button id="sensorRun" type="button" disabled>Analyser les mesures IoT</button></div>
+    <p id="sensorAnalysisStatus" class="signals-status" role="status" aria-live="polite">En attente d’une session authentifiée.</p>
+    <div id="sensorAnalysisResults" class="sensor-analysis-results" aria-live="polite"></div>
+    <p class="signals-footnote">Le profil de capteurs doit être activé et couvrir toute la période. L’analyse descriptive, le dépistage statistique et l’interprétation biologique sont des couches distinctes ; aucun seuil biologique n’est inventé par l’interface.</p>
+  </section>
+
   <!-- ======================================================
        MESSAGES
        ====================================================== -->
