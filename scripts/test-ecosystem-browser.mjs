@@ -192,8 +192,10 @@ async function checkWorkingScene(name, viewport) {
         name + ': selecting a branch must replace the dock with its actual child branches. ' + JSON.stringify(childDockState));
       navigated = true;
       await page.waitForFunction(() => !document.querySelector('#mainView .webgl-stage')?.classList.contains('is-transitioning'), undefined, { timeout: 8000 });
-      const visibleLabelState = await page.evaluate(() => window.__BALABS_3D_E2E__()?.visibleLabelDepths || []);
-      assert.ok(visibleLabelState.includes(0) && visibleLabelState.includes(1), name + ': at the branch navigation zoom, every immediate sub-branch must have a visible text label');
+      const visibleLabelState = await page.evaluate(() => window.__BALABS_3D_E2E__());
+      assert.ok(visibleLabelState?.visibleLabelDepths?.includes(0), name + ': immediate sub-branches must have visible labels');
+      assert.equal(visibleLabelState?.visibleLabelCountsByDepth?.[0] || 0, childDockState.childCount,
+        name + ': every immediate child must have its own visible text label at the branch navigation zoom. ' + JSON.stringify({childCount:childDockState.childCount,visibleCounts:visibleLabelState?.visibleLabelCountsByDepth}));
       if (!zoomOutChecked) {
         const nestedDepth = await page.evaluate(() => window.__BALABS_3D_E2E__()?.depth || 0);
         const cameraDistance = await page.evaluate(() => window.__BALABS_3D_E2E__()?.cameraDistance || 0);
