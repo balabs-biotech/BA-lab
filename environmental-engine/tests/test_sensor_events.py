@@ -23,22 +23,23 @@ def make_envelopes(values, *, quality="validated", interval_seconds=60):
 
 
 def profile(**overrides):
-    rule = SensorEventRule(
-        rule_id="temperature-high-v1",
-        variable_code="temperature",
-        unit_code="degC",
-        operator="above",
-        threshold=28.0,
-        minimum_observations=2,
-        minimum_duration_seconds=60,
-        maximum_gap_seconds=90,
-        accepted_quality_states=frozenset({"validated"}),
-        required_context_tags=frozenset({"stage:fruiting"}),
-        severity="high",
-        event_code="temperature_above_configured_limit",
-        message_code="temperature_threshold_exceeded",
-        **overrides,
-    )
+    rule_data = {
+        "rule_id": "temperature-high-v1",
+        "variable_code": "temperature",
+        "unit_code": "degC",
+        "operator": "above",
+        "threshold": 28.0,
+        "minimum_observations": 2,
+        "minimum_duration_seconds": 60,
+        "maximum_gap_seconds": 90,
+        "accepted_quality_states": frozenset({"validated"}),
+        "required_context_tags": frozenset({"stage:fruiting"}),
+        "severity": "high",
+        "event_code": "temperature_above_configured_limit",
+        "message_code": "temperature_threshold_exceeded",
+    }
+    rule_data.update(overrides)
+    rule = SensorEventRule(**rule_data)
     return SensorEventProfile(
         profile_id="mycology-fruiting-room",
         module="mycology",
