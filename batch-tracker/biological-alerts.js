@@ -498,6 +498,11 @@
     if (!lineage || lineage.unavailable || !lineage.cultures.length) return null;
     const section = element("section", "signal-lineage");
     section.append(element("h4", "", "Généalogie biologique"));
+    const provenanceIndex = buildBiologicalProvenanceIndex(lineage);
+    const provenanceSummary = provenanceIndex.summarize();
+    section.append(element("p", "signal-lineage-batches",
+      provenanceSummary.material_count + " matériaux · " + provenanceSummary.relationship_count + " relations · " +
+      provenanceSummary.event_count + " événements · " + provenanceSummary.multi_parent_count + " matériau(x) multi-source"));
     const list = element("ol", "signal-lineage-list");
     lineage.cultures.forEach(culture => {
       const item = element("li", culture.id === currentCultureId ? "is-current" : "");
