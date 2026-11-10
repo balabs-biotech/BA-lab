@@ -31,6 +31,7 @@ begin
      or position('private.operation_idempotency_receipts' in v_definition)=0
      or position('idempotency_key_reused_with_different_payload' in v_definition)=0
      or position('experiment_result_recorded' in v_definition)=0
+     or position('results_event_fk' in lower(pg_get_constraintdef((select oid from pg_constraint where conname='results_event_fk'))))=0
      or position('experimental_unit_not_found' in v_definition)=0
      or position('experimental_result_value_must_be_json_object' in v_definition)=0 then
     raise exception 'FAIL: experimental-result RPC is missing authorization, receipt, traceability or payload-validation contract';
