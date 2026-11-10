@@ -19,7 +19,9 @@ The engine foundation provides:
 Derived values remain distinct from source observations. The engine does not
 write calculated values back as sensor measurements. A strict NASA POWER daily-row
 adapter maps the versioned provider parameters to canonical variables while
-preserving source-row identity, original units, timestamps and quality flags.
+preserving source-row identity, original units, timestamps, quality flags, spatial
+resolution and provider metadata. Provider adapters return the shared
+`NormalizedEnvironmentalObservation` contract in `sources/models.py`.
 
 ## Setup
 
