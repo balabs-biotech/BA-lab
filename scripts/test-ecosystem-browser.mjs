@@ -34,6 +34,34 @@ async function tapSpatialTarget(page, name, x, y, selector) {
   return page.touchscreen.tap(x, y);
 }
 
+async function checkTwoFingerPan(page, name) {
+  if (name !== 'mobile') return;
+  const before = await page.evaluate(() => window.__BALABS_3D_E2E__()?.cameraTarget);
+  assert.ok(before, name + ': camera target probe is unavailable before the two-finger gesture');
+  const rect = await page.locator('#mainView .webgl-stage canvas').boundingBox();
+  assert.ok(rect, name + ': canvas bounds are unavailable for the two-finger gesture');
+  const session = await page.context().newCDPSession(page);
+  const x = Math.round(rect.x + rect.width * .5);
+  const y = Math.round(rect.y + rect.height * .5);
+  await session.send('Input.dispatchTouchEvent', {
+    type: 'touchStart',
+    touchPoints: [{ x: x - 34, y, id: 1 }, { x: x + 34, y, id: 2 }],
+  });
+  await session.send('Input.dispatchTouchEvent', {
+    type: 'touchMove',
+    touchPoints: [{ x: x + 26, y: y + 8, id: 1 }, { x: x + 94, y: y + 8, id: 2 }],
+  });
+  await session.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+  await session.detach();
+  await page.waitForTimeout(150);
+  const after = await page.evaluate(() => window.__BALABS_3D_E2E__()?.cameraTarget);
+  const moved = after && Math.hypot(after.x - before.x, after.y - before.y, after.z - before.z);
+  assert.ok(moved > 0.02, name + ': dragging with two fingers must pan the complete 3D map without changing hierarchy');
+  const state = await page.evaluate(() => window.__BALABS_3D_E2E__());
+  assert.ok(state?.selected === 'bio', name + ': two-finger panning must not change the selected universe');
+  console.log(name + ': two-finger map pan moved camera target', { before, after });
+}
+
 async function checkWorkingScene(name, viewport) {
   const page = await browser.newPage({ viewport, deviceScaleFactor: 1, isMobile: name === 'mobile', hasTouch: name === 'mobile' });
   const pageErrors = [];
@@ -127,6 +155,7 @@ async function checkWorkingScene(name, viewport) {
     name + ': no legacy 2D links may overlay the 3D scene');
   await page.waitForFunction(() => !document.querySelector('#mainView .webgl-stage')?.classList.contains('is-transitioning'), undefined, { timeout: 8000 });
   await page.waitForFunction(() => typeof window.__BALABS_3D_E2E__ === 'function', undefined, { timeout: 5000 });
+  await checkTwoFingerPan(page, name);
   await page.waitForFunction(() => (window.__BALABS_3D_E2E__()?.visible || 0) > 0, undefined, { timeout: 15000 }).catch(async error => { throw new Error('No 3D branch is visible for a real tap: ' + JSON.stringify(await page.evaluate(() => window.__BALABS_3D_E2E__())) + ' — ' + error.message); });
   await page.waitForFunction(() => { const dock=document.querySelector('.webgl-branch-dock'); return dock && !dock.hidden && dock.querySelectorAll('.webgl-branch-item').length>0; }, undefined, { timeout: 8000 });
   assert.ok(await page.locator('.webgl-branch-dock .webgl-branch-item').count() > 0, name + ': current hierarchy level must expose visible, selectable branches');
