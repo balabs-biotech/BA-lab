@@ -197,7 +197,7 @@ begin
   end if;
 
   if cardinality(new.sensor_ids) <> cardinality(array(
-    select distinct sensor_id from unnest(new.sensor_ids) as sensor_id
+    select distinct sensor_id from unnest(new.sensor_ids) as sensor(sensor_id)
   )) then
     raise exception 'environment_profile_sensor_ids_must_be_unique'
       using errcode = '23514';
@@ -243,6 +243,11 @@ as $$
 declare
   v_rule jsonb;
 begin
+  if jsonb_typeof(new.rules) <> 'array' then
+    raise exception 'domain_profile_rules_must_be_a_json_array'
+      using errcode = '23514';
+  end if;
+
   for v_rule in select value from jsonb_array_elements(new.rules)
   loop
     if not (v_rule ?& array[
