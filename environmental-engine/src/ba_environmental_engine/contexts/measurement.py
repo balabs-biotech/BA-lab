@@ -96,7 +96,7 @@ class EnvironmentalMeasurement(MeasurementContract):
             raise ValueError("observed_at must include a valid timezone")
         return value
 
-    @field_validator("value")
+    @field_validator("value", mode="before")
     @classmethod
     def value_is_finite(cls, value: float) -> float:
         if isinstance(value, bool) or not isinstance(value, (int, float)) or not isfinite(value):
