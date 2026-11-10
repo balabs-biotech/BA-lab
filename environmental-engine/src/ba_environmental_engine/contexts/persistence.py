@@ -157,6 +157,28 @@ class SupabaseBiologicalContextRepository:
             and (context.valid_to is None or target_date <= context.valid_to)
         )
 
+    def get_for_subject_on_date(
+        self,
+        *,
+        organization_id: str,
+        domain: BiologicalDomain,
+        subject_id: str,
+        on_date: str,
+    ) -> BiologicalContext | None:
+        """Resolve one context for a subject/date; reject overlapping matches."""
+        matches = self.list_for_subject(
+            organization_id=organization_id,
+            domain=domain,
+            subject_id=subject_id,
+            on_date=on_date,
+        )
+        if len(matches) > 1:
+            raise ValueError(
+                "multiple biological contexts overlap this subject and date; "
+                "resolve the validity intervals before interpretation"
+            )
+        return matches[0] if matches else None
+
     def create(self, context: BiologicalContext) -> BiologicalContext:
         response = (
             self._client.table("biological_contexts")
