@@ -181,6 +181,9 @@ Deno.serve(async (req: Request) => {
     if (!profiles?.length) return reply(422, { error: "sensor_profile_unavailable" });
     if (profiles.length !== 1) return reply(422, { error: "ambiguous_sensor_profile" });
     const profile = profiles[0];
+    if (profile.origin !== "sensor" || !["active", "retired"].includes(profile.status)) {
+      return reply(422, { error: "sensor_profile_not_activated" });
+    }
     if (profile.valid_from > fromDate || (profile.valid_to && profile.valid_to < toDate)) {
       return reply(422, { error: "sensor_profile_does_not_cover_scope" });
     }
