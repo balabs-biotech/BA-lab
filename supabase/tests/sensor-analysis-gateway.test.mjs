@@ -47,3 +47,10 @@ assert.match(source, /biologicalInterpretationPayload/, "resolved biological con
 assert.match(source, /biological_contexts_environment_fk/, "biological context must use the explicit environment relationship");
 
 console.log("PASS: sensor analysis gateway security contract");
+
+assert.match(source, /from\("biological_signals"\)/, "interpreted sensor signals must be persisted");
+assert.match(source, /\.upsert\(signalRows/, "sensor signal persistence must use an idempotent upsert");
+assert.match(source, /analysis_method: signal\.evidence\?\.assessment_type === "causal_robust_temporal_screen"/, "temporal findings must retain their analysis method");
+assert.match(source, /analysis_evidence: signal\.evidence \?\? \{\}/, "sensor signal evidence must be persisted");
+assert.match(source, /biological_signal_persistence_failed/, "failed persistence must not be reported as a successful analysis");
+assert.match(source, /signal_persistence_status: signalPersistenceStatus/, "gateway response must expose persistence status");
