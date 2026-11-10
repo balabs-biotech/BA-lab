@@ -83,3 +83,34 @@ extent measurements.
 The calculation module is pure and provider-neutral. The row adapter is also
 pure: it validates one supplied row and a supplied variable registry. No
 database migration or new table is required for this increment.
+
+## Analysis pipeline
+
+`analyze_measurement_rows` is the provider-neutral orchestration entry point.
+The application repository supplies a measurement snapshot that has already
+been retrieved under tenant authorization, together with the variable registry
+and an explicit quality-state policy.
+
+The pipeline:
+1. Materializes the supplied iterable once so generators are supported and
+   row accounting is deterministic.
+2. Applies organization and variable-code scope filters before row adaptation.
+   This is defense in depth; it does not replace repository authorization or
+   row-level security.
+3. Adapts each candidate row through
+   `measurement_row_to_biological_measurement`.
+4. Reports malformed candidate rows with their source ID when available and a
+   validation reason. It does not silently count them as valid evidence.
+5. Passes mapped evidence to `analyze_extent_growth_rate`, which applies the
+   exact subject ID/type filter and quality policy before calculation.
+
+The pipeline result contains the calculation, input/candidate/ignored counts,
+and rejected candidate rows. The calculation itself retains accepted and
+quality-excluded source IDs, formula metadata, time period and output unit.
+Rows belonging to other subjects are excluded by the calculation layer. Other
+organizations and variables are ignored before adaptation.
+
+Duplicate source IDs within the selected subject/variable scope remain a hard
+contract violation and raise an error; the pipeline does not choose one
+arbitrarily. The pipeline performs no database access, unit conversion,
+quality-policy inference, causal inference, or DOM work.
