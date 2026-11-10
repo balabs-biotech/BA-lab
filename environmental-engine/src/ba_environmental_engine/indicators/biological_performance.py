@@ -1,9 +1,4 @@
-"""Pure, provenance-preserving calculations for biological performance evidence.
-
-This module deliberately consumes normalized records instead of querying the
-application database. Adapters map real database rows into this contract and
-explicitly decide which quality states are admissible for an analysis.
-"""
+"""Pure, provenance-preserving calculations for biological performance evidence."""
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -11,16 +6,19 @@ from datetime import datetime
 from math import isfinite
 from typing import Iterable
 
+QUALITY_STATES = frozenset({"raw", "controlled", "validated", "excluded"})
+
 
 @dataclass(frozen=True, slots=True)
 class BiologicalMeasurement:
-    """One numeric biological observation with its source and quality state."""
+    """Normalized biological measurement mapped from a tenant-scoped source row."""
+
     source_record_id: str
     organization_id: str
     subject_id: str
     metric_code: str
     value: float
-    unit_code: str
+    canonical_unit_code: str
     measured_at: datetime
     quality_state: str
     sample_id: str | None = None
@@ -31,12 +29,19 @@ class BiologicalMeasurement:
     instrument: str | None = None
 
     def __post_init__(self) -> None:
-        for field_name in (
-            "source_record_id", "organization_id", "subject_id",
-            "metric_code", "unit_code", "quality_state",
-        ):
+        required = (
+            "source_record_id",
+            "organization_id",
+            "subject_id",
+            "metric_code",
+            "canonical_unit_code",
+            "quality_state",
+        )
+        for field_name in required:
             if not getattr(self, field_name).strip():
                 raise ValueError(f"{field_name} must not be empty")
+        if self.quality_state not in QUALITY_STATES:
+            raise ValueError("quality_state must match the database quality_state enum")
         if (
             isinstance(self.value, bool)
             or not isinstance(self.value, (int, float))
@@ -50,11 +55,13 @@ class BiologicalMeasurement:
 @dataclass(frozen=True, slots=True)
 class BiologicalPerformanceResult:
     """A calculated indicator with complete input lineage and formula metadata."""
+
     status: str
     metric_code: str
     value: float | None
     unit_code: str | None
     source_record_ids: tuple[str, ...]
+    excluded_source_record_ids: tuple[str, ...]
     formula_code: str
     formula_version: str
     period_start: datetime | None
@@ -71,21 +78,22 @@ def analyze_growth_rate(
     subject_id: str,
     accepted_quality_states: set[str] | frozenset[str],
 ) -> BiologicalPerformanceResult:
-    """Calculate first-to-last growth extent per elapsed day for one subject.
+    """Calculate first-to-last growth extent per elapsed day for one tenant/subject.
 
-    No unit conversion or application quality policy is applied here. The
-    caller supplies admissible quality states. Only growth_extent records for
-    the requested subject are considered.
+    Values must already use the variable's canonical unit. This function does
+    not convert units or choose a quality policy. The caller supplies the
+    admissible database quality states; the excluded state is never accepted.
     """
     if not organization_id.strip():
         raise ValueError("organization_id must not be empty")
     if not subject_id.strip():
         raise ValueError("subject_id must not be empty")
-    if not accepted_quality_states or any(not state.strip() for state in accepted_quality_states):
-        raise ValueError("accepted_quality_states must contain non-empty states")
+    if not accepted_quality_states or not accepted_quality_states.issubset(QUALITY_STATES):
+        raise ValueError("accepted_quality_states must use the database quality_state enum")
 
     relevant = [
-        item for item in measurements
+        item
+        for item in measurements
         if (
             item.organization_id == organization_id
             and item.subject_id == subject_id
@@ -97,10 +105,17 @@ def analyze_growth_rate(
         raise ValueError("source record IDs must be unique")
 
     accepted = sorted(
-        (item for item in relevant if item.quality_state in accepted_quality_states),
+        (
+            item
+            for item in relevant
+            if item.quality_state in accepted_quality_states and item.quality_state != "excluded"
+        ),
         key=lambda item: item.measured_at,
     )
-    excluded_count = len(relevant) - len(accepted)
+    accepted_ids = {item.source_record_id for item in accepted}
+    excluded = tuple(
+        item.source_record_id for item in relevant if item.source_record_id not in accepted_ids
+    )
 
     def insufficient(reason: str) -> BiologicalPerformanceResult:
         return BiologicalPerformanceResult(
@@ -109,38 +124,39 @@ def analyze_growth_rate(
             value=None,
             unit_code=None,
             source_record_ids=tuple(item.source_record_id for item in accepted),
+            excluded_source_record_ids=excluded,
             formula_code="net_growth_rate",
             formula_version="1.0.0",
             period_start=accepted[0].measured_at if accepted else None,
             period_end=accepted[-1].measured_at if accepted else None,
             accepted_count=len(accepted),
-            excluded_count=excluded_count,
+            excluded_count=len(excluded),
             reason=reason,
         )
 
     if len(accepted) < 2:
         return insufficient("at_least_two_quality_accepted_observations_required")
 
-    units = {item.unit_code for item in accepted}
+    units = {item.canonical_unit_code for item in accepted}
     if len(units) != 1:
-        raise ValueError("growth extent observations must use the same unit")
+        raise ValueError("growth extent observations must use the same canonical unit")
 
     first, last = accepted[0], accepted[-1]
     elapsed_seconds = (last.measured_at - first.measured_at).total_seconds()
     if elapsed_seconds <= 0:
         return insufficient("positive_elapsed_time_required")
 
-    elapsed_days = elapsed_seconds / 86400
     return BiologicalPerformanceResult(
         status="calculated",
         metric_code="growth_rate",
-        value=(last.value - first.value) / elapsed_days,
-        unit_code=f"{first.unit_code}/day",
+        value=(last.value - first.value) / (elapsed_seconds / 86400),
+        unit_code=f"{first.canonical_unit_code}/day",
         source_record_ids=tuple(item.source_record_id for item in accepted),
+        excluded_source_record_ids=excluded,
         formula_code="net_growth_rate",
         formula_version="1.0.0",
         period_start=first.measured_at,
         period_end=last.measured_at,
         accepted_count=len(accepted),
-        excluded_count=excluded_count,
+        excluded_count=len(excluded),
     )
