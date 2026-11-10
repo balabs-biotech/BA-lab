@@ -117,8 +117,10 @@ def test_normalized_observation_retains_provider_independent_context():
     [
         {"data_family": "satellite"},
         {"data_family": "unknown"},
+        {"data_family": None},
         {"spatial_resolution_m": 0},
         {"spatial_resolution_m": -1},
+        {"spatial_resolution_m": True},
         {"spatial_resolution_m": float("inf")},
     ],
 )
