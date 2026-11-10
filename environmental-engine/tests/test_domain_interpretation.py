@@ -473,6 +473,7 @@ def test_persisted_profile_orchestrator_resolves_context_and_rules_from_reposito
         analysis,
         biological_repository,
         profile_repository,
+        domain=BiologicalDomain.MYCOLOGY,
         subject_id=biological.subject_id,
     )
 
@@ -515,6 +516,7 @@ def test_persisted_profile_orchestrator_rejects_environment_profile_for_wrong_en
             analysis,
             biological_repository,
             profile_repository,
+            domain=BiologicalDomain.MYCOLOGY,
             subject_id=biological.subject_id,
         )
 
@@ -537,5 +539,6 @@ def test_persisted_profile_orchestrator_does_not_fallback_when_domain_profile_mi
             analysis,
             biological_repository,
             profile_repository,
+            domain=BiologicalDomain.MYCOLOGY,
             subject_id=biological.subject_id,
         )
