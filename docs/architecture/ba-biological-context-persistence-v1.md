@@ -98,7 +98,7 @@ The first persistence slice is now present on the feature branch:
 - Python row mapper: `environmental-engine/src/ba_environmental_engine/contexts/persistence.py`.
 - Python mapper tests: `environmental-engine/tests/test_biological_context_persistence.py`.
 
-The SQL table stores either `culture_id` or `plant_culture_id`, plus `environment_id`. It does not duplicate `location_id`; an insert/update trigger rejects environments without a physical location. Tenant-scoped composite foreign keys enforce subject and environment ownership. Reads require organization membership; writes require the existing `private.is_org_writer` policy, so viewer accounts remain read-only.
+The SQL table stores either `culture_id` or `plant_culture_id`, plus `environment_id`. It does not duplicate `location_id`; an insert/update trigger rejects environments without a physical location. A second trigger prevents changing or clearing an environment's location once a biological context references it, preserving historical scope binding. Tenant-scoped composite foreign keys enforce subject and environment ownership. Reads require organization membership; writes require the existing `private.is_org_writer` policy, so viewer accounts remain read-only.
 
 The Python mapper accepts a row with the PostgREST relation alias `environment` containing `location_id`. It maps the typed database subject FK to the model's `subject_id` and resolves the model's `location_id` from that joined environment. The reverse mapper emits database columns only and deliberately omits the derived location and generic subject ID.
 
