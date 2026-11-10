@@ -20,6 +20,8 @@ class BiologicalMeasurement:
     variable_code: str
     value: float
     canonical_unit_code: str
+    source_unit_code: str
+    value_source: str
     measured_at: datetime
     quality_state: str
     sample_id: str | None = None
@@ -37,11 +39,15 @@ class BiologicalMeasurement:
             "subject_type",
             "variable_code",
             "canonical_unit_code",
+            "source_unit_code",
+            "value_source",
             "quality_state",
         )
         for field_name in required:
             if not getattr(self, field_name).strip():
                 raise ValueError(f"{field_name} must not be empty")
+        if self.value_source not in {"raw", "normalized"}:
+            raise ValueError("value_source must be raw or normalized")
         if self.quality_state not in QUALITY_STATES:
             raise ValueError("quality_state must match the database quality_state enum")
         if (
