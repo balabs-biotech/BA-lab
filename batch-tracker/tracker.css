@@ -2789,3 +2789,62 @@ body[data-domain] :is(button, input, select, textarea, a, [tabindex]):focus-visi
   outline: 3px solid var(--focus) !important;
   outline-offset: 3px;
 }
+
+/* Biological signal inbox — shared structure, domain-specific semantic palette. */
+#biologicalSignalsCard .signals-heading,
+#biologicalSignalsCard .signals-item-header,
+#biologicalSignalsCard .signals-item-footer,
+#biologicalSignalsCard .signals-toolbar {
+  display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap;
+}
+#biologicalSignalsCard .signals-heading h2 { margin-bottom:6px; }
+#biologicalSignalsCard .signals-summary {
+  display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; margin:22px 0;
+}
+#biologicalSignalsCard .signals-summary article {
+  display:flex; flex-direction:column; gap:8px; padding:16px;
+  border:1px solid var(--border); border-radius:12px; background:var(--surface-2);
+}
+#biologicalSignalsCard .signals-summary span { color:var(--muted); font-size:12px; }
+#biologicalSignalsCard .signals-summary strong { color:var(--brand); font-size:30px; line-height:1; font-variant-numeric:tabular-nums; }
+#biologicalSignalsCard .signals-toolbar { justify-content:flex-start; margin:18px 0 8px; }
+#biologicalSignalsCard .signals-toolbar label { margin:0; }
+#biologicalSignalsCard .signals-toolbar select { min-width:190px; }
+#biologicalSignalsCard .signals-status { min-height:22px; margin:10px 0; color:var(--muted); font-size:13px; }
+#biologicalSignalsCard .signals-status[data-state="error"] { color:var(--err); }
+#biologicalSignalsCard .signals-list { display:grid; gap:12px; }
+#biologicalSignalsCard .signal-item {
+  padding:17px; border:1px solid var(--border); border-left:4px solid var(--border-strong);
+  border-radius:12px; background:var(--surface); min-width:0;
+}
+#biologicalSignalsCard .signal-item[data-severity="critical"] { border-left-color:#b3261e; }
+#biologicalSignalsCard .signal-item[data-severity="high"] { border-left-color:#b66a21; }
+#biologicalSignalsCard .signal-item[data-severity="medium"] { border-left-color:#b18b37; }
+#biologicalSignalsCard .signal-item-header { align-items:flex-start; }
+#biologicalSignalsCard .signal-title-group { display:flex; align-items:center; flex-wrap:wrap; gap:8px 12px; min-width:0; }
+#biologicalSignalsCard .signal-title-group h3 { margin:0; font-size:16px; overflow-wrap:anywhere; }
+#biologicalSignalsCard .signal-severity, #biologicalSignalsCard .signal-state {
+  display:inline-flex; align-items:center; border:1px solid var(--border); border-radius:999px;
+  padding:4px 9px; font-size:11px; font-weight:750;
+}
+#biologicalSignalsCard .signal-state { background:var(--surface-2); color:var(--text); }
+#biologicalSignalsCard .signal-message { margin:12px 0; color:var(--text); overflow-wrap:anywhere; }
+#biologicalSignalsCard .signal-metadata {
+  display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px 18px; margin:12px 0;
+}
+#biologicalSignalsCard .signal-metadata dt { color:var(--muted); font-size:11px; }
+#biologicalSignalsCard .signal-metadata dd { margin:2px 0 0; font-size:12px; overflow-wrap:anywhere; }
+#biologicalSignalsCard .signal-item-footer { padding-top:12px; border-top:1px solid var(--border); }
+#biologicalSignalsCard .signal-time { color:var(--muted); font-size:11px; }
+#biologicalSignalsCard .signal-actions { display:flex; flex-wrap:wrap; gap:7px; }
+#biologicalSignalsCard .signal-actions button { padding:7px 10px; font-size:11px; }
+#biologicalSignalsCard .signals-empty { padding:24px; text-align:center; color:var(--muted); border:1px dashed var(--border-strong); border-radius:12px; }
+#biologicalSignalsCard .signals-footnote { margin-top:18px; color:var(--muted); font-size:11px; line-height:1.6; }
+@media(max-width:650px) {
+  #biologicalSignalsCard .signals-summary { grid-template-columns:1fr 1fr; }
+  #biologicalSignalsCard .signals-summary article:last-child { grid-column:1/-1; }
+  #biologicalSignalsCard .signal-metadata { grid-template-columns:1fr; }
+  #biologicalSignalsCard .signal-item-footer { align-items:flex-start; flex-direction:column; }
+  #biologicalSignalsCard .signal-actions { width:100%; }
+  #biologicalSignalsCard .signal-actions button { flex:1 1 auto; }
+}
