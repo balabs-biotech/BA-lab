@@ -87,7 +87,7 @@ function addStyles() {
     #mainView .webgl-intro-orb b{font:700 33px system-ui;letter-spacing:-.1em;color:#e1e7dc}
     #mainView .webgl-intro-copy{color:#d6ded6;font:600 10px system-ui;letter-spacing:.17em}
     #mainView .webgl-intro-cta{border:1px solid #9eb7a2;border-radius:999px;padding:12px 17px;color:#f1f2e9;background:#21342edb;font:700 10px system-ui;letter-spacing:.1em}
-    #mainView .webgl-branch-dock{position:absolute;left:clamp(10px,2vw,24px);right:clamp(10px,2vw,24px);bottom:48px;z-index:2147483647!important;display:flex;flex-wrap:wrap;justify-content:center;align-content:flex-start;gap:8px;max-height:178px;overflow:auto;padding:10px 12px;border:1px solid #78958a88;border-radius:16px;background:linear-gradient(145deg,#142321ed,#10191bf0);box-shadow:0 12px 34px #0007;backdrop-filter:blur(14px);scrollbar-width:thin}
+    #mainView .webgl-branch-dock{touch-action:pan-y;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;position:absolute;left:clamp(10px,2vw,24px);right:clamp(10px,2vw,24px);bottom:48px;z-index:2147483647!important;display:flex;flex-wrap:wrap;justify-content:center;align-content:flex-start;gap:8px;max-height:178px;overflow:auto;padding:10px 12px;border:1px solid #78958a88;border-radius:16px;background:linear-gradient(145deg,#142321ed,#10191bf0);box-shadow:0 12px 34px #0007;backdrop-filter:blur(14px);scrollbar-width:thin}
     #mainView .webgl-branch-dock[hidden]{display:none!important}
     #mainView .webgl-branch-dock .webgl-branch-item{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;max-width:min(320px,100%);padding:9px 14px;border:1px solid #78958a99;border-radius:12px;background:#263b38;color:#f2f2e9;font:650 15px/1.25 system-ui,sans-serif;text-align:left;text-decoration:none;cursor:pointer;touch-action:manipulation}
     #mainView .webgl-branch-dock .webgl-branch-item[data-has-children="true"]:after{content:'›';color:#d69a7f;font-size:21px;line-height:1}
@@ -448,7 +448,7 @@ function setupUI() {
   intro.addEventListener('click',()=>{opened=true;intro.hidden=true;nav.hidden=false;ROOT.classList.remove('universe-closed');ROOT.classList.add('universe-open');status.textContent='BALABS / LIVING NETWORK'});
   controls.addEventListener('click',e=>{const action=e.target.closest('button')?.dataset.camera;if(action==='back'){goBackLevel();return}if(action==='in')zoomTargetDistance=Math.max(1.25,zoomTargetDistance*.72);if(action==='out')zoomTargetDistance=Math.min(60,zoomTargetDistance*1.28);if(action==='reset'){goOverview();return}cameraPosition()});
   stage.append(hint,status,controls,nav,panel,intro);ROOT.append(stage);
-  branchDock=document.createElement('nav');branchDock.className='webgl-branch-dock';branchDock.setAttribute('aria-label','Branches et sous-branches');branchDock.hidden=true;stage.append(branchDock);
+  branchDock=document.createElement('nav');branchDock.className='webgl-branch-dock';branchDock.setAttribute('aria-label','Branches et sous-branches');branchDock.hidden=true;ROOT.append(branchDock);
   document.getElementById('homeBtn')?.addEventListener('click',()=>{if(selected)goOverview()});
   stage.setAttribute('aria-keyshortcuts','ArrowUp ArrowDown ArrowLeft ArrowRight + - Escape Backspace Home');
   stage.addEventListener('keydown',e=>{
