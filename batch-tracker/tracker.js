@@ -1024,6 +1024,7 @@ async function initializeAuthenticatedTracker(
     showElement(batchCard);
     showElement(measurementCard);
     showElement(document.getElementById("statisticsCard"));
+    showElement(document.getElementById("sensorAnalysisCard"));
     showElement(document.getElementById("overviewCard"));
     updateOverview();
 
@@ -6411,8 +6412,8 @@ function updateOverview() {
 function activateWorkspaceModule(moduleId) {
   const modulesByDomain = {
     agronomy: ["overviewCard", "plantCard", "measurementCard", "statisticsCard"],
-    mycology: ["overviewCard", "trackerCard", "measurementCard", "statisticsCard"],
-    laboratory: ["overviewCard", "trackerCard", "batchCard", "measurementCard", "statisticsCard"]
+    mycology: ["overviewCard", "trackerCard", "measurementCard", "statisticsCard", "sensorAnalysisCard"],
+    laboratory: ["overviewCard", "trackerCard", "batchCard", "measurementCard", "statisticsCard", "sensorAnalysisCard"]
   };
   const activeDomain = document.body.dataset.domain;
   const modules = modulesByDomain[activeDomain] || modulesByDomain.laboratory;
@@ -6555,7 +6556,7 @@ function setupUiEnhancements() {
   document.querySelectorAll(".section-nav a").forEach((link) => {
     link.addEventListener("click", (event) => {
       const target = link.getAttribute("href");
-      if (target === "#overviewCard" || target === "#trackerCard" || target === "#plantCard" || target === "#batchCard" || target === "#measurementCard" || target === "#statisticsCard") {
+      if (target === "#overviewCard" || target === "#trackerCard" || target === "#plantCard" || target === "#batchCard" || target === "#measurementCard" || target === "#statisticsCard" || target === "#sensorAnalysisCard") {
         event.preventDefault();
         activateWorkspaceModule(target.slice(1));
         document.getElementById(target.slice(1))?.scrollIntoView({
