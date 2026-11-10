@@ -14,6 +14,7 @@ assert.match(panel, /environment_id:\s*environmentId/, "analysis request must bi
 assert.match(panel, /subject_id:\s*subjectId/, "biological interpretation must bind only a selected subject");
 assert.match(panel, /requestRevision/, "stale requests must not paint data after tenant changes");
 assert.match(panel, /replaceChildren\(/, "rendering must avoid injecting untrusted result strings as HTML");
+assert.match(panel, /temporal_screening\?\.status === "completed"/, "unrequested temporal screening must not be displayed as zero anomalies");
 assert.match(workspace, /id="sensorAnalysisCard"/, "workspace must expose the independent sensor analysis panel");
 assert.match(workspace, /href="#sensorAnalysisCard"[^>]*data-domain-nav="biological"/, "sensor panel must be navigable only in biological workspaces");
 assert.match(tracker, /mycology: \[[^\]]*"sensorAnalysisCard"/, "Mycology must expose the sensor panel in workspace navigation");
