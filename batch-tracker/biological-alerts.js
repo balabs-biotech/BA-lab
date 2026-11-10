@@ -22,7 +22,8 @@
     sensor_series: "Résumé de série IoT",
     sensor_temporal: "Anomalie temporelle IoT (MAD robuste)"
   };
-  const state = { userId: null, organizationId: null, domain: null, rows: [], filter: "active", request: 0 };
+  const PAGE_SIZE = 100;
+  const state = { userId: null, organizationId: null, domain: null, rows: [], filter: "active", request: 0, offset: 0, hasMore: false, loading: false };
   const root = document.getElementById("biologicalSignalsCard");
   if (!root) return;
 
@@ -62,6 +63,10 @@
       if (state.filter === "dismissed") return row.signal_status === "dismissed";
       return true;
     });
+    const loadMore = $("signalsLoadMore");
+    loadMore.classList.toggle("hidden", !state.hasMore);
+    loadMore.disabled = state.loading;
+    loadMore.textContent = state.loading ? "Chargement…" : "Charger 100 signaux supplémentaires";
     if (!visible.length) {
       list.append(element("p", "signals-empty", state.rows.length
         ? "Aucun signal dans cette catégorie."
@@ -138,9 +143,18 @@
     });
   }
 
-  async function loadSignals() {
-    if (!state.userId || !state.organizationId || !state.domain) return;
-    const request = ++state.request;
+  async function loadSignals({ append = false } = {}) {
+    if (!state.userId || !state.organizationId || !state.domain || state.loading) return;
+    if (!append) {
+      state.request++;
+      state.offset = 0;
+      state.hasMore = false;
+      state.rows = [];
+    }
+    const request = state.request;
+    const pageOffset = state.offset;
+    state.loading = true;
+    render();
     notify("Chargement des signaux biologiques…");
     const { data, error } = await client
       .from("biological_signals")
@@ -148,16 +162,20 @@
       .eq("organization_id", state.organizationId)
       .eq("domain", state.domain)
       .order("first_seen_at", { ascending: false })
-      .limit(100);
+      .range(pageOffset, pageOffset + PAGE_SIZE - 1);
     if (request !== state.request) return;
+    state.loading = false;
     if (error) {
       console.error("[CultureOps signals] Read failed", error.message);
       notify("Impossible de charger les signaux. Vérifiez les droits d’accès et la connexion.", true);
       return;
     }
-    state.rows = data || [];
+    const page = data || [];
+    state.rows = append ? state.rows.concat(page) : page;
+    state.offset += page.length;
+    state.hasMore = page.length === PAGE_SIZE;
     render();
-    notify(state.rows.length + " signal(aux) chargé(s).");
+    notify(state.rows.length + " signal(aux) chargé(s)." + (state.hasMore ? " D’autres signaux sont disponibles." : ""));
   }
 
   async function changeStatus(signalId, nextStatus, button) {
@@ -208,7 +226,8 @@
     state.filter = event.target.value;
     render();
   });
-  $("signalsRefresh").addEventListener("click", loadSignals);
+  $("signalsRefresh").addEventListener("click", () => loadSignals());
+  $("signalsLoadMore").addEventListener("click", () => loadSignals({ append: true }));
 
   client.auth.getSession().then(({ data }) => applySession(data.session));
   client.auth.onAuthStateChange((_event, session) => {
@@ -220,6 +239,8 @@
     state.userId = event.detail?.userId || null;
     if (!state.userId) {
       state.rows = [];
+      state.offset = 0;
+      state.hasMore = false;
       render();
       root.classList.add("hidden");
       return;
@@ -240,6 +261,8 @@
     previousDomain = nextDomain;
     state.domain = domainByWorkspace[nextDomain] || null;
     state.rows = [];
+    state.offset = 0;
+    state.hasMore = false;
     render();
     if (state.domain && state.organizationId) void loadSignals();
   }).observe(document.body, { attributes: true, attributeFilter: ["data-domain"] });
