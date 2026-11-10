@@ -161,6 +161,7 @@ async function checkWorkingScene(name, viewport) {
   assert.ok(await page.locator('.webgl-branch-dock .webgl-branch-item').count() > 0, name + ': current hierarchy level must expose visible, selectable branches');
   await page.evaluate(() => { window.__BALABS_3D_TARGET_EVENTS__=[]; for (const type of ['pointerdown','pointerup','click','touchend']) document.addEventListener(type,event=>{if(event.target?.closest?.('.webgl-hit-target,.webgl-branch-item'))window.__BALABS_3D_TARGET_EVENTS__.push({type,target:event.target.title||event.target.tagName,pointerType:event.pointerType||null,x:event.clientX??null,y:event.clientY??null})},true); });
   await page.evaluate(() => { window.__BALABS_3D_TARGET_EVENTS__=[]; window.__BALABS_3D_DOCUMENT_CLICK__=null; });
+  await page.evaluate(() => { window.__BALABS_3D_E2E_CLICKS=0; window.__BALABS_3D_LAST_OPEN__=null; window.__BALABS_3D_LAST_OPEN_ERROR__=null; });
   let navigated = false;
   let openedNotion = false;
   let zoomOutChecked = false;
@@ -177,7 +178,7 @@ async function checkWorkingScene(name, viewport) {
       const beforeActivation = await page.evaluate(() => ({clicks:window.__BALABS_3D_E2E_CLICKS||0,picks:window.__BALABS_3D_E2E__()?.pickCalls||0}));
       const clicksBefore = beforeActivation.clicks;
       await tapSpatialTarget(page, name, branchButtonPoint.x, branchButtonPoint.y, '.webgl-branch-dock .webgl-branch-item[data-branch-index="'+branchButtonPoint.index+'"]');
-      await page.waitForFunction(({title,before}) => { const probe=window.__BALABS_3D_E2E__?.(); return window.__BALABS_3D_LAST_OPEN__?.title===title && (window.__BALABS_3D_E2E_CLICKS||0)>before && probe?.currentTitle===title && probe.childCount>0; }, {title:branchButtonPoint.title,before:clicksBefore}, { timeout: 8000 }).catch(async error => { throw new Error(name + ': selecting a branch did not activate the intended folder. ' + JSON.stringify(await page.evaluate(() => ({probe:window.__BALABS_3D_E2E__(),lastOpen:window.__BALABS_3D_LAST_OPEN__,clicks:window.__BALABS_3D_E2E_CLICKS,trace:window.__BALABS_3D_NAV_TRACE__,events:window.__BALABS_3D_TARGET_EVENTS__})) ) + ' — ' + error.message); });
+      await page.waitForFunction(({title,before}) => { const probe=window.__BALABS_3D_E2E__?.(); return window.__BALABS_3D_LAST_OPEN__?.title===title && (window.__BALABS_3D_E2E_CLICKS||0)>before && probe?.currentTitle===title && probe.childCount>0; }, {title:branchButtonPoint.title,before:clicksBefore}, { timeout: 8000 }).catch(async error => { throw new Error(name + ': selecting a branch did not activate the intended folder. ' + JSON.stringify(await page.evaluate(() => ({probe:window.__BALABS_3D_E2E__(),lastOpen:window.__BALABS_3D_LAST_OPEN__,clicks:window.__BALABS_3D_E2E_CLICKS,trace:window.__BALABS_3D_NAV_TRACE__,events:window.__BALABS_3D_TARGET_EVENTS__})) ) + ' expected=' + JSON.stringify({title:branchButtonPoint.title,before:beforeActivation}) + ' — ' + error.message); });
       await page.waitForTimeout(250);
       const activation = await page.evaluate(() => ({clicks:window.__BALABS_3D_E2E_CLICKS||0,last:window.__BALABS_3D_LAST_OPEN__,events:window.__BALABS_3D_TARGET_EVENTS__||[]}));
       assert.equal(activation.clicks, clicksBefore+1, name + ': one finger tap must activate a branch exactly once');
