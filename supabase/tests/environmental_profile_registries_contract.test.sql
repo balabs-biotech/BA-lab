@@ -204,6 +204,15 @@ begin
     null;
   end;
 
+  begin
+    update public.environments
+       set location_id = null
+     where organization_id = v_org and id = v_environment;
+    raise exception 'FAIL: environment location changed after profile activation';
+  exception when check_violation then
+    null;
+  end;
+
   insert into public.environment_context_profiles(
     organization_id, environment_id, profile_code, profile_version,
     context_type, label, timezone, origin, valid_from, status
