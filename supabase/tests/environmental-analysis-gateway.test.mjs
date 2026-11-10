@@ -38,6 +38,8 @@ assert.match(source, /context_does_not_cover_scope/, "a context must cover the c
 
 assert.match(source, /\.lte\("valid_from", startDate\)/, "resolved profiles must start no later than the analysis window");
 assert.match(source, /valid_to\.gte\.\$\{endDate\}/, "resolved profiles must remain valid through the end of the analysis window");
+assert.match(source, /\.eq\(subjectColumn, subjectId\)\s*\.lte\("valid_from", startDate\)\s*\.or\(`valid_to\.is\.null,valid_to\.gte\.\$\{endDate\}`\)/, "biological context candidates must cover the complete analysis window");
+assert.match(source, /overlappingContexts/, "partial context windows must be distinguished from unknown subjects");
 
 assert.match(source, /environment_profile_unavailable/, "missing environment profiles must be explicit");
 assert.match(source, /domain_profile_unavailable/, "missing domain profiles must be explicit");
