@@ -59,22 +59,25 @@ def _actual_vapor_pressure(
     saturation_min_kpa: float,
     saturation_max_kpa: float,
     actual_vapor_pressure_kpa: float | None,
+    relative_humidity_mean_percent: float | None,
     relative_humidity_min_percent: float | None,
     relative_humidity_max_percent: float | None,
     dew_point_temperature_c: float | None,
 ) -> float:
     direct = actual_vapor_pressure_kpa is not None
-    humidity = (
+    humidity_mean = relative_humidity_mean_percent is not None
+    humidity_extremes = (
         relative_humidity_min_percent is not None
         or relative_humidity_max_percent is not None
     )
+    humidity = humidity_mean or humidity_extremes
     dew_point = dew_point_temperature_c is not None
 
     if sum((direct, humidity, dew_point)) != 1:
         raise ValueError(
             "provide exactly one actual vapour pressure method: "
-            "actual_vapor_pressure_kpa, both relative humidity extremes, "
-            "or dew_point_temperature_c"
+            "actual_vapor_pressure_kpa, mean relative humidity, both relative "
+            "humidity extremes, or dew_point_temperature_c"
         )
 
     if direct:
@@ -85,6 +88,14 @@ def _actual_vapor_pressure(
             raise ValueError("actual_vapor_pressure_kpa must be non-negative")
     elif dew_point:
         actual = saturation_vapor_pressure_kpa(dew_point_temperature_c)
+    elif humidity_mean:
+        rh_mean = _finite_number(
+            "relative_humidity_mean_percent", relative_humidity_mean_percent
+        )
+        if not 0.0 <= rh_mean <= 100.0:
+            raise ValueError("relative_humidity_mean_percent must be between 0 and 100")
+        saturation_mean = (saturation_min_kpa + saturation_max_kpa) / 2.0
+        actual = saturation_mean * (rh_mean / 100.0)
     else:
         if (
             relative_humidity_min_percent is None
@@ -125,6 +136,7 @@ def calculate_fao56_et0(
     atmospheric_pressure_kpa: float | None = None,
     altitude_m: float | None = None,
     actual_vapor_pressure_kpa: float | None = None,
+    relative_humidity_mean_percent: float | None = None,
     relative_humidity_min_percent: float | None = None,
     relative_humidity_max_percent: float | None = None,
     dew_point_temperature_c: float | None = None,
@@ -133,8 +145,9 @@ def calculate_fao56_et0(
     """Calculate daily reference ET0 in mm/day using FAO-56 Eq. 6.
 
     Exactly one of atmospheric pressure or station altitude is required.
-    Actual vapour pressure must be supplied directly, derived from both daily
-    RH extremes, or derived from dew-point temperature. Net radiation is
+    Actual vapour pressure must be supplied directly, derived from mean daily
+    RH, derived from both daily RH extremes, or derived from dew-point
+    temperature. Net radiation is
     required as a precomputed daily value (MJ m-2 day-1); no solar-to-net
     radiation approximation is made here.
 
@@ -185,6 +198,7 @@ def calculate_fao56_et0(
         saturation_min_kpa=saturation_min,
         saturation_max_kpa=saturation_max,
         actual_vapor_pressure_kpa=actual_vapor_pressure_kpa,
+        relative_humidity_mean_percent=relative_humidity_mean_percent,
         relative_humidity_min_percent=relative_humidity_min_percent,
         relative_humidity_max_percent=relative_humidity_max_percent,
         dew_point_temperature_c=dew_point_temperature_c,
