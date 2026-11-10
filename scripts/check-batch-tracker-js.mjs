@@ -290,7 +290,7 @@ if(!engine.includes("pendingExperimentOccurredAt || (pendingExperimentOccurredAt
 if(!engine.includes('from("experimental_units")')||!engine.includes('unit_code,replicate_no,treatment_code'))throw new Error("Experimental unit registry read model is missing");
 if(!engine.includes('isCurrentWorkspaceRevision(revision, orgId)'))throw new Error("Experiment registry does not guard tenant/session transitions");
 if(!template.includes('id="experimentRegistryList"')||!template.includes('id="experimentRegistryStatus"'))throw new Error("Experiment registry list/status region is missing");
-if(!template.includes('id="experimentRegistryCard" class="hidden"')||!engine.includes("showElement(experimentRegistryCard)")||!(engine.includes("hideElement(experimentRegistryCard)")||engine.includes('hideElement(document.getElementById("experimentRegistryCard"))')))throw new Error("Experimental registry must only appear in the laboratory workspace");
+if(!template.includes('class="experiment-registry hidden" id="experimentRegistryCard"')||!engine.includes("showElement(experimentRegistryCard)")||!(engine.includes("hideElement(experimentRegistryCard)")||engine.includes('hideElement(document.getElementById("experimentRegistryCard"))')))throw new Error("Experimental registry must only appear in the laboratory workspace");
 console.log("✓ Atomic experimental registry form, unit rows and tenant-safe read model are wired");
 
 if(!template.includes('id="cultureExperimentId"')||!template.includes('id="cultureExperimentalUnitId"'))throw new Error("Culture-to-experiment assignment selectors are missing");
