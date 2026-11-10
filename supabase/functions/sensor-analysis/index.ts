@@ -167,6 +167,7 @@ Deno.serve(async (req: Request) => {
         "environment:environments!environment_context_profiles_environment_fk(id,location_id)," +
         "sensors:environment_context_profile_sensors!environment_context_profile_sensors_profile_fk(sensor_id)",
       )
+      .eq("organization_id", authorizedEnvironment.organization_id)
       .eq("environment_id", environmentId)
       .eq("origin", "sensor")
       .in("status", ["active", "retired"])
