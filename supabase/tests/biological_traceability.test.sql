@@ -84,6 +84,9 @@ create table public.experimental_units(
   id uuid not null default gen_random_uuid(),
   experiment_id uuid not null,
   unit_code text not null,
+  replicate_no integer,
+  treatment_code text,
+  metadata jsonb not null default '{}'::jsonb,
   primary key(organization_id,id),
   unique(organization_id,experiment_id,unit_code),
   foreign key(organization_id,experiment_id) references public.experiments(organization_id,id)
