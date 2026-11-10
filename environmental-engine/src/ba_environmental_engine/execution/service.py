@@ -68,6 +68,8 @@ def run_environmental_analysis(
     weather_by_date: dict[date, list[NormalizedEnvironmentalObservation]] = defaultdict(list)
     weather_by_variable: dict[str, dict[date, float]] = defaultdict(dict)
     units_by_variable: dict[str, str] = {}
+    rolling_by_variable: dict[str, dict[date, float]] = defaultdict(dict)
+    rolling_units: dict[str, str] = {}
 
     for row in rows:
         if row.data_family != "weather":
@@ -83,6 +85,9 @@ def run_environmental_analysis(
                 f"weather variable {row.variable_code} has inconsistent canonical units"
             )
         weather_by_variable[row.variable_code][row.observed_date] = row.value
+        if rolling_methods and row.variable_code in rolling_methods:
+            rolling_by_variable[row.variable_code][row.observed_date] = row.value
+            rolling_units[row.variable_code] = row.unit
 
     if not weather_by_date:
         raise ValueError("at least one weather observation is required")
@@ -110,19 +115,19 @@ def run_environmental_analysis(
             raise ValueError(
                 "requested scope must contain the full length of every rolling window"
             )
-        if set(rolling_methods) != set(weather_by_variable):
-            missing = sorted(set(rolling_methods) - set(weather_by_variable))
+        if set(rolling_methods) != set(rolling_by_variable):
+            missing = sorted(set(rolling_methods) - set(rolling_by_variable))
             raise ValueError(
                 "rolling methods require observations for every configured variable: "
                 + ", ".join(missing)
             )
         rolling_results = calculate_rolling_climate_indicators(
-            weather_by_variable,
+            rolling_by_variable,
             end_date=scope_to,
             methods=rolling_methods,
             window_days=rolling_windows,
             minimum_coverage_ratio=minimum_rolling_coverage,
-            units=units_by_variable,
+            units=rolling_units,
         )
 
     selected_temporal_variables = (
