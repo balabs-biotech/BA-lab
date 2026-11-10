@@ -9,7 +9,7 @@ create or replace function public.record_experiment_result(
   p_value jsonb,
   p_quality_state text,
   p_idempotency_key uuid,
-  p_occurred_at timestamptz default now()
+  p_occurred_at timestamptz
 )
 returns jsonb
 language plpgsql
@@ -38,6 +38,9 @@ begin
   end if;
   if p_experimental_unit_id is null then
     raise exception 'experimental_unit_required' using errcode = '22023';
+  end if;
+  if p_occurred_at is null then
+    raise exception 'experimental_result_timestamp_required' using errcode = '22023';
   end if;
   if nullif(btrim(coalesce(p_code,'')),'') is null or length(btrim(p_code)) > 120 then
     raise exception 'experimental_result_code_invalid' using errcode = '22023';
@@ -72,7 +75,7 @@ begin
     'result_type',btrim(p_result_type),
     'value',p_value,
     'quality_state',v_quality_state::text,
-    'occurred_at',coalesce(p_occurred_at,now())
+    'occurred_at',p_occurred_at
   );
 
   insert into private.operation_idempotency_receipts(
@@ -118,7 +121,7 @@ begin
   insert into public.events(
     organization_id,event_type,occurred_at,actor_user_id,experimental_unit_id,payload
   ) values (
-    p_organization_id,'experiment_result_recorded',coalesce(p_occurred_at,now()),
+    p_organization_id,'experiment_result_recorded',p_occurred_at,
     v_actor_id,p_experimental_unit_id,
     jsonb_build_object(
       'result_id',v_result_id,
