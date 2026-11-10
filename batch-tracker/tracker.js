@@ -64,7 +64,7 @@ function isCurrentWorkspaceRevision(revision, expectedOrganizationId) {
 function clearAuthenticatedWorkspaceState() {
   // Remove the previous tenant context before an auth transition can yield.
   organizationId = null;
-  window.dispatchEvent(new CustomEvent('balabs:organization-context', { detail: { organizationId: null } }));
+  window.dispatchEvent(new CustomEvent('balabs:organization-context', { detail: { organizationId: null, userId: null } }));
   organization = null;
   strainOptions = [];
   referenceData = [];
@@ -911,7 +911,7 @@ async function initializeAuthenticatedTracker(
     // still current; an obsolete claim must never overwrite the active tenant.
     organization = claim.organization;
     organizationId = claim.organization.id;
-    window.dispatchEvent(new CustomEvent('balabs:organization-context', { detail: { organizationId } }));
+    window.dispatchEvent(new CustomEvent('balabs:organization-context', { detail: { organizationId, userId: session.user.id } }));
 
     if (!organizationId) {
 
