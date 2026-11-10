@@ -276,3 +276,8 @@ console.log("✓ Atomic measurement/observation writes no longer perform separat
 const forbiddenDirectWrite = engine.match(/\.from\(["'](?:events|measurements|observations)["']\)\s*\.(?:insert|upsert|update|delete)\s*\(/);
 if (forbiddenDirectWrite) throw new Error("Audit-sensitive event/measurement/observation writes must go through validated RPCs, not direct table mutations");
 console.log("✓ Tracker uses RPC-backed writes for events, measurements and observations");
+
+
+// Experimental results must be visible from the culture detail that owns their unit.
+if(!engine.includes('from("results")')||!engine.includes('in("experimental_unit_id", unitIds)'))throw new Error("Structured experimental results are not loaded for culture experimental units");
+if(!engine.includes("result_type")||!engine.includes("quality_state")||!engine.includes("result.value"))throw new Error("Experimental result type, quality state and structured value are not rendered");
