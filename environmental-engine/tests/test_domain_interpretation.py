@@ -4,7 +4,7 @@ from uuid import uuid4
 from ba_environmental_engine.contexts.biological import BiologicalContext
 from ba_environmental_engine.contexts.environment import EnvironmentContext, EnvironmentType, ObservationOrigin
 from ba_environmental_engine.execution import run_environmental_analysis
-from ba_environmental_engine.interpretation import interpret_findings, interpret_analysis_for_biological_context
+from ba_environmental_engine.interpretation import (\n    interpret_findings,\n    interpret_analysis_for_biological_context,\n    interpret_persisted_analysis_for_subject,\n)
 from ba_environmental_engine.interpretation.models import (
     DomainProfile,
     InterpretationRule,
@@ -271,3 +271,147 @@ def test_biological_context_cannot_be_interpreted_by_another_domain_profile():
     import pytest
     with pytest.raises(ValueError, match="profile module must match biological context domain"):
         interpret_analysis_for_biological_context(analysis, profile, biological, environment)
+
+
+class InMemoryBiologicalContextRepository:
+    def __init__(self, contexts):
+        self.contexts = tuple(contexts)
+        self.last_query = None
+
+    def list_for_subject(
+        self, *, organization_id, domain, subject_id, on_date=None
+    ):
+        self.last_query = (organization_id, domain, subject_id)
+        return tuple(
+            context
+            for context in self.contexts
+            if str(context.organization_id) == organization_id
+            and context.domain == domain
+            and str(context.subject_id) == subject_id
+        )
+
+
+def make_persisted_context_for_analysis(analysis, *, valid_from=None, valid_to=None):
+    environment = EnvironmentContext(
+        context_id=uuid4(),
+        organization_id=analysis.scope.organization_id,
+        location_id=analysis.scope.location_id,
+        context_type=EnvironmentType.FRUITING_CHAMBER,
+        label="Chambre Pleurotus",
+        timezone="Africa/Algiers",
+        origin=ObservationOrigin.SENSOR,
+        sensor_ids=[uuid4()],
+        profile_code="ba_fruiting_room",
+        profile_version="1.0.0",
+    )
+    context = BiologicalContext(
+        context_id=uuid4(),
+        subject_id=uuid4(),
+        organization_id=analysis.scope.organization_id,
+        location_id=analysis.scope.location_id,
+        environment_context_id=environment.context_id,
+        domain="mycology",
+        organism_kind="fungus",
+        taxon_code="pleurotus_ostreatus",
+        strain_code="BA-P80",
+        culture_stage="fruiting",
+        substrate_code="wheat_straw",
+        production_system="fruiting_chamber",
+        context_tags=frozenset({"season:winter"}),
+        valid_from=valid_from or analysis.scope.from_date,
+        valid_to=valid_to if valid_to is not None else analysis.scope.to_date,
+    )
+    return context, environment
+
+
+def test_persisted_context_repository_is_connected_to_interpretation():
+    analysis = make_analysis()
+    context, environment = make_persisted_context_for_analysis(analysis)
+    repository = InMemoryBiologicalContextRepository([context])
+    profile = DomainProfile(
+        profile_id="mycology-persisted-v1",
+        module="mycology",
+        version="1.0.0",
+        rules=(),
+    )
+
+    result = interpret_persisted_analysis_for_subject(
+        analysis,
+        profile,
+        repository,
+        environment,
+        subject_id=context.subject_id,
+    )
+
+    assert result.module == "mycology"
+    assert result.evaluated_findings == len(analysis.findings)
+    assert repository.last_query == (
+        str(analysis.scope.organization_id),
+        __import__(
+            "ba_environmental_engine.contexts.biological",
+            fromlist=["BiologicalDomain"],
+        ).BiologicalDomain.MYCOLOGY,
+        str(context.subject_id),
+    )
+
+
+def test_persisted_interpretation_rejects_context_covering_only_part_of_scope():
+    import pytest
+
+    analysis = make_analysis()
+    context, environment = make_persisted_context_for_analysis(
+        analysis,
+        valid_from=analysis.scope.from_date + timedelta(days=1),
+    )
+    repository = InMemoryBiologicalContextRepository([context])
+    profile = DomainProfile(
+        profile_id="mycology-persisted-v1",
+        module="mycology",
+        version="1.0.0",
+        rules=(),
+    )
+
+    with pytest.raises(ValueError, match="cover the complete analysis scope"):
+        interpret_persisted_analysis_for_subject(
+            analysis, profile, repository, environment, subject_id=context.subject_id
+        )
+
+
+def test_persisted_interpretation_rejects_multiple_overlapping_contexts():
+    from copy import deepcopy
+    import pytest
+
+    analysis = make_analysis()
+    context, environment = make_persisted_context_for_analysis(analysis)
+    other = context.model_copy(update={"context_id": uuid4()})
+    repository = InMemoryBiologicalContextRepository([context, other])
+    profile = DomainProfile(
+        profile_id="mycology-persisted-v1",
+        module="mycology",
+        version="1.0.0",
+        rules=(),
+    )
+
+    with pytest.raises(ValueError, match="multiple persisted biological contexts"):
+        interpret_persisted_analysis_for_subject(
+            analysis, profile, repository, environment, subject_id=context.subject_id
+        )
+
+
+def test_persisted_interpretation_fails_when_context_is_missing():
+    import pytest
+
+    analysis = make_analysis()
+    context, environment = make_persisted_context_for_analysis(analysis)
+    repository = InMemoryBiologicalContextRepository([])
+    profile = DomainProfile(
+        profile_id="mycology-persisted-v1",
+        module="mycology",
+        version="1.0.0",
+        rules=(),
+    )
+
+    with pytest.raises(LookupError, match="no persisted biological context"):
+        interpret_persisted_analysis_for_subject(
+            analysis, profile, repository, environment, subject_id=context.subject_id
+        )
