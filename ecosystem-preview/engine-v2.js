@@ -88,9 +88,9 @@ function addStyles() {
     #mainView .webgl-intro-orb b{font:700 33px system-ui;letter-spacing:-.1em;color:#e1e7dc}
     #mainView .webgl-intro-copy{color:#d6ded6;font:600 10px system-ui;letter-spacing:.17em}
     #mainView .webgl-intro-cta{border:1px solid #9eb7a2;border-radius:999px;padding:12px 17px;color:#f1f2e9;background:#21342edb;font:700 10px system-ui;letter-spacing:.1em}
-    #mainView .webgl-branch-dock{touch-action:pan-x;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;position:absolute;left:clamp(10px,2vw,24px);right:clamp(10px,2vw,24px);bottom:48px;z-index:2147483647!important;display:flex;flex-wrap:nowrap;justify-content:flex-start;align-items:center;gap:10px;height:48px;max-height:48px;overflow-x:auto;overflow-y:hidden;padding:4px 0;border:0;border-radius:0;background:transparent;box-shadow:none;backdrop-filter:none;scrollbar-width:none}
+    #mainView .webgl-branch-dock{touch-action:pan-x;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;position:absolute;left:clamp(10px,2vw,24px);right:clamp(10px,2vw,24px);bottom:48px;z-index:24!important;display:flex;flex-wrap:nowrap;justify-content:flex-start;align-items:center;gap:10px;height:48px;max-height:48px;overflow-x:auto;overflow-y:hidden;padding:4px 0;border:0;border-radius:0;background:transparent;box-shadow:none;backdrop-filter:none;scrollbar-width:none}
     #mainView .webgl-branch-dock[hidden]{display:none!important}
-    #mainView .webgl-branch-dock .webgl-branch-item{display:inline-flex;flex:0 0 auto;align-items:center;justify-content:center;gap:6px;min-height:36px;max-width:230px;padding:6px 5px;border:0;border-radius:0;background:transparent;color:#e5e9df;font:650 13px/1.2 system-ui,sans-serif;text-align:left;text-decoration:none;cursor:pointer;touch-action:manipulation;text-shadow:0 1px 5px #07110f}
+    #mainView .webgl-branch-dock .webgl-branch-item{display:inline-flex;flex:0 0 auto;align-items:center;justify-content:center;gap:6px;min-height:36px;max-width:230px;min-width:0;padding:6px 5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;border:0;border-radius:0;background:transparent;color:#e5e9df;font:650 13px/1.2 system-ui,sans-serif;text-align:left;text-decoration:none;cursor:pointer;touch-action:manipulation;text-shadow:0 1px 5px #07110f}
     #mainView .webgl-branch-dock .webgl-branch-item[data-has-children="true"]:after{content:'›';color:#d69a7f;font-size:21px;line-height:1}
     #mainView .webgl-branch-dock .webgl-branch-item:hover,#mainView .webgl-branch-dock .webgl-branch-item:focus-visible{background:#385044;border-color:#d1d0c5;outline:2px solid #d1d0c5;outline-offset:2px}
     #mainView .webgl-branch-dock .webgl-branch-item[aria-current="page"]{background:transparent;color:#d99a7d;text-decoration:underline;text-decoration-color:#b96b4d;text-decoration-thickness:2px;text-underline-offset:5px}
@@ -293,7 +293,7 @@ function syncResourceHitTargets() {
  // especially important on narrow mobile screens where projected branches cluster.
  projected.sort((a,b)=>a.p.z-b.p.z);
  const occupied=[];
- const obstacles=[...stage.querySelectorAll('.webgl-controls,.webgl-status,.webgl-path,.webgl-focus,.webgl-intro')]
+ const obstacles=[...stage.querySelectorAll('.webgl-controls,.webgl-status,.webgl-path,.webgl-focus,.webgl-intro,.webgl-branch-dock')]
   .filter(el=>!el.hidden&&getComputedStyle(el).display!=='none')
   .map(el=>{const r=el.getBoundingClientRect();return {l:r.left-stageRect.left,t:r.top-stageRect.top,r:r.right-stageRect.left,b:r.bottom-stageRect.top}});
  const overlaps=(a,b)=>a.l<b.r+8&&a.r>b.l-8&&a.t<b.b+8&&a.b>b.t-8;
