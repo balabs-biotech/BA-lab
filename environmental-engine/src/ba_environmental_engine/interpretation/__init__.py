@@ -1,3 +1,10 @@
+from .sensor_events import (
+    SensorEvent,
+    SensorEventAnalysis,
+    SensorEventProfile,
+    SensorEventRule,
+    detect_sensor_events,
+)
 """Configurable, domain-specific interpretation of environmental findings."""
 
 from .sensor_service import interpret_sensor_analysis
@@ -14,4 +21,9 @@ __all__ = [
     "interpret_persisted_analysis_for_subject",
     "interpret_persisted_analysis_with_profiles",
     "interpret_sensor_analysis",
+    "SensorEvent",
+    "SensorEventAnalysis",
+    "SensorEventProfile",
+    "SensorEventRule",
+    "detect_sensor_events",
 ]
