@@ -84,7 +84,7 @@ The `interpret_persisted_analysis_with_profiles` orchestration function now reso
 
 The application supplies only the requested domain and subject identifier. It does not select a profile version or submit rules. The domain profile is selected from the persisted biological context after the context has been resolved.
 
-The adapter is database-client agnostic and receives an already-authenticated Supabase client. It does not import the Supabase SDK, read credentials, or perform authentication.
+The adapter is database-client agnostic and receives an already-authenticated Supabase client. It does not import the Supabase SDK, read credentials, or perform authentication. Unit tests cover its row mapping, tenant/date filters, missing and ambiguous profile handling, and the end-to-end interpretation resolver; these tests have been added but have not yet been executed.
 
 ## Required persistence before end-to-end interpretation
 
