@@ -109,8 +109,13 @@ begin
 end
 $$;
 
-select set_config('test.variable_code', (select code from public.variables order by code limit 1), true);
-select set_config('test.unit_code', (select code from public.units order by code limit 1), true);
+select
+  set_config('test.variable_code', v.code, true),
+  set_config('test.unit_code', u.code, true)
+from public.variables v
+join public.units u on u.dimension = v.dimension
+order by v.code, u.code
+limit 1;
 
 set local role authenticated;
 select set_config('request.jwt.claim.sub', '00000000-0000-0000-0000-0000000000f2', true);
