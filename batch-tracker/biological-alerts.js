@@ -201,13 +201,21 @@
   });
   window.addEventListener("balabs:organization-context", event => {
     state.organizationId = event.detail?.organizationId || null;
+    state.userId = event.detail?.userId || null;
+    if (!state.userId) {
+      state.rows = [];
+      render();
+      root.classList.add("hidden");
+      return;
+    }
+    root.classList.remove("hidden");
     if (!state.organizationId) {
       state.rows = [];
       render();
-      if (state.userId) notify("En attente du rattachement à l’organisation BA-LABS…");
+      notify("En attente du rattachement à l’organisation BA-LABS…");
       return;
     }
-    if (state.userId) void loadSignals();
+    void loadSignals();
   });
   let previousDomain = document.body.dataset.domain;
   new MutationObserver(() => {
