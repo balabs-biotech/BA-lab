@@ -210,7 +210,7 @@ async function resolveBiologicalInterpretation(
         valid_to: context.valid_to,
       },
       environment_context: {
-        context_id: environmentProfile.id,
+        context_id: environmentProfile.environment_id,
         organization_id: environmentProfile.organization_id,
         location_id: environmentProfile.environment.location_id,
         context_type: environmentProfile.context_type,
