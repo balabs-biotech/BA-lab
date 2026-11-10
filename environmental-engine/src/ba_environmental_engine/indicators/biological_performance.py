@@ -16,7 +16,7 @@ class BiologicalMeasurement:
     source_record_id: str
     organization_id: str
     subject_id: str
-    metric_code: str
+    variable_code: str
     value: float
     canonical_unit_code: str
     measured_at: datetime
@@ -33,7 +33,7 @@ class BiologicalMeasurement:
             "source_record_id",
             "organization_id",
             "subject_id",
-            "metric_code",
+            "variable_code",
             "canonical_unit_code",
             "quality_state",
         )
@@ -76,6 +76,7 @@ def analyze_growth_rate(
     *,
     organization_id: str,
     subject_id: str,
+    variable_code: str,
     accepted_quality_states: set[str] | frozenset[str],
 ) -> BiologicalPerformanceResult:
     """Calculate first-to-last growth extent per elapsed day for one tenant/subject.
@@ -88,6 +89,8 @@ def analyze_growth_rate(
         raise ValueError("organization_id must not be empty")
     if not subject_id.strip():
         raise ValueError("subject_id must not be empty")
+    if not variable_code.strip():
+        raise ValueError("variable_code must not be empty")
     if not accepted_quality_states or not accepted_quality_states.issubset(QUALITY_STATES):
         raise ValueError("accepted_quality_states must use the database quality_state enum")
 
@@ -97,7 +100,7 @@ def analyze_growth_rate(
         if (
             item.organization_id == organization_id
             and item.subject_id == subject_id
-            and item.metric_code == "growth_extent"
+            and item.variable_code == variable_code
         )
     ]
     source_ids = [item.source_record_id for item in relevant]
