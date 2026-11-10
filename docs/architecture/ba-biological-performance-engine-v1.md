@@ -8,7 +8,7 @@ query Supabase, infer biological identity, or apply hidden quality policy.
 
 ## First implemented indicator
 
-### Net growth rate
+### Linear extent growth rate
 
 For one organization and biological subject, use the earliest and latest
 admissible observations for one explicitly selected `variable_code` (for example, `root_length` or `shoot_length`):
