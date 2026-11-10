@@ -37,3 +37,11 @@ def test_preserves_input_values_and_does_not_mutate_them():
     result = calculate_vpd(temperature_c=temperature, relative_humidity_percent=humidity)
     assert result.temperature_c == temperature
     assert result.relative_humidity_percent == humidity
+
+
+def test_fao56_saturation_vapor_pressure_helper():
+    from ba_environmental_engine.indicators.vapor_pressure import (
+        saturation_vapor_pressure_kpa,
+    )
+
+    assert saturation_vapor_pressure_kpa(25.0) == pytest.approx(3.1678, rel=2e-3)
