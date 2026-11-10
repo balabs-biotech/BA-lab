@@ -45,3 +45,21 @@ def test_fao56_saturation_vapor_pressure_helper():
     )
 
     assert saturation_vapor_pressure_kpa(25.0) == pytest.approx(3.1678, rel=2e-3)
+
+
+def test_actual_vapor_pressure_from_mean_rh_uses_mean_saturation_pressure():
+    from ba_environmental_engine.indicators.vapor_pressure import (
+        actual_vapor_pressure_from_mean_rh,
+        saturation_vapor_pressure_kpa,
+    )
+
+    expected = (
+        saturation_vapor_pressure_kpa(15.0)
+        + saturation_vapor_pressure_kpa(25.0)
+    ) / 2.0 * 0.6
+    actual = actual_vapor_pressure_from_mean_rh(
+        temperature_max_c=25.0,
+        temperature_min_c=15.0,
+        relative_humidity_mean_percent=60.0,
+    )
+    assert actual == pytest.approx(expected)
