@@ -1,11 +1,11 @@
-"""Provider-specific source adapters for environmental observations."""
+"""Provider-neutral contracts and provider-specific environmental adapters."""
 
-from ba_environmental_engine.sources.nasa_power import (
+from ba_environmental_engine.sources.models import (
     DuplicateSourceKey,
     NormalizedEnvironmentalObservation,
-    normalize_nasa_power_observation,
     find_duplicate_source_keys,
 )
+from ba_environmental_engine.sources.nasa_power import normalize_nasa_power_observation
 
 __all__ = [
     "DuplicateSourceKey",
