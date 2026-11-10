@@ -28,7 +28,7 @@ The result retains:
 - The database enum is `raw`, `controlled`, `validated`, and `excluded`.
   The caller explicitly supplies the admissible states; `excluded` is never
   accepted, even if mistakenly included in that policy.
-- Records from other organizations, subjects, and metric codes are ignored.
+- Records from other organizations, subject types, subjects, and variable codes are ignored.
 - Duplicate source IDs are rejected.
 - Input values must already be expressed in the variable's canonical unit.
   Mixed canonical units are rejected; no implicit conversion is performed.
@@ -51,7 +51,7 @@ The current `measurements` table provides organization and record IDs,
 
 A database adapter must:
 1. scope reads by `organization_id`;
-2. resolve the subject from exactly one supported biological subject link;
+2. resolve both `subject_type` and `subject_id` from exactly one supported link (`culture_id`, `plant_culture_id`, `sample_id`, or `experimental_unit_id`);
 3. pass the selected `variable_code` explicitly; do not invent a `growth_extent` database variable;
 4. verify canonical units against the variable registry;
 5. preserve sample, experimental-unit, event, result, method, and instrument
