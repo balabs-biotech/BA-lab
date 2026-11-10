@@ -57,7 +57,7 @@ console.log("✓ Shared workspace excludes universe switcher");
 console.log("✓ Batch production scoped to Laboratory");
 console.log("✓ Mycology terracotta palette verified in workspace and chooser");
 if(!engine.includes('from("observations")')||!engine.includes('value_text,observed_at,quality_state'))throw new Error("Qualitative observations are not loaded");
-if(!engine.includes('in("experimental_unit_id", unitIds)'))throw new Error("Unit-linked observations are not loaded");
+if(!engine.includes('.eq("experimental_unit_id", culture.experimental_unit_id)'))throw new Error("Unit-linked observations are not loaded");
 if(!engine.includes("<th>Observations qualitatives</th>"))throw new Error("Qualitative observation column is missing");
 if(!engine.includes("batchObservations.slice(0, 3)"))throw new Error("Observation summary is not bounded");
 
@@ -276,3 +276,8 @@ console.log("✓ Atomic measurement/observation writes no longer perform separat
 const forbiddenDirectWrite = engine.match(/\.from\(["'](?:events|measurements|observations)["']\)\s*\.(?:insert|upsert|update|delete)\s*\(/);
 if (forbiddenDirectWrite) throw new Error("Audit-sensitive event/measurement/observation writes must go through validated RPCs, not direct table mutations");
 console.log("✓ Tracker uses RPC-backed writes for events, measurements and observations");
+
+
+// Experimental results must be visible from the culture detail that owns their unit.
+if(!engine.includes('from("results")')||!engine.includes('.eq("experimental_unit_id", culture.experimental_unit_id)'))throw new Error("Structured experimental results are not loaded for culture experimental units");
+if(!engine.includes("result_type")||!engine.includes("quality_state")||!engine.includes("result.value"))throw new Error("Experimental result type, quality state and structured value are not rendered");
