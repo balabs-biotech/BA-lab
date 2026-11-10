@@ -77,7 +77,7 @@ assert.ok(engine.includes('lineHeight=210'), 'Multi-line 3D labels must retain s
 assert.ok(previewEngine.includes("ctx.font='700 '+(size*14)+'px Inter,system-ui,sans-serif'"), 'Preview 3D labels must use the same enlarged, heavier glyphs');
 assert.ok(previewEngine.includes('lineHeight=210'), 'Preview multiline labels must use matching vertical spacing');
 assert.ok(engine.includes("e.target.closest('.webgl-controls,.webgl-focus,.webgl-intro,.webgl-hit-target,.webgl-branch-dock')"), 'Public branch controls must keep native click dispatch outside stage pointer capture');
-assert.ok(previewEngine.includes("e.target.closest('.webgl-hit-target,.webgl-controls,.webgl-focus,.webgl-intro,.webgl-branch-dock')"), 'Preview branch controls must keep native click dispatch outside stage pointer capture');
+assert.ok(previewEngine.includes("e.target.closest('.webgl-controls,.webgl-focus,.webgl-intro,.webgl-hit-target,.webgl-branch-dock')"), 'Preview branch controls must keep native click dispatch outside stage pointer capture');
 assert.ok(engine.includes("button.style.display=visible?'block':'none'"), 'Public offscreen hit targets must not intercept branch clicks');
 assert.ok(previewEngine.includes("button.style.display=visible?'block':'none'"), 'Preview offscreen hit targets must not intercept branch clicks');
 assert.ok(engine.includes("const soma=new THREE.Group();soma.userData={id,kind:'domain'};group.add(soma);"), 'Domain centres must remain open mycelial junctions rather than solid cell bodies');
