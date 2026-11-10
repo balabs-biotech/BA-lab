@@ -430,7 +430,32 @@
         <div><label for="cultureTypeFilter">Type de culture</label><select id="cultureTypeFilter"><option value="">Tous les types</option></select></div>
       </div>
       <div id="cultureCatalogList" class="culture-catalog-list" aria-live="polite"><p class="muted">Connectez-vous pour charger les cultures.</p></div>
-      <section id="cultureDetailPanel" class="culture-detail hidden" aria-labelledby="cultureDetailTitle">
+      <section class="material-mixture-panel" id="materialMixturePanel" aria-labelledby="materialMixtureTitle">
+  <div class="material-mixture-heading"><div><h4 id="materialMixtureTitle">Assembler un mélange / consortium</h4><p class="muted">Associez plusieurs matériaux actifs de cet univers. La création conserve chaque source dans le graphe de provenance.</p></div><span class="material-mixture-tag">2 à 12 sources</span></div>
+  <form id="materialMixtureForm" class="material-mixture-form">
+    <div class="material-mixture-wide"><label for="mixtureSources">Matériaux sources</label><select id="mixtureSources" multiple size="6" required aria-describedby="mixtureSourcesHint"></select><small id="mixtureSourcesHint" class="hint">La sélection est limitée aux matériaux rattachés aux cultures de l’univers actif. Utilisez Ctrl ou Cmd pour sélectionner plusieurs éléments.</small></div>
+    <div><label for="mixtureOperation">Nature de l’opération</label><select id="mixtureOperation"><option value="mixing">Mélange</option><option value="consortium_assembly">Assemblage de consortium</option><option value="blending">Combinaison / formulation</option></select></div>
+    <div><label for="mixtureResultCode">Code du matériau résultant</label><input id="mixtureResultCode" type="text" maxlength="100" required placeholder="Ex. MIX-TRI-001"></div>
+    <div><label for="mixtureDate">Date et heure</label><input id="mixtureDate" type="datetime-local" required></div>
+    <div class="material-mixture-wide"><label for="mixtureNote">Note de préparation</label><textarea id="mixtureNote" rows="2" maxlength="4000" placeholder="Proportions, conditions, objectif, observations…"></textarea></div>
+    <div class="material-mixture-wide"><div id="mixturePreview" class="material-mixture-preview" aria-live="polite"><p class="muted">Sélectionnez au moins deux matériaux pour afficher leur provenance connue.</p></div><button id="saveMaterialMixture" type="submit">Créer le matériau composé</button><p id="mixtureMessage" class="muted" role="status" aria-live="polite"></p></div>
+  </form>
+</section>
+<style>
+.material-mixture-panel{margin:20px 0;padding:20px;border:1px solid var(--line,#303b34);border-radius:14px;background:var(--surface,#17201b)}
+.material-mixture-heading{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap}
+.material-mixture-heading h4{margin:0 0 6px}.material-mixture-heading p{margin:0}
+.material-mixture-tag{font-size:11px;border:1px solid var(--line,#526657);border-radius:999px;padding:5px 9px}
+.material-mixture-form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:16px}
+.material-mixture-form>div{min-width:0}.material-mixture-wide{grid-column:1/-1}
+.material-mixture-form select[multiple]{width:100%;min-height:142px;padding:8px}
+.material-mixture-form input,.material-mixture-form textarea{box-sizing:border-box;width:100%;font:inherit}
+.material-mixture-preview{padding:10px 12px;margin:0 0 12px;border-radius:9px;background:var(--surface-raised,#0d1110)}
+.material-mixture-preview ul{margin:6px 0 0;padding-left:20px}.material-mixture-preview li{margin:4px 0}
+#mixtureMessage[data-state="error"]{color:#f0a59b}#mixtureMessage[data-state="success"]{color:#a8d4a5}
+@media(max-width:600px){.material-mixture-panel{padding:14px}.material-mixture-form{grid-template-columns:1fr}.material-mixture-wide{grid-column:auto}}
+</style>
+<section id="cultureDetailPanel" class="culture-detail hidden" aria-labelledby="cultureDetailTitle">
         <div class="culture-detail-heading"><div><span class="section-kicker-label">FICHE EXPÉRIMENTALE</span><h3 id="cultureDetailTitle">Culture</h3><p id="cultureDetailMeta" class="muted"></p></div><button id="closeCultureDetail" type="button" class="secondary-button small-button">Fermer la fiche</button></div>
         <div class="culture-detail-summary" id="cultureDetailSummary"></div>
 <section class="bio-operation-panel" aria-labelledby="bioOperationTitle">
