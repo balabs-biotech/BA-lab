@@ -659,7 +659,13 @@
       analysisStatus.textContent="Vérification du cache météo et calcul des indicateurs…";
       analysisResults.replaceChildren();
       try{
-        await importWeather(false);
+        const {data:site,error:siteError}=await db.from("locations").select("altitude_m").eq("id",location.value).maybeSingle();
+        if(siteError)throw new Error("Impossible de vérifier l’altitude enregistrée : "+siteError.message);
+        if(site?.altitude_m===null||site?.altitude_m===undefined||Number(site.altitude_m)!==Number(altitude.value)){
+          throw new Error("L’altitude affichée n’est pas encore enregistrée pour cet emplacement. Enregistrez-la avant l’analyse.");
+        }
+        const weatherReady=await importWeather(false);
+        if(!weatherReady)throw new Error("La collecte ou la vérification du cache météo a échoué : "+status.textContent);
         const {data,error}=await db.functions.invoke("environmental-analysis",{body:{location_id:location.value,start_date:from.value,end_date:to.value}});
         if(error)throw new Error(await functionErrorMessage(error));
         if(!data?.ok||!data.analysis)throw new Error(data?.error||"Réponse d’analyse invalide.");
@@ -688,14 +694,14 @@
       }finally{analysisButton.disabled=false;}
     });
     async function importWeather(forceRefresh=false){
-      if(!location.value||!from.value||!to.value||from.value>to.value){status.textContent="Choisissez un emplacement et une période valide.";return;}
+      if(!location.value||!from.value||!to.value||from.value>to.value){status.textContent="Choisissez un emplacement et une période valide.";return false;}
       const days=(Date.parse(to.value)-Date.parse(from.value))/86400000+1;
-      if(days>366){status.textContent="La période maximale est de 366 jours.";return;}
+      if(days>366){status.textContent="La période maximale est de 366 jours.";return false;}
       run.disabled=true; refresh.disabled=true;
       status.textContent=forceRefresh?"Actualisation forcée en cours…":"Collecte en cours…";
       try{
         const {data,error}=await db.functions.invoke("nasa-power-agroclimate",{body:{location_id:location.value,start_date:from.value,end_date:to.value,refresh:forceRefresh}});
-        if(error){status.textContent="Échec de la collecte météo : "+await functionErrorMessage(error);return;}
+        if(error){status.textContent="Échec de la collecte météo : "+await functionErrorMessage(error);return false;}
         if(data?.ok){
           const detail=data.cached
             ? "Cache réutilisé ; "+(data.variables_checked??0)+" variables principales vérifiées."
@@ -707,8 +713,10 @@
         }else{
           status.textContent="Import refusé : "+(data?.error||"réponse invalide");
         }
+        if(!data?.ok)return false;
         await loadRows();
-      }catch(error){status.textContent="Échec de la collecte : "+(error?.message||"erreur inconnue");}
+        return true;
+      }catch(error){status.textContent="Échec de la collecte : "+(error?.message||"erreur inconnue");return false;}
       finally{run.disabled=false;refresh.disabled=false;}
     }
     run.addEventListener("click",()=>importWeather(false));
