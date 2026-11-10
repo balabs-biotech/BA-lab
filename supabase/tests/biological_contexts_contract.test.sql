@@ -64,6 +64,15 @@ begin
   end if;
 
   if not exists (
+    select 1 from pg_trigger
+    where tgrelid = 'public.environments'::regclass
+      and tgname = 'environments_biological_context_location_guard'
+      and not tgisinternal
+  ) then
+    raise exception 'FAIL: historical environment location guard is missing';
+  end if;
+
+  if not exists (
     select 1 from pg_policies
     where schemaname = 'public' and tablename = 'biological_contexts'
       and policyname = 'biological_contexts_select'
@@ -149,6 +158,15 @@ begin
   ) then
     raise exception 'FAIL: valid biological context was not persisted';
   end if;
+
+  begin
+    update public.environments
+       set location_id = null
+     where organization_id = v_org and id = v_environment;
+    raise exception 'FAIL: environment location changed after biological context binding';
+  exception when check_violation then
+    null;
+  end;
 end
 $;
 
