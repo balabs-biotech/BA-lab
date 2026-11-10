@@ -370,6 +370,7 @@ def create_app(engine_api_key: str | None = None) -> FastAPI:
                 expected_interval_seconds=request.expected_interval_seconds,
             )
             temporal_screening = {"status": "not_requested", "assessments": []}
+            scoped_assessments = ()
             if request.temporal_window_seconds is not None:
                 profile_zone = ZoneInfo(request.profile_timezone)
                 evaluation_start = datetime.combine(
@@ -426,6 +427,16 @@ def create_app(engine_api_key: str | None = None) -> FastAPI:
                         source_analysis_id=request.analysis_id,
                         from_date=request.from_date,
                         to_date=request.to_date,
+                        temporal_assessments=scoped_assessments,
+                        temporal_parameters=(
+                            {
+                                "temporal_window_seconds": request.temporal_window_seconds,
+                                "temporal_minimum_history": request.temporal_minimum_history,
+                                "temporal_threshold": request.temporal_threshold,
+                            }
+                            if request.temporal_window_seconds is not None
+                            else None
+                        ),
                     )
                     interpretation_status = "interpreted"
                     domain_interpretation = jsonable_encoder(interpretation)
