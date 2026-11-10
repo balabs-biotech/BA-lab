@@ -717,6 +717,13 @@
     dictionaries.ar[fr] ||= ar;
   }
 
+  const materialMixtureCoverage = [["Assembler un mélange / consortium","Create a mixture / consortium","Criar uma mistura / consórcio","إنشاء مزيج / مجتمع ميكروبي"],["Associez plusieurs matériaux actifs de cet univers. La création conserve chaque source dans le graphe de provenance.","Combine multiple active materials from this workspace. Creation preserves each source in the provenance graph.","Associe vários materiais ativos deste espaço. A criação preserva cada origem no grafo de proveniência.","اجمع عدة مواد نشطة من مساحة العمل هذه. يحافظ الإنشاء على كل مصدر في مخطط التتبع."],["Matériaux sources","Source materials","Materiais de origem","المواد المصدرية"],["La sélection est limitée aux matériaux rattachés aux cultures de l’univers actif. Utilisez Ctrl ou Cmd pour sélectionner plusieurs éléments.","Selection is limited to materials linked to cultures in the active workspace. Use Ctrl or Cmd to select multiple items.","A seleção limita-se aos materiais ligados às culturas do espaço ativo. Use Ctrl ou Cmd para selecionar vários itens.","يقتصر الاختيار على المواد المرتبطة بالمزارع في مساحة العمل النشطة. استخدم Ctrl أو Cmd لتحديد عدة عناصر."],["Nature de l’opération","Operation type","Tipo de operação","نوع العملية"],["Mélange","Mixing","Mistura","خلط"],["Assemblage de consortium","Consortium assembly","Montagem de consórcio","تجميع مجتمع ميكروبي"],["Combinaison / formulation","Blending / formulation","Combinação / formulação","مزج / تركيب"],["Code du matériau résultant","Resulting material code","Código do material resultante","رمز المادة الناتجة"],["Date et heure","Date and time","Data e hora","التاريخ والوقت"],["Note de préparation","Preparation note","Preparation note","ملاحظة التحضير"],["Créer le matériau composé","Create composite material","Criar material composto","إنشاء مادة مركبة"],["2 à 12 sources","2 to 12 sources","2 a 12 origens","من 2 إلى 12 مصدرًا"]];
+  for (const [fr, en, pt, ar] of materialMixtureCoverage) {
+    dictionaries.en[fr] ||= en;
+    dictionaries.pt[fr] ||= pt;
+    dictionaries.ar[fr] ||= ar;
+  }
+
   const sourceText = new WeakMap();
   const sourceAttrs = new WeakMap();
   let currentLanguage = "fr";
