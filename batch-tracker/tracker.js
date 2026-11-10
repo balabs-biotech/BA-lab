@@ -78,6 +78,9 @@ function clearAuthenticatedWorkspaceState() {
   batchEnvironmentOptions = [];
   recentObservations = [];
   initializationWarnings = [];
+  experimentRegistryRows = [];
+  experimentalUnitRegistryRows = [];
+  pendingExperimentOccurredAt = null;
 
   hideElement(document.getElementById("cultureExperimentContext"));
   const cultureDetailPanel = document.getElementById("cultureDetailPanel");
@@ -1911,6 +1914,13 @@ async function createCulture() {
     return;
   }
 
+  const selectedExperimentId = cultureExperimentSelect?.value || "";
+  const selectedExperimentalUnitId = cultureExperimentalUnitSelect?.value || "";
+  if (Boolean(selectedExperimentId) !== Boolean(selectedExperimentalUnitId)) {
+    showMessage("Pour rattacher une culture à une expérience, sélectionnez à la fois l’expérience et son unité expérimentale.", "error");
+    return;
+  }
+
   let session;
 
   try {
@@ -2012,11 +2022,6 @@ async function createCulture() {
 
 
     if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) throw new Error("Session ou espace de travail modifié pendant l’opération. Recommencez.");
-    const selectedExperimentId = cultureExperimentSelect?.value || "";
-    const selectedExperimentalUnitId = cultureExperimentalUnitSelect?.value || "";
-    if (Boolean(selectedExperimentId) !== Boolean(selectedExperimentalUnitId)) {
-      throw new Error("Pour rattacher une culture à une expérience, sélectionnez à la fois l’expérience et son unité expérimentale.");
-    }
     const cultureGenerationPayload = {
       p_organization_id: operationOrganizationId,
       p_code: cultureCode,
