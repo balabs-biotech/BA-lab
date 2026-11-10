@@ -52,15 +52,23 @@ assert.match(moduleSource, /resolveHistoryIdentity\(kind, id, organizationId, do
 assert.match(moduleSource, /\.eq\("organization_id", organizationId\)\.eq\("domain", domain\)\.eq\(kind, id\)/);
 
 assert.match(moduleSource, /parent_culture_id/);
-assert.match(moduleSource, /\.eq\("parent_culture_id", cultureId\)/);
+assert.match(moduleSource, /\.in\("parent_culture_id", frontier\)/);
+assert.match(moduleSource, /MAX_ANCESTORS = 8/);
+assert.match(moduleSource, /MAX_DESCENDANT_DEPTH = 5/);
+assert.match(moduleSource, /MAX_CULTURES = 100/);
+assert.match(moduleSource, /seen\.has\(child\.id\)/);
+assert.match(moduleSource, /\.from\("events"\)/);
+assert.match(moduleSource, /\.in\("culture_id", cultureIds\)/);
+assert.match(moduleSource, /payload\.operation/);
 assert.match(moduleSource, /\.in\("culture_id", cultureIds\)/);
 assert.match(moduleSource, /\.limit\(100\)/);
 assert.match(moduleSource, /function renderCultureLineage/);
-assert.match(moduleSource, /"Lignée de culture"/);
+assert.match(moduleSource, /"Généalogie biologique"/);
 assert.match(moduleSource, /signal-lineage-batches/);
 assert.match(moduleSource, /request !== state\.historyRequest/);
 assert.match(styles, /signal-lineage-list/);
 assert.match(styles, /signal-lineage-batches/);
+assert.match(styles, /signal-lineage-event/);
 
 assert.doesNotMatch(moduleSource, /\["Sujet biologique", row\.biological_subject_id\]/);
 assert.doesNotMatch(moduleSource, /\["Contexte biologique", row\.biological_context_id\]/);
