@@ -136,6 +136,29 @@ Deno.serve(async (req: Request) => {
       return reply(422, { error: "expected_interval_seconds_must_be_positive_integer" });
     }
 
+    // RLS-scoped environment lookup and membership check precede every service-role read.
+    const { data: authorizedEnvironment, error: environmentError } = await userClient
+      .from("environments")
+      .select("id,organization_id,location_id")
+      .eq("id", environmentId)
+      .maybeSingle();
+    if (environmentError || !authorizedEnvironment) {
+      return reply(404, { error: "environment_not_found_or_access_denied" });
+    }
+    if (!authorizedEnvironment.location_id) {
+      return reply(422, { error: "sensor_environment_location_missing" });
+    }
+    const { data: membership, error: membershipError } = await userClient
+      .from("organization_members")
+      .select("role")
+      .eq("organization_id", authorizedEnvironment.organization_id)
+      .eq("user_id", authData.user.id)
+      .maybeSingle();
+    if (membershipError || !membership ||
+        !["owner", "admin", "member", "viewer"].includes(String(membership.role))) {
+      return reply(403, { error: "organization_membership_required" });
+    }
+
     // Resolve a single profile covering the complete requested calendar window.
     const { data: profiles, error: profileError } = await adminClient
       .from("environment_context_profiles")
@@ -165,26 +188,9 @@ Deno.serve(async (req: Request) => {
       return reply(422, { error: "sensor_profile_timezone_missing" });
     }
     const locationId = profile.environment?.location_id;
-    if (!locationId) return reply(422, { error: "sensor_environment_location_missing" });
-
-    // The caller must be able to see the physical location under RLS.
-    const { data: location, error: locationError } = await userClient
-      .from("locations")
-      .select("id,organization_id")
-      .eq("id", locationId)
-      .maybeSingle();
-    if (locationError || !location || location.organization_id !== profile.organization_id) {
-      return reply(404, { error: "environment_not_found_or_access_denied" });
-    }
-    const { data: membership, error: membershipError } = await userClient
-      .from("organization_members")
-      .select("role")
-      .eq("organization_id", profile.organization_id)
-      .eq("user_id", authData.user.id)
-      .maybeSingle();
-    if (membershipError || !membership ||
-        !["owner", "admin", "member", "viewer"].includes(String(membership.role))) {
-      return reply(403, { error: "organization_membership_required" });
+    if (!locationId || locationId !== authorizedEnvironment.location_id ||
+        profile.organization_id !== authorizedEnvironment.organization_id) {
+      return reply(422, { error: "sensor_profile_environment_mismatch" });
     }
 
     const sensorIds = [...new Set((profile.sensors ?? [])
