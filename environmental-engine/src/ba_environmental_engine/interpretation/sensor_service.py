@@ -22,7 +22,9 @@ _SENSOR_SIGNAL_NAMESPACE = UUID("f31c5e16-7d4d-4d1d-bf43-ff76d9eebd5a")
 def _finding_status(summary) -> str:
     if summary.status != "ok":
         return "insufficient_history"
-    if summary.availability_ratio is not None and summary.availability_ratio < 1.0:
+    if summary.availability_ratio is None:
+        return "indeterminate"
+    if summary.availability_ratio < 1.0:
         return "insufficient_coverage"
     return "normal"
 
