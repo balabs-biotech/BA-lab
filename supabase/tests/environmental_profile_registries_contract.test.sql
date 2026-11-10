@@ -139,9 +139,21 @@ begin
    where organization_id = v_org and id = v_env_profile;
 
   if not exists (
+    select 1 from public.environment_context_profiles
+     where organization_id = v_org and id = v_env_profile
+       and status = 'retired' and valid_to = current_date and retired_at is not null
+  ) then
+    raise exception 'FAIL: retirement must close the immutable profile validity interval';
+  end if;
+
+  if not exists (
     select 1 from pg_constraint
     where conrelid = 'public.environment_context_profile_sensors'::regclass
       and conname = 'environment_context_profile_sensors_device_fk'
+  ) or not exists (
+    select 1 from pg_constraint
+    where conrelid = 'public.environment_context_profile_sensors'::regclass
+      and conname = 'environment_context_profile_sensors_profile_fk'
   ) or not exists (
     select 1 from pg_trigger
     where tgrelid = 'public.environment_context_profile_sensors'::regclass
@@ -163,7 +175,7 @@ begin
   ) values (
     v_org, v_sensor_profile, v_environment, 'GREENHOUSE-SENSORS', '1.0.0',
     'greenhouse', 'Greenhouse sensors', 'Africa/Algiers', 'sensor',
-    date '2026-11-11', 'draft'
+    current_date + 1, 'draft'
   );
 
   begin
