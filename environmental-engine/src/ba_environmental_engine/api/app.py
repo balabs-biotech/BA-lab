@@ -28,6 +28,7 @@ from ba_environmental_engine.climate.aggregation import AggregationMethod
 from ba_environmental_engine.execution import run_environmental_analysis, run_sensor_analysis
 from ba_environmental_engine.sources.sensor import normalize_iot_measurement_row
 from ba_environmental_engine.sources.sensor_temporal import assess_sensor_temporal_anomalies
+from ba_environmental_engine.quality.sensor_health import assess_sensor_flatlines
 from ba_environmental_engine.sources.models import NormalizedEnvironmentalObservation
 from ba_environmental_engine.sources.nasa_power import normalize_nasa_power_observation
 
@@ -153,6 +154,8 @@ class SensorAnalysisRequest(APIModel):
     temporal_window_seconds: StrictInt | None = Field(default=None, gt=0)
     temporal_minimum_history: StrictInt | None = Field(default=None, gt=0)
     temporal_threshold: float | None = Field(default=None, gt=0)
+    flatline_minimum_repeated_observations: StrictInt | None = Field(default=None, ge=2)
+    flatline_minimum_duration_seconds: StrictInt | None = Field(default=None, gt=0)
     biological_interpretation: dict[str, Any] | None = None
     measurements: list[dict[str, Any]] = Field(min_length=1, max_length=5000)
 
@@ -171,6 +174,14 @@ class SensorAnalysisRequest(APIModel):
             value is not None for value in temporal_options
         ):
             raise ValueError("temporal screening parameters must be supplied together")
+        flatline_options = (
+            self.flatline_minimum_repeated_observations,
+            self.flatline_minimum_duration_seconds,
+        )
+        if any(value is not None for value in flatline_options) and not all(
+            value is not None for value in flatline_options
+        ):
+            raise ValueError("flatline diagnostic parameters must be supplied together")
         for row in self.measurements:
             if row.get("organization_id") != str(self.organization_id):
                 raise ValueError("every sensor measurement must match the requested organization")
@@ -395,6 +406,22 @@ def create_app(engine_api_key: str | None = None) -> FastAPI:
                     "status": "completed",
                     "assessments": jsonable_encoder(scoped_assessments),
                 }
+            flatline_diagnostics = {"status": "not_requested", "assessments": []}
+            if request.flatline_minimum_repeated_observations is not None:
+                profile_zone = ZoneInfo(request.profile_timezone)
+                scoped_envelopes = tuple(
+                    envelope for envelope in envelopes
+                    if request.from_date <= envelope.measurement.observed_at.astimezone(profile_zone).date() <= request.to_date
+                )
+                flatline_assessments = assess_sensor_flatlines(
+                    scoped_envelopes,
+                    minimum_repeated_observations=request.flatline_minimum_repeated_observations,
+                    minimum_duration_seconds=request.flatline_minimum_duration_seconds,
+                )
+                flatline_diagnostics = {
+                    "status": "completed",
+                    "assessments": jsonable_encoder(flatline_assessments),
+                }
             interpretation_status = "not_requested"
             domain_interpretation = None
             if request.biological_interpretation is not None:
@@ -448,6 +475,7 @@ def create_app(engine_api_key: str | None = None) -> FastAPI:
                 "source": "iot_sensor",
                 "analysis": analysis,
                 "temporal_screening": temporal_screening,
+                "instrument_health": {"flatline_diagnostics": flatline_diagnostics},
                 "interpretation_status": interpretation_status,
                 "domain_interpretation": domain_interpretation,
             }
