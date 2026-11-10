@@ -1,10 +1,12 @@
 """Apply explicit domain rules to traceable BAL-JSON findings."""
 
+from typing import Protocol
 from uuid import UUID, uuid5
 
 from ba_environmental_engine.contracts.bal_json import BALAnalysis
 from ba_environmental_engine.contexts.biological import (
     BiologicalContext,
+    BiologicalDomain,
     validate_biological_context_for_analysis,
 )
 from ba_environmental_engine.contexts.environment import EnvironmentContext
@@ -124,4 +126,71 @@ def interpret_analysis_for_biological_context(
         biological_context_id=biological_context.context_id,
         biological_subject_id=biological_context.subject_id,
         environment_context_id=environment_context.context_id,
+    )
+
+
+class BiologicalContextRepository(Protocol):
+    """Read-only repository surface required by persisted interpretation."""
+
+    def list_for_subject(
+        self,
+        *,
+        organization_id: str,
+        domain: BiologicalDomain,
+        subject_id: str,
+        on_date: str | None = None,
+    ) -> tuple[BiologicalContext, ...]: ...
+
+
+def interpret_persisted_analysis_for_subject(
+    analysis: BALAnalysis,
+    profile: DomainProfile,
+    repository: BiologicalContextRepository,
+    environment_context: EnvironmentContext,
+    *,
+    subject_id: UUID,
+) -> DomainInterpretation:
+    """Resolve one persisted context covering the complete analysis window.
+
+    A context that only overlaps part of the analysis window is insufficient:
+    one interpretation must not silently combine multiple biological regimes.
+    """
+    domain = BiologicalDomain(profile.module)
+    contexts = repository.list_for_subject(
+        organization_id=str(analysis.scope.organization_id),
+        domain=domain,
+        subject_id=str(subject_id),
+    )
+    overlapping = tuple(
+        context
+        for context in contexts
+        if context.valid_from <= analysis.scope.to_date
+        and (context.valid_to is None or context.valid_to >= analysis.scope.from_date)
+    )
+    if not overlapping:
+        raise LookupError(
+            "no persisted biological context overlaps the analysis scope"
+        )
+    if len(overlapping) > 1:
+        raise ValueError(
+            "multiple persisted biological contexts overlap the analysis scope"
+        )
+
+    context = overlapping[0]
+    if (
+        context.valid_from > analysis.scope.from_date
+        or (
+            context.valid_to is not None
+            and context.valid_to < analysis.scope.to_date
+        )
+    ):
+        raise ValueError(
+            "one biological context must cover the complete analysis scope"
+        )
+
+    return interpret_analysis_for_biological_context(
+        analysis,
+        profile,
+        context,
+        environment_context,
     )
