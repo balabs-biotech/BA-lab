@@ -23,6 +23,10 @@ assert.match(moduleSource, /\.from\("biological_signals"\)/);
 assert.match(moduleSource, /\.eq\("organization_id", state\.organizationId\)/);
 assert.match(moduleSource, /\.eq\("domain", state\.domain\)/);
 assert.match(moduleSource, /\.limit\(100\)/);
+assert.match(moduleSource, /analysis_method,analysis_evidence/);
+assert.match(moduleSource, /robust_z_score/);
+assert.match(moduleSource, /temporal_window_seconds/);
+
 assert.match(moduleSource, /\.rpc\("set_biological_signal_status"/);
 assert.match(moduleSource, /balabs:organization-context/);
 assert.match(moduleSource, /new MutationObserver/);
