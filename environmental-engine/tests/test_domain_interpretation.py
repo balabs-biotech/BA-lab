@@ -151,6 +151,13 @@ def test_domain_profile_ids_are_stable_for_same_inputs():
 
     assert first.signals[0].signal_id == second.signals[0].signal_id
 
+    other_context = interpret_findings(
+        analysis,
+        profile,
+        biological_context_id=uuid4(),
+    )
+    assert first.signals[0].signal_id != other_context.signals[0].signal_id
+
 
 
 def test_biological_context_is_bound_to_environment_and_enriches_domain_rules():
