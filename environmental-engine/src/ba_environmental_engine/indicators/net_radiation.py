@@ -3,6 +3,8 @@
 from dataclasses import dataclass
 from math import acos, cos, isfinite, pi, radians, sin, sqrt, tan
 
+from ba_environmental_engine.indicators.vapor_pressure import saturation_vapor_pressure_kpa
+
 
 FORMULA_PROFILE = "fao56_daily_net_radiation_v1"
 SOLAR_CONSTANT_MJ_M2_MIN = 0.0820
@@ -95,7 +97,7 @@ def calculate_fao56_net_radiation(
     actual_vapor_pressure_kpa: float,
     albedo: float = 0.23,
 ) -> FAO56NetRadiationResult:
-    """Calculate daily net radiation (Rn) using FAO-56 Eqs. 37- net longwave.
+    """Calculate daily net radiation (Rn) using FAO-56 Eqs. 21 and 37–40.
 
     Inputs must already be normalized to the stated units. Solar radiation
     (Rs) is incoming shortwave radiation, not net radiation. The FAO-56
@@ -127,6 +129,8 @@ def calculate_fao56_net_radiation(
         raise ValueError("temperature_min_c is below absolute zero")
     if actual_vapor_pressure < 0:
         raise ValueError("actual_vapor_pressure_kpa must be non-negative")
+    if actual_vapor_pressure > saturation_vapor_pressure_kpa(t_max):
+        raise ValueError("actual_vapor_pressure_kpa exceeds saturation pressure at Tmax")
     if not 0.0 <= surface_albedo < 1.0:
         raise ValueError("albedo must be in [0, 1)")
 
