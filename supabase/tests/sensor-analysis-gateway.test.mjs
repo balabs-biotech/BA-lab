@@ -14,7 +14,6 @@ assert.match(source, /const match = \/\^Bearer/, "caller must present a bearer J
 assert.ok(jwt >= 0 && environmentRead > jwt, "JWT verification must precede RLS environment lookup");
 assert.ok(membershipRead > environmentRead, "organization membership must be checked after RLS environment lookup");
 assert.ok(profileRead > membershipRead, "service-role profile reads must follow membership authorization");
-assert.match(source, /\\.eq\\("organization_id", authorizedEnvironment\\.organization_id\\)/, "profile reads must be tenant-scoped");
 assert.ok(measurementRead > profileRead, "sensor measurement reads must follow profile resolution");
 assert.ok(engineCall > measurementRead, "private engine call must follow authorized measurement retrieval");
 assert.match(source, /\.eq\("organization_id", authorizedEnvironment\.organization_id\)/, "profile lookup must be tenant-scoped");
