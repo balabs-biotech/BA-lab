@@ -13,6 +13,7 @@ from typing import Annotated, Any, Literal
 from uuid import UUID
 
 from fastapi import Depends, FastAPI, Header, HTTPException, status
+from fastapi.encoders import jsonable_encoder
 from pydantic import BaseModel, ConfigDict, Field, StrictInt, ValidationError, model_validator
 
 from ba_environmental_engine.contexts.biological import BiologicalContext
@@ -24,6 +25,7 @@ from ba_environmental_engine import __version__
 from ba_environmental_engine.climate.aggregation import AggregationMethod
 from ba_environmental_engine.execution import run_environmental_analysis, run_sensor_analysis
 from ba_environmental_engine.sources.sensor import normalize_iot_measurement_row
+from ba_environmental_engine.sources.sensor_temporal import assess_sensor_temporal_anomalies
 from ba_environmental_engine.sources.models import NormalizedEnvironmentalObservation
 from ba_environmental_engine.sources.nasa_power import normalize_nasa_power_observation
 
@@ -146,6 +148,9 @@ class SensorAnalysisRequest(APIModel):
     to_date: date
     profile_timezone: str = Field(min_length=1, max_length=80)
     expected_interval_seconds: StrictInt | None = Field(default=None, gt=0)
+    temporal_window_seconds: StrictInt | None = Field(default=None, gt=0)
+    temporal_minimum_history: StrictInt | None = Field(default=None, gt=0)
+    temporal_threshold: float | None = Field(default=None, gt=0)
     measurements: list[dict[str, Any]] = Field(min_length=1, max_length=5000)
 
     @model_validator(mode="after")
@@ -154,6 +159,15 @@ class SensorAnalysisRequest(APIModel):
             raise ValueError("to_date must be on or after from_date")
         if self.expected_interval_seconds is not None and self.expected_interval_seconds <= 0:
             raise ValueError("expected_interval_seconds must be positive")
+        temporal_options = (
+            self.temporal_window_seconds,
+            self.temporal_minimum_history,
+            self.temporal_threshold,
+        )
+        if any(value is not None for value in temporal_options) and not all(
+            value is not None for value in temporal_options
+        ):
+            raise ValueError("temporal screening parameters must be supplied together")
         for row in self.measurements:
             if row.get("organization_id") != str(self.organization_id):
                 raise ValueError("every sensor measurement must match the requested organization")
@@ -352,10 +366,23 @@ def create_app(engine_api_key: str | None = None) -> FastAPI:
                 profile_timezone=request.profile_timezone,
                 expected_interval_seconds=request.expected_interval_seconds,
             )
+            temporal_screening = {"status": "not_requested", "assessments": []}
+            if request.temporal_window_seconds is not None:
+                assessments = assess_sensor_temporal_anomalies(
+                    envelopes,
+                    window_seconds=request.temporal_window_seconds,
+                    minimum_history=request.temporal_minimum_history,
+                    threshold=request.temporal_threshold,
+                )
+                temporal_screening = {
+                    "status": "completed",
+                    "assessments": jsonable_encoder(assessments),
+                }
             return {
                 "analysis_id": str(request.analysis_id),
                 "source": "iot_sensor",
                 "analysis": analysis,
+                "temporal_screening": temporal_screening,
             }
         except (ValueError, LookupError) as exc:
             raise HTTPException(status_code=422, detail=str(exc)) from exc
