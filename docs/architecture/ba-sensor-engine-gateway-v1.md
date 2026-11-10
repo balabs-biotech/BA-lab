@@ -60,3 +60,22 @@ The gateway does not yet resolve a persisted biological context or call the
 domain interpretation service. That remains the next integration layer; it
 must be non-fatal and source-aware. The route has not been deployed, and the
 PostgREST relationship names still require verification against a live schema.
+
+## Optional biological interpretation
+
+A caller may supply `subject_id` to request interpretation against persisted
+CultureOps context. The gateway then resolves exactly one
+`biological_contexts` record matching tenant, physical environment, typed
+subject FK (culture or plant culture), and the complete date interval. It
+resolves exactly one active/retired `domain_interpretation_profiles` version
+for that context's domain and period.
+
+The Edge Function constructs the typed biological context, environment
+context, and domain profile payload from those database records. The private
+engine validates domain, tenant, location, environment, date validity and
+sensor membership before emitting domain signals. The browser never submits
+thresholds or rule definitions. If no `subject_id` is supplied, interpretation
+is skipped and descriptive sensor analysis still runs.
+
+The separate numeric `SensorEventProfile` detector is not yet persisted or
+wired into this route. It remains a pure, explicitly configured Python layer.
