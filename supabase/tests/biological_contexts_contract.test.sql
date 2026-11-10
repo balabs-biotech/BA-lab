@@ -97,6 +97,10 @@ begin
      or has_table_privilege('anon', 'public.biological_contexts', 'INSERT') then
     raise exception 'FAIL: anonymous access must remain disabled';
   end if;
+
+  if not has_table_privilege('service_role', 'public.biological_contexts', 'SELECT') then
+    raise exception 'FAIL: authorized server-side context resolution requires service_role SELECT';
+  end if;
 end
 $$;
 
