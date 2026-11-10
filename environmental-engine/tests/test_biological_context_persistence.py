@@ -1,12 +1,9 @@
-from datetime import date
 from uuid import uuid4
 
 import pytest
 
 from ba_environmental_engine.contexts.biological import (
     BiologicalContext,
-    BiologicalDomain,
-    OrganismKind,
 )
 from ba_environmental_engine.contexts.persistence import (
     biological_context_from_record,
@@ -47,10 +44,10 @@ def test_database_record_round_trips_to_biological_context(domain):
     context = biological_context_from_record(record)
 
     assert isinstance(context, BiologicalContext)
-    assert context.context_id == record["id"]
-    assert context.organization_id == record["organization_id"]
-    assert context.environment_context_id == record["environment_id"]
-    assert context.location_id == record["environment"]["location_id"]
+    assert str(context.context_id) == record["id"]
+    assert str(context.organization_id) == record["organization_id"]
+    assert str(context.environment_context_id) == record["environment_id"]
+    assert str(context.location_id) == record["environment"]["location_id"]
     assert context.domain.value == domain
     assert context.context_tags == frozenset(record["context_tags"])
 
