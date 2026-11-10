@@ -32,6 +32,19 @@ assert.match(moduleSource, /\.range\(pageOffset, pageOffset \+ PAGE_SIZE - 1\)/)
 assert.match(moduleSource, /signalsLoadMore/);
 assert.match(moduleSource, /loadHistory\("biological_subject_id"/);
 assert.match(moduleSource, /loadHistory\("environment_id"/);
+assert.match(moduleSource, /async function resolveHistoryIdentity/);
+assert.match(moduleSource, /\.from\("cultures"\)/);
+assert.match(moduleSource, /\.from\("plant_cultures"\)/);
+assert.match(moduleSource, /\.from\("batches"\)/);
+assert.match(moduleSource, /\.from\("environments"\)/);
+assert.match(moduleSource, /strain:strains\(strain_code,designation,organism:organisms\(scientific_name\)\)/);
+assert.match(moduleSource, /\.eq\("organization_id", state\.organizationId\).*\.eq\("id", id\)/);
+assert.match(moduleSource, /\.eq\("culture_id", id\)/);
+assert.match(moduleSource, /\.limit\(10\)/);
+assert.match(moduleSource, /resolveHistoryIdentity\(kind, id\)/);
+assert.match(moduleSource, /identity\.title/);
+assert.match(moduleSource, /identity\.subtitle/);
+
 assert.match(moduleSource, /\.eq\(kind, id\)/);
 assert.match(moduleSource, /\.limit\(50\)/);
 assert.match(moduleSource, /signalsHistoryStatus/);
