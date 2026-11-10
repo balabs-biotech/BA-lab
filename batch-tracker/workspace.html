@@ -114,6 +114,24 @@
         <option value="dismissed">Écartées</option>
         <option value="all">Tous les états</option>
       </select>
+      <label for="signalsSeverityFilter">Gravité</label>
+      <select id="signalsSeverityFilter">
+        <option value="all">Toutes les gravités</option>
+        <option value="critical">Critique</option>
+        <option value="high">Élevée</option>
+        <option value="moderate">Modérée</option>
+        <option value="low">Faible</option>
+        <option value="info">Information</option>
+      </select>
+      <label for="signalsMethodFilter">Méthode</label>
+      <select id="signalsMethodFilter">
+        <option value="all">Toutes les méthodes</option>
+        <option value="environmental_daily">Climat quotidien</option>
+        <option value="sensor_series">Série IoT</option>
+        <option value="sensor_temporal">Anomalie temporelle IoT</option>
+      </select>
+      <label for="signalsVariableFilter">Variable</label>
+      <input id="signalsVariableFilter" type="search" placeholder="Ex. air_temperature" autocomplete="off">
     </div>
     <p id="signalsStatus" class="signals-status" role="status" aria-live="polite">En attente de la session.</p>
     <div id="signalsList" class="signals-list" aria-live="polite"></div>
