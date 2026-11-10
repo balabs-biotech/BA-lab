@@ -158,7 +158,7 @@ begin
   returning id into v_unit_b;
 
   insert into public.cultures(organization_id,code,culture_type,material_id,experiment_id,experimental_unit_id)
-  select '00000000-0000-0000-0000-0000000000a1','EXP-CONTEXT-CULTURE','agar',m.id,experiment_a,unit_a
+  select '00000000-0000-0000-0000-0000000000a1','EXP-CONTEXT-CULTURE','agar',m.id,v_experiment_a,v_unit_a
     from public.materials m
    where m.organization_id='00000000-0000-0000-0000-0000000000a1'
      and m.material_code='MAT-PARENT'
@@ -180,7 +180,7 @@ begin
     update public.cultures
        set experimental_unit_id=null
      where organization_id='00000000-0000-0000-0000-0000000000a1'
-       and id=culture_id;
+       and id=v_culture_id;
   exception when check_violation then caught := true;
   end;
   if not caught then
