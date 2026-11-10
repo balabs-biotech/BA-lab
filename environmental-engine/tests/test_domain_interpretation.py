@@ -8,6 +8,7 @@ from ba_environmental_engine.interpretation import (
     interpret_findings,
     interpret_analysis_for_biological_context,
     interpret_persisted_analysis_for_subject,
+    interpret_persisted_analysis_with_profiles,
 )
 from ba_environmental_engine.interpretation.models import (
     DomainProfile,
@@ -423,4 +424,118 @@ def test_persisted_interpretation_fails_when_context_is_missing():
     with pytest.raises(LookupError, match="no persisted biological context"):
         interpret_persisted_analysis_for_subject(
             analysis, profile, repository, environment, subject_id=context.subject_id
+        )
+
+
+
+class InMemoryEnvironmentalProfileRepository:
+    def __init__(self, environment, domain_profile):
+        self.environment = environment
+        self.domain_profile = domain_profile
+        self.environment_query = None
+        self.domain_query = None
+
+    def get_environment_profile_for_scope(
+        self, *, organization_id, environment_id, from_date, to_date
+    ):
+        self.environment_query = (organization_id, environment_id, from_date, to_date)
+        return self.environment
+
+    def get_domain_profile_for_scope(
+        self, *, organization_id, domain, from_date, to_date
+    ):
+        self.domain_query = (organization_id, domain, from_date, to_date)
+        return self.domain_profile
+
+
+def test_persisted_profile_orchestrator_resolves_context_and_rules_from_repositories():
+    analysis = make_analysis()
+    biological, environment = make_persisted_context_for_analysis(analysis)
+    rule = InterpretationRule(
+        rule_id="temperature-review",
+        variable_code="air_temperature_mean",
+        finding_status="suspect",
+        required_context_tags=frozenset({"stage:fruiting"}),
+        signal_code="environmental_review",
+        severity="high",
+        message_code="temperature_deviation_review",
+    )
+    profile = DomainProfile(
+        profile_id="mycology-persisted-v1",
+        module="mycology",
+        version="2.0.0",
+        rules=(rule,),
+    )
+    biological_repository = InMemoryBiologicalContextRepository([biological])
+    profile_repository = InMemoryEnvironmentalProfileRepository(environment, profile)
+
+    result = interpret_persisted_analysis_with_profiles(
+        analysis,
+        biological_repository,
+        profile_repository,
+        subject_id=biological.subject_id,
+    )
+
+    assert result.profile_id == "mycology-persisted-v1"
+    assert result.profile_version == "2.0.0"
+    assert result.module == "mycology"
+    assert result.evaluated_findings == len(analysis.findings)
+    assert biological_repository.last_query[0] == str(analysis.scope.organization_id)
+    assert profile_repository.environment_query == (
+        str(analysis.scope.organization_id),
+        str(biological.environment_context_id),
+        analysis.scope.from_date.isoformat(),
+        analysis.scope.to_date.isoformat(),
+    )
+    assert profile_repository.domain_query == (
+        str(analysis.scope.organization_id),
+        BiologicalDomain.MYCOLOGY,
+        analysis.scope.from_date.isoformat(),
+        analysis.scope.to_date.isoformat(),
+    )
+
+
+def test_persisted_profile_orchestrator_rejects_environment_profile_for_wrong_environment():
+    import pytest
+
+    analysis = make_analysis()
+    biological, environment = make_persisted_context_for_analysis(analysis)
+    wrong_environment = environment.model_copy(update={"context_id": uuid4()})
+    profile = DomainProfile(
+        profile_id="mycology-persisted-v1",
+        module="mycology",
+        version="1.0.0",
+        rules=(),
+    )
+    biological_repository = InMemoryBiologicalContextRepository([biological])
+    profile_repository = InMemoryEnvironmentalProfileRepository(wrong_environment, profile)
+
+    with pytest.raises(ValueError, match="environment"):
+        interpret_persisted_analysis_with_profiles(
+            analysis,
+            biological_repository,
+            profile_repository,
+            subject_id=biological.subject_id,
+        )
+
+
+def test_persisted_profile_orchestrator_does_not_fallback_when_domain_profile_missing():
+    import pytest
+
+    analysis = make_analysis()
+    biological, environment = make_persisted_context_for_analysis(analysis)
+    biological_repository = InMemoryBiologicalContextRepository([biological])
+
+    class MissingDomainProfileRepository(InMemoryEnvironmentalProfileRepository):
+        def get_domain_profile_for_scope(self, **kwargs):
+            raise LookupError("no versioned profile covers the complete mycology domain scope")
+
+    profile_repository = MissingDomainProfileRepository(environment, None)
+
+    with pytest.raises(LookupError, match="no versioned profile"):
+        interpret_persisted_analysis_with_profiles(
+            analysis,
+            biological_repository,
+            profile_repository,
+            subject_id=biological.subject_id,
         )
