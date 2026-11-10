@@ -140,6 +140,7 @@ async function checkWorkingScene(name, viewport) {
       // hierarchy creation. Wait for the screen-space controls to be positioned
       // before evaluating their real DOM hit targets.
       await page.waitForFunction(() => [...document.querySelectorAll('.webgl-resource-target:not([hidden])')]
+        .filter(item => item.dataset.hasChildren === 'true')
         .some(item => {
           const rect = item.getBoundingClientRect();
           if (rect.width <= 0 || rect.height <= 0 || rect.left < 0 || rect.top < 0) return false;
