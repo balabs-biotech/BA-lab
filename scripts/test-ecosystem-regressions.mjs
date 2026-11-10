@@ -7,8 +7,8 @@ const engine = readFileSync('ecosystem/engine-v2.js', 'utf8');
 const previewEngine = readFileSync('ecosystem-preview/engine-v2.js', 'utf8');
 const expectedDomains = ['bio', 'myco', 'soil', 'lab', 'products', 'iot', 'work', 'learn'];
 
-assert.ok(html.includes('engine-v2.js?v=20261110-progressive-subbranch-labels-v77'), 'Public explorer must load the cache-busted screen-space label engine');
-assert.ok(previewHtml.includes('engine-v2.js?v=20261110-progressive-subbranch-labels-v77'), 'Preview must load the matching cache-busted label engine');
+assert.ok(html.includes('engine-v2.js?v=20261110-progressive-subbranch-labels-v78'), 'Public explorer must load the cache-busted screen-space label engine');
+assert.ok(previewHtml.includes('engine-v2.js?v=20261110-progressive-subbranch-labels-v78'), 'Preview must load the matching cache-busted label engine');
 assert.ok(engine.includes('function labelTargetPixels(label)') && previewEngine.includes('function labelTargetPixels(label)') && engine.includes('Math.pow(THREE.MathUtils.clamp(distance/13.5,.3,1.18),.68)') && previewEngine.includes('Math.pow(THREE.MathUtils.clamp(distance/13.5,.3,1.18),.68)') && engine.includes('return base*zoomScale') && previewEngine.includes('return base*zoomScale'), '3D labels must shrink smoothly as the camera zooms in while retaining a readable minimum');
 assert.ok(engine.includes('resourceHitTargets.set(label,element)'), 'Public branch labels must have real DOM hit targets');
 assert.ok(engine.includes("const displayTitle=[item.title,item.name,item.label,item.id].map(value=>String(value??'').trim()).find(Boolean)||('Branche '+(index+1));") && previewEngine.includes("const displayTitle=[item.title,item.name,item.label,item.id].map(value=>String(value??'').trim()).find(Boolean)||('Branche '+(index+1));") && engine.includes('title:displayTitle,sourceItem:item') && previewEngine.includes('title:displayTitle,sourceItem:item'), 'Every branch must expose a stable visible fallback label in both 3D engines');
