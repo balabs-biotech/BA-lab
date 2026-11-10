@@ -89,13 +89,14 @@
         ["Contexte biologique", row.biological_context_id],
         ["Environnement", row.environment_id],
         ["Règle", row.rule_id],
-        ["Code du message", row.message_code],
         ["Code recommandation", row.recommendation_code],
         ["Profil biologique", row.domain_profile_code && row.domain_profile_version ? row.domain_profile_code + " / v" + row.domain_profile_version : null],
         ["Profil environnemental", row.environment_profile_code && row.environment_profile_version ? row.environment_profile_code + " / v" + row.environment_profile_version : null],
         ["Analyse source", row.source_analysis_id],
         ["Constat source", row.source_finding_id],
-        ["Observations sources", Array.isArray(row.source_observation_ids) && row.source_observation_ids.length ? row.source_observation_ids.join(", ") : null],
+        ["Observations sources", Array.isArray(row.source_observation_ids) && row.source_observation_ids.length
+          ? row.source_observation_ids.slice(0, 5).join(", ") + (row.source_observation_ids.length > 5 ? " … (+" + (row.source_observation_ids.length - 5) + ")" : "")
+          : null],
         ["Méthode d’analyse", methodLabels[row.analysis_method] || row.analysis_method],
         ["Médiane de référence", Number.isFinite(row.analysis_evidence?.baseline_median) ? String(row.analysis_evidence.baseline_median) + (row.unit ? " " + row.unit : "") : null],
         ["MAD de référence", Number.isFinite(row.analysis_evidence?.baseline_mad) ? String(row.analysis_evidence.baseline_mad) + (row.unit ? " " + row.unit : "") : null],
