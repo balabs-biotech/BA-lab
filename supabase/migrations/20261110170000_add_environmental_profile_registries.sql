@@ -300,7 +300,7 @@ returns trigger
 language plpgsql
 security invoker
 set search_path = pg_catalog, public
-as $
+as $$
 declare
   v_status text;
   v_origin text;
@@ -338,7 +338,7 @@ begin
   if tg_op = 'DELETE' then return old; end if;
   return new;
 end;
-$;
+$$;
 
 create or replace function private.validate_domain_interpretation_profile()
 returns trigger
