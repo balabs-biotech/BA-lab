@@ -1,4 +1,4 @@
-// BA Labs 3D Engine v2 — clean interaction core.
+// BA Labs 3D Engine v2 — continuous mycelium navigation; domain colonies are filamentary, never solid spheres.
 // The legacy HTML remains the content source; this module owns all spatial navigation.
 const importThree = async () => {
   const sources = [
@@ -20,7 +20,7 @@ const importThree = async () => {
 
 const ROOT = document.getElementById('mainView');
 const IDS = ['bio','myco','soil','lab','products','iot','work','learn'];
-const COLORS = { bio:0x79a991, myco:0xa88fc3, soil:0xc19b73, lab:0x80aeb8, products:0xc88773, iot:0x7eaaa3, work:0xa99dbb, learn:0xb5b58d };
+const COLORS = { bio:0x78998a, myco:0x9b806d, soil:0x8d9b78, lab:0x829b9d, products:0xb96b4d, iot:0x789c91, work:0xa47c67, learn:0xb1aa8e };
 const POS = {
   bio:[0,2.55,0], myco:[-2.35,1.05,.35], soil:[-2.15,-1.05,-.1], lab:[-.05,.35,-.7],
   products:[.2,-1.35,.55], iot:[2.45,.85,-.25], work:[2.15,-1.25,-.45], learn:[-.15,-2.8,.1],
@@ -49,6 +49,7 @@ let opened = false, raf = 0, lastFrame = 0, dragging = false, moved = false, dra
 let lastPointer = null, pointers = new Map(), pinchStart = 0, pinchDistance = 0, pinchCenter = null, hoverId = null , lastBranchTouchActivationAt = 0;
 let canvasRect = null, cameraInitialized = false, lastPickAt = 0;
 let _hitWorld = null;
+let labelWorldPosition = null;
 
 function addStyles() {
   const style = document.createElement('style');
@@ -57,9 +58,9 @@ function addStyles() {
     @media(max-width:760px){#mainView.webgl-ready{height:640px;min-height:640px}}
     #mainView.webgl-ready>.hub,#mainView.webgl-ready>.sphere,#mainView.webgl-ready>.network,#mainView.webgl-ready>.galaxy{display:none!important}
     #mainView .webgl-stage{position:absolute;inset:0;z-index:4;min-height:100%;touch-action:none;overflow:hidden}
-    #mainView .webgl-stage canvas{display:block;width:100%;height:100%;outline:none;touch-action:none}#mainView .webgl-stage canvas:focus-visible{outline:2px solid #d1d0c5;outline-offset:-4px}
-    #mainView .webgl-hit-target{position:absolute!important;z-index:30;width:76px;height:76px;min-width:64px;min-height:64px;padding:0;border:0;border-radius:50%;background:transparent;color:transparent;opacity:.015;pointer-events:auto!important;touch-action:manipulation;transform:translate(-50%,-50%);cursor:pointer;-webkit-tap-highlight-color:transparent}
-    #mainView .webgl-hit-target:focus-visible{opacity:.24;outline:2px solid #d1d0c5;background:#b96b4d33}
+    #mainView .webgl-stage canvas{display:block;width:100%;height:100%;outline:none;touch-action:none}
+    #mainView .webgl-stage .webgl-hit-target{position:absolute;z-index:30;width:76px;height:76px;min-width:64px;min-height:64px;padding:0;border:0;border-radius:50%;background:transparent;color:transparent;opacity:.015;pointer-events:auto!important;touch-action:manipulation;transform:translate(-50%,-50%);cursor:pointer;-webkit-tap-highlight-color:transparent}
+    body > .webgl-hit-target:focus-visible{opacity:.24;outline:2px solid #d1d0c5;background:#b96b4d33}
     #mainView .webgl-stage .webgl-hint{position:absolute;left:16px;bottom:14px;z-index:8;padding:9px 12px;max-width:calc(100% - 32px);white-space:normal;border:1px solid #78958a66;border-radius:999px;background:#142321d9;color:#e5e9df;font:600 9px/1.4 system-ui;letter-spacing:.08em;pointer-events:none;backdrop-filter:blur(12px)}
     #mainView .webgl-stage .webgl-status{position:absolute;right:16px;bottom:17px;z-index:8;color:#c2cfc5;font:600 9px system-ui;letter-spacing:.12em;pointer-events:none}
     #mainView .webgl-controls{position:absolute;right:14px;top:14px;z-index:16;display:flex;gap:6px}
@@ -139,20 +140,20 @@ function makeLabel(text, color, size=16) {
 
 function createWorld() {
   scene=new THREE.Scene();
-  scene.fog=new THREE.FogExp2(0x172321,.009);
+  scene.fog=new THREE.FogExp2(0x071522,.0065);
   world=new THREE.Group();scene.add(world);
   scene.add(new THREE.AmbientLight(0xdce6df,1.65));
-  const key=new THREE.PointLight(0xa6c1ad,24,35);key.position.set(0,7,8);scene.add(key);
+  const key=new THREE.PointLight(0x58c9e8,31,42);key.position.set(0,7,8);scene.add(key);
   const warm=new THREE.PointLight(0xb96b4d,9,26);warm.position.set(7,-3,3);scene.add(warm);
-  const fill=new THREE.PointLight(0x78958a,15,32);fill.position.set(-7,-2,-5);scene.add(fill);
-  // Sparse background hyphae connect the field without forming panels or solid spheres.
+  const fill=new THREE.PointLight(0x36b8a8,23,38);fill.position.set(-7,-2,-5);scene.add(fill);
+  // Fine background hyphae add depth and interconnect the colonies visually.
   let fieldSeed=81273;const fieldRand=()=>{fieldSeed=(fieldSeed*16807)%2147483647;return(fieldSeed-1)/2147483646};
-  const fieldPalette=[0x263b38,0xb96b4d,0xd1d0c5,0x78958a];
-  for(let i=0;i<58;i++){const start=new THREE.Vector3(-5+fieldRand()*10,-4+fieldRand()*8,-3.5+fieldRand()*7),end=start.clone().add(new THREE.Vector3((fieldRand()-.5)*3.2,(fieldRand()-.5)*2.8,(fieldRand()-.5)*1.8)),mid=start.clone().lerp(end,.5).add(new THREE.Vector3((fieldRand()-.5)*.8,(fieldRand()-.5)*.8,(fieldRand()-.5)*.5)),curve=new THREE.CatmullRomCurve3([start,mid,end]),color=fieldPalette[Math.floor(fieldRand()*fieldPalette.length)];world.add(new THREE.Mesh(new THREE.TubeGeometry(curve,18,.0018+fieldRand()*.002,3,false),new THREE.MeshBasicMaterial({color,transparent:true,opacity:.10+fieldRand()*.14,depthWrite:false})));if(i%2===0){const at=curve.getPoint(.48),tip=at.clone().add(new THREE.Vector3((fieldRand()-.5)*1.5,(fieldRand()-.5)*1.5,(fieldRand()-.5)*.8)),fork=new THREE.CatmullRomCurve3([at,at.clone().lerp(tip,.5).add(new THREE.Vector3(0,.05,.03)),tip]);world.add(new THREE.Mesh(new THREE.TubeGeometry(fork,12,.0016,3,false),new THREE.MeshBasicMaterial({color,transparent:true,opacity:.12,depthWrite:false})));}}
+  const fieldPalette=[0x43c5df,0x42b9aa,0x83d6a1,0x719fe0,0xb96b4d];
+  for(let i=0;i<58;i++){const start=new THREE.Vector3(-5+fieldRand()*10,-4+fieldRand()*8,-3.5+fieldRand()*7),end=start.clone().add(new THREE.Vector3((fieldRand()-.5)*3.2,(fieldRand()-.5)*2.8,(fieldRand()-.5)*1.8)),mid=start.clone().lerp(end,.5).add(new THREE.Vector3((fieldRand()-.5)*.8,(fieldRand()-.5)*.8,(fieldRand()-.5)*.5)),curve=new THREE.CatmullRomCurve3([start,mid,end]),color=fieldPalette[Math.floor(fieldRand()*fieldPalette.length)];world.add(new THREE.Mesh(new THREE.TubeGeometry(curve,18,.0018+fieldRand()*.002,3,false),new THREE.MeshBasicMaterial({color,transparent:true,opacity:.10+fieldRand()*.14,depthWrite:false})));if(i%2===0){const at=curve.getPoint(.48),tip=at.clone().add(new THREE.Vector3((fieldRand()-.5)*1.5,(fieldRand()-.5)*1.5,(fieldRand()-.5)*.8)),fork=new THREE.CatmullRomCurve3([at,at.clone().lerp(tip,.5).add(new THREE.Vector3(0,.05,.03)),tip]);world.add(new THREE.Mesh(new THREE.TubeGeometry(fork,12,.0016,3,false),new THREE.MeshBasicMaterial({color,transparent:true,opacity:.12,depthWrite:false})))}}
   for(const id of IDS){
     const color=COLORS[id],pos=new THREE.Vector3(...POS[id]);
     const group=new THREE.Group();group.position.copy(pos);group.userData={id,kind:'domain'};
-    // Open hyphal junction: the identity node is a branching intersection, not a solid cell.
+    // The colony centre is an open hyphal junction, never a solid cell/planet.
     const soma=new THREE.Group();soma.userData={id,kind:'domain'};group.add(soma);
     for(let strand=0;strand<7;strand++){
       const a=strand/7*Math.PI*2+IDS.indexOf(id)*.23;
@@ -163,21 +164,22 @@ function createWorld() {
       const strandMesh=new THREE.Mesh(new THREE.TubeGeometry(curve,16,.0045,4,false),new THREE.MeshStandardMaterial({color,emissive:color,emissiveIntensity:.28,transparent:true,opacity:.8,roughness:.8}));
       soma.add(strandMesh);
     }
-    const glow=new THREE.Mesh(new THREE.SphereGeometry(1.18,24,18),new THREE.MeshBasicMaterial({color,transparent:true,opacity:.035,side:THREE.BackSide,depthWrite:false}));
-    glow.scale.copy(soma.scale);group.add(glow);
-    const label=makeLabel(LABELS[id]?.title||id, color, 17);label.position.set(0,-.94,0);label.scale.set(2.8,.66,1);label.userData={id,kind:'domain-label'};group.add(label);
-    const hit=new THREE.Mesh(new THREE.SphereGeometry(.96,16,12),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));hit.userData={id,kind:'domain'};group.add(hit);
+    const label=makeLabel(LABELS[id]?.title||id, color, 17);label.position.set(0,-1.42,0);label.scale.set(2.8,.66,1);label.userData={id,kind:'domain-label'};group.add(label);
+    // Invisible selection volume remains generous for touch, while visible geometry stays filamentary.
+    const hit=new THREE.Mesh(new THREE.SphereGeometry(1.12,16,12),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));hit.userData={id,kind:'domain'};group.add(hit);
     world.add(group);cells.set(id,{group,soma,label,hit,position:pos,color});
-    const domainButton=document.createElement('button');domainButton.type='button';domainButton.className='webgl-hit-target webgl-domain-target';domainButton.setAttribute('aria-label',(LABELS[id]?.title||id)+' — '+t('domain'));domainButton.title=LABELS[id]?.title||id;domainButton.dataset.domainId=id;domainButton.style.width='116px';domainButton.style.height='116px';domainButton.addEventListener('pointerdown',()=>stage?.focus({preventScroll:true}));domainButton.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();stage?.focus({preventScroll:true});if(!selected)enterDomain(id)});stage.append(domainButton);domainHitTargets.set(id,{object:hit,button:domainButton});
+    const domainButton=document.createElement('button');domainButton.type='button';domainButton.className='webgl-hit-target webgl-domain-target';domainButton.setAttribute('aria-label',(LABELS[id]?.title||id)+' — '+t('domain'));domainButton.title=LABELS[id]?.title||id;domainButton.dataset.domainId=id;domainButton.style.width='116px';domainButton.style.height='116px';domainButton.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();stage?.focus({preventScroll:true});if(!selected)enterDomain(id)});stage.append(domainButton);domainHitTargets.set(id,{object:hit,button:domainButton});
     pickables.push(soma,hit,label);
-    for(let j=0;j<14;j++){
-      const a=j/14*Math.PI*2+IDS.indexOf(id)*.31;
-      const start=new THREE.Vector3(Math.cos(a)*.10,Math.sin(a)*.09,Math.sin(a*1.7)*.035);
+    const branches=14;
+    for(let j=0;j<branches;j++){
+      const a=j/branches*Math.PI*2+IDS.indexOf(id)*.31;
       const reach=1.0+(j%4)*.24;
+      const start=new THREE.Vector3(Math.cos(a)*.10,Math.sin(a)*.09,Math.sin(a*1.7)*.035);
       const end=new THREE.Vector3(Math.cos(a)*reach,Math.sin(a)*reach*.76,Math.sin(a*1.7)*.34);
       const mid=start.clone().lerp(end,.52).add(new THREE.Vector3(Math.cos(a+1)*.18,Math.sin(a+1)*.16,.13));
       const curve=new THREE.CatmullRomCurve3([start,mid,end]);
-      const neurite=new THREE.Mesh(new THREE.TubeGeometry(curve,28,.0065+(j%3)*.0014,5,false),new THREE.MeshStandardMaterial({color,emissive:color,emissiveIntensity:.28,transparent:true,opacity:.76,roughness:.7}));
+      const thickness=.0065+(j%3)*.0014;
+      const neurite=new THREE.Mesh(new THREE.TubeGeometry(curve,28,thickness,5,false),new THREE.MeshStandardMaterial({color,emissive:color,emissiveIntensity:.28,transparent:true,opacity:.76,roughness:.7}));
       neurite.userData={id,kind:'neurite'};group.add(neurite);
       for(let fork=0;fork<2;fork++){
         const at=curve.getPoint(.48+fork*.22),side=fork===0?-1:1;
@@ -301,10 +303,22 @@ function syncResourceHitTargets() {
    if(!occupied.some(r=>overlaps(box,r))&&!obstacles.some(r=>overlaps(box,r))){chosen={cx,cy,box};break}
   }
   if(!chosen){
-   const columns=stageRect.width<560?2:3,slotWidth=stageRect.width/columns,rows=Math.max(2,Math.ceil(projected.length/columns)),candidates=[];
-   for(let row=0;row<rows;row++)for(let col=0;col<columns;col++){const cx=slotWidth*(col+.5),cy=stageRect.height*(.28+row*.44/Math.max(1,rows-1)),box={l:cx-w/2,t:cy-h/2,r:cx+w/2,b:cy+h/2};if(box.l>=4&&box.r<=stageRect.width-4&&box.t>=4&&box.b<=stageRect.height-4)candidates.push({cx,cy,box})}
+   // On narrow screens, clustered branches can project to the same pixels.
+   // Fall back to a compact, collision-free screen-space index so every folder
+   // remains visible and directly tappable instead of stacking invisible buttons.
+   const columns=stageRect.width<560?2:3,slotWidth=stageRect.width/columns;
+   const rows=Math.max(2,Math.ceil(projected.length/columns));
+   const candidates=[];
+   for(let row=0;row<rows;row++)for(let col=0;col<columns;col++){
+    const cx=slotWidth*(col+.5),cy=stageRect.height*(.28+row*.44/Math.max(1,rows-1));
+    const box={l:cx-w/2,t:cy-h/2,r:cx+w/2,b:cy+h/2};
+    if(box.l>=4&&box.r<=stageRect.width-4&&box.t>=4&&box.b<=stageRect.height-4)candidates.push({cx,cy,box});
+   }
    chosen=candidates.find(candidate=>!occupied.some(r=>overlaps(candidate.box,r))&&!obstacles.some(r=>overlaps(candidate.box,r)))||null;
-   if(!chosen){const cx=Math.max(w/2+4,Math.min(stageRect.width-w/2-4,sx)),cy=Math.max(h/2+4,Math.min(stageRect.height-h/2-4,sy));chosen={cx,cy,box:{l:cx-w/2,t:cy-h/2,r:cx+w/2,b:cy+h/2}}}
+   if(!chosen){
+    const cx=Math.max(w/2+4,Math.min(stageRect.width-w/2-4,sx)),cy=Math.max(h/2+4,Math.min(stageRect.height-h/2-4,sy));
+    chosen={cx,cy,box:{l:cx-w/2,t:cy-h/2,r:cx+w/2,b:cy+h/2}};
+   }
   }
   occupied.push(chosen.box);
   button.style.setProperty('z-index',String(12000+Math.round((1-item.p.z)*100)),'important');
@@ -365,10 +379,17 @@ function navigateToStack(index) {
   buildResources(selected,currentNode,currentAnchor);smoothCamera(currentAnchor,6.2,650);
 }
 function buildResources(id,parentNode=null,anchor=null) {
- clearResources();const domain=manifest?.domains?.find(d=>d.id===id);if(!domain)return;currentNode=parentNode||domain;currentAnchor=(anchor||cells.get(id).position).clone();const children=currentNode.children||[];renderPath();if(!children.length){status.textContent=(currentNode.title||domain.title).toUpperCase();return}
+ clearResources();const domain=manifest?.domains?.find(d=>d.id===id);
+ if(!domain){
+   // The eighth public universe is reserved in the 3D taxonomy, but its Notion page
+   // cannot be linked until the workspace permits creating it. Never fabricate a URL.
+   if(id==='learn'&&!parentNode){currentNode={id:'learn',title:'RESSOURCES & TRANSMISSION',children:[]};currentAnchor=(anchor||cells.get(id)?.position||new THREE.Vector3()).clone();renderPath();status.textContent='RESSOURCES & TRANSMISSION · DOWNLOADING';}
+   return;
+ }
+ currentNode=parentNode||domain;currentAnchor=(anchor||cells.get(id).position).clone();const children=currentNode.children||[];renderPath();if(!children.length){status.textContent=(currentNode.title||domain.title).toUpperCase();return}
  const baseColor=new THREE.Color(COLORS[id]),accent=new THREE.Color(0xb96b4d);
  const filament=(pts,color,radius,opacity)=>{const curve=new THREE.CatmullRomCurve3(pts),mesh=new THREE.Mesh(new THREE.TubeGeometry(curve,18,radius,4,false),new THREE.MeshStandardMaterial({color,emissive:color,emissiveIntensity:.18,transparent:true,opacity,roughness:.65}));world.add(mesh);resourceObjects.push(mesh);return curve};
- const maxDepth=3; // Render every real Notion level currently present in the language manifests.
+ const maxDepth=3; // Keep preview hierarchy depth aligned with the public language manifests.
  const drawNode=(item,pos,depth,parent,angle,index)=>{const has=!!item.children?.length,color=baseColor.clone().lerp(accent,Math.min(.34,depth*.12+(index%3)*.025)),radius=depth===0?(has?.135:.105):depth===1?(has?.085:.065):.043;item.position=pos.clone();item.parentNode=parent;const data={kind:'resource',...item,sourceItem:item,sourceId:id,position:pos.clone(),hasChildren:has,depth,parentNode:parent,denseRoot:depth===0&&children.length>16};const hitRadius=depth===0?.32:depth===1?.25:.19;const hit=new THREE.Mesh(new THREE.SphereGeometry(hitRadius,10,8),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));hit.position.copy(pos);hit.userData=data;world.add(hit);resourceObjects.push(hit);pickables.push(hit);
  // Represent each folder/page as a living hyphal junction: fine branching strands, no bead-like node.
  const junction=new THREE.Group();junction.position.copy(pos);junction.userData=data;world.add(junction);resourceObjects.push(junction);
@@ -472,17 +493,24 @@ function setupUI() {
   stage.addEventListener('pointerdown',onPointerDown);
   stage.addEventListener('pointermove',onPointerMove);
   stage.addEventListener('pointerup',onPointerUp);
-  document.addEventListener('pointerup',onPointerUp,true);
+  // Pointer-up is handled once on the stage; a capture-phase document listener
+  // previously consumed the pointer before the stage could perform hit-testing.
   stage.addEventListener('pointercancel',onPointerCancel);
   // Direct stage touch fallback for mobile browsers that omit pointer events.
   let touchFallback=null;
   const rememberTouch=e=>{if(e.touches.length===1){const p=e.touches[0];touchFallback={x:p.clientX,y:p.clientY,at:performance.now()}}};
-  const finishTouch=e=>{if(e.target.closest?.('.webgl-hit-target,.webgl-branch-dock')){touchFallback=null;return}if(!touchFallback)return;const p=e.changedTouches[0],start=touchFallback;touchFallback=null;if(!p||Math.hypot(p.clientX-start.x,p.clientY-start.y)>12)return;if(performance.now()-lastPickAt>450)pickAt(p.clientX,p.clientY)};
+  const finishTouch=e=>{if(e.target.closest?.('.webgl-hit-target,.webgl-branch-dock')){touchFallback=null;return}if(!touchFallback)return;const p=e.changedTouches[0],start=touchFallback;touchFallback=null;if(!p||Math.hypot(p.clientX-start.x,p.clientY-start.y)>12)return;if(performance.now()-lastPickAt>120)pickAt(p.clientX,p.clientY)};
+  // Spatial pointer selection is handled exclusively by the WebGL canvas ray-pick.
   stage.addEventListener('touchstart',rememberTouch,{passive:true});
   stage.addEventListener('touchend',finishTouch,{passive:true});
   stage.addEventListener('touchcancel',()=>{touchFallback=null},{passive:true});
 
-  document.addEventListener('click',e=>{if(performance.now()-lastBranchTouchActivationAt<800){e.preventDefault();e.stopImmediatePropagation();return;}if(!e.detail||dragGesture||!renderer)return;if(e.target.closest?.('.webgl-controls,.webgl-focus,.webgl-intro,.webgl-hit-target,.webgl-branch-dock'))return;const r=renderer.domElement.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)return;if(performance.now()-lastPickAt>450)pickAt(e.clientX,e.clientY)},true);
+  // Mobile Chromium can retarget a tap to a legacy transparent hit button
+  // attached outside the stage. Such an event never bubbles through stage,
+  // so resolve that pointer-up at document capture using the same projected
+  // screen coordinates as canvas picking.
+  document.addEventListener('pointerup',e=>{if(e.pointerType!=='touch'||stage.contains(e.target)||!e.target.closest?.('.webgl-hit-target'))return;if(transition||performance.now()-lastPickAt<=120)return;pickAt(e.clientX,e.clientY)},true);
+  document.addEventListener('click',e=>{if(performance.now()-lastBranchTouchActivationAt<800){e.preventDefault();e.stopImmediatePropagation();return;}if(!e.detail||dragGesture||!renderer)return;if(e.target.closest?.('.webgl-controls,.webgl-focus,.webgl-intro,.webgl-hit-target,.webgl-branch-dock'))return;const r=renderer.domElement.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)return;if(performance.now()-lastPickAt>120)pickAt(e.clientX,e.clientY)},true);
   stage.addEventListener('lostpointercapture',onLostCapture);
   stage.addEventListener('contextmenu',e=>e.preventDefault());
   window.addEventListener('resize',resize);
@@ -528,7 +556,7 @@ function onPointerUp(e) {
     return;
   }
   dragging=false;
-  if(!moved&&!transition&&performance.now()-lastPickAt>450&&!e.target.closest('.webgl-controls,.webgl-focus,.webgl-intro'))pickAt(e.clientX,e.clientY);
+  if(!moved&&!transition&&performance.now()-lastPickAt>120&&!e.target.closest('.webgl-controls,.webgl-focus,.webgl-intro'))pickAt(e.clientX,e.clientY);
   lastPointer=null;
 }function onPointerCancel(){pointers.clear();dragging=false;moved=true;pinchStart=0;pinchCenter=null;lastPointer=null}
 function onLostCapture(e){if(pointers.has(e.pointerId)){pointers.delete(e.pointerId);if(!pointers.size){dragging=false;lastPointer=null}}}
@@ -553,7 +581,6 @@ function pickAt(x,y) {
   const labels=resourceObjects.filter(o=>o.userData?.kind==='resource-label');
   let nearestLabel=null,nearestLabelDistance=Infinity;
   for(const label of labels){const p=screenPoint(label);if(p.d<nearestLabelDistance){nearestLabel=label;nearestLabelDistance=p.d}}
-  // Keep touch targets tight: a wide radius makes adjacent labels steal taps in dense branches.
   if(nearestLabel&&nearestLabelDistance<(window.innerWidth<760?58:70)){
     if(window.__BALABS_3D_E2E__)window.__BALABS_3D_LAST_PICK__={title:nearestLabel.userData.title,kind:nearestLabel.userData.kind,children:nearestLabel.userData.children?.length||0,distance:nearestLabelDistance};
     openResource(nearestLabel.userData);return;
@@ -567,7 +594,6 @@ function pickAt(x,y) {
 
 // Labels use screen-space sizing: zoom changes the scene, not the reading size.
 // The camera distance is measured per label so nested branches remain equally legible.
-let labelWorldPosition=null;
 function syncLabelScales() {
   if(!renderer||!camera)return;
   if(!labelWorldPosition)labelWorldPosition=new THREE.Vector3();
@@ -585,6 +611,7 @@ function syncLabelScales() {
   for(const item of cells.values())apply(item.label);
   for(const item of resourceObjects)if(item.userData?.kind==='resource-label')apply(item);
 }
+
 
 function animate(now=0) {
   raf=requestAnimationFrame(animate);
@@ -618,7 +645,9 @@ async function init() {
       const rect=renderer.domElement.getBoundingClientRect();
       const project=obj=>{const p=obj.getWorldPosition(new THREE.Vector3()).project(camera);return{x:rect.left+(p.x+1)*rect.width/2,y:rect.top+(1-p.y)*rect.height/2,z:p.z,title:obj.userData.title||obj.userData.id,hasChildren:!!obj.userData.hasChildren,depth:obj.userData.depth??0,url:obj.userData.url||null}};
       const inside=p=>p.z>-1&&p.z<1&&p.x>=rect.left&&p.x<=rect.right&&p.y>=rect.top&&p.y<=rect.bottom;
-      const branches=resourceObjects.filter(o=>o.userData?.kind==='resource-label'&&o.userData.depth===0).map(project).filter(inside);
+      const branches=resourceObjects.filter(o=>o.userData?.kind==='resource-label')
+        .map(project)
+        .filter(p=>p&&p.depth===0&&p.z>-1&&p.z<1&&p.x>=rect.left&&p.x<=rect.right&&p.y>=rect.top&&p.y<=rect.bottom);
       const center={x:rect.left+rect.width/2,y:rect.top+rect.height/2};
       const targetBranch=branches.sort((a,b)=>Number(b.hasChildren)-Number(a.hasChildren)||Math.hypot(a.x-center.x,a.y-center.y)-Math.hypot(b.x-center.x,b.y-center.y))[0]||null;
       const domain=cells.get('bio'),domainTarget=domain?project(domain.hit):null;
