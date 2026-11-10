@@ -29,7 +29,7 @@ __all__ = [
     "OrganismKind",
     "validate_biological_context_for_analysis",
     "biological_context_from_record",
-    "biological_context_to_record",
+    "biological_context_to_record",\n    "SupabaseBiologicalContextRepository",
     "CalibrationStatus",
     "EnvironmentalMeasurement",
     "EnvironmentContext",
