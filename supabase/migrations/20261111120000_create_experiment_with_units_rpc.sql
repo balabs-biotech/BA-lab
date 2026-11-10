@@ -56,8 +56,10 @@ begin
   if jsonb_typeof(v_design) <> 'object' then
     raise exception 'experiment_design_must_be_json_object' using errcode = '22023';
   end if;
-  if p_units is null or jsonb_typeof(p_units) <> 'array'
-     or jsonb_array_length(p_units) < 1 then
+  if p_units is null or jsonb_typeof(p_units) <> 'array' then
+    raise exception 'experiment_units_must_be_json_array' using errcode = '22023';
+  end if;
+  if jsonb_array_length(p_units) < 1 then
     raise exception 'experiment_units_required' using errcode = '22023';
   end if;
   if jsonb_array_length(p_units) > 200 then
@@ -72,6 +74,9 @@ begin
     'units', p_units,
     'occurred_at', p_occurred_at
   );
+  if octet_length(v_request_payload::text) > 262144 then
+    raise exception 'experiment_setup_payload_too_large' using errcode = '22023';
+  end if;
 
   insert into private.operation_idempotency_receipts (
     organization_id, actor_user_id, operation_name, idempotency_key, request_payload
