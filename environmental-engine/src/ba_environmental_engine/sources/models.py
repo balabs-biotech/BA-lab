@@ -2,7 +2,7 @@
 
 from dataclasses import dataclass
 from datetime import date, datetime
-from typing import Any, Literal
+from typing import Any, Iterable, Literal
 from uuid import UUID
 
 
@@ -42,7 +42,7 @@ class DuplicateSourceKey:
     count: int
 
 
-def find_duplicate_source_keys(rows: list[dict[str, Any]]) -> list[DuplicateSourceKey]:
+def find_duplicate_source_keys(rows: Iterable[dict[str, Any]]) -> list[DuplicateSourceKey]:
     """Report repeated tenant/provider/dataset/variable/time keys.
 
     Rows are reported, never collapsed or silently discarded.
