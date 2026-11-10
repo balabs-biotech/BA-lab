@@ -28,8 +28,10 @@ create table public.biological_contexts (
     check (num_nonnulls(culture_id, plant_culture_id) = 1),
   constraint biological_contexts_domain_subject_check
     check (
-      (domain in ('mycology', 'lab') and culture_id is not null and plant_culture_id is null
-        and organism_kind in ('fungus', 'fungal_consortium', 'bacterium', 'archaea', 'microbial_consortium', 'other'))
+      (domain = 'mycology' and culture_id is not null and plant_culture_id is null
+        and organism_kind in ('fungus', 'fungal_consortium'))
+      or
+      (domain = 'lab' and culture_id is not null and plant_culture_id is null)
       or
       (domain = 'greentech' and plant_culture_id is not null and culture_id is null
         and organism_kind = 'plant')
@@ -98,3 +100,39 @@ comment on column public.biological_contexts.context_tags is
   'JSON array of explicit, non-empty domain tags; no biological facts are inferred from environmental observations.';
 comment on column public.biological_contexts.environment_id is
   'References the existing environment; location_id is resolved through environments.location_id and is not duplicated.';
+
+-- An environment must resolve to a physical location for analysis-scope binding.
+-- location_id is deliberately derived, never duplicated on biological_contexts.
+create or replace function private.validate_biological_context_environment()
+returns trigger
+language plpgsql
+security invoker
+set search_path = pg_catalog, public
+as $$
+declare
+  v_location_id uuid;
+begin
+  select e.location_id
+    into v_location_id
+    from public.environments e
+   where e.organization_id = new.organization_id
+     and e.id = new.environment_id;
+
+  if not found or v_location_id is null then
+    raise exception 'biological_context_environment_requires_location'
+      using errcode = '23514';
+  end if;
+
+  return new;
+end;
+$$;
+
+drop trigger if exists biological_contexts_environment_location_guard
+  on public.biological_contexts;
+create trigger biological_contexts_environment_location_guard
+  before insert or update of organization_id, environment_id
+  on public.biological_contexts
+  for each row
+  execute function private.validate_biological_context_environment();
+
+revoke all on function private.validate_biological_context_environment() from public, anon, authenticated;
