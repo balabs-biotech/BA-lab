@@ -83,7 +83,7 @@ function clearAuthenticatedWorkspaceState() {
   pendingExperimentOccurredAt = null;
 
   hideElement(document.getElementById("cultureExperimentContext"));
-  hideElement(experimentRegistryCard);
+  hideElement(document.getElementById("experimentRegistryCard"));
   const cultureDetailPanel = document.getElementById("cultureDetailPanel");
   if (cultureDetailPanel) {
     cultureDetailPanel.classList.add("hidden");
