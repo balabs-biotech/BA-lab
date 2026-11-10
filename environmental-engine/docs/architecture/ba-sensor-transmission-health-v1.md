@@ -66,3 +66,23 @@ Statuses:
 The existing `gap_count` and `maximum_gap_seconds` are measurement-series statistics over non-excluded readings. They are useful descriptive indicators but are not a device heartbeat and must not be relabeled as transmission health.
 
 The existing gateway returns `no_sensor_measurements_in_scope` when no measurement rows exist. This must be revised only together with the registry/receipt path; removing that guard alone would create an empty analysis request with no way to identify the silent devices.
+
+
+## Implemented Python component
+
+The first provider-neutral implementation is available in
+`quality/sensor_transmission.py`:
+- `SensorDeviceTransmission` models registry and profile expectation evidence;
+- `SensorTransmissionReceipt` models a single ingestion receipt;
+- `assess_sensor_transmissions` computes device-level interior gaps and optional current-window trailing silence;
+- explicit cadence and tolerance policy are mandatory;
+- disabled/unbound devices are `not_evaluable`;
+- no receipt history is `insufficient_data`, never an automatic `silent` classification;
+- historical windows do not produce a current silence status;
+- receipt IDs are retained as lineage and duplicates are rejected.
+
+A dedicated test module covers regular cadence, interior gaps, current trailing silence,
+historical windows, empty history, disabled/unbound devices, expectation-window bounds,
+invalid policy and duplicate receipt IDs. The module and tests are committed, but the
+Python test suite has not yet been executed in this environment. The API and gateway
+integration remain pending.
