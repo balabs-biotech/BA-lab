@@ -174,6 +174,8 @@ def build_bal_analysis(
             raise ValueError("daily calculation source observations must match its date")
 
         selected_by_variable = {row.variable_code: row for row in result_rows}
+        if len(selected_by_variable) != len(result_rows):
+            raise ValueError("daily calculation cannot reference multiple observations for one variable")
         if set(selected_by_variable) != set(result.source_variable_codes):
             raise ValueError("daily calculation variable lineage does not match source rows")
         used_variables.update(result.source_variable_codes)
