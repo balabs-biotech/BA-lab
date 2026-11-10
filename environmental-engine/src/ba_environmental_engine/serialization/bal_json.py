@@ -15,6 +15,7 @@ from ba_environmental_engine.contracts.bal_json import (
     IndicatorMethod,
     IndicatorPeriod,
     IndicatorQuality,
+    AnomalyFinding,
     SourceSummary,
 )
 from ba_environmental_engine.sources.models import NormalizedEnvironmentalObservation
@@ -111,6 +112,7 @@ def build_bal_analysis(
     scope_to: date,
     daily_indicators: Iterable[DailyReferenceIndicators] = (),
     rolling_indicators: Iterable[ClimateWindowIndicator] = (),
+    findings: Iterable[AnomalyFinding] = (),
 ) -> BALAnalysis:
     """Build and validate one tenant/location-scoped BAL-JSON analysis.
 
@@ -120,6 +122,7 @@ def build_bal_analysis(
     rows = list(observations)
     daily_results = list(daily_indicators)
     rolling_results = list(rolling_indicators)
+    anomaly_findings = list(findings)
 
     if scope_to < scope_from:
         raise ValueError("scope_to must be on or after scope_from")
@@ -359,6 +362,12 @@ def build_bal_analysis(
 
     output.sort(key=lambda item: (item.period.from_date, item.code))
     summaries = _source_summaries(rows, used_variables)
+    finding_dates = [item.observed_date for item in anomaly_findings]
+    if len(finding_dates) != len(set((item.finding_id for item in anomaly_findings))):
+        raise ValueError("anomaly finding IDs must be unique")
+    if any(not scope_from <= item.observed_date <= scope_to for item in anomaly_findings):
+        raise ValueError("anomaly finding date must be contained within analysis scope")
+
     return BALAnalysis(
         contract_version="1.0.0",
         engine={"name": "ba-environmental-intelligence", "version": engine_version},
@@ -372,5 +381,6 @@ def build_bal_analysis(
         },
         source_summary=summaries,
         indicators=output,
+        findings=anomaly_findings,
         warnings=sorted(warnings),
     )
