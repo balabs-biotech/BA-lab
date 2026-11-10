@@ -148,7 +148,7 @@
     ["Sujet biologique","Biological subject","Sujeito biológico","الموضوع البيولوجي"],
     ["Contexte biologique","Biological context","Contexto biológico","السياق البيولوجي"],
     ["Environnement","Environment","Ambiente","البيئة"],
-    ["Recommandation","Recommendation","Recomendação","التوصية"],
+    ["Code recommandation","Recommendation code","Código de recomendação","رمز التوصية"],
     ["Profil biologique","Biological profile","Perfil biológico","الملف البيولوجي"],
     ["Profil environnemental","Environmental profile","Perfil ambiental","الملف البيئي"],
     ["Analyse source","Source analysis","Análise de origem","تحليل المصدر"],
