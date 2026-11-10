@@ -5153,6 +5153,7 @@ const experimentUnitRows = document.getElementById("experimentUnitRows");
 const experimentRegistryList = document.getElementById("experimentRegistryList");
 const experimentRegistryStatus = document.getElementById("experimentRegistryStatus");
 let experimentUnitRowSequence = 0;
+let pendingExperimentOccurredAt = null;
 
 function addExperimentUnitRow(values = {}) {
   if (!experimentUnitRows || experimentUnitRows.children.length >= 200) return;
@@ -5256,7 +5257,7 @@ async function createExperimentWithUnits(event) {
     if (experimentRegistryStatus) experimentRegistryStatus.textContent = "Renseignez le code, le nom et au moins une unité avec un code.";
     return;
   }
-  const occurredAt = new Date().toISOString();
+  const occurredAt = pendingExperimentOccurredAt || (pendingExperimentOccurredAt = new Date().toISOString());
   const payload = {
     p_organization_id: orgId,
     p_code: code,
@@ -5278,6 +5279,7 @@ async function createExperimentWithUnits(event) {
     if (error) throw error;
     if (!isCurrentWorkspaceRevision(revision, orgId)) return;
     clearManualWriteIdempotencyKey("experiment-setup");
+    pendingExperimentOccurredAt = null;
     experimentSetupForm.reset();
     experimentUnitRows.replaceChildren();
     addExperimentUnitRow();
