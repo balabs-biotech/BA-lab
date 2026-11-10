@@ -403,6 +403,97 @@
     };
   }
 
+  // Pure, bounded query layer over a loaded biological lineage snapshot.
+  function buildBiologicalProvenanceIndex(lineage) {
+    const materials = Array.isArray(lineage?.materials) ? lineage.materials : [];
+    const edges = Array.isArray(lineage?.relationships) ? lineage.relationships : [];
+    const events = Array.isArray(lineage?.events) ? lineage.events : [];
+    const materialById = new Map(materials.map(material => [material.id, material]));
+    const incoming = new Map();
+    const outgoing = new Map();
+    const edgeKeys = new Set();
+    const addEdge = (parentId, childId, type = "parent_material_id", legacy = false) => {
+      if (!parentId || !childId || parentId === childId) return;
+      const key = [parentId, childId, type].join(":");
+      if (edgeKeys.has(key)) return;
+      edgeKeys.add(key);
+      const edge = { parent_material_id: parentId, child_material_id: childId, relationship_type: type, legacy_pointer: legacy };
+      if (!incoming.has(childId)) incoming.set(childId, []);
+      if (!outgoing.has(parentId)) outgoing.set(parentId, []);
+      incoming.get(childId).push(edge);
+      outgoing.get(parentId).push(edge);
+    };
+    edges.forEach(edge => addEdge(edge.parent_material_id, edge.child_material_id, edge.relationship_type, Boolean(edge.legacy_pointer)));
+    materials.forEach(material => {
+      if (material.parent_material_id) addEdge(material.parent_material_id, material.id, "parent_material_id", true);
+    });
+    const eventsByMaterial = new Map();
+    events.forEach(event => {
+      if (!event.material_id) return;
+      if (!eventsByMaterial.has(event.material_id)) eventsByMaterial.set(event.material_id, []);
+      eventsByMaterial.get(event.material_id).push(event);
+    });
+    const traverse = (startId, adjacency, endpointField, maxNodes = 150) => {
+      const visited = new Set([startId]);
+      const queue = [startId];
+      while (queue.length && visited.size < maxNodes) {
+        const currentId = queue.shift();
+        (adjacency.get(currentId) || []).forEach(edge => {
+          const nextId = edge[endpointField];
+          if (visited.has(nextId)) return;
+          visited.add(nextId);
+          if (visited.size < maxNodes) queue.push(nextId);
+        });
+      }
+      return [...visited].filter(id => id !== startId);
+    };
+    const traceMaterial = materialId => {
+      if (!materialById.has(materialId)) return { found: false, material_id: materialId, ancestors: [], descendants: [], strains: [], events: [], unresolved_material_ids: [] };
+      const ancestorIds = traverse(materialId, incoming, "parent_material_id");
+      const descendantIds = traverse(materialId, outgoing, "child_material_id");
+      const relatedIds = [materialId, ...ancestorIds];
+      const strainMap = new Map();
+      relatedIds.map(id => materialById.get(id)).filter(Boolean).forEach(material => {
+        const strain = material.strain || {};
+        const organism = strain.organism || {};
+        const strainId = material.strain_id || strain.id;
+        const label = [strain.strain_code || strain.designation, organism.scientific_name].filter(Boolean).join(" — ");
+        if (label) strainMap.set(strainId || label, { strain_id: strainId || null, label, material_id: material.id, material_code: material.material_code || null });
+      });
+      const relatedEventIds = new Set([materialId, ...ancestorIds, ...descendantIds]);
+      const relatedEvents = [...relatedEventIds].flatMap(id => eventsByMaterial.get(id) || [])
+        .sort((a, b) => String(a.occurred_at || "").localeCompare(String(b.occurred_at || "")));
+      const unresolved = [...new Set([...ancestorIds, ...descendantIds])].filter(id => !materialById.has(id));
+      return {
+        found: true,
+        material_id: materialId,
+        material: materialById.get(materialId),
+        ancestors: ancestorIds.map(id => materialById.get(id)).filter(Boolean),
+        descendants: descendantIds.map(id => materialById.get(id)).filter(Boolean),
+        strains: [...strainMap.values()],
+        events: relatedEvents,
+        unresolved_material_ids: unresolved,
+        truncated: ancestorIds.length + descendantIds.length >= 298
+      };
+    };
+    const findMaterialsByStrain = strainId => materials.filter(material =>
+      material.strain_id === strainId || material.strain?.id === strainId
+    );
+    const summarize = () => ({
+      material_count: materials.length,
+      relationship_count: edgeKeys.size,
+      event_count: events.length,
+      root_count: materials.filter(material => !(incoming.get(material.id) || []).length && !material.parent_material_id).length,
+      multi_parent_count: materials.filter(material => (incoming.get(material.id) || []).length > 1).length,
+      unresolved_parent_count: [...incoming.values()].flat().filter(edge => !materialById.has(edge.parent_material_id)).length
+    });
+    return { traceMaterial, findMaterialsByStrain, summarize };
+  }
+
+  window.BALabsBiologicalProvenance = {
+    buildIndex: buildBiologicalProvenanceIndex
+  };
+
   function renderCultureLineage(lineage, currentCultureId) {
     if (!lineage || lineage.unavailable || !lineage.cultures.length) return null;
     const section = element("section", "signal-lineage");
