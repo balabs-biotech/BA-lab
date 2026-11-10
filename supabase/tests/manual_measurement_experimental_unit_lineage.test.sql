@@ -177,7 +177,7 @@ begin
     end if;
   end;
 end
-$;
+$$;
 
 reset role;
 
@@ -203,7 +203,7 @@ begin
     raise exception 'FAIL: manual measurement or traceability event lost the culture experimental unit';
   end if;
 end
-$;
+$$;
 
 rollback;
 
