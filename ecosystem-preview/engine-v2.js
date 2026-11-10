@@ -377,7 +377,26 @@ function buildResources(id,parentNode=null,anchor=null) {
  status.textContent=(currentNode.title||domain.title).toUpperCase()+' · '+children.length+' '+t('children').toUpperCase();
 }
 // Resolve raw Notion nodes to their positioned 3D counterparts before camera navigation.
-function openResource(item) { let data=item?.userData||item;const spatial=resourceObjects.find(object=>object.userData?.kind==='resource'&&(object.userData.sourceItem===data||object.userData===data))?.userData;if(spatial)data=spatial;if(data.children?.length){const previousNode=currentNode,previousAnchor=currentAnchor?.clone()||new THREE.Vector3();navigationStack.push({node:previousNode,anchor:previousAnchor});let parent=data.parentNode;const ancestors=[];while(parent&&parent!==previousNode){ancestors.unshift(parent);parent=parent.parentNode}if(parent===previousNode){for(const ancestor of ancestors)navigationStack.push({node:ancestor,anchor:ancestor.position.clone()})}currentNode=data;currentAnchor=data.position.clone();renderPath();smoothCamera(currentAnchor,6.1,720,()=>buildResources(selected,data,currentAnchor));return}if(data.url){window.open(data.url,'_blank','noopener');return}status.textContent=data.title||'';}
+function openResource(item) {
+ let data=item?.userData||item;
+ const raw=data,spatial=resourceObjects.find(object=>object.userData?.kind==='resource'&&(object.userData.sourceItem===data||object.userData===data))?.userData;
+ if(spatial)data=spatial;
+ const before={title:currentNode?.title||null,depth:navigationStack.length,children:currentNode?.children?.length||0};
+ if(data.children?.length){
+  const previousNode=currentNode,previousAnchor=currentAnchor?.clone()||new THREE.Vector3();
+  navigationStack.push({node:previousNode,anchor:previousAnchor});
+  let parent=data.parentNode;const ancestors=[];
+  while(parent&&parent!==previousNode){ancestors.unshift(parent);parent=parent.parentNode}
+  if(parent===previousNode){for(const ancestor of ancestors)navigationStack.push({node:ancestor,anchor:ancestor.position.clone()})}
+  currentNode=data;currentAnchor=data.position.clone();renderPath();
+  const trace={rawTitle:raw?.title||raw?.name||null,resolved:!!spatial,parentMatches:parent===previousNode,before,after:{title:currentNode?.title||null,depth:navigationStack.length,children:currentNode?.children?.length||0},position:!!currentAnchor,error:null};
+  window.__BALABS_3D_NAV_TRACE__=trace;
+  smoothCamera(currentAnchor,6.1,720,()=>{try{buildResources(selected,data,currentAnchor);trace.afterBuild={title:currentNode?.title||null,depth:navigationStack.length,children:currentNode?.children?.length||0}}catch(error){trace.error={message:error?.message||String(error),stack:error?.stack||''};window.__BALABS_3D_LAST_OPEN_ERROR__=trace.error}});
+  return;
+ }
+ if(data.url){window.open(data.url,'_blank','noopener');return}
+ status.textContent=data.title||'';
+}
 function showDomainPanel(id,message='') {if(message)status.textContent=message;renderPath()}
 function enterDomain(id) {
   if(!cells.has(id))return;selected=id;selectedBranch=null;opened=true;navigationStack=[];currentNode=manifest?.domains?.find(d=>d.id===id)||null;currentAnchor=cells.get(id).position.clone();
@@ -581,7 +600,7 @@ async function init() {
       const center={x:rect.left+rect.width/2,y:rect.top+rect.height/2};
       const targetBranch=branches.sort((a,b)=>Number(b.hasChildren)-Number(a.hasChildren)||Math.hypot(a.x-center.x,a.y-center.y)-Math.hypot(b.x-center.x,b.y-center.y))[0]||null;
       const domain=cells.get('bio'),domainTarget=domain?project(domain.hit):null;
-      return{count:resourceObjects.filter(o=>o.userData?.kind==='resource-label').length,visible:branches.length,nestedAvailable:resourceObjects.some(o=>o.userData?.kind==='resource'&&o.userData.depth===0&&o.userData.children?.length),visibleDepths:[...new Set(resourceObjects.filter(o=>o.userData?.kind==='resource').map(o=>o.userData.depth??0))].sort(),target:targetBranch,domainTarget:domainTarget&&inside(domainTarget)?domainTarget:null,lastPick:window.__BALABS_3D_LAST_PICK__||null,lastOpen:window.__BALABS_3D_LAST_OPEN__||null,miniHidden:!!document.getElementById('miniView')?.hidden,transitioning:!!transition,selected,currentTitle:currentNode?.title||null,depth:navigationStack.length,childCount:currentNode?.children?.length||0,clickCount:window.__BALABS_3D_E2E_CLICKS||0,cameraDistance:distance,pointerDowns:window.__BALABS_3D_POINTERDOWN||0,pointerUps:window.__BALABS_3D_POINTERUP||0,pickCalls:window.__BALABS_3D_PICK_CALLS||0};
+      return{count:resourceObjects.filter(o=>o.userData?.kind==='resource-label').length,visible:branches.length,nestedAvailable:resourceObjects.some(o=>o.userData?.kind==='resource'&&o.userData.depth===0&&o.userData.children?.length),visibleDepths:[...new Set(resourceObjects.filter(o=>o.userData?.kind==='resource').map(o=>o.userData.depth??0))].sort(),target:targetBranch,domainTarget:domainTarget&&inside(domainTarget)?domainTarget:null,lastPick:window.__BALABS_3D_LAST_PICK__||null,lastOpen:window.__BALABS_3D_LAST_OPEN__||null,lastOpenError:window.__BALABS_3D_LAST_OPEN_ERROR__||null,navTrace:window.__BALABS_3D_NAV_TRACE__||null,miniHidden:!!document.getElementById('miniView')?.hidden,transitioning:!!transition,selected,currentTitle:currentNode?.title||null,depth:navigationStack.length,childCount:currentNode?.children?.length||0,clickCount:window.__BALABS_3D_E2E_CLICKS||0,cameraDistance:distance,pointerDowns:window.__BALABS_3D_POINTERDOWN||0,pointerUps:window.__BALABS_3D_POINTERUP||0,pickCalls:window.__BALABS_3D_PICK_CALLS||0};
     };
     animate();
   } catch(error){showFailure(error)}
