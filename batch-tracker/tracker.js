@@ -2275,7 +2275,7 @@ async function loadCultureOptions() {
   const requestedOrganizationId = organizationId;
   const data = await loadOrganizationRowsInPages(
     "cultures",
-    "id, code, culture_type, material_id, started_at, metadata",
+    "id, code, culture_type, material_id, experiment_id, experimental_unit_id, started_at, metadata",
     "Chargement des cultures impossible"
   );
 
@@ -7484,7 +7484,8 @@ async function loadCultureDetail(cultureId) {
     ["Démarrage", culture.started_at ? new Date(culture.started_at).toLocaleString("fr-FR") : "Non renseigné"],
     ["Identifiant matériel", culture.material_id || "Non renseigné"],
     ["Événements", "Chargement…"],
-    ["Mesures / observations", "Chargement…"]
+    ["Mesures / observations", "Chargement…"],
+    ["Résultats expérimentaux", "Chargement…"]
   ].forEach(([label, value]) => {
     const field = document.createElement("div");
     field.className = "culture-detail-field";
@@ -7509,6 +7510,18 @@ async function loadCultureDetail(cultureId) {
     if (requestId !== cultureDetailRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
 
     const batches = cultureBatches || [];
+    const resultQuery = culture.experimental_unit_id
+      ? supabaseClient.from("results")
+          .select("id,code,result_type,value,quality_state,created_at,event_id")
+          .eq("organization_id", loadOrganizationId)
+          .eq("experimental_unit_id", culture.experimental_unit_id)
+          .order("created_at", { ascending: false })
+          .limit(100)
+      : Promise.resolve({ data: [], error: null });
+    const { data: experimentalResults, error: experimentalResultsError } = await resultQuery;
+    if (experimentalResultsError) throw new Error("Résultats expérimentaux : " + experimentalResultsError.message);
+    if (requestId !== cultureDetailRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
+
     const { data: eventHistory, error: eventHistoryError } = await supabaseClient.rpc("get_culture_event_history", {
       p_organization_id: loadOrganizationId,
       p_culture_id: culture.id,
@@ -7619,11 +7632,30 @@ async function loadCultureDetail(cultureId) {
       detail: (row.value_text || "Sans description") +
         (row.metadata?.note ? " — " + row.metadata.note : "")
     }));
+    (experimentalResults || []).forEach(result => {
+      let structuredValue = "{}";
+      try {
+        structuredValue = JSON.stringify(result.value ?? {});
+      } catch (_) {
+        structuredValue = "Valeur structurée non affichable";
+      }
+      if (structuredValue.length > 1000) structuredValue = structuredValue.slice(0, 997) + "…";
+      entries.push({
+        date: result.created_at,
+        type: "Résultat expérimental · " + (result.result_type || "Type non renseigné"),
+        detail: [
+          result.code || "Résultat sans code",
+          "Qualité : " + (result.quality_state || "non renseignée"),
+          structuredValue
+        ].join(" · ")
+      });
+    });
     entries.sort((a,b) => new Date(b.date || 0) - new Date(a.date || 0));
 
     const fields = summary.querySelectorAll(".culture-detail-field strong");
     if (fields[4]) fields[4].textContent = String(eventHistory?.[0]?.total_rows ?? events.length);
     if (fields[5]) fields[5].textContent = String(measurements.length + observations.length);
+    if (fields[6]) fields[6].textContent = String(experimentalResults?.length || 0);
     timeline.innerHTML = "";
     if (batches.length) {
       const batchSection = document.createElement("section");
