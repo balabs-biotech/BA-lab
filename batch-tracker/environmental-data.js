@@ -680,6 +680,38 @@
           card.append(node("h4",{},indicator.label||indicator.code||"Indicateur"),node("p",{},value),node("p",{class:"muted"},"Couverture : "+coverage),node("p",{class:"muted"},"Qualité : "+(indicator.quality?.class||"non précisée")+" · Statut : "+(indicator.status||"inconnu")),node("p",{class:"muted"},"Période : "+(indicator.period?.from||"—")+" → "+(indicator.period?.to||"—")));
           analysisResults.append(card);
         });
+        const findings=Array.isArray(analysis.findings)?analysis.findings:[];
+        if(findings.length){
+          const counts=findings.reduce((acc,item)=>{acc[item.status]=(acc[item.status]||0)+1;return acc;},{});
+          const suspect=findings.filter(item=>item.status==="suspect");
+          const signalPanel=node("section",{class:"card","aria-live":"polite"});
+          signalPanel.append(node("h4",{},"Signaux statistiques · dépistage temporel"));
+          signalPanel.append(node("p",{class:"muted"},suspect.length
+            ? suspect.length+" écart(s) statistique(s) à examiner. Ce dépistage ne constitue pas un diagnostic biologique."
+            : counts.normal===findings.length
+              ? "Aucun écart statistique atypique détecté dans les séries évaluées."
+              : "Aucun écart atypique confirmé, mais une partie des séries ne dispose pas encore d’un historique suffisant."));
+          suspect.forEach(item=>{
+            const card=node("article",{class:"card"});
+            const score=item.robust_z_score===null||item.robust_z_score===undefined?"non calculable":Number(item.robust_z_score).toFixed(2);
+            const baseline=item.baseline_median===null||item.baseline_median===undefined?"non disponible":Number(item.baseline_median).toFixed(2)+" "+(item.unit||"");
+            card.append(
+              node("h4",{},(item.variable_code||"Variable")+" · "+(item.observed_date||"date inconnue")),
+              node("p",{}, "Valeur observée : "+Number(item.observed_value).toFixed(2)+" "+(item.unit||"")),
+              node("p",{class:"muted"},"Médiane historique : "+baseline+" · MAD : "+(item.baseline_mad===null?"—":Number(item.baseline_mad).toFixed(2))+" · Score robuste : "+score),
+              node("p",{class:"muted"},"Historique : "+(item.history_count??"—")+" observations · couverture : "+Math.round(Number(item.coverage_ratio||0)*100)+" %")
+            );
+            signalPanel.append(card);
+          });
+          const otherStatuses=Object.entries(counts).filter(([status])=>status!=="suspect"&&status!=="normal");
+          if(otherStatuses.length){
+            const details=node("details");
+            details.append(node("summary",{},"Limites de couverture et d’historique"));
+            otherStatuses.forEach(([status,count])=>details.append(node("p",{class:"muted"},status+" : "+count)));
+            signalPanel.append(details);
+          }
+          analysisResults.append(signalPanel);
+        }
         (analysis.source_summary||[]).forEach(source=>{
           analysisResults.append(node("p",{class:"muted"},"Source : "+source.provider_code+" / "+source.dataset_code+" · "+source.observations_count+" observations · "+source.quality_class+" · "+(source.spatial_resolution_m===null?"résolution non précisée":source.spatial_resolution_m+" m")));
         });
