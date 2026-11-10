@@ -77,6 +77,26 @@ jobs:
         run: |
           [ -f .gitignore ] && echo "✓ .gitignore" || exit 1
 
+  environmental-engine:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+          cache-dependency-path: environmental-engine/pyproject.toml
+      - name: Install the environmental engine and test dependencies
+        working-directory: environmental-engine
+        run: python -m pip install -e ".[dev]"
+      - name: Run environmental engine tests
+        working-directory: environmental-engine
+        run: python -m pytest -q
+
   batch-tracker-audit:
     runs-on: ubuntu-latest
     steps:
