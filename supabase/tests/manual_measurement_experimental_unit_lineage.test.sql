@@ -192,7 +192,7 @@ begin
     from public.measurements m
    where m.organization_id = '00000000-0000-0000-0000-0000000000f1'
      and m.event_id = v_event_id;
-  select e.experimental_unit_id
+  select (e.payload->>'experimental_unit_id')::uuid
     into v_event_unit_id
     from public.events e
    where e.organization_id = '00000000-0000-0000-0000-0000000000f1'
