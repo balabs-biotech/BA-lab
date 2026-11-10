@@ -2888,3 +2888,5 @@ body[data-domain] :is(button, input, select, textarea, a, [tabindex]):focus-visi
 #biologicalSignalsCard .signal-lineage-list small { display:block; overflow-wrap:anywhere; }
 #biologicalSignalsCard .signal-lineage-list small { margin-top:4px; color:var(--muted); font-size:11px; }
 #biologicalSignalsCard .signal-lineage-list .signal-lineage-batches { color:var(--text); }
+
+#biologicalSignalsCard .signal-lineage-list .signal-lineage-event { padding-left:8px; border-left:1px solid var(--border-strong); }
