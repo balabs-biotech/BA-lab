@@ -29,6 +29,13 @@ _DAILY_INPUTS: tuple[tuple[str, str], ...] = (
     ("relative_humidity_mean", "%"),
 )
 
+_NET_RADIATION_INPUTS: tuple[tuple[str, str], ...] = (
+    ("air_temperature_max", "degC"),
+    ("air_temperature_min", "degC"),
+    ("solar_radiation_all_sky", "MJ/m2"),
+    ("relative_humidity_mean", "%"),
+)
+
 
 def _quality_class(row: NormalizedEnvironmentalObservation) -> str:
     if row.data_family == "satellite":
@@ -185,18 +192,33 @@ def build_bal_analysis(
             observed=len(result.source_variable_codes),
             ratio=len(result.source_variable_codes) / len(_DAILY_INPUTS),
         )
-        inputs = [
-            IndicatorInput(
-                variable_code=variable,
-                unit=unit,
-                source_observation_ids=(
-                    [selected_by_variable[variable].source_observation_id]
-                    if variable in selected_by_variable else []
-                ),
-            )
-            for variable, unit in _DAILY_INPUTS
+        def build_inputs(input_definitions: tuple[tuple[str, str], ...]) -> list[IndicatorInput]:
+            return [
+                IndicatorInput(
+                    variable_code=variable,
+                    unit=unit,
+                    source_observation_ids=(
+                        [selected_by_variable[variable].source_observation_id]
+                        if variable in selected_by_variable else []
+                    ),
+                )
+                for variable, unit in input_definitions
+            ]
+
+        net_radiation_rows = [
+            selected_by_variable[variable]
+            for variable, _unit in _NET_RADIATION_INPUTS
+            if variable in selected_by_variable
         ]
-        quality = _indicator_quality(result_rows, result.diagnostics)
+        et0_rows = [
+            selected_by_variable[variable]
+            for variable, _unit in _DAILY_INPUTS
+            if variable in selected_by_variable
+        ]
+        net_radiation_inputs = build_inputs(_NET_RADIATION_INPUTS)
+        et0_inputs = build_inputs(_DAILY_INPUTS)
+        net_radiation_quality = _indicator_quality(net_radiation_rows, result.diagnostics)
+        et0_quality = _indicator_quality(et0_rows, result.diagnostics)
         if result.status == "insufficient_data":
             for variable in result.missing_variables:
                 warnings.add(f"INSUFFICIENT_DAILY_INPUT:{result.observed_date.isoformat()}:{variable}")
@@ -222,12 +244,12 @@ def build_bal_analysis(
                     ),
                     status=net_status,
                     coverage=coverage,
-                    quality=quality,
+                    quality=net_radiation_quality,
                     method=IndicatorMethod(
                         name="fao56_net_radiation",
                         version=result.net_radiation.formula_profile if result.net_radiation is not None else "fao56_daily_net_radiation_v1",
                     ),
-                    inputs=inputs,
+                    inputs=net_radiation_inputs,
                 ),
                 Indicator(
                     code="reference_et0_fao56_daily",
@@ -240,12 +262,12 @@ def build_bal_analysis(
                     ),
                     status=et0_status,
                     coverage=coverage,
-                    quality=quality,
+                    quality=et0_quality,
                     method=IndicatorMethod(
                         name="fao56_penman_monteith",
                         version=result.et0.formula_profile if result.et0 is not None else "fao56_penman_monteith_daily_v1",
                     ),
-                    inputs=inputs,
+                    inputs=et0_inputs,
                 ),
             ]
         )
