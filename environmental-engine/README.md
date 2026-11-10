@@ -9,7 +9,8 @@ The engine foundation provides:
 - deterministic daily aggregation with explicit coverage thresholds;
 - BAL-JSON v1 schema validation;
 - explicit climate-variable unit normalization with original-unit provenance;
-- variable-specific plausibility screening that flags suspect values without modifying them.
+- variable-specific plausibility screening that flags suspect values without modifying them;
+- trailing robust temporal anomaly screening with explicit insufficient-history and zero-MAD states.
 
 Derived values remain distinct from source observations. The engine does not
 write calculated values back as sensor measurements. A strict NASA POWER daily-row
@@ -29,4 +30,5 @@ Python 3.10+; CPU-only. See
 `docs/architecture/ba-environmental-unit-registry-v1.md` for canonical units
 and conversion conventions, and `docs/architecture/ba-nasa-power-adapter-v1.md`
 for the provider mapping and daily time semantics, and
-`docs/architecture/ba-environmental-quality-screening-v1.md` for screening rules.
+`docs/architecture/ba-environmental-quality-screening-v1.md` for screening rules, and
+`docs/architecture/ba-environmental-temporal-screening-v1.md` for temporal anomaly semantics.
