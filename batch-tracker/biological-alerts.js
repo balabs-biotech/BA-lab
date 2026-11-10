@@ -23,7 +23,7 @@
     sensor_temporal: "Anomalie temporelle IoT (MAD robuste)"
   };
   const PAGE_SIZE = 100;
-  const state = { userId: null, organizationId: null, domain: null, rows: [], filter: "active", severity: "all", method: "all", variable: "", request: 0, offset: 0, hasMore: false, loading: false };
+  const state = { userId: null, organizationId: null, domain: null, rows: [], filter: "active", severity: "all", method: "all", variable: "", request: 0, offset: 0, hasMore: false, loading: false, historyRequest: 0 };
   const root = document.getElementById("biologicalSignalsCard");
   if (!root) return;
 
@@ -139,9 +139,23 @@
         addAction("Rouvrir", "open");
       }
       footer.append(actions);
+      const historyActions = element("div", "signal-history-actions");
+      if (row.biological_subject_id) {
+        const subjectButton = element("button", "secondary-button", "Historique du sujet");
+        subjectButton.type = "button";
+        subjectButton.addEventListener("click", () => loadHistory("biological_subject_id", row.biological_subject_id, "Sujet biologique"));
+        historyActions.append(subjectButton);
+      }
+      if (row.environment_id) {
+        const environmentButton = element("button", "secondary-button", "Historique de l’environnement");
+        environmentButton.type = "button";
+        environmentButton.addEventListener("click", () => loadHistory("environment_id", row.environment_id, "Environnement"));
+        historyActions.append(environmentButton);
+      }
       card.append(header, detail);
       if (metadata.childNodes.length) card.append(metadata);
       card.append(footer);
+      if (historyActions.childNodes.length) card.append(historyActions);
       list.append(card);
     });
   }
@@ -182,6 +196,47 @@
     notify(state.rows.length + " signal(aux) chargé(s)." + (state.hasMore ? " D’autres signaux sont disponibles." : ""));
   }
 
+  async function loadHistory(kind, id, label) {
+    if (!state.userId || !state.organizationId || !state.domain || !["biological_subject_id", "environment_id"].includes(kind)) return;
+    const request = ++state.historyRequest;
+    const panel = $("signalsHistory");
+    panel.classList.remove("hidden");
+    $("signalsHistoryTitle").textContent = "Historique — " + label;
+    $("signalsHistoryList").replaceChildren(element("p", "signals-empty", "Chargement de l’historique…"));
+    panel.scrollIntoView({ behavior: "smooth", block: "start" });
+    const { data, error } = await client.from("biological_signals")
+      .select("signal_id,signal_code,severity,variable_code,observed_date,observed_value,unit,analysis_method,signal_status,first_seen_at,rule_id")
+      .eq("organization_id", state.organizationId).eq("domain", state.domain).eq(kind, id)
+      .order("observed_date", { ascending: false }).order("first_seen_at", { ascending: false }).limit(50);
+    if (request !== state.historyRequest) return;
+    const list = $("signalsHistoryList");
+    list.replaceChildren();
+    if (error) {
+      console.error("[CultureOps signals] History read failed", error.message);
+      list.append(element("p", "signals-empty", "Impossible de charger cet historique. Vérifiez les droits d’accès et la connexion."));
+      return;
+    }
+    if (!data?.length) {
+      list.append(element("p", "signals-empty", "Aucun historique disponible pour ce contexte."));
+      return;
+    }
+    data.forEach(item => {
+      const entry = element("article", "signal-history-entry");
+      const heading = element("div", "signal-history-heading");
+      heading.append(element("strong", "", item.signal_code || "Signal biologique"), element("span", "signal-state", labels[item.signal_status] || item.signal_status));
+      const detail = element("p", "", [item.observed_date, item.variable_code, item.observed_value === null ? null : String(item.observed_value) + (item.unit ? " " + item.unit : ""), severityLabels[item.severity] || item.severity, methodLabels[item.analysis_method] || item.analysis_method].filter(Boolean).join(" · "));
+      entry.append(heading, detail, element("small", "", "Règle : " + (item.rule_id || "—") + " · Détecté : " + dateLabel(item.first_seen_at)));
+      list.append(entry);
+    });
+    $("signalsHistoryStatus").textContent = data.length === 50 ? "50 événements affichés au maximum." : data.length + " événement(s) dans cet historique.";
+  }
+
+  $("signalsHistoryClose").addEventListener("click", () => {
+    state.historyRequest++;
+    $("signalsHistory").classList.add("hidden");
+    $("signalsHistoryList").replaceChildren();
+  });
+
   async function changeStatus(signalId, nextStatus, button) {
     if (!state.organizationId || button.disabled) return;
     button.disabled = true;
@@ -209,6 +264,8 @@
     state.rows = [];
     state.offset = 0;
     state.hasMore = false;
+    state.historyRequest++;
+    $("signalsHistory").classList.add("hidden");
     if (!state.userId) {
       root.classList.add("hidden");
       return;
@@ -258,6 +315,8 @@
     state.loading = false;
     state.organizationId = event.detail?.organizationId || null;
     state.userId = event.detail?.userId || null;
+    state.historyRequest++;
+    $("signalsHistory").classList.add("hidden");
     if (!state.userId) {
       state.rows = [];
       state.offset = 0;
@@ -285,6 +344,8 @@
     state.request++;
     state.loading = false;
     state.domain = domainByWorkspace[nextDomain] || null;
+    state.historyRequest++;
+    $("signalsHistory").classList.add("hidden");
     state.rows = [];
     state.offset = 0;
     state.hasMore = false;
