@@ -126,3 +126,9 @@ def test_execution_service_requires_weather_observations():
 
     with pytest.raises(ValueError, match="at least one weather observation"):
         run(satellite_rows)
+
+
+def test_execution_service_rejects_rolling_window_larger_than_scope():
+    rows = observations_for_days()
+    with pytest.raises(ValueError, match="full length of every rolling window"):
+        run(rows, rolling_methods={"air_temperature_mean": "mean"})
