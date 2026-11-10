@@ -89,6 +89,14 @@ def test_rejects_duplicate_source_keys_without_silently_collapsing_rows():
 
     assert len(duplicates) == 1
     assert duplicates[0].count == 2
+    assert duplicates[0].key == (
+        "a08a9c31-7fd8-4e6c-9b84-2e99d0f1a002",
+        "b08a9c31-7fd8-4e6c-9b84-2e99d0f1a003",
+        "NASA_POWER",
+        "POWER_DAILY_AGRO",
+        "precipitation_corrected",
+        "2026-10-19T12:00:00+00:00",
+    )
 
 
 def test_normalized_observation_retains_provider_independent_context():
