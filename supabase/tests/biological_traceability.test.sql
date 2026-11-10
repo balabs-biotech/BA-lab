@@ -397,8 +397,6 @@ select 'PASS: biological traceability runtime, lineage, RLS boundary, input vali
 -- Idempotency regression: a retry after an unknown client outcome must return
 -- the original result without creating another operation or descendant.
 \i supabase/migrations/20261109100000_add_biological_operation_idempotency.sql
-\i supabase/migrations/20261111120000_create_experiment_with_units_rpc.sql
-
 -- Experiment setup is atomic, idempotent and append-traceable.
 set role authenticated;
 do $experiment_setup$
@@ -409,6 +407,9 @@ declare
   request_key uuid := '00000000-0000-0000-0000-0000000000c5';
   fixed_time timestamptz := '2026-11-10T09:00:00Z';
 begin
+  if to_regprocedure('public.create_experiment_with_units(uuid,text,text,jsonb,jsonb,uuid,timestamptz)') is null then
+    raise exception 'FAIL: atomic experiment setup RPC is missing';
+  end if;
   first_response := public.create_experiment_with_units(
     '00000000-0000-0000-0000-0000000000a1',
     'EXP-RESULT-001',
