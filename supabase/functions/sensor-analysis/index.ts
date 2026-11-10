@@ -155,6 +155,21 @@ Deno.serve(async (req: Request) => {
       return reply(422, { error: "expected_interval_seconds_must_be_positive_integer" });
     }
 
+    const flatlineMinimumObservations = body.flatline_minimum_repeated_observations;
+    const flatlineMinimumDurationSeconds = body.flatline_minimum_duration_seconds;
+    const flatlineOptions = [flatlineMinimumObservations, flatlineMinimumDurationSeconds];
+    if (flatlineOptions.some((value) => value !== undefined)) {
+      if (
+        !Number.isSafeInteger(flatlineMinimumObservations) ||
+        flatlineMinimumObservations < 2 || flatlineMinimumObservations > MAX_ROWS ||
+        !Number.isSafeInteger(flatlineMinimumDurationSeconds) ||
+        flatlineMinimumDurationSeconds <= 0 ||
+        flatlineMinimumDurationSeconds > MAX_TEMPORAL_WINDOW_SECONDS
+      ) {
+        return reply(422, { error: "flatline_diagnostic_parameters_must_be_supplied_together_and_within_limits" });
+      }
+    }
+
     const temporalWindowSeconds = body.temporal_window_seconds;
     const temporalMinimumHistory = body.temporal_minimum_history;
     const temporalThreshold = body.temporal_threshold;
@@ -413,6 +428,8 @@ Deno.serve(async (req: Request) => {
         temporal_window_seconds: temporalWindowSeconds,
         temporal_minimum_history: temporalMinimumHistory,
         temporal_threshold: temporalThreshold,
+        flatline_minimum_repeated_observations: flatlineMinimumObservations,
+        flatline_minimum_duration_seconds: flatlineMinimumDurationSeconds,
         biological_interpretation: biologicalInterpretationPayload,
         measurements: sensorMeasurements,
       }),
