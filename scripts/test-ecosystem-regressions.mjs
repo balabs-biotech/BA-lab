@@ -7,8 +7,8 @@ const engine = readFileSync('ecosystem/engine-v2.js', 'utf8');
 const previewEngine = readFileSync('ecosystem-preview/engine-v2.js', 'utf8');
 const expectedDomains = ['bio', 'myco', 'soil', 'lab', 'products', 'iot', 'work', 'learn'];
 
-assert.ok(html.includes('engine-v2.js?v=20261110-branch-dock-v32'), 'Public explorer must load the cache-busted screen-space label engine');
-assert.ok(previewHtml.includes('engine-v2.js?v=20261110-branch-dock-v33'), 'Preview must load the matching cache-busted label engine');
+assert.ok(html.includes('engine-v2.js?v=20261110-branch-dock-v32-nodefix'), 'Public explorer must load the cache-busted screen-space label engine');
+assert.ok(previewHtml.includes('engine-v2.js?v=20261110-branch-dock-v33-nodefix'), 'Preview must load the matching cache-busted label engine');
 assert.ok(engine.includes('function syncLabelScales()') && engine.includes('cameraDistance*projection*targetPixels'), '3D labels must keep a stable screen-space size across zoom levels');
 assert.ok(engine.includes('resourceHitTargets.set(label,element)'), 'Public branch labels must have real DOM hit targets');
 assert.ok(engine.includes('domainHitTargets.set(id,{object:hit,button:domainButton})'), 'Public universes must have real clickable hit targets');
@@ -17,6 +17,7 @@ assert.ok(previewEngine.includes('resourceHitTargets.set(label,element)') && pre
 assert.ok(engine.includes('function renderBranchDock()') && engine.includes('webgl-branch-dock') && engine.includes('openResource(item)'), 'Public engine must expose visible, recursively navigable branch and sub-branch controls');
 assert.ok(engine.includes(".webgl-hit-target,.webgl-branch-dock") && previewEngine.includes(".webgl-hit-target,.webgl-branch-dock"), 'Document-level canvas picking must ignore branch dock clicks to prevent duplicate or incorrect navigation');
 assert.ok(engine.includes("event.stopPropagation();openResource(item)") && previewEngine.includes("event.stopPropagation();openResource(item)"), 'Branch dock must navigate with the exact Notion tree node to preserve nested identity and camera anchors');
+assert.ok(engine.includes('sourceItem:item') && previewEngine.includes('sourceItem:item') && engine.includes('candidate?.sourceItem===data') && previewEngine.includes('candidate?.sourceItem===data'), 'Raw branch dock nodes must resolve to their positioned spatial node before camera navigation');
 assert.ok(engine.includes('branchDock.hidden=true;stage.append(branchDock)') && previewEngine.includes('branchDock.hidden=true;stage.append(branchDock)'), 'Branch navigation dock must share the stage stacking context so it reliably receives mobile taps above spatial hit targets');
 assert.ok(engine.includes('z-index:2147483647!important') && previewEngine.includes('z-index:2147483647!important'), 'Branch dock must stack above projected 3D hit targets so actual pointer events reach its controls');
 assert.ok(engine.includes('z-index:2147483647!important') && previewEngine.includes('z-index:2147483647!important'), 'Branch dock must be above the high-z-index projected spatial hit targets');
