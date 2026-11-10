@@ -2851,3 +2851,23 @@ body[data-domain] :is(button, input, select, textarea, a, [tabindex]):focus-visi
 
 #biologicalSignalsCard #signalsLoadMore { margin:14px auto 0; display:block; }
 #biologicalSignalsCard #signalsLoadMore.hidden { display:none; }
+
+
+/* Longitudinal biological history panel. */
+#biologicalSignalsCard .signals-history {
+  margin-top:20px; padding:18px; border:1px solid var(--border);
+  border-radius:12px; background:var(--surface-2);
+}
+#biologicalSignalsCard .signals-history-heading,
+#biologicalSignalsCard .signal-history-heading {
+  display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;
+}
+#biologicalSignalsCard .signals-history-heading h3 { margin:0; font-size:16px; }
+#biologicalSignalsCard .signals-history-list { display:grid; gap:9px; }
+#biologicalSignalsCard .signal-history-entry {
+  padding:12px; border:1px solid var(--border); border-radius:9px; background:var(--surface);
+}
+#biologicalSignalsCard .signal-history-entry p { margin:7px 0; font-size:12px; overflow-wrap:anywhere; }
+#biologicalSignalsCard .signal-history-entry small { color:var(--muted); font-size:11px; }
+#biologicalSignalsCard .signal-history-actions { display:flex; flex-wrap:wrap; gap:8px; margin-top:10px; }
+#biologicalSignalsCard .signal-history-actions button { font-size:11px; padding:7px 10px; }
