@@ -7,8 +7,8 @@ const engine = readFileSync('ecosystem/engine-v2.js', 'utf8');
 const previewEngine = readFileSync('ecosystem-preview/engine-v2.js', 'utf8');
 const expectedDomains = ['bio', 'myco', 'soil', 'lab', 'products', 'iot', 'work', 'learn'];
 
-assert.ok(html.includes('engine-v2.js?v=20261110-branch-dock-v41-nav-trace'), 'Public explorer must load the cache-busted screen-space label engine');
-assert.ok(previewHtml.includes('engine-v2.js?v=20261110-branch-dock-v42-nav-trace'), 'Preview must load the matching cache-busted label engine');
+assert.ok(html.includes('engine-v2.js?v=20261110-two-finger-pan-v43'), 'Public explorer must load the cache-busted screen-space label engine');
+assert.ok(previewHtml.includes('engine-v2.js?v=20261110-two-finger-pan-v44'), 'Preview must load the matching cache-busted label engine');
 assert.ok(engine.includes('function syncLabelScales()') && engine.includes('cameraDistance*projection*targetPixels'), '3D labels must keep a stable screen-space size across zoom levels');
 assert.ok(engine.includes('resourceHitTargets.set(label,element)'), 'Public branch labels must have real DOM hit targets');
 assert.ok(engine.includes('domainHitTargets.set(id,{object:hit,button:domainButton})'), 'Public universes must have real clickable hit targets');
@@ -22,11 +22,13 @@ assert.ok(engine.includes('sourceItem:item') && previewEngine.includes('sourceIt
 assert.ok(engine.includes('branchDock.hidden=true;stage.append(branchDock)') && previewEngine.includes('branchDock.hidden=true;stage.append(branchDock)'), 'Branch navigation dock must share the stage stacking context so it reliably receives mobile taps above spatial hit targets');
 assert.ok(engine.includes('z-index:2147483647!important') && previewEngine.includes('z-index:2147483647!important'), 'Branch dock must stack above projected 3D hit targets so actual pointer events reach its controls');
 assert.ok(engine.includes('z-index:2147483647!important') && previewEngine.includes('z-index:2147483647!important'), 'Branch dock must be above the high-z-index projected spatial hit targets');
-assert.ok(engine.includes(".webgl-hit-target,.webgl-branch-dock'))return") && previewEngine.includes(".webgl-hit-target,.webgl-controls,.webgl-focus,.webgl-intro,.webgl-branch-dock'))return") && engine.includes(".webgl-hit-target,.webgl-branch-dock')){touchFallback=null;return}") && previewEngine.includes(".webgl-hit-target,.webgl-branch-dock')){touchFallback=null;return}"), 'Stage pointer capture and touch fallback must leave branch dock taps to native buttons');
+assert.ok(engine.includes(".webgl-hit-target,.webgl-branch-dock'))return") && previewEngine.includes(".webgl-branch-dock'))return") && engine.includes(".webgl-hit-target,.webgl-branch-dock')){touchFallback=null;return}") && previewEngine.includes(".webgl-hit-target,.webgl-branch-dock')){touchFallback=null;return}"), 'Stage pointer capture and touch fallback must leave branch dock taps to native buttons');
 assert.ok(previewEngine.includes('function renderBranchDock()') && previewEngine.includes('webgl-branch-dock') && previewEngine.includes('openResource(item)'), 'Preview engine must expose visible, recursively navigable branch and sub-branch controls');
 assert.ok(engine.includes('let distance = 13.5, zoomTargetDistance = 13.5') && engine.includes('const blend=1-Math.exp(-dt*13)'), 'Public camera zoom must ease smoothly toward its target instead of stepping instantly');
 assert.ok(previewEngine.includes('let distance = 13.5, zoomTargetDistance = 13.5') && previewEngine.includes('const blend=1-Math.exp(-dt*13)'), 'Preview camera zoom must use the same smooth easing');
 assert.ok(previewEngine.includes('function syncLabelScales()') && previewEngine.includes('cameraDistance*projection*targetPixels') && previewEngine.includes('syncLabelScales();'), 'Preview labels must keep the same stable screen-space size across zoom levels');
+assert.ok(engine.includes('function panCameraByPixels(dx,dy)') && previewEngine.includes('function panCameraByPixels(dx,dy)'), 'Both 3D engines must translate the complete camera view when a two-finger gesture moves the map');
+assert.ok(engine.includes('pinchCenter') && previewEngine.includes('pinchCenter') && engine.includes('panCameraByPixels(dx,dy)') && previewEngine.includes('panCameraByPixels(dx,dy)'), 'Two-finger touch must pan from the gesture centre while preserving pinch zoom');
 assert.ok(!html.includes('constellation-3d.js?v='), 'Legacy monolithic engine must no longer be loaded');
 assert.ok(engine.includes("const IDS = ['bio','myco','soil','lab','products','iot','work','learn']"), 'The clean engine must own the complete eight-domain registry');
 const htmlDomains = [...html.matchAll(/<button[^>]*data-sphere="([^"]+)"/g)].map(match => match[1]);
