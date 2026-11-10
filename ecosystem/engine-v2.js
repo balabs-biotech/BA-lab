@@ -49,7 +49,7 @@ let opened = false, raf = 0, lastFrame = 0, dragging = false, moved = false, dra
 let lastPointer = null, pointers = new Map(), pinchStart = 0, pinchDistance = 0, pinchCenter = null, hoverId = null , lastBranchTouchActivationAt = 0;
 let canvasRect = null, cameraInitialized = false, lastPickAt = 0;
 let _hitWorld = null;
-let labelWorldPosition = null;
+let labelWorldPosition = null, activeResourceLabelDepth = 0;
 
 function addStyles() {
   const style = document.createElement('style');
@@ -247,11 +247,11 @@ function clearResources() {
 }
 function mDispose(material){material?.map?.dispose();material?.dispose?.()}
 function visibleResourceLabelDepth() {
- // Keep the current branches named, then reveal each deeper layer as the user zooms in.
- if(distance<=4.2)return 3;
- if(distance<=4.8)return 2;
- if(distance<=5.5)return 1;
- return 0;
+ // Hysteresis prevents labels flickering when pinch/scroll settles on a zoom boundary.
+ const thresholds=[5.5,4.8,4.2],margin=.14;
+ while(activeResourceLabelDepth<3&&distance<=thresholds[activeResourceLabelDepth]-margin)activeResourceLabelDepth++;
+ while(activeResourceLabelDepth>0&&distance>thresholds[activeResourceLabelDepth-1]+margin)activeResourceLabelDepth--;
+ return activeResourceLabelDepth;
 }
 function makeResourceLabel(item,color,depth=0) {
  const size=depth===0?18:depth===1?16:14,label=makeLabel(item.title,color,size);label.material.opacity=0;
@@ -345,6 +345,7 @@ function navigateToStack(index) {
   buildResources(selected,currentNode,currentAnchor);smoothCamera(currentAnchor,6.2,650);
 }
 function buildResources(id,parentNode=null,anchor=null) {
+ activeResourceLabelDepth=0;
  clearResources();const domain=manifest?.domains?.find(d=>d.id===id);
  if(!domain){
    // The eighth public universe is reserved in the 3D taxonomy, but its Notion page
