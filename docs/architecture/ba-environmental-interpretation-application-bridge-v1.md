@@ -69,6 +69,23 @@ The SQL contract test covers RLS, anonymous-role denial, tenant/environment sens
 
 This is repository work only. The migration has not been applied to the live BALabs Supabase project, and the SQL contract test has not yet been executed on a PostgreSQL runner.
 
+## Python profile resolver
+
+The engine now has a read-only `SupabaseEnvironmentalProfileRepository` adapter. It resolves only active or retired versions whose effective interval covers the complete analysis window. It joins the physical environment location and normalized sensor bindings, then validates them through the existing Pydantic `EnvironmentContext` contract.
+
+The `domain_profile_from_record` mapper validates each persisted JSON rule against `InterpretationRule`; the resulting `DomainProfile` is therefore typed before evaluation.
+
+The `interpret_persisted_analysis_with_profiles` orchestration function now resolves, in order:
+
+1. the biological context for the requested tenant, domain, subject, and complete analysis period;
+2. the environment profile referenced by that biological context;
+3. the active or historical domain rule profile for that context's domain;
+4. the interpretation after tenant, location, environment, domain, and validity checks.
+
+The application supplies only the requested domain and subject identifier. It does not select a profile version or submit rules. The domain profile is selected from the persisted biological context after the context has been resolved.
+
+The adapter is database-client agnostic and receives an already-authenticated Supabase client. It does not import the Supabase SDK, read credentials, or perform authentication.
+
 ## Required persistence before end-to-end interpretation
 
 Before enabling the target contract, define and migrate:
