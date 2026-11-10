@@ -49,8 +49,6 @@ assert.match(source, /enginePayload\.biological_interpretation\s*=\s*interpretat
 assert.match(source, /environment_context:\s*\{[\s\S]*?context_id:\s*environmentProfile\.environment_id/, "the engine context identity must reference environments.id, not the profile-version row ID");
 assert.match(source, /interpretation_status:\s*interpretationResolution\.status\s*===\s*"ready"/, "the gateway must preserve explicit interpretation status");
 
-console.log("PASS: environmental analysis gateway security contract");
-
 const signalPersistence = source.indexOf('.from("biological_signals")');
 assert.ok(signalPersistence > engineCall, "engine-generated signals must only be persisted after the private engine responds");
 assert.match(source, /adminClient\s*\.from\("biological_signals"\)[\s\S]*?\.upsert\(/, "signal persistence must use the trusted service-role client and idempotent upsert");
@@ -60,3 +58,5 @@ assert.match(source, /biological_signal_persistence_failed/, "persistence failur
 
 assert.match(source, /analysis_method: "environmental_daily"/, "NASA POWER signals must retain their daily climate analysis method");
 assert.match(source, /analysis_evidence: signal\.evidence \?\? \{\}/, "environmental signal evidence must be persisted");
+
+console.log("PASS: environmental analysis gateway security contract");
