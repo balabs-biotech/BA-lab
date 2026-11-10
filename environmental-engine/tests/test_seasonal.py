@@ -11,7 +11,7 @@ from ba_environmental_engine.quality.seasonal import (
 def observations():
     rows = []
     for year, base in [(2022, 10.0), (2023, 10.5), (2024, 9.8), (2025, 10.2)]:
-        for day in range(1, 32):
+        for day in range(1, 31):
             rows.append(DailySeasonalObservation(date(year, 6, day), base + (day % 3) * 0.1))
     rows.append(DailySeasonalObservation(date(2026, 6, 15), 30.0))
     return rows
