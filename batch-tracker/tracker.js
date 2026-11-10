@@ -231,6 +231,8 @@ const cultureTypeSelect =
 
 const protocolSelect =
   document.getElementById("protocol");
+const cultureExperimentSelect = document.getElementById("cultureExperimentId");
+const cultureExperimentalUnitSelect = document.getElementById("cultureExperimentalUnitId");
 
 const startedAtInput =
   document.getElementById("startedAt");
@@ -2008,6 +2010,11 @@ async function createCulture() {
 
 
     if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) throw new Error("Session ou espace de travail modifié pendant l’opération. Recommencez.");
+    const selectedExperimentId = cultureExperimentSelect?.value || "";
+    const selectedExperimentalUnitId = cultureExperimentalUnitSelect?.value || "";
+    if (Boolean(selectedExperimentId) !== Boolean(selectedExperimentalUnitId)) {
+      throw new Error("Pour rattacher une culture à une expérience, sélectionnez à la fois l’expérience et son unité expérimentale.");
+    }
     const cultureGenerationPayload = {
       p_organization_id: operationOrganizationId,
       p_code: cultureCode,
@@ -2016,8 +2023,8 @@ async function createCulture() {
       p_parent_culture_id: null,
       p_protocol_version_id: protocolVersionId,
       p_environment_id: null,
-      p_experiment_id: null,
-      p_experimental_unit_id: null,
+      p_experiment_id: selectedExperimentId || null,
+      p_experimental_unit_id: selectedExperimentalUnitId || null,
       p_started_at: startedAt ? new Date(startedAt).toISOString() : null,
       p_metadata: {
         source: "BA Labs Culture Tracker",
@@ -5154,6 +5161,8 @@ const experimentRegistryList = document.getElementById("experimentRegistryList")
 const experimentRegistryStatus = document.getElementById("experimentRegistryStatus");
 let experimentUnitRowSequence = 0;
 let pendingExperimentOccurredAt = null;
+let experimentRegistryRows = [];
+let experimentalUnitRegistryRows = [];
 
 function addExperimentUnitRow(values = {}) {
   if (!experimentUnitRows || experimentUnitRows.children.length >= 200) return;
@@ -5168,6 +5177,33 @@ function addExperimentUnitRow(values = {}) {
   `;
   experimentUnitRows.appendChild(row);
 }
+
+
+function populateCultureExperimentOptions() {
+  if (!cultureExperimentSelect || !cultureExperimentalUnitSelect) return;
+  const selectedExperimentId = cultureExperimentSelect.value;
+  cultureExperimentSelect.replaceChildren(new Option("Aucune expérience", ""));
+  for (const experiment of experimentRegistryRows) {
+    cultureExperimentSelect.add(new Option(`${experiment.code} — ${experiment.name}`, experiment.id));
+  }
+  if (experimentRegistryRows.some(item => item.id === selectedExperimentId)) cultureExperimentSelect.value = selectedExperimentId;
+  populateCultureExperimentalUnitOptions();
+}
+
+function populateCultureExperimentalUnitOptions() {
+  if (!cultureExperimentSelect || !cultureExperimentalUnitSelect) return;
+  const experimentId = cultureExperimentSelect.value;
+  const previousUnitId = cultureExperimentalUnitSelect.value;
+  cultureExperimentalUnitSelect.replaceChildren(new Option("Aucune unité", ""));
+  for (const unit of experimentalUnitRegistryRows.filter(item => item.experiment_id === experimentId)) {
+    const details = [unit.treatment_code, unit.replicate_no ? `R${unit.replicate_no}` : null].filter(Boolean).join(" · ");
+    cultureExperimentalUnitSelect.add(new Option(`${unit.unit_code}${details ? " — " + details : ""}`, unit.id));
+  }
+  cultureExperimentalUnitSelect.disabled = !experimentId;
+  if ([...cultureExperimentalUnitSelect.options].some(option => option.value === previousUnitId)) cultureExperimentalUnitSelect.value = previousUnitId;
+}
+
+cultureExperimentSelect?.addEventListener("change", populateCultureExperimentalUnitOptions);
 
 function renderExperimentRegistry(experiments, units) {
   if (!experimentRegistryList) return;
@@ -5228,7 +5264,10 @@ async function loadExperimentRegistry() {
     if (experimentResult.error) throw experimentResult.error;
     if (unitResult.error) throw unitResult.error;
     if (!isCurrentWorkspaceRevision(revision, orgId)) return;
-    renderExperimentRegistry(experimentResult.data || [], unitResult.data || []);
+    experimentRegistryRows = experimentResult.data || [];
+    experimentalUnitRegistryRows = unitResult.data || [];
+    populateCultureExperimentOptions();
+    renderExperimentRegistry(experimentRegistryRows, experimentalUnitRegistryRows);
     if (experimentRegistryStatus) experimentRegistryStatus.textContent = `${(experimentResult.data || []).length} expérience(s) · ${(unitResult.data || []).length} unité(s) chargée(s).`;
   } catch (error) {
     if (!isCurrentWorkspaceRevision(revision, orgId)) return;
