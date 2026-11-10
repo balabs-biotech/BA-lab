@@ -106,10 +106,7 @@ class SupabaseEnvironmentalProfileRepository:
             raise LookupError(f"no versioned profile covers the complete {profile_kind} scope")
         if len(rows) > 1:
             raise ValueError(f"multiple versioned profiles cover the {profile_kind} scope")
-        record = rows[0]
-        if record["valid_from"] > record.get("_scope_from", record["valid_from"]):
-            raise ValueError("profile validity does not cover the requested start date")
-        return record
+        return rows[0]
 
     def get_environment_profile_for_scope(
         self,
@@ -135,7 +132,9 @@ class SupabaseEnvironmentalProfileRepository:
         record = self._one_profile(
             self._data(response), profile_kind="environment"
         )
-        if record.get("valid_to") is not None and record["valid_to"] < to_date:
+        if record["valid_from"] > from_date or (
+            record.get("valid_to") is not None and record["valid_to"] < to_date
+        ):
             raise LookupError("no versioned profile covers the complete environment scope")
         return environment_context_from_record(record)
 
@@ -165,6 +164,8 @@ class SupabaseEnvironmentalProfileRepository:
         )
         if record["domain"] != domain.value:
             raise ValueError("persisted domain profile does not match requested domain")
-        if record.get("valid_to") is not None and record["valid_to"] < to_date:
+        if record["valid_from"] > from_date or (
+            record.get("valid_to") is not None and record["valid_to"] < to_date
+        ):
             raise LookupError("no versioned profile covers the complete domain scope")
         return domain_profile_from_record(record)
