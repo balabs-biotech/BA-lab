@@ -169,3 +169,11 @@ the repository implementation after authenticating and authorizing the caller.
 Four orchestration tests were added for successful resolution, missing context,
 partial validity coverage, and overlapping contexts. These tests are written
 but remain unexecuted on the current branch HEAD.
+
+
+The repository now provides `list_overlapping_scope`, which pushes the
+validity-window predicate into PostgREST instead of downloading the subject's
+entire context history. It filters by tenant, domain, typed subject, and
+`valid_from <= scope.to`, together with
+`valid_to IS NULL OR valid_to >= scope.from`. The interpretation service
+uses this bounded query through its repository protocol.
