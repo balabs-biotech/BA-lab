@@ -43,6 +43,10 @@ The API rejects cross-organization/location observations, dates outside the decl
 
 Success returns a validated BAL-JSON v1 analysis envelope. Invalid requests return 422, invalid credentials return 401, and a missing server-side secret returns 503. The service does not persist results or create a background queue in this milestone.
 
+### `POST /v1/analyses/nasa-power`
+
+This provider-specific ingestion boundary accepts persisted `environmental_observations` rows using the database column names (`id`, `unit_code`, `metadata`, and so on). It passes each row through the Python `normalize_nasa_power_observation` adapter before execution. The adapter validates the provider, dataset, parameter-to-variable mapping, original unit, source date, timestamp semantics and source identifiers, then converts to canonical units while retaining source provenance. This lets Supabase remain a transport and authorization gateway instead of duplicating scientific normalization in TypeScript.
+
 ## Execution model
 
 The first API version is synchronous and stateless. analysis_id is the execution identifier, and the HTTP response is the result. This is intentional: the current calculations are bounded CPU work, while a durable job queue would introduce storage, retries, cancellation and lifecycle semantics that are not yet required.
