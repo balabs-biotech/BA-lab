@@ -10,10 +10,18 @@ from .biological_performance import (
     analyze_extent_growth_rate,
 )
 from .measurement_adapter import measurement_row_to_biological_measurement
+from .biological_pipeline import (
+    BiologicalAnalysisPipelineResult,
+    RejectedMeasurementRow,
+    analyze_measurement_rows,
+)
 
 __all__ = [
     "BiologicalMeasurement",
     "BiologicalPerformanceResult",
     "analyze_extent_growth_rate",
     "measurement_row_to_biological_measurement",
+    "BiologicalAnalysisPipelineResult",
+    "RejectedMeasurementRow",
+    "analyze_measurement_rows",
 ]
