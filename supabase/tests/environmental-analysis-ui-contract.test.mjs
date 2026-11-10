@@ -20,3 +20,8 @@ assert.match(source, /indicator\.quality/, "indicator quality must be rendered")
 assert.match(source, /analysis\.source_summary/, "source provenance summary must be rendered");
 assert.match(source, /analysis\.warnings/, "scientific warnings must be visible");
 console.log("PASS: Green Tech environmental analysis UI contract");
+
+assert.match(source, /analysis\.findings/, "temporal findings must be consumed by the Green Tech UI");
+assert.match(source, /Signaux statistiques/, "the UI must label statistical findings separately from biological diagnoses");
+assert.match(source, /robust_z_score/, "suspect findings must expose their robust score");
+assert.match(source, /insufficient_history/, "the UI must distinguish insufficient history from normal results");
