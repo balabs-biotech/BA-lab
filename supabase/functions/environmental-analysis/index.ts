@@ -120,7 +120,7 @@ Deno.serve(async (req: Request) => {
     // This RLS-scoped lookup proves the caller can see this location.
     const { data: location, error: locationError } = await userClient
       .from("locations")
-      .select("id, organization_id, latitude, longitude, metadata")
+      .select("id, organization_id, latitude, longitude, altitude_m")
       .eq("id", locationId)
       .maybeSingle();
     if (locationError || !location) return reply(404, { error: "location_not_found_or_access_denied" });
@@ -142,8 +142,7 @@ Deno.serve(async (req: Request) => {
         location.longitude < -180 || location.longitude > 180) {
       return reply(422, { error: "valid_location_coordinates_required" });
     }
-    const metadata = location.metadata && typeof location.metadata === "object" ? location.metadata : {};
-    const altitude = metadata.altitude_m;
+    const altitude = location.altitude_m;
     if (typeof altitude !== "number" || !Number.isFinite(altitude) || altitude < -500 || altitude > 9000) {
       return reply(422, { error: "location_altitude_m_required_in_location_metadata" });
     }
