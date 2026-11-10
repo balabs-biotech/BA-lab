@@ -104,6 +104,9 @@ def validate_biological_context_for_analysis(
     analysis_from = analysis_scope.from_date
     analysis_to = analysis_scope.to_date
     context_to = biological_context.valid_to or date.max
-    if analysis_to < biological_context.valid_from or analysis_from > context_to:
-        raise ValueError("analysis scope does not overlap biological context validity")
+    if (
+        biological_context.valid_from > analysis_from
+        or context_to < analysis_to
+    ):
+        raise ValueError("biological context must cover the complete analysis scope")
     return biological_context
