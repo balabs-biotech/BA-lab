@@ -12,7 +12,6 @@ create table public.environment_context_profiles (
   label text not null check (length(btrim(label)) between 1 and 120),
   timezone text not null check (length(btrim(timezone)) between 1 and 64),
   origin text not null check (origin in ('sensor', 'weather_provider', 'satellite', 'manual')),
-  sensor_ids uuid[] not null default '{}'::uuid[],
   valid_from date not null,
   valid_to date,
   status text not null default 'draft' check (status in ('draft', 'active', 'retired')),
@@ -26,18 +25,77 @@ create table public.environment_context_profiles (
     references public.environments (organization_id, id) on delete restrict,
   constraint environment_context_profiles_version_key
     unique (organization_id, environment_id, profile_code, profile_version),
+  constraint environment_context_profiles_sensor_parent_key
+    unique (organization_id, id, environment_id),
   constraint environment_context_profiles_validity_check
     check (valid_to is null or valid_to >= valid_from),
-  constraint environment_context_profiles_sensor_array_check
-    check (array_position(sensor_ids, null) is null),
-  constraint environment_context_profiles_sensor_origin_check
-    check (
-      (origin = 'sensor' and cardinality(sensor_ids) > 0)
-      or (origin <> 'sensor' and cardinality(sensor_ids) = 0)
-    ),
   constraint environment_context_profiles_gridded_origin_check
     check (origin not in ('weather_provider', 'satellite') or context_type = 'outdoor')
 );
+
+
+-- Normalize sensor bindings so tenant and environment identity are enforced by
+-- composite foreign keys rather than an unvalidated UUID array.
+alter table public.iot_devices
+  add constraint iot_devices_org_environment_id_key
+  unique (organization_id, environment_id, id);
+
+create table public.environment_context_profile_sensors (
+  organization_id uuid not null,
+  profile_id uuid not null,
+  environment_id uuid not null,
+  sensor_id uuid not null,
+  created_at timestamptz not null default now(),
+  primary key (organization_id, profile_id, sensor_id),
+  constraint environment_context_profile_sensors_profile_fk
+    foreign key (organization_id, profile_id, environment_id)
+    references public.environment_context_profiles (organization_id, id, environment_id)
+    on delete cascade,
+  constraint environment_context_profile_sensors_device_fk
+    foreign key (organization_id, environment_id, sensor_id)
+    references public.iot_devices (organization_id, environment_id, id)
+    on delete restrict
+);
+
+create index environment_context_profile_sensors_device_idx
+  on public.environment_context_profile_sensors (organization_id, environment_id, sensor_id);
+
+alter table public.environment_context_profile_sensors enable row level security;
+create policy environment_context_profile_sensors_select
+  on public.environment_context_profile_sensors
+  for select to authenticated
+  using (private.is_org_member(organization_id));
+create policy environment_context_profile_sensors_insert
+  on public.environment_context_profile_sensors
+  for insert to authenticated
+  with check (
+    private.is_org_writer(organization_id)
+    and exists (
+      select 1 from public.environment_context_profiles p
+       where p.organization_id = environment_context_profile_sensors.organization_id
+         and p.id = environment_context_profile_sensors.profile_id
+         and p.environment_id = environment_context_profile_sensors.environment_id
+         and p.status = 'draft'
+         and p.origin = 'sensor'
+    )
+  );
+create policy environment_context_profile_sensors_delete
+  on public.environment_context_profile_sensors
+  for delete to authenticated
+  using (
+    private.is_org_writer(organization_id)
+    and exists (
+      select 1 from public.environment_context_profiles p
+       where p.organization_id = environment_context_profile_sensors.organization_id
+         and p.id = environment_context_profile_sensors.profile_id
+         and p.environment_id = environment_context_profile_sensors.environment_id
+         and p.status = 'draft'
+    )
+  );
+
+revoke all on public.environment_context_profile_sensors from public, anon;
+grant select, insert, delete on public.environment_context_profile_sensors to authenticated;
+grant select, insert, update, delete on public.environment_context_profile_sensors to service_role;
 
 create unique index environment_context_profiles_one_active_per_environment_idx
   on public.environment_context_profiles (organization_id, environment_id)
@@ -196,23 +254,23 @@ begin
       using errcode = '23514';
   end if;
 
-  if cardinality(new.sensor_ids) <> cardinality(array(
-    select distinct sensor_id from unnest(new.sensor_ids) as sensor(sensor_id)
-  )) then
-    raise exception 'environment_profile_sensor_ids_must_be_unique'
+  if new.status = 'active' and new.origin = 'sensor' and not exists (
+    select 1 from public.environment_context_profile_sensors s
+     where s.organization_id = new.organization_id
+       and s.profile_id = new.id
+       and s.environment_id = new.environment_id
+  ) then
+    raise exception 'sensor_environment_profile_requires_at_least_one_sensor'
       using errcode = '23514';
   end if;
 
-  if new.origin = 'sensor' and exists (
-    select 1
-      from unnest(new.sensor_ids) as requested(sensor_id)
-      left join public.iot_devices d
-        on d.organization_id = new.organization_id
-       and d.environment_id = new.environment_id
-       and d.id = requested.sensor_id
-     where d.id is null
+  if new.status = 'active' and new.origin <> 'sensor' and exists (
+    select 1 from public.environment_context_profile_sensors s
+     where s.organization_id = new.organization_id
+       and s.profile_id = new.id
+       and s.environment_id = new.environment_id
   ) then
-    raise exception 'environment_profile_sensor_must_belong_to_environment'
+    raise exception 'non_sensor_environment_profile_cannot_bind_sensors'
       using errcode = '23514';
   end if;
 
@@ -233,6 +291,45 @@ begin
   return new;
 end;
 $$;
+
+create or replace function private.guard_environment_context_profile_sensor()
+returns trigger
+language plpgsql
+security invoker
+set search_path = pg_catalog, public
+as $
+declare
+  v_status text;
+  v_origin text;
+  v_organization_id uuid;
+  v_profile_id uuid;
+  v_environment_id uuid;
+begin
+  if tg_op = 'DELETE' then
+    v_organization_id := old.organization_id;
+    v_profile_id := old.profile_id;
+    v_environment_id := old.environment_id;
+  else
+    v_organization_id := new.organization_id;
+    v_profile_id := new.profile_id;
+    v_environment_id := new.environment_id;
+  end if;
+
+  select p.status, p.origin into v_status, v_origin
+    from public.environment_context_profiles p
+   where p.organization_id = v_organization_id
+     and p.id = v_profile_id
+     and p.environment_id = v_environment_id;
+
+  if not found or v_status <> 'draft' or v_origin <> 'sensor' then
+    raise exception 'environment_profile_sensor_binding_requires_sensor_draft'
+      using errcode = '23514';
+  end if;
+
+  if tg_op = 'DELETE' then return old; end if;
+  return new;
+end;
+$;
 
 create or replace function private.validate_domain_interpretation_profile()
 returns trigger
@@ -314,6 +411,10 @@ create trigger domain_interpretation_profiles_version_guard
   before insert or update or delete on public.domain_interpretation_profiles
   for each row execute function private.guard_versioned_environmental_profile();
 
+create trigger environment_context_profile_sensors_guard
+  before insert or update or delete on public.environment_context_profile_sensors
+  for each row execute function private.guard_environment_context_profile_sensor();
+
 create trigger environment_context_profiles_validate
   before insert or update on public.environment_context_profiles
   for each row execute function private.validate_environment_context_profile();
@@ -323,6 +424,7 @@ create trigger domain_interpretation_profiles_validate
 
 revoke all on function private.guard_versioned_environmental_profile() from public, anon, authenticated;
 revoke all on function private.validate_environment_context_profile() from public, anon, authenticated;
+revoke all on function private.guard_environment_context_profile_sensor() from public, anon, authenticated;
 revoke all on function private.validate_domain_interpretation_profile() from public, anon, authenticated;
 
 comment on table public.environment_context_profiles is
