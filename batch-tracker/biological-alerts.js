@@ -199,6 +199,7 @@
 
   async function applySession(session) {
     state.request++;
+    state.loading = false;
     state.userId = session?.user?.id || null;
     state.organizationId = window.BALabsGetOrganizationId?.() || null;
     state.rows = [];
@@ -235,6 +236,8 @@
     setTimeout(() => applySession(session), 0);
   });
   window.addEventListener("balabs:organization-context", event => {
+    state.request++;
+    state.loading = false;
     state.organizationId = event.detail?.organizationId || null;
     state.userId = event.detail?.userId || null;
     if (!state.userId) {
@@ -259,6 +262,8 @@
     const nextDomain = document.body.dataset.domain;
     if (nextDomain === previousDomain) return;
     previousDomain = nextDomain;
+    state.request++;
+    state.loading = false;
     state.domain = domainByWorkspace[nextDomain] || null;
     state.rows = [];
     state.offset = 0;
