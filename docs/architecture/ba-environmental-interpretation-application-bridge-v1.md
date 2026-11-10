@@ -14,6 +14,8 @@ Climate analysis remains independent. If the client does not send both `domain` 
 
 The Edge Function accepts optional `domain` and `subject_id` fields together with `location_id`, `start_date`, and `end_date`. The GreenTech client loads active plant cultures associated with the selected location (directly or through an environment) under caller RLS. When one is selected, it sends the subject identifier and GreenTech domain; otherwise it requests climate-only analysis. Mycology and Lab client selectors remain to be integrated.
 
+**Source boundary:** the current `/nasa-power` analysis is a gridded outdoor-weather analysis. Its biological interpretation is therefore allowed only when the resolved environment profile is `origin: weather_provider` and `context_type: outdoor`. A greenhouse or laboratory sensor profile is rejected with `environment_source_mismatch`; the climate analysis remains available. Sensor-backed greenhouse/lab interpretation requires a separate sensor-observation analysis path and must not reuse NASA POWER values as if they were in-situ readings.
+
 The current `EnvironmentContext` model requires:
 
 - context/environment UUID;
