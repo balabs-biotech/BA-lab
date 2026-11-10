@@ -722,3 +722,87 @@ def test_sensor_api_rejects_partial_flatline_policy():
 
     assert response.status_code == 422
     assert "flatline diagnostic parameters must be supplied together" in str(response.json()["detail"])
+
+
+def test_sensor_api_exposes_device_transmission_diagnostics_separately():
+    request = sensor_payload()
+    sensor_id = request["measurements"][0]["iot_device_id"]
+    device_id = sensor_id
+    request["transmission_expected_interval_seconds"] = 3600
+    request["transmission_gap_tolerance_factor"] = 2.0
+    request["transmission_current_window"] = False
+    request["transmission_devices"] = [{
+        "device_id": device_id,
+        "device_code": "sensor-01",
+        "enabled": True,
+        "created_at": "2026-02-27T00:00:00+00:00",
+        "profile_bound": True,
+        "expected_from": "2026-02-27T00:00:00+00:00",
+        "expected_to": None,
+    }]
+    request["transmission_receipts"] = [
+        {"receipt_id": str(uuid4()), "device_id": device_id, "received_at": f"2026-03-01T{hour:02d}:00:00+00:00"}
+        for hour in (0, 1, 5, 6)
+    ]
+
+    client = TestClient(create_app(engine_api_key="test-secret"))
+    response = client.post(
+        "/v1/analyses/sensors",
+        json=request,
+        headers={"X-BA-Engine-Key": "test-secret"},
+    )
+
+    assert response.status_code == 200, response.text
+    body = response.json()
+    diagnostics = body["instrument_health"]["transmission_diagnostics"]
+    assert diagnostics["status"] == "completed"
+    assert diagnostics["assessments"][0]["status"] == "irregular"
+    assert diagnostics["assessments"][0]["gap_count"] == 1
+    assert diagnostics["assessments"][0]["maximum_gap_seconds"] == 14400
+    assert body["instrument_health"]["flatline_diagnostics"]["status"] == "not_requested"
+    assert body["interpretation_status"] == "not_requested"
+
+
+def test_sensor_api_reports_no_receipt_history_as_insufficient_data():
+    request = sensor_payload()
+    device_id = request["measurements"][0]["iot_device_id"]
+    request["transmission_expected_interval_seconds"] = 3600
+    request["transmission_gap_tolerance_factor"] = 2.0
+    request["transmission_current_window"] = False
+    request["transmission_devices"] = [{
+        "device_id": device_id,
+        "device_code": "sensor-01",
+        "enabled": True,
+        "created_at": "2026-02-27T00:00:00+00:00",
+        "profile_bound": True,
+        "expected_from": "2026-02-27T00:00:00+00:00",
+        "expected_to": None,
+    }]
+    request["transmission_receipts"] = []
+
+    client = TestClient(create_app(engine_api_key="test-secret"))
+    response = client.post(
+        "/v1/analyses/sensors",
+        json=request,
+        headers={"X-BA-Engine-Key": "test-secret"},
+    )
+
+    assert response.status_code == 200, response.text
+    assessment = response.json()["instrument_health"]["transmission_diagnostics"]["assessments"][0]
+    assert assessment["status"] == "insufficient_data"
+    assert assessment["receipt_count"] == 0
+
+
+def test_sensor_api_rejects_partial_transmission_diagnostics_policy():
+    request = sensor_payload()
+    request["transmission_expected_interval_seconds"] = 3600
+
+    client = TestClient(create_app(engine_api_key="test-secret"))
+    response = client.post(
+        "/v1/analyses/sensors",
+        json=request,
+        headers={"X-BA-Engine-Key": "test-secret"},
+    )
+
+    assert response.status_code == 422
+    assert "policy, devices and receipts must be supplied together" in str(response.json()["detail"])
