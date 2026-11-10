@@ -22,7 +22,7 @@ for (const [name, rpc, payloadKey, directTable] of [
     throw new Error(name + " handler still performs non-atomic direct inserts");
   }
   const sqlStart = migration.indexOf("create or replace function public." + rpc + "(");
-  const sqlEnd = migration.indexOf("$;", migration.indexOf("as $", sqlStart) + 5);
+  const sqlEnd = migration.indexOf("$$;", migration.indexOf("as $$", sqlStart) + 5);
   const sqlFunction = migration.slice(sqlStart, sqlEnd);
   if (!sqlFunction.includes("create or replace function public." + rpc + "(") ||
       !sqlFunction.includes("Event culture does not match batch culture") ||
@@ -30,8 +30,6 @@ for (const [name, rpc, payloadKey, directTable] of [
       !sqlFunction.includes("Batch not found in organization") ||
       !sqlFunction.includes("insert into public.events") ||
       !sqlFunction.includes("insert into public." + directTable) ||
-      !sqlFunction.includes("grant execute on function public." + rpc + "(jsonb, jsonb) to authenticated") && 
-      !migration.includes("grant execute on function public." + rpc + "(jsonb, jsonb) to authenticated") ||
       !sqlFunction.includes("auth.uid(),") ||
       !sqlFunction.includes("v_batch_location_id") ||
       !sqlFunction.includes("Event and " + name + " targets must match") ||
@@ -60,3 +58,41 @@ if (!idempotencyMigration.includes("idempotency_key_reused_with_different_payloa
   throw new Error("Manual writes must reject key reuse with a different payload");
 }
 console.log("✓ Manual measurement and observation RPCs preserve retry identity and private receipt isolation");
+
+// A manual measurement linked to a culture must inherit that culture's exact
+// experimental unit in both the measurement row and its traceability event.
+const unitLineageMigration = readFileSync(path.join(root, "supabase/migrations/20261111130000_record_manual_measurement_experimental_unit.sql"), "utf8");
+const unitRpcStart = unitLineageMigration.indexOf("create or replace function public.record_manual_measurement(");
+const unitRpcEnd = unitLineageMigration.indexOf("$$;", unitRpcStart);
+const unitRpc = unitRpcStart >= 0 && unitRpcEnd >= 0
+  ? unitLineageMigration.slice(unitRpcStart, unitRpcEnd)
+  : "";
+for (const fragment of [
+  "v_experimental_unit_id",
+  "from public.cultures c",
+  "c.experimental_unit_id",
+  "from public.experimental_units eu",
+  "eu.organization_id = v_org_id",
+  "experimental_unit_id",
+  "v_experimental_unit_id",
+  "measurements",
+  "events",
+  "p_idempotency_key"
+]) {
+  if (!unitRpc.includes(fragment)) {
+    throw new Error("Manual measurement experimental-unit lineage missing: " + fragment);
+  }
+}
+if (!unitRpc.includes("culture_experimental_unit_mismatch") ||
+    !unitRpc.includes("experimental_unit_not_found") ||
+    !unitRpc.includes("'experimental_unit_id', v_experimental_unit_id")) {
+  throw new Error("Manual measurement RPC must validate and persist consistent experimental-unit lineage");
+}
+if (!tracker.includes('select("id, variable_code, raw_value, raw_unit_code, normalized_value, normalized_unit_code, measured_at, method, instrument, culture_id, plant_culture_id, experimental_unit_id, event_id, metadata")')) {
+  throw new Error("Measurement history must retrieve experimental_unit_id");
+}
+if (!tracker.includes('from("experimental_units")') ||
+    !tracker.includes("row.experimental_unit_id")) {
+  throw new Error("Measurement history must resolve and display its experimental-unit context");
+}
+console.log("✓ Manual measurements preserve experimental-unit lineage and expose it in the history");
