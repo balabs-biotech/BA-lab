@@ -12,7 +12,8 @@ The engine foundation provides:
 - variable-specific plausibility screening that flags suspect values without modifying them;
 - trailing robust temporal anomaly screening with explicit insufficient-history and zero-MAD states;
 - seasonal historical reference screening that compares only with prior years;
-- a traceable air vapor-pressure deficit (VPD) calculation from temperature and relative humidity.
+- a traceable air vapor-pressure deficit (VPD) calculation from temperature and relative humidity;
+- period-level VPD summaries with explicit above-threshold duration and sampling-gap exclusions.
 
 Derived values remain distinct from source observations. The engine does not
 write calculated values back as sensor measurements. A strict NASA POWER daily-row
@@ -35,4 +36,5 @@ for the provider mapping and daily time semantics, and
 `docs/architecture/ba-environmental-quality-screening-v1.md` for screening rules, and
 `docs/architecture/ba-environmental-temporal-screening-v1.md` for temporal anomaly semantics, and
 `docs/architecture/ba-environmental-seasonal-reference-v1.md` for seasonal reference semantics, and
-`docs/architecture/ba-vapor-pressure-deficit-v1.md` for the VPD formula and interpretation limits.
+`docs/architecture/ba-vapor-pressure-deficit-v1.md` for the VPD formula and interpretation limits, and
+`docs/architecture/ba-vpd-period-aggregation-v1.md` for period aggregation semantics.
