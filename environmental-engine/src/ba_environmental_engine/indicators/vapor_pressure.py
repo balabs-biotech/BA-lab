@@ -55,3 +55,18 @@ def calculate_vpd(
         actual_vapor_pressure_kpa=actual,
         vpd_kpa=deficit,
     )
+
+
+def saturation_vapor_pressure_kpa(temperature_c: float) -> float:
+    """Saturation vapour pressure in kPa using the FAO-56 Tetens equation."""
+    if (
+        isinstance(temperature_c, bool)
+        or not isinstance(temperature_c, (int, float))
+        or not isfinite(temperature_c)
+    ):
+        raise ValueError("temperature_c must be a finite numeric value")
+    if temperature_c <= -237.3:
+        raise ValueError("temperature_c is outside the valid FAO-56 formula domain")
+    return 0.6108 * exp(
+        (17.27 * float(temperature_c)) / (float(temperature_c) + 237.3)
+    )
