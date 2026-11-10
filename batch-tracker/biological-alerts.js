@@ -378,28 +378,64 @@
       }
     }
     const relationships = [...relationshipByKey.values()].slice(0, MAX_RELATIONSHIPS);
-    const [batchResult, cultureEventResult, materialEventResult] = await Promise.all([
+    const [batchResult, cultureEventResult, materialEventResult, measurementResult, observationResult, signalResult] = await Promise.all([
       client.from("batches").select("batch_code,name,status,current_stage,culture_id,material_id")
         .eq("organization_id", organizationId)
         .or("culture_id.in.(" + cultureIds.join(",") + "),material_id.in.(" + materialIds.join(",") + ")")
         .order("created_at", { ascending: false }).limit(100),
-      client.from("events").select("id,event_type,occurred_at,culture_id,material_id,payload")
+      client.from("events").select("id,event_type,occurred_at,culture_id,material_id,location_id,environment_id,payload")
         .eq("organization_id", organizationId).in("culture_id", cultureIds)
         .order("occurred_at", { ascending: true }).limit(200),
-      client.from("events").select("id,event_type,occurred_at,culture_id,material_id,payload")
+      client.from("events").select("id,event_type,occurred_at,culture_id,material_id,location_id,environment_id,payload")
         .eq("organization_id", organizationId).in("material_id", materialIds)
-        .order("occurred_at", { ascending: true }).limit(200)
+        .order("occurred_at", { ascending: true }).limit(200),
+      client.from("measurements").select("id,variable_code,raw_value,raw_unit_code,normalized_value,normalized_unit_code,measured_at,method,instrument,quality_state,culture_id,event_id,result_id,metadata")
+        .eq("organization_id", organizationId).in("culture_id", cultureIds)
+        .order("measured_at", { ascending: true }).limit(500),
+      client.from("observations").select("id,variable_code,value_text,observed_at,quality_state,culture_id,event_id,metadata")
+        .eq("organization_id", organizationId).in("culture_id", cultureIds)
+        .order("observed_at", { ascending: true }).limit(500),
+      client.from("biological_signals").select("signal_id,biological_subject_id,environment_id,signal_code,severity,variable_code,observed_date,observed_value,unit,analysis_method,analysis_evidence,first_seen_at")
+        .eq("organization_id", organizationId).eq("domain", domainByWorkspace[document.body.dataset.domain] || "mycology")
+        .in("biological_subject_id", cultureIds).order("first_seen_at", { ascending: true }).limit(200)
     ]);
     const eventsById = new Map();
     [...(cultureEventResult.data || []), ...(materialEventResult.data || [])].forEach(event => eventsById.set(event.id, event));
+    const events = [...eventsById.values()].sort((x, y) => String(x.occurred_at).localeCompare(String(y.occurred_at)));
+    const locationIds = [...new Set(events.map(event => event.location_id).filter(Boolean))];
+    let environmentalObservations = [];
+    if (locationIds.length) {
+      const eventTimes = events.map(event => new Date(event.occurred_at).getTime()).filter(Number.isFinite);
+      const from = eventTimes.length ? new Date(Math.min(...eventTimes) - 86400000).toISOString() : null;
+      const to = eventTimes.length ? new Date(Math.max(...eventTimes) + 86400000).toISOString() : null;
+      let query = client.from("environmental_observations")
+        .select("id,location_id,data_family,provider_code,dataset_code,variable_code,value,unit_code,observed_at,quality_flag,metadata")
+        .eq("organization_id", organizationId).in("location_id", locationIds)
+        .order("observed_at", { ascending: true }).limit(500);
+      if (from && to) query = query.gte("observed_at", from).lte("observed_at", to);
+      const environmentalResult = await query;
+      if (!environmentalResult.error) environmentalObservations = environmentalResult.data || [];
+    }
+    const measurements = measurementResult.error ? [] : (measurementResult.data || []);
+    const observations = observationResult.error ? [] : (observationResult.data || []);
+    const biologicalSignals = signalResult.error ? [] : (signalResult.data || []);
+    const evidenceAvailability = {
+      measurements: !measurementResult.error,
+      observations: !observationResult.error,
+      biological_signals: !signalResult.error,
+      environmental_observations: locationIds.length > 0
+    };
     return {
       cultures,
       materials: [...materialById.values()],
       relationships,
       batches: batchResult.error ? [] : (batchResult.data || []),
-      events: [...eventsById.values()].sort((x, y) => String(x.occurred_at).localeCompare(String(y.occurred_at))),
+      events,
+      evidence: { measurements, observations, biological_signals: biologicalSignals, environmental_observations: environmentalObservations },
+      evidenceAvailability,
       unavailable: false,
-      truncated: byId.size >= MAX_CULTURES || materialById.size >= MAX_MATERIALS || relationshipByKey.size >= MAX_RELATIONSHIPS
+      truncated: byId.size >= MAX_CULTURES || materialById.size >= MAX_MATERIALS || relationshipByKey.size >= MAX_RELATIONSHIPS ||
+        measurements.length >= 500 || observations.length >= 500 || biologicalSignals.length >= 200 || environmentalObservations.length >= 500
     };
   }
 
