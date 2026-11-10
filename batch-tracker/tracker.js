@@ -15,6 +15,7 @@ const supabaseClient =
     SUPABASE_URL,
     SUPABASE_PUBLISHABLE_KEY
   );
+window.BALabsSupabaseClient = supabaseClient;
 
 
 /* ============================================================
