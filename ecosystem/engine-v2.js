@@ -376,7 +376,7 @@ function buildResources(id,parentNode=null,anchor=null) {
  }
 };
  if(children.length>16){const golden=Math.PI*(3-Math.sqrt(5)),mobile=window.innerWidth<760,outer=mobile?3.55:4.35;children.forEach((item,k)=>{const ang=-Math.PI/2+k*golden,rad=1.35+outer*Math.sqrt((k+.5)/children.length),p=currentAnchor.clone().add(new THREE.Vector3(Math.cos(ang)*rad,Math.sin(ang)*rad,.18*Math.sin(k*1.7)));drawNode(item,p,0,currentNode,ang,k)});}else{children.forEach((item,k)=>{const ang=k/Math.max(1,children.length)*Math.PI*2-Math.PI/2+(k%2)*.11,rad=2.15+(k%3)*.16,p=currentAnchor.clone().add(new THREE.Vector3(Math.cos(ang)*rad,Math.sin(ang)*rad*.78,Math.sin(ang*1.6)*.34));drawNode(item,p,0,currentNode,ang,k)});}
- status.textContent=(currentNode.title||domain.title).toUpperCase()+' · '+children.length+' '+t('children').toUpperCase();
+ status.textContent=(currentNode.title||domain.title).toUpperCase()+' · '+children.length+' '+t('children').toUpperCase();status.hidden=!!selected;
 }
 // Resolve raw Notion nodes to their positioned 3D counterparts before camera navigation.
 function openResource(item) {
@@ -401,7 +401,7 @@ function openResource(item) {
 }
 function showDomainPanel(id,message='') {if(message)status.textContent=message;renderPath()}
 function enterDomain(id) {
-  if(!cells.has(id))return;selected=id;selectedBranch=null;opened=true;navigationStack=[];currentNode=manifest?.domains?.find(d=>d.id===id)||null;currentAnchor=cells.get(id).position.clone();
+  if(!cells.has(id))return;selected=id;if(status)status.hidden=true;selectedBranch=null;opened=true;navigationStack=[];currentNode=manifest?.domains?.find(d=>d.id===id)||null;currentAnchor=cells.get(id).position.clone();
   intro.hidden=true;nav.hidden=false;ROOT.classList.remove('universe-closed');ROOT.classList.add('universe-open');panel.hidden=true;panel.replaceChildren();
   if(typeof window.enterSphere==='function')window.enterSphere(id,false,true); // Populate the hidden legacy content source only; the old engine no longer owns #mainView events.
   const rootCount=manifest?.domains?.find(d=>d.id===id)?.children?.length||0;const initialDistance=rootCount>16?(window.innerWidth<760?20.5:11.5):7.5;smoothCamera(cells.get(id).position,initialDistance,900,()=>buildResources(id));
@@ -411,7 +411,7 @@ function goBackLevel() {
   if(selected)goOverview();
 }
 function goOverview() {
-  selected=null;selectedBranch=null;navigationStack=[];currentNode=null;currentAnchor=null;clearResources();nav?.replaceChildren();nav.hidden=true;if(branchDock){branchDock.replaceChildren();branchDock.hidden=true}panel.hidden=true;panel.replaceChildren();
+  selected=null;selectedBranch=null;navigationStack=[];currentNode=null;currentAnchor=null;if(status)status.hidden=false;clearResources();nav?.replaceChildren();nav.hidden=true;if(branchDock){branchDock.replaceChildren();branchDock.hidden=true}panel.hidden=true;panel.replaceChildren();
   const mini=document.getElementById('miniView');if(mini){mini.hidden=true;mini.classList.remove('spatial-source-only')}
   const homeButton=document.getElementById('homeBtn');if(homeButton)homeButton.hidden=true;
   smoothCamera(new THREE.Vector3(0,0,0),13.5,850,()=>{status.textContent='BALABS / LIVING NETWORK'});
@@ -581,7 +581,7 @@ function syncLabelScales() {
     const worldHeight=cameraDistance*projection*targetPixels;
     label.scale.set(worldHeight*4.25,worldHeight,1);
   };
-  for(const item of cells.values())apply(item.label);
+  for(const item of cells.values()){if(item.label)item.label.visible=!selected;apply(item.label);}
   for(const item of resourceObjects)if(item.userData?.kind==='resource-label')apply(item);
 }
 
