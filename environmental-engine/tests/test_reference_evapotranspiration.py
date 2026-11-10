@@ -122,3 +122,32 @@ def test_rejects_missing_pressure_or_altitude():
             net_radiation_mj_m2_day=10.0,
             actual_vapor_pressure_kpa=1.2,
         )
+
+
+def test_derives_actual_vapor_pressure_from_dew_point():
+    result = calculate_fao56_et0(
+        temperature_mean_c=20.0,
+        temperature_max_c=25.0,
+        temperature_min_c=15.0,
+        wind_speed_2m_m_s=2.0,
+        net_radiation_mj_m2_day=10.0,
+        atmospheric_pressure_kpa=90.0,
+        dew_point_temperature_c=10.0,
+    )
+    assert result.actual_vapor_pressure_kpa == pytest.approx(
+        saturation_vapor_pressure_kpa(10.0)
+    )
+
+
+def test_negative_et0_is_retained_and_flagged_not_clamped():
+    result = calculate_fao56_et0(
+        temperature_mean_c=5.0,
+        temperature_max_c=8.0,
+        temperature_min_c=2.0,
+        wind_speed_2m_m_s=0.0,
+        net_radiation_mj_m2_day=-5.0,
+        atmospheric_pressure_kpa=90.0,
+        actual_vapor_pressure_kpa=0.5,
+    )
+    assert result.reference_evapotranspiration_mm_day < 0
+    assert "negative_reference_et_review_energy_balance_inputs" in result.diagnostics
