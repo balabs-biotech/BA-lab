@@ -21,7 +21,7 @@ The engine foundation provides:
 - period-level VPD summaries with explicit above-threshold duration and sampling-gap exclusions;
 - versioned environment context metadata separating outdoor, greenhouse, fruiting-chamber and laboratory observations;
 - sensor descriptors and measurement contracts with source-observation and formula lineage;
-- a configurable domain-interpretation layer routing traceable findings to Mycology, GreenTech or Lab profiles, with explicit context tags and no implicit biological thresholds or recommendations;
+- a configurable domain-interpretation layer routing traceable findings to Mycology, GreenTech or Lab profiles, with explicit context tags, biological subject/environment binding and no implicit biological thresholds or recommendations;
 - biological subject and cultivation-context contracts binding organism, strain/cultivar, stage, substrate and production system to a tenant-scoped environmental context and analysis period.
 
 Derived values remain distinct from source observations. The engine does not
