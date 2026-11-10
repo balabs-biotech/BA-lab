@@ -45,7 +45,7 @@ def interpret_findings(
             signal_id = uuid5(
                 _DOMAIN_SIGNAL_NAMESPACE,
                 f"{analysis.analysis_id}:{profile.profile_id}:{profile.version}:"
-                f"{finding.finding_id}:{rule.rule_id}",
+                f"{finding.finding_id}:{rule.rule_id}:{biological_context_id or 'none'}",
             )
             signals.append(
                 DomainSignal(
