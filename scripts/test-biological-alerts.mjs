@@ -71,6 +71,8 @@ assert.match(moduleSource, /parent_material_id\.in\.\(/);
 assert.match(moduleSource, /MAX_RELATIONSHIP_DEPTH = 5/);
 assert.match(moduleSource, /MAX_RELATIONSHIPS = 300/);
 assert.match(moduleSource, /relationshipByKey/);
+assert.match(moduleSource, /unresolvedLegacyParents/);
+assert.match(moduleSource, /Hydrate any legacy parent pointer/);
 assert.match(moduleSource, /incomingByChild/);
 assert.match(moduleSource, /Souches contributrices/);
 assert.match(moduleSource, /\.in\("material_id", materialIds\)/);
