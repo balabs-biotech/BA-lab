@@ -22,7 +22,8 @@ from ba_environmental_engine.interpretation.service import interpret_analysis_fo
 
 from ba_environmental_engine import __version__
 from ba_environmental_engine.climate.aggregation import AggregationMethod
-from ba_environmental_engine.execution import run_environmental_analysis
+from ba_environmental_engine.execution import run_environmental_analysis, run_sensor_analysis
+from ba_environmental_engine.sources.sensor import normalize_iot_measurement_row
 from ba_environmental_engine.sources.models import NormalizedEnvironmentalObservation
 from ba_environmental_engine.sources.nasa_power import normalize_nasa_power_observation
 
@@ -133,6 +134,31 @@ class PersistedAnalysisRequest(APIModel):
             raise ValueError("rolling_windows must contain positive integers")
         if len(set(self.rolling_windows)) != len(self.rolling_windows):
             raise ValueError("rolling_windows must not contain duplicates")
+        return self
+
+
+
+class SensorAnalysisRequest(APIModel):
+    analysis_id: UUID
+    organization_id: UUID
+    environment_id: UUID
+    from_date: date
+    to_date: date
+    profile_timezone: str = Field(min_length=1, max_length=80)
+    expected_interval_seconds: StrictInt | None = Field(default=None, gt=0)
+    measurements: list[dict[str, Any]] = Field(min_length=1, max_length=5000)
+
+    @model_validator(mode="after")
+    def validate_sensor_scope(self) -> SensorAnalysisRequest:
+        if self.to_date < self.from_date:
+            raise ValueError("to_date must be on or after from_date")
+        if self.expected_interval_seconds is not None and self.expected_interval_seconds <= 0:
+            raise ValueError("expected_interval_seconds must be positive")
+        for row in self.measurements:
+            if row.get("organization_id") != str(self.organization_id):
+                raise ValueError("every sensor measurement must match the requested organization")
+            if row.get("environment_id") != str(self.environment_id):
+                raise ValueError("every sensor measurement must match the requested environment")
         return self
 
 
@@ -294,6 +320,44 @@ def create_app(engine_api_key: str | None = None) -> FastAPI:
                 request.biological_interpretation,
             )
         except ValueError as exc:
+            raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+
+    @app.post("/v1/analyses/sensors", dependencies=[Depends(require_internal_key)])
+    def create_sensor_analysis(request: SensorAnalysisRequest):
+        try:
+            envelopes = tuple(
+                normalize_iot_measurement_row(row)
+                for row in request.measurements
+            )
+
+            class RequestRepository:
+                """Request-scoped adapter; all reads and authorization happened in the gateway."""
+                def list_for_scope(self, **kwargs):
+                    if kwargs != {
+                        "organization_id": str(request.organization_id),
+                        "environment_id": str(request.environment_id),
+                        "from_date": request.from_date,
+                        "to_date": request.to_date,
+                    }:
+                        raise ValueError("sensor repository scope mismatch")
+                    return envelopes
+
+            analysis = run_sensor_analysis(
+                repository=RequestRepository(),
+                organization_id=str(request.organization_id),
+                environment_id=str(request.environment_id),
+                from_date=request.from_date,
+                to_date=request.to_date,
+                profile_timezone=request.profile_timezone,
+                expected_interval_seconds=request.expected_interval_seconds,
+            )
+            return {
+                "analysis_id": str(request.analysis_id),
+                "source": "iot_sensor",
+                "analysis": analysis,
+            }
+        except (ValueError, LookupError) as exc:
             raise HTTPException(status_code=422, detail=str(exc)) from exc
 
     return app
