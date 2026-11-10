@@ -365,8 +365,25 @@ def build_bal_analysis(
     finding_ids = [item.finding_id for item in anomaly_findings]
     if len(finding_ids) != len(set(finding_ids)):
         raise ValueError("anomaly finding IDs must be unique")
-    if any(not scope_from <= item.observed_date <= scope_to for item in anomaly_findings):
-        raise ValueError("anomaly finding date must be contained within analysis scope")
+    for finding in anomaly_findings:
+        if not scope_from <= finding.observed_date <= scope_to:
+            raise ValueError("anomaly finding date must be contained within analysis scope")
+        if not finding.source_observation_ids:
+            raise ValueError("anomaly findings must retain source observation lineage")
+        finding_rows = []
+        for source_id in finding.source_observation_ids:
+            source_row = by_id.get(source_id)
+            if source_row is None:
+                raise ValueError("anomaly finding references unknown source observation IDs")
+            if (
+                source_row.observed_date != finding.observed_date
+                or source_row.variable_code != finding.variable_code
+                or source_row.unit != finding.unit
+                or source_row.value != finding.observed_value
+            ):
+                raise ValueError("anomaly finding source observations must match its date, variable, unit and value")
+            finding_rows.append(source_row)
+        used_variables.add(finding.variable_code)
 
     return BALAnalysis(
         contract_version="1.0.0",
