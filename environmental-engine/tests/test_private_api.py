@@ -367,3 +367,26 @@ def test_nasa_power_api_keeps_climate_analysis_when_biological_context_is_invali
     assert body["domain_interpretation"] is None
     assert len(body["indicators"]) == 2
     assert len(body["findings"]) == 6
+
+
+def test_nasa_power_interpretation_rejects_sensor_profile_without_relabeling_climate_data():
+    request = nasa_power_payload()
+    interpretation = biological_interpretation_payload(request)
+    interpretation["environment_context"]["context_type"] = "greenhouse"
+    interpretation["environment_context"]["origin"] = "sensor"
+    interpretation["environment_context"]["sensor_ids"] = [str(uuid4())]
+    request["biological_interpretation"] = interpretation
+    client = TestClient(create_app(engine_api_key="test-secret"))
+
+    response = client.post(
+        "/v1/analyses/nasa-power",
+        json=request,
+        headers={"X-BA-Engine-Key": "test-secret"},
+    )
+
+    assert response.status_code == 200, response.text
+    body = response.json()
+    assert body["interpretation_status"] == "context_invalid"
+    assert body["domain_interpretation"] is None
+    assert len(body["indicators"]) == 2
+    assert len(body["findings"]) == 6
