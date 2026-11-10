@@ -4,7 +4,7 @@ declare
   t text;
   p text;
 begin
-  foreach t in array array['events','measurements','observations'] loop
+  foreach t in array array['events','measurements','observations','results'] loop
     foreach p in array array['INSERT','UPDATE','DELETE','TRUNCATE'] loop
       if has_table_privilege('authenticated', format('public.%I',t), p) then
         raise exception 'authenticated retains % privilege on public.%', p, t;
