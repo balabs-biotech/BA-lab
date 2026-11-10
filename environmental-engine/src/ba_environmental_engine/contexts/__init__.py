@@ -13,6 +13,10 @@ from ba_environmental_engine.contexts.measurement import (
     MeasurementOrigin,
     SensorDescriptor,
 )
+from ba_environmental_engine.contexts.persistence import (
+    biological_context_from_record,
+    biological_context_to_record,
+)
 from ba_environmental_engine.contexts.environment import (
     EnvironmentContext,
     EnvironmentType,
@@ -24,6 +28,8 @@ __all__ = [
     "BiologicalDomain",
     "OrganismKind",
     "validate_biological_context_for_analysis",
+    "biological_context_from_record",
+    "biological_context_to_record",
     "CalibrationStatus",
     "EnvironmentalMeasurement",
     "EnvironmentContext",
