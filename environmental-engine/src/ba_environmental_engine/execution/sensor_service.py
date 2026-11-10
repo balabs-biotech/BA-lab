@@ -6,7 +6,12 @@ from typing import Protocol
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 from ba_environmental_engine.sources.sensor import SensorMeasurementEnvelope
-from ba_environmental_engine.interpretation.sensor_events import (\n    SensorEventAnalysis,\n    SensorEventProfile,\n    detect_sensor_events,\n)\nfrom ba_environmental_engine.sources.sensor_analysis import (
+from ba_environmental_engine.interpretation.sensor_events import (
+    SensorEventAnalysis,
+    SensorEventProfile,
+    detect_sensor_events,
+)
+from ba_environmental_engine.sources.sensor_analysis import (
     SensorAnalysis,
     summarize_sensor_measurements,
 )
