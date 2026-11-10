@@ -18,11 +18,13 @@ def measurement(
     subject="culture-1",
     organization="org-1",
     variable="root_length",
+    subject_type="culture",
 ):
     return BiologicalMeasurement(
         source_record_id=record_id,
         organization_id=organization,
         subject_id=subject,
+        subject_type=subject_type,
         variable_code=variable,
         value=value,
         canonical_unit_code=unit,
@@ -36,6 +38,7 @@ def analyze(records, *, accepted={"validated"}, variable="root_length"):
         records,
         organization_id="org-1",
         subject_id="culture-1",
+        subject_type="culture",
         variable_code=variable,
         accepted_quality_states=accepted,
     )
@@ -85,7 +88,7 @@ def test_growth_rate_rejects_duplicate_source_ids():
 def test_measurement_contract_rejects_naive_timestamps_and_nonfinite_values():
     with pytest.raises(ValueError, match="timezone"):
         BiologicalMeasurement(
-            "m1", "org-1", "culture-1", "root_length", 1, "mm",
+            "m1", "org-1", "culture-1", "culture", "root_length", 1, "mm",
             datetime(2026, 1, 1), "validated",
         )
     with pytest.raises(ValueError, match="finite"):
@@ -98,6 +101,7 @@ def test_growth_rate_is_tenant_and_variable_scoped():
         measurement("m2", 2, 10),
         measurement("foreign", 3, 100, organization="org-2"),
         measurement("other-variable", 3, 100, variable="shoot_length"),
+        measurement("same-id-other-type", 3, 100, subject_type="plant_culture"),
     ])
     assert result.value == pytest.approx(3.0)
     assert result.source_record_ids == ("m1", "m2")
