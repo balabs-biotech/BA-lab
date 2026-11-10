@@ -1,6 +1,9 @@
 -- Atomic, idempotent structured experimental-result recording.
 -- A result belongs to an experimental unit; its experiment is derived from that unit
 -- so the two provenance references cannot disagree.
+alter table public.results add column event_id uuid;
+alter table public.results add constraint results_event_fk
+  foreign key (organization_id,event_id) references public.events(organization_id,id);
 create or replace function public.record_experiment_result(
   p_organization_id uuid,
   p_experimental_unit_id uuid,
@@ -19,7 +22,7 @@ as $function$
 declare
   v_actor_id uuid := auth.uid();
   v_experiment_id uuid;
-  v_result_id uuid;
+  v_result_id uuid := gen_random_uuid();
   v_event_id uuid;
   v_quality_state public.quality_state;
   v_request_payload jsonb;
@@ -111,13 +114,6 @@ begin
     raise exception 'experimental_result_code_already_exists' using errcode = '23505';
   end if;
 
-  insert into public.results(
-    organization_id,experiment_id,experimental_unit_id,code,result_type,value,quality_state
-  ) values (
-    p_organization_id,v_experiment_id,p_experimental_unit_id,btrim(p_code),
-    btrim(p_result_type),p_value,v_quality_state
-  ) returning id into v_result_id;
-
   insert into public.events(
     organization_id,event_type,occurred_at,actor_user_id,experimental_unit_id,payload
   ) values (
@@ -130,6 +126,13 @@ begin
       'quality_state',v_quality_state::text
     )
   ) returning id into v_event_id;
+
+  insert into public.results(
+    id,organization_id,experiment_id,experimental_unit_id,event_id,code,result_type,value,quality_state
+  ) values (
+    v_result_id,p_organization_id,v_experiment_id,p_experimental_unit_id,v_event_id,
+    btrim(p_code),btrim(p_result_type),p_value,v_quality_state
+  );
 
   v_response := jsonb_build_object(
     'result_id',v_result_id,
