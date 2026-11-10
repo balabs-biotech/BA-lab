@@ -70,3 +70,43 @@ def test_rejects_duplicate_dates_and_non_finite_values():
 def test_rejects_invalid_window_parameters():
     with pytest.raises(ValueError):
         assess_temporal_anomalies(series([1.0, 2.0]), window=0)
+
+
+def test_calendar_window_reports_low_coverage_instead_of_calling_sparse_history_normal():
+    observations = [
+        DailyObservation(date(2026, 1, day), 10.0 + (day % 3) * 0.1)
+        for day in (1, 2, 3, 4, 5, 10, 11)
+    ]
+
+    result = assess_temporal_anomalies(
+        observations,
+        window=9,
+        minimum_history=3,
+        minimum_coverage_ratio=0.7,
+    )
+
+    assert result[-1].status == "insufficient_coverage"
+    assert result[-1].history_count == 5
+    assert result[-1].coverage_ratio == pytest.approx(5 / 9)
+
+
+def test_calendar_window_excludes_observations_older_than_its_start():
+    observations = [
+        DailyObservation(date(2026, 1, 1), 500.0),
+        *[
+            DailyObservation(date(2026, 1, day), 10.0 + (day % 3) * 0.1)
+            for day in range(3, 13)
+        ],
+        DailyObservation(date(2026, 1, 13), 10.1),
+    ]
+
+    result = assess_temporal_anomalies(
+        observations,
+        window=10,
+        minimum_history=5,
+        minimum_coverage_ratio=0.5,
+    )
+
+    assert result[-1].history_count == 10
+    assert result[-1].baseline_median < 20
+    assert result[-1].coverage_ratio == 1.0
