@@ -42,7 +42,10 @@ for (const phrase of [
   "Alertes actives",
   "Prendre en compte",
   "Observations sources",
-  "Environnement"
+  "Environnement",
+  "Méthode d’analyse",
+  "Anomalie temporelle IoT (MAD robuste)",
+  "Score robuste"
 ]) {
   assert.ok(locales.includes(phrase), `Missing i18n coverage for: ${phrase}`);
 }
