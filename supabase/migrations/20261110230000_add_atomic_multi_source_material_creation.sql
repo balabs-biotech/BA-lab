@@ -41,7 +41,7 @@ begin
     raise exception 'material_mixture_requires_two_to_twelve_sources';
   end if;
 
-  if (select count(distinct source_id) from unnest(p_source_material_ids) as source_id)
+  if (select count(distinct source_id) from unnest(p_source_material_ids) as ids(source_id))
      <> cardinality(p_source_material_ids) then
     raise exception 'material_mixture_sources_must_be_unique';
   end if;
