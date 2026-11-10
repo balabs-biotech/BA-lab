@@ -297,7 +297,7 @@ function syncResourceHitTargets() {
   .filter(el=>!el.hidden&&getComputedStyle(el).display!=='none')
   .map(el=>{const r=el.getBoundingClientRect();return {l:r.left-stageRect.left,t:r.top-stageRect.top,r:r.right-stageRect.left,b:r.bottom-stageRect.top}});
  const overlaps=(a,b)=>a.l<b.r+8&&a.r>b.l-8&&a.t<b.b+8&&a.b>b.t-8;
- const offsets=[[0,0]];for(let ring=1;ring<=4;ring++){const steps=ring*8;for(let step=0;step<steps;step++){const angle=step/steps*Math.PI*2;offsets.push([Math.cos(angle)*ring,Math.sin(angle)*ring]);}}
+ const offsets=[[0,0]];for(let ring=1;ring<=2;ring++){const steps=ring*12;for(let step=0;step<steps;step++){const angle=step/steps*Math.PI*2;offsets.push([Math.cos(angle)*ring,Math.sin(angle)*ring]);}}
  for(const item of projected){
   const {button}=item,columns=stageRect.width<380?2:3,slotWidth=stageRect.width/columns;button.style.maxWidth=Math.max(128,slotWidth-12)+'px';button.style.width=Math.min(button.offsetWidth||150,slotWidth-12)+'px';const w=button.offsetWidth||150,h=button.offsetHeight||50;
   const sx=Math.max(w/2+6,Math.min(stageRect.width-w/2-6,item.x)),sy=Math.max(h/2+6,Math.min(stageRect.height-h/2-6,item.y));
@@ -320,7 +320,8 @@ function syncResourceHitTargets() {
     const conflicts=occupied.filter(r=>overlaps(box,r)).length+obstacles.filter(r=>overlaps(box,r)).length;
     return{cx,cy,box,conflicts,displacement:Math.hypot(cx-sx,cy-sy)};
    }).sort((a,b)=>a.conflicts-b.conflicts||a.displacement-b.displacement);
-   chosen=candidates[0]||{cx:sx,cy:sy,box:{l:sx-w/2,t:sy-h/2,r:sx+w/2,b:sy+h/2}};
+   if(candidates[0]?.conflicts){button.hidden=true;button.style.display='none';button.dataset.labelDecluttered='true';continue;}
+    chosen=candidates[0]||{cx:sx,cy:sy,box:{l:sx-w/2,t:sy-h/2,r:sx+w/2,b:sy+h/2}};
   }
   occupied.push(chosen.box);
   button.style.setProperty('z-index',String(12000+Math.round((1-item.p.z)*100)),'important');
