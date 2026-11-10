@@ -107,3 +107,29 @@ CI was extended to:
 - run the Environmental Engine pytest suite on Python 3.10 and 3.12.
 
 **Validation state:** these tests have been added to CI but have not yet been observed running on the latest branch commit. No migration has been applied to the production Supabase project.
+
+
+### Repository adapter — 2026-11-10
+
+The repository layer is now implemented in `contexts/persistence.py` as
+`SupabaseBiologicalContextRepository`. It receives an already-authenticated
+Supabase client by dependency injection; it does not create clients or load
+credentials.
+
+Supported operations:
+
+- `get_by_id`: tenant-scoped lookup by organization and context UUID.
+- `list_for_subject`: tenant/domain/typed-subject lookup, with optional
+  application-side validity-date filtering.
+- `create`: insert through the row mapper and return the joined environment.
+- `update`: update by tenant + context UUID; the payload cannot reassign the
+  primary key or organization.
+
+The joined location uses the explicit FK relationship
+`biological_contexts_environment_fk`, avoiding an ambiguous implicit relation.
+PostgreSQL RLS remains the security boundary; explicit tenant predicates are
+defense-in-depth, not a replacement for RLS.
+
+Mock-client tests cover tenant/subject filters, validity filtering, explicit
+relationship selection, and immutable tenant/primary-key fields during update.
+They are written but have not been executed in this environment.
