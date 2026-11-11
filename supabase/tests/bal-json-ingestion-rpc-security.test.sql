@@ -19,6 +19,12 @@ begin
      v_definition not ilike '%bal_json_record_id_payload_mismatch%' then
     raise exception 'FAIL: BAL-JSON RPC does not bind record IDs to payload hashes';
   end if;
+  if v_definition not ilike '%p_record_type is null%' then
+    raise exception 'FAIL: BAL-JSON RPC does not reject a null record type';
+  end if;
+  if v_definition not ilike '%bal_json_record_id%''%p_record_id%' then
+    raise exception 'FAIL: BAL-JSON event payload does not bind the receipt record ID';
+  end if;
   if v_definition not ilike '%record_manual_measurement%' or
      v_definition not ilike '%record_manual_observation%' then
     raise exception 'FAIL: BAL-JSON RPC does not reuse atomic domain write functions';
