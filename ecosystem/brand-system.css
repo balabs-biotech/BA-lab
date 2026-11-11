@@ -312,49 +312,49 @@
 #app.balabs-ui > .top .lang:hover {
   border-color: var(--balabs-paper) !important;
 }
-#app.balabs-ui > .hero {
+#app.balabs-ui > main > .hero {
   color: var(--balabs-mineral) !important;
   background: var(--balabs-graphite) !important;
 }
-#app.balabs-ui > .hero h1,
-#app.balabs-ui > .hero h1 span {
+#app.balabs-ui > main > .hero h1,
+#app.balabs-ui > main > .hero h1 span {
   color: var(--balabs-paper) !important;
   text-shadow: none !important;
 }
-#app.balabs-ui > .hero h1 span { color: var(--balabs-copper) !important; }
-#app.balabs-ui > .hero .eyebrow { color: var(--balabs-muted) !important; }
-#app.balabs-ui > .hero p,
-#app.balabs-ui > .hero .aside { color: var(--balabs-mineral) !important; }
-#app.balabs-ui > .editorial-feature {
+#app.balabs-ui > main > .hero h1 span { color: var(--balabs-copper) !important; }
+#app.balabs-ui > main > .hero .eyebrow { color: var(--balabs-muted) !important; }
+#app.balabs-ui > main > .hero p,
+#app.balabs-ui > main > .hero .aside { color: var(--balabs-mineral) !important; }
+#app.balabs-ui > main > .editorial-feature {
   background: var(--balabs-forest) !important;
   border-color: var(--balabs-line) !important;
   color: var(--balabs-mineral) !important;
 }
-#app.balabs-ui > .editorial-feature .editorial-copy h2,
-#app.balabs-ui > .editorial-feature .editorial-copy h2 em {
+#app.balabs-ui > main > .editorial-feature .editorial-copy h2,
+#app.balabs-ui > main > .editorial-feature .editorial-copy h2 em {
   color: var(--balabs-paper) !important;
 }
-#app.balabs-ui > .editorial-feature .editorial-copy p { color: var(--balabs-mineral) !important; }
-#app.balabs-ui > .editorial-feature .eyebrow,
-#app.balabs-ui > .editorial-feature .editorial-link { color: var(--balabs-copper) !important; }
-#app.balabs-ui > .editorial-about {
+#app.balabs-ui > main > .editorial-feature .editorial-copy p { color: var(--balabs-mineral) !important; }
+#app.balabs-ui > main > .editorial-feature .eyebrow,
+#app.balabs-ui > main > .editorial-feature .editorial-link { color: var(--balabs-copper) !important; }
+#app.balabs-ui > main > .editorial-about {
   background: var(--balabs-graphite) !important;
   border-color: var(--balabs-line) !important;
   color: var(--balabs-mineral) !important;
 }
-#app.balabs-ui > .editorial-about h2,
-#app.balabs-ui > .editorial-about h2 em { color: var(--balabs-paper) !important; }
-#app.balabs-ui > .editorial-about p { color: var(--balabs-mineral) !important; }
-#app.balabs-ui > .editorial-about .eyebrow,
-#app.balabs-ui > .editorial-about .editorial-link { color: var(--balabs-copper) !important; }
-#app.balabs-ui > .editorial-work {
+#app.balabs-ui > main > .editorial-about h2,
+#app.balabs-ui > main > .editorial-about h2 em { color: var(--balabs-paper) !important; }
+#app.balabs-ui > main > .editorial-about p { color: var(--balabs-mineral) !important; }
+#app.balabs-ui > main > .editorial-about .eyebrow,
+#app.balabs-ui > main > .editorial-about .editorial-link { color: var(--balabs-copper) !important; }
+#app.balabs-ui > main > .editorial-work {
   background: var(--balabs-graphite) !important;
   color: var(--balabs-mineral) !important;
 }
-#app.balabs-ui > .editorial-work .work-heading h2,
-#app.balabs-ui > .editorial-work .work-heading h2 em { color: var(--balabs-paper) !important; }
-#app.balabs-ui > .editorial-work .work-heading p { color: var(--balabs-muted) !important; }
-#app.balabs-ui > .editorial-work .work-card {
+#app.balabs-ui > main > .editorial-work .work-heading h2,
+#app.balabs-ui > main > .editorial-work .work-heading h2 em { color: var(--balabs-paper) !important; }
+#app.balabs-ui > main > .editorial-work .work-heading p { color: var(--balabs-muted) !important; }
+#app.balabs-ui > main > .editorial-work .work-card {
   min-height: 0 !important;
   display: flex !important;
   flex-direction: column !important;
@@ -367,29 +367,29 @@
   border-radius: var(--balabs-radius-md) !important;
   box-shadow: none !important;
 }
-#app.balabs-ui > .editorial-work .work-card:nth-child(2),
-#app.balabs-ui > .editorial-work .work-card:nth-child(3) {
+#app.balabs-ui > main > .editorial-work .work-card:nth-child(2),
+#app.balabs-ui > main > .editorial-work .work-card:nth-child(3) {
   background: #202F2D !important;
   border-top-color: var(--balabs-muted) !important;
 }
-#app.balabs-ui > .editorial-work .work-card h3 { color: var(--balabs-paper) !important; }
-#app.balabs-ui > .editorial-work .work-card p,
-#app.balabs-ui > .editorial-work .work-card .work-topics { color: var(--balabs-mineral) !important; }
-#app.balabs-ui > .editorial-work .work-card .work-index,
-#app.balabs-ui > .editorial-work .work-card .work-tag { color: var(--balabs-muted) !important; }
-#app.balabs-ui > .editorial-work .work-card a,
-#app.balabs-ui > .editorial-work .work-explore { color: var(--balabs-copper) !important; }
-#app.balabs-ui > .editorial-work .work-card .work-media {
+#app.balabs-ui > main > .editorial-work .work-card h3 { color: var(--balabs-paper) !important; }
+#app.balabs-ui > main > .editorial-work .work-card p,
+#app.balabs-ui > main > .editorial-work .work-card .work-topics { color: var(--balabs-mineral) !important; }
+#app.balabs-ui > main > .editorial-work .work-card .work-index,
+#app.balabs-ui > main > .editorial-work .work-card .work-tag { color: var(--balabs-muted) !important; }
+#app.balabs-ui > main > .editorial-work .work-card a,
+#app.balabs-ui > main > .editorial-work .work-explore { color: var(--balabs-copper) !important; }
+#app.balabs-ui > main > .editorial-work .work-card .work-media {
   border-radius: var(--balabs-radius-sm) !important;
   background: var(--balabs-graphite) !important;
 }
-#app.balabs-ui > .universe-index {
+#app.balabs-ui > main > .universe-index {
   background: var(--balabs-graphite) !important;
   color: var(--balabs-mineral) !important;
 }
-#app.balabs-ui > .universe-index .universe-index-heading h2 { color: var(--balabs-paper) !important; }
-#app.balabs-ui > .universe-index .universe-index-heading > p { color: var(--balabs-muted) !important; }
-#app.balabs-ui > .universe-index .universe-index-card {
+#app.balabs-ui > main > .universe-index .universe-index-heading h2 { color: var(--balabs-paper) !important; }
+#app.balabs-ui > main > .universe-index .universe-index-heading > p { color: var(--balabs-muted) !important; }
+#app.balabs-ui > main > .universe-index .universe-index-card {
   min-height: 0 !important;
   display: flex !important;
   flex-direction: column !important;
@@ -404,30 +404,30 @@
   color: var(--balabs-mineral) !important;
   text-decoration: none !important;
 }
-#app.balabs-ui > .universe-index .universe-index-card:nth-child(2n) {
+#app.balabs-ui > main > .universe-index .universe-index-card:nth-child(2n) {
   background: #202F2D !important;
   border-top-color: var(--balabs-muted) !important;
 }
-#app.balabs-ui > .universe-index .universe-index-card > span {
+#app.balabs-ui > main > .universe-index .universe-index-card > span {
   color: var(--balabs-copper) !important;
   font: 700 .72rem/1.2 ui-monospace,monospace !important;
   letter-spacing: .12em !important;
 }
-#app.balabs-ui > .universe-index .universe-index-card > b {
+#app.balabs-ui > main > .universe-index .universe-index-card > b {
   color: var(--balabs-paper) !important;
   font-size: clamp(1rem,1.25vw,1.2rem) !important;
   line-height: 1.25 !important;
 }
-#app.balabs-ui > .universe-index .universe-index-card > small {
+#app.balabs-ui > main > .universe-index .universe-index-card > small {
   color: var(--balabs-muted) !important;
   line-height: 1.45 !important;
 }
-#app.balabs-ui > .universe-index .universe-index-card > p {
+#app.balabs-ui > main > .universe-index .universe-index-card > p {
   color: var(--balabs-mineral) !important;
   line-height: 1.6 !important;
   margin: 0 !important;
 }
-#app.balabs-ui > .universe-index .universe-index-card > em {
+#app.balabs-ui > main > .universe-index .universe-index-card > em {
   margin-top: auto !important;
   color: var(--balabs-copper) !important;
   font-style: normal !important;
@@ -435,20 +435,20 @@
   font-weight: 700 !important;
   letter-spacing: .04em !important;
 }
-#app.balabs-ui > .universe-index .universe-index-card:hover {
+#app.balabs-ui > main > .universe-index .universe-index-card:hover {
   transform: translateY(-2px) !important;
   border-color: var(--balabs-copper) !important;
   box-shadow: 0 12px 28px rgba(0,0,0,.22) !important;
 }
-#app.balabs-ui > .editorial-method {
+#app.balabs-ui > main > .editorial-method {
   background: var(--balabs-forest) !important;
   color: var(--balabs-mineral) !important;
 }
-#app.balabs-ui > .editorial-method h2,
-#app.balabs-ui > .editorial-method h2 em { color: var(--balabs-paper) !important; }
-#app.balabs-ui > .editorial-method p { color: var(--balabs-mineral) !important; }
-#app.balabs-ui > .editorial-method .eyebrow,
-#app.balabs-ui > .editorial-method .method-no { color: var(--balabs-copper) !important; }
+#app.balabs-ui > main > .editorial-method h2,
+#app.balabs-ui > main > .editorial-method h2 em { color: var(--balabs-paper) !important; }
+#app.balabs-ui > main > .editorial-method p { color: var(--balabs-mineral) !important; }
+#app.balabs-ui > main > .editorial-method .eyebrow,
+#app.balabs-ui > main > .editorial-method .method-no { color: var(--balabs-copper) !important; }
 #app.balabs-ui > .foot {
   background: var(--balabs-graphite) !important;
   border-color: var(--balabs-line) !important;
@@ -459,26 +459,26 @@
 #app.balabs-ui > .foot small { color: var(--balabs-muted) !important; }
 
 @media (min-width: 1000px) {
-  #app.balabs-ui > .universe-index .universe-index-grid {
+  #app.balabs-ui > main > .universe-index .universe-index-grid {
     grid-template-columns: repeat(4,minmax(0,1fr)) !important;
     gap: 16px !important;
   }
 }
 @media (min-width: 600px) and (max-width: 999px) {
-  #app.balabs-ui > .universe-index .universe-index-grid {
+  #app.balabs-ui > main > .universe-index .universe-index-grid {
     grid-template-columns: repeat(2,minmax(0,1fr)) !important;
   }
 }
 @media (max-width: 599px) {
-  #app.balabs-ui > .universe-index .universe-index-grid {
+  #app.balabs-ui > main > .universe-index .universe-index-grid {
     grid-template-columns: minmax(0,1fr) !important;
   }
-  #app.balabs-ui > .universe-index .universe-index-card { padding: 18px !important; }
+  #app.balabs-ui > main > .universe-index .universe-index-card { padding: 18px !important; }
 }
 @media (prefers-reduced-motion: reduce) {
-  #app.balabs-ui > .universe-index .universe-index-card,
-  #app.balabs-ui > .editorial-work .work-card,
-  #app.balabs-ui > .editorial-work .work-card .work-media img {
+  #app.balabs-ui > main > .universe-index .universe-index-card,
+  #app.balabs-ui > main > .editorial-work .work-card,
+  #app.balabs-ui > main > .editorial-work .work-card .work-media img {
     transition: none !important;
   }
 }
