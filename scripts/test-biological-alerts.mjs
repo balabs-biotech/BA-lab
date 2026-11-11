@@ -208,4 +208,41 @@ for (const phrase of [
   assert.ok(locales.includes(phrase), `Missing i18n coverage for: ${phrase}`);
 }
 
+
+assert.match(moduleSource, /operation_source:/);
+assert.match(moduleSource, /operation_source_edge_count/);
+assert.match(moduleSource, /payload\.source_material_ids/);
+
+// Exercise the pure graph builder with a converging two-source operation.
+// The output must trace back to both contributors and expose the operation edges.
+const provenanceStart = moduleSource.indexOf("  function buildBiologicalProvenanceIndex(lineage) {");
+const provenanceEnd = moduleSource.indexOf("\\n  window.BALabsBiologicalProvenance", provenanceStart);
+assert.ok(provenanceStart >= 0 && provenanceEnd > provenanceStart, "provenance builder must remain independently testable");
+const buildProvenanceIndex = new Function("return (" + moduleSource.slice(provenanceStart, provenanceEnd).trim() + ");")();
+const provenance = buildProvenanceIndex({
+  materials: [
+    { id: "source-a", material_code: "A", strain_id: "strain-a", strain: { id: "strain-a", strain_code: "A1", organism: { scientific_name: "Species A" } } },
+    { id: "source-b", material_code: "B", strain_id: "strain-b", strain: { id: "strain-b", strain_code: "B1", organism: { scientific_name: "Species B" } } },
+    { id: "mixture", material_code: "MIX-01", strain_id: null }
+  ],
+  relationships: [],
+  cultures: [],
+  events: [{
+    id: "mix-event",
+    material_id: "mixture",
+    event_type: "material_mixture_created",
+    occurred_at: "2026-11-11T10:00:00Z",
+    payload: { operation: "consortium_assembly", source_material_ids: ["source-a", "source-b"] }
+  }],
+  evidence: {}
+});
+const mixtureTrace = provenance.traceMaterial("mixture");
+assert.equal(mixtureTrace.found, true);
+assert.deepEqual(new Set(mixtureTrace.ancestors.map(item => item.id)), new Set(["source-a", "source-b"]));
+assert.equal(mixtureTrace.strains.length, 2, "a multi-source output must retain both contributing strains");
+assert.equal(provenance.summarize().operation_source_edge_count, 2);
+assert.equal(provenance.summarize().multi_parent_count, 1);
+assert.ok(provenance.traceMaterial("source-a").descendants.some(item => item.id === "mixture"),
+  "source trace must discover the mixture output");
+
 console.log("PASS: shared biological alert inbox contract");
