@@ -118,5 +118,27 @@
     return Object.freeze({ status: "loaded", reason: "tenant_scoped_rule_history_loaded", records: Object.freeze(records) });
   }
 
-  root.BALabsBiologicalRuleStore = Object.freeze({ version: VERSION, loadExecutableRules, loadRuleHistory });
+  async function loadAuthoringCapabilities(input) {
+    if (!input || !input.client || typeof input.client.from !== "function" ||
+        !input.client.auth || typeof input.client.auth.getUser !== "function" ||
+        typeof input.organizationId !== "string" || !input.organizationId.trim()) {
+      return Object.freeze({ status: "unavailable", isAdmin: false, role: null });
+    }
+    const auth = await input.client.auth.getUser();
+    const userId = auth && auth.data && auth.data.user && auth.data.user.id;
+    if (!auth || auth.error || typeof userId !== "string" || !userId.trim()) {
+      return Object.freeze({ status: "unauthenticated", isAdmin: false, role: null });
+    }
+    const { data, error } = await input.client.from("organization_members")
+      .select("role")
+      .eq("organization_id", input.organizationId)
+      .eq("user_id", userId)
+      .maybeSingle();
+    if (error || !data || !["owner", "admin", "member"].includes(data.role)) {
+      return Object.freeze({ status: "unavailable", isAdmin: false, role: null });
+    }
+    return Object.freeze({ status: "loaded", isAdmin: data.role === "owner" || data.role === "admin", role: data.role });
+  }
+
+  root.BALabsBiologicalRuleStore = Object.freeze({ version: VERSION, loadExecutableRules, loadRuleHistory, loadAuthoringCapabilities });
 })(typeof globalThis !== "undefined" ? globalThis : window);
