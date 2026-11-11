@@ -200,6 +200,7 @@ window.BA_LABS_ASSESS_AND_RECORD_BIOLOGICAL_MEASUREMENT = async ({ measurementId
     organizationId: requestOrganizationId,
     domain,
     measurementId: source.id,
+    idempotencyKey,
     ruleVersionId: assessed.rule_version_id,
     result: assessed,
     measurementSnapshot: {
