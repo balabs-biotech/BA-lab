@@ -330,6 +330,15 @@ assert.match(moduleSource, /lineage\?\.lineageQuality\?\.complete === true/);
 assert.match(moduleSource, /biological_field_coverage/);
 assert.match(moduleSource, /insufficient_context_for_biological_interpretation/);
 assert.match(moduleSource, /temporal_evidence: temporalEvidenceForFinding\(signal\)/);
+assert.match(moduleSource, /const compareFindingEvidence = \(signal, temporalEvidence\) =>/);
+assert.match(moduleSource, /same_variable_measurement_count/);
+assert.match(moduleSource, /unit_compatible_measurement_count/);
+assert.match(moduleSource, /different_numeric_value_no_tolerance_defined/);
+assert.match(moduleSource, /no_unit_compatible_measurement/);
+assert.match(moduleSource, /environmental_evidence_role: "context_only_not_direct_biological_confirmation"/);
+assert.match(moduleSource, /evidence_interpretation: "descriptive_comparison_only_no_threshold_or_causal_inference"/);
+assert.match(moduleSource, /evidence_assessment: compareFindingEvidence\(signal, temporalEvidence\)/);
+
 
 assert.match(moduleSource, /trend_semantics: "descriptive_first_to_last_change_not_a_causal_or_threshold_assessment"/);
 
