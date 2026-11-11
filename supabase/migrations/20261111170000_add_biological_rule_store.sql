@@ -48,7 +48,7 @@ create table public.biological_rules (
 );
 
 create index biological_rules_lookup_idx
-  on public.biological_rules (organization_id,domain,variable_code,unit_code,status,created_at desc);
+  on public.biological_rules (organization_id,domain,variable_code,unit_code,status,revision_seq desc);
 
 alter table public.biological_rules enable row level security;
 create policy biological_rules_select
