@@ -7,6 +7,7 @@ declare
   v_context_table oid := to_regclass('public.biological_contexts');
   v_evidence_table oid := to_regclass('public.biological_signal_evidence');
   v_constraint text;
+  v_evidence_trigger_definition text;
 begin
   if v_signal_table is null or v_context_table is null then
     raise exception 'FAIL: biological signal/context tables are missing';
@@ -118,6 +119,21 @@ begin
        and not tgisinternal
   ) then
     raise exception 'FAIL: signal observation provenance trigger is missing';
+  end if;
+
+  select pg_get_functiondef(tg.tgfoid)
+    into v_evidence_trigger_definition
+    from pg_trigger tg
+   where tg.tgrelid = v_signal_table
+     and tg.tgname = 'biological_signals_link_evidence'
+     and not tg.tgisinternal;
+
+  if position('environmental_daily' in v_evidence_trigger_definition) = 0
+     or position('sensor_series' in v_evidence_trigger_definition) = 0
+     or position('sensor_temporal' in v_evidence_trigger_definition) = 0
+     or position('environmental_observation_id' in v_evidence_trigger_definition) = 0
+     or position('measurement_id' in v_evidence_trigger_definition) = 0 then
+    raise exception 'FAIL: signal evidence trigger must route climate and IoT evidence to their correct source tables';
   end if;
 end
 $$;
