@@ -7018,3 +7018,11 @@ setupUiEnhancements();
 
 init();
 
+window.BA_LABS_REFRESH_EXPERIMENTAL_DATA = async () => {
+  const refreshOrganizationId = organizationId;
+  const refreshRevision = authStateRevision;
+  if (!refreshOrganizationId) return;
+  await Promise.all([loadRecentMeasurements(), loadRecentObservations()]);
+  if (isCurrentWorkspaceRevision(refreshRevision, refreshOrganizationId)) updateOverview();
+};
+
