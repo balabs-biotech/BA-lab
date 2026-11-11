@@ -82,8 +82,8 @@
     const changes = paths.filter(path => JSON.stringify(before[path]) !== JSON.stringify(after[path]))
       .slice(0, 40).map(path => ({
         path,
-        category: path.startsWith("finding.") ? "constat"
-          : path.startsWith("evidence.") ? "preuves"
+        category: path.startsWith("evidence.") || path.includes(".evidence.") ? "preuves"
+          : path.startsWith("finding.") ? "constat"
             : path.startsWith("interpretation.") ? "conclusion" : "contexte",
         previous: Object.prototype.hasOwnProperty.call(before, path) ? before[path] : "[absent]",
         current: Object.prototype.hasOwnProperty.call(after, path) ? after[path] : "[absent]"
