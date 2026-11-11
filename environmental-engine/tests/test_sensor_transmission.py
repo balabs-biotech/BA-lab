@@ -81,8 +81,13 @@ def test_historical_window_does_not_label_device_currently_silent():
 
 
 def test_no_receipt_history_is_insufficient_before_one_tolerance_window_elapses():
+    short_window_device = SensorDeviceTransmission(
+        device_id=DEVICE, device_code="sensor-01", enabled=True,
+        created_at=BASE - timedelta(days=1), profile_bound=True,
+        expected_from=BASE,
+    )
     result = assess_sensor_transmissions(
-        [device()], [],
+        [short_window_device], [],
         evaluation_start=BASE,
         evaluation_end=BASE + timedelta(seconds=30),
         evaluated_at=BASE + timedelta(seconds=30),
