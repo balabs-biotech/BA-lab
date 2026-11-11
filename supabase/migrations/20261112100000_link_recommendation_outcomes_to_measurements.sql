@@ -7,6 +7,16 @@ create table public.biological_recommendation_outcome_measurements (
   recommendation_id uuid not null,
   outcome_event_id uuid not null,
   measurement_id uuid not null,
+  measurement_observed_at timestamptz not null,
+  variable_code text not null,
+  normalized_value numeric,
+  normalized_unit_code text,
+  raw_value numeric,
+  raw_unit_code text,
+  method text,
+  instrument text,
+  source_metadata jsonb not null default '{}'::jsonb
+    check (jsonb_typeof(source_metadata) = 'object'),
   evidence_scope text not null check (
     evidence_scope in ('biological_subject', 'environmental_context')
   ),
@@ -148,6 +158,11 @@ begin
       using errcode = 'P0002';
   end if;
 
+  if v_measurement.measured_at is null then
+    raise exception 'biological_recommendation_measurement_timestamp_missing'
+      using errcode = '23514';
+  end if;
+
   if v_measurement.measured_at < v_execution_at
      or v_measurement.measured_at > v_outcome_event.outcome_observed_at then
     raise exception 'biological_recommendation_measurement_outside_outcome_window'
@@ -166,10 +181,16 @@ begin
 
   insert into public.biological_recommendation_outcome_measurements (
     organization_id, recommendation_id, outcome_event_id,
-    measurement_id, evidence_scope, linked_by
+    measurement_id, measurement_observed_at, variable_code,
+    normalized_value, normalized_unit_code, raw_value, raw_unit_code,
+    method, instrument, source_metadata, evidence_scope, linked_by
   ) values (
     p_organization_id, p_recommendation_id, v_outcome_event.event_id,
-    p_measurement_id, v_scope, v_actor_id
+    p_measurement_id, v_measurement.measured_at, v_measurement.variable_code,
+    v_measurement.normalized_value, v_measurement.normalized_unit_code,
+    v_measurement.raw_value, v_measurement.raw_unit_code,
+    v_measurement.method, v_measurement.instrument,
+    coalesce(v_measurement.metadata, '{}'::jsonb), v_scope, v_actor_id
   )
   on conflict (
     organization_id, recommendation_id, outcome_event_id, measurement_id
