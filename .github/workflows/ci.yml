@@ -288,6 +288,14 @@ jobs:
         run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/biological_signals_contract.test.sql
       - name: Test biological signal lifecycle authorization after replay
         run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/biological_signal_lifecycle.test.sql
+      - name: Prepare disposable database for Privacy & Audit Engine draft
+        run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/privacy_audit_engine_draft_bootstrap.test.sql
+      - name: Apply Privacy & Audit Engine review draft in disposable PostgreSQL
+        run: psql -v ON_ERROR_STOP=1 -X -q -f docs/compliance/drafts/privacy-audit-engine-schema.draft.sql
+      - name: Verify Privacy & Audit Engine SQL contract
+        run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/privacy_audit_engine_contract.test.sql
+      - name: Exercise Privacy & Audit Engine signup and version lifecycle
+        run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/privacy_audit_engine_draft_behavior.test.sql
 
   ecosystem-regression:
     runs-on: ubuntu-latest
