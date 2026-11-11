@@ -10,6 +10,13 @@ begin
   if v_table is null then
     raise exception 'FAIL: public.biological_rules is missing';
   end if;
+  if not exists (
+    select 1 from information_schema.columns
+    where table_schema='public' and table_name='biological_rules'
+      and column_name='revision_seq' and is_identity='YES'
+  ) then
+    raise exception 'FAIL: biological rule versions need a monotonic identity sequence';
+  end if;
   if not (select relrowsecurity from pg_class where oid = v_table) then
     raise exception 'FAIL: biological_rules must have row-level security enabled';
   end if;
