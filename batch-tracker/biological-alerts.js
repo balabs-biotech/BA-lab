@@ -633,6 +633,47 @@
         association_type: "temporal_location_context",
         causal_relationship_established: false
       };
+      const observationById = new Map(cultureObservations.map(item => [item.id, item]));
+      const temporalEvidenceForFinding = signal => {
+        const anchor = signal.observed_date || signal.first_seen_at;
+        const anchorTime = anchor ? new Date(anchor).getTime() : NaN;
+        const withinWindow = (timestamp) => {
+          const observedTime = timestamp ? new Date(timestamp).getTime() : NaN;
+          return Number.isFinite(anchorTime) && Number.isFinite(observedTime) &&
+            Math.abs(observedTime - anchorTime) <= 86400000;
+        };
+        const linkedObservations = (Array.isArray(signal.source_observation_ids) ? signal.source_observation_ids : [])
+          .map(id => observationById.get(id)).filter(Boolean);
+        const nearbyMeasurements = Number.isFinite(anchorTime) ?
+          cultureMeasurements.filter(item => withinWindow(item.measured_at)) : [];
+        const nearbyEnvironmental = Number.isFinite(anchorTime) ?
+          environmentalContext.filter(item => withinWindow(item.observed_at)) : [];
+        return {
+          anchor_at: anchor || null,
+          window_hours: 24,
+          linked_observation_ids: linkedObservations.map(item => item.id),
+          nearby_measurement_ids: nearbyMeasurements.map(item => item.id),
+          nearby_environmental_observation_ids: nearbyEnvironmental.map(item => item.id),
+          temporal_association_only: true,
+          causal_relationship_established: false
+        };
+      };
+      const contextFields = [
+        "culture_type", "started_at", "material_id", "generation",
+        "strain_id", "organism_name", "current_stage"
+      ];
+      const populatedContextFields = contextFields.filter(field => biologicalContext[field] !== null && biologicalContext[field] !== "");
+      const contextCompleteness = {
+        biological_fields_present: populatedContextFields,
+        biological_fields_missing: contextFields.filter(field => !populatedContextFields.includes(field)),
+        biological_field_count: contextFields.length,
+        biological_field_coverage: populatedContextFields.length / contextFields.length,
+        measurements_available: evidenceAvailability.measurements,
+        environmental_observations_available: evidenceAvailability.environmental_observations,
+        lineage_complete: lineageQuality.complete,
+        interpretation_readiness: populatedContextFields.length >= 4 && cultureMeasurements.length > 0
+          ? "context_available_for_review" : "insufficient_context_for_biological_interpretation"
+      };
       // Adapt existing rule-engine outputs into the inference contract.
       // A signal is a finding, not an organism identification or a calibrated probability.
       const findings = cultureSignals.map(signal => ({
@@ -656,18 +697,21 @@
         confirmation_status: "unconfirmed",
         composition_status: "not_assessed",
         biological_context: biologicalContext,
-        environmental_context: environmentalSummary
+        environmental_context: environmentalSummary,
+        temporal_evidence: temporalEvidenceForFinding(signal)
       }));
       return {
         culture_id: cultureId,
         biological_context: biologicalContext,
+        context_completeness: contextCompleteness,
         measurement_trends: measurementTrends,
         environmental_summary: environmentalSummary,
         temporal_context: {
           measurement_series_count: measurementTrends.length,
           environmental_series_count: environmentalTrends.length,
           trend_semantics: "descriptive_first_to_last_change_not_a_causal_or_threshold_assessment",
-          temporal_association_is_causal: false
+          temporal_association_is_causal: false,
+          finding_window_hours: 24
         },
         measurements: cultureMeasurements,
         observations: cultureObservations,
