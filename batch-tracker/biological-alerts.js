@@ -565,6 +565,35 @@
       const cultureSignals = biologicalSignals.filter(item => item.biological_subject_id === cultureId);
       const cultureResults = experimentalResults.filter(result =>
         cultureMeasurements.some(item => item.result_id === result.id));
+      const culture = cultures.find(item => item.id === cultureId) || null;
+      const cultureBatches = batches.filter(batch =>
+        batch.culture_id === cultureId || (culture?.material?.id && batch.material_id === culture.material.id));
+      const currentBatch = cultureBatches[0] || null;
+      const biologicalContext = {
+        culture_id: cultureId,
+        culture_code: culture?.code || null,
+        culture_type: culture?.culture_type || null,
+        started_at: culture?.started_at || null,
+        material_id: culture?.material?.id || null,
+        material_code: culture?.material?.material_code || null,
+        material_type: culture?.material?.material_type || null,
+        generation: culture?.material?.generation ?? null,
+        strain_id: culture?.material?.strain_id || culture?.material?.strain?.id || null,
+        strain_code: culture?.material?.strain?.strain_code || null,
+        organism_name: culture?.material?.strain?.organism?.scientific_name || null,
+        batch_code: currentBatch?.batch_code || null,
+        batch_status: currentBatch?.status || null,
+        current_stage: currentBatch?.current_stage || null,
+        batch_context_is_current: Boolean(currentBatch)
+      };
+      const environmentalSummary = {
+        observation_count: environmentalContext.length,
+        variables: [...new Set(environmentalContext.map(item => item.variable_code).filter(Boolean))],
+        first_observed_at: environmentalContext.map(item => item.observed_at).filter(Boolean).sort()[0] || null,
+        last_observed_at: environmentalContext.map(item => item.observed_at).filter(Boolean).sort().slice(-1)[0] || null,
+        association_type: "temporal_location_context",
+        causal_relationship_established: false
+      };
       // Adapt existing rule-engine outputs into the inference contract.
       // A signal is a finding, not an organism identification or a calibrated probability.
       const findings = cultureSignals.map(signal => ({
@@ -586,10 +615,14 @@
         hypotheses: [],
         confidence: null,
         confirmation_status: "unconfirmed",
-        composition_status: "not_assessed"
+        composition_status: "not_assessed",
+        biological_context: biologicalContext,
+        environmental_context: environmentalSummary
       }));
       return {
         culture_id: cultureId,
+        biological_context: biologicalContext,
+        environmental_summary: environmentalSummary,
         measurements: cultureMeasurements,
         observations: cultureObservations,
         biological_signals: cultureSignals,
