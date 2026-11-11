@@ -220,6 +220,7 @@ $;
 
 revoke all on function public.hook_validate_signup_legal_versions(jsonb)
   from public, anon, authenticated;
+grant usage on schema public to supabase_auth_admin;
 grant execute on function public.hook_validate_signup_legal_versions(jsonb)
   to supabase_auth_admin;
 
@@ -369,9 +370,12 @@ begin
     where d.document_type = p_document_type
       and d.effective_at is not null
       and (d.retired_at is null or d.retired_at > p_effective_at)
-      and d.effective_at >= p_effective_at
+      and (
+        d.effective_at >= p_effective_at
+        or (d.effective_at < p_effective_at and d.retired_at > p_effective_at)
+      )
   ) then
-    raise exception 'legal_document_future_version_conflict';
+    raise exception 'legal_document_validity_overlap_conflict';
   end if;
 
   update private.legal_document_versions d
