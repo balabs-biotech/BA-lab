@@ -3031,3 +3031,29 @@ body[data-domain] :is(button, input, select, textarea, a, [tabindex]):focus-visi
     grid-template-columns: 1fr;
   }
 }
+
+
+.signal-interpretation-comparison {
+  display: grid;
+  gap: 0.45rem;
+  margin-top: 0.8rem;
+  padding: 0.7rem;
+  border-left: 3px solid var(--accent, #64748b);
+  background: var(--surface-muted, rgba(128, 128, 128, 0.08));
+  border-radius: 0.35rem;
+}
+.signal-interpretation-diff-list {
+  display: grid;
+  gap: 0.5rem;
+  margin: 0;
+  padding-left: 1.1rem;
+}
+.signal-interpretation-diff-list li strong,
+.signal-interpretation-diff-list li small {
+  display: block;
+  overflow-wrap: anywhere;
+}
+.signal-interpretation-diff-list li small {
+  margin-top: 0.15rem;
+  color: var(--muted);
+}
