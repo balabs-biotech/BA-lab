@@ -8,7 +8,7 @@ vm.runInNewContext(registrySource, context, { filename: "shared/biological-rule-
 const engine = context.globalThis.BALabsBiologicalInterpreter;
 
 const rule = {
-  rule_id: "mycology-incubation-temperature-demo",\n  status: "reviewed",\n  sources: [{ type: "publication", citation: "Reviewed protocol v1" }],\n  review: { reviewer_id: "reviewer-001", reviewed_at: "2026-11-11T10:00:00.000Z" },
+  rule_id: "mycology-incubation-temperature-demo",\n  status: "reviewed",\n  target: { taxon_code: "pleurotus_ostreatus", growth_stage: "incubation" },\n  sources: [{ type: "publication", citation: "Reviewed protocol v1" }],\n  review: { reviewer_id: "reviewer-001", reviewed_at: "2026-11-11T10:00:00.000Z" },
   version: "1.0.0",
   variable_code: "incubation_temperature",
   unit_code: "degC",
@@ -24,7 +24,7 @@ const base = {
   context: {
     culture_id: "b0b0b0b0-0000-4000-8000-000000000001",
     strain_id: "c0c0c0c0-0000-4000-8000-000000000001",
-    growth_stage: "incubation",
+    growth_stage: "incubation",\n    taxon_code: "pleurotus_ostreatus",
   },
 };
 
@@ -34,7 +34,7 @@ assert.equal(engine.assessMeasurement({ measurement: { ...base, assessed_value: 
 assert.equal(engine.assessMeasurement({ measurement: base, rule: null }).status, "insufficient_context");\nassert.equal(engine.assessMeasurement({ measurement: base, rule: { ...rule, status: "draft" } }).status, "not_assessed");
 assert.equal(engine.assessMeasurement({ measurement: { ...base, context: { culture_id: base.context.culture_id } }, rule }).status, "insufficient_context");
 assert.equal(engine.assessMeasurement({ measurement: { ...base, assessed_unit_code: "K" }, rule }).status, "not_assessed");
-assert.equal(engine.assessMeasurement({ measurement: base, rule: { ...rule, applies_to: { growth_stage: "fruiting" } } }).status, "not_assessed");
+assert.equal(engine.assessMeasurement({ measurement: base, rule: { ...rule, applies_to: { growth_stage: "fruiting" } } }).status, "not_assessed");\nassert.equal(engine.assessMeasurement({ measurement: base, rule: { ...rule, target: { taxon_code: "pleurotus_pulmonarius" } } }).status, "not_assessed");
 
 const result = engine.assessMeasurement({ measurement: base, rule });
 assert.equal(result.rule_id, rule.rule_id);
