@@ -370,6 +370,7 @@ declare
   v_last_event_at timestamptz;
   v_execution_at timestamptz;
   v_next_status text;
+  v_events jsonb;
 begin
   if v_actor_id is null or p_organization_id is null
      or not private.is_org_writer(p_organization_id) then
@@ -429,9 +430,18 @@ begin
      where r.organization_id = p_organization_id
        and r.recommendation_id = p_recommendation_id;
 
+    select coalesce(
+      jsonb_agg(to_jsonb(e) order by e.revision),
+      '[]'::jsonb
+    ) into v_events
+      from public.biological_recommendation_events e
+     where e.organization_id = p_organization_id
+       and e.recommendation_id = p_recommendation_id;
+
     return jsonb_build_object(
       'recommendation', to_jsonb(v_recommendation),
       'event', to_jsonb(v_existing),
+      'events', v_events,
       'idempotent_replay', true
     );
   end if;
@@ -527,9 +537,18 @@ begin
      and r.recommendation_id = p_recommendation_id
   returning * into v_recommendation;
 
+  select coalesce(
+    jsonb_agg(to_jsonb(e) order by e.revision),
+    '[]'::jsonb
+  ) into v_events
+    from public.biological_recommendation_events e
+   where e.organization_id = p_organization_id
+     and e.recommendation_id = p_recommendation_id;
+
   return jsonb_build_object(
     'recommendation', to_jsonb(v_recommendation),
     'event', to_jsonb(v_event),
+    'events', v_events,
     'idempotent_replay', false
   );
 end;
