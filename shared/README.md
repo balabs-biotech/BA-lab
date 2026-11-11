@@ -180,7 +180,8 @@ Security model:
 
 - Authenticated organization members can read only their own organization's rule records.
 - Only organization owners/admins can create or modify draft records.
-- A transition to `reviewed` requires the authenticated reviewer ID in the embedded review metadata; the database records the reviewer UUID and timestamp.
+- A `reviewed` version cannot be inserted directly: it must be an explicit update from `draft`. The authenticated reviewer ID in the embedded review metadata must match `auth.uid()`; the database records the reviewer UUID and timestamp.
+- A `retired` version must be inserted as a new version and must match an existing reviewed version's target, thresholds, sources, domain and variable/unit tuple. A draft cannot be changed directly to retired.
 - Reviewed and retired versions cannot be updated or deleted. A new version is inserted instead.
 - To retire a rule, insert a new `retired` version with the same `rule_id`; the store treats the newest reviewed/retired version as authoritative and suppresses older reviewed versions when the newest is retired.
 - The global scientific catalogue is not mixed into tenant data. Cross-organization publication is a separate governance decision.
