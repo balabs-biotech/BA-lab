@@ -476,6 +476,17 @@
     materials.forEach(material => {
       if (material.parent_material_id) addEdge(material.parent_material_id, material.id, "parent_material_id", true);
     });
+    // Operation payloads provide a second, auditable path for multi-source provenance.
+    // Keep these edges directional: each source material contributes to the event output.
+    events.forEach(event => {
+      const payload = event.payload && typeof event.payload === "object" ? event.payload : {};
+      const sourceIds = Array.isArray(payload.source_material_ids) ? payload.source_material_ids : [];
+      const operation = payload.operation || payload.operation_type || event.event_type || "unspecified";
+      if (!event.material_id) return;
+      sourceIds.forEach(sourceId => {
+        addEdge(sourceId, event.material_id, "operation_source:" + String(operation), false);
+      });
+    });
     const eventsByMaterial = new Map();
     events.forEach(event => {
       if (!event.material_id) return;
@@ -569,6 +580,7 @@
       experimental_result_count: experimentalResults.length,
       environmental_context_count: environmentalObservations.length,
       relationship_count: edgeKeys.size,
+      operation_source_edge_count: [...incoming.values()].flat().filter(edge => edge.relationship_type.startsWith("operation_source:")).length,
       event_count: events.length,
       root_count: materials.filter(material => !(incoming.get(material.id) || []).length && !material.parent_material_id).length,
       multi_parent_count: materials.filter(material => (incoming.get(material.id) || []).length > 1).length,
