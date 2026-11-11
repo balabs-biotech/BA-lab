@@ -146,6 +146,10 @@ begin
     raise exception 'privacy_audit_platform_administrators_table_missing';
   end if;
 
+  if not (select relrowsecurity from pg_class where oid = 'private.platform_administrators'::regclass) then
+    raise exception 'privacy_audit_platform_admin_rls_disabled';
+  end if;
+
   if has_table_privilege('anon', 'private.platform_administrators', 'SELECT')
      or has_table_privilege('authenticated', 'private.platform_administrators', 'SELECT')
      or has_table_privilege('service_role', 'private.platform_administrators', 'SELECT') then
