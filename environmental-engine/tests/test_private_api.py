@@ -693,6 +693,15 @@ def test_sensor_temporal_suspect_is_routed_through_versioned_biological_profile(
         "message_code": "temperature_deviation_review",
         "recommendation_code": "review_fruiting_conditions",
     }]
+    interpretation["domain_profile"]["recommendations"] = [{
+        "recommendation_code": "review_fruiting_conditions",
+        "instruction_code": "inspect_fruiting_environment",
+        "rationale_code": "confirmed_temperature_deviation",
+        "applicable_signal_codes": ["temperature_deviation_review"],
+        "allowed_finding_statuses": ["suspect"],
+        "required_context_tags": ["stage:fruiting"],
+        "contraindicated_context_tags": [],
+    }]
     request["biological_interpretation"] = interpretation
     client = TestClient(create_app(engine_api_key="test-secret"))
 
@@ -715,6 +724,10 @@ def test_sensor_temporal_suspect_is_routed_through_versioned_biological_profile(
     assert signal["evidence"]["assessment_type"] == "causal_robust_temporal_screen"
     assert signal["evidence"]["robust_z_score"] > 3.5
     assert signal["evidence"]["temporal_window_seconds"] == 9 * 60 * 60
+    resolution = body["recommendation_resolution"]
+    assert resolution["proposed_count"] == 1
+    assert resolution["proposals"][0]["status"] == "proposed"
+    assert resolution["proposals"][0]["source_signal_id"] == signal["signal_id"]
 
 
 
