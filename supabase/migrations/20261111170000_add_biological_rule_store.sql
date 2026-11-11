@@ -75,6 +75,31 @@ declare
   v_variable_dimension text;
   v_unit_dimension text;
 begin
+  if tg_op = 'INSERT' then
+    if new.status = 'reviewed' then
+      raise exception 'biological_rule_review_must_be_explicit_transition' using errcode = '42501';
+    elsif new.status = 'retired' then
+      if not exists (
+        select 1
+          from public.biological_rules prior
+         where prior.organization_id = new.organization_id
+           and prior.rule_id = new.rule_id
+           and prior.status = 'reviewed'
+           and prior.domain = new.domain
+           and prior.variable_code = new.variable_code
+           and prior.unit_code = new.unit_code
+           and prior.target = new.target
+           and prior.rule->'min' = new.rule->'min'
+           and prior.rule->'max' = new.rule->'max'
+           and prior.rule->'sources' = new.rule->'sources'
+      ) then
+        raise exception 'biological_rule_retirement_requires_prior_reviewed_version' using errcode = '23514';
+      end if;
+    elsif new.status <> 'draft' then
+      raise exception 'biological_rule_invalid_initial_status' using errcode = '23514';
+    end if;
+  end if;
+
   if tg_op = 'DELETE' then
     if old.status <> 'draft' then
       raise exception 'biological_rule_version_immutable' using errcode = '55000';
