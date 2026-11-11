@@ -101,7 +101,8 @@
         "plant_culture_id": {
           "type": "string",
           "format": "uuid"
-        },        "batch_id": {
+        },
+        "batch_id": {
           "type": "string",
           "format": "uuid"
         },
