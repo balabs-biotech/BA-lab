@@ -22,6 +22,7 @@ class SensorDeviceTransmission:
     profile_bound: bool
     expected_from: datetime
     expected_to: datetime | None = None
+    last_seen_at: datetime | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -104,6 +105,8 @@ def assess_sensor_transmissions(
             _require_aware(device.expected_to, "device.expected_to")
             if device.expected_to <= device.expected_from:
                 raise ValueError("device.expected_to must be after expected_from")
+        if device.last_seen_at is not None:
+            _require_aware(device.last_seen_at, "device.last_seen_at")
         device_by_id[device.device_id] = device
 
     receipt_ids: set[UUID] = set()
@@ -151,13 +154,25 @@ def assess_sensor_transmissions(
         )
         ids = tuple(receipt.receipt_id for receipt in observed)
         if not observed:
+            trailing_silence = (
+                max(0.0, (cutoff - device.last_seen_at).total_seconds())
+                if current_window and device.last_seen_at is not None
+                and device.last_seen_at <= cutoff else None
+            )
+            threshold = expected_interval_seconds * float(gap_tolerance_factor)
+            status = (
+                "silent"
+                if trailing_silence is not None and trailing_silence > threshold
+                else "insufficient_data"
+            )
             results.append(SensorTransmissionAssessment(
                 device_id=device_id, device_code=device.device_code,
-                status="insufficient_data",
+                status=status,
                 expected_interval_seconds=expected_interval_seconds,
                 gap_tolerance_factor=float(gap_tolerance_factor),
                 receipt_count=0, gap_count=0, maximum_gap_seconds=None,
-                trailing_silence_seconds=None, last_received_at=None,
+                trailing_silence_seconds=trailing_silence,
+                last_received_at=device.last_seen_at,
                 source_receipt_ids=(),
             ))
             continue
