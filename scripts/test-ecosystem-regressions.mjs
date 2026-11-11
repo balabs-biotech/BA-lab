@@ -29,6 +29,29 @@ assert.ok(html.includes('#app.balabs-ui[dir="rtl"] .site-nav a:after'), 'RTL nav
 assert.ok(html.includes('#app.balabs-ui[dir="rtl"] .editorial-link span'), 'RTL editorial arrows must mirror their visual direction');
 assert.ok(html.includes('#app.balabs-ui[dir="rtl"] .site-nav{'), 'RTL mobile navigation must retain right-to-left reading order');
 
+const homepageSequence = [
+  '<section class="hero"',
+  '<section class="editorial-work"',
+  '<section class="scene"',
+  '<section class="universe-index"',
+  '<section class="editorial-feature"',
+  '<section class="editorial-about"',
+  '<section class="editorial-method"',
+  '<section class="universe-bridge"',
+  '<section class="under"',
+].map((marker) => html.indexOf(marker));
+assert.ok(homepageSequence.every((position) => position >= 0), 'Homepage must retain every primary editorial and explorer section');
+assert.ok(homepageSequence.every((position, index) => index === 0 || position > homepageSequence[index - 1]), 'Homepage journey must prioritize the IoT-led work section, then the 3D explorer, then the eight-universe directory');
+for (const [before, after] of [
+  ['01 / CHAMPS D’EXPLORATION', '02 / Univers BALabs'],
+  ['01 / AREAS OF EXPLORATION', '02 / BALabs universe'],
+  ['01 / مجالات الاستكشاف', '02 / عالم BALabs'],
+  ['01 / ÁREAS DE EXPLORAÇÃO', '02 / Universo BALabs'],
+]) {
+  assert.ok(html.includes(before) && html.includes(after), 'Section numbering must reflect the new homepage journey: ' + before);
+}
+
+
 const languageTrees = Object.fromEntries(['fr', 'en', 'ar', 'pt'].map((language) => [
   language,
   JSON.parse(readFileSync('ecosystem/notion-tree.' + language + '.json', 'utf8')),
