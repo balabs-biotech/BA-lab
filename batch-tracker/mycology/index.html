@@ -12,6 +12,9 @@
   <script src="../../shared/biological-rule-store.js?v=20261111-rule-store-1"></script>
   <script src="../../shared/biological-assessment-store.js?v=20261111-assessment-store-1"></script>
   <script src="../../shared/biological-rule-authoring.js?v=20261111-rule-authoring-1"></script>
+  <script src="../../shared/biological-decision-engine.js?v=20261111-decision-engine-1"></script>
+  <script src="../../shared/biological-decision-policy-store.js?v=20261111-decision-policy-store-1"></script>
+  <script src="../../shared/biological-decision-policy-authoring.js?v=20261111-decision-policy-authoring-1"></script>
   <script src="../../shared/biological-rule-resolver.js?v=20261111-rule-resolver-1"></script>
   <script src="../../shared/biological-interpreter.js?v=20261111-interpreter-1"></script>
   <script src="../../shared/biological-assessment-engine.js?v=20261111-assessment-engine-1"></script>
@@ -45,6 +48,10 @@
             ruleManager.src = "../../shared/biological-rule-management-ui.js?v=20261111-rule-management-2";
             ruleManager.onerror = () => console.error("L’interface de gestion des règles biologiques n’a pas pu être chargée.");
             document.body.appendChild(ruleManager);
+            const policyManager = document.createElement("script");
+            policyManager.src = "../../shared/biological-decision-policy-management-ui.js?v=20261111-policy-management-1";
+            policyManager.onerror = () => console.error("L’interface de gestion des politiques de décision n’a pas pu être chargée.");
+            document.body.appendChild(policyManager);
             const assessmentUi = document.createElement("script");
             assessmentUi.src = "../../shared/biological-assessment-ui.js?v=20261111-assessment-ui-1";
             assessmentUi.onerror = () => console.error("Le module d’évaluation biologique n’a pas pu être chargé.");
