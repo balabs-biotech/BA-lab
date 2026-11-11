@@ -913,6 +913,24 @@ def test_sensor_api_exposes_reference_based_drift_diagnostics_separately():
             "measured_at": f"2026-03-01T0{index}:00:00+00:00",
         })
         request["measurements"].extend((target, reference))
+    # Add guard-band observations before the requested local date. They
+    # must not influence the relative drift assessment for this analysis.
+    for sensor_id, code, value in (
+        (target_id, "sensor-target", 100.0),
+        (reference_id, "sensor-reference", 20.0),
+    ):
+        guard = dict(base)
+        guard.update({
+            "id": str(uuid4()),
+            "iot_device_id": sensor_id,
+            "device_code": code,
+            "raw_value": value,
+            "measured_at": "2026-02-28T23:00:00+00:00",
+            "profile_valid_from": "2026-02-28",
+        })
+        request["measurements"].append(guard)
+    for measurement in request["measurements"]:
+        measurement["profile_valid_from"] = "2026-02-28"
     request["drift_policies"] = [{
         "target_sensor_id": target_id,
         "reference_sensor_id": reference_id,
