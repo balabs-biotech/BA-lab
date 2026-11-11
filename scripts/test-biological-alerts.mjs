@@ -386,6 +386,16 @@ assert.match(moduleSource, /\.from\("biological_interpretation_events"\)/);
 assert.match(moduleSource, /biological_interpretations: !interpretationResult\.error/);
 assert.match(moduleSource, /biological_interpretation_events: interpretationEventsAvailable/);
 assert.match(moduleSource, /interpretation_history: \{/);
+assert.match(moduleSource, /Historique des interprétations/);
+assert.match(moduleSource, /signal-interpretation-history/);
+assert.match(moduleSource, /signal-interpretation-snapshot/);
+assert.match(moduleSource, /signal-interpretation-events/);
+assert.match(moduleSource, /historyEvents\.filter\(event => event\.interpretation_id === snapshot\.interpretation_id\)/);
+assert.match(moduleSource, /dateLabel\(snapshot\.recorded_at\)/);
+assert.match(styles, /\.signal-interpretation-history/);
+assert.match(styles, /\.signal-interpretation-snapshot summary/);
+assert.match(styles, /\.signal-interpretation-events/);
+
 assert.match(moduleSource, /snapshots: cultureInterpretations/);
 assert.match(moduleSource, /events: cultureInterpretationEvents/);
 assert.match(moduleSource, /interpretation_snapshot_count: cultureInterpretations\.length/);
