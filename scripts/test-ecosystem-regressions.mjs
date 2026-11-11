@@ -389,7 +389,7 @@ assert.ok(brandCss.includes('min-height: min(690px, calc(100svh - 145px))'), 'De
 assert.ok(brandCss.includes('font: 400 clamp(64px, 8.2vw, 116px)/.88 Georgia'), 'Hero typography must use the new oversized editorial scale');
 assert.ok(brandCss.includes('grid-template-columns: minmax(0, 1.08fr) minmax(0, .92fr)'), 'Featured project must use the new asymmetric image-led split');
 assert.ok(brandCss.includes('min-height: 740px !important'), 'Mobile hero must have its own image-led composition');
-assert.ok(publicHtml.includes('brand-system.css?v=4'), 'Public page must request the new visual system version');
+assert.ok(html.includes('brand-system.css?v=4'), 'Public page must request the new visual system version');
 assert.ok(previewHtml.includes('brand-system.css?v=4'), 'Preview must request the same visual system version');
 
 // Featured section metadata must remain legible against its light mineral background.
@@ -399,7 +399,7 @@ assert.ok(brandCss.includes('#app.balabs-ui > main > .editorial-feature .art-cap
 
 // Shared design-system contract: preview consumes the same maintained editorial layer as public.
 assert.ok(previewHtml.includes('class="wrap balabs-ui" id="app"'), 'Preview root must opt into the shared BA Labs visual system');
-assert.ok(previewHtml.includes('../ecosystem/brand-system.css?v=3'), 'Preview must load the shared visual system after its local styles');
+assert.ok(previewHtml.includes('../ecosystem/brand-system.css?v=4'), 'Preview must load the shared visual system after its local styles');
 
 // Preview parity contract: retain the preview's independent light theme while
 // matching editorial hierarchy, responsive grids, touch targets and RTL focus.
