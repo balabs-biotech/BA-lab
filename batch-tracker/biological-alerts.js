@@ -1017,6 +1017,68 @@
           ].filter(Boolean).join(" · ")));
         }
         if (interpretation.status) detail.append(element("small", "", "Résolution moteur : " + interpretation.status));
+        const reviewPanel = element("div", "signal-interpretation-review");
+        reviewPanel.append(element("strong", "", "Revue scientifique humaine"));
+        reviewPanel.append(element("small", "", "La revue ajoute un événement au dossier sans modifier l’instantané moteur."));
+        const reviewNote = element("textarea", "signal-interpretation-review-note");
+        reviewNote.rows = 2;
+        reviewNote.maxLength = 2000;
+        reviewNote.placeholder = "Note de revue (facultative, 2 000 caractères maximum)";
+        reviewPanel.append(reviewNote);
+        const reviewStatus = element("small", "signal-interpretation-review-status");
+        const reviewActions = element("div", "signal-interpretation-review-actions");
+        const decisions = [
+          ["accepted", "Accepter"],
+          ["contested", "Contester"],
+          ["reassessment_requested", "Demander une réévaluation"]
+        ];
+        decisions.forEach(([decision, label]) => {
+          const button = element("button", "secondary-button", label);
+          button.type = "button";
+          button.addEventListener("click", async () => {
+            if (!state.organizationId || !state.userId) {
+              reviewStatus.textContent = "Session ou organisation indisponible.";
+              return;
+            }
+            reviewActions.querySelectorAll("button").forEach(control => { control.disabled = true; });
+            reviewStatus.textContent = "Enregistrement de la revue…";
+            const { data, error } = await client.rpc("review_biological_interpretation", {
+              p_organization_id: state.organizationId,
+              p_interpretation_id: snapshot.interpretation_id,
+              p_decision: decision,
+              p_note: reviewNote.value.trim() || null
+            });
+            if (error) {
+              console.error("[CultureOps interpretation review] Write failed", error.message);
+              reviewStatus.textContent = "Échec de l’enregistrement. Vérifiez les droits et réessayez.";
+              reviewActions.querySelectorAll("button").forEach(control => { control.disabled = false; });
+              return;
+            }
+            const event = {
+              event_id: data?.event_id,
+              interpretation_id: snapshot.interpretation_id,
+              event_type: "reviewed",
+              actor_kind: "user",
+              actor_id: state.userId,
+              occurred_at: new Date().toISOString(),
+              event_payload: { decision, note: reviewNote.value.trim() || null }
+            };
+            historyEvents.push(event);
+            const eventList = detail.querySelector(".signal-interpretation-events") || element("ol", "signal-interpretation-events");
+            if (!eventList.isConnected) detail.append(eventList);
+            const eventItem = element("li", "");
+            eventItem.append(element("strong", "", "Revue : " + label));
+            eventItem.append(element("small", "", dateLabel(event.occurred_at) + " · Action utilisateur"));
+            if (event.event_payload.note) eventItem.append(element("small", "", event.event_payload.note));
+            eventList.append(eventItem);
+            reviewStatus.textContent = "Revue enregistrée dans l’historique.";
+            reviewNote.value = "";
+            reviewActions.querySelectorAll("button").forEach(control => { control.disabled = false; });
+          });
+          reviewActions.append(button);
+        });
+        reviewPanel.append(reviewActions, reviewStatus);
+        detail.append(reviewPanel);
         const snapshotEvents = historyEvents.filter(event => event.interpretation_id === snapshot.interpretation_id)
           .slice().sort((left, right) =>
             new Date(left.occurred_at || 0).getTime() - new Date(right.occurred_at || 0).getTime());
@@ -1024,7 +1086,11 @@
           const eventList = element("ol", "signal-interpretation-events");
           snapshotEvents.forEach(event => {
             const eventItem = element("li", "");
-            eventItem.append(element("strong", "", event.event_type || "Événement"));
+            const decisionLabels = { accepted: "acceptée", contested: "contestée", reassessment_requested: "réévaluation demandée" };
+            const eventLabel = event.event_type === "reviewed" && event.event_payload?.decision
+              ? "Revue : " + (decisionLabels[event.event_payload.decision] || event.event_payload.decision)
+              : event.event_type || "Événement";
+            eventItem.append(element("strong", "", eventLabel));
             eventItem.append(element("small", "", dateLabel(event.occurred_at) + " · " +
               (event.actor_kind === "user" ? "Action utilisateur" : "Événement système")));
             if (event.event_payload && event.event_payload.note) {
