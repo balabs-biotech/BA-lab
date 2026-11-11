@@ -209,8 +209,9 @@ begin
   end if;
   if not exists(select 1 from public.events where organization_id='00000000-0000-0000-0000-0000000000a1'
       and material_id=mixed_material_id and event_type='consortium_assembly'
-      and payload->'source_material_ids' is not null) then
-    raise exception 'FAIL: consortium event provenance missing';
+      and payload->>'operation'='consortium_assembly'
+      and payload->'source_material_ids'=to_jsonb(source_material_ids)) then
+    raise exception 'FAIL: consortium event provenance missing or incomplete';
   end if;
   if exists(select 1 from public.material_relationships r
       join public.materials p on p.organization_id=r.organization_id and p.id=r.parent_material_id
