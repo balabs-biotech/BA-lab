@@ -70,7 +70,7 @@
       "then": {
         "properties": {
           "data": {
-            "$ref": "measurement.schema.json"
+            "$ref": "urn:ba-labs:bal-json:v1:measurement"
           }
         }
       }
@@ -89,7 +89,7 @@
       "then": {
         "properties": {
           "data": {
-            "$ref": "observation.schema.json"
+            "$ref": "urn:ba-labs:bal-json:v1:observation"
           }
         }
       }
