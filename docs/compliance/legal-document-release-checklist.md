@@ -57,7 +57,7 @@ Ordre requis :
 - Les pages juridiques sont des documents de travail avec des champs à compléter.
 - Les tables et fonctions du Privacy & Audit Engine sont dans un brouillon SQL de revue, pas dans une migration active.
 - Le hook Auth n'est pas configuré dans le projet.
-- L'API Edge du registre est versionnée mais non déployée ; aucune interface graphique d'administration n'est encore disponible.
+- L'API Edge du registre et la console statique `legal/admin.html` sont versionnées mais non déployées ; la console n'est pas un contrôle d'accès et toutes les actions sont autorisées côté serveur.
 - Aucun administrateur plateforme n'est provisionné par le code.
 - Le formulaire d'inscription ne transmet pas encore d'identifiants de versions.
 - Aucun document juridique n'est considéré comme publié par le registre.
