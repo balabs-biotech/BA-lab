@@ -151,11 +151,12 @@
     $("sensorDriftProfileValidity").textContent =
       "Profil " + state.profile.code + " v" + state.profile.version +
       " · statut " + state.profile.status + " · période " + state.profile.validFrom + " → " + end +
-      " · " + state.devices.length + " appareil(s) activé(s). Les politiques reprendront cette période."
+      " · " + state.devices.length + " appareil(s) activé(s). Les politiques reprendront cette période.";
+    const canCreate = state.profile.status === "active" && state.devices.length >= 2;
     ["sensorDriftVariable", "sensorDriftOffset", "sensorDriftMinimumPairs",
       "sensorDriftMinimumDuration", "sensorDriftMaximumRate"]
-      .forEach(id => { $(id).disabled = false; });
-    $("sensorDriftCreateDraft").disabled = state.devices.length < 2 || state.profile.status !== "active";
+      .forEach(id => { $(id).disabled = !canCreate; });
+    $("sensorDriftCreateDraft").disabled = !canCreate;
     await loadPolicies(revision, organizationId, environmentId);
     if (revision === state.revision) setStatus(state.devices.length >= 2
       ? (state.profile.status === "active"
