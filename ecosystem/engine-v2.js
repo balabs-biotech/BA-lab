@@ -240,15 +240,18 @@ function resize() {
   renderer.setPixelRatio(Math.min(devicePixelRatio||1,window.innerWidth<760?1.2:1.65));
   renderer.setSize(w,h,false);camera.aspect=w/h;camera.fov=w/h>1.25?43:58;camera.updateProjectionMatrix();cameraPosition();
 }
-function smoothCamera(to,distTo,duration=950,done) {
+function smoothCamera(to,distTo,duration=950,done,travelArc=false) {
   if(transition?.frame)cancelAnimationFrame(transition.frame);
   const from=target.clone(),fromDist=distance,started=performance.now();
   const end=to.clone();
+  // A restrained pullback at mid-flight preserves the surrounding mycelium while focus moves between levels.
+  const arc=travelArc?Math.min(.85,Math.max(.18,from.distanceTo(end)*.11)):0;
   stage.classList.add('is-transitioning');
   transition={frame:0};
   const step=now=>{
     const raw=Math.min(1,(now-started)/duration),e=raw<.5?4*raw*raw*raw:1-Math.pow(-2*raw+2,3)/2;
-    target=from.clone().lerp(end,e);distance=fromDist+(distTo-fromDist)*e;zoomTargetDistance=distance;
+    target=from.clone().lerp(end,e);
+    distance=fromDist+(distTo-fromDist)*e+Math.sin(Math.PI*e)*arc;zoomTargetDistance=distance;
     cameraPosition();
     if(raw<1)transition.frame=requestAnimationFrame(step);
     else{transition=null;stage.classList.remove('is-transitioning');targetGoal=null;done?.()}
@@ -469,7 +472,7 @@ function openResource(item) {
   currentNode=data;currentAnchor=data.position.clone();renderPath();
   const trace={rawTitle:raw?.title||raw?.name||null,resolved:!!spatial,parentMatches:parent===previousNode,before,after:{title:currentNode?.title||null,depth:navigationStack.length,children:currentNode?.children?.length||0},position:!!currentAnchor,error:null};
   window.__BALABS_3D_NAV_TRACE__=trace;
-  smoothCamera(currentAnchor,6.1,720,()=>{try{buildResources(selected,data,currentAnchor);trace.afterBuild={title:currentNode?.title||null,depth:navigationStack.length,children:currentNode?.children?.length||0}}catch(error){trace.error={message:error?.message||String(error),stack:error?.stack||''};window.__BALABS_3D_LAST_OPEN_ERROR__=trace.error}});
+  smoothCamera(currentAnchor,6.1,820,()=>{try{buildResources(selected,data,currentAnchor);trace.afterBuild={title:currentNode?.title||null,depth:navigationStack.length,children:currentNode?.children?.length||0}}catch(error){trace.error={message:error?.message||String(error),stack:error?.stack||''};window.__BALABS_3D_LAST_OPEN_ERROR__=trace.error}},true);
   return;
  }
  if(data.url){window.open(data.url,'_blank','noopener');return}
@@ -493,7 +496,7 @@ function enterDomain(id) {
   const rootCount=manifest?.domains?.find(d=>d.id===id)?.children?.length||0;const initialDistance=resourceOverviewDistance(rootCount);smoothCamera(cells.get(id).position,initialDistance,900,()=>buildResources(id));
 }
 function goBackLevel() {
-  if(navigationStack.length){const previous=navigationStack.pop();currentNode=previous.node;currentAnchor=previous.anchor.clone();smoothCamera(currentAnchor,6.2,650,()=>buildResources(selected,currentNode,currentAnchor));return}
+  if(navigationStack.length){const previous=navigationStack.pop();currentNode=previous.node;currentAnchor=previous.anchor.clone();smoothCamera(currentAnchor,6.2,760,()=>buildResources(selected,currentNode,currentAnchor),true);return}
   if(selected)goOverview();
 }
 function goOverview() {
