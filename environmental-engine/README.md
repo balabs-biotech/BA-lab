@@ -24,6 +24,7 @@ The engine foundation provides:
 - opt-in instrument-health diagnostics for exact repeated-reading runs, isolated from biological interpretation;
 - a configurable domain-interpretation layer routing traceable findings to Mycology, GreenTech or Lab profiles, with explicit context tags, biological subject/environment binding and no implicit biological thresholds or recommendations;
 - biological subject and cultivation-context contracts binding organism, strain/cultivar, stage, substrate and production system to a tenant-scoped environmental context and analysis period.
+- a separate biological BAL envelope serializing performance indicators with subject identity, formula/version, period, accepted and excluded measurement lineage, and explicit insufficient-evidence states.
 
 Derived values remain distinct from source observations. The engine does not
 write calculated values back as sensor measurements. A strict NASA POWER daily-row
@@ -55,6 +56,7 @@ The optional FastAPI boundary exposes `GET /health`, `POST /v1/analyses` for tru
 - `docs/architecture/ba-environmental-execution-service-v1.md`: execution service entrypoint, orchestration sequence, scientific boundaries and application integration responsibilities.
 - `docs/architecture/ba-domain-interpretation-framework-v1.md`: configurable domain profiles, biological context binding, context-tag matching, traceable signals and biological validation boundaries.
 - `docs/architecture/ba-environmental-private-api-v1.md`: private FastAPI boundary, service authentication, tenant trust boundary and synchronous request/response contract.
+- `docs/architecture/ba-biological-bal-envelope-v1.md`: biological performance envelope kept separate from the location-scoped environmental BAL-JSON analysis.
 - `docs/architecture/ba-environmental-intelligence-contract-v1.md`: engine boundaries and data flow.
 - `docs/architecture/ba-environmental-unit-registry-v1.md`: canonical units and conversion conventions.
 - `docs/architecture/ba-nasa-power-adapter-v1.md`: provider mapping and daily time semantics.
