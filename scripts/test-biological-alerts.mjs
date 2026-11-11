@@ -413,6 +413,19 @@ assert.match(interpretationMigration, /p_decision is null/);
 assert.match(interpretationMigration, /'accepted', 'contested', 'reassessment_requested'/);
 assert.match(interpretationMigration, /'reviewed',\s+'user', v_actor_id/);
 assert.match(interpretationMigration, /grant execute on function public\.review_biological_interpretation[\s\S]*to authenticated/);
+
+assert.match(interpretationMigration, /select \\* into v_signal[\\s\\S]*for update/);
+assert.match(interpretationMigration, /'superseded'/);
+assert.match(interpretationMigration, /replaced_by_interpretation_id/);
+assert.match(interpretationMigration, /replaced_by_engine_version/);
+assert.match(interpretationMigration, /previous\.engine_code = btrim\(p_engine_code\)/);
+assert.match(moduleSource, /const supersededEvents = snapshotEvents\.filter\(event => event\.event_type === "superseded"\)/);
+assert.match(moduleSource, /Version remplacée/);
+assert.match(moduleSource, /Version courante/);
+assert.match(moduleSource, /Cycle de vie non vérifié/);
+assert.match(moduleSource, /replaced_by_interpretation_id/);
+assert.match(moduleSource, /event\.event_type === "superseded" \? "Instantané remplacé"/);
+assert.match(styles, /\.signal-interpretation-lifecycle/);
 assert.match(interpretationMigration, /revoke all on function public\.review_biological_interpretation[\s\S]*from public, anon/);
 
 assert.match(moduleSource, /String\(event\.event_payload\.note\)/);
