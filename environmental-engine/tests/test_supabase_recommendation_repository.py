@@ -1,0 +1,194 @@
+from datetime import datetime, timezone
+from uuid import uuid4
+
+import pytest
+
+from ba_environmental_engine.interpretation.models import RecommendationProposal
+from ba_environmental_engine.interpretation.recommendation_lifecycle import (
+    RecommendationLifecycle,
+    RecommendationLifecycleEvent,
+)
+from ba_environmental_engine.interpretation.recommendation_repository import (
+    RecommendationAccessDeniedError,
+)
+from ba_environmental_engine.interpretation.supabase_recommendation_repository import (
+    SupabaseRecommendationRepository,
+)
+
+
+class FakeResponse:
+    def __init__(self, data):
+        self.data = data
+
+
+class FakeRpc:
+    def __init__(self, client, name, params):
+        self.client = client
+        self.name = name
+        self.params = params
+
+    def execute(self):
+        self.client.rpc_calls.append((self.name, self.params))
+        return FakeResponse(self.client.rpc_results[self.name])
+
+
+class FakeQuery:
+    def __init__(self, client, table):
+        self.client = client
+        self.table_name = table
+
+    def select(self, _columns):
+        return self
+
+    def eq(self, _column, _value):
+        return self
+
+    def maybe_single(self):
+        return self
+
+    def order(self, _column):
+        return self
+
+    def execute(self):
+        return FakeResponse(self.client.table_results[self.table_name])
+
+
+class FakeClient:
+    def __init__(self, *, rpc_results=None, table_results=None):
+        self.rpc_results = rpc_results or {}
+        self.table_results = table_results or {}
+        self.rpc_calls = []
+
+    def rpc(self, name, params):
+        return FakeRpc(self, name, params)
+
+    def table(self, name):
+        return FakeQuery(self, name)
+
+
+def make_proposal():
+    return RecommendationProposal(
+        recommendation_id=uuid4(),
+        recommendation_code="review_fruiting_airflow",
+        profile_id="mycology-fruiting",
+        profile_version="1.2.0",
+        module="mycology",
+        source_signal_id=uuid4(),
+        source_analysis_id=uuid4(),
+        source_finding_id=uuid4(),
+        instruction_code="inspect_air_exchange",
+        rationale_code="sustained_temperature_deviation",
+        status="proposed",
+    )
+
+
+def recommendation_row(proposal, *, status="proposed", revision=0):
+    return {
+        "recommendation_id": str(proposal.recommendation_id),
+        "recommendation_code": proposal.recommendation_code,
+        "profile_id": proposal.profile_id,
+        "profile_version": proposal.profile_version,
+        "module": proposal.module,
+        "source_signal_id": str(proposal.source_signal_id),
+        "source_analysis_id": str(proposal.source_analysis_id),
+        "source_finding_id": str(proposal.source_finding_id),
+        "instruction_code": proposal.instruction_code,
+        "rationale_code": proposal.rationale_code,
+        "proposal_status": proposal.status,
+        "withholding_reasons": list(proposal.withholding_reasons),
+        "requires_human_review": True,
+        "auto_execute": False,
+        "lifecycle_status": status,
+        "revision": revision,
+        "execution_details": None,
+        "outcome_summary": None,
+        "outcome_observed_at": None,
+    }
+
+
+def test_create_uses_service_role_rpc_and_returns_initial_snapshot():
+    proposal = make_proposal()
+    lifecycle = RecommendationLifecycle.from_proposal(proposal)
+    service_client = FakeClient(rpc_results={
+        "create_biological_recommendation": {
+            "recommendation": recommendation_row(proposal),
+            "events": [],
+        }
+    })
+    repository = SupabaseRecommendationRepository(
+        user_client=FakeClient(),
+        service_client=service_client,
+        authenticated_user_id=uuid4(),
+    )
+
+    result = repository.create(
+        organization_id=uuid4(),
+        lifecycle=lifecycle,
+    )
+
+    assert result == lifecycle
+    assert service_client.rpc_calls[0][0] == "create_biological_recommendation"
+    assert service_client.rpc_calls[0][1]["p_proposal_status"] == "proposed"
+
+
+def test_get_reconstructs_full_revision_ordered_history():
+    proposal = make_proposal()
+    actor_id = uuid4()
+    event_time = datetime(2026, 11, 11, tzinfo=timezone.utc)
+    event = RecommendationLifecycleEvent(
+        action="accept",
+        actor_id=str(actor_id),
+        occurred_at=event_time,
+    )
+    user_client = FakeClient(table_results={
+        "biological_recommendations": {
+            **recommendation_row(proposal, status="accepted", revision=1),
+            "events": [{
+                "event_id": str(event.event_id),
+                "revision": 1,
+                "action": "accept",
+                "actor_id": str(actor_id),
+                "occurred_at": event_time.isoformat(),
+                "note": None,
+                "execution_details": None,
+                "outcome_summary": None,
+                "outcome_observed_at": None,
+            }],
+        }
+    })
+    repository = SupabaseRecommendationRepository(
+        user_client=user_client,
+        service_client=FakeClient(),
+        authenticated_user_id=actor_id,
+    )
+
+    result = repository.get(
+        organization_id=uuid4(),
+        recommendation_id=proposal.recommendation_id,
+    )
+
+    assert result is not None
+    assert result.status == "accepted"
+    assert result.revision == 1
+    assert result.events[0].event_id == event.event_id
+
+
+def test_append_event_rejects_actor_not_bound_to_authenticated_client():
+    repository = SupabaseRecommendationRepository(
+        user_client=FakeClient(),
+        service_client=FakeClient(),
+        authenticated_user_id=uuid4(),
+    )
+    event = RecommendationLifecycleEvent(
+        action="accept",
+        actor_id=str(uuid4()),
+        occurred_at=datetime.now(timezone.utc),
+    )
+
+    with pytest.raises(RecommendationAccessDeniedError):
+        repository.append_event(
+            organization_id=uuid4(),
+            recommendation_id=uuid4(),
+            expected_revision=0,
+            event=event,
+        )
