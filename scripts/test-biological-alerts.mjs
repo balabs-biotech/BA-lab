@@ -309,6 +309,15 @@ assert.match(moduleSource, /organism_name: culture\?\.material\?\.strain\?\.orga
 assert.match(moduleSource, /causal_relationship_established: false/);
 assert.match(moduleSource, /biological_context: biologicalContext/);
 assert.match(moduleSource, /environmental_context: environmentalSummary/);
+assert.match(moduleSource, /const summarizeTimeSeries =/);
+assert.match(moduleSource, /measurementTrends = summarizeTimeSeries\(cultureMeasurements/);
+assert.match(moduleSource, /environmentalTrends = summarizeTimeSeries\(environmentalContext/);
+assert.match(moduleSource, /minimum: Math\.min\(\.\.\.values\)/);
+assert.match(moduleSource, /maximum: Math\.max\(\.\.\.values\)/);
+assert.match(moduleSource, /direction: delta > 0 \? "increasing"/);
+assert.match(moduleSource, /temporal_association_is_causal: false/);
+assert.match(moduleSource, /trend_semantics: "descriptive_first_to_last_change_not_a_causal_or_threshold_assessment"/);
+
 
 assert.match(moduleSource, /source_observation_ids,variable_code,observed_date/);
 
