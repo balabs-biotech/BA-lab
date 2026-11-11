@@ -16,12 +16,16 @@ let env: Record<string, string | undefined>;
 let userValid = true;
 let isAdmin = true;
 let rpcError: string | null = null;
+let verifiedToken: string | undefined;
+const clientKeys: string[] = [];
 const rpcCalls: { name: string; args: Record<string, unknown> }[] = [];
 
-(globalThis as any).__createClient = (_url: string, key: string) => ({
-  auth: { getUser: async () => key === "publishable"
+(globalThis as any).__createClient = (_url: string, key: string) => {
+  clientKeys.push(key);
+  return {
+  auth: { getUser: async (token?: string) => { verifiedToken = token; return key === "publishable"
     ? (userValid ? { data: { user: { id: "user-verified" } }, error: null } : { data: { user: null }, error: { message: "invalid" } })
-    : { data: { user: null }, error: null } },
+    : { data: { user: null }, error: null }; } },
   rpc: async (name: string, args: Record<string, unknown> = {}) => {
     rpcCalls.push({ name, args });
     if (rpcError) return { data: null, error: { message: rpcError } };
@@ -31,7 +35,8 @@ const rpcCalls: { name: string; args: Record<string, unknown> }[] = [];
     if (name === "retire_legal_document_version") return { data: true, error: null };
     return { data: null, error: { message: "unexpected rpc" } };
   },
-});
+  };
+};
 (globalThis as any).Deno = {
   env: { get: (key: string) => env[key] },
   serve: (fn: any) => { handler = fn; },
@@ -43,11 +48,13 @@ fs.writeFileSync(tmpFile, source.replace(importLine, "const createClient = (glob
 await import(pathToFileURL(tmpFile).href);
 
 function reset(overrides: { valid?: boolean; admin?: boolean; rpcError?: string | null } = {}) {
-  env = { SUPABASE_URL: "https://example.supabase.co", SUPABASE_PUBLISHABLE_KEY: "publishable", SUPABASE_SECRET_KEY: "secret" };
+  env = { SUPABASE_URL: "https://example.supabase.co", SUPABASE_PUBLISHABLE_KEYS: JSON.stringify({ default: "publishable" }), SUPABASE_SECRET_KEYS: JSON.stringify({ default: "secret" }) };
   userValid = overrides.valid ?? true;
   isAdmin = overrides.admin ?? true;
   rpcError = overrides.rpcError ?? null;
   rpcCalls.length = 0;
+  verifiedToken = undefined;
+  clientKeys.length = 0;
 }
 async function call(body: Record<string, unknown> | null, authorization = "Bearer test-jwt", method = "POST") {
   const response = await handler(new Request("https://edge.test", {
@@ -61,6 +68,12 @@ async function call(body: Record<string, unknown> | null, authorization = "Beare
 reset();
 {
   const r = await call({ action: "list" }, "");
+  assert.equal(r.status, 401);
+  assert.equal(rpcCalls.length, 0);
+}
+reset();
+{
+  const r = await call({ action: "list" }, "not-a-bearer-token");
   assert.equal(r.status, 401);
   assert.equal(rpcCalls.length, 0);
 }
@@ -81,6 +94,8 @@ reset();
   const r = await call({ action: "list" });
   assert.equal(r.status, 200);
   assert.equal(r.body.documents[0].version, "v1");
+  assert.equal(verifiedToken, "test-jwt", "the bearer token must be explicitly verified by Auth");
+  assert.deepEqual(clientKeys, ["publishable", "secret"], "the function must resolve the modern default API keys");
 }
 reset();
 {
@@ -131,4 +146,4 @@ reset({ rpcError: "database unavailable" });
   const r = await call({ action: "list" }, "Bearer test-jwt", "GET");
   assert.equal(r.status, 405);
 }
-console.log("PASS legal-document-registry: 10 scenarios");
+console.log("PASS legal-document-registry: 11 scenarios");
