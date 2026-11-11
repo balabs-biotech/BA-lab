@@ -15,6 +15,14 @@ for (const section of ['hero', 'editorial-feature', 'editorial-about', 'editoria
 }
 assert.ok(brandCss.includes('#app.balabs-ui > .top'), 'Header styling must remain scoped to the app header');
 assert.ok(brandCss.includes('#app.balabs-ui > .foot'), 'Footer styling must remain scoped to the app footer');
+const editorialSections = ['hero', 'editorial-feature', 'editorial-about', 'editorial-work', 'universe-index', 'editorial-method', 'universe-bridge', 'scene', 'under'];
+for (const section of editorialSections) {
+  const escaped = section.replace(/[.*+?^${}()|[\\]\\\\]/g, '\\\\assert.ok(brandCss.includes('#app.balabs-ui > .foot'), 'Footer styling must remain scoped to the app footer');
+');
+  assert.match(html, new RegExp('#app\\\\s*>\\\\s*main\\\\s*>\\\\s*\\\\.' + escaped + '\\\\b'), 'Inline layout rules must target the nested main section: ' + section);
+  assert.doesNotMatch(html, new RegExp('#app\\\\s*>\\\\s*\\\\.' + escaped + '\\\\b'), 'No layout rule may target ' + section + ' as a direct app child');
+}
+assert.ok(!brandCss.includes('NOT imported by ecosystem/index.html'), 'Brand stylesheet integration note must reflect the live import');
 
 const languageTrees = Object.fromEntries(['fr', 'en', 'ar', 'pt'].map((language) => [
   language,
