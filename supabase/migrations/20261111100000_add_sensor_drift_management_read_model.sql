@@ -8,6 +8,7 @@ returns table (
   profile_id uuid,
   profile_code text,
   profile_version text,
+  profile_status text,
   profile_valid_from date,
   profile_valid_to date,
   sensor_id uuid,
@@ -38,7 +39,7 @@ begin
   end if;
 
   return query
-  select p.id, p.profile_code, p.profile_version, p.valid_from, p.valid_to,
+  select p.id, p.profile_code, p.profile_version, p.status, p.valid_from, p.valid_to,
          d.id, d.device_code, d.device_type, d.enabled
     from public.environment_context_profiles p
     left join public.environment_context_profile_sensors ps
@@ -52,7 +53,18 @@ begin
    where p.organization_id = p_organization_id
      and p.environment_id = p_environment_id
      and p.origin = 'sensor'
-     and p.status = 'active'
+     and p.status in ('active', 'retired')
+     and p.id = (
+       select candidate.id
+         from public.environment_context_profiles candidate
+        where candidate.organization_id = p_organization_id
+          and candidate.environment_id = p_environment_id
+          and candidate.origin = 'sensor'
+          and candidate.status in ('active', 'retired')
+        order by (candidate.status = 'active') desc,
+                 candidate.valid_from desc, candidate.activated_at desc nulls last
+        limit 1
+     )
    order by d.device_code nulls last, d.id;
 end;
 $$;
