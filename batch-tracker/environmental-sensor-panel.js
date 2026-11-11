@@ -106,9 +106,10 @@
     const series = Array.isArray(analysis.series) ? analysis.series : [];
     const temporal = Array.isArray(payload.temporal_screening?.assessments) ? payload.temporal_screening.assessments : [];
     const flatlines = Array.isArray(payload.instrument_health?.flatline_diagnostics?.assessments) ? payload.instrument_health.flatline_diagnostics.assessments : [];
+    const transmissions = Array.isArray(payload.instrument_health?.transmission_diagnostics?.assessments) ? payload.instrument_health.transmission_diagnostics.assessments : [];
     const signals = Array.isArray(payload.domain_interpretation?.signals) ? payload.domain_interpretation.signals : [];
     const summary = node("div", "sensor-summary");
-    [["Observations", analysis.total_observations ?? 0], ["Séries", series.length], ["Lectures suspectes", payload.temporal_screening?.status === "completed" ? temporal.filter(item => item.status === "suspect").length : "Non demandé"], ["Alertes instrumentales", payload.instrument_health?.flatline_diagnostics?.status === "completed" ? flatlines.filter(item => item.status === "suspected").length : "Non demandé"], ["Signaux biologiques", signals.length]].forEach(([label, value]) => {
+    [["Observations", analysis.total_observations ?? 0], ["Séries", series.length], ["Lectures suspectes", payload.temporal_screening?.status === "completed" ? temporal.filter(item => item.status === "suspect").length : "Non demandé"], ["Alertes instrumentales", payload.instrument_health?.flatline_diagnostics?.status === "completed" ? flatlines.filter(item => item.status === "suspected").length : "Non demandé"], ["Appareils silencieux", payload.instrument_health?.transmission_diagnostics?.status === "completed" ? transmissions.filter(item => item.status === "silent").length : "Non demandé"], ["Signaux biologiques", signals.length]].forEach(([label, value]) => {
       const metric = node("article", "sensor-metric");
       metric.append(node("span", "", label), node("strong", "", String(value)));
       summary.append(metric);
@@ -165,6 +166,19 @@
       details.append(node("p", "sensor-notice", "Une séquence identique est un indice instrumental à examiner, pas un diagnostic de panne ni une anomalie biologique."));
       output.append(details);
     }
+    if (payload.instrument_health?.transmission_diagnostics?.status === "completed") {
+      const details = node("details", "sensor-detail");
+      details.append(node("summary", "", "État des transmissions IoT (" + transmissions.length + " appareil(s))"));
+      transmissions.forEach(item => details.append(node("p", "", [
+        item.device_code, item.status,
+        "reçus=" + (item.receipt_count ?? 0),
+        item.gap_count == null ? null : "ruptures=" + item.gap_count,
+        item.maximum_gap_seconds == null ? null : "écart max=" + Math.round(item.maximum_gap_seconds) + " s",
+        item.trailing_silence_seconds == null ? null : "silence=" + Math.round(item.trailing_silence_seconds) + " s"
+      ].filter(value => value !== undefined && value !== null).join(" · "))));
+      details.append(node("p", "sensor-notice", "Une absence de transmission est un diagnostic de transport, distinct de la qualité des mesures et de l’état biologique. Les périodes historiques ne sont pas qualifiées de silencieuses."));
+      output.append(details);
+    }
     if (signals.length) {
       const details = node("details", "sensor-detail");
       details.append(node("summary", "", "Signaux biologiques interprétés (" + signals.length + ")"));
@@ -196,6 +210,8 @@
       const temporalThreshold = $("sensorTemporalThreshold").value.trim();
       const flatlineMinimumObservations = $("sensorFlatlineMinimumObservations").value.trim();
       const flatlineMinimumDurationSeconds = $("sensorFlatlineMinimumDurationSeconds").value.trim();
+      const transmissionIntervalMinutes = $("sensorTransmissionIntervalMinutes").value.trim();
+      const transmissionToleranceFactor = $("sensorTransmissionToleranceFactor").value.trim();
       const flatlineValues = [flatlineMinimumObservations, flatlineMinimumDurationSeconds];
       const flatlineRequested = flatlineValues.some(value => value !== "");
       if (flatlineRequested && flatlineValues.some(value => value === "")) {
@@ -203,6 +219,24 @@
         return;
       }
       const body = { environment_id: environmentId, start_date: startDate, end_date: endDate, subject_id: subjectId };
+      const transmissionValues = [transmissionIntervalMinutes, transmissionToleranceFactor];
+      const transmissionRequested = transmissionValues.some(value => value !== "");
+      if (transmissionRequested && transmissionValues.some(value => value === "")) {
+        status("Pour activer la surveillance des transmissions, renseignez ensemble la cadence attendue et le multiplicateur de tolérance.", true);
+        return;
+      }
+      if (transmissionRequested) {
+        const intervalMinutes = Number(transmissionIntervalMinutes);
+        const toleranceFactor = Number(transmissionToleranceFactor);
+        if (!Number.isSafeInteger(intervalMinutes) || intervalMinutes <= 0 || intervalMinutes > 1440 ||
+            !Number.isFinite(toleranceFactor) || toleranceFactor <= 1 || toleranceFactor > 10) {
+          status("Réglages de transmission invalides : cadence entière de 1 à 1 440 minutes et tolérance supérieure à 1, jusqu’à 10.", true);
+          return;
+        }
+        body.transmission_expected_interval_seconds = intervalMinutes * 60;
+        body.transmission_gap_tolerance_factor = toleranceFactor;
+      }
+
       if (flatlineRequested) {
         const minimumObservations = Number(flatlineMinimumObservations);
         const minimumDurationSeconds = Number(flatlineMinimumDurationSeconds);
