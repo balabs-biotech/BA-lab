@@ -69,6 +69,27 @@ type InterpretationResolution = {
   status: string;
   payload?: Record<string, unknown>;
 };
+type PersistedInterpretationStatus =
+  | "observed_only"
+  | "supporting_evidence"
+  | "discordant_evidence"
+  | "insufficient_evidence"
+  | "requires_review";
+
+function persistedInterpretationStatus(findingStatus: unknown): PersistedInterpretationStatus {
+  switch (findingStatus) {
+    case "normal":
+      return "observed_only";
+    case "insufficient_history":
+    case "insufficient_coverage":
+      return "insufficient_evidence";
+    case "suspect":
+    case "indeterminate":
+    default:
+      return "requires_review";
+  }
+}
+
 
 async function resolveBiologicalInterpretation(
   adminClient: any,
@@ -426,7 +447,17 @@ Deno.serve(async (req: Request) => {
     const signals = Array.isArray(analysisResult.domain_interpretation?.signals)
       ? analysisResult.domain_interpretation.signals
       : [];
+    let interpretationPersistenceStatus = "not_requested";
+    let persistedInterpretationCount = 0;
     if (interpretationResolution.status === "ready" && signals.length > 0) {
+      const engineVersion = typeof analysisResult.engine_version === "string"
+        ? analysisResult.engine_version.trim()
+        : "";
+      if (!engineVersion || engineVersion.length > 64) {
+        console.error("[environmental-analysis] Engine version is missing or invalid");
+        return reply(502, { error: "environmental_engine_version_missing" });
+      }
+      const domainInterpretation = analysisResult.domain_interpretation as Record<string, any>;
       const biological = interpretationResolution.payload!.biological_context as Record<string, any>;
       const environment = interpretationResolution.payload!.environment_context as Record<string, any>;
       const domainProfile = interpretationResolution.payload!.domain_profile as Record<string, any>;
@@ -470,8 +501,64 @@ Deno.serve(async (req: Request) => {
         return reply(500, { error: "biological_signal_persistence_failed" });
       }
       signalPersistenceStatus = "persisted";
+
+      for (const signal of signals as Record<string, any>[]) {
+        const interpretationPayload = {
+          schema_version: "ba.biological_interpretation.v1",
+          engine: { code: "ba_environmental_engine", version: engineVersion },
+          analysis: {
+            analysis_id: analysisResult.analysis_id,
+            generated_at: analysisResult.generated_at ?? null,
+          },
+          domain_profile: {
+            profile_id: domainInterpretation.profile_id,
+            profile_version: domainInterpretation.profile_version,
+            module: domainInterpretation.module,
+          },
+          interpretation: {
+            status: analysisResult.interpretation_status,
+            evaluated_findings: domainInterpretation.evaluated_findings,
+            matched_findings: domainInterpretation.matched_findings,
+          },
+          finding: {
+            signal_id: signal.signal_id,
+            source_finding_id: signal.source_finding_id,
+            signal_code: signal.signal_code,
+            finding_status: signal.finding_status,
+            severity: signal.severity,
+            rule_id: signal.rule_id,
+            variable_code: signal.variable_code,
+            observed_date: signal.observed_date,
+            observed_value: signal.observed_value ?? null,
+            unit: signal.unit,
+            source_observation_ids: signal.source_observation_ids ?? [],
+            context_tags: signal.context_tags ?? [],
+            evidence: signal.evidence ?? {},
+          },
+        };
+        const { error: interpretationError } = await adminClient.rpc(
+          "record_biological_interpretation",
+          {
+            p_organization_id: location.organization_id,
+            p_interpretation_id: crypto.randomUUID(),
+            p_event_id: crypto.randomUUID(),
+            p_source_signal_id: signal.signal_id,
+            p_engine_code: "ba_environmental_engine",
+            p_engine_version: engineVersion,
+            p_interpretation_status: persistedInterpretationStatus(signal.finding_status),
+            p_interpretation_payload: interpretationPayload,
+          },
+        );
+        if (interpretationError) {
+          console.error("[environmental-analysis] Interpretation snapshot persistence failed", interpretationError.message);
+          return reply(500, { error: "biological_interpretation_persistence_failed" });
+        }
+        persistedInterpretationCount += 1;
+      }
+      interpretationPersistenceStatus = "persisted";
     } else if (interpretationResolution.status === "ready") {
       signalPersistenceStatus = "no_signals";
+      interpretationPersistenceStatus = "no_findings";
     }
 
     let recommendationPersistenceStatus = "not_requested";
@@ -543,6 +630,8 @@ Deno.serve(async (req: Request) => {
         signal_persistence_status: signalPersistenceStatus,
         recommendation_persistence_status: recommendationPersistenceStatus,
         persisted_recommendation_count: persistedRecommendationCount,
+        interpretation_persistence_status: interpretationPersistenceStatus,
+        persisted_interpretation_count: persistedInterpretationCount,
       },
     });
   } catch (error) {
