@@ -19,6 +19,8 @@ create table public.biological_interpretations (
   interpretation_payload jsonb not null check (jsonb_typeof(interpretation_payload) = 'object'),
   recorded_at timestamptz not null default now(),
   primary key (organization_id, interpretation_id),
+  constraint biological_interpretations_engine_snapshot_key
+    unique (organization_id, source_signal_id, engine_code, engine_version),
   constraint biological_interpretations_signal_fk
     foreign key (organization_id, source_signal_id)
     references public.biological_signals (organization_id, signal_id) on delete restrict,
@@ -163,7 +165,9 @@ begin
     btrim(p_engine_code), btrim(p_engine_version),
     p_interpretation_status, p_interpretation_payload
   )
-  on conflict (organization_id, interpretation_id) do nothing;
+  on conflict (
+    organization_id, source_signal_id, engine_code, engine_version
+  ) do nothing;
 
   get diagnostics v_rows = row_count;
   v_inserted := v_rows > 0;
@@ -171,9 +175,12 @@ begin
   select * into v_snapshot
     from public.biological_interpretations bi
    where bi.organization_id = p_organization_id
-     and bi.interpretation_id = p_interpretation_id;
+     and bi.source_signal_id = p_source_signal_id
+     and bi.engine_code = btrim(p_engine_code)
+     and bi.engine_version = btrim(p_engine_version);
 
-  if v_snapshot.source_signal_id <> p_source_signal_id
+  if v_snapshot.interpretation_id is null
+     or v_snapshot.source_signal_id <> p_source_signal_id
      or v_snapshot.engine_code <> btrim(p_engine_code)
      or v_snapshot.engine_version <> btrim(p_engine_version)
      or v_snapshot.interpretation_status <> p_interpretation_status
