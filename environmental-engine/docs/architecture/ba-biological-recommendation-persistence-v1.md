@@ -183,13 +183,16 @@ from this design document.
 
 `RecommendationService` coordinates the pure lifecycle transition with the repository port:
 
-Proposal persistence is exposed through `RecommendationService.create` and
-`persist_resolution`. The latter persists proposed and withheld results alike.
-Proposal IDs are deterministic; the create RPC returns the existing aggregate
-and its complete event history for an identical replay, and rejects reuse with
-different immutable content. A resolution batch is a sequence of individually
-atomic creates, not one cross-proposal transaction; an interrupted batch can
-therefore be safely replayed.
+Proposal persistence is exposed through `RecommendationService.create`,
+`persist_resolution`, and `resolve_and_persist`. The last method resolves only
+against the exact versioned `DomainProfile`, then persists proposed and withheld
+results alike. Source biological signals must already exist; the database
+checks their analysis, finding and profile lineage before accepting each
+proposal. Proposal IDs are deterministic; the create RPC returns the existing
+aggregate and its complete event history for an identical replay, and rejects
+reuse with different immutable content. A resolution batch is a sequence of
+individually atomic creates, not one cross-proposal transaction; an interrupted
+batch can therefore be safely replayed.
 
 A human lifecycle transition follows this sequence:
 
@@ -197,7 +200,11 @@ A human lifecycle transition follows this sequence:
 2. Return a not-found result scoped to that organization when absent.
 3. Apply the domain transition and construct one immutable event.
 4. Call `append_event` with the revision observed during the load.
-5. Propagate a revision conflict unchanged. The service must not retry by silently applying the same human decision to a newer state.
+5. The transition RPC returns the committed recommendation and complete
+   revision-ordered event history in the same transaction; the adapter does
+   not perform a second read that could race with another writer.
+6. Propagate a revision conflict unchanged. The service must not retry by
+   silently applying the same human decision to a newer state.
 
 The service receives the actor identifier from the authenticated server request context. This value is descriptive event data, not an authorization credential: the concrete repository/RPC must independently compare it with `auth.uid()` and reject mismatches. A client must never be able to choose the actor recorded in the audit trail.
 
