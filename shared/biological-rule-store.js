@@ -34,7 +34,7 @@
     }
 
     let query = input.client.from("biological_rules")
-      .select("id,organization_id,rule_id,version,status,domain,variable_code,unit_code,rule,created_at")
+      .select("id,organization_id,rule_id,version,status,domain,variable_code,unit_code,rule,created_at,reviewed_by,reviewed_at")
       .eq("organization_id", input.organizationId)
       .eq("domain", input.domain)
       .eq("variable_code", input.variableCode)
@@ -72,7 +72,13 @@
         row.status === rule.status &&
         row.domain === rule.domain &&
         row.variable_code === rule.variable_code &&
-        row.unit_code === rule.unit_code;
+        row.unit_code === rule.unit_code &&
+        typeof row.reviewed_by === "string" &&
+        typeof row.reviewed_at === "string" &&
+        rule.review && rule.review.reviewer_id === row.reviewed_by &&
+        Number.isFinite(Date.parse(rule.review.reviewed_at)) &&
+        Number.isFinite(Date.parse(row.reviewed_at)) &&
+        Date.parse(rule.review.reviewed_at) === Date.parse(row.reviewed_at);
       if (!consistent || !registry.isExecutable(rule)) {
         rejected.push(ruleId);
         continue;
