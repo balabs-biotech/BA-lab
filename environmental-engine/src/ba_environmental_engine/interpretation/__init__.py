@@ -1,5 +1,11 @@
 """Configurable, domain-specific interpretation of environmental findings."""
 
+from .recommendations import resolve_recommendations
+from .models import (
+    RecommendationDefinition,
+    RecommendationProposal,
+    RecommendationResolution,
+)
 from .sensor_events import (
     SensorEvent,
     SensorEventAnalysis,
@@ -30,4 +36,8 @@ __all__ = [
     "SensorEventProfile",
     "SensorEventRule",
     "detect_sensor_events",
+    "RecommendationDefinition",
+    "RecommendationProposal",
+    "RecommendationResolution",
+    "resolve_recommendations",
 ]
