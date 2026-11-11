@@ -77,6 +77,13 @@ jobs:
         run: |
           [ -f .gitignore ] && echo "✓ .gitignore" || exit 1
 
+  bal-json-contract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify BAL-JSON v1 schema structure and examples
+        run: node scripts/test-bal-json-contract.mjs
+
   batch-tracker-audit:
     runs-on: ubuntu-latest
     steps:
