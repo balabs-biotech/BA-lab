@@ -1191,6 +1191,41 @@ h1 span{font-style:italic!important;color:var(--field-rust)!important}
  #app > main > #universes .universe-index-card{min-height:205px}
 }
 
+
+/* RTL editorial polish — mirror directional micro-interactions, not the biological scene. */
+#app.balabs-ui[dir="rtl"] > main .site-nav a:after,
+#app.balabs-ui[dir="rtl"] .site-nav a:after{
+  left:auto!important;
+  right:0!important;
+}
+#app.balabs-ui[dir="rtl"] > main .site-nav a:hover:after,
+#app.balabs-ui[dir="rtl"] .site-nav a:hover:after,
+#app.balabs-ui[dir="rtl"] .site-nav a:focus-visible:after{
+  left:0!important;
+  right:0!important;
+}
+#app.balabs-ui[dir="rtl"] .editorial-link span{
+  transform:scaleX(-1);
+}
+#app.balabs-ui[dir="rtl"] .editorial-link:hover span{
+  transform:scaleX(-1) translate(4px,-3px);
+}
+#app.balabs-ui[dir="rtl"] .hero-action-primary span{
+  transform:scaleX(-1);
+}
+@media(max-width:760px){
+  #app.balabs-ui[dir="rtl"] .site-nav{
+    direction:rtl;
+    justify-content:flex-start!important;
+  }
+  #app.balabs-ui[dir="rtl"] .top .tools{
+    justify-content:flex-start!important;
+  }
+}
+@media(prefers-reduced-motion:reduce){
+  #app.balabs-ui .editorial-link span{transition:none!important}
+}
+
 </style>
 <style>
 #mainView .webgl-focus-next{margin-top:5px;color:#829b80;font:600 9px/1.4 system-ui,sans-serif;letter-spacing:.09em;text-transform:uppercase}
