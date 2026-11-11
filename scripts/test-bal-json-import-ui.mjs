@@ -50,7 +50,7 @@ function makeRecord(overrides = {}) {
   };
 }
 
-function harness({ domain = "mycology", organizationId = "a0a0a0a0-0000-4000-8000-000000000001", result = { status: "inserted", event_id: "e0e0e0e0-0000-4000-8000-000000000001" }, catalogue = { variables: [{ code: "fresh_mass", dimension: "mass", canonical_unit_code: "g" }], units: [{ code: "g", dimension: "mass", factor: 1, offset_value: 0, is_linear: true }, { code: "kg", dimension: "mass", factor: 1000, offset_value: 0, is_linear: true }] } } = {}) {
+function harness({ domain = "mycology", organizationId = "a0a0a0a0-0000-4000-8000-000000000001", result = { status: "inserted", event_id: "e0e0e0e0-0000-4000-8000-000000000001" }, catalogue = { variables: [{ code: "fresh_mass", dimension: "mass", canonical_unit_code: "g" }], units: [{ code: "g", dimension: "mass", factor: 1, offset_value: 0, is_linear: true }, { code: "kg", dimension: "mass", factor: 1000, offset_value: 0, is_linear: true }] }, catalogueThrows = false } = {}) {
   const ids = ["balJsonImportPanel","balJsonImportSource","balJsonPreviewButton","balJsonImportButton","balJsonPreview","balJsonImportStatus"];
   const elements = new Map(ids.map(id => [id, element(id)]));
   const calls = [];
@@ -64,7 +64,7 @@ function harness({ domain = "mycology", organizationId = "a0a0a0a0-0000-4000-800
     BA_LABS_DOMAIN: domain,
     BA_LABS_SUPABASE_CLIENT: client,
     BA_LABS_GET_ORGANIZATION_ID: () => organizationId,
-    BA_LABS_GET_MEASUREMENT_CATALOGUE: () => catalogue,
+    BA_LABS_GET_MEASUREMENT_CATALOGUE: () => { if (catalogueThrows) throw new Error("catalogue read failed"); return catalogue; },
     BALabsNormalizer: normalizerApi,
     BA_LABS_REFRESH_EXPERIMENTAL_DATA: async () => { refreshCalls += 1; },
   };
@@ -188,6 +188,15 @@ function harness({ domain = "mycology", organizationId = "a0a0a0a0-0000-4000-800
   elements.get("balJsonPreviewButton").click();
   assert.equal(elements.get("balJsonImportButton").disabled, false, "missing catalogue must not block raw data import");
   assert.match(elements.get("balJsonPreview").textContent, /Catalogue des unités indisponible/);
+}
+
+{
+  const { elements } = harness({ catalogueThrows: true });
+  elements.get("balJsonImportSource").value = JSON.stringify(makeRecord());
+  elements.get("balJsonPreviewButton").click();
+  assert.equal(elements.get("balJsonImportButton").disabled, false, "a catalogue runtime failure must not block raw import");
+  assert.match(elements.get("balJsonPreview").textContent, /moteur de normalisation indisponible/i);
+  assert.match(elements.get("balJsonPreview").textContent, /valeur brute reste la référence/i);
 }
 
 console.log("✓ BAL-JSON import UI: strict preview, advisory catalogue normalization, conservative conversion blocks, tenant guard, stale-preview rejection, duplicate handling and explicit authenticated submission");
