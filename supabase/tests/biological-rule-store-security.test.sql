@@ -67,7 +67,8 @@ begin
      v_guard not ilike '%biological_rule_reviewer_must_match_authenticated_user%' or
      v_guard not ilike '%biological_rule_variable_unit_dimension_mismatch%' or
      v_guard not ilike '%biological_rule_review_must_be_explicit_transition%' or
-     v_guard not ilike '%biological_rule_retirement_requires_prior_reviewed_version%' or
+     v_guard not ilike '%biological_rule_retirement_requires_latest_reviewed_version%' or
+     v_guard not ilike '%biological_rule_stale_draft_cannot_be_reviewed%' or
      v_guard not ilike '%biological_rule_retirement_requires_new_version%' or
      v_guard not ilike '%biological_rule_invalid_initial_status%' or
      v_guard not ilike '%biological_rule_review_must_be_explicit_transition%' or
