@@ -72,6 +72,7 @@ Les durées doivent être définies par catégorie, approuvées par le responsab
 - [ ] Examiner la nécessité d'une analyse d'impact / évaluation de risques pour les traitements à risque élevé et documenter la décision.
 - [ ] Auditer les politiques RLS, vues, fonctions RPC, journaux, Storage, Auth et accès de support.
 - [ ] Vérifier la séparation du consentement recherche/statistiques et de l'acceptation des conditions.
+- [ ] Enregistrer côté serveur les versions et horodatages d'acceptation des conditions et notices ; le simple état d'une case à cocher côté navigateur n'est pas une preuve d'audit immuable.
 - [ ] Tester le gestionnaire de préférences, son retrait, le blocage de tout futur traceur facultatif et l'accessibilité clavier/mobile.
 - [ ] Faire relire les politiques et les conditions par un juriste algérien avant publication définitive.
 
