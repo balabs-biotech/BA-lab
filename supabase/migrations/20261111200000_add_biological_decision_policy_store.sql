@@ -65,14 +65,15 @@ begin
     return old;
   end if;
 
-  if jsonb_typeof(new.sources) is distinct from 'array'
-     or jsonb_array_length(new.sources) = 0
-     or exists (
-       select 1 from jsonb_array_elements(new.sources) as source(value)
-        where jsonb_typeof(source.value) is distinct from 'object'
-           or nullif(btrim(source.value->>'type'),'') is null
-           or nullif(btrim(source.value->>'citation'),'') is null
-     ) then
+  if jsonb_typeof(new.sources) is distinct from 'array' then
+    raise exception 'biological_decision_policy_source_evidence_invalid' using errcode = '23514';
+  end if;
+  if jsonb_array_length(new.sources) = 0 or exists (
+    select 1 from jsonb_array_elements(new.sources) as source(value)
+     where jsonb_typeof(source.value) is distinct from 'object'
+        or nullif(btrim(source.value->>'type'),'') is null
+        or nullif(btrim(source.value->>'citation'),'') is null
+  ) then
     raise exception 'biological_decision_policy_source_evidence_invalid' using errcode = '23514';
   end if;
 
