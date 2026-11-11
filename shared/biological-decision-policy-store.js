@@ -115,6 +115,8 @@
       row.trigger_assessment_statuses.length === 1 &&
       row.trigger_assessment_statuses[0] === "out_of_range" &&
       Array.isArray(row.sources) && row.sources.length > 0 &&
+      row.sources.every(source => source && typeof source.type === "string" && source.type.trim() &&
+        typeof source.citation === "string" && source.citation.trim()) &&
       typeof row.decision_code === "string" && row.decision_code.trim() &&
       typeof row.title === "string" && row.title.trim() &&
       typeof row.explanation === "string" && row.explanation.trim() &&
