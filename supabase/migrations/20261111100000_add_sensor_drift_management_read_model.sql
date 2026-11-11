@@ -12,7 +12,8 @@ returns table (
   profile_valid_to date,
   sensor_id uuid,
   device_code text,
-  device_type text
+  device_type text,
+  device_enabled boolean
 )
 language plpgsql
 security definer
@@ -38,7 +39,7 @@ begin
 
   return query
   select p.id, p.profile_code, p.profile_version, p.valid_from, p.valid_to,
-         d.id, d.device_code, d.device_type
+         d.id, d.device_code, d.device_type, d.enabled
     from public.environment_context_profiles p
     join public.environment_context_profile_sensors ps
       on ps.organization_id = p.organization_id
