@@ -146,6 +146,12 @@ probe rows were rolled back. These checks validate the database trigger
 behavior; they do not replace the Python test suite or a full authenticated API
 end-to-end request.
 
+Migration `20261111043003_revoke_anonymous_profile_registry_access.sql`
+removes the inherited anonymous CRUD and administrative table grants. The
+contract test `supabase/tests/environmental_profile_registries_contract.test.sql`
+was aligned with the actual registry schema and executed against the live
+project; it returned `PASS` after the privilege correction.
+
 ## Verification status
 
 The four registry tables, RLS policies, composite tenant constraints, trigger
