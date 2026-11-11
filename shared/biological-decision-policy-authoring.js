@@ -20,7 +20,7 @@
     if (p.status !== "draft" || !p.policy_id?.trim?.() || !p.version?.trim?.() ||
         !["mycology","laboratory"].includes(p.domain) || !p.rule_version_id?.trim() ||
         !p.decision_code?.trim?.() || !p.title?.trim?.() || !p.explanation?.trim() ||
-        !Array.isArray(p.sources) || p.sources.length === 0 ||
+        !Array.isArray(p.sources) || p.sources.length === 0 || p.sources.some(source => !source || typeof source.type !== "string" || !source.type.trim() || typeof source.citation !== "string" || !source.citation.trim()) ||
         !p.sources.every(s => s && typeof s.type === "string" && s.type.trim() &&
           typeof s.citation === "string" && s.citation.trim()) ||
         !Array.isArray(p.trigger_assessment_statuses) ||
