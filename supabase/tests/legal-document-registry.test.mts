@@ -131,4 +131,4 @@ reset({ rpcError: "database unavailable" });
   const r = await call({ action: "list" }, "Bearer test-jwt", "GET");
   assert.equal(r.status, 405);
 }
-console.log("PASS legal-document-registry: 9 scenarios");
+console.log("PASS legal-document-registry: 10 scenarios");
