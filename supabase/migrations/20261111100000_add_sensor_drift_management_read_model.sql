@@ -41,11 +41,11 @@ begin
   select p.id, p.profile_code, p.profile_version, p.valid_from, p.valid_to,
          d.id, d.device_code, d.device_type, d.enabled
     from public.environment_context_profiles p
-    join public.environment_context_profile_sensors ps
+    left join public.environment_context_profile_sensors ps
       on ps.organization_id = p.organization_id
      and ps.profile_id = p.id
      and ps.environment_id = p.environment_id
-    join public.iot_devices d
+    left join public.iot_devices d
       on d.organization_id = ps.organization_id
      and d.environment_id = ps.environment_id
      and d.id = ps.sensor_id
@@ -53,8 +53,7 @@ begin
      and p.environment_id = p_environment_id
      and p.origin = 'sensor'
      and p.status = 'active'
-     and d.enabled = true
-   order by d.device_code, d.id;
+   order by d.device_code nulls last, d.id;
 end;
 $$;
 
