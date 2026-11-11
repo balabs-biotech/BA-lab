@@ -154,6 +154,13 @@ The recommendation tables and RPCs follow as
 tests cover the RLS/grant boundary, RPC execution grants, immutable proposal
 snapshot, append-only event trigger, provenance FKs and event revision key.
 
+The remaining feature migrations are ordered after that dependency chain:
+`20261111043500` adds verified location altitude; `20261111043600` upgrades
+the existing environment-profile sensor bindings and lifecycle guards;
+`20261111043700`–`20261111043900` add lineage indexes and atomic multi-source
+material creation; `20261111044000`–`20261111044100` add sensor-drift reference
+policies and their writer-only read model.
+
 ## Deployment gate
 
 These migrations are committed to the feature branch only; none has been
