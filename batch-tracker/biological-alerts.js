@@ -1053,13 +1053,31 @@
       }
       snapshots.forEach((snapshot, snapshotIndex) => {
         const detail = element("details", "signal-interpretation-snapshot");
+        const snapshotEvents = historyEvents.filter(event => event.interpretation_id === snapshot.interpretation_id)
+          .slice().sort((left, right) =>
+            new Date(left.occurred_at || 0).getTime() - new Date(right.occurred_at || 0).getTime());
+        const supersededEvents = snapshotEvents.filter(event => event.event_type === "superseded");
+        const latestSupersededEvent = supersededEvents[supersededEvents.length - 1] || null;
+        const lifecycleLabel = history.events_available === false ? "Cycle de vie non vérifié"
+          : latestSupersededEvent ? "Version remplacée" : "Version courante";
         const summary = element("summary", "", [
+          lifecycleLabel,
           snapshot.interpretation_status || "Statut inconnu",
           snapshot.engine_code || "Moteur non précisé",
           snapshot.engine_version || "Version inconnue"
         ].join(" · "));
         detail.append(summary);
         detail.append(element("small", "", "Enregistré le " + dateLabel(snapshot.recorded_at)));
+        if (latestSupersededEvent) {
+          const replacement = latestSupersededEvent.event_payload || {};
+          detail.append(element("small", "signal-interpretation-lifecycle",
+            "Remplacée le " + dateLabel(latestSupersededEvent.occurred_at) +
+            (replacement.replaced_by_engine_version ? " par la version " + replacement.replaced_by_engine_version : "") +
+            (replacement.replaced_by_interpretation_id ? " · Instantané " + replacement.replaced_by_interpretation_id : "")));
+        } else if (history.events_available !== false) {
+          detail.append(element("small", "signal-interpretation-lifecycle",
+            "Aucun événement de remplacement enregistré pour cet instantané."));
+        }
         detail.append(element("small", "", "Signal : " + (snapshot.source_signal_id || "non référencé") +
           " · Analyse : " + (snapshot.source_analysis_id || "non référencée")));
         const payload = snapshot.interpretation_payload || {};
@@ -1177,9 +1195,6 @@
         });
         reviewPanel.append(reviewActions, reviewStatus);
         detail.append(reviewPanel);
-        const snapshotEvents = historyEvents.filter(event => event.interpretation_id === snapshot.interpretation_id)
-          .slice().sort((left, right) =>
-            new Date(left.occurred_at || 0).getTime() - new Date(right.occurred_at || 0).getTime());
         if (snapshotEvents.length) {
           const eventList = element("ol", "signal-interpretation-events");
           snapshotEvents.forEach(event => {
@@ -1187,12 +1202,17 @@
             const decisionLabels = { accepted: "acceptée", contested: "contestée", reassessment_requested: "réévaluation demandée" };
             const eventLabel = event.event_type === "reviewed" && event.event_payload?.decision
               ? "Revue : " + (decisionLabels[event.event_payload.decision] || event.event_payload.decision)
-              : event.event_type || "Événement";
+              : event.event_type === "superseded" ? "Instantané remplacé"
+                : event.event_type === "recorded" ? "Instantané enregistré"
+                  : event.event_type || "Événement";
             eventItem.append(element("strong", "", eventLabel));
             eventItem.append(element("small", "", dateLabel(event.occurred_at) + " · " +
               (event.actor_kind === "user" ? "Action utilisateur" : "Événement système")));
             if (event.event_payload && event.event_payload.note) {
               eventItem.append(element("small", "", String(event.event_payload.note)));
+            }
+            if (event.event_type === "superseded" && event.event_payload?.replaced_by_engine_version) {
+              eventItem.append(element("small", "", "Remplacé par la version " + String(event.event_payload.replaced_by_engine_version)));
             }
             eventList.append(eventItem);
           });
