@@ -78,7 +78,7 @@
     const ids = [...new Set(input.measurementIds.filter(id => typeof id === "string" && id.trim()))].slice(0, 50);
     if (!ids.length) return Object.freeze({ status: "insufficient_context", records: Object.freeze([]) });
     const { data, error } = await input.client.from("biological_assessments")
-      .select("id,organization_id,source_measurement_id,rule_version_id,status,reason,engine_version,calculation_origin,server_verification,result_snapshot,assessed_at")
+      .select("id,organization_id,source_measurement_id,rule_version_id,status,reason,engine_version,calculation_origin,server_verification,context_snapshot,result_snapshot,assessed_at")
       .eq("organization_id", input.organizationId)
       .in("source_measurement_id", ids)
       .order("assessed_at", { ascending: false })
