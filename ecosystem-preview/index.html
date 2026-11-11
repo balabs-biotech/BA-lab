@@ -3027,17 +3027,12 @@ document.querySelectorAll('[data-lang]').forEach(b=>b.addEventListener('click',(
 window.addEventListener('resize',()=>{drawMiniConnections()});
 
 /* Customer journey: featured work → live 3D explorer → eight domains.
-   Reorder existing sections without rebuilding or reinitializing the explorer. */
+   Keep the scientific method and network bridge after the main discovery path. */
 (()=>{
  const app=document.getElementById('app');
- const method=app?.querySelector('#demarche');
- const bridge=app?.querySelector('.universe-bridge');
- const work=app?.querySelector('#chantiers');
  const scene=app?.querySelector('#universe');
  const domains=app?.querySelector('#universes');
- if(!app||!method||!bridge||!work||!scene||!domains)return;
- app.insertBefore(method,work);
- app.insertBefore(bridge,work);
+ if(!app||!scene||!domains)return;
  app.insertBefore(scene,domains);
 })();
 
