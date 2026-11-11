@@ -400,7 +400,7 @@ Deno.serve(async (req: Request) => {
 
       const { data: domainProfiles, error: domainProfileError } = await adminClient
         .from("domain_interpretation_profiles")
-        .select("id,organization_id,domain,profile_code,profile_version,rules,valid_from,valid_to,status")
+        .select("id,organization_id,domain,profile_code,profile_version,rules,recommendations,valid_from,valid_to,status")
         .eq("organization_id", profile.organization_id)
         .eq("domain", biological.domain)
         .in("status", ["active", "retired"])
@@ -459,6 +459,7 @@ Deno.serve(async (req: Request) => {
           module: domainProfile.domain,
           version: domainProfile.profile_version,
           rules: domainProfile.rules ?? [],
+          recommendations: domainProfile.recommendations ?? [],
         },
       };
     }
