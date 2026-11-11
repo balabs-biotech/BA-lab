@@ -22,7 +22,13 @@ on:
     branches: ["feat/bal-json-contract-v1"]
     paths:
       - "batch-tracker/bal-json-import.js"
+      - "batch-tracker/workspace.html"
+      - "batch-tracker/tracker.js"
+      - "batch-tracker/tracker.css"
+      - "batch-tracker/mycology/index.html"
+      - "batch-tracker/laboratory/index.html"
       - "scripts/test-bal-json-import-ui.mjs"
+      - "shared/**"
       - "scripts/test-bal-json-contract.mjs"
       - "supabase/tests/bal-json-ingest-contract.test.mjs"
       - "supabase/migrations/20261111160000_add_bal_json_atomic_ingestion.sql"
