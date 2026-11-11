@@ -23,7 +23,7 @@
     sensor_temporal: "Anomalie temporelle IoT (MAD robuste)"
   };
   const PAGE_SIZE = 100;
-  const state = { userId: null, organizationId: null, domain: null, rows: [], recommendationsBySignal: {}, recommendationHistoryAvailable: true, filter: "active", severity: "all", method: "all", variable: "", request: 0, offset: 0, hasMore: false, loading: false, historyRequest: 0 };
+  const state = { userId: null, organizationId: null, domain: null, rows: [], recommendationsBySignal: {}, environmentalEvidenceBySignal: {}, environmentalEvidenceAvailable: true, recommendationHistoryAvailable: true, filter: "active", severity: "all", method: "all", variable: "", request: 0, offset: 0, hasMore: false, loading: false, historyRequest: 0 };
   const root = document.getElementById("biologicalSignalsCard");
   if (!root) return;
 
@@ -233,6 +233,29 @@
           (statusLabels[recommendation.lifecycle_status] || recommendation.lifecycle_status)));
         item.append(element("small", "", "Profil " + recommendation.profile_id + " / v" +
           recommendation.profile_version + " · " + (recommendation.instruction_code || "Instruction non disponible")));
+        const environmentalEvidence = state.environmentalEvidenceBySignal[row.signal_id] || [];
+        const contextPanel = element("div", "signal-recommendation-context");
+        contextPanel.append(element("strong", "", "Contexte environnemental lié au signal"));
+        if (environmentalEvidence.length) {
+          environmentalEvidence.forEach(observation => {
+            const details = [
+              observation.variable_code,
+              observation.value === null ? "valeur absente" : String(observation.value) + (observation.unit_code ? " " + observation.unit_code : ""),
+              dateLabel(observation.observed_at),
+              observation.provider_code + " / " + observation.dataset_code
+            ].filter(Boolean).join(" · ");
+            contextPanel.append(element("small", "", details));
+            if (observation.quality_flag) contextPanel.append(element("small", "", "Qualité source : " + observation.quality_flag));
+            if (observation.spatial_resolution_m !== null) contextPanel.append(element("small", "", "Résolution spatiale : " + observation.spatial_resolution_m + " m"));
+          });
+        } else {
+          contextPanel.append(element("small", "", "Aucune observation environnementale externe directement liée à ce signal."));
+        }
+        const linkedMeasurementCount = environmentalEvidence.measurement_count || 0;
+        if (linkedMeasurementCount) contextPanel.append(element("small", "", linkedMeasurementCount + " mesure(s) liée(s) également référencée(s), non détaillée(s) dans ce panneau."));
+        if (!state.environmentalEvidenceAvailable) contextPanel.append(element("small", "signal-recommendation-warning",
+          "Lecture du contexte source partielle : ne pas interpréter cette liste comme exhaustive."));
+        item.append(contextPanel);
         if (recommendation.rationale_code) item.append(element("small", "", "Motif : " + recommendation.rationale_code));
         if (Array.isArray(recommendation.withholding_reasons) && recommendation.withholding_reasons.length) {
           item.append(element("small", "signal-recommendation-withheld",
@@ -373,8 +396,58 @@
     const page = data || [];
     const signalIds = page.map(row => row.signal_id).filter(Boolean);
     const recommendationsBySignal = append ? { ...state.recommendationsBySignal } : {};
+    const environmentalEvidenceBySignal = append ? { ...state.environmentalEvidenceBySignal } : {};
     state.recommendationHistoryAvailable = append ? state.recommendationHistoryAvailable : true;
+    state.environmentalEvidenceAvailable = append ? state.environmentalEvidenceAvailable : true;
     if (signalIds.length) {
+      const evidenceResult = await client.from("biological_signal_evidence")
+        .select("signal_id,source_kind,environmental_observation_id,measurement_id")
+        .eq("organization_id", state.organizationId)
+        .in("signal_id", signalIds)
+        .limit(1000);
+      if (request !== state.request) return;
+      if (evidenceResult.error || (evidenceResult.data || []).length >= 1000) {
+        state.environmentalEvidenceAvailable = false;
+      } else {
+        const evidenceRows = evidenceResult.data || [];
+        const observationIds = evidenceRows
+          .filter(item => item.source_kind === "environmental_observation" && item.environmental_observation_id)
+          .map(item => item.environmental_observation_id);
+        const measurementsBySignal = {};
+        evidenceRows.filter(item => item.source_kind === "measurement").forEach(item => {
+          measurementsBySignal[item.signal_id] = (measurementsBySignal[item.signal_id] || 0) + 1;
+        });
+        let observationRows = [];
+        if (observationIds.length) {
+          const observationResult = await client.from("environmental_observations")
+            .select("id,data_family,provider_code,dataset_code,variable_code,value,unit_code,observed_at,spatial_resolution_m,quality_flag,source_url")
+            .eq("organization_id", state.organizationId)
+            .in("id", observationIds)
+            .order("observed_at", { ascending: true })
+            .limit(1000);
+          if (request !== state.request) return;
+          if (observationResult.error || (observationResult.data || []).length >= 1000) {
+            state.environmentalEvidenceAvailable = false;
+          } else {
+            observationRows = observationResult.data || [];
+          }
+        }
+        const signalByObservation = new Map();
+        evidenceRows.filter(item => item.source_kind === "environmental_observation").forEach(item => {
+          if (!signalByObservation.has(item.environmental_observation_id)) signalByObservation.set(item.environmental_observation_id, []);
+          signalByObservation.get(item.environmental_observation_id).push(item.signal_id);
+        });
+        observationRows.forEach(observation => {
+          (signalByObservation.get(observation.id) || []).forEach(signalId => {
+            if (!environmentalEvidenceBySignal[signalId]) environmentalEvidenceBySignal[signalId] = [];
+            environmentalEvidenceBySignal[signalId].push(observation);
+          });
+        });
+        signalIds.forEach(signalId => {
+          environmentalEvidenceBySignal[signalId] = environmentalEvidenceBySignal[signalId] || [];
+          environmentalEvidenceBySignal[signalId].measurement_count = measurementsBySignal[signalId] || 0;
+        });
+      }
       const recommendationResult = await client.from("biological_recommendations")
         .select("*")
         .eq("organization_id", state.organizationId)
@@ -416,6 +489,7 @@
       }
     }
     state.recommendationsBySignal = recommendationsBySignal;
+    state.environmentalEvidenceBySignal = environmentalEvidenceBySignal;
     state.loading = false;
     state.rows = append ? state.rows.concat(page) : page;
     state.offset += page.length;
