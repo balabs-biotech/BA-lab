@@ -96,6 +96,7 @@ assert.match(mixtureMigration, /insert into public\.material_relationships/);
 assert.match(mixtureMigration, /insert into public\.events/);
 assert.match(mixtureMigration, /grant execute on function public\.create_biological_material_mixture/);
 assert.match(traceabilityRuntimeTest, /create_biological_material_mixture/);
+assert.match(traceabilityRuntimeTest, /single-source mixture was accepted/);
 assert.match(traceabilityRuntimeTest, /consortium must persist two parent edges/);
 assert.match(traceabilityRuntimeTest, /cross-tenant mixture source was accepted/);
 assert.match(traceabilityRuntimeTest, /multiple strains into one strain_id/);
