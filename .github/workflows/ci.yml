@@ -188,6 +188,8 @@ jobs:
         run: node supabase/tests/nasa-power-agroclimate-writer-authorization.test.mjs
       - name: Test IoT ingestion bounded-body and device-auth security contract
         run: node supabase/tests/iot-ingest-security.test.mjs
+      - name: Test BAL-JSON authenticated ingestion and idempotency contract
+        run: node supabase/tests/bal-json-ingest-contract.test.mjs
 
   supabase-migration-replay:
     runs-on: ubuntu-latest
