@@ -81,3 +81,20 @@ def test_biological_contract_rejects_duplicate_source_ids():
     payload["evidence"]["accepted_source_record_ids"] = ["m1", "m1"]
     with pytest.raises(ValidationError, match="unique"):
         BALBiologicalAnalysis.model_validate(payload)
+
+
+def test_calculated_result_requires_two_accepted_measurements():
+    payload = build(result()).model_dump(mode="python", by_alias=True)
+    payload["evidence"]["accepted_count"] = 1
+    payload["evidence"]["accepted_source_record_ids"] = ["m1"]
+    with pytest.raises(ValidationError, match="at least two"):
+        BALBiologicalAnalysis.model_validate(payload)
+
+
+def test_insufficient_evidence_requires_an_explicit_reason():
+    payload = build(result(status="insufficient_evidence")).model_dump(
+        mode="python", by_alias=True
+    )
+    payload["reason"] = None
+    with pytest.raises(ValidationError, match="reason"):
+        BALBiologicalAnalysis.model_validate(payload)
