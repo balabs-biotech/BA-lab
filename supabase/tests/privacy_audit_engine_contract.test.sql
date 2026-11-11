@@ -141,5 +141,50 @@ begin
     raise exception 'privacy_audit_signup_validation_hook_auth_role_not_granted';
   end if;
 
+
+  if to_regclass('private.platform_administrators') is null then
+    raise exception 'privacy_audit_platform_administrators_table_missing';
+  end if;
+
+  if has_table_privilege('anon', 'private.platform_administrators', 'SELECT')
+     or has_table_privilege('authenticated', 'private.platform_administrators', 'SELECT')
+     or has_table_privilege('service_role', 'private.platform_administrators', 'SELECT') then
+    raise exception 'privacy_audit_platform_admin_table_must_not_be_directly_readable';
+  end if;
+
+  foreach required_column in array array['user_id','granted_at','granted_by','reason'] loop
+    if not exists (
+      select 1 from information_schema.columns
+      where table_schema='private'
+        and table_name='platform_administrators'
+        and column_name=required_column
+    ) then
+      raise exception 'privacy_audit_platform_admin_column_missing: %', required_column;
+    end if;
+  end loop;
+
+  if to_regprocedure('public.is_platform_administrator(uuid)') is null
+     or to_regprocedure('public.list_legal_document_versions()') is null
+     or to_regprocedure('public.publish_legal_document_version(text,text,text,text,timestamp with time zone,uuid)') is null
+     or to_regprocedure('public.retire_legal_document_version(uuid,timestamp with time zone)') is null then
+    raise exception 'privacy_audit_document_registry_rpc_missing';
+  end if;
+
+  foreach role_name in array array['anon','authenticated'] loop
+    if has_function_privilege(role_name, 'public.is_platform_administrator(uuid)', 'EXECUTE')
+       or has_function_privilege(role_name, 'public.list_legal_document_versions()', 'EXECUTE')
+       or has_function_privilege(role_name, 'public.publish_legal_document_version(text,text,text,text,timestamp with time zone,uuid)', 'EXECUTE')
+       or has_function_privilege(role_name, 'public.retire_legal_document_version(uuid,timestamp with time zone)', 'EXECUTE') then
+      raise exception 'privacy_audit_registry_rpc_client_executable: %', role_name;
+    end if;
+  end loop;
+
+  if not has_function_privilege('service_role', 'public.is_platform_administrator(uuid)', 'EXECUTE')
+     or not has_function_privilege('service_role', 'public.list_legal_document_versions()', 'EXECUTE')
+     or not has_function_privilege('service_role', 'public.publish_legal_document_version(text,text,text,text,timestamp with time zone,uuid)', 'EXECUTE')
+     or not has_function_privilege('service_role', 'public.retire_legal_document_version(uuid,timestamp with time zone)', 'EXECUTE') then
+    raise exception 'privacy_audit_registry_rpc_service_role_grants_missing';
+  end if;
+
 end
 $;
