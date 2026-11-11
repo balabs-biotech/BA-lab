@@ -89,6 +89,8 @@ jobs:
         run: node supabase/tests/bal-json-ingest-contract.test.mjs
       - name: Test conservative BAL-Normalizer rules
         run: node scripts/test-bal-normalizer.mjs
+      - name: Test reviewed-policy biological decision engine
+        run: node scripts/test-biological-decision-engine.mjs
 
   batch-tracker-audit:
     runs-on: ubuntu-latest
