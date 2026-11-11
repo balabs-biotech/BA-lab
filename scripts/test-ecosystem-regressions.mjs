@@ -43,7 +43,7 @@ for (const language of ['fr', 'en', 'ar', 'pt']) {
 const frenchProducts = languageTrees.fr.domains.find((domain) => domain.id === 'products');
 const frenchWa = frenchProducts.children.find((node) => node.id === 'products-wa-agar');
 assert.equal(frenchWa.url, 'https://app.notion.com/p/3f473152f171812a814dd7b951786313', 'French WA must link to the canonical public catalogue record, not its internal working record');
-for (const [language, unavailablePhrase] of [['fr', 'non présenté comme un produit disponible à la vente'], ['en', 'not available for sale'], ['ar', 'غير متاح للبيع'], ['pt', 'não disponível para venda']]) {
+for (const [language, unavailablePhrase] of [['fr', 'non disponible à la vente'], ['en', 'not available for sale'], ['ar', 'غير متاح للبيع'], ['pt', 'não disponível para venda']]) {
   const products = languageTrees[language].domains.find((domain) => domain.id === 'products');
   const prototypes = products.children.filter((node) => /myco-(start|plate)/i.test(node.id));
   assert.equal(prototypes.length, 2, language + ' must expose both Myco kit prototypes');
