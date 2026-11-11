@@ -2808,3 +2808,25 @@ body[data-domain] :is(button, input, select, textarea, a, [tabindex]):focus-visi
   .bal-json-import .row { flex-direction: column; }
   .bal-json-import .row button { width: 100%; }
 }
+
+
+/* Biological rule lifecycle interface */
+.biological-rule-manager { margin-top: 22px; }
+.rule-manager-heading,.rule-history-heading,.rule-record-top { display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap; }
+.rule-manager-heading h2,.rule-history-heading h3 { margin:0 0 6px; }
+.rule-create { margin:18px 0;padding:16px;border:1px solid var(--border);border-radius:12px;background:var(--surface-2); }
+.rule-create summary { cursor:pointer;font-weight:700; }
+.rule-create form { margin-top:14px; }
+.rule-create textarea { width:100%;box-sizing:border-box; }
+.rule-history-heading { margin-top:22px; }
+.rule-history { display:grid;gap:10px;margin-top:12px; }
+.rule-record { padding:15px;border:1px solid var(--border);border-radius:12px;background:var(--surface); }
+.rule-record p { margin:8px 0;overflow-wrap:anywhere; }
+.rule-status { padding:4px 8px;border-radius:999px;font-size:11px;font-weight:700;text-transform:uppercase; }
+.rule-status.status-reviewed { background:#e5f3e8;color:#245c40; }
+.rule-status.status-draft { background:#fff3d9;color:#78591a; }
+.rule-status.status-retired { background:#eceeed;color:#59635b; }
+.rule-retire { display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:end;margin-top:12px; }
+.rule-retire label { grid-column:1/-1;margin:0; }
+.rule-retire input { margin:0; }
+@media(max-width:700px){.rule-retire{grid-template-columns:1fr}.rule-retire label{grid-column:auto}.rule-retire button{width:100%}}
