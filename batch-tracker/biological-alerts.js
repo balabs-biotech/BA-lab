@@ -510,7 +510,8 @@
       lineageQuality: { complete: qualityIssues.length === 0, issues: qualityIssues },
       unavailable: false,
       truncated: byId.size >= MAX_CULTURES || materialById.size >= MAX_MATERIALS || relationshipByKey.size >= MAX_RELATIONSHIPS ||
-        measurements.length >= 500 || observations.length >= 500 || biologicalSignals.length >= 200 || environmentalObservations.length >= 500
+        measurements.length >= 500 || observations.length >= 500 || biologicalSignals.length >= 200 ||
+        biologicalInterpretations.length >= 500 || biologicalInterpretationEvents.length >= 2000 || environmentalObservations.length >= 500
     };
   }
 
@@ -815,6 +816,7 @@
           biological_signal_count: cultureSignals.length,
           interpretation_snapshot_count: cultureInterpretations.length,
           interpretation_event_count: cultureInterpretationEvents.length,
+          interpretation_history_events_available: lineage?.evidenceAvailability?.biological_interpretation_events === true,
           finding_count: findings.length,
           experimental_result_count: cultureResults.length,
           environmental_context_count: environmentalContext.length,
