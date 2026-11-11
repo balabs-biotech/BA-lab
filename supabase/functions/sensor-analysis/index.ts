@@ -155,6 +155,25 @@ Deno.serve(async (req: Request) => {
       return reply(422, { error: "expected_interval_seconds_must_be_positive_integer" });
     }
 
+    const transmissionExpectedInterval = body.transmission_expected_interval_seconds;
+    const transmissionGapToleranceFactor = body.transmission_gap_tolerance_factor;
+    const transmissionOptions = [
+      transmissionExpectedInterval, transmissionGapToleranceFactor,
+    ];
+    if (transmissionOptions.some((value) => value !== undefined)) {
+      if (
+        !Number.isSafeInteger(transmissionExpectedInterval) ||
+        transmissionExpectedInterval <= 0 ||
+        transmissionExpectedInterval > MAX_TEMPORAL_WINDOW_SECONDS ||
+        typeof transmissionGapToleranceFactor !== "number" ||
+        !Number.isFinite(transmissionGapToleranceFactor) ||
+        transmissionGapToleranceFactor <= 1 ||
+        transmissionGapToleranceFactor > 10
+      ) {
+        return reply(422, { error: "transmission_diagnostics_parameters_must_be_supplied_together_and_within_limits" });
+      }
+    }
+
     const flatlineMinimumObservations = body.flatline_minimum_repeated_observations;
     const flatlineMinimumDurationSeconds = body.flatline_minimum_duration_seconds;
     const flatlineOptions = [flatlineMinimumObservations, flatlineMinimumDurationSeconds];
@@ -253,6 +272,39 @@ Deno.serve(async (req: Request) => {
       .map((row: { sensor_id?: string }) => row.sensor_id)
       .filter((id: unknown): id is string => typeof id === "string" && UUID_RE.test(id)))];
     if (!sensorIds.length) return reply(422, { error: "sensor_profile_has_no_bound_devices" });
+
+    let transmissionDevicePayload: Record<string, unknown>[] | undefined;
+    if (transmissionExpectedInterval !== undefined) {
+      const { data: devices, error: devicesError } = await adminClient
+        .from("iot_devices")
+        .select("id,organization_id,environment_id,device_code,enabled,created_at,last_seen_at")
+        .eq("organization_id", profile.organization_id)
+        .eq("environment_id", environmentId)
+        .in("id", sensorIds)
+        .limit(101);
+      if (devicesError) {
+        console.error("[sensor-analysis] Device registry lookup failed", devicesError.message);
+        return reply(500, { error: "sensor_device_registry_lookup_failed" });
+      }
+      if (!devices || devices.length !== sensorIds.length || devices.length > 100 ||
+          devices.some((device: any) =>
+            device.organization_id !== profile.organization_id ||
+            device.environment_id !== environmentId ||
+            !sensorIds.includes(device.id)
+          )) {
+        return reply(422, { error: "sensor_device_registry_profile_binding_mismatch" });
+      }
+      transmissionDevicePayload = devices.map((device: any) => ({
+        device_id: device.id,
+        device_code: device.device_code,
+        enabled: device.enabled,
+        created_at: device.created_at,
+        profile_bound: sensorIds.includes(device.id),
+        expected_from: "1970-01-01T00:00:00.000Z",
+        expected_to: null,
+        last_seen_at: device.last_seen_at,
+      }));
+    }
 
     let biologicalInterpretationPayload: Record<string, unknown> | undefined;
     if (subjectId !== undefined) {
@@ -362,6 +414,29 @@ Deno.serve(async (req: Request) => {
       : Math.ceil(temporalWindowSeconds / 86_400) + 1;
     const queryFrom = addDays(fromDate, -historyGuardDays) + "T00:00:00.000Z";
     const queryTo = addDays(toDate, 2) + "T00:00:00.000Z";
+    let transmissionReceiptPayload: Record<string, unknown>[] | undefined;
+    if (transmissionExpectedInterval !== undefined) {
+      const { data: receipts, error: receiptsError } = await adminClient
+        .from("iot_ingest_receipts")
+        .select("id,device_id,received_at")
+        .in("device_id", sensorIds)
+        .gte("received_at", queryFrom)
+        .lt("received_at", queryTo)
+        .order("received_at", { ascending: true })
+        .limit(MAX_ROWS + 1);
+      if (receiptsError) {
+        console.error("[sensor-analysis] Ingestion receipt lookup failed", receiptsError.message);
+        return reply(500, { error: "sensor_receipt_lookup_failed" });
+      }
+      if (!receipts || receipts.length > MAX_ROWS) {
+        return reply(422, { error: "sensor_receipt_limit_reached_narrow_date_range" });
+      }
+      transmissionReceiptPayload = receipts.map((receipt: any) => ({
+        receipt_id: receipt.id,
+        device_id: receipt.device_id,
+        received_at: receipt.received_at,
+      }));
+    }
     const { data: rows, error: rowsError } = await adminClient
       .from("measurements")
       .select(
@@ -425,6 +500,12 @@ Deno.serve(async (req: Request) => {
         to_date: toDate,
         profile_timezone: profile.timezone,
         expected_interval_seconds: expectedInterval,
+        transmission_expected_interval_seconds: transmissionExpectedInterval,
+        transmission_gap_tolerance_factor: transmissionGapToleranceFactor,
+        transmission_current_window: transmissionExpectedInterval !== undefined &&
+          toDate === localCalendarDate(new Date().toISOString(), profile.timezone),
+        transmission_devices: transmissionDevicePayload,
+        transmission_receipts: transmissionReceiptPayload,
         temporal_window_seconds: temporalWindowSeconds,
         temporal_minimum_history: temporalMinimumHistory,
         temporal_threshold: temporalThreshold,
