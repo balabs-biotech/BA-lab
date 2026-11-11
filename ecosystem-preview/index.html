@@ -3035,7 +3035,7 @@ window.addEventListener('resize',()=>{drawMiniConnections()});
 
 setLanguage('fr');applyOrbit();
 </script>
-<script type="module" src="./engine-v2.js?v=20261110-touch-branch-activation-v54"></script>
+<script type="module" src="./engine-v2.js?v=20261111-continuous-level-transition-v103"></script>
 
 <style id="balabs-visual-refinement">
 /* BALabs visual refinement — editorial mineral / botanical system */
@@ -4161,4 +4161,78 @@ html,body{background:var(--bal-petrol)!important;color:var(--bal-mineral)!import
    the overlay's own action buttons remain interactive. */
 #mainView.webgl-ready .webgl-focus{pointer-events:none!important}
 #mainView.webgl-ready .webgl-focus button{pointer-events:auto!important}
+</style>
+
+
+<style id="balabs-minimal-3d-overlays">
+/* One information layer, no stack of floating cards around the mycelium. */
+#mainView.webgl-ready .webgl-stage .webgl-hint,
+#mainView.webgl-ready .webgl-stage .webgl-status{
+  background:transparent!important;border:0!important;border-radius:0!important;
+  box-shadow:none!important;padding:3px 0!important;backdrop-filter:none!important;
+  color:#dce5dc!important;text-shadow:0 1px 5px #07110f!important;
+}
+#mainView.webgl-ready .webgl-path{
+  background:transparent!important;border:0!important;border-radius:0!important;
+  box-shadow:none!important;padding:3px 0!important;backdrop-filter:none!important;
+}
+#mainView.webgl-ready .webgl-focus{
+  width:min(310px,calc(100% - 92px))!important;padding:5px 0!important;
+  background:transparent!important;border:0!important;border-radius:0!important;
+  box-shadow:none!important;backdrop-filter:none!important;
+}
+#mainView.webgl-ready .webgl-focus-meta{
+  background:transparent!important;border:0!important;border-radius:0!important;
+  padding:2px 0!important;color:#d8dfd3!important;
+}
+#mainView.webgl-ready .webgl-focus-link{
+  background:transparent!important;border:0!important;border-bottom:1px solid #78958a66!important;
+  border-radius:0!important;padding:8px 2px!important;color:#f0f2e9!important;
+}
+#mainView.webgl-ready .webgl-focus-link:hover,
+#mainView.webgl-ready .webgl-focus-link:focus-visible{
+  background:transparent!important;border-color:#b96b4d!important;color:#fff!important;
+}
+#mainView.webgl-ready .webgl-branch-dock{
+  background:transparent!important;border:0!important;border-radius:0!important;
+  box-shadow:none!important;backdrop-filter:none!important;padding-inline:0!important;
+  scrollbar-width:none!important;
+}
+#mainView.webgl-ready .webgl-branch-dock .webgl-branch-item{
+  background:transparent!important;border:0!important;border-radius:0!important;
+  box-shadow:none!important;padding-inline:5px!important;
+}
+#mainView.webgl-ready .webgl-branch-dock .webgl-branch-item[aria-current="page"]{
+  background:transparent!important;border:0!important;color:#d99a7d!important;
+  text-decoration:underline!important;text-decoration-color:#b96b4d!important;
+  text-underline-offset:5px!important;
+}
+@media(max-width:760px){
+  #mainView.webgl-ready .webgl-focus{padding:5px 0!important;border-radius:0!important}
+  #mainView.webgl-ready .webgl-stage .webgl-hint{padding:3px 0!important;text-align:left!important}
+}
+
+/* Keep actions discoverable without turning them into button tiles. */
+#mainView.webgl-ready .webgl-focus .webgl-focus-actions button,
+#mainView.webgl-ready .webgl-focus .webgl-focus-actions a{
+  border:0!important;border-bottom:1px solid #78958a66!important;
+  border-radius:0!important;background:transparent!important;box-shadow:none!important;
+  padding:7px 3px!important;color:#e7e9df!important;
+}
+#mainView.webgl-ready .webgl-focus .webgl-focus-actions button:hover,
+#mainView.webgl-ready .webgl-focus .webgl-focus-actions a:hover{
+  border-color:#b96b4d!important;color:#fff!important;
+}
+#mainView.webgl-ready .webgl-controls button{
+  border:0!important;border-radius:0!important;background:transparent!important;
+  box-shadow:none!important;backdrop-filter:none!important;color:#d1d0c5!important;
+}
+#mainView.webgl-ready .webgl-controls button:hover,
+#mainView.webgl-ready .webgl-controls button:focus-visible{
+  background:transparent!important;color:#fff!important;outline:1px solid #b96b4d!important;
+}
+#mainView.webgl-ready .webgl-intro-cta{
+  border:0!important;border-bottom:1px solid #b96b4d!important;border-radius:0!important;
+  background:transparent!important;box-shadow:none!important;padding:9px 3px!important;
+}
 </style>
