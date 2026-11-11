@@ -8,6 +8,16 @@ import recordSchema from "../../../schemas/bal-json/v1/record.schema.json" with 
 import measurementSchema from "../../../schemas/bal-json/v1/measurement.schema.json" with { type: "json" };
 import observationSchema from "../../../schemas/bal-json/v1/observation.schema.json" with { type: "json" };
 
+const Ajv2020Constructor = (Ajv2020 as unknown as {
+  default: new (options: { allErrors: boolean; strict: boolean }) => {
+    addSchema(schema: unknown): unknown;
+    compile(schema: unknown): ((data: unknown) => boolean) & {
+      errors?: Array<{ instancePath?: string; keyword?: string; message?: string }>;
+    };
+  };
+}).default;
+const addFormatsPlugin = (addFormats as unknown as { default: (instance: unknown) => void }).default;
+
 const headers = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, apikey, content-type, x-client-info",
@@ -16,8 +26,8 @@ const headers = {
   "Cache-Control": "no-store",
 };
 const MAX_BODY_BYTES = 64_000;
-const ajv = new Ajv2020({ allErrors: true, strict: true });
-addFormats(ajv);
+const ajv = new Ajv2020Constructor({ allErrors: true, strict: true });
+addFormatsPlugin(ajv);
 ajv.addSchema(measurementSchema);
 ajv.addSchema(observationSchema);
 const validateRecord = ajv.compile(recordSchema);
@@ -84,7 +94,7 @@ Deno.serve(async (req: Request) => {
   if (!validateRecord(record)) {
     return response(422, {
       error: "schema_validation_failed",
-      details: (validateRecord.errors ?? []).slice(0, 12).map((e) => ({
+      details: (validateRecord.errors ?? []).slice(0, 12).map((e: { instancePath?: string; keyword?: string; message?: string }) => ({
         path: e.instancePath, keyword: e.keyword, message: e.message,
       })),
     });
