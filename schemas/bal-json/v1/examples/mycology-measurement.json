@@ -1,0 +1,29 @@
+{
+  "contract": "BA-LABS/JSON",
+  "contract_version": "1.0.0",
+  "record_type": "measurement",
+  "record_id": "4b6c2b3d-4a6f-4b3e-8a1f-5b4c3d2e1f00",
+  "organization_id": "1b6c2b3d-4a6f-4b3e-8a1f-5b4c3d2e1f00",
+  "created_at": "2026-11-11T15:00:00Z",
+  "data": {
+    "variable_code": "temperature",
+    "raw_value": 24.5,
+    "raw_unit_code": "degC",
+    "measured_at": "2026-11-11T14:55:00Z",
+    "quality_state": "raw",
+    "context": {
+      "culture_id": "2b6c2b3d-4a6f-4b3e-8a1f-5b4c3d2e1f00",
+      "environment_id": "3b6c2b3d-4a6f-4b3e-8a1f-5b4c3d2e1f00"
+    },
+    "metadata": {
+      "workspace": "mycology",
+      "culture_code": "PLEU-TEST-001"
+    }
+  },
+  "provenance": {
+    "source": "sensor",
+    "source_id": "sensor-room-01",
+    "captured_at": "2026-11-11T14:55:00Z",
+    "review_status": "unreviewed"
+  }
+}
