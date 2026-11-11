@@ -34,13 +34,13 @@
     }
 
     let query = input.client.from("biological_rules")
-      .select("id,organization_id,rule_id,version,status,domain,variable_code,unit_code,rule,created_at,reviewed_by,reviewed_at")
+      .select("id,revision_seq,organization_id,rule_id,version,status,domain,variable_code,unit_code,rule,created_at,reviewed_by,reviewed_at")
       .eq("organization_id", input.organizationId)
       .eq("domain", input.domain)
       .eq("variable_code", input.variableCode)
       .eq("unit_code", input.unitCode)
       .in("status", ["reviewed", "retired"])
-      .order("created_at", { ascending: false })
+      .order("revision_seq", { ascending: false })
       .order("id", { ascending: false });
 
     const { data, error } = await query;
