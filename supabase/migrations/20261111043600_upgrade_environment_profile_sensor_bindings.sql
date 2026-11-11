@@ -7,6 +7,11 @@ alter table public.environment_context_profiles
   add column if not exists activated_at timestamptz,
   add column if not exists retired_at timestamptz;
 
+alter table public.domain_interpretation_profiles
+  add column if not exists created_by uuid references auth.users(id) on delete set null default auth.uid(),
+  add column if not exists activated_at timestamptz,
+  add column if not exists retired_at timestamptz;
+
 alter table public.iot_devices
   add constraint iot_devices_org_environment_id_key
   unique (organization_id, environment_id, id);
@@ -410,6 +415,11 @@ create policy environment_context_profile_sensors_delete
 
 revoke update on public.environment_context_profile_sensors from authenticated;
 grant select, insert, delete on public.environment_context_profile_sensors to authenticated;
+grant select on
+  public.environment_context_profiles,
+  public.environment_context_profile_sensors,
+  public.domain_interpretation_profiles
+to service_role;
 
 revoke all on function private.guard_versioned_environmental_profile() from public, anon, authenticated;
 revoke all on function private.validate_environment_context_profile() from public, anon, authenticated;
