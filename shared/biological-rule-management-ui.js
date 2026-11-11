@@ -12,8 +12,8 @@
 
   function init() {
     if (document.getElementById("biologicalRuleManager")) return;
-    const anchor = document.getElementById("resultCard");
-    if (!anchor || !anchor.parentNode) return;
+    const anchor = document.getElementById("measurementCard");
+    if (!anchor) return;
     const section = document.createElement("section");
     section.id = "biologicalRuleManager";
     section.className = "card biological-rule-manager";
@@ -43,7 +43,7 @@
       </details>
       <div class="rule-history-heading"><h3>Historique des versions</h3><span class="muted">200 dernières révisions maximum</span></div>
       <div id="ruleHistory" class="rule-history"><p class="muted">Aucune liste chargée.</p></div>`;
-    anchor.parentNode.insertBefore(section, anchor);
+    anchor.appendChild(section);
 
     const $ = (id) => section.querySelector("#" + id);
     const status = (message, kind = "") => {
@@ -153,6 +153,9 @@
 
     populateCatalogue();
     $("ruleRefresh").addEventListener("click", () => populateCatalogue());
+    section.querySelector(".rule-create").addEventListener("toggle", () => {
+      if (section.querySelector(".rule-create").open) populateCatalogue();
+    });
     refresh();
   }
 
