@@ -658,6 +658,46 @@
           causal_relationship_established: false
         };
       };
+      const compareFindingEvidence = (signal, temporalEvidence) => {
+        const rawSignalValue = signal.observed_value;
+        const signalValue = rawSignalValue === null || rawSignalValue === undefined || rawSignalValue === ""
+          ? NaN : Number(rawSignalValue);
+        const matchingMeasurements = cultureMeasurements.filter(item =>
+          item.variable_code && item.variable_code === signal.variable_code &&
+          temporalEvidence.nearby_measurement_ids.includes(item.id));
+        const comparableMeasurements = Number.isFinite(signalValue)
+          ? matchingMeasurements.filter(item =>
+            item.normalized_value !== null && item.normalized_value !== undefined &&
+            item.normalized_value !== "" && signal.unit && item.normalized_unit_code === signal.unit)
+          : [];
+        const numericComparisons = comparableMeasurements.map(item => ({
+          measurement_id: item.id,
+          measurement_value: Number(item.normalized_value),
+          signal_value: signalValue,
+          difference: Number(item.normalized_value) - signalValue,
+          comparison_status: Number(item.normalized_value) === signalValue
+            ? "same_numeric_value" : "different_numeric_value_no_tolerance_defined"
+        })).filter(item => Number.isFinite(item.measurement_value));
+        const linkedObservationIds = temporalEvidence.linked_observation_ids;
+        const linkedObservations = linkedObservationIds.map(id => observationById.get(id)).filter(Boolean);
+        const qualityLimitedMeasurements = matchingMeasurements.filter(item =>
+          item.quality_state && !["valid", "accepted", "verified"].includes(String(item.quality_state).toLowerCase()));
+        return {
+          signal_value_is_numeric: Number.isFinite(signalValue),
+          same_variable_measurement_count: matchingMeasurements.length,
+          unit_compatible_measurement_count: numericComparisons.length,
+          numeric_comparisons: numericComparisons,
+          linked_descriptive_observation_count: linkedObservations.length,
+          linked_descriptive_observation_ids: linkedObservations.map(item => item.id),
+          measurement_quality_limited_ids: qualityLimitedMeasurements.map(item => item.id),
+          comparison_status: !Number.isFinite(signalValue) ? "signal_value_not_numeric"
+            : numericComparisons.length === 0 ? "no_unit_compatible_measurement"
+            : numericComparisons.every(item => item.comparison_status === "same_numeric_value")
+              ? "numeric_values_match" : "numeric_values_differ_no_tolerance_defined",
+          environmental_evidence_role: "context_only_not_direct_biological_confirmation",
+          evidence_interpretation: "descriptive_comparison_only_no_threshold_or_causal_inference"
+        };
+      };
       const contextFields = [
         "culture_type", "started_at", "material_id", "generation",
         "strain_id", "organism_name", "current_stage"
@@ -698,7 +738,8 @@
         composition_status: "not_assessed",
         biological_context: biologicalContext,
         environmental_context: environmentalSummary,
-        temporal_evidence: temporalEvidenceForFinding(signal)
+        temporal_evidence: temporalEvidenceForFinding(signal),
+        evidence_assessment: compareFindingEvidence(signal, temporalEvidenceForFinding(signal))
       }));
       return {
         culture_id: cultureId,
