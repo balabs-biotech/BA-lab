@@ -177,6 +177,8 @@ def test_repository_persists_signal_with_full_tenant_and_profile_lineage():
         str(item) for item in signal.source_observation_ids
     ]
     assert row["context_tags"] == ["stage:fruiting", "strain:BA-P80"]
+    assert row["analysis_method"] == "environmental_daily"
+    assert row["analysis_evidence"] == {}
 
     table, payload, conflict_key, ignore_duplicates = client.upsert_calls[0]
     assert table == "biological_signals"
@@ -362,3 +364,27 @@ def test_repository_chunks_large_batches_below_postgrest_row_cap():
         _SIGNAL_BATCH_SIZE,
         1,
     ]
+
+
+def test_repository_preserves_sensor_temporal_method_and_evidence():
+    organization_id, biological, environment, interpretation, signal = make_contexts()
+    evidence = {
+        "assessment_type": "causal_robust_temporal_screen",
+        "robust_z_score": 4.2,
+        "temporal_window_seconds": 3600,
+    }
+    temporal_signal = signal.model_copy(update={"evidence": evidence})
+    temporal_interpretation = interpretation.model_copy(
+        update={"signals": (temporal_signal,)}
+    )
+    client = FakeSupabase()
+
+    persisted = SupabaseBiologicalSignalRepository(client).persist_interpretation(
+        organization_id=organization_id,
+        interpretation=temporal_interpretation,
+        biological_context=biological,
+        environment_context=environment,
+    )
+
+    assert persisted[0]["analysis_method"] == "sensor_temporal"
+    assert persisted[0]["analysis_evidence"] == evidence
