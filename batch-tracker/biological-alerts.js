@@ -461,11 +461,17 @@
     const incoming = new Map();
     const outgoing = new Map();
     const edgeKeys = new Set();
+    const graphPairKeys = new Set();
+    const operationSourcePairs = new Set();
     const addEdge = (parentId, childId, type = "parent_material_id", legacy = false) => {
       if (!parentId || !childId || parentId === childId) return;
       const key = [parentId, childId, type].join(":");
       if (edgeKeys.has(key)) return;
       edgeKeys.add(key);
+      const pairKey = [parentId, childId].join(":");
+      // Typed records remain auditable, but a source→output pair is traversed once.
+      if (graphPairKeys.has(pairKey)) return;
+      graphPairKeys.add(pairKey);
       const edge = { parent_material_id: parentId, child_material_id: childId, relationship_type: type, legacy_pointer: legacy };
       if (!incoming.has(childId)) incoming.set(childId, []);
       if (!outgoing.has(parentId)) outgoing.set(parentId, []);
@@ -484,6 +490,7 @@
       const operation = payload.operation || payload.operation_type || event.event_type || "unspecified";
       if (!event.material_id) return;
       sourceIds.forEach(sourceId => {
+        operationSourcePairs.add([sourceId, event.material_id].join(":"));
         addEdge(sourceId, event.material_id, "operation_source:" + String(operation), false);
       });
     });
@@ -579,8 +586,8 @@
       biological_signal_count: biologicalSignals.length,
       experimental_result_count: experimentalResults.length,
       environmental_context_count: environmentalObservations.length,
-      relationship_count: edgeKeys.size,
-      operation_source_edge_count: [...incoming.values()].flat().filter(edge => edge.relationship_type.startsWith("operation_source:")).length,
+      relationship_count: graphPairKeys.size,
+      operation_source_edge_count: operationSourcePairs.size,
       event_count: events.length,
       root_count: materials.filter(material => !(incoming.get(material.id) || []).length && !material.parent_material_id).length,
       multi_parent_count: materials.filter(material => (incoming.get(material.id) || []).length > 1).length,
