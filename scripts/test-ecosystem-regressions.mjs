@@ -87,6 +87,11 @@ for (const [label, source] of [['public', html], ['preview', previewHtml]]) {
   assert.ok(source.includes("skipLabels={fr:'Aller au contenu principal'") && source.includes('skip.textContent=skipLabels[l]'), label + ' skip navigation text must be localised in all four languages');
 }
 
+assert.ok(html.includes('data-domain-page="products" data-i18n="navCatalogue"') && previewHtml.includes('data-domain-page="products" data-i18n="navCatalogue"'), 'The footer must provide a direct route into the public products catalogue universe');
+for (const [language, label] of Object.entries({ fr: 'Catalogue', en: 'Catalogue', ar: 'الكتالوج', pt: 'Catálogo' })) {
+  const languageStart = html.indexOf('\\n' + language + ':{');
+  assert.ok(languageStart >= 0 && html.slice(languageStart, languageStart + 1800).includes('navCatalogue:"' + label + '"'), language + ' footer catalogue label must be localised');
+}
 assert.ok(html.includes("a[data-domain-page],a[data-work-page]") && previewHtml.includes("a[data-domain-page],a[data-work-page]") && html.includes("enterSphere(id,true,false)") && previewHtml.includes("enterSphere(id,true,false)"), 'Homepage universe and featured-work links must open the selected domain directly');
 assert.ok(!/<a class="(?:editorial-link|work-card-link)" data-(?:domain|work)-page="[^"]+" href="#">/.test(html) && !/<a class="(?:editorial-link|work-card-link)" data-(?:domain|work)-page="[^"]+" href="#">/.test(previewHtml), 'Featured-work and domain shortcuts must have a useful in-page fallback destination');
 assert.ok(html.includes('engine-v2.js?v=20261110-touch-branch-activation-v53'), 'Public explorer must load the cache-busted screen-space label engine');
