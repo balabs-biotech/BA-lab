@@ -194,3 +194,20 @@ Run:
 ```sh
 node scripts/test-biological-rule-store.mjs
 ```
+
+
+### Biological Rule Authoring API
+
+`shared/biological-rule-authoring.js` adds the write lifecycle without exposing privileged credentials:
+
+- `createDraft`: validates and inserts a draft under the active organization. RLS limits writes to organization owners/admins.
+- `reviewDraft`: retrieves one exact draft, obtains the authenticated Supabase user, adds reviewer identity and server-generated review timestamp, then performs a conditional draft-to-reviewed update. The database trigger independently verifies the reviewer identity and freezes the reviewed version.
+- `retireRule`: inserts a new `retired` version from an executable reviewed rule. It does not modify the historical reviewed version.
+
+CultureOps exposes these operations through:
+
+- `window.BA_LABS_CREATE_BIOLOGICAL_RULE_DRAFT(rule)`
+- `window.BA_LABS_REVIEW_BIOLOGICAL_RULE_DRAFT({ ruleId, version, reviewNote })`
+- `window.BA_LABS_RETIRE_BIOLOGICAL_RULE({ rule, newVersion })`
+
+These are application APIs, not yet a visible rule-management screen. The database remains the authorization and immutability boundary; client-side validation is only an early rejection layer. The rule authoring tests exercise the draft, review and retirement transitions.
