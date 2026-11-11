@@ -15,6 +15,12 @@ for (const language of ['fr', 'en', 'ar', 'pt']) {
   const ids = languageTrees[language].domains.map((domain) => domain.id).sort();
   assert.deepEqual(ids, [...expectedDomains].sort(), language + ' manifest must expose exactly the eight public universes');
 }
+const englishBiotechnology = languageTrees.en.domains.find((domain) => domain.id === 'bio');
+const englishWork = languageTrees.en.domains.find((domain) => domain.id === 'work');
+assert.ok(englishBiotechnology.children.some((node) => node.notionId === '40173152f17181e1aa6eebe9f6c26c46'), 'English biotechnology universe must include the verified Plant micropropagation page linked from its public landing page');
+assert.ok(englishWork.children.some((node) => node.notionId === '40173152f17181baa905d6afb836f038'), 'English R&D universe must include the verified Documented work page linked from its public landing page');
+assert.ok(englishWork.children.some((node) => node.notionId === '40173152f1718173ae6bc8cce9f0ba52'), 'English R&D universe must include the verified Research and development page linked from its public landing page');
+
 function flattenManifest(node, out = []) {
   out.push(node);
   for (const child of node.children || []) flattenManifest(child, out);
