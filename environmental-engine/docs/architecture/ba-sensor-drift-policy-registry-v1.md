@@ -64,6 +64,27 @@ reference or a short note, not certificate contents or sensitive attachments.
 - Anonymous table access is revoked. Server-side policy resolution is available
   to `service_role`.
 
+## Runtime resolution and assessment
+
+The authenticated `sensor-analysis` gateway resolves policies after JWT,
+environment membership, and sensor-profile authorization. Resolution is scoped
+by organization, environment, active status, verified reference binding, and
+the requested date interval. The target and reference devices must both belong
+to the resolved sensor profile. The gateway forwards only database-resolved
+policy fields; no client-supplied threshold or reference binding is trusted.
+
+The private Python API validates policy structure and invokes
+`quality.sensor_drift.assess_sensor_drift` against the normalized measurement
+envelopes. Results are returned separately under
+`instrument_health.drift_diagnostics`, preserving pair counts, robust
+differential slope, assessment status, reason, and source observation IDs.
+CultureOps displays this result as a separate instrumental diagnostic.
+
+No policy means `not_requested`; it does not mean that the sensors are
+normal. A policy that is present but cannot be evaluated remains explicitly
+`not_evaluable` or `insufficient_data`. The UI counts only `suspected`
+assessments as drift alerts and labels them as requiring metrological review.
+
 ## Deliberate boundaries
 
 This migration does not yet expose drift policies through the Sensor Analysis
