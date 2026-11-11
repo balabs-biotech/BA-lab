@@ -223,3 +223,21 @@ def test_lifecycle_snapshot_rejects_execution_without_execution_event():
             events=(),
             execution_details="Forged execution record",
         )
+
+def test_lifecycle_revision_increments_once_per_appended_event():
+    accepted = transition_recommendation(
+        make_lifecycle(),
+        action="accept",
+        actor_id="operator-01",
+        occurred_at=datetime(2026, 11, 11, tzinfo=timezone.utc),
+    )
+    assert accepted.revision == 1
+
+    executed = transition_recommendation(
+        accepted,
+        action="record_execution",
+        actor_id="operator-01",
+        occurred_at=datetime(2026, 11, 11, 1, tzinfo=timezone.utc),
+        execution_details="Inspection completed",
+    )
+    assert executed.revision == 2
