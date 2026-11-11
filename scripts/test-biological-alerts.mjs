@@ -380,3 +380,14 @@ assert.match(environmentalAnalysisFunction, /p_source_signal_id: signal\.signal_
 assert.match(environmentalAnalysisFunction, /p_interpretation_payload: interpretationPayload/);
 assert.match(environmentalAnalysisFunction, /interpretation_persistence_status: interpretationPersistenceStatus/);
 assert.match(environmentalAnalysisFunction, /persisted_interpretation_count: persistedInterpretationCount/);
+
+assert.match(moduleSource, /\.from\("biological_interpretations"\)/);
+assert.match(moduleSource, /\.from\("biological_interpretation_events"\)/);
+assert.match(moduleSource, /biological_interpretations: !interpretationResult\.error/);
+assert.match(moduleSource, /biological_interpretation_events: interpretationEventsAvailable/);
+assert.match(moduleSource, /interpretation_history: \{/);
+assert.match(moduleSource, /snapshots: cultureInterpretations/);
+assert.match(moduleSource, /events: cultureInterpretationEvents/);
+assert.match(moduleSource, /interpretation_snapshot_count: cultureInterpretations\.length/);
+assert.match(moduleSource, /interpretation_event_count: cultureInterpretationEvents\.length/);
+assert.match(moduleSource, /biologicalInterpretationEvents\.length >= 2000/);
