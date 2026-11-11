@@ -171,6 +171,10 @@ for (const language of ['fr', 'ar', 'en', 'pt']) {
   });
   walk(tree.domains);
 }
+for (const language of ['fr', 'en', 'ar', 'pt']) {
+  const products = languageTrees[language].domains.find((domain) => domain.id === 'products');
+  assert.equal(products.children.length, 5, language + ' catalogue branch must expose only the five currently verified public entry points');
+}
 const arabicProducts = JSON.parse(readFileSync('ecosystem/notion-tree.ar.json', 'utf8')).domains.find((domain) => domain.id === 'products');
 assert.equal(arabicProducts.children.filter((node) => /WA/i.test(node.id)).length, 1, 'Arabic catalogue must expose one canonical WA entry, not a duplicate cross-language record');
 for (const id of ['ar-product-myco-start', 'ar-product-myco-plate']) {
