@@ -69,6 +69,7 @@ The optional FastAPI boundary exposes `GET /health`, `POST /v1/analyses` for tru
 - `docs/architecture/ba-environment-context-v1.md`: environment context identity and origin rules.
 - `docs/architecture/ba-sensor-measurement-lineage-v1.md`: sensor and observation lineage.
 - `docs/architecture/ba-sensor-instrument-health-v1.md`: opt-in flatline-candidate semantics, configuration and interpretation limits.
+- `docs/architecture/ba-sensor-domain-signal-evidence-v1.md`: descriptive evidence carried by profile-routed sensor signals.
 - `docs/architecture/ba-fao56-reference-evapotranspiration-v1.md`: daily FAO-56 ET0 contract.
 - `docs/architecture/ba-fao56-net-radiation-v1.md`: daily solar and net-radiation calculations.
 - `docs/architecture/ba-daily-reference-indicators-pipeline-v1.md`: normalized source-to-indicator pipeline.
