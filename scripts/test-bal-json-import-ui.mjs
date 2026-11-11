@@ -3,6 +3,18 @@ import fs from "node:fs";
 import vm from "node:vm";
 
 const source = fs.readFileSync("batch-tracker/bal-json-import.js", "utf8");
+const workspace = fs.readFileSync("batch-tracker/workspace.html", "utf8");
+const tracker = fs.readFileSync("batch-tracker/tracker.js", "utf8");
+for (const page of ["batch-tracker/mycology/index.html", "batch-tracker/laboratory/index.html"]) {
+  const html = fs.readFileSync(page, "utf8");
+  assert.match(html, /bal-json-import\.js/, page + " must load the BAL-JSON client");
+  assert.match(html, /20261111-bal-json-import-1/, page + " must invalidate cached workspace assets");
+}
+for (const id of ["balJsonImportPanel","balJsonImportSource","balJsonPreviewButton","balJsonImportButton","balJsonPreview","balJsonImportStatus"]) {
+  assert.match(workspace, new RegExp('id="' + id + '"'), "workspace is missing " + id);
+}
+assert.match(tracker, /window\.BA_LABS_SUPABASE_CLIENT\s*=\s*supabaseClient/, "tracker must expose its authenticated Supabase client");
+assert.match(tracker, /window\.BA_LABS_GET_ORGANIZATION_ID\s*=\s*\(\)\s*=>\s*organizationId/, "tracker must expose the active organization getter");
 
 function element(id) {
   return {
