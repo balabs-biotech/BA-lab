@@ -87,7 +87,13 @@ class BALBiologicalAnalysis(ContractModel):
                 raise ValueError("calculated biological metrics require value and unit")
             if self.period is None:
                 raise ValueError("calculated biological metrics require a period")
+            if self.evidence.accepted_count < 2:
+                raise ValueError("calculated biological metrics require at least two accepted observations")
+            if self.reason is not None:
+                raise ValueError("calculated biological metrics must not include an insufficiency reason")
         else:
             if self.metric.value is not None:
                 raise ValueError("insufficient biological evidence must have value=null")
+            if self.reason is None or not self.reason.strip():
+                raise ValueError("insufficient biological evidence requires a reason")
         return self
