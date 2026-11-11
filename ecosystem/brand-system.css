@@ -646,3 +646,22 @@
     transition: none !important;
   }
 }
+
+/* Featured-work metadata: preserve the light section's contrast at small sizes. */
+#app.balabs-ui > main > .editorial-feature .feature-status {
+  color: #70402F !important;
+  font-size: .7rem !important;
+  font-weight: 700 !important;
+  letter-spacing: .075em !important;
+  line-height: 1.55 !important;
+}
+#app.balabs-ui > main > .editorial-feature .feature-status .status-dot {
+  background: #8B4936 !important;
+  box-shadow: 0 0 0 3px rgba(139,73,54,.14) !important;
+}
+#app.balabs-ui > main > .editorial-feature .art-caption {
+  color: #F2F1E9 !important;
+  text-shadow: 0 1px 5px rgba(0,0,0,.9) !important;
+  font-size: .62rem !important;
+  line-height: 1.5 !important;
+}
