@@ -213,9 +213,11 @@
       const linkedRecommendations = state.recommendationsBySignal[row.signal_id] || [];
       recommendationPanel.append(element("strong", "", "Recommandations opérationnelles"));
       if (!linkedRecommendations.length) {
-        recommendationPanel.append(element("small", "", row.recommendation_code
-          ? "Code présent sur le signal, mais aucune proposition persistée n’est liée."
-          : "Aucune recommandation configurée pour ce signal."));
+        recommendationPanel.append(element("small", "", !state.recommendationHistoryAvailable
+          ? "Lecture des recommandations indisponible ou incomplète."
+          : row.recommendation_code
+            ? "Code présent sur le signal, mais aucune proposition persistée n’est liée."
+            : "Aucune recommandation configurée pour ce signal."));
       }
       linkedRecommendations.forEach(recommendation => {
         const item = element("div", "signal-recommendation-item");
@@ -369,7 +371,7 @@
     const page = data || [];
     const signalIds = page.map(row => row.signal_id).filter(Boolean);
     const recommendationsBySignal = append ? { ...state.recommendationsBySignal } : {};
-    state.recommendationHistoryAvailable = true;
+    state.recommendationHistoryAvailable = append ? state.recommendationHistoryAvailable : true;
     if (signalIds.length) {
       const recommendationResult = await client.from("biological_recommendations")
         .select("*")
