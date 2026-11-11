@@ -3080,7 +3080,10 @@ body[data-domain] :is(button, input, select, textarea, a, [tabindex]):focus-visi
   overflow-wrap: anywhere;
 }
 
-#biologicalSignalsCard .signal-recommendation-panel {
+#biologicalSignalsCard #biologicalSignalsCard .signal-recommendation-context { display: grid; gap: 4px; margin: 8px 0; padding: 9px; border-left: 2px solid var(--border-strong, #87939d); background: var(--surface-muted, rgba(127,127,127,.06)); border-radius: 6px; }
+#biologicalSignalsCard .signal-recommendation-context strong { font-size: .82rem; }
+#biologicalSignalsCard .signal-recommendation-context small { overflow-wrap: anywhere; color: var(--text-secondary, #68737d); }
+.signal-recommendation-panel {
   display: grid;
   gap: 0.65rem;
   margin: 0.8rem 0;
