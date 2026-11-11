@@ -50,6 +50,7 @@ on:
       - "scripts/test-biological-context-adapter.mjs"
       - "scripts/test-biological-context-loader.mjs"
       - "scripts/test-biological-context-pipeline.mjs"
+      - "scripts/test-biological-assessment-engine.mjs"
       - "supabase/tests/bal-json-ingest-contract.test.mjs"
       - "supabase/migrations/20261111160000_add_bal_json_atomic_ingestion.sql"
       - ".github/workflows/bal-json-import-ui.yml"
