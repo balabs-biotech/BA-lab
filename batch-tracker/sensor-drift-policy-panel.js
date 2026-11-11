@@ -142,7 +142,7 @@
       id: first.profile_id, code: first.profile_code, version: first.profile_version,
       validFrom: first.profile_valid_from, validTo: first.profile_valid_to
     };
-    state.devices = rows.map(row => ({
+    state.devices = rows.filter(row => row.sensor_id && row.device_enabled === true).map(row => ({
       sensor_id: row.sensor_id, device_code: row.device_code, device_type: row.device_type
     }));
     populateDeviceSelect($("sensorDriftTarget"), "Choisir le capteur cible…");
@@ -157,7 +157,9 @@
       .forEach(id => { $(id).disabled = false; });
     $("sensorDriftCreateDraft").disabled = state.devices.length < 2;
     await loadPolicies(revision, organizationId, environmentId);
-    if (revision === state.revision) setStatus("Profil et appareils éligibles chargés. Les mutations restent protégées par RLS et les déclencheurs PostgreSQL.");
+    if (revision === state.revision) setStatus(state.devices.length >= 2
+      ? "Profil et appareils activés chargés. Les mutations restent protégées par RLS et les déclencheurs PostgreSQL."
+      : "Profil actif chargé, mais il faut au moins deux appareils activés pour créer une nouvelle référence. Les politiques existantes restent consultables.");
   }
   function positiveInteger(id, min, max) {
     const value = Number($(id).value);
