@@ -53,6 +53,16 @@ assert.match(source, /analysis_evidence: signal\.evidence \?\? \{\}/, "sensor si
 assert.match(source, /biological_signal_persistence_failed/, "failed persistence must not be reported as a successful analysis");
 assert.match(source, /signal_persistence_status: signalPersistenceStatus/, "gateway response must expose persistence status");
 
+const recommendationResolution = source.indexOf("result.recommendation_resolution");
+const recommendationRpc = source.indexOf('adminClient.rpc(\n          "create_biological_recommendation"');
+assert.ok(recommendationResolution > signalPersistence, "recommendation resolution must follow persisted sensor signals");
+assert.ok(recommendationRpc > recommendationResolution, "recommendation RPC must run after source signal persistence");
+assert.match(source, /p_source_signal_id: proposal\.source_signal_id/, "recommendation persistence must retain source signal provenance");
+assert.match(source, /recommendation_provenance_mismatch/, "sensor recommendation provenance mismatches must fail closed");
+assert.match(source, /biological_recommendation_persistence_failed/, "sensor recommendation write failures must be surfaced");
+assert.match(source, /recommendations: domainProfile\.recommendations \?\? \[\]/, "versioned recommendation definitions must be forwarded to the engine");
+assert.match(source, /persisted_recommendation_count/, "sensor gateway must report durable recommendation count");
+
 
 assert.match(source, /flatline_minimum_repeated_observations: flatlineMinimumObservations/, "explicit flatline observation policy must be forwarded");
 assert.match(source, /flatline_minimum_duration_seconds: flatlineMinimumDurationSeconds/, "explicit flatline duration policy must be forwarded");
