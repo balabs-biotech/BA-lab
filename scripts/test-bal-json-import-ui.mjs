@@ -17,6 +17,8 @@ for (const id of ["balJsonImportPanel","balJsonImportSource","balJsonPreviewButt
 }
 assert.match(tracker, /window\.BA_LABS_SUPABASE_CLIENT\s*=\s*supabaseClient/, "tracker must expose its authenticated Supabase client");
 assert.match(tracker, /window\.BA_LABS_GET_ORGANIZATION_ID\s*=\s*\(\)\s*=>\s*organizationId/, "tracker must expose the active organization getter");
+assert.match(tracker, /window\.BA_LABS_GET_MEASUREMENT_CATALOGUE\s*=\s*\(\)\s*=>/, "tracker must expose the controlled measurement catalogue");
+assert.match(tracker, /select\("code, label, dimension, factor, offset_value, is_linear"\)/, "tracker must load audited conversion metadata");
 
 function element(id) {
   return {
@@ -101,6 +103,9 @@ function harness({ domain = "mycology", organizationId = "a0a0a0a0-0000-4000-800
   assert.equal(calls.length, 1);
   assert.equal(calls[0].name, "bal-json-ingest");
   assert.equal(calls[0].options.body.record_id, "d0d0d0d0-0000-4000-8000-000000000001");
+  assert.equal(calls[0].options.body.data.raw_value, 2, "normalization preview must never replace the raw value");
+  assert.equal(calls[0].options.body.data.raw_unit_code, "kg", "normalization preview must never replace the raw unit");
+  assert.equal("normalized_value" in calls[0].options.body.data, false, "preview normalization must not be persisted by v1");
   assert.match(elements.get("balJsonImportStatus").textContent, /enregistré/i);
   assert.equal(h.refreshCalls, 1, "successful import must refresh the experimental history");
 }
@@ -182,6 +187,15 @@ function harness({ domain = "mycology", organizationId = "a0a0a0a0-0000-4000-800
   elements.get("balJsonPreviewButton").click();
   assert.match(elements.get("balJsonPreview").textContent, /Conversion avec décalage ou échelle non linéaire non activée/);
   assert.match(elements.get("balJsonPreview").textContent, /valeur brute reste la référence/i);
+}
+
+
+{
+  const { elements } = harness({ catalogue: null });
+  elements.get("balJsonImportSource").value = JSON.stringify(makeRecord());
+  elements.get("balJsonPreviewButton").click();
+  assert.equal(elements.get("balJsonImportButton").disabled, false, "missing catalogue must not block raw data import");
+  assert.match(elements.get("balJsonPreview").textContent, /Catalogue des unités indisponible/);
 }
 
 console.log("✓ BAL-JSON import UI: strict preview, advisory catalogue normalization, conservative conversion blocks, tenant guard, stale-preview rejection, duplicate handling and explicit authenticated submission");
