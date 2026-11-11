@@ -517,6 +517,13 @@
     const observations = observationResult.error ? [] : (observationResult.data || []);
     const biologicalSignals = signalResult.error ? [] : (signalResult.data || []);
     const biologicalInterpretations = interpretationResult.error ? [] : (interpretationResult.data || []);
+    let interpretationSnapshotsAvailable = !interpretationResult.error;
+    if (!interpretationResult.error && biologicalInterpretations.length >= 500) {
+      interpretationSnapshotsAvailable = false;
+      markIncomplete("biological_interpretations", {
+        message: "Interpretation snapshot history reached the 500-row read limit."
+      });
+    }
     const interpretationIds = biologicalInterpretations.map(item => item.interpretation_id);
     let biologicalInterpretationEvents = [];
     let interpretationEventsAvailable = true;
@@ -553,7 +560,7 @@
       measurements: !measurementResult.error,
       observations: !observationResult.error,
       biological_signals: !signalResult.error,
-      biological_interpretations: !interpretationResult.error,
+      biological_interpretations: interpretationSnapshotsAvailable,
       biological_interpretation_events: interpretationEventsAvailable,
       experimental_results: resultsAvailable,
       environmental_observations: environmentalAvailable
@@ -866,6 +873,7 @@
         interpretation_history: {
           snapshots: cultureInterpretations,
           events: cultureInterpretationEvents,
+          snapshots_available: lineage?.evidenceAvailability?.biological_interpretations === true,
           snapshot_count: cultureInterpretations.length,
           event_count: cultureInterpretationEvents.length,
           events_available: lineage?.evidenceAvailability?.biological_interpretation_events === true,
@@ -1049,12 +1057,13 @@
       const historySection = element("div", "signal-interpretation-history");
       historySection.append(element("strong", "", "Historique des interprétations"));
       historySection.append(element("small", "", snapshots.length + " instantané(s) · " + historyEvents.length + " événement(s)"));
+      const interpretationHistoryComplete = history.snapshots_available === true && history.events_available === true;
       if (history.status === "unavailable") {
         historySection.append(element("p", "signal-lineage-quality",
           "Historique indisponible : la lecture du registre n'a pas abouti."));
-      } else if (history.events_available === false) {
+      } else if (!interpretationHistoryComplete) {
         historySection.append(element("p", "signal-lineage-quality",
-          "Instantanés disponibles, mais historique des événements incomplet."));
+          "Historique partiel : les instantanés ou leurs événements ont atteint une limite de lecture ou sont indisponibles. Le statut de version et la dernière revue ne peuvent pas être garantis."));
       }
       if (history.status !== "unavailable" && !snapshots.length) {
         historySection.append(element("p", "signal-lineage-batches",
@@ -1075,7 +1084,7 @@
           contested: "contestée",
           reassessment_requested: "réévaluation demandée"
         };
-        const lifecycleLabel = history.events_available !== true ? "Cycle de vie non vérifié"
+        const lifecycleLabel = !interpretationHistoryComplete ? "Cycle de vie non vérifié"
           : latestSupersededEvent ? "Version remplacée" : "Version courante";
         const summary = element("summary", "", [
           lifecycleLabel,
@@ -1085,14 +1094,14 @@
         ].join(" · "));
         detail.append(summary);
         detail.append(element("small", "", "Enregistré le " + dateLabel(snapshot.recorded_at)));
-        if (history.events_available === true && latestReviewEvent) {
+        if (interpretationHistoryComplete && latestReviewEvent) {
           detail.append(element("p", "signal-interpretation-review-state",
             "Décision de revue humaine : " +
             reviewDecisionLabels[latestReviewEvent.event_payload.decision] +
             " · " + dateLabel(latestReviewEvent.occurred_at)));
           detail.append(element("small", "signal-interpretation-review-disclaimer",
             "Cette décision documente une revue utilisateur ; elle ne modifie pas le statut du moteur et ne constitue pas une preuve biologique."));
-        } else if (history.events_available === true) {
+        } else if (interpretationHistoryComplete) {
           detail.append(element("small", "signal-interpretation-review-state",
             "Aucune décision de revue humaine enregistrée."));
         }
