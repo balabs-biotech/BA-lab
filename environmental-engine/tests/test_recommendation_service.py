@@ -105,3 +105,42 @@ def test_service_does_not_silently_override_domain_transition_rules():
             occurred_at=datetime(2026, 11, 11, tzinfo=timezone.utc),
             execution_details="Attempted without acceptance",
         )
+
+class RevisionConflictRepository(InMemoryRepository):
+    def append_event(
+        self, *, organization_id, recommendation_id, expected_revision, event
+    ):
+        from ba_environmental_engine.interpretation.recommendation_repository import (
+            RecommendationRevisionConflictError,
+        )
+
+        self.received_organization_id = organization_id
+        self.received_expected_revision = expected_revision
+        raise RecommendationRevisionConflictError("stale recommendation revision")
+
+
+def test_service_propagates_optimistic_concurrency_conflict():
+    from ba_environmental_engine.interpretation.recommendation_repository import (
+        RecommendationRevisionConflictError,
+    )
+
+    lifecycle = make_lifecycle()
+    organization_id = uuid4()
+    repository = RevisionConflictRepository(lifecycle)
+    service = RecommendationService(repository)
+
+    with pytest.raises(
+        RecommendationRevisionConflictError,
+        match="stale recommendation revision",
+    ):
+        service.transition(
+            organization_id=organization_id,
+            recommendation_id=lifecycle.proposal.recommendation_id,
+            actor_id="auth-user-01",
+            action="accept",
+            occurred_at=datetime(2026, 11, 11, tzinfo=timezone.utc),
+        )
+
+    assert repository.received_organization_id == organization_id
+    assert repository.received_expected_revision == 0
+    assert repository.appended_event is None
