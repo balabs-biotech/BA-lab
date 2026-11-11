@@ -23,6 +23,10 @@
       return output("insufficient_evidence", "assessment_status_unknown");
     if (typeof assessment.id !== "string" || !assessment.id.trim())
       return output("insufficient_evidence", "persisted_assessment_id_missing");
+    if (typeof assessment.organization_id !== "string" || !assessment.organization_id.trim() ||
+        typeof assessment.domain !== "string" || !assessment.domain.trim() ||
+        typeof assessment.rule_version_id !== "string" || !assessment.rule_version_id.trim())
+      return output("insufficient_evidence", "assessment_tenant_domain_or_rule_version_missing");
     if (assessment.server_verification !== "not_recomputed" || assessment.calculation_origin !== "client_engine")
       return output("insufficient_evidence", "assessment_provenance_unrecognized");
     if (assessment.status !== "out_of_range")
@@ -32,7 +36,10 @@
     if (!Array.isArray(input.policies))
       return output("decision_not_configured", "decision_policy_list_missing", { assessment_id: assessment.id });
     const policies = input.policies.filter((policy) =>
-      policy && policy.status === "reviewed" && policy.domain === input.domain &&
+      policy && policy.status === "reviewed" &&
+      policy.organization_id === assessment.organization_id &&
+      policy.domain === assessment.domain && policy.domain === input.domain &&
+      policy.rule_version_id === assessment.rule_version_id &&
       Array.isArray(policy.trigger_assessment_statuses) &&
       policy.trigger_assessment_statuses.includes(assessment.status) &&
       Array.isArray(policy.sources) && policy.sources.length > 0 &&
