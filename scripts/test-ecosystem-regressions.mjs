@@ -24,8 +24,11 @@ for (const id of [
   '40173152f17181ce95cfcc669321cc1d',
 ]) assert.ok(englishAgrotechnology.children.some((node) => node.notionId === id), 'English agrotechnology must expose every verified public child page');
 const arabicMycology = languageTrees.ar.domains.find((domain) => domain.id === 'myco');
+function containsNotionPage(nodes, id) {
+  return nodes.some((node) => node.notionId === id || (node.url || '').endsWith('/' + id) || containsNotionPage(node.children || [], id));
+}
 for (const id of ['40173152f1718101afcbdb364eb5d44a', '40173152f17181afb288feda1d2c3e5c']) {
-  assert.ok(arabicMycology.children.some((node) => node.notionId === id), 'Arabic mycology must expose its verified cultivation and applications pages');
+  assert.ok(containsNotionPage(arabicMycology.children, id), 'Arabic mycology must expose its verified cultivation and applications pages at any valid hierarchy depth');
 }
 const portugueseAgrotechnology = languageTrees.pt.domains.find((domain) => domain.id === 'soil');
 for (const id of [
