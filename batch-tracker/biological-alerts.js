@@ -391,12 +391,13 @@
           const eventResult = await client.from("biological_recommendation_events")
             .select("*").eq("organization_id", state.organizationId)
             .in("recommendation_id", recommendationIds)
-            .order("revision", { ascending: true }).limit(2000);
+            .order("revision", { ascending: false }).limit(2000);
           if (request !== state.request) return;
-          if (eventResult.error || (eventResult.data || []).length >= 2000) {
+          if (eventResult.error) {
             state.recommendationHistoryAvailable = false;
           } else {
             eventRows = eventResult.data || [];
+            if (eventRows.length >= 2000) state.recommendationHistoryAvailable = false;
           }
         }
         const eventsByRecommendation = new Map();
@@ -404,6 +405,7 @@
           if (!eventsByRecommendation.has(event.recommendation_id)) eventsByRecommendation.set(event.recommendation_id, []);
           eventsByRecommendation.get(event.recommendation_id).push(event);
         });
+        eventsByRecommendation.forEach(events => events.sort((left, right) => left.revision - right.revision));
         recommendations.forEach(recommendation => {
           const linked = { ...recommendation, events: eventsByRecommendation.get(recommendation.recommendation_id) || [] };
           if (!recommendationsBySignal[recommendation.source_signal_id]) recommendationsBySignal[recommendation.source_signal_id] = [];
