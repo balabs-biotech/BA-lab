@@ -18,6 +18,13 @@ begin
        and pg_get_constraintdef(oid) ilike '%trigger_assessment_statuses%'
        and pg_get_constraintdef(oid) ilike '%out_of_range%'
   ) then raise exception 'FAIL: decision policies must be restricted to the implemented explicit trigger'; end if;
+  if not exists (
+    select 1 from pg_constraint
+     where conrelid=v_table and contype='c'
+       and pg_get_constraintdef(oid) ilike '%domain%'
+       and pg_get_constraintdef(oid) ilike '%mycology%'
+       and pg_get_constraintdef(oid) ilike '%laboratory%'
+  ) then raise exception 'FAIL: decision policy domain must be restricted to supported biological workspaces'; end if;
   if not (select relrowsecurity from pg_class where oid=v_table) then
     raise exception 'FAIL: decision policy RLS is disabled';
   end if;
