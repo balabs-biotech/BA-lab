@@ -101,6 +101,25 @@ def interpret_sensor_analysis(
                     unit=summary.unit_code,
                     finding_status=finding_status,
                     context_tags=context_tags,
+                    evidence={
+                        "assessment_type": "sensor_series_summary",
+                        "sensor_id": str(summary.sensor_id),
+                        "window_from": analysis.from_at.isoformat(),
+                        "window_to_exclusive": analysis.to_at_exclusive.isoformat(),
+                        "observation_count": summary.observation_count,
+                        "usable_count": summary.usable_count,
+                        "excluded_count": summary.excluded_count,
+                        "quality_counts": dict(summary.quality_counts),
+                        "minimum": summary.minimum,
+                        "maximum": summary.maximum,
+                        "mean": summary.mean,
+                        "median": summary.median,
+                        "standard_deviation": summary.standard_deviation,
+                        "expected_count": summary.expected_count,
+                        "availability_ratio": summary.availability_ratio,
+                        "gap_count": summary.gap_count,
+                        "maximum_gap_seconds": summary.maximum_gap_seconds,
+                    },
                 )
             )
             matched.add((source_finding_id, rule.rule_id))
