@@ -162,3 +162,44 @@ def test_event_timestamp_must_be_timezone_aware():
             actor_id="operator-01",
             occurred_at=datetime(2026, 11, 11),
         )
+
+def test_lifecycle_events_must_be_chronological():
+    accepted = transition_recommendation(
+        make_lifecycle(),
+        action="accept",
+        actor_id="operator-01",
+        occurred_at=datetime(2026, 11, 11, 2, tzinfo=timezone.utc),
+    )
+    with pytest.raises(ValueError, match="event time cannot precede prior lifecycle event"):
+        transition_recommendation(
+            accepted,
+            action="record_execution",
+            actor_id="operator-01",
+            occurred_at=datetime(2026, 11, 11, 1, tzinfo=timezone.utc),
+            execution_details="Inspection completed",
+        )
+
+
+def test_outcome_observation_cannot_be_after_its_recording_time():
+    accepted = transition_recommendation(
+        make_lifecycle(),
+        action="accept",
+        actor_id="operator-01",
+        occurred_at=datetime(2026, 11, 11, tzinfo=timezone.utc),
+    )
+    executed = transition_recommendation(
+        accepted,
+        action="record_execution",
+        actor_id="operator-01",
+        occurred_at=datetime(2026, 11, 11, 1, tzinfo=timezone.utc),
+        execution_details="Inspection completed",
+    )
+    with pytest.raises(ValueError, match="outcome observation time must be between execution and recording"):
+        transition_recommendation(
+            executed,
+            action="record_outcome",
+            actor_id="operator-01",
+            occurred_at=datetime(2026, 11, 12, tzinfo=timezone.utc),
+            outcome_summary="Observed",
+            outcome_observed_at=datetime(2026, 11, 13, tzinfo=timezone.utc),
+        )
