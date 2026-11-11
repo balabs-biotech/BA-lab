@@ -77,3 +77,6 @@ assert.ok(receiptForward > receiptRead, "receipt payload must be forwarded to th
 
 assert.match(source, /!rows\?\.length && transmissionExpectedInterval === undefined/, "empty measurement scope must remain an error unless transmission-only diagnostics were requested");
 assert.match(source, /transmission_current_window: transmissionExpectedInterval !== undefined/, "current silence evaluation must be enabled only for a current local-date window");
+
+assert.match(source, /\(rows \?\? \[\]\)\.filter/, "transmission-only analysis must tolerate an empty measurement query result");
+assert.match(source, /!profileScopedRows\.length && transmissionExpectedInterval === undefined/, "empty profile-scoped measurements must be allowed only for transmission diagnostics");
