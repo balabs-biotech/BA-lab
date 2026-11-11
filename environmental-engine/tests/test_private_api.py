@@ -859,3 +859,31 @@ def test_sensor_api_rejects_empty_measurements_without_transmission_policy():
 
     assert response.status_code == 422
     assert "at least one sensor measurement or transmission diagnostics policy is required" in str(response.json()["detail"])
+
+
+def test_sensor_api_rejects_current_silence_for_a_historical_window():
+    request = sensor_payload()
+    request["transmission_expected_interval_seconds"] = 60
+    request["transmission_gap_tolerance_factor"] = 2.0
+    request["transmission_current_window"] = True
+    device_id = request["measurements"][0]["iot_device_id"]
+    request["transmission_devices"] = [{
+        "device_id": device_id,
+        "device_code": "sensor-01",
+        "enabled": True,
+        "created_at": "2026-02-27T00:00:00+00:00",
+        "profile_bound": True,
+        "expected_from": "2026-02-27",
+        "expected_to": None,
+    }]
+    request["transmission_receipts"] = []
+
+    client = TestClient(create_app(engine_api_key="test-secret"))
+    response = client.post(
+        "/v1/analyses/sensors",
+        json=request,
+        headers={"X-BA-Engine-Key": "test-secret"},
+    )
+
+    assert response.status_code == 422
+    assert "current profile-local date" in str(response.json()["detail"])
