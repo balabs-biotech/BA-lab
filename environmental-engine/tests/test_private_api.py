@@ -738,7 +738,7 @@ def test_sensor_api_exposes_device_transmission_diagnostics_separately():
         "enabled": True,
         "created_at": "2026-02-27T00:00:00+00:00",
         "profile_bound": True,
-        "expected_from": "2026-02-27T00:00:00+00:00",
+        "expected_from": "2026-02-27",
         "expected_to": None,
     }]
     request["transmission_receipts"] = [
@@ -776,7 +776,7 @@ def test_sensor_api_reports_no_receipt_history_as_insufficient_data():
         "enabled": True,
         "created_at": "2026-02-27T00:00:00+00:00",
         "profile_bound": True,
-        "expected_from": "2026-02-27T00:00:00+00:00",
+        "expected_from": "2026-02-27",
         "expected_to": None,
     }]
     request["transmission_receipts"] = []
@@ -825,7 +825,7 @@ def test_sensor_api_accepts_transmission_only_analysis_for_a_silent_device():
         "enabled": True,
         "created_at": (today - timedelta(days=10)).isoformat() + "T00:00:00+00:00",
         "profile_bound": True,
-        "expected_from": (today - timedelta(days=10)).isoformat() + "T00:00:00+00:00",
+        "expected_from": (today - timedelta(days=10)).isoformat(),
         "expected_to": None,
         "last_seen_at": (today - timedelta(days=1)).isoformat() + "T00:00:00+00:00",
     }]
