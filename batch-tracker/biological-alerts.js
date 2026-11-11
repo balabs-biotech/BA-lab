@@ -406,7 +406,7 @@
       }
     }
     const relationships = [...relationshipByKey.values()].slice(0, MAX_RELATIONSHIPS);
-    const [batchResult, cultureEventResult, materialEventResult, measurementResult, observationResult, signalResult] = await Promise.all([
+    const [batchResult, cultureEventResult, materialEventResult, measurementResult, observationResult, signalResult, interpretationResult] = await Promise.all([
       client.from("batches").select("batch_code,name,status,current_stage,culture_id,material_id")
         .eq("organization_id", organizationId)
         .or("culture_id.in.(" + cultureIds.join(",") + "),material_id.in.(" + materialIds.join(",") + ")")
@@ -425,7 +425,10 @@
         .order("observed_at", { ascending: true }).limit(500),
       client.from("biological_signals").select("signal_id,biological_subject_id,environment_id,signal_code,severity,message_code,recommendation_code,rule_id,source_analysis_id,source_finding_id,source_observation_ids,variable_code,observed_date,observed_value,unit,analysis_method,analysis_evidence,first_seen_at")
         .eq("organization_id", organizationId).eq("domain", domainByWorkspace[document.body.dataset.domain] || "mycology")
-        .in("biological_subject_id", cultureIds).order("first_seen_at", { ascending: true }).limit(200)
+        .in("biological_subject_id", cultureIds).order("first_seen_at", { ascending: true }).limit(200),
+      client.from("biological_interpretations").select("interpretation_id,domain,biological_subject_id,source_signal_id,source_analysis_id,source_finding_id,engine_code,engine_version,interpretation_status,interpretation_payload,recorded_at")
+        .eq("organization_id", organizationId).eq("domain", domainByWorkspace[document.body.dataset.domain] || "mycology")
+        .in("biological_subject_id", cultureIds).order("recorded_at", { ascending: false }).limit(500)
     ]);
     if (batchResult.error) markIncomplete("batches", batchResult.error);
     if (cultureEventResult.error) markIncomplete("culture_events", cultureEventResult.error);
@@ -433,6 +436,7 @@
     if (measurementResult.error) markIncomplete("measurements", measurementResult.error);
     if (observationResult.error) markIncomplete("observations", observationResult.error);
     if (signalResult.error) markIncomplete("biological_signals", signalResult.error);
+    if (interpretationResult.error) markIncomplete("biological_interpretations", interpretationResult.error);
     const eventsById = new Map();
     [...(cultureEventResult.data || []), ...(materialEventResult.data || [])].forEach(event => eventsById.set(event.id, event));
     const events = [...eventsById.values()].sort((x, y) => String(x.occurred_at).localeCompare(String(y.occurred_at)));
@@ -456,6 +460,19 @@
     const measurements = measurementResult.error ? [] : (measurementResult.data || []);
     const observations = observationResult.error ? [] : (observationResult.data || []);
     const biologicalSignals = signalResult.error ? [] : (signalResult.data || []);
+    const biologicalInterpretations = interpretationResult.error ? [] : (interpretationResult.data || []);
+    const interpretationIds = biologicalInterpretations.map(item => item.interpretation_id);
+    let biologicalInterpretationEvents = [];
+    let interpretationEventsAvailable = true;
+    if (interpretationIds.length) {
+      const interpretationEventResult = await client.from("biological_interpretation_events")
+        .select("interpretation_id,event_id,event_type,actor_kind,actor_id,occurred_at,event_payload")
+        .eq("organization_id", organizationId).in("interpretation_id", interpretationIds)
+        .order("occurred_at", { ascending: true }).limit(2000);
+      interpretationEventsAvailable = !interpretationEventResult.error;
+      if (interpretationEventResult.error) markIncomplete("biological_interpretation_events", interpretationEventResult.error);
+      else biologicalInterpretationEvents = interpretationEventResult.data || [];
+    }
     const resultIds = [...new Set(measurements.map(item => item.result_id).filter(Boolean))];
     let experimentalResults = [];
     let resultsAvailable = resultIds.length > 0;
@@ -471,6 +488,8 @@
       measurements: !measurementResult.error,
       observations: !observationResult.error,
       biological_signals: !signalResult.error,
+      biological_interpretations: !interpretationResult.error,
+      biological_interpretation_events: interpretationEventsAvailable,
       experimental_results: resultsAvailable,
       environmental_observations: environmentalAvailable
     };
@@ -480,7 +499,13 @@
       relationships,
       batches: batchResult.error ? [] : (batchResult.data || []),
       events,
-      evidence: { measurements, observations, biological_signals: biologicalSignals, experimental_results: experimentalResults, environmental_observations: environmentalObservations },
+      evidence: {
+        measurements, observations, biological_signals: biologicalSignals,
+        biological_interpretations: biologicalInterpretations,
+        biological_interpretation_events: biologicalInterpretationEvents,
+        experimental_results: experimentalResults,
+        environmental_observations: environmentalObservations
+      },
       evidenceAvailability,
       lineageQuality: { complete: qualityIssues.length === 0, issues: qualityIssues },
       unavailable: false,
@@ -541,6 +566,8 @@
     const measurements = Array.isArray(evidence.measurements) ? evidence.measurements : [];
     const observations = Array.isArray(evidence.observations) ? evidence.observations : [];
     const biologicalSignals = Array.isArray(evidence.biological_signals) ? evidence.biological_signals : [];
+    const biologicalInterpretations = Array.isArray(evidence.biological_interpretations) ? evidence.biological_interpretations : [];
+    const biologicalInterpretationEvents = Array.isArray(evidence.biological_interpretation_events) ? evidence.biological_interpretation_events : [];
     const environmentalObservations = Array.isArray(evidence.environmental_observations) ? evidence.environmental_observations : [];
     const experimentalResults = Array.isArray(evidence.experimental_results) ? evidence.experimental_results : [];
     const cultures = Array.isArray(lineage?.cultures) ? lineage.cultures : [];
@@ -563,6 +590,9 @@
       const cultureObservations = observations.filter(item =>
         item.culture_id === cultureId || (item.event_id && cultureEventIds.has(item.event_id)));
       const cultureSignals = biologicalSignals.filter(item => item.biological_subject_id === cultureId);
+      const cultureInterpretations = biologicalInterpretations.filter(item => item.biological_subject_id === cultureId);
+      const cultureInterpretationIds = new Set(cultureInterpretations.map(item => item.interpretation_id));
+      const cultureInterpretationEvents = biologicalInterpretationEvents.filter(item => cultureInterpretationIds.has(item.interpretation_id));
       const cultureResults = experimentalResults.filter(result =>
         cultureMeasurements.some(item => item.result_id === result.id));
       const summarizeTimeSeries = (items, valueField, timeField, unitField) => {
@@ -767,6 +797,14 @@
         measurements: cultureMeasurements,
         observations: cultureObservations,
         biological_signals: cultureSignals,
+        interpretation_history: {
+          snapshots: cultureInterpretations,
+          events: cultureInterpretationEvents,
+          snapshot_count: cultureInterpretations.length,
+          event_count: cultureInterpretationEvents.length,
+          status: lineage?.evidenceAvailability?.biological_interpretations === true
+            ? "available" : "unavailable"
+        },
         findings,
         experimental_results: cultureResults,
         events: cultureEvents,
@@ -775,6 +813,8 @@
           measurement_count: cultureMeasurements.length,
           observation_count: cultureObservations.length,
           biological_signal_count: cultureSignals.length,
+          interpretation_snapshot_count: cultureInterpretations.length,
+          interpretation_event_count: cultureInterpretationEvents.length,
           finding_count: findings.length,
           experimental_result_count: cultureResults.length,
           environmental_context_count: environmentalContext.length,
