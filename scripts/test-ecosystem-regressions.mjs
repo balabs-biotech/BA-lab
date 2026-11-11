@@ -379,7 +379,7 @@ assert.ok(brandCss.includes('aspect-ratio: 16 / 10 !important'), 'Editorial proj
 assert.ok(brandCss.includes('grid-template-columns: repeat(2, minmax(0, 1fr)) !important'), 'Editorial work cards must collapse to two columns on tablet');
 assert.ok(brandCss.includes('grid-template-columns: minmax(0, 1fr) !important'), 'Editorial work cards must collapse to one column on mobile');
 assert.ok(brandCss.includes('outline: 3px solid var(--balabs-copper) !important'), 'Editorial links and controls must have a visible keyboard focus state');
-assert.ok(!/\.(?:sphere|webgl-[\w-]*|branch-dock|camera)\b|#mainView|canvas/i.test(brandCss.slice(brandCss.indexOf('Site-wide visual refinement — phase 3'))), 'Phase 3 must not target the 3D explorer or Batch Tracker');
+assert.ok(!/\.(?:sphere|webgl-[\w-]*|branch-dock|camera)\b|#mainView|canvas/i.test(brandCss.slice(brandCss.indexOf('Site-wide visual refinement — phase 3'), brandCss.indexOf('PHASE 6 — internal universe navigation'))), 'Phase 3 must not target the 3D explorer or Batch Tracker');
 
 
 
@@ -391,7 +391,7 @@ for (const selector of ['.editorial-work .work-grid', '.editorial-about .about-c
 }
 assert.ok(brandCss.includes('grid-template-columns: repeat(4, minmax(0, 1fr)) !important'), 'Scientific method must present four distinct steps on desktop');
 assert.ok(brandCss.includes('@media (max-width: 760px)'), 'Homepage editorial sections must retain mobile layouts');
-assert.ok(!/\\.(?:sphere|webgl-[\\w-]*|branch-dock|camera)\\b|#mainView|canvas/i.test(brandCss.slice(brandCss.indexOf('PHASE 5 — editorial system across the full homepage'))), 'Phase 5 must not target the 3D explorer');
+assert.ok(!/\\.(?:sphere|webgl-[\\w-]*|branch-dock|camera)\\b|#mainView|canvas/i.test(brandCss.slice(brandCss.indexOf('PHASE 5 — editorial system across the full homepage'), brandCss.indexOf('PHASE 6 — internal universe navigation'))), 'Phase 5 must not target the 3D explorer');
 
 // Phase 4 visible art-direction contract: major homepage composition, not micro-adjustments.
 assert.ok(brandCss.includes('PHASE 4 — visible homepage art direction'), 'Phase 4 homepage art direction must be present');
