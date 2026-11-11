@@ -204,7 +204,7 @@ class SensorAnalysisRequest(APIModel):
     transmission_devices: list[SensorTransmissionDeviceInput] | None = Field(default=None, max_length=100)
     transmission_receipts: list[SensorTransmissionReceiptInput] | None = Field(default=None, max_length=5000)
     biological_interpretation: dict[str, Any] | None = None
-    measurements: list[dict[str, Any]] = Field(min_length=1, max_length=5000)
+    measurements: list[dict[str, Any]] = Field(min_length=0, max_length=5000)
 
     @model_validator(mode="after")
     def validate_sensor_scope(self) -> SensorAnalysisRequest:
@@ -250,6 +250,8 @@ class SensorAnalysisRequest(APIModel):
                 raise ValueError("every transmission receipt must reference a supplied device")
         elif self.transmission_current_window:
             raise ValueError("transmission_current_window requires transmission diagnostics")
+        if not self.measurements and self.transmission_expected_interval_seconds is None:
+            raise ValueError("at least one sensor measurement or transmission diagnostics policy is required")
         for row in self.measurements:
             if row.get("organization_id") != str(self.organization_id):
                 raise ValueError("every sensor measurement must match the requested organization")
