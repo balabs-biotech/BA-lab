@@ -171,6 +171,12 @@ for (const language of ['fr', 'ar', 'en', 'pt']) {
   });
   walk(tree.domains);
 }
+const arabicProducts = JSON.parse(readFileSync('ecosystem/notion-tree.ar.json', 'utf8')).domains.find((domain) => domain.id === 'products');
+assert.equal(arabicProducts.children.filter((node) => /WA/i.test(node.id)).length, 1, 'Arabic catalogue must expose one canonical WA entry, not a duplicate cross-language record');
+for (const id of ['ar-product-myco-start', 'ar-product-myco-plate']) {
+  const prototype = arabicProducts.children.find((node) => node.id === id);
+  assert.ok(prototype && prototype.description.includes('غير متاح للبيع'), 'Arabic ' + id + ' must clearly state that the prototype is not for sale');
+}
 const enTree = JSON.parse(readFileSync('ecosystem/notion-tree.en.json', 'utf8'));
 const ptTree = JSON.parse(readFileSync('ecosystem/notion-tree.pt.json', 'utf8'));
 for (const [language, tree, mycologyId, fungalId] of [
