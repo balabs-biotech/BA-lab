@@ -107,9 +107,10 @@
     const temporal = Array.isArray(payload.temporal_screening?.assessments) ? payload.temporal_screening.assessments : [];
     const flatlines = Array.isArray(payload.instrument_health?.flatline_diagnostics?.assessments) ? payload.instrument_health.flatline_diagnostics.assessments : [];
     const transmissions = Array.isArray(payload.instrument_health?.transmission_diagnostics?.assessments) ? payload.instrument_health.transmission_diagnostics.assessments : [];
+    const driftAssessments = Array.isArray(payload.instrument_health?.drift_diagnostics?.assessments) ? payload.instrument_health.drift_diagnostics.assessments : [];
     const signals = Array.isArray(payload.domain_interpretation?.signals) ? payload.domain_interpretation.signals : [];
     const summary = node("div", "sensor-summary");
-    [["Observations", analysis.total_observations ?? 0], ["Séries", series.length], ["Lectures suspectes", payload.temporal_screening?.status === "completed" ? temporal.filter(item => item.status === "suspect").length : "Non demandé"], ["Alertes instrumentales", payload.instrument_health?.flatline_diagnostics?.status === "completed" ? flatlines.filter(item => item.status === "suspected").length : "Non demandé"], ["Appareils silencieux", payload.instrument_health?.transmission_diagnostics?.status === "completed" ? transmissions.filter(item => item.status === "silent").length : "Non demandé"], ["Transmissions irrégulières", payload.instrument_health?.transmission_diagnostics?.status === "completed" ? transmissions.filter(item => item.status === "irregular").length : "Non demandé"], ["Signaux biologiques", signals.length]].forEach(([label, value]) => {
+    [["Observations", analysis.total_observations ?? 0], ["Séries", series.length], ["Lectures suspectes", payload.temporal_screening?.status === "completed" ? temporal.filter(item => item.status === "suspect").length : "Non demandé"], ["Alertes instrumentales", payload.instrument_health?.flatline_diagnostics?.status === "completed" ? flatlines.filter(item => item.status === "suspected").length : "Non demandé"], ["Appareils silencieux", payload.instrument_health?.transmission_diagnostics?.status === "completed" ? transmissions.filter(item => item.status === "silent").length : "Non demandé"], ["Transmissions irrégulières", payload.instrument_health?.transmission_diagnostics?.status === "completed" ? transmissions.filter(item => item.status === "irregular").length : "Non demandé"], ["Dérives suspectées", payload.instrument_health?.drift_diagnostics?.status === "completed" ? driftAssessments.filter(item => item.status === "suspected").length : "Non demandé"], ["Signaux biologiques", signals.length]].forEach(([label, value]) => {
       const metric = node("article", "sensor-metric");
       metric.append(node("span", "", label), node("strong", "", String(value)));
       summary.append(metric);
@@ -177,6 +178,22 @@
         item.trailing_silence_seconds == null ? null : "silence=" + Math.round(item.trailing_silence_seconds) + " s"
       ].filter(value => value !== undefined && value !== null).join(" · "))));
       details.append(node("p", "sensor-notice", "Une absence de transmission est un diagnostic de transport, distinct de la qualité des mesures et de l’état biologique. Les périodes historiques ne sont pas qualifiées de silencieuses."));
+      output.append(details);
+    }
+    if (payload.instrument_health?.drift_diagnostics?.status === "completed") {
+      const details = node("details", "sensor-detail");
+      details.append(node("summary", "", "Dérive instrumentale relative — comparaison à une référence (" + driftAssessments.length + " paire(s))"));
+      driftAssessments.forEach(item => details.append(node("p", "", [
+        item.variable_code,
+        "cible=" + item.target_sensor_id,
+        "référence=" + item.reference_sensor_id,
+        item.status,
+        "paires=" + (item.pair_count ?? 0),
+        item.robust_drift_rate_per_hour == null ? null : "pente robuste=" + Number(item.robust_drift_rate_per_hour).toPrecision(4) + " / h",
+        item.maximum_abs_drift_rate_per_hour == null ? null : "seuil=" + item.maximum_abs_drift_rate_per_hour + " / h",
+        item.reason
+      ].filter(value => value !== undefined && value !== null).join(" · "))));
+      details.append(node("p", "sensor-notice", "Une dérive suspectée correspond à une évolution du différentiel cible/référence. Elle nécessite une vérification métrologique ; elle ne constitue pas une confirmation de panne ni une correction automatique des mesures."));
       output.append(details);
     }
     if (signals.length) {
