@@ -21,3 +21,13 @@ Supabase remains the operational source of truth. Validate sync and biological l
 
 ## Batch workflows
 Batch creation selects a workflow by batch category: generic biological culture, Trichoderma preparation, Pleurotus grain spawn, harvested mushroom product, biostimulant/biofertilizer, or final formulation. Each workflow retains quality control and release stages. Existing batches render the stages actually stored for that batch, ordered by their saved sequence number. The legacy universal sequence is only a display fallback when a batch has no stage rows.
+
+## BAL-JSON import
+
+The Mycology and Laboratory workspaces expose a BAL-JSON v1 import panel inside the experimental-data area. It accepts one JSON record at a time. The preview is non-mutating and checks the contract version, record type, basic field shape, biological context anchor, and active organization. The user must explicitly submit the reviewed record.
+
+Submission uses the active Supabase client/session and invokes the `bal-json-ingest` Edge Function. The server performs the authoritative JSON Schema validation, authentication, catalogue checks, tenant-scoped reference resolution, and atomic idempotent write through BAL-Core. A successful response returns the event ID; a byte-identical retry is reported as a duplicate rather than creating another record.
+
+The import panel is hidden in Green Tech until a plant-specific BAL-JSON adapter is designed. It is not a free-form AI chat interface and does not accept conclusions as validated biological facts. It currently accepts only raw measurements and observations; quality review remains a separate workflow.
+
+Deployment prerequisites: apply the migration and deploy the Edge Function to the intended Supabase project before enabling production imports. Repository CI does not deploy either component.
