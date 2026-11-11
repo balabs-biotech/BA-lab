@@ -99,6 +99,8 @@ $$;
 create trigger biological_interpretations_immutable
 before update or delete on public.biological_interpretations
 for each row execute function private.prevent_biological_interpretation_mutation();
+revoke all on function private.prevent_biological_interpretation_mutation()
+  from public, anon, authenticated;
 
 create trigger biological_interpretation_events_append_only
 before update or delete on public.biological_interpretation_events
