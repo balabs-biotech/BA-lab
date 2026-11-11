@@ -680,8 +680,11 @@
         })).filter(item => Number.isFinite(item.measurement_value));
         const linkedObservationIds = temporalEvidence.linked_observation_ids;
         const linkedObservations = linkedObservationIds.map(id => observationById.get(id)).filter(Boolean);
-        const qualityLimitedMeasurements = matchingMeasurements.filter(item =>
-          item.quality_state && !["valid", "accepted", "verified"].includes(String(item.quality_state).toLowerCase()));
+        const nearbyMeasurementIds = new Set(temporalEvidence.nearby_measurement_ids);
+        const nearbyResultIds = [...new Set(cultureMeasurements
+          .filter(item => nearbyMeasurementIds.has(item.id) && item.result_id)
+          .map(item => item.result_id))];
+        const linkedResults = cultureResults.filter(result => nearbyResultIds.includes(result.id));
         return {
           signal_value_is_numeric: Number.isFinite(signalValue),
           same_variable_measurement_count: matchingMeasurements.length,
@@ -689,7 +692,11 @@
           numeric_comparisons: numericComparisons,
           linked_descriptive_observation_count: linkedObservations.length,
           linked_descriptive_observation_ids: linkedObservations.map(item => item.id),
-          measurement_quality_limited_ids: qualityLimitedMeasurements.map(item => item.id),
+          measurement_quality_states: matchingMeasurements.map(item => ({
+            measurement_id: item.id,
+            quality_state: item.quality_state || null
+          })),
+          nearby_experimental_result_ids: linkedResults.map(result => result.id),
           comparison_status: !Number.isFinite(signalValue) ? "signal_value_not_numeric"
             : numericComparisons.length === 0 ? "no_unit_compatible_measurement"
             : numericComparisons.every(item => item.comparison_status === "same_numeric_value")
