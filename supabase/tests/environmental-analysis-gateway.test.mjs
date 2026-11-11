@@ -59,4 +59,15 @@ assert.match(source, /biological_signal_persistence_failed/, "persistence failur
 assert.match(source, /analysis_method: "environmental_daily"/, "NASA POWER signals must retain their daily climate analysis method");
 assert.match(source, /analysis_evidence: signal\.evidence \?\? \{\}/, "environmental signal evidence must be persisted");
 
+const recommendationResolution = source.indexOf("analysisResult.recommendation_resolution");
+const recommendationRpc = source.indexOf('adminClient.rpc(\n          "create_biological_recommendation"');
+assert.ok(recommendationResolution > signalPersistence, "recommendation resolution must be consumed after signal persistence");
+assert.ok(recommendationRpc > recommendationResolution, "recommendations must be persisted only after signal rows exist");
+assert.match(source, /p_source_signal_id: proposal\.source_signal_id/, "recommendation RPC must retain source signal lineage");
+assert.match(source, /p_withholding_reasons: proposal\.withholding_reasons \?\? \[\]/, "withheld recommendation reasons must be persisted");
+assert.match(source, /recommendation_provenance_mismatch/, "recommendation/source mismatches must fail closed");
+assert.match(source, /biological_recommendation_persistence_failed/, "recommendation persistence failures must not be reported as success");
+assert.match(source, /persisted_recommendation_count/, "gateway must report the number of persisted recommendation aggregates");
+assert.match(source, /recommendations: domainProfile\.recommendations \?\? \[\]/, "only persisted versioned recommendation definitions may reach the engine");
+
 console.log("PASS: environmental analysis gateway security contract");
