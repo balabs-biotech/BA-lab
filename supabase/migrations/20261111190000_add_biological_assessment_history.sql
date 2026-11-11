@@ -170,4 +170,4 @@ end;
 $function$;
 
 revoke all on function public.record_biological_assessment(uuid,uuid,text,text,text,jsonb,jsonb,jsonb,jsonb,uuid) from public, anon;
-grant execute on function public.record_biological_assessment(uuid,uuid,text,text,text,jsonb,jsonb,jsonb,jsonb) to authenticated;
+grant execute on function public.record_biological_assessment(uuid,uuid,text,text,text,jsonb,jsonb,jsonb,jsonb,uuid) to authenticated;
