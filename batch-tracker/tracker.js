@@ -253,6 +253,31 @@ window.BA_LABS_REVIEW_BIOLOGICAL_RULE_DRAFT = ({ ruleId, version, reviewNote } =
 window.BA_LABS_RETIRE_BIOLOGICAL_RULE = ({ rule, newVersion } = {}) =>
   runBiologicalRuleAuthoring("retireRule", { rule, newVersion });
 
+async function runBiologicalDecisionPolicyAuthoring(methodName, input) {
+  const requestRevision = authStateRevision;
+  const requestOrganizationId = organizationId;
+  const authoring = window.BALabsBiologicalDecisionPolicyAuthoring;
+  if (!authoring || typeof authoring[methodName] !== "function") {
+    return { status: "unavailable", reason: "biological_decision_policy_authoring_unavailable", record: null };
+  }
+  const result = await authoring[methodName]({
+    ...(input || {}),
+    client: supabaseClient,
+    organizationId: requestOrganizationId,
+  });
+  if (!isCurrentWorkspaceRevision(requestRevision, requestOrganizationId)) {
+    return { status: "stale_context", reason: "workspace_changed_during_decision_policy_authoring", record: null };
+  }
+  return result;
+}
+
+window.BA_LABS_CREATE_DECISION_POLICY_DRAFT = (policy) =>
+  runBiologicalDecisionPolicyAuthoring("createDraft", { policy });
+window.BA_LABS_REVIEW_DECISION_POLICY_DRAFT = ({ policyId, version } = {}) =>
+  runBiologicalDecisionPolicyAuthoring("reviewDraft", { policyId, version });
+window.BA_LABS_RETIRE_DECISION_POLICY = ({ policy, newVersion } = {}) =>
+  runBiologicalDecisionPolicyAuthoring("retirePolicy", { policy, newVersion });
+
 let organization = null;
 
 let strainOptions = [];
