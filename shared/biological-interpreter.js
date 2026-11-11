@@ -47,6 +47,11 @@
     if (!rule || typeof rule !== "object") {
       return result("insufficient_context", "no_reviewed_rule_supplied", measurement, null);
     }
+
+    const registry = root.BALabsBiologicalRuleRegistry;
+    if (!registry || typeof registry.isExecutable !== "function" || !registry.isExecutable(rule)) {
+      return result("not_assessed", "rule_not_executable_or_not_reviewed", measurement, rule);
+    }
     if (typeof rule.rule_id !== "string" || !rule.rule_id.trim() ||
         typeof rule.version !== "string" || !rule.version.trim() ||
         typeof rule.variable_code !== "string" || !rule.variable_code.trim() ||
