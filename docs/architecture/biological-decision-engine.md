@@ -6,7 +6,8 @@ The decision engine consumes a persisted biological assessment and an explicitly
 
 ## Input contract
 
-- A persisted assessment ID is mandatory.
+- A persisted assessment ID, organization ID, domain and exact biological rule-version ID are mandatory.
+- A reviewed policy must belong to the same organization and domain and reference the exact rule version used by the assessment; a policy cannot spill over to another tenant or a later rule revision.
 - Only recognized assessment states are accepted.
 - The assessment provenance must be a client-engine result that has not been independently recomputed by the server.
 - The first trigger implemented is the explicit `out_of_range` assessment state. Other states are not silently interpreted as biological alerts.
