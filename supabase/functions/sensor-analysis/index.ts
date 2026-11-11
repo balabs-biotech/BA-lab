@@ -641,11 +641,75 @@ Deno.serve(async (req: Request) => {
       }
     }
 
+    let recommendationPersistenceStatus = "not_requested";
+    let persistedRecommendationCount = 0;
+    if (biologicalInterpretationPayload && result.interpretation_status === "interpreted") {
+      const resolution = result.recommendation_resolution;
+      if (!resolution || !Array.isArray(resolution.proposals)) {
+        console.error("[sensor-analysis] Engine omitted recommendation resolution");
+        return reply(502, { error: "recommendation_resolution_missing" });
+      }
+      if (resolution.proposals.length > 500) {
+        return reply(422, { error: "recommendation_proposal_limit_exceeded" });
+      }
+
+      const signalById = new Map(
+        signals.map((signal: Record<string, any>) => [signal.signal_id, signal]),
+      );
+      const recommendationIds = new Set<string>();
+      for (const proposal of resolution.proposals as Record<string, any>[]) {
+        const sourceSignal = signalById.get(proposal.source_signal_id) as Record<string, any> | undefined;
+        if (
+          !sourceSignal ||
+          recommendationIds.has(proposal.recommendation_id) ||
+          proposal.source_analysis_id !== sourceSignal.source_analysis_id ||
+          proposal.source_finding_id !== sourceSignal.source_finding_id ||
+          proposal.recommendation_code !== sourceSignal.recommendation_code ||
+          proposal.profile_id !== sourceSignal.profile_id ||
+          proposal.profile_version !== sourceSignal.profile_version ||
+          proposal.module !== sourceSignal.module
+        ) {
+          console.error("[sensor-analysis] Recommendation provenance did not match persisted signal");
+          return reply(500, { error: "recommendation_provenance_mismatch" });
+        }
+        recommendationIds.add(proposal.recommendation_id);
+
+        const { error: recommendationError } = await adminClient.rpc(
+          "create_biological_recommendation",
+          {
+            p_organization_id: profile.organization_id,
+            p_recommendation_id: proposal.recommendation_id,
+            p_recommendation_code: proposal.recommendation_code,
+            p_profile_id: proposal.profile_id,
+            p_profile_version: proposal.profile_version,
+            p_module: proposal.module,
+            p_source_signal_id: proposal.source_signal_id,
+            p_source_analysis_id: proposal.source_analysis_id,
+            p_source_finding_id: proposal.source_finding_id,
+            p_instruction_code: proposal.instruction_code ?? null,
+            p_rationale_code: proposal.rationale_code ?? null,
+            p_proposal_status: proposal.status,
+            p_withholding_reasons: proposal.withholding_reasons ?? [],
+          },
+        );
+        if (recommendationError) {
+          console.error("[sensor-analysis] Recommendation persistence failed", recommendationError.message);
+          return reply(500, { error: "biological_recommendation_persistence_failed" });
+        }
+        persistedRecommendationCount += 1;
+      }
+      recommendationPersistenceStatus = resolution.proposals.length
+        ? "persisted"
+        : "no_recommendations";
+    }
+
     return reply(200, {
       ok: true,
       analysis: {
         ...result,
         signal_persistence_status: signalPersistenceStatus,
+        recommendation_persistence_status: recommendationPersistenceStatus,
+        persisted_recommendation_count: persistedRecommendationCount,
       },
     });
   } catch (error) {
