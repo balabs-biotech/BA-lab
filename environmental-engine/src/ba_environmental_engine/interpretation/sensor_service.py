@@ -6,7 +6,7 @@ insufficient data, insufficient coverage, or normal availability.
 """
 from __future__ import annotations
 
-from datetime import date
+from datetime import date, timedelta
 from zoneinfo import ZoneInfo
 from uuid import UUID, uuid5
 
@@ -204,12 +204,12 @@ def interpret_sensor_analysis_for_biological_context(
         or biological_context.environment_context_id != environment_context.context_id
     ):
         raise ValueError("biological and sensor environment context bindings must match")
+    if to_date < from_date:
+        raise ValueError("sensor analysis to_date must be on or after from_date")
     if biological_context.valid_from > from_date or (
         biological_context.valid_to is not None and biological_context.valid_to < to_date
     ):
         raise ValueError("biological context must cover the complete sensor analysis scope")
-    if to_date < from_date:
-        raise ValueError("sensor analysis to_date must be on or after from_date")
 
     configured_sensor_ids = set(environment_context.sensor_ids)
     analyzed_sensor_ids = {series.sensor_id for series in analysis.series}
@@ -219,6 +219,12 @@ def interpret_sensor_analysis_for_biological_context(
     if not assessment_sensor_ids.issubset(configured_sensor_ids):
         raise ValueError("temporal assessment contains a device outside the resolved environment profile")
     profile_zone = ZoneInfo(environment_context.timezone)
+    analysis_start_date = analysis.from_at.astimezone(profile_zone).date()
+    analysis_end_date = (
+        analysis.to_at_exclusive - timedelta(microseconds=1)
+    ).astimezone(profile_zone).date()
+    if analysis_start_date < from_date or analysis_end_date > to_date:
+        raise ValueError("sensor analysis interval falls outside the biological context date scope")
     if any(
         not from_date <= item.observed_at.astimezone(profile_zone).date() <= to_date
         for item in temporal_assessments
