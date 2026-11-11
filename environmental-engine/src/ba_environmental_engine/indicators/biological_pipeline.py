@@ -18,6 +18,14 @@ from ba_environmental_engine.indicators.measurement_adapter import (
 )
 
 
+_SUBJECT_LINKS = {
+    "culture": "culture_id",
+    "plant_culture": "plant_culture_id",
+    "sample": "sample_id",
+    "experimental_unit": "experimental_unit_id",
+}
+
+
 @dataclass(frozen=True, slots=True)
 class RejectedMeasurementRow:
     """A candidate source row that could not satisfy the evidence contract."""
@@ -77,6 +85,17 @@ def analyze_measurement_rows(
         row_organization = str(row.get("organization_id") or "").strip()
         row_variable = str(row.get("variable_code") or "").strip()
         if row_organization != organization_id or row_variable != variable_code:
+            continue
+
+        subject_field = _SUBJECT_LINKS.get(subject_type)
+        if subject_field is None:
+            raise ValueError("subject_type must identify a supported biological subject")
+        linked_subjects = [
+            row.get(field)
+            for field in _SUBJECT_LINKS.values()
+            if row.get(field) is not None
+        ]
+        if linked_subjects and row.get(subject_field) != subject_id:
             continue
 
         candidate_count += 1
