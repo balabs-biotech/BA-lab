@@ -84,19 +84,31 @@
       button.dataset.assessmentIdempotencyKey = window.crypto.randomUUID();
     }
     const idempotencyKey = button.dataset.assessmentIdempotencyKey;
+    const orgAtStart = organizationId();
     button.disabled = true;
     button.textContent = "Évaluation en cours…";
-    const output = await assessment({ measurementId, idempotencyKey });
-    if (output.status === "recorded") {
-      delete button.dataset.assessmentIdempotencyKey;
-      button.disabled = false;
-      button.textContent = "Nouvelle évaluation";
-      await loadVisibleHistory();
-    } else {
+    try {
+      const output = await assessment({ measurementId, idempotencyKey });
+      // A workspace switch during the request must not update the newly active tenant's UI.
+      if (organizationId() !== orgAtStart) return;
+      if (output && output.status === "recorded") {
+        delete button.dataset.assessmentIdempotencyKey;
+        button.disabled = false;
+        button.textContent = "Nouvelle évaluation";
+        await loadVisibleHistory();
+      } else {
+        button.disabled = false;
+        button.textContent = "Réessayer l’évaluation";
+        const host = historyRoot()?.querySelector('[data-assessment-history="' + CSS.escape(measurementId) + '"]');
+        if (host) host.textContent = "Évaluation non enregistrée : " + ((output && (output.reason || output.status)) || "réponse invalide");
+      }
+    } catch (error) {
+      // Keep the same idempotency key: a network failure may happen after the RPC committed.
+      if (organizationId() !== orgAtStart) return;
       button.disabled = false;
       button.textContent = "Réessayer l’évaluation";
-      const host = historyRoot().querySelector('[data-assessment-history="' + CSS.escape(measurementId) + '"]');
-      if (host) host.textContent = "Évaluation non enregistrée : " + (output.reason || output.status || "erreur inconnue");
+      const host = historyRoot()?.querySelector('[data-assessment-history="' + CSS.escape(measurementId) + '"]');
+      if (host) host.textContent = "Évaluation non enregistrée : erreur de communication. Réessayer conserve la même clé d’idempotence.";
     }
   }
 
