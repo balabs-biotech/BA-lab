@@ -117,15 +117,32 @@ The pure `transition_recommendation` function remains useful for validating
 the proposed transition before persistence, but the database must revalidate
 against the locked persisted aggregate.
 
+## Migration dependency correction
+
+The live database currently has profile registries but no `biological_signals`
+table. Its `biological_contexts` primary key is `id`, and the existing unique
+key `(id, organization_id)` cannot satisfy a foreign key referencing
+`(organization_id, id)`. The signal migration therefore now creates an explicit
+unique key over `(organization_id, id, environment_id, domain)` and references
+that exact tuple. It also binds `source_analysis_id` to the tenant-scoped
+`analyses` key.
+
+The signal persistence, analysis-evidence and signal-lifecycle migrations have
+been moved to versions after the live migration head `20261111043003`:
+`20261111043100`, `20261111043200`, and `20261111043300`. This removes the
+previous ordering where the signal table could be attempted before its profile
+registry dependencies. A structural SQL test now checks these keys, grants and
+RLS expectations.
+
 ## Deployment gate
 
-This is a persistence contract, not an applied database migration. Before
-writing DDL, deploy and verify the branch's biological-signal persistence
-migration, inspect the resulting constraints and grants, and confirm whether
-analysis findings need their own normalized persistence table. Then create a
-new Supabase migration through the repository's normal migration workflow and
-test it against a disposable database. Do not apply this schema directly to
-production from this design document.
+These migrations are committed to the feature branch only; none has been
+applied to the live database. Before deployment, run the full migration chain
+against a disposable Supabase database and execute the SQL contract tests.
+The live project reports `ACTIVE_HEALTHY`, while its development-branch status
+reports `MIGRATIONS_FAILED`; that status needs a separate migration-history
+reconciliation and must not be treated as evidence that production DDL is safe.
+Do not apply this schema directly to production from this design document.
 
 ## Application orchestration
 
