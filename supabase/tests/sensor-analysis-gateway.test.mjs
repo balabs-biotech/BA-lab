@@ -80,3 +80,5 @@ assert.match(source, /transmission_current_window: transmissionExpectedInterval 
 
 assert.match(source, /\(rows \?\? \[\]\)\.filter/, "transmission-only analysis must tolerate an empty measurement query result");
 assert.match(source, /!profileScopedRows\.length && transmissionExpectedInterval === undefined/, "empty profile-scoped measurements must be allowed only for transmission diagnostics");
+
+assert.match(source, /expected_to: profile\.valid_to/, "device expectation must stop at the sensor profile end date");
