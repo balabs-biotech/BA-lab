@@ -174,7 +174,7 @@ returns jsonb
 language plpgsql
 security definer
 set search_path = pg_catalog, private
-as $
+as $$
 declare
   terms_version text;
   privacy_version text;
