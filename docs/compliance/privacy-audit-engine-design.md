@@ -197,3 +197,45 @@ Une Edge Function appelée avant `signUp()` ne connaît pas encore l'UUID Auth e
 La publication des documents et l'activation progressive du hook sont cadrées dans `docs/compliance/legal-document-release-checklist.md`. Le formulaire client reste volontairement inchangé tant que les versions ne sont pas juridiquement validées et enregistrées.
 
 **Décision de portée :** ce mécanisme enregistre une déclaration d'acceptation à la création du compte. La validité juridique de la formulation, la preuve d'information préalable et les durées de conservation restent à valider par le conseil compétent / DPO. Le mécanisme ne remplace pas cette validation.
+
+
+## 11. Registre documentaire — administration privilégiée
+
+### Modèle d'autorisation
+
+L'administration des documents juridiques est une fonction **plateforme**, distincte des rôles `owner` et `admin` d'une organisation CultureOps. Un administrateur d'organisation ne doit pas pouvoir publier des conditions d'utilisation communes à toute la plateforme.
+
+Le brouillon SQL ajoute donc `private.platform_administrators`. Aucun rôle client et même `service_role` ne reçoit d'accès direct à cette table. Le premier administrateur doit être provisionné hors bande par le propriétaire de la base, après vérification d'identité ; aucun endpoint d'auto-attribution n'est prévu.
+
+### API Edge Function
+
+`supabase/functions/legal-document-registry/index.ts` expose trois actions POST, derrière une session Auth vérifiée et le contrôle `is_platform_administrator` :
+
+- `list` : lire les versions, empreintes, chemins et dates ;
+- `publish` : publier une nouvelle version avec un SHA-256, un chemin autorisé et une date d'effet ;
+- `retire` : programmer le retrait d'une version publiée.
+
+La fonction Edge n'expose jamais la clé `service_role`. Après validation du JWT, elle utilise la clé serveur pour appeler des RPC dédiées, elles-mêmes révoquées à `anon` et `authenticated`. Les chemins de documents sont limités aux pages juridiques connues ; le client ne peut pas faire publier un chemin arbitraire.
+
+### Invariants de publication
+
+- Une version est identifiée par le couple `document_type + version`, et son empreinte SHA-256 est immuable.
+- Une publication planifiée retire la version précédente à la même date d'effet, dans une seule transaction.
+- Un verrou transactionnel par type de document sérialise les publications concurrentes.
+- Une version publiée ne peut pas être supprimée ou réécrite ; son retrait est unidirectionnel.
+- Les erreurs de conflit sont renvoyées sans révéler les détails internes de la base.
+- L'empreinte fournie doit être calculée sur le fichier final exact. Le registre ne télécharge ni ne réécrit lui-même les pages HTML.
+
+### Tests ajoutés
+
+`supabase/tests/legal-document-registry.test.mts` couvre l'authentification, le refus d'un non-administrateur, la lecture, la publication, le refus d'empreinte ou de chemin invalide, le retrait et les erreurs serveur. Le test est ajouté au workflow CI.
+
+Le contrat SQL vérifie aussi l'existence de la table d'administrateurs, l'absence d'accès direct et les permissions des RPC. Ces tests de contrat ne remplacent pas encore les tests d'intégration PostgreSQL sur les transitions de versions et les publications concurrentes.
+
+### Limites avant activation
+
+- Le registre SQL reste un brouillon, pas une migration installée.
+- La fonction Edge est versionnée mais pas déployée.
+- Aucun administrateur plateforme n'est provisionné par ce changement.
+- Il n'existe pas encore d'interface graphique d'administration.
+- Les documents sont toujours des versions de travail ; aucune publication réelle n'est autorisée.
