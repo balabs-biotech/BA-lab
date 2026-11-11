@@ -1,9 +1,13 @@
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 from uuid import uuid4
 
 import pytest
 
 from ba_environmental_engine.interpretation.models import (
+    DomainInterpretation,
+    DomainProfile,
+    DomainSignal,
+    InterpretationRule,
     RecommendationProposal,
     RecommendationResolution,
 )
@@ -68,6 +72,76 @@ def make_lifecycle():
         status="proposed",
     )
     return RecommendationLifecycle.from_proposal(proposal)
+
+
+def test_service_resolves_and_persists_from_exact_versioned_profile():
+    organization_id = uuid4()
+    signal = DomainSignal(
+        signal_id=uuid4(),
+        profile_id="mycology-fruiting",
+        profile_version="1.2.0",
+        module="mycology",
+        rule_id="temperature-review",
+        signal_code="fruiting_environment_review",
+        severity="moderate",
+        message_code="temperature_deviation_review",
+        recommendation_code="review_fruiting_airflow",
+        source_analysis_id=uuid4(),
+        source_finding_id=uuid4(),
+        source_observation_ids=(uuid4(),),
+        variable_code="air_temperature_mean",
+        observed_date=date(2026, 11, 11),
+        observed_value=28.0,
+        unit="degC",
+        finding_status="suspect",
+        context_tags=frozenset({"stage:fruiting", "system:fruiting_chamber"}),
+    )
+    profile = DomainProfile(
+        profile_id="mycology-fruiting",
+        module="mycology",
+        version="1.2.0",
+        rules=(InterpretationRule(
+            rule_id="temperature-review",
+            variable_code="air_temperature_mean",
+            finding_status="suspect",
+            signal_code="fruiting_environment_review",
+            severity="moderate",
+            message_code="temperature_deviation_review",
+            recommendation_code="review_fruiting_airflow",
+        ),),
+        recommendations=({
+            "recommendation_code": "review_fruiting_airflow",
+            "instruction_code": "inspect_air_exchange",
+            "rationale_code": "sustained_temperature_deviation",
+            "applicable_signal_codes": ("fruiting_environment_review",),
+            "allowed_finding_statuses": ("suspect",),
+            "required_context_tags": ("stage:fruiting", "system:fruiting_chamber"),
+            "contraindicated_context_tags": (),
+        },),
+    )
+    interpretation = DomainInterpretation(
+        profile_id=profile.profile_id,
+        profile_version=profile.version,
+        module=profile.module,
+        signals=(signal,),
+        evaluated_findings=1,
+        matched_findings=1,
+    )
+    repository = InMemoryRepository(None)
+    service = RecommendationService(repository)
+
+    resolution, persisted = service.resolve_and_persist(
+        organization_id=organization_id,
+        interpretation=interpretation,
+        profile=profile,
+    )
+
+    assert resolution.proposed_count == 1
+    assert resolution.withheld_count == 0
+    assert len(persisted) == 1
+    assert persisted[0].proposal.source_signal_id == signal.signal_id
+    assert persisted[0].proposal.instruction_code == "inspect_air_exchange"
+    assert repository.created_lifecycle == persisted[0]
 
 
 def test_service_persists_proposed_recommendation_without_mutating_it():
