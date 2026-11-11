@@ -106,3 +106,16 @@ Run:
 node scripts/test-biological-rule-registry.mjs
 node scripts/test-biological-interpreter.mjs
 ```
+
+
+## Biological Rule Schema
+
+The versioned contract is defined at `schemas/biological-rules/v1/rule.schema.json` (Draft 2020-12). The included fixture is deliberately `draft` and uses placeholder identifiers and bounds; it is not a biological recommendation.
+
+The schema constrains the record shape, target, source provenance and reviewed metadata. The registry performs the additional cross-field check that `min <= max` and is the execution gate. Schema validity alone never makes a rule executable. The `reviewed` lifecycle state requires reviewer metadata, and only the registry's reviewed-only gate permits interpretation.
+
+Run:
+
+```sh
+node scripts/test-biological-rule-schema.mjs
+```
