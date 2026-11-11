@@ -44,6 +44,10 @@
             sensorPanel.src = "../environmental-sensor-panel.js?v=20261111-sensor-panel-1";
             sensorPanel.onerror = () => console.error("Le module d’analyse des capteurs n’a pas pu être chargé ; les autres modules restent disponibles.");
             document.body.appendChild(sensorPanel);
+            const driftPolicyPanel = document.createElement("script");
+            driftPolicyPanel.src = "../sensor-drift-policy-panel.js?v=20261111-drift-policy-1";
+            driftPolicyPanel.onerror = () => console.error("Le module de gestion des références instrumentales n’a pas pu être chargé ; l’analyse des capteurs reste disponible.");
+            document.body.appendChild(driftPolicyPanel);
           };
           document.body.appendChild(script);
         };
