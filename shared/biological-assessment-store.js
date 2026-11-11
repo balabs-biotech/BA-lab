@@ -24,6 +24,7 @@
     const contextSnapshot = Object.freeze({
       ...input.contextSnapshot,
       organization_id: input.organizationId,
+      domain: input.domain,
     });
     const { data, error } = await input.client.rpc("record_biological_assessment", {
       p_source_measurement_id: input.measurementId,
