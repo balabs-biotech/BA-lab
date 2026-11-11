@@ -161,3 +161,79 @@ revoke all on function private.reject_published_legal_document_delete() from pub
 create trigger legal_document_versions_no_published_delete
 before delete on private.legal_document_versions
 for each row execute function private.reject_published_legal_document_delete();
+
+
+-- Pre-session signup capture. Auth creates the user even when email confirmation
+-- is required and no client session is returned. The trigger snapshots the
+-- submitted version identifiers into the immutable ledger in the same DB
+-- transaction as auth.users insertion.
+create or replace function private.capture_signup_legal_acts()
+returns trigger
+language plpgsql
+security definer
+set search_path = pg_catalog, private
+as $$
+declare
+  terms_version_id uuid;
+  privacy_version_id uuid;
+  terms_version text;
+  privacy_version text;
+  captured_at timestamptz := statement_timestamp();
+begin
+  terms_version := new.raw_user_meta_data ->> 'legal_terms_version';
+  privacy_version := new.raw_user_meta_data ->> 'legal_privacy_version';
+
+  if terms_version is null or length(btrim(terms_version)) = 0
+     or privacy_version is null or length(btrim(privacy_version)) = 0 then
+    raise exception 'signup_legal_document_versions_required';
+  end if;
+
+  select id into terms_version_id
+  from private.legal_document_versions
+  where document_type = 'terms'
+    and version = terms_version
+    and effective_at is not null
+    and effective_at <= captured_at
+    and (retired_at is null or retired_at > captured_at);
+
+  if terms_version_id is null then
+    raise exception 'signup_terms_version_not_current';
+  end if;
+
+  select id into privacy_version_id
+  from private.legal_document_versions
+  where document_type = 'privacy_notice'
+    and version = privacy_version
+    and effective_at is not null
+    and effective_at <= captured_at
+    and (retired_at is null or retired_at > captured_at);
+
+  if privacy_version_id is null then
+    raise exception 'signup_privacy_version_not_current';
+  end if;
+
+  insert into private.legal_consent_events (
+    organization_id, subject_user_id, actor_user_id, document_version_id,
+    action, purpose, occurred_at, capture_channel
+  ) values (
+    null, new.id, new.id, terms_version_id,
+    'accepted', 'terms_acceptance', captured_at, 'signup'
+  );
+
+  insert into private.legal_consent_events (
+    organization_id, subject_user_id, actor_user_id, document_version_id,
+    action, purpose, occurred_at, capture_channel
+  ) values (
+    null, new.id, new.id, privacy_version_id,
+    'acknowledged', 'privacy_notice_acknowledgement', captured_at, 'signup'
+  );
+
+  return new;
+end;
+$$;
+
+revoke all on function private.capture_signup_legal_acts() from public, anon, authenticated;
+
+create trigger auth_user_signup_legal_acts
+after insert on auth.users
+for each row execute function private.capture_signup_legal_acts();
