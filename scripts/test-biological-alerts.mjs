@@ -398,6 +398,9 @@ assert.match(styles, /\.signal-interpretation-events/);
 
 assert.match(moduleSource, /snapshots: cultureInterpretations/);
 assert.match(moduleSource, /events: cultureInterpretationEvents/);
+assert.match(moduleSource, /events_available: lineage\?\.evidenceAvailability\?\.biological_interpretation_events === true/);
+assert.match(moduleSource, /Instantanés disponibles, mais historique des événements incomplet/);
+
 assert.match(moduleSource, /interpretation_snapshot_count: cultureInterpretations\.length/);
 assert.match(moduleSource, /interpretation_event_count: cultureInterpretationEvents\.length/);
 assert.match(moduleSource, /biologicalInterpretationEvents\.length >= 2000/);
