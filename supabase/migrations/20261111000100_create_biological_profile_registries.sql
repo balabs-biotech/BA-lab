@@ -5,9 +5,9 @@ create table if not exists public.biological_contexts (
   id uuid primary key default gen_random_uuid(),
   organization_id uuid not null references public.organizations(id) on delete cascade,
   domain text not null check (domain in ('mycology', 'greentech', 'lab')),
-  culture_id uuid references public.cultures(id) on delete cascade,
-  plant_culture_id uuid references public.plant_cultures(id) on delete cascade,
-  environment_id uuid not null references public.environments(id) on delete restrict,
+  culture_id uuid,
+  plant_culture_id uuid,
+  environment_id uuid not null,
   organism_kind text not null,
   taxon_code text,
   strain_code text,
@@ -24,6 +24,9 @@ create table if not exists public.biological_contexts (
     or (plant_culture_id is not null and culture_id is null and domain = 'greentech')
   ),
   constraint biological_contexts_valid_window check (valid_to is null or valid_to >= valid_from),
+  constraint biological_contexts_culture_fk foreign key (organization_id, culture_id) references public.cultures(organization_id, id) on delete cascade,
+  constraint biological_contexts_plant_fk foreign key (organization_id, plant_culture_id) references public.plant_cultures(organization_id, id) on delete cascade,
+  constraint biological_contexts_environment_fk foreign key (organization_id, environment_id) references public.environments(organization_id, id) on delete restrict,
   constraint biological_contexts_subject_domain_unique
     unique (id, organization_id)
 );
@@ -34,7 +37,7 @@ create index if not exists biological_contexts_subject_window_idx
 create table if not exists public.environment_context_profiles (
   id uuid primary key default gen_random_uuid(),
   organization_id uuid not null references public.organizations(id) on delete cascade,
-  environment_id uuid not null references public.environments(id) on delete cascade,
+  environment_id uuid not null,
   profile_code text not null,
   profile_version integer not null check (profile_version > 0),
   context_type text not null,
@@ -47,6 +50,7 @@ create table if not exists public.environment_context_profiles (
   created_at timestamptz not null default now(),
   constraint environment_context_profiles_version_unique
     unique (organization_id, environment_id, profile_code, profile_version),
+  constraint environment_context_profiles_environment_fk foreign key (organization_id, environment_id) references public.environments(organization_id, id) on delete cascade,
   constraint environment_context_profiles_valid_window
     check (valid_to is null or valid_to >= valid_from)
 );
@@ -59,9 +63,11 @@ create table if not exists public.environment_context_profile_sensors (
   id uuid primary key default gen_random_uuid(),
   organization_id uuid not null references public.organizations(id) on delete cascade,
   profile_id uuid not null references public.environment_context_profiles(id) on delete cascade,
-  sensor_id uuid not null references public.iot_devices(id) on delete restrict,
+  sensor_id uuid not null,
   created_at timestamptz not null default now(),
-  constraint environment_context_profile_sensors_unique unique (profile_id, sensor_id)
+  constraint environment_context_profile_sensors_unique unique (profile_id, sensor_id),
+  constraint environment_context_profile_sensors_profile_fk foreign key (profile_id) references public.environment_context_profiles(id) on delete cascade,
+  constraint environment_context_profile_sensors_device_fk foreign key (organization_id, sensor_id) references public.iot_devices(organization_id, id) on delete restrict
 );
 
 create table if not exists public.domain_interpretation_profiles (
