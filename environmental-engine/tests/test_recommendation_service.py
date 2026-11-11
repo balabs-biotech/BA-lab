@@ -3,7 +3,10 @@ from uuid import uuid4
 
 import pytest
 
-from ba_environmental_engine.interpretation.models import RecommendationProposal
+from ba_environmental_engine.interpretation.models import (
+    RecommendationProposal,
+    RecommendationResolution,
+)
 from ba_environmental_engine.interpretation.recommendation_lifecycle import (
     RecommendationLifecycle,
 )
@@ -21,9 +24,11 @@ class InMemoryRepository:
         self.expected_revision = None
         self.appended_event = None
         self.created_lifecycle = None
+        self.created_lifecycles = []
 
     def create(self, *, organization_id, lifecycle):
         self.created_lifecycle = lifecycle
+        self.created_lifecycles.append(lifecycle)
         self.lifecycle = lifecycle
         return lifecycle
 
@@ -103,6 +108,41 @@ def test_service_persists_withheld_proposal_for_auditability():
     assert result.proposal.withholding_reasons == (
         "required_context_missing:stage:fruiting",
     )
+
+
+def test_service_persists_all_proposed_and_withheld_resolution_items():
+    proposed = make_lifecycle().proposal
+    withheld = proposed.model_copy(
+        update={
+            "recommendation_id": uuid4(),
+            "status": "withheld",
+            "instruction_code": None,
+            "rationale_code": None,
+            "withholding_reasons": ("contraindicated_context:stage:incubation",),
+        }
+    )
+    resolution = RecommendationResolution(
+        profile_id=proposed.profile_id,
+        profile_version=proposed.profile_version,
+        module=proposed.module,
+        proposals=(proposed, withheld),
+        proposed_count=1,
+        withheld_count=1,
+    )
+    repository = InMemoryRepository(None)
+    service = RecommendationService(repository)
+
+    persisted = service.persist_resolution(
+        organization_id=uuid4(),
+        resolution=resolution,
+    )
+
+    assert [item.status for item in persisted] == ["proposed", "withheld"]
+    assert len(repository.created_lifecycles) == 2
+    assert [item.proposal.recommendation_id for item in persisted] == [
+        proposed.recommendation_id,
+        withheld.recommendation_id,
+    ]
 
 
 def test_service_persists_domain_event_with_current_revision():
