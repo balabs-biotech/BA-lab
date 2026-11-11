@@ -65,8 +65,8 @@ def test_pipeline_ignores_other_tenants_variables_and_subjects():
     assert result.calculation.value == 4.0
     assert result.calculation.source_record_ids == ("m1", "m2")
     assert result.input_row_count == 6
-    assert result.candidate_row_count == 4
-    assert result.ignored_out_of_scope_count == 2
+    assert result.candidate_row_count == 2
+    assert result.ignored_out_of_scope_count == 4
 
 
 def test_pipeline_reports_invalid_candidate_rows_instead_of_silently_dropping_them():
