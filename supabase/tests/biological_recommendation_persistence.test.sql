@@ -5,16 +5,14 @@ do $$
 declare
   v_recommendations oid := to_regclass('public.biological_recommendations');
   v_events oid := to_regclass('public.biological_recommendation_events');
-  v_create_definition text;
-  v_transition_definition text;
   v_create oid := to_regprocedure(
     'public.create_biological_recommendation(uuid,uuid,text,text,text,text,uuid,uuid,uuid,text,text,text,jsonb)'
   );
   v_transition oid := to_regprocedure(
     'public.transition_biological_recommendation(uuid,uuid,integer,uuid,text,timestamp with time zone,text,text,text,timestamp with time zone)'
   );
-  v_transition_definition text;
   v_create_definition text;
+  v_transition_definition text;
 begin
   if v_recommendations is null or v_events is null then
     raise exception 'FAIL: recommendation persistence tables are missing';
