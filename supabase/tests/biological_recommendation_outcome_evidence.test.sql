@@ -55,6 +55,35 @@ begin
   if not exists (
     select 1 from pg_attribute
      where attrelid = v_links
+       and attname = 'variable_code'
+       and atttypid = 'text'::regtype
+       and attnotnull
+       and not attisdropped
+  ) or not exists (
+    select 1 from pg_attribute
+     where attrelid = v_links
+       and attname = 'normalized_value'
+       and atttypid = 'numeric'::regtype
+       and not attisdropped
+  ) or not exists (
+    select 1 from pg_attribute
+     where attrelid = v_links
+       and attname = 'method'
+       and atttypid = 'text'::regtype
+       and not attisdropped
+  ) or not exists (
+    select 1 from pg_attribute
+     where attrelid = v_links
+       and attname = 'instrument'
+       and atttypid = 'text'::regtype
+       and not attisdropped
+  ) then
+    raise exception 'FAIL: measurement snapshot must preserve variable, value, method and instrument';
+  end if;
+
+  if not exists (
+    select 1 from pg_attribute
+     where attrelid = v_links
        and attname = 'measurement_observed_at'
        and atttypid = 'timestamp with time zone'::regtype
        and attnotnull
