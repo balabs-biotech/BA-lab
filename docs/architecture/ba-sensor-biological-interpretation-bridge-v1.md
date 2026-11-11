@@ -95,3 +95,10 @@ existing SECURITY DEFINER RPCs and leaked-password protection predate this
 registry work; none names the four new registry tables. Python integration
 tests and a full authenticated end-to-end request still need to be run before
 this bridge can be considered fully verified.
+
+Profile versions are stored as text (maximum 32 characters), matching the
+engine contract and its semantic-version values such as `1.2.0`. An initial
+integer-only database constraint conflicted with the Python models and existing
+persistence fixtures; migration `20261111000400_align_profile_versions_with_engine_contract.sql`
+converts both profile registries to text. The live schema was queried after
+migration and both columns now report PostgreSQL `text`.
