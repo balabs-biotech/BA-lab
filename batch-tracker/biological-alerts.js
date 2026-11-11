@@ -23,7 +23,7 @@
     sensor_temporal: "Anomalie temporelle IoT (MAD robuste)"
   };
   const PAGE_SIZE = 100;
-  const state = { userId: null, organizationId: null, domain: null, rows: [], filter: "active", severity: "all", method: "all", variable: "", request: 0, offset: 0, hasMore: false, loading: false, historyRequest: 0 };
+  const state = { userId: null, organizationId: null, domain: null, rows: [], recommendationsBySignal: {}, recommendationHistoryAvailable: true, filter: "active", severity: "all", method: "all", variable: "", request: 0, offset: 0, hasMore: false, loading: false, historyRequest: 0 };
   const root = document.getElementById("biologicalSignalsCard");
   if (!root) return;
 
@@ -104,6 +104,44 @@
     };
   };
 
+  async function transitionRecommendation(recommendation, action, controls = {}) {
+    if (!state.organizationId || !recommendation?.recommendation_id) return;
+    const note = controls.note?.value?.trim() || null;
+    const executionDetails = controls.execution?.value?.trim() || null;
+    const outcomeSummary = controls.outcome?.value?.trim() || null;
+    const outcomeDate = controls.outcomeDate?.value || null;
+    if (action === "record_execution" && !executionDetails) {
+      notify("Décrivez l’action réellement effectuée avant de l’enregistrer.", true);
+      return;
+    }
+    if (action === "record_outcome" && (!outcomeSummary || !outcomeDate)) {
+      notify("Renseignez le résultat observé et sa date.", true);
+      return;
+    }
+    const params = {
+      p_organization_id: state.organizationId,
+      p_recommendation_id: recommendation.recommendation_id,
+      p_expected_revision: recommendation.revision,
+      p_event_id: crypto.randomUUID(),
+      p_action: action,
+      p_occurred_at: new Date().toISOString(),
+      p_note: note,
+      p_execution_details: action === "record_execution" ? executionDetails : null,
+      p_outcome_summary: action === "record_outcome" ? outcomeSummary : null,
+      p_outcome_observed_at: action === "record_outcome" ? new Date(outcomeDate).toISOString() : null
+    };
+    const { error } = await client.rpc("transition_biological_recommendation", params);
+    if (error) {
+      console.error("[CultureOps recommendations] Transition failed", error.message);
+      notify(error.message?.includes("revision_conflict")
+        ? "Cette recommandation a été modifiée ailleurs. Rechargez-la avant de réessayer."
+        : "Transition refusée. Vérifiez vos droits, le statut et les informations saisies.", true);
+      return;
+    }
+    notify("Événement de recommandation enregistré.");
+    await loadSignals();
+  }
+
   function render() {
     const list = $("signalsList");
     list.replaceChildren();
@@ -171,6 +209,92 @@
       pairs.filter(([, value]) => value).forEach(([term, value]) => {
         metadata.append(element("dt", "", term), element("dd", "", String(value)));
       });
+      const recommendationPanel = element("section", "signal-recommendation-panel");
+      const linkedRecommendations = state.recommendationsBySignal[row.signal_id] || [];
+      recommendationPanel.append(element("strong", "", "Recommandations opérationnelles"));
+      if (!linkedRecommendations.length) {
+        recommendationPanel.append(element("small", "", row.recommendation_code
+          ? "Code présent sur le signal, mais aucune proposition persistée n’est liée."
+          : "Aucune recommandation configurée pour ce signal."));
+      }
+      linkedRecommendations.forEach(recommendation => {
+        const item = element("div", "signal-recommendation-item");
+        const statusLabels = {
+          proposed: "À examiner", withheld: "Non proposée · contexte insuffisant",
+          accepted: "Acceptée par un utilisateur", rejected: "Refusée par un utilisateur",
+          executed: "Exécution déclarée", outcome_recorded: "Résultat documenté"
+        };
+        item.append(element("div", "signal-recommendation-heading",
+          (recommendation.recommendation_code || "Recommandation") + " · " +
+          (statusLabels[recommendation.lifecycle_status] || recommendation.lifecycle_status)));
+        item.append(element("small", "", "Profil " + recommendation.profile_id + " / v" +
+          recommendation.profile_version + " · " + (recommendation.instruction_code || "Instruction non disponible")));
+        if (recommendation.rationale_code) item.append(element("small", "", "Motif : " + recommendation.rationale_code));
+        if (Array.isArray(recommendation.withholding_reasons) && recommendation.withholding_reasons.length) {
+          item.append(element("small", "signal-recommendation-withheld",
+            "Motifs de non-proposition : " + recommendation.withholding_reasons.join(" · ")));
+        }
+        const events = Array.isArray(recommendation.events) ? recommendation.events : [];
+        if (events.length) {
+          const timeline = element("ol", "signal-recommendation-events");
+          events.forEach(event => {
+            const eventLabels = { accept: "Acceptée", reject: "Refusée", record_execution: "Exécution déclarée", record_outcome: "Résultat documenté" };
+            const eventItem = element("li", "", (eventLabels[event.action] || event.action) +
+              " · " + dateLabel(event.occurred_at) + " · utilisateur " + event.actor_id);
+            const eventText = event.note || event.execution_details || event.outcome_summary;
+            if (eventText) eventItem.append(element("small", "", eventText));
+            if (event.outcome_observed_at) eventItem.append(element("small", "", "Observation : " + dateLabel(event.outcome_observed_at)));
+            timeline.append(eventItem);
+          });
+          item.append(timeline);
+        } else {
+          item.append(element("small", "", "Aucun événement de cycle de vie."));
+        }
+        if (!state.recommendationHistoryAvailable) {
+          item.append(element("small", "signal-recommendation-warning",
+            "Historique partiel : les transitions affichées peuvent être incomplètes."));
+        }
+        const controls = element("div", "signal-recommendation-controls");
+        const note = element("textarea", "signal-recommendation-note");
+        note.rows = 2;
+        note.maxLength = 2000;
+        note.placeholder = "Note de revue (facultative)";
+        if (recommendation.lifecycle_status === "proposed") {
+          const accept = element("button", "secondary-button", "Accepter");
+          accept.type = "button";
+          accept.addEventListener("click", () => transitionRecommendation(recommendation, "accept", { note }));
+          const reject = element("button", "secondary-button", "Refuser");
+          reject.type = "button";
+          reject.addEventListener("click", () => transitionRecommendation(recommendation, "reject", { note }));
+          controls.append(note, accept, reject);
+        } else if (recommendation.lifecycle_status === "accepted") {
+          const execution = element("textarea", "signal-recommendation-note");
+          execution.rows = 2;
+          execution.maxLength = 4000;
+          execution.placeholder = "Décrire l’action effectivement réalisée";
+          const record = element("button", "secondary-button", "Enregistrer l’exécution");
+          record.type = "button";
+          record.addEventListener("click", () => transitionRecommendation(recommendation, "record_execution", { note, execution }));
+          controls.append(note, execution, record);
+        } else if (recommendation.lifecycle_status === "executed") {
+          const outcome = element("textarea", "signal-recommendation-note");
+          outcome.rows = 2;
+          outcome.maxLength = 4000;
+          outcome.placeholder = "Décrire le résultat observé (sans conclure à une causalité)";
+          const outcomeDate = element("input", "signal-recommendation-date");
+          outcomeDate.type = "datetime-local";
+          const record = element("button", "secondary-button", "Documenter le résultat");
+          record.type = "button";
+          record.addEventListener("click", () => transitionRecommendation(recommendation, "record_outcome", { note, outcome, outcomeDate }));
+          controls.append(note, outcome, outcomeDate, record);
+        }
+        if (controls.childNodes.length) item.append(controls);
+        recommendationPanel.append(item);
+      });
+      if (!state.recommendationHistoryAvailable) {
+        recommendationPanel.append(element("small", "signal-recommendation-warning",
+          "Historique des recommandations incomplet ou indisponible."));
+      }
       const footer = element("div", "signal-item-footer");
       footer.append(element("span", "signal-time", "Détecté : " + dateLabel(row.first_seen_at)));
       const actions = element("div", "signal-actions");
@@ -207,6 +331,7 @@
       }
       card.append(header, detail);
       if (metadata.childNodes.length) card.append(metadata);
+      if (linkedRecommendations.length || row.recommendation_code) card.append(recommendationPanel);
       card.append(footer);
       if (historyActions.childNodes.length) card.append(historyActions);
       list.append(card);
@@ -242,6 +367,49 @@
       return;
     }
     const page = data || [];
+    const signalIds = page.map(row => row.signal_id).filter(Boolean);
+    const recommendationsBySignal = append ? { ...state.recommendationsBySignal } : {};
+    state.recommendationHistoryAvailable = true;
+    if (signalIds.length) {
+      const recommendationResult = await client.from("biological_recommendations")
+        .select("*")
+        .eq("organization_id", state.organizationId)
+        .in("source_signal_id", signalIds)
+        .order("created_at", { ascending: false }).limit(500);
+      if (request !== state.request) return;
+      if (recommendationResult.error) {
+        state.recommendationHistoryAvailable = false;
+        console.error("[CultureOps recommendations] Read failed", recommendationResult.error.message);
+      } else {
+        const recommendations = recommendationResult.data || [];
+        if (recommendations.length >= 500) state.recommendationHistoryAvailable = false;
+        const recommendationIds = recommendations.map(item => item.recommendation_id);
+        let eventRows = [];
+        if (recommendationIds.length) {
+          const eventResult = await client.from("biological_recommendation_events")
+            .select("*").eq("organization_id", state.organizationId)
+            .in("recommendation_id", recommendationIds)
+            .order("revision", { ascending: true }).limit(2000);
+          if (request !== state.request) return;
+          if (eventResult.error || (eventResult.data || []).length >= 2000) {
+            state.recommendationHistoryAvailable = false;
+          } else {
+            eventRows = eventResult.data || [];
+          }
+        }
+        const eventsByRecommendation = new Map();
+        eventRows.forEach(event => {
+          if (!eventsByRecommendation.has(event.recommendation_id)) eventsByRecommendation.set(event.recommendation_id, []);
+          eventsByRecommendation.get(event.recommendation_id).push(event);
+        });
+        recommendations.forEach(recommendation => {
+          const linked = { ...recommendation, events: eventsByRecommendation.get(recommendation.recommendation_id) || [] };
+          if (!recommendationsBySignal[recommendation.source_signal_id]) recommendationsBySignal[recommendation.source_signal_id] = [];
+          recommendationsBySignal[recommendation.source_signal_id].push(linked);
+        });
+      }
+    }
+    state.recommendationsBySignal = recommendationsBySignal;
     state.rows = append ? state.rows.concat(page) : page;
     state.offset += page.length;
     state.hasMore = page.length === PAGE_SIZE;
