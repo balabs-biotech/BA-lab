@@ -52,6 +52,34 @@ begin
     raise exception 'FAIL: outcome evidence links must be append-only';
   end if;
 
+  if not exists (
+    select 1 from pg_attribute
+     where attrelid = v_links
+       and attname = 'measurement_observed_at'
+       and atttypid = 'timestamp with time zone'::regtype
+       and attnotnull
+       and not attisdropped
+  ) or not exists (
+    select 1 from pg_attribute
+     where attrelid = v_links
+       and attname = 'source_metadata'
+       and atttypid = 'jsonb'::regtype
+       and attnotnull
+       and not attisdropped
+  ) then
+    raise exception 'FAIL: linked measurements must preserve immutable typed snapshots';
+  end if;
+
+  if not exists (
+    select 1 from pg_policies
+     where schemaname = 'public'
+       and tablename = 'biological_recommendation_outcome_measurements'
+       and policyname = 'biological_recommendation_outcome_measurements_select'
+       and roles @> array['authenticated']::name[]
+  ) then
+    raise exception 'FAIL: outcome evidence links need authenticated tenant-scoped read policy';
+  end if;
+
   select pg_get_functiondef(v_rpc) into v_definition;
   if position('auth.uid()' in v_definition) = 0
      or position('private.is_org_writer' in v_definition) = 0
@@ -61,7 +89,9 @@ begin
      or position('measured_at < v_execution_at' in v_definition) = 0
      or position('measured_at > v_outcome_event.outcome_observed_at' in v_definition) = 0
      or position('biological_subject_id' in v_definition) = 0
-     or position('environment_id' in v_definition) = 0 then
+     or position('environment_id' in v_definition) = 0
+     or position('v_measurement.measured_at is null' in v_definition) = 0
+     or position('source_metadata' in v_definition) = 0 then
     raise exception 'FAIL: RPC must validate actor, lifecycle, temporal and biological/environmental scope';
   end if;
 
