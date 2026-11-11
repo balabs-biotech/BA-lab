@@ -40,6 +40,10 @@
             document.getElementById("workspace-root").innerHTML = "<main class='container'><p role='alert'>Le moteur de CultureOps n’a pas pu être chargé. Rechargez la page.</p></main>";
           };
           script.onload = () => {
+            const ruleManager = document.createElement("script");
+            ruleManager.src = "../../shared/biological-rule-management-ui.js?v=20261111-rule-management-1";
+            ruleManager.onerror = () => console.error("L’interface de gestion des règles biologiques n’a pas pu être chargée.");
+            document.body.appendChild(ruleManager);
             const assisted = document.createElement("script");
             assisted.src = "../smart-entry.js?v=20261029-assisted-entry-1";
             assisted.onerror = () => console.error("Le module de saisie assistée n’a pas pu être chargé.");
