@@ -2798,6 +2798,9 @@ body[data-domain] :is(button, input, select, textarea, a, [tabindex]):focus-visi
 .bal-json-import button:disabled { opacity: .5; cursor: not-allowed; }
 .bal-json-preview { white-space: pre-wrap; overflow-wrap: anywhere; padding: 14px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface-2); color: var(--text); font: 13px/1.6 ui-monospace, SFMono-Regular, Consolas, monospace; }
 .bal-json-preview:empty { display: none; }
+.bal-json-preview { max-height: 420px; overflow: auto; }
+.bal-json-import [data-normalization="proposed"] { border-left: 3px solid var(--ok); }
+.bal-json-import [data-normalization="blocked"] { border-left: 3px solid var(--warning, #c99a55); }
 #balJsonImportStatus[data-state="error"] { color: var(--err); }
 #balJsonImportStatus[data-state="success"] { color: var(--ok); }
 #balJsonImportStatus[data-state="pending"] { color: var(--brand); }
