@@ -45,6 +45,7 @@ assert.equal(loaded.policies[0].version,"2.0.0");
 assert.equal(loaded.policies[0].organization_id,"org-1");
 assert.equal(loaded.policies[0].rule_version_id,"rule-v1");
 assert.equal(loaded.policies[0].review.reviewer_id,"user-1");
+assert.equal((await store.loadReviewedPolicies({client:{from:()=>queryBuilder("bad")},assessment})).policies.length,1);
 assert.ok(calls[0].filters.some(x=>x[1]==="organization_id" && x[2]==="org-1"));
 assert.ok(calls[0].filters.some(x=>x[1]==="rule_version_id" && x[2]==="rule-v1"));
 assert.equal((await store.loadReviewedPolicies({client:{from:queryBuilder},assessment:{...assessment,organization_id:""}})).status,"insufficient_context");
