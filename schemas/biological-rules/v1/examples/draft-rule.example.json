@@ -1,0 +1,21 @@
+{
+  "rule_id": "example.mycology.target-range",
+  "version": "0.1.0",
+  "status": "draft",
+  "domain": "mycology",
+  "target": {
+    "taxon_code": "example_taxon_code",
+    "growth_stage": "example_stage"
+  },
+  "variable_code": "example_variable_code",
+  "unit_code": "example_unit_code",
+  "min": 0,
+  "max": 1,
+  "sources": [
+    {
+      "type": "publication",
+      "citation": "Replace with a verified bibliographic reference before review."
+    }
+  ],
+  "description": "Illustrative schema fixture only. Numeric bounds and identifiers are placeholders, not biological recommendations."
+}
