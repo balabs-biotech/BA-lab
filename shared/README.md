@@ -174,7 +174,7 @@ node scripts/test-biological-assessment-engine.mjs
 
 ## Biological Rule Store v1
 
-The tenant-scoped store is introduced by `supabase/migrations/20261111170000_add_biological_rule_store.sql`. It stores immutable, versioned rule snapshots in `public.biological_rules`; the JSON rule remains the interchange representation defined by `schemas/biological-rules/v1/rule.schema.json`. Indexed columns mirror rule identity, lifecycle, domain and variable/unit codes so reads remain selective and auditable.
+The tenant-scoped store is introduced by `supabase/migrations/20261111170000_add_biological_rule_store.sql`. It stores immutable, versioned rule snapshots in `public.biological_rules`; the JSON rule remains the interchange representation defined by `schemas/biological-rules/v1/rule.schema.json`. Indexed columns mirror rule identity, lifecycle, domain and variable/unit codes so reads remain selective and auditable. A monotonic identity `revision_seq` orders lifecycle versions deterministically, including when timestamps collide. Database trigger validation also rejects variable/unit dimension mismatches.
 
 Security model:
 
