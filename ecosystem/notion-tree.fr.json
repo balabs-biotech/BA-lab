@@ -765,24 +765,6 @@
       "description": "Ressources publiques pour parcourir les travaux documentés, comprendre les limites des preuves et découvrir les modalités de collaboration.",
       "children": [
         {
-          "id": "learn-work",
-          "title": "Travaux & réalisations documentés",
-          "url": "https://app.notion.com/p/3f273152f171815597b6c696402b42c0",
-          "children": []
-        },
-        {
-          "id": "learn-evidence",
-          "title": "Ce qui est effectivement démontré",
-          "url": "https://app.notion.com/p/3e973152f171816781fbf56674cfe55c",
-          "children": []
-        },
-        {
-          "id": "learn-catalogue",
-          "title": "Catalogue public — ressources biologiques",
-          "url": "https://app.notion.com/p/3ec73152f1718125b1a7c58bc58ebcaa",
-          "children": []
-        },
-        {
           "id": "learn-collaborate",
           "title": "Collaborer avec BA Labs",
           "url": "https://app.notion.com/p/3e273152f17181a8bedae0bfd2452543",
