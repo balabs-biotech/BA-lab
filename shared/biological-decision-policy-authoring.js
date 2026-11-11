@@ -21,6 +21,8 @@
         !p.domain?.trim?.() || !p.rule_version_id?.trim() ||
         !p.decision_code?.trim?.() || !p.title?.trim?.() || !p.explanation?.trim() ||
         !Array.isArray(p.sources) || p.sources.length === 0 ||
+        !p.sources.every(s => s && typeof s.type === "string" && s.type.trim() &&
+          typeof s.citation === "string" && s.citation.trim()) ||
         !Array.isArray(p.trigger_assessment_statuses) ||
         p.trigger_assessment_statuses.length !== 1 ||
         p.trigger_assessment_statuses[0] !== "out_of_range")
