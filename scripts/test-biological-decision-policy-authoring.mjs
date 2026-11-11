@@ -16,7 +16,7 @@ function clientFor(mode) {
         select(value){state.select=value;return q;},
         eq(k,v){state.filters.push([k,v]);return q;},
         single:async()=>({data:mode==="create"?{...state.insert,id:"p1"}:{...state.insert,id:"p2",status:"retired"},error:null}),
-        maybeSingle:async()=>mode==="lookup"?{data:{id:"p1",...draft},error:null}:{data:reviewed,error:null}
+        maybeSingle:async()=>state.update?{data:reviewed,error:null}:{data:{id:"p1",...draft},error:null}
       };
       return q;
     }
