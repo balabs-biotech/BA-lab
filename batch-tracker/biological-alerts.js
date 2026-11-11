@@ -526,8 +526,15 @@
         .eq("organization_id", organizationId).in("interpretation_id", interpretationIds)
         .order("occurred_at", { ascending: true }).limit(2000);
       interpretationEventsAvailable = !interpretationEventResult.error;
-      if (interpretationEventResult.error) markIncomplete("biological_interpretation_events", interpretationEventResult.error);
-      else biologicalInterpretationEvents = interpretationEventResult.data || [];
+      if (interpretationEventResult.error) {
+        markIncomplete("biological_interpretation_events", interpretationEventResult.error);
+      } else {
+        biologicalInterpretationEvents = interpretationEventResult.data || [];
+        if (biologicalInterpretationEvents.length >= 2000) {
+          interpretationEventsAvailable = false;
+          markIncomplete("biological_interpretation_events", new Error("event_history_limit_reached"));
+        }
+      }
     }
     const resultIds = [...new Set(measurements.map(item => item.result_id).filter(Boolean))];
     let experimentalResults = [];
