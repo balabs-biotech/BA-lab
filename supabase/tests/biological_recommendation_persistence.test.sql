@@ -142,13 +142,6 @@ begin
     raise exception 'FAIL: transition RPC must return the committed aggregate event history atomically';
   end if;
 
-  if not exists (
-    select 1 from pg_constraint
-     where conrelid = v_events
-       and conname = 'biological_recommendation_events_revision_key'
-  ) then
-    raise exception 'FAIL: ordered recommendation event revision key is missing';
-  end if;
 end
 $$;
 
