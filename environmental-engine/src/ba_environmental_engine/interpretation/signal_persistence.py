@@ -125,6 +125,14 @@ class SupabaseBiologicalSignalRepository:
                         str(item) for item in signal.source_observation_ids
                     ],
                     "context_tags": sorted(signal.context_tags),
+                    "analysis_method": (
+                        "sensor_temporal"
+                        if signal.evidence.get("assessment_type") == "causal_robust_temporal_screen"
+                        else "sensor_series"
+                        if signal.evidence.get("assessment_type") == "sensor_series_summary"
+                        else "environmental_daily"
+                    ),
+                    "analysis_evidence": signal.evidence,
                 }
             )
 
