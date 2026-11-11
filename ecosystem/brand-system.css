@@ -3,8 +3,8 @@
  * Version: 1.0.0
  * Scope: opt-in editorial UI only.
  *
- * This file is intentionally NOT imported by ecosystem/index.html yet.
- * Integrate only after visual review. It does not target Three.js/WebGL,
+ * This file is imported by ecosystem/index.html for the editorial layer.
+ * It does not target Three.js/WebGL,
  * canvas, .sphere, .webgl-*, branch-dock, camera, or Batch Tracker selectors.
  */
 
