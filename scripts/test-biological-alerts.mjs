@@ -391,3 +391,5 @@ assert.match(moduleSource, /events: cultureInterpretationEvents/);
 assert.match(moduleSource, /interpretation_snapshot_count: cultureInterpretations\.length/);
 assert.match(moduleSource, /interpretation_event_count: cultureInterpretationEvents\.length/);
 assert.match(moduleSource, /biologicalInterpretationEvents\.length >= 2000/);
+
+assert.match(interpretationMigration, /revoke all on function private\.prevent_biological_interpretation_mutation\(\)/);
