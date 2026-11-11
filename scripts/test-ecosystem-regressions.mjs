@@ -385,6 +385,8 @@ assert.ok(!/\.(?:sphere|webgl-[\w-]*|branch-dock|camera)\b|#mainView|canvas/i.te
 
 // Phase 4 visible art-direction contract: major homepage composition, not micro-adjustments.
 assert.ok(brandCss.includes('PHASE 4 — visible homepage art direction'), 'Phase 4 homepage art direction must be present');
+assert.ok(brandCss.includes('#app.balabs-ui > .site-nav'), 'Phase 4 navigation must target its actual direct-child location');
+assert.ok(!brandCss.includes('#app.balabs-ui > main > .site-nav'), 'Phase 4 navigation must not target a nonexistent main child');
 assert.ok(brandCss.includes('min-height: min(690px, calc(100svh - 145px))'), 'Desktop hero must have a visibly expanded editorial composition');
 assert.ok(brandCss.includes('font: 400 clamp(64px, 8.2vw, 116px)/.88 Georgia'), 'Hero typography must use the new oversized editorial scale');
 assert.ok(brandCss.includes('grid-template-columns: minmax(0, 1.08fr) minmax(0, .92fr)'), 'Featured project must use the new asymmetric image-led split');
