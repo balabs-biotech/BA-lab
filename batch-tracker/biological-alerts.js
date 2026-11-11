@@ -532,7 +532,9 @@
         biologicalInterpretationEvents = interpretationEventResult.data || [];
         if (biologicalInterpretationEvents.length >= 2000) {
           interpretationEventsAvailable = false;
-          markIncomplete("biological_interpretation_events", new Error("event_history_limit_reached"));
+          markIncomplete("biological_interpretation_events", {
+            message: "Interpretation event history reached the 2000-row read limit."
+          });
         }
       }
     }
@@ -1065,7 +1067,7 @@
             new Date(left.occurred_at || 0).getTime() - new Date(right.occurred_at || 0).getTime());
         const supersededEvents = snapshotEvents.filter(event => event.event_type === "superseded");
         const latestSupersededEvent = supersededEvents[supersededEvents.length - 1] || null;
-        const lifecycleLabel = history.events_available === false ? "Cycle de vie non vérifié"
+        const lifecycleLabel = history.events_available !== true ? "Cycle de vie non vérifié"
           : latestSupersededEvent ? "Version remplacée" : "Version courante";
         const summary = element("summary", "", [
           lifecycleLabel,
@@ -1081,7 +1083,7 @@
             "Remplacée le " + dateLabel(latestSupersededEvent.occurred_at) +
             (replacement.replaced_by_engine_version ? " par la version " + replacement.replaced_by_engine_version : "") +
             (replacement.replaced_by_interpretation_id ? " · Instantané " + replacement.replaced_by_interpretation_id : "")));
-        } else if (history.events_available !== false) {
+        } else if (history.events_available === true) {
           detail.append(element("small", "signal-interpretation-lifecycle",
             "Aucun événement de remplacement enregistré pour cet instantané."));
         }
