@@ -33,6 +33,7 @@ const client = {
 const recorded = await store.record({
   client, organizationId: "org-A", domain: "mycology", measurementId: "measurement-A",
   ruleVersionId: "rule-version-A",
+  idempotencyKey: "00000000-0000-4000-8000-000000000001",
   result: { status: "normal", reason: "within_explicit_reviewed_range", engine_version: "0.1.0" },
   measurementSnapshot: { variable_code: "temperature", assessed_value: 22, assessed_unit_code: "degC" },
   contextSnapshot: { culture_id: "culture-A" },
@@ -45,6 +46,7 @@ assert.equal(calls[0].name, "record_biological_assessment");
 assert.equal(calls[0].args.p_context_snapshot.organization_id, "org-A");
 assert.equal(calls[0].args.p_context_snapshot.domain, "mycology");
 assert.equal(calls[0].args.p_rule_version_id, "rule-version-A");
+assert.equal(calls[0].args.p_idempotency_key, "00000000-0000-4000-8000-000000000001");
 
 const history = await store.loadHistoryBatch({ client, organizationId: "org-A", measurementIds: ["measurement-A"] });
 assert.equal(history.status, "loaded");
