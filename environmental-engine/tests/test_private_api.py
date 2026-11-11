@@ -349,6 +349,45 @@ def test_nasa_power_api_returns_domain_interpretation_as_sibling_without_mutatin
     assert {finding["status"] for finding in body["findings"]} == {"insufficient_history"}
 
 
+def test_nasa_power_api_resolves_recommendations_from_persisted_profile_definitions():
+    request = nasa_power_payload()
+    interpretation = biological_interpretation_payload(request)
+    interpretation["domain_profile"]["rules"][0].update({
+        "recommendation_code": "request_more_history",
+        "finding_status": "insufficient_history",
+        "signal_code": "review_environmental_history",
+    })
+    interpretation["domain_profile"]["recommendations"] = [{
+        "recommendation_code": "request_more_history",
+        "instruction_code": "extend_observation_window",
+        "rationale_code": "insufficient_environmental_history",
+        "applicable_signal_codes": ["review_environmental_history"],
+        "allowed_finding_statuses": ["insufficient_history"],
+        "required_context_tags": ["stage:fruiting"],
+        "contraindicated_context_tags": [],
+    }]
+    request["biological_interpretation"] = interpretation
+    client = TestClient(create_app(engine_api_key="test-secret"))
+
+    response = client.post(
+        "/v1/analyses/nasa-power",
+        json=request,
+        headers={"X-BA-Engine-Key": "test-secret"},
+    )
+
+    assert response.status_code == 200, response.text
+    body = response.json()
+    resolution = body["recommendation_resolution"]
+    assert resolution["proposed_count"] == 1
+    assert resolution["withheld_count"] == 0
+    proposal = resolution["proposals"][0]
+    assert proposal["status"] == "proposed"
+    assert proposal["instruction_code"] == "extend_observation_window"
+    assert proposal["requires_human_review"] is True
+    assert proposal["auto_execute"] is False
+    assert proposal["source_signal_id"] == body["domain_interpretation"]["signals"][0]["signal_id"]
+
+
 def test_nasa_power_api_keeps_climate_analysis_when_biological_context_is_invalid():
     request = nasa_power_payload()
     interpretation = biological_interpretation_payload(request)
