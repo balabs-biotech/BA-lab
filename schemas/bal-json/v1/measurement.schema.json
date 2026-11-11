@@ -101,20 +101,7 @@
         "plant_culture_id": {
           "type": "string",
           "format": "uuid"
-        },
-        "material_id": {
-          "type": "string",
-          "format": "uuid"
-        },
-        "sample_id": {
-          "type": "string",
-          "format": "uuid"
-        },
-        "experimental_unit_id": {
-          "type": "string",
-          "format": "uuid"
-        },
-        "batch_id": {
+        },        "batch_id": {
           "type": "string",
           "format": "uuid"
         },
