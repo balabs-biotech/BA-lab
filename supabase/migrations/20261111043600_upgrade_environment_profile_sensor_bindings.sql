@@ -133,12 +133,21 @@ begin
     return new;
   end if;
 
-  if old.status = 'active'
-     and new.status = 'retired'
-     and (to_jsonb(new) - array['status', 'retired_at', 'valid_to'])
-         = (to_jsonb(old) - array['status', 'retired_at', 'valid_to']) then
+  if old.status = 'active' and new.status = 'retired' then
+    if (to_jsonb(new) - array['status', 'retired_at', 'valid_to'])
+       is distinct from (to_jsonb(old) - array['status', 'retired_at', 'valid_to']) then
+      raise exception 'published_environmental_profile_is_immutable'
+        using errcode = '23514';
+    end if;
+    if new.valid_to is null then
+      raise exception 'retiring_an_activated_profile_requires_finite_valid_to'
+        using errcode = '23514';
+    end if;
+    if old.valid_to is not null and new.valid_to > old.valid_to then
+      raise exception 'retirement_may_only_shorten_profile_validity'
+        using errcode = '23514';
+    end if;
     new.retired_at := now();
-    new.valid_to := greatest(old.valid_from, current_date);
     return new;
   end if;
 
@@ -328,10 +337,6 @@ begin
 end;
 $$;
 
-drop trigger if exists environment_context_profiles_immutable on public.environment_context_profiles;
-drop trigger if exists environment_context_profiles_no_delete on public.environment_context_profiles;
-drop trigger if exists domain_interpretation_profiles_immutable on public.domain_interpretation_profiles;
-drop trigger if exists domain_interpretation_profiles_no_delete on public.domain_interpretation_profiles;
 drop trigger if exists environment_context_profiles_version_guard on public.environment_context_profiles;
 drop trigger if exists domain_interpretation_profiles_version_guard on public.domain_interpretation_profiles;
 drop trigger if exists environment_context_profile_sensors_guard on public.environment_context_profile_sensors;
