@@ -245,6 +245,15 @@
               observation.provider_code + " / " + observation.dataset_code
             ].filter(Boolean).join(" · ");
             contextPanel.append(element("small", "", details));
+            if (recommendation.outcome_observed_at) {
+              const temporalDelta = new Date(recommendation.outcome_observed_at).getTime() - new Date(observation.observed_at).getTime();
+              if (Number.isFinite(temporalDelta)) {
+                const hours = Math.round(Math.abs(temporalDelta) / 3600000);
+                const interval = hours >= 48 ? (Math.round(hours / 24) + " jour(s)") : (hours + " heure(s)");
+                contextPanel.append(element("small", "", "Écart temporel avec le résultat documenté : " +
+                  interval + (temporalDelta >= 0 ? " après l’observation source." : " avant l’observation source.")));
+              }
+            }
             if (observation.quality_flag) contextPanel.append(element("small", "", "Qualité source : " + observation.quality_flag));
             if (observation.spatial_resolution_m !== null) contextPanel.append(element("small", "", "Résolution spatiale : " + observation.spatial_resolution_m + " m"));
           });
@@ -255,6 +264,8 @@
         if (linkedMeasurementCount) contextPanel.append(element("small", "", linkedMeasurementCount + " mesure(s) liée(s) également référencée(s), non détaillée(s) dans ce panneau."));
         if (!state.environmentalEvidenceAvailable) contextPanel.append(element("small", "signal-recommendation-warning",
           "Lecture du contexte source partielle : ne pas interpréter cette liste comme exhaustive."));
+        contextPanel.append(element("small", "signal-recommendation-warning",
+          "Écart temporel descriptif uniquement : il ne démontre pas un effet de la recommandation."));
         item.append(contextPanel);
         if (recommendation.rationale_code) item.append(element("small", "", "Motif : " + recommendation.rationale_code));
         if (Array.isArray(recommendation.withholding_reasons) && recommendation.withholding_reasons.length) {
