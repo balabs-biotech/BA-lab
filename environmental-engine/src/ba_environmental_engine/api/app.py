@@ -250,6 +250,13 @@ class SensorAnalysisRequest(APIModel):
                 raise ValueError("every transmission receipt must reference a supplied device")
         elif self.transmission_current_window:
             raise ValueError("transmission_current_window requires transmission diagnostics")
+        if self.transmission_current_window:
+            try:
+                current_profile_date = datetime.now(ZoneInfo(self.profile_timezone)).date()
+            except (ValueError, Exception) as exc:
+                raise ValueError("profile_timezone must be a valid IANA timezone") from exc
+            if self.to_date != current_profile_date:
+                raise ValueError("current transmission silence can only be evaluated through the current profile-local date")
         if not self.measurements and self.transmission_expected_interval_seconds is None:
             raise ValueError("at least one sensor measurement or transmission diagnostics policy is required")
         for row in self.measurements:
