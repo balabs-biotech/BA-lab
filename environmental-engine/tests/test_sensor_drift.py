@@ -53,6 +53,7 @@ def policy(**overrides):
         target_sensor_id=TARGET,
         reference_sensor_id=REFERENCE,
         variable_code="air_temperature",
+        reference_binding_verified=True,
         maximum_pair_offset_seconds=30,
         minimum_pairs=3,
         minimum_duration_seconds=7200,
@@ -164,3 +165,51 @@ def test_slope_sampling_is_bounded_and_deterministic():
     assert result.pair_count == 250
     assert result.slope_sample_count == 200
     assert result.robust_drift_rate_per_hour == pytest.approx(0.1)
+
+
+def test_unverified_reference_binding_is_not_evaluable():
+    result = assess_sensor_drift(
+        paired_rows([0.0, 0.5, 1.0, 1.5]),
+        [policy(reference_binding_verified=False)],
+    )[0]
+
+    assert result.status == "not_evaluable"
+    assert result.reason == "reference_pair_not_verified"
+
+
+def test_reference_pair_context_must_match():
+    rows = paired_rows([0.0, 0.5, 1.0, 1.5])
+    moved_reference = [
+        envelope(REFERENCE, index, 20.0)
+        for index in range(4)
+    ]
+    moved_reference = [
+        SensorMeasurementEnvelope(
+            measurement=row.measurement.model_copy(update={"context_id": UUID("99999999-9999-4999-8999-999999999999")}),
+            quality_state=row.quality_state,
+            exclusion_reason=row.exclusion_reason,
+            method=row.method,
+            instrument=row.instrument,
+            device_code=row.device_code,
+            device_type=row.device_type,
+            metadata=row.metadata,
+        )
+        for row in moved_reference
+    ]
+    rows = [row for row in rows if row.measurement.sensor_id == TARGET] + moved_reference
+    result = assess_sensor_drift(rows, [policy()])[0]
+
+    assert result.status == "not_evaluable"
+    assert result.reason == "reference_pair_context_mismatch"
+
+
+def test_reference_tie_breaking_prefers_earlier_timestamp():
+    target = envelope(TARGET, 10, 20.0, minute=10)
+    earlier = envelope(REFERENCE, 20, 19.0, minute=9)
+    later = envelope(REFERENCE, 21, 19.0, minute=11)
+    result = assess_sensor_drift(
+        [target, later, earlier],
+        [policy(maximum_pair_offset_seconds=60, minimum_pairs=3, minimum_duration_seconds=1)],
+    )[0]
+
+    assert result.source_reference_observation_ids == (earlier.measurement.observation_id,)
