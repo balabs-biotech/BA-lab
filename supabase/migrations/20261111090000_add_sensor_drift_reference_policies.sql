@@ -121,20 +121,25 @@ begin
       using errcode = '23514';
   end if;
 
-  if new.reference_binding_verified then
-    if tg_op = 'INSERT' or not old.reference_binding_verified then
-      new.reference_verified_at := now();
-      new.reference_verified_by := auth.uid();
-    elsif
-      new.reference_verification_method is distinct from old.reference_verification_method
-      or new.reference_verification_evidence is distinct from old.reference_verification_evidence
-      or new.reference_verified_at is distinct from old.reference_verified_at
-      or new.reference_verified_by is distinct from old.reference_verified_by
-    then
-      raise exception 'sensor_drift_reference_verification_is_immutable'
-        using errcode = '23514';
+  if tg_op = 'INSERT' and new.reference_binding_verified then
+    raise exception 'sensor_drift_reference_must_be_verified_after_draft_creation'
+      using errcode = '23514';
+  elsif tg_op = 'UPDATE' and new.reference_binding_verified and not old.reference_binding_verified then
+    if auth.uid() is null then
+      raise exception 'authenticated_reference_verifier_required'
+        using errcode = '42501';
     end if;
-  elsif tg_op = 'UPDATE' and old.reference_binding_verified then
+    new.reference_verified_at := now();
+    new.reference_verified_by := auth.uid();
+  elsif new.reference_binding_verified and (
+    new.reference_verification_method is distinct from old.reference_verification_method
+    or new.reference_verification_evidence is distinct from old.reference_verification_evidence
+    or new.reference_verified_at is distinct from old.reference_verified_at
+    or new.reference_verified_by is distinct from old.reference_verified_by
+  ) then
+    raise exception 'sensor_drift_reference_verification_is_immutable'
+      using errcode = '23514';
+  elsif tg_op = 'UPDATE' and old.reference_binding_verified and not new.reference_binding_verified then
     raise exception 'sensor_drift_reference_verification_cannot_be_revoked'
       using errcode = '23514';
   end if;
