@@ -13,6 +13,7 @@ from ba_environmental_engine.interpretation.models import DomainInterpretation, 
 from ba_environmental_engine.interpretation.signal_persistence import (
     BiologicalSignalPersistenceError,
     SupabaseBiologicalSignalRepository,
+    _SIGNAL_BATCH_SIZE,
     _SIGNAL_CONFLICT_KEY,
 )
 
@@ -329,3 +330,35 @@ def test_repository_rejects_mixed_source_analyses_in_one_batch():
         )
 
     assert client.upsert_calls == []
+
+
+def test_repository_chunks_large_batches_below_postgrest_row_cap():
+    organization_id, biological, environment, interpretation, signal = make_contexts()
+    signals = tuple(
+        signal.model_copy(
+            update={
+                "signal_id": uuid4(),
+                "source_finding_id": uuid4(),
+                "rule_id": f"rule-{index}",
+            }
+        )
+        for index in range(_SIGNAL_BATCH_SIZE + 1)
+    )
+    large_interpretation = interpretation.model_copy(
+        update={"signals": signals, "evaluated_findings": len(signals),
+                "matched_findings": len(signals)}
+    )
+    client = FakeSupabase()
+
+    persisted = SupabaseBiologicalSignalRepository(client).persist_interpretation(
+        organization_id=organization_id,
+        interpretation=large_interpretation,
+        biological_context=biological,
+        environment_context=environment,
+    )
+
+    assert len(persisted) == _SIGNAL_BATCH_SIZE + 1
+    assert [len(call[1]) for call in client.upsert_calls] == [
+        _SIGNAL_BATCH_SIZE,
+        1,
+    ]
