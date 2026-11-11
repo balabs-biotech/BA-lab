@@ -139,7 +139,7 @@ create policy biological_signal_observations_select
 
 revoke all on public.biological_signal_observations from public, anon, authenticated;
 grant select on public.biological_signal_observations to authenticated;
-grant select, insert, delete on public.biological_signal_observations to service_role;
+grant insert on public.biological_signal_observations to service_role;
 
 create or replace function private.link_biological_signal_observations()
 returns trigger
