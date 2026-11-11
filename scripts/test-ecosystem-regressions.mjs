@@ -383,6 +383,11 @@ assert.ok(!/\.(?:sphere|webgl-[\w-]*|branch-dock|camera)\b|#mainView|canvas/i.te
 
 
 
+// Featured section metadata must remain legible against its light mineral background.
+assert.ok(brandCss.includes('#app.balabs-ui > main > .editorial-feature .feature-status'), 'Featured status metadata must use a scoped high-contrast treatment');
+assert.ok(brandCss.includes('color: #70402F !important'), 'Featured status text must use a dark copper foreground on the light section');
+assert.ok(brandCss.includes('#app.balabs-ui > main > .editorial-feature .art-caption'), 'Featured image credit must retain a readable overlay treatment');
+
 // Shared design-system contract: preview consumes the same maintained editorial layer as public.
 assert.ok(previewHtml.includes('class="wrap balabs-ui" id="app"'), 'Preview root must opt into the shared BA Labs visual system');
 assert.ok(previewHtml.includes('../ecosystem/brand-system.css?v=3'), 'Preview must load the shared visual system after its local styles');
