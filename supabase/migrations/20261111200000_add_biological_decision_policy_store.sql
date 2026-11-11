@@ -138,7 +138,6 @@ begin
        where newer.organization_id = new.organization_id
          and newer.policy_id = new.policy_id
          and newer.revision_seq > old.revision_seq
-         and newer.status in ('reviewed','retired')
     ) then
       raise exception 'biological_decision_policy_stale_draft_cannot_be_reviewed' using errcode = '40001';
     end if;
