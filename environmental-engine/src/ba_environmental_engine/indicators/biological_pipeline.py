@@ -61,9 +61,9 @@ def analyze_measurement_rows(
 ) -> BiologicalAnalysisPipelineResult:
     """Run the v1 extent-growth indicator over one supplied measurement snapshot.
 
-    Rows from other organizations or variables are ignored before adaptation.
-    The repository remains responsible for tenant-scoped retrieval; this
-    additional filter is defense in depth, not an authorization boundary.
+    Rows from other organizations, variables, or biological subjects are ignored
+    before adaptation. The repository remains responsible for tenant-scoped
+    retrieval; these filters are defense in depth, not an authorization boundary.
     Invalid in-scope rows are reported rather than silently discarded.
     """
     if not organization_id.strip():
