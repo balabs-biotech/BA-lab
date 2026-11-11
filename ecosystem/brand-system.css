@@ -1525,7 +1525,8 @@
   content: "01" !important;
   position: absolute !important;
   z-index: -1 !important;
-  inset: auto auto - .14em - .04em !important;
+  bottom: -.14em !important;
+  left: -.04em !important;
   color: rgba(209,208,197,.045) !important;
   font: 800 clamp(240px, 43vw, 620px)/.72 ui-monospace, monospace !important;
   letter-spacing: -.13em !important;
