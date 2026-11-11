@@ -19,6 +19,7 @@ from .recommendation_repository import (
     RecommendationRevisionConflictError,
 )
 from .recommendation_service import RecommendationService
+from .supabase_recommendation_repository import SupabaseRecommendationRepository
 from .sensor_events import (
     SensorEvent,
     SensorEventAnalysis,
@@ -62,4 +63,5 @@ __all__ = [
     "RecommendationRevisionConflictError",
     "RecommendationAccessDeniedError",
     "RecommendationService",
+    "SupabaseRecommendationRepository",
 ]
