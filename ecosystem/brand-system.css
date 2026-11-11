@@ -1503,3 +1503,324 @@
     transition: none !important;
   }
 }
+
+
+/* PHASE 8 — editorial research atlas.
+   A deliberate break from the generic card-grid language: long-form research
+   spreads, asymmetry, hard edges, oversized indexing and image-led field notes.
+   The WebGL scene and its interaction layer remain untouched. */
+#app.balabs-ui > main > .hero {
+  position: relative !important;
+  min-height: min(860px, calc(100svh - 74px)) !important;
+  display: grid !important;
+  grid-template-columns: minmax(0, 1.04fr) minmax(340px, .96fr) !important;
+  align-items: center !important;
+  gap: clamp(24px, 5vw, 84px) !important;
+  padding: clamp(64px, 8vw, 118px) clamp(24px, 7vw, 112px) !important;
+  overflow: hidden !important;
+  isolation: isolate !important;
+  background: #111B1D !important;
+}
+#app.balabs-ui > main > .hero::before {
+  content: "01" !important;
+  position: absolute !important;
+  z-index: -1 !important;
+  inset: auto auto - .14em - .04em !important;
+  color: rgba(209,208,197,.045) !important;
+  font: 800 clamp(240px, 43vw, 620px)/.72 ui-monospace, monospace !important;
+  letter-spacing: -.13em !important;
+  pointer-events: none !important;
+}
+#app.balabs-ui > main > .hero > div:first-of-type {
+  grid-column: 1 !important;
+  grid-row: 1 !important;
+  max-width: 700px !important;
+  position: relative !important;
+  z-index: 2 !important;
+}
+#app.balabs-ui > main > .hero .hero-micrograph {
+  position: relative !important;
+  grid-column: 2 !important;
+  grid-row: 1 !important;
+  width: 100% !important;
+  height: clamp(420px, 60vw, 690px) !important;
+  max-height: none !important;
+  object-fit: cover !important;
+  object-position: 46% center !important;
+  opacity: .88 !important;
+  filter: grayscale(1) contrast(1.18) brightness(.8) !important;
+  clip-path: polygon(10% 0,100% 0,100% 88%,87% 100%,0 100%,0 12%) !important;
+}
+#app.balabs-ui > main > .hero .hero-micrograph::after { content: none !important; }
+#app.balabs-ui > main > .hero .eyebrow,
+#app.balabs-ui > main > .hero .hero-credit {
+  font: 700 9px/1.5 ui-monospace,monospace !important;
+  letter-spacing: .18em !important;
+  text-transform: uppercase !important;
+}
+#app.balabs-ui > main > .hero h1 {
+  max-width: 10ch !important;
+  margin: 26px 0 28px !important;
+  font: 400 clamp(64px,8.4vw,124px)/.84 Georgia,serif !important;
+  letter-spacing: -.075em !important;
+  text-wrap: balance !important;
+}
+#app.balabs-ui > main > .hero h1 span { color: #B96B4D !important; }
+#app.balabs-ui > main > .hero p {
+  max-width: 43ch !important;
+  font: 400 clamp(15px,1.2vw,18px)/1.8 system-ui,sans-serif !important;
+}
+#app.balabs-ui > main > .hero .aside {
+  grid-column: 1 !important;
+  grid-row: 2 !important;
+  position: static !important;
+  max-width: 42rem !important;
+  margin-top: 28px !important;
+  padding: 18px 0 0 18px !important;
+  border-top: 1px solid #52635A !important;
+  border-left: 2px solid #B96B4D !important;
+  background: transparent !important;
+}
+#app.balabs-ui > main > .hero .hero-credit {
+  position: absolute !important;
+  right: 24px !important;
+  bottom: 16px !important;
+  z-index: 3 !important;
+  color: #D1D0C5 !important;
+  writing-mode: vertical-rl !important;
+  font-size: 8px !important;
+}
+#app.balabs-ui > main > .hero .hero-actions { gap: 12px !important; margin-top: 30px !important; }
+#app.balabs-ui > main > .hero .hero-action-primary,
+#app.balabs-ui > main > .hero .hero-action-secondary {
+  min-height: 48px !important;
+  border-radius: 0 !important;
+  padding: 14px 20px !important;
+  font: 700 10px/1.3 ui-monospace,monospace !important;
+  letter-spacing: .1em !important;
+  text-transform: uppercase !important;
+}
+#app.balabs-ui > main > .editorial-work {
+  padding: clamp(76px,10vw,144px) clamp(22px,7vw,112px) !important;
+  background: #D1D0C5 !important;
+  color: #111B1D !important;
+}
+#app.balabs-ui > main > .editorial-work .work-heading {
+  display: grid !important;
+  grid-template-columns: minmax(0,1.35fr) minmax(220px,.65fr) !important;
+  align-items: end !important;
+  gap: 32px !important;
+  max-width: 1200px !important;
+  margin: 0 auto clamp(42px,6vw,82px) !important;
+  padding-bottom: 26px !important;
+  border-bottom: 1px solid rgba(17,27,29,.38) !important;
+}
+#app.balabs-ui > main > .editorial-work .work-heading h2 {
+  max-width: 12ch !important;
+  color: #111B1D !important;
+  font: 400 clamp(48px,6.4vw,88px)/.94 Georgia,serif !important;
+  letter-spacing: -.065em !important;
+}
+#app.balabs-ui > main > .editorial-work .work-heading h2 em { color: #526B5F !important; }
+#app.balabs-ui > main > .editorial-work .work-heading p {
+  max-width: 38ch !important;
+  color: #3E4B44 !important;
+  font-size: 13px !important;
+  line-height: 1.8 !important;
+}
+#app.balabs-ui > main > .editorial-work .work-grid {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 0 !important;
+  max-width: 1200px !important;
+  margin: 0 auto !important;
+}
+#app.balabs-ui > main > .editorial-work .work-card {
+  display: grid !important;
+  grid-template-columns: minmax(280px,.9fr) minmax(0,1.1fr) !important;
+  grid-template-rows: auto auto auto 1fr auto !important;
+  grid-template-areas: "image index" "image title" "image copy" "image topics" "image link" !important;
+  align-content: center !important;
+  align-items: start !important;
+  column-gap: clamp(28px,5vw,76px) !important;
+  row-gap: 12px !important;
+  min-height: 0 !important;
+  padding: clamp(30px,5vw,68px) 0 !important;
+  border: 0 !important;
+  border-top: 1px solid rgba(17,27,29,.35) !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  color: #111B1D !important;
+  box-shadow: none !important;
+}
+#app.balabs-ui > main > .editorial-work .work-card:nth-child(even) {
+  grid-template-columns: minmax(0,1.1fr) minmax(280px,.9fr) !important;
+  grid-template-areas: "index image" "title image" "copy image" "topics image" "link image" !important;
+}
+#app.balabs-ui > main > .editorial-work .work-media {
+  grid-area: image !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 310px !important;
+  margin: 0 !important;
+  overflow: hidden !important;
+  background: #263B38 !important;
+}
+#app.balabs-ui > main > .editorial-work .work-media img {
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 310px !important;
+  aspect-ratio: 4/3 !important;
+  object-fit: cover !important;
+  filter: grayscale(.72) contrast(1.08) !important;
+  transition: filter .45s ease, transform .7s cubic-bezier(.2,.7,.2,1) !important;
+}
+#app.balabs-ui > main > .editorial-work .work-card:hover .work-media img {
+  filter: grayscale(.1) contrast(1.04) !important;
+  transform: scale(1.025) !important;
+}
+#app.balabs-ui > main > .editorial-work .work-index { grid-area: index !important; color: #8A4D38 !important; font: 700 10px/1.4 ui-monospace,monospace !important; letter-spacing: .16em !important; }
+#app.balabs-ui > main > .editorial-work .work-card h3 {
+  grid-area: title !important;
+  margin: 5px 0 !important;
+  color: #111B1D !important;
+  font: 400 clamp(30px,3.7vw,52px)/1 Georgia,serif !important;
+  letter-spacing: -.045em !important;
+}
+#app.balabs-ui > main > .editorial-work .work-card > p:not(.work-topics) {
+  grid-area: copy !important;
+  max-width: 52ch !important;
+  color: #3E4B44 !important;
+  font-size: 14px !important;
+  line-height: 1.8 !important;
+}
+#app.balabs-ui > main > .editorial-work .work-topics { grid-area: topics !important; color: #526B5F !important; font: 600 10px/1.5 ui-monospace,monospace !important; letter-spacing: .06em !important; text-transform: uppercase !important; }
+#app.balabs-ui > main > .editorial-work .work-tag { display: none !important; }
+#app.balabs-ui > main > .editorial-work .work-card-link {
+  grid-area: link !important;
+  justify-self: start !important;
+  margin-top: 10px !important;
+  padding: 12px 0 !important;
+  border: 0 !important;
+  border-bottom: 1px solid #8A4D38 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  color: #8A4D38 !important;
+  font: 700 10px/1.3 ui-monospace,monospace !important;
+  letter-spacing: .1em !important;
+  text-transform: uppercase !important;
+}
+#app.balabs-ui > main > .editorial-about {
+  grid-template-columns: minmax(0,1fr) minmax(300px,.85fr) !important;
+  gap: clamp(36px,8vw,120px) !important;
+  padding: clamp(76px,10vw,140px) clamp(22px,8vw,128px) !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+}
+#app.balabs-ui > main > .editorial-about h2 {
+  max-width: 10ch !important;
+  font: 400 clamp(48px,6.6vw,92px)/.93 Georgia,serif !important;
+  letter-spacing: -.065em !important;
+}
+#app.balabs-ui > main > .editorial-about p { max-width: 48ch !important; font-size: 15px !important; line-height: 1.9 !important; }
+#app.balabs-ui > main > .editorial-about .editorial-art-about {
+  min-height: 390px !important;
+  border: 1px solid rgba(209,208,197,.24) !important;
+  border-radius: 0 !important;
+  background: radial-gradient(ellipse at 52% 48%,rgba(185,107,77,.16),transparent 60%) !important;
+}
+#app.balabs-ui > main > .editorial-about .editorial-art-about svg { width: 100% !important; height: auto !important; color: #B96B4D !important; }
+#app.balabs-ui > main > .editorial-method {
+  padding: clamp(72px,9vw,126px) clamp(22px,7vw,112px) !important;
+  background: #263B38 !important;
+}
+#app.balabs-ui > main > .editorial-method .method-top {
+  max-width: 1100px !important;
+  display: grid !important;
+  grid-template-columns: minmax(0,1fr) minmax(240px,.55fr) !important;
+  align-items: end !important;
+  column-gap: 48px !important;
+  margin: 0 auto 56px !important;
+}
+#app.balabs-ui > main > .editorial-method .method-top h2 {
+  grid-column: 1 !important;
+  font: 400 clamp(48px,6vw,82px)/.95 Georgia,serif !important;
+  letter-spacing: -.06em !important;
+}
+#app.balabs-ui > main > .editorial-method .method-top p { grid-column: 2 !important; color: #D1D0C5 !important; font-size: 13px !important; line-height: 1.8 !important; }
+#app.balabs-ui > main > .editorial-method .method-steps {
+  max-width: 1100px !important;
+  margin: 0 auto !important;
+  display: grid !important;
+  grid-template-columns: repeat(4,minmax(0,1fr)) !important;
+  border-top: 1px solid rgba(209,208,197,.4) !important;
+}
+#app.balabs-ui > main > .editorial-method .method-steps li {
+  min-height: 210px !important;
+  padding: 22px 22px 0 0 !important;
+  border: 0 !important;
+  border-right: 1px solid rgba(209,208,197,.25) !important;
+  background: transparent !important;
+}
+#app.balabs-ui > main > .editorial-method .method-steps li + li { padding-left: 22px !important; }
+#app.balabs-ui > main > .editorial-method .method-steps .method-no { font: 700 11px/1 ui-monospace,monospace !important; letter-spacing: .12em !important; }
+#app.balabs-ui > main > .editorial-method .method-steps b { display: block !important; margin: 34px 0 12px !important; color: #F2F1E9 !important; font: 400 28px/1 Georgia,serif !important; }
+#app.balabs-ui > main > .editorial-method .method-steps p { color: #D1D0C5 !important; font-size: 12px !important; line-height: 1.7 !important; }
+#app.balabs-ui > main > .universe-bridge {
+  grid-template-columns: minmax(0,.8fr) minmax(0,1.2fr) !important;
+  min-height: 420px !important;
+  padding: clamp(72px,9vw,128px) clamp(22px,7vw,112px) !important;
+  background: #111B1D !important;
+  color: #D1D0C5 !important;
+  border: 0 !important;
+}
+#app.balabs-ui > main > .universe-bridge .bridge-copy h2 { color: #F2F1E9 !important; font: 400 clamp(50px,6.5vw,88px)/.92 Georgia,serif !important; letter-spacing: -.065em !important; }
+#app.balabs-ui > main > .universe-bridge .bridge-copy h2 em { color: #B96B4D !important; }
+#app.balabs-ui > main > .universe-bridge .bridge-network { width: 100% !important; transform: scale(1.12) !important; color: #9BAEA4 !important; }
+#app.balabs-ui > main > .universe-bridge .bridge-action { border-radius: 0 !important; }
+#app.balabs-ui > .foot { border-top: 1px solid #52635A !important; }
+@media (max-width: 760px) {
+  #app.balabs-ui > main > .hero {
+    min-height: auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 24px !important;
+    padding: 44px 20px 64px !important;
+  }
+  #app.balabs-ui > main > .hero > div:first-of-type { order: 1 !important; }
+  #app.balabs-ui > main > .hero .hero-micrograph {
+    order: 0 !important;
+    width: 100% !important;
+    height: 43svh !important;
+    min-height: 230px !important;
+    max-height: 360px !important;
+    clip-path: polygon(8% 0,100% 0,100% 90%,90% 100%,0 100%,0 10%) !important;
+  }
+  #app.balabs-ui > main > .hero h1 { font-size: clamp(58px,15vw,82px) !important; }
+  #app.balabs-ui > main > .hero .aside { order: 2 !important; margin-top: 6px !important; }
+  #app.balabs-ui > main > .hero .hero-credit { display: none !important; }
+  #app.balabs-ui > main > .editorial-work .work-heading,
+  #app.balabs-ui > main > .editorial-method .method-top { display: block !important; }
+  #app.balabs-ui > main > .editorial-work .work-heading p,
+  #app.balabs-ui > main > .editorial-method .method-top p { margin-top: 24px !important; }
+  #app.balabs-ui > main > .editorial-work .work-card,
+  #app.balabs-ui > main > .editorial-work .work-card:nth-child(even) {
+    grid-template-columns: minmax(0,1fr) !important;
+    grid-template-rows: auto !important;
+    grid-template-areas: "index" "image" "title" "copy" "topics" "link" !important;
+    row-gap: 13px !important;
+    padding: 34px 0 !important;
+  }
+  #app.balabs-ui > main > .editorial-work .work-media,
+  #app.balabs-ui > main > .editorial-work .work-media img { min-height: 0 !important; height: auto !important; aspect-ratio: 5/4 !important; }
+  #app.balabs-ui > main > .editorial-about { grid-template-columns: minmax(0,1fr) !important; }
+  #app.balabs-ui > main > .editorial-about .editorial-art-about { min-height: 250px !important; }
+  #app.balabs-ui > main > .editorial-method .method-steps { grid-template-columns: repeat(2,minmax(0,1fr)) !important; }
+  #app.balabs-ui > main > .editorial-method .method-steps li { min-height: 190px !important; padding: 18px 12px 18px 0 !important; border-bottom: 1px solid rgba(209,208,197,.25) !important; }
+  #app.balabs-ui > main > .editorial-method .method-steps li + li { padding-left: 12px !important; }
+  #app.balabs-ui > main > .universe-bridge { grid-template-columns: minmax(0,1fr) !important; gap: 24px !important; }
+}
+@media (prefers-reduced-motion: reduce) {
+  #app.balabs-ui > main > .editorial-work .work-media img { transition: none !important; }
+}
