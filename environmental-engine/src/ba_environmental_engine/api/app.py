@@ -154,7 +154,7 @@ class SensorTransmissionDeviceInput(APIModel):
     enabled: StrictBool
     created_at: datetime
     profile_bound: StrictBool
-    expected_from: datetime
+    expected_from: date
     expected_to: datetime | None = None
     last_seen_at: datetime | None = None
 
@@ -162,14 +162,11 @@ class SensorTransmissionDeviceInput(APIModel):
     def validate_device_timestamps(self) -> SensorTransmissionDeviceInput:
         for name, value in (
             ("created_at", self.created_at),
-            ("expected_from", self.expected_from),
             ("expected_to", self.expected_to),
             ("last_seen_at", self.last_seen_at),
         ):
             if value is not None and (value.tzinfo is None or value.utcoffset() is None):
                 raise ValueError(f"transmission device {name} must include a timezone")
-        if self.expected_to is not None and self.expected_to <= self.expected_from:
-            raise ValueError("transmission device expected_to must be after expected_from")
         return self
 
 
@@ -517,7 +514,9 @@ def create_app(engine_api_key: str | None = None) -> FastAPI:
                         enabled=item.enabled,
                         created_at=item.created_at,
                         profile_bound=item.profile_bound,
-                        expected_from=item.expected_from,
+                        expected_from=datetime.combine(
+                            item.expected_from, time.min, tzinfo=profile_zone
+                        ).astimezone(timezone.utc),
                         expected_to=item.expected_to,
                         last_seen_at=item.last_seen_at,
                     )
