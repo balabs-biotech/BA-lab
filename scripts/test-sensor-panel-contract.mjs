@@ -65,7 +65,7 @@ assert.match(workspace, /id="sensorDriftActivate"/, "manager must expose separat
 assert.match(workspace, /id="sensorDriftRetire"/, "manager must expose version retirement");
 assert.match(driftManager, /list_sensor_drift_management_devices/, "manager must resolve device choices through the writer-scoped read model");
 assert.doesNotMatch(driftManager, /\.from\(["']iot_devices["']\)/, "browser must not read the protected IoT device registry directly");
-assert.match(driftManager, /\.from\(["']environment_context_profiles["']\)/, "manager is linked to the existing environment context profile selection");
+assert.match(driftManager, /profile_valid_from|profile_valid_to/, "manager must inherit the validity interval of the persisted sensor profile");
 assert.match(driftManager, /reference_binding_verified:\s*false/, "new policies must start as unverified drafts");
 assert.match(driftManager, /reference_binding_verified:\s*true/, "verification must be a separate authenticated update");
 assert.match(driftManager, /\.update\(\{\s*status:\s*"active"\s*\}\)/, "activation must be a separate lifecycle update");
