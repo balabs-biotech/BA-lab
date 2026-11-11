@@ -57,23 +57,15 @@ function harness({ domain = "mycology", organizationId = "a0a0a0a0-0000-4000-800
   let refreshCalls = 0;
   const client = { functions: { async invoke(name, options) { calls.push({ name, options }); return { data: result, error: null }; } } };
   const document = { getElementById(id) { return elements.get(id) ?? null; } };
+  const normalizerContext = { Map, Number, Object, Array, globalThis: {} };
+  vm.runInNewContext(fs.readFileSync("shared/bal-normalizer.js", "utf8"), normalizerContext, { filename: "shared/bal-normalizer.js" });
+  const normalizerApi = normalizerContext.globalThis.BALabsNormalizer;
   const window = {
     BA_LABS_DOMAIN: domain,
     BA_LABS_SUPABASE_CLIENT: client,
     BA_LABS_GET_ORGANIZATION_ID: () => organizationId,
     BA_LABS_GET_MEASUREMENT_CATALOGUE: () => catalogue,
-    BALabsNormalizer: {
-      normalizeMeasurement(input) {
-        const units = new Map(input.units.map((unit) => [unit.code, unit]));
-        const raw = units.get(input.rawUnitCode);
-        const canonical = units.get(input.variable.canonical_unit_code);
-        if (!raw || !canonical) return { status: "blocked", reason: "unknown_raw_unit" };
-        if (raw.dimension !== input.variable.dimension || canonical.dimension !== input.variable.dimension) return { status: "blocked", reason: "raw_unit_dimension_mismatch" };
-        if (input.rawUnitCode === input.variable.canonical_unit_code) return { status: "already_canonical", normalizedValue: input.rawValue, normalizedUnitCode: input.variable.canonical_unit_code, method: "identity", version: "0.1.0" };
-        if (raw.is_linear !== true || canonical.is_linear !== true || Number(raw.offset_value ?? 0) !== 0 || Number(canonical.offset_value ?? 0) !== 0) return { status: "blocked", reason: "nonlinear_or_offset_conversion_not_enabled" };
-        return { status: "normalized", normalizedValue: input.rawValue * Number(raw.factor) / Number(canonical.factor), normalizedUnitCode: input.variable.canonical_unit_code, method: "catalogue_factor_ratio", version: "0.1.0" };
-      },
-    },
+    BALabsNormalizer: normalizerApi,
     BA_LABS_REFRESH_EXPERIMENTAL_DATA: async () => { refreshCalls += 1; },
   };
   vm.runInNewContext(source, { document, window, console, JSON, String, RegExp, Promise, TextEncoder }, { filename: "batch-tracker/bal-json-import.js" });
