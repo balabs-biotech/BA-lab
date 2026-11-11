@@ -22,6 +22,7 @@ for (const [label, source] of [['public', html], ['preview', previewHtml]]) {
 }
 
 assert.ok(html.includes('engine-v2.js?v=20261110-touch-branch-activation-v53'), 'Public explorer must load the cache-busted screen-space label engine');
+assert.ok(html.includes('Customer journey: featured work → live 3D explorer → eight domains') && previewHtml.includes('Customer journey: featured work → live 3D explorer → eight domains') && html.includes('app.insertBefore(scene,domains);') && previewHtml.includes('app.insertBefore(scene,domains);') && !html.includes('app.insertBefore(method,work);') && !previewHtml.includes('app.insertBefore(method,work);') && !html.includes('app.insertBefore(bridge,work);') && !previewHtml.includes('app.insertBefore(bridge,work);'), 'The homepage discovery path must flow from featured projects to the live 3D explorer and then the eight-universe directory, with method content after it');
 assert.ok(previewHtml.includes('engine-v2.js?v=20261110-touch-branch-activation-v54'), 'Preview must load the matching cache-busted label engine');
 assert.ok(engine.includes('function syncLabelScales()') && engine.includes('cameraDistance*projection*targetPixels'), '3D labels must keep a stable screen-space size across zoom levels');
 assert.ok(engine.includes('resourceHitTargets.set(label,element)'), 'Public branch labels must have real DOM hit targets');
