@@ -56,3 +56,25 @@ La vérification SQL directe réalisée pendant cette revue a toutefois retourn�
 6. Activer la protection des mots de passe compromis.
 7. Finaliser les durées, le processus de droits, la procédure incident et la validation juridique des pages.
 
+
+
+## Vérification ciblée — consentements existants et audit (11 novembre 2026)
+
+L'inspection SQL a révélé une table existante `public.culture_data_consents`, mais son contrat actuel n'est pas celui d'un registre immuable des acceptations légales :
+- RLS autorise INSERT, SELECT et UPDATE aux utilisateurs authentifiés pour leur propre ligne et leur organisation ;
+- le rôle `authenticated` détient aussi le privilège SQL DELETE ;
+- aucune politique DELETE n'a été observée, ce qui bloque actuellement la suppression via les politiques RLS, mais le privilège SQL reste accordé et doit être supprimé dans une migration après vérification des dépendances ;
+- aucune protection trigger append-only n'a été observée ;
+- le code client utilise la version `2026-10-09-v1` et met à jour les champs d'opt-in statistique sur une ligne existante ;
+- l'acceptation de la notice/CGU au parcours de création de compte reste une validation d'interface : elle n'est pas enregistrée dans cette table lors de l'inscription.
+
+La table `public.events` est un journal de traçabilité biologique avec des politiques UPDATE/DELETE destinées aux rédacteurs de l'organisation. Elle ne peut donc pas être réutilisée telle quelle comme journal réglementaire append-only.
+
+**Mesure de prudence :** aucune modification DDL n'a été appliquée à la base live pendant cette vérification. La conception cible et les tests requis sont consignés dans `docs/compliance/privacy-audit-engine-design.md`. Ne pas annoncer l'existence d'une preuve d'acceptation serveur ni d'un carnet complet tant que la migration et les parcours de journalisation n'ont pas été livrés et testés.
+
+## Nouveau point de contrôle
+
+- [ ] Vérifier les dépendances et usages historiques de `culture_data_consents` avant retrait du privilège DELETE ou modification de ses politiques.
+- [ ] Créer une migration dédiée au registre des versions de documents et aux événements de consentement append-only.
+- [ ] Créer un journal d'opérations distinct des événements biologiques, couvrant les actions pertinentes de l'article 41 bis 3.
+- [ ] Ajouter les tests SQL d'isolation multi-tenant, d'interdiction UPDATE/DELETE et de validation des versions documentaires.
