@@ -7,7 +7,7 @@ const engine = readFileSync('ecosystem/engine-v2.js', 'utf8');
 const previewEngine = readFileSync('ecosystem-preview/engine-v2.js', 'utf8');
 const expectedDomains = ['bio', 'myco', 'soil', 'lab', 'products', 'iot', 'work', 'learn'];
 const brandCss = readFileSync('ecosystem/brand-system.css', 'utf8');
-assert.ok(html.includes('<link rel="stylesheet" href="./brand-system.css?v=1">'), 'Public homepage must load the BA Labs visual system');
+assert.ok(html.includes('<link rel="stylesheet" href="./brand-system.css?v=2">'), 'Public homepage must load the BA Labs visual system');
 assert.ok(html.includes('<div class="wrap balabs-ui" id="app"'), 'Public homepage must opt into the BA Labs visual system');
 for (const section of ['hero', 'editorial-feature', 'editorial-about', 'editorial-work', 'universe-index', 'editorial-method']) {
   assert.ok(brandCss.includes('#app.balabs-ui > main > .' + section), 'Visual system must target the actual main landmark child: ' + section);
@@ -363,6 +363,48 @@ for (const [label, tree] of [['public', JSON.parse(readFileSync('ecosystem/notio
   for (const id of inactiveArabicProducts) assert.ok(!ids.has(id), label + ' Arabic tree must not expose inactive catalogue item ' + id);
 }
 
+
+
+// Phase 3 visual-system contract: responsive editorial cards, touch targets,
+// logical RTL spacing and visible keyboard focus. No explorer selectors.
+for (const selector of [
+  '#app.balabs-ui > main > .editorial-work .work-grid',
+  '#app.balabs-ui > main > .editorial-work .work-card',
+  '#app.balabs-ui > main > .universe-index .universe-index-card',
+  '#app.balabs-ui > main > .site-nav a',
+  '#app.balabs-ui[dir="rtl"] > main > .hero .aside',
+]) assert.ok(brandCss.includes(selector), 'Phase 3 must include the responsive editorial selector: ' + selector);
+assert.ok(brandCss.includes('min-height: 44px !important'), 'Language and navigation controls must retain accessible touch targets');
+assert.ok(brandCss.includes('aspect-ratio: 16 / 10 !important'), 'Editorial project imagery must use a consistent landscape ratio');
+assert.ok(brandCss.includes('grid-template-columns: repeat(2, minmax(0, 1fr)) !important'), 'Editorial work cards must collapse to two columns on tablet');
+assert.ok(brandCss.includes('grid-template-columns: minmax(0, 1fr) !important'), 'Editorial work cards must collapse to one column on mobile');
+assert.ok(brandCss.includes('outline: 3px solid var(--balabs-copper) !important'), 'Editorial links and controls must have a visible keyboard focus state');
+assert.ok(!/\.(?:sphere|webgl-[\w-]*|branch-dock|camera)\b|#mainView|canvas/i.test(brandCss.slice(brandCss.indexOf('Site-wide visual refinement — phase 3'))), 'Phase 3 must not target the 3D explorer or Batch Tracker');
+
+
+
+// Featured section metadata must remain legible against its light mineral background.
+assert.ok(brandCss.includes('#app.balabs-ui > main > .editorial-feature .feature-status'), 'Featured status metadata must use a scoped high-contrast treatment');
+assert.ok(brandCss.includes('color: #70402F !important'), 'Featured status text must use a dark copper foreground on the light section');
+assert.ok(brandCss.includes('#app.balabs-ui > main > .editorial-feature .art-caption'), 'Featured image credit must retain a readable overlay treatment');
+
+// Shared design-system contract: preview consumes the same maintained editorial layer as public.
+assert.ok(previewHtml.includes('class="wrap balabs-ui" id="app"'), 'Preview root must opt into the shared BA Labs visual system');
+assert.ok(previewHtml.includes('../ecosystem/brand-system.css?v=3'), 'Preview must load the shared visual system after its local styles');
+
+// Preview parity contract: retain the preview's independent light theme while
+// matching editorial hierarchy, responsive grids, touch targets and RTL focus.
+for (const selector of [
+  '.wrap > main > .editorial-work .work-grid',
+  '.wrap > main > .universe-index .universe-index-card',
+  '.wrap[dir="rtl"] > main > .hero .aside',
+]) assert.ok(previewHtml.includes(selector), 'Preview must implement phase 3 editorial parity: ' + selector);
+assert.ok(previewHtml.includes('aspect-ratio:16/10!important'), 'Preview project imagery must use the same landscape ratio');
+assert.ok(previewHtml.includes('min-height:44px!important'), 'Preview language controls must retain accessible touch targets');
+assert.ok(previewHtml.includes('grid-template-columns:repeat(2,minmax(0,1fr))!important'), 'Preview must use a two-column tablet work grid');
+assert.ok(previewHtml.includes('grid-template-columns:minmax(0,1fr)!important'), 'Preview must use a one-column mobile work grid');
+
+console.log('BA Labs site-wide visual refinement checks passed.');
 console.log('Clean 3D engine regression checks passed: eight domains, mycelial topology, animated signals, stable camera, desktop/mobile controls, hierarchical Notion branches and explicit page actions.');
 
 
