@@ -44,6 +44,14 @@ const missingContext = structuredClone(measurementExample);
 missingContext.data.context = { environment_id: measurementExample.data.context.environment_id };
 assert.equal(validateRecord(missingContext), false, "environment-only context must not identify a biological record");
 
+const materialOnly = structuredClone(measurementExample);
+materialOnly.data.context = { material_id: "6b6c2b3d-4a6f-4b3e-8a1f-5b4c3d2e1f00" };
+assert.equal(validateRecord(materialOnly), false, "material-only context is not accepted by the current manual-write RPC contract");
+
+const sampleOnly = structuredClone(measurementExample);
+sampleOnly.data.context = { sample_id: "7b6c2b3d-4a6f-4b3e-8a1f-5b4c3d2e1f00" };
+assert.equal(validateRecord(sampleOnly), false, "sample-only context is not accepted by the current manual-write RPC contract");
+
 const emptyObservation = structuredClone(observationExample);
 emptyObservation.data.value_text = "";
 assert.equal(validateRecord(emptyObservation), false, "empty qualitative observation must be rejected");
