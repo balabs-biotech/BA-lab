@@ -161,4 +161,20 @@ class SupabaseBiologicalSignalRepository:
                 "one or more signal rows conflicted with existing provenance "
                 "or could not be verified"
             )
+
+        # An idempotent replay is valid only if the immutable scientific
+        # payload is unchanged. Operational status/timestamps are intentionally
+        # excluded because users may have triaged the signal since first insert.
+        immutable_fields = tuple(rows[0])
+        for expected in rows:
+            actual = by_id[expected["signal_id"]]
+            changed = [
+                field for field in immutable_fields
+                if actual.get(field) != expected[field]
+            ]
+            if changed:
+                raise BiologicalSignalPersistenceError(
+                    "existing signal has conflicting immutable content: "
+                    + ", ".join(changed)
+                )
         return tuple(by_id[signal_id] for signal_id in signal_ids)
