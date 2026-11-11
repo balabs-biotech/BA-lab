@@ -1,4 +1,5 @@
-from datetime import date, datetime, timezone
+from datetime import date, datetime, timedelta, timezone
+from zoneinfo import ZoneInfo
 from uuid import uuid4
 
 from fastapi.testclient import TestClient
@@ -812,6 +813,9 @@ def test_sensor_api_accepts_transmission_only_analysis_for_a_silent_device():
     request = sensor_payload()
     device_id = request["measurements"][0]["iot_device_id"]
     request["measurements"] = []
+    today = datetime.now(ZoneInfo("Africa/Algiers")).date()
+    request["from_date"] = (today - timedelta(days=1)).isoformat()
+    request["to_date"] = today.isoformat()
     request["transmission_expected_interval_seconds"] = 60
     request["transmission_gap_tolerance_factor"] = 2.0
     request["transmission_current_window"] = True
@@ -819,11 +823,11 @@ def test_sensor_api_accepts_transmission_only_analysis_for_a_silent_device():
         "device_id": device_id,
         "device_code": "sensor-01",
         "enabled": True,
-        "created_at": "2026-02-27T00:00:00+00:00",
+        "created_at": (today - timedelta(days=10)).isoformat() + "T00:00:00+00:00",
         "profile_bound": True,
-        "expected_from": "2026-02-27T00:00:00+00:00",
+        "expected_from": (today - timedelta(days=10)).isoformat() + "T00:00:00+00:00",
         "expected_to": None,
-        "last_seen_at": "2026-02-28T00:00:00+00:00",
+        "last_seen_at": (today - timedelta(days=1)).isoformat() + "T00:00:00+00:00",
     }]
     request["transmission_receipts"] = []
 
