@@ -24,6 +24,10 @@ from .signal_persistence import (
     SupabaseBiologicalSignalRepository,
 )
 from .signal_service import BiologicalSignalService
+from .biological_workflow import (
+    BiologicalWorkflowResult,
+    BiologicalWorkflowService,
+)
 from .supabase_recommendation_repository import SupabaseRecommendationRepository
 from .sensor_events import (
     SensorEvent,
@@ -72,4 +76,6 @@ __all__ = [
     "BiologicalSignalPersistenceError",
     "SupabaseBiologicalSignalRepository",
     "BiologicalSignalService",
+    "BiologicalWorkflowResult",
+    "BiologicalWorkflowService",
 ]
