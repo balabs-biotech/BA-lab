@@ -373,6 +373,7 @@ $$;
 
 drop trigger if exists environment_context_profiles_version_guard on public.environment_context_profiles;
 drop trigger if exists domain_interpretation_profiles_version_guard on public.domain_interpretation_profiles;
+drop trigger if exists environment_context_profile_sensors_draft_only on public.environment_context_profile_sensors;
 drop trigger if exists environment_context_profile_sensors_guard on public.environment_context_profile_sensors;
 drop trigger if exists environment_context_profiles_validate on public.environment_context_profiles;
 drop trigger if exists domain_interpretation_profiles_validate on public.domain_interpretation_profiles;
