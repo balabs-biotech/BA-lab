@@ -298,7 +298,25 @@
       "description": "Public resources to explore documented work, understand evidence limitations and learn how to collaborate with BA Labs.",
       "children": [
         {
-          "id": "learn-collaborate",
+          "id": "learn-resource-1",
+          "title": "Documented work",
+          "url": "https://app.notion.com/p/40173152f17181baa905d6afb836f038",
+          "children": []
+        },
+        {
+          "id": "learn-resource-2",
+          "title": "Evidence and research",
+          "url": "https://app.notion.com/p/40173152f17181e99831c9e40fb8e614",
+          "children": []
+        },
+        {
+          "id": "learn-resource-3",
+          "title": "Public catalogue",
+          "url": "https://app.notion.com/p/d0fbe1d779344eb58bc240fe7876ae0e",
+          "children": []
+        },
+        {
+          "id": "learn-resource-4",
           "title": "Collaborate with BA Labs",
           "url": "https://app.notion.com/p/40173152f1718118ac1ad58358720ae4",
           "children": []
