@@ -165,7 +165,13 @@ class SupabaseRecommendationRepository:
                 raise RecommendationRepositoryError(
                     "Supabase did not return the created recommendation"
                 )
-            return _lifecycle_from_payload(payload["recommendation"], [])
+            event_rows = payload.get("events", []) or []
+            if not isinstance(event_rows, list):
+                raise RecommendationRepositoryError(
+                    "Supabase returned an invalid recommendation event history"
+                )
+            event_rows.sort(key=lambda item: item["revision"])
+            return _lifecycle_from_payload(payload["recommendation"], event_rows)
         except RecommendationRepositoryError:
             raise
         except Exception as error:
