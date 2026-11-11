@@ -153,6 +153,13 @@
         throw new Error("Réponse du serveur non reconnue. Vérifiez l’historique avant de réessayer.");
       }
       invalidatePreview();
+      if (typeof window.BA_LABS_REFRESH_EXPERIMENTAL_DATA === "function") {
+        try {
+          await window.BA_LABS_REFRESH_EXPERIMENTAL_DATA();
+        } catch (_) {
+          setStatus("Fiche enregistrée, mais l’historique n’a pas pu être actualisé. Utilisez Actualiser.", "notice");
+        }
+      }
     } catch (error) {
       setStatus(error instanceof Error ? error.message : "Échec de l’import.", "error");
       importButton.disabled = false;
