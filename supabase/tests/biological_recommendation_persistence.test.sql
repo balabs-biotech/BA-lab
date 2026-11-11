@@ -6,6 +6,7 @@ declare
   v_recommendations oid := to_regclass('public.biological_recommendations');
   v_events oid := to_regclass('public.biological_recommendation_events');
   v_create_definition text;
+  v_transition_definition text;
   v_create oid := to_regprocedure(
     'public.create_biological_recommendation(uuid,uuid,text,text,text,text,uuid,uuid,uuid,text,text,text,jsonb)'
   );
@@ -133,6 +134,12 @@ begin
   if position('pg_advisory_xact_lock' in v_create_definition) = 0
      or position('auth.role()' in v_create_definition) > 0 then
     raise exception 'FAIL: proposal creation must serialize first-write retries without deprecated auth.role checks';
+  end if;
+
+  select pg_get_functiondef(v_transition) into v_transition_definition;
+  if position('''events''' in v_transition_definition) = 0
+     or position('jsonb_agg' in v_transition_definition) = 0 then
+    raise exception 'FAIL: transition RPC must return the committed aggregate event history atomically';
   end if;
 
   if not exists (
