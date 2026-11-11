@@ -1399,3 +1399,107 @@
     transition: none !important;
   }
 }
+
+
+/* PHASE 7 — selected branch dossier.
+   Restyles the existing information panel; content and click behavior stay in engine-v2.js. */
+#mainView.webgl-ready .webgl-focus {
+  width: min(360px, calc(100% - 108px)) !important;
+  max-height: calc(100% - 116px) !important;
+  padding: 0 !important;
+  overflow: auto !important;
+  border: 1px solid #40534D !important;
+  border-top: 2px solid #B96B4D !important;
+  border-radius: 2px !important;
+  background: rgba(17, 27, 29, .97) !important;
+  box-shadow: 0 18px 46px rgba(0,0,0,.34) !important;
+  color: #D1D0C5 !important;
+  backdrop-filter: blur(18px) !important;
+}
+#mainView.webgl-ready .webgl-focus-kicker {
+  margin: 0 !important;
+  padding: 14px 18px 10px !important;
+  border-bottom: 1px solid rgba(209,208,197,.18) !important;
+  color: #D99A7D !important;
+  font: 700 9px/1.4 ui-monospace, monospace !important;
+  letter-spacing: .16em !important;
+  text-transform: uppercase !important;
+}
+#mainView.webgl-ready .webgl-focus strong {
+  padding: 15px 18px 0 !important;
+  color: #F2F1E9 !important;
+  font: 500 clamp(19px, 2vw, 25px)/1.08 Georgia, serif !important;
+  letter-spacing: -.025em !important;
+  overflow-wrap: anywhere !important;
+}
+#mainView.webgl-ready .webgl-focus small {
+  padding: 0 18px !important;
+  margin-top: 9px !important;
+  color: #B9C5BB !important;
+  font: 12px/1.65 system-ui, sans-serif !important;
+}
+#mainView.webgl-ready .webgl-focus .webgl-focus-actions {
+  display: grid !important;
+  gap: 0 !important;
+  margin: 14px 0 0 !important;
+  padding: 8px 18px 14px !important;
+  border-top: 1px solid rgba(209,208,197,.18) !important;
+}
+#mainView.webgl-ready .webgl-focus .webgl-focus-actions > * {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 12px !important;
+  width: 100% !important;
+  min-height: 42px !important;
+  padding: 9px 0 !important;
+  border: 0 !important;
+  border-bottom: 1px solid rgba(209,208,197,.14) !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  color: #D1D0C5 !important;
+  font: 600 11px/1.4 system-ui, sans-serif !important;
+  text-align: start !important;
+  text-decoration: none !important;
+  box-shadow: none !important;
+}
+#mainView.webgl-ready .webgl-focus .webgl-focus-actions > *:last-child {
+  border-bottom: 0 !important;
+}
+#mainView.webgl-ready .webgl-focus .webgl-focus-actions > *:hover,
+#mainView.webgl-ready .webgl-focus .webgl-focus-actions > *:focus-visible {
+  color: #F2F1E9 !important;
+  background: rgba(38,59,56,.72) !important;
+  outline: 1px solid #B96B4D !important;
+  outline-offset: 2px !important;
+}
+#mainView.webgl-ready .webgl-focus .webgl-focus-link span {
+  color: #D99A7D !important;
+  font: 600 10px/1.35 ui-monospace, monospace !important;
+}
+#mainView.webgl-ready .webgl-focus[hidden] { display: none !important; }
+@media (max-width: 600px) {
+  #mainView.webgl-ready .webgl-focus {
+    left: 9px !important;
+    top: 9px !important;
+    width: min(300px, calc(100% - 78px)) !important;
+    max-height: calc(100% - 112px) !important;
+  }
+  #mainView.webgl-ready .webgl-focus strong {
+    padding: 12px 14px 0 !important;
+    font-size: 21px !important;
+  }
+  #mainView.webgl-ready .webgl-focus small { padding-inline: 14px !important; }
+  #mainView.webgl-ready .webgl-focus-kicker { padding: 12px 14px 9px !important; }
+  #mainView.webgl-ready .webgl-focus .webgl-focus-actions { padding-inline: 14px !important; }
+}
+#mainView.webgl-ready[dir="rtl"] .webgl-focus,
+#mainView.webgl-ready[dir="rtl"] .webgl-focus .webgl-focus-actions > * {
+  text-align: start !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  #mainView.webgl-ready .webgl-focus,
+  #mainView.webgl-ready .webgl-focus .webgl-focus-actions > * {
+    transition: none !important;
+  }
+}
