@@ -27,15 +27,16 @@ begin
   if v_guard not ilike '%biological_assessment_history_is_append_only%' then
     raise exception 'FAIL: immutable assessment trigger is missing';
   end if;
-  select pg_get_functiondef('public.record_biological_assessment(uuid,uuid,text,text,text,jsonb,jsonb,jsonb,jsonb)'::regprocedure) into v_rpc;
+  select pg_get_functiondef('public.record_biological_assessment(uuid,uuid,text,text,text,jsonb,jsonb,jsonb,jsonb,uuid)'::regprocedure) into v_rpc;
   if v_rpc not ilike '%is_org_member%'
      or v_rpc not ilike '%Source measurement unavailable or excluded%'
      or v_rpc not ilike '%Assessment evidence does not match source raw measurement%'
      or v_rpc not ilike '%Assessment rule version is not the current reviewed version%'
-     or v_rpc not ilike '%not_recomputed%' then
+     or v_rpc not ilike '%not_recomputed%'
+     or v_rpc not ilike '%Assessment idempotency key payload conflict%' then
     raise exception 'FAIL: guarded assessment evidence RPC contract is incomplete';
   end if;
-  if not has_function_privilege('authenticated','public.record_biological_assessment(uuid,uuid,text,text,text,jsonb,jsonb,jsonb,jsonb)','EXECUTE') then
+  if not has_function_privilege('authenticated','public.record_biological_assessment(uuid,uuid,text,text,text,jsonb,jsonb,jsonb,jsonb,uuid)','EXECUTE') then
     raise exception 'FAIL: authenticated users need guarded assessment RPC execution';
   end if;
 end
