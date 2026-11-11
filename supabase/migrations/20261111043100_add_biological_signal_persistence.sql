@@ -109,70 +109,115 @@ create index biological_signals_environment_history_idx
     organization_id, environment_id, observed_date desc
   );
 
--- Normalize observation provenance into tenant-scoped relational links. The
--- JSONB array remains a portable snapshot, while this table proves that every
--- referenced observation belongs to the same organization.
-create table public.biological_signal_observations (
+-- Normalize source evidence into tenant-scoped relational links. Climate
+-- signals reference environmental_observations; IoT signals reference
+-- measurements. A polymorphic source_kind is constrained by two real FKs.
+create table public.biological_signal_evidence (
   organization_id uuid not null,
   signal_id uuid not null,
-  observation_id uuid not null,
-  primary key (organization_id, signal_id, observation_id),
-  constraint biological_signal_observations_signal_fk
+  source_kind text not null check (
+    source_kind in ('environmental_observation', 'measurement')
+  ),
+  evidence_id uuid not null,
+  environmental_observation_id uuid,
+  measurement_id uuid,
+  primary key (organization_id, signal_id, source_kind, evidence_id),
+  constraint biological_signal_evidence_source_shape_check
+    check (
+      (source_kind = 'environmental_observation'
+        and environmental_observation_id = evidence_id
+        and measurement_id is null)
+      or
+      (source_kind = 'measurement'
+        and measurement_id = evidence_id
+        and environmental_observation_id is null)
+    ),
+  constraint biological_signal_evidence_signal_fk
     foreign key (organization_id, signal_id)
     references public.biological_signals (organization_id, signal_id)
     on delete cascade,
-  constraint biological_signal_observations_observation_fk
-    foreign key (organization_id, observation_id)
+  constraint biological_signal_evidence_environmental_observation_fk
+    foreign key (organization_id, environmental_observation_id)
     references public.environmental_observations (organization_id, id)
+    on delete restrict,
+  constraint biological_signal_evidence_measurement_fk
+    foreign key (organization_id, measurement_id)
+    references public.measurements (organization_id, id)
     on delete restrict
 );
 
-create index biological_signal_observations_observation_idx
-  on public.biological_signal_observations (organization_id, observation_id);
+create index biological_signal_evidence_observation_idx
+  on public.biological_signal_evidence (organization_id, environmental_observation_id)
+  where environmental_observation_id is not null;
+create index biological_signal_evidence_measurement_idx
+  on public.biological_signal_evidence (organization_id, measurement_id)
+  where measurement_id is not null;
 
-alter table public.biological_signal_observations enable row level security;
+alter table public.biological_signal_evidence enable row level security;
 
-create policy biological_signal_observations_select
-  on public.biological_signal_observations
+create policy biological_signal_evidence_select
+  on public.biological_signal_evidence
   for select to authenticated
   using (private.is_org_member(organization_id));
 
-revoke all on public.biological_signal_observations from public, anon, authenticated;
-grant select on public.biological_signal_observations to authenticated;
-grant insert on public.biological_signal_observations to service_role;
+revoke all on public.biological_signal_evidence from public, anon, authenticated;
+grant select on public.biological_signal_evidence to authenticated;
+grant insert on public.biological_signal_evidence to service_role;
 
-create or replace function private.link_biological_signal_observations()
+create or replace function private.link_biological_signal_evidence()
 returns trigger
 language plpgsql
 security invoker
 set search_path = pg_catalog, public
 as $$
 declare
-  v_observation_id uuid;
+  v_evidence_id uuid;
 begin
-  for v_observation_id in
-    select value::uuid
-      from jsonb_array_elements_text(new.source_observation_ids) as item(value)
-  loop
-    insert into public.biological_signal_observations (
-      organization_id, signal_id, observation_id
-    )
-    values (
-      new.organization_id, new.signal_id, v_observation_id
-    )
-    on conflict (organization_id, signal_id, observation_id) do nothing;
-  end loop;
+  if new.analysis_method = 'environmental_daily' then
+    for v_evidence_id in
+      select value::uuid
+        from jsonb_array_elements_text(new.source_observation_ids) as item(value)
+    loop
+      insert into public.biological_signal_evidence (
+        organization_id, signal_id, source_kind, evidence_id,
+        environmental_observation_id, measurement_id
+      )
+      values (
+        new.organization_id, new.signal_id, 'environmental_observation',
+        v_evidence_id, v_evidence_id, null
+      )
+      on conflict (organization_id, signal_id, source_kind, evidence_id) do nothing;
+    end loop;
+  elsif new.analysis_method in ('sensor_series', 'sensor_temporal') then
+    for v_evidence_id in
+      select value::uuid
+        from jsonb_array_elements_text(new.source_observation_ids) as item(value)
+    loop
+      insert into public.biological_signal_evidence (
+        organization_id, signal_id, source_kind, evidence_id,
+        environmental_observation_id, measurement_id
+      )
+      values (
+        new.organization_id, new.signal_id, 'measurement',
+        v_evidence_id, null, v_evidence_id
+      )
+      on conflict (organization_id, signal_id, source_kind, evidence_id) do nothing;
+    end loop;
+  else
+    raise exception 'unsupported_biological_signal_analysis_method'
+      using errcode = '23514';
+  end if;
 
   return new;
 end;
 $$;
 
-revoke all on function private.link_biological_signal_observations()
+revoke all on function private.link_biological_signal_evidence()
   from public, anon, authenticated;
 
-create trigger biological_signals_link_observations
+create trigger biological_signals_link_evidence
   after insert on public.biological_signals
-  for each row execute function private.link_biological_signal_observations();
+  for each row execute function private.link_biological_signal_evidence();
 
 alter table public.biological_signals enable row level security;
 
