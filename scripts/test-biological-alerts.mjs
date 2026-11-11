@@ -438,6 +438,8 @@ assert.match(moduleSource, /if \(eventRows\.length >= 2000\) state\.recommendati
 assert.match(moduleSource, /state\.recommendationHistoryAvailable = append \? state\.recommendationHistoryAvailable : true/);
 assert.match(moduleSource, /Lecture des recommandations indisponible ou incomplète/);
 assert.match(moduleSource, /transition_biological_recommendation/);
+assert.match(moduleSource, /CultureOps n’exécute aucune action automatiquement/);
+assert.match(moduleSource, /« exécution déclarée » signifie qu’un opérateur a consigné une action réalisée/);
 assert.match(moduleSource, /p_expected_revision: recommendation\.revision/);
 assert.match(moduleSource, /action === "record_execution" && !executionDetails/);
 assert.match(moduleSource, /action === "record_outcome" && \(!outcomeSummary \|\| !outcomeDate\)/);
