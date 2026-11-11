@@ -73,3 +73,22 @@ The mapping is intentionally adapter-based. BAL-JSON must not force a one-to-one
 This first slice defines only measurements and observations. It does not yet define culture creation, strain/genetic lineage, experiments, protocols, environmental time series, analytical claims, evidence graphs, or device telemetry. Those are subsequent contracts and must be based on their existing authoritative schemas.
 
 Before production ingestion, add a full Draft 2020-12 validator in the application boundary and test UUID/date-time formats, reference resolution, tenant isolation, unit dimensions, duplicate/replay handling, and round-trip preservation. The current repository test is a structural guard for the checked-in contract files; it is not a substitute for full JSON Schema validation.
+
+## Authenticated ingestion adapter (first implementation)
+
+The Edge Function `bal-json-ingest` accepts one BAL-JSON v1 record per POST request. It validates the Draft 2020-12 schema, authenticates the caller JWT, checks the organization through the domain RPC, resolves variable/unit dimensions through the controlled catalogues, and resolves batch context under the caller's RLS scope.
+
+The adapter then calls `public.ingest_bal_json_record`. The RPC stores a tenant-scoped receipt keyed by `(organization_id, record_id)` and binds it to the SHA-256 hash of the exact request bytes. A byte-identical retry returns the original event ID; reuse of the same record ID with different bytes is rejected. The receipt and domain write execute in one PostgreSQL transaction.
+
+The adapter currently accepts only `quality_state=raw` (or an omitted state). Review-state transitions are deliberately rejected until a dedicated review workflow exists. The raw measurement/observation is written through the existing atomic BAL-Core RPCs; provenance, contract identity, extensions and the original context are retained in event/record metadata.
+
+The Edge Function uses the caller's publishable/anon key and JWT. It does not use a service-role key. It does not expose direct table writes.
+
+### Current limitations
+
+- One record per request; bulk import is a later layer.
+- No automatic unit conversion: raw value and unit are preserved; dimensional compatibility is checked.
+- No automatic variable creation or fuzzy catalogue matching.
+- No creation of missing cultures, batches, locations or environments.
+- No AI-generated biological conclusions are accepted as validated facts.
+- Deployment and end-to-end Supabase verification are separate from repository CI and must be completed before production use.
