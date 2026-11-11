@@ -119,3 +119,16 @@ Run:
 ```sh
 node scripts/test-biological-rule-schema.mjs
 ```
+
+
+## Biological Rule Resolver
+
+`shared/biological-rule-resolver.js` performs exact-match selection across the supplied rules. It filters by domain, variable and unit, then requires every declared biological target and context selector to match. It never ranks strain-specific rules above taxon-level rules: if two reviewed rules match, the result is `ambiguous_rule` and no rule is selected.
+
+Possible outcomes are `matched_rule`, `ambiguous_rule`, `insufficient_context` and `no_matching_rule`. Only the registry's structurally valid `reviewed` rules are candidates. The resolver is pure and does not query Supabase; the caller must supply rules and context from an authorized, trusted source.
+
+Run:
+
+```sh
+node scripts/test-biological-rule-resolver.mjs
+```
