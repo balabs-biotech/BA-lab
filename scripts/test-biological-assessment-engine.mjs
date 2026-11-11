@@ -33,12 +33,14 @@ const input = { domain: "mycology", measurement, context: contextData, rules: [r
 assert.equal(engine.version, "0.1.0");
 const normal = engine.assess(input);
 assert.equal(normal.status, "normal");
+assert.equal(normal.engine_version, engine.version);
 assert.equal(normal.resolution.status, "matched_rule");
 assert.equal(normal.assessment.rule_id, rule.rule_id);
 assert.equal(normal.raw_measurement_modified, false);
 
 const outOfRange = engine.assess({ ...input, measurement: { ...measurement, assessed_value: 30 } });
 assert.equal(outOfRange.status, "out_of_range");
+assert.equal(outOfRange.engine_version, engine.version);
 
 const missingStageRule = { ...rule, target: { taxon_code: "ncbi:12345", growth_stage: "incubation" } };
 const missingStage = engine.assess({ ...input, rules: [missingStageRule] });
