@@ -49,6 +49,9 @@ begin
   if v_guard not ilike '%biological_rule_version_immutable%' or
      v_guard not ilike '%biological_rule_reviewer_must_match_authenticated_user%' or
      v_guard not ilike '%biological_rule_variable_unit_dimension_mismatch%' or
+     v_guard not ilike '%biological_rule_review_must_be_explicit_transition%' or
+     v_guard not ilike '%biological_rule_retirement_requires_prior_reviewed_version%' or
+     v_guard not ilike '%biological_rule_retirement_requires_new_version%' or
      v_guard not ilike '%set search_path = pg_catalog, public, private, auth%' then
     raise exception 'FAIL: reviewed rule immutability or reviewer identity guard is missing';
   end if;
