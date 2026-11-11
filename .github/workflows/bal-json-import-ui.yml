@@ -4,6 +4,13 @@ on:
   pull_request:
     paths:
       - "batch-tracker/bal-json-import.js"
+      - "batch-tracker/workspace.html"
+      - "batch-tracker/tracker.js"
+      - "batch-tracker/tracker.css"
+      - "batch-tracker/mycology/index.html"
+      - "batch-tracker/laboratory/index.html"
+      - "supabase/functions/bal-json-ingest/**"
+      - "schemas/bal-json/**"
       - "scripts/test-bal-json-import-ui.mjs"
       - ".github/workflows/bal-json-import-ui.yml"
   push:
@@ -26,3 +33,8 @@ jobs:
           node-version: "22"
       - name: Test BAL-JSON import preview and authenticated submission
         run: node scripts/test-bal-json-import-ui.mjs
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      - name: Type-check authenticated BAL-JSON Edge Function
+        run: deno check supabase/functions/bal-json-ingest/index.ts
