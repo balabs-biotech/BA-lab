@@ -383,6 +383,16 @@ assert.ok(!/\.(?:sphere|webgl-[\w-]*|branch-dock|camera)\b|#mainView|canvas/i.te
 
 
 
+
+ // Phase 5 homepage-wide editorial system. Scope excludes the 3D scene.
+assert.ok(brandCss.includes('PHASE 5 — editorial system across the full homepage'), 'Phase 5 must style the full editorial homepage');
+for (const selector of ['.editorial-work .work-grid', '.editorial-about .about-copy', '.editorial-method .method-steps', '.universe-bridge .bridge-network']) {
+  assert.ok(brandCss.includes(selector), 'Phase 5 must include the next homepage section: ' + selector);
+}
+assert.ok(brandCss.includes('grid-template-columns: repeat(4, minmax(0, 1fr)) !important'), 'Scientific method must present four distinct steps on desktop');
+assert.ok(brandCss.includes('@media (max-width: 760px)'), 'Homepage editorial sections must retain mobile layouts');
+assert.ok(!/\\.(?:sphere|webgl-[\\w-]*|branch-dock|camera)\\b|#mainView|canvas/i.test(brandCss.slice(brandCss.indexOf('PHASE 5 — editorial system across the full homepage'))), 'Phase 5 must not target the 3D explorer');
+
 // Phase 4 visible art-direction contract: major homepage composition, not micro-adjustments.
 assert.ok(brandCss.includes('PHASE 4 — visible homepage art direction'), 'Phase 4 homepage art direction must be present');
 assert.ok(brandCss.includes('#app.balabs-ui > .site-nav'), 'Phase 4 navigation must target its actual direct-child location');
