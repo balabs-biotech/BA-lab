@@ -765,7 +765,25 @@
       "description": "Ressources publiques pour parcourir les travaux documentés, comprendre les limites des preuves et découvrir les modalités de collaboration.",
       "children": [
         {
-          "id": "learn-collaborate",
+          "id": "learn-resource-1",
+          "title": "Travaux documentés",
+          "url": "https://app.notion.com/p/3f273152f171815597b6c696402b42c0",
+          "children": []
+        },
+        {
+          "id": "learn-resource-2",
+          "title": "Méthodologie de R&D",
+          "url": "https://app.notion.com/p/3e273152f17181ab88bfe456f838b011",
+          "children": []
+        },
+        {
+          "id": "learn-resource-3",
+          "title": "Catalogue public",
+          "url": "https://app.notion.com/p/d0fbe1d779344eb58bc240fe7876ae0e",
+          "children": []
+        },
+        {
+          "id": "learn-resource-4",
           "title": "Collaborer avec BA Labs",
           "url": "https://app.notion.com/p/3e273152f17181a8bedae0bfd2452543",
           "children": []
