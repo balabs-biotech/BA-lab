@@ -205,7 +205,7 @@ window.BA_LABS_ASSESS_AND_RECORD_BIOLOGICAL_MEASUREMENT = async ({ measurementId
     measurementSnapshot: {
       source_measurement_id: source.id,
       variable_code: source.variable_code,
-      assessed_value: numericValue,
+      assessed_value: String(source.raw_value),
       assessed_unit_code: source.raw_unit_code,
       measured_at: source.measured_at,
     },
