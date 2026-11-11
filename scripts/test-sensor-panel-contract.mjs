@@ -44,3 +44,10 @@ assert.match(panel, /flatlineValues\.some\(value => value === ""\)/, "partial fl
 assert.match(workspace, /id="sensorFlatlineMinimumObservations"/, "workspace must expose the repeated-reading threshold");
 assert.match(workspace, /id="sensorFlatlineMinimumDurationSeconds"/, "workspace must expose the repeated-reading duration");
 console.log("PASS: sensor analysis UI integration, temporal screening, quality diagnostics, and instrument-health contract");
+
+assert.match(panel, /transmission_expected_interval_seconds = intervalMinutes \* 60/, "UI must forward explicit device transmission cadence");
+assert.match(panel, /transmission_gap_tolerance_factor = toleranceFactor/, "UI must forward explicit device transmission tolerance");
+assert.match(panel, /transmissionValues\.some\(value => value === ""\)/, "partial transmission policy must be rejected");
+assert.match(panel, /instrument_health\?\.transmission_diagnostics/, "panel must render device transmission diagnostics");
+assert.match(workspace, /id="sensorTransmissionIntervalMinutes"/, "workspace must expose device transmission cadence");
+assert.match(workspace, /id="sensorTransmissionToleranceFactor"/, "workspace must expose device transmission tolerance");
