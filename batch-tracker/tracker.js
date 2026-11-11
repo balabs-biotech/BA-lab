@@ -547,10 +547,6 @@ async function signIn() {
 
   try {
 
-    if (!authPrivacyAcceptedCheckbox?.checked) {
-      throw new Error("Pour créer un compte, lisez et acceptez les conditions d’utilisation et prenez connaissance de la politique de confidentialité.");
-    }
-
     const email =
       authEmail.value.trim();
 
@@ -636,6 +632,10 @@ async function signUp() {
 
 
   try {
+
+    if (!authPrivacyAcceptedCheckbox?.checked) {
+      throw new Error("Pour créer un compte, lisez et acceptez les conditions d’utilisation et prenez connaissance de la politique de confidentialité.");
+    }
 
     const email =
       authEmail.value.trim();
