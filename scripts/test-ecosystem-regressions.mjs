@@ -379,7 +379,7 @@ assert.ok(brandCss.includes('aspect-ratio: 16 / 10 !important'), 'Editorial proj
 assert.ok(brandCss.includes('grid-template-columns: repeat(2, minmax(0, 1fr)) !important'), 'Editorial work cards must collapse to two columns on tablet');
 assert.ok(brandCss.includes('grid-template-columns: minmax(0, 1fr) !important'), 'Editorial work cards must collapse to one column on mobile');
 assert.ok(brandCss.includes('outline: 3px solid var(--balabs-copper) !important'), 'Editorial links and controls must have a visible keyboard focus state');
-assert.ok(!/\\.(?:sphere|webgl-[\\w-]*|branch-dock|camera)\\b|#mainView|canvas/i.test(brandCss.slice(brandCss.indexOf('Site-wide visual refinement — phase 3'))), 'Phase 3 must not target the 3D explorer or Batch Tracker');
+assert.ok(!/\.(?:sphere|webgl-[\w-]*|branch-dock|camera)\b|#mainView|canvas/i.test(brandCss.slice(brandCss.indexOf('Site-wide visual refinement — phase 3'))), 'Phase 3 must not target the 3D explorer or Batch Tracker');
 
 console.log('BA Labs site-wide visual refinement checks passed.');
 console.log('Clean 3D engine regression checks passed: eight domains, mycelial topology, animated signals, stable camera, desktop/mobile controls, hierarchical Notion branches and explicit page actions.');
