@@ -34,7 +34,7 @@
       "default": "raw"
     },
     "context": {
-      "$ref": "measurement.schema.json#/$defs/context"
+      "$ref": "urn:ba-labs:bal-json:v1:measurement#/$defs/context"
     },
     "metadata": {
       "type": "object"
