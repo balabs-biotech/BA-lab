@@ -306,24 +306,6 @@
       "description": "Public resources to explore documented work, understand evidence limitations and learn how to collaborate with BA Labs.",
       "children": [
         {
-          "id": "learn-work",
-          "title": "Documented work & projects",
-          "url": "https://app.notion.com/p/40173152f171812084fcc3e45ece4ec9",
-          "children": []
-        },
-        {
-          "id": "learn-evidence",
-          "title": "What the evidence currently supports",
-          "url": "https://app.notion.com/p/40173152f17181e99831c9e40fb8e614",
-          "children": []
-        },
-        {
-          "id": "learn-catalogue",
-          "title": "Public catalogue — biological resources",
-          "url": "https://app.notion.com/p/40173152f171812f813cf1b792d83281",
-          "children": []
-        },
-        {
           "id": "learn-collaborate",
           "title": "Collaborate with BA Labs",
           "url": "https://app.notion.com/p/40173152f1718118ac1ad58358720ae4",
