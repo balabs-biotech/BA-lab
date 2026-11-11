@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
+const entryHtml = readFileSync('index.html', 'utf8');
 const html = readFileSync('ecosystem/index.html', 'utf8');
 const previewHtml = readFileSync('ecosystem-preview/index.html', 'utf8');
 const engine = readFileSync('ecosystem/engine-v2.js', 'utf8');
@@ -472,3 +473,12 @@ assert.ok(brandCss.includes('width: min(360px, calc(100% - 108px)) !important'),
 assert.ok(brandCss.includes('max-height: calc(100% - 112px) !important'), 'Mobile dossier must remain inside the explorer viewport');
 assert.ok(html.includes('brand-system.css?v=7'), 'Public site must request phase 7 visual system');
 assert.ok(previewHtml.includes('brand-system.css?v=7'), 'Preview must request phase 7 visual system');
+
+
+// Root entry page: deliberate art-direction change, not another rounded-card skin.
+assert.ok(entryHtml.includes('FIELD NOTE / 001'), 'Entry page must carry the field-research editorial identity');
+assert.ok(entryHtml.includes('BRANCHED BIOLOGICAL NETWORK'), 'Entry page must feature the original branched biology illustration');
+assert.ok(entryHtml.includes('--paper:#111B1D') && entryHtml.includes('--copper:#B96B4D'), 'Entry page must use the BA Labs graphite/copper palette');
+assert.ok(entryHtml.includes('font:400 clamp(29px,3.1vw,43px)/1 Georgia,serif'), 'Workspace links must use the editorial list composition');
+assert.ok(!entryHtml.includes('border-radius:16px'), 'Entry page must not fall back to generic rounded cards');
+assert.ok(entryHtml.includes('intro-note-copy'), 'The intro note must remain translatable in all four languages');
