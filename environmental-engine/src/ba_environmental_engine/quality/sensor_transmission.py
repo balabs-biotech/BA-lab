@@ -172,7 +172,11 @@ def assess_sensor_transmissions(
                 gap_tolerance_factor=float(gap_tolerance_factor),
                 receipt_count=0, gap_count=0, maximum_gap_seconds=None,
                 trailing_silence_seconds=trailing_silence,
-                last_received_at=device.last_seen_at,
+                last_received_at=(
+                    device.last_seen_at
+                    if current_window and device.last_seen_at is not None
+                    and device.last_seen_at <= cutoff else None
+                ),
                 source_receipt_ids=(),
             ))
             continue
