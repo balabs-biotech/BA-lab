@@ -10,6 +10,7 @@ const locales = read("batch-tracker/i18n.js");
 const lineageIndexMigration = read("supabase/migrations/20261110220000_add_material_relationship_reverse_index.sql");
 const mixtureMigration = read("supabase/migrations/20261110230000_add_atomic_multi_source_material_creation.sql");
 const interpretationMigration = read("supabase/migrations/20261112090000_add_biological_interpretation_registry.sql");
+const environmentalAnalysisFunction = read("supabase/functions/environmental-analysis/index.ts");
 const traceabilityRuntimeTest = read("supabase/tests/biological_traceability.test.sql");
 
 for (const entry of [
@@ -366,3 +367,16 @@ assert.match(interpretationMigration, /v_signal\.source_analysis_id/);
 assert.match(interpretationMigration, /v_signal\.source_finding_id/);
 assert.match(interpretationMigration, /v_inserted boolean/);
 assert.match(interpretationMigration, /if v_inserted then/);
+
+assert.match(interpretationMigration, /unique \(organization_id, source_signal_id, engine_code, engine_version\)/);
+assert.match(interpretationMigration, /on conflict \([\s\S]*source_signal_id, engine_code, engine_version[\s\S]*\) do nothing/);
+assert.match(environmentalAnalysisFunction, /function persistedInterpretationStatus\(findingStatus: unknown\)/);
+assert.match(environmentalAnalysisFunction, /case "normal":[\s\S]*return "observed_only"/);
+assert.match(environmentalAnalysisFunction, /case "insufficient_history":[\s\S]*return "insufficient_evidence"/);
+assert.match(environmentalAnalysisFunction, /case "suspect":[\s\S]*return "requires_review"/);
+assert.match(environmentalAnalysisFunction, /analysisResult\.engine_version/);
+assert.match(environmentalAnalysisFunction, /adminClient\.rpc\([\s\S]*"record_biological_interpretation"/);
+assert.match(environmentalAnalysisFunction, /p_source_signal_id: signal\.signal_id/);
+assert.match(environmentalAnalysisFunction, /p_interpretation_payload: interpretationPayload/);
+assert.match(environmentalAnalysisFunction, /interpretation_persistence_status: interpretationPersistenceStatus/);
+assert.match(environmentalAnalysisFunction, /persisted_interpretation_count: persistedInterpretationCount/);
