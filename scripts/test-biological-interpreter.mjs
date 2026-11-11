@@ -2,13 +2,19 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import vm from "node:vm";
 
-const registrySource = fs.readFileSync("shared/biological-rule-registry.js", "utf8");\nconst source = fs.readFileSync("shared/biological-interpreter.js", "utf8");
+const registrySource = fs.readFileSync("shared/biological-rule-registry.js", "utf8");
+const source = fs.readFileSync("shared/biological-interpreter.js", "utf8");
 const context = { Object, Array, Number, String, Set, globalThis: {} };
-vm.runInNewContext(registrySource, context, { filename: "shared/biological-rule-registry.js" });\nvm.runInNewContext(source, context, { filename: "shared/biological-interpreter.js" });
+vm.runInNewContext(registrySource, context, { filename: "shared/biological-rule-registry.js" });
+vm.runInNewContext(source, context, { filename: "shared/biological-interpreter.js" });
 const engine = context.globalThis.BALabsBiologicalInterpreter;
 
 const rule = {
-  rule_id: "mycology-incubation-temperature-demo",\n  status: "reviewed",\n  target: { taxon_code: "pleurotus_ostreatus", growth_stage: "incubation" },\n  sources: [{ type: "publication", citation: "Reviewed protocol v1" }],\n  review: { reviewer_id: "reviewer-001", reviewed_at: "2026-11-11T10:00:00.000Z" },
+  rule_id: "mycology-incubation-temperature-demo",
+  status: "reviewed",
+  target: { taxon_code: "pleurotus_ostreatus", growth_stage: "incubation" },
+  sources: [{ type: "publication", citation: "Reviewed protocol v1" }],
+  review: { reviewer_id: "reviewer-001", reviewed_at: "2026-11-11T10:00:00.000Z" },
   version: "1.0.0",
   variable_code: "incubation_temperature",
   unit_code: "degC",
@@ -24,17 +30,20 @@ const base = {
   context: {
     culture_id: "b0b0b0b0-0000-4000-8000-000000000001",
     strain_id: "c0c0c0c0-0000-4000-8000-000000000001",
-    growth_stage: "incubation",\n    taxon_code: "pleurotus_ostreatus",
+    growth_stage: "incubation",
+    taxon_code: "pleurotus_ostreatus",
   },
 };
 
 assert.equal(engine.version, "0.1.0");
 assert.equal(engine.assessMeasurement({ measurement: base, rule }).status, "normal");
 assert.equal(engine.assessMeasurement({ measurement: { ...base, assessed_value: 26 }, rule }).status, "out_of_range");
-assert.equal(engine.assessMeasurement({ measurement: base, rule: null }).status, "insufficient_context");\nassert.equal(engine.assessMeasurement({ measurement: base, rule: { ...rule, status: "draft" } }).status, "not_assessed");
+assert.equal(engine.assessMeasurement({ measurement: base, rule: null }).status, "insufficient_context");
+assert.equal(engine.assessMeasurement({ measurement: base, rule: { ...rule, status: "draft" } }).status, "not_assessed");
 assert.equal(engine.assessMeasurement({ measurement: { ...base, context: { culture_id: base.context.culture_id } }, rule }).status, "insufficient_context");
 assert.equal(engine.assessMeasurement({ measurement: { ...base, assessed_unit_code: "K" }, rule }).status, "not_assessed");
-assert.equal(engine.assessMeasurement({ measurement: base, rule: { ...rule, applies_to: { growth_stage: "fruiting" } } }).status, "not_assessed");\nassert.equal(engine.assessMeasurement({ measurement: base, rule: { ...rule, target: { taxon_code: "pleurotus_pulmonarius" } } }).status, "not_assessed");
+assert.equal(engine.assessMeasurement({ measurement: base, rule: { ...rule, applies_to: { growth_stage: "fruiting" } } }).status, "not_assessed");
+assert.equal(engine.assessMeasurement({ measurement: base, rule: { ...rule, target: { taxon_code: "pleurotus_pulmonarius" } } }).status, "not_assessed");
 
 const result = engine.assessMeasurement({ measurement: base, rule });
 assert.equal(result.rule_id, rule.rule_id);
