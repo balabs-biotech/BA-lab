@@ -2516,7 +2516,7 @@ html,body{background:#111B1D!important}
     <div class="feature-status"><span class="status-dot" aria-hidden="true"></span><span data-i18n="featureStatus">AXE D’EXPLORATION · DÉMARCHE EN DÉVELOPPEMENT</span></div>
     <h2 data-i18n-html="featureTitle">Le mycélium,<br><em>une matière vivante.</em></h2>
     <p data-i18n="featureText">Des cultures fongiques aux substrats, la mycologie ouvre des pistes concrètes pour observer, expérimenter et valoriser la matière organique.</p>
-    <a class="editorial-link" data-domain-page="myco" href="#" data-i18n="featureLink">Explorer les domaines <span aria-hidden="true">↗</span></a>
+    <a class="editorial-link" data-domain-page="myco" href="#universe" data-i18n="featureLink">Explorer les domaines <span aria-hidden="true">↗</span></a>
   </div>
 </section>
 <section class="editorial-about" id="a-propos" aria-label="À propos de BA Labs">
@@ -2568,7 +2568,7 @@ html,body{background:#111B1D!important}
       <p data-i18n="workIotText">Relier capteurs, acquisition de données et automatisation pour mieux suivre les environnements expérimentaux.</p>
       <p class="work-topics" data-i18n="workIotTopics">Capteurs · instrumentation · automatisation</p>
       <span class="work-tag" data-i18n="workIotTag">INGÉNIERIE & IOT</span>
-      <a class="work-card-link" data-work-page="iot" href="#" data-i18n="workOpenIot">Découvrir le domaine <span aria-hidden="true">↗</span></a>
+      <a class="work-card-link" data-work-page="iot" href="#universe" data-i18n="workOpenIot">Découvrir le domaine <span aria-hidden="true">↗</span></a>
     </article>
     <article class="work-card work-myco">
       <span class="work-index">02 / CULTURES</span>
@@ -2580,7 +2580,7 @@ html,body{background:#111B1D!important}
       <p data-i18n="workMycoText">Observer les souches, développer les cultures et explorer les relations entre mycélium, substrats et matière organique.</p>
       <p class="work-topics" data-i18n="workMycoTopics">Ressources fongiques · cultures &amp; multiplication · applications mycologiques</p>
       <span class="work-tag" data-i18n="workMycoTag">MYCOLOGIE APPLIQUÉE</span>
-      <a class="work-card-link" data-work-page="myco" href="#" data-i18n="workOpenMyco">Découvrir le domaine <span aria-hidden="true">↗</span></a>
+      <a class="work-card-link" data-work-page="myco" href="#universe" data-i18n="workOpenMyco">Découvrir le domaine <span aria-hidden="true">↗</span></a>
     </article>
     <article class="work-card work-soil">
       <span class="work-index">03 / MATIÈRES</span>
@@ -2592,7 +2592,7 @@ html,body{background:#111B1D!important}
       <p data-i18n="workSoilText">Étudier les mélanges organiques, les substrats et les propriétés des matières pour imaginer de nouveaux usages.</p>
       <p class="work-topics" data-i18n="workSoilTopics">Matières organiques · substrats · essais de culture</p>
       <span class="work-tag" data-i18n="workSoilTag">MATIÈRES & CIRCULARITÉ</span>
-      <a class="work-card-link" data-work-page="soil" href="#" data-i18n="workOpenSoil">Découvrir le domaine <span aria-hidden="true">↗</span></a>
+      <a class="work-card-link" data-work-page="soil" href="#universe" data-i18n="workOpenSoil">Découvrir le domaine <span aria-hidden="true">↗</span></a>
     </article>
   </div>
   <a class="work-explore" href="#universe" data-i18n="workExplore">Explorer les domaines associés <span aria-hidden="true">↗</span></a>
@@ -3035,6 +3035,15 @@ function resourceDescription(id,index,title){
 function showResource(index,title,url,description){const panel=document.getElementById('resourceDetail');document.getElementById('resourceDetailKicker').textContent=(lang==='fr'?'ÉTAPE 02 · EXPLORATION':lang==='en'?'STEP 02 · DISCOVERY':lang==='ar'?'الخطوة 02 · استكشاف':'ETAPA 02 · DESCOBERTA');document.getElementById('resourceDetailTitle').textContent=title;document.getElementById('resourceDetailText').textContent=description;const open=document.getElementById('resourceOpen');open.href=url;open.textContent=lang==='fr'?'Accéder à cette ressource ↗':lang==='en'?'Open this resource ↗':lang==='ar'?'فتح هذا المورد ↗':'Abrir este recurso ↗';document.getElementById('resourceBack').textContent=lang==='fr'?'← Retour aux thèmes':lang==='en'?'← Back to themes':lang==='ar'?'→ العودة إلى المواضيع':'← Voltar aos temas';panel.hidden=false;panel.scrollIntoView({behavior:'smooth',block:'center'});}document.getElementById('resourceBack').addEventListener('click',()=>{document.getElementById('resourceDetail').hidden=true;document.getElementById('miniMap').scrollIntoView({behavior:'smooth',block:'center'});});
 function enterSphere(id,scroll=true,spatial3D=false){selected=id;const d=pages[id],tx=T[lang];if(!spatial3D&&mainView.classList.contains('universe-closed'))toggleUniverse();if(!spatial3D){mainView.hidden=false;homeBtn.hidden=false;}miniView.hidden=false;miniView.classList.toggle('spatial-source-only',spatial3D);sceneTitle.textContent=tx.sphere[id][0];document.getElementById('miniKicker').textContent=tx.tag+' '+String(['bio','myco','soil','lab','products','iot','work','learn'].indexOf(id)+1).padStart(2,'0');document.getElementById('miniTitle').textContent=tx.sphere[id][0];document.getElementById('miniDesc').textContent=tx.desc[id];document.getElementById('spherePage').textContent=lang==='fr'?'Parcourir les thèmes ↓':lang==='en'?'Browse themes ↓':lang==='ar'?'استكشف المواضيع ↓':'Explorar temas ↓';document.getElementById('spherePage').href=d[lang]||roots[lang];document.getElementById('spherePage').target='_blank';document.getElementById('spherePage').rel='noopener noreferrer';document.getElementById('spherePage').textContent=lang==='fr'?'Ouvrir l’univers dans Notion ↗':lang==='en'?'Open this universe in Notion ↗':lang==='ar'?'فتح هذا العالم في Notion ↗':'Abrir este universo no Notion ↗';document.getElementById('resourceDetail').hidden=true;document.querySelector('.mini-map').style.setProperty('--sphere-color',getComputedStyle(document.querySelector('[data-sphere="'+id+'"]')).getPropertyValue('--c').trim()||'var(--lime)');const links=document.querySelectorAll('.linknode');const list=(localizedLinks[id]&&localizedLinks[id][lang])||d.links;links.forEach((a,i)=>{const p=list[i];if(!p){a.hidden=true;a.removeAttribute('href');return}a.hidden=false;a.href=p[1];a.target='_blank';a.rel='noopener noreferrer';a.dataset.resourceIndex=String(i);a.dataset.resourceUrl=p[1];a.setAttribute('aria-label',p[0]+' — '+(lang==='fr'?'ouvrir la page Notion':lang==='en'?'open Notion page':lang==='ar'?'فتح صفحة Notion':'abrir página Notion'));a.title=p[0];a.querySelector('span').textContent=String(i+1).padStart(2,'0')+' / '+(lang==='fr'?'PAGE':lang==='en'?'PAGE':lang==='ar'?'صفحة':'PÁGINA');a.querySelector('b').textContent=p[0];a.querySelector('small').textContent=lang==='fr'?'Ouvrir cette page ↗':lang==='en'?'Open this page ↗':lang==='ar'?'فتح هذه الصفحة ↗':'Abrir esta página ↗';a.onclick=null});renderSphereHops(id);requestAnimationFrame(drawMiniConnections);document.querySelectorAll('.sphere').forEach(s=>s.classList.toggle('active',s.dataset.sphere===id));if(scroll)document.querySelector('.miniintro')?.scrollIntoView({behavior:'smooth',block:'start'})}
 window.enterSphere=enterSphere;
+/* Homepage cards must open their selected universe, not merely scroll to the explorer. */
+document.addEventListener('click',event=>{
+ const link=event.target.closest('a[data-domain-page],a[data-work-page]');
+ if(!link)return;
+ const id=link.dataset.domainPage||link.dataset.workPage;
+ if(!pages[id])return;
+ event.preventDefault();
+ enterSphere(id,true,false);
+});
 function goHome(){miniView.hidden=true;miniView.classList.remove('spatial-source-only');mainView.hidden=false;mainView.classList.add('universe-closed');mainView.classList.remove('universe-open','has-focus','dragging');document.getElementById('networkEdges')?.replaceChildren();homeBtn.hidden=true;sceneTitle.textContent=tr('sceneTitle');document.querySelectorAll('.sphere').forEach(s=>{s.classList.toggle('active',s.dataset.sphere===selected);s.classList.remove('focused')});applyOrbit()}
 /* The clean Three.js engine is the sole owner of #mainView. This legacy script keeps only site-wide language/content behavior; it must not bind sphere, hub, home or pointer navigation. */
 document.querySelectorAll('[data-lang]').forEach(b=>b.addEventListener('click',()=>setLanguage(b.dataset.lang)));
