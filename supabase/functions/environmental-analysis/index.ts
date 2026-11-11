@@ -157,7 +157,7 @@ async function resolveBiologicalInterpretation(
 
   const { data: domainProfiles, error: domainProfileError } = await adminClient
     .from("domain_interpretation_profiles")
-    .select("id,organization_id,domain,profile_code,profile_version,rules,status,valid_from,valid_to")
+    .select("id,organization_id,domain,profile_code,profile_version,rules,recommendations,status,valid_from,valid_to")
     .eq("organization_id", organizationId)
     .eq("domain", domain)
     .in("status", ["active", "retired"])
@@ -226,6 +226,7 @@ async function resolveBiologicalInterpretation(
         module: domainProfile.domain,
         version: domainProfile.profile_version,
         rules: domainProfile.rules,
+        recommendations: domainProfile.recommendations ?? [],
       },
     },
   };
