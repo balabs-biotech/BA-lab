@@ -26,6 +26,8 @@ from ba_environmental_engine.interpretation.sensor_service import interpret_sens
 from ba_environmental_engine import __version__
 from ba_environmental_engine.climate.aggregation import AggregationMethod
 from ba_environmental_engine.execution import run_environmental_analysis, run_sensor_analysis
+from ba_environmental_engine.indicators.biological_pipeline import analyze_measurement_rows
+from ba_environmental_engine.serialization.biological_performance import build_bal_biological_analysis
 from ba_environmental_engine.sources.sensor import normalize_iot_measurement_row
 from ba_environmental_engine.sources.sensor_temporal import assess_sensor_temporal_anomalies
 from ba_environmental_engine.quality.sensor_health import assess_sensor_flatlines
@@ -147,6 +149,26 @@ class PersistedAnalysisRequest(APIModel):
             raise ValueError("rolling_windows must not contain duplicates")
         return self
 
+
+
+class BiologicalPerformanceRequest(APIModel):
+    analysis_id: UUID
+    organization_id: UUID
+    subject_id: UUID
+    subject_type: Literal["culture", "plant_culture", "sample", "experimental_unit"]
+    variable_code: str = Field(min_length=1, max_length=120)
+    variable_registry: dict[str, str] = Field(min_length=1, max_length=500)
+    accepted_quality_states: set[Literal["raw", "controlled", "validated", "excluded"]] = Field(min_length=1)
+    measurements: list[dict[str, Any]] = Field(default_factory=list, max_length=5000)
+
+    @model_validator(mode="after")
+    def validate_measurement_scope(self) -> BiologicalPerformanceRequest:
+        if self.variable_code not in self.variable_registry:
+            raise ValueError("variable_code must exist in the supplied canonical variable registry")
+        for row in self.measurements:
+            if str(row.get("organization_id") or "") != str(self.organization_id):
+                raise ValueError("every biological measurement must match the requested organization")
+        return self
 
 
 class SensorTransmissionDeviceInput(APIModel):
@@ -447,6 +469,39 @@ def create_app(engine_api_key: str | None = None) -> FastAPI:
         except ValueError as exc:
             raise HTTPException(status_code=422, detail=str(exc)) from exc
 
+
+    @app.post("/v1/analyses/biological-performance", dependencies=[Depends(require_internal_key)])
+    def create_biological_performance_analysis(request: BiologicalPerformanceRequest):
+        try:
+            pipeline = analyze_measurement_rows(
+                request.measurements,
+                organization_id=str(request.organization_id),
+                subject_id=str(request.subject_id),
+                subject_type=request.subject_type,
+                variable_code=request.variable_code,
+                variable_registry=request.variable_registry,
+                accepted_quality_states=request.accepted_quality_states,
+            )
+            analysis = build_bal_biological_analysis(
+                calculation=pipeline.calculation,
+                analysis_id=request.analysis_id,
+                generated_at=datetime.now(timezone.utc),
+                engine_version=__version__,
+                organization_id=str(request.organization_id),
+                subject_id=str(request.subject_id),
+                subject_type=request.subject_type,
+            )
+            return {
+                "analysis": analysis.model_dump(mode="json", by_alias=True),
+                "pipeline": {
+                    "input_row_count": pipeline.input_row_count,
+                    "candidate_row_count": pipeline.candidate_row_count,
+                    "ignored_out_of_scope_count": pipeline.ignored_out_of_scope_count,
+                    "rejected_rows": jsonable_encoder(pipeline.rejected_rows),
+                },
+            }
+        except (TypeError, ValueError) as exc:
+            raise HTTPException(status_code=422, detail=str(exc)) from exc
 
     @app.post("/v1/analyses/sensors", dependencies=[Depends(require_internal_key)])
     def create_sensor_analysis(request: SensorAnalysisRequest):
