@@ -429,18 +429,45 @@ set search_path = pg_catalog, private
 as $$
 declare
   changed integer;
+  target_document_type text;
+  has_successor boolean;
 begin
   if p_document_version_id is null or p_retired_at is null
      or p_retired_at < statement_timestamp() then
     raise exception 'invalid_legal_document_retirement_payload';
   end if;
 
-  update private.legal_document_versions
-  set retired_at = p_retired_at
+  select document_type into target_document_type
+  from private.legal_document_versions
   where id = p_document_version_id
     and effective_at is not null
     and retired_at is null
-    and p_retired_at >= effective_at;
+    and p_retired_at >= effective_at
+  for update;
+
+  if target_document_type is null then
+    raise exception 'legal_document_version_not_retirable';
+  end if;
+
+  if target_document_type in ('terms','privacy_notice') then
+    select exists (
+      select 1 from private.legal_document_versions successor
+      where successor.document_type = target_document_type
+        and successor.id <> p_document_version_id
+        and successor.effective_at is not null
+        and successor.effective_at <= p_retired_at
+        and (successor.retired_at is null or successor.retired_at > p_retired_at)
+    ) into has_successor;
+
+    if not has_successor then
+      raise exception 'legal_document_successor_required';
+    end if;
+  end if;
+
+  update private.legal_document_versions
+  set retired_at = p_retired_at
+  where id = p_document_version_id
+    and retired_at is null;
 
   get diagnostics changed = row_count;
   if changed = 0 then
