@@ -102,6 +102,24 @@ begin
     raise exception 'Invalid biological assessment payload' using errcode = '22023';
   end if;
 
+  -- Resolve a retry before checking whether its formerly-current rule is still current.
+  select * into v_existing from public.biological_assessments
+   where organization_id = v_org_id and idempotency_key = p_idempotency_key;
+  if found then
+    if v_existing.source_measurement_id is distinct from p_source_measurement_id
+       or v_existing.rule_version_id is distinct from p_rule_version_id
+       or v_existing.status is distinct from p_status
+       or v_existing.reason is distinct from p_reason
+       or v_existing.engine_version is distinct from p_engine_version
+       or v_existing.measurement_snapshot is distinct from p_measurement_snapshot
+       or v_existing.context_snapshot is distinct from p_context_snapshot
+       or v_existing.resolution_snapshot is distinct from p_resolution_snapshot
+       or v_existing.result_snapshot is distinct from p_result_snapshot then
+      raise exception 'Assessment idempotency key payload conflict' using errcode = '23505';
+    end if;
+    return v_existing.id;
+  end if;
+
   select * into v_measurement
     from public.measurements
    where organization_id = v_org_id and id = p_source_measurement_id
