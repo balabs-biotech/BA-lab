@@ -36,6 +36,11 @@ const missingUnit = structuredClone(measurementExample);
 delete missingUnit.data.raw_unit_code;
 assert.equal(validateRecord(missingUnit), false, "measurement without a raw unit must be rejected");
 
+const unverifiedNormalized = structuredClone(measurementExample);
+unverifiedNormalized.data.normalized_value = 24.5;
+unverifiedNormalized.data.normalized_unit_code = "degC";
+assert.equal(validateRecord(unverifiedNormalized), false, "v1 must not accept unverified normalized values");
+
 const excludedWithoutReason = structuredClone(measurementExample);
 excludedWithoutReason.data.quality_state = "excluded";
 assert.equal(validateRecord(excludedWithoutReason), false, "excluded measurement without a reason must be rejected");
