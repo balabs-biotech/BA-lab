@@ -51,3 +51,8 @@ assert.match(panel, /transmissionValues\.some\(value => value === ""\)/, "partia
 assert.match(panel, /instrument_health\?\.transmission_diagnostics/, "panel must render device transmission diagnostics");
 assert.match(workspace, /id="sensorTransmissionIntervalMinutes"/, "workspace must expose device transmission cadence");
 assert.match(workspace, /id="sensorTransmissionToleranceFactor"/, "workspace must expose device transmission tolerance");
+
+assert.match(panel, /instrument_health\?\.drift_diagnostics/, "panel must render reference-based drift diagnostics separately");
+assert.match(panel, /Dérive instrumentale relative/, "panel must label relative drift assessments explicitly");
+assert.match(panel, /item\.status === "suspected"/, "only suspected relative drift assessments count as alerts");
+assert.match(panel, /source_target_observation_ids|source_reference_observation_ids/, "drift result lineage identifiers must remain available in the API contract");
