@@ -169,6 +169,14 @@
       "url": "https://app.notion.com/p/40173152f171812f813cf1b792d83281",
       "children": [
         {
+          "id": "en-public-catalogue",
+          "title": "Public catalogue — publishable resources",
+          "notionId": "d0fbe1d779344eb58bc240fe7876ae0e",
+          "url": "https://app.notion.com/p/d0fbe1d779344eb58bc240fe7876ae0e",
+          "description": "Shared public catalogue of resources and products approved for publication. Confirm the batch, packaging and availability before any supply.",
+          "children": []
+        },
+        {
           "id": "en-products-wa",
           "title": "WA — Water Agar, ready to use",
           "notionId": "40173152f17181fc9d18ec817853e38d",
