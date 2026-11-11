@@ -155,14 +155,13 @@ class SensorTransmissionDeviceInput(APIModel):
     created_at: datetime
     profile_bound: StrictBool
     expected_from: date
-    expected_to: datetime | None = None
+    expected_to: date | None = None
     last_seen_at: datetime | None = None
 
     @model_validator(mode="after")
     def validate_device_timestamps(self) -> SensorTransmissionDeviceInput:
         for name, value in (
             ("created_at", self.created_at),
-            ("expected_to", self.expected_to),
             ("last_seen_at", self.last_seen_at),
         ):
             if value is not None and (value.tzinfo is None or value.utcoffset() is None):
@@ -517,7 +516,14 @@ def create_app(engine_api_key: str | None = None) -> FastAPI:
                         expected_from=datetime.combine(
                             item.expected_from, time.min, tzinfo=profile_zone
                         ).astimezone(timezone.utc),
-                        expected_to=item.expected_to,
+                        expected_to=(
+                            datetime.combine(
+                                item.expected_to + timedelta(days=1),
+                                time.min,
+                                tzinfo=profile_zone,
+                            ).astimezone(timezone.utc)
+                            if item.expected_to is not None else None
+                        ),
                         last_seen_at=item.last_seen_at,
                     )
                     for item in request.transmission_devices or []
