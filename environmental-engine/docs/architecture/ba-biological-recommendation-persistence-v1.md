@@ -135,6 +135,14 @@ unique key over `(organization_id, id, environment_id, domain)` and references
 that exact tuple. It also binds `source_analysis_id` to the tenant-scoped
 `analyses` key.
 
+The repository migration versions for the four profile-registry migrations
+now match the versions already recorded by Supabase (`20261111032007`,
+`20261111032018`, `20261111032035`, and `20261111034000`). The earlier duplicate
+table-creation migrations for biological contexts and environment registries
+were removed because those tables already exist in the live baseline. Their
+still-needed sensor-binding upgrade is now an additive migration against the
+actual live schema.
+
 The signal persistence, analysis-evidence and signal-lifecycle migrations have
 been moved to versions after the live migration head `20261111043003`:
 `20261111043100`, `20261111043200`, and `20261111043300`. This removes the
