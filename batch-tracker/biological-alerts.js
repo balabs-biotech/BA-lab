@@ -558,14 +558,35 @@
           }));
         matching.forEach(item => environmentalContext.push({ ...item, association_type: "temporal_location_context" }));
       });
+      const cultureMeasurements = measurements.filter(item =>
+        item.culture_id === cultureId || (item.event_id && cultureEventIds.has(item.event_id)));
+      const cultureObservations = observations.filter(item =>
+        item.culture_id === cultureId || (item.event_id && cultureEventIds.has(item.event_id)));
+      const cultureSignals = biologicalSignals.filter(item => item.biological_subject_id === cultureId);
+      const cultureResults = experimentalResults.filter(result =>
+        cultureMeasurements.some(item => item.result_id === result.id));
       return {
         culture_id: cultureId,
-        measurements: measurements.filter(item => item.culture_id === cultureId || (item.event_id && cultureEventIds.has(item.event_id))),
-        observations: observations.filter(item => item.culture_id === cultureId || (item.event_id && cultureEventIds.has(item.event_id))),
-        biological_signals: biologicalSignals.filter(item => item.biological_subject_id === cultureId),
-        experimental_results: experimentalResults.filter(result => measurements.some(item => item.culture_id === cultureId && item.result_id === result.id)),
+        measurements: cultureMeasurements,
+        observations: cultureObservations,
+        biological_signals: cultureSignals,
+        experimental_results: cultureResults,
         events: cultureEvents,
         environmental_context: environmentalContext,
+        evidence_summary: {
+          measurement_count: cultureMeasurements.length,
+          observation_count: cultureObservations.length,
+          biological_signal_count: cultureSignals.length,
+          experimental_result_count: cultureResults.length,
+          environmental_context_count: environmentalContext.length,
+          measurement_interpretation: "quantitative_observation",
+          observation_interpretation: "descriptive_observation",
+          signal_interpretation: "rule_or_anomaly_output_not_identity_confirmation",
+          result_interpretation: "experiment_result_requires_method_and_result_semantics_review",
+          composition_status: "not_assessed",
+          composition_evidence: [],
+          environmental_context_is_causal: false
+        },
         environmental_context_is_causal: false
       };
     };
