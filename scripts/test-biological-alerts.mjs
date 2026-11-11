@@ -272,3 +272,10 @@ assert.equal(duplicatePathIndex.summarize().multi_parent_count, 0,
   "multiple provenance paths from the same parent must not be counted as multiple biological parents");
 
 console.log("PASS: shared biological alert inbox contract");
+
+assert.match(moduleSource, /qualityIssues/);
+assert.match(moduleSource, /markIncomplete\("material_relationships"/);
+assert.match(moduleSource, /markIncomplete\("material_ancestors"/);
+assert.match(moduleSource, /lineageQuality: \{ complete: qualityIssues\.length === 0, issues: qualityIssues \}/);
+assert.match(moduleSource, /Généalogie partielle/);
+assert.match(styles, /signal-lineage-quality/);
