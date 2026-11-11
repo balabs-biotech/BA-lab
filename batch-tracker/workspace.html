@@ -816,6 +816,19 @@
       <p class="quick-capture-tip"><span aria-hidden="true">↳</span> Astuce : la culture ou le lot choisi est conservé pendant la saisie des mesures et observations.</p>
     </div>
 
+    <details class="observation-details bal-json-import" id="balJsonImportPanel">
+      <summary>Importer une fiche BAL-JSON v1</summary>
+      <p class="muted">Collez une fiche JSON produite par un outil d’analyse ou un export de données. L’aperçu ne modifie rien. L’enregistrement n’a lieu qu’après validation explicite, avec votre session active.</p>
+      <label for="balJsonImportSource">Fiche BAL-JSON</label>
+      <textarea id="balJsonImportSource" rows="8" maxlength="64000" spellcheck="false" autocapitalize="off" autocomplete="off" placeholder='{"contract":"BA-LABS/JSON","contract_version":"1.0.0",...}'></textarea>
+      <div class="row">
+        <button id="balJsonPreviewButton" type="button" class="secondary-button">Vérifier et prévisualiser</button>
+        <button id="balJsonImportButton" type="button" disabled>Importer dans BAL-Core</button>
+      </div>
+      <pre id="balJsonPreview" class="bal-json-preview" aria-label="Aperçu de la fiche" aria-live="polite"></pre>
+      <p id="balJsonImportStatus" class="muted" data-state="idle" role="status" aria-live="polite">Aucune fiche vérifiée. Aucune donnée n’a été enregistrée.</p>
+    </details>
+
     <div class="grid">
       <div>
         <label for="measurementTarget">Culture ou lot</label>
