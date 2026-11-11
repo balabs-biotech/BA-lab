@@ -18,8 +18,13 @@ const rows = [
   { id:"foreign", organization_id:"org-2", policy_id:"foreign", version:"1.0.0", revision_seq:3,
     status:"reviewed", domain:"mycology", rule_version_id:"rule-v1",
     trigger_assessment_statuses:["out_of_range"], decision_code:"foreign",
-    title:"Foreign", explanation:"Foreign", sources:[{type:"protocol"}],
-    reviewed_by:"user-2", reviewed_at:"2026-11-11T10:00:00Z" }
+    title:"Foreign", explanation:"Foreign", sources:[{type:"protocol",citation:"FOREIGN"}],
+    reviewed_by:"user-2", reviewed_at:"2026-11-11T10:00:00Z" },
+  { id:"bad-source", organization_id:"org-1", policy_id:"bad-source", version:"1.0.0", revision_seq:4,
+    status:"reviewed", domain:"mycology", rule_version_id:"rule-v1",
+    trigger_assessment_statuses:["out_of_range"], decision_code:"bad",
+    title:"Bad", explanation:"Bad", sources:[{type:"protocol"}],
+    reviewed_by:"user-1", reviewed_at:"2026-11-11T10:00:00Z" }
 ];
 function queryBuilder(table) {
   const state = { table, filters:[] };
