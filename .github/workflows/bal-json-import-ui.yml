@@ -25,6 +25,7 @@ on:
       - "scripts/test-biological-context-pipeline.mjs"
       - "scripts/test-biological-assessment-engine.mjs"
       - "scripts/test-biological-rule-store.mjs"
+      - "scripts/test-biological-rule-management-ui.mjs"
       - "scripts/test-biological-rule-authoring.mjs"
       - "supabase/migrations/20261111170000_add_biological_rule_store.sql"
       - "supabase/tests/biological-rule-store-security.test.sql"
@@ -96,6 +97,8 @@ jobs:
         run: node scripts/test-biological-rule-resolver.mjs
       - name: Test tenant-scoped biological rule store
         run: node scripts/test-biological-rule-store.mjs
+      - name: Test biological rule management interface boundaries
+        run: node scripts/test-biological-rule-management-ui.mjs
       - name: Test authenticated biological rule authoring lifecycle
         run: node scripts/test-biological-rule-authoring.mjs
       - name: Test biological rule registry validation and review gate
