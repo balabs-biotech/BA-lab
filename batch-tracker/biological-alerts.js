@@ -361,8 +361,8 @@
       .order("first_seen_at", { ascending: false })
       .range(pageOffset, pageOffset + PAGE_SIZE - 1);
     if (request !== state.request) return;
-    state.loading = false;
     if (error) {
+      state.loading = false;
       console.error("[CultureOps signals] Read failed", error.message);
       render();
       notify("Impossible de charger les signaux. Vérifiez les droits d’accès et la connexion.", true);
@@ -412,6 +412,7 @@
       }
     }
     state.recommendationsBySignal = recommendationsBySignal;
+    state.loading = false;
     state.rows = append ? state.rows.concat(page) : page;
     state.offset += page.length;
     state.hasMore = page.length === PAGE_SIZE;
