@@ -70,7 +70,8 @@ The optional FastAPI boundary exposes `GET /health`, `POST /v1/analyses` for tru
 - `docs/architecture/ba-sensor-measurement-lineage-v1.md`: sensor and observation lineage.
 - `docs/architecture/ba-sensor-instrument-health-v1.md`: opt-in flatline-candidate semantics, configuration and interpretation limits.
 - `docs/architecture/ba-sensor-domain-signal-evidence-v1.md`: descriptive evidence carried by profile-routed sensor signals.
-- `docs/architecture/ba-biological-recommendation-resolution-v1.md`: fail-closed, human-reviewed recommendation proposals resolved from versioned domain signals.\n- `docs/architecture/ba-biological-recommendation-persistence-v1.md`: tenant-scoped persistence, append-only review events, authorization and optimistic concurrency.
+- `docs/architecture/ba-biological-recommendation-resolution-v1.md`: fail-closed, human-reviewed recommendation proposals resolved from versioned domain signals.
+- `docs/architecture/ba-biological-recommendation-persistence-v1.md`: tenant-scoped persistence, append-only review events, authorization and optimistic concurrency.
 - `docs/architecture/ba-fao56-reference-evapotranspiration-v1.md`: daily FAO-56 ET0 contract.
 - `docs/architecture/ba-fao56-net-radiation-v1.md`: daily solar and net-radiation calculations.
 - `docs/architecture/ba-daily-reference-indicators-pipeline-v1.md`: normalized source-to-indicator pipeline.
