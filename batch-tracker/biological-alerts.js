@@ -716,7 +716,9 @@
       };
       // Adapt existing rule-engine outputs into the inference contract.
       // A signal is a finding, not an organism identification or a calibrated probability.
-      const findings = cultureSignals.map(signal => ({
+      const findings = cultureSignals.map(signal => {
+        const temporalEvidence = temporalEvidenceForFinding(signal);
+        return {
         finding_id: signal.signal_id,
         finding_type: signal.signal_code,
         severity: signal.severity || null,
@@ -738,9 +740,10 @@
         composition_status: "not_assessed",
         biological_context: biologicalContext,
         environmental_context: environmentalSummary,
-        temporal_evidence: temporalEvidenceForFinding(signal),
-        evidence_assessment: compareFindingEvidence(signal, temporalEvidenceForFinding(signal))
-      }));
+        temporal_evidence: temporalEvidence,
+        evidence_assessment: compareFindingEvidence(signal, temporalEvidence)
+        };
+      });
       return {
         culture_id: cultureId,
         biological_context: biologicalContext,
