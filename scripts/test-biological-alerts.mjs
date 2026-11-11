@@ -310,6 +310,7 @@ assert.match(moduleSource, /causal_relationship_established: false/);
 assert.match(moduleSource, /biological_context: biologicalContext/);
 assert.match(moduleSource, /environmental_context: environmentalSummary/);
 assert.match(moduleSource, /const summarizeTimeSeries =/);
+assert.match(moduleSource, /rawValue === null \|\| rawValue === undefined \|\| rawValue === ""/);
 assert.match(moduleSource, /measurementTrends = summarizeTimeSeries\(cultureMeasurements/);
 assert.match(moduleSource, /environmentalTrends = summarizeTimeSeries\(environmentalContext/);
 assert.match(moduleSource, /minimum: Math\.min\(\.\.\.values\)/);
