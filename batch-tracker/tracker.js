@@ -52,6 +52,31 @@ window.BA_LABS_LOAD_BIOLOGICAL_CONTEXT = async (cultureId) => {
   return result;
 };
 
+window.BA_LABS_ASSESS_BIOLOGICAL_MEASUREMENT = async ({ cultureId, measurement, rules } = {}) => {
+  const contextResult = await window.BA_LABS_LOAD_BIOLOGICAL_CONTEXT(cultureId);
+  const engine = window.BALabsBiologicalAssessmentEngine;
+  if (!engine || typeof engine.assess !== "function") {
+    return {
+      status: "insufficient_context",
+      reason: "biological_assessment_engine_unavailable",
+      context_status: contextResult.status,
+      assessment: null,
+      raw_measurement_modified: false,
+    };
+  }
+  const result = engine.assess({
+    domain: window.BA_LABS_DOMAIN || document.body.dataset.domain,
+    measurement,
+    context: contextResult.context,
+    rules,
+  });
+  return Object.freeze({
+    ...result,
+    context_status: contextResult.status,
+    context_missing_fields: contextResult.missing_fields || [],
+  });
+};
+
 let organization = null;
 
 let strainOptions = [];
