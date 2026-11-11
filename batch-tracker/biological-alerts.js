@@ -588,14 +588,26 @@
       const ancestorIds = traverse(materialId, incoming, "parent_material_id");
       const descendantIds = traverse(materialId, outgoing, "child_material_id");
       const relatedIds = [materialId, ...ancestorIds];
+      const directSourceIds = [...new Set((incoming.get(materialId) || []).map(edge => edge.parent_material_id))];
+      const sourceMaterials = directSourceIds.map(id => materialById.get(id)).filter(Boolean);
       const strainMap = new Map();
       relatedIds.map(id => materialById.get(id)).filter(Boolean).forEach(material => {
         const strain = material.strain || {};
         const organism = strain.organism || {};
         const strainId = material.strain_id || strain.id;
         const label = [strain.strain_code || strain.designation, organism.scientific_name].filter(Boolean).join(" — ");
-        if (label) strainMap.set(strainId || label, { strain_id: strainId || null, label, material_id: material.id, material_code: material.material_code || null });
+        if (label) strainMap.set(strainId || label, {
+          strain_id: strainId || null,
+          label,
+          material_id: material.id,
+          material_code: material.material_code || null,
+          assignment_type: material.id === materialId ? "direct_material_assignment" : "ancestral_material_assignment"
+        });
       });
+      // A strain assignment or a source-material edge documents genealogy only.
+      // Confirmed composition requires an explicit analytical result contract,
+      // which is not yet represented in the current schema.
+      const lineageStrains = [...strainMap.values()];
       const relatedEventIds = new Set([materialId, ...ancestorIds, ...descendantIds]);
       const relatedEvents = [...relatedEventIds].flatMap(id => eventsByMaterial.get(id) || [])
         .sort((a, b) => String(a.occurred_at || "").localeCompare(String(b.occurred_at || "")));
@@ -606,7 +618,12 @@
         material: materialById.get(materialId),
         ancestors: ancestorIds.map(id => materialById.get(id)).filter(Boolean),
         descendants: descendantIds.map(id => materialById.get(id)).filter(Boolean),
-        strains: [...strainMap.values()],
+        source_materials: sourceMaterials,
+        lineage_strains: lineageStrains,
+        // Backward-compatible alias; callers must not interpret this as measured composition.
+        strains: lineageStrains,
+        confirmed_composition: [],
+        composition_status: "not_assessed",
         events: relatedEvents,
         culture_evidence: cultures.filter(culture => relatedIds.includes(culture.material?.id)).map(culture => getCultureEvidence(culture.id)),
         unresolved_material_ids: unresolved,
@@ -755,9 +772,13 @@
           });
         });
         if (inheritedStrains.size) {
-          item.append(element("small", "signal-lineage-batches", "Souches contributrices : " + [...inheritedStrains.values()].map(source =>
-            [source.label, source.origin ? "Origine : " + source.origin : null, source.supplier ? "Fournisseur : " + source.supplier : null].filter(Boolean).join(" · ")
-          ).join(" ; ")));
+          item.append(element("small", "signal-lineage-batches",
+            "Souches documentées dans la généalogie (non confirmées dans le produit) : " +
+            [...inheritedStrains.values()].map(source =>
+              [source.label, source.origin ? "Origine : " + source.origin : null, source.supplier ? "Fournisseur : " + source.supplier : null].filter(Boolean).join(" · ")
+            ).join(" ; ")));
+          item.append(element("small", "signal-lineage-composition",
+            "Composition biologique confirmée : non évaluée (aucun résultat analytique structuré associé)."));
         }
         const linkedBatches = lineage.batches.filter(batch => batch.material_id === material.id);
         if (linkedBatches.length) item.append(element("small", "signal-lineage-batches", "Lots matière : " +
