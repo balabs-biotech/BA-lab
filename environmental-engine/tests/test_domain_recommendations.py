@@ -96,7 +96,9 @@ def test_recommendation_is_withheld_when_required_context_is_missing():
     result = resolve_recommendations(make_interpretation(signal), profile)
 
     assert result.proposals[0].status == "withheld"
-    assert result.proposals[0].withholding_reasons == ("required_context_missing:system:fruiting_chamber",)
+    assert result.proposals[0].withholding_reasons == (
+        "required_context_missing:system:fruiting_chamber",
+    )
 
 
 def test_recommendation_is_withheld_for_a_contraindicated_context():
@@ -107,7 +109,9 @@ def test_recommendation_is_withheld_for_a_contraindicated_context():
     result = resolve_recommendations(make_interpretation(signal), profile)
 
     assert result.proposals[0].status == "withheld"
-    assert result.proposals[0].withholding_reasons == ("contraindicated_context:door_open_for_maintenance",)
+    assert result.proposals[0].withholding_reasons == (
+        "contraindicated_context:door_open_for_maintenance",
+    )
 
 
 def test_recommendation_is_withheld_when_signal_status_is_not_allowed():
@@ -121,7 +125,9 @@ def test_recommendation_is_withheld_when_signal_status_is_not_allowed():
 
 def test_recommendation_resolution_rejects_profile_version_mismatch():
     profile = make_profile()
-    interpretation = make_interpretation(make_signal()).model_copy(update={"profile_version": "2.0.0"})
+    interpretation = make_interpretation(
+        make_signal()
+    ).model_copy(update={"profile_version": "2.0.0"})
 
     with pytest.raises(ValueError, match="interpretation and recommendation profile must match"):
         resolve_recommendations(interpretation, profile)
