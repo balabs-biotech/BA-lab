@@ -68,23 +68,31 @@
 
   function assessNormalization(record) {
     if (record.record_type !== "measurement") return null;
-    const normalizer = window.BALabsNormalizer;
-    const catalogue = window.BA_LABS_GET_MEASUREMENT_CATALOGUE?.();
-    if (!normalizer?.normalizeMeasurement || !catalogue?.variables || !catalogue?.units) {
-      return { status: "blocked", reason: "catalogue_unavailable" };
+    try {
+      const normalizer = window.BALabsNormalizer;
+      const catalogue = window.BA_LABS_GET_MEASUREMENT_CATALOGUE?.();
+      if (!normalizer?.normalizeMeasurement || !catalogue?.variables || !catalogue?.units) {
+        return { status: "blocked", reason: "catalogue_unavailable" };
+      }
+      const variable = catalogue.variables.find((item) => item.code === record.data.variable_code);
+      if (!variable) return { status: "blocked", reason: "unknown_variable" };
+      return normalizer.normalizeMeasurement({
+        rawValue: record.data.raw_value,
+        rawUnitCode: record.data.raw_unit_code,
+        variable,
+        units: catalogue.units,
+      });
+    } catch (_) {
+      // Advisory conversion must never prevent the raw BAL-JSON record from
+      // being previewed or imported when catalogue loading is unavailable.
+      return { status: "blocked", reason: "normalizer_unavailable" };
     }
-    const variable = catalogue.variables.find((item) => item.code === record.data.variable_code);
-    if (!variable) return { status: "blocked", reason: "unknown_variable" };
-    return normalizer.normalizeMeasurement({
-      rawValue: record.data.raw_value,
-      rawUnitCode: record.data.raw_unit_code,
-      variable,
-      units: catalogue.units,
-    });
   }
 
   const normalizationMessages = {
     catalogue_unavailable: "Catalogue des unités indisponible : mesure brute conservée.",
+    unit_catalogue_unavailable: "Catalogue des unités indisponible : mesure brute conservée.",
+    normalizer_unavailable: "Moteur de normalisation indisponible : mesure brute conservée.",
     unknown_variable: "Variable absente du catalogue : aucune conversion proposée.",
     unknown_raw_unit: "Unité brute inconnue : aucune conversion proposée.",
     raw_unit_dimension_mismatch: "Dimension de l’unité incompatible avec la variable.",
