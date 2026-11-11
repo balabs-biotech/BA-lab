@@ -75,6 +75,13 @@ declare
   v_variable_dimension text;
   v_unit_dimension text;
 begin
+  if tg_op = 'DELETE' then
+    if old.status <> 'draft' then
+      raise exception 'biological_rule_version_immutable' using errcode = '55000';
+    end if;
+    return old;
+  end if;
+
   select v.dimension, u.dimension
     into v_variable_dimension, v_unit_dimension
     from public.variables v
@@ -82,13 +89,6 @@ begin
    where v.code = new.variable_code and u.code = new.unit_code;
   if not found or v_variable_dimension is distinct from v_unit_dimension then
     raise exception 'biological_rule_variable_unit_dimension_mismatch' using errcode = '23514';
-  end if;
-
-  if tg_op = 'DELETE' then
-    if old.status <> 'draft' then
-      raise exception 'biological_rule_version_immutable' using errcode = '55000';
-    end if;
-    return old;
   end if;
 
   if tg_op = 'UPDATE' then
