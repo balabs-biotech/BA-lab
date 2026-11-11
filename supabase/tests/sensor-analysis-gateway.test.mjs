@@ -72,7 +72,7 @@ assert.match(source, /transmission_expected_interval_seconds: transmissionExpect
 assert.match(source, /transmission_gap_tolerance_factor: transmissionGapToleranceFactor/, "explicit transmission tolerance must be forwarded");
 assert.match(source, /MAX_ROWS \+ 1/, "receipt history must enforce a bounded result size");
 assert.match(source, /sensor_receipt_limit_reached_narrow_date_range/, "receipt truncation must fail closed");
-assert.match(source, /profile\.valid_from \+ "T00:00:00\.000Z"/, "device expectation must be bounded by profile validity");
+assert.match(source, /expected_from: profile\.valid_from/, "device expectation must use the profile-local validity date");
 assert.ok(receiptForward > receiptRead, "receipt payload must be forwarded to the private engine");
 
 assert.match(source, /!rows\?\.length && transmissionExpectedInterval === undefined/, "empty measurement scope must remain an error unless transmission-only diagnostics were requested");
