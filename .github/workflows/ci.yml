@@ -290,6 +290,12 @@ jobs:
         run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/biological_signals_contract.test.sql
       - name: Test biological signal lifecycle authorization after replay
         run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/biological_signal_lifecycle.test.sql
+      - name: Test biological signal persistence constraints and grants after replay
+        run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/biological_signal_persistence.test.sql
+      - name: Test biological recommendation persistence security contract after replay
+        run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/biological_recommendation_persistence.test.sql
+      - name: Test persisted domain recommendation definitions after replay
+        run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/domain_profile_recommendations.test.sql
       - name: Prepare disposable database for Privacy & Audit Engine draft
         run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/privacy_audit_engine_draft_bootstrap.test.sql
       - name: Apply Privacy & Audit Engine review draft in disposable PostgreSQL
