@@ -32,7 +32,7 @@ begin
     raise exception 'material_mixture_requires_multiple_sources';
   end if;
   if cardinality(p_source_material_ids) <>
-     (select count(distinct source_id) from unnest(p_source_material_ids) as source_id) then
+     (select count(distinct source_id) from unnest(p_source_material_ids) as source_ids(source_id)) then
     raise exception 'material_mixture_sources_must_be_unique';
   end if;
   if v_operation is null or v_code is null then
@@ -86,7 +86,7 @@ begin
     organization_id, parent_material_id, child_material_id, relationship_type
   )
   select p_organization_id, source_id, v_material.id, v_operation
-    from unnest(p_source_material_ids) as source_id
+    from unnest(p_source_material_ids) as source_ids(source_id)
    order by source_id;
 
   insert into public.events(
