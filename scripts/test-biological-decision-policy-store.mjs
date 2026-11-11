@@ -33,7 +33,7 @@ function queryBuilder(table) {
   };
   return q;
 }
-const context={Object,Array,String,Date,Map,globalThis:{}};
+const context={Object,Array,String,Number,Date,Map,globalThis:{}};
 vm.runInNewContext(fs.readFileSync("shared/biological-decision-policy-store.js","utf8"),context);
 const store=context.globalThis.BALabsBiologicalDecisionPolicyStore;
 const assessment={id:"a1",organization_id:"org-1",domain:"mycology",rule_version_id:"rule-v1",status:"out_of_range"};
