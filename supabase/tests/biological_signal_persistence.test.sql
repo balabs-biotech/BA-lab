@@ -85,7 +85,7 @@ begin
      and c.conname = 'biological_signal_observations_observation_fk';
 
   if v_constraint is null or v_constraint not like
-    '%FOREIGN KEY (organization_id, observation_id) REFERENCES environmental_observations(organization_id, id)%' then
+    '%FOREIGN KEY (organization_id, observation_id) REFERENCES public.environmental_observations(organization_id, id)%' then
     raise exception 'FAIL: signal observation evidence must enforce tenant-scoped observation references';
   end if;
 
