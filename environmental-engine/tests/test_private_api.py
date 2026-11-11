@@ -1015,3 +1015,23 @@ def test_sensor_api_keeps_drift_not_evaluable_when_reference_is_unverified():
     assessment = response.json()["instrument_health"]["drift_diagnostics"]["assessments"][0]
     assert assessment["status"] == "not_evaluable"
     assert assessment["reason"] == "reference_pair_not_verified"
+
+
+def test_sensor_analysis_api_rejects_biological_context_starting_after_analysis_scope():
+    request = sensor_payload()
+    interpretation = sensor_biological_interpretation_payload(request)
+    interpretation["biological_context"]["valid_from"] = "2026-03-02"
+    request["biological_interpretation"] = interpretation
+    client = TestClient(create_app(engine_api_key="test-secret"))
+
+    response = client.post(
+        "/v1/analyses/sensors",
+        json=request,
+        headers={"X-BA-Engine-Key": "test-secret"},
+    )
+
+    assert response.status_code == 200, response.text
+    body = response.json()
+    assert body["interpretation_status"] == "context_invalid"
+    assert body["domain_interpretation"] is None
+    assert body["analysis"]["total_observations"] == 2
