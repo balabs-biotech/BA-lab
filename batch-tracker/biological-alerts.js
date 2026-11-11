@@ -23,7 +23,7 @@
     sensor_temporal: "Anomalie temporelle IoT (MAD robuste)"
   };
   const PAGE_SIZE = 100;
-  const state = { userId: null, organizationId: null, domain: null, rows: [], recommendationsBySignal: {}, environmentalEvidenceBySignal: {}, environmentalEvidenceAvailable: true, recommendationHistoryAvailable: true, filter: "active", severity: "all", method: "all", variable: "", request: 0, offset: 0, hasMore: false, loading: false, historyRequest: 0 };
+  const state = { userId: null, organizationId: null, domain: null, rows: [], recommendationsBySignal: {}, environmentalEvidenceBySignal: {}, environmentalEvidenceAvailable: true, recommendationHistoryAvailable: true, recommendationEvidenceAvailable: true, recommendationMeasurementCandidatesBySignal: {}, filter: "active", severity: "all", method: "all", variable: "", request: 0, offset: 0, hasMore: false, loading: false, historyRequest: 0 };
   const root = document.getElementById("biologicalSignalsCard");
   if (!root) return;
 
@@ -103,6 +103,29 @@
       truncated: paths.length > 100 || changes.length >= 40
     };
   };
+
+  async function linkRecommendationOutcomeMeasurement(recommendation, measurementId, button) {
+    if (!state.organizationId || !recommendation?.recommendation_id ||
+        recommendation.lifecycle_status !== "outcome_recorded" || !measurementId) return;
+    button.disabled = true;
+    const { error } = await client.rpc("link_biological_recommendation_outcome_measurement", {
+      p_organization_id: state.organizationId,
+      p_recommendation_id: recommendation.recommendation_id,
+      p_measurement_id: measurementId
+    });
+    if (error) {
+      console.error("[CultureOps recommendation evidence] Link failed", error.message);
+      notify(error.message?.includes("outside_outcome_window")
+        ? "Cette mesure est hors de la période entre l’exécution et le résultat documenté."
+        : error.message?.includes("context_mismatch")
+          ? "Cette mesure ne correspond pas au sujet biologique ni à son environnement."
+          : "Lien de preuve refusé. Vérifiez le contexte, la période et les droits.", true);
+      button.disabled = false;
+      return;
+    }
+    notify("Mesure liée au résultat documenté. Ce lien établit la traçabilité, pas une causalité.");
+    await loadSignals();
+  }
 
   async function transitionRecommendation(recommendation, action, controls = {}) {
     if (!state.organizationId || !recommendation?.recommendation_id) return;
@@ -267,6 +290,74 @@
         contextPanel.append(element("small", "signal-recommendation-warning",
           "Écart temporel descriptif uniquement : il ne démontre pas un effet de la recommandation."));
         item.append(contextPanel);
+        if (recommendation.lifecycle_status === "outcome_recorded") {
+          const evidencePanel = element("div", "signal-recommendation-outcome-evidence");
+          evidencePanel.append(element("strong", "", "Mesures quantitatives liées au résultat"));
+          const linkedMeasurements = recommendation.outcome_measurements || [];
+          if (!state.recommendationEvidenceAvailable) {
+            evidencePanel.append(element("small", "signal-recommendation-warning",
+              "Lecture des liens ou des mesures incomplète : l’exhaustivité des preuves ne peut pas être garantie."));
+          } else if (linkedMeasurements.length) {
+            linkedMeasurements.forEach(link => {
+              const measurement = link.measurement;
+              if (!measurement) return;
+              const value = measurement.normalized_value !== null && measurement.normalized_value !== undefined
+                ? String(measurement.normalized_value) + (measurement.normalized_unit_code ? " " + measurement.normalized_unit_code : "")
+                : measurement.raw_value !== null && measurement.raw_value !== undefined
+                  ? String(measurement.raw_value) + (measurement.raw_unit_code ? " " + measurement.raw_unit_code : "")
+                  : "Valeur non disponible";
+              evidencePanel.append(element("small", "",
+                (measurement.variable_code || "Mesure") + " · " + value + " · " +
+                dateLabel(measurement.measured_at) + " · " +
+                (link.evidence_scope === "biological_subject" ? "Sujet biologique" : "Contexte environnemental")));
+            });
+          } else {
+            evidencePanel.append(element("small", "", "Aucune mesure quantitative n’est encore reliée à ce résultat."));
+          }
+          if (state.recommendationEvidenceAvailable) {
+            const eventsForWindow = Array.isArray(recommendation.events) ? recommendation.events : [];
+            const executionEvent = eventsForWindow.find(event => event.action === "record_execution");
+            const outcomeEvent = eventsForWindow.find(event => event.action === "record_outcome");
+            const lower = new Date(executionEvent?.occurred_at || "").getTime();
+            const upper = new Date(recommendation.outcome_observed_at || outcomeEvent?.outcome_observed_at || "").getTime();
+            const linkedIds = new Set(linkedMeasurements.map(link => link.measurement_id));
+            const candidates = (state.recommendationMeasurementCandidatesBySignal[row.signal_id] || []).filter(measurement => {
+              const measuredAt = new Date(measurement.measured_at || "").getTime();
+              const sameSubject = measurement.culture_id === row.biological_subject_id ||
+                measurement.plant_culture_id === row.biological_subject_id;
+              const sameEnvironment = measurement.environment_id === row.environment_id;
+              return Number.isFinite(lower) && Number.isFinite(upper) && Number.isFinite(measuredAt) &&
+                measuredAt >= lower && measuredAt <= upper && (sameSubject || sameEnvironment) &&
+                !linkedIds.has(measurement.id);
+            });
+            if (candidates.length) {
+              const selector = element("select", "signal-recommendation-measurement-select");
+              const placeholder = element("option", "");
+              placeholder.value = "";
+              placeholder.textContent = "Sélectionner une mesure dans la période…";
+              selector.append(placeholder);
+              candidates.forEach(measurement => {
+                const option = element("option", "");
+                option.value = measurement.id;
+                const value = measurement.normalized_value !== null && measurement.normalized_value !== undefined
+                  ? String(measurement.normalized_value) + (measurement.normalized_unit_code ? " " + measurement.normalized_unit_code : "")
+                  : String(measurement.raw_value ?? "valeur indisponible") + (measurement.raw_unit_code ? " " + measurement.raw_unit_code : "");
+                option.textContent = (measurement.variable_code || "Mesure") + " · " + value + " · " + dateLabel(measurement.measured_at);
+                selector.append(option);
+              });
+              const linkButton = element("button", "secondary-button", "Lier la mesure au résultat");
+              linkButton.type = "button";
+              linkButton.addEventListener("click", () =>
+                linkRecommendationOutcomeMeasurement(recommendation, selector.value, linkButton));
+              evidencePanel.append(selector, linkButton);
+            } else {
+              evidencePanel.append(element("small", "", "Aucune mesure admissible dans la période d’exécution au résultat pour ce sujet ou cet environnement."));
+            }
+          }
+          evidencePanel.append(element("small", "signal-recommendation-warning",
+            "Le rattachement est une relation de traçabilité temporelle et contextuelle ; il ne démontre pas que la recommandation a causé le résultat."));
+          item.append(evidencePanel);
+        }
         if (recommendation.rationale_code) item.append(element("small", "", "Motif : " + recommendation.rationale_code));
         if (Array.isArray(recommendation.withholding_reasons) && recommendation.withholding_reasons.length) {
           item.append(element("small", "signal-recommendation-withheld",
@@ -410,6 +501,8 @@
     const environmentalEvidenceBySignal = append ? { ...state.environmentalEvidenceBySignal } : {};
     state.recommendationHistoryAvailable = append ? state.recommendationHistoryAvailable : true;
     state.environmentalEvidenceAvailable = append ? state.environmentalEvidenceAvailable : true;
+    state.recommendationEvidenceAvailable = append ? state.recommendationEvidenceAvailable : true;
+    const recommendationMeasurementCandidatesBySignal = append ? { ...state.recommendationMeasurementCandidatesBySignal } : {};
     if (signalIds.length) {
       const evidenceResult = await client.from("biological_signal_evidence")
         .select("signal_id,source_kind,environmental_observation_id,measurement_id")
@@ -492,15 +585,92 @@
           eventsByRecommendation.get(event.recommendation_id).push(event);
         });
         eventsByRecommendation.forEach(events => events.sort((left, right) => left.revision - right.revision));
+        const recommendationIdsForEvidence = recommendations.map(item => item.recommendation_id);
+        const outcomeLinksResult = await client.from("biological_recommendation_outcome_measurements")
+          .select("recommendation_id,outcome_event_id,measurement_id,evidence_scope,linked_by,linked_at")
+          .eq("organization_id", state.organizationId)
+          .in("recommendation_id", recommendationIdsForEvidence)
+          .limit(1000);
+        if (request !== state.request) return;
+        const outcomeLinksByRecommendation = new Map();
+        const linkedMeasurementIds = [];
+        if (outcomeLinksResult.error || (outcomeLinksResult.data || []).length >= 1000) {
+          state.recommendationEvidenceAvailable = false;
+          console.error("[CultureOps recommendation evidence] Link read incomplete",
+            outcomeLinksResult.error?.message || "read_limit_reached");
+        } else {
+          (outcomeLinksResult.data || []).forEach(link => {
+            linkedMeasurementIds.push(link.measurement_id);
+            if (!outcomeLinksByRecommendation.has(link.recommendation_id)) {
+              outcomeLinksByRecommendation.set(link.recommendation_id, []);
+            }
+            outcomeLinksByRecommendation.get(link.recommendation_id).push(link);
+          });
+        }
+        let linkedMeasurementsById = new Map();
+        if (linkedMeasurementIds.length && state.recommendationEvidenceAvailable) {
+          const linkedMeasurementsResult = await client.from("measurements")
+            .select("id,variable_code,normalized_value,normalized_unit_code,raw_value,raw_unit_code,measured_at,culture_id,plant_culture_id,environment_id")
+            .eq("organization_id", state.organizationId)
+            .in("id", [...new Set(linkedMeasurementIds)]);
+          if (request !== state.request) return;
+          if (linkedMeasurementsResult.error ||
+              (linkedMeasurementsResult.data || []).length !== new Set(linkedMeasurementIds).size) {
+            state.recommendationEvidenceAvailable = false;
+          } else {
+            linkedMeasurementsById = new Map((linkedMeasurementsResult.data || []).map(item => [item.id, item]));
+          }
+        }
         recommendations.forEach(recommendation => {
-          const linked = { ...recommendation, events: eventsByRecommendation.get(recommendation.recommendation_id) || [] };
+          const outcomeMeasurements = (outcomeLinksByRecommendation.get(recommendation.recommendation_id) || [])
+            .map(link => ({ ...link, measurement: linkedMeasurementsById.get(link.measurement_id) || null }));
+          if (outcomeMeasurements.some(link => !link.measurement)) state.recommendationEvidenceAvailable = false;
+          const linked = {
+            ...recommendation,
+            events: eventsByRecommendation.get(recommendation.recommendation_id) || [],
+            outcome_measurements: outcomeMeasurements
+          };
           if (!recommendationsBySignal[recommendation.source_signal_id]) recommendationsBySignal[recommendation.source_signal_id] = [];
           recommendationsBySignal[recommendation.source_signal_id].push(linked);
         });
+        if (recommendations.some(item => item.lifecycle_status === "outcome_recorded")) {
+          const subjectIds = [...new Set(page.map(row => row.biological_subject_id).filter(Boolean))];
+          const environmentIds = [...new Set(page.map(row => row.environment_id).filter(Boolean))];
+          const measurementFilters = [];
+          if (subjectIds.length) {
+            measurementFilters.push("culture_id.in.(" + subjectIds.join(",") + ")");
+            measurementFilters.push("plant_culture_id.in.(" + subjectIds.join(",") + ")");
+          }
+          if (environmentIds.length) measurementFilters.push("environment_id.in.(" + environmentIds.join(",") + ")");
+          if (measurementFilters.length) {
+            const candidateResult = await client.from("measurements")
+              .select("id,variable_code,normalized_value,normalized_unit_code,raw_value,raw_unit_code,measured_at,culture_id,plant_culture_id,environment_id")
+              .eq("organization_id", state.organizationId)
+              .or(measurementFilters.join(","))
+              .order("measured_at", { ascending: false })
+              .limit(1000);
+            if (request !== state.request) return;
+            if (candidateResult.error || (candidateResult.data || []).length >= 1000) {
+              state.recommendationEvidenceAvailable = false;
+              console.error("[CultureOps recommendation evidence] Candidate read incomplete",
+                candidateResult.error?.message || "read_limit_reached");
+            } else {
+              page.forEach(row => {
+                recommendationMeasurementCandidatesBySignal[row.signal_id] =
+                  (candidateResult.data || []).filter(measurement =>
+                    measurement.culture_id === row.biological_subject_id ||
+                    measurement.plant_culture_id === row.biological_subject_id ||
+                    measurement.environment_id === row.environment_id
+                  );
+              });
+            }
+          }
+        }
       }
     }
     state.recommendationsBySignal = recommendationsBySignal;
     state.environmentalEvidenceBySignal = environmentalEvidenceBySignal;
+    state.recommendationMeasurementCandidatesBySignal = recommendationMeasurementCandidatesBySignal;
     state.loading = false;
     state.rows = append ? state.rows.concat(page) : page;
     state.offset += page.length;
