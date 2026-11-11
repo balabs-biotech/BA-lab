@@ -10,6 +10,8 @@ const locales = read("batch-tracker/i18n.js");
 const lineageIndexMigration = read("supabase/migrations/20261110220000_add_material_relationship_reverse_index.sql");
 const mixtureMigration = read("supabase/migrations/20261110230000_add_atomic_multi_source_material_creation.sql");
 const interpretationMigration = read("supabase/migrations/20261112090000_add_biological_interpretation_registry.sql");
+const recommendationOutcomeEvidenceMigration = read("supabase/migrations/20261112100000_link_recommendation_outcomes_to_measurements.sql");
+const recommendationOutcomeEvidenceContractTest = read("supabase/tests/biological_recommendation_outcome_evidence.test.sql");
 const environmentalAnalysisFunction = read("supabase/functions/environmental-analysis/index.ts");
 const traceabilityRuntimeTest = read("supabase/tests/biological_traceability.test.sql");
 
@@ -449,6 +451,16 @@ assert.match(moduleSource, /if \(eventRows\.length >= 2000\) state\.recommendati
 assert.match(moduleSource, /state\.recommendationHistoryAvailable = append \? state\.recommendationHistoryAvailable : true/);
 assert.match(moduleSource, /Lecture des recommandations indisponible ou incomplète/);
 assert.match(moduleSource, /transition_biological_recommendation/);
+assert.match(recommendationOutcomeEvidenceMigration, /create table public\.biological_recommendation_outcome_measurements/);
+assert.match(recommendationOutcomeEvidenceMigration, /references public\.biological_recommendation_events/);
+assert.match(recommendationOutcomeEvidenceMigration, /references public\.measurements/);
+assert.match(recommendationOutcomeEvidenceMigration, /private\.is_org_writer\(p_organization_id\)/);
+assert.match(recommendationOutcomeEvidenceMigration, /v_measurement\.measured_at < v_execution_at/);
+assert.match(recommendationOutcomeEvidenceMigration, /v_measurement\.measured_at > v_outcome_event\.outcome_observed_at/);
+assert.match(recommendationOutcomeEvidenceMigration, /biological_recommendation_measurement_context_mismatch/);
+assert.match(recommendationOutcomeEvidenceMigration, /biological_recommendation_outcome_measurements_append_only/);
+assert.match(recommendationOutcomeEvidenceContractTest, /outcome evidence links must be append-only/);
+assert.match(recommendationOutcomeEvidenceContractTest, /temporal and biological\/environmental scope/);
 assert.match(moduleSource, /biological_recommendation_outcome_measurements/);
 assert.match(moduleSource, /link_biological_recommendation_outcome_measurement/);
 assert.match(moduleSource, /recommendationMeasurementCandidatesBySignal/);
