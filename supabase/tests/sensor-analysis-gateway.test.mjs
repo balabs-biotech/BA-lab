@@ -59,3 +59,18 @@ assert.match(source, /flatline_minimum_duration_seconds: flatlineMinimumDuration
 assert.match(source, /flatline_diagnostic_parameters_must_be_supplied_together_and_within_limits/, "partial or out-of-range flatline configuration must be rejected");
 assert.match(source, /flatlineMinimumObservations > MAX_ROWS/, "flatline observation count must not exceed the measurement cap");
 console.log("PASS: sensor analysis gateway security and instrument-health contract");
+
+const receiptRead = source.indexOf('.from("iot_ingest_receipts")');
+const deviceRegistryRead = source.indexOf('.from("iot_devices")');
+const receiptForward = source.indexOf("transmission_receipts: transmissionReceiptPayload");
+assert.ok(receiptRead > membershipRead, "receipt history must be read only after tenant membership authorization");
+assert.ok(deviceRegistryRead > membershipRead, "device registry must be read only after tenant membership authorization");
+assert.ok(receiptRead < engineCall, "receipt history must be retrieved before the private engine call");
+assert.ok(deviceRegistryRead < receiptRead, "profile-bound device registry must be resolved before receipt history");
+assert.match(source, /\.in\("device_id", sensorIds\)/, "receipt history must be limited to profile-bound device IDs");
+assert.match(source, /transmission_expected_interval_seconds: transmissionExpectedInterval/, "explicit transmission cadence must be forwarded");
+assert.match(source, /transmission_gap_tolerance_factor: transmissionGapToleranceFactor/, "explicit transmission tolerance must be forwarded");
+assert.match(source, /MAX_ROWS \+ 1/, "receipt history must enforce a bounded result size");
+assert.match(source, /sensor_receipt_limit_reached_narrow_date_range/, "receipt truncation must fail closed");
+assert.match(source, /profile\.valid_from \+ "T00:00:00\.000Z"/, "device expectation must be bounded by profile validity");
+assert.ok(receiptForward > receiptRead, "receipt payload must be forwarded to the private engine");
