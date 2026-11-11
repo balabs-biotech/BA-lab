@@ -21,6 +21,7 @@ from ba_environmental_engine.contexts.biological import BiologicalContext
 from ba_environmental_engine.contexts.environment import EnvironmentContext
 from ba_environmental_engine.interpretation.models import DomainProfile
 from ba_environmental_engine.interpretation.service import interpret_analysis_for_biological_context
+from ba_environmental_engine.interpretation.recommendations import resolve_recommendations
 from ba_environmental_engine.interpretation.sensor_service import interpret_sensor_analysis_for_biological_context
 
 from ba_environmental_engine import __version__
@@ -350,6 +351,7 @@ def _analysis_with_optional_interpretation(
         response.update(
             interpretation_status="not_requested",
             domain_interpretation=None,
+            recommendation_resolution=None,
         )
         return response
 
@@ -380,12 +382,18 @@ def _analysis_with_optional_interpretation(
         response.update(
             interpretation_status="context_invalid",
             domain_interpretation=None,
+            recommendation_resolution=None,
         )
         return response
 
+    recommendation_resolution = resolve_recommendations(
+        interpretation,
+        domain_profile,
+    )
     response.update(
         interpretation_status="interpreted",
         domain_interpretation=interpretation.model_dump(mode="json"),
+        recommendation_resolution=recommendation_resolution.model_dump(mode="json"),
     )
     return response
 
@@ -658,6 +666,7 @@ def create_app(engine_api_key: str | None = None) -> FastAPI:
 
             interpretation_status = "not_requested"
             domain_interpretation = None
+            recommendation_resolution = None
             if request.biological_interpretation is not None:
                 try:
                     biological_context = BiologicalContext.model_validate(
@@ -701,6 +710,9 @@ def create_app(engine_api_key: str | None = None) -> FastAPI:
                     )
                     interpretation_status = "interpreted"
                     domain_interpretation = jsonable_encoder(interpretation)
+                    recommendation_resolution = jsonable_encoder(
+                        resolve_recommendations(interpretation, domain_profile)
+                    )
                 except (KeyError, TypeError, ValueError, ValidationError):
                     interpretation_status = "context_invalid"
 
@@ -716,6 +728,7 @@ def create_app(engine_api_key: str | None = None) -> FastAPI:
                 },
                 "interpretation_status": interpretation_status,
                 "domain_interpretation": domain_interpretation,
+                "recommendation_resolution": recommendation_resolution,
             }
         except (ValueError, LookupError) as exc:
             raise HTTPException(status_code=422, detail=str(exc)) from exc
