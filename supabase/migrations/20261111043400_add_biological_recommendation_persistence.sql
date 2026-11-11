@@ -223,6 +223,8 @@ as $$
 declare
   v_signal public.biological_signals%rowtype;
   v_recommendation public.biological_recommendations%rowtype;
+  v_existing public.biological_recommendations%rowtype;
+  v_events jsonb;
 begin
   if coalesce(auth.role(), '') <> 'service_role' then
     raise exception 'biological_recommendation_create_forbidden'
@@ -274,6 +276,45 @@ begin
       using errcode = '23514';
   end if;
 
+  -- Stable proposal IDs make retries expected. Return an existing aggregate
+  -- only when every immutable proposal field is identical.
+  select r.* into v_existing
+    from public.biological_recommendations r
+   where r.organization_id = p_organization_id
+     and r.recommendation_id = p_recommendation_id
+   for update;
+
+  if found then
+    if v_existing.recommendation_code is distinct from p_recommendation_code
+       or v_existing.profile_id is distinct from p_profile_id
+       or v_existing.profile_version is distinct from p_profile_version
+       or v_existing.module is distinct from p_module
+       or v_existing.source_signal_id is distinct from p_source_signal_id
+       or v_existing.source_analysis_id is distinct from p_source_analysis_id
+       or v_existing.source_finding_id is distinct from p_source_finding_id
+       or v_existing.instruction_code is distinct from p_instruction_code
+       or v_existing.rationale_code is distinct from p_rationale_code
+       or v_existing.proposal_status is distinct from p_proposal_status
+       or v_existing.withholding_reasons is distinct from p_withholding_reasons then
+      raise exception 'biological_recommendation_proposal_idempotency_conflict'
+        using errcode = '23505';
+    end if;
+
+    select coalesce(
+      jsonb_agg(to_jsonb(e) order by e.revision),
+      '[]'::jsonb
+    ) into v_events
+      from public.biological_recommendation_events e
+     where e.organization_id = p_organization_id
+       and e.recommendation_id = p_recommendation_id;
+
+    return jsonb_build_object(
+      'recommendation', to_jsonb(v_existing),
+      'events', v_events,
+      'idempotent_replay', true
+    );
+  end if;
+
   insert into public.biological_recommendations (
     organization_id, recommendation_id, recommendation_code,
     profile_id, profile_version, module,
@@ -291,7 +332,8 @@ begin
 
   return jsonb_build_object(
     'recommendation', to_jsonb(v_recommendation),
-    'events', '[]'::jsonb
+    'events', '[]'::jsonb,
+    'idempotent_replay', false
   );
 end;
 $$;
