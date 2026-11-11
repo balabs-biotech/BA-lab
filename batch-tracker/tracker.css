@@ -3079,3 +3079,61 @@ body[data-domain] :is(button, input, select, textarea, a, [tabindex]):focus-visi
   font-size: 11px;
   overflow-wrap: anywhere;
 }
+
+#biologicalSignalsCard .signal-recommendation-panel {
+  display: grid;
+  gap: 0.65rem;
+  margin: 0.8rem 0;
+  padding: 0.8rem;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  min-width: 0;
+}
+#biologicalSignalsCard .signal-recommendation-item {
+  display: grid;
+  gap: 0.45rem;
+  min-width: 0;
+  padding-top: 0.65rem;
+  border-top: 1px solid var(--border);
+}
+#biologicalSignalsCard .signal-recommendation-heading {
+  font-weight: 650;
+  overflow-wrap: anywhere;
+}
+#biologicalSignalsCard .signal-recommendation-item small,
+#biologicalSignalsCard .signal-recommendation-events small {
+  display: block;
+  color: var(--muted);
+  font-size: 11px;
+  overflow-wrap: anywhere;
+}
+#biologicalSignalsCard .signal-recommendation-withheld,
+#biologicalSignalsCard .signal-recommendation-warning {
+  color: var(--warning, var(--muted));
+}
+#biologicalSignalsCard .signal-recommendation-events {
+  margin: 0;
+  padding-left: 1.2rem;
+  display: grid;
+  gap: 0.4rem;
+}
+#biologicalSignalsCard .signal-recommendation-controls {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.45rem;
+}
+#biologicalSignalsCard .signal-recommendation-note,
+#biologicalSignalsCard .signal-recommendation-date {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  padding: 0.55rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface, transparent);
+  color: inherit;
+  font: inherit;
+}
+#biologicalSignalsCard .signal-recommendation-controls button {
+  justify-self: start;
+}
