@@ -18,6 +18,7 @@ const policy = {
 assert.equal(engine.version, "0.1.0");
 assert.equal(engine.evaluate({ domain: "mycology", assessment }).status, "decision_not_configured");
 assert.equal(engine.evaluate({ domain: "mycology", assessment, policies: [policy] }).status, "decision_candidate");
+assert.equal(engine.evaluate({ domain: "mycology", assessment, policies: [{...policy,sources:[{type:"protocol"}]}] }).status, "decision_not_configured");
 assert.equal(engine.evaluate({ domain: "mycology", assessment, policies: [policy] }).automatic_action_taken, false);
 assert.equal(engine.evaluate({ domain: "mycology", assessment, policies: [policy, policy] }).status, "ambiguous_decision_policy");
 assert.equal(engine.evaluate({ domain: "mycology", assessment: { ...assessment, status: "normal" }, policies: [policy] }).status, "no_decision_candidate");
