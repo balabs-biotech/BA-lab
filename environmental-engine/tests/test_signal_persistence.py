@@ -259,16 +259,19 @@ def test_repository_fails_closed_when_persisted_signal_cannot_be_reloaded():
 
 
 def test_repository_replay_does_not_overwrite_operational_signal_status():
-    organization_id, biological, environment, interpretation, signal = make_contexts()
-    existing = {
-        "organization_id": str(organization_id),
-        "signal_id": str(signal.signal_id),
-        "signal_status": "acknowledged",
-        "message_code": signal.message_code,
-    }
-    client = FakeSupabase(rows=[existing])
+    organization_id, biological, environment, interpretation, _ = make_contexts()
+    client = FakeSupabase()
+    repository = SupabaseBiologicalSignalRepository(client)
 
-    persisted = SupabaseBiologicalSignalRepository(client).persist_interpretation(
+    repository.persist_interpretation(
+        organization_id=organization_id,
+        interpretation=interpretation,
+        biological_context=biological,
+        environment_context=environment,
+    )
+    client.rows[0]["signal_status"] = "acknowledged"
+
+    persisted = repository.persist_interpretation(
         organization_id=organization_id,
         interpretation=interpretation,
         biological_context=biological,
@@ -276,6 +279,35 @@ def test_repository_replay_does_not_overwrite_operational_signal_status():
     )
 
     assert persisted[0]["signal_status"] == "acknowledged"
+
+
+def test_repository_rejects_replay_with_changed_immutable_scientific_content():
+    organization_id, biological, environment, interpretation, signal = make_contexts()
+    client = FakeSupabase()
+    repository = SupabaseBiologicalSignalRepository(client)
+    repository.persist_interpretation(
+        organization_id=organization_id,
+        interpretation=interpretation,
+        biological_context=biological,
+        environment_context=environment,
+    )
+    changed_signal = signal.model_copy(
+        update={"message_code": "different_scientific_interpretation"}
+    )
+    changed_interpretation = interpretation.model_copy(
+        update={"signals": (changed_signal,)}
+    )
+
+    with pytest.raises(
+        BiologicalSignalPersistenceError,
+        match="conflicting immutable content",
+    ):
+        repository.persist_interpretation(
+            organization_id=organization_id,
+            interpretation=changed_interpretation,
+            biological_context=biological,
+            environment_context=environment,
+        )
 
 
 def test_repository_rejects_mixed_source_analyses_in_one_batch():
