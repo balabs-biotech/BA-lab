@@ -129,31 +129,49 @@
       },
       "anyOf": [
         {
+          "properties": {
+            "culture_id": true
+          },
           "required": [
             "culture_id"
           ]
         },
         {
+          "properties": {
+            "plant_culture_id": true
+          },
           "required": [
             "plant_culture_id"
           ]
         },
         {
+          "properties": {
+            "material_id": true
+          },
           "required": [
             "material_id"
           ]
         },
         {
+          "properties": {
+            "sample_id": true
+          },
           "required": [
             "sample_id"
           ]
         },
         {
+          "properties": {
+            "experimental_unit_id": true
+          },
           "required": [
             "experimental_unit_id"
           ]
         },
         {
+          "properties": {
+            "batch_id": true
+          },
           "required": [
             "batch_id"
           ]
