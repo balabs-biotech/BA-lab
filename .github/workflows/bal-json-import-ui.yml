@@ -18,6 +18,10 @@ on:
       - "scripts/test-biological-decision-engine.mjs"
       - "shared/biological-decision-policy-store.js"
       - "scripts/test-biological-decision-policy-store.mjs"
+      - "shared/biological-decision-policy-authoring.js"
+      - "shared/biological-decision-policy-management-ui.js"
+      - "scripts/test-biological-decision-policy-authoring.mjs"
+      - "batch-tracker/tracker.js"
       - "supabase/migrations/20261111200000_add_biological_decision_policy_store.sql"
       - "supabase/tests/biological-decision-policy-store-security.test.sql"
       - "supabase/migrations/20261111190000_add_biological_assessment_history.sql"
@@ -110,6 +114,8 @@ jobs:
         run: node scripts/test-biological-decision-engine.mjs
       - name: Test tenant-scoped biological decision policy store
         run: node scripts/test-biological-decision-policy-store.mjs
+      - name: Test biological decision policy authoring lifecycle
+        run: node scripts/test-biological-decision-policy-authoring.mjs
       - name: Test append-only biological assessment persistence
         run: node scripts/test-biological-assessment-store.mjs
       - name: Test biological assessment history UI boundaries
