@@ -52,6 +52,10 @@ const sampleOnly = structuredClone(measurementExample);
 sampleOnly.data.context = { sample_id: "7b6c2b3d-4a6f-4b3e-8a1f-5b4c3d2e1f00" };
 assert.equal(validateRecord(sampleOnly), false, "sample-only context is not accepted by the current manual-write RPC contract");
 
+const unsupportedAnchor = structuredClone(measurementExample);
+unsupportedAnchor.data.context.sample_id = "7b6c2b3d-4a6f-4b3e-8a1f-5b4c3d2e1f00";
+assert.equal(validateRecord(unsupportedAnchor), false, "unsupported sample reference must not be silently dropped when another anchor is present");
+
 const emptyObservation = structuredClone(observationExample);
 emptyObservation.data.value_text = "";
 assert.equal(validateRecord(emptyObservation), false, "empty qualitative observation must be rejected");
