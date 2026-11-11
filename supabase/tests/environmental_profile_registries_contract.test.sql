@@ -37,6 +37,42 @@ begin
   if not exists (
     select 1 from pg_constraint
     where conrelid = 'public.environment_context_profiles'::regclass
+      and conname = 'environment_context_profiles_sensor_parent_key'
+  ) or not exists (
+    select 1 from pg_constraint
+    where conrelid = 'public.iot_devices'::regclass
+      and conname = 'iot_devices_org_environment_id_key'
+  ) or not exists (
+    select 1 from pg_constraint
+    where conrelid = 'public.environment_context_profile_sensors'::regclass
+      and conname = 'environment_context_profile_sensors_profile_fk'
+  ) or not exists (
+    select 1 from pg_constraint
+    where conrelid = 'public.environment_context_profile_sensors'::regclass
+      and conname = 'environment_context_profile_sensors_device_fk'
+  ) then
+    raise exception 'FAIL: sensor bindings must be constrained to one tenant and environment';
+  end if;
+
+  if not exists (
+    select 1 from information_schema.columns
+    where table_schema='public' and table_name='environment_context_profile_sensors'
+      and column_name='environment_id' and is_nullable='NO'
+  ) or not exists (
+    select 1 from information_schema.columns
+    where table_schema='public' and table_name='environment_context_profiles'
+      and column_name='activated_at'
+  ) or not exists (
+    select 1 from information_schema.columns
+    where table_schema='public' and table_name='domain_interpretation_profiles'
+      and column_name='retired_at'
+  ) then
+    raise exception 'FAIL: versioned sensor profile lifecycle columns are incomplete';
+  end if;
+
+  if not exists (
+    select 1 from pg_constraint
+    where conrelid = 'public.environment_context_profiles'::regclass
       and conname = 'environment_context_profiles_environment_fk'
   ) or not exists (
     select 1 from pg_constraint
