@@ -2,6 +2,7 @@
 
 from datetime import datetime
 from typing import Literal
+from uuid import UUID, uuid4
 
 from pydantic import Field, field_validator, model_validator
 
@@ -15,6 +16,7 @@ LifecycleAction = Literal["accept", "reject", "record_execution", "record_outcom
 
 
 class RecommendationLifecycleEvent(InterpretationModel):
+    event_id: UUID = Field(default_factory=uuid4)
     action: LifecycleAction
     actor_id: str = Field(min_length=1, max_length=160)
     occurred_at: datetime
@@ -35,6 +37,7 @@ class RecommendationLifecycleEvent(InterpretationModel):
 
 class RecommendationLifecycle(InterpretationModel):
     proposal: RecommendationProposal
+    revision: int = Field(default=0, ge=0)
     status: LifecycleStatus
     events: tuple[RecommendationLifecycleEvent, ...] = ()
     execution_details: str | None = None
@@ -76,6 +79,8 @@ class RecommendationLifecycle(InterpretationModel):
             expected_status = next_status
             previous_event = event
 
+        if self.revision != len(self.events):
+            raise ValueError("lifecycle status does not match event history")
         if (
             self.status != expected_status
             or self.execution_details != execution_details
@@ -150,6 +155,7 @@ def transition_recommendation(
             )
     return RecommendationLifecycle(
         proposal=lifecycle.proposal,
+        revision=lifecycle.revision + 1,
         status=next_status,
         events=(*lifecycle.events, event),
         execution_details=(
