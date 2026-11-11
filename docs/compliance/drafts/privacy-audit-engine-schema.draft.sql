@@ -425,6 +425,9 @@ begin
     raise exception 'legal_document_version_not_retirable';
   end if;
 
+  -- Serialize retirement with publication for the same document type.
+  perform pg_advisory_xact_lock(hashtext('ba_labs_legal_doc:' || target_document_type));
+
   if target_document_type in ('terms','privacy_notice') then
     select exists (
       select 1 from private.legal_document_versions successor
