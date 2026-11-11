@@ -94,12 +94,24 @@
         {
           "required": [
             "taxon_code"
-          ]
+          ],
+          "properties": {
+            "taxon_code": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
         },
         {
           "required": [
             "strain_code"
-          ]
+          ],
+          "properties": {
+            "strain_code": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
         }
       ]
     },
@@ -186,5 +198,24 @@
         }
       }
     }
-  }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "reviewed"
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "then": {
+        "required": [
+          "review"
+        ]
+      }
+    }
+  ]
 }
