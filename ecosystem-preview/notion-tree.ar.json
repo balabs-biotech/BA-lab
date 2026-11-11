@@ -781,24 +781,6 @@
       "description": "موارد عامة لاستكشاف الأعمال الموثّقة وفهم حدود الأدلة والتعرّف على طرق التعاون مع BA Labs.",
       "children": [
         {
-          "id": "learn-work",
-          "title": "الأعمال والمشاريع الموثّقة",
-          "url": "https://app.notion.com/p/40173152f17181c7ab4ad1cdeac8d075",
-          "children": []
-        },
-        {
-          "id": "learn-evidence",
-          "title": "ما الذي تدعمه الأدلة حاليًا؟",
-          "url": "https://app.notion.com/p/40173152f17181eb86f6f623452f9f5d",
-          "children": []
-        },
-        {
-          "id": "learn-catalogue",
-          "title": "الفهرس العام — الموارد البيولوجية",
-          "url": "https://app.notion.com/p/40173152f171817d8608cafa8a118065",
-          "children": []
-        },
-        {
           "id": "learn-collaborate",
           "title": "التعاون مع BA Labs",
           "url": "https://app.notion.com/p/40173152f17181598fc7f2f5a3e64e8a",
