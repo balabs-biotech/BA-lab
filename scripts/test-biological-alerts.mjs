@@ -407,5 +407,13 @@ assert.match(moduleSource, /biologicalInterpretationEvents\.length >= 2000/);
 
 assert.match(interpretationMigration, /revoke all on function private\.prevent_biological_interpretation_mutation\(\)/);
 
+assert.match(interpretationMigration, /create or replace function public\.review_biological_interpretation/);
+assert.match(interpretationMigration, /private\.is_org_member\(p_organization_id\)/);
+assert.match(interpretationMigration, /p_decision is null/);
+assert.match(interpretationMigration, /'accepted', 'contested', 'reassessment_requested'/);
+assert.match(interpretationMigration, /'reviewed',\s+'user', v_actor_id/);
+assert.match(interpretationMigration, /grant execute on function public\.review_biological_interpretation[\s\S]*to authenticated/);
+assert.match(interpretationMigration, /revoke all on function public\.review_biological_interpretation[\s\S]*from public, anon/);
+
 assert.match(moduleSource, /String\(event\.event_payload\.note\)/);
 assert.match(moduleSource, /event\.actor_kind === "user" \? "Action utilisateur" : "Événement système"/);
