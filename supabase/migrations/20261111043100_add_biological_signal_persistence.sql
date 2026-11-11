@@ -123,7 +123,7 @@ create table public.biological_signal_observations (
     on delete cascade,
   constraint biological_signal_observations_observation_fk
     foreign key (organization_id, observation_id)
-    references public.observations (organization_id, id)
+    references public.environmental_observations (organization_id, id)
     on delete restrict
 );
 
