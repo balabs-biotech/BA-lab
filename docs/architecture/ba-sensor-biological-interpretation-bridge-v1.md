@@ -49,3 +49,10 @@ records and forwards it over the private server-to-server channel.
 
 Without `subject_id`, the route remains a descriptive Sensor Engine request
 and returns `interpretation_status = not_requested`.
+
+
+## Temporal integrity hardening
+
+The bridge validates the actual half-open sensor-analysis interval (`[from_at, to_at_exclusive)`) against the requested biological date scope in the resolved environment timezone. It converts the first instant and the final included instant to local calendar dates before accepting interpretation. This prevents a valid-looking request envelope from authorizing measurements that extend beyond the biological context's declared validity window.
+
+The check is deliberately applied to the interpretation layer, not to the descriptive sensor analysis. If the biological context is invalid, the API retains the descriptive sensor result and returns `interpretation_status = context_invalid` with no domain signals. The API contract test covers a biological context whose validity starts after the requested sensor-analysis day.
