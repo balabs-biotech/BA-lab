@@ -18,6 +18,7 @@ from ba_environmental_engine.sources.sensor import SensorMeasurementEnvelope
 
 
 _MAX_SLOPE_SAMPLE_PAIRS = 200
+_MAX_PAIR_INPUT_ROWS = 5000
 
 
 @dataclass(frozen=True, slots=True)
@@ -25,6 +26,7 @@ class SensorDriftPolicy:
     target_sensor_id: UUID
     reference_sensor_id: UUID
     variable_code: str
+    reference_binding_verified: bool
     maximum_pair_offset_seconds: int
     minimum_pairs: int
     minimum_duration_seconds: int
@@ -58,6 +60,8 @@ class SensorDriftAssessment:
 def _validate_policy(policy: SensorDriftPolicy) -> None:
     if policy.target_sensor_id == policy.reference_sensor_id:
         raise ValueError("target and reference sensors must be different")
+    if not isinstance(policy.reference_binding_verified, bool):
+        raise ValueError("reference_binding_verified must be a boolean")
     if not isinstance(policy.variable_code, str) or not policy.variable_code.strip():
         raise ValueError("variable_code is required")
     for name, value, minimum in (
@@ -110,6 +114,8 @@ def assess_sensor_drift(
     here; the source adapter must already have normalized canonical units.
     """
     rows = tuple(envelopes)
+    if len(rows) > _MAX_PAIR_INPUT_ROWS:
+        raise ValueError(f"drift input exceeds the {_MAX_PAIR_INPUT_ROWS}-measurement limit")
     policy_rows = tuple(policies)
     policy_keys: set[tuple[UUID, UUID, str]] = set()
     for policy in policy_rows:
@@ -155,12 +161,37 @@ def assess_sensor_drift(
             ),
             key=lambda row: (row.measurement.observed_at, str(row.measurement.observation_id)),
         )
+        if not policy.reference_binding_verified:
+            results.append(SensorDriftAssessment(
+                policy.target_sensor_id, policy.reference_sensor_id, policy.variable_code,
+                "not_evaluable", 0, 0, None, None,
+                float(policy.maximum_abs_drift_rate_per_hour), (), (),
+                "reference_pair_not_verified",
+            ))
+            continue
         if not target_rows or not reference_rows:
             results.append(SensorDriftAssessment(
                 policy.target_sensor_id, policy.reference_sensor_id, policy.variable_code,
                 "not_evaluable", 0, 0, None, None,
                 float(policy.maximum_abs_drift_rate_per_hour), (), (),
                 "reference_pair_measurements_missing",
+            ))
+            continue
+
+        target_contexts = {
+            (row.measurement.organization_id, row.measurement.location_id, row.measurement.context_id)
+            for row in target_rows
+        }
+        reference_contexts = {
+            (row.measurement.organization_id, row.measurement.location_id, row.measurement.context_id)
+            for row in reference_rows
+        }
+        if len(target_contexts) != 1 or target_contexts != reference_contexts:
+            results.append(SensorDriftAssessment(
+                policy.target_sensor_id, policy.reference_sensor_id, policy.variable_code,
+                "not_evaluable", 0, 0, None, None,
+                float(policy.maximum_abs_drift_rate_per_hour), (), (),
+                "reference_pair_context_mismatch",
             ))
             continue
 
