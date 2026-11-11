@@ -46,6 +46,7 @@ begin
      or v_guard not ilike '%biological_decision_policy_stale_draft_cannot_be_reviewed%'
      or v_guard not ilike '%biological_decision_policy_stale_retirement_blocked%'
      or v_guard not ilike '%biological_decision_policy_retirement_requires_latest_reviewed_version%'
+     or v_guard not ilike '%biological_decision_policy_source_evidence_invalid%'
      or v_guard not ilike '%biological_decision_policy_requires_current_reviewed_rule%'
      or v_guard not ilike '%biological_decision_policy_retirement_requires_new_version%'
      or v_guard not ilike '%search_path%pg_catalog, public, private, auth%' then
