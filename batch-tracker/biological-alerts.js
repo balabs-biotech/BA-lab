@@ -48,6 +48,54 @@
     node.dataset.state = isError ? "error" : "info";
   };
 
+  const flattenInterpretationPayload = (value, prefix = "", output = {}, depth = 0) => {
+    if (depth > 6 || Object.keys(output).length >= 100) return output;
+    if (value === null || value === undefined) {
+      if (prefix) output[prefix] = value;
+      return output;
+    }
+    if (Array.isArray(value)) {
+      if (value.every(item => item === null || ["string", "number", "boolean"].includes(typeof item))) {
+        output[prefix || "payload"] = JSON.stringify(value);
+      } else {
+        value.slice(0, 30).forEach((item, index) =>
+          flattenInterpretationPayload(item, prefix + "[" + index + "]", output, depth + 1));
+      }
+      return output;
+    }
+    if (typeof value === "object") {
+      Object.keys(value).sort().forEach(key => {
+        if (["recorded_at", "created_at", "updated_at", "generated_at"].includes(key)) return;
+        flattenInterpretationPayload(value[key], prefix ? prefix + "." + key : key, output, depth + 1);
+      });
+      return output;
+    }
+    if (prefix) output[prefix] = value;
+    return output;
+  };
+
+  const compareInterpretationSnapshots = (older, newer) => {
+    if (!older || !newer || older.source_signal_id !== newer.source_signal_id) return null;
+    const before = flattenInterpretationPayload(older.interpretation_payload || {});
+    const after = flattenInterpretationPayload(newer.interpretation_payload || {});
+    const paths = [...new Set([...Object.keys(before), ...Object.keys(after)])].sort();
+    const changes = paths.filter(path => JSON.stringify(before[path]) !== JSON.stringify(after[path]))
+      .slice(0, 40).map(path => ({
+        path,
+        previous: Object.prototype.hasOwnProperty.call(before, path) ? before[path] : "[absent]",
+        current: Object.prototype.hasOwnProperty.call(after, path) ? after[path] : "[absent]"
+      }));
+    return {
+      previous_engine_version: older.engine_version || "inconnue",
+      current_engine_version: newer.engine_version || "inconnue",
+      status_changed: older.interpretation_status !== newer.interpretation_status,
+      previous_status: older.interpretation_status || "inconnu",
+      current_status: newer.interpretation_status || "inconnu",
+      changes,
+      truncated: paths.length > 100 || changes.length >= 40
+    };
+  };
+
   function render() {
     const list = $("signalsList");
     list.replaceChildren();
@@ -995,7 +1043,7 @@
         historySection.append(element("p", "signal-lineage-batches",
           "Aucun instantané d'interprétation enregistré pour cette culture."));
       }
-      snapshots.forEach(snapshot => {
+      snapshots.forEach((snapshot, snapshotIndex) => {
         const detail = element("details", "signal-interpretation-snapshot");
         const summary = element("summary", "", [
           snapshot.interpretation_status || "Statut inconnu",
@@ -1016,7 +1064,39 @@
             finding.finding_status
           ].filter(Boolean).join(" · ")));
         }
-        if (interpretation.status) detail.append(element("small", "", "Résolution moteur : " + interpretation.status));
+        if (snapshotIndex < snapshots.length - 1) {
+          const olderSnapshot = snapshots.slice(snapshotIndex + 1).find(candidate =>
+            candidate.source_signal_id === snapshot.source_signal_id);
+          const comparison = compareInterpretationSnapshots(olderSnapshot, snapshot);
+          if (comparison) {
+            const comparisonPanel = element("div", "signal-interpretation-comparison");
+            comparisonPanel.append(element("strong", "", "Évolution depuis la version précédente"));
+            comparisonPanel.append(element("small", "", "Moteur " + comparison.previous_engine_version +
+              " → " + comparison.current_engine_version));
+            if (comparison.status_changed) {
+              comparisonPanel.append(element("p", "", "Statut : " + comparison.previous_status +
+                " → " + comparison.current_status));
+            } else {
+              comparisonPanel.append(element("small", "", "Statut inchangé : " + comparison.current_status));
+            }
+            if (!comparison.changes.length) {
+              comparisonPanel.append(element("small", "", "Aucune différence détectée dans les champs comparables du contenu enregistré."));
+            } else {
+              const changeList = element("ul", "signal-interpretation-diff-list");
+              comparison.changes.forEach(change => {
+                const changeItem = element("li", "");
+                changeItem.append(element("strong", "", change.path));
+                changeItem.append(element("small", "", "Avant : " + String(change.previous)));
+                changeItem.append(element("small", "", "Après : " + String(change.current)));
+                changeList.append(changeItem);
+              });
+              comparisonPanel.append(changeList);
+            }
+            if (comparison.truncated) comparisonPanel.append(element("small", "", "Comparaison limitée : certains champs n’ont pas été affichés."));
+            comparisonPanel.append(element("small", "", "Comparaison descriptive des instantanés — aucune validation scientifique ou causalité déduite."));
+            detail.append(comparisonPanel);
+          }
+        }
         const reviewPanel = element("div", "signal-interpretation-review");
         reviewPanel.append(element("strong", "", "Revue scientifique humaine"));
         reviewPanel.append(element("small", "", "La revue ajoute un événement au dossier sans modifier l’instantané moteur."));
