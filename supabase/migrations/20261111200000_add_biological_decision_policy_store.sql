@@ -74,6 +74,11 @@ begin
          where prior.organization_id = new.organization_id
            and prior.policy_id = new.policy_id
            and prior.status = 'reviewed'
+           and prior.revision_seq = (
+             select max(latest.revision_seq) from public.biological_decision_policies latest
+              where latest.organization_id = new.organization_id
+                and latest.policy_id = new.policy_id and latest.status = 'reviewed'
+           )
            and prior.domain = new.domain
            and prior.rule_version_id = new.rule_version_id
            and prior.trigger_assessment_statuses = new.trigger_assessment_statuses
@@ -84,7 +89,7 @@ begin
            and prior.recommended_action is not distinct from new.recommended_action
            and prior.sources = new.sources
       ) then
-        raise exception 'biological_decision_policy_retirement_requires_reviewed_version' using errcode = '23514';
+        raise exception 'biological_decision_policy_retirement_requires_latest_reviewed_version' using errcode = '23514';
       end if;
     elsif new.status <> 'draft' then
       raise exception 'biological_decision_policy_invalid_initial_status' using errcode = '23514';
@@ -108,18 +113,20 @@ begin
     end if;
   end if;
 
-  select * into v_rule from public.biological_rules
-   where organization_id = new.organization_id and id = new.rule_version_id
-   for share;
-  if not found or v_rule.status <> 'reviewed' or v_rule.domain is distinct from new.domain
-     or exists (
-       select 1 from public.biological_rules newer
-        where newer.organization_id = new.organization_id
-          and newer.rule_id = v_rule.rule_id
-          and newer.revision_seq > v_rule.revision_seq
-          and newer.status in ('reviewed','retired')
-     ) then
-    raise exception 'biological_decision_policy_requires_current_reviewed_rule' using errcode = '23514';
+  if new.status <> 'retired' then
+    select * into v_rule from public.biological_rules
+     where organization_id = new.organization_id and id = new.rule_version_id
+     for share;
+    if not found or v_rule.status <> 'reviewed' or v_rule.domain is distinct from new.domain
+       or exists (
+         select 1 from public.biological_rules newer
+          where newer.organization_id = new.organization_id
+            and newer.rule_id = v_rule.rule_id
+            and newer.revision_seq > v_rule.revision_seq
+            and newer.status in ('reviewed','retired')
+       ) then
+      raise exception 'biological_decision_policy_requires_current_reviewed_rule' using errcode = '23514';
+    end if;
   end if;
 
   if new.status = 'reviewed' then
