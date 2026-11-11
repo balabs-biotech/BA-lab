@@ -43,6 +43,10 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
+      - name: Install pinned BAL-JSON schema validator
+        run: npm install --no-save --package-lock=false ajv@8.17.1 ajv-formats@3.0.1
+      - name: Validate BAL-JSON v1 schemas and fixtures
+        run: node scripts/test-bal-json-contract.mjs
       - name: Test BAL-JSON import preview and authenticated submission
         run: node scripts/test-bal-json-import-ui.mjs
       - name: Test conservative BAL-Normalizer rules
