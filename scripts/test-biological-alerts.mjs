@@ -251,7 +251,11 @@ const provenance = buildProvenanceIndex({
 const mixtureTrace = provenance.traceMaterial("mixture");
 assert.equal(mixtureTrace.found, true);
 assert.deepEqual(new Set(mixtureTrace.ancestors.map(item => item.id)), new Set(["source-a", "source-b"]));
-assert.equal(mixtureTrace.strains.length, 2, "a multi-source output must retain both contributing strains");
+assert.equal(mixtureTrace.strains.length, 2, "a multi-source output must retain both documented ancestral strain assignments");
+assert.equal(mixtureTrace.lineage_strains.length, 2);
+assert.equal(mixtureTrace.source_materials.length, 2, "direct source materials must remain distinct from ancestral strain assignments");
+assert.deepEqual(mixtureTrace.confirmed_composition, [], "genealogy alone must never be reported as confirmed biological composition");
+assert.equal(mixtureTrace.composition_status, "not_assessed");
 assert.equal(provenance.summarize().operation_source_edge_count, 2);
 assert.equal(provenance.summarize().relationship_count, 2, "persisted edges and event evidence must not double-count graph relationships");
 assert.equal(provenance.summarize().multi_parent_count, 1, "a multi-source output must count unique contributing parents");
@@ -279,3 +283,9 @@ assert.match(moduleSource, /markIncomplete\("material_ancestors"/);
 assert.match(moduleSource, /lineageQuality: \{ complete: qualityIssues\.length === 0, issues: qualityIssues \}/);
 assert.match(moduleSource, /Généalogie partielle/);
 assert.match(styles, /signal-lineage-quality/);
+
+assert.match(moduleSource, /lineage_strains: lineageStrains/);
+assert.match(moduleSource, /confirmed_composition: \[\]/);
+assert.match(moduleSource, /composition_status: "not_assessed"/);
+assert.match(moduleSource, /Souches documentées dans la généalogie/);
+assert.match(moduleSource, /Composition biologique confirmée : non évaluée/);
