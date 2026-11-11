@@ -12,6 +12,10 @@ const migration = fs.readFileSync("supabase/migrations/20261111190000_add_biolog
 assert.match(ui, /\["mycology",\s*"laboratory"\]/);
 assert.match(ui, /data-biological-assess/);
 assert.match(ui, /loadHistoryBatch/);
+assert.match(ui, /loadReviewedPolicies/);
+assert.match(ui, /decisionEngine\.evaluate/);
+assert.match(ui, /policyLoads/);
+assert.match(ui, /aucune politique de décision examinée/i);
 assert.match(ui, /BALabsBiologicalDecisionPolicyStore/);
 assert.match(ui, /BALabsBiologicalDecisionEngine/);
 assert.match(ui, /decision_candidate/);
@@ -20,6 +24,7 @@ assert.match(store, /context_snapshot,result_snapshot/);
 assert.match(ui, /non recalculé côté serveur/);
 assert.match(store, /record_biological_assessment/);
 assert.match(store, /source_measurement_id/);
+assert.match(store, /context_snapshot,result_snapshot,assessed_at/);
 assert.match(tracker, /BA_LABS_ASSESS_AND_RECORD_BIOLOGICAL_MEASUREMENT/);
 assert.match(tracker, /quality_state === "excluded"/);
 assert.match(tracker, /rule_version_id/);
