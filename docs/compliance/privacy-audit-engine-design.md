@@ -241,3 +241,15 @@ Le contrat SQL vérifie aussi l'existence de la table d'administrateurs, l'absen
 - Aucun administrateur plateforme n'est provisionné par ce changement.
 - Une console statique `legal/admin.html` est versionnée : connexion, calcul SHA-256 local, liste, publication planifiée et retrait. Elle n'est pas encore déployée/activée ; elle ne remplace pas l'autorisation serveur.
 - Les documents sont toujours des versions de travail ; aucune publication réelle n'est autorisée.
+
+
+### Corrections de validation — 11 novembre 2026
+
+La revue de l'exécution a fait apparaître deux points qui ont été corrigés dans le brouillon :
+
+- le délimiteur dollar de la fonction Before User Created est désormais correctement apparié ; le test de cohérence vérifie que les blocs dollar-quotés sont équilibrés ;
+- publication et retrait prennent le même verrou transactionnel par type de document. Une publication est refusée si elle crée un chevauchement avec une version dont le retrait était déjà planifié après sa nouvelle date d'effet.
+
+La fonction Edge `legal-document-registry` vérifie maintenant explicitement le jeton Bearer transmis à `auth.getUser(token)`. Elle lit en priorité les dictionnaires de clés actuels `SUPABASE_PUBLISHABLE_KEYS` et `SUPABASE_SECRET_KEYS`, avec compatibilité sur les anciennes variables singulières. Le test simulé vérifie que le jeton exact est transmis à Auth et que les deux clés attendues sont résolues.
+
+Le workflow de migration replay est complété par une exécution du brouillon dans une base PostgreSQL 17 jetable, suivie du contrat SQL et d'un scénario comportemental (hook Auth, création des événements, immutabilité, conflit de validité et retrait sans successeur). Ces étapes sont raccordées à la CI ; leur réussite n'est pas encore confirmée par un run disponible.
