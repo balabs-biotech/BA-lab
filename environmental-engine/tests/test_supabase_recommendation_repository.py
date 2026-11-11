@@ -132,6 +132,48 @@ def test_create_uses_service_role_rpc_and_returns_initial_snapshot():
     assert service_client.rpc_calls[0][1]["p_proposal_status"] == "proposed"
 
 
+def test_create_idempotent_replay_restores_existing_lifecycle_history():
+    proposal = make_proposal()
+    actor_id = uuid4()
+    event_time = datetime(2026, 11, 11, tzinfo=timezone.utc)
+    event_id = uuid4()
+    service_client = FakeClient(rpc_results={
+        "create_biological_recommendation": {
+            "recommendation": recommendation_row(
+                proposal, status="accepted", revision=1
+            ),
+            "events": [{
+                "event_id": str(event_id),
+                "revision": 1,
+                "action": "accept",
+                "actor_id": str(actor_id),
+                "occurred_at": event_time.isoformat(),
+                "note": "Already reviewed",
+                "execution_details": None,
+                "outcome_summary": None,
+                "outcome_observed_at": None,
+            }],
+            "idempotent_replay": True,
+        }
+    })
+    repository = SupabaseRecommendationRepository(
+        user_client=FakeClient(),
+        service_client=service_client,
+        authenticated_user_id=actor_id,
+    )
+
+    result = repository.create(
+        organization_id=uuid4(),
+        lifecycle=RecommendationLifecycle.from_proposal(proposal),
+    )
+
+    assert result.status == "accepted"
+    assert result.revision == 1
+    assert len(result.events) == 1
+    assert result.events[0].event_id == event_id
+    assert result.events[0].note == "Already reviewed"
+
+
 def test_get_reconstructs_full_revision_ordered_history():
     proposal = make_proposal()
     actor_id = uuid4()
