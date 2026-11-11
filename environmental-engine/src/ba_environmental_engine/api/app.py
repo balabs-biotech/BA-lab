@@ -29,6 +29,7 @@ from ba_environmental_engine.execution import run_environmental_analysis, run_se
 from ba_environmental_engine.sources.sensor import normalize_iot_measurement_row
 from ba_environmental_engine.sources.sensor_temporal import assess_sensor_temporal_anomalies
 from ba_environmental_engine.quality.sensor_health import assess_sensor_flatlines
+from ba_environmental_engine.quality.sensor_drift import SensorDriftPolicy, assess_sensor_drift
 from ba_environmental_engine.quality.sensor_transmission import (
     SensorDeviceTransmission,
     SensorTransmissionReceipt,
@@ -181,6 +182,17 @@ class SensorTransmissionReceiptInput(APIModel):
         return self
 
 
+class SensorDriftPolicyInput(APIModel):
+    target_sensor_id: UUID
+    reference_sensor_id: UUID
+    variable_code: str = Field(min_length=1, max_length=120)
+    reference_binding_verified: StrictBool
+    maximum_pair_offset_seconds: StrictInt = Field(ge=1, le=86400)
+    minimum_pairs: StrictInt = Field(ge=3, le=5000)
+    minimum_duration_seconds: StrictInt = Field(ge=1, le=2592000)
+    maximum_abs_drift_rate_per_hour: StrictFloat | StrictInt = Field(gt=0)
+
+
 class SensorAnalysisRequest(APIModel):
     analysis_id: UUID
     organization_id: UUID
@@ -199,6 +211,7 @@ class SensorAnalysisRequest(APIModel):
     transmission_current_window: StrictBool = False
     transmission_devices: list[SensorTransmissionDeviceInput] | None = Field(default=None, max_length=100)
     transmission_receipts: list[SensorTransmissionReceiptInput] | None = Field(default=None, max_length=5000)
+    drift_policies: list[SensorDriftPolicyInput] = Field(default_factory=list, max_length=100)
     biological_interpretation: dict[str, Any] | None = None
     measurements: list[dict[str, Any]] = Field(min_length=0, max_length=5000)
 
@@ -253,6 +266,17 @@ class SensorAnalysisRequest(APIModel):
                 raise ValueError("profile_timezone must be a valid IANA timezone") from exc
             if self.to_date != current_profile_date:
                 raise ValueError("current transmission silence can only be evaluated through the current profile-local date")
+        drift_keys = [
+            (item.target_sensor_id, item.reference_sensor_id, item.variable_code)
+            for item in self.drift_policies
+        ]
+        if len(drift_keys) != len(set(drift_keys)):
+            raise ValueError("drift policies must be unique per target/reference/variable")
+        for item in self.drift_policies:
+            if item.target_sensor_id == item.reference_sensor_id:
+                raise ValueError("drift target and reference sensors must differ")
+        if self.drift_policies and not self.measurements:
+            raise ValueError("drift diagnostics require sensor measurements")
         if not self.measurements and self.transmission_expected_interval_seconds is None:
             raise ValueError("at least one sensor measurement or transmission diagnostics policy is required")
         for row in self.measurements:
@@ -495,6 +519,27 @@ def create_app(engine_api_key: str | None = None) -> FastAPI:
                     "status": "completed",
                     "assessments": jsonable_encoder(flatline_assessments),
                 }
+            drift_diagnostics = {"status": "not_requested", "assessments": []}
+            if request.drift_policies:
+                drift_policies = tuple(
+                    SensorDriftPolicy(
+                        target_sensor_id=item.target_sensor_id,
+                        reference_sensor_id=item.reference_sensor_id,
+                        variable_code=item.variable_code,
+                        reference_binding_verified=item.reference_binding_verified,
+                        maximum_pair_offset_seconds=item.maximum_pair_offset_seconds,
+                        minimum_pairs=item.minimum_pairs,
+                        minimum_duration_seconds=item.minimum_duration_seconds,
+                        maximum_abs_drift_rate_per_hour=float(item.maximum_abs_drift_rate_per_hour),
+                    )
+                    for item in request.drift_policies
+                )
+                drift_assessments = assess_sensor_drift(envelopes, drift_policies)
+                drift_diagnostics = {
+                    "status": "completed",
+                    "assessments": jsonable_encoder(drift_assessments),
+                }
+
             transmission_diagnostics = {"status": "not_requested", "assessments": []}
             if request.transmission_expected_interval_seconds is not None:
                 profile_zone = ZoneInfo(request.profile_timezone)
@@ -607,6 +652,7 @@ def create_app(engine_api_key: str | None = None) -> FastAPI:
                 "instrument_health": {
                     "flatline_diagnostics": flatline_diagnostics,
                     "transmission_diagnostics": transmission_diagnostics,
+                    "drift_diagnostics": drift_diagnostics,
                 },
                 "interpretation_status": interpretation_status,
                 "domain_interpretation": domain_interpretation,
