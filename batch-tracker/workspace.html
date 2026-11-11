@@ -179,6 +179,52 @@
     <p class="signals-footnote">Le profil de capteurs doit être activé et couvrir toute la période. L’analyse descriptive, le dépistage statistique et l’interprétation biologique sont des couches distinctes ; aucun seuil biologique n’est inventé par l’interface.</p>
   </section>
 
+  <section class="card sensor-policy-card" id="sensorDriftPolicyCard" aria-labelledby="sensorDriftPolicyTitle">
+    <div class="section-kicker"><span>MODULE 08</span><span class="kicker-line"></span><span>MÉTROLOGIE &amp; RÉFÉRENCES</span></div>
+    <h2 id="sensorDriftPolicyTitle">Gestion des références instrumentales</h2>
+    <p class="muted">Configurez une comparaison relative entre deux capteurs activés dans le profil environnemental courant. La vérification physique doit être documentée avant activation.</p>
+    <p id="sensorDriftPolicyStatus" class="signals-status" role="status" aria-live="polite">En attente d’une session authentifiée.</p>
+    <div class="grid sensor-controls">
+      <div><label for="sensorDriftTarget">Capteur à surveiller</label><select id="sensorDriftTarget" disabled><option value="">Sélectionner…</option></select></div>
+      <div><label for="sensorDriftReference">Capteur de référence</label><select id="sensorDriftReference" disabled><option value="">Sélectionner…</option></select></div>
+      <div><label for="sensorDriftVariable">Code de variable</label><input id="sensorDriftVariable" maxlength="120" placeholder="Ex. temperature_air" disabled></div>
+      <div><label for="sensorDriftOffset">Écart maximal entre paires (secondes)</label><input id="sensorDriftOffset" type="number" min="1" max="86400" step="1" value="300" disabled></div>
+      <div><label for="sensorDriftMinimumPairs">Nombre minimal de paires</label><input id="sensorDriftMinimumPairs" type="number" min="3" max="5000" step="1" value="6" disabled></div>
+      <div><label for="sensorDriftMinimumDuration">Durée minimale d’évaluation (secondes)</label><input id="sensorDriftMinimumDuration" type="number" min="1" max="2592000" step="1" value="3600" disabled></div>
+      <div><label for="sensorDriftMaximumRate">Dérive différentielle maximale par heure</label><input id="sensorDriftMaximumRate" type="number" min="0.000001" step="any" placeholder="Seuil explicite dans l’unité canonique/h" disabled></div>
+    </div>
+    <p id="sensorDriftProfileValidity" class="signals-footnote">Les politiques reprennent la période du profil capteur actif. Les capteurs désactivés ne sont pas proposés.</p>
+    <div class="sensor-actions"><button id="sensorDriftCreateDraft" type="button" disabled>Créer le brouillon</button></div>
+    <hr>
+    <h3>Cycle de vérification et publication</h3>
+    <div class="grid sensor-controls">
+      <div><label for="sensorDriftPolicySelect">Politique enregistrée</label><select id="sensorDriftPolicySelect" disabled><option value="">Aucune politique chargée</option></select></div>
+      <div><label for="sensorDriftVerificationMethod">Méthode de vérification physique</label><select id="sensorDriftVerificationMethod" disabled>
+        <option value="co_located">Co-localisation vérifiée</option>
+        <option value="calibration_certificate">Certificat d’étalonnage</option>
+        <option value="manufacturer_reference">Référence fabricant</option>
+        <option value="other">Autre méthode documentée</option>
+      </select></div>
+      <div class="sensor-policy-evidence"><label for="sensorDriftVerificationEvidence">Preuve / référence documentaire</label><textarea id="sensorDriftVerificationEvidence" rows="3" maxlength="2000" placeholder="Protocole, certificat, emplacement, date et opérateur…" disabled></textarea></div>
+    </div>
+    <div class="sensor-actions sensor-policy-actions">
+      <button id="sensorDriftVerify" type="button" disabled>Enregistrer la vérification</button>
+      <button id="sensorDriftActivate" type="button" disabled>Activer la politique vérifiée</button>
+      <button id="sensorDriftRetire" type="button" class="secondary-button" disabled>Retirer la version active</button>
+    </div>
+    <p class="signals-footnote">Le cycle est imposé par PostgreSQL : brouillon → vérification authentifiée distincte → activation → retrait. Une référence vérifiée ne peut plus être remplacée ; créez une nouvelle version pour un autre couple physique. Les seuils restent explicites et ne sont jamais fournis par la requête d’analyse.</p>
+  </section>
+  <style>
+    .sensor-policy-card{margin-top:18px}
+    .sensor-policy-card hr{border:0;border-top:1px solid var(--line,#39443e);margin:22px 0}
+    .sensor-policy-card h3{margin:0 0 12px}
+    .sensor-policy-evidence{grid-column:1/-1}
+    .sensor-policy-evidence textarea{box-sizing:border-box;width:100%;font:inherit}
+    .sensor-policy-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+    .sensor-policy-card [disabled]{opacity:.55;cursor:not-allowed}
+    @media(max-width:600px){.sensor-policy-actions button{flex:1 1 100%}}
+  </style>
+
   <!-- ======================================================
        MESSAGES
        ====================================================== -->
