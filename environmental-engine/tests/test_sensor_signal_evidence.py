@@ -42,7 +42,7 @@ def test_series_signal_preserves_the_complete_descriptive_evidence():
         rules=(InterpretationRule(
             rule_id="coverage-review",
             variable_code="air_temperature",
-            finding_status="normal",
+            finding_status="insufficient_coverage",
             signal_code="sensor_series_review",
             severity="info",
             message_code="sensor_series_summary_available",
@@ -111,7 +111,7 @@ def test_series_signal_does_not_fabricate_sampling_coverage_when_cadence_is_unkn
         rules=(InterpretationRule(
             rule_id="series-available",
             variable_code="air_temperature",
-            finding_status="normal",
+            finding_status="indeterminate",
             signal_code="sensor_series_available",
             severity="info",
             message_code="sensor_series_available",
