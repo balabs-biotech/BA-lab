@@ -37,7 +37,7 @@ a{color:var(--accent)}h1{font-size:clamp(28px,5vw,42px);line-height:1.1;margin:1
 <section id="registryPanel" hidden>
 <div class="panel">
 <div class="top"><h2>Publier une version</h2><span class="pill">SHA-256 obligatoire</span></div>
-<p class="muted">Sélectionnez le fichier HTML final validé pour calculer son empreinte. Le fichier n'est pas téléversé : la publication enregistre son empreinte et son chemin de déploiement.</p>
+<p class="muted">Sélectionnez le fichier HTML final validé pour calculer son empreinte. Le fichier n'est pas téléversé : il doit être strictement identique, octet pour octet, au fichier qui sera déployé au chemin indiqué. La publication enregistre uniquement son empreinte et ce chemin.</p>
 <form id="publishForm">
 <div class="grid">
 <div class="field"><label for="docType">Document</label><select id="docType" required><option value="terms">Conditions d’utilisation</option><option value="privacy_notice">Politique de confidentialité</option><option value="cookies_notice">Politique cookies</option></select></div>
