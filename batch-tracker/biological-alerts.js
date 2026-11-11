@@ -212,6 +212,8 @@
       const recommendationPanel = element("section", "signal-recommendation-panel");
       const linkedRecommendations = state.recommendationsBySignal[row.signal_id] || [];
       recommendationPanel.append(element("strong", "", "Recommandations opérationnelles"));
+      recommendationPanel.append(element("small", "signal-recommendation-safety-note",
+        "Ces propositions nécessitent une décision humaine. CultureOps n’exécute aucune action automatiquement ; « exécution déclarée » signifie qu’un opérateur a consigné une action réalisée."));
       if (!linkedRecommendations.length) {
         recommendationPanel.append(element("small", "", !state.recommendationHistoryAvailable
           ? "Lecture des recommandations indisponible ou incomplète."
