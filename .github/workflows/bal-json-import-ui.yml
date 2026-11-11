@@ -15,6 +15,7 @@ on:
       - "shared/**"
       - "scripts/test-biological-assessment-store.mjs"
       - "scripts/test-biological-assessment-ui.mjs"
+      - "scripts/test-biological-decision-engine.mjs"
       - "supabase/migrations/20261111190000_add_biological_assessment_history.sql"
       - "supabase/tests/biological-assessment-history-security.test.sql"
       - "scripts/test-bal-json-import-ui.mjs"
@@ -101,6 +102,8 @@ jobs:
         run: node scripts/test-biological-context-loader.mjs
       - name: Test integrated biological assessment engine
         run: node scripts/test-biological-assessment-engine.mjs
+      - name: Test reviewed-policy biological decision engine
+        run: node scripts/test-biological-decision-engine.mjs
       - name: Test append-only biological assessment persistence
         run: node scripts/test-biological-assessment-store.mjs
       - name: Test biological assessment history UI boundaries
