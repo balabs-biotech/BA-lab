@@ -317,6 +317,16 @@ assert.match(moduleSource, /minimum: Math\.min\(\.\.\.values\)/);
 assert.match(moduleSource, /maximum: Math\.max\(\.\.\.values\)/);
 assert.match(moduleSource, /direction: delta > 0 \? "increasing"/);
 assert.match(moduleSource, /temporal_association_is_causal: false/);
+assert.match(moduleSource, /const temporalEvidenceForFinding = signal =>/);
+assert.match(moduleSource, /nearby_environmental_observation_ids/);
+assert.match(moduleSource, /linked_observation_ids/);
+assert.match(moduleSource, /window_hours: 24/);
+assert.match(moduleSource, /causal_relationship_established: false/);
+assert.match(moduleSource, /const contextCompleteness =/);
+assert.match(moduleSource, /biological_field_coverage/);
+assert.match(moduleSource, /insufficient_context_for_biological_interpretation/);
+assert.match(moduleSource, /temporal_evidence: temporalEvidenceForFinding\(signal\)/);
+
 assert.match(moduleSource, /trend_semantics: "descriptive_first_to_last_change_not_a_causal_or_threshold_assessment"/);
 
 
