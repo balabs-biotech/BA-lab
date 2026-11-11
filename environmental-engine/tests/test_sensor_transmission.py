@@ -148,3 +148,46 @@ def test_duplicate_receipt_ids_are_rejected():
             expected_interval_seconds=60,
             gap_tolerance_factor=2.0,
         )
+
+
+def test_registry_last_seen_can_confirm_current_silence_without_in_scope_receipts():
+    stale_device = SensorDeviceTransmission(
+        device_id=DEVICE, device_code="sensor-01", enabled=True,
+        created_at=BASE - timedelta(days=1), profile_bound=True,
+        expected_from=BASE - timedelta(days=1),
+        last_seen_at=BASE - timedelta(minutes=10),
+    )
+    result = assess_sensor_transmissions(
+        [stale_device], [],
+        evaluation_start=BASE,
+        evaluation_end=BASE + timedelta(minutes=10),
+        evaluated_at=BASE + timedelta(minutes=10),
+        expected_interval_seconds=60,
+        gap_tolerance_factor=2.0,
+        current_window=True,
+    )[0]
+    assert result.status == "silent"
+    assert result.receipt_count == 0
+    assert result.trailing_silence_seconds == 1200
+    assert result.source_receipt_ids == ()
+
+
+def test_registry_last_seen_is_not_used_for_historical_silence():
+    stale_device = SensorDeviceTransmission(
+        device_id=DEVICE, device_code="sensor-01", enabled=True,
+        created_at=BASE - timedelta(days=1), profile_bound=True,
+        expected_from=BASE - timedelta(days=1),
+        last_seen_at=BASE - timedelta(minutes=10),
+    )
+    result = assess_sensor_transmissions(
+        [stale_device], [],
+        evaluation_start=BASE,
+        evaluation_end=BASE + timedelta(minutes=10),
+        evaluated_at=BASE + timedelta(days=2),
+        expected_interval_seconds=60,
+        gap_tolerance_factor=2.0,
+        current_window=False,
+    )[0]
+    assert result.status == "insufficient_data"
+    assert result.trailing_silence_seconds is None
+    assert result.last_received_at is None
