@@ -404,6 +404,9 @@ assert.match(moduleSource, /Instantanés disponibles, mais historique des évén
 assert.match(moduleSource, /interpretation_snapshot_count: cultureInterpretations\.length/);
 assert.match(moduleSource, /interpretation_event_count: cultureInterpretationEvents\.length/);
 assert.match(moduleSource, /biologicalInterpretationEvents\.length >= 2000/);
+assert.match(moduleSource, /biologicalInterpretations\.length >= 500/);
+assert.match(moduleSource, /Interpretation snapshot history reached the 500-row read limit/);
+assert.match(moduleSource, /snapshots_available: lineage\?\.evidenceAvailability\?\.biological_interpretations === true/);
 
 assert.match(interpretationMigration, /revoke all on function private\.prevent_biological_interpretation_mutation\(\)/);
 
@@ -423,7 +426,8 @@ assert.match(interpretationMigration, /not exists \([\s\S]*prior_event\.event_ty
 assert.match(moduleSource, /biologicalInterpretationEvents\.length >= 2000/);
 assert.match(moduleSource, /Interpretation event history reached the 2000-row read limit/);
 assert.match(moduleSource, /\.order\("occurred_at", \{ ascending: false \}\)\.limit\(2000\)/);
-assert.match(moduleSource, /history\.events_available !== true \? "Cycle de vie non vérifié"/);
+assert.match(moduleSource, /!interpretationHistoryComplete \? "Cycle de vie non vérifié"/);
+assert.match(moduleSource, /history\.snapshots_available === true && history\.events_available === true/);
 assert.match(moduleSource, /history\.events_available === true/);
 assert.match(moduleSource, /const supersededEvents = snapshotEvents\.filter\(event => event\.event_type === "superseded"\)/);
 assert.match(moduleSource, /const reviewEvents = snapshotEvents\.filter\(event =>/);
