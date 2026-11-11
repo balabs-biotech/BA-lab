@@ -976,6 +976,62 @@
         cultureEvidence.environmental_context.length ? cultureEvidence.environmental_context.length + " relevé(s) environnemental(aux) contextualisé(s)" : null
       ].filter(Boolean);
       if (evidenceParts.length) item.append(element("small", "signal-lineage-batches", "Preuves associées : " + evidenceParts.join(" · ")));
+      const history = cultureEvidence.interpretation_history || {};
+      const snapshots = Array.isArray(history.snapshots) ? history.snapshots.slice()
+        .sort((left, right) => new Date(right.recorded_at || 0).getTime() - new Date(left.recorded_at || 0).getTime()) : [];
+      const historyEvents = Array.isArray(history.events) ? history.events : [];
+      const historySection = element("div", "signal-interpretation-history");
+      historySection.append(element("strong", "", "Historique des interprétations"));
+      historySection.append(element("small", "", snapshots.length + " instantané(s) · " + historyEvents.length + " événement(s)"));
+      if (history.status === "unavailable") {
+        historySection.append(element("p", "signal-lineage-quality",
+          "Historique indisponible : la lecture du registre n'a pas abouti."));
+      } else if (!snapshots.length) {
+        historySection.append(element("p", "signal-lineage-batches",
+          "Aucun instantané d'interprétation enregistré pour cette culture."));
+      }
+      snapshots.forEach(snapshot => {
+        const detail = element("details", "signal-interpretation-snapshot");
+        const summary = element("summary", "", [
+          snapshot.interpretation_status || "Statut inconnu",
+          snapshot.engine_code || "Moteur non précisé",
+          snapshot.engine_version || "Version inconnue"
+        ].join(" · "));
+        detail.append(summary);
+        detail.append(element("small", "", "Enregistré le " + dateLabel(snapshot.recorded_at)));
+        detail.append(element("small", "", "Signal : " + (snapshot.source_signal_id || "non référencé") +
+          " · Analyse : " + (snapshot.source_analysis_id || "non référencée")));
+        const payload = snapshot.interpretation_payload || {};
+        const finding = payload.finding || {};
+        const interpretation = payload.interpretation || {};
+        if (finding.signal_code || finding.variable_code || finding.finding_status) {
+          detail.append(element("p", "", [
+            finding.signal_code,
+            finding.variable_code,
+            finding.finding_status
+          ].filter(Boolean).join(" · ")));
+        }
+        if (interpretation.status) detail.append(element("small", "", "Résolution moteur : " + interpretation.status));
+        const snapshotEvents = historyEvents.filter(event => event.interpretation_id === snapshot.interpretation_id)
+          .slice().sort((left, right) =>
+            new Date(left.occurred_at || 0).getTime() - new Date(right.occurred_at || 0).getTime());
+        if (snapshotEvents.length) {
+          const eventList = element("ol", "signal-interpretation-events");
+          snapshotEvents.forEach(event => {
+            const eventItem = element("li", "");
+            eventItem.append(element("strong", "", event.event_type || "Événement"));
+            eventItem.append(element("small", "", dateLabel(event.occurred_at) + " · " +
+              (event.actor_kind === "user" ? "Action utilisateur" : "Événement système")));
+            if (event.event_payload && event.event_payload.note) {
+              eventItem.append(element("small", "", String(event.event_payload.note)));
+            }
+            eventList.append(eventItem);
+          });
+          detail.append(eventList);
+        }
+        historySection.append(detail);
+      });
+      item.append(historySection);
       if (cultureEvidence.environmental_context.length) item.append(element("small", "signal-lineage-event",
         "Contexte environnemental temporel et géographique uniquement — aucune causalité établie"));
       const operations = lineage.events.filter(event => event.culture_id === culture.id);
