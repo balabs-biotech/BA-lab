@@ -161,3 +161,13 @@ def test_recommendation_is_withheld_when_catalog_entry_is_missing():
     assert result.proposals[0].withholding_reasons == ("recommendation_definition_missing",)
     assert result.proposed_count == 0
     assert result.withheld_count == 1
+
+def test_recommendation_is_withheld_when_signal_uses_another_profile_version():
+    profile = make_profile()
+    signal = make_signal().model_copy(update={"profile_version": "2.0.0"})
+    result = resolve_recommendations(make_interpretation(signal), profile)
+
+    assert result.proposals[0].status == "withheld"
+    assert result.proposals[0].withholding_reasons == (
+        "signal_profile_version_mismatch",
+    )
