@@ -332,22 +332,6 @@
               "children": []
             }
           ]
-        },
-        {
-          "id": "ar-mycology-cultivation",
-          "title": "الزراعة والإكثار",
-          "notionId": "40173152f1718101afcbdb364eb5d44a",
-          "url": "https://app.notion.com/p/40173152f1718101afcbdb364eb5d44a",
-          "description": "مراحل إنشاء الزراعات الفطرية وإكثارها ومتابعتها.",
-          "children": []
-        },
-        {
-          "id": "ar-mycology-applications",
-          "title": "التطبيقات الفطرية",
-          "notionId": "40173152f17181afb288feda1d2c3e5c",
-          "url": "https://app.notion.com/p/40173152f17181afb288feda1d2c3e5c",
-          "description": "مجالات تطبيق الفطريات وإنزيماتها في التحويلات والعمليات البيولوجية.",
-          "children": []
         }
       ],
       "description": "استكشف عالم الفطريات: الأنواع المزروعة، مواردها، طرق الإكثار، والتفاعلات التي تربطها بالتربة والمواد العضوية."
