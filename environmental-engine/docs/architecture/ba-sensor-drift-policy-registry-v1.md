@@ -34,14 +34,14 @@ to bypass these constraints.
 
 A policy starts as `draft` and `reference_binding_verified = false`.
 
-Before activation, a writer must set verification to true and provide:
+After creating the draft, an authenticated organization writer must explicitly set verification to true and provide:
 
 - `reference_verification_method`: `co_located`,
   `calibration_certificate`, `manufacturer_reference`, or `other`;
 - `reference_verification_evidence`: a concise evidence locator or note.
 
-The database trigger stamps `reference_verified_at` and
-`reference_verified_by` from the authenticated request. Verification metadata
+The database rejects verification on initial insert and stamps `reference_verified_at` and
+`reference_verified_by` only on the subsequent authenticated false-to-true transition. Service-role calls without an authenticated user cannot perform this verification. Verification metadata
 is immutable once recorded and cannot be revoked in-place. If the verification
 was incorrect, create a replacement policy version and retain the earlier
 record for auditability.
