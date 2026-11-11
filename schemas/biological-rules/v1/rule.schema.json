@@ -72,40 +72,6 @@
       "minLength": 1
     }
   },
-  "allOf": [
-    {
-      "if": {
-        "properties": {
-          "status": {
-            "const": "reviewed"
-          }
-        },
-        "required": [
-          "status"
-        ]
-      },
-      "then": {
-        "required": [
-          "review"
-        ]
-      }
-    },
-    {
-      "if": {
-        "required": [
-          "min",
-          "max"
-        ]
-      },
-      "then": {
-        "properties": {
-          "max": {
-            "minimum": -1.7976931348623157e+308
-          }
-        }
-      }
-    }
-  ],
   "$defs": {
     "target": {
       "type": "object",
