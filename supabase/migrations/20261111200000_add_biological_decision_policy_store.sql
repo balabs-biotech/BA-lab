@@ -23,7 +23,7 @@ create table public.biological_decision_policies (
   unique (organization_id,policy_id,version),
   foreign key (organization_id,rule_version_id)
     references public.biological_rules(organization_id,id) on delete restrict,
-  check (trigger_assessment_statuses <@ array['out_of_range']::text[]),
+  check (trigger_assessment_statuses = array['out_of_range']::text[]),
   check (
     (status = 'reviewed' and reviewed_by is not null and reviewed_at is not null)
     or (status <> 'reviewed' and reviewed_by is null and reviewed_at is null)
