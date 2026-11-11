@@ -164,61 +164,6 @@ revoke all on public.biological_signal_evidence from public, anon, authenticated
 grant select on public.biological_signal_evidence to authenticated;
 grant insert on public.biological_signal_evidence to service_role;
 
-create or replace function private.link_biological_signal_evidence()
-returns trigger
-language plpgsql
-security invoker
-set search_path = pg_catalog, public
-as $$
-declare
-  v_evidence_id uuid;
-begin
-  if new.analysis_method = 'environmental_daily' then
-    for v_evidence_id in
-      select value::uuid
-        from jsonb_array_elements_text(new.source_observation_ids) as item(value)
-    loop
-      insert into public.biological_signal_evidence (
-        organization_id, signal_id, source_kind, evidence_id,
-        environmental_observation_id, measurement_id
-      )
-      values (
-        new.organization_id, new.signal_id, 'environmental_observation',
-        v_evidence_id, v_evidence_id, null
-      )
-      on conflict (organization_id, signal_id, source_kind, evidence_id) do nothing;
-    end loop;
-  elsif new.analysis_method in ('sensor_series', 'sensor_temporal') then
-    for v_evidence_id in
-      select value::uuid
-        from jsonb_array_elements_text(new.source_observation_ids) as item(value)
-    loop
-      insert into public.biological_signal_evidence (
-        organization_id, signal_id, source_kind, evidence_id,
-        environmental_observation_id, measurement_id
-      )
-      values (
-        new.organization_id, new.signal_id, 'measurement',
-        v_evidence_id, null, v_evidence_id
-      )
-      on conflict (organization_id, signal_id, source_kind, evidence_id) do nothing;
-    end loop;
-  else
-    raise exception 'unsupported_biological_signal_analysis_method'
-      using errcode = '23514';
-  end if;
-
-  return new;
-end;
-$$;
-
-revoke all on function private.link_biological_signal_evidence()
-  from public, anon, authenticated;
-
-create trigger biological_signals_link_evidence
-  after insert on public.biological_signals
-  for each row execute function private.link_biological_signal_evidence();
-
 alter table public.biological_signals enable row level security;
 
 create policy biological_signals_select
