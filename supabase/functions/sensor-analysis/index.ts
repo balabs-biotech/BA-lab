@@ -301,7 +301,7 @@ Deno.serve(async (req: Request) => {
         created_at: device.created_at,
         profile_bound: sensorIds.includes(device.id),
         expected_from: profile.valid_from,
-        expected_to: null,
+        expected_to: profile.valid_to,
         last_seen_at: device.last_seen_at,
       }));
     }
