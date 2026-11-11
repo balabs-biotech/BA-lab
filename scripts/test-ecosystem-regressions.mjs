@@ -482,3 +482,11 @@ assert.ok(entryHtml.includes('--paper:#111B1D') && entryHtml.includes('--copper:
 assert.ok(entryHtml.includes('font:400 clamp(29px,3.1vw,43px)/1 Georgia,serif'), 'Workspace links must use the editorial list composition');
 assert.ok(!entryHtml.includes('border-radius:16px'), 'Entry page must not fall back to generic rounded cards');
 assert.ok(entryHtml.includes('intro-note-copy'), 'The intro note must remain translatable in all four languages');
+
+assert.ok(brandCss.includes('PHASE 8 — editorial research atlas'), 'Phase 8 editorial research art direction must exist');
+assert.ok(brandCss.includes('grid-template-areas: "image index" "image title" "image copy"'), 'Work areas must become image-led editorial spreads, not generic cards');
+assert.ok(brandCss.includes('filter: grayscale(.72) contrast(1.08)'), 'Research imagery must use the monochrome field-documentation treatment');
+assert.ok(brandCss.includes('grid-template-columns: repeat(4,minmax(0,1fr))'), 'Method section must use a four-column research sequence on desktop');
+assert.ok(brandCss.includes('grid-template-columns: repeat(2,minmax(0,1fr)) !important;'), 'Editorial method must adapt to a two-column mobile sequence');
+assert.ok(html.includes('brand-system.css?v=8'), 'Public site must request phase 8 art direction');
+assert.ok(previewHtml.includes('brand-system.css?v=8'), 'Preview must request phase 8 art direction');
