@@ -430,6 +430,15 @@ assert.match(moduleSource, /!interpretationHistoryComplete \? "Cycle de vie non 
 assert.match(moduleSource, /history\.snapshots_available === true && history\.events_available === true/);
 assert.match(moduleSource, /history\.events_available === true/);
 assert.match(moduleSource, /const supersededEvents = snapshotEvents\.filter\(event => event\.event_type === "superseded"\)/);
+assert.match(moduleSource, /from\("biological_recommendations"\)/);
+assert.match(moduleSource, /from\("biological_recommendation_events"\)/);
+assert.match(moduleSource, /transition_biological_recommendation/);
+assert.match(moduleSource, /p_expected_revision: recommendation\.revision/);
+assert.match(moduleSource, /action === "record_execution" && !executionDetails/);
+assert.match(moduleSource, /action === "record_outcome" && \(!outcomeSummary \|\| !outcomeDate\)/);
+assert.match(moduleSource, /Enregistrer l’exécution/);
+assert.match(moduleSource, /Documenter le résultat/);
+assert.match(moduleSource, /sans conclure à une causalité/);
 assert.match(moduleSource, /const reviewEvents = snapshotEvents\.filter\(event =>/);
 assert.match(moduleSource, /reviewDecisionLabels\[latestReviewEvent\.event_payload\.decision\]/);
 assert.match(moduleSource, /Décision de revue humaine/);
