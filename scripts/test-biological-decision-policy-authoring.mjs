@@ -32,6 +32,7 @@ assert.equal(calls[0].insert.organization_id,"org-1");
 assert.equal(calls[0].insert.rule_version_id,"rule-uuid-1");
 assert.equal((await api.createDraft({client:clientFor("create"),organizationId:"org-1",policy:{...base,trigger_assessment_statuses:["normal"]}})).status,"invalid_policy");
 assert.equal((await api.createDraft({client:clientFor("create"),organizationId:"org-1",policy:{...base,domain:"green-tech"}})).status,"invalid_policy");
+assert.equal((await api.createDraft({client:clientFor("create"),organizationId:"org-1",policy:{...base,sources:[{type:"protocol",citation:" "}]}})).status,"invalid_policy");
 assert.equal((await api.createDraft({client:clientFor("create"),organizationId:"org-1",policy:{...base,sources:[{type:"protocol"}]}})).status,"invalid_policy");
 const reviewCalls=[];
 const reviewClient=clientFor("review");
