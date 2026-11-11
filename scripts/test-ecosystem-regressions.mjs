@@ -7,7 +7,7 @@ const engine = readFileSync('ecosystem/engine-v2.js', 'utf8');
 const previewEngine = readFileSync('ecosystem-preview/engine-v2.js', 'utf8');
 const expectedDomains = ['bio', 'myco', 'soil', 'lab', 'products', 'iot', 'work', 'learn'];
 const brandCss = readFileSync('ecosystem/brand-system.css', 'utf8');
-assert.ok(html.includes('<link rel="stylesheet" href="./brand-system.css?v=6">'), 'Public homepage must load the BA Labs visual system');
+assert.ok(html.includes('<link rel="stylesheet" href="./brand-system.css?v=7">'), 'Public homepage must load the BA Labs visual system');
 assert.ok(html.includes('<div class="wrap balabs-ui" id="app"'), 'Public homepage must opt into the BA Labs visual system');
 for (const section of ['hero', 'editorial-feature', 'editorial-about', 'editorial-work', 'universe-index', 'editorial-method']) {
   assert.ok(brandCss.includes('#app.balabs-ui > main > .' + section), 'Visual system must target the actual main landmark child: ' + section);
@@ -403,8 +403,8 @@ assert.ok(brandCss.includes('flex-wrap: wrap !important;') && brandCss.includes(
 assert.ok(brandCss.includes('font: 400 clamp(58px, 6.6vw, 94px)/.94 Georgia'), 'Hero typography must use the refined editorial scale without pushing actions below the composition');
 assert.ok(brandCss.includes('grid-template-columns: minmax(0, 1.08fr) minmax(0, .92fr)'), 'Featured project must use the new asymmetric image-led split');
 assert.ok(brandCss.includes('min-height: 740px !important'), 'Mobile hero must have its own image-led composition');
-assert.ok(html.includes('brand-system.css?v=6'), 'Public page must request the new visual system version');
-assert.ok(previewHtml.includes('brand-system.css?v=6'), 'Preview must request the same visual system version');
+assert.ok(html.includes('brand-system.css?v=7'), 'Public page must request the new visual system version');
+assert.ok(previewHtml.includes('brand-system.css?v=7'), 'Preview must request the same visual system version');
 
 // Featured section metadata must remain legible against its light mineral background.
 assert.ok(brandCss.includes('#app.balabs-ui > main > .editorial-feature .feature-status'), 'Featured status metadata must use a scoped high-contrast treatment');
@@ -413,7 +413,7 @@ assert.ok(brandCss.includes('#app.balabs-ui > main > .editorial-feature .art-cap
 
 // Shared design-system contract: preview consumes the same maintained editorial layer as public.
 assert.ok(previewHtml.includes('class="wrap balabs-ui" id="app"'), 'Preview root must opt into the shared BA Labs visual system');
-assert.ok(previewHtml.includes('../ecosystem/brand-system.css?v=6'), 'Preview must load the shared visual system after its local styles');
+assert.ok(previewHtml.includes('../ecosystem/brand-system.css?v=7'), 'Preview must load the shared visual system after its local styles');
 
 // Preview parity contract: retain the preview's independent light theme while
 // matching editorial hierarchy, responsive grids, touch targets and RTL focus.
@@ -453,5 +453,19 @@ for (const selector of [
 assert.ok(brandCss.includes('PHASE 6 — internal universe navigation'), 'Internal universe navigation art direction must be present');
 assert.ok(brandCss.includes('counter-increment: branch-index'), 'Nested branch links must receive a consistent editorial index');
 assert.ok(brandCss.includes('grid-template-columns: repeat(4, minmax(0, 1fr)) !important'), 'Homepage scientific method section remains intact after phase 6');
-assert.ok(html.includes('brand-system.css?v=6'), 'Public page must request phase 6 visual system');
-assert.ok(previewHtml.includes('brand-system.css?v=6'), 'Preview must request phase 6 visual system');
+assert.ok(html.includes('brand-system.css?v=7'), 'Public page must request phase 6 visual system');
+assert.ok(previewHtml.includes('brand-system.css?v=7'), 'Preview must request phase 6 visual system');
+
+
+// Phase 7 selected branch dossier: presentation-only, no engine logic changes.
+for (const selector of [
+  '#mainView.webgl-ready .webgl-focus',
+  '#mainView.webgl-ready .webgl-focus-kicker',
+  '#mainView.webgl-ready .webgl-focus .webgl-focus-actions',
+  '#mainView.webgl-ready[dir="rtl"] .webgl-focus',
+]) assert.ok(brandCss.includes(selector), 'Phase 7 must style the selected branch dossier: ' + selector);
+assert.ok(brandCss.includes('PHASE 7 — selected branch dossier'), 'Phase 7 dossier art direction must be present');
+assert.ok(brandCss.includes('width: min(360px, calc(100% - 108px)) !important'), 'Dossier must reserve room for explorer controls');
+assert.ok(brandCss.includes('max-height: calc(100% - 112px) !important'), 'Mobile dossier must remain inside the explorer viewport');
+assert.ok(html.includes('brand-system.css?v=7'), 'Public site must request phase 7 visual system');
+assert.ok(previewHtml.includes('brand-system.css?v=7'), 'Preview must request phase 7 visual system');
