@@ -21,7 +21,8 @@ REFERENCE = UUID("eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee")
 
 def envelope(sensor_id, index, value, *, minute=None, unit="degC", quality="validated"):
     observed_at = BASE + timedelta(minutes=index * 60 if minute is None else minute)
-    observation_id = UUID(f"f0000000-0000-4000-8000-{index:012d}")
+    observation_number = index * 2 + (1 if sensor_id == TARGET else 2)
+    observation_id = UUID(f"f0000000-0000-4000-8000-{observation_number:012d}")
     measurement = EnvironmentalMeasurement(
         observation_id=observation_id,
         organization_id=ORG,
