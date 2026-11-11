@@ -265,6 +265,9 @@
       seen.add(cursor.id);
       byId.set(cursor.id, cursor);
     }
+    if (cursor.parent_culture_id && !seen.has(cursor.parent_culture_id) && byId.size < MAX_CULTURES) {
+      markIncomplete("culture_ancestor_depth_limit", { message: "Profondeur maximale des ancêtres atteinte" });
+    }
 
     // Walk descendants breadth-first; one batched query per generation, not N+1.
     let frontier = [cursor.id];
@@ -282,6 +285,9 @@
         next.push(child.id);
       }
       frontier = next;
+    }
+    if (frontier.length && byId.size < MAX_CULTURES) {
+      markIncomplete("culture_descendant_depth_limit", { message: "Profondeur maximale des descendants atteinte" });
     }
 
     const cultures = [...byId.values()].sort((a, b) => {
@@ -310,6 +316,9 @@
       rows.forEach(row => materialById.set(row.id, row));
       materialFrontier = rows.map(row => row.parent_material_id).filter(id => id && !materialSeen.has(id));
     }
+    if (materialFrontier.length && materialById.size < MAX_MATERIALS) {
+      markIncomplete("material_ancestor_depth_limit", { message: "Profondeur maximale des matériaux parents atteinte" });
+    }
     // Expand descendants from every material already linked to the culture family.
     materialFrontier = [...new Set(initialMaterialIds)];
     for (let depth = 0; depth < 5 && materialFrontier.length && materialById.size < MAX_MATERIALS; depth++) {
@@ -327,6 +336,9 @@
         next.push(row.id);
       }
       materialFrontier = next;
+    }
+    if (materialFrontier.length && materialById.size < MAX_MATERIALS) {
+      markIncomplete("material_descendant_depth_limit", { message: "Profondeur maximale des descendants matière atteinte" });
     }
     // Expand the explicit material graph in both directions. The relationship table
     // supports multiple parents; parent_material_id remains a legacy single-parent edge.
@@ -361,6 +373,9 @@
       }
       relationshipFrontier = hydrateIds.filter(id => !relationshipSeen.has(id));
       relationshipFrontier.forEach(id => relationshipSeen.add(id));
+    }
+    if (relationshipFrontier.length && materialById.size < MAX_MATERIALS && relationshipByKey.size < MAX_RELATIONSHIPS) {
+      markIncomplete("material_relationship_depth_limit", { message: "Profondeur maximale du graphe de relations atteinte" });
     }
     // Hydrate any legacy parent pointer not represented by an explicit relationship row.
     const unresolvedLegacyParents = [...new Set([...materialById.values()]
