@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    branches: [main, feat/bal-json-contract-v1]
   pull_request:
 
 # CI only checks repository contents; do not grant write permissions by default.
@@ -85,6 +85,10 @@ jobs:
         run: npm install --no-save --package-lock=false ajv@8.17.1 ajv-formats@3.0.1
       - name: Validate BAL-JSON v1 schemas and fixtures
         run: node scripts/test-bal-json-contract.mjs
+      - name: Test BAL-JSON authenticated ingestion contract
+        run: node supabase/tests/bal-json-ingest-contract.test.mjs
+      - name: Test conservative BAL-Normalizer rules
+        run: node scripts/test-bal-normalizer.mjs
 
   batch-tracker-audit:
     runs-on: ubuntu-latest
