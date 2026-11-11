@@ -464,12 +464,12 @@ Deno.serve(async (req: Request) => {
 
     // A historical screening guard band may cross the profile's validity dates.
     // Keep only readings whose local calendar date belongs to this exact profile.
-    const profileScopedRows = rows.filter((row: any) => {
+    const profileScopedRows = (rows ?? []).filter((row: any) => {
       const localDate = localCalendarDate(row.measured_at, profile.timezone);
       return localDate >= profile.valid_from &&
         (profile.valid_to === null || localDate <= profile.valid_to);
     });
-    if (!profileScopedRows.length) {
+    if (!profileScopedRows.length && transmissionExpectedInterval === undefined) {
       return reply(422, { error: "no_sensor_measurements_in_profile_validity" });
     }
 
