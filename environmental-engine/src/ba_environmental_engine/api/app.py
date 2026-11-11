@@ -15,7 +15,7 @@ from uuid import UUID
 
 from fastapi import Depends, FastAPI, Header, HTTPException, status
 from fastapi.encoders import jsonable_encoder
-from pydantic import BaseModel, ConfigDict, Field, StrictBool, StrictInt, ValidationError, model_validator
+from pydantic import BaseModel, ConfigDict, Field, StrictBool, StrictFloat, StrictInt, ValidationError, model_validator
 
 from ba_environmental_engine.contexts.biological import BiologicalContext
 from ba_environmental_engine.contexts.environment import EnvironmentContext
@@ -199,7 +199,7 @@ class SensorAnalysisRequest(APIModel):
     flatline_minimum_repeated_observations: StrictInt | None = Field(default=None, ge=2)
     flatline_minimum_duration_seconds: StrictInt | None = Field(default=None, gt=0)
     transmission_expected_interval_seconds: StrictInt | None = Field(default=None, gt=0)
-    transmission_gap_tolerance_factor: float | None = Field(default=None, gt=1)
+    transmission_gap_tolerance_factor: StrictFloat | None = Field(default=None, gt=1)
     transmission_current_window: StrictBool = False
     transmission_devices: list[SensorTransmissionDeviceInput] | None = Field(default=None, max_length=100)
     transmission_receipts: list[SensorTransmissionReceiptInput] | None = Field(default=None, max_length=5000)
