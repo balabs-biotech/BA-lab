@@ -159,7 +159,11 @@ The remaining feature migrations are ordered after that dependency chain:
 the existing environment-profile sensor bindings and lifecycle guards;
 `20261111043700`–`20261111043900` add lineage indexes and atomic multi-source
 material creation; `20261111044000`–`20261111044100` add sensor-drift reference
-policies and their writer-only read model.
+policies and their writer-only read model. Migration `20261111044200` adds the
+missing versioned `recommendations` JSONB field to
+domain_interpretation_profiles and validates recommendation definitions against
+the Python `RecommendationDefinition` contract. This closes the configuration
+path from persisted profile to resolver without inventing definitions in code.
 
 ## Deployment gate
 
