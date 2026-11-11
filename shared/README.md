@@ -52,3 +52,41 @@ During local preview only:
 If the normalizer script or catalogue is unavailable, raw import remains possible after the server's authoritative contract and catalogue checks. This fallback does not imply that a conversion was performed.
 
 The import UI tests execute the actual shared normalizer module, rather than a copied test implementation.
+
+
+# Biological Interpreter
+
+Status: experimental deterministic component, v0.1.0.
+
+## Responsibility
+
+The Biological Interpreter evaluates a single measurement against an explicitly supplied, reviewed rule. It does not generate biological thresholds, infer optimal conditions from species names, diagnose contamination, or convert units.
+
+## Required evidence
+
+- A finite `assessed_value` and exact `assessed_unit_code` already expressed in the rule's unit.
+- An exact `variable_code` match.
+- A culture context identifier.
+- A rule identifier and version, plus explicit finite minimum and maximum bounds.
+- Any context selectors declared by the rule (currently culture, strain, growth stage, medium and environment).
+
+The caller must resolve the measurement's unit before assessment. A unit mismatch is not silently converted.
+
+## Outcomes
+
+- `normal`: within the supplied inclusive range.
+- `out_of_range`: outside the supplied inclusive range.
+- `insufficient_context`: required measurement, context or reviewed rule is absent or invalid.
+- `not_assessed`: variable, unit or declared context does not match the supplied rule.
+
+Every result includes engine version, rule ID/version, a compact evidence snapshot and `raw_measurement_modified: false`. The component is pure and does not access Supabase or write interpretations into BAL-Core.
+
+## Important boundary
+
+CultureOps does not yet have a validated, versioned library of biological operating ranges for all strains, media and growth stages. Therefore this first slice is an execution kernel only. Without an explicitly supplied reviewed rule, it returns `insufficient_context`; it never invents a temperature, humidity, pH or growth target.
+
+## Verification
+
+```sh
+node scripts/test-biological-interpreter.mjs
+```
