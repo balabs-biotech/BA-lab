@@ -125,12 +125,28 @@ begin
     raise exception 'sensor_drift_reference_must_be_verified_after_draft_creation'
       using errcode = '23514';
   elsif tg_op = 'UPDATE' and new.reference_binding_verified and not old.reference_binding_verified then
+    -- Verification is a distinct, auditable step. Activation must be a later update.
+    if new.status <> 'draft' then
+      raise exception 'sensor_drift_reference_must_remain_draft_during_verification'
+        using errcode = '23514';
+    end if;
     if auth.uid() is null then
       raise exception 'authenticated_reference_verifier_required'
         using errcode = '42501';
     end if;
     new.reference_verified_at := now();
     new.reference_verified_by := auth.uid();
+  elsif tg_op = 'UPDATE' and old.reference_binding_verified and (
+    new.organization_id is distinct from old.organization_id
+    or new.environment_id is distinct from old.environment_id
+    or new.target_sensor_id is distinct from old.target_sensor_id
+    or new.reference_sensor_id is distinct from old.reference_sensor_id
+    or new.variable_code is distinct from old.variable_code
+  ) then
+    -- The evidence attests to this exact physical binding; changing it requires
+    -- a new draft and a new verification record.
+    raise exception 'sensor_drift_reference_binding_cannot_change_after_verification'
+      using errcode = '23514';
   elsif new.reference_binding_verified and (
     new.reference_verification_method is distinct from old.reference_verification_method
     or new.reference_verification_evidence is distinct from old.reference_verification_evidence
