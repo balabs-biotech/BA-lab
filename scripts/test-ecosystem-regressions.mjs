@@ -371,7 +371,7 @@ for (const selector of [
   '#app.balabs-ui > main > .editorial-work .work-grid',
   '#app.balabs-ui > main > .editorial-work .work-card',
   '#app.balabs-ui > main > .universe-index .universe-index-card',
-  '#app.balabs-ui > main > .site-nav a',
+  '#app.balabs-ui > .site-nav a',
   '#app.balabs-ui[dir="rtl"] > main > .hero .aside',
 ]) assert.ok(brandCss.includes(selector), 'Phase 3 must include the responsive editorial selector: ' + selector);
 assert.ok(brandCss.includes('min-height: 44px !important'), 'Language and navigation controls must retain accessible touch targets');
