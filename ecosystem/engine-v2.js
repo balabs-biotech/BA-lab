@@ -263,7 +263,7 @@ function clearResources() {
 function mDispose(material){material?.map?.dispose();material?.dispose?.()}
 function visibleResourceLabelDepth() {
  // Hysteresis prevents labels flickering when pinch/scroll settles on a zoom boundary.
- const thresholds=[5.9,5.1,4.5],margin=.14;
+ const thresholds=[6.6,5.5,4.5],margin=.14;
  while(activeResourceLabelDepth<3&&distance<=thresholds[activeResourceLabelDepth]-margin)activeResourceLabelDepth++;
  while(activeResourceLabelDepth>0&&distance>thresholds[activeResourceLabelDepth-1]+margin)activeResourceLabelDepth--;
  return activeResourceLabelDepth;
