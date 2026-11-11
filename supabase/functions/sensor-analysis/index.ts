@@ -457,7 +457,9 @@ Deno.serve(async (req: Request) => {
       console.error("[sensor-analysis] Measurement lookup failed", rowsError.message);
       return reply(500, { error: "sensor_measurement_lookup_failed" });
     }
-    if (!rows?.length) return reply(422, { error: "no_sensor_measurements_in_scope" });
+    if (!rows?.length && transmissionExpectedInterval === undefined) {
+      return reply(422, { error: "no_sensor_measurements_in_scope" });
+    }
     if (rows.length > MAX_ROWS) return reply(422, { error: "sensor_observation_limit_reached_narrow_date_range" });
 
     // A historical screening guard band may cross the profile's validity dates.
