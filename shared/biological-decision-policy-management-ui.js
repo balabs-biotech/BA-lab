@@ -47,6 +47,17 @@
     const org = () => window.BA_LABS_GET_ORGANIZATION_ID?.();
     let canAdmin = false;
     let latestRules = [];
+    $("decisionPolicyCreateForm").querySelectorAll("input,select,textarea,button").forEach(el => { el.disabled = true; });
+
+    function lockForUnavailableWorkspace() {
+      canAdmin = false;
+      latestRules = [];
+      $("decisionPolicyCreateForm").querySelectorAll("input,select,textarea,button").forEach(el => { el.disabled = true; });
+      $("decisionPolicyPermission").textContent = "Session ou organisation non disponible : consultation et écriture suspendues.";
+      $("decisionPolicyPermission").className = "rule-permission is-readonly";
+      $("decisionPolicyHistory").replaceChildren();
+      $("decisionPolicyRule").innerHTML = '<option value="">Organisation non disponible</option>';
+    }
 
     function status(message, kind="") {
       $("decisionPolicyStatus").textContent = message;
@@ -120,7 +131,10 @@
 
     async function refresh() {
       const organizationId = org();
-      if (!organizationId || !client()) return status("Session ou organisation indisponible. Connectez-vous puis actualisez.","warning");
+      if (!organizationId || !client()) {
+        lockForUnavailableWorkspace();
+        return status("Session ou organisation indisponible. Connectez-vous puis actualisez.","warning");
+      }
       status("Vérification des droits et chargement de l’historique…");
       const capabilities = await window.BALabsBiologicalRuleStore.loadAuthoringCapabilities({client:client(),organizationId});
       if (org() !== organizationId) return status("Espace modifié pendant le chargement. Actualisez.","warning");
@@ -174,6 +188,7 @@
       } catch (_) { status("Création impossible. Vérifiez la session et les permissions.","error"); }
       finally { submit.disabled=!canAdmin; }
     });
+    window.addEventListener("ba-labs-measurements-rendered", refresh);
     refresh();
   }
   if (document.readyState==="loading") document.addEventListener("DOMContentLoaded",init,{once:true});
