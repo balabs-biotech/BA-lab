@@ -1067,6 +1067,14 @@
             new Date(left.occurred_at || 0).getTime() - new Date(right.occurred_at || 0).getTime());
         const supersededEvents = snapshotEvents.filter(event => event.event_type === "superseded");
         const latestSupersededEvent = supersededEvents[supersededEvents.length - 1] || null;
+        const reviewEvents = snapshotEvents.filter(event =>
+          event.event_type === "reviewed" && ["accepted", "contested", "reassessment_requested"].includes(event.event_payload?.decision));
+        const latestReviewEvent = reviewEvents[reviewEvents.length - 1] || null;
+        const reviewDecisionLabels = {
+          accepted: "acceptée",
+          contested: "contestée",
+          reassessment_requested: "réévaluation demandée"
+        };
         const lifecycleLabel = history.events_available !== true ? "Cycle de vie non vérifié"
           : latestSupersededEvent ? "Version remplacée" : "Version courante";
         const summary = element("summary", "", [
@@ -1077,6 +1085,17 @@
         ].join(" · "));
         detail.append(summary);
         detail.append(element("small", "", "Enregistré le " + dateLabel(snapshot.recorded_at)));
+        if (history.events_available === true && latestReviewEvent) {
+          detail.append(element("p", "signal-interpretation-review-state",
+            "Décision de revue humaine : " +
+            reviewDecisionLabels[latestReviewEvent.event_payload.decision] +
+            " · " + dateLabel(latestReviewEvent.occurred_at)));
+          detail.append(element("small", "signal-interpretation-review-disclaimer",
+            "Cette décision documente une revue utilisateur ; elle ne modifie pas le statut du moteur et ne constitue pas une preuve biologique."));
+        } else if (history.events_available === true) {
+          detail.append(element("small", "signal-interpretation-review-state",
+            "Aucune décision de revue humaine enregistrée."));
+        }
         if (latestSupersededEvent) {
           const replacement = latestSupersededEvent.event_payload || {};
           detail.append(element("small", "signal-interpretation-lifecycle",
