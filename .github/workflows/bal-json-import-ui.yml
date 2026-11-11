@@ -17,6 +17,7 @@ on:
       - "scripts/test-biological-interpreter.mjs"
       - "scripts/test-biological-rule-registry.mjs"
       - "scripts/test-biological-rule-schema.mjs"
+      - "scripts/test-biological-rule-resolver.mjs"
       - "schemas/biological-rules/**"
       - "supabase/tests/bal-json-ingest-contract.test.mjs"
       - "supabase/migrations/20261111160000_add_bal_json_atomic_ingestion.sql"
@@ -64,6 +65,8 @@ jobs:
         run: node scripts/test-bal-normalizer.mjs
       - name: Validate versioned biological rule schema
         run: node scripts/test-biological-rule-schema.mjs
+      - name: Test exact biological rule resolution
+        run: node scripts/test-biological-rule-resolver.mjs
       - name: Test biological rule registry validation and review gate
         run: node scripts/test-biological-rule-registry.mjs
       - name: Test explicit-rule Biological Interpreter
