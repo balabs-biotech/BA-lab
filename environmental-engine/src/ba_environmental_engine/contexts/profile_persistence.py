@@ -16,6 +16,7 @@ from ba_environmental_engine.contexts.environment import (
 from ba_environmental_engine.interpretation.models import (
     DomainProfile,
     InterpretationRule,
+    RecommendationDefinition,
 )
 
 
@@ -66,12 +67,20 @@ def domain_profile_from_record(record: Mapping[str, Any]) -> DomainProfile:
     if not isinstance(rules, (list, tuple)):
         raise ValueError("persisted domain profile rules must be an array")
 
+    recommendations = record.get("recommendations", [])
+    if not isinstance(recommendations, (list, tuple)):
+        raise ValueError("persisted domain profile recommendations must be an array")
+
     typed_rules = tuple(InterpretationRule.model_validate(rule) for rule in rules)
+    typed_recommendations = tuple(
+        RecommendationDefinition.model_validate(item) for item in recommendations
+    )
     return DomainProfile(
         profile_id=record["profile_code"],
         module=record["domain"],
         version=record["profile_version"],
         rules=typed_rules,
+        recommendations=typed_recommendations,
     )
 
 
@@ -84,7 +93,7 @@ class SupabaseEnvironmentalProfileRepository:
         "sensors:environment_context_profile_sensors!"
         "environment_context_profile_sensors_profile_fk(sensor_id)"
     )
-    _DOMAIN_SELECT = "id,organization_id,domain,profile_code,profile_version,rules,status,valid_from,valid_to"
+    _DOMAIN_SELECT = "id,organization_id,domain,profile_code,profile_version,rules,recommendations,status,valid_from,valid_to"
 
     def __init__(self, client: Any):
         self._client = client
