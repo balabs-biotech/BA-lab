@@ -4,9 +4,9 @@ import vm from "node:vm";
 const context = { Object, Array, String, Set, Number, Date, globalThis: {} };
 vm.runInNewContext(fs.readFileSync("shared/biological-decision-engine.js", "utf8"), context);
 const engine = context.globalThis.BALabsBiologicalDecisionEngine;
-const assessment = { id: "assessment-1", status: "out_of_range", calculation_origin: "client_engine", server_verification: "not_recomputed" };
+const assessment = { id: "assessment-1", organization_id: "org-1", domain: "mycology", rule_version_id: "rule-version-1", status: "out_of_range", calculation_origin: "client_engine", server_verification: "not_recomputed" };
 const policy = {
-  policy_id: "mycology.temperature.review", version: "1.0.0", status: "reviewed", domain: "mycology",
+  policy_id: "mycology.temperature.review", version: "1.0.0", status: "reviewed", organization_id: "org-1", domain: "mycology", rule_version_id: "rule-version-1",
   trigger_assessment_statuses: ["out_of_range"], decision_code: "inspect_culture_conditions",
   title: "Inspection requise",
   explanation: "Une mesure est hors de la plage définie par une règle biologique examinée.",
@@ -24,4 +24,6 @@ assert.equal(engine.evaluate({ domain: "mycology", assessment: { ...assessment, 
 assert.equal(engine.evaluate({ domain: "mycology", assessment: { ...assessment, server_verification: "verified" }, policies: [policy] }).status, "insufficient_evidence");
 assert.equal(engine.evaluate({ domain: "mycology", assessment: { ...assessment, calculation_origin: "external" }, policies: [policy] }).status, "insufficient_evidence");
 assert.equal(engine.evaluate({ domain: "mycology", assessment: { ...assessment, id: "" }, policies: [policy] }).status, "insufficient_evidence");
+assert.equal(engine.evaluate({ domain: "mycology", assessment: { ...assessment, organization_id: "org-2" }, policies: [policy] }).status, "decision_not_configured");
+assert.equal(engine.evaluate({ domain: "mycology", assessment: { ...assessment, rule_version_id: "rule-version-2" }, policies: [policy] }).status, "decision_not_configured");
 console.log("✓ Biological Decision Engine: reviewed-policy gating, ambiguity, provenance and no automatic actions");
