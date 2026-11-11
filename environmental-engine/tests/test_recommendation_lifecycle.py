@@ -156,7 +156,7 @@ def test_invalid_transition_is_rejected():
 
 
 def test_event_timestamp_must_be_timezone_aware():
-    with pytest.raises(ValueError, match="occurred_at must be timezone-aware"):
+    with pytest.raises(ValueError, match="timestamps must be timezone-aware"):
         RecommendationLifecycleEvent(
             action="accept",
             actor_id="operator-01",
