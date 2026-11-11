@@ -152,3 +152,21 @@ Run:
 node scripts/test-biological-context-adapter.mjs
 node scripts/test-biological-context-loader.mjs
 ```
+
+
+## Biological Assessment Engine
+
+`shared/biological-assessment-engine.js` is the orchestration layer. It passes the supplied domain, measurement variable/unit, BAL-Core context and candidate rules to the exact-match resolver. It calls the interpreter only when exactly one executable reviewed rule matches. Ambiguous rules, missing context and unit mismatches stop before interpretation.
+
+The Mycology and Laboratory workspaces load the registry, resolver, interpreter, assessment engine, context adapter and context loader. The tracker exposes:
+
+- `window.BA_LABS_LOAD_BIOLOGICAL_CONTEXT(cultureId)`
+- `window.BA_LABS_ASSESS_BIOLOGICAL_MEASUREMENT({ cultureId, measurement, rules })`
+
+The caller must supply a candidate rule set. This change does not add a database table or publish biological thresholds. It does not automatically assess measurements on page load, convert units, persist assessments or modify source records. An assessment is currently an explicit, read-only operation invoked by another feature or developer console.
+
+Run:
+
+```sh
+node scripts/test-biological-assessment-engine.mjs
+```
