@@ -76,11 +76,21 @@
       return;
     }
     const measurementId = button.dataset.biologicalAssess;
+    if (!button.dataset.assessmentIdempotencyKey) {
+      if (!window.crypto || typeof window.crypto.randomUUID !== "function") {
+        button.textContent = "Identifiant sécurisé indisponible";
+        return;
+      }
+      button.dataset.assessmentIdempotencyKey = window.crypto.randomUUID();
+    }
+    const idempotencyKey = button.dataset.assessmentIdempotencyKey;
     button.disabled = true;
     button.textContent = "Évaluation en cours…";
-    const output = await assessment({ measurementId });
+    const output = await assessment({ measurementId, idempotencyKey });
     if (output.status === "recorded") {
-      button.textContent = "Évaluation enregistrée";
+      delete button.dataset.assessmentIdempotencyKey;
+      button.disabled = false;
+      button.textContent = "Nouvelle évaluation";
       await loadVisibleHistory();
     } else {
       button.disabled = false;
