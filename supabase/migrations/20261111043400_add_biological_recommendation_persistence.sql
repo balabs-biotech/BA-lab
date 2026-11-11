@@ -57,7 +57,8 @@ create table public.biological_recommendations (
     ),
   constraint biological_recommendations_revision_state_check
     check (
-      (lifecycle_status in ('proposed', 'withheld', 'rejected') and revision in (0, 1))
+      (lifecycle_status in ('proposed', 'withheld') and revision = 0)
+      or (lifecycle_status = 'rejected' and revision = 1)
       or (lifecycle_status = 'accepted' and revision = 1)
       or (lifecycle_status = 'executed' and revision = 2)
       or (lifecycle_status = 'outcome_recorded' and revision = 3)
@@ -199,7 +200,7 @@ begin
       using errcode = '42501';
   end if;
 
-  if p_proposal_status not in ('proposed', 'withheld')
+  if p_proposal_status is null or p_proposal_status not in ('proposed', 'withheld')
      or p_withholding_reasons is null
      or jsonb_typeof(p_withholding_reasons) <> 'array'
      or jsonb_path_exists(p_withholding_reasons, '$[*] ? (@.type() != "string")') then
@@ -287,6 +288,7 @@ begin
 
   if p_event_id is null or p_occurred_at is null
      or p_occurred_at > now() + interval '5 minutes'
+     or p_action is null
      or p_action not in ('accept', 'reject', 'record_execution', 'record_outcome') then
     raise exception 'invalid_biological_recommendation_event'
       using errcode = '23514';
@@ -305,6 +307,12 @@ begin
     raise exception 'invalid_biological_recommendation_event_payload'
       using errcode = '23514';
   end if;
+
+  -- Serialize reuse of an event UUID within an organization. This makes
+  -- concurrent identical retries idempotent even when they target one row.
+  perform pg_advisory_xact_lock(
+    hashtextextended(p_organization_id::text || ':' || p_event_id::text, 0)
+  );
 
   select e.* into v_existing
     from public.biological_recommendation_events e
