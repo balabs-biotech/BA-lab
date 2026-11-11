@@ -126,5 +126,20 @@ begin
     raise exception 'privacy_audit_service_role_consent_ledger_privileges_missing';
   end if;
 
+
+  -- Before User Created hook must be executable by Auth only.
+  if to_regprocedure('public.hook_validate_signup_legal_versions(jsonb)') is null then
+    raise exception 'privacy_audit_signup_validation_hook_missing';
+  end if;
+
+  if has_function_privilege('anon', 'public.hook_validate_signup_legal_versions(jsonb)', 'EXECUTE')
+     or has_function_privilege('authenticated', 'public.hook_validate_signup_legal_versions(jsonb)', 'EXECUTE') then
+    raise exception 'privacy_audit_signup_validation_hook_client_executable';
+  end if;
+
+  if not has_function_privilege('supabase_auth_admin', 'public.hook_validate_signup_legal_versions(jsonb)', 'EXECUTE') then
+    raise exception 'privacy_audit_signup_validation_hook_auth_role_not_granted';
+  end if;
+
 end
 $;
