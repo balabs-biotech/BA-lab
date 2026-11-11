@@ -87,10 +87,12 @@ for (const [label, source] of [['public', html], ['preview', previewHtml]]) {
   assert.ok(source.includes("skipLabels={fr:'Aller au contenu principal'") && source.includes('skip.textContent=skipLabels[l]'), label + ' skip navigation text must be localised in all four languages');
 }
 
-assert.ok(/<footer\\b[\\s\\S]*?data-domain-page="products" data-i18n="navCatalogue"[\\s\\S]*?<\\/footer>/.test(html) && /<footer\\b[\\s\\S]*?data-domain-page="products" data-i18n="navCatalogue"[\\s\\S]*?<\\/footer>/.test(previewHtml), 'The public and preview footers must both link directly to the products universe');
+const publicFooter = html.slice(html.lastIndexOf('<footer'), html.indexOf('</footer>', html.lastIndexOf('<footer')) + 9);
+const previewFooter = previewHtml.slice(previewHtml.lastIndexOf('<footer'), previewHtml.indexOf('</footer>', previewHtml.lastIndexOf('<footer')) + 9);
+assert.ok(publicFooter.includes('data-domain-page="products" data-i18n="navCatalogue"') && previewFooter.includes('data-domain-page="products" data-i18n="navCatalogue"'), 'The public and preview footers must both link directly to the products universe');
 assert.ok(html.includes('data-domain-page="products" data-i18n="navCatalogue"') && previewHtml.includes('data-domain-page="products" data-i18n="navCatalogue"'), 'The footer must provide a direct route into the public products catalogue universe');
 for (const [language, label] of Object.entries({ fr: 'Catalogue', en: 'Catalogue', ar: 'الكتالوج', pt: 'Catálogo' })) {
-  const languageStart = html.indexOf('\\n' + language + ':{');
+  const languageStart = html.indexOf(language + ':{');
   assert.ok(languageStart >= 0 && html.slice(languageStart, languageStart + 1800).includes('navCatalogue:"' + label + '"'), language + ' footer catalogue label must be localised');
 }
 assert.ok(html.includes("a[data-domain-page],a[data-work-page]") && previewHtml.includes("a[data-domain-page],a[data-work-page]") && html.includes("enterSphere(id,true,false)") && previewHtml.includes("enterSphere(id,true,false)"), 'Homepage universe and featured-work links must open the selected domain directly');
