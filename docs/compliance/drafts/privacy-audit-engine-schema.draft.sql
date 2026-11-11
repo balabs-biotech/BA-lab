@@ -297,3 +297,158 @@ revoke all on function private.capture_signup_legal_acts() from public, anon, au
 create trigger auth_user_signup_legal_acts
 after insert on auth.users
 for each row execute function private.capture_signup_legal_acts();
+
+
+-- Platform-level administrators are distinct from organization owners/admins.
+-- No client role receives access. Initial provisioning is performed out-of-band
+-- by the database owner after identity verification; no self-service grant path.
+create table private.platform_administrators (
+  user_id uuid primary key references auth.users(id) on delete restrict,
+  granted_at timestamptz not null default now(),
+  granted_by uuid references auth.users(id) on delete set null,
+  reason text not null check (length(btrim(reason)) > 0)
+);
+
+alter table private.platform_administrators enable row level security;
+revoke all on private.platform_administrators from public, anon, authenticated, service_role;
+
+-- Narrow server-only authorization check. The Edge Function first validates
+-- the caller's JWT with Auth, then asks this function about that verified UUID.
+create or replace function public.is_platform_administrator(p_user_id uuid)
+returns boolean
+language sql
+stable
+security definer
+set search_path = pg_catalog, private
+as $$
+  select exists (
+    select 1 from private.platform_administrators pa
+    where pa.user_id = p_user_id
+  );
+$$;
+
+revoke all on function public.is_platform_administrator(uuid) from public, anon, authenticated;
+grant execute on function public.is_platform_administrator(uuid) to service_role;
+
+create or replace function public.list_legal_document_versions()
+returns table (
+  id uuid,
+  document_type text,
+  version text,
+  content_sha256 text,
+  document_path text,
+  effective_at timestamptz,
+  retired_at timestamptz,
+  created_at timestamptz
+)
+language sql
+stable
+security definer
+set search_path = pg_catalog, private
+as $$
+  select d.id, d.document_type, d.version, d.content_sha256, d.document_path,
+         d.effective_at, d.retired_at, d.created_at
+  from private.legal_document_versions d
+  order by d.document_type, d.effective_at desc nulls last, d.created_at desc;
+$$;
+
+revoke all on function public.list_legal_document_versions() from public, anon, authenticated;
+grant execute on function public.list_legal_document_versions() to service_role;
+
+create or replace function public.publish_legal_document_version(
+  p_document_type text,
+  p_version text,
+  p_content_sha256 text,
+  p_document_path text,
+  p_effective_at timestamptz,
+  p_created_by uuid
+)
+returns uuid
+language plpgsql
+security definer
+set search_path = pg_catalog, private
+as $$
+declare
+  new_id uuid;
+begin
+  if p_document_type not in ('terms','privacy_notice','cookies_notice','research_consent')
+     or p_version is null or length(btrim(p_version)) = 0
+     or p_content_sha256 !~ '^[0-9a-f]{64}$'
+     or p_document_path is null or length(btrim(p_document_path)) = 0
+     or p_effective_at is null or p_effective_at < statement_timestamp()
+     or p_created_by is null then
+    raise exception 'invalid_legal_document_publication_payload';
+  end if;
+
+  perform pg_advisory_xact_lock(hashtext('ba_labs_legal_doc:' || p_document_type));
+
+  if exists (
+    select 1 from private.legal_document_versions d
+    where d.document_type = p_document_type
+      and d.effective_at is not null
+      and (d.retired_at is null or d.retired_at > p_effective_at)
+      and d.effective_at >= p_effective_at
+  ) then
+    raise exception 'legal_document_future_version_conflict';
+  end if;
+
+  update private.legal_document_versions d
+  set retired_at = p_effective_at
+  where d.document_type = p_document_type
+    and d.effective_at is not null
+    and d.effective_at < p_effective_at
+    and d.retired_at is null;
+
+  insert into private.legal_document_versions (
+    document_type, version, content_sha256, document_path,
+    effective_at, created_by
+  ) values (
+    p_document_type, p_version, p_content_sha256, p_document_path,
+    p_effective_at, p_created_by
+  ) returning id into new_id;
+
+  return new_id;
+end;
+$$;
+
+revoke all on function public.publish_legal_document_version(text,text,text,text,timestamptz,uuid)
+  from public, anon, authenticated;
+grant execute on function public.publish_legal_document_version(text,text,text,text,timestamptz,uuid)
+  to service_role;
+
+create or replace function public.retire_legal_document_version(
+  p_document_version_id uuid,
+  p_retired_at timestamptz
+)
+returns boolean
+language plpgsql
+security definer
+set search_path = pg_catalog, private
+as $$
+declare
+  changed integer;
+begin
+  if p_document_version_id is null or p_retired_at is null
+     or p_retired_at < statement_timestamp() then
+    raise exception 'invalid_legal_document_retirement_payload';
+  end if;
+
+  update private.legal_document_versions
+  set retired_at = p_retired_at
+  where id = p_document_version_id
+    and effective_at is not null
+    and retired_at is null
+    and p_retired_at >= effective_at;
+
+  get diagnostics changed = row_count;
+  if changed = 0 then
+    raise exception 'legal_document_version_not_retirable';
+  end if;
+  return true;
+end;
+$$;
+
+revoke all on function public.retire_legal_document_version(uuid,timestamptz)
+  from public, anon, authenticated;
+grant execute on function public.retire_legal_document_version(uuid,timestamptz)
+  to service_role;
