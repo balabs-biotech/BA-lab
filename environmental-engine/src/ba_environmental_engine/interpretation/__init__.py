@@ -1,7 +1,7 @@
 """Configurable, domain-specific interpretation of environmental findings."""
 
 from .recommendations import resolve_recommendations
-from .recommendation_lifecycle import (
+from .recommendation_repository import (\n    RecommendationAccessDeniedError,\n    RecommendationNotFoundError,\n    RecommendationRepository,\n    RecommendationRepositoryError,\n    RecommendationRevisionConflictError,\n)\nfrom .recommendation_lifecycle import (
     RecommendationLifecycle,
     RecommendationLifecycleEvent,
     transition_recommendation,
@@ -47,5 +47,5 @@ __all__ = [
     "resolve_recommendations",
     "RecommendationLifecycle",
     "RecommendationLifecycleEvent",
-    "transition_recommendation",
+    "transition_recommendation",\n    "RecommendationRepository",\n    "RecommendationRepositoryError",\n    "RecommendationNotFoundError",\n    "RecommendationRevisionConflictError",\n    "RecommendationAccessDeniedError",
 ]
