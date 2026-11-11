@@ -15,6 +15,34 @@ for (const language of ['fr', 'en', 'ar', 'pt']) {
   const ids = languageTrees[language].domains.map((domain) => domain.id).sort();
   assert.deepEqual(ids, [...expectedDomains].sort(), language + ' manifest must expose exactly the eight public universes');
 }
+function flattenManifest(node, out = []) {
+  out.push(node);
+  for (const child of node.children || []) flattenManifest(child, out);
+  return out;
+}
+for (const language of ['fr', 'en', 'ar', 'pt']) {
+  const tree = languageTrees[language];
+  const allIds = new Set();
+  for (const domain of tree.domains) {
+    const nodes = flattenManifest(domain);
+    for (const node of nodes) {
+      assert.ok(node.id && !allIds.has(node.id), language + ' manifest node IDs must be present and unique');
+      allIds.add(node.id);
+      if (node.url) {
+        const match = node.url.match(/^https:\/\/app\.notion\.com\/p\/([a-f0-9]{32})$/);
+        assert.ok(match, language + ' ' + node.id + ' must use a valid Notion page URL');
+        if (node.notionId) assert.equal(node.notionId, match[1], language + ' ' + node.id + ' notionId must match its URL');
+      } else {
+        assert.equal(node, domain, language + ' only a universe root may omit its own Notion URL');
+        assert.ok((node.children || []).length > 0, language + ' an unlinked universe root must still expose real child pages');
+      }
+    }
+  }
+}
+assert.ok(engine.includes("fetch('./notion-tree.'+LANG()+'.json'") && engine.includes("attributeFilter:['lang']"),
+  'The 3D explorer must load the active language manifest and refresh it when the document language changes');
+assert.ok(engine.includes('function buildResources(id,parentNode=null,anchor=null)') && engine.includes('currentNode.children||[]'),
+  'The 3D explorer must build each navigable level from the active manifest hierarchy');
 function domainRootFromEngine(source, domain, language) {
   const start = source.indexOf('const pages={');
   const end = source.indexOf('\n};', start);
