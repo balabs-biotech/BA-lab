@@ -78,3 +78,17 @@ La table `public.events` est un journal de traçabilité biologique avec des pol
 - [ ] Créer une migration dédiée au registre des versions de documents et aux événements de consentement append-only.
 - [ ] Créer un journal d'opérations distinct des événements biologiques, couvrant les actions pertinentes de l'article 41 bis 3.
 - [ ] Ajouter les tests SQL d'isolation multi-tenant, d'interdiction UPDATE/DELETE et de validation des versions documentaires.
+
+
+## Contrôle complémentaire Supabase — 11 novembre 2026, 15:xx UTC
+
+Le contrôle des Advisors et des privilèges effectifs confirme les points suivants :
+
+- `private.culture_notion_sync_locks` a RLS désactivée. L'Advisor l'a signalée comme critique. La vérification SQL ciblée montre toutefois qu'`anon` n'a pas USAGE sur le schéma `private`, que `authenticated` n'a aucun privilège SELECT/INSERT sur cette table, et que l'ACL de table n'accorde les droits opérationnels qu'à `service_role`. Il n'y a donc pas d'accès direct client constaté à cet instant, mais RLS reste une défense en profondeur manquante. Ne pas appliquer automatiquement la commande sans vérifier le chemin d'accès serveur et les tests.
+- Remédiation candidate, non appliquée :
+  `ALTER TABLE private.culture_notion_sync_locks ENABLE ROW LEVEL SECURITY;`
+  Aucune policy client ne doit être ajoutée. Les appels serveur doivent continuer à utiliser le rôle privilégié attendu et être retestés après activation.
+- Les Advisors signalent aussi huit fonctions métier `SECURITY DEFINER` exécutables par `authenticated` (déjà identifiées dans la revue précédente). Elles ne doivent pas être révoquées en bloc : les contrôles d'organisation et les tests cross-tenant doivent être vérifiés individuellement.
+- La protection contre les mots de passe compromis demeure désactivée dans Auth.
+
+La liste des migrations de production se termine toujours par `20261111043003_revoke_anonymous_profile_registry_access`. Aucune migration Privacy & Audit Engine n'est présente ; les tables et fonctions du registre documentaire ne sont pas installées en production.
