@@ -2841,3 +2841,11 @@ body[data-domain] :is(button, input, select, textarea, a, [tabindex]):focus-visi
 .rule-version-compare dd{margin:0;overflow-wrap:anywhere}
 .rule-conflict{padding:8px 10px;border-left:3px solid #b36a24;background:#fff6e9;color:#754514}
 .rule-record button:disabled,.rule-create button:disabled{opacity:.45;cursor:not-allowed}
+
+.biological-assess-button{margin-top:8px;font-size:12px}
+.biological-assessment-history{display:grid;gap:6px;margin-top:8px}
+.biological-assessment-record{padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:var(--surface,transparent)}
+.biological-assessment-record strong{display:block;margin-bottom:3px}
+.biological-assessment-record.status-out_of_range{border-left:3px solid #b36a24}
+.biological-assessment-record.status-normal{border-left:3px solid #3d8b61}
+.biological-assessment-record.status-insufficient_context,.biological-assessment-record.status-not_assessed{border-left:3px solid #89939a}
