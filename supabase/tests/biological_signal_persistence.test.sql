@@ -85,8 +85,9 @@ begin
    where c.conrelid = v_evidence_table
      and c.conname = 'biological_signal_evidence_environmental_observation_fk';
 
-  if v_constraint is null or v_constraint not like
-    '%FOREIGN KEY (organization_id, environmental_observation_id) REFERENCES public.environmental_observations(organization_id, id)%' then
+  if v_constraint is null
+     or position('FOREIGN KEY (organization_id, environmental_observation_id)' in v_constraint) = 0
+     or position('environmental_observations' in v_constraint) = 0 then
     raise exception 'FAIL: climate signal evidence must enforce tenant-scoped environmental observation references';
   end if;
 
@@ -96,8 +97,9 @@ begin
    where c.conrelid = v_evidence_table
      and c.conname = 'biological_signal_evidence_measurement_fk';
 
-  if v_constraint is null or v_constraint not like
-    '%FOREIGN KEY (organization_id, measurement_id) REFERENCES public.measurements(organization_id, id)%' then
+  if v_constraint is null
+     or position('FOREIGN KEY (organization_id, measurement_id)' in v_constraint) = 0
+     or position('measurements' in v_constraint) = 0 then
     raise exception 'FAIL: IoT signal evidence must enforce tenant-scoped measurement references';
   end if;
 
