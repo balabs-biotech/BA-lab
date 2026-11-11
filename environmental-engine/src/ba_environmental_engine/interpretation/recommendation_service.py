@@ -25,6 +25,23 @@ class RecommendationService:
     def __init__(self, repository: RecommendationRepository):
         self._repository = repository
 
+    def create(
+        self,
+        *,
+        organization_id: UUID,
+        proposal,
+    ) -> RecommendationLifecycle:
+        """Persist one resolved proposal without changing its scientific content.
+
+        Both proposed and withheld outcomes are retained for traceability. The
+        repository enforces source-signal provenance and tenant ownership.
+        """
+        lifecycle = RecommendationLifecycle.from_proposal(proposal)
+        return self._repository.create(
+            organization_id=organization_id,
+            lifecycle=lifecycle,
+        )
+
     def transition(
         self,
         *,
