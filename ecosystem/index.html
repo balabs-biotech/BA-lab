@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#eeeae0">
+<meta name="theme-color" content="#111B1D">
 <meta name="description" content="Explorez le réseau vivant de BALabs : biotechnologies, mycologie, TechnoSoil, R&D et applications connectées aux ressources publiques.">
 <title>BALabs — Réseau vivant</title>
 <style>
@@ -4137,6 +4137,73 @@ html,body{background:var(--bal-petrol)!important;color:var(--bal-mineral)!import
 @media(prefers-reduced-motion:reduce){
  .editorial-work .work-card,.editorial-work .work-card .work-media img,.universe-index-card{transition:none!important}
  .editorial-work .work-card:hover,.universe-index-card:hover{transform:none!important}
+}
+
+
+/* BA Labs brand integration — editorial homepage only. Spatial engine stays isolated. */
+:root{
+ --balabs-graphite:#111B1D;--balabs-forest:#263B38;--balabs-copper:#B96B4D;
+ --balabs-mineral:#D1D0C5;--balabs-paper:#F2F1E9;--balabs-muted:#9BAEA4;--balabs-line:#40534D;
+}
+html{background:var(--balabs-graphite)!important}
+body{background:radial-gradient(ellipse at 18% 0%,#263B38 0%,transparent 38%),linear-gradient(145deg,#111B1D 0%,#172321 58%,#111B1D 100%)!important;color:var(--balabs-mineral)!important}
+#app>.top,#app>.site-nav{background:rgba(17,27,29,.94)!important;border-color:var(--balabs-line)!important}
+#app>.top .brand strong,#app>.foot .foot-home strong{color:var(--balabs-paper)!important}
+#app>.top .brand small,#app>.foot .foot-brand small{color:var(--balabs-muted)!important}
+#app>.top .lang{background:var(--balabs-forest)!important;border-color:var(--balabs-line)!important;color:var(--balabs-mineral)!important}
+#app>.top .lang[aria-pressed=true]{background:var(--balabs-copper)!important;border-color:var(--balabs-copper)!important;color:var(--balabs-paper)!important}
+#app>.site-nav a{color:var(--balabs-muted)!important}
+#app>.site-nav a:hover,#app>.site-nav a[aria-current=page]{color:var(--balabs-paper)!important}
+#app>.hero,#app>.editorial-feature,#app>.editorial-about,#app>.editorial-work,#app>.editorial-method,#app>.foot{
+ background:transparent!important;color:var(--balabs-mineral)!important;border-color:var(--balabs-line)!important
+}
+#app>.hero h1,#app>.editorial-feature h2,#app>.editorial-about h2,#app>.editorial-work h2,#app>.editorial-method h2{color:var(--balabs-paper)!important}
+#app>.hero p,#app>.editorial-feature p,#app>.editorial-about p,#app>.editorial-work .work-heading>p,#app>.editorial-work .work-card p,#app>.editorial-method p{color:var(--balabs-muted)!important}
+#app .eyebrow,#app .editorial-feature .feature-status{color:var(--balabs-copper)!important}
+#app .hero-action-primary{background:var(--balabs-copper)!important;border-color:var(--balabs-copper)!important;color:var(--balabs-paper)!important}
+#app .hero-action-secondary,#app .editorial-link{color:var(--balabs-mineral)!important;border-color:var(--balabs-line)!important}
+#app .editorial-art{color:var(--balabs-muted)!important}
+#app>.editorial-work .work-card{
+ background:linear-gradient(155deg,#263B38,#1a2927)!important;color:var(--balabs-mineral)!important;
+ border:1px solid var(--balabs-line)!important;border-top:3px solid var(--balabs-copper)!important;
+ box-shadow:0 12px 32px #0005!important
+}
+#app>.editorial-work .work-card h3{color:var(--balabs-paper)!important}
+#app>.editorial-work .work-card p{color:var(--balabs-muted)!important}
+#app>.editorial-work .work-card a,#app>.editorial-work .work-card .work-explore{color:#D99A7F!important}
+#app>.universe-index{
+ background:linear-gradient(160deg,#172522,#111B1D)!important;color:var(--balabs-mineral)!important;
+ border-block:1px solid var(--balabs-line)!important
+}
+#app>.universe-index .universe-index-heading h2{color:var(--balabs-paper)!important}
+#app>.universe-index .universe-index-heading>p{color:var(--balabs-muted)!important}
+#app>.universe-index .universe-index-card{
+ background:linear-gradient(155deg,#263B38,#1b2b28)!important;color:var(--balabs-mineral)!important;
+ border:1px solid var(--balabs-line)!important;border-top:3px solid var(--balabs-copper)!important;
+ box-shadow:0 10px 28px #0004!important
+}
+#app>.universe-index .universe-index-card:nth-child(2n),
+#app>.universe-index .universe-index-card:nth-child(3n){background:linear-gradient(155deg,#263B38,#1b2b28)!important;border-top-color:var(--balabs-copper)!important}
+#app>.universe-index .universe-index-card>b{color:var(--balabs-paper)!important}
+#app>.universe-index .universe-index-card>small,
+#app>.universe-index .universe-index-card>p{color:var(--balabs-muted)!important}
+#app>.universe-index .universe-index-card>span,
+#app>.universe-index .universe-index-card>em{color:#D99A7F!important}
+#app>.editorial-method .method-steps li{border-color:var(--balabs-line)!important}
+#app>.editorial-method .method-no{color:var(--balabs-copper)!important}
+#app>.foot a{color:var(--balabs-mineral)!important}
+#app .hero-action-primary:focus-visible,#app .hero-action-secondary:focus-visible,
+#app .editorial-link:focus-visible,#app .universe-index-card:focus-visible{
+ outline:3px solid var(--balabs-copper)!important;outline-offset:4px!important
+}
+@media(max-width:760px){
+ #app>.hero,#app>.editorial-feature,#app>.editorial-about,#app>.editorial-work,#app>.editorial-method{border-color:var(--balabs-line)!important}
+ #app>.universe-index .universe-index-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+}
+@media(max-width:420px){#app>.universe-index .universe-index-grid{grid-template-columns:1fr!important}}
+@media(prefers-reduced-motion:reduce){
+ #app>.editorial-work .work-card,#app>.universe-index .universe-index-card{transition:none!important}
+ #app>.editorial-work .work-card:hover,#app>.universe-index .universe-index-card:hover{transform:none!important}
 }
 
 </style>
