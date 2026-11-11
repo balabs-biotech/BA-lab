@@ -2,54 +2,54 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
+import Ajv2020 from "ajv/dist/2020.js";
+import addFormats from "ajv-formats";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const readJson = (relativePath) => JSON.parse(readFileSync(path.join(root, relativePath), "utf8"));
 
-const record = readJson("schemas/bal-json/v1/record.schema.json");
-const measurement = readJson("schemas/bal-json/v1/measurement.schema.json");
-const observation = readJson("schemas/bal-json/v1/observation.schema.json");
-
-assert.equal(record.$schema, "https://json-schema.org/draft/2020-12/schema");
-assert.equal(record.$id, "https://ba-labs.com/schemas/bal-json/v1/record.schema.json");
-assert.deepEqual(record.required, [
-  "contract", "contract_version", "record_type", "record_id",
-  "organization_id", "created_at", "data", "provenance"
-]);
-assert.deepEqual(record.properties.contract, { const: "BA-LABS/JSON" });
-assert.deepEqual(record.properties.contract_version, { const: "1.0.0" });
-assert.deepEqual(record.properties.record_type.enum, ["measurement", "observation"]);
-assert.ok(record.allOf.some((rule) => rule.if?.properties?.record_type?.const === "measurement"));
-assert.ok(record.allOf.some((rule) => rule.if?.properties?.record_type?.const === "observation"));
-assert.equal(record.allOf[0].then.properties.data.$ref, "urn:ba-labs:bal-json:v1:measurement");
-assert.equal(record.allOf[1].then.properties.data.$ref, "urn:ba-labs:bal-json:v1:observation");
-assert.equal(record.properties.provenance.$ref, "#/$defs/provenance");
-assert.equal(record.additionalProperties, false);
-
-assert.ok(measurement.required.includes("variable_code"));
-assert.ok(measurement.required.includes("raw_value"));
-assert.ok(measurement.required.includes("raw_unit_code"));
-assert.ok(measurement.properties.raw_value.type === "number");
-assert.ok(measurement.properties.normalized_value.type === "number");
-assert.ok(measurement.properties.quality_state.enum.includes("excluded"));
-assert.ok(measurement.additionalProperties === false);
-
-assert.ok(observation.required.includes("variable_code"));
-assert.ok(observation.required.includes("value_text"));
-assert.ok(observation.required.includes("observed_at"));
-assert.ok(observation.additionalProperties === false);
-
-const example = readJson("schemas/bal-json/v1/examples/mycology-measurement.json");
+const recordSchema = readJson("schemas/bal-json/v1/record.schema.json");
+const measurementSchema = readJson("schemas/bal-json/v1/measurement.schema.json");
+const observationSchema = readJson("schemas/bal-json/v1/observation.schema.json");
+const measurementExample = readJson("schemas/bal-json/v1/examples/mycology-measurement.json");
 const observationExample = readJson("schemas/bal-json/v1/examples/laboratory-observation.json");
-assert.equal(example.contract, "BA-LABS/JSON");
-assert.equal(example.contract_version, "1.0.0");
-assert.equal(example.record_type, "measurement");
-assert.equal(example.data.variable_code, "temperature");
-assert.equal(example.data.raw_unit_code, "degC");
-assert.equal(example.provenance.source, "sensor");
-assert.equal(observationExample.record_type, "observation");
-assert.equal(observationExample.data.variable_code, "colony_morphology");
-assert.equal(observationExample.data.context.culture_id, example.data.context.culture_id);
-assert.equal(observation.properties.context.$ref, "urn:ba-labs:bal-json:v1:measurement#/$defs/context");
 
-console.log("✓ BAL-JSON v1 schema structure and canonical mycology measurement fixture");
+assert.equal(recordSchema.$schema, "https://json-schema.org/draft/2020-12/schema");
+assert.equal(recordSchema.$id, "urn:ba-labs:bal-json:v1:record");
+assert.equal(recordSchema.properties.contract.const, "BA-LABS/JSON");
+assert.equal(recordSchema.properties.contract_version.const, "1.0.0");
+assert.deepEqual(recordSchema.properties.record_type.enum, ["measurement", "observation"]);
+assert.equal(recordSchema.allOf[0].then.properties.data.$ref, measurementSchema.$id);
+assert.equal(recordSchema.allOf[1].then.properties.data.$ref, observationSchema.$id);
+assert.equal(observationSchema.properties.context.$ref, measurementSchema.$id + "#/$defs/context");
+
+const ajv = new Ajv2020({ allErrors: true, strict: true });
+addFormats(ajv);
+ajv.addSchema(measurementSchema);
+ajv.addSchema(observationSchema);
+const validateRecord = ajv.compile(recordSchema);
+
+assert.equal(validateRecord(measurementExample), true, JSON.stringify(validateRecord.errors));
+assert.equal(validateRecord(observationExample), true, JSON.stringify(validateRecord.errors));
+
+const missingUnit = structuredClone(measurementExample);
+delete missingUnit.data.raw_unit_code;
+assert.equal(validateRecord(missingUnit), false, "measurement without a raw unit must be rejected");
+
+const excludedWithoutReason = structuredClone(measurementExample);
+excludedWithoutReason.data.quality_state = "excluded";
+assert.equal(validateRecord(excludedWithoutReason), false, "excluded measurement without a reason must be rejected");
+
+const missingContext = structuredClone(measurementExample);
+missingContext.data.context = { environment_id: measurementExample.data.context.environment_id };
+assert.equal(validateRecord(missingContext), false, "environment-only context must not identify a biological record");
+
+const emptyObservation = structuredClone(observationExample);
+emptyObservation.data.value_text = "";
+assert.equal(validateRecord(emptyObservation), false, "empty qualitative observation must be rejected");
+
+const unknownRecordType = structuredClone(observationExample);
+unknownRecordType.record_type = "prediction";
+assert.equal(validateRecord(unknownRecordType), false, "unknown record types must be rejected");
+
+console.log("✓ BAL-JSON v1 Draft 2020-12 schemas compile and valid/invalid fixtures behave as specified");
