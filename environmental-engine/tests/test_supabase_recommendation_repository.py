@@ -216,6 +216,113 @@ def test_get_reconstructs_full_revision_ordered_history():
     assert result.events[0].event_id == event.event_id
 
 
+def test_append_event_uses_authenticated_rpc_and_reloads_committed_history():
+    proposal = make_proposal()
+    actor_id = uuid4()
+    occurred_at = datetime(2026, 11, 11, tzinfo=timezone.utc)
+    event = RecommendationLifecycleEvent(
+        event_id=uuid4(),
+        action="accept",
+        actor_id=str(actor_id),
+        occurred_at=occurred_at,
+        note="Validated by operator",
+    )
+    user_client = FakeClient(
+        rpc_results={
+            "transition_biological_recommendation": {
+                "recommendation": recommendation_row(
+                    proposal, status="accepted", revision=1
+                ),
+                "event": {
+                    "event_id": str(event.event_id),
+                    "revision": 1,
+                    "action": "accept",
+                    "actor_id": str(actor_id),
+                    "occurred_at": occurred_at.isoformat(),
+                    "note": event.note,
+                    "execution_details": None,
+                    "outcome_summary": None,
+                    "outcome_observed_at": None,
+                },
+                "idempotent_replay": False,
+            }
+        },
+        table_results={
+            "biological_recommendations": {
+                **recommendation_row(proposal, status="accepted", revision=1),
+                "events": [{
+                    "event_id": str(event.event_id),
+                    "revision": 1,
+                    "action": "accept",
+                    "actor_id": str(actor_id),
+                    "occurred_at": occurred_at.isoformat(),
+                    "note": event.note,
+                    "execution_details": None,
+                    "outcome_summary": None,
+                    "outcome_observed_at": None,
+                }],
+            }
+        },
+    )
+    repository = SupabaseRecommendationRepository(
+        user_client=user_client,
+        service_client=FakeClient(),
+        authenticated_user_id=actor_id,
+    )
+
+    result = repository.append_event(
+        organization_id=uuid4(),
+        recommendation_id=proposal.recommendation_id,
+        expected_revision=0,
+        event=event,
+    )
+
+    assert result.status == "accepted"
+    assert result.revision == 1
+    assert result.events[0].event_id == event.event_id
+    rpc_name, params = user_client.rpc_calls[0]
+    assert rpc_name == "transition_biological_recommendation"
+    assert params["p_expected_revision"] == 0
+    assert params["p_event_id"] == str(event.event_id)
+
+
+def test_append_event_maps_database_revision_conflict():
+    class ConflictRpc(FakeRpc):
+        def execute(self):
+            class DatabaseError(Exception):
+                code = "40001"
+
+            raise DatabaseError("biological_recommendation_revision_conflict")
+
+    class ConflictClient(FakeClient):
+        def rpc(self, name, params):
+            return ConflictRpc(self, name, params)
+
+    from ba_environmental_engine.interpretation.recommendation_repository import (
+        RecommendationRevisionConflictError,
+    )
+
+    actor_id = uuid4()
+    repository = SupabaseRecommendationRepository(
+        user_client=ConflictClient(),
+        service_client=FakeClient(),
+        authenticated_user_id=actor_id,
+    )
+    event = RecommendationLifecycleEvent(
+        action="accept",
+        actor_id=str(actor_id),
+        occurred_at=datetime.now(timezone.utc),
+    )
+
+    with pytest.raises(RecommendationRevisionConflictError):
+        repository.append_event(
+            organization_id=uuid4(),
+            recommendation_id=uuid4(),
+            expected_revision=0,
+            event=event,
+        )
+
+
 def test_append_event_rejects_actor_not_bound_to_authenticated_client():
     repository = SupabaseRecommendationRepository(
         user_client=FakeClient(),
