@@ -140,7 +140,8 @@ Le test `supabase/tests/privacy_audit_engine_contract.test.sql` a été exécut�
 
 - confirmer la stratégie de conservation et de suppression/anonymisation des sujets ;
 - confirmer les codes de finalité et les catégories de données autorisés ;
-- définir le mécanisme d'enregistrement initial avant confirmation e-mail (métadonnées Auth validées par trigger, ou parcours serveur dédié) ;
+- configurer le Before User Created Hook dans Supabase Auth et vérifier son exécution en environnement local ;
+- décider du parcours d'acceptation pour les invitations administrateur et les fournisseurs OAuth ;
 - ajouter des tests d'intégration qui prouvent le rejet réel de UPDATE/DELETE, et pas seulement la présence des triggers ;
 - vérifier les droits de `service_role` et les permissions de schéma dans l'environnement local.
 
@@ -149,40 +150,48 @@ Le test `supabase/tests/privacy_audit_engine_contract.test.sql` a été exécut�
 
 ### Problème
 
-Avec la confirmation e-mail activée, `auth.signUp()` peut créer l'utilisateur sans retourner de session. Le navigateur ne peut donc pas appeler ensuite une RPC protégée par `auth.uid()` pour enregistrer l'acceptation. L'acceptation doit être capturée dans la même opération serveur que la création du compte, sans dépendre d'une session.
+Avec la confirmation e-mail activée, `auth.signUp()` peut créer l'utilisateur sans retourner de session. Le navigateur ne peut donc pas appeler ensuite une RPC protégée par `auth.uid()` pour enregistrer l'acte. La capture doit être côté serveur et ne pas dépendre d'une session.
 
-### Option retenue pour le prototype : métadonnées d'inscription + trigger Auth
+### Architecture retenue : validation avant création + journal transactionnel après création
 
-1. Le client affiche les documents exacts et demande deux actes distincts : acceptation des CGU et accusé de prise de connaissance de la notice de confidentialité.
-2. Avant `auth.signUp()`, le client transmet dans `options.data` uniquement les identifiants de versions publiées attendues (par exemple `terms_version` et `privacy_notice_version`). Il ne transmet ni date d'acceptation ni identifiant utilisateur supposé.
-3. Un trigger PostgreSQL `AFTER INSERT ON auth.users` appelle une fonction privée étroitement bornée. Cette fonction lit les métadonnées de la ligne nouvellement créée, vérifie que chaque version existe, est publiée (`effective_at <= now()`) et n'est pas retirée (`retired_at IS NULL OR retired_at > now()`), puis écrit les deux événements avec `subject_user_id = NEW.id`, `actor_user_id = NEW.id`, `capture_channel = 'signup'` et l'heure serveur.
-4. Si les métadonnées sont absentes, incohérentes ou obsolètes, le trigger lève une exception : la création Auth échoue plutôt que de créer un compte sans les actes obligatoires.
-5. Le compte peut ensuite attendre la confirmation e-mail. Les événements sont déjà persistés et ne dépendent pas d'une session client.
+Le schéma combine deux mécanismes complémentaires :
+
+1. **Before User Created Auth Hook** — Supabase transmet à la fonction le futur objet utilisateur et ses `user_metadata`, avant insertion. La fonction `public.hook_validate_signup_legal_versions(event jsonb)` vérifie que les versions CGU et notice de confidentialité sont présentes, publiées, effectives et non retirées. Elle rejette la création Auth en cas de version manquante ou obsolète.
+2. **Trigger AFTER INSERT sur `auth.users`** — `private.capture_signup_legal_acts()` relit les versions, les valide une seconde fois, puis inscrit les deux actes dans `private.legal_consent_events` avec l'UUID Auth et l'heure serveur. Le journal est écrit dans la même transaction PostgreSQL que la création de l'utilisateur ; si l'écriture échoue, la transaction de création échoue également.
+
+Le hook et le trigger ont des rôles différents : le hook produit un refus propre avant insertion ; le trigger est le garde-fou transactionnel qui matérialise la preuve. Le hook doit être activé explicitement dans la configuration Auth du projet Supabase ; la présence de la fonction SQL seule ne l'active pas.
+
+### Données transmises par le client
+
+Avant `auth.signUp()`, le client transmet dans `options.data` uniquement :
+- `legal_terms_version` : identifiant de la version des CGU affichée ;
+- `legal_privacy_version` : identifiant de la version de la notice affichée.
+
+Le client ne transmet ni date d'acceptation, ni UUID utilisateur, ni empreinte prétendument autoritative. Les empreintes SHA-256 sont calculées et enregistrées lors de la publication documentaire ; les horodatages sont générés côté base.
 
 ### Limites et contrôles
 
-- `raw_user_meta_data` est modifiable par l'utilisateur après inscription : il ne doit jamais servir à l'autorisation, à RLS ou à déterminer les droits. Le trigger ne l'utilise que comme déclaration d'inscription instantanée, copiée immédiatement dans le journal immuable.
-- Un appel direct à l'API Auth peut contourner l'interface et fournir les mêmes métadonnées. Le serveur peut prouver qu'une déclaration portant sur des versions déterminées a été soumise à la création du compte ; il ne peut pas prouver que la personne a réellement lu les documents ni que le clic UI a été exécuté. Ne pas présenter cette preuve comme une signature électronique qualifiée.
-- La version des documents est validée côté base, pas acceptée aveuglément depuis le navigateur. Les dates sont toujours générées côté base.
-- La fonction trigger devra être privée, avec `search_path` fixe, propriétaire privilégié maîtrisé et EXECUTE révoqué des rôles clients. Aucune fonction `SECURITY DEFINER` générique ou exposée dans `public`.
-- L'échec d'insertion du journal doit faire échouer la création Auth : pas de compte « orphelin » sans preuve.
-- L'opt-in de recherche reste séparé, facultatif et révocable. Il ne doit pas être précoché ni conditionner l'accès au compte. Son enregistrement initial peut être ajouté au même trigger uniquement si un choix explicite distinct est transmis et validé.
-- Le trigger s'applique à toute insertion dans `auth.users`, pas uniquement au bouton d'inscription du navigateur. Les invitations administrateur et futurs fournisseurs OAuth devront donc transmettre les mêmes versions documentaires ou disposer d'un parcours d'acceptation distinct conçu explicitement ; sinon la création est refusée. Ne pas ajouter d'exception silencieuse qui permettrait de créer des comptes sans actes requis.
-- Ne pas stocker d'IP, de user-agent ou de mot de passe dans les événements sans nécessité démontrée, finalité, durée de conservation et validation juridique.
+- `raw_user_meta_data` est modifiable par l'utilisateur après inscription : il ne doit jamais servir à l'autorisation, à RLS ou à déterminer les droits. Le hook et le trigger l'utilisent uniquement comme déclaration d'inscription instantanée, validée puis copiée dans le journal immuable.
+- Un appel direct à l'API Auth peut soumettre les mêmes métadonnées sans passer par l'interface. Le journal prouve la déclaration faite à la création du compte et les versions concernées ; il ne prouve pas que la personne a réellement lu les documents ni qu'un clic UI a eu lieu. Ce n'est pas une signature électronique qualifiée.
+- La fonction du hook est exposée dans le schéma attendu par la configuration Auth, mais son exécution est accordée uniquement à `supabase_auth_admin`, jamais aux rôles client. Elle est `SECURITY DEFINER` avec `search_path` fixe et doit être revue comme une surface privilégiée.
+- Le trigger s'applique à toute insertion dans `auth.users`, pas uniquement au formulaire web. Les invitations administrateur et futurs fournisseurs OAuth devront transmettre les versions requises ou avoir un parcours d'acceptation distinct explicitement conçu. Aucun contournement silencieux.
+- L'opt-in de recherche reste séparé, facultatif et révocable. Il ne doit pas être précoché ni conditionner l'accès au compte.
+- Ne pas stocker d'IP, de user-agent ou de mot de passe dans ces événements sans nécessité démontrée, finalité, durée de conservation et validation juridique.
 
 ### Pourquoi ne pas choisir une Edge Function seule
 
-Une Edge Function appelée avant `signUp()` ne connaît pas encore l'UUID Auth et ne peut pas garantir une transaction atomique entre une écriture de consentement et la création du compte. Elle introduirait une table de pré-inscriptions, des identifiants de corrélation et une réconciliation des comptes abandonnés. Elle devient pertinente si BA Labs exige un parcours d'inscription entièrement orchestré côté serveur, mais ce n'est pas le chemin minimal pour le prototype.
+Une Edge Function appelée avant `signUp()` ne connaît pas encore l'UUID Auth et ne peut pas garantir une transaction atomique entre une écriture de consentement et la création du compte. Elle introduirait une table de pré-inscriptions, des identifiants de corrélation et une réconciliation des comptes abandonnés. Le hook Auth + trigger transactionnel évite cette file d'attente et s'appuie sur le cycle de création Auth natif.
 
 ### Tests bloquants avant migration
 
-- inscription avec versions courantes : compte et deux événements créés ;
-- absence de métadonnées : création Auth rejetée ;
-- version inexistante, future ou retirée : création Auth rejetée ;
-- métadonnées falsifiées après création : aucun événement historique modifié ;
-- doublon/rejeu : comportement idempotent explicitement défini ;
-- échec d'insertion de l'un des événements : transaction Auth annulée ;
-- aucune permission directe `anon`/`authenticated` sur tables ou fonction trigger ;
-- test avec confirmation e-mail activée : preuve présente avant toute session utilisateur.
+- hook : absence de métadonnées, version inconnue, future ou retirée → refus avant création ;
+- hook : versions courantes → autorisation ;
+- trigger : création Auth avec versions courantes → deux événements distincts ;
+- trigger : insertion d'un des événements en échec → création Auth annulée ;
+- métadonnées falsifiées après création → aucun événement historique modifié ;
+- appel direct à la fonction hook par `anon` ou `authenticated` → refus de permission ;
+- hook configuré dans Auth et confirmation e-mail activée → journal présent avant toute session utilisateur ;
+- parcours d'invitation et OAuth testés explicitement avant activation de ces fournisseurs.
+
 
 **Décision de portée :** ce mécanisme enregistre une déclaration d'acceptation à la création du compte. La validité juridique de la formulation, la preuve d'information préalable et les durées de conservation restent à valider par le conseil compétent / DPO. Le mécanisme ne remplace pas cette validation.
