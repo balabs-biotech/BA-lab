@@ -31,6 +31,7 @@ _SIGNAL_CONFLICT_KEY = ",".join(
         "environment_profile_version",
     )
 )
+_SIGNAL_BATCH_SIZE = 500
 
 
 class SupabaseBiologicalSignalRepository:
@@ -133,20 +134,49 @@ class SupabaseBiologicalSignalRepository:
         if len(analysis_ids) != 1:
             raise ValueError("one interpretation batch must belong to one source analysis")
 
+        persisted_by_id: dict[str, Mapping[str, Any]] = {}
         try:
-            self._client.table("biological_signals").upsert(
-                rows,
-                on_conflict=_SIGNAL_CONFLICT_KEY,
-                ignore_duplicates=True,
-            ).execute()
-            response = (
-                self._client.table("biological_signals")
-                .select("*")
-                .eq("organization_id", str(organization_id))
-                .in_("signal_id", signal_ids)
-                .execute()
-            )
-            persisted = self._response_data(response)
+            # Keep each PostgREST response below the default row cap. A failed
+            # later chunk can be replayed safely because earlier inserts are
+            # idempotent and operational state is never overwritten.
+            for offset in range(0, len(rows), _SIGNAL_BATCH_SIZE):
+                chunk = rows[offset : offset + _SIGNAL_BATCH_SIZE]
+                chunk_ids = signal_ids[offset : offset + _SIGNAL_BATCH_SIZE]
+                self._client.table("biological_signals").upsert(
+                    chunk,
+                    on_conflict=_SIGNAL_CONFLICT_KEY,
+                    ignore_duplicates=True,
+                ).execute()
+                response = (
+                    self._client.table("biological_signals")
+                    .select("*")
+                    .eq("organization_id", str(organization_id))
+                    .in_("signal_id", chunk_ids)
+                    .execute()
+                )
+                persisted = self._response_data(response)
+                by_id = {str(row.get("signal_id")): row for row in persisted}
+                missing = sorted(set(chunk_ids) - set(by_id))
+                if missing:
+                    raise BiologicalSignalPersistenceError(
+                        "one or more signal rows conflicted with existing provenance "
+                        "or could not be verified"
+                    )
+
+                # An idempotent replay is valid only if the immutable scientific
+                # payload is unchanged. Triage state and timestamps are excluded.
+                for expected in chunk:
+                    actual = by_id[expected["signal_id"]]
+                    changed = [
+                        field for field in expected
+                        if actual.get(field) != expected[field]
+                    ]
+                    if changed:
+                        raise BiologicalSignalPersistenceError(
+                            "existing signal has conflicting immutable content: "
+                            + ", ".join(changed)
+                        )
+                persisted_by_id.update(by_id)
         except BiologicalSignalPersistenceError:
             raise
         except Exception as error:
@@ -154,27 +184,4 @@ class SupabaseBiologicalSignalRepository:
                 "Supabase failed to persist biological interpretation signals"
             ) from error
 
-        by_id = {str(row.get("signal_id")): row for row in persisted}
-        missing = sorted(set(signal_ids) - set(by_id))
-        if missing:
-            raise BiologicalSignalPersistenceError(
-                "one or more signal rows conflicted with existing provenance "
-                "or could not be verified"
-            )
-
-        # An idempotent replay is valid only if the immutable scientific
-        # payload is unchanged. Operational status/timestamps are intentionally
-        # excluded because users may have triaged the signal since first insert.
-        immutable_fields = tuple(rows[0])
-        for expected in rows:
-            actual = by_id[expected["signal_id"]]
-            changed = [
-                field for field in immutable_fields
-                if actual.get(field) != expected[field]
-            ]
-            if changed:
-                raise BiologicalSignalPersistenceError(
-                    "existing signal has conflicting immutable content: "
-                    + ", ".join(changed)
-                )
-        return tuple(by_id[signal_id] for signal_id in signal_ids)
+        return tuple(persisted_by_id[signal_id] for signal_id in signal_ids)
