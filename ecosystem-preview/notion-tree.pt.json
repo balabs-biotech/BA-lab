@@ -132,6 +132,38 @@
           "description": "Conceitos de fermentadores modulares e processos-piloto em desenvolvimento, distinguindo desenhos de equipamentos construídos e validados.",
           "url": "https://app.notion.com/p/40173152f17181f19424c0aee1e7a863",
           "children": []
+        },
+        {
+          "id": "pt-soil-equipment",
+          "title": "Equipamentos experimentais",
+          "notionId": "40173152f171815692d6c55cd7032b94",
+          "url": "https://app.notion.com/p/40173152f171815692d6c55cd7032b94",
+          "description": "Equipamentos e dispositivos para investigação e experimentação.",
+          "children": []
+        },
+        {
+          "id": "pt-soil-substrates",
+          "title": "Preparação de substratos",
+          "notionId": "40173152f17181628dace7026da068a9",
+          "url": "https://app.notion.com/p/40173152f17181628dace7026da068a9",
+          "description": "Preparação de suportes biológicos considerando granulometria, humidade e estrutura.",
+          "children": []
+        },
+        {
+          "id": "pt-soil-prototyping",
+          "title": "Prototipagem e fabrico",
+          "notionId": "40173152f1718136afe3fd533c629c64",
+          "url": "https://app.notion.com/p/40173152f1718136afe3fd533c629c64",
+          "description": "Conceção, adaptação, fabrico e ensaio de dispositivos para I&D.",
+          "children": []
+        },
+        {
+          "id": "pt-soil-instrumentation",
+          "title": "Instrumentação integrada",
+          "notionId": "40173152f171819b8edfc928072a23a0",
+          "url": "https://app.notion.com/p/40173152f171819b8edfc928072a23a0",
+          "description": "Integração de sensores e sistemas de controlo para observar processos biológicos.",
+          "children": []
         }
       ],
       "notionParentId": "hub"
