@@ -45,7 +45,7 @@ function harness({ domain = "mycology", organizationId = "a0a0a0a0-0000-4000-800
     BA_LABS_SUPABASE_CLIENT: client,
     BA_LABS_GET_ORGANIZATION_ID: () => organizationId,
   };
-  vm.runInNewContext(source, { document, window, console, JSON, String, RegExp, Promise }, { filename: "batch-tracker/bal-json-import.js" });
+  vm.runInNewContext(source, { document, window, console, JSON, String, RegExp, Promise, TextEncoder }, { filename: "batch-tracker/bal-json-import.js" });
   return { elements, calls };
 }
 
