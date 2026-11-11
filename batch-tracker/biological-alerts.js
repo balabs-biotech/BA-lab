@@ -94,7 +94,12 @@
       status_changed: older.interpretation_status !== newer.interpretation_status,
       previous_status: older.interpretation_status || "inconnu",
       current_status: newer.interpretation_status || "inconnu",
+      category_counts: changes.reduce((counts, change) => {
+        counts[change.category] = (counts[change.category] || 0) + 1;
+        return counts;
+      }, {}),
       changes,
+      compared_field_count: paths.length,
       truncated: paths.length > 100 || changes.length >= 40
     };
   };
@@ -1077,6 +1082,15 @@
             comparisonPanel.append(element("strong", "", "Évolution depuis la version précédente"));
             comparisonPanel.append(element("small", "", "Moteur " + comparison.previous_engine_version +
               " → " + comparison.current_engine_version));
+            const comparisonCategories = [
+              ["preuves", "preuves"],
+              ["constat", "constats"],
+              ["conclusion", "conclusions"],
+              ["contexte", "éléments de contexte"]
+            ].filter(([key]) => comparison.category_counts[key])
+              .map(([key, label]) => comparison.category_counts[key] + " " + label);
+            comparisonPanel.append(element("small", "", comparison.compared_field_count +
+              " champ(s) comparé(s)" + (comparisonCategories.length ? " · " + comparisonCategories.join(" · ") : "")));
             if (comparison.status_changed) {
               comparisonPanel.append(element("p", "", "Statut : " + comparison.previous_status +
                 " → " + comparison.current_status));
