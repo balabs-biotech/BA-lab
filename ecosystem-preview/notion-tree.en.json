@@ -116,6 +116,46 @@
           "url": "https://app.notion.com/p/40173152f171817e918cc9c278aeca0d",
           "description": "Explore microorganisms associated with agricultural systems, including their roles and limits of current evidence.",
           "children": []
+        },
+        {
+          "id": "en-soil-equipment",
+          "title": "Experimental equipment",
+          "notionId": "40173152f17181c0955ef6b706891bfa",
+          "url": "https://app.notion.com/p/40173152f17181c0955ef6b706891bfa",
+          "description": "Equipment concepts and devices for research, experimentation and biological processes.",
+          "children": []
+        },
+        {
+          "id": "en-soil-fermenters",
+          "title": "Fermenters and pilot processes",
+          "notionId": "40173152f171818bbe4adc44550b7913",
+          "url": "https://app.notion.com/p/40173152f171818bbe4adc44550b7913",
+          "description": "Modular fermentation systems and pilot-scale process development.",
+          "children": []
+        },
+        {
+          "id": "en-soil-substrate-preparation",
+          "title": "Substrate preparation",
+          "notionId": "40173152f171818daed1d22deb38a624",
+          "url": "https://app.notion.com/p/40173152f171818daed1d22deb38a624",
+          "description": "Preparation of biological supports with attention to structure, moisture and treatment.",
+          "children": []
+        },
+        {
+          "id": "en-soil-prototyping",
+          "title": "Prototyping and fabrication",
+          "notionId": "40173152f171813da2e3dafa7265dc6a",
+          "url": "https://app.notion.com/p/40173152f171813da2e3dafa7265dc6a",
+          "description": "Design, fabrication and testing of devices for research and development.",
+          "children": []
+        },
+        {
+          "id": "en-soil-integrated-instrumentation",
+          "title": "Integrated instrumentation",
+          "notionId": "40173152f17181ce95cfcc669321cc1d",
+          "url": "https://app.notion.com/p/40173152f17181ce95cfcc669321cc1d",
+          "description": "Integration of sensors and control systems to observe biological processes.",
+          "children": []
         }
       ],
       "notionParentId": "hub"
