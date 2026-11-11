@@ -53,6 +53,7 @@ begin
      and p.environment_id = p_environment_id
      and p.origin = 'sensor'
      and p.status = 'active'
+     and d.enabled = true
    order by d.device_code, d.id;
 end;
 $$;
