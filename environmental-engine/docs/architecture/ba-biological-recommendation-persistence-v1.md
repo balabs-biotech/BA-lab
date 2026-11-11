@@ -197,14 +197,16 @@ A replay therefore does not overwrite operational triage state such as
 `acknowledged` or `resolved`. A replay whose natural provenance key resolves
 to a different signal UUID fails closed during read-back verification.
 
-The current schema deliberately stores `source_finding_id` and
-`source_observation_ids` as provenance values rather than foreign keys:
-findings have no normalized persisted table, and the observation identifiers
-are carried in JSONB. The signal table does enforce tenant-scoped foreign keys
+The current schema deliberately keeps `source_finding_id` as a provenance
+value rather than a foreign key because findings have no normalized persisted
+table. Observation identifiers remain in JSONB as a stable snapshot and are
+also normalized into `biological_signal_observations`; its composite foreign
+key to `observations(organization_id, id)` proves tenant ownership. An
+AFTER INSERT trigger creates those evidence links in the same transaction as
+the signal insert. The signal table also enforces tenant-scoped foreign keys
 to the analysis, biological context, domain profile and environment profile.
-This is an explicit limitation, not a claim that every source identifier has
-referential integrity. A future normalized finding/evidence store should add
-composite tenant foreign keys after its canonical schema is established.
+A future normalized finding store should add a composite tenant foreign key
+after its canonical schema is established.
 
 `BiologicalSignalService.interpret_and_persist` is the application entry point
 for this stage. `BiologicalWorkflowService.run` then sequences that verified
