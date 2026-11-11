@@ -1,0 +1,26 @@
+{
+  "contract": "BA-LABS/JSON",
+  "contract_version": "1.0.0",
+  "record_type": "observation",
+  "record_id": "5b6c2b3d-4a6f-4b3e-8a1f-5b4c3d2e1f00",
+  "organization_id": "1b6c2b3d-4a6f-4b3e-8a1f-5b4c3d2e1f00",
+  "created_at": "2026-11-11T15:10:00Z",
+  "data": {
+    "variable_code": "colony_morphology",
+    "value_text": "Colonies cream-colored, circular, with entire margins.",
+    "observed_at": "2026-11-11T15:05:00Z",
+    "quality_state": "raw",
+    "context": {
+      "culture_id": "2b6c2b3d-4a6f-4b3e-8a1f-5b4c3d2e1f00"
+    },
+    "metadata": {
+      "workspace": "laboratory",
+      "observation_method": "macroscopic_visual"
+    }
+  },
+  "provenance": {
+    "source": "ai_assisted",
+    "software": "ChatGPT-assisted draft",
+    "review_status": "unreviewed"
+  }
+}
