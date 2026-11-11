@@ -652,6 +652,14 @@
       "url": "https://app.notion.com/p/40173152f171817d8608cafa8a118065",
       "children": [
         {
+          "id": "ar-public-catalogue",
+          "title": "الكتالوج العام — الموارد القابلة للنشر",
+          "notionId": "d0fbe1d779344eb58bc240fe7876ae0e",
+          "url": "https://app.notion.com/p/d0fbe1d779344eb58bc240fe7876ae0e",
+          "description": "كتالوج موحد للموارد والمنتجات؛ يجب تأكيد الدفعة والتغليف والتوفر قبل أي طلب.",
+          "children": []
+        },
+        {
           "id": "ar-product-wa",
           "title": "WA — آغار الماء الجاهز للاستخدام",
           "notionId": "40173152f171817d966dd334a044b4e8",
@@ -681,14 +689,6 @@
           "notionId": "40173152f171810bb1afe68cfc91ee7c",
           "url": "https://app.notion.com/p/40173152f171810bb1afe68cfc91ee7c",
           "description": "دليل وصول سريع يرافق نماذج Myco Start وMyco Plate ويوجه المستخدم إلى تعليمات البدء.",
-          "children": []
-        },
-        {
-          "id": "ar-public-catalogue",
-          "title": "الكتالوج العام — الموارد القابلة للنشر",
-          "notionId": "d0fbe1d779344eb58bc240fe7876ae0e",
-          "url": "https://app.notion.com/p/d0fbe1d779344eb58bc240fe7876ae0e",
-          "description": "كتالوج موحد للموارد والمنتجات؛ يجب تأكيد الدفعة والتغليف والتوفر قبل أي طلب.",
           "children": []
         },
         {
