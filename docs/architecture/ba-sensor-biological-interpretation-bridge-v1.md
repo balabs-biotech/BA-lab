@@ -56,3 +56,42 @@ and returns `interpretation_status = not_requested`.
 The bridge validates the actual half-open sensor-analysis interval (`[from_at, to_at_exclusive)`) against the requested biological date scope in the resolved environment timezone. It converts the first instant and the final included instant to local calendar dates before accepting interpretation. This prevents a valid-looking request envelope from authorizing measurements that extend beyond the biological context's declared validity window.
 
 The check is deliberately applied to the interpretation layer, not to the descriptive sensor analysis. If the biological context is invalid, the API retains the descriptive sensor result and returns `interpretation_status = context_invalid` with no domain signals. The API contract test covers a biological context whose validity starts after the requested sensor-analysis day.
+
+
+## Persisted registry implementation
+
+The CultureOps Supabase project now contains the persistence layer expected by
+the Python adapters:
+
+- `biological_contexts`: tenant-scoped biological subject context, with
+  exactly one culture or plant-culture reference and an environment reference;
+- `environment_context_profiles`: versioned environment configuration;
+- `environment_context_profile_sensors`: sensor membership for an environment
+  profile;
+- `domain_interpretation_profiles`: versioned JSON rule sets for mycology,
+  GreenTech and Lab.
+
+All four tables have RLS enabled. Reads are limited to organization members;
+writes are limited to organization writers through the existing
+`private.is_org_member` and `private.is_org_writer` authorization helpers.
+Composite foreign keys preserve tenant consistency across biological subjects,
+environments, sensor devices and profile bindings.
+
+Environment and domain profile content becomes immutable after activation.
+Activated versions cannot be deleted; sensor bindings can only be changed while
+their parent profile remains a draft. Authenticated table grants are restricted
+to SELECT/INSERT/UPDATE/DELETE; row authorization remains the responsibility
+of RLS.
+
+The migrations are:
+
+- `20261111000100_create_biological_profile_registries.sql`
+- `20261111000200_harden_profile_registry_immutability.sql`
+- `20261111000300_restrict_registry_table_grants.sql`
+
+The live schema and policies were queried after deployment. Security Advisor
+findings currently reported for `iot_devices`, `iot_ingest_receipts`,
+existing SECURITY DEFINER RPCs and leaked-password protection predate this
+registry work; none names the four new registry tables. Python integration
+tests and a full authenticated end-to-end request still need to be run before
+this bridge can be considered fully verified.
