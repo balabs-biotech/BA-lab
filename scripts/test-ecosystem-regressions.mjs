@@ -143,6 +143,7 @@ assert.ok(engine.includes('pinchStart'), 'Mobile pinch zoom must be supported');
 assert.ok(engine.includes('function resize()'), 'The engine must resize its renderer and camera');
 assert.ok(engine.includes('cameraPosition();'), 'Camera state must be reapplied after resize instead of resetting zoom');
 assert.ok(engine.includes('function smoothCamera('), 'Domain navigation must use a smooth camera transition');
+assert.ok(engine.includes('function smoothCamera(to,distTo,duration=950,done,travelArc=false)') && previewEngine.includes('function smoothCamera(to,distTo,duration=950,done,travelArc=false)') && engine.includes('Math.sin(Math.PI*e)*arc') && previewEngine.includes('Math.sin(Math.PI*e)*arc') && engine.includes('},true);') && previewEngine.includes('},true);'), 'Moving between nested levels must use a gentle camera pullback to preserve spatial context');
 assert.ok(engine.includes('function goOverview()'), 'The user must be able to return to the overview');
 assert.ok(engine.includes('function enterDomain(id)'), 'Domain entry must be implemented in the new engine');
 assert.ok(engine.includes('The active folder owns all taps while inside a universe'), 'A selected universe must not let adjacent domains steal folder taps');
