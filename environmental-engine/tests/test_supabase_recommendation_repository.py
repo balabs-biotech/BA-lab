@@ -10,6 +10,7 @@ from ba_environmental_engine.interpretation.recommendation_lifecycle import (
 )
 from ba_environmental_engine.interpretation.recommendation_repository import (
     RecommendationAccessDeniedError,
+    RecommendationRepositoryError,
 )
 from ba_environmental_engine.interpretation.supabase_recommendation_repository import (
     SupabaseRecommendationRepository,
@@ -191,4 +192,36 @@ def test_append_event_rejects_actor_not_bound_to_authenticated_client():
             recommendation_id=uuid4(),
             expected_revision=0,
             event=event,
+        )
+
+def test_get_rejects_incomplete_or_noncontiguous_event_history():
+    proposal = make_proposal()
+    actor_id = uuid4()
+    event_time = datetime(2026, 11, 11, tzinfo=timezone.utc)
+    user_client = FakeClient(table_results={
+        "biological_recommendations": {
+            **recommendation_row(proposal, status="accepted", revision=1),
+            "events": [{
+                "event_id": str(uuid4()),
+                "revision": 2,
+                "action": "accept",
+                "actor_id": str(actor_id),
+                "occurred_at": event_time.isoformat(),
+                "note": None,
+                "execution_details": None,
+                "outcome_summary": None,
+                "outcome_observed_at": None,
+            }],
+        }
+    })
+    repository = SupabaseRecommendationRepository(
+        user_client=user_client,
+        service_client=FakeClient(),
+        authenticated_user_id=actor_id,
+    )
+
+    with pytest.raises(RecommendationRepositoryError, match="revision gap"):
+        repository.get(
+            organization_id=uuid4(),
+            recommendation_id=proposal.recommendation_id,
         )
