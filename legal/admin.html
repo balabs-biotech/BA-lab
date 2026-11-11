@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<meta name="referrer" content="no-referrer">
+<title>Registre documentaire — BA Labs</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.118.0"></script>
+<style>
+:root{color-scheme:dark;--bg:#0d1110;--panel:#151d18;--line:#344239;--text:#eef3ed;--muted:#bac6bb;--accent:#b8d6a8;--danger:#e5a49b;font:15px/1.55 system-ui,sans-serif}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text)}main{width:min(1040px,calc(100% - 32px));margin:38px auto 72px}
+a{color:var(--accent)}h1{font-size:clamp(28px,5vw,42px);line-height:1.1;margin:16px 0 8px}h2{font-size:20px;margin:0 0 12px}.muted{color:var(--muted)}.eyebrow{color:var(--accent);font-size:12px;letter-spacing:.14em;text-transform:uppercase;font-weight:700}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:22px;margin:18px 0}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.field{display:grid;gap:6px}.field.full{grid-column:1/-1}label{font-weight:650}input,select{width:100%;min-height:44px;border:1px solid #526454;border-radius:8px;padding:9px 11px;background:#0f1511;color:var(--text);font:inherit}input[type=file]{padding:8px}button{min-height:42px;border:1px solid #81917f;border-radius:8px;padding:9px 14px;background:#243328;color:#fff;font:inherit;font-weight:700;cursor:pointer}button.primary{background:var(--accent);color:#172018;border-color:var(--accent)}button.danger{border-color:#86534d;color:#ffd8d2;background:#392321}button:disabled{opacity:.55;cursor:wait}button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #8eb9df;outline-offset:2px}.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}.status{padding:12px 14px;border-radius:9px;background:#202b23;border:1px solid #455a48;margin:12px 0}.status.error{background:#342321;border-color:#86534d;color:#ffd8d2}.status[hidden],section[hidden]{display:none}.hash{overflow-wrap:anywhere;font:12px/1.5 ui-monospace,monospace;color:#c6d0c7}.table-wrap{overflow-x:auto}table{width:100%;border-collapse:collapse;min-width:700px}th,td{text-align:left;padding:11px 9px;border-bottom:1px solid var(--line);vertical-align:top}th{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}.pill{display:inline-block;border:1px solid #526454;border-radius:99px;padding:2px 8px;font-size:12px}.top{display:flex;justify-content:space-between;gap:16px;align-items:center;flex-wrap:wrap;border-bottom:1px solid var(--line);padding-bottom:15px}
+@media(max-width:640px){.grid{grid-template-columns:1fr}.field.full{grid-column:auto}.panel{padding:16px}}
+</style>
+</head>
+<body>
+<main>
+<div class="top"><a href="../">← BA Labs</a><span class="eyebrow">Administration plateforme · accès restreint</span></div>
+<h1>Registre documentaire</h1>
+<p class="muted">Publication contrôlée des versions juridiques de CultureOps. L'accès à cette page ne confère aucun droit : chaque opération est autorisée côté serveur.</p>
+<div id="status" class="status" role="status" aria-live="polite" hidden></div>
+
+<section id="loginPanel" class="panel">
+<h2>Authentification administrateur</h2>
+<form id="loginForm">
+<div class="grid">
+<div class="field"><label for="email">Adresse e-mail</label><input id="email" type="email" autocomplete="username" required></div>
+<div class="field"><label for="password">Mot de passe</label><input id="password" type="password" autocomplete="current-password" required></div>
+</div>
+<div class="actions"><button class="primary" type="submit">Se connecter</button></div>
+</form>
+<p class="muted">Aucune création de compte n'est proposée depuis cette page. Le compte doit déjà être administrateur plateforme dans le registre privé.</p>
+</section>
+
+<section id="registryPanel" hidden>
+<div class="panel">
+<div class="top"><h2>Publier une version</h2><span class="pill">SHA-256 obligatoire</span></div>
+<p class="muted">Sélectionnez le fichier HTML final validé pour calculer son empreinte. Le fichier n'est pas téléversé : la publication enregistre son empreinte et son chemin de déploiement.</p>
+<form id="publishForm">
+<div class="grid">
+<div class="field"><label for="docType">Document</label><select id="docType" required><option value="terms">Conditions d’utilisation</option><option value="privacy_notice">Politique de confidentialité</option><option value="cookies_notice">Politique cookies</option></select></div>
+<div class="field"><label for="version">Identifiant de version</label><input id="version" maxlength="64" pattern="[A-Za-z0-9][A-Za-z0-9._-]{0,63}" placeholder="2026-11-v1" required></div>
+<div class="field"><label for="file">Fichier HTML final</label><input id="file" type="file" accept=".html,text/html" required></div>
+<div class="field"><label for="effectiveAt">Date d’entrée en vigueur</label><input id="effectiveAt" type="datetime-local" required></div>
+<div class="field full"><span class="muted">Empreinte calculée localement</span><output id="hash" class="hash">Aucun fichier sélectionné.</output></div>
+</div>
+<div class="actions"><button class="primary" type="submit">Publier la version</button><button type="button" id="refreshButton">Actualiser le registre</button><button type="button" id="signOutButton">Se déconnecter</button></div>
+</form>
+</div>
+
+<div class="panel">
+<div class="top"><h2>Historique des versions</h2><span class="muted" id="documentCount"></span></div>
+<div class="table-wrap"><table><thead><tr><th>Document</th><th>Version</th><th>Empreinte SHA-256</th><th>Entrée en vigueur</th><th>Retrait</th><th>Action</th></tr></thead><tbody id="documentsBody"><tr><td colspan="6" class="muted">Chargement…</td></tr></tbody></table></div>
+</div>
+</section>
+</main>
+<script>
+(() => {
+  "use strict";
+  const SUPABASE_URL = "https://axcouwiodqsauwnsiotn.supabase.co";
+  const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_8H4XRh8V07Hlo0WwdfOXwg_2RXRX992";
+  const PATHS = { terms:"legal/terms.html", privacy_notice:"legal/privacy.html", cookies_notice:"legal/cookies.html" };
+  const LABELS = { terms:"CGU", privacy_notice:"Confidentialité", cookies_notice:"Cookies" };
+  const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+  const $ = id => document.getElementById(id);
+  let currentHash = null;
+
+  function message(text, error=false) {
+    const box = $("status");
+    box.textContent = text;
+    box.classList.toggle("error", error);
+    box.hidden = false;
+  }
+  function clearMessage() { $("status").hidden = true; }
+  function setBusy(form, busy) {
+    form.querySelectorAll("button").forEach(button => button.disabled = busy);
+  }
+  function showAuthenticated(show) {
+    $("loginPanel").hidden = show;
+    $("registryPanel").hidden = !show;
+  }
+  function formatDate(value) {
+    if (!value) return "—";
+    const date = new Date(value);
+    return Number.isNaN(date.getTime()) ? "—" : date.toLocaleString("fr-FR");
+  }
+  async function invoke(body) {
+    const { data, error } = await client.functions.invoke("legal-document-registry", { body });
+    if (error) throw new Error(error.message || "Opération du registre refusée.");
+    if (data?.error) throw new Error(data.error);
+    return data;
+  }
+  async function loadDocuments() {
+    const result = await invoke({ action:"list" });
+    const tbody = $("documentsBody");
+    tbody.replaceChildren();
+    const rows = Array.isArray(result.documents) ? result.documents : [];
+    $("documentCount").textContent = rows.length + " version(s)";
+    if (!rows.length) {
+      const tr = document.createElement("tr"), td = document.createElement("td");
+      td.colSpan = 6; td.className = "muted"; td.textContent = "Aucune version enregistrée.";
+      tr.append(td); tbody.append(tr); return;
+    }
+    for (const doc of rows) {
+      const tr = document.createElement("tr");
+      const values = [
+        LABELS[doc.document_type] || doc.document_type,
+        doc.version,
+        String(doc.content_sha256 || "").slice(0,16) + "…",
+        formatDate(doc.effective_at),
+        formatDate(doc.retired_at)
+      ];
+      for (const value of values) {
+        const td = document.createElement("td"); td.textContent = value ?? "—"; tr.append(td);
+      }
+      const actionCell = document.createElement("td");
+      if (doc.effective_at && !doc.retired_at) {
+        const button = document.createElement("button");
+        button.type = "button"; button.className = "danger"; button.textContent = "Retirer";
+        button.addEventListener("click", async () => {
+          if (!window.confirm("Programmer le retrait de " + doc.document_type + " " + doc.version + " ?")) return;
+          button.disabled = true;
+          try {
+            const retiredAt = new Date(Date.now() + 60_000).toISOString();
+            await invoke({ action:"retire", document_version_id:doc.id, retired_at:retiredAt });
+            message("Retrait programmé. Vérifiez la date dans l’historique.");
+            await loadDocuments();
+          } catch (error) { message(error.message, true); button.disabled = false; }
+        });
+        actionCell.append(button);
+      } else {
+        const span = document.createElement("span"); span.className = "pill"; span.textContent = "Archivée / planifiée";
+        actionCell.append(span);
+      }
+      tr.append(actionCell); tbody.append(tr);
+    }
+  }
+  async function refreshSession() {
+    const { data } = await client.auth.getSession();
+    const authenticated = Boolean(data.session);
+    showAuthenticated(authenticated);
+    if (authenticated) {
+      try { await loadDocuments(); }
+      catch (error) { message(error.message, true); }
+    }
+  }
+
+  $("loginForm").addEventListener("submit", async event => {
+    event.preventDefault(); clearMessage();
+    const form = event.currentTarget; setBusy(form, true);
+    try {
+      const { error } = await client.auth.signInWithPassword({
+        email:$("email").value.trim(), password:$("password").value
+      });
+      if (error) throw error;
+      await refreshSession();
+      if (!$("registryPanel").hidden) message("Session ouverte. Les droits administrateur sont vérifiés côté serveur.");
+    } catch (error) { message(error.message || "Authentification impossible.", true); }
+    finally { setBusy(form, false); }
+  });
+
+  $("file").addEventListener("change", async () => {
+    currentHash = null;
+    const file = $("file").files?.[0];
+    if (!file) { $("hash").textContent = "Aucun fichier sélectionné."; return; }
+    try {
+      const bytes = await file.arrayBuffer();
+      const digest = await crypto.subtle.digest("SHA-256", bytes);
+      currentHash = Array.from(new Uint8Array(digest), byte => byte.toString(16).padStart(2,"0")).join("");
+      $("hash").textContent = currentHash;
+    } catch (_) { $("hash").textContent = "Calcul SHA-256 impossible dans ce navigateur."; }
+  });
+
+  $("publishForm").addEventListener("submit", async event => {
+    event.preventDefault(); clearMessage();
+    const form = event.currentTarget; setBusy(form, true);
+    try {
+      const type = $("docType").value;
+      const file = $("file").files?.[0];
+      if (!file || !currentHash) throw new Error("Sélectionnez un fichier et calculez son empreinte SHA-256.");
+      const effective = new Date($("effectiveAt").value);
+      if (!Number.isFinite(effective.getTime()) || effective.getTime() < Date.now() + 60_000) {
+        throw new Error("La date d’effet doit être au moins une minute dans le futur.");
+      }
+      const result = await invoke({
+        action:"publish", document_type:type, version:$("version").value.trim(),
+        content_sha256:currentHash, document_path:PATHS[type], effective_at:effective.toISOString()
+      });
+      message("Version publiée dans le registre : " + result.document_version_id);
+      form.reset(); currentHash = null; $("hash").textContent = "Aucun fichier sélectionné.";
+      await loadDocuments();
+    } catch (error) { message(error.message || "Publication impossible.", true); }
+    finally { setBusy(form, false); }
+  });
+
+  $("refreshButton").addEventListener("click", async () => {
+    clearMessage();
+    try { await loadDocuments(); message("Registre actualisé."); }
+    catch (error) { message(error.message, true); }
+  });
+  $("signOutButton").addEventListener("click", async () => {
+    await client.auth.signOut(); showAuthenticated(false); message("Session fermée.");
+  });
+  client.auth.onAuthStateChange((_event, session) => {
+    if (!session) showAuthenticated(false);
+  });
+  refreshSession();
+})();
+</script>
+</body>
+</html>
