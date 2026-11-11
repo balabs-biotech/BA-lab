@@ -2911,3 +2911,38 @@ body[data-domain] :is(button, input, select, textarea, a, [tabindex]):focus-visi
   #sensorAnalysisCard .sensor-summary { grid-template-columns:repeat(2,minmax(0,1fr)); }
   #sensorAnalysisCard .sensor-series-table { display:block; overflow-x:auto; white-space:nowrap; }
 }
+
+
+/* Legal and privacy navigation */
+.legal-footer-links {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  margin: 22px auto 8px;
+  padding: 14px 0;
+  border-top: 1px solid var(--border);
+  font-size: 12px;
+}
+.legal-footer-links a,
+.legal-footer-links button {
+  color: var(--muted);
+  text-underline-offset: 3px;
+}
+.legal-footer-links button {
+  border: 0;
+  background: transparent;
+  padding: 0;
+  font: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}
+.legal-footer-links a:focus-visible,
+.legal-footer-links button:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 3px;
+}
+@media(max-width:600px) {
+  .legal-footer-links { gap: 10px 16px; justify-content: flex-start; }
+}
