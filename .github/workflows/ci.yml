@@ -95,6 +95,8 @@ jobs:
         run: node scripts/test-biological-decision-policy-store.mjs
       - name: Test biological decision policy authoring lifecycle
         run: node scripts/test-biological-decision-policy-authoring.mjs
+      - name: Test biological decision policy management UI
+        run: node scripts/test-biological-decision-policy-ui.mjs
 
   batch-tracker-audit:
     runs-on: ubuntu-latest
