@@ -24,6 +24,9 @@ on:
       - "scripts/test-biological-context-loader.mjs"
       - "scripts/test-biological-context-pipeline.mjs"
       - "scripts/test-biological-assessment-engine.mjs"
+      - "scripts/test-biological-rule-store.mjs"
+      - "supabase/migrations/20261111170000_add_biological_rule_store.sql"
+      - "supabase/tests/biological-rule-store-security.test.sql"
       - "supabase/tests/bal-json-ingest-contract.test.mjs"
       - "supabase/migrations/20261111160000_add_bal_json_atomic_ingestion.sql"
       - ".github/workflows/bal-json-import-ui.yml"
@@ -86,6 +89,8 @@ jobs:
         run: node scripts/test-biological-context-pipeline.mjs
       - name: Test exact biological rule resolution
         run: node scripts/test-biological-rule-resolver.mjs
+      - name: Test tenant-scoped biological rule store
+        run: node scripts/test-biological-rule-store.mjs
       - name: Test biological rule registry validation and review gate
         run: node scripts/test-biological-rule-registry.mjs
       - name: Test explicit-rule Biological Interpreter
