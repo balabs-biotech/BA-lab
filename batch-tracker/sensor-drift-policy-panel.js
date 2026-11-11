@@ -178,6 +178,7 @@
     } finally {
       state.busy = false;
       $("sensorDriftCreateDraft").disabled = !state.profile || state.devices.length < 2;
+      $("sensorDriftPolicySelect").disabled = !state.policies.length;
       updateActionState();
     }
   }
