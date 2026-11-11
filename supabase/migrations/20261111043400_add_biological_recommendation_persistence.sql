@@ -62,8 +62,8 @@ create table public.biological_recommendations (
       or (lifecycle_status = 'accepted' and revision = 1)
       or (lifecycle_status = 'executed' and revision = 2)
       or (lifecycle_status = 'outcome_recorded' and revision = 3)
-    )
-,  constraint biological_recommendations_outcome_projection_check
+    ),
+  constraint biological_recommendations_outcome_projection_check
     check (
       (
         lifecycle_status in ('proposed', 'withheld', 'accepted', 'rejected')
