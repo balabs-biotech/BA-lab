@@ -153,8 +153,9 @@
       " · période " + state.profile.validFrom + " → " + end +
       " · " + state.devices.length + " appareil(s) activé(s). Les politiques reprendront cette période.";
     ["sensorDriftVariable", "sensorDriftOffset", "sensorDriftMinimumPairs",
-      "sensorDriftMinimumDuration", "sensorDriftMaximumRate", "sensorDriftCreateDraft"]
+      "sensorDriftMinimumDuration", "sensorDriftMaximumRate"]
       .forEach(id => { $(id).disabled = false; });
+    $("sensorDriftCreateDraft").disabled = state.devices.length < 2;
     await loadPolicies(revision, organizationId, environmentId);
     if (revision === state.revision) setStatus("Profil et appareils éligibles chargés. Les mutations restent protégées par RLS et les déclencheurs PostgreSQL.");
   }
@@ -230,8 +231,10 @@
         reference_verification_evidence: evidence
       }).eq("organization_id", state.organizationId)
         .eq("id", policy.id).eq("status", "draft")
-        .eq("reference_binding_verified", false);
+        .eq("reference_binding_verified", false)
+        .select("id").maybeSingle();
       if (error) throw error;
+      if (!data) throw new Error("Le brouillon n’a pas été modifié ; vérifiez vos droits et son état.");
       await refreshPolicies(policy.id);
       setStatus("Vérification enregistrée. Le couple physique est désormais immuable ; l’activation est une étape distincte.");
     });
@@ -240,12 +243,14 @@
     const policy = selectedPolicy();
     if (!policy || policy.status !== "draft" || !policy.reference_binding_verified) return;
     await withBusy("Activation de la version vérifiée…", async () => {
-      const { error } = await client.from("sensor_drift_reference_policies")
+      const { data, error } = await client.from("sensor_drift_reference_policies")
         .update({ status: "active" })
         .eq("organization_id", state.organizationId)
         .eq("id", policy.id).eq("status", "draft")
-        .eq("reference_binding_verified", true);
+        .eq("reference_binding_verified", true)
+        .select("id").maybeSingle();
       if (error) throw error;
+      if (!data) throw new Error("La politique n’a pas été activée ; vérifiez son état et les chevauchements de validité.");
       await refreshPolicies(policy.id);
       setStatus("Politique activée. Elle sera résolue côté serveur lors des analyses couvrant sa période.");
     });
@@ -254,11 +259,13 @@
     const policy = selectedPolicy();
     if (!policy || policy.status !== "active") return;
     await withBusy("Retrait de la version active…", async () => {
-      const { error } = await client.from("sensor_drift_reference_policies")
+      const { data, error } = await client.from("sensor_drift_reference_policies")
         .update({ status: "retired" })
         .eq("organization_id", state.organizationId)
-        .eq("id", policy.id).eq("status", "active");
+        .eq("id", policy.id).eq("status", "active")
+        .select("id").maybeSingle();
       if (error) throw error;
+      if (!data) throw new Error("La politique n’a pas été retirée ; vérifiez son état.");
       await refreshPolicies(policy.id);
       setStatus("Version retirée. Son historique est conservé ; créez un nouveau brouillon pour une nouvelle configuration.");
     });
