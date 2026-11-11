@@ -32,6 +32,12 @@
             const assisted = document.createElement("script");
             assisted.src = "../smart-entry.js?v=20261029-assisted-entry-1";
             assisted.onerror = () => console.error("Le module de saisie assistée n’a pas pu être chargé.");
+            assisted.onload = () => {
+              const importer = document.createElement("script");
+              importer.src = "../bal-json-import.js?v=20261111-bal-json-import-1";
+              importer.onerror = () => console.error("Le module d’import BAL-JSON n’a pas pu être chargé.");
+              document.body.appendChild(importer);
+            };
             document.body.appendChild(assisted);
           };
           document.body.appendChild(script);
