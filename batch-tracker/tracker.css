@@ -2830,3 +2830,14 @@ body[data-domain] :is(button, input, select, textarea, a, [tabindex]):focus-visi
 .rule-retire label { grid-column:1/-1;margin:0; }
 .rule-retire input { margin:0; }
 @media(max-width:700px){.rule-retire{grid-template-columns:1fr}.rule-retire label{grid-column:auto}.rule-retire button{width:100%}}
+
+.rule-permission{margin:10px 0;padding:10px 12px;border-radius:8px;font-size:13px}
+.rule-permission.is-admin{background:#e8f3eb;color:#28563a}
+.rule-permission.is-readonly{background:#f1f2f2;color:#505b61}
+.rule-version-compare{margin:12px 0;padding:10px;border:1px solid var(--border);border-radius:8px}
+.rule-version-compare summary{cursor:pointer;font-weight:600}
+.rule-version-compare dl{display:grid;grid-template-columns:minmax(100px,.5fr) 1.5fr;gap:7px;margin:10px 0 0}
+.rule-version-compare dt{font-weight:700}
+.rule-version-compare dd{margin:0;overflow-wrap:anywhere}
+.rule-conflict{padding:8px 10px;border-left:3px solid #b36a24;background:#fff6e9;color:#754514}
+.rule-record button:disabled,.rule-create button:disabled{opacity:.45;cursor:not-allowed}
