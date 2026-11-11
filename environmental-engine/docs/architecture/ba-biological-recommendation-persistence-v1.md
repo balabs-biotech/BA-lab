@@ -179,6 +179,36 @@ the live head `20261111043003`. The Supabase project reports
 contract tests before merge. Do not apply this schema directly to production
 from this design document.
 
+## Biological signal persistence
+
+`interpretation/signal_service.py` now provides the application orchestration
+for the first persistence stage: it interprets one analysis against the exact
+supplied `DomainProfile`, validates the biological/environment binding, and
+then calls `SupabaseBiologicalSignalRepository`. The adapter uses only an
+injected trusted server-side client, maps the analysis, finding, observation,
+biological subject/context and both profile versions into the database row,
+and verifies that every generated signal can be read back.
+
+The database's natural idempotency key is used with conflict-ignore semantics.
+A replay therefore does not overwrite operational triage state such as
+`acknowledged` or `resolved`. A replay whose natural provenance key resolves
+to a different signal UUID fails closed during read-back verification.
+
+The current schema deliberately stores `source_finding_id` and
+`source_observation_ids` as provenance values rather than foreign keys:
+findings have no normalized persisted table, and the observation identifiers
+are carried in JSONB. The signal table does enforce tenant-scoped foreign keys
+to the analysis, biological context, domain profile and environment profile.
+This is an explicit limitation, not a claim that every source identifier has
+referential integrity. A future normalized finding/evidence store should add
+composite tenant foreign keys after its canonical schema is established.
+
+`BiologicalSignalService.interpret_and_persist` is the application entry point
+for this stage. Its output is the exact interpretation plus the verified
+persisted rows. Recommendation resolution can then consume that same
+interpretation; recommendation persistence remains a subsequent, separately
+idempotent step.
+
 ## Application orchestration
 
 `RecommendationService` coordinates the pure lifecycle transition with the repository port:
