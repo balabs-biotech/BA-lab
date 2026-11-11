@@ -119,6 +119,30 @@ Deno.serve(async (req: Request) => {
     const locationId = context.location_id ?? null;
     const batchId = context.batch_id ?? null;
 
+    async function assertTenantReference(
+      table: "cultures" | "plant_cultures" | "environments" | "locations",
+      id: string | null,
+      errorCode: string,
+    ) {
+      if (!id) return;
+      const { data: reference, error } = await supabase
+        .from(table)
+        .select("id")
+        .eq("organization_id", organizationId)
+        .eq("id", id)
+        .maybeSingle();
+      if (error || !reference) throw new Error(errorCode);
+    }
+
+    try {
+      await assertTenantReference("cultures", cultureId, "culture_not_found_or_access_denied");
+      await assertTenantReference("plant_cultures", plantCultureId, "plant_culture_not_found_or_access_denied");
+      await assertTenantReference("environments", environmentId, "environment_not_found_or_access_denied");
+      await assertTenantReference("locations", locationId, "location_not_found_or_access_denied");
+    } catch (error) {
+      return response(422, { error: error instanceof Error ? error.message : "context_reference_invalid" });
+    }
+
     if (batchId) {
       const { data: batch, error } = await supabase
         .from("batches")
