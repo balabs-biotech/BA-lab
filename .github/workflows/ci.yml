@@ -275,6 +275,8 @@ jobs:
         run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/environmental_profile_registries_contract.test.sql
       - name: Test persisted sensor drift reference policies after replay
         run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/sensor_drift_reference_policies_contract.test.sql
+      - name: Test sensor drift management read model after replay
+        run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/sensor_drift_management_read_model_contract.test.sql
       - name: Test persisted biological signal events after replay
         run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/biological_signals_contract.test.sql
       - name: Test biological signal lifecycle authorization after replay
