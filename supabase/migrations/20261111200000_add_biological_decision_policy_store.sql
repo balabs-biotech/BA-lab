@@ -169,6 +169,7 @@ begin
             where prior.organization_id = new.organization_id
               and prior.policy_id = new.policy_id and prior.status = 'reviewed'
          )
+         and newer.status in ('reviewed','retired')
     ) then
       raise exception 'biological_decision_policy_stale_retirement_blocked' using errcode = '40001';
     end if;
