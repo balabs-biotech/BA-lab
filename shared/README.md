@@ -36,3 +36,19 @@ Run:
 ```sh
 node scripts/test-bal-normalizer.mjs
 ```
+
+
+## CultureOps preview integration
+
+The Mycology and Laboratory workspaces load this module before the BAL-JSON import client. The tracker exposes read-only snapshots of the authenticated workspace's already-loaded `variables` and `units` catalogue rows, including `factor`, `offset_value`, and `is_linear`.
+
+During local preview only:
+
+1. BAL-JSON's raw `variable_code`, `raw_value`, and `raw_unit_code` are matched exactly to the loaded catalogue.
+2. BAL-Normalizer returns an advisory conversion assessment.
+3. The preview labels any result as proposed and not saved.
+4. The import request remains the original BAL-JSON record. It never receives `normalized_value` or `normalized_unit_code` from this preview.
+
+If the normalizer script or catalogue is unavailable, raw import remains possible after the server's authoritative contract and catalogue checks. This fallback does not imply that a conversion was performed.
+
+The import UI tests execute the actual shared normalizer module, rather than a copied test implementation.
