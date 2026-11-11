@@ -169,7 +169,7 @@ class SupabaseRecommendationRepository:
         try:
             response = (
                 self._user_client.table("biological_recommendations")
-                .select("*")
+                .select("*,events:biological_recommendation_events(*)")
                 .eq("organization_id", str(organization_id))
                 .eq("recommendation_id", str(recommendation_id))
                 .maybe_single()
@@ -179,20 +179,12 @@ class SupabaseRecommendationRepository:
             if recommendation is None:
                 return None
 
-            event_response = (
-                self._user_client.table("biological_recommendation_events")
-                .select("*")
-                .eq("organization_id", str(organization_id))
-                .eq("recommendation_id", str(recommendation_id))
-                .order("occurred_at")
-                .order("event_id")
-                .execute()
-            )
-            event_rows = _response_data(event_response) or []
+            event_rows = recommendation.pop("events", []) or []
             if not isinstance(event_rows, list):
                 raise RecommendationRepositoryError(
                     "Supabase returned an invalid recommendation event history"
                 )
+            event_rows.sort(key=lambda item: item["revision"])
             return _lifecycle_from_payload(recommendation, event_rows)
         except RecommendationRepositoryError:
             raise
@@ -244,13 +236,15 @@ class SupabaseRecommendationRepository:
                 raise RecommendationRepositoryError(
                     "Supabase did not return the transitioned recommendation"
                 )
-            return _lifecycle_from_payload(
-                payload["recommendation"],
-                [payload["event"]] if payload.get("event") else [],
-            ) if payload.get("event") else self.get(
+            lifecycle = self.get(
                 organization_id=organization_id,
                 recommendation_id=recommendation_id,
             )
+            if lifecycle is None:
+                raise RecommendationNotFoundError(
+                    "recommendation disappeared after lifecycle transition"
+                )
+            return lifecycle
         except RecommendationRepositoryError:
             raise
         except Exception as error:
