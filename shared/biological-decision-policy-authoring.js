@@ -18,7 +18,7 @@
       return fail("insufficient_context", "policy_draft_input_incomplete");
     const p = input.policy;
     if (p.status !== "draft" || !p.policy_id?.trim?.() || !p.version?.trim?.() ||
-        !p.domain?.trim?.() || !p.rule_version_id?.trim() ||
+        !["mycology","laboratory"].includes(p.domain) || !p.rule_version_id?.trim() ||
         !p.decision_code?.trim?.() || !p.title?.trim?.() || !p.explanation?.trim() ||
         !Array.isArray(p.sources) || p.sources.length === 0 ||
         !p.sources.every(s => s && typeof s.type === "string" && s.type.trim() &&
