@@ -42,7 +42,7 @@ begin
      or v_guard not ilike '%biological_decision_policy_retirement_requires_latest_reviewed_version%'
      or v_guard not ilike '%biological_decision_policy_requires_current_reviewed_rule%'
      or v_guard not ilike '%biological_decision_policy_retirement_requires_new_version%'
-     or v_guard not ilike '%set search_path = pg_catalog, public, private, auth%' then
+     or v_guard not ilike '%search_path%pg_catalog, public, private, auth%' then
     raise exception 'FAIL: decision policy lifecycle and exact-rule binding guard is incomplete';
   end if;
   if not exists (
