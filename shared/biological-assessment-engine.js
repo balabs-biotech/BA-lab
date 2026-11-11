@@ -15,6 +15,7 @@
       return Object.freeze({
         status: "insufficient_context",
         reason: "biological_engine_dependency_unavailable",
+        engine_version: VERSION,
         resolution: Object.freeze({ status: "insufficient_context", reason: "engine_dependency_unavailable", candidate_rule_ids: Object.freeze([]) }),
         assessment: null,
         raw_measurement_modified: false,
@@ -24,6 +25,7 @@
       return Object.freeze({
         status: "insufficient_context",
         reason: "measurement_missing",
+        engine_version: VERSION,
         resolution: Object.freeze({ status: "insufficient_context", reason: "measurement_missing", candidate_rule_ids: Object.freeze([]) }),
         assessment: null,
         raw_measurement_modified: false,
@@ -43,6 +45,7 @@
       return Object.freeze({
         status: resolution.status,
         reason: resolution.reason,
+        engine_version: VERSION,
         resolution,
         assessment: null,
         raw_measurement_modified: false,
@@ -56,6 +59,7 @@
     return Object.freeze({
       status: assessment.status,
       reason: assessment.reason,
+      engine_version: VERSION,
       resolution,
       assessment,
       raw_measurement_modified: false,
