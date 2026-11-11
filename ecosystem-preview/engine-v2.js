@@ -410,6 +410,19 @@ function buildResources(id,parentNode=null,anchor=null) {
  }
  currentNode=parentNode||domain;currentAnchor=(anchor||cells.get(id).position).clone();const children=currentNode.children||[];renderPath();if(!children.length){status.textContent=(currentNode.title||domain.title).toUpperCase();return}
  const baseColor=new THREE.Color(COLORS[id]),accent=new THREE.Color(0xb96b4d);
+ // Keep a quiet spatial trace of the route already travelled when drilling into a nested folder.
+ // It reconnects the active colony to its parent branches without restoring their labels or hit targets.
+ const drawAncestorContext=()=>{
+  const ancestors=[];let parent=currentNode?.parentNode;
+  while(parent&&parent!==domain){if(parent.position?.isVector3)ancestors.unshift(parent);parent=parent.parentNode}
+  if(!ancestors.length)return;
+  const points=[cells.get(id).position.clone(),...ancestors.map(node=>node.position.clone()),currentAnchor.clone()];
+  const distinct=points.filter((point,index)=>index===0||point.distanceTo(points[index-1])>.025);
+  if(distinct.length<2)return;
+  const curve=new THREE.CatmullRomCurve3(distinct),mesh=new THREE.Mesh(new THREE.TubeGeometry(curve,Math.max(12,distinct.length*10),.0045,4,false),new THREE.MeshBasicMaterial({color:baseColor.clone().lerp(new THREE.Color(0xd1d0c5),.32),transparent:true,opacity:.24,depthWrite:false}));
+  mesh.userData.kind='ancestor-context';world.add(mesh);resourceObjects.push(mesh);
+ };
+ drawAncestorContext();
  const filament=(pts,color,radius,opacity)=>{const curve=new THREE.CatmullRomCurve3(pts),mesh=new THREE.Mesh(new THREE.TubeGeometry(curve,18,radius,4,false),new THREE.MeshStandardMaterial({color,emissive:color,emissiveIntensity:.18,transparent:true,opacity,roughness:.65}));world.add(mesh);resourceObjects.push(mesh);return curve};
  const maxDepth=3; // Keep preview hierarchy depth aligned with the public language manifests.
  const drawNode=(item,pos,depth,parent,angle,index)=>{const has=!!item.children?.length,color=baseColor.clone().lerp(accent,depth===0?.08:depth===1?.23:.36).lerp(new THREE.Color(0xd1d0c5),depth>=2?.10:0),radius=depth===0?(has?.135:.105):depth===1?(has?.085:.065):.043;item.position=pos.clone();item.parentNode=parent;const displayTitle=[item.title,item.name,item.label,item.id].map(value=>String(value??'').trim()).find(Boolean)||('Branche '+(index+1));const data={kind:'resource',...item,title:displayTitle,sourceItem:item,sourceId:id,position:pos.clone(),hasChildren:has,depth,parentNode:parent,denseRoot:depth===0&&children.length>16};const hitRadius=depth===0?.32:depth===1?.25:.19;const hit=new THREE.Mesh(new THREE.SphereGeometry(hitRadius,10,8),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));hit.position.copy(pos);hit.userData=data;world.add(hit);resourceObjects.push(hit);pickables.push(hit);
