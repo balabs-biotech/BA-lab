@@ -61,6 +61,8 @@
           !Array.isArray(row.trigger_assessment_statuses) ||
           !row.trigger_assessment_statuses.includes(assessment.status) ||
           !Array.isArray(row.sources) || row.sources.length === 0 ||
+          !row.sources.every(source => source && typeof source.type === "string" && source.type.trim() &&
+            typeof source.citation === "string" && source.citation.trim()) ||
           typeof row.decision_code !== "string" || !row.decision_code.trim() ||
           typeof row.title !== "string" || !row.title.trim() ||
           typeof row.explanation !== "string" || !row.explanation.trim() ||
