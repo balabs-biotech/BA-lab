@@ -44,7 +44,7 @@ begin
        or jsonb_typeof(v_definition->'applicable_signal_codes') <> 'array'
        or jsonb_array_length(v_definition->'applicable_signal_codes') = 0
        or jsonb_path_exists(v_definition->'applicable_signal_codes', '$[*] ? (@.type() != "string")')
-       or jsonb_path_exists(v_definition->'applicable_signal_codes', '$[*] ? (length(@) == 0)')
+       or jsonb_path_exists(v_definition->'applicable_signal_codes', '$[*] ? (@ == "")')
        or jsonb_typeof(v_definition->'allowed_finding_statuses') <> 'array'
        or jsonb_path_exists(v_definition->'allowed_finding_statuses', '$[*] ? (@.type() != "string")')
        or jsonb_path_exists(
