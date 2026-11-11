@@ -577,13 +577,13 @@
 #app.balabs-ui > main > .universe-index .universe-index-card:focus-visible,
 #app.balabs-ui > main > .editorial-work .work-card-link:focus-visible,
 #app.balabs-ui > .top .lang:focus-visible,
-#app.balabs-ui > main > .site-nav a:focus-visible,
+#app.balabs-ui > .site-nav a:focus-visible,
 #app.balabs-ui > .foot a:focus-visible {
   outline: 3px solid var(--balabs-copper) !important;
   outline-offset: 4px !important;
   box-shadow: 0 0 0 2px var(--balabs-graphite) !important;
 }
-#app.balabs-ui > main > .site-nav a {
+#app.balabs-ui > .site-nav a {
   min-height: 44px !important;
   display: inline-flex !important;
   align-items: center !important;
@@ -631,13 +631,13 @@
   #app.balabs-ui > main > .editorial-work .work-card {
     width: 100% !important;
   }
-  #app.balabs-ui > main > .site-nav {
+  #app.balabs-ui > .site-nav {
     justify-content: flex-start !important;
     overflow-x: auto !important;
     overscroll-behavior-inline: contain !important;
     scrollbar-width: none !important;
   }
-  #app.balabs-ui > main > .site-nav::-webkit-scrollbar {
+  #app.balabs-ui > .site-nav::-webkit-scrollbar {
     display: none !important;
   }
 }
@@ -707,14 +707,14 @@
   background: #B96B4D !important;
   color: #111B1D !important;
 }
-#app.balabs-ui > main > .site-nav {
+#app.balabs-ui > .site-nav {
   min-height: 58px !important;
   padding-inline: clamp(18px, 4vw, 58px) !important;
   border-top: 0 !important;
   border-bottom: 1px solid #40534D !important;
   background: #111B1D !important;
 }
-#app.balabs-ui > main > .site-nav a {
+#app.balabs-ui > .site-nav a {
   color: #D1D0C5 !important;
   font-size: 10px !important;
   letter-spacing: .16em !important;
