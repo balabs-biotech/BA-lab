@@ -64,6 +64,17 @@ def _lifecycle_from_payload(
     recommendation: dict[str, Any],
     events: list[dict[str, Any]] | None = None,
 ) -> RecommendationLifecycle:
+    event_rows = events or []
+    revisions = [int(item["revision"]) for item in event_rows]
+    if revisions != list(range(1, len(event_rows) + 1)):
+        raise RecommendationRepositoryError(
+            "Supabase recommendation event history has a revision gap"
+        )
+    if int(recommendation["revision"]) != len(event_rows):
+        raise RecommendationRepositoryError(
+            "Supabase recommendation snapshot revision does not match its event history"
+        )
+
     proposal = RecommendationProposal(
         recommendation_id=recommendation["recommendation_id"],
         recommendation_code=recommendation["recommendation_code"],
@@ -91,7 +102,7 @@ def _lifecycle_from_payload(
             outcome_summary=item.get("outcome_summary"),
             outcome_observed_at=item.get("outcome_observed_at"),
         )
-        for item in (events or [])
+        for item in event_rows
     )
     return RecommendationLifecycle(
         proposal=proposal,
