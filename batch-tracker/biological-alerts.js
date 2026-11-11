@@ -423,7 +423,7 @@
       client.from("observations").select("id,variable_code,value_text,observed_at,quality_state,culture_id,event_id,metadata")
         .eq("organization_id", organizationId).in("culture_id", cultureIds)
         .order("observed_at", { ascending: true }).limit(500),
-      client.from("biological_signals").select("signal_id,biological_subject_id,environment_id,signal_code,severity,variable_code,observed_date,observed_value,unit,analysis_method,analysis_evidence,first_seen_at")
+      client.from("biological_signals").select("signal_id,biological_subject_id,environment_id,signal_code,severity,message_code,recommendation_code,rule_id,source_analysis_id,source_finding_id,source_observation_ids,variable_code,observed_date,observed_value,unit,analysis_method,analysis_evidence,first_seen_at")
         .eq("organization_id", organizationId).eq("domain", domainByWorkspace[document.body.dataset.domain] || "mycology")
         .in("biological_subject_id", cultureIds).order("first_seen_at", { ascending: true }).limit(200)
     ]);
@@ -565,11 +565,35 @@
       const cultureSignals = biologicalSignals.filter(item => item.biological_subject_id === cultureId);
       const cultureResults = experimentalResults.filter(result =>
         cultureMeasurements.some(item => item.result_id === result.id));
+      // Adapt existing rule-engine outputs into the inference contract.
+      // A signal is a finding, not an organism identification or a calibrated probability.
+      const findings = cultureSignals.map(signal => ({
+        finding_id: signal.signal_id,
+        finding_type: signal.signal_code,
+        severity: signal.severity || null,
+        rule_id: signal.rule_id || null,
+        source_analysis_id: signal.source_analysis_id || null,
+        source_finding_id: signal.source_finding_id || null,
+        recommendation_code: signal.recommendation_code || null,
+        message_code: signal.message_code || null,
+        variable_code: signal.variable_code || null,
+        observed_value: signal.observed_value ?? null,
+        unit: signal.unit || null,
+        observed_at: signal.observed_date || signal.first_seen_at || null,
+        analysis_method: signal.analysis_method || null,
+        analysis_evidence: signal.analysis_evidence || {},
+        source_observation_ids: Array.isArray(signal.source_observation_ids) ? signal.source_observation_ids : [],
+        hypotheses: [],
+        confidence: null,
+        confirmation_status: "unconfirmed",
+        composition_status: "not_assessed"
+      }));
       return {
         culture_id: cultureId,
         measurements: cultureMeasurements,
         observations: cultureObservations,
         biological_signals: cultureSignals,
+        findings,
         experimental_results: cultureResults,
         events: cultureEvents,
         environmental_context: environmentalContext,
@@ -577,6 +601,7 @@
           measurement_count: cultureMeasurements.length,
           observation_count: cultureObservations.length,
           biological_signal_count: cultureSignals.length,
+          finding_count: findings.length,
           experimental_result_count: cultureResults.length,
           environmental_context_count: environmentalContext.length,
           measurement_interpretation: "quantitative_observation",
