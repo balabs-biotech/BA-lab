@@ -20,7 +20,7 @@ const importThree = async () => {
 
 const ROOT = document.getElementById('mainView');
 const IDS = ['bio','myco','soil','lab','products','iot','work','learn'];
-const COLORS = { bio:0x78998a, myco:0x9b806d, soil:0x8d9b78, lab:0x829b9d, products:0xb96b4d, iot:0x789c91, work:0xa47c67, learn:0xb1aa8e };
+const COLORS = { bio:0x79a991, myco:0xa88fc3, soil:0xc19b73, lab:0x80aeb8, products:0xc88773, iot:0x7eaaa3, work:0xa99dbb, learn:0xb5b58d };
 const POS = {
   bio:[0,2.55,0], myco:[-2.35,1.05,.35], soil:[-2.15,-1.05,-.1], lab:[-.05,.35,-.7],
   products:[.2,-1.35,.55], iot:[2.45,.85,-.25], work:[2.15,-1.25,-.45], learn:[-.15,-2.8,.1],
@@ -58,7 +58,7 @@ function addStyles() {
     @media(max-width:760px){#mainView.webgl-ready{height:640px;min-height:640px}}
     #mainView.webgl-ready>.hub,#mainView.webgl-ready>.sphere,#mainView.webgl-ready>.network,#mainView.webgl-ready>.galaxy{display:none!important}
     #mainView .webgl-stage{position:absolute;inset:0;z-index:4;min-height:100%;touch-action:none;overflow:hidden}
-    #mainView .webgl-stage canvas{display:block;width:100%;height:100%;outline:none;touch-action:none}
+    #mainView .webgl-stage canvas{display:block;width:100%;height:100%;outline:none;touch-action:none}#mainView .webgl-stage canvas:focus-visible{outline:2px solid #d1d0c5;outline-offset:-4px}
     #mainView .webgl-stage .webgl-hit-target{position:absolute;z-index:30;width:76px;height:76px;min-width:64px;min-height:64px;padding:0;border:0;border-radius:50%;background:transparent;color:transparent;opacity:.015;pointer-events:auto!important;touch-action:manipulation;transform:translate(-50%,-50%);cursor:pointer;-webkit-tap-highlight-color:transparent}
     body > .webgl-hit-target:focus-visible{opacity:.24;outline:2px solid #d1d0c5;background:#b96b4d33}
     #mainView .webgl-stage .webgl-hint{position:absolute;left:16px;bottom:14px;z-index:8;padding:3px 0;max-width:calc(100% - 32px);white-space:normal;border:0;border-radius:0;background:transparent;color:#d1d9d0;font:600 9px/1.4 system-ui;letter-spacing:.06em;pointer-events:none;text-shadow:0 1px 5px #07110f}
@@ -141,15 +141,15 @@ function makeLabel(text, color, size=16) {
 
 function createWorld() {
   scene=new THREE.Scene();
-  scene.fog=new THREE.FogExp2(0x071522,.0065);
+  scene.fog=new THREE.FogExp2(0x172321,.009);
   world=new THREE.Group();scene.add(world);
   scene.add(new THREE.AmbientLight(0xdce6df,1.65));
-  const key=new THREE.PointLight(0x58c9e8,31,42);key.position.set(0,7,8);scene.add(key);
+  const key=new THREE.PointLight(0xa6c1ad,24,35);key.position.set(0,7,8);scene.add(key);
   const warm=new THREE.PointLight(0xb96b4d,9,26);warm.position.set(7,-3,3);scene.add(warm);
-  const fill=new THREE.PointLight(0x36b8a8,23,38);fill.position.set(-7,-2,-5);scene.add(fill);
-  // Fine background hyphae add depth and interconnect the colonies visually.
+  const fill=new THREE.PointLight(0x78958a,15,32);fill.position.set(-7,-2,-5);scene.add(fill);
+  // Sparse background hyphae connect the field without forming panels or solid spheres.
   let fieldSeed=81273;const fieldRand=()=>{fieldSeed=(fieldSeed*16807)%2147483647;return(fieldSeed-1)/2147483646};
-  const fieldPalette=[0x43c5df,0x42b9aa,0x83d6a1,0x719fe0,0xb96b4d];
+  const fieldPalette=[0x263b38,0xb96b4d,0xd1d0c5,0x78958a];
   for(let i=0;i<58;i++){const start=new THREE.Vector3(-5+fieldRand()*10,-4+fieldRand()*8,-3.5+fieldRand()*7),end=start.clone().add(new THREE.Vector3((fieldRand()-.5)*3.2,(fieldRand()-.5)*2.8,(fieldRand()-.5)*1.8)),mid=start.clone().lerp(end,.5).add(new THREE.Vector3((fieldRand()-.5)*.8,(fieldRand()-.5)*.8,(fieldRand()-.5)*.5)),curve=new THREE.CatmullRomCurve3([start,mid,end]),color=fieldPalette[Math.floor(fieldRand()*fieldPalette.length)];world.add(new THREE.Mesh(new THREE.TubeGeometry(curve,18,.0018+fieldRand()*.002,3,false),new THREE.MeshBasicMaterial({color,transparent:true,opacity:.10+fieldRand()*.14,depthWrite:false})));if(i%2===0){const at=curve.getPoint(.48),tip=at.clone().add(new THREE.Vector3((fieldRand()-.5)*1.5,(fieldRand()-.5)*1.5,(fieldRand()-.5)*.8)),fork=new THREE.CatmullRomCurve3([at,at.clone().lerp(tip,.5).add(new THREE.Vector3(0,.05,.03)),tip]);world.add(new THREE.Mesh(new THREE.TubeGeometry(fork,12,.0016,3,false),new THREE.MeshBasicMaterial({color,transparent:true,opacity:.12,depthWrite:false})))}}
   for(const id of IDS){
     const color=COLORS[id],pos=new THREE.Vector3(...POS[id]).multiplyScalar(1.62);
