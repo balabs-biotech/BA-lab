@@ -53,6 +53,8 @@ window.BA_LABS_LOAD_BIOLOGICAL_CONTEXT = async (cultureId) => {
 };
 
 window.BA_LABS_ASSESS_BIOLOGICAL_MEASUREMENT = async ({ cultureId, measurement, rules } = {}) => {
+  const requestRevision = authStateRevision;
+  const activeOrganizationId = organizationId;
   const contextResult = await window.BA_LABS_LOAD_BIOLOGICAL_CONTEXT(cultureId);
   const engine = window.BALabsBiologicalAssessmentEngine;
   if (!engine || typeof engine.assess !== "function") {
@@ -65,8 +67,10 @@ window.BA_LABS_ASSESS_BIOLOGICAL_MEASUREMENT = async ({ cultureId, measurement, 
     };
   }
 
+  if (!isCurrentWorkspaceRevision(requestRevision, activeOrganizationId)) {
+    return { status: "stale_context", reason: "workspace_changed_during_context_load", context_status: contextResult.status, assessment: null, raw_measurement_modified: false };
+  }
   const domain = window.BA_LABS_DOMAIN || document.body.dataset.domain;
-  const activeOrganizationId = organizationId;
   let candidateRules = rules;
   let ruleStoreStatus = "provided_by_caller";
 
@@ -97,7 +101,7 @@ window.BA_LABS_ASSESS_BIOLOGICAL_MEASUREMENT = async ({ cultureId, measurement, 
         raw_measurement_modified: false,
       };
     }
-    if (!isCurrentWorkspaceRevision(authStateRevision, activeOrganizationId)) {
+    if (!isCurrentWorkspaceRevision(requestRevision, activeOrganizationId)) {
       return {
         status: "stale_context",
         reason: "workspace_changed_during_rule_load",
