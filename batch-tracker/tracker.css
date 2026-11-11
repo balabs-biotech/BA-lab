@@ -3065,3 +3065,17 @@ body[data-domain] :is(button, input, select, textarea, a, [tabindex]):focus-visi
   border-left:2px solid var(--accent, #64748b);
   overflow-wrap:anywhere;
 }
+
+#biologicalSignalsCard .signal-interpretation-review-state {
+  display: block;
+  margin-top: 0.55rem;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+#biologicalSignalsCard .signal-interpretation-review-disclaimer {
+  display: block;
+  margin-top: 0.2rem;
+  color: var(--muted);
+  font-size: 11px;
+  overflow-wrap: anywhere;
+}
