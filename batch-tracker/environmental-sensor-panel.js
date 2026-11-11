@@ -189,6 +189,7 @@
         "référence=" + item.reference_sensor_id,
         item.status,
         "paires=" + (item.pair_count ?? 0),
+        "observations sources=" + ((item.source_target_observation_ids?.length ?? 0) + (item.source_reference_observation_ids?.length ?? 0)),
         item.robust_drift_rate_per_hour == null ? null : "pente robuste=" + Number(item.robust_drift_rate_per_hour).toPrecision(4) + " / h",
         item.maximum_abs_drift_rate_per_hour == null ? null : "seuil=" + item.maximum_abs_drift_rate_per_hour + " / h",
         item.reason
