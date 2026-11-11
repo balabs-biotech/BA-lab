@@ -2,9 +2,14 @@
 -- Runs only against the disposable PostgreSQL 17 CI database, inside a rollback transaction.
 begin;
 
-do $$
+-- Seed an administrative actor without invoking the signup capture trigger.
+alter table auth.users disable trigger auth_user_signup_legal_acts;
+insert into auth.users(id, raw_user_meta_data)
+values ('11111111-1111-4111-8111-111111111111', '{}'::jsonb);
+alter table auth.users enable trigger auth_user_signup_legal_acts;
+
+do $
 declare
-  bootstrap_user uuid := '11111111-1111-4111-8111-111111111111';
   signup_user uuid := '22222222-2222-4222-8222-222222222222';
   start_at timestamptz := clock_timestamp() + interval '3 seconds';
   terms_v1 uuid;
@@ -14,18 +19,11 @@ declare
   event_count integer;
   active_count integer;
 begin
-  -- Create the actor before publishing versions; bypass only the new signup
-  -- trigger for this fixture account, then restore it immediately.
-  alter table auth.users disable trigger auth_user_signup_legal_acts;
-  insert into auth.users(id, raw_user_meta_data)
-  values (bootstrap_user, '{}'::jsonb);
-  alter table auth.users enable trigger auth_user_signup_legal_acts;
-
   terms_v1 := public.publish_legal_document_version(
-    'terms','test-terms-v1',repeat('a',64),'legal/terms.html',start_at,bootstrap_user
+    'terms','test-terms-v1',repeat('a',64),'legal/terms.html',start_at,'11111111-1111-4111-8111-111111111111'
   );
   privacy_v1 := public.publish_legal_document_version(
-    'privacy_notice','test-privacy-v1',repeat('b',64),'legal/privacy.html',start_at,bootstrap_user
+    'privacy_notice','test-privacy-v1',repeat('b',64),'legal/privacy.html',start_at,'11111111-1111-4111-8111-111111111111'
   );
 
   -- Both mandatory documents must be effective before Auth accepts the user.
@@ -86,7 +84,7 @@ begin
   -- effective instant of its replacement.
   terms_v2 := public.publish_legal_document_version(
     'terms','test-terms-v2',repeat('c',64),'legal/terms.html',
-    start_at + interval '10 minutes',bootstrap_user
+    start_at + interval '10 minutes','11111111-1111-4111-8111-111111111111'
   );
 
   -- A second publication inserted before the scheduled retirement would
@@ -94,7 +92,7 @@ begin
   begin
     perform public.publish_legal_document_version(
       'terms','test-terms-conflict',repeat('d',64),'legal/terms.html',
-      start_at + interval '5 minutes',bootstrap_user
+      start_at + interval '5 minutes','11111111-1111-4111-8111-111111111111'
     );
     raise exception 'expected_validity_overlap_conflict';
   exception when raise_exception then
