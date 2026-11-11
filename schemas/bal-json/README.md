@@ -41,7 +41,7 @@ Every record carries:
 5. Preserve acquisition time (`measured_at` / `observed_at`) separately from record creation time (`created_at`).
 6. Keep provenance. AI-assisted extraction is marked `ai_assisted` and remains unreviewed until a human or an explicitly authorized workflow reviews it.
 7. Quality states describe data quality, not biological success. `excluded` measurements require an exclusion reason.
-8. Context identifiers are references, not embedded copies of private records. The receiver must verify that each referenced object belongs to the stated organization.
+8. Context identifiers are references, not embedded copies of private records. The receiver must verify that each referenced object belongs to the stated organization. In v1, every record must be anchored by a culture, plant culture or batch because those are the supported anchors in the current atomic manual-write RPCs; environment/location alone, or a standalone material/sample/experimental-unit reference, is insufficient.
 9. The workspace/domain label belongs in metadata or a namespaced extension; it does not replace biological context.
 10. Do not put credentials, access tokens, private keys, or secrets in a record.
 
