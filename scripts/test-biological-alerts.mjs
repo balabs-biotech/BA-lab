@@ -216,7 +216,7 @@ assert.match(moduleSource, /payload\.source_material_ids/);
 // Exercise the pure graph builder with a converging two-source operation.
 // The output must trace back to both contributors and expose the operation edges.
 const provenanceStart = moduleSource.indexOf("  function buildBiologicalProvenanceIndex(lineage) {");
-const provenanceEnd = moduleSource.indexOf("\\n  window.BALabsBiologicalProvenance", provenanceStart);
+const provenanceEnd = moduleSource.indexOf("\n  window.BALabsBiologicalProvenance", provenanceStart);
 assert.ok(provenanceStart >= 0 && provenanceEnd > provenanceStart, "provenance builder must remain independently testable");
 const buildProvenanceIndex = new Function("return (" + moduleSource.slice(provenanceStart, provenanceEnd).trim() + ");")();
 const provenance = buildProvenanceIndex({
