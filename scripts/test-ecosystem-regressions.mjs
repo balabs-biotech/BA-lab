@@ -363,6 +363,25 @@ for (const [label, tree] of [['public', JSON.parse(readFileSync('ecosystem/notio
   for (const id of inactiveArabicProducts) assert.ok(!ids.has(id), label + ' Arabic tree must not expose inactive catalogue item ' + id);
 }
 
+
+
+// Phase 3 visual-system contract: responsive editorial cards, touch targets,
+// logical RTL spacing and visible keyboard focus. No explorer selectors.
+for (const selector of [
+  '#app.balabs-ui > main > .editorial-work .work-grid',
+  '#app.balabs-ui > main > .editorial-work .work-card',
+  '#app.balabs-ui > main > .universe-index .universe-index-card',
+  '#app.balabs-ui > main > .site-nav a',
+  '#app.balabs-ui[dir="rtl"] > main > .hero .aside',
+]) assert.ok(brandCss.includes(selector), 'Phase 3 must include the responsive editorial selector: ' + selector);
+assert.ok(brandCss.includes('min-height: 44px !important'), 'Language and navigation controls must retain accessible touch targets');
+assert.ok(brandCss.includes('aspect-ratio: 16 / 10 !important'), 'Editorial project imagery must use a consistent landscape ratio');
+assert.ok(brandCss.includes('grid-template-columns: repeat(2, minmax(0, 1fr)) !important'), 'Editorial work cards must collapse to two columns on tablet');
+assert.ok(brandCss.includes('grid-template-columns: minmax(0, 1fr) !important'), 'Editorial work cards must collapse to one column on mobile');
+assert.ok(brandCss.includes('outline: 3px solid var(--balabs-copper) !important'), 'Editorial links and controls must have a visible keyboard focus state');
+assert.ok(!/\\.(?:sphere|webgl-[\\w-]*|branch-dock|camera)\\b|#mainView|canvas/i.test(brandCss.slice(brandCss.indexOf('Site-wide visual refinement — phase 3'))), 'Phase 3 must not target the 3D explorer or Batch Tracker');
+
+console.log('BA Labs site-wide visual refinement checks passed.');
 console.log('Clean 3D engine regression checks passed: eight domains, mycelial topology, animated signals, stable camera, desktop/mobile controls, hierarchical Notion branches and explicit page actions.');
 
 
