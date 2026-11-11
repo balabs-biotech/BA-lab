@@ -167,6 +167,7 @@ Avec la confirmation e-mail activée, `auth.signUp()` peut créer l'utilisateur 
 - La fonction trigger devra être privée, avec `search_path` fixe, propriétaire privilégié maîtrisé et EXECUTE révoqué des rôles clients. Aucune fonction `SECURITY DEFINER` générique ou exposée dans `public`.
 - L'échec d'insertion du journal doit faire échouer la création Auth : pas de compte « orphelin » sans preuve.
 - L'opt-in de recherche reste séparé, facultatif et révocable. Il ne doit pas être précoché ni conditionner l'accès au compte. Son enregistrement initial peut être ajouté au même trigger uniquement si un choix explicite distinct est transmis et validé.
+- Le trigger s'applique à toute insertion dans `auth.users`, pas uniquement au bouton d'inscription du navigateur. Les invitations administrateur et futurs fournisseurs OAuth devront donc transmettre les mêmes versions documentaires ou disposer d'un parcours d'acceptation distinct conçu explicitement ; sinon la création est refusée. Ne pas ajouter d'exception silencieuse qui permettrait de créer des comptes sans actes requis.
 - Ne pas stocker d'IP, de user-agent ou de mot de passe dans les événements sans nécessité démontrée, finalité, durée de conservation et validation juridique.
 
 ### Pourquoi ne pas choisir une Edge Function seule
