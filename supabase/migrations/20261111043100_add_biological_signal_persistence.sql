@@ -146,7 +146,7 @@ returns trigger
 language plpgsql
 security invoker
 set search_path = pg_catalog, public
-as $
+as $$
 declare
   v_observation_id uuid;
 begin
@@ -165,7 +165,7 @@ begin
 
   return new;
 end;
-$;
+$$;
 
 revoke all on function private.link_biological_signal_observations()
   from public, anon, authenticated;
