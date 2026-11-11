@@ -323,6 +323,10 @@ assert.match(moduleSource, /linked_observation_ids/);
 assert.match(moduleSource, /window_hours: 24/);
 assert.match(moduleSource, /causal_relationship_established: false/);
 assert.match(moduleSource, /const contextCompleteness =/);
+assert.match(moduleSource, /lineage\?\.evidenceAvailability\?\.measurements === true/);
+assert.match(moduleSource, /lineage\?\.evidenceAvailability\?\.environmental_observations === true/);
+assert.match(moduleSource, /lineage\?\.lineageQuality\?\.complete === true/);
+
 assert.match(moduleSource, /biological_field_coverage/);
 assert.match(moduleSource, /insufficient_context_for_biological_interpretation/);
 assert.match(moduleSource, /temporal_evidence: temporalEvidenceForFinding\(signal\)/);
