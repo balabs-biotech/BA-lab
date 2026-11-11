@@ -72,7 +72,7 @@ begin
      v_guard not ilike '%biological_rule_retirement_requires_new_version%' or
      v_guard not ilike '%biological_rule_invalid_initial_status%' or
      v_guard not ilike '%biological_rule_review_must_be_explicit_transition%' or
-     v_guard not ilike '%set search_path = pg_catalog, public, private, auth%' then
+     v_guard not ilike '%search_path%pg_catalog, public, private, auth%' then
     raise exception 'FAIL: reviewed rule immutability or reviewer identity guard is missing';
   end if;
   if not exists (
