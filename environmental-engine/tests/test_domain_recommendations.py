@@ -138,3 +138,20 @@ def test_recommendation_catalog_codes_must_be_unique():
             rules=profile.rules,
             recommendations=(duplicate, duplicate),
         )
+
+def test_recommendation_is_withheld_when_catalog_entry_is_missing():
+    signal = make_signal()
+    profile = DomainProfile(
+        profile_id="mycology-fruiting",
+        module="mycology",
+        version="1.2.0",
+        rules=(),
+        recommendations=(),
+    )
+    result = resolve_recommendations(make_interpretation(signal), profile)
+
+    assert result.proposals[0].status == "withheld"
+    assert result.proposals[0].instruction_code is None
+    assert result.proposals[0].withholding_reasons == ("recommendation_definition_missing",)
+    assert result.proposed_count == 0
+    assert result.withheld_count == 1
