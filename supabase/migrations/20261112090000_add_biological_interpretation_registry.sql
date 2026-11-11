@@ -228,7 +228,14 @@ begin
     where previous.organization_id = p_organization_id
       and previous.source_signal_id = p_source_signal_id
       and previous.engine_code = btrim(p_engine_code)
-      and previous.interpretation_id <> v_snapshot.interpretation_id;
+      and previous.interpretation_id <> v_snapshot.interpretation_id
+      and not exists (
+        select 1
+          from public.biological_interpretation_events prior_event
+         where prior_event.organization_id = previous.organization_id
+           and prior_event.interpretation_id = previous.interpretation_id
+           and prior_event.event_type = 'superseded'
+      );
   end if;
 
   return jsonb_build_object(
