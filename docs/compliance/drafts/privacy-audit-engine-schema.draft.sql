@@ -371,7 +371,8 @@ as $$
 declare
   new_id uuid;
 begin
-  if p_document_type not in ('terms','privacy_notice','cookies_notice','research_consent')
+  if p_document_type is null
+     or p_document_type not in ('terms','privacy_notice','cookies_notice','research_consent')
      or p_version is null or length(btrim(p_version)) = 0
      or p_content_sha256 is null
      or p_content_sha256 !~ '^[0-9a-f]{64}
