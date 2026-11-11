@@ -417,3 +417,13 @@ assert.match(interpretationMigration, /revoke all on function public\.review_bio
 
 assert.match(moduleSource, /String\(event\.event_payload\.note\)/);
 assert.match(moduleSource, /event\.actor_kind === "user" \? "Action utilisateur" : "Événement système"/);
+
+assert.match(moduleSource, /review_biological_interpretation/);
+assert.match(moduleSource, /Revue scientifique humaine/);
+assert.match(moduleSource, /reassessment_requested/);
+assert.match(moduleSource, /p_organization_id: state\.organizationId/);
+assert.match(moduleSource, /p_interpretation_id: snapshot\.interpretation_id/);
+assert.match(moduleSource, /event_payload: \{ decision, note:/);
+assert.match(moduleSource, /reviewStatus\.textContent = "Revue enregistrée dans l’historique\."/);
+assert.match(styles, /\.signal-interpretation-review-actions/);
+assert.match(styles, /@media \(max-width: 560px\)/);
