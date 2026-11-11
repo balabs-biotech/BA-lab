@@ -107,6 +107,7 @@ jobs:
           node --check batch-tracker/legal-consent.js
           node scripts/test-legal-consent.mjs
           node scripts/test-auth-privacy-consent-flow.mjs
+          node scripts/test-legal-admin-console.mjs
           node --check batch-tracker/biological-alerts.js
           node scripts/test-biological-alerts.mjs
           node --check batch-tracker/environmental-sensor-panel.js
