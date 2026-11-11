@@ -83,21 +83,31 @@
     function renderHistory(records) {
       const host = $("decisionPolicyHistory");
       if (!records.length) { host.innerHTML = '<p class="muted">Aucune politique enregistrée dans cet espace.</p>'; return; }
-      const latest = new Map();
-      for (const row of records) if (!latest.has(row.policy_id)) latest.set(row.policy_id,row.id);
+      const latestCommitted = new Map();
+      const latestDraft = new Map();
+      for (const row of records) {
+        if (row.status === "reviewed" || row.status === "retired") {
+          if (!latestCommitted.has(row.policy_id)) latestCommitted.set(row.policy_id,row);
+        } else if (row.status === "draft" && !latestDraft.has(row.policy_id)) {
+          latestDraft.set(row.policy_id,row);
+        }
+      }
       const groups = new Map();
       for (const row of records) {
         if (!groups.has(row.policy_id)) groups.set(row.policy_id,[]);
         groups.get(row.policy_id).push(row);
       }
       host.innerHTML = records.map((row,index) => {
-        const isLatest = latest.get(row.policy_id) === row.id;
+        const committed = latestCommitted.get(row.policy_id);
+        const draft = latestDraft.get(row.policy_id);
+        const isLatestCommitted = committed?.id === row.id;
+        const isLatestDraft = draft?.id === row.id && (!committed || Number(row.revision_seq) > Number(committed.revision_seq));
         const previous = (groups.get(row.policy_id)||[])[(groups.get(row.policy_id)||[]).findIndex(x=>x.id===row.id)+1];
         const actions = !canAdmin ? '<span class="muted">Consultation seule</span>' :
-          row.status === "draft" ? (isLatest
+          row.status === "draft" ? (isLatestDraft
             ? `<button type="button" class="small-button" data-policy-action="review" data-index="${index}">Examiner et publier</button>`
             : '<span class="muted">Brouillon dépassé — publication bloquée</span>') :
-          row.status === "reviewed" ? (isLatest
+          row.status === "reviewed" ? (isLatestCommitted
             ? `<div class="rule-retire"><label for="decision-retire-${index}">Nouvelle version de retrait</label><input id="decision-retire-${index}" data-policy-version="${index}" maxlength="40" placeholder="2.0.0"><button type="button" class="small-button secondary-button" data-policy-action="retire" data-index="${index}">Retirer</button></div>`
             : '<span class="muted">Version remplacée — retrait bloqué</span>') :
           '<span class="muted">Politique retirée</span>';
