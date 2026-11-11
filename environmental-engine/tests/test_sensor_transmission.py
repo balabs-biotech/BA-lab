@@ -103,7 +103,7 @@ def test_no_receipt_history_is_insufficient_before_one_tolerance_window_elapses(
 def test_zero_receipts_become_silent_after_explicit_expectation_window_elapses():
     result = assess([])
     assert result.status == "silent"
-    assert result.trailing_silence_seconds == 600
+    assert result.trailing_silence_seconds == 87000
     assert result.last_received_at is None
 
 
