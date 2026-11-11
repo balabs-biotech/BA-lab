@@ -333,6 +333,11 @@ assert.match(moduleSource, /temporal_evidence: temporalEvidenceForFinding\(signa
 assert.match(moduleSource, /const compareFindingEvidence = \(signal, temporalEvidence\) =>/);
 assert.match(moduleSource, /same_variable_measurement_count/);
 assert.match(moduleSource, /unit_compatible_measurement_count/);
+assert.match(moduleSource, /measurement_quality_states: matchingMeasurements\.map/);
+assert.match(moduleSource, /nearby_experimental_result_ids: linkedResults\.map/);
+assert.doesNotMatch(moduleSource, /qualityLimitedMeasurements/);
+assert.doesNotMatch(moduleSource, /measurement_quality_limited_ids/);
+
 assert.match(moduleSource, /different_numeric_value_no_tolerance_defined/);
 assert.match(moduleSource, /no_unit_compatible_measurement/);
 assert.match(moduleSource, /environmental_evidence_role: "context_only_not_direct_biological_confirmation"/);
