@@ -78,7 +78,13 @@
       "then": {
         "required": [
           "exclusion_reason"
-        ]
+        ],
+        "properties": {
+          "exclusion_reason": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
       }
     }
   ],
