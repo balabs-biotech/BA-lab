@@ -21,6 +21,8 @@ assert.deepEqual(record.properties.contract_version, { const: "1.0.0" });
 assert.deepEqual(record.properties.record_type.enum, ["measurement", "observation"]);
 assert.ok(record.allOf.some((rule) => rule.if?.properties?.record_type?.const === "measurement"));
 assert.ok(record.allOf.some((rule) => rule.if?.properties?.record_type?.const === "observation"));
+assert.equal(record.allOf[0].then.properties.data.$ref, "urn:ba-labs:bal-json:v1:measurement");
+assert.equal(record.allOf[1].then.properties.data.$ref, "urn:ba-labs:bal-json:v1:observation");
 assert.equal(record.properties.provenance.$ref, "#/$defs/provenance");
 assert.equal(record.additionalProperties, false);
 
@@ -38,11 +40,16 @@ assert.ok(observation.required.includes("observed_at"));
 assert.ok(observation.additionalProperties === false);
 
 const example = readJson("schemas/bal-json/v1/examples/mycology-measurement.json");
+const observationExample = readJson("schemas/bal-json/v1/examples/laboratory-observation.json");
 assert.equal(example.contract, "BA-LABS/JSON");
 assert.equal(example.contract_version, "1.0.0");
 assert.equal(example.record_type, "measurement");
 assert.equal(example.data.variable_code, "temperature");
 assert.equal(example.data.raw_unit_code, "degC");
 assert.equal(example.provenance.source, "sensor");
+assert.equal(observationExample.record_type, "observation");
+assert.equal(observationExample.data.variable_code, "colony_morphology");
+assert.equal(observationExample.data.context.culture_id, example.data.context.culture_id);
+assert.equal(observation.properties.context.$ref, "urn:ba-labs:bal-json:v1:measurement#/$defs/context");
 
 console.log("✓ BAL-JSON v1 schema structure and canonical mycology measurement fixture");
