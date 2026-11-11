@@ -109,6 +109,71 @@ create index biological_signals_environment_history_idx
     organization_id, environment_id, observed_date desc
   );
 
+-- Normalize observation provenance into tenant-scoped relational links. The
+-- JSONB array remains a portable snapshot, while this table proves that every
+-- referenced observation belongs to the same organization.
+create table public.biological_signal_observations (
+  organization_id uuid not null,
+  signal_id uuid not null,
+  observation_id uuid not null,
+  primary key (organization_id, signal_id, observation_id),
+  constraint biological_signal_observations_signal_fk
+    foreign key (organization_id, signal_id)
+    references public.biological_signals (organization_id, signal_id)
+    on delete cascade,
+  constraint biological_signal_observations_observation_fk
+    foreign key (organization_id, observation_id)
+    references public.observations (organization_id, id)
+    on delete restrict
+);
+
+create index biological_signal_observations_observation_idx
+  on public.biological_signal_observations (organization_id, observation_id);
+
+alter table public.biological_signal_observations enable row level security;
+
+create policy biological_signal_observations_select
+  on public.biological_signal_observations
+  for select to authenticated
+  using (private.is_org_member(organization_id));
+
+revoke all on public.biological_signal_observations from public, anon, authenticated;
+grant select on public.biological_signal_observations to authenticated;
+grant select, insert, delete on public.biological_signal_observations to service_role;
+
+create or replace function private.link_biological_signal_observations()
+returns trigger
+language plpgsql
+security invoker
+set search_path = pg_catalog, public
+as $
+declare
+  v_observation_id uuid;
+begin
+  for v_observation_id in
+    select value::uuid
+      from jsonb_array_elements_text(new.source_observation_ids) as item(value)
+  loop
+    insert into public.biological_signal_observations (
+      organization_id, signal_id, observation_id
+    )
+    values (
+      new.organization_id, new.signal_id, v_observation_id
+    )
+    on conflict (organization_id, signal_id, observation_id) do nothing;
+  end loop;
+
+  return new;
+end;
+$;
+
+revoke all on function private.link_biological_signal_observations()
+  from public, anon, authenticated;
+
+create trigger biological_signals_link_observations
+  after insert on public.biological_signals
+  for each row execute function private.link_biological_signal_observations();
+
 alter table public.biological_signals enable row level security;
 
 create policy biological_signals_select
