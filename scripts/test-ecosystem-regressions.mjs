@@ -15,6 +15,26 @@ for (const language of ['fr', 'en', 'ar', 'pt']) {
   const ids = languageTrees[language].domains.map((domain) => domain.id).sort();
   assert.deepEqual(ids, [...expectedDomains].sort(), language + ' manifest must expose exactly the eight public universes');
 }
+const englishAgrotechnology = languageTrees.en.domains.find((domain) => domain.id === 'soil');
+for (const id of [
+  '40173152f17181c0955ef6b706891bfa',
+  '40173152f171818bbe4adc44550b7913',
+  '40173152f171818daed1d22deb38a624',
+  '40173152f171813da2e3dafa7265dc6a',
+  '40173152f17181ce95cfcc669321cc1d',
+]) assert.ok(englishAgrotechnology.children.some((node) => node.notionId === id), 'English agrotechnology must expose every verified public child page');
+const arabicMycology = languageTrees.ar.domains.find((domain) => domain.id === 'myco');
+for (const id of ['40173152f1718101afcbdb364eb5d44a', '40173152f17181afb288feda1d2c3e5c']) {
+  assert.ok(arabicMycology.children.some((node) => node.notionId === id), 'Arabic mycology must expose its verified cultivation and applications pages');
+}
+const portugueseAgrotechnology = languageTrees.pt.domains.find((domain) => domain.id === 'soil');
+for (const id of [
+  '40173152f171815692d6c55cd7032b94',
+  '40173152f17181628dace7026da068a9',
+  '40173152f1718136afe3fd533c629c64',
+  '40173152f171819b8edfc928072a23a0',
+]) assert.ok(portugueseAgrotechnology.children.some((node) => node.notionId === id), 'Portuguese agrotechnology must expose every verified public child page');
+
 const englishBiotechnology = languageTrees.en.domains.find((domain) => domain.id === 'bio');
 const englishWork = languageTrees.en.domains.find((domain) => domain.id === 'work');
 assert.ok(englishBiotechnology.children.some((node) => node.notionId === '40173152f17181e1aa6eebe9f6c26c46'), 'English biotechnology universe must include the verified Plant micropropagation page linked from its public landing page');
