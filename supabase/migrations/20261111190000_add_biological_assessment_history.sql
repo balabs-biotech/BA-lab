@@ -2,6 +2,7 @@
 create table public.biological_assessments (
   organization_id uuid not null references public.organizations(id) on delete cascade,
   id uuid not null default gen_random_uuid(),
+  idempotency_key uuid not null,
   source_measurement_id uuid not null,
   rule_version_id uuid,
   status text not null check (status in ('normal','out_of_range','insufficient_context','not_assessed','no_matching_rule','ambiguous_rule')),
@@ -16,6 +17,7 @@ create table public.biological_assessments (
   assessed_by uuid not null default auth.uid() references auth.users(id),
   assessed_at timestamptz not null default now(),
   primary key (organization_id,id),
+  unique (organization_id,idempotency_key),
   foreign key (organization_id,source_measurement_id)
     references public.measurements(organization_id,id) on delete restrict,
   foreign key (organization_id,rule_version_id)
@@ -64,7 +66,8 @@ create or replace function public.record_biological_assessment(
   p_measurement_snapshot jsonb,
   p_context_snapshot jsonb,
   p_resolution_snapshot jsonb,
-  p_result_snapshot jsonb
+  p_result_snapshot jsonb,
+  p_idempotency_key uuid
 )
 returns uuid
 language plpgsql
@@ -76,12 +79,14 @@ declare
   v_measurement public.measurements%rowtype;
   v_rule public.biological_rules%rowtype;
   v_assessment_id uuid;
+  v_existing public.biological_assessments%rowtype;
 begin
   v_org_id := nullif(p_context_snapshot->>'organization_id','')::uuid;
   if auth.uid() is null or v_org_id is null or not private.is_org_member(v_org_id) then
     raise exception 'Organization access denied' using errcode = '42501';
   end if;
-  if p_source_measurement_id is null
+  if p_idempotency_key is null
+     or p_source_measurement_id is null
      or p_status is null
      or p_status not in ('normal','out_of_range','insufficient_context','not_assessed','no_matching_rule','ambiguous_rule')
      or p_reason is null or length(btrim(p_reason)) = 0
@@ -134,18 +139,35 @@ begin
   end if;
 
   insert into public.biological_assessments (
-    organization_id, source_measurement_id, rule_version_id, status, reason,
+    organization_id, idempotency_key, source_measurement_id, rule_version_id, status, reason,
     engine_version, calculation_origin, server_verification,
     measurement_snapshot, context_snapshot, resolution_snapshot, result_snapshot, assessed_by
   ) values (
-    v_org_id, p_source_measurement_id, p_rule_version_id, p_status, p_reason,
+    v_org_id, p_idempotency_key, p_source_measurement_id, p_rule_version_id, p_status, p_reason,
     p_engine_version, 'client_engine', 'not_recomputed',
     p_measurement_snapshot, p_context_snapshot, p_resolution_snapshot, p_result_snapshot, auth.uid()
-  ) returning id into v_assessment_id;
+  ) on conflict (organization_id,idempotency_key) do nothing returning id into v_assessment_id;
+
+  if v_assessment_id is null then
+    select * into v_existing from public.biological_assessments
+     where organization_id = v_org_id and idempotency_key = p_idempotency_key;
+    if not found
+       or v_existing.source_measurement_id is distinct from p_source_measurement_id
+       or v_existing.rule_version_id is distinct from p_rule_version_id
+       or v_existing.status is distinct from p_status
+       or v_existing.reason is distinct from p_reason
+       or v_existing.measurement_snapshot is distinct from p_measurement_snapshot
+       or v_existing.context_snapshot is distinct from p_context_snapshot
+       or v_existing.resolution_snapshot is distinct from p_resolution_snapshot
+       or v_existing.result_snapshot is distinct from p_result_snapshot then
+      raise exception 'Assessment idempotency key payload conflict' using errcode = '23505';
+    end if;
+    v_assessment_id := v_existing.id;
+  end if;
 
   return v_assessment_id;
 end;
 $function$;
 
-revoke all on function public.record_biological_assessment(uuid,uuid,text,text,text,jsonb,jsonb,jsonb,jsonb) from public, anon;
+revoke all on function public.record_biological_assessment(uuid,uuid,text,text,text,jsonb,jsonb,jsonb,jsonb,uuid) from public, anon;
 grant execute on function public.record_biological_assessment(uuid,uuid,text,text,text,jsonb,jsonb,jsonb,jsonb) to authenticated;
