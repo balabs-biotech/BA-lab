@@ -94,5 +94,29 @@
     });
   }
 
-  root.BALabsBiologicalRuleStore = Object.freeze({ version: VERSION, loadExecutableRules });
+  async function loadRuleHistory(input) {
+    if (!input || !input.client || typeof input.client.from !== "function" ||
+        typeof input.organizationId !== "string" || !input.organizationId.trim() ||
+        typeof input.domain !== "string" || !input.domain.trim()) {
+      return Object.freeze({ status: "insufficient_context", reason: "rule_history_query_incomplete", records: Object.freeze([]) });
+    }
+    const { data, error } = await input.client.from("biological_rules")
+      .select("id,revision_seq,organization_id,rule_id,version,status,domain,variable_code,unit_code,target,rule,created_at,created_by,reviewed_by,reviewed_at")
+      .eq("organization_id", input.organizationId)
+      .eq("domain", input.domain)
+      .order("revision_seq", { ascending: false })
+      .order("id", { ascending: false })
+      .limit(200);
+    if (error) return Object.freeze({ status: "unavailable", reason: "rule_history_query_failed", records: Object.freeze([]) });
+    const records = (Array.isArray(data) ? data : []).filter(row =>
+      row && row.organization_id === input.organizationId && row.domain === input.domain &&
+      row.rule && typeof row.rule === "object" && !Array.isArray(row.rule) &&
+      row.rule_id === row.rule.rule_id && row.version === row.rule.version &&
+      row.status === row.rule.status && row.variable_code === row.rule.variable_code &&
+      row.unit_code === row.rule.unit_code
+    );
+    return Object.freeze({ status: "loaded", reason: "tenant_scoped_rule_history_loaded", records: Object.freeze(records) });
+  }
+
+  root.BALabsBiologicalRuleStore = Object.freeze({ version: VERSION, loadExecutableRules, loadRuleHistory });
 })(typeof globalThis !== "undefined" ? globalThis : window);
