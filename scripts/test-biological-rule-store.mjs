@@ -33,6 +33,7 @@ const rows = [
 rows[5].rule = { ...rows[5].rule, version: "wrong-version" };
 const calls = [];
 const client = {
+  auth: { async getUser() { return { data: { user: { id: "user-A" } }, error: null }; } },
   from(table) {
     const query = { table, filters: [], orders: [] };
     calls.push(query);
@@ -42,6 +43,7 @@ const client = {
       in(column, value) { query.filters.push(["in", column, value]); return builder; },
       order(column, options) { query.orders.push([column, options]); return builder; },
       limit(value) { query.limit = value; return builder; },
+      maybeSingle() { return Promise.resolve({ data: query.table === "organization_members" ? { role: "admin" } : null, error: null }); },
       then(resolve, reject) { return Promise.resolve({ data: rows, error: null }).then(resolve, reject); },
     };
     return builder;
@@ -68,5 +70,14 @@ assert.ok(calls.at(-1).filters.some(([kind, key, value]) => kind === "eq" && key
 assert.ok(calls.at(-1).filters.some(([kind, key, value]) => kind === "eq" && key === "domain" && value === "mycology"));
 assert.equal(calls.at(-1).limit, 200);
 assert.equal((await store.loadRuleHistory({ client, organizationId: "", domain: "mycology" })).status, "insufficient_context");
+const capabilities = await store.loadAuthoringCapabilities({ client, organizationId: "org-A" });
+assert.equal(capabilities.status, "loaded");
+assert.equal(capabilities.isAdmin, true);
+assert.equal(capabilities.role, "admin");
+assert.ok(calls.at(-1).filters.some(([kind, key, value]) => kind === "eq" && key === "user_id" && value === "user-A"));
+const memberClient = { ...client, from(table) { const q = client.from(table); q.maybeSingle = () => Promise.resolve({ data: { role: "member" }, error: null }); return q; } };
+const memberCapabilities = await store.loadAuthoringCapabilities({ client: memberClient, organizationId: "org-A" });
+assert.equal(memberCapabilities.status, "loaded");
+assert.equal(memberCapabilities.isAdmin, false);
 
-console.log("✓ Biological Rule Store: tenant scope, latest version, retirement suppression, history filtering and fail-closed validation");
+console.log("✓ Biological Rule Store: tenant scope, latest version, retirement suppression, history filtering, authoring permissions and fail-closed validation");
