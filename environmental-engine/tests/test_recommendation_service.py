@@ -20,6 +20,12 @@ class InMemoryRepository:
         self.lifecycle = lifecycle
         self.expected_revision = None
         self.appended_event = None
+        self.created_lifecycle = None
+
+    def create(self, *, organization_id, lifecycle):
+        self.created_lifecycle = lifecycle
+        self.lifecycle = lifecycle
+        return lifecycle
 
     def get(self, *, organization_id, recommendation_id):
         if self.lifecycle.proposal.recommendation_id != recommendation_id:
@@ -57,6 +63,46 @@ def make_lifecycle():
         status="proposed",
     )
     return RecommendationLifecycle.from_proposal(proposal)
+
+
+def test_service_persists_proposed_recommendation_without_mutating_it():
+    lifecycle = make_lifecycle()
+    repository = InMemoryRepository(None)
+    service = RecommendationService(repository)
+
+    result = service.create(
+        organization_id=uuid4(),
+        proposal=lifecycle.proposal,
+    )
+
+    assert result.status == "proposed"
+    assert result.revision == 0
+    assert result.events == ()
+    assert repository.created_lifecycle == result
+    assert result.proposal == lifecycle.proposal
+
+
+def test_service_persists_withheld_proposal_for_auditability():
+    lifecycle = make_lifecycle()
+    proposal = lifecycle.proposal.model_copy(
+        update={
+            "status": "withheld",
+            "instruction_code": None,
+            "rationale_code": None,
+            "withholding_reasons": ("required_context_missing:stage:fruiting",),
+        }
+    )
+    repository = InMemoryRepository(None)
+    service = RecommendationService(repository)
+
+    result = service.create(organization_id=uuid4(), proposal=proposal)
+
+    assert result.status == "withheld"
+    assert result.revision == 0
+    assert result.events == ()
+    assert result.proposal.withholding_reasons == (
+        "required_context_missing:stage:fruiting",
+    )
 
 
 def test_service_persists_domain_event_with_current_revision():
