@@ -39,6 +39,19 @@ for (const language of ['fr', 'en', 'ar', 'pt']) {
     }
   }
 }
+const publicCatalogueLabels = {
+  fr: 'Catalogue public — Ressources publiables',
+  en: 'Public catalogue — publishable resources',
+  ar: 'الكتالوج العام — الموارد القابلة للنشر',
+  pt: 'Catálogo público — recursos publicáveis',
+};
+for (const language of ['fr', 'en', 'ar', 'pt']) {
+  const products = languageTrees[language].domains.find((domain) => domain.id === 'products');
+  const catalogue = (products?.children || []).find((node) => node.url === 'https://app.notion.com/p/d0fbe1d779344eb58bc240fe7876ae0e');
+  assert.ok(catalogue, language + ' products universe must expose the shared public catalogue directly');
+  assert.equal(catalogue.notionId, 'd0fbe1d779344eb58bc240fe7876ae0e', language + ' public catalogue must use the verified shared database page');
+  assert.equal(catalogue.title, publicCatalogueLabels[language], language + ' public catalogue entry must be localised');
+}
 for (const [label, source] of [['public', engine], ['preview', previewEngine]]) {
   assert.ok(source.includes("fetch('./notion-tree.'+LANG()+'.json'") && source.includes("attributeFilter:['lang']"),
     label + ' 3D explorer must load the active language manifest and refresh it when the document language changes');
