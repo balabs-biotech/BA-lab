@@ -1,6 +1,11 @@
 """Configurable, domain-specific interpretation of environmental findings."""
 
 from .recommendations import resolve_recommendations
+from .recommendation_lifecycle import (
+    RecommendationLifecycle,
+    RecommendationLifecycleEvent,
+    transition_recommendation,
+)
 from .models import (
     RecommendationDefinition,
     RecommendationProposal,
@@ -40,4 +45,7 @@ __all__ = [
     "RecommendationProposal",
     "RecommendationResolution",
     "resolve_recommendations",
+    "RecommendationLifecycle",
+    "RecommendationLifecycleEvent",
+    "transition_recommendation",
 ]
