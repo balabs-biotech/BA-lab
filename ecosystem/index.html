@@ -4140,6 +4140,53 @@ html,body{background:var(--bal-petrol)!important;color:var(--bal-mineral)!import
 }
 
 
+
+/* Universe directory — strengthen the information hierarchy without changing destinations. */
+#app>.universe-index .universe-index-grid{align-items:stretch!important;grid-auto-rows:1fr!important;gap:16px!important}
+#app>.universe-index .universe-index-card{
+ position:relative!important;isolation:isolate!important;min-height:248px!important;
+ padding:22px 21px 20px!important;display:flex!important;flex-direction:column!important;
+ gap:0!important;border-radius:3px 12px 3px 12px!important;
+}
+#app>.universe-index .universe-index-card>span{
+ display:flex!important;align-items:center!important;justify-content:center!important;
+ width:34px!important;height:30px!important;margin:0 0 19px!important;
+ border:1px solid #B96B4D!important;border-radius:2px!important;
+ color:#D99A7F!important;font:700 11px/1 ui-monospace,monospace!important;letter-spacing:.08em!important
+}
+#app>.universe-index .universe-index-card>b{
+ display:block!important;margin:0 0 8px!important;font-size:clamp(18px,1.4vw,21px)!important;
+ line-height:1.18!important;letter-spacing:-.025em!important;text-wrap:balance!important
+}
+#app>.universe-index .universe-index-card>small{
+ display:block!important;margin:0 0 12px!important;font-size:12px!important;
+ line-height:1.45!important;letter-spacing:.025em!important;color:#B4C3BA!important
+}
+#app>.universe-index .universe-index-card>p{
+ margin:0 0 20px!important;font-size:13px!important;line-height:1.65!important;
+ max-width:38ch!important;color:#D1D0C5!important
+}
+#app>.universe-index .universe-index-card>em{
+ display:flex!important;align-items:center!important;gap:8px!important;
+ margin-top:auto!important;padding-top:12px!important;border-top:1px solid #40534D!important;
+ font-size:11px!important;line-height:1.4!important;letter-spacing:.06em!important;text-transform:uppercase!important
+}
+#app>.universe-index .universe-index-card>em:after{content:"↗";font-size:15px!important;transition:transform .18s ease!important}
+#app>.universe-index .universe-index-card:hover>em:after{transform:translate(3px,-2px)!important}
+@media(max-width:900px){
+ #app>.universe-index .universe-index-card{min-height:230px!important;padding:19px!important}
+ #app>.universe-index .universe-index-card>b{font-size:19px!important}
+}
+@media(max-width:520px){
+ #app>.universe-index .universe-index-grid{grid-template-columns:1fr!important;gap:10px!important}
+ #app>.universe-index .universe-index-card{min-height:0!important;padding:18px!important}
+ #app>.universe-index .universe-index-card>span{margin-bottom:13px!important}
+ #app>.universe-index .universe-index-card>p{max-width:58ch!important}
+}
+@media(prefers-reduced-motion:reduce){
+ #app>.universe-index .universe-index-card>em:after{transition:none!important}
+}
+
 /* BA Labs brand integration — editorial homepage only. Spatial engine stays isolated. */
 :root{
  --balabs-graphite:#111B1D;--balabs-forest:#263B38;--balabs-copper:#B96B4D;
