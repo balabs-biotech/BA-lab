@@ -70,6 +70,15 @@ window.BA_LABS_ASSESS_BIOLOGICAL_MEASUREMENT = async ({ cultureId, measurement, 
   if (!isCurrentWorkspaceRevision(requestRevision, activeOrganizationId)) {
     return { status: "stale_context", reason: "workspace_changed_during_context_load", context_status: contextResult.status, assessment: null, raw_measurement_modified: false };
   }
+  if (!contextResult || !contextResult.context) {
+    return {
+      status: contextResult?.status || "insufficient_context",
+      reason: contextResult?.reason || "biological_context_unavailable",
+      context_status: contextResult?.status || "insufficient_context",
+      assessment: null,
+      raw_measurement_modified: false,
+    };
+  }
   const domain = window.BA_LABS_DOMAIN || document.body.dataset.domain;
   let candidateRules = rules;
   let ruleStoreStatus = "provided_by_caller";
