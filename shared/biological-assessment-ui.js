@@ -92,9 +92,11 @@
 
   function initialize() {
     const root = historyRoot();
-    if (!root || root.dataset.biologicalAssessmentUi === "ready") return;
-    root.dataset.biologicalAssessmentUi = "ready";
-    root.addEventListener("click", handleClick);
+    if (!root) return;
+    if (root.dataset.biologicalAssessmentUi !== "ready") {
+      root.dataset.biologicalAssessmentUi = "ready";
+      root.addEventListener("click", handleClick);
+    }
     loadVisibleHistory().catch(() => {});
   }
 
