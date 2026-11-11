@@ -163,6 +163,66 @@ before delete on private.legal_document_versions
 for each row execute function private.reject_published_legal_document_delete();
 
 
+
+
+-- Supabase Before User Created Auth Hook.
+-- Configure this function as the project's before-user-created hook in Auth.
+-- It validates the document versions before Auth inserts the user. The
+-- AFTER INSERT trigger below remains the transactional persistence safeguard.
+create or replace function public.hook_validate_signup_legal_versions(event jsonb)
+returns jsonb
+language plpgsql
+security definer
+set search_path = pg_catalog, private
+as $
+declare
+  terms_version text;
+  privacy_version text;
+  current_at timestamptz := statement_timestamp();
+  terms_is_current boolean;
+  privacy_is_current boolean;
+begin
+  terms_version := event -> 'user' -> 'user_metadata' ->> 'legal_terms_version';
+  privacy_version := event -> 'user' -> 'user_metadata' ->> 'legal_privacy_version';
+
+  if terms_version is null or length(btrim(terms_version)) = 0
+     or privacy_version is null or length(btrim(privacy_version)) = 0 then
+    return jsonb_build_object('error', jsonb_build_object(
+      'http_code', 400,
+      'message', 'Current terms and privacy notice versions are required.'
+    ));
+  end if;
+
+  select exists (
+    select 1 from private.legal_document_versions
+    where document_type = 'terms' and version = terms_version
+      and effective_at is not null and effective_at <= current_at
+      and (retired_at is null or retired_at > current_at)
+  ) into terms_is_current;
+
+  select exists (
+    select 1 from private.legal_document_versions
+    where document_type = 'privacy_notice' and version = privacy_version
+      and effective_at is not null and effective_at <= current_at
+      and (retired_at is null or retired_at > current_at)
+  ) into privacy_is_current;
+
+  if not terms_is_current or not privacy_is_current then
+    return jsonb_build_object('error', jsonb_build_object(
+      'http_code', 400,
+      'message', 'The legal documents have changed. Reload the current documents and try again.'
+    ));
+  end if;
+
+  return '{}'::jsonb;
+end;
+$;
+
+revoke all on function public.hook_validate_signup_legal_versions(jsonb)
+  from public, anon, authenticated;
+grant execute on function public.hook_validate_signup_legal_versions(jsonb)
+  to supabase_auth_admin;
+
 -- Pre-session signup capture. Auth creates the user even when email confirmation
 -- is required and no client session is returned. The trigger snapshots the
 -- submitted version identifiers into the immutable ledger in the same DB
