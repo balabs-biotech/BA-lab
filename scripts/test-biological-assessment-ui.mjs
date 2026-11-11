@@ -12,6 +12,11 @@ const migration = fs.readFileSync("supabase/migrations/20261111190000_add_biolog
 assert.match(ui, /\["mycology",\s*"laboratory"\]/);
 assert.match(ui, /data-biological-assess/);
 assert.match(ui, /loadHistoryBatch/);
+assert.match(ui, /BALabsBiologicalDecisionPolicyStore/);
+assert.match(ui, /BALabsBiologicalDecisionEngine/);
+assert.match(ui, /decision_candidate/);
+assert.match(ui, /aucune action automatique/i);
+assert.match(store, /context_snapshot,result_snapshot/);
 assert.match(ui, /non recalculé côté serveur/);
 assert.match(store, /record_biological_assessment/);
 assert.match(store, /source_measurement_id/);
