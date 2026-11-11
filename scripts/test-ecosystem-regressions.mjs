@@ -381,6 +381,20 @@ assert.ok(brandCss.includes('grid-template-columns: minmax(0, 1fr) !important'),
 assert.ok(brandCss.includes('outline: 3px solid var(--balabs-copper) !important'), 'Editorial links and controls must have a visible keyboard focus state');
 assert.ok(!/\.(?:sphere|webgl-[\w-]*|branch-dock|camera)\b|#mainView|canvas/i.test(brandCss.slice(brandCss.indexOf('Site-wide visual refinement — phase 3'))), 'Phase 3 must not target the 3D explorer or Batch Tracker');
 
+
+
+// Preview parity contract: retain the preview's independent light theme while
+// matching editorial hierarchy, responsive grids, touch targets and RTL focus.
+for (const selector of [
+  '.wrap > main > .editorial-work .work-grid',
+  '.wrap > main > .universe-index .universe-index-card',
+  '.wrap[dir="rtl"] > main > .hero .aside',
+]) assert.ok(previewHtml.includes(selector), 'Preview must implement phase 3 editorial parity: ' + selector);
+assert.ok(previewHtml.includes('aspect-ratio:16/10!important'), 'Preview project imagery must use the same landscape ratio');
+assert.ok(previewHtml.includes('min-height:44px!important'), 'Preview language controls must retain accessible touch targets');
+assert.ok(previewHtml.includes('grid-template-columns:repeat(2,minmax(0,1fr))!important'), 'Preview must use a two-column tablet work grid');
+assert.ok(previewHtml.includes('grid-template-columns:minmax(0,1fr)!important'), 'Preview must use a one-column mobile work grid');
+
 console.log('BA Labs site-wide visual refinement checks passed.');
 console.log('Clean 3D engine regression checks passed: eight domains, mycelial topology, animated signals, stable camera, desktop/mobile controls, hierarchical Notion branches and explicit page actions.');
 
