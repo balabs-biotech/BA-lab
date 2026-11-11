@@ -13,8 +13,9 @@ const reviewed = (ruleId, version = "1.0.0", status = "reviewed") => ({
   sources: [{ type: "publication", citation: "Source fixture" }],
   ...(status === "reviewed" ? { review: { reviewer_id: "reviewer-1", reviewed_at: "2026-11-11T10:00:00Z" } } : {}),
 });
+let revisionSequence = 0;
 const row = (rule, createdAt, id = rule.rule_id) => ({
-  id, organization_id: "org-A", rule_id: rule.rule_id, version: rule.version,
+  id, revision_seq: ++revisionSequence, organization_id: "org-A", rule_id: rule.rule_id, version: rule.version,
   status: rule.status, domain: rule.domain, variable_code: rule.variable_code,
   unit_code: rule.unit_code, rule, created_at: createdAt,
   reviewed_by: rule.status === "reviewed" ? rule.review.reviewer_id : null,
@@ -56,6 +57,7 @@ assert.ok(!result.rules.some(rule => rule.rule_id === "rule-retired"));
 assert.ok(!result.rules.some(rule => rule.rule_id === "rule-draft"));
 assert.ok(calls[0].filters.some(([kind, key, value]) => kind === "eq" && key === "organization_id" && value === "org-A"));
 assert.ok(calls[0].filters.some(([kind, key, value]) => kind === "in" && key === "status" && value.includes("retired")));
+assert.ok(calls[0].orders.some(([key, options]) => key === "revision_seq" && options.ascending === false));
 assert.equal((await store.loadExecutableRules({ client, organizationId: "", domain: "mycology", variableCode: "temperature", unitCode: "degC" })).status, "insufficient_context");
 
 console.log("✓ Biological Rule Store: tenant scope, latest version, retirement suppression and fail-closed validation");
