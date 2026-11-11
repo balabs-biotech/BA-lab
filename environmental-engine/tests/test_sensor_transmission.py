@@ -80,9 +80,25 @@ def test_historical_window_does_not_label_device_currently_silent():
     assert result.trailing_silence_seconds is None
 
 
-def test_no_receipt_history_is_insufficient_not_silent():
-    result = assess([])
+def test_no_receipt_history_is_insufficient_before_one_tolerance_window_elapses():
+    result = assess_sensor_transmissions(
+        [device()], [],
+        evaluation_start=BASE,
+        evaluation_end=BASE + timedelta(seconds=30),
+        evaluated_at=BASE + timedelta(seconds=30),
+        expected_interval_seconds=60,
+        gap_tolerance_factor=2.0,
+        current_window=True,
+    )[0]
     assert result.status == "insufficient_data"
+    assert result.trailing_silence_seconds == 30
+    assert result.last_received_at is None
+
+
+def test_zero_receipts_become_silent_after_explicit_expectation_window_elapses():
+    result = assess([])
+    assert result.status == "silent"
+    assert result.trailing_silence_seconds == 600
     assert result.last_received_at is None
 
 
