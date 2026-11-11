@@ -157,12 +157,13 @@ snapshot, append-only event trigger, provenance FKs and event revision key.
 ## Deployment gate
 
 These migrations are committed to the feature branch only; none has been
-applied to the live database. Before deployment, run the full migration chain
-against a disposable Supabase database and execute the SQL contract tests.
-The live project reports `ACTIVE_HEALTHY`, while its development-branch status
-reports `MIGRATIONS_FAILED`; that status needs a separate migration-history
-reconciliation and must not be treated as evidence that production DDL is safe.
-Do not apply this schema directly to production from this design document.
+applied to the live database. The repository versions for already-applied
+profile migrations now match the live history, and all new migrations follow
+the live head `20261111043003`. The Supabase project reports
+`ACTIVE_HEALTHY`, but its development-branch status still reports
+`MIGRATIONS_FAILED`. A disposable branch must replay the chain and run the SQL
+contract tests before merge. Do not apply this schema directly to production
+from this design document.
 
 ## Application orchestration
 
