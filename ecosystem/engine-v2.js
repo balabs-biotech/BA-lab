@@ -69,6 +69,7 @@ function addStyles() {
     #mainView .webgl-path{position:absolute;left:16px;top:60px;z-index:14;display:flex;align-items:center;gap:5px;max-width:min(560px,calc(100% - 210px));overflow-x:auto;padding:3px 0;border:0;border-radius:0;background:transparent;color:#e8eee7;font:600 10px system-ui;white-space:nowrap;text-shadow:0 1px 5px #07110f}
     #mainView .webgl-path button{border:0;background:transparent;color:#dce8dc;padding:4px 5px;border-radius:6px;font:inherit;cursor:pointer}
     #mainView .webgl-path button:hover{background:#385044}
+    #mainView .webgl-path .webgl-depth-marker{flex:0 0 auto;margin-left:7px;padding:3px 6px;border-left:1px solid #b96b4d;color:#d99a7d;font:700 9px/1 system-ui;letter-spacing:.08em;text-shadow:0 1px 5px #07110f}
     #mainView .webgl-path .sep{color:#8fa99a}
     #mainView .webgl-path .current{color:#c8dcae}
     #mainView .webgl-focus{position:absolute;left:16px;top:16px;z-index:12;width:min(310px,calc(100% - 92px));max-height:calc(100% - 108px);overflow:auto;padding:5px 0;border:0;border-radius:0;background:transparent;box-shadow:none;backdrop-filter:none;color:#edf0e9;text-shadow:0 1px 5px #07110f}
@@ -389,7 +390,9 @@ function renderPath() {
   if(selected)crumbs.push({title:LABELS[selected]?.title||selected,action:()=>{navigationStack=[];currentNode=manifest?.domains?.find(d=>d.id===selected)||null;currentAnchor=cells.get(selected).position.clone();buildResources(selected);smoothCamera(currentAnchor,7.5,650)}});
   navigationStack.slice(1).forEach((entry,index)=>crumbs.push({title:entry.node.title,action:()=>navigateToStack(index+1)}));
   if(currentNode&&currentNode!==manifest?.domains?.find(d=>d.id===selected))crumbs.push({title:currentNode.title});
-  crumbs.forEach((crumb,index)=>{if(index){const sep=document.createElement('span');sep.className='sep';sep.textContent='›';nav.append(sep)}const b=document.createElement('button');b.type='button';b.textContent=crumb.title;if(index===crumbs.length-1)b.className='current';else b.addEventListener('click',crumb.action);nav.append(b)});
+  crumbs.forEach((crumb,index)=>{if(index){const sep=document.createElement('span');sep.className='sep';sep.textContent='›';sep.setAttribute('aria-hidden','true');nav.append(sep)}const b=document.createElement('button');b.type='button';b.textContent=crumb.title;if(index===crumbs.length-1){b.className='current';b.setAttribute('aria-current','page');b.title='Niveau actif : '+crumb.title}else{b.setAttribute('aria-label','Revenir à '+crumb.title);b.addEventListener('click',crumb.action)}nav.append(b)});
+  const depthMarker=document.createElement('span');depthMarker.className='webgl-depth-marker';depthMarker.textContent='N'+(navigationStack.length+1);depthMarker.setAttribute('aria-label','Niveau '+(navigationStack.length+1));nav.append(depthMarker);
+  const back=stage?.querySelector('.webgl-controls [data-camera="back"]');if(back){back.setAttribute('aria-label',navigationStack.length?'Revenir au niveau précédent : '+(navigationStack[navigationStack.length-1]?.node?.title||t('domain')):'Quitter le domaine et revenir à la vue d’ensemble');back.title=back.getAttribute('aria-label')}
 }
 function navigateToStack(index) {
   const entry=navigationStack[index];if(!entry)return;
