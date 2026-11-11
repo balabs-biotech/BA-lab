@@ -425,5 +425,15 @@ assert.match(moduleSource, /p_organization_id: state\.organizationId/);
 assert.match(moduleSource, /p_interpretation_id: snapshot\.interpretation_id/);
 assert.match(moduleSource, /event_payload: \{ decision, note:/);
 assert.match(moduleSource, /reviewStatus\.textContent = "Revue enregistrée dans l’historique\."/);
+
+assert.match(moduleSource, /const flattenInterpretationPayload =/);
+assert.match(moduleSource, /const compareInterpretationSnapshots =/);
+assert.match(moduleSource, /older\.source_signal_id !== newer\.source_signal_id/);
+assert.match(moduleSource, /previous_engine_version/);
+assert.match(moduleSource, /status_changed/);
+assert.match(moduleSource, /Évolution depuis la version précédente/);
+assert.match(moduleSource, /Aucune validation scientifique ou causalité déduite/);
+assert.match(styles, /\.signal-interpretation-comparison/);
+assert.match(styles, /\.signal-interpretation-diff-list/);
 assert.match(styles, /\.signal-interpretation-review-actions/);
 assert.match(styles, /@media \(max-width: 560px\)/);
