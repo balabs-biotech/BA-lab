@@ -42,27 +42,28 @@
       let matchesRule = true;
       const selectors = rule.applies_to && typeof rule.applies_to === "object" ? rule.applies_to : {};
       const target = rule.target && typeof rule.target === "object" ? rule.target : {};
-      const requirements = { ...target, ...selectors };
-
-      for (const key of Object.keys(requirements)) {
-        if (key !== "taxon_code" && key !== "strain_code" && !SUPPORTED_SELECTORS.includes(key)) {
-          matchesRule = false;
-          break;
+      for (const requirements of [target, selectors]) {
+        for (const key of Object.keys(requirements)) {
+          if (key !== "taxon_code" && key !== "strain_code" && !SUPPORTED_SELECTORS.includes(key)) {
+            matchesRule = false;
+            break;
+          }
+          const expected = requirements[key];
+          if (typeof expected !== "string" || !expected.trim()) {
+            matchesRule = false;
+            break;
+          }
+          if (typeof context[key] !== "string" || !context[key].trim()) {
+            missingContext = true;
+            matchesRule = false;
+            break;
+          }
+          if (context[key] !== expected) {
+            matchesRule = false;
+            break;
+          }
         }
-        const expected = requirements[key];
-        if (typeof expected !== "string" || !expected.trim()) {
-          matchesRule = false;
-          break;
-        }
-        if (typeof context[key] !== "string" || !context[key].trim()) {
-          missingContext = true;
-          matchesRule = false;
-          break;
-        }
-        if (context[key] !== expected) {
-          matchesRule = false;
-          break;
-        }
+        if (!matchesRule) break;
       }
       if (matchesRule) matches.push(rule);
     }
