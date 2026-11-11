@@ -85,6 +85,26 @@ normal. A policy that is present but cannot be evaluated remains explicitly
 `not_evaluable` or `insufficient_data`. The UI counts only `suspected`
 assessments as drift alerts and labels them as requiring metrological review.
 
+## CultureOps policy management
+
+The Mycology and Laboratory workspaces expose a dedicated reference-policy
+manager alongside sensor analysis. It resolves eligible devices through the
+`list_sensor_drift_management_devices` RPC, which is executable only by an
+authenticated organization writer. The function returns only enabled devices
+bound to the active sensor-origin environment profile; the browser has no
+SELECT grant on `iot_devices` and does not query that registry directly.
+
+The manager creates draft policies using the active profile validity interval,
+then performs reference verification and activation as separate authenticated
+updates. It records verification method and evidence, supports retirement, and
+keeps prior versions visible. The database remains authoritative for tenant
+scope, writer authorization, immutable reference binding, and lifecycle
+transitions. A new physical target/reference pair requires a new draft.
+
+The read-model contract is checked by
+`supabase/tests/sensor_drift_management_read_model_contract.test.sql`; the UI
+contract and script syntax are checked in the batch-tracker CI job.
+
 ## Deliberate boundaries
 
 The registry, authenticated gateway resolution, private API assessment, and
