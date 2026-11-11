@@ -22,8 +22,9 @@ Therefore v1 MUST NOT label a single-sensor trend as instrument drift.
 
 A drift assessment requires an explicit independent reference:
 1. a designated reference sensor measuring the same variable;
-2. an explicit pairing/configuration proving the sensors are comparable
-   (co-located or validated as a reference pair);
+2. an explicit, verified pairing/configuration proving the sensors are
+   comparable (co-located or validated as a reference pair), with matching
+   organization, environment context and location in the measurement lineage;
 3. readings expressed in the same canonical unit;
 4. a configured maximum time offset for pairing observations;
 5. an explicit variable-specific maximum differential drift rate;
@@ -58,7 +59,8 @@ time. The slope is expressed in canonical units per hour.
 
 To bound CPU and memory:
 - sort pairs by timestamp;
-- cap the input series at a documented maximum;
+- reject input above 5,000 measurement envelopes rather than silently truncating;
+- cap the Theil–Sen slope sample at 200 evenly distributed pairs;
 - if subsampling is needed, use deterministic, evenly spaced indices;
 - never silently truncate the newest or oldest evidence;
 - return an explicit `insufficient_data` or `not_evaluable` status when
@@ -103,9 +105,9 @@ This is a candidate for calibration review, not proof of sensor failure.
 
 ## Implementation sequence
 
-1. Add a pure provider-neutral pairing and differential-slope module.
+1. Add a pure provider-neutral pairing and differential-slope module. (Implemented in `quality/sensor_drift.py`.)
 2. Add unit tests for matching, tie-breaking, excluded rows, units, thresholds,
-   missing references, and resource caps.
+   missing references, verified context binding, and resource caps. (Initial tests added; Python execution remains pending.)
 3. Add a private API contract with explicit reference binding and policy.
 4. Add authenticated tenant-scoped reference resolution in the Supabase
    gateway only after the database representation of reference pairings is
