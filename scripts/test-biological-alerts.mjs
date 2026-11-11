@@ -431,6 +431,14 @@ assert.match(moduleSource, /history\.snapshots_available === true && history\.ev
 assert.match(moduleSource, /history\.events_available === true/);
 assert.match(moduleSource, /const supersededEvents = snapshotEvents\.filter\(event => event\.event_type === "superseded"\)/);
 assert.match(moduleSource, /from\("biological_recommendations"\)/);
+assert.match(moduleSource, /from\("biological_signal_evidence"\)/);
+assert.match(moduleSource, /from\("environmental_observations"\)/);
+assert.match(moduleSource, /environmentalEvidenceBySignal/);
+assert.match(moduleSource, /source_kind === "environmental_observation"/);
+assert.match(moduleSource, /source_kind === "measurement"/);
+assert.match(moduleSource, /Contexte environnemental lié au signal/);
+assert.match(moduleSource, /ne pas interpréter cette liste comme exhaustive/);
+assert.match(moduleSource, /Aucune observation environnementale externe directement liée à ce signal/);
 assert.match(moduleSource, /from\("biological_recommendation_events"\)/);
 assert.match(moduleSource, /\.order\("revision", \{ ascending: false \}\)\.limit\(2000\)/);
 assert.match(moduleSource, /eventsByRecommendation\.forEach\(events => events\.sort\(\(left, right\) => left\.revision - right\.revision\)\)/);
