@@ -31,6 +31,23 @@ begin
   if not exists (
     select 1 from pg_policies
     where schemaname='public' and tablename='biological_rules'
+      and policyname='biological_rules_update'
+      and qual ilike '%is_org_admin%'
+      and with_check ilike '%is_org_admin%'
+  ) then
+    raise exception 'FAIL: only organization administrators may update draft rules';
+  end if;
+  if not exists (
+    select 1 from pg_policies
+    where schemaname='public' and tablename='biological_rules'
+      and policyname='biological_rules_delete'
+      and qual ilike '%is_org_admin%'
+  ) then
+    raise exception 'FAIL: only organization administrators may delete draft rules';
+  end if;
+  if not exists (
+    select 1 from pg_policies
+    where schemaname='public' and tablename='biological_rules'
       and policyname='biological_rules_insert'
       and with_check ilike '%is_org_admin%'
   ) then
@@ -52,6 +69,8 @@ begin
      v_guard not ilike '%biological_rule_review_must_be_explicit_transition%' or
      v_guard not ilike '%biological_rule_retirement_requires_prior_reviewed_version%' or
      v_guard not ilike '%biological_rule_retirement_requires_new_version%' or
+     v_guard not ilike '%biological_rule_invalid_initial_status%' or
+     v_guard not ilike '%biological_rule_review_must_be_explicit_transition%' or
      v_guard not ilike '%set search_path = pg_catalog, public, private, auth%' then
     raise exception 'FAIL: reviewed rule immutability or reviewer identity guard is missing';
   end if;
