@@ -117,6 +117,9 @@ begin
   end if;
 
   if tg_op = 'UPDATE' then
+    if new.status = 'retired' then
+      raise exception 'biological_rule_retirement_requires_new_version' using errcode = '55000';
+    end if;
     if old.status <> 'draft' then
       raise exception 'biological_rule_version_immutable' using errcode = '55000';
     end if;
