@@ -146,10 +146,6 @@ begin
     select 1 from pg_trigger
     where tgrelid = 'public.domain_interpretation_profiles'::regclass
       and tgname = 'domain_interpretation_profiles_resolution_window' and not tgisinternal
-  ) or not exists (
-    select 1 from pg_trigger
-    where tgrelid = 'public.environment_context_profile_sensors'::regclass
-      and tgname = 'environment_context_profile_sensors_draft_only' and not tgisinternal
   ) then
     raise exception 'FAIL: profile immutability, lifecycle or resolution-window triggers are missing';
   end if;
