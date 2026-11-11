@@ -449,6 +449,12 @@ assert.match(moduleSource, /if \(eventRows\.length >= 2000\) state\.recommendati
 assert.match(moduleSource, /state\.recommendationHistoryAvailable = append \? state\.recommendationHistoryAvailable : true/);
 assert.match(moduleSource, /Lecture des recommandations indisponible ou incomplète/);
 assert.match(moduleSource, /transition_biological_recommendation/);
+assert.match(moduleSource, /biological_recommendation_outcome_measurements/);
+assert.match(moduleSource, /link_biological_recommendation_outcome_measurement/);
+assert.match(moduleSource, /recommendationMeasurementCandidatesBySignal/);
+assert.match(moduleSource, /measuredAt >= lower && measuredAt <= upper/);
+assert.match(moduleSource, /Le rattachement est une relation de traçabilité temporelle et contextuelle/);
+assert.match(moduleSource, /Mesures quantitatives liées au résultat/);
 assert.match(moduleSource, /CultureOps n’exécute aucune action automatiquement/);
 assert.match(moduleSource, /« exécution déclarée » signifie qu’un opérateur a consigné une action réalisée/);
 assert.match(moduleSource, /p_expected_revision: recommendation\.revision/);
