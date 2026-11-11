@@ -30,5 +30,10 @@ assert.match(migration, /Assessment evidence does not match source raw measureme
 assert.match(migration, /biological_assessments_select/);
 assert.match(migration, /unique \(organization_id,idempotency_key\)/);
 assert.match(ui, /assessmentIdempotencyKey/);
+assert.match(ui, /try \{/);
+assert.match(ui, /catch \(error\)/);
+assert.match(ui, /Keep the same idempotency key/);
+assert.match(ui, /organizationId\(\) !== orgAtStart/);
+assert.match(ui, /output && output.status === "recorded"/);
 
 console.log("✓ Biological Assessment UI: explicit measurement actions, domain isolation and evidence-history boundaries");
