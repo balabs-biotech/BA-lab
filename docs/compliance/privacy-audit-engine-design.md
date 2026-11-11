@@ -230,6 +230,8 @@ La fonction Edge n'expose jamais la clé `service_role`. Après validation du JW
 
 `supabase/tests/legal-document-registry.test.mts` couvre l'authentification, le refus d'un non-administrateur, la lecture, la publication, le refus d'empreinte ou de chemin invalide, le retrait et les erreurs serveur. Le test est ajouté au workflow CI.
 
+La console `legal/admin.html` utilise uniquement la clé publishable, authentifie un compte existant et appelle l'Edge Function ; elle ne contient aucune clé privilégiée et n'offre aucune inscription. Son contrat statique est testé par `scripts/test-legal-admin-console.mjs` dans la CI.
+
 Le contrat SQL vérifie aussi l'existence de la table d'administrateurs, l'absence d'accès direct et les permissions des RPC. Ces tests de contrat ne remplacent pas encore les tests d'intégration PostgreSQL sur les transitions de versions et les publications concurrentes.
 
 ### Limites avant activation
@@ -237,5 +239,5 @@ Le contrat SQL vérifie aussi l'existence de la table d'administrateurs, l'absen
 - Le registre SQL reste un brouillon, pas une migration installée.
 - La fonction Edge est versionnée mais pas déployée.
 - Aucun administrateur plateforme n'est provisionné par ce changement.
-- Il n'existe pas encore d'interface graphique d'administration.
+- Une console statique `legal/admin.html` est versionnée : connexion, calcul SHA-256 local, liste, publication planifiée et retrait. Elle n'est pas encore déployée/activée ; elle ne remplace pas l'autorisation serveur.
 - Les documents sont toujours des versions de travail ; aucune publication réelle n'est autorisée.
