@@ -197,6 +197,9 @@ const signInButton =
 const signUpButton =
   document.getElementById("signUpButton");
 
+const authPrivacyAcceptedCheckbox =
+  document.getElementById("authPrivacyAccepted");
+
 const signOutButton =
   document.getElementById("signOutButton");
 
@@ -543,6 +546,10 @@ async function signIn() {
 
 
   try {
+
+    if (!authPrivacyAcceptedCheckbox?.checked) {
+      throw new Error("Pour créer un compte, lisez et acceptez les conditions d’utilisation et prenez connaissance de la politique de confidentialité.");
+    }
 
     const email =
       authEmail.value.trim();
