@@ -420,6 +420,13 @@ assert.match(interpretationMigration, /replaced_by_interpretation_id/);
 assert.match(interpretationMigration, /replaced_by_engine_version/);
 assert.match(interpretationMigration, /previous\.engine_code = btrim\(p_engine_code\)/);
 assert.match(moduleSource, /const supersededEvents = snapshotEvents\.filter\(event => event\.event_type === "superseded"\)/);
+
+assert.match(moduleSource, /biologicalInterpretationEvents\.length >= 2000/);
+assert.match(moduleSource, /interpretationEventsAvailable = false/);
+assert.match(moduleSource, /markIncomplete\("biological_interpretation_events", new Error\("event_history_limit_reached"\)\)/);
+assert.match(moduleSource, /Remplacée le/);
+assert.match(moduleSource, /replacement\.replaced_by_engine_version/);
+assert.match(moduleSource, /replacement\.replaced_by_interpretation_id/);
 assert.match(moduleSource, /Version remplacée/);
 assert.match(moduleSource, /Version courante/);
 assert.match(moduleSource, /Cycle de vie non vérifié/);
