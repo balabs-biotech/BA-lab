@@ -51,7 +51,7 @@ Allowed transitions are deliberately linear:
 - `accepted -> executed`, with a required execution record;
 - `executed -> outcome_recorded`, with a required outcome summary and observation timestamp.
 
-A withheld proposal cannot enter review. Rejected proposals are terminal in this version. Every transition appends an immutable event carrying the actor identifier, timezone-aware event time and optional note/details. The aggregate retains execution details separately from the later observed outcome.
+A withheld proposal cannot enter review. Rejected proposals are terminal in this version. Every transition appends an immutable event carrying the actor identifier, timezone-aware event time and optional note/details. The aggregate retains execution details separately from the later observed outcome. Event timestamps must be timezone-aware and monotonic; an outcome observation must fall between the execution time and the time at which that outcome is recorded.
 
 The domain function does not authenticate the actor or persist the event. Those responsibilities belong to a tenant-authorized application/repository adapter. Production persistence should store events append-only and derive the current status from validated transitions; clients must not be allowed to rewrite scientific proposal provenance or historical events.
 
