@@ -225,7 +225,7 @@
     await withBusy("Enregistrement de la vérification authentifiée…", async () => {
       const evidence = $("sensorDriftVerificationEvidence").value.trim();
       if (!evidence) throw new Error("La preuve documentaire est obligatoire.");
-      const { error } = await client.from("sensor_drift_reference_policies").update({
+      const { data, error } = await client.from("sensor_drift_reference_policies").update({
         reference_binding_verified: true,
         reference_verification_method: $("sensorDriftVerificationMethod").value,
         reference_verification_evidence: evidence
