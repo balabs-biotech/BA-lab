@@ -582,7 +582,8 @@ function labelTargetPixels(label) {
   const compact=window.innerWidth<760;
   const depth=label?.userData?.depth||0;
   const base=label?.userData?.kind==='domain-label'?(compact?42:50):label?.userData?.denseRoot?(compact?38:44):Math.max(compact?34:40,(compact?44:50)-depth*2);
-  const zoomScale=THREE.MathUtils.clamp(Math.pow(THREE.MathUtils.clamp(distance/13.5,.3,1.18),.68),.52,1.12);
+   // Keep type size stable through zoom; add a restrained 12% emphasis at close range.
+  const zoomScale=THREE.MathUtils.clamp(1+Math.max(0,(13.5-distance)/13.5)*.12,1,1.12);
   return base*zoomScale;
 }
 function syncLabelScales() {
