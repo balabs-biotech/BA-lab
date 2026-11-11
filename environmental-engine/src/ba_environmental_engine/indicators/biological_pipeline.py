@@ -18,12 +18,51 @@ from ba_environmental_engine.indicators.measurement_adapter import (
 )
 
 
-_SUBJECT_LINKS = {
-    "culture": "culture_id",
-    "plant_culture": "plant_culture_id",
-    "sample": "sample_id",
-    "experimental_unit": "experimental_unit_id",
-}
+_PRIMARY_SUBJECT_LINKS = (
+    ("culture", "culture_id"),
+    ("plant_culture", "plant_culture_id"),
+)
+_FALLBACK_SUBJECT_LINKS = (
+    ("sample", "sample_id"),
+    ("experimental_unit", "experimental_unit_id"),
+)
+_SUPPORTED_SUBJECT_TYPES = frozenset(
+    subject_type
+    for subject_type, _field in _PRIMARY_SUBJECT_LINKS + _FALLBACK_SUBJECT_LINKS
+)
+
+
+def _row_matches_subject_scope(
+    row: Mapping[str, object],
+    *,
+    subject_id: str,
+    subject_type: str,
+) -> bool:
+    """Mirror the adapter's primary-subject then fallback-subject resolution."""
+    primary = [
+        (kind, field)
+        for kind, field in _PRIMARY_SUBJECT_LINKS
+        if row.get(field) is not None
+    ]
+    if primary:
+        return any(
+            kind == subject_type and str(row.get(field)) == subject_id
+            for kind, field in primary
+        )
+
+    fallback = [
+        (kind, field)
+        for kind, field in _FALLBACK_SUBJECT_LINKS
+        if row.get(field) is not None
+    ]
+    if fallback:
+        return any(
+            kind == subject_type and str(row.get(field)) == subject_id
+            for kind, field in fallback
+        )
+
+    # Keep malformed, unlinked rows in scope so the adapter reports them.
+    return True
 
 
 @dataclass(frozen=True, slots=True)
@@ -72,6 +111,8 @@ def analyze_measurement_rows(
         raise ValueError("subject_id must not be empty")
     if not variable_code.strip():
         raise ValueError("variable_code must not be empty")
+    if subject_type not in _SUPPORTED_SUBJECT_TYPES:
+        raise ValueError("subject_type must identify a supported biological subject")
 
     snapshot = tuple(rows)
     mapped = []
@@ -87,15 +128,11 @@ def analyze_measurement_rows(
         if row_organization != organization_id or row_variable != variable_code:
             continue
 
-        subject_field = _SUBJECT_LINKS.get(subject_type)
-        if subject_field is None:
-            raise ValueError("subject_type must identify a supported biological subject")
-        linked_subjects = [
-            row.get(field)
-            for field in _SUBJECT_LINKS.values()
-            if row.get(field) is not None
-        ]
-        if linked_subjects and row.get(subject_field) != subject_id:
+        if not _row_matches_subject_scope(
+            row,
+            subject_id=subject_id,
+            subject_type=subject_type,
+        ):
             continue
 
         candidate_count += 1
