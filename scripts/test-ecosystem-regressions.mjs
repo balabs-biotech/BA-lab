@@ -21,6 +21,10 @@ for (const section of editorialSections) {
   assert.doesNotMatch(html, new RegExp('#app\\s*>\\s*\\.' + section + '\\b'), 'No layout rule may target ' + section + ' as a direct app child');
 }
 assert.ok(!brandCss.includes('NOT imported by ecosystem/index.html'), 'Brand stylesheet integration note must reflect the live import');
+for (const sectionId of ['chantiers', 'universe', 'universes']) {
+  assert.match(html, new RegExp('#app\\s*>\\s*main\\s*>\\s*#' + sectionId + '\\b'), 'Inline layout rules must target the nested main section ID: ' + sectionId);
+  assert.doesNotMatch(html, new RegExp('#app\\s*>\\s*#' + sectionId + '\\b'), 'No layout rule may target ' + sectionId + ' as a direct app child');
+}
 
 const languageTrees = Object.fromEntries(['fr', 'en', 'ar', 'pt'].map((language) => [
   language,
