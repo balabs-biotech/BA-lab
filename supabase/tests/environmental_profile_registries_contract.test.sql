@@ -91,6 +91,38 @@ begin
   end if;
 
   if not exists (
+    select 1 from pg_constraint
+    where conrelid = 'public.environment_context_profiles'::regclass
+      and conname = 'environment_context_profiles_context_type_check'
+  ) or not exists (
+    select 1 from pg_constraint
+    where conrelid = 'public.environment_context_profiles'::regclass
+      and conname = 'environment_context_profiles_origin_check'
+  ) or not exists (
+    select 1 from pg_constraint
+    where conrelid = 'public.environment_context_profiles'::regclass
+      and conname = 'environment_context_profiles_gridded_origin_check'
+  ) then
+    raise exception 'FAIL: environment profile source and context contracts are missing';
+  end if;
+
+  if not exists (
+    select 1 from pg_trigger
+    where tgrelid = 'public.environment_context_profiles'::regclass
+      and tgname = 'environment_context_profiles_version_guard' and not tgisinternal
+  ) or not exists (
+    select 1 from pg_trigger
+    where tgrelid = 'public.domain_interpretation_profiles'::regclass
+      and tgname = 'domain_interpretation_profiles_version_guard' and not tgisinternal
+  ) or not exists (
+    select 1 from pg_trigger
+    where tgrelid = 'public.environment_context_profile_sensors'::regclass
+      and tgname = 'environment_context_profile_sensors_guard' and not tgisinternal
+  ) then
+    raise exception 'FAIL: versioned profile and tenant-bound sensor guards are missing';
+  end if;
+
+  if not exists (
     select 1 from pg_trigger
     where tgrelid = 'public.environment_context_profiles'::regclass
       and tgname = 'environment_context_profiles_immutable' and not tgisinternal
