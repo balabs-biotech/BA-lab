@@ -25,6 +25,9 @@ for (const sectionId of ['chantiers', 'universe', 'universes']) {
   assert.match(html, new RegExp('#app\\s*>\\s*main\\s*>\\s*#' + sectionId + '\\b'), 'Inline layout rules must target the nested main section ID: ' + sectionId);
   assert.doesNotMatch(html, new RegExp('#app\\s*>\\s*#' + sectionId + '\\b'), 'No layout rule may target ' + sectionId + ' as a direct app child');
 }
+assert.ok(html.includes('#app.balabs-ui[dir="rtl"] .site-nav a:after'), 'RTL navigation underline must mirror its animation direction');
+assert.ok(html.includes('#app.balabs-ui[dir="rtl"] .editorial-link span'), 'RTL editorial arrows must mirror their visual direction');
+assert.ok(html.includes('#app.balabs-ui[dir="rtl"] .site-nav{'), 'RTL mobile navigation must retain right-to-left reading order');
 
 const languageTrees = Object.fromEntries(['fr', 'en', 'ar', 'pt'].map((language) => [
   language,
