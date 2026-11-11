@@ -75,6 +75,7 @@ create table public.biological_recommendation_events (
   organization_id uuid not null,
   recommendation_id uuid not null,
   event_id uuid not null,
+  revision integer not null check (revision > 0),
   action text not null check (action in ('accept', 'reject', 'record_execution', 'record_outcome')),
   actor_id uuid not null,
   occurred_at timestamptz not null,
@@ -86,6 +87,8 @@ create table public.biological_recommendation_events (
   primary key (organization_id, recommendation_id, event_id),
   constraint biological_recommendation_events_idempotency_key
     unique (organization_id, event_id),
+  constraint biological_recommendation_events_revision_key
+    unique (organization_id, recommendation_id, revision),
   constraint biological_recommendation_events_recommendation_fk
     foreign key (organization_id, recommendation_id)
     references public.biological_recommendations (organization_id, recommendation_id)
@@ -417,11 +420,12 @@ begin
   end if;
 
   insert into public.biological_recommendation_events (
-    organization_id, recommendation_id, event_id, action,
+    organization_id, recommendation_id, event_id, revision, action,
     actor_id, occurred_at, note, execution_details,
     outcome_summary, outcome_observed_at
   ) values (
-    p_organization_id, p_recommendation_id, p_event_id, p_action,
+    p_organization_id, p_recommendation_id, p_event_id,
+    v_recommendation.revision + 1, p_action,
     v_actor_id, p_occurred_at, p_note, p_execution_details,
     p_outcome_summary, p_outcome_observed_at
   )
