@@ -194,4 +194,6 @@ Une Edge Function appelée avant `signUp()` ne connaît pas encore l'UUID Auth e
 - parcours d'invitation et OAuth testés explicitement avant activation de ces fournisseurs.
 
 
+La publication des documents et l'activation progressive du hook sont cadrées dans `docs/compliance/legal-document-release-checklist.md`. Le formulaire client reste volontairement inchangé tant que les versions ne sont pas juridiquement validées et enregistrées.
+
 **Décision de portée :** ce mécanisme enregistre une déclaration d'acceptation à la création du compte. La validité juridique de la formulation, la preuve d'information préalable et les durées de conservation restent à valider par le conseil compétent / DPO. Le mécanisme ne remplace pas cette validation.
