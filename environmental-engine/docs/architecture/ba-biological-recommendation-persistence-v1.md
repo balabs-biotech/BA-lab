@@ -183,6 +183,16 @@ from this design document.
 
 `RecommendationService` coordinates the pure lifecycle transition with the repository port:
 
+Proposal persistence is exposed through `RecommendationService.create` and
+`persist_resolution`. The latter persists proposed and withheld results alike.
+Proposal IDs are deterministic; the create RPC returns the existing aggregate
+and its complete event history for an identical replay, and rejects reuse with
+different immutable content. A resolution batch is a sequence of individually
+atomic creates, not one cross-proposal transaction; an interrupted batch can
+therefore be safely replayed.
+
+A human lifecycle transition follows this sequence:
+
 1. Load the aggregate by `(organization_id, recommendation_id)`.
 2. Return a not-found result scoped to that organization when absent.
 3. Apply the domain transition and construct one immutable event.
