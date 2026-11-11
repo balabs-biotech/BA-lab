@@ -2946,3 +2946,6 @@ body[data-domain] :is(button, input, select, textarea, a, [tabindex]):focus-visi
 @media(max-width:600px) {
   .legal-footer-links { gap: 10px 16px; justify-content: flex-start; }
 }
+
+.signal-lineage-quality { padding: 8px 10px; border-left: 3px solid var(--warning, #b7791f); background: rgba(183, 121, 31, .09); border-radius: 4px; font-size: .88rem; }
+.signal-lineage-quality.is-complete { border-left-color: var(--success, #39845a); background: rgba(57, 132, 90, .08); }
