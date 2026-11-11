@@ -253,6 +253,7 @@ begin
   end if;
 
   if p_organization_id is null or p_interpretation_id is null
+     or p_decision is null
      or p_decision not in ('accepted', 'contested', 'reassessment_requested')
      or (p_note is not null and length(p_note) > 2000) then
     raise exception 'invalid_biological_interpretation_review'
