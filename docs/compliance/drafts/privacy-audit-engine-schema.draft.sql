@@ -373,7 +373,87 @@ declare
 begin
   if p_document_type not in ('terms','privacy_notice','cookies_notice','research_consent')
      or p_version is null or length(btrim(p_version)) = 0
-     or p_content_sha256 !~ '^[0-9a-f]{64}$'
+     or p_content_sha256 is null
+     or p_content_sha256 !~ '^[0-9a-f]{64}
+     or p_document_path is null or length(btrim(p_document_path)) = 0
+     or p_effective_at is null or p_effective_at < statement_timestamp()
+     or p_created_by is null then
+    raise exception 'invalid_legal_document_publication_payload';
+  end if;
+
+  perform pg_advisory_xact_lock(hashtext('ba_labs_legal_doc:' || p_document_type));
+
+  if exists (
+    select 1 from private.legal_document_versions d
+    where d.document_type = p_document_type
+      and d.effective_at is not null
+      and (d.retired_at is null or d.retired_at > p_effective_at)
+      and d.effective_at >= p_effective_at
+  ) then
+    raise exception 'legal_document_future_version_conflict';
+  end if;
+
+  update private.legal_document_versions d
+  set retired_at = p_effective_at
+  where d.document_type = p_document_type
+    and d.effective_at is not null
+    and d.effective_at < p_effective_at
+    and d.retired_at is null;
+
+  insert into private.legal_document_versions (
+    document_type, version, content_sha256, document_path,
+    effective_at, created_by
+  ) values (
+    p_document_type, p_version, p_content_sha256, p_document_path,
+    p_effective_at, p_created_by
+  ) returning id into new_id;
+
+  return new_id;
+end;
+$$;
+
+revoke all on function public.publish_legal_document_version(text,text,text,text,timestamptz,uuid)
+  from public, anon, authenticated;
+grant execute on function public.publish_legal_document_version(text,text,text,text,timestamptz,uuid)
+  to service_role;
+
+create or replace function public.retire_legal_document_version(
+  p_document_version_id uuid,
+  p_retired_at timestamptz
+)
+returns boolean
+language plpgsql
+security definer
+set search_path = pg_catalog, private
+as $$
+declare
+  changed integer;
+begin
+  if p_document_version_id is null or p_retired_at is null
+     or p_retired_at < statement_timestamp() then
+    raise exception 'invalid_legal_document_retirement_payload';
+  end if;
+
+  update private.legal_document_versions
+  set retired_at = p_retired_at
+  where id = p_document_version_id
+    and effective_at is not null
+    and retired_at is null
+    and p_retired_at >= effective_at;
+
+  get diagnostics changed = row_count;
+  if changed = 0 then
+    raise exception 'legal_document_version_not_retirable';
+  end if;
+  return true;
+end;
+$$;
+
+revoke all on function public.retire_legal_document_version(uuid,timestamptz)
+  from public, anon, authenticated;
+grant execute on function public.retire_legal_document_version(uuid,timestamptz)
+  to service_role;
+
      or p_document_path is null or length(btrim(p_document_path)) = 0
      or p_effective_at is null or p_effective_at < statement_timestamp()
      or p_created_by is null then
