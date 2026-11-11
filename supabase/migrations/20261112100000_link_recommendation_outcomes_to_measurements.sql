@@ -81,6 +81,7 @@ declare
   v_scope text;
   v_link public.biological_recommendation_outcome_measurements%rowtype;
   v_inserted boolean := false;
+  v_inserted_rows integer := 0;
 begin
   if v_actor_id is null or p_organization_id is null
      or not private.is_org_writer(p_organization_id) then
@@ -174,7 +175,8 @@ begin
     organization_id, recommendation_id, outcome_event_id, measurement_id
   ) do nothing;
 
-  get diagnostics v_inserted = row_count;
+  get diagnostics v_inserted_rows = row_count;
+  v_inserted := v_inserted_rows > 0;
   select l.* into v_link
     from public.biological_recommendation_outcome_measurements l
    where l.organization_id = p_organization_id
