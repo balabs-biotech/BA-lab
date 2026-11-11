@@ -2,7 +2,7 @@ name: BAL-JSON import UI contract
 
 on:
   pull_request:
-    paths:
+    paths: &relevant_paths
       - "batch-tracker/bal-json-import.js"
       - "batch-tracker/workspace.html"
       - "batch-tracker/tracker.js"
@@ -11,6 +11,8 @@ on:
       - "batch-tracker/laboratory/index.html"
       - "supabase/functions/bal-json-ingest/**"
       - "schemas/bal-json/**"
+      - "schemas/biological-rules/**"
+      - "shared/**"
       - "scripts/test-bal-json-import-ui.mjs"
       - "scripts/test-bal-json-contract.mjs"
       - "scripts/test-bal-normalizer.mjs"
@@ -21,36 +23,12 @@ on:
       - "scripts/test-biological-context-adapter.mjs"
       - "scripts/test-biological-context-loader.mjs"
       - "scripts/test-biological-context-pipeline.mjs"
-      - "schemas/biological-rules/**"
-      - "scripts/test-biological-rule-schema.mjs"
-      - "scripts/test-biological-rule-resolver.mjs"
-      - "scripts/test-biological-context-adapter.mjs"
-      - "scripts/test-biological-context-loader.mjs"
-      - "schemas/biological-rules/**"
       - "supabase/tests/bal-json-ingest-contract.test.mjs"
       - "supabase/migrations/20261111160000_add_bal_json_atomic_ingestion.sql"
-      - "shared/**"
       - ".github/workflows/bal-json-import-ui.yml"
   push:
     branches: ["feat/bal-json-contract-v1"]
-    paths:
-      - "batch-tracker/bal-json-import.js"
-      - "batch-tracker/workspace.html"
-      - "batch-tracker/tracker.js"
-      - "batch-tracker/tracker.css"
-      - "batch-tracker/mycology/index.html"
-      - "batch-tracker/laboratory/index.html"
-      - "supabase/functions/bal-json-ingest/**"
-      - "schemas/bal-json/**"
-      - "scripts/test-bal-json-import-ui.mjs"
-      - "scripts/test-bal-json-contract.mjs"
-      - "scripts/test-bal-normalizer.mjs"
-      - "scripts/test-biological-interpreter.mjs"
-      - "scripts/test-biological-rule-registry.mjs"
-      - "supabase/tests/bal-json-ingest-contract.test.mjs"
-      - "supabase/migrations/20261111160000_add_bal_json_atomic_ingestion.sql"
-      - "shared/**"
-      - ".github/workflows/bal-json-import-ui.yml"
+    paths: *relevant_paths
 
 permissions:
   contents: read
@@ -73,12 +51,12 @@ jobs:
         run: node scripts/test-bal-normalizer.mjs
       - name: Validate versioned biological rule schema
         run: node scripts/test-biological-rule-schema.mjs
-      - name: Test context-to-rule biological pipeline
-        run: node scripts/test-biological-context-pipeline.mjs
-      - name: Test tenant-scoped biological context loader
-        run: node scripts/test-biological-context-loader.mjs
       - name: Test BAL-Core biological context adapter
         run: node scripts/test-biological-context-adapter.mjs
+      - name: Test tenant-scoped biological context loader
+        run: node scripts/test-biological-context-loader.mjs
+      - name: Test context-to-rule biological pipeline
+        run: node scripts/test-biological-context-pipeline.mjs
       - name: Test exact biological rule resolution
         run: node scripts/test-biological-rule-resolver.mjs
       - name: Test biological rule registry validation and review gate
