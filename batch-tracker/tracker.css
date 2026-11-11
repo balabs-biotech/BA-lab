@@ -3140,3 +3140,21 @@ body[data-domain] :is(button, input, select, textarea, a, [tabindex]):focus-visi
 #biologicalSignalsCard .signal-recommendation-controls button {
   justify-self: start;
 }
+
+#biologicalSignalsCard .signal-recommendation-outcome-evidence {
+  display: grid;
+  gap: 7px;
+  margin-top: 10px;
+  padding: 10px;
+  border: 1px solid var(--border, #d7dce2);
+  border-radius: 8px;
+}
+#biologicalSignalsCard .signal-recommendation-measurement-select {
+  width: 100%;
+  min-width: 0;
+  padding: 9px;
+  border: 1px solid var(--border, #d7dce2);
+  border-radius: 6px;
+  background: var(--surface, #fff);
+  color: inherit;
+}
