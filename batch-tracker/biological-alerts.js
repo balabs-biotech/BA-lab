@@ -691,24 +691,10 @@
         if (relationLabels.length) item.append(element("small", "signal-lineage-event", "Relations entrantes : " + relationLabels.join(" ; ")));
         if (missingParentCount) item.append(element("small", "signal-lineage-event", missingParentCount + " parent(s) non résolu(s) dans le périmètre chargé"));
         const inheritedStrains = new Map();
-        const contributorIds = new Set();
-        let contributorFrontier = [material.id];
-        while (contributorFrontier.length && contributorIds.size < 150) {
-          const nextFrontier = [];
-          contributorFrontier.forEach(childId => {
-            if (contributorIds.has(childId)) return;
-            contributorIds.add(childId);
-            (incomingByChild.get(childId) || []).forEach(edge => {
-              if (!contributorIds.has(edge.parent_material_id)) nextFrontier.push(edge.parent_material_id);
-            });
-            const currentMaterial = materialMap.get(childId);
-            if (currentMaterial?.parent_material_id && !contributorIds.has(currentMaterial.parent_material_id)) {
-              nextFrontier.push(currentMaterial.parent_material_id);
-            }
-          });
-          contributorFrontier = [...new Set(nextFrontier)];
-        }
-        [...contributorIds].map(id => materialMap.get(id)).filter(Boolean).forEach(source => {
+        // Reuse the canonical provenance traversal so SQL edges and event-derived
+        // source links produce the same contributor list without duplicate strains.
+        const materialTrace = provenanceIndex.traceMaterial(material.id);
+        [material, ...(materialTrace.ancestors || [])].forEach(source => {
           const sourceStrain = source.strain || {};
           const sourceOrganism = sourceStrain.organism || {};
           const label = [sourceStrain.strain_code || sourceStrain.designation, sourceOrganism.scientific_name].filter(Boolean).join(" — ");
