@@ -87,17 +87,32 @@ assessments as drift alerts and labels them as requiring metrological review.
 
 ## Deliberate boundaries
 
-This migration does not yet expose drift policies through the Sensor Analysis
-Edge Function or the CultureOps UI. It does not choose a reference sensor
-automatically, infer co-location, convert units, interpolate observations,
-apply calibration corrections, or write back modified measurements.
+The registry, authenticated gateway resolution, private API assessment, and
+read-only CultureOps diagnostics are integrated. A dedicated CultureOps
+management interface for creating and retiring policies is not yet exposed;
+until it exists, authorized writers must manage the lifecycle through a
+controlled administrative workflow.
 
-The API integration must next resolve policies using the authenticated
-environment's organization and environment IDs, verify that both devices are
-members of the active sensor profile for the requested period, and pass only
-database-resolved policy rows to the pure drift engine. The client must never
-submit trusted policy thresholds or a reference-verification flag directly to
-the analysis engine.
+The verification lifecycle is intentionally multi-step:
+
+1. Create a `draft` with `reference_binding_verified = false`.
+2. In a separate authenticated update, record the verification method and
+evidence and transition the flag to true. The database stamps the verifier
+and timestamp, and requires the row to remain a draft during this step.
+3. In a later update, activate the verified draft.
+4. Retire an active version rather than editing its published contents.
+
+Once verified, the organization, environment, target sensor, reference sensor,
+and variable binding are immutable. A different physical pairing requires a
+new draft and a new verification record. Thresholds and validity may still be
+refined while the row remains a draft; activation freezes the published
+version.
+
+The system does not choose a reference sensor automatically, infer
+co-location, convert units, interpolate observations, apply calibration
+corrections, or write back modified measurements. The client must never submit
+trusted policy thresholds or a reference-verification flag directly to the
+analysis engine.
 
 ## Validation
 
