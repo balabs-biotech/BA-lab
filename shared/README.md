@@ -132,3 +132,23 @@ Run:
 ```sh
 node scripts/test-biological-rule-resolver.mjs
 ```
+
+
+## Biological Context Adapter and Loader
+
+`shared/biological-context-adapter.js` maps a supplied BAL-Core snapshot into the exact context keys consumed by the resolver and interpreter. It uses the current culture's material reference, material strain reference, organism taxonomy identifier and environment reference. It does not infer a growth stage or medium from free text, timestamps, protocol labels or unstructured metadata.
+
+`shared/biological-context-loader.js` reads that snapshot from Supabase using the authenticated workspace client. Every organization-scoped read filters by the active `organization_id`; the global organism catalogue is read by exact organism ID. It delegates all mapping and relationship checks to the adapter. It performs no writes and does not use a service-role credential.
+
+The Mycology and Laboratory entry points load both modules. The tracker exposes `window.BA_LABS_LOAD_BIOLOGICAL_CONTEXT(cultureId)`, which captures the active organization and authentication revision, then discards a result if the workspace changes during the request.
+
+### Context limitations
+
+The current BAL-Core schema provides structured culture, material, strain, organism and environment links. It does not provide a first-class growth-stage or culture-medium field on `cultures`. Those selectors remain absent from the generated context and any rule requiring them must remain unassessed until those data are explicitly captured. A partial context is not treated as a complete biological profile.
+
+Run:
+
+```sh
+node scripts/test-biological-context-adapter.mjs
+node scripts/test-biological-context-loader.mjs
+```
