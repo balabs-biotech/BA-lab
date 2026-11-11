@@ -665,3 +665,335 @@
   font-size: .62rem !important;
   line-height: 1.5 !important;
 }
+
+
+/* PHASE 4 — visible homepage art direction.
+   High-impact editorial composition only; deliberately excludes the 3D engine. */
+#app.balabs-ui > .top {
+  position: relative !important;
+  min-height: 88px !important;
+  padding: 18px clamp(20px, 4vw, 58px) !important;
+  border-bottom: 1px solid #53665c !important;
+  background: #111B1D !important;
+}
+#app.balabs-ui > .top::after {
+  content: "APPLIED BIOLOGY / FIELD RESEARCH / SÉTIF";
+  position: absolute;
+  inset-inline-start: clamp(20px, 4vw, 58px);
+  bottom: 7px;
+  color: #B96B4D;
+  font: 700 8px/1.2 ui-monospace, monospace;
+  letter-spacing: .18em;
+}
+#app.balabs-ui > .top .brand strong {
+  color: #F2F1E9 !important;
+  font-size: 18px !important;
+  letter-spacing: .28em !important;
+}
+#app.balabs-ui > .top .brand small {
+  color: #AAB9AE !important;
+  font-size: 9px !important;
+  letter-spacing: .18em !important;
+}
+#app.balabs-ui > .top .lang {
+  min-height: 42px !important;
+  border: 1px solid #53665c !important;
+  border-radius: 2px !important;
+  background: #1B2926 !important;
+  color: #D1D0C5 !important;
+}
+#app.balabs-ui > .top .lang[aria-pressed="true"] {
+  border-color: #B96B4D !important;
+  background: #B96B4D !important;
+  color: #111B1D !important;
+}
+#app.balabs-ui > main > .site-nav {
+  min-height: 58px !important;
+  padding-inline: clamp(18px, 4vw, 58px) !important;
+  border-top: 0 !important;
+  border-bottom: 1px solid #40534D !important;
+  background: #111B1D !important;
+}
+#app.balabs-ui > main > .site-nav a {
+  color: #D1D0C5 !important;
+  font-size: 10px !important;
+  letter-spacing: .16em !important;
+}
+#app.balabs-ui > main > .hero {
+  position: relative !important;
+  isolation: isolate !important;
+  display: grid !important;
+  grid-template-columns: minmax(0, 1.15fr) minmax(260px, .65fr) !important;
+  align-items: end !important;
+  gap: clamp(24px, 5vw, 76px) !important;
+  min-height: min(690px, calc(100svh - 145px)) !important;
+  padding: clamp(78px, 10vw, 138px) clamp(24px, 7vw, 104px) clamp(66px, 8vw, 100px) !important;
+  overflow: hidden !important;
+  background:
+    radial-gradient(ellipse at 75% 45%, rgba(38,59,56,.2), transparent 45%),
+    #111B1D !important;
+}
+#app.balabs-ui > main > .hero .hero-micrograph {
+  z-index: -1 !important;
+  inset: 0 0 0 auto !important;
+  width: 61% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  object-position: 56% 48% !important;
+  opacity: .88 !important;
+  filter: grayscale(1) contrast(1.24) brightness(.72) !important;
+  mask-image: linear-gradient(90deg, transparent 0%, rgba(0,0,0,.25) 13%, #000 48%, #000 100%) !important;
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, rgba(0,0,0,.25) 13%, #000 48%, #000 100%) !important;
+}
+#app.balabs-ui > main > .hero > div:first-of-type {
+  position: relative !important;
+  z-index: 2 !important;
+  grid-column: 1 !important;
+  max-width: 760px !important;
+}
+#app.balabs-ui > main > .hero .eyebrow {
+  color: #D28C6E !important;
+  font-size: 10px !important;
+  letter-spacing: .24em !important;
+}
+#app.balabs-ui > main > .hero h1 {
+  max-width: 9ch !important;
+  margin-block: 24px 26px !important;
+  color: #F2F1E9 !important;
+  font: 400 clamp(64px, 8.2vw, 116px)/.88 Georgia, "Times New Roman", serif !important;
+  letter-spacing: -.065em !important;
+}
+#app.balabs-ui > main > .hero h1 span {
+  color: #B9C9B8 !important;
+  font-style: italic !important;
+}
+#app.balabs-ui > main > .hero p {
+  max-width: 52ch !important;
+  color: #D1D0C5 !important;
+  font-size: clamp(14px, 1.2vw, 17px) !important;
+  line-height: 1.8 !important;
+}
+#app.balabs-ui > main > .hero .hero-actions {
+  gap: 14px !important;
+  margin-top: 34px !important;
+}
+#app.balabs-ui > main > .hero .hero-action-primary {
+  min-height: 52px !important;
+  padding: 0 24px !important;
+  border: 1px solid #B96B4D !important;
+  border-radius: 2px !important;
+  background: #B96B4D !important;
+  color: #111B1D !important;
+  font-size: 10px !important;
+  letter-spacing: .16em !important;
+}
+#app.balabs-ui > main > .hero .hero-action-secondary {
+  min-height: 52px !important;
+  padding-inline: 12px !important;
+  color: #F2F1E9 !important;
+  font-size: 10px !important;
+  letter-spacing: .12em !important;
+}
+#app.balabs-ui > main > .hero .aside {
+  position: relative !important;
+  z-index: 2 !important;
+  grid-column: 2 !important;
+  align-self: end !important;
+  max-width: 340px !important;
+  margin: 0 0 8px auto !important;
+  padding: 20px 22px !important;
+  border: 1px solid rgba(209,208,197,.3) !important;
+  border-inline-start: 2px solid #B96B4D !important;
+  background: rgba(17,27,29,.86) !important;
+  color: #D1D0C5 !important;
+  backdrop-filter: blur(8px) !important;
+}
+#app.balabs-ui > main > .hero .aside b {
+  color: #F2F1E9 !important;
+  font: 400 22px/1.15 Georgia, serif !important;
+}
+#app.balabs-ui > main > .hero .aside span {
+  display: block !important;
+  margin-top: 10px !important;
+  color: #B9C9B8 !important;
+  font-size: 12px !important;
+  line-height: 1.7 !important;
+}
+#app.balabs-ui > main > .hero .hero-credit {
+  z-index: 2 !important;
+  inset-inline-start: clamp(24px, 7vw, 104px) !important;
+  bottom: 18px !important;
+  color: #D1D0C5 !important;
+  opacity: .75 !important;
+  font-size: 8px !important;
+  letter-spacing: .1em !important;
+}
+#app.balabs-ui > main > .editorial-feature {
+  grid-template-columns: minmax(0, 1.08fr) minmax(0, .92fr) !important;
+  min-height: 600px !important;
+  background: #D1D0C5 !important;
+}
+#app.balabs-ui > main > .editorial-feature .editorial-art {
+  min-height: 500px !important;
+  height: 100% !important;
+  overflow: hidden !important;
+}
+#app.balabs-ui > main > .editorial-feature .feature-photo {
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 500px !important;
+  object-fit: cover !important;
+  filter: grayscale(.35) contrast(1.12) !important;
+  transform: scale(1.015) !important;
+}
+#app.balabs-ui > main > .editorial-feature .editorial-copy {
+  padding: clamp(38px, 6vw, 86px) clamp(24px, 5vw, 72px) !important;
+}
+#app.balabs-ui > main > .editorial-feature .editorial-copy h2 {
+  color: #111B1D !important;
+  font-size: clamp(44px, 5.4vw, 76px) !important;
+}
+#app.balabs-ui > main > .editorial-feature .editorial-copy p {
+  color: #34443D !important;
+  font-size: 16px !important;
+}
+#app.balabs-ui > main > .editorial-feature .feature-status {
+  color: #70402F !important;
+  font-weight: 750 !important;
+}
+#app.balabs-ui > main > .editorial-work .work-heading h2,
+#app.balabs-ui > main > .editorial-method h2,
+#app.balabs-ui > main > .universe-index .universe-index-heading h2 {
+  font-size: clamp(40px, 5.4vw, 76px) !important;
+  letter-spacing: -.045em !important;
+}
+#app.balabs-ui > main > .editorial-work .work-card {
+  position: relative !important;
+  padding: 0 0 30px !important;
+  border-top: 2px solid #B96B4D !important;
+}
+#app.balabs-ui > main > .editorial-work .work-card .work-media {
+  height: clamp(190px, 23vw, 300px) !important;
+  margin-top: 16px !important;
+  overflow: hidden !important;
+}
+#app.balabs-ui > main > .editorial-work .work-card .work-media img {
+  transition: transform 500ms cubic-bezier(.2,.7,.2,1), filter 500ms ease !important;
+  filter: grayscale(.28) contrast(1.08) !important;
+}
+#app.balabs-ui > main > .editorial-work .work-card:hover .work-media img {
+  transform: scale(1.045) !important;
+  filter: grayscale(0) contrast(1.08) !important;
+}
+#app.balabs-ui > main > .universe-index .universe-index-card {
+  position: relative !important;
+  min-height: 230px !important;
+  padding: 26px 22px !important;
+  border-top: 2px solid #B96B4D !important;
+  transition: background 180ms ease, transform 180ms ease !important;
+}
+#app.balabs-ui > main > .universe-index .universe-index-card > span {
+  display: block !important;
+  margin-bottom: 28px !important;
+  font: 700 11px/1 ui-monospace, monospace !important;
+  letter-spacing: .18em !important;
+}
+#app.balabs-ui > main > .universe-index .universe-index-card > b {
+  display: block !important;
+  max-width: 13ch !important;
+  font-size: clamp(21px, 2.2vw, 29px) !important;
+}
+#app.balabs-ui > main > .universe-index .universe-index-card > p {
+  margin-top: 12px !important;
+  font-size: 12px !important;
+  line-height: 1.65 !important;
+}
+#app.balabs-ui > main > .universe-index .universe-index-card:hover {
+  transform: translateY(-5px) !important;
+  background: #F0F1E9 !important;
+}
+@media (max-width: 760px) {
+  #app.balabs-ui > .top {
+    min-height: 0 !important;
+    padding: 15px 14px 23px !important;
+  }
+  #app.balabs-ui > .top::after {
+    inset-inline-start: 14px !important;
+    bottom: 7px !important;
+    font-size: 7px !important;
+  }
+  #app.balabs-ui > main > .hero {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    justify-content: flex-end !important;
+    gap: 20px !important;
+    min-height: 740px !important;
+    padding: 300px 22px 58px !important;
+  }
+  #app.balabs-ui > main > .hero .hero-micrograph {
+    inset: 0 0 auto !important;
+    width: 100% !important;
+    height: 66% !important;
+    object-position: 58% 38% !important;
+    opacity: .8 !important;
+    mask-image: linear-gradient(180deg, #000 0%, rgba(0,0,0,.86) 48%, transparent 100%) !important;
+    -webkit-mask-image: linear-gradient(180deg, #000 0%, rgba(0,0,0,.86) 48%, transparent 100%) !important;
+  }
+  #app.balabs-ui > main > .hero > div:first-of-type {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+  #app.balabs-ui > main > .hero h1 {
+    max-width: 8ch !important;
+    margin-block: 16px 18px !important;
+    font-size: clamp(54px, 15vw, 78px) !important;
+  }
+  #app.balabs-ui > main > .hero .aside {
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 14px 16px !important;
+  }
+  #app.balabs-ui > main > .hero .aside b {
+    font-size: 19px !important;
+  }
+  #app.balabs-ui > main > .hero .hero-actions {
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+    margin-top: 24px !important;
+  }
+  #app.balabs-ui > main > .hero .hero-action-primary,
+  #app.balabs-ui > main > .hero .hero-action-secondary {
+    min-height: 48px !important;
+  }
+  #app.balabs-ui > main > .hero .hero-credit {
+    inset-inline-start: 22px !important;
+    bottom: 14px !important;
+    max-width: calc(100% - 44px) !important;
+    font-size: 6px !important;
+  }
+  #app.balabs-ui > main > .editorial-feature {
+    grid-template-columns: 1fr !important;
+    min-height: 0 !important;
+  }
+  #app.balabs-ui > main > .editorial-feature .editorial-art,
+  #app.balabs-ui > main > .editorial-feature .feature-photo {
+    height: 300px !important;
+    min-height: 300px !important;
+  }
+  #app.balabs-ui > main > .editorial-feature .editorial-copy {
+    padding: 36px 24px 44px !important;
+  }
+  #app.balabs-ui > main > .universe-index .universe-index-card {
+    min-height: 0 !important;
+    padding: 20px 16px !important;
+  }
+  #app.balabs-ui > main > .universe-index .universe-index-card > span {
+    margin-bottom: 14px !important;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  #app.balabs-ui > main > .editorial-work .work-card .work-media img {
+    transition: none !important;
+  }
+}
