@@ -3,7 +3,7 @@
 from datetime import datetime
 from typing import Literal
 
-from pydantic import Field, field_validator
+from pydantic import Field, field_validator, model_validator
 
 from .models import InterpretationModel, RecommendationProposal
 
@@ -40,6 +40,50 @@ class RecommendationLifecycle(InterpretationModel):
     execution_details: str | None = None
     outcome_summary: str | None = None
     outcome_observed_at: datetime | None = None
+
+    @model_validator(mode="after")
+    def validate_snapshot_against_history(self):
+        expected_status = self.proposal.status
+        execution_details = None
+        outcome_summary = None
+        outcome_observed_at = None
+        previous_event = None
+        transitions = {
+            ("proposed", "accept"): "accepted",
+            ("proposed", "reject"): "rejected",
+            ("accepted", "record_execution"): "executed",
+            ("executed", "record_outcome"): "outcome_recorded",
+        }
+        for event in self.events:
+            next_status = transitions.get((expected_status, event.action))
+            if next_status is None:
+                raise ValueError("lifecycle status does not match event history")
+            if previous_event and event.occurred_at < previous_event.occurred_at:
+                raise ValueError("lifecycle status does not match event history")
+            if event.action == "record_execution":
+                if not (event.execution_details and event.execution_details.strip()):
+                    raise ValueError("lifecycle status does not match event history")
+                execution_details = event.execution_details
+            if event.action == "record_outcome":
+                if not (event.outcome_summary and event.outcome_summary.strip()):
+                    raise ValueError("lifecycle status does not match event history")
+                if event.outcome_observed_at is None or previous_event is None:
+                    raise ValueError("lifecycle status does not match event history")
+                if not previous_event.occurred_at <= event.outcome_observed_at <= event.occurred_at:
+                    raise ValueError("lifecycle status does not match event history")
+                outcome_summary = event.outcome_summary
+                outcome_observed_at = event.outcome_observed_at
+            expected_status = next_status
+            previous_event = event
+
+        if (
+            self.status != expected_status
+            or self.execution_details != execution_details
+            or self.outcome_summary != outcome_summary
+            or self.outcome_observed_at != outcome_observed_at
+        ):
+            raise ValueError("lifecycle status does not match event history")
+        return self
 
     @classmethod
     def from_proposal(cls, proposal: RecommendationProposal):
