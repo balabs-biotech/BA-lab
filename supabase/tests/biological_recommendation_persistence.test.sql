@@ -12,6 +12,7 @@ declare
     'public.transition_biological_recommendation(uuid,uuid,integer,uuid,text,timestamp with time zone,text,text,text,timestamp with time zone)'
   );
   v_transition_definition text;
+  v_create_definition text;
 begin
   if v_recommendations is null or v_events is null then
     raise exception 'FAIL: recommendation persistence tables are missing';
@@ -56,6 +57,12 @@ begin
   if not (select prosecdef from pg_proc where oid = v_create)
      or not (select prosecdef from pg_proc where oid = v_transition) then
     raise exception 'FAIL: recommendation RPCs must use controlled SECURITY DEFINER execution';
+  end if;
+
+  select pg_get_functiondef(v_create) into v_create_definition;
+  if position('biological_recommendation_proposal_idempotency_conflict' in v_create_definition) = 0
+     or position('idempotent_replay' in v_create_definition) = 0 then
+    raise exception 'FAIL: deterministic proposal creation must be idempotent and reject conflicting reuse';
   end if;
 
   select pg_get_functiondef(v_transition) into v_transition_definition;
