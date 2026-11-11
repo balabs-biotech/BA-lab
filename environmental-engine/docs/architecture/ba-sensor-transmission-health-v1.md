@@ -108,3 +108,9 @@ The profile's `valid_from` is passed as a calendar date, then converted to UTC
 midnight using the profile's IANA timezone inside the Python API. This avoids
 treating a local validity date as UTC midnight and shifting the expected-device
 window by the local UTC offset.
+
+
+The profile's inclusive SQL `valid_to` date is also forwarded to the engine.
+The API converts it to midnight at the start of the following local calendar
+day, yielding an exclusive UTC boundary. Thus the device remains expected
+throughout its final valid date but is not treated as expected afterwards.
