@@ -253,4 +253,16 @@ assert.equal(provenance.summarize().multi_parent_count, 1);
 assert.ok(provenance.traceMaterial("source-a").descendants.some(item => item.id === "mixture"),
   "source trace must discover the mixture output");
 
+// A material with one biological parent may have both a relationship-table edge
+// and an operation-event edge. Those are two provenance paths, not two parents.
+const duplicatePathIndex = buildProvenanceIndex({
+  materials: [{ id: "single-parent", material_code: "SRC" }, { id: "single-child", material_code: "OUT" }],
+  relationships: [{ parent_material_id: "single-parent", child_material_id: "single-child", relationship_type: "derived_from" }],
+  cultures: [],
+  events: [{ id: "single-parent-event", material_id: "single-child", event_type: "material_mixture_created", payload: { operation: "blending", source_material_ids: ["single-parent"] } }],
+  evidence: {}
+});
+assert.equal(duplicatePathIndex.summarize().multi_parent_count, 0,
+  "multiple provenance paths from the same parent must not be counted as multiple biological parents");
+
 console.log("PASS: shared biological alert inbox contract");
