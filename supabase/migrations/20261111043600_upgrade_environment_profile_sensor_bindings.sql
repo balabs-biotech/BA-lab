@@ -7,6 +7,40 @@ alter table public.environment_context_profiles
   add column if not exists activated_at timestamptz,
   add column if not exists retired_at timestamptz;
 
+do $
+begin
+  if not exists (
+    select 1 from pg_constraint
+     where conrelid = 'public.environment_context_profiles'::regclass
+       and conname = 'environment_context_profiles_context_type_check'
+  ) then
+    alter table public.environment_context_profiles
+      add constraint environment_context_profiles_context_type_check
+      check (context_type in ('outdoor', 'greenhouse', 'fruiting_chamber', 'laboratory'));
+  end if;
+
+  if not exists (
+    select 1 from pg_constraint
+     where conrelid = 'public.environment_context_profiles'::regclass
+       and conname = 'environment_context_profiles_origin_check'
+  ) then
+    alter table public.environment_context_profiles
+      add constraint environment_context_profiles_origin_check
+      check (origin in ('sensor', 'weather_provider', 'satellite', 'manual'));
+  end if;
+
+  if not exists (
+    select 1 from pg_constraint
+     where conrelid = 'public.environment_context_profiles'::regclass
+       and conname = 'environment_context_profiles_gridded_origin_check'
+  ) then
+    alter table public.environment_context_profiles
+      add constraint environment_context_profiles_gridded_origin_check
+      check (origin not in ('weather_provider', 'satellite') or context_type = 'outdoor');
+  end if;
+end;
+$;
+
 alter table public.domain_interpretation_profiles
   add column if not exists created_by uuid references auth.users(id) on delete set null default auth.uid(),
   add column if not exists activated_at timestamptz,
