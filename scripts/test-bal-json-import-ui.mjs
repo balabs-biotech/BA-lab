@@ -50,15 +50,17 @@ function harness({ domain = "mycology", organizationId = "a0a0a0a0-0000-4000-800
   const ids = ["balJsonImportPanel","balJsonImportSource","balJsonPreviewButton","balJsonImportButton","balJsonPreview","balJsonImportStatus"];
   const elements = new Map(ids.map(id => [id, element(id)]));
   const calls = [];
+  let refreshCalls = 0;
   const client = { functions: { async invoke(name, options) { calls.push({ name, options }); return { data: result, error: null }; } } };
   const document = { getElementById(id) { return elements.get(id) ?? null; } };
   const window = {
     BA_LABS_DOMAIN: domain,
     BA_LABS_SUPABASE_CLIENT: client,
     BA_LABS_GET_ORGANIZATION_ID: () => organizationId,
+    BA_LABS_REFRESH_EXPERIMENTAL_DATA: async () => { refreshCalls += 1; },
   };
   vm.runInNewContext(source, { document, window, console, JSON, String, RegExp, Promise, TextEncoder }, { filename: "batch-tracker/bal-json-import.js" });
-  return { elements, calls };
+  return { elements, calls, get refreshCalls() { return refreshCalls; } };
 }
 
 {
@@ -76,7 +78,7 @@ function harness({ domain = "mycology", organizationId = "a0a0a0a0-0000-4000-800
 }
 
 {
-  const { elements, calls } = harness();
+  const { elements, calls, refreshCalls } = harness();
   elements.get("balJsonImportSource").value = JSON.stringify(makeRecord());
   elements.get("balJsonPreviewButton").click();
   await elements.get("balJsonImportButton").click();
@@ -84,6 +86,7 @@ function harness({ domain = "mycology", organizationId = "a0a0a0a0-0000-4000-800
   assert.equal(calls[0].name, "bal-json-ingest");
   assert.equal(calls[0].options.body.record_id, "d0d0d0d0-0000-4000-8000-000000000001");
   assert.match(elements.get("balJsonImportStatus").textContent, /enregistré/i);
+  assert.equal(refreshCalls, 1, "successful import must refresh the experimental history");
 }
 
 {
