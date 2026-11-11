@@ -130,8 +130,10 @@ begin
 
   select pg_get_functiondef(v_create) into v_create_definition;
   if position('pg_advisory_xact_lock' in v_create_definition) = 0
-     or position('auth.role()' in v_create_definition) > 0 then
-    raise exception 'FAIL: proposal creation must serialize first-write retries without deprecated auth.role checks';
+     or position('auth.role()' in v_create_definition) > 0
+     or position('auth.jwt()' in v_create_definition) = 0
+     or position('service_role' in v_create_definition) = 0 then
+    raise exception 'FAIL: proposal creation must serialize retries and verify the signed service-role JWT';
   end if;
 
   select pg_get_functiondef(v_transition) into v_transition_definition;
