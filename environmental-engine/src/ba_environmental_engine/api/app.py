@@ -534,7 +534,12 @@ def create_app(engine_api_key: str | None = None) -> FastAPI:
                     )
                     for item in request.drift_policies
                 )
-                drift_assessments = assess_sensor_drift(envelopes, drift_policies)
+                profile_zone = ZoneInfo(request.profile_timezone)
+                drift_envelopes = tuple(
+                    envelope for envelope in envelopes
+                    if request.from_date <= envelope.measurement.observed_at.astimezone(profile_zone).date() <= request.to_date
+                )
+                drift_assessments = assess_sensor_drift(drift_envelopes, drift_policies)
                 drift_diagnostics = {
                     "status": "completed",
                     "assessments": jsonable_encoder(drift_assessments),
