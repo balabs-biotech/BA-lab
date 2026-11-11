@@ -6042,8 +6042,8 @@ async function saveMaterialMixture(event) {
     const { data, error } = await supabaseClient.rpc("create_biological_material_mixture", {
       p_organization_id: operationOrganizationId,
       p_source_material_ids: selectedIds,
-      p_event_type: eventType,
-      p_result_code: resultCode,
+      p_operation: eventType,
+      p_material_code: resultCode,
       p_occurred_at: new Date(dateValue).toISOString(),
       p_note: note || null,
       p_details: { source: "BA Labs CultureOps", interface_version: "1.0", domain: operationDomain, source_material_count: selectedIds.length }
