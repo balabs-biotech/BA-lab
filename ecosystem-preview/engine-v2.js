@@ -289,6 +289,19 @@ function addResourceHitTarget(label) {
  element.dataset.hasChildren=String(hasChildren);element.dataset.depth=String(data.depth||0);element.dataset.resourceUrl=data.url||'';
  stage.append(element);resourceHitTargets.set(label,element);
 }
+function labelLeaderSegmentHitsRect(a,b,r) {
+ const dx=b.x-a.x,dy=b.y-a.y;let t0=0,t1=1;
+ for(const [p,q] of [[-dx,a.x-r.l],[dx,r.r-a.x],[-dy,a.y-r.t],[dy,r.b-a.y]]){
+  if(Math.abs(p)<1e-6){if(q<0)return false;continue;}
+  const t=q/p;if(p<0){if(t>t1)return false;t0=Math.max(t0,t);}else{if(t<t0)return false;t1=Math.min(t1,t);}
+ }
+ return t0<=t1;
+}
+function labelLeaderSegmentsCross(a,b,c,d) {
+ const cross=(p,q,r)=>(q.x-p.x)*(r.y-p.y)-(q.y-p.y)*(r.x-p.x);
+ const ab1=cross(a,b,c),ab2=cross(a,b,d),cd1=cross(c,d,a),cd2=cross(c,d,b);
+ return ab1*ab2<0&&cd1*cd2<0;
+}
 function syncResourceHitTargets() {
  if(!renderer||!camera||!stage)return;
  if(!_hitWorld)_hitWorld=new THREE.Vector3();
@@ -310,7 +323,7 @@ function syncResourceHitTargets() {
  // Place labels in screen space, not directly on top of one another. This is
  // especially important on narrow mobile screens where projected branches cluster.
  projected.sort((a,b)=>Number(b.button.dataset.hasChildren==='true')-Number(a.button.dataset.hasChildren==='true')||a.p.z-b.p.z);
- const occupied=[];
+ const occupied=[],leaderSegments=[];
  const obstacles=[...ROOT.querySelectorAll('.webgl-controls,.webgl-status,.webgl-path,.webgl-focus,.webgl-intro,.webgl-branch-dock')]
   .filter(el=>!el.hidden&&getComputedStyle(el).display!=='none')
   .map(el=>{const r=el.getBoundingClientRect();return {l:r.left-stageRect.left,t:r.top-stageRect.top,r:r.right-stageRect.left,b:r.bottom-stageRect.top}});
@@ -346,7 +359,20 @@ function syncResourceHitTargets() {
   occupied.push(chosen.box);
   const endX=Math.max(chosen.box.l,Math.min(chosen.box.r,item.x)),endY=Math.max(chosen.box.t,Math.min(chosen.box.b,item.y)),leaderLength=Math.hypot(endX-item.x,endY-item.y);
   if(leaderLength>26){
-   const line=document.createElementNS('http://www.w3.org/2000/svg','line');line.setAttribute('x1',String(item.x));line.setAttribute('y1',String(item.y));line.setAttribute('x2',String(endX));line.setAttribute('y2',String(endY));line.setAttribute('stroke','#B96B4D');line.setAttribute('stroke-width','1.25');line.setAttribute('stroke-linecap','round');line.setAttribute('opacity','.78');line.setAttribute('vector-effect','non-scaling-stroke');leaderLayer.append(line);
+   const start={x:item.x,y:item.y},end={x:endX,y:endY},otherLabels=occupied.slice(0,-1);
+   const routes=[[start,{x:end.x,y:start.y},end],[start,{x:start.x,y:end.y},end],[start,{x:(start.x+end.x)/2,y:start.y},{x:(start.x+end.x)/2,y:end.y},end]];
+   const routeScore=points=>{
+    let score=0;
+    for(let i=0;i<points.length-1;i++){
+     const a=points[i],b=points[i+1];
+     for(const r of [...otherLabels,...obstacles])if(labelLeaderSegmentHitsRect(a,b,r))score+=12;
+     for(const [c,d] of leaderSegments)if(labelLeaderSegmentsCross(a,b,c,d))score+=5;
+    }
+    return score;
+   };
+   const route=routes.map(points=>({points,score:routeScore(points),length:points.slice(1).reduce((sum,p,i)=>sum+Math.hypot(p.x-points[i].x,p.y-points[i].y),0)})).sort((a,b)=>a.score-b.score||a.length-b.length)[0].points;
+   for(let i=0;i<route.length-1;i++)leaderSegments.push([route[i],route[i+1]]);
+   const line=document.createElementNS('http://www.w3.org/2000/svg','polyline');line.setAttribute('points',route.map(p=>p.x+','+p.y).join(' '));line.setAttribute('fill','none');line.setAttribute('stroke','#B96B4D');line.setAttribute('stroke-width','1.15');line.setAttribute('stroke-linecap','round');line.setAttribute('stroke-linejoin','round');line.setAttribute('opacity','.76');line.setAttribute('vector-effect','non-scaling-stroke');leaderLayer.append(line);
    const anchor=document.createElementNS('http://www.w3.org/2000/svg','circle');anchor.setAttribute('cx',String(item.x));anchor.setAttribute('cy',String(item.y));anchor.setAttribute('r','2');anchor.setAttribute('fill','#D1D0C5');anchor.setAttribute('opacity','.9');leaderLayer.append(anchor);
   }
   button.style.setProperty('z-index',String(12000+Math.round((1-item.p.z)*100)),'important');
