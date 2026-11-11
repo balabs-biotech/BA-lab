@@ -58,7 +58,7 @@
       option.value = device.sensor_id;
       select.append(option);
     });
-    select.disabled = state.devices.length < 2;
+    select.disabled = state.devices.length < 2 || state.profile?.status !== "active";
   }
   function selectedPolicy() {
     return state.policies.find(policy => policy.id === state.selectedPolicyId) || null;
@@ -140,7 +140,7 @@
     const first = rows[0];
     state.profile = {
       id: first.profile_id, code: first.profile_code, version: first.profile_version,
-      validFrom: first.profile_valid_from, validTo: first.profile_valid_to
+      status: first.profile_status, validFrom: first.profile_valid_from, validTo: first.profile_valid_to
     };
     state.devices = rows.filter(row => row.sensor_id && row.device_enabled === true).map(row => ({
       sensor_id: row.sensor_id, device_code: row.device_code, device_type: row.device_type
@@ -150,16 +150,18 @@
     const end = state.profile.validTo || "sans date de fin";
     $("sensorDriftProfileValidity").textContent =
       "Profil " + state.profile.code + " v" + state.profile.version +
-      " · période " + state.profile.validFrom + " → " + end +
-      " · " + state.devices.length + " appareil(s) activé(s). Les politiques reprendront cette période.";
+      " · statut " + state.profile.status + " · période " + state.profile.validFrom + " → " + end +
+      " · " + state.devices.length + " appareil(s) activé(s). Les politiques reprendront cette période."
     ["sensorDriftVariable", "sensorDriftOffset", "sensorDriftMinimumPairs",
       "sensorDriftMinimumDuration", "sensorDriftMaximumRate"]
       .forEach(id => { $(id).disabled = false; });
-    $("sensorDriftCreateDraft").disabled = state.devices.length < 2;
+    $("sensorDriftCreateDraft").disabled = state.devices.length < 2 || state.profile.status !== "active";
     await loadPolicies(revision, organizationId, environmentId);
     if (revision === state.revision) setStatus(state.devices.length >= 2
-      ? "Profil et appareils activés chargés. Les mutations restent protégées par RLS et les déclencheurs PostgreSQL."
-      : "Profil actif chargé, mais il faut au moins deux appareils activés pour créer une nouvelle référence. Les politiques existantes restent consultables.");
+      ? (state.profile.status === "active"
+          ? "Profil actif et appareils activés chargés. Les mutations restent protégées par RLS et les déclencheurs PostgreSQL."
+          : "Dernier profil capteur retiré chargé en lecture historique. Vous pouvez consulter et retirer les politiques, mais pas en créer de nouvelles.")
+      : "Profil capteur chargé, mais il faut un profil actif avec au moins deux appareils activés pour créer une nouvelle référence. Les politiques existantes restent consultables.");
   }
   function positiveInteger(id, min, max) {
     const value = Number($(id).value);
@@ -177,7 +179,7 @@
       setStatus(error?.message || "Opération impossible.", true);
     } finally {
       state.busy = false;
-      $("sensorDriftCreateDraft").disabled = !state.profile || state.devices.length < 2;
+      $("sensorDriftCreateDraft").disabled = !state.profile || state.profile.status !== "active" || state.devices.length < 2;
       $("sensorDriftPolicySelect").disabled = !state.policies.length;
       updateActionState();
     }
@@ -197,6 +199,7 @@
       const pairs = positiveInteger("sensorDriftMinimumPairs", 3, 5000);
       const duration = positiveInteger("sensorDriftMinimumDuration", 1, 2592000);
       const rate = Number($("sensorDriftMaximumRate").value);
+      if (state.profile?.status !== "active") throw new Error("La création exige un profil capteur actif.");
       if (!target || !reference || target === reference) throw new Error("Choisissez deux capteurs distincts du profil actif.");
       if (!variable || variable.length > 120) throw new Error("Le code de variable est obligatoire (120 caractères maximum).");
       if (offset === null || pairs === null || duration === null || !Number.isFinite(rate) || rate <= 0) {
