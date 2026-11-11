@@ -568,8 +568,10 @@
       const summarizeTimeSeries = (items, valueField, timeField, unitField) => {
         const groups = new Map();
         items.forEach(item => {
-          const value = Number(item[valueField]);
+          const rawValue = item[valueField];
           const timestamp = item[timeField];
+          if (rawValue === null || rawValue === undefined || rawValue === "") return;
+          const value = Number(rawValue);
           if (!Number.isFinite(value) || !timestamp || !Number.isFinite(new Date(timestamp).getTime())) return;
           const variable = item.variable_code || "unspecified";
           const unit = item[unitField] || null;
