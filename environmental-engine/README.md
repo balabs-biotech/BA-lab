@@ -49,7 +49,7 @@ Python 3.10+; CPU-only.
 
 ## Private service API
 
-The optional FastAPI boundary exposes `GET /health`, `POST /v1/analyses` for trusted normalized observations, and `POST /v1/analyses/nasa-power` for strict normalization of persisted NASA POWER rows. Configure `BA_ENVIRONMENTAL_ENGINE_API_KEY` in the runtime secret manager before starting the service. Keep the API behind private ingress; never expose the internal key to CultureOps clients. The `environmental-analysis` Supabase Edge Function is the authenticated CultureOps gateway and reads authorized persisted rows before calling the engine. The Supabase Edge Function must authenticate the user and enforce organization/location authorization before forwarding normalized observations.
+The optional FastAPI boundary exposes `GET /health`, `POST /v1/analyses` for trusted normalized observations, `POST /v1/analyses/nasa-power` for strict normalization of persisted NASA POWER rows, and `POST /v1/analyses/biological-performance` for tenant-scoped biological measurement analysis and BAL biological serialization. Configure `BA_ENVIRONMENTAL_ENGINE_API_KEY` in the runtime secret manager before starting the service. Keep the API behind private ingress; never expose the internal key to CultureOps clients. The `environmental-analysis` Supabase Edge Function is the authenticated CultureOps gateway and reads authorized persisted rows before calling the engine. The Supabase Edge Function must authenticate the user and enforce organization/location authorization before forwarding normalized observations.
 
 ## Architecture contracts
 
