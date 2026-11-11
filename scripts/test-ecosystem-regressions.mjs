@@ -39,6 +39,16 @@ for (const language of ['fr', 'en', 'ar', 'pt']) {
     }
   }
 }
+// Catalogue labels and supply claims must match the verified public Notion records.
+const frenchProducts = languageTrees.fr.domains.find((domain) => domain.id === 'products');
+const frenchWa = frenchProducts.children.find((node) => node.id === 'products-wa-agar');
+assert.equal(frenchWa.url, 'https://app.notion.com/p/3f473152f171812a814dd7b951786313', 'French WA must link to the canonical public catalogue record, not its internal working record');
+for (const [language, unavailablePhrase] of [['fr', 'non présenté comme un produit disponible à la vente'], ['en', 'not available for sale'], ['ar', 'غير متاح للبيع'], ['pt', 'não disponível para venda']]) {
+  const products = languageTrees[language].domains.find((domain) => domain.id === 'products');
+  const prototypes = products.children.filter((node) => /myco[- ](start|plate)/i.test(node.id + ' ' + node.title));
+  assert.equal(prototypes.length, 2, language + ' must expose both Myco kit prototypes');
+  for (const prototype of prototypes) assert.ok((prototype.description || '').toLowerCase().includes(unavailablePhrase.toLowerCase()), language + ' ' + prototype.id + ' must clearly state that the prototype is not for sale');
+}
 const publicCatalogueLabels = {
   fr: 'Catalogue public — Ressources publiables',
   en: 'Public catalogue — publishable resources',
@@ -111,7 +121,7 @@ for (const [language, label] of Object.entries({ fr: 'Catalogue', en: 'Catalogue
 assert.ok(html.includes("a[data-domain-page],a[data-work-page]") && previewHtml.includes("a[data-domain-page],a[data-work-page]") && html.includes("enterSphere(id,true,false)") && previewHtml.includes("enterSphere(id,true,false)"), 'Homepage universe and featured-work links must open the selected domain directly');
 assert.ok(!/<a class="(?:editorial-link|work-card-link)" data-(?:domain|work)-page="[^"]+" href="#">/.test(html) && !/<a class="(?:editorial-link|work-card-link)" data-(?:domain|work)-page="[^"]+" href="#">/.test(previewHtml), 'Featured-work and domain shortcuts must have a useful in-page fallback destination');
 assert.ok(html.includes('engine-v2.js?v=20261110-touch-branch-activation-v53'), 'Public explorer must load the cache-busted screen-space label engine');
-assert.ok(html.includes('Customer journey: featured work → live 3D explorer → eight domains') && previewHtml.includes('Customer journey: featured work → live 3D explorer → eight domains') && html.includes('app.insertBefore(scene,domains);') && previewHtml.includes('app.insertBefore(scene,domains);') && !html.includes('app.insertBefore(method,work);') && !previewHtml.includes('app.insertBefore(method,work);') && !html.includes('app.insertBefore(bridge,work);') && !previewHtml.includes('app.insertBefore(bridge,work);'), 'The homepage discovery path must flow from featured projects to the live 3D explorer and then the eight-universe directory, with method content after it');
+assert.ok(html.includes('Customer journey: featured work → live 3D explorer → eight domains') && previewHtml.includes('Customer journey: featured work → live 3D explorer → eight domains') && html.includes('domains.parentNode.insertBefore(scene,domains);') && previewHtml.includes('domains.parentNode.insertBefore(scene,domains);') && !html.includes('app.insertBefore(scene,domains);') && !previewHtml.includes('app.insertBefore(scene,domains);') && !html.includes('app.insertBefore(method,work);') && !previewHtml.includes('app.insertBefore(method,work);') && !html.includes('app.insertBefore(bridge,work);') && !previewHtml.includes('app.insertBefore(bridge,work);'), 'The homepage discovery path must flow from featured projects to the live 3D explorer and then the eight-universe directory, with method content after it');
 assert.ok(previewHtml.includes('engine-v2.js?v=20261110-touch-branch-activation-v54'), 'Preview must load the matching cache-busted label engine');
 assert.ok(engine.includes('function syncLabelScales()') && engine.includes('cameraDistance*projection*targetPixels'), '3D labels must keep a stable screen-space size across zoom levels');
 assert.ok(engine.includes('resourceHitTargets.set(label,element)'), 'Public branch labels must have real DOM hit targets');
