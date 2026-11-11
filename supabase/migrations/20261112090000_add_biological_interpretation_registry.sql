@@ -147,10 +147,12 @@ begin
       using errcode = '23514';
   end if;
 
+  -- Serialize version creation for one biological signal.
   select * into v_signal
     from public.biological_signals bs
    where bs.organization_id = p_organization_id
-     and bs.signal_id = p_source_signal_id;
+     and bs.signal_id = p_source_signal_id
+   for update;
   if not found then
     raise exception 'biological_interpretation_source_signal_not_found'
       using errcode = 'P0002';
@@ -196,13 +198,37 @@ begin
       organization_id, interpretation_id, event_id, event_type,
       actor_kind, actor_id, event_payload
     ) values (
-      p_organization_id, p_interpretation_id, p_event_id, 'recorded',
+      p_organization_id, v_snapshot.interpretation_id, p_event_id, 'recorded',
       'system', null, jsonb_build_object(
         'engine_code', btrim(p_engine_code),
         'engine_version', btrim(p_engine_version),
         'interpretation_status', p_interpretation_status
       )
     );
+
+    -- A newly recorded version becomes current for this signal and engine.
+    -- Older snapshots remain immutable and receive an append-only superseded event.
+    insert into public.biological_interpretation_events (
+      organization_id, interpretation_id, event_id, event_type,
+      actor_kind, actor_id, event_payload
+    )
+    select
+      p_organization_id,
+      previous.interpretation_id,
+      gen_random_uuid(),
+      'superseded',
+      'system',
+      null,
+      jsonb_build_object(
+        'replaced_by_interpretation_id', v_snapshot.interpretation_id,
+        'replaced_by_engine_version', v_snapshot.engine_version,
+        'replacement_recorded_at', v_snapshot.recorded_at
+      )
+    from public.biological_interpretations previous
+    where previous.organization_id = p_organization_id
+      and previous.source_signal_id = p_source_signal_id
+      and previous.engine_code = btrim(p_engine_code)
+      and previous.interpretation_id <> v_snapshot.interpretation_id;
   end if;
 
   return jsonb_build_object(
