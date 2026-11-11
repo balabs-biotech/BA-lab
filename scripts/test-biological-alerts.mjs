@@ -289,3 +289,10 @@ assert.match(moduleSource, /confirmed_composition: \[\]/);
 assert.match(moduleSource, /composition_status: "not_assessed"/);
 assert.match(moduleSource, /Souches documentées dans la généalogie/);
 assert.match(moduleSource, /Composition biologique confirmée : non évaluée/);
+assert.match(moduleSource, /measurement_interpretation: "quantitative_observation"/);
+assert.match(moduleSource, /observation_interpretation: "descriptive_observation"/);
+assert.match(moduleSource, /signal_interpretation: "rule_or_anomaly_output_not_identity_confirmation"/);
+assert.match(moduleSource, /result_interpretation: "experiment_result_requires_method_and_result_semantics_review"/);
+assert.match(moduleSource, /composition_evidence: \[\]/);
+assert.match(moduleSource, /composition_status: "not_assessed"/);
+
