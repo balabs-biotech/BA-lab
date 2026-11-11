@@ -7,7 +7,7 @@ const engine = readFileSync('ecosystem/engine-v2.js', 'utf8');
 const previewEngine = readFileSync('ecosystem-preview/engine-v2.js', 'utf8');
 const expectedDomains = ['bio', 'myco', 'soil', 'lab', 'products', 'iot', 'work', 'learn'];
 const brandCss = readFileSync('ecosystem/brand-system.css', 'utf8');
-assert.ok(html.includes('<link rel="stylesheet" href="./brand-system.css?v=4">'), 'Public homepage must load the BA Labs visual system');
+assert.ok(html.includes('<link rel="stylesheet" href="./brand-system.css?v=5">'), 'Public homepage must load the BA Labs visual system');
 assert.ok(html.includes('<div class="wrap balabs-ui" id="app"'), 'Public homepage must opt into the BA Labs visual system');
 for (const section of ['hero', 'editorial-feature', 'editorial-about', 'editorial-work', 'universe-index', 'editorial-method']) {
   assert.ok(brandCss.includes('#app.balabs-ui > main > .' + section), 'Visual system must target the actual main landmark child: ' + section);
@@ -387,12 +387,14 @@ assert.ok(!/\.(?:sphere|webgl-[\w-]*|branch-dock|camera)\b|#mainView|canvas/i.te
 assert.ok(brandCss.includes('PHASE 4 — visible homepage art direction'), 'Phase 4 homepage art direction must be present');
 assert.ok(brandCss.includes('#app.balabs-ui > .site-nav'), 'Phase 4 navigation must target its actual direct-child location');
 assert.ok(!brandCss.includes('#app.balabs-ui > main > .site-nav'), 'Phase 4 navigation must not target a nonexistent main child');
-assert.ok(brandCss.includes('min-height: min(690px, calc(100svh - 145px))'), 'Desktop hero must have a visibly expanded editorial composition');
-assert.ok(brandCss.includes('font: 400 clamp(64px, 8.2vw, 116px)/.88 Georgia'), 'Hero typography must use the new oversized editorial scale');
+assert.ok(brandCss.includes('min-height: max(760px, calc(100svh - 145px))'), 'Desktop hero must provide enough vertical room for its full editorial content');
+assert.ok(brandCss.includes('align-items: center !important;'), 'Desktop hero content must remain vertically composed without clipping the primary actions');
+assert.ok(brandCss.includes('flex-wrap: wrap !important;') && brandCss.includes('overflow: visible !important;'), 'Mobile navigation must wrap rather than clip its destinations');
+assert.ok(brandCss.includes('font: 400 clamp(58px, 6.6vw, 94px)/.94 Georgia'), 'Hero typography must use the refined editorial scale without pushing actions below the composition');
 assert.ok(brandCss.includes('grid-template-columns: minmax(0, 1.08fr) minmax(0, .92fr)'), 'Featured project must use the new asymmetric image-led split');
 assert.ok(brandCss.includes('min-height: 740px !important'), 'Mobile hero must have its own image-led composition');
-assert.ok(html.includes('brand-system.css?v=4'), 'Public page must request the new visual system version');
-assert.ok(previewHtml.includes('brand-system.css?v=4'), 'Preview must request the same visual system version');
+assert.ok(html.includes('brand-system.css?v=5'), 'Public page must request the new visual system version');
+assert.ok(previewHtml.includes('brand-system.css?v=5'), 'Preview must request the same visual system version');
 
 // Featured section metadata must remain legible against its light mineral background.
 assert.ok(brandCss.includes('#app.balabs-ui > main > .editorial-feature .feature-status'), 'Featured status metadata must use a scoped high-contrast treatment');
@@ -401,7 +403,7 @@ assert.ok(brandCss.includes('#app.balabs-ui > main > .editorial-feature .art-cap
 
 // Shared design-system contract: preview consumes the same maintained editorial layer as public.
 assert.ok(previewHtml.includes('class="wrap balabs-ui" id="app"'), 'Preview root must opt into the shared BA Labs visual system');
-assert.ok(previewHtml.includes('../ecosystem/brand-system.css?v=4'), 'Preview must load the shared visual system after its local styles');
+assert.ok(previewHtml.includes('../ecosystem/brand-system.css?v=5'), 'Preview must load the shared visual system after its local styles');
 
 // Preview parity contract: retain the preview's independent light theme while
 // matching editorial hierarchy, responsive grids, touch targets and RTL focus.
