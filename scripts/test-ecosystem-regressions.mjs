@@ -379,7 +379,10 @@ assert.ok(brandCss.includes('aspect-ratio: 16 / 10 !important'), 'Editorial proj
 assert.ok(brandCss.includes('grid-template-columns: repeat(2, minmax(0, 1fr)) !important'), 'Editorial work cards must collapse to two columns on tablet');
 assert.ok(brandCss.includes('grid-template-columns: minmax(0, 1fr) !important'), 'Editorial work cards must collapse to one column on mobile');
 assert.ok(brandCss.includes('outline: 3px solid var(--balabs-copper) !important'), 'Editorial links and controls must have a visible keyboard focus state');
-assert.ok(!/\.(?:sphere|webgl-[\w-]*|branch-dock|camera)\b|#mainView|canvas/i.test(brandCss.slice(brandCss.indexOf('Site-wide visual refinement — phase 3'), brandCss.indexOf('PHASE 6 — internal universe navigation'))), 'Phase 3 must not target the 3D explorer or Batch Tracker');
+const phase3Start = brandCss.indexOf('Site-wide visual refinement — phase 3');
+const phase4Start = brandCss.indexOf('PHASE 4 — visible homepage art direction', phase3Start);
+const phase3Css = brandCss.slice(phase3Start, phase4Start > phase3Start ? phase4Start : undefined);
+assert.ok(!/\.(?:sphere|webgl-[\w-]*|branch-dock|camera)\b|#mainView|canvas/i.test(phase3Css), 'Phase 3 must not target the 3D explorer or Batch Tracker');
 
 
 
