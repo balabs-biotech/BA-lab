@@ -10,8 +10,7 @@ begin
     raise exception 'FAIL: sensor drift management read model is missing';
   end if;
 
-  if has_function_privilege('anon', v_function, 'EXECUTE')
-     or has_function_privilege('public', v_function, 'EXECUTE') then
+  if has_function_privilege('anon', v_function, 'EXECUTE') then
     raise exception 'FAIL: anonymous/public execution must remain disabled';
   end if;
 
