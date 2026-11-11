@@ -23,13 +23,6 @@
       "type": "string",
       "minLength": 1
     },
-    "normalized_value": {
-      "type": "number"
-    },
-    "normalized_unit_code": {
-      "type": "string",
-      "minLength": 1
-    },
     "measured_at": {
       "type": "string",
       "format": "date-time"
