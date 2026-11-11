@@ -253,15 +253,13 @@ class SupabaseRecommendationRepository:
                 raise RecommendationRepositoryError(
                     "Supabase did not return the transitioned recommendation"
                 )
-            lifecycle = self.get(
-                organization_id=organization_id,
-                recommendation_id=recommendation_id,
-            )
-            if lifecycle is None:
-                raise RecommendationNotFoundError(
-                    "recommendation disappeared after lifecycle transition"
+            event_rows = payload.get("events")
+            if not isinstance(event_rows, list):
+                raise RecommendationRepositoryError(
+                    "Supabase did not return the committed recommendation event history"
                 )
-            return lifecycle
+            event_rows.sort(key=lambda item: item["revision"])
+            return _lifecycle_from_payload(payload["recommendation"], event_rows)
         except RecommendationRepositoryError:
             raise
         except Exception as error:
