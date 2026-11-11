@@ -8,7 +8,9 @@ const tracker = fs.readFileSync("batch-tracker/tracker.js", "utf8");
 for (const page of ["batch-tracker/mycology/index.html", "batch-tracker/laboratory/index.html"]) {
   const html = fs.readFileSync(page, "utf8");
   assert.match(html, /bal-json-import\.js/, page + " must load the BAL-JSON client");
-  assert.match(html, /20261111-bal-json-import-1/, page + " must invalidate cached workspace assets");
+  assert.match(html, /shared\/bal-normalizer\.js/, page + " must load BAL-Normalizer");
+  assert.match(html, /20261111-bal-normalizer-preview-1/, page + " must invalidate cached workspace assets");
+  assert.match(html, /normalizer\.onload\s*=\s*loadImporter/, page + " must wait for normalizer before loading importer");
 }
 for (const id of ["balJsonImportPanel","balJsonImportSource","balJsonPreviewButton","balJsonImportButton","balJsonPreview","balJsonImportStatus"]) {
   assert.match(workspace, new RegExp('id="' + id + '"'), "workspace is missing " + id);
@@ -35,9 +37,9 @@ function makeRecord(overrides = {}) {
     organization_id: "a0a0a0a0-0000-4000-8000-000000000001",
     created_at: "2026-11-11T10:00:00.000Z",
     data: {
-      variable_code: "temperature",
-      raw_value: 24.5,
-      raw_unit_code: "degC",
+      variable_code: "fresh_mass",
+      raw_value: 2,
+      raw_unit_code: "kg",
       measured_at: "2026-11-11T09:59:00.000Z",
       context: { culture_id: "b0b0b0b0-0000-4000-8000-000000000001" },
     },
@@ -46,7 +48,7 @@ function makeRecord(overrides = {}) {
   };
 }
 
-function harness({ domain = "mycology", organizationId = "a0a0a0a0-0000-4000-8000-000000000001", result = { status: "inserted", event_id: "e0e0e0e0-0000-4000-8000-000000000001" } } = {}) {
+function harness({ domain = "mycology", organizationId = "a0a0a0a0-0000-4000-8000-000000000001", result = { status: "inserted", event_id: "e0e0e0e0-0000-4000-8000-000000000001" }, catalogue = { variables: [{ code: "fresh_mass", dimension: "mass", canonical_unit_code: "g" }], units: [{ code: "g", dimension: "mass", factor: 1, offset_value: 0, is_linear: true }, { code: "kg", dimension: "mass", factor: 1000, offset_value: 0, is_linear: true }] } } = {}) {
   const ids = ["balJsonImportPanel","balJsonImportSource","balJsonPreviewButton","balJsonImportButton","balJsonPreview","balJsonImportStatus"];
   const elements = new Map(ids.map(id => [id, element(id)]));
   const calls = [];
@@ -57,6 +59,19 @@ function harness({ domain = "mycology", organizationId = "a0a0a0a0-0000-4000-800
     BA_LABS_DOMAIN: domain,
     BA_LABS_SUPABASE_CLIENT: client,
     BA_LABS_GET_ORGANIZATION_ID: () => organizationId,
+    BA_LABS_GET_MEASUREMENT_CATALOGUE: () => catalogue,
+    BALabsNormalizer: {
+      normalizeMeasurement(input) {
+        const units = new Map(input.units.map((unit) => [unit.code, unit]));
+        const raw = units.get(input.rawUnitCode);
+        const canonical = units.get(input.variable.canonical_unit_code);
+        if (!raw || !canonical) return { status: "blocked", reason: "unknown_raw_unit" };
+        if (raw.dimension !== input.variable.dimension || canonical.dimension !== input.variable.dimension) return { status: "blocked", reason: "raw_unit_dimension_mismatch" };
+        if (input.rawUnitCode === input.variable.canonical_unit_code) return { status: "already_canonical", normalizedValue: input.rawValue, normalizedUnitCode: input.variable.canonical_unit_code, method: "identity", version: "0.1.0" };
+        if (raw.is_linear !== true || canonical.is_linear !== true || Number(raw.offset_value ?? 0) !== 0 || Number(canonical.offset_value ?? 0) !== 0) return { status: "blocked", reason: "nonlinear_or_offset_conversion_not_enabled" };
+        return { status: "normalized", normalizedValue: input.rawValue * Number(raw.factor) / Number(canonical.factor), normalizedUnitCode: input.variable.canonical_unit_code, method: "catalogue_factor_ratio", version: "0.1.0" };
+      },
+    },
     BA_LABS_REFRESH_EXPERIMENTAL_DATA: async () => { refreshCalls += 1; },
   };
   vm.runInNewContext(source, { document, window, console, JSON, String, RegExp, Promise, TextEncoder }, { filename: "batch-tracker/bal-json-import.js" });
@@ -145,4 +160,28 @@ function harness({ domain = "mycology", organizationId = "a0a0a0a0-0000-4000-800
   assert.match(elements.get("balJsonImportStatus").textContent, /déjà été importée/i);
 }
 
-console.log("✓ BAL-JSON import UI: domain scope, strict preview, tenant guard, stale-preview rejection, duplicate handling and explicit authenticated submission");
+
+{
+  const { elements } = harness();
+  elements.get("balJsonImportSource").value = JSON.stringify(makeRecord());
+  elements.get("balJsonPreviewButton").click();
+  assert.match(elements.get("balJsonPreview").textContent, /Normalisation proposée \(non enregistrée\) : 2000 g/);
+  assert.match(elements.get("balJsonPreview").textContent, /valeur brute reste la référence/i);
+}
+
+{
+  const temperatureCatalogue = {
+    variables: [{ code: "temperature", dimension: "temperature", canonical_unit_code: "degC" }],
+    units: [
+      { code: "degC", dimension: "temperature", factor: 1, offset_value: 0, is_linear: true },
+      { code: "K", dimension: "temperature", factor: 1, offset_value: 0, is_linear: true },
+    ],
+  };
+  const { elements } = harness({ catalogue: temperatureCatalogue });
+  elements.get("balJsonImportSource").value = JSON.stringify(makeRecord({ data: { ...makeRecord().data, variable_code: "temperature", raw_unit_code: "K" } }));
+  elements.get("balJsonPreviewButton").click();
+  assert.match(elements.get("balJsonPreview").textContent, /Conversion avec décalage ou échelle non linéaire non activée/);
+  assert.match(elements.get("balJsonPreview").textContent, /valeur brute reste la référence/i);
+}
+
+console.log("✓ BAL-JSON import UI: strict preview, advisory catalogue normalization, conservative conversion blocks, tenant guard, stale-preview rejection, duplicate handling and explicit authenticated submission");
