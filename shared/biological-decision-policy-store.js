@@ -37,7 +37,13 @@
     } catch (_) {
       return EMPTY("unavailable", "decision_policy_query_failed");
     }
-    const { data, error } = await query;
+    let response;
+    try {
+      response = await query;
+    } catch (_) {
+      return EMPTY("unavailable", "decision_policy_query_failed");
+    }
+    const { data, error } = response || {};
     if (error) return EMPTY("unavailable", "decision_policy_query_failed");
 
     const latestByPolicyId = new Map();
