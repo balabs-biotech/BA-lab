@@ -115,6 +115,8 @@ Deno.serve(async (req: Request) => {
     const context = data.context;
     let cultureId = context.culture_id ?? null;
     const plantCultureId = context.plant_culture_id ?? null;
+    const environmentId = context.environment_id ?? null;
+    const locationId = context.location_id ?? null;
     const batchId = context.batch_id ?? null;
 
     if (batchId) {
@@ -160,6 +162,7 @@ Deno.serve(async (req: Request) => {
       variable_code: data.variable_code,
       culture_id: cultureId,
       plant_culture_id: plantCultureId,
+      environment_id: environmentId,
       metadata: {
         ...(isObject(data.metadata) ? data.metadata : {}),
         bal_json: {
@@ -198,6 +201,8 @@ Deno.serve(async (req: Request) => {
       occurred_at: record.created_at,
       culture_id: cultureId,
       plant_culture_id: plantCultureId,
+      environment_id: environmentId,
+      location_id: locationId,
       batch_id: batchId,
       payload: {
         bal_json_record_id: record.record_id,
