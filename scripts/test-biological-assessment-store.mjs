@@ -60,9 +60,20 @@ assert.equal(query.max, 500);
 const denied = await store.record({
   client: { ...client, auth: { async getUser() { return { data: { user: null }, error: null }; } } },
   organizationId: "org-A", measurementId: "measurement-A",
+  idempotencyKey: "00000000-0000-4000-8000-000000000002",
   result: { status: "normal", reason: "x", engine_version: "0.1.0" },
   measurementSnapshot: {}, contextSnapshot: {}, resolutionSnapshot: {}, resultSnapshot: {},
 });
 assert.equal(denied.status, "unauthenticated");
+
+const beforeInvalidKey = calls.filter(call => call.name === "record_biological_assessment").length;
+const invalidKey = await store.record({
+  client, organizationId: "org-A", domain: "mycology", measurementId: "measurement-A",
+  idempotencyKey: "not-a-canonical-uuid",
+  result: { status: "normal", reason: "x", engine_version: "0.1.0" },
+  measurementSnapshot: {}, contextSnapshot: {}, resolutionSnapshot: {}, resultSnapshot: {},
+});
+assert.equal(invalidKey.status, "insufficient_context");
+assert.equal(calls.filter(call => call.name === "record_biological_assessment").length, beforeInvalidKey);
 
 console.log("✓ Biological Assessment Store: authenticated append-only RPC, tenant/domain evidence and scoped history");
