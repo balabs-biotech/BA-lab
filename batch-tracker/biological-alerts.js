@@ -232,12 +232,22 @@
     const MAX_ANCESTORS = 8;
     const MAX_DESCENDANT_DEPTH = 5;
     const MAX_CULTURES = 100;
+    const qualityIssues = [];
+    const markIncomplete = (stage, error) => qualityIssues.push({
+      stage,
+      code: error?.code || error?.name || "query_failed",
+      message: error?.message || String(error || "Lecture incomplète")
+    });
     const seen = new Set();
     const byId = new Map();
     let current = null;
     const currentResult = await client.from("cultures").select(columns)
       .eq("organization_id", organizationId).eq("id", cultureId).maybeSingle();
-    if (currentResult.error || !currentResult.data) return { cultures: [], materials: [], relationships: [], batches: [], events: [], unavailable: true };
+    if (currentResult.error || !currentResult.data) {
+      if (currentResult.error) markIncomplete("current_culture", currentResult.error);
+      return { cultures: [], materials: [], relationships: [], batches: [], events: [], unavailable: true,
+        lineageQuality: { complete: false, issues: qualityIssues } };
+    }
     current = currentResult.data;
     byId.set(current.id, current);
     seen.add(current.id);
@@ -249,7 +259,8 @@
       if (seen.has(parentId)) break;
       const result = await client.from("cultures").select(columns)
         .eq("organization_id", organizationId).eq("id", parentId).maybeSingle();
-      if (result.error || !result.data) break;
+      if (result.error) { markIncomplete("culture_ancestors", result.error); break; }
+      if (!result.data) { markIncomplete("culture_ancestor_missing", { message: "Culture parente référencée introuvable dans l’organisation" }); break; }
       cursor = result.data;
       seen.add(cursor.id);
       byId.set(cursor.id, cursor);
@@ -262,7 +273,7 @@
       const result = await client.from("cultures").select(columns)
         .eq("organization_id", organizationId).in("parent_culture_id", frontier)
         .order("started_at", { ascending: true }).limit(Math.min(room, 100));
-      if (result.error) break;
+      if (result.error) { markIncomplete("culture_descendants", result.error); break; }
       const next = [];
       for (const child of result.data || []) {
         if (seen.has(child.id) || byId.size >= MAX_CULTURES) continue;
@@ -294,7 +305,7 @@
       const result = await client.from("materials")
         .select("id,material_code,material_type,parent_material_id,strain_id,generation,state,metadata,strain:strains(id,strain_code,designation,origin,supplier,source_description,organism:organisms(scientific_name))")
         .eq("organization_id", organizationId).in("id", ids);
-      if (result.error) break;
+      if (result.error) { markIncomplete("material_ancestors", result.error); break; }
       const rows = result.data || [];
       rows.forEach(row => materialById.set(row.id, row));
       materialFrontier = rows.map(row => row.parent_material_id).filter(id => id && !materialSeen.has(id));
@@ -307,7 +318,7 @@
         .select("id,material_code,material_type,parent_material_id,strain_id,generation,state,metadata,strain:strains(id,strain_code,designation,origin,supplier,source_description,organism:organisms(scientific_name))")
         .eq("organization_id", organizationId).in("parent_material_id", materialFrontier)
         .order("created_at", { ascending: true }).limit(Math.min(room, 100));
-      if (result.error) break;
+      if (result.error) { markIncomplete("material_descendants", result.error); break; }
       const next = [];
       for (const row of result.data || []) {
         if (materialSeen.has(row.id) || materialById.has(row.id) || materialById.size >= MAX_MATERIALS) continue;
@@ -331,7 +342,7 @@
         .eq("organization_id", organizationId)
         .or("parent_material_id.in.(" + ids.join(",") + "),child_material_id.in.(" + ids.join(",") + ")")
         .limit(MAX_RELATIONSHIPS);
-      if (result.error) break;
+      if (result.error) { markIncomplete("material_relationships", result.error); break; }
       const nextIds = new Set();
       for (const edge of result.data || []) {
         const key = [edge.parent_material_id, edge.child_material_id, edge.relationship_type].join(":");
@@ -345,7 +356,8 @@
         const hydrated = await client.from("materials")
           .select("id,material_code,material_type,parent_material_id,strain_id,generation,state,metadata,strain:strains(id,strain_code,designation,origin,supplier,source_description,organism:organisms(scientific_name))")
           .eq("organization_id", organizationId).in("id", hydrateIds);
-        if (!hydrated.error) (hydrated.data || []).forEach(material => materialById.set(material.id, material));
+        if (hydrated.error) markIncomplete("relationship_material_hydration", hydrated.error);
+        else (hydrated.data || []).forEach(material => materialById.set(material.id, material));
       }
       relationshipFrontier = hydrateIds.filter(id => !relationshipSeen.has(id));
       relationshipFrontier.forEach(id => relationshipSeen.add(id));
@@ -358,7 +370,8 @@
       const legacyParents = await client.from("materials")
         .select("id,material_code,material_type,parent_material_id,strain_id,generation,state,metadata,strain:strains(id,strain_code,designation,origin,supplier,source_description,organism:organisms(scientific_name))")
         .eq("organization_id", organizationId).in("id", unresolvedLegacyParents);
-      if (!legacyParents.error) (legacyParents.data || []).forEach(material => materialById.set(material.id, material));
+      if (legacyParents.error) markIncomplete("legacy_parent_hydration", legacyParents.error);
+      else (legacyParents.data || []).forEach(material => materialById.set(material.id, material));
     }
     const materialIds = [...materialById.keys()];
     // Keep legacy parent pointers visible even when no explicit edge row exists.
@@ -399,6 +412,12 @@
         .eq("organization_id", organizationId).eq("domain", domainByWorkspace[document.body.dataset.domain] || "mycology")
         .in("biological_subject_id", cultureIds).order("first_seen_at", { ascending: true }).limit(200)
     ]);
+    if (batchResult.error) markIncomplete("batches", batchResult.error);
+    if (cultureEventResult.error) markIncomplete("culture_events", cultureEventResult.error);
+    if (materialEventResult.error) markIncomplete("material_events", materialEventResult.error);
+    if (measurementResult.error) markIncomplete("measurements", measurementResult.error);
+    if (observationResult.error) markIncomplete("observations", observationResult.error);
+    if (signalResult.error) markIncomplete("biological_signals", signalResult.error);
     const eventsById = new Map();
     [...(cultureEventResult.data || []), ...(materialEventResult.data || [])].forEach(event => eventsById.set(event.id, event));
     const events = [...eventsById.values()].sort((x, y) => String(x.occurred_at).localeCompare(String(y.occurred_at)));
@@ -416,7 +435,8 @@
       if (from && to) query = query.gte("observed_at", from).lte("observed_at", to);
       const environmentalResult = await query;
       environmentalAvailable = !environmentalResult.error;
-      if (environmentalAvailable) environmentalObservations = environmentalResult.data || [];
+      if (environmentalResult.error) markIncomplete("environmental_observations", environmentalResult.error);
+      else environmentalObservations = environmentalResult.data || [];
     }
     const measurements = measurementResult.error ? [] : (measurementResult.data || []);
     const observations = observationResult.error ? [] : (observationResult.data || []);
@@ -429,7 +449,8 @@
         .select("id,code,result_type,value,quality_state,experiment_id,experimental_unit_id,created_at")
         .eq("organization_id", organizationId).in("id", resultIds).limit(200);
       resultsAvailable = !resultQuery.error;
-      if (resultsAvailable) experimentalResults = resultQuery.data || [];
+      if (resultQuery.error) markIncomplete("experimental_results", resultQuery.error);
+      else experimentalResults = resultQuery.data || [];
     }
     const evidenceAvailability = {
       measurements: !measurementResult.error,
@@ -446,6 +467,7 @@
       events,
       evidence: { measurements, observations, biological_signals: biologicalSignals, experimental_results: experimentalResults, environmental_observations: environmentalObservations },
       evidenceAvailability,
+      lineageQuality: { complete: qualityIssues.length === 0, issues: qualityIssues },
       unavailable: false,
       truncated: byId.size >= MAX_CULTURES || materialById.size >= MAX_MATERIALS || relationshipByKey.size >= MAX_RELATIONSHIPS ||
         measurements.length >= 500 || observations.length >= 500 || biologicalSignals.length >= 200 || environmentalObservations.length >= 500
@@ -606,6 +628,19 @@
     section.append(element("h4", "", "Généalogie biologique"));
     const provenanceIndex = buildBiologicalProvenanceIndex(lineage);
     const provenanceSummary = provenanceIndex.summarize();
+    if (lineage.lineageQuality && !lineage.lineageQuality.complete) {
+      const quality = element("p", "signal-lineage-quality",
+        "Généalogie partielle : " + lineage.lineageQuality.issues.length +
+        " lecture(s) incomplète(s). Les relations absentes ne peuvent pas être interprétées comme inexistantes.");
+      quality.setAttribute("role", "status");
+      section.append(quality);
+    } else if (lineage.truncated) {
+      section.append(element("p", "signal-lineage-quality",
+        "Généalogie partielle : limite de profondeur ou de volume atteinte."));
+    } else {
+      section.append(element("p", "signal-lineage-quality is-complete",
+        "Chargement de la généalogie terminé."));
+    }
     section.append(element("p", "signal-lineage-batches",
       provenanceSummary.material_count + " matériaux · " + provenanceSummary.relationship_count + " relations · " +
       provenanceSummary.event_count + " événements · " + provenanceSummary.multi_parent_count + " matériau(x) multi-source"));
