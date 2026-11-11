@@ -129,6 +129,9 @@ class SupabaseBiologicalSignalRepository:
 
         if len(signal_ids) != len(set(signal_ids)):
             raise ValueError("interpretation contains duplicate signal IDs")
+        analysis_ids = {row["source_analysis_id"] for row in rows}
+        if len(analysis_ids) != 1:
+            raise ValueError("one interpretation batch must belong to one source analysis")
 
         try:
             self._client.table("biological_signals").upsert(
