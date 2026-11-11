@@ -826,7 +826,7 @@ def test_sensor_api_accepts_transmission_only_analysis_for_a_silent_device():
         "created_at": (today - timedelta(days=10)).isoformat() + "T00:00:00+00:00",
         "profile_bound": True,
         "expected_from": (today - timedelta(days=10)).isoformat(),
-        "expected_to": None,
+        "expected_to": today.isoformat(),
         "last_seen_at": (today - timedelta(days=1)).isoformat() + "T00:00:00+00:00",
     }]
     request["transmission_receipts"] = []
