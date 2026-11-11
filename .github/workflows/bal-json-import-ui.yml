@@ -2,7 +2,7 @@ name: BAL-JSON import UI contract
 
 on:
   pull_request:
-    paths: &relevant_paths
+    paths:
       - "batch-tracker/bal-json-import.js"
       - "batch-tracker/workspace.html"
       - "batch-tracker/tracker.js"
@@ -28,7 +28,30 @@ on:
       - ".github/workflows/bal-json-import-ui.yml"
   push:
     branches: ["feat/bal-json-contract-v1"]
-    paths: *relevant_paths
+    paths:
+      - "batch-tracker/bal-json-import.js"
+      - "batch-tracker/workspace.html"
+      - "batch-tracker/tracker.js"
+      - "batch-tracker/tracker.css"
+      - "batch-tracker/mycology/index.html"
+      - "batch-tracker/laboratory/index.html"
+      - "supabase/functions/bal-json-ingest/**"
+      - "schemas/bal-json/**"
+      - "schemas/biological-rules/**"
+      - "shared/**"
+      - "scripts/test-bal-json-import-ui.mjs"
+      - "scripts/test-bal-json-contract.mjs"
+      - "scripts/test-bal-normalizer.mjs"
+      - "scripts/test-biological-interpreter.mjs"
+      - "scripts/test-biological-rule-registry.mjs"
+      - "scripts/test-biological-rule-schema.mjs"
+      - "scripts/test-biological-rule-resolver.mjs"
+      - "scripts/test-biological-context-adapter.mjs"
+      - "scripts/test-biological-context-loader.mjs"
+      - "scripts/test-biological-context-pipeline.mjs"
+      - "supabase/tests/bal-json-ingest-contract.test.mjs"
+      - "supabase/migrations/20261111160000_add_bal_json_atomic_ingestion.sql"
+      - ".github/workflows/bal-json-import-ui.yml"
 
 permissions:
   contents: read
