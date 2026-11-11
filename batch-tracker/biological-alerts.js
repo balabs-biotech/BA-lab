@@ -584,7 +584,12 @@
       return [...visited].filter(id => id !== startId);
     };
     const traceMaterial = materialId => {
-      if (!materialById.has(materialId)) return { found: false, material_id: materialId, ancestors: [], descendants: [], strains: [], events: [], unresolved_material_ids: [] };
+      if (!materialById.has(materialId)) return {
+        found: false, material_id: materialId, ancestors: [], descendants: [],
+        source_materials: [], lineage_strains: [], strains: [],
+        confirmed_composition: [], composition_status: "not_assessed",
+        events: [], unresolved_material_ids: []
+      };
       const ancestorIds = traverse(materialId, incoming, "parent_material_id");
       const descendantIds = traverse(materialId, outgoing, "child_material_id");
       const relatedIds = [materialId, ...ancestorIds];
@@ -777,9 +782,9 @@
             [...inheritedStrains.values()].map(source =>
               [source.label, source.origin ? "Origine : " + source.origin : null, source.supplier ? "Fournisseur : " + source.supplier : null].filter(Boolean).join(" · ")
             ).join(" ; ")));
-          item.append(element("small", "signal-lineage-composition",
-            "Composition biologique confirmée : non évaluée (aucun résultat analytique structuré associé)."));
         }
+        item.append(element("small", "signal-lineage-composition",
+          "Composition biologique confirmée : non évaluée (aucun résultat analytique structuré associé)."));
         const linkedBatches = lineage.batches.filter(batch => batch.material_id === material.id);
         if (linkedBatches.length) item.append(element("small", "signal-lineage-batches", "Lots matière : " +
           linkedBatches.map(batch => [batch.batch_code, batch.status, batch.current_stage].filter(Boolean).join(" / ")).join(", ")));
