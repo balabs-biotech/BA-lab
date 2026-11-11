@@ -2789,3 +2789,19 @@ body[data-domain] :is(button, input, select, textarea, a, [tabindex]):focus-visi
   outline: 3px solid var(--focus) !important;
   outline-offset: 3px;
 }
+
+/* BAL-JSON import: compact, readable scientific record preview. */
+.bal-json-import { margin-top: 22px; }
+.bal-json-import > summary { font-weight: 700; cursor: pointer; }
+.bal-json-import textarea { width: 100%; min-height: 150px; font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: 13px; line-height: 1.5; }
+.bal-json-import .row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
+.bal-json-import button:disabled { opacity: .5; cursor: not-allowed; }
+.bal-json-preview { white-space: pre-wrap; overflow-wrap: anywhere; padding: 14px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface-2); color: var(--text); font: 13px/1.6 ui-monospace, SFMono-Regular, Consolas, monospace; }
+.bal-json-preview:empty { display: none; }
+#balJsonImportStatus[data-state="error"] { color: var(--err); }
+#balJsonImportStatus[data-state="success"] { color: var(--ok); }
+#balJsonImportStatus[data-state="pending"] { color: var(--brand); }
+@media (max-width: 600px) {
+  .bal-json-import .row { flex-direction: column; }
+  .bal-json-import .row button { width: 100%; }
+}
