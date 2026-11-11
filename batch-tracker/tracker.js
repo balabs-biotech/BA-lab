@@ -64,16 +64,63 @@ window.BA_LABS_ASSESS_BIOLOGICAL_MEASUREMENT = async ({ cultureId, measurement, 
       raw_measurement_modified: false,
     };
   }
+
+  const domain = window.BA_LABS_DOMAIN || document.body.dataset.domain;
+  const activeOrganizationId = organizationId;
+  let candidateRules = rules;
+  let ruleStoreStatus = "provided_by_caller";
+
+  if (!Array.isArray(candidateRules)) {
+    const store = window.BALabsBiologicalRuleStore;
+    if (!store || typeof store.loadExecutableRules !== "function") {
+      return {
+        status: "insufficient_context",
+        reason: "biological_rule_store_unavailable",
+        context_status: contextResult.status,
+        assessment: null,
+        raw_measurement_modified: false,
+      };
+    }
+    const loaded = await store.loadExecutableRules({
+      client: supabaseClient,
+      organizationId: activeOrganizationId,
+      domain,
+      variableCode: measurement && measurement.variable_code,
+      unitCode: measurement && measurement.assessed_unit_code,
+    });
+    if (loaded.status !== "loaded") {
+      return {
+        status: loaded.status,
+        reason: loaded.reason,
+        context_status: contextResult.status,
+        assessment: null,
+        raw_measurement_modified: false,
+      };
+    }
+    if (!isCurrentWorkspaceRevision(authStateRevision, activeOrganizationId)) {
+      return {
+        status: "stale_context",
+        reason: "workspace_changed_during_rule_load",
+        context_status: contextResult.status,
+        assessment: null,
+        raw_measurement_modified: false,
+      };
+    }
+    candidateRules = loaded.rules;
+    ruleStoreStatus = loaded.status;
+  }
+
   const result = engine.assess({
-    domain: window.BA_LABS_DOMAIN || document.body.dataset.domain,
+    domain,
     measurement,
     context: contextResult.context,
-    rules,
+    rules: candidateRules,
   });
   return Object.freeze({
     ...result,
     context_status: contextResult.status,
     context_missing_fields: contextResult.missing_fields || [],
+    rule_store_status: ruleStoreStatus,
   });
 };
 
