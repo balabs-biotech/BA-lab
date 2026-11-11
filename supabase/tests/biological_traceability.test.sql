@@ -130,6 +130,19 @@ begin
     '{"purpose":"multi-strain inoculum"}'::jsonb
   );
   mixed_material_id := (mix_result->>'material_id')::uuid;
+  -- A mixture must have at least two distinct source materials.
+  caught := false;
+  begin
+    perform public.create_biological_material_mixture(
+      '00000000-0000-0000-0000-0000000000a1',
+      array[source_material_ids[1]],
+      'mixing','SINGLE-SOURCE-MIX',now(),null,'{}'::jsonb
+    );
+  exception when others then
+    if sqlerrm='material_mixture_requires_multiple_sources' then caught := true; else raise; end if;
+  end;
+  if not caught then raise exception 'FAIL: single-source mixture was accepted'; end if;
+
   caught := false;
   begin
     perform public.create_biological_material_mixture(
