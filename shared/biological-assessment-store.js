@@ -12,6 +12,7 @@
         !input.client.auth || typeof input.client.auth.getUser !== "function" ||
         typeof input.organizationId !== "string" || !input.organizationId.trim() ||
         typeof input.measurementId !== "string" || !input.measurementId.trim() ||
+        typeof input.idempotencyKey !== "string" || !/^[0-9a-f-]{36}$/i.test(input.idempotencyKey) ||
         !input.result || !ALLOWED.has(input.result.status) ||
         !input.measurementSnapshot || !input.contextSnapshot ||
         !input.resolutionSnapshot || !input.resultSnapshot) {
@@ -37,6 +38,7 @@
       p_context_snapshot: contextSnapshot,
       p_resolution_snapshot: input.resolutionSnapshot,
       p_result_snapshot: input.resultSnapshot,
+      p_idempotency_key: input.idempotencyKey,
     });
     if (error || typeof data !== "string" || !data) {
       return Object.freeze({ status: "unavailable", reason: "assessment_record_write_failed", id: null });
