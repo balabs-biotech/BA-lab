@@ -78,7 +78,8 @@ function harness({ domain = "mycology", organizationId = "a0a0a0a0-0000-4000-800
 }
 
 {
-  const { elements, calls, refreshCalls } = harness();
+  const h = harness();
+  const { elements, calls } = h;
   elements.get("balJsonImportSource").value = JSON.stringify(makeRecord());
   elements.get("balJsonPreviewButton").click();
   await elements.get("balJsonImportButton").click();
@@ -86,7 +87,7 @@ function harness({ domain = "mycology", organizationId = "a0a0a0a0-0000-4000-800
   assert.equal(calls[0].name, "bal-json-ingest");
   assert.equal(calls[0].options.body.record_id, "d0d0d0d0-0000-4000-8000-000000000001");
   assert.match(elements.get("balJsonImportStatus").textContent, /enregistré/i);
-  assert.equal(refreshCalls, 1, "successful import must refresh the experimental history");
+  assert.equal(h.refreshCalls, 1, "successful import must refresh the experimental history");
 }
 
 {
@@ -115,4 +116,33 @@ function harness({ domain = "mycology", organizationId = "a0a0a0a0-0000-4000-800
   assert.equal(calls.length, 0);
 }
 
-console.log("✓ BAL-JSON import UI: domain scope, preview, tenant guard, contract version and explicit authenticated submission");
+{
+  const { elements, calls } = harness();
+  const invalid = makeRecord({ data: { ...makeRecord().data, raw_value: null } });
+  elements.get("balJsonImportSource").value = JSON.stringify(invalid);
+  elements.get("balJsonPreviewButton").click();
+  assert.equal(elements.get("balJsonImportButton").disabled, true, "null must not coerce to a numeric zero");
+  assert.equal(calls.length, 0);
+}
+
+{
+  const { elements, calls } = harness();
+  elements.get("balJsonImportSource").value = JSON.stringify(makeRecord());
+  elements.get("balJsonPreviewButton").click();
+  elements.get("balJsonImportSource").value = JSON.stringify(makeRecord({ data: { ...makeRecord().data, raw_value: 26 } }));
+  await elements.get("balJsonImportButton").click();
+  assert.equal(calls.length, 0, "changed content must invalidate the reviewed preview");
+  assert.equal(elements.get("balJsonImportButton").disabled, true);
+  assert.match(elements.get("balJsonImportStatus").textContent, /changé depuis l’aperçu/i);
+}
+
+{
+  const { elements, calls } = harness({ result: { status: "duplicate", event_id: "e0e0e0e0-0000-4000-8000-000000000001" } });
+  elements.get("balJsonImportSource").value = JSON.stringify(makeRecord());
+  elements.get("balJsonPreviewButton").click();
+  await elements.get("balJsonImportButton").click();
+  assert.equal(calls.length, 1);
+  assert.match(elements.get("balJsonImportStatus").textContent, /déjà été importée/i);
+}
+
+console.log("✓ BAL-JSON import UI: domain scope, strict preview, tenant guard, stale-preview rejection, duplicate handling and explicit authenticated submission");
