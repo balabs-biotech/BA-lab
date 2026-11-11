@@ -9,6 +9,7 @@
 
   async function record(input) {
     if (!input || !input.client || typeof input.client.rpc !== "function" ||
+        !input.client.auth || typeof input.client.auth.getUser !== "function" ||
         typeof input.organizationId !== "string" || !input.organizationId.trim() ||
         typeof input.measurementId !== "string" || !input.measurementId.trim() ||
         !input.result || !ALLOWED.has(input.result.status) ||
