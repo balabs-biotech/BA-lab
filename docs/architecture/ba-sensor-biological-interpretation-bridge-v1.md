@@ -124,14 +124,27 @@ search path and no direct EXECUTE grant to API roles. This is required so the
 integrity check sees all rows in the tenant scope even when RLS is active; the
 caller still needs the existing writer policy to modify the row.
 
+A profile with an open-ended validity period must be closable when its
+replacement is activated. Migration
+`20261111042631_allow_profile_validity_closure_on_retirement.sql` therefore
+allows exactly one lifecycle exception: an `active` profile may become
+`retired` while setting a finite `valid_to` date. The date may only shorten an
+existing finite window; scientific/configuration fields remain immutable, a
+retired profile cannot be reactivated, and the normal overlap trigger validates
+the shortened interval before the update is accepted.
+
 The live regression probe first demonstrated the defect: two active
 environment profiles with different codes and overlapping dates were accepted
 (the transaction was rolled back). After migration, transactional probes
 confirmed that an inclusive boundary overlap is rejected for environment
 profiles, an overlapping domain profile is rejected, and a sequential
 non-overlapping environment profile is accepted. All probe rows were rolled
-back. These checks validate the database trigger behavior; they do not replace
-the Python test suite or a full authenticated API end-to-end request.
+back. Additional transactional probes confirmed that an open-ended active profile
+can be retired with a finite end date, its scientific fields cannot be changed
+during retirement, and a non-overlapping successor can then be activated. All
+probe rows were rolled back. These checks validate the database trigger
+behavior; they do not replace the Python test suite or a full authenticated API
+end-to-end request.
 
 ## Verification status
 
