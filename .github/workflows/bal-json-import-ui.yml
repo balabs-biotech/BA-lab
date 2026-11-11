@@ -20,6 +20,7 @@ on:
       - "scripts/test-biological-rule-resolver.mjs"
       - "scripts/test-biological-context-adapter.mjs"
       - "scripts/test-biological-context-loader.mjs"
+      - "scripts/test-biological-context-pipeline.mjs"
       - "schemas/biological-rules/**"
       - "scripts/test-biological-rule-schema.mjs"
       - "scripts/test-biological-rule-resolver.mjs"
@@ -72,6 +73,8 @@ jobs:
         run: node scripts/test-bal-normalizer.mjs
       - name: Validate versioned biological rule schema
         run: node scripts/test-biological-rule-schema.mjs
+      - name: Test context-to-rule biological pipeline
+        run: node scripts/test-biological-context-pipeline.mjs
       - name: Test tenant-scoped biological context loader
         run: node scripts/test-biological-context-loader.mjs
       - name: Test BAL-Core biological context adapter
