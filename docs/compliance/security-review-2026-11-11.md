@@ -80,7 +80,7 @@ La table `public.events` est un journal de traçabilité biologique avec des pol
 - [ ] Ajouter les tests SQL d'isolation multi-tenant, d'interdiction UPDATE/DELETE et de validation des versions documentaires.
 
 
-## Contrôle complémentaire Supabase — 11 novembre 2026, 15:xx UTC
+## Contrôle complémentaire Supabase — 11 novembre 2026
 
 Le contrôle des Advisors et des privilèges effectifs confirme les points suivants :
 
