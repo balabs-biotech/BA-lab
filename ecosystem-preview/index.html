@@ -4188,4 +4188,79 @@ html,body{background:var(--bal-petrol)!important;color:var(--bal-mineral)!import
    the overlay's own action buttons remain interactive. */
 #mainView.webgl-ready .webgl-focus{pointer-events:none!important}
 #mainView.webgl-ready .webgl-focus button{pointer-events:auto!important}
+
+
+/* Phase 3 parity: responsive editorial shell for the isolated preview.
+   Preserve the preview's light mineral paper palette and its own 3D engine. */
+.wrap > .top .lang {
+  min-width:44px!important;min-height:44px!important;
+  display:inline-flex!important;align-items:center!important;justify-content:center!important;
+  padding:9px 12px!important;font-size:.75rem!important;font-weight:700!important;
+}
+.wrap > main > .hero h1 {max-width:12ch!important;line-height:.98!important;text-wrap:balance!important}
+.wrap > main > .hero p {max-width:58ch!important;line-height:1.75!important}
+.wrap > main > .editorial-work,
+.wrap > main > .universe-index,
+.wrap > main > .editorial-method {
+  padding-block:clamp(3.25rem,7vw,6rem)!important;
+  padding-inline:clamp(1.125rem,5vw,4rem)!important;
+}
+.wrap > main > .editorial-work .work-heading,
+.wrap > main > .universe-index .universe-index-heading {
+  max-width:74rem!important;margin-inline:auto!important;
+  margin-bottom:clamp(1.5rem,3vw,2.5rem)!important;
+}
+.wrap > main > .editorial-work .work-heading h2,
+.wrap > main > .universe-index .universe-index-heading h2,
+.wrap > main > .editorial-method h2 {
+  max-width:17ch!important;line-height:1.04!important;text-wrap:balance!important;
+}
+.wrap > main > .editorial-work .work-grid {
+  width:min(100%,74rem)!important;margin-inline:auto!important;
+  display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  align-items:stretch!important;gap:clamp(.85rem,1.6vw,1.35rem)!important;
+}
+.wrap > main > .editorial-work .work-card {
+  min-width:0!important;min-height:100%!important;overflow:hidden!important;
+}
+.wrap > main > .editorial-work .work-media img {
+  width:100%!important;aspect-ratio:16/10!important;object-fit:cover!important;
+}
+.wrap > main > .editorial-work .work-card h3 {line-height:1.18!important;text-wrap:balance!important}
+.wrap > main > .editorial-work .work-card p {line-height:1.65!important}
+.wrap > main > .universe-index .universe-index-grid {
+  width:min(100%,74rem)!important;margin-inline:auto!important;align-items:stretch!important;
+}
+.wrap > main > .universe-index .universe-index-card {
+  min-width:0!important;min-height:100%!important;text-align:start!important;overflow-wrap:anywhere!important;
+}
+.wrap > main > .site-nav a {
+  min-height:44px!important;display:inline-flex!important;align-items:center!important;padding-block:12px!important;
+}
+.wrap > .top .lang:focus-visible,
+.wrap > main > .site-nav a:focus-visible,
+.wrap > main > .editorial-work a:focus-visible,
+.wrap > main > .universe-index a:focus-visible,
+.wrap > .foot a:focus-visible {
+  outline:3px solid #B96B4D!important;outline-offset:4px!important;
+}
+.wrap[dir="rtl"] > main > .hero .aside {
+  border-left:0!important;border-right:2px solid #B96B4D!important;
+  padding-left:0!important;padding-right:1.125rem!important;
+}
+@media(max-width:900px) {
+  .wrap > main > .editorial-work .work-grid {grid-template-columns:repeat(2,minmax(0,1fr))!important}
+}
+@media(max-width:640px) {
+  .wrap > main > .hero {padding:3rem 1.125rem 2.5rem!important}
+  .wrap > main > .hero h1 {max-width:11ch!important;font-size:clamp(2.7rem,13vw,4.25rem)!important}
+  .wrap > main > .editorial-work,
+  .wrap > main > .universe-index,
+  .wrap > main > .editorial-method {padding:3rem 1.125rem!important}
+  .wrap > main > .editorial-work .work-grid {grid-template-columns:minmax(0,1fr)!important;gap:1rem!important}
+  .wrap > main > .editorial-work .work-card {width:100%!important}
+}
+@media(prefers-reduced-motion:reduce) {
+  .wrap > main > .universe-index .universe-index-card {transition:none!important}
+}
 </style>
