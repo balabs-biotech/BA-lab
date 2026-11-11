@@ -294,6 +294,9 @@ function syncResourceHitTargets() {
  if(!_hitWorld)_hitWorld=new THREE.Vector3();
  camera.updateMatrixWorld(true);world?.updateMatrixWorld(true);
  const rect=renderer.domElement.getBoundingClientRect(),stageRect=stage.getBoundingClientRect();
+ let leaderLayer=stage.querySelector('.webgl-label-leaders');
+ if(!leaderLayer){leaderLayer=document.createElementNS('http://www.w3.org/2000/svg','svg');leaderLayer.classList.add('webgl-label-leaders');Object.assign(leaderLayer.style,{position:'absolute',inset:'0',width:'100%',height:'100%',overflow:'visible',pointerEvents:'none',zIndex:'11000'});stage.prepend(leaderLayer);}
+ leaderLayer.setAttribute('width',String(stageRect.width));leaderLayer.setAttribute('height',String(stageRect.height));leaderLayer.replaceChildren();
  const projected=[];
  const project=(object,button)=>{
   object.getWorldPosition(_hitWorld);const p=_hitWorld.clone().project(camera);
@@ -341,6 +344,11 @@ function syncResourceHitTargets() {
    button.dataset.labelCrowded=String((chosen.conflicts||0)>0);
   }
   occupied.push(chosen.box);
+  const endX=Math.max(chosen.box.l,Math.min(chosen.box.r,item.x)),endY=Math.max(chosen.box.t,Math.min(chosen.box.b,item.y)),leaderLength=Math.hypot(endX-item.x,endY-item.y);
+  if(leaderLength>26){
+   const line=document.createElementNS('http://www.w3.org/2000/svg','line');line.setAttribute('x1',String(item.x));line.setAttribute('y1',String(item.y));line.setAttribute('x2',String(endX));line.setAttribute('y2',String(endY));line.setAttribute('stroke','#B96B4D');line.setAttribute('stroke-width','1.25');line.setAttribute('stroke-linecap','round');line.setAttribute('opacity','.78');line.setAttribute('vector-effect','non-scaling-stroke');leaderLayer.append(line);
+   const anchor=document.createElementNS('http://www.w3.org/2000/svg','circle');anchor.setAttribute('cx',String(item.x));anchor.setAttribute('cy',String(item.y));anchor.setAttribute('r','2');anchor.setAttribute('fill','#D1D0C5');anchor.setAttribute('opacity','.9');leaderLayer.append(anchor);
+  }
   button.style.setProperty('z-index',String(12000+Math.round((1-item.p.z)*100)),'important');
   button.style.left=chosen.cx+'px';button.style.top=chosen.cy+'px';
  }
