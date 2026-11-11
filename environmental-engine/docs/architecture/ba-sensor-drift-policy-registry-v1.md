@@ -88,11 +88,14 @@ assessments as drift alerts and labels them as requiring metrological review.
 ## CultureOps policy management
 
 The Mycology and Laboratory workspaces expose a dedicated reference-policy
-manager alongside sensor analysis. It resolves eligible devices through the
-`list_sensor_drift_management_devices` RPC, which is executable only by an
-authenticated organization writer. The function returns only enabled devices
-bound to the active sensor-origin environment profile; the browser has no
-SELECT grant on `iot_devices` and does not query that registry directly.
+manager alongside sensor analysis. It resolves profile/device context through
+the `list_sensor_drift_management_devices` RPC, which is executable only by an
+authenticated organization writer. The function returns device labels and
+enabled state only for the active sensor-origin profile, or the latest retired
+sensor profile when no active profile remains. Draft creation is restricted to
+an active profile and at least two enabled devices; retired-profile context
+remains available to inspect and retire historical policies. The browser has
+no SELECT grant on `iot_devices` and does not query that registry directly.
 
 The manager creates draft policies using the active profile validity interval,
 then performs reference verification and activation as separate authenticated
