@@ -226,8 +226,12 @@ declare
   v_existing public.biological_recommendations%rowtype;
   v_events jsonb;
 begin
-  -- EXECUTE is granted only to service_role below. The function is
-  -- SECURITY DEFINER, so current_user is not a reliable caller identity here.
+  -- The signed JWT role is checked explicitly because SECURITY DEFINER changes
+  -- current_user to the function owner. This endpoint is server-only.
+  if coalesce(auth.jwt() ->> 'role', '') <> 'service_role' then
+    raise exception 'biological_recommendation_create_forbidden'
+      using errcode = '42501';
+  end if;
 
   if p_proposal_status is null or p_proposal_status not in ('proposed', 'withheld')
      or p_withholding_reasons is null
