@@ -233,7 +233,12 @@ const provenance = buildProvenanceIndex({
     { id: "source-b", material_code: "B", strain_id: "strain-b", strain: { id: "strain-b", strain_code: "B1", organism: { scientific_name: "Species B" } } },
     { id: "mixture", material_code: "MIX-01", strain_id: null }
   ],
-  relationships: [],
+  // The SQL graph and event payload intentionally describe the same source pairs.
+  // Traversal must count each parent→mixture edge once, while retaining event evidence.
+  relationships: [
+    { parent_material_id: "source-a", child_material_id: "mixture", relationship_type: "consortium_assembly" },
+    { parent_material_id: "source-b", child_material_id: "mixture", relationship_type: "consortium_assembly" }
+  ],
   cultures: [],
   events: [{
     id: "mix-event",
@@ -249,7 +254,9 @@ assert.equal(mixtureTrace.found, true);
 assert.deepEqual(new Set(mixtureTrace.ancestors.map(item => item.id)), new Set(["source-a", "source-b"]));
 assert.equal(mixtureTrace.strains.length, 2, "a multi-source output must retain both contributing strains");
 assert.equal(provenance.summarize().operation_source_edge_count, 2);
-assert.equal(provenance.summarize().multi_parent_count, 1);
+assert.equal(provenance.summarize().relationship_count, 2, "persisted edges and event evidence must not double-count graph relationships");
+assert.equal(provenance.summarize().multi_parent_count, 1, "a multi-source output must count unique contributing parents");
+assert.equal(mixtureTrace.ancestors.length, 2, "duplicate event and relationship evidence must not duplicate ancestors");
 assert.ok(provenance.traceMaterial("source-a").descendants.some(item => item.id === "mixture"),
   "source trace must discover the mixture output");
 
