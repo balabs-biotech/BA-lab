@@ -302,6 +302,14 @@ assert.match(moduleSource, /confidence: null/);
 assert.match(moduleSource, /confirmation_status: "unconfirmed"/);
 assert.match(moduleSource, /composition_status: "not_assessed"/);
 assert.match(moduleSource, /finding_count: findings\.length/);
+assert.match(moduleSource, /const biologicalContext =/);
+assert.match(moduleSource, /current_stage: currentBatch\?\.current_stage/);
+assert.match(moduleSource, /generation: culture\?\.material\?\.generation/);
+assert.match(moduleSource, /organism_name: culture\?\.material\?\.strain\?\.organism\?\.scientific_name/);
+assert.match(moduleSource, /causal_relationship_established: false/);
+assert.match(moduleSource, /biological_context: biologicalContext/);
+assert.match(moduleSource, /environmental_context: environmentalSummary/);
+
 assert.match(moduleSource, /source_observation_ids,variable_code,observed_date/);
 
 assert.match(moduleSource, /composition_status: "not_assessed"/);
