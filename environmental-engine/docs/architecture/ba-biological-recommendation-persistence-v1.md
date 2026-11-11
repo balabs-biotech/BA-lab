@@ -215,6 +215,19 @@ the interpretation, stored signals, resolution and stored recommendation
 aggregates as one application result. The stages remain independently
 injectable and testable.
 
+The private FastAPI analysis boundary now returns a
+`recommendation_resolution` alongside the biological interpretation. Both
+authenticated Supabase gateways (daily NASA POWER and IoT sensor analysis)
+resolve the recommendation definitions from the tenant-scoped versioned
+profile registry, persist signal rows first, then call the restricted
+`create_biological_recommendation` RPC for each proposal. The gateway verifies
+that every proposal points to a signal from the same response and matches its
+analysis, finding, recommendation code and profile version before the RPC.
+Withheld proposals are persisted as audit records; no recommendation is
+automatically executed. Each RPC call is atomic and idempotent, while a batch
+of proposals is intentionally replayable rather than one cross-proposal
+transaction.
+
 ## Application orchestration
 
 `RecommendationService` coordinates the pure lifecycle transition with the repository port:
