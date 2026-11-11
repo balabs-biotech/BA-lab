@@ -4,6 +4,7 @@ from uuid import uuid4
 from ba_environmental_engine.contexts.biological import BiologicalContext, BiologicalDomain
 from ba_environmental_engine.contexts.environment import EnvironmentContext, EnvironmentType, ObservationOrigin
 from ba_environmental_engine.execution import run_environmental_analysis
+from ba_environmental_engine.interpretation.signal_service import BiologicalSignalService
 from ba_environmental_engine.interpretation import (
     interpret_findings,
     interpret_analysis_for_biological_context,
@@ -566,3 +567,78 @@ def test_biological_context_must_cover_the_complete_analysis_scope():
             biological,
             environment,
         )
+
+
+class RecordingBiologicalSignalRepository:
+    def __init__(self):
+        self.calls = []
+
+    def persist_interpretation(
+        self, *, organization_id, interpretation, biological_context, environment_context
+    ):
+        self.calls.append(
+            (organization_id, interpretation, biological_context, environment_context)
+        )
+        return tuple({"signal_id": str(signal.signal_id)} for signal in interpretation.signals)
+
+
+def test_biological_signal_service_interprets_then_persists_same_signal_batch():
+    analysis = make_analysis()
+    biological, environment = make_persisted_context_for_analysis(analysis)
+    profile = DomainProfile(
+        profile_id="mycology-persisted-v1",
+        module="mycology",
+        version="1.0.0",
+        rules=(
+            InterpretationRule(
+                rule_id="temperature-review",
+                variable_code="air_temperature_mean",
+                finding_status="suspect",
+                required_context_tags=frozenset({"stage:fruiting"}),
+                signal_code="environmental_review",
+                severity="high",
+                message_code="temperature_deviation_review",
+            ),
+        ),
+    )
+    repository = RecordingBiologicalSignalRepository()
+    service = BiologicalSignalService(repository)
+
+    interpretation, persisted = service.interpret_and_persist(
+        analysis=analysis,
+        profile=profile,
+        biological_context=biological,
+        environment_context=environment,
+    )
+
+    assert interpretation.matched_findings == 1
+    assert len(persisted) == 1
+    assert persisted[0]["signal_id"] == str(interpretation.signals[0].signal_id)
+    assert repository.calls == [
+        (analysis.scope.organization_id, interpretation, biological, environment)
+    ]
+
+
+def test_biological_signal_service_does_not_persist_invalid_context_binding():
+    import pytest
+
+    analysis = make_analysis()
+    biological, environment = make_persisted_context_for_analysis(analysis)
+    foreign_environment = environment.model_copy(update={"context_id": uuid4()})
+    profile = DomainProfile(
+        profile_id="mycology-persisted-v1",
+        module="mycology",
+        version="1.0.0",
+        rules=(),
+    )
+    repository = RecordingBiologicalSignalRepository()
+
+    with pytest.raises(ValueError, match="binding must match"):
+        BiologicalSignalService(repository).interpret_and_persist(
+            analysis=analysis,
+            profile=profile,
+            biological_context=biological,
+            environment_context=foreign_environment,
+        )
+
+    assert repository.calls == []
