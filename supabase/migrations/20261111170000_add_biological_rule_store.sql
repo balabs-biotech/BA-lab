@@ -57,7 +57,7 @@ create or replace function private.guard_biological_rule_version()
 returns trigger
 language plpgsql
 security invoker
-set search_path = pg_catalog, public, private
+set search_path = pg_catalog, public, private, auth
 as $$
 begin
   if tg_op = 'DELETE' then
@@ -67,8 +67,18 @@ begin
     return old;
   end if;
 
-  if tg_op = 'UPDATE' and old.status <> 'draft' then
-    raise exception 'biological_rule_version_immutable' using errcode = '55000';
+  if tg_op = 'UPDATE' then
+    if old.status <> 'draft' then
+      raise exception 'biological_rule_version_immutable' using errcode = '55000';
+    end if;
+    if new.organization_id is distinct from old.organization_id
+       or new.id is distinct from old.id
+       or new.rule_id is distinct from old.rule_id
+       or new.version is distinct from old.version
+       or new.created_by is distinct from old.created_by
+       or new.created_at is distinct from old.created_at then
+      raise exception 'biological_rule_version_identity_immutable' using errcode = '55000';
+    end if;
   end if;
 
   if new.status = 'reviewed' then
