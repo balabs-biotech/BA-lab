@@ -132,6 +132,38 @@
           "description": "Conceitos de fermentadores modulares e processos-piloto em desenvolvimento, distinguindo desenhos de equipamentos construídos e validados.",
           "url": "https://app.notion.com/p/40173152f17181f19424c0aee1e7a863",
           "children": []
+        },
+        {
+          "id": "pt-soil-equipment",
+          "title": "Equipamentos experimentais",
+          "notionId": "40173152f171815692d6c55cd7032b94",
+          "url": "https://app.notion.com/p/40173152f171815692d6c55cd7032b94",
+          "description": "Equipamentos e dispositivos para investigação e experimentação.",
+          "children": []
+        },
+        {
+          "id": "pt-soil-substrates",
+          "title": "Preparação de substratos",
+          "notionId": "40173152f17181628dace7026da068a9",
+          "url": "https://app.notion.com/p/40173152f17181628dace7026da068a9",
+          "description": "Preparação de suportes biológicos considerando granulometria, humidade e estrutura.",
+          "children": []
+        },
+        {
+          "id": "pt-soil-prototyping",
+          "title": "Prototipagem e fabrico",
+          "notionId": "40173152f1718136afe3fd533c629c64",
+          "url": "https://app.notion.com/p/40173152f1718136afe3fd533c629c64",
+          "description": "Conceção, adaptação, fabrico e ensaio de dispositivos para I&D.",
+          "children": []
+        },
+        {
+          "id": "pt-soil-instrumentation",
+          "title": "Instrumentação integrada",
+          "notionId": "40173152f171819b8edfc928072a23a0",
+          "url": "https://app.notion.com/p/40173152f171819b8edfc928072a23a0",
+          "description": "Integração de sensores e sistemas de controlo para observar processos biológicos.",
+          "children": []
         }
       ],
       "notionParentId": "hub"
@@ -185,11 +217,19 @@
       "url": "https://app.notion.com/p/40173152f17181fcadf1cd543c83ed60",
       "children": [
         {
+          "id": "pt-public-catalogue",
+          "title": "Catálogo público — recursos publicáveis",
+          "notionId": "d0fbe1d779344eb58bc240fe7876ae0e",
+          "url": "https://app.notion.com/p/d0fbe1d779344eb58bc240fe7876ae0e",
+          "description": "Catálogo público partilhado de recursos e produtos aprovados para publicação. Confirme o lote, a embalagem e a disponibilidade antes de qualquer fornecimento.",
+          "children": []
+        },
+        {
           "id": "pt-products-wa",
           "title": "WA — ágar-água pronto a usar",
           "notionId": "40173152f1718141b796f246eb142532",
           "url": "https://app.notion.com/p/40173152f1718141b796f246eb142532",
-          "description": "Recurso de ágar-água pronto a usar.",
+          "description": "WA (ágar-água): suporte gelificado pobre em nutrientes, preparado em placas de Petri. Disponível sob pedido conforme o lote; quantidade, diâmetro, embalagem, preço e conservação são confirmados antes do fornecimento.",
           "children": []
         },
         {
@@ -197,7 +237,7 @@
           "title": "Myco Start — protótipo de kit inicial de micologia",
           "notionId": "40173152f17181a284b6ecc1cda6a13e",
           "url": "https://app.notion.com/p/40173152f17181a284b6ecc1cda6a13e",
-          "description": "Página informativa do protótipo Myco Start.",
+          "description": "Protótipo educativo em desenvolvimento — não disponível para venda. O conteúdo, o recurso atribuído, os controlos de qualidade e a conservação ainda precisam de ser definidos e verificados.",
           "children": []
         },
         {
@@ -205,7 +245,7 @@
           "title": "Myco Plate — protótipo de kit de observação em ágar",
           "notionId": "40173152f17181669030d583da31ce13",
           "url": "https://app.notion.com/p/40173152f17181669030d583da31ce13",
-          "description": "Página informativa do protótipo Myco Plate.",
+          "description": "Protótipo de observação em definição — não disponível para venda. O suporte, o recurso biológico, a rastreabilidade do lote e os controlos ainda precisam de ser especificados e verificados.",
           "children": []
         },
         {
@@ -234,14 +274,6 @@
           "children": []
         },
         {
-          "id": "pt-work-collaborate",
-          "title": "Colaborar com a BA Labs",
-          "notionId": "40173152f17181f194deca033c534128",
-          "url": "https://app.notion.com/p/40173152f17181f194deca033c534128",
-          "description": "Como apresentar uma necessidade e preparar uma colaboração.",
-          "children": []
-        },
-        {
           "id": "pt-work-measurement",
           "title": "Medição e reprodutibilidade",
           "notionId": "40273152f1718150b2beccb7c12d0792",
@@ -266,25 +298,25 @@
       "description": "Recursos públicos para explorar o trabalho documentado, compreender os limites da evidência e conhecer as formas de colaborar com a BA Labs.",
       "children": [
         {
-          "id": "learn-work",
-          "title": "Trabalho documentado e projetos",
-          "url": "https://app.notion.com/p/40173152f171818fb366e51fc9ba0f18",
-          "children": []
-        },
-        {
-          "id": "learn-evidence",
-          "title": "O que a evidência demonstra atualmente",
+          "id": "learn-resource-1",
+          "title": "Trabalho documentado",
           "url": "https://app.notion.com/p/40173152f17181b08d08fdfb8e7eca54",
           "children": []
         },
         {
-          "id": "learn-catalogue",
-          "title": "Catálogo público — recursos biológicos",
-          "url": "https://app.notion.com/p/40173152f17181fcadf1cd543c83ed60",
+          "id": "learn-resource-2",
+          "title": "Evidências e medição",
+          "url": "https://app.notion.com/p/40273152f1718150b2beccb7c12d0792",
           "children": []
         },
         {
-          "id": "learn-collaborate",
+          "id": "learn-resource-3",
+          "title": "Catálogo público",
+          "url": "https://app.notion.com/p/d0fbe1d779344eb58bc240fe7876ae0e",
+          "children": []
+        },
+        {
+          "id": "learn-resource-4",
           "title": "Colaborar com a BA Labs",
           "url": "https://app.notion.com/p/40173152f17181f194deca033c534128",
           "children": []

@@ -6,8 +6,200 @@ const previewHtml = readFileSync('ecosystem-preview/index.html', 'utf8');
 const engine = readFileSync('ecosystem/engine-v2.js', 'utf8');
 const previewEngine = readFileSync('ecosystem-preview/engine-v2.js', 'utf8');
 const expectedDomains = ['bio', 'myco', 'soil', 'lab', 'products', 'iot', 'work', 'learn'];
+const brandCss = readFileSync('ecosystem/brand-system.css', 'utf8');
+assert.ok(html.includes('<link rel="stylesheet" href="./brand-system.css?v=1">'), 'Public homepage must load the BA Labs visual system');
+assert.ok(html.includes('<div class="wrap balabs-ui" id="app"'), 'Public homepage must opt into the BA Labs visual system');
+for (const section of ['hero', 'editorial-feature', 'editorial-about', 'editorial-work', 'universe-index', 'editorial-method']) {
+  assert.ok(brandCss.includes('#app.balabs-ui > main > .' + section), 'Visual system must target the actual main landmark child: ' + section);
+  assert.ok(!brandCss.includes('#app.balabs-ui > .' + section), 'Visual system must not target ' + section + ' as a direct app child');
+}
+assert.ok(brandCss.includes('#app.balabs-ui > .top'), 'Header styling must remain scoped to the app header');
+assert.ok(brandCss.includes('#app.balabs-ui > .foot'), 'Footer styling must remain scoped to the app footer');
+const editorialSections = ['hero', 'editorial-feature', 'editorial-about', 'editorial-work', 'universe-index', 'editorial-method', 'universe-bridge', 'scene'];
+for (const section of editorialSections) {
+  assert.match(html, new RegExp('#app\\s*>\\s*main\\s*>\\s*\\.' + section + '\\b'), 'Inline layout rules must target the nested main section: ' + section);
+  assert.doesNotMatch(html, new RegExp('#app\\s*>\\s*\\.' + section + '\\b'), 'No layout rule may target ' + section + ' as a direct app child');
+}
+assert.ok(!brandCss.includes('NOT imported by ecosystem/index.html'), 'Brand stylesheet integration note must reflect the live import');
+for (const sectionId of ['chantiers', 'universe', 'universes']) {
+  assert.match(html, new RegExp('#app\\s*>\\s*main\\s*>\\s*#' + sectionId + '\\b'), 'Inline layout rules must target the nested main section ID: ' + sectionId);
+  assert.doesNotMatch(html, new RegExp('#app\\s*>\\s*#' + sectionId + '\\b'), 'No layout rule may target ' + sectionId + ' as a direct app child');
+}
+assert.ok(html.includes('#app.balabs-ui[dir="rtl"] .site-nav a:after'), 'RTL navigation underline must mirror its animation direction');
+assert.ok(html.includes('#app.balabs-ui[dir="rtl"] .editorial-link span'), 'RTL editorial arrows must mirror their visual direction');
+assert.ok(html.includes('#app.balabs-ui[dir="rtl"] .site-nav{'), 'RTL mobile navigation must retain right-to-left reading order');
 
+const homepageSequence = [
+  '<section class="hero"',
+  '<section class="editorial-work"',
+  '<section class="scene"',
+  '<section class="universe-index"',
+  '<section class="editorial-feature"',
+  '<section class="editorial-about"',
+  '<section class="editorial-method"',
+  '<section class="universe-bridge"',
+  '<section class="under"',
+].map((marker) => html.indexOf(marker));
+assert.ok(homepageSequence.every((position) => position >= 0), 'Homepage must retain every primary editorial and explorer section');
+assert.ok(homepageSequence.every((position, index) => index === 0 || position > homepageSequence[index - 1]), 'Homepage journey must prioritize the IoT-led work section, then the 3D explorer, then the eight-universe directory');
+for (const [before, after] of [
+  ['01 / CHAMPS D’EXPLORATION', '02 / Univers BALabs'],
+  ['01 / AREAS OF EXPLORATION', '02 / BALabs universe'],
+  ['01 / مجالات الاستكشاف', '02 / عالم BALabs'],
+  ['01 / ÁREAS DE EXPLORAÇÃO', '02 / Universo BALabs'],
+]) {
+  assert.ok(html.includes(before) && html.includes(after), 'Section numbering must reflect the new homepage journey: ' + before);
+}
+
+
+const languageTrees = Object.fromEntries(['fr', 'en', 'ar', 'pt'].map((language) => [
+  language,
+  JSON.parse(readFileSync('ecosystem/notion-tree.' + language + '.json', 'utf8')),
+]));
+for (const language of ['fr', 'en', 'ar', 'pt']) {
+  const ids = languageTrees[language].domains.map((domain) => domain.id).sort();
+  assert.deepEqual(ids, [...expectedDomains].sort(), language + ' manifest must expose exactly the eight public universes');
+}
+const englishAgrotechnology = languageTrees.en.domains.find((domain) => domain.id === 'soil');
+for (const id of [
+  '40173152f17181c0955ef6b706891bfa',
+  '40173152f171818bbe4adc44550b7913',
+  '40173152f171818daed1d22deb38a624',
+  '40173152f171813da2e3dafa7265dc6a',
+  '40173152f17181ce95cfcc669321cc1d',
+]) assert.ok(englishAgrotechnology.children.some((node) => node.notionId === id), 'English agrotechnology must expose every verified public child page');
+const arabicMycology = languageTrees.ar.domains.find((domain) => domain.id === 'myco');
+function containsNotionPage(nodes, id) {
+  return nodes.some((node) => node.notionId === id || (node.url || '').endsWith('/' + id) || containsNotionPage(node.children || [], id));
+}
+for (const id of ['40173152f1718101afcbdb364eb5d44a', '40173152f17181afb288feda1d2c3e5c']) {
+  assert.ok(containsNotionPage(arabicMycology.children, id), 'Arabic mycology must expose its verified cultivation and applications pages at any valid hierarchy depth');
+}
+const portugueseAgrotechnology = languageTrees.pt.domains.find((domain) => domain.id === 'soil');
+for (const id of [
+  '40173152f171815692d6c55cd7032b94',
+  '40173152f17181628dace7026da068a9',
+  '40173152f1718136afe3fd533c629c64',
+  '40173152f171819b8edfc928072a23a0',
+]) assert.ok(portugueseAgrotechnology.children.some((node) => node.notionId === id), 'Portuguese agrotechnology must expose every verified public child page');
+
+const englishBiotechnology = languageTrees.en.domains.find((domain) => domain.id === 'bio');
+const englishWork = languageTrees.en.domains.find((domain) => domain.id === 'work');
+assert.ok(englishBiotechnology.children.some((node) => node.notionId === '40173152f17181e1aa6eebe9f6c26c46'), 'English biotechnology universe must include the verified Plant micropropagation page linked from its public landing page');
+assert.ok(englishWork.children.some((node) => node.notionId === '40173152f17181baa905d6afb836f038'), 'English R&D universe must include the verified Documented work page linked from its public landing page');
+assert.ok(englishWork.children.some((node) => node.notionId === '40173152f1718173ae6bc8cce9f0ba52'), 'English R&D universe must include the verified Research and development page linked from its public landing page');
+
+function flattenManifest(node, out = []) {
+  out.push(node);
+  for (const child of node.children || []) flattenManifest(child, out);
+  return out;
+}
+for (const language of ['fr', 'en', 'ar', 'pt']) {
+  const tree = languageTrees[language];
+  const allIds = new Set();
+  for (const domain of tree.domains) {
+    const nodes = flattenManifest(domain);
+    for (const node of nodes) {
+      assert.ok(node.id && !allIds.has(node.id), language + ' manifest node IDs must be present and unique');
+      allIds.add(node.id);
+      if (node.url) {
+        const match = node.url.match(/^https:\/\/app\.notion\.com\/p\/([a-f0-9]{32})$/);
+        assert.ok(match, language + ' ' + node.id + ' must use a valid Notion page URL');
+        if (node.notionId) assert.equal(node.notionId, match[1], language + ' ' + node.id + ' notionId must match its URL');
+      } else {
+        assert.equal(node, domain, language + ' only a universe root may omit its own Notion URL');
+        assert.ok((node.children || []).length > 0, language + ' an unlinked universe root must still expose real child pages');
+      }
+    }
+  }
+}
+// Catalogue labels and supply claims must match the verified public Notion records.
+const frenchProducts = languageTrees.fr.domains.find((domain) => domain.id === 'products');
+const frenchWa = frenchProducts.children.find((node) => node.id === 'products-wa-agar');
+assert.equal(frenchWa.url, 'https://app.notion.com/p/3f473152f171812a814dd7b951786313', 'French WA must link to the canonical public catalogue record, not its internal working record');
+for (const [language, unavailablePhrase] of [['fr', 'non disponible à la vente'], ['en', 'not available for sale'], ['ar', 'غير متاح للبيع'], ['pt', 'não disponível para venda']]) {
+  const products = languageTrees[language].domains.find((domain) => domain.id === 'products');
+  const prototypes = products.children.filter((node) => /myco-(start|plate)/i.test(node.id));
+  assert.equal(prototypes.length, 2, language + ' must expose both Myco kit prototypes');
+  for (const prototype of prototypes) assert.ok((prototype.description || '').toLowerCase().includes(unavailablePhrase.toLowerCase()), language + ' ' + prototype.id + ' must clearly state that the prototype is not for sale');
+}
+const publicCatalogueLabels = {
+  fr: 'Catalogue public — Ressources publiables',
+  en: 'Public catalogue — publishable resources',
+  ar: 'الكتالوج العام — الموارد القابلة للنشر',
+  pt: 'Catálogo público — recursos publicáveis',
+};
+for (const language of ['fr', 'en', 'ar', 'pt']) {
+  const products = languageTrees[language].domains.find((domain) => domain.id === 'products');
+  const catalogue = (products?.children || []).find((node) => node.url === 'https://app.notion.com/p/d0fbe1d779344eb58bc240fe7876ae0e');
+  assert.ok(catalogue, language + ' products universe must expose the shared public catalogue directly');
+  assert.equal(catalogue.notionId, 'd0fbe1d779344eb58bc240fe7876ae0e', language + ' public catalogue must use the verified shared database page');
+  assert.equal(catalogue.title, publicCatalogueLabels[language], language + ' public catalogue entry must be localised');
+}
+for (const [label, source] of [['public', engine], ['preview', previewEngine]]) {
+  assert.ok(source.includes("fetch('./notion-tree.'+LANG()+'.json'") && source.includes("attributeFilter:['lang']"),
+    label + ' 3D explorer must load the active language manifest and refresh it when the document language changes');
+  assert.ok(source.includes('function buildResources(id,parentNode=null,anchor=null)') && source.includes('currentNode.children||[]'),
+    label + ' 3D explorer must build each navigable level from the active manifest hierarchy');
+}
+function domainRootFromEngine(source, domain, language) {
+  const start = source.indexOf('const pages={');
+  const end = source.indexOf('\n};', start);
+  assert.ok(start >= 0 && end > start, 'engine pages map must be present');
+  const map = source.slice(start, end);
+  const domainStart = map.indexOf('\n' + domain + ':{');
+  if (domainStart < 0) return null;
+  const nextDomain = map.slice(domainStart + 1).search(/\n[a-z]+:\{/);
+  const section = nextDomain < 0 ? map.slice(domainStart) : map.slice(domainStart, domainStart + 1 + nextDomain);
+  const match = section.match(new RegExp(language + ":'([^']+)'"));
+  return match?.[1] || null;
+}
+for (const [label, source] of [['public', html], ['preview', previewHtml]]) {
+  for (const language of ['fr', 'en', 'ar', 'pt']) {
+    for (const domain of languageTrees[language].domains) {
+      const expectedId = domain.notionId || domain.url?.match(/\/p\/([a-f0-9]{32})/)?.[1];
+      if (!expectedId) continue;
+      const actualUrl = domainRootFromEngine(source, domain.id, language);
+      assert.ok(actualUrl, label + ' ' + language + ' ' + domain.id + ' must have a universe entry URL');
+      assert.equal(actualUrl.match(/\/p\/([a-f0-9]{32})/)?.[1], expectedId,
+        label + ' ' + language + ' ' + domain.id + ' must open the verified root page from its language manifest');
+    }
+  }
+}
+
+for (const [label, source] of [['public', html], ['preview', previewHtml]]) {
+  assert.ok(source.includes("document.documentElement.dir=direction") && source.includes("app.dir=direction"), label + ' Arabic mode must set document-level and app-level reading direction');
+  assert.ok(source.includes("localStorage.setItem('balabs-language',l)") && source.includes("localStorage.getItem('balabs-language')"), label + ' language preference must persist and restore safely');
+  assert.ok(source.includes("let initialLanguage='fr'") && source.includes("setLanguage(initialLanguage)"), label + ' must restore a supported language before rendering the page');
+  assert.ok(source.includes('role="group" aria-label="Choisir la langue"') && source.includes('aria-label="العربية"'), label + ' language controls must have a named semantic group and explicit language names');
+  assert.ok(source.includes('<small id="brandSubtitle">Applied biotechnology · Sétif</small>') && !source.includes('<div class="mark" aria-hidden="true">Y</div>'), label + ' header must use the text wordmark rather than a substitute Y glyph');
+  assert.ok(source.includes("brandSubtitles={fr:'Biotechnologie appliquée · Sétif'") && source.includes('brandSubtitle.textContent=brandSubtitles[l]'), label + ' brand descriptor must follow the selected language');
+  assert.ok(source.includes('id="siteNavigation"') && source.includes("setAttribute('aria-label',navigationLabels[l])"), label + ' primary navigation accessible name must follow the active language');
+  assert.ok(source.includes("document.title=({fr:'BALabs — Réseau vivant'"), label + ' document title must follow the selected language');
+  assert.ok(source.includes('id="pageDescription"') && source.includes("description.content=descriptions[l]"), label + ' SEO description must follow the selected language');
+  assert.ok(source.includes('<main id="main-content" tabindex="-1">') && source.includes('class="skip-link" href="#main-content"') && source.includes('.skip-link:focus'), label + ' keyboard users must have a visible skip link targeting the complete semantic main landmark');
+  assert.ok(source.includes('.top{flex-wrap:wrap;align-items:center;row-gap:12px}') && source.includes('.lang{min-width:44px;min-height:44px;'), label + ' mobile language controls must wrap cleanly and meet a 44px touch target');
+  assert.ok(!source.includes('<section class="hero" id="accueil" role="main">'), label + ' hero must not incorrectly represent the entire main landmark');
+  assert.equal(source.split('<main').length - 1, 1, label + ' page must contain exactly one main landmark');
+  assert.ok(source.includes("skipLabels={fr:'Aller au contenu principal'") && source.includes('skip.textContent=skipLabels[l]'), label + ' skip navigation text must be localised in all four languages');
+}
+
+const publicFooter = html.slice(html.lastIndexOf('<footer'), html.indexOf('</footer>', html.lastIndexOf('<footer')) + 9);
+const previewFooter = previewHtml.slice(previewHtml.lastIndexOf('<footer'), previewHtml.indexOf('</footer>', previewHtml.lastIndexOf('<footer')) + 9);
+assert.ok(publicFooter.includes('data-domain-page="products" data-i18n="navCatalogue"') && previewFooter.includes('data-domain-page="products" data-i18n="navCatalogue"'), 'The public and preview footers must both link directly to the products universe');
+assert.ok(html.includes('data-domain-page="products" data-i18n="navCatalogue"') && previewHtml.includes('data-domain-page="products" data-i18n="navCatalogue"'), 'The footer must provide a direct route into the public products catalogue universe');
+for (const [language, label] of Object.entries({ fr: 'Catalogue', en: 'Catalogue', ar: 'الكتالوج', pt: 'Catálogo' })) {
+  const languageStart = html.indexOf(language + ':{');
+  assert.ok(languageStart >= 0 && html.slice(languageStart, languageStart + 1800).includes('navCatalogue:"' + label + '"'), language + ' footer catalogue label must be localised');
+}
+assert.ok(html.includes("a[data-domain-page],a[data-work-page]") && previewHtml.includes("a[data-domain-page],a[data-work-page]") && html.includes("enterSphere(id,true,false)") && previewHtml.includes("enterSphere(id,true,false)"), 'Homepage universe and featured-work links must open the selected domain directly');
+const featuredOrder = (source) => [...source.matchAll(/<a class="work-card-link" data-work-page="([^"]+)"/g)].map((match) => match[1]);
+assert.deepEqual(featuredOrder(html), ['iot', 'myco', 'soil'], 'Public featured work must present IoT, cultures, then materials');
+assert.deepEqual(featuredOrder(previewHtml), ['iot', 'myco', 'soil'], 'Preview featured work must match the public homepage order');
+assert.ok(html.includes('04 / LES HUIT UNIVERS') && previewHtml.includes('04 / LES HUIT UNIVERS'), 'Both homepages must label the eight-universe directory as the fourth discovery stage');
+assert.ok(!/<a class="(?:editorial-link|work-card-link)" data-(?:domain|work)-page="[^"]+" href="#">/.test(html) && !/<a class="(?:editorial-link|work-card-link)" data-(?:domain|work)-page="[^"]+" href="#">/.test(previewHtml), 'Featured-work and domain shortcuts must have a useful in-page fallback destination');
 assert.ok(html.includes('engine-v2.js?v=20261110-touch-branch-activation-v53'), 'Public explorer must load the cache-busted screen-space label engine');
+assert.ok(html.includes('Customer journey: featured work → live 3D explorer → eight domains') && previewHtml.includes('Customer journey: featured work → live 3D explorer → eight domains') && html.includes('domains.parentNode.insertBefore(scene,domains);') && previewHtml.includes('domains.parentNode.insertBefore(scene,domains);') && !html.includes('app.insertBefore(scene,domains);') && !previewHtml.includes('app.insertBefore(scene,domains);') && !html.includes('app.insertBefore(method,work);') && !previewHtml.includes('app.insertBefore(method,work);') && !html.includes('app.insertBefore(bridge,work);') && !previewHtml.includes('app.insertBefore(bridge,work);'), 'The homepage discovery path must flow from featured projects to the live 3D explorer and then the eight-universe directory, with method content after it');
 assert.ok(previewHtml.includes('engine-v2.js?v=20261110-touch-branch-activation-v54'), 'Preview must load the matching cache-busted label engine');
 assert.ok(engine.includes('function syncLabelScales()') && engine.includes('cameraDistance*projection*targetPixels'), '3D labels must keep a stable screen-space size across zoom levels');
 assert.ok(engine.includes('resourceHitTargets.set(label,element)'), 'Public branch labels must have real DOM hit targets');
@@ -56,6 +248,16 @@ for (const language of ['fr', 'ar', 'en', 'pt']) {
     walk(node.children || []);
   });
   walk(tree.domains);
+}
+for (const language of ['fr', 'en', 'ar', 'pt']) {
+  const products = languageTrees[language].domains.find((domain) => domain.id === 'products');
+  assert.equal(products.children.length, 5, language + ' catalogue branch must expose only the five currently verified public entry points');
+}
+const arabicProducts = JSON.parse(readFileSync('ecosystem/notion-tree.ar.json', 'utf8')).domains.find((domain) => domain.id === 'products');
+assert.equal(arabicProducts.children.filter((node) => /WA/i.test(node.id)).length, 1, 'Arabic catalogue must expose one canonical WA entry, not a duplicate cross-language record');
+for (const id of ['ar-product-myco-start', 'ar-product-myco-plate']) {
+  const prototype = arabicProducts.children.find((node) => node.id === id);
+  assert.ok(prototype && prototype.description.includes('غير متاح للبيع'), 'Arabic ' + id + ' must clearly state that the prototype is not for sale');
 }
 const enTree = JSON.parse(readFileSync('ecosystem/notion-tree.en.json', 'utf8'));
 const ptTree = JSON.parse(readFileSync('ecosystem/notion-tree.pt.json', 'utf8'));
@@ -151,6 +353,15 @@ assert.ok(!html.includes("mainView.addEventListener('pointerdown',beginOrbit)"),
 assert.ok(!html.includes("openUniverse.addEventListener('click',toggleUniverse)"), 'Legacy hub navigation must not compete with the clean engine');
 assert.ok(html.includes('if(!spatial3D&&mainView.classList.contains(\'universe-closed\'))toggleUniverse()'), 'The hidden content source must not change the new engine scene state');
 assert.ok(engine.includes('window.__BALABS_3D_E2E__'), 'The browser smoke test must be able to inspect the live scene');
+
+
+// Public catalogue exclusions: these five Trichoderma records are explicitly inactive in Notion and must not leak into either Arabic tree.
+const inactiveArabicProducts = ['ar-lc-tricho-harzianum', 'ar-lc-tricho-hamatum', 'ar-lc-tricho-koningii', 'ar-lc-tricho-longibrachiatum', 'ar-lc-tricho-reesei'];
+for (const [label, tree] of [['public', JSON.parse(readFileSync('ecosystem/notion-tree.ar.json', 'utf8'))], ['preview', JSON.parse(readFileSync('ecosystem-preview/notion-tree.ar.json', 'utf8'))]]) {
+  assert.equal(tree.domains.find((domain) => domain.id === 'products')?.children?.[0]?.id, 'ar-public-catalogue', label + ' Arabic products universe must lead with the public catalogue');
+  const ids = new Set(flattenManifest({ children: tree.domains }).map((node) => node.id));
+  for (const id of inactiveArabicProducts) assert.ok(!ids.has(id), label + ' Arabic tree must not expose inactive catalogue item ' + id);
+}
 
 console.log('Clean 3D engine regression checks passed: eight domains, mycelial topology, animated signals, stable camera, desktop/mobile controls, hierarchical Notion branches and explicit page actions.');
 

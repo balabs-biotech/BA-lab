@@ -668,23 +668,23 @@
         {
           "id": "products-wa-agar",
           "title": "WA — gélose à l’eau prête à l’emploi",
-          "notionId": "3ec73152f17181988ae7daf20c2100d0",
-          "url": "https://app.notion.com/p/3ec73152f17181988ae7daf20c2100d0",
-          "description": "Support gélifié simple à base d’eau et d’agar, destiné à des usages de laboratoire et à l’expérimentation mycologique ; disponibilité à confirmer selon le lot."
+          "notionId": "3f473152f171812a814dd7b951786313",
+          "url": "https://app.notion.com/p/3f473152f171812a814dd7b951786313",
+          "description": "WA (Water Agar) : gélose à l’eau pauvre en nutriments, coulée en boîte de Petri. Vente sur demande selon le lot ; quantité, conditionnement, prix et conservation sont confirmés avant fourniture."
         },
         {
           "id": "products-myco-start",
           "title": "Myco Start — prototype de kit de démarrage mycologique",
           "notionId": "3ff73152f1718157b723ddd66e88e6b1",
           "url": "https://app.notion.com/p/3ff73152f1718157b723ddd66e88e6b1",
-          "description": "Prototype pédagogique associant culture, support d’observation et documentation par QR ; ce concept n’est pas présenté comme un produit disponible à la vente."
+          "description": "Prototype pédagogique en développement — non disponible à la vente. Le contenu, la ressource attribuée, les contrôles qualité et les conditions de conservation restent à définir et à vérifier."
         },
         {
           "id": "products-myco-plate",
           "title": "Myco Plate — prototype de kit d’observation sur gélose",
           "notionId": "3ff73152f171817c8255e44fed840560",
           "url": "https://app.notion.com/p/3ff73152f171817c8255e44fed840560",
-          "description": "Prototype centré sur l’observation d’une culture documentée ; une morphologie observée ne suffit pas à établir une identification certaine."
+          "description": "Prototype de kit d’observation sur gélose — non disponible à la vente. Le support, la ressource biologique, la traçabilité du lot et les contrôles restent à définir et à vérifier."
         },
         {
           "id": "products-qr-guide",
@@ -765,25 +765,25 @@
       "description": "Ressources publiques pour parcourir les travaux documentés, comprendre les limites des preuves et découvrir les modalités de collaboration.",
       "children": [
         {
-          "id": "learn-work",
-          "title": "Travaux & réalisations documentés",
+          "id": "learn-resource-1",
+          "title": "Travaux documentés",
           "url": "https://app.notion.com/p/3f273152f171815597b6c696402b42c0",
           "children": []
         },
         {
-          "id": "learn-evidence",
-          "title": "Ce qui est effectivement démontré",
-          "url": "https://app.notion.com/p/3e973152f171816781fbf56674cfe55c",
+          "id": "learn-resource-2",
+          "title": "Méthodologie de R&D",
+          "url": "https://app.notion.com/p/3e273152f17181ab88bfe456f838b011",
           "children": []
         },
         {
-          "id": "learn-catalogue",
-          "title": "Catalogue public — ressources biologiques",
-          "url": "https://app.notion.com/p/3ec73152f1718125b1a7c58bc58ebcaa",
+          "id": "learn-resource-3",
+          "title": "Catalogue public",
+          "url": "https://app.notion.com/p/d0fbe1d779344eb58bc240fe7876ae0e",
           "children": []
         },
         {
-          "id": "learn-collaborate",
+          "id": "learn-resource-4",
           "title": "Collaborer avec BA Labs",
           "url": "https://app.notion.com/p/3e273152f17181a8bedae0bfd2452543",
           "children": []
