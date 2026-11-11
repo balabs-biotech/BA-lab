@@ -199,3 +199,65 @@ def test_sensor_interpretation_marks_coverage_indeterminate_when_no_cadence_was_
     )
     assert result.matched_findings == 1
     assert result.signals[0].finding_status == "indeterminate"
+
+
+def test_biological_sensor_bridge_rejects_analysis_outside_declared_date_scope():
+    from ba_environmental_engine.contexts.biological import (
+        BiologicalContext,
+        BiologicalDomain,
+        OrganismKind,
+    )
+    from ba_environmental_engine.contexts.environment import (
+        EnvironmentContext,
+        EnvironmentType,
+        ObservationOrigin,
+    )
+    from ba_environmental_engine.interpretation import (
+        interpret_sensor_analysis_for_biological_context,
+    )
+
+    analysis = make_analysis()
+    organization_id, location_id = uuid4(), uuid4()
+    sensor_id = analysis.series[0].sensor_id
+    environment = EnvironmentContext(
+        context_id=uuid4(),
+        organization_id=organization_id,
+        location_id=location_id,
+        context_type=EnvironmentType.FRUITING_CHAMBER,
+        label="Fruiting room",
+        timezone="Africa/Algiers",
+        origin=ObservationOrigin.SENSOR,
+        sensor_ids=[sensor_id],
+        profile_code="ba_fruiting_room",
+        profile_version="1.0.0",
+    )
+    biological = BiologicalContext(
+        context_id=uuid4(),
+        subject_id=uuid4(),
+        organization_id=organization_id,
+        location_id=location_id,
+        environment_context_id=environment.context_id,
+        domain=BiologicalDomain.MYCOLOGY,
+        organism_kind=OrganismKind.FUNGUS,
+        taxon_code="pleurotus_ostreatus",
+        strain_code="BA-P80",
+        culture_stage="fruiting",
+        production_system="fruiting_chamber",
+        valid_from=date(2026, 10, 1),
+        valid_to=date(2026, 12, 31),
+    )
+
+    with pytest.raises(ValueError, match="sensor analysis interval falls outside"):
+        interpret_sensor_analysis_for_biological_context(
+            analysis,
+            DomainProfile(
+                profile_id="mycology-sensor-v1",
+                module="mycology",
+                version="1.0.0",
+            ),
+            biological,
+            environment,
+            source_analysis_id=uuid4(),
+            from_date=date(2026, 11, 1),
+            to_date=date(2026, 11, 5),
+        )
