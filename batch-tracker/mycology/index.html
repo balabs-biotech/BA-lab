@@ -36,16 +36,19 @@
             assisted.src = "../smart-entry.js?v=20261029-assisted-entry-1";
             assisted.onerror = () => console.error("Le module de saisie assistée n’a pas pu être chargé.");
             assisted.onload = () => {
-              const normalizer = document.createElement("script");
-              normalizer.src = "../../shared/bal-normalizer.js?v=20261111-bal-normalizer-preview-1";
-              normalizer.onerror = () => console.error("BAL-Normalizer indisponible : l’import brut reste possible.");
-              normalizer.onload = () => {
+              const loadImporter = () => {
                 const importer = document.createElement("script");
                 importer.src = "../bal-json-import.js?v=20261111-bal-normalizer-preview-1";
                 importer.onerror = () => console.error("Le module d’import BAL-JSON n’a pas pu être chargé.");
                 document.body.appendChild(importer);
               };
-              normalizer.onload();
+              const normalizer = document.createElement("script");
+              normalizer.src = "../../shared/bal-normalizer.js?v=20261111-bal-normalizer-preview-1";
+              normalizer.onload = loadImporter;
+              normalizer.onerror = () => {
+                console.error("BAL-Normalizer indisponible : l’import brut reste possible.");
+                loadImporter();
+              };
               document.body.appendChild(normalizer);
             };
             document.body.appendChild(assisted);
