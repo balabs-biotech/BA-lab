@@ -8,22 +8,31 @@ causality. The Python domain aggregate remains independent of Supabase.
 
 ## Existing tenant boundary
 
-The Supabase project uses `public.organizations` and
+The live project uses `public.organizations` and
 `public.organization_members`. Membership is keyed by
-`(organization_id, user_id)`; the existing role enum is
-`owner | admin | member | viewer`. Existing write authorization is expressed
-through `private.is_org_writer(organization_id)`; membership/read access is
-separate from write access.
+`(organization_id, user_id)`; roles are `owner | admin | member | viewer`.
+Existing write authorization is expressed through
+`private.is_org_writer(organization_id)`; membership/read access is separate
+from write access.
 
-The repository branch defines `public.biological_signals` in its pending
-biological-signal persistence migration. The live Supabase migration ledger
-currently ends at `20261111043003` and does not yet contain that migration;
-the live database therefore must not be assumed to have this table. Once the
-branch migration is reviewed and applied in the intended deployment sequence,
-`biological_signals` remains distinct from the recommendation ledger: it
-stores interpreted signal snapshots and has its own inbox lifecycle
-(`open`, `acknowledged`, `resolved`, `dismissed`). Recommendation review
-must not overload or mutate that signal lifecycle.
+The live `public.analyses` table has primary key
+`(organization_id, id)`. The live `public.observations` table also has
+primary key `(organization_id, id)`. These are valid tenant-scoped lineage
+anchors.
+
+There is no live `public.biological_signals` table and no live normalized
+finding table identified in the current schema. The engine's finding UUID is
+therefore a provenance identifier carried by the analysis output, not a
+foreign-key target at this stage. The branch's future biological-signal
+migration defines a separate signal inbox lifecycle (`open`, `acknowledged`,
+`resolved`, `dismissed`). Recommendation review must not overload or mutate
+that signal state.
+
+The live `public.biological_contexts` table is tenant-scoped and links to
+cultures, plant cultures and environments using organization-composite
+foreign keys. Its primary key is currently `id`; do not assume it has the
+composite primary key `(organization_id, id)` merely because its references
+are tenant-scoped.
 
 ## Aggregate storage model
 
@@ -43,10 +52,11 @@ One immutable proposal snapshot plus a mutable concurrency projection:
 
 The proposal fields and provenance are immutable after insert. Only the
 lifecycle projection and revision may change, and only through the transition
-transaction. A composite foreign key to `biological_signals` must include
-`organization_id` and `source_signal_id`, preventing cross-tenant lineage.
-The source analysis/finding identifiers remain provenance references unless
-their authoritative composite-key constraints are confirmed.
+transaction. Add a composite foreign key to `analyses` using
+`(organization_id, source_analysis_id)`. Do not add a foreign key to
+`source_finding_id` until findings have an authoritative persisted table.
+A composite foreign key to `biological_signals` can be added only after that
+table's migration has been deployed and its tenant key verified.
 
 ### `biological_recommendation_events`
 
@@ -110,7 +120,9 @@ against the locked persisted aggregate.
 ## Deployment gate
 
 This is a persistence contract, not an applied database migration. Before
-writing DDL, verify the live production policies and exact composite keys for
-the source signal, analysis, and finding tables. The current project migration
-history is behind the latest repository branch migrations; do not apply this
-schema directly to production from this design document.
+writing DDL, deploy and verify the branch's biological-signal persistence
+migration, inspect the resulting constraints and grants, and confirm whether
+analysis findings need their own normalized persistence table. Then create a
+new Supabase migration through the repository's normal migration workflow and
+test it against a disposable database. Do not apply this schema directly to
+production from this design document.
