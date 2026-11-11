@@ -14,6 +14,8 @@ assert.match(ui,/\["mycology","laboratory"\]/);
 assert.match(ui,/loadAuthoringCapabilities/);
 assert.match(ui,/canAdmin/);
 assert.match(ui,/loadPolicyHistory/);
+assert.match(ui,/latestCommitted/);
+assert.match(ui,/latestDraft/);
 assert.match(ui,/loadRuleHistory/);
 assert.match(ui,/status === "reviewed"/);
 assert.match(ui,/BA_LABS_CREATE_DECISION_POLICY_DRAFT/);
