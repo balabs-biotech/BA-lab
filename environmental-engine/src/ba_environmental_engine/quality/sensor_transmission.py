@@ -145,7 +145,8 @@ def assess_sensor_transmissions(
             ))
             continue
 
-        active_start = max(evaluation_start, device.created_at, device.expected_from)
+        expectation_start = max(device.created_at, device.expected_from)
+        active_start = max(evaluation_start, expectation_start)
         active_end = min(cutoff, device.expected_to) if device.expected_to else cutoff
         silence_cutoff = (
             cutoff
@@ -164,8 +165,8 @@ def assess_sensor_transmissions(
                 and device.last_seen_at <= cutoff
             )
             silence_baseline = (
-                max(active_start, device.last_seen_at)
-                if last_seen_is_known else active_start
+                max(expectation_start, device.last_seen_at)
+                if last_seen_is_known else expectation_start
             )
             trailing_silence = (
                 max(0.0, (silence_cutoff - silence_baseline).total_seconds())
