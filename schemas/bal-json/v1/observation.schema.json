@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:ba-labs:bal-json:v1:observation",
+  "title": "BAL-JSON qualitative observation",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "variable_code",
+    "value_text",
+    "observed_at",
+    "context"
+  ],
+  "properties": {
+    "variable_code": {
+      "type": "string",
+      "minLength": 1
+    },
+    "value_text": {
+      "type": "string",
+      "minLength": 1
+    },
+    "observed_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "quality_state": {
+      "type": "string",
+      "enum": [
+        "raw",
+        "controlled",
+        "validated",
+        "excluded"
+      ],
+      "default": "raw"
+    },
+    "context": {
+      "$ref": "urn:ba-labs:bal-json:v1:measurement#/$defs/context"
+    },
+    "metadata": {
+      "type": "object"
+    }
+  }
+}

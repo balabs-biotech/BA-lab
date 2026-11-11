@@ -77,6 +77,15 @@ jobs:
         run: |
           [ -f .gitignore ] && echo "✓ .gitignore" || exit 1
 
+  bal-json-contract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install pinned BAL-JSON schema validator
+        run: npm install --no-save --package-lock=false ajv@8.17.1 ajv-formats@3.0.1
+      - name: Validate BAL-JSON v1 schemas and fixtures
+        run: node scripts/test-bal-json-contract.mjs
+
   batch-tracker-audit:
     runs-on: ubuntu-latest
     steps:
@@ -179,6 +188,8 @@ jobs:
         run: node supabase/tests/nasa-power-agroclimate-writer-authorization.test.mjs
       - name: Test IoT ingestion bounded-body and device-auth security contract
         run: node supabase/tests/iot-ingest-security.test.mjs
+      - name: Test BAL-JSON authenticated ingestion and idempotency contract
+        run: node supabase/tests/bal-json-ingest-contract.test.mjs
 
   supabase-migration-replay:
     runs-on: ubuntu-latest

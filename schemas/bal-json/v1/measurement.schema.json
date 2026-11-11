@@ -1,0 +1,158 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:ba-labs:bal-json:v1:measurement",
+  "title": "BAL-JSON measurement",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "variable_code",
+    "raw_value",
+    "raw_unit_code",
+    "measured_at",
+    "context"
+  ],
+  "properties": {
+    "variable_code": {
+      "type": "string",
+      "minLength": 1
+    },
+    "raw_value": {
+      "type": "number"
+    },
+    "raw_unit_code": {
+      "type": "string",
+      "minLength": 1
+    },
+    "normalized_value": {
+      "type": "number"
+    },
+    "normalized_unit_code": {
+      "type": "string",
+      "minLength": 1
+    },
+    "measured_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "method": {
+      "type": "string",
+      "minLength": 1
+    },
+    "instrument": {
+      "type": "string",
+      "minLength": 1
+    },
+    "quality_state": {
+      "type": "string",
+      "enum": [
+        "raw",
+        "controlled",
+        "validated",
+        "excluded"
+      ],
+      "default": "raw"
+    },
+    "exclusion_reason": {
+      "type": "string",
+      "minLength": 1
+    },
+    "context": {
+      "$ref": "#/$defs/context"
+    },
+    "metadata": {
+      "type": "object"
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "quality_state": {
+            "const": "excluded"
+          }
+        },
+        "required": [
+          "quality_state"
+        ]
+      },
+      "then": {
+        "required": [
+          "exclusion_reason"
+        ],
+        "properties": {
+          "exclusion_reason": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "context": {
+      "type": "object",
+      "additionalProperties": false,
+      "minProperties": 1,
+      "properties": {
+        "culture_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "plant_culture_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "material_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "sample_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "experimental_unit_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "batch_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "environment_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "location_id": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      "anyOf": [
+        {
+          "properties": {
+            "culture_id": true
+          },
+          "required": [
+            "culture_id"
+          ]
+        },
+        {
+          "properties": {
+            "plant_culture_id": true
+          },
+          "required": [
+            "plant_culture_id"
+          ]
+        },
+        {
+          "properties": {
+            "batch_id": true
+          },
+          "required": [
+            "batch_id"
+          ]
+        }
+      ]
+    }
+  }
+}
