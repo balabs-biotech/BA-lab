@@ -16,7 +16,7 @@ on:
       - "supabase/tests/bal-json-ingest-contract.test.mjs"
       - "supabase/migrations/20261111160000_add_bal_json_atomic_ingestion.sql"
       - "shared/**"
-      - "scripts/test-bal-normalizer.mjs"
+      - "scripts/test-bal-normalizer.mjs"\n      - "scripts/test-biological-interpreter.mjs"\n      - "scripts/test-biological-rule-registry.mjs"\n      - "scripts/test-biological-interpreter.mjs"\n      - "scripts/test-biological-rule-registry.mjs"
       - ".github/workflows/bal-json-import-ui.yml"
   push:
     branches: ["feat/bal-json-contract-v1"]
