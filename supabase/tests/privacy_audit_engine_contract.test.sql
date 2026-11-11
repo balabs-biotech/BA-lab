@@ -95,5 +95,36 @@ begin
       raise exception 'personal_data_operation_column_missing: %', required_column;
     end if;
   end loop;
+
+  -- Signup capture must run on auth.users INSERT, before any email-confirmation
+  -- session exists. It must be narrowly privileged and unavailable as an RPC.
+  if not exists (
+    select 1
+    from pg_trigger t
+    join pg_class c on c.oid = t.tgrelid
+    join pg_namespace n on n.oid = c.relnamespace
+    where n.nspname = 'auth'
+      and c.relname = 'users'
+      and t.tgname = 'auth_user_signup_legal_acts'
+      and not t.tgisinternal
+      and (t.tgtype & 4) = 4
+    ) then
+    raise exception 'privacy_audit_signup_capture_trigger_missing';
+  end if;
+
+  if to_regprocedure('private.capture_signup_legal_acts()') is null then
+    raise exception 'privacy_audit_signup_capture_function_missing';
+  end if;
+
+  if has_function_privilege('anon', 'private.capture_signup_legal_acts()', 'EXECUTE')
+     or has_function_privilege('authenticated', 'private.capture_signup_legal_acts()', 'EXECUTE') then
+    raise exception 'privacy_audit_signup_capture_function_client_executable';
+  end if;
+
+  if not has_table_privilege('service_role', 'private.legal_consent_events', 'INSERT')
+     or not has_table_privilege('service_role', 'private.legal_consent_events', 'SELECT') then
+    raise exception 'privacy_audit_service_role_consent_ledger_privileges_missing';
+  end if;
+
 end
-$$;
+$;
