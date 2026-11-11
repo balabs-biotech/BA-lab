@@ -79,6 +79,17 @@
       return result("insufficient_context", "culture_context_missing", measurement, rule);
     }
 
+    const target = rule.target && typeof rule.target === "object" ? rule.target : {};
+    for (const key of ["taxon_code", "strain_code", "growth_stage"]) {
+      if (target[key] === undefined) continue;
+      if (typeof context[key] !== "string" || !context[key].trim()) {
+        return result("insufficient_context", "required_biological_target_missing:" + key, measurement, rule);
+      }
+      if (context[key] !== target[key]) {
+        return result("not_assessed", "biological_target_does_not_match:" + key, measurement, rule);
+      }
+    }
+
     const selectors = rule.applies_to && typeof rule.applies_to === "object"
       ? rule.applies_to
       : {};
