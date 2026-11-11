@@ -24,6 +24,10 @@ const supabaseClient =
 let organizationId = null;
 window.BA_LABS_SUPABASE_CLIENT = supabaseClient;
 window.BA_LABS_GET_ORGANIZATION_ID = () => organizationId;
+window.BA_LABS_GET_MEASUREMENT_CATALOGUE = () => ({
+  variables: measurementVariables.map((item) => ({ ...item })),
+  units: measurementUnits.map((item) => ({ ...item })),
+});
 
 let organization = null;
 
@@ -4954,7 +4958,7 @@ async function loadMeasurementReferences() {
       .select("code, label, dimension, canonical_unit_code, description")
       .order("label"),
     supabaseClient.from("units")
-      .select("code, label, dimension")
+      .select("code, label, dimension, factor, offset_value, is_linear")
       .order("code")
   ]);
 
