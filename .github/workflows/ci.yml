@@ -282,8 +282,6 @@ jobs:
         run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/biological_contexts_contract.test.sql
       - name: Test biological recommendation persistence and lifecycle contract after replay
         run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/biological_recommendation_persistence.test.sql
-      - name: Test recommendation outcome measurement evidence links after replay
-        run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/biological_recommendation_outcome_evidence.test.sql
       - name: Test versioned environmental profile registries after replay
         run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/environmental_profile_registries_contract.test.sql
       - name: Test persisted sensor drift reference policies after replay
@@ -298,6 +296,8 @@ jobs:
         run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/biological_signal_persistence.test.sql
       - name: Test biological recommendation persistence security contract after replay
         run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/biological_recommendation_persistence.test.sql
+      - name: Test recommendation outcome measurement evidence links after replay
+        run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/biological_recommendation_outcome_evidence.test.sql
       - name: Test persisted domain recommendation definitions after replay
         run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/domain_profile_recommendations.test.sql
       - name: Prepare disposable database for Privacy & Audit Engine draft
