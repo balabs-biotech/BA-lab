@@ -83,5 +83,45 @@
     });
   }
 
-  root.BALabsBiologicalDecisionPolicyStore = Object.freeze({ version: VERSION, loadReviewedPolicies });
+  async function loadPolicyHistory(input) {
+    if (!input || !input.client || typeof input.client.from !== "function" ||
+        typeof input.organizationId !== "string" || !input.organizationId.trim() ||
+        typeof input.domain !== "string" || !input.domain.trim()) {
+      return Object.freeze({ status: "insufficient_context", reason: "policy_history_query_incomplete", records: Object.freeze([]) });
+    }
+    let response;
+    try {
+      response = await input.client.from("biological_decision_policies")
+        .select("id,revision_seq,organization_id,policy_id,version,status,domain,rule_version_id,trigger_assessment_statuses,decision_code,title,explanation,severity,recommended_action,sources,created_by,created_at,reviewed_by,reviewed_at")
+        .eq("organization_id", input.organizationId)
+        .eq("domain", input.domain)
+        .order("revision_seq", { ascending: false })
+        .order("id", { ascending: false })
+        .limit(200);
+    } catch (_) {
+      return Object.freeze({ status: "unavailable", reason: "policy_history_query_failed", records: Object.freeze([]) });
+    }
+    const { data, error } = response || {};
+    if (error) return Object.freeze({ status: "unavailable", reason: "policy_history_query_failed", records: Object.freeze([]) });
+    const records = (Array.isArray(data) ? data : []).filter(row =>
+      row && row.organization_id === input.organizationId && row.domain === input.domain &&
+      typeof row.policy_id === "string" && row.policy_id.trim() &&
+      typeof row.version === "string" && row.version.trim() &&
+      ["draft","reviewed","retired"].includes(row.status) &&
+      typeof row.rule_version_id === "string" && row.rule_version_id.trim() &&
+      Array.isArray(row.trigger_assessment_statuses) &&
+      row.trigger_assessment_statuses.length === 1 &&
+      row.trigger_assessment_statuses[0] === "out_of_range" &&
+      Array.isArray(row.sources) && row.sources.length > 0 &&
+      typeof row.decision_code === "string" && row.decision_code.trim() &&
+      typeof row.title === "string" && row.title.trim() &&
+      typeof row.explanation === "string" && row.explanation.trim() &&
+      (row.status !== "reviewed" ||
+        (typeof row.reviewed_by === "string" && row.reviewed_by.trim() &&
+         typeof row.reviewed_at === "string" && Number.isFinite(Date.parse(row.reviewed_at))))
+    );
+    return Object.freeze({ status: "loaded", reason: "tenant_scoped_decision_policy_history_loaded", records: Object.freeze(records) });
+  }
+
+  root.BALabsBiologicalDecisionPolicyStore = Object.freeze({ version: VERSION, loadReviewedPolicies, loadPolicyHistory });
 })(typeof globalThis !== "undefined" ? globalThis : window);
