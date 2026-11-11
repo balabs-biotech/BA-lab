@@ -82,13 +82,14 @@ begin
     raise exception 'Organization access denied' using errcode = '42501';
   end if;
   if p_source_measurement_id is null
+     or p_status is null
      or p_status not in ('normal','out_of_range','insufficient_context','not_assessed','no_matching_rule','ambiguous_rule')
      or p_reason is null or length(btrim(p_reason)) = 0
      or p_engine_version is null or length(btrim(p_engine_version)) = 0
-     or jsonb_typeof(p_measurement_snapshot) <> 'object'
-     or jsonb_typeof(p_context_snapshot) <> 'object'
-     or jsonb_typeof(p_resolution_snapshot) <> 'object'
-     or jsonb_typeof(p_result_snapshot) <> 'object'
+     or jsonb_typeof(p_measurement_snapshot) is distinct from 'object'
+     or jsonb_typeof(p_context_snapshot) is distinct from 'object'
+     or jsonb_typeof(p_resolution_snapshot) is distinct from 'object'
+     or jsonb_typeof(p_result_snapshot) is distinct from 'object'
      or p_result_snapshot->>'status' is distinct from p_status
      or p_result_snapshot->>'reason' is distinct from p_reason
      or p_result_snapshot->>'engine_version' is distinct from p_engine_version
@@ -116,6 +117,7 @@ begin
      where organization_id = v_org_id and id = p_rule_version_id
      for share;
     if not found or v_rule.status <> 'reviewed'
+       or v_rule.domain is distinct from p_context_snapshot->>'domain'
        or v_rule.rule_id is distinct from p_result_snapshot->>'rule_id'
        or v_rule.version is distinct from p_result_snapshot->>'rule_version'
        or exists (
@@ -123,6 +125,7 @@ begin
           where newer.organization_id = v_org_id
             and newer.rule_id = v_rule.rule_id
             and newer.revision_seq > v_rule.revision_seq
+            and newer.status in ('reviewed','retired')
        ) then
       raise exception 'Assessment rule version is not the current reviewed version' using errcode = '40001';
     end if;
