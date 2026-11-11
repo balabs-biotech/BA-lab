@@ -2,7 +2,7 @@
   "version": 1,
   "source": "Verified public language-specific BA Labs pages from the corresponding public language entry and Notion page search",
   "language": "en",
-  "coverage": "expanded_verified_topic_pages; only explicitly identified public pages are linked_eight_universes_including_planned_resources_transmission",
+  "coverage": "expanded_verified_topic_pages; landing-page destinations reconciled against live English Notion page; only verified public pages linked; eight universes including planned resources transmission",
   "domains": [
     {
       "id": "myco",
@@ -90,6 +90,14 @@
           "notionId": "40173152f17181cab354dd2c11933208",
           "url": "https://app.notion.com/p/40173152f17181cab354dd2c11933208",
           "description": "Biological solutions and biostimulant approaches under study.",
+          "children": []
+        },
+        {
+          "id": "en-bio-plant-micropropagation",
+          "title": "Plant micropropagation",
+          "notionId": "40173152f17181e1aa6eebe9f6c26c46",
+          "url": "https://app.notion.com/p/40173152f17181e1aa6eebe9f6c26c46",
+          "description": "Experimental plant micropropagation and controlled plant-culture systems.",
           "children": []
         }
       ],
@@ -231,6 +239,22 @@
           "notionId": "40173152f1718118ac1ad58358720ae4",
           "url": "https://app.notion.com/p/40173152f1718118ac1ad58358720ae4",
           "description": "Ways to frame a project need and explore collaboration.",
+          "children": []
+        },
+        {
+          "id": "en-work-documented",
+          "title": "Documented work and achievements",
+          "notionId": "40173152f17181baa905d6afb836f038",
+          "url": "https://app.notion.com/p/40173152f17181baa905d6afb836f038",
+          "description": "Overview of documented workstreams, observations and evidence limits.",
+          "children": []
+        },
+        {
+          "id": "en-work-r-and-d",
+          "title": "Research and development",
+          "notionId": "40173152f1718173ae6bc8cce9f0ba52",
+          "url": "https://app.notion.com/p/40173152f1718173ae6bc8cce9f0ba52",
+          "description": "Research workflow connecting questions, protocols, observations, measurements and conclusions.",
           "children": []
         }
       ],
