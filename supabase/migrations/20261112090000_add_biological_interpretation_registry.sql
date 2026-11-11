@@ -120,7 +120,7 @@ as $$
 declare
   v_signal public.biological_signals%rowtype;
   v_snapshot public.biological_interpretations%rowtype;
-  v_existing public.biological_interpretations%rowtype;
+  v_inserted boolean := false;
 begin
   if coalesce(auth.jwt() ->> 'role', '') <> 'service_role' then
     raise exception 'biological_interpretation_record_forbidden'
@@ -164,6 +164,8 @@ begin
   )
   on conflict (organization_id, interpretation_id) do nothing;
 
+  get diagnostics v_inserted = row_count;
+
   select * into v_snapshot
     from public.biological_interpretations bi
    where bi.organization_id = p_organization_id
@@ -178,18 +180,19 @@ begin
       using errcode = '23505';
   end if;
 
-  insert into public.biological_interpretation_events (
-    organization_id, interpretation_id, event_id, event_type,
-    actor_kind, actor_id, event_payload
-  ) values (
-    p_organization_id, p_interpretation_id, p_event_id, 'recorded',
-    'system', null, jsonb_build_object(
-      'engine_code', btrim(p_engine_code),
-      'engine_version', btrim(p_engine_version),
-      'interpretation_status', p_interpretation_status
-    )
-  )
-  on conflict (organization_id, event_id) do nothing;
+  if v_inserted then
+    insert into public.biological_interpretation_events (
+      organization_id, interpretation_id, event_id, event_type,
+      actor_kind, actor_id, event_payload
+    ) values (
+      p_organization_id, p_interpretation_id, p_event_id, 'recorded',
+      'system', null, jsonb_build_object(
+        'engine_code', btrim(p_engine_code),
+        'engine_version', btrim(p_engine_version),
+        'interpretation_status', p_interpretation_status
+      )
+    );
+  end if;
 
   return jsonb_build_object(
     'interpretation_id', v_snapshot.interpretation_id,
