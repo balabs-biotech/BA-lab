@@ -17,6 +17,8 @@ const row = (rule, createdAt, id = rule.rule_id) => ({
   id, organization_id: "org-A", rule_id: rule.rule_id, version: rule.version,
   status: rule.status, domain: rule.domain, variable_code: rule.variable_code,
   unit_code: rule.unit_code, rule, created_at: createdAt,
+  reviewed_by: rule.status === "reviewed" ? rule.review.reviewer_id : null,
+  reviewed_at: rule.status === "reviewed" ? rule.review.reviewed_at : null,
 });
 const rows = [
   row(reviewed("rule-active", "2.0.0"), "2026-11-11T12:00:00Z", "z"),
