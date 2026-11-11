@@ -26,8 +26,8 @@ declare
   v_source record;
   v_components jsonb := '[]'::jsonb;
 begin
-  if not private.is_org_member(p_organization_id) then
-    raise exception 'organization_access_denied' using errcode = '42501';
+  if auth.uid() is null or not private.is_org_writer(p_organization_id) then
+    raise exception 'organization_write_access_denied' using errcode = '42501';
   end if;
 
   if p_event_type is null or p_event_type not in ('mixing','consortium_assembly','blending') then
@@ -48,6 +48,9 @@ begin
 
   if nullif(btrim(coalesce(p_result_code, '')), '') is null then
     raise exception 'material_mixture_result_code_required';
+  end if;
+  if p_details is null or jsonb_typeof(p_details) <> 'object' then
+    raise exception 'material_mixture_details_must_be_object';
   end if;
 
   -- Lock source rows in a stable order before reading state/generation.
