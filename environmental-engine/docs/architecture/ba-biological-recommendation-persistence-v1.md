@@ -117,7 +117,10 @@ client. The actor is resolved from the authenticated session.
 `interpretation/recommendation_repository.py` defines the application-facing
 Protocol. `interpretation/supabase_recommendation_repository.py` implements it
 using a service-role RPC for proposal creation and the caller's authenticated
-client for reads and human transitions. The adapter binds the supplied actor
+client for reads and human transitions. `contexts/profile_persistence.py` now
+loads the persisted `recommendations` JSONB into typed
+`RecommendationDefinition` values, so profile-based resolution uses the same
+versioned definitions that are stored in PostgreSQL. The adapter binds the supplied actor
 UUID to the verified request context; PostgreSQL independently records
 `auth.uid()`. The database owns authorization, transactionality, row locking,
 idempotency, and mapping database conflicts to domain repository errors.
@@ -200,8 +203,9 @@ The database adapter is not complete until a disposable database verifies:
 - stale `expected_revision` produces a conflict without changing either row;
 - a successful transition inserts exactly one event and increments revision once;
 - event UPDATE/DELETE is denied to application roles;
+- identical proposal ID replay returns the existing aggregate and history, while conflicting proposal reuse fails;
 - identical event UUID replay is idempotent, while conflicting payload reuse fails;
 - source analysis foreign keys cannot cross organization boundaries;
 - proposal provenance cannot be changed after creation.
 
-Unit tests around the Python service verify orchestration and conflict propagation only; they do not substitute for these PostgreSQL/RLS tests.
+Unit tests cover profile-definition hydration, proposal creation/replay reconstruction, service orchestration and conflict propagation. They do not substitute for the PostgreSQL/RLS tests.
