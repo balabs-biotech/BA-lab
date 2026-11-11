@@ -41,6 +41,7 @@ const client = {
       eq(column, value) { query.filters.push(["eq", column, value]); return builder; },
       in(column, value) { query.filters.push(["in", column, value]); return builder; },
       order(column, options) { query.orders.push([column, options]); return builder; },
+      limit(value) { query.limit = value; return builder; },
       then(resolve, reject) { return Promise.resolve({ data: rows, error: null }).then(resolve, reject); },
     };
     return builder;
@@ -59,5 +60,13 @@ assert.ok(calls[0].filters.some(([kind, key, value]) => kind === "eq" && key ===
 assert.ok(calls[0].filters.some(([kind, key, value]) => kind === "in" && key === "status" && value.includes("retired")));
 assert.ok(calls[0].orders.some(([key, options]) => key === "revision_seq" && options.ascending === false));
 assert.equal((await store.loadExecutableRules({ client, organizationId: "", domain: "mycology", variableCode: "temperature", unitCode: "degC" })).status, "insufficient_context");
+const history = await store.loadRuleHistory({ client, organizationId: "org-A", domain: "mycology" });
+assert.equal(history.status, "loaded");
+assert.ok(history.records.some(record => record.status === "draft"));
+assert.ok(history.records.some(record => record.status === "retired"));
+assert.ok(calls.at(-1).filters.some(([kind, key, value]) => kind === "eq" && key === "organization_id" && value === "org-A"));
+assert.ok(calls.at(-1).filters.some(([kind, key, value]) => kind === "eq" && key === "domain" && value === "mycology"));
+assert.equal(calls.at(-1).limit, 200);
+assert.equal((await store.loadRuleHistory({ client, organizationId: "", domain: "mycology" })).status, "insufficient_context");
 
-console.log("✓ Biological Rule Store: tenant scope, latest version, retirement suppression and fail-closed validation");
+console.log("✓ Biological Rule Store: tenant scope, latest version, retirement suppression, history filtering and fail-closed validation");
