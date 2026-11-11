@@ -10,6 +10,7 @@ from dataclasses import dataclass
 from itertools import combinations
 from math import isfinite
 from statistics import median
+from datetime import datetime
 from typing import Iterable
 from uuid import UUID
 
@@ -34,7 +35,7 @@ class SensorDriftPolicy:
 class SensorDriftPair:
     target_observation_id: UUID
     reference_observation_id: UUID
-    observed_at: object
+    observed_at: datetime
     differential_value: float
 
 
