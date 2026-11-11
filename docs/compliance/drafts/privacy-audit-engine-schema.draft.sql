@@ -86,9 +86,9 @@ revoke all on private.legal_document_versions from public, anon, authenticated;
 revoke all on private.legal_consent_events from public, anon, authenticated;
 revoke all on private.personal_data_operation_events from public, anon, authenticated;
 grant usage on schema private to service_role;
-grant all on private.legal_document_versions to service_role;
-grant all on private.legal_consent_events to service_role;
-grant all on private.personal_data_operation_events to service_role;
+grant select, insert, update, delete on private.legal_document_versions to service_role;
+grant select, insert on private.legal_consent_events to service_role;
+grant select, insert on private.personal_data_operation_events to service_role;
 
 create or replace function private.reject_append_only_mutation()
 returns trigger
