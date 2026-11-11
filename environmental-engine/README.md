@@ -23,7 +23,7 @@ The engine foundation provides:
 - sensor descriptors and measurement contracts with source-observation and formula lineage;
 - opt-in instrument-health diagnostics for exact repeated-reading runs, isolated from biological interpretation;
 - a configurable domain-interpretation layer routing traceable findings to Mycology, GreenTech or Lab profiles, with explicit context tags, biological subject/environment binding and no implicit biological thresholds or recommendations;
-- biological subject and cultivation-context contracts binding organism, strain/cultivar, stage, substrate and production system to a tenant-scoped environmental context and analysis period.
+- biological subject and cultivation-context contracts binding organism, strain/cultivar, stage, substrate and production system to a tenant-scoped environmental context and analysis period;
 - a separate biological BAL envelope serializing performance indicators with subject identity, formula/version, period, accepted and excluded measurement lineage, and explicit insufficient-evidence states.
 
 Derived values remain distinct from source observations. The engine does not
