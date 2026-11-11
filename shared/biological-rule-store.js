@@ -62,6 +62,7 @@
     }
 
     const rules = [];
+    const ruleRecords = [];
     const rejected = [];
     for (const [ruleId, row] of latestByRuleId) {
       if (row.status !== "reviewed") continue;
@@ -84,12 +85,14 @@
         continue;
       }
       rules.push(rule);
+      ruleRecords.push(Object.freeze({ id: row.id, rule_id: row.rule_id, version: row.version, revision_seq: row.revision_seq }));
     }
 
     return Object.freeze({
       status: "loaded",
       reason: "tenant_scoped_reviewed_rule_versions_loaded",
       rules: Object.freeze(rules),
+      rule_records: Object.freeze(ruleRecords),
       rejected_rule_ids: Object.freeze(rejected),
     });
   }
