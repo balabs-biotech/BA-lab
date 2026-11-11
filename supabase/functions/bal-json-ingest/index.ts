@@ -175,7 +175,7 @@ Deno.serve(async (req: Request) => {
         .from("variables").select("code, dimension").eq("code", data.variable_code).maybeSingle();
       if (variableError || !variable) return response(422, { error: "unknown_variable_code" });
 
-      const unitCodes = [data.raw_unit_code, data.normalized_unit_code].filter(Boolean);
+      const unitCodes = [data.raw_unit_code];
       const { data: units, error: unitsError } = await supabase
         .from("units").select("code, dimension").in("code", unitCodes);
       if (unitsError) return response(422, { error: "unit_catalogue_unavailable" });
@@ -215,8 +215,6 @@ Deno.serve(async (req: Request) => {
       Object.assign(recordData, {
         raw_value: data.raw_value,
         raw_unit_code: data.raw_unit_code,
-        normalized_value: data.normalized_value,
-        normalized_unit_code: data.normalized_unit_code,
         measured_at: data.measured_at,
         method: data.method,
         instrument: data.instrument,
