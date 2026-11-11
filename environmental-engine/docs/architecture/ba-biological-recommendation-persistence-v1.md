@@ -55,20 +55,24 @@ lifecycle projection and revision may change, and only through the transition
 transaction. Add a composite foreign key to `analyses` using
 `(organization_id, source_analysis_id)`. Do not add a foreign key to
 `source_finding_id` until findings have an authoritative persisted table.
-A composite foreign key to `biological_signals` can be added only after that
-table's migration has been deployed and its tenant key verified.
+The feature-branch migration now defines the composite foreign key to
+`biological_signals` on `(organization_id, source_signal_id)`. The signal
+migration itself binds the source analysis and biological context to the same
+tenant.
 
 ### `biological_recommendation_events`
 
 Append-only history:
 
-- `organization_id`, `recommendation_id`, `event_id`;
+- `organization_id`, `recommendation_id`, `event_id`, `revision`;
 - `action`, `actor_id`, `occurred_at`;
 - `note`, `execution_details`, `outcome_summary`,
   `outcome_observed_at`.
 
-Use a composite foreign key to the recommendation aggregate and a unique
-constraint on `(organization_id, event_id)` for idempotency. Events must not
+Use a composite foreign key to the recommendation aggregate, a unique
+constraint on `(organization_id, event_id)` for idempotency, and a unique
+`(organization_id, recommendation_id, revision)` key to preserve exact append
+order even when timestamps tie. Events must not
 be updated or deleted by application roles. The event actor must be the
 authenticated principal, not a browser-supplied identity.
 
@@ -78,8 +82,8 @@ A transition is a single database transaction:
 
 1. Resolve the authenticated user with `auth.uid()`; reject null identity.
 2. Verify `private.is_org_writer(organization_id)`.
-3. Lock the tenant-scoped recommendation row (`FOR UPDATE`) or perform a
-   revision compare-and-swap.
+3. Serialize event UUID reuse within the organization, then lock the
+   tenant-scoped recommendation row (`FOR UPDATE`).
 4. Compare stored `revision` with `expected_revision`; return a conflict
    instead of overwriting a concurrent transition.
 5. Validate the action against the persisted lifecycle state and validate
@@ -111,7 +115,11 @@ client. The actor is resolved from the authenticated session.
 ## Python adapter boundary
 
 `interpretation/recommendation_repository.py` defines the application-facing
-Protocol. The adapter owns authorization, transactionality, row locking,
+Protocol. `interpretation/supabase_recommendation_repository.py` implements it
+using a service-role RPC for proposal creation and the caller's authenticated
+client for reads and human transitions. The adapter binds the supplied actor
+UUID to the verified request context; PostgreSQL independently records
+`auth.uid()`. The database owns authorization, transactionality, row locking,
 idempotency, and mapping database conflicts to domain repository errors.
 The pure `transition_recommendation` function remains useful for validating
 the proposed transition before persistence, but the database must revalidate
@@ -133,6 +141,10 @@ been moved to versions after the live migration head `20261111043003`:
 previous ordering where the signal table could be attempted before its profile
 registry dependencies. A structural SQL test now checks these keys, grants and
 RLS expectations.
+The recommendation tables and RPCs follow as
+`20261111043400_add_biological_recommendation_persistence.sql`. Structural SQL
+tests cover the RLS/grant boundary, RPC execution grants, immutable proposal
+snapshot, append-only event trigger, provenance FKs and event revision key.
 
 ## Deployment gate
 
