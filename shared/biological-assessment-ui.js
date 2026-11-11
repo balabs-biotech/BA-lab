@@ -50,6 +50,42 @@
         provenance.className = "measurement-meta";
         provenance.textContent = "Calcul client · non recalculé côté serveur";
         item.append(heading, details, provenance);
+        if (row.decision && row.decision.status !== "no_decision_candidate") {
+          const decision = document.createElement("div");
+          decision.className = "biological-assessment-record decision-candidate";
+          if (row.decision.status === "decision_candidate") {
+            const title = document.createElement("strong");
+            title.textContent = "Décision candidate : " + row.decision.title;
+            const explanation = document.createElement("div");
+            explanation.textContent = row.decision.explanation;
+            decision.append(title, explanation);
+            if (row.decision.severity) {
+              const severity = document.createElement("div");
+              severity.textContent = "Niveau défini par la politique : " + row.decision.severity;
+              decision.appendChild(severity);
+            }
+            if (row.decision.recommended_action) {
+              const action = document.createElement("div");
+              action.textContent = "Conduite documentée : " + row.decision.recommended_action;
+              decision.appendChild(action);
+            }
+            const source = document.createElement("div");
+            source.className = "measurement-meta";
+            source.textContent = "Politique " + row.decision.policy_id + " · v" + row.decision.policy_version;
+            decision.appendChild(source);
+          } else {
+            decision.textContent = row.decision.status === "ambiguous_decision_policy"
+              ? "Décision non proposée : plusieurs politiques examinées correspondent. Résolution manuelle requise."
+              : row.decision.status === "decision_not_configured"
+                ? "Aucune politique de décision examinée n’est configurée pour cette version de règle."
+                : "Décision non proposée : preuves insuffisantes.";
+          }
+          const boundary = document.createElement("div");
+          boundary.className = "measurement-meta";
+          boundary.textContent = "Analyse côté client · non vérifiée indépendamment par le serveur · aucune action automatique.";
+          decision.appendChild(boundary);
+          item.appendChild(decision);
+        }
         host.appendChild(item);
       }
     }
@@ -64,7 +100,33 @@
     if (!ids.length) return;
     const result = await api.loadHistoryBatch({ client: client(), organizationId: org, measurementIds: ids });
     if (organizationId() !== org || result.status !== "loaded") return;
-    renderRecords(result.records);
+    const policyStore = window.BALabsBiologicalDecisionPolicyStore;
+    const decisionEngine = window.BALabsBiologicalDecisionEngine;
+    const domain = document.body.dataset.domain;
+    const enriched = await Promise.all(result.records.map(async row => {
+      if (row.status !== "out_of_range" || !row.rule_version_id ||
+          !policyStore || !decisionEngine || !row.context_snapshot ||
+          row.context_snapshot.domain !== domain) return row;
+      const assessment = {
+        id: row.id,
+        organization_id: row.organization_id,
+        domain,
+        rule_version_id: row.rule_version_id,
+        status: row.status,
+        calculation_origin: row.calculation_origin,
+        server_verification: row.server_verification
+      };
+      try {
+        const loaded = await policyStore.loadReviewedPolicies({ client: client(), assessment });
+        if (organizationId() !== org) return row;
+        if (loaded.status !== "loaded") return { ...row, decision: { status: "insufficient_evidence" } };
+        return { ...row, decision: decisionEngine.evaluate({ domain, assessment, policies: loaded.policies }) };
+      } catch (_) {
+        return { ...row, decision: { status: "insufficient_evidence" } };
+      }
+    }));
+    if (organizationId() !== org) return;
+    renderRecords(enriched);
   }
 
   async function handleClick(event) {
