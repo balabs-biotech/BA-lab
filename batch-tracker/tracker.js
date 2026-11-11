@@ -198,6 +198,7 @@ window.BA_LABS_ASSESS_AND_RECORD_BIOLOGICAL_MEASUREMENT = async ({ measurementId
   const persisted = await store.record({
     client: supabaseClient,
     organizationId: requestOrganizationId,
+    domain,
     measurementId: source.id,
     ruleVersionId: assessed.rule_version_id,
     result: assessed,
