@@ -3,6 +3,7 @@
 create table public.biological_rules (
   organization_id uuid not null references public.organizations(id) on delete cascade,
   id uuid not null default gen_random_uuid(),
+  revision_seq bigint generated always as identity unique,
   rule_id text not null check (length(btrim(rule_id)) > 0),
   version text not null check (length(btrim(version)) > 0),
   status text not null check (status in ('draft','reviewed','retired')),
