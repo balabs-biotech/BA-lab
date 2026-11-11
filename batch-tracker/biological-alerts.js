@@ -299,8 +299,7 @@
               "Lecture des liens ou des mesures incomplète : l’exhaustivité des preuves ne peut pas être garantie."));
           } else if (linkedMeasurements.length) {
             linkedMeasurements.forEach(link => {
-              const measurement = link.measurement;
-              if (!measurement) return;
+              const measurement = link;
               const value = measurement.normalized_value !== null && measurement.normalized_value !== undefined
                 ? String(measurement.normalized_value) + (measurement.normalized_unit_code ? " " + measurement.normalized_unit_code : "")
                 : measurement.raw_value !== null && measurement.raw_value !== undefined
@@ -308,8 +307,9 @@
                   : "Valeur non disponible";
               evidencePanel.append(element("small", "",
                 (measurement.variable_code || "Mesure") + " · " + value + " · " +
-                dateLabel(measurement.measured_at) + " · " +
-                (link.evidence_scope === "biological_subject" ? "Sujet biologique" : "Contexte environnemental")));
+                dateLabel(measurement.measurement_observed_at) + " · " +
+                (link.evidence_scope === "biological_subject" ? "Sujet biologique" : "Contexte environnemental") +
+                (measurement.method ? " · " + measurement.method : "")));
             });
           } else {
             evidencePanel.append(element("small", "", "Aucune mesure quantitative n’est encore reliée à ce résultat."));
@@ -587,44 +587,26 @@
         eventsByRecommendation.forEach(events => events.sort((left, right) => left.revision - right.revision));
         const recommendationIdsForEvidence = recommendations.map(item => item.recommendation_id);
         const outcomeLinksResult = await client.from("biological_recommendation_outcome_measurements")
-          .select("recommendation_id,outcome_event_id,measurement_id,evidence_scope,linked_by,linked_at")
+          .select("recommendation_id,outcome_event_id,measurement_id,measurement_observed_at,variable_code,normalized_value,normalized_unit_code,raw_value,raw_unit_code,method,instrument,source_metadata,evidence_scope,linked_by,linked_at")
           .eq("organization_id", state.organizationId)
           .in("recommendation_id", recommendationIdsForEvidence)
           .limit(1000);
         if (request !== state.request) return;
         const outcomeLinksByRecommendation = new Map();
-        const linkedMeasurementIds = [];
         if (outcomeLinksResult.error || (outcomeLinksResult.data || []).length >= 1000) {
           state.recommendationEvidenceAvailable = false;
           console.error("[CultureOps recommendation evidence] Link read incomplete",
             outcomeLinksResult.error?.message || "read_limit_reached");
         } else {
           (outcomeLinksResult.data || []).forEach(link => {
-            linkedMeasurementIds.push(link.measurement_id);
             if (!outcomeLinksByRecommendation.has(link.recommendation_id)) {
               outcomeLinksByRecommendation.set(link.recommendation_id, []);
             }
             outcomeLinksByRecommendation.get(link.recommendation_id).push(link);
           });
         }
-        let linkedMeasurementsById = new Map();
-        if (linkedMeasurementIds.length && state.recommendationEvidenceAvailable) {
-          const linkedMeasurementsResult = await client.from("measurements")
-            .select("id,variable_code,normalized_value,normalized_unit_code,raw_value,raw_unit_code,measured_at,culture_id,plant_culture_id,environment_id")
-            .eq("organization_id", state.organizationId)
-            .in("id", [...new Set(linkedMeasurementIds)]);
-          if (request !== state.request) return;
-          if (linkedMeasurementsResult.error ||
-              (linkedMeasurementsResult.data || []).length !== new Set(linkedMeasurementIds).size) {
-            state.recommendationEvidenceAvailable = false;
-          } else {
-            linkedMeasurementsById = new Map((linkedMeasurementsResult.data || []).map(item => [item.id, item]));
-          }
-        }
         recommendations.forEach(recommendation => {
-          const outcomeMeasurements = (outcomeLinksByRecommendation.get(recommendation.recommendation_id) || [])
-            .map(link => ({ ...link, measurement: linkedMeasurementsById.get(link.measurement_id) || null }));
-          if (outcomeMeasurements.some(link => !link.measurement)) state.recommendationEvidenceAvailable = false;
+          const outcomeMeasurements = outcomeLinksByRecommendation.get(recommendation.recommendation_id) || [];
           const linked = {
             ...recommendation,
             events: eventsByRecommendation.get(recommendation.recommendation_id) || [],
