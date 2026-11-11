@@ -925,7 +925,7 @@ def test_sensor_api_exposes_reference_based_drift_diagnostics_separately():
             "iot_device_id": sensor_id,
             "device_code": code,
             "raw_value": value,
-            "measured_at": "2026-02-28T23:00:00+00:00",
+            "measured_at": "2026-02-28T20:00:00+00:00",
             "profile_valid_from": "2026-02-28",
         })
         request["measurements"].append(guard)
