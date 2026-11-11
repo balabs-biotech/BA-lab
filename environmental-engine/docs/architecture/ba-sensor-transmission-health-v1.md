@@ -102,3 +102,9 @@ in the profile timezone. Historical windows can report interior receipt gaps, bu
 cannot report a current trailing-silence status. The registry heartbeat is only
 used as current evidence when there are no in-window receipts; it is not a
 historical reconstruction source.
+
+
+The profile's `valid_from` is passed as a calendar date, then converted to UTC
+midnight using the profile's IANA timezone inside the Python API. This avoids
+treating a local validity date as UTC midnight and shifting the expected-device
+window by the local UTC offset.
