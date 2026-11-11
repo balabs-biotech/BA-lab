@@ -98,3 +98,23 @@ Les valeurs de données personnelles elles-mêmes ne doivent pas être copiées 
 - Journal officiel n° 48 du 24 juillet 2025, loi n° 25-11, notamment articles 41 bis, 41 bis 1, 41 bis 2 et 41 bis 3 : https://www.joradp.dz/FTP/JO-FRANCAIS/2025/F2025048.pdf
 - Portail du droit algérien — loi 18-07 et modifications : https://droit.mjustice.gov.dz/fr/content/protection-des-personnes-physiques-dans-le-traitement-des-donn%C3%A9es-%C3%A0-caract%C3%A8re-personnel
 - ANPDP — notice d'information sur les droits : https://plaintes.anpdp.dz/notice.php
+
+
+## 7. Vérification complémentaire — consentements et journalisation (11 novembre 2026)
+
+L'inspection du schéma Supabase de production a identifié une table existante `public.culture_data_consents`. Elle contient notamment `organization_id`, `user_id`, `terms_version`, `terms_accepted_at`, `research_statistics_opt_in` et `research_opt_in_at`.
+
+Cette table ne constitue pas encore un registre juridique complet :
+- les politiques RLS autorisent SELECT, INSERT et UPDATE pour le membre concerné ; les privilèges SQL accordent également DELETE à `authenticated` ;
+- la contrainte unique porte sur organisation, utilisateur et version des conditions ;
+- l'application consulte actuellement la version historique `2026-10-09-v1` au moment de la création d'une culture et peut mettre à jour l'opt-in statistique sur la ligne existante ;
+- le parcours d'inscription impose une case côté interface, mais cette case n'écrit pas à elle seule une preuve serveur au moment de la création du compte ;
+- aucune table dédiée aux versions des documents juridiques ni aucun journal append-only générique n'a été identifié dans les schémas inspectés.
+
+**Décision d'architecture :** ne pas détourner `culture_data_consents` pour y stocker les acceptations générales des CGU ou de la notice. Elle reste liée au consentement de partage / statistiques associé à la création d'une culture jusqu'à migration dédiée. Le modèle cible est décrit dans `docs/compliance/privacy-audit-engine-design.md`.
+
+Les dates, versions et retraits de consentements facultatifs devront être des événements distincts et append-only. L'acceptation des CGU, la prise de connaissance de la notice de confidentialité et l'opt-in de réutilisation scientifique sont trois actes différents ; ils ne doivent pas être fusionnés en un booléen générique.
+
+## 8. État du carnet automatisé
+
+À ce stade, aucun mécanisme générique de journalisation couvrant les consultations, extractions, transmissions, modifications et effacements de données personnelles n'a été confirmé. Les événements métier de `public.events` sont orientés traçabilité biologique, pas audit de protection des données. Ils ne doivent pas être considérés comme le carnet de l'article 41 bis 3 sans extension et validation spécifiques.
