@@ -64,5 +64,28 @@
     return Object.freeze({ status: "loaded", records: Object.freeze(records) });
   }
 
-  root.BALabsBiologicalAssessmentStore = Object.freeze({ version: VERSION, record, loadHistory });
+
+  async function loadHistoryBatch(input) {
+    if (!input || !input.client || typeof input.client.from !== "function" ||
+        typeof input.organizationId !== "string" || !input.organizationId.trim() ||
+        !Array.isArray(input.measurementIds) || !input.measurementIds.length) {
+      return Object.freeze({ status: "insufficient_context", records: Object.freeze([]) });
+    }
+    const ids = [...new Set(input.measurementIds.filter(id => typeof id === "string" && id.trim()))].slice(0, 50);
+    if (!ids.length) return Object.freeze({ status: "insufficient_context", records: Object.freeze([]) });
+    const { data, error } = await input.client.from("biological_assessments")
+      .select("id,organization_id,source_measurement_id,rule_version_id,status,reason,engine_version,calculation_origin,server_verification,result_snapshot,assessed_at")
+      .eq("organization_id", input.organizationId)
+      .in("source_measurement_id", ids)
+      .order("assessed_at", { ascending: false })
+      .limit(500);
+    if (error) return Object.freeze({ status: "unavailable", records: Object.freeze([]) });
+    const records = (Array.isArray(data) ? data : []).filter(row =>
+      row && row.organization_id === input.organizationId && ids.includes(row.source_measurement_id) &&
+      ALLOWED.has(row.status) && row.calculation_origin === "client_engine" &&
+      row.server_verification === "not_recomputed"
+    );
+    return Object.freeze({ status: "loaded", records: Object.freeze(records) });
+  }
+\n  root.BALabsBiologicalAssessmentStore = Object.freeze({ version: VERSION, record, loadHistory, loadHistoryBatch });
 })(typeof globalThis !== "undefined" ? globalThis : window);
