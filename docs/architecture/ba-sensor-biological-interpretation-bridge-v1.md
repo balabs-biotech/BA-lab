@@ -108,7 +108,7 @@ not partitioned by `profile_code`. Therefore, two different profile codes
 must not have overlapping activated validity intervals in the same resolver
 scope.
 
-Migration `20261111000500_enforce_profile_resolution_windows.sql` adds
+Migration `20261111042419_enforce_profile_resolution_windows.sql` adds
 database triggers for both registries. On activation or insertion of an
 active/retired row, each trigger:
 
