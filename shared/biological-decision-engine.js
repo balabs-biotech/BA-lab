@@ -43,6 +43,8 @@
       Array.isArray(policy.trigger_assessment_statuses) &&
       policy.trigger_assessment_statuses.includes(assessment.status) &&
       Array.isArray(policy.sources) && policy.sources.length > 0 &&
+      policy.sources.every(source => source && typeof source.type === "string" && source.type.trim() &&
+        typeof source.citation === "string" && source.citation.trim()) &&
       policy.review && typeof policy.review.reviewer_id === "string" && policy.review.reviewer_id.trim() &&
       typeof policy.review.reviewed_at === "string" &&
       typeof policy.decision_code === "string" && policy.decision_code.trim() &&
