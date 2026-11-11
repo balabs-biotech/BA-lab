@@ -280,3 +280,205 @@
     animation-iteration-count: 1 !important;
   }
 }
+
+
+/* -------------------------------------------------------------------------
+   Homepage integration — phase 1.
+   Editorial layer only. The #mainView WebGL scene is deliberately excluded.
+   ------------------------------------------------------------------------- */
+#app.balabs-ui > .top {
+  background: rgba(17,27,29,.94) !important;
+  border-bottom: 1px solid var(--balabs-line) !important;
+  color: var(--balabs-mineral) !important;
+}
+#app.balabs-ui > .top .brand strong {
+  color: var(--balabs-paper) !important;
+  letter-spacing: .18em !important;
+}
+#app.balabs-ui > .top .brand small {
+  color: var(--balabs-muted) !important;
+}
+#app.balabs-ui > .top .lang {
+  color: var(--balabs-mineral) !important;
+  background: var(--balabs-forest) !important;
+  border-color: var(--balabs-line) !important;
+}
+#app.balabs-ui > .top .lang[aria-pressed="true"] {
+  color: var(--balabs-graphite) !important;
+  background: var(--balabs-copper) !important;
+  border-color: var(--balabs-copper) !important;
+}
+#app.balabs-ui > .top .lang:focus-visible,
+#app.balabs-ui > .top .lang:hover {
+  border-color: var(--balabs-paper) !important;
+}
+#app.balabs-ui > .hero {
+  color: var(--balabs-mineral) !important;
+  background: var(--balabs-graphite) !important;
+}
+#app.balabs-ui > .hero h1,
+#app.balabs-ui > .hero h1 span {
+  color: var(--balabs-paper) !important;
+  text-shadow: none !important;
+}
+#app.balabs-ui > .hero h1 span { color: var(--balabs-copper) !important; }
+#app.balabs-ui > .hero .eyebrow { color: var(--balabs-muted) !important; }
+#app.balabs-ui > .hero p,
+#app.balabs-ui > .hero .aside { color: var(--balabs-mineral) !important; }
+#app.balabs-ui > .editorial-feature {
+  background: var(--balabs-forest) !important;
+  border-color: var(--balabs-line) !important;
+  color: var(--balabs-mineral) !important;
+}
+#app.balabs-ui > .editorial-feature .editorial-copy h2,
+#app.balabs-ui > .editorial-feature .editorial-copy h2 em {
+  color: var(--balabs-paper) !important;
+}
+#app.balabs-ui > .editorial-feature .editorial-copy p { color: var(--balabs-mineral) !important; }
+#app.balabs-ui > .editorial-feature .eyebrow,
+#app.balabs-ui > .editorial-feature .editorial-link { color: var(--balabs-copper) !important; }
+#app.balabs-ui > .editorial-about {
+  background: var(--balabs-graphite) !important;
+  border-color: var(--balabs-line) !important;
+  color: var(--balabs-mineral) !important;
+}
+#app.balabs-ui > .editorial-about h2,
+#app.balabs-ui > .editorial-about h2 em { color: var(--balabs-paper) !important; }
+#app.balabs-ui > .editorial-about p { color: var(--balabs-mineral) !important; }
+#app.balabs-ui > .editorial-about .eyebrow,
+#app.balabs-ui > .editorial-about .editorial-link { color: var(--balabs-copper) !important; }
+#app.balabs-ui > .editorial-work {
+  background: var(--balabs-graphite) !important;
+  color: var(--balabs-mineral) !important;
+}
+#app.balabs-ui > .editorial-work .work-heading h2,
+#app.balabs-ui > .editorial-work .work-heading h2 em { color: var(--balabs-paper) !important; }
+#app.balabs-ui > .editorial-work .work-heading p { color: var(--balabs-muted) !important; }
+#app.balabs-ui > .editorial-work .work-card {
+  min-height: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: .85rem !important;
+  padding: clamp(18px,2vw,26px) !important;
+  background: var(--balabs-forest) !important;
+  color: var(--balabs-mineral) !important;
+  border: 1px solid var(--balabs-line) !important;
+  border-top: 3px solid var(--balabs-copper) !important;
+  border-radius: var(--balabs-radius-md) !important;
+  box-shadow: none !important;
+}
+#app.balabs-ui > .editorial-work .work-card:nth-child(2),
+#app.balabs-ui > .editorial-work .work-card:nth-child(3) {
+  background: #202F2D !important;
+  border-top-color: var(--balabs-muted) !important;
+}
+#app.balabs-ui > .editorial-work .work-card h3 { color: var(--balabs-paper) !important; }
+#app.balabs-ui > .editorial-work .work-card p,
+#app.balabs-ui > .editorial-work .work-card .work-topics { color: var(--balabs-mineral) !important; }
+#app.balabs-ui > .editorial-work .work-card .work-index,
+#app.balabs-ui > .editorial-work .work-card .work-tag { color: var(--balabs-muted) !important; }
+#app.balabs-ui > .editorial-work .work-card a,
+#app.balabs-ui > .editorial-work .work-explore { color: var(--balabs-copper) !important; }
+#app.balabs-ui > .editorial-work .work-card .work-media {
+  border-radius: var(--balabs-radius-sm) !important;
+  background: var(--balabs-graphite) !important;
+}
+#app.balabs-ui > .universe-index {
+  background: var(--balabs-graphite) !important;
+  color: var(--balabs-mineral) !important;
+}
+#app.balabs-ui > .universe-index .universe-index-heading h2 { color: var(--balabs-paper) !important; }
+#app.balabs-ui > .universe-index .universe-index-heading > p { color: var(--balabs-muted) !important; }
+#app.balabs-ui > .universe-index .universe-index-card {
+  min-height: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  gap: .65rem !important;
+  padding: clamp(17px,2vw,24px) !important;
+  border: 1px solid var(--balabs-line) !important;
+  border-top: 2px solid var(--balabs-copper) !important;
+  border-radius: var(--balabs-radius-md) !important;
+  background: var(--balabs-forest) !important;
+  box-shadow: none !important;
+  color: var(--balabs-mineral) !important;
+  text-decoration: none !important;
+}
+#app.balabs-ui > .universe-index .universe-index-card:nth-child(2n) {
+  background: #202F2D !important;
+  border-top-color: var(--balabs-muted) !important;
+}
+#app.balabs-ui > .universe-index .universe-index-card > span {
+  color: var(--balabs-copper) !important;
+  font: 700 .72rem/1.2 ui-monospace,monospace !important;
+  letter-spacing: .12em !important;
+}
+#app.balabs-ui > .universe-index .universe-index-card > b {
+  color: var(--balabs-paper) !important;
+  font-size: clamp(1rem,1.25vw,1.2rem) !important;
+  line-height: 1.25 !important;
+}
+#app.balabs-ui > .universe-index .universe-index-card > small {
+  color: var(--balabs-muted) !important;
+  line-height: 1.45 !important;
+}
+#app.balabs-ui > .universe-index .universe-index-card > p {
+  color: var(--balabs-mineral) !important;
+  line-height: 1.6 !important;
+  margin: 0 !important;
+}
+#app.balabs-ui > .universe-index .universe-index-card > em {
+  margin-top: auto !important;
+  color: var(--balabs-copper) !important;
+  font-style: normal !important;
+  font-size: .75rem !important;
+  font-weight: 700 !important;
+  letter-spacing: .04em !important;
+}
+#app.balabs-ui > .universe-index .universe-index-card:hover {
+  transform: translateY(-2px) !important;
+  border-color: var(--balabs-copper) !important;
+  box-shadow: 0 12px 28px rgba(0,0,0,.22) !important;
+}
+#app.balabs-ui > .editorial-method {
+  background: var(--balabs-forest) !important;
+  color: var(--balabs-mineral) !important;
+}
+#app.balabs-ui > .editorial-method h2,
+#app.balabs-ui > .editorial-method h2 em { color: var(--balabs-paper) !important; }
+#app.balabs-ui > .editorial-method p { color: var(--balabs-mineral) !important; }
+#app.balabs-ui > .editorial-method .eyebrow,
+#app.balabs-ui > .editorial-method .method-no { color: var(--balabs-copper) !important; }
+#app.balabs-ui > .foot {
+  background: var(--balabs-graphite) !important;
+  border-color: var(--balabs-line) !important;
+  color: var(--balabs-mineral) !important;
+}
+#app.balabs-ui > .foot a,
+#app.balabs-ui > .foot strong { color: var(--balabs-paper) !important; }
+#app.balabs-ui > .foot small { color: var(--balabs-muted) !important; }
+
+@media (min-width: 1000px) {
+  #app.balabs-ui > .universe-index .universe-index-grid {
+    grid-template-columns: repeat(4,minmax(0,1fr)) !important;
+    gap: 16px !important;
+  }
+}
+@media (min-width: 600px) and (max-width: 999px) {
+  #app.balabs-ui > .universe-index .universe-index-grid {
+    grid-template-columns: repeat(2,minmax(0,1fr)) !important;
+  }
+}
+@media (max-width: 599px) {
+  #app.balabs-ui > .universe-index .universe-index-grid {
+    grid-template-columns: minmax(0,1fr) !important;
+  }
+  #app.balabs-ui > .universe-index .universe-index-card { padding: 18px !important; }
+}
+@media (prefers-reduced-motion: reduce) {
+  #app.balabs-ui > .universe-index .universe-index-card,
+  #app.balabs-ui > .editorial-work .work-card,
+  #app.balabs-ui > .editorial-work .work-card .work-media img {
+    transition: none !important;
+  }
+}
