@@ -9,6 +9,7 @@ const styles = read("batch-tracker/tracker.css");
 const locales = read("batch-tracker/i18n.js");
 const lineageIndexMigration = read("supabase/migrations/20261110220000_add_material_relationship_reverse_index.sql");
 const mixtureMigration = read("supabase/migrations/20261110230000_add_atomic_multi_source_material_creation.sql");
+const interpretationMigration = read("supabase/migrations/20261112090000_add_biological_interpretation_registry.sql");
 const traceabilityRuntimeTest = read("supabase/tests/biological_traceability.test.sql");
 
 for (const entry of [
@@ -329,7 +330,7 @@ assert.match(moduleSource, /lineage\?\.lineageQuality\?\.complete === true/);
 
 assert.match(moduleSource, /biological_field_coverage/);
 assert.match(moduleSource, /insufficient_context_for_biological_interpretation/);
-assert.match(moduleSource, /temporal_evidence: temporalEvidenceForFinding\(signal\)/);
+assert.match(moduleSource, /temporal_evidence: temporalEvidence,/);
 assert.match(moduleSource, /const compareFindingEvidence = \(signal, temporalEvidence\) =>/);
 assert.match(moduleSource, /same_variable_measurement_count/);
 assert.match(moduleSource, /unit_compatible_measurement_count/);
@@ -352,3 +353,16 @@ assert.match(moduleSource, /source_observation_ids,variable_code,observed_date/)
 
 assert.match(moduleSource, /composition_status: "not_assessed"/);
 
+
+assert.match(interpretationMigration, /create table public\.biological_interpretations/);
+assert.match(interpretationMigration, /create table public\.biological_interpretation_events/);
+assert.match(interpretationMigration, /interpretation_payload jsonb not null check \(jsonb_typeof\(interpretation_payload\) = 'object'\)/);
+assert.match(interpretationMigration, /before update or delete on public\.biological_interpretations/);
+assert.match(interpretationMigration, /before update or delete on public\.biological_interpretation_events/);
+assert.match(interpretationMigration, /private\.is_org_member\(organization_id\)/);
+assert.match(interpretationMigration, /auth\.jwt\(\) ->> 'role'.*service_role/s);
+assert.match(interpretationMigration, /v_signal\.biological_subject_id/);
+assert.match(interpretationMigration, /v_signal\.source_analysis_id/);
+assert.match(interpretationMigration, /v_signal\.source_finding_id/);
+assert.match(interpretationMigration, /v_inserted boolean/);
+assert.match(interpretationMigration, /if v_inserted then/);
