@@ -260,6 +260,7 @@ assert.ok(engine.includes('window.__BALABS_3D_E2E__'), 'The browser smoke test m
 // Public catalogue exclusions: these five Trichoderma records are explicitly inactive in Notion and must not leak into either Arabic tree.
 const inactiveArabicProducts = ['ar-lc-tricho-harzianum', 'ar-lc-tricho-hamatum', 'ar-lc-tricho-koningii', 'ar-lc-tricho-longibrachiatum', 'ar-lc-tricho-reesei'];
 for (const [label, tree] of [['public', JSON.parse(readFileSync('ecosystem/notion-tree.ar.json', 'utf8'))], ['preview', JSON.parse(readFileSync('ecosystem-preview/notion-tree.ar.json', 'utf8'))]]) {
+  assert.equal(tree.domains.find((domain) => domain.id === 'products')?.children?.[0]?.id, 'ar-public-catalogue', label + ' Arabic products universe must lead with the public catalogue');
   const ids = new Set(flattenManifest({ children: tree.domains }).map((node) => node.id));
   for (const id of inactiveArabicProducts) assert.ok(!ids.has(id), label + ' Arabic tree must not expose inactive catalogue item ' + id);
 }
