@@ -145,7 +145,7 @@ window.BA_LABS_ASSESS_BIOLOGICAL_MEASUREMENT = async ({ cultureId, measurement, 
   });
 };
 
-window.BA_LABS_ASSESS_AND_RECORD_BIOLOGICAL_MEASUREMENT = async ({ measurementId } = {}) => {
+window.BA_LABS_ASSESS_AND_RECORD_BIOLOGICAL_MEASUREMENT = async ({ measurementId, idempotencyKey } = {}) => {
   const requestRevision = authStateRevision;
   const requestOrganizationId = organizationId;
   const domain = window.BA_LABS_DOMAIN || document.body.dataset.domain;
