@@ -63,6 +63,27 @@ create table public.biological_recommendations (
       or (lifecycle_status = 'executed' and revision = 2)
       or (lifecycle_status = 'outcome_recorded' and revision = 3)
     )
+,  constraint biological_recommendations_outcome_projection_check
+    check (
+      (
+        lifecycle_status in ('proposed', 'withheld', 'accepted', 'rejected')
+        and execution_details is null
+        and outcome_summary is null
+        and outcome_observed_at is null
+      )
+      or (
+        lifecycle_status = 'executed'
+        and length(btrim(execution_details)) > 0
+        and outcome_summary is null
+        and outcome_observed_at is null
+      )
+      or (
+        lifecycle_status = 'outcome_recorded'
+        and length(btrim(execution_details)) > 0
+        and length(btrim(outcome_summary)) > 0
+        and outcome_observed_at is not null
+      )
+    )
 );
 
 create index biological_recommendations_review_queue_idx
