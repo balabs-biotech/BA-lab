@@ -36,7 +36,7 @@ Statuses:
 - `normal`: evaluated and no interval exceeded the configured tolerance;
 - `irregular`: one or more interior receipt gaps exceeded the configured tolerance;
 - `silent`: the most recent receipt is older than the explicitly configured trailing-silence threshold;
-- `insufficient_data`: device is expected, but no usable receipt history exists to establish a baseline;
+- `insufficient_data`: the explicit expectation window has not yet exceeded the configured tolerance and there is not enough receipt evidence to classify the device;
 - `not_evaluable`: no explicit cadence policy, device expectation, or valid evaluation window was supplied.
 
 ## Temporal rules
@@ -49,7 +49,7 @@ Statuses:
 6. Historical intervals may report interior irregularity, but must not label a device currently silent based on an old period.
 7. A device is eligible only when it is bound to the selected sensor profile and its activation/validity interval overlaps the evaluation interval.
 8. Disabled devices and devices not yet created are not classified as silent.
-9. A zero-receipt device remains assessable only if the registry proves it was expected to transmit during the interval. Otherwise return `not_evaluable` or `insufficient_data`, not `silent`.
+9. A zero-receipt device can be `silent` only when the registry proves it was expected to transmit and the elapsed expectation window exceeds the explicit cadence tolerance. A shorter window remains `insufficient_data`.
 10. Receipt diagnostics remain independent from measurement quality flags and biological signal persistence.
 
 ## Integration sequence
@@ -77,7 +77,7 @@ The first provider-neutral implementation is available in
 - `assess_sensor_transmissions` computes device-level interior gaps and optional current-window trailing silence;
 - explicit cadence and tolerance policy are mandatory;
 - disabled/unbound devices are `not_evaluable`;
-- no receipt history is `insufficient_data`, never an automatic `silent` classification;
+- zero receipts become `silent` only after the explicit device expectation window exceeds the configured cadence tolerance; a shorter window remains `insufficient_data`;
 - historical windows do not produce a current silence status;
 - receipt IDs are retained as lineage and duplicates are rejected.
 
