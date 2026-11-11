@@ -227,3 +227,67 @@ comment on table public.biological_interpretations is
   'Immutable versioned snapshots of biological interpretation, linked to the exact persisted signal, analysis and finding.';
 comment on table public.biological_interpretation_events is
   'Append-only lifecycle history for biological interpretation snapshots.';
+
+
+-- Human review is recorded as an append-only event; the engine snapshot is never edited.
+create or replace function public.review_biological_interpretation(
+  p_organization_id uuid,
+  p_interpretation_id uuid,
+  p_decision text,
+  p_note text default null
+)
+returns jsonb
+language plpgsql
+security definer
+set search_path = pg_catalog, public, private, auth
+as $$
+declare
+  v_actor_id uuid := auth.uid();
+  v_event_id uuid := gen_random_uuid();
+begin
+  if v_actor_id is null
+     or coalesce(auth.jwt() ->> 'role', '') <> 'authenticated'
+     or not private.is_org_member(p_organization_id) then
+    raise exception 'biological_interpretation_review_forbidden'
+      using errcode = '42501';
+  end if;
+
+  if p_organization_id is null or p_interpretation_id is null
+     or p_decision not in ('accepted', 'contested', 'reassessment_requested')
+     or (p_note is not null and length(p_note) > 2000) then
+    raise exception 'invalid_biological_interpretation_review'
+      using errcode = '23514';
+  end if;
+
+  if not exists (
+    select 1 from public.biological_interpretations bi
+     where bi.organization_id = p_organization_id
+       and bi.interpretation_id = p_interpretation_id
+  ) then
+    raise exception 'biological_interpretation_not_found'
+      using errcode = 'P0002';
+  end if;
+
+  insert into public.biological_interpretation_events (
+    organization_id, interpretation_id, event_id, event_type,
+    actor_kind, actor_id, event_payload
+  ) values (
+    p_organization_id, p_interpretation_id, v_event_id, 'reviewed',
+    'user', v_actor_id, jsonb_build_object(
+      'decision', p_decision,
+      'note', nullif(btrim(coalesce(p_note, '')), '')
+    )
+  );
+
+  return jsonb_build_object(
+    'event_id', v_event_id,
+    'interpretation_id', p_interpretation_id,
+    'decision', p_decision
+  );
+end;
+$$;
+
+revoke all on function public.review_biological_interpretation(uuid, uuid, text, text)
+  from public, anon;
+grant execute on function public.review_biological_interpretation(uuid, uuid, text, text)
+  to authenticated;
