@@ -93,6 +93,8 @@ jobs:
         run: node scripts/test-biological-decision-engine.mjs
       - name: Test tenant-scoped biological decision policy store
         run: node scripts/test-biological-decision-policy-store.mjs
+      - name: Test biological decision policy authoring lifecycle
+        run: node scripts/test-biological-decision-policy-authoring.mjs
 
   batch-tracker-audit:
     runs-on: ubuntu-latest
