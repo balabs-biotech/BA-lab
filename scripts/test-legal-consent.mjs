@@ -32,6 +32,6 @@ assert.ok(existsSync("legal/terms.html"));
 assert.match(readFileSync("batch-tracker/workspace.html", "utf8"), /authPrivacyAccepted/);
 assert.match(readFileSync("batch-tracker/tracker.js", "utf8"), /authPrivacyAcceptedCheckbox\?\.checked/);
 for (const page of ["index.html", "batch-tracker/mycology/index.html", "batch-tracker/green-tech/index.html", "batch-tracker/laboratory/index.html"]) {
-  assert.match(readFileSync(page, "utf8"), /legal-consent\\.js/);
+  assert.ok(readFileSync(page, "utf8").includes("legal-consent.js"), `${page} must load the privacy manager`);
 }
 console.log("Legal and consent assets: structural contract checks passed.");
