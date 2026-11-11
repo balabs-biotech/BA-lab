@@ -22,6 +22,8 @@ const supabaseClient =
    ============================================================ */
 
 let organizationId = null;
+window.BA_LABS_SUPABASE_CLIENT = supabaseClient;
+window.BA_LABS_GET_ORGANIZATION_ID = () => organizationId;
 
 let organization = null;
 
