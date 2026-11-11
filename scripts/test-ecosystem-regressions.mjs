@@ -7,7 +7,7 @@ const engine = readFileSync('ecosystem/engine-v2.js', 'utf8');
 const previewEngine = readFileSync('ecosystem-preview/engine-v2.js', 'utf8');
 const expectedDomains = ['bio', 'myco', 'soil', 'lab', 'products', 'iot', 'work', 'learn'];
 const brandCss = readFileSync('ecosystem/brand-system.css', 'utf8');
-assert.ok(html.includes('<link rel="stylesheet" href="./brand-system.css?v=1">'), 'Public homepage must load the BA Labs visual system');
+assert.ok(html.includes('<link rel="stylesheet" href="./brand-system.css?v=2">'), 'Public homepage must load the BA Labs visual system');
 assert.ok(html.includes('<div class="wrap balabs-ui" id="app"'), 'Public homepage must opt into the BA Labs visual system');
 for (const section of ['hero', 'editorial-feature', 'editorial-about', 'editorial-work', 'universe-index', 'editorial-method']) {
   assert.ok(brandCss.includes('#app.balabs-ui > main > .' + section), 'Visual system must target the actual main landmark child: ' + section);
