@@ -265,7 +265,7 @@
       seen.add(cursor.id);
       byId.set(cursor.id, cursor);
     }
-    if (cursor.parent_culture_id && !seen.has(cursor.parent_culture_id) && byId.size < MAX_CULTURES) {
+    if (cursor.parent_culture_id && !seen.has(cursor.parent_culture_id) && byId.size < MAX_CULTURES && !qualityIssues.some(issue => issue.stage === "culture_ancestors")) {
       markIncomplete("culture_ancestor_depth_limit", { message: "Profondeur maximale des ancêtres atteinte" });
     }
 
@@ -286,7 +286,7 @@
       }
       frontier = next;
     }
-    if (frontier.length && byId.size < MAX_CULTURES) {
+    if (frontier.length && byId.size < MAX_CULTURES && !qualityIssues.some(issue => issue.stage === "culture_descendants")) {
       markIncomplete("culture_descendant_depth_limit", { message: "Profondeur maximale des descendants atteinte" });
     }
 
@@ -316,7 +316,7 @@
       rows.forEach(row => materialById.set(row.id, row));
       materialFrontier = rows.map(row => row.parent_material_id).filter(id => id && !materialSeen.has(id));
     }
-    if (materialFrontier.length && materialById.size < MAX_MATERIALS) {
+    if (materialFrontier.length && materialById.size < MAX_MATERIALS && !qualityIssues.some(issue => issue.stage === "material_ancestors")) {
       markIncomplete("material_ancestor_depth_limit", { message: "Profondeur maximale des matériaux parents atteinte" });
     }
     // Expand descendants from every material already linked to the culture family.
@@ -337,7 +337,7 @@
       }
       materialFrontier = next;
     }
-    if (materialFrontier.length && materialById.size < MAX_MATERIALS) {
+    if (materialFrontier.length && materialById.size < MAX_MATERIALS && !qualityIssues.some(issue => issue.stage === "material_descendants")) {
       markIncomplete("material_descendant_depth_limit", { message: "Profondeur maximale des descendants matière atteinte" });
     }
     // Expand the explicit material graph in both directions. The relationship table
@@ -374,7 +374,7 @@
       relationshipFrontier = hydrateIds.filter(id => !relationshipSeen.has(id));
       relationshipFrontier.forEach(id => relationshipSeen.add(id));
     }
-    if (relationshipFrontier.length && materialById.size < MAX_MATERIALS && relationshipByKey.size < MAX_RELATIONSHIPS) {
+    if (relationshipFrontier.length && materialById.size < MAX_MATERIALS && relationshipByKey.size < MAX_RELATIONSHIPS && !qualityIssues.some(issue => issue.stage === "material_relationships")) {
       markIncomplete("material_relationship_depth_limit", { message: "Profondeur maximale du graphe de relations atteinte" });
     }
     // Hydrate any legacy parent pointer not represented by an explicit relationship row.
