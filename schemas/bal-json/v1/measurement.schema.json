@@ -146,30 +146,6 @@
         },
         {
           "properties": {
-            "material_id": true
-          },
-          "required": [
-            "material_id"
-          ]
-        },
-        {
-          "properties": {
-            "sample_id": true
-          },
-          "required": [
-            "sample_id"
-          ]
-        },
-        {
-          "properties": {
-            "experimental_unit_id": true
-          },
-          "required": [
-            "experimental_unit_id"
-          ]
-        },
-        {
-          "properties": {
             "batch_id": true
           },
           "required": [
