@@ -419,11 +419,21 @@ function openResource(item) {
  status.textContent=data.title||'';
 }
 function showDomainPanel(id,message='') {if(message)status.textContent=message;renderPath()}
+function resourceOverviewDistance(rootCount) {
+  const mobile=window.innerWidth<760;
+  const radius=rootCount>16
+    ?1.35+(mobile?3.55:4.35)*Math.sqrt((rootCount-.5)/rootCount)
+    :2.47;
+  const vertical=THREE.MathUtils.degToRad(camera.fov*.5);
+  const horizontal=Math.atan(Math.tan(vertical)*camera.aspect);
+  const limitingHalfAngle=Math.max(.08,Math.min(vertical,horizontal));
+  return Math.max(7.5,radius/Math.tan(limitingHalfAngle)*1.12);
+}
 function enterDomain(id) {
   if(!cells.has(id))return;selected=id;if(status)status.hidden=true;selectedBranch=null;opened=true;navigationStack=[];currentNode=manifest?.domains?.find(d=>d.id===id)||null;currentAnchor=cells.get(id).position.clone();
   intro.hidden=true;nav.hidden=false;ROOT.classList.remove('universe-closed');ROOT.classList.add('universe-open');panel.hidden=true;panel.replaceChildren();
   if(typeof window.enterSphere==='function')window.enterSphere(id,false,true); // Populate the hidden legacy content source only; the old engine no longer owns #mainView events.
-  const rootCount=manifest?.domains?.find(d=>d.id===id)?.children?.length||0;const initialDistance=rootCount>16?(window.innerWidth<760?20.5:11.5):7.5;smoothCamera(cells.get(id).position,initialDistance,900,()=>buildResources(id));
+  const rootCount=manifest?.domains?.find(d=>d.id===id)?.children?.length||0;const initialDistance=resourceOverviewDistance(rootCount);smoothCamera(cells.get(id).position,initialDistance,900,()=>buildResources(id));
 }
 function goBackLevel() {
   if(navigationStack.length){const previous=navigationStack.pop();currentNode=previous.node;currentAnchor=previous.anchor.clone();smoothCamera(currentAnchor,6.2,650,()=>buildResources(selected,currentNode,currentAnchor));return}
