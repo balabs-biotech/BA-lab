@@ -222,7 +222,7 @@ La fonction Edge n'expose jamais la clé `service_role`. Après validation du JW
 - Une version est identifiée par le couple `document_type + version`, et son empreinte SHA-256 est immuable.
 - Une publication planifiée retire la version précédente à la même date d'effet, dans une seule transaction.
 - Un verrou transactionnel par type de document sérialise les publications concurrentes.
-- Une version publiée ne peut pas être supprimée ou réécrite ; son retrait est unidirectionnel.
+- Une version publiée ne peut pas être supprimée ou réécrite ; son retrait est unidirectionnel. Le retrait des CGU ou de la notice de confidentialité est refusé tant qu'une version de remplacement n'est pas effective à la date du retrait, afin de ne pas bloquer toutes les nouvelles inscriptions.
 - Les erreurs de conflit sont renvoyées sans révéler les détails internes de la base.
 - L'empreinte fournie doit être calculée sur le fichier final exact. Le registre ne télécharge ni ne réécrit lui-même les pages HTML.
 
