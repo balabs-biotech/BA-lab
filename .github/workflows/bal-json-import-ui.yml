@@ -12,12 +12,16 @@ on:
       - "supabase/functions/bal-json-ingest/**"
       - "schemas/bal-json/**"
       - "scripts/test-bal-json-import-ui.mjs"
+      - "shared/**"
+      - "scripts/test-bal-normalizer.mjs"
       - ".github/workflows/bal-json-import-ui.yml"
   push:
     branches: ["feat/bal-json-contract-v1"]
     paths:
       - "batch-tracker/bal-json-import.js"
       - "scripts/test-bal-json-import-ui.mjs"
+      - "shared/**"
+      - "scripts/test-bal-normalizer.mjs"
       - ".github/workflows/bal-json-import-ui.yml"
 
 permissions:
@@ -33,6 +37,8 @@ jobs:
           node-version: "22"
       - name: Test BAL-JSON import preview and authenticated submission
         run: node scripts/test-bal-json-import-ui.mjs
+      - name: Test conservative BAL-Normalizer rules
+        run: node scripts/test-bal-normalizer.mjs
       - uses: denoland/setup-deno@v2
         with:
           deno-version: v2.x
