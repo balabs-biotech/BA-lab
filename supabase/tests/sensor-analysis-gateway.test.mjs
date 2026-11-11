@@ -82,3 +82,19 @@ assert.match(source, /\(rows \?\? \[\]\)\.filter/, "transmission-only analysis m
 assert.match(source, /!profileScopedRows\.length && transmissionExpectedInterval === undefined/, "empty profile-scoped measurements must be allowed only for transmission diagnostics");
 
 assert.match(source, /expected_to: profile\.valid_to/, "device expectation must stop at the sensor profile end date");
+
+
+const driftPolicyRead = source.indexOf('.from("sensor_drift_reference_policies")');
+const driftPolicyForward = source.indexOf("drift_policies: driftPolicyPayload");
+assert.ok(driftPolicyRead > membershipRead, "drift policy registry must only be read after tenant membership authorization");
+assert.ok(driftPolicyRead < engineCall, "persisted drift policies must be resolved before the private engine call");
+assert.match(source, /\.eq\("organization_id", profile\.organization_id\)/, "drift policy lookup must be tenant-scoped");
+assert.match(source, /\.eq\("environment_id", environmentId\)/, "drift policy lookup must be environment-scoped");
+assert.match(source, /\.eq\("status", "active"\)/, "only active drift policy versions may be used");
+assert.match(source, /\.eq\("reference_binding_verified", true\)/, "only explicitly verified reference bindings may be resolved");
+assert.match(source, /\.in\("target_sensor_id", sensorIds\)/, "drift policy targets must belong to the resolved sensor profile");
+assert.match(source, /!sensorIds\.includes\(policy\.reference_sensor_id\)/, "reference sensors must also belong to the resolved sensor profile");
+assert.match(source, /policy\.valid_from > fromDate/, "drift policy validity must cover the requested start date");
+assert.match(source, /policy\.valid_to < toDate/, "drift policy validity must cover the requested end date");
+assert.match(source, /drift_policies: driftPolicyPayload/, "only database-resolved drift policies may be forwarded");
+assert.ok(driftPolicyForward > driftPolicyRead, "resolved drift policy payload must be built after the registry lookup");
