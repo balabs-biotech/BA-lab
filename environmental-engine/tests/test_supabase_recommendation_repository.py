@@ -244,12 +244,6 @@ def test_append_event_uses_authenticated_rpc_and_reloads_committed_history():
                     "outcome_summary": None,
                     "outcome_observed_at": None,
                 },
-                "idempotent_replay": False,
-            }
-        },
-        table_results={
-            "biological_recommendations": {
-                **recommendation_row(proposal, status="accepted", revision=1),
                 "events": [{
                     "event_id": str(event.event_id),
                     "revision": 1,
@@ -261,8 +255,9 @@ def test_append_event_uses_authenticated_rpc_and_reloads_committed_history():
                     "outcome_summary": None,
                     "outcome_observed_at": None,
                 }],
+                "idempotent_replay": False,
             }
-        },
+        }
     )
     repository = SupabaseRecommendationRepository(
         user_client=user_client,
