@@ -41,3 +41,18 @@ Withholding reasons are machine-readable. A missing definition never falls back 
 ## Example boundary
 
 A temperature signal for a declared fruiting-room context may resolve to an inspection proposal only when the profile explicitly maps that signal and the required cultivation-stage/system tags are present. If a contraindication such as an active maintenance state is present, the proposal is withheld. The engine does not decide a target temperature or automatically increase ventilation/humidity.
+
+## Lifecycle boundary v1
+
+The pure domain module `interpretation/recommendation_lifecycle.py` models the human workflow without binding it to a database or UI.
+
+Allowed transitions are deliberately linear:
+- `proposed -> accepted` or `proposed -> rejected`;
+- `accepted -> executed`, with a required execution record;
+- `executed -> outcome_recorded`, with a required outcome summary and observation timestamp.
+
+A withheld proposal cannot enter review. Rejected proposals are terminal in this version. Every transition appends an immutable event carrying the actor identifier, timezone-aware event time and optional note/details. The aggregate retains execution details separately from the later observed outcome.
+
+The domain function does not authenticate the actor or persist the event. Those responsibilities belong to a tenant-authorized application/repository adapter. Production persistence should store events append-only and derive the current status from validated transitions; clients must not be allowed to rewrite scientific proposal provenance or historical events.
+
+Execution means a human records that an intervention occurred. It is not an instruction to an actuator. An outcome is a subsequent observation, not proof that the intervention caused the observed change.
