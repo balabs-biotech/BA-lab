@@ -67,7 +67,7 @@ def assess_sensor_transmissions(
 
     Interior gaps are evaluated for both historical and current windows.
     Trailing silence is evaluated only when current_window is explicitly true.
-    A device with no receipt history is insufficient_data, not silent.
+    A device with no receipt history can be silent only after its explicit expectation window has exceeded the configured tolerance; otherwise it is insufficient_data.
     """
     for field, value in (
         ("evaluation_start", evaluation_start),
