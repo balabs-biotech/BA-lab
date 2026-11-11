@@ -524,7 +524,7 @@
       const interpretationEventResult = await client.from("biological_interpretation_events")
         .select("interpretation_id,event_id,event_type,actor_kind,actor_id,occurred_at,event_payload")
         .eq("organization_id", organizationId).in("interpretation_id", interpretationIds)
-        .order("occurred_at", { ascending: true }).limit(2000);
+        .order("occurred_at", { ascending: false }).limit(2000);
       interpretationEventsAvailable = !interpretationEventResult.error;
       if (interpretationEventResult.error) {
         markIncomplete("biological_interpretation_events", interpretationEventResult.error);
