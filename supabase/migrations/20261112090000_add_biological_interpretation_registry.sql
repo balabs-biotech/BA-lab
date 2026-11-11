@@ -121,6 +121,7 @@ declare
   v_signal public.biological_signals%rowtype;
   v_snapshot public.biological_interpretations%rowtype;
   v_inserted boolean := false;
+  v_rows integer := 0;
 begin
   if coalesce(auth.jwt() ->> 'role', '') <> 'service_role' then
     raise exception 'biological_interpretation_record_forbidden'
@@ -164,7 +165,8 @@ begin
   )
   on conflict (organization_id, interpretation_id) do nothing;
 
-  get diagnostics v_inserted = row_count;
+  get diagnostics v_rows = row_count;
+  v_inserted := v_rows > 0;
 
   select * into v_snapshot
     from public.biological_interpretations bi
