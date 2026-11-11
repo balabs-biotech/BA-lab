@@ -335,8 +335,10 @@ function syncResourceHitTargets() {
     const conflicts=occupied.filter(r=>overlaps(box,r)).length+obstacles.filter(r=>overlaps(box,r)).length;
     return{cx,cy,box,conflicts,displacement:Math.hypot(cx-sx,cy-sy)};
    }).sort((a,b)=>a.conflicts-b.conflicts||a.displacement-b.displacement);
-   if(candidates[0]?.conflicts){button.hidden=true;button.style.display='none';button.dataset.labelDecluttered='true';continue;}
-    chosen=candidates[0]||{cx:sx,cy:sy,box:{l:sx-w/2,t:sy-h/2,r:sx+w/2,b:sy+h/2}};
+   // Never discard a branch label solely because the viewport is crowded.
+   // Use the least-conflicting nearby slot; slight overlap is preferable to a missing destination.
+   chosen=candidates[0]||{cx:sx,cy:sy,box:{l:sx-w/2,t:sy-h/2,r:sx+w/2,b:sy+h/2}};
+   button.dataset.labelCrowded=String((chosen.conflicts||0)>0);
   }
   occupied.push(chosen.box);
   button.style.setProperty('z-index',String(12000+Math.round((1-item.p.z)*100)),'important');
