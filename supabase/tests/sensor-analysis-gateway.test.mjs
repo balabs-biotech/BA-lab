@@ -74,3 +74,6 @@ assert.match(source, /MAX_ROWS \+ 1/, "receipt history must enforce a bounded re
 assert.match(source, /sensor_receipt_limit_reached_narrow_date_range/, "receipt truncation must fail closed");
 assert.match(source, /profile\.valid_from \+ "T00:00:00\.000Z"/, "device expectation must be bounded by profile validity");
 assert.ok(receiptForward > receiptRead, "receipt payload must be forwarded to the private engine");
+
+assert.match(source, /!rows\?\.length && transmissionExpectedInterval === undefined/, "empty measurement scope must remain an error unless transmission-only diagnostics were requested");
+assert.match(source, /transmission_current_window: transmissionExpectedInterval !== undefined/, "current silence evaluation must be enabled only for a current local-date window");
