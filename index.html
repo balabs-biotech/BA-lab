@@ -56,7 +56,7 @@ html[dir="rtl"] .intro-note{border-left:0;border-right:1px solid var(--copper);p
       <p class="lead">Un espace de travail conçu pour suivre le vivant avec méthode : des cultures aux lots, des observations aux résultats.</p>
     </div>
     <aside class="intro-note">
-      <svg class="hyphae-figure" viewBox="0 0 520 260" role="img" aria-label="Réseau ramifié de filaments biologiques">
+      <svg class="hyphae-figure" viewBox="0 0 520 260" aria-hidden="true">
         <path class="main-filament" d="M18 228 C90 198 92 146 158 137 S236 160 286 111 S371 87 493 18"/>
         <path d="M83 192 C51 154 54 122 24 99 M91 180 C123 159 134 128 130 92 M157 137 C154 102 181 81 173 38 M180 139 C223 119 225 82 215 52 M285 111 C264 75 280 45 267 16 M308 101 C355 123 383 110 410 82 M371 87 C375 54 401 40 400 13 M421 58 C452 65 473 52 503 44"/>
         <path d="M52 212 C83 222 109 240 118 256 M128 153 C108 121 102 104 107 70 M215 127 C243 145 250 176 246 204 M268 123 C301 149 302 180 292 214 M339 97 C335 66 348 44 342 22 M398 72 C430 97 449 110 483 105"/>
@@ -64,7 +64,7 @@ html[dir="rtl"] .intro-note{border-left:0;border-right:1px solid var(--copper);p
         <circle cx="158" cy="137" r="4"/><circle cx="286" cy="111" r="4"/><circle cx="371" cy="87" r="3"/><circle cx="83" cy="192" r="3"/>
       </svg>
       <strong>Une plateforme. Trois espaces spécialisés.</strong>
-      Une même exigence de traçabilité biologique, avec des outils adaptés à chaque activité.
+      <span class="intro-note-copy">Une même exigence de traçabilité biologique, avec des outils adaptés à chaque activité.</span>
       <span class="hyphae-caption">FIG. 01 / BRANCHED BIOLOGICAL NETWORK</span>
     </aside>
   </section>
@@ -117,7 +117,7 @@ html[dir="rtl"] .intro-note{border-left:0;border-right:1px solid var(--copper);p
       document.querySelector(".universes").setAttribute("aria-label", vals[4]);
       document.querySelector(".section-head h2").textContent = vals[10];
       document.querySelector(".intro-note strong").textContent = vals[11];
-      document.querySelector(".intro-note").lastChild.textContent = vals[12];
+      document.querySelector(".intro-note-copy").textContent = vals[12];
       document.querySelector(".section-head p").textContent = vals[13];
       document.querySelector(".agronomy .universe-label").textContent = vals[14];
       document.querySelector(".myco .universe-label").textContent = vals[15];
