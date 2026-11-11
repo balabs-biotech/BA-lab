@@ -887,3 +887,113 @@ def test_sensor_api_rejects_current_silence_for_a_historical_window():
 
     assert response.status_code == 422
     assert "current profile-local date" in str(response.json()["detail"])
+
+
+def test_sensor_api_exposes_reference_based_drift_diagnostics_separately():
+    request = sensor_payload()
+    target_id = request["measurements"][0]["iot_device_id"]
+    reference_id = str(uuid4())
+    base = request["measurements"][0]
+    request["measurements"] = []
+    for index, target_value in enumerate((20.0, 21.0, 22.0, 23.0)):
+        target = dict(base)
+        target.update({
+            "id": str(uuid4()),
+            "iot_device_id": target_id,
+            "device_code": "sensor-target",
+            "raw_value": target_value,
+            "measured_at": f"2026-03-01T0{index}:00:00+00:00",
+        })
+        reference = dict(base)
+        reference.update({
+            "id": str(uuid4()),
+            "iot_device_id": reference_id,
+            "device_code": "sensor-reference",
+            "raw_value": 20.0,
+            "measured_at": f"2026-03-01T0{index}:00:00+00:00",
+        })
+        request["measurements"].extend((target, reference))
+    request["drift_policies"] = [{
+        "target_sensor_id": target_id,
+        "reference_sensor_id": reference_id,
+        "variable_code": "air_temperature",
+        "reference_binding_verified": True,
+        "maximum_pair_offset_seconds": 60,
+        "minimum_pairs": 3,
+        "minimum_duration_seconds": 7200,
+        "maximum_abs_drift_rate_per_hour": 0.1,
+    }]
+    client = TestClient(create_app(engine_api_key="test-secret"))
+    response = client.post(
+        "/v1/analyses/sensors",
+        json=request,
+        headers={"X-BA-Engine-Key": "test-secret"},
+    )
+    assert response.status_code == 200, response.text
+    diagnostics = response.json()["instrument_health"]["drift_diagnostics"]
+    assert diagnostics["status"] == "completed"
+    assessment = diagnostics["assessments"][0]
+    assert assessment["status"] == "suspected"
+    assert assessment["pair_count"] == 4
+    assert assessment["robust_drift_rate_per_hour"] == 1.0
+    assert len(assessment["source_target_observation_ids"]) == 4
+    assert len(assessment["source_reference_observation_ids"]) == 4
+
+
+def test_sensor_api_rejects_duplicate_drift_policy():
+    request = sensor_payload()
+    target_id = request["measurements"][0]["iot_device_id"]
+    policy = {
+        "target_sensor_id": target_id,
+        "reference_sensor_id": str(uuid4()),
+        "variable_code": "air_temperature",
+        "reference_binding_verified": True,
+        "maximum_pair_offset_seconds": 60,
+        "minimum_pairs": 3,
+        "minimum_duration_seconds": 7200,
+        "maximum_abs_drift_rate_per_hour": 0.1,
+    }
+    request["drift_policies"] = [policy, dict(policy)]
+    client = TestClient(create_app(engine_api_key="test-secret"))
+    response = client.post(
+        "/v1/analyses/sensors",
+        json=request,
+        headers={"X-BA-Engine-Key": "test-secret"},
+    )
+    assert response.status_code == 422
+    assert "drift policies must be unique" in str(response.json()["detail"])
+
+
+def test_sensor_api_keeps_drift_not_evaluable_when_reference_is_unverified():
+    request = sensor_payload()
+    target_id = request["measurements"][0]["iot_device_id"]
+    reference_id = str(uuid4())
+    base = request["measurements"][0]
+    reference = dict(base)
+    reference.update({
+        "id": str(uuid4()),
+        "iot_device_id": reference_id,
+        "device_code": "sensor-reference",
+        "measured_at": "2026-03-01T00:00:00+00:00",
+    })
+    request["measurements"].append(reference)
+    request["drift_policies"] = [{
+        "target_sensor_id": target_id,
+        "reference_sensor_id": reference_id,
+        "variable_code": "air_temperature",
+        "reference_binding_verified": False,
+        "maximum_pair_offset_seconds": 60,
+        "minimum_pairs": 3,
+        "minimum_duration_seconds": 7200,
+        "maximum_abs_drift_rate_per_hour": 0.1,
+    }]
+    client = TestClient(create_app(engine_api_key="test-secret"))
+    response = client.post(
+        "/v1/analyses/sensors",
+        json=request,
+        headers={"X-BA-Engine-Key": "test-secret"},
+    )
+    assert response.status_code == 200, response.text
+    assessment = response.json()["instrument_health"]["drift_diagnostics"]["assessments"][0]
+    assert assessment["status"] == "not_evaluable"
+    assert assessment["reason"] == "reference_pair_not_verified"
