@@ -12,7 +12,7 @@
         !input.client.auth || typeof input.client.auth.getUser !== "function" ||
         typeof input.organizationId !== "string" || !input.organizationId.trim() ||
         typeof input.measurementId !== "string" || !input.measurementId.trim() ||
-        typeof input.idempotencyKey !== "string" || !/^[0-9a-f-]{36}$/i.test(input.idempotencyKey) ||
+        typeof input.idempotencyKey !== "string" || !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(input.idempotencyKey) ||
         !input.result || !ALLOWED.has(input.result.status) ||
         !input.measurementSnapshot || !input.contextSnapshot ||
         !input.resolutionSnapshot || !input.resultSnapshot) {
