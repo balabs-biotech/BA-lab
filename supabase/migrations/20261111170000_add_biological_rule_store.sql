@@ -70,7 +70,7 @@ returns trigger
 language plpgsql
 security invoker
 set search_path = pg_catalog, public, private, auth
-as $
+as $function$
 declare
   v_variable_dimension text;
   v_unit_dimension text;
@@ -123,7 +123,7 @@ begin
 
   return new;
 end;
-$$;
+$function$;
 
 revoke all on function private.guard_biological_rule_version() from public;
 create trigger biological_rules_version_guard
