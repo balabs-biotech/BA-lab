@@ -8,8 +8,8 @@ const terms = readFileSync("legal/terms.html", "utf8");
 const register = readFileSync("docs/compliance/processing-register.md", "utf8");
 
 assert.match(consent, /necessary:\s*true/);
-assert.match(consent, /analytics:\s*false/);
-assert.match(consent, /marketing:\s*false/);
+assert.match(consent, /analytics = false/);
+assert.match(consent, /marketing = false/);
 assert.match(consent, /localStorage/);
 assert.match(consent, /Refuser les cookies facultatifs/);
 assert.match(consent, /Personnaliser/);
@@ -21,7 +21,7 @@ assert.match(privacy, /délégué à la protection des données/i);
 assert.match(privacy, /Supabase/);
 assert.match(privacy, /France|eu-west-3/i);
 assert.match(cookies, /localStorage/);
-assert.match(cookies, /aucun cookie publicitaire/i);
+assert.match(cookies, /aucun outil publicitaire/i);
 assert.match(terms, /traçabilité biologique/i);
 assert.match(register, /41 bis 2/);
 assert.match(register, /41 bis 3/);
@@ -29,4 +29,9 @@ assert.match(register, /délégué à la protection des données/i);
 assert.ok(existsSync("legal/privacy.html"));
 assert.ok(existsSync("legal/cookies.html"));
 assert.ok(existsSync("legal/terms.html"));
+assert.match(readFileSync("batch-tracker/workspace.html", "utf8"), /authPrivacyAccepted/);
+assert.match(readFileSync("batch-tracker/tracker.js", "utf8"), /authPrivacyAcceptedCheckbox\?\.checked/);
+for (const page of ["index.html", "batch-tracker/mycology/index.html", "batch-tracker/green-tech/index.html", "batch-tracker/laboratory/index.html"]) {
+  assert.match(readFileSync(page, "utf8"), /legal-consent\\.js/);
+}
 console.log("Legal and consent assets: structural contract checks passed.");
