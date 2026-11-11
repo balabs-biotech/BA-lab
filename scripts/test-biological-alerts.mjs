@@ -91,6 +91,8 @@ assert.match(mixtureMigration, /create or replace function public\.create_biolog
 assert.match(mixtureMigration, /cardinality\(p_source_material_ids\) < 2/);
 assert.match(mixtureMigration, /material_mixture_sources_must_be_unique/);
 assert.match(mixtureMigration, /material_mixture_source_not_found/);
+assert.match(mixtureMigration, /unsupported_material_mixture_operation/);
+assert.match(mixtureMigration, /material_mixture_source_not_active/);
 assert.match(mixtureMigration, /order by m\.id\s+for update/);
 assert.match(mixtureMigration, /insert into public\.material_relationships/);
 assert.match(mixtureMigration, /insert into public\.events/);
@@ -99,6 +101,8 @@ assert.match(traceabilityRuntimeTest, /create_biological_material_mixture/);
 assert.match(traceabilityRuntimeTest, /single-source mixture was accepted/);
 assert.match(traceabilityRuntimeTest, /consortium must persist two parent edges/);
 assert.match(traceabilityRuntimeTest, /cross-tenant mixture source was accepted/);
+assert.match(traceabilityRuntimeTest, /unsupported mixture operation was accepted/);
+assert.match(traceabilityRuntimeTest, /inactive mixture source was accepted/);
 assert.match(traceabilityRuntimeTest, /multiple strains into one strain_id/);
 assert.match(workspace, /id="materialMixtureForm"/);
 assert.match(workspace, /id="mixtureSources" multiple/);
