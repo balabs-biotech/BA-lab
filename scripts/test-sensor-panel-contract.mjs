@@ -56,3 +56,23 @@ assert.match(panel, /instrument_health\?\.drift_diagnostics/, "panel must render
 assert.match(panel, /Dérive instrumentale relative/, "panel must label relative drift assessments explicitly");
 assert.match(panel, /item\.status === "suspected"/, "only suspected relative drift assessments count as alerts");
 assert.match(panel, /source_target_observation_ids|source_reference_observation_ids/, "drift result lineage identifiers must remain available in the API contract");
+
+const driftManager = read("../batch-tracker/sensor-drift-policy-panel.js");
+assert.match(workspace, /id="sensorDriftPolicyCard"/, "sensor workspace must expose the reference policy manager");
+assert.match(workspace, /id="sensorDriftCreateDraft"/, "manager must expose draft creation");
+assert.match(workspace, /id="sensorDriftVerify"/, "manager must expose the explicit verification step");
+assert.match(workspace, /id="sensorDriftActivate"/, "manager must expose separate activation");
+assert.match(workspace, /id="sensorDriftRetire"/, "manager must expose version retirement");
+assert.match(driftManager, /list_sensor_drift_management_devices/, "manager must resolve device choices through the writer-scoped read model");
+assert.doesNotMatch(driftManager, /\.from\(["']iot_devices["']\)/, "browser must not read the protected IoT device registry directly");
+assert.match(driftManager, /\.from\(["']environment_context_profiles["']\)/, "manager is linked to the existing environment context profile selection");
+assert.match(driftManager, /reference_binding_verified:\s*false/, "new policies must start as unverified drafts");
+assert.match(driftManager, /reference_binding_verified:\s*true/, "verification must be a separate authenticated update");
+assert.match(driftManager, /\.update\(\{\s*status:\s*"active"\s*\}\)/, "activation must be a separate lifecycle update");
+assert.match(driftManager, /\.update\(\{\s*status:\s*"retired"\s*\}\)/, "retirement must preserve version history");
+assert.match(driftManager, /reference_verification_evidence/, "physical verification evidence must be persisted");
+assert.match(driftManager, /valid_from:\s*state\.profile\.validFrom/, "policy validity must derive from the active sensor profile");
+assert.match(driftManager, /select\("id"\)\.maybeSingle\(\)/, "lifecycle updates must confirm that a row was actually changed");
+assert.match(mycology, /sensor-drift-policy-panel\.js/, "Mycology must load the independent reference policy manager");
+assert.match(laboratory, /sensor-drift-policy-panel\.js/, "Laboratory must load the independent reference policy manager");
+console.log("PASS: sensor drift reference policy management UI contract");
