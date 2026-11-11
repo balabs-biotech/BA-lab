@@ -147,6 +147,11 @@ def assess_sensor_transmissions(
 
         active_start = max(evaluation_start, device.created_at, device.expected_from)
         active_end = min(cutoff, device.expected_to) if device.expected_to else cutoff
+        silence_cutoff = (
+            cutoff
+            if device.expected_to is None or device.expected_to >= cutoff
+            else None
+        )
         observed = sorted(
             (receipt for receipt in grouped[device_id]
              if active_start <= receipt.received_at <= active_end),
@@ -156,8 +161,9 @@ def assess_sensor_transmissions(
         if not observed:
             trailing_silence = (
                 max(0.0, (cutoff - device.last_seen_at).total_seconds())
-                if current_window and device.last_seen_at is not None
-                and device.last_seen_at <= cutoff else None
+                if current_window and silence_cutoff is not None
+                and device.last_seen_at is not None
+                and device.last_seen_at <= silence_cutoff else None
             )
             threshold = expected_interval_seconds * float(gap_tolerance_factor)
             status = (
@@ -174,8 +180,9 @@ def assess_sensor_transmissions(
                 trailing_silence_seconds=trailing_silence,
                 last_received_at=(
                     device.last_seen_at
-                    if current_window and device.last_seen_at is not None
-                    and device.last_seen_at <= cutoff else None
+                    if current_window and silence_cutoff is not None
+                    and device.last_seen_at is not None
+                    and device.last_seen_at <= silence_cutoff else None
                 ),
                 source_receipt_ids=(),
             ))
@@ -188,8 +195,8 @@ def assess_sensor_transmissions(
         threshold = expected_interval_seconds * float(gap_tolerance_factor)
         irregular_gaps = [gap for gap in gaps if gap > threshold]
         trailing_silence = (
-            max(0.0, (cutoff - observed[-1].received_at).total_seconds())
-            if current_window else None
+            max(0.0, (silence_cutoff - observed[-1].received_at).total_seconds())
+            if current_window and silence_cutoff is not None else None
         )
         status = "irregular" if irregular_gaps else "normal"
         if trailing_silence is not None and trailing_silence > threshold:
