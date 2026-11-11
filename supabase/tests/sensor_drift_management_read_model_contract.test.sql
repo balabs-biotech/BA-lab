@@ -14,9 +14,8 @@ begin
     raise exception 'FAIL: anonymous/public execution must remain disabled';
   end if;
 
-  if not has_function_privilege('authenticated', v_function, 'EXECUTE')
-     or not has_function_privilege('service_role', v_function, 'EXECUTE') then
-    raise exception 'FAIL: authenticated and service-role execution grants are required';
+  if not has_function_privilege('authenticated', v_function, 'EXECUTE') then
+    raise exception 'FAIL: authenticated writer execution grant is required';
   end if;
 
   select pg_get_functiondef(v_function) into v_definition;
