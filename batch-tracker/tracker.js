@@ -29,6 +29,29 @@ window.BA_LABS_GET_MEASUREMENT_CATALOGUE = () => ({
   units: measurementUnits.map((item) => ({ ...item })),
 });
 
+window.BA_LABS_LOAD_BIOLOGICAL_CONTEXT = async (cultureId) => {
+  const requestRevision = authStateRevision;
+  const requestOrganizationId = organizationId;
+  const loader = window.BALabsBiologicalContextLoader;
+  const adapter = window.BALabsBiologicalContextAdapter;
+  if (!requestOrganizationId || typeof cultureId !== "string" || !cultureId.trim()) {
+    return { status: "insufficient_context", reason: "workspace_or_culture_missing", context: null };
+  }
+  if (!loader || !adapter) {
+    return { status: "insufficient_context", reason: "biological_context_modules_unavailable", context: null };
+  }
+  const result = await loader.load({
+    client: supabaseClient,
+    organizationId: requestOrganizationId,
+    cultureId,
+    adapter,
+  });
+  if (!isCurrentWorkspaceRevision(requestRevision, requestOrganizationId)) {
+    return { status: "stale_context", reason: "workspace_changed_during_context_load", context: null };
+  }
+  return result;
+};
+
 let organization = null;
 
 let strainOptions = [];
