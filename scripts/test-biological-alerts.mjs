@@ -418,6 +418,17 @@ assert.match(interpretationMigration, /revoke all on function public\.review_bio
 assert.match(moduleSource, /String\(event\.event_payload\.note\)/);
 assert.match(moduleSource, /event\.actor_kind === "user" \? "Action utilisateur" : "Événement système"/);
 
+
+assert.match(moduleSource, /const flattenInterpretationPayload =/);
+assert.match(moduleSource, /const compareInterpretationSnapshots =/);
+assert.match(moduleSource, /older\.source_signal_id !== newer\.source_signal_id/);
+assert.match(moduleSource, /older\.engine_code !== newer\.engine_code/);
+assert.match(moduleSource, /path\.startsWith\("finding\."\)/);
+assert.match(moduleSource, /path\.startsWith\("evidence\."\)/);
+assert.match(moduleSource, /path\.startsWith\("interpretation\."\)/);
+assert.match(moduleSource, /category_counts: changes\.reduce/);
+assert.match(moduleSource, /compared_field_count: paths\.length/);
+assert.match(moduleSource, /Comparaison descriptive des instantanés — aucune validation scientifique ou causalité déduite/);
 assert.match(moduleSource, /review_biological_interpretation/);
 assert.match(moduleSource, /Revue scientifique humaine/);
 assert.match(moduleSource, /reassessment_requested/);
