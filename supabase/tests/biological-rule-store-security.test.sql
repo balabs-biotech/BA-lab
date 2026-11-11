@@ -47,7 +47,8 @@ begin
   select pg_get_functiondef('private.guard_biological_rule_version()'::regprocedure)
     into v_guard;
   if v_guard not ilike '%biological_rule_version_immutable%' or
-     v_guard not ilike '%biological_rule_reviewer_must_match_authenticated_user%' then
+     v_guard not ilike '%biological_rule_reviewer_must_match_authenticated_user%' or
+     v_guard not ilike '%biological_rule_variable_unit_dimension_mismatch%' then
     raise exception 'FAIL: reviewed rule immutability or reviewer identity guard is missing';
   end if;
   if not exists (
