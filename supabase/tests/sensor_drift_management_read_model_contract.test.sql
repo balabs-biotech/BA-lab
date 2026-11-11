@@ -25,8 +25,9 @@ begin
      or position('p.status = ''active''' in v_definition) = 0
      or position('p.origin = ''sensor''' in v_definition) = 0
      or position('d.enabled' in v_definition) = 0
+     or position('left join public.iot_devices' in v_definition) = 0
      or position('environment_context_profile_sensors' in v_definition) = 0 then
-    raise exception 'FAIL: read model must be writer-only and limited to enabled devices in the active sensor profile';
+    raise exception 'FAIL: read model must be writer-only and expose enabled state only for devices bound to the active sensor profile';
   end if;
 
   if (select prosecdef from pg_proc where oid = v_function) is not true then
