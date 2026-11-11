@@ -104,6 +104,8 @@ jobs:
       - name: Check batch-tracker structure
         run: |
           node scripts/check-batch-tracker-js.mjs
+          node --check batch-tracker/legal-consent.js
+          node scripts/test-legal-consent.mjs
           node --check batch-tracker/biological-alerts.js
           node scripts/test-biological-alerts.mjs
           node --check batch-tracker/environmental-sensor-panel.js
