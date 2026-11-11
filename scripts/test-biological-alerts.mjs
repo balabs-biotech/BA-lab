@@ -406,3 +406,6 @@ assert.match(moduleSource, /interpretation_event_count: cultureInterpretationEve
 assert.match(moduleSource, /biologicalInterpretationEvents\.length >= 2000/);
 
 assert.match(interpretationMigration, /revoke all on function private\.prevent_biological_interpretation_mutation\(\)/);
+
+assert.match(moduleSource, /String\(event\.event_payload\.note\)/);
+assert.match(moduleSource, /event\.actor_kind === "user" \? "Action utilisateur" : "Événement système"/);
