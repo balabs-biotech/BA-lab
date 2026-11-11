@@ -2949,3 +2949,51 @@ body[data-domain] :is(button, input, select, textarea, a, [tabindex]):focus-visi
 
 .signal-lineage-quality { padding: 8px 10px; border-left: 3px solid var(--warning, #b7791f); background: rgba(183, 121, 31, .09); border-radius: 4px; font-size: .88rem; }
 .signal-lineage-quality.is-complete { border-left-color: var(--success, #39845a); background: rgba(57, 132, 90, .08); }
+
+
+/* Versioned biological interpretation timeline */
+#biologicalSignalsCard .signal-interpretation-history {
+  display:grid;
+  gap:7px;
+  margin-top:10px;
+  padding:10px;
+  border:1px solid var(--border);
+  border-radius:9px;
+  background:var(--surface-2);
+}
+#biologicalSignalsCard .signal-interpretation-history > strong { font-size:12px; }
+#biologicalSignalsCard .signal-interpretation-history > small { color:var(--muted); font-size:11px; }
+#biologicalSignalsCard .signal-interpretation-snapshot {
+  min-width:0;
+  padding:8px 10px;
+  border:1px solid var(--border);
+  border-radius:7px;
+  background:var(--surface);
+}
+#biologicalSignalsCard .signal-interpretation-snapshot summary {
+  cursor:pointer;
+  font-size:12px;
+  font-weight:600;
+  overflow-wrap:anywhere;
+}
+#biologicalSignalsCard .signal-interpretation-snapshot > small,
+#biologicalSignalsCard .signal-interpretation-snapshot > p {
+  display:block;
+  margin:6px 0 0;
+  color:var(--muted);
+  font-size:11px;
+  overflow-wrap:anywhere;
+}
+#biologicalSignalsCard .signal-interpretation-events {
+  display:grid;
+  gap:6px;
+  margin:9px 0 0;
+  padding-left:18px;
+}
+#biologicalSignalsCard .signal-interpretation-events li strong,
+#biologicalSignalsCard .signal-interpretation-events li small {
+  display:block;
+  font-size:11px;
+  overflow-wrap:anywhere;
+}
+#biologicalSignalsCard .signal-interpretation-events li small { margin-top:3px; color:var(--muted); }
