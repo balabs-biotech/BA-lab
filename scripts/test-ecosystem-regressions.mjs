@@ -12,6 +12,8 @@ for (const [label, source] of [['public', html], ['preview', previewHtml]]) {
   assert.ok(source.includes("localStorage.setItem('balabs-language',l)") && source.includes("localStorage.getItem('balabs-language')"), label + ' language preference must persist and restore safely');
   assert.ok(source.includes("let initialLanguage='fr'") && source.includes("setLanguage(initialLanguage)"), label + ' must restore a supported language before rendering the page');
   assert.ok(source.includes('role="group" aria-label="Choisir la langue"') && source.includes('aria-label="العربية"'), label + ' language controls must have a named semantic group and explicit language names');
+  assert.ok(source.includes('<small id="brandSubtitle">Applied biotechnology · Sétif</small>') && !source.includes('<div class="mark" aria-hidden="true">Y</div>'), label + ' header must use the text wordmark rather than a substitute Y glyph');
+  assert.ok(source.includes("brandSubtitles={fr:'Biotechnologie appliquée · Sétif'") && source.includes('brandSubtitle.textContent=brandSubtitles[l]'), label + ' brand descriptor must follow the selected language');
   assert.ok(source.includes('id="siteNavigation"') && source.includes("setAttribute('aria-label',navigationLabels[l])"), label + ' primary navigation accessible name must follow the active language');
   assert.ok(source.includes("document.title=({fr:'BALabs — Réseau vivant'"), label + ' document title must follow the selected language');
   assert.ok(source.includes('id="pageDescription"') && source.includes("description.content=descriptions[l]"), label + ' SEO description must follow the selected language');
