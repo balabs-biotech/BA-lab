@@ -26,6 +26,23 @@ Pour chaque fichier destiné à être publié (legal/terms.html, legal/privacy.h
 
 Une page de confidentialité est une information sur le traitement ; son affichage ou son accusé de prise de connaissance ne doit pas être décrit automatiquement comme un consentement. L'acceptation contractuelle des CGU et les consentements facultatifs (ex. réutilisation scientifique) sont des actes distincts.
 
+### Préflight automatisé du dépôt
+
+Avant la revue humaine, exécuter :
+
+```bash
+node scripts/legal-document-preflight.mjs
+```
+
+Le contrôle :
+- vérifie uniquement les trois chemins autorisés (`terms`, `privacy_notice`, `cookies_notice`) ;
+- bloque les mentions de brouillon, les notices de validation, les placeholders entre crochets et les marqueurs de template ;
+- vérifie la structure HTML minimale et l'encodage UTF-8 ;
+- calcule SHA-256 sur les octets exacts lus sur disque ;
+- ne modifie aucun fichier et ne publie aucun document.
+
+Un résultat `BLOCKED` est attendu tant que les champs provisoires ne sont pas levés. Les empreintes calculées pendant ce contrôle sont diagnostiques : elles ne constituent pas une approbation juridique ni une publication dans le registre. Après correction des documents, le contrôle doit être relancé sur le contenu gelé, puis les empreintes doivent être enregistrées avec la version publiée.
+
 ## 3. Enregistrement du registre
 
 Après validation seulement :
