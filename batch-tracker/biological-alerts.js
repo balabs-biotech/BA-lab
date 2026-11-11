@@ -75,13 +75,16 @@
   };
 
   const compareInterpretationSnapshots = (older, newer) => {
-    if (!older || !newer || older.source_signal_id !== newer.source_signal_id) return null;
+    if (!older || !newer || older.source_signal_id !== newer.source_signal_id || older.engine_code !== newer.engine_code) return null;
     const before = flattenInterpretationPayload(older.interpretation_payload || {});
     const after = flattenInterpretationPayload(newer.interpretation_payload || {});
     const paths = [...new Set([...Object.keys(before), ...Object.keys(after)])].sort();
     const changes = paths.filter(path => JSON.stringify(before[path]) !== JSON.stringify(after[path]))
       .slice(0, 40).map(path => ({
         path,
+        category: path.startsWith("finding.") ? "constat"
+          : path.startsWith("evidence.") ? "preuves"
+            : path.startsWith("interpretation.") ? "conclusion" : "contexte",
         previous: Object.prototype.hasOwnProperty.call(before, path) ? before[path] : "[absent]",
         current: Object.prototype.hasOwnProperty.call(after, path) ? after[path] : "[absent]"
       }));
@@ -1066,7 +1069,8 @@
         }
         if (snapshotIndex < snapshots.length - 1) {
           const olderSnapshot = snapshots.slice(snapshotIndex + 1).find(candidate =>
-            candidate.source_signal_id === snapshot.source_signal_id);
+            candidate.source_signal_id === snapshot.source_signal_id &&
+            candidate.engine_code === snapshot.engine_code);
           const comparison = compareInterpretationSnapshots(olderSnapshot, snapshot);
           if (comparison) {
             const comparisonPanel = element("div", "signal-interpretation-comparison");
@@ -1085,7 +1089,7 @@
               const changeList = element("ul", "signal-interpretation-diff-list");
               comparison.changes.forEach(change => {
                 const changeItem = element("li", "");
-                changeItem.append(element("strong", "", change.path));
+                changeItem.append(element("strong", "", change.category + " · " + change.path));
                 changeItem.append(element("small", "", "Avant : " + String(change.previous)));
                 changeItem.append(element("small", "", "Après : " + String(change.current)));
                 changeList.append(changeItem);
