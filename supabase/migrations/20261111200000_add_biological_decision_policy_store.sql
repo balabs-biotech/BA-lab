@@ -6,7 +6,7 @@ create table public.biological_decision_policies (
   policy_id text not null check (length(btrim(policy_id)) > 0),
   version text not null check (length(btrim(version)) > 0),
   status text not null check (status in ('draft','reviewed','retired')),
-  domain text not null check (length(btrim(domain)) > 0),
+  domain text not null check (domain in ('mycology','laboratory')),
   rule_version_id uuid not null,
   trigger_assessment_statuses text[] not null default array['out_of_range']::text[],
   decision_code text not null check (length(btrim(decision_code)) > 0),
