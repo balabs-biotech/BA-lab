@@ -432,6 +432,8 @@ assert.match(moduleSource, /history\.events_available === true/);
 assert.match(moduleSource, /const supersededEvents = snapshotEvents\.filter\(event => event\.event_type === "superseded"\)/);
 assert.match(moduleSource, /from\("biological_recommendations"\)/);
 assert.match(moduleSource, /from\("biological_recommendation_events"\)/);
+assert.match(moduleSource, /state\.recommendationHistoryAvailable = append \? state\.recommendationHistoryAvailable : true/);
+assert.match(moduleSource, /Lecture des recommandations indisponible ou incomplète/);
 assert.match(moduleSource, /transition_biological_recommendation/);
 assert.match(moduleSource, /p_expected_revision: recommendation\.revision/);
 assert.match(moduleSource, /action === "record_execution" && !executionDetails/);
