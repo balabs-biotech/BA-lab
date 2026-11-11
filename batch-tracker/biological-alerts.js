@@ -668,9 +668,9 @@
         biological_fields_missing: contextFields.filter(field => !populatedContextFields.includes(field)),
         biological_field_count: contextFields.length,
         biological_field_coverage: populatedContextFields.length / contextFields.length,
-        measurements_available: evidenceAvailability.measurements,
-        environmental_observations_available: evidenceAvailability.environmental_observations,
-        lineage_complete: lineageQuality.complete,
+        measurements_available: lineage?.evidenceAvailability?.measurements === true,
+        environmental_observations_available: lineage?.evidenceAvailability?.environmental_observations === true,
+        lineage_complete: lineage?.lineageQuality?.complete === true,
         interpretation_readiness: populatedContextFields.length >= 4 && cultureMeasurements.length > 0
           ? "context_available_for_review" : "insufficient_context_for_biological_interpretation"
       };
