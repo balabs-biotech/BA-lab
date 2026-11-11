@@ -3058,7 +3058,7 @@ window.addEventListener('resize',()=>{drawMiniConnections()});
  const scene=app?.querySelector('#universe');
  const domains=app?.querySelector('#universes');
  if(!app||!scene||!domains)return;
- app.insertBefore(scene,domains);
+ domains.parentNode.insertBefore(scene,domains);
 })();
 
 let initialLanguage='fr';try{const savedLanguage=localStorage.getItem('balabs-language');if(['fr','en','ar','pt'].includes(savedLanguage))initialLanguage=savedLanguage}catch(_){}setLanguage(initialLanguage);applyOrbit();
