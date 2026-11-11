@@ -208,6 +208,18 @@ begin
       using errcode = '23514';
   end if;
 
+  if (p_recommendation_id is null or p_organization_id is null
+     or p_recommendation_code is null or length(btrim(p_recommendation_code)) = 0
+     or p_profile_id is null or length(btrim(p_profile_id)) = 0
+     or p_profile_version is null or length(btrim(p_profile_version)) = 0
+     or p_module is null or p_source_signal_id is null
+     or p_source_analysis_id is null or p_source_finding_id is null
+     or (p_instruction_code is not null and length(btrim(p_instruction_code)) = 0)
+     or (p_rationale_code is not null and length(btrim(p_rationale_code)) = 0)) then
+    raise exception 'biological_recommendation_required_field_missing'
+      using errcode = '23514';
+  end if;
+
   if (p_proposal_status = 'proposed'
       and (jsonb_array_length(p_withholding_reasons) <> 0
         or p_instruction_code is null or p_rationale_code is null))
@@ -281,7 +293,8 @@ declare
   v_execution_at timestamptz;
   v_next_status text;
 begin
-  if v_actor_id is null or not private.is_org_writer(p_organization_id) then
+  if v_actor_id is null or p_organization_id is null
+     or not private.is_org_writer(p_organization_id) then
     raise exception 'biological_recommendation_write_forbidden'
       using errcode = '42501';
   end if;
@@ -353,6 +366,11 @@ begin
   if not found then
     raise exception 'biological_recommendation_not_found'
       using errcode = 'P0002';
+  end if;
+
+  if p_occurred_at < v_recommendation.created_at then
+    raise exception 'biological_recommendation_event_precedes_proposal'
+      using errcode = '23514';
   end if;
 
   if v_recommendation.revision <> p_expected_revision then
