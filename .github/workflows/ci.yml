@@ -91,6 +91,8 @@ jobs:
         run: node scripts/test-bal-normalizer.mjs
       - name: Test reviewed-policy biological decision engine
         run: node scripts/test-biological-decision-engine.mjs
+      - name: Test tenant-scoped biological decision policy store
+        run: node scripts/test-biological-decision-policy-store.mjs
 
   batch-tracker-audit:
     runs-on: ubuntu-latest
@@ -254,6 +256,8 @@ jobs:
         run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/biological-rule-store-security.test.sql
       - name: Verify biological assessment history security contract
         run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/biological-assessment-history-security.test.sql
+      - name: Verify biological decision policy store security contract
+        run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/biological-decision-policy-store-security.test.sql
       - name: Verify sensitive RPC search-path contracts after replay
         run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/sensitive_rpc_search_path_contract.test.sql
       - name: Verify append-only audit table privileges after replay
