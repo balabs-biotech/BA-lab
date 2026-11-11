@@ -25,7 +25,7 @@ Policy-authored severity and recommended action are never inferred by the engine
 
 ## Trust boundary
 
-This is a pure deterministic module. It does not query the database or persist decisions. The tenant-scoped `biological_decision_policies` read adapter now supplies reviewed policies bound to the same organization, domain and exact biological rule-version ID as the assessment. Client-side policy evaluation is not server verification and must not be represented as such. Policy creation/review UI and a persisted decision-event history remain separate increments.
+This is a pure deterministic module. It does not query the database or persist decisions. The tenant-scoped `biological_decision_policies` read adapter now supplies reviewed policies bound to the same organization, domain and exact biological rule-version ID as the assessment. Client-side policy evaluation is not server verification and must not be represented as such. Policy creation, review and retirement are available in the Mycology and Laboratory workspaces. The assessment history can display a decision candidate from the matching reviewed policy. This display is a fresh client-side evaluation of persisted assessment evidence; it is not a persisted decision event, independent server verification or an intervention record. A durable decision-event history and server-side recomputation remain separate increments.
 
 ## Non-goals
 
