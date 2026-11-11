@@ -124,3 +124,22 @@ Ne jamais copier les valeurs avant/après, les notes libres, les emails ou les s
 7. Refaire la revue Supabase Advisors et la revue de sécurité après migration.
 
 **Limite actuelle :** ce document est une conception, pas une implémentation active. Aucune migration n'a été appliquée à la base live dans ce lot.
+
+
+## 9. Premier contrat SQL — brouillon de revue
+
+Le fichier `docs/compliance/drafts/privacy-audit-engine-schema.draft.sql` matérialise le premier contrat PostgreSQL. Il reste volontairement hors de `supabase/migrations` : la migration officielle doit être créée avec `supabase migration new` dans l'environnement du dépôt, puis testée localement avant toute application distante.
+
+Le contrat comprend les trois tables privées, les index temporels, l'activation RLS sans policy client, les privilèges réservés à `service_role`, les protections append-only des événements et l'immuabilité des versions documentaires publiées (avec retrait unidirectionnel). Les références vers les utilisateurs et organisations utilisent `ON DELETE SET NULL` afin de ne pas supprimer en cascade les événements ; la stratégie juridique de conservation et d'anonymisation reste à valider.
+
+### Résultat du test contractuel
+
+Le test `supabase/tests/privacy_audit_engine_contract.test.sql` a été exécuté en lecture seule contre le schéma actuel et a échoué comme attendu sur `private.legal_document_versions` absente. Cela confirme l'état RED : le modèle n'est pas encore installé. Aucun DDL n'a été exécuté sur la base live.
+
+### Points à verrouiller avant génération de la migration
+
+- confirmer la stratégie de conservation et de suppression/anonymisation des sujets ;
+- confirmer les codes de finalité et les catégories de données autorisés ;
+- définir le mécanisme d'enregistrement initial avant confirmation e-mail (métadonnées Auth validées par trigger, ou parcours serveur dédié) ;
+- ajouter des tests d'intégration qui prouvent le rejet réel de UPDATE/DELETE, et pas seulement la présence des triggers ;
+- vérifier les droits de `service_role` et les permissions de schéma dans l'environnement local.
