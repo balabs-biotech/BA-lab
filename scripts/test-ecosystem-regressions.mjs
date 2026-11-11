@@ -87,6 +87,7 @@ for (const [label, source] of [['public', html], ['preview', previewHtml]]) {
   assert.ok(source.includes("skipLabels={fr:'Aller au contenu principal'") && source.includes('skip.textContent=skipLabels[l]'), label + ' skip navigation text must be localised in all four languages');
 }
 
+assert.ok(/<footer\\b[\\s\\S]*?data-domain-page="products" data-i18n="navCatalogue"[\\s\\S]*?<\\/footer>/.test(html) && /<footer\\b[\\s\\S]*?data-domain-page="products" data-i18n="navCatalogue"[\\s\\S]*?<\\/footer>/.test(previewHtml), 'The public and preview footers must both link directly to the products universe');
 assert.ok(html.includes('data-domain-page="products" data-i18n="navCatalogue"') && previewHtml.includes('data-domain-page="products" data-i18n="navCatalogue"'), 'The footer must provide a direct route into the public products catalogue universe');
 for (const [language, label] of Object.entries({ fr: 'Catalogue', en: 'Catalogue', ar: 'الكتالوج', pt: 'Catálogo' })) {
   const languageStart = html.indexOf('\\n' + language + ':{');
