@@ -383,6 +383,10 @@ assert.ok(!/\.(?:sphere|webgl-[\w-]*|branch-dock|camera)\b|#mainView|canvas/i.te
 
 
 
+// Shared design-system contract: preview consumes the same maintained editorial layer as public.
+assert.ok(previewHtml.includes('class="wrap balabs-ui" id="app"'), 'Preview root must opt into the shared BA Labs visual system');
+assert.ok(previewHtml.includes('../ecosystem/brand-system.css?v=3'), 'Preview must load the shared visual system after its local styles');
+
 // Preview parity contract: retain the preview's independent light theme while
 // matching editorial hierarchy, responsive grids, touch targets and RTL focus.
 for (const selector of [
