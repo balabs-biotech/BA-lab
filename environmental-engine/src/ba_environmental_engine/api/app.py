@@ -10,7 +10,7 @@ import os
 import secrets
 from datetime import date, datetime, time, timedelta, timezone
 from typing import Annotated, Any, Literal
-from zoneinfo import ZoneInfo
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 from uuid import UUID
 
 from fastapi import Depends, FastAPI, Header, HTTPException, status
@@ -253,7 +253,7 @@ class SensorAnalysisRequest(APIModel):
         if self.transmission_current_window:
             try:
                 current_profile_date = datetime.now(ZoneInfo(self.profile_timezone)).date()
-            except (ValueError, Exception) as exc:
+            except (ZoneInfoNotFoundError, ValueError) as exc:
                 raise ValueError("profile_timezone must be a valid IANA timezone") from exc
             if self.to_date != current_profile_date:
                 raise ValueError("current transmission silence can only be evaluated through the current profile-local date")
