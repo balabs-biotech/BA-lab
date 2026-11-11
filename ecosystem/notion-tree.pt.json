@@ -298,7 +298,25 @@
       "description": "Recursos públicos para explorar o trabalho documentado, compreender os limites da evidência e conhecer as formas de colaborar com a BA Labs.",
       "children": [
         {
-          "id": "learn-collaborate",
+          "id": "learn-resource-1",
+          "title": "Trabalho documentado",
+          "url": "https://app.notion.com/p/40173152f17181b08d08fdfb8e7eca54",
+          "children": []
+        },
+        {
+          "id": "learn-resource-2",
+          "title": "Evidências e medição",
+          "url": "https://app.notion.com/p/40273152f1718150b2beccb7c12d0792",
+          "children": []
+        },
+        {
+          "id": "learn-resource-3",
+          "title": "Catálogo público",
+          "url": "https://app.notion.com/p/d0fbe1d779344eb58bc240fe7876ae0e",
+          "children": []
+        },
+        {
+          "id": "learn-resource-4",
           "title": "Colaborar com a BA Labs",
           "url": "https://app.notion.com/p/40173152f17181f194deca033c534128",
           "children": []
