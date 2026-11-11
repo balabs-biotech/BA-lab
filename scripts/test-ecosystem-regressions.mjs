@@ -7,6 +7,15 @@ const engine = readFileSync('ecosystem/engine-v2.js', 'utf8');
 const previewEngine = readFileSync('ecosystem-preview/engine-v2.js', 'utf8');
 const expectedDomains = ['bio', 'myco', 'soil', 'lab', 'products', 'iot', 'work', 'learn'];
 
+for (const [label, source] of [['public', html], ['preview', previewHtml]]) {
+  assert.ok(source.includes("document.documentElement.dir=direction") && source.includes("app.dir=direction"), label + ' Arabic mode must set document-level and app-level reading direction');
+  assert.ok(source.includes("localStorage.setItem('balabs-language',l)") && source.includes("localStorage.getItem('balabs-language')"), label + ' language preference must persist and restore safely');
+  assert.ok(source.includes("let initialLanguage='fr'") && source.includes("setLanguage(initialLanguage)"), label + ' must restore a supported language before rendering the page');
+  assert.ok(source.includes('role="group" aria-label="Choisir la langue"') && source.includes('aria-label="العربية"'), label + ' language controls must have a named semantic group and explicit language names');
+  assert.ok(source.includes('id="siteNavigation"') && source.includes("setAttribute('aria-label',navigationLabels[l])"), label + ' primary navigation accessible name must follow the active language');
+  assert.ok(source.includes("document.title=({fr:'BALabs — Réseau vivant'"), label + ' document title must follow the selected language');
+}
+
 assert.ok(html.includes('engine-v2.js?v=20261110-touch-branch-activation-v53'), 'Public explorer must load the cache-busted screen-space label engine');
 assert.ok(previewHtml.includes('engine-v2.js?v=20261110-touch-branch-activation-v54'), 'Preview must load the matching cache-busted label engine');
 assert.ok(engine.includes('function syncLabelScales()') && engine.includes('cameraDistance*projection*targetPixels'), '3D labels must keep a stable screen-space size across zoom levels');
