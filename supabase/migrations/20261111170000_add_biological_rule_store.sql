@@ -25,6 +25,17 @@ create table public.biological_rules (
   check (rule->>'variable_code' = variable_code),
   check (rule->>'unit_code' = unit_code),
   check (rule->'target' = target),
+  check (
+    (jsonb_typeof(target->'taxon_code') = 'string' and length(btrim(target->>'taxon_code')) > 0)
+    or
+    (jsonb_typeof(target->'strain_code') = 'string' and length(btrim(target->>'strain_code')) > 0)
+  ),
+  check (
+    case when jsonb_typeof(rule->'min') = 'number' and jsonb_typeof(rule->'max') = 'number'
+      then (rule->>'min')::numeric <= (rule->>'max')::numeric
+      else false
+    end
+  ),
   check (case when jsonb_typeof(rule->'sources') = 'array' then jsonb_array_length(rule->'sources') > 0 else false end),
   check (
     case when status = 'reviewed'
@@ -59,8 +70,20 @@ returns trigger
 language plpgsql
 security invoker
 set search_path = pg_catalog, public, private, auth
-as $$
+as $
+declare
+  v_variable_dimension text;
+  v_unit_dimension text;
 begin
+  select v.dimension, u.dimension
+    into v_variable_dimension, v_unit_dimension
+    from public.variables v
+    cross join public.units u
+   where v.code = new.variable_code and u.code = new.unit_code;
+  if not found or v_variable_dimension is distinct from v_unit_dimension then
+    raise exception 'biological_rule_variable_unit_dimension_mismatch' using errcode = '23514';
+  end if;
+
   if tg_op = 'DELETE' then
     if old.status <> 'draft' then
       raise exception 'biological_rule_version_immutable' using errcode = '55000';
