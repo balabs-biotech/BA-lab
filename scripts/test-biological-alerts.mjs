@@ -294,5 +294,15 @@ assert.match(moduleSource, /observation_interpretation: "descriptive_observation
 assert.match(moduleSource, /signal_interpretation: "rule_or_anomaly_output_not_identity_confirmation"/);
 assert.match(moduleSource, /result_interpretation: "experiment_result_requires_method_and_result_semantics_review"/);
 assert.match(moduleSource, /composition_evidence: \[\]/);
+assert.match(moduleSource, /const findings = cultureSignals\.map\(signal =>/);
+assert.match(moduleSource, /finding_id: signal\.signal_id/);
+assert.match(moduleSource, /recommendation_code: signal\.recommendation_code/);
+assert.match(moduleSource, /hypotheses: \[\]/);
+assert.match(moduleSource, /confidence: null/);
+assert.match(moduleSource, /confirmation_status: "unconfirmed"/);
+assert.match(moduleSource, /composition_status: "not_assessed"/);
+assert.match(moduleSource, /finding_count: findings\.length/);
+assert.match(moduleSource, /source_observation_ids,variable_code,observed_date/);
+
 assert.match(moduleSource, /composition_status: "not_assessed"/);
 
