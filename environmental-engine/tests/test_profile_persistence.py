@@ -42,6 +42,7 @@ def make_domain_profile(**overrides):
         "status": "active",
         "valid_from": "2026-10-01",
         "valid_to": None,
+        "recommendations": [],
         "rules": [
             {
                 "rule_id": "vpd-suspect",
@@ -95,6 +96,53 @@ def test_domain_profile_record_builds_typed_rules():
     assert len(profile.rules) == 1
     assert profile.rules[0].rule_id == "vpd-suspect"
     assert profile.rules[0].required_context_tags == frozenset({"stage:fruiting"})
+    assert profile.recommendations == ()
+
+
+def test_domain_profile_record_builds_typed_recommendation_definitions():
+    record = make_domain_profile()
+    record["recommendations"] = [
+        {
+            "recommendation_code": "inspect_airflow",
+            "instruction_code": "inspect_air_exchange",
+            "rationale_code": "persistent_vpd_deviation",
+            "applicable_signal_codes": ["vpd_suspect"],
+            "allowed_finding_statuses": ["suspect"],
+            "required_context_tags": ["stage:fruiting"],
+            "contraindicated_context_tags": ["stage:incubation"],
+        }
+    ]
+
+    profile = domain_profile_from_record(record)
+
+    assert len(profile.recommendations) == 1
+    definition = profile.recommendations[0]
+    assert definition.recommendation_code == "inspect_airflow"
+    assert definition.applicable_signal_codes == ("vpd_suspect",)
+    assert definition.required_context_tags == frozenset({"stage:fruiting"})
+    assert definition.contraindicated_context_tags == frozenset({"stage:incubation"})
+
+
+def test_domain_profile_rejects_non_array_recommendations():
+    record = make_domain_profile(recommendations={"recommendation_code": "invalid"})
+    with pytest.raises(ValueError, match="recommendations must be an array"):
+        domain_profile_from_record(record)
+
+
+def test_domain_profile_rejects_duplicate_recommendation_codes():
+    record = make_domain_profile()
+    definition = {
+        "recommendation_code": "inspect_airflow",
+        "instruction_code": "inspect_air_exchange",
+        "rationale_code": "persistent_vpd_deviation",
+        "applicable_signal_codes": ["vpd_suspect"],
+        "allowed_finding_statuses": ["suspect"],
+        "required_context_tags": [],
+        "contraindicated_context_tags": [],
+    }
+    record["recommendations"] = [definition, definition]
+    with pytest.raises(ValueError, match="recommendation codes must be unique"):
+        domain_profile_from_record(record)
 
 
 def test_domain_profile_rejects_duplicate_rule_ids():
@@ -197,6 +245,8 @@ def test_repository_resolves_domain_profile_by_tenant_domain_and_full_window():
     assert ("status", "in", ["active", "retired"]) in query.filters
     assert ("valid_from", "lte", "2026-11-01") in query.filters
     assert ("or", "valid_to.is.null,valid_to.gte.2026-11-30") in query.operations
+    select = next(op[1] for op in query.operations if op[0] == "select")
+    assert "recommendations" in select
 
 
 @pytest.mark.parametrize(
