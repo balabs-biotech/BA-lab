@@ -90,3 +90,19 @@ CultureOps does not yet have a validated, versioned library of biological operat
 ```sh
 node scripts/test-biological-interpreter.mjs
 ```
+
+
+## Biological Rule Registry
+
+The companion `shared/biological-rule-registry.js` validates rule records before they can be used by the interpreter.
+
+A rule carries a stable `rule_id`, semantic `version`, lifecycle `status` (`draft`, `reviewed`, `retired`), biological target, variable/unit, explicit bounds, source citations and review metadata. A target must identify at least a taxon or a strain. Reviewed rules require a reviewer identifier and timestamp.
+
+Only structurally valid rules whose status is exactly `reviewed` are executable. Draft and retired rules remain valid registry records but cannot produce biological assessments. The registry checks metadata completeness; it does not authenticate citations, verify the scientific conclusions, or replace expert review.
+
+Run:
+
+```sh
+node scripts/test-biological-rule-registry.mjs
+node scripts/test-biological-interpreter.mjs
+```
