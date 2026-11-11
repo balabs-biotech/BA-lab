@@ -565,6 +565,40 @@
       const cultureSignals = biologicalSignals.filter(item => item.biological_subject_id === cultureId);
       const cultureResults = experimentalResults.filter(result =>
         cultureMeasurements.some(item => item.result_id === result.id));
+      const summarizeTimeSeries = (items, valueField, timeField, unitField) => {
+        const groups = new Map();
+        items.forEach(item => {
+          const value = Number(item[valueField]);
+          const timestamp = item[timeField];
+          if (!Number.isFinite(value) || !timestamp || !Number.isFinite(new Date(timestamp).getTime())) return;
+          const variable = item.variable_code || "unspecified";
+          const unit = item[unitField] || null;
+          const key = variable + "::" + (unit || "");
+          if (!groups.has(key)) groups.set(key, { variable_code: variable, unit, points: [] });
+          groups.get(key).points.push({ value, observed_at: timestamp });
+        });
+        return [...groups.values()].map(group => {
+          const points = group.points.sort((a, b) => new Date(a.observed_at) - new Date(b.observed_at));
+          const values = points.map(point => point.value);
+          const first = points[0];
+          const last = points[points.length - 1];
+          const delta = last.value - first.value;
+          return {
+            variable_code: group.variable_code,
+            unit: group.unit,
+            sample_count: points.length,
+            first_observed_at: first.observed_at,
+            last_observed_at: last.observed_at,
+            first_value: first.value,
+            last_value: last.value,
+            minimum: Math.min(...values),
+            maximum: Math.max(...values),
+            delta,
+            direction: delta > 0 ? "increasing" : delta < 0 ? "decreasing" : "stable_between_endpoints",
+            temporal_resolution: points.length > 1 ? "multiple_observations" : "single_observation"
+          };
+        });
+      };
       const culture = cultures.find(item => item.id === cultureId) || null;
       const cultureBatches = batches.filter(batch =>
         batch.culture_id === cultureId || (culture?.material?.id && batch.material_id === culture.material.id));
@@ -586,8 +620,11 @@
         current_stage: currentBatch?.current_stage || null,
         batch_context_is_current: Boolean(currentBatch)
       };
+      const measurementTrends = summarizeTimeSeries(cultureMeasurements, "normalized_value", "measured_at", "normalized_unit_code");
+      const environmentalTrends = summarizeTimeSeries(environmentalContext, "value", "observed_at", "unit_code");
       const environmentalSummary = {
         observation_count: environmentalContext.length,
+        temporal_trends: environmentalTrends,
         variables: [...new Set(environmentalContext.map(item => item.variable_code).filter(Boolean))],
         first_observed_at: environmentalContext.map(item => item.observed_at).filter(Boolean).sort()[0] || null,
         last_observed_at: environmentalContext.map(item => item.observed_at).filter(Boolean).sort().slice(-1)[0] || null,
@@ -622,7 +659,14 @@
       return {
         culture_id: cultureId,
         biological_context: biologicalContext,
+        measurement_trends: measurementTrends,
         environmental_summary: environmentalSummary,
+        temporal_context: {
+          measurement_series_count: measurementTrends.length,
+          environmental_series_count: environmentalTrends.length,
+          trend_semantics: "descriptive_first_to_last_change_not_a_causal_or_threshold_assessment",
+          temporal_association_is_causal: false
+        },
         measurements: cultureMeasurements,
         observations: cultureObservations,
         biological_signals: cultureSignals,
