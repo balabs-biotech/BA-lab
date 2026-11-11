@@ -1,0 +1,31 @@
+import assert from "node:assert/strict";
+import fs from "node:fs";
+
+const ui = fs.readFileSync("shared/biological-assessment-ui.js", "utf8");
+const store = fs.readFileSync("shared/biological-assessment-store.js", "utf8");
+const tracker = fs.readFileSync("batch-tracker/tracker.js", "utf8");
+const mycology = fs.readFileSync("batch-tracker/mycology/index.html", "utf8");
+const laboratory = fs.readFileSync("batch-tracker/laboratory/index.html", "utf8");
+const greenTech = fs.readFileSync("batch-tracker/green-tech/index.html", "utf8");
+const migration = fs.readFileSync("supabase/migrations/20261111190000_add_biological_assessment_history.sql", "utf8");
+
+assert.match(ui, /\["mycology",\s*"laboratory"\]/);
+assert.match(ui, /data-biological-assess/);
+assert.match(ui, /loadHistoryBatch/);
+assert.match(ui, /non recalculé côté serveur/);
+assert.match(store, /record_biological_assessment/);
+assert.match(store, /source_measurement_id/);
+assert.match(tracker, /BA_LABS_ASSESS_AND_RECORD_BIOLOGICAL_MEASUREMENT/);
+assert.match(tracker, /quality_state === "excluded"/);
+assert.match(tracker, /rule_version_id/);
+assert.match(mycology, /biological-assessment-store\.js/);
+assert.match(mycology, /biological-assessment-ui\.js/);
+assert.match(laboratory, /biological-assessment-store\.js/);
+assert.match(laboratory, /biological-assessment-ui\.js/);
+assert.doesNotMatch(greenTech, /biological-assessment-ui\.js/);
+assert.match(migration, /server_verification text not null default 'not_recomputed'/);
+assert.match(migration, /biological_assessment_history_is_append_only/);
+assert.match(migration, /Assessment evidence does not match source raw measurement/);
+assert.match(migration, /biological_assessments_select/);
+
+console.log("✓ Biological Assessment UI: explicit measurement actions, domain isolation and evidence-history boundaries");
