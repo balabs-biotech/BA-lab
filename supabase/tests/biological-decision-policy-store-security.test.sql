@@ -12,6 +12,12 @@ begin
      where table_schema='public' and table_name='biological_decision_policies'
        and column_name='revision_seq' and is_identity='YES'
   ) then raise exception 'FAIL: decision policy revision sequence is missing'; end if;
+  if not exists (
+    select 1 from pg_constraint
+     where conrelid=v_table and contype='c'
+       and pg_get_constraintdef(oid) ilike '%trigger_assessment_statuses%'
+       and pg_get_constraintdef(oid) ilike '%out_of_range%'
+  ) then raise exception 'FAIL: decision policies must be restricted to the implemented explicit trigger'; end if;
   if not (select relrowsecurity from pg_class where oid=v_table) then
     raise exception 'FAIL: decision policy RLS is disabled';
   end if;
