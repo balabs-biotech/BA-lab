@@ -38,6 +38,9 @@ begin
   if v_operation is null or v_code is null then
     raise exception 'material_mixture_operation_and_code_required';
   end if;
+  if v_operation not in ('mixing', 'consortium_assembly', 'blending') then
+    raise exception 'unsupported_material_mixture_operation';
+  end if;
 
   -- Deterministic lock order prevents deadlocks when concurrent operations share sources.
   perform m.id
@@ -53,6 +56,14 @@ begin
      and m.id = any(p_source_material_ids);
   if v_source_count <> cardinality(p_source_material_ids) then
     raise exception 'material_mixture_source_not_found';
+  end if;
+  if exists (
+    select 1 from public.materials m
+     where m.organization_id = p_organization_id
+       and m.id = any(p_source_material_ids)
+       and m.state <> 'active'
+  ) then
+    raise exception 'material_mixture_source_not_active';
   end if;
   if exists (
     select 1 from public.materials m
