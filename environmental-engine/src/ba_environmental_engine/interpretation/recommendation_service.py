@@ -8,7 +8,13 @@ database principal and for committing the event with optimistic concurrency.
 from datetime import datetime
 from uuid import UUID
 
-from .models import RecommendationProposal, RecommendationResolution
+from .models import (
+    DomainInterpretation,
+    DomainProfile,
+    RecommendationProposal,
+    RecommendationResolution,
+)
+from .recommendations import resolve_recommendations
 from .recommendation_lifecycle import (
     LifecycleAction,
     RecommendationLifecycle,
@@ -59,6 +65,26 @@ class RecommendationService:
             self.create(organization_id=organization_id, proposal=proposal)
             for proposal in resolution.proposals
         )
+
+    def resolve_and_persist(
+        self,
+        *,
+        organization_id: UUID,
+        interpretation: DomainInterpretation,
+        profile: DomainProfile,
+    ) -> tuple[RecommendationResolution, tuple[RecommendationLifecycle, ...]]:
+        """Resolve configured actions and persist their complete audit outcome.
+
+        The source biological signals must already have been persisted by the
+        trusted signal pipeline. The database verifies every proposal's source
+        signal, analysis, finding and profile provenance before accepting it.
+        """
+        resolution = resolve_recommendations(interpretation, profile)
+        persisted = self.persist_resolution(
+            organization_id=organization_id,
+            resolution=resolution,
+        )
+        return resolution, persisted
 
     def transition(
         self,
