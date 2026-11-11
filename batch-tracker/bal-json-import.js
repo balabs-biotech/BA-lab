@@ -53,7 +53,7 @@
       throw new Error("L’import accepte uniquement les données brutes (raw).");
     }
     if (record.record_type === "measurement") {
-      if (!Number.isFinite(Number(record.data.raw_value)) || !record.data.raw_unit_code || !record.data.variable_code) {
+      if (typeof record.data.raw_value !== "number" || !Number.isFinite(record.data.raw_value) || !record.data.raw_unit_code || !record.data.variable_code) {
         throw new Error("Mesure incomplète : variable_code, raw_value et raw_unit_code sont requis.");
       }
     } else if (!record.data.variable_code || typeof record.data.value_text !== "string" || !record.data.value_text.trim()) {
