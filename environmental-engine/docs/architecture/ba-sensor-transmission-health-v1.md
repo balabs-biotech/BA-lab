@@ -86,3 +86,19 @@ historical windows, empty history, disabled/unbound devices, expectation-window 
 invalid policy and duplicate receipt IDs. The module and tests are committed, but the
 Python test suite has not yet been executed in this environment. The API and gateway
 integration remain pending.
+
+
+## Transmission-only scope
+
+The authenticated gateway may run transmission diagnostics even when the selected
+period contains no measurement rows. It still requires a valid active sensor profile
+and at least one profile-bound device, then loads the device registry and bounded
+receipt history before calling the engine. The private API accepts an empty
+`measurements` list only when the complete transmission policy/device/receipt
+contract is present. This is necessary for a truly silent device to remain visible.
+
+Current silence is evaluated only when the selected end date is the current date
+in the profile timezone. Historical windows can report interior receipt gaps, but
+cannot report a current trailing-silence status. The registry heartbeat is only
+used as current evidence when there are no in-window receipts; it is not a
+historical reconstruction source.
