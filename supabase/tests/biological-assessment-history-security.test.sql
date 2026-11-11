@@ -8,6 +8,9 @@ declare
   v_rpc text;
 begin
   if v_table is null then raise exception 'FAIL: biological_assessments is missing'; end if;
+  if not exists (select 1 from pg_constraint where conrelid=v_table and contype='u' and pg_get_constraintdef(oid) ilike '%organization_id, idempotency_key%') then
+    raise exception 'FAIL: assessment idempotency uniqueness is missing';
+  end if;
   if not (select relrowsecurity from pg_class where oid = v_table) then
     raise exception 'FAIL: biological assessment RLS is disabled';
   end if;
@@ -33,7 +36,8 @@ begin
      or v_rpc not ilike '%Assessment evidence does not match source raw measurement%'
      or v_rpc not ilike '%Assessment rule version is not the current reviewed version%'
      or v_rpc not ilike '%not_recomputed%'
-     or v_rpc not ilike '%Assessment idempotency key payload conflict%' then
+     or v_rpc not ilike '%Assessment idempotency key payload conflict%'
+     or position('Resolve a retry before checking' in v_rpc) = 0 then
     raise exception 'FAIL: guarded assessment evidence RPC contract is incomplete';
   end if;
   if not has_function_privilege('authenticated','public.record_biological_assessment(uuid,uuid,text,text,text,jsonb,jsonb,jsonb,jsonb,uuid)','EXECUTE') then
