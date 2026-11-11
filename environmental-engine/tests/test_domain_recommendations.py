@@ -131,4 +131,10 @@ def test_recommendation_catalog_codes_must_be_unique():
     profile = make_profile()
     duplicate = profile.recommendations[0]
     with pytest.raises(ValueError, match="recommendation codes must be unique"):
-        profile.model_copy(update={"recommendations": (duplicate, duplicate)})
+        DomainProfile(
+            profile_id=profile.profile_id,
+            module=profile.module,
+            version=profile.version,
+            rules=profile.rules,
+            recommendations=(duplicate, duplicate),
+        )
