@@ -256,6 +256,14 @@ assert.ok(!html.includes("openUniverse.addEventListener('click',toggleUniverse)"
 assert.ok(html.includes('if(!spatial3D&&mainView.classList.contains(\'universe-closed\'))toggleUniverse()'), 'The hidden content source must not change the new engine scene state');
 assert.ok(engine.includes('window.__BALABS_3D_E2E__'), 'The browser smoke test must be able to inspect the live scene');
 
+
+// Public catalogue exclusions: these five Trichoderma records are explicitly inactive in Notion and must not leak into either Arabic tree.
+const inactiveArabicProducts = ['ar-lc-tricho-harzianum', 'ar-lc-tricho-hamatum', 'ar-lc-tricho-koningii', 'ar-lc-tricho-longibrachiatum', 'ar-lc-tricho-reesei'];
+for (const [label, tree] of [['public', JSON.parse(readFileSync('ecosystem/notion-tree.ar.json', 'utf8'))], ['preview', JSON.parse(readFileSync('ecosystem-preview/notion-tree.ar.json', 'utf8'))]]) {
+  const ids = new Set(flattenManifest({ children: tree.domains }).map((node) => node.id));
+  for (const id of inactiveArabicProducts) assert.ok(!ids.has(id), label + ' Arabic tree must not expose inactive catalogue item ' + id);
+}
+
 console.log('Clean 3D engine regression checks passed: eight domains, mycelial topology, animated signals, stable camera, desktop/mobile controls, hierarchical Notion branches and explicit page actions.');
 
 
