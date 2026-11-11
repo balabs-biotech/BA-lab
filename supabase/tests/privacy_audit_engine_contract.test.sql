@@ -141,6 +141,32 @@ begin
     raise exception 'privacy_audit_signup_validation_hook_auth_role_not_granted';
   end if;
 
+  if not has_schema_privilege('supabase_auth_admin', 'public', 'USAGE') then
+    raise exception 'privacy_audit_signup_validation_hook_schema_usage_missing';
+  end if;
+
+  -- SECURITY DEFINER functions that bypass RLS must be owned by postgres and
+  -- pin their search_path; do not rely on the caller's role or path.
+  foreach required_column in array array[
+    'public.hook_validate_signup_legal_versions(jsonb)',
+    'private.capture_signup_legal_acts()',
+    'public.is_platform_administrator(uuid)',
+    'public.list_legal_document_versions()',
+    'public.publish_legal_document_version(text,text,text,text,timestamp with time zone,uuid)',
+    'public.retire_legal_document_version(uuid,timestamp with time zone)'
+  ] loop
+    if not exists (
+      select 1
+      from pg_proc p
+      where p.oid = to_regprocedure(required_column)
+        and p.prosecdef
+        and pg_get_userbyid(p.proowner) = 'postgres'
+        and coalesce(array_to_string(p.proconfig, ','), '') like '%search_path=%'
+    ) then
+      raise exception 'privacy_audit_security_definer_owner_or_search_path_invalid: %', required_column;
+    end if;
+  end loop;
+
 
   if to_regclass('private.platform_administrators') is null then
     raise exception 'privacy_audit_platform_administrators_table_missing';
