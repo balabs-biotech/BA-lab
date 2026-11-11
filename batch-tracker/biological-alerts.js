@@ -803,6 +803,7 @@
           events: cultureInterpretationEvents,
           snapshot_count: cultureInterpretations.length,
           event_count: cultureInterpretationEvents.length,
+          events_available: lineage?.evidenceAvailability?.biological_interpretation_events === true,
           status: lineage?.evidenceAvailability?.biological_interpretations === true
             ? "available" : "unavailable"
         },
@@ -986,7 +987,11 @@
       if (history.status === "unavailable") {
         historySection.append(element("p", "signal-lineage-quality",
           "Historique indisponible : la lecture du registre n'a pas abouti."));
-      } else if (!snapshots.length) {
+      } else if (history.events_available === false) {
+        historySection.append(element("p", "signal-lineage-quality",
+          "Instantanés disponibles, mais historique des événements incomplet."));
+      }
+      if (history.status !== "unavailable" && !snapshots.length) {
         historySection.append(element("p", "signal-lineage-batches",
           "Aucun instantané d'interprétation enregistré pour cette culture."));
       }
