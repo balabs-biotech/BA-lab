@@ -724,10 +724,10 @@
   isolation: isolate !important;
   display: grid !important;
   grid-template-columns: minmax(0, 1.15fr) minmax(260px, .65fr) !important;
-  align-items: end !important;
+  align-items: center !important;
   gap: clamp(24px, 5vw, 76px) !important;
-  min-height: min(690px, calc(100svh - 145px)) !important;
-  padding: clamp(78px, 10vw, 138px) clamp(24px, 7vw, 104px) clamp(66px, 8vw, 100px) !important;
+  min-height: max(760px, calc(100svh - 145px)) !important;
+  padding: clamp(64px, 7vw, 100px) clamp(24px, 7vw, 104px) clamp(76px, 8vw, 100px) !important;
   overflow: hidden !important;
   background:
     radial-gradient(ellipse at 75% 45%, rgba(38,59,56,.2), transparent 45%),
@@ -760,7 +760,7 @@
   max-width: 9ch !important;
   margin-block: 24px 26px !important;
   color: #F2F1E9 !important;
-  font: 400 clamp(64px, 8.2vw, 116px)/.88 Georgia, "Times New Roman", serif !important;
+  font: 400 clamp(58px, 6.6vw, 94px)/.94 Georgia, "Times New Roman", serif !important;
   letter-spacing: -.065em !important;
 }
 #app.balabs-ui > main > .hero h1 span {
@@ -913,6 +913,18 @@
   background: #F0F1E9 !important;
 }
 @media (max-width: 760px) {
+  #app.balabs-ui > .site-nav {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    justify-content: center !important;
+    align-content: center !important;
+    gap: 2px 14px !important;
+    min-height: 0 !important;
+    padding: 9px 12px !important;
+    overflow: visible !important;
+    white-space: normal !important;
+  }
+  #app.balabs-ui > .site-nav a { flex: 0 0 auto !important; padding: 8px 2px !important; white-space: nowrap !important; }
   #app.balabs-ui > .top {
     min-height: 0 !important;
     padding: 15px 14px 23px !important;
