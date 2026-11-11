@@ -22,6 +22,11 @@ begin
     raise exception 'FAIL: decision policy RLS is disabled';
   end if;
   if not exists (
+    select 1 from pg_constraint
+     where conrelid=v_table
+       and pg_get_constraintdef(oid) ilike '%cardinality(trigger_assessment_statuses) = 1%'
+  ) then raise exception 'FAIL: decision policy trigger must be exactly out_of_range'; end if;
+  if not exists (
     select 1 from pg_policies where schemaname='public' and tablename='biological_decision_policies'
       and policyname='biological_decision_policies_select' and qual ilike '%is_org_member%'
   ) then raise exception 'FAIL: decision policy reads must be organization-member scoped'; end if;
