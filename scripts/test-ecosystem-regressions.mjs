@@ -9,7 +9,7 @@ const expectedDomains = ['bio', 'myco', 'soil', 'lab', 'products', 'iot', 'work'
 
 const languageTrees = Object.fromEntries(['fr', 'en', 'ar', 'pt'].map((language) => [
   language,
-  JSON.parse(readFileSync(\`ecosystem/notion-tree.\${language}.json\`, 'utf8')),
+  JSON.parse(readFileSync('ecosystem/notion-tree.' + language + '.json', 'utf8')),
 ]));
 function domainRootFromEngine(source, domain, language) {
   const start = source.indexOf('const pages={');
