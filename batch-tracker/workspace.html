@@ -177,9 +177,7 @@
     <p id="sensorAnalysisStatus" class="signals-status" role="status" aria-live="polite">En attente d’une session authentifiée.</p>
     <div id="sensorAnalysisResults" class="sensor-analysis-results" aria-live="polite"></div>
     <p class="signals-footnote">Le profil de capteurs doit être activé et couvrir toute la période. L’analyse descriptive, le dépistage statistique et l’interprétation biologique sont des couches distinctes ; aucun seuil biologique n’est inventé par l’interface.</p>
-  </section>
-
-  <section class="card sensor-policy-card" id="sensorDriftPolicyCard" aria-labelledby="sensorDriftPolicyTitle">
+  <section class="sensor-policy-card" id="sensorDriftPolicyCard" aria-labelledby="sensorDriftPolicyTitle">
     <div class="section-kicker"><span>MODULE 08</span><span class="kicker-line"></span><span>MÉTROLOGIE &amp; RÉFÉRENCES</span></div>
     <h2 id="sensorDriftPolicyTitle">Gestion des références instrumentales</h2>
     <p class="muted">Configurez une comparaison relative entre deux capteurs activés dans le profil environnemental courant. La vérification physique doit être documentée avant activation.</p>
@@ -213,6 +211,7 @@
       <button id="sensorDriftRetire" type="button" class="secondary-button" disabled>Retirer la version active</button>
     </div>
     <p class="signals-footnote">Le cycle est imposé par PostgreSQL : brouillon → vérification authentifiée distincte → activation → retrait. Une référence vérifiée ne peut plus être remplacée ; créez une nouvelle version pour un autre couple physique. Les seuils restent explicites et ne sont jamais fournis par la requête d’analyse.</p>
+  </section>
   </section>
   <style>
     .sensor-policy-card{margin-top:18px}
