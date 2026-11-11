@@ -216,7 +216,7 @@ begin
 
   return '{}'::jsonb;
 end;
-$;
+$$;
 
 revoke all on function public.hook_validate_signup_legal_versions(jsonb)
   from public, anon, authenticated;
