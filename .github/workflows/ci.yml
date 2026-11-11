@@ -250,6 +250,8 @@ jobs:
         run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/bal-json-ingestion-rpc-security.test.sql
       - name: Verify biological rule store tenant isolation and immutable versions after replay
         run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/biological-rule-store-security.test.sql
+      - name: Verify biological assessment history security contract
+        run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/biological-assessment-history-security.test.sql
       - name: Verify sensitive RPC search-path contracts after replay
         run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/sensitive_rpc_search_path_contract.test.sql
       - name: Verify append-only audit table privileges after replay
