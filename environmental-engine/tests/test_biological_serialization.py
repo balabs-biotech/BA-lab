@@ -44,7 +44,7 @@ def build(calculation):
 
 
 def test_biological_result_serializes_formula_period_and_complete_lineage():
-    payload = build(result()).model_dump(mode="json")
+    payload = build(result()).model_dump(mode="json", by_alias=True)
     assert payload["engine"]["name"] == "ba-biological-performance"
     assert payload["subject"]["id"] == "culture-1"
     assert payload["metric"]["value"] == 4.0
@@ -63,7 +63,7 @@ def test_insufficient_biological_evidence_serializes_null_value_not_zero():
 
 
 def test_biological_contract_rejects_lineage_count_mismatch():
-    payload = build(result()).model_dump(mode="python")
+    payload = build(result()).model_dump(mode="python", by_alias=True)
     payload["evidence"]["accepted_count"] = 1
     with pytest.raises(ValidationError, match="accepted_count"):
         BALBiologicalAnalysis.model_validate(payload)
