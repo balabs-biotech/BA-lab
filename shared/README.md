@@ -170,3 +170,27 @@ Run:
 ```sh
 node scripts/test-biological-assessment-engine.mjs
 ```
+
+
+## Biological Rule Store v1
+
+The tenant-scoped store is introduced by `supabase/migrations/20261111170000_add_biological_rule_store.sql`. It stores immutable, versioned rule snapshots in `public.biological_rules`; the JSON rule remains the interchange representation defined by `schemas/biological-rules/v1/rule.schema.json`. Indexed columns mirror rule identity, lifecycle, domain and variable/unit codes so reads remain selective and auditable.
+
+Security model:
+
+- Authenticated organization members can read only their own organization's rule records.
+- Only organization owners/admins can create or modify draft records.
+- A transition to `reviewed` requires the authenticated reviewer ID in the embedded review metadata; the database records the reviewer UUID and timestamp.
+- Reviewed and retired versions cannot be updated or deleted. A new version is inserted instead.
+- To retire a rule, insert a new `retired` version with the same `rule_id`; the store treats the newest reviewed/retired version as authoritative and suppresses older reviewed versions when the newest is retired.
+- The global scientific catalogue is not mixed into tenant data. Cross-organization publication is a separate governance decision.
+
+`shared/biological-rule-store.js` loads reviewed versions for the active organization and exact domain/variable/unit tuple. It selects the newest lifecycle version per `rule_id`, excludes retired rules, and rejects malformed or column/JSON-inconsistent records. It never searches another organization and has no write API.
+
+CultureOps now loads this store in Mycology and Laboratory. If a caller does not explicitly pass a rule array to `BA_LABS_ASSESS_BIOLOGICAL_MEASUREMENT`, the tracker fetches executable rules from the active tenant's store. The operation is read-only; rule authoring and approval UI are not part of this slice.
+
+Run:
+
+```sh
+node scripts/test-biological-rule-store.mjs
+```
