@@ -11,6 +11,10 @@ const languageTrees = Object.fromEntries(['fr', 'en', 'ar', 'pt'].map((language)
   language,
   JSON.parse(readFileSync('ecosystem/notion-tree.' + language + '.json', 'utf8')),
 ]));
+for (const language of ['fr', 'en', 'ar', 'pt']) {
+  const ids = languageTrees[language].domains.map((domain) => domain.id).sort();
+  assert.deepEqual(ids, [...expectedDomains].sort(), language + ' manifest must expose exactly the eight public universes');
+}
 function domainRootFromEngine(source, domain, language) {
   const start = source.indexOf('const pages={');
   const end = source.indexOf('\n};', start);
