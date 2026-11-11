@@ -806,3 +806,52 @@ def test_sensor_api_rejects_partial_transmission_diagnostics_policy():
 
     assert response.status_code == 422
     assert "policy, devices and receipts must be supplied together" in str(response.json()["detail"])
+
+
+def test_sensor_api_accepts_transmission_only_analysis_for_a_silent_device():
+    request = sensor_payload()
+    device_id = request["measurements"][0]["iot_device_id"]
+    request["measurements"] = []
+    request["transmission_expected_interval_seconds"] = 60
+    request["transmission_gap_tolerance_factor"] = 2.0
+    request["transmission_current_window"] = True
+    request["transmission_devices"] = [{
+        "device_id": device_id,
+        "device_code": "sensor-01",
+        "enabled": True,
+        "created_at": "2026-02-27T00:00:00+00:00",
+        "profile_bound": True,
+        "expected_from": "2026-02-27T00:00:00+00:00",
+        "expected_to": None,
+        "last_seen_at": "2026-02-28T00:00:00+00:00",
+    }]
+    request["transmission_receipts"] = []
+
+    client = TestClient(create_app(engine_api_key="test-secret"))
+    response = client.post(
+        "/v1/analyses/sensors",
+        json=request,
+        headers={"X-BA-Engine-Key": "test-secret"},
+    )
+
+    assert response.status_code == 200, response.text
+    body = response.json()
+    assert body["analysis"]["total_observations"] == 0
+    assessment = body["instrument_health"]["transmission_diagnostics"]["assessments"][0]
+    assert assessment["status"] == "silent"
+    assert assessment["receipt_count"] == 0
+
+
+def test_sensor_api_rejects_empty_measurements_without_transmission_policy():
+    request = sensor_payload()
+    request["measurements"] = []
+
+    client = TestClient(create_app(engine_api_key="test-secret"))
+    response = client.post(
+        "/v1/analyses/sensors",
+        json=request,
+        headers={"X-BA-Engine-Key": "test-secret"},
+    )
+
+    assert response.status_code == 422
+    assert "at least one sensor measurement or transmission diagnostics policy is required" in str(response.json()["detail"])
