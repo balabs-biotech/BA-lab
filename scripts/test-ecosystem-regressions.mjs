@@ -7,6 +7,36 @@ const engine = readFileSync('ecosystem/engine-v2.js', 'utf8');
 const previewEngine = readFileSync('ecosystem-preview/engine-v2.js', 'utf8');
 const expectedDomains = ['bio', 'myco', 'soil', 'lab', 'products', 'iot', 'work', 'learn'];
 
+const languageTrees = Object.fromEntries(['fr', 'en', 'ar', 'pt'].map((language) => [
+  language,
+  JSON.parse(readFileSync(`ecosystem/notion-tree.${language}.json`, 'utf8')),
+]));
+function domainRootFromEngine(source, domain, language) {
+  const start = source.indexOf('const pages={');
+  const end = source.indexOf('\\n};', start);
+  assert.ok(start >= 0 && end > start, 'engine pages map must be present');
+  const map = source.slice(start, end);
+  const domainStart = map.indexOf(`\\n${domain}:{`);
+  if (domainStart < 0) return null;
+  const nextDomain = map.slice(domainStart + 1).search(/\\n[a-z]+:\\{/);
+  const section = nextDomain < 0 ? map.slice(domainStart) : map.slice(domainStart, domainStart + 1 + nextDomain);
+  const match = section.match(new RegExp(`${language}:'([^']+)'`));
+  return match?.[1] || null;
+}
+for (const [label, source] of [['public', html], ['preview', previewHtml]]) {
+  for (const language of ['fr', 'en', 'ar', 'pt']) {
+    for (const domain of languageTrees[language].domains) {
+      const expectedId = domain.notionId || domain.url?.match(/\\/p\\/([a-f0-9]{32})/)?.[1];
+      if (!expectedId) continue;
+      const actualUrl = domainRootFromEngine(source, domain.id, language);
+      assert.ok(actualUrl, label + ' ' + language + ' ' + domain.id + ' must have a universe entry URL');
+      assert.equal(actualUrl.match(/\\/p\\/([a-f0-9]{32})/)?.[1], expectedId,
+        label + ' ' + language + ' ' + domain.id + ' must open the verified root page from its language manifest');
+    }
+  }
+}
+
+
 for (const [label, source] of [['public', html], ['preview', previewHtml]]) {
   assert.ok(source.includes("document.documentElement.dir=direction") && source.includes("app.dir=direction"), label + ' Arabic mode must set document-level and app-level reading direction');
   assert.ok(source.includes("localStorage.setItem('balabs-language',l)") && source.includes("localStorage.getItem('balabs-language')"), label + ' language preference must persist and restore safely');
