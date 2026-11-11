@@ -8,7 +8,7 @@ vm.runInNewContext(source, context, { filename: "shared/biological-interpreter.j
 const engine = context.globalThis.BALabsBiologicalInterpreter;
 
 const rule = {
-  rule_id: "mycology-incubation-temperature-demo",
+  rule_id: "mycology-incubation-temperature-demo",\n  status: "reviewed",
   version: "1.0.0",
   variable_code: "incubation_temperature",
   unit_code: "degC",
@@ -31,7 +31,7 @@ const base = {
 assert.equal(engine.version, "0.1.0");
 assert.equal(engine.assessMeasurement({ measurement: base, rule }).status, "normal");
 assert.equal(engine.assessMeasurement({ measurement: { ...base, assessed_value: 26 }, rule }).status, "out_of_range");
-assert.equal(engine.assessMeasurement({ measurement: base, rule: null }).status, "insufficient_context");
+assert.equal(engine.assessMeasurement({ measurement: base, rule: null }).status, "insufficient_context");\nassert.equal(engine.assessMeasurement({ measurement: base, rule: { ...rule, status: "draft" } }).status, "not_assessed");
 assert.equal(engine.assessMeasurement({ measurement: { ...base, context: { culture_id: base.context.culture_id } }, rule }).status, "insufficient_context");
 assert.equal(engine.assessMeasurement({ measurement: { ...base, assessed_unit_code: "K" }, rule }).status, "not_assessed");
 assert.equal(engine.assessMeasurement({ measurement: base, rule: { ...rule, applies_to: { growth_stage: "fruiting" } } }).status, "not_assessed");
