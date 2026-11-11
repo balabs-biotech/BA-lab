@@ -126,3 +126,33 @@ analysis findings need their own normalized persistence table. Then create a
 new Supabase migration through the repository's normal migration workflow and
 test it against a disposable database. Do not apply this schema directly to
 production from this design document.
+
+## Application orchestration
+
+`RecommendationService` coordinates the pure lifecycle transition with the repository port:
+
+1. Load the aggregate by `(organization_id, recommendation_id)`.
+2. Return a not-found result scoped to that organization when absent.
+3. Apply the domain transition and construct one immutable event.
+4. Call `append_event` with the revision observed during the load.
+5. Propagate a revision conflict unchanged. The service must not retry by silently applying the same human decision to a newer state.
+
+The service receives the actor identifier from the authenticated server request context. This value is descriptive event data, not an authorization credential: the concrete repository/RPC must independently compare it with `auth.uid()` and reject mismatches. A client must never be able to choose the actor recorded in the audit trail.
+
+## Required persistence test matrix
+
+The database adapter is not complete until a disposable database verifies:
+
+- member read access is restricted to the member's organizations;
+- viewer reads succeed but lifecycle mutations fail;
+- owner/admin/member can mutate only within their own organizations;
+- anonymous execution and direct client writes are denied;
+- event actor is derived from `auth.uid()` and mismatched actor input is rejected;
+- stale `expected_revision` produces a conflict without changing either row;
+- a successful transition inserts exactly one event and increments revision once;
+- event UPDATE/DELETE is denied to application roles;
+- identical event UUID replay is idempotent, while conflicting payload reuse fails;
+- source analysis foreign keys cannot cross organization boundaries;
+- proposal provenance cannot be changed after creation.
+
+Unit tests around the Python service verify orchestration and conflict propagation only; they do not substitute for these PostgreSQL/RLS tests.
