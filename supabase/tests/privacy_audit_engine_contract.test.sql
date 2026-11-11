@@ -55,6 +55,11 @@ begin
     end if;
   end loop;
 
+  if has_table_privilege('service_role', 'private.legal_consent_events', 'TRUNCATE')
+     or has_table_privilege('service_role', 'private.personal_data_operation_events', 'TRUNCATE') then
+    raise exception 'privacy_audit_service_role_truncate_grant_forbidden';
+  end if;
+
   -- The document ledger must pin a version to the exact published content.
   foreach required_column in array array['document_type','version','content_sha256','effective_at'] loop
     if not exists (
@@ -68,7 +73,7 @@ begin
   end loop;
 
   -- Consent acts are separate immutable events and reference a document version.
-  foreach required_column in array array['user_id','document_version_id','action','purpose','occurred_at','capture_channel'] loop
+  foreach required_column in array array['subject_user_id','actor_user_id','document_version_id','action','purpose','occurred_at','capture_channel'] loop
     if not exists (
       select 1 from information_schema.columns
       where table_schema='private'
