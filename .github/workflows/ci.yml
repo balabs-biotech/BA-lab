@@ -195,6 +195,8 @@ jobs:
           node-version: "22"
       - name: Test sync-culture-to-notion (mocked Supabase and Notion, no network)
         run: node --experimental-strip-types supabase/tests/sync-culture-to-notion.test.mts
+      - name: Test legal document registry authorization and lifecycle (mocked Supabase, no network)
+        run: node --experimental-strip-types supabase/tests/legal-document-registry.test.mts
       - name: Test Sentinel-2 catalogue security and query contract
         run: node supabase/tests/copernicus-sentinel-catalogue.test.mjs
       - name: Test Sentinel-2 frontend catalogue contract
