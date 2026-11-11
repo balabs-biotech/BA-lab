@@ -15,8 +15,13 @@ The Supabase project uses `public.organizations` and
 through `private.is_org_writer(organization_id)`; membership/read access is
 separate from write access.
 
-The existing `public.biological_signals` table is not a recommendation
-ledger. It stores interpreted signal snapshots and has its own inbox lifecycle
+The repository branch defines `public.biological_signals` in its pending
+biological-signal persistence migration. The live Supabase migration ledger
+currently ends at `20261111043003` and does not yet contain that migration;
+the live database therefore must not be assumed to have this table. Once the
+branch migration is reviewed and applied in the intended deployment sequence,
+`biological_signals` remains distinct from the recommendation ledger: it
+stores interpreted signal snapshots and has its own inbox lifecycle
 (`open`, `acknowledged`, `resolved`, `dismissed`). Recommendation review
 must not overload or mutate that signal lifecycle.
 
