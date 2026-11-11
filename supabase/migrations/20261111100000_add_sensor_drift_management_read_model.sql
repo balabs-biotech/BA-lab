@@ -75,4 +75,4 @@ grant execute on function public.list_sensor_drift_management_devices(uuid, uuid
   to authenticated, service_role;
 
 comment on function public.list_sensor_drift_management_devices(uuid, uuid) is
-  'Writer-only read model for sensor drift policy management; exposes only devices bound to the active sensor context profile, never raw IoT registry access.';
+  'Writer-only read model for sensor drift policy management; exposes only devices bound to the active sensor profile or latest retired profile, never raw IoT registry access.';
