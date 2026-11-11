@@ -81,6 +81,7 @@ window.BA_LABS_ASSESS_BIOLOGICAL_MEASUREMENT = async ({ cultureId, measurement, 
   }
   const domain = window.BA_LABS_DOMAIN || document.body.dataset.domain;
   let candidateRules = rules;
+  let candidateRuleRecords = [];
   let ruleStoreStatus = "provided_by_caller";
 
   if (!Array.isArray(candidateRules)) {
@@ -120,6 +121,7 @@ window.BA_LABS_ASSESS_BIOLOGICAL_MEASUREMENT = async ({ cultureId, measurement, 
       };
     }
     candidateRules = loaded.rules;
+    candidateRuleRecords = loaded.rule_records || [];
     ruleStoreStatus = loaded.status;
   }
 
@@ -129,12 +131,97 @@ window.BA_LABS_ASSESS_BIOLOGICAL_MEASUREMENT = async ({ cultureId, measurement, 
     context: contextResult.context,
     rules: candidateRules,
   });
+  const matchedRule = result.resolution && result.resolution.rule;
+  const ruleVersion = matchedRule
+    ? candidateRuleRecords.find(item => item.rule_id === matchedRule.rule_id && item.version === matchedRule.version)
+    : null;
   return Object.freeze({
     ...result,
+    rule_version_id: ruleVersion?.id || null,
+    context_snapshot: contextResult.context,
     context_status: contextResult.status,
     context_missing_fields: contextResult.missing_fields || [],
     rule_store_status: ruleStoreStatus,
   });
+};
+
+window.BA_LABS_ASSESS_AND_RECORD_BIOLOGICAL_MEASUREMENT = async ({ measurementId } = {}) => {
+  const requestRevision = authStateRevision;
+  const requestOrganizationId = organizationId;
+  const domain = window.BA_LABS_DOMAIN || document.body.dataset.domain;
+  if (!requestOrganizationId || !["mycology", "laboratory"].includes(domain) ||
+      typeof measurementId !== "string" || !/^[0-9a-f-]{36}$/i.test(measurementId)) {
+    return { status: "insufficient_context", reason: "measurement_or_supported_workspace_missing" };
+  }
+  const { data: source, error } = await supabaseClient.from("measurements")
+    .select("id,culture_id,variable_code,raw_value,raw_unit_code,measured_at,quality_state")
+    .eq("organization_id", requestOrganizationId)
+    .eq("id", measurementId)
+    .maybeSingle();
+  if (!isCurrentWorkspaceRevision(requestRevision, requestOrganizationId)) {
+    return { status: "stale_context", reason: "workspace_changed_during_measurement_load" };
+  }
+  if (error || !source || !source.culture_id || source.quality_state === "excluded") {
+    return { status: "insufficient_context", reason: "source_measurement_unavailable_or_excluded" };
+  }
+  const numericValue = Number(source.raw_value);
+  if (!Number.isFinite(numericValue)) {
+    return { status: "insufficient_context", reason: "source_measurement_value_not_numeric" };
+  }
+  const measurement = {
+    measurement_id: source.id,
+    variable_code: source.variable_code,
+    assessed_value: numericValue,
+    assessed_unit_code: source.raw_unit_code,
+    raw_value: numericValue,
+    raw_unit_code: source.raw_unit_code,
+  };
+  const assessed = await window.BA_LABS_ASSESS_BIOLOGICAL_MEASUREMENT({
+    cultureId: source.culture_id,
+    measurement,
+  });
+  if (!isCurrentWorkspaceRevision(requestRevision, requestOrganizationId)) {
+    return { status: "stale_context", reason: "workspace_changed_during_assessment" };
+  }
+  const store = window.BALabsBiologicalAssessmentStore;
+  if (!store || typeof store.record !== "function" || !assessed.context_snapshot ||
+      !assessed.engine_version || !assessed.resolution) {
+    return { status: assessed.status || "insufficient_context", reason: assessed.reason || "assessment_not_persistable", assessment: assessed };
+  }
+  const resultSnapshot = {
+    ...assessed,
+    rule_id: assessed.assessment?.rule_id || null,
+    rule_version: assessed.assessment?.rule_version || null,
+    engine_version: assessed.engine_version,
+    raw_measurement_modified: false,
+  };
+  const persisted = await store.record({
+    client: supabaseClient,
+    organizationId: requestOrganizationId,
+    measurementId: source.id,
+    ruleVersionId: assessed.rule_version_id,
+    result: assessed,
+    measurementSnapshot: {
+      source_measurement_id: source.id,
+      variable_code: source.variable_code,
+      assessed_value: numericValue,
+      assessed_unit_code: source.raw_unit_code,
+      measured_at: source.measured_at,
+    },
+    contextSnapshot: assessed.context_snapshot,
+    resolutionSnapshot: assessed.resolution,
+    resultSnapshot,
+  });
+  if (!isCurrentWorkspaceRevision(requestRevision, requestOrganizationId)) {
+    return { status: "stale_context", reason: "workspace_changed_during_assessment_persistence" };
+  }
+  return {
+    status: persisted.status,
+    reason: persisted.reason,
+    history_record_id: persisted.id,
+    assessment: assessed,
+    server_verification: "not_recomputed",
+  };
 };
 
 async function runBiologicalRuleAuthoring(methodName, input) {
@@ -5469,18 +5556,23 @@ async function loadRecentMeasurements() {
     const note = row.metadata?.note ? `<div class="measurement-meta">${escapeHtml(row.metadata.note)}</div>` : "";
     const method = row.method ? ` · ${escapeHtml(row.method)}` : "";
     const instrument = row.instrument ? ` · ${escapeHtml(row.instrument)}` : "";
+    const assessmentAction = ["mycology", "laboratory"].includes(document.body.dataset.domain) && row.culture_id
+      ? `<button type="button" class="small-button biological-assess-button" data-biological-assess="${escapeHtml(row.id)}">Évaluer biologiquement</button><div class="biological-assessment-history" data-assessment-history="${escapeHtml(row.id)}"></div>`
+      : "";
     return `
       <article class="measurement-entry">
         <div>
           <strong>${escapeHtml(variable?.label || row.variable_code)}</strong>
           <div class="measurement-meta">${target}${method}${instrument}</div>
           ${note}
+          ${assessmentAction}
         </div>
         <div class="measurement-value">${escapeHtml(row.raw_value)} <span class="measurement-meta">${escapeHtml(row.raw_unit_code)}</span></div>
         <div class="measurement-stamp">${escapeHtml(stamp)} · Réf. ${escapeHtml(row.variable_code)}</div>
       </article>
     `;
   }).join("");
+  window.dispatchEvent(new CustomEvent("ba-labs-measurements-rendered", { detail: { measurementIds: visibleRows.map(row => row.id) } }));
 }
 
 
