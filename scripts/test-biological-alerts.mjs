@@ -422,6 +422,7 @@ assert.match(interpretationMigration, /previous\.engine_code = btrim\(p_engine_c
 assert.match(interpretationMigration, /not exists \([\s\S]*prior_event\.event_type = 'superseded'/);
 assert.match(moduleSource, /biologicalInterpretationEvents\.length >= 2000/);
 assert.match(moduleSource, /Interpretation event history reached the 2000-row read limit/);
+assert.match(moduleSource, /\.order\("occurred_at", \{ ascending: false \}\)\.limit\(2000\)/);
 assert.match(moduleSource, /history\.events_available !== true \? "Cycle de vie non vérifié"/);
 assert.match(moduleSource, /history\.events_available === true/);
 assert.match(moduleSource, /const supersededEvents = snapshotEvents\.filter\(event => event\.event_type === "superseded"\)/);
