@@ -5,7 +5,7 @@ do $$
 declare
   v_signal_table oid := to_regclass('public.biological_signals');
   v_context_table oid := to_regclass('public.biological_contexts');
-  v_evidence_table oid := to_regclass('public.biological_signal_observations');
+  v_evidence_table oid := to_regclass('public.biological_signal_evidence');
   v_constraint text;
 begin
   if v_signal_table is null or v_context_table is null then
@@ -82,20 +82,31 @@ begin
     into v_constraint
     from pg_constraint c
    where c.conrelid = v_evidence_table
-     and c.conname = 'biological_signal_observations_observation_fk';
+     and c.conname = 'biological_signal_evidence_environmental_observation_fk';
 
   if v_constraint is null or v_constraint not like
-    '%FOREIGN KEY (organization_id, observation_id) REFERENCES public.environmental_observations(organization_id, id)%' then
-    raise exception 'FAIL: signal observation evidence must enforce tenant-scoped observation references';
+    '%FOREIGN KEY (organization_id, environmental_observation_id) REFERENCES public.environmental_observations(organization_id, id)%' then
+    raise exception 'FAIL: climate signal evidence must enforce tenant-scoped environmental observation references';
   end if;
 
-  if not has_table_privilege('authenticated', 'public.biological_signal_observations', 'SELECT')
-     or has_table_privilege('authenticated', 'public.biological_signal_observations', 'INSERT')
-     or has_table_privilege('authenticated', 'public.biological_signal_observations', 'DELETE') then
+  select pg_get_constraintdef(c.oid)
+    into v_constraint
+    from pg_constraint c
+   where c.conrelid = v_evidence_table
+     and c.conname = 'biological_signal_evidence_measurement_fk';
+
+  if v_constraint is null or v_constraint not like
+    '%FOREIGN KEY (organization_id, measurement_id) REFERENCES public.measurements(organization_id, id)%' then
+    raise exception 'FAIL: IoT signal evidence must enforce tenant-scoped measurement references';
+  end if;
+
+  if not has_table_privilege('authenticated', 'public.biological_signal_evidence', 'SELECT')
+     or has_table_privilege('authenticated', 'public.biological_signal_evidence', 'INSERT')
+     or has_table_privilege('authenticated', 'public.biological_signal_evidence', 'DELETE') then
     raise exception 'FAIL: normalized signal evidence must be read-only to authenticated users';
   end if;
 
-  if not has_table_privilege('service_role', 'public.biological_signal_observations', 'INSERT') then
+  if not has_table_privilege('service_role', 'public.biological_signal_evidence', 'INSERT') then
     raise exception 'FAIL: trusted signal evidence insertion grant is missing';
   end if;
 
@@ -103,7 +114,7 @@ begin
     select 1
       from pg_trigger
      where tgrelid = v_signal_table
-       and tgname = 'biological_signals_link_observations'
+       and tgname = 'biological_signals_link_evidence'
        and not tgisinternal
   ) then
     raise exception 'FAIL: signal observation provenance trigger is missing';
