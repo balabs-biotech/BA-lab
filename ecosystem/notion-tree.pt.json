@@ -306,24 +306,6 @@
       "description": "Recursos públicos para explorar o trabalho documentado, compreender os limites da evidência e conhecer as formas de colaborar com a BA Labs.",
       "children": [
         {
-          "id": "learn-work",
-          "title": "Trabalho documentado e projetos",
-          "url": "https://app.notion.com/p/40173152f171818fb366e51fc9ba0f18",
-          "children": []
-        },
-        {
-          "id": "learn-evidence",
-          "title": "O que a evidência demonstra atualmente",
-          "url": "https://app.notion.com/p/40173152f17181b08d08fdfb8e7eca54",
-          "children": []
-        },
-        {
-          "id": "learn-catalogue",
-          "title": "Catálogo público — recursos biológicos",
-          "url": "https://app.notion.com/p/40173152f17181fcadf1cd543c83ed60",
-          "children": []
-        },
-        {
           "id": "learn-collaborate",
           "title": "Colaborar com a BA Labs",
           "url": "https://app.notion.com/p/40173152f17181f194deca033c534128",
