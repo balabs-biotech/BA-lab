@@ -73,13 +73,16 @@ create table public.biological_recommendations (
       )
       or (
         lifecycle_status = 'executed'
+        and execution_details is not null
         and length(btrim(execution_details)) > 0
         and outcome_summary is null
         and outcome_observed_at is null
       )
       or (
         lifecycle_status = 'outcome_recorded'
+        and execution_details is not null
         and length(btrim(execution_details)) > 0
+        and outcome_summary is not null
         and length(btrim(outcome_summary)) > 0
         and outcome_observed_at is not null
       )
@@ -117,11 +120,13 @@ create table public.biological_recommendation_events (
   constraint biological_recommendation_events_payload_check
     check (
       (action = 'record_execution'
+        and execution_details is not null
         and length(btrim(execution_details)) > 0
         and outcome_summary is null and outcome_observed_at is null)
       or
       (action = 'record_outcome'
         and execution_details is null
+        and outcome_summary is not null
         and length(btrim(outcome_summary)) > 0
         and outcome_observed_at is not null)
       or
@@ -323,7 +328,8 @@ begin
       using errcode = '42501';
   end if;
 
-  if p_event_id is null or p_occurred_at is null
+  if p_event_id is null or p_expected_revision is null or p_expected_revision < 0
+     or p_occurred_at is null
      or p_occurred_at > now() + interval '5 minutes'
      or p_action is null
      or p_action not in ('accept', 'reject', 'record_execution', 'record_outcome') then
