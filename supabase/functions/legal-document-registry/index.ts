@@ -44,7 +44,7 @@ Deno.serve(async (req: Request) => {
   if (req.method !== "POST") return json(405, { error: "method_not_allowed" });
 
   const authorization = req.headers.get("authorization") ?? "";
-  const bearerToken = /^Bearer\\s+(\\S+)$/i.exec(authorization.trim())?.[1];
+  const bearerToken = /^Bearer\s+(\S+)$/i.exec(authorization.trim())?.[1];
   if (!bearerToken) return json(401, { error: "authentication_required" });
 
   const supabaseUrl = Deno.env.get("SUPABASE_URL");
