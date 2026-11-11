@@ -100,7 +100,7 @@
     loadVisibleHistory().catch(() => {});
   }
 
-  document.addEventListener("ba-labs-measurements-rendered", initialize);
+  window.addEventListener("ba-labs-measurements-rendered", initialize);
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", initialize, { once: true });
   else initialize();
 })();
