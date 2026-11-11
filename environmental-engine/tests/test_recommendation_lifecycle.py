@@ -203,3 +203,23 @@ def test_outcome_observation_cannot_be_after_its_recording_time():
             outcome_summary="Observed",
             outcome_observed_at=datetime(2026, 11, 13, tzinfo=timezone.utc),
         )
+
+def test_lifecycle_snapshot_rejects_status_without_matching_history():
+    state = make_lifecycle()
+    with pytest.raises(ValueError, match="lifecycle status does not match event history"):
+        RecommendationLifecycle(
+            proposal=state.proposal,
+            status="accepted",
+            events=(),
+        )
+
+
+def test_lifecycle_snapshot_rejects_execution_without_execution_event():
+    state = make_lifecycle()
+    with pytest.raises(ValueError, match="lifecycle status does not match event history"):
+        RecommendationLifecycle(
+            proposal=state.proposal,
+            status="executed",
+            events=(),
+            execution_details="Forged execution record",
+        )
