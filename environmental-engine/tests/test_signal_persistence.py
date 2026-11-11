@@ -256,3 +256,44 @@ def test_repository_fails_closed_when_persisted_signal_cannot_be_reloaded():
             biological_context=biological,
             environment_context=environment,
         )
+
+
+def test_repository_replay_does_not_overwrite_operational_signal_status():
+    organization_id, biological, environment, interpretation, signal = make_contexts()
+    existing = {
+        "organization_id": str(organization_id),
+        "signal_id": str(signal.signal_id),
+        "signal_status": "acknowledged",
+        "message_code": signal.message_code,
+    }
+    client = FakeSupabase(rows=[existing])
+
+    persisted = SupabaseBiologicalSignalRepository(client).persist_interpretation(
+        organization_id=organization_id,
+        interpretation=interpretation,
+        biological_context=biological,
+        environment_context=environment,
+    )
+
+    assert persisted[0]["signal_status"] == "acknowledged"
+
+
+def test_repository_rejects_mixed_source_analyses_in_one_batch():
+    organization_id, biological, environment, interpretation, signal = make_contexts()
+    second_signal = signal.model_copy(
+        update={"signal_id": uuid4(), "source_analysis_id": uuid4()}
+    )
+    mixed = interpretation.model_copy(
+        update={"signals": (signal, second_signal)}
+    )
+    client = FakeSupabase()
+
+    with pytest.raises(ValueError, match="one source analysis"):
+        SupabaseBiologicalSignalRepository(client).persist_interpretation(
+            organization_id=organization_id,
+            interpretation=mixed,
+            biological_context=biological,
+            environment_context=environment,
+        )
+
+    assert client.upsert_calls == []
