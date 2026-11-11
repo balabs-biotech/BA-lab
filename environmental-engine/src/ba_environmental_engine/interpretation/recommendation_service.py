@@ -8,6 +8,7 @@ database principal and for committing the event with optimistic concurrency.
 from datetime import datetime
 from uuid import UUID
 
+from .models import RecommendationProposal
 from .recommendation_lifecycle import (
     LifecycleAction,
     RecommendationLifecycle,
@@ -29,7 +30,7 @@ class RecommendationService:
         self,
         *,
         organization_id: UUID,
-        proposal,
+        proposal: RecommendationProposal,
     ) -> RecommendationLifecycle:
         """Persist one resolved proposal without changing its scientific content.
 
