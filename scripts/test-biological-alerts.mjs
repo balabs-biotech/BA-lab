@@ -426,6 +426,11 @@ assert.match(moduleSource, /\.order\("occurred_at", \{ ascending: false \}\)\.li
 assert.match(moduleSource, /history\.events_available !== true \? "Cycle de vie non vérifié"/);
 assert.match(moduleSource, /history\.events_available === true/);
 assert.match(moduleSource, /const supersededEvents = snapshotEvents\.filter\(event => event\.event_type === "superseded"\)/);
+assert.match(moduleSource, /const reviewEvents = snapshotEvents\.filter\(event =>/);
+assert.match(moduleSource, /reviewDecisionLabels\[latestReviewEvent\.event_payload\.decision\]/);
+assert.match(moduleSource, /Décision de revue humaine/);
+assert.match(moduleSource, /ne modifie pas le statut du moteur et ne constitue pas une preuve biologique/);
+assert.match(moduleSource, /Aucune décision de revue humaine enregistrée/);
 
 assert.match(moduleSource, /biologicalInterpretationEvents\.length >= 2000/);
 assert.match(moduleSource, /interpretationEventsAvailable = false/);
