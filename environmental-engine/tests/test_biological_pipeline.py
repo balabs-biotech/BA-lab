@@ -96,3 +96,35 @@ def test_pipeline_does_not_hide_duplicate_source_record_ids():
         assert "unique" in str(exc)
     else:
         raise AssertionError("duplicate source IDs must be rejected")
+
+
+def test_pipeline_respects_adapter_primary_subject_precedence_for_nested_samples():
+    result = analyze_measurement_rows(
+        [row("sample-measurement", 1, 8, sample_id="sample-1")],
+        organization_id="org-1",
+        subject_id="sample-1",
+        subject_type="sample",
+        variable_code="root_length",
+        variable_registry={"root_length": "mm"},
+        accepted_quality_states={"validated"},
+    )
+    assert result.candidate_row_count == 0
+    assert result.ignored_out_of_scope_count == 1
+    assert result.calculation.source_record_ids == ()
+
+
+def test_pipeline_rejects_unsupported_subject_type_even_for_empty_snapshot():
+    try:
+        analyze_measurement_rows(
+            [],
+            organization_id="org-1",
+            subject_id="culture-1",
+            subject_type="unsupported",
+            variable_code="root_length",
+            variable_registry={"root_length": "mm"},
+            accepted_quality_states={"validated"},
+        )
+    except ValueError as exc:
+        assert "subject_type" in str(exc)
+    else:
+        raise AssertionError("unsupported subject types must be rejected")
