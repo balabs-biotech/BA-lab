@@ -96,6 +96,14 @@ def transition_recommendation(
         outcome_summary=outcome_summary,
         outcome_observed_at=outcome_observed_at,
     )
+    if lifecycle.events and event.occurred_at < lifecycle.events[-1].occurred_at:
+        raise ValueError("event time cannot precede prior lifecycle event")
+    if action == "record_outcome":
+        execution_time = lifecycle.events[-1].occurred_at
+        if not execution_time <= event.outcome_observed_at <= event.occurred_at:
+            raise ValueError(
+                "outcome observation time must be between execution and recording"
+            )
     return RecommendationLifecycle(
         proposal=lifecycle.proposal,
         status=next_status,
