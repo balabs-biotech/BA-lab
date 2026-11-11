@@ -159,11 +159,17 @@ def assess_sensor_transmissions(
         )
         ids = tuple(receipt.receipt_id for receipt in observed)
         if not observed:
+            last_seen_is_known = (
+                device.last_seen_at is not None
+                and device.last_seen_at <= cutoff
+            )
+            silence_baseline = (
+                max(active_start, device.last_seen_at)
+                if last_seen_is_known else active_start
+            )
             trailing_silence = (
-                max(0.0, (cutoff - device.last_seen_at).total_seconds())
-                if current_window and silence_cutoff is not None
-                and device.last_seen_at is not None
-                and device.last_seen_at <= silence_cutoff else None
+                max(0.0, (silence_cutoff - silence_baseline).total_seconds())
+                if current_window and silence_cutoff is not None else None
             )
             threshold = expected_interval_seconds * float(gap_tolerance_factor)
             status = (
@@ -178,12 +184,7 @@ def assess_sensor_transmissions(
                 gap_tolerance_factor=float(gap_tolerance_factor),
                 receipt_count=0, gap_count=0, maximum_gap_seconds=None,
                 trailing_silence_seconds=trailing_silence,
-                last_received_at=(
-                    device.last_seen_at
-                    if current_window and silence_cutoff is not None
-                    and device.last_seen_at is not None
-                    and device.last_seen_at <= silence_cutoff else None
-                ),
+                last_received_at=device.last_seen_at if last_seen_is_known else None,
                 source_receipt_ids=(),
             ))
             continue
