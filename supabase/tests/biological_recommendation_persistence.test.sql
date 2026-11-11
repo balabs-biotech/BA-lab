@@ -5,6 +5,7 @@ do $$
 declare
   v_recommendations oid := to_regclass('public.biological_recommendations');
   v_events oid := to_regclass('public.biological_recommendation_events');
+  v_create_definition text;
   v_create oid := to_regprocedure(
     'public.create_biological_recommendation(uuid,uuid,text,text,text,text,uuid,uuid,uuid,text,text,text,jsonb)'
   );
@@ -111,6 +112,27 @@ begin
        and conname = 'biological_recommendation_events_idempotency_key'
   ) then
     raise exception 'FAIL: recommendation event idempotency constraint is missing';
+  end if;
+
+  if not exists (
+    select 1 from pg_attribute
+     where attrelid = v_events
+       and attname = 'revision'
+       and atttypid = 'integer'::regtype
+       and attnotnull
+       and not attisdropped
+  ) or not exists (
+    select 1 from pg_constraint
+     where conrelid = v_events
+       and conname = 'biological_recommendation_events_revision_key'
+  ) then
+    raise exception 'FAIL: recommendation event revisions must be persisted and unique per aggregate';
+  end if;
+
+  select pg_get_functiondef(v_create) into v_create_definition;
+  if position('pg_advisory_xact_lock' in v_create_definition) = 0
+     or position('auth.role()' in v_create_definition) > 0 then
+    raise exception 'FAIL: proposal creation must serialize first-write retries without deprecated auth.role checks';
   end if;
 
   if not exists (
