@@ -226,10 +226,8 @@ declare
   v_existing public.biological_recommendations%rowtype;
   v_events jsonb;
 begin
-  if coalesce(auth.role(), '') <> 'service_role' then
-    raise exception 'biological_recommendation_create_forbidden'
-      using errcode = '42501';
-  end if;
+  -- EXECUTE is granted only to service_role below. The function is
+  -- SECURITY DEFINER, so current_user is not a reliable caller identity here.
 
   if p_proposal_status is null or p_proposal_status not in ('proposed', 'withheld')
      or p_withholding_reasons is null
@@ -275,6 +273,15 @@ begin
     raise exception 'biological_recommendation_source_provenance_mismatch'
       using errcode = '23514';
   end if;
+
+  -- Serialize deterministic proposal retries, including the first insert
+  -- where no row exists yet and SELECT FOR UPDATE cannot acquire a row lock.
+  perform pg_advisory_xact_lock(
+    hashtextextended(
+      p_organization_id::text || ':' || p_recommendation_id::text,
+      0
+    )
+  );
 
   -- Stable proposal IDs make retries expected. Return an existing aggregate
   -- only when every immutable proposal field is identical.
