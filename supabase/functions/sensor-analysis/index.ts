@@ -273,6 +273,62 @@ Deno.serve(async (req: Request) => {
       .filter((id: unknown): id is string => typeof id === "string" && UUID_RE.test(id)))];
     if (!sensorIds.length) return reply(422, { error: "sensor_profile_has_no_bound_devices" });
 
+    // Resolve drift policies from the tenant-scoped registry. The browser
+    // never supplies trusted reference bindings or scientific thresholds.
+    const { data: persistedDriftPolicies, error: driftPolicyError } = await adminClient
+      .from("sensor_drift_reference_policies")
+      .select(
+        "id,organization_id,environment_id,target_sensor_id,reference_sensor_id,variable_code," +
+        "maximum_pair_offset_seconds,minimum_pairs,minimum_duration_seconds," +
+        "maximum_abs_drift_rate_per_hour,reference_binding_verified,status,valid_from,valid_to",
+      )
+      .eq("organization_id", profile.organization_id)
+      .eq("environment_id", environmentId)
+      .eq("status", "active")
+      .eq("reference_binding_verified", true)
+      .in("target_sensor_id", sensorIds)
+      .lte("valid_from", fromDate)
+      .or(`valid_to.is.null,valid_to.gte.${toDate}`)
+      .order("valid_from", { ascending: false })
+      .limit(101);
+    if (driftPolicyError) {
+      console.error("[sensor-analysis] Drift policy lookup failed", driftPolicyError.message);
+      return reply(500, { error: "sensor_drift_policy_lookup_failed" });
+    }
+    if (!persistedDriftPolicies || persistedDriftPolicies.length > 100) {
+      return reply(422, { error: "sensor_drift_policy_limit_reached" });
+    }
+    const driftPolicyKeys = new Set<string>();
+    const driftPolicyPayload: Record<string, unknown>[] = [];
+    for (const policy of persistedDriftPolicies) {
+      const key = `${policy.target_sensor_id}:${policy.reference_sensor_id}:${policy.variable_code}`;
+      if (
+        policy.organization_id !== profile.organization_id ||
+        policy.environment_id !== environmentId ||
+        policy.status !== "active" ||
+        policy.reference_binding_verified !== true ||
+        !sensorIds.includes(policy.target_sensor_id) ||
+        !sensorIds.includes(policy.reference_sensor_id) ||
+        policy.target_sensor_id === policy.reference_sensor_id ||
+        policy.valid_from > fromDate ||
+        (policy.valid_to && policy.valid_to < toDate) ||
+        driftPolicyKeys.has(key)
+      ) {
+        return reply(422, { error: "sensor_drift_policy_profile_binding_or_validity_mismatch" });
+      }
+      driftPolicyKeys.add(key);
+      driftPolicyPayload.push({
+        target_sensor_id: policy.target_sensor_id,
+        reference_sensor_id: policy.reference_sensor_id,
+        variable_code: policy.variable_code,
+        reference_binding_verified: policy.reference_binding_verified,
+        maximum_pair_offset_seconds: policy.maximum_pair_offset_seconds,
+        minimum_pairs: policy.minimum_pairs,
+        minimum_duration_seconds: policy.minimum_duration_seconds,
+        maximum_abs_drift_rate_per_hour: policy.maximum_abs_drift_rate_per_hour,
+      });
+    }
+
     let transmissionDevicePayload: Record<string, unknown>[] | undefined;
     if (transmissionExpectedInterval !== undefined) {
       const { data: devices, error: devicesError } = await adminClient
@@ -508,6 +564,7 @@ Deno.serve(async (req: Request) => {
           toDate === localCalendarDate(new Date().toISOString(), profile.timezone),
         transmission_devices: transmissionDevicePayload,
         transmission_receipts: transmissionReceiptPayload,
+        drift_policies: driftPolicyPayload,
         temporal_window_seconds: temporalWindowSeconds,
         temporal_minimum_history: temporalMinimumHistory,
         temporal_threshold: temporalThreshold,
