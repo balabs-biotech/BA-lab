@@ -154,6 +154,33 @@ begin
     if sqlerrm='material_mixture_sources_must_be_unique' then caught := true; else raise; end if;
   end;
   if not caught then raise exception 'FAIL: duplicate mixture sources were accepted'; end if;
+
+  caught := false;
+  begin
+    perform public.create_biological_material_mixture(
+      '00000000-0000-0000-0000-0000000000a1',source_material_ids,
+      'unsupported_operation','UNSUPPORTED-OPERATION',now(),null,'{}'::jsonb
+    );
+  exception when others then
+    if sqlerrm='unsupported_material_mixture_operation' then caught := true; else raise; end if;
+  end;
+  if not caught then raise exception 'FAIL: unsupported mixture operation was accepted'; end if;
+
+  insert into public.materials(organization_id,material_code,material_type,state,generation)
+    values ('00000000-0000-0000-0000-0000000000a1','MAT-INACTIVE','strain','archived',1);
+  caught := false;
+  begin
+    perform public.create_biological_material_mixture(
+      '00000000-0000-0000-0000-0000000000a1',
+      array[source_material_ids[1],
+        (select id from public.materials where organization_id='00000000-0000-0000-0000-0000000000a1' and material_code='MAT-INACTIVE')],
+      'mixing','INACTIVE-SOURCE-MIX',now(),null,'{}'::jsonb
+    );
+  exception when others then
+    if sqlerrm='material_mixture_source_not_active' then caught := true; else raise; end if;
+  end;
+  if not caught then raise exception 'FAIL: inactive mixture source was accepted'; end if;
+
   caught := false;
   begin
     perform public.create_biological_material_mixture(
