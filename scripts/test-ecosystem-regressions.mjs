@@ -39,10 +39,12 @@ for (const language of ['fr', 'en', 'ar', 'pt']) {
     }
   }
 }
-assert.ok(engine.includes("fetch('./notion-tree.'+LANG()+'.json'") && engine.includes("attributeFilter:['lang']"),
-  'The 3D explorer must load the active language manifest and refresh it when the document language changes');
-assert.ok(engine.includes('function buildResources(id,parentNode=null,anchor=null)') && engine.includes('currentNode.children||[]'),
-  'The 3D explorer must build each navigable level from the active manifest hierarchy');
+for (const [label, source] of [['public', engine], ['preview', previewEngine]]) {
+  assert.ok(source.includes("fetch('./notion-tree.'+LANG()+'.json'") && source.includes("attributeFilter:['lang']"),
+    label + ' 3D explorer must load the active language manifest and refresh it when the document language changes');
+  assert.ok(source.includes('function buildResources(id,parentNode=null,anchor=null)') && source.includes('currentNode.children||[]'),
+    label + ' 3D explorer must build each navigable level from the active manifest hierarchy');
+}
 function domainRootFromEngine(source, domain, language) {
   const start = source.indexOf('const pages={');
   const end = source.indexOf('\n};', start);
