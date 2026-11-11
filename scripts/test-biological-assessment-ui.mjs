@@ -27,5 +27,7 @@ assert.match(migration, /server_verification text not null default 'not_recomput
 assert.match(migration, /biological_assessment_history_is_append_only/);
 assert.match(migration, /Assessment evidence does not match source raw measurement/);
 assert.match(migration, /biological_assessments_select/);
+assert.match(migration, /unique \(organization_id,idempotency_key\)/);
+assert.match(ui, /assessmentIdempotencyKey/);
 
 console.log("✓ Biological Assessment UI: explicit measurement actions, domain isolation and evidence-history boundaries");
