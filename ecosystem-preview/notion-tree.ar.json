@@ -765,7 +765,25 @@
       "description": "موارد عامة لاستكشاف الأعمال الموثّقة وفهم حدود الأدلة والتعرّف على طرق التعاون مع BA Labs.",
       "children": [
         {
-          "id": "learn-collaborate",
+          "id": "learn-resource-1",
+          "title": "الأعمال الموثقة",
+          "url": "https://app.notion.com/p/40173152f171811aaac8db82b1c7a9fe",
+          "children": []
+        },
+        {
+          "id": "learn-resource-2",
+          "title": "منهجية البحث والتطوير",
+          "url": "https://app.notion.com/p/40273152f1718172aabbe09bb712c3d1",
+          "children": []
+        },
+        {
+          "id": "learn-resource-3",
+          "title": "الكتالوج العام",
+          "url": "https://app.notion.com/p/d0fbe1d779344eb58bc240fe7876ae0e",
+          "children": []
+        },
+        {
+          "id": "learn-resource-4",
           "title": "التعاون مع BA Labs",
           "url": "https://app.notion.com/p/40173152f17181598fc7f2f5a3e64e8a",
           "children": []
