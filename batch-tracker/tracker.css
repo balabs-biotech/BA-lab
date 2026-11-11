@@ -3057,3 +3057,11 @@ body[data-domain] :is(button, input, select, textarea, a, [tabindex]):focus-visi
   margin-top: 0.15rem;
   color: var(--muted);
 }
+
+#biologicalSignalsCard .signal-interpretation-snapshot .signal-interpretation-lifecycle {
+  display:block;
+  margin-top:5px;
+  padding-left:8px;
+  border-left:2px solid var(--accent, #64748b);
+  overflow-wrap:anywhere;
+}
