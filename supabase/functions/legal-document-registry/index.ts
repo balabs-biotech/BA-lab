@@ -15,6 +15,18 @@ const DOCUMENT_PATHS: Record<string, string> = {
   cookies_notice: "legal/cookies.html",
 };
 
+function getDefaultApiKey(raw: string | undefined): string | undefined {
+  if (!raw) return undefined;
+  try {
+    const keys = JSON.parse(raw);
+    return keys && typeof keys === "object" && typeof keys.default === "string"
+      ? keys.default
+      : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
 function json(status: number, body: Record<string, unknown>) {
   return new Response(JSON.stringify(body), {
     status,
@@ -31,12 +43,17 @@ Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") return new Response(null, { status: 204, headers: corsHeaders });
   if (req.method !== "POST") return json(405, { error: "method_not_allowed" });
 
-  const authorization = req.headers.get("authorization");
-  if (!authorization) return json(401, { error: "authentication_required" });
+  const authorization = req.headers.get("authorization") ?? "";
+  const bearerToken = /^Bearer\\s+(\\S+)$/i.exec(authorization.trim())?.[1];
+  if (!bearerToken) return json(401, { error: "authentication_required" });
 
   const supabaseUrl = Deno.env.get("SUPABASE_URL");
-  const publishableKey = Deno.env.get("SUPABASE_PUBLISHABLE_KEY") ?? Deno.env.get("SUPABASE_ANON_KEY");
-  const secretKey = Deno.env.get("SUPABASE_SECRET_KEY") ?? Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+  const publishableKey = getDefaultApiKey(Deno.env.get("SUPABASE_PUBLISHABLE_KEYS"))
+    ?? Deno.env.get("SUPABASE_PUBLISHABLE_KEY")
+    ?? Deno.env.get("SUPABASE_ANON_KEY");
+  const secretKey = getDefaultApiKey(Deno.env.get("SUPABASE_SECRET_KEYS"))
+    ?? Deno.env.get("SUPABASE_SECRET_KEY")
+    ?? Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
   if (!supabaseUrl || !publishableKey || !secretKey) return json(500, { error: "server_configuration_error" });
 
   const userClient = createClient(supabaseUrl, publishableKey, {
@@ -48,7 +65,7 @@ Deno.serve(async (req: Request) => {
   });
 
   try {
-    const { data: authData, error: authError } = await userClient.auth.getUser();
+    const { data: authData, error: authError } = await userClient.auth.getUser(bearerToken);
     if (authError || !authData.user) return json(401, { error: "invalid_session" });
 
     const { data: isAdmin, error: adminCheckError } = await adminClient.rpc(
