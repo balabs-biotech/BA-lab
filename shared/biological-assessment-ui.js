@@ -103,28 +103,49 @@
     const policyStore = window.BALabsBiologicalDecisionPolicyStore;
     const decisionEngine = window.BALabsBiologicalDecisionEngine;
     const domain = document.body.dataset.domain;
-    const enriched = await Promise.all(result.records.map(async row => {
+    const visible = [];
+    const visibleCounts = new Map();
+    for (const row of result.records) {
+      const count = visibleCounts.get(row.source_measurement_id) || 0;
+      if (count < 5) visible.push(row);
+      visibleCounts.set(row.source_measurement_id, count + 1);
+    }
+    const policyLoads = new Map();
+    for (const row of visible) {
       if (row.status !== "out_of_range" || !row.rule_version_id ||
           !policyStore || !decisionEngine || !row.context_snapshot ||
-          row.context_snapshot.domain !== domain) return row;
+          row.context_snapshot.domain !== domain) continue;
+      if (!policyLoads.has(row.rule_version_id)) {
+        const assessment = {
+          id: row.id, organization_id: org, domain,
+          rule_version_id: row.rule_version_id, status: row.status,
+          calculation_origin: row.calculation_origin,
+          server_verification: row.server_verification
+        };
+        policyLoads.set(row.rule_version_id,
+          policyStore.loadReviewedPolicies({ client: client(), assessment }));
+      }
+    }
+    const loadedPolicies = new Map();
+    await Promise.all([...policyLoads.entries()].map(async ([ruleVersionId, promise]) => {
+      try { loadedPolicies.set(ruleVersionId, await promise); }
+      catch (_) { loadedPolicies.set(ruleVersionId, {status:"unavailable"}); }
+    }));
+    if (organizationId() !== org) return;
+    const enriched = visible.map(row => {
+      if (row.status !== "out_of_range" || !row.rule_version_id ||
+          !row.context_snapshot || row.context_snapshot.domain !== domain) return row;
+      const loaded = loadedPolicies.get(row.rule_version_id);
+      if (!loaded || loaded.status !== "loaded")
+        return { ...row, decision: { status: "insufficient_evidence" } };
       const assessment = {
-        id: row.id,
-        organization_id: row.organization_id,
-        domain,
-        rule_version_id: row.rule_version_id,
-        status: row.status,
+        id: row.id, organization_id: org, domain,
+        rule_version_id: row.rule_version_id, status: row.status,
         calculation_origin: row.calculation_origin,
         server_verification: row.server_verification
       };
-      try {
-        const loaded = await policyStore.loadReviewedPolicies({ client: client(), assessment });
-        if (organizationId() !== org) return row;
-        if (loaded.status !== "loaded") return { ...row, decision: { status: "insufficient_evidence" } };
-        return { ...row, decision: decisionEngine.evaluate({ domain, assessment, policies: loaded.policies }) };
-      } catch (_) {
-        return { ...row, decision: { status: "insufficient_evidence" } };
-      }
-    }));
+      return { ...row, decision: decisionEngine.evaluate({ domain, assessment, policies: loaded.policies }) };
+    });
     if (organizationId() !== org) return;
     renderRecords(enriched);
   }
