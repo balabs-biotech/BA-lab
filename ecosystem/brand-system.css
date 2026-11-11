@@ -482,3 +482,167 @@
     transition: none !important;
   }
 }
+
+/* -------------------------------------------------------------------------
+   Site-wide visual refinement — phase 3.
+   Stronger editorial hierarchy, responsive project discovery and touch/focus
+   affordances. The explorer, WebGL scene and branch navigation are excluded.
+   ------------------------------------------------------------------------- */
+#app.balabs-ui > .top .lang {
+  min-width: 44px !important;
+  min-height: 44px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 9px 12px !important;
+  font-size: .75rem !important;
+  font-weight: 700 !important;
+}
+#app.balabs-ui > main > .hero {
+  padding: clamp(3.25rem, 7vw, 6.5rem) clamp(1.25rem, 5vw, 4.5rem) !important;
+}
+#app.balabs-ui > main > .hero h1 {
+  max-width: 12ch !important;
+  line-height: .98 !important;
+  text-wrap: balance !important;
+}
+#app.balabs-ui > main > .hero p {
+  max-width: 58ch !important;
+  font-size: clamp(.98rem, 1.15vw, 1.1rem) !important;
+  line-height: 1.75 !important;
+}
+#app.balabs-ui > main > .editorial-work,
+#app.balabs-ui > main > .universe-index,
+#app.balabs-ui > main > .editorial-method {
+  padding-block: clamp(3.5rem, 7vw, 6.25rem) !important;
+  padding-inline: clamp(1.25rem, 5vw, 4.5rem) !important;
+}
+#app.balabs-ui > main > .editorial-work .work-heading,
+#app.balabs-ui > main > .universe-index .universe-index-heading {
+  max-width: 74rem !important;
+  margin-inline: auto !important;
+  margin-bottom: clamp(1.5rem, 3vw, 2.5rem) !important;
+}
+#app.balabs-ui > main > .editorial-work .work-heading h2,
+#app.balabs-ui > main > .universe-index .universe-index-heading h2,
+#app.balabs-ui > main > .editorial-method h2 {
+  max-width: 17ch !important;
+  line-height: 1.04 !important;
+  text-wrap: balance !important;
+}
+#app.balabs-ui > main > .editorial-work .work-heading > p,
+#app.balabs-ui > main > .universe-index .universe-index-heading > p {
+  max-width: 62ch !important;
+  line-height: 1.7 !important;
+}
+#app.balabs-ui > main > .editorial-work .work-grid {
+  width: min(100%, 74rem) !important;
+  margin-inline: auto !important;
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  align-items: stretch !important;
+  gap: clamp(.85rem, 1.6vw, 1.35rem) !important;
+  background: transparent !important;
+}
+#app.balabs-ui > main > .editorial-work .work-card {
+  min-width: 0 !important;
+  min-height: 100% !important;
+  border-radius: var(--balabs-radius-md) !important;
+  overflow: hidden !important;
+}
+#app.balabs-ui > main > .editorial-work .work-media img {
+  aspect-ratio: 16 / 10 !important;
+  width: 100% !important;
+  object-fit: cover !important;
+}
+#app.balabs-ui > main > .editorial-work .work-card h3 {
+  line-height: 1.18 !important;
+  text-wrap: balance !important;
+}
+#app.balabs-ui > main > .editorial-work .work-card p {
+  line-height: 1.65 !important;
+}
+#app.balabs-ui > main > .universe-index .universe-index-grid {
+  width: min(100%, 74rem) !important;
+  margin-inline: auto !important;
+  align-items: stretch !important;
+}
+#app.balabs-ui > main > .universe-index .universe-index-card {
+  min-width: 0 !important;
+  min-height: 100% !important;
+  text-align: start !important;
+  overflow-wrap: anywhere !important;
+  transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease !important;
+}
+#app.balabs-ui > main > .universe-index .universe-index-card:focus-visible,
+#app.balabs-ui > main > .editorial-work .work-card-link:focus-visible,
+#app.balabs-ui > .top .lang:focus-visible,
+#app.balabs-ui > main > .site-nav a:focus-visible,
+#app.balabs-ui > .foot a:focus-visible {
+  outline: 3px solid var(--balabs-copper) !important;
+  outline-offset: 4px !important;
+  box-shadow: 0 0 0 2px var(--balabs-graphite) !important;
+}
+#app.balabs-ui > main > .site-nav a {
+  min-height: 44px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  padding-block: 12px !important;
+}
+#app.balabs-ui > .foot {
+  padding: clamp(1.5rem, 4vw, 3rem) clamp(1.25rem, 5vw, 4.5rem) !important;
+}
+#app.balabs-ui > .foot > * {
+  max-width: 74rem !important;
+  margin-inline: auto !important;
+}
+#app.balabs-ui[dir="rtl"] > main > .hero .aside {
+  border-left: 0 !important;
+  border-right: 2px solid var(--balabs-copper) !important;
+  padding-left: 0 !important;
+  padding-right: 1.125rem !important;
+}
+#app.balabs-ui[dir="rtl"] > main > .editorial-work .work-card,
+#app.balabs-ui[dir="rtl"] > main > .universe-index .universe-index-card {
+  text-align: start !important;
+}
+@media (max-width: 900px) {
+  #app.balabs-ui > main > .editorial-work .work-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+@media (max-width: 640px) {
+  #app.balabs-ui > main > .hero {
+    padding: 3rem 1.125rem 2.5rem !important;
+  }
+  #app.balabs-ui > main > .hero h1 {
+    max-width: 11ch !important;
+    font-size: clamp(2.7rem, 13vw, 4.25rem) !important;
+  }
+  #app.balabs-ui > main > .editorial-work,
+  #app.balabs-ui > main > .universe-index,
+  #app.balabs-ui > main > .editorial-method {
+    padding: 3rem 1.125rem !important;
+  }
+  #app.balabs-ui > main > .editorial-work .work-grid {
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 1rem !important;
+  }
+  #app.balabs-ui > main > .editorial-work .work-card {
+    width: 100% !important;
+  }
+  #app.balabs-ui > main > .site-nav {
+    justify-content: flex-start !important;
+    overflow-x: auto !important;
+    overscroll-behavior-inline: contain !important;
+    scrollbar-width: none !important;
+  }
+  #app.balabs-ui > main > .site-nav::-webkit-scrollbar {
+    display: none !important;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  #app.balabs-ui > main > .universe-index .universe-index-card {
+    transition: none !important;
+  }
+}
