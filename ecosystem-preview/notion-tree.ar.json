@@ -772,46 +772,6 @@
           "children": []
         },
         {
-          "id": "ar-lc-tricho-harzianum",
-          "title": "LC — Trichoderma harzianum",
-          "notionId": "40173152f171816c812df39d52e2484c",
-          "url": "https://app.notion.com/p/40173152f171816c812df39d52e2484c",
-          "description": "بطاقة معلومات للتركيبة المرتبطة بالنوع؛ لا تُعرض كسلالة منفردة متاحة للبيع حاليًا.",
-          "children": []
-        },
-        {
-          "id": "ar-lc-tricho-hamatum",
-          "title": "LC — Trichoderma hamatum",
-          "notionId": "40173152f1718190872de4a9c5a21e64",
-          "url": "https://app.notion.com/p/40173152f1718190872de4a9c5a21e64",
-          "description": "بطاقة معلومات للتركيبة المرتبطة بالنوع؛ حالة التوفير تحتاج إلى تأكيد.",
-          "children": []
-        },
-        {
-          "id": "ar-lc-tricho-koningii",
-          "title": "LC — Trichoderma koningii",
-          "notionId": "40173152f1718110a2dfc823dc27bf03",
-          "url": "https://app.notion.com/p/40173152f1718110a2dfc823dc27bf03",
-          "description": "بطاقة معلومات للتركيبة المرتبطة بالنوع؛ لا تعني وجود زراعة نقية متاحة للبيع.",
-          "children": []
-        },
-        {
-          "id": "ar-lc-tricho-longibrachiatum",
-          "title": "LC — Trichoderma longibrachiatum",
-          "notionId": "40173152f17181c49f19f0cb82752d75",
-          "url": "https://app.notion.com/p/40173152f17181c49f19f0cb82752d75",
-          "description": "بطاقة معلومات للتركيبة المرتبطة بالنوع؛ التوفر غير مفترض.",
-          "children": []
-        },
-        {
-          "id": "ar-lc-tricho-reesei",
-          "title": "LC — Trichoderma reesei",
-          "notionId": "40173152f171813aa500fc6f2f1684c4",
-          "url": "https://app.notion.com/p/40173152f171813aa500fc6f2f1684c4",
-          "description": "بطاقة معلومات للتركيبة المرتبطة بالنوع؛ يجب تأكيد حالة المورد والدفعة.",
-          "children": []
-        },
-        {
           "id": "ar-lc-pulmonarius-summer",
           "title": "LC — Pleurotus pulmonarius، إصدار الصيف",
           "notionId": "40173152f1718165a79ace1bc6189c24",
