@@ -18,6 +18,7 @@ assert.match(store, /source_measurement_id/);
 assert.match(tracker, /BA_LABS_ASSESS_AND_RECORD_BIOLOGICAL_MEASUREMENT/);
 assert.match(tracker, /quality_state === "excluded"/);
 assert.match(tracker, /rule_version_id/);
+assert.match(tracker, /idempotencyKey,/);
 assert.match(mycology, /biological-assessment-store\.js/);
 assert.match(mycology, /biological-assessment-ui\.js/);
 assert.match(laboratory, /biological-assessment-store\.js/);
