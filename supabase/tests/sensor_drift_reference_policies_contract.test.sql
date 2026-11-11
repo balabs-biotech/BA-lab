@@ -29,6 +29,17 @@ begin
     raise exception 'FAIL: target/reference devices must be constrained to the same tenant and environment';
   end if;
 
+  if position(
+       'sensor_drift_reference_must_remain_draft_during_verification'
+       in pg_get_functiondef('private.validate_sensor_drift_reference_policy()'::regprocedure)
+     ) = 0
+     or position(
+       'sensor_drift_reference_binding_cannot_change_after_verification'
+       in pg_get_functiondef('private.validate_sensor_drift_reference_policy()'::regprocedure)
+     ) = 0 then
+    raise exception 'FAIL: reference verification must be a separate step and lock the attested binding';
+  end if;
+
   if not exists (
     select 1 from pg_constraint
      where conrelid = v_table
