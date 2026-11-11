@@ -468,6 +468,14 @@ assert.match(recommendationOutcomeEvidenceContractTest, /outcome evidence links 
 assert.match(recommendationOutcomeEvidenceContractTest, /temporal and biological\/environmental scope/);
 assert.match(moduleSource, /biological_recommendation_outcome_measurements/);
 assert.match(moduleSource, /link_biological_recommendation_outcome_measurement/);
+assert.match(recommendationOutcomeEvidenceMigration, /measurement_observed_at timestamptz not null/);
+assert.match(recommendationOutcomeEvidenceMigration, /variable_code text not null/);
+assert.match(recommendationOutcomeEvidenceMigration, /normalized_value, v_measurement\.normalized_unit_code/);
+assert.match(recommendationOutcomeEvidenceMigration, /v_measurement\.method, v_measurement\.instrument/);
+assert.match(recommendationOutcomeEvidenceMigration, /coalesce\(v_measurement\.metadata/);
+assert.match(moduleSource, /measurement_observed_at,variable_code,normalized_value/);
+assert.match(moduleSource, /dateLabel\(measurement\.measurement_observed_at\)/);
+assert.match(moduleSource, /const measurement = link;/);
 assert.match(moduleSource, /recommendationMeasurementCandidatesBySignal/);
 assert.match(moduleSource, /measuredAt >= lower && measuredAt <= upper/);
 assert.match(moduleSource, /Le rattachement est une relation de traçabilité temporelle et contextuelle/);
