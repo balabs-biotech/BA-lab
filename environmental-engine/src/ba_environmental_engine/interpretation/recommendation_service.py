@@ -8,7 +8,7 @@ database principal and for committing the event with optimistic concurrency.
 from datetime import datetime
 from uuid import UUID
 
-from .models import RecommendationProposal
+from .models import RecommendationProposal, RecommendationResolution
 from .recommendation_lifecycle import (
     LifecycleAction,
     RecommendationLifecycle,
@@ -41,6 +41,23 @@ class RecommendationService:
         return self._repository.create(
             organization_id=organization_id,
             lifecycle=lifecycle,
+        )
+
+    def persist_resolution(
+        self,
+        *,
+        organization_id: UUID,
+        resolution: RecommendationResolution,
+    ) -> tuple[RecommendationLifecycle, ...]:
+        """Persist every proposed and withheld result from one resolution.
+
+        Each proposal has a deterministic ID and an idempotent create RPC, so
+        an interrupted batch can be safely replayed without duplicating rows.
+        The batch is intentionally not presented as one database transaction.
+        """
+        return tuple(
+            self.create(organization_id=organization_id, proposal=proposal)
+            for proposal in resolution.proposals
         )
 
     def transition(
