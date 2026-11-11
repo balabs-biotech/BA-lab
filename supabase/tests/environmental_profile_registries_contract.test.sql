@@ -94,7 +94,7 @@ begin
   ) or not exists (
     select 1 from pg_policies
     where schemaname = 'public' and tablename = 'environment_context_profiles'
-      and policyname = 'environment_context_profiles_write'
+      and policyname = 'environment_context_profiles_insert'
       and coalesce(with_check, '') like '%is_org_writer%'
   ) or not exists (
     select 1 from pg_policies
@@ -104,7 +104,7 @@ begin
   ) or not exists (
     select 1 from pg_policies
     where schemaname = 'public' and tablename = 'domain_interpretation_profiles'
-      and policyname = 'domain_interpretation_profiles_write'
+      and policyname = 'domain_interpretation_profiles_insert'
       and coalesce(with_check, '') like '%is_org_writer%'
   ) then
     raise exception 'FAIL: organization-scoped profile read/write policies are missing';
@@ -166,7 +166,7 @@ begin
     context_type, label, timezone, origin, status, valid_from, valid_to
   ) values (
     v_org, v_env_a, v_environment, 'ENV-A', '1.0.0',
-    'fruiting_chamber', 'Environment A', 'Africa/Algiers', 'sensor',
+    'fruiting_chamber', 'Environment A', 'Africa/Algiers', 'manual',
     'draft', date '2026-01-01', date '2026-01-31'
   );
 
@@ -178,7 +178,7 @@ begin
     context_type, label, timezone, origin, status, valid_from, valid_to
   ) values (
     v_org, v_env_b, v_environment, 'ENV-B', '1.0.0',
-    'fruiting_chamber', 'Environment B', 'Africa/Algiers', 'sensor',
+    'fruiting_chamber', 'Environment B', 'Africa/Algiers', 'manual',
     'draft', date '2026-01-31', date '2026-02-15'
   );
 
@@ -196,7 +196,7 @@ begin
     context_type, label, timezone, origin, status, valid_from, valid_to
   ) values (
     v_org, v_env_c, v_environment, 'ENV-C', '1.0.0',
-    'fruiting_chamber', 'Environment C', 'Africa/Algiers', 'sensor',
+    'fruiting_chamber', 'Environment C', 'Africa/Algiers', 'manual',
     'draft', date '2026-02-01', date '2026-02-28'
   );
 
@@ -209,7 +209,7 @@ begin
     context_type, label, timezone, origin, status, valid_from, valid_to
   ) values (
     v_org, v_env_open, v_environment, 'ENV-OPEN', '1.0.0',
-    'fruiting_chamber', 'Open environment profile', 'Africa/Algiers', 'sensor',
+    'fruiting_chamber', 'Open environment profile', 'Africa/Algiers', 'manual',
     'draft', date '2026-03-01', null
   );
 
@@ -244,7 +244,7 @@ begin
     context_type, label, timezone, origin, status, valid_from, valid_to
   ) values (
     v_org, v_env_successor, v_environment, 'ENV-OPEN-SUCCESSOR', '1.0.0',
-    'fruiting_chamber', 'Successor environment profile', 'Africa/Algiers', 'sensor',
+    'fruiting_chamber', 'Successor environment profile', 'Africa/Algiers', 'manual',
     'draft', date '2026-03-16', null
   );
 
