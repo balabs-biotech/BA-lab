@@ -61,7 +61,7 @@
 
     const auth = await input.client.auth.getUser();
     const reviewerId = auth && auth.data && auth.data.user && auth.data.user.id;
-    if (auth.error || typeof reviewerId !== "string" || !reviewerId.trim()) {
+    if (!auth || auth.error || typeof reviewerId !== "string" || !reviewerId.trim()) {
       return failure("unauthenticated", "authenticated_reviewer_required");
     }
 
