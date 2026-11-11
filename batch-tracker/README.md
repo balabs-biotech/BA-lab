@@ -31,3 +31,8 @@ Submission uses the active Supabase client/session and invokes the `bal-json-ing
 The import panel is hidden in Green Tech until a plant-specific BAL-JSON adapter is designed. It is not a free-form AI chat interface and does not accept conclusions as validated biological facts. It currently accepts only raw measurements and observations; quality review remains a separate workflow.
 
 Deployment prerequisites: apply the migration and deploy the Edge Function to the intended Supabase project before enabling production imports. Repository CI does not deploy either component.
+
+
+## Règles biologiques
+
+Les espaces Mycology et Laboratory disposent d'un panneau de gestion du cycle de vie des règles. Il permet de créer des brouillons à partir des codes exacts du catalogue, de consulter l'historique des versions, de demander la publication d'un brouillon et de retirer une règle en créant une nouvelle version immuable. Les droits effectifs sont imposés par RLS et les déclencheurs PostgreSQL : l'interface ne confère aucun privilège. Les règles exigent une cible taxonomique ou une souche, des bornes numériques explicites et au moins une référence documentaire. Aucun seuil n'est préchargé ni présenté comme validé scientifiquement. L'historique visible est limité aux 200 dernières révisions de l'espace et de l'organisation active.
