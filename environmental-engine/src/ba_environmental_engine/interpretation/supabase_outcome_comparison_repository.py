@@ -8,6 +8,7 @@ kept out of this first subject-level comparison path.
 from __future__ import annotations
 
 from dataclasses import dataclass
+from datetime import datetime
 from typing import Any, Iterable
 from uuid import UUID
 
@@ -53,6 +54,25 @@ def _rows(value: Any, *, source: str) -> list[dict[str, Any]]:
         raise OutcomeComparisonRepositoryError(f"{source} returned an invalid row set")
     return value
 
+
+
+def _timestamp(value: Any) -> datetime:
+    if isinstance(value, datetime):
+        parsed = value
+    elif isinstance(value, str):
+        try:
+            parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+        except ValueError as error:
+            raise OutcomeComparisonRepositoryError(
+                "measurement snapshot timestamp is not valid ISO-8601"
+            ) from error
+    else:
+        raise OutcomeComparisonRepositoryError("measurement snapshot timestamp is missing")
+    if parsed.tzinfo is None or parsed.utcoffset() is None:
+        raise OutcomeComparisonRepositoryError(
+            "measurement snapshot timestamp must include a timezone"
+        )
+    return parsed
 
 def _numeric(value: Any) -> float | None:
     if value is None or isinstance(value, bool):
@@ -240,7 +260,7 @@ class SupabaseOutcomeComparisonRepository:
                 variable_code=str(link["variable_code"]),
                 value=value,
                 canonical_unit_code=unit,
-                measured_at=link["measurement_observed_at"],
+                measured_at=_timestamp(link["measurement_observed_at"]),
                 quality_state=quality_state,
                 profile_id=str(recommendation["profile_id"]),
                 profile_version=str(recommendation["profile_version"]),
