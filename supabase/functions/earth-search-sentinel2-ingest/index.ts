@@ -116,7 +116,7 @@ function validateRows(rows: unknown, organizationId: string, locationId: string)
     if (!row.metadata || typeof row.metadata !== "object" || Array.isArray(row.metadata)) return "metadata_required";
     const metadata = row.metadata as Record<string, unknown>;
     if (metadata.scene_id !== row.source_record_id ||
-        typeof metadata.processing_version !== "string" || metadata.processing_version.length > 80 ||
+        typeof metadata.processing_version !== "string" || metadata.processing_version.length < 1 || metadata.processing_version.length > 80 ||
         typeof metadata.valid_pixel_ratio !== "number" || metadata.valid_pixel_ratio < 0.2 ||
         metadata.valid_pixel_ratio > 1 ||
         typeof metadata.cloud_cover_pct !== "number" || metadata.cloud_cover_pct < 0 ||
@@ -126,6 +126,7 @@ function validateRows(rows: unknown, organizationId: string, locationId: string)
       if (pair.observedAt !== row.observed_at || pair.retrievedAt !== row.retrieved_at || pair.sourceUrl !== row.source_url) {
         return "scene_pair_provenance_mismatch";
       }
+      if (pair.variables.has(String(row.variable_code))) return "duplicate_scene_variable_row";
       pair.variables.add(String(row.variable_code));
     } else {
       pairs.set(sceneId, {
@@ -154,7 +155,7 @@ Deno.serve(async (req: Request) => {
   const publishableKey = Deno.env.get("SUPABASE_PUBLISHABLE_KEY") ?? Deno.env.get("SUPABASE_ANON_KEY");
   const serviceKey = Deno.env.get("SUPABASE_SECRET_KEY") ?? Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
   const workerSecret = Deno.env.get("BA_SENTINEL2_WORKER_SECRET");
-  if (!supabaseUrl || !publishableKey || !serviceKey || !workerSecret) {
+  if (!supabaseUrl || !publishableKey || !serviceKey || !workerSecret || new TextEncoder().encode(workerSecret).length < 32) {
     console.error("[earth-search-sentinel2-ingest] Required server configuration is missing");
     return json(500, { error: "server_configuration_error" });
   }
