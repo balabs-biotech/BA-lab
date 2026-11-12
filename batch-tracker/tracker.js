@@ -6338,10 +6338,40 @@ function renderRecentEngineExecutions() {
         article.appendChild(flagLine);
       }
       if (result.outcome) {
+        const outcomeLabels = {
+          success: "Analyse exploitable",
+          insufficient_data: "Données insuffisantes",
+          out_of_domain: "Hors domaine analytique",
+          review_required: "Révision nécessaire"
+        };
         const outcome = document.createElement("p");
         outcome.className = "muted";
-        outcome.textContent = "Conclusion technique : " + result.outcome;
+        outcome.textContent = "Résultat : " + (outcomeLabels[result.outcome] || "État non documenté");
         article.appendChild(outcome);
+      }
+
+      const provenance = storedResult?.provenance || execution.result_payload?.result?.provenance;
+      const limitations = storedResult?.limitations || execution.result_payload?.result?.limitations;
+      if ((provenance && provenance.algorithm) || (Array.isArray(limitations) && limitations.length)) {
+        const details = document.createElement("details");
+        const summaryLabel = document.createElement("summary");
+        summaryLabel.textContent = "Méthode et limites";
+        details.appendChild(summaryLabel);
+        if (provenance?.algorithm) {
+          const method = document.createElement("p");
+          method.className = "muted";
+          method.textContent = "Algorithme : " + provenance.algorithm;
+          details.appendChild(method);
+        }
+        if (Array.isArray(limitations)) {
+          for (const limitation of limitations) {
+            const note = document.createElement("p");
+            note.className = "muted";
+            note.textContent = String(limitation);
+            details.appendChild(note);
+          }
+        }
+        article.appendChild(details);
       }
       const series = Array.isArray(result.value?.series) ? result.value.series : [];
       if (series.length) {
