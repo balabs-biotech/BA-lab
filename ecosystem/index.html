@@ -2684,6 +2684,10 @@ html,body{background:#111B1D!important}
     <h3 id="methodDetailTitle">Observer</h3>
     <p id="methodDetailText"></p>
     <div class="method-output"><span id="methodOutputLabel">TRACE À PRODUIRE</span><p id="methodDetailOutput"></p></div>
+    <section class="method-workbook" id="methodWorkbook" aria-label="Carnet de travail">
+      <div class="workbook-heading"><span id="workbookKicker">CARNET DE TRAVAIL · BROUILLON LOCAL</span><p id="workbookIntro">Renseigne les champs utiles. Le brouillon reste enregistré sur cet appareil.</p></div>
+      <form id="methodDraftForm"><div id="methodDraftFields" class="method-draft-fields"></div><div class="workbook-actions"><button type="submit" class="workbook-save" id="workbookSave">Enregistrer le brouillon</button><button type="button" class="workbook-export" id="workbookExport">Exporter en JSON</button><button type="button" class="workbook-clear" id="workbookClear">Effacer ce brouillon</button></div><p id="workbookStatus" class="workbook-status" role="status" aria-live="polite"></p></form>
+    </section>
   </article>
 </section>
 
@@ -4620,3 +4624,103 @@ body{background:radial-gradient(ellipse at 18% 0%,#263B38 0%,transparent 38%),li
 #mainView.webgl-ready .webgl-focus{pointer-events:none!important}
 #mainView.webgl-ready .webgl-focus button{pointer-events:auto!important}
 </style>
+
+
+<style id="balabs-method-workbook-style">
+#app .method-workbook{grid-column:1/-1;margin-top:24px;padding-top:20px;border-top:1px solid rgba(17,27,29,.22);color:#111B1D}
+#app .workbook-heading{display:flex;justify-content:space-between;align-items:baseline;gap:18px;flex-wrap:wrap;margin-bottom:16px}
+#app .workbook-heading>span{font:800 10px/1.4 ui-monospace,monospace;letter-spacing:.13em;color:#99563F}
+#app .workbook-heading>p{margin:0;color:#465650;font-size:12px;line-height:1.5}
+#app .method-draft-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+#app .method-draft-field{display:flex;flex-direction:column;gap:6px;min-width:0}
+#app .method-draft-field.wide{grid-column:1/-1}
+#app .method-draft-field label{font-size:11px;font-weight:750;color:#263B38}
+#app .method-draft-field input,#app .method-draft-field textarea{width:100%;min-height:44px;border:1px solid #9BA69D;border-radius:2px;background:#F2F1E9;color:#111B1D;padding:11px 12px;font:inherit;font-size:13px;line-height:1.55}
+#app .method-draft-field textarea{min-height:88px;resize:vertical}
+#app .method-draft-field input:focus-visible,#app .method-draft-field textarea:focus-visible{outline:2px solid #B96B4D;outline-offset:2px;border-color:#99563F}
+#app .workbook-actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:14px}
+#app .workbook-actions button{min-height:42px;padding:9px 13px;border:1px solid #52645D;border-radius:2px;background:transparent;color:#263B38;font-size:11px;font-weight:800;cursor:pointer}
+#app .workbook-actions .workbook-save{background:#263B38;color:#F2F1E9;border-color:#263B38}
+#app .workbook-actions button:hover{border-color:#B96B4D}
+#app .workbook-status{min-height:18px;margin:10px 0 0;color:#465650;font-size:11px}
+@media(max-width:600px){#app .method-draft-fields{grid-template-columns:1fr}#app .method-draft-field.wide{grid-column:1}#app .workbook-heading{display:block}#app .workbook-heading>p{margin-top:6px}#app .workbook-actions{display:grid;grid-template-columns:1fr}#app .workbook-actions button{width:100%}}
+[dir=rtl] #app .workbook-heading{direction:rtl}
+</style>
+<script id="balabs-method-workbook">
+(()=>{
+ const root=document.querySelector('#app .editorial-method');
+ if(!root||root.dataset.workbookReady)return;
+ root.dataset.workbookReady='true';
+ const storeKey='balabs-method-drafts-v1';
+ const fields=document.getElementById('methodDraftFields');
+ const form=document.getElementById('methodDraftForm');
+ const status=document.getElementById('workbookStatus');
+ const ui={
+ fr:{kicker:'CARNET DE TRAVAIL · BROUILLON LOCAL',intro:'Renseigne les champs utiles. Le brouillon reste enregistré sur cet appareil.',save:'Enregistrer le brouillon',export:'Exporter en JSON',clear:'Effacer ce brouillon',saved:'Brouillon enregistré sur cet appareil.',cleared:'Brouillon effacé.',empty:'Aucun brouillon à exporter.',exported:'Fichier JSON préparé.',error:'Enregistrement impossible : le stockage local est indisponible.',fields:{
+ observe:[['title','Objet observé','text'],['date','Date','date'],['sample','Organisme, souche ou matière','text'],['context','Conditions et contexte','textarea'],['facts','Faits observés (sans interprétation)','textarea'],['questions','Anomalies et questions à vérifier','textarea']],
+ question:[['question','Question de recherche','textarea'],['hypothesis','Hypothèse réfutable','textarea'],['variable','Variable étudiée','text'],['control','Témoin et paramètres constants','textarea'],['criteria','Critères de lecture et répétitions','textarea']],
+ test:[['trial','Identifiant de l’essai / lot','text'],['date','Date','date'],['protocol','Protocole réellement suivi','textarea'],['conditions','Conditions et écarts au protocole','textarea'],['data','Mesures et observations','textarea'],['decision','Résultat et décision (poursuivre, modifier, arrêter)','textarea']],
+ share:[['title','Titre de la fiche / version','text'],['results','Résultats consolidés','textarea'],['interpretation','Interprétation prudente','textarea'],['limits','Limites et incertitudes','textarea'],['sources','Sources et références','textarea'],['next','Prochaine étape','textarea']]}},
+ en:{kicker:'WORKBOOK · LOCAL DRAFT',intro:'Fill in the useful fields. Your draft is saved on this device only.',save:'Save draft',export:'Export JSON',clear:'Clear this draft',saved:'Draft saved on this device.',cleared:'Draft cleared.',empty:'There is no draft to export.',exported:'JSON file prepared.',error:'Could not save: local storage is unavailable.',fields:{
+ observe:[['title','Observed subject','text'],['date','Date','date'],['sample','Organism, strain or material','text'],['context','Conditions and context','textarea'],['facts','Observed facts (without interpretation)','textarea'],['questions','Anomalies and questions to verify','textarea']],
+ question:[['question','Research question','textarea'],['hypothesis','Falsifiable hypothesis','textarea'],['variable','Variable under study','text'],['control','Control and constant parameters','textarea'],['criteria','Reading criteria and replicates','textarea']],
+ test:[['trial','Trial / batch ID','text'],['date','Date','date'],['protocol','Protocol actually followed','textarea'],['conditions','Conditions and protocol deviations','textarea'],['data','Measurements and observations','textarea'],['decision','Outcome and decision (continue, modify, stop)','textarea']],
+ share:[['title','Record title / version','text'],['results','Consolidated results','textarea'],['interpretation','Cautious interpretation','textarea'],['limits','Limitations and uncertainty','textarea'],['sources','Sources and references','textarea'],['next','Next step','textarea']]}},
+ ar:{kicker:'دفتر العمل · مسودة محلية',intro:'املأ الحقول المناسبة. تُحفظ المسودة على هذا الجهاز فقط.',save:'حفظ المسودة',export:'تصدير JSON',clear:'مسح هذه المسودة',saved:'تم حفظ المسودة على هذا الجهاز.',cleared:'تم مسح المسودة.',empty:'لا توجد مسودة للتصدير.',exported:'تم إعداد ملف JSON.',error:'تعذر الحفظ: التخزين المحلي غير متاح.',fields:{
+ observe:[['title','الموضوع المرصود','text'],['date','التاريخ','date'],['sample','الكائن أو السلالة أو المادة','text'],['context','الظروف والسياق','textarea'],['facts','الوقائع المرصودة دون تفسير','textarea'],['questions','الشذوذ والأسئلة المطلوب التحقق منها','textarea']],
+ question:[['question','سؤال البحث','textarea'],['hypothesis','فرضية قابلة للاختبار','textarea'],['variable','المتغير المدروس','text'],['control','الشاهد والعوامل الثابتة','textarea'],['criteria','معايير القراءة والتكرارات','textarea']],
+ test:[['trial','معرّف التجربة / الدفعة','text'],['date','التاريخ','date'],['protocol','البروتوكول المنفذ فعلياً','textarea'],['conditions','الظروف والانحرافات عن البروتوكول','textarea'],['data','القياسات والملاحظات','textarea'],['decision','النتيجة والقرار (متابعة، تعديل، إيقاف)','textarea']],
+ share:[['title','عنوان البطاقة / الإصدار','text'],['results','النتائج المجمعة','textarea'],['interpretation','تفسير حذر','textarea'],['limits','الحدود ومواطن عدم اليقين','textarea'],['sources','المصادر والمراجع','textarea'],['next','الخطوة التالية','textarea']]}},
+ pt:{kicker:'CADERNO DE TRABALHO · RASCUNHO LOCAL',intro:'Preencha os campos úteis. O rascunho fica guardado apenas neste dispositivo.',save:'Guardar rascunho',export:'Exportar JSON',clear:'Apagar este rascunho',saved:'Rascunho guardado neste dispositivo.',cleared:'Rascunho apagado.',empty:'Não existe rascunho para exportar.',exported:'Ficheiro JSON preparado.',error:'Não foi possível guardar: armazenamento local indisponível.',fields:{
+ observe:[['title','Objeto observado','text'],['date','Data','date'],['sample','Organismo, estirpe ou material','text'],['context','Condições e contexto','textarea'],['facts','Factos observados (sem interpretação)','textarea'],['questions','Anomalias e questões a verificar','textarea']],
+ question:[['question','Questão de investigação','textarea'],['hypothesis','Hipótese refutável','textarea'],['variable','Variável estudada','text'],['control','Controlo e parâmetros constantes','textarea'],['criteria','Critérios de leitura e repetições','textarea']],
+ test:[['trial','Identificador do ensaio / lote','text'],['date','Data','date'],['protocol','Protocolo realmente seguido','textarea'],['conditions','Condições e desvios ao protocolo','textarea'],['data','Medições e observações','textarea'],['decision','Resultado e decisão (continuar, alterar, parar)','textarea']],
+ share:[['title','Título da ficha / versão','text'],['results','Resultados consolidados','textarea'],['interpretation','Interpretação prudente','textarea'],['limits','Limites e incertezas','textarea'],['sources','Fontes e referências','textarea'],['next','Próxima etapa','textarea']]}}
+ };
+ const current=()=>ui[document.documentElement.lang]||ui.fr;
+ let active='observe';
+ const read=()=>{try{return JSON.parse(localStorage.getItem(storeKey)||'{}')}catch(_){return {}}};
+ const write=data=>localStorage.setItem(storeKey,JSON.stringify(data));
+ const today=()=>{const d=new Date();return [d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-')};
+ function render(key){
+  active=key;const lang=current(),draft=read()[key]||{};
+  document.getElementById('workbookKicker').textContent=lang.kicker;
+  document.getElementById('workbookIntro').textContent=lang.intro;
+  document.getElementById('workbookSave').textContent=lang.save;
+  document.getElementById('workbookExport').textContent=lang.export;
+  document.getElementById('workbookClear').textContent=lang.clear;
+  fields.replaceChildren();
+  lang.fields[key].forEach(([name,label,type])=>{
+   const wrap=document.createElement('div');wrap.className='method-draft-field'+(type==='textarea'?' wide':'');
+   const id='draft-'+key+'-'+name;const lab=document.createElement('label');lab.htmlFor=id;lab.textContent=label;
+   const control=document.createElement(type==='textarea'?'textarea':'input');control.id=id;control.name=name;
+   if(type!=='textarea')control.type=type;
+   if(type==='date'&&!draft[name])control.value=today();else control.value=draft[name]||'';
+   wrap.append(lab,control);fields.append(wrap);
+  });
+  status.textContent='';
+ }
+ function snapshot(){const data={};fields.querySelectorAll('[name]').forEach(el=>data[el.name]=el.value);return {...data,step:active,updated_at:new Date().toISOString()};}
+ root.addEventListener('click',event=>{
+  const trigger=event.target.closest('[data-method-step]');
+  if(trigger&&!root.querySelector('#methodDetail').hidden)render(trigger.dataset.methodStep);
+ });
+ document.querySelectorAll('[data-lang]').forEach(button=>button.addEventListener('click',()=>{if(!root.querySelector('#methodDetail').hidden)render(active)}));
+ form.addEventListener('submit',event=>{
+  event.preventDefault();
+  try{const all=read();all[active]=snapshot();write(all);status.textContent=current().saved}
+  catch(_){status.textContent=current().error}
+ });
+ document.getElementById('workbookClear').addEventListener('click',()=>{
+  try{const all=read();delete all[active];write(all);render(active);status.textContent=current().cleared}
+  catch(_){status.textContent=current().error}
+ });
+ document.getElementById('workbookExport').addEventListener('click',()=>{
+  const draft=read()[active];if(!draft){status.textContent=current().empty;return}
+  const blob=new Blob([JSON.stringify(draft,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);const a=document.createElement('a');
+  a.href=url;a.download='balabs-'+active+'-'+(draft.updated_at||today()).slice(0,10)+'.json';
+  document.body.append(a);a.click();a.remove();URL.revokeObjectURL(url);status.textContent=current().exported;
+ });
+})();
+</script>
