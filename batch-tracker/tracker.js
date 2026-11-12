@@ -6519,6 +6519,27 @@ function renderBiologicalContextAssessment(article, result) {
   const title = document.createElement("p"); title.textContent = "Évaluation du contexte biologique"; article.appendChild(title);
   const subject = value.subject || {};
   addLine(article, "Sujet : " + String(subject.subject_type || "biologique") + " · " + String(subject.subject_id || "identifiant indisponible"));
+  const biologicalContexts = Array.isArray(subject.biological_contexts) ? subject.biological_contexts : [];
+  addList(article, "Contextes biologiques datés", biologicalContexts, item => {
+    const reference = item.genetic_reference || {};
+    const parts = [
+      String(item.valid_from || "début inconnu") + " → " + String(item.valid_to || "sans date de fin"),
+      item.organism_kind ? "organisme : " + item.organism_kind : null,
+      item.taxon_code ? "taxon : " + item.taxon_code : null,
+      item.strain_code ? "souche : " + item.strain_code : null,
+      item.cultivar_code ? "cultivar : " + item.cultivar_code : null,
+      item.culture_stage ? "stade : " + item.culture_stage : null,
+      item.substrate_code ? "substrat : " + item.substrate_code : null,
+      item.production_system ? "système : " + item.production_system : null,
+      reference.scientific_name ? "référence : " + reference.scientific_name : null,
+      reference.status === "unresolved" ? "référence génétique non résolue" : null,
+      Array.isArray(item.context_tags) && item.context_tags.length ? "tags : " + item.context_tags.join(", ") : null
+    ].filter(Boolean);
+    return parts.join(" · ");
+  }, 8);
+  if (Array.isArray(subject.genetic_reference_ids) && subject.genetic_reference_ids.length) {
+    addLine(article, "Références génétiques résolues : " + subject.genetic_reference_ids.length);
+  }
   const outcomeLabels = {
     success: "Analyse exploitable",
     insufficient_data: "Données insuffisantes",
