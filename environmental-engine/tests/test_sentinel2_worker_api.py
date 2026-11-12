@@ -44,6 +44,7 @@ def test_private_worker_route_forwards_user_jwt_and_validated_scope(monkeypatch)
             "scenes_duplicated": 0,
             "quality_rejected_scenes": 0,
             "observations_submitted": 2,
+            "scene_failures": (),
             "persistence_response": {"ok": True, "observations_upserted": 2},
         })()
 
