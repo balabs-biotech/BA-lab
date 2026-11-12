@@ -96,10 +96,10 @@ def analyze_environmental_timeseries_qc(request: Mapping[str, Any]) -> dict[str,
             rejected_records.append({"record_id": record["record_id"], "reason": "missing_variable_code"})
             continue
         if not isinstance(value, (int, float)) or isinstance(value, bool) or not isfinite(value):
-            rejected_records.append({"record_id": record["record_id"], "reason": "missing_or_invalid_normalized_value"})
+            rejected_records.append({"record_id": record["record_id"], "reason": "missing_or_invalid_value"})
             continue
         if not isinstance(unit, str) or not unit:
-            rejected_records.append({"record_id": record["record_id"], "reason": "missing_normalized_unit"})
+            rejected_records.append({"record_id": record["record_id"], "reason": "missing_or_invalid_unit"})
             continue
         try:
             parsed = _parse_timestamp(timestamp)
@@ -107,10 +107,16 @@ def analyze_environmental_timeseries_qc(request: Mapping[str, Any]) -> dict[str,
             rejected_records.append({"record_id": record["record_id"], "reason": "invalid_or_timezone_naive_timestamp"})
             continue
         grouped[(variable, unit)].append((parsed, float(value), record["record_id"]))
+        if record_type == "measurement":
+            total_measurement_points += 1
+        else:
+            total_environmental_observation_points += 1
 
     series_results = []
     all_flags: set[str] = set()
     total_points = 0
+    total_measurement_points = 0
+    total_environmental_observation_points = 0
     for (variable, unit), points in sorted(grouped.items()):
         points.sort(key=lambda item: (item[0], item[2]))
         values = [point[1] for point in points]
@@ -151,14 +157,16 @@ def analyze_environmental_timeseries_qc(request: Mapping[str, Any]) -> dict[str,
         "Robust outlier flags are statistical review signals, not evidence that a measurement is erroneous.",
     ]
     if rejected_records:
-        limitations.append("Some records were excluded because required normalized fields or timestamps were missing or invalid.")
+        limitations.append("Some records were excluded because required values, units, source context or timestamps were missing or invalid.")
     return {
         "outcome": outcome,
         "value": {
             "series": series_results,
             "summary": {
                 "series_count": len(series_results),
-                "measurement_count": total_points,
+                "record_count": total_points,
+                "measurement_count": total_measurement_points,
+                "environmental_observation_count": total_environmental_observation_points,
                 "excluded_record_count": len(rejected_records),
                 "excluded_records": rejected_records,
             },
