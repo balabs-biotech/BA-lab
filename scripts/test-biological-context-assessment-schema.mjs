@@ -26,7 +26,8 @@ assert.deepEqual(schema.$defs.geneticReference.properties.status.enum, [
   "not_specified", "unresolved", "resolved"
 ]);
 assert.equal(schema.$defs.biologicalContext.properties.valid_to.type.includes("null"), true);
-assert.deepEqual(schema.properties.subject.properties.subject_type.enum, ["culture", "plant", "batch"]);\nassert.equal(schema.properties.subject.properties.plant_culture_id.type.includes("null"), true);
+assert.deepEqual(schema.properties.subject.properties.subject_type.enum, ["culture", "plant", "batch"]);
+assert.equal(schema.properties.subject.properties.plant_culture_id.type.includes("null"), true);
 assert.equal(schema.properties.coverage.properties.requested_window.$ref, "#/$defs/timeWindow");
 assert.equal(schema.properties.coverage.properties.excluded_record_count.type, "integer");
 assert.equal(schema.$defs.observedFact.properties.source_record_ids.$ref, "#/$defs/sourceReferences");
