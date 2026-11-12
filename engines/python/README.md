@@ -46,7 +46,7 @@ docker run -d --name ba-engine-worker \
 
 The container runs as UID/GID 10001, has a read-only root filesystem and drops Linux capabilities. Do not publish the port publicly. Place it behind a TLS-terminating reverse proxy or private service network, restrict inbound traffic to the Supabase Edge Function egress path, and enforce an outbound-deny network policy. The worker itself does not need database or external network access.
 
-The manifest's 15-second engine limit and 256 MB memory declaration are metadata. The container's 256 MB memory cap and 1 CPU limit are enforced by the container runtime; per-request hard execution deadlines and network egress policy must be enforced by the deployment platform/runtime. The Python adapter's 10-second socket read timeout is not a hard engine CPU timeout. Deploy only reviewed, allowlisted engines; this image is not a complete hostile-code sandbox.
+The adapter launches each registered engine in a separate Python worker process and enforces the manifest's 15-second wall-clock deadline by terminating that process on timeout. The container's 256 MB memory cap and 1 CPU limit are enforced by the container runtime; outbound network policy remains a deployment-platform responsibility. The process deadline is a wall-clock limit, not a per-process CPU quota. Deploy only reviewed, allowlisted engines; this image is not a complete hostile-code sandbox.
 
 Health check: `GET /healthz`. Execution endpoint: authenticated `POST /v1/execute`.
 
