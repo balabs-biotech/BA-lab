@@ -13,7 +13,7 @@ const checks = [
   ["engine versions are explicitly allowlisted", /ENGINE_ALLOWLIST/],
   ["worker response is schema validated", /validateResponse/],
   ["request and snapshot correlation is enforced", /input_snapshot_sha256/],
-  ["service credential is server-side only", /SUPABASE_SERVICE_ROLE_KEY/],
+  ["service credential is server-side only", /Deno\.env\.get\("SUPABASE_[A-Z_]*KEY"\)/],
   ["worker call has an abort timeout", /AbortController/],
   ["source queries are tenant-filtered", /\.eq\("organization_id", organizationId\)/],
   ["excluded source measurements cannot enter analysis", /excluded_source_records_not_eligible/],
