@@ -236,7 +236,7 @@ Deno.serve(async (req: Request) => {
   if (insertError || !execution) {
     // Resolve the unique-key race without creating a second execution.
     const { data: raced } = await serviceClient.from("engine_executions")
-      .select("id,request_id,engine_id,engine_version,input_snapshot_sha256,status,result_payload,error_code")
+      .select("id,request_id,engine_id,engine_version,scope,input_snapshot_sha256,request_payload,status,result_payload,error_code")
       .eq("organization_id", organizationId).eq("idempotency_key", idempotencyKey).maybeSingle();
     if (raced && sameExecutionInput(raced, engineRequest)) {
       return reply(200, { execution_id: raced.id, request_id: raced.request_id, status: raced.status,
