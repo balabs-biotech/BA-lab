@@ -92,6 +92,7 @@ def process_and_persist_sentinel2_batch(
     retrieved_at,
     processing_version: str,
     user_authorization: str,
+    supabase_api_key: str,
     ingest_url: str,
     worker_secret: str,
     post: Callable[..., dict[str, Any]] | None = None,
@@ -105,6 +106,8 @@ def process_and_persist_sentinel2_batch(
     trusted_url = _validate_ingest_url(ingest_url)
     if not isinstance(user_authorization, str) or not user_authorization.startswith("Bearer "):
         raise ValueError("caller bearer token is required")
+    if not isinstance(supabase_api_key, str) or not supabase_api_key.strip():
+        raise ValueError("Supabase publishable API key is required")
     if not isinstance(worker_secret, str) or len(worker_secret.encode("utf-8")) < 32:
         raise ValueError("worker signing secret must contain at least 32 bytes")
     if timestamp_seconds is not None and (
@@ -154,6 +157,7 @@ def process_and_persist_sentinel2_batch(
         ).hexdigest()
         headers = {
             "Authorization": user_authorization,
+            "apikey": supabase_api_key,
             "Content-Type": "application/json",
             "x-ba-worker-timestamp": str(timestamp),
             "x-ba-worker-signature": signature,
