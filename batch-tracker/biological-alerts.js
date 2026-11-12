@@ -323,9 +323,11 @@
             const linkedIds = new Set(linkedMeasurements.map(link => link.measurement_id));
             const candidates = (state.recommendationMeasurementCandidatesBySignal[row.signal_id] || []).filter(measurement => {
               const measuredAt = new Date(measurement.measured_at || "").getTime();
-              const sameSubject = measurement.culture_id === row.biological_subject_id ||
-                measurement.plant_culture_id === row.biological_subject_id;
-              const sameEnvironment = measurement.environment_id === row.environment_id;
+              const sameSubject = Boolean(row.biological_subject_id) &&
+                (measurement.culture_id === row.biological_subject_id ||
+                  measurement.plant_culture_id === row.biological_subject_id);
+              const sameEnvironment = Boolean(row.environment_id) &&
+                measurement.environment_id === row.environment_id;
               return Number.isFinite(lower) && Number.isFinite(upper) && Number.isFinite(measuredAt) &&
                 measuredAt >= lower && measuredAt <= upper && (sameSubject || sameEnvironment) &&
                 !linkedIds.has(measurement.id);
