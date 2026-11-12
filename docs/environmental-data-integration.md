@@ -160,3 +160,25 @@ worker has been configured. The Sentinel-2 processor must still be wired to
 the existing STAC/raster pipeline and ingestion gateway. The processor must
 check its stop event between scenes and before persistence; a currently running
 network/raster operation cannot be forcibly interrupted by this coordinator.
+
+
+### Private Supabase RPC transport for queue workers
+
+The engine now includes `ba_environmental_engine.execution.supabase_rpc`,
+a minimal PostgREST RPC adapter. It accepts the project URL and service-role
+credential only through constructor injection, restricts the host to a
+Supabase project domain, rejects redirects, validates RPC identifiers, bounds
+response size, and sanitizes transport/JSON errors. Its intended permission
+boundary is the four service-role-only lease RPCs; it is not a general table
+repository and must run only in a private worker environment.
+
+The queue is not yet end-to-end operable. The existing Sentinel-2 gateway still
+creates synchronous `processing` ledger rows without lease tokens, while the
+claim RPC selects `queued` jobs (or expired leased jobs). The current ingestion
+gateway also requires a caller JWT, which a durable background worker cannot
+safely retain as a long-lived job credential. Before enabling queue mode, the
+request lifecycle and authorization model must be changed together: enqueue
+bounded job parameters, let the worker perform trusted discovery, and authorize
+persistence through a server-to-server job/lease proof rather than persisting
+or replaying the original user's bearer token. No credentials or bearer tokens
+should be stored in job parameters.
