@@ -193,3 +193,43 @@ def test_worker_does_not_expose_remote_error_body():
             )
     finally:
         monkeypatch.undo()
+
+
+def test_worker_returns_sanitized_per_scene_failure_summary(monkeypatch):
+    import ba_environmental_engine.sources.sentinel2_worker as worker
+
+    failure = type("Failure", (), {
+        "scene_id": "S2A_FAILED",
+        "error_type": "RasterioIOError",
+        "message": "https://private.example/object?signature=secret",
+    })()
+    monkeypatch.setattr(
+        worker,
+        "process_sentinel2_stac_items",
+        lambda *args, **kwargs: type("Batch", (), {
+            "succeeded": (),
+            "failed": (failure,),
+            "duplicate_scene_ids": (),
+            "items_received": 1,
+        })(),
+    )
+    result = process_and_persist_sentinel2_batch(
+        items=[{"id": "S2A_FAILED"}],
+        aoi_geojson={"type": "Polygon", "coordinates": []},
+        organization_id=uuid4(),
+        location_id=uuid4(),
+        retrieved_at=datetime(2026, 10, 2, tzinfo=timezone.utc),
+        processing_version="worker-test-v1",
+        user_authorization="Bearer user-jwt",
+        supabase_api_key="test-publishable-key",
+        ingest_url="https://example.supabase.co/functions/v1/earth-search-sentinel2-ingest",
+        worker_secret="ba-labs-test-secret-at-least-32-bytes",
+        post=lambda *args, **kwargs: {},
+        timestamp_seconds=1790928000,
+    )
+    assert result.scenes_failed == 1
+    assert result.scene_failures == ({
+        "scene_id": "S2A_FAILED",
+        "error_type": "RasterioIOError",
+    },)
+    assert "signature" not in str(result.scene_failures)
