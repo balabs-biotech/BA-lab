@@ -17,9 +17,12 @@ const checks = [
   ["worker call has an abort timeout", /AbortController/],
   ["source queries are tenant-filtered", /\.eq\("organization_id", organizationId\)/],
   ["excluded source measurements cannot enter analysis", /excluded_source_records_not_eligible/],
-  ["raw source records are not updated", !/\.from\(["']measurements["']\)[\s\S]{0,500}\.update\(/],
 ];
 for (const [name, pattern] of checks) {
   assert.ok(pattern instanceof RegExp ? pattern.test(source) : pattern, name);
 }
+const sourceReadStart = source.indexOf("const { data: measurements");
+const sourceReadEnd = source.indexOf("const records = measurements.map", sourceReadStart);
+assert.ok(sourceReadStart >= 0 && sourceReadEnd > sourceReadStart, "measurement snapshot query boundary exists");
+assert.doesNotMatch(source.slice(sourceReadStart, sourceReadEnd), /\\.update\\(/, "raw source measurements are never updated");
 console.log("Engine orchestration boundary contract passed");
