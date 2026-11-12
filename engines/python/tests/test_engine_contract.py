@@ -6,7 +6,10 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from jsonschema import Draft202012Validator, FormatChecker
-from ba_engine_contract import (\n    ContractValidationError, EngineExecutionError, EngineSpec, execute_engine,\n    validate_request, validate_response,\n)
+from ba_engine_contract import (
+    ContractValidationError, EngineExecutionError, EngineSpec, execute_engine,
+    validate_request, validate_response,
+)
 from ba_engine_contract.environmental_timeseries_qc import run_environmental_timeseries_qc
 
 ROOT = Path(__file__).resolve().parents[3]
