@@ -32,6 +32,7 @@ class Sentinel2WorkerResult:
     scenes_duplicated: int
     quality_rejected_scenes: int
     observations_submitted: int
+    scene_failures: tuple[dict[str, str], ...]
     persistence_response: dict[str, Any] | None
 
 
@@ -182,5 +183,9 @@ def process_and_persist_sentinel2_batch(
         scenes_duplicated=len(batch.duplicate_scene_ids),
         quality_rejected_scenes=quality_rejected,
         observations_submitted=len(valid_rows),
+        scene_failures=tuple(
+            {"scene_id": failure.scene_id, "error_type": failure.error_type}
+            for failure in batch.failed
+        ),
         persistence_response=persistence_response,
     )
