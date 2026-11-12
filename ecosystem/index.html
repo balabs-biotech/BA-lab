@@ -2710,7 +2710,19 @@ html,body{background:#111B1D!important}
   </svg>
 </section>
 
-<section class="under" aria-label="Principes de BALabs"><div class="tile"><b data-i18n="tile1">Biologie d’abord</b><p data-i18n="tile1p">La technologie sert l’observation, les cultures et les procédés biologiques.</p></div><div class="tile"><b data-i18n="tile2">Des liens réels</b><p data-i18n="tile2p">Les cellules et les connexions relient les rubriques publiques existantes.</p></div><div class="tile"><b data-i18n="tile3">Multilingue natif</b><p data-i18n="tile3p">Français, anglais, arabe et portugais, avec interface adaptée au sens de lecture.</p></div><div class="tile"><b data-i18n="tile4">Explorer autrement</b><p data-i18n="tile4p">Découvre les liens entre les disciplines et leurs applications.</p></div></section>
+<section class="under value-principles" aria-label="Les engagements de BA Labs">
+  <div class="value-heading">
+    <span class="eyebrow">BA LABS / NOTRE APPROCHE</span>
+    <h2>
+      <span data-value-lang="fr">Ce que cela change concrètement.</span><span data-value-lang="en">What this means in practice.</span><span data-value-lang="ar">ماذا يعني ذلك عملياً؟</span><span data-value-lang="pt">O que isto significa na prática.</span>
+    </h2>
+  </div>
+  <div class="value-grid">
+    <article class="value-item"><span class="value-no">01 / BIOLOGIE</span><h3><span data-value-lang="fr">Le vivant comme point de départ</span><span data-value-lang="en">Biology comes first</span><span data-value-lang="ar">الحياة نقطة الانطلاق</span><span data-value-lang="pt">A biologia como ponto de partida</span></h3><p><span data-value-lang="fr">Nous partons des organismes, des cultures et des matières biologiques pour définir les outils et les procédés utiles.</span><span data-value-lang="en">We start with organisms, cultures and biological materials, then define the tools and processes that serve them.</span><span data-value-lang="ar">ننطلق من الكائنات الحية والمزارع والمواد البيولوجية لتحديد الأدوات والعمليات المناسبة لها.</span><span data-value-lang="pt">Partimos dos organismos, das culturas e dos materiais biológicos para definir as ferramentas e os processos adequados.</span></p></article>
+    <article class="value-item"><span class="value-no">02 / APPLICATION</span><h3><span data-value-lang="fr">Du laboratoire au terrain</span><span data-value-lang="en">From lab to field</span><span data-value-lang="ar">من المختبر إلى الميدان</span><span data-value-lang="pt">Do laboratório ao terreno</span></h3><p><span data-value-lang="fr">Les essais relient l’observation, la mesure et les conditions réelles d’application, sans confondre prototype et solution validée.</span><span data-value-lang="en">Trials connect observation, measurement and real-world conditions, without confusing a prototype with a validated solution.</span><span data-value-lang="ar">تربط التجارب بين الملاحظة والقياس وظروف التطبيق الفعلية، مع التمييز بين النموذج الأولي والحل المثبت.</span><span data-value-lang="pt">Os ensaios ligam observação, medição e condições reais de aplicação, distinguindo um protótipo de uma solução validada.</span></p></article>
+    <article class="value-item"><span class="value-no">03 / MÉTHODE</span><h3><span data-value-lang="fr">Des résultats documentés</span><span data-value-lang="en">Evidence, clearly documented</span><span data-value-lang="ar">نتائج موثقة بوضوح</span><span data-value-lang="pt">Resultados documentados</span></h3><p><span data-value-lang="fr">Méthodes, paramètres et limites sont explicités pour distinguer une piste exploratoire d’un résultat établi.</span><span data-value-lang="en">Methods, parameters and limitations are made explicit, separating exploratory directions from established results.</span><span data-value-lang="ar">نوضح المناهج والمعايير والحدود للتمييز بين مسار استكشافي ونتيجة مثبتة.</span><span data-value-lang="pt">Métodos, parâmetros e limites são explicitados para distinguir uma hipótese exploratória de um resultado estabelecido.</span></p></article>
+  </div>
+</section>
 </main>
 <footer class="foot" aria-label="Pied de page BALabs">
   <div class="foot-brand">
@@ -4705,6 +4717,23 @@ body{background:radial-gradient(ellipse at 18% 0%,#263B38 0%,transparent 38%),li
  #app > main > .editorial-work .work-card:hover,#app > main > .universe-index .universe-index-card:hover{transform:none!important}
 }
 
+/* Closing value proposition: replace internal site slogans with visitor-facing benefits. */
+#app > main > .value-principles{display:grid!important;grid-template-columns:minmax(210px,.72fr) minmax(0,1.8fr)!important;gap:clamp(24px,4vw,64px)!important;align-items:start!important;margin:0!important;padding:clamp(44px,6vw,76px) clamp(20px,5vw,72px)!important;border-block:1px solid var(--balabs-line,#40534D)!important;background:#172522!important;color:#D1D0C5!important}
+.value-heading .eyebrow{font:600 9px/1.5 ui-monospace,monospace!important;letter-spacing:.15em!important;color:#D99A7F!important}
+.value-heading h2{margin:13px 0 0!important;color:#F2F1E9!important;font-size:clamp(23px,2.8vw,34px)!important;line-height:1.12!important;letter-spacing:-.04em!important}
+.value-grid{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:0!important}
+.value-item{min-width:0!important;padding:5px clamp(14px,2vw,26px) 4px!important;border-left:1px solid #40534D!important}
+.value-item:first-child{padding-left:0!important;border-left:0!important}
+.value-no{display:block!important;margin:0 0 19px!important;color:#D99A7F!important;font:600 9px/1.4 ui-monospace,monospace!important;letter-spacing:.12em!important}
+.value-item h3{margin:0 0 10px!important;color:#F2F1E9!important;font-size:clamp(15px,1.3vw,18px)!important;line-height:1.25!important}
+.value-item p{margin:0!important;color:#AEBDB4!important;font-size:12px!important;line-height:1.75!important}
+.value-principles [data-value-lang]{display:none!important}
+html[lang="fr"] .value-principles [data-value-lang="fr"],html[lang="en"] .value-principles [data-value-lang="en"],html[lang="ar"] .value-principles [data-value-lang="ar"],html[lang="pt"] .value-principles [data-value-lang="pt"]{display:inline!important}
+html[lang="ar"] #app > main > .value-principles{direction:rtl!important;text-align:right!important}
+html[lang="ar"] .value-item{border-left:0!important;border-right:1px solid #40534D!important}
+html[lang="ar"] .value-item:first-child{padding-right:0!important;border-right:0!important}
+@media(max-width:900px){#app > main > .value-principles{grid-template-columns:1fr!important;gap:22px!important}}
+@media(max-width:640px){#app > main > .value-principles{padding:40px 18px!important}.value-grid{grid-template-columns:1fr!important}.value-item,.value-item:first-child{padding:17px 0!important;border-left:0!important;border-right:0!important;border-top:1px solid #40534D!important}html[lang="ar"] .value-item,html[lang="ar"] .value-item:first-child{border-right:0!important}.value-no{margin-bottom:9px!important}.value-item h3{font-size:17px!important}.value-item p{font-size:12px!important;max-width:58ch!important}}
 </style>
 
 <style id="notion-node-navigation-fix">.linknode{display:block;text-decoration:none;cursor:pointer}.linknode[hidden]{display:none!important}.linknode:focus-visible{outline:3px solid #B96B4D;outline-offset:4px}.linknode small{pointer-events:none}#spherePage{text-decoration:none}
