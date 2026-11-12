@@ -175,21 +175,18 @@ Deno.serve(async (req: Request) => {
   if (isBiologicalContextEngine) {
     let snapshot;
     try {
-      const loadSnapshot = scope.plant_culture_id
-        ? loadAuthenticatedPlantBiologicalContextSnapshot
-        : loadAuthenticatedBiologicalContextSnapshot;
-      snapshot = await loadSnapshot({
-        userClient,
-        organizationId,
-        ...(scope.plant_culture_id
-          ? { plantCultureId: scope.plant_culture_id }
-          : { cultureId: scope.culture_id }),
-        window: {
-          start: parameters.window_start,
-          end: parameters.window_end,
-          timezone: parameters.timezone,
-        },
-      });
+      const window = {
+        start: parameters.window_start,
+        end: parameters.window_end,
+        timezone: parameters.timezone,
+      };
+      snapshot = scope.plant_culture_id
+        ? await loadAuthenticatedPlantBiologicalContextSnapshot({
+          userClient, organizationId, plantCultureId: scope.plant_culture_id, window,
+        })
+        : await loadAuthenticatedBiologicalContextSnapshot({
+          userClient, organizationId, cultureId: scope.culture_id, window,
+        });
     } catch (error) {
       const code = error instanceof Error ? error.message : "biological_source_loading_failed";
       const allowedCodes = new Set([
