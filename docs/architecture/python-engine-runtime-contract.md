@@ -57,6 +57,21 @@ Every response echoes `request_id`, engine identity and `input_snapshot_sha256`,
 4. Implement one deterministic engine (environmental time-series quality checks) using fixtures, without external network calls.
 5. Add provider adapters and biological interpretation only after the deterministic worker lifecycle is verified.
 
+
+## First reference engine: environmental time-series QC
+
+The first implementation is `engines/python/ba_engine_contract/environmental_timeseries_qc.py`. It is deliberately a deterministic quality-control engine, not a biological recommendation engine.
+
+It groups normalized measurements by `(variable_code, normalized_unit_code)`, requires timezone-aware timestamps, sorts each series, reports sampling gaps and duplicate timestamps, and flags robust statistical outliers using the median absolute deviation (MAD). Records without a usable normalized value, unit, variable code or timestamp are excluded with a record-level reason.
+
+The engine does not:
+- infer heat stress, contamination, growth inhibition or disease;
+- issue humidification, aeration or culture-condition recommendations;
+- treat a statistical outlier as a confirmed measurement error;
+- fetch NASA POWER, Sentinel-2 or any other remote dataset itself.
+
+Those functions belong in separate engines/adapters after data provenance, calibration and biological decision rules are specified. The current implementation uses Python's standard library only. Its test fixtures are offline and deterministic; execution timestamps and execution IDs are envelope metadata.
+
 ## Deliberately not defined by v1
 
 - Transport (HTTP, queue or direct process invocation).
