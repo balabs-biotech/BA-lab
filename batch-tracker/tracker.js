@@ -6587,7 +6587,9 @@ async function savePlantBiologicalContext(event) {
     if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
     setPlantBiologicalContextMessage(error.message || "Impossible d’enregistrer le contexte végétal.", "error");
   } finally {
-    if (isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) {\n      button.disabled = document.getElementById("plantBiologicalContextEnvironment").options.length <= 1;\n    }
+    if (isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) {
+      button.disabled = document.getElementById("plantBiologicalContextEnvironment").options.length <= 1;
+    }
   }
 }
 
