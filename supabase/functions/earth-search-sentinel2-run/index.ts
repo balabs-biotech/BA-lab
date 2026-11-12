@@ -102,14 +102,18 @@ Deno.serve(async (req: Request) => {
   if (!authorization) return json(401, { error: "authentication_required" });
   const supabaseUrl = Deno.env.get("SUPABASE_URL");
   const publishableKey = Deno.env.get("SUPABASE_PUBLISHABLE_KEY") ?? Deno.env.get("SUPABASE_ANON_KEY");
+  const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
   const engineBaseUrl = Deno.env.get("BA_ENVIRONMENTAL_ENGINE_URL");
   const engineApiKey = Deno.env.get("BA_ENVIRONMENTAL_ENGINE_API_KEY");
   const workerUrl = engineBaseUrl ? trustedWorkerUrl(engineBaseUrl) : null;
-  if (!supabaseUrl || !publishableKey || !engineApiKey || !workerUrl) {
+  if (!supabaseUrl || !publishableKey || !serviceRoleKey || !engineApiKey || !workerUrl) {
     console.error("[earth-search-sentinel2-run] Required server configuration is missing or invalid");
     return json(503, { error: "sentinel2_worker_not_configured" });
   }
 
+  const adminClient = createClient(supabaseUrl, serviceRoleKey, {
+    auth: { persistSession: false, autoRefreshToken: false },
+  });
   const userClient = createClient(supabaseUrl, publishableKey, {
     global: { headers: { Authorization: authorization } },
     auth: { persistSession: false, autoRefreshToken: false },
@@ -247,6 +251,35 @@ Deno.serve(async (req: Request) => {
       });
     }
 
+    const { data: job, error: jobInsertError } = await adminClient
+      .from("environmental_ingestion_jobs")
+      .insert({
+        organization_id: location.organization_id,
+        location_id: location.id,
+        requested_by: authData.user.id,
+        job_type: "sentinel2_scene_ingestion",
+        provider_code: "EARTH_SEARCH",
+        dataset_code: "SENTINEL_2_L2A",
+        status: "processing",
+        request_parameters: {
+          start_date: startDate,
+          end_date: endDate,
+          max_cloud_cover_pct: cloudLimit,
+          max_scenes: requestedScenes,
+          aoi_method: "approximate_location_buffer_not_cadastral_boundary",
+        },
+        items_seen: itemsSeen,
+        scenes_selected: items.length,
+        started_at: new Date().toISOString(),
+      })
+      .select("id")
+      .single();
+    if (jobInsertError || !job?.id) {
+      console.error("[earth-search-sentinel2-run] Could not create ingestion job", jobInsertError?.code ?? "unknown");
+      return json(503, { error: "ingestion_job_creation_failed" });
+    }
+    const jobId = String(job.id);
+
     const workerRequest = {
       organization_id: location.organization_id,
       location_id: location.id,
@@ -257,30 +290,89 @@ Deno.serve(async (req: Request) => {
       minimum_valid_ratio: 0.2,
       max_pixels: 4_000_000,
     };
-    const workerResponse = await fetch(workerUrl, {
-      redirect: "error",
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        apikey: publishableKey,
-        "X-BA-Engine-Key": engineApiKey,
-        Authorization: authorization,
-      },
-      body: JSON.stringify(workerRequest),
-      signal: AbortSignal.timeout(110_000),
-    });
+    let workerResponse: Response;
+    try {
+      workerResponse = await fetch(workerUrl, {
+        redirect: "error",
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          apikey: publishableKey,
+          "X-BA-Engine-Key": engineApiKey,
+          Authorization: authorization,
+        },
+        body: JSON.stringify(workerRequest),
+        signal: AbortSignal.timeout(110_000),
+      });
+    } catch (error) {
+      await adminClient.from("environmental_ingestion_jobs").update({
+        status: "failed",
+        error_code: error instanceof Error && error.name === "TimeoutError"
+          ? "worker_timeout"
+          : "worker_unreachable",
+        completed_at: new Date().toISOString(),
+      }).eq("id", jobId).eq("status", "processing");
+      return json(502, { error: "sentinel2_processing_worker_unavailable", job_id: jobId });
+    }
     if (!workerResponse.ok) {
       console.error("[earth-search-sentinel2-run] Private worker failed", workerResponse.status);
-      return json(workerResponse.status === 504 ? 504 : 502, { error: "sentinel2_processing_worker_failed" });
+      await adminClient.from("environmental_ingestion_jobs").update({
+        status: "failed",
+        error_code: "worker_http_" + workerResponse.status,
+        completed_at: new Date().toISOString(),
+      }).eq("id", jobId).eq("status", "processing");
+      return json(workerResponse.status === 504 ? 504 : 502, {
+        error: "sentinel2_processing_worker_failed",
+        job_id: jobId,
+      });
     }
     const workerResult = await workerResponse.json().catch(() => null);
-    if (!workerResult || workerResult.ok !== true) return json(502, { error: "sentinel2_processing_worker_response_invalid" });
+    if (!workerResult || workerResult.ok !== true) {
+      await adminClient.from("environmental_ingestion_jobs").update({
+        status: "failed",
+        error_code: "worker_response_invalid",
+        completed_at: new Date().toISOString(),
+      }).eq("id", jobId).eq("status", "processing");
+      return json(502, { error: "sentinel2_processing_worker_response_invalid", job_id: jobId });
+    }
+
+    const count = (value: unknown) =>
+      Number.isSafeInteger(value) && Number(value) >= 0 ? Number(value) : 0;
+    const scenesProcessed = count(workerResult.scenes_processed);
+    const scenesFailed = count(workerResult.scenes_failed);
+    const scenesDuplicated = count(workerResult.scenes_duplicated);
+    const observationsSubmitted = count(workerResult.observations_submitted);
+    const finalStatus = scenesFailed > 0
+      ? (scenesProcessed > 0 ? "partial_failed" : "failed")
+      : "succeeded";
+    const { error: jobUpdateError } = await adminClient
+      .from("environmental_ingestion_jobs")
+      .update({
+        status: finalStatus,
+        scenes_processed: scenesProcessed,
+        scenes_failed: scenesFailed,
+        scenes_duplicated: scenesDuplicated,
+        observations_submitted: observationsSubmitted,
+        result_summary: {
+          quality_rejected_scenes: count(workerResult.quality_rejected_scenes),
+          scene_failures: Array.isArray(workerResult.scene_failures)
+            ? workerResult.scene_failures.slice(0, MAX_SCENES)
+            : [],
+        },
+        completed_at: new Date().toISOString(),
+      })
+      .eq("id", jobId)
+      .eq("status", "processing");
+    if (jobUpdateError) {
+      console.error("[earth-search-sentinel2-run] Could not finalize ingestion job", jobUpdateError.code);
+    }
 
     return json(200, {
       ok: true,
       provider: "EARTH_SEARCH",
       dataset: "SENTINEL_2_L2A",
       location_id: location.id,
+      job_id: jobId,
       date_range: { start: startDate, end: endDate },
       max_cloud_cover_pct: cloudLimit,
       aoi_method: "approximate_location_buffer_not_cadastral_boundary",
