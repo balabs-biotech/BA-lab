@@ -272,12 +272,12 @@ async function checkUniverseIndexLayout(name, viewport, expectedColumns) {
       if (Math.min(a.right,b.right)-Math.max(a.left,b.left)>1 &&
           Math.min(a.bottom,b.bottom)-Math.max(a.top,b.top)>1) overlaps.push([a.number,b.number]);
     }
-    return { columns:gridStyle?.gridTemplateColumns?.split(' ').length || 0, cards:rects, overlaps,
+    return { columns:gridStyle?.gridTemplateColumns?.split(' ').length || 0, gridTemplateColumns:gridStyle?.gridTemplateColumns, cards:rects, overlaps,
       sectionWidth:document.querySelector('#universes')?.getBoundingClientRect().width || 0,
       viewportWidth:window.innerWidth };
   });
   assert.equal(result.cards.length, 8, name + ': the homepage must show exactly eight universe panels');
-  assert.equal(result.columns, expectedColumns, name + ': universe panels must use the intended responsive column count');
+  assert.equal(result.columns, expectedColumns, name + ': universe panels must use the intended responsive column count; layout=' + JSON.stringify({columns:result.columns,viewportWidth:result.viewportWidth,sectionWidth:result.sectionWidth,grid:result.gridTemplateColumns}));
   assert.deepEqual(result.overlaps, [], name + ': universe panels must not overlap');
   for (const card of result.cards) {
     assert.ok(card.width >= (name === 'mobile' ? 300 : 200), name + ': panel ' + card.number + ' is too narrow');
