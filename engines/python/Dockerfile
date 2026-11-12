@@ -3,7 +3,9 @@ FROM python:3.12-slim
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     BA_ENGINE_HTTP_HOST=0.0.0.0 \
-    BA_ENGINE_HTTP_PORT=8080
+    BA_ENGINE_HTTP_PORT=8080 \
+    BA_ENGINE_SCHEMA_DIR=/app/schemas/engine/v1 \
+    BA_ENGINE_REGISTRY_DIR=/app/engines/python/registry
 
 WORKDIR /app
 
