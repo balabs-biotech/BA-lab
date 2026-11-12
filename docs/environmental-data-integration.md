@@ -75,3 +75,27 @@ The first connector is implemented as the Supabase Edge Function `nasa-power-agr
 - The panel labels these values as gridded estimates and does not turn them into diagnoses or irrigation commands.
 
 Before production use, deploy the Edge Function with JWT verification enabled and test with a real organization location whose coordinates have been explicitly checked. Confirm read/update RLS policies on `locations` and read RLS on `environmental_observations`. Do not populate live data using invented coordinates or synthetic observations.
+
+
+## Sentinel-2 ingestion architecture — persistence boundary
+
+The Sentinel-2 pipeline is split into three trust zones:
+
+1. **Catalogue and scene processing** — Earth Search STAC discovery plus the Python environmental engine. The Python engine validates STAC identity, reads bounded COG windows, applies the SCL quality mask, computes native-grid NDVI statistics and builds provider-provenanced observation rows. It does not hold database credentials.
+2. **Authenticated orchestration** — a signed-in user invokes the ingestion workflow for a location. The caller's JWT is used to resolve the location under RLS and verify explicit membership in the owning organization.
+3. **Persistence boundary** — the Edge Function `earth-search-sentinel2-ingest` accepts only a trusted worker's HMAC-SHA256-signed payload, checks a five-minute timestamp window, revalidates tenant scope and row provenance, then uses a server-only Supabase secret to upsert the paired `ndvi_mean` / `ndvi_median` observations.
+
+### Worker request contract
+
+- Required server secret: `BA_SENTINEL2_WORKER_SECRET`. It must exist only in the Edge Function's secret store and the private worker environment; never in the browser or repository.
+- Headers: the user's `Authorization: Bearer <JWT>`, `x-ba-worker-timestamp: <unix-seconds>`, and `x-ba-worker-signature: <hex-HMAC-SHA256>`.
+- Signature input: UTF-8 bytes of `<unix-seconds>.<exact-raw-request-body>`, keyed with `BA_SENTINEL2_WORKER_SECRET`.
+- Payload scope: `organization_id`, `location_id`, and `rows`. Every row must match the requested tenant/location and the Earth Search Sentinel-2 L2A source contract.
+- Each scene must include exactly one `ndvi_mean` and one `ndvi_median` row, the same STAC scene ID in `source_record_id` and `metadata.scene_id`, canonical unit `1`, quality flag `valid`, a valid-pixel ratio of at least 0.2, cloud percentage and an Earth Search STAC item URL.
+- Request size is capped at 256 KiB and one batch at 100 scenes / 200 observations. Upserts use the scene-aware unique key, so retries do not create duplicate observations.
+
+### Current implementation boundary
+
+The persistence Edge Function and its source-contract test have been added to the feature branch. The Python scene processor and payload builder already produce the corresponding data shape; the Edge Function validates the actual field names and units emitted by that builder.
+
+**The private processing worker and its secret are not configured yet.** The Edge Function has not been deployed, no satellite rows have been written, and no production migration has been applied. The existing `earth-search-sentinel2-ndvi-preview` remains a display-only preview and is not a source of persisted scientific statistics. Before enabling the workflow, implement and test the private worker adapter, configure the shared secret in both server environments, run the contract tests, then deploy only after explicit approval.
