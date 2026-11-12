@@ -71,3 +71,8 @@ def validate_response(
             raise ContractValidationError(
                 f"response.{field} does not match the submitted request"
             )
+
+
+def validate_manifest(manifest: Mapping[str, Any]) -> None:
+    """Validate a declarative engine registration against the v1 manifest schema."""
+    _validate(manifest, "manifest.schema.json")
