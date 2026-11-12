@@ -28,7 +28,7 @@ window.BA_LABS_SUPABASE_CLIENT = supabaseClient;
 window.BA_LABS_GET_ORGANIZATION_ID = () => organizationId;
 window.BA_LABS_REFRESH_EXPERIMENTAL_DATA = async () => {
   if (!organizationId) throw new Error("Aucune organisation active.");
-  await Promise.all([loadRecentMeasurements(), loadRecentObservations()]);
+  await Promise.all([loadRecentMeasurements(), loadRecentObservations(), loadRecentEngineExecutions()]);
 };
 
 let organization = null;
@@ -59,6 +59,8 @@ let quantityUnitOptions = [];
 let batchLocationOptions = [];
 let batchEnvironmentOptions = [];
 let recentObservations = [];
+let recentEngineExecutions = [];
+let engineExecutionHistoryRequestId = 0;
 
 
 function isCurrentWorkspaceRevision(revision, expectedOrganizationId) {
@@ -85,6 +87,8 @@ function clearAuthenticatedWorkspaceState() {
   batchLocationOptions = [];
   batchEnvironmentOptions = [];
   recentObservations = [];
+  recentEngineExecutions = [];
+  engineExecutionHistoryRequestId++;
   initializationWarnings = [];
 
   const cultureDetailPanel = document.getElementById("cultureDetailPanel");
@@ -1002,6 +1006,16 @@ async function initializeAuthenticatedTracker(
         console.error("Historique des observations indisponible :", observationHistoryError);
         initializationWarnings.push("historique des observations");
         observationHistory.textContent = "Impossible de charger l’historique des observations. L’enregistrement reste disponible.";
+      }
+      try {
+        await loadRecentEngineExecutions();
+        if (initRevision !== authStateRevision) return;
+      } catch (engineHistoryError) {
+        if (initRevision !== authStateRevision) return;
+        console.error("Historique des analyses indisponible :", engineHistoryError);
+        initializationWarnings.push("historique des analyses");
+        const panel = document.getElementById("overviewRecentEngineExecutions");
+        if (panel) panel.textContent = "Historique des analyses indisponible. Les autres modules restent utilisables.";
       }
     } catch (measurementError) {
       if (initRevision !== authStateRevision) return;
@@ -6224,12 +6238,98 @@ async function loadCultureDetail(cultureId) {
   }
 }
 
+async function loadRecentEngineExecutions() {
+  const panel = document.getElementById("overviewRecentEngineExecutions");
+  const requestId = ++engineExecutionHistoryRequestId;
+  const loadRevision = authStateRevision;
+  const loadOrganizationId = organizationId;
+  if (!loadOrganizationId || !panel) return;
+
+  const query = await supabaseClient.from("engine_executions")
+    .select("id,engine_id,engine_version,status,result_payload,error_code,created_at,completed_at,input_record_ids")
+    .eq("organization_id", loadOrganizationId)
+    .order("created_at", { ascending: false })
+    .limit(8);
+
+  if (requestId !== engineExecutionHistoryRequestId ||
+      !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
+  if (query.error) throw new Error("Chargement des exécutions analytiques impossible : " + query.error.message);
+  recentEngineExecutions = query.data || [];
+  renderRecentEngineExecutions();
+}
+
+function renderRecentEngineExecutions() {
+  const panel = document.getElementById("overviewRecentEngineExecutions");
+  if (!panel) return;
+  panel.replaceChildren();
+
+  if (!recentEngineExecutions.length) {
+    const empty = document.createElement("p");
+    empty.className = "muted";
+    empty.textContent = "Aucune exécution analytique enregistrée pour cette organisation.";
+    panel.appendChild(empty);
+    return;
+  }
+
+  for (const execution of recentEngineExecutions) {
+    const article = document.createElement("article");
+    article.className = "overview-observation";
+    const title = document.createElement("strong");
+    title.textContent = execution.engine_id + " · v" + execution.engine_version;
+    const status = document.createElement("span");
+    status.className = "muted";
+    const statusLabels = {
+      queued: "En attente",
+      running: "En cours",
+      completed: "Terminée",
+      failed: "Échec"
+    };
+    status.textContent = statusLabels[execution.status] || "État inconnu";
+    const stamp = document.createElement("time");
+    stamp.dateTime = execution.created_at || "";
+    stamp.textContent = execution.created_at
+      ? new Date(execution.created_at).toLocaleString()
+      : "Date inconnue";
+    article.append(title, status, stamp);
+
+    const result = execution.result_payload?.result;
+    const summary = result?.value?.summary;
+    if (execution.status === "completed" && summary) {
+      const details = document.createElement("p");
+      details.textContent = String(summary.measurement_count ?? 0) +
+        " mesures · " + String(summary.series_count ?? 0) +
+        " séries · " + String(summary.excluded_record_count ?? 0) + " exclues";
+      article.appendChild(details);
+      const flags = Array.isArray(result.quality_flags) ? result.quality_flags : [];
+      if (flags.length) {
+        const flagLine = document.createElement("p");
+        flagLine.className = "muted";
+        flagLine.textContent = "Signaux qualité : " + flags.join(", ");
+        article.appendChild(flagLine);
+      }
+      if (result.outcome) {
+        const outcome = document.createElement("p");
+        outcome.className = "muted";
+        outcome.textContent = "Conclusion technique : " + result.outcome;
+        article.appendChild(outcome);
+      }
+    } else if (execution.status === "failed") {
+      const failure = document.createElement("p");
+      failure.className = "muted";
+      failure.textContent = "Code de sortie : " + (execution.error_code || "non renseigné");
+      article.appendChild(failure);
+    }
+    panel.appendChild(article);
+  }
+}
+
 function updateOverview() {
   const cultureCount = document.getElementById("overviewCultureCount");
   const batchCount = document.getElementById("overviewBatchCount");
   const observationCount = document.getElementById("overviewObservationCount");
   const observationsPanel = document.getElementById("overviewRecentObservations");
   if (!cultureCount || !batchCount || !observationCount || !observationsPanel) return;
+  renderRecentEngineExecutions();
 
   const domain = document.body.dataset.domain;
   const cultureMetricLabel = cultureCount.closest(".overview-metric")?.querySelector(".overview-metric-label");
