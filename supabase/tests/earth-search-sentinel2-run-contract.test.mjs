@@ -10,7 +10,7 @@ const checks = [
   ["requires explicit writer membership", /organization_members[\s\S]*?\["owner", "admin", "member"\]/],
   ["resolves organization and coordinates from the authorized location", /from\("locations"\)[\s\S]*?organization_id,latitude,longitude/],
   ["bounds the requested historical window", /MAX_DAYS = 90/],
-  ["bounds each ingestion batch to twenty scenes", /MAX_SCENES = 20/],
+  ["bounds each ingestion batch to ten scenes", /MAX_SCENES = 10/],
   ["restricts STAC search and pagination to Earth Search HTTPS", /earth-search\.aws\.element84\.com/],
   ["uses the location-derived approximate AOI transparently", /approximate_location_buffer_not_cadastral_boundary/],
   ["validates cloud-cover filtering", /max_cloud_cover_pct_must_be_between_0_and_100/],
