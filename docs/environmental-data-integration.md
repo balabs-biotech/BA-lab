@@ -99,3 +99,13 @@ The Sentinel-2 pipeline is split into three trust zones:
 The persistence Edge Function and its source-contract test have been added to the feature branch. The Python scene processor and payload builder already produce the corresponding data shape; the Edge Function validates the actual field names and units emitted by that builder.
 
 **The private processing worker path is now implemented in code.** The authenticated `earth-search-sentinel2-run` gateway performs STAC discovery and tenant authorization, then calls the private FastAPI route `/v1/sentinel2/process-and-persist`. The Python worker processes bounded scenes and signs the exact payload; `earth-search-sentinel2-ingest` verifies that signature and re-checks the caller before persistence. A CPU-only container definition and deployment/secret contract are documented in `environmental-engine/docs/architecture/ba-sentinel2-ingestion-worker-v1.md`. The worker is not deployed, its secrets are not configured, neither Edge Function has been deployed, no satellite rows have been written, and no production migration has been applied. The existing `earth-search-sentinel2-ndvi-preview` remains display-only and is not a source of persisted scientific statistics. Focused tests have been added but have not yet been executed; do not enable production ingestion until they pass and the source identity migration has been verified/applied with approval.
+
+
+### Partial-index persistence compatibility
+
+The source identity migration replaces the former global unique constraint with separate partial unique indexes for weather and satellite observations. PostgREST's generic `.upsert(onConflict=...)` cannot supply the partial-index predicate, so provider writes now use privileged SQL RPCs:
+
+- `upsert_weather_environmental_observations(jsonb)` for both interactive and scheduled NASA POWER ingestion.
+- `upsert_satellite_environmental_observations(jsonb)` for Sentinel-2 scene pairs.
+
+Both functions are `SECURITY DEFINER`, validate their source-family contract, and grant execution only to `service_role`. This preserves weather idempotency while allowing multiple Sentinel-2 scenes with the same acquisition timestamp.
