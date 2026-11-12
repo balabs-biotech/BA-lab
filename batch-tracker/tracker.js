@@ -6311,7 +6311,7 @@ async function closeBiologicalContext() {
     setBiologicalContextMessage(error.message || "Impossible de clôturer le contexte.", "error");
   } finally {
     if (isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) {
-      button.disabled = false;
+      button.disabled = !button.dataset.contextId;
     }
   }
 }
