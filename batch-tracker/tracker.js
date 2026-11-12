@@ -6331,20 +6331,34 @@ function areEngineExecutionsComparable(left, right) {
   return Boolean(leftResult?.value && rightResult?.value);
 }
 
+function getComparableEngineExecutionCandidates(reference, candidates) {
+  return candidates.filter((candidate) => areEngineExecutionsComparable(reference, candidate));
+}
+
+function findInitialComparableEnginePair(candidates) {
+  for (const reference of candidates) {
+    const candidate = getComparableEngineExecutionCandidates(reference, candidates)[0];
+    if (candidate) return [reference, candidate];
+  }
+  return null;
+}
+
 function renderEngineExecutionComparison(panel, eligible) {
   if (eligible.length < 2) return;
+  const initialPair = findInitialComparableEnginePair(eligible);
+  if (!initialPair) return;
   const section = document.createElement("section");
   section.className = "engine-comparison";
   const heading = document.createElement("strong");
   heading.textContent = "Comparer deux exécutions";
   const controls = document.createElement("div");
   controls.className = "engine-comparison-controls";
-  const makeSelect = (labelText, selectedId) => {
+  const makeSelect = (labelText, options, selectedId) => {
     const label = document.createElement("label");
     label.textContent = labelText;
     const select = document.createElement("select");
     select.className = "engine-comparison-select";
-    eligible.forEach((execution) => {
+    options.forEach((execution) => {
       const option = document.createElement("option");
       option.value = execution.id;
       option.textContent = new Date(execution.created_at).toLocaleString() +
@@ -6356,8 +6370,9 @@ function renderEngineExecutionComparison(panel, eligible) {
     controls.appendChild(label);
     return select;
   };
-  const leftSelect = makeSelect("Exécution A", eligible[1].id);
-  const rightSelect = makeSelect("Exécution B", eligible[0].id);
+  const leftSelect = makeSelect("Exécution A", eligible, initialPair[0].id);
+  const rightCandidates = getComparableEngineExecutionCandidates(initialPair[0], eligible);
+  const rightSelect = makeSelect("Exécution B", rightCandidates, initialPair[1].id);
   const compareButton = document.createElement("button");
   compareButton.type = "button";
   compareButton.className = "secondary-button small-button";
@@ -6365,6 +6380,33 @@ function renderEngineExecutionComparison(panel, eligible) {
   const output = document.createElement("div");
   output.className = "engine-comparison-output";
   output.setAttribute("aria-live", "polite");
+  const refreshRightCandidates = () => {
+    const reference = eligible.find((item) => item.id === leftSelect.value);
+    const candidates = getComparableEngineExecutionCandidates(reference, eligible);
+    const previousSelection = rightSelect.value;
+    rightSelect.replaceChildren();
+    candidates.forEach((execution) => {
+      const option = document.createElement("option");
+      option.value = execution.id;
+      option.textContent = new Date(execution.created_at).toLocaleString() +
+        " · " + execution.engine_id + " v" + execution.engine_version;
+      rightSelect.appendChild(option);
+    });
+    rightSelect.disabled = candidates.length === 0;
+    compareButton.disabled = candidates.length === 0;
+    if (candidates.length) {
+      rightSelect.value = candidates.some((item) => item.id === previousSelection)
+        ? previousSelection
+        : candidates[0].id;
+    } else {
+      output.replaceChildren();
+      const message = document.createElement("p");
+      message.className = "muted";
+      message.textContent = "Aucune autre exécution compatible pour ce moteur, cette version et ce périmètre.";
+      output.appendChild(message);
+    }
+  };
+  leftSelect.addEventListener("change", refreshRightCandidates);
   compareButton.addEventListener("click", () => {
     output.replaceChildren();
     const left = eligible.find((item) => item.id === leftSelect.value);
