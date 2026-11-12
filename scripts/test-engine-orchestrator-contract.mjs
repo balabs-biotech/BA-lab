@@ -16,6 +16,7 @@ const checks = [
   ["service credential is server-side only", /SUPABASE_SERVICE_ROLE_KEY/],
   ["worker call has an abort timeout", /AbortController/],
   ["source queries are tenant-filtered", /\.eq\("organization_id", organizationId\)/],
+  ["excluded source measurements cannot enter analysis", /excluded_source_records_not_eligible/],
   ["raw source records are not updated", !/\.from\(["']measurements["']\)[\s\S]{0,500}\.update\(/],
 ];
 for (const [name, pattern] of checks) {
