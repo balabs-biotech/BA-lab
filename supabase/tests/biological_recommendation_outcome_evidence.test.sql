@@ -86,6 +86,7 @@ begin
      where attrelid = v_links
        and attname = 'measurement_quality_state'
        and atttypid = 'text'::regtype
+       and attnotnull
        and not attisdropped
   ) then
     raise exception 'FAIL: immutable evidence must preserve measurement quality state';
