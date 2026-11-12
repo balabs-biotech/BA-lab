@@ -1,5 +1,4 @@
 from datetime import datetime, timezone
-from types import SimpleNamespace
 
 import numpy as np
 import pytest
@@ -63,7 +62,7 @@ def test_reads_aoi_window_and_aligns_20m_scl_to_10m_band_grid():
     # WGS84 polygon corresponding to a small interior portion of the test grid.
     from rasterio.warp import transform
 
-    xs, ys = transform("EPSG:32631", "EPSG:4326", [500000, 500020], [980, 1000])
+    xs, ys = transform("EPSG:32631", "EPSG:4326", [500001, 500019], [981, 999])
     geometry = {
         "type": "Polygon",
         "coordinates": [[
@@ -116,7 +115,7 @@ def test_enforces_aoi_pixel_budget():
     }
     from rasterio.warp import transform
 
-    xs, ys = transform("EPSG:32631", "EPSG:4326", [500000, 500040], [960, 1000])
+    xs, ys = transform("EPSG:32631", "EPSG:4326", [500001, 500039], [961, 999])
     geometry = {"type": "Polygon", "coordinates": [[
         [xs[0], ys[0]], [xs[1], ys[0]], [xs[1], ys[1]],
         [xs[0], ys[1]], [xs[0], ys[0]],
