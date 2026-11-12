@@ -15,6 +15,10 @@ from ba_environmental_engine.sources.sensor_temporal import (
     assess_sensor_temporal_anomalies,
 )
 from ba_environmental_engine.sources.sentinel2 import normalize_sentinel2_observation
+from ba_environmental_engine.sources.sentinel2_raster import (
+    Sentinel2NdviStatistics,
+    calculate_ndvi_statistics,
+)
 from ba_environmental_engine.sources.supabase_satellite import (
     SupabaseSatelliteObservationRepository,
 )
@@ -26,8 +30,10 @@ __all__ = [
     "SensorMeasurementEnvelope",
     "SensorTemporalAssessment",
     "SupabaseSatelliteObservationRepository",
+    "Sentinel2NdviStatistics",
     "SupabaseSensorMeasurementRepository",
     "assess_sensor_temporal_anomalies",
+    "calculate_ndvi_statistics",
     "find_duplicate_source_keys",
     "normalize_iot_measurement_row",
     "normalize_nasa_power_observation",
