@@ -17,6 +17,8 @@ from .validation import validate_request
 
 
 def _parse_timestamp(value: str) -> datetime:
+    if not isinstance(value, str) or not value:
+        raise ValueError("measurement timestamp must be a non-empty string")
     parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
     if parsed.tzinfo is None:
         raise ValueError("measurement timestamp must include a timezone")
