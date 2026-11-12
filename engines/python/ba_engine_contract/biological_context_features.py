@@ -191,8 +191,34 @@ def analyze_biological_context_features(request: Mapping[str, Any]) -> dict[str,
         missing_context.append("culture_environment_not_linked")
     elif environment_link_state == "environment_without_location":
         missing_context.append("culture_environment_location_missing")
+    elif environment_link_state == "ambiguous":
+        missing_context.append("analysis_window_environment_ambiguous")
+    elif environment_link_state == "conflict":
+        missing_context.append("analysis_window_environment_conflict")
+    elif environment_link_state == "missing":
+        missing_context.append("analysis_window_environment_not_resolved")
+
+    measurement_environment_states = {
+        (record.get("context") or {}).get("environment_resolution", {}).get("status")
+        for record in request["input"]["records"]
+        if record.get("record_type") == "measurement"
+    }
+    if "ambiguous" in measurement_environment_states:
+        missing_context.append("measurement_environment_context_ambiguous")
+    if "conflict" in measurement_environment_states:
+        missing_context.append("measurement_environment_context_conflict")
+    if "missing" in measurement_environment_states:
+        missing_context.append("measurement_environment_context_missing")
 
     quality_flags = ["biological_interpretation_not_performed"]
+    if environment_link_state == "ambiguous":
+        quality_flags.append("environment_context_ambiguous")
+    if environment_link_state == "conflict" or "conflict" in measurement_environment_states:
+        quality_flags.append("environment_context_conflict")
+    if "ambiguous" in measurement_environment_states:
+        quality_flags.append("measurement_environment_context_ambiguous")
+    if "missing" in measurement_environment_states:
+        quality_flags.append("measurement_environment_context_missing")
     if not observed_times:
         quality_flags.append("insufficient_data")
     if temporal_gaps:
