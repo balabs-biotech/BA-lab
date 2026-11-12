@@ -231,7 +231,7 @@ class EngineContractTests(unittest.TestCase):
             engine_version=REQUEST["engine"]["engine_version"],
             execute=lambda payload: {
                 "outcome": "success",
-                "value": {"processed_records": len(payload["records"])},
+                "value": {"processed_records": len(payload["input"]["records"])},
                 "limitations": [],
                 "quality_flags": [],
                 "provenance": {"algorithm": "fixture-v1", "libraries": []},
@@ -241,6 +241,19 @@ class EngineContractTests(unittest.TestCase):
         self.assertEqual(result["status"], "completed")
         self.assertEqual(result["request_id"], REQUEST["request_id"])
         self.assertEqual(result["input_snapshot_sha256"], REQUEST["input"]["snapshot_sha256"])
+
+
+    def test_runner_invokes_environmental_qc_with_full_contract_envelope(self):
+        request = json.loads(json.dumps(REQUEST))
+        request["engine"] = {"engine_id": "environmental.timeseries.qc", "engine_version": "0.1.0"}
+        engine = EngineSpec(
+            engine_id="environmental.timeseries.qc",
+            engine_version="0.1.0",
+            execute=run_environmental_timeseries_qc,
+        )
+        result = execute_engine(request, engine)
+        self.assertEqual(result["status"], "completed")
+        self.assertEqual(result["result"]["outcome"], "insufficient_data")
 
     def test_runner_returns_typed_failure_without_leaking_exception(self):
         def fail(_payload):
