@@ -809,6 +809,7 @@ def create_app(engine_api_key: str | None = None) -> FastAPI:
                 "scenes_duplicated": result.scenes_duplicated,
                 "quality_rejected_scenes": result.quality_rejected_scenes,
                 "observations_submitted": result.observations_submitted,
+                "scene_failures": list(result.scene_failures),
                 "persistence": result.persistence_response,
             }
         except Sentinel2PersistenceError as exc:
