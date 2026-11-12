@@ -153,3 +153,18 @@ def test_one_biological_subject_cannot_be_counted_in_both_cohorts():
             obs("t1", "treated", "shared-subject", 15, 1),
             obs("t2", "treated", "t2", 16, 0),
         ])
+
+
+
+def test_comparison_rejects_mixed_methods_or_instruments():
+    with pytest.raises(ValueError, match="same measurement method and instrument"):
+        compare([
+            obs("b1", "control", "b1", 10, 0),
+            obs("b2", "control", "b2", 11, 0),
+            obs("t1", "treated", "t1", 15, 0),
+            obs("t2", "treated", "t2", 16, 0),
+        ] + [
+            __import__("dataclasses").replace(
+                obs("t3", "treated", "t3", 17, 0), instrument="different-instrument"
+            )
+        ])
