@@ -94,3 +94,15 @@ This is still an implementation foundation, not an activated queue. The
 authenticated synchronous gateway remains the active path until the queued
 request gateway, worker processor composition, retry/reconciliation schedule,
 integration tests, and deployment configuration are implemented and verified.
+
+
+## Leased processor composition (implementation foundation)
+
+- Added `LeasedSentinel2JobProcessor`: validates the claimed job contract and bounded date/cloud/scene parameters, resolves location coordinates within the job tenant, reconstructs the same approximate AOI used by the synchronous gateway, discovers scenes, processes the COGs, filters invalid NDVI pairs and submits rows through the lease-bound HMAC transport.
+- Added a bounded Earth Search HTTP adapter with HTTPS host allowlisting, redirect rejection, request/response byte caps and GET/POST pagination support.
+- Corrected a defect in the STAC search result ordering: the search previously attempted to sort (scene, item) tuples as though they were scenes. Results now sort by acquisition timestamp and scene ID, and retain the original STAC Features in the same order for raster processing.
+- Added lease-loss cancellation checks between scenes and immediately before persistence. In-flight raster reads are not forcibly interrupted; the coordinator will refuse finalization if heartbeat ownership is lost.
+- Added an explicit runtime factory that composes the service-role RPC adapter, tenant-scoped location reader, STAC HTTP client, lease processor and worker coordinator from private process environment variables. Importing the package does not start the worker.
+- Added tests for processor composition, AOI bounds, cancellation, STAC HTTP transport and raw-item ordering. These tests have been added but not executed in this session.
+
+The async path is still not ready for activation. The authenticated gateway has not yet been converted to enqueue-only behavior, the worker process has no deployment/supervision configuration, and end-to-end tests against a disposable Supabase project remain required.
