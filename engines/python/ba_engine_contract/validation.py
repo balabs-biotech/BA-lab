@@ -3,22 +3,23 @@
 from __future__ import annotations
 
 import json
+import os
 from functools import lru_cache
 from pathlib import Path
 from typing import Any, Mapping
 
 from jsonschema import Draft202012Validator, FormatChecker
 
-_SCHEMA_DIR = Path(__file__).resolve().parents[3] / "schemas" / "engine" / "v1"
 
 
 class ContractValidationError(ValueError):
     """Raised when an engine request or result violates the v1 contract."""
 
 
-@lru_cache(maxsize=2)
-def _validator(name: str) -> Draft202012Validator:
-    path = _SCHEMA_DIR / name
+@lru_cache(maxsize=16)
+def _validator(name: str, schema_dir: str | None = None) -> Draft202012Validator:
+    root = Path(schema_dir) if schema_dir else Path(__file__).resolve().parents[3] / "schemas" / "engine" / "v1"
+    path = root / name
     try:
         with path.open(encoding="utf-8") as handle:
             schema = json.load(handle)
@@ -30,7 +31,7 @@ def _validator(name: str) -> Draft202012Validator:
 
 def _validate(instance: Mapping[str, Any], schema_name: str) -> None:
     errors = sorted(
-        _validator(schema_name).iter_errors(instance),
+        _validator(schema_name, os.environ.get("BA_ENGINE_SCHEMA_DIR")).iter_errors(instance),
         key=lambda error: (list(error.absolute_path), error.message),
     )
     if errors:
