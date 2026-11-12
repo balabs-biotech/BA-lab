@@ -12,6 +12,7 @@ type ContextRow = {
   id: string;
   organization_id: string;
   culture_id: string | null;
+  plant_culture_id?: string | null;
   environment_id: string;
   valid_from: string;
   valid_to: string | null;
@@ -62,7 +63,8 @@ function environmentExists(
 
 export function resolveBiologicalContext(input: {
   organizationId: string;
-  cultureId: string;
+  cultureId?: string;
+  plantCultureId?: string;
   /** Deliberately not used as a historical fallback. */
   currentEnvironmentId?: string | null;
   contexts: ContextRow[];
@@ -70,7 +72,12 @@ export function resolveBiologicalContext(input: {
   measurements: MeasurementRow[];
   window: { start: string; end: string; timezone: string };
 }) {
-  const { organizationId, cultureId, contexts, environments, measurements, window } = input;
+  const { organizationId, cultureId, plantCultureId, contexts, environments, measurements, window } = input;
+  if (Boolean(cultureId) === Boolean(plantCultureId)) {
+    throw new Error("exactly_one_biological_subject_required");
+  }
+  const subjectField = plantCultureId ? "plant_culture_id" : "culture_id";
+  const subjectId = plantCultureId ?? cultureId;
   const startInstant = Date.parse(window.start);
   const endInstant = Date.parse(window.end);
   if (!Number.isFinite(startInstant) || !Number.isFinite(endInstant) ||
@@ -85,7 +92,7 @@ export function resolveBiologicalContext(input: {
   const lastIncludedDate = localDate(new Date(endInstant - 1).toISOString(), window.timezone);
 
   const scopedContexts = contexts.filter((context) =>
-    context.organization_id === organizationId && context.culture_id === cultureId
+    context.organization_id === organizationId && context[subjectField] === subjectId
   );
   const resolvedMeasurements = measurements.map((measurement) => {
     const date = localDate(measurement.measured_at, window.timezone);
