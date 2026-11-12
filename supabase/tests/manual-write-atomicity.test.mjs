@@ -17,6 +17,7 @@ for (const [name, rpc, payloadKey, directTable] of [
   const block = tracker.slice(start, next);
   if (!block.includes('rpc("' + rpc + '"')) throw new Error(name + " handler does not call atomic RPC");
   if (!block.includes(payloadKey + ":")) throw new Error(name + " RPC payload missing");
+  if (!block.includes("p_idempotency_key:")) throw new Error(name + " RPC does not send a stable idempotency key");
   if (block.includes('.from("events").insert(') || block.includes('.from("' + directTable + '").insert(')) {
     throw new Error(name + " handler still performs non-atomic direct inserts");
   }
@@ -40,3 +41,22 @@ for (const [name, rpc, payloadKey, directTable] of [
   }
 }
 console.log("✓ Manual measurement and observation writes use atomic RPCs; client-side split inserts are absent");
+
+const idempotencyMigration = readFileSync(path.join(root, "supabase/migrations/20261109110000_add_manual_write_idempotency.sql"), "utf8");
+for (const rpc of ["record_manual_measurement", "record_manual_observation"]) {
+  const start = idempotencyMigration.indexOf("create or replace function public." + rpc + "(");
+  const end = idempotencyMigration.indexOf("$$;", start);
+  const sqlFunction = start >= 0 && end >= 0 ? idempotencyMigration.slice(start, end) : "";
+  if (!sqlFunction.includes("p_idempotency_key uuid") ||
+      !sqlFunction.includes("security definer") ||
+      !sqlFunction.includes("set search_path = pg_catalog")) {
+    throw new Error(rpc + " must be a pinned SECURITY DEFINER RPC with an explicit safe search_path and idempotency key");
+  }
+}
+if (!idempotencyMigration.includes("private.operation_idempotency_receipts")) {
+  throw new Error("Manual writes must reuse the private idempotency receipt ledger");
+}
+if (!idempotencyMigration.includes("idempotency_key_reused_with_different_payload")) {
+  throw new Error("Manual writes must reject key reuse with a different payload");
+}
+console.log("✓ Manual measurement and observation RPCs preserve retry identity and private receipt isolation");

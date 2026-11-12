@@ -2,7 +2,7 @@
 do $$
 declare
   v_iot regprocedure := 'public.ingest_iot_payload(uuid,text,text,jsonb)'::regprocedure;
-  v_bio regprocedure := 'public.record_biological_operation(uuid,uuid,text,timestamp with time zone,text,jsonb,text[])'::regprocedure;
+  v_bio regprocedure := 'public.record_biological_operation(uuid,uuid,text,uuid,timestamp with time zone,text,jsonb,text[])'::regprocedure;
   v_iot_config text[];
   v_bio_config text[];
 begin

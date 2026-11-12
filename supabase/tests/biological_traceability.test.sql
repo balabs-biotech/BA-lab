@@ -24,7 +24,10 @@ create table public.organizations(id uuid primary key);
 create table public.organization_members(organization_id uuid not null, user_id uuid not null, primary key(organization_id,user_id));
 create or replace function private.is_org_member(p_org uuid) returns boolean
   language sql stable security definer set search_path = pg_catalog, public
-  as $$ select exists(select 1 from public.organization_members m where m.organization_id=p_org and m.user_id=auth.uid()) $$;
+  as $writer$ select exists(select 1 from public.organization_members m where m.organization_id=p_org and m.user_id=auth.uid()) $writer$;
+create or replace function private.is_org_writer(p_org uuid) returns boolean
+  language sql stable security definer set search_path = pg_catalog, public
+  as $writer$ select exists(select 1 from public.organization_members m where m.organization_id=p_org and m.user_id=auth.uid()) $writer$;
 create table public.material_types(code text primary key);
 create table public.culture_types(code text primary key);
 create table public.strains(organization_id uuid not null, id uuid not null default gen_random_uuid(), primary key(organization_id,id));
@@ -115,3 +118,75 @@ begin
 end $$;
 reset role;
 select 'PASS: biological traceability runtime, lineage, RLS boundary, input validation and grants' as test_result;
+
+-- Idempotency regression: a retry after an unknown client outcome must return
+-- the original result without creating another operation or descendant.
+\i supabase/migrations/20261109100000_add_biological_operation_idempotency.sql
+set role authenticated;
+do $$
+declare
+  first_result jsonb;
+  retry_result jsonb;
+  event_id uuid;
+  event_count integer;
+  child_count integer;
+  caught boolean := false;
+  request_key uuid := '00000000-0000-0000-0000-0000000000c1';
+  parent_id uuid;
+  fixed_time timestamptz := '2026-11-09T10:00:00Z';
+begin
+  select id into parent_id from public.cultures
+   where organization_id='00000000-0000-0000-0000-0000000000a1'
+     and code='PARENT-001';
+
+  first_result := public.record_biological_operation(
+    '00000000-0000-0000-0000-0000000000a1', parent_id, 'repiquage',
+    request_key, fixed_time, 'idempotency test', '{"conditions":"agar 24C"}'::jsonb,
+    array['IDEMP-CHILD-A']
+  );
+  retry_result := public.record_biological_operation(
+    '00000000-0000-0000-0000-0000000000a1', parent_id, 'repiquage',
+    request_key, fixed_time, 'idempotency test', '{"conditions":"agar 24C"}'::jsonb,
+    array['IDEMP-CHILD-A']
+  );
+
+  if first_result is distinct from retry_result then
+    raise exception 'FAIL: an identical retry must return the original result';
+  end if;
+
+  event_id := (first_result->>'event_id')::uuid;
+  select count(*) into event_count from public.events
+   where organization_id='00000000-0000-0000-0000-0000000000a1'
+     and id=event_id;
+  select count(*) into child_count from public.cultures
+   where organization_id='00000000-0000-0000-0000-0000000000a1'
+     and code='IDEMP-CHILD-A';
+  if event_count <> 1 or child_count <> 1 then
+    raise exception 'FAIL: retry duplicated biological records (events %, children %)', event_count, child_count;
+  end if;
+
+  begin
+    perform public.record_biological_operation(
+      '00000000-0000-0000-0000-0000000000a1', parent_id, 'repiquage',
+      request_key, fixed_time, 'different request with same key', '{"conditions":"agar 24C"}'::jsonb,
+      array['IDEMP-CHILD-A']
+    );
+  exception when others then
+    if sqlerrm = 'idempotency_key_reused_with_different_payload' then
+      caught := true;
+    else
+      raise;
+    end if;
+  end;
+  if not caught then
+    raise exception 'FAIL: reusing an idempotency key with a different payload must be rejected';
+  end if;
+
+  if (select count(*) from public.cultures
+      where organization_id='00000000-0000-0000-0000-0000000000a1'
+        and code='IDEMP-CHILD-A') <> 1 then
+    raise exception 'FAIL: conflicting retry changed biological state';
+  end if;
+end $$;
+reset role;
+select 'PASS: biological operation idempotency, duplicate suppression and payload conflict rejection' as test_result;

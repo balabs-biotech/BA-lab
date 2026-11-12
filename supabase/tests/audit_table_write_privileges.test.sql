@@ -15,9 +15,9 @@ begin
     end loop;
   end loop;
 
-  if not has_function_privilege('authenticated','public.record_manual_measurement(jsonb,jsonb)','EXECUTE')
-     or not has_function_privilege('authenticated','public.record_manual_observation(jsonb,jsonb)','EXECUTE')
-     or not has_function_privilege('authenticated','public.record_biological_operation(uuid,uuid,text,timestamp with time zone,text,jsonb,text[])','EXECUTE') then
+  if not has_function_privilege('authenticated','public.record_manual_measurement(jsonb,jsonb,uuid)','EXECUTE')
+     or not has_function_privilege('authenticated','public.record_manual_observation(jsonb,jsonb,uuid)','EXECUTE')
+     or not has_function_privilege('authenticated','public.record_biological_operation(uuid,uuid,text,uuid,timestamp with time zone,text,jsonb,text[])','EXECUTE') then
     raise exception 'Expected authenticated RPC execution grants are missing';
   end if;
 end
