@@ -195,7 +195,7 @@ begin
   ) values (
     p_organization_id, p_recommendation_id, v_outcome_event.event_id,
     p_measurement_id, v_measurement.measured_at, v_measurement.variable_code,
-    coalesce(v_measurement.quality_state, 'raw'),
+    coalesce(v_measurement.quality_state::text, 'raw'),
     v_measurement.normalized_value, v_measurement.normalized_unit_code,
     v_measurement.raw_value, v_measurement.raw_unit_code,
     v_measurement.quality_state, v_measurement.method, v_measurement.instrument,
