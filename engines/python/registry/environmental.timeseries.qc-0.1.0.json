@@ -7,7 +7,7 @@
     "display_name": "Environmental time-series quality control"
   },
   "domain": "environmental",
-  "entrypoint": "ba_engine_contract.environmental_timeseries_qc:run_environmental_timeseries_qc",
+  "entrypoint": "ba_engine_contract.environmental_timeseries_qc:analyze_environmental_timeseries_qc",
   "runtime": {
     "language": "python",
     "version": "3.12"
