@@ -56,14 +56,20 @@ function hexToBytes(value: string): Uint8Array | null {
   return out;
 }
 
-async function verifyWorkerSignature(body: Uint8Array, signature: string | null, secret: string): Promise<boolean> {
-  if (!signature) return false;
+async function verifyWorkerSignature(body: Uint8Array, signature: string | null, timestamp: string | null, secret: string): Promise<boolean> {
+  if (!signature || !timestamp || !/^\\d{10}$/.test(timestamp)) return false;
+  const timestampSeconds = Number(timestamp);
+  if (!Number.isSafeInteger(timestampSeconds) || Math.abs(Math.floor(Date.now() / 1000) - timestampSeconds) > 300) return false;
   const supplied = hexToBytes(signature);
   if (!supplied) return false;
   const key = await crypto.subtle.importKey(
     "raw", new TextEncoder().encode(secret), { name: "HMAC", hash: "SHA-256" }, false, ["sign"],
   );
-  const expected = new Uint8Array(await crypto.subtle.sign("HMAC", key, body));
+  const timestampPrefix = new TextEncoder().encode(timestamp + ".");
+  const signedPayload = new Uint8Array(timestampPrefix.length + body.length);
+  signedPayload.set(timestampPrefix, 0);
+  signedPayload.set(body, timestampPrefix.length);
+  const expected = new Uint8Array(await crypto.subtle.sign("HMAC", key, signedPayload));
   if (expected.length !== supplied.length) return false;
   let mismatch = 0;
   for (let i = 0; i < expected.length; i++) mismatch |= expected[i] ^ supplied[i];
@@ -159,7 +165,7 @@ Deno.serve(async (req: Request) => {
         ? json(413, { error: "request_body_too_large", max_bytes: MAX_BODY_BYTES })
         : json(400, { error: "invalid_request_body" });
     }
-    if (!await verifyWorkerSignature(rawBody, req.headers.get("x-ba-worker-signature"), workerSecret)) {
+    if (!await verifyWorkerSignature(rawBody, req.headers.get("x-ba-worker-signature"), req.headers.get("x-ba-worker-timestamp"), workerSecret)) {
       return json(401, { error: "trusted_worker_signature_required" });
     }
 
