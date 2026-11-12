@@ -13,6 +13,10 @@ import {
 } from "./biological-context-snapshot.ts";
 import { resolveBiologicalContext } from "./biological-context-resolver.ts";
 
+function boundedText(value: unknown, maxLength: number): string | null {
+  return typeof value === "string" ? value.slice(0, maxLength) : null;
+}
+
 function dateInTimezone(instant: string, timezone: string): string {
   const timestamp = Date.parse(instant);
   if (!Number.isFinite(timestamp)) throw new Error("analysis_window_must_be_timezone_aware");
@@ -129,27 +133,27 @@ export async function assembleResolvedBiologicalContextSnapshot(input: {
         context_id: context.id,
         valid_from: context.valid_from,
         valid_to: context.valid_to,
-        organism_kind: context.organism_kind ?? null,
-        taxon_code: context.taxon_code ?? null,
-        strain_code: context.strain_code ?? null,
-        cultivar_code: context.cultivar_code ?? null,
-        culture_stage: context.culture_stage ?? null,
-        substrate_code: context.substrate_code ?? null,
-        production_system: context.production_system ?? null,
+        organism_kind: boundedText(context.organism_kind, 80),
+        taxon_code: boundedText(context.taxon_code, 120),
+        strain_code: boundedText(context.strain_code, 120),
+        cultivar_code: boundedText(context.cultivar_code, 120),
+        culture_stage: boundedText(context.culture_stage, 120),
+        substrate_code: boundedText(context.substrate_code, 120),
+        production_system: boundedText(context.production_system, 120),
         context_tags: Array.isArray(context.context_tags)
-          ? context.context_tags.filter((tag): tag is string => typeof tag === "string")
+          ? context.context_tags.filter((tag): tag is string => typeof tag === "string").slice(0, 100).map((tag) => tag.slice(0, 120))
           : [],
         genetic_reference: {
           status: !context.strain_code ? "not_specified" : strain ? "resolved" : "unresolved",
           strain_id: strain?.id ?? null,
           organism_id: strain?.organism_id ?? null,
-          designation: strain?.designation ?? null,
-          origin: strain?.origin ?? null,
-          source_description: strain?.source_description ?? null,
-          scientific_name: organism?.scientific_name ?? null,
-          common_name: organism?.common_name ?? null,
-          taxonomy_source: organism?.taxonomy_source ?? null,
-          taxonomy_id: organism?.taxonomy_id ?? null,
+          designation: boundedText(strain?.designation, 200),
+          origin: boundedText(strain?.origin, 300),
+          source_description: boundedText(strain?.source_description, 1000),
+          scientific_name: boundedText(organism?.scientific_name, 300),
+          common_name: boundedText(organism?.common_name, 300),
+          taxonomy_source: boundedText(organism?.taxonomy_source, 120),
+          taxonomy_id: boundedText(organism?.taxonomy_id, 120),
         },
       };
     });
