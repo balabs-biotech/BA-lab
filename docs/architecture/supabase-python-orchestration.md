@@ -37,3 +37,42 @@ The adapter resolves the exact engine ID/version from its allowlisted registry a
 ## Current boundary
 
 This commit creates the durable database contract and documents the transport boundary. It does not claim that Python is reachable from Supabase, that a worker token exists, or that any production execution can run yet. The next implementation step is the authenticated Edge Function and its adapter-backed dispatch, followed by end-to-end tests against a local adapter.
+
+## Implemented Edge Function boundary
+
+`supabase/functions/engine-orchestrator/index.ts` now implements the first authenticated dispatch path.
+
+### Input
+
+`POST /functions/v1/engine-orchestrator`
+
+JSON body:
+```json
+{
+  "organization_id": "<uuid>",
+  "engine_id": "environmental.timeseries.qc",
+  "engine_version": "0.1.0",
+  "record_ids": ["<measurement-uuid>"],
+  "scope": { "culture_id": "<optional-uuid>" },
+  "parameters": { "max_gap_minutes": 180 },
+  "idempotency_key": "client-generated-stable-key"
+}
+```
+
+The caller may also send `Idempotency-Key` as a header. The endpoint currently accepts measurement IDs only and limits one call to 500 records. It reads records through the caller JWT and checks membership plus writer role before using the server credential. The only enabled engine is the exact `environmental.timeseries.qc@0.1.0` registry entry.
+
+### Required Edge Function secrets
+
+- `SUPABASE_URL`
+- `SUPABASE_PUBLISHABLE_KEY` (or legacy `SUPABASE_ANON_KEY`)
+- `SUPABASE_SERVICE_ROLE_KEY` (server-side only)
+- `BA_ENGINE_WORKER_URL`
+- `BA_ENGINE_WORKER_TOKEN`
+
+The worker call is capped at 20 seconds; the response body is capped at 128 KB. The endpoint validates the request and response schemas, verifies request/engine/snapshot correlation, persists the full completed envelope, and stores safe failure codes. The source measurement rows are read-only throughout this flow.
+
+The static CI contract check is `scripts/test-engine-orchestrator-contract.mjs`. It checks that the security and isolation boundaries remain present; it is not a substitute for an integration test against a deployed worker.
+
+### Deployment boundary
+
+The function source is committed but not deployed. No worker URL/token is configured here, no Supabase production migration was applied, and no end-to-end execution has yet been demonstrated. The next verification gate is a local PostgreSQL migration replay plus an authenticated Edge Function integration test against a disposable worker adapter.
