@@ -10,7 +10,7 @@ from ba_engine_contract import (
     ContractValidationError, EngineExecutionError, EngineSpec, execute_engine,
     validate_request, validate_response,
 )
-from ba_engine_contract.environmental_timeseries_qc import run_environmental_timeseries_qc
+from ba_engine_contract.environmental_timeseries_qc import (\n    analyze_environmental_timeseries_qc, run_environmental_timeseries_qc,\n)
 
 ROOT = Path(__file__).resolve().parents[3]
 SCHEMA_DIR = ROOT / "schemas" / "engine" / "v1"
@@ -194,7 +194,7 @@ class EngineContractTests(unittest.TestCase):
     def test_environmental_qc_rejects_wrong_engine_identity(self):
         request = json.loads(json.dumps(REQUEST))
         with self.assertRaisesRegex(ValueError, "unsupported_engine_id"):
-            run_environmental_timeseries_qc(request)
+            analyze_environmental_timeseries_qc(request)
 
     def test_environmental_qc_rejects_naive_timestamp_as_excluded_data(self):
         request = json.loads(json.dumps(REQUEST))
@@ -249,7 +249,7 @@ class EngineContractTests(unittest.TestCase):
         engine = EngineSpec(
             engine_id="environmental.timeseries.qc",
             engine_version="0.1.0",
-            execute=run_environmental_timeseries_qc,
+            execute=analyze_environmental_timeseries_qc,
         )
         result = execute_engine(request, engine)
         self.assertEqual(result["status"], "completed")
