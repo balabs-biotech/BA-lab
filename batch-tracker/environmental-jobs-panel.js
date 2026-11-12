@@ -31,12 +31,70 @@
   const location = node("select");
   locationLabel.append(location);
   controls.append(locationLabel);
+  const requestBox = node("div", "environmental-job-request");
+  const requestHeading = node("h4", "", "Nouvelle analyse Sentinel-2");
+  const startDate = node("input");
+  startDate.type = "date";
+  startDate.required = true;
+  const endDate = node("input");
+  endDate.type = "date";
+  endDate.required = true;
+  const cloudLimit = node("input");
+  cloudLimit.type = "number";
+  cloudLimit.min = "0";
+  cloudLimit.max = "100";
+  cloudLimit.step = "1";
+  cloudLimit.value = "30";
+  cloudLimit.required = true;
+  const maxScenes = node("select");
+  [3, 5, 10].forEach(value => {
+    const option = node("option", "", String(value));
+    option.value = String(value);
+    if (value === 10) option.selected = true;
+    maxScenes.append(option);
+  });
+  const dateField = (labelText, input) => {
+    const wrap = node("label", "environmental-job-field", labelText);
+    wrap.append(input);
+    return wrap;
+  };
+  const enqueue = node("button", "primary-button", "Lancer l’analyse satellite");
+  enqueue.type = "button";
+  const enqueueStatus = node("p", "signals-status", "Choisissez un emplacement et une période.");
+  enqueueStatus.setAttribute("role", "status");
+  enqueueStatus.setAttribute("aria-live", "polite");
+  requestBox.append(
+    requestHeading,
+    dateField("Date de début", startDate),
+    dateField("Date de fin", endDate),
+    dateField("Couverture nuageuse maximale (%)", cloudLimit),
+    dateField("Nombre maximal de scènes", maxScenes),
+    enqueue,
+    enqueueStatus
+  );
   const status = node("p", "signals-status", "En attente de la session.");
   status.setAttribute("role", "status");
   status.setAttribute("aria-live", "polite");
   const summary = node("div", "overview-metrics");
   const list = node("div", "overview-observations");
-  card.append(heading, controls, status, summary, list);
+  card.append(heading, controls, requestBox, status, summary, list);
+
+  function setDefaultDates() {
+    const today = new Date();
+    today.setDate(today.getDate() - 1);
+    const from = new Date(today);
+    from.setDate(from.getDate() - 29);
+    const iso = value => [
+      value.getFullYear(),
+      String(value.getMonth() + 1).padStart(2, "0"),
+      String(value.getDate()).padStart(2, "0")
+    ].join("-");
+    const maximum = iso(today);
+    startDate.max = maximum;
+    endDate.max = maximum;
+    startDate.value = iso(from);
+    endDate.value = maximum;
+  }
 
   function mount() {
     const target = document.getElementById("environmentalCard");
@@ -150,16 +208,83 @@
     location.replaceChildren(node("option", "", "Chargement…"));
     summary.replaceChildren();
     list.replaceChildren();
+    setDefaultDates();
+    enqueue.disabled = true;
     if (!state.organizationId) {
       setStatus("Connectez-vous pour consulter les exécutions.");
+      enqueueStatus.textContent = "Connectez-vous pour lancer une analyse.";
       return;
     }
     await loadLocations(revision, state.organizationId);
+    enqueue.disabled = false;
   }
 
   location.addEventListener("change", () => {
     state.locationId = location.value;
+    enqueue.disabled = !state.locationId;
+    enqueueStatus.textContent = state.locationId
+      ? "Emplacement sélectionné. Définissez la période puis lancez l’analyse."
+      : "Choisissez un emplacement pour lancer une analyse.";
     loadJobs();
+  });
+
+  enqueue.addEventListener("click", async () => {
+    const selectedLocation = location.value;
+    if (!selectedLocation) {
+      enqueueStatus.textContent = "Sélectionnez d’abord un emplacement.";
+      return;
+    }
+    if (!startDate.value || !endDate.value || startDate.value > endDate.value) {
+      enqueueStatus.textContent = "La période demandée est invalide.";
+      return;
+    }
+    const cloud = Number(cloudLimit.value);
+    const scenes = Number(maxScenes.value);
+    if (!Number.isFinite(cloud) || cloud < 0 || cloud > 100 ||
+        !Number.isInteger(scenes) || scenes < 1 || scenes > 10) {
+      enqueueStatus.textContent = "Vérifiez la couverture nuageuse et le nombre de scènes.";
+      return;
+    }
+    const from = new Date(startDate.value + "T00:00:00Z");
+    const to = new Date(endDate.value + "T00:00:00Z");
+    const days = Math.floor((to.getTime() - from.getTime()) / 86400000) + 1;
+    if (days > 90) {
+      enqueueStatus.textContent = "La période ne peut pas dépasser 90 jours.";
+      return;
+    }
+    enqueue.disabled = true;
+    enqueueStatus.textContent = "Envoi de la demande au registre des traitements…";
+    try {
+      const { data, error } = await client.functions.invoke(
+        "earth-search-sentinel2-enqueue",
+        {
+          body: {
+            location_id: selectedLocation,
+            start_date: startDate.value,
+            end_date: endDate.value,
+            max_cloud_cover_pct: cloud,
+            max_scenes: scenes
+          }
+        }
+      );
+      if (error) {
+        console.warn("[environmental jobs] Enqueue failed:", error.message);
+        enqueueStatus.textContent = "Impossible de mettre l’analyse en file. Vérifiez le déploiement de la fonction et vos droits.";
+        return;
+      }
+      if (!data?.ok || !data?.job_id) {
+        enqueueStatus.textContent = "La demande n’a pas été confirmée par le serveur.";
+        return;
+      }
+      enqueueStatus.textContent = "Analyse mise en file · identifiant " + data.job_id;
+      state.locationId = selectedLocation;
+      await loadJobs(state.revision, state.organizationId);
+    } catch (error) {
+      console.warn("[environmental jobs] Enqueue request failed:", error?.message || "unknown");
+      enqueueStatus.textContent = "Erreur réseau lors de l’envoi de la demande.";
+    } finally {
+      enqueue.disabled = !state.organizationId || !location.value;
+    }
   });
   refresh.addEventListener("click", () => loadJobs());
   window.addEventListener("balabs:organization-context", event => activate(event.detail || {}));
