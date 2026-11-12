@@ -9,7 +9,7 @@ BAL-Core is the deterministic boundary between incoming biological records and B
 - **CultureOps (TypeScript):** data entry, previews, workflow orchestration and user feedback. Client validation is advisory only.
 - **Supabase Edge Functions:** authenticated ingress, payload limits, JSON Schema validation, organization authorization, catalogue lookup and calls to atomic database functions.
 - **PostgreSQL:** canonical persistence, relational integrity, row-level security, idempotency and immutable event history.
-- **BAL-Core (planned deterministic library):** shared validation and normalization rules. It must not bypass database authorization or become a second persistence layer.
+- **BAL-Core (shared deterministic rules):** server-side validation and unit normalization, beginning with the shared helper in `supabase/functions/_shared/measurement-normalization.ts`. It must not bypass database authorization or become a second persistence layer.
 - **Python analytical engines:** statistical analysis, time-series processing, environmental data fusion and model execution. They consume validated records and return versioned outputs.
 - **Specialized engines:** mycology, laboratory, GreenTech and environmental intelligence. Each is replaceable and isolated behind versioned input/output contracts.
 
@@ -34,7 +34,7 @@ The normalized unit must equal the variable's canonical unit. Both units must sh
 
 **Non-linear dimensions are not converted by this formula.** pH is the current explicit example: retain the raw pH reading and canonical pH unit; do not apply a linear conversion.
 
-Temperature catalogue entries require particular care. The seeded Kelvin entry currently has a zero offset, which is not compatible with a Celsius-based canonical representation. Do not normalize Kelvin to Celsius until the catalogue offset is corrected and regression-tested. A unit dimension match alone is not proof of a valid conversion.
+Temperature catalogue entries require particular care. Migration `20261112010000_correct_kelvin_unit_offset.sql` sets the Kelvin offset to -273.15 for the Celsius-based temperature dimension. Regression coverage checks 273.15 K → 0 °C. A unit dimension match alone is not proof of a valid conversion; the factor, offset and linearity flags must also be valid.
 
 ## Ingestion invariants
 
