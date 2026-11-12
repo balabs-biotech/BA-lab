@@ -13,6 +13,7 @@ dependencies = [
 
 [project.scripts]
 ba-engine-worker = "ba_engine_contract.worker:main"
+ba-engine-http-worker = "ba_engine_contract.http_adapter:main"
 
 [tool.setuptools.packages.find]
 where = ["."]
