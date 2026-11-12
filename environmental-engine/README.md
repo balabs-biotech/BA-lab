@@ -58,6 +58,7 @@ The optional FastAPI boundary exposes `GET /health`, `POST /v1/analyses` for tru
 - `docs/architecture/ba-environmental-private-api-v1.md`: private FastAPI boundary, service authentication, tenant trust boundary and synchronous request/response contract.
 - `docs/architecture/ba-biological-bal-envelope-v1.md`: biological performance envelope kept separate from the location-scoped environmental BAL-JSON analysis.
 - `docs/architecture/ba-environmental-intelligence-contract-v1.md`: engine boundaries and data flow.
+- `docs/architecture/ba-sentinel2-ingestion-worker-v1.md`: Sentinel-2 STAC gateway, private raster worker, HMAC trust boundary and deployment contract.
 - `docs/architecture/ba-environmental-unit-registry-v1.md`: canonical units and conversion conventions.
 - `docs/architecture/ba-nasa-power-adapter-v1.md`: provider mapping and daily time semantics.
 - `docs/architecture/ba-environmental-quality-screening-v1.md`: plausibility and quality screening.
