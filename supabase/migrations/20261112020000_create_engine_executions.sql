@@ -49,3 +49,58 @@ grant select on public.engine_executions to authenticated;
 
 comment on table public.engine_executions is
   'Immutable-input, tenant-scoped execution ledger for versioned BA Labs scientific engines. Writes are service-managed; raw source records remain unchanged.';
+
+-- The execution identity and input snapshot are immutable after creation.
+-- Only the controlled lifecycle fields may change, and only along valid edges.
+create or replace function private.guard_engine_execution_update()
+returns trigger
+language plpgsql
+set search_path = pg_catalog
+as $$
+begin
+  if new.organization_id is distinct from old.organization_id
+    or new.id is distinct from old.id
+    or new.request_id is distinct from old.request_id
+    or new.idempotency_key is distinct from old.idempotency_key
+    or new.engine_id is distinct from old.engine_id
+    or new.engine_version is distinct from old.engine_version
+    or new.scope is distinct from old.scope
+    or new.input_record_ids is distinct from old.input_record_ids
+    or new.input_snapshot_sha256 is distinct from old.input_snapshot_sha256
+    or new.request_payload is distinct from old.request_payload
+    or new.requested_by is distinct from old.requested_by
+    or new.created_at is distinct from old.created_at then
+    raise exception 'engine execution identity and input snapshot are immutable'
+      using errcode = '55000';
+  end if;
+
+  if old.status in ('completed', 'failed') then
+    raise exception 'terminal engine executions are immutable'
+      using errcode = '55000';
+  end if;
+
+  if old.status = 'queued' and new.status not in ('running', 'failed') then
+    raise exception 'invalid engine execution transition from queued'
+      using errcode = '55000';
+  end if;
+  if old.status = 'running' and new.status not in ('completed', 'failed') then
+    raise exception 'invalid engine execution transition from running'
+      using errcode = '55000';
+  end if;
+  if old.status = 'running' and new.started_at is distinct from old.started_at then
+    raise exception 'engine execution start timestamp is immutable once running'
+      using errcode = '55000';
+  end if;
+  if new.updated_at < old.updated_at then
+    raise exception 'engine execution updated_at cannot move backwards'
+      using errcode = '55000';
+  end if;
+  return new;
+end;
+$$;
+
+revoke all on function private.guard_engine_execution_update() from public, anon, authenticated;
+drop trigger if exists engine_executions_guard_update on public.engine_executions;
+create trigger engine_executions_guard_update
+  before update on public.engine_executions
+  for each row execute function private.guard_engine_execution_update();
