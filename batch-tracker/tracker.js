@@ -26,6 +26,10 @@ let organizationId = null;
 // Public, read-only bridge for isolated workspace adapters.
 window.BA_LABS_SUPABASE_CLIENT = supabaseClient;
 window.BA_LABS_GET_ORGANIZATION_ID = () => organizationId;
+window.BA_LABS_REFRESH_EXPERIMENTAL_DATA = async () => {
+  if (!organizationId) throw new Error("Aucune organisation active.");
+  await Promise.all([loadRecentMeasurements(), loadRecentObservations()]);
+};
 
 let organization = null;
 
