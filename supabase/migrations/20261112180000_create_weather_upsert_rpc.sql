@@ -22,6 +22,7 @@ BEGIN
     WHERE item ->> 'data_family' IS DISTINCT FROM 'weather'
        OR item ->> 'provider_code' IS DISTINCT FROM 'NASA_POWER'
        OR item ->> 'dataset_code' IS DISTINCT FROM 'POWER_DAILY_AGRO'
+       OR item ->> 'variable_code' IS NULL
        OR item ->> 'variable_code' NOT IN (
          'air_temperature_mean',
          'air_temperature_max',
