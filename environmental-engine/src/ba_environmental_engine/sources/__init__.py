@@ -22,7 +22,7 @@ from ba_environmental_engine.sources.sentinel2_search import (
     Sentinel2SearchResult,
     search_sentinel2_scenes,
 )
-from ba_environmental_engine.sources.sentinel2_pipeline import (
+from ba_environmental_engine.sources.sentinel2_batch import (\n    Sentinel2BatchProcessingResult,\n    Sentinel2SceneFailure,\n    process_sentinel2_stac_items,\n)\nfrom ba_environmental_engine.sources.sentinel2_pipeline import (
     Sentinel2SceneProcessingResult,
     process_sentinel2_stac_item,
 )
@@ -45,7 +45,7 @@ __all__ = [
     "SensorMeasurementEnvelope",
     "SensorTemporalAssessment",
     "SupabaseSatelliteObservationRepository",
-    "Sentinel2NdviStatistics",
+    "Sentinel2BatchProcessingResult",\n    "Sentinel2SceneFailure",\n    "Sentinel2NdviStatistics",
     "Sentinel2RasterReadResult",
     "Sentinel2SceneProcessingResult",
     "Sentinel2SearchCriteria",
@@ -60,7 +60,7 @@ __all__ = [
     "normalize_nasa_power_observation",
     "normalize_sentinel2_observation",
     "parse_sentinel2_stac_item",
-    "process_sentinel2_stac_item",
+    "process_sentinel2_stac_item",\n    "process_sentinel2_stac_items",
     "search_sentinel2_scenes",
     "read_sentinel2_ndvi_window",
 ]
