@@ -89,6 +89,14 @@ function clearAuthenticatedWorkspaceState() {
   recentObservations = [];
   recentEngineExecutions = [];
   engineExecutionHistoryRequestId++;
+  const engineHistoryPanel = document.getElementById("overviewRecentEngineExecutions");
+  if (engineHistoryPanel) {
+    engineHistoryPanel.replaceChildren();
+    const clearedState = document.createElement("p");
+    clearedState.className = "muted";
+    clearedState.textContent = "Connectez-vous pour charger les analyses de l’organisation.";
+    engineHistoryPanel.appendChild(clearedState);
+  }
   initializationWarnings = [];
 
   const cultureDetailPanel = document.getElementById("cultureDetailPanel");
