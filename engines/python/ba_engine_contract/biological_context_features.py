@@ -30,19 +30,24 @@ def _iso(value: datetime) -> str:
 def analyze_biological_context_features(request: Mapping[str, Any]) -> dict[str, Any]:
     """Build a bounded, provenance-preserving context assessment."""
     validate_request(request)
-    if request["engine"] != {
-        "engine_id": "biological.context.features",
-        "engine_version": "0.1.0",
-    }:
+    engine_identity = request["engine"]
+    if engine_identity.get("engine_id") != "biological.context.features" or engine_identity.get("engine_version") not in {"0.1.0", "0.2.0"}:
         raise ValueError("unsupported_engine_identity")
 
     scope = request["scope"]
     culture_id = scope.get("culture_id")
+    plant_culture_id = scope.get("plant_culture_id")
     batch_id = scope.get("batch_id")
-    if bool(culture_id) == bool(batch_id):
+    subject_values = [culture_id, plant_culture_id, batch_id]
+    if sum(value is not None for value in subject_values) != 1:
         raise ValueError("exactly_one_biological_subject_required")
     if batch_id:
         raise ValueError("batch_subject_adapter_not_yet_supported")
+    if plant_culture_id and engine_identity["engine_version"] != "0.2.0":
+        raise ValueError("plant_subject_requires_engine_version_0_2_0")
+    subject_field = "plant_culture_id" if plant_culture_id else "culture_id"
+    subject_id = plant_culture_id or culture_id
+    subject_type = "plant" if plant_culture_id else "culture"
 
     parameters = request["parameters"]
     window_start = _timestamp(parameters.get("window_start"), "window_start")
@@ -74,8 +79,8 @@ def analyze_biological_context_features(request: Mapping[str, Any]) -> dict[str,
             if data.get("quality_state") == "excluded":
                 excluded.append({"record_id": record_id, "reason": "measurement_quality_state_excluded"})
                 continue
-            if context.get("culture_id") != culture_id:
-                excluded.append({"record_id": record_id, "reason": "measurement_culture_scope_mismatch"})
+            if context.get(subject_field) != subject_id:
+                excluded.append({"record_id": record_id, "reason": f"measurement_{subject_type}_scope_mismatch"})
                 continue
             variable = data.get("variable_code")
             value = data.get("normalized_value")
@@ -198,9 +203,9 @@ def analyze_biological_context_features(request: Mapping[str, Any]) -> dict[str,
         missing_context.append("genetic_reference_unresolved")
     environment_link_state = parameters.get("environment_link_state")
     if environment_link_state == "unlinked":
-        missing_context.append("culture_environment_not_linked")
+        missing_context.append("plant_environment_not_linked" if plant_culture_id else "culture_environment_not_linked")
     elif environment_link_state == "environment_without_location":
-        missing_context.append("culture_environment_location_missing")
+        missing_context.append("plant_environment_location_missing" if plant_culture_id else "culture_environment_location_missing")
     elif environment_link_state == "ambiguous":
         missing_context.append("analysis_window_environment_ambiguous")
     elif environment_link_state == "conflict":
@@ -243,7 +248,6 @@ def analyze_biological_context_features(request: Mapping[str, Any]) -> dict[str,
     if environmental_sources:
         quality_flags.append("external_environmental_estimates_present")
 
-    subject_id = culture_id or batch_id
     return {
         "outcome": "success" if observed_times else "insufficient_data",
         "value": {
@@ -251,9 +255,10 @@ def analyze_biological_context_features(request: Mapping[str, Any]) -> dict[str,
             "result_version": "1.0.0",
             "subject": {
                 "organization_id": scope["organization_id"],
-                "subject_type": "culture",
+                "subject_type": subject_type,
                 "subject_id": subject_id,
                 "culture_id": culture_id,
+                "plant_culture_id": plant_culture_id,
                 "batch_id": None,
                 "experimental_unit_id": None,
                 "experiment_id": None,
@@ -288,11 +293,11 @@ def analyze_biological_context_features(request: Mapping[str, Any]) -> dict[str,
         "limitations": [
             "This engine reports coverage and descriptive features only; it does not diagnose biological state or recommend interventions.",
             "Provider-derived environmental observations remain distinct from local in-situ measurements.",
-            "A culture-to-environment relationship must be verified by the trusted source adapter before environmental observations are included.",
+            "A biological-subject-to-environment relationship must be verified by the trusted source adapter before environmental observations are included.",
         ],
         "quality_flags": sorted(set(quality_flags)),
         "provenance": {
-            "algorithm": "biological-context-features-v1",
+            "algorithm": "biological-context-features-v2" if engine_identity["engine_version"] == "0.2.0" else "biological-context-features-v1",
             "libraries": [],
             "source_references": sorted(f"{provider}/{dataset}" for provider, dataset in environmental_sources),
         },
