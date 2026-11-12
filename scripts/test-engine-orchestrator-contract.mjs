@@ -24,5 +24,5 @@ for (const [name, pattern] of checks) {
 const sourceReadStart = source.indexOf("const { data: measurements");
 const sourceReadEnd = source.indexOf("const records = measurements.map", sourceReadStart);
 assert.ok(sourceReadStart >= 0 && sourceReadEnd > sourceReadStart, "measurement snapshot query boundary exists");
-assert.doesNotMatch(source.slice(sourceReadStart, sourceReadEnd), /\\.update\\(/, "raw source measurements are never updated");
+assert.doesNotMatch(source.slice(sourceReadStart, sourceReadEnd), /\.update\(/, "raw source measurements are never updated");
 console.log("Engine orchestration boundary contract passed");
