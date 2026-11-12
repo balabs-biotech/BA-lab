@@ -28,6 +28,7 @@ for (const field of ["variable_code","value_text","observed_at","context"]) {
 }
 assert.equal(record.properties.contract.const, "BA-LABS/JSON");
 assert.equal(record.properties.contract_version.const, "1.0.0");
+assert.equal(record.properties.provenance.properties.review_status.const, "unreviewed");
 assert.deepEqual(measurement.dependentRequired, { normalized_value: ["normalized_unit_code"], normalized_unit_code: ["normalized_value"] });
 assert.equal(measurement.properties.quality_state.const, "raw");
 assert.equal(observation.properties.quality_state.const, "raw");
