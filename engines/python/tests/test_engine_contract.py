@@ -11,6 +11,7 @@ from ba_engine_contract.environmental_timeseries_qc import run_environmental_tim
 
 ROOT = Path(__file__).resolve().parents[3]
 SCHEMA_DIR = ROOT / "schemas" / "engine" / "v1"
+REGISTRY_DIR = ROOT / "engines" / "python" / "registry"
 
 
 def load_schema(name: str) -> dict:
@@ -75,6 +76,28 @@ class EngineContractTests(unittest.TestCase):
     def setUpClass(cls):
         cls.request_validator = validator(load_schema("request.schema.json"))
         cls.response_validator = validator(load_schema("response.schema.json"))
+
+
+    def test_registered_environmental_engine_manifest_is_valid_and_sandboxed(self):
+        schema = load_schema("manifest.schema.json")
+        manifest = json.loads((REGISTRY_DIR / "environmental.timeseries.qc-0.1.0.json").read_text(encoding="utf-8"))
+        manifest_validator = validator(schema)
+        self.assertEqual(list(manifest_validator.iter_errors(manifest)), [])
+        self.assertFalse(manifest["capabilities"]["database_access"])
+        self.assertFalse(manifest["capabilities"]["network_access"])
+        self.assertTrue(manifest["determinism"]["deterministic_analysis"])
+
+    def test_engine_manifest_rejects_network_or_database_capability(self):
+        schema = load_schema("manifest.schema.json")
+        manifest = json.loads((REGISTRY_DIR / "environmental.timeseries.qc-0.1.0.json").read_text(encoding="utf-8"))
+        manifest["capabilities"]["network_access"] = True
+        self.assertTrue(list(validator(schema).iter_errors(manifest)))
+
+    def test_engine_manifest_rejects_unbounded_resource_limits(self):
+        schema = load_schema("manifest.schema.json")
+        manifest = json.loads((REGISTRY_DIR / "environmental.timeseries.qc-0.1.0.json").read_text(encoding="utf-8"))
+        manifest["resource_limits"]["timeout_seconds"] = 9999
+        self.assertTrue(list(validator(schema).iter_errors(manifest)))
 
     def test_valid_request_and_result(self):
         self.assertEqual(list(self.request_validator.iter_errors(REQUEST)), [])
