@@ -20,7 +20,7 @@ from urllib.parse import urlsplit
 from .registry import load_engine
 from .validation import ContractValidationError, validate_request, validate_response
 
-MAX_BODY_BYTES = 48_000
+MAX_BODY_BYTES = 256_000
 MAX_RESPONSE_BYTES = 128_000
 MAX_CONCURRENCY = 2
 CONNECTION_TIMEOUT_SECONDS = 10
