@@ -1,6 +1,6 @@
 # Biological Intelligence Engine — architecture contract v1
 
-Status: design contract. This document defines the first safe integration boundary; it does not claim that biological inference is implemented or deployed.
+Status: architecture and implementation contract. The deterministic context-coverage slice is implemented on stacked feature branches; biological inference and production deployment are not claimed.
 
 ## 1. Purpose
 
@@ -147,4 +147,6 @@ The CultureOps execution-history interface has a dedicated BIE result renderer i
 
 **Production rollout is not complete.** A direct inspection of the connected Supabase project on 2026-11-12 found that the engine execution tables and the `engine-orchestrator` Edge Function are not deployed there, and the three engine-ledger migrations are absent from `supabase_migrations.schema_migrations`. No production migration, function deployment, worker configuration or BIE feature-flag activation has been performed.
 
-Next steps: finish CI for the empty-snapshot migration regression; integrate the stacked PRs in dependency order; deploy the ledger migrations; deploy the orchestrator and Python worker; configure server-side worker credentials and the BIE flag only after the worker registry and authorization checks are verified; then run an authenticated end-to-end test for both a populated snapshot and an empty snapshot. Keep biological recommendations, strain ranking and autonomous interventions out of scope until validated domain datasets and methods exist.
+Verification update (2026-11-12): PR #283 passed all 10 CI jobs, including the empty-snapshot persistence regression and migration replay. PR #299 passed all 10 CI jobs, including the BIE results UI browser smoke test. PR #294 has a new CI run queued for the biological-context enrichment changes; do not treat that tranche as verified until its jobs complete.
+
+Next steps: finish CI for PR #294; integrate the stacked PRs in dependency order; deploy the ledger migrations; deploy the orchestrator and Python worker; configure server-side worker credentials and the BIE flag only after the worker registry and authorization checks are verified; then run authenticated end-to-end tests for populated, missing-context and empty snapshots. The live project currently has no biological-context rows, so first populate and validate those records through CultureOps before expecting strain-specific context output. Keep biological recommendations, strain ranking and autonomous interventions out of scope until validated domain datasets and methods exist.
