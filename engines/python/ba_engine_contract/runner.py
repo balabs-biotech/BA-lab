@@ -80,7 +80,7 @@ def execute_engine(request: Mapping[str, Any], engine: EngineSpec) -> dict[str, 
                 "retryable": error.retryable,
             },
         }
-    except Exception:
+    except Exception as error:
         response = {
             "contract": "BA-LABS/ENGINE-RESULT",
             "contract_version": "1.0.0",
@@ -95,6 +95,7 @@ def execute_engine(request: Mapping[str, Any], engine: EngineSpec) -> dict[str, 
                 "code": "engine_execution_failed",
                 "message": "The engine failed unexpectedly",
                 "retryable": False,
+                "details": {"exception_type": type(error).__name__},
             },
         }
 
