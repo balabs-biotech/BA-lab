@@ -2789,3 +2789,41 @@ body[data-domain] :is(button, input, select, textarea, a, [tabindex]):focus-visi
   outline: 3px solid var(--focus) !important;
   outline-offset: 3px;
 }
+
+
+/* Engine history comparison controls: compact, responsive and keyboard-accessible. */
+.engine-comparison {
+  display: grid;
+  gap: 0.75rem;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border: 1px solid var(--border, #64748b);
+  border-radius: 0.75rem;
+  background: var(--surface-soft, rgba(127, 127, 127, 0.08));
+}
+.engine-comparison-controls {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+.engine-comparison-controls label {
+  display: grid;
+  gap: 0.35rem;
+  min-width: 0;
+  font-size: 0.875rem;
+}
+.engine-comparison-select {
+  width: 100%;
+  min-width: 0;
+}
+.engine-comparison-output {
+  overflow-wrap: anywhere;
+}
+.engine-comparison-output ul {
+  padding-left: 1.25rem;
+}
+@media (max-width: 560px) {
+  .engine-comparison-controls {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
