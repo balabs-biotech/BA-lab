@@ -63,10 +63,10 @@ declare
   v_result_id uuid;
   v_payload jsonb;
 begin
-  if jsonb_typeof(p_result) <> 'object'
-    or p_result->>'contract' <> 'BA-LABS/ENGINE-RESULT'
-    or p_result->>'status' <> 'completed'
-    or jsonb_typeof(p_result->'result') <> 'object' then
+  if jsonb_typeof(p_result) is distinct from 'object'
+    or p_result->>'contract' is distinct from 'BA-LABS/ENGINE-RESULT'
+    or p_result->>'status' is distinct from 'completed'
+    or jsonb_typeof(p_result->'result') is distinct from 'object' then
     raise exception 'invalid completed engine result envelope' using errcode = '22023';
   end if;
 
@@ -84,11 +84,12 @@ begin
   end if;
 
   v_payload := p_result->'result';
-  if v_payload->>'outcome' not in ('success','insufficient_data','out_of_domain','review_required')
-    or jsonb_typeof(v_payload->'value') <> 'object'
-    or jsonb_typeof(v_payload->'limitations') <> 'array'
-    or jsonb_typeof(v_payload->'quality_flags') <> 'array'
-    or jsonb_typeof(v_payload->'provenance') <> 'object' then
+  if v_payload->>'outcome' is null
+    or v_payload->>'outcome' not in ('success','insufficient_data','out_of_domain','review_required')
+    or jsonb_typeof(v_payload->'value') is distinct from 'object'
+    or jsonb_typeof(v_payload->'limitations') is distinct from 'array'
+    or jsonb_typeof(v_payload->'quality_flags') is distinct from 'array'
+    or jsonb_typeof(v_payload->'provenance') is distinct from 'object' then
     raise exception 'result payload is missing required structured fields' using errcode = '22023';
   end if;
 
