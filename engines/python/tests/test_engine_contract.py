@@ -740,5 +740,62 @@ class EngineContractTests(unittest.TestCase):
             validate_request(non_biological)
 
 
+    def test_biological_context_features_preserves_time_bounded_genetic_context(self):
+        request = json.loads(json.dumps(REQUEST))
+        request["engine"] = {
+            "engine_id": "biological.context.features",
+            "engine_version": "0.1.0",
+        }
+        request["scope"] = {
+            "organization_id": REQUEST["scope"]["organization_id"],
+            "culture_id": "2c2b3a4d-5e6f-4789-8123-456789abcdef",
+        }
+        strain_id = "99999999-9999-4999-8999-999999999999"
+        organism_id = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaab"
+        request["parameters"] = {
+            "window_start": "2026-11-10T00:00:00Z",
+            "window_end": "2026-11-11T00:00:00Z",
+            "timezone": "Africa/Algiers",
+            "biological_context_supplied": True,
+            "biological_contexts": [{
+                "context_id": "77777777-7777-4777-8777-777777777777",
+                "valid_from": "2026-11-01",
+                "valid_to": None,
+                "organism_kind": "fungus",
+                "taxon_code": "PLEURO",
+                "strain_code": "HK35",
+                "cultivar_code": None,
+                "culture_stage": "fruiting",
+                "substrate_code": "straw",
+                "production_system": "monotub",
+                "context_tags": ["fruiting-run"],
+                "genetic_reference": {
+                    "status": "resolved",
+                    "strain_id": strain_id,
+                    "organism_id": organism_id,
+                    "designation": "HK35",
+                    "origin": "reference collection",
+                    "source_description": "verified strain record",
+                    "scientific_name": "Pleurotus ostreatus",
+                    "common_name": "Oyster mushroom",
+                    "taxonomy_source": "NCBI",
+                    "taxonomy_id": "NCBI:fungus-example",
+                },
+            }],
+        }
+        request["input"]["record_ids"] = []
+        request["input"]["records"] = []
+        result = execute_registered_engine(request)
+        self.assertEqual(result["status"], "completed", msg=str(result.get("error")))
+        value = result["result"]["value"]
+        biological_schema = json.loads((ROOT / "schemas" / "biological" / "v1" / "context-assessment.schema.json").read_text(encoding="utf-8"))
+        Draft202012Validator(biological_schema, format_checker=FormatChecker()).validate(value)
+        self.assertEqual(value["subject"]["genetic_reference_ids"], [strain_id])
+        self.assertEqual(value["subject"]["biological_contexts"][0]["culture_stage"], "fruiting")
+        self.assertEqual(value["subject"]["biological_contexts"][0]["genetic_reference"]["scientific_name"], "Pleurotus ostreatus")
+        self.assertNotIn("biological_context_not_recorded", value["coverage"]["missing_context"])
+        self.assertEqual(result["result"]["outcome"], "insufficient_data")
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
