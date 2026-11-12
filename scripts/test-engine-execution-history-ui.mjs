@@ -105,6 +105,25 @@ const initialPairHelperStart = tracker.indexOf("function findInitialComparableEn
 assert.ok(candidateHelperStart >= 0, "compatible candidate filtering helper must exist");
 assert.ok(initialPairHelperStart > candidateHelperStart, "initial compatible pair helper must exist");
 
+const candidateHelpersEnd = tracker.indexOf("function renderEngineExecutionComparison(", candidateHelperStart);
+const candidateHelpers = tracker.slice(candidateHelperStart, candidateHelpersEnd);
+const candidateFunctions = new Function(
+  "areEngineExecutionsComparable",
+  candidateHelpers + "; return { getComparableEngineExecutionCandidates, findInitialComparableEnginePair };"
+)((left, right) => left.compatible === true && right.compatible === true && left.id !== right.id);
+const candidateA = { id: "candidate-a", compatible: true };
+const candidateB = { id: "candidate-b", compatible: true };
+const candidateC = { id: "candidate-c", compatible: false };
+assert.deepEqual(
+  candidateFunctions.getComparableEngineExecutionCandidates(candidateA, [candidateA, candidateB, candidateC]).map((item) => item.id),
+  ["candidate-b"]
+);
+assert.deepEqual(
+  candidateFunctions.findInitialComparableEnginePair([candidateA, candidateC, candidateB]).map((item) => item.id),
+  ["candidate-a", "candidate-b"]
+);
+assert.equal(candidateFunctions.findInitialComparableEnginePair([candidateA, candidateC]), null);
+
 assert.equal(compareExecutions(executionA, executionB), true);
 assert.equal(compareExecutions(executionA, { ...executionB, id: executionA.id }), false);
 assert.equal(compareExecutions(executionA, { ...executionB, engine_id: "other.engine" }), false);
