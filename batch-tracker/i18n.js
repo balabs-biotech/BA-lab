@@ -723,7 +723,19 @@
     ["Lecture des contextes végétaux :", "Reading plant contexts:", "Leitura dos contextos vegetais:", "قراءة السياقات النباتية:"],
     ["Vérification des périodes impossible :", "Could not validate periods:", "Não foi possível validar os períodos:", "تعذّر التحقق من الفترات:"],
     ["Contexte végétal clôturé.", "Plant context closed.", "Contexto vegetal fechado.", "تم إغلاق السياق النباتي."],
-    ["Le contexte végétal a changé pendant la clôture. Rechargez la fiche.", "The plant context changed during closure. Reload the record.", "O contexto vegetal mudou durante o fecho. Recarregue a ficha.", "تغير السياق النباتي أثناء الإغلاق. أعد تحميل السجل."]
+    ["Le contexte végétal a changé pendant la clôture. Rechargez la fiche.", "The plant context changed during closure. Reload the record.", "O contexto vegetal mudou durante o fecho. Recarregue a ficha.", "تغير السياق النباتي أثناء الإغلاق. أعد تحميل السجل."],
+    ["Évaluation du contexte biologique · BIE v0.2", "Biological context assessment · BIE v0.2", "Avaliação do contexto biológico · BIE v0.2", "تقييم السياق البيولوجي · BIE v0.2"],
+    ["Lancez une évaluation descriptive sur une fenêtre datée. Le moteur mesure la couverture, la traçabilité et les séries disponibles ; il ne pose pas de diagnostic et ne formule pas de recommandation.", "Run a descriptive assessment over a dated window. The engine measures coverage, traceability and available series; it does not diagnose or recommend interventions.", "Execute uma avaliação descritiva numa janela temporal. O motor mede a cobertura, a rastreabilidade e as séries disponíveis; não faz diagnósticos nem recomenda intervenções.", "أطلق تقييماً وصفياً ضمن فترة زمنية محددة. يقيس المحرك التغطية وإمكانية التتبع والسلاسل المتاحة؛ ولا يقدم تشخيصاً أو توصيات."],
+    ["Début de la fenêtre", "Window start", "Início da janela", "بداية الفترة"],
+    ["Fin de la fenêtre (exclue)", "Window end (exclusive)", "Fim da janela (exclusivo)", "نهاية الفترة (غير مشمولة)"],
+    ["Évaluer avec le BIE", "Assess with BIE", "Avaliar com o BIE", "التقييم باستخدام BIE"],
+    ["Le moteur doit être déployé et activé côté serveur pour exécuter cette évaluation.", "The engine must be deployed and enabled server-side to run this assessment.", "O motor tem de estar implementado e ativado no servidor para executar esta avaliação.", "يجب نشر المحرك وتفعيله على الخادم لتنفيذ هذا التقييم."],
+    ["Choisissez une fenêtre valide : la date de fin est exclusive et doit suivre le début.", "Choose a valid window: the end date is exclusive and must follow the start date.", "Escolha uma janela válida: a data final é exclusiva e deve ser posterior à inicial.", "اختر فترة صالحة: تاريخ النهاية غير مشمول ويجب أن يأتي بعد تاريخ البداية."],
+    ["Le service engine-orchestrator n’est pas encore déployé.", "The engine-orchestrator service is not deployed yet.", "O serviço engine-orchestrator ainda não foi implementado.", "لم يتم نشر خدمة engine-orchestrator بعد."],
+    ["Le BIE v0.2 n’est pas encore activé côté serveur (BA_BIE_ENABLED).", "BIE v0.2 is not enabled server-side yet (BA_BIE_ENABLED).", "O BIE v0.2 ainda não está ativado no servidor (BA_BIE_ENABLED).", "لم يتم تفعيل BIE v0.2 على الخادم بعد (BA_BIE_ENABLED)."],
+    ["Préparation du snapshot biologique authentifié…", "Preparing the authenticated biological snapshot…", "A preparar o snapshot biológico autenticado…", "جارٍ إعداد اللقطة البيولوجية الموثقة…"],
+    ["Évaluation enregistrée", "Assessment recorded", "Avaliação registada", "تم تسجيل التقييم"],
+    ["Évaluation transmise. Consultez l’historique des exécutions.", "Assessment submitted. Check execution history.", "Avaliação enviada. Consulte o histórico de execuções.", "تم إرسال التقييم. راجع سجل التنفيذ."]
   ];
   for (const [fr, en, pt, ar] of supplementalCoverage) {
     dictionaries.en[fr] ||= en;
