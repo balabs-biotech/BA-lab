@@ -516,4 +516,4 @@ assert.ok(brandCss.includes('PHASE 13 — research principles as an editorial co
 assert.ok(brandCss.includes('#app.balabs-ui > main > .under .tile::before'), 'Each principle must carry a clear editorial index');
 assert.ok(brandCss.includes('box-shadow:none !important') && brandCss.includes('border-radius:0 !important'), 'Closing principles must not regress to generic rounded tiles');
 assert.ok(brandCss.includes('grid-template-columns:repeat(4,minmax(0,1fr)) !important'), 'Closing principles must form a four-column desktop colophon');
-assert.ok(pub.includes('brand-system.css?v=13') && prev.includes('brand-system.css?v=13'), 'Public and preview must use the same Phase 13 stylesheet');
+assert.ok(html.includes('brand-system.css?v=13') && previewHtml.includes('brand-system.css?v=13'), 'Public and preview must use the same Phase 13 stylesheet');
