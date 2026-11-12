@@ -63,6 +63,7 @@ def test_private_worker_route_forwards_user_jwt_and_validated_scope(monkeypatch)
 
     assert response.status_code == 200
     assert response.json()["observations_submitted"] == 2
+    assert response.json()["scene_failures"] == []
     assert captured["user_authorization"] == "Bearer end-user-jwt"
     assert captured["supabase_api_key"] == "test-publishable-key"
     assert str(captured["organization_id"]) == payload["organization_id"]
