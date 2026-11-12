@@ -9,6 +9,7 @@ from datetime import date, datetime, time, timedelta, timezone
 from typing import Any
 from uuid import UUID
 
+from ba_environmental_engine.sources.models import NormalizedEnvironmentalObservation
 from ba_environmental_engine.sources.sentinel2 import normalize_sentinel2_observation
 
 
@@ -52,7 +53,7 @@ class SupabaseSatelliteObservationRepository:
         location_id: str | UUID,
         from_date: date,
         to_date: date,
-    ) -> tuple[Any, ...]:
+    ) -> tuple[NormalizedEnvironmentalObservation, ...]:
         """Return UTC-date-window NDVI observations, preserving every source row.
 
         The database query is tenant and location scoped. Returned rows are
@@ -79,11 +80,15 @@ class SupabaseSatelliteObservationRepository:
         )
 
         rows = self._data(response) or []
-        observations = []
+        if not isinstance(rows, list):
+            raise RuntimeError("Supabase response data must be a list of observation rows")
+        observations: list[NormalizedEnvironmentalObservation] = []
         for row in rows:
-            if str(row.get("organization_id")) != str(org_id):
+            if not isinstance(row, dict):
+                raise ValueError("persisted satellite observation row must be an object")
+            if self._uuid(row.get("organization_id"), "organization_id") != org_id:
                 raise ValueError("persisted satellite observation organization does not match scope")
-            if str(row.get("location_id")) != str(loc_id):
+            if self._uuid(row.get("location_id"), "location_id") != loc_id:
                 raise ValueError("persisted satellite observation location does not match scope")
             observation = normalize_sentinel2_observation(row)
             if not start_at <= observation.observed_at.isoformat() < end_at:
