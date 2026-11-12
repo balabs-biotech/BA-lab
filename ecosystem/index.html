@@ -3964,25 +3964,32 @@ h1 span{
  const detail=root.querySelector('#methodDetail');
  const titles={observe:'methodObserve',question:'methodQuestion',test:'methodTest',share:'methodShare'};
  const indices={observe:'01',question:'02',test:'03',share:'04'};
- document.querySelectorAll('[data-lang]').forEach(button=>button.addEventListener('click',()=>{detail.hidden=true;root.querySelectorAll('[data-method-step]').forEach(item=>item.setAttribute('aria-expanded','false'));}));
- root.querySelectorAll('[data-method-step]').forEach(button=>{
-  button.addEventListener('click',()=>{
-   const key=button.dataset.methodStep;
-   const wasOpen=button.getAttribute('aria-expanded')==='true';
-   root.querySelectorAll('[data-method-step]').forEach(item=>item.setAttribute('aria-expanded','false'));
-   if(wasOpen){detail.hidden=true;return;}
-   button.setAttribute('aria-expanded','true');
-   const dict=typeof T!=='undefined'?(T[document.documentElement.lang]||T.fr||{}):{};
-   const lang=document.documentElement.lang||'fr';
-   const name=root.querySelector('[data-i18n="'+titles[key]+'"]')?.textContent||key;
-   detail.querySelector('#methodDetailIndex').textContent=indices[key]+' / '+({fr:'NOTE DE MÉTHODE',en:'METHOD NOTE',ar:'مذكرة منهجية',pt:'NOTA DE MÉTODO'}[lang]||'METHOD NOTE');
-   detail.querySelector('#methodDetailTitle').textContent=name;
-   detail.querySelector('#methodDetailText').textContent=dict['method'+({observe:'Observe',question:'Question',test:'Test',share:'Share'}[key])+'Detail']||'';
-   detail.querySelector('#methodDetailOutput').textContent=dict['method'+({observe:'Observe',question:'Question',test:'Test',share:'Share'}[key])+'Output']||'';
-   detail.querySelector('#methodOutputLabel').textContent=({fr:'TRACE À PRODUIRE',en:'EXPECTED RECORD',ar:'الأثر المطلوب',pt:'REGISTO ESPERADO'}[lang]||'EXPECTED RECORD');
-   detail.hidden=false;
-   detail.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'nearest'});
-  });
+ const labels={fr:'NOTE DE MÉTHODE',en:'METHOD NOTE',ar:'مذكرة منهجية',pt:'NOTA DE MÉTODO'};
+ const outputs={fr:'TRACE À PRODUIRE',en:'EXPECTED RECORD',ar:'الأثر المطلوب',pt:'REGISTO ESPERADO'};
+ const clear=()=>{detail.hidden=true;root.querySelectorAll('[data-method-step]').forEach(item=>item.setAttribute('aria-expanded','false'));};
+ document.addEventListener('click',event=>{
+  if(event.target.closest('[data-lang]'))clear();
+ });
+ root.addEventListener('click',event=>{
+  const button=event.target.closest('[data-method-step]');
+  if(!button||!root.contains(button))return;
+  const key=button.dataset.methodStep;
+  if(!titles[key])return;
+  const wasOpen=button.getAttribute('aria-expanded')==='true';
+  root.querySelectorAll('[data-method-step]').forEach(item=>item.setAttribute('aria-expanded','false'));
+  if(wasOpen){detail.hidden=true;return;}
+  button.setAttribute('aria-expanded','true');
+  const lang=document.documentElement.lang||'fr';
+  const dict=typeof T!=='undefined'?(T[lang]||T.fr||{}):{};
+  const name=root.querySelector('[data-i18n="'+titles[key]+'"]')?.textContent||key;
+  const suffix={observe:'Observe',question:'Question',test:'Test',share:'Share'}[key];
+  detail.querySelector('#methodDetailIndex').textContent=indices[key]+' / '+(labels[lang]||labels.en);
+  detail.querySelector('#methodDetailTitle').textContent=name;
+  detail.querySelector('#methodDetailText').textContent=dict['method'+suffix+'Detail']||'';
+  detail.querySelector('#methodDetailOutput').textContent=dict['method'+suffix+'Output']||'';
+  detail.querySelector('#methodOutputLabel').textContent=outputs[lang]||outputs.en;
+  detail.hidden=false;
+  detail.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'nearest'});
  });
 })();
 </script>
