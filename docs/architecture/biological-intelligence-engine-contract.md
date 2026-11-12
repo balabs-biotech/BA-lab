@@ -149,6 +149,16 @@ The CultureOps execution-history interface has a dedicated BIE result renderer i
 
 **Production rollout is not complete.** A direct inspection of the connected Supabase project on 2026-11-12 found that the engine execution tables and the `engine-orchestrator` Edge Function are not deployed there, and the three engine-ledger migrations are absent from `supabase_migrations.schema_migrations`. No production migration, function deployment, worker configuration or BIE feature-flag activation has been performed.
 
-Verification update (2026-11-12): PR #283 passed all 10 CI jobs, including the empty-snapshot persistence regression and migration replay. PR #299 passed all 10 CI jobs, including the BIE results UI browser smoke test. PR #294 has a new CI run queued for the biological-context enrichment changes; do not treat that tranche as verified until its jobs complete.
+Verification update (2026-11-12): PR #283 passed all 10 CI jobs, including the empty-snapshot persistence regression and migration replay. PR #299 passed all 10 CI jobs, including the BIE results UI browser smoke test. PR #294's biological-context editor tranche passed all 10 CI jobs, including browser smoke and migration replay. A subsequent database temporal-integrity migration and regression test have been added to PR #294 and are awaiting their own CI run.
 
 Next steps: finish CI for PR #294; integrate the stacked PRs in dependency order; deploy the ledger migrations; deploy the orchestrator and Python worker; configure server-side worker credentials and the BIE flag only after the worker registry and authorization checks are verified; then run authenticated end-to-end tests for populated, missing-context and empty snapshots. The live project currently has no biological-context rows, so first populate and validate those records through CultureOps before expecting strain-specific context output. Keep biological recommendations, strain ranking and autonomous interventions out of scope until validated domain datasets and methods exist.
+
+
+## Temporal integrity for biological contexts (2026-11-12)
+
+- Migration `20261112040000_prevent_biological_context_overlap.sql` adds a PostgreSQL GiST exclusion constraint over tenant, domain, biological subject and the half-open date range `[valid_from, valid_to)`.
+- The constraint rejects overlapping context windows even when writes bypass the CultureOps editor or occur concurrently; adjacent intervals remain valid because `valid_to` is exclusive.
+- The existing validity check now rejects empty and inverted windows (`valid_to <= valid_from`), rather than permitting zero-length contexts.
+- A migration preflight fails explicitly if legacy rows contain invalid or overlapping intervals; the production audit on 2026-11-12 found zero context rows and therefore no existing conflicts.
+- Regression test `supabase/tests/biological_contexts_temporal_integrity.test.sql` checks the deployed constraint catalog entry, adjacency, overlap rejection, subject isolation and empty-window rejection.
+- This migration is committed to PR #294 only. It has not been applied to the live Supabase project.
