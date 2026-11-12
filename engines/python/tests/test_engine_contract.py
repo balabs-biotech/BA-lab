@@ -3,6 +3,7 @@ import unittest
 from pathlib import Path
 
 from jsonschema import Draft202012Validator, FormatChecker
+from ba_engine_contract.validation import ContractValidationError, validate_request, validate_response
 
 ROOT = Path(__file__).resolve().parents[3]
 SCHEMA_DIR = ROOT / "schemas" / "engine" / "v1"
@@ -102,6 +103,29 @@ class EngineContractTests(unittest.TestCase):
         invalid = json.loads(json.dumps(RESPONSE))
         invalid["result"]["confidence"] = {"value": 0.92}
         self.assertTrue(list(self.response_validator.iter_errors(invalid)))
+
+
+    def test_runtime_validator_accepts_matching_request_and_response(self):
+        validate_request(REQUEST)
+        validate_response(RESPONSE, REQUEST)
+
+    def test_runtime_validator_rejects_record_snapshot_id_mismatch(self):
+        invalid = json.loads(json.dumps(REQUEST))
+        invalid["input"]["records"][0]["record_id"] = "5c2b3a4d-5e6f-4789-8123-456789abcdef"
+        with self.assertRaises(ContractValidationError):
+            validate_request(invalid)
+
+    def test_runtime_validator_binds_result_to_exact_request(self):
+        invalid = json.loads(json.dumps(RESPONSE))
+        invalid["input_snapshot_sha256"] = "d" * 64
+        with self.assertRaises(ContractValidationError):
+            validate_response(invalid, REQUEST)
+
+    def test_runtime_validator_rejects_engine_version_drift(self):
+        invalid = json.loads(json.dumps(RESPONSE))
+        invalid["engine"]["engine_version"] = "0.2.0"
+        with self.assertRaises(ContractValidationError):
+            validate_response(invalid, REQUEST)
 
     def test_unknown_fields_are_rejected_at_envelope_boundaries(self):
         invalid = json.loads(json.dumps(REQUEST))
