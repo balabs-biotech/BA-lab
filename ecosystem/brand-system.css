@@ -2070,3 +2070,174 @@
  #app.balabs-ui > main > .universe-index .universe-index-card > span { font-size: 24px !important; }
  #app.balabs-ui > main > .universe-index .universe-index-card b { font-size: 29px !important; }
 }
+
+
+/* PHASE 10 — field-report project index.
+   Three research tracks become one continuous editorial sequence, not product cards. */
+#app.balabs-ui > main > .editorial-work {
+  padding: clamp(68px,8vw,116px) clamp(18px,5vw,72px) !important;
+  background: #111B1D !important;
+}
+#app.balabs-ui > main > .editorial-work .work-heading {
+  display: grid !important;
+  grid-template-columns: minmax(0,1fr) minmax(220px,.48fr) !important;
+  align-items: end !important;
+  gap: 36px !important;
+  margin-bottom: 48px !important;
+}
+#app.balabs-ui > main > .editorial-work .work-heading h2 {
+  max-width: 850px !important;
+  font: 400 clamp(48px,6.8vw,90px)/.9 Georgia,serif !important;
+  letter-spacing: -.07em !important;
+}
+#app.balabs-ui > main > .editorial-work .work-heading h2 em {
+  color: #B96B4D !important;
+  font-style: italic !important;
+}
+#app.balabs-ui > main > .editorial-work .work-heading p {
+  max-width: 330px !important;
+  margin: 0 0 5px auto !important;
+  color: #9BAEA4 !important;
+  font-size: 12px !important;
+  line-height: 1.8 !important;
+}
+#app.balabs-ui > main > .editorial-work .work-grid {
+  display: grid !important;
+  grid-template-columns: minmax(0,1fr) !important;
+  border-top: 1px solid rgba(209,208,197,.42) !important;
+}
+#app.balabs-ui > main > .editorial-work .work-card,
+#app.balabs-ui > main > .editorial-work .work-card:nth-child(2),
+#app.balabs-ui > main > .editorial-work .work-card:nth-child(3) {
+  display: grid !important;
+  grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr) !important;
+  grid-template-rows: auto auto auto auto auto auto !important;
+  grid-template-areas: "image index" "image title" "image copy" "image topics" "image tag" "image link" !important;
+  align-content: center !important;
+  align-items: start !important;
+  gap: 11px  clamp(24px,5vw,72px) !important;
+  min-height: 390px !important;
+  padding: 38px 0 !important;
+  border: 0 !important;
+  border-bottom: 1px solid rgba(209,208,197,.32) !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+#app.balabs-ui > main > .editorial-work .work-card:nth-child(2) {
+  grid-template-columns: minmax(0,1.1fr) minmax(0,.9fr) !important;
+  grid-template-areas: "index image" "title image" "copy image" "topics image" "tag image" "link image" !important;
+}
+#app.balabs-ui > main > .editorial-work .work-index { grid-area:index !important; color:#B96B4D !important; font:700 10px/1.4 ui-monospace,monospace !important; letter-spacing:.14em !important; }
+#app.balabs-ui > main > .editorial-work .work-media {
+  grid-area:image !important;
+  position:relative !important;
+  align-self:stretch !important;
+  min-height:300px !important;
+  height:100% !important;
+  margin:0 !important;
+  overflow:hidden !important;
+  background:#263B38 !important;
+  clip-path:polygon(0 0,100% 0,100% 94%,94% 100%,0 100%) !important;
+}
+#app.balabs-ui > main > .editorial-work .work-media img {
+  display:block !important;
+  width:100% !important;
+  height:100% !important;
+  min-height:300px !important;
+  object-fit:cover !important;
+  filter:grayscale(.78) contrast(1.12) brightness(.82) !important;
+  transition:filter .35s ease,transform .65s cubic-bezier(.2,.7,.2,1) !important;
+}
+#app.balabs-ui > main > .editorial-work .work-card:hover .work-media img {
+  filter:grayscale(.18) contrast(1.08) brightness(.96) !important;
+  transform:scale(1.035) !important;
+}
+#app.balabs-ui > main > .editorial-work .work-media figcaption {
+  position:absolute !important;
+  inset:auto 0 0 !important;
+  padding:9px 12px !important;
+  background:linear-gradient(transparent,rgba(17,27,29,.9)) !important;
+  color:#D1D0C5 !important;
+  font:9px/1.4 ui-monospace,monospace !important;
+  text-align:left !important;
+}
+#app.balabs-ui > main > .editorial-work .work-media figcaption a { color:#D1D0C5 !important; }
+#app.balabs-ui > main > .editorial-work .work-card h3 {
+  grid-area:title !important;
+  margin:5px 0 3px !important;
+  color:#F2F1E9 !important;
+  font:400 clamp(34px,4.1vw,56px)/.98 Georgia,serif !important;
+  letter-spacing:-.055em !important;
+}
+#app.balabs-ui > main > .editorial-work .work-card > p:not(.work-topics) {
+  grid-area:copy !important;
+  max-width:48ch !important;
+  margin:0 !important;
+  color:#D1D0C5 !important;
+  font-size:13px !important;
+  line-height:1.8 !important;
+}
+#app.balabs-ui > main > .editorial-work .work-card .work-topics {
+  grid-area:topics !important;
+  margin:4px 0 0 !important;
+  color:#9BAEA4 !important;
+  font:10px/1.7 ui-monospace,monospace !important;
+}
+#app.balabs-ui > main > .editorial-work .work-card .work-tag {
+  grid-area:tag !important;
+  justify-self:start !important;
+  margin-top:7px !important;
+  padding:5px 0 !important;
+  border:0 !important;
+  border-top:1px solid #B96B4D !important;
+  border-radius:0 !important;
+  color:#B96B4D !important;
+  background:transparent !important;
+  font:700 9px/1.5 ui-monospace,monospace !important;
+  letter-spacing:.12em !important;
+}
+#app.balabs-ui > main > .editorial-work .work-card-link {
+  grid-area:link !important;
+  justify-self:start !important;
+  margin-top:8px !important;
+  color:#D1D0C5 !important;
+  font:700 10px/1.5 ui-monospace,monospace !important;
+  letter-spacing:.09em !important;
+  text-decoration:none !important;
+  text-transform:uppercase !important;
+}
+#app.balabs-ui > main > .editorial-work .work-card-link:hover { color:#B96B4D !important; }
+#app.balabs-ui > main > .editorial-work .work-explore {
+  display:inline-flex !important;
+  margin-top:30px !important;
+  padding-bottom:8px !important;
+  border-bottom:1px solid #B96B4D !important;
+  border-radius:0 !important;
+  color:#D1D0C5 !important;
+  font:700 10px/1.5 ui-monospace,monospace !important;
+  letter-spacing:.1em !important;
+  text-decoration:none !important;
+  text-transform:uppercase !important;
+}
+@media(max-width:760px) {
+  #app.balabs-ui > main > .editorial-work { padding:62px 18px !important; }
+  #app.balabs-ui > main > .editorial-work .work-heading { grid-template-columns:1fr !important; gap:18px !important; margin-bottom:28px !important; }
+  #app.balabs-ui > main > .editorial-work .work-heading p { margin:0 !important; }
+  #app.balabs-ui > main > .editorial-work .work-card,
+  #app.balabs-ui > main > .editorial-work .work-card:nth-child(2),
+  #app.balabs-ui > main > .editorial-work .work-card:nth-child(3) {
+    grid-template-columns: minmax(0,1fr) !important;
+    grid-template-rows:auto auto auto auto auto auto auto !important;
+    grid-template-areas:"index" "image" "title" "copy" "topics" "tag" "link" !important;
+    gap:10px !important;
+    min-height:0 !important;
+    padding:27px 0 32px !important;
+  }
+  #app.balabs-ui > main > .editorial-work .work-media { min-height:0 !important; height:auto !important; aspect-ratio:5/4 !important; }
+  #app.balabs-ui > main > .editorial-work .work-media img { min-height:0 !important; height:100% !important; aspect-ratio:5/4 !important; }
+  #app.balabs-ui > main > .editorial-work .work-card h3 { font-size:39px !important; }
+}
+@media(prefers-reduced-motion:reduce) {
+  #app.balabs-ui > main > .editorial-work .work-media img { transition:none !important; }
+}
