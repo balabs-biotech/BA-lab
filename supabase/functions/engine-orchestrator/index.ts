@@ -221,12 +221,14 @@ Deno.serve(async (req: Request) => {
       retrieved_at: row.retrieved_at,
       spatial_resolution_m: row.spatial_resolution_m,
       quality_flag: row.quality_flag,
-      source_url: row.source_url,
-      metadata: row.metadata ?? {},
     },
     context: { location_id: row.location_id },
   }));
-  for (const record of records) record.payload_sha256 = await sha256(stable(record.data) + stable(record.context));
+  const sourceRowById = new Map(sourceRows.map((row) => [row.id, row]));
+  for (const record of records) {
+    const sourceRow = sourceRowById.get(record.record_id);
+    record.payload_sha256 = await sha256(stable(sourceRow) + stable(record.context ?? {}));
+  }
   const recordMap = new Map(records.map((record) => [record.record_id, record]));
   const orderedRecords = recordIds.map((id) => recordMap.get(id)!);
   const snapshotHash = await sha256(stable(orderedRecords));
