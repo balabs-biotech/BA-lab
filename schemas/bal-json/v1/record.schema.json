@@ -54,11 +54,7 @@
           "maxLength": 80
         },
         "review_status": {
-          "enum": [
-            "unreviewed",
-            "reviewed",
-            "rejected"
-          ]
+          "const": "unreviewed"
         },
         "source_model": {
           "type": "string",
