@@ -144,7 +144,7 @@ class LeasedEnvironmentalWorker:
             except Exception:
                 # A transient network failure is treated as lease loss: never
                 # risk writing a result after ownership can no longer be proven.
-                logger.exception("Environmental job heartbeat failed")
+                logger.warning("Environmental job heartbeat failed; lease ownership is uncertain")
                 lost.set()
                 return
 
@@ -198,7 +198,7 @@ class LeasedEnvironmentalWorker:
                 did_work = True
             except Exception:
                 # Do not expose job payloads, credentials, or upstream bodies.
-                logger.exception("Environmental job execution failed; lease will expire for retry")
+                logger.warning("Environmental job execution failed; lease will expire for retry")
                 did_work = True
             if not did_work:
                 shutdown.wait(self._settings.idle_poll_seconds)
