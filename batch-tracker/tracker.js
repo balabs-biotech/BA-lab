@@ -6107,6 +6107,21 @@ async function loadBiologicalContextPanel(cultureId) {
       empty.textContent = "Aucun contexte biologique enregistré pour cette culture.";
       history.appendChild(empty);
     } else {
+      const organismLabels = {
+        fungus: "Champignon", bacterium: "Bactérie", yeast: "Levure",
+        plant: "Végétal", microalgae: "Microalgue", other: "Autre"
+      };
+      const stageLabels = {
+        inoculation: "Inoculation", incubation: "Incubation", colonization: "Colonisation",
+        fruiting: "Fructification", sporulation: "Sporulation", storage: "Conservation",
+        analysis: "Analyse", other: "Autre"
+      };
+      const productionLabels = {
+        petri_dish: "Boîte de Petri", grain_spawn: "Culture sur grain",
+        liquid_culture: "Culture liquide", substrate_block: "Bloc de substrat",
+        monotub: "Monotub", grow_bag: "Sac de culture", tray: "Bac / plateau",
+        bioreactor: "Bioréacteur", greenhouse: "Serre", other: "Autre"
+      };
       contexts.forEach(context => {
         const article = document.createElement("article");
         article.className = "biological-context-record";
@@ -6117,12 +6132,12 @@ async function loadBiologicalContextPanel(cultureId) {
         const environment = environments.find(item => item.id === context.environment_id);
         details.textContent = [
           environment?.name || "Environnement non résolu",
-          context.organism_kind,
+          organismLabels[context.organism_kind] || context.organism_kind,
           context.taxon_code,
-          context.strain_code ? "Souche " + context.strain_code : null,
-          context.culture_stage,
-          context.substrate_code ? "Substrat " + context.substrate_code : null,
-          context.production_system
+          context.strain_code ? "Référence de souche : " + context.strain_code : null,
+          stageLabels[context.culture_stage] || context.culture_stage,
+          context.substrate_code ? "Substrat : " + context.substrate_code : null,
+          productionLabels[context.production_system] || context.production_system
         ].filter(Boolean).join(" · ");
         article.append(heading, details);
         history.appendChild(article);
