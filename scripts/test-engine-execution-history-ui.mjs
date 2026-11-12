@@ -14,6 +14,9 @@ assert.ok(loaderStart >= 0 && rendererStart > loaderStart && overviewStart > ren
 
 const loader = tracker.slice(loaderStart, rendererStart);
 assert.match(loader, /from\("engine_executions"\)/);
+assert.match(loader, /from\("engine_execution_results"\)/);
+assert.match(loader, /input_snapshot_sha256/);
+assert.match(loader, /recentEngineResultsByExecution/);
 assert.match(loader, /\.eq\("organization_id", loadOrganizationId\)/);
 assert.match(loader, /\.order\("created_at", \{ ascending: false \}\)/);
 assert.match(loader, /\.limit\(8\)/);
@@ -24,6 +27,8 @@ const renderer = tracker.slice(rendererStart, overviewStart);
 assert.match(renderer, /replaceChildren\(\)/);
 assert.match(renderer, /textContent/);
 assert.match(renderer, /quality_flags/);
+assert.match(renderer, /storedResult/);
+assert.match(renderer, /storedResult\.value/);
 assert.match(renderer, /measurement_count/);
 assert.match(renderer, /variable_code/);
 assert.match(renderer, /max_gap_minutes/);
@@ -31,6 +36,7 @@ assert.match(renderer, /error_code/);
 assert.doesNotMatch(renderer, /innerHTML|insertAdjacentHTML/);
 
 assert.match(tracker, /recentEngineExecutions = \[\]/);
+assert.match(tracker, /recentEngineResultsByExecution = new Map\(\)/);
 assert.match(tracker, /engineExecutionHistoryRequestId\+\+/);
 assert.match(tracker, /loadRecentEngineExecutions\(\)/);
 
@@ -40,7 +46,7 @@ for (const path of [
   "batch-tracker/green-tech/index.html",
 ]) {
   const page = readFileSync(path, "utf8");
-  assert.match(page, /workspace\.html\?v=20261112-engine-history-1/);
+  assert.match(page, /workspace\.html\?v=20261112-engine-history-2/);
   assert.match(page, /tracker\.js\?v=20261112-engine-history-1/);
 }
 
