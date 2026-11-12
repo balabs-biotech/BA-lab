@@ -9,7 +9,10 @@ const locationA = "44444444-4444-4444-8444-444444444444";
 const locationB = "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb";
 const contexts = [
   { id: "55555555-5555-4555-8555-555555555555", organization_id: organizationId,
-    culture_id: cultureId, environment_id: envA, valid_from: "2026-11-01", valid_to: "2026-11-12" },
+    culture_id: cultureId, environment_id: envA, organism_kind: "fungus", taxon_code: "PLEURO",
+    strain_code: "HK35", cultivar_code: null, culture_stage: "fruiting", substrate_code: "straw",
+    production_system: "monotub", context_tags: ["fruiting-run"],
+    valid_from: "2026-11-01", valid_to: "2026-11-12" },
   { id: "66666666-6666-4666-8666-666666666666", organization_id: organizationId,
     culture_id: cultureId, environment_id: envB, valid_from: "2026-11-12", valid_to: null },
 ];
@@ -33,7 +36,13 @@ const weather = [{
 const singleWindow = { start: "2026-11-10T00:00:00Z", end: "2026-11-11T00:00:00Z", timezone: "Africa/Algiers" };
 const assembled = await assembleResolvedBiologicalContextSnapshot({
   organizationId, culture, contexts, environments, measurements,
-  environmentalObservations: weather, window: singleWindow,
+  environmentalObservations: weather,
+  strainReferences: [{ id: "99999999-9999-4999-8999-999999999999", organization_id: organizationId,
+    strain_code: "HK35", organism_id: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaab", designation: "HK35",
+    origin: "reference collection", source_description: "verified strain record" }],
+  organisms: [{ id: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaab", scientific_name: "Pleurotus ostreatus",
+    common_name: "Oyster mushroom", taxonomy_source: "NCBI", taxonomy_id: "NCBI:fungus-example" }],
+  window: singleWindow,
 });
 assert.equal(assembled.scope.environment_id, envA,
   "historical context, not current culture FK, selects the environment");
@@ -41,6 +50,13 @@ assert.equal(assembled.scope.location_id, locationA);
 assert.equal(assembled.input.records.length, 2);
 assert.equal(assembled.input.records.find((row) => row.record_type === "measurement").context.environment_id, envA);
 assert.equal(assembled.context_resolution.window.status, "resolved");
+assert.equal(assembled.parameters.biological_context_supplied, true);
+assert.equal(assembled.parameters.biological_contexts.length, 1,
+  "only contexts intersecting the requested window are included");
+assert.equal(assembled.parameters.biological_contexts[0].culture_stage, "fruiting");
+assert.equal(assembled.parameters.biological_contexts[0].genetic_reference.status, "resolved");
+assert.equal(assembled.parameters.biological_contexts[0].genetic_reference.scientific_name, "Pleurotus ostreatus");
+assert.deepEqual(assembled.parameters.biological_contexts[0].context_tags, ["fruiting-run"]);
 assert.deepEqual(assembled.excluded_environmental_observation_ids, []);
 
 const conflictingMeasurement = await assembleResolvedBiologicalContextSnapshot({
