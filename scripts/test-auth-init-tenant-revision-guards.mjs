@@ -205,8 +205,11 @@ assert.ok(
 const lineage = getFunctionBlock("loadBiologicalLineage");
 assert.match(lineage, /const loadRevision = authStateRevision;/);
 assert.match(lineage, /const loadOrganizationId = organizationId;/);
-assert.equal((lineage.match(/isCurrentWorkspaceRevision\(loadRevision, loadOrganizationId\)/g) || []).length, 3,
-  "lineage loader must guard both reads and stale error rendering");
+assert.equal((lineage.match(/isCurrentWorkspaceRevision\(loadRevision, loadOrganizationId\)/g) || []).length, 1,
+  "lineage request guard must centralize workspace revision validation");
+assert.match(lineage, /requestId === cultureLineageRequestId/);
+assert.match(lineage, /target\.dataset\.cultureId === cultureId/);
+assert.match(lineage, /if \(!isCurrentRequest\(\)\) return; target\.textContent/);
 
 const cultureDetail = getFunctionBlock("loadCultureDetail");
 assert.match(cultureDetail, /const loadRevision = authStateRevision;/);

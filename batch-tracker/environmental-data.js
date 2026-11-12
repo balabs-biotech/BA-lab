@@ -1,10 +1,11 @@
 /* BA Labs Green Tech: NASA POWER historical agroclimate. */
 (() => {
   if (document.body.dataset.domain !== "agronomy" || !window.supabase) return;
-  const db = window.supabase.createClient(
-    "https://axcouwiodqsauwnsiotn.supabase.co",
-    "sb_publishable_8H4XRh8V07Hlo0WwdfOXwg_2RXRX992"
-  );
+  const db = window.BA_LABS_SUPABASE_CLIENT;
+  if (!db) {
+    console.error("Le client Supabase partagé de CultureOps n’est pas disponible.");
+    return;
+  }
   const node = (tag, attrs = {}, value = "") => {
     const n = document.createElement(tag);
     Object.entries(attrs).forEach(([k, v]) => n.setAttribute(k, v));
@@ -113,7 +114,68 @@
 
     let satelliteLeafletMap=null, satelliteMarker=null, satelliteGridCircle=null, selectedSentinelSceneDate=null, selectedSentinelDisplayMode="ndvi";
     let environmentalAuthRevision=0, environmentalSelectionRevision=0, environmentalRowsRequest=0, environmentalSatelliteRequest=0;
-    db.auth.onAuthStateChange(()=>{environmentalAuthRevision+=1;});
+    function clearEnvironmentWorkspace() {
+      environmentalAuthRevision += 1;
+      environmentalSelectionRevision += 1;
+      environmentalRowsRequest += 1;
+      environmentalSatelliteRequest += 1;
+      panel.classList.add("hidden");
+      location.replaceChildren(node("option",{value:""},"Choisir un emplacement…"));
+      lat.value = "";
+      lon.value = "";
+      accuracy.value = "";
+      results.replaceChildren();
+      summary.replaceChildren();
+      weatherCharts.replaceChildren();
+      agroSynthesisPanel.replaceChildren(node("h3",{},"Lecture agronomique"));
+      vegetationChart.replaceChildren(
+        node("h3",{},"Évolution de la végétation (NDVI)"),
+        node("p",{class:"muted"},"Comparaison automatique des dernières scènes Sentinel-2 disponibles.")
+      );
+      uvComparisonPanel.replaceChildren();
+      satelliteResults.replaceChildren();
+      satelliteMapStatus.textContent = "Connectez-vous à CultureOps pour accéder aux emplacements de votre organisation.";
+      selectedSentinelSceneDate = null;
+      if (satelliteSentinelObjectUrl) {
+        URL.revokeObjectURL(satelliteSentinelObjectUrl);
+        satelliteSentinelObjectUrl = null;
+      }
+      if (satelliteLeafletMap) {
+        satelliteLeafletMap.remove();
+        satelliteLeafletMap = null;
+      }
+      satelliteMarker = null;
+      satelliteGridCircle = null;
+      satelliteNDVILayer = null;
+      satelliteTrueColorLayer = null;
+      satelliteSentinelNDVILayer = null;
+      satelliteLayerControl = null;
+    }
+
+    async function loadEnvironmentForAuthenticatedSession() {
+      clearEnvironmentWorkspace();
+      panel.classList.remove("hidden");
+      await loadLocations();
+      if (location.value) {
+        await importWeather(false);
+        if (lat.value !== "" && lon.value !== "") await searchSatellite();
+        else satelliteMapStatus.textContent = "Coordonnées du site manquantes.";
+      }
+    }
+
+    db.auth.onAuthStateChange((event, session) => {
+      if (event === "INITIAL_SESSION" || event === "TOKEN_REFRESHED") return;
+      if (event === "SIGNED_OUT" || !session) {
+        clearEnvironmentWorkspace();
+        return;
+      }
+      if (event === "SIGNED_IN") {
+        Promise.resolve().then(() => loadEnvironmentForAuthenticatedSession()).catch(error => {
+          console.error("Réinitialisation GreenTech après connexion impossible :", error);
+          status.textContent = "Impossible de recharger les données de l’espace. Actualisez la page.";
+        });
+      }
+    });
     function isCurrentEnvironmentRequest(authRevision,selectionRevision,locationId){
       return authRevision===environmentalAuthRevision &&
         selectionRevision===environmentalSelectionRevision &&
@@ -297,9 +359,12 @@
       }
     }
     async function loadLocations() {
+      const authRevision = environmentalAuthRevision;
       const {data,error}=await db.from("locations").select("id,code,name,latitude,longitude,coordinate_accuracy_m,coordinate_source").order("name");
+      if (authRevision !== environmentalAuthRevision || document.body.dataset.domain !== "agronomy") return;
       if(error){satelliteMapStatus.textContent="Sites indisponibles.";return;}
-      data.forEach(x=>location.append(node("option",{value:x.id},x.code?x.name+" ("+x.code+")":x.name)));
+      location.replaceChildren(node("option",{value:""},"Choisir un emplacement…"));
+      (data || []).forEach(x=>location.append(node("option",{value:x.id},x.code?x.name+" ("+x.code+")":x.name)));
       let savedId="";try{savedId=localStorage.getItem("ba-labs-active-environment-location")||"";}catch(_){}
       const saved=data.find(x=>x.id===savedId&&x.latitude!=null&&x.longitude!=null);
       const preferred=saved||data.find(x=>x.latitude!=null&&x.longitude!=null&&Number.isFinite(Number(x.latitude))&&Number.isFinite(Number(x.longitude)))||data[0];
@@ -308,8 +373,12 @@
       if(!location.value) await updateSatelliteMap();
     }
     async function selectLocation(){
-      if(!location.value){lat.value="";lon.value="";accuracy.value="";await updateSatelliteMap();return;}
-      const {data}=await db.from("locations").select("latitude,longitude,coordinate_accuracy_m,coordinate_source").eq("id",location.value).maybeSingle();
+      const authRevision = environmentalAuthRevision;
+      const selectionRevision = environmentalSelectionRevision;
+      const locationId = location.value;
+      if(!locationId){lat.value="";lon.value="";accuracy.value="";await updateSatelliteMap();return;}
+      const {data}=await db.from("locations").select("latitude,longitude,coordinate_accuracy_m,coordinate_source").eq("id",locationId).maybeSingle();
+      if(authRevision !== environmentalAuthRevision || selectionRevision !== environmentalSelectionRevision || location.value !== locationId) return;
       if(!data)return;
       lat.value=data.latitude??""; lon.value=data.longitude??""; accuracy.value=data.coordinate_accuracy_m??"";
       if(data.coordinate_source && [...source.options].some(o=>o.value===data.coordinate_source))source.value=data.coordinate_source;
@@ -638,10 +707,15 @@
       if(!location.value||!from.value||!to.value||from.value>to.value){status.textContent="Choisissez un emplacement et une période valide.";return;}
       const days=(Date.parse(to.value)-Date.parse(from.value))/86400000+1;
       if(days>366){status.textContent="La période maximale est de 366 jours.";return;}
+      const authRevision = environmentalAuthRevision;
+      const selectionRevision = environmentalSelectionRevision;
+      const locationId = location.value;
+      const current = () => isCurrentEnvironmentRequest(authRevision, selectionRevision, locationId);
       run.disabled=true; refresh.disabled=true;
       status.textContent=forceRefresh?"Actualisation forcée en cours…":"Collecte en cours…";
       try{
-        const {data,error}=await db.functions.invoke("nasa-power-agroclimate",{body:{location_id:location.value,start_date:from.value,end_date:to.value,refresh:forceRefresh}});
+        const {data,error}=await db.functions.invoke("nasa-power-agroclimate",{body:{location_id:locationId,start_date:from.value,end_date:to.value,refresh:forceRefresh}});
+        if (!current()) return;
         if(error){status.textContent="Échec de la collecte météo : "+await functionErrorMessage(error);return;}
         if(data?.ok){
           const detail=data.cached
@@ -655,8 +729,8 @@
           status.textContent="Import refusé : "+(data?.error||"réponse invalide");
         }
         await loadRows();
-      }catch(error){status.textContent="Échec de la collecte : "+(error?.message||"erreur inconnue");}
-      finally{run.disabled=false;refresh.disabled=false;}
+      }catch(error){if(current())status.textContent="Échec de la collecte : "+(error?.message||"erreur inconnue");}
+      finally{if(current()){run.disabled=false;refresh.disabled=false;}}
     }
     run.addEventListener("click",()=>importWeather(false));
     refresh.addEventListener("click",()=>importWeather(true));
@@ -680,13 +754,16 @@
     satelliteViewControls.append(regionalTrueColorButton,regionalNDVIButton);
     const {data: authState}=await db.auth.getSession();
     if(!authState?.session){
-      status.textContent="Connectez-vous à CultureOps pour accéder aux emplacements de votre organisation.";
-      db.auth.onAuthStateChange((_event,session)=>{if(session){panel.classList.remove("hidden");loadLocations().then(()=>{if(location.value){importWeather(false);if(lat.value!==""&&lon.value!=="")searchSatellite();else satelliteMapStatus.textContent="Coordonnées du site manquantes.";}});}});
+      clearEnvironmentWorkspace();
       return;
     }
     panel.classList.remove("hidden");
     await loadLocations();
-    if(location.value){importWeather(false);if(lat.value!==""&&lon.value!=="")searchSatellite();else satelliteMapStatus.textContent="Coordonnées du site manquantes.";}
+    if(location.value){
+      await importWeather(false);
+      if(lat.value!==""&&lon.value!=="") await searchSatellite();
+      else satelliteMapStatus.textContent="Coordonnées du site manquantes.";
+    }
   }
   const watch=new MutationObserver(()=>{if(document.getElementById("plantCard")){watch.disconnect();init().catch(e=>console.error("Environmental context",e));}});
   watch.observe(document.getElementById("workspace-root")||document.body,{childList:true,subtree:true});

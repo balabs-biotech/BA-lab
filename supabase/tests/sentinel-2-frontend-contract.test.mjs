@@ -1,9 +1,10 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 
-const [source, entry, i18n] = await Promise.all([
+const [source, entry, bootstrap, i18n] = await Promise.all([
   readFile(new URL("../../batch-tracker/environmental-data.js", import.meta.url), "utf8"),
   readFile(new URL("../../batch-tracker/green-tech/index.html", import.meta.url), "utf8"),
+  readFile(new URL("../../batch-tracker/workspace-bootstrap.js", import.meta.url), "utf8"),
   readFile(new URL("../../batch-tracker/i18n.js", import.meta.url), "utf8"),
 ]);
 const checks = [
@@ -12,7 +13,7 @@ const checks = [
   ["restores the last used location automatically", /localStorage\.getItem\("ba-labs-active-environment-location"\)/],
   ["automatically selects a configured location when no previous site exists", /const preferred=saved\|\|data\.find/],
   ["waits for the map to initialize before requesting imagery", /async function selectLocation\(\)[\s\S]*?await updateSatelliteMap\(\);/],
-  ["searches the satellite catalogue automatically on initial load", /await loadLocations\(\);\s*if\(location\.value\)\{importWeather\(false\);if\(lat\.value!==""&&lon\.value!==""\)searchSatellite\(\);/],
+  ["searches the satellite catalogue automatically after authenticated workspace initialization", /async function loadEnvironmentForAuthenticatedSession\(\)[\s\S]*?await loadLocations\(\);[\s\S]*?await importWeather\(false\);[\s\S]*?await searchSatellite\(\)/],
   ["prioritizes the public AWS Open Data catalogue before the Copernicus fallback", /earth-search-sentinel2-catalogue[\s\S]*?copernicus-sentinel-catalogue/],
   ["automatically searches again when the selected location changes", /location\.addEventListener\("change"[\s\S]*?searchSatellite\(\)/],
   ["prioritizes recent scenes with at most 30% cloud cover", /usableA=cloudA<=30\?0:1[\s\S]*?return usableA===0\?dateB-dateA/],
@@ -22,7 +23,7 @@ const checks = [
   ["keeps the last image when a new request fails", /Dernière image conservée/],
   ["renders weather charts directly below the satellite map", /panel\.append\(satelliteMapPanel,vegetationChart,agroSynthesisPanel,weatherCharts,uvComparisonPanel\)/],
   ["keeps weather charts visible by default", /\[form,status,satelliteHint,satelliteButton,satelliteResults,details\]\.forEach\(el=>el\.style\.display="none"\)/],
-  ["automatically imports weather history when Green Tech opens", /if\(location\.value\)\{importWeather\(false\);if\(lat\.value!==""&&lon\.value!==""\)searchSatellite\(\)/],
+  ["automatically imports weather history after a location is restored in the authenticated workspace", /async function loadEnvironmentForAuthenticatedSession\(\)[\s\S]*?await loadLocations\(\);[\s\S]*?if \(location\.value\) \{\s*await importWeather\(false\)/],
   ["compares the two latest real UV dates without manual date entry", /Comparatif UV automatique[\s\S]*?uvDays\[uvDays\.length-2\][\s\S]*?uvDays\[uvDays\.length-1\]/],
   ["builds a vegetation chart from real NDVI raster statistics", /X-NDVI-Stats[\s\S]*?function renderVegetationChart[\s\S]*?NDVI moyen/],
   ["shows a coverage-aware agronomic synthesis", /function renderAgroSynthesis[\s\S]*?Couverture météo[\s\S]*?Les dates sans valeur ne sont pas assimilées à zéro/],
@@ -32,10 +33,10 @@ const checks = [
   ["labels partial rainfall totals explicitly", /Cumul partiel · /],
   ["calculates agronomic coverage against calendar days, including missing days", /windowStart=Math\.max\(firstDay,lastDay-6\*86400000\)[\s\S]*?windowObservations/],
  ];
+assert.match(entry, /workspace-bootstrap\.js/, "Green Tech delegates startup to the shared bootstrap");
 assert.doesNotMatch(entry, /smart-entry\.js/, "Green Tech must not load the biological smart-entry adapter");
-assert.match(entry, /script\.onload = \(\) => \{[\s\S]*?environmental-data\.js/, "loads the environmental module directly after the shared tracker");
-assert.match(entry, /environmental-data\.js\?v=20261027-sentinel-fallback-fix-1/, "uses a cache-busted environmental module path");
-assert.match(entry, /i18n\.js\?v=[^"]+/, "uses a cache-busted localization module path");
+assert.match(bootstrap, /agronomy:\s*"\.\.\/environmental-data\.js\?v=20261027-sentinel-fallback-fix-1"/, "loads the environmental module directly after the shared tracker");
+assert.match(bootstrap, /i18n\.js\?v=[^"]+/, "uses a cache-busted localization module path");
 assert.match(i18n, /Lecture agronomique/, "contains localized agronomic synthesis labels");
 assert.match(i18n, /Vegetation trend \(NDVI\)/, "contains localized satellite chart labels");
 assert.match(i18n, /Qualidade dos dados:/, "contains localized data-quality diagnostics in Portuguese");

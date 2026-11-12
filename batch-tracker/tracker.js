@@ -16,6 +16,9 @@ const supabaseClient =
     SUPABASE_PUBLISHABLE_KEY
   );
 
+// Feature modules share the authenticated client and its session lifecycle.
+window.BA_LABS_SUPABASE_CLIENT = supabaseClient;
+
 
 /* ============================================================
    ETAT GLOBAL
@@ -5717,10 +5720,10 @@ function renderCultureCatalog() {
 
 function getStatisticsTranslations(language) {
   const translations = {
-    fr: { login:"Connectez-vous pour analyser les données de votre organisation.", variable:"Sélectionnez une variable mesurée.", loading:"Chargement des mesures depuis Supabase…", loadingData:"Chargement des données…", buttonLoading:"Chargement…", buttonAnalyze:"Analyser les données", loadedMeasurements:"Mesures chargées", numericValues:"Valeurs numériques", comparableValues:"Valeurs comparables", capped:"Au moins 1 000 mesures correspondent aux filtres. Le résultat peut être tronqué ; réduisez la période ou sélectionnez une culture.", excluded:n=>n+" valeur(s) exclue(s) du graphique car l’unité n’est pas comparable. ", loaded:"Données chargées depuis Supabase. Les résultats sont descriptifs.", empty:"Aucune mesure ne correspond aux filtres sélectionnés.", needTwo:"Il faut au moins deux mesures numériques comparables pour tracer une évolution. Les données brutes restent consultables ci-dessous.", unknownDate:"Date inconnue", measurementDate:"Date de mesure", unknownUnit:"unité inconnue", period:"Période représentée : ", noRows:"Aucune mesure pour ces filtres.", limited:n=>"Affichage limité aux 200 mesures les plus récentes sur "+n+" chargées.", graphError:"Le graphique n’a pas pu être produit.", unavailable:"Données indisponibles.", loadError:"Impossible de charger les mesures : ", cultureLinked:"Culture liée par identifiant", noCulture:"Lot / cible sans culture directe", unitMissing:"Unité non renseignée" },
-    en: { login:"Sign in to analyze your organization's data.", variable:"Select a measured variable.", loading:"Loading measurements from Supabase…", loadingData:"Loading data…", buttonLoading:"Loading…", buttonAnalyze:"Analyze data", loadedMeasurements:"Measurements loaded", numericValues:"Numeric values", comparableValues:"Comparable values", capped:"At least 1,000 measurements match the filters. Results may be truncated; narrow the period or select a culture.", excluded:n=>n+" value(s) excluded from the chart because the unit is not comparable. ", loaded:"Data loaded from Supabase. Results are descriptive.", empty:"No measurements match the selected filters.", needTwo:"At least two comparable numeric measurements are needed to plot a trend. Raw data remain available below.", unknownDate:"Unknown date", measurementDate:"Measurement date", unknownUnit:"unknown unit", period:"Period shown: ", noRows:"No measurements for these filters.", limited:n=>"Showing the 200 most recent measurements out of "+n+" loaded.", graphError:"The chart could not be generated.", unavailable:"Data unavailable.", loadError:"Unable to load measurements: ", cultureLinked:"Culture linked by ID", noCulture:"Batch / target without direct culture", unitMissing:"Unit not specified" },
-    pt: { login:"Inicie sessão para analisar os dados da sua organização.", variable:"Selecione uma variável medida.", loading:"A carregar medições do Supabase…", loadingData:"A carregar dados…", buttonLoading:"A carregar…", buttonAnalyze:"Analisar dados", loadedMeasurements:"Medições carregadas", numericValues:"Valores numéricos", comparableValues:"Valores comparáveis", capped:"Pelo menos 1.000 medições correspondem aos filtros. Os resultados podem estar truncados; reduza o período ou selecione uma cultura.", excluded:n=>n+" valor(es) excluído(s) do gráfico porque a unidade não é comparável. ", loaded:"Dados carregados do Supabase. Os resultados são descritivos.", empty:"Nenhuma medição corresponde aos filtros selecionados.", needTwo:"São necessárias pelo menos duas medições numéricas comparáveis para traçar uma evolução. Os dados brutos continuam disponíveis abaixo.", unknownDate:"Data desconhecida", measurementDate:"Data da medição", unknownUnit:"unidade desconhecida", period:"Período apresentado: ", noRows:"Nenhuma medição para estes filtros.", limited:n=>"A mostrar as 200 medições mais recentes de "+n+" carregadas.", graphError:"Não foi possível gerar o gráfico.", unavailable:"Dados indisponíveis.", loadError:"Não foi possível carregar as medições: ", cultureLinked:"Cultura associada por identificador", noCulture:"Lote / alvo sem cultura direta", unitMissing:"Unidade não indicada" },
-    ar: { login:"سجّل الدخول لتحليل بيانات مؤسستك.", variable:"اختر متغيرًا مقاسًا.", loading:"جارٍ تحميل القياسات من Supabase…", loadingData:"جارٍ تحميل البيانات…", buttonLoading:"جارٍ التحميل…", buttonAnalyze:"تحليل البيانات", loadedMeasurements:"القياسات المحمّلة", numericValues:"القيم الرقمية", comparableValues:"القيم القابلة للمقارنة", capped:"تطابق ١٬٠٠٠ قياس على الأقل عوامل التصفية. قد تكون النتائج مقتطعة؛ قلّص الفترة أو اختر مزرعة.", excluded:n=>n+" قيمة مستبعدة من الرسم لأن الوحدة غير قابلة للمقارنة. ", loaded:"تم تحميل البيانات من Supabase. النتائج وصفية.", empty:"لا توجد قياسات تطابق عوامل التصفية المحددة.", needTwo:"يلزم قياسان رقميان قابلان للمقارنة على الأقل لرسم الاتجاه. تبقى البيانات الخام متاحة أدناه.", unknownDate:"تاريخ غير معروف", measurementDate:"تاريخ القياس", unknownUnit:"وحدة غير معروفة", period:"الفترة المعروضة: ", noRows:"لا توجد قياسات لهذه العوامل.", limited:n=>"يقتصر العرض على أحدث ٢٠٠ قياس من أصل "+n+" قياسًا محمّلًا.", graphError:"تعذر إنشاء الرسم البياني.", unavailable:"البيانات غير متاحة.", loadError:"تعذر تحميل القياسات: ", cultureLinked:"مزرعة مرتبطة بالمعرّف", noCulture:"دفعة / هدف دون مزرعة مباشرة", unitMissing:"الوحدة غير محددة" }
+    fr: { login:"Connectez-vous pour analyser les données de votre organisation.", variable:"Sélectionnez une variable mesurée.", loading:"Chargement des mesures depuis Supabase…", loadingData:"Chargement des données…", buttonLoading:"Chargement…", buttonAnalyze:"Analyser les données", loadedMeasurements:"Mesures chargées", numericValues:"Valeurs numériques", comparableValues:"Valeurs comparables", capped:"Au moins 1 000 mesures correspondent aux filtres. Le résultat peut être tronqué ; réduisez la période ou sélectionnez une culture.", excluded:n=>n+" valeur(s) exclue(s) du graphique car l’unité n’est pas comparable. ", loaded:"Données chargées depuis Supabase. Les résultats sont descriptifs.", empty:"Aucune mesure ne correspond aux filtres sélectionnés.", needTwo:"Il faut au moins deux mesures numériques comparables pour tracer une évolution. Les données brutes restent consultables ci-dessous.", unknownDate:"Date inconnue", measurementDate:"Date de mesure", unknownUnit:"unité inconnue", period:"Période représentée : ", noRows:"Aucune mesure pour ces filtres.", limited:n=>"Affichage limité aux 200 mesures les plus récentes sur "+n+" chargées.", graphError:"Le graphique n’a pas pu être produit.", unavailable:"Données indisponibles.", loadError:"Impossible de charger les mesures : ", cultureLinked:"Culture liée par identifiant", noCulture:"Lot / cible sans culture directe", unitMissing:"Unité non renseignée", demoTitle:"Mycologie · incubation illustrative", demoMetric:"Température d’incubation", demoAxis:"Séquence illustrative", demoPoint:(n,v,u)=>"Point illustratif "+n+": "+v+" "+u, chartEvolution:"Évolution de ", demoNotice:"DONNÉES DE DÉMONSTRATION — exemple synthétique uniquement. Non mesuré, non enregistré et jamais mélangé aux données de l’organisation.", demoTitleAgronomy:"GreenTech · suivi végétal illustratif", demoMetricAgronomy:"Humidité relative", demoTitleMycology:"Mycologie · incubation illustrative", demoMetricMycology:"Température d’incubation", demoTitleLaboratory:"Laboratoire · mesures illustratives", demoMetricLaboratory:"pH" },
+    en: { login:"Sign in to analyze your organization's data.", variable:"Select a measured variable.", loading:"Loading measurements from Supabase…", loadingData:"Loading data…", buttonLoading:"Loading…", buttonAnalyze:"Analyze data", loadedMeasurements:"Measurements loaded", numericValues:"Numeric values", comparableValues:"Comparable values", capped:"At least 1,000 measurements match the filters. Results may be truncated; narrow the period or select a culture.", excluded:n=>n+" value(s) excluded from the chart because the unit is not comparable. ", loaded:"Data loaded from Supabase. Results are descriptive.", empty:"No measurements match the selected filters.", needTwo:"At least two comparable numeric measurements are needed to plot a trend. Raw data remain available below.", unknownDate:"Unknown date", measurementDate:"Measurement date", unknownUnit:"unknown unit", period:"Period shown: ", noRows:"No measurements for these filters.", limited:n=>"Showing the 200 most recent measurements out of "+n+" loaded.", graphError:"The chart could not be generated.", unavailable:"Data unavailable.", loadError:"Unable to load measurements: ", cultureLinked:"Culture linked by ID", noCulture:"Batch / target without direct culture", unitMissing:"Unit not specified", demoTitle:"Mycology · illustrative incubation", demoMetric:"Incubation temperature", demoAxis:"Illustrative sequence", demoPoint:(n,v,u)=>"Illustrative point "+n+": "+v+" "+u, chartEvolution:"Trend for ", demoNotice:"DEMONSTRATION DATA — synthetic example only. Not measured, not stored, and never mixed with organization data.", demoTitleAgronomy:"GreenTech · illustrative plant monitoring", demoMetricAgronomy:"Relative humidity", demoTitleMycology:"Mycology · illustrative incubation", demoMetricMycology:"Incubation temperature", demoTitleLaboratory:"Laboratory · illustrative measurements", demoMetricLaboratory:"pH" },
+    pt: { login:"Inicie sessão para analisar os dados da sua organização.", variable:"Selecione uma variável medida.", loading:"A carregar medições do Supabase…", loadingData:"A carregar dados…", buttonLoading:"A carregar…", buttonAnalyze:"Analisar dados", loadedMeasurements:"Medições carregadas", numericValues:"Valores numéricos", comparableValues:"Valores comparáveis", capped:"Pelo menos 1.000 medições correspondem aos filtros. Os resultados podem estar truncados; reduza o período ou selecione uma cultura.", excluded:n=>n+" valor(es) excluído(s) do gráfico porque a unidade não é comparável. ", loaded:"Dados carregados do Supabase. Os resultados são descritivos.", empty:"Nenhuma medição corresponde aos filtros selecionados.", needTwo:"São necessárias pelo menos duas medições numéricas comparáveis para traçar uma evolução. Os dados brutos continuam disponíveis abaixo.", unknownDate:"Data desconhecida", measurementDate:"Data da medição", unknownUnit:"unidade desconhecida", period:"Período apresentado: ", noRows:"Nenhuma medição para estes filtros.", limited:n=>"A mostrar as 200 medições mais recentes de "+n+" carregadas.", graphError:"Não foi possível gerar o gráfico.", unavailable:"Dados indisponíveis.", loadError:"Não foi possível carregar as medições: ", cultureLinked:"Cultura associada por identificador", noCulture:"Lote / alvo sem cultura direta", unitMissing:"Unidade não indicada", demoTitle:"Micologia · incubação ilustrativa", demoMetric:"Temperatura de incubação", demoAxis:"Sequência ilustrativa", demoPoint:(n,v,u)=>"Ponto ilustrativo "+n+": "+v+" "+u, chartEvolution:"Evolução de ", demoNotice:"DADOS DE DEMONSTRAÇÃO — exemplo sintético apenas. Não medido, não armazenado e nunca misturado com os dados da organização.", demoTitleAgronomy:"GreenTech · acompanhamento vegetal ilustrativo", demoMetricAgronomy:"Humidade relativa", demoTitleMycology:"Micologia · incubação ilustrativa", demoMetricMycology:"Temperatura de incubação", demoTitleLaboratory:"Laboratório · medições ilustrativas", demoMetricLaboratory:"pH" },
+    ar: { login:"سجّل الدخول لتحليل بيانات مؤسستك.", variable:"اختر متغيرًا مقاسًا.", loading:"جارٍ تحميل القياسات من Supabase…", loadingData:"جارٍ تحميل البيانات…", buttonLoading:"جارٍ التحميل…", buttonAnalyze:"تحليل البيانات", loadedMeasurements:"القياسات المحمّلة", numericValues:"القيم الرقمية", comparableValues:"القيم القابلة للمقارنة", capped:"تطابق ١٬٠٠٠ قياس على الأقل عوامل التصفية. قد تكون النتائج مقتطعة؛ قلّص الفترة أو اختر مزرعة.", excluded:n=>n+" قيمة مستبعدة من الرسم لأن الوحدة غير قابلة للمقارنة. ", loaded:"تم تحميل البيانات من Supabase. النتائج وصفية.", empty:"لا توجد قياسات تطابق عوامل التصفية المحددة.", needTwo:"يلزم قياسان رقميان قابلان للمقارنة على الأقل لرسم الاتجاه. تبقى البيانات الخام متاحة أدناه.", unknownDate:"تاريخ غير معروف", measurementDate:"تاريخ القياس", unknownUnit:"وحدة غير معروفة", period:"الفترة المعروضة: ", noRows:"لا توجد قياسات لهذه العوامل.", limited:n=>"يقتصر العرض على أحدث ٢٠٠ قياس من أصل "+n+" قياسًا محمّلًا.", graphError:"تعذر إنشاء الرسم البياني.", unavailable:"البيانات غير متاحة.", loadError:"تعذر تحميل القياسات: ", cultureLinked:"مزرعة مرتبطة بالمعرّف", noCulture:"دفعة / هدف دون مزرعة مباشرة", unitMissing:"الوحدة غير محددة", demoTitle:"علم الفطريات · حضانة توضيحية", demoMetric:"درجة حرارة الحضانة", demoAxis:"تسلسل توضيحي", demoPoint:(n,v,u)=>"نقطة توضيحية "+n+": "+v+" "+u, chartEvolution:"تطور ", demoNotice:"بيانات توضيحية — مثال اصطناعي فقط. لم تُقَس ولم تُخزَّن ولا تُخلط مطلقًا ببيانات المؤسسة.", demoTitleAgronomy:"GreenTech · متابعة نباتية توضيحية", demoMetricAgronomy:"الرطوبة النسبية", demoTitleMycology:"علم الفطريات · حضانة توضيحية", demoMetricMycology:"درجة حرارة الحضانة", demoTitleLaboratory:"المختبر · قياسات توضيحية", demoMetricLaboratory:"الرقم الهيدروجيني" }
   };
   return translations[language] || translations.fr;
 }
@@ -5743,6 +5746,7 @@ async function loadStatistics() {
   const summary = document.getElementById("statisticsSummary");
   const tbody = document.getElementById("statisticsRows");
   const lang = window.BALabsI18n?.language || "fr";
+  const chartLocale = lang === "ar" ? "ar-DZ" : lang === "pt" ? "pt-PT" : lang === "en" ? "en-GB" : "fr-FR";
   const L = getStatisticsTranslations(lang);
   if (!loadOrganizationId) { status.textContent = L.login; return; }
   if (!variableCode) { status.textContent = L.variable; return; }
@@ -5831,35 +5835,37 @@ async function loadStatistics() {
     chart.innerHTML = "";
     if (plotted.length < 2) {
       const demoSets = {
-        agronomy: { title: "GreenTech · suivi végétal illustratif", metric: "Humidité relative", unit: "%", values: [61, 64, 60, 68, 66, 71, 69], stroke: "#65b982" },
-        mycology: { title: "Mycologie · incubation illustrative", metric: "Température d’incubation", unit: "°C", values: [21.2, 21.8, 22.1, 21.7, 22.4, 22.0, 21.9], stroke: "#d78b56" },
-        laboratory: { title: "Laboratoire · mesures illustratives", metric: "pH", unit: "pH", values: [6.2, 6.4, 6.35, 6.5, 6.45, 6.6, 6.55], stroke: "#69a9e0" }
+        agronomy: { unit: "%", values: [61, 64, 60, 68, 66, 71, 69], stroke: "#65b982" },
+        mycology: { unit: "°C", values: [21.2, 21.8, 22.1, 21.7, 22.4, 22.0, 21.9], stroke: "#d78b56" },
+        laboratory: { unit: "pH", values: [6.2, 6.4, 6.35, 6.5, 6.45, 6.6, 6.55], stroke: "#69a9e0" }
       };
-      const demo = demoSets[domain] || demoSets.laboratory;
+      const demoDomain = ["agronomy","mycology","laboratory"].includes(domain) ? domain : "laboratory";
+      const demo = {...demoSets[demoDomain], title:L["demoTitle"+(demoDomain === "agronomy" ? "Agronomy" : demoDomain === "mycology" ? "Mycology" : "Laboratory")], metric:L["demoMetric"+(demoDomain === "agronomy" ? "Agronomy" : demoDomain === "mycology" ? "Mycology" : "Laboratory")]};
       const width=760,height=290,left=64,right=22,top=40,bottom=48,values=demo.values,min=Math.min(...values),max=Math.max(...values),span=max-min||1;
       const x=i=>left+i*(width-left-right)/(values.length-1), y=value=>top+20+(max-value)*(height-top-bottom-20)/span, ns="http://www.w3.org/2000/svg", svg=document.createElementNS(ns,"svg");
       svg.setAttribute("viewBox","0 0 "+width+" "+height); svg.setAttribute("role","img"); svg.setAttribute("aria-label",demo.title+" — "+demo.metric); svg.classList.add("statistics-demo-svg");
       const title=document.createElementNS(ns,"text"); title.setAttribute("x",left); title.setAttribute("y",20); title.setAttribute("font-size","14"); title.setAttribute("font-weight","700"); title.setAttribute("fill","currentColor"); title.textContent=demo.title; svg.appendChild(title);
       for(let tick=0;tick<5;tick++){const value=min+span*tick/4,yy=y(value),line=document.createElementNS(ns,"line");line.setAttribute("x1",left);line.setAttribute("x2",width-right);line.setAttribute("y1",yy);line.setAttribute("y2",yy);line.setAttribute("stroke","currentColor");line.setAttribute("stroke-opacity",".16");svg.appendChild(line);const label=document.createElementNS(ns,"text");label.setAttribute("x",left-9);label.setAttribute("y",yy+4);label.setAttribute("text-anchor","end");label.setAttribute("font-size","11");label.setAttribute("fill","currentColor");label.textContent=Number(value.toPrecision(3)).toString();svg.appendChild(label);}
       const polyline=document.createElementNS(ns,"polyline");polyline.setAttribute("points",values.map((value,i)=>x(i)+","+y(value)).join(" "));polyline.setAttribute("fill","none");polyline.setAttribute("stroke",demo.stroke);polyline.setAttribute("stroke-width","3");polyline.setAttribute("stroke-linecap","round");polyline.setAttribute("stroke-linejoin","round");svg.appendChild(polyline);
-      values.forEach((value,i)=>{const circle=document.createElementNS(ns,"circle");circle.setAttribute("cx",x(i));circle.setAttribute("cy",y(value));circle.setAttribute("r","4");circle.setAttribute("fill",demo.stroke);const pointTitle=document.createElementNS(ns,"title");pointTitle.textContent="Point illustratif "+(i+1)+": "+value+" "+demo.unit;circle.appendChild(pointTitle);svg.appendChild(circle);});
-      const axis=document.createElementNS(ns,"text");axis.setAttribute("x",(left+width-right)/2);axis.setAttribute("y",height-10);axis.setAttribute("text-anchor","middle");axis.setAttribute("font-size","11");axis.setAttribute("fill","currentColor");axis.textContent="Séquence illustrative";svg.appendChild(axis);
+      values.forEach((value,i)=>{const circle=document.createElementNS(ns,"circle");circle.setAttribute("cx",x(i));circle.setAttribute("cy",y(value));circle.setAttribute("r","4");circle.setAttribute("fill",demo.stroke);const pointTitle=document.createElementNS(ns,"title");pointTitle.textContent=L.demoPoint(i+1,value,demo.unit);circle.appendChild(pointTitle);svg.appendChild(circle);});
+      const axis=document.createElementNS(ns,"text");axis.setAttribute("x",(left+width-right)/2);axis.setAttribute("y",height-10);axis.setAttribute("text-anchor","middle");axis.setAttribute("font-size","11");axis.setAttribute("fill","currentColor");axis.textContent=L.demoAxis;svg.appendChild(axis);
       chart.appendChild(svg);
-      const note=document.createElement("p");note.className="statistics-demo-note";note.textContent="DONNÉES DE DÉMONSTRATION — exemple synthétique uniquement. Non mesuré, non enregistré et jamais mélangé aux données de l’organisation.";chart.appendChild(note);
+      const note=document.createElement("p");note.className="statistics-demo-note";note.textContent=L.demoNotice;chart.appendChild(note);
       const explanation=document.createElement("p");explanation.className="muted";explanation.textContent=L.needTwo;chart.appendChild(explanation);
     } else {
       const width=760,height=270,left=64,right=20,top=22,bottom=50,values=plotted.map(row=>row.plotValue),min=Math.min(...values),max=Math.max(...values),span=max-min||Math.max(Math.abs(max)*.1,1);
+      const chartStroke = domain === "mycology" ? "#a94f1d" : domain === "agronomy" ? "#65b982" : "#215b91";
       const x=i=>left+i*(width-left-right)/(plotted.length-1), y=value=>top+(max-value)*(height-top-bottom)/span, ns="http://www.w3.org/2000/svg", svg=document.createElementNS(ns,"svg");
-      svg.setAttribute("viewBox","0 0 "+width+" "+height); svg.setAttribute("role","img"); svg.setAttribute("aria-label","Évolution de "+(variable?.label||variableCode)+", unité "+(canonical||plotted[0].plotUnit||"non renseignée"));
+      svg.setAttribute("viewBox","0 0 "+width+" "+height); svg.setAttribute("role","img"); svg.setAttribute("aria-label",L.chartEvolution+(variable?.label||variableCode)+", unité "+(canonical||plotted[0].plotUnit||"non renseignée"));
       for(let tick=0;tick<5;tick++){const value=min+(max-min)*tick/4,yy=y(value),line=document.createElementNS(ns,"line");line.setAttribute("x1",left);line.setAttribute("x2",width-right);line.setAttribute("y1",yy);line.setAttribute("y2",yy);line.setAttribute("stroke","#e5ebe1");svg.appendChild(line);const label=document.createElementNS(ns,"text");label.setAttribute("x",left-9);label.setAttribute("y",yy+4);label.setAttribute("text-anchor","end");label.setAttribute("font-size","11");label.setAttribute("fill","#657267");label.textContent=Number(value.toPrecision(4)).toString();svg.appendChild(label);}
-      const polyline=document.createElementNS(ns,"polyline");polyline.setAttribute("points",plotted.map((row,i)=>x(i)+","+y(row.plotValue)).join(" "));polyline.setAttribute("fill","none");polyline.setAttribute("stroke","#47764d");polyline.setAttribute("stroke-width","2.5");polyline.setAttribute("stroke-linejoin","round");svg.appendChild(polyline);
-      plotted.forEach((row,i)=>{const circle=document.createElementNS(ns,"circle");circle.setAttribute("cx",x(i));circle.setAttribute("cy",y(row.plotValue));circle.setAttribute("r","3.5");circle.setAttribute("fill","#47764d");const title=document.createElementNS(ns,"title");title.textContent=(row.measured_at?new Date(row.measured_at).toLocaleString("fr-FR"):L.unknownDate)+": "+row.plotValue+" "+(row.plotUnit||"");circle.appendChild(title);svg.appendChild(circle);});
-      const xl=document.createElementNS(ns,"text");xl.setAttribute("x",(left+width-right)/2);xl.setAttribute("y",height-10);xl.setAttribute("text-anchor","middle");xl.setAttribute("font-size","11");xl.setAttribute("fill","#4f6252");xl.textContent=L.measurementDate;svg.appendChild(xl);
-      const yl=document.createElementNS(ns,"text");yl.setAttribute("transform","translate(15 "+((top+height-bottom)/2)+") rotate(-90)");yl.setAttribute("text-anchor","middle");yl.setAttribute("font-size","11");yl.setAttribute("fill","#4f6252");yl.textContent=(variable?.label||variableCode)+" ("+(canonical||plotted[0].plotUnit||"unité inconnue")+")";svg.appendChild(yl);chart.appendChild(svg);
-      const periodLabel=document.createElement("p");periodLabel.className="muted";periodLabel.textContent=L.period+(plotted[0].measured_at?new Date(plotted[0].measured_at).toLocaleDateString("fr-FR"):"date inconnue")+" — "+(plotted[plotted.length-1].measured_at?new Date(plotted[plotted.length-1].measured_at).toLocaleDateString("fr-FR"):"date inconnue");chart.appendChild(periodLabel);
+      const polyline=document.createElementNS(ns,"polyline");polyline.setAttribute("points",plotted.map((row,i)=>x(i)+","+y(row.plotValue)).join(" "));polyline.setAttribute("fill","none");polyline.setAttribute("stroke",chartStroke);polyline.setAttribute("stroke-width","2.5");polyline.setAttribute("stroke-linejoin","round");svg.appendChild(polyline);
+      plotted.forEach((row,i)=>{const circle=document.createElementNS(ns,"circle");circle.setAttribute("cx",x(i));circle.setAttribute("cy",y(row.plotValue));circle.setAttribute("r","3.5");circle.setAttribute("fill",chartStroke);const title=document.createElementNS(ns,"title");title.textContent=(row.measured_at?new Date(row.measured_at).toLocaleString(chartLocale):L.unknownDate)+": "+row.plotValue+" "+(row.plotUnit||"");circle.appendChild(title);svg.appendChild(circle);});
+      const xl=document.createElementNS(ns,"text");xl.setAttribute("x",(left+width-right)/2);xl.setAttribute("y",height-10);xl.setAttribute("text-anchor","middle");xl.setAttribute("font-size","11");xl.setAttribute("fill","currentColor");xl.textContent=L.measurementDate;svg.appendChild(xl);
+      const yl=document.createElementNS(ns,"text");yl.setAttribute("transform","translate(15 "+((top+height-bottom)/2)+") rotate(-90)");yl.setAttribute("text-anchor","middle");yl.setAttribute("font-size","11");yl.setAttribute("fill","currentColor");yl.textContent=(variable?.label||variableCode)+" ("+(canonical||plotted[0].plotUnit||L.unknownUnit)+")";svg.appendChild(yl);chart.appendChild(svg);
+      const periodLabel=document.createElement("p");periodLabel.className="muted";periodLabel.textContent=L.period+(plotted[0].measured_at?new Date(plotted[0].measured_at).toLocaleDateString(chartLocale):L.unknownDate)+" — "+(plotted[plotted.length-1].measured_at?new Date(plotted[plotted.length-1].measured_at).toLocaleDateString(chartLocale):L.unknownDate);chart.appendChild(periodLabel);
     }
     if(!rows.length) tbody.innerHTML='<tr><td colspan="5">' + L.noRows + '</td></tr>';
-    else { rows.slice().reverse().slice(0,200).forEach(row=>{const tr=document.createElement("tr"),culture=cultureById.get(row.culture_id),cells=[row.measured_at?new Date(row.measured_at).toLocaleString("fr-FR"):"Date inconnue",culture?.code||(row.culture_id?L.cultureLinked:L.noCulture),String(row.raw_value??"—"),row.raw_unit_code||"Unité non renseignée",row.method||"—"];cells.forEach(value=>{const td=document.createElement("td");td.textContent=value;tr.appendChild(td);});tbody.appendChild(tr);});if(rows.length>200){const tr=document.createElement("tr"),td=document.createElement("td");td.colSpan=5;td.textContent=L.limited(rows.length);tr.appendChild(td);tbody.appendChild(tr);}}
+    else { rows.slice().reverse().slice(0,200).forEach(row=>{const tr=document.createElement("tr"),culture=cultureById.get(row.culture_id),cells=[row.measured_at?new Date(row.measured_at).toLocaleString(chartLocale):L.unknownDate,culture?.code||(row.culture_id?L.cultureLinked:L.noCulture),String(row.raw_value??"—"),row.raw_unit_code||L.unitMissing,row.method||"—"];cells.forEach(value=>{const td=document.createElement("td");td.textContent=value;tr.appendChild(td);});tbody.appendChild(tr);});if(rows.length>200){const tr=document.createElement("tr"),td=document.createElement("td");td.colSpan=5;td.textContent=L.limited(rows.length);tr.appendChild(td);tbody.appendChild(tr);}}
   } catch(error) { if (requestId !== statisticsRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId) || domain !== (document.body.dataset.domain || "mycology")) return; console.error("Analyse des mesures impossible :",error); status.textContent=L.loadError+error.message; chart.innerHTML='<p class="muted">' + L.graphError + '</p>'; summary.innerHTML=""; tbody.innerHTML='<tr><td colspan="5">' + L.unavailable + '</td></tr>'; }
   finally { if (requestId === statisticsRequestId && isCurrentWorkspaceRevision(loadRevision, loadOrganizationId) && domain === (document.body.dataset.domain || "mycology")) { button.disabled=false; button.textContent=L.buttonAnalyze; } }
 }
@@ -5877,27 +5883,52 @@ function biologicalWorkflowText(key, count = 0) {
 }
 
 async function loadBiologicalLineage(cultureId) {
+  const requestId = ++cultureLineageRequestId;
   const target = document.getElementById('cultureLineage');
   const loadRevision = authStateRevision;
   const loadOrganizationId = organizationId;
   if (!target || !loadOrganizationId) return;
+  target.dataset.cultureId = cultureId;
+  const isCurrentRequest = () =>
+    requestId === cultureLineageRequestId &&
+    target.dataset.cultureId === cultureId &&
+    isCurrentWorkspaceRevision(loadRevision, loadOrganizationId);
   target.textContent = biologicalWorkflowText("loading");
   try {
-    const { data, error } = await supabaseClient.from('cultures')
-      .select('id,code,culture_type,material_id,parent_culture_id,started_at,metadata')
-      .eq('organization_id', loadOrganizationId).order('created_at', { ascending: true }).limit(1000);
-    if (error) throw error;
-    if (!isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
-    const rows = data || [];
+    const pageSize = 1000;
+    const maxRows = 10000;
+    const loadPages = async (table, columns) => {
+      const rows = [];
+      for (let offset = 0; offset < maxRows; offset += pageSize) {
+        const { data, error } = await supabaseClient.from(table)
+          .select(columns)
+          .eq("organization_id", loadOrganizationId)
+          .order("created_at", { ascending: true })
+          .order("id", { ascending: true })
+          .range(offset, offset + pageSize - 1);
+        if (error) throw error;
+        if (!isCurrentRequest()) return { rows: [], truncated: false };
+        rows.push(...(data || []));
+        if (!data || data.length < pageSize) return { rows, truncated: false };
+      }
+      return { rows, truncated: true };
+    };
+    const culturePage = await loadPages(
+      "cultures",
+      "id,code,culture_type,material_id,parent_culture_id,started_at,metadata"
+    );
+    if (!isCurrentRequest()) return;
+    const rows = culturePage.rows;
     const byId = new Map(rows.map(row => [row.id, row]));
     const current = byId.get(cultureId);
     if (!current) { target.textContent = biologicalWorkflowText("missing"); return; }
-    const { data: materials, error: materialError } = await supabaseClient.from('materials')
-      .select('id,material_code,material_type,parent_material_id,generation,state,strain_id')
-      .eq('organization_id', loadOrganizationId).limit(2000);
-    if (materialError) throw materialError;
-    if (!isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
-    const materialById = new Map((materials || []).map(item => [item.id, item]));
+    const materialPage = await loadPages(
+      "materials",
+      "id,material_code,material_type,parent_material_id,generation,state,strain_id"
+    );
+    if (!isCurrentRequest()) return;
+    const materials = materialPage.rows;
+    const materialById = new Map(materials.map(item => [item.id, item]));
     const materialChain = []; let materialId = current.material_id; let materialGuard = 0;
     while (materialId && materialGuard++ < 50) { const material = materialById.get(materialId); if (!material) break; materialChain.unshift(material); materialId = material.parent_material_id; }
     const ancestors = []; let parentId = current.parent_culture_id; let guard = 0;
@@ -5917,8 +5948,13 @@ async function loadBiologicalLineage(cultureId) {
     makeGroup(biologicalWorkflowText("selected"), [{ row: current, label: biologicalWorkflowText("openSheet") }]);
     if (descendants.length) makeGroup(biologicalWorkflowText("descendants") + ' (' + descendants.length + ')', descendants.map(row => ({ row, label: biologicalWorkflowText("generation") + (row.depth || 1) })));
     if (!ancestors.length && !descendants.length) { const p = document.createElement('p'); p.className = 'muted'; p.textContent = biologicalWorkflowText("noLineage"); target.appendChild(p); }
-    if (rows.length >= 1000) { const note = document.createElement('p'); note.className = 'muted'; note.textContent = biologicalWorkflowText("partial"); target.appendChild(note); }
-  } catch (error) { if (!isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return; target.textContent = biologicalWorkflowText("loadError") + (error.message || error); }
+    if (culturePage.truncated || materialPage.truncated) {
+      const note = document.createElement('p');
+      note.className = 'muted';
+      note.textContent = biologicalWorkflowText("partial") + " (limite de sécurité : " + maxRows + " enregistrements par table).";
+      target.appendChild(note);
+    }
+  } catch (error) { if (!isCurrentRequest()) return; target.textContent = biologicalWorkflowText("loadError") + (error.message || error); }
 }
 
 async function saveBiologicalOperation(event) {
@@ -5973,6 +6009,7 @@ async function saveBiologicalOperation(event) {
 }
 
 let cultureDetailRequestId = 0;
+let cultureLineageRequestId = 0;
 
 async function loadCultureDetail(cultureId) {
   const requestId = ++cultureDetailRequestId;
