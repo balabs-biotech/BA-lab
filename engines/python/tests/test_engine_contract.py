@@ -1,7 +1,9 @@
 import json
 import sys
 import unittest
+from io import StringIO
 from pathlib import Path
+from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
@@ -10,6 +12,7 @@ from ba_engine_contract import (
     ContractValidationError, EngineExecutionError, EngineSpec, execute_engine,
     validate_request, validate_response,
 )
+from ba_engine_contract.worker import main as worker_main
 from ba_engine_contract.environmental_timeseries_qc import (
     analyze_environmental_timeseries_qc, run_environmental_timeseries_qc,
 )
@@ -273,6 +276,34 @@ class EngineContractTests(unittest.TestCase):
         engine = EngineSpec(REQUEST["engine"]["engine_id"], "9.9.9", lambda _payload: {})
         with self.assertRaises(ContractValidationError):
             execute_engine(REQUEST, engine)
+
+
+    def test_registry_resolves_and_executes_exact_engine_version(self):
+        request = json.loads(json.dumps(REQUEST))
+        request["engine"] = {"engine_id": "environmental.timeseries.qc", "engine_version": "0.1.0"}
+        result = execute_registered_engine(request)
+        self.assertEqual(result["status"], "completed")
+        self.assertEqual(result["engine"], request["engine"])
+        self.assertEqual(result["result"]["outcome"], "insufficient_data")
+
+    def test_registry_rejects_unregistered_engine(self):
+        request = json.loads(json.dumps(REQUEST))
+        request["engine"] = {"engine_id": "environmental.unknown", "engine_version": "0.1.0"}
+        with self.assertRaisesRegex(ContractValidationError, "engine_not_registered"):
+            execute_registered_engine(request)
+
+    def test_worker_cli_reads_request_and_writes_result_json(self):
+        request = json.loads(json.dumps(REQUEST))
+        request["engine"] = {"engine_id": "environmental.timeseries.qc", "engine_version": "0.1.0"}
+        stdin = StringIO(json.dumps(request))
+        stdout = StringIO()
+        stderr = StringIO()
+        with patch("sys.stdin", stdin), patch("sys.stdout", stdout), patch("sys.stderr", stderr):
+            exit_code = worker_main()
+        self.assertEqual(exit_code, 0, msg=stderr.getvalue())
+        response = json.loads(stdout.getvalue())
+        self.assertEqual(response["status"], "completed")
+        self.assertEqual(response["request_id"], request["request_id"])
 
     def test_unknown_fields_are_rejected_at_envelope_boundaries(self):
         invalid = json.loads(json.dumps(REQUEST))
