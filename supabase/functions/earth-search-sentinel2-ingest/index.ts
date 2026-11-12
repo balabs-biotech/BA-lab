@@ -209,12 +209,14 @@ Deno.serve(async (req: Request) => {
     const invalidRows = validateRows(body.rows, organizationId, locationId);
     if (invalidRows) return json(422, { error: invalidRows });
 
-    const { error: upsertError } = await adminClient.from("environmental_observations").upsert(body.rows, {
-      onConflict: "organization_id,location_id,provider_code,dataset_code,variable_code,observed_at,source_record_id",
-      ignoreDuplicates: false,
-    });
-    if (upsertError) {
-      console.error("[earth-search-sentinel2-ingest] Persistence failed", upsertError.code ?? "unknown");
+    // The satellite deduplication index is partial. Route through the SQL
+    // function so PostgreSQL can infer the matching data_family predicate.
+    const { data: persistedCount, error: upsertError } = await adminClient.rpc(
+      "upsert_satellite_environmental_observations",
+      { p_rows: body.rows },
+    );
+    if (upsertError || typeof persistedCount !== "number") {
+      console.error("[earth-search-sentinel2-ingest] Persistence failed", upsertError?.code ?? "unknown");
       return json(500, { error: "observation_persistence_failed" });
     }
     return json(200, {
@@ -222,8 +224,8 @@ Deno.serve(async (req: Request) => {
       provider: "Earth Search",
       dataset: "Sentinel-2 L2A",
       location_id: locationId,
-      scenes_persisted: body.rows.length / 2,
-      observations_upserted: body.rows.length,
+      scenes_persisted: persistedCount / 2,
+      observations_upserted: persistedCount,
       idempotent: true,
     });
   } catch (error) {
