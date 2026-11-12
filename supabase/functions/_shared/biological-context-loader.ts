@@ -9,6 +9,7 @@
 import { assembleResolvedBiologicalContextSnapshot } from "./biological-context-assembly.ts";
 import { resolveBiologicalContext } from "./biological-context-resolver.ts";
 
+const MAX_CONTEXTS = 500;
 const MAX_MEASUREMENTS = 1000;
 const MAX_WEATHER_OBSERVATIONS = 3000;
 
@@ -46,7 +47,8 @@ export async function loadAuthenticatedBiologicalContextSnapshot(input: {
     userClient.from("biological_contexts")
       .select("id,organization_id,culture_id,environment_id,valid_from,valid_to")
       .eq("organization_id", organizationId)
-      .eq("culture_id", cultureId),
+      .eq("culture_id", cultureId)
+      .limit(MAX_CONTEXTS + 1),
     userClient.from("measurements")
       .select("id,organization_id,culture_id,environment_id,variable_code,raw_value,raw_unit_code,normalized_value,normalized_unit_code,measured_at,method,instrument,quality_state,exclusion_reason,sample_id,experimental_unit_id,event_id,result_id,metadata")
       .eq("organization_id", organizationId)
@@ -58,6 +60,9 @@ export async function loadAuthenticatedBiologicalContextSnapshot(input: {
   ]);
   const contexts = requireRows(contextResult, "biological_contexts_unavailable");
   const measurements = requireRows(measurementResult, "culture_measurements_unavailable");
+  if (contexts.length > MAX_CONTEXTS) {
+    throw new Error("biological_analysis_context_limit_exceeded");
+  }
   if (measurements.length > MAX_MEASUREMENTS) {
     throw new Error("biological_analysis_measurement_limit_exceeded");
   }
