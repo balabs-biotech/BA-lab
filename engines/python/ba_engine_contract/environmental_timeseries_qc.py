@@ -47,11 +47,11 @@ def run_environmental_timeseries_qc(request: Mapping[str, Any]) -> dict[str, Any
     max_gap_minutes = parameters.get("max_gap_minutes", 180)
     outlier_threshold = parameters.get("outlier_mad_threshold", 3.5)
     minimum_points = parameters.get("minimum_points", 3)
-    if not isinstance(max_gap_minutes, (int, float)) or max_gap_minutes <= 0:
+    if isinstance(max_gap_minutes, bool) or not isinstance(max_gap_minutes, (int, float)) or not isfinite(max_gap_minutes) or max_gap_minutes <= 0:
         raise ValueError("invalid_max_gap_minutes")
-    if not isinstance(outlier_threshold, (int, float)) or outlier_threshold <= 0:
+    if isinstance(outlier_threshold, bool) or not isinstance(outlier_threshold, (int, float)) or not isfinite(outlier_threshold) or outlier_threshold <= 0:
         raise ValueError("invalid_outlier_mad_threshold")
-    if not isinstance(minimum_points, int) or minimum_points < 2:
+    if isinstance(minimum_points, bool) or not isinstance(minimum_points, int) or minimum_points < 2:
         raise ValueError("invalid_minimum_points")
 
     grouped: dict[tuple[str, str], list[tuple[datetime, float, str]]] = defaultdict(list)
