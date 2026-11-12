@@ -54,14 +54,12 @@ Every response echoes `request_id`, engine identity and `input_snapshot_sha256`,
 
 ## Delivery sequence
 
-1. Land and test these v1 schemas.
-2. Add a Python contract package that loads schemas and validates envelopes.
-3. Implement a minimal worker runner with timeout, structured logs and typed errors.
-4. Register one deterministic engine (environmental time-series quality checks) with explicit sandbox capabilities and bounded resource limits.
-5. Implement the worker runner with timeout, structured logs and typed errors.
-6. Add provider adapters and biological interpretation only after the deterministic worker lifecycle is verified.
-
-
+1. Version and test the request, response and manifest schemas.
+2. Validate request/result correlation and immutable record snapshots in the Python contract package.
+3. Execute registered engines through a stateless typed runner that validates all returned envelopes.
+4. Register the deterministic environmental QC engine with explicit sandbox capabilities and bounded resource declarations.
+5. Add a deployment adapter that enforces hard process timeouts, memory/CPU limits, concurrency, cancellation and idempotency. The in-process Python runner does not itself provide OS-level sandboxing or hard resource enforcement.
+6. Add external provider adapters and biological interpretation only after the worker lifecycle and evidence requirements are verified.
 
 ## First reference engine: environmental time-series QC
 
@@ -81,7 +79,7 @@ Those functions belong in separate engines/adapters after data provenance, calib
 
 - Transport (HTTP, queue or direct process invocation).
 - Worker deployment target and container image policy.
-- Per-engine parameter schemas and resource budgets.
+- Per-engine parameter schemas and enforcement of resource budgets by the deployment adapter.
 - Result retention period and human-review workflow.
 
 These are orchestration/deployment decisions and should not be hidden inside the data contract.
