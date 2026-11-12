@@ -141,19 +141,7 @@ Deno.serve(async (req: Request) => {
     return reply(403, { error: "organization_role_not_permitted" });
   }
 
-  // Source rows are read with the caller JWT, so RLS and tenant filters both apply.
-  const { data: measurements, error: sourceError } = await userClient
-    .from("measurements")
-    .select("id,variable_code,raw_value,raw_unit_code,normalized_value,normalized_unit_code,measured_at,method,instrument,quality_state,exclusion_reason,culture_id,sample_id,experimental_unit_id,event_id,result_id,metadata")
-    .eq("organization_id", organizationId)
-    .in("id", recordIds);
-  if (sourceError) return reply(422, { error: "source_records_unavailable" });
-  if (!measurements || measurements.length !== recordIds.length) {
-    return reply(422, { error: "one_or_more_source_records_missing_or_inaccessible" });
-  }
-  if (measurements.some((row) => row.quality_state === "excluded")) {
-    return reply(422, { error: "excluded_source_records_not_eligible" });
-  }
+  // Source rows are read with the caller JWT; each supported source has its own RLS-scoped query.
   let sourceRows: Record<string, any>[];
   if (recordType === "measurement") {
     const { data, error: sourceError } = await userClient
