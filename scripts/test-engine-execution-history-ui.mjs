@@ -25,6 +25,8 @@ assert.match(renderer, /replaceChildren\(\)/);
 assert.match(renderer, /textContent/);
 assert.match(renderer, /quality_flags/);
 assert.match(renderer, /measurement_count/);
+assert.match(renderer, /variable_code/);
+assert.match(renderer, /max_gap_minutes/);
 assert.match(renderer, /error_code/);
 assert.doesNotMatch(renderer, /innerHTML|insertAdjacentHTML/);
 
