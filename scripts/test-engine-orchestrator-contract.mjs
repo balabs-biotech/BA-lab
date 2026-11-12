@@ -14,6 +14,8 @@ const checks = [
   ["idempotency race resolution uses the same invocation comparison", /if \(raced && sameExecutionInput\(raced, engineRequest\)\)/],
   ["engine versions are explicitly allowlisted", /ENGINE_ALLOWLIST/],
   ["worker response is schema validated", /validateResponse/],
+  ["successful results use atomic structured persistence", /rpc\("complete_engine_execution"/],
+  ["atomic result persistence returns a durable result id", /result_id: resultId/],
   ["request and snapshot correlation is enforced", /input_snapshot_sha256/],
   ["service credential is server-side only", /Deno\.env\.get\("SUPABASE_[A-Z_]*KEY"\)/],
   ["worker call has an abort timeout", /AbortController/],
