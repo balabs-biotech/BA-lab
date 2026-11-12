@@ -1,6 +1,6 @@
 # Supabase ↔ Python engine orchestration contract
 
-Status: interface and persistence foundation. No production worker endpoint is configured and no Edge Function dispatch is enabled by this change.
+Status: source implementation includes the authenticated Edge Function dispatch path, PostgreSQL execution ledger, Python HTTP adapter and container build. No worker has been deployed and no production dispatch has been enabled.
 
 ## Execution lifecycle
 
@@ -20,7 +20,7 @@ The Deno Edge Function must not attempt to import or spawn the Python CLI. A sep
 - Body: exact `BA-LABS/ENGINE` v1 request envelope from `schemas/engine/v1/request.schema.json`
 - Response: exact `BA-LABS/ENGINE-RESULT` v1 envelope from `schemas/engine/v1/response.schema.json`
 
-The adapter resolves the exact engine ID/version from its allowlisted registry and applies OS-level CPU, memory, timeout, network and filesystem restrictions. The Python runner's manifest declarations alone are not a sandbox.
+The adapter resolves the exact engine ID/version from its allowlisted registry. The container image is built from `engines/python/Dockerfile`, runs as UID 10001, and is intended to run read-only with dropped Linux capabilities, no-new-privileges, 256 MB memory, 1 CPU and a 64-process limit. Network ingress/egress policy and hard per-request CPU deadlines remain deployment-platform responsibilities. The Python runner's manifest declarations alone are not a sandbox.
 
 ## Required orchestration invariants
 
@@ -36,7 +36,7 @@ The adapter resolves the exact engine ID/version from its allowlisted registry a
 
 ## Current boundary
 
-This commit creates the durable database contract and documents the transport boundary. It does not claim that Python is reachable from Supabase, that a worker token exists, or that any production execution can run yet. The next implementation step is the authenticated Edge Function and its adapter-backed dispatch, followed by end-to-end tests against a local adapter.
+The repository now contains the durable database contract, authenticated Edge Function, standard-library HTTP adapter, non-root Docker image and black-box container smoke test. CI builds the image, starts it with a test-only token, and checks health, authentication, registered-engine dispatch and result correlation. This does not establish production reachability: the image is not deployed, no worker URL/token is configured in Supabase, and no production execution has run.
 
 ## Implemented Edge Function boundary
 
@@ -89,3 +89,16 @@ The function source is committed but not deployed. No worker URL/token is config
 - The adapter uses only Python's standard library; it is exposed as `ba-engine-http-worker`.
 
 Runtime configuration: `BA_ENGINE_WORKER_TOKEN` (required), `BA_ENGINE_HTTP_HOST` (default `0.0.0.0`), and `BA_ENGINE_HTTP_PORT` (default `8080`). Run it behind a TLS-terminating reverse proxy and inside a container/runtime that enforces the manifest's CPU, memory, filesystem, network and process-time limits. The adapter itself is not an OS sandbox and is not deployed by this repository change.
+
+
+## Container build and runtime
+
+Build from the repository root:
+
+```sh
+docker build -f engines/python/Dockerfile -t ba-labs-engine-worker:0.1.0 .
+```
+
+The image contains the Python package, versioned engine registry and `schemas/engine/v1`. It exposes port 8080 and requires `BA_ENGINE_WORKER_TOKEN` at runtime. See `engines/python/README.md` for the hardened `docker run` invocation and network placement requirements.
+
+CI builds the image and executes `scripts/test-engine-worker-container.py` against a running container with a disposable token. The smoke test checks readiness, rejects unauthenticated execution, runs the registered environmental QC engine and verifies the result's request/engine/snapshot correlation.
