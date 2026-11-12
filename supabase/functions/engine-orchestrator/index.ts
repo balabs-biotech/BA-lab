@@ -299,11 +299,23 @@ Deno.serve(async (req: Request) => {
 
   const completedAt = new Date().toISOString();
   if (result.status === "completed") {
-    const { error: saveError } = await serviceClient.from("engine_executions").update({
-      status: "completed", result_payload: result, completed_at: completedAt, updated_at: completedAt,
-    }).eq("organization_id", organizationId).eq("id", execution.id);
-    if (saveError) return reply(500, { error: "result_persistence_failed", execution_id: execution.id });
-    return reply(200, { execution_id: execution.id, request_id: requestId, status: "completed", result });
+    const { data: resultId, error: saveError } = await serviceClient.rpc("complete_engine_execution", {
+      p_organization_id: organizationId,
+      p_execution_id: execution.id,
+      p_result: result,
+      p_completed_at: completedAt,
+    });
+    if (saveError || !resultId) {
+      console.error("[engine-orchestrator] atomic result persistence failed");
+      return reply(500, { error: "result_persistence_failed", execution_id: execution.id });
+    }
+    return reply(200, {
+      execution_id: execution.id,
+      result_id: resultId,
+      request_id: requestId,
+      status: "completed",
+      result,
+    });
   }
 
   await serviceClient.from("engine_executions").update({
