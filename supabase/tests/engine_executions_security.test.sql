@@ -228,6 +228,6 @@ begin
       and r.result_type='biological.context.features'
       and e.status='completed'
   ) then raise exception 'empty BIE snapshot must persist as an insufficient-data result'; end if;
-end $;
+end $$;
 
 rollback;
