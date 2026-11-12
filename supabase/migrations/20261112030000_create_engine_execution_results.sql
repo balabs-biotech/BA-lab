@@ -52,7 +52,7 @@ create trigger engine_execution_results_immutable
   before update or delete on public.engine_execution_results
   for each row execute function private.reject_engine_result_mutation();
 
-create or replace function private.complete_engine_execution(
+create or replace function public.complete_engine_execution(
   p_organization_id uuid, p_execution_id uuid, p_result jsonb, p_completed_at timestamptz
 )
 returns uuid language plpgsql security definer
@@ -111,7 +111,7 @@ begin
   return v_result_id;
 end;
 $$;
-revoke all on function private.complete_engine_execution(uuid, uuid, jsonb, timestamptz) from public, anon, authenticated;
-grant execute on function private.complete_engine_execution(uuid, uuid, jsonb, timestamptz) to service_role;
+revoke all on function public.complete_engine_execution(uuid, uuid, jsonb, timestamptz) from public, anon, authenticated;
+grant execute on function public.complete_engine_execution(uuid, uuid, jsonb, timestamptz) to service_role;
 comment on table public.engine_execution_results is
   'Queryable immutable analytical outputs, separated from raw measurements and linked to their immutable execution input snapshot.';
