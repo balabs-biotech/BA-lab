@@ -58,6 +58,7 @@ The orchestrator must resolve source rows using the caller-scoped Supabase clien
 
 Every execution must include:
 - organization and authorized biological scope;
+- a source record list that may be empty only for `biological.context.features`, where an empty snapshot is a valid `insufficient_data` result and must still be persisted;
 - engine ID and semantic version;
 - stable request and idempotency identifiers;
 - immutable input snapshot hash;
@@ -75,7 +76,7 @@ Input eligibility:
 
 ## 5. Output contract
 
-BIE returns the existing `BA-LABS/ENGINE-RESULT` envelope. Its structured result must use a versioned result type, initially `biological.context_assessment.v1`.
+BIE returns the existing `BA-LABS/ENGINE-RESULT` envelope. Its structured result uses `result_type: biological.context_assessment` and `result_version: 1.0.0`.
 
 Required result sections:
 
@@ -136,6 +137,12 @@ Implementation update (2026-11-12): the first deterministic Python feature engin
 
 ## 10. Explicit implementation boundary
 
-This contract is a design artifact on top of the BAL-JSON/BAL-Core/Python-engine branch. The schema, production read-model audit, deterministic feature engine, pure snapshot adapter and pure temporal context resolver are present on the feature branch; none of this means the authenticated BIE data path or production deployment is complete.
+The deterministic engine, versioned registry manifest, schemas, authenticated source loader, temporal resolver, snapshot assembly and BIE orchestrator path now exist on the stacked feature branches. The orchestrator remains opt-in behind `BA_BIE_ENABLED=true`; the flag must remain unset until the deployment prerequisites and end-to-end checks below are complete.
 
-The next code task is to connect the resolver and snapshot adapter to the existing authenticated `engine-orchestrator`: load culture, dated biological contexts, environments/locations and measurements under the caller JWT/RLS; resolve the analysis window; fetch external weather only for one unambiguous location; then build and persist the immutable BIE execution. Keep the BIE allowlist closed until end-to-end tenant-scope, temporal-conflict, idempotency and persistence tests pass. Do not begin recommendations or strain ranking before those gates pass.
+The execution ledger and immutable result tables are defined by migrations in the BAL-Core/runtime branch. Empty source snapshots are valid only for `biological.context.features`, and both persistence tables must permit that engine-specific case so the engine can store an honest `insufficient_data` result. A regression test now covers this behavior.
+
+The CultureOps execution-history interface has a dedicated BIE result renderer in PR #299. It presents coverage, source-linked observations, derived features, missing context and temporal gaps without interpreting result text as HTML. Its CI run passed all listed jobs after correcting the asset-version assertion.
+
+**Production rollout is not complete.** A direct inspection of the connected Supabase project on 2026-11-12 found that the engine execution tables and the `engine-orchestrator` Edge Function are not deployed there, and the three engine-ledger migrations are absent from `supabase_migrations.schema_migrations`. No production migration, function deployment, worker configuration or BIE feature-flag activation has been performed.
+
+Next steps: finish CI for the empty-snapshot migration regression; integrate the stacked PRs in dependency order; deploy the ledger migrations; deploy the orchestrator and Python worker; configure server-side worker credentials and the BIE flag only after the worker registry and authorization checks are verified; then run an authenticated end-to-end test for both a populated snapshot and an empty snapshot. Keep biological recommendations, strain ranking and autonomous interventions out of scope until validated domain datasets and methods exist.
