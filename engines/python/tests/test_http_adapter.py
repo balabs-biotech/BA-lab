@@ -43,7 +43,7 @@ def make_request():
 class EngineHttpAdapterTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.server = create_server("test-worker-token", host="127.0.0.1", port=0)
+        cls.server = create_server("test-worker-token-123456789", host="127.0.0.1", port=0)
         cls.thread = threading.Thread(target=cls.server.serve_forever, daemon=True)
         cls.thread.start()
         cls.base_url = f"http://127.0.0.1:{cls.server.server_port}"
@@ -78,7 +78,7 @@ class EngineHttpAdapterTests(unittest.TestCase):
             data=json.dumps(payload).encode(),
             headers={
                 "Content-Type": "application/json",
-                "Authorization": "Bearer test-worker-token",
+                "Authorization": "Bearer test-worker-token-123456789",
             },
             method="POST",
         )
@@ -97,7 +97,7 @@ class EngineHttpAdapterTests(unittest.TestCase):
             data=body,
             headers={
                 "Content-Type": "application/json",
-                "Authorization": "Bearer test-worker-token",
+                "Authorization": "Bearer test-worker-token-123456789",
             },
             method="POST",
         )
