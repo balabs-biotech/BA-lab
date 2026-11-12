@@ -42,7 +42,11 @@ def _trusted_asset_url(url: str) -> bool:
 
 
 def _masked_as_float(array: Any) -> np.ndarray:
-    return np.asarray(np.ma.filled(array, np.nan), dtype=np.float64)
+    values = np.asarray(np.ma.getdata(array), dtype=np.float64)
+    mask = np.ma.getmaskarray(array)
+    if np.any(mask):
+        values[mask] = np.nan
+    return values
 
 
 def _band_scale_offset(dataset: Any) -> tuple[float, float]:
@@ -97,6 +101,8 @@ def read_sentinel2_ndvi_window(
         nir_ds = stack.enter_context(open_asset(scene.nir_asset_url))
         scl_ds = stack.enter_context(open_asset(scene.scl_asset_url))
 
+        if red_ds.count < 1 or nir_ds.count < 1 or scl_ds.count < 1:
+            raise ValueError("all Sentinel-2 assets must contain at least one raster band")
         if red_ds.crs is None or nir_ds.crs is None or scl_ds.crs is None:
             raise ValueError("all Sentinel-2 assets must declare a CRS")
         if (
