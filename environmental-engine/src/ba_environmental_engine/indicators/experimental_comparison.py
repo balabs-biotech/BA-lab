@@ -151,7 +151,6 @@ def compare_experimental_cohorts(
     profiles = {(item.profile_id, item.profile_version) for item in accepted}
     subject_types = {item.subject_type for item in accepted}
     methods = {item.method for item in accepted}
-    instruments = {item.instrument for item in accepted}
     if len(contexts) != 1:
         raise ValueError("cohorts must share one declared context_signature")
     if len(units) != 1:
