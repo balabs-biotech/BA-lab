@@ -1,5 +1,8 @@
 import json
+import os
+import shutil
 import sys
+import tempfile
 import unittest
 from io import StringIO
 from pathlib import Path
@@ -13,6 +16,8 @@ from ba_engine_contract import (
     execute_registered_engine, validate_request, validate_response,
 )
 from ba_engine_contract.worker import main as worker_main
+from ba_engine_contract.validation import _validator
+from ba_engine_contract.registry import load_engine
 from ba_engine_contract.environmental_timeseries_qc import (
     analyze_environmental_timeseries_qc, run_environmental_timeseries_qc,
 )
@@ -277,6 +282,25 @@ class EngineContractTests(unittest.TestCase):
         with self.assertRaises(ContractValidationError):
             execute_engine(REQUEST, engine)
 
+
+    def test_schema_directory_can_be_overridden_for_installed_runtime(self):
+        with tempfile.TemporaryDirectory() as schema_dir:
+            shutil.copy(SCHEMA_DIR / "request.schema.json", schema_dir)
+            with patch.dict(os.environ, {"BA_ENGINE_SCHEMA_DIR": schema_dir}):
+                _validator.cache_clear()
+                validate_request(REQUEST)
+        _validator.cache_clear()
+
+    def test_registry_directory_can_be_overridden_for_installed_runtime(self):
+        with tempfile.TemporaryDirectory() as registry_dir:
+            shutil.copy(
+                REGISTRY_DIR / "environmental.timeseries.qc-0.1.0.json",
+                registry_dir,
+            )
+            with patch.dict(os.environ, {"BA_ENGINE_REGISTRY_DIR": registry_dir}):
+                manifest, engine = load_engine("environmental.timeseries.qc", "0.1.0")
+        self.assertEqual(manifest["engine"]["engine_id"], "environmental.timeseries.qc")
+        self.assertEqual(engine.engine_version, "0.1.0")
 
     def test_registry_resolves_and_executes_exact_engine_version(self):
         request = json.loads(json.dumps(REQUEST))
