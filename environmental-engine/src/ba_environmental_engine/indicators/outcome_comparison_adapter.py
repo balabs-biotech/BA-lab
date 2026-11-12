@@ -73,7 +73,7 @@ def outcome_evidence_rows_to_experimental_observations(
     context evidence is intentionally not treated as a biological outcome.
     """
     observations: list[ExperimentalObservation] = []
-    seen_measurements: set[tuple[str, str, str]] = set()
+    seen_measurements: set[str] = set()
 
     for row in rows:
         recommendation_id = str(row.get("recommendation_id") or "").strip()
@@ -107,10 +107,9 @@ def outcome_evidence_rows_to_experimental_observations(
         outcome_event_id = str(row.get("outcome_event_id") or "").strip()
         if not measurement_id or not outcome_event_id:
             raise ValueError("outcome measurement and event IDs are required")
-        unique_key = (recommendation_id, outcome_event_id, measurement_id)
-        if unique_key in seen_measurements:
+        if measurement_id in seen_measurements:
             raise ValueError("duplicate recommendation outcome measurement evidence")
-        seen_measurements.add(unique_key)
+        seen_measurements.add(measurement_id)
 
         variable_code = str(row.get("variable_code") or "").strip()
         canonical_unit = variable_registry.get(variable_code)
