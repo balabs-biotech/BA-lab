@@ -106,3 +106,14 @@ integration tests, and deployment configuration are implemented and verified.
 - Added tests for processor composition, AOI bounds, cancellation, STAC HTTP transport and raw-item ordering. These tests have been added but not executed in this session.
 
 The async path is still not ready for activation. The authenticated gateway has not yet been converted to enqueue-only behavior, the worker process has no deployment/supervision configuration, and end-to-end tests against a disposable Supabase project remain required.
+
+
+## Dedicated worker process entrypoint
+
+A graceful-stop CLI is now available as
+`python -m ba_environmental_engine.execution.worker_main`. It builds the
+private runtime from environment-injected service-role credentials, handles
+SIGTERM/SIGINT, and drains the current job before stopping its poll loop.
+The existing API Docker image already installs the `satellite` extra, so a
+separate worker service can reuse that image with a command override. No worker
+service has been deployed or started.
