@@ -254,7 +254,7 @@ class EngineContractTests(unittest.TestCase):
             execute=analyze_environmental_timeseries_qc,
         )
         result = execute_engine(request, engine)
-        self.assertEqual(result["status"], "completed")
+        self.assertEqual(result["status"], "completed", msg=str(result.get("error")))
         self.assertEqual(result["result"]["outcome"], "insufficient_data")
 
     def test_runner_returns_typed_failure_without_leaking_exception(self):
