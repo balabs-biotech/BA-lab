@@ -105,15 +105,15 @@ export async function buildBiologicalContextSnapshot(input: {
   if (windowEnd <= windowStart) throw new Error("analysis_window_end_must_follow_start");
   if (!window.timezone) throw new Error("analysis_timezone_required");
 
+  // The supplied environment is the historically resolved environment for
+  // this analysis window, not necessarily cultures.environment_id (which is
+  // mutable and must never be used to reconstruct past context).
   let locationId: string | null = null;
-  if (culture.environment_id) {
-    if (!environment || environment.id !== culture.environment_id ||
-        environment.organization_id !== organizationId) {
-      throw new Error("culture_environment_not_resolved");
+  if (environment) {
+    if (!environment.id || environment.organization_id !== organizationId) {
+      throw new Error("resolved_environment_organization_scope_mismatch");
     }
     if (environment.location_id) locationId = environment.location_id;
-  } else if (environment) {
-    throw new Error("unexpected_environment_for_unlinked_culture");
   }
 
   const records: Record<string, unknown>[] = [];
@@ -121,13 +121,11 @@ export async function buildBiologicalContextSnapshot(input: {
     if (row.organization_id !== organizationId || row.culture_id !== culture.id) {
       throw new Error("measurement_culture_scope_mismatch");
     }
-    if (row.environment_id && row.environment_id !== culture.environment_id) {
-      throw new Error("measurement_environment_scope_mismatch");
-    }
     const instant = parseInstant(row.measured_at, "measurement_timestamp");
     if (instant < windowStart || instant > windowEnd) continue;
     const context = {
       culture_id: row.culture_id,
+      environment_id: row.environment_id ?? null,
       sample_id: row.sample_id ?? null,
       experimental_unit_id: row.experimental_unit_id ?? null,
       event_id: row.event_id ?? null,
@@ -205,7 +203,7 @@ export async function buildBiologicalContextSnapshot(input: {
     organization_id: organizationId,
     culture_id: culture.id,
   };
-  if (culture.environment_id) scope.environment_id = culture.environment_id;
+  if (environment) scope.environment_id = environment.id;
   if (locationId) scope.location_id = locationId;
 
   const parameters = {
@@ -213,7 +211,7 @@ export async function buildBiologicalContextSnapshot(input: {
     window_end: window.end,
     timezone: window.timezone,
     biological_context_supplied: false,
-    environment_link_state: culture.environment_id
+    environment_link_state: environment
       ? (locationId ? "resolved" : "environment_without_location")
       : "unlinked",
   };
