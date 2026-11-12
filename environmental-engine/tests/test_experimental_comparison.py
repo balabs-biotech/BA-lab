@@ -52,7 +52,6 @@ def test_comparison_aggregates_repeated_observations_per_independent_subject():
     assert result.baseline.mean == pytest.approx(15.5)
     assert result.comparison.mean == pytest.approx(16)
     assert result.mean_difference == pytest.approx(0.5)
-    assert result.source_record_ids if hasattr(result, "source_record_ids") else True
     assert result.formula_code == "subject_median_cohort_summary"
     assert "does not establish causality" in result.interpretation
 
@@ -141,5 +140,16 @@ def test_duplicate_source_records_and_inconsistent_cohort_labels_are_rejected():
             obs("b1", "control", "b1", 10, 0, label="control"),
             obs("b2", "control", "b2", 11, 0, label="other"),
             obs("t1", "treated", "t1", 15, 0),
+            obs("t2", "treated", "t2", 16, 0),
+        ])
+
+
+
+def test_one_biological_subject_cannot_be_counted_in_both_cohorts():
+    with pytest.raises(ValueError, match="cannot belong to both comparison cohorts"):
+        compare([
+            obs("b1", "control", "shared-subject", 10, 0),
+            obs("b2", "control", "b2", 11, 0),
+            obs("t1", "treated", "shared-subject", 15, 1),
             obs("t2", "treated", "t2", 16, 0),
         ])
