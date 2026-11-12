@@ -56,12 +56,14 @@ def test_private_worker_route_forwards_user_jwt_and_validated_scope(monkeypatch)
         headers={
             "X-BA-Engine-Key": "internal-test-key",
             "Authorization": "Bearer end-user-jwt",
+            "apikey": "test-publishable-key",
         },
     )
 
     assert response.status_code == 200
     assert response.json()["observations_submitted"] == 2
     assert captured["user_authorization"] == "Bearer end-user-jwt"
+    assert captured["supabase_api_key"] == "test-publishable-key"
     assert str(captured["organization_id"]) == payload["organization_id"]
     assert str(captured["location_id"]) == payload["location_id"]
 
