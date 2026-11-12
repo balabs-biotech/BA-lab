@@ -2,17 +2,25 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 
 const source = readFileSync("supabase/functions/engine-orchestrator/index.ts", "utf8");
+const biologicalLoader = readFileSync("supabase/functions/_shared/biological-context-loader.ts", "utf8");
 const checks = [
   ["caller identity is verified", /userClient\.auth\.getUser\(\)/],
   ["organization membership is checked", /organization_members/],
   ["viewer roles cannot invoke privileged execution", /!\["owner", "admin", "member"\]\.includes\(String\(membership\.role\)\)/],
-  ["source record type is explicitly validated", /recordType !== "measurement" && recordType !== "environmental_observation"/],
+  ["ordinary source record types are explicitly validated", /const validSourceType = isBiologicalContextEngine \|\|[\s\S]*recordType === "measurement" \|\| recordType === "environmental_observation"/],
+  ["BIE is disabled unless an explicit server-side feature flag is true", /isBiologicalContextEngine && Deno\.env\.get\("BA_BIE_ENABLED"\) === "true"/],
+  ["BIE ignores caller-supplied source record IDs", /const recordIds = isBiologicalContextEngine \? \[\] : suppliedRecordIds/],
+  ["BIE requires a culture and bounded-window parameters", /validBiologicalRequest[\s\S]*scope\?\.culture_id[\s\S]*parameters\.window_start[\s\S]*parameters\.window_end[\s\S]*parameters\.timezone/],
+  ["BIE loader is called only with caller-scoped Supabase client", /loadAuthenticatedBiologicalContextSnapshot\(\{[\s\S]*userClient[\s\S]*organizationId[\s\S]*cultureId/],
   ["environmental observations are read through caller RLS", /userClient[\s\S]*\.from\("environmental_observations"\)/],
   ["environmental observations are bound to the requested location", /\.eq\("location_id", scope\.location_id\)/],
   ["environmental QC accepts weather records only", /\.eq\("data_family", "weather"\)/],
   ["one environmental provider and dataset are kept per execution", /environmental_source_mismatch/],
   ["environmental observation provenance is included in the snapshot", /provider_code[\s\S]*dataset_code[\s\S]*spatial_resolution_m/],
   ["source rows are loaded through caller-scoped client", /userClient[\s\S]*\.from\(["']measurements["']\)/],
+  ["BIE loader has no service-role or privileged-client creation", !/service_role|SUPABASE_SERVICE_ROLE_KEY|createClient/.test(biologicalLoader)],
+  ["BIE loader enforces row caps before snapshot creation", /MAX_MEASUREMENTS = 1000[\s\S]*MAX_WEATHER_OBSERVATIONS = 3000[\s\S]*analysis_measurement_limit_exceeded[\s\S]*analysis_weather_limit_exceeded/],
+  ["BIE weather query is gated by one resolved location", /preflight\.window\.status === "resolved" && preflight\.window\.location_id/],
   ["snapshot payload hashes the complete source row", /sourceRowById[\s\S]*sha256\(stable\(sourceRow\)/],
   ["worker request size is bounded before dispatch", /workerRequestBody[\s\S]*byteLength > 240_000/],
   ["snapshot is SHA-256 hashed", /crypto\.subtle\.digest\(["']SHA-256["']/],
