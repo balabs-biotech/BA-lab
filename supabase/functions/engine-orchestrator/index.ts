@@ -58,9 +58,6 @@ async function sha256(value: string): Promise<string> {
   const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(value));
   return Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, "0")).join("");
 }
-function safeError(error: unknown): string {
-  return error instanceof Error ? error.message.slice(0, 160) : "unknown_error";
-}
 
 Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") return new Response(null, { status: 204, headers });
@@ -244,11 +241,20 @@ Deno.serve(async (req: Request) => {
   const { error: startError } = await serviceClient.from("engine_executions")
     .update({ status: "running", started_at: startedAt, updated_at: startedAt })
     .eq("organization_id", organizationId).eq("id", execution.id).eq("status", "queued");
-  if (startError) return reply(500, { error: "execution_start_failed", execution_id: execution.id });
+  if (startError) {
+    const failedAt = new Date().toISOString();
+    await serviceClient.from("engine_executions").update({
+      status: "failed", error_code: "execution_start_failed",
+      error_message: "Execution could not enter the running state.",
+      completed_at: failedAt, updated_at: failedAt,
+    }).eq("organization_id", organizationId).eq("id", execution.id);
+    return reply(500, { error: "execution_start_failed", execution_id: execution.id });
+  }
 
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), WORKER_TIMEOUT_MS);
   let workerResponse: Response;
+  let workerBody: string;
   try {
     workerResponse = await fetch(new URL("/v1/execute", workerUrl), {
       method: "POST",
@@ -256,18 +262,20 @@ Deno.serve(async (req: Request) => {
       body: JSON.stringify(engineRequest),
       signal: controller.signal,
     });
+    workerBody = await workerResponse.text();
+    if (workerBody.length > 128_000) throw new Error("worker_response_too_large");
   } catch (error) {
-    clearTimeout(timeout);
     const code = controller.signal.aborted ? "worker_timeout" : "worker_unreachable";
+    const failedAt = new Date().toISOString();
     await serviceClient.from("engine_executions").update({
       status: "failed", error_code: code, error_message: "The registered engine worker did not return a usable response.",
-      completed_at: new Date().toISOString(), updated_at: new Date().toISOString(),
+      completed_at: failedAt, updated_at: failedAt,
     }).eq("organization_id", organizationId).eq("id", execution.id);
     return reply(502, { error: code, execution_id: execution.id });
   } finally { clearTimeout(timeout); }
 
   let result: unknown;
-  try { result = await workerResponse.json(); } catch {
+  try { result = JSON.parse(workerBody); } catch {
     result = null;
   }
   if (!workerResponse.ok || !validateResponse(result) || !object(result) ||
