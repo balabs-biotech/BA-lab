@@ -28,7 +28,7 @@ assert.match(renderer, /replaceChildren\(\)/);
 assert.match(renderer, /textContent/);
 assert.match(renderer, /quality_flags/);
 assert.match(renderer, /storedResult/);
-assert.match(renderer, /storedResult\.value/);
+assert.match(renderer, /result\.value/);
 assert.match(renderer, /Analyse exploitable/);
 assert.match(renderer, /Données insuffisantes/);
 assert.match(renderer, /Méthode et limites/);
