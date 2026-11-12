@@ -9,6 +9,7 @@ const checks = [
   ["requires an authenticated Supabase user", /userClient\.auth\.getUser\(\)/],
   ["requires a server-only worker HMAC secret", /BA_SENTINEL2_WORKER_SECRET/],
   ["verifies the exact raw request body using HMAC-SHA256", /crypto\.subtle\.importKey[\s\S]*?HMAC[\s\S]*?crypto\.subtle\.sign/],
+  ["requires a signed timestamp within a five-minute window", /x-ba-worker-timestamp[\s\S]*?Math\.abs[\s\S]*?> 300/],
   ["bounds request body size", /MAX_BODY_BYTES = 256 \* 1024/],
   ["bounds the number of observation rows", /MAX_ROWS = 200/],
   ["checks location scope using the caller JWT", /userClient\.from\("locations"\)[\s\S]*?eq\("organization_id", organizationId\)/],
