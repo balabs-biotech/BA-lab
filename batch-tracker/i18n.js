@@ -673,7 +673,24 @@
     ["Clôturez d’abord le contexte actif avant d’enregistrer une nouvelle période.","Close the active context before saving a new period.","Feche o contexto ativo antes de guardar um novo período.","أغلق السياق النشط قبل حفظ فترة جديدة."],
     ["Cette période chevauche un contexte déjà enregistré. Corrigez les dates avant de continuer.","This period overlaps an existing context. Correct the dates before continuing.","Este período sobrepõe-se a um contexto existente. Corrija as datas antes de continuar.","تتداخل هذه الفترة مع سياق مسجل. صحح التواريخ قبل المتابعة."],
     ["La date de clôture doit être postérieure au début du contexte.","The closing date must be after the context start date.","A data de fecho deve ser posterior ao início do contexto.","يجب أن يكون تاريخ الإغلاق بعد تاريخ بدء السياق."],
-    ["Renseignez l’environnement, l’organisme, le stade, le système et la date de début.","Enter the environment, organism, stage, system and start date.","Indique o ambiente, organismo, fase, sistema e data de início.","أدخل البيئة والكائن والمرحلة والنظام وتاريخ البداية."]
+    ["Renseignez l’environnement, l’organisme, le stade, le système et la date de início.","Enter the environment, organism, stage, system and start date.","Indique o ambiente, organismo, fase, sistema e data de início.","أدخل البيئة والكائن والمرحلة والنظام وتاريخ البداية."],
+    ["Chargement des contextes biologiques…","Loading biological contexts…","A carregar os contextos biológicos…","جارٍ تحميل السياقات البيولوجية…"],
+    ["Créez d’abord un environnement dans le référentiel.","Create an environment in the catalogue first.","Crie primeiro um ambiente no catálogo.","أنشئ بيئة في الفهرس أولاً."],
+    ["Un contexte est actif. Clôturez-le avant d’enregistrer une nouvelle période.","A context is active. Close it before saving a new period.","Existe um contexto ativo. Feche-o antes de guardar um novo período.","يوجد سياق نشط. أغلقه قبل حفظ فترة جديدة."],
+    ["Culture ou domaine de travail indisponible.","Culture or workspace domain unavailable.","Cultura ou domínio de trabalho indisponível.","المستنبت أو نطاق العمل غير متاح."],
+    ["La fin de validité doit être postérieure au début (borne exclue).","The validity end must be after the start (exclusive bound).","O fim da validade deve ser posterior ao início (limite exclusivo).","يجب أن تكون نهاية الصلاحية بعد البداية (حد غير مشمول)."],
+    ["La souche sélectionnée n’appartient pas au référentiel chargé.","The selected strain is not in the loaded catalogue.","A estirpe selecionada não pertence ao catálogo carregado.","السلالة المحددة ليست ضمن الفهرس المحمّل."],
+    ["Vérification des périodes et enregistrement…","Checking periods and saving…","A verificar os períodos e a guardar…","جارٍ التحقق من الفترات والحفظ…"],
+    ["Vérification des périodes impossible : ","Could not verify periods: ","Não foi possível verificar os períodos: ","تعذّر التحقق من الفترات: "],
+    ["Enregistrement refusé : ","Save rejected: ","Gravação recusada: ","تم رفض الحفظ: "],
+    ["Aucun contexte actif à clôturer ou date de fin absente.","No active context to close or end date missing.","Não existe contexto ativo para fechar ou falta a data de fim.","لا يوجد سياق نشط لإغلاقه أو أن تاريخ الانتهاء مفقود."],
+    ["Lecture du contexte actif impossible : ","Could not read active context: ","Não foi possível ler o contexto ativo: ","تعذّرت قراءة السياق النشط: "],
+    ["Le contexte actif a déjà été modifié. Rechargez la fiche.","The active context has already changed. Reload the record.","O contexto ativo já foi alterado. Atualize a ficha.","تم تعديل السياق النشط بالفعل. أعد تحميل السجل."],
+    ["Clôture impossible : ","Could not close context: ","Não foi possível fechar o contexto: ","تعذّر إغلاق السياق: "],
+    ["Le contexte actif a changé pendant la clôture. Rechargez la fiche.","The active context changed during closure. Reload the record.","O contexto ativo mudou durante o fecho. Atualize a ficha.","تغير السياق النشط أثناء الإغلاق. أعد تحميل السجل."],
+    ["Chargement du contexte biologique impossible : ","Could not load biological context: ","Não foi possível carregar o contexto biológico: ","تعذّر تحميل السياق البيولوجي: "],
+    ["Référence de souche : ","Strain reference: ","Referência da estirpe: ","مرجع السلالة: "],
+    ["Substrat : ","Substrate: ","Substrato: ","الركيزة: "]
   ];
   for (const [fr, en, pt, ar] of supplementalCoverage) {
     dictionaries.en[fr] ||= en;
