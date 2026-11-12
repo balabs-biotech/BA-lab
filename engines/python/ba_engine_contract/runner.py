@@ -44,12 +44,7 @@ def execute_engine(request: Mapping[str, Any], engine: EngineSpec) -> dict[str, 
     started_at = _timestamp()
     execution_id = str(uuid4())
     try:
-        value = engine.execute({
-            "records": request["input"]["records"],
-            "parameters": request["parameters"],
-            "datasets": request.get("datasets", []),
-            "scope": request["scope"],
-        })
+        value = engine.execute(request)
         required = {"outcome", "value", "limitations", "quality_flags", "provenance"}
         if not isinstance(value, Mapping) or not required.issubset(value):
             raise EngineExecutionError(
