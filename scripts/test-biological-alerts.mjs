@@ -478,6 +478,8 @@ assert.match(moduleSource, /dateLabel\(measurement\.measurement_observed_at\)/);
 assert.match(moduleSource, /const measurement = link;/);
 assert.match(moduleSource, /recommendationMeasurementCandidatesBySignal/);
 assert.match(moduleSource, /measuredAt >= lower && measuredAt <= upper/);
+assert.match(moduleSource, /Boolean\(row\.biological_subject_id\)/);
+assert.match(moduleSource, /Boolean\(row\.environment_id\)/);
 assert.match(moduleSource, /Le rattachement est une relation de traçabilité temporelle et contextuelle/);
 assert.match(moduleSource, /Mesures quantitatives liées au résultat/);
 assert.match(moduleSource, /CultureOps n’exécute aucune action automatiquement/);
