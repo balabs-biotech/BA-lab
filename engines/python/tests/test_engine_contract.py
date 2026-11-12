@@ -93,7 +93,7 @@ class EngineContractTests(unittest.TestCase):
 
     def test_registered_environmental_engine_manifest_is_valid_and_sandboxed(self):
         schema = load_schema("manifest.schema.json")
-        manifest = json.loads((REGISTRY_DIR / "environmental.timeseries.qc-0.1.0.json").read_text(encoding="utf-8"))
+        manifest = json.loads((REGISTRY_DIR / "environmental.timeseries.qc-0.2.0.json").read_text(encoding="utf-8"))
         manifest_validator = validator(schema)
         self.assertEqual(list(manifest_validator.iter_errors(manifest)), [])
         self.assertFalse(manifest["capabilities"]["database_access"])
@@ -102,13 +102,13 @@ class EngineContractTests(unittest.TestCase):
 
     def test_engine_manifest_rejects_network_or_database_capability(self):
         schema = load_schema("manifest.schema.json")
-        manifest = json.loads((REGISTRY_DIR / "environmental.timeseries.qc-0.1.0.json").read_text(encoding="utf-8"))
+        manifest = json.loads((REGISTRY_DIR / "environmental.timeseries.qc-0.2.0.json").read_text(encoding="utf-8"))
         manifest["capabilities"]["network_access"] = True
         self.assertTrue(list(validator(schema).iter_errors(manifest)))
 
     def test_engine_manifest_rejects_unbounded_resource_limits(self):
         schema = load_schema("manifest.schema.json")
-        manifest = json.loads((REGISTRY_DIR / "environmental.timeseries.qc-0.1.0.json").read_text(encoding="utf-8"))
+        manifest = json.loads((REGISTRY_DIR / "environmental.timeseries.qc-0.2.0.json").read_text(encoding="utf-8"))
         manifest["resource_limits"]["timeout_seconds"] = 9999
         self.assertTrue(list(validator(schema).iter_errors(manifest)))
 
@@ -170,7 +170,7 @@ class EngineContractTests(unittest.TestCase):
 
     def test_environmental_qc_detects_sampling_gaps_and_outliers_without_diagnosis(self):
         request = json.loads(json.dumps(REQUEST))
-        request["engine"] = {"engine_id": "environmental.timeseries.qc", "engine_version": "0.1.0"}
+        request["engine"] = {"engine_id": "environmental.timeseries.qc", "engine_version": "0.2.0"}
         request["input"]["records"] = []
         request["input"]["record_ids"] = []
         for index, (timestamp, value) in enumerate([
@@ -203,7 +203,7 @@ class EngineContractTests(unittest.TestCase):
 
     def test_environmental_qc_accepts_location_scoped_environmental_observations(self):
         request = json.loads(json.dumps(REQUEST))
-        request["engine"] = {"engine_id": "environmental.timeseries.qc", "engine_version": "0.1.0"}
+        request["engine"] = {"engine_id": "environmental.timeseries.qc", "engine_version": "0.2.0"}
         request["scope"] = {
             "organization_id": REQUEST["scope"]["organization_id"],
             "location_id": "5c2b3a4d-5e6f-4789-8123-456789abcdef",
@@ -281,7 +281,7 @@ class EngineContractTests(unittest.TestCase):
 
     def test_environmental_qc_rejects_naive_timestamp_as_excluded_data(self):
         request = json.loads(json.dumps(REQUEST))
-        request["engine"] = {"engine_id": "environmental.timeseries.qc", "engine_version": "0.1.0"}
+        request["engine"] = {"engine_id": "environmental.timeseries.qc", "engine_version": "0.2.0"}
         request["input"]["records"][0]["data"] = {
             "variable_code": "temperature",
             "normalized_value": 22.0,
@@ -295,7 +295,7 @@ class EngineContractTests(unittest.TestCase):
 
     def test_environmental_qc_rejects_non_finite_or_boolean_thresholds(self):
         request = json.loads(json.dumps(REQUEST))
-        request["engine"] = {"engine_id": "environmental.timeseries.qc", "engine_version": "0.1.0"}
+        request["engine"] = {"engine_id": "environmental.timeseries.qc", "engine_version": "0.2.0"}
         for key, value in [
             ("max_gap_minutes", float("inf")),
             ("max_gap_minutes", True),
@@ -328,12 +328,12 @@ class EngineContractTests(unittest.TestCase):
 
     def test_runner_invokes_environmental_qc_with_full_contract_envelope(self):
         request = json.loads(json.dumps(REQUEST))
-        request["engine"] = {"engine_id": "environmental.timeseries.qc", "engine_version": "0.1.0"}
+        request["engine"] = {"engine_id": "environmental.timeseries.qc", "engine_version": "0.2.0"}
         analysis = analyze_environmental_timeseries_qc(request)
         self.assertEqual(analysis["outcome"], "insufficient_data")
         engine = EngineSpec(
             engine_id="environmental.timeseries.qc",
-            engine_version="0.1.0",
+            engine_version="0.2.0",
             execute=analyze_environmental_timeseries_qc,
         )
         result = execute_engine(request, engine)
@@ -367,17 +367,17 @@ class EngineContractTests(unittest.TestCase):
     def test_registry_directory_can_be_overridden_for_installed_runtime(self):
         with tempfile.TemporaryDirectory() as registry_dir:
             shutil.copy(
-                REGISTRY_DIR / "environmental.timeseries.qc-0.1.0.json",
+                REGISTRY_DIR / "environmental.timeseries.qc-0.2.0.json",
                 registry_dir,
             )
             with patch.dict(os.environ, {"BA_ENGINE_REGISTRY_DIR": registry_dir}):
-                manifest, engine = load_engine("environmental.timeseries.qc", "0.1.0")
+                manifest, engine = load_engine("environmental.timeseries.qc", "0.2.0")
         self.assertEqual(manifest["engine"]["engine_id"], "environmental.timeseries.qc")
-        self.assertEqual(engine.engine_version, "0.1.0")
+        self.assertEqual(engine.engine_version, "0.2.0")
 
     def test_registry_resolves_and_executes_exact_engine_version(self):
         request = json.loads(json.dumps(REQUEST))
-        request["engine"] = {"engine_id": "environmental.timeseries.qc", "engine_version": "0.1.0"}
+        request["engine"] = {"engine_id": "environmental.timeseries.qc", "engine_version": "0.2.0"}
         result = execute_registered_engine(request)
         self.assertEqual(result["status"], "completed")
         self.assertEqual(result["engine"], request["engine"])
@@ -391,7 +391,7 @@ class EngineContractTests(unittest.TestCase):
 
     def test_worker_cli_reads_request_and_writes_result_json(self):
         request = json.loads(json.dumps(REQUEST))
-        request["engine"] = {"engine_id": "environmental.timeseries.qc", "engine_version": "0.1.0"}
+        request["engine"] = {"engine_id": "environmental.timeseries.qc", "engine_version": "0.2.0"}
         stdin = StringIO(json.dumps(request))
         stdout = StringIO()
         stderr = StringIO()
