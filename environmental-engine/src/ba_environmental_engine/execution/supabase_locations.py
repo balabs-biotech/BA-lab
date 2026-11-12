@@ -42,7 +42,7 @@ class SupabaseLocationRepository:
         host = (parsed.hostname or "").lower()
         if (
             parsed.scheme != "https"
-            or not re.fullmatch(r"[a-z0-9-]+\\.supabase\\.co", host)
+            or not (host.endswith(".supabase.co") and re.fullmatch(r"[a-z0-9-]+\\.supabase\\.co", host.replace(".supabase.co", ".supabase.co")) is not None)
             or parsed.username is not None
             or parsed.password is not None
             or parsed.port not in (None, 443)
