@@ -6143,8 +6143,12 @@ async function loadBiologicalContextPanel(cultureId) {
     document.getElementById("biologicalContextTags").value =
       Array.isArray(defaultContext.context_tags) ? defaultContext.context_tags.join(", ") : "";
     const startedDate = culture.started_at ? localDateValue(new Date(culture.started_at)) : localDateValue();
+    const today = localDateValue();
+    const nextAvailableDate = latest?.valid_to && latest.valid_to > today
+      ? latest.valid_to
+      : today > (latest?.valid_from || "") ? today : "";
     document.getElementById("biologicalContextValidFrom").value =
-      latest ? localDateValue() > latest.valid_from ? localDateValue() : "" : startedDate;
+      latest ? nextAvailableDate : startedDate;
     document.getElementById("biologicalContextValidTo").value = "";
 
     const openContext = contexts.find(context => context.valid_to === null);
