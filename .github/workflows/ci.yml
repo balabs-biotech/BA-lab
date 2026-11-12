@@ -129,6 +129,7 @@ jobs:
           node scripts/test-biological-context-assessment-schema.mjs
           node --experimental-strip-types scripts/test-biological-context-snapshot.mjs
           node --experimental-strip-types scripts/test-biological-context-resolver.mjs
+          node --experimental-strip-types scripts/test-biological-context-assembly.mjs
           node scripts/test-environmental-fallback.mjs
           node scripts/test-workspace-scenarios.mjs
           node scripts/test-qc-check-session-errors.mjs
