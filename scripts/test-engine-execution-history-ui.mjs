@@ -47,7 +47,7 @@ for (const path of [
 ]) {
   const page = readFileSync(path, "utf8");
   assert.match(page, /workspace\.html\?v=20261112-engine-history-2/);
-  assert.match(page, /tracker\.js\?v=20261112-engine-history-1/);
+  assert.match(page, /tracker\.js\?v=20261112-engine-history-2/);
 }
 
 console.log("Engine execution history UI contract checks passed.");
