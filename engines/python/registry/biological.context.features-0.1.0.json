@@ -6,7 +6,7 @@
     "engine_version": "0.1.0",
     "display_name": "Biological context coverage and descriptive features"
   },
-  "domain": "biological",
+  "domain": "cross_domain",
   "entrypoint": "ba_engine_contract.biological_context_features:analyze_biological_context_features",
   "runtime": {
     "language": "python",
