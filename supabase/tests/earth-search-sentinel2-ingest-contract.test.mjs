@@ -21,6 +21,8 @@ const checks = [
   ["requires canonical NDVI unit and valid quality flag", /row\.unit_code !== "1" \|\| row\.quality_flag !== "valid"/],
   ["requires cloud and valid-pixel provenance", /metadata\.valid_pixel_ratio[\s\S]*?metadata\.cloud_cover_pct/],
   ["restricts STAC source URLs to the Earth Search item endpoint", /earth-search\.aws\.element84\.com[\s\S]*?sentinel-2-l2a\/items/],
+  ["binds the STAC item URL to the same scene ID as the payload", /decodeURIComponent\(url\.pathname\.split\("\/"\)\.pop\(\) \?\? ""\) === sceneId/],
+  ["requires paired mean and median rows to share acquisition and provenance", /scene_pair_provenance_mismatch/],
   ["uses the scene-aware unique key for idempotent persistence", /onConflict: "organization_id,location_id,provider_code,dataset_code,variable_code,observed_at,source_record_id"/],
   ["keeps service-role persistence server-side", /adminClient\.from\("environmental_observations"\)\.upsert/],
   ["does not return raw exception messages to callers", /error: "internal_error"/],
