@@ -58,8 +58,8 @@ BEGIN
         AND job.lease_expires_at < now())
     )
   ORDER BY job.available_at ASC, job.created_at ASC
-  FOR UPDATE SKIP LOCKED
-  LIMIT 1;
+  LIMIT 1
+  FOR UPDATE SKIP LOCKED;
 
   IF v_job_id IS NULL THEN
     RETURN;
@@ -132,7 +132,7 @@ BEGIN
   IF p_status NOT IN ('succeeded', 'partial_failed', 'failed') THEN
     RAISE EXCEPTION 'invalid_terminal_status' USING ERRCODE = '22023';
   END IF;
-  IF jsonb_typeof(p_result_summary) <> 'object'
+  IF jsonb_typeof(p_result_summary) IS DISTINCT FROM 'object'
     OR p_scenes_processed < 0 OR p_scenes_failed < 0
     OR p_scenes_duplicated < 0 OR p_observations_submitted < 0 THEN
     RAISE EXCEPTION 'invalid_job_result' USING ERRCODE = '22023';
