@@ -23,7 +23,7 @@
     },
     "subject": {
       "type": "object",
-      "required": ["organization_id", "subject_type", "subject_id"],
+      "required": ["organization_id", "subject_type", "subject_id", "biological_contexts"],
       "properties": {
         "organization_id": { "type": "string", "format": "uuid" },
         "subject_type": { "enum": ["culture", "batch"] },
@@ -36,6 +36,11 @@
           "type": "array",
           "uniqueItems": true,
           "items": { "type": "string", "format": "uuid" }
+        },
+        "biological_contexts": {
+          "type": "array",
+          "maxItems": 500,
+          "items": { "$ref": "#/$defs/biologicalContext" }
         }
       },
       "additionalProperties": false
@@ -95,6 +100,53 @@
     }
   },
   "$defs": {
+    "biologicalContext": {
+      "type": "object",
+      "required": [
+        "context_id", "valid_from", "valid_to", "organism_kind", "taxon_code",
+        "strain_code", "cultivar_code", "culture_stage", "substrate_code",
+        "production_system", "context_tags", "genetic_reference"
+      ],
+      "properties": {
+        "context_id": { "type": "string", "format": "uuid" },
+        "valid_from": { "type": "string", "format": "date" },
+        "valid_to": { "type": ["string", "null"], "format": "date" },
+        "organism_kind": { "type": ["string", "null"], "maxLength": 80 },
+        "taxon_code": { "type": ["string", "null"], "maxLength": 120 },
+        "strain_code": { "type": ["string", "null"], "maxLength": 120 },
+        "cultivar_code": { "type": ["string", "null"], "maxLength": 120 },
+        "culture_stage": { "type": ["string", "null"], "maxLength": 120 },
+        "substrate_code": { "type": ["string", "null"], "maxLength": 120 },
+        "production_system": { "type": ["string", "null"], "maxLength": 120 },
+        "context_tags": {
+          "type": "array",
+          "maxItems": 100,
+          "items": { "type": "string", "maxLength": 120 }
+        },
+        "genetic_reference": { "$ref": "#/$defs/geneticReference" }
+      },
+      "additionalProperties": false
+    },
+    "geneticReference": {
+      "type": "object",
+      "required": [
+        "status", "strain_id", "organism_id", "designation", "origin",
+        "source_description", "scientific_name", "common_name", "taxonomy_source", "taxonomy_id"
+      ],
+      "properties": {
+        "status": { "enum": ["not_specified", "unresolved", "resolved"] },
+        "strain_id": { "type": ["string", "null"], "format": "uuid" },
+        "organism_id": { "type": ["string", "null"], "format": "uuid" },
+        "designation": { "type": ["string", "null"], "maxLength": 200 },
+        "origin": { "type": ["string", "null"], "maxLength": 300 },
+        "source_description": { "type": ["string", "null"], "maxLength": 1000 },
+        "scientific_name": { "type": ["string", "null"], "maxLength": 300 },
+        "common_name": { "type": ["string", "null"], "maxLength": 300 },
+        "taxonomy_source": { "type": ["string", "null"], "maxLength": 120 },
+        "taxonomy_id": { "type": ["string", "null"], "maxLength": 120 }
+      },
+      "additionalProperties": false
+    },
     "timeWindow": {
       "type": "object",
       "required": ["start", "end", "timezone"],
