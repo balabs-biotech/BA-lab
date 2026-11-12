@@ -109,3 +109,14 @@ The source identity migration replaces the former global unique constraint with 
 - `upsert_satellite_environmental_observations(jsonb)` for Sentinel-2 scene pairs.
 
 Both functions are `SECURITY DEFINER`, validate their source-family contract, and grant execution only to `service_role`. This preserves weather idempotency while allowing multiple Sentinel-2 scenes with the same acquisition timestamp.
+
+
+### Durable ingestion job ledger
+
+Each Sentinel-2 processing attempt now creates a row in `public.environmental_ingestion_jobs` after STAC discovery and before the private raster worker is called. The row records the organization/location scope, requesting user, bounded search parameters, selected-scene count, lifecycle status, completion timestamp, and aggregate result counters.
+
+- Status lifecycle: `processing` → `succeeded`, `partial_failed`, or `failed`.
+- Worker connection failures and non-success HTTP responses are recorded with bounded error codes; no exception text, credentials, AOI payload, or signed asset URL is stored.
+- `authenticated` users receive read-only access through organization-membership RLS. All writes are performed by the authenticated Edge gateway using its server-only `SUPABASE_SERVICE_ROLE_KEY`.
+- CultureOps can query the table directly with the user's Supabase client to show recent jobs and refresh their status. It must filter by `location_id` and order by `created_at`; RLS remains the tenant boundary.
+- This is a durable execution ledger for the current synchronous worker call, not yet a background queue. A request timeout can leave a job in `processing` if the gateway itself is terminated before it can record the failure. A later worker-queue phase should add leases, heartbeat timestamps, and stale-job reconciliation.
