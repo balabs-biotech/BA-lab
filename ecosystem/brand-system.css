@@ -2442,3 +2442,102 @@
 @media(prefers-reduced-motion:reduce) {
  #app.balabs-ui > main > .editorial-about *, #app.balabs-ui > main > .editorial-method *, #app.balabs-ui > main > .universe-bridge * { scroll-behavior:auto !important; transition:none !important; }
 }
+
+
+/* PHASE 12 — navigation and closing imprint.
+   A precise editorial finish for the public ecosystem page. */
+#app.balabs-ui > .site-nav {
+  position:relative !important;
+  justify-content:flex-start !important;
+  gap:clamp(18px,2.8vw,42px) !important;
+  padding-block:0 !important;
+}
+#app.balabs-ui > .site-nav a {
+  position:relative !important;
+  min-height:58px !important;
+  display:inline-flex !important;
+  align-items:center !important;
+  color:#C8D0C8 !important;
+  font:700 9px/1.2 ui-monospace,monospace !important;
+  letter-spacing:.14em !important;
+  text-transform:uppercase !important;
+  transition:color 160ms ease !important;
+}
+#app.balabs-ui > .site-nav a::after {
+  content:"" !important;
+  position:absolute !important;
+  inset-inline:0 !important;
+  bottom:-1px !important;
+  height:2px !important;
+  background:#B96B4D !important;
+  transform:scaleX(0) !important;
+  transform-origin:left center !important;
+  transition:transform 180ms ease !important;
+}
+#app.balabs-ui > .site-nav a:hover { color:#F2F1E9 !important; }
+#app.balabs-ui > .site-nav a:hover::after,
+#app.balabs-ui > .site-nav a:focus-visible::after { transform:scaleX(1) !important; }
+#app.balabs-ui > .foot {
+  display:grid !important;
+  grid-template-columns:minmax(0,1fr) auto !important;
+  align-items:start !important;
+  gap:28px clamp(24px,5vw,72px) !important;
+  padding:clamp(38px,5vw,68px) clamp(22px,7vw,104px) 24px !important;
+  background:#111B1D !important;
+  border-top:1px solid #52635A !important;
+}
+#app.balabs-ui > .foot .foot-brand { display:flex !important; flex-direction:column !important; gap:14px !important; }
+#app.balabs-ui > .foot .foot-home { display:inline-flex !important; flex-direction:column !important; align-items:flex-start !important; gap:7px !important; text-decoration:none !important; }
+#app.balabs-ui > .foot .foot-home strong {
+  color:#F2F1E9 !important;
+  font:700 17px/1 ui-monospace,monospace !important;
+  letter-spacing:.28em !important;
+}
+#app.balabs-ui > .foot .foot-home span {
+  color:#B9C9B8 !important;
+  font:9px/1.4 ui-monospace,monospace !important;
+  letter-spacing:.12em !important;
+  text-transform:uppercase !important;
+}
+#app.balabs-ui > .foot .foot-note {
+  color:#899A90 !important;
+  font:9px/1.6 ui-monospace,monospace !important;
+  letter-spacing:.08em !important;
+}
+#app.balabs-ui > .foot .foot-nav {
+  display:flex !important;
+  flex-wrap:wrap !important;
+  justify-content:flex-end !important;
+  gap:10px 24px !important;
+  max-width:480px !important;
+}
+#app.balabs-ui > .foot .foot-nav a {
+  color:#D1D0C5 !important;
+  font:700 9px/1.5 ui-monospace,monospace !important;
+  letter-spacing:.1em !important;
+  text-decoration:none !important;
+  text-transform:uppercase !important;
+}
+#app.balabs-ui > .foot .foot-nav a:hover { color:#D28C6E !important; }
+#app.balabs-ui > .foot .asset-credit {
+  grid-column:1/-1 !important;
+  max-width:none !important;
+  margin:22px 0 0 !important;
+  padding-top:15px !important;
+  border-top:1px solid rgba(209,208,197,.18) !important;
+  color:#84938B !important;
+  font:8px/1.7 ui-monospace,monospace !important;
+  letter-spacing:.04em !important;
+}
+#app.balabs-ui > .foot .asset-credit a { color:#B9C9B8 !important; text-decoration:underline !important; text-underline-offset:3px !important; }
+@media(max-width:760px) {
+  #app.balabs-ui > .site-nav { gap:0 16px !important; }
+  #app.balabs-ui > .site-nav a { min-height:42px !important; font-size:8px !important; }
+  #app.balabs-ui > .foot { grid-template-columns:1fr !important; gap:24px !important; padding:38px 20px 20px !important; }
+  #app.balabs-ui > .foot .foot-nav { justify-content:flex-start !important; gap:12px 20px !important; }
+  #app.balabs-ui > .foot .asset-credit { margin-top:8px !important; }
+}
+@media(prefers-reduced-motion:reduce) {
+  #app.balabs-ui > .site-nav a,
+  #app.balabs-ui > .site-nav a::after { transition:none !important; }
+}
