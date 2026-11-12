@@ -12,7 +12,7 @@ create table if not exists public.engine_execution_results (
   value jsonb not null check (jsonb_typeof(value) = 'object'),
   limitations jsonb not null default '[]'::jsonb check (jsonb_typeof(limitations) = 'array'),
   quality_flags jsonb not null default '[]'::jsonb check (jsonb_typeof(quality_flags) = 'array'),
-  confidence jsonb,
+  confidence jsonb check (confidence is null or jsonb_typeof(confidence) = 'object'),
   provenance jsonb not null check (jsonb_typeof(provenance) = 'object'),
   generated_at timestamptz not null,
   created_at timestamptz not null default now(),
@@ -89,7 +89,8 @@ begin
     or jsonb_typeof(v_payload->'value') is distinct from 'object'
     or jsonb_typeof(v_payload->'limitations') is distinct from 'array'
     or jsonb_typeof(v_payload->'quality_flags') is distinct from 'array'
-    or jsonb_typeof(v_payload->'provenance') is distinct from 'object' then
+    or jsonb_typeof(v_payload->'provenance') is distinct from 'object'
+    or (v_payload ? 'confidence' and jsonb_typeof(v_payload->'confidence') is distinct from 'object') then
     raise exception 'result payload is missing required structured fields' using errcode = '22023';
   end if;
 
