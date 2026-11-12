@@ -312,7 +312,7 @@ def run_biological_context_features(request: Mapping[str, Any]) -> dict[str, Any
         request,
         EngineSpec(
             engine_id="biological.context.features",
-            engine_version="0.1.0",
+            engine_version=request["engine"]["engine_version"],
             execute=analyze_biological_context_features,
         ),
     )
