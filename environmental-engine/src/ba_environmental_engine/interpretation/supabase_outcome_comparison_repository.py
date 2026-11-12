@@ -145,7 +145,7 @@ class SupabaseOutcomeComparisonRepository:
                 self._client.table("biological_recommendation_outcome_measurements")
                 .select(
                     "recommendation_id,outcome_event_id,measurement_id,"
-                    "measurement_observed_at,variable_code,quality_state,"
+                    "measurement_observed_at,variable_code,measurement_quality_state,"
                     "normalized_value,normalized_unit_code,raw_value,raw_unit_code,"
                     "method,instrument,evidence_scope"
                 )
@@ -232,7 +232,7 @@ class SupabaseOutcomeComparisonRepository:
                 raise OutcomeComparisonRepositoryError(
                     "outcome evidence snapshot lacks measurement date or variable"
                 )
-            quality_state = str(link.get("quality_state") or "raw")
+            quality_state = str(link.get("measurement_quality_state") or "raw")
             if quality_state not in {"raw", "controlled", "validated", "excluded"}:
                 raise OutcomeComparisonRepositoryError(
                     "outcome evidence snapshot has an unknown quality state"
@@ -264,6 +264,8 @@ class SupabaseOutcomeComparisonRepository:
                 quality_state=quality_state,
                 profile_id=str(recommendation["profile_id"]),
                 profile_version=str(recommendation["profile_version"]),
+                method=str(link["method"]) if link.get("method") is not None else None,
+                instrument=str(link["instrument"]) if link.get("instrument") is not None else None,
             ))
             evidence_by_recommendation.setdefault(recommendation_id, []).append(link)
 
