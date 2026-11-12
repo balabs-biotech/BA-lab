@@ -43,10 +43,7 @@ def build_leased_environmental_worker_from_env(
     """Build the worker from private process environment variables."""
     values = os.environ if env is None else env
     supabase_url = _required(values, "SUPABASE_URL")
-    service_key = _required(
-        values,
-        "SUPABASE_SECRET_KEY" if values.get("SUPABASE_SECRET_KEY") else "SUPABASE_SERVICE_ROLE_KEY",
-    )
+    service_key = _required(values, "SUPABASE_SERVICE_ROLE_KEY")
     ingest_url = validate_lease_ingest_url(
         _required(values, "BA_SENTINEL2_LEASE_INGEST_URL")
     )
