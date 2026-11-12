@@ -673,7 +673,7 @@
     ["Clôturez d’abord le contexte actif avant d’enregistrer une nouvelle période.","Close the active context before saving a new period.","Feche o contexto ativo antes de guardar um novo período.","أغلق السياق النشط قبل حفظ فترة جديدة."],
     ["Cette période chevauche un contexte déjà enregistré. Corrigez les dates avant de continuer.","This period overlaps an existing context. Correct the dates before continuing.","Este período sobrepõe-se a um contexto existente. Corrija as datas antes de continuar.","تتداخل هذه الفترة مع سياق مسجل. صحح التواريخ قبل المتابعة."],
     ["La date de clôture doit être postérieure au début du contexte.","The closing date must be after the context start date.","A data de fecho deve ser posterior ao início do contexto.","يجب أن يكون تاريخ الإغلاق بعد تاريخ بدء السياق."],
-    ["Renseignez l’environnement, l’organisme, le stade, le système et la date de début.","Enter the environment, organism, stage, system and start date.","Indique o ambiente, organismo, fase, sistema e data de início.","أدخل البيئة والكائن والمرحلة والنظام وتاريخ البداية."],
+    ["Renseignez l’environnement, l’organisme, le stade, le système et la date de début.","Enter the environment, organism, stage, system and start date.","Indique o ambiente, organismo, fase, sistema e data de início.","أدخل البيئة والكائن والمرحلة والنظام وتاريخ البداية."]
   ];
   for (const [fr, en, pt, ar] of supplementalCoverage) {
     dictionaries.en[fr] ||= en;
