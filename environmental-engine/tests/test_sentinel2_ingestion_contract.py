@@ -39,7 +39,7 @@ def test_builds_two_persistable_ndvi_rows_with_complete_provenance():
         assert row["provider_code"] == "EARTH_SEARCH"
         assert row["dataset_code"] == "SENTINEL_2_L2A"
         assert row["unit_code"] == "1"
-        assert row["metadata"]["scene_id"] == "S2A_TEST_SCENE"
+        assert row["source_record_id"] == "S2A_TEST_SCENE"\n        assert row["metadata"]["scene_id"] == "S2A_TEST_SCENE"
         assert row["metadata"]["valid_pixel_count"] == 4
         assert row["metadata"]["valid_pixel_ratio"] == 1
         assert row["metadata"]["mask_classes"] == []
