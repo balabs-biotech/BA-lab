@@ -127,6 +127,38 @@ class EngineContractTests(unittest.TestCase):
         invalid_level["product_level"] = "L1C"
         self.assertTrue(list(scene_validator.iter_errors(invalid_level)))
 
+    def test_spatial_ndvi_request_binds_scene_aoi_bands_mask_and_grid(self):
+        schema_path = ROOT / "schemas" / "spatial" / "v1" / "ndvi-request.schema.json"
+        schema = json.loads(schema_path.read_text(encoding="utf-8"))
+        request = {
+            "contract": "BA-LABS/SPATIAL-REQUEST",
+            "contract_version": "1.0.0",
+            "request_id": "7c2b3a4d-5e6f-4789-8123-456789abcdef",
+            "source_scene": {
+                "provider": "earth-search",
+                "collection_id": "sentinel-2-l2a",
+                "item_id": "S2A_20261112T101021",
+                "metadata_sha256": "a" * 64,
+            },
+            "aoi": {
+                "geometry": {"type": "Polygon", "coordinates": [[[5.0, 36.0], [5.1, 36.0], [5.1, 36.1], [5.0, 36.0]]]},
+                "crs": "EPSG:4326",
+            },
+            "index": "NDVI",
+            "bands": {"red": "B04", "nir": "B08"},
+            "mask": {"scl_excluded_classes": [3, 8, 9, 10, 11], "minimum_valid_pixel_fraction": 0.6},
+            "grid": {"resolution_m": 10, "target_crs": "EPSG:32631"},
+            "output": {"format": "COG"},
+        }
+        request_validator = validator(schema)
+        self.assertEqual(list(request_validator.iter_errors(request)), [])
+        wrong_mask = json.loads(json.dumps(request))
+        wrong_mask["mask"]["scl_excluded_classes"] = [8, 9]
+        self.assertTrue(list(request_validator.iter_errors(wrong_mask)))
+        wrong_grid = json.loads(json.dumps(request))
+        wrong_grid["grid"]["resolution_m"] = 20
+        self.assertTrue(list(request_validator.iter_errors(wrong_grid)))
+
     def test_spatial_ndvi_result_requires_mask_coverage_and_cog_provenance(self):
         schema_path = ROOT / "schemas" / "spatial" / "v1" / "ndvi-result.schema.json"
         schema = json.loads(schema_path.read_text(encoding="utf-8"))
