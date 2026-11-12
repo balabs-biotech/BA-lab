@@ -21,7 +21,7 @@ def make_request():
         "contract_version": "1.0.0",
         "request_id": str(uuid4()),
         "created_at": "2026-11-12T10:00:00Z",
-        "engine": {"engine_id": "environmental.timeseries.qc", "engine_version": "0.1.0"},
+        "engine": {"engine_id": "environmental.timeseries.qc", "engine_version": "0.2.0"},
         "scope": {"organization_id": str(uuid4())},
         "input": {
             "record_ids": [record_id],
