@@ -24,7 +24,7 @@ const css=fs.readFileSync("batch-tracker/tracker.css","utf8");
 const activeCss=css.replace(/\/\*[\s\S]*?\*\//g,"");
 for(const obsoleteSelector of [".domain-switcher",".domain-switcher-copy",".domain-overline",".domain-options",".domain-option",".domain-option-icon"]){if(activeCss.includes(obsoleteSelector))throw new Error("Obsolete workspace-switcher CSS remains: "+obsoleteSelector);}
 if(!css.includes("--brand:#a94f1d")||!css.includes("--focus:#a94f1d"))throw new Error("Terracotta palette missing");
-if(!root.includes(".universe.myco{--accent:#a94f1d;"))throw new Error("Chooser mycology accent is still fluorescent");
+if(!root.includes(".universe.myco{--accent:#B96B4D}"))throw new Error("Chooser mycology accent must use the BA Labs copper");
 if(!template.includes('id="batchCompareSelect"')||!template.includes('id="batchCompareResults"'))throw new Error("Batch comparison UI missing");
 if(!engine.includes("async function compareSelectedBatches")||!engine.includes('from("batch_stages")')||!engine.includes('from("measurements")'))throw new Error("Batch comparison data flow missing");
 if(!engine.includes('map(batch => batch.environment_id)')||!engine.includes('environmentMeasurementResult')||!engine.includes('row.environment_id === batch.environment_id'))throw new Error("Environment-linked measurements are not included in batch comparison");

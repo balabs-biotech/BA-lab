@@ -652,38 +652,6 @@
       "url": "https://app.notion.com/p/40173152f171817d8608cafa8a118065",
       "children": [
         {
-          "id": "ar-product-wa",
-          "title": "WA — آغار الماء الجاهز للاستخدام",
-          "notionId": "40173152f171817d966dd334a044b4e8",
-          "url": "https://app.notion.com/p/40173152f171817d966dd334a044b4e8",
-          "description": "وسط هلامي فقير بالمغذيات لبعض بروتوكولات الملاحظة؛ النمو المرئي وحده لا يثبت الهوية أو النقاوة أو الأداء.",
-          "children": []
-        },
-        {
-          "id": "ar-product-myco-start",
-          "title": "Myco Start — نموذج أولي لطقم بدء زراعة الفطريات",
-          "notionId": "40173152f17181fdb34bf72c6ac036e9",
-          "url": "https://app.notion.com/p/40173152f17181fdb34bf72c6ac036e9",
-          "description": "نموذج أولي تعليمي قيد التقييم؛ المحتوى النهائي وفحوصات الجودة لم تُحسم بعد.",
-          "children": []
-        },
-        {
-          "id": "ar-product-myco-plate",
-          "title": "Myco Plate — نموذج أولي لطقم الملاحظة على وسط هلامي",
-          "notionId": "40173152f17181aa8206f4337a7f67d5",
-          "url": "https://app.notion.com/p/40173152f17181aa8206f4337a7f67d5",
-          "description": "مفهوم أولي لطقم ملاحظة فطرية؛ ما تزال مواصفات الوسط والمورد وتتبع الدفعة قيد الاستكمال.",
-          "children": []
-        },
-        {
-          "id": "ar-product-qr-guide",
-          "title": "دليل البدء عبر QR — Myco Start / Myco Plate",
-          "notionId": "40173152f171810bb1afe68cfc91ee7c",
-          "url": "https://app.notion.com/p/40173152f171810bb1afe68cfc91ee7c",
-          "description": "دليل وصول سريع يرافق نماذج Myco Start وMyco Plate ويوجه المستخدم إلى تعليمات البدء.",
-          "children": []
-        },
-        {
           "id": "ar-public-catalogue",
           "title": "الكتالوج العام — الموارد القابلة للنشر",
           "notionId": "d0fbe1d779344eb58bc240fe7876ae0e",
@@ -692,235 +660,35 @@
           "children": []
         },
         {
-          "id": "ar-catalog-wa",
-          "title": "WA — أطباق آغار الماء الجاهزة",
-          "notionId": "3f473152f171812a814dd7b951786313",
-          "url": "https://app.notion.com/p/3f473152f171812a814dd7b951786313",
-          "description": "دعامة هلامية فقيرة بالمغذيات لبعض أعمال الملاحظة والعزل والنقل؛ ليست وسطًا شاملًا للإكثار.",
+          "id": "ar-product-wa",
+          "title": "WA — آغار الماء الجاهز للاستخدام",
+          "notionId": "40173152f171817d966dd334a044b4e8",
+          "url": "https://app.notion.com/p/40173152f171817d966dd334a044b4e8",
+          "description": "WA (آغار الماء): وسط هلامي فقير بالمغذيات يُحضّر في أطباق بتري. متاح حسب الطلب ووفق الدفعة؛ تُؤكد الكمية والقطر والتغليف والسعر وظروف الحفظ قبل التوريد.",
           "children": []
         },
         {
-          "id": "ar-lc-hk35",
-          "title": "LC — Pleurotus ostreatus HK35",
-          "notionId": "40173152f1718150a36eddc52198e963",
-          "url": "https://app.notion.com/p/40173152f1718150a36eddc52198e963",
-          "description": "بطاقة مرجع للزراعة السائلة المرتبطة بسلالة HK35؛ التوفر والدفعة يحتاجان إلى تأكيد.",
+          "id": "ar-product-myco-start",
+          "title": "Myco Start — نموذج أولي لطقم بدء زراعة الفطريات",
+          "notionId": "40173152f17181fdb34bf72c6ac036e9",
+          "url": "https://app.notion.com/p/40173152f17181fdb34bf72c6ac036e9",
+          "description": "نموذج أولي تعليمي قيد التطوير — غير متاح للبيع. لم يُحسم بعد المحتوى النهائي والموارد المخصصة وفحوصات الجودة وظروف الحفظ.",
           "children": []
         },
         {
-          "id": "ar-lc-p80",
-          "title": "LC — Pleurotus ostreatus P80",
-          "notionId": "40173152f17181e7acbcd20c85566bc6",
-          "url": "https://app.notion.com/p/40173152f17181e7acbcd20c85566bc6",
-          "description": "بطاقة مرجع للزراعة السائلة المرتبطة بسلالة P80؛ التوفر والدفعة يحتاجان إلى تأكيد.",
+          "id": "ar-product-myco-plate",
+          "title": "Myco Plate — نموذج أولي لطقم الملاحظة على وسط هلامي",
+          "notionId": "40173152f17181aa8206f4337a7f67d5",
+          "url": "https://app.notion.com/p/40173152f17181aa8206f4337a7f67d5",
+          "description": "نموذج أولي لطقم الملاحظة — غير متاح للبيع. ما تزال مواصفات الوسط والمورد البيولوجي وتتبع الدفعة وفحوصات الجودة بحاجة إلى تحديد وتحقق.",
           "children": []
         },
         {
-          "id": "ar-lc-blue-oyster",
-          "title": "LC — Pleurotus ostreatus Blue Oyster",
-          "notionId": "40173152f17181fc877cd198e7911eac",
-          "url": "https://app.notion.com/p/40173152f17181fc877cd198e7911eac",
-          "description": "بطاقة مرجع للزراعة السائلة Blue Oyster؛ لا تعني البطاقة توفر مخزون دائم.",
-          "children": []
-        },
-        {
-          "id": "ar-lc-grey-american",
-          "title": "LC — Pleurotus ostreatus Gris américain",
-          "notionId": "40173152f17181388138ce462dc3596e",
-          "url": "https://app.notion.com/p/40173152f17181388138ce462dc3596e",
-          "description": "بطاقة مرجع للزراعة السائلة Gris américain؛ يُحفظ اسم المورد كما هو للتتبع.",
-          "children": []
-        },
-        {
-          "id": "ar-lc-kryos",
-          "title": "LC — Pleurotus ostreatus KRYOS",
-          "notionId": "40173152f171813081afe4ef7766742b",
-          "url": "https://app.notion.com/p/40173152f171813081afe4ef7766742b",
-          "description": "بطاقة مرجع للزراعة السائلة KRYOS؛ التوفر الفعلي يؤكد قبل الطلب.",
-          "children": []
-        },
-        {
-          "id": "ar-lc-g8",
-          "title": "LC — Pleurotus ostreatus G8",
-          "notionId": "40173152f17181f4888dc89c8c43ee76",
-          "url": "https://app.notion.com/p/40173152f17181f4888dc89c8c43ee76",
-          "description": "بطاقة مرجع للزراعة السائلة G8؛ الرمز لا يثبت هوية تصنيفية إضافية.",
-          "children": []
-        },
-        {
-          "id": "ar-lc-pulmonarius",
-          "title": "LC — Pleurotus pulmonarius",
-          "notionId": "40173152f17181ab8b0bd41a5832e355",
-          "url": "https://app.notion.com/p/40173152f17181ab8b0bd41a5832e355",
-          "description": "بطاقة مرجع للزراعة السائلة لهذا النوع؛ يجب التحقق من الدفعة والحالة.",
-          "children": []
-        },
-        {
-          "id": "ar-lc-eryngii",
-          "title": "LC — Pleurotus eryngii والهجن",
-          "notionId": "40173152f1718121bb57fd5eb152e64d",
-          "url": "https://app.notion.com/p/40173152f1718121bb57fd5eb152e64d",
-          "description": "بطاقة مرجع للزراعة السائلة المرتبطة بـPleurotus eryngii والهجن.",
-          "children": []
-        },
-        {
-          "id": "ar-lc-columbinus",
-          "title": "LC — Pleurotus columbinus",
-          "notionId": "40173152f17181c393c6c26aa5b9191b",
-          "url": "https://app.notion.com/p/40173152f17181c393c6c26aa5b9191b",
-          "description": "بطاقة مرجع للزراعة السائلة لهذا النوع؛ لا تفترض التوفر دون تأكيد.",
-          "children": []
-        },
-        {
-          "id": "ar-lc-tricho-harzianum",
-          "title": "LC — Trichoderma harzianum",
-          "notionId": "40173152f171816c812df39d52e2484c",
-          "url": "https://app.notion.com/p/40173152f171816c812df39d52e2484c",
-          "description": "بطاقة معلومات للتركيبة المرتبطة بالنوع؛ لا تُعرض كسلالة منفردة متاحة للبيع حاليًا.",
-          "children": []
-        },
-        {
-          "id": "ar-lc-tricho-hamatum",
-          "title": "LC — Trichoderma hamatum",
-          "notionId": "40173152f1718190872de4a9c5a21e64",
-          "url": "https://app.notion.com/p/40173152f1718190872de4a9c5a21e64",
-          "description": "بطاقة معلومات للتركيبة المرتبطة بالنوع؛ حالة التوفير تحتاج إلى تأكيد.",
-          "children": []
-        },
-        {
-          "id": "ar-lc-tricho-koningii",
-          "title": "LC — Trichoderma koningii",
-          "notionId": "40173152f1718110a2dfc823dc27bf03",
-          "url": "https://app.notion.com/p/40173152f1718110a2dfc823dc27bf03",
-          "description": "بطاقة معلومات للتركيبة المرتبطة بالنوع؛ لا تعني وجود زراعة نقية متاحة للبيع.",
-          "children": []
-        },
-        {
-          "id": "ar-lc-tricho-longibrachiatum",
-          "title": "LC — Trichoderma longibrachiatum",
-          "notionId": "40173152f17181c49f19f0cb82752d75",
-          "url": "https://app.notion.com/p/40173152f17181c49f19f0cb82752d75",
-          "description": "بطاقة معلومات للتركيبة المرتبطة بالنوع؛ التوفر غير مفترض.",
-          "children": []
-        },
-        {
-          "id": "ar-lc-tricho-reesei",
-          "title": "LC — Trichoderma reesei",
-          "notionId": "40173152f171813aa500fc6f2f1684c4",
-          "url": "https://app.notion.com/p/40173152f171813aa500fc6f2f1684c4",
-          "description": "بطاقة معلومات للتركيبة المرتبطة بالنوع؛ يجب تأكيد حالة المورد والدفعة.",
-          "children": []
-        },
-        {
-          "id": "ar-lc-pulmonarius-summer",
-          "title": "LC — Pleurotus pulmonarius، إصدار الصيف",
-          "notionId": "40173152f1718165a79ace1bc6189c24",
-          "url": "https://app.notion.com/p/40173152f1718165a79ace1bc6189c24",
-          "description": "مرجع منفصل لإصدار الصيف؛ لا تدمج بياناته تلقائيًا مع إصدار الشتاء.",
-          "children": []
-        },
-        {
-          "id": "ar-lc-pulmonarius-winter",
-          "title": "LC — Pleurotus pulmonarius، إصدار الشتاء",
-          "notionId": "40173152f17181cab9f3e85af551ebde",
-          "url": "https://app.notion.com/p/40173152f17181cab9f3e85af551ebde",
-          "description": "مرجع منفصل لإصدار الشتاء؛ يجب الحفاظ على تتبع الإصدار والدفعة.",
-          "children": []
-        },
-        {
-          "id": "ar-pda",
-          "title": "PDA — آغار البطاطا والدكستروز",
-          "notionId": "40173152f1718183ac57e3d7235ce00b",
-          "url": "https://app.notion.com/p/40173152f1718183ac57e3d7235ce00b",
-          "description": "وسط مغذٍ للنمو والملاحظة؛ وصفة BA Labs وحالة تأهيلها موضحتان في البطاقة.",
-          "children": []
-        },
-        {
-          "id": "ar-pdae-grain",
-          "title": "PDAE GRAIN+ — آغار مدعم بماء الحبوب",
-          "notionId": "40173152f17181098d44c5e85d73b05c",
-          "url": "https://app.notion.com/p/40173152f17181098d44c5e85d73b05c",
-          "description": "تركيبة مقارنة مدعمة بماء الحبوب؛ يلزم مطابقة الوصفة والمستخلص.",
-          "children": []
-        },
-        {
-          "id": "ar-master-b",
-          "title": "MASTER B / BLAGARD — آغار تجريبي معقد",
-          "notionId": "40173152f17181c482b4f0d4f3ce27e4",
-          "url": "https://app.notion.com/p/40173152f17181c482b4f0d4f3ce27e4",
-          "description": "تركيبة تجريبية معقدة؛ الوظيفة والوصفة بحاجة إلى تأهيل ومطابقة.",
-          "children": []
-        },
-        {
-          "id": "ar-g-clair",
-          "title": "G CLAIR — آغار مغذٍ",
-          "notionId": "40173152f171811eb843dd419d8279c0",
-          "url": "https://app.notion.com/p/40173152f171811eb843dd419d8279c0",
-          "description": "تركيبة مغذية قيد إعادة بناء الوثائق؛ لا تُعامل كوصفة مثبتة.",
-          "children": []
-        },
-        {
-          "id": "ar-g-ligneux",
-          "title": "G LIGNEUX — آغار تجريبي بالدبس والفحم الحيوي",
-          "notionId": "40173152f1718179a6faf08806253a46",
-          "url": "https://app.notion.com/p/40173152f1718179a6faf08806253a46",
-          "description": "تركيبة استكشافية؛ يلزم توصيف المكونات والأس الهيدروجيني والسلوك البصري.",
-          "children": []
-        },
-        {
-          "id": "ar-ba-clean",
-          "title": "BA CLEAN — آغار للتنقية المساعدة",
-          "notionId": "40173152f17181af8deed2f4f1437990",
-          "url": "https://app.notion.com/p/40173152f17181af8deed2f4f1437990",
-          "description": "خط قيد التطوير لحالات محددة؛ لا يعقم الزراعة ولا يضمن إزالة التلوث.",
-          "children": []
-        },
-        {
-          "id": "ar-lc-grain",
-          "title": "LC GRAIN — وسط سائل للتلقيح إلى الحبوب",
-          "notionId": "40173152f17181e580bcc4963a38ab29",
-          "url": "https://app.notion.com/p/40173152f17181e580bcc4963a38ab29",
-          "description": "يُقيّم وفق استعادة النمو واستعمار الحبوب؛ النمو داخل القارورة وحده غير كافٍ.",
-          "children": []
-        },
-        {
-          "id": "ar-lc-transfer",
-          "title": "LC TRANSFER — وسط سائل لنقل زراعة إلى أخرى",
-          "notionId": "40173152f17181a5928ae148d8e07a85",
-          "url": "https://app.notion.com/p/40173152f17181a5928ae148d8e07a85",
-          "description": "مخصص لمسار نقل سائل إلى سائل؛ معاييره تختلف عن LC GRAIN.",
-          "children": []
-        },
-        {
-          "id": "ar-lc-holding",
-          "title": "LC MAINTIEN — وسط سائل للصيانة المؤقتة",
-          "notionId": "40173152f1718150bbf6f9054be8b905",
-          "url": "https://app.notion.com/p/40173152f1718150bbf6f9054be8b905",
-          "description": "مرجع للصيانة المؤقتة الاستكشافية؛ لا يثبت الحفظ طويل الأمد.",
-          "children": []
-        },
-        {
-          "id": "ar-lcmd",
-          "title": "LCMD — وسط سائل بدبس التمر",
-          "notionId": "40173152f17181888a6af073a562afcd",
-          "url": "https://app.notion.com/p/40173152f17181888a6af073a562afcd",
-          "description": "تركيبة تاريخية تحتاج إلى مطابقة الوثائق قبل اعتماد أي وصفة.",
-          "children": []
-        },
-        {
-          "id": "ar-lc-lignicole",
-          "title": "LC LIGNICOLE — وسط سائل استكشافي",
-          "notionId": "40173152f171815b8537fd09016220d6",
-          "url": "https://app.notion.com/p/40173152f171815b8537fd09016220d6",
-          "description": "تركيبة عمل استكشافية؛ يلزم تأهيلها بحسب السلالة والاستخدام.",
-          "children": []
-        },
-        {
-          "id": "ar-lc-terricole",
-          "title": "LC TERRICOLE — وسط سائل استكشافي",
-          "notionId": "40173152f17181c5ab66c8dab2791814",
-          "url": "https://app.notion.com/p/40173152f17181c5ab66c8dab2791814",
-          "description": "تركيبة عمل استكشافية؛ يلزم تأهيلها بحسب السلالة والاستخدام.",
+          "id": "ar-product-qr-guide",
+          "title": "دليل البدء عبر QR — Myco Start / Myco Plate",
+          "notionId": "40173152f171810bb1afe68cfc91ee7c",
+          "url": "https://app.notion.com/p/40173152f171810bb1afe68cfc91ee7c",
+          "description": "دليل وصول سريع يرافق نماذج Myco Start وMyco Plate ويوجه المستخدم إلى تعليمات البدء.",
           "children": []
         }
       ],
@@ -997,25 +765,25 @@
       "description": "موارد عامة لاستكشاف الأعمال الموثّقة وفهم حدود الأدلة والتعرّف على طرق التعاون مع BA Labs.",
       "children": [
         {
-          "id": "learn-work",
-          "title": "الأعمال والمشاريع الموثّقة",
-          "url": "https://app.notion.com/p/40173152f17181c7ab4ad1cdeac8d075",
+          "id": "learn-resource-1",
+          "title": "الأعمال الموثقة",
+          "url": "https://app.notion.com/p/40173152f171811aaac8db82b1c7a9fe",
           "children": []
         },
         {
-          "id": "learn-evidence",
-          "title": "ما الذي تدعمه الأدلة حاليًا؟",
-          "url": "https://app.notion.com/p/40173152f17181eb86f6f623452f9f5d",
+          "id": "learn-resource-2",
+          "title": "منهجية البحث والتطوير",
+          "url": "https://app.notion.com/p/40273152f1718172aabbe09bb712c3d1",
           "children": []
         },
         {
-          "id": "learn-catalogue",
-          "title": "الفهرس العام — الموارد البيولوجية",
-          "url": "https://app.notion.com/p/40173152f171817d8608cafa8a118065",
+          "id": "learn-resource-3",
+          "title": "الكتالوج العام",
+          "url": "https://app.notion.com/p/d0fbe1d779344eb58bc240fe7876ae0e",
           "children": []
         },
         {
-          "id": "learn-collaborate",
+          "id": "learn-resource-4",
           "title": "التعاون مع BA Labs",
           "url": "https://app.notion.com/p/40173152f17181598fc7f2f5a3e64e8a",
           "children": []
