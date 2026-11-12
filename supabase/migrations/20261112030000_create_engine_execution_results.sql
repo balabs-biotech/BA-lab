@@ -38,19 +38,20 @@ revoke all on public.engine_execution_results from anon, authenticated;
 grant select on public.engine_execution_results to authenticated;
 grant all on public.engine_execution_results to service_role;
 
-create or replace function private.reject_engine_result_mutation()
+create or replace function private.reject_engine_result_update()
 returns trigger language plpgsql set search_path = pg_catalog
 as $$
 begin
-  raise exception 'engine results are immutable; create a new execution for a new interpretation'
+  raise exception 'engine results cannot be updated; create a new execution for a new interpretation'
     using errcode = '55000';
 end;
 $$;
-revoke all on function private.reject_engine_result_mutation() from public, anon, authenticated;
+revoke all on function private.reject_engine_result_update() from public, anon, authenticated;
 drop trigger if exists engine_execution_results_immutable on public.engine_execution_results;
-create trigger engine_execution_results_immutable
-  before update or delete on public.engine_execution_results
-  for each row execute function private.reject_engine_result_mutation();
+drop trigger if exists engine_execution_results_no_update on public.engine_execution_results;
+create trigger engine_execution_results_no_update
+  before update on public.engine_execution_results
+  for each row execute function private.reject_engine_result_update();
 
 create or replace function public.complete_engine_execution(
   p_organization_id uuid, p_execution_id uuid, p_result jsonb, p_completed_at timestamptz
