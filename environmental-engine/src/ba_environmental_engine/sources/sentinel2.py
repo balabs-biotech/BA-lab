@@ -5,7 +5,7 @@ download imagery, calculate NDVI, apply cloud masks, or decide biological meanin
 """
 from __future__ import annotations
 
-from datetime import date, datetime, timezone
+from datetime import datetime, timezone
 from math import isfinite
 from typing import Any
 from urllib.parse import urlsplit
@@ -152,7 +152,7 @@ def normalize_sentinel2_observation(
         source_value=value,
         source_unit="1",
         observed_at=observed_at,
-        observed_date=observed_at.date() if isinstance(observed_at, datetime) else date.min,
+        observed_date=observed_at.date(),
         retrieved_at=retrieved_at,
         spatial_resolution_m=resolution,
         quality_flag=quality_flag,
