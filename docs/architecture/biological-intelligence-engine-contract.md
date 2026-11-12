@@ -136,6 +136,6 @@ Implementation update (2026-11-12): the first deterministic Python feature engin
 
 ## 10. Explicit implementation boundary
 
-This contract is a design artifact on top of the BAL-JSON/BAL-Core/Python-engine branch. It does not indicate that the BIE schema, source adapters, biological inference algorithms, production worker or production Supabase deployment already exist.
+This contract is a design artifact on top of the BAL-JSON/BAL-Core/Python-engine branch. The schema, production read-model audit, deterministic feature engine, pure snapshot adapter and pure temporal context resolver are present on the feature branch; none of this means the authenticated BIE data path or production deployment is complete.
 
-The next code task is the read-model audit and schema design, followed by the deterministic feature engine. Do not begin recommendations or strain ranking before those gates pass.
+The next code task is to connect the resolver and snapshot adapter to the existing authenticated `engine-orchestrator`: load culture, dated biological contexts, environments/locations and measurements under the caller JWT/RLS; resolve the analysis window; fetch external weather only for one unambiguous location; then build and persist the immutable BIE execution. Keep the BIE allowlist closed until end-to-end tenant-scope, temporal-conflict, idempotency and persistence tests pass. Do not begin recommendations or strain ranking before those gates pass.
