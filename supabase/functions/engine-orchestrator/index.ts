@@ -88,6 +88,7 @@ Deno.serve(async (req: Request) => {
   const engineId = parsed.engine_id;
   const engineVersion = parsed.engine_version;
   const recordIds = parsed.record_ids;
+  const recordType = parsed.record_type ?? "measurement";
   const parameters = parsed.parameters ?? {};
   const scope = parsed.scope;
   const idempotencyKey = req.headers.get("idempotency-key") ?? parsed.idempotency_key;
@@ -96,6 +97,7 @@ Deno.serve(async (req: Request) => {
       recordIds.length < 1 || recordIds.length > 500 ||
       recordIds.some((id) => typeof id !== "string") ||
       new Set(recordIds).size !== recordIds.length ||
+      (recordType !== "measurement" && recordType !== "environmental_observation") ||
       typeof idempotencyKey !== "string" || idempotencyKey.length < 8 || idempotencyKey.length > 160 ||
       !object(parameters) || !object(scope ?? {})) {
     return reply(422, { error: "invalid_or_incomplete_request" });
@@ -152,11 +154,47 @@ Deno.serve(async (req: Request) => {
   if (measurements.some((row) => row.quality_state === "excluded")) {
     return reply(422, { error: "excluded_source_records_not_eligible" });
   }
-  if (scope?.culture_id && measurements.some((row) => row.culture_id !== scope.culture_id)) {
-    return reply(422, { error: "source_scope_mismatch" });
+  let sourceRows: Record<string, any>[];
+  if (recordType === "measurement") {
+    const { data, error: sourceError } = await userClient
+      .from("measurements")
+      .select("id,variable_code,raw_value,raw_unit_code,normalized_value,normalized_unit_code,measured_at,method,instrument,quality_state,exclusion_reason,culture_id,sample_id,experimental_unit_id,event_id,result_id,metadata")
+      .eq("organization_id", organizationId)
+      .in("id", recordIds);
+    if (sourceError) return reply(422, { error: "source_records_unavailable" });
+    if (!data || data.length !== recordIds.length) {
+      return reply(422, { error: "one_or_more_source_records_missing_or_inaccessible" });
+    }
+    if (data.some((row) => row.quality_state === "excluded")) {
+      return reply(422, { error: "excluded_source_records_not_eligible" });
+    }
+    if (scope?.culture_id && data.some((row) => row.culture_id !== scope.culture_id)) {
+      return reply(422, { error: "source_scope_mismatch" });
+    }
+    sourceRows = data;
+  } else {
+    if (typeof scope?.location_id !== "string") {
+      return reply(422, { error: "environmental_location_scope_required" });
+    }
+    const { data, error: sourceError } = await userClient
+      .from("environmental_observations")
+      .select("id,location_id,data_family,provider_code,dataset_code,variable_code,value,unit_code,observed_at,retrieved_at,spatial_resolution_m,quality_flag,source_url,metadata")
+      .eq("organization_id", organizationId)
+      .eq("location_id", scope.location_id)
+      .eq("data_family", "weather")
+      .in("id", recordIds);
+    if (sourceError) return reply(422, { error: "source_records_unavailable" });
+    if (!data || data.length !== recordIds.length) {
+      return reply(422, { error: "one_or_more_source_records_missing_or_inaccessible" });
+    }
+    const sourceIdentities = new Set(data.map((row) => row.provider_code + "/" + row.dataset_code));
+    if (sourceIdentities.size !== 1) {
+      return reply(422, { error: "environmental_source_mismatch" });
+    }
+    sourceRows = data;
   }
 
-  const records = measurements.map((row) => ({
+  const records = sourceRows.map((row) => recordType === "measurement" ? ({
     record_id: row.id,
     record_type: "measurement",
     payload_sha256: "",
@@ -180,6 +218,25 @@ Deno.serve(async (req: Request) => {
       event_id: row.event_id,
       result_id: row.result_id,
     },
+  }) : ({
+    record_id: row.id,
+    record_type: "environmental_observation",
+    payload_sha256: "",
+    data: {
+      variable_code: row.variable_code,
+      value: row.value,
+      unit_code: row.unit_code,
+      observed_at: row.observed_at,
+      data_family: row.data_family,
+      provider_code: row.provider_code,
+      dataset_code: row.dataset_code,
+      retrieved_at: row.retrieved_at,
+      spatial_resolution_m: row.spatial_resolution_m,
+      quality_flag: row.quality_flag,
+      source_url: row.source_url,
+      metadata: row.metadata ?? {},
+    },
+    context: { location_id: row.location_id },
   }));
   for (const record of records) record.payload_sha256 = await sha256(stable(record.data) + stable(record.context));
   const recordMap = new Map(records.map((record) => [record.record_id, record]));
