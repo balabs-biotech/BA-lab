@@ -91,6 +91,69 @@ class EngineContractTests(unittest.TestCase):
         cls.response_validator = validator(load_schema("response.schema.json"))
 
 
+    def test_spatial_scene_contract_requires_l2a_calibration_and_provenance(self):
+        schema_path = ROOT / "schemas" / "spatial" / "v1" / "scene.schema.json"
+        schema = json.loads(schema_path.read_text(encoding="utf-8"))
+        scene = {
+            "contract": "BA-LABS/SPATIAL-SCENE",
+            "contract_version": "1.0.0",
+            "provider": "earth-search",
+            "collection_id": "sentinel-2-l2a",
+            "item_id": "S2A_20261112T101021",
+            "acquired_at": "2026-11-12T10:10:21Z",
+            "product_level": "L2A",
+            "processing_baseline": "05.11",
+            "platform": "sentinel-2a",
+            "cloud_cover_percent": 12.5,
+            "assets": {
+                "red": {"href": "https://data.example/red.tif", "band_code": "B04", "native_resolution_m": 10},
+                "nir": {"href": "https://data.example/nir.tif", "band_code": "B08", "native_resolution_m": 10},
+                "scl": {"href": "https://data.example/scl.tif", "band_code": "SCL", "native_resolution_m": 20},
+            },
+            "calibration": {
+                "reflectance_status": "raw_dn",
+                "bands": {
+                    "B04": {"quantification_value": 10000, "boa_add_offset": -1000},
+                    "B08": {"quantification_value": 10000, "boa_add_offset": -1000},
+                },
+            },
+        }
+        scene_validator = validator(schema)
+        self.assertEqual(list(scene_validator.iter_errors(scene)), [])
+        missing_baseline = json.loads(json.dumps(scene))
+        del missing_baseline["processing_baseline"]
+        self.assertTrue(list(scene_validator.iter_errors(missing_baseline)))
+        invalid_level = json.loads(json.dumps(scene))
+        invalid_level["product_level"] = "L1C"
+        self.assertTrue(list(scene_validator.iter_errors(invalid_level)))
+
+    def test_spatial_ndvi_result_requires_mask_coverage_and_cog_provenance(self):
+        schema_path = ROOT / "schemas" / "spatial" / "v1" / "ndvi-result.schema.json"
+        schema = json.loads(schema_path.read_text(encoding="utf-8"))
+        result = {
+            "contract": "BA-LABS/SPATIAL-RESULT",
+            "contract_version": "1.0.0",
+            "result_id": "ndvi:scene-123:aoi-456",
+            "source_scene_id": "S2A_20261112T101021",
+            "algorithm": "sentinel2-ndvi-v1",
+            "bands": {"red": "B04", "nir": "B08"},
+            "mask": {"scl_excluded_classes": [3, 8, 9, 10, 11], "cloud_shadow_masked": True},
+            "calibration": {"reflectance_status": "raw_dn", "formula": "(DN + BOA_ADD_OFFSET) / QUANTIFICATION_VALUE"},
+            "grid": {"crs": "EPSG:32631", "resolution_m": 10},
+            "pixel_accounting": {"total_pixel_count": 1000, "valid_pixel_count": 720, "valid_pixel_fraction": 0.72},
+            "statistics": {"minimum": -0.2, "maximum": 0.91, "mean": 0.48},
+            "artifact": {"format": "COG", "href": "s3://ba-labs-private/ndvi/scene-123.tif", "sha256": "a" * 64},
+            "provenance": {"generated_at": "2026-11-12T10:30:00Z", "software_version": "1.0.0"},
+        }
+        result_validator = validator(schema)
+        self.assertEqual(list(result_validator.iter_errors(result)), [])
+        low_coverage = json.loads(json.dumps(result))
+        low_coverage["pixel_accounting"]["valid_pixel_fraction"] = 1.2
+        self.assertTrue(list(result_validator.iter_errors(low_coverage)))
+        missing_hash = json.loads(json.dumps(result))
+        del missing_hash["artifact"]["sha256"]
+        self.assertTrue(list(result_validator.iter_errors(missing_hash)))
+
     def test_registered_environmental_engine_manifest_is_valid_and_sandboxed(self):
         schema = load_schema("manifest.schema.json")
         manifest = json.loads((REGISTRY_DIR / "environmental.timeseries.qc-0.2.0.json").read_text(encoding="utf-8"))
