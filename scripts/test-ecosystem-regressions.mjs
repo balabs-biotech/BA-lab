@@ -490,3 +490,8 @@ assert.ok(brandCss.includes('grid-template-columns: repeat(4,minmax(0,1fr))'), '
 assert.ok(brandCss.includes('grid-template-columns: repeat(2,minmax(0,1fr)) !important;'), 'Editorial method must adapt to a two-column mobile sequence');
 assert.ok(html.includes('brand-system.css?v=10'), 'Public site must request phase 8 art direction');
 assert.ok(previewHtml.includes('brand-system.css?v=10'), 'Preview must request phase 8 art direction');
+
+assert.ok(brandCss.includes('PHASE 10 — field-report project index'), 'Phase 10 field-report art direction must exist');
+assert.ok(brandCss.includes('grid-template-areas: "image index" "image title" "image copy" "image topics" "image tag" "image link"'), 'Project tracks must render as an alternating editorial field-report sequence');
+assert.ok(brandCss.includes('.work-card:nth-child(2)') && brandCss.includes('clip-path:polygon(0 0,100% 0,100% 94%,94% 100%,0 100%)'), 'Project imagery must use the asymmetric specimen treatment');
+assert.ok(brandCss.includes('filter:grayscale(.78) contrast(1.12) brightness(.82)'), 'Project imagery must use the monochrome research-publication treatment');
