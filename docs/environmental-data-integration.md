@@ -83,7 +83,7 @@ The Sentinel-2 pipeline is split into three trust zones:
 
 1. **Catalogue and scene processing** — Earth Search STAC discovery plus the Python environmental engine. The Python engine validates STAC identity, reads bounded COG windows, applies the SCL quality mask, computes native-grid NDVI statistics and builds provider-provenanced observation rows. It does not hold database credentials.
 2. **Authenticated orchestration** — a signed-in user invokes the ingestion workflow for a location. The caller's JWT is used to resolve the location under RLS and verify explicit membership in the owning organization.
-3. **Persistence boundary** — the Edge Function `earth-search-sentinel2-ingest` accepts only a trusted worker's HMAC-SHA256-signed payload, checks a five-minute timestamp window, revalidates tenant scope and row provenance, then uses a server-only Supabase secret to upsert the paired `ndvi_mean` / `ndvi_median` observations.
+3. **Persistence boundary** — the Edge Function `earth-search-sentinel2-ingest` accepts only a trusted worker's HMAC-SHA256-signed payload, checks a five-minute timestamp window, revalidates tenant scope and row provenance, then calls the service-role-only SQL RPC `upsert_satellite_environmental_observations(jsonb)`. This RPC supplies the partial-index predicate required for scene-aware idempotent upserts.
 
 ### Worker request contract
 
