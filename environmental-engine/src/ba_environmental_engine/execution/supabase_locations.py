@@ -41,7 +41,13 @@ class SupabaseLocationRepository:
         host = (parsed.hostname or "").lower()
         if (
             parsed.scheme != "https"
-            or not (host.endswith(".supabase.co") and bool(host[:-len(".supabase.co")]) and "." not in host[:-len(".supabase.co")] and all(char.isalnum() or char == "-" for char in host[:-len(".supabase.co")]))
+            or not host.endswith(".supabase.co")
+            or not host[:-len(".supabase.co")]
+            or "." in host[:-len(".supabase.co")]
+            or not all(
+                char.isalnum() or char == "-"
+                for char in host[:-len(".supabase.co")]
+            )
             or parsed.username is not None
             or parsed.password is not None
             or parsed.port not in (None, 443)
