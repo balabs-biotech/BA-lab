@@ -150,6 +150,20 @@ await assert.rejects(() => loadAuthenticatedPlantBiologicalContextSnapshot({
   userClient: clientFor(plantData), organizationId: "99999999-9999-4999-8999-999999999999", plantCultureId, window,
 }), /plant_culture_not_found_or_inaccessible/);
 
+
+const unlinkedPlantData = structuredClone(plantData);
+unlinkedPlantData.biological_contexts = [];
+unlinkedPlantData.measurements = [];
+const unlinkedPlantCounts = {};
+const unlinkedPlant = await loadAuthenticatedPlantBiologicalContextSnapshot({
+  userClient: clientFor(unlinkedPlantData, unlinkedPlantCounts),
+  organizationId: org, plantCultureId, window,
+});
+assert.equal(unlinkedPlant.scope.environment_id, undefined,
+  "the plant record's mutable current environment must not be used as a historical fallback");
+assert.equal(unlinkedPlant.parameters.environment_link_state, "missing");
+assert.equal(unlinkedPlantCounts.environmental_observations ?? 0, 0);
+
 const mixedPlantContext = structuredClone(plantData);
 mixedPlantContext.biological_contexts[0].culture_id = cultureId;
 await assert.rejects(() => loadAuthenticatedPlantBiologicalContextSnapshot({
