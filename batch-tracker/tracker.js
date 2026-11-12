@@ -4612,6 +4612,10 @@ document.getElementById("plantBiologicalContextCloseButton")?.addEventListener(
   "click",
   closePlantBiologicalContext
 );
+document.getElementById("runPlantBiologicalAssessment")?.addEventListener(
+  "click",
+  runPlantBiologicalAssessment
+);
 document.getElementById("closePlantBiologicalContextPanel")?.addEventListener(
   "click",
   () => {
@@ -6031,6 +6035,7 @@ async function saveBiologicalOperation(event) {
 
 let biologicalContextRequestId = 0;
 let plantBiologicalContextRequestId = 0;
+let plantBiologicalAssessmentRequestId = 0;
 
 function localDateValue(date = new Date()) {
   const year = date.getFullYear();
@@ -6639,6 +6644,93 @@ async function closePlantBiologicalContext() {
   } finally {
     if (isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) {
       button.disabled = !button.dataset.contextId;
+    }
+  }
+}
+
+
+function setPlantBiologicalAssessmentMessage(message, state = "") {
+  const target = document.getElementById("plantBiologicalAssessmentMessage");
+  if (!target) return;
+  target.textContent = message;
+  if (state) target.dataset.state = state;
+  else delete target.dataset.state;
+}
+
+async function runPlantBiologicalAssessment() {
+  const requestId = ++plantBiologicalAssessmentRequestId;
+  const operationRevision = authStateRevision;
+  const operationOrganizationId = organizationId;
+  const panel = document.getElementById("plantBiologicalContextPanel");
+  const plantCultureId = panel?.dataset.plantCultureId;
+  const startDate = document.getElementById("plantBiologicalAssessmentStart")?.value;
+  const endDate = document.getElementById("plantBiologicalAssessmentEnd")?.value;
+  const button = document.getElementById("runPlantBiologicalAssessment");
+
+  if (!operationOrganizationId || !plantCultureId ||
+      document.body.dataset.domain !== "agronomy") {
+    setPlantBiologicalAssessmentMessage("Culture végétale ou espace GreenTech indisponible.", "error");
+    return;
+  }
+  if (!startDate || !endDate || endDate <= startDate) {
+    setPlantBiologicalAssessmentMessage("Choisissez une fenêtre valide : la date de fin est exclusive et doit suivre le début.", "error");
+    return;
+  }
+
+  button.disabled = true;
+  setPlantBiologicalAssessmentMessage("Préparation du snapshot biologique authentifié…");
+  try {
+    const { data, error } = await supabaseClient.functions.invoke("engine-orchestrator", {
+      body: {
+        organization_id: operationOrganizationId,
+        engine_id: "biological.context.features",
+        engine_version: "0.2.0",
+        scope: {
+          organization_id: operationOrganizationId,
+          plant_culture_id: plantCultureId,
+        },
+        record_ids: [],
+        parameters: {
+          window_start: startDate + "T00:00:00+01:00",
+          window_end: endDate + "T00:00:00+01:00",
+          timezone: "Africa/Algiers",
+        },
+        idempotency_key: crypto.randomUUID(),
+      },
+    });
+    if (requestId !== plantBiologicalAssessmentRequestId ||
+        !isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
+    if (error) {
+      const detail = String(error.message || "Erreur inconnue");
+      if (/function.*not found|not deployed|404/i.test(detail)) {
+        throw new Error("Le service engine-orchestrator n’est pas encore déployé.");
+      }
+      if (/engine_version_not_registered/i.test(detail)) {
+        throw new Error("Le BIE v0.2 n’est pas encore activé côté serveur (BA_BIE_ENABLED).");
+      }
+      throw new Error(detail);
+    }
+    await loadRecentEngineExecutions();
+    if (requestId !== plantBiologicalAssessmentRequestId ||
+        !isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
+    const executionId = data?.execution_id || data?.execution?.id;
+    setPlantBiologicalAssessmentMessage(
+      executionId
+        ? "Évaluation enregistrée (" + executionId + "). Consultez l’historique des exécutions."
+        : "Évaluation transmise. Consultez l’historique des exécutions.",
+      "success"
+    );
+  } catch (error) {
+    if (requestId !== plantBiologicalAssessmentRequestId ||
+        !isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
+    setPlantBiologicalAssessmentMessage(
+      error.message || "Impossible de lancer l’évaluation BIE.",
+      "error"
+    );
+  } finally {
+    if (requestId === plantBiologicalAssessmentRequestId &&
+        isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) {
+      button.disabled = false;
     }
   }
 }
