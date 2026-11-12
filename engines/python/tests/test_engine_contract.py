@@ -654,6 +654,54 @@ class EngineContractTests(unittest.TestCase):
         self.assertIn("culture_environment_not_linked", missing)
 
 
+
+    def test_biological_context_features_reports_ambiguous_or_conflicting_environment_links(self):
+        request = json.loads(json.dumps(REQUEST))
+        request["engine"] = {
+            "engine_id": "biological.context.features",
+            "engine_version": "0.1.0",
+        }
+        culture_id = "2c2b3a4d-5e6f-4789-8123-456789abcdef"
+        request["scope"] = {
+            "organization_id": REQUEST["scope"]["organization_id"],
+            "culture_id": culture_id,
+        }
+        request["parameters"] = {
+            "window_start": "2026-11-10T00:00:00Z",
+            "window_end": "2026-11-13T00:00:00Z",
+            "timezone": "Africa/Algiers",
+            "environment_link_state": "ambiguous",
+        }
+        record_id = "ac2b3a4d-5e6f-4789-8123-456789abcdef"
+        request["input"]["record_ids"] = [record_id]
+        request["input"]["records"] = [{
+            "record_id": record_id,
+            "record_type": "measurement",
+            "payload_sha256": "e" * 64,
+            "data": {
+                "variable_code": "air_temperature",
+                "normalized_value": 22.0,
+                "normalized_unit_code": "degC",
+                "measured_at": "2026-11-10T08:00:00Z",
+            },
+            "context": {
+                "culture_id": culture_id,
+                "environment_resolution": {
+                    "status": "conflict",
+                    "reason": "measurement_environment_context_mismatch",
+                    "environment_id": None,
+                    "location_id": None,
+                },
+            },
+        }]
+        result = execute_registered_engine(request)
+        self.assertEqual(result["status"], "completed", msg=str(result.get("error")))
+        missing = result["result"]["value"]["coverage"]["missing_context"]
+        self.assertIn("analysis_window_environment_ambiguous", missing)
+        self.assertIn("measurement_environment_context_conflict", missing)
+        self.assertIn("environment_context_ambiguous", result["result"]["quality_flags"])
+        self.assertIn("environment_context_conflict", result["result"]["quality_flags"])
+
     def test_biological_context_features_accepts_empty_snapshot_as_insufficient_data(self):
         request = json.loads(json.dumps(REQUEST))
         request["engine"] = {
