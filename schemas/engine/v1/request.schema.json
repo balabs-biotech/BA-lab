@@ -89,7 +89,6 @@
       "properties": {
         "record_ids": {
           "type": "array",
-          "minItems": 1,
           "uniqueItems": true,
           "items": {
             "type": "string",
@@ -102,7 +101,6 @@
         },
         "records": {
           "type": "array",
-          "minItems": 1,
           "items": {
             "type": "object",
             "required": [
@@ -185,5 +183,54 @@
       }
     }
   },
-  "additionalProperties": false
+  "additionalProperties": false,
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "engine": {
+            "properties": {
+              "engine_id": {
+                "const": "biological.context.features"
+              }
+            },
+            "required": [
+              "engine_id"
+            ]
+          }
+        },
+        "required": [
+          "engine"
+        ]
+      },
+      "then": {
+        "properties": {
+          "input": {
+            "properties": {
+              "record_ids": {
+                "minItems": 0
+              },
+              "records": {
+                "minItems": 0
+              }
+            }
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "input": {
+            "properties": {
+              "record_ids": {
+                "minItems": 1
+              },
+              "records": {
+                "minItems": 1
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
 }
