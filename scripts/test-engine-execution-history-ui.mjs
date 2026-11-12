@@ -24,6 +24,12 @@ assert.match(loader, /engineExecutionHistoryRequestId/);
 assert.match(loader, /isCurrentWorkspaceRevision/);
 
 const renderer = tracker.slice(rendererStart, overviewStart);
+const biologicalRendererStart = tracker.indexOf("function renderBiologicalContextAssessment(");
+assert.ok(biologicalRendererStart >= 0 && biologicalRendererStart < rendererStart);
+const biologicalRenderer = tracker.slice(biologicalRendererStart, rendererStart);
+for (const contract of ["biological.context_assessment", "record_counts_by_type", "missing_context", "observed_facts", "derived_features", "findings", "hypotheses", "temporal_gaps", "textContent"]) assert.ok(biologicalRenderer.includes(contract), "Missing BIE UI contract: " + contract);
+assert.ok(!/innerHTML|insertAdjacentHTML/.test(biologicalRenderer));
+assert.ok(renderer.includes("renderBiologicalContextAssessment(article, result)"));
 assert.match(renderer, /replaceChildren\(\)/);
 assert.match(renderer, /textContent/);
 assert.match(renderer, /quality_flags/);
