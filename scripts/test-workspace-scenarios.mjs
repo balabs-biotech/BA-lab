@@ -517,6 +517,15 @@ console.log("✓ Measurement history reload: stale errors are discarded");
 // Biological context editor: tenant-scoped reads/writes, required environment,
 // explicit temporal validity, and safe closure of an active context.
 const workspaceHtml = fs.readFileSync(new URL("../batch-tracker/workspace.html", import.meta.url), "utf8");
+const localization = fs.readFileSync("batch-tracker/i18n.js", "utf8");
+for (const phrase of [
+  "Identité et conditions biologiques", "Environnement associé", "Type d’organisme",
+  "Souche du référentiel", "Stade biologique", "Système de production",
+  "Début de validité", "Fin de validité (exclue)", "Enregistrer ce contexte daté"
+]) {
+  assert.ok(localization.includes(phrase),
+    "biological context editor phrase must be present in the localization catalogue: " + phrase);
+}
 for (const id of [
   "biologicalContextPanel", "biologicalContextHistory", "biologicalContextForm",
   "biologicalContextEnvironment", "biologicalContextOrganismKind",
