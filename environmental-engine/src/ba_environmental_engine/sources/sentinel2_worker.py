@@ -11,11 +11,12 @@ import json
 import re
 import time
 from dataclasses import dataclass
+from datetime import datetime
 from typing import Any, Callable, Sequence
 from urllib.error import HTTPError, URLError
 from urllib.request import HTTPRedirectHandler, Request, build_opener
-from uuid import UUID
 from urllib.parse import urlsplit
+from uuid import UUID
 
 from ba_environmental_engine.sources.sentinel2_batch import process_sentinel2_stac_items
 
@@ -90,7 +91,7 @@ def process_and_persist_sentinel2_batch(
     aoi_geojson: dict[str, Any],
     organization_id: str | UUID,
     location_id: str | UUID,
-    retrieved_at,
+    retrieved_at: datetime,
     processing_version: str,
     user_authorization: str,
     supabase_api_key: str,
