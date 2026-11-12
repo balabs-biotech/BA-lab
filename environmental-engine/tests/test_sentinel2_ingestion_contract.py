@@ -82,3 +82,29 @@ def test_refuses_no_valid_pixel_scene():
     )
     with pytest.raises(ValueError, match="no valid pixels"):
         build_sentinel2_observation_rows(**inputs)
+
+
+def test_rejects_malformed_https_source_urls():
+    inputs = _inputs()
+    inputs["source_url"] = "https://"
+    with pytest.raises(ValueError, match="trusted Earth Search"):
+        build_sentinel2_observation_rows(**inputs)
+
+    inputs = _inputs()
+    inputs["source_url"] = "https://example.com/forged-scene"
+    with pytest.raises(ValueError, match="trusted Earth Search"):
+        build_sentinel2_observation_rows(**inputs)
+
+
+def test_rejects_non_finite_or_out_of_range_ndvi_statistics():
+    from dataclasses import replace
+
+    inputs = _inputs()
+    inputs["statistics"] = replace(inputs["statistics"], mean_ndvi=float("nan"))
+    with pytest.raises(ValueError, match="mean_ndvi"):
+        build_sentinel2_observation_rows(**inputs)
+
+    inputs = _inputs()
+    inputs["statistics"] = replace(inputs["statistics"], median_ndvi=1.2)
+    with pytest.raises(ValueError, match="median_ndvi"):
+        build_sentinel2_observation_rows(**inputs)
