@@ -64,6 +64,8 @@ def analyze_environmental_timeseries_qc(request: Mapping[str, Any]) -> dict[str,
     grouped: dict[tuple[str, str], list[tuple[datetime, float, str]]] = defaultdict(list)
     rejected_records: list[dict[str, str]] = []
     source_references: set[str] = set()
+    total_measurement_points = 0
+    total_environmental_observation_points = 0
     environmental_source_identity: tuple[str, str] | None = None
     for record in request["input"]["records"]:
         record_type = record["record_type"]
@@ -120,8 +122,6 @@ def analyze_environmental_timeseries_qc(request: Mapping[str, Any]) -> dict[str,
     series_results = []
     all_flags: set[str] = set()
     total_points = 0
-    total_measurement_points = 0
-    total_environmental_observation_points = 0
     for (variable, unit), points in sorted(grouped.items()):
         points.sort(key=lambda item: (item[0], item[2]))
         values = [point[1] for point in points]
