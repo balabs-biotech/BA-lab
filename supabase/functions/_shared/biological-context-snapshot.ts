@@ -19,6 +19,7 @@ export interface BiologicalMeasurementRow {
   id: string;
   organization_id: string;
   culture_id: string | null;
+  environment_id?: string | null;
   variable_code: string;
   raw_value: number | null;
   raw_unit_code: string | null;
@@ -119,6 +120,9 @@ export async function buildBiologicalContextSnapshot(input: {
   for (const row of input.measurements) {
     if (row.organization_id !== organizationId || row.culture_id !== culture.id) {
       throw new Error("measurement_culture_scope_mismatch");
+    }
+    if (row.environment_id && row.environment_id !== culture.environment_id) {
+      throw new Error("measurement_environment_scope_mismatch");
     }
     const instant = parseInstant(row.measured_at, "measurement_timestamp");
     if (instant < windowStart || instant > windowEnd) continue;
