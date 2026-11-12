@@ -98,6 +98,7 @@
         : `Observation — ${d.variable_code} : ${d.value_text}`;
       preview.textContent = [
         "Document reconnu : BA-LABS/JSON v1.0.0",
+        `Type : ${validatedRecord.record_type}`,
         description,
         `Identifiant : ${validatedRecord.record_id}`,
         `Contexte : ${d.context.culture_id ? "culture" : d.context.plant_culture_id ? "culture végétale" : "lot"}`,
