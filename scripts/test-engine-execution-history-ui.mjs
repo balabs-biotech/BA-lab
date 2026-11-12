@@ -66,8 +66,8 @@ for (const path of [
   "batch-tracker/green-tech/index.html",
 ]) {
   const page = readFileSync(path, "utf8");
-  assert.match(page, /workspace\.html\?v=20261112-engine-history-4/);
-  assert.match(page, /tracker\.js\?v=20261112-engine-history-4/);
+  assert.match(page, /workspace\.html\?v=20261112-engine-history-compare-1/);
+  assert.match(page, /tracker\.js\?v=20261112-engine-history-compare-1/);
 }
 
 console.log("Engine execution history UI contract checks passed.");
