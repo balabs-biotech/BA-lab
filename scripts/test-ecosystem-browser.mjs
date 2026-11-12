@@ -110,6 +110,8 @@ async function checkWorkingScene(name, viewport) {
   }
 
   try {
+  await checkUniverseIndexLayout('desktop', { width: 1440, height: 1000 }, 4);
+  await checkUniverseIndexLayout('mobile', { width: 390, height: 844 }, 1);
     await page.waitForFunction(() => {
       const root = document.querySelector('#mainView');
       return root?.classList.contains('webgl-ready') ||
@@ -282,6 +284,51 @@ async function checkWorkingScene(name, viewport) {
   console.log(name + ': WebGL started, legacy spheres hidden, gateway entered successfully', JSON.stringify(canvasState));
   await page.close();
 }
+
+async function checkUniverseIndexLayout(name, viewport, expectedColumns) {
+  const page = await browser.newPage({ viewport, deviceScaleFactor: 1, isMobile: name === 'mobile', hasTouch: name === 'mobile' });
+  await page.goto(baseURL + (baseURL.includes('?') ? '&' : '?') + 'e2e=1', { waitUntil: 'domcontentloaded', timeout: 30000 });
+  const section = page.locator('#universes');
+  await section.waitFor({ state: 'visible', timeout: 10000 });
+  await section.scrollIntoViewIfNeeded();
+  const grid = page.locator('#universes .universe-index-grid');
+  const cards = grid.locator(':scope > .universe-index-card');
+  await cards.first().waitFor({ state: 'visible' });
+  const result = await page.evaluate(() => {
+    const grid = document.querySelector('#universes .universe-index-grid');
+    const cards = [...(grid?.querySelectorAll(':scope > .universe-index-card') || [])];
+    const gridStyle = grid && getComputedStyle(grid);
+    const rects = cards.map(card => {
+      const r = card.getBoundingClientRect();
+      return { left:r.left, top:r.top, right:r.right, bottom:r.bottom, width:r.width, height:r.height,
+        scrollWidth:card.scrollWidth, clientWidth:card.clientWidth, scrollHeight:card.scrollHeight, clientHeight:card.clientHeight,
+        number:card.querySelector(':scope > span')?.textContent?.trim(),
+        title:card.querySelector(':scope > b')?.textContent?.trim() };
+    });
+    const overlaps = [];
+    for (let i=0;i<rects.length;i++) for (let j=i+1;j<rects.length;j++) {
+      const a=rects[i], b=rects[j];
+      if (Math.min(a.right,b.right)-Math.max(a.left,b.left)>1 &&
+          Math.min(a.bottom,b.bottom)-Math.max(a.top,b.top)>1) overlaps.push([a.number,b.number]);
+    }
+    return { columns:gridStyle?.gridTemplateColumns?.split(' ').length || 0, gridTemplateColumns:gridStyle?.gridTemplateColumns, cards:rects, overlaps,
+      sectionWidth:document.querySelector('#universes')?.getBoundingClientRect().width || 0,
+      viewportWidth:window.innerWidth };
+  });
+  assert.equal(result.cards.length, 8, name + ': the homepage must show exactly eight universe panels');
+  assert.equal(result.columns, expectedColumns, name + ': universe panels must use the intended responsive column count; layout=' + JSON.stringify({columns:result.columns,viewportWidth:result.viewportWidth,sectionWidth:result.sectionWidth,grid:result.gridTemplateColumns}));
+  assert.deepEqual(result.overlaps, [], name + ': universe panels must not overlap');
+  for (const card of result.cards) {
+    assert.ok(card.width >= (name === 'mobile' ? 300 : 200), name + ': panel ' + card.number + ' is too narrow');
+    assert.ok(card.scrollWidth <= card.clientWidth + 1, name + ': panel ' + card.number + ' clips text horizontally');
+    assert.ok(card.scrollHeight <= card.clientHeight + 1, name + ': panel ' + card.number + ' clips text vertically');
+    assert.ok(card.title, name + ': panel ' + card.number + ' is missing its title');
+  }
+  await section.screenshot({ path: outputDir + '/' + name + '-universe-index.png' });
+  console.log(name + ': eight universe panels verified', JSON.stringify({ columns:result.columns, overlaps:result.overlaps, cards:result.cards.map(card=>({number:card.number,title:card.title,width:card.width,height:card.height})) }));
+  await page.close();
+}
+
 
 async function checkPrimaryCdnFallback() {
   const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
