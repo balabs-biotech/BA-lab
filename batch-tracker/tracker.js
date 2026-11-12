@@ -23,6 +23,10 @@ const supabaseClient =
 
 let organizationId = null;
 
+// Public, read-only bridge for isolated workspace adapters.
+window.BA_LABS_SUPABASE_CLIENT = supabaseClient;
+window.BA_LABS_GET_ORGANIZATION_ID = () => organizationId;
+
 let organization = null;
 
 let strainOptions = [];
