@@ -72,6 +72,39 @@ async function checkWorkingScene(name, viewport) {
   page.on('requestfailed', (request) => browserDiagnostics.push('request failed: ' + request.url() + ' — ' + (request.failure()?.errorText || 'unknown')));
   await page.goto(baseURL + (baseURL.includes('?') ? '&' : '?') + 'e2e=1', { waitUntil: 'domcontentloaded', timeout: 30000 });
 
+  // The four editorial method steps must open real, translated content—not just animate.
+  const methodRoot = page.locator('#app .editorial-method');
+  await methodRoot.waitFor({ state: 'visible', timeout: 10000 });
+  for (const language of ['fr', 'en', 'ar', 'pt']) {
+    await page.locator('[data-lang="' + language + '"]').click();
+    for (const [step, titleKey] of [
+      ['observe', 'methodObserve'],
+      ['question', 'methodQuestion'],
+      ['test', 'methodTest'],
+      ['share', 'methodShare'],
+    ]) {
+      const trigger = methodRoot.locator('[data-method-step="' + step + '"]');
+      await trigger.click();
+      const detail = methodRoot.locator('#methodDetail');
+      await detail.waitFor({ state: 'visible', timeout: 3000 });
+      const detailState = await detail.evaluate((el) => ({
+        title: el.querySelector('#methodDetailTitle')?.textContent?.trim() || '',
+        explanation: el.querySelector('#methodDetailText')?.textContent?.trim() || '',
+        output: el.querySelector('#methodDetailOutput')?.textContent?.trim() || '',
+        display: getComputedStyle(el).display,
+        hidden: el.hidden,
+      }));
+      assert.ok(detailState.title && detailState.explanation.length > 40 && detailState.output.length > 25,
+        language + '/' + step + ': method detail must contain translated explanation and a concrete expected record. ' + JSON.stringify(detailState));
+      assert.notEqual(detailState.display, 'none', language + '/' + step + ': opened method detail must be visible');
+      assert.equal(await trigger.getAttribute('aria-expanded'), 'true',
+        language + '/' + step + ': active method step must expose its expanded state');
+      await trigger.click();
+      await detail.waitFor({ state: 'hidden', timeout: 3000 });
+    }
+  }
+  await page.locator('[data-lang="fr"]').click();
+
   try {
     await page.waitForFunction(() => {
       const root = document.querySelector('#mainView');
