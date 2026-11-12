@@ -71,3 +71,26 @@ The caller JWT is forwarded end-to-end. The worker does not trust organization o
 8. Run one authorized test location/date window and verify both mean/median rows, source identity, provenance and retry idempotency.
 
 No production deployment, secret configuration, migration application or satellite persistence is performed by this code change.
+
+
+## Leased worker persistence boundary
+
+The durable-worker path uses a separate server-to-server endpoint:
+`earth-search-sentinel2-lease-ingest`. Its Python transport is
+`execution/lease_ingest.py` and sends only `job_id`, `lease_token`,
+tenant/location identifiers, and paired observation rows. It signs the exact
+UTF-8 request bytes with HMAC-SHA256 and does not forward a user JWT or
+publishable API key.
+
+Lease validation and persistence are now one database transaction through
+`persist_leased_satellite_environmental_observations(job_id, lease_token, rows)`.
+The RPC locks the job row with `FOR UPDATE`, checks that the lease is current
+and that job type/provider/dataset and row tenant/source scopes match, then
+calls the existing satellite upsert RPC before releasing the lock. This closes
+the previous read-then-upsert race in which a lease could expire or be reclaimed
+after Edge Function validation but before the observation write.
+
+This is still an implementation foundation, not an activated queue. The
+authenticated synchronous gateway remains the active path until the queued
+request gateway, worker processor composition, retry/reconciliation schedule,
+integration tests, and deployment configuration are implemented and verified.
