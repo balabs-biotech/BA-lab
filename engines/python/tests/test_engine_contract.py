@@ -247,6 +247,13 @@ class EngineContractTests(unittest.TestCase):
             ["NASA_POWER/POWER_DAILY_AGRO"],
         )
 
+        daily_cadence = json.loads(json.dumps(request))
+        daily_cadence["parameters"] = {"minimum_points": 2}
+        for index, record in enumerate(daily_cadence["input"]["records"]):
+            record["data"]["observed_at"] = f"2026-11-{10 + index:02d}T12:00:00Z"
+        daily_result = run_environmental_timeseries_qc(daily_cadence)
+        self.assertNotIn("sampling_gap_detected", daily_result["result"]["quality_flags"])
+
         invalid_family = json.loads(json.dumps(request))
         invalid_family["input"]["records"][0]["data"]["data_family"] = "satellite"
         family_result = run_environmental_timeseries_qc(invalid_family)
