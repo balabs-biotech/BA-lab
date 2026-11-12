@@ -35,7 +35,9 @@ assert.equal(Object.hasOwn(schema.properties, "confidence"), false);
 assert.equal(Object.hasOwn(schema.$defs.finding.properties, "confidence"), false);
 
 for (const definition of Object.values(schema.$defs)) {
-  assert.equal(definition.additionalProperties, false,
-    "all object definitions must reject undeclared fields");
+  if (definition.type === "object") {
+    assert.equal(definition.additionalProperties, false,
+      "all object definitions must reject undeclared fields");
+  }
 }
 console.log("✓ Biological context assessment v1 schema: traceable facts, derived features, evidence states and explicitly unverified hypotheses");
