@@ -156,15 +156,29 @@ def test_one_biological_subject_cannot_be_counted_in_both_cohorts():
 
 
 
-def test_comparison_rejects_mixed_methods_or_instruments():
-    with pytest.raises(ValueError, match="same measurement method and instrument"):
-        compare([
-            obs("b1", "control", "b1", 10, 0),
-            obs("b2", "control", "b2", 11, 0),
-            obs("t1", "treated", "t1", 15, 0),
-            obs("t2", "treated", "t2", 16, 0),
-        ] + [
-            __import__("dataclasses").replace(
-                obs("t3", "treated", "t3", 17, 0), instrument="different-instrument"
-            )
-        ])
+def test_instrument_differences_are_preserved_as_metadata():
+    from dataclasses import replace
+
+    rows = [
+        obs("b1", "control", "b1", 10, 0),
+        obs("b2", "control", "b2", 11, 0),
+        obs("t1", "treated", "t1", 15, 0),
+        replace(obs("t2", "treated", "t2", 16, 0), instrument="instrument-02"),
+    ]
+    result = compare(rows)
+    assert result.status == "descriptive_comparison"
+    assert result.baseline.instruments == ()
+    assert result.comparison.instruments == ("instrument-02",)
+
+
+def test_mixed_measurement_methods_are_not_pooled():
+    from dataclasses import replace
+
+    rows = [
+        obs("b1", "control", "b1", 10, 0),
+        obs("b2", "control", "b2", 11, 0),
+        obs("t1", "treated", "t1", 15, 0),
+        replace(obs("t2", "treated", "t2", 16, 0), method="image_analysis"),
+    ]
+    with pytest.raises(ValueError, match="same measurement method"):
+        compare(rows)
