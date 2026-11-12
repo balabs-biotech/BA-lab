@@ -92,6 +92,13 @@ export async function buildBiologicalContextSnapshot(input: {
   environment: BiologicalEnvironmentRow | null;
   measurements: BiologicalMeasurementRow[];
   environmentalObservations: BiologicalEnvironmentalObservationRow[];
+  measurementContextById?: Record<string, {
+    status: string;
+    reason: string | null;
+    environment_id: string | null;
+    location_id: string | null;
+  }>;
+  environmentLinkState?: string;
   window: BiologicalContextWindow;
 }) {
   const { organizationId, culture, environment, window } = input;
@@ -125,7 +132,8 @@ export async function buildBiologicalContextSnapshot(input: {
     if (instant < windowStart || instant > windowEnd) continue;
     const context = {
       culture_id: row.culture_id,
-      environment_id: row.environment_id ?? null,
+      environment_id: input.measurementContextById?.[row.id]?.environment_id ?? row.environment_id ?? null,
+      environment_resolution: input.measurementContextById?.[row.id] ?? null,
       sample_id: row.sample_id ?? null,
       experimental_unit_id: row.experimental_unit_id ?? null,
       event_id: row.event_id ?? null,
@@ -211,9 +219,8 @@ export async function buildBiologicalContextSnapshot(input: {
     window_end: window.end,
     timezone: window.timezone,
     biological_context_supplied: false,
-    environment_link_state: environment
-      ? (locationId ? "resolved" : "environment_without_location")
-      : "unlinked",
+    environment_link_state: input.environmentLinkState ??
+      (environment ? (locationId ? "resolved" : "environment_without_location") : "unlinked"),
   };
   const snapshotHash = await sha256(stable(records));
   return {
