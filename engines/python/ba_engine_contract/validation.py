@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+from functools import lru_cache
 from pathlib import Path
 from typing import Any, Mapping
 
@@ -15,6 +16,7 @@ class ContractValidationError(ValueError):
     """Raised when an engine request or result violates the v1 contract."""
 
 
+@lru_cache(maxsize=2)
 def _validator(name: str) -> Draft202012Validator:
     path = _SCHEMA_DIR / name
     try:
