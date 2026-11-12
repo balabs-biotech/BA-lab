@@ -38,7 +38,7 @@ class ExperimentalObservation:
         for name in required:
             if not getattr(self, name).strip():
                 raise ValueError(f"{name} must not be empty")
-        if self.subject_type not in {"culture", "plant_culture", "sample", "experimental_unit"}:
+        if self.subject_type not in {"culture", "plant_culture", "sample", "experimental_unit", "biological_subject"}:
             raise ValueError("subject_type must identify a supported biological subject")
         if isinstance(self.value, bool) or not isinstance(self.value, (int, float)) or not isfinite(self.value):
             raise ValueError("value must be finite and numeric")
