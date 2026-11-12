@@ -120,6 +120,8 @@ A finding must be reproducible from its cited input records and declared method.
 6. **UI:** present observed facts, derived features, limitations and provenance separately.
 7. **Biological interpretation:** only after validation datasets and domain-specific reference methods are documented.
 
+Implementation update (2026-11-12): the first deterministic Python feature engine, `biological.context.features@0.1.0`, and its registry manifest are now present on the BIE feature branch. It accepts an already-authorized immutable snapshot for one culture and computes descriptive series statistics, temporal gaps, coverage, source-linked observations and quality flags. It deliberately does not resolve database rows, validate culture-to-environment relationships, support batch subjects, or make biological interpretations. It is not yet enabled in the Supabase orchestrator allowlist and is not deployed.
+
 ## 9. Acceptance criteria for the first executable slice
 
 - An authorized user can request an assessment for one culture/batch and a bounded window.
