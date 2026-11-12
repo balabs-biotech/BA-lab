@@ -168,6 +168,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
+      - name: Test BAL-Core measurement normalization
+        run: node --experimental-strip-types supabase/tests/measurement-normalization.test.mts
       - name: Test sync-culture-to-notion (mocked Supabase and Notion, no network)
         run: node --experimental-strip-types supabase/tests/sync-culture-to-notion.test.mts
       - name: Test Sentinel-2 catalogue security and query contract
