@@ -7,6 +7,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from jsonschema import Draft202012Validator, FormatChecker
 from ba_engine_contract.validation import ContractValidationError, validate_request, validate_response
+from ba_engine_contract.environmental_timeseries_qc import run_environmental_timeseries_qc
 
 ROOT = Path(__file__).resolve().parents[3]
 SCHEMA_DIR = ROOT / "schemas" / "engine" / "v1"
@@ -129,6 +130,58 @@ class EngineContractTests(unittest.TestCase):
         invalid["engine"]["engine_version"] = "0.2.0"
         with self.assertRaises(ContractValidationError):
             validate_response(invalid, REQUEST)
+
+
+    def test_environmental_qc_detects_sampling_gaps_and_outliers_without_diagnosis(self):
+        request = json.loads(json.dumps(REQUEST))
+        request["engine"] = {"engine_id": "environmental.timeseries.qc", "engine_version": "0.1.0"}
+        request["input"]["records"] = []
+        request["input"]["record_ids"] = []
+        for index, (timestamp, value) in enumerate([
+            ("2026-11-12T08:00:00Z", 20.0),
+            ("2026-11-12T08:10:00Z", 20.1),
+            ("2026-11-12T12:00:00Z", 20.0),
+            ("2026-11-12T12:10:00Z", 40.0),
+        ]):
+            record_id = f"3c2b3a4d-5e6f-4789-8123-456789abcde{index}"
+            request["input"]["record_ids"].append(record_id)
+            request["input"]["records"].append({
+                "record_id": record_id,
+                "record_type": "measurement",
+                "payload_sha256": "b" * 64,
+                "data": {
+                    "variable_code": "temperature",
+                    "normalized_value": value,
+                    "normalized_unit_code": "degC",
+                    "measured_at": timestamp
+                }
+            })
+        request["parameters"] = {"max_gap_minutes": 60, "outlier_mad_threshold": 3.0, "minimum_points": 3}
+        result = run_environmental_timeseries_qc(request)
+        validate_response(result, request)
+        self.assertEqual(result["result"]["outcome"], "success")
+        flags = result["result"]["value"]["series"][0]["quality_flags"]
+        self.assertIn("sampling_gap_detected", flags)
+        self.assertIn("robust_outlier_detected", flags)
+        self.assertIn("data-quality screening only", result["result"]["limitations"][0])
+
+    def test_environmental_qc_rejects_wrong_engine_identity(self):
+        request = json.loads(json.dumps(REQUEST))
+        with self.assertRaisesRegex(ValueError, "unsupported_engine_id"):
+            run_environmental_timeseries_qc(request)
+
+    def test_environmental_qc_rejects_naive_timestamp_as_excluded_data(self):
+        request = json.loads(json.dumps(REQUEST))
+        request["engine"] = {"engine_id": "environmental.timeseries.qc", "engine_version": "0.1.0"}
+        request["input"]["records"][0]["data"] = {
+            "variable_code": "temperature",
+            "normalized_value": 22.0,
+            "normalized_unit_code": "degC",
+            "measured_at": "2026-11-12T10:00:00"
+        }
+        result = run_environmental_timeseries_qc(request)
+        self.assertEqual(result["result"]["outcome"], "insufficient_data")
+        self.assertEqual(result["result"]["value"]["summary"]["excluded_record_count"], 1)
 
     def test_unknown_fields_are_rejected_at_envelope_boundaries(self):
         invalid = json.loads(json.dumps(REQUEST))
