@@ -45,7 +45,7 @@ export async function loadAuthenticatedBiologicalContextSnapshot(input: {
 
   const [contextResult, measurementResult] = await Promise.all([
     userClient.from("biological_contexts")
-      .select("id,organization_id,culture_id,environment_id,valid_from,valid_to")
+      .select("id,organization_id,culture_id,environment_id,organism_kind,taxon_code,strain_code,cultivar_code,culture_stage,substrate_code,production_system,context_tags,valid_from,valid_to")
       .eq("organization_id", organizationId)
       .eq("culture_id", cultureId)
       .limit(MAX_CONTEXTS + 1),
@@ -65,6 +65,30 @@ export async function loadAuthenticatedBiologicalContextSnapshot(input: {
   }
   if (measurements.length > MAX_MEASUREMENTS) {
     throw new Error("biological_analysis_measurement_limit_exceeded");
+  }
+
+  // Resolve strain codes only inside the caller's organization. The biological
+  // context stores a code, not a foreign key, so the catalogue lookup is explicit.
+  const strainCodes = [...new Set(contexts
+    .map((row: any) => row.strain_code)
+    .filter((value): value is string => typeof value === "string" && value.length > 0))];
+  let strainReferences: any[] = [];
+  let organisms: any[] = [];
+  if (strainCodes.length) {
+    const strainResult = await userClient.from("strains")
+      .select("id,organization_id,strain_code,organism_id,designation,origin,source_description")
+      .eq("organization_id", organizationId)
+      .in("strain_code", strainCodes);
+    strainReferences = requireRows(strainResult, "biological_strain_references_unavailable")
+      .filter((row: any) => row.organization_id === organizationId && strainCodes.includes(row.strain_code));
+    const organismIds = [...new Set(strainReferences.map((row: any) => row.organism_id))];
+    if (organismIds.length) {
+      const organismResult = await userClient.from("organisms")
+        .select("id,scientific_name,common_name,taxonomy_source,taxonomy_id")
+        .in("id", organismIds);
+      organisms = requireRows(organismResult, "biological_organisms_unavailable")
+        .filter((row: any) => organismIds.includes(row.id));
+    }
   }
 
   const environmentIds = [...new Set([
@@ -140,6 +164,8 @@ export async function loadAuthenticatedBiologicalContextSnapshot(input: {
     environments,
     measurements,
     environmentalObservations,
+    strainReferences,
+    organisms,
     window,
   });
 }
