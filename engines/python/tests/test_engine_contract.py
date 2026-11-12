@@ -558,9 +558,9 @@ class EngineContractTests(unittest.TestCase):
         self.assertEqual(value["subject"]["subject_id"], culture_id)
         self.assertEqual(value["coverage"]["source_record_count"], 3)
         self.assertEqual(value["coverage"]["record_counts_by_type"]["measurement"], 3)
-        self.assertEqual(len(value["derived_features"]), 1)
-        feature = value["derived_features"][0]
-        self.assertEqual(feature["feature_code"], "series.air_temperature.mean")
+        self.assertEqual(len(value["derived_features"]), 4)
+        feature = next(item for item in value["derived_features"] if item["feature_code"] == "series.measurement.air_temperature.mean")
+        self.assertEqual(feature["feature_code"], "series.measurement.air_temperature.mean")
         self.assertEqual(feature["value"], 22.0)
         self.assertEqual(feature["unit_code"], "degC")
         self.assertEqual(set(feature["source_record_ids"]), set(request["input"]["record_ids"]))
