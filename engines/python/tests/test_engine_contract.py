@@ -683,6 +683,14 @@ class EngineContractTests(unittest.TestCase):
         self.assertIn("culture_environment_not_linked", value["coverage"]["missing_context"])
         self.assertIn("insufficient_data", result["result"]["quality_flags"])
 
+        non_biological = json.loads(json.dumps(request))
+        non_biological["engine"] = {
+            "engine_id": "environmental.timeseries.qc",
+            "engine_version": "0.2.0",
+        }
+        with self.assertRaisesRegex(ContractValidationError, "record_ids.*non-empty"):
+            validate_request(non_biological)
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
