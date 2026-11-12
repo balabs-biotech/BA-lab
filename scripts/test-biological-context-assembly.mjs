@@ -43,6 +43,16 @@ assert.equal(assembled.input.records.find((row) => row.record_type === "measurem
 assert.equal(assembled.context_resolution.window.status, "resolved");
 assert.deepEqual(assembled.excluded_environmental_observation_ids, []);
 
+const conflictingMeasurement = await assembleResolvedBiologicalContextSnapshot({
+  organizationId, culture, contexts, environments,
+  measurements: [{ ...measurements[0], environment_id: envB }],
+  environmentalObservations: weather, window: singleWindow,
+});
+const conflictingRecord = conflictingMeasurement.input.records.find((row) => row.record_type === "measurement");
+assert.equal(conflictingRecord.context.environment_resolution.status, "conflict");
+assert.equal(conflictingRecord.context.environment_id, null,
+  "a conflicting raw FK must not be restored after temporal resolution rejects it");
+
 const spanning = await assembleResolvedBiologicalContextSnapshot({
   organizationId, culture, contexts, environments, measurements,
   environmentalObservations: weather,
