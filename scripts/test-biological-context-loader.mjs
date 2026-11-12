@@ -78,4 +78,13 @@ await assert.rejects(() => loadAuthenticatedBiologicalContextSnapshot({
   userClient: clientFor(base), organizationId: "99999999-9999-4999-8999-999999999999", cultureId, window,
 }), /culture_not_found_or_inaccessible/);
 
+const tooManyContexts = structuredClone(base);
+tooManyContexts.biological_contexts = Array.from({ length: 501 }, (_, index) => ({
+  ...base.biological_contexts[0],
+  id: "77777777-7777-4777-8777-" + String(index).padStart(12, "0"),
+}));
+await assert.rejects(() => loadAuthenticatedBiologicalContextSnapshot({
+  userClient: clientFor(tooManyContexts), organizationId: org, cultureId, window,
+}), /biological_analysis_context_limit_exceeded/);
+
 console.log("✓ BIE authenticated loader: caller-scoped reads, tenant filters, bounded queries and weather gating");
