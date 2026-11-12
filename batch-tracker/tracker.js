@@ -6519,6 +6519,22 @@ function renderBiologicalContextAssessment(article, result) {
   const title = document.createElement("p"); title.textContent = "Évaluation du contexte biologique"; article.appendChild(title);
   const subject = value.subject || {};
   addLine(article, "Sujet : " + String(subject.subject_type || "biologique") + " · " + String(subject.subject_id || "identifiant indisponible"));
+  const outcomeLabels = {
+    success: "Analyse exploitable",
+    insufficient_data: "Données insuffisantes",
+    out_of_domain: "Hors domaine analytique",
+    review_required: "Révision nécessaire"
+  };
+  addLine(article, "Résultat : " + String(outcomeLabels[result.outcome] || "État non documenté"));
+  addList(article, "Signaux qualité", result.quality_flags, item => item, 12);
+  const provenance = result.provenance || {};
+  if (provenance.algorithm) addLine(article, "Algorithme : " + String(provenance.algorithm));
+  if (Array.isArray(provenance.source_references) && provenance.source_references.length) {
+    addList(article, "Sources environnementales", provenance.source_references, item => item, 8);
+  }
+  if (Array.isArray(result.limitations) && result.limitations.length) {
+    addList(article, "Méthode et limites", result.limitations, item => item, 12);
+  }
   const coverage = value.coverage || {}; const counts = coverage.record_counts_by_type || {};
   addLine(article, "Couverture : " + String(coverage.source_record_count ?? 0) + " retenus · " + String(coverage.excluded_record_count ?? 0) + " exclus · mesures : " + String(counts.measurement ?? 0) + " · météo : " + String(counts.environmental_observation ?? 0));
   const requested = coverage.requested_window;
