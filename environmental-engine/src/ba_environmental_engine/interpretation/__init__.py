@@ -29,6 +29,12 @@ from .biological_workflow import (
     BiologicalWorkflowService,
 )
 from .supabase_recommendation_repository import SupabaseRecommendationRepository
+from .supabase_outcome_comparison_repository import (
+    OutcomeCohortAssignment,
+    OutcomeComparisonDataset,
+    OutcomeComparisonRepositoryError,
+    SupabaseOutcomeComparisonRepository,
+)
 from .sensor_events import (
     SensorEvent,
     SensorEventAnalysis,
@@ -73,6 +79,10 @@ __all__ = [
     "RecommendationAccessDeniedError",
     "RecommendationService",
     "SupabaseRecommendationRepository",
+    "OutcomeCohortAssignment",
+    "OutcomeComparisonDataset",
+    "OutcomeComparisonRepositoryError",
+    "SupabaseOutcomeComparisonRepository",
     "BiologicalSignalPersistenceError",
     "SupabaseBiologicalSignalRepository",
     "BiologicalSignalService",
