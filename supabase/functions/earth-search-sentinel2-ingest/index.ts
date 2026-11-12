@@ -99,7 +99,7 @@ function validateRows(rows: unknown, organizationId: string, locationId: string)
         row.dataset_code !== "SENTINEL_2_L2A") return "source_identity_mismatch";
     if (!["ndvi_mean", "ndvi_median"].includes(String(row.variable_code))) return "unsupported_variable";
     if (typeof row.value !== "number" || !Number.isFinite(row.value) || row.value < -1 || row.value > 1) return "invalid_ndvi_value";
-    if (row.unit_code !== "index" || !validTimestamp(row.observed_at) || !validTimestamp(row.retrieved_at) ||
+    if (row.unit_code !== "1" || row.quality_flag !== "valid" || !validTimestamp(row.observed_at) || !validTimestamp(row.retrieved_at) ||
         Date.parse(row.retrieved_at) < Date.parse(row.observed_at)) return "invalid_observation_timestamp_or_unit";
     if (typeof row.source_record_id !== "string" || row.source_record_id.trim().length < 3 ||
         row.source_record_id.length > 200) return "source_record_id_required";
@@ -110,8 +110,8 @@ function validateRows(rows: unknown, organizationId: string, locationId: string)
         typeof metadata.processing_version !== "string" || metadata.processing_version.length > 80 ||
         typeof metadata.valid_pixel_ratio !== "number" || metadata.valid_pixel_ratio < 0.2 ||
         metadata.valid_pixel_ratio > 1 ||
-        typeof metadata.cloud_cover_percent !== "number" || metadata.cloud_cover_percent < 0 ||
-        metadata.cloud_cover_percent > 100) return "invalid_processing_provenance";
+        typeof metadata.cloud_cover_pct !== "number" || metadata.cloud_cover_pct < 0 ||
+        metadata.cloud_cover_pct > 100) return "invalid_processing_provenance";
     const pair = pairs.get(row.source_record_id) ?? new Set<string>();
     pair.add(String(row.variable_code));
     pairs.set(row.source_record_id, pair);
