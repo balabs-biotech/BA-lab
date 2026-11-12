@@ -104,7 +104,16 @@
     [satelliteMapLegend,satelliteModeHelp,satelliteNDVILegend,sentinelHighResNote,sentinelHighResLink,satelliteViewControls].forEach(el=>el.style.display="none");
     satelliteMapPanel.querySelector("h3").textContent="Carte satellite";
     satelliteMapPanel.append(locationControl,satelliteMapStatus,satelliteMap);
-    panel.append(satelliteMapPanel,vegetationChart,agroSynthesisPanel,weatherCharts,uvComparisonPanel);
+    const enginePanel=node("section",{id:"environmentalEnginePanel",class:"card","aria-live":"polite"});
+    enginePanel.append(
+      node("h3",{},"Contrôle qualité des séries météo"),
+      node("p",{class:"muted"},"Analyse reproductible des observations enregistrées : cadence, doublons, lacunes temporelles et valeurs atypiques. Cette étape ne produit pas de diagnostic agronomique."),
+    );
+    const engineRun=node("button",{type:"button"},"Analyser la période météo");
+    const engineStatus=node("p",{class:"muted","aria-live":"polite"},"L’analyse sera disponible lorsque des observations météo seront enregistrées et que le moteur distant sera configuré.");
+    const engineOutput=node("div",{id:"environmentalEngineOutput"});
+    enginePanel.append(engineRun,engineStatus,engineOutput);
+    panel.append(satelliteMapPanel,vegetationChart,agroSynthesisPanel,weatherCharts,uvComparisonPanel,enginePanel);
     const hero=document.querySelector(".app-hero");
     if(hero?.parentNode) hero.parentNode.insertBefore(panel,hero.nextSibling);
     else plant.parentNode.insertBefore(panel,plant);
@@ -634,6 +643,93 @@
       status.textContent=error?"Échec de l’enregistrement : "+error.message:"Coordonnées enregistrées.";
       if(!error)updateSatelliteMap();
     });
+    async function runEnvironmentalQualityCheck(){
+      const organizationId=window.BA_LABS_GET_ORGANIZATION_ID?.();
+      const locationId=location.value;
+      if(!organizationId||!locationId||!from.value||!to.value||from.value>to.value){
+        engineStatus.textContent="Organisation, emplacement ou période invalide.";
+        return;
+      }
+      const days=(Date.parse(to.value)-Date.parse(from.value))/86400000+1;
+      if(days>366){engineStatus.textContent="La période maximale est de 366 jours.";return;}
+      engineRun.disabled=true;
+      engineOutput.replaceChildren();
+      engineStatus.textContent="Chargement des identifiants de la période et préparation de l’analyse…";
+      try{
+        const {data:sourceRows,error:sourceError}=await db
+          .from("environmental_observations")
+          .select("id")
+          .eq("organization_id",organizationId)
+          .eq("location_id",locationId)
+          .eq("data_family","weather")
+          .gte("observed_at",from.value+"T00:00:00Z")
+          .lte("observed_at",to.value+"T23:59:59Z")
+          .order("observed_at",{ascending:true})
+          .limit(501);
+        if(sourceError)throw new Error("Lecture des observations refusée : "+sourceError.message);
+        const recordIds=(sourceRows||[]).map(row=>row.id).filter(Boolean);
+        if(!recordIds.length)throw new Error("Aucune observation météo enregistrée pour cette période.");
+        if(recordIds.length>500)throw new Error("La période contient plus de 500 observations. Réduisez la période avant de lancer l’analyse.");
+        engineStatus.textContent="Exécution de environmental.timeseries.qc@0.2.0 sur "+recordIds.length+" observation(s)…";
+        const idempotencyKey="greentech-weather-qc:"+locationId+":"+from.value+":"+to.value+":"+crypto.randomUUID();
+        const {data,error}=await db.functions.invoke("engine-orchestrator",{
+          body:{
+            organization_id:organizationId,
+            engine_id:"environmental.timeseries.qc",
+            engine_version:"0.2.0",
+            record_type:"environmental_observation",
+            record_ids:recordIds,
+            scope:{location_id:locationId},
+            parameters:{}
+          },
+          headers:{"idempotency-key":idempotencyKey}
+        });
+        if(error){
+          const detail=await functionErrorMessage(error);
+          if(detail.includes("orchestration_not_configured")||detail.includes("HTTP 503")){
+            throw new Error("Le moteur analytique n’est pas encore configuré sur l’environnement distant (worker et secrets serveur). Les observations restent enregistrées.");
+          }
+          throw new Error("Orchestrateur indisponible : "+detail);
+        }
+        if(!data||data.status!=="completed"||!data.result_id)throw new Error(data?.error?.message||data?.error||"Réponse d’analyse incomplète.");
+        const result=data.result||{};
+        const value=result.value||result.result||{};
+        const summary=value.summary||value;
+        const stats=node("div",{class:"grid"});
+        const metric=(label,val)=>{
+          const card=node("article",{class:"card"});
+          card.append(node("strong",{},label),node("p",{},String(val??"—")));
+          stats.append(card);
+        };
+        metric("Observations analysées",summary.record_count??recordIds.length);
+        metric("Séries détectées",summary.series_count);
+        metric("Doublons",summary.duplicate_timestamp_count??summary.duplicate_count);
+        metric("Lacunes",summary.sampling_gap_count??summary.gap_count);
+        engineOutput.append(stats);
+        const flags=Array.isArray(value.quality_flags)?value.quality_flags:[];
+        if(flags.length){
+          const list=node("ul");
+          flags.slice(0,20).forEach(flag=>list.append(node("li",{},typeof flag==="string"?flag:JSON.stringify(flag))));
+          engineOutput.append(node("h4",{},"Signaux qualité"),list);
+        }
+        const limitations=Array.isArray(value.limitations)?value.limitations:[];
+        if(limitations.length){
+          const list=node("ul");
+          limitations.slice(0,10).forEach(item=>list.append(node("li",{},String(item))));
+          engineOutput.append(node("h4",{},"Limites"),list);
+        }
+        engineStatus.textContent="Analyse terminée · résultat durable "+data.result_id+" · exécution "+data.execution_id+".";
+        if(typeof window.BA_LABS_REFRESH_EXPERIMENTAL_DATA==="function"){
+          await window.BA_LABS_REFRESH_EXPERIMENTAL_DATA().catch(()=>{});
+        }
+      }catch(error){
+        engineStatus.textContent=error?.message||"Échec de l’analyse.";
+      }finally{
+        engineRun.disabled=false;
+      }
+    }
+    engineRun.addEventListener("click",runEnvironmentalQualityCheck);
+
     async function importWeather(forceRefresh=false){
       if(!location.value||!from.value||!to.value||from.value>to.value){status.textContent="Choisissez un emplacement et une période valide.";return;}
       const days=(Date.parse(to.value)-Date.parse(from.value))/86400000+1;
