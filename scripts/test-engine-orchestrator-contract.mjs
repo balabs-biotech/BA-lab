@@ -5,7 +5,7 @@ const source = readFileSync("supabase/functions/engine-orchestrator/index.ts", "
 const checks = [
   ["caller identity is verified", /supabase\.auth\.getUser\(\)/],
   ["organization membership is checked", /organization_members/],
-  ["viewer roles cannot invoke privileged execution", /!\["owner", "admin", "member"\]\.includes\(membership\.role\)/],
+  ["viewer roles cannot invoke privileged execution", /!\["owner", "admin", "member"\]\.includes\(String\(membership\.role\)\)/],
   ["source rows are loaded through caller-scoped client", /userClient[\s\S]*\.from\(["']measurements["']\)/],
   ["snapshot is SHA-256 hashed", /crypto\.subtle\.digest\(["']SHA-256["']/],
   ["idempotency is organization-scoped", /idempotency_key/],
