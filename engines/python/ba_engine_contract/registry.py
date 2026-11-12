@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import importlib
 import json
+import os
 import re
 from pathlib import Path
 from typing import Any, Mapping
@@ -11,7 +12,6 @@ from typing import Any, Mapping
 from .runner import EngineSpec, execute_engine
 from .validation import ContractValidationError, validate_manifest, validate_request
 
-_REGISTRY_DIR = Path(__file__).resolve().parents[1] / "registry"
 _ENGINE_ID = re.compile(r"^[a-z][a-z0-9_.-]{1,79}$")
 _ENGINE_VERSION = re.compile(r"^[0-9]+\.[0-9]+\.[0-9]+([+-][0-9A-Za-z.-]+)?$")
 
@@ -20,7 +20,8 @@ def load_engine(engine_id: str, engine_version: str) -> tuple[Mapping[str, Any],
     """Resolve a registered engine manifest and its allowlisted package entrypoint."""
     if not _ENGINE_ID.fullmatch(engine_id) or not _ENGINE_VERSION.fullmatch(engine_version):
         raise ContractValidationError("invalid_engine_identity")
-    manifest_path = _REGISTRY_DIR / f"{engine_id}-{engine_version}.json"
+    registry_dir = Path(os.environ.get("BA_ENGINE_REGISTRY_DIR", str(Path(__file__).resolve().parents[1] / "registry")))
+    manifest_path = registry_dir / f"{engine_id}-{engine_version}.json"
     try:
         with manifest_path.open(encoding="utf-8") as handle:
             manifest = json.load(handle)
