@@ -81,7 +81,7 @@ def search_sentinel2_scenes(
     }
     url, method = SEARCH_URL, "POST"
     pages = seen = rejected = 0
-    selected: dict[str, Sentinel2StacScene] = {}
+    selected: dict[str, tuple[Sentinel2StacScene, dict[str, Any]]] = {}
 
     while url and seen < criteria.max_items:
         response = request(method=method, url=_trusted_search_url(url), json=body, timeout=30)
@@ -102,7 +102,7 @@ def search_sentinel2_scenes(
             if not start <= scene.observed_at <= end or scene.cloud_cover_pct > criteria.max_cloud_cover_pct:
                 rejected += 1
                 continue
-            selected[scene.scene_id] = scene
+            selected[scene.scene_id] = (scene, item)
 
         links = payload.get("links", [])
         if not isinstance(links, list):
