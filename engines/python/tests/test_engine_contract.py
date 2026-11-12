@@ -10,7 +10,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from jsonschema import Draft202012Validator, FormatChecker
 from ba_engine_contract import (
     ContractValidationError, EngineExecutionError, EngineSpec, execute_engine,
-    validate_request, validate_response,
+    execute_registered_engine, validate_request, validate_response,
 )
 from ba_engine_contract.worker import main as worker_main
 from ba_engine_contract.environmental_timeseries_qc import (
