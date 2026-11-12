@@ -69,8 +69,14 @@ for (const path of [
   "batch-tracker/green-tech/index.html",
 ]) {
   const page = readFileSync(path, "utf8");
-  assert.match(page, /workspace\.html\?v=20261112-engine-history-compare-3/);
-  assert.match(page, /tracker\.js\?v=20261112-engine-history-compare-3/);
+  if (path.includes("green-tech")) {
+    assert.match(page, /workspace\.html\?v=20261112-greentech-engine-qc-1/);
+    assert.match(page, /tracker\.js\?v=20261112-greentech-engine-qc-1/);
+    assert.match(page, /environmental-data\.js\?v=20261112-greentech-engine-qc-1/);
+  } else {
+    assert.match(page, /workspace\.html\?v=20261112-engine-history-compare-3/);
+    assert.match(page, /tracker\.js\?v=20261112-engine-history-compare-3/);
+  }
 }
 
 
@@ -150,3 +156,18 @@ assert.notEqual(
 );
 
 console.log("Engine execution history UI contract checks passed.");
+
+
+const environmental = readFileSync("batch-tracker/environmental-data.js", "utf8");
+assert.match(environmental, /environmentalEnginePanel/);
+assert.match(environmental, /Analyser la période météo/);
+assert.match(environmental, /BA_LABS_GET_ORGANIZATION_ID/);
+assert.match(environmental, /engine-orchestrator/);
+assert.match(environmental, /environmental\.timeseries\.qc/);
+assert.match(environmental, /record_type:\s*"environmental_observation"/);
+assert.match(environmental, /scope:\s*\{location_id:locationId\}/);
+assert.match(environmental, /idempotency-key/);
+assert.match(environmental, /recordIds\.length>500/);
+assert.match(environmental, /summary\.excluded_record_count/);
+assert.match(environmental, /gap_after_record_ids/);
+assert.doesNotMatch(environmental, /engineOutput\.innerHTML/);
