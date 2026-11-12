@@ -128,3 +128,28 @@ def test_noncanonical_units_and_duplicate_evidence_are_rejected():
             [row(), row()], assignments={"rec-1": assignment("rec-1")},
             variable_registry={"growth_extent": "mm"},
         )
+
+
+
+def test_mapping_key_and_experiment_identity_are_enforced():
+    with pytest.raises(ValueError, match="mapping key"):
+        outcome_evidence_rows_to_experimental_observations(
+            [row()], assignments={"rec-1": assignment("other-rec")},
+            variable_registry={"growth_extent": "mm"},
+        )
+    second = assignment("rec-2", cohort="treated")
+    second = ExperimentCohortAssignment(
+        organization_id=second.organization_id,
+        experiment_id="experiment-2",
+        recommendation_id=second.recommendation_id,
+        cohort_id=second.cohort_id,
+        cohort_label=second.cohort_label,
+        context_signature=second.context_signature,
+        subject_type=second.subject_type,
+    )
+    with pytest.raises(ValueError, match="distinct experiments"):
+        outcome_evidence_rows_to_experimental_observations(
+            [row("rec-1", measurement="m-1"), row("rec-2", measurement="m-2")],
+            assignments={"rec-1": assignment("rec-1"), "rec-2": second},
+            variable_registry={"growth_extent": "mm"},
+        )
