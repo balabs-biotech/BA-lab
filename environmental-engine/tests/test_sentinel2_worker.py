@@ -70,6 +70,7 @@ def test_worker_signs_payload_and_forwards_callers_jwt(monkeypatch):
         retrieved_at=datetime(2026, 10, 2, tzinfo=timezone.utc),
         processing_version="worker-test-v1",
         user_authorization="Bearer user-jwt",
+        supabase_api_key="test-publishable-key",
         ingest_url="https://example.supabase.co/functions/v1/earth-search-sentinel2-ingest",
         worker_secret="ba-labs-test-secret-at-least-32-bytes",
         post=fake_post,
@@ -78,6 +79,7 @@ def test_worker_signs_payload_and_forwards_callers_jwt(monkeypatch):
 
     assert result.observations_submitted == 2
     assert captured["headers"]["Authorization"] == "Bearer user-jwt"
+    assert captured["headers"]["apikey"] == "test-publishable-key"
     assert captured["headers"]["x-ba-worker-timestamp"] == "1790928000"
     assert len(captured["headers"]["x-ba-worker-signature"]) == 64
     expected_signature = hmac.new(
