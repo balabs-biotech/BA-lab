@@ -14,7 +14,7 @@ const environments = [
 ];
 const window = {
   start: "2026-11-10T00:00:00Z",
-  end: "2026-11-12T00:00:00Z",
+  end: "2026-11-13T00:00:00Z",
   timezone: "Africa/Algiers",
 };
 const contexts = [
@@ -53,6 +53,15 @@ assert.equal(resolved.measurements[0].status, "resolved");
 assert.equal(resolved.measurements[1].status, "resolved");
 assert.equal(resolved.window.status, "ambiguous",
   "a window spanning two environments must not be collapsed to the culture's current environment");
+
+const endsAtTransition = resolveBiologicalContext({
+  organizationId, cultureId, currentEnvironmentId: envB, contexts, environments,
+  measurements: [],
+  window: { start: "2026-11-10T00:00:00Z", end: "2026-11-12T00:00:00Z", timezone: "Africa/Algiers" },
+});
+assert.equal(endsAtTransition.window.status, "resolved",
+  "an exclusive window end exactly at the context transition must not include the next context");
+assert.equal(endsAtTransition.window.environment_id, envA);
 
 const mismatch = resolveBiologicalContext({
   organizationId, cultureId, currentEnvironmentId: envB, contexts, environments,
