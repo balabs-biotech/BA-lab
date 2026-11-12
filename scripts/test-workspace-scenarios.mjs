@@ -602,3 +602,34 @@ assert.match(engine.slice(engine.indexOf("function renderPlantCultureList("), en
   /loadPlantBiologicalContextPanel\(row\.id\)/,
   "plant culture rows must open their biological context history");
 console.log("✓ GreenTech biological context: plant subject, tenant isolation and dated history");
+
+for (const id of [
+  "plantBiologicalAssessmentStart", "plantBiologicalAssessmentEnd",
+  "runPlantBiologicalAssessment", "plantBiologicalAssessmentMessage"
+]) {
+  assert.ok(workspaceHtml.includes('id="' + id + '"'),
+    "GreenTech BIE assessment UI must expose " + id);
+}
+const plantAssessmentStart = engine.indexOf("async function runPlantBiologicalAssessment(");
+const plantAssessmentEnd = engine.indexOf("\\nlet cultureDetailRequestId", plantAssessmentStart);
+assert.ok(plantAssessmentStart >= 0 && plantAssessmentEnd > plantAssessmentStart,
+  "GreenTech BIE assessment action must exist");
+const plantAssessment = engine.slice(plantAssessmentStart, plantAssessmentEnd);
+assert.match(plantAssessment, /functions\\.invoke\\("engine-orchestrator"/,
+  "GreenTech BIE assessment must call the authenticated Edge Function");
+assert.match(plantAssessment, /engine_id: "biological\\.context\\.features"/,
+  "GreenTech BIE assessment must use the biological context engine");
+assert.match(plantAssessment, /engine_version: "0\\.2\\.0"/,
+  "GreenTech plant subjects must use BIE v0.2");
+assert.match(plantAssessment, /plant_culture_id: plantCultureId/,
+  "GreenTech BIE scope must use plant_culture_id");
+assert.match(plantAssessment, /record_ids: \\[\\]/,
+  "GreenTech BIE source IDs must be derived server-side");
+assert.match(plantAssessment, /timezone: "Africa\\/Algiers"/,
+  "GreenTech BIE window must declare the Algeria timezone");
+assert.match(plantAssessment, /endDate <= startDate/,
+  "GreenTech BIE window must enforce a non-empty half-open interval");
+assert.match(plantAssessment, /isCurrentWorkspaceRevision/,
+  "GreenTech BIE responses must be guarded against stale workspace state");
+console.log("✓ GreenTech BIE v0.2: explicit plant subject, bounded window and authenticated orchestration");
+
