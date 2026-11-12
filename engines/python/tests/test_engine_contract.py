@@ -244,6 +244,33 @@ class EngineContractTests(unittest.TestCase):
             ["NASA_POWER/POWER_DAILY_AGRO"],
         )
 
+        invalid_family = json.loads(json.dumps(request))
+        invalid_family["input"]["records"][0]["data"]["data_family"] = "satellite"
+        family_result = run_environmental_timeseries_qc(invalid_family)
+        self.assertEqual(family_result["result"]["outcome"], "insufficient_data")
+        self.assertEqual(
+            family_result["result"]["value"]["summary"]["excluded_records"][0]["reason"],
+            "unsupported_environmental_data_family",
+        )
+
+        invalid_location = json.loads(json.dumps(request))
+        invalid_location["input"]["records"][0]["context"]["location_id"] = "7c2b3a4d-5e6f-4789-8123-456789abcdef"
+        location_result = run_environmental_timeseries_qc(invalid_location)
+        self.assertEqual(location_result["result"]["outcome"], "insufficient_data")
+        self.assertEqual(
+            location_result["result"]["value"]["summary"]["excluded_records"][0]["reason"],
+            "environmental_location_scope_mismatch",
+        )
+
+        mixed_sources = json.loads(json.dumps(request))
+        extra = json.loads(json.dumps(mixed_sources["input"]["records"][0]))
+        extra["record_id"] = "8c2b3a4d-5e6f-4789-8123-456789abcdef"
+        extra["data"]["provider_code"] = "OTHER_PROVIDER"
+        mixed_sources["input"]["record_ids"].append(extra["record_id"])
+        mixed_sources["input"]["records"].append(extra)
+        with self.assertRaisesRegex(ValueError, "mixed_environmental_sources_not_supported"):
+            analyze_environmental_timeseries_qc(mixed_sources)
+
     def test_environmental_qc_rejects_wrong_engine_identity(self):
         request = json.loads(json.dumps(REQUEST))
         with self.assertRaisesRegex(ValueError, "unsupported_engine_id"):
