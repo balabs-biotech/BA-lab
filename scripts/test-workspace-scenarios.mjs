@@ -631,4 +631,10 @@ assert.match(plantAssessment, /endDate <= startDate/,
   "GreenTech BIE window must enforce a non-empty half-open interval");
 assert.match(plantAssessment, /isCurrentWorkspaceRevision/,
   "GreenTech BIE responses must be guarded against stale workspace state");
+assert.match(plantAssessment, /panel\?\.dataset\.plantCultureId !== plantCultureId/,
+  "GreenTech BIE responses must not render after the selected plant changes");
+assert.match(engine.slice(engine.indexOf("async function loadPlantBiologicalContextPanel("), plantAssessmentStart),
+  /plantBiologicalAssessmentRequestId \+= 1/,
+  "opening another plant record must invalidate a pending BIE assessment");
+
 console.log("✓ GreenTech BIE v0.2: explicit plant subject, bounded window and authenticated orchestration");
