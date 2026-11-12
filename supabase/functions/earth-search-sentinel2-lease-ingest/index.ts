@@ -171,14 +171,14 @@ Deno.serve(async (req: Request) => {
     // The opaque lease is checked against the live row on every write. A
     // reclaimed/expired lease cannot persist, even with a valid worker HMAC.
     const { data: job, error: jobError } = await admin.from("environmental_ingestion_jobs")
-      .select("id,organization_id,location_id,status,job_type,provider,dataset,lease_token,lease_expires_at")
+      .select("id,organization_id,location_id,status,job_type,provider_code,dataset_code,lease_token,lease_expires_at")
       .eq("id", body.job_id).maybeSingle();
     if (jobError) {
       console.error("[earth-search-sentinel2-lease-ingest] Lease lookup failed", jobError.code);
       return json(500, { error: "lease_validation_failed" });
     }
     if (!job || job.status !== "processing" || job.job_type !== "sentinel2_scene_ingestion" ||
-        job.provider !== "EARTH_SEARCH" || job.dataset !== "SENTINEL_2_L2A" ||
+        job.provider_code !== "EARTH_SEARCH" || job.dataset_code !== "SENTINEL_2_L2A" ||
         job.lease_token !== body.lease_token || !job.lease_expires_at ||
         Date.parse(job.lease_expires_at) <= Date.now()) {
       return json(409, { error: "active_job_lease_required" });
