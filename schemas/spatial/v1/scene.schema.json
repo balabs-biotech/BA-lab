@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.ba-labs.dz/spatial/v1/scene.schema.json",
+  "title": "BA Labs Sentinel-2 L2A scene metadata",
+  "type": "object",
+  "required": ["contract", "contract_version", "provider", "collection_id", "item_id", "acquired_at", "product_level", "processing_baseline", "platform", "cloud_cover_percent", "assets", "calibration"],
+  "properties": {
+    "contract": {"const": "BA-LABS/SPATIAL-SCENE"},
+    "contract_version": {"const": "1.0.0"},
+    "provider": {"type": "string", "minLength": 1, "maxLength": 80},
+    "collection_id": {"type": "string", "minLength": 1, "maxLength": 160},
+    "item_id": {"type": "string", "minLength": 1, "maxLength": 200},
+    "acquired_at": {"type": "string", "format": "date-time"},
+    "product_level": {"const": "L2A"},
+    "processing_baseline": {"type": "string", "pattern": "^[0-9]{2}\\.[0-9]{2}$"},
+    "platform": {"enum": ["sentinel-2a", "sentinel-2b", "sentinel-2c"]},
+    "tile_id": {"type": "string", "maxLength": 40},
+    "cloud_cover_percent": {"type": "number", "minimum": 0, "maximum": 100},
+    "assets": {
+      "type": "object",
+      "required": ["red", "nir", "scl"],
+      "properties": {
+        "red": {"$ref": "#/$defs/asset"},
+        "nir": {"$ref": "#/$defs/asset"},
+        "scl": {"$ref": "#/$defs/asset"}
+      },
+      "additionalProperties": false
+    },
+    "calibration": {
+      "type": "object",
+      "required": ["reflectance_status", "bands"],
+      "properties": {
+        "reflectance_status": {"enum": ["raw_dn", "harmonized_reflectance"]},
+        "bands": {
+          "type": "object",
+          "required": ["B04", "B08"],
+          "properties": {
+            "B04": {"$ref": "#/$defs/bandCalibration"},
+            "B08": {"$ref": "#/$defs/bandCalibration"}
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "source_metadata_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
+  },
+  "$defs": {
+    "asset": {
+      "type": "object",
+      "required": ["href", "band_code", "native_resolution_m"],
+      "properties": {
+        "href": {"type": "string", "format": "uri"},
+        "band_code": {"type": "string", "minLength": 2, "maxLength": 8},
+        "native_resolution_m": {"type": "integer", "enum": [10, 20, 60]},
+        "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
+      },
+      "additionalProperties": false
+    },
+    "bandCalibration": {
+      "type": "object",
+      "required": ["quantification_value", "boa_add_offset"],
+      "properties": {
+        "quantification_value": {"type": "number", "exclusiveMinimum": 0},
+        "boa_add_offset": {"type": "number"},
+        "already_harmonized": {"type": "boolean"}
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}
