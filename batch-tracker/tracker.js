@@ -6436,14 +6436,14 @@ function renderEngineExecutionComparison(panel, eligible) {
     const summaryA = a.value?.summary || {};
     const summaryB = b.value?.summary || {};
     const summaryTable = document.createElement("ul");
-    for (const [label, key] of [
-      ["Mesures", "measurement_count"],
-      ["Séries", "series_count"],
-      ["Enregistrements exclus", "excluded_record_count"]
+    for (const [label, valueA, valueB] of [
+      ["Enregistrements", summaryA.record_count ?? summaryA.measurement_count, summaryB.record_count ?? summaryB.measurement_count],
+      ["Séries", summaryA.series_count, summaryB.series_count],
+      ["Enregistrements exclus", summaryA.excluded_record_count, summaryB.excluded_record_count]
     ]) {
       const row = document.createElement("li");
-      row.textContent = label + " : " + String(summaryA[key] ?? "—") +
-        " → " + String(summaryB[key] ?? "—");
+      row.textContent = label + " : " + String(valueA ?? "—") +
+        " → " + String(valueB ?? "—");
       summaryTable.appendChild(row);
     }
     output.appendChild(summaryTable);
@@ -6543,8 +6543,8 @@ function renderRecentEngineExecutions() {
     const summary = result?.value?.summary;
     if (execution.status === "completed" && summary) {
       const details = document.createElement("p");
-      details.textContent = String(summary.measurement_count ?? 0) +
-        " mesures · " + String(summary.series_count ?? 0) +
+      details.textContent = String(summary.record_count ?? summary.measurement_count ?? 0) +
+        " enregistrements · " + String(summary.series_count ?? 0) +
         " séries · " + String(summary.excluded_record_count ?? 0) + " exclues";
       article.appendChild(details);
       const flags = Array.isArray(result.quality_flags) ? result.quality_flags : [];
