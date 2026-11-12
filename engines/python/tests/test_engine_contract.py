@@ -512,5 +512,55 @@ class EngineContractTests(unittest.TestCase):
         self.assertTrue(list(self.request_validator.iter_errors(invalid)))
 
 
+    def test_biological_context_features_reports_traceable_coverage_and_never_infers_diagnosis(self):
+        request = json.loads(json.dumps(REQUEST))
+        request["engine"] = {
+            "engine_id": "biological.context.features",
+            "engine_version": "0.1.0",
+        }
+        culture_id = "2c2b3a4d-5e6f-4789-8123-456789abcdef"
+        request["scope"] = {
+            "organization_id": REQUEST["scope"]["organization_id"],
+            "culture_id": culture_id,
+        }
+        request["input"]["record_ids"] = []
+        request["input"]["records"] = []
+        for index, (timestamp, value) in enumerate([
+            ("2026-11-10T08:00:00Z", 21.0),
+            ("2026-11-10T09:00:00Z", 23.0),
+            ("2026-11-10T10:00:00Z", 22.0),
+        ]):
+            record_id = f"3c2b3a4d-5e6f-4789-8123-456789abcde{index}"
+            request["input"]["record_ids"].append(record_id)
+            request["input"]["records"].append({
+                "record_id": record_id,
+                "record_type": "measurement",
+                "payload_sha256": "b" * 64,
+                "data": {
+                    "variable_code": "air_temperature",
+                    "normalized_value": value,
+                    "normalized_unit_code": "degC",
+                    "measured_at": timestamp,
+                },
+                "context": {"culture_id": culture_id},
+            })
+        result = execute_registered_engine(request)
+        self.assertEqual(result["status"], "completed", msg=str(result.get("error")))
+        value = result["result"]["value"]
+        self.assertEqual(value["subject"]["subject_type"], "culture")
+        self.assertEqual(value["subject"]["subject_id"], culture_id)
+        self.assertEqual(value["coverage"]["source_record_count"], 3)
+        self.assertEqual(value["coverage"]["record_counts_by_type"]["measurement"], 3)
+        self.assertEqual(len(value["derived_features"]), 1)
+        feature = value["derived_features"][0]
+        self.assertEqual(feature["feature_code"], "series.air_temperature.mean")
+        self.assertEqual(feature["value"], 22.0)
+        self.assertEqual(feature["unit_code"], "degC")
+        self.assertEqual(set(feature["source_record_ids"]), set(request["input"]["record_ids"]))
+        self.assertEqual(value["findings"], [])
+        self.assertEqual(value["hypotheses"], [])
+        self.assertIn("biological_interpretation_not_performed", result["result"]["quality_flags"])
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
