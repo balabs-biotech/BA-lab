@@ -218,7 +218,7 @@ Deno.serve(async (req: Request) => {
         const acquired = Date.parse(feature?.properties?.datetime ?? "");
         const cloud = Number(feature?.properties?.["eo:cloud_cover"]);
         if (!id || seen.has(id) || !Number.isFinite(acquired) ||
-            acquired < startMs || acquired > endMs + DAY_MS ||
+            acquired < startMs || acquired >= endMs + DAY_MS ||
             !Number.isFinite(cloud) || cloud < 0 || cloud > cloudLimit) continue;
         seen.add(id);
         items.push(feature);
