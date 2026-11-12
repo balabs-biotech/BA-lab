@@ -46,7 +46,12 @@ def analyze_environmental_timeseries_qc(request: Mapping[str, Any]) -> dict[str,
         raise ValueError("unsupported_engine_id")
 
     parameters = request["parameters"]
-    max_gap_minutes = parameters.get("max_gap_minutes", 180)
+    has_environmental_observations = any(
+        record["record_type"] == "environmental_observation"
+        for record in request["input"]["records"]
+    )
+    default_max_gap_minutes = 2160 if has_environmental_observations else 180
+    max_gap_minutes = parameters.get("max_gap_minutes", default_max_gap_minutes)
     outlier_threshold = parameters.get("outlier_mad_threshold", 3.5)
     minimum_points = parameters.get("minimum_points", 3)
     if isinstance(max_gap_minutes, bool) or not isinstance(max_gap_minutes, (int, float)) or not isfinite(max_gap_minutes) or max_gap_minutes <= 0:
