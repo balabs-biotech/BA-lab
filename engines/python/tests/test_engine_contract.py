@@ -224,7 +224,7 @@ class EngineContractTests(unittest.TestCase):
             invalid = json.loads(json.dumps(request))
             invalid["parameters"] = {key: value}
             with self.assertRaises(ValueError):
-                run_environmental_timeseries_qc(invalid)
+                analyze_environmental_timeseries_qc(invalid)
 
 
     def test_runner_executes_and_returns_request_bound_result(self):
