@@ -196,3 +196,17 @@ A separate Edge Function, `earth-search-sentinel2-lease-ingest`, now provides th
 Request body shape: `{ "job_id": "<uuid>", "lease_token": "<uuid>", "rows": [...] }`. The lease token is an opaque per-attempt capability and must never be exposed to the browser, written into logs, or persisted outside the worker's in-memory claim result. The HMAC authenticates the private worker; the database lease check prevents an expired or reclaimed attempt from persisting. Replayed identical scene rows remain idempotent through the source-aware SQL upsert.
 
 This endpoint is a new isolated boundary; the existing JWT-protected `earth-search-sentinel2-ingest` remains unchanged for the current synchronous flow. The gateway does not yet enqueue jobs, the Python processor does not yet call this endpoint, and the worker does not yet perform its own location lookup/STAC discovery. Therefore **the queue is still inactive**. Before activation, implement the enqueue-only user gateway, service-role location resolver and STAC discovery in the worker, lease-aware cancellation/persistence, retry/reconciliation operations, and integration tests against a disposable Supabase project. Deploy neither function nor migrations as part of this code change.
+
+
+### Tenant-scoped location resolver for leased workers
+
+The private Python execution layer now includes `SupabaseLocationRepository`. Given only the `location_id` and `organization_id` returned by an atomic job claim, it performs a narrowly scoped service-role PostgREST read of `locations` and requests only `id,organization_id,latitude,longitude`.
+
+- The repository is deliberately not a general table/query abstraction.
+- Both UUID filters are applied server-side; the response must contain exactly one row.
+- Returned location and organization identifiers are independently checked against the claimed job.
+- Coordinates must be finite numeric values within geographic bounds; booleans, strings, missing values and out-of-range coordinates are rejected.
+- Project URL validation requires HTTPS on a single-label `*.supabase.co` project host, with no userinfo, custom port, path, query or fragment. Redirects are rejected and response size is bounded.
+- The service-role credential is constructor-injected and never read from source files or logged.
+
+Focused tests cover tenant scoping, identity mismatch, missing/ambiguous records, invalid coordinates and untrusted URLs. They have been added but not executed. This resolver is a building block only: the leased worker still needs its job processor, STAC discovery, lease-bound persistence sender and queue entrypoint before it can run end-to-end.
