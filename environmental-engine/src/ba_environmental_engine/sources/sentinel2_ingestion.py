@@ -121,7 +121,7 @@ def build_sentinel2_observation_rows(
         raise ValueError("masked_scl_classes must contain SCL classes from 0 to 11")
 
     common = {
-        "organization_id": org_id,
+        "organization_id": org_id,\n        "source_record_id": scene_id.strip(),
         "location_id": loc_id,
         "data_family": "satellite",
         "provider_code": "EARTH_SEARCH",
