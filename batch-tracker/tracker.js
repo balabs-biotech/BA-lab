@@ -6311,6 +6311,7 @@ function areEngineExecutionsComparable(left, right) {
   if (JSON.stringify(left.scope || {}) !== JSON.stringify(right.scope || {})) return false;
   const leftResult = getStoredEngineResult(left);
   const rightResult = getStoredEngineResult(right);
+  if (leftResult?.result_type && rightResult?.result_type && leftResult.result_type !== rightResult.result_type) return false;
   return Boolean(leftResult?.value && rightResult?.value);
 }
 
@@ -6372,7 +6373,7 @@ function renderEngineExecutionComparison(panel, eligible) {
     snapshotNote.className = "muted";
     snapshotNote.textContent = snapshotChanged
       ? "Les instantanés d’entrée diffèrent : les deux analyses ne portent pas exactement sur les mêmes données."
-      : "Les identifiants d’entrée et l’empreinte disponibles sont identiques.";
+      : "Les empreintes ou identifiants d’entrée disponibles sont identiques.";
     output.appendChild(snapshotNote);
 
     const summaryA = a.value?.summary || {};
