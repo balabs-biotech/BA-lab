@@ -50,4 +50,4 @@ alter table public.biological_contexts
 
 comment on constraint biological_contexts_no_overlapping_subject_windows
   on public.biological_contexts is
-  'Prevents overlapping half-open [valid_from, valid_to) biological context intervals for the same tenant, domain and culture subject.';
+  'Prevents overlapping half-open [valid_from, valid_to) biological context intervals for the same tenant, domain and biological subject.';
