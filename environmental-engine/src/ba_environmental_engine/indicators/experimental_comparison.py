@@ -66,7 +66,7 @@ class CohortSummary:
     subject_ids: tuple[str, ...]
     source_record_ids: tuple[str, ...]
     method: str | None
-    instrument: str | None
+    instruments: tuple[str, ...]
 
 
 @dataclass(frozen=True, slots=True)
@@ -160,8 +160,8 @@ def compare_experimental_cohorts(
         raise ValueError("cohorts must share one biological profile and version")
     if len(subject_types) != 1:
         raise ValueError("cohorts must use the same biological subject type")
-    if len(methods) != 1 or len(instruments) != 1:
-        raise ValueError("cohorts must use the same measurement method and instrument")
+    if len(methods) != 1:
+        raise ValueError("cohorts must use the same measurement method")
 
     subject_cohorts: dict[str, str] = {}
     subjects_by_cohort: dict[str, dict[str, list[ExperimentalObservation]]] = {
@@ -197,7 +197,7 @@ def compare_experimental_cohorts(
             subject_ids=tuple(sorted(subjects)),
             source_record_ids=source_ids,
             method=next(iter(methods)),
-            instrument=next(iter(instruments)),
+            instruments=tuple(sorted({item.instrument for rows in subjects.values() for item in rows if item.instrument is not None})),
         )
 
     baseline = summarize(baseline_cohort_id)
