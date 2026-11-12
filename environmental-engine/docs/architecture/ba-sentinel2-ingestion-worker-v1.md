@@ -9,7 +9,7 @@ Move Sentinel-2 native-grid COG reading and NDVI statistics out of the Supabase 
 1. The CultureOps client calls `earth-search-sentinel2-run` with a location and bounded acquisition-date window.
 2. The Edge Function validates the user's JWT, resolves the location under the caller's RLS context, and verifies the user's `owner`, `admin` or `member` role in the owning organization.
 3. The gateway derives an approximate AOI from the saved location coordinates, queries Earth Search STAC over HTTPS, bounds pagination and selects at most 10 scenes.
-4. It calls the private FastAPI worker with both the caller JWT and `X-BA-Engine-Key`.
+4. It calls the private FastAPI worker with the caller JWT, the Supabase publishable `apikey` header required by the Functions gateway, and `X-BA-Engine-Key`.
 5. The worker validates the request, processes each scene through the existing STAC parser, bounded COG reader, SCL mask, NDVI statistics calculator and observation payload builder.
 6. The worker excludes incomplete or non-valid scene pairs, serializes the exact payload, and signs `<unix-seconds>.<raw-json-body>` with HMAC-SHA256.
 7. The worker forwards the caller JWT plus timestamp/signature headers to `earth-search-sentinel2-ingest`.
