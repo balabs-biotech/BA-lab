@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 
-const panel = await readFile(new URL("../batch-tracker/environmental-jobs-panel.js", import.meta.url), "utf8");
+const panel = await readFile(new URL("../../batch-tracker/environmental-jobs-panel.js", import.meta.url), "utf8");
 const entry = await readFile(new URL("../batch-tracker/green-tech/index.html", import.meta.url), "utf8");
 
 test("Sentinel-2 history panel is isolated to Green Tech", () => {
