@@ -178,4 +178,56 @@ begin
   raise notice 'engine execution ledger security and idempotency contract passed';
 end $$;
 
+-- BIE may legitimately produce an insufficient-data result with no source rows.
+do $
+declare
+  v_org uuid := 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
+  v_user uuid := 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb';
+  v_request uuid := '44444444-4444-4444-8444-444444444444';
+  v_execution uuid;
+begin
+  insert into public.engine_executions(
+    organization_id,request_id,idempotency_key,engine_id,engine_version,scope,
+    input_record_ids,input_snapshot_sha256,request_payload,status,requested_by
+  ) values (
+    v_org,v_request,'test-bie-empty-snapshot-0001',
+    'biological.context.features','0.1.0',
+    jsonb_build_object('organization_id',v_org,'culture_id','55555555-5555-4555-8555-555555555555'),
+    '{}'::uuid[],repeat('e',64),'{}','queued',v_user
+  ) returning id into v_execution;
+  update public.engine_executions
+    set status='running',started_at=now(),updated_at=now()
+    where organization_id=v_org and id=v_execution;
+  perform public.complete_engine_execution(
+    v_org,v_execution,
+    jsonb_build_object(
+      'contract','BA-LABS/ENGINE-RESULT',
+      'contract_version','1.0.0',
+      'request_id',v_request,
+      'execution_id',v_execution,
+      'engine',jsonb_build_object('engine_id','biological.context.features','engine_version','0.1.0'),
+      'input_snapshot_sha256',repeat('e',64),
+      'status','completed',
+      'started_at',now(),
+      'completed_at',now(),
+      'result',jsonb_build_object(
+        'outcome','insufficient_data',
+        'value',jsonb_build_object('result_type','biological.context_assessment','result_version','1.0.0','observed_facts','[]'::jsonb,'derived_features','[]'::jsonb),
+        'limitations',jsonb_build_array('No eligible source observations'),
+        'quality_flags',jsonb_build_array('insufficient_data'),
+        'provenance',jsonb_build_object('algorithm','biological-context-features-v1','libraries','[]'::jsonb)
+      )
+    ),now()
+  );
+  if not exists (
+    select 1 from public.engine_execution_results r
+    join public.engine_executions e on e.organization_id=r.organization_id and e.id=r.execution_id
+    where r.organization_id=v_org and r.execution_id=v_execution
+      and cardinality(r.input_record_ids)=0
+      and r.outcome='insufficient_data'
+      and r.result_type='biological.context.features'
+      and e.status='completed'
+  ) then raise exception 'empty BIE snapshot must persist as an insufficient-data result'; end if;
+end $;
+
 rollback;
