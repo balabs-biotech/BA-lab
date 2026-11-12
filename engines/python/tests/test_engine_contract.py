@@ -6,7 +6,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from jsonschema import Draft202012Validator, FormatChecker
-from ba_engine_contract.validation import ContractValidationError, validate_request, validate_response
+from ba_engine_contract import (\n    ContractValidationError, EngineExecutionError, EngineSpec, execute_engine,\n    validate_request, validate_response,\n)
 from ba_engine_contract.environmental_timeseries_qc import run_environmental_timeseries_qc
 
 ROOT = Path(__file__).resolve().parents[3]
@@ -197,6 +197,39 @@ class EngineContractTests(unittest.TestCase):
             invalid["parameters"] = {key: value}
             with self.assertRaises(ValueError):
                 run_environmental_timeseries_qc(invalid)
+
+
+    def test_runner_executes_and_returns_request_bound_result(self):
+        engine = EngineSpec(
+            engine_id=REQUEST["engine"]["engine_id"],
+            engine_version=REQUEST["engine"]["engine_version"],
+            execute=lambda payload: {
+                "outcome": "success",
+                "value": {"processed_records": len(payload["records"])},
+                "limitations": [],
+                "quality_flags": [],
+                "provenance": {"algorithm": "fixture-v1", "libraries": []},
+            },
+        )
+        result = execute_engine(REQUEST, engine)
+        self.assertEqual(result["status"], "completed")
+        self.assertEqual(result["request_id"], REQUEST["request_id"])
+        self.assertEqual(result["input_snapshot_sha256"], REQUEST["input"]["snapshot_sha256"])
+
+    def test_runner_returns_typed_failure_without_leaking_exception(self):
+        def fail(_payload):
+            raise EngineExecutionError("provider_timeout", "Provider timed out", True)
+
+        engine = EngineSpec(REQUEST["engine"]["engine_id"], REQUEST["engine"]["engine_version"], fail)
+        result = execute_engine(REQUEST, engine)
+        self.assertEqual(result["status"], "failed")
+        self.assertEqual(result["error"]["code"], "provider_timeout")
+        self.assertTrue(result["error"]["retryable"])
+
+    def test_runner_rejects_wrong_registered_engine_version(self):
+        engine = EngineSpec(REQUEST["engine"]["engine_id"], "9.9.9", lambda _payload: {})
+        with self.assertRaises(ContractValidationError):
+            execute_engine(REQUEST, engine)
 
     def test_unknown_fields_are_rejected_at_envelope_boundaries(self):
         invalid = json.loads(json.dumps(REQUEST))
