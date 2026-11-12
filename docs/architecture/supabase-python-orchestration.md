@@ -112,3 +112,17 @@ The installed Python package accepts `BA_ENGINE_SCHEMA_DIR` and `BA_ENGINE_REGIS
 The overview now reads the latest eight rows from `public.engine_executions` using the authenticated Supabase client and an explicit active-organization filter. RLS remains the authorization boundary. The panel presents lifecycle state, engine/version, timestamp, measurement/series counts, excluded-record count and quality flags; failed runs expose only the safe error code. It does not render arbitrary worker payloads or raw error messages.
 
 The history loader is bound to the active workspace revision and organization. Tenant transitions clear the in-memory execution list and visible panel before a new organization can load. The UI contract is checked by `scripts/test-engine-execution-history-ui.mjs` in the batch-tracker CI audit.
+
+
+## Structured analytical result persistence
+
+A successful execution is committed through the service-only `public.complete_engine_execution` RPC. In one PostgreSQL transaction it:
+- locks and verifies the matching `running` execution;
+- checks request ID, engine ID/version and input snapshot hash against the immutable ledger row;
+- validates the required result fields;
+- inserts one immutable `engine_execution_results` row;
+- transitions the execution ledger to `completed` with the full versioned response envelope.
+
+The result table is query-oriented: engine/result type, outcome, structured value, limitations, quality flags, optional calibrated confidence, provenance, input record IDs, input snapshot hash and generation timestamp are independently addressable. It is tenant-scoped under RLS and read-only to authenticated organization members. Result rows cannot be updated or deleted; a new interpretation requires a new execution.
+
+CultureOps reads recent execution status from `engine_executions` and structured outputs from `engine_execution_results`. The UI retains a compatibility fallback to the envelope stored in the execution ledger while older records are being migrated. Neither table modifies source measurements.
