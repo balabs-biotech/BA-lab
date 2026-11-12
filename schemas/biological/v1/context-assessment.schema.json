@@ -26,9 +26,10 @@
       "required": ["organization_id", "subject_type", "subject_id", "biological_contexts"],
       "properties": {
         "organization_id": { "type": "string", "format": "uuid" },
-        "subject_type": { "enum": ["culture", "batch"] },
+        "subject_type": { "enum": ["culture", "plant", "batch"] },
         "subject_id": { "type": "string", "format": "uuid" },
         "culture_id": { "type": ["string", "null"], "format": "uuid" },
+        "plant_culture_id": { "type": ["string", "null"], "format": "uuid" },
         "batch_id": { "type": ["string", "null"], "format": "uuid" },
         "experimental_unit_id": { "type": ["string", "null"], "format": "uuid" },
         "experiment_id": { "type": ["string", "null"], "format": "uuid" },
