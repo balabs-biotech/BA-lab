@@ -194,6 +194,7 @@ Deno.serve(async (req: Request) => {
       const safeUrl = trustedStacNextUrl(nextUrl);
       if (!safeUrl) return json(502, { error: "earth_search_pagination_url_rejected" });
       const response = await fetch(safeUrl, {
+        redirect: "error",
         method: nextMethod,
         headers: { Accept: "application/geo+json", ...(nextMethod === "POST" ? { "Content-Type": "application/json" } : {}) },
         body: nextMethod === "POST" ? JSON.stringify(nextBody) : undefined,
@@ -257,6 +258,7 @@ Deno.serve(async (req: Request) => {
       max_pixels: 4_000_000,
     };
     const workerResponse = await fetch(workerUrl, {
+      redirect: "error",
       method: "POST",
       headers: {
         "Content-Type": "application/json",
