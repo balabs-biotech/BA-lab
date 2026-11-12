@@ -18,7 +18,7 @@ const checks = [
   ["one environmental provider and dataset are kept per execution", /environmental_source_mismatch/],
   ["environmental observation provenance is included in the snapshot", /provider_code[\s\S]*dataset_code[\s\S]*spatial_resolution_m/],
   ["source rows are loaded through caller-scoped client", /userClient[\s\S]*\.from\(["']measurements["']\)/],
-  ["BIE loader has no service-role or privileged-client creation", !/service_role|createClient/.test(biologicalLoader)],
+  ["BIE culture and plant loaders have no service-role or privileged-client creation", !/service_role|createClient/.test(biologicalLoader)],
   ["BIE loader enforces row caps before snapshot creation", /MAX_MEASUREMENTS = 1000[\s\S]*MAX_WEATHER_OBSERVATIONS = 3000[\s\S]*analysis_measurement_limit_exceeded[\s\S]*analysis_weather_limit_exceeded/.test(biologicalLoader)],
   ["BIE weather query is gated by one resolved location", /preflight\.window\.status === "resolved" && preflight\.window\.location_id/.test(biologicalLoader)],
   ["snapshot payload hashes the complete source row", /sourceRowById[\s\S]*sha256\(stable\(sourceRow\)/],
