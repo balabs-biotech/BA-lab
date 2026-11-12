@@ -2541,3 +2541,88 @@
   #app.balabs-ui > .site-nav a,
   #app.balabs-ui > .site-nav a::after { transition:none !important; }
 }
+
+
+/* PHASE 13 — research principles as an editorial colophon, not generic tiles. */
+#app.balabs-ui > main > .under {
+  display:grid !important;
+  grid-template-columns:repeat(4,minmax(0,1fr)) !important;
+  gap:0 !important;
+  padding:0 clamp(22px,7vw,104px) !important;
+  background:#D1D0C5 !important;
+  color:#111B1D !important;
+  border-top:1px solid rgba(17,27,29,.35) !important;
+  border-bottom:1px solid rgba(17,27,29,.35) !important;
+}
+#app.balabs-ui > main > .under .tile {
+  position:relative !important;
+  min-width:0 !important;
+  min-height:190px !important;
+  display:flex !important;
+  flex-direction:column !important;
+  justify-content:space-between !important;
+  gap:28px !important;
+  margin:0 !important;
+  padding:24px clamp(14px,2vw,28px) 26px 0 !important;
+  border:0 !important;
+  border-right:1px solid rgba(17,27,29,.24) !important;
+  border-radius:0 !important;
+  background:transparent !important;
+  box-shadow:none !important;
+}
+#app.balabs-ui > main > .under .tile + .tile { padding-left:clamp(14px,2vw,28px) !important; }
+#app.balabs-ui > main > .under .tile:last-child { border-right:0 !important; }
+#app.balabs-ui > main > .under .tile::before {
+  display:block !important;
+  color:#98553F !important;
+  font:italic 25px/1 Georgia,serif !important;
+  letter-spacing:-.04em !important;
+}
+#app.balabs-ui > main > .under .tile:nth-child(1)::before { content:"01 / BIOLOGY" !important; }
+#app.balabs-ui > main > .under .tile:nth-child(2)::before { content:"02 / SYSTEMS" !important; }
+#app.balabs-ui > main > .under .tile:nth-child(3)::before { content:"03 / ACCESS" !important; }
+#app.balabs-ui > main > .under .tile:nth-child(4)::before { content:"04 / EXPLORATION" !important; }
+#app.balabs-ui > main > .under .tile b {
+  display:block !important;
+  margin:0 0 9px !important;
+  color:#111B1D !important;
+  font:400 clamp(20px,1.9vw,27px)/1.08 Georgia,serif !important;
+  letter-spacing:-.035em !important;
+}
+#app.balabs-ui > main > .under .tile p {
+  max-width:31ch !important;
+  margin:0 !important;
+  color:#46524B !important;
+  font-size:12px !important;
+  line-height:1.75 !important;
+}
+@media(max-width:760px) {
+  #app.balabs-ui > main > .under {
+    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+    padding:0 18px !important;
+  }
+  #app.balabs-ui > main > .under .tile {
+    min-height:165px !important;
+    padding:20px 12px 22px 0 !important;
+    gap:22px !important;
+    border-bottom:1px solid rgba(17,27,29,.24) !important;
+  }
+  #app.balabs-ui > main > .under .tile + .tile { padding-left:12px !important; }
+  #app.balabs-ui > main > .under .tile:nth-child(2n) { border-right:0 !important; }
+  #app.balabs-ui > main > .under .tile:nth-child(3),
+  #app.balabs-ui > main > .under .tile:nth-child(4) { border-bottom:0 !important; }
+}
+@media(max-width:420px) {
+  #app.balabs-ui > main > .under { grid-template-columns:1fr !important; }
+  #app.balabs-ui > main > .under .tile,
+  #app.balabs-ui > main > .under .tile + .tile {
+    min-height:0 !important;
+    padding:18px 0 !important;
+    border-right:0 !important;
+    border-bottom:1px solid rgba(17,27,29,.24) !important;
+  }
+  #app.balabs-ui > main > .under .tile:last-child { border-bottom:0 !important; }
+}
+@media(prefers-reduced-motion:reduce) {
+  #app.balabs-ui > main > .under .tile { transition:none !important; }
+}
