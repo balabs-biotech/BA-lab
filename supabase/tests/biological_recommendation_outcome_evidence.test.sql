@@ -68,6 +68,13 @@ begin
   ) or not exists (
     select 1 from pg_attribute
      where attrelid = v_links
+       and attname = 'quality_state'
+       and atttypid = 'text'::regtype
+       and attnotnull
+       and not attisdropped
+  ) or not exists (
+    select 1 from pg_attribute
+     where attrelid = v_links
        and attname = 'method'
        and atttypid = 'text'::regtype
        and not attisdropped
