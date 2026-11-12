@@ -2716,7 +2716,7 @@ async function compareSelectedBatches() {
     if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
     status.textContent = error?.message || labels.impossible;
   } finally {
-    if (isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) button.disabled = false;
+    if (isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) {\n      button.disabled = document.getElementById("plantBiologicalContextEnvironment").options.length <= 1;\n    }
   }
 }
 document.getElementById("compareBatchesButton")?.addEventListener("click", compareSelectedBatches);
@@ -6454,8 +6454,8 @@ async function loadPlantBiologicalContextPanel(plantCultureId) {
     const latest = contexts[0] || null;
     const defaultContext = latest || {};
     environmentSelect.value = defaultContext.environment_id || plant.environment_id || "";
-    document.getElementById("plantBiologicalContextStage").value = defaultContext.culture_stage || "vegetative";
-    document.getElementById("plantBiologicalContextProduction").value = defaultContext.production_system || "greenhouse";
+    document.getElementById("plantBiologicalContextStage").value = defaultContext.culture_stage || "";
+    document.getElementById("plantBiologicalContextProduction").value = defaultContext.production_system || "";
     document.getElementById("plantBiologicalContextSubstrate").value = defaultContext.substrate_code || plant.substrate || "";
     document.getElementById("plantBiologicalContextTags").value =
       Array.isArray(defaultContext.context_tags) ? defaultContext.context_tags.join(", ") : "";
@@ -6483,7 +6483,7 @@ async function loadPlantBiologicalContextPanel(plantCultureId) {
     closeButton.disabled = !openContext;
     closeButton.dataset.contextId = openContext?.id || "";
     document.getElementById("savePlantBiologicalContext").disabled =
-      !environments.length || Boolean(openContext);
+      !environments.length;
     setPlantBiologicalContextMessage(
       openContext
         ? "Un contexte végétal est actif. Clôturez-le avant d’enregistrer une nouvelle période."
