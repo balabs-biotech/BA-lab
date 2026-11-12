@@ -13,8 +13,8 @@ create table public.biological_recommendation_outcome_measurements (
   normalized_unit_code text,
   raw_value numeric,
   raw_unit_code text,
-  measurement_quality_state text check (
-    measurement_quality_state is null or measurement_quality_state in (
+  measurement_quality_state text not null default 'raw' check (
+    measurement_quality_state in (
       'raw', 'controlled', 'validated', 'excluded'
     )
   ),
@@ -194,7 +194,7 @@ begin
     p_measurement_id, v_measurement.measured_at, v_measurement.variable_code,
     v_measurement.normalized_value, v_measurement.normalized_unit_code,
     v_measurement.raw_value, v_measurement.raw_unit_code,
-    v_measurement.quality_state, v_measurement.method, v_measurement.instrument,
+    coalesce(v_measurement.quality_state::text, 'raw'), v_measurement.method, v_measurement.instrument,
     coalesce(v_measurement.metadata, '{}'::jsonb), v_scope, v_actor_id
   )
   on conflict (
