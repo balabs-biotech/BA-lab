@@ -182,3 +182,17 @@ bounded job parameters, let the worker perform trusted discovery, and authorize
 persistence through a server-to-server job/lease proof rather than persisting
 or replaying the original user's bearer token. No credentials or bearer tokens
 should be stored in job parameters.
+
+
+### Lease-bound Sentinel-2 persistence boundary (implementation added; queue still inactive)
+
+A separate Edge Function, `earth-search-sentinel2-lease-ingest`, now provides the persistence contract intended for a future durable worker. It does not accept or require a user JWT. Instead it:
+
+- verifies the exact raw request body using `x-ba-worker-timestamp` and `x-ba-worker-signature` with the existing `BA_SENTINEL2_WORKER_SECRET` and five-minute timestamp window;
+- requires `job_id` and `lease_token`, then reads the live `environmental_ingestion_jobs` row with the service-role client;
+- requires `status=processing`, the Sentinel-2 job type/provider/dataset, the exact active lease token and an unexpired `lease_expires_at`;
+- derives organization and location scope from that trusted job row (not from caller-supplied tenant IDs), validates every NDVI row against that scope and the Sentinel-2 provenance contract, then calls `upsert_satellite_environmental_observations(jsonb)`.
+
+Request body shape: `{ "job_id": "<uuid>", "lease_token": "<uuid>", "rows": [...] }`. The lease token is an opaque per-attempt capability and must never be exposed to the browser, written into logs, or persisted outside the worker's in-memory claim result. The HMAC authenticates the private worker; the database lease check prevents an expired or reclaimed attempt from persisting. Replayed identical scene rows remain idempotent through the source-aware SQL upsert.
+
+This endpoint is a new isolated boundary; the existing JWT-protected `earth-search-sentinel2-ingest` remains unchanged for the current synchronous flow. The gateway does not yet enqueue jobs, the Python processor does not yet call this endpoint, and the worker does not yet perform its own location lookup/STAC discovery. Therefore **the queue is still inactive**. Before activation, implement the enqueue-only user gateway, service-role location resolver and STAC discovery in the worker, lease-aware cancellation/persistence, retry/reconciliation operations, and integration tests against a disposable Supabase project. Deploy neither function nor migrations as part of this code change.
