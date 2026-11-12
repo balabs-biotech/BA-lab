@@ -100,6 +100,11 @@ const executionA = {
   mockResult: { result_type: "environmental_timeseries_qc", value: {} }
 };
 const executionB = { ...executionA, id: "execution-b", scope: { ...executionA.scope } };
+const candidateHelperStart = tracker.indexOf("function getComparableEngineExecutionCandidates(");
+const initialPairHelperStart = tracker.indexOf("function findInitialComparableEnginePair(");
+assert.ok(candidateHelperStart >= 0, "compatible candidate filtering helper must exist");
+assert.ok(initialPairHelperStart > candidateHelperStart, "initial compatible pair helper must exist");
+
 assert.equal(compareExecutions(executionA, executionB), true);
 assert.equal(compareExecutions(executionA, { ...executionB, id: executionA.id }), false);
 assert.equal(compareExecutions(executionA, { ...executionB, engine_id: "other.engine" }), false);
