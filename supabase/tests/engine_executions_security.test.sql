@@ -58,7 +58,7 @@ begin
   ) then
     raise exception 'tenant membership SELECT policy missing';
   end if;
-  insert into public.organizations(id) values(v_org) on conflict do nothing;
+  insert into public.organizations(id,code,name) values(v_org,'TEST-ENGINE-ORG','Engine Test Organization') on conflict do nothing;
   insert into auth.users(id) values(v_user) on conflict do nothing;
   insert into public.organization_members(organization_id,user_id,role)
     values(v_org,v_user,'member') on conflict do nothing;
