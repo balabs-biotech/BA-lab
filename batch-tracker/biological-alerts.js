@@ -309,7 +309,14 @@
                 (measurement.variable_code || "Mesure") + " · " + value + " · " +
                 dateLabel(measurement.measurement_observed_at) + " · " +
                 (link.evidence_scope === "biological_subject" ? "Sujet biologique" : "Contexte environnemental") +
-                (measurement.method ? " · " + measurement.method : "")));
+                (measurement.method ? " · Méthode : " + measurement.method : "") +
+                (measurement.instrument ? " · Instrument : " + measurement.instrument : "")));
+              if (measurement.normalized_value !== null && measurement.normalized_value !== undefined &&
+                  measurement.raw_value !== null && measurement.raw_value !== undefined) {
+                evidencePanel.append(element("small", "signal-recommendation-raw-value",
+                  "Valeur brute conservée : " + String(measurement.raw_value) +
+                  (measurement.raw_unit_code ? " " + measurement.raw_unit_code : "")));
+              }
             });
           } else {
             evidencePanel.append(element("small", "", "Aucune mesure quantitative n’est encore reliée à ce résultat."));
