@@ -149,4 +149,16 @@ assert.equal(plantCounts.environmental_observations, 1);
 await assert.rejects(() => loadAuthenticatedPlantBiologicalContextSnapshot({
   userClient: clientFor(plantData), organizationId: "99999999-9999-4999-8999-999999999999", plantCultureId, window,
 }), /plant_culture_not_found_or_inaccessible/);
+
+const mixedPlantContext = structuredClone(plantData);
+mixedPlantContext.biological_contexts[0].culture_id = cultureId;
+await assert.rejects(() => loadAuthenticatedPlantBiologicalContextSnapshot({
+  userClient: clientFor(mixedPlantContext), organizationId: org, plantCultureId, window,
+}), /plant_biological_context_scope_mismatch/);
+const mixedPlantMeasurement = structuredClone(plantData);
+mixedPlantMeasurement.measurements[0].culture_id = cultureId;
+await assert.rejects(() => loadAuthenticatedPlantBiologicalContextSnapshot({
+  userClient: clientFor(mixedPlantMeasurement), organizationId: org, plantCultureId, window,
+}), /plant_culture_measurement_scope_mismatch/);
+
 console.log("✓ BIE GreenTech loader: authenticated plant scope, temporal contexts, measurement and weather provenance");
