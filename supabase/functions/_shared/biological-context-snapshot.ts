@@ -98,6 +98,7 @@ export async function buildBiologicalContextSnapshot(input: {
     environment_id: string | null;
     location_id: string | null;
   }>;
+  biologicalContexts?: Array<Record<string, unknown>>;
   environmentLinkState?: string;
   window: BiologicalContextWindow;
 }) {
@@ -220,11 +221,17 @@ export async function buildBiologicalContextSnapshot(input: {
     window_start: window.start,
     window_end: window.end,
     timezone: window.timezone,
-    biological_context_supplied: false,
+    biological_context_supplied: (input.biologicalContexts ?? []).length > 0,
+    biological_contexts: input.biologicalContexts ?? [],
     environment_link_state: input.environmentLinkState ??
       (environment ? (locationId ? "resolved" : "environment_without_location") : "unlinked"),
   };
-  const snapshotHash = await sha256(stable(records));
+  // Context descriptors are part of the immutable analytical input even
+  // though they are metadata rather than measurement record IDs.
+  const snapshotHash = await sha256(stable({
+    records,
+    biological_contexts: input.biologicalContexts ?? [],
+  }));
   return {
     scope,
     parameters,
