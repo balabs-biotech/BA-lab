@@ -119,7 +119,8 @@
               "record_type": {
                 "enum": [
                   "measurement",
-                  "observation"
+                  "observation",
+                  "environmental_observation"
                 ]
               },
               "payload_sha256": {
