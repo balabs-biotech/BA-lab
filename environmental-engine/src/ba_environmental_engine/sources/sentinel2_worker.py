@@ -107,8 +107,11 @@ def process_and_persist_sentinel2_batch(
         raise ValueError("caller bearer token is required")
     if not isinstance(worker_secret, str) or len(worker_secret.encode("utf-8")) < 32:
         raise ValueError("worker signing secret must contain at least 32 bytes")
-    timestamp = int(time.time()) if timestamp_seconds is None else timestamp_seconds
-    if isinstance(timestamp, bool) or not isinstance(timestamp, int) or timestamp <= 0:
+    if timestamp_seconds is not None and (
+        isinstance(timestamp_seconds, bool)
+        or not isinstance(timestamp_seconds, int)
+        or timestamp_seconds <= 0
+    ):
         raise ValueError("timestamp_seconds must be a positive integer")
 
     batch = process_sentinel2_stac_items(
@@ -135,6 +138,8 @@ def process_and_persist_sentinel2_batch(
 
     persistence_response = None
     if valid_rows:
+        # Sign only after raster processing so the five-minute receiver window starts at send time.
+        timestamp = int(time.time()) if timestamp_seconds is None else timestamp_seconds
         payload = {
             "organization_id": str(organization_id),
             "location_id": str(location_id),
