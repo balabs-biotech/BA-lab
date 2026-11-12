@@ -13,6 +13,21 @@ import {
 } from "./biological-context-snapshot.ts";
 import { resolveBiologicalContext } from "./biological-context-resolver.ts";
 
+function dateInTimezone(instant: string, timezone: string): string {
+  const timestamp = Date.parse(instant);
+  if (!Number.isFinite(timestamp)) throw new Error("analysis_window_must_be_timezone_aware");
+  let parts: Intl.DateTimeFormatPart[];
+  try {
+    parts = new Intl.DateTimeFormat("en-CA", {
+      timeZone: timezone, year: "numeric", month: "2-digit", day: "2-digit",
+    }).formatToParts(timestamp);
+  } catch {
+    throw new Error("analysis_timezone_invalid");
+  }
+  const values = Object.fromEntries(parts.map((part) => [part.type, part.value]));
+  return values.year + "-" + values.month + "-" + values.day;
+}
+
 export async function assembleResolvedBiologicalContextSnapshot(input: {
   organizationId: string;
   culture: BiologicalCultureRow;
@@ -21,12 +36,28 @@ export async function assembleResolvedBiologicalContextSnapshot(input: {
     organization_id: string;
     culture_id: string | null;
     environment_id: string;
+    organism_kind?: string | null;
+    taxon_code?: string | null;
+    strain_code?: string | null;
+    cultivar_code?: string | null;
+    culture_stage?: string | null;
+    substrate_code?: string | null;
+    production_system?: string | null;
+    context_tags?: string[] | null;
     valid_from: string;
     valid_to: string | null;
   }>;
   environments: BiologicalEnvironmentRow[];
   measurements: BiologicalMeasurementRow[];
   environmentalObservations: BiologicalEnvironmentalObservationRow[];
+  strainReferences?: Array<{
+    id: string; organization_id: string; strain_code: string; organism_id: string;
+    designation?: string | null; origin?: string | null; source_description?: string | null;
+  }>;
+  organisms?: Array<{
+    id: string; scientific_name: string; common_name?: string | null;
+    taxonomy_source?: string | null; taxonomy_id?: string | null;
+  }>;
   window: BiologicalContextWindow;
 }) {
   const resolution = resolveBiologicalContext({
@@ -74,6 +105,55 @@ export async function assembleResolvedBiologicalContextSnapshot(input: {
     ? (resolvedEnvironment?.location_id ? "resolved" : "environment_without_location")
     : resolution.window.status;
 
+  const startDate = dateInTimezone(input.window.start, input.window.timezone);
+  const lastIncludedDate = dateInTimezone(
+    new Date(Date.parse(input.window.end) - 1).toISOString(),
+    input.window.timezone,
+  );
+  const biologicalContexts = input.contexts
+    .filter((context) =>
+      context.valid_from <= lastIncludedDate &&
+      (context.valid_to === null || context.valid_to > startDate)
+    )
+    .sort((a, b) => a.valid_from.localeCompare(b.valid_from) || a.id.localeCompare(b.id))
+    .map((context) => {
+      const strain = context.strain_code
+        ? (input.strainReferences ?? []).find((item) =>
+          item.organization_id === input.organizationId && item.strain_code === context.strain_code
+        ) ?? null
+        : null;
+      const organism = strain
+        ? (input.organisms ?? []).find((item) => item.id === strain.organism_id) ?? null
+        : null;
+      return {
+        context_id: context.id,
+        valid_from: context.valid_from,
+        valid_to: context.valid_to,
+        organism_kind: context.organism_kind ?? null,
+        taxon_code: context.taxon_code ?? null,
+        strain_code: context.strain_code ?? null,
+        cultivar_code: context.cultivar_code ?? null,
+        culture_stage: context.culture_stage ?? null,
+        substrate_code: context.substrate_code ?? null,
+        production_system: context.production_system ?? null,
+        context_tags: Array.isArray(context.context_tags)
+          ? context.context_tags.filter((tag): tag is string => typeof tag === "string")
+          : [],
+        genetic_reference: {
+          status: !context.strain_code ? "not_specified" : strain ? "resolved" : "unresolved",
+          strain_id: strain?.id ?? null,
+          organism_id: strain?.organism_id ?? null,
+          designation: strain?.designation ?? null,
+          origin: strain?.origin ?? null,
+          source_description: strain?.source_description ?? null,
+          scientific_name: organism?.scientific_name ?? null,
+          common_name: organism?.common_name ?? null,
+          taxonomy_source: organism?.taxonomy_source ?? null,
+          taxonomy_id: organism?.taxonomy_id ?? null,
+        },
+      };
+    });
+
   const snapshot = await buildBiologicalContextSnapshot({
     organizationId: input.organizationId,
     culture: input.culture,
@@ -81,6 +161,7 @@ export async function assembleResolvedBiologicalContextSnapshot(input: {
     measurements: input.measurements,
     environmentalObservations: weatherRows,
     measurementContextById,
+    biologicalContexts,
     environmentLinkState,
     window: input.window,
   });
