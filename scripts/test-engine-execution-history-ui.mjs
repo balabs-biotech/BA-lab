@@ -69,8 +69,8 @@ for (const path of [
   "batch-tracker/green-tech/index.html",
 ]) {
   const page = readFileSync(path, "utf8");
-  assert.match(page, /workspace\.html\?v=20261112-engine-history-compare-2/);
-  assert.match(page, /tracker\.js\?v=20261112-engine-history-compare-2/);
+  assert.match(page, /workspace\.html\?v=20261112-engine-history-compare-3/);
+  assert.match(page, /tracker\.js\?v=20261112-engine-history-compare-3/);
 }
 
 
