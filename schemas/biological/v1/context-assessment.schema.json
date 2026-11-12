@@ -1,0 +1,167 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.ba-labs.dz/biological/v1/context-assessment.schema.json",
+  "title": "BA Labs biological context assessment v1",
+  "description": "Structured value payload for biological.context_assessment.v1. This schema validates analytical output structure, not scientific validity.",
+  "type": "object",
+  "required": [
+    "result_type",
+    "result_version",
+    "subject",
+    "coverage",
+    "observed_facts",
+    "derived_features",
+    "findings",
+    "hypotheses"
+  ],
+  "properties": {
+    "result_type": {
+      "const": "biological.context_assessment"
+    },
+    "result_version": {
+      "const": "1.0.0"
+    },
+    "subject": {
+      "type": "object",
+      "required": ["organization_id", "subject_type", "subject_id"],
+      "properties": {
+        "organization_id": { "type": "string", "format": "uuid" },
+        "subject_type": { "enum": ["culture", "batch"] },
+        "subject_id": { "type": "string", "format": "uuid" },
+        "culture_id": { "type": ["string", "null"], "format": "uuid" },
+        "batch_id": { "type": ["string", "null"], "format": "uuid" },
+        "experimental_unit_id": { "type": ["string", "null"], "format": "uuid" },
+        "experiment_id": { "type": ["string", "null"], "format": "uuid" },
+        "genetic_reference_ids": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "type": "string", "format": "uuid" }
+        }
+      },
+      "additionalProperties": false
+    },
+    "coverage": {
+      "type": "object",
+      "required": ["requested_window", "observed_window", "source_record_count", "missing_context", "temporal_gaps"],
+      "properties": {
+        "requested_window": { "$ref": "#/$defs/timeWindow" },
+        "observed_window": {
+          "anyOf": [
+            { "$ref": "#/$defs/timeWindow" },
+            { "type": "null" }
+          ]
+        },
+        "source_record_count": { "type": "integer", "minimum": 0 },
+        "record_counts_by_type": {
+          "type": "object",
+          "additionalProperties": { "type": "integer", "minimum": 0 }
+        },
+        "missing_context": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1, "maxLength": 200 }
+        },
+        "temporal_gaps": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["from", "to", "duration_seconds"],
+            "properties": {
+              "from": { "type": "string", "format": "date-time" },
+              "to": { "type": "string", "format": "date-time" },
+              "duration_seconds": { "type": "number", "exclusiveMinimum": 0 }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "observed_facts": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/observedFact" }
+    },
+    "derived_features": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/derivedFeature" }
+    },
+    "findings": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/finding" }
+    },
+    "hypotheses": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/hypothesis" }
+    }
+  },
+  "$defs": {
+    "timeWindow": {
+      "type": "object",
+      "required": ["start", "end", "timezone"],
+      "properties": {
+        "start": { "type": "string", "format": "date-time" },
+        "end": { "type": "string", "format": "date-time" },
+        "timezone": { "type": "string", "minLength": 1, "maxLength": 80 }
+      },
+      "additionalProperties": false
+    },
+    "sourceReferences": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "type": "string", "format": "uuid" }
+    },
+    "observedFact": {
+      "type": "object",
+      "required": ["fact_code", "statement", "observed_at", "source_record_ids"],
+      "properties": {
+        "fact_code": { "type": "string", "pattern": "^[a-z][a-z0-9_.-]{1,79}$" },
+        "statement": { "type": "string", "minLength": 1, "maxLength": 1000 },
+        "observed_at": { "type": "string", "format": "date-time" },
+        "source_record_ids": { "$ref": "#/$defs/sourceReferences" },
+        "value": {},
+        "unit_code": { "type": ["string", "null"], "maxLength": 80 }
+      },
+      "additionalProperties": false
+    },
+    "derivedFeature": {
+      "type": "object",
+      "required": ["feature_code", "value", "method", "method_version", "unit_code", "source_record_ids"],
+      "properties": {
+        "feature_code": { "type": "string", "pattern": "^[a-z][a-z0-9_.-]{1,79}$" },
+        "value": { "type": ["number", "integer"] },
+        "method": { "type": "string", "minLength": 1, "maxLength": 300 },
+        "method_version": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$" },
+        "unit_code": { "type": ["string", "null"], "maxLength": 80 },
+        "source_record_ids": { "$ref": "#/$defs/sourceReferences" }
+      },
+      "additionalProperties": false
+    },
+    "finding": {
+      "type": "object",
+      "required": ["finding_code", "statement", "evidence_state", "supporting_record_ids", "contradicting_record_ids"],
+      "properties": {
+        "finding_code": { "type": "string", "pattern": "^[a-z][a-z0-9_.-]{1,79}$" },
+        "statement": { "type": "string", "minLength": 1, "maxLength": 1000 },
+        "evidence_state": { "enum": ["supported", "limited", "conflicting", "insufficient_data"] },
+        "supporting_record_ids": { "type": "array", "uniqueItems": true, "items": { "type": "string", "format": "uuid" } },
+        "contradicting_record_ids": { "type": "array", "uniqueItems": true, "items": { "type": "string", "format": "uuid" } },
+        "derived_feature_codes": { "type": "array", "uniqueItems": true, "items": { "type": "string", "pattern": "^[a-z][a-z0-9_.-]{1,79}$" } }
+      },
+      "additionalProperties": false
+    },
+    "hypothesis": {
+      "type": "object",
+      "required": ["hypothesis_code", "statement", "status", "supporting_record_ids", "contradicting_record_ids", "requires_validation"],
+      "properties": {
+        "hypothesis_code": { "type": "string", "pattern": "^[a-z][a-z0-9_.-]{1,79}$" },
+        "statement": { "type": "string", "minLength": 1, "maxLength": 1000 },
+        "status": { "const": "unverified" },
+        "supporting_record_ids": { "type": "array", "uniqueItems": true, "items": { "type": "string", "format": "uuid" } },
+        "contradicting_record_ids": { "type": "array", "uniqueItems": true, "items": { "type": "string", "format": "uuid" } },
+        "requires_validation": { "type": "array", "items": { "type": "string", "minLength": 1, "maxLength": 300 } }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}
