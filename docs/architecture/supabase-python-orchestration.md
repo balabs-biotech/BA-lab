@@ -51,7 +51,7 @@ JSON body:
 {
   "organization_id": "<uuid>",
   "engine_id": "environmental.timeseries.qc",
-  "engine_version": "0.1.0",
+  "engine_version": "0.2.0",
   "record_ids": ["<measurement-uuid>"],
   "scope": { "culture_id": "<optional-uuid>" },
   "parameters": { "max_gap_minutes": 180 },
@@ -59,7 +59,7 @@ JSON body:
 }
 ```
 
-The caller may also send `Idempotency-Key` as a header. The endpoint currently accepts measurement IDs only and limits one call to 500 records. It reads records through the caller JWT and checks membership plus writer role before using the server credential. The only enabled engine is the exact `environmental.timeseries.qc@0.1.0` registry entry.
+The caller may also send `Idempotency-Key` as a header. The endpoint currently accepts measurement IDs only and limits one call to 500 records. It reads records through the caller JWT and checks membership plus writer role before using the server credential. The only enabled engine is the exact `environmental.timeseries.qc@0.2.0` registry entry.
 
 ### Required Edge Function secrets
 
@@ -138,7 +138,7 @@ To run the deterministic QC engine against externally sourced weather observatio
 {
   "organization_id": "<uuid>",
   "engine_id": "environmental.timeseries.qc",
-  "engine_version": "0.1.0",
+  "engine_version": "0.2.0",
   "record_type": "environmental_observation",
   "record_ids": ["<environmental-observation-uuid>"],
   "scope": { "location_id": "<location-uuid>" },
