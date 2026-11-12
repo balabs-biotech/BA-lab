@@ -238,6 +238,9 @@ class EngineContractTests(unittest.TestCase):
         result = run_environmental_timeseries_qc(request)
         validate_response(result, request)
         self.assertEqual(result["result"]["outcome"], "success")
+        self.assertEqual(result["result"]["value"]["summary"]["record_count"], 3)
+        self.assertEqual(result["result"]["value"]["summary"]["measurement_count"], 0)
+        self.assertEqual(result["result"]["value"]["summary"]["environmental_observation_count"], 3)
         self.assertIn("sampling_gap_detected", result["result"]["quality_flags"])
         self.assertEqual(
             result["result"]["provenance"]["source_references"],
