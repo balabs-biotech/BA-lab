@@ -67,3 +67,33 @@ def test_no_valid_pixels_returns_explicit_quality_state():
     assert result.valid_pixel_ratio == 0
     assert result.mean_ndvi is None
     assert result.quality_flag == "no_valid_pixels"
+
+
+def test_applies_asset_scale_and_offset_before_ndvi():
+    # Distinct offsets change NDVI; computing directly from stored DN is wrong.
+    red = np.array([[2000]], dtype=np.uint16)
+    nir = np.array([[4000]], dtype=np.uint16)
+
+    result = calculate_ndvi_statistics(
+        red,
+        nir,
+        red_scale=0.0001,
+        nir_scale=0.0001,
+        red_offset=-0.05,
+        nir_offset=0.0,
+    )
+
+    expected_red = 0.15
+    expected_nir = 0.40
+    assert result.mean_ndvi == pytest.approx((expected_nir - expected_red) / (expected_nir + expected_red))
+
+
+def test_rejects_invalid_reflectance_scale_or_offset():
+    red = np.array([[1000]], dtype=np.uint16)
+    nir = np.array([[3000]], dtype=np.uint16)
+
+    with pytest.raises(ValueError, match="red_scale"):
+        calculate_ndvi_statistics(red, nir, red_scale=0)
+
+    with pytest.raises(ValueError, match="nir_offset"):
+        calculate_ndvi_statistics(red, nir, nir_offset=float("nan"))
