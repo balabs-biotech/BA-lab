@@ -19,6 +19,7 @@ const checks = [
   ["idempotency binds scope and parameters", /stable\(prior\.scope\)[\s\S]*stable\(prior\.request_payload\?\.parameters/],
   ["idempotency race resolution uses the same invocation comparison", /if \(raced && sameExecutionInput\(raced, engineRequest\)\)/],
   ["engine versions are explicitly allowlisted", /ENGINE_ALLOWLIST/],
+  ["environmental QC is pinned to semantic version 0.2.0", /environmental\.timeseries\.qc[\s\S]*?new Set\(\["0\.2\.0"\]\)/],
   ["worker response is schema validated", /validateResponse/],
   ["successful results use atomic structured persistence", /rpc\("complete_engine_execution"/],
   ["atomic result persistence returns a durable result id", /result_id: resultId/],
