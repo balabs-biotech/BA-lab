@@ -102,3 +102,6 @@ docker build -f engines/python/Dockerfile -t ba-labs-engine-worker:0.1.0 .
 The image contains the Python package, versioned engine registry and `schemas/engine/v1`. It exposes port 8080 and requires `BA_ENGINE_WORKER_TOKEN` at runtime. See `engines/python/README.md` for the hardened `docker run` invocation and network placement requirements.
 
 CI builds the image and executes `scripts/test-engine-worker-container.py` against a running container with a disposable token. The smoke test checks readiness, rejects unauthenticated execution, runs the registered environmental QC engine and verifies the result's request/engine/snapshot correlation.
+
+
+The installed Python package accepts `BA_ENGINE_SCHEMA_DIR` and `BA_ENGINE_REGISTRY_DIR` so schemas and manifests can live outside the Python site-packages directory. The container sets both paths explicitly to the copied, versioned repository assets.
