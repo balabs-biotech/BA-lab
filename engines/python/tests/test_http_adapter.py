@@ -1,4 +1,5 @@
 import json
+import subprocess
 import sys
 import threading
 import unittest
@@ -89,6 +90,45 @@ class EngineHttpAdapterTests(unittest.TestCase):
         self.assertEqual(result["engine"], payload["engine"])
         self.assertEqual(result["input_snapshot_sha256"], payload["input"]["snapshot_sha256"])
         self.assertEqual(result["status"], "completed")
+
+    def test_execute_runs_registered_engine_in_bounded_subprocess_without_worker_token(self):
+        payload = make_request()
+        request = urllib.request.Request(
+            self.base_url + "/v1/execute",
+            data=json.dumps(payload).encode(),
+            headers={
+                "Content-Type": "application/json",
+                "Authorization": "Bearer test-worker-token-123456789",
+            },
+            method="POST",
+        )
+        with patch("ba_engine_contract.http_adapter.subprocess.run", wraps=subprocess.run) as run:
+            with urllib.request.urlopen(request, timeout=5) as response:
+                result = json.loads(response.read())
+        self.assertEqual(result["status"], "completed")
+        self.assertEqual(run.call_args.kwargs["timeout"], 15)
+        self.assertNotIn("BA_ENGINE_WORKER_TOKEN", run.call_args.kwargs["env"])
+        self.assertIn("ba_engine_contract.worker", run.call_args.args[0])
+
+    def test_execute_returns_gateway_timeout_when_engine_process_exceeds_manifest_budget(self):
+        payload = make_request()
+        request = urllib.request.Request(
+            self.base_url + "/v1/execute",
+            data=json.dumps(payload).encode(),
+            headers={
+                "Content-Type": "application/json",
+                "Authorization": "Bearer test-worker-token-123456789",
+            },
+            method="POST",
+        )
+        with patch(
+            "ba_engine_contract.http_adapter.subprocess.run",
+            side_effect=subprocess.TimeoutExpired(cmd="worker", timeout=15),
+        ):
+            with self.assertRaises(urllib.error.HTTPError) as caught:
+                urllib.request.urlopen(request, timeout=3)
+        self.assertEqual(caught.exception.code, 504)
+        self.assertEqual(json.loads(caught.exception.read())["error"], "engine_timeout")
 
     def test_execute_rejects_oversized_payload_before_json_parsing(self):
         body = b" " * (MAX_BODY_BYTES + 1)
