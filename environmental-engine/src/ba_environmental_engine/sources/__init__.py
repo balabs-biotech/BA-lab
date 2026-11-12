@@ -14,6 +14,7 @@ from ba_environmental_engine.sources.sensor_temporal import (
     SensorTemporalAssessment,
     assess_sensor_temporal_anomalies,
 )
+from ba_environmental_engine.sources.sentinel2 import normalize_sentinel2_observation
 from ba_environmental_engine.sources.supabase_sensor import SupabaseSensorMeasurementRepository
 
 __all__ = [
@@ -26,4 +27,5 @@ __all__ = [
     "find_duplicate_source_keys",
     "normalize_iot_measurement_row",
     "normalize_nasa_power_observation",
+    "normalize_sentinel2_observation",
 ]
