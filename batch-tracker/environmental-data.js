@@ -1,10 +1,11 @@
 /* BA Labs Green Tech: NASA POWER historical agroclimate. */
 (() => {
   if (document.body.dataset.domain !== "agronomy" || !window.supabase) return;
-  const db = window.supabase.createClient(
-    "https://axcouwiodqsauwnsiotn.supabase.co",
-    "sb_publishable_8H4XRh8V07Hlo0WwdfOXwg_2RXRX992"
-  );
+  const db = window.BA_LABS_SUPABASE_CLIENT;
+  if (!db) {
+    console.error("Le client Supabase partagé de CultureOps n’est pas disponible.");
+    return;
+  }
   const node = (tag, attrs = {}, value = "") => {
     const n = document.createElement(tag);
     Object.entries(attrs).forEach(([k, v]) => n.setAttribute(k, v));
