@@ -1,5 +1,5 @@
 from datetime import datetime, timezone
-from uuid import uuid4
+from uuid import UUID, uuid4
 
 import pytest
 
@@ -48,9 +48,9 @@ def test_sentinel2_adapter_normalizes_persisted_ndvi_and_preserves_provenance():
 
     result = normalizer()(row)
 
-    assert result.source_observation_id == __import__("uuid").UUID(row["id"])
-    assert result.organization_id == __import__("uuid").UUID(row["organization_id"])
-    assert result.location_id == __import__("uuid").UUID(row["location_id"])
+    assert result.source_observation_id == UUID(row["id"])
+    assert result.organization_id == UUID(row["organization_id"])
+    assert result.location_id == UUID(row["location_id"])
     assert result.data_family == "satellite"
     assert result.provider_code == "EARTH_SEARCH"
     assert result.dataset_code == "SENTINEL_2_L2A"
