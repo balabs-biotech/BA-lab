@@ -6,6 +6,7 @@ effects, calculate p-values, or select biological thresholds.
 from __future__ import annotations
 
 from dataclasses import dataclass
+from datetime import datetime
 from math import isfinite
 from statistics import mean, median, stdev
 from typing import Iterable
@@ -23,7 +24,7 @@ class ExperimentalObservation:
     variable_code: str
     value: float
     canonical_unit_code: str
-    measured_at: object
+    measured_at: datetime
     quality_state: str
     profile_id: str | None = None
     profile_version: str | None = None
@@ -154,10 +155,14 @@ def compare_experimental_cohorts(
     if len(subject_types) != 1:
         raise ValueError("cohorts must use the same biological subject type")
 
+    subject_cohorts: dict[str, str] = {}
     subjects_by_cohort: dict[str, dict[str, list[ExperimentalObservation]]] = {
         baseline_cohort_id: {}, comparison_cohort_id: {}
     }
     for item in accepted:
+        assigned_cohort = subject_cohorts.setdefault(item.subject_id, item.cohort_id)
+        if assigned_cohort != item.cohort_id:
+            raise ValueError("one biological subject cannot belong to both comparison cohorts")
         subjects = subjects_by_cohort[item.cohort_id]
         subjects.setdefault(item.subject_id, []).append(item)
 
