@@ -32,6 +32,8 @@ BEGIN
        OR jsonb_typeof(item -> 'value') IS DISTINCT FROM 'number'
        OR jsonb_typeof(item -> 'metadata' -> 'valid_pixel_ratio') IS DISTINCT FROM 'number'
        OR jsonb_typeof(item -> 'metadata' -> 'cloud_cover_pct') IS DISTINCT FROM 'number'
+       OR jsonb_typeof(item -> 'metadata' -> 'processing_version') IS DISTINCT FROM 'string'
+       OR item -> 'metadata' ->> 'processing_version' IS NULL
        OR length(btrim(item -> 'metadata' ->> 'processing_version')) = 0
   ) THEN
     RAISE EXCEPTION 'Sentinel-2 payload contains an invalid source identity';
