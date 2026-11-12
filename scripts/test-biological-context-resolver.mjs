@@ -97,3 +97,30 @@ assert.equal(noContext.measurements[0].status, "missing");
 assert.equal(noContext.measurements[0].reason, "historical_environment_not_resolved");
 
 console.log("✓ BIE temporal resolver: dated context, explicit measurement FK, conflict and ambiguity handling");
+
+const plantCultureId = "cccccccc-cccc-4ccc-8ccc-cccccccccccc";
+const plantContext = {
+  id: "dddddddd-dddd-4ddd-8ddd-dddddddddddd",
+  organization_id: organizationId,
+  culture_id: null,
+  plant_culture_id: plantCultureId,
+  environment_id: envA,
+  valid_from: "2026-11-01",
+  valid_to: "2026-11-12",
+};
+const plantResolution = resolveBiologicalContext({
+  organizationId, plantCultureId, contexts: [plantContext], environments,
+  measurements: [{ id: "plant-m1", measured_at: "2026-11-10T08:00:00Z", environment_id: envA }],
+  window: { start: "2026-11-10T00:00:00Z", end: "2026-11-11T00:00:00Z", timezone: "Africa/Algiers" },
+});
+assert.equal(plantResolution.measurements[0].status, "resolved");
+assert.equal(plantResolution.window.status, "resolved");
+assert.equal(plantResolution.window.environment_id, envA);
+const wrongPlant = resolveBiologicalContext({
+  organizationId, plantCultureId: "eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee",
+  contexts: [plantContext], environments, measurements: [],
+  window: { start: "2026-11-10T00:00:00Z", end: "2026-11-11T00:00:00Z", timezone: "Africa/Algiers" },
+});
+assert.equal(wrongPlant.window.status, "missing",
+  "plant contexts must never resolve across plant_culture_id boundaries");
+console.log("✓ BIE temporal resolver: GreenTech plant_culture_id isolation and dated environment resolution");
