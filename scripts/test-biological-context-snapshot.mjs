@@ -125,4 +125,38 @@ assert.equal(Object.hasOwn(unlinked.scope, "location_id"), false);
 assert.equal(unlinked.input.records.length, 1);
 assert.equal(unlinked.parameters.environment_link_state, "unlinked");
 
+const contextSnapshot = await buildBiologicalContextSnapshot({
+  organizationId,
+  culture,
+  environment,
+  measurements,
+  environmentalObservations,
+  biologicalContexts: [{
+    context_id: "99999999-9999-4999-8999-999999999999",
+    valid_from: "2026-11-01",
+    valid_to: null,
+    culture_stage: "fruiting",
+  }],
+  window,
+});
+const changedContextSnapshot = await buildBiologicalContextSnapshot({
+  organizationId,
+  culture,
+  environment,
+  measurements,
+  environmentalObservations,
+  biologicalContexts: [{
+    context_id: "99999999-9999-4999-8999-999999999999",
+    valid_from: "2026-11-01",
+    valid_to: null,
+    culture_stage: "incubation",
+  }],
+  window,
+});
+assert.equal(contextSnapshot.parameters.biological_context_supplied, true);
+assert.notEqual(contextSnapshot.input.snapshot_sha256, historicalSnapshot.input.snapshot_sha256,
+  "biological context metadata must contribute to the immutable snapshot hash");
+assert.notEqual(contextSnapshot.input.snapshot_sha256, changedContextSnapshot.input.snapshot_sha256,
+  "changing a biological context descriptor must change the immutable snapshot hash");
+
 console.log("✓ BIE source adapter: tenant, culture and environment links; mixed-source provenance; deterministic hashes; unlinked culture handling");
