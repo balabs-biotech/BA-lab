@@ -6,7 +6,6 @@ Sentinel-2 AOI from a claimed job. It is not a general table/query client.
 from __future__ import annotations
 
 import json
-import re
 from typing import Any
 from urllib.error import HTTPError, URLError
 from urllib.parse import urlencode, urlsplit
@@ -42,7 +41,7 @@ class SupabaseLocationRepository:
         host = (parsed.hostname or "").lower()
         if (
             parsed.scheme != "https"
-            or not (host.endswith(".supabase.co") and re.fullmatch(r"[a-z0-9-]+\\.supabase\\.co", host.replace(".supabase.co", ".supabase.co")) is not None)
+            or not (host.endswith(".supabase.co") and bool(host[:-len(".supabase.co")]) and "." not in host[:-len(".supabase.co")] and all(char.isalnum() or char == "-" for char in host[:-len(".supabase.co")]))
             or parsed.username is not None
             or parsed.password is not None
             or parsed.port not in (None, 443)
