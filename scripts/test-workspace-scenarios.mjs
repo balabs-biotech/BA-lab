@@ -554,4 +554,51 @@ assert.match(contextHandlers, /openContext/,
   "new context must not overlap an unclosed active context");
 assert.match(contextHandlers, /isCurrentWorkspaceRevision/,
   "context handlers must discard stale workspace operations");
+
 console.log("✓ Biological context editor: tenant isolation, temporal bounds and active-context closure");
+
+// GreenTech biological context must use the plant_cultures subject FK and the
+// greentech domain; it must never write a plant row as a fungal culture.
+for (const id of [
+  "plantBiologicalContextPanel", "plantBiologicalContextHistory",
+  "plantBiologicalContextForm", "plantBiologicalContextEnvironment",
+  "plantBiologicalContextStage", "plantBiologicalContextProduction",
+  "plantBiologicalContextValidFrom", "plantBiologicalContextValidTo",
+  "plantBiologicalContextCloseButton"
+]) {
+  assert.ok(workspaceHtml.includes('id="' + id + '"'),
+    "GreenTech biological context panel must expose " + id);
+}
+for (const phrase of [
+  "Contexte de la culture végétale", "Stade végétatif",
+  "Substrat / milieu racinaire", "Plein champ", "Hydroponie"
+]) {
+  assert.ok(localization.includes(phrase),
+    "GreenTech context phrase must be localized: " + phrase);
+}
+const plantContextLoadStart = engine.indexOf("async function loadPlantBiologicalContextPanel(");
+const plantContextSaveStart = engine.indexOf("async function savePlantBiologicalContext(");
+const plantContextCloseStart = engine.indexOf("async function closePlantBiologicalContext(");
+const plantContextEnd = engine.indexOf("\\nlet cultureDetailRequestId", plantContextLoadStart);
+assert.ok(plantContextLoadStart >= 0 &&
+  plantContextSaveStart > plantContextLoadStart &&
+  plantContextCloseStart > plantContextSaveStart &&
+  plantContextEnd > plantContextCloseStart,
+  "GreenTech biological context load, save and close handlers must exist");
+const plantContextHandlers = engine.slice(plantContextLoadStart, plantContextEnd);
+assert.match(plantContextHandlers, /\\.eq\\("organization_id", loadOrganizationId\\)/,
+  "GreenTech context reads must be tenant-scoped");
+assert.match(plantContextHandlers, /\\.eq\\("plant_culture_id", plantCultureId\\)/,
+  "GreenTech context reads and writes must use plant_culture_id");
+assert.match(plantContextHandlers, /domain: "greentech"/,
+  "GreenTech context writes must use the greentech domain");
+assert.match(plantContextHandlers, /organism_kind: "plant"/,
+  "GreenTech context writes must identify the organism as plant");
+assert.match(plantContextHandlers, /culture_id: null/,
+  "GreenTech context writes must not populate the fungal culture FK");
+assert.match(plantContextHandlers, /isCurrentWorkspaceRevision/,
+  "GreenTech context handlers must discard stale workspace operations");
+assert.match(engine.slice(engine.indexOf("function renderPlantCultureList("), engine.indexOf("async function loadPlantCultures(")),
+  /loadPlantBiologicalContextPanel\\(row\\.id\\)/,
+  "plant culture rows must open their biological context history");
+console.log("✓ GreenTech biological context: plant subject, tenant isolation and dated history");
