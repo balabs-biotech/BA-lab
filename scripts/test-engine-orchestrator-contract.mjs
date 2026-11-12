@@ -6,6 +6,12 @@ const checks = [
   ["caller identity is verified", /userClient\.auth\.getUser\(\)/],
   ["organization membership is checked", /organization_members/],
   ["viewer roles cannot invoke privileged execution", /!\["owner", "admin", "member"\]\.includes\(String\(membership\.role\)\)/],
+  ["source record type is explicitly validated", /recordType === "measurement" \|\| recordType === "environmental_observation"/],
+  ["environmental observations are read through caller RLS", /userClient[\s\S]*\.from\("environmental_observations"\)/],
+  ["environmental observations are bound to the requested location", /\.eq\("location_id", scope\.location_id\)/],
+  ["environmental QC accepts weather records only", /\.eq\("data_family", "weather"\)/],
+  ["one environmental provider and dataset are kept per execution", /environmental_source_mismatch/],
+  ["environmental observation provenance is included in the snapshot", /provider_code[\s\S]*dataset_code[\s\S]*spatial_resolution_m/],
   ["source rows are loaded through caller-scoped client", /userClient[\s\S]*\.from\(["']measurements["']\)/],
   ["snapshot is SHA-256 hashed", /crypto\.subtle\.digest\(["']SHA-256["']/],
   ["idempotency is organization-scoped", /idempotency_key/],
@@ -29,4 +35,6 @@ const sourceReadStart = source.indexOf("const { data: measurements");
 const sourceReadEnd = source.indexOf("const records = measurements.map", sourceReadStart);
 assert.ok(sourceReadStart >= 0 && sourceReadEnd > sourceReadStart, "measurement snapshot query boundary exists");
 assert.doesNotMatch(source.slice(sourceReadStart, sourceReadEnd), /\.update\(/, "raw source measurements are never updated");
+assert.match(source, /environmental_observations[\s\S]*?const records =/);
+assert.doesNotMatch(source.slice(source.indexOf(".from(\"environmental_observations\")"), source.indexOf("const records =")), /\.update\(/, "environmental source observations are never updated");
 console.log("Engine orchestration boundary contract passed");
