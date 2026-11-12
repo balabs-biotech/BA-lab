@@ -95,5 +95,13 @@
       "type": "object"
     }
   },
-  "additionalProperties": false
+  "additionalProperties": false,
+  "dependentRequired": {
+    "normalized_value": [
+      "normalized_unit_code"
+    ],
+    "normalized_unit_code": [
+      "normalized_value"
+    ]
+  }
 }
