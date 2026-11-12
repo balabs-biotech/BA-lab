@@ -27,7 +27,7 @@ The adapter resolves the exact engine ID/version from its allowlisted registry. 
 1. Resolve all input rows through the caller-scoped client; never accept arbitrary cross-tenant row payloads from the browser.
 2. Require every selected record to belong to the requested organization and requested scope.
 3. Canonicalize the immutable input snapshot deterministically, hash it with SHA-256, and persist both hash and exact request payload before dispatch.
-4. Use organization-scoped idempotency. Same key + same engine/version/scope/hash returns the prior execution; same key with any mismatch returns HTTP 409.
+4. Use organization-scoped idempotency. Same key + same engine/version/scope/input hash/parameters returns the prior execution; changing scope or parameters under the same key returns HTTP 409.
 5. Persist `running` before network dispatch. Use a bounded timeout and never retry non-idempotent worker calls without the same request ID.
 6. Validate the response schema and correlate request ID, execution ID, engine ID/version and input snapshot hash before accepting any result.
 7. Persist the complete validated result envelope; keep quality flags, limitations and provenance intact.
