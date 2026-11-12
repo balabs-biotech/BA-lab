@@ -6305,6 +6305,22 @@ function getComparableEngineExecutions() {
   );
 }
 
+function getEngineSnapshotComparison(leftResult, rightResult) {
+  if (leftResult?.input_snapshot_sha256 && rightResult?.input_snapshot_sha256) {
+    return leftResult.input_snapshot_sha256 === rightResult.input_snapshot_sha256 ? "same" : "different";
+  }
+  if (Array.isArray(leftResult?.input_record_ids) && Array.isArray(rightResult?.input_record_ids)) {
+    const leftIds = JSON.stringify([...leftResult.input_record_ids].sort());
+    const rightIds = JSON.stringify([...rightResult.input_record_ids].sort());
+    return leftIds === rightIds ? "same" : "different";
+  }
+  return "unknown";
+}
+
+function getEngineSeriesComparisonKey(series) {
+  return String(series.variable_code) + "::" + String(series.unit_code);
+}
+
 function areEngineExecutionsComparable(left, right) {
   if (!left || !right || left.id === right.id) return false;
   if (left.engine_id !== right.engine_id || left.engine_version !== right.engine_version) return false;
@@ -6365,18 +6381,12 @@ function renderEngineExecutionComparison(panel, eligible) {
     const title = document.createElement("p");
     title.textContent = "Comparaison descriptive — aucune relation causale n’est déduite.";
     output.appendChild(title);
-    let snapshotComparison = null;
-    if (a.input_snapshot_sha256 && b.input_snapshot_sha256) {
-      snapshotComparison = a.input_snapshot_sha256 === b.input_snapshot_sha256;
-    } else if (Array.isArray(a.input_record_ids) && Array.isArray(b.input_record_ids)) {
-      snapshotComparison = JSON.stringify([...a.input_record_ids].sort()) ===
-        JSON.stringify([...b.input_record_ids].sort());
-    }
+    const snapshotComparison = getEngineSnapshotComparison(a, b);
     const snapshotNote = document.createElement("p");
     snapshotNote.className = "muted";
-    snapshotNote.textContent = snapshotComparison === false
+    snapshotNote.textContent = snapshotComparison === "different"
       ? "Les instantanés d’entrée diffèrent : les deux analyses ne portent pas exactement sur les mêmes données."
-      : snapshotComparison === true
+      : snapshotComparison === "same"
         ? "Les empreintes ou identifiants d’entrée disponibles sont identiques."
         : "Comparaison exacte des instantanés indéterminée : empreinte et identifiants complets indisponibles.";
     output.appendChild(snapshotNote);
@@ -6398,7 +6408,7 @@ function renderEngineExecutionComparison(panel, eligible) {
 
     const seriesMap = (result) => new Map(
       (Array.isArray(result.value?.series) ? result.value.series : [])
-        .map((series) => [String(series.variable_code) + "::" + String(series.unit_code), series])
+        .map((series) => [getEngineSeriesComparisonKey(series), series])
     );
     const seriesA = seriesMap(a);
     const seriesB = seriesMap(b);
