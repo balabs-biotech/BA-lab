@@ -105,3 +105,10 @@ CI builds the image and executes `scripts/test-engine-worker-container.py` again
 
 
 The installed Python package accepts `BA_ENGINE_SCHEMA_DIR` and `BA_ENGINE_REGISTRY_DIR` so schemas and manifests can live outside the Python site-packages directory. The container sets both paths explicitly to the copied, versioned repository assets.
+
+
+## CultureOps execution history surface
+
+The overview now reads the latest eight rows from `public.engine_executions` using the authenticated Supabase client and an explicit active-organization filter. RLS remains the authorization boundary. The panel presents lifecycle state, engine/version, timestamp, measurement/series counts, excluded-record count and quality flags; failed runs expose only the safe error code. It does not render arbitrary worker payloads or raw error messages.
+
+The history loader is bound to the active workspace revision and organization. Tenant transitions clear the in-memory execution list and visible panel before a new organization can load. The UI contract is checked by `scripts/test-engine-execution-history-ui.mjs` in the batch-tracker CI audit.
