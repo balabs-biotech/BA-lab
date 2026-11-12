@@ -6502,6 +6502,36 @@ function renderEngineExecutionComparison(panel, eligible) {
   panel.appendChild(section);
 }
 
+function renderBiologicalContextAssessment(article, result) {
+  const value = result?.value;
+  if (!value || value.result_type !== "biological.context_assessment") return;
+  const addLine = (parent, text) => { const node = document.createElement("p"); node.className = "muted"; node.textContent = String(text); parent.appendChild(node); };
+  const addList = (parent, title, items, format, limit = 8) => {
+    if (!Array.isArray(items) || !items.length) return;
+    const details = document.createElement("details");
+    const summary = document.createElement("summary"); summary.textContent = title + " (" + items.length + ")"; details.appendChild(summary);
+    const list = document.createElement("ul");
+    for (const item of items.slice(0, limit)) { const entry = document.createElement("li"); entry.textContent = String(format(item)); list.appendChild(entry); }
+    details.appendChild(list);
+    if (items.length > limit) addLine(details, (items.length - limit) + " éléments supplémentaires non affichés.");
+    parent.appendChild(details);
+  };
+  const title = document.createElement("p"); title.textContent = "Évaluation du contexte biologique"; article.appendChild(title);
+  const subject = value.subject || {};
+  addLine(article, "Sujet : " + String(subject.subject_type || "biologique") + " · " + String(subject.subject_id || "identifiant indisponible"));
+  const coverage = value.coverage || {}; const counts = coverage.record_counts_by_type || {};
+  addLine(article, "Couverture : " + String(coverage.source_record_count ?? 0) + " retenus · " + String(coverage.excluded_record_count ?? 0) + " exclus · mesures : " + String(counts.measurement ?? 0) + " · météo : " + String(counts.environmental_observation ?? 0));
+  const requested = coverage.requested_window;
+  if (requested?.start && requested?.end) addLine(article, "Fenêtre demandée : " + requested.start + " → " + requested.end + " · " + String(requested.timezone || "fuseau non précisé"));
+  const observed = coverage.observed_window;
+  if (observed?.start && observed?.end) addLine(article, "Fenêtre observée : " + observed.start + " → " + observed.end);
+  addList(article, "Contexte manquant ou non résolu", coverage.missing_context, item => item, 12);
+  addList(article, "Faits observés et sources", value.observed_facts, item => String(item.statement || item.fact_code || "Fait") + (item.observed_at ? " · " + item.observed_at : "") + (Array.isArray(item.source_record_ids) ? " · sources : " + item.source_record_ids.join(", ") : ""), 8);
+  addList(article, "Caractéristiques calculées", value.derived_features, item => String(item.feature_code || "Caractéristique") + " : " + String(item.value ?? "—") + (item.unit_code ? " " + item.unit_code : "") + (item.method ? " · méthode : " + item.method : "") + (Array.isArray(item.source_record_ids) ? " · " + item.source_record_ids.length + " sources" : ""), 10);
+  addList(article, "Constats", value.findings, item => typeof item === "string" ? item : (item.statement || item.description || JSON.stringify(item)), 8);
+  addList(article, "Hypothèses à vérifier", value.hypotheses, item => typeof item === "string" ? item : (item.statement || item.description || JSON.stringify(item)), 8);
+  addList(article, "Lacunes temporelles", coverage.temporal_gaps, item => String(item.from || "début inconnu") + " → " + String(item.to || "fin inconnue") + " · " + String(item.duration_seconds ?? "durée inconnue") + " secondes", 8);
+}
 function renderRecentEngineExecutions() {
   const panel = document.getElementById("overviewRecentEngineExecutions");
   if (!panel) return;
@@ -6541,7 +6571,9 @@ function renderRecentEngineExecutions() {
     const storedResult = recentEngineResultsByExecution.get(execution.id);
     const result = getStoredEngineResult(execution);
     const summary = result?.value?.summary;
-    if (execution.status === "completed" && summary) {
+    if (execution.status === "completed" && result?.value?.result_type === "biological.context_assessment") {
+      renderBiologicalContextAssessment(article, result);
+    } else if (execution.status === "completed" && summary) {
       const details = document.createElement("p");
       details.textContent = String(summary.record_count ?? summary.measurement_count ?? 0) +
         " enregistrements · " + String(summary.series_count ?? 0) +
