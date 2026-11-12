@@ -22,6 +22,7 @@ assert.deepEqual(schema.properties.subject.required, [
 ]);
 assert.deepEqual(schema.properties.subject.properties.subject_type.enum, ["culture", "batch"]);
 assert.equal(schema.properties.coverage.properties.requested_window.$ref, "#/$defs/timeWindow");
+assert.equal(schema.properties.coverage.properties.excluded_record_count.type, "integer");
 assert.equal(schema.$defs.observedFact.properties.source_record_ids.$ref, "#/$defs/sourceReferences");
 assert.equal(schema.$defs.derivedFeature.properties.source_record_ids.$ref, "#/$defs/sourceReferences");
 assert.deepEqual(schema.$defs.finding.properties.evidence_state.enum, [
