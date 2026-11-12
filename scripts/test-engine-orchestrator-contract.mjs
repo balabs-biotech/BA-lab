@@ -10,6 +10,8 @@ const checks = [
   ["snapshot is SHA-256 hashed", /crypto\.subtle\.digest\(["']SHA-256["']/],
   ["idempotency is organization-scoped", /idempotency_key/],
   ["idempotency collisions with changed inputs are rejected", /idempotency_key_reused_with_different_input/],
+  ["idempotency binds scope and parameters", /stable\(prior\.scope\)[\s\S]*stable\(prior\.request_payload\?\.parameters/],
+  ["idempotency race resolution uses the same invocation comparison", /if \(raced && sameExecutionInput\(raced, engineRequest\)\)/],
   ["engine versions are explicitly allowlisted", /ENGINE_ALLOWLIST/],
   ["worker response is schema validated", /validateResponse/],
   ["request and snapshot correlation is enforced", /input_snapshot_sha256/],
