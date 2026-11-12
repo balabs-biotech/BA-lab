@@ -110,6 +110,7 @@
 
 
   const supplementalCoverage = [
+    ["Contexte biologique / historique", "Biological context / history", "Contexto biológico / histórico", "السياق البيولوجي / السجل"],
     ["Préparation","Preparation","Preparação","التحضير"],
     ["Stérilisation","Sterilization","Esterilização","التعقيم"],
     ["Récolte","Harvest","Colheita","الحصاد"],
