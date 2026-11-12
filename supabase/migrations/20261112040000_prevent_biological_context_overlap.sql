@@ -1,6 +1,7 @@
 -- Enforce one non-overlapping, half-open biological context interval per subject.
 -- btree_gist supplies GiST equality operator classes for UUID and text keys.
 create extension if not exists btree_gist with schema extensions;
+set search_path = public, extensions;
 
 do $preflight$
 begin
