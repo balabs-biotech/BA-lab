@@ -2710,7 +2710,7 @@ html,body{background:#111B1D!important}
   </svg>
 </section>
 
-<section class="under value-principles" aria-label="Les engagements de BA Labs">
+<section class="under" id="value-principles" aria-label="Les engagements de BA Labs">
   <div class="value-heading">
     <span class="eyebrow">BA LABS / NOTRE APPROCHE</span>
     <h2>
@@ -4718,7 +4718,7 @@ body{background:radial-gradient(ellipse at 18% 0%,#263B38 0%,transparent 38%),li
 }
 
 /* Closing value proposition: replace internal site slogans with visitor-facing benefits. */
-#app > main > .value-principles{display:grid!important;grid-template-columns:minmax(210px,.72fr) minmax(0,1.8fr)!important;gap:clamp(24px,4vw,64px)!important;align-items:start!important;margin:0!important;padding:clamp(44px,6vw,76px) clamp(20px,5vw,72px)!important;border-block:1px solid var(--balabs-line,#40534D)!important;background:#172522!important;color:#D1D0C5!important}
+#app > main > #value-principles{display:grid!important;grid-template-columns:minmax(210px,.72fr) minmax(0,1.8fr)!important;gap:clamp(24px,4vw,64px)!important;align-items:start!important;margin:0!important;padding:clamp(44px,6vw,76px) clamp(20px,5vw,72px)!important;border-block:1px solid var(--balabs-line,#40534D)!important;background:#172522!important;color:#D1D0C5!important}
 .value-heading .eyebrow{font:600 9px/1.5 ui-monospace,monospace!important;letter-spacing:.15em!important;color:#D99A7F!important}
 .value-heading h2{margin:13px 0 0!important;color:#F2F1E9!important;font-size:clamp(23px,2.8vw,34px)!important;line-height:1.12!important;letter-spacing:-.04em!important}
 .value-grid{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:0!important}
@@ -4727,13 +4727,13 @@ body{background:radial-gradient(ellipse at 18% 0%,#263B38 0%,transparent 38%),li
 .value-no{display:block!important;margin:0 0 19px!important;color:#D99A7F!important;font:600 9px/1.4 ui-monospace,monospace!important;letter-spacing:.12em!important}
 .value-item h3{margin:0 0 10px!important;color:#F2F1E9!important;font-size:clamp(15px,1.3vw,18px)!important;line-height:1.25!important}
 .value-item p{margin:0!important;color:#AEBDB4!important;font-size:12px!important;line-height:1.75!important}
-.value-principles [data-value-lang]{display:none!important}
-html[lang="fr"] .value-principles [data-value-lang="fr"],html[lang="en"] .value-principles [data-value-lang="en"],html[lang="ar"] .value-principles [data-value-lang="ar"],html[lang="pt"] .value-principles [data-value-lang="pt"]{display:inline!important}
-html[lang="ar"] #app > main > .value-principles{direction:rtl!important;text-align:right!important}
+#value-principles [data-value-lang]{display:none!important}
+html[lang="fr"] #value-principles [data-value-lang="fr"],html[lang="en"] #value-principles [data-value-lang="en"],html[lang="ar"] #value-principles [data-value-lang="ar"],html[lang="pt"] #value-principles [data-value-lang="pt"]{display:inline!important}
+html[lang="ar"] #app > main > #value-principles{direction:rtl!important;text-align:right!important}
 html[lang="ar"] .value-item{border-left:0!important;border-right:1px solid #40534D!important}
 html[lang="ar"] .value-item:first-child{padding-right:0!important;border-right:0!important}
-@media(max-width:900px){#app > main > .value-principles{grid-template-columns:1fr!important;gap:22px!important}}
-@media(max-width:640px){#app > main > .value-principles{padding:40px 18px!important}.value-grid{grid-template-columns:1fr!important}.value-item,.value-item:first-child{padding:17px 0!important;border-left:0!important;border-right:0!important;border-top:1px solid #40534D!important}html[lang="ar"] .value-item,html[lang="ar"] .value-item:first-child{border-right:0!important}.value-no{margin-bottom:9px!important}.value-item h3{font-size:17px!important}.value-item p{font-size:12px!important;max-width:58ch!important}}
+@media(max-width:900px){#app > main > #value-principles{grid-template-columns:1fr!important;gap:22px!important}}
+@media(max-width:640px){#app > main > #value-principles{padding:40px 18px!important}.value-grid{grid-template-columns:1fr!important}.value-item,.value-item:first-child{padding:17px 0!important;border-left:0!important;border-right:0!important;border-top:1px solid #40534D!important}html[lang="ar"] .value-item,html[lang="ar"] .value-item:first-child{border-right:0!important}.value-no{margin-bottom:9px!important}.value-item h3{font-size:17px!important}.value-item p{font-size:12px!important;max-width:58ch!important}}
 </style>
 
 <style id="notion-node-navigation-fix">.linknode{display:block;text-decoration:none;cursor:pointer}.linknode[hidden]{display:none!important}.linknode:focus-visible{outline:3px solid #B96B4D;outline-offset:4px}.linknode small{pointer-events:none}#spherePage{text-decoration:none}
