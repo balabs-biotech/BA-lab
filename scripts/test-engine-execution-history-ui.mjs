@@ -37,7 +37,7 @@ assert.match(renderer, /measurement_count/);
 assert.match(renderer, /variable_code/);
 assert.match(renderer, /max_gap_minutes/);
 assert.match(renderer, /error_code/);
-const comparisonStart = tracker.indexOf("function getStoredEngineResult()");
+const comparisonStart = tracker.indexOf("function getStoredEngineResult(execution)");
 const comparison = tracker.slice(comparisonStart, rendererStart);
 assert.ok(comparisonStart >= 0);
 assert.match(comparison, /renderEngineExecutionComparison/);
