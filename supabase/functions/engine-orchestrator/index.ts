@@ -193,6 +193,7 @@ Deno.serve(async (req: Request) => {
         "caller_scoped_supabase_client_required", "biological_subject_scope_required",
         "culture_not_found_or_inaccessible", "culture_tenant_scope_mismatch",
         "plant_culture_not_found_or_inaccessible", "plant_culture_tenant_scope_mismatch",
+        "plant_biological_context_scope_mismatch", "plant_culture_measurement_scope_mismatch",
         "biological_contexts_unavailable", "biological_analysis_context_limit_exceeded",
         "culture_measurements_unavailable", "plant_culture_measurements_unavailable",
         "biological_analysis_measurement_limit_exceeded", "biological_environments_unavailable",
