@@ -8,6 +8,7 @@ from __future__ import annotations
 from datetime import datetime, timezone
 from math import isfinite
 from typing import Any
+from urllib.parse import urlsplit
 from uuid import UUID
 
 from ba_environmental_engine.sources.sentinel2_raster import Sentinel2NdviStatistics
@@ -70,8 +71,25 @@ def build_sentinel2_observation_rows(
     ):
         raise ValueError("statistics pixel counts are inconsistent")
     expected_ratio = statistics.valid_pixel_count / statistics.total_pixel_count
-    if not isfinite(statistics.valid_pixel_ratio) or abs(statistics.valid_pixel_ratio - expected_ratio) > 1e-9:
+    if (
+        isinstance(statistics.valid_pixel_ratio, bool)
+        or not isinstance(statistics.valid_pixel_ratio, (int, float))
+        or not isfinite(statistics.valid_pixel_ratio)
+        or abs(statistics.valid_pixel_ratio - expected_ratio) > 1e-9
+    ):
         raise ValueError("statistics valid_pixel_ratio is inconsistent with pixel counts")
+    for field in ("mean_ndvi", "median_ndvi", "min_ndvi", "max_ndvi"):
+        value = getattr(statistics, field)
+        if value is None or isinstance(value, bool) or not isinstance(value, (int, float)):
+            raise ValueError(f"statistics {field} must be a finite NDVI value")
+        if not isfinite(value) or not -1 <= value <= 1:
+            raise ValueError(f"statistics {field} must be a finite NDVI value in [-1, 1]")
+    if statistics.min_ndvi > statistics.max_ndvi:
+        raise ValueError("statistics NDVI minimum cannot exceed maximum")
+    if not statistics.min_ndvi <= statistics.mean_ndvi <= statistics.max_ndvi:
+        raise ValueError("statistics mean_ndvi must fall within min/max")
+    if not statistics.min_ndvi <= statistics.median_ndvi <= statistics.max_ndvi:
+        raise ValueError("statistics median_ndvi must fall within min/max")
 
     org_id = _uuid(organization_id, "organization_id")
     loc_id = _uuid(location_id, "location_id")
@@ -84,8 +102,13 @@ def build_sentinel2_observation_rows(
         raise ValueError("scene_id is required")
     if not isinstance(processing_version, str) or not processing_version.strip():
         raise ValueError("processing_version is required")
-    if not isinstance(source_url, str) or not source_url.startswith("https://"):
-        raise ValueError("source_url must be HTTPS")
+    parsed_source_url = urlsplit(source_url) if isinstance(source_url, str) else None
+    if (
+        parsed_source_url is None
+        or parsed_source_url.scheme != "https"
+        or (parsed_source_url.hostname or "").lower() != "earth-search.aws.element84.com"
+    ):
+        raise ValueError("source_url must be an HTTPS URL on the trusted Earth Search host")
     cloud_cover = _finite_number(cloud_cover_pct, "cloud_cover_pct")
     if not 0 <= cloud_cover <= 100:
         raise ValueError("cloud_cover_pct must be between 0 and 100")
