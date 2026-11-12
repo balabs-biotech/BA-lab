@@ -8,6 +8,9 @@ Python engines are isolated analytical workers. They receive a versioned request
 
 - `schemas/engine/v1/request.schema.json`: immutable input envelope.
 - `schemas/engine/v1/response.schema.json`: completed or failed execution envelope.
+- `schemas/engine/v1/manifest.schema.json`: declarative engine registry and sandbox/resource policy.
+- `engines/python/registry/`: versioned engine registrations; the first QC engine has no database, network, external-data or filesystem-write capability.
+- `engines/python/ba_engine_contract/`: request/result validators and the first deterministic QC implementation.
 - `engines/python/tests/test_engine_contract.py`: executable contract and negative-case tests.
 
 Both schemas use JSON Schema Draft 2020-12. A contract version change that breaks compatibility requires a new versioned schema path; do not silently widen v1.
@@ -54,8 +57,10 @@ Every response echoes `request_id`, engine identity and `input_snapshot_sha256`,
 1. Land and test these v1 schemas.
 2. Add a Python contract package that loads schemas and validates envelopes.
 3. Implement a minimal worker runner with timeout, structured logs and typed errors.
-4. Implement one deterministic engine (environmental time-series quality checks) using fixtures, without external network calls.
-5. Add provider adapters and biological interpretation only after the deterministic worker lifecycle is verified.
+4. Register one deterministic engine (environmental time-series quality checks) with explicit sandbox capabilities and bounded resource limits.
+5. Implement the worker runner with timeout, structured logs and typed errors.
+6. Add provider adapters and biological interpretation only after the deterministic worker lifecycle is verified.
+
 
 
 ## First reference engine: environmental time-series QC
