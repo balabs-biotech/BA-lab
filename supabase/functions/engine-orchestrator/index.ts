@@ -5,7 +5,10 @@ import Ajv2020 from "npm:ajv@8.17.1/dist/2020.js";
 import addFormats from "npm:ajv-formats@3.0.1";
 import requestSchema from "../../../schemas/engine/v1/request.schema.json" with { type: "json" };
 import responseSchema from "../../../schemas/engine/v1/response.schema.json" with { type: "json" };
-import { loadAuthenticatedBiologicalContextSnapshot } from "../_shared/biological-context-loader.ts";
+import {
+  loadAuthenticatedBiologicalContextSnapshot,
+  loadAuthenticatedPlantBiologicalContextSnapshot,
+} from "../_shared/biological-context-loader.ts";
 
 const headers = {
   "Access-Control-Allow-Origin": "*",
@@ -102,8 +105,12 @@ Deno.serve(async (req: Request) => {
       recordIds.every((id) => typeof id === "string") && new Set(recordIds).size === recordIds.length);
   const validSourceType = isBiologicalContextEngine ||
     recordType === "measurement" || recordType === "environmental_observation";
+  const validBiologicalSubject = isBiologicalContextEngine &&
+    ((typeof scope?.culture_id === "string") !== (typeof scope?.plant_culture_id === "string"));
+  const validBiologicalVersion = !isBiologicalContextEngine ||
+    (scope?.plant_culture_id ? engineVersion === "0.2.0" : ["0.1.0", "0.2.0"].includes(engineVersion));
   const validBiologicalRequest = !isBiologicalContextEngine ||
-    (typeof scope?.culture_id === "string" &&
+    (validBiologicalSubject && validBiologicalVersion &&
       typeof parameters.window_start === "string" &&
       typeof parameters.window_end === "string" &&
       typeof parameters.timezone === "string");
@@ -116,7 +123,7 @@ Deno.serve(async (req: Request) => {
   }
   const allowedVersions = ENGINE_ALLOWLIST.get(engineId) ??
     (isBiologicalContextEngine && Deno.env.get("BA_BIE_ENABLED") === "true"
-      ? new Set(["0.1.0"])
+      ? new Set(["0.1.0", "0.2.0"])
       : undefined);
   if (!allowedVersions?.has(engineVersion)) {
     return reply(422, { error: "engine_version_not_registered" });
@@ -168,10 +175,15 @@ Deno.serve(async (req: Request) => {
   if (isBiologicalContextEngine) {
     let snapshot;
     try {
-      snapshot = await loadAuthenticatedBiologicalContextSnapshot({
+      const loadSnapshot = scope.plant_culture_id
+        ? loadAuthenticatedPlantBiologicalContextSnapshot
+        : loadAuthenticatedBiologicalContextSnapshot;
+      snapshot = await loadSnapshot({
         userClient,
         organizationId,
-        cultureId: scope.culture_id,
+        ...(scope.plant_culture_id
+          ? { plantCultureId: scope.plant_culture_id }
+          : { cultureId: scope.culture_id }),
         window: {
           start: parameters.window_start,
           end: parameters.window_end,
@@ -183,7 +195,9 @@ Deno.serve(async (req: Request) => {
       const allowedCodes = new Set([
         "caller_scoped_supabase_client_required", "biological_subject_scope_required",
         "culture_not_found_or_inaccessible", "culture_tenant_scope_mismatch",
-        "biological_contexts_unavailable", "biological_analysis_context_limit_exceeded", "culture_measurements_unavailable",
+        "plant_culture_not_found_or_inaccessible", "plant_culture_tenant_scope_mismatch",
+        "biological_contexts_unavailable", "biological_analysis_context_limit_exceeded",
+        "culture_measurements_unavailable", "plant_culture_measurements_unavailable",
         "biological_analysis_measurement_limit_exceeded", "biological_environments_unavailable",
         "biological_locations_unavailable", "environmental_observations_unavailable",
         "biological_strain_references_unavailable", "biological_organisms_unavailable",
