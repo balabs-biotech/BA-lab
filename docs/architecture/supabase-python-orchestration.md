@@ -20,7 +20,7 @@ The Deno Edge Function must not attempt to import or spawn the Python CLI. A sep
 - Body: exact `BA-LABS/ENGINE` v1 request envelope from `schemas/engine/v1/request.schema.json`
 - Response: exact `BA-LABS/ENGINE-RESULT` v1 envelope from `schemas/engine/v1/response.schema.json`
 
-The adapter resolves the exact engine ID/version from its allowlisted registry. The container image is built from `engines/python/Dockerfile`, runs as UID 10001, and is intended to run read-only with dropped Linux capabilities, no-new-privileges, 256 MB memory, 1 CPU and a 64-process limit. Network ingress/egress policy and hard per-request CPU deadlines remain deployment-platform responsibilities. The Python runner's manifest declarations alone are not a sandbox.
+The adapter resolves the exact engine ID/version from its allowlisted registry. The container image is built from `engines/python/Dockerfile`, runs as UID 10001, and is intended to run read-only with dropped Linux capabilities, no-new-privileges, 256 MB memory, 1 CPU and a 64-process limit. The adapter executes each request in a child process and applies the registered manifest's wall-clock timeout (15 seconds for the current QC engine), terminating the child on expiry. Container CPU/memory quotas are enforced by the runtime; network ingress/egress policy remains a deployment-platform responsibility. The Python runner's manifest declarations alone are not a sandbox.
 
 ## Required orchestration invariants
 
