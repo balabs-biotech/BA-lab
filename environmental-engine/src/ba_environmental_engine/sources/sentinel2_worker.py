@@ -13,7 +13,7 @@ import time
 from dataclasses import dataclass
 from typing import Any, Callable, Sequence
 from urllib.error import HTTPError, URLError
-from urllib.request import Request, urlopen
+from urllib.request import HTTPRedirectHandler, Request, build_opener
 from uuid import UUID
 from urllib.parse import urlsplit
 
@@ -54,6 +54,11 @@ def _validate_ingest_url(value: str) -> str:
     return value
 
 
+class _RejectRedirect(HTTPRedirectHandler):
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        return None
+
+
 def _post_json(
     url: str,
     *,
@@ -63,7 +68,7 @@ def _post_json(
 ) -> dict[str, Any]:
     request = Request(url, data=data, headers=headers, method="POST")
     try:
-        with urlopen(request, timeout=timeout) as response:
+        with build_opener(_RejectRedirect()).open(request, timeout=timeout) as response:
             payload = response.read(64 * 1024)
             if response.status < 200 or response.status >= 300:
                 raise Sentinel2PersistenceError("remote persistence request failed")
