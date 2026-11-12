@@ -78,12 +78,12 @@ for (const path of [
 ]) {
   const page = readFileSync(path, "utf8");
   if (path.includes("green-tech")) {
-    assert.match(page, /workspace\.html\?v=20261112-greentech-engine-qc-1/);
-    assert.match(page, /tracker\.js\?v=20261112-bie-results-2/);
+    assert.match(page, /workspace\.html\?v=20261112-greentech-bie-assessment-5/);
+    assert.match(page, /tracker\.js\?v=20261112-greentech-bie-assessment-5/);
     assert.match(page, /environmental-data\.js\?v=20261112-greentech-engine-qc-1/);
   } else {
-    assert.match(page, /workspace\.html\?v=20261112-engine-history-compare-3/);
-    assert.match(page, /tracker\.js\?v=20261112-bie-results-2/);
+    assert.match(page, /workspace\.html\?v=20261112-greentech-bie-assessment-5/);
+    assert.match(page, /tracker\.js\?v=20261112-greentech-bie-assessment-5/);
   }
 }
 
