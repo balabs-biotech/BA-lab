@@ -16,6 +16,7 @@ const checks = [
   ["validates cloud-cover filtering", /max_cloud_cover_pct_must_be_between_0_and_100/],
   ["uses only a configured private worker endpoint", /BA_ENVIRONMENTAL_ENGINE_URL[\s\S]*?BA_ENVIRONMENTAL_ENGINE_API_KEY/],
   ["forwards the caller JWT and private engine key to the worker", /"X-BA-Engine-Key": engineApiKey,[\s\S]*?Authorization: authorization/],
+  ["forwards the Supabase publishable key required by the Functions gateway", /apikey: publishableKey/],
   ["does not use a service-role key in the gateway", !/SUPABASE_SERVICE_ROLE_KEY|SUPABASE_SECRET_KEY/.test(source)],
   ["does not expose upstream worker response bodies on errors", /sentinel2_processing_worker_failed/],
 ];
