@@ -168,7 +168,8 @@ class SupabaseOutcomeComparisonRepository:
                 self._client.table("biological_signals")
                 .select(
                     "signal_id,biological_subject_id,environment_id,domain,"
-                    "environment_profile_code,environment_profile_version"
+                    "environment_profile_code,environment_profile_version,"
+                    "domain_profile_code,domain_profile_version"
                 )
                 .eq("organization_id", organization)
                 .in_("signal_id", signal_ids)
@@ -223,6 +224,7 @@ class SupabaseOutcomeComparisonRepository:
             required_signal_fields = (
                 "biological_subject_id", "environment_id", "domain",
                 "environment_profile_code", "environment_profile_version",
+                "domain_profile_code", "domain_profile_version",
             )
             if any(not signal.get(field) for field in required_signal_fields):
                 raise OutcomeComparisonRepositoryError(
@@ -231,6 +233,19 @@ class SupabaseOutcomeComparisonRepository:
             if not link.get("measurement_observed_at") or not link.get("variable_code"):
                 raise OutcomeComparisonRepositoryError(
                     "outcome evidence snapshot lacks measurement date or variable"
+                )
+            if not link.get("outcome_event_id") or not link.get("measurement_id"):
+                raise OutcomeComparisonRepositoryError(
+                    "outcome evidence snapshot lacks immutable source identifiers"
+                )
+            if recommendation.get("module") != signal.get("domain"):
+                raise OutcomeComparisonRepositoryError(
+                    "recommendation module does not match its source signal domain"
+                )
+            if (recommendation.get("profile_id") != signal.get("domain_profile_code")
+                    or recommendation.get("profile_version") != signal.get("domain_profile_version")):
+                raise OutcomeComparisonRepositoryError(
+                    "recommendation profile does not match its source signal profile"
                 )
             quality_state = str(link.get("measurement_quality_state") or "raw")
             if quality_state not in {"raw", "controlled", "validated", "excluded"}:
