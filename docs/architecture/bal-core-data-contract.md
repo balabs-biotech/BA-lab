@@ -82,3 +82,10 @@ A failed satellite provider, weather source, Python package, model or specialize
 ## Current implementation boundary
 
 BAL-JSON v1 schemas, the authenticated Edge Function and the atomic PostgreSQL receipt/RPC exist in the repository. The browser import adapter is being connected to Mycology and Laboratory. This does not yet establish that production Supabase has the function deployed or that all external records have been tested end-to-end.
+
+
+## External environmental observations
+
+Records in `public.environmental_observations` are provider-derived environmental estimates, not manual measurements or IoT sensor readings. Their original provider, dataset, variable, value, unit, observation timestamp, retrieval timestamp, spatial resolution, quality flag, source URL and metadata remain part of the immutable analytical input snapshot. Do not silently convert or relabel a provider value as a normalized physical measurement.
+
+The first engine path accepts only weather observations from one location and one provider/dataset pair per execution. It performs temporal quality screening using the stored variable/unit/time fields and preserves source identity in result provenance. NASA POWER values remain explicitly identified as gridded estimates; their nominal grid resolution does not support parcel-level claims. Satellite raster processing and NDVI aggregation remain a separate future contract, not an extension of this weather QC input by implication.
