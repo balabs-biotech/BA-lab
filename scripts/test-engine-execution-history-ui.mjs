@@ -72,7 +72,7 @@ for (const path of [
   if (path.includes("green-tech")) {
     assert.match(page, /workspace\.html\?v=20261112-bio-context-editor-1/);
     assert.match(page, /tracker\.js\?v=20261112-bio-context-editor-1/);
-    assert.match(page, /environmental-data\.js\?v=20261112-bio-context-editor-1/);
+    assert.match(page, /environmental-data\.js\?v=20261112-greentech-engine-qc-1/);
   } else {
     assert.match(page, /workspace\.html\?v=20261112-bio-context-editor-1/);
     assert.match(page, /tracker\.js\?v=20261112-bio-context-editor-1/);
