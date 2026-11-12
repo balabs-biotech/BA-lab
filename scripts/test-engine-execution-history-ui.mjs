@@ -37,6 +37,19 @@ assert.match(renderer, /measurement_count/);
 assert.match(renderer, /variable_code/);
 assert.match(renderer, /max_gap_minutes/);
 assert.match(renderer, /error_code/);
+assert.match(renderer, /renderEngineExecutionComparison/);
+assert.match(renderer, /getComparableEngineExecutions/);
+assert.match(renderer, /areEngineExecutionsComparable/);
+assert.match(renderer, /engine-comparison-select/);
+assert.match(renderer, /input_snapshot_sha256/);
+assert.match(renderer, /Les instantanés d’entrée diffèrent/);
+assert.match(renderer, /quality_flags/);
+assert.match(renderer, /variable_code/);
+assert.match(renderer, /unit_code/);
+assert.match(renderer, /périmètre incompatibles/);
+assert.match(renderer, /aucune relation causale/);
+assert.match(loader, /scope\)/);
+
 assert.doesNotMatch(renderer, /innerHTML|insertAdjacentHTML/);
 
 assert.match(tracker, /recentEngineExecutions = \[\]/);
