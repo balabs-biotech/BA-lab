@@ -247,6 +247,10 @@ Deno.serve(async (req: Request) => {
     console.error("[engine-orchestrator] internally generated request failed schema validation");
     return reply(500, { error: "engine_request_contract_invalid" });
   }
+  const workerRequestBody = JSON.stringify(engineRequest);
+  if (new TextEncoder().encode(workerRequestBody).byteLength > 240_000) {
+    return reply(413, { error: "engine_request_too_large", hint: "Reduce the selected date range or record count." });
+  }
 
   const { data: prior, error: priorError } = await serviceClient
     .from("engine_executions")
@@ -314,7 +318,7 @@ Deno.serve(async (req: Request) => {
     workerResponse = await fetch(new URL("/v1/execute", workerUrl), {
       method: "POST",
       headers: { "Authorization": `Bearer ${workerToken}`, "Content-Type": "application/json" },
-      body: JSON.stringify(engineRequest),
+      body: workerRequestBody,
       signal: controller.signal,
     });
     workerBody = await workerResponse.text();
