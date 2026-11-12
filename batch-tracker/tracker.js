@@ -6256,7 +6256,7 @@ async function loadRecentEngineExecutions() {
   if (!loadOrganizationId || !panel) return;
 
   const query = await supabaseClient.from("engine_executions")
-    .select("id,engine_id,engine_version,status,result_payload,error_code,created_at,completed_at,input_record_ids,input_snapshot_sha256,scope_type,scope_id")
+    .select("id,engine_id,engine_version,status,result_payload,error_code,created_at,completed_at,input_record_ids,input_snapshot_sha256,scope")
     .eq("organization_id", loadOrganizationId)
     .order("created_at", { ascending: false })
     .limit(8);
@@ -6308,8 +6308,7 @@ function getComparableEngineExecutions() {
 function areEngineExecutionsComparable(left, right) {
   if (!left || !right || left.id === right.id) return false;
   if (left.engine_id !== right.engine_id || left.engine_version !== right.engine_version) return false;
-  if ((left.scope_type || null) !== (right.scope_type || null)) return false;
-  if ((left.scope_id || null) !== (right.scope_id || null)) return false;
+  if (JSON.stringify(left.scope || {}) !== JSON.stringify(right.scope || {})) return false;
   const leftResult = getStoredEngineResult(left);
   const rightResult = getStoredEngineResult(right);
   return Boolean(leftResult?.value && rightResult?.value);
