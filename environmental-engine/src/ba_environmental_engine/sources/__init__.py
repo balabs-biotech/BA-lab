@@ -22,7 +22,12 @@ from ba_environmental_engine.sources.sentinel2_search import (
     Sentinel2SearchResult,
     search_sentinel2_scenes,
 )
-from ba_environmental_engine.sources.sentinel2_batch import (\n    Sentinel2BatchProcessingResult,\n    Sentinel2SceneFailure,\n    process_sentinel2_stac_items,\n)\nfrom ba_environmental_engine.sources.sentinel2_pipeline import (
+from ba_environmental_engine.sources.sentinel2_batch import (
+    Sentinel2BatchProcessingResult,
+    Sentinel2SceneFailure,
+    process_sentinel2_stac_items,
+)
+from ba_environmental_engine.sources.sentinel2_pipeline import (
     Sentinel2SceneProcessingResult,
     process_sentinel2_stac_item,
 )
@@ -38,6 +43,11 @@ from ba_environmental_engine.sources.supabase_satellite import (
     SupabaseSatelliteObservationRepository,
 )
 from ba_environmental_engine.sources.supabase_sensor import SupabaseSensorMeasurementRepository
+from ba_environmental_engine.sources.sentinel2_worker import (
+    Sentinel2PersistenceError,
+    Sentinel2WorkerResult,
+    process_and_persist_sentinel2_batch,
+)
 
 __all__ = [
     "DuplicateSourceKey",
@@ -45,13 +55,17 @@ __all__ = [
     "SensorMeasurementEnvelope",
     "SensorTemporalAssessment",
     "SupabaseSatelliteObservationRepository",
-    "Sentinel2BatchProcessingResult",\n    "Sentinel2SceneFailure",\n    "Sentinel2NdviStatistics",
+    "SupabaseSensorMeasurementRepository",
+    "Sentinel2BatchProcessingResult",
+    "Sentinel2NdviStatistics",
+    "Sentinel2PersistenceError",
     "Sentinel2RasterReadResult",
+    "Sentinel2SceneFailure",
     "Sentinel2SceneProcessingResult",
     "Sentinel2SearchCriteria",
     "Sentinel2SearchResult",
     "Sentinel2StacScene",
-    "SupabaseSensorMeasurementRepository",
+    "Sentinel2WorkerResult",
     "assess_sensor_temporal_anomalies",
     "build_sentinel2_observation_rows",
     "calculate_ndvi_statistics",
@@ -60,7 +74,9 @@ __all__ = [
     "normalize_nasa_power_observation",
     "normalize_sentinel2_observation",
     "parse_sentinel2_stac_item",
-    "process_sentinel2_stac_item",\n    "process_sentinel2_stac_items",
-    "search_sentinel2_scenes",
+    "process_and_persist_sentinel2_batch",
+    "process_sentinel2_stac_item",
+    "process_sentinel2_stac_items",
     "read_sentinel2_ndvi_window",
+    "search_sentinel2_scenes",
 ]
