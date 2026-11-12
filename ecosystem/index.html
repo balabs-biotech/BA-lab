@@ -3634,6 +3634,111 @@ h1 span{
 @media(prefers-reduced-motion:reduce){#app > .foot .foot-nav a{transition:none!important}}
 </style>
 <style id="spatial-3d-source-only">#miniView.spatial-source-only{display:none!important}</style>
+
+<style id="universe-index-panel-layout-fix">
+/* The eight numbered panels are a page directory, not part of the 3D scene. */
+#app > main > .universe-index .universe-index-grid{
+  display:grid!important;
+  grid-template-columns:repeat(4,minmax(0,1fr))!important;
+  grid-auto-flow:row!important;
+  grid-auto-rows:1fr!important;
+  align-items:stretch!important;
+  gap:18px!important;
+  width:100%!important;
+  max-width:1440px!important;
+}
+#app > main > .universe-index .universe-index-card{
+  position:relative!important;
+  inset:auto!important;
+  float:none!important;
+  transform:none!important;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:flex-start!important;
+  justify-content:flex-start!important;
+  gap:0!important;
+  width:100%!important;
+  min-width:0!important;
+  min-height:260px!important;
+  height:100%!important;
+  margin:0!important;
+  padding:22px!important;
+  overflow:hidden!important;
+  overflow-wrap:anywhere!important;
+  white-space:normal!important;
+}
+#app > main > .universe-index .universe-index-card > span{
+  position:static!important;
+  inset:auto!important;
+  display:flex!important;
+  flex:0 0 34px!important;
+  align-self:flex-start!important;
+  align-items:center!important;
+  justify-content:center!important;
+  width:42px!important;
+  min-width:42px!important;
+  height:34px!important;
+  margin:0 0 20px!important;
+  padding:0!important;
+  transform:none!important;
+  float:none!important;
+  line-height:1!important;
+  font-size:11px!important;
+  letter-spacing:.08em!important;
+  white-space:nowrap!important;
+}
+#app > main > .universe-index .universe-index-card > b{
+  display:block!important;
+  position:static!important;
+  min-width:0!important;
+  max-width:100%!important;
+  margin:0 0 8px!important;
+  line-height:1.25!important;
+  overflow-wrap:anywhere!important;
+}
+#app > main > .universe-index .universe-index-card > small,
+#app > main > .universe-index .universe-index-card > p{
+  position:static!important;
+  min-width:0!important;
+  max-width:100%!important;
+  overflow-wrap:anywhere!important;
+}
+#app > main > .universe-index .universe-index-card > p{
+  margin:12px 0 18px!important;
+}
+#app > main > .universe-index .universe-index-card > em{
+  position:static!important;
+  margin-top:auto!important;
+  max-width:100%!important;
+  line-height:1.45!important;
+  overflow-wrap:anywhere!important;
+}
+@media(max-width:1050px){
+  #app > main > .universe-index .universe-index-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    gap:14px!important;
+  }
+}
+@media(max-width:560px){
+  #app > main > .universe-index .universe-index-grid{
+    grid-template-columns:minmax(0,1fr)!important;
+    gap:12px!important;
+  }
+  #app > main > .universe-index .universe-index-card{
+    min-height:0!important;
+    height:auto!important;
+    padding:19px!important;
+  }
+  #app > main > .universe-index .universe-index-card > span{
+    margin-bottom:14px!important;
+  }
+}
+[dir="rtl"] #app > main > .universe-index .universe-index-card{
+  align-items:flex-start!important;
+  text-align:start!important;
+}
+</style>
+
 </body>
 </html>
 
