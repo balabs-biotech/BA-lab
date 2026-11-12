@@ -13,6 +13,8 @@ const checks = [
   ["one environmental provider and dataset are kept per execution", /environmental_source_mismatch/],
   ["environmental observation provenance is included in the snapshot", /provider_code[\s\S]*dataset_code[\s\S]*spatial_resolution_m/],
   ["source rows are loaded through caller-scoped client", /userClient[\s\S]*\.from\(["']measurements["']\)/],
+  ["snapshot payload hashes the complete source row", /sourceRowById[\s\S]*sha256\(stable\(sourceRow\)/],
+  ["worker request size is bounded before dispatch", /workerRequestBody[\s\S]*byteLength > 240_000/],
   ["snapshot is SHA-256 hashed", /crypto\.subtle\.digest\(["']SHA-256["']/],
   ["idempotency is organization-scoped", /idempotency_key/],
   ["idempotency collisions with changed inputs are rejected", /idempotency_key_reused_with_different_input/],
