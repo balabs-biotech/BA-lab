@@ -102,6 +102,7 @@ jobs:
           node --check batch-tracker/bal-json-import.js
           node scripts/test-bal-json-import-ui.mjs
           node scripts/test-bal-json-schemas.mjs
+          node scripts/test-engine-orchestrator-contract.mjs
           node scripts/test-environmental-fallback.mjs
           node scripts/test-workspace-scenarios.mjs
           node scripts/test-qc-check-session-errors.mjs
