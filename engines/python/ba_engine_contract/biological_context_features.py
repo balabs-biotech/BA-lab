@@ -52,6 +52,11 @@ def analyze_biological_context_features(request: Mapping[str, Any]) -> dict[str,
     timezone_name = parameters.get("timezone", "UTC")
     if not isinstance(timezone_name, str) or not timezone_name:
         raise ValueError("analysis_timezone_required")
+    biological_contexts = parameters.get("biological_contexts", [])
+    if not isinstance(biological_contexts, list) or len(biological_contexts) > 500:
+        raise ValueError("invalid_biological_context_snapshot")
+    if any(not isinstance(item, dict) for item in biological_contexts):
+        raise ValueError("invalid_biological_context_snapshot")
 
     grouped: dict[tuple[str, str, str, str], list[tuple[datetime, float, str]]] = defaultdict(list)
     observed_facts: list[dict[str, Any]] = []
@@ -184,8 +189,13 @@ def analyze_biological_context_features(request: Mapping[str, Any]) -> dict[str,
         missing_context.append("no_linked_environmental_observations_supplied")
     if excluded:
         missing_context.append("some_input_records_were_excluded")
-    if not request.get("parameters", {}).get("biological_context_supplied", False):
-        missing_context.append("biological_context_record_not_supplied")
+    if not biological_contexts:
+        missing_context.append("biological_context_not_recorded")
+    if any(
+        (item.get("genetic_reference") or {}).get("status") == "unresolved"
+        for item in biological_contexts
+    ):
+        missing_context.append("genetic_reference_unresolved")
     environment_link_state = parameters.get("environment_link_state")
     if environment_link_state == "unlinked":
         missing_context.append("culture_environment_not_linked")
@@ -221,6 +231,11 @@ def analyze_biological_context_features(request: Mapping[str, Any]) -> dict[str,
         quality_flags.append("measurement_environment_context_missing")
     if not observed_times:
         quality_flags.append("insufficient_data")
+    if any(
+        (item.get("genetic_reference") or {}).get("status") == "unresolved"
+        for item in biological_contexts
+    ):
+        quality_flags.append("genetic_reference_unresolved")
     if temporal_gaps:
         quality_flags.append("temporal_gaps_detected")
     if excluded:
@@ -242,7 +257,15 @@ def analyze_biological_context_features(request: Mapping[str, Any]) -> dict[str,
                 "batch_id": None,
                 "experimental_unit_id": None,
                 "experiment_id": None,
-                "genetic_reference_ids": [],
+                "genetic_reference_ids": sorted({
+                    reference_id
+                    for item in biological_contexts
+                    for reference_id in [
+                        (item.get("genetic_reference") or {}).get("strain_id")
+                    ]
+                    if isinstance(reference_id, str) and reference_id
+                }),
+                "biological_contexts": biological_contexts,
             },
             "coverage": {
                 "requested_window": {
