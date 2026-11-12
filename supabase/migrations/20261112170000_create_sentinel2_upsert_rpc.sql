@@ -9,8 +9,11 @@ AS $$
 DECLARE
   v_rows_written integer := 0;
 BEGIN
-  IF jsonb_typeof(p_rows) IS DISTINCT FROM 'array'
-     OR jsonb_array_length(p_rows) < 2
+  IF jsonb_typeof(p_rows) IS DISTINCT FROM 'array' THEN
+    RAISE EXCEPTION 'Sentinel-2 payload must be a JSON array';
+  END IF;
+
+  IF jsonb_array_length(p_rows) < 2
      OR jsonb_array_length(p_rows) > 200
      OR mod(jsonb_array_length(p_rows), 2) <> 0 THEN
     RAISE EXCEPTION 'Sentinel-2 payload must contain 2 to 200 rows in pairs';
@@ -18,7 +21,7 @@ BEGIN
 
   IF EXISTS (
     SELECT 1
-    FROM jsonb_array_elements(p_rows) AS item
+    FROM jsonb_array_elements(p_rows) AS expanded(item)
     WHERE item ->> 'data_family' IS DISTINCT FROM 'satellite'
        OR item ->> 'provider_code' IS DISTINCT FROM 'EARTH_SEARCH'
        OR item ->> 'dataset_code' IS DISTINCT FROM 'SENTINEL_2_L2A'
