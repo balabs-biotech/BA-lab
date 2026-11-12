@@ -141,3 +141,22 @@ The follow-on migration `20261112210000_add_environmental_ingestion_job_leases.s
 This is a database protocol foundation, not yet an active asynchronous queue. The current gateway still creates and executes synchronous `processing` jobs; it does not enqueue work, and no worker polling/heartbeat loop or scheduled reconciler is deployed. The existing synchronous rows have no lease token and are deliberately excluded from queue reclamation.
 
 Before queue activation, add a separate enqueue entry point, a worker poll loop with heartbeat cancellation, idempotent result finalization, a scheduled stale-job reconciler, and operational limits/metrics. Validate the migration against a disposable Supabase database and exercise concurrent claims and expired-token races before applying it to production.
+
+
+### Python lease worker coordinator
+
+The environmental engine now includes `ba_environmental_engine.execution.leased_worker`,
+a transport-agnostic coordinator for the durable job lease RPCs. A deployment
+adapter injects the authenticated RPC transport and a processor. The coordinator
+claims one job, renews its lease on a background heartbeat, passes a stop event
+to long-running processors, and completes only while lease ownership is still
+confirmed. A heartbeat error or rejected completion is treated as lease loss;
+the worker does not attempt a stale completion. Processor failures leave the
+lease to expire so the database can reclaim it up to `max_attempts`.
+
+This is an execution primitive, not yet a runnable production service: no
+Supabase REST adapter, container entrypoint, process supervisor, or deployed
+worker has been configured. The Sentinel-2 processor must still be wired to
+the existing STAC/raster pipeline and ingestion gateway. The processor must
+check its stop event between scenes and before persistence; a currently running
+network/raster operation cannot be forcibly interrupted by this coordinator.
