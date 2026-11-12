@@ -201,6 +201,49 @@ class EngineContractTests(unittest.TestCase):
         self.assertIn("robust_outlier_detected", flags)
         self.assertIn("data-quality screening only", result["result"]["limitations"][0])
 
+    def test_environmental_qc_accepts_location_scoped_environmental_observations(self):
+        request = json.loads(json.dumps(REQUEST))
+        request["engine"] = {"engine_id": "environmental.timeseries.qc", "engine_version": "0.1.0"}
+        request["scope"] = {
+            "organization_id": REQUEST["scope"]["organization_id"],
+            "location_id": "5c2b3a4d-5e6f-4789-8123-456789abcdef",
+        }
+        request["input"]["records"] = []
+        request["input"]["record_ids"] = []
+        for index, (timestamp, value) in enumerate([
+            ("2026-11-10T12:00:00Z", 12.0),
+            ("2026-11-11T12:00:00Z", 13.0),
+            ("2026-11-14T12:00:00Z", 14.0),
+        ]):
+            record_id = f"6c2b3a4d-5e6f-4789-8123-456789abcde{index}"
+            request["input"]["record_ids"].append(record_id)
+            request["input"]["records"].append({
+                "record_id": record_id,
+                "record_type": "environmental_observation",
+                "payload_sha256": "d" * 64,
+                "data": {
+                    "variable_code": "air_temperature_mean",
+                    "value": value,
+                    "unit_code": "degC",
+                    "observed_at": timestamp,
+                    "data_family": "weather",
+                    "provider_code": "NASA_POWER",
+                    "dataset_code": "POWER_DAILY_AGRO",
+                    "spatial_resolution_m": 55000,
+                    "quality_flag": "gridded_estimate",
+                },
+                "context": {"location_id": request["scope"]["location_id"]},
+            })
+        request["parameters"] = {"max_gap_minutes": 1800, "minimum_points": 2}
+        result = run_environmental_timeseries_qc(request)
+        validate_response(result, request)
+        self.assertEqual(result["result"]["outcome"], "success")
+        self.assertIn("sampling_gap_detected", result["result"]["quality_flags"])
+        self.assertEqual(
+            result["result"]["provenance"]["source_references"],
+            ["NASA_POWER/POWER_DAILY_AGRO"],
+        )
+
     def test_environmental_qc_rejects_wrong_engine_identity(self):
         request = json.loads(json.dumps(REQUEST))
         with self.assertRaisesRegex(ValueError, "unsupported_engine_id"):
