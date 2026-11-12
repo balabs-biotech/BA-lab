@@ -34,11 +34,13 @@ function dateInTimezone(instant: string, timezone: string): string {
 
 export async function assembleResolvedBiologicalContextSnapshot(input: {
   organizationId: string;
-  culture: BiologicalCultureRow;
+  culture?: BiologicalCultureRow;
+  plantCulture?: BiologicalCultureRow;
   contexts: Array<{
     id: string;
     organization_id: string;
     culture_id: string | null;
+    plant_culture_id?: string | null;
     environment_id: string;
     organism_kind?: string | null;
     taxon_code?: string | null;
@@ -64,10 +66,16 @@ export async function assembleResolvedBiologicalContextSnapshot(input: {
   }>;
   window: BiologicalContextWindow;
 }) {
+  if (Boolean(input.culture) === Boolean(input.plantCulture)) {
+    throw new Error("exactly_one_biological_subject_required");
+  }
+  const subject = input.plantCulture ?? input.culture!;
+  const subjectType = input.plantCulture ? "plant" : "culture";
+  const subjectField = input.plantCulture ? "plant_culture_id" : "culture_id";
   const resolution = resolveBiologicalContext({
     organizationId: input.organizationId,
-    cultureId: input.culture.id,
-    currentEnvironmentId: input.culture.environment_id,
+    ...(input.plantCulture ? { plantCultureId: subject.id } : { cultureId: subject.id }),
+    currentEnvironmentId: subject.environment_id,
     contexts: input.contexts,
     environments: input.environments,
     measurements: input.measurements.map((row) => ({
@@ -160,7 +168,7 @@ export async function assembleResolvedBiologicalContextSnapshot(input: {
 
   const snapshot = await buildBiologicalContextSnapshot({
     organizationId: input.organizationId,
-    culture: input.culture,
+    ...(input.plantCulture ? { plantCulture: input.plantCulture } : { culture: input.culture }),
     environment: resolvedEnvironment,
     measurements: input.measurements,
     environmentalObservations: weatherRows,
