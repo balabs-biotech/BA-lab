@@ -16,8 +16,11 @@ DECLARE
   v_persisted integer;
 BEGIN
   IF p_job_id IS NULL OR p_lease_token IS NULL
-    OR jsonb_typeof(p_rows) IS DISTINCT FROM 'array'
-    OR jsonb_array_length(p_rows) < 2
+    OR jsonb_typeof(p_rows) IS DISTINCT FROM 'array' THEN
+    RAISE EXCEPTION 'invalid_leased_satellite_payload' USING ERRCODE = '22023';
+  END IF;
+
+  IF jsonb_array_length(p_rows) < 2
     OR jsonb_array_length(p_rows) > 200
     OR mod(jsonb_array_length(p_rows), 2) <> 0 THEN
     RAISE EXCEPTION 'invalid_leased_satellite_payload' USING ERRCODE = '22023';
@@ -28,8 +31,12 @@ BEGIN
   WHERE id = p_job_id
   FOR UPDATE;
 
-  IF NOT FOUND
-    OR v_job.status <> 'processing'
+  IF NOT FOUND THEN
+    RAISE EXCEPTION 'active_environmental_job_lease_required'
+      USING ERRCODE = '42501';
+  END IF;
+
+  IF v_job.status <> 'processing'
     OR v_job.job_type <> 'sentinel2_scene_ingestion'
     OR v_job.provider_code <> 'EARTH_SEARCH'
     OR v_job.dataset_code <> 'SENTINEL_2_L2A'
