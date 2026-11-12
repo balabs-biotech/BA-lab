@@ -31,10 +31,8 @@ const checks = [
 for (const [name, pattern] of checks) {
   assert.ok(pattern instanceof RegExp ? pattern.test(source) : pattern, name);
 }
-const sourceReadStart = source.indexOf("const { data: measurements");
-const sourceReadEnd = source.indexOf("const records = measurements.map", sourceReadStart);
+const sourceReadStart = source.indexOf("let sourceRows: Record<string, any>[];");
+const sourceReadEnd = source.indexOf("const records = sourceRows.map", sourceReadStart);
 assert.ok(sourceReadStart >= 0 && sourceReadEnd > sourceReadStart, "measurement snapshot query boundary exists");
-assert.doesNotMatch(source.slice(sourceReadStart, sourceReadEnd), /\.update\(/, "raw source measurements are never updated");
-assert.match(source, /environmental_observations[\s\S]*?const records =/);
-assert.doesNotMatch(source.slice(source.indexOf(".from(\"environmental_observations\")"), source.indexOf("const records =")), /\.update\(/, "environmental source observations are never updated");
+assert.doesNotMatch(source.slice(sourceReadStart, sourceReadEnd), /\.update\(/, "source records are never updated");
 console.log("Engine orchestration boundary contract passed");
