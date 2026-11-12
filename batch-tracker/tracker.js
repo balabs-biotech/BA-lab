@@ -4620,6 +4620,7 @@ document.getElementById("closePlantBiologicalContextPanel")?.addEventListener(
   "click",
   () => {
     plantBiologicalContextRequestId += 1;
+    plantBiologicalAssessmentRequestId += 1;
     document.getElementById("plantBiologicalContextPanel")?.classList.add("hidden");
   }
 );
@@ -6362,6 +6363,7 @@ async function closeBiologicalContext() {
 
 async function loadPlantBiologicalContextPanel(plantCultureId) {
   const requestId = ++plantBiologicalContextRequestId;
+  plantBiologicalAssessmentRequestId += 1;
   const loadRevision = authStateRevision;
   const loadOrganizationId = organizationId;
   const plant = plantCultureOptions.find(item => item.id === plantCultureId);
@@ -6699,6 +6701,7 @@ async function runPlantBiologicalAssessment() {
       },
     });
     if (requestId !== plantBiologicalAssessmentRequestId ||
+        panel?.dataset.plantCultureId !== plantCultureId ||
         !isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
     if (error) {
       const detail = String(error.message || "Erreur inconnue");
@@ -6725,6 +6728,7 @@ async function runPlantBiologicalAssessment() {
     }
     await loadRecentEngineExecutions();
     if (requestId !== plantBiologicalAssessmentRequestId ||
+        panel?.dataset.plantCultureId !== plantCultureId ||
         !isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
     const executionId = data?.execution_id || data?.execution?.id;
     setPlantBiologicalAssessmentMessage(
@@ -6735,6 +6739,7 @@ async function runPlantBiologicalAssessment() {
     );
   } catch (error) {
     if (requestId !== plantBiologicalAssessmentRequestId ||
+        panel?.dataset.plantCultureId !== plantCultureId ||
         !isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
     setPlantBiologicalAssessmentMessage(
       error.message || "Impossible de lancer l’évaluation BIE.",
