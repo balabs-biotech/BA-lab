@@ -17,7 +17,7 @@ class SupabaseSatelliteObservationRepository:
     """Load and normalize Sentinel-2 NDVI aggregates for one tenant/location."""
 
     _SELECT = (
-        "id,organization_id,location_id,data_family,provider_code,dataset_code,"
+        "id,organization_id,location_id,source_record_id,data_family,provider_code,dataset_code,"
         "variable_code,value,unit_code,observed_at,retrieved_at,"
         "spatial_resolution_m,quality_flag,source_url,metadata"
     )
@@ -90,7 +90,7 @@ class SupabaseSatelliteObservationRepository:
                 raise ValueError("persisted satellite observation organization does not match scope")
             if self._uuid(row.get("location_id"), "location_id") != loc_id:
                 raise ValueError("persisted satellite observation location does not match scope")
-            observation = normalize_sentinel2_observation(row)
+            if row.get("source_record_id") != (row.get("metadata") or {}).get("scene_id"):\n                raise ValueError("persisted satellite source_record_id does not match metadata.scene_id")\n            observation = normalize_sentinel2_observation(row)
             if not start_at <= observation.observed_at.isoformat() < end_at:
                 raise ValueError("persisted satellite observation timestamp is outside requested date scope")
             observations.append(observation)
