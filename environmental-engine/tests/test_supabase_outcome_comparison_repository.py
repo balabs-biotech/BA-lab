@@ -64,7 +64,8 @@ def setup_rows():
     signal_rows = [
         {"signal_id": sig_a, "biological_subject_id": "culture-a",
          "environment_id": "room-1", "domain": "mycology",
-         "environment_profile_code": "fruiting", "environment_profile_version": "1.0"},
+         "environment_profile_code": "fruiting", "environment_profile_version": "1.0",
+         "domain_profile_code": "fruiting", "domain_profile_version": "1.2"},
         {"signal_id": sig_b, "biological_subject_id": "culture-b",
          "environment_id": "room-1", "domain": "mycology",
          "environment_profile_code": "fruiting", "environment_profile_version": "1.0"},
@@ -177,6 +178,27 @@ def test_missing_source_signal_is_a_hard_error():
     org, rec_a, rec_b, client = setup_rows()
     client.rows["biological_signals"].pop()
     with pytest.raises(OutcomeComparisonRepositoryError, match="source biological signals"):
+        SupabaseOutcomeComparisonRepository(user_client=client).load_dataset(
+            organization_id=UUID(org), assignments=assignments(rec_a, rec_b)
+        )
+
+
+
+def test_rejects_recommendation_profile_that_does_not_match_source_signal():
+    org, rec_a, rec_b, client = setup_rows()
+    client.rows["biological_signals"][0]["domain_profile_version"] = "9.9"
+    with pytest.raises(OutcomeComparisonRepositoryError, match="profile does not match"):
+        SupabaseOutcomeComparisonRepository(user_client=client).load_dataset(
+            organization_id=UUID(org), assignments=assignments(rec_a, rec_b)
+        )
+
+
+def test_rejects_naive_snapshot_timestamps():
+    org, rec_a, rec_b, client = setup_rows()
+    client.rows["biological_recommendation_outcome_measurements"][0][
+        "measurement_observed_at"
+    ] = "2026-11-10T10:00:00"
+    with pytest.raises(OutcomeComparisonRepositoryError, match="must include a timezone"):
         SupabaseOutcomeComparisonRepository(user_client=client).load_dataset(
             organization_id=UUID(org), assignments=assignments(rec_a, rec_b)
         )
