@@ -168,8 +168,8 @@ def process_and_persist_sentinel2_batch(
 
     return Sentinel2WorkerResult(
         items_received=batch.items_received,
-        scenes_processed=batch.success_count,
-        scenes_failed=batch.failure_count,
+        scenes_processed=len(batch.succeeded),
+        scenes_failed=len(batch.failed),
         scenes_duplicated=len(batch.duplicate_scene_ids),
         quality_rejected_scenes=quality_rejected,
         observations_submitted=len(valid_rows),
