@@ -6089,8 +6089,10 @@ async function loadBiologicalContextPanel(cultureId) {
     noStrain.value = "";
     noStrain.textContent = "Non spécifiée";
     strainSelect.appendChild(noStrain);
+    const seenStrainCodes = new Set();
     (strainOptions || []).forEach(strain => {
-      if (!strain.strain_code) return;
+      if (!strain.strain_code || seenStrainCodes.has(strain.strain_code)) return;
+      seenStrainCodes.add(strain.strain_code);
       const option = document.createElement("option");
       option.value = strain.strain_code;
       option.textContent = strain.strain_code + " — " +
