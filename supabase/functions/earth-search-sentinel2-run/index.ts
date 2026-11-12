@@ -262,6 +262,7 @@ Deno.serve(async (req: Request) => {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        apikey: publishableKey,
         "X-BA-Engine-Key": engineApiKey,
         Authorization: authorization,
       },
