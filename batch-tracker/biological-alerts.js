@@ -309,6 +309,9 @@
                 (measurement.variable_code || "Mesure") + " · " + value + " · " +
                 dateLabel(measurement.measurement_observed_at) + " · " +
                 (link.evidence_scope === "biological_subject" ? "Sujet biologique" : "Contexte environnemental") +
+                " · Qualité : " + ({
+                  raw: "Brute", controlled: "Contrôlée", validated: "Validée", excluded: "Exclue"
+                }[measurement.measurement_quality_state] || "Non capturée — non comparable") +
                 (measurement.method ? " · Méthode : " + measurement.method : "") +
                 (measurement.instrument ? " · Instrument : " + measurement.instrument : "")));
               if (measurement.normalized_value !== null && measurement.normalized_value !== undefined &&
@@ -596,7 +599,7 @@
         eventsByRecommendation.forEach(events => events.sort((left, right) => left.revision - right.revision));
         const recommendationIdsForEvidence = recommendations.map(item => item.recommendation_id);
         const outcomeLinksResult = await client.from("biological_recommendation_outcome_measurements")
-          .select("recommendation_id,outcome_event_id,measurement_id,measurement_observed_at,variable_code,normalized_value,normalized_unit_code,raw_value,raw_unit_code,method,instrument,source_metadata,evidence_scope,linked_by,linked_at")
+          .select("recommendation_id,outcome_event_id,measurement_id,measurement_observed_at,variable_code,normalized_value,normalized_unit_code,raw_value,raw_unit_code,measurement_quality_state,method,instrument,source_metadata,evidence_scope,linked_by,linked_at")
           .eq("organization_id", state.organizationId)
           .in("recommendation_id", recommendationIdsForEvidence)
           .limit(1000);
