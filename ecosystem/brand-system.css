@@ -1946,7 +1946,7 @@
 #app.balabs-ui > main > .editorial-work .work-card h3 { grid-area: title !important; align-self: end !important; margin: 0 !important; font: 400 clamp(25px,3vw,39px)/1 Georgia,serif !important; }
 #app.balabs-ui > main > .editorial-work .work-card > p { grid-area: copy !important; align-self: start !important; margin: 0 !important; color: #B8C1B9 !important; font-size: 12px !important; line-height: 1.7 !important; }
 #app.balabs-ui > main > .editorial-work .work-card .work-topics { grid-area: topics !important; }
-#app.balabs-ui > main > .editorial-work .work-card .work-link { grid-area: link !important; }
+#app.balabs-ui > main > .editorial-work .work-card .work-card-link { grid-area: link !important; }
 @media(max-width:760px) {
  #app.balabs-ui > main > .hero { display:flex !important; flex-direction:column !important; align-items:stretch !important; min-height:0 !important; padding:38px 0 30px !important; gap:18px !important; }
  #app.balabs-ui > main > .hero .hero-micrograph { order:0 !important; min-height:260px !important; max-height:360px !important; height:42svh !important; clip-path:polygon(7% 0,100% 0,100% 91%,91% 100%,0 100%,0 10%) !important; }
@@ -1967,4 +1967,106 @@
 @media(prefers-reduced-motion:reduce) {
  #app.balabs-ui > main > .hero .hero-action-primary,
  #app.balabs-ui > main > .hero .hero-action-secondary { transition:none !important; }
+}
+
+
+/* PHASE 9 — eight-universe specimen directory, not a card catalogue. */
+#app.balabs-ui > main > .universe-index {
+  padding: clamp(72px,9vw,132px) clamp(18px,5vw,72px) !important;
+  background: #D1D0C5 !important;
+  color: #111B1D !important;
+}
+#app.balabs-ui > main > .universe-index .universe-index-heading {
+  display: grid !important;
+  grid-template-columns: minmax(0,1fr) minmax(240px,.55fr) !important;
+  align-items: end !important;
+  gap: 28px !important;
+  margin-bottom: 46px !important;
+}
+#app.balabs-ui > main > .universe-index .eyebrow { color: #8C4D39 !important; }
+#app.balabs-ui > main > .universe-index h2 {
+  max-width: 760px !important;
+  margin: 18px 0 0 !important;
+  color: #111B1D !important;
+  font: 400 clamp(48px,7vw,94px)/.9 Georgia,serif !important;
+  letter-spacing: -.07em !important;
+}
+#app.balabs-ui > main > .universe-index .universe-index-heading p {
+  max-width: 360px !important;
+  margin: 0 0 4px auto !important;
+  color: #34423D !important;
+  font-size: 12px !important;
+  line-height: 1.8 !important;
+}
+#app.balabs-ui > main > .universe-index .universe-index-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2,minmax(0,1fr)) !important;
+  border-top: 1px solid rgba(17,27,29,.5) !important;
+}
+#app.balabs-ui > main > .universe-index .universe-index-card {
+  position: relative !important;
+  display: grid !important;
+  grid-template-columns: 48px minmax(0,1fr) !important;
+  grid-template-rows: auto auto auto auto !important;
+  align-content: start !important;
+  gap: 7px 17px !important;
+  min-height: 190px !important;
+  padding: 25px 26px 25px 0 !important;
+  border: 0 !important;
+  border-bottom: 1px solid rgba(17,27,29,.32) !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  color: #111B1D !important;
+  text-decoration: none !important;
+  box-shadow: none !important;
+  transition: padding .2s ease,background .2s ease !important;
+}
+#app.balabs-ui > main > .universe-index .universe-index-card:nth-child(odd) { border-right: 1px solid rgba(17,27,29,.28) !important; }
+#app.balabs-ui > main > .universe-index .universe-index-card:nth-child(even) { padding-left: 26px !important; }
+#app.balabs-ui > main > .universe-index .universe-index-card > span {
+  grid-column: 1 !important; grid-row: 1/5 !important;
+  color: #A75C43 !important;
+  font: italic 28px/1 Georgia,serif !important;
+}
+#app.balabs-ui > main > .universe-index .universe-index-card b {
+  grid-column: 2 !important; grid-row: 1 !important;
+  color: #111B1D !important;
+  font: 400 clamp(25px,3vw,38px)/1 Georgia,serif !important;
+}
+#app.balabs-ui > main > .universe-index .universe-index-card small {
+  grid-column: 2 !important; grid-row: 2 !important;
+  color: #8C4D39 !important;
+  font: 9px ui-monospace,monospace !important;
+  letter-spacing: .11em !important;
+  text-transform: uppercase !important;
+}
+#app.balabs-ui > main > .universe-index .universe-index-card p {
+  grid-column: 2 !important; grid-row: 3 !important;
+  max-width: 420px !important; margin: 5px 0 0 !important;
+  color: #394A43 !important; font-size: 12px !important; line-height: 1.65 !important;
+}
+#app.balabs-ui > main > .universe-index .universe-index-card em {
+  grid-column: 2 !important; grid-row: 4 !important;
+  margin-top: 8px !important;
+  color: #8C4D39 !important;
+  font: 700 9px ui-monospace,monospace !important;
+  font-style: normal !important;
+  letter-spacing: .1em !important;
+  text-transform: uppercase !important;
+}
+#app.balabs-ui > main > .universe-index .universe-index-card:hover,
+#app.balabs-ui > main > .universe-index .universe-index-card:focus-visible {
+  padding-top: 31px !important; padding-bottom: 19px !important;
+  background: rgba(38,59,56,.06) !important;
+}
+#app.balabs-ui > main > .universe-index .universe-index-card:focus-visible { outline: 2px solid #A75C43 !important; outline-offset: -3px !important; }
+@media(max-width:760px) {
+ #app.balabs-ui > main > .universe-index { padding: 64px 18px !important; }
+ #app.balabs-ui > main > .universe-index .universe-index-heading { grid-template-columns: 1fr !important; gap: 18px !important; margin-bottom: 28px !important; }
+ #app.balabs-ui > main > .universe-index .universe-index-heading p { margin: 0 !important; }
+ #app.balabs-ui > main > .universe-index .universe-index-grid { grid-template-columns: 1fr !important; }
+ #app.balabs-ui > main > .universe-index .universe-index-card,
+ #app.balabs-ui > main > .universe-index .universe-index-card:nth-child(even) { min-height: 0 !important; padding: 20px 0 !important; border-right: 0 !important; }
+ #app.balabs-ui > main > .universe-index .universe-index-card > span { font-size: 24px !important; }
+ #app.balabs-ui > main > .universe-index .universe-index-card b { font-size: 29px !important; }
 }
