@@ -58,6 +58,13 @@ async function sha256(value: string): Promise<string> {
   const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(value));
   return Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, "0")).join("");
 }
+function sameExecutionInput(prior: Record<string, any>, request: Record<string, any>): boolean {
+  return prior.engine_id === request.engine.engine_id &&
+    prior.engine_version === request.engine.engine_version &&
+    prior.input_snapshot_sha256 === request.input.snapshot_sha256 &&
+    stable(prior.scope) === stable(request.scope) &&
+    stable(prior.request_payload?.parameters ?? {}) === stable(request.parameters ?? {});
+}
 
 Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") return new Response(null, { status: 204, headers });
@@ -196,14 +203,13 @@ Deno.serve(async (req: Request) => {
 
   const { data: prior, error: priorError } = await serviceClient
     .from("engine_executions")
-    .select("id,request_id,engine_id,engine_version,input_snapshot_sha256,status,result_payload,error_code")
+    .select("id,request_id,engine_id,engine_version,scope,input_snapshot_sha256,request_payload,status,result_payload,error_code")
     .eq("organization_id", organizationId)
     .eq("idempotency_key", idempotencyKey)
     .maybeSingle();
   if (priorError) return reply(500, { error: "execution_ledger_unavailable" });
   if (prior) {
-    if (prior.engine_id !== engineId || prior.engine_version !== engineVersion ||
-        prior.input_snapshot_sha256 !== snapshotHash) {
+    if (!sameExecutionInput(prior, engineRequest)) {
       return reply(409, { error: "idempotency_key_reused_with_different_input" });
     }
     return reply(200, { execution_id: prior.id, request_id: prior.request_id, status: prior.status,
@@ -232,8 +238,7 @@ Deno.serve(async (req: Request) => {
     const { data: raced } = await serviceClient.from("engine_executions")
       .select("id,request_id,engine_id,engine_version,input_snapshot_sha256,status,result_payload,error_code")
       .eq("organization_id", organizationId).eq("idempotency_key", idempotencyKey).maybeSingle();
-    if (raced && raced.engine_id === engineId && raced.engine_version === engineVersion &&
-        raced.input_snapshot_sha256 === snapshotHash) {
+    if (raced && sameExecutionInput(raced, engineRequest)) {
       return reply(200, { execution_id: raced.id, request_id: raced.request_id, status: raced.status,
         result: raced.result_payload, error_code: raced.error_code, reused: true });
     }
