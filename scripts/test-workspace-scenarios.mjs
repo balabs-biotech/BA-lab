@@ -513,3 +513,36 @@ assert.match(reloadListener,
   /const operationRevision = authStateRevision;[\s\S]*?const operationOrganizationId = organizationId;[\s\S]*?loadRecentMeasurements\(\)\.catch\(error => \{[\s\S]*?if \(!isCurrentWorkspaceRevision\(operationRevision, operationOrganizationId\)\) return;[\s\S]*?showMessage\(error\.message, "error"\);/,
   "measurement-history reload errors must be discarded after a workspace transition");
 console.log("✓ Measurement history reload: stale errors are discarded");
+
+// Biological context editor: tenant-scoped reads/writes, required environment,
+// explicit temporal validity, and safe closure of an active context.
+const workspaceHtml = fs.readFileSync(new URL("../batch-tracker/workspace.html", import.meta.url), "utf8");
+for (const id of [
+  "biologicalContextPanel", "biologicalContextHistory", "biologicalContextForm",
+  "biologicalContextEnvironment", "biologicalContextOrganismKind",
+  "biologicalContextStrain", "biologicalContextStage", "biologicalContextProductionSystem",
+  "biologicalContextValidFrom", "biologicalContextValidTo",
+  "biologicalContextCloseDate", "biologicalContextCloseButton"
+]) {
+  assert.ok(workspaceHtml.includes('id="' + id + '"'),
+    "biological context editor must expose " + id);
+}
+const contextLoadStart = engine.indexOf("async function loadBiologicalContextPanel(");
+const contextSaveStart = engine.indexOf("async function saveBiologicalContext(");
+const contextCloseStart = engine.indexOf("async function closeBiologicalContext(");
+assert.ok(contextLoadStart >= 0 && contextSaveStart > contextLoadStart && contextCloseStart > contextSaveStart,
+  "biological context load, save and close handlers must exist");
+const contextHandlers = engine.slice(contextLoadStart, engine.indexOf("\nlet cultureDetailRequestId", contextLoadStart));
+assert.match(contextHandlers, /\.eq\("organization_id", loadOrganizationId\)/,
+  "biological context reads must be tenant-scoped");
+assert.match(contextHandlers, /\.from\("biological_contexts"\)/,
+  "biological context editor must use the canonical biological_contexts table");
+assert.match(contextHandlers, /valid_from/);
+assert.match(contextHandlers, /valid_to/);
+assert.match(contextHandlers, /\.eq\("organization_id", operationOrganizationId\)/,
+  "biological context writes must be tenant-scoped");
+assert.match(contextHandlers, /openContext/,
+  "new context must not overlap an unclosed active context");
+assert.match(contextHandlers, /isCurrentWorkspaceRevision/,
+  "context handlers must discard stale workspace operations");
+console.log("✓ Biological context editor: tenant isolation, temporal bounds and active-context closure");
