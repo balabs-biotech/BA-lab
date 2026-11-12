@@ -92,14 +92,17 @@ await assert.rejects(() => buildBiologicalContextSnapshot({
   window,
 }), /measurement_culture_scope_mismatch/);
 
-await assert.rejects(() => buildBiologicalContextSnapshot({
+const historicalSnapshot = await buildBiologicalContextSnapshot({
   organizationId,
-  culture,
+  culture: { ...culture, environment_id: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa" },
   environment,
-  measurements: [{ ...measurements[0], environment_id: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa" }],
-  environmentalObservations: [],
+  measurements: [{ ...measurements[0], environment_id: environmentId }],
+  environmentalObservations,
   window,
-}), /measurement_environment_scope_mismatch/);
+});
+assert.equal(historicalSnapshot.scope.environment_id, environmentId,
+  "historically resolved context must take precedence over the mutable current culture environment");
+assert.equal(historicalSnapshot.input.records.find((record) => record.record_type === "measurement").context.environment_id, environmentId);
 
 await assert.rejects(() => buildBiologicalContextSnapshot({
   organizationId,
