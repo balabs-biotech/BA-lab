@@ -171,3 +171,16 @@ Next steps: finish CI for PR #294; integrate the stacked PRs in dependency order
 - Species and cultivar are copied from the selected plant record; stage, production system, environment, substrate, tags and half-open validity interval are explicitly captured.
 - The interface supports dated history, active-context closure and the same PostgreSQL overlap guard as Mycology/Laboratory.
 - **Engine boundary:** the current BIE source loader and feature engine still analyse culture subjects only. GreenTech contexts are now captured consistently but are not yet consumed by BIE; plant-context resolution and a dedicated plant feature contract remain a separate implementation tranche.
+
+
+## GreenTech BIE subject support (2026-11-12)
+
+BIE v0.2.0 now supports authenticated plant-culture subjects without aliasing them to fungal cultures.
+
+- Request scope uses `plant_culture_id`; the result subject uses `subject_type: "plant"` and preserves `plant_culture_id` separately from `culture_id`.
+- The source loader reads `plant_cultures`, dated `biological_contexts` filtered to `domain = greentech`, and `measurements` filtered to `plant_culture_id`, all through the caller JWT and RLS.
+- Environment resolution uses dated biological contexts and explicit per-measurement environment FKs. The plant record's mutable current `environment_id` is not used as historical fallback.
+- External weather observations are loaded only when the full analysis window resolves to one environment and one organization-visible location.
+- The Python engine reuses the deterministic descriptive feature pipeline but requires semantic version 0.2.0 for plant subjects. Version 0.1.0 remains available for existing culture callers.
+- The result schema now explicitly models plant subjects. No diagnostic, causal or intervention claims were added.
+- Production activation remains gated by `BA_BIE_ENABLED=true`; no flag, worker, Edge Function or schema was deployed during this tranche.
