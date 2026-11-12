@@ -3158,3 +3158,53 @@ body[data-domain] :is(button, input, select, textarea, a, [tabindex]):focus-visi
   background: var(--surface, #fff);
   color: inherit;
 }
+
+
+/* Sentinel-2 queued analysis controls — Green Tech only */
+body[data-domain="agronomy"] .environmental-jobs-card .environmental-job-request {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin: 18px 0;
+  padding: 16px;
+  border: 1px solid rgba(115, 145, 119, .28);
+  border-radius: 12px;
+  background: rgba(19, 35, 25, .48);
+}
+body[data-domain="agronomy"] .environmental-jobs-card .environmental-job-request h4,
+body[data-domain="agronomy"] .environmental-jobs-card .environmental-job-request > button,
+body[data-domain="agronomy"] .environmental-jobs-card .environmental-job-request > p {
+  grid-column: 1 / -1;
+}
+body[data-domain="agronomy"] .environmental-jobs-card .environmental-job-field {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+  color: var(--text, #e7eee8);
+  font-size: .9rem;
+}
+body[data-domain="agronomy"] .environmental-jobs-card .environmental-job-field input,
+body[data-domain="agronomy"] .environmental-jobs-card .environmental-job-field select {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 42px;
+  padding: 8px 10px;
+  border: 1px solid rgba(150, 180, 155, .35);
+  border-radius: 8px;
+  color: #eef5ef;
+  background: #17251b;
+}
+body[data-domain="agronomy"] .environmental-jobs-card .environmental-job-request button {
+  justify-self: start;
+  min-height: 42px;
+}
+body[data-domain="agronomy"] .environmental-jobs-card button:disabled {
+  opacity: .55;
+  cursor: not-allowed;
+}
+@media (max-width: 560px) {
+  body[data-domain="agronomy"] .environmental-jobs-card .environmental-job-request {
+    grid-template-columns: minmax(0, 1fr);
+    padding: 12px;
+  }
+}
