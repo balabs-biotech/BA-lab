@@ -69,3 +69,26 @@ def test_batch_rejects_more_than_configured_limit():
             processing_version="test-1",
             max_scenes=2,
         )
+
+
+def test_batch_aborts_between_scenes_when_lease_loss_is_signalled(monkeypatch):
+    from threading import Event
+    import pytest
+
+    stop = Event()
+    stop.set()
+    monkeypatch.setattr(
+        batch,
+        "process_sentinel2_stac_item",
+        lambda *args, **kwargs: pytest.fail("scene processing must not start"),
+    )
+    with pytest.raises(InterruptedError, match="lease loss"):
+        batch.process_sentinel2_stac_items(
+            [_item("first")],
+            {"type": "Polygon", "coordinates": []},
+            organization_id=uuid4(),
+            location_id=uuid4(),
+            retrieved_at=datetime(2026, 6, 1, tzinfo=timezone.utc),
+            processing_version="test-1",
+            stop_event=stop,
+        )
