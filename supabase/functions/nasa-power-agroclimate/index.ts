@@ -234,14 +234,12 @@ Deno.serve(async (req: Request) => {
       return json(502, { error: "nasa_power_returned_no_valid_values" });
     }
 
-    const { error: upsertError } = await adminClient
-      .from("environmental_observations")
-      .upsert(rows, {
-        onConflict: "organization_id,location_id,provider_code,dataset_code,variable_code,observed_at",
-        ignoreDuplicates: false,
-      });
+    const { error: upsertError } = await adminClient.rpc(
+      "upsert_weather_environmental_observations",
+      { p_rows: rows },
+    );
     if (upsertError) {
-      console.error("[nasa-power-agroclimate] Observation upsert failed", upsertError.message);
+      console.error("[nasa-power-agroclimate] Observation upsert failed", upsertError.code ?? "unknown");
       return json(500, { error: "observation_persistence_failed" });
     }
 
