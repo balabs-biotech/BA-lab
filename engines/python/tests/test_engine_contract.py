@@ -523,6 +523,11 @@ class EngineContractTests(unittest.TestCase):
             "organization_id": REQUEST["scope"]["organization_id"],
             "culture_id": culture_id,
         }
+        request["parameters"] = {
+            "window_start": "2026-11-10T00:00:00Z",
+            "window_end": "2026-11-11T00:00:00Z",
+            "timezone": "Africa/Algiers",
+        }
         request["input"]["record_ids"] = []
         request["input"]["records"] = []
         for index, (timestamp, value) in enumerate([
@@ -547,6 +552,8 @@ class EngineContractTests(unittest.TestCase):
         result = execute_registered_engine(request)
         self.assertEqual(result["status"], "completed", msg=str(result.get("error")))
         value = result["result"]["value"]
+        biological_schema = json.loads((ROOT / "schemas" / "biological" / "v1" / "context-assessment.schema.json").read_text(encoding="utf-8"))
+        Draft202012Validator(biological_schema, format_checker=FormatChecker()).validate(value)
         self.assertEqual(value["subject"]["subject_type"], "culture")
         self.assertEqual(value["subject"]["subject_id"], culture_id)
         self.assertEqual(value["coverage"]["source_record_count"], 3)
