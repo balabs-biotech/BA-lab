@@ -10,6 +10,7 @@ from collections import defaultdict
 from datetime import datetime
 from math import isfinite
 from statistics import median
+from uuid import uuid4
 from typing import Any, Mapping
 
 from .validation import validate_request
@@ -127,7 +128,7 @@ def run_environmental_timeseries_qc(request: Mapping[str, Any]) -> dict[str, Any
         "contract": "BA-LABS/ENGINE-RESULT",
         "contract_version": "1.0.0",
         "request_id": request["request_id"],
-        "execution_id": request["request_id"],
+        "execution_id": str(uuid4()),
         "engine": request["engine"],
         "input_snapshot_sha256": request["input"]["snapshot_sha256"],
         "status": "completed",
