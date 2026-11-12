@@ -154,7 +154,7 @@ def analyze_environmental_timeseries_qc(request: Mapping[str, Any]) -> dict[str,
     outcome = "success" if series_results and not rejected_records else "insufficient_data"
     limitations = [
         "This engine performs data-quality screening only; it does not infer biological stress or prescribe interventions.",
-        "Robust outlier flags are statistical review signals, not evidence that a measurement is erroneous.",
+        "Robust outlier flags are statistical review signals, not evidence that an observation is erroneous.",
     ]
     if rejected_records:
         limitations.append("Some records were excluded because required values, units, source context or timestamps were missing or invalid.")
