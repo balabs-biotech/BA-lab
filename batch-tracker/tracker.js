@@ -88,9 +88,9 @@ function clearAuthenticatedWorkspaceState() {
   batchLocationOptions = [];
   batchEnvironmentOptions = [];
   recentObservations = [];
-  recentEngineExecutions = [];
-  recentEngineResultsByExecution = new Map();
-  engineExecutionHistoryRequestId++;
+  if (typeof recentEngineExecutions !== "undefined") recentEngineExecutions = [];
+  if (typeof recentEngineResultsByExecution !== "undefined") recentEngineResultsByExecution = new Map();
+  if (typeof engineExecutionHistoryRequestId !== "undefined") engineExecutionHistoryRequestId++;
   const engineHistoryPanel = document.getElementById("overviewRecentEngineExecutions");
   if (engineHistoryPanel) {
     engineHistoryPanel.replaceChildren();
