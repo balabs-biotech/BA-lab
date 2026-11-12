@@ -21,6 +21,7 @@ from ba_engine_contract.registry import load_engine
 from ba_engine_contract.environmental_timeseries_qc import (
     analyze_environmental_timeseries_qc, run_environmental_timeseries_qc,
 )
+from ba_engine_contract.biological_context_features import analyze_biological_context_features
 
 ROOT = Path(__file__).resolve().parents[3]
 SCHEMA_DIR = ROOT / "schemas" / "engine" / "v1"
@@ -795,6 +796,74 @@ class EngineContractTests(unittest.TestCase):
         self.assertEqual(value["subject"]["biological_contexts"][0]["genetic_reference"]["scientific_name"], "Pleurotus ostreatus")
         self.assertNotIn("biological_context_not_recorded", value["coverage"]["missing_context"])
         self.assertEqual(result["result"]["outcome"], "insufficient_data")
+
+
+    def test_biological_context_features_supports_plant_culture_subjects(self):
+        request = json.loads(json.dumps(REQUEST))
+        request["engine"] = {
+            "engine_id": "biological.context.features",
+            "engine_version": "0.2.0",
+        }
+        plant_culture_id = "7c2b3a4d-5e6f-4789-8123-456789abcdef"
+        request["scope"] = {
+            "organization_id": REQUEST["scope"]["organization_id"],
+            "plant_culture_id": plant_culture_id,
+        }
+        request["parameters"] = {
+            "window_start": "2026-11-10T00:00:00Z",
+            "window_end": "2026-11-11T00:00:00Z",
+            "timezone": "Africa/Algiers",
+            "environment_link_state": "resolved",
+            "biological_context_supplied": True,
+            "biological_contexts": [{
+                "context_id": "77777777-7777-4777-8777-777777777777",
+                "valid_from": "2026-11-01",
+                "valid_to": None,
+                "organism_kind": "plant",
+                "taxon_code": "Solanum lycopersicum",
+                "strain_code": None,
+                "cultivar_code": "Yellow Pear",
+                "culture_stage": "vegetative",
+                "substrate_code": "Technosoil",
+                "production_system": "greenhouse",
+                "context_tags": ["greentech-trial"],
+                "genetic_reference": {"status": "not_specified"},
+            }],
+        }
+        record_id = "ac2b3a4d-5e6f-4789-8123-456789abcdef"
+        request["input"]["record_ids"] = [record_id]
+        request["input"]["records"] = [{
+            "record_id": record_id,
+            "record_type": "measurement",
+            "payload_sha256": "e" * 64,
+            "data": {
+                "variable_code": "air_temperature",
+                "normalized_value": 24.0,
+                "normalized_unit_code": "degC",
+                "measured_at": "2026-11-10T08:00:00Z",
+            },
+            "context": {
+                "plant_culture_id": plant_culture_id,
+                "environment_id": "8c2b3a4d-5e6f-4789-8123-456789abcdef",
+                "environment_resolution": {
+                    "status": "resolved", "reason": None,
+                    "environment_id": "8c2b3a4d-5e6f-4789-8123-456789abcdef",
+                    "location_id": None,
+                },
+            },
+        }]
+        result = analyze_biological_context_features(request)
+        self.assertEqual(result["outcome"], "success")
+        value = result["value"]
+        self.assertEqual(value["subject"]["subject_type"], "plant")
+        self.assertEqual(value["subject"]["subject_id"], plant_culture_id)
+        self.assertEqual(value["subject"]["plant_culture_id"], plant_culture_id)
+        self.assertIsNone(value["subject"]["culture_id"])
+        self.assertEqual(value["subject"]["biological_contexts"][0]["organism_kind"], "plant")
+        self.assertEqual(value["coverage"]["source_record_count"], 1)
+        schema = json.loads((ROOT / "schemas" / "biological" / "v1" / "context-assessment.schema.json").read_text(encoding="utf-8"))
+        validator(schema).validate(value)
+
 
 
 if __name__ == "__main__":
