@@ -248,6 +248,8 @@ class EngineContractTests(unittest.TestCase):
     def test_runner_invokes_environmental_qc_with_full_contract_envelope(self):
         request = json.loads(json.dumps(REQUEST))
         request["engine"] = {"engine_id": "environmental.timeseries.qc", "engine_version": "0.1.0"}
+        analysis = analyze_environmental_timeseries_qc(request)
+        self.assertEqual(analysis["outcome"], "insufficient_data")
         engine = EngineSpec(
             engine_id="environmental.timeseries.qc",
             engine_version="0.1.0",
