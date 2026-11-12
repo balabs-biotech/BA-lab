@@ -23,3 +23,31 @@ The schemas live in the repository-level `schemas/engine/v1` directory. Keep thi
 A Python engine is a stateless compute worker. It receives only the authorized input snapshot and bounded parameters. It does not receive Supabase credentials, query tenant tables, mutate source records or persist results itself. The orchestrator authenticates and authorizes, schedules work, applies time/resource limits, validates the returned envelope and persists derived results.
 
 The `execute_engine` wrapper binds execution to the registered engine ID/version, builds a completed or typed-failure envelope, and validates the response before returning it. It deliberately does not pretend to enforce hard process timeouts: the deployment/orchestrator must terminate workers that exceed their wall-clock or resource budget.\n\nEngine-specific algorithms belong in separate modules/packages. They must not make one engine a mandatory dependency of another.
+
+
+## HTTP worker container
+
+Build from the repository root so the versioned engine schemas are included:
+
+```sh
+docker build -f engines/python/Dockerfile -t ba-labs-engine-worker:0.1.0 .
+```
+
+Run with a unique secret of at least 24 characters:
+
+```sh
+docker run -d --name ba-engine-worker \
+  --publish 127.0.0.1:8080:8080 \
+  --env BA_ENGINE_WORKER_TOKEN="$BA_ENGINE_WORKER_TOKEN" \
+  --read-only --cap-drop=ALL --security-opt=no-new-privileges \
+  --memory=256m --cpus=1 --pids-limit=64 --user=10001:10001 \
+  ba-labs-engine-worker:0.1.0
+```
+
+The container runs as UID/GID 10001, has a read-only root filesystem and drops Linux capabilities. Do not publish the port publicly. Place it behind a TLS-terminating reverse proxy or private service network, restrict inbound traffic to the Supabase Edge Function egress path, and enforce an outbound-deny network policy. The worker itself does not need database or external network access.
+
+The manifest's 15-second engine limit and 256 MB memory declaration are metadata. The container's 256 MB memory cap and 1 CPU limit are enforced by the container runtime; per-request hard execution deadlines and network egress policy must be enforced by the deployment platform/runtime. The Python adapter's 10-second socket read timeout is not a hard engine CPU timeout. Deploy only reviewed, allowlisted engines; this image is not a complete hostile-code sandbox.
+
+Health check: `GET /healthz`. Execution endpoint: authenticated `POST /v1/execute`.
+
+Required environment: `BA_ENGINE_WORKER_TOKEN` (random secret, minimum 24 characters); optional `BA_ENGINE_HTTP_HOST` (default `0.0.0.0`) and `BA_ENGINE_HTTP_PORT` (default `8080`). No secret is baked into the image. Configure the matching token in the Supabase Edge Function environment and set `BA_ENGINE_WORKER_URL` to the private HTTPS endpoint. Rotate both sides together.
