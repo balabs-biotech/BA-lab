@@ -569,5 +569,53 @@ class EngineContractTests(unittest.TestCase):
         self.assertIn("biological_interpretation_not_performed", result["result"]["quality_flags"])
 
 
+    def test_biological_context_features_excludes_invalid_scope_and_explicitly_excluded_measurements(self):
+        request = json.loads(json.dumps(REQUEST))
+        request["engine"] = {
+            "engine_id": "biological.context.features",
+            "engine_version": "0.1.0",
+        }
+        culture_id = "2c2b3a4d-5e6f-4789-8123-456789abcdef"
+        other_culture_id = "5c2b3a4d-5e6f-4789-8123-456789abcdef"
+        request["scope"] = {
+            "organization_id": REQUEST["scope"]["organization_id"],
+            "culture_id": culture_id,
+        }
+        request["parameters"] = {
+            "window_start": "2026-11-10T00:00:00Z",
+            "window_end": "2026-11-11T00:00:00Z",
+            "timezone": "Africa/Algiers",
+        }
+        request["input"]["record_ids"] = []
+        request["input"]["records"] = []
+        for index, (record_culture, quality_state) in enumerate([
+            (culture_id, "valid"),
+            (culture_id, "excluded"),
+            (other_culture_id, "valid"),
+        ]):
+            record_id = f"7c2b3a4d-5e6f-4789-8123-456789abcde{index}"
+            request["input"]["record_ids"].append(record_id)
+            request["input"]["records"].append({
+                "record_id": record_id,
+                "record_type": "measurement",
+                "payload_sha256": "c" * 64,
+                "data": {
+                    "variable_code": "air_temperature",
+                    "normalized_value": 20.0 + index,
+                    "normalized_unit_code": "degC",
+                    "measured_at": f"2026-11-10T0{8 + index}:00:00Z",
+                    "quality_state": quality_state,
+                },
+                "context": {"culture_id": record_culture},
+            })
+        result = execute_registered_engine(request)
+        self.assertEqual(result["status"], "completed", msg=str(result.get("error")))
+        coverage = result["result"]["value"]["coverage"]
+        self.assertEqual(coverage["source_record_count"], 1)
+        self.assertEqual(coverage["excluded_record_count"], 2)
+        self.assertIn("input_records_excluded", result["result"]["quality_flags"])
+        self.assertEqual(result["result"]["value"]["derived_features"][0]["source_record_ids"], [request["input"]["record_ids"][0]])
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
