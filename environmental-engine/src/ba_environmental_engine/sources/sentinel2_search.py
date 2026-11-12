@@ -31,6 +31,9 @@ class Sentinel2SearchResult:
     pages_read: int
     items_seen: int
     rejected_items: int
+    # Original validated STAC Features, kept in the same deterministic order
+    # as scenes so the raster pipeline can consume the complete asset metadata.
+    items: tuple[dict[str, Any], ...] = ()
 
 
 def _utc(value: datetime, field: str) -> datetime:
@@ -120,5 +123,15 @@ def search_sentinel2_scenes(
             raise ValueError("Unsupported STAC pagination method")
         body = link.get("body") if method == "POST" else None
 
-    scenes = tuple(sorted(selected.values(), key=lambda scene: (scene.observed_at, scene.scene_id)))
-    return Sentinel2SearchResult(scenes, pages, seen, rejected)
+    ordered = tuple(
+        sorted(selected.values(), key=lambda pair: (pair[0].observed_at, pair[0].scene_id))
+    )
+    scenes = tuple(pair[0] for pair in ordered)
+    items = tuple(pair[1] for pair in ordered)
+    return Sentinel2SearchResult(
+        scenes=scenes,
+        pages_read=pages,
+        items_seen=seen,
+        rejected_items=rejected,
+        items=items,
+    )
