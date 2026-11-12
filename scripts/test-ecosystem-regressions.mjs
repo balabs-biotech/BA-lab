@@ -495,3 +495,9 @@ assert.ok(brandCss.includes('PHASE 10 — field-report project index'), 'Phase 1
 assert.ok(brandCss.includes('grid-template-areas: "image index" "image title" "image copy" "image topics" "image tag" "image link"'), 'Project tracks must render as an alternating editorial field-report sequence');
 assert.ok(brandCss.includes('.work-card:nth-child(2)') && brandCss.includes('clip-path:polygon(0 0,100% 0,100% 94%,94% 100%,0 100%)'), 'Project imagery must use the asymmetric specimen treatment');
 assert.ok(brandCss.includes('filter:grayscale(.78) contrast(1.12) brightness(.82)'), 'Project imagery must use the monochrome research-publication treatment');
+
+assert.ok(brandCss.includes('PHASE 11 — institutional identity and research protocol'), 'Phase 11 about and method redesign must exist');
+assert.ok(brandCss.includes('min-height:660px') && brandCss.includes('background:#263B38'), 'About section must use the full mineral-green field composition');
+assert.ok(brandCss.includes('grid-template-columns:repeat(4,minmax(0,1fr))'), 'Research protocol must use four editorial stages on desktop');
+assert.ok(brandCss.includes('PROTOCOL / 04 STAGES'), 'Research method must be marked as a protocol dossier');
+assert.ok(brandCss.includes('grid-template-columns:1fr !important;') && brandCss.includes('.universe-bridge'), 'Bridge composition must collapse for mobile');
