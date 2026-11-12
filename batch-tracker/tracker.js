@@ -6420,6 +6420,14 @@ function renderEngineExecutionComparison(panel, eligible) {
       seriesHeading.textContent = "Évolution des séries (variable et unité identiques)";
       output.append(seriesHeading, seriesList);
     }
+    const limitationsA = new Set(a.limitations || []);
+    const limitationsB = new Set(b.limitations || []);
+    const addedLimitations = [...limitationsB].filter((item) => !limitationsA.has(item));
+    const removedLimitations = [...limitationsA].filter((item) => !limitationsB.has(item));
+    const limitationsLine = document.createElement("p");
+    limitationsLine.textContent = "Limites ajoutées : " + (addedLimitations.join(" · ") || "aucune") +
+      " ; limites disparues : " + (removedLimitations.join(" · ") || "aucune");
+    output.appendChild(limitationsLine);
     const flagsA = new Set(a.quality_flags || []);
     const flagsB = new Set(b.quality_flags || []);
     const added = [...flagsB].filter((flag) => !flagsA.has(flag));
