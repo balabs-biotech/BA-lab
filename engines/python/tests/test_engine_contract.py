@@ -827,7 +827,12 @@ class EngineContractTests(unittest.TestCase):
                 "substrate_code": "Technosoil",
                 "production_system": "greenhouse",
                 "context_tags": ["greentech-trial"],
-                "genetic_reference": {"status": "not_specified"},
+                "genetic_reference": {
+                    "status": "not_specified", "strain_id": None, "organism_id": None,
+                    "designation": None, "origin": None, "source_description": None,
+                    "scientific_name": None, "common_name": None,
+                    "taxonomy_source": None, "taxonomy_id": None,
+                },
             }],
         }
         record_id = "ac2b3a4d-5e6f-4789-8123-456789abcdef"
@@ -852,9 +857,10 @@ class EngineContractTests(unittest.TestCase):
                 },
             },
         }]
-        result = analyze_biological_context_features(request)
-        self.assertEqual(result["outcome"], "success")
-        value = result["value"]
+        result = execute_registered_engine(request)
+        self.assertEqual(result["status"], "completed", msg=str(result.get("error")))
+        self.assertEqual(result["result"]["outcome"], "success")
+        value = result["result"]["value"]
         self.assertEqual(value["subject"]["subject_type"], "plant")
         self.assertEqual(value["subject"]["subject_id"], plant_culture_id)
         self.assertEqual(value["subject"]["plant_culture_id"], plant_culture_id)
