@@ -84,6 +84,16 @@ begin
   if not exists (
     select 1 from pg_attribute
      where attrelid = v_links
+       and attname = 'measurement_quality_state'
+       and atttypid = 'text'::regtype
+       and not attisdropped
+  ) then
+    raise exception 'FAIL: immutable evidence must preserve measurement quality state';
+  end if;
+
+  if not exists (
+    select 1 from pg_attribute
+     where attrelid = v_links
        and attname = 'measurement_observed_at'
        and atttypid = 'timestamp with time zone'::regtype
        and attnotnull
@@ -120,7 +130,9 @@ begin
      or position('biological_subject_id' in v_definition) = 0
      or position('environment_id' in v_definition) = 0
      or position('v_measurement.measured_at is null' in v_definition) = 0
-     or position('source_metadata' in v_definition) = 0 then
+     or position('source_metadata' in v_definition) = 0
+     or position('measurement_quality_state' in v_definition) = 0
+     or position('v_measurement.quality_state' in v_definition) = 0 then
     raise exception 'FAIL: RPC must validate actor, lifecycle, temporal and biological/environmental scope';
   end if;
 
