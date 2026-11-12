@@ -49,6 +49,10 @@ def calculate_ndvi_statistics(
     *,
     scl: Any | None = None,
     minimum_valid_ratio: float = 0.2,
+    red_scale: float = 1.0,
+    nir_scale: float = 1.0,
+    red_offset: float = 0.0,
+    nir_offset: float = 0.0,
 ) -> Sentinel2NdviStatistics:
     """Calculate NDVI statistics on native, co-registered pixels.
 
@@ -66,8 +70,23 @@ def calculate_ndvi_statistics(
     ):
         raise ValueError("minimum_valid_ratio must be between 0 and 1")
 
-    red_array = _raster(red, "red")
-    nir_array = _raster(nir, "nir")
+    for name, value, positive in (
+        ("red_scale", red_scale, True),
+        ("nir_scale", nir_scale, True),
+        ("red_offset", red_offset, False),
+        ("nir_offset", nir_offset, False),
+    ):
+        if (
+            isinstance(value, bool)
+            or not isinstance(value, (int, float))
+            or not np.isfinite(value)
+            or (positive and value <= 0)
+        ):
+            qualifier = "positive and finite" if positive else "finite"
+            raise ValueError(f"{name} must be {qualifier}")
+
+    red_array = _raster(red, "red") * float(red_scale) + float(red_offset)
+    nir_array = _raster(nir, "nir") * float(nir_scale) + float(nir_offset)
     if red_array.shape != nir_array.shape:
         raise ValueError("red and nir rasters must have the same shape")
 
