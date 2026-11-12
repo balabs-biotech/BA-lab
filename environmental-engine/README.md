@@ -38,7 +38,7 @@ resolution and provider metadata. Provider adapters return the shared
 ```bash
 python -m venv .venv
 . .venv/bin/activate
-python -m pip install -e ".[dev,api]"
+python -m pip install -e ".[dev,api,satellite]"
 pytest
 
 # Start the private API locally (requires BA_ENVIRONMENTAL_ENGINE_API_KEY)
@@ -49,7 +49,7 @@ Python 3.10+; CPU-only.
 
 ## Private service API
 
-The optional FastAPI boundary exposes `GET /health`, `POST /v1/analyses` for trusted normalized observations, `POST /v1/analyses/nasa-power` for strict normalization of persisted NASA POWER rows, and `POST /v1/analyses/biological-performance` for tenant-scoped biological measurement analysis and BAL biological serialization. Configure `BA_ENVIRONMENTAL_ENGINE_API_KEY` in the runtime secret manager before starting the service. Keep the API behind private ingress; never expose the internal key to CultureOps clients. The `environmental-analysis` Supabase Edge Function is the authenticated CultureOps gateway and reads authorized persisted rows before calling the engine. The Supabase Edge Function must authenticate the user and enforce organization/location authorization before forwarding normalized observations.
+The optional FastAPI boundary exposes `GET /health`, `POST /v1/analyses` for trusted normalized observations, `POST /v1/analyses/nasa-power` for strict normalization of persisted NASA POWER rows, and `POST /v1/analyses/biological-performance` for tenant-scoped biological measurement analysis and BAL biological serialization, and `POST /v1/sentinel2/process-and-persist` for bounded Sentinel-2 scene processing and signed persistence. Configure `BA_ENVIRONMENTAL_ENGINE_API_KEY` in the runtime secret manager before starting the service. Keep the API behind private ingress; never expose the internal key to CultureOps clients. The `environmental-analysis` Supabase Edge Function is the authenticated CultureOps gateway and reads authorized persisted rows before calling the engine. The Supabase Edge Function must authenticate the user and enforce organization/location authorization before forwarding normalized observations.
 
 ## Architecture contracts
 
@@ -77,3 +77,20 @@ The optional FastAPI boundary exposes `GET /health`, `POST /v1/analyses` for tru
 - `docs/architecture/ba-fao56-reference-evapotranspiration-v1.md`: daily FAO-56 ET0 contract.
 - `docs/architecture/ba-fao56-net-radiation-v1.md`: daily solar and net-radiation calculations.
 - `docs/architecture/ba-daily-reference-indicators-pipeline-v1.md`: normalized source-to-indicator pipeline.
+
+
+### Sentinel-2 private worker
+
+The Sentinel-2 worker is a private service, not a browser API. Build it from this directory with `Dockerfile`; the image installs the optional `satellite` extra (Rasterio) and runs the existing FastAPI service. The authenticated Supabase gateway `earth-search-sentinel2-run` resolves the caller's location and writer membership, searches Earth Search STAC, then forwards the bounded scene batch and the caller JWT to this worker.
+
+Required worker runtime secrets:
+
+- `BA_ENVIRONMENTAL_ENGINE_API_KEY`: private gateway-to-worker key. The same value is configured in the Supabase Edge Function `earth-search-sentinel2-run` as `BA_ENVIRONMENTAL_ENGINE_API_KEY`.
+- `BA_SENTINEL2_INGEST_URL`: full URL of the `earth-search-sentinel2-ingest` Supabase Edge Function.
+- `BA_SENTINEL2_WORKER_SECRET`: at least 32 random bytes, shared only between this worker and the persistence Edge Function.
+
+The persistence Edge Function also requires the same `BA_SENTINEL2_WORKER_SECRET`; it uses the caller JWT to re-check user identity, location scope and writer membership before using its server-only Supabase secret to upsert rows. The worker has no service-role key and cannot bypass that authorization boundary.
+
+The gateway currently derives an **approximate location buffer** from the saved latitude/longitude; it is not a cadastral or surveyed parcel polygon. It limits a request to 90 days and 20 scenes. Each scene is processed independently; only complete, valid mean/median NDVI pairs are submitted. The worker does not create or modify migrations, deploy functions, or configure secrets automatically.
+
+Do not expose the worker publicly without its private ingress controls and `X-BA-Engine-Key` authentication. Configure all three services and execute the focused tests before enabling production ingestion.
