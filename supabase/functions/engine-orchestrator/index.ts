@@ -128,7 +128,7 @@ Deno.serve(async (req: Request) => {
     .eq("user_id", auth.user.id)
     .maybeSingle();
   if (membershipError || !membership) return reply(403, { error: "organization_access_denied" });
-  if (!["owner", "admin", "member"].includes(membership.role)) {
+  if (!["owner", "admin", "member"].includes(String(membership.role))) {
     return reply(403, { error: "organization_role_not_permitted" });
   }
 
@@ -141,6 +141,9 @@ Deno.serve(async (req: Request) => {
   if (sourceError) return reply(422, { error: "source_records_unavailable" });
   if (!measurements || measurements.length !== recordIds.length) {
     return reply(422, { error: "one_or_more_source_records_missing_or_inaccessible" });
+  }
+  if (measurements.some((row) => row.quality_state === "excluded")) {
+    return reply(422, { error: "excluded_source_records_not_eligible" });
   }
   if (scope?.culture_id && measurements.some((row) => row.culture_id !== scope.culture_id)) {
     return reply(422, { error: "source_scope_mismatch" });
