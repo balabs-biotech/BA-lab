@@ -3,7 +3,7 @@ import { readFileSync } from "node:fs";
 
 const source = readFileSync("supabase/functions/engine-orchestrator/index.ts", "utf8");
 const checks = [
-  ["caller identity is verified", /supabase\.auth\.getUser\(\)/],
+  ["caller identity is verified", /userClient\.auth\.getUser\(\)/],
   ["organization membership is checked", /organization_members/],
   ["viewer roles cannot invoke privileged execution", /!\["owner", "admin", "member"\]\.includes\(String\(membership\.role\)\)/],
   ["source rows are loaded through caller-scoped client", /userClient[\s\S]*\.from\(["']measurements["']\)/],
