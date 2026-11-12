@@ -3739,6 +3739,110 @@ h1 span{
 }
 </style>
 
+
+<style id="universe-index-final-cascade">
+/* The linked brand-system stylesheet defines a later, two-column editorial grid.
+   This higher-specificity rule owns only the eight homepage directory panels. */
+#app.balabs-ui > main > #universes .universe-index-grid{
+  display:grid!important;
+  grid-template-columns:repeat(4,minmax(0,1fr))!important;
+  grid-auto-flow:row!important;
+  gap:16px!important;
+  border:0!important;
+}
+#app.balabs-ui > main > #universes .universe-index-card,
+#app.balabs-ui > main > #universes .universe-index-card:nth-child(odd),
+#app.balabs-ui > main > #universes .universe-index-card:nth-child(even),
+#app.balabs-ui > main > #universes .universe-index-card:nth-child(2n),
+#app.balabs-ui > main > #universes .universe-index-card:nth-child(3n){
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:flex-start!important;
+  position:relative!important;
+  min-width:0!important;
+  min-height:280px!important;
+  height:auto!important;
+  margin:0!important;
+  padding:22px!important;
+  gap:0!important;
+  border:1px solid #40534D!important;
+  border-top:3px solid #B96B4D!important;
+  background:linear-gradient(155deg,#263B38,#1b2b28)!important;
+  box-shadow:0 10px 28px #0004!important;
+  overflow:visible!important;
+  text-align:start!important;
+  overflow-wrap:anywhere!important;
+}
+#app.balabs-ui > main > #universes .universe-index-card > span,
+#app.balabs-ui > main > #universes .universe-index-card > b,
+#app.balabs-ui > main > #universes .universe-index-card > small,
+#app.balabs-ui > main > #universes .universe-index-card > p,
+#app.balabs-ui > main > #universes .universe-index-card > em{
+  position:static!important;
+  inset:auto!important;
+  float:none!important;
+  transform:none!important;
+  grid-column:auto!important;
+  grid-row:auto!important;
+  width:auto!important;
+  max-width:100%!important;
+  min-width:0!important;
+  text-align:start!important;
+  overflow-wrap:anywhere!important;
+}
+#app.balabs-ui > main > #universes .universe-index-card > span{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  flex:0 0 34px!important;
+  width:42px!important;
+  height:34px!important;
+  margin:0 0 18px!important;
+  border:1px solid #B96B4D!important;
+  color:#D99A7F!important;
+  font:700 11px/1 ui-monospace,monospace!important;
+}
+#app.balabs-ui > main > #universes .universe-index-card > b{
+  display:block!important;
+  margin:0 0 8px!important;
+  color:#F2F1E9!important;
+  font:400 clamp(18px,1.5vw,22px)/1.2 Georgia,serif!important;
+}
+#app.balabs-ui > main > #universes .universe-index-card > small{
+  display:block!important;
+  margin:0 0 12px!important;
+  color:#9BAEA4!important;
+  font-size:11px!important;
+  line-height:1.5!important;
+}
+#app.balabs-ui > main > #universes .universe-index-card > p{
+  display:block!important;
+  margin:0 0 20px!important;
+  color:#D1D0C5!important;
+  font-size:13px!important;
+  line-height:1.65!important;
+}
+#app.balabs-ui > main > #universes .universe-index-card > em{
+  display:flex!important;
+  align-items:center!important;
+  gap:8px!important;
+  margin-top:auto!important;
+  padding-top:12px!important;
+  border-top:1px solid #40534D!important;
+  color:#D99A7F!important;
+  font-size:10px!important;
+  line-height:1.5!important;
+}
+@media(max-width:900px){
+  #app.balabs-ui > main > #universes .universe-index-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  #app.balabs-ui > main > #universes .universe-index-card{min-height:250px!important;padding:19px!important}
+}
+@media(max-width:520px){
+  #app.balabs-ui > main > #universes .universe-index-grid{grid-template-columns:minmax(0,1fr)!important;gap:12px!important}
+  #app.balabs-ui > main > #universes .universe-index-card{min-height:0!important;padding:19px!important}
+}
+</style>
+
 </body>
 </html>
 
