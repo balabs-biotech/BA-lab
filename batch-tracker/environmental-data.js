@@ -703,8 +703,12 @@
         };
         metric("Observations analysées",summary.record_count??recordIds.length);
         metric("Séries détectées",summary.series_count);
-        metric("Doublons",summary.duplicate_timestamp_count??summary.duplicate_count);
-        metric("Lacunes",summary.sampling_gap_count??summary.gap_count);
+        const series=Array.isArray(value.series)?value.series:[];
+        const duplicateCount=series.reduce((total,item)=>total+(Number(item.duplicate_timestamps)||0),0);
+        const gapCount=series.reduce((total,item)=>total+(Array.isArray(item.gap_after_record_ids)?item.gap_after_record_ids.length:0),0);
+        metric("Doublons",duplicateCount);
+        metric("Lacunes temporelles",gapCount);
+        metric("Points exclus",summary.excluded_record_count??0);
         engineOutput.append(stats);
         const flags=Array.isArray(value.quality_flags)?value.quality_flags:[];
         if(flags.length){
