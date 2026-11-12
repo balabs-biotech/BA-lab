@@ -189,7 +189,7 @@ def run_environmental_timeseries_qc(request: Mapping[str, Any]) -> dict[str, Any
         request,
         EngineSpec(
             engine_id="environmental.timeseries.qc",
-            engine_version="0.1.0",
+            engine_version="0.2.0",
             execute=analyze_environmental_timeseries_qc,
         ),
     )
