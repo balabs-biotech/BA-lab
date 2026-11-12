@@ -22,6 +22,8 @@ A measurement has two distinct value representations:
 
 The variable catalogue (`public.variables`) supplies the dimension and `canonical_unit_code`. The unit catalogue (`public.units`) supplies the dimension, factor, offset and linearity.
 
+The first shared deterministic implementation now lives in `supabase/functions/_shared/measurement-normalization.ts` and is used by BAL-JSON ingestion. The Kelvin catalogue offset is corrected by migration `20261112010000_correct_kelvin_unit_offset.sql`; regression tests assert that 273.15 K normalizes to 0 °C. Client-provided normalized values are checked against the server-computed result.
+
 For linear units with a verified catalogue mapping, the intended conversion is:
 
 `base_value = raw_value * raw_unit.factor + raw_unit.offset_value`
