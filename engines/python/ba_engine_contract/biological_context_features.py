@@ -186,6 +186,11 @@ def analyze_biological_context_features(request: Mapping[str, Any]) -> dict[str,
         missing_context.append("some_input_records_were_excluded")
     if not request.get("parameters", {}).get("biological_context_supplied", False):
         missing_context.append("biological_context_record_not_supplied")
+    environment_link_state = parameters.get("environment_link_state")
+    if environment_link_state == "unlinked":
+        missing_context.append("culture_environment_not_linked")
+    elif environment_link_state == "environment_without_location":
+        missing_context.append("culture_environment_location_missing")
 
     quality_flags = ["biological_interpretation_not_performed"]
     if not observed_times:
