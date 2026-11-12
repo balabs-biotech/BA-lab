@@ -117,3 +117,18 @@ SIGTERM/SIGINT, and drains the current job before stopping its poll loop.
 The existing API Docker image already installs the `satellite` extra, so a
 separate worker service can reuse that image with a command override. No worker
 service has been deployed or started.
+
+
+## Authenticated enqueue-only gateway
+
+Added `supabase/functions/earth-search-sentinel2-enqueue` as a separate
+future queue entrypoint. It authenticates the user JWT, verifies location
+visibility and organization write membership, validates the same 90-day,
+cloud-cover and 10-scene request bounds, and inserts a `queued` ledger row
+containing only the bounded date/cloud/scene parameters and the approximate
+AOI method. It does not call Earth Search, the raster worker, or the
+synchronous endpoint, and it never stores the caller JWT.
+
+The existing `earth-search-sentinel2-run` synchronous endpoint remains
+unchanged and remains the current active path. The new enqueue endpoint is not
+yet wired into CultureOps UI or deployed.
