@@ -84,7 +84,7 @@ function validateRows(rows: unknown, organizationId: string, locationId: string)
   if (!Array.isArray(rows) || rows.length < 2 || rows.length > MAX_ROWS || rows.length % 2 !== 0) {
     return "rows_must_contain_2_to_200_entries_in_scene_pairs";
   }
-  const pairs = new Map<string, Set<string>>();
+  const pairs = new Map<string, { variables: Set<string>; observedAt: string; retrievedAt: string; sourceUrl: string }>();
   for (const candidate of rows) {
     if (!candidate || typeof candidate !== "object" || Array.isArray(candidate)) return "invalid_observation_row";
     const row = candidate as Record<string, unknown>;
@@ -101,7 +101,7 @@ function validateRows(rows: unknown, organizationId: string, locationId: string)
     if (typeof row.source_url !== "string") return "invalid_stac_source_url";
     try {
       const url = new URL(row.source_url);
-      if (url.protocol !== "https:" || !ALLOWED_HOSTS.has(url.hostname.toLowerCase()) ||
+      if (url.protocol !== "https:" || url.username || url.password || !ALLOWED_HOSTS.has(url.hostname.toLowerCase()) ||
           !url.pathname.startsWith("/v1/collections/sentinel-2-l2a/items/") ||
           decodeURIComponent(url.pathname.split("/").pop() ?? "") !== sceneId) return "invalid_stac_source_url";
     } catch {
@@ -110,18 +110,28 @@ function validateRows(rows: unknown, organizationId: string, locationId: string)
     if (!row.metadata || typeof row.metadata !== "object" || Array.isArray(row.metadata)) return "metadata_required";
     const metadata = row.metadata as Record<string, unknown>;
     if (metadata.scene_id !== sceneId ||
-        typeof metadata.processing_version !== "string" ||
+        typeof metadata.processing_version !== "string" || metadata.processing_version.length < 1 || metadata.processing_version.length > 80 ||
         typeof metadata.valid_pixel_ratio !== "number" || metadata.valid_pixel_ratio < 0.2 ||
         metadata.valid_pixel_ratio > 1 ||
         typeof metadata.cloud_cover_pct !== "number" || metadata.cloud_cover_pct < 0 ||
         metadata.cloud_cover_pct > 100) return "invalid_processing_provenance";
-    const variables = pairs.get(sceneId) ?? new Set<string>();
-    if (variables.has(String(row.variable_code))) return "duplicate_scene_variable_row";
-    variables.add(String(row.variable_code));
-    pairs.set(sceneId, variables);
+    const pair = pairs.get(sceneId);
+    if (pair) {
+      if (pair.observedAt !== row.observed_at || pair.retrievedAt !== row.retrieved_at ||
+          pair.sourceUrl !== row.source_url) return "scene_pair_provenance_mismatch";
+      if (pair.variables.has(String(row.variable_code))) return "duplicate_scene_variable_row";
+      pair.variables.add(String(row.variable_code));
+    } else {
+      pairs.set(sceneId, {
+        variables: new Set([String(row.variable_code)]),
+        observedAt: String(row.observed_at),
+        retrievedAt: String(row.retrieved_at),
+        sourceUrl: String(row.source_url),
+      });
+    }
   }
-  for (const variables of pairs.values()) {
-    if (variables.size !== 2 || !variables.has("ndvi_mean") || !variables.has("ndvi_median")) {
+  for (const pair of pairs.values()) {
+    if (pair.variables.size !== 2 || !pair.variables.has("ndvi_mean") || !pair.variables.has("ndvi_median")) {
       return "each_scene_requires_mean_and_median";
     }
   }
