@@ -13,7 +13,7 @@ Move Sentinel-2 native-grid COG reading and NDVI statistics out of the Supabase 
 5. The worker validates the request, processes each scene through the existing STAC parser, bounded COG reader, SCL mask, NDVI statistics calculator and observation payload builder.
 6. The worker excludes incomplete or non-valid scene pairs, serializes the exact payload, and signs `<unix-seconds>.<raw-json-body>` with HMAC-SHA256.
 7. The worker forwards the caller JWT plus timestamp/signature headers to `earth-search-sentinel2-ingest`.
-8. The persistence Edge Function re-authenticates the user, verifies the timestamp and HMAC, re-checks location and organization writer membership, validates scene provenance and upserts using the scene-aware idempotency key.
+8. The persistence Edge Function re-authenticates the user, verifies the timestamp and HMAC, re-checks location and organization writer membership, validates scene provenance and calls `upsert_satellite_environmental_observations(jsonb)`.
 
 ## Trust boundaries
 
@@ -39,7 +39,7 @@ The caller JWT is forwarded end-to-end. The worker does not trust organization o
 - Each scene produces `ndvi_mean` and `ndvi_median`, with the same acquisition time, retrieval time, source URL and scene identity.
 - The AOI is an approximate buffer around the saved location point. It must not be represented as a property boundary or parcel measurement.
 - Scene failures are isolated by the batch processor. A scene failure does not abort the remaining scenes.
-- Upserts are retry-safe through `source_record_id` and the satellite partial unique index.
+- Upserts are retry-safe through `source_record_id` and the satellite partial unique index. Because PostgREST's generic upsert cannot express the partial-index inference predicate, persistence uses a `SECURITY DEFINER` SQL RPC that supplies `WHERE data_family = 'satellite'` in the `ON CONFLICT` target. Execute permission is limited to `service_role`.
 
 ## Deployment configuration
 
