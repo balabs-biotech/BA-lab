@@ -66,6 +66,9 @@ def analyze_biological_context_features(request: Mapping[str, Any]) -> dict[str,
         context = record.get("context") or {}
 
         if record_type == "measurement":
+            if data.get("quality_state") == "excluded":
+                excluded.append({"record_id": record_id, "reason": "measurement_quality_state_excluded"})
+                continue
             if context.get("culture_id") != culture_id:
                 excluded.append({"record_id": record_id, "reason": "measurement_culture_scope_mismatch"})
                 continue
@@ -218,6 +221,7 @@ def analyze_biological_context_features(request: Mapping[str, Any]) -> dict[str,
                 },
                 "observed_window": observed_window,
                 "source_record_count": sum(accepted_by_type.values()),
+                "excluded_record_count": len(excluded),
                 "record_counts_by_type": dict(sorted(accepted_by_type.items())),
                 "missing_context": missing_context,
                 "temporal_gaps": temporal_gaps,
