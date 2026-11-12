@@ -6365,15 +6365,20 @@ function renderEngineExecutionComparison(panel, eligible) {
     const title = document.createElement("p");
     title.textContent = "Comparaison descriptive — aucune relation causale n’est déduite.";
     output.appendChild(title);
-    const snapshotChanged = a.input_snapshot_sha256 && b.input_snapshot_sha256
-      ? a.input_snapshot_sha256 !== b.input_snapshot_sha256
-      : JSON.stringify([...(a.input_record_ids || [])].sort()) !==
-        JSON.stringify([...(b.input_record_ids || [])].sort());
+    let snapshotComparison = null;
+    if (a.input_snapshot_sha256 && b.input_snapshot_sha256) {
+      snapshotComparison = a.input_snapshot_sha256 === b.input_snapshot_sha256;
+    } else if (Array.isArray(a.input_record_ids) && Array.isArray(b.input_record_ids)) {
+      snapshotComparison = JSON.stringify([...a.input_record_ids].sort()) ===
+        JSON.stringify([...b.input_record_ids].sort());
+    }
     const snapshotNote = document.createElement("p");
     snapshotNote.className = "muted";
-    snapshotNote.textContent = snapshotChanged
+    snapshotNote.textContent = snapshotComparison === false
       ? "Les instantanés d’entrée diffèrent : les deux analyses ne portent pas exactement sur les mêmes données."
-      : "Les empreintes ou identifiants d’entrée disponibles sont identiques.";
+      : snapshotComparison === true
+        ? "Les empreintes ou identifiants d’entrée disponibles sont identiques."
+        : "Comparaison exacte des instantanés indéterminée : empreinte et identifiants complets indisponibles.";
     output.appendChild(snapshotNote);
 
     const summaryA = a.value?.summary || {};
