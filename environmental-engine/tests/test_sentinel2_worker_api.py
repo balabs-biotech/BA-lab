@@ -50,9 +50,10 @@ def test_private_worker_route_forwards_user_jwt_and_validated_scope(monkeypatch)
 
     monkeypatch.setattr(api, "process_and_persist_sentinel2_batch", fake_process)
     client = TestClient(api.create_app(engine_api_key="internal-test-key"))
+    payload = _payload()
     response = client.post(
         "/v1/sentinel2/process-and-persist",
-        json=_payload(),
+        json=payload,
         headers={
             "X-BA-Engine-Key": "internal-test-key",
             "Authorization": "Bearer end-user-jwt",
@@ -62,7 +63,8 @@ def test_private_worker_route_forwards_user_jwt_and_validated_scope(monkeypatch)
     assert response.status_code == 200
     assert response.json()["observations_submitted"] == 2
     assert captured["user_authorization"] == "Bearer end-user-jwt"
-    assert str(captured["organization_id"]) == _payload()["organization_id"] or captured["organization_id"]
+    assert str(captured["organization_id"]) == payload["organization_id"]
+    assert str(captured["location_id"]) == payload["location_id"]
 
 
 def test_private_worker_route_requires_user_jwt(monkeypatch):
