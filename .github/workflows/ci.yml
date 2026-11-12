@@ -28,6 +28,28 @@ jobs:
         run: python -m pip install --disable-pip-version-check -e engines/python
       - name: Validate versioned Python engine contracts
         run: python -m unittest discover -s engines/python/tests -p "test_*.py" -v
+      - name: Build Python engine worker container
+        run: docker build --pull -f engines/python/Dockerfile -t ba-labs-engine-worker:ci .
+      - name: Smoke test isolated Python engine worker container
+        shell: bash
+        run: |
+          set -euo pipefail
+          token="ci-worker-token-0123456789abcdef"
+          docker run --detach --name ba-engine-worker-ci \
+            --publish 127.0.0.1:18080:8080 \
+            --env "BA_ENGINE_WORKER_TOKEN=$token" \
+            --read-only --cap-drop=ALL --security-opt=no-new-privileges \
+            --memory=256m --cpus=1 --pids-limit=64 --user=10001:10001 \
+            ba-labs-engine-worker:ci
+          cleanup() { docker logs ba-engine-worker-ci || true; docker rm -f ba-engine-worker-ci >/dev/null 2>&1 || true; }
+          trap cleanup EXIT
+          for attempt in $(seq 1 20); do
+            if curl --fail --silent http://127.0.0.1:18080/healthz >/dev/null; then break; fi
+            sleep 1
+          done
+          BA_ENGINE_WORKER_URL=http://127.0.0.1:18080 \
+            BA_ENGINE_WORKER_TOKEN="$token" \
+            python scripts/test-engine-worker-container.py
 
   firmware-logic:
     runs-on: ubuntu-latest
