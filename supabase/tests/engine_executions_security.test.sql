@@ -179,7 +179,7 @@ begin
 end $$;
 
 -- BIE may legitimately produce an insufficient-data result with no source rows.
-do $
+do $bie$
 declare
   v_org uuid := 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
   v_user uuid := 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb';
@@ -228,6 +228,6 @@ begin
       and r.result_type='biological.context.features'
       and e.status='completed'
   ) then raise exception 'empty BIE snapshot must persist as an insufficient-data result'; end if;
-end $$;
+end $bie$;
 
 rollback;
