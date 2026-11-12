@@ -71,11 +71,18 @@ export function resolveBiologicalContext(input: {
   window: { start: string; end: string; timezone: string };
 }) {
   const { organizationId, cultureId, contexts, environments, measurements, window } = input;
-  const startDate = localDate(window.start, window.timezone);
-  const endDate = localDate(window.end, window.timezone);
-  if (Date.parse(window.end) <= Date.parse(window.start)) {
-    throw new Error("analysis_window_end_must_follow_start");
+  const startInstant = Date.parse(window.start);
+  const endInstant = Date.parse(window.end);
+  if (!Number.isFinite(startInstant) || !Number.isFinite(endInstant) ||
+      !/(Z|[+-][0-9]{2}:[0-9]{2})$/i.test(window.start) ||
+      !/(Z|[+-][0-9]{2}:[0-9]{2})$/i.test(window.end)) {
+    throw new Error("analysis_window_must_be_timezone_aware");
   }
+  if (endInstant <= startInstant) throw new Error("analysis_window_end_must_follow_start");
+  // Analysis windows are half-open [start, end); valid_to is also exclusive.
+  // Resolve the last included instant, not the date at the exclusive end.
+  const startDate = localDate(window.start, window.timezone);
+  const lastIncludedDate = localDate(new Date(endInstant - 1).toISOString(), window.timezone);
 
   const scopedContexts = contexts.filter((context) =>
     context.organization_id === organizationId && context.culture_id === cultureId
@@ -109,12 +116,12 @@ export function resolveBiologicalContext(input: {
   });
 
   const intersectingContexts = scopedContexts.filter((context) =>
-    context.valid_from <= endDate &&
+    context.valid_from <= lastIncludedDate &&
     (context.valid_to === null || context.valid_to > startDate)
   );
   const windowContexts = intersectingContexts.filter((context) =>
     context.valid_from <= startDate &&
-    (context.valid_to === null || context.valid_to > endDate)
+    (context.valid_to === null || context.valid_to > lastIncludedDate)
   );
   let windowResolution: Record<string, unknown>;
   if (intersectingContexts.length > 1) {
