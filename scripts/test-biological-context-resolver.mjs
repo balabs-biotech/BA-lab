@@ -57,7 +57,7 @@ assert.equal(resolved.window.status, "ambiguous",
 const endsAtTransition = resolveBiologicalContext({
   organizationId, cultureId, currentEnvironmentId: envB, contexts, environments,
   measurements: [],
-  window: { start: "2026-11-10T00:00:00Z", end: "2026-11-12T00:00:00Z", timezone: "Africa/Algiers" },
+  window: { start: "2026-11-10T00:00:00Z", end: "2026-11-11T23:00:00Z", timezone: "Africa/Algiers" },
 });
 assert.equal(endsAtTransition.window.status, "resolved",
   "an exclusive window end exactly at the context transition must not include the next context");
