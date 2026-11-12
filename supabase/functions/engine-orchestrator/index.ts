@@ -183,7 +183,7 @@ Deno.serve(async (req: Request) => {
       const allowedCodes = new Set([
         "caller_scoped_supabase_client_required", "biological_subject_scope_required",
         "culture_not_found_or_inaccessible", "culture_tenant_scope_mismatch",
-        "biological_contexts_unavailable", "culture_measurements_unavailable",
+        "biological_contexts_unavailable", "biological_analysis_context_limit_exceeded", "culture_measurements_unavailable",
         "biological_analysis_measurement_limit_exceeded", "biological_environments_unavailable",
         "biological_locations_unavailable", "environmental_observations_unavailable",
         "biological_analysis_weather_limit_exceeded", "analysis_window_must_be_timezone_aware",
