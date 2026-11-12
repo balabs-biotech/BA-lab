@@ -4,6 +4,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from datetime import datetime
 from typing import Any, Callable, Sequence
+from threading import Event
 from uuid import UUID
 
 from ba_environmental_engine.sources.sentinel2_pipeline import (
@@ -47,6 +48,7 @@ def process_sentinel2_stac_items(
     minimum_valid_ratio: float = 0.2,
     max_pixels: int = 4_000_000,
     max_scenes: int = 100,
+    stop_event: Event | None = None,
 ) -> Sentinel2BatchProcessingResult:
     """Process each unique scene independently; one failure never aborts peers.
 
@@ -66,6 +68,8 @@ def process_sentinel2_stac_items(
     seen: set[str] = set()
 
     for index, item in enumerate(items):
+        if stop_event is not None and stop_event.is_set():
+            raise InterruptedError("Sentinel-2 batch cancelled after lease loss")
         candidate_id = item.get("id") if isinstance(item, dict) else None
         scene_id = candidate_id.strip() if isinstance(candidate_id, str) and candidate_id.strip() else f"<item:{index}>"
         if scene_id in seen:
