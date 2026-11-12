@@ -74,6 +74,7 @@ def outcome_evidence_rows_to_experimental_observations(
     """
     observations: list[ExperimentalObservation] = []
     seen_measurements: set[str] = set()
+    experiment_ids: set[str] = set()
 
     for row in rows:
         recommendation_id = str(row.get("recommendation_id") or "").strip()
@@ -82,6 +83,9 @@ def outcome_evidence_rows_to_experimental_observations(
         assignment = assignments.get(recommendation_id)
         if assignment is None:
             raise ValueError("every outcome recommendation needs an explicit cohort assignment")
+        if assignment.recommendation_id != recommendation_id:
+            raise ValueError("cohort assignment recommendation ID does not match its mapping key")
+        experiment_ids.add(assignment.experiment_id)
 
         organization_id = str(row.get("organization_id") or "").strip()
         if organization_id != assignment.organization_id:
@@ -156,4 +160,6 @@ def outcome_evidence_rows_to_experimental_observations(
             )
         )
 
+    if len(experiment_ids) > 1:
+        raise ValueError("one comparison dataset cannot mix distinct experiments")
     return tuple(observations)
