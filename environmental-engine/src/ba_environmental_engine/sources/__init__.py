@@ -16,6 +16,7 @@ from ba_environmental_engine.sources.sensor_temporal import (
 )
 from ba_environmental_engine.sources.sentinel2 import normalize_sentinel2_observation
 from ba_environmental_engine.sources.sentinel2_ingestion import build_sentinel2_observation_rows
+from ba_environmental_engine.sources.sentinel2_stac import Sentinel2StacScene, parse_sentinel2_stac_item
 from ba_environmental_engine.sources.sentinel2_raster import (
     Sentinel2NdviStatistics,
     calculate_ndvi_statistics,
@@ -32,6 +33,7 @@ __all__ = [
     "SensorTemporalAssessment",
     "SupabaseSatelliteObservationRepository",
     "Sentinel2NdviStatistics",
+    "Sentinel2StacScene",
     "SupabaseSensorMeasurementRepository",
     "assess_sensor_temporal_anomalies",
     "build_sentinel2_observation_rows",
@@ -40,4 +42,5 @@ __all__ = [
     "normalize_iot_measurement_row",
     "normalize_nasa_power_observation",
     "normalize_sentinel2_observation",
+    "parse_sentinel2_stac_item",
 ]
