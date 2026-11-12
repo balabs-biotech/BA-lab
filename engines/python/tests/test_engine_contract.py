@@ -168,6 +168,8 @@ class EngineContractTests(unittest.TestCase):
             "result_id": "ndvi:scene-123:aoi-456",
             "source_scene_id": "S2A_20261112T101021",
             "algorithm": "sentinel2-ndvi-v1",
+            "quality_state": "accepted",
+            "limitations": [],
             "bands": {"red": "B04", "nir": "B08"},
             "mask": {"scl_excluded_classes": [3, 8, 9, 10, 11], "cloud_shadow_masked": True},
             "calibration": {"reflectance_status": "raw_dn", "formula": "(DN + BOA_ADD_OFFSET) / QUANTIFICATION_VALUE"},
@@ -175,7 +177,7 @@ class EngineContractTests(unittest.TestCase):
             "pixel_accounting": {"total_pixel_count": 1000, "valid_pixel_count": 720, "valid_pixel_fraction": 0.72},
             "statistics": {"minimum": -0.2, "maximum": 0.91, "mean": 0.48},
             "artifact": {"format": "COG", "href": "s3://ba-labs-private/ndvi/scene-123.tif", "sha256": "a" * 64},
-            "provenance": {"generated_at": "2026-11-12T10:30:00Z", "software_version": "1.0.0"},
+            "provenance": {"generated_at": "2026-11-12T10:30:00Z", "software_version": "1.0.0", "processing_baseline": "05.11", "source_metadata_sha256": "b" * 64},
         }
         result_validator = validator(schema)
         self.assertEqual(list(result_validator.iter_errors(result)), [])
