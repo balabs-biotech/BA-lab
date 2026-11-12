@@ -46,6 +46,7 @@ assert.match(comparison, /areEngineExecutionsComparable/);
 assert.match(comparison, /engine-comparison-select/);
 assert.match(comparison, /input_snapshot_sha256/);
 assert.match(comparison, /Les instantanés d’entrée diffèrent/);
+assert.match(comparison, /Comparaison exacte des instantanés indéterminée/);
 assert.match(comparison, /quality_flags/);
 assert.match(comparison, /limitationsA/);
 assert.match(comparison, /Limites ajoutées/);
