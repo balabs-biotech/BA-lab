@@ -108,14 +108,18 @@ export function resolveBiologicalContext(input: {
       location_id: environment.location_id, status: "resolved", reason: null };
   });
 
-  const windowContexts = scopedContexts.filter((context) =>
+  const intersectingContexts = scopedContexts.filter((context) =>
+    context.valid_from <= endDate &&
+    (context.valid_to === null || context.valid_to > startDate)
+  );
+  const windowContexts = intersectingContexts.filter((context) =>
     context.valid_from <= startDate &&
     (context.valid_to === null || context.valid_to > endDate)
   );
   let windowResolution: Record<string, unknown>;
-  if (windowContexts.length > 1) {
+  if (intersectingContexts.length > 1) {
     windowResolution = { status: "ambiguous", environment_id: null, location_id: null,
-      reason: "overlapping_biological_contexts" };
+      reason: "analysis_window_spans_multiple_biological_contexts" };
   } else if (windowContexts.length === 0) {
     windowResolution = { status: "missing", environment_id: null, location_id: null,
       reason: "biological_context_does_not_cover_analysis_window" };
