@@ -30,6 +30,8 @@ def test_search_follows_pages_deduplicates_and_sorts_scenes():
         return Response({'features':[_item('earlier','2026-06-02T10:00:00Z'),_item('cloudy',cloud=90)],'links':[]})
     result = search_sentinel2_scenes(_criteria(), request=request)
     assert [scene.scene_id for scene in result.scenes] == ['earlier','later']
+    assert [item['id'] for item in result.items] == ['earlier','later']
+    assert result.items[0]['assets']['red']['href'].endswith('B04.tif')
     assert result.pages_read == 2
     assert result.items_seen == 4
     assert result.rejected_items == 1
