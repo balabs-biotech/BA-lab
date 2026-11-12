@@ -183,6 +183,21 @@ class EngineContractTests(unittest.TestCase):
         self.assertEqual(result["result"]["outcome"], "insufficient_data")
         self.assertEqual(result["result"]["value"]["summary"]["excluded_record_count"], 1)
 
+
+    def test_environmental_qc_rejects_non_finite_or_boolean_thresholds(self):
+        request = json.loads(json.dumps(REQUEST))
+        request["engine"] = {"engine_id": "environmental.timeseries.qc", "engine_version": "0.1.0"}
+        for key, value in [
+            ("max_gap_minutes", float("inf")),
+            ("max_gap_minutes", True),
+            ("outlier_mad_threshold", float("nan")),
+            ("minimum_points", True),
+        ]:
+            invalid = json.loads(json.dumps(request))
+            invalid["parameters"] = {key: value}
+            with self.assertRaises(ValueError):
+                run_environmental_timeseries_qc(invalid)
+
     def test_unknown_fields_are_rejected_at_envelope_boundaries(self):
         invalid = json.loads(json.dumps(REQUEST))
         invalid["unversioned_extra"] = True
