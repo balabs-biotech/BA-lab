@@ -113,7 +113,7 @@ def test_repository_returns_normalized_observations_for_tenant_location_and_date
     assert ("variable_code", "in", ["ndvi_mean", "ndvi_median"]) in query.filters
     assert ("observed_at", "gte", "2026-11-10T00:00:00+00:00") in query.filters
     assert ("observed_at", "lt", "2026-11-13T00:00:00+00:00") in query.filters
-    assert any(op == ("order", "observed_at", False) for op in query.operations)
+    assert any(op == ("order", "observed_at", False) for op in query.operations)\n    assert "source_record_id" in query.operations[0][1]
 
 
 def test_repository_rejects_rows_returned_outside_requested_tenant_scope():
@@ -151,4 +151,17 @@ def test_repository_rejects_reversed_date_scope():
             location_id=str(uuid4()),
             from_date=date(2026, 11, 12),
             to_date=date(2026, 11, 10),
+        )
+
+
+def test_repository_rejects_mismatched_source_record_identity():
+    org, location = str(uuid4()), str(uuid4())
+    client = Client([observation_row(org, location, source_record_id="other-scene")])
+
+    with pytest.raises(ValueError, match="source_record_id"):
+        SupabaseSatelliteObservationRepository(client).list_ndvi_for_scope(
+            organization_id=org,
+            location_id=location,
+            from_date=date(2026, 11, 10),
+            to_date=date(2026, 11, 12),
         )
