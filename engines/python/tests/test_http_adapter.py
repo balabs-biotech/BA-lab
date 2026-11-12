@@ -7,6 +7,7 @@ import urllib.error
 import urllib.request
 from pathlib import Path
 from uuid import uuid4
+from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
