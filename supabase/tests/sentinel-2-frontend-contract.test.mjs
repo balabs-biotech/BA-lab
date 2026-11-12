@@ -20,7 +20,8 @@ const checks = [
   ["renders the returned raster as an in-app map overlay", /L\.imageOverlay\(objectUrl,\[\[south,west\],\[north,east\]\]/],
   ["uses a compact image date and NDVI status", /satelliteMapStatus\.textContent="Sentinel-2 · "\+sceneDate/],
   ["keeps the last image when a new request fails", /Dernière image conservée/],
-  ["adds the environmental QC panel after weather charts", /environmentalEnginePanel[\s\S]*?engine-orchestrator[\s\S]*?environmental\.timeseries\.qc@0\.2\.0/],
+  ["adds the environmental QC panel to the GreenTech surface", /environmentalEnginePanel[\s\S]*?panel\.append\(satelliteMapPanel,vegetationChart,agroSynthesisPanel,weatherCharts,uvComparisonPanel,enginePanel\)/],
+  ["invokes the versioned environmental QC engine from the panel", /engine-orchestrator[\s\S]*?environmental\.timeseries\.qc@0\.2\.0/]
   ["renders weather charts directly below the satellite map", /panel\.append\(satelliteMapPanel,vegetationChart,agroSynthesisPanel,weatherCharts,uvComparisonPanel,enginePanel\)/],
   ["keeps weather charts visible by default", /\[form,status,satelliteHint,satelliteButton,satelliteResults,details\]\.forEach\(el=>el\.style\.display="none"\)/],
   ["automatically imports weather history when Green Tech opens", /if\(location\.value\)\{importWeather\(false\);if\(lat\.value!==""&&lon\.value!==""\)searchSatellite\(\)/],
