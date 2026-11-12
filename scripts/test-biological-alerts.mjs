@@ -475,6 +475,8 @@ assert.match(recommendationOutcomeEvidenceMigration, /v_measurement\.method, v_m
 assert.match(recommendationOutcomeEvidenceMigration, /coalesce\(v_measurement\.metadata/);
 assert.match(moduleSource, /measurement_observed_at,variable_code,normalized_value/);
 assert.match(moduleSource, /dateLabel\(measurement\.measurement_observed_at\)/);
+assert.match(moduleSource, /Valeur brute conservée/);
+assert.match(moduleSource, /Instrument : /);
 assert.match(moduleSource, /const measurement = link;/);
 assert.match(moduleSource, /recommendationMeasurementCandidatesBySignal/);
 assert.match(moduleSource, /measuredAt >= lower && measuredAt <= upper/);
