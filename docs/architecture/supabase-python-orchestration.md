@@ -123,6 +123,6 @@ A successful execution is committed through the service-only `public.complete_en
 - inserts one immutable `engine_execution_results` row;
 - transitions the execution ledger to `completed` with the full versioned response envelope.
 
-The result table is query-oriented: engine/result type, outcome, structured value, limitations, quality flags, optional calibrated confidence, provenance, input record IDs, input snapshot hash and generation timestamp are independently addressable. It is tenant-scoped under RLS and read-only to authenticated organization members. Result rows cannot be updated or deleted; a new interpretation requires a new execution.
+The result table is query-oriented: engine/result type, outcome, structured value, limitations, quality flags, optional calibrated confidence, provenance, input record IDs, input snapshot hash and generation timestamp are independently addressable. It is tenant-scoped under RLS and read-only to authenticated organization members. Database triggers reject result updates; tenant cleanup can remove records through privileged parent deletion cascades. A new interpretation requires a new execution.
 
 CultureOps reads recent execution status from `engine_executions` and structured outputs from `engine_execution_results`. The UI retains a compatibility fallback to the envelope stored in the execution ledger while older records are being migrated. Neither table modifies source measurements.
