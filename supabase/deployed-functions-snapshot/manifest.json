@@ -1,0 +1,108 @@
+{
+  "schema_version": 1,
+  "project_ref": "axcouwiodqsauwnsiotn",
+  "capture_date": "2026-11-01",
+  "source_kind": "read-only snapshot of currently deployed Supabase Edge Functions",
+  "note": "Exact deployed source snapshots. Recovery/reference artifacts only; do not deploy automatically. Review and reconcile against supabase/functions before deployment.",
+  "functions": [
+    {
+      "name": "claim-ba-labs",
+      "version": 9,
+      "verify_jwt": true,
+      "files": [
+        "index.ts"
+      ],
+      "git_blob_sha": "44c17635a9393d5a899bc847c420e0d7cfdbdbf6",
+      "edge_function_id": "e2f8418e-c0bb-4b08-b6f0-51ea972a48fd",
+      "edge_function_bundle_sha256": "e19e5939ce5ac0d6623cabe8f11379912bd9f4f1f3009305aac9ede96f507d9d"
+    },
+    {
+      "name": "sync-culture-to-notion",
+      "version": 13,
+      "verify_jwt": true,
+      "files": [
+        "index.ts"
+      ],
+      "git_blob_sha": "92b468b6a407b2dcac9243bbe6a12aeb88e70dd1",
+      "edge_function_id": "2c83b0a5-810c-421e-b35e-1a19c3395835",
+      "edge_function_bundle_sha256": "0ae36e3ae4046db42405351d0fde7ba331a83dae8e322c6ce8ea99d13873d2f3"
+    },
+    {
+      "name": "iot-ingest",
+      "version": 2,
+      "verify_jwt": false,
+      "files": [
+        "index.ts"
+      ],
+      "git_blob_sha": "3540d302265c79706b8fde329d8c94240adbc6bd",
+      "edge_function_id": "1ba0f38c-8270-486b-9751-7a9f7a101c5b",
+      "edge_function_bundle_sha256": "4c728a44bb62741b9641f43b92c9373b9aa83855a9aa7bbed01268d95b6e875a"
+    },
+    {
+      "name": "nasa-power-agroclimate",
+      "version": 6,
+      "verify_jwt": true,
+      "files": [
+        "index.ts"
+      ],
+      "git_blob_sha": "8b599431a7c7e382bb9181c7c55fc11c25ead3f4",
+      "edge_function_id": "5b364355-290d-4126-abdb-22b083b9a283",
+      "edge_function_bundle_sha256": "c95ac0d3363684f1227dd6de1a8a946998ea03fe826eae2f888841de974aad9f"
+    },
+    {
+      "name": "nasa-power-scheduled-import",
+      "version": 4,
+      "verify_jwt": false,
+      "files": [
+        "index.ts"
+      ],
+      "git_blob_sha": "3d6ae2fb463c36730a782bfe9691f4749bcbeb83",
+      "edge_function_id": "4db0f2a8-ad5e-4858-a543-5283a22c97ff",
+      "edge_function_bundle_sha256": "1a40654c124394be7a696116651dad83530eaeebd6c17eb1793946c3bf384db7"
+    },
+    {
+      "name": "copernicus-sentinel-catalogue",
+      "version": 8,
+      "verify_jwt": true,
+      "files": [
+        "index.ts"
+      ],
+      "git_blob_sha": "ae457c7c71b68c029260746a56abaa37710cc26e",
+      "edge_function_id": "4b579f4f-cd03-4223-abdb-22b083c4e407",
+      "edge_function_bundle_sha256": "47744f1e363837439b9e7c23e67f039a952dba18874af2e57dfa356617b494e4"
+    },
+    {
+      "name": "sentinel-2-ndvi-preview",
+      "version": 1,
+      "verify_jwt": true,
+      "files": [
+        "index.ts"
+      ],
+      "git_blob_sha": "5b3c302d6412c7b4686c766ff9b7387ea6aa258d",
+      "edge_function_id": "00979e77-25b5-4428-ae42-641b9959d06e",
+      "edge_function_bundle_sha256": "b3618b1f6eca9693142a363d19502c2a80b9a530b114f7c471244494511d5a52"
+    },
+    {
+      "name": "earth-search-sentinel2-catalogue",
+      "version": 1,
+      "verify_jwt": true,
+      "files": [
+        "index.ts"
+      ],
+      "git_blob_sha": "5cd374434b904e81c5e89de6706188399359f7cc",
+      "edge_function_id": "dc74be04-6506-41f4-aabe-7d0dd6fd6b28",
+      "edge_function_bundle_sha256": "d7993ca76f7d985ca690670c68cbd74a4195019aff4eadbe31de7ba200748f39"
+    },
+    {
+      "name": "earth-search-sentinel2-ndvi-preview",
+      "version": 5,
+      "verify_jwt": true,
+      "files": [
+        "index.ts"
+      ],
+      "git_blob_sha": "12bd5d6646c7baeda084bccf9932b8674ef88d31",
+      "edge_function_id": "e1dbe5a8-a74b-47d3-8ed1-4b65c036d897",
+      "edge_function_bundle_sha256": "b6442eb01b8e50f5c2bda533ccc986118071650c0746f3ab4fa26a6bf942f698"
+    }
+  ]
+}
