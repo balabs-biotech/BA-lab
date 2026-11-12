@@ -28,6 +28,8 @@ class ExperimentalObservation:
     quality_state: str
     profile_id: str | None = None
     profile_version: str | None = None
+    method: str | None = None
+    instrument: str | None = None
 
     def __post_init__(self) -> None:
         required = (
@@ -63,6 +65,8 @@ class CohortSummary:
     maximum: float
     subject_ids: tuple[str, ...]
     source_record_ids: tuple[str, ...]
+    method: str | None
+    instrument: str | None
 
 
 @dataclass(frozen=True, slots=True)
@@ -146,6 +150,8 @@ def compare_experimental_cohorts(
     units = {item.canonical_unit_code for item in accepted}
     profiles = {(item.profile_id, item.profile_version) for item in accepted}
     subject_types = {item.subject_type for item in accepted}
+    methods = {item.method for item in accepted}
+    instruments = {item.instrument for item in accepted}
     if len(contexts) != 1:
         raise ValueError("cohorts must share one declared context_signature")
     if len(units) != 1:
@@ -154,6 +160,8 @@ def compare_experimental_cohorts(
         raise ValueError("cohorts must share one biological profile and version")
     if len(subject_types) != 1:
         raise ValueError("cohorts must use the same biological subject type")
+    if len(methods) != 1 or len(instruments) != 1:
+        raise ValueError("cohorts must use the same measurement method and instrument")
 
     subject_cohorts: dict[str, str] = {}
     subjects_by_cohort: dict[str, dict[str, list[ExperimentalObservation]]] = {
@@ -188,6 +196,8 @@ def compare_experimental_cohorts(
             minimum=min(values), maximum=max(values),
             subject_ids=tuple(sorted(subjects)),
             source_record_ids=source_ids,
+            method=next(iter(methods)),
+            instrument=next(iter(instruments)),
         )
 
     baseline = summarize(baseline_cohort_id)
