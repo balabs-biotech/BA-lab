@@ -127,6 +127,13 @@ Every adapter should return both the selected rows and a coverage report: expect
 5. **Validate real cases:** add test fixtures for culture-only, batch-only, linked culture+batch, missing biological context, missing environment, mixed provider/dataset, excluded measurements, time gaps and cross-tenant IDs.
 6. **Only then add biological interpretation:** do not rank strains or prescribe environmental changes from the current sparse dataset.
 
+
+## 7.1 First deterministic BIE engine (feature branch only)
+
+The BIE branch now includes `biological.context.features@0.1.0` and a Python registry manifest. It consumes a caller-authorized immutable engine snapshot for one culture, requires an explicit timezone-aware analysis window, rejects measurements outside the selected culture scope and external weather rows outside the selected location scope, and computes descriptive mean/minimum/maximum/count features plus temporal gaps. Every emitted fact and feature retains source record IDs.
+
+The engine returns empty findings and hypotheses and emits `biological_interpretation_not_performed`. It is a deterministic feature layer, not a biological inference engine. Batch subjects are explicitly rejected until batch-linked measurement and lifecycle semantics are implemented. The current Supabase orchestrator allowlist does not include this engine, and the culture/environment source adapter is not implemented; therefore it is registered in the Python branch but not yet callable through the application or production.
+
 ## 8. Architectural decision
 
 **Reuse the existing production source schema. Reuse the engine ledger/orchestrator from PR #283 after its branch is reconciled and deployed. Build a BIE-specific, read-only subject adapter and deterministic context features on top.**
