@@ -579,16 +579,16 @@ for (const phrase of [
 const plantContextLoadStart = engine.indexOf("async function loadPlantBiologicalContextPanel(");
 const plantContextSaveStart = engine.indexOf("async function savePlantBiologicalContext(");
 const plantContextCloseStart = engine.indexOf("async function closePlantBiologicalContext(");
-const plantContextEnd = engine.indexOf("\\nlet cultureDetailRequestId", plantContextLoadStart);
+const plantContextEnd = engine.indexOf("\nlet cultureDetailRequestId", plantContextLoadStart);
 assert.ok(plantContextLoadStart >= 0 &&
   plantContextSaveStart > plantContextLoadStart &&
   plantContextCloseStart > plantContextSaveStart &&
   plantContextEnd > plantContextCloseStart,
   "GreenTech biological context load, save and close handlers must exist");
 const plantContextHandlers = engine.slice(plantContextLoadStart, plantContextEnd);
-assert.match(plantContextHandlers, /\\.eq\\("organization_id", loadOrganizationId\\)/,
+assert.match(plantContextHandlers, /\.eq\("organization_id", loadOrganizationId\)/,
   "GreenTech context reads must be tenant-scoped");
-assert.match(plantContextHandlers, /\\.eq\\("plant_culture_id", plantCultureId\\)/,
+assert.match(plantContextHandlers, /\.eq\("plant_culture_id", plantCultureId\)/,
   "GreenTech context reads and writes must use plant_culture_id");
 assert.match(plantContextHandlers, /domain: "greentech"/,
   "GreenTech context writes must use the greentech domain");
@@ -599,6 +599,6 @@ assert.match(plantContextHandlers, /culture_id: null/,
 assert.match(plantContextHandlers, /isCurrentWorkspaceRevision/,
   "GreenTech context handlers must discard stale workspace operations");
 assert.match(engine.slice(engine.indexOf("function renderPlantCultureList("), engine.indexOf("async function loadPlantCultures(")),
-  /loadPlantBiologicalContextPanel\\(row\\.id\\)/,
+  /loadPlantBiologicalContextPanel\(row\.id\)/,
   "plant culture rows must open their biological context history");
 console.log("✓ GreenTech biological context: plant subject, tenant isolation and dated history");
