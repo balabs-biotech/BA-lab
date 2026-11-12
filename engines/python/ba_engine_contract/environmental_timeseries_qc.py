@@ -59,6 +59,7 @@ def analyze_environmental_timeseries_qc(request: Mapping[str, Any]) -> dict[str,
     grouped: dict[tuple[str, str], list[tuple[datetime, float, str]]] = defaultdict(list)
     rejected_records: list[dict[str, str]] = []
     source_references: set[str] = set()
+    environmental_source_identity: tuple[str, str] | None = None
     for record in request["input"]["records"]:
         record_type = record["record_type"]
         if record_type not in {"measurement", "environmental_observation"}:
@@ -66,13 +67,27 @@ def analyze_environmental_timeseries_qc(request: Mapping[str, Any]) -> dict[str,
         data = record["data"]
         variable = data.get("variable_code")
         if record_type == "environmental_observation":
+            if data.get("data_family") != "weather":
+                rejected_records.append({"record_id": record["record_id"], "reason": "unsupported_environmental_data_family"})
+                continue
+            location_id = request["scope"].get("location_id")
+            record_location_id = (record.get("context") or {}).get("location_id")
+            if not isinstance(location_id, str) or record_location_id != location_id:
+                rejected_records.append({"record_id": record["record_id"], "reason": "environmental_location_scope_mismatch"})
+                continue
+            provider = data.get("provider_code")
+            dataset = data.get("dataset_code")
+            if not isinstance(provider, str) or not provider or not isinstance(dataset, str) or not dataset:
+                rejected_records.append({"record_id": record["record_id"], "reason": "missing_environmental_source_identity"})
+                continue
+            identity = (provider, dataset)
+            if environmental_source_identity is not None and identity != environmental_source_identity:
+                raise ValueError("mixed_environmental_sources_not_supported")
+            environmental_source_identity = identity
+            source_references.add(f"{provider}/{dataset}")
             value = data.get("value")
             unit = data.get("unit_code")
             timestamp = data.get("observed_at")
-            provider = data.get("provider_code")
-            dataset = data.get("dataset_code")
-            if isinstance(provider, str) and isinstance(dataset, str):
-                source_references.add(f"{provider}/{dataset}")
         else:
             value = data.get("normalized_value")
             unit = data.get("normalized_unit_code")
