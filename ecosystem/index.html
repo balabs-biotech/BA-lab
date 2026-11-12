@@ -3915,6 +3915,115 @@ h1 span{
  });
 })();
 </script>
+
+<style id="balabs-eight-universes-field-atlas">
+/* Eight-universe field atlas: replace generic cards with a scientific register. */
+#app > main > .universe-index{
+  position:relative!important;
+  padding:clamp(64px,8vw,112px) clamp(18px,5vw,72px)!important;
+  background:#111B1D!important;
+  color:#D1D0C5!important;
+  border-block:1px solid #40534D!important;
+}
+#app > main > .universe-index:before{
+  content:"BA / FIELD REGISTER — 08 DOMAINS";
+  display:block!important;
+  margin:0 0 24px!important;
+  color:#B96B4D!important;
+  font:10px/1.4 ui-monospace,monospace!important;
+  letter-spacing:.16em!important;
+}
+#app > main > .universe-index .universe-index-heading{
+  display:grid!important;grid-template-columns:minmax(0,1fr) minmax(220px,.5fr)!important;
+  align-items:end!important;gap:28px!important;margin:0 0 42px!important;
+}
+#app > main > .universe-index .universe-index-heading h2{
+  color:#F2F1E9!important;font:400 clamp(42px,6.2vw,82px)/.92 Georgia,serif!important;
+  letter-spacing:-.065em!important;max-width:820px!important;
+}
+#app > main > .universe-index .universe-index-heading>p{
+  max-width:330px!important;margin:0 0 5px auto!important;
+  color:#9BAEA4!important;font-size:12px!important;line-height:1.8!important;
+}
+#app > main > .universe-index .universe-index-grid{
+  display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;
+  gap:0!important;border-top:1px solid #53645D!important;
+  border-left:1px solid #53645D!important;
+}
+#app > main > .universe-index .universe-index-card{
+  position:relative!important;isolation:isolate!important;
+  display:flex!important;flex-direction:column!important;align-items:stretch!important;
+  min-width:0!important;min-height:250px!important;padding:20px 18px 17px!important;
+  gap:0!important;border:0!important;border-right:1px solid #53645D!important;
+  border-bottom:1px solid #53645D!important;border-radius:0!important;
+  background:transparent!important;box-shadow:none!important;
+  color:#D1D0C5!important;text-decoration:none!important;
+  transition:background .2s ease!important;
+}
+#app > main > .universe-index .universe-index-card:before{
+  content:"";position:absolute;z-index:-1;inset:0 auto 0 0;width:2px;
+  background:#B96B4D;transform:scaleY(0);transform-origin:top;transition:transform .22s ease;
+}
+#app > main > .universe-index .universe-index-card>span{
+  display:block!important;width:auto!important;height:auto!important;
+  margin:0 0 26px!important;padding:0!important;border:0!important;border-radius:0!important;
+  color:#B96B4D!important;background:transparent!important;
+  font:italic 27px/.9 Georgia,serif!important;letter-spacing:-.04em!important;
+}
+#app > main > .universe-index .universe-index-card>b{
+  display:block!important;margin:0 0 8px!important;color:#F2F1E9!important;
+  font:400 clamp(17px,1.45vw,21px)/1.15 Georgia,serif!important;
+  letter-spacing:-.025em!important;text-wrap:balance!important;
+}
+#app > main > .universe-index .universe-index-card>small{
+  display:block!important;margin:0 0 12px!important;color:#D99A7F!important;
+  font:9px/1.5 ui-monospace,monospace!important;letter-spacing:.09em!important;
+  text-transform:uppercase!important;
+}
+#app > main > .universe-index .universe-index-card>p{
+  margin:0 0 18px!important;max-width:34ch!important;color:#AEBDB4!important;
+  font-size:12px!important;line-height:1.65!important;
+}
+#app > main > .universe-index .universe-index-card>em{
+  display:flex!important;align-items:center!important;gap:8px!important;margin-top:auto!important;
+  padding-top:12px!important;border-top:1px solid #40534D!important;
+  color:#D99A7F!important;font:10px/1.4 ui-monospace,monospace!important;
+  font-style:normal!important;letter-spacing:.08em!important;text-transform:uppercase!important;
+}
+#app > main > .universe-index .universe-index-card>em:after{
+  content:"↗";font:15px/1 sans-serif!important;transition:transform .2s ease!important;
+}
+#app > main > .universe-index .universe-index-card:hover,
+#app > main > .universe-index .universe-index-card:focus-visible{
+  background:#1A2A27!important;transform:none!important;box-shadow:none!important;
+}
+#app > main > .universe-index .universe-index-card:hover:before,
+#app > main > .universe-index .universe-index-card:focus-visible:before{transform:scaleY(1)}
+#app > main > .universe-index .universe-index-card:hover>em:after{transform:translate(3px,-2px)!important}
+#app > main > .universe-index .universe-index-card:focus-visible{
+  outline:2px solid #B96B4D!important;outline-offset:-4px!important;
+}
+@media(max-width:900px){
+ #app > main > .universe-index .universe-index-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+ #app > main > .universe-index .universe-index-card{min-height:220px!important;padding:18px!important}
+ #app > main > .universe-index .universe-index-card>b{font-size:20px!important}
+}
+@media(max-width:600px){
+ #app > main > .universe-index{padding:56px 17px!important}
+ #app > main > .universe-index .universe-index-heading{grid-template-columns:1fr!important;gap:16px!important;margin-bottom:28px!important}
+ #app > main > .universe-index .universe-index-heading>p{margin:0!important}
+ #app > main > .universe-index .universe-index-grid{grid-template-columns:1fr!important}
+ #app > main > .universe-index .universe-index-card{min-height:0!important;padding:18px 16px!important}
+ #app > main > .universe-index .universe-index-card>span{margin-bottom:12px!important}
+ #app > main > .universe-index .universe-index-card>p{max-width:58ch!important}
+}
+@media(prefers-reduced-motion:reduce){
+ #app > main > .universe-index .universe-index-card,
+ #app > main > .universe-index .universe-index-card:before,
+ #app > main > .universe-index .universe-index-card>em:after{transition:none!important}
+}
+</style>
+
 </body>
 </html>
 
