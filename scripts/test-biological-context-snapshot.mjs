@@ -77,11 +77,11 @@ assert.equal(offsetOrdered.input.records[0].record_type, "measurement",
 await assert.rejects(() => buildBiologicalContextSnapshot({
   organizationId,
   culture,
-  environment: { ...environment, id: "77777777-7777-4777-8777-777777777777" },
+  environment: { ...environment, organization_id: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa" },
   measurements,
   environmentalObservations,
   window,
-}), /culture_environment_not_resolved/);
+}), /resolved_environment_organization_scope_mismatch/);
 
 await assert.rejects(() => buildBiologicalContextSnapshot({
   organizationId,
