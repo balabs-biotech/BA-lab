@@ -7,6 +7,7 @@ import addFormats from "npm:ajv-formats@3.0.1";
 import recordSchema from "../../../schemas/bal-json/v1/record.schema.json" with { type: "json" };
 import measurementSchema from "../../../schemas/bal-json/v1/measurement.schema.json" with { type: "json" };
 import observationSchema from "../../../schemas/bal-json/v1/observation.schema.json" with { type: "json" };
+import { normalizeMeasurement } from "../_shared/measurement-normalization.ts";
 
 const headers = {
   "Access-Control-Allow-Origin": "*",
@@ -164,25 +165,16 @@ Deno.serve(async (req: Request) => {
           return response(422, { error: "canonical_unit_catalogue_mismatch", variable_code: data.variable_code });
         }
 
-        if (data.raw_unit_code === canonicalCode) {
-          normalizedValue = data.raw_value;
-          normalizedUnitCode = canonicalCode;
-        } else {
-          if (!rawUnit.is_linear || !canonicalUnit.is_linear) {
-            return response(422, { error: "nonlinear_unit_conversion_not_supported", variable_code: data.variable_code });
-          }
-          const rawFactor = Number(rawUnit.factor);
-          const canonicalFactor = Number(canonicalUnit.factor);
-          const rawOffset = Number(rawUnit.offset_value);
-          const canonicalOffset = Number(canonicalUnit.offset_value);
-          if (!Number.isFinite(rawFactor) || !Number.isFinite(canonicalFactor) ||
-              !Number.isFinite(rawOffset) || !Number.isFinite(canonicalOffset) || canonicalFactor === 0) {
-            return response(422, { error: "unit_conversion_not_calibrated", unit_code: data.raw_unit_code });
-          }
-          const baseValue = data.raw_value * rawFactor + rawOffset;
-          normalizedValue = (baseValue - canonicalOffset) / canonicalFactor;
-          normalizedUnitCode = canonicalCode;
+        const normalized = normalizeMeasurement(
+          data.raw_value,
+          rawUnit,
+          canonicalUnit,
+        );
+        if (!normalized.ok) {
+          return response(422, { error: normalized.error, variable_code: data.variable_code });
         }
+        normalizedValue = normalized.value;
+        normalizedUnitCode = normalized.unitCode;
       }
 
       const suppliedNormalizedValue = data.normalized_value;
