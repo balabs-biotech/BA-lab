@@ -44,10 +44,10 @@ BEGIN
 
   IF (
     SELECT count(DISTINCT item ->> 'organization_id')
-    FROM jsonb_array_elements(p_rows) AS item
+    FROM jsonb_array_elements(p_rows) AS expanded(item)
   ) <> 1 OR (
     SELECT count(DISTINCT item ->> 'location_id')
-    FROM jsonb_array_elements(p_rows) AS item
+    FROM jsonb_array_elements(p_rows) AS expanded(item)
   ) <> 1 THEN
     RAISE EXCEPTION 'Sentinel-2 rows must share one organization and location scope';
   END IF;
