@@ -29,6 +29,10 @@ from .biological_workflow import (
     BiologicalWorkflowService,
 )
 from .supabase_recommendation_repository import SupabaseRecommendationRepository
+from .outcome_comparison_service import (
+    OutcomeComparisonService,
+    PersistedOutcomeComparison,
+)
 from .supabase_outcome_comparison_repository import (
     OutcomeCohortAssignment,
     OutcomeComparisonDataset,
@@ -79,6 +83,8 @@ __all__ = [
     "RecommendationAccessDeniedError",
     "RecommendationService",
     "SupabaseRecommendationRepository",
+    "OutcomeComparisonService",
+    "PersistedOutcomeComparison",
     "OutcomeCohortAssignment",
     "OutcomeComparisonDataset",
     "OutcomeComparisonRepositoryError",
