@@ -10,6 +10,12 @@ from .biological_performance import (
     analyze_extent_growth_rate,
 )
 from .measurement_adapter import measurement_row_to_biological_measurement
+from .experimental_comparison import (
+    CohortSummary,
+    ExperimentalComparisonResult,
+    ExperimentalObservation,
+    compare_experimental_cohorts,
+)
 from .biological_pipeline import (
     BiologicalAnalysisPipelineResult,
     RejectedMeasurementRow,
@@ -17,6 +23,10 @@ from .biological_pipeline import (
 )
 
 __all__ = [
+    "CohortSummary",
+    "ExperimentalComparisonResult",
+    "ExperimentalObservation",
+    "compare_experimental_cohorts",
     "BiologicalMeasurement",
     "BiologicalPerformanceResult",
     "analyze_extent_growth_rate",
