@@ -15,7 +15,7 @@ const headers = {
 };
 const MAX_BODY_BYTES = 48_000;
 const WORKER_TIMEOUT_MS = 20_000;
-const ENGINE_ALLOWLIST = new Map([["environmental.timeseries.qc", new Set(["0.1.0"])]]);
+const ENGINE_ALLOWLIST = new Map([["environmental.timeseries.qc", new Set(["0.2.0"])]]);
 const ajv = new Ajv2020({ allErrors: true, strict: true });
 addFormats(ajv);
 const validateRequest = ajv.compile(requestSchema);
