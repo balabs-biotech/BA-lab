@@ -19,6 +19,7 @@ export interface BiologicalMeasurementRow {
   id: string;
   organization_id: string;
   culture_id: string | null;
+  plant_culture_id?: string | null;
   environment_id?: string | null;
   variable_code: string;
   raw_value: number | null;
@@ -88,7 +89,8 @@ async function sha256(value: string): Promise<string> {
 
 export async function buildBiologicalContextSnapshot(input: {
   organizationId: string;
-  culture: BiologicalCultureRow;
+  culture?: BiologicalCultureRow;
+  plantCulture?: BiologicalCultureRow;
   environment: BiologicalEnvironmentRow | null;
   measurements: BiologicalMeasurementRow[];
   environmentalObservations: BiologicalEnvironmentalObservationRow[];
@@ -102,11 +104,17 @@ export async function buildBiologicalContextSnapshot(input: {
   environmentLinkState?: string;
   window: BiologicalContextWindow;
 }) {
-  const { organizationId, culture, environment, window } = input;
-  if (!organizationId || culture.organization_id !== organizationId) {
-    throw new Error("culture_organization_scope_mismatch");
+  const { organizationId, environment, window } = input;
+  if (Boolean(input.culture) === Boolean(input.plantCulture)) {
+    throw new Error("exactly_one_biological_subject_required");
   }
-  if (!culture.id) throw new Error("culture_id_required");
+  const subject = input.plantCulture ?? input.culture!;
+  const subjectType = input.plantCulture ? "plant" : "culture";
+  const subjectField = input.plantCulture ? "plant_culture_id" : "culture_id";
+  if (!organizationId || subject.organization_id !== organizationId) {
+    throw new Error(subjectType + "_organization_scope_mismatch");
+  }
+  if (!subject.id) throw new Error(subjectType + "_id_required");
 
   const windowStart = parseInstant(window.start, "window_start");
   const windowEnd = parseInstant(window.end, "window_end");
@@ -126,13 +134,13 @@ export async function buildBiologicalContextSnapshot(input: {
 
   const records: Record<string, unknown>[] = [];
   for (const row of input.measurements) {
-    if (row.organization_id !== organizationId || row.culture_id !== culture.id) {
-      throw new Error("measurement_culture_scope_mismatch");
+    if (row.organization_id !== organizationId || row[subjectField] !== subject.id) {
+      throw new Error("measurement_" + subjectType + "_scope_mismatch");
     }
     const instant = parseInstant(row.measured_at, "measurement_timestamp");
     if (instant < windowStart || instant > windowEnd) continue;
     const context = {
-      culture_id: row.culture_id,
+      [subjectField]: row[subjectField],
       environment_id: input.measurementContextById?.[row.id]
         ? input.measurementContextById[row.id].environment_id
         : row.environment_id ?? null,
@@ -165,7 +173,7 @@ export async function buildBiologicalContextSnapshot(input: {
   }
 
   if (input.environmentalObservations.length && !locationId) {
-    throw new Error("culture_environment_location_not_resolved");
+    throw new Error(subjectType + "_environment_location_not_resolved");
   }
   for (const row of input.environmentalObservations) {
     if (row.organization_id !== organizationId || row.location_id !== locationId) {
@@ -212,7 +220,7 @@ export async function buildBiologicalContextSnapshot(input: {
 
   const scope: Record<string, string> = {
     organization_id: organizationId,
-    culture_id: culture.id,
+    [subjectField]: subject.id,
   };
   if (environment) scope.environment_id = environment.id;
   if (locationId) scope.location_id = locationId;
