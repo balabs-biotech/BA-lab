@@ -532,6 +532,30 @@
 
     <div class="overview-section-heading"><h3>Registre des cultures végétales</h3><span id="plantCultureCount" class="culture-catalog-count">0</span></div>
     <div id="plantCultureList" class="culture-catalog-list" aria-live="polite"><p class="muted">Connectez-vous pour charger les cultures végétales.</p></div>
+
+    <section class="biological-context-panel hidden" id="plantBiologicalContextPanel" aria-labelledby="plantBiologicalContextTitle">
+      <div class="biological-context-heading">
+        <div><span class="section-kicker-label">CONTEXTE BIOLOGIQUE / BIE · GREENTECH</span><h4 id="plantBiologicalContextTitle">Contexte de la culture végétale</h4><p id="plantBiologicalContextSubjectMeta" class="muted"></p></div>
+        <button id="closePlantBiologicalContextPanel" type="button" class="secondary-button small-button">Fermer la fiche</button>
+      </div>
+      <p class="muted">L’espèce et le cultivar proviennent de la fiche végétale. Enregistrez ici les stades, l’environnement et le système de production réellement observés, avec leur période de validité.</p>
+      <div id="plantBiologicalContextHistory" class="biological-context-history" aria-live="polite"><p class="muted">Chargement de l’historique biologique…</p></div>
+      <form id="plantBiologicalContextForm" class="biological-context-form" autocomplete="off">
+        <div><label for="plantBiologicalContextEnvironment">Environnement associé <span class="req">*</span></label><select id="plantBiologicalContextEnvironment" required><option value="">Chargement des environnements…</option></select></div>
+        <div><label for="plantBiologicalContextStage">Stade végétatif <span class="req">*</span></label><select id="plantBiologicalContextStage" required><option value="sowing">Semis</option><option value="germination">Germination</option><option value="seedling">Plantule</option><option value="vegetative">Croissance végétative</option><option value="flowering">Floraison</option><option value="fruiting">Fructification</option><option value="harvest">Récolte</option><option value="dormancy">Dormance</option><option value="analysis">Analyse</option><option value="other">Autre</option></select></div>
+        <div><label for="plantBiologicalContextProduction">Système de production <span class="req">*</span></label><select id="plantBiologicalContextProduction" required><option value="greenhouse">Serre</option><option value="open_field">Plein champ</option><option value="container">Contenant / pot</option><option value="hydroponic">Hydroponie</option><option value="raised_bed">Bac / planche de culture</option><option value="other">Autre</option></select></div>
+        <div><label for="plantBiologicalContextSubstrate">Substrat / milieu racinaire</label><input id="plantBiologicalContextSubstrate" maxlength="120" placeholder="Ex. Technosoil, terre, fibre végétale"></div>
+        <div><label for="plantBiologicalContextValidFrom">Début de validité <span class="req">*</span></label><input id="plantBiologicalContextValidFrom" type="date" required></div>
+        <div><label for="plantBiologicalContextValidTo">Fin de validité (exclue)</label><input id="plantBiologicalContextValidTo" type="date"><small>Laisser vide pour un contexte toujours actif.</small></div>
+        <div class="biological-context-wide"><label for="plantBiologicalContextTags">Étiquettes contextuelles</label><input id="plantBiologicalContextTags" maxlength="600" placeholder="Ex. serre-nord, essai-technosoil, stress-thermique"><small>Séparez les étiquettes par des virgules.</small></div>
+        <div class="biological-context-wide"><button id="savePlantBiologicalContext" type="submit">Enregistrer ce contexte daté</button><p id="plantBiologicalContextMessage" class="muted" role="status" aria-live="polite"></p></div>
+      </form>
+      <div class="biological-context-close">
+        <strong>Clôturer le contexte actif</strong>
+        <p class="muted">Clôturez la période actuelle avant d’enregistrer un nouvel état biologique.</p>
+        <div><label for="plantBiologicalContextCloseDate">Date de fin (exclue)</label><input id="plantBiologicalContextCloseDate" type="date"><button id="plantBiologicalContextCloseButton" type="button" class="secondary-button">Clôturer le contexte actif</button></div>
+      </div>
+    </section>
   </section>
 
   <!-- ======================================================
