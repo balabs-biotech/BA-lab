@@ -6,7 +6,7 @@ const checks = [
   ["caller identity is verified", /userClient\.auth\.getUser\(\)/],
   ["organization membership is checked", /organization_members/],
   ["viewer roles cannot invoke privileged execution", /!\["owner", "admin", "member"\]\.includes\(String\(membership\.role\)\)/],
-  ["source record type is explicitly validated", /recordType === "measurement" \|\| recordType === "environmental_observation"/],
+  ["source record type is explicitly validated", /recordType !== "measurement" && recordType !== "environmental_observation"/],
   ["environmental observations are read through caller RLS", /userClient[\s\S]*\.from\("environmental_observations"\)/],
   ["environmental observations are bound to the requested location", /\.eq\("location_id", scope\.location_id\)/],
   ["environmental QC accepts weather records only", /\.eq\("data_family", "weather"\)/],
