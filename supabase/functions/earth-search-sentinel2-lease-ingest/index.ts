@@ -178,35 +178,24 @@ Deno.serve(async (req: Request) => {
     const admin = createClient(supabaseUrl, serviceKey, {
       auth: { persistSession: false, autoRefreshToken: false },
     });
-    // The opaque lease is checked against the live row on every write. A
-    // reclaimed/expired lease cannot persist, even with a valid worker HMAC.
-    const { data: job, error: jobError } = await admin.from("environmental_ingestion_jobs")
-      .select("id,organization_id,location_id,status,job_type,provider_code,dataset_code,lease_token,lease_expires_at")
-      .eq("id", body.job_id).maybeSingle();
-    if (jobError) {
-      console.error("[earth-search-sentinel2-lease-ingest] Lease lookup failed", jobError.code);
-      return json(500, { error: "lease_validation_failed" });
-    }
-    if (!job || job.status !== "processing" || job.job_type !== "sentinel2_scene_ingestion" ||
-        job.provider_code !== "EARTH_SEARCH" || job.dataset_code !== "SENTINEL_2_L2A" ||
-        job.lease_token !== body.lease_token || !job.lease_expires_at ||
-        Date.parse(job.lease_expires_at) <= Date.now()) {
-      return json(409, { error: "active_job_lease_required" });
-    }
-
-    const invalidRows = validateRows(body.rows, job.organization_id, job.location_id);
+    // Lease validation and persistence happen in one SQL transaction. The
+    // database locks the job row before checking the token and keeps that lock
+    // through the observation upsert, closing the stale-lease race.
+    const invalidRows = validateRows(body.rows, body.organization_id, body.location_id);
     if (invalidRows) return json(422, { error: invalidRows });
     const { data: persistedCount, error: upsertError } = await admin.rpc(
-      "upsert_satellite_environmental_observations", { p_rows: body.rows },
+      "persist_leased_satellite_environmental_observations",
+      { p_job_id: body.job_id, p_lease_token: body.lease_token, p_rows: body.rows },
     );
     if (upsertError || typeof persistedCount !== "number") {
-      console.error("[earth-search-sentinel2-lease-ingest] Persistence failed", upsertError?.code ?? "unknown");
+      const code = upsertError?.code ?? "unknown";
+      if (code === "42501") return json(409, { error: "active_job_lease_required" });
+      console.error("[earth-search-sentinel2-lease-ingest] Atomic persistence failed", code);
       return json(500, { error: "observation_persistence_failed" });
     }
     return json(200, {
       ok: true,
-      job_id: job.id,
-      location_id: job.location_id,
+      job_id: body.job_id,
       scenes_persisted: persistedCount / 2,
       observations_upserted: persistedCount,
       idempotent: true,
