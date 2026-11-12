@@ -5,7 +5,7 @@ import { createClient } from "npm:@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, apikey, content-type, x-client-info, x-ba-worker-signature",
+  "Access-Control-Allow-Headers": "authorization, apikey, content-type, x-client-info, x-ba-worker-signature", "x-ba-worker-timestamp",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
   "Vary": "Access-Control-Request-Headers",
 };
@@ -57,7 +57,7 @@ function hexToBytes(value: string): Uint8Array | null {
 }
 
 async function verifyWorkerSignature(body: Uint8Array, signature: string | null, timestamp: string | null, secret: string): Promise<boolean> {
-  if (!signature || !timestamp || !/^\\d{10}$/.test(timestamp)) return false;
+  if (!signature || !timestamp || !/^\d{10}$/.test(timestamp)) return false;
   const timestampSeconds = Number(timestamp);
   if (!Number.isSafeInteger(timestampSeconds) || Math.abs(Math.floor(Date.now() / 1000) - timestampSeconds) > 300) return false;
   const supplied = hexToBytes(signature);
