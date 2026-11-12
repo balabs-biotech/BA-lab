@@ -96,6 +96,15 @@ await assert.rejects(() => buildBiologicalContextSnapshot({
   organizationId,
   culture,
   environment,
+  measurements: [{ ...measurements[0], environment_id: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa" }],
+  environmentalObservations: [],
+  window,
+}), /measurement_environment_scope_mismatch/);
+
+await assert.rejects(() => buildBiologicalContextSnapshot({
+  organizationId,
+  culture,
+  environment,
   measurements: [],
   environmentalObservations: [{ ...environmentalObservations[0], location_id: "99999999-9999-4999-8999-999999999999" }],
   window,
