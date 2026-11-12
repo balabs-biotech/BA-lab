@@ -6343,6 +6343,33 @@ function renderRecentEngineExecutions() {
         outcome.textContent = "Conclusion technique : " + result.outcome;
         article.appendChild(outcome);
       }
+      const series = Array.isArray(result.value?.series) ? result.value.series : [];
+      if (series.length) {
+        const seriesDetails = document.createElement("details");
+        const seriesSummary = document.createElement("summary");
+        seriesSummary.textContent = "Détail des séries (" + series.length + ")";
+        seriesDetails.appendChild(seriesSummary);
+        const seriesList = document.createElement("ul");
+        seriesList.className = "muted";
+        for (const item of series.slice(0, 8)) {
+          const line = document.createElement("li");
+          const itemFlags = Array.isArray(item.quality_flags) ? item.quality_flags : [];
+          line.textContent = String(item.variable_code || "Variable inconnue") +
+            " · " + String(item.unit_code || "unité inconnue") +
+            " · " + String(item.point_count ?? 0) + " points" +
+            " · écart maximal " + String(item.max_gap_minutes ?? 0) + " min" +
+            (itemFlags.length ? " · " + itemFlags.join(", ") : "");
+          seriesList.appendChild(line);
+        }
+        seriesDetails.appendChild(seriesList);
+        if (series.length > 8) {
+          const remaining = document.createElement("p");
+          remaining.className = "muted";
+          remaining.textContent = (series.length - 8) + " autres séries non affichées.";
+          seriesDetails.appendChild(remaining);
+        }
+        article.appendChild(seriesDetails);
+      }
     } else if (execution.status === "failed") {
       const failure = document.createElement("p");
       failure.className = "muted";
