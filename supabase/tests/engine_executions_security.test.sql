@@ -75,6 +75,27 @@ begin
     where organization_id=v_org and idempotency_key='test-idempotency-0001'
       and status='queued'
   ) then raise exception 'queued execution could not be persisted'; end if;
+  update public.engine_executions
+    set status='running', started_at=now(), updated_at=now()
+    where organization_id=v_org and idempotency_key='test-idempotency-0001';
+  update public.engine_executions
+    set status='completed', result_payload='{"outcome":"success"}',
+        completed_at=now(), updated_at=now()
+    where organization_id=v_org and idempotency_key='test-idempotency-0001';
+  begin
+    update public.engine_executions
+      set input_snapshot_sha256=repeat('c',64)
+      where organization_id=v_org and idempotency_key='test-idempotency-0001';
+    raise exception 'immutable input snapshot was modified';
+  exception when sqlstate '55000' then null;
+  end;
+  begin
+    update public.engine_executions
+      set status='failed', error_code='late_failure'
+      where organization_id=v_org and idempotency_key='test-idempotency-0001';
+    raise exception 'terminal execution was modified';
+  exception when sqlstate '55000' then null;
+  end;
   begin
     insert into public.engine_executions(
       organization_id,request_id,idempotency_key,engine_id,engine_version,scope,
