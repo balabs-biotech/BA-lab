@@ -151,6 +151,7 @@ def test_worker_rejects_missing_caller_authorization():
             retrieved_at=datetime(2026, 10, 2, tzinfo=timezone.utc),
             processing_version="worker-test-v1",
             user_authorization="",
+            supabase_api_key="test-publishable-key",
             ingest_url="https://example.supabase.co/functions/v1/earth-search-sentinel2-ingest",
             worker_secret="ba-labs-test-secret-at-least-32-bytes",
             post=lambda *args, **kwargs: {},
