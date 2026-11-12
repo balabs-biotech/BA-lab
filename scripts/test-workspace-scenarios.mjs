@@ -636,5 +636,8 @@ assert.match(plantAssessment, /panel\?\.dataset\.plantCultureId !== plantCulture
 assert.match(engine.slice(engine.indexOf("async function loadPlantBiologicalContextPanel("), plantAssessmentStart),
   /plantBiologicalAssessmentRequestId \+= 1/,
   "opening another plant record must invalidate a pending BIE assessment");
+assert.match(engine.slice(engine.indexOf("async function loadPlantBiologicalContextPanel("), plantAssessmentStart),
+  /assessmentButton\.disabled = false/,
+  "switching plant records must restore the assessment control after invalidating a prior request");
 
 console.log("✓ GreenTech BIE v0.2: explicit plant subject, bounded window and authenticated orchestration");
