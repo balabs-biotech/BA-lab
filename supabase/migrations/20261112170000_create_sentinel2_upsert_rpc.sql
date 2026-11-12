@@ -25,9 +25,26 @@ BEGIN
        OR item ->> 'source_record_id' IS NULL
        OR length(btrim(item ->> 'source_record_id')) = 0
        OR item -> 'metadata' ->> 'scene_id' IS DISTINCT FROM item ->> 'source_record_id'
+       OR item ->> 'variable_code' IS NULL
        OR item ->> 'variable_code' NOT IN ('ndvi_mean', 'ndvi_median')
+       OR item ->> 'unit_code' IS DISTINCT FROM '1'
+       OR item ->> 'quality_flag' IS DISTINCT FROM 'valid'
+       OR jsonb_typeof(item -> 'value') IS DISTINCT FROM 'number'
+       OR jsonb_typeof(item -> 'metadata' -> 'valid_pixel_ratio') IS DISTINCT FROM 'number'
+       OR jsonb_typeof(item -> 'metadata' -> 'cloud_cover_pct') IS DISTINCT FROM 'number'
+       OR length(btrim(item -> 'metadata' ->> 'processing_version')) = 0
   ) THEN
     RAISE EXCEPTION 'Sentinel-2 payload contains an invalid source identity';
+  END IF;
+
+  IF (
+    SELECT count(DISTINCT item ->> 'organization_id')
+    FROM jsonb_array_elements(p_rows) AS item
+  ) <> 1 OR (
+    SELECT count(DISTINCT item ->> 'location_id')
+    FROM jsonb_array_elements(p_rows) AS item
+  ) <> 1 THEN
+    RAISE EXCEPTION 'Sentinel-2 rows must share one organization and location scope';
   END IF;
 
   IF EXISTS (
