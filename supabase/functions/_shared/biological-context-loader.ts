@@ -203,13 +203,13 @@ export async function loadAuthenticatedPlantBiologicalContextSnapshot(input: {
 
   const [contextResult, measurementResult] = await Promise.all([
     userClient.from("biological_contexts")
-      .select("id,organization_id,plant_culture_id,domain,environment_id,organism_kind,taxon_code,cultivar_code,culture_stage,substrate_code,production_system,context_tags,valid_from,valid_to")
+      .select("id,organization_id,culture_id,plant_culture_id,domain,environment_id,organism_kind,taxon_code,cultivar_code,culture_stage,substrate_code,production_system,context_tags,valid_from,valid_to")
       .eq("organization_id", organizationId)
       .eq("plant_culture_id", plantCultureId)
       .eq("domain", "greentech")
       .limit(MAX_CONTEXTS + 1),
     userClient.from("measurements")
-      .select("id,organization_id,plant_culture_id,environment_id,variable_code,raw_value,raw_unit_code,normalized_value,normalized_unit_code,measured_at,method,instrument,quality_state,exclusion_reason,sample_id,experimental_unit_id,event_id,result_id,metadata")
+      .select("id,organization_id,culture_id,plant_culture_id,environment_id,variable_code,raw_value,raw_unit_code,normalized_value,normalized_unit_code,measured_at,method,instrument,quality_state,exclusion_reason,sample_id,experimental_unit_id,event_id,result_id,metadata")
       .eq("organization_id", organizationId)
       .eq("plant_culture_id", plantCultureId)
       .gte("measured_at", window.start)
@@ -219,6 +219,21 @@ export async function loadAuthenticatedPlantBiologicalContextSnapshot(input: {
   ]);
   const contexts = requireRows(contextResult, "biological_contexts_unavailable");
   const measurements = requireRows(measurementResult, "plant_culture_measurements_unavailable");
+  if (contexts.some((row: any) =>
+    row.organization_id !== organizationId ||
+    row.plant_culture_id !== plantCultureId ||
+    row.culture_id !== null ||
+    row.domain !== "greentech"
+  )) {
+    throw new Error("plant_biological_context_scope_mismatch");
+  }
+  if (measurements.some((row: any) =>
+    row.organization_id !== organizationId ||
+    row.plant_culture_id !== plantCultureId ||
+    row.culture_id !== null
+  )) {
+    throw new Error("plant_culture_measurement_scope_mismatch");
+  }
   if (contexts.length > MAX_CONTEXTS) {
     throw new Error("biological_analysis_context_limit_exceeded");
   }
