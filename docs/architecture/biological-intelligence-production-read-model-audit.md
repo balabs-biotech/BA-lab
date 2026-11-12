@@ -58,6 +58,27 @@ Read-only counts at audit time:
 
 These are database-wide counts, not claims about data completeness or experimental validation. They show that environmental ingestion is the most populated analytical source today, while the local measurement and experiment pathways have not yet accumulated production records. BIE must return sparse/insufficient coverage rather than fabricate biological conclusions when subject-level evidence is absent.
 
+
+### 3.1 Environmental series detail
+
+The 1,366 environmental rows are all tagged `quality_flag = gridded_estimate`. They belong to one provider/dataset pair: `NASA_POWER / POWER_DAILY_AGRO`, with six daily weather variables:
+
+| Variable | Rows | Unit |
+|---|---:|---|
+| `air_temperature_max` | 199 | degC |
+| `air_temperature_mean` | 199 | degC |
+| `air_temperature_min` | 199 | degC |
+| `precipitation_corrected` | 199 | mm/day |
+| `relative_humidity_mean` | 198 | % |
+| `wind_speed_mean` | 198 | m/s |
+| `solar_radiation_all_sky` | 174 | kWh/m2/day |
+
+The series begin on 2026-09-23; the most recent observation in this snapshot is 2026-11-08. The shorter radiation series demonstrates that variable coverage is not uniform and must be computed per variable, not inferred from the overall row count.
+
+Five location records currently carry the same latitude/longitude coordinate (36.2034889, 5.4303972) while retaining distinct semantic labels (site, greenhouse, production, QC, laboratory). The NASA POWER observations are therefore location-keyed in the database, but they are not five independent microclimate sensor networks. The BIE adapter must retain provider, dataset, spatial resolution and `gridded_estimate` quality provenance, and must not treat these records as direct measurements of conditions inside each room.
+
+The three existing culture records have `environment_id = NULL`; their environment → location relationship is consequently unresolved. Until an explicit, historically valid culture-to-environment link exists, BIE may report site-level weather context as a separate contextual series, but must not state that it measured the culture's actual incubation or fruiting conditions.
+
 ## 4. Tenant isolation and write boundaries
 
 All inspected source tables have RLS enabled.
