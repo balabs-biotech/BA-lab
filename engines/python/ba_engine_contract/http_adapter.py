@@ -9,6 +9,7 @@ from __future__ import annotations
 import hmac
 import json
 import os
+import subprocess
 import sys
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -16,10 +17,11 @@ from threading import BoundedSemaphore
 from typing import Any
 from urllib.parse import urlsplit
 
-from .registry import execute_registered_engine
-from .validation import ContractValidationError
+from .registry import load_engine
+from .validation import ContractValidationError, validate_request, validate_response
 
 MAX_BODY_BYTES = 48_000
+MAX_RESPONSE_BYTES = 128_000
 MAX_CONCURRENCY = 2
 CONNECTION_TIMEOUT_SECONDS = 10
 
@@ -129,8 +131,45 @@ class _Handler(BaseHTTPRequestHandler):
             return
 
         try:
-            result = execute_registered_engine(request)
+            validate_request(request)
+            engine_identity = request["engine"]
+            manifest, _engine = load_engine(
+                engine_identity["engine_id"],
+                engine_identity["engine_version"],
+            )
+            timeout_seconds = manifest["resource_limits"]["timeout_seconds"]
+            child_env = {
+                "PATH": os.environ.get("PATH", "/usr/local/bin:/usr/bin:/bin"),
+                "PYTHONUNBUFFERED": "1",
+                "PYTHONDONTWRITEBYTECODE": "1",
+            }
+            for name in ("BA_ENGINE_SCHEMA_DIR", "BA_ENGINE_REGISTRY_DIR"):
+                if os.environ.get(name):
+                    child_env[name] = os.environ[name]
+
+            completed = subprocess.run(
+                [sys.executable, "-m", "ba_engine_contract.worker"],
+                input=json.dumps(request, ensure_ascii=False, allow_nan=False),
+                text=True,
+                encoding="utf-8",
+                capture_output=True,
+                timeout=timeout_seconds,
+                env=child_env,
+                check=False,
+            )
+            if completed.returncode == 2:
+                raise ContractValidationError("engine_request_rejected")
+            if completed.returncode != 0:
+                raise RuntimeError("engine_worker_failed")
+            if len(completed.stdout.encode("utf-8")) > MAX_RESPONSE_BYTES:
+                raise RuntimeError("engine_response_too_large")
+            result = json.loads(completed.stdout)
+            if not isinstance(result, dict):
+                raise RuntimeError("engine_response_must_be_object")
+            validate_response(result, request)
             self._send(HTTPStatus.OK, result)
+        except subprocess.TimeoutExpired:
+            self._send(HTTPStatus.GATEWAY_TIMEOUT, {"error": "engine_timeout"})
         except ContractValidationError:
             self._send(HTTPStatus.UNPROCESSABLE_ENTITY, {"error": "engine_request_rejected"})
         except Exception:
