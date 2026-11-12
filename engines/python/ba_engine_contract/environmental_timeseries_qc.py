@@ -58,14 +58,25 @@ def analyze_environmental_timeseries_qc(request: Mapping[str, Any]) -> dict[str,
 
     grouped: dict[tuple[str, str], list[tuple[datetime, float, str]]] = defaultdict(list)
     rejected_records: list[dict[str, str]] = []
+    source_references: set[str] = set()
     for record in request["input"]["records"]:
-        if record["record_type"] != "measurement":
+        record_type = record["record_type"]
+        if record_type not in {"measurement", "environmental_observation"}:
             continue
         data = record["data"]
         variable = data.get("variable_code")
-        value = data.get("normalized_value")
-        unit = data.get("normalized_unit_code")
-        timestamp = data.get("measured_at")
+        if record_type == "environmental_observation":
+            value = data.get("value")
+            unit = data.get("unit_code")
+            timestamp = data.get("observed_at")
+            provider = data.get("provider_code")
+            dataset = data.get("dataset_code")
+            if isinstance(provider, str) and isinstance(dataset, str):
+                source_references.add(f"{provider}/{dataset}")
+        else:
+            value = data.get("normalized_value")
+            unit = data.get("normalized_unit_code")
+            timestamp = data.get("measured_at")
         if not isinstance(variable, str) or not variable:
             rejected_records.append({"record_id": record["record_id"], "reason": "missing_variable_code"})
             continue
@@ -142,7 +153,7 @@ def analyze_environmental_timeseries_qc(request: Mapping[str, Any]) -> dict[str,
         "provenance": {
             "algorithm": "environmental-timeseries-qc-mad-v1",
             "libraries": [],
-            "source_references": [],
+            "source_references": sorted(source_references),
         },
     }
 
