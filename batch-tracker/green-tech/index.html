@@ -38,6 +38,10 @@
             environmental.src = "../environmental-data.js?v=20261027-sentinel-fallback-fix-1";
             environmental.onerror = () => console.error("Le module de contexte environnemental n’a pas pu être chargé.");
             document.body.appendChild(environmental);
+            const environmentalJobs = document.createElement("script");
+            environmentalJobs.src = "../environmental-jobs-panel.js?v=20261112-job-ledger-ui-1";
+            environmentalJobs.onerror = () => console.error("L’historique des traitements satellite n’a pas pu être chargé ; Green Tech reste disponible.");
+            document.body.appendChild(environmentalJobs);
             const alerts = document.createElement("script");
             alerts.src = "../biological-alerts.js?v=20261110-alert-inbox-1";
             alerts.onerror = () => console.error("Le centre des alertes biologiques n’a pas pu être chargé.");
