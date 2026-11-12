@@ -56,6 +56,7 @@ Temperature catalogue entries require particular care. Migration `20261112010000
 Analytical engines must return a separate result object, not mutate the source record. Each result must include:
 
 - `engine_id` and semantic `engine_version`
+- a separate immutable `engine_execution_results` record linked to the execution ledger, with queryable outcome, structured value, limitations, quality flags, optional calibrated confidence, provenance and immutable input snapshot references
 - `input_record_ids` or a stable input-set hash
 - `generated_at`
 - `result_type` and structured `result`
