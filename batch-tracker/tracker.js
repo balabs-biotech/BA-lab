@@ -6364,6 +6364,8 @@ async function closeBiologicalContext() {
 async function loadPlantBiologicalContextPanel(plantCultureId) {
   const requestId = ++plantBiologicalContextRequestId;
   plantBiologicalAssessmentRequestId += 1;
+  const assessmentButton = document.getElementById("runPlantBiologicalAssessment");
+  if (assessmentButton) assessmentButton.disabled = false;
   const loadRevision = authStateRevision;
   const loadOrganizationId = organizationId;
   const plant = plantCultureOptions.find(item => item.id === plantCultureId);
