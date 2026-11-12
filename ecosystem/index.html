@@ -3893,6 +3893,7 @@ h1 span{
  const detail=root.querySelector('#methodDetail');
  const titles={observe:'methodObserve',question:'methodQuestion',test:'methodTest',share:'methodShare'};
  const indices={observe:'01',question:'02',test:'03',share:'04'};
+ document.querySelectorAll('[data-lang]').forEach(button=>button.addEventListener('click',()=>{detail.hidden=true;root.querySelectorAll('[data-method-step]').forEach(item=>item.setAttribute('aria-expanded','false'));}));
  root.querySelectorAll('[data-method-step]').forEach(button=>{
   button.addEventListener('click',()=>{
    const key=button.dataset.methodStep;
@@ -3900,7 +3901,7 @@ h1 span{
    root.querySelectorAll('[data-method-step]').forEach(item=>item.setAttribute('aria-expanded','false'));
    if(wasOpen){detail.hidden=true;return;}
    button.setAttribute('aria-expanded','true');
-   const dict=window.T&&window.T[document.documentElement.lang]||window.T&&window.T.fr||{};
+   const dict=typeof T!=='undefined'?(T[document.documentElement.lang]||T.fr||{}):{};
    const lang=document.documentElement.lang||'fr';
    const name=root.querySelector('[data-i18n="'+titles[key]+'"]')?.textContent||key;
    detail.querySelector('#methodDetailIndex').textContent=indices[key]+' / '+({fr:'NOTE DE MÉTHODE',en:'METHOD NOTE',ar:'مذكرة منهجية',pt:'NOTA DE MÉTODO'}[lang]||'METHOD NOTE');
