@@ -31,7 +31,8 @@ const checks = [
   ["does not return raw exception messages to callers", /error: "internal_error"/],
 ];
 for (const [label, pattern] of checks) {
-  assert.match(source, pattern, label);
+  if (pattern instanceof RegExp) assert.match(source, pattern, label);
+  else assert.equal(pattern, true, label);
   console.log("✓ " + label);
 }
 console.log("Passed " + checks.length + " Sentinel-2 ingestion contract checks.");
