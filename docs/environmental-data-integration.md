@@ -120,3 +120,24 @@ Each Sentinel-2 processing attempt now creates a row in `public.environmental_in
 - `authenticated` users receive read-only access through organization-membership RLS. All writes are performed by the authenticated Edge gateway using its server-only `SUPABASE_SERVICE_ROLE_KEY`.
 - CultureOps can query the table directly with the user's Supabase client to show recent jobs and refresh their status. It must filter by `location_id` and order by `created_at`; RLS remains the tenant boundary.
 - Static Edge and SQL contract tests have been added for the job ledger but have not been executed in this environment. This is a durable execution ledger for the current synchronous worker call, not yet a background queue. A request timeout can leave a job in `processing` if the gateway itself is terminated before it can record the failure. A later worker-queue phase should add leases, heartbeat timestamps, and stale-job reconciliation.
+
+
+## Sentinel-2 execution ledger and queue protocol
+
+The Sentinel-2 gateway currently records a synchronous execution in `environmental_ingestion_jobs`. The ledger is visible to authenticated members of the owning organization through read-only RLS. The Green Tech history panel reads the latest 50 records and filters them by location.
+
+### Lease protocol foundation (migration pending)
+
+The follow-on migration `20261112210000_add_environmental_ingestion_job_leases.sql` adds the database primitives for a future worker queue:
+
+- `queued` jobs become claimable when `available_at <= now()`.
+- A claim is serialized with `FOR UPDATE SKIP LOCKED`, increments `attempt_count`, and issues a random opaque lease token.
+- Lease duration is bounded to 30–900 seconds.
+- A worker must heartbeat with the matching token before expiry; an expired or superseded worker cannot extend the lease or finalize the job.
+- Finalization is accepted only for the current unexpired lease and a terminal status.
+- Expired leased jobs can be reclaimed while attempts remain. The reconciliation RPC marks exhausted attempts as failed.
+- Claim, heartbeat, completion and reconciliation RPCs are executable only by `service_role`.
+
+This is a database protocol foundation, not yet an active asynchronous queue. The current gateway still creates and executes synchronous `processing` jobs; it does not enqueue work, and no worker polling/heartbeat loop or scheduled reconciler is deployed. The existing synchronous rows have no lease token and are deliberately excluded from queue reclamation.
+
+Before queue activation, add a separate enqueue entry point, a worker poll loop with heartbeat cancellation, idempotent result finalization, a scheduled stale-job reconciler, and operational limits/metrics. Validate the migration against a disposable Supabase database and exercise concurrent claims and expired-token races before applying it to production.
