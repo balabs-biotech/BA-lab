@@ -13,7 +13,7 @@ const STAC_SEARCH_URL = "https://earth-search.aws.element84.com/v1/search";
 const MAX_REQUEST_BYTES = 16 * 1024;
 const MAX_STAC_RESPONSE_BYTES = 12 * 1024 * 1024;
 const MAX_DAYS = 90;
-const MAX_SCENES = 20;
+const MAX_SCENES = 10;
 const DAY_MS = 24 * 60 * 60 * 1000;
 
 const json = (status: number, body: Record<string, unknown>) => new Response(JSON.stringify(body), {
@@ -141,7 +141,7 @@ Deno.serve(async (req: Request) => {
       return json(422, { error: "max_cloud_cover_pct_must_be_between_0_and_100" });
     }
     if (!Number.isInteger(requestedScenes) || requestedScenes < 1 || requestedScenes > MAX_SCENES) {
-      return json(422, { error: "max_scenes_must_be_between_1_and_20" });
+      return json(422, { error: "max_scenes_must_be_between_1_and_10" });
     }
 
     const startMs = Date.parse(startDate + "T00:00:00Z");
@@ -190,7 +190,7 @@ Deno.serve(async (req: Request) => {
     let pagesRead = 0;
     let itemsSeen = 0;
 
-    while (nextUrl && items.length < requestedScenes && pagesRead < 5) {
+    while (nextUrl && items.length < requestedScenes && pagesRead < 2) {
       const safeUrl = trustedStacNextUrl(nextUrl);
       if (!safeUrl) return json(502, { error: "earth_search_pagination_url_rejected" });
       const response = await fetch(safeUrl, {
@@ -198,7 +198,7 @@ Deno.serve(async (req: Request) => {
         method: nextMethod,
         headers: { Accept: "application/geo+json", ...(nextMethod === "POST" ? { "Content-Type": "application/json" } : {}) },
         body: nextMethod === "POST" ? JSON.stringify(nextBody) : undefined,
-        signal: AbortSignal.timeout(25_000),
+        signal: AbortSignal.timeout(15_000),
       });
       if (!response.ok) {
         console.error("[earth-search-sentinel2-run] STAC search failed", response.status);
@@ -266,7 +266,7 @@ Deno.serve(async (req: Request) => {
         Authorization: authorization,
       },
       body: JSON.stringify(workerRequest),
-      signal: AbortSignal.timeout(120_000),
+      signal: AbortSignal.timeout(110_000),
     });
     if (!workerResponse.ok) {
       console.error("[earth-search-sentinel2-run] Private worker failed", workerResponse.status);
