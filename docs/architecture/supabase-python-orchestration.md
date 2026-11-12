@@ -76,3 +76,16 @@ The static CI contract check is `scripts/test-engine-orchestrator-contract.mjs`.
 ### Deployment boundary
 
 The function source is committed but not deployed. No worker URL/token is configured here, no Supabase production migration was applied, and no end-to-end execution has yet been demonstrated. The next verification gate is a local PostgreSQL migration replay plus an authenticated Edge Function integration test against a disposable worker adapter.
+
+## Python HTTP worker adapter
+
+`engines/python/ba_engine_contract/http_adapter.py` exposes the registry through the matching HTTP transport:
+
+- `POST /v1/execute` accepts the versioned request envelope and returns the validated result envelope.
+- `GET /healthz` returns a minimal readiness response without exposing configuration.
+- Bearer token comparison is constant-time; tokens shorter than 24 characters are rejected.
+- Request body is capped at 48 KB, content type is checked, socket reads have a timeout, and concurrency is bounded to two requests.
+- Unknown engine versions and invalid request contracts are rejected by the shared registry/validator.
+- The adapter uses only Python's standard library; it is exposed as `ba-engine-http-worker`.
+
+Runtime configuration: `BA_ENGINE_WORKER_TOKEN` (required), `BA_ENGINE_HTTP_HOST` (default `0.0.0.0`), and `BA_ENGINE_HTTP_PORT` (default `8080`). Run it behind a TLS-terminating reverse proxy and inside a container/runtime that enforces the manifest's CPU, memory, filesystem, network and process-time limits. The adapter itself is not an OS sandbox and is not deployed by this repository change.
