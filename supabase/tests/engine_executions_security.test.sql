@@ -108,6 +108,59 @@ begin
     raise exception 'duplicate organization idempotency key was accepted';
   exception when unique_violation then null;
   end;
+  -- A completed analytical result is normalized into its own immutable,
+  -- queryable row and the execution ledger transitions atomically.
+  insert into public.engine_executions(
+    organization_id,request_id,idempotency_key,engine_id,engine_version,scope,
+    input_record_ids,input_snapshot_sha256,request_payload,status,requested_by
+  ) values (
+    v_org,'11111111-1111-4111-8111-111111111111','test-result-0001',
+    'environmental.timeseries.qc','0.1.0',
+    '{"organization_id":"aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa"}',
+    array['22222222-2222-4222-8222-222222222222'::uuid],repeat('d',64),'{}','queued',v_user
+  );
+  update public.engine_executions
+    set status='running', started_at=now(), updated_at=now()
+    where organization_id=v_org and idempotency_key='test-result-0001';
+
+  perform public.complete_engine_execution(
+    v_org,
+    (select id from public.engine_executions where organization_id=v_org and idempotency_key='test-result-0001'),
+    jsonb_build_object(
+      'contract','BA-LABS/ENGINE-RESULT',
+      'contract_version','1.0.0',
+      'request_id','11111111-1111-4111-8111-111111111111',
+      'execution_id','33333333-3333-4333-8333-333333333333',
+      'engine',jsonb_build_object('engine_id','environmental.timeseries.qc','engine_version','0.1.0'),
+      'input_snapshot_sha256',repeat('d',64),
+      'status','completed',
+      'started_at',now(),
+      'completed_at',now(),
+      'result',jsonb_build_object(
+        'outcome','success',
+        'value',jsonb_build_object('series',jsonb_build_array(),'summary',jsonb_build_object('series_count',0)),
+        'limitations',jsonb_build_array('QC only'),
+        'quality_flags',jsonb_build_array(),
+        'provenance',jsonb_build_object('algorithm','test-v1','libraries',jsonb_build_array())
+      )
+    ),
+    now()
+  );
+  if not exists (
+    select 1 from public.engine_execution_results r
+    join public.engine_executions e on e.organization_id=r.organization_id and e.id=r.execution_id
+    where r.organization_id=v_org and e.idempotency_key='test-result-0001'
+      and r.outcome='success' and r.result_type='environmental.timeseries.qc'
+      and e.status='completed'
+  ) then raise exception 'structured result and completed execution must persist atomically'; end if;
+
+  begin
+    update public.engine_execution_results set outcome='review_required'
+    where organization_id=v_org and result_type='environmental.timeseries.qc';
+    raise exception 'immutable engine result was modified';
+  exception when sqlstate '55000' then null;
+  end;
+
   raise notice 'engine execution ledger security and idempotency contract passed';
 end $$;
 
