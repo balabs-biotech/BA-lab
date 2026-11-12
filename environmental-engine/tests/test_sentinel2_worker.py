@@ -68,7 +68,7 @@ def test_worker_signs_payload_and_forwards_callers_jwt(monkeypatch):
         processing_version="worker-test-v1",
         user_authorization="Bearer user-jwt",
         ingest_url="https://example.supabase.co/functions/v1/earth-search-sentinel2-ingest",
-        worker_secret="private-secret",
+        worker_secret="ba-labs-test-secret-at-least-32-bytes",
         post=fake_post,
         timestamp_seconds=1790928000,
     )
@@ -103,7 +103,7 @@ def test_worker_does_not_persist_insufficient_quality_scenes(monkeypatch):
         processing_version="worker-test-v1",
         user_authorization="Bearer user-jwt",
         ingest_url="https://example.supabase.co/functions/v1/earth-search-sentinel2-ingest",
-        worker_secret="private-secret",
+        worker_secret="ba-labs-test-secret-at-least-32-bytes",
         post=lambda *args, **kwargs: calls.append(args),
         timestamp_seconds=1790928000,
     )
@@ -123,7 +123,7 @@ def test_worker_rejects_non_supabase_ingest_destination_before_processing():
             processing_version="worker-test-v1",
             user_authorization="Bearer user-jwt",
             ingest_url="https://attacker.example/collect",
-            worker_secret="private-secret",
+            worker_secret="ba-labs-test-secret-at-least-32-bytes",
             post=lambda *args, **kwargs: {},
             timestamp_seconds=1790928000,
         )
@@ -140,7 +140,7 @@ def test_worker_rejects_missing_caller_authorization():
             processing_version="worker-test-v1",
             user_authorization="",
             ingest_url="https://example.supabase.co/functions/v1/earth-search-sentinel2-ingest",
-            worker_secret="private-secret",
+            worker_secret="ba-labs-test-secret-at-least-32-bytes",
             post=lambda *args, **kwargs: {},
             timestamp_seconds=1790928000,
         )
@@ -171,7 +171,7 @@ def test_worker_does_not_expose_remote_error_body():
                 processing_version="worker-test-v1",
                 user_authorization="Bearer user-jwt",
                 ingest_url="https://example.supabase.co/functions/v1/earth-search-sentinel2-ingest",
-                worker_secret="private-secret",
+                worker_secret="ba-labs-test-secret-at-least-32-bytes",
                 post=lambda *args, **kwargs: (_ for _ in ()).throw(RuntimeError("secret query token")),
                 timestamp_seconds=1790928000,
             )
