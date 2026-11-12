@@ -14,7 +14,7 @@ assert.match(migration, /CREATE TABLE public\.environmental_ingestion_jobs/);
 assert.match(migration, /ENABLE ROW LEVEL SECURITY/);
 assert.match(migration, /TO authenticated[\s\S]*?organization_members/);
 assert.match(migration, /GRANT SELECT ON public\.environmental_ingestion_jobs TO authenticated/);
-assert.match(migration, /REVOKE ALL ON public\\.environmental_ingestion_jobs FROM PUBLIC, anon, authenticated/);
+assert.match(migration, /REVOKE ALL ON public\.environmental_ingestion_jobs FROM PUBLIC, anon, authenticated/);
 
 assert.match(gateway, /SUPABASE_SERVICE_ROLE_KEY/);
 assert.match(gateway, /from\("environmental_ingestion_jobs"\)[\s\S]*?\.insert\(/);
