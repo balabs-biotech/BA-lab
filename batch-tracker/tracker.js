@@ -60,6 +60,7 @@ let batchLocationOptions = [];
 let batchEnvironmentOptions = [];
 let recentObservations = [];
 let recentEngineExecutions = [];
+let recentEngineResultsByExecution = new Map();
 let engineExecutionHistoryRequestId = 0;
 
 
@@ -88,6 +89,7 @@ function clearAuthenticatedWorkspaceState() {
   batchEnvironmentOptions = [];
   recentObservations = [];
   recentEngineExecutions = [];
+  recentEngineResultsByExecution = new Map();
   engineExecutionHistoryRequestId++;
   const engineHistoryPanel = document.getElementById("overviewRecentEngineExecutions");
   if (engineHistoryPanel) {
@@ -6263,6 +6265,23 @@ async function loadRecentEngineExecutions() {
       !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
   if (query.error) throw new Error("Chargement des exécutions analytiques impossible : " + query.error.message);
   recentEngineExecutions = query.data || [];
+
+  const completedIds = recentEngineExecutions
+    .filter((execution) => execution.status === "completed")
+    .map((execution) => execution.id);
+  recentEngineResultsByExecution = new Map();
+  if (completedIds.length) {
+    const resultsQuery = await supabaseClient.from("engine_execution_results")
+      .select("execution_id,result_type,outcome,value,limitations,quality_flags,confidence,provenance,generated_at,input_snapshot_sha256,input_record_ids")
+      .eq("organization_id", loadOrganizationId)
+      .in("execution_id", completedIds);
+    if (requestId !== engineExecutionHistoryRequestId ||
+        !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
+    if (resultsQuery.error) throw new Error("Chargement des résultats analytiques impossible : " + resultsQuery.error.message);
+    recentEngineResultsByExecution = new Map(
+      (resultsQuery.data || []).map((row) => [row.execution_id, row])
+    );
+  }
   renderRecentEngineExecutions();
 }
 
@@ -6300,7 +6319,10 @@ function renderRecentEngineExecutions() {
       : "Date inconnue";
     article.append(title, status, stamp);
 
-    const result = execution.result_payload?.result;
+    const storedResult = recentEngineResultsByExecution.get(execution.id);
+    const result = storedResult
+      ? { outcome: storedResult.outcome, value: storedResult.value, quality_flags: storedResult.quality_flags }
+      : execution.result_payload?.result;
     const summary = result?.value?.summary;
     if (execution.status === "completed" && summary) {
       const details = document.createElement("p");
