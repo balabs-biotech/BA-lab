@@ -37,7 +37,7 @@ def _robust_outliers(values: list[float], threshold: float) -> set[int]:
     }
 
 
-def run_environmental_timeseries_qc(request: Mapping[str, Any]) -> dict[str, Any]:
+def analyze_environmental_timeseries_qc(request: Mapping[str, Any]) -> dict[str, Any]:
     """Run transparent timestamp, coverage and robust-outlier checks."""
     validate_request(request)
     if request["engine"]["engine_id"] != "environmental.timeseries.qc":
@@ -125,32 +125,35 @@ def run_environmental_timeseries_qc(request: Mapping[str, Any]) -> dict[str, Any
     if rejected_records:
         limitations.append("Some records were excluded because required normalized fields or timestamps were missing or invalid.")
     return {
-        "contract": "BA-LABS/ENGINE-RESULT",
-        "contract_version": "1.0.0",
-        "request_id": request["request_id"],
-        "execution_id": str(uuid4()),
-        "engine": request["engine"],
-        "input_snapshot_sha256": request["input"]["snapshot_sha256"],
-        "status": "completed",
-        "started_at": request["created_at"],
-        "completed_at": datetime.now().astimezone().isoformat(),
-        "result": {
-            "outcome": outcome,
-            "value": {
-                "series": series_results,
-                "summary": {
-                    "series_count": len(series_results),
-                    "measurement_count": total_points,
-                    "excluded_record_count": len(rejected_records),
-                    "excluded_records": rejected_records,
-                },
-            },
-            "limitations": limitations,
-            "quality_flags": sorted(all_flags),
-            "provenance": {
-                "algorithm": "environmental-timeseries-qc-mad-v1",
-                "libraries": [],
-                "source_references": [],
+        "outcome": outcome,
+        "value": {
+            "series": series_results,
+            "summary": {
+                "series_count": len(series_results),
+                "measurement_count": total_points,
+                "excluded_record_count": len(rejected_records),
+                "excluded_records": rejected_records,
             },
         },
+        "limitations": limitations,
+        "quality_flags": sorted(all_flags),
+        "provenance": {
+            "algorithm": "environmental-timeseries-qc-mad-v1",
+            "libraries": [],
+            "source_references": [],
+        },
     }
+
+
+def run_environmental_timeseries_qc(request: Mapping[str, Any]) -> dict[str, Any]:
+    """Convenience entrypoint returning the standard validated response envelope."""
+    from .runner import EngineSpec, execute_engine
+
+    return execute_engine(
+        request,
+        EngineSpec(
+            engine_id="environmental.timeseries.qc",
+            engine_version="0.1.0",
+            execute=analyze_environmental_timeseries_qc,
+        ),
+    )
