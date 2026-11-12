@@ -1825,3 +1825,146 @@
 @media (prefers-reduced-motion: reduce) {
   #app.balabs-ui > main > .editorial-work .work-media img { transition: none !important; }
 }
+
+
+/* PHASE 8 — field dossier composition: break the template-like hero and card rhythm. */
+#app.balabs-ui > main > .hero {
+  position: relative !important;
+  display: grid !important;
+  grid-template-columns: minmax(0, .92fr) minmax(0, 1.08fr) !important;
+  grid-template-rows: minmax(390px, 1fr) auto !important;
+  align-items: end !important;
+  gap: 0 0 !important;
+  min-height: min(820px, calc(100svh - 90px)) !important;
+  padding: clamp(48px,7vw,96px) 0 36px !important;
+  border-bottom: 1px solid rgba(209,208,197,.28) !important;
+  overflow: visible !important;
+}
+#app.balabs-ui > main > .hero > div:first-of-type {
+  grid-column: 1 !important;
+  grid-row: 1 !important;
+  position: relative !important;
+  z-index: 2 !important;
+  align-self: center !important;
+  padding: 0 clamp(18px,3vw,44px) 44px 0 !important;
+}
+#app.balabs-ui > main > .hero .hero-micrograph {
+  grid-column: 2 !important;
+  grid-row: 1 / 3 !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 520px !important;
+  max-height: 690px !important;
+  object-fit: cover !important;
+  object-position: 48% center !important;
+  clip-path: polygon(11% 0,100% 0,100% 89%,88% 100%,0 100%,0 12%) !important;
+  filter: grayscale(1) contrast(1.2) brightness(.82) sepia(.14) !important;
+  mix-blend-mode: screen !important;
+  opacity: .84 !important;
+}
+#app.balabs-ui > main > .hero .aside {
+  grid-column: 1 !important;
+  grid-row: 2 !important;
+  z-index: 2 !important;
+  align-self: end !important;
+  max-width: 470px !important;
+  margin: 0 36px 0 0 !important;
+  padding: 16px 0 0 18px !important;
+  border-left: 1px solid #B96B4D !important;
+  border-top: 0 !important;
+  background: transparent !important;
+}
+#app.balabs-ui > main > .hero .hero-credit {
+  position: absolute !important;
+  right: 0 !important;
+  bottom: 7px !important;
+  z-index: 3 !important;
+  color: #AAB7AE !important;
+  font: 8px/1.4 ui-monospace,monospace !important;
+  letter-spacing: .1em !important;
+  text-align: right !important;
+}
+#app.balabs-ui > main > .hero .eyebrow:before {
+  content: "BA—LABS / FIELD DOSSIER 001" !important;
+  display: block !important;
+  margin-bottom: 28px !important;
+  color: #AAB7AE !important;
+  font: 9px/1 ui-monospace,monospace !important;
+  letter-spacing: .18em !important;
+}
+#app.balabs-ui > main > .hero .eyebrow { font-size: 0 !important; }
+#app.balabs-ui > main > .hero h1 {
+  max-width: 720px !important;
+  font: 400 clamp(64px,8.3vw,122px)/.86 Georgia,serif !important;
+  letter-spacing: -.075em !important;
+  text-wrap: balance !important;
+}
+#app.balabs-ui > main > .hero h1 span { color: #B96B4D !important; font-style: italic !important; }
+#app.balabs-ui > main > .hero .hero-actions { gap: 0 !important; flex-wrap: wrap !important; }
+#app.balabs-ui > main > .hero .hero-action-primary {
+  min-height: 50px !important;
+  padding: 0 18px !important;
+  border-radius: 0 !important;
+  background: #B96B4D !important;
+  color: #111B1D !important;
+  border: 1px solid #B96B4D !important;
+  font: 700 10px/1 ui-monospace,monospace !important;
+  letter-spacing: .09em !important;
+  text-transform: uppercase !important;
+}
+#app.balabs-ui > main > .hero .hero-action-secondary {
+  min-height: 50px !important;
+  padding: 0 18px !important;
+  border-radius: 0 !important;
+  border: 1px solid rgba(209,208,197,.28) !important;
+  background: transparent !important;
+  color: #D1D0C5 !important;
+  font: 10px/1 ui-monospace,monospace !important;
+  letter-spacing: .08em !important;
+  text-transform: uppercase !important;
+}
+#app.balabs-ui > main > .editorial-work .work-grid {
+  display: block !important;
+  border-top: 1px solid rgba(209,208,197,.3) !important;
+}
+#app.balabs-ui > main > .editorial-work .work-card,
+#app.balabs-ui > main > .editorial-work .work-card:nth-child(even) {
+  display: grid !important;
+  grid-template-columns: 72px minmax(220px,.85fr) minmax(0,1.15fr) 150px !important;
+  grid-template-rows: auto auto !important;
+  grid-template-areas: "index image title link" "index image copy topics" !important;
+  align-items: center !important;
+  gap: 12px 26px !important;
+  padding: 34px 0 !important;
+  border: 0 !important;
+  border-bottom: 1px solid rgba(209,208,197,.25) !important;
+  background: transparent !important;
+}
+#app.balabs-ui > main > .editorial-work .work-index { grid-area: index !important; align-self: start !important; color: #B96B4D !important; font: 10px ui-monospace,monospace !important; writing-mode: vertical-rl !important; }
+#app.balabs-ui > main > .editorial-work .work-media { grid-area: image !important; margin: 0 !important; min-width: 0 !important; }
+#app.balabs-ui > main > .editorial-work .work-media img { width: 100% !important; height: 190px !important; object-fit: cover !important; filter: grayscale(.82) contrast(1.13) !important; }
+#app.balabs-ui > main > .editorial-work .work-card h3 { grid-area: title !important; align-self: end !important; margin: 0 !important; font: 400 clamp(25px,3vw,39px)/1 Georgia,serif !important; }
+#app.balabs-ui > main > .editorial-work .work-card > p { grid-area: copy !important; align-self: start !important; margin: 0 !important; color: #B8C1B9 !important; font-size: 12px !important; line-height: 1.7 !important; }
+#app.balabs-ui > main > .editorial-work .work-card .work-topics { grid-area: topics !important; }
+#app.balabs-ui > main > .editorial-work .work-card .work-link { grid-area: link !important; }
+@media(max-width:760px) {
+ #app.balabs-ui > main > .hero { display:flex !important; flex-direction:column !important; align-items:stretch !important; min-height:0 !important; padding:38px 0 30px !important; gap:18px !important; }
+ #app.balabs-ui > main > .hero .hero-micrograph { order:0 !important; min-height:260px !important; max-height:360px !important; height:42svh !important; clip-path:polygon(7% 0,100% 0,100% 91%,91% 100%,0 100%,0 10%) !important; }
+ #app.balabs-ui > main > .hero > div:first-of-type { order:1 !important; padding:0 !important; }
+ #app.balabs-ui > main > .hero .aside { order:2 !important; margin:0 !important; }
+ #app.balabs-ui > main > .hero .hero-credit { position:static !important; order:3 !important; text-align:left !important; }
+ #app.balabs-ui > main > .hero h1 { font-size:clamp(58px,14vw,86px) !important; }
+ #app.balabs-ui > main > .editorial-work .work-card,
+ #app.balabs-ui > main > .editorial-work .work-card:nth-child(even) {
+  grid-template-columns:36px minmax(0,1fr) !important;
+  grid-template-rows:auto auto auto auto auto !important;
+  grid-template-areas:"index image" "index title" "index copy" "index topics" "index link" !important;
+  gap:12px 14px !important;
+ }
+ #app.balabs-ui > main > .editorial-work .work-index { writing-mode:vertical-rl !important; }
+ #app.balabs-ui > main > .editorial-work .work-media img { height:auto !important; aspect-ratio:5/4 !important; }
+}
+@media(prefers-reduced-motion:reduce) {
+ #app.balabs-ui > main > .hero .hero-action-primary,
+ #app.balabs-ui > main > .hero .hero-action-secondary { transition:none !important; }
+}
