@@ -63,6 +63,17 @@ const repeated = await buildBiologicalContextSnapshot({
 assert.equal(repeated.input.snapshot_sha256, snapshot.input.snapshot_sha256,
   "identical authorized source rows must produce a deterministic snapshot hash");
 
+const offsetOrdered = await buildBiologicalContextSnapshot({
+  organizationId,
+  culture,
+  environment,
+  measurements: [{ ...measurements[0], measured_at: "2026-11-10T10:00:00+02:00" }],
+  environmentalObservations: [{ ...environmentalObservations[0], observed_at: "2026-11-10T09:00:00Z" }],
+  window,
+});
+assert.equal(offsetOrdered.input.records[0].record_type, "measurement",
+  "snapshot ordering must compare absolute instants, not timestamp strings");
+
 await assert.rejects(() => buildBiologicalContextSnapshot({
   organizationId,
   culture,
