@@ -32,6 +32,10 @@
             document.getElementById("workspace-root").innerHTML = "<main class='container'><p role='alert'>Le moteur de CultureOps n’a pas pu être chargé. Rechargez la page.</p></main>";
           };
           script.onload = () => {
+            const balJsonImport = document.createElement("script");
+            balJsonImport.src = "../bal-json-import.js?v=20261111-bal-json-import-1";
+            balJsonImport.onerror = () => console.error("Le module d’import BAL-JSON n’a pas pu être chargé.");
+            document.body.appendChild(balJsonImport);
             const assisted = document.createElement("script");
             assisted.src = "../smart-entry.js?v=20261029-assisted-entry-1";
             assisted.onerror = () => console.error("Le module de saisie assistée n’a pas pu être chargé.");
