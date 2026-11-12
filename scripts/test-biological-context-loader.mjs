@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { loadAuthenticatedBiologicalContextSnapshot } from "../supabase/functions/_shared/biological-context-loader.ts";
+import { loadAuthenticatedBiologicalContextSnapshot, loadAuthenticatedPlantBiologicalContextSnapshot } from "../supabase/functions/_shared/biological-context-loader.ts";
 
 class MockQuery {
   constructor(table, datasets, counts) {
@@ -104,3 +104,49 @@ await assert.rejects(() => loadAuthenticatedBiologicalContextSnapshot({
 }), /biological_analysis_context_limit_exceeded/);
 
 console.log("✓ BIE authenticated loader: caller-scoped reads, tenant filters, bounded queries and weather gating");
+
+const plantCultureId = "cccccccc-cccc-4ccc-8ccc-cccccccccccc";
+const plantMeasurementId = "dddddddd-dddd-4ddd-8ddd-dddddddddddd";
+const plantData = {
+  plant_cultures: [{
+    id: plantCultureId, organization_id: org, environment_id: envB,
+    species_name: "Solanum lycopersicum", cultivar_name: "Yellow Pear",
+    crop_type: "tomato", substrate: "Technosoil", started_at: "2026-10-01T08:00:00Z",
+  }],
+  biological_contexts: [{
+    id: "eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee", organization_id: org,
+    plant_culture_id: plantCultureId, culture_id: null, domain: "greentech",
+    environment_id: envA, organism_kind: "plant", taxon_code: "Solanum lycopersicum",
+    cultivar_code: "Yellow Pear", culture_stage: "vegetative",
+    substrate_code: "Technosoil", production_system: "greenhouse",
+    context_tags: ["greentech-trial"], valid_from: "2026-11-01", valid_to: null,
+  }],
+  measurements: [{
+    id: plantMeasurementId, organization_id: org, plant_culture_id: plantCultureId,
+    culture_id: null, environment_id: envA, variable_code: "air_temperature",
+    raw_value: 297, raw_unit_code: "K", normalized_value: 24,
+    normalized_unit_code: "degC", measured_at: "2026-11-10T08:00:00Z",
+    quality_state: "valid", metadata: {},
+  }],
+  environments: base.environments,
+  locations: base.locations,
+  environmental_observations: base.environmental_observations,
+};
+const plantCounts = {};
+const plantSnapshot = await loadAuthenticatedPlantBiologicalContextSnapshot({
+  userClient: clientFor(plantData, plantCounts), organizationId: org, plantCultureId, window,
+});
+assert.equal(plantSnapshot.scope.plant_culture_id, plantCultureId);
+assert.equal(Object.hasOwn(plantSnapshot.scope, "culture_id"), false);
+assert.equal(plantSnapshot.input.records.length, 2);
+const plantMeasurement = plantSnapshot.input.records.find((row) => row.record_type === "measurement");
+assert.equal(plantMeasurement.context.plant_culture_id, plantCultureId);
+assert.equal(Object.hasOwn(plantMeasurement.context, "culture_id"), false);
+assert.equal(plantSnapshot.parameters.biological_contexts[0].organism_kind, "plant");
+assert.equal(plantSnapshot.parameters.biological_contexts[0].cultivar_code, "Yellow Pear");
+assert.equal(plantCounts.plant_cultures, 1);
+assert.equal(plantCounts.environmental_observations, 1);
+await assert.rejects(() => loadAuthenticatedPlantBiologicalContextSnapshot({
+  userClient: clientFor(plantData), organizationId: "99999999-9999-4999-8999-999999999999", plantCultureId, window,
+}), /plant_culture_not_found_or_inaccessible/);
+console.log("✓ BIE GreenTech loader: authenticated plant scope, temporal contexts, measurement and weather provenance");
