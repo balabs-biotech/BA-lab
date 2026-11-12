@@ -92,7 +92,7 @@ jobs:
           cache-dependency-path: environmental-engine/pyproject.toml
       - name: Install the environmental engine and test dependencies
         working-directory: environmental-engine
-        run: python -m pip install -e ".[dev,api]"
+        run: python -m pip install -e ".[dev,api,satellite]"
       - name: Run environmental engine tests
         working-directory: environmental-engine
         run: python -m pytest -q
@@ -395,7 +395,7 @@ jobs:
         run: |
           cd environmental-engine
           python -m pip install --upgrade pip
-          pip install -e ".[dev]"
+          pip install -e ".[dev,satellite]"
       - name: Run Environmental Engine tests
         run: |
           cd environmental-engine
