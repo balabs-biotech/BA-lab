@@ -50,4 +50,4 @@ The manifest's 15-second engine limit and 256 MB memory declaration are metadata
 
 Health check: `GET /healthz`. Execution endpoint: authenticated `POST /v1/execute`.
 
-Required environment: `BA_ENGINE_WORKER_TOKEN` (random secret, minimum 24 characters); optional `BA_ENGINE_HTTP_HOST` (default `0.0.0.0`) and `BA_ENGINE_HTTP_PORT` (default `8080`). No secret is baked into the image. Configure the matching token in the Supabase Edge Function environment and set `BA_ENGINE_WORKER_URL` to the private HTTPS endpoint. Rotate both sides together.
+Container paths are configured with `BA_ENGINE_SCHEMA_DIR=/app/schemas/engine/v1` and `BA_ENGINE_REGISTRY_DIR=/app/engines/python/registry`; override these only when relocating those assets. Required environment: `BA_ENGINE_WORKER_TOKEN` (random secret, minimum 24 characters); optional `BA_ENGINE_HTTP_HOST` (default `0.0.0.0`) and `BA_ENGINE_HTTP_PORT` (default `8080`). No secret is baked into the image. Configure the matching token in the Supabase Edge Function environment and set `BA_ENGINE_WORKER_URL` to the private HTTPS endpoint. Rotate both sides together.
