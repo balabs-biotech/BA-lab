@@ -108,9 +108,11 @@ function validateRows(rows: unknown, organizationId: string, locationId: string)
     if (typeof row.value !== "number" || !Number.isFinite(row.value) || row.value < -1 || row.value > 1) return "invalid_ndvi_value";
     if (row.unit_code !== "1" || row.quality_flag !== "valid" || !validTimestamp(row.observed_at) || !validTimestamp(row.retrieved_at) ||
         Date.parse(row.retrieved_at) < Date.parse(row.observed_at)) return "invalid_observation_timestamp_or_unit";
-    if (typeof row.source_record_id !== "string" || row.source_record_id.trim().length < 3 ||
-        row.source_record_id.length > 200) return "source_record_id_required";
-    if (!validSourceUrl(row.source_url, row.source_record_id)) return "invalid_stac_source_url";
+    const sceneId = row.source_record_id;
+    if (typeof sceneId !== "string" || sceneId.trim().length < 3 || sceneId.length > 200) {
+      return "source_record_id_required";
+    }
+    if (!validSourceUrl(row.source_url, sceneId)) return "invalid_stac_source_url";
     if (!row.metadata || typeof row.metadata !== "object" || Array.isArray(row.metadata)) return "metadata_required";
     const metadata = row.metadata as Record<string, unknown>;
     if (metadata.scene_id !== row.source_record_id ||
@@ -119,14 +121,14 @@ function validateRows(rows: unknown, organizationId: string, locationId: string)
         metadata.valid_pixel_ratio > 1 ||
         typeof metadata.cloud_cover_pct !== "number" || metadata.cloud_cover_pct < 0 ||
         metadata.cloud_cover_pct > 100) return "invalid_processing_provenance";
-    const pair = pairs.get(row.source_record_id);
+    const pair = pairs.get(sceneId);
     if (pair) {
       if (pair.observedAt !== row.observed_at || pair.retrievedAt !== row.retrieved_at || pair.sourceUrl !== row.source_url) {
         return "scene_pair_provenance_mismatch";
       }
       pair.variables.add(String(row.variable_code));
     } else {
-      pairs.set(row.source_record_id, {
+      pairs.set(sceneId, {
         variables: new Set([String(row.variable_code)]),
         observedAt: String(row.observed_at),
         retrievedAt: String(row.retrieved_at),
