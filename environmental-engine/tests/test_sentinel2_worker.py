@@ -1,4 +1,7 @@
 from datetime import datetime, timezone
+import hashlib
+import hmac
+import json
 from uuid import uuid4
 
 import pytest
@@ -77,6 +80,13 @@ def test_worker_signs_payload_and_forwards_callers_jwt(monkeypatch):
     assert captured["headers"]["Authorization"] == "Bearer user-jwt"
     assert captured["headers"]["x-ba-worker-timestamp"] == "1790928000"
     assert len(captured["headers"]["x-ba-worker-signature"]) == 64
+    expected_signature = hmac.new(
+        b"ba-labs-test-secret-at-least-32-bytes",
+        b"1790928000." + captured["data"],
+        hashlib.sha256,
+    ).hexdigest()
+    assert captured["headers"]["x-ba-worker-signature"] == expected_signature
+    assert json.loads(captured["data"])["rows"][0]["source_record_id"] == "S2A_TEST"
     assert captured["timeout"] == 30
 
 
