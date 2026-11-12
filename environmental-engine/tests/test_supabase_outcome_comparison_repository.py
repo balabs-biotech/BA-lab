@@ -122,6 +122,8 @@ def test_loads_only_persisted_outcome_snapshots_with_explicit_cohort_assignment(
     assert dataset.observations[1].value == 15
     assert dataset.observations[1].quality_state == "controlled"
     assert dataset.observations[0].subject_type == "biological_subject"
+    assert dataset.observations[0].method == "caliper"
+    assert dataset.observations[0].instrument == "caliper-1"
     assert dataset.observations[0].context_signature == dataset.observations[1].context_signature
     assert dataset.excluded_environmental_context_links == 1
     assert client.limits["biological_recommendations"] == 201
