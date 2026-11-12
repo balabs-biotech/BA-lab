@@ -456,6 +456,12 @@ assert.match(recommendationOutcomeEvidenceMigration, /references public\.biologi
 assert.match(recommendationOutcomeEvidenceMigration, /references public\.measurements/);
 assert.match(recommendationOutcomeEvidenceMigration, /measurement_observed_at timestamptz not null/);
 assert.match(recommendationOutcomeEvidenceMigration, /source_metadata jsonb not null/);
+assert.match(recommendationOutcomeEvidenceMigration, /measurement_quality_state text check/);
+assert.match(recommendationOutcomeEvidenceMigration, /v_measurement\.quality_state/);
+assert.match(recommendationOutcomeEvidenceContractTest, /immutable evidence must preserve measurement quality state/);
+assert.match(moduleSource, /measurement_quality_state,method,instrument/);
+assert.match(moduleSource, /Qualité : /);
+assert.match(moduleSource, /Non capturée — non comparable/);
 assert.match(recommendationOutcomeEvidenceMigration, /v_measurement\.normalized_value/);
 assert.match(moduleSource, /measurement_observed_at/);
 assert.match(moduleSource, /measurement_snapshot|normalized_value/);
