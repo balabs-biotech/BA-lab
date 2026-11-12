@@ -61,6 +61,18 @@ Every response echoes `request_id`, engine identity and `input_snapshot_sha256`,
 5. Add a deployment adapter that enforces hard process timeouts, memory/CPU limits, concurrency, cancellation and idempotency. The in-process Python runner does not itself provide OS-level sandboxing or hard resource enforcement.
 6. Add external provider adapters and biological interpretation only after the worker lifecycle and evidence requirements are verified.
 
+## Registry and worker invocation
+
+Registered engines are resolved by the exact pair `engine_id + engine_version` from `engines/python/registry/`. The registry loader validates the manifest, restricts entrypoints to the `ba_engine_contract.*` package namespace, and refuses missing or mismatched registrations.
+
+The worker accepts one JSON request on standard input and writes one JSON result envelope to standard output:
+
+```bash
+printf '%s' "$ENGINE_REQUEST_JSON" | ba-engine-worker
+```
+
+The CLI returns exit code 0 for a valid execution result, 2 for invalid input or an unregistered engine, and 3 for an unexpected worker-level failure. Diagnostics go to standard error; credentials and raw exception text are not emitted. The worker is a process entrypoint, not a sandbox by itself: its host/container must enforce the manifest's timeout, memory, filesystem and network restrictions.
+
 ## First reference engine: environmental time-series QC
 
 The first implementation is `engines/python/ba_engine_contract/environmental_timeseries_qc.py`. It is deliberately a deterministic quality-control engine, not a biological recommendation engine.
