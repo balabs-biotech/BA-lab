@@ -6256,7 +6256,7 @@ async function loadRecentEngineExecutions() {
   if (!loadOrganizationId || !panel) return;
 
   const query = await supabaseClient.from("engine_executions")
-    .select("id,engine_id,engine_version,status,result_payload,error_code,created_at,completed_at,input_record_ids")
+    .select("id,engine_id,engine_version,status,result_payload,error_code,created_at,completed_at,input_record_ids,input_snapshot_sha256,scope_type,scope_id")
     .eq("organization_id", loadOrganizationId)
     .order("created_at", { ascending: false })
     .limit(8);
@@ -6285,6 +6285,158 @@ async function loadRecentEngineExecutions() {
   renderRecentEngineExecutions();
 }
 
+function getStoredEngineResult(execution) {
+  const stored = recentEngineResultsByExecution.get(execution.id);
+  const envelopeResult = execution.result_payload?.result;
+  return stored || (envelopeResult ? {
+    outcome: envelopeResult.outcome,
+    value: envelopeResult.value,
+    limitations: envelopeResult.limitations,
+    quality_flags: envelopeResult.quality_flags,
+    provenance: envelopeResult.provenance,
+    input_snapshot_sha256: execution.input_snapshot_sha256,
+    input_record_ids: execution.input_record_ids
+  } : null);
+}
+
+function getComparableEngineExecutions() {
+  return recentEngineExecutions.filter((execution) =>
+    execution.status === "completed" && Boolean(getStoredEngineResult(execution)?.value)
+  );
+}
+
+function areEngineExecutionsComparable(left, right) {
+  if (!left || !right || left.id === right.id) return false;
+  if (left.engine_id !== right.engine_id || left.engine_version !== right.engine_version) return false;
+  if ((left.scope_type || null) !== (right.scope_type || null)) return false;
+  if ((left.scope_id || null) !== (right.scope_id || null)) return false;
+  const leftResult = getStoredEngineResult(left);
+  const rightResult = getStoredEngineResult(right);
+  return Boolean(leftResult?.value && rightResult?.value);
+}
+
+function renderEngineExecutionComparison(panel, eligible) {
+  if (eligible.length < 2) return;
+  const section = document.createElement("section");
+  section.className = "engine-comparison";
+  const heading = document.createElement("strong");
+  heading.textContent = "Comparer deux exécutions";
+  const controls = document.createElement("div");
+  controls.className = "engine-comparison-controls";
+  const makeSelect = (labelText, selectedId) => {
+    const label = document.createElement("label");
+    label.textContent = labelText;
+    const select = document.createElement("select");
+    select.className = "engine-comparison-select";
+    eligible.forEach((execution) => {
+      const option = document.createElement("option");
+      option.value = execution.id;
+      option.textContent = new Date(execution.created_at).toLocaleString() +
+        " · " + execution.engine_id + " v" + execution.engine_version;
+      option.selected = execution.id === selectedId;
+      select.appendChild(option);
+    });
+    label.appendChild(select);
+    controls.appendChild(label);
+    return select;
+  };
+  const leftSelect = makeSelect("Exécution A", eligible[1].id);
+  const rightSelect = makeSelect("Exécution B", eligible[0].id);
+  const compareButton = document.createElement("button");
+  compareButton.type = "button";
+  compareButton.className = "secondary-button small-button";
+  compareButton.textContent = "Comparer";
+  const output = document.createElement("div");
+  output.className = "engine-comparison-output";
+  output.setAttribute("aria-live", "polite");
+  compareButton.addEventListener("click", () => {
+    output.replaceChildren();
+    const left = eligible.find((item) => item.id === leftSelect.value);
+    const right = eligible.find((item) => item.id === rightSelect.value);
+    if (!areEngineExecutionsComparable(left, right)) {
+      const warning = document.createElement("p");
+      warning.className = "muted";
+      warning.textContent = "Comparaison impossible : moteur, version ou périmètre incompatibles.";
+      output.appendChild(warning);
+      return;
+    }
+    const a = getStoredEngineResult(left);
+    const b = getStoredEngineResult(right);
+    const title = document.createElement("p");
+    title.textContent = "Comparaison descriptive — aucune relation causale n’est déduite.";
+    output.appendChild(title);
+    const snapshotChanged = a.input_snapshot_sha256 && b.input_snapshot_sha256
+      ? a.input_snapshot_sha256 !== b.input_snapshot_sha256
+      : JSON.stringify([...(a.input_record_ids || [])].sort()) !==
+        JSON.stringify([...(b.input_record_ids || [])].sort());
+    const snapshotNote = document.createElement("p");
+    snapshotNote.className = "muted";
+    snapshotNote.textContent = snapshotChanged
+      ? "Les instantanés d’entrée diffèrent : les deux analyses ne portent pas exactement sur les mêmes données."
+      : "Les identifiants d’entrée et l’empreinte disponibles sont identiques.";
+    output.appendChild(snapshotNote);
+
+    const summaryA = a.value?.summary || {};
+    const summaryB = b.value?.summary || {};
+    const summaryTable = document.createElement("ul");
+    for (const [label, key] of [
+      ["Mesures", "measurement_count"],
+      ["Séries", "series_count"],
+      ["Enregistrements exclus", "excluded_record_count"]
+    ]) {
+      const row = document.createElement("li");
+      row.textContent = label + " : " + String(summaryA[key] ?? "—") +
+        " → " + String(summaryB[key] ?? "—");
+      summaryTable.appendChild(row);
+    }
+    output.appendChild(summaryTable);
+
+    const seriesMap = (result) => new Map(
+      (Array.isArray(result.value?.series) ? result.value.series : [])
+        .map((series) => [String(series.variable_code) + "::" + String(series.unit_code), series])
+    );
+    const seriesA = seriesMap(a);
+    const seriesB = seriesMap(b);
+    const seriesKeys = [...new Set([...seriesA.keys(), ...seriesB.keys()])].sort();
+    const seriesList = document.createElement("ul");
+    for (const key of seriesKeys) {
+      const first = seriesA.get(key);
+      const second = seriesB.get(key);
+      const row = document.createElement("li");
+      if (!first || !second) {
+        row.textContent = key.replace("::", " · ") +
+          (first ? " : absente de B" : " : absente de A");
+      } else {
+        row.textContent = key.replace("::", " · ") +
+          " — points " + first.point_count + " → " + second.point_count +
+          " ; écart maximal " + first.max_gap_minutes + " → " + second.max_gap_minutes +
+          " min ; doublons " + Boolean(first.duplicate_timestamps) +
+          " → " + Boolean(second.duplicate_timestamps);
+      }
+      seriesList.appendChild(row);
+    }
+    if (seriesKeys.length) {
+      const seriesHeading = document.createElement("p");
+      seriesHeading.textContent = "Évolution des séries (variable et unité identiques)";
+      output.append(seriesHeading, seriesList);
+    }
+    const flagsA = new Set(a.quality_flags || []);
+    const flagsB = new Set(b.quality_flags || []);
+    const added = [...flagsB].filter((flag) => !flagsA.has(flag));
+    const removed = [...flagsA].filter((flag) => !flagsB.has(flag));
+    const flags = document.createElement("p");
+    flags.textContent = "Signaux ajoutés : " + (added.join(", ") || "aucun") +
+      " · Signaux disparus : " + (removed.join(", ") || "aucun");
+    output.appendChild(flags);
+    const limits = document.createElement("p");
+    limits.className = "muted";
+    limits.textContent = "Les changements peuvent provenir des données d’entrée, de leur couverture ou du traitement. Cette comparaison ne conclut pas à une amélioration ou à une dégradation biologique.";
+    output.appendChild(limits);
+  });
+  section.append(heading, controls, compareButton, output);
+  panel.appendChild(section);
+}
+
 function renderRecentEngineExecutions() {
   const panel = document.getElementById("overviewRecentEngineExecutions");
   if (!panel) return;
@@ -6297,6 +6449,8 @@ function renderRecentEngineExecutions() {
     panel.appendChild(empty);
     return;
   }
+
+  renderEngineExecutionComparison(panel, getComparableEngineExecutions());
 
   for (const execution of recentEngineExecutions) {
     const article = document.createElement("article");
@@ -6320,9 +6474,7 @@ function renderRecentEngineExecutions() {
     article.append(title, status, stamp);
 
     const storedResult = recentEngineResultsByExecution.get(execution.id);
-    const result = storedResult
-      ? { outcome: storedResult.outcome, value: storedResult.value, quality_flags: storedResult.quality_flags }
-      : execution.result_payload?.result;
+    const result = getStoredEngineResult(execution);
     const summary = result?.value?.summary;
     if (execution.status === "completed" && summary) {
       const details = document.createElement("p");
