@@ -108,6 +108,20 @@ begin
     raise exception 'duplicate organization idempotency key was accepted';
   exception when unique_violation then null;
   end;
+  if not (select relrowsecurity from pg_class where oid='public.engine_execution_results'::regclass) then
+    raise exception 'engine_execution_results must have RLS enabled';
+  end if;
+  if not has_table_privilege('authenticated','public.engine_execution_results','SELECT')
+    or has_table_privilege('authenticated','public.engine_execution_results','INSERT')
+    or has_table_privilege('authenticated','public.engine_execution_results','UPDATE')
+    or has_table_privilege('authenticated','public.engine_execution_results','DELETE') then
+    raise exception 'engine result rows must be read-only to authenticated members';
+  end if;
+  if not has_function_privilege('service_role','public.complete_engine_execution(uuid,uuid,jsonb,timestamptz)','EXECUTE')
+    or has_function_privilege('authenticated','public.complete_engine_execution(uuid,uuid,jsonb,timestamptz)','EXECUTE') then
+    raise exception 'atomic completion RPC must be service-role only';
+  end if;
+
   -- A completed analytical result is normalized into its own immutable,
   -- queryable row and the execution ledger transitions atomically.
   insert into public.engine_executions(
