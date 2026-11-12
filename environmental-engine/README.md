@@ -92,6 +92,6 @@ Required worker runtime secrets:
 
 The persistence Edge Function also requires the same `BA_SENTINEL2_WORKER_SECRET`; it uses the caller JWT to re-check user identity, location scope and writer membership before using its server-only Supabase secret to upsert rows. The worker has no service-role key and cannot bypass that authorization boundary.
 
-The gateway currently derives an **approximate location buffer** from the saved latitude/longitude; it is not a cadastral or surveyed parcel polygon. It limits a request to 90 days and 20 scenes. Each scene is processed independently; only complete, valid mean/median NDVI pairs are submitted. The worker does not create or modify migrations, deploy functions, or configure secrets automatically.
+The gateway currently derives an **approximate location buffer** from the saved latitude/longitude; it is not a cadastral or surveyed parcel polygon. It limits a request to 90 days and 10 scenes. Each scene is processed independently; only complete, valid mean/median NDVI pairs are submitted. The worker does not create or modify migrations, deploy functions, or configure secrets automatically.
 
 Do not expose the worker publicly without its private ingress controls and `X-BA-Engine-Key` authentication. Configure all three services and execute the focused tests before enabling production ingestion.
