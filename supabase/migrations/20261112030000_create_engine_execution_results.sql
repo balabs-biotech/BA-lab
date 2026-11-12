@@ -7,7 +7,7 @@ create table if not exists public.engine_execution_results (
   engine_version text not null,
   result_type text not null,
   outcome text not null check (outcome in ('success','insufficient_data','out_of_domain','review_required')),
-  input_record_ids uuid[] not null check (cardinality(input_record_ids) > 0),
+  input_record_ids uuid[] not null check (cardinality(input_record_ids) > 0 or engine_id = 'biological.context.features'),
   input_snapshot_sha256 text not null check (input_snapshot_sha256 ~ '^[a-f0-9]{64}$'),
   value jsonb not null check (jsonb_typeof(value) = 'object'),
   limitations jsonb not null default '[]'::jsonb check (jsonb_typeof(limitations) = 'array'),
