@@ -147,7 +147,7 @@ To run the deterministic QC engine against externally sourced weather observatio
 }
 ```
 
-The function reads `environmental_observations` through the caller-scoped Supabase client and RLS, with explicit organization, location and `data_family = weather` filters. It requires all selected rows to belong to one provider/dataset pair; a run cannot silently mix weather products. The immutable request snapshot includes the stored value and unit, observation/retrieval timestamps, provider, dataset, spatial resolution, quality flag, source URL and metadata.
+The function reads `environmental_observations` through the caller-scoped Supabase client and RLS, with explicit organization, location and `data_family = weather` filters. It requires all selected rows to belong to one provider/dataset pair; a run cannot silently mix weather products. The immutable request snapshot includes the stored analytical value and unit, observation/retrieval timestamps, provider, dataset, spatial resolution and quality flag. Each record also carries a SHA-256 digest of the complete source row (including source URL and metadata), so large provider metadata is not duplicated into the worker payload while remaining integrity-bound to the execution.
 
 The QC engine reads these values from the environmental-observation shape (`value`, `unit_code`, `observed_at`) without relabeling them as normalized sensor measurements. It groups series by variable and stored unit, reports source provider/dataset in `provenance.source_references`, and flags coverage gaps/duplicates/outliers only. The engine does not rescale gridded values to parcel resolution or infer crop stress.
 
