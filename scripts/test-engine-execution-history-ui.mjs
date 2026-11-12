@@ -73,4 +73,56 @@ for (const path of [
   assert.match(page, /tracker\.js\?v=20261112-engine-history-compare-1/);
 }
 
+
+const snapshotHelperStart = tracker.indexOf("function getEngineSnapshotComparison(");
+const seriesKeyStart = tracker.indexOf("function getEngineSeriesComparisonKey(", snapshotHelperStart);
+const comparableStart = tracker.indexOf("function areEngineExecutionsComparable(", seriesKeyStart);
+const comparisonRendererStart = tracker.indexOf("function renderEngineExecutionComparison(", comparableStart);
+assert.ok(snapshotHelperStart >= 0 && seriesKeyStart > snapshotHelperStart);
+assert.ok(comparableStart > seriesKeyStart && comparisonRendererStart > comparableStart);
+
+const snapshotHelperSource = tracker.slice(snapshotHelperStart, seriesKeyStart);
+const seriesKeySource = tracker.slice(seriesKeyStart, comparableStart);
+const comparableSource = tracker.slice(comparableStart, comparisonRendererStart);
+const compareSnapshots = new Function(snapshotHelperSource + "; return getEngineSnapshotComparison;")();
+const getSeriesKey = new Function(seriesKeySource + "; return getEngineSeriesComparisonKey;")();
+const compareExecutions = new Function(
+  "getStoredEngineResult",
+  comparableSource + "; return areEngineExecutionsComparable;"
+)((execution) => execution.mockResult);
+
+const executionA = {
+  id: "execution-a",
+  status: "completed",
+  engine_id: "environmental.timeseries.qc",
+  engine_version: "0.1.0",
+  scope: { organization_id: "org-a", culture_id: "culture-a" },
+  mockResult: { result_type: "environmental_timeseries_qc", value: {} }
+};
+const executionB = { ...executionA, id: "execution-b", scope: { ...executionA.scope } };
+assert.equal(compareExecutions(executionA, executionB), true);
+assert.equal(compareExecutions(executionA, { ...executionB, id: executionA.id }), false);
+assert.equal(compareExecutions(executionA, { ...executionB, engine_id: "other.engine" }), false);
+assert.equal(compareExecutions(executionA, { ...executionB, engine_version: "0.2.0" }), false);
+assert.equal(compareExecutions(executionA, { ...executionB, scope: { organization_id: "org-a", culture_id: "culture-b" } }), false);
+assert.equal(compareExecutions(executionA, { ...executionB, mockResult: { result_type: "other_result", value: {} } }), false);
+
+assert.equal(compareSnapshots(
+  { input_snapshot_sha256: "a".repeat(64) },
+  { input_snapshot_sha256: "a".repeat(64) }
+), "same");
+assert.equal(compareSnapshots(
+  { input_snapshot_sha256: "a".repeat(64) },
+  { input_snapshot_sha256: "b".repeat(64) }
+), "different");
+assert.equal(compareSnapshots({ input_record_ids: ["b", "a"] }, { input_record_ids: ["a", "b"] }), "same");
+assert.equal(compareSnapshots({ input_record_ids: ["a"] }, { input_record_ids: ["b"] }), "different");
+assert.equal(compareSnapshots({ input_record_ids: ["a"] }, {}), "unknown");
+
+assert.equal(getSeriesKey({ variable_code: "temperature", unit_code: "Cel" }), "temperature::Cel");
+assert.notEqual(
+  getSeriesKey({ variable_code: "temperature", unit_code: "Cel" }),
+  getSeriesKey({ variable_code: "temperature", unit_code: "K" })
+);
+
 console.log("Engine execution history UI contract checks passed.");
