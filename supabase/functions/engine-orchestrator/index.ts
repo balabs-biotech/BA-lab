@@ -5,6 +5,7 @@ import Ajv2020 from "npm:ajv@8.17.1/dist/2020.js";
 import addFormats from "npm:ajv-formats@3.0.1";
 import requestSchema from "../../../schemas/engine/v1/request.schema.json" with { type: "json" };
 import responseSchema from "../../../schemas/engine/v1/response.schema.json" with { type: "json" };
+import { loadAuthenticatedBiologicalContextSnapshot } from "../_shared/biological-context-loader.ts";
 
 const headers = {
   "Access-Control-Allow-Origin": "*",
@@ -87,22 +88,37 @@ Deno.serve(async (req: Request) => {
   const organizationId = parsed.organization_id;
   const engineId = parsed.engine_id;
   const engineVersion = parsed.engine_version;
-  const recordIds = parsed.record_ids;
+  const isBiologicalContextEngine = engineId === "biological.context.features";
+  const suppliedRecordIds = parsed.record_ids;
+  // BIE source IDs are derived exclusively from RLS-authorized database rows.
+  const recordIds = isBiologicalContextEngine ? [] : suppliedRecordIds;
   const recordType = parsed.record_type ?? "measurement";
   const parameters = parsed.parameters ?? {};
   const scope = parsed.scope;
   const idempotencyKey = req.headers.get("idempotency-key") ?? parsed.idempotency_key;
+  const validRecordIds = isBiologicalContextEngine
+    ? (suppliedRecordIds === undefined || (Array.isArray(suppliedRecordIds) && suppliedRecordIds.length === 0))
+    : (Array.isArray(recordIds) && recordIds.length >= 1 && recordIds.length <= 500 &&
+      recordIds.every((id) => typeof id === "string") && new Set(recordIds).size === recordIds.length);
+  const validSourceType = isBiologicalContextEngine ||
+    recordType === "measurement" || recordType === "environmental_observation";
+  const validBiologicalRequest = !isBiologicalContextEngine ||
+    (typeof scope?.culture_id === "string" &&
+      typeof parameters.window_start === "string" &&
+      typeof parameters.window_end === "string" &&
+      typeof parameters.timezone === "string");
   if (typeof organizationId !== "string" || typeof engineId !== "string" ||
-      typeof engineVersion !== "string" || !Array.isArray(recordIds) ||
-      recordIds.length < 1 || recordIds.length > 500 ||
-      recordIds.some((id) => typeof id !== "string") ||
-      new Set(recordIds).size !== recordIds.length ||
-      (recordType !== "measurement" && recordType !== "environmental_observation") ||
+      typeof engineVersion !== "string" || !validRecordIds || !validSourceType ||
+      !validBiologicalRequest ||
       typeof idempotencyKey !== "string" || idempotencyKey.length < 8 || idempotencyKey.length > 160 ||
       !object(parameters) || !object(scope ?? {})) {
     return reply(422, { error: "invalid_or_incomplete_request" });
   }
-  if (!ENGINE_ALLOWLIST.get(engineId)?.has(engineVersion)) {
+  const allowedVersions = ENGINE_ALLOWLIST.get(engineId) ??
+    (isBiologicalContextEngine && Deno.env.get("BA_BIE_ENABLED") === "true"
+      ? new Set(["0.1.0"])
+      : undefined);
+  if (!allowedVersions?.has(engineVersion)) {
     return reply(422, { error: "engine_version_not_registered" });
   }
   if (scope?.organization_id && scope.organization_id !== organizationId) {
@@ -141,97 +157,140 @@ Deno.serve(async (req: Request) => {
     return reply(403, { error: "organization_role_not_permitted" });
   }
 
-  // Source rows are read with the caller JWT; each supported source has its own RLS-scoped query.
-  let sourceRows: Record<string, any>[];
-  if (recordType === "measurement") {
-    const { data, error: sourceError } = await userClient
-      .from("measurements")
-      .select("id,variable_code,raw_value,raw_unit_code,normalized_value,normalized_unit_code,measured_at,method,instrument,quality_state,exclusion_reason,culture_id,sample_id,experimental_unit_id,event_id,result_id,metadata")
-      .eq("organization_id", organizationId)
-      .in("id", recordIds);
-    if (sourceError) return reply(422, { error: "source_records_unavailable" });
-    if (!data || data.length !== recordIds.length) {
-      return reply(422, { error: "one_or_more_source_records_missing_or_inaccessible" });
-    }
-    if (data.some((row) => row.quality_state === "excluded")) {
-      return reply(422, { error: "excluded_source_records_not_eligible" });
-    }
-    if (scope?.culture_id && data.some((row) => row.culture_id !== scope.culture_id)) {
-      return reply(422, { error: "source_scope_mismatch" });
-    }
-    sourceRows = data;
-  } else {
-    if (typeof scope?.location_id !== "string") {
-      return reply(422, { error: "environmental_location_scope_required" });
-    }
-    const { data, error: sourceError } = await userClient
-      .from("environmental_observations")
-      .select("id,location_id,data_family,provider_code,dataset_code,variable_code,value,unit_code,observed_at,retrieved_at,spatial_resolution_m,quality_flag,source_url,metadata")
-      .eq("organization_id", organizationId)
-      .eq("location_id", scope.location_id)
-      .eq("data_family", "weather")
-      .in("id", recordIds);
-    if (sourceError) return reply(422, { error: "source_records_unavailable" });
-    if (!data || data.length !== recordIds.length) {
-      return reply(422, { error: "one_or_more_source_records_missing_or_inaccessible" });
-    }
-    const sourceIdentities = new Set(data.map((row) => row.provider_code + "/" + row.dataset_code));
-    if (sourceIdentities.size !== 1) {
-      return reply(422, { error: "environmental_source_mismatch" });
-    }
-    sourceRows = data;
-  }
+  // Source rows are read with the caller JWT. BIE derives all IDs from
+  // authenticated culture/window queries; ordinary engines retain explicit IDs.
+  let orderedRecords: Record<string, any>[];
+  let effectiveRecordIds: string[];
+  let effectiveScope: Record<string, any>;
+  let effectiveParameters: Record<string, any>;
+  let snapshotHash: string;
 
-  const records = sourceRows.map((row) => recordType === "measurement" ? ({
-    record_id: row.id,
-    record_type: "measurement",
-    payload_sha256: "",
-    data: {
-      variable_code: row.variable_code,
-      raw_value: row.raw_value,
-      raw_unit_code: row.raw_unit_code,
-      normalized_value: row.normalized_value,
-      normalized_unit_code: row.normalized_unit_code,
-      measured_at: row.measured_at,
-      method: row.method,
-      instrument: row.instrument,
-      quality_state: row.quality_state,
-      exclusion_reason: row.exclusion_reason,
-      metadata: row.metadata ?? {},
-    },
-    context: {
-      culture_id: row.culture_id,
-      sample_id: row.sample_id,
-      experimental_unit_id: row.experimental_unit_id,
-      event_id: row.event_id,
-      result_id: row.result_id,
-    },
-  }) : ({
-    record_id: row.id,
-    record_type: "environmental_observation",
-    payload_sha256: "",
-    data: {
-      variable_code: row.variable_code,
-      value: row.value,
-      unit_code: row.unit_code,
-      observed_at: row.observed_at,
-      data_family: row.data_family,
-      provider_code: row.provider_code,
-      dataset_code: row.dataset_code,
-      retrieved_at: row.retrieved_at,
-      spatial_resolution_m: row.spatial_resolution_m,
-      quality_flag: row.quality_flag,
-    },
-    context: { location_id: row.location_id },
-  }));
-  const sourceRowById = new Map(sourceRows.map((row) => [row.id, row]));
-  for (const record of records) {
-    const sourceRow = sourceRowById.get(record.record_id);
-    record.payload_sha256 = await sha256(stable(sourceRow) + stable(record.context ?? {}));
+  if (isBiologicalContextEngine) {
+    let snapshot;
+    try {
+      snapshot = await loadAuthenticatedBiologicalContextSnapshot({
+        userClient,
+        organizationId,
+        cultureId: scope.culture_id,
+        window: {
+          start: parameters.window_start,
+          end: parameters.window_end,
+          timezone: parameters.timezone,
+        },
+      });
+    } catch (error) {
+      const code = error instanceof Error ? error.message : "biological_source_loading_failed";
+      const allowedCodes = new Set([
+        "caller_scoped_supabase_client_required", "biological_subject_scope_required",
+        "culture_not_found_or_inaccessible", "culture_tenant_scope_mismatch",
+        "biological_contexts_unavailable", "culture_measurements_unavailable",
+        "biological_analysis_measurement_limit_exceeded", "biological_environments_unavailable",
+        "biological_locations_unavailable", "environmental_observations_unavailable",
+        "biological_analysis_weather_limit_exceeded", "analysis_window_must_be_timezone_aware",
+        "analysis_window_end_must_follow_start", "analysis_timezone_invalid",
+      ]);
+      return reply(422, { error: allowedCodes.has(code) ? code : "biological_source_loading_failed" });
+    }
+    orderedRecords = snapshot.input.records;
+    effectiveRecordIds = snapshot.input.record_ids;
+    effectiveScope = snapshot.scope;
+    effectiveParameters = snapshot.parameters;
+    snapshotHash = snapshot.input.snapshot_sha256;
+  } else {
+    let sourceRows: Record<string, any>[];
+    if (recordType === "measurement") {
+      const { data, error: sourceError } = await userClient
+        .from("measurements")
+        .select("id,variable_code,raw_value,raw_unit_code,normalized_value,normalized_unit_code,measured_at,method,instrument,quality_state,exclusion_reason,culture_id,sample_id,experimental_unit_id,event_id,result_id,metadata")
+        .eq("organization_id", organizationId)
+        .in("id", recordIds);
+      if (sourceError) return reply(422, { error: "source_records_unavailable" });
+      if (!data || data.length !== recordIds.length) {
+        return reply(422, { error: "one_or_more_source_records_missing_or_inaccessible" });
+      }
+      if (data.some((row) => row.quality_state === "excluded")) {
+        return reply(422, { error: "excluded_source_records_not_eligible" });
+      }
+      if (scope?.culture_id && data.some((row) => row.culture_id !== scope.culture_id)) {
+        return reply(422, { error: "source_scope_mismatch" });
+      }
+      sourceRows = data;
+    } else {
+      if (typeof scope?.location_id !== "string") {
+        return reply(422, { error: "environmental_location_scope_required" });
+      }
+      const { data, error: sourceError } = await userClient
+        .from("environmental_observations")
+        .select("id,location_id,data_family,provider_code,dataset_code,variable_code,value,unit_code,observed_at,retrieved_at,spatial_resolution_m,quality_flag,source_url,metadata")
+        .eq("organization_id", organizationId)
+        .eq("location_id", scope.location_id)
+        .eq("data_family", "weather")
+        .in("id", recordIds);
+      if (sourceError) return reply(422, { error: "source_records_unavailable" });
+      if (!data || data.length !== recordIds.length) {
+        return reply(422, { error: "one_or_more_source_records_missing_or_inaccessible" });
+      }
+      const sourceIdentities = new Set(data.map((row) => row.provider_code + "/" + row.dataset_code));
+      if (sourceIdentities.size !== 1) {
+        return reply(422, { error: "environmental_source_mismatch" });
+      }
+      sourceRows = data;
+    }
+
+    const records = sourceRows.map((row) => recordType === "measurement" ? ({
+      record_id: row.id,
+      record_type: "measurement",
+      payload_sha256: "",
+      data: {
+        variable_code: row.variable_code,
+        raw_value: row.raw_value,
+        raw_unit_code: row.raw_unit_code,
+        normalized_value: row.normalized_value,
+        normalized_unit_code: row.normalized_unit_code,
+        measured_at: row.measured_at,
+        method: row.method,
+        instrument: row.instrument,
+        quality_state: row.quality_state,
+        exclusion_reason: row.exclusion_reason,
+        metadata: row.metadata ?? {},
+      },
+      context: {
+        culture_id: row.culture_id,
+        sample_id: row.sample_id,
+        experimental_unit_id: row.experimental_unit_id,
+        event_id: row.event_id,
+        result_id: row.result_id,
+      },
+    }) : ({
+      record_id: row.id,
+      record_type: "environmental_observation",
+      payload_sha256: "",
+      data: {
+        variable_code: row.variable_code,
+        value: row.value,
+        unit_code: row.unit_code,
+        observed_at: row.observed_at,
+        data_family: row.data_family,
+        provider_code: row.provider_code,
+        dataset_code: row.dataset_code,
+        retrieved_at: row.retrieved_at,
+        spatial_resolution_m: row.spatial_resolution_m,
+        quality_flag: row.quality_flag,
+      },
+      context: { location_id: row.location_id },
+    }));
+    const sourceRowById = new Map(sourceRows.map((row) => [row.id, row]));
+    for (const record of records) {
+      const sourceRow = sourceRowById.get(record.record_id);
+      record.payload_sha256 = await sha256(stable(sourceRow) + stable(record.context ?? {}));
+    }
+    const recordMap = new Map(records.map((record) => [record.record_id, record]));
+    orderedRecords = recordIds.map((id) => recordMap.get(id)!);
+    effectiveRecordIds = recordIds;
+    effectiveScope = { ...scope, organization_id: organizationId };
+    effectiveParameters = parameters;
+    snapshotHash = await sha256(stable(orderedRecords));
   }
-  const recordMap = new Map(records.map((record) => [record.record_id, record]));
-  const orderedRecords = recordIds.map((id) => recordMap.get(id)!);
-  const snapshotHash = await sha256(stable(orderedRecords));
   const requestId = crypto.randomUUID();
   const engineRequest = {
     contract: "BA-LABS/ENGINE",
@@ -239,9 +298,9 @@ Deno.serve(async (req: Request) => {
     request_id: requestId,
     created_at: new Date().toISOString(),
     engine: { engine_id: engineId, engine_version: engineVersion },
-    scope: { ...scope, organization_id: organizationId },
-    input: { record_ids: recordIds, snapshot_sha256: snapshotHash, records: orderedRecords },
-    parameters,
+    scope: effectiveScope,
+    input: { record_ids: effectiveRecordIds, snapshot_sha256: snapshotHash, records: orderedRecords },
+    parameters: effectiveParameters,
   };
   if (!validateRequest(engineRequest)) {
     console.error("[engine-orchestrator] internally generated request failed schema validation");
@@ -276,7 +335,7 @@ Deno.serve(async (req: Request) => {
       engine_id: engineId,
       engine_version: engineVersion,
       scope: engineRequest.scope,
-      input_record_ids: recordIds,
+      input_record_ids: effectiveRecordIds,
       input_snapshot_sha256: snapshotHash,
       request_payload: engineRequest,
       status: "queued",
