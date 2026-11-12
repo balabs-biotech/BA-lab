@@ -40,6 +40,10 @@ from ba_environmental_engine.quality.sensor_transmission import (
 )
 from ba_environmental_engine.sources.models import NormalizedEnvironmentalObservation
 from ba_environmental_engine.sources.nasa_power import normalize_nasa_power_observation
+from ba_environmental_engine.sources.sentinel2_worker import (
+    Sentinel2PersistenceError,
+    process_and_persist_sentinel2_batch,
+)
 
 
 class APIModel(BaseModel):
@@ -150,6 +154,28 @@ class PersistedAnalysisRequest(APIModel):
             raise ValueError("rolling_windows must not contain duplicates")
         return self
 
+
+
+class Sentinel2WorkerRequest(APIModel):
+    organization_id: UUID
+    location_id: UUID
+    aoi_geojson: dict[str, Any]
+    items: list[dict[str, Any]] = Field(min_length=1, max_length=100)
+    retrieved_at: datetime
+    processing_version: str = Field(min_length=1, max_length=80)
+    minimum_valid_ratio: float = Field(default=0.2, ge=0.2, le=1)
+    max_pixels: StrictInt = Field(default=4_000_000, ge=1, le=4_000_000)
+
+    @model_validator(mode="after")
+    def validate_worker_request(self) -> Sentinel2WorkerRequest:
+        if self.retrieved_at.tzinfo is None or self.retrieved_at.utcoffset() is None:
+            raise ValueError("retrieved_at must include a timezone")
+        if self.aoi_geojson.get("type") not in {"Polygon", "MultiPolygon"}:
+            raise ValueError("aoi_geojson must be a GeoJSON Polygon or MultiPolygon")
+        for item in self.items:
+            if item.get("type") != "Feature" or not isinstance(item.get("id"), str):
+                raise ValueError("every item must be a STAC Feature with an id")
+        return self
 
 
 class BiologicalPerformanceRequest(APIModel):
@@ -732,6 +758,59 @@ def create_app(engine_api_key: str | None = None) -> FastAPI:
             }
         except (ValueError, LookupError) as exc:
             raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+
+    @app.post("/v1/sentinel2/process-and-persist", dependencies=[Depends(require_internal_key)])
+    def process_and_persist_sentinel2(
+        request: Sentinel2WorkerRequest,
+        authorization: Annotated[str | None, Header(alias="Authorization")] = None,
+    ):
+        ingest_url = os.getenv("BA_SENTINEL2_INGEST_URL")
+        worker_secret = os.getenv("BA_SENTINEL2_WORKER_SECRET")
+        if not ingest_url or not worker_secret:
+            raise HTTPException(
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                detail="Sentinel-2 worker persistence is not configured",
+            )
+        if not authorization or not authorization.startswith("Bearer "):
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="caller bearer token is required",
+            )
+        try:
+            result = process_and_persist_sentinel2_batch(
+                items=request.items,
+                aoi_geojson=request.aoi_geojson,
+                organization_id=request.organization_id,
+                location_id=request.location_id,
+                retrieved_at=request.retrieved_at,
+                processing_version=request.processing_version,
+                user_authorization=authorization,
+                ingest_url=ingest_url,
+                worker_secret=worker_secret,
+                minimum_valid_ratio=request.minimum_valid_ratio,
+                max_pixels=request.max_pixels,
+                max_scenes=100,
+            )
+            return {
+                "ok": True,
+                "provider": "EARTH_SEARCH",
+                "dataset": "SENTINEL_2_L2A",
+                "items_received": result.items_received,
+                "scenes_processed": result.scenes_processed,
+                "scenes_failed": result.scenes_failed,
+                "scenes_duplicated": result.scenes_duplicated,
+                "quality_rejected_scenes": result.quality_rejected_scenes,
+                "observations_submitted": result.observations_submitted,
+                "persistence": result.persistence_response,
+            }
+        except Sentinel2PersistenceError as exc:
+            raise HTTPException(
+                status_code=status.HTTP_502_BAD_GATEWAY,
+                detail="Sentinel-2 persistence boundary unavailable",
+            ) from exc
+        except (TypeError, ValueError) as exc:
+            raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(exc)) from exc
 
     return app
 
