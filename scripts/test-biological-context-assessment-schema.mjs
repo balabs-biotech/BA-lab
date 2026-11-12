@@ -18,8 +18,14 @@ for (const key of [
 }
 
 assert.deepEqual(schema.properties.subject.required, [
-  "organization_id", "subject_type", "subject_id"
+  "organization_id", "subject_type", "subject_id", "biological_contexts"
 ]);
+assert.equal(schema.properties.subject.properties.biological_contexts.items.$ref, "#/$defs/biologicalContext");
+assert.equal(schema.$defs.biologicalContext.properties.genetic_reference.$ref, "#/$defs/geneticReference");
+assert.deepEqual(schema.$defs.geneticReference.properties.status.enum, [
+  "not_specified", "unresolved", "resolved"
+]);
+assert.equal(schema.$defs.biologicalContext.properties.valid_to.type.includes("null"), true);
 assert.deepEqual(schema.properties.subject.properties.subject_type.enum, ["culture", "batch"]);
 assert.equal(schema.properties.coverage.properties.requested_window.$ref, "#/$defs/timeWindow");
 assert.equal(schema.properties.coverage.properties.excluded_record_count.type, "integer");
