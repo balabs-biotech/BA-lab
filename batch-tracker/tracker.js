@@ -6702,13 +6702,26 @@ async function runPlantBiologicalAssessment() {
         !isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
     if (error) {
       const detail = String(error.message || "Erreur inconnue");
+      let errorCode = "";
+      try {
+        const response = error.context?.clone?.();
+        if (response) {
+          const payload = await response.json();
+          errorCode = typeof payload?.error === "string" ? payload.error : "";
+        }
+      } catch {
+        // Some transport errors do not expose a JSON response body.
+      }
       if (/function.*not found|not deployed|404/i.test(detail)) {
         throw new Error("Le service engine-orchestrator n’est pas encore déployé.");
       }
-      if (/engine_version_not_registered/i.test(detail)) {
+      if (errorCode === "engine_version_not_registered") {
         throw new Error("Le BIE v0.2 n’est pas encore activé côté serveur (BA_BIE_ENABLED).");
       }
-      throw new Error(detail);
+      if (errorCode === "orchestration_not_configured") {
+        throw new Error("Le worker BIE ou ses secrets serveur ne sont pas encore configurés.");
+      }
+      throw new Error(errorCode || detail);
     }
     await loadRecentEngineExecutions();
     if (requestId !== plantBiologicalAssessmentRequestId ||
