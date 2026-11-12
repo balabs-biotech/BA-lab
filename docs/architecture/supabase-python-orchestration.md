@@ -126,3 +126,29 @@ A successful execution is committed through the service-only `public.complete_en
 The result table is query-oriented: engine/result type, outcome, structured value, limitations, quality flags, optional calibrated confidence, provenance, input record IDs, input snapshot hash and generation timestamp are independently addressable. It is tenant-scoped under RLS and read-only to authenticated organization members. Database triggers reject result updates; tenant cleanup can remove records through privileged parent deletion cascades. A new interpretation requires a new execution.
 
 CultureOps reads recent execution status from `engine_executions` and structured outputs from `engine_execution_results`. The UI retains a compatibility fallback to the envelope stored in the execution ledger while older records are being migrated. Neither table modifies source measurements.
+
+
+## Environmental observation input — weather time series
+
+The orchestrator now supports two explicit source types. Existing requests remain backward compatible: omitting `record_type` means `measurement`.
+
+To run the deterministic QC engine against externally sourced weather observations, send:
+
+```json
+{
+  "organization_id": "<uuid>",
+  "engine_id": "environmental.timeseries.qc",
+  "engine_version": "0.1.0",
+  "record_type": "environmental_observation",
+  "record_ids": ["<environmental-observation-uuid>"],
+  "scope": { "location_id": "<location-uuid>" },
+  "parameters": { "max_gap_minutes": 1800 },
+  "idempotency_key": "stable-client-generated-key"
+}
+```
+
+The function reads `environmental_observations` through the caller-scoped Supabase client and RLS, with explicit organization, location and `data_family = weather` filters. It requires all selected rows to belong to one provider/dataset pair; a run cannot silently mix weather products. The immutable request snapshot includes the stored value and unit, observation/retrieval timestamps, provider, dataset, spatial resolution, quality flag, source URL and metadata.
+
+The QC engine reads these values from the environmental-observation shape (`value`, `unit_code`, `observed_at`) without relabeling them as normalized sensor measurements. It groups series by variable and stored unit, reports source provider/dataset in `provenance.source_references`, and flags coverage gaps/duplicates/outliers only. The engine does not rescale gridded values to parcel resolution or infer crop stress.
+
+This path currently accepts weather observations only. Satellite rows are deliberately not accepted by this time-series entrypoint: Sentinel-2 rasters and derived NDVI need a separate, spatially aware processing contract with valid-pixel fraction, cloud/shadow masking, geometry/version and processing provenance. A scene catalogue or rendered preview is not itself a persisted analytical observation.
