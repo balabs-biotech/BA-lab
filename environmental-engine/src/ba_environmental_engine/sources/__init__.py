@@ -17,6 +17,11 @@ from ba_environmental_engine.sources.sensor_temporal import (
 from ba_environmental_engine.sources.sentinel2 import normalize_sentinel2_observation
 from ba_environmental_engine.sources.sentinel2_ingestion import build_sentinel2_observation_rows
 from ba_environmental_engine.sources.sentinel2_stac import Sentinel2StacScene, parse_sentinel2_stac_item
+from ba_environmental_engine.sources.sentinel2_search import (
+    Sentinel2SearchCriteria,
+    Sentinel2SearchResult,
+    search_sentinel2_scenes,
+)
 from ba_environmental_engine.sources.sentinel2_pipeline import (
     Sentinel2SceneProcessingResult,
     process_sentinel2_stac_item,
@@ -43,6 +48,8 @@ __all__ = [
     "Sentinel2NdviStatistics",
     "Sentinel2RasterReadResult",
     "Sentinel2SceneProcessingResult",
+    "Sentinel2SearchCriteria",
+    "Sentinel2SearchResult",
     "Sentinel2StacScene",
     "SupabaseSensorMeasurementRepository",
     "assess_sensor_temporal_anomalies",
@@ -54,5 +61,6 @@ __all__ = [
     "normalize_sentinel2_observation",
     "parse_sentinel2_stac_item",
     "process_sentinel2_stac_item",
+    "search_sentinel2_scenes",
     "read_sentinel2_ndvi_window",
 ]
