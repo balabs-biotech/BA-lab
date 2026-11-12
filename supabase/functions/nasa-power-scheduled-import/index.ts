@@ -111,10 +111,10 @@ Deno.serve(async (req: Request) => {
           }
         }
         if (rows.length) {
-          const { error } = await db.from("environmental_observations").upsert(rows, {
-            onConflict: "organization_id,location_id,provider_code,dataset_code,variable_code,observed_at",
-            ignoreDuplicates: false,
-          });
+          const { error } = await db.rpc(
+            "upsert_weather_environmental_observations",
+            { p_rows: rows },
+          );
           if (error) results.push({ location_id: loc.id, ok: false, error: "persistence_failed" });
           else results.push({ location_id: loc.id, ok: true, records: rows.length });
         } else results.push({ location_id: loc.id, ok: false, error: "no_valid_values" });
