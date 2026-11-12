@@ -69,7 +69,7 @@ The caller may also send `Idempotency-Key` as a header. The endpoint currently a
 - `BA_ENGINE_WORKER_URL`
 - `BA_ENGINE_WORKER_TOKEN`
 
-The worker call is capped at 20 seconds; the response body is capped at 128 KB. The endpoint validates the request and response schemas, verifies request/engine/snapshot correlation, persists the full completed envelope, and stores safe failure codes. The source measurement rows are read-only throughout this flow.
+The inbound Edge Function request is capped at 48 KB; the canonical worker request is capped at 240 KB before dispatch, the adapter accepts at most 256 KB, and the worker response body is capped at 128 KB. The worker call is capped at 20 seconds. The endpoint validates the request and response schemas, verifies request/engine/snapshot correlation, persists the full completed envelope, and stores safe failure codes. The source measurement rows are read-only throughout this flow.
 
 The static CI contract check is `scripts/test-engine-orchestrator-contract.mjs`. It checks that the security and isolation boundaries remain present; it is not a substitute for an integration test against a deployed worker.
 
@@ -84,7 +84,7 @@ The function source is committed but not deployed. No worker URL/token is config
 - `POST /v1/execute` accepts the versioned request envelope and returns the validated result envelope.
 - `GET /healthz` returns a minimal readiness response without exposing configuration.
 - Bearer token comparison is constant-time; tokens shorter than 24 characters are rejected.
-- Request body is capped at 48 KB, content type is checked, socket reads have a timeout, and concurrency is bounded to two requests.
+- Request body is capped at 256 KB, content type is checked, socket reads have a timeout, and concurrency is bounded to two requests. The Edge Function applies a stricter 240 KB serialized-request cap before dispatch.
 - Unknown engine versions and invalid request contracts are rejected by the shared registry/validator.
 - The adapter uses only Python's standard library; it is exposed as `ba-engine-http-worker`.
 
