@@ -132,3 +132,21 @@ synchronous endpoint, and it never stores the caller JWT.
 The existing `earth-search-sentinel2-run` synchronous endpoint remains
 unchanged and remains the current active path. The new enqueue endpoint is not
 yet wired into CultureOps UI or deployed.
+
+
+## Green Tech enqueue UI integration
+
+The Green Tech environmental jobs panel now includes a bounded Sentinel-2
+request form: location, start/end dates, maximum cloud cover, and scene limit.
+It invokes the authenticated `earth-search-sentinel2-enqueue` Edge Function
+through the existing Supabase client, reports the returned job identifier,
+then refreshes the job history for the selected location. Client-side checks
+mirror the server's date, cloud and scene bounds; server-side validation and
+authorization remain authoritative.
+
+The form is responsive on narrow screens and uses DOM text nodes rather than
+HTML interpolation. The existing weather refresh controls and synchronous
+environmental views are unchanged. Static UI contract tests were added but
+have not been executed. The form will return a server configuration/function
+error until the new Edge Function and required database migrations are deployed
+to a non-production test environment.
