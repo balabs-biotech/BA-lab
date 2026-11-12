@@ -132,7 +132,9 @@ export async function buildBiologicalContextSnapshot(input: {
     if (instant < windowStart || instant > windowEnd) continue;
     const context = {
       culture_id: row.culture_id,
-      environment_id: input.measurementContextById?.[row.id]?.environment_id ?? row.environment_id ?? null,
+      environment_id: input.measurementContextById?.[row.id]
+        ? input.measurementContextById[row.id].environment_id
+        : row.environment_id ?? null,
       environment_resolution: input.measurementContextById?.[row.id] ?? null,
       sample_id: row.sample_id ?? null,
       experimental_unit_id: row.experimental_unit_id ?? null,
