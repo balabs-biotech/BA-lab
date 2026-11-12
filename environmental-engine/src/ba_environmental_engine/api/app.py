@@ -764,6 +764,7 @@ def create_app(engine_api_key: str | None = None) -> FastAPI:
     def process_and_persist_sentinel2(
         request: Sentinel2WorkerRequest,
         authorization: Annotated[str | None, Header(alias="Authorization")] = None,
+        supabase_api_key: Annotated[str | None, Header(alias="apikey")] = None,
     ):
         ingest_url = os.getenv("BA_SENTINEL2_INGEST_URL")
         worker_secret = os.getenv("BA_SENTINEL2_WORKER_SECRET")
@@ -777,6 +778,11 @@ def create_app(engine_api_key: str | None = None) -> FastAPI:
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="caller bearer token is required",
             )
+        if not supabase_api_key:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Supabase publishable API key is required",
+            )
         try:
             result = process_and_persist_sentinel2_batch(
                 items=request.items,
@@ -786,6 +792,7 @@ def create_app(engine_api_key: str | None = None) -> FastAPI:
                 retrieved_at=request.retrieved_at,
                 processing_version=request.processing_version,
                 user_authorization=authorization,
+                supabase_api_key=supabase_api_key,
                 ingest_url=ingest_url,
                 worker_secret=worker_secret,
                 minimum_valid_ratio=request.minimum_valid_ratio,
