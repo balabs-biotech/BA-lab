@@ -617,5 +617,42 @@ class EngineContractTests(unittest.TestCase):
         self.assertEqual(result["result"]["value"]["derived_features"][0]["source_record_ids"], [request["input"]["record_ids"][0]])
 
 
+    def test_biological_context_features_reports_unlinked_environment_as_missing_context(self):
+        request = json.loads(json.dumps(REQUEST))
+        request["engine"] = {
+            "engine_id": "biological.context.features",
+            "engine_version": "0.1.0",
+        }
+        culture_id = "2c2b3a4d-5e6f-4789-8123-456789abcdef"
+        request["scope"] = {
+            "organization_id": REQUEST["scope"]["organization_id"],
+            "culture_id": culture_id,
+        }
+        request["parameters"] = {
+            "window_start": "2026-11-10T00:00:00Z",
+            "window_end": "2026-11-11T00:00:00Z",
+            "timezone": "Africa/Algiers",
+            "environment_link_state": "unlinked",
+        }
+        record_id = "9c2b3a4d-5e6f-4789-8123-456789abcdef"
+        request["input"]["record_ids"] = [record_id]
+        request["input"]["records"] = [{
+            "record_id": record_id,
+            "record_type": "measurement",
+            "payload_sha256": "d" * 64,
+            "data": {
+                "variable_code": "air_temperature",
+                "normalized_value": 22.0,
+                "normalized_unit_code": "degC",
+                "measured_at": "2026-11-10T08:00:00Z",
+            },
+            "context": {"culture_id": culture_id},
+        }]
+        result = execute_registered_engine(request)
+        self.assertEqual(result["status"], "completed", msg=str(result.get("error")))
+        missing = result["result"]["value"]["coverage"]["missing_context"]
+        self.assertIn("culture_environment_not_linked", missing)
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
