@@ -26,9 +26,9 @@ The following production tables were inspected directly through `information_sch
 |---|---|---|
 | `cultures` | Mycology/lab culture identity and lineage | `organization_id`, `id`, `material_id`, `parent_culture_id`, `experiment_id`, `experimental_unit_id`, `protocol_version_id`, `environment_id`, `started_at`, `metadata` |
 | `batches` | Production batch lifecycle | `batch_code`, `batch_type`, `status`, `current_stage`, `material_id`, optional `culture_id`, `location_id`, `environment_id`, planned/started/completed timestamps, quantities |
-| `measurements` | Local/instrumental or manually entered quantitative measurements | raw and normalized values/units, `measured_at`, method, instrument, `quality_state`, exclusion reason, links to culture/sample/experimental unit/event/result/environment/device/plant culture |
+| `measurements` | Local/instrumental or manually entered quantitative measurements | raw and normalized values/units, `measured_at`, method, instrument, `quality_state`, exclusion reason, links to culture/sample/experimental unit/event/result/**environment**/device/plant culture. Importantly, `environment_id` exists on each measurement row, so a reading can carry a more specific environment link than the culture's current `environment_id`. |
 | `environmental_observations` | External/provider-derived environmental time series | `location_id`, `data_family`, provider/dataset/variable codes, value/unit, observed/retrieved timestamps, spatial resolution, quality flag, source URL, metadata |
-| `biological_contexts` | Time-bounded biological subject context | domain, culture or plant-culture reference, environment, organism kind, taxon/strain/cultivar codes, culture stage, substrate, production system, tags, validity window |
+| `biological_contexts` | Time-bounded biological subject context | domain, culture or plant-culture reference, environment, organism kind, taxon/strain/cultivar codes, culture stage, substrate, production system, tags, date-based `valid_from` / `valid_to` window |
 | `environments` / `locations` | Physical context and spatial anchor | tenant-scoped environment and location IDs; location stores coordinates and coordinate provenance |
 | `experiments` / `experimental_units` / `results` | Experimental design, treatment/replicate and result context | experiment design JSON, unit code/replicate/treatment, structured result JSON and quality state |
 | `events` | Append-style biological/production event context | event type/time and optional links to culture, batch, plant culture, material, sample, experimental unit, location and environment |
@@ -104,13 +104,23 @@ The live production migration history inspected on 2026-11-12 ends with the 2026
 
 Consequently, the parent PR's execution ledger and orchestration code must not be described as production-active. PR #283 is open, Draft, and its current GitHub metadata reports `mergeable=false`; reconcile that branch and its CI before treating it as a deployable dependency.
 
+### 5.1 Environment linkage refinement
+
+The live foreign-key inspection confirms three distinct environment-link paths:
+
+- `cultures.environment_id → environments.id` (current culture-level assignment);
+- `measurements.environment_id → environments.id` (per-measurement assignment);
+- `biological_contexts.environment_id → environments.id`, with date-based `valid_from` / `valid_to` validity.
+
+All these relationships are tenant-composite foreign keys. The source adapter should prefer a time-valid `biological_contexts` row for the requested analysis window, then verify that the measurement's own `environment_id` agrees where populated. A culture's current `environment_id` alone must not be retroactively applied to older measurements if a time-valid context contradicts it. Where context rows are absent, a per-measurement `environment_id` may still establish the environment for that individual measurement; it does not automatically authorize joining all weather observations for the whole culture window.
+
 ## 6. BIE input adapter mapping
 
 For the first culture-condition context assessment, the existing read model should be composed as follows:
 
 1. **Subject identity:** `cultures` or `batches`; use `plant_cultures` for the GreenTech domain. Do not assume a batch always has a culture or vice versa.
 2. **Biological identity/context:** `materials` → `strains` → `organisms`, plus `biological_contexts` where present. Resolve the valid context row for the analysis window; do not infer historical strain identity from current metadata.
-3. **Environment anchor:** subject `environment_id` → `environments` → `locations`. If the only location is indirect or ambiguous, report the missing link.
+3. **Environment anchor:** resolve date-valid `biological_contexts.environment_id` first; corroborate with each measurement's `environment_id`; use `cultures.environment_id` only as a current fallback when the analysis window does not predate that assignment. Follow `environments` → `locations`. If links conflict, are missing, or are not historically valid, keep weather context separate and report the ambiguity.
 4. **Local observations:** `measurements`, filtered by organization, subject/scope, quality state and time window. Preserve raw and normalized values/units and exclusion reasons.
 5. **External observations:** `environmental_observations`, filtered by organization, location, data family, provider/dataset and time window. Do not merge different locations or provider/dataset identities in one series unless an explicit engine contract allows it.
 6. **Operations and experimental context:** `events`, `experiments`, `experimental_units`, `results` and `batches` as linked by exact IDs.
