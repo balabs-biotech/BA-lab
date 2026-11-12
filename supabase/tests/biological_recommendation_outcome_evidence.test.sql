@@ -68,9 +68,6 @@ begin
   ) or not exists (
     select 1 from pg_attribute
      where attrelid = v_links
-       and attname = 'method'  ) or not exists (
-    select 1 from pg_attribute
-     where attrelid = v_links
        and attname = 'method'
        and atttypid = 'text'::regtype
        and not attisdropped
