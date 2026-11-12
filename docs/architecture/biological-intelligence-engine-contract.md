@@ -162,3 +162,12 @@ Next steps: finish CI for PR #294; integrate the stacked PRs in dependency order
 - A migration preflight fails explicitly if legacy rows contain invalid or overlapping intervals; the production audit on 2026-11-12 found zero context rows and therefore no existing conflicts.
 - Regression test `supabase/tests/biological_contexts_temporal_integrity.test.sql` checks the deployed constraint catalog entry, adjacency, overlap rejection, subject isolation and empty-window rejection.
 - This migration is committed to PR #294 only. It has not been applied to the live Supabase project.
+
+
+## GreenTech plant context capture (2026-11-12)
+
+- The GreenTech plant registry now exposes a per-plant biological-context history panel.
+- Reads and writes are scoped to the authenticated organization and the selected `plant_cultures.id`; records use `domain='greentech'`, `organism_kind='plant'`, `plant_culture_id`, and leave `culture_id` null.
+- Species and cultivar are copied from the selected plant record; stage, production system, environment, substrate, tags and half-open validity interval are explicitly captured.
+- The interface supports dated history, active-context closure and the same PostgreSQL overlap guard as Mycology/Laboratory.
+- **Engine boundary:** the current BIE source loader and feature engine still analyse culture subjects only. GreenTech contexts are now captured consistently but are not yet consumed by BIE; plant-context resolution and a dedicated plant feature contract remain a separate implementation tranche.
