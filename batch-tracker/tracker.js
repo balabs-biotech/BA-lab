@@ -4595,6 +4595,15 @@ createButton.addEventListener(
   createCulture
 );
 
+document.getElementById("biologicalContextForm")?.addEventListener(
+  "submit",
+  saveBiologicalContext
+);
+document.getElementById("biologicalContextCloseButton")?.addEventListener(
+  "click",
+  closeBiologicalContext
+);
+
 
 createBatchButton.addEventListener(
   "click",
@@ -6004,6 +6013,309 @@ async function saveBiologicalOperation(event) {
   }
 }
 
+let biologicalContextRequestId = 0;
+
+function localDateValue(date = new Date()) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return year + "-" + month + "-" + day;
+}
+
+function setBiologicalContextMessage(message, state = "") {
+  const target = document.getElementById("biologicalContextMessage");
+  if (!target) return;
+  target.textContent = message;
+  if (state) target.dataset.state = state;
+  else delete target.dataset.state;
+}
+
+async function loadBiologicalContextPanel(cultureId) {
+  const requestId = ++biologicalContextRequestId;
+  const loadRevision = authStateRevision;
+  const loadOrganizationId = organizationId;
+  const culture = cultureOptions.find(item => item.id === cultureId);
+  const panel = document.getElementById("biologicalContextPanel");
+  const history = document.getElementById("biologicalContextHistory");
+  const environmentSelect = document.getElementById("biologicalContextEnvironment");
+  const strainSelect = document.getElementById("biologicalContextStrain");
+  const form = document.getElementById("biologicalContextForm");
+  const closeButton = document.getElementById("biologicalContextCloseButton");
+  if (!culture || !panel || !history || !environmentSelect || !strainSelect || !form) return;
+
+  panel.dataset.cultureId = cultureId;
+  history.replaceChildren();
+  const loading = document.createElement("p");
+  loading.className = "muted";
+  loading.textContent = "Chargement des contextes biologiques…";
+  history.appendChild(loading);
+
+  try {
+    const [contextResult, environmentResult] = await Promise.all([
+      supabaseClient.from("biological_contexts")
+        .select("id,domain,environment_id,organism_kind,taxon_code,strain_code,cultivar_code,culture_stage,substrate_code,production_system,context_tags,valid_from,valid_to")
+        .eq("organization_id", loadOrganizationId)
+        .eq("culture_id", cultureId)
+        .order("valid_from", { ascending: false }),
+      supabaseClient.from("environments")
+        .select("id,name")
+        .eq("organization_id", loadOrganizationId)
+        .order("name", { ascending: true })
+    ]);
+    if (requestId !== biologicalContextRequestId ||
+        !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId) ||
+        panel.dataset.cultureId !== cultureId) return;
+    if (contextResult.error) throw new Error("Lecture des contextes : " + contextResult.error.message);
+    if (environmentResult.error) throw new Error("Lecture des environnements : " + environmentResult.error.message);
+
+    const contexts = contextResult.data || [];
+    const environments = environmentResult.data || [];
+    environmentSelect.replaceChildren();
+    const environmentPlaceholder = document.createElement("option");
+    environmentPlaceholder.value = "";
+    environmentPlaceholder.textContent = environments.length
+      ? "Sélectionner un environnement…"
+      : "Aucun environnement disponible";
+    environmentSelect.appendChild(environmentPlaceholder);
+    environments.forEach(environment => {
+      const option = document.createElement("option");
+      option.value = environment.id;
+      option.textContent = environment.name;
+      environmentSelect.appendChild(option);
+    });
+
+    strainSelect.replaceChildren();
+    const noStrain = document.createElement("option");
+    noStrain.value = "";
+    noStrain.textContent = "Non spécifiée";
+    strainSelect.appendChild(noStrain);
+    (strainOptions || []).forEach(strain => {
+      if (!strain.strain_code) return;
+      const option = document.createElement("option");
+      option.value = strain.strain_code;
+      option.textContent = strain.strain_code + " — " +
+        (strain.strain_designation || strain.scientific_name || strain.common_name || "Souche");
+      strainSelect.appendChild(option);
+    });
+
+    history.replaceChildren();
+    if (!contexts.length) {
+      const empty = document.createElement("p");
+      empty.className = "muted";
+      empty.textContent = "Aucun contexte biologique enregistré pour cette culture.";
+      history.appendChild(empty);
+    } else {
+      contexts.forEach(context => {
+        const article = document.createElement("article");
+        article.className = "biological-context-record";
+        const heading = document.createElement("strong");
+        heading.textContent = (context.valid_from || "Date inconnue") + " → " +
+          (context.valid_to || "En cours") + (context.valid_to ? " (fin exclue)" : "");
+        const details = document.createElement("p");
+        const environment = environments.find(item => item.id === context.environment_id);
+        details.textContent = [
+          environment?.name || "Environnement non résolu",
+          context.organism_kind,
+          context.taxon_code,
+          context.strain_code ? "Souche " + context.strain_code : null,
+          context.culture_stage,
+          context.substrate_code ? "Substrat " + context.substrate_code : null,
+          context.production_system
+        ].filter(Boolean).join(" · ");
+        article.append(heading, details);
+        history.appendChild(article);
+      });
+    }
+
+    const latest = contexts[0] || null;
+    const preferredStrain = (strainOptions || []).find(item => item.material_id === culture.material_id);
+    const defaultContext = latest || {};
+    environmentSelect.value = defaultContext.environment_id || "";
+    document.getElementById("biologicalContextOrganismKind").value =
+      defaultContext.organism_kind || (document.body.dataset.domain === "laboratory" ? "other" : "fungus");
+    document.getElementById("biologicalContextTaxonCode").value =
+      defaultContext.taxon_code || preferredStrain?.scientific_name || "";
+    strainSelect.value = defaultContext.strain_code || preferredStrain?.strain_code || "";
+    document.getElementById("biologicalContextStage").value = defaultContext.culture_stage || "inoculation";
+    document.getElementById("biologicalContextProductionSystem").value = defaultContext.production_system || "petri_dish";
+    document.getElementById("biologicalContextSubstrate").value = defaultContext.substrate_code || "";
+    document.getElementById("biologicalContextCultivar").value = defaultContext.cultivar_code || "";
+    document.getElementById("biologicalContextTags").value =
+      Array.isArray(defaultContext.context_tags) ? defaultContext.context_tags.join(", ") : "";
+    const startedDate = culture.started_at ? localDateValue(new Date(culture.started_at)) : localDateValue();
+    document.getElementById("biologicalContextValidFrom").value =
+      latest ? localDateValue() > latest.valid_from ? localDateValue() : "" : startedDate;
+    document.getElementById("biologicalContextValidTo").value = "";
+
+    const openContext = contexts.find(context => context.valid_to === null);
+    const closeDate = document.getElementById("biologicalContextCloseDate");
+    closeDate.value = openContext
+      ? (localDateValue() > openContext.valid_from ? localDateValue() : localDateValue(new Date(new Date(openContext.valid_from + "T00:00:00").getTime() + 86400000)))
+      : "";
+    closeButton.disabled = !openContext;
+    closeButton.dataset.contextId = openContext?.id || "";
+    setBiologicalContextMessage(
+      openContext
+        ? "Un contexte est actif. Clôturez-le avant d’enregistrer une nouvelle période."
+        : (environments.length ? "Prêt à enregistrer un nouveau contexte." : "Créez d’abord un environnement dans le référentiel."),
+      environments.length ? "" : "error"
+    );
+    document.getElementById("saveBiologicalContext").disabled = !environments.length;
+  } catch (error) {
+    if (requestId !== biologicalContextRequestId ||
+        !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
+    history.replaceChildren();
+    const message = document.createElement("p");
+    message.className = "info error";
+    message.textContent = "Chargement du contexte biologique impossible : " + error.message;
+    history.appendChild(message);
+    setBiologicalContextMessage(error.message, "error");
+  }
+}
+
+async function saveBiologicalContext(event) {
+  event?.preventDefault();
+  const operationRevision = authStateRevision;
+  const operationOrganizationId = organizationId;
+  const panel = document.getElementById("biologicalContextPanel");
+  const cultureId = panel?.dataset.cultureId;
+  const button = document.getElementById("saveBiologicalContext");
+  const validFrom = document.getElementById("biologicalContextValidFrom").value;
+  const validTo = document.getElementById("biologicalContextValidTo").value || null;
+  const environmentId = document.getElementById("biologicalContextEnvironment").value;
+  const strainCode = document.getElementById("biologicalContextStrain").value || null;
+  const domain = document.body.dataset.domain === "laboratory" ? "lab" : document.body.dataset.domain;
+
+  if (!cultureId || !operationOrganizationId || !["mycology", "lab"].includes(domain)) {
+    setBiologicalContextMessage("Culture ou domaine de travail indisponible.", "error");
+    return;
+  }
+  if (!validFrom || !environmentId ||
+      !document.getElementById("biologicalContextOrganismKind").value ||
+      !document.getElementById("biologicalContextStage").value ||
+      !document.getElementById("biologicalContextProductionSystem").value) {
+    setBiologicalContextMessage("Renseignez l’environnement, l’organisme, le stade, le système et la date de début.", "error");
+    return;
+  }
+  if (validTo && validTo <= validFrom) {
+    setBiologicalContextMessage("La fin de validité doit être postérieure au début (borne exclue).", "error");
+    return;
+  }
+  if (strainCode && !(strainOptions || []).some(item => item.strain_code === strainCode)) {
+    setBiologicalContextMessage("La souche sélectionnée n’appartient pas au référentiel chargé.", "error");
+    return;
+  }
+
+  button.disabled = true;
+  setBiologicalContextMessage("Vérification des périodes et enregistrement…");
+  try {
+    const { data: existingContexts, error: lookupError } = await supabaseClient
+      .from("biological_contexts")
+      .select("id,valid_from,valid_to")
+      .eq("organization_id", operationOrganizationId)
+      .eq("culture_id", cultureId)
+      .order("valid_from", { ascending: true });
+    if (lookupError) throw new Error("Vérification des périodes impossible : " + lookupError.message);
+    if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
+
+    const contexts = existingContexts || [];
+    const openContext = contexts.find(context => context.valid_to === null);
+    if (openContext) {
+      throw new Error("Clôturez d’abord le contexte actif avant d’enregistrer une nouvelle période.");
+    }
+    const newEnd = validTo || "9999-12-31";
+    const overlaps = contexts.some(context => {
+      const oldEnd = context.valid_to || "9999-12-31";
+      return validFrom < oldEnd && context.valid_from < newEnd;
+    });
+    if (overlaps) throw new Error("Cette période chevauche un contexte déjà enregistré. Corrigez les dates avant de continuer.");
+
+    const payload = {
+      organization_id: operationOrganizationId,
+      domain,
+      culture_id: cultureId,
+      plant_culture_id: null,
+      environment_id: environmentId,
+      organism_kind: document.getElementById("biologicalContextOrganismKind").value,
+      taxon_code: document.getElementById("biologicalContextTaxonCode").value.trim() || null,
+      strain_code: strainCode,
+      cultivar_code: document.getElementById("biologicalContextCultivar").value.trim() || null,
+      culture_stage: document.getElementById("biologicalContextStage").value,
+      substrate_code: document.getElementById("biologicalContextSubstrate").value.trim() || null,
+      production_system: document.getElementById("biologicalContextProductionSystem").value,
+      context_tags: document.getElementById("biologicalContextTags").value
+        .split(",").map(value => value.trim()).filter(Boolean).slice(0, 100),
+      valid_from: validFrom,
+      valid_to: validTo
+    };
+    const { error: insertError } = await supabaseClient
+      .from("biological_contexts")
+      .insert(payload);
+    if (insertError) throw new Error("Enregistrement refusé : " + insertError.message);
+    if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
+    await loadBiologicalContextPanel(cultureId);
+    setBiologicalContextMessage("Contexte biologique enregistré.", "success");
+  } catch (error) {
+    if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
+    setBiologicalContextMessage(error.message || "Impossible d’enregistrer le contexte.", "error");
+  } finally {
+    if (isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) {
+      button.disabled = false;
+    }
+  }
+}
+
+async function closeBiologicalContext() {
+  const operationRevision = authStateRevision;
+  const operationOrganizationId = organizationId;
+  const button = document.getElementById("biologicalContextCloseButton");
+  const contextId = button?.dataset.contextId;
+  const panel = document.getElementById("biologicalContextPanel");
+  const cultureId = panel?.dataset.cultureId;
+  const validTo = document.getElementById("biologicalContextCloseDate").value;
+  if (!contextId || !cultureId || !validTo) {
+    setBiologicalContextMessage("Aucun contexte actif à clôturer ou date de fin absente.", "error");
+    return;
+  }
+  button.disabled = true;
+  try {
+    const { data: activeContext, error: lookupError } = await supabaseClient
+      .from("biological_contexts")
+      .select("id,valid_from")
+      .eq("organization_id", operationOrganizationId)
+      .eq("culture_id", cultureId)
+      .eq("id", contextId)
+      .is("valid_to", null)
+      .maybeSingle();
+    if (lookupError) throw new Error("Lecture du contexte actif impossible : " + lookupError.message);
+    if (!activeContext) throw new Error("Le contexte actif a déjà été modifié. Rechargez la fiche.");
+    if (validTo <= activeContext.valid_from) {
+      throw new Error("La date de clôture doit être postérieure au début du contexte.");
+    }
+    if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
+    const { data, error } = await supabaseClient.from("biological_contexts")
+      .update({ valid_to: validTo })
+      .eq("organization_id", operationOrganizationId)
+      .eq("culture_id", cultureId)
+      .eq("id", contextId)
+      .is("valid_to", null)
+      .select("id")
+      .maybeSingle();
+    if (error) throw new Error("Clôture impossible : " + error.message);
+    if (!data) throw new Error("Le contexte actif a changé pendant la clôture. Rechargez la fiche.");
+    if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
+    await loadBiologicalContextPanel(cultureId);
+    setBiologicalContextMessage("Contexte actif clôturé. Vous pouvez enregistrer la période suivante.", "success");
+  } catch (error) {
+    if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
+    setBiologicalContextMessage(error.message || "Impossible de clôturer le contexte.", "error");
+  } finally {
+    if (isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) {
+      button.disabled = false;
+    }
+  }
+}
+
 let cultureDetailRequestId = 0;
 
 async function loadCultureDetail(cultureId) {
@@ -6020,6 +6332,7 @@ async function loadCultureDetail(cultureId) {
 
   panel.dataset.cultureId = culture.id;
   loadBiologicalLineage(culture.id);
+  loadBiologicalContextPanel(culture.id);
   panel.classList.remove("hidden");
   title.textContent = culture.code || "Culture sans code";
   meta.textContent = culture.culture_type || "Type de culture non renseigné";
