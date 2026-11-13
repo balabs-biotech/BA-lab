@@ -1,10 +1,16 @@
-# BA Labs — visual system foundation
+# BA Labs — visual system
 
-This branch contains an **opt-in CSS foundation** for the editorial layer of the BA Labs public site.
+This is the active visual layer for the public BA Labs ecosystem page.
 
-## Files
+## Integration
 
-- `ecosystem/brand-system.css`: brand tokens, accessible action styles, hierarchical navigation, resource/project cards and responsive grid primitives.
+`ecosystem/index.html` loads the stylesheets in this order:
+
+1. `site-base.css` — foundational layout and legacy fallback styling.
+2. `brand-system.css` — BA Labs brand tokens and editorial homepage styling.
+3. `site-overrides.css` — final, page-specific visual corrections.
+
+The page root (`#app`) carries the `.balabs-ui` class. The brand stylesheet is therefore part of the live page, not an opt-in or future integration.
 
 ## Brand tokens
 
@@ -18,31 +24,24 @@ This branch contains an **opt-in CSS foundation** for the editorial layer of the
 | Muted | `#9BAEA4` | Secondary text |
 | Line | `#40534D` | Borders and separators |
 
-## Integration boundary
+## Scope and ownership
 
-The stylesheet is deliberately **not imported** by `ecosystem/index.html`. No production behavior changes in this commit. Apply the `.balabs-ui` class only to the editorial shell after visual review.
-
-## Protected scope
-
-This stylesheet does not target or override:
-
-- Three.js/WebGL scene, camera, labels, hit targets or branch dock
-- legacy sphere fallback
-- Notion manifest/navigation logic
-- Batch Tracker
-- existing language switching
-
-The 3D engine must remain independently testable and unchanged by editorial CSS work.
+- This stylesheet owns editorial presentation for the header, hero, featured work, eight-universe directory, method section and footer.
+- It also styles selected WebGL interface surfaces, including focus and branch-navigation controls.
+- It does not own 3D scene generation, graph topology, camera movement, node selection or navigation logic.
+- `engine-v2.js` and `constellation-3d.js` remain the owners of the interactive 3D experience.
+- The stylesheet is loaded only by the public ecosystem page; it does not style the Batch Tracker application.
 
 ## Accessibility and responsive behavior
 
-- Visible focus ring with copper contrast
-- Native button disabled state
-- Persistent text labels for all navigation depths
-- 44px minimum action target
-- Reduced-motion preference respected
-- One-column layout at narrow mobile widths
+- Visible keyboard focus states
+- Touch targets sized for mobile use
+- Responsive layouts for desktop, tablet and narrow mobile screens
+- Reduced-motion preferences respected
 
-## Next integration step
+## Maintenance rules
 
-Compare the opt-in shell against the Figma homepage concept at desktop and mobile sizes. Then integrate one page section at a time and run the existing regression suite before merging.
+- Keep the stylesheet order documented above; `site-overrides.css` intentionally has final cascade priority.
+- Do not remove engine-generated selectors merely because they are absent from static HTML.
+- When changing selectors that affect the WebGL interface, run the ecosystem regression and browser smoke checks.
+- Keep 3D engine behavior changes isolated from editorial CSS cleanup.

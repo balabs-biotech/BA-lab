@@ -1,11 +1,12 @@
 /*
- * BA Labs — visual system foundation
+ * BA Labs — visual system
  * Version: 1.0.0
- * Scope: opt-in editorial UI only.
+ * Scope: active editorial styling for the public ecosystem page.
  *
- * This file is imported by ecosystem/index.html for the editorial layer.
- * It does not target Three.js/WebGL,
- * canvas, .sphere, .webgl-*, branch-dock, camera, or Batch Tracker selectors.
+ * Loaded by ecosystem/index.html after site-base.css and before site-overrides.css.
+ * Styles the editorial shell and selected WebGL interface surfaces through CSS.
+ * engine-v2.js and constellation-3d.js remain the owners of 3D rendering,
+ * topology, camera movement and interaction behavior.
  */
 
 :root {
@@ -17,20 +18,20 @@
   --balabs-muted: #9BAEA4;
   --balabs-line: #40534D;
 
-  --balabs-space-sm: 0.5rem;
-  --balabs-space-md: 1rem;
-  --balabs-space-lg: 1.5rem;
+  
+  
+  
 
   --balabs-radius-sm: 0.5rem;
   --balabs-radius-md: 0.75rem;
-  --balabs-radius-pill: 999px;
+  
 
-  --balabs-content-width: 76rem;
+  
   --balabs-reading-width: 66ch;
   --balabs-focus-ring: 0 0 0 3px var(--balabs-graphite), 0 0 0 5px var(--balabs-copper);
 }
 
-/* Opt-in component scope: add .balabs-ui to a future editorial shell. */
+/* Editorial shell scope: the live homepage root already carries .balabs-ui. */
 .balabs-ui {
   color: var(--balabs-mineral);
   background: var(--balabs-graphite);
