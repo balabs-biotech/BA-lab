@@ -30,7 +30,7 @@ def _iso(value: datetime) -> str:
 
 
 _RULE_ID = re.compile(r"^[a-z][a-z0-9_.-]{1,79}$")
-_RULE_VERSION = re.compile(r"^[0-9]+\\.[0-9]+\\.[0-9]+$")
+_RULE_VERSION = re.compile(r"^[0-9]+\.[0-9]+\.[0-9]+$")
 _RULE_CONTEXT_FIELDS = {
     "organism_kind", "taxon_code", "strain_code", "cultivar_code",
     "culture_stage", "substrate_code", "production_system",
@@ -73,7 +73,7 @@ def _evaluate_interpretation_rules(
             raise ValueError("invalid_interpretation_rule_version")
         if not isinstance(feature_code, str) or not _RULE_ID.fullmatch(feature_code):
             raise ValueError("invalid_interpretation_feature_code")
-        if operator not in {"gt", "gte", "lt", "lte"}:
+        if not isinstance(operator, str) or operator not in {"gt", "gte", "lt", "lte"}:
             raise ValueError("unsupported_interpretation_operator")
         if isinstance(threshold, bool) or not isinstance(threshold, (int, float)) or not isfinite(threshold):
             raise ValueError("invalid_interpretation_threshold")
