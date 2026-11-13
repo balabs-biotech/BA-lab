@@ -9,6 +9,8 @@ import {
   loadAuthenticatedBiologicalContextSnapshot,
   loadAuthenticatedPlantBiologicalContextSnapshot,
 } from "../_shared/biological-context-loader.ts";
+import { loadAuthenticatedBiologicalInterpretationProfile } from "../_shared/biological-interpretation-profile.ts";
+import { loadAuthenticatedBiologicalIdentityAssertions } from "../_shared/biological-identity-assertions.ts";
 
 const headers = {
   "Access-Control-Allow-Origin": "*",
@@ -67,7 +69,8 @@ function sameExecutionInput(prior: Record<string, any>, request: Record<string, 
     prior.engine_version === request.engine.engine_version &&
     prior.input_snapshot_sha256 === request.input.snapshot_sha256 &&
     stable(prior.scope) === stable(request.scope) &&
-    stable(prior.request_payload?.parameters ?? {}) === stable(request.parameters ?? {});
+    stable(prior.request_payload?.parameters ?? {}) === stable(request.parameters ?? {}) &&
+    stable(prior.request_payload?.datasets ?? []) === stable(request.datasets ?? []);
 }
 
 Deno.serve(async (req: Request) => {
@@ -170,6 +173,7 @@ Deno.serve(async (req: Request) => {
   let effectiveRecordIds: string[];
   let effectiveScope: Record<string, any>;
   let effectiveParameters: Record<string, any>;
+  let effectiveDatasets: Record<string, any>[] = [];
   let snapshotHash: string;
 
   if (isBiologicalContextEngine) {
@@ -207,7 +211,64 @@ Deno.serve(async (req: Request) => {
     orderedRecords = snapshot.input.records;
     effectiveRecordIds = snapshot.input.record_ids;
     effectiveScope = snapshot.scope;
-    effectiveParameters = snapshot.parameters;
+    let interpretationProfile;
+    try {
+      interpretationProfile = await loadAuthenticatedBiologicalInterpretationProfile({
+        userClient,
+        organizationId,
+        domain: snapshot.parameters.profile_domain,
+        domainAmbiguous: snapshot.parameters.profile_domain_ambiguous === true,
+        contextStable: snapshot.parameters.profile_context_stable === true,
+        windowStartDate: snapshot.parameters.analysis_window_start_date,
+        windowLastIncludedDate: snapshot.parameters.analysis_window_last_included_date,
+      });
+    } catch (error) {
+      const code = error instanceof Error ? error.message : "interpretation_profile_resolution_failed";
+      const allowedCodes = new Set([
+        "interpretation_profile_domain_invalid",
+        "interpretation_profile_registry_unavailable",
+        "active_interpretation_profile_ambiguous",
+        "interpretation_profile_rules_invalid",
+        "interpretation_profile_rule_shape_invalid",
+        "interpretation_profile_rule_identity_invalid",
+        "interpretation_profile_duplicate_rule_id",
+        "biological_reference_registry_unavailable",
+        "interpretation_reference_not_validated",
+        "interpretation_reference_source_url_invalid",
+      ]);
+      return reply(422, { error: allowedCodes.has(code) ? code : "interpretation_profile_resolution_failed" });
+    }
+    let identityResolution;
+    try {
+      identityResolution = await loadAuthenticatedBiologicalIdentityAssertions({
+        userClient,
+        organizationId,
+        biologicalContexts: snapshot.parameters.biological_contexts ?? [],
+        windowStartDate: snapshot.parameters.analysis_window_start_date,
+        windowLastIncludedDate: snapshot.parameters.analysis_window_last_included_date,
+      });
+    } catch (error) {
+      const code = error instanceof Error ? error.message : "biological_identity_resolution_failed";
+      const allowedCodes = new Set([
+        "biological_identity_context_invalid",
+        "biological_identity_assertion_registry_unavailable",
+        "biological_identity_assertion_limit_exceeded",
+        "biological_reference_registry_unavailable",
+        "biological_identity_reference_ambiguous",
+        "biological_identity_assertion_identity_ambiguous",
+        "biological_identity_source_provenance_integrity_failure",
+      ]);
+      return reply(422, { error: allowedCodes.has(code) ? code : "biological_identity_resolution_failed" });
+    }
+    effectiveParameters = {
+      ...snapshot.parameters,
+      interpretation_rules: interpretationProfile.rules,
+      interpretation_profile_state: interpretationProfile.state,
+      interpretation_profile: interpretationProfile.profile,
+      biological_identity_state: identityResolution.state,
+      biological_identity_assertions: identityResolution.assertions,
+    };
+    effectiveDatasets = [...interpretationProfile.datasets, ...identityResolution.datasets];
     snapshotHash = snapshot.input.snapshot_sha256;
   } else {
     let sourceRows: Record<string, any>[];
@@ -314,6 +375,7 @@ Deno.serve(async (req: Request) => {
     scope: effectiveScope,
     input: { record_ids: effectiveRecordIds, snapshot_sha256: snapshotHash, records: orderedRecords },
     parameters: effectiveParameters,
+    datasets: effectiveDatasets,
   };
   if (!validateRequest(engineRequest)) {
     console.error("[engine-orchestrator] internally generated request failed schema validation");

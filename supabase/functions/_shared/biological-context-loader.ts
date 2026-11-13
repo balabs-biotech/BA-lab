@@ -45,7 +45,7 @@ export async function loadAuthenticatedBiologicalContextSnapshot(input: {
 
   const [contextResult, measurementResult] = await Promise.all([
     userClient.from("biological_contexts")
-      .select("id,organization_id,culture_id,environment_id,organism_kind,taxon_code,strain_code,cultivar_code,culture_stage,substrate_code,production_system,context_tags,valid_from,valid_to")
+      .select("id,organization_id,domain,culture_id,environment_id,organism_kind,taxon_code,strain_code,cultivar_code,culture_stage,substrate_code,production_system,context_tags,valid_from,valid_to")
       .eq("organization_id", organizationId)
       .eq("culture_id", cultureId)
       .limit(MAX_CONTEXTS + 1),

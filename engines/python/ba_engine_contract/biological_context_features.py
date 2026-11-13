@@ -1,13 +1,17 @@
-"""Deterministic biological context features from an authorized immutable snapshot.
+"""Deterministic biological context features and scoped threshold findings.
 
-This first slice reports traceable observations, coverage and descriptive
-statistics only. It does not diagnose organisms or recommend interventions.
+Rule-based findings require an exact biological-context match and a versioned
+rule-registry dataset manifest. They remain limited evidence, not diagnosis or
+intervention recommendations.
 """
 from __future__ import annotations
 
 from collections import defaultdict
 from datetime import datetime
+import hashlib
+import json
 from math import isfinite
+import re
 from statistics import fmean
 from typing import Any, Mapping
 
@@ -25,6 +29,200 @@ def _timestamp(value: Any, field: str) -> datetime:
 
 def _iso(value: datetime) -> str:
     return value.isoformat().replace("+00:00", "Z")
+
+
+
+
+def _stable_sha256(value: Any) -> str:
+    """Match the TypeScript stable JSON encoding used by the authenticated resolver."""
+    encoded = json.dumps(
+        value, sort_keys=True, separators=(",", ":"), ensure_ascii=False, allow_nan=False,
+    ).encode("utf-8")
+    return hashlib.sha256(encoded).hexdigest()
+
+
+_RULE_ID = re.compile(r"^[a-z][a-z0-9_.-]{1,79}$")
+_RULE_VERSION = re.compile(r"^[0-9]+\.[0-9]+\.[0-9]+$")
+_RULE_CONTEXT_FIELDS = {
+    "organism_kind", "taxon_code", "strain_code", "cultivar_code",
+    "culture_stage", "substrate_code", "production_system",
+}
+
+
+def _evaluate_interpretation_rules(
+    rules: Any,
+    biological_contexts: list[dict[str, Any]],
+    derived_features: list[dict[str, Any]],
+    datasets: Any,
+    identity_state: str = "not_documented",
+    identity_assertions: list[dict[str, Any]] | None = None,
+) -> tuple[list[dict[str, Any]], list[str]]:
+    """Evaluate explicitly scoped, versioned thresholds without asserting diagnosis."""
+    if not isinstance(rules, list) or len(rules) > 100:
+        raise ValueError("invalid_interpretation_rules")
+    if not isinstance(datasets, list):
+        raise ValueError("invalid_interpretation_rule_datasets")
+
+    findings: list[dict[str, Any]] = []
+    reference_sources: set[str] = set()
+    profile_manifests = [
+        dataset for dataset in datasets
+        if isinstance(dataset, dict)
+        and dataset.get("provider") == "BA_LABS_INTERPRETATION_PROFILE"
+    ]
+    if rules:
+        if len(profile_manifests) != 1:
+            raise ValueError("interpretation_profile_manifest_required")
+        profile_manifest = profile_manifests[0]
+        if (
+            profile_manifest.get("dataset_id") != "biological.context.features"
+            or not isinstance(profile_manifest.get("dataset_version"), str)
+            or not _RULE_VERSION.fullmatch(profile_manifest["dataset_version"])
+            or not isinstance(profile_manifest.get("content_sha256"), str)
+            or not re.fullmatch(r"[0-9a-f]{64}", profile_manifest["content_sha256"])
+        ):
+            raise ValueError("invalid_interpretation_profile_manifest")
+        reference_sources.add(
+            "BA_LABS_INTERPRETATION_PROFILE/"
+            f"{profile_manifest['dataset_id']}@{profile_manifest['dataset_version']}"
+            f"#sha256={profile_manifest['content_sha256']}"
+        )
+    for rule in rules:
+        required = {
+            "rule_id", "rule_version", "feature_code", "operator", "threshold",
+            "unit_code", "statement", "context_match", "reference_id",
+            "reference_version",
+        }
+        optional = {"identity_match"}
+        if not isinstance(rule, dict) or not required.issubset(rule) or not set(rule).issubset(required | optional):
+            raise ValueError("invalid_interpretation_rule_shape")
+
+        rule_id = rule["rule_id"]
+        rule_version = rule["rule_version"]
+        feature_code = rule["feature_code"]
+        operator = rule["operator"]
+        threshold = rule["threshold"]
+        unit_code = rule["unit_code"]
+        statement = rule["statement"]
+        context_match = rule["context_match"]
+        reference_id = rule["reference_id"]
+        reference_version = rule["reference_version"]
+
+        if not isinstance(rule_id, str) or not _RULE_ID.fullmatch(rule_id):
+            raise ValueError("invalid_interpretation_rule_id")
+        if not isinstance(rule_version, str) or not _RULE_VERSION.fullmatch(rule_version):
+            raise ValueError("invalid_interpretation_rule_version")
+        if not isinstance(feature_code, str) or not _RULE_ID.fullmatch(feature_code):
+            raise ValueError("invalid_interpretation_feature_code")
+        if not isinstance(operator, str) or operator not in {"gt", "gte", "lt", "lte"}:
+            raise ValueError("unsupported_interpretation_operator")
+        if isinstance(threshold, bool) or not isinstance(threshold, (int, float)) or not isfinite(threshold):
+            raise ValueError("invalid_interpretation_threshold")
+        if not isinstance(unit_code, str) or not unit_code:
+            raise ValueError("invalid_interpretation_unit")
+        if not isinstance(statement, str) or not statement.strip() or len(statement) > 700:
+            raise ValueError("invalid_interpretation_statement")
+        if (
+            not isinstance(reference_id, str) or not reference_id.strip()
+            or len(reference_id) > 160
+            or not isinstance(reference_version, str) or not reference_version.strip()
+            or len(reference_version) > 80
+        ):
+            raise ValueError("invalid_interpretation_reference")
+        if (
+            not isinstance(context_match, dict) or not context_match
+            or not set(context_match).issubset(_RULE_CONTEXT_FIELDS)
+            or any(not isinstance(value, str) or not value.strip() for value in context_match.values())
+        ):
+            raise ValueError("interpretation_rule_requires_biological_context_scope")
+        identity_match = rule.get("identity_match")
+        if identity_match is not None and (
+            not isinstance(identity_match, dict)
+            or set(identity_match) != {"assertion_type", "assertion_value"}
+            or not isinstance(identity_match.get("assertion_type"), str)
+            or not identity_match["assertion_type"].strip()
+            or not isinstance(identity_match.get("assertion_value"), str)
+            or not identity_match["assertion_value"].strip()
+        ):
+            raise ValueError("invalid_interpretation_identity_match")
+        reference_manifest = next((
+            dataset for dataset in datasets
+            if isinstance(dataset, dict)
+            and dataset.get("provider") == "BA_LABS_RULE_REGISTRY"
+            and dataset.get("dataset_id") == reference_id
+            and dataset.get("dataset_version") == reference_version
+        ), None)
+        if reference_manifest is None:
+            raise ValueError("interpretation_rule_reference_not_in_dataset_manifest")
+
+        if identity_match is not None:
+            if identity_state != "documented" or not identity_assertions:
+                continue
+            if not any(
+                assertion.get("assertion_type") == identity_match["assertion_type"]
+                and assertion.get("assertion_value") == identity_match["assertion_value"]
+                and any(
+                    (
+                        assertion.get("subject_type") == "strain"
+                        and assertion.get("strain_id") == (context.get("genetic_reference") or {}).get("strain_id")
+                    ) or (
+                        assertion.get("subject_type") == "organism"
+                        and assertion.get("organism_id") == (context.get("genetic_reference") or {}).get("organism_id")
+                    )
+                    for context in biological_contexts
+                )
+                for assertion in identity_assertions
+            ):
+                continue
+
+        if not any(
+            all(context.get(field) == expected for field, expected in context_match.items())
+            for context in biological_contexts
+        ):
+            continue
+        reference_sources.add(f"BA_LABS_RULE_REGISTRY/{reference_id}@{reference_version}#sha256={reference_manifest['content_sha256']}")
+
+        matching_features = [
+            feature for feature in derived_features
+            if feature["feature_code"] == feature_code and feature["unit_code"] == unit_code
+        ]
+        if not matching_features:
+            continue
+
+        def matches(value: float) -> bool:
+            if operator == "gt":
+                return value > threshold
+            if operator == "gte":
+                return value >= threshold
+            if operator == "lt":
+                return value < threshold
+            return value <= threshold
+
+        triggered = [feature for feature in matching_features if matches(feature["value"])]
+        if not triggered:
+            continue
+
+        supporting_ids = sorted({
+            record_id
+            for feature in triggered
+            for record_id in feature["source_record_ids"]
+        })
+        observed_values = sorted({feature["value"] for feature in triggered})
+        findings.append({
+            "finding_code": rule_id,
+            "statement": (
+                f"{statement} [observed_values={observed_values} {unit_code}; "
+                f"threshold={operator} {threshold} {unit_code}; "
+                f"rule_version={rule_version}; "
+                f"reference={reference_id}@{reference_version}]"
+            ),
+            "evidence_state": "limited",
+            "supporting_record_ids": supporting_ids,
+            "contradicting_record_ids": [],
+            "derived_feature_codes": [feature_code],
+        })
+
+    return findings, sorted(reference_sources)
 
 
 def analyze_biological_context_features(request: Mapping[str, Any]) -> dict[str, Any]:
@@ -124,7 +322,7 @@ def analyze_biological_context_features(request: Mapping[str, Any]) -> dict[str,
         except (TypeError, ValueError):
             excluded.append({"record_id": record_id, "reason": "invalid_or_timezone_naive_timestamp"})
             continue
-        if observed_at < window_start or observed_at > window_end:
+        if observed_at < window_start or observed_at >= window_end:
             excluded.append({"record_id": record_id, "reason": "outside_requested_window"})
             continue
 
@@ -196,6 +394,17 @@ def analyze_biological_context_features(request: Mapping[str, Any]) -> dict[str,
         missing_context.append("some_input_records_were_excluded")
     if not biological_contexts:
         missing_context.append("biological_context_not_recorded")
+    profile_state = parameters.get("interpretation_profile_state")
+    if profile_state == "not_configured":
+        missing_context.append("no_active_interpretation_profile")
+    elif profile_state == "context_not_stable":
+        missing_context.append("biological_context_not_stable_for_full_window")
+    elif profile_state == "domain_ambiguous":
+        missing_context.append("biological_domain_ambiguous_for_full_window")
+    elif parameters.get("interpretation_profile_state") == "context_not_stable":
+        missing_context.append("biological_context_not_stable_for_profile")
+    elif parameters.get("interpretation_profile_state") == "domain_ambiguous":
+        missing_context.append("biological_interpretation_domain_ambiguous")
     if any(
         (item.get("genetic_reference") or {}).get("status") == "unresolved"
         for item in biological_contexts
@@ -225,7 +434,80 @@ def analyze_biological_context_features(request: Mapping[str, Any]) -> dict[str,
     if "missing" in measurement_environment_states:
         missing_context.append("measurement_environment_context_missing")
 
-    quality_flags = ["biological_interpretation_not_performed"]
+    identity_state = parameters.get("biological_identity_state", "not_documented")
+    identity_assertions = parameters.get("biological_identity_assertions", [])
+    if identity_state not in {"documented", "not_documented", "conflicting"}:
+        raise ValueError("invalid_biological_identity_state")
+    if not isinstance(identity_assertions, list) or len(identity_assertions) > 500:
+        raise ValueError("invalid_biological_identity_assertions")
+    identity_sources: set[str] = set()
+    identity_manifests = [
+        dataset for dataset in request.get("datasets", [])
+        if isinstance(dataset, dict) and dataset.get("provider") == "BA_LABS_BIOLOGICAL_IDENTITY"
+    ]
+    manifest_keys = {
+        (dataset.get("dataset_id"), dataset.get("dataset_version")): dataset
+        for dataset in identity_manifests
+    }
+    for assertion in identity_assertions:
+        if not isinstance(assertion, dict):
+            raise ValueError("invalid_biological_identity_assertion")
+        code = assertion.get("assertion_code")
+        version = assertion.get("assertion_version")
+        digest = assertion.get("content_sha256")
+        if (
+            not isinstance(code, str) or not code
+            or not isinstance(version, str) or not _RULE_VERSION.fullmatch(version)
+            or not isinstance(digest, str) or not re.fullmatch(r"[0-9a-f]{64}", digest)
+        ):
+            raise ValueError("invalid_biological_identity_assertion")
+        manifest = manifest_keys.get((code, version))
+        if (
+            not manifest
+            or not isinstance(manifest.get("content_sha256"), str)
+            or not re.fullmatch(r"[0-9a-f]{64}", manifest["content_sha256"])
+        ):
+            raise ValueError("biological_identity_manifest_missing")
+        if _stable_sha256(assertion) != manifest["content_sha256"]:
+            raise ValueError("biological_identity_manifest_hash_mismatch")
+        source_digest = assertion.get("source_reference_sha256")
+        if not isinstance(source_digest, str) or not re.fullmatch(r"[0-9a-f]{64}", source_digest):
+            raise ValueError("invalid_biological_identity_source_digest")
+        identity_sources.add(
+            f"BA_LABS_BIOLOGICAL_IDENTITY/{code}@{version}"
+            f"#sha256={manifest['content_sha256']}"
+        )
+    if identity_state == "documented" and not identity_assertions:
+        raise ValueError("documented_biological_identity_requires_assertions")
+    if identity_state == "not_documented" and identity_assertions:
+        raise ValueError("undocumented_biological_identity_has_assertions")
+    if identity_state == "conflicting":
+        missing_context.append("biological_identity_assertions_conflict")
+    elif identity_state == "not_documented":
+        missing_context.append("biological_identity_not_documented")
+
+    interpretation_rules = parameters.get("interpretation_rules", [])
+    findings, interpretation_sources = _evaluate_interpretation_rules(interpretation_rules, biological_contexts, derived_features, request.get("datasets", []), identity_state, identity_assertions)
+    if findings:
+        quality_flags = ["biological_diagnosis_not_performed", "rule_based_interpretation_performed"]
+    elif interpretation_rules:
+        quality_flags = ["rule_based_interpretation_evaluated_no_findings"]
+    else:
+        quality_flags = ["biological_interpretation_not_performed"]
+    if identity_state == "conflicting":
+        quality_flags.append("biological_identity_conflict")
+    elif identity_state == "documented":
+        quality_flags.append("biological_identity_assertions_present")
+    if profile_state == "not_configured":
+        quality_flags.append("interpretation_profile_not_available")
+    elif profile_state == "context_not_stable":
+        quality_flags.append("interpretation_profile_not_applied_context_changed")
+    elif profile_state == "domain_ambiguous":
+        quality_flags.append("interpretation_profile_not_applied_domain_ambiguous")
+    elif parameters.get("interpretation_profile_state") == "context_not_stable":
+        quality_flags.append("interpretation_profile_context_not_stable")
+    elif parameters.get("interpretation_profile_state") == "domain_ambiguous":
+        quality_flags.append("interpretation_profile_domain_ambiguous")
     if environment_link_state == "ambiguous":
         quality_flags.append("environment_context_ambiguous")
     if environment_link_state == "conflict" or "conflict" in measurement_environment_states:
@@ -247,6 +529,12 @@ def analyze_biological_context_features(request: Mapping[str, Any]) -> dict[str,
         quality_flags.append("input_records_excluded")
     if environmental_sources:
         quality_flags.append("external_environmental_estimates_present")
+
+    profile_sources = {
+        f"BA_LABS_INTERPRETATION_PROFILE/{dataset['dataset_id']}@{dataset.get('dataset_version', '')}#sha256={dataset['content_sha256']}"
+        for dataset in request.get("datasets", [])
+        if isinstance(dataset, dict) and dataset.get("provider") == "BA_LABS_INTERPRETATION_PROFILE"
+    }
 
     return {
         "outcome": "success" if observed_times else "insufficient_data",
@@ -271,6 +559,8 @@ def analyze_biological_context_features(request: Mapping[str, Any]) -> dict[str,
                     if isinstance(reference_id, str) and reference_id
                 }),
                 "biological_contexts": biological_contexts,
+                "identity_assertion_state": identity_state,
+                "identity_assertions": identity_assertions,
             },
             "coverage": {
                 "requested_window": {
@@ -287,11 +577,11 @@ def analyze_biological_context_features(request: Mapping[str, Any]) -> dict[str,
             },
             "observed_facts": observed_facts,
             "derived_features": derived_features,
-            "findings": [],
+            "findings": findings,
             "hypotheses": [],
         },
         "limitations": [
-            "This engine reports coverage and descriptive features only; it does not diagnose biological state or recommend interventions.",
+            "This engine reports traceable coverage and descriptive features; optional rules produce limited threshold findings only, not biological diagnoses or intervention recommendations.",
             "Provider-derived environmental observations remain distinct from local in-situ measurements.",
             "A biological-subject-to-environment relationship must be verified by the trusted source adapter before environmental observations are included.",
         ],
@@ -299,7 +589,7 @@ def analyze_biological_context_features(request: Mapping[str, Any]) -> dict[str,
         "provenance": {
             "algorithm": "biological-context-features-v2" if engine_identity["engine_version"] == "0.2.0" else "biological-context-features-v1",
             "libraries": [],
-            "source_references": sorted(f"{provider}/{dataset}" for provider, dataset in environmental_sources),
+            "source_references": sorted({*(f"{provider}/{dataset}" for provider, dataset in environmental_sources), *interpretation_sources, *profile_sources, *identity_sources}),
         },
     }
 

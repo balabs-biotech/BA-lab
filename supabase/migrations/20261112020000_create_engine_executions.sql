@@ -9,7 +9,7 @@ create table if not exists public.engine_executions (
   engine_id text not null check (engine_id ~ '^[a-z][a-z0-9_.-]{1,79}$'),
   engine_version text not null check (engine_version ~ '^[0-9]+\.[0-9]+\.[0-9]+([+-][0-9A-Za-z.-]+)?$'),
   scope jsonb not null check (jsonb_typeof(scope) = 'object'),
-  input_record_ids uuid[] not null check (cardinality(input_record_ids) > 0),
+  input_record_ids uuid[] not null,
   input_snapshot_sha256 text not null check (input_snapshot_sha256 ~ '^[a-f0-9]{64}$'),
   request_payload jsonb not null check (jsonb_typeof(request_payload) = 'object'),
   status text not null default 'queued' check (status in ('queued','running','completed','failed')),

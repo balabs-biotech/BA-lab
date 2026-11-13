@@ -38,6 +38,33 @@
           "uniqueItems": true,
           "items": { "type": "string", "format": "uuid" }
         },
+        "identity_assertion_state": { "enum": ["documented", "not_documented", "conflicting"] },
+        "identity_assertions": {
+          "type": "array",
+          "maxItems": 500,
+          "items": {
+            "type": "object",
+            "required": ["assertion_code", "assertion_version", "subject_type", "organism_id", "strain_id", "assertion_type", "assertion_value", "evidence_level", "content_sha256", "source_reference_id", "source_reference_version", "source_reference_sha256", "reviewed_at", "valid_from", "valid_to"],
+            "properties": {
+              "assertion_code": { "type": "string", "minLength": 1, "maxLength": 160 },
+              "assertion_version": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$" },
+              "subject_type": { "enum": ["organism", "strain"] },
+              "organism_id": { "type": "string", "format": "uuid" },
+              "strain_id": { "type": ["string", "null"], "format": "uuid" },
+              "assertion_type": { "type": "string", "minLength": 1, "maxLength": 80 },
+              "assertion_value": { "type": "string", "minLength": 1, "maxLength": 2000 },
+              "evidence_level": { "type": "string", "minLength": 1, "maxLength": 80 },
+              "content_sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+              "source_reference_id": { "type": "string", "minLength": 1, "maxLength": 160 },
+              "source_reference_version": { "type": "string", "minLength": 1, "maxLength": 80 },
+              "source_reference_sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+              "reviewed_at": { "type": "string", "format": "date-time" },
+              "valid_from": { "type": "string", "format": "date" },
+              "valid_to": { "type": ["string", "null"], "format": "date" }
+            },
+            "additionalProperties": false
+          }
+        },
         "biological_contexts": {
           "type": "array",
           "maxItems": 500,

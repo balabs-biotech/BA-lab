@@ -130,6 +130,8 @@ jobs:
           node --experimental-strip-types scripts/test-biological-context-snapshot.mjs
           node --experimental-strip-types scripts/test-biological-context-resolver.mjs
           node --experimental-strip-types scripts/test-biological-context-assembly.mjs
+          node --experimental-strip-types scripts/test-biological-interpretation-profile.mjs
+          node --experimental-strip-types scripts/test-biological-identity-assertions.mjs
           node --experimental-strip-types scripts/test-biological-context-loader.mjs
           node scripts/test-environmental-fallback.mjs
           node scripts/test-workspace-scenarios.mjs
@@ -291,6 +293,10 @@ jobs:
         run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/engine_executions_security.test.sql
       - name: Test biological context temporal integrity
         run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/biological_contexts_temporal_integrity.test.sql
+      - name: Test biological interpretation and scientific reference registry
+        run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/biological_reference_registry_contract.test.sql
+      - name: Test biological identity assertion integrity
+        run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/biological_identity_assertions_contract.test.sql
 
   ecosystem-regression:
     runs-on: ubuntu-latest

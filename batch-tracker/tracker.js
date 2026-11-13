@@ -7254,6 +7254,90 @@ function renderEngineExecutionComparison(panel, eligible) {
   panel.appendChild(section);
 }
 
+function renderBiologicalContextAssessment(article, result) {
+  const value = result?.value;
+  if (!value || value.result_type !== "biological.context_assessment") return;
+  const addLine = (parent, text) => { const node = document.createElement("p"); node.className = "muted"; node.textContent = String(text); parent.appendChild(node); };
+  const addList = (parent, title, items, format, limit = 8) => {
+    if (!Array.isArray(items) || !items.length) return;
+    const details = document.createElement("details");
+    const summary = document.createElement("summary"); summary.textContent = title + " (" + items.length + ")"; details.appendChild(summary);
+    const list = document.createElement("ul");
+    for (const item of items.slice(0, limit)) { const entry = document.createElement("li"); entry.textContent = String(format(item)); list.appendChild(entry); }
+    details.appendChild(list);
+    if (items.length > limit) addLine(details, (items.length - limit) + " éléments supplémentaires non affichés.");
+    parent.appendChild(details);
+  };
+  const title = document.createElement("p"); title.textContent = "Évaluation du contexte biologique"; article.appendChild(title);
+  const subject = value.subject || {};
+  addLine(article, "Sujet : " + String(subject.subject_type || "biologique") + " · " + String(subject.subject_id || "identifiant indisponible"));
+  const biologicalContexts = Array.isArray(subject.biological_contexts) ? subject.biological_contexts : [];
+  addList(article, "Contextes biologiques datés", biologicalContexts, item => {
+    const reference = item.genetic_reference || {};
+    const parts = [
+      String(item.valid_from || "début inconnu") + " → " + String(item.valid_to || "sans date de fin"),
+      item.organism_kind ? "organisme : " + item.organism_kind : null,
+      item.taxon_code ? "taxon : " + item.taxon_code : null,
+      item.strain_code ? "souche : " + item.strain_code : null,
+      item.cultivar_code ? "cultivar : " + item.cultivar_code : null,
+      item.culture_stage ? "stade : " + item.culture_stage : null,
+      item.substrate_code ? "substrat : " + item.substrate_code : null,
+      item.production_system ? "système : " + item.production_system : null,
+      reference.scientific_name ? "référence : " + reference.scientific_name : null,
+      reference.status === "unresolved" ? "référence génétique non résolue" : null,
+      Array.isArray(item.context_tags) && item.context_tags.length ? "tags : " + item.context_tags.join(", ") : null
+    ].filter(Boolean);
+    return parts.join(" · ");
+  }, 8);
+  if (Array.isArray(subject.genetic_reference_ids) && subject.genetic_reference_ids.length) {
+    addLine(article, "Références génétiques résolues : " + subject.genetic_reference_ids.length);
+  }
+  const identityState = subject.identity_assertion_state || "not_documented";
+  const identityLabels = {
+    documented: "Identité biologique documentée",
+    not_documented: "Identité biologique non documentée",
+    conflicting: "Identité biologique contradictoire"
+  };
+  addLine(article, "Identité : " + String(identityLabels[identityState] || "État d’identité inconnu"));
+  addList(article, "Assertions d’identité vérifiées", subject.identity_assertions, item => {
+    const source = item.source_reference_id && item.source_reference_version
+      ? item.source_reference_id + "@" + item.source_reference_version
+      : "source indisponible";
+    const digest = typeof item.content_sha256 === "string" ? " · SHA-256 " + item.content_sha256.slice(0, 12) : "";
+    return String(item.assertion_type || "assertion") + " : " +
+      String(item.assertion_value || "valeur indisponible") +
+      " · " + String(item.evidence_level || "niveau de preuve non précisé") +
+      " · " + source + digest;
+  }, 12);
+  const outcomeLabels = {
+    success: "Analyse exploitable",
+    insufficient_data: "Données insuffisantes",
+    out_of_domain: "Hors domaine analytique",
+    review_required: "Révision nécessaire"
+  };
+  addLine(article, "Résultat : " + String(outcomeLabels[result.outcome] || "État non documenté"));
+  addList(article, "Signaux qualité", result.quality_flags, item => item, 12);
+  const provenance = result.provenance || {};
+  if (provenance.algorithm) addLine(article, "Algorithme : " + String(provenance.algorithm));
+  if (Array.isArray(provenance.source_references) && provenance.source_references.length) {
+    addList(article, "Sources environnementales", provenance.source_references, item => item, 8);
+  }
+  if (Array.isArray(result.limitations) && result.limitations.length) {
+    addList(article, "Méthode et limites", result.limitations, item => item, 12);
+  }
+  const coverage = value.coverage || {}; const counts = coverage.record_counts_by_type || {};
+  addLine(article, "Couverture : " + String(coverage.source_record_count ?? 0) + " retenus · " + String(coverage.excluded_record_count ?? 0) + " exclus · mesures : " + String(counts.measurement ?? 0) + " · météo : " + String(counts.environmental_observation ?? 0));
+  const requested = coverage.requested_window;
+  if (requested?.start && requested?.end) addLine(article, "Fenêtre demandée : " + requested.start + " → " + requested.end + " · " + String(requested.timezone || "fuseau non précisé"));
+  const observed = coverage.observed_window;
+  if (observed?.start && observed?.end) addLine(article, "Fenêtre observée : " + observed.start + " → " + observed.end);
+  addList(article, "Contexte manquant ou non résolu", coverage.missing_context, item => item, 12);
+  addList(article, "Faits observés et sources", value.observed_facts, item => String(item.statement || item.fact_code || "Fait") + (item.observed_at ? " · " + item.observed_at : "") + (Array.isArray(item.source_record_ids) ? " · sources : " + item.source_record_ids.join(", ") : ""), 8);
+  addList(article, "Caractéristiques calculées", value.derived_features, item => String(item.feature_code || "Caractéristique") + " : " + String(item.value ?? "—") + (item.unit_code ? " " + item.unit_code : "") + (item.method ? " · méthode : " + item.method : "") + (Array.isArray(item.source_record_ids) ? " · " + item.source_record_ids.length + " sources" : ""), 10);
+  addList(article, "Constats", value.findings, item => typeof item === "string" ? item : (item.statement || item.description || JSON.stringify(item)), 8);
+  addList(article, "Hypothèses à vérifier", value.hypotheses, item => typeof item === "string" ? item : (item.statement || item.description || JSON.stringify(item)), 8);
+  addList(article, "Lacunes temporelles", coverage.temporal_gaps, item => String(item.from || "début inconnu") + " → " + String(item.to || "fin inconnue") + " · " + String(item.duration_seconds ?? "durée inconnue") + " secondes", 8);
+}
 function renderRecentEngineExecutions() {
   const panel = document.getElementById("overviewRecentEngineExecutions");
   if (!panel) return;
@@ -7293,7 +7377,9 @@ function renderRecentEngineExecutions() {
     const storedResult = recentEngineResultsByExecution.get(execution.id);
     const result = getStoredEngineResult(execution);
     const summary = result?.value?.summary;
-    if (execution.status === "completed" && summary) {
+    if (execution.status === "completed" && result?.value?.result_type === "biological.context_assessment") {
+      renderBiologicalContextAssessment(article, result);
+    } else if (execution.status === "completed" && summary) {
       const details = document.createElement("p");
       details.textContent = String(summary.record_count ?? summary.measurement_count ?? 0) +
         " enregistrements · " + String(summary.series_count ?? 0) +

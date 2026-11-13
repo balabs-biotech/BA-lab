@@ -8,12 +8,12 @@ const envB = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa";
 const locationA = "44444444-4444-4444-8444-444444444444";
 const locationB = "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb";
 const contexts = [
-  { id: "55555555-5555-4555-8555-555555555555", organization_id: organizationId,
+  { id: "55555555-5555-4555-8555-555555555555", organization_id: organizationId, domain: "mycology",
     culture_id: cultureId, environment_id: envA, organism_kind: "fungus", taxon_code: "PLEURO",
     strain_code: "HK35", cultivar_code: null, culture_stage: "fruiting", substrate_code: "straw",
     production_system: "monotub", context_tags: ["fruiting-run"],
     valid_from: "2026-11-01", valid_to: "2026-11-12" },
-  { id: "66666666-6666-4666-8666-666666666666", organization_id: organizationId,
+  { id: "66666666-6666-4666-8666-666666666666", organization_id: organizationId, domain: "mycology",
     culture_id: cultureId, environment_id: envB, valid_from: "2026-11-12", valid_to: null },
 ];
 const environments = [
@@ -51,6 +51,10 @@ assert.equal(assembled.input.records.length, 2);
 assert.equal(assembled.input.records.find((row) => row.record_type === "measurement").context.environment_id, envA);
 assert.equal(assembled.context_resolution.window.status, "resolved");
 assert.equal(assembled.parameters.biological_context_supplied, true);
+assert.equal(assembled.parameters.profile_domain, "mycology",
+  "one domain covering the full window selects the interpretation profile domain");
+assert.equal(assembled.parameters.profile_domain_ambiguous, false);
+assert.equal(assembled.parameters.profile_context_stable, true);
 assert.equal(assembled.parameters.biological_contexts.length, 1,
   "only contexts intersecting the requested window are included");
 assert.equal(assembled.parameters.biological_contexts[0].culture_stage, "fruiting");
@@ -78,6 +82,8 @@ assert.equal(spanning.context_resolution.window.status, "ambiguous");
 assert.equal(spanning.input.records.length, 1,
   "weather must be excluded when the requested window spans multiple locations");
 assert.equal(spanning.parameters.environment_link_state, "ambiguous");
+assert.equal(spanning.parameters.profile_context_stable, false,
+  "rule profiles are disabled when biological context changes inside the requested window");
 assert.deepEqual(spanning.excluded_environmental_observation_ids, [weather[0].id]);
 
 console.log("✓ BIE context assembly: historical environment wins; weather requires one unambiguous window location");

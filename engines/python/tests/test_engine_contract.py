@@ -1,3 +1,4 @@
+import hashlib
 import json
 import os
 import shutil
@@ -21,7 +22,7 @@ from ba_engine_contract.registry import load_engine
 from ba_engine_contract.environmental_timeseries_qc import (
     analyze_environmental_timeseries_qc, run_environmental_timeseries_qc,
 )
-from ba_engine_contract.biological_context_features import analyze_biological_context_features
+from ba_engine_contract.biological_context_features import analyze_biological_context_features, _evaluate_interpretation_rules
 
 ROOT = Path(__file__).resolve().parents[3]
 SCHEMA_DIR = ROOT / "schemas" / "engine" / "v1"
@@ -60,7 +61,7 @@ REQUEST = {
         "provider": "NASA_POWER",
         "dataset_id": "point-daily",
         "dataset_version": "v1",
-        "content_sha256": "c" * 64,
+        "content_sha256": "a" * 64,
         "retrieved_at": "2026-11-12T09:55:00Z"
     }]
 }
@@ -570,6 +571,204 @@ class EngineContractTests(unittest.TestCase):
         self.assertIn("biological_interpretation_not_performed", result["result"]["quality_flags"])
 
 
+    def test_biological_context_features_emits_limited_findings_for_scoped_versioned_rules(self):
+        request = json.loads(json.dumps(REQUEST))
+        request["engine"] = {
+            "engine_id": "biological.context.features",
+            "engine_version": "0.1.0",
+        }
+        culture_id = "2c2b3a4d-5e6f-4789-8123-456789abcdef"
+        request["scope"] = {
+            "organization_id": REQUEST["scope"]["organization_id"],
+            "culture_id": culture_id,
+        }
+        request["parameters"] = {
+            "window_start": "2026-11-10T00:00:00Z",
+            "window_end": "2026-11-11T00:00:00Z",
+            "timezone": "Africa/Algiers",
+            "biological_contexts": [{
+                "context_id": "5c2b3a4d-5e6f-4789-8123-456789abcdef",
+                "valid_from": "2026-11-01",
+                "valid_to": None,
+                "organism_kind": "fungus",
+                "taxon_code": "Pleurotus ostreatus",
+                "strain_code": "BA-P80",
+                "cultivar_code": None,
+                "culture_stage": "fruiting",
+                "substrate_code": "wheat-straw",
+                "production_system": "bucket",
+                "context_tags": [],
+                "genetic_reference": {
+                    "status": "not_specified",
+                    "strain_id": None,
+                    "organism_id": None,
+                    "designation": None,
+                    "origin": None,
+                    "source_description": None,
+                    "scientific_name": None,
+                    "common_name": None,
+                    "taxonomy_source": None,
+                    "taxonomy_id": None,
+                },
+            }],
+            "interpretation_rules": [{
+                "rule_id": "mycology.air_temperature.upper_bound",
+                "rule_version": "1.0.0",
+                "feature_code": "series.measurement.air_temperature.maximum",
+                "operator": "gt",
+                "threshold": 22.0,
+                "unit_code": "degC",
+                "statement": "Observed maximum exceeds the configured reference threshold.",
+                "context_match": {
+                    "taxon_code": "Pleurotus ostreatus",
+                    "strain_code": "BA-P80",
+                    "culture_stage": "fruiting",
+                },
+                "reference_id": "ba-labs.protocols.pleurotus-fruiting",
+                "reference_version": "2026.1",
+            }],
+        }
+        request["datasets"].append({
+            "provider": "BA_LABS_RULE_REGISTRY",
+            "dataset_id": "ba-labs.protocols.pleurotus-fruiting",
+            "dataset_version": "2026.1",
+            "content_sha256": "d" * 64,
+            "retrieved_at": "2026-11-10T07:55:00Z",
+        })
+        request["datasets"].append({
+            "provider": "BA_LABS_INTERPRETATION_PROFILE",
+            "dataset_id": "biological.context.features",
+            "dataset_version": "1.0.0",
+            "content_sha256": "e" * 64,
+            "retrieved_at": "2026-11-10T07:55:00Z",
+        })
+        missing_registry = json.loads(json.dumps(request))
+        missing_registry["datasets"] = [
+            dataset for dataset in missing_registry["datasets"]
+            if dataset["provider"] != "BA_LABS_RULE_REGISTRY"
+        ]
+        with self.assertRaisesRegex(ValueError, "interpretation_rule_reference_not_in_dataset_manifest"):
+            analyze_biological_context_features(missing_registry)
+
+        missing_profile_manifest = json.loads(json.dumps(request))
+        missing_profile_manifest["datasets"] = [
+            dataset for dataset in missing_profile_manifest["datasets"]
+            if dataset["provider"] != "BA_LABS_INTERPRETATION_PROFILE"
+        ]
+        with self.assertRaisesRegex(ValueError, "interpretation_profile_manifest_required"):
+            analyze_biological_context_features(missing_profile_manifest)
+
+        invalid_profile_manifest = json.loads(json.dumps(request))
+        next(dataset for dataset in invalid_profile_manifest["datasets"]
+             if dataset["provider"] == "BA_LABS_INTERPRETATION_PROFILE")["dataset_id"] = "untrusted.profile"
+        with self.assertRaisesRegex(ValueError, "invalid_interpretation_profile_manifest"):
+            analyze_biological_context_features(invalid_profile_manifest)
+
+        request["input"]["record_ids"] = []
+        request["input"]["records"] = []
+        for index, value in enumerate([21.0, 23.0, 22.0]):
+            record_id = f"dc2b3a4d-5e6f-4789-8123-456789abcde{index}"
+            request["input"]["record_ids"].append(record_id)
+            request["input"]["records"].append({
+                "record_id": record_id,
+                "record_type": "measurement",
+                "payload_sha256": "e" * 64,
+                "data": {
+                    "variable_code": "air_temperature",
+                    "normalized_value": value,
+                    "normalized_unit_code": "degC",
+                    "measured_at": f"2026-11-10T{8 + index:02d}:00:00Z",
+                },
+                "context": {"culture_id": culture_id},
+            })
+        result = execute_registered_engine(request)
+        self.assertEqual(result["status"], "completed", msg=str(result.get("error")))
+        value = result["result"]["value"]
+        self.assertEqual(len(value["findings"]), 1)
+        finding = value["findings"][0]
+        self.assertEqual(finding["finding_code"], "mycology.air_temperature.upper_bound")
+        self.assertEqual(finding["evidence_state"], "limited")
+        self.assertEqual(finding["supporting_record_ids"], sorted(request["input"]["record_ids"]))
+        self.assertEqual(
+            finding["derived_feature_codes"],
+            ["series.measurement.air_temperature.maximum"],
+        )
+        self.assertIn("rule_version=1.0.0", finding["statement"])
+        self.assertIn("reference=ba-labs.protocols.pleurotus-fruiting@2026.1", finding["statement"])
+        self.assertIn("BA_LABS_RULE_REGISTRY/ba-labs.protocols.pleurotus-fruiting@2026.1#sha256=" + ("d" * 64), result["result"]["provenance"]["source_references"])
+        self.assertIn("BA_LABS_INTERPRETATION_PROFILE/biological.context.features@1.0.0#sha256=" + ("e" * 64), result["result"]["provenance"]["source_references"])
+        mismatched_context = json.loads(json.dumps(request))
+        mismatched_context["parameters"]["biological_contexts"][0]["strain_code"] = "OTHER-STRAIN"
+        mismatch_result = execute_registered_engine(mismatched_context)
+        self.assertEqual(mismatch_result["status"], "completed")
+        self.assertEqual(mismatch_result["result"]["value"]["findings"], [])
+        self.assertIn("rule_based_interpretation_evaluated_no_findings", mismatch_result["result"]["quality_flags"])
+
+        unconfigured = json.loads(json.dumps(mismatched_context))
+        unconfigured["parameters"]["interpretation_rules"] = []
+        unconfigured["parameters"]["interpretation_profile_state"] = "not_configured"
+        unconfigured["datasets"] = []
+        unconfigured["input"]["record_ids"] = []
+        unconfigured["input"]["records"] = []
+        unconfigured_result = execute_registered_engine(unconfigured)
+        self.assertEqual(unconfigured_result["status"], "completed")
+        self.assertIn("no_active_interpretation_profile", unconfigured_result["result"]["value"]["coverage"]["missing_context"])
+        self.assertIn("interpretation_profile_not_available", unconfigured_result["result"]["quality_flags"])
+
+        unstable_context = json.loads(json.dumps(unconfigured))
+        unstable_context["parameters"]["interpretation_profile_state"] = "context_not_stable"
+        unstable_result = execute_registered_engine(unstable_context)
+        self.assertIn("biological_context_not_stable_for_full_window", unstable_result["result"]["value"]["coverage"]["missing_context"])
+        self.assertIn("interpretation_profile_not_applied_context_changed", unstable_result["result"]["quality_flags"])
+        self.assertNotIn("biological_interpretation_not_performed", mismatch_result["result"]["quality_flags"])
+
+    def test_biological_context_features_uses_half_open_analysis_window(self):
+        request = json.loads(json.dumps(REQUEST))
+        request["engine"] = {
+            "engine_id": "biological.context.features",
+            "engine_version": "0.1.0",
+        }
+        culture_id = "2c2b3a4d-5e6f-4789-8123-456789abcdef"
+        request["scope"] = {
+            "organization_id": REQUEST["scope"]["organization_id"],
+            "culture_id": culture_id,
+        }
+        request["parameters"] = {
+            "window_start": "2026-11-10T00:00:00Z",
+            "window_end": "2026-11-11T00:00:00Z",
+            "timezone": "Africa/Algiers",
+        }
+        request["input"]["record_ids"] = []
+        request["input"]["records"] = []
+        for index, timestamp in enumerate([
+            "2026-11-10T00:00:00Z",
+            "2026-11-11T00:00:00Z",
+        ]):
+            record_id = f"bc2b3a4d-5e6f-4789-8123-456789abcde{index}"
+            request["input"]["record_ids"].append(record_id)
+            request["input"]["records"].append({
+                "record_id": record_id,
+                "record_type": "measurement",
+                "payload_sha256": "f" * 64,
+                "data": {
+                    "variable_code": "air_temperature",
+                    "normalized_value": 22.0 + index,
+                    "normalized_unit_code": "degC",
+                    "measured_at": timestamp,
+                },
+                "context": {"culture_id": culture_id},
+            })
+        result = execute_registered_engine(request)
+        self.assertEqual(result["status"], "completed", msg=str(result.get("error")))
+        value = result["result"]["value"]
+        self.assertEqual(value["coverage"]["source_record_count"], 1)
+        self.assertEqual(value["coverage"]["excluded_record_count"], 1)
+        self.assertEqual(
+            value["observed_facts"][0]["source_record_ids"],
+            [request["input"]["record_ids"][0]],
+        )
+        self.assertIn("some_input_records_were_excluded", value["coverage"]["missing_context"])
+
     def test_biological_context_features_excludes_invalid_scope_and_explicitly_excluded_measurements(self):
         request = json.loads(json.dumps(REQUEST))
         request["engine"] = {
@@ -869,6 +1068,148 @@ class EngineContractTests(unittest.TestCase):
         self.assertEqual(value["coverage"]["source_record_count"], 1)
         schema = json.loads((ROOT / "schemas" / "biological" / "v1" / "context-assessment.schema.json").read_text(encoding="utf-8"))
         validator(schema).validate(value)
+
+
+
+    def test_biological_context_features_preserves_validated_identity_assertions(self):
+        request = json.loads(json.dumps(REQUEST))
+        request["engine"] = {
+            "engine_id": "biological.context.features",
+            "engine_version": "0.1.0",
+        }
+        request["scope"] = {
+            "organization_id": REQUEST["scope"]["organization_id"],
+            "culture_id": "2c2b3a4d-5e6f-4789-8123-456789abcdef",
+        }
+        assertion = {
+            "assertion_code": "strain.identity.designation",
+            "assertion_version": "1.0.0",
+            "subject_type": "strain",
+            "organism_id": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaab",
+            "strain_id": "99999999-9999-4999-8999-999999999999",
+            "assertion_type": "strain.designation",
+            "assertion_value": "HK35",
+            "evidence_level": "documented",
+            "content_sha256": "b" * 64,
+            "source_reference_id": "source.taxonomy",
+            "source_reference_version": "1.0.0",
+            "source_reference_sha256": "a" * 64,
+            "reviewed_at": "2026-11-02T00:00:00Z",
+            "valid_from": "2026-01-01",
+            "valid_to": None,
+        }
+        request["parameters"] = {
+            "window_start": "2026-11-10T00:00:00Z",
+            "window_end": "2026-11-11T00:00:00Z",
+            "timezone": "Africa/Algiers",
+            "biological_identity_state": "documented",
+            "biological_identity_assertions": [assertion],
+        }
+        request["datasets"] = [{
+            "provider": "BA_LABS_BIOLOGICAL_IDENTITY",
+            "dataset_id": assertion["assertion_code"],
+            "dataset_version": assertion["assertion_version"],
+            "content_sha256": hashlib.sha256(json.dumps(assertion, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode("utf-8")).hexdigest(),
+            "retrieved_at": assertion["reviewed_at"],
+        }]
+        request["input"]["record_ids"] = []
+        request["input"]["records"] = []
+        result = execute_registered_engine(request)
+        self.assertEqual(result["status"], "completed", msg=str(result.get("error")))
+        value = result["result"]["value"]
+        self.assertEqual(value["subject"]["identity_assertion_state"], "documented")
+        self.assertEqual(value["subject"]["identity_assertions"], [assertion])
+        self.assertIn("biological_identity_assertions_present", result["result"]["quality_flags"])
+        self.assertTrue(any(
+            source.startswith("BA_LABS_BIOLOGICAL_IDENTITY/strain.identity.designation@1.0.0#sha256=")
+            for source in result["result"]["provenance"]["source_references"]
+        ))
+        schema = json.loads((ROOT / "schemas" / "biological" / "v1" / "context-assessment.schema.json").read_text(encoding="utf-8"))
+        validator(schema).validate(value)
+
+        tampered_request = json.loads(json.dumps(request))
+        tampered_request["parameters"]["biological_identity_assertions"][0]["assertion_value"] = "NOT-HK35"
+        tampered = execute_registered_engine(tampered_request)
+        self.assertEqual(tampered["status"], "failed")
+        self.assertEqual(tampered["error"]["code"], "engine_execution_failed")
+
+
+    def test_identity_scoped_interpretation_rule_requires_validated_identity(self):
+        rule = {
+            "rule_id": "strain-specific-humidity",
+            "rule_version": "1.0.0",
+            "feature_code": "mean_relative_humidity",
+            "operator": "lt",
+            "threshold": 85.0,
+            "unit_code": "%",
+            "statement": "Humidity below the strain-specific reference threshold.",
+            "context_match": {"organism_kind": "fungus"},
+            "reference_id": "humidity-reference",
+            "reference_version": "1.0.0",
+            "identity_match": {
+                "assertion_type": "strain.designation",
+                "assertion_value": "HK35",
+            },
+        }
+        datasets = [
+            {
+                "provider": "BA_LABS_INTERPRETATION_PROFILE",
+                "dataset_id": "biological.context.features",
+                "dataset_version": "1.0.0",
+                "content_sha256": "a" * 64,
+            },
+            {
+                "provider": "BA_LABS_RULE_REGISTRY",
+                "dataset_id": "humidity-reference",
+                "dataset_version": "1.0.0",
+                "content_sha256": "b" * 64,
+            },
+        ]
+        contexts = [{
+            "organism_kind": "fungus",
+            "genetic_reference": {
+                "organism_id": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaab",
+                "strain_id": "99999999-9999-4999-8999-999999999999",
+            },
+        }]
+        features = [{
+            "feature_code": "mean_relative_humidity",
+            "value": 70.0,
+            "unit_code": "%",
+            "source_record_ids": ["3c2b3a4d-5e6f-4789-8123-456789abcdef"],
+        }]
+        assertions = [{
+            "assertion_type": "strain.designation",
+            "assertion_value": "HK35",
+            "subject_type": "strain",
+            "organism_id": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaab",
+            "strain_id": "99999999-9999-4999-8999-999999999999",
+        }]
+        unverified, _ = _evaluate_interpretation_rules(
+            [rule], contexts, features, datasets, "not_documented", []
+        )
+        self.assertEqual(unverified, [])
+        conflicting, _ = _evaluate_interpretation_rules(
+            [rule], contexts, features, datasets, "conflicting", assertions
+        )
+        self.assertEqual(conflicting, [])
+        documented, _ = _evaluate_interpretation_rules(
+            [rule], contexts, features, datasets, "documented", assertions
+        )
+        self.assertEqual(len(documented), 1)
+        self.assertEqual(documented[0]["evidence_state"], "limited")
+        self.assertEqual(documented[0]["finding_code"], "strain-specific-humidity")
+        mismatched_contexts = [{
+            "organism_kind": "fungus",
+            "genetic_reference": {
+                "organism_id": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaab",
+                "strain_id": "88888888-8888-4888-8888-888888888888",
+            },
+        }]
+        mismatched, _ = _evaluate_interpretation_rules(
+            [rule], mismatched_contexts, features, datasets, "documented", assertions
+        )
+        self.assertEqual(mismatched, [])
 
 
 

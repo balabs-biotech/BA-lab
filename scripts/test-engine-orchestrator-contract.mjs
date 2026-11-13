@@ -3,7 +3,24 @@ import { readFileSync } from "node:fs";
 
 const source = readFileSync("supabase/functions/engine-orchestrator/index.ts", "utf8");
 const biologicalLoader = readFileSync("supabase/functions/_shared/biological-context-loader.ts", "utf8");
+const biologicalProfile = readFileSync("supabase/functions/_shared/biological-interpretation-profile.ts", "utf8");
 const checks = [
+  ["BIE profile loader is imported into the authenticated orchestrator", /loadAuthenticatedBiologicalInterpretationProfile/],
+  ["profile resolution refuses privileged client creation and requires the caller RLS client", /caller_scoped_supabase_client_required[\s\S]*?userClient\.from/, biologicalProfile],
+  ["profile resolution is restricted to approved biological domains", /ALLOWED_DOMAINS = new Set\(\["mycology", "greentech", "lab"\]\)/, biologicalProfile],
+  ["profile rules require the exact base schema with one bounded optional identity matcher", /Object\.keys\(rule\)\.some\(\(key\) => !RULE_FIELDS\.has\(key\)\)[\s\S]*?filter\(\(key\) => key !== "identity_match"\)/, biologicalProfile],
+  ["profile applicability requires the entire analysis window", /profile\.valid_from <= windowStartDate[\s\S]*?profile\.valid_to >= windowLastIncludedDate/, biologicalProfile],
+  ["only validated references are eligible for interpretation", /reference\.status !== "validated"/, biologicalProfile],
+  ["reference manifest preserves the stored SHA-256", /content_sha256: row\.content_sha256/, biologicalProfile],
+  ["profile manifest hashes the canonical profile and rules", /content_sha256: await sha256\(stable\(/, biologicalProfile],
+  ["profile lookup is organization and caller scoped", /userClient\.from\("domain_interpretation_profiles"\)[\s\S]*?\.eq\("organization_id", organizationId\)/, biologicalProfile],
+  ["reference lookup is organization scoped and validated only", /userClient\.from\("biological_reference_registry"\)[\s\S]*?\.eq\("organization_id", organizationId\)[\s\S]*?\.eq\("status", "validated"\)/, biologicalProfile],
+  ["profile evaluation is withheld if biological context changes during the window", /if \(!contextStable\) return \{ state: "context_not_stable"/, biologicalProfile],
+
+  ["BIE rules are disabled unless one biological context covers the full analysis window", /contextStable: snapshot\.parameters\.profile_context_stable === true/],
+  ["BIE profile and reference rows are resolved through the caller JWT client", /loadAuthenticatedBiologicalInterpretationProfile\([\s\S]*?userClient/],
+  ["BIE dataset manifests are included in the immutable engine request", /datasets: effectiveDatasets/],
+  ["idempotency binds the scientific dataset manifest", /stable\(prior\.request_payload\?\.datasets \?\? \[\]\)[\s\S]*?stable\(request\.datasets \?\? \[\]\)/],
   ["caller identity is verified", /userClient\.auth\.getUser\(\)/],
   ["organization membership is checked", /organization_members/],
   ["viewer roles cannot invoke privileged execution", /!\["owner", "admin", "member"\]\.includes\(String\(membership\.role\)\)/],
@@ -45,8 +62,8 @@ const checks = [
   ["source queries are tenant-filtered", /\.eq\("organization_id", organizationId\)/],
   ["excluded source measurements cannot enter analysis", /excluded_source_records_not_eligible/],
 ];
-for (const [name, pattern] of checks) {
-  assert.ok(pattern instanceof RegExp ? pattern.test(source) : pattern, name);
+for (const [name, pattern, target = source] of checks) {
+  assert.ok(pattern instanceof RegExp ? pattern.test(target) : pattern, name);
 }
 const sourceReadStart = source.indexOf("let sourceRows: Record<string, any>[];");
 const sourceReadEnd = source.indexOf("const records = sourceRows.map", sourceReadStart);

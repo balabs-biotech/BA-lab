@@ -73,6 +73,21 @@ class EngineHttpAdapterTests(unittest.TestCase):
         self.assertEqual(caught.exception.code, 401)
         self.assertEqual(json.loads(caught.exception.read())["error"], "authentication_required")
 
+    def test_execute_rejects_incorrect_worker_bearer_token(self):
+        request = urllib.request.Request(
+            self.base_url + "/v1/execute",
+            data=json.dumps(make_request()).encode(),
+            headers={
+                "Content-Type": "application/json",
+                "Authorization": "Bearer incorrect-worker-token-123456",
+            },
+            method="POST",
+        )
+        with self.assertRaises(urllib.error.HTTPError) as caught:
+            urllib.request.urlopen(request, timeout=2)
+        self.assertEqual(caught.exception.code, 401)
+        self.assertEqual(json.loads(caught.exception.read())["error"], "authentication_required")
+
     def test_execute_dispatches_registered_engine_and_returns_bound_envelope(self):
         payload = make_request()
         request = urllib.request.Request(
