@@ -29,8 +29,8 @@ export async function loadAuthenticatedBiologicalIdentityAssertions(input: {
   const { userClient, organizationId } = input;
   if (!userClient || typeof userClient.from !== "function") throw new Error("caller_scoped_supabase_client_required");
   if (!organizationId || !Array.isArray(input.biologicalContexts) ||
-      !/^\\d{4}-\\d{2}-\\d{2}$/.test(input.windowStartDate) ||
-      !/^\\d{4}-\\d{2}-\\d{2}$/.test(input.windowLastIncludedDate) ||
+      !/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/.test(input.windowStartDate) ||
+      !/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/.test(input.windowLastIncludedDate) ||
       input.windowLastIncludedDate < input.windowStartDate) throw new Error("biological_identity_context_invalid");
   const organismIds = uniqueStrings(input.biologicalContexts.map((context) => context?.genetic_reference?.organism_id));
   const strainIds = uniqueStrings(input.biologicalContexts.map((context) => context?.genetic_reference?.strain_id));
