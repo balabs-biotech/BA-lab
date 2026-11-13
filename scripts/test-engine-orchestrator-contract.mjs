@@ -53,6 +53,7 @@ const checks = [
   ["worker response is schema validated", /validateResponse/],
   ["every failed execution transition is persisted and verified", /async function persistExecutionFailure[\s\S]*?status: "failed"[\s\S]*?\.in\("status", \["queued", "running"\]\)[\s\S]*?\.select\("id"\)[\s\S]*?return !error && !!data/],
   ["queued-to-running transition must return the updated ledger row before worker dispatch", /const \{ data: startedExecution, error: startError \}[\s\S]*?\.eq\("status", "queued"\)[\s\S]*?\.select\("id"\)[\s\S]*?\.maybeSingle\(\)[\s\S]*?if \(startError \|\| !startedExecution\)/],
+  ["running execution receives a bounded two-minute lease before worker dispatch", /const EXECUTION_LEASE_MS = 120_000[\s\S]*?status: "running"[\s\S]*?lease_expires_at: new Date\(Date.parse\(startedAt\) \+ EXECUTION_LEASE_MS\)\.toISOString\(\)/],
   ["failed ledger writes are surfaced instead of silently reported as failed", /execution_state_persistence_failed/],
   ["atomic result commit failures are persisted as terminal ledger failures", /persistExecutionFailure[\s\S]*?result_persistence_failed/],
   ["worker result execution identity is rebound to the durable ledger row", /result\.execution_id = execution\.id/],
