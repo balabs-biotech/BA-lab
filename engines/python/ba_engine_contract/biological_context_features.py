@@ -41,12 +41,16 @@ def _evaluate_interpretation_rules(
     rules: Any,
     biological_contexts: list[dict[str, Any]],
     derived_features: list[dict[str, Any]],
-) -> list[dict[str, Any]]:
+    datasets: Any,
+) -> tuple[list[dict[str, Any]], list[str]]:
     """Evaluate explicitly scoped, versioned thresholds without asserting diagnosis."""
     if not isinstance(rules, list) or len(rules) > 100:
         raise ValueError("invalid_interpretation_rules")
+    if not isinstance(datasets, list):
+        raise ValueError("invalid_interpretation_rule_datasets")
 
     findings: list[dict[str, Any]] = []
+    reference_sources: set[str] = set()
     for rule in rules:
         required = {
             "rule_id", "rule_version", "feature_code", "operator", "threshold",
@@ -94,12 +98,21 @@ def _evaluate_interpretation_rules(
             or any(not isinstance(value, str) or not value.strip() for value in context_match.values())
         ):
             raise ValueError("interpretation_rule_requires_biological_context_scope")
+        if not any(
+            isinstance(dataset, dict)
+            and dataset.get("provider") == "BA_LABS_RULE_REGISTRY"
+            and dataset.get("dataset_id") == reference_id
+            and dataset.get("dataset_version") == reference_version
+            for dataset in datasets
+        ):
+            raise ValueError("interpretation_rule_reference_not_in_dataset_manifest")
 
         if not any(
             all(context.get(field) == expected for field, expected in context_match.items())
             for context in biological_contexts
         ):
             continue
+        reference_sources.add(f"BA_LABS_RULE_REGISTRY/{reference_id}@{reference_version}")
 
         matching_features = [
             feature for feature in derived_features
@@ -141,7 +154,7 @@ def _evaluate_interpretation_rules(
             "derived_feature_codes": [feature_code],
         })
 
-    return findings
+    return findings, sorted(reference_sources)
 
 
 def analyze_biological_context_features(request: Mapping[str, Any]) -> dict[str, Any]:
@@ -342,7 +355,7 @@ def analyze_biological_context_features(request: Mapping[str, Any]) -> dict[str,
     if "missing" in measurement_environment_states:
         missing_context.append("measurement_environment_context_missing")
 
-    findings = _evaluate_interpretation_rules(parameters.get("interpretation_rules", []), biological_contexts, derived_features)
+    findings, interpretation_sources = _evaluate_interpretation_rules(parameters.get("interpretation_rules", []), biological_contexts, derived_features, request.get("datasets", []))
     quality_flags = ["biological_interpretation_not_performed"] if not findings else ["biological_diagnosis_not_performed", "rule_based_interpretation_performed"]
     if environment_link_state == "ambiguous":
         quality_flags.append("environment_context_ambiguous")
@@ -417,7 +430,7 @@ def analyze_biological_context_features(request: Mapping[str, Any]) -> dict[str,
         "provenance": {
             "algorithm": "biological-context-features-v2" if engine_identity["engine_version"] == "0.2.0" else "biological-context-features-v1",
             "libraries": [],
-            "source_references": sorted(f"{provider}/{dataset}" for provider, dataset in environmental_sources),
+            "source_references": sorted({*(f"{provider}/{dataset}" for provider, dataset in environmental_sources), *interpretation_sources}),
         },
     }
 
