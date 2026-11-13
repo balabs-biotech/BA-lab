@@ -72,6 +72,12 @@ class EngineRegistryTests(unittest.TestCase):
         with self.assertRaisesRegex(RuntimeError, "engine failure"):
             self.registry.execute("demo.broken", "1.0.0", self.context, {})
 
+    def test_engine_result_rejects_non_json_values(self):
+        with self.assertRaisesRegex(TypeError, "JSON-serializable"):
+            EngineResult(status="succeeded", data={"bad": object()})
+        with self.assertRaisesRegex(TypeError, "JSON-serializable"):
+            EngineResult(status="succeeded", provenance={"not_finite": float("nan")})
+
     def test_invalid_engine_result_is_rejected(self):
         class InvalidEngine:
             engine_code = "demo.invalid"
