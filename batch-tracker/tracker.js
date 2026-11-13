@@ -6661,6 +6661,49 @@ function setPlantBiologicalAssessmentMessage(message, state = "") {
   else delete target.dataset.state;
 }
 
+async function monitorPlantBiologicalAssessmentExecution({
+  executionId,
+  requestId,
+  plantCultureId,
+  operationRevision,
+  operationOrganizationId
+}) {
+  for (let attempt = 0; attempt < 20; attempt++) {
+    await new Promise(resolve => setTimeout(resolve, 3000));
+    if (requestId !== plantBiologicalAssessmentRequestId ||
+        !isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
+    const panel = document.getElementById("plantBiologicalContextPanel");
+    if (panel?.dataset.plantCultureId !== plantCultureId) return;
+    try {
+      await loadRecentEngineExecutions();
+    } catch (error) {
+      console.warn("Actualisation de l’exécution BIE impossible :", error);
+    }
+    const execution = recentEngineExecutions.find(item => item.id === executionId);
+    if (execution?.status === "completed") {
+      setPlantBiologicalAssessmentMessage(
+        "Évaluation terminée et résultat enregistré. Consultez l’historique des analyses.",
+        "success"
+      );
+      return;
+    }
+    if (execution?.status === "failed") {
+      setPlantBiologicalAssessmentMessage(
+        "L’évaluation a échoué (" + String(execution.error_code || "erreur non documentée") + "). Consultez l’historique.",
+        "error"
+      );
+      return;
+    }
+  }
+  if (requestId === plantBiologicalAssessmentRequestId &&
+      isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) {
+    setPlantBiologicalAssessmentMessage(
+      "L’évaluation reste en attente ou en cours. L’historique peut être actualisé à tout moment.",
+      "success"
+    );
+  }
+}
+
 async function runPlantBiologicalAssessment() {
   const requestId = ++plantBiologicalAssessmentRequestId;
   const operationRevision = authStateRevision;
@@ -6733,9 +6776,23 @@ async function runPlantBiologicalAssessment() {
         panel?.dataset.plantCultureId !== plantCultureId ||
         !isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
     const executionId = data?.execution_id || data?.execution?.id;
+    if (executionId && ["queued", "running"].includes(data?.status)) {
+      setPlantBiologicalAssessmentMessage(
+        "Évaluation enregistrée (" + executionId + "). Traitement en file d’attente…",
+        "success"
+      );
+      void monitorPlantBiologicalAssessmentExecution({
+        executionId,
+        requestId,
+        plantCultureId,
+        operationRevision,
+        operationOrganizationId
+      });
+      return;
+    }
     setPlantBiologicalAssessmentMessage(
       executionId
-        ? "Évaluation enregistrée (" + executionId + "). Consultez l’historique des exécutions."
+        ? "Évaluation terminée (" + executionId + "). Consultez l’historique des exécutions."
         : "Évaluation transmise. Consultez l’historique des exécutions.",
       "success"
     );
