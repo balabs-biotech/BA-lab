@@ -383,3 +383,15 @@ jobs:
           path: artifacts/3d-browser-smoke-preview/
           if-no-files-found: ignore
           retention-days: 14
+  engine-edge-runtime-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      - name: Type-check the deployed Edge orchestration entrypoints
+        run: >-
+          deno check
+          supabase/functions/engine-orchestrator/index.ts
+          supabase/functions/engine-queue-dispatch/index.ts
