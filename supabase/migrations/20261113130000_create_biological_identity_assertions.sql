@@ -4,7 +4,7 @@ create table if not exists public.biological_identity_assertions (
   id uuid primary key default gen_random_uuid(),
   organization_id uuid not null references public.organizations(id) on delete cascade,
   assertion_code text not null check (length(assertion_code) between 1 and 160),
-  assertion_version text not null check (assertion_version ~ '^\\d+\\.\\d+\\.\\d+$'),
+  assertion_version text not null check (assertion_version ~ '^[0-9]+[.][0-9]+[.][0-9]+$'),
   subject_type text not null check (subject_type in ('organism', 'strain')),
   organism_id uuid not null references public.organisms(id) on delete restrict,
   strain_id uuid,
