@@ -146,6 +146,9 @@ class _Handler(BaseHTTPRequestHandler):
             for name in ("BA_ENGINE_SCHEMA_DIR", "BA_ENGINE_REGISTRY_DIR"):
                 if os.environ.get(name):
                     child_env[name] = os.environ[name]
+            for name in ("BA_ENGINE_BUILD_REVISION", "BA_ENGINE_IMAGE_DIGEST"):
+                if os.environ.get(name):
+                    child_env[name] = os.environ[name]
 
             completed = subprocess.run(
                 [sys.executable, "-m", "ba_engine_contract.worker"],
