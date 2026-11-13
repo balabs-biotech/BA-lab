@@ -123,7 +123,13 @@ assert.match(tracker, /async function monitorPlantBiologicalAssessmentExecution/
 assert.match(tracker, /setTimeout\(resolve, 1000\)/);
 assert.match(tracker, /execution\?\.status === "completed"/);
 assert.match(tracker, /execution\?\.status === "failed"/);
-assert.match(tracker, /["queued", "running"]\.includes\(data\?\.status\)/);
+assert.match(tracker, /for \(let attempt = 0; attempt < 90; attempt\+\+\)/);
+const plantMonitorStart = tracker.indexOf("async function monitorPlantBiologicalAssessmentExecution(");
+const plantMonitorEnd = tracker.indexOf("async function runPlantBiologicalAssessment()", plantMonitorStart);
+const plantMonitor = tracker.slice(plantMonitorStart, plantMonitorEnd);
+assert.doesNotMatch(plantMonitor, /await loadRecentEngineExecutions\(\)/, "BIE notices must reuse the shared tenant-safe polling loop");
+assert.match(plantMonitor, /execution\?\.status === "completed"/);
+assert.match(plantMonitor, /execution\?\.status === "failed"/);
 
 for (const path of [
   "batch-tracker/mycology/index.html",
