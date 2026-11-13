@@ -519,6 +519,7 @@ class EngineContractTests(unittest.TestCase):
         self.assertEqual(result["status"], "completed")
         self.assertEqual(result["result"]["provenance"]["execution_environment"]["source_revision"], "unrecorded")
         self.assertIn("build_revision_unavailable", result["result"]["quality_flags"])
+        self.assertIn("container_image_digest_unavailable", result["result"]["quality_flags"])
 
     def test_registry_rejects_unregistered_engine(self):
         request = json.loads(json.dumps(REQUEST))
