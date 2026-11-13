@@ -7,7 +7,7 @@ const PROFILE_CODE = "biological.context.features";
 const ALLOWED_DOMAINS = new Set(["mycology", "greentech", "lab"]);
 const RULE_FIELDS = new Set([
   "rule_id", "rule_version", "feature_code", "operator", "threshold",
-  "unit_code", "statement", "context_match", "reference_id", "reference_version",
+  "unit_code", "statement", "context_match", "reference_id", "reference_version", "identity_match",
 ]);
 
 type Row = Record<string, any>;
@@ -38,8 +38,9 @@ function requireValidRuleReferences(rules: unknown): Array<{ id: string; version
   const seen = new Set<string>();
   const references: Array<{ id: string; version: string }> = [];
   for (const rule of rules) {
-    if (!isObject(rule) || Object.keys(rule).length !== RULE_FIELDS.size ||
-        Object.keys(rule).some((key) => !RULE_FIELDS.has(key))) {
+    if (!isObject(rule) ||
+        Object.keys(rule).some((key) => !RULE_FIELDS.has(key)) ||
+        [...RULE_FIELDS].filter((key) => key !== "identity_match").some((key) => !(key in rule))) {
       throw new Error("interpretation_profile_rule_shape_invalid");
     }
     if (typeof rule.rule_id !== "string" || !/^[a-z][a-z0-9_.-]{1,79}$/.test(rule.rule_id) ||
@@ -58,6 +59,12 @@ function requireValidRuleReferences(rules: unknown): Array<{ id: string; version
         Object.values(rule.context_match).some((value) => typeof value !== "string" || !value.trim())) {
       throw new Error("interpretation_profile_rule_content_invalid");
     }
+    if ("identity_match" in rule && (
+      !isObject(rule.identity_match) ||
+      Object.keys(rule.identity_match).length !== 2 ||
+      typeof rule.identity_match.assertion_type !== "string" || !rule.identity_match.assertion_type.trim() ||
+      typeof rule.identity_match.assertion_value !== "string" || !rule.identity_match.assertion_value.trim()
+    )) throw new Error("interpretation_profile_identity_match_invalid");
     if (seen.has(rule.rule_id)) throw new Error("interpretation_profile_duplicate_rule_id");
     seen.add(rule.rule_id);
     references.push({ id: rule.reference_id, version: rule.reference_version });
