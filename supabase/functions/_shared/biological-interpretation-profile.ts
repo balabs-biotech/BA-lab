@@ -79,8 +79,11 @@ export async function buildBiologicalInterpretationProfile(input: {
   windowLastIncludedDate: string;
   profiles: Row[];
   references: Row[];
+  historicalReplay?: boolean;
 }) {
   const { organizationId, domain, windowStartDate, windowLastIncludedDate } = input;
+  const acceptedProfileStatuses = input.historicalReplay ? new Set(["active", "retired"]) : new Set(["active"]);
+  const acceptedReferenceStatuses = input.historicalReplay ? new Set(["validated", "retired"]) : new Set(["validated"]);
   if (!organizationId || !ALLOWED_DOMAINS.has(domain)) {
     throw new Error("interpretation_profile_domain_invalid");
   }
@@ -92,7 +95,7 @@ export async function buildBiologicalInterpretationProfile(input: {
     profile.organization_id === organizationId &&
     profile.domain === domain &&
     profile.profile_code === PROFILE_CODE &&
-    profile.status === "active" &&
+    acceptedProfileStatuses.has(profile.status) &&
     typeof profile.valid_from === "string" &&
     profile.valid_from <= windowStartDate &&
     (profile.valid_to === null || (
@@ -102,7 +105,7 @@ export async function buildBiologicalInterpretationProfile(input: {
   if (applicable.length === 0) {
     return { state: "not_configured", profile: null, rules: [], datasets: [] };
   }
-  if (applicable.length !== 1) throw new Error("active_interpretation_profile_ambiguous");
+  if (applicable.length !== 1) throw new Error("interpretation_profile_ambiguous");
 
   const profile = applicable[0];
   if (
@@ -117,7 +120,7 @@ export async function buildBiologicalInterpretationProfile(input: {
   for (const reference of input.references) {
     if (!isObject(reference) ||
         reference.organization_id !== organizationId ||
-        reference.status !== "validated" ||
+        !acceptedReferenceStatuses.has(reference.status) ||
         typeof reference.content_sha256 !== "string" ||
         !/^[0-9a-f]{64}$/.test(reference.content_sha256) ||
         typeof reference.reviewed_at !== "string") continue;
@@ -187,6 +190,7 @@ export async function loadAuthenticatedBiologicalInterpretationProfile(input: {
   contextStable: boolean;
   windowStartDate: string;
   windowLastIncludedDate: string;
+  historicalReplay?: boolean;
 }) {
   const { userClient, organizationId, domain, domainAmbiguous, contextStable, windowStartDate, windowLastIncludedDate } = input;
   if (!userClient || typeof userClient.from !== "function") {
@@ -202,7 +206,7 @@ export async function loadAuthenticatedBiologicalInterpretationProfile(input: {
     .eq("organization_id", organizationId)
     .eq("domain", domain)
     .eq("profile_code", PROFILE_CODE)
-    .eq("status", "active")
+    .in("status", input.historicalReplay ? ["active", "retired"] : ["active"])
     .lte("valid_from", windowStartDate)
     .or("valid_to.is.null,valid_to.gte." + windowLastIncludedDate)
     .limit(2);
@@ -220,7 +224,7 @@ export async function loadAuthenticatedBiologicalInterpretationProfile(input: {
       const referenceResult = await userClient.from("biological_reference_registry")
         .select("organization_id,reference_id,reference_version,source_url,content_sha256,status,reviewed_at")
         .eq("organization_id", organizationId)
-        .eq("status", "validated")
+        .in("status", input.historicalReplay ? ["validated", "retired"] : ["validated"])
         .in("reference_id", referenceIds)
         .limit(200);
       if (referenceResult.error || !Array.isArray(referenceResult.data)) {
@@ -237,5 +241,6 @@ export async function loadAuthenticatedBiologicalInterpretationProfile(input: {
     windowLastIncludedDate,
     profiles,
     references: referenceRows,
+    historicalReplay: input.historicalReplay,
   });
 }
