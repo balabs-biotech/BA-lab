@@ -439,6 +439,53 @@ begin
 end;
 $$;
 
+-- Public RPC wrappers are the only PostgREST entry points. The private tables
+-- remain unexposed and the wrappers execute with caller privileges.
+grant usage on schema private to authenticated, service_role;
+
+create or replace function public.enqueue_engine_job(
+  p_organization_id uuid, p_engine_code text, p_engine_version text,
+  p_job_type text, p_payload jsonb, p_idempotency_key text,
+  p_priority integer default 0, p_max_attempts integer default 3
+)
+returns uuid language sql security invoker set search_path = ''
+as $ select private.enqueue_engine_job(
+  p_organization_id, p_engine_code, p_engine_version, p_job_type,
+  p_payload, p_idempotency_key, p_priority, p_max_attempts
+) $;
+
+create or replace function public.get_engine_job_status(p_job_id uuid)
+returns jsonb language sql security invoker set search_path = ''
+as $ select private.get_engine_job_status(p_job_id) $;
+
+create or replace function public.claim_engine_job(p_worker_id text, p_lease_seconds integer default 60)
+returns jsonb language sql security invoker set search_path = ''
+as $ select private.claim_engine_job(p_worker_id, p_lease_seconds) $;
+
+create or replace function public.heartbeat_engine_job(
+  p_job_id uuid, p_lease_token uuid, p_worker_id text, p_lease_seconds integer default 60
+)
+returns boolean language sql security invoker set search_path = ''
+as $ select private.heartbeat_engine_job(p_job_id, p_lease_token, p_worker_id, p_lease_seconds) $;
+
+create or replace function public.complete_engine_job(
+  p_job_id uuid, p_lease_token uuid, p_worker_id text,
+  p_result jsonb, p_result_summary text default null
+)
+returns boolean language sql security invoker set search_path = ''
+as $ select private.complete_engine_job(
+  p_job_id, p_lease_token, p_worker_id, p_result, p_result_summary
+) $;
+
+create or replace function public.fail_engine_job(
+  p_job_id uuid, p_lease_token uuid, p_worker_id text,
+  p_error_code text, p_error_details text, p_retryable boolean
+)
+returns text language sql security invoker set search_path = ''
+as $ select private.fail_engine_job(
+  p_job_id, p_lease_token, p_worker_id, p_error_code, p_error_details, p_retryable
+) $;
+
 revoke all on function private.enqueue_engine_job(uuid,text,text,text,jsonb,text,integer,integer) from public, anon, authenticated, service_role;
 revoke all on function private.get_engine_job_status(uuid) from public, anon, authenticated, service_role;
 revoke all on function private.recover_expired_engine_jobs() from public, anon, authenticated, service_role;
@@ -453,7 +500,20 @@ grant execute on function private.heartbeat_engine_job(uuid,uuid,text,integer) t
 grant execute on function private.complete_engine_job(uuid,uuid,text,jsonb,text) to service_role;
 grant execute on function private.fail_engine_job(uuid,uuid,text,text,text,boolean) to service_role;
 
-do $$
+revoke all on function public.enqueue_engine_job(uuid,text,text,text,jsonb,text,integer,integer) from public, anon, authenticated, service_role;
+revoke all on function public.get_engine_job_status(uuid) from public, anon, authenticated, service_role;
+revoke all on function public.claim_engine_job(text,integer) from public, anon, authenticated, service_role;
+revoke all on function public.heartbeat_engine_job(uuid,uuid,text,integer) from public, anon, authenticated, service_role;
+revoke all on function public.complete_engine_job(uuid,uuid,text,jsonb,text) from public, anon, authenticated, service_role;
+revoke all on function public.fail_engine_job(uuid,uuid,text,text,text,boolean) from public, anon, authenticated, service_role;
+grant execute on function public.enqueue_engine_job(uuid,text,text,text,jsonb,text,integer,integer) to authenticated;
+grant execute on function public.get_engine_job_status(uuid) to authenticated;
+grant execute on function public.claim_engine_job(text,integer) to service_role;
+grant execute on function public.heartbeat_engine_job(uuid,uuid,text,integer) to service_role;
+grant execute on function public.complete_engine_job(uuid,uuid,text,jsonb,text) to service_role;
+grant execute on function public.fail_engine_job(uuid,uuid,text,text,text,boolean) to service_role;
+
+do $
 declare
   v_user uuid := '10000000-0000-4000-8000-000000000001';
   v_org uuid := '20000000-0000-4000-8000-000000000001';
@@ -479,11 +539,11 @@ begin
   perform set_config('request.jwt.claims',
     jsonb_build_object('role','authenticated','sub',v_user)::text, true);
 
-  v_job := private.enqueue_engine_job(
+  v_job := public.enqueue_engine_job(
     v_org, 'demo.engine', '1.0.0', 'contract_test',
     '{"input":1}'::jsonb, 'queue-idem-001', 10, 2
   );
-  v_duplicate := private.enqueue_engine_job(
+  v_duplicate := public.enqueue_engine_job(
     v_org, 'demo.engine', '1.0.0', 'contract_test',
     '{"input":1}'::jsonb, 'queue-idem-001', 10, 2
   );
@@ -492,7 +552,7 @@ begin
   end if;
 
   begin
-    perform private.enqueue_engine_job(
+    perform public.enqueue_engine_job(
       v_org, 'demo.engine', '1.0.0', 'contract_test',
       '{"input":2}'::jsonb, 'queue-idem-001', 10, 2
     );
@@ -501,7 +561,7 @@ begin
     null;
   end;
 
-  v_status := private.get_engine_job_status(v_job);
+  v_status := public.get_engine_job_status(v_job);
   if v_status->>'status' <> 'queued' then
     raise exception 'Unexpected initial job status: %', v_status;
   end if;
@@ -509,20 +569,20 @@ begin
   perform set_config('request.jwt.claims',
     jsonb_build_object('role','service_role','sub',v_user)::text, true);
 
-  v_claim := private.claim_engine_job('worker-a', 60);
+  v_claim := public.claim_engine_job('worker-a', 60);
   if v_claim is null or (v_claim->>'job_id')::uuid <> v_job then
     raise exception 'Worker did not claim the expected job';
   end if;
   v_token := (v_claim->>'lease_token')::uuid;
 
-  if not private.heartbeat_engine_job(v_job, v_token, 'worker-a', 60) then
+  if not public.heartbeat_engine_job(v_job, v_token, 'worker-a', 60) then
     raise exception 'Current lease heartbeat was rejected';
   end if;
-  if not private.complete_engine_job(v_job, v_token, 'worker-a', '{"value":42}'::jsonb, 'ok') then
+  if not public.complete_engine_job(v_job, v_token, 'worker-a', '{"value":42}'::jsonb, 'ok') then
     raise exception 'Current lease completion was rejected';
   end if;
 
-  v_status := private.get_engine_job_status(v_job);
+  v_status := public.get_engine_job_status(v_job);
   if v_status->>'status' <> 'succeeded' then
     raise exception 'Job did not reach succeeded: %', v_status;
   end if;
@@ -530,13 +590,13 @@ begin
   -- A second attempt expires. Reclaim must issue a new fencing token.
   perform set_config('request.jwt.claims',
     jsonb_build_object('role','authenticated','sub',v_user)::text, true);
-  v_job := private.enqueue_engine_job(
+  v_job := public.enqueue_engine_job(
     v_org, 'demo.engine', '1.0.0', 'expiry_test',
     '{"input":2}'::jsonb, 'queue-expiry-001', 0, 2
   );
   perform set_config('request.jwt.claims',
     jsonb_build_object('role','service_role','sub',v_user)::text, true);
-  v_claim := private.claim_engine_job('worker-a', 60);
+  v_claim := public.claim_engine_job('worker-a', 60);
   v_token := (v_claim->>'lease_token')::uuid;
 
   update private.engine_job_leases
@@ -547,7 +607,7 @@ begin
   update private.engine_jobs set available_at = clock_timestamp()
    where id = v_job and status = 'retry_wait';
 
-  v_claim2 := private.claim_engine_job('worker-b', 60);
+  v_claim2 := public.claim_engine_job('worker-b', 60);
   if v_claim2 is null or (v_claim2->>'job_id')::uuid <> v_job then
     raise exception 'Expired job was not recovered';
   end if;
@@ -555,13 +615,13 @@ begin
   if v_token = v_token2 then
     raise exception 'Reclaim reused the previous fencing token';
   end if;
-  if private.heartbeat_engine_job(v_job, v_token, 'worker-a', 60) then
+  if public.heartbeat_engine_job(v_job, v_token, 'worker-a', 60) then
     raise exception 'Stale worker heartbeat was accepted';
   end if;
-  if private.complete_engine_job(v_job, v_token, 'worker-a', '{"stale":true}'::jsonb, 'stale') then
+  if public.complete_engine_job(v_job, v_token, 'worker-a', '{"stale":true}'::jsonb, 'stale') then
     raise exception 'Stale worker completion was accepted';
   end if;
-  if not private.complete_engine_job(v_job, v_token2, 'worker-b', '{"fresh":true}'::jsonb, 'fresh') then
+  if not public.complete_engine_job(v_job, v_token2, 'worker-b', '{"fresh":true}'::jsonb, 'fresh') then
     raise exception 'New lease completion was rejected';
   end if;
 
@@ -570,9 +630,9 @@ begin
      or has_table_privilege('service_role','private.engine_jobs','SELECT') then
     raise exception 'A client/backend role has direct queue table access';
   end if;
-  if has_function_privilege('authenticated','private.claim_engine_job(text,integer)','EXECUTE')
-     or has_function_privilege('anon','private.enqueue_engine_job(uuid,text,text,text,jsonb,text,integer,integer)','EXECUTE')
-     or has_function_privilege('authenticated','private.complete_engine_job(uuid,uuid,text,jsonb,text)','EXECUTE') then
+  if has_function_privilege('authenticated','public.claim_engine_job(text,integer)','EXECUTE')
+     or has_function_privilege('anon','public.enqueue_engine_job(uuid,text,text,text,jsonb,text,integer,integer)','EXECUTE')
+     or has_function_privilege('authenticated','public.complete_engine_job(uuid,uuid,text,jsonb,text)','EXECUTE') then
     raise exception 'Queue RPC grants are broader than intended';
   end if;
 end;
