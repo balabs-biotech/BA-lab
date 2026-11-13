@@ -1210,6 +1210,29 @@ class EngineContractTests(unittest.TestCase):
             [rule], mismatched_contexts, features, datasets, "documented", assertions
         )
         self.assertEqual(mismatched, [])
+        # A context match and a matching identity assertion on two different
+        # temporal contexts must not be combined into one scientific finding.
+        split_contexts = [
+            {
+                "organism_kind": "fungus",
+                "genetic_reference": {
+                    "organism_id": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb",
+                    "strain_id": "88888888-8888-4888-8888-888888888888",
+                },
+            },
+            {
+                "organism_kind": "bacterium",
+                "genetic_reference": {
+                    "organism_id": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaab",
+                    "strain_id": "99999999-9999-4999-8999-999999999999",
+                },
+            },
+        ]
+        split_context_result, _ = _evaluate_interpretation_rules(
+            [rule], split_contexts, features, datasets, "documented", assertions
+        )
+        self.assertEqual(split_context_result, [])
+
 
 
 
