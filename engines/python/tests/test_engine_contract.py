@@ -920,6 +920,12 @@ class EngineContractTests(unittest.TestCase):
         }
         request["input"]["record_ids"] = []
         request["input"]["records"] = []
+        request["input"]["snapshot_sha256"] = hashlib.sha256(
+            json.dumps(
+                {"records": [], "biological_contexts": []},
+                sort_keys=True, separators=(",", ":"), ensure_ascii=False,
+            ).encode("utf-8")
+        ).hexdigest()
         result = execute_registered_engine(request)
         self.assertEqual(result["status"], "completed", msg=str(result.get("error")))
         self.assertEqual(result["result"]["outcome"], "insufficient_data")
