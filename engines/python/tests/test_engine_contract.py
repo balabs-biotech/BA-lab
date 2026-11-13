@@ -627,6 +627,13 @@ class EngineContractTests(unittest.TestCase):
                 "reference_version": "2026.1",
             }],
         }
+        request["datasets"].append({
+            "provider": "BA_LABS_RULE_REGISTRY",
+            "dataset_id": "ba-labs.protocols.pleurotus-fruiting",
+            "dataset_version": "2026.1",
+            "content_sha256": "d" * 64,
+            "retrieved_at": "2026-11-10T07:55:00Z",
+        })
         request["input"]["record_ids"] = []
         request["input"]["records"] = []
         for index, value in enumerate([21.0, 23.0, 22.0]):
@@ -658,6 +665,7 @@ class EngineContractTests(unittest.TestCase):
         )
         self.assertIn("rule_version=1.0.0", finding["statement"])
         self.assertIn("reference=ba-labs.protocols.pleurotus-fruiting@2026.1", finding["statement"])
+        self.assertIn("BA_LABS_RULE_REGISTRY/ba-labs.protocols.pleurotus-fruiting@2026.1", result["result"]["provenance"]["source_references"])
 
     def test_biological_context_features_uses_half_open_analysis_window(self):
         request = json.loads(json.dumps(REQUEST))
