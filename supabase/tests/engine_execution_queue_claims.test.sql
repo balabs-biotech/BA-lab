@@ -25,7 +25,7 @@ begin
 
   select pg_get_functiondef('public.claim_engine_executions(text,integer,integer,uuid,uuid)'::regprocedure)
     into v_def;
-  if v_def not ilike '%for update skip locked%' then
+  if v_def not ilike '%for update%skip locked%' then
     raise exception 'queue claim RPC must use SKIP LOCKED to prevent concurrent duplicate claims';
   end if;
 
