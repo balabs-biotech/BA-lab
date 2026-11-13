@@ -108,7 +108,8 @@ Initial retry policy: 3 attempts total; exponential delay starting at 30 seconds
 ## 6. Authorization model
 
 - Queue tables stay in `private`; no direct browser grants.
-- `anon` and `authenticated` receive no table privileges.
+- Only narrow PostgREST RPC wrappers live in `public`; they run as `SECURITY INVOKER`, use an empty `search_path`, and have explicit role grants. The underlying mutation functions and tables remain in `private`.
+- `anon` and `authenticated` receive no table privileges; authenticated users may enqueue and read only their own organization's jobs.
 - The local worker authenticates with a backend-only Supabase credential stored in a local environment variable; never embed it in frontend assets or commit it.
 - Enqueue/status RPCs must derive or validate the organization against the authenticated user and existing tenant authorization helpers.
 - Worker-only claim/heartbeat/complete/fail operations are restricted to the trusted backend role.
