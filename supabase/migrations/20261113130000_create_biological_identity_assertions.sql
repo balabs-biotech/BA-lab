@@ -151,7 +151,8 @@ revoke all on function private.guard_biological_identity_assertion_immutability(
 revoke all on function private.guard_biological_identity_assertion_delete() from public, anon, authenticated;
 
 drop trigger if exists biological_identity_assertions_subject_guard on public.biological_identity_assertions;
-create trigger biological_identity_assertions_subject_guard
+drop trigger if exists biological_identity_assertions_00_subject_guard on public.biological_identity_assertions;
+create trigger biological_identity_assertions_00_subject_guard
   before insert or update of organization_id, organism_id, strain_id, subject_type, assertion_type
   on public.biological_identity_assertions
   for each row execute function private.guard_biological_identity_assertion_subject();
