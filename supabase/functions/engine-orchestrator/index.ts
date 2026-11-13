@@ -256,6 +256,7 @@ Deno.serve(async (req: Request) => {
         "biological_reference_registry_unavailable",
         "biological_identity_reference_ambiguous",
         "biological_identity_assertion_identity_ambiguous",
+        "biological_identity_source_provenance_integrity_failure",
       ]);
       return reply(422, { error: allowedCodes.has(code) ? code : "biological_identity_resolution_failed" });
     }
