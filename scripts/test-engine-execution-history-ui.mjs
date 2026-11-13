@@ -3,6 +3,30 @@ import { readFileSync } from "node:fs";
 
 const tracker = readFileSync("batch-tracker/tracker.js", "utf8");
 const workspace = readFileSync("batch-tracker/workspace.html", "utf8");
+const i18n = readFileSync("batch-tracker/i18n.js", "utf8");
+for (const label of [
+  "Évaluation du contexte biologique",
+  "Analyse exploitable",
+  "Données insuffisantes",
+  "Signaux qualité",
+  "Sources environnementales",
+  "Méthode et limites",
+  "Fenêtre demandée : ",
+  "Contexte manquant ou non résolu",
+  "Faits observés et sources",
+  "Caractéristiques calculées",
+  "Hypothèses à vérifier",
+  "Lacunes temporelles"
+]) assert.ok(i18n.includes(JSON.stringify(label)), "Missing BIE localization source key: " + label);
+for (const language of ["en", "ar", "pt"]) {
+  const start = i18n.indexOf(language + ": {");
+  assert.ok(start >= 0, "Missing localization dictionary: " + language);
+  const end = i18n.indexOf("\\n    },", start);
+  const dictionary = i18n.slice(start, end >= 0 ? end : start + 30000);
+  assert.ok(dictionary.includes("Évaluation du contexte biologique"), "Missing BIE assessment translation in " + language);
+  assert.ok(dictionary.includes("Données insuffisantes"), "Missing BIE insufficient-data translation in " + language);
+}
+
 
 assert.match(workspace, /id="overviewRecentEngineExecutions"/);
 assert.match(workspace, /Afficher les dernières analyses calculées/);
