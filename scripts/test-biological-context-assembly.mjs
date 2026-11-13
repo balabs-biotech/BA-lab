@@ -54,6 +54,7 @@ assert.equal(assembled.parameters.biological_context_supplied, true);
 assert.equal(assembled.parameters.profile_domain, "mycology",
   "one domain covering the full window selects the interpretation profile domain");
 assert.equal(assembled.parameters.profile_domain_ambiguous, false);
+assert.equal(assembled.parameters.profile_context_stable, true);
 assert.equal(assembled.parameters.biological_contexts.length, 1,
   "only contexts intersecting the requested window are included");
 assert.equal(assembled.parameters.biological_contexts[0].culture_stage, "fruiting");
@@ -81,6 +82,8 @@ assert.equal(spanning.context_resolution.window.status, "ambiguous");
 assert.equal(spanning.input.records.length, 1,
   "weather must be excluded when the requested window spans multiple locations");
 assert.equal(spanning.parameters.environment_link_state, "ambiguous");
+assert.equal(spanning.parameters.profile_context_stable, false,
+  "rule profiles are disabled when biological context changes inside the requested window");
 assert.deepEqual(spanning.excluded_environmental_observation_ids, [weather[0].id]);
 
 console.log("✓ BIE context assembly: historical environment wins; weather requires one unambiguous window location");
