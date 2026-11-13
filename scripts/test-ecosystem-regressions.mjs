@@ -517,9 +517,9 @@ assert.ok(previewHtml.includes('brand-system.css?v=14'), 'Preview must request p
 
 // Phase 13: close the homepage with an editorial principles colophon, not generic cards.
 assert.ok(brandCss.includes('PHASE 13 — research principles as an editorial colophon'), 'Closing principles must use the shared research publication art direction');
-assert.ok(brandCss.includes('#app.balabs-ui > main > .under .tile::before'), 'Each principle must carry a clear editorial index');
-assert.ok(brandCss.includes('box-shadow:none !important') && brandCss.includes('border-radius:0 !important'), 'Closing principles must not regress to generic rounded tiles');
-assert.ok(brandCss.includes('grid-template-columns:repeat(4,minmax(0,1fr)) !important'), 'Closing principles must form a four-column desktop colophon');
+assert.ok(html.includes('class="value-grid"') && html.includes('class="value-item"'), 'Closing principles must use the active semantic value-grid markup');
+assert.ok(overridesCss.includes('.value-grid{display:grid') && overridesCss.includes('.value-item{'), 'Closing principles must use the active value-item styles');
+assert.ok(overridesCss.includes('grid-template-columns:repeat(3,minmax(0,1fr))'), 'Closing principles must use the current three-column desktop layout');
 assert.ok(html.includes('brand-system.css?v=14') && previewHtml.includes('brand-system.css?v=14'), 'Public and preview must use the same Phase 13 stylesheet');
 
 
