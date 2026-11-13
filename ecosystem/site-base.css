@@ -1084,8 +1084,7 @@ h1 span{font-style:italic!important;color:var(--field-rust)!important}
   .editorial-work .work-card>.work-card-link,
   .editorial-work .work-card .work-topics{margin-left:18px!important;margin-right:18px!important}
 }
-@media(prefers-reduced-motion:reduce){
-}
+
 
 
 /* Customer experience flow: projects → interactive explorer → domain directory */
