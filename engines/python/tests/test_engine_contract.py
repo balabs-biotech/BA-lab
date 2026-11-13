@@ -647,7 +647,7 @@ class EngineContractTests(unittest.TestCase):
                     "variable_code": "air_temperature",
                     "normalized_value": value,
                     "normalized_unit_code": "degC",
-                    "measured_at": f"2026-11-10T0{8 + index}:00:00Z",
+                    "measured_at": f"2026-11-10T{8 + index:02d}:00:00Z",
                 },
                 "context": {"culture_id": culture_id},
             })
