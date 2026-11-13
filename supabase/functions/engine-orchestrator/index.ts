@@ -243,7 +243,7 @@ Deno.serve(async (req: Request) => {
       identityResolution = await loadAuthenticatedBiologicalIdentityAssertions({
         userClient,
         organizationId,
-        biologicalContexts: snapshot.parameters.biological_contexts ?? [],
+        biologicalContexts: snapshot.parameters.biological_contexts ?? [],\n        windowStartDate: snapshot.parameters.analysis_window_start_date,\n        windowLastIncludedDate: snapshot.parameters.analysis_window_last_included_date,
       });
     } catch (error) {
       const code = error instanceof Error ? error.message : "biological_identity_resolution_failed";
