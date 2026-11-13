@@ -41,13 +41,13 @@ export async function loadAuthenticatedBiologicalIdentityAssertions(input: {
   if (organismIds.length) queries.push(userClient.from("biological_identity_assertions")
     .select("id,organization_id,assertion_code,assertion_version,subject_type,organism_id,strain_id,assertion_type,assertion_value,source_reference_id,source_reference_version,evidence_level,content_sha256,status,reviewed_at,valid_from,valid_to")
     .eq("organization_id", organizationId).eq("status", "validated")
-    .eq("subject_type", "organism").in("organism_id", organismIds).limit(500));
+    .eq("subject_type", "organism").in("organism_id", organismIds).limit(501));
   if (strainIds.length) queries.push(userClient.from("biological_identity_assertions")
     .select("id,organization_id,assertion_code,assertion_version,subject_type,organism_id,strain_id,assertion_type,assertion_value,source_reference_id,source_reference_version,evidence_level,content_sha256,status,reviewed_at,valid_from,valid_to")
     .eq("organization_id", organizationId).eq("status", "validated")
-    .eq("subject_type", "strain").in("strain_id", strainIds).limit(500));
+    .eq("subject_type", "strain").in("strain_id", strainIds).limit(501));
   const results = await Promise.all(queries);
-  if (results.some((result) => result.error || !Array.isArray(result.data))) {
+  if (results.some((result) => result.error || !Array.isArray(result.data) || result.data.length > 500)) {
     throw new Error("biological_identity_assertion_registry_unavailable");
   }
   const rows: Row[] = results.flatMap((result) => result.data).filter((row) =>
@@ -64,8 +64,8 @@ export async function loadAuthenticatedBiologicalIdentityAssertions(input: {
     const referenceResult = await userClient.from("biological_reference_registry")
       .select("organization_id,reference_id,reference_version,content_sha256,status,reviewed_at")
       .eq("organization_id", organizationId).eq("status", "validated")
-      .in("reference_id", refs).limit(500);
-    if (referenceResult.error || !Array.isArray(referenceResult.data)) {
+      .in("reference_id", refs).limit(501);
+    if (referenceResult.error || !Array.isArray(referenceResult.data) || referenceResult.data.length > 500) {
       throw new Error("biological_reference_registry_unavailable");
     }
     referenceRows = referenceResult.data.filter((row: Row) =>
