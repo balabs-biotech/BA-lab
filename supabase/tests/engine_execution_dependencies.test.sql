@@ -107,6 +107,18 @@ begin
  ) then
    raise exception 'immutable dependency edge disappeared after rejected deletion';
  end if;
+  begin
+   delete from public.engine_executions
+   where organization_id=org_id and id=bie_id;
+   raise exception 'downstream execution with immutable lineage was deleted';
+ exception when foreign_key_violation then null;
+ end;
+ if not exists (
+   select 1 from public.engine_executions
+   where organization_id=org_id and id=bie_id
+ ) then
+   raise exception 'downstream execution disappeared despite retained lineage';
+ end if;
  
  if has_function_privilege('authenticated','public.attach_environmental_qc_dependency(uuid,uuid,uuid)','EXECUTE')
    or not has_function_privilege('service_role','public.attach_environmental_qc_dependency(uuid,uuid,uuid)','EXECUTE') then
