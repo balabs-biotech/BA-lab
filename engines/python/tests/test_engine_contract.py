@@ -940,6 +940,55 @@ class EngineContractTests(unittest.TestCase):
             validate_request(non_biological)
 
 
+    def test_bie_v02_empty_culture_and_plant_snapshots_through_jsonl_worker(self):
+        # Exercise the actual JSON-lines worker boundary used by the container,
+        # not only the in-process engine registry. Empty production databases
+        # must yield a valid insufficient_data result for both UI entry points.
+        subjects = (
+            ("culture", {"culture_id": "2c2b3a4d-5e6f-4789-8123-456789abcdef"}),
+            ("plant", {"plant_culture_id": "5c2b3a4d-5e6f-4789-8123-456789abcdef"}),
+        )
+        for subject_name, subject_scope in subjects:
+            with self.subTest(subject=subject_name):
+                request = json.loads(json.dumps(REQUEST))
+                request["engine"] = {
+                    "engine_id": "biological.context.features",
+                    "engine_version": "0.2.0",
+                }
+                request["scope"] = {
+                    "organization_id": REQUEST["scope"]["organization_id"],
+                    **subject_scope,
+                }
+                request["input"]["record_ids"] = []
+                request["input"]["records"] = []
+                request["input"]["snapshot_sha256"] = "a" * 64
+                request["parameters"] = {
+                    "window_start": "2026-11-10T00:00:00+01:00",
+                    "window_end": "2026-11-11T00:00:00+01:00",
+                    "timezone": "Africa/Algiers",
+                    "biological_contexts": [],
+                    "interpretation_rules": [],
+                    "interpretation_profile_state": "not_configured",
+                    "biological_identity_state": "not_documented",
+                    "biological_identity_assertions": [],
+                }
+                output = StringIO()
+                with patch("sys.stdin", StringIO(json.dumps(request))), patch("sys.stdout", output):
+                    exit_code = worker_main()
+
+                self.assertEqual(exit_code, 0)
+                response = json.loads(output.getvalue())
+                self.assertEqual(response["status"], "completed")
+                self.assertEqual(response["engine"]["engine_version"], "0.2.0")
+                self.assertEqual(response["result"]["outcome"], "insufficient_data")
+                value = response["result"]["value"]
+                self.assertEqual(value["coverage"]["source_record_count"], 0)
+                self.assertIsNone(value["coverage"]["observed_window"])
+                self.assertEqual(value["observed_facts"], [])
+                self.assertEqual(value["derived_features"], [])
+                self.assertIn("insufficient_data", response["result"]["quality_flags"])
+                self.assertEqual(response["input_snapshot_sha256"], "a" * 64)
+
     def test_biological_context_features_preserves_time_bounded_genetic_context(self):
         request = json.loads(json.dumps(REQUEST))
         request["engine"] = {
