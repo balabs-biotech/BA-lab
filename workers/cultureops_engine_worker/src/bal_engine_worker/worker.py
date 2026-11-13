@@ -10,6 +10,10 @@ from typing import Callable, Mapping, Protocol
 from .registry import EngineExecutionContext, EngineRegistry, EngineResult, RegistryError
 
 
+class LeaseLostError(RuntimeError):
+    """The database rejected a mutation because this worker no longer owns the lease."""
+
+
 @dataclass(frozen=True)
 class ClaimedJob:
     """A job already atomically claimed by the database adapter."""
@@ -174,12 +178,15 @@ class EngineWorker:
             )
 
         if isinstance(engine_error, RegistryError):
-            self._queue.fail(
-                job,
-                error_code="engine_not_registered",
-                error_message=str(engine_error),
-                retryable=False,
-            )
+            try:
+                self._queue.fail(
+                    job,
+                    error_code="engine_not_registered",
+                    error_message=str(engine_error),
+                    retryable=False,
+                )
+            except LeaseLostError:
+                return ExecutionOutcome(status="lease_lost", job_id=job.job_id, error_code="lease_lost")
             return ExecutionOutcome(
                 status="failed", job_id=job.job_id,
                 error_code="engine_not_registered",
@@ -187,12 +194,15 @@ class EngineWorker:
 
         if engine_error is not None:
             retryable = self._failure_classifier(engine_error)
-            self._queue.fail(
-                job,
-                error_code="engine_execution_error",
-                error_message=f"{type(engine_error).__name__}: {engine_error}",
-                retryable=retryable,
-            )
+            try:
+                self._queue.fail(
+                    job,
+                    error_code="engine_execution_error",
+                    error_message=f"{type(engine_error).__name__}: {engine_error}",
+                    retryable=retryable,
+                )
+            except LeaseLostError:
+                return ExecutionOutcome(status="lease_lost", job_id=job.job_id, error_code="lease_lost")
             return ExecutionOutcome(
                 status="failed", job_id=job.job_id,
                 error_code="engine_execution_error",
@@ -203,5 +213,8 @@ class EngineWorker:
 
         # SQL must re-check the fencing token: a lease may expire between
         # the last heartbeat and this completion transaction.
-        self._queue.complete(job, result)
+        try:
+            self._queue.complete(job, result)
+        except LeaseLostError:
+            return ExecutionOutcome(status="lease_lost", job_id=job.job_id, error_code="lease_lost")
         return ExecutionOutcome(status="succeeded", job_id=job.job_id)
