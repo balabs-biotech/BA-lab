@@ -151,7 +151,7 @@ async function processExecution(
     ) ? "failed" : "lost";
   }
 
-  const actualSnapshotDigest = await sha256(stable(request.input.records));
+  const actualSnapshotDigest = await sha256(stable(request.input?.records));
   if (actualSnapshotDigest !== execution.input_snapshot_sha256) {
     return await persistFailure(
       db, execution, workerId, "input_snapshot_digest_mismatch",
