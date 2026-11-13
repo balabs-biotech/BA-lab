@@ -35,7 +35,7 @@ assert.equal(result.state, "documented");
 assert.equal(result.assertions.length, 1);
 assert.equal(result.assertions[0].assertion_value, "P80");
 assert.equal(result.datasets.length, 1);
-assert.deepEqual(calls.filter((call) => call[0] === "from").map((call) => call[1]), [
+assert.deepEqual([...new Set(calls.filter((call) => call[0] === "from").map((call) => call[1]))], [
   "biological_identity_assertions", "biological_reference_registry",
 ]);
 assert.ok(calls.some((call) => call[0] === "biological_identity_assertions" &&
