@@ -1070,5 +1070,63 @@ class EngineContractTests(unittest.TestCase):
 
 
 
+    def test_biological_context_features_preserves_validated_identity_assertions(self):
+        request = json.loads(json.dumps(REQUEST))
+        request["engine"] = {
+            "engine_id": "biological.context.features",
+            "engine_version": "0.1.0",
+        }
+        request["scope"] = {
+            "organization_id": REQUEST["scope"]["organization_id"],
+            "culture_id": "2c2b3a4d-5e6f-4789-8123-456789abcdef",
+        }
+        assertion = {
+            "assertion_code": "strain.identity.designation",
+            "assertion_version": "1.0.0",
+            "subject_type": "strain",
+            "organism_id": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaab",
+            "strain_id": "99999999-9999-4999-8999-999999999999",
+            "assertion_type": "strain.designation",
+            "assertion_value": "HK35",
+            "evidence_level": "documented",
+            "content_sha256": "b" * 64,
+            "source_reference_id": "source.taxonomy",
+            "source_reference_version": "1.0.0",
+            "source_reference_sha256": "a" * 64,
+            "reviewed_at": "2026-11-02T00:00:00Z",
+            "valid_from": "2026-01-01",
+            "valid_to": None,
+        }
+        request["parameters"] = {
+            "window_start": "2026-11-10T00:00:00Z",
+            "window_end": "2026-11-11T00:00:00Z",
+            "timezone": "Africa/Algiers",
+            "biological_identity_state": "documented",
+            "biological_identity_assertions": [assertion],
+        }
+        request["datasets"] = [{
+            "provider": "BA_LABS_BIOLOGICAL_IDENTITY",
+            "dataset_id": assertion["assertion_code"],
+            "dataset_version": assertion["assertion_version"],
+            "content_sha256": "c" * 64,
+            "retrieved_at": assertion["reviewed_at"],
+        }]
+        request["input"]["record_ids"] = []
+        request["input"]["records"] = []
+        result = execute_registered_engine(request)
+        self.assertEqual(result["status"], "completed", msg=str(result.get("error")))
+        value = result["result"]["value"]
+        self.assertEqual(value["subject"]["identity_assertion_state"], "documented")
+        self.assertEqual(value["subject"]["identity_assertions"], [assertion])
+        self.assertIn("biological_identity_assertions_present", result["result"]["quality_flags"])
+        self.assertTrue(any(
+            source.startswith("BA_LABS_BIOLOGICAL_IDENTITY/strain.identity.designation@1.0.0#sha256=")
+            for source in result["result"]["provenance"]["source_references"]
+        ))
+        schema = json.loads((ROOT / "schemas" / "biological" / "v1" / "context-assessment.schema.json").read_text(encoding="utf-8"))
+        validator(schema).validate(value)
+
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
