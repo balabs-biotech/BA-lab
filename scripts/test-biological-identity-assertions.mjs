@@ -47,6 +47,32 @@ assert.equal(result.assertions.length, 1);
 assert.equal(result.assertions[0].assertion_value, "P80");
 assert.equal(result.datasets.length, 1);
 
+const retiredSource = { ...source, status: "retired" };
+const retiredAssertion = { ...assertion, status: "retired", valid_to: "2026-11-03" };
+retiredAssertion.content_sha256 = assertionDigest(retiredAssertion);
+const retiredClient = { from(table) {
+  const query = {
+    select() { return this; }, eq() { return this; }, in() { return this; },
+    limit() { return Promise.resolve({ error: null, data: table === "biological_identity_assertions" ? [retiredAssertion] : [retiredSource] }); },
+  };
+  return query;
+}};
+const historical = await loadAuthenticatedBiologicalIdentityAssertions({
+  userClient: retiredClient, organizationId, historicalReplay: true,
+  biologicalContexts: [{ genetic_reference: { organism_id: organismId, strain_id: strainId } }],
+  windowStartDate: "2026-11-01", windowLastIncludedDate: "2026-11-03",
+});
+assert.equal(historical.state, "documented");
+assert.equal(historical.assertions[0].assertion_value, "P80");
+
+const currentOnly = await loadAuthenticatedBiologicalIdentityAssertions({
+  userClient: retiredClient, organizationId,
+  biologicalContexts: [{ genetic_reference: { organism_id: organismId, strain_id: strainId } }],
+  windowStartDate: "2026-11-01", windowLastIncludedDate: "2026-11-03",
+});
+assert.equal(currentOnly.state, "not_documented");
+
+
 const conflictingAssertion = {
   ...assertion,
   id: "eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee",
