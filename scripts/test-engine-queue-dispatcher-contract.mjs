@@ -6,6 +6,11 @@ const source = readFileSync(
   "utf8",
 );
 
+const schedule = readFileSync(
+  new URL("../supabase/migrations/20261113170000_schedule_engine_queue_dispatch.sql", import.meta.url),
+  "utf8",
+);
+
 const checks = [
   ["dispatcher authenticates with a dedicated server secret", /BA_ENGINE_DISPATCH_TOKEN/],
   ["dispatcher rejects unauthenticated requests before database access", /authentication_required/],
@@ -33,5 +38,14 @@ const claimPosition = source.indexOf('rpc("claim_engine_executions"');
 const workerPosition = source.indexOf('fetch(new URL("/v1/execute"');
 assert.ok(claimPosition >= 0 && workerPosition > claimPosition,
   "worker dispatch must occur only after atomic queue claims");
+
+assert.match(schedule, /ba_labs_engine_dispatch_secret/,
+  "scheduled dispatch must read its dedicated secret from Vault");
+assert.match(schedule, /extname = 'pg_cron'[\s\S]*?extname = 'pg_net'/,
+  "scheduled dispatch must require both pg_cron and pg_net");
+assert.match(schedule, /ba-labs-engine-queue-dispatch'[\s\S]*?\* \* \* \* \*/,
+  "scheduled dispatch must be installed as an idempotent one-minute job");
+assert.match(schedule, /length\(decrypted_secret\) >= 32/,
+  "scheduled dispatch must not activate with a weak or missing Vault secret");
 
 console.log("Engine queue dispatcher contract passed.");
