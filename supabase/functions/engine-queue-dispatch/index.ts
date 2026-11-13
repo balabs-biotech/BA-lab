@@ -109,21 +109,14 @@ async function persistFailure(
   code: string,
   message: string,
 ): Promise<boolean> {
-  const now = new Date().toISOString();
-  const { data, error } = await db.from("engine_executions").update({
-    status: "failed",
-    error_code: code,
-    error_message: message.slice(0, 1_000),
-    completed_at: now,
-    updated_at: now,
-  })
-    .eq("organization_id", execution.organization_id)
-    .eq("id", execution.id)
-    .eq("claimed_by", workerId)
-    .eq("status", "running")
-    .select("id")
-    .maybeSingle();
-  return !error && !!data;
+  const { data, error } = await db.rpc("fail_claimed_engine_execution", {
+    p_organization_id: execution.organization_id,
+    p_execution_id: execution.id,
+    p_worker_id: workerId,
+    p_error_code: code,
+    p_error_message: message.slice(0, 1_000),
+  });
+  return !error && data === true;
 }
 async function processExecution(
   db: ReturnType<typeof createClient>,
