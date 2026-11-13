@@ -2361,15 +2361,15 @@
     grid-template-columns:repeat(2,minmax(0,1fr)) !important;
     padding:0 18px !important;
   }
-  
-  
-  
-  
+
+
+
+
 }
 @media(max-width:420px) {
   #app.balabs-ui > main > .under { grid-template-columns:1fr !important; }
-  
-  
+
+
 }
 
 /* PHASE 14 — browser-capture fixes: mobile language rail, single-line nav, hero breathing room. */
