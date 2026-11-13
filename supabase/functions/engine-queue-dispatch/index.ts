@@ -131,7 +131,11 @@ async function processExecution(
   workerToken: string,
 ): Promise<"completed" | "failed" | "lost"> {
   const request = execution.request_payload;
-  if (!object(request) || !validateRequest(request)) {
+  if (!object(request) || !validateRequest(request) ||
+    request.engine?.engine_id !== execution.engine_id ||
+    request.engine?.engine_version !== execution.engine_version ||
+    request.scope?.organization_id !== execution.organization_id ||
+    request.input?.snapshot_sha256 !== execution.input_snapshot_sha256) {
     return await persistFailure(
       db, execution, workerId, "stored_request_invalid",
       "The immutable queued request failed engine contract validation.",
