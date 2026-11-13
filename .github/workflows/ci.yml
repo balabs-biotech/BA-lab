@@ -301,6 +301,8 @@ jobs:
         run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/engine_execution_lease_recovery.test.sql
       - name: Test atomic engine queue claims and worker leases
         run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/engine_execution_queue_claims.test.sql
+      - name: Test worker lease heartbeat ownership and expiry contract
+        run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/engine_execution_lease_heartbeat.test.sql
 
   ecosystem-regression:
     runs-on: ubuntu-latest
