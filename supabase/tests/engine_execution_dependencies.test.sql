@@ -94,6 +94,19 @@ begin
    raise exception 'dependency edge mutation accepted';
  exception when sqlstate '55000' then null;
  end;
+ begin
+   delete from public.engine_execution_dependencies
+   where organization_id=org_id and downstream_execution_id=bie_id;
+   raise exception 'dependency edge deletion accepted';
+ exception when sqlstate '55000' then null;
+ end;
+ if not exists (
+   select 1 from public.engine_execution_dependencies
+   where organization_id=org_id and downstream_execution_id=bie_id
+     and upstream_execution_id=qc_id and upstream_result_id=qc_result_id
+ ) then
+   raise exception 'immutable dependency edge disappeared after rejected deletion';
+ end if;
  
  if has_function_privilege('authenticated','public.attach_environmental_qc_dependency(uuid,uuid,uuid)','EXECUTE')
    or not has_function_privilege('service_role','public.attach_environmental_qc_dependency(uuid,uuid,uuid)','EXECUTE') then
