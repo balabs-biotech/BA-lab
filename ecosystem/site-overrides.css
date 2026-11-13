@@ -1399,8 +1399,7 @@ html,body{background:var(--bal-petrol)!important;color:var(--bal-mineral)!import
  .universe-index-card>p{margin:9px 0 14px!important}
 }
 @media(prefers-reduced-motion:reduce){
- .editorial-work .work-card,.editorial-work .work-card .work-media img,.universe-index-card{transition:none!important}
- .editorial-work .work-card:hover,.universe-index-card:hover{transform:none!important}
+ .editorial-work .work-card .work-media img{transition:none!important}
 }
 
 /* Universe directory — strengthen the information hierarchy without changing destinations. */
