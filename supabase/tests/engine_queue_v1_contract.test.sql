@@ -7,6 +7,9 @@ declare
   v_other_org uuid := '20000000-0000-4000-8000-000000000002';
   v_job uuid;
   v_other_job uuid;
+  v_priority_a uuid;
+  v_priority_b uuid;
+  v_priority_c uuid;
   v_duplicate uuid;
   v_claim jsonb;
   v_claim2 jsonb;
@@ -115,6 +118,45 @@ begin
   end if;
 
 
+
+
+  -- Claim ordering is priority-descending, then FIFO within equal priority.
+  perform set_config('request.jwt.claims',
+    jsonb_build_object('role','authenticated','sub',v_user)::text, true);
+  v_priority_a := public.enqueue_engine_job(
+    v_org, 'demo.engine', '1.0.0', 'priority_test',
+    '{"order":"A"}'::jsonb, 'priority-a', 10, 1
+  );
+  v_priority_b := public.enqueue_engine_job(
+    v_org, 'demo.engine', '1.0.0', 'priority_test',
+    '{"order":"B"}'::jsonb, 'priority-b', 1, 1
+  );
+  v_priority_c := public.enqueue_engine_job(
+    v_org, 'demo.engine', '1.0.0', 'priority_test',
+    '{"order":"C"}'::jsonb, 'priority-c', 10, 1
+  );
+  perform set_config('request.jwt.claims',
+    jsonb_build_object('role','service_role','sub',v_user)::text, true);
+  v_claim := public.claim_engine_job('worker-priority-a', 60);
+  if (v_claim->>'job_id')::uuid <> v_priority_a then
+    raise exception 'Highest priority FIFO-first job was not claimed first';
+  end if;
+  v_token := (v_claim->>'lease_token')::uuid;
+  perform public.complete_engine_job(v_priority_a, v_token, 'worker-priority-a', '{"ok":true}'::jsonb, 'A');
+
+  v_claim := public.claim_engine_job('worker-priority-c', 60);
+  if (v_claim->>'job_id')::uuid <> v_priority_c then
+    raise exception 'Second high-priority FIFO job was not claimed before lower priority';
+  end if;
+  v_token := (v_claim->>'lease_token')::uuid;
+  perform public.complete_engine_job(v_priority_c, v_token, 'worker-priority-c', '{"ok":true}'::jsonb, 'C');
+
+  v_claim := public.claim_engine_job('worker-priority-b', 60);
+  if (v_claim->>'job_id')::uuid <> v_priority_b then
+    raise exception 'Lower-priority job was not claimed after high-priority jobs';
+  end if;
+  v_token := (v_claim->>'lease_token')::uuid;
+  perform public.complete_engine_job(v_priority_b, v_token, 'worker-priority-b', '{"ok":true}'::jsonb, 'B');
 
   -- Transient failures retry with backoff; max-attempt exhaustion is terminal.
   perform set_config('request.jwt.claims',
