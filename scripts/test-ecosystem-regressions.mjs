@@ -31,7 +31,7 @@ for (const sectionId of ['chantiers', 'universe', 'universes']) {
 }
 assert.ok(pageCss.includes('#app.balabs-ui[dir="rtl"] .site-nav a:after'), 'RTL navigation underline must mirror its animation direction');
 assert.ok(pageCss.includes('#app.balabs-ui[dir="rtl"] .editorial-link span'), 'RTL editorial arrows must mirror their visual direction');
-assert.ok(pageCss.includes('#app.balabs-ui[dir="rtl"] .site-nav{', 'RTL mobile navigation must retain right-to-left reading order');
+assert.ok(pageCss.includes('#app.balabs-ui[dir="rtl"] .site-nav{'), 'RTL mobile navigation must retain right-to-left reading order');
 
 const homepageSequence = [
   '<section class="hero"',
