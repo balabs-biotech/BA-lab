@@ -8342,6 +8342,10 @@ function setupDomainWorkspaces() {
     const activeDomain = Object.hasOwn(modes, domain) ? domain : "agronomy";
     const config = modes[activeDomain];
     document.body.dataset.domain = activeDomain;
+    document.querySelector(".bio-assessment-panel")?.classList.toggle(
+      "hidden",
+      activeDomain !== "mycology" && activeDomain !== "laboratory"
+    );
     buttons.forEach(button => button.setAttribute("aria-pressed", String(button.dataset.domainChoice === activeDomain)));
     if (heading) heading.textContent = config.heading;
     if (description) description.textContent = config.description;
