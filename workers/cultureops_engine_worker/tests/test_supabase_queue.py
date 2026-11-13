@@ -122,6 +122,11 @@ class SupabaseQueueAdapterTests(unittest.TestCase):
             self.client.claim_one("worker-a")
         self.assertNotIn("test-secret", str(caught.exception))
 
+    @patch.dict(os.environ, {"SUPABASE_URL": "https://project.example", "SUPABASE_SERVICE_ROLE_KEY": "test-secret"})
+    def test_from_env_passes_configured_lease_duration(self):
+        client = SupabaseRestQueueClient.from_env(lease_seconds=12)
+        self.assertEqual(client._lease_seconds, 12)
+
     def test_configuration_is_validated(self):
         with self.assertRaises(ValueError):
             SupabaseRestQueueClient("ftp://example", "secret")
