@@ -73,6 +73,25 @@ for (const contract of ["biological.context_assessment", "record_counts_by_type"
 }
 assert.doesNotMatch(biologicalRenderer, /innerHTML|insertAdjacentHTML/);
 assert.match(renderer, /renderBiologicalContextAssessment\(article, result\)/);
+assert.match(biologicalRenderer, /environmental_quality_control/, "BIE UI must render attached environmental QC evidence");
+for (const field of ["upstream_execution_id", "upstream_result_id", "artifact_sha256", "outcome", "quality_flags", "limitations", "provenance", "value", "review_required"]) {
+  assert.ok(biologicalRenderer.includes(field), "Missing environmental QC UI field: " + field);
+}
+for (const label of [
+  "Contrôle qualité environnemental amont",
+  "État du contrôle qualité : ",
+  "Exécution QC liée : ",
+  "Résultat QC lié : ",
+  "Résultat QC : ",
+  "Empreinte de l’artefact QC : ",
+  "Signaux QC à examiner",
+  "Limites du contrôle QC",
+  "Algorithme QC : ",
+  "Sources du contrôle QC",
+  "Séries examinées par le contrôle QC : ",
+  "Révision environnementale requise : les signaux QC sont des éléments à examiner, pas des exclusions automatiques."
+]) assert.ok(i18n.includes(JSON.stringify(label)), "Missing environmental QC UI localization source key: " + label);
+
 
 assert.match(renderer, /replaceChildren\(\)/);
 assert.match(renderer, /textContent/);
