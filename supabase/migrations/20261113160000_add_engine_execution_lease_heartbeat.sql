@@ -1,3 +1,59 @@
+-- Permit heartbeat-only updates while preserving all other running-row immutability.
+create or replace function private.guard_engine_execution_update()
+returns trigger
+language plpgsql
+set search_path = pg_catalog
+as $$
+begin
+  if new.organization_id is distinct from old.organization_id
+    or new.id is distinct from old.id
+    or new.request_id is distinct from old.request_id
+    or new.idempotency_key is distinct from old.idempotency_key
+    or new.engine_id is distinct from old.engine_id
+    or new.engine_version is distinct from old.engine_version
+    or new.scope is distinct from old.scope
+    or new.input_record_ids is distinct from old.input_record_ids
+    or new.input_snapshot_sha256 is distinct from old.input_snapshot_sha256
+    or new.request_payload is distinct from old.request_payload
+    or new.requested_by is distinct from old.requested_by
+    or new.created_at is distinct from old.created_at then
+    raise exception 'engine execution identity and input snapshot are immutable'
+      using errcode = '55000';
+  end if;
+
+  if old.status in ('completed', 'failed') then
+    raise exception 'terminal engine executions are immutable'
+      using errcode = '55000';
+  end if;
+
+  if old.status = 'queued' and new.status not in ('running', 'failed') then
+    raise exception 'invalid engine execution transition from queued'
+      using errcode = '55000';
+  end if;
+  if old.status = 'running' and new.status = 'running' then
+    if (to_jsonb(new) - 'lease_expires_at' - 'updated_at')
+      is distinct from (to_jsonb(old) - 'lease_expires_at' - 'updated_at') then
+      raise exception 'running execution heartbeat may only update its lease and timestamp'
+        using errcode = '55000';
+    end if;
+  elsif old.status = 'running' and new.status not in ('completed', 'failed') then
+    raise exception 'invalid engine execution transition from running'
+      using errcode = '55000';
+  end if;
+  if old.status = 'running' and new.started_at is distinct from old.started_at then
+    raise exception 'engine execution start timestamp is immutable once running'
+      using errcode = '55000';
+  end if;
+  if new.updated_at < old.updated_at then
+    raise exception 'engine execution updated_at cannot move backwards'
+      using errcode = '55000';
+  end if;
+  return new;
+end;
+$$;
+
+revoke all on function private.guard_engine_execution_update() from public, anon, authenticated;
+
 -- Allow the current queue worker to extend its own active lease without reviving expired work.
 create or replace function public.renew_engine_execution_lease(
   p_organization_id uuid,
