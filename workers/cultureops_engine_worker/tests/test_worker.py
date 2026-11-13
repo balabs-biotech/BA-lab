@@ -4,7 +4,7 @@ import unittest
 from urllib.error import HTTPError, URLError
 
 from bal_engine_worker.registry import EngineRegistry, EngineResult
-from bal_engine_worker.worker import ClaimedJob, EngineWorker
+from bal_engine_worker.worker import ClaimedJob, EngineWorker, LeaseLostError
 
 
 class DemoEngine:
@@ -149,6 +149,16 @@ class WorkerTests(unittest.TestCase):
         self.assertEqual(outcome.status, "failed")
         self.assertEqual(queue.failures[0][1]["retryable"], True)
         self.assertEqual(queue.failures[0][1]["error_code"], "engine_execution_error")
+
+    def test_fencing_rejection_returns_lease_lost_outcome(self):
+        class StaleQueue(FakeQueue):
+            def complete(self, job, result):
+                raise LeaseLostError("stale lease")
+        registry = EngineRegistry()
+        registry.register(DemoEngine())
+        outcome = EngineWorker(StaleQueue(make_job()), registry, "worker-a").run_once()
+        self.assertEqual(outcome.status, "lease_lost")
+        self.assertEqual(outcome.error_code, "lease_lost")
 
     def test_completion_rejection_is_not_hidden(self):
         class RejectingQueue(FakeQueue):
