@@ -1445,9 +1445,6 @@ html,body{background:var(--bal-petrol)!important;color:var(--bal-mineral)!import
  #app > main > .universe-index .universe-index-card>span{margin-bottom:13px!important}
  #app > main > .universe-index .universe-index-card>p{max-width:58ch!important}
 }
-@media(prefers-reduced-motion:reduce){
- #app > main > .universe-index .universe-index-card>em:after{transition:none!important}
-}
 
 /* BA Labs brand integration — editorial homepage only. Spatial engine stays isolated. */
 :root{
