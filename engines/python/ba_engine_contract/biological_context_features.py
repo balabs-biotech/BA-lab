@@ -150,6 +150,16 @@ def _evaluate_interpretation_rules(
             if not any(
                 assertion.get("assertion_type") == identity_match["assertion_type"]
                 and assertion.get("assertion_value") == identity_match["assertion_value"]
+                and any(
+                    (
+                        assertion.get("subject_type") == "strain"
+                        and assertion.get("strain_id") == (context.get("genetic_reference") or {}).get("strain_id")
+                    ) or (
+                        assertion.get("subject_type") == "organism"
+                        and assertion.get("organism_id") == (context.get("genetic_reference") or {}).get("organism_id")
+                    )
+                    for context in biological_contexts
+                )
                 for assertion in identity_assertions
             ):
                 continue
