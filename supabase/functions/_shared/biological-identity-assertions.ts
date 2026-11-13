@@ -99,12 +99,15 @@ export async function loadAuthenticatedBiologicalIdentityAssertions(input: {
     duplicateKeys.add(key);
   }
   const state = accepted.length ? "documented" : "not_documented";
-  const datasets = accepted.map((assertion) => ({
-    provider: "BA_LABS_BIOLOGICAL_IDENTITY",
-    dataset_id: assertion.assertion_code,
-    dataset_version: assertion.assertion_version,
-    content_sha256: await sha256(stable(assertion)),
-    retrieved_at: assertion.reviewed_at,
-  }));
+  const datasets: Row[] = [];
+  for (const assertion of accepted) {
+    datasets.push({
+      provider: "BA_LABS_BIOLOGICAL_IDENTITY",
+      dataset_id: assertion.assertion_code,
+      dataset_version: assertion.assertion_version,
+      content_sha256: await sha256(stable(assertion)),
+      retrieved_at: assertion.reviewed_at,
+    });
+  }
   return { state, assertions: accepted, datasets };
 }
