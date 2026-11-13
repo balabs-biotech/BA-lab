@@ -196,6 +196,56 @@ $function$;
 revoke all on function private.is_org_admin(uuid) from public, anon;
 grant execute on function private.is_org_admin(uuid) to authenticated;
 
+-- Activation is a scientific governance action, not an ordinary draft edit.
+create or replace function private.guard_interpretation_profile_activation()
+returns trigger
+language plpgsql
+security definer
+set search_path = pg_catalog, public
+as $function$
+begin
+  if new.status in ('active', 'retired') and not private.is_org_admin(new.organization_id) then
+    raise exception 'activating or retiring an interpretation profile requires an organization administrator'
+      using errcode = '42501';
+  end if;
+  return new;
+end;
+$function$;
+
+revoke all on function private.guard_interpretation_profile_activation() from public, anon, authenticated;
+drop trigger if exists domain_interpretation_profiles_admin_activation on public.domain_interpretation_profiles;
+create trigger domain_interpretation_profiles_admin_activation
+  before insert or update of status, organization_id
+  on public.domain_interpretation_profiles
+  for each row execute function private.guard_interpretation_profile_activation();
+
+-- The database stamps the identity and time of the actual reviewer.
+create or replace function private.stamp_biological_reference_review()
+returns trigger
+language plpgsql
+security definer
+set search_path = pg_catalog, public
+as $function$
+begin
+  if new.status = 'validated' and (tg_op = 'INSERT' or old.status = 'draft') then
+    if not private.is_org_admin(new.organization_id) then
+      raise exception 'validating a biological reference requires an organization administrator'
+        using errcode = '42501';
+    end if;
+    new.reviewed_by := auth.uid();
+    new.reviewed_at := now();
+  end if;
+  return new;
+end;
+$function$;
+
+revoke all on function private.stamp_biological_reference_review() from public, anon, authenticated;
+drop trigger if exists biological_reference_registry_review_stamp on public.biological_reference_registry;
+create trigger biological_reference_registry_review_stamp
+  before insert or update of status, organization_id
+  on public.biological_reference_registry
+  for each row execute function private.stamp_biological_reference_review();
+
 create or replace function private.guard_validated_biological_reference_immutability()
 returns trigger
 language plpgsql
