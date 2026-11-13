@@ -111,6 +111,11 @@ assert.match(tracker, /recentEngineExecutions = \[\]/);
 assert.match(tracker, /recentEngineResultsByExecution = new Map\(\)/);
 assert.match(tracker, /engineExecutionHistoryRequestId\+\+/);
 assert.match(tracker, /loadRecentEngineExecutions\(\)/);
+assert.match(tracker, /async function monitorPlantBiologicalAssessmentExecution/);
+assert.match(tracker, /setTimeout\(resolve, 3000\)/);
+assert.match(tracker, /execution\?\.status === "completed"/);
+assert.match(tracker, /execution\?\.status === "failed"/);
+assert.match(tracker, /["queued", "running"]\.includes\(data\?\.status\)/);
 
 for (const path of [
   "batch-tracker/mycology/index.html",
@@ -119,12 +124,12 @@ for (const path of [
 ]) {
   const page = readFileSync(path, "utf8");
   if (path.includes("green-tech")) {
-    assert.match(page, /workspace\.html\?v=20261113-bie-identity-ui-1/);
-    assert.match(page, /tracker\.js\?v=20261113-bie-identity-ui-1/);
+    assert.match(page, /workspace\.html\?v=20261113-bie-async-dispatch-1/);
+    assert.match(page, /tracker\.js\?v=20261113-bie-async-dispatch-1/);
     assert.match(page, /environmental-data\.js\?v=20261112-greentech-engine-qc-1/);
   } else {
-    assert.match(page, /workspace\.html\?v=20261113-bie-identity-ui-1/);
-    assert.match(page, /tracker\.js\?v=20261113-bie-identity-ui-1/);
+    assert.match(page, /workspace\.html\?v=20261113-bie-async-dispatch-1/);
+    assert.match(page, /tracker\.js\?v=20261113-bie-async-dispatch-1/);
   }
 }
 
