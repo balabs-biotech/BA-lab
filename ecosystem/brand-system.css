@@ -18,15 +18,9 @@
   --balabs-muted: #9BAEA4;
   --balabs-line: #40534D;
 
-  
-  
-  
-
   --balabs-radius-sm: 0.5rem;
   --balabs-radius-md: 0.75rem;
-  
 
-  
   --balabs-reading-width: 66ch;
   --balabs-focus-ring: 0 0 0 3px var(--balabs-graphite), 0 0 0 5px var(--balabs-copper);
 }
@@ -477,7 +471,6 @@
   line-height: 1.5 !important;
 }
 
-
 /* PHASE 4 — visible homepage art direction.
    High-impact editorial composition only; deliberately excludes the 3D engine. */
 #app.balabs-ui > .top {
@@ -821,7 +814,6 @@
   }
 }
 
-
 /* PHASE 5 — editorial system across the full homepage.
    Content sections only; the interactive mycelium engine remains untouched. */
 #app.balabs-ui > main > .editorial-work {
@@ -1060,7 +1052,6 @@
   #app.balabs-ui > main > .universe-bridge .bridge-network { min-height: 160px !important; }
 }
 
-
 /* PHASE 6 — internal universe navigation.
    Editorial treatment for existing breadcrumbs and branch links only.
    No scene, topology, camera, node or navigation logic is modified. */
@@ -1209,7 +1200,6 @@
   }
 }
 
-
 /* PHASE 7 — selected branch dossier.
    Restyles the existing information panel; content and click behavior stay in engine-v2.js. */
 #mainView.webgl-ready .webgl-focus {
@@ -1312,7 +1302,6 @@
     transition: none !important;
   }
 }
-
 
 /* PHASE 8 — editorial research atlas.
    A deliberate break from the generic card-grid language: long-form research
@@ -1635,7 +1624,6 @@
   #app.balabs-ui > main > .editorial-work .work-media img { transition: none !important; }
 }
 
-
 /* PHASE 8 — field dossier composition: break the template-like hero and card rhythm. */
 #app.balabs-ui > main > .hero {
   position: relative !important;
@@ -1778,7 +1766,6 @@
  #app.balabs-ui > main > .hero .hero-action-secondary { transition:none !important; }
 }
 
-
 /* PHASE 9 — eight-universe specimen directory, not a card catalogue. */
 #app.balabs-ui > main > .universe-index {
   padding: clamp(72px,9vw,132px) clamp(18px,5vw,72px) !important;
@@ -1879,7 +1866,6 @@
  #app.balabs-ui > main > .universe-index .universe-index-card > span { font-size: 24px !important; }
  #app.balabs-ui > main > .universe-index .universe-index-card b { font-size: 29px !important; }
 }
-
 
 /* PHASE 10 — field-report project index.
    Three research tracks become one continuous editorial sequence, not product cards. */
@@ -2050,7 +2036,6 @@
 @media(prefers-reduced-motion:reduce) {
   #app.balabs-ui > main > .editorial-work .work-media img { transition:none !important; }
 }
-
 
 /* PHASE 11 — institutional identity and research protocol, rebuilt as one field dossier. */
 #app.balabs-ui > main > .editorial-about {
@@ -2252,7 +2237,6 @@
  #app.balabs-ui > main > .editorial-about *, #app.balabs-ui > main > .editorial-method *, #app.balabs-ui > main > .universe-bridge * { scroll-behavior:auto !important; transition:none !important; }
 }
 
-
 /* PHASE 12 — navigation and closing imprint.
    A precise editorial finish for the public ecosystem page. */
 #app.balabs-ui > .site-nav {
@@ -2351,7 +2335,6 @@
   #app.balabs-ui > .site-nav a::after { transition:none !important; }
 }
 
-
 /* PHASE 13 — research principles as an editorial colophon, not generic tiles. */
 #app.balabs-ui > main > .under {
   display:grid !important;
@@ -2435,7 +2418,6 @@
 @media(prefers-reduced-motion:reduce) {
   #app.balabs-ui > main > .under .tile { transition:none !important; }
 }
-
 
 /* PHASE 14 — browser-capture fixes: mobile language rail, single-line nav, hero breathing room. */
 #app.balabs-ui > main > .hero {
