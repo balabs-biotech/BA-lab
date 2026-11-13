@@ -158,14 +158,16 @@ export async function loadAuthenticatedBiologicalInterpretationProfile(input: {
   organizationId: string;
   domain: string | null;
   domainAmbiguous: boolean;
+  contextStable: boolean;
   windowStartDate: string;
   windowLastIncludedDate: string;
 }) {
-  const { userClient, organizationId, domain, domainAmbiguous, windowStartDate, windowLastIncludedDate } = input;
+  const { userClient, organizationId, domain, domainAmbiguous, contextStable, windowStartDate, windowLastIncludedDate } = input;
   if (!userClient || typeof userClient.from !== "function") {
     throw new Error("caller_scoped_supabase_client_required");
   }
-  if (domainAmbiguous) throw new Error("biological_interpretation_domain_ambiguous");
+  if (domainAmbiguous) return { state: "domain_ambiguous", profile: null, rules: [], datasets: [] };
+  if (!contextStable) return { state: "context_not_stable", profile: null, rules: [], datasets: [] };
   if (!domain) return { state: "not_configured", profile: null, rules: [], datasets: [] };
   if (!ALLOWED_DOMAINS.has(domain)) throw new Error("interpretation_profile_domain_invalid");
 
