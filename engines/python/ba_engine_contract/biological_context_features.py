@@ -536,6 +536,7 @@ def analyze_biological_context_features(request: Mapping[str, Any]) -> dict[str,
             "outcome": qc_result["outcome"],
             "quality_flags": qc_flags,
             "limitations": qc_result["limitations"],
+            "provenance": qc_result["provenance"],
             "value": qc_result["value"],
         }
         quality_flags.append("environmental_qc_artifact_attached")
