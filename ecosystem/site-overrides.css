@@ -12,9 +12,6 @@
  .lang{flex:0 1 auto}
 }
 
-
-
-
 /* BALabs visual refinement — editorial mineral / botanical system */
 :root{
  color-scheme:light;
@@ -86,9 +83,6 @@ h1 span{color:#748b5e}
  .webgl-intro-orb{animation:none!important}
 }
 
-
-
-
 /* Readability pass: solid high-contrast text surfaces for the 3D navigation. */
 #mainView.webgl-ready .webgl-focus{
   width:min(320px,52%)!important;padding:16px 17px!important;gap:8px!important;
@@ -127,8 +121,6 @@ h1 span{color:#748b5e}
  #mainView .webgl-focus-reason{font-size:10px!important}
 }
 
-
-
 /* Improve all explanatory copy directly below the 3D navigation. */
 #miniView{color:#f4f7f1;background:linear-gradient(180deg,rgba(25,39,31,.96),rgba(18,29,25,.98));border-top:1px solid #789574;border-radius:0 0 18px 18px}
 #miniView .miniintro h2{color:#fff!important;font-weight:750;line-height:1.18}
@@ -162,8 +154,6 @@ h1 span{color:#748b5e}
  #miniView .tile p{font-size:12px!important}
 }
 
-
-
 /* Lisibilité et hiérarchie de la légende autour de la scène 3D */
 .scenehead{background:linear-gradient(105deg,rgba(29,40,39,.98),rgba(24,34,37,.96));border-bottom-color:#53665d;padding:16px 19px}
 .scenehead small{color:#c0d1c5;font-size:10px;letter-spacing:.16em}
@@ -176,8 +166,6 @@ h1 span{color:#748b5e}
 .cluster-applications{border-left-color:#53665d}
 #mainView .webgl-stage .webgl-hint{font-size:11px;color:#f0f6ef;border-color:#a7bda477;background:linear-gradient(110deg,rgba(35,53,46,.96),rgba(48,59,57,.96));box-shadow:0 10px 28px rgba(0,0,0,.28)}
 @media(max-width:760px){.scenehead{padding:13px 14px}.scenehead small{font-size:9px}.scenehead strong{font-size:12px}.cluster-key{padding:13px 15px;gap:11px}.cluster-item b{font-size:10px}.cluster-item small{font-size:11px}.cluster-applications{border-top-color:#53665d}}
-
-
 
 /* Surface pass: sortir de l'effet uniformément sombre sans affaiblir le contraste */
 :root{--bg:#202b29;--panel:#2b3936;--line:#60746a;--muted:#c5d0c9}
@@ -259,7 +247,6 @@ h1 span{color:#b66d43;text-shadow:none}
  .tile:nth-child(3){border-bottom:0}
 }
 
-
 /* 2026-10-30 — Mineral daylight pass: brighten the 3D atlas without flattening its depth. */
 .scene{background:radial-gradient(ellipse at 50% 42%,#d2ded7 0%,#aebfb9 56%,#879d9b 100%);border-color:#829991;box-shadow:0 22px 58px rgba(37,58,55,.16),inset 0 0 80px rgba(255,255,255,.20)}
 #mainView.webgl-ready{background:radial-gradient(ellipse at 50% 42%,#d9e4dc 0%,#bdcec7 48%,#91aaa5 100%);border-color:#829991}
@@ -300,8 +287,6 @@ h1 span{color:#b66d43;text-shadow:none}
 @media(prefers-reduced-motion:reduce){
  #mainView .webgl-stage .webgl-controls button{transition:none!important}
 }
-
-
 
 /* BA LABS — radical mycology / field-notes interface.
    Deliberately scoped to the editorial chrome and 2D information panels.
@@ -526,9 +511,7 @@ h1 span{
 }
 @media(prefers-reduced-motion:reduce){#app > .foot .foot-nav a{transition:none!important}}
 
-
 #miniView.spatial-source-only{display:none!important}
-
 
 /* The eight numbered panels are a page directory, not part of the 3D scene. */
 #app > main > .universe-index .universe-index-grid{
@@ -632,8 +615,6 @@ h1 span{
   text-align:start!important;
 }
 
-
-
 /* The linked brand-system stylesheet defines a later, two-column editorial grid.
    This higher-specificity rule owns only the eight homepage directory panels. */
 #app.balabs-ui > main > #universes .universe-index-grid{
@@ -735,8 +716,6 @@ h1 span{
   #app.balabs-ui > main > #universes .universe-index-card{min-height:0!important;padding:19px!important}
 }
 
-
-
 #app > main > .editorial-method .method-steps{align-items:stretch!important}
 #app > main > .editorial-method .method-steps li{display:block!important;min-height:0!important;padding:0!important;border-right:1px solid rgba(17,27,29,.22)!important}
 #app > main > .editorial-method .method-steps li:last-child{border-right:0!important}
@@ -770,8 +749,6 @@ h1 span{
  #app > main > .editorial-method .method-steps li,#app > main > .editorial-method .method-steps li:nth-child(2n){border-right:0!important}
  #app > main > .editorial-method .method-trigger,#app > main > .editorial-method .method-steps li+li .method-trigger,#app > main > .editorial-method .method-steps li:nth-child(2n) .method-trigger{min-height:0!important;padding:18px 0!important}
 }
-
-
 
 /* Eight-universe field atlas: replace generic cards with a scientific register. */
 #app > main > .universe-index{
@@ -877,8 +854,6 @@ h1 span{
  #app > main > .universe-index .universe-index-card:before,
  #app > main > .universe-index .universe-index-card>em:after{transition:none!important}
 }
-
-
 
 /* Mobile: keep the biological photograph as a side atmosphere, clear of the reading axis. */
 @media(max-width:760px){
@@ -999,7 +974,6 @@ h1 span{font-style:italic!important}
  .mini{background:var(--bal-forest)!important}
 }
 
-
 /* Editorial system pass — approved mineral palette. 3D explorer untouched. */
 :root{--bal-petrol:#111B1D;--bal-forest:#263B38;--bal-copper:#B96B4D;--bal-mineral:#D1D0C5}
 html,body{background:var(--bal-petrol)!important;color:var(--bal-mineral)!important}
@@ -1045,7 +1019,6 @@ html,body{background:var(--bal-petrol)!important;color:var(--bal-mineral)!import
  .under{background:#111b1d!important}
 }
 
-
 /* Case-study bridge: substantive work themes between the about section and the 3D explorer. */
 .editorial-work{padding:clamp(58px,8vw,104px) clamp(22px,6vw,82px) clamp(50px,7vw,82px);background:#e9e8df;color:#111B1D}
 .work-heading{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(250px,.65fr);align-items:end;gap:44px;max-width:1320px;margin:0 auto 42px}
@@ -1057,7 +1030,6 @@ html,body{background:var(--bal-petrol)!important;color:var(--bal-mineral)!import
 .work-card{position:relative;display:flex;flex-direction:column;min-height:390px;padding:26px clamp(18px,2.5vw,34px) 28px;background:#e9e8df;overflow:hidden;isolation:isolate;transition:background .35s ease,transform .35s ease}.work-card:before{content:"";position:absolute;z-index:-1;inset:0;opacity:.42;pointer-events:none}.work-card:after{content:"";position:absolute;z-index:-1;right:-58px;top:104px;width:210px;height:210px;border:1px solid currentColor;border-radius:50%;opacity:.12;pointer-events:none}.work-card:hover{transform:translateY(-4px)}
 .work-index{font:600 9px/1.4 ui-monospace,monospace;letter-spacing:.16em;color:#7b8980}.work-myco{border-top:3px solid #B96B4D}.work-soil{background:#d9ded3;border-top:3px solid #788b72}.work-iot{background:#263B38;border-top:3px solid #9baea4;color:#e9e8df}.work-iot .work-index{color:#b9c6bb}.work-iot h3{color:#f0eee5}.work-iot p{color:#d1d8cf}.work-iot .work-tag{border-color:#60746b;color:#d6a087}.work-iot .work-card-link{color:#f0eee5;border-color:#60746b}.work-myco:before{background-image:radial-gradient(circle at 18% 25%,#B96B4D18 0 1px,transparent 1.5px),radial-gradient(circle at 70% 55%,#263B3810 0 1px,transparent 1.5px);background-size:18px 18px,26px 26px}.work-soil:before{background:repeating-linear-gradient(165deg,transparent 0 17px,#788b7214 18px 19px,transparent 20px 34px)}.work-iot:before{background-image:linear-gradient(#d1d0c50b 1px,transparent 1px),linear-gradient(90deg,#d1d0c50b 1px,transparent 1px);background-size:22px 22px}
 
-
 .work-card h3{font:500 clamp(21px,2vw,27px)/1.1 Georgia,'Times New Roman',serif;letter-spacing:-.02em;margin:0 0 12px;color:#111B1D}.work-soil h3{color:#263b38}
 .work-card p{font:400 13px/1.7 ui-sans-serif,system-ui,sans-serif;color:#56635d;margin:0 0 24px;max-width:390px}.work-soil p{color:#4e5c50}
 .work-tag{margin-top:auto;padding-top:16px;border-top:1px solid #c1c8c0;font:600 8px/1.4 ui-monospace,monospace;letter-spacing:.15em;color:#99563f}.work-soil .work-tag{color:#52694e;border-color:#aeb9a9}
@@ -1066,7 +1038,6 @@ html,body{background:var(--bal-petrol)!important;color:var(--bal-mineral)!import
 .work-explore:hover span{transform:translate(4px,-3px)}
 @media(max-width:760px){.editorial-work{padding:48px 20px}.work-heading{grid-template-columns:1fr;gap:16px;margin-bottom:26px}.work-heading>p{font-size:14px}.work-grid{grid-template-columns:1fr}.work-card{min-height:0;padding:22px 22px 24px}.work-card p{max-width:none}.work-explore{font-size:9px}}
 @media(prefers-reduced-motion:reduce){.work-explore span{transition:none}}
-
 
 .universe-bridge{position:relative;display:grid;grid-template-columns:minmax(0,.85fr) minmax(320px,1.15fr);align-items:center;gap:clamp(24px,6vw,80px);padding:clamp(48px,7vw,86px) clamp(22px,6vw,82px);overflow:hidden;background:linear-gradient(115deg,#1c302d 0%,#172725 55%,#111b1d 100%);color:#d1d0c5;border-top:1px solid #71837a55;border-bottom:1px solid #71837a55}.bridge-copy{position:relative;z-index:1;max-width:590px}.bridge-kicker{display:block;margin-bottom:18px;color:#d6a087;font:600 9px/1.5 ui-monospace,monospace;letter-spacing:.2em}.bridge-copy h2{margin:0 0 18px;color:#f0eee5;font:500 clamp(34px,4.5vw,58px)/1.02 Georgia,'Times New Roman',serif;letter-spacing:-.04em}.bridge-copy h2 em{color:#c4d0c5;font-weight:400}.bridge-copy p{max-width:470px;margin:0 0 26px;color:#c1cbc2;font:400 14px/1.8 ui-sans-serif,system-ui,sans-serif}.bridge-action{display:inline-flex;align-items:center;gap:24px;min-height:46px;padding:0 17px;border:1px solid #9baea477;color:#f0eee5;text-decoration:none;font:600 9px/1.4 ui-monospace,monospace;letter-spacing:.14em;text-transform:uppercase;transition:background .25s,border-color .25s}.bridge-action:hover{background:#B96B4D;border-color:#B96B4D}.bridge-action span{color:#d6a087;font-size:17px}.bridge-network{width:100%;max-height:250px;overflow:visible;color:#9baea4;opacity:.82;filter:drop-shadow(0 0 8px #9baea422)}.bridge-network circle{animation:bridge-pulse 4s ease-in-out infinite alternate}.bridge-network circle:nth-of-type(even){animation-delay:1.7s}@keyframes bridge-pulse{from{opacity:.45}to{opacity:1}}@media(max-width:760px){.universe-bridge{grid-template-columns:1fr;gap:18px;padding:46px 20px 38px}.bridge-network{max-height:145px;width:100%}.bridge-copy p{font-size:13px}.bridge-action{width:100%;justify-content:space-between}}@media(prefers-reduced-motion:reduce){.bridge-network circle{animation:none}.bridge-action{transition:none}}
 
@@ -1084,7 +1055,6 @@ html,body{background:var(--bal-petrol)!important;color:var(--bal-mineral)!import
 .method-steps p{font:400 12px/1.7 ui-sans-serif,system-ui,sans-serif;color:#c1cbc2;margin:0;max-width:250px}
 @media(max-width:760px){.editorial-method{padding:46px 20px}.method-top{grid-template-columns:1fr;gap:14px;margin-bottom:26px}.method-top .eyebrow{grid-column:auto}.method-top>p{font-size:13px}.method-steps{grid-template-columns:1fr 1fr}.method-steps li{min-height:0;padding:17px 12px 20px 0;gap:16px}.method-steps li+li{padding-left:14px}.method-steps li:nth-child(3){border-left:0;padding-left:0;border-top:1px solid #52665d}.method-steps li:nth-child(4){border-top:1px solid #52665d}.method-steps b{font-size:20px}.method-steps p{font-size:11px}}
 @media(max-width:380px){.method-steps{grid-template-columns:1fr}.method-steps li,.method-steps li+li{padding:16px 0;border-left:0;border-top:1px solid #52665d;min-height:0}.method-steps li:first-child{border-top:0}}
-
 
 .work-topics{margin:13px 0 0!important;padding-top:11px;border-top:1px solid #aeb9b1;color:#596761;font:600 9px/1.7 ui-monospace,monospace!important;letter-spacing:.035em}.work-myco .work-topics{border-color:#c7b7a4}.work-soil .work-topics{border-color:#9cac9c}.work-iot .work-topics{border-color:#52665d;color:#d1d8cf}[dir="rtl"] .work-topics{text-align:right}@media(max-width:760px){.work-topics{font-size:8px!important;line-height:1.65!important}}
 .work-card-link{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:16px;padding:12px 0 0;border-top:1px solid #c1c8c0;color:#263B38;text-decoration:none;font:600 9px/1.5 ui-monospace,monospace;letter-spacing:.1em;text-transform:uppercase}.work-card-link span{font-size:16px;color:#B96B4D;transition:transform .2s ease}.work-card-link:hover span{transform:translate(3px,-3px)}[dir="rtl"] .work-card-link{flex-direction:row-reverse}@media(prefers-reduced-motion:reduce){.work-card-link span{transition:none}}
@@ -1264,7 +1234,6 @@ html,body{background:var(--bal-petrol)!important;color:var(--bal-mineral)!import
   .editorial-method .method-steps li:first-child{border-top:0!important}
 }
 
-
 /* Editorial refinement 05 — header, navigation and section rhythm.
    Scoped to the editorial shell; the interactive 3D scene remains untouched. */
 #app > .top{position:relative!important;z-index:40!important;min-height:76px!important;padding:14px clamp(16px,3vw,34px)!important;margin-inline:calc(-1 * clamp(12px,3vw,38px))!important;border-bottom:1px solid #c4c9bf!important;background:#e9e8df!important;color:#111b1d!important}
@@ -1303,7 +1272,6 @@ html,body{background:var(--bal-petrol)!important;color:var(--bal-mineral)!import
 @media(max-width:390px){#app > .top{align-items:flex-start!important;flex-direction:column!important;padding:10px 14px!important}#app > .top .tools{width:100%!important;justify-content:flex-start!important}}
 @media(prefers-reduced-motion:reduce){#app > .top .lang{transition:none!important}#app > .site-nav{backdrop-filter:none!important}}
 
-
 /* BA Labs — explicit eight-universe index; project cards above are examples, not taxonomy. */
 .universe-index{padding:clamp(52px,7vw,92px) clamp(22px,5vw,72px);background:#e3e5dc;color:#111b1d;border-top:1px solid #c3c9bf}
 .universe-index-heading{display:grid;grid-template-columns:minmax(0,1fr) minmax(250px,.62fr);gap:34px;align-items:end;margin:0 auto 30px;max-width:1440px}
@@ -1323,8 +1291,6 @@ html,body{background:var(--bal-petrol)!important;color:var(--bal-mineral)!import
 .editorial-work .work-iot .work-media img{display:block!important;opacity:1!important;visibility:visible!important;min-height:190px!important;object-position:center 54%!important}
 @media(max-width:900px){.universe-index-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.universe-index-heading{grid-template-columns:1fr;gap:14px}}
 @media(max-width:520px){.universe-index{padding:48px 18px}.universe-index-grid{gap:9px}.universe-index-card{padding:15px;min-height:215px}.universe-index-card>b{font-size:16px}.universe-index-card>p{font-size:11px}}
-
-
 
 /* Visual pass 05 — unify project cards and domain directory; preserve 3D runtime. */
 #app > main > .editorial-work{
@@ -1439,8 +1405,6 @@ html,body{background:var(--bal-petrol)!important;color:var(--bal-mineral)!import
  .editorial-work .work-card,.editorial-work .work-card .work-media img,.universe-index-card{transition:none!important}
  .editorial-work .work-card:hover,.universe-index-card:hover{transform:none!important}
 }
-
-
 
 /* Universe directory — strengthen the information hierarchy without changing destinations. */
 #app > main > .universe-index .universe-index-grid{align-items:stretch!important;grid-auto-rows:1fr!important;gap:16px!important}
@@ -1572,7 +1536,6 @@ html[lang="ar"] .value-item:first-child{padding-right:0!important;border-right:0
 @media(max-width:900px){#app > main > #value-principles{grid-template-columns:1fr!important;gap:22px!important}}
 @media(max-width:640px){#app > main > #value-principles{padding:40px 18px!important}.value-grid{grid-template-columns:1fr!important}.value-item,.value-item:first-child{padding:17px 0!important;border-left:0!important;border-right:0!important;border-top:1px solid #40534D!important}html[lang="ar"] .value-item,html[lang="ar"] .value-item:first-child{border-right:0!important}.value-no{margin-bottom:9px!important}.value-item h3{font-size:17px!important}.value-item p{font-size:12px!important;max-width:58ch!important}}
 
-
 .linknode{display:block;text-decoration:none;cursor:pointer}.linknode[hidden]{display:none!important}.linknode:focus-visible{outline:3px solid #B96B4D;outline-offset:4px}.linknode small{pointer-events:none}#spherePage{text-decoration:none}
 /* Final spatial UI override: neutral geometry must win over legacy organic theme. */
 #mainView.webgl-ready .webgl-stage .webgl-hint,
@@ -1588,14 +1551,10 @@ html[lang="ar"] .value-item:first-child{padding-right:0!important;border-right:0
   }
 }
 
-
-
 /* Keep the scene directly tappable beneath the informational overlay;
    the overlay's own action buttons remain interactive. */
 #mainView.webgl-ready .webgl-focus{pointer-events:none!important}
 #mainView.webgl-ready .webgl-focus button{pointer-events:auto!important}
-
-
 
 .product-catalogue{padding:clamp(54px,7vw,94px) clamp(20px,6vw,82px);background:#111b1d;color:#d1d0c5;border-top:1px solid #40534a}
 .product-catalogue-head{display:grid;grid-template-columns:minmax(0,1fr) minmax(280px,.8fr);gap:clamp(28px,6vw,86px);align-items:end;max-width:1440px;margin:0 auto 32px}
