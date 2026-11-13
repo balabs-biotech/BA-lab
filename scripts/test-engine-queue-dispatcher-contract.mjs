@@ -29,7 +29,7 @@ const checks = [
   ["dispatcher recomputes the canonical input snapshot digest before worker dispatch", /sha256\(stable\(request\.input\?\.records\)\)[\s\S]*?execution\.input_snapshot_sha256/],
   ["dispatcher forwards the complete stored request envelope to the Python worker without rebuilding it from caller input", /body:\s*JSON\.stringify\(request\)/],
   ["dispatcher does not discard QC artifact metadata before worker validation", /const request = execution\.request_payload[\s\S]*?validateRequest\(request\)[\s\S]*?JSON\.stringify\(request\)/],
-  ["dispatcher persists the worker's QC assessment and provenance in the durable result", /p_result:\s*result[\s\S]*?complete_claimed_engine_execution/],
+  ["dispatcher persists the worker's QC assessment and provenance in the durable result", /rpc\("complete_claimed_engine_execution"[\s\S]*?p_result:\s*result/],
   ["dispatcher leaves optional QC attachment behavior to the versioned engine contract", /validateRequest\(request\)[\s\S]*?body:\s*JSON\.stringify\(request\)/],
   ["dispatcher verifies immutable source IDs", /request\.input\?\.record_ids[\s\S]*?execution\.input_record_ids/],
   ["dispatcher failure transitions use the lease-owner RPC", /rpc\("fail_claimed_engine_execution"/],
