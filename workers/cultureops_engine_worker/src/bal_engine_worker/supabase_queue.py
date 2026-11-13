@@ -44,11 +44,12 @@ class SupabaseRestQueueClient:
         self._lease_seconds = lease_seconds
 
     @classmethod
-    def from_env(cls) -> "SupabaseRestQueueClient":
+    def from_env(cls, *, lease_seconds: int = 60) -> "SupabaseRestQueueClient":
         """Load backend-only credentials from process environment."""
         return cls(
             os.environ["SUPABASE_URL"],
             os.environ["SUPABASE_SERVICE_ROLE_KEY"],
+            lease_seconds=lease_seconds,
         )
 
     def _rpc(self, function: str, arguments: Mapping[str, Any]) -> Any:
