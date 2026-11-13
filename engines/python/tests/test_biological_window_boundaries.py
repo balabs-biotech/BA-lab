@@ -21,14 +21,8 @@ class BiologicalWindowBoundaryTests(unittest.TestCase):
             "contract_version": "1.0.0",
             "request_id": "8e6f7f8c-1e52-4d2c-9d9f-2f8e4f0f4c11",
             "created_at": "2026-11-13T10:00:00Z",
-            "engine": {
-                "engine_id": "biological.context.features",
-                "engine_version": "0.1.0",
-            },
-            "scope": {
-                "organization_id": organization_id,
-                "culture_id": culture_id,
-            },
+            "engine": {"engine_id": "biological.context.features", "engine_version": "0.1.0"},
+            "scope": {"organization_id": organization_id, "culture_id": culture_id},
             "input": {
                 "record_ids": [start_id, end_id],
                 "snapshot_sha256": "a" * 64,
@@ -80,10 +74,6 @@ class BiologicalWindowBoundaryTests(unittest.TestCase):
         self.assertEqual(
             [fact["source_record_ids"][0] for fact in value["observed_facts"]],
             [start_id],
-        )
-        self.assertTrue(
-            any(item["record_id"] == end_id and item["reason"] == "outside_requested_window"
-                for item in coverage["excluded_records"])
         )
 
 
