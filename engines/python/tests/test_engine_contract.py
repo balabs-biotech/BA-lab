@@ -61,7 +61,7 @@ REQUEST = {
         "provider": "NASA_POWER",
         "dataset_id": "point-daily",
         "dataset_version": "v1",
-        "content_sha256": hashlib.sha256(json.dumps(assertion, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode("utf-8")).hexdigest(),
+        "content_sha256": "a" * 64,
         "retrieved_at": "2026-11-12T09:55:00Z"
     }]
 }
@@ -1109,7 +1109,7 @@ class EngineContractTests(unittest.TestCase):
             "provider": "BA_LABS_BIOLOGICAL_IDENTITY",
             "dataset_id": assertion["assertion_code"],
             "dataset_version": assertion["assertion_version"],
-            "content_sha256": "c" * 64,
+            "content_sha256": hashlib.sha256(json.dumps(assertion, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode("utf-8")).hexdigest(),
             "retrieved_at": assertion["reviewed_at"],
         }]
         request["input"]["record_ids"] = []
