@@ -1193,6 +1193,17 @@ class EngineContractTests(unittest.TestCase):
         self.assertEqual(len(documented), 1)
         self.assertEqual(documented[0]["evidence_state"], "limited")
         self.assertEqual(documented[0]["finding_code"], "strain-specific-humidity")
+        mismatched_contexts = [{
+            "organism_kind": "fungus",
+            "genetic_reference": {
+                "organism_id": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaab",
+                "strain_id": "88888888-8888-4888-8888-888888888888",
+            },
+        }]
+        mismatched, _ = _evaluate_interpretation_rules(
+            [rule], mismatched_contexts, features, datasets, "documented", assertions
+        )
+        self.assertEqual(mismatched, [])
 
 
 
