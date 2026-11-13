@@ -7292,6 +7292,23 @@ function renderBiologicalContextAssessment(article, result) {
   if (Array.isArray(subject.genetic_reference_ids) && subject.genetic_reference_ids.length) {
     addLine(article, "Références génétiques résolues : " + subject.genetic_reference_ids.length);
   }
+  const identityState = subject.identity_assertion_state || "not_documented";
+  const identityLabels = {
+    documented: "Identité biologique documentée",
+    not_documented: "Identité biologique non documentée",
+    conflicting: "Identité biologique contradictoire"
+  };
+  addLine(article, "Identité : " + String(identityLabels[identityState] || "État d’identité inconnu"));
+  addList(article, "Assertions d’identité vérifiées", subject.identity_assertions, item => {
+    const source = item.source_reference_id && item.source_reference_version
+      ? item.source_reference_id + "@" + item.source_reference_version
+      : "source indisponible";
+    const digest = typeof item.content_sha256 === "string" ? " · SHA-256 " + item.content_sha256.slice(0, 12) : "";
+    return String(item.assertion_type || "assertion") + " : " +
+      String(item.assertion_value || "valeur indisponible") +
+      " · " + String(item.evidence_level || "niveau de preuve non précisé") +
+      " · " + source + digest;
+  }, 12);
   const outcomeLabels = {
     success: "Analyse exploitable",
     insufficient_data: "Données insuffisantes",
