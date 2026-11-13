@@ -6675,17 +6675,12 @@ async function monitorPlantBiologicalAssessmentExecution({
   operationRevision,
   operationOrganizationId
 }) {
-  for (let attempt = 0; attempt < 20; attempt++) {
-    await new Promise(resolve => setTimeout(resolve, 3000));
+  for (let attempt = 0; attempt < 90; attempt++) {
+    await new Promise(resolve => setTimeout(resolve, 1000));
     if (requestId !== plantBiologicalAssessmentRequestId ||
         !isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
     const panel = document.getElementById("plantBiologicalContextPanel");
     if (panel?.dataset.plantCultureId !== plantCultureId) return;
-    try {
-      await loadRecentEngineExecutions();
-    } catch (error) {
-      console.warn("Actualisation de l’exécution BIE impossible :", error);
-    }
     const execution = recentEngineExecutions.find(item => item.id === executionId);
     if (execution?.status === "completed") {
       setPlantBiologicalAssessmentMessage(
