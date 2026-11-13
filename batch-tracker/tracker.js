@@ -113,6 +113,11 @@ function clearAuthenticatedWorkspaceState() {
     cultureDetailPanel.classList.add("hidden");
     cultureDetailPanel.dataset.cultureId = "";
   }
+  if (typeof cultureBiologicalAssessmentRequestId !== "undefined") {
+    cultureBiologicalAssessmentRequestId++;
+  }
+  const biologicalContextPanel = document.getElementById("biologicalContextPanel");
+  if (biologicalContextPanel) biologicalContextPanel.dataset.cultureId = "";
 
   if (recordHarvestButton) recordHarvestButton.disabled = true;
   if (saveMeasurementButton) saveMeasurementButton.disabled = true;
@@ -7950,7 +7955,10 @@ function setupUiEnhancements() {
   document.getElementById("bioOperationForm")?.addEventListener("submit", saveBiologicalOperation);
   document.getElementById("bioOperationDate")?.setAttribute("value", new Date().toISOString().slice(0,16));
   document.getElementById("closeCultureDetail")?.addEventListener("click", () => {
+    cultureBiologicalAssessmentRequestId += 1;
     document.getElementById("cultureDetailPanel")?.classList.add("hidden");
+    const contextPanel = document.getElementById("biologicalContextPanel");
+    if (contextPanel) contextPanel.dataset.cultureId = "";
   });
 
   measurementVariableSelect.addEventListener("change", updateMeasurementUnits);
