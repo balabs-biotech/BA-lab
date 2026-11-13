@@ -21,7 +21,7 @@ from ba_engine_contract.registry import load_engine
 from ba_engine_contract.environmental_timeseries_qc import (
     analyze_environmental_timeseries_qc, run_environmental_timeseries_qc,
 )
-from ba_engine_contract.biological_context_features import analyze_biological_context_features
+from ba_engine_contract.biological_context_features import analyze_biological_context_features, _evaluate_interpretation_rules
 
 ROOT = Path(__file__).resolve().parents[3]
 SCHEMA_DIR = ROOT / "schemas" / "engine" / "v1"
@@ -1125,6 +1125,65 @@ class EngineContractTests(unittest.TestCase):
         ))
         schema = json.loads((ROOT / "schemas" / "biological" / "v1" / "context-assessment.schema.json").read_text(encoding="utf-8"))
         validator(schema).validate(value)
+
+
+
+    def test_identity_scoped_interpretation_rule_requires_validated_identity(self):
+        rule = {
+            "rule_id": "strain-specific-humidity",
+            "rule_version": "1.0.0",
+            "feature_code": "mean_relative_humidity",
+            "operator": "lt",
+            "threshold": 85.0,
+            "unit_code": "%",
+            "statement": "Humidity below the strain-specific reference threshold.",
+            "context_match": {"organism_kind": "fungus"},
+            "reference_id": "humidity-reference",
+            "reference_version": "1.0.0",
+            "identity_match": {
+                "assertion_type": "strain.designation",
+                "assertion_value": "HK35",
+            },
+        }
+        datasets = [
+            {
+                "provider": "BA_LABS_INTERPRETATION_PROFILE",
+                "dataset_id": "biological.context.features",
+                "dataset_version": "1.0.0",
+                "content_sha256": "a" * 64,
+            },
+            {
+                "provider": "BA_LABS_RULE_REGISTRY",
+                "dataset_id": "humidity-reference",
+                "dataset_version": "1.0.0",
+                "content_sha256": "b" * 64,
+            },
+        ]
+        contexts = [{"organism_kind": "fungus"}]
+        features = [{
+            "feature_code": "mean_relative_humidity",
+            "value": 70.0,
+            "unit_code": "%",
+            "source_record_ids": ["3c2b3a4d-5e6f-4789-8123-456789abcdef"],
+        }]
+        assertions = [{
+            "assertion_type": "strain.designation",
+            "assertion_value": "HK35",
+        }]
+        unverified, _ = _evaluate_interpretation_rules(
+            [rule], contexts, features, datasets, "not_documented", []
+        )
+        self.assertEqual(unverified, [])
+        conflicting, _ = _evaluate_interpretation_rules(
+            [rule], contexts, features, datasets, "conflicting", assertions
+        )
+        self.assertEqual(conflicting, [])
+        documented, _ = _evaluate_interpretation_rules(
+            [rule], contexts, features, datasets, "documented", assertions
+        )
+        self.assertEqual(len(documented), 1)
+        self.assertEqual(documented[0]["evidence_state"], "limited")
+        self.assertEqual(documented[0]["finding_code"], "strain-specific-humidity")
 
 
 
