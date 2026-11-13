@@ -446,7 +446,7 @@ document.addEventListener('click',event=>{
  event.preventDefault();
  enterSphere(id,true,false);
 });
-function goHome(){miniView.hidden=true;miniView.classList.remove('spatial-source-only');mainView.hidden=false;mainView.classList.add('universe-closed');mainView.classList.remove('universe-open','has-focus','dragging');document.getElementById('networkEdges')?.replaceChildren();homeBtn.hidden=true;sceneTitle.textContent=tr('sceneTitle');document.querySelectorAll('.sphere').forEach(s=>{s.classList.toggle('active',s.dataset.sphere===selected);s.classList.remove('focused')});applyOrbit()}
+
 /* The clean Three.js engine is the sole owner of #mainView. This legacy script keeps only site-wide language/content behavior; it must not bind sphere, hub, home or pointer navigation. */
 document.querySelectorAll('[data-lang]').forEach(b=>b.addEventListener('click',()=>setLanguage(b.dataset.lang)));
 window.addEventListener('resize',()=>{drawMiniConnections()});
