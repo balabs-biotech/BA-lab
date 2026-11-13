@@ -98,4 +98,12 @@ await assert.rejects(loadAuthenticatedBiologicalIdentityAssertions({
   userClient: client, organizationId, biologicalContexts: [],
   windowStartDate: "not-a-date", windowLastIncludedDate: "2026-11-03",
 }), /biological_identity_context_invalid/);
+await assert.rejects(loadAuthenticatedBiologicalIdentityAssertions({
+  userClient: client, organizationId, biologicalContexts: [],
+  windowStartDate: "2026-02-30", windowLastIncludedDate: "2026-03-03",
+}), /biological_identity_context_invalid/);
+await assert.rejects(loadAuthenticatedBiologicalIdentityAssertions({
+  userClient: client, organizationId, biologicalContexts: [],
+  windowStartDate: "2026-11-01", windowLastIncludedDate: "2026-13-01",
+}), /biological_identity_context_invalid/);
 console.log("Biological identity assertion resolver contract passed");
