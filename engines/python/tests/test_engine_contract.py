@@ -934,7 +934,7 @@ class EngineContractTests(unittest.TestCase):
         self.assertIsNone(value["coverage"]["observed_window"])
         self.assertEqual(value["observed_facts"], [])
         self.assertEqual(value["derived_features"], [])
-        self.assertIn("analysis_window_environment_not_resolved", value["coverage"]["missing_context"])
+        self.assertIn("culture_environment_not_linked", value["coverage"]["missing_context"])
         self.assertIn("insufficient_data", result["result"]["quality_flags"])
 
         non_biological = json.loads(json.dumps(request))
@@ -983,7 +983,7 @@ class EngineContractTests(unittest.TestCase):
         self.assertEqual(value["coverage"]["source_record_count"], 0)
         self.assertEqual(value["observed_facts"], [])
         self.assertEqual(value["derived_features"], [])
-        self.assertIn("culture_environment_not_linked", value["coverage"]["missing_context"])
+        self.assertIn("analysis_window_environment_not_resolved", value["coverage"]["missing_context"])
         self.assertIn("insufficient_data", result["result"]["quality_flags"])
 
     def test_biological_context_features_preserves_time_bounded_genetic_context(self):
