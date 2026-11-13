@@ -252,6 +252,7 @@ Deno.serve(async (req: Request) => {
       const allowedCodes = new Set([
         "biological_identity_context_invalid",
         "biological_identity_assertion_registry_unavailable",
+        "biological_identity_assertion_registry_unavailable",
         "biological_identity_assertion_limit_exceeded",
         "biological_reference_registry_unavailable",
         "biological_identity_reference_ambiguous",
