@@ -43,8 +43,11 @@ export async function loadAuthenticatedBiologicalIdentityAssertions(input: {
   biologicalContexts: Row[];
   windowStartDate: string;
   windowLastIncludedDate: string;
+  historicalReplay?: boolean;
 }) {
   const { userClient, organizationId } = input;
+  const acceptedAssertionStatuses = input.historicalReplay ? ["validated", "retired"] : ["validated"];
+  const acceptedReferenceStatuses = input.historicalReplay ? ["validated", "retired"] : ["validated"];
   if (!userClient || typeof userClient.from !== "function") throw new Error("caller_scoped_supabase_client_required");
   if (!organizationId || !Array.isArray(input.biologicalContexts) ||
       !/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/.test(input.windowStartDate) ||
@@ -58,11 +61,11 @@ export async function loadAuthenticatedBiologicalIdentityAssertions(input: {
   const queries: Promise<any>[] = [];
   if (organismIds.length) queries.push(userClient.from("biological_identity_assertions")
     .select("id,organization_id,assertion_code,assertion_version,subject_type,organism_id,strain_id,assertion_type,assertion_value,source_reference_id,source_reference_version,evidence_level,content_sha256,status,reviewed_at,valid_from,valid_to")
-    .eq("organization_id", organizationId).eq("status", "validated")
+    .eq("organization_id", organizationId).in("status", acceptedAssertionStatuses)
     .eq("subject_type", "organism").in("organism_id", organismIds).limit(501));
   if (strainIds.length) queries.push(userClient.from("biological_identity_assertions")
     .select("id,organization_id,assertion_code,assertion_version,subject_type,organism_id,strain_id,assertion_type,assertion_value,source_reference_id,source_reference_version,evidence_level,content_sha256,status,reviewed_at,valid_from,valid_to")
-    .eq("organization_id", organizationId).eq("status", "validated")
+    .eq("organization_id", organizationId).in("status", acceptedAssertionStatuses)
     .eq("subject_type", "strain").in("strain_id", strainIds).limit(501));
   const results = await Promise.all(queries);
   if (results.some((result) => result.error || !Array.isArray(result.data) || result.data.length > 500)) {
@@ -80,7 +83,7 @@ export async function loadAuthenticatedBiologicalIdentityAssertions(input: {
     rowsById.set(row.id, row);
   }
   const rows: Row[] = [...rowsById.values()].filter((row) =>
-    row.organization_id === organizationId && row.status === "validated" &&
+    row.organization_id === organizationId && acceptedAssertionStatuses.includes(row.status) &&
     typeof row.valid_from === "string" && row.valid_from <= input.windowStartDate &&
     (row.valid_to === null || (typeof row.valid_to === "string" && row.valid_to >= input.windowLastIncludedDate)) &&
     ((row.subject_type === "organism" && organismIds.includes(row.organism_id) && row.strain_id === null) ||
@@ -92,13 +95,13 @@ export async function loadAuthenticatedBiologicalIdentityAssertions(input: {
   if (refs.length) {
     const referenceResult = await userClient.from("biological_reference_registry")
       .select("organization_id,reference_id,reference_version,content_sha256,status,reviewed_at")
-      .eq("organization_id", organizationId).eq("status", "validated")
+      .eq("organization_id", organizationId).in("status", acceptedReferenceStatuses)
       .in("reference_id", refs).limit(501);
     if (referenceResult.error || !Array.isArray(referenceResult.data) || referenceResult.data.length > 500) {
       throw new Error("biological_reference_registry_unavailable");
     }
     referenceRows = referenceResult.data.filter((row: Row) =>
-      row.organization_id === organizationId && row.status === "validated"
+      row.organization_id === organizationId && acceptedReferenceStatuses.includes(row.status)
     );
   }
   const referenceMap = new Map<string, Row>();
