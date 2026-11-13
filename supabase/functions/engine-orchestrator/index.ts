@@ -278,6 +278,7 @@ Deno.serve(async (req: Request) => {
         biologicalContexts: snapshot.parameters.biological_contexts ?? [],
         windowStartDate: snapshot.parameters.analysis_window_start_date,
         windowLastIncludedDate: snapshot.parameters.analysis_window_last_included_date,
+        historicalReplay: parameters.historical_replay === true,
       });
     } catch (error) {
       const code = error instanceof Error ? error.message : "biological_identity_resolution_failed";
