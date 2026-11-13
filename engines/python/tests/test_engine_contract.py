@@ -1,3 +1,4 @@
+import hashlib
 import json
 import os
 import shutil
@@ -60,7 +61,7 @@ REQUEST = {
         "provider": "NASA_POWER",
         "dataset_id": "point-daily",
         "dataset_version": "v1",
-        "content_sha256": "c" * 64,
+        "content_sha256": hashlib.sha256(json.dumps(assertion, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode("utf-8")).hexdigest(),
         "retrieved_at": "2026-11-12T09:55:00Z"
     }]
 }
@@ -1126,6 +1127,14 @@ class EngineContractTests(unittest.TestCase):
         schema = json.loads((ROOT / "schemas" / "biological" / "v1" / "context-assessment.schema.json").read_text(encoding="utf-8"))
         validator(schema).validate(value)
 
+        tampered_request = json.loads(json.dumps(request))
+        tampered_request["parameters"]["biological_identity_assertions"][0]["assertion_value"] = "NOT-HK35"
+        tampered = execute_registered_engine(tampered_request)
+        self.assertEqual(tampered["status"], "failed")
+        self.assertEqual(
+            tampered["error"]["code"],
+            "biological_identity_manifest_hash_mismatch",
+        )
 
 
     def test_identity_scoped_interpretation_rule_requires_validated_identity(self):
