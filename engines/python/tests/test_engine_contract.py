@@ -1066,7 +1066,7 @@ class EngineContractTests(unittest.TestCase):
         self.assertEqual(value["subject"]["subject_type"], "plant")
         self.assertEqual(value["subject"]["subject_id"], plant_culture_id)
         self.assertEqual(value["coverage"]["source_record_count"], 3)
-        self.assertEqual(value["coverage"]["accepted_record_count"], 3)
+        self.assertEqual(value["coverage"]["record_counts_by_type"]["measurement"], 3)
         self.assertEqual(len(value["observed_facts"]), 3)
         self.assertEqual(len(value["derived_features"]), 4)
         mean_feature = next(
@@ -1078,7 +1078,7 @@ class EngineContractTests(unittest.TestCase):
         self.assertEqual(
             mean_feature["source_record_ids"], request["input"]["record_ids"]
         )
-        self.assertEqual(value["interpretation"]["findings"], [])
+        self.assertEqual(value["findings"], [])
         self.assertIn("no_active_interpretation_profile", value["coverage"]["missing_context"])
         self.assertNotIn("recommendations", value)
 
