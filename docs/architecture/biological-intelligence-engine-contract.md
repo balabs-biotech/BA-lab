@@ -204,7 +204,7 @@ Findings are emitted with evidence_state = limited. The rule evaluator does not 
 
 ## Tenant-scoped interpretation profile and scientific reference registry (2026-11-13)
 
-The BIE orchestrator now resolves an active `domain_interpretation_profiles` record using the caller-JWT Supabase client. It selects the fixed profile code `biological.context.features` for the domain derived from dated biological contexts. The selected profile must cover the complete requested analysis window; a profile that starts mid-window or expires before the last included date is not applied. Ambiguous domains or multiple matching active profiles fail closed.
+The BIE orchestrator now resolves an active `domain_interpretation_profiles` record using the caller-JWT Supabase client. It selects the fixed profile code `biological.context.features` for the domain derived from dated biological contexts. The selected profile must cover the complete requested analysis window; a profile that starts mid-window or expires before the last included date is not applied. Rule evaluation is additionally disabled unless exactly one biological context covers the complete window, preventing a stage-specific threshold from being applied to measurements collected under a different stage. Ambiguous domains or multiple matching active profiles fail closed.
 
 Every rule in the profile must use the Python engine rule contract and reference a matching `biological_reference_registry` row in the same organization with status `validated`. Draft, retired, missing, or cross-tenant references are never passed to the worker. The worker receives a profile manifest and one reference manifest per cited source, including content SHA-256 hashes and stable retrieval/review timestamps.
 
