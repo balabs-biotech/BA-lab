@@ -4,9 +4,9 @@
 #
 # Two passes:
 #  - VALUES: real token/key shapes, checked in every tracked file.
-#  - NAMES : env-var names such as NOTION_API_KEY. Forbidden everywhere except in
-#    Edge Function source and its tests (supabase/functions/, supabase/tests/), which
-#    read them via Deno.env.
+#  - NAMES : env-var names such as NOTION_API_KEY. Allowed only in server-side
+#    Edge Functions/tests and the isolated Python worker package, which reads them
+#    from its process environment; never in frontend code.
 set -eu
 cd "$(dirname "$0")/.."
 VALUES='(sb_secret_[A-Za-z0-9_-]{10,}|secret_[A-Za-z0-9]{30,}|ntn_[A-Za-z0-9]{20,}|AKIA[0-9A-Z]{16}|ghp_[A-Za-z0-9]{30,}|github_pat_|xox[bap]-|-----BEGIN [A-Z ]*PRIVATE KEY|eyJ[A-Za-z0-9_-]{15,}\.[A-Za-z0-9_-]{15,}\.)'
