@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.ba-labs.dz/spatial/v1/ndvi-request.schema.json",
+  "title": "BA Labs Sentinel-2 NDVI processing request",
+  "type": "object",
+  "required": ["contract", "contract_version", "request_id", "source_scene", "aoi", "index", "mask", "grid"],
+  "properties": {
+    "contract": {"const": "BA-LABS/SPATIAL-REQUEST"},
+    "contract_version": {"const": "1.0.0"},
+    "request_id": {"type": "string", "format": "uuid"},
+    "source_scene": {
+      "type": "object",
+      "required": ["provider", "collection_id", "item_id", "metadata_sha256"],
+      "properties": {
+        "provider": {"type": "string", "minLength": 1},
+        "collection_id": {"const": "sentinel-2-l2a"},
+        "item_id": {"type": "string", "minLength": 1},
+        "metadata_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
+      },
+      "additionalProperties": false
+    },
+    "aoi": {
+      "type": "object",
+      "required": ["geometry", "crs"],
+      "properties": {
+        "geometry": {
+          "type": "object",
+          "required": ["type", "coordinates"],
+          "properties": {
+            "type": {"enum": ["Polygon", "MultiPolygon"]},
+            "coordinates": {"type": "array", "minItems": 1}
+          },
+          "additionalProperties": false
+        },
+        "crs": {"const": "EPSG:4326"},
+        "geometry_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
+      },
+      "additionalProperties": false
+    },
+    "index": {"const": "NDVI"},
+    "bands": {
+      "type": "object",
+      "properties": {"red": {"const": "B04"}, "nir": {"const": "B08"}},
+      "required": ["red", "nir"],
+      "additionalProperties": false
+    },
+    "mask": {
+      "type": "object",
+      "required": ["scl_excluded_classes"],
+      "properties": {
+        "scl_excluded_classes": {
+          "const": [3, 8, 9, 10, 11]
+        },
+        "minimum_valid_pixel_fraction": {"type": "number", "minimum": 0, "maximum": 1}
+      },
+      "additionalProperties": false
+    },
+    "grid": {
+      "type": "object",
+      "required": ["resolution_m", "target_crs"],
+      "properties": {
+        "resolution_m": {"const": 10},
+        "target_crs": {"type": "string", "pattern": "^EPSG:[0-9]{4,6}$"}
+      },
+      "additionalProperties": false
+    },
+    "output": {"type": "object", "properties": {"format": {"const": "COG"}}, "required": ["format"], "additionalProperties": false}
+  },
+  "additionalProperties": false
+}

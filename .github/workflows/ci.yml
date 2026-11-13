@@ -17,6 +17,40 @@ jobs:
       - name: Scan for hardcoded secrets
         run: sh scripts/check-secrets.sh
 
+  bal-engine-contract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install Python engine contract package
+        run: python -m pip install --disable-pip-version-check -e engines/python
+      - name: Validate versioned Python engine contracts
+        run: python -m unittest discover -s engines/python/tests -p "test_*.py" -v
+      - name: Build Python engine worker container
+        run: docker build --pull -f engines/python/Dockerfile -t ba-labs-engine-worker:ci .
+      - name: Smoke test isolated Python engine worker container
+        shell: bash
+        run: |
+          set -euo pipefail
+          token="ci-worker-token-0123456789abcdef"
+          docker run --detach --name ba-engine-worker-ci \
+            --publish 127.0.0.1:18080:8080 \
+            --env "BA_ENGINE_WORKER_TOKEN=$token" \
+            --read-only --cap-drop=ALL --security-opt=no-new-privileges \
+            --memory=256m --cpus=1 --pids-limit=64 --user=10001:10001 \
+            ba-labs-engine-worker:ci
+          cleanup() { docker logs ba-engine-worker-ci || true; docker rm -f ba-engine-worker-ci >/dev/null 2>&1 || true; }
+          trap cleanup EXIT
+          for attempt in $(seq 1 20); do
+            if curl --fail --silent http://127.0.0.1:18080/healthz >/dev/null; then break; fi
+            sleep 1
+          done
+          BA_ENGINE_WORKER_URL=http://127.0.0.1:18080 \
+            BA_ENGINE_WORKER_TOKEN="$token" \
+            python scripts/test-engine-worker-container.py
+
   firmware-logic:
     runs-on: ubuntu-latest
     steps:
@@ -87,6 +121,11 @@ jobs:
           node supabase/tests/copernicus-sentinel-catalogue.test.mjs
           node --check batch-tracker/environmental-data.js
           node scripts/check-i18n.mjs
+          node --check batch-tracker/bal-json-import.js
+          node scripts/test-bal-json-import-ui.mjs
+          node scripts/test-bal-json-schemas.mjs
+          node scripts/test-engine-orchestrator-contract.mjs
+          node scripts/test-engine-execution-history-ui.mjs
           node scripts/test-environmental-fallback.mjs
           node scripts/test-workspace-scenarios.mjs
           node scripts/test-qc-check-session-errors.mjs
@@ -165,6 +204,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
+      - name: Test BAL-Core measurement normalization
+        run: node --experimental-strip-types supabase/tests/measurement-normalization.test.mts
       - name: Test sync-culture-to-notion (mocked Supabase and Notion, no network)
         run: node --experimental-strip-types supabase/tests/sync-culture-to-notion.test.mts
       - name: Test Sentinel-2 catalogue security and query contract
@@ -225,6 +266,8 @@ jobs:
       - name: Verify expected schema after replay
         run: |
           psql -At -v ON_ERROR_STOP=1 -X -q -c "select to_regclass('public.cultures'), to_regclass('public.batches'), to_regclass('public.culture_data_consents')" | grep -q 'cultures'
+      - name: Verify BAL-Core canonical unit normalization after replay
+        run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/bal_core_unit_normalization.test.sql
       - name: Verify atomic manual-write RPC security contract after replay
         run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/manual_write_rpc_security_contract.test.sql
       - name: Verify batch harvest RPC security contract after replay
@@ -239,6 +282,8 @@ jobs:
         run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/environmental_observations_contract.test.sql
       - name: Test role-aware tenant write authorization after replay
         run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/role_aware_tenant_writes.test.sql
+      - name: Test engine execution ledger security and idempotency
+        run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/engine_executions_security.test.sql
 
   ecosystem-regression:
     runs-on: ubuntu-latest

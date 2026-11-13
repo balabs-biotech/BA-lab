@@ -82,6 +82,12 @@
           <summary>Afficher les dernières observations</summary>
           <div id="overviewRecentObservations" class="overview-observations"><p class="muted">Connectez-vous pour charger les données de l’organisation.</p></div>
         </details>
+        <details class="overview-observations-details" id="engineExecutionDetails">
+          <summary>Afficher les dernières analyses calculées</summary>
+          <div id="overviewRecentEngineExecutions" class="overview-observations" aria-live="polite">
+            <p class="muted">Les exécutions analytiques apparaîtront ici après connexion.</p>
+          </div>
+        </details>
       </section>
       <aside class="overview-shortcuts" aria-label="Accès rapides">
         <h3>Accès rapides</h3>
@@ -795,6 +801,20 @@
        ====================================================== -->
 
 
+
+  <section class="card" id="balJsonImportPanel" aria-labelledby="balJsonImportTitle" hidden>
+    <div class="section-kicker"><span>ÉCHANGE DE DONNÉES</span><span class="kicker-line"></span><span>BAL-JSON 1.0.0</span></div>
+    <h2 id="balJsonImportTitle">Importer un enregistrement BAL-JSON</h2>
+    <p class="muted">Collez un document produit par un outil externe ou une IA. La prévisualisation vérifie le format et le contexte local ; la validation scientifique, les droits et l’écriture définitive restent contrôlés par le serveur.</p>
+    <label for="balJsonImportSource">Document JSON</label>
+    <textarea id="balJsonImportSource" rows="8" spellcheck="false" autocapitalize="off" autocomplete="off" placeholder='{"contract":"BA-LABS/JSON","contract_version":"1.0.0", ...}'></textarea>
+    <div class="row" style="gap:.75rem;flex-wrap:wrap">
+      <button id="balJsonPreviewButton" type="button">Vérifier et prévisualiser</button>
+      <button id="balJsonImportButton" type="button" disabled>Importer dans CultureOps</button>
+    </div>
+    <pre id="balJsonPreview" class="muted" aria-live="polite" style="white-space:pre-wrap;overflow-wrap:anywhere"></pre>
+    <p id="balJsonImportStatus" class="muted" role="status" aria-live="polite">Aucun document prévisualisé.</p>
+  </section>
 
   <section
     class="card hidden"

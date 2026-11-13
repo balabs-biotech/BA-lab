@@ -7,6 +7,7 @@ import addFormats from "npm:ajv-formats@3.0.1";
 import recordSchema from "../../../schemas/bal-json/v1/record.schema.json" with { type: "json" };
 import measurementSchema from "../../../schemas/bal-json/v1/measurement.schema.json" with { type: "json" };
 import observationSchema from "../../../schemas/bal-json/v1/observation.schema.json" with { type: "json" };
+import { normalizeMeasurement } from "../_shared/measurement-normalization.ts";
 
 const headers = {
   "Access-Control-Allow-Origin": "*",
@@ -134,20 +135,60 @@ Deno.serve(async (req: Request) => {
       return response(422, { error: "biological_context_required" });
     }
 
+    let normalizedValue: number | null = null;
+    let normalizedUnitCode: string | null = null;
+
     if (record.record_type === "measurement") {
       const { data: variable, error: variableError } = await supabase
-        .from("variables").select("code, dimension").eq("code", data.variable_code).maybeSingle();
+        .from("variables")
+        .select("code, dimension, canonical_unit_code")
+        .eq("code", data.variable_code)
+        .maybeSingle();
       if (variableError || !variable) return response(422, { error: "unknown_variable_code" });
 
-      const unitCodes = [data.raw_unit_code, data.normalized_unit_code].filter(Boolean);
+      const canonicalCode = variable.canonical_unit_code as string | null;
+      const unitCodes = [...new Set([data.raw_unit_code, canonicalCode].filter(Boolean))];
       const { data: units, error: unitsError } = await supabase
-        .from("units").select("code, dimension").in("code", unitCodes);
+        .from("units")
+        .select("code, dimension, factor, offset_value, is_linear")
+        .in("code", unitCodes);
       if (unitsError) return response(422, { error: "unit_catalogue_unavailable" });
       const unitMap = new Map((units ?? []).map((unit) => [unit.code, unit]));
-      for (const code of unitCodes) {
-        const unit = unitMap.get(code);
-        if (!unit || unit.dimension !== variable.dimension) {
-          return response(422, { error: "unit_dimension_mismatch", variable_code: data.variable_code, unit_code: code });
+      const rawUnit = unitMap.get(data.raw_unit_code);
+      if (!rawUnit || rawUnit.dimension !== variable.dimension) {
+        return response(422, { error: "unit_dimension_mismatch", variable_code: data.variable_code, unit_code: data.raw_unit_code });
+      }
+
+      if (canonicalCode) {
+        const canonicalUnit = unitMap.get(canonicalCode);
+        if (!canonicalUnit || canonicalUnit.dimension !== variable.dimension) {
+          return response(422, { error: "canonical_unit_catalogue_mismatch", variable_code: data.variable_code });
+        }
+
+        const normalized = normalizeMeasurement(
+          data.raw_value,
+          rawUnit,
+          canonicalUnit,
+        );
+        if (!normalized.ok) {
+          return response(422, { error: normalized.error, variable_code: data.variable_code });
+        }
+        normalizedValue = normalized.value;
+        normalizedUnitCode = normalized.unitCode;
+      }
+
+      const suppliedNormalizedValue = data.normalized_value;
+      const suppliedNormalizedUnit = data.normalized_unit_code;
+      if ((suppliedNormalizedValue === undefined) !== (suppliedNormalizedUnit === undefined)) {
+        return response(422, { error: "normalized_value_and_unit_must_be_provided_together" });
+      }
+      if (suppliedNormalizedValue !== undefined) {
+        if (normalizedValue === null || suppliedNormalizedUnit !== normalizedUnitCode) {
+          return response(422, { error: "client_normalization_not_canonical" });
+        }
+        const tolerance = Math.max(1e-9, Math.abs(normalizedValue) * 1e-9);
+        if (Math.abs(suppliedNormalizedValue - normalizedValue) > tolerance) {
+          return response(422, { error: "client_normalized_value_mismatch" });
         }
       }
     } else {
@@ -179,8 +220,8 @@ Deno.serve(async (req: Request) => {
       Object.assign(recordData, {
         raw_value: data.raw_value,
         raw_unit_code: data.raw_unit_code,
-        normalized_value: data.normalized_value,
-        normalized_unit_code: data.normalized_unit_code,
+        normalized_value: normalizedValue,
+        normalized_unit_code: normalizedUnitCode,
         measured_at: data.measured_at,
         method: data.method,
         instrument: data.instrument,

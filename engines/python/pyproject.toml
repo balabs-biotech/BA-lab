@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=69,<76"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ba-labs-engine-contract"
+version = "0.1.0"
+description = "Versioned request and result validation for BA Labs scientific engines"
+requires-python = ">=3.12"
+dependencies = [
+  "jsonschema==4.23.0",
+]
+
+[project.scripts]
+ba-engine-worker = "ba_engine_contract.worker:main"
+ba-engine-http-worker = "ba_engine_contract.http_adapter:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["ba_engine_contract*"]

@@ -1,0 +1,90 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.ba-labs.dz/spatial/v1/ndvi-result.schema.json",
+  "title": "BA Labs Sentinel-2 NDVI analytical result",
+  "type": "object",
+  "required": ["contract", "contract_version", "result_id", "source_scene_id", "algorithm", "quality_state", "limitations", "bands", "mask", "calibration", "grid", "pixel_accounting", "statistics", "artifact", "provenance"],
+  "properties": {
+    "contract": {"const": "BA-LABS/SPATIAL-RESULT"},
+    "contract_version": {"const": "1.0.0"},
+    "result_id": {"type": "string", "minLength": 1, "maxLength": 240},
+    "source_scene_id": {"type": "string", "minLength": 1, "maxLength": 200},
+    "algorithm": {"const": "sentinel2-ndvi-v1"},
+    "quality_state": {"enum": ["accepted", "review_required", "insufficient_valid_pixels"]},
+    "limitations": {"type": "array", "items": {"type": "string", "maxLength": 500}},
+    "bands": {
+      "type": "object",
+      "required": ["red", "nir"],
+      "properties": {"red": {"const": "B04"}, "nir": {"const": "B08"}},
+      "additionalProperties": false
+    },
+    "mask": {
+      "type": "object",
+      "required": ["scl_excluded_classes", "cloud_shadow_masked"],
+      "properties": {
+        "scl_excluded_classes": {"const": [3, 8, 9, 10, 11]},
+        "cloud_shadow_masked": {"const": true}
+      },
+      "additionalProperties": false
+    },
+    "calibration": {
+      "type": "object",
+      "required": ["reflectance_status", "formula"],
+      "properties": {
+        "reflectance_status": {"enum": ["raw_dn", "harmonized_reflectance"]},
+        "formula": {"enum": ["(DN + BOA_ADD_OFFSET) / QUANTIFICATION_VALUE", "already_harmonized_surface_reflectance"]}
+      },
+      "additionalProperties": false
+    },
+    "grid": {
+      "type": "object",
+      "required": ["crs", "resolution_m"],
+      "properties": {"crs": {"type": "string"}, "resolution_m": {"const": 10}},
+      "additionalProperties": false
+    },
+    "pixel_accounting": {
+      "type": "object",
+      "required": ["total_pixel_count", "valid_pixel_count", "valid_pixel_fraction"],
+      "properties": {
+        "total_pixel_count": {"type": "integer", "minimum": 1},
+        "valid_pixel_count": {"type": "integer", "minimum": 0},
+        "valid_pixel_fraction": {"type": "number", "minimum": 0, "maximum": 1},
+        "masked_pixel_count": {"type": "integer", "minimum": 0}
+      },
+      "additionalProperties": false
+    },
+    "statistics": {
+      "type": "object",
+      "required": ["minimum", "maximum", "mean"],
+      "properties": {
+        "minimum": {"type": "number", "minimum": -1, "maximum": 1},
+        "maximum": {"type": "number", "minimum": -1, "maximum": 1},
+        "mean": {"type": "number", "minimum": -1, "maximum": 1},
+        "median": {"type": "number", "minimum": -1, "maximum": 1}
+      },
+      "additionalProperties": false
+    },
+    "artifact": {
+      "type": "object",
+      "required": ["format", "href", "sha256"],
+      "properties": {
+        "format": {"const": "COG"},
+        "href": {"type": "string", "format": "uri"},
+        "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
+      },
+      "additionalProperties": false
+    },
+    "provenance": {
+      "type": "object",
+      "required": ["generated_at", "software_version", "processing_baseline", "source_metadata_sha256"],
+      "properties": {
+        "generated_at": {"type": "string", "format": "date-time"},
+        "software_version": {"type": "string", "minLength": 1},
+        "processing_baseline": {"type": "string"},
+        "source_metadata_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

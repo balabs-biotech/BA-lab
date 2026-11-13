@@ -23,6 +23,14 @@ const supabaseClient =
 
 let organizationId = null;
 
+// Public, read-only bridge for isolated workspace adapters.
+window.BA_LABS_SUPABASE_CLIENT = supabaseClient;
+window.BA_LABS_GET_ORGANIZATION_ID = () => organizationId;
+window.BA_LABS_REFRESH_EXPERIMENTAL_DATA = async () => {
+  if (!organizationId) throw new Error("Aucune organisation active.");
+  await Promise.all([loadRecentMeasurements(), loadRecentObservations(), loadRecentEngineExecutions()]);
+};
+
 let organization = null;
 
 let strainOptions = [];
@@ -51,6 +59,9 @@ let quantityUnitOptions = [];
 let batchLocationOptions = [];
 let batchEnvironmentOptions = [];
 let recentObservations = [];
+let recentEngineExecutions = [];
+let recentEngineResultsByExecution = new Map();
+let engineExecutionHistoryRequestId = 0;
 
 
 function isCurrentWorkspaceRevision(revision, expectedOrganizationId) {
@@ -77,6 +88,17 @@ function clearAuthenticatedWorkspaceState() {
   batchLocationOptions = [];
   batchEnvironmentOptions = [];
   recentObservations = [];
+  if (typeof recentEngineExecutions !== "undefined") recentEngineExecutions = [];
+  if (typeof recentEngineResultsByExecution !== "undefined") recentEngineResultsByExecution = new Map();
+  if (typeof engineExecutionHistoryRequestId !== "undefined") engineExecutionHistoryRequestId++;
+  const engineHistoryPanel = document.getElementById("overviewRecentEngineExecutions");
+  if (engineHistoryPanel) {
+    engineHistoryPanel.replaceChildren();
+    const clearedState = document.createElement("p");
+    clearedState.className = "muted";
+    clearedState.textContent = "Connectez-vous pour charger les analyses de l’organisation.";
+    engineHistoryPanel.appendChild(clearedState);
+  }
   initializationWarnings = [];
 
   const cultureDetailPanel = document.getElementById("cultureDetailPanel");
@@ -994,6 +1016,16 @@ async function initializeAuthenticatedTracker(
         console.error("Historique des observations indisponible :", observationHistoryError);
         initializationWarnings.push("historique des observations");
         observationHistory.textContent = "Impossible de charger l’historique des observations. L’enregistrement reste disponible.";
+      }
+      try {
+        await loadRecentEngineExecutions();
+        if (initRevision !== authStateRevision) return;
+      } catch (engineHistoryError) {
+        if (initRevision !== authStateRevision) return;
+        console.error("Historique des analyses indisponible :", engineHistoryError);
+        initializationWarnings.push("historique des analyses");
+        const panel = document.getElementById("overviewRecentEngineExecutions");
+        if (panel) panel.textContent = "Historique des analyses indisponible. Les autres modules restent utilisables.";
       }
     } catch (measurementError) {
       if (initRevision !== authStateRevision) return;
@@ -6216,12 +6248,392 @@ async function loadCultureDetail(cultureId) {
   }
 }
 
+async function loadRecentEngineExecutions() {
+  const panel = document.getElementById("overviewRecentEngineExecutions");
+  const requestId = ++engineExecutionHistoryRequestId;
+  const loadRevision = authStateRevision;
+  const loadOrganizationId = organizationId;
+  if (!loadOrganizationId || !panel) return;
+
+  const query = await supabaseClient.from("engine_executions")
+    .select("id,engine_id,engine_version,status,result_payload,error_code,created_at,completed_at,input_record_ids,input_snapshot_sha256,scope")
+    .eq("organization_id", loadOrganizationId)
+    .order("created_at", { ascending: false })
+    .limit(8);
+
+  if (requestId !== engineExecutionHistoryRequestId ||
+      !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
+  if (query.error) throw new Error("Chargement des exécutions analytiques impossible : " + query.error.message);
+  recentEngineExecutions = query.data || [];
+
+  const completedIds = recentEngineExecutions
+    .filter((execution) => execution.status === "completed")
+    .map((execution) => execution.id);
+  recentEngineResultsByExecution = new Map();
+  if (completedIds.length) {
+    const resultsQuery = await supabaseClient.from("engine_execution_results")
+      .select("execution_id,result_type,outcome,value,limitations,quality_flags,confidence,provenance,generated_at,input_snapshot_sha256,input_record_ids")
+      .eq("organization_id", loadOrganizationId)
+      .in("execution_id", completedIds);
+    if (requestId !== engineExecutionHistoryRequestId ||
+        !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
+    if (resultsQuery.error) throw new Error("Chargement des résultats analytiques impossible : " + resultsQuery.error.message);
+    recentEngineResultsByExecution = new Map(
+      (resultsQuery.data || []).map((row) => [row.execution_id, row])
+    );
+  }
+  renderRecentEngineExecutions();
+}
+
+function getStoredEngineResult(execution) {
+  const stored = recentEngineResultsByExecution.get(execution.id);
+  const envelopeResult = execution.result_payload?.result;
+  return stored || (envelopeResult ? {
+    outcome: envelopeResult.outcome,
+    value: envelopeResult.value,
+    limitations: envelopeResult.limitations,
+    quality_flags: envelopeResult.quality_flags,
+    provenance: envelopeResult.provenance,
+    input_snapshot_sha256: execution.input_snapshot_sha256,
+    input_record_ids: execution.input_record_ids
+  } : null);
+}
+
+function getComparableEngineExecutions() {
+  return recentEngineExecutions.filter((execution) =>
+    execution.status === "completed" && Boolean(getStoredEngineResult(execution)?.value)
+  );
+}
+
+function getEngineSnapshotComparison(leftResult, rightResult) {
+  if (leftResult?.input_snapshot_sha256 && rightResult?.input_snapshot_sha256) {
+    return leftResult.input_snapshot_sha256 === rightResult.input_snapshot_sha256 ? "same" : "different";
+  }
+  if (Array.isArray(leftResult?.input_record_ids) && Array.isArray(rightResult?.input_record_ids)) {
+    const leftIds = JSON.stringify([...leftResult.input_record_ids].sort());
+    const rightIds = JSON.stringify([...rightResult.input_record_ids].sort());
+    return leftIds === rightIds ? "same" : "different";
+  }
+  return "unknown";
+}
+
+function getEngineSeriesComparisonKey(series) {
+  return String(series.variable_code) + "::" + String(series.unit_code);
+}
+
+function areEngineExecutionsComparable(left, right) {
+  if (!left || !right || left.id === right.id) return false;
+  if (left.engine_id !== right.engine_id || left.engine_version !== right.engine_version) return false;
+  if (JSON.stringify(left.scope || {}) !== JSON.stringify(right.scope || {})) return false;
+  const leftResult = getStoredEngineResult(left);
+  const rightResult = getStoredEngineResult(right);
+  if (leftResult?.result_type && rightResult?.result_type && leftResult.result_type !== rightResult.result_type) return false;
+  return Boolean(leftResult?.value && rightResult?.value);
+}
+
+function getComparableEngineExecutionCandidates(reference, candidates) {
+  return candidates.filter((candidate) => areEngineExecutionsComparable(reference, candidate));
+}
+
+function findInitialComparableEnginePair(candidates) {
+  for (const reference of candidates) {
+    const candidate = getComparableEngineExecutionCandidates(reference, candidates)[0];
+    if (candidate) return [reference, candidate];
+  }
+  return null;
+}
+
+function renderEngineExecutionComparison(panel, eligible) {
+  if (eligible.length < 2) return;
+  const initialPair = findInitialComparableEnginePair(eligible);
+  if (!initialPair) return;
+  const section = document.createElement("section");
+  section.className = "engine-comparison";
+  const heading = document.createElement("strong");
+  heading.textContent = "Comparer deux exécutions";
+  const controls = document.createElement("div");
+  controls.className = "engine-comparison-controls";
+  const makeSelect = (labelText, options, selectedId) => {
+    const label = document.createElement("label");
+    label.textContent = labelText;
+    const select = document.createElement("select");
+    select.className = "engine-comparison-select";
+    options.forEach((execution) => {
+      const option = document.createElement("option");
+      option.value = execution.id;
+      option.textContent = new Date(execution.created_at).toLocaleString() +
+        " · " + execution.engine_id + " v" + execution.engine_version;
+      option.selected = execution.id === selectedId;
+      select.appendChild(option);
+    });
+    label.appendChild(select);
+    controls.appendChild(label);
+    return select;
+  };
+  const leftSelect = makeSelect("Exécution A", eligible, initialPair[0].id);
+  const rightCandidates = getComparableEngineExecutionCandidates(initialPair[0], eligible);
+  const rightSelect = makeSelect("Exécution B", rightCandidates, initialPair[1].id);
+  const compareButton = document.createElement("button");
+  compareButton.type = "button";
+  compareButton.className = "secondary-button small-button";
+  compareButton.textContent = "Comparer";
+  const output = document.createElement("div");
+  output.className = "engine-comparison-output";
+  output.setAttribute("aria-live", "polite");
+  const refreshRightCandidates = () => {
+    const reference = eligible.find((item) => item.id === leftSelect.value);
+    const candidates = getComparableEngineExecutionCandidates(reference, eligible);
+    const previousSelection = rightSelect.value;
+    rightSelect.replaceChildren();
+    candidates.forEach((execution) => {
+      const option = document.createElement("option");
+      option.value = execution.id;
+      option.textContent = new Date(execution.created_at).toLocaleString() +
+        " · " + execution.engine_id + " v" + execution.engine_version;
+      rightSelect.appendChild(option);
+    });
+    rightSelect.disabled = candidates.length === 0;
+    compareButton.disabled = candidates.length === 0;
+    if (candidates.length) {
+      rightSelect.value = candidates.some((item) => item.id === previousSelection)
+        ? previousSelection
+        : candidates[0].id;
+    } else {
+      output.replaceChildren();
+      const message = document.createElement("p");
+      message.className = "muted";
+      message.textContent = "Aucune autre exécution compatible pour ce moteur, cette version et ce périmètre.";
+      output.appendChild(message);
+    }
+  };
+  leftSelect.addEventListener("change", refreshRightCandidates);
+  compareButton.addEventListener("click", () => {
+    output.replaceChildren();
+    const left = eligible.find((item) => item.id === leftSelect.value);
+    const right = eligible.find((item) => item.id === rightSelect.value);
+    if (!areEngineExecutionsComparable(left, right)) {
+      const warning = document.createElement("p");
+      warning.className = "muted";
+      warning.textContent = "Comparaison impossible : moteur, version ou périmètre incompatibles.";
+      output.appendChild(warning);
+      return;
+    }
+    const a = getStoredEngineResult(left);
+    const b = getStoredEngineResult(right);
+    const title = document.createElement("p");
+    title.textContent = "Comparaison descriptive — aucune relation causale n’est déduite.";
+    output.appendChild(title);
+    const snapshotComparison = getEngineSnapshotComparison(a, b);
+    const snapshotNote = document.createElement("p");
+    snapshotNote.className = "muted";
+    snapshotNote.textContent = snapshotComparison === "different"
+      ? "Les instantanés d’entrée diffèrent : les deux analyses ne portent pas exactement sur les mêmes données."
+      : snapshotComparison === "same"
+        ? "Les empreintes ou identifiants d’entrée disponibles sont identiques."
+        : "Comparaison exacte des instantanés indéterminée : empreinte et identifiants complets indisponibles.";
+    output.appendChild(snapshotNote);
+
+    const summaryA = a.value?.summary || {};
+    const summaryB = b.value?.summary || {};
+    const summaryTable = document.createElement("ul");
+    for (const [label, valueA, valueB] of [
+      ["Enregistrements", summaryA.record_count ?? summaryA.measurement_count, summaryB.record_count ?? summaryB.measurement_count],
+      ["Séries", summaryA.series_count, summaryB.series_count],
+      ["Enregistrements exclus", summaryA.excluded_record_count, summaryB.excluded_record_count]
+    ]) {
+      const row = document.createElement("li");
+      row.textContent = label + " : " + String(valueA ?? "—") +
+        " → " + String(valueB ?? "—");
+      summaryTable.appendChild(row);
+    }
+    output.appendChild(summaryTable);
+
+    const seriesMap = (result) => new Map(
+      (Array.isArray(result.value?.series) ? result.value.series : [])
+        .map((series) => [getEngineSeriesComparisonKey(series), series])
+    );
+    const seriesA = seriesMap(a);
+    const seriesB = seriesMap(b);
+    const seriesKeys = [...new Set([...seriesA.keys(), ...seriesB.keys()])].sort();
+    const seriesList = document.createElement("ul");
+    for (const key of seriesKeys) {
+      const first = seriesA.get(key);
+      const second = seriesB.get(key);
+      const row = document.createElement("li");
+      if (!first || !second) {
+        row.textContent = key.replace("::", " · ") +
+          (first ? " : absente de B" : " : absente de A");
+      } else {
+        row.textContent = key.replace("::", " · ") +
+          " — points " + first.point_count + " → " + second.point_count +
+          " ; écart maximal " + first.max_gap_minutes + " → " + second.max_gap_minutes +
+          " min ; doublons " + Boolean(first.duplicate_timestamps) +
+          " → " + Boolean(second.duplicate_timestamps);
+      }
+      seriesList.appendChild(row);
+    }
+    if (seriesKeys.length) {
+      const seriesHeading = document.createElement("p");
+      seriesHeading.textContent = "Évolution des séries (variable et unité identiques)";
+      output.append(seriesHeading, seriesList);
+    }
+    const limitationsA = new Set(a.limitations || []);
+    const limitationsB = new Set(b.limitations || []);
+    const addedLimitations = [...limitationsB].filter((item) => !limitationsA.has(item));
+    const removedLimitations = [...limitationsA].filter((item) => !limitationsB.has(item));
+    const limitationsLine = document.createElement("p");
+    limitationsLine.textContent = "Limites ajoutées : " + (addedLimitations.join(" · ") || "aucune") +
+      " ; limites disparues : " + (removedLimitations.join(" · ") || "aucune");
+    output.appendChild(limitationsLine);
+    const flagsA = new Set(a.quality_flags || []);
+    const flagsB = new Set(b.quality_flags || []);
+    const added = [...flagsB].filter((flag) => !flagsA.has(flag));
+    const removed = [...flagsA].filter((flag) => !flagsB.has(flag));
+    const flags = document.createElement("p");
+    flags.textContent = "Signaux ajoutés : " + (added.join(", ") || "aucun") +
+      " · Signaux disparus : " + (removed.join(", ") || "aucun");
+    output.appendChild(flags);
+    const limits = document.createElement("p");
+    limits.className = "muted";
+    limits.textContent = "Les changements peuvent provenir des données d’entrée, de leur couverture ou du traitement. Cette comparaison ne conclut pas à une amélioration ou à une dégradation biologique.";
+    output.appendChild(limits);
+  });
+  section.append(heading, controls, compareButton, output);
+  panel.appendChild(section);
+}
+
+function renderRecentEngineExecutions() {
+  const panel = document.getElementById("overviewRecentEngineExecutions");
+  if (!panel) return;
+  panel.replaceChildren();
+
+  if (!recentEngineExecutions.length) {
+    const empty = document.createElement("p");
+    empty.className = "muted";
+    empty.textContent = "Aucune exécution analytique enregistrée pour cette organisation.";
+    panel.appendChild(empty);
+    return;
+  }
+
+  renderEngineExecutionComparison(panel, getComparableEngineExecutions());
+
+  for (const execution of recentEngineExecutions) {
+    const article = document.createElement("article");
+    article.className = "overview-observation";
+    const title = document.createElement("strong");
+    title.textContent = execution.engine_id + " · v" + execution.engine_version;
+    const status = document.createElement("span");
+    status.className = "muted";
+    const statusLabels = {
+      queued: "En attente",
+      running: "En cours",
+      completed: "Terminée",
+      failed: "Échec"
+    };
+    status.textContent = statusLabels[execution.status] || "État inconnu";
+    const stamp = document.createElement("time");
+    stamp.dateTime = execution.created_at || "";
+    stamp.textContent = execution.created_at
+      ? new Date(execution.created_at).toLocaleString()
+      : "Date inconnue";
+    article.append(title, status, stamp);
+
+    const storedResult = recentEngineResultsByExecution.get(execution.id);
+    const result = getStoredEngineResult(execution);
+    const summary = result?.value?.summary;
+    if (execution.status === "completed" && summary) {
+      const details = document.createElement("p");
+      details.textContent = String(summary.record_count ?? summary.measurement_count ?? 0) +
+        " enregistrements · " + String(summary.series_count ?? 0) +
+        " séries · " + String(summary.excluded_record_count ?? 0) + " exclues";
+      article.appendChild(details);
+      const flags = Array.isArray(result.quality_flags) ? result.quality_flags : [];
+      if (flags.length) {
+        const flagLine = document.createElement("p");
+        flagLine.className = "muted";
+        flagLine.textContent = "Signaux qualité : " + flags.join(", ");
+        article.appendChild(flagLine);
+      }
+      if (result.outcome) {
+        const outcomeLabels = {
+          success: "Analyse exploitable",
+          insufficient_data: "Données insuffisantes",
+          out_of_domain: "Hors domaine analytique",
+          review_required: "Révision nécessaire"
+        };
+        const outcome = document.createElement("p");
+        outcome.className = "muted";
+        outcome.textContent = "Résultat : " + (outcomeLabels[result.outcome] || "État non documenté");
+        article.appendChild(outcome);
+      }
+
+      const provenance = storedResult?.provenance || execution.result_payload?.result?.provenance;
+      const limitations = storedResult?.limitations || execution.result_payload?.result?.limitations;
+      if ((provenance && provenance.algorithm) || (Array.isArray(limitations) && limitations.length)) {
+        const details = document.createElement("details");
+        const summaryLabel = document.createElement("summary");
+        summaryLabel.textContent = "Méthode et limites";
+        details.appendChild(summaryLabel);
+        if (provenance?.algorithm) {
+          const method = document.createElement("p");
+          method.className = "muted";
+          method.textContent = "Algorithme : " + provenance.algorithm;
+          details.appendChild(method);
+        }
+        if (Array.isArray(limitations)) {
+          for (const limitation of limitations) {
+            const note = document.createElement("p");
+            note.className = "muted";
+            note.textContent = String(limitation);
+            details.appendChild(note);
+          }
+        }
+        article.appendChild(details);
+      }
+      const series = Array.isArray(result.value?.series) ? result.value.series : [];
+      if (series.length) {
+        const seriesDetails = document.createElement("details");
+        const seriesSummary = document.createElement("summary");
+        seriesSummary.textContent = "Détail des séries (" + series.length + ")";
+        seriesDetails.appendChild(seriesSummary);
+        const seriesList = document.createElement("ul");
+        seriesList.className = "muted";
+        for (const item of series.slice(0, 8)) {
+          const line = document.createElement("li");
+          const itemFlags = Array.isArray(item.quality_flags) ? item.quality_flags : [];
+          line.textContent = String(item.variable_code || "Variable inconnue") +
+            " · " + String(item.unit_code || "unité inconnue") +
+            " · " + String(item.point_count ?? 0) + " points" +
+            " · écart maximal " + String(item.max_gap_minutes ?? 0) + " min" +
+            (itemFlags.length ? " · " + itemFlags.join(", ") : "");
+          seriesList.appendChild(line);
+        }
+        seriesDetails.appendChild(seriesList);
+        if (series.length > 8) {
+          const remaining = document.createElement("p");
+          remaining.className = "muted";
+          remaining.textContent = (series.length - 8) + " autres séries non affichées.";
+          seriesDetails.appendChild(remaining);
+        }
+        article.appendChild(seriesDetails);
+      }
+    } else if (execution.status === "failed") {
+      const failure = document.createElement("p");
+      failure.className = "muted";
+      failure.textContent = "Code de sortie : " + (execution.error_code || "non renseigné");
+      article.appendChild(failure);
+    }
+    panel.appendChild(article);
+  }
+}
+
 function updateOverview() {
   const cultureCount = document.getElementById("overviewCultureCount");
   const batchCount = document.getElementById("overviewBatchCount");
   const observationCount = document.getElementById("overviewObservationCount");
   const observationsPanel = document.getElementById("overviewRecentObservations");
   if (!cultureCount || !batchCount || !observationCount || !observationsPanel) return;
+  renderRecentEngineExecutions();
 
   const domain = document.body.dataset.domain;
   const cultureMetricLabel = cultureCount.closest(".overview-metric")?.querySelector(".overview-metric-label");

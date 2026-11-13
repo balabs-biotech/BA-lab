@@ -1,0 +1,189 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.ba-labs.dz/engine/v1/request.schema.json",
+  "title": "BA Labs scientific engine request v1",
+  "type": "object",
+  "required": [
+    "contract",
+    "contract_version",
+    "request_id",
+    "created_at",
+    "engine",
+    "scope",
+    "input",
+    "parameters"
+  ],
+  "properties": {
+    "contract": {
+      "const": "BA-LABS/ENGINE"
+    },
+    "contract_version": {
+      "const": "1.0.0"
+    },
+    "request_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "engine": {
+      "type": "object",
+      "required": [
+        "engine_id",
+        "engine_version"
+      ],
+      "properties": {
+        "engine_id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_.-]{1,79}$"
+        },
+        "engine_version": {
+          "type": "string",
+          "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+([+-][0-9A-Za-z.-]+)?$"
+        }
+      },
+      "additionalProperties": false
+    },
+    "scope": {
+      "type": "object",
+      "required": [
+        "organization_id"
+      ],
+      "properties": {
+        "organization_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "culture_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "plant_culture_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "batch_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "environment_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "location_id": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      "additionalProperties": false
+    },
+    "input": {
+      "type": "object",
+      "required": [
+        "record_ids",
+        "snapshot_sha256",
+        "records"
+      ],
+      "properties": {
+        "record_ids": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "snapshot_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "records": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "record_id",
+              "record_type",
+              "payload_sha256",
+              "data"
+            ],
+            "properties": {
+              "record_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "record_type": {
+                "enum": [
+                  "measurement",
+                  "observation",
+                  "environmental_observation"
+                ]
+              },
+              "payload_sha256": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              },
+              "data": {
+                "type": "object"
+              },
+              "context": {
+                "type": "object"
+              }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "parameters": {
+      "type": "object"
+    },
+    "datasets": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "provider",
+          "dataset_id",
+          "content_sha256",
+          "retrieved_at"
+        ],
+        "properties": {
+          "provider": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80
+          },
+          "dataset_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "dataset_version": {
+            "type": "string",
+            "maxLength": 100
+          },
+          "content_sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "retrieved_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "uri": {
+            "type": "string",
+            "format": "uri"
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

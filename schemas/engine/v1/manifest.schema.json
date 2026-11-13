@@ -1,0 +1,160 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.ba-labs.dz/engine/v1/manifest.schema.json",
+  "title": "BA Labs scientific engine manifest v1",
+  "type": "object",
+  "required": [
+    "contract",
+    "contract_version",
+    "engine",
+    "domain",
+    "entrypoint",
+    "runtime",
+    "capabilities",
+    "resource_limits",
+    "determinism",
+    "input_contract",
+    "output_contract"
+  ],
+  "properties": {
+    "contract": {
+      "const": "BA-LABS/ENGINE-MANIFEST"
+    },
+    "contract_version": {
+      "const": "1.0.0"
+    },
+    "engine": {
+      "type": "object",
+      "required": [
+        "engine_id",
+        "engine_version",
+        "display_name"
+      ],
+      "properties": {
+        "engine_id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_.-]{1,79}$"
+        },
+        "engine_version": {
+          "type": "string",
+          "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+([+-][0-9A-Za-z.-]+)?$"
+        },
+        "display_name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        }
+      },
+      "additionalProperties": false
+    },
+    "domain": {
+      "enum": [
+        "mycology",
+        "laboratory",
+        "greentech",
+        "environmental",
+        "cross_domain"
+      ]
+    },
+    "entrypoint": {
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9_./-]+:[a-zA-Z_][a-zA-Z0-9_]*$"
+    },
+    "runtime": {
+      "type": "object",
+      "required": [
+        "language",
+        "version"
+      ],
+      "properties": {
+        "language": {
+          "const": "python"
+        },
+        "version": {
+          "type": "string",
+          "pattern": "^3\\.[0-9]+$"
+        }
+      },
+      "additionalProperties": false
+    },
+    "capabilities": {
+      "type": "object",
+      "required": [
+        "database_access",
+        "network_access",
+        "external_data_access",
+        "filesystem_write"
+      ],
+      "properties": {
+        "database_access": {
+          "const": false
+        },
+        "network_access": {
+          "const": false
+        },
+        "external_data_access": {
+          "const": false
+        },
+        "filesystem_write": {
+          "const": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "resource_limits": {
+      "type": "object",
+      "required": [
+        "timeout_seconds",
+        "memory_mb",
+        "max_concurrency"
+      ],
+      "properties": {
+        "timeout_seconds": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 300
+        },
+        "memory_mb": {
+          "type": "integer",
+          "minimum": 64,
+          "maximum": 4096
+        },
+        "max_concurrency": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 32
+        }
+      },
+      "additionalProperties": false
+    },
+    "determinism": {
+      "type": "object",
+      "required": [
+        "deterministic_analysis",
+        "randomness_allowed"
+      ],
+      "properties": {
+        "deterministic_analysis": {
+          "type": "boolean"
+        },
+        "randomness_allowed": {
+          "const": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "input_contract": {
+      "type": "string",
+      "const": "BA-LABS/ENGINE@1.0.0"
+    },
+    "output_contract": {
+      "type": "string",
+      "const": "BA-LABS/ENGINE-RESULT@1.0.0"
+    },
+    "description": {
+      "type": "string",
+      "maxLength": 1000
+    }
+  },
+  "additionalProperties": false
+}

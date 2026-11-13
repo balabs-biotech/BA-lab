@@ -1,0 +1,79 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.ba-labs.dz/bal-json/v1/observation.schema.json",
+  "title": "BAL-JSON v1 observation record data",
+  "type": "object",
+  "required": [
+    "variable_code",
+    "value_text",
+    "observed_at",
+    "context"
+  ],
+  "properties": {
+    "variable_code": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 100,
+      "pattern": "^[a-z][a-z0-9_]*$"
+    },
+    "value_text": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 10000
+    },
+    "observed_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "quality_state": {
+      "const": "raw"
+    },
+    "context": {
+      "type": "object",
+      "properties": {
+        "culture_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "plant_culture_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "batch_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "environment_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "location_id": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      "anyOf": [
+        {
+          "required": [
+            "culture_id"
+          ]
+        },
+        {
+          "required": [
+            "plant_culture_id"
+          ]
+        },
+        {
+          "required": [
+            "batch_id"
+          ]
+        }
+      ],
+      "additionalProperties": false
+    },
+    "metadata": {
+      "type": "object"
+    }
+  },
+  "additionalProperties": false
+}
