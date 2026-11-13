@@ -121,9 +121,19 @@ begin
        'timezone','Africa/Algiers'
      ),
      'upstream_artifacts',jsonb_build_array(jsonb_build_object(
+       'contract','BA-LABS/UPSTREAM-ENGINE-ARTIFACT',
+       'contract_version','1.0.0',
        'role','environmental_qc',
        'execution_id',qc_id::text,
        'result_id',qc_result_id::text,
+       'request_id','11111111-1111-4111-8111-111111111111',
+       'completed_at',ts::text,
+       'scope',jsonb_build_object(
+         'organization_id',org_id::text,
+         'location_id','eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee',
+         'window_start','2026-11-12T00:00:00Z',
+         'window_end','2026-11-13T00:00:00Z'
+       ),
        'engine_id','environmental.timeseries.qc',
        'engine_version','0.2.0',
        'input_snapshot_sha256',repeat('a',64),
