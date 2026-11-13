@@ -426,7 +426,9 @@ Deno.serve(async (req: Request) => {
     if (!sameExecutionInput(prior, engineRequest)) {
       return reply(409, { error: "idempotency_key_reused_with_different_input" });
     }
-    return reply(200, { execution_id: prior.id, request_id: prior.request_id, status: prior.status,
+    const asyncMode = Deno.env.get("BA_ENGINE_ASYNC_DISPATCH") === "true";
+    const responseStatus = asyncMode && ["queued", "running"].includes(prior.status) ? 202 : 200;
+    return reply(responseStatus, { execution_id: prior.id, request_id: prior.request_id, status: prior.status,
       result: prior.result_payload, error_code: prior.error_code, reused: true });
   }
 
@@ -459,25 +461,39 @@ Deno.serve(async (req: Request) => {
     return reply(409, { error: "execution_creation_conflict" });
   }
 
-  // Every terminal failure must be durable in the execution ledger. A worker
-  // error is not considered recorded if the state transition itself failed.
-  async function persistExecutionFailure(code: string, message: string, at = new Date().toISOString()) {
-    const { data, error } = await serviceClient.from("engine_executions").update({
+  if (Deno.env.get("BA_ENGINE_ASYNC_DISPATCH") === "true") {
+    return reply(202, {
+      execution_id: execution.id,
+      request_id: requestId,
+      status: "queued",
+      queued: true,
+    });
+  }
+
+  // Failure writes are scoped to the state/worker that this invocation owns.
+  async function persistExecutionFailure(
+    code: string,
+    message: string,
+    at = new Date().toISOString(),
+    claimedWorkerId?: string,
+  ) {
+    let update = serviceClient.from("engine_executions").update({
       status: "failed",
       error_code: code,
       error_message: message,
       completed_at: at,
       updated_at: at,
-    }).eq("organization_id", organizationId)
-      .eq("id", execution.id)
-      .in("status", ["queued", "running"])
-      .select("id")
-      .maybeSingle();
+    }).eq("organization_id", organizationId).eq("id", execution.id);
+    update = claimedWorkerId
+      ? update.eq("claimed_by", claimedWorkerId).eq("status", "running")
+      : update.eq("status", "queued");
+    const { data, error } = await update.select("id").maybeSingle();
     return !error && !!data;
   }
 
+  const workerId = "edge-engine-orchestrator:" + crypto.randomUUID();
   const { data: claimedExecutions, error: startError } = await serviceClient.rpc("claim_engine_executions", {
-    p_worker_id: `edge-engine-orchestrator:${crypto.randomUUID()}`,
+    p_worker_id: workerId,
     p_limit: 1,
     p_lease_seconds: EXECUTION_LEASE_SECONDS,
     p_execution_id: execution.id,
@@ -485,10 +501,34 @@ Deno.serve(async (req: Request) => {
   });
   const startedExecution = Array.isArray(claimedExecutions) ? claimedExecutions[0] : null;
   if (startError || !startedExecution) {
-    const persisted = await persistExecutionFailure(
+    const persisted = startError ? await persistExecutionFailure(
       "execution_start_failed",
       "Execution could not enter the running state.",
-    );
+    ) : false;
+    const { data: latest } = await serviceClient.from("engine_executions")
+      .select("id,request_id,status,result_payload,error_code")
+      .eq("organization_id", organizationId)
+      .eq("id", execution.id)
+      .maybeSingle();
+    if (!persisted && latest && ["queued", "running", "completed"].includes(latest.status)) {
+      return reply(latest.status === "completed" ? 200 : 202, {
+        execution_id: latest.id,
+        request_id: latest.request_id,
+        status: latest.status,
+        result: latest.result_payload,
+        error_code: latest.error_code,
+        reused: true,
+      });
+    }
+    if (!persisted && latest?.status === "failed") {
+      return reply(200, {
+        execution_id: latest.id,
+        request_id: latest.request_id,
+        status: "failed",
+        error_code: latest.error_code,
+        reused: true,
+      });
+    }
     return reply(500, {
       error: persisted ? "execution_start_failed" : "execution_state_persistence_failed",
       execution_id: execution.id,
@@ -513,6 +553,8 @@ Deno.serve(async (req: Request) => {
     const persisted = await persistExecutionFailure(
       code,
       "The registered engine worker did not return a usable response.",
+      new Date().toISOString(),
+      workerId,
     );
     return reply(persisted ? 502 : 500, {
       error: persisted ? code : "execution_state_persistence_failed",
@@ -531,6 +573,8 @@ Deno.serve(async (req: Request) => {
     const persisted = await persistExecutionFailure(
       code,
       "Worker response failed transport or correlation validation.",
+      new Date().toISOString(),
+      workerId,
     );
     return reply(persisted ? 502 : 500, {
       error: persisted ? code : "execution_state_persistence_failed",
@@ -543,11 +587,12 @@ Deno.serve(async (req: Request) => {
   result.execution_id = execution.id;
   const completedAt = new Date().toISOString();
   if (result.status === "completed") {
-    const { data: resultId, error: saveError } = await serviceClient.rpc("complete_engine_execution", {
+    const { data: resultId, error: saveError } = await serviceClient.rpc("complete_claimed_engine_execution", {
       p_organization_id: organizationId,
       p_execution_id: execution.id,
       p_result: result,
       p_completed_at: completedAt,
+      p_worker_id: workerId,
     });
     if (saveError || !resultId) {
       console.error("[engine-orchestrator] atomic result persistence failed");
@@ -555,6 +600,7 @@ Deno.serve(async (req: Request) => {
         "result_persistence_failed",
         "The worker result could not be committed atomically to the execution ledger.",
         completedAt,
+        workerId,
       );
       return reply(500, {
         error: persisted ? "result_persistence_failed" : "execution_state_persistence_failed",
@@ -570,7 +616,7 @@ Deno.serve(async (req: Request) => {
     });
   }
 
-  const persisted = await persistExecutionFailure(result.error.code, result.error.message, completedAt);
+  const persisted = await persistExecutionFailure(result.error.code, result.error.message, completedAt, workerId);
   if (!persisted) {
     return reply(500, { error: "execution_state_persistence_failed", execution_id: execution.id });
   }
