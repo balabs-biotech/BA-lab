@@ -1159,7 +1159,13 @@ class EngineContractTests(unittest.TestCase):
                 "content_sha256": "b" * 64,
             },
         ]
-        contexts = [{"organism_kind": "fungus"}]
+        contexts = [{
+            "organism_kind": "fungus",
+            "genetic_reference": {
+                "organism_id": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaab",
+                "strain_id": "99999999-9999-4999-8999-999999999999",
+            },
+        }]
         features = [{
             "feature_code": "mean_relative_humidity",
             "value": 70.0,
@@ -1169,6 +1175,9 @@ class EngineContractTests(unittest.TestCase):
         assertions = [{
             "assertion_type": "strain.designation",
             "assertion_value": "HK35",
+            "subject_type": "strain",
+            "organism_id": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaab",
+            "strain_id": "99999999-9999-4999-8999-999999999999",
         }]
         unverified, _ = _evaluate_interpretation_rules(
             [rule], contexts, features, datasets, "not_documented", []
