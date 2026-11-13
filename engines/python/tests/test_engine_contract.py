@@ -659,7 +659,7 @@ class EngineContractTests(unittest.TestCase):
 
         invalid_profile_manifest = json.loads(json.dumps(request))
         next(dataset for dataset in invalid_profile_manifest["datasets"]
-             if dataset["provider"] == "BA_LABS_INTERPRETATION_PROFILE")["content_sha256"] = "invalid"
+             if dataset["provider"] == "BA_LABS_INTERPRETATION_PROFILE")["dataset_id"] = "untrusted.profile"
         with self.assertRaisesRegex(ValueError, "invalid_interpretation_profile_manifest"):
             analyze_biological_context_features(invalid_profile_manifest)
 
