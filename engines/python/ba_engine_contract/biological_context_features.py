@@ -423,7 +423,7 @@ def analyze_biological_context_features(request: Mapping[str, Any]) -> dict[str,
             "hypotheses": [],
         },
         "limitations": [
-            "This engine reports coverage and descriptive features only; it does not diagnose biological state or recommend interventions.",
+            "This engine reports traceable coverage and descriptive features; optional rules produce limited threshold findings only, not biological diagnoses or intervention recommendations.",
             "Provider-derived environmental observations remain distinct from local in-situ measurements.",
             "A biological-subject-to-environment relationship must be verified by the trusted source adapter before environmental observations are included.",
         ],
