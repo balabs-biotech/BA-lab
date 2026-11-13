@@ -63,6 +63,10 @@ begin
     or v_artifact->>'contract_version' is distinct from '1.0.0'
     or v_artifact->>'role' is distinct from 'environmental_qc'
     or v_artifact->>'execution_id' is distinct from p_upstream_execution_id::text
+    or nullif(v_artifact->>'completed_at','')::timestamptz is distinct from (
+      select completed_at from public.engine_executions
+      where organization_id = p_organization_id and id = p_upstream_execution_id
+    )
     or v_artifact->>'request_id' is distinct from (
       select request_id::text from public.engine_executions
       where organization_id = p_organization_id and id = p_upstream_execution_id
