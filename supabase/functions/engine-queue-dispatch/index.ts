@@ -29,6 +29,8 @@ type Execution = {
   engine_id: string;
   engine_version: string;
   input_snapshot_sha256: string;
+  scope: Record<string, any>;
+  input_record_ids: string[];
   request_payload: Record<string, any>;
 };
 
@@ -135,6 +137,8 @@ async function processExecution(
     request.engine?.engine_id !== execution.engine_id ||
     request.engine?.engine_version !== execution.engine_version ||
     request.scope?.organization_id !== execution.organization_id ||
+    JSON.stringify(request.scope) !== JSON.stringify(execution.scope) ||
+    JSON.stringify(request.input?.record_ids) !== JSON.stringify(execution.input_record_ids) ||
     request.input?.snapshot_sha256 !== execution.input_snapshot_sha256) {
     return await persistFailure(
       db, execution, workerId, "stored_request_invalid",
@@ -188,11 +192,12 @@ async function processExecution(
   result.execution_id = execution.id;
   const completedAt = new Date().toISOString();
   if (result.status === "completed") {
-    const { data: resultId, error } = await db.rpc("complete_engine_execution", {
+    const { data: resultId, error } = await db.rpc("complete_claimed_engine_execution", {
       p_organization_id: execution.organization_id,
       p_execution_id: execution.id,
       p_result: result,
       p_completed_at: completedAt,
+      p_worker_id: workerId,
     });
     if (!error && resultId) return "completed";
     return await persistFailure(
