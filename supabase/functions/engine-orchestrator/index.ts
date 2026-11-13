@@ -252,6 +252,7 @@ Deno.serve(async (req: Request) => {
         contextStable: snapshot.parameters.profile_context_stable === true,
         windowStartDate: snapshot.parameters.analysis_window_start_date,
         windowLastIncludedDate: snapshot.parameters.analysis_window_last_included_date,
+        historicalReplay: parameters.historical_replay === true,
       });
     } catch (error) {
       const code = error instanceof Error ? error.message : "interpretation_profile_resolution_failed";
