@@ -64,6 +64,26 @@ const conflict = await loadAuthenticatedBiologicalIdentityAssertions({
 });
 assert.equal(conflict.state, "conflicting");
 assert.equal(conflict.assertions.length, 2);
+
+const invalidSourceClient = { from(table) {
+  const query = {
+    select() { return this; }, eq() { return this; }, in() { return this; },
+    limit() {
+      return Promise.resolve({
+        error: null,
+        data: table === "biological_identity_assertions"
+          ? [assertion]
+          : [{ ...source, status: "retired" }],
+      });
+    },
+  };
+  return query;
+}};
+await assert.rejects(loadAuthenticatedBiologicalIdentityAssertions({
+  userClient: invalidSourceClient, organizationId,
+  biologicalContexts: [{ genetic_reference: { organism_id: organismId, strain_id: strainId } }],
+  windowStartDate: "2026-11-01", windowLastIncludedDate: "2026-11-03",
+}), /biological_identity_source_provenance_integrity_failure/);
 assert.deepEqual([...new Set(calls.filter((call) => call[0] === "from").map((call) => call[1]))], [
   "biological_identity_assertions", "biological_reference_registry",
 ]);
