@@ -297,6 +297,8 @@ jobs:
         run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/biological_reference_registry_contract.test.sql
       - name: Test biological identity assertion integrity
         run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/biological_identity_assertions_contract.test.sql
+      - name: Test bounded recovery of expired engine execution leases
+        run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/engine_execution_lease_recovery.test.sql
 
   ecosystem-regression:
     runs-on: ubuntu-latest
