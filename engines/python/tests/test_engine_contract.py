@@ -673,7 +673,7 @@ class EngineContractTests(unittest.TestCase):
         )
         self.assertIn("rule_version=1.0.0", finding["statement"])
         self.assertIn("reference=ba-labs.protocols.pleurotus-fruiting@2026.1", finding["statement"])
-        self.assertIn("BA_LABS_RULE_REGISTRY/ba-labs.protocols.pleurotus-fruiting@2026.1", result["result"]["provenance"]["source_references"])
+        self.assertIn("BA_LABS_RULE_REGISTRY/ba-labs.protocols.pleurotus-fruiting@2026.1#sha256=" + ("d" * 64), result["result"]["provenance"]["source_references"])
         mismatched_context = json.loads(json.dumps(request))
         mismatched_context["parameters"]["biological_contexts"][0]["strain_code"] = "OTHER-STRAIN"
         mismatch_result = execute_registered_engine(mismatched_context)
