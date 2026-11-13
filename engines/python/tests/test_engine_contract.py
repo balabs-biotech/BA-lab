@@ -560,8 +560,7 @@ class EngineContractTests(unittest.TestCase):
         self.assertEqual(value["subject"]["subject_id"], culture_id)
         self.assertEqual(value["coverage"]["source_record_count"], 3)
         self.assertEqual(value["coverage"]["record_counts_by_type"]["measurement"], 3)
-        self.assertEqual(value["coverage"]["record_counts_by_type"]["environmental_observation"], 2)
-        self.assertEqual(len(value["derived_features"]), 8)
+        self.assertEqual(len(value["derived_features"]), 4)
         feature = next(item for item in value["derived_features"] if item["feature_code"] == "series.measurement.air_temperature.mean")
         self.assertEqual(feature["feature_code"], "series.measurement.air_temperature.mean")
         self.assertEqual(feature["value"], 22.0)
@@ -1092,6 +1091,7 @@ class EngineContractTests(unittest.TestCase):
         self.assertEqual(value["subject"]["subject_id"], plant_culture_id)
         self.assertEqual(value["coverage"]["source_record_count"], 5)
         self.assertEqual(value["coverage"]["record_counts_by_type"]["measurement"], 3)
+        self.assertEqual(value["coverage"]["record_counts_by_type"]["environmental_observation"], 2)
         self.assertEqual(len(value["observed_facts"]), 5)
         self.assertEqual(len(value["derived_features"]), 8)
         mean_feature = next(
