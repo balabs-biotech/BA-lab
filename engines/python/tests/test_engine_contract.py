@@ -17,7 +17,7 @@ from ba_engine_contract import (
     execute_registered_engine, validate_request, validate_response,
 )
 from ba_engine_contract.worker import main as worker_main
-from ba_engine_contract.validation import _validator
+from ba_engine_contract.validation import _validator, _stable_sha256
 from ba_engine_contract.registry import load_engine
 from ba_engine_contract.environmental_timeseries_qc import (
     analyze_environmental_timeseries_qc, run_environmental_timeseries_qc,
@@ -1299,7 +1299,7 @@ class EngineContractTests(unittest.TestCase):
                 "variable_code": "air_temperature",
                 "outlier_record_ids": ["3c2b3a4d-5e6f-4789-8123-456789abcdef"],
             }],
-            "review_summary": {"outlier_count": 1},
+            "review_summary": {"outlier_count": 1, "mean_temperature_c": 22.0},
         }
         artifact = {
             "contract": "BA-LABS/UPSTREAM-ENGINE-ARTIFACT",
@@ -1326,9 +1326,7 @@ class EngineContractTests(unittest.TestCase):
                 "provenance": {"algorithm": "environmental-timeseries-qc-v2"},
             },
         }
-        artifact["artifact_sha256"] = hashlib.sha256(
-            json.dumps(artifact, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode("utf-8")
-        ).hexdigest()
+        artifact["artifact_sha256"] = _stable_sha256(artifact)
         request["upstream_artifacts"] = [artifact]
 
         result = execute_registered_engine(request)
