@@ -64,7 +64,7 @@ for (const contract of [
 ]) assert.ok(cultureAssessmentSource.includes(contract), "Missing culture BIE execution contract: " + contract);
 assert.match(tracker, /runCultureBiologicalAssessment\s*\n\s*\);/);
 assert.match(tracker, /closeCultureDetail[\s\S]*?cultureBiologicalAssessmentRequestId \+= 1;/);
-assert.match(tracker, /cultureDetailPanel\?\.classList\.add\("hidden"\)/);
+assert.match(tracker, /getElementById\("cultureDetailPanel"\)\?\.classList\.add\("hidden"\)/);
 assert.match(tracker, /assessmentStart\.value = startedDate/);
 assert.match(tracker, /assessmentEnd\.value = localDateValue\(nextDay\)/);
 
