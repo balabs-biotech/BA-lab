@@ -395,3 +395,39 @@ jobs:
           deno check
           supabase/functions/engine-orchestrator/index.ts
           supabase/functions/engine-queue-dispatch/index.ts
+
+  supabase-local-engine-runtime:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: supabase/setup-cli@v1
+        with:
+          version: 3.0.0
+      - name: Start isolated Supabase stack and apply migrations
+        run: supabase start -x studio,mailpit,storage-api,imgproxy,realtime,logflare,vector,supavisor
+      - name: Verify local migration state
+        run: supabase migration list
+      - name: Start real Edge Functions runtime
+        run: |
+          cat > /tmp/ba-labs-edge-ci.env <<'EOF'
+          BA_ENGINE_ASYNC_DISPATCH=true
+          BA_ENGINE_DISPATCH_TOKEN=ci-dispatch-token-0123456789abcdef
+          EOF
+          supabase functions serve --no-verify-jwt --env-file /tmp/ba-labs-edge-ci.env > /tmp/ba-labs-edge-runtime.log 2>&1 &
+          echo $! > /tmp/ba-labs-edge-runtime.pid
+          for attempt in $(seq 1 60); do
+            code="$(curl --silent --output /dev/null --write-out '%{http_code}' --request POST http://127.0.0.1:54321/functions/v1/engine-orchestrator --header 'content-type: application/json' --data '{}' || true)"
+            if [ "$code" = "401" ]; then exit 0; fi
+            if ! kill -0 "$(cat /tmp/ba-labs-edge-runtime.pid)" 2>/dev/null; then
+              cat /tmp/ba-labs-edge-runtime.log
+              exit 1
+            fi
+            sleep 2
+          done
+          cat /tmp/ba-labs-edge-runtime.log
+          exit 1
+      - name: Exercise both deployed Edge handlers through Kong
+        run: node scripts/test-local-engine-edge-runtime.mjs
+      - name: Stop local Supabase stack
+        if: always()
+        run: supabase stop --no-backup
