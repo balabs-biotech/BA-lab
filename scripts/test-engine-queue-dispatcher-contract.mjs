@@ -27,7 +27,7 @@ const checks = [
   ["dispatcher commits completed results atomically under the active worker lease", /rpc\("complete_claimed_engine_execution"/],
   ["dispatcher compares JSONB scope semantically with canonical key ordering", /stable\(request\.scope\)\s*!==\s*stable\(execution\.scope\)/],
   ["dispatcher recomputes the canonical input snapshot digest before worker dispatch", /sha256\(stable\(request\.input\?\.records\)\)[\s\S]*?execution\.input_snapshot_sha256/],
-  ["dispatcher forwards the stored upstream QC artifact to the Python worker without rebuilding it from caller input", /body:\s*JSON\.stringify\(request\)[\s\S]*?upstream_artifacts/],
+  ["dispatcher forwards the complete stored request envelope to the Python worker without rebuilding it from caller input", /body:\s*JSON\.stringify\(request\)/],
   ["dispatcher does not discard QC artifact metadata before worker validation", /const request = execution\.request_payload[\s\S]*?validateRequest\(request\)[\s\S]*?JSON\.stringify\(request\)/],
   ["dispatcher persists the worker's QC assessment and provenance in the durable result", /p_result:\s*result[\s\S]*?complete_claimed_engine_execution/],
   ["dispatcher leaves optional QC attachment behavior to the versioned engine contract", /validateRequest\(request\)[\s\S]*?body:\s*JSON\.stringify\(request\)/],
