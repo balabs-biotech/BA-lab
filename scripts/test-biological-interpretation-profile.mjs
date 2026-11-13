@@ -106,6 +106,47 @@ assert.equal(resolved.datasets[1].provider, "BA_LABS_RULE_REGISTRY");
 assert.equal(resolved.datasets[1].content_sha256, "d".repeat(64));
 assert.equal(resolved.datasets[1].uri, "https://example.org/pleurotus-protocol");
 
+const queryLog = [];
+const makeQuery = (table) => {
+  const query = {
+    select(value) { queryLog.push([table, "select", value]); return this; },
+    eq(field, value) { queryLog.push([table, "eq", field, value]); return this; },
+    lte(field, value) { queryLog.push([table, "lte", field, value]); return this; },
+    or(value) { queryLog.push([table, "or", value]); return this; },
+    in(field, value) { queryLog.push([table, "in", field, value]); return this; },
+    limit(value) {
+      queryLog.push([table, "limit", value]);
+      return Promise.resolve({
+        error: null,
+        data: table === "domain_interpretation_profiles" ? [profile] : [reference],
+      });
+    },
+  };
+  return query;
+};
+const authenticated = await loadAuthenticatedBiologicalInterpretationProfile({
+  userClient: { from(table) { queryLog.push(["from", table]); return makeQuery(table); } },
+  organizationId,
+  domain: "mycology",
+  domainAmbiguous: false,
+  contextStable: true,
+  windowStartDate: input.windowStartDate,
+  windowLastIncludedDate: input.windowLastIncludedDate,
+});
+assert.equal(authenticated.state, "loaded");
+assert.deepEqual(queryLog.filter((entry) => entry[0] === "from").map((entry) => entry[1]), [
+  "domain_interpretation_profiles",
+  "biological_reference_registry",
+]);
+assert.ok(queryLog.some((entry) =>
+  entry[0] === "domain_interpretation_profiles" &&
+  entry[1] === "eq" && entry[2] === "organization_id" && entry[3] === organizationId
+));
+assert.ok(queryLog.some((entry) =>
+  entry[0] === "biological_reference_registry" &&
+  entry[1] === "eq" && entry[2] === "status" && entry[3] === "validated"
+));
+
 const missingReference = await assert.rejects(
   buildBiologicalInterpretationProfile({ ...input, references: [] }),
   /interpretation_reference_not_validated/,
