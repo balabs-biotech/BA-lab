@@ -10,6 +10,7 @@ import {
   loadAuthenticatedPlantBiologicalContextSnapshot,
 } from "../_shared/biological-context-loader.ts";
 import { loadAuthenticatedBiologicalInterpretationProfile } from "../_shared/biological-interpretation-profile.ts";
+import { loadAuthenticatedBiologicalIdentityAssertions } from "../_shared/biological-identity-assertions.ts";
 
 const headers = {
   "Access-Control-Allow-Origin": "*",
@@ -237,13 +238,34 @@ Deno.serve(async (req: Request) => {
       ]);
       return reply(422, { error: allowedCodes.has(code) ? code : "interpretation_profile_resolution_failed" });
     }
+    let identityResolution;
+    try {
+      identityResolution = await loadAuthenticatedBiologicalIdentityAssertions({
+        userClient,
+        organizationId,
+        biologicalContexts: snapshot.parameters.biological_contexts ?? [],
+      });
+    } catch (error) {
+      const code = error instanceof Error ? error.message : "biological_identity_resolution_failed";
+      const allowedCodes = new Set([
+        "biological_identity_context_invalid",
+        "biological_identity_assertion_registry_unavailable",
+        "biological_identity_assertion_limit_exceeded",
+        "biological_reference_registry_unavailable",
+        "biological_identity_reference_ambiguous",
+        "biological_identity_assertion_identity_ambiguous",
+      ]);
+      return reply(422, { error: allowedCodes.has(code) ? code : "biological_identity_resolution_failed" });
+    }
     effectiveParameters = {
       ...snapshot.parameters,
       interpretation_rules: interpretationProfile.rules,
       interpretation_profile_state: interpretationProfile.state,
       interpretation_profile: interpretationProfile.profile,
+      biological_identity_state: identityResolution.state,
+      biological_identity_assertions: identityResolution.assertions,
     };
-    effectiveDatasets = interpretationProfile.datasets;
+    effectiveDatasets = [...interpretationProfile.datasets, ...identityResolution.datasets];
     snapshotHash = snapshot.input.snapshot_sha256;
   } else {
     let sourceRows: Record<string, any>[];
