@@ -52,7 +52,7 @@ const input = {
 
 const resolved = await buildBiologicalInterpretationProfile(input);
 const ambiguousDomain = await loadAuthenticatedBiologicalInterpretationProfile({
-  userClient: null,
+  userClient: { from() { throw new Error("unexpected_registry_query"); } },
   organizationId,
   domain: null,
   domainAmbiguous: true,
@@ -63,7 +63,7 @@ const ambiguousDomain = await loadAuthenticatedBiologicalInterpretationProfile({
 assert.equal(ambiguousDomain.state, "domain_ambiguous");
 
 const unstableContext = await loadAuthenticatedBiologicalInterpretationProfile({
-  userClient: null,
+  userClient: { from() { throw new Error("unexpected_registry_query"); } },
   organizationId,
   domain: "mycology",
   domainAmbiguous: false,
@@ -74,7 +74,7 @@ const unstableContext = await loadAuthenticatedBiologicalInterpretationProfile({
 assert.equal(unstableContext.state, "context_not_stable");
 
 const absentDomain = await loadAuthenticatedBiologicalInterpretationProfile({
-  userClient: null,
+  userClient: { from() { throw new Error("unexpected_registry_query"); } },
   organizationId,
   domain: null,
   domainAmbiguous: false,
@@ -86,7 +86,7 @@ assert.equal(absentDomain.state, "not_configured");
 
 await assert.rejects(
   loadAuthenticatedBiologicalInterpretationProfile({
-    userClient: null,
+    userClient: { from() { throw new Error("unexpected_registry_query"); } },
     organizationId,
     domain: "mycology",
     domainAmbiguous: false,
