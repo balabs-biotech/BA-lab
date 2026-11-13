@@ -2050,7 +2050,7 @@ body{background:linear-gradient(180deg,#0b1214 0,#101a1b 44%,#eeeade 44%,#eeeade
 .editorial-about h2{font:500 clamp(36px,4.5vw,60px)/1.02 Georgia,serif!important;color:#F0EEE5!important}
 .editorial-about p{max-width:700px!important;color:#D1D8CF!important;font-size:15px!important}
 .editorial-about .editorial-link{color:#F0EEE5!important}
-.editorial-about .editorial-art-about{display:none!important}
+
 .editorial-work{
   background:#D1D0C5!important;color:#111B1D!important;
   padding:clamp(58px,7vw,88px) clamp(22px,7vw,104px)!important
