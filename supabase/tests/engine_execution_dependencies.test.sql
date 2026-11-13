@@ -41,6 +41,8 @@ declare
   bie_id uuid := 'dddddddd-dddd-4ddd-8ddd-dddddddddddd';
   atomic_execution_id uuid;
   atomic_result_id uuid;
+  bie_result_id uuid;
+  bie_completed_at timestamptz;
   tampered_payload jsonb;
   qc_result_id uuid;
   got uuid;
@@ -191,6 +193,79 @@ begin
      and d.dependency_role='environmental_qc'
  ) then
    raise exception 'dispatcher claim did not retain the exact QC lineage edge';
+ end if;
+
+ -- Complete the claimed BIE execution through the same lease-owned RPC used
+ -- by the queue dispatcher, then verify its QC assessment and lineage survive
+ -- in the immutable, queryable result ledger.
+ bie_completed_at := clock_timestamp();
+ bie_result_id := public.complete_claimed_engine_execution(
+   org_id,
+   atomic_execution_id,
+   jsonb_build_object(
+     'contract','BA-LABS/ENGINE-RESULT',
+     'contract_version','1.0.0',
+     'request_id','33333333-3333-4333-8333-333333333333',
+     'execution_id',atomic_execution_id::text,
+     'engine',jsonb_build_object(
+       'engine_id','biological.context.features',
+       'engine_version','0.2.0'
+     ),
+     'input_snapshot_sha256',repeat('c',64),
+     'status','completed',
+     'result',jsonb_build_object(
+       'outcome','review_required',
+       'value',jsonb_build_object(
+         'features',jsonb_build_object('environmental_observation_count',0),
+         'environmental_quality_control',jsonb_build_object(
+           'outcome','success',
+           'value',jsonb_build_object('series',jsonb_build_array()),
+           'limitations',jsonb_build_array(),
+           'quality_flags',jsonb_build_array('qc_review_signal'),
+           'provenance',jsonb_build_object('algorithm','fixture')
+         )
+       ),
+       'limitations',jsonb_build_array('fixture_limitation'),
+       'quality_flags',jsonb_build_array('environmental_qc_review_required'),
+       'provenance',jsonb_build_object(
+         'upstream_artifacts',jsonb_build_array(jsonb_build_object(
+           'role','environmental_qc',
+           'execution_id',qc_id::text,
+           'result_id',qc_result_id::text,
+           'artifact_sha256',repeat('f',64)
+         ))
+       )
+     )
+   ),
+   bie_completed_at,
+   'bie-dispatch-fixture-worker'
+ );
+
+ if not exists(
+   select 1
+   from public.engine_execution_results r
+   join public.engine_executions e
+     on e.organization_id=r.organization_id and e.id=r.execution_id
+   join public.engine_execution_dependencies d
+     on d.organization_id=r.organization_id and d.downstream_execution_id=r.execution_id
+   where r.organization_id=org_id
+     and r.id=bie_result_id
+     and r.execution_id=atomic_execution_id
+     and r.engine_id='biological.context.features'
+     and r.engine_version='0.2.0'
+     and r.outcome='review_required'
+     and r.value->'environmental_quality_control'->'quality_flags'
+       = '["qc_review_signal"]'::jsonb
+     and r.quality_flags='["environmental_qc_review_required"]'::jsonb
+     and r.provenance->'upstream_artifacts'->0->>'execution_id'=qc_id::text
+     and r.provenance->'upstream_artifacts'->0->>'result_id'=qc_result_id::text
+     and e.status='completed'
+     and e.result_payload->'result'->'provenance'->'upstream_artifacts'->0->>'artifact_sha256'=repeat('f',64)
+     and d.upstream_execution_id=qc_id
+     and d.upstream_result_id=qc_result_id
+     and d.dependency_role='environmental_qc'
+ ) then
+   raise exception 'completed BIE result did not persist QC assessment and exact upstream lineage';
  end if;
 
  -- The enqueue boundary must reject a caller-modified QC result even when
