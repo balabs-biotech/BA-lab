@@ -35,6 +35,35 @@ assert.equal(result.state, "documented");
 assert.equal(result.assertions.length, 1);
 assert.equal(result.assertions[0].assertion_value, "P80");
 assert.equal(result.datasets.length, 1);
+
+const conflictingAssertion = {
+  ...assertion,
+  id: "eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee",
+  assertion_code: "strain.identity.designation.alt",
+  assertion_value: "P80-legacy",
+  content_sha256: "c".repeat(64),
+};
+const conflictClient = { from(table) {
+  const query = {
+    select() { return this; }, eq() { return this; }, in() { return this; },
+    limit() {
+      return Promise.resolve({
+        error: null,
+        data: table === "biological_identity_assertions"
+          ? [assertion, conflictingAssertion]
+          : [source],
+      });
+    },
+  };
+  return query;
+}};
+const conflict = await loadAuthenticatedBiologicalIdentityAssertions({
+  userClient: conflictClient, organizationId,
+  biologicalContexts: [{ genetic_reference: { organism_id: organismId, strain_id: strainId } }],
+  windowStartDate: "2026-11-01", windowLastIncludedDate: "2026-11-03",
+});
+assert.equal(conflict.state, "conflicting");
+assert.equal(conflict.assertions.length, 2);
 assert.deepEqual([...new Set(calls.filter((call) => call[0] === "from").map((call) => call[1]))], [
   "biological_identity_assertions", "biological_reference_registry",
 ]);
