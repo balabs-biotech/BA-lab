@@ -19,11 +19,13 @@ for (const label of [
   "Hypothèses à vérifier",
   "Lacunes temporelles"
 ]) assert.ok(i18n.includes(JSON.stringify(label)), "Missing BIE localization source key: " + label);
-for (const translation of [
-  "Biological context assessment",
-  "Avaliação do contexto biológico",
-  "تقييم السياق البيولوجي"
-]) assert.ok(i18n.includes(translation), "Missing BIE translation: " + translation);
+for (const entry of [
+  ["Évaluation du contexte biologique", "Biological context assessment"],
+  ["Évaluation du contexte biologique", "Avaliação do contexto biológico"],
+  ["Évaluation du contexte biologique", "تقييم السياق البيولوجي"]
+]) {
+  assert.ok(i18n.includes(JSON.stringify(entry[0]) + ":" + JSON.stringify(entry[1])), "Missing BIE translation: " + entry[1]);
+}
 
 
 assert.match(workspace, /id="overviewRecentEngineExecutions"/);
