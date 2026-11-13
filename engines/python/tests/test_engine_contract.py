@@ -674,6 +674,12 @@ class EngineContractTests(unittest.TestCase):
         self.assertIn("rule_version=1.0.0", finding["statement"])
         self.assertIn("reference=ba-labs.protocols.pleurotus-fruiting@2026.1", finding["statement"])
         self.assertIn("BA_LABS_RULE_REGISTRY/ba-labs.protocols.pleurotus-fruiting@2026.1", result["result"]["provenance"]["source_references"])
+        mismatched_context = json.loads(json.dumps(request))
+        mismatched_context["parameters"]["biological_contexts"][0]["strain_code"] = "OTHER-STRAIN"
+        mismatch_result = execute_registered_engine(mismatched_context)
+        self.assertEqual(mismatch_result["status"], "completed")
+        self.assertEqual(mismatch_result["result"]["value"]["findings"], [])
+        self.assertIn("biological_interpretation_not_performed", mismatch_result["result"]["quality_flags"])
 
     def test_biological_context_features_uses_half_open_analysis_window(self):
         request = json.loads(json.dumps(REQUEST))
