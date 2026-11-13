@@ -346,5 +346,5 @@ begin
    null;
  end;
 
-end $;
+end $$;
 rollback;
