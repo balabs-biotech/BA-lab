@@ -71,7 +71,7 @@ assert result["input_snapshot_sha256"] == payload["input"]["snapshot_sha256"]
 print("Container HTTP smoke test passed: health, auth, registry dispatch and result correlation.")
 
 # GreenTech BIE v0.2: exercise the registered plant-subject engine through the
-// same isolated HTTP worker used by the orchestrator. The worker receives only
+# same isolated HTTP worker used by the orchestrator. The worker receives only
 # an immutable snapshot; it has no database or external-network capability.
 plant_id = str(uuid4())
 plant_measurement_id = str(uuid4())
