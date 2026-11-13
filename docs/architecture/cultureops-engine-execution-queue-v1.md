@@ -144,7 +144,7 @@ The polling loop catches failures per job. An engine exception closes only that 
 3. **Complete:** PostgreSQL 17 migration-replay contract tests for idempotency, tenant authorization, fencing, expiry recovery, retry backoff/exhaustion, and priority/FIFO ordering. Concurrent multi-session claim testing remains a follow-up.
 4. **Complete:** standard-library Python PostgREST client and consumer with `--once`, continuous polling, signal handling, and configurable engine plugin loading.
 5. **Complete:** deterministic demo engine and worker-boundary end-to-end test.
-6. **In progress:** first real engine `environmental.qc@1.0.0` validates normalized environmental observations using explicit caller-supplied bounds and units; it deliberately makes no agronomic diagnosis.
+6. **Complete:** first real engine `environmental.qc@1.0.0` validates normalized environmental observations using explicit caller-supplied bounds and units; it deliberately makes no agronomic diagnosis.
 7. **Pending:** connect BAL-JSON/environmental ingestion to durable queue submission, then implement provider-specific and spatial engines.
 8. **In progress:** final review of edge cases and CI after the latest worker reliability changes. Production migration and live Supabase connectivity remain explicitly separate approval steps.
 
