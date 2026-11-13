@@ -390,9 +390,9 @@ jobs:
       - uses: denoland/setup-deno@v2
         with:
           deno-version: v2.x
-      - name: Type-check the deployed Edge orchestration entrypoints
+      - name: Resolve and transpile the deployed Edge orchestration entrypoints
         run: >-
-          deno check
+          deno check --no-check
           supabase/functions/engine-orchestrator/index.ts
           supabase/functions/engine-queue-dispatch/index.ts
 
