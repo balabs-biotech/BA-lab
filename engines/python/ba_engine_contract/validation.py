@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import hashlib
 import json
+import math
+from decimal import Decimal
 import os
 from functools import lru_cache
 from pathlib import Path
@@ -43,11 +45,35 @@ def _validate(instance: Mapping[str, Any], schema_name: str) -> None:
         raise ContractValidationError(f"{schema_name} validation failed: {details}")
 
 
+def _javascript_stable_json(value: Any) -> str:
+    """Canonical JSON matching the TypeScript JSON.stringify number semantics."""
+    if value is None or isinstance(value, (str, bool, int)):
+        return json.dumps(value, ensure_ascii=False, separators=(",", ":"))
+    if isinstance(value, float):
+        if not math.isfinite(value):
+            raise ContractValidationError("upstream artifact contains a non-finite number")
+        if value == 0:
+            return "0"
+        absolute = abs(value)
+        if value.is_integer() and absolute < 1e21:
+            return str(int(value))
+        raw = repr(value).lower()
+        if 1e-6 <= absolute < 1e21:
+            return format(Decimal(raw), "f").rstrip("0").rstrip(".") if "." in format(Decimal(raw), "f") else format(Decimal(raw), "f")
+        mantissa, exponent = raw.split("e")
+        return f"{mantissa}e{int(exponent):+d}" if int(exponent) >= 0 else f"{mantissa}e{int(exponent)}"
+    if isinstance(value, list):
+        return "[" + ",".join(_javascript_stable_json(item) for item in value) + "]"
+    if isinstance(value, Mapping):
+        return "{" + ",".join(
+            json.dumps(key, ensure_ascii=False) + ":" + _javascript_stable_json(value[key])
+            for key in sorted(value)
+        ) + "}"
+    raise ContractValidationError("upstream artifact contains an unsupported JSON value")
+
+
 def _stable_sha256(value: Any) -> str:
-    encoded = json.dumps(
-        value, sort_keys=True, separators=(",", ":"), ensure_ascii=False, allow_nan=False,
-    ).encode("utf-8")
-    return hashlib.sha256(encoded).hexdigest()
+    return hashlib.sha256(_javascript_stable_json(value).encode("utf-8")).hexdigest()
 
 
 def validate_request(request: Mapping[str, Any]) -> None:
