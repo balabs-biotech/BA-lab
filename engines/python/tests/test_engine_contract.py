@@ -489,6 +489,38 @@ class EngineContractTests(unittest.TestCase):
         self.assertEqual(result["engine"], request["engine"])
         self.assertEqual(result["result"]["outcome"], "insufficient_data")
 
+    def test_registered_result_records_reproducible_runtime_provenance(self):
+        request = json.loads(json.dumps(REQUEST))
+        request["engine"] = {"engine_id": "environmental.timeseries.qc", "engine_version": "0.2.0"}
+        with patch.dict(os.environ, {
+            "BA_ENGINE_BUILD_REVISION": "a" * 40,
+            "BA_ENGINE_IMAGE_DIGEST": "sha256:" + "b" * 64,
+        }):
+            result = execute_registered_engine(request)
+        self.assertEqual(result["status"], "completed")
+        provenance = result["result"]["provenance"]
+        runtime = provenance["execution_environment"]
+        manifest_path = REGISTRY_DIR / "environmental.timeseries.qc-0.2.0.json"
+        self.assertEqual(
+            runtime["engine_manifest_sha256"],
+            hashlib.sha256(manifest_path.read_bytes()).hexdigest(),
+        )
+        self.assertEqual(runtime["source_revision"], "a" * 40)
+        self.assertEqual(runtime["container_image_digest"], "sha256:" + "b" * 64)
+        self.assertTrue(runtime["python_version"])
+        self.assertTrue(runtime["dependencies"])
+        self.assertEqual(list(self.response_validator.iter_errors(result)), [])
+
+    def test_registered_result_flags_missing_build_revision(self):
+        request = json.loads(json.dumps(REQUEST))
+        request["engine"] = {"engine_id": "environmental.timeseries.qc", "engine_version": "0.2.0"}
+        with patch.dict(os.environ, {}, clear=True):
+            result = execute_registered_engine(request)
+        self.assertEqual(result["status"], "completed")
+        self.assertEqual(result["result"]["provenance"]["execution_environment"]["source_revision"], "unrecorded")
+        self.assertIn("build_revision_unavailable", result["result"]["quality_flags"])
+        self.assertIn("container_image_digest_unavailable", result["result"]["quality_flags"])
+
     def test_registry_rejects_unregistered_engine(self):
         request = json.loads(json.dumps(REQUEST))
         request["engine"] = {"engine_id": "environmental.unknown", "engine_version": "0.1.0"}

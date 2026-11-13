@@ -30,7 +30,10 @@ The `execute_engine` wrapper binds execution to the registered engine ID/version
 Build from the repository root so the versioned engine schemas are included:
 
 ```sh
-docker build -f engines/python/Dockerfile -t ba-labs-engine-worker:0.1.0 .
+docker build \
+  --build-arg BA_ENGINE_BUILD_REVISION="$(git rev-parse HEAD)" \
+  -f engines/python/Dockerfile \
+  -t ba-labs-engine-worker:0.1.0 .
 ```
 
 Run with a unique secret of at least 24 characters:
@@ -47,6 +50,15 @@ docker run -d --name ba-engine-worker \
 The container runs as UID/GID 10001, has a read-only root filesystem and drops Linux capabilities. Do not publish the port publicly. Place it behind a TLS-terminating reverse proxy or private service network, restrict inbound traffic to the Supabase Edge Function egress path, and enforce an outbound-deny network policy. The worker itself does not need database or external network access.
 
 The adapter launches each registered engine in a separate Python worker process and enforces the manifest's 15-second wall-clock deadline by terminating that process on timeout. The container's 256 MB memory cap and 1 CPU limit are enforced by the container runtime; outbound network policy remains a deployment-platform responsibility. The process deadline is a wall-clock limit, not a per-process CPU quota. Deploy only reviewed, allowlisted engines; this image is not a complete hostile-code sandbox.
+
+Every completed registered-engine result records an `execution_environment` provenance block:
+- SHA-256 of the exact engine manifest bytes loaded by the worker;
+- source Git revision from `BA_ENGINE_BUILD_REVISION`;
+- Python runtime version;
+- installed versions of declared runtime dependencies;
+- optional immutable container image digest from `BA_ENGINE_IMAGE_DIGEST`.
+
+Build the image with the Git revision build argument shown above. At deployment, inject `BA_ENGINE_IMAGE_DIGEST` from the platform's immutable image identifier (for example, the OCI digest); do not use a mutable tag as a digest. If the source revision or immutable image digest is missing, the result is explicitly marked with `build_revision_unavailable` or `container_image_digest_unavailable` (and `source_revision=unrecorded` where applicable). Results remain usable for descriptive analysis, but must not be represented as fully build-reproducible.
 
 Health check: `GET /healthz`. Execution endpoint: authenticated `POST /v1/execute`.
 

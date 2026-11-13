@@ -1,4 +1,5 @@
 import json
+import os
 import subprocess
 import sys
 import threading
@@ -118,12 +119,25 @@ class EngineHttpAdapterTests(unittest.TestCase):
             },
             method="POST",
         )
-        with patch("ba_engine_contract.http_adapter.subprocess.run", wraps=subprocess.run) as run:
+        with patch.dict(os.environ, {
+            "BA_ENGINE_BUILD_REVISION": "c" * 40,
+            "BA_ENGINE_IMAGE_DIGEST": "sha256:" + "d" * 64,
+        }), patch("ba_engine_contract.http_adapter.subprocess.run", wraps=subprocess.run) as run:
             with urllib.request.urlopen(request, timeout=5) as response:
                 result = json.loads(response.read())
         self.assertEqual(result["status"], "completed")
         self.assertEqual(run.call_args.kwargs["timeout"], 15)
         self.assertNotIn("BA_ENGINE_WORKER_TOKEN", run.call_args.kwargs["env"])
+        self.assertEqual(run.call_args.kwargs["env"]["BA_ENGINE_BUILD_REVISION"], "c" * 40)
+        self.assertEqual(run.call_args.kwargs["env"]["BA_ENGINE_IMAGE_DIGEST"], "sha256:" + "d" * 64)
+        self.assertEqual(
+            result["result"]["provenance"]["execution_environment"]["source_revision"],
+            "c" * 40,
+        )
+        self.assertEqual(
+            result["result"]["provenance"]["execution_environment"]["container_image_digest"],
+            "sha256:" + "d" * 64,
+        )
         self.assertIn("ba_engine_contract.worker", run.call_args.args[0])
 
     def test_execute_returns_gateway_timeout_when_engine_process_exceeds_manifest_budget(self):
