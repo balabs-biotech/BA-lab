@@ -26,6 +26,7 @@ const checks = [
   ["dispatcher rebinds worker result to durable ledger identity", /result\.execution_id\s*=\s*execution\.id/],
   ["dispatcher commits completed results atomically under the active worker lease", /rpc\("complete_claimed_engine_execution"/],
   ["dispatcher compares JSONB scope semantically with canonical key ordering", /stable\(request\.scope\)\s*!==\s*stable\(execution\.scope\)/],
+  ["dispatcher recomputes the canonical input snapshot digest before worker dispatch", /sha256\(stable\(request\.input\?\.records\)\)[\s\S]*?execution\.input_snapshot_sha256/],
   ["dispatcher verifies immutable source IDs", /request\.input\?\.record_ids[\s\S]*?execution\.input_record_ids/],
   ["dispatcher failure transitions use the lease-owner RPC", /rpc\("fail_claimed_engine_execution"/],
   ["dispatcher reports bounded per-execution outcomes", /claimed:\s*executions\.length/],
