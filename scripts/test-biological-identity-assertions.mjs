@@ -1,4 +1,5 @@
-import assert from "node:assert/strict";\nimport { createHash } from "node:crypto";
+import assert from "node:assert/strict";
+import { createHash } from "node:crypto";
 import { loadAuthenticatedBiologicalIdentityAssertions } from "../supabase/functions/_shared/biological-identity-assertions.ts";
 const organizationId = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa";
 const organismId = "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb";
@@ -25,7 +26,8 @@ const assertion = {
   evidence_level: "documented", content_sha256: "b".repeat(64), status: "validated",
   reviewed_at: "2026-11-02T00:00:00Z", valid_from: "2026-01-01", valid_to: null,
 };
-assertion.content_sha256 = assertionDigest(assertion);\nconst calls = [];
+assertion.content_sha256 = assertionDigest(assertion);
+const calls = [];
 const client = { from(table) {
   calls.push(["from", table]);
   const query = {
@@ -52,7 +54,8 @@ const conflictingAssertion = {
   assertion_value: "P80-legacy",
   content_sha256: "c".repeat(64),
 };
-conflictingAssertion.content_sha256 = assertionDigest(conflictingAssertion);\nconst conflictClient = { from(table) {
+conflictingAssertion.content_sha256 = assertionDigest(conflictingAssertion);
+const conflictClient = { from(table) {
   const query = {
     select() { return this; }, eq() { return this; }, in() { return this; },
     limit() {
