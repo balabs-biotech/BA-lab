@@ -144,7 +144,7 @@ assert.ok(queryLog.some((entry) =>
 ));
 assert.ok(queryLog.some((entry) =>
   entry[0] === "biological_reference_registry" &&
-  entry[1] === "eq" && entry[2] === "status" && entry[3] === "validated"
+  entry[1] === "in" && entry[2] === "status" && entry[3].join(",") === "validated"
 ));
 
 const missingReference = await assert.rejects(
