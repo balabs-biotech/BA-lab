@@ -1588,8 +1588,7 @@ body{background:linear-gradient(180deg,#0b1214 0,#101a1b 44%,#eeeade 44%,#eeeade
   border-top:2px solid #B96B4D!important;
   box-shadow:none!important;
 }
-.work-card:before,.work-card:after,
-.work-illustration:after{
+.work-card:before,.work-card:after{
   content:none!important;
   display:none!important;
   background:none!important;
@@ -1630,8 +1629,7 @@ body{background:linear-gradient(180deg,#0b1214 0,#101a1b 44%,#eeeade 44%,#eeeade
 /* 2026-10-30 — structural art direction: stop the repeated illustrated-board effect.
    Remove ornamental line drawings; let typography, real imagery and whitespace carry the story.
    The interactive 3D explorer and its scripts remain untouched. */
-.editorial-art,
-.work-illustration{display:none!important}
+.editorial-art{display:none!important}
 .editorial-feature,
 .editorial-about,
 .editorial-work,
