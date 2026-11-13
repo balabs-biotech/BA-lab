@@ -22,6 +22,7 @@ const headers = {
 const MAX_BODY_BYTES = 48_000;
 const MAX_WORKER_RESPONSE_BYTES = 128_000;
 const WORKER_TIMEOUT_MS = 20_000;
+const EXECUTION_LEASE_MS = 120_000;
 const ENGINE_ALLOWLIST = new Map([["environmental.timeseries.qc", new Set(["0.2.0"])]]);
 const ajv = new Ajv2020({ allErrors: true, strict: true });
 addFormats(ajv);
@@ -477,7 +478,12 @@ Deno.serve(async (req: Request) => {
 
   const startedAt = new Date().toISOString();
   const { data: startedExecution, error: startError } = await serviceClient.from("engine_executions")
-    .update({ status: "running", started_at: startedAt, updated_at: startedAt })
+    .update({
+      status: "running",
+      started_at: startedAt,
+      updated_at: startedAt,
+      lease_expires_at: new Date(Date.parse(startedAt) + EXECUTION_LEASE_MS).toISOString(),
+    })
     .eq("organization_id", organizationId).eq("id", execution.id).eq("status", "queued")
     .select("id")
     .maybeSingle();
