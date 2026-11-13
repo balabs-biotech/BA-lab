@@ -26,7 +26,7 @@ const checks = [
   ["dispatcher rebinds worker result to durable ledger identity", /result\.execution_id\s*=\s*execution\.id/],
   ["dispatcher commits completed results atomically under the active worker lease", /rpc\("complete_claimed_engine_execution"/],
   ["dispatcher verifies immutable scope and source IDs", /JSON\.stringify\(request\.scope\)[\s\S]*?JSON\.stringify\(execution\.scope\)[\s\S]*?request\.input\?\.record_ids[\s\S]*?execution\.input_record_ids/],
-  ["dispatcher failure writes are scoped to the claiming worker", /\.eq\("claimed_by",\s*workerId\)/],
+  ["dispatcher failure transitions use the lease-owner RPC", /rpc\("fail_claimed_engine_execution"/],
   ["dispatcher reports bounded per-execution outcomes", /claimed:\s*executions\.length/],
   ["dispatcher does not accept client-supplied execution or tenant identifiers", /request body must be an empty object/],
 ];
