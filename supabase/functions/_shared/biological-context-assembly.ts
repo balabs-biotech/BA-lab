@@ -174,9 +174,10 @@ export async function assembleResolvedBiologicalContextSnapshot(input: {
   const contextDomains = [...new Set(windowContexts
     .map((context) => context.domain)
     .filter((domain) => typeof domain === "string" && ["mycology", "greentech", "lab"].includes(domain)))];
-  const profileContextStable = windowContexts.length === 1 &&
-    windowContexts[0].valid_from <= startDate &&
-    (windowContexts[0].valid_to === null || windowContexts[0].valid_to > lastIncludedDate);
+  const soleWindowContext = windowContexts.length === 1 ? windowContexts[0] : null;
+  const profileContextStable = !!soleWindowContext &&
+    soleWindowContext.valid_from <= startDate &&
+    (soleWindowContext.valid_to === null || soleWindowContext.valid_to > lastIncludedDate);
   const snapshot = await buildBiologicalContextSnapshot({
     organizationId: input.organizationId,
     ...(input.plantCulture ? { plantCulture: input.plantCulture } : { culture: input.culture }),
