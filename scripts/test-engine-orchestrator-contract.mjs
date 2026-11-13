@@ -52,4 +52,16 @@ const sourceReadStart = source.indexOf("let sourceRows: Record<string, any>[];")
 const sourceReadEnd = source.indexOf("const records = sourceRows.map", sourceReadStart);
 assert.ok(sourceReadStart >= 0 && sourceReadEnd > sourceReadStart, "measurement snapshot query boundary exists");
 assert.doesNotMatch(source.slice(sourceReadStart, sourceReadEnd), /\.update\(/, "source records are never updated");
+
+assert.match(
+  source,
+  /async function readBoundedWorkerResponse\([\s\S]*?getReader\([\s\S]*?MAX_WORKER_RESPONSE_BYTES[\s\S]*?workerResponse\.body/,
+  "worker response bytes are bounded while streaming, before the body is fully buffered",
+);
+assert.doesNotMatch(
+  source,
+  /workerBody = await workerResponse\.text\(\)/,
+  "orchestrator must not buffer an unbounded worker response before enforcing its limit",
+);
+
 console.log("Engine orchestration boundary contract passed");
