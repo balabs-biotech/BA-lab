@@ -86,7 +86,7 @@ def _parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
 def main(
     argv: Sequence[str] | None = None,
     *,
-    queue_factory: Callable[[], SupabaseRestQueueClient] = SupabaseRestQueueClient.from_env,
+    queue_factory: Callable[[int], SupabaseRestQueueClient] = SupabaseRestQueueClient.from_env,
     registry_loader: Callable[[str], EngineRegistry] = load_registry,
 ) -> int:
     args = _parse_args(argv)
@@ -100,7 +100,7 @@ def main(
         raise SystemExit("--lease-seconds must be between 3 and 300")
 
     registry = registry_loader(args.engine_module)
-    queue = queue_factory()
+    queue = queue_factory(args.lease_seconds)
     worker_id = f"{socket.gethostname()}:{os.getpid()}"
     worker = EngineWorker(
         queue,
