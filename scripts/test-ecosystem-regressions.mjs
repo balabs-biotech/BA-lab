@@ -172,6 +172,7 @@ for (const [label, source] of [['public', html], ['preview', previewHtml]]) {
 }
 
 for (const [label, source] of [['public', html], ['preview', previewHtml]]) {
+  const stylesForPage = label === 'public' ? pageCss : source;
   assert.ok(source.includes("document.documentElement.dir=direction") && source.includes("app.dir=direction"), label + ' Arabic mode must set document-level and app-level reading direction');
   assert.ok(source.includes("localStorage.setItem('balabs-language',l)") && source.includes("localStorage.getItem('balabs-language')"), label + ' language preference must persist and restore safely');
   assert.ok(source.includes("let initialLanguage='fr'") && source.includes("setLanguage(initialLanguage)"), label + ' must restore a supported language before rendering the page');
@@ -181,8 +182,8 @@ for (const [label, source] of [['public', html], ['preview', previewHtml]]) {
   assert.ok(source.includes('id="siteNavigation"') && source.includes("setAttribute('aria-label',navigationLabels[l])"), label + ' primary navigation accessible name must follow the active language');
   assert.ok(source.includes("document.title=({fr:'BALabs — Réseau vivant'"), label + ' document title must follow the selected language');
   assert.ok(source.includes('id="pageDescription"') && source.includes("description.content=descriptions[l]"), label + ' SEO description must follow the selected language');
-  assert.ok(source.includes('<main id="main-content" tabindex="-1">') && source.includes('class="skip-link" href="#main-content"') && source.includes('.skip-link:focus'), label + ' keyboard users must have a visible skip link targeting the complete semantic main landmark');
-  assert.ok(source.includes('.top{flex-wrap:wrap;align-items:center;row-gap:12px}') && source.includes('.lang{min-width:44px;min-height:44px;'), label + ' mobile language controls must wrap cleanly and meet a 44px touch target');
+  assert.ok(source.includes('<main id="main-content" tabindex="-1">') && source.includes('class="skip-link" href="#main-content"') && stylesForPage.includes('.skip-link:focus'), label + ' keyboard users must have a visible skip link targeting the complete semantic main landmark');
+  assert.ok(stylesForPage.includes('.top{flex-wrap:wrap;align-items:center;row-gap:12px}') && stylesForPage.includes('.lang{min-width:44px;min-height:44px;'), label + ' mobile language controls must wrap cleanly and meet a 44px touch target');
   assert.ok(!source.includes('<section class="hero" id="accueil" role="main">'), label + ' hero must not incorrectly represent the entire main landmark');
   assert.equal(source.split('<main').length - 1, 1, label + ' page must contain exactly one main landmark');
   assert.ok(source.includes("skipLabels={fr:'Aller au contenu principal'") && source.includes('skip.textContent=skipLabels[l]'), label + ' skip navigation text must be localised in all four languages');
