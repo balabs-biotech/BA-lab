@@ -7062,6 +7062,10 @@ async function loadCultureDetail(cultureId) {
 async function loadRecentEngineExecutions() {
   const panel = document.getElementById("overviewRecentEngineExecutions");
   const requestId = ++engineExecutionHistoryRequestId;
+  if (engineExecutionPollingTimer !== null) {
+    clearTimeout(engineExecutionPollingTimer);
+    engineExecutionPollingTimer = null;
+  }
   const loadRevision = authStateRevision;
   const loadOrganizationId = organizationId;
   if (!loadOrganizationId || !panel) return;
