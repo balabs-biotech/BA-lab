@@ -243,8 +243,8 @@ begin
      and available_at <= v_now
      and attempt_count < max_attempts
    order by priority desc, created_at asc
-   for update skip locked
-   limit 1;
+   limit 1
+   for update skip locked;
 
   if not found then
     return null;
