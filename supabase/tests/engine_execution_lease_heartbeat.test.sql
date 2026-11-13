@@ -72,7 +72,7 @@ begin
 
   update public.engine_executions
   set status='failed', error_code='test_terminal', error_message='terminal fixture',
-      completed_at=now(), updated_at=now()
+      completed_at=clock_timestamp(), updated_at=clock_timestamp()
   where organization_id=v_org and id=v_terminal;
   begin
     perform public.renew_engine_execution_lease(v_org,v_terminal,'heartbeat-worker',120);
