@@ -200,3 +200,16 @@ The reference must also exist in the request dataset manifest under provider BA_
 Findings are emitted with evidence_state = limited. The rule evaluator does not infer causality, diagnose contamination or disease, rank strains, or recommend interventions. Rules with no matching biological context or no matching feature produce no finding. A malformed rule or unregistered reference fails the engine request rather than silently producing an untraceable result.
 
 **Operational boundary:** this is an execution contract, not yet a populated scientific rule catalogue. The authenticated server-side adapter must load approved, versioned rules and include their manifest metadata in the request. No default biological thresholds are enabled, and the connected Supabase project has not yet been populated with a rule registry. The synthetic threshold used by the regression test is test data only, not a BA Labs cultivation recommendation.
+
+
+## Tenant-scoped interpretation profile and scientific reference registry (2026-11-13)
+
+The BIE orchestrator now resolves an active `domain_interpretation_profiles` record using the caller-JWT Supabase client. It selects the fixed profile code `biological.context.features` for the domain derived from dated biological contexts. The selected profile must cover the complete requested analysis window; a profile that starts mid-window or expires before the last included date is not applied. Ambiguous domains or multiple matching active profiles fail closed.
+
+Every rule in the profile must use the Python engine rule contract and reference a matching `biological_reference_registry` row in the same organization with status `validated`. Draft, retired, missing, or cross-tenant references are never passed to the worker. The worker receives a profile manifest and one reference manifest per cited source, including content SHA-256 hashes and stable retrieval/review timestamps.
+
+The execution ledger stores the resolved parameters and dataset manifest. Idempotency comparison includes the manifest, so a repeated key cannot silently reuse a result after the scientific profile or reference set changes. The Python result provenance includes both profile and reference identifiers with their hashes. A missing active profile is represented explicitly as `no_active_interpretation_profile`; it does not block descriptive analysis.
+
+The migration `20261113110900_create_biological_reference_registry.sql` reconciles the existing profile-registry baseline into the repository migration chain and adds the tenant-scoped scientific reference table. Both registries are RLS-protected. Organization members can read; profile writes require organization writer rights; scientific reference lifecycle writes require owner/admin rights. Activated profiles and validated references are immutable, with retirement as the only controlled lifecycle transition.
+
+No scientific reference records or active interpretation profiles have been seeded. The new reference registry migration is in the PR branch only; it has not been applied to the live Supabase project. The production database already contains the profile-registry objects in its migration history, but their original migration files were absent from this repository branch; the new baseline is additive and replay-safe.
