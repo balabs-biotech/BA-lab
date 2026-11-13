@@ -4,6 +4,10 @@ import { readFileSync } from "node:fs";
 const source = readFileSync("supabase/functions/engine-orchestrator/index.ts", "utf8");
 const biologicalLoader = readFileSync("supabase/functions/_shared/biological-context-loader.ts", "utf8");
 const checks = [
+  ["BIE profile loader is imported into the authenticated orchestrator", /loadAuthenticatedBiologicalInterpretationProfile/],
+  ["BIE profile and reference rows are resolved through the caller JWT client", /loadAuthenticatedBiologicalInterpretationProfile\([\s\S]*?userClient/],
+  ["BIE dataset manifests are included in the immutable engine request", /datasets: effectiveDatasets/],
+  ["idempotency binds the scientific dataset manifest", /stable\(prior\.request_payload\?\.datasets \?\? \[\]\)[\s\S]*?stable\(request\.datasets \?\? \[\]\)/],
   ["caller identity is verified", /userClient\.auth\.getUser\(\)/],
   ["organization membership is checked", /organization_members/],
   ["viewer roles cannot invoke privileged execution", /!\["owner", "admin", "member"\]\.includes\(String\(membership\.role\)\)/],
