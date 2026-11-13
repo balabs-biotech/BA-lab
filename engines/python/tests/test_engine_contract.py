@@ -649,6 +649,20 @@ class EngineContractTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "interpretation_rule_reference_not_in_dataset_manifest"):
             analyze_biological_context_features(missing_registry)
 
+        missing_profile_manifest = json.loads(json.dumps(request))
+        missing_profile_manifest["datasets"] = [
+            dataset for dataset in missing_profile_manifest["datasets"]
+            if dataset["provider"] != "BA_LABS_INTERPRETATION_PROFILE"
+        ]
+        with self.assertRaisesRegex(ValueError, "interpretation_profile_manifest_required"):
+            analyze_biological_context_features(missing_profile_manifest)
+
+        invalid_profile_manifest = json.loads(json.dumps(request))
+        next(dataset for dataset in invalid_profile_manifest["datasets"]
+             if dataset["provider"] == "BA_LABS_INTERPRETATION_PROFILE")["content_sha256"] = "invalid"
+        with self.assertRaisesRegex(ValueError, "invalid_interpretation_profile_manifest"):
+            analyze_biological_context_features(invalid_profile_manifest)
+
         request["input"]["record_ids"] = []
         request["input"]["records"] = []
         for index, value in enumerate([21.0, 23.0, 22.0]):
