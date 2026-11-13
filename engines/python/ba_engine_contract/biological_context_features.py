@@ -418,7 +418,11 @@ def analyze_biological_context_features(request: Mapping[str, Any]) -> dict[str,
         ):
             raise ValueError("invalid_biological_identity_assertion")
         manifest = manifest_keys.get((code, version))
-        if not manifest or not isinstance(manifest.get("content_sha256"), str):
+        if (
+            not manifest
+            or not isinstance(manifest.get("content_sha256"), str)
+            or not re.fullmatch(r"[0-9a-f]{64}", manifest["content_sha256"])
+        ):
             raise ValueError("biological_identity_manifest_missing")
         identity_sources.add(
             f"BA_LABS_BIOLOGICAL_IDENTITY/{code}@{version}"
