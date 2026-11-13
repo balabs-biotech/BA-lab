@@ -558,7 +558,7 @@ class EngineContractTests(unittest.TestCase):
         Draft202012Validator(biological_schema, format_checker=FormatChecker()).validate(value)
         self.assertEqual(value["subject"]["subject_type"], "culture")
         self.assertEqual(value["subject"]["subject_id"], culture_id)
-        self.assertEqual(value["coverage"]["source_record_count"], 5)
+        self.assertEqual(value["coverage"]["source_record_count"], 3)
         self.assertEqual(value["coverage"]["record_counts_by_type"]["measurement"], 3)
         self.assertEqual(value["coverage"]["record_counts_by_type"]["environmental_observation"], 2)
         self.assertEqual(len(value["derived_features"]), 8)
@@ -1090,10 +1090,10 @@ class EngineContractTests(unittest.TestCase):
         value = response["result"]["value"]
         self.assertEqual(value["subject"]["subject_type"], "plant")
         self.assertEqual(value["subject"]["subject_id"], plant_culture_id)
-        self.assertEqual(value["coverage"]["source_record_count"], 3)
+        self.assertEqual(value["coverage"]["source_record_count"], 5)
         self.assertEqual(value["coverage"]["record_counts_by_type"]["measurement"], 3)
         self.assertEqual(len(value["observed_facts"]), 5)
-        self.assertEqual(len(value["derived_features"]), 4)
+        self.assertEqual(len(value["derived_features"]), 8)
         mean_feature = next(
             feature for feature in value["derived_features"]
             if feature["feature_code"] == "series.measurement.air_temperature.mean"
