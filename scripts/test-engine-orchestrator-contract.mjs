@@ -34,6 +34,8 @@ const checks = [
   ["BIE v0.2 is server-flag gated", /new Set\(\["0\.1\.0", "0\.2\.0"\]\)/],
   ["environmental QC is pinned to semantic version 0.2.0", /environmental\.timeseries\.qc[\s\S]*?new Set\(\["0\.2\.0"\]\)/],
   ["worker response is schema validated", /validateResponse/],
+  ["every failed execution transition is persisted and verified", /async function persistExecutionFailure[\s\S]*?status: "failed"[\s\S]*?\.in\("status", \["queued", "running"\]\)[\s\S]*?\.select\("id"\)[\s\S]*?return !error && !!data/],
+  ["failed ledger writes are surfaced instead of silently reported as failed", /execution_state_persistence_failed/],
   ["successful results use atomic structured persistence", /rpc\("complete_engine_execution"/],
   ["atomic result persistence returns a durable result id", /result_id: resultId/],
   ["request and snapshot correlation is enforced", /input_snapshot_sha256/],
