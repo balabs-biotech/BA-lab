@@ -45,6 +45,10 @@ function stable(value: unknown): string {
   }
   return JSON.stringify(value);
 }
+async function sha256(value: string): Promise<string> {
+  const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(value));
+  return Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, "0")).join("");
+}
 function object(value: unknown): value is Record<string, any> {
   return !!value && typeof value === "object" && !Array.isArray(value);
 }
@@ -144,6 +148,14 @@ async function processExecution(
     return await persistFailure(
       db, execution, workerId, "stored_request_invalid",
       "The immutable queued request failed engine contract validation.",
+    ) ? "failed" : "lost";
+  }
+
+  const actualSnapshotDigest = await sha256(stable(request.input?.records));
+  if (actualSnapshotDigest !== execution.input_snapshot_sha256) {
+    return await persistFailure(
+      db, execution, workerId, "input_snapshot_digest_mismatch",
+      "The queued input records do not match the immutable ledger snapshot digest.",
     ) ? "failed" : "lost";
   }
 
