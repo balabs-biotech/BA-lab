@@ -35,9 +35,9 @@ for (const [label, pattern] of checks) {
 }
 
 const claimPosition = source.indexOf('rpc("claim_engine_executions"');
-const workerPosition = source.indexOf('fetch(new URL("/v1/execute"');
-assert.ok(claimPosition >= 0 && workerPosition > claimPosition,
-  "worker dispatch must occur only after atomic queue claims");
+const dispatchPosition = source.indexOf("processExecution(db, execution, workerId, workerUrl, workerToken)");
+assert.ok(claimPosition >= 0 && dispatchPosition > claimPosition,
+  "worker dispatch must be invoked only after atomic queue claims");
 
 assert.match(schedule, /ba_labs_engine_dispatch_secret/,
   "scheduled dispatch must read its dedicated secret from Vault");
