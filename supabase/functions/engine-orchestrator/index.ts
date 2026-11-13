@@ -368,18 +368,36 @@ Deno.serve(async (req: Request) => {
     return reply(409, { error: "execution_creation_conflict" });
   }
 
+  // Every terminal failure must be durable in the execution ledger. A worker
+  // error is not considered recorded if the state transition itself failed.
+  async function persistExecutionFailure(code: string, message: string, at = new Date().toISOString()) {
+    const { data, error } = await serviceClient.from("engine_executions").update({
+      status: "failed",
+      error_code: code,
+      error_message: message,
+      completed_at: at,
+      updated_at: at,
+    }).eq("organization_id", organizationId)
+      .eq("id", execution.id)
+      .in("status", ["queued", "running"])
+      .select("id")
+      .maybeSingle();
+    return !error && !!data;
+  }
+
   const startedAt = new Date().toISOString();
   const { error: startError } = await serviceClient.from("engine_executions")
     .update({ status: "running", started_at: startedAt, updated_at: startedAt })
     .eq("organization_id", organizationId).eq("id", execution.id).eq("status", "queued");
   if (startError) {
-    const failedAt = new Date().toISOString();
-    await serviceClient.from("engine_executions").update({
-      status: "failed", error_code: "execution_start_failed",
-      error_message: "Execution could not enter the running state.",
-      completed_at: failedAt, updated_at: failedAt,
-    }).eq("organization_id", organizationId).eq("id", execution.id);
-    return reply(500, { error: "execution_start_failed", execution_id: execution.id });
+    const persisted = await persistExecutionFailure(
+      "execution_start_failed",
+      "Execution could not enter the running state.",
+    );
+    return reply(500, {
+      error: persisted ? "execution_start_failed" : "execution_state_persistence_failed",
+      execution_id: execution.id,
+    });
   }
 
   const controller = new AbortController();
@@ -397,12 +415,14 @@ Deno.serve(async (req: Request) => {
     if (workerBody.length > 128_000) throw new Error("worker_response_too_large");
   } catch (error) {
     const code = controller.signal.aborted ? "worker_timeout" : "worker_unreachable";
-    const failedAt = new Date().toISOString();
-    await serviceClient.from("engine_executions").update({
-      status: "failed", error_code: code, error_message: "The registered engine worker did not return a usable response.",
-      completed_at: failedAt, updated_at: failedAt,
-    }).eq("organization_id", organizationId).eq("id", execution.id);
-    return reply(502, { error: code, execution_id: execution.id });
+    const persisted = await persistExecutionFailure(
+      code,
+      "The registered engine worker did not return a usable response.",
+    );
+    return reply(persisted ? 502 : 500, {
+      error: persisted ? code : "execution_state_persistence_failed",
+      execution_id: execution.id,
+    });
   } finally { clearTimeout(timeout); }
 
   let result: unknown;
@@ -413,11 +433,14 @@ Deno.serve(async (req: Request) => {
       result.request_id !== requestId || result.engine.engine_id !== engineId ||
       result.engine.engine_version !== engineVersion || result.input_snapshot_sha256 !== snapshotHash) {
     const code = !workerResponse.ok ? "worker_http_error" : "worker_response_invalid_or_unbound";
-    await serviceClient.from("engine_executions").update({
-      status: "failed", error_code: code, error_message: "Worker response failed transport or correlation validation.",
-      completed_at: new Date().toISOString(), updated_at: new Date().toISOString(),
-    }).eq("organization_id", organizationId).eq("id", execution.id);
-    return reply(502, { error: code, execution_id: execution.id });
+    const persisted = await persistExecutionFailure(
+      code,
+      "Worker response failed transport or correlation validation.",
+    );
+    return reply(persisted ? 502 : 500, {
+      error: persisted ? code : "execution_state_persistence_failed",
+      execution_id: execution.id,
+    });
   }
 
   const completedAt = new Date().toISOString();
@@ -441,9 +464,9 @@ Deno.serve(async (req: Request) => {
     });
   }
 
-  await serviceClient.from("engine_executions").update({
-    status: "failed", error_code: result.error.code, error_message: result.error.message,
-    completed_at: completedAt, updated_at: completedAt,
-  }).eq("organization_id", organizationId).eq("id", execution.id);
+  const persisted = await persistExecutionFailure(result.error.code, result.error.message, completedAt);
+  if (!persisted) {
+    return reply(500, { error: "execution_state_persistence_failed", execution_id: execution.id });
+  }
   return reply(422, { execution_id: execution.id, request_id: requestId, status: "failed", error: result.error });
 });
