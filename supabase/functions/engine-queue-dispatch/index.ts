@@ -45,7 +45,7 @@ function stable(value: unknown): string {
   }
   return JSON.stringify(value);
 }
-function object(value: unknown): value is Record<string, any> {
+async function sha256(value: string): Promise<string> {\n  const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(value));\n  return Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, "0")).join("");\n}\nfunction object(value: unknown): value is Record<string, any> {
   return !!value && typeof value === "object" && !Array.isArray(value);
 }
 function constantTimeEqual(left: string, right: string): boolean {
