@@ -6854,7 +6854,7 @@ function mountCultureBiologicalAssessmentPanel(culture) {
     button.type = "button";
     button.className = "secondary-button";
     button.textContent = "Évaluer cette culture avec le BIE";
-    button.addEventListener("click", () => { void runCultureBiologicalAssessment(culture.id); });
+    button.addEventListener("click", () => { const selectedCultureId = section.dataset.cultureId; if (selectedCultureId) void runCultureBiologicalAssessment(selectedCultureId); });
     const message = document.createElement("p");
     message.id = "cultureBiologicalAssessmentMessage";
     message.className = "muted";
