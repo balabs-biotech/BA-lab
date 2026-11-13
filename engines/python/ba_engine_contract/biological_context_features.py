@@ -328,6 +328,8 @@ def analyze_biological_context_features(request: Mapping[str, Any]) -> dict[str,
         missing_context.append("some_input_records_were_excluded")
     if not biological_contexts:
         missing_context.append("biological_context_not_recorded")
+    if parameters.get("interpretation_profile_state") == "not_configured":
+        missing_context.append("no_active_interpretation_profile")
     if any(
         (item.get("genetic_reference") or {}).get("status") == "unresolved"
         for item in biological_contexts
@@ -357,8 +359,16 @@ def analyze_biological_context_features(request: Mapping[str, Any]) -> dict[str,
     if "missing" in measurement_environment_states:
         missing_context.append("measurement_environment_context_missing")
 
-    findings, interpretation_sources = _evaluate_interpretation_rules(parameters.get("interpretation_rules", []), biological_contexts, derived_features, request.get("datasets", []))
-    quality_flags = ["biological_interpretation_not_performed"] if not findings else ["biological_diagnosis_not_performed", "rule_based_interpretation_performed"]
+    interpretation_rules = parameters.get("interpretation_rules", [])
+    findings, interpretation_sources = _evaluate_interpretation_rules(interpretation_rules, biological_contexts, derived_features, request.get("datasets", []))
+    if findings:
+        quality_flags = ["biological_diagnosis_not_performed", "rule_based_interpretation_performed"]
+    elif interpretation_rules:
+        quality_flags = ["rule_based_interpretation_evaluated_no_findings"]
+    else:
+        quality_flags = ["biological_interpretation_not_performed"]
+    if parameters.get("interpretation_profile_state") == "not_configured":
+        quality_flags.append("interpretation_profile_not_available")
     if environment_link_state == "ambiguous":
         quality_flags.append("environment_context_ambiguous")
     if environment_link_state == "conflict" or "conflict" in measurement_environment_states:
@@ -380,6 +390,12 @@ def analyze_biological_context_features(request: Mapping[str, Any]) -> dict[str,
         quality_flags.append("input_records_excluded")
     if environmental_sources:
         quality_flags.append("external_environmental_estimates_present")
+
+    profile_sources = {
+        f"BA_LABS_INTERPRETATION_PROFILE/{dataset['dataset_id']}@{dataset.get('dataset_version', '')}#sha256={dataset['content_sha256']}"
+        for dataset in request.get("datasets", [])
+        if isinstance(dataset, dict) and dataset.get("provider") == "BA_LABS_INTERPRETATION_PROFILE"
+    }
 
     return {
         "outcome": "success" if observed_times else "insufficient_data",
@@ -432,7 +448,7 @@ def analyze_biological_context_features(request: Mapping[str, Any]) -> dict[str,
         "provenance": {
             "algorithm": "biological-context-features-v2" if engine_identity["engine_version"] == "0.2.0" else "biological-context-features-v1",
             "libraries": [],
-            "source_references": sorted({*(f"{provider}/{dataset}" for provider, dataset in environmental_sources), *interpretation_sources}),
+            "source_references": sorted({*(f"{provider}/{dataset}" for provider, dataset in environmental_sources), *interpretation_sources, *profile_sources}),
         },
     }
 
