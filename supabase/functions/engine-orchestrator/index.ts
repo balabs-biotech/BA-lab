@@ -167,9 +167,11 @@ Deno.serve(async (req: Request) => {
   const url = Deno.env.get("SUPABASE_URL");
   const publishableKey = Deno.env.get("SUPABASE_PUBLISHABLE_KEY") ?? Deno.env.get("SUPABASE_ANON_KEY");
   const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+  const asyncDispatchEnabled = Deno.env.get("BA_ENGINE_ASYNC_DISPATCH") === "true";
   const workerUrl = Deno.env.get("BA_ENGINE_WORKER_URL");
   const workerToken = Deno.env.get("BA_ENGINE_WORKER_TOKEN");
-  if (!url || !publishableKey || !serviceKey || !workerUrl || !workerToken) {
+  if (!url || !publishableKey || !serviceKey ||
+      (!asyncDispatchEnabled && (!workerUrl || !workerToken))) {
     console.error("[engine-orchestrator] required server configuration is missing");
     return reply(503, { error: "orchestration_not_configured" });
   }
@@ -455,13 +457,15 @@ Deno.serve(async (req: Request) => {
       .select("id,request_id,engine_id,engine_version,scope,input_snapshot_sha256,request_payload,status,result_payload,error_code")
       .eq("organization_id", organizationId).eq("idempotency_key", idempotencyKey).maybeSingle();
     if (raced && sameExecutionInput(raced, engineRequest)) {
-      return reply(200, { execution_id: raced.id, request_id: raced.request_id, status: raced.status,
-        result: raced.result_payload, error_code: raced.error_code, reused: true });
+      return reply(asyncDispatchEnabled && ["queued", "running"].includes(raced.status) ? 202 : 200, {
+        execution_id: raced.id, request_id: raced.request_id, status: raced.status,
+        result: raced.result_payload, error_code: raced.error_code, reused: true,
+      });
     }
     return reply(409, { error: "execution_creation_conflict" });
   }
 
-  if (Deno.env.get("BA_ENGINE_ASYNC_DISPATCH") === "true") {
+  if (asyncDispatchEnabled) {
     return reply(202, {
       execution_id: execution.id,
       request_id: requestId,
