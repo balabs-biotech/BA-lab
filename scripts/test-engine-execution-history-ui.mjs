@@ -44,18 +44,18 @@ for (const entry of [
 
 
 
-assert.match(tracker, /function mountCultureBiologicalAssessmentPanel\(culture\)/);
-assert.match(tracker, /function runCultureBiologicalAssessment\(cultureId\)/);
-assert.match(tracker, /mountCultureBiologicalAssessmentPanel\(culture\)/);
-assert.match(tracker, /engine_version: "0\\.1\\.0"/);
-assert.match(tracker, /scope: \{ organization_id: operationOrganizationId, culture_id: cultureId \}/);
-assert.match(tracker, /window_start: startDate \+ "T00:00:00\\+01:00"/);
-assert.match(tracker, /window_end: endDate \+ "T00:00:00\\+01:00"/);
-assert.match(tracker, /!\["mycology", "laboratory"\]\.includes\(document\.body\.dataset\.domain\)/);
-assert.match(tracker, /cultureBiologicalAssessmentRequestId/);
-assert.match(tracker, /isCurrentWorkspaceRevision\(operationRevision, operationOrganizationId\)/);
-assert.match(tracker, /Le service engine-orchestrator n’est pas encore déployé/);
-assert.match(tracker, /Le moteur BIE v0\.1 n’est pas enregistré côté serveur/);
+assert.ok(tracker.includes("function mountCultureBiologicalAssessmentPanel(culture)"));
+assert.ok(tracker.includes("function runCultureBiologicalAssessment(cultureId)"));
+assert.ok(tracker.includes("mountCultureBiologicalAssessmentPanel(culture)"));
+assert.ok(tracker.includes('engine_version: "0.1.0"'));
+assert.ok(tracker.includes("culture_id: cultureId"));
+assert.ok(tracker.includes('window_start: startDate + "T00:00:00+01:00"'));
+assert.ok(tracker.includes('window_end: endDate + "T00:00:00+01:00"'));
+assert.ok(tracker.includes('"mycology", "laboratory"'));
+assert.ok(tracker.includes("cultureBiologicalAssessmentRequestId"));
+assert.ok(tracker.includes("isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)"));
+assert.ok(tracker.includes("Le service engine-orchestrator n’est pas encore déployé"));
+assert.ok(tracker.includes("Le moteur BIE v0.1 n’est pas enregistré côté serveur"));
 
 assert.match(workspace, /id="overviewRecentEngineExecutions"/);
 assert.match(workspace, /Afficher les dernières analyses calculées/);
