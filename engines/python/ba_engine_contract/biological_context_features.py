@@ -435,16 +435,16 @@ def analyze_biological_context_features(request: Mapping[str, Any]) -> dict[str,
 
     interpretation_rules = parameters.get("interpretation_rules", [])
     findings, interpretation_sources = _evaluate_interpretation_rules(interpretation_rules, biological_contexts, derived_features, request.get("datasets", []))
-    if identity_state == "conflicting":
-        quality_flags.append("biological_identity_conflict")
-    elif identity_state == "documented":
-        quality_flags.append("biological_identity_assertions_present")
     if findings:
         quality_flags = ["biological_diagnosis_not_performed", "rule_based_interpretation_performed"]
     elif interpretation_rules:
         quality_flags = ["rule_based_interpretation_evaluated_no_findings"]
     else:
         quality_flags = ["biological_interpretation_not_performed"]
+    if identity_state == "conflicting":
+        quality_flags.append("biological_identity_conflict")
+    elif identity_state == "documented":
+        quality_flags.append("biological_identity_assertions_present")
     if profile_state == "not_configured":
         quality_flags.append("interpretation_profile_not_available")
     elif profile_state == "context_not_stable":
