@@ -5,6 +5,7 @@ const source = readFileSync("supabase/functions/engine-orchestrator/index.ts", "
 const biologicalLoader = readFileSync("supabase/functions/_shared/biological-context-loader.ts", "utf8");
 const checks = [
   ["BIE profile loader is imported into the authenticated orchestrator", /loadAuthenticatedBiologicalInterpretationProfile/],
+  ["BIE rules are disabled unless one biological context covers the full analysis window", /contextStable: snapshot\.parameters\.profile_context_stable === true/],
   ["BIE profile and reference rows are resolved through the caller JWT client", /loadAuthenticatedBiologicalInterpretationProfile\([\s\S]*?userClient/],
   ["BIE dataset manifests are included in the immutable engine request", /datasets: effectiveDatasets/],
   ["idempotency binds the scientific dataset manifest", /stable\(prior\.request_payload\?\.datasets \?\? \[\]\)[\s\S]*?stable\(request\.datasets \?\? \[\]\)/],
