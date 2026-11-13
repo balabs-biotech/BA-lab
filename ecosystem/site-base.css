@@ -1195,7 +1195,7 @@ h1 span{font-style:italic!important;color:var(--field-rust)!important}
 @media(max-width:760px){
  .hero:after{right:-7%!important;top:16%!important;width:74vw!important;height:300px!important;opacity:.72!important}
 }
-@media(prefers-reduced-motion:reduce){}
+
 
 
 
