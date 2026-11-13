@@ -353,4 +353,6 @@ jobs:
             exit 1
           fi
           git commit -m "chore(supabase): add CLI-generated CultureOps queue migration"
+          git fetch origin feat/cultureops-engine-execution-queue-v1
+          git pull --rebase origin feat/cultureops-engine-execution-queue-v1
           git push origin HEAD:feat/cultureops-engine-execution-queue-v1
