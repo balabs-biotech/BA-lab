@@ -61,6 +61,7 @@ assert.match(loader, /\.order\("created_at", \{ ascending: false \}\)/);
 assert.match(loader, /\.limit\(8\)/);
 assert.match(loader, /engineExecutionHistoryRequestId/);
 assert.match(loader, /isCurrentWorkspaceRevision/);
+assert.match(loader, /scheduleEngineExecutionPolling\(/, "queued/running executions must activate status polling");
 
 const renderer = tracker.slice(rendererStart, overviewStart);
 
@@ -111,6 +112,24 @@ assert.match(tracker, /recentEngineExecutions = \[\]/);
 assert.match(tracker, /recentEngineResultsByExecution = new Map\(\)/);
 assert.match(tracker, /engineExecutionHistoryRequestId\+\+/);
 assert.match(tracker, /loadRecentEngineExecutions\(\)/);
+assert.match(tracker, /function scheduleEngineExecutionPolling\(/);
+assert.match(tracker, /status === "queued" \|\| execution\.status === "running"/);
+assert.match(tracker, /document\.visibilityState === "hidden" \? 15000 : 5000/);
+assert.match(tracker, /isCurrentWorkspaceRevision\(expectedRevision, expectedOrganizationId\)/);
+assert.match(tracker, /clearTimeout\(engineExecutionPollingTimer\)/);
+assert.match(tracker, /engineExecutionPollingOrganizationId !== expectedOrganizationId/);
+assert.match(tracker, /engineExecutionPollingTimer = null/);
+assert.match(tracker, /async function monitorPlantBiologicalAssessmentExecution/);
+assert.match(tracker, /setTimeout\(resolve, 1000\)/);
+assert.match(tracker, /execution\?\.status === "completed"/);
+assert.match(tracker, /execution\?\.status === "failed"/);
+assert.match(tracker, /for \(let attempt = 0; attempt < 90; attempt\+\+\)/);
+const plantMonitorStart = tracker.indexOf("async function monitorPlantBiologicalAssessmentExecution(");
+const plantMonitorEnd = tracker.indexOf("async function runPlantBiologicalAssessment()", plantMonitorStart);
+const plantMonitor = tracker.slice(plantMonitorStart, plantMonitorEnd);
+assert.doesNotMatch(plantMonitor, /await loadRecentEngineExecutions\(\)/, "BIE notices must reuse the shared tenant-safe polling loop");
+assert.match(plantMonitor, /execution\?\.status === "completed"/);
+assert.match(plantMonitor, /execution\?\.status === "failed"/);
 
 for (const path of [
   "batch-tracker/mycology/index.html",
@@ -120,11 +139,11 @@ for (const path of [
   const page = readFileSync(path, "utf8");
   if (path.includes("green-tech")) {
     assert.match(page, /workspace\.html\?v=20261113-bie-identity-ui-1/);
-    assert.match(page, /tracker\.js\?v=20261113-bie-identity-ui-1/);
+    assert.match(page, /tracker\.js\?v=20261113-bie-async-dispatch-1/);
     assert.match(page, /environmental-data\.js\?v=20261112-greentech-engine-qc-1/);
   } else {
     assert.match(page, /workspace\.html\?v=20261113-bie-identity-ui-1/);
-    assert.match(page, /tracker\.js\?v=20261113-bie-identity-ui-1/);
+    assert.match(page, /tracker\.js\?v=20261113-bie-async-dispatch-1/);
   }
 }
 

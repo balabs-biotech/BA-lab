@@ -125,6 +125,7 @@ jobs:
           node scripts/test-bal-json-import-ui.mjs
           node scripts/test-bal-json-schemas.mjs
           node scripts/test-engine-orchestrator-contract.mjs
+          node scripts/test-engine-queue-dispatcher-contract.mjs
           node scripts/test-engine-execution-history-ui.mjs
           node scripts/test-biological-context-assessment-schema.mjs
           node --experimental-strip-types scripts/test-biological-context-snapshot.mjs
@@ -303,6 +304,8 @@ jobs:
         run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/engine_execution_queue_claims.test.sql
       - name: Test worker lease heartbeat ownership and expiry contract
         run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/engine_execution_lease_heartbeat.test.sql
+      - name: Test lease-bound atomic worker completion
+        run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/engine_execution_claimed_completion.test.sql
 
   ecosystem-regression:
     runs-on: ubuntu-latest
