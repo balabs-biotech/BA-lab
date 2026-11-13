@@ -167,13 +167,16 @@ export async function assembleResolvedBiologicalContextSnapshot(input: {
       };
     });
 
-  const contextDomains = [...new Set(input.contexts
-    .filter((context) =>
-      context.valid_from <= lastIncludedDate &&
-      (context.valid_to === null || context.valid_to > startDate)
-    )
+  const windowContexts = input.contexts.filter((context) =>
+    context.valid_from <= lastIncludedDate &&
+    (context.valid_to === null || context.valid_to > startDate)
+  );
+  const contextDomains = [...new Set(windowContexts
     .map((context) => context.domain)
-    .filter((domain) => ["mycology", "greentech", "lab"].includes(domain)))];
+    .filter((domain) => typeof domain === "string" && ["mycology", "greentech", "lab"].includes(domain)))];
+  const profileContextStable = windowContexts.length === 1 &&
+    windowContexts[0].valid_from <= startDate &&
+    (windowContexts[0].valid_to === null || windowContexts[0].valid_to > lastIncludedDate);
   const snapshot = await buildBiologicalContextSnapshot({
     organizationId: input.organizationId,
     ...(input.plantCulture ? { plantCulture: input.plantCulture } : { culture: input.culture }),
@@ -191,6 +194,7 @@ export async function assembleResolvedBiologicalContextSnapshot(input: {
       ...snapshot.parameters,
       profile_domain: contextDomains.length === 1 ? contextDomains[0] : null,
       profile_domain_ambiguous: contextDomains.length > 1,
+      profile_context_stable: profileContextStable,
       analysis_window_start_date: startDate,
       analysis_window_last_included_date: lastIncludedDate,
     },
