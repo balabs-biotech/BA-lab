@@ -16,6 +16,24 @@ async function sha256(value: string): Promise<string> {
   const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(value));
   return Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, "0")).join("");
 }
+// The stored digest authenticates the immutable scientific assertion fields,
+// not the resolver's transport envelope or reviewer lifecycle metadata.
+function assertionContentPayload(row: Row): Row {
+  return {
+    assertion_code: row.assertion_code,
+    assertion_version: row.assertion_version,
+    subject_type: row.subject_type,
+    organism_id: row.organism_id,
+    strain_id: row.strain_id,
+    assertion_type: row.assertion_type,
+    assertion_value: row.assertion_value,
+    source_reference_id: row.source_reference_id,
+    source_reference_version: row.source_reference_version,
+    evidence_level: row.evidence_level,
+    valid_from: row.valid_from,
+    valid_to: row.valid_to,
+  };
+}
 function uniqueStrings(values: unknown[]): string[] {
   return [...new Set(values.filter((value): value is string => typeof value === "string" && value.length > 0))];
 }
@@ -93,7 +111,8 @@ export async function loadAuthenticatedBiologicalIdentityAssertions(input: {
     const reference = referenceMap.get(row.source_reference_id + "@" + row.source_reference_version);
     if (!reference || typeof reference.content_sha256 !== "string" ||
         !/^[0-9a-f]{64}$/.test(reference.content_sha256) || !reference.reviewed_at ||
-        typeof row.reviewed_at !== "string" || !/^[0-9a-f]{64}$/.test(row.content_sha256)) {
+        typeof row.reviewed_at !== "string" || !/^[0-9a-f]{64}$/.test(row.content_sha256) ||
+        await sha256(stable(assertionContentPayload(row))) !== row.content_sha256) {
       throw new Error("biological_identity_source_provenance_integrity_failure");
     }
   }
