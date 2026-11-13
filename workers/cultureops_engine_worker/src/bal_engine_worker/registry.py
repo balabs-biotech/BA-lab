@@ -6,6 +6,7 @@ The registry is intentionally independent from Supabase and queue transport.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+import json
 from typing import Any, Mapping, Protocol
 
 
@@ -37,6 +38,11 @@ class EngineResult:
             raise TypeError("EngineResult.data must be a mapping")
         if not isinstance(self.provenance, Mapping):
             raise TypeError("EngineResult.provenance must be a mapping")
+        try:
+            json.dumps(dict(self.data), allow_nan=False)
+            json.dumps(dict(self.provenance), allow_nan=False)
+        except (TypeError, ValueError) as exc:
+            raise TypeError("EngineResult data and provenance must be JSON-serializable") from exc
 
 
 class Engine(Protocol):
