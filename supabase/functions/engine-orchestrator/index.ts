@@ -535,6 +535,9 @@ Deno.serve(async (req: Request) => {
     });
   }
 
+  // The durable ledger ID is authoritative; do not persist the worker-local UUID
+  // as though it were the database execution identity.
+  result.execution_id = execution.id;
   const completedAt = new Date().toISOString();
   if (result.status === "completed") {
     const { data: resultId, error: saveError } = await serviceClient.rpc("complete_engine_execution", {
