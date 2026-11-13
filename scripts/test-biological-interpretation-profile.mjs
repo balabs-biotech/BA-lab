@@ -159,6 +159,23 @@ const outOfWindow = await buildBiologicalInterpretationProfile({
 });
 assert.equal(outOfWindow.state, "not_configured");
 
+const retiredHistoricalProfile = await buildBiologicalInterpretationProfile({
+  ...input,
+  historicalReplay: true,
+  profiles: [{ ...profile, status: "retired", valid_to: "2026-11-12" }],
+  references: [{ ...reference, status: "retired" }],
+});
+assert.equal(retiredHistoricalProfile.state, "loaded");
+assert.equal(retiredHistoricalProfile.profile.profile_version, "1.0.0");
+assert.equal(retiredHistoricalProfile.datasets.length, 2);
+
+const retiredProfileRejectedForCurrentResolution = await buildBiologicalInterpretationProfile({
+  ...input,
+  profiles: [{ ...profile, status: "retired", valid_to: "2026-11-12" }],
+  references: [{ ...reference, status: "retired" }],
+});
+assert.equal(retiredProfileRejectedForCurrentResolution.state, "not_configured");
+
 await assert.rejects(
   buildBiologicalInterpretationProfile({
     ...input,
