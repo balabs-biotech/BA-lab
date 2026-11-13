@@ -44,6 +44,30 @@ for (const entry of [
 
 
 assert.match(workspace, /id="overviewRecentEngineExecutions"/);
+assert.match(workspace, /id="runCultureBiologicalAssessment"/);
+assert.match(workspace, /id="cultureBieAssessmentStart"/);
+assert.match(workspace, /id="cultureBieAssessmentEnd"/);
+const cultureAssessmentStart = tracker.indexOf("async function runCultureBiologicalAssessment()");
+const plantAssessmentStart = tracker.indexOf("async function runPlantBiologicalAssessment()");
+assert.ok(cultureAssessmentStart >= 0 && plantAssessmentStart > cultureAssessmentStart,
+  "mycology/lab cultures must have a dedicated BIE assessment path");
+const cultureAssessmentSource = tracker.slice(cultureAssessmentStart, plantAssessmentStart);
+for (const contract of [
+  'engine_id: "biological.context.features"',
+  'engine_version: "0.2.0"',
+  'culture_id: cultureId',
+  'window_start: startDate + "T00:00:00+01:00"',
+  'window_end: endDate + "T00:00:00+01:00"',
+  'idempotency_key: crypto.randomUUID()',
+  'await loadRecentEngineExecutions()',
+  'isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)'
+]) assert.ok(cultureAssessmentSource.includes(contract), "Missing culture BIE execution contract: " + contract);
+assert.match(tracker, /runCultureBiologicalAssessment\s*\n\s*\);/);
+assert.match(tracker, /closeCultureDetail[\s\S]*?cultureBiologicalAssessmentRequestId \+= 1;/);
+assert.match(tracker, /getElementById\("cultureDetailPanel"\)\?\.classList\.add\("hidden"\)/);
+assert.match(tracker, /assessmentStart\.value = startedDate/);
+assert.match(tracker, /assessmentEnd\.value = localDateValue\(nextDay\)/);
+
 assert.match(workspace, /Afficher les dernières analyses calculées/);
 
 const loaderStart = tracker.indexOf("async function loadRecentEngineExecutions()");
@@ -61,6 +85,7 @@ assert.match(loader, /\.order\("created_at", \{ ascending: false \}\)/);
 assert.match(loader, /\.limit\(8\)/);
 assert.match(loader, /engineExecutionHistoryRequestId/);
 assert.match(loader, /isCurrentWorkspaceRevision/);
+assert.match(loader, /scheduleEngineExecutionPolling\(/, "queued/running executions must activate status polling");
 
 const renderer = tracker.slice(rendererStart, overviewStart);
 
@@ -111,6 +136,24 @@ assert.match(tracker, /recentEngineExecutions = \[\]/);
 assert.match(tracker, /recentEngineResultsByExecution = new Map\(\)/);
 assert.match(tracker, /engineExecutionHistoryRequestId\+\+/);
 assert.match(tracker, /loadRecentEngineExecutions\(\)/);
+assert.match(tracker, /function scheduleEngineExecutionPolling\(/);
+assert.match(tracker, /status === "queued" \|\| execution\.status === "running"/);
+assert.match(tracker, /document\.visibilityState === "hidden" \? 15000 : 5000/);
+assert.match(tracker, /isCurrentWorkspaceRevision\(expectedRevision, expectedOrganizationId\)/);
+assert.match(tracker, /clearTimeout\(engineExecutionPollingTimer\)/);
+assert.match(tracker, /engineExecutionPollingOrganizationId !== expectedOrganizationId/);
+assert.match(tracker, /engineExecutionPollingTimer = null/);
+assert.match(tracker, /async function monitorPlantBiologicalAssessmentExecution/);
+assert.match(tracker, /setTimeout\(resolve, 1000\)/);
+assert.match(tracker, /execution\?\.status === "completed"/);
+assert.match(tracker, /execution\?\.status === "failed"/);
+assert.match(tracker, /for \(let attempt = 0; attempt < 90; attempt\+\+\)/);
+const plantMonitorStart = tracker.indexOf("async function monitorPlantBiologicalAssessmentExecution(");
+const plantMonitorEnd = tracker.indexOf("function setCultureBiologicalAssessmentMessage(", plantMonitorStart);
+const plantMonitor = tracker.slice(plantMonitorStart, plantMonitorEnd);
+assert.doesNotMatch(plantMonitor, /await loadRecentEngineExecutions\(\)/, "BIE notices must reuse the shared tenant-safe polling loop");
+assert.match(plantMonitor, /execution\?\.status === "completed"/);
+assert.match(plantMonitor, /execution\?\.status === "failed"/);
 
 for (const path of [
   "batch-tracker/mycology/index.html",
@@ -119,12 +162,12 @@ for (const path of [
 ]) {
   const page = readFileSync(path, "utf8");
   if (path.includes("green-tech")) {
-    assert.match(page, /workspace\.html\?v=20261113-bie-identity-ui-1/);
-    assert.match(page, /tracker\.js\?v=20261113-bie-identity-ui-1/);
+    assert.match(page, /workspace\.html\?v=20261113-bie-culture-assessment-1/);
+    assert.match(page, /tracker\.js\?v=20261113-bie-culture-assessment-1/);
     assert.match(page, /environmental-data\.js\?v=20261112-greentech-engine-qc-1/);
   } else {
-    assert.match(page, /workspace\.html\?v=20261113-bie-identity-ui-1/);
-    assert.match(page, /tracker\.js\?v=20261113-bie-identity-ui-1/);
+    assert.match(page, /workspace\.html\?v=20261113-bie-culture-assessment-1/);
+    assert.match(page, /tracker\.js\?v=20261113-bie-culture-assessment-1/);
   }
 }
 

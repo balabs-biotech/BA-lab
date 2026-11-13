@@ -735,7 +735,15 @@
     ["Le BIE v0.2 n’est pas encore activé côté serveur (BA_BIE_ENABLED).", "BIE v0.2 is not enabled server-side yet (BA_BIE_ENABLED).", "O BIE v0.2 ainda não está ativado no servidor (BA_BIE_ENABLED).", "لم يتم تفعيل BIE v0.2 على الخادم بعد (BA_BIE_ENABLED)."],
     ["Préparation du snapshot biologique authentifié…", "Preparing the authenticated biological snapshot…", "A preparar o snapshot biológico autenticado…", "جارٍ إعداد اللقطة البيولوجية الموثقة…"],
     ["Évaluation enregistrée", "Assessment recorded", "Avaliação registada", "تم تسجيل التقييم"],
-    ["Évaluation transmise. Consultez l’historique des exécutions.", "Assessment submitted. Check execution history.", "Avaliação enviada. Consulte o histórico de execuções.", "تم إرسال التقييم. راجع سجل التنفيذ."]
+    ["Évaluation transmise. Consultez l’historique des exécutions.", "Assessment submitted. Check execution history.", "Avaliação enviada. Consulte o histórico de execuções.", "تم إرسال التقييم. راجع سجل التنفيذ."],
+["BIOLOGICAL INTELLIGENCE ENGINE", "BIOLOGICAL INTELLIGENCE ENGINE", "BIOLOGICAL INTELLIGENCE ENGINE", "محرك الذكاء البيولوجي"],
+    ["Mycology / Lab", "Mycology / Lab", "Micologia / Laboratório", "علم الفطريات / المختبر"],
+    ["Lancez une évaluation descriptive de cette culture sur une fenêtre datée. Le moteur examine les mesures, les données environnementales et les informations biologiques disponibles ; il signale les lacunes sans produire de diagnostic.", "Run a descriptive assessment of this culture over a dated window. The engine examines measurements, environmental data and available biological information; it reports gaps without producing a diagnosis.", "Execute uma avaliação descritiva desta cultura num período definido. O motor examina medições, dados ambientais e informações biológicas disponíveis; assinala lacunas sem produzir um diagnóstico.", "أطلق تقييماً وصفياً لهذه الثقافة ضمن فترة محددة. يفحص المحرك القياسات والبيانات البيئية والمعلومات البيولوجية المتاحة؛ ويشير إلى الثغرات دون إصدار تشخيص."],
+    ["Le worker BIE ou ses secrets serveur ne sont pas encore configurés.", "The BIE worker or its server secrets are not configured yet.", "O worker BIE ou os respetivos segredos do servidor ainda não estão configurados.", "لم يتم إعداد عامل BIE أو أسرار الخادم بعد."],
+    ["L’évaluation a échoué", "The assessment failed", "A avaliação falhou", "فشل التقييم"],
+    ["Traitement en file d’attente ; le statut sera actualisé dans l’historique.", "Queued for processing; status will update in execution history.", "Em fila de processamento; o estado será atualizado no histórico.", "تم وضعه في قائمة الانتظار؛ ستُحدّث الحالة في سجل التنفيذ."],
+    ["Évaluation terminée", "Assessment completed", "Avaliação concluída", "اكتمل التقييم"],
+    ["Prêt à lancer une évaluation descriptive pour cette culture.", "Ready to run a descriptive assessment for this culture.", "Pronto para executar uma avaliação descritiva desta cultura.", "جاهز لإجراء تقييم وصفي لهذه الثقافة."]
   ];
   for (const [fr, en, pt, ar] of supplementalCoverage) {
     dictionaries.en[fr] ||= en;
