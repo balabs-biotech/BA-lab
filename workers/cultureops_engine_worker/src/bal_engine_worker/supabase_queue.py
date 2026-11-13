@@ -12,15 +12,11 @@ from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
 from .registry import EngineResult
-from .worker import ClaimedJob
+from .worker import ClaimedJob, LeaseLostError
 
 
 class QueueTransportError(RuntimeError):
     """Raised when the queue API cannot be reached or returns an invalid response."""
-
-
-class LeaseLostError(RuntimeError):
-    """Raised when PostgreSQL rejects a mutation for a stale or expired lease."""
 
 
 class SupabaseRestQueueClient:
