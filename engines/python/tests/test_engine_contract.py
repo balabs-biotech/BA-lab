@@ -688,6 +688,17 @@ class EngineContractTests(unittest.TestCase):
         self.assertEqual(mismatch_result["status"], "completed")
         self.assertEqual(mismatch_result["result"]["value"]["findings"], [])
         self.assertIn("rule_based_interpretation_evaluated_no_findings", mismatch_result["result"]["quality_flags"])
+
+        unconfigured = json.loads(json.dumps(mismatched_context))
+        unconfigured["parameters"]["interpretation_rules"] = []
+        unconfigured["parameters"]["interpretation_profile_state"] = "not_configured"
+        unconfigured["datasets"] = []
+        unconfigured["input"]["record_ids"] = []
+        unconfigured["input"]["records"] = []
+        unconfigured_result = execute_registered_engine(unconfigured)
+        self.assertEqual(unconfigured_result["status"], "completed")
+        self.assertIn("no_active_interpretation_profile", unconfigured_result["result"]["value"]["coverage"]["missing_context"])
+        self.assertIn("interpretation_profile_not_available", unconfigured_result["result"]["quality_flags"])
         self.assertIn("biological_interpretation_not_performed", mismatch_result["result"]["quality_flags"])
 
     def test_biological_context_features_uses_half_open_analysis_window(self):
