@@ -1336,6 +1336,7 @@ class EngineContractTests(unittest.TestCase):
         self.assertEqual(qc["state"], "review_required")
         self.assertEqual(qc["upstream_execution_id"], artifact["execution_id"])
         self.assertEqual(qc["quality_flags"], ["outlier_detected"])
+        self.assertEqual(qc["provenance"], artifact["result"]["provenance"])
         self.assertEqual(qc["value"], qc_value)
         self.assertIn("environmental_qc_review_required", result["result"]["quality_flags"])
         self.assertTrue(any(
