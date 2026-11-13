@@ -316,6 +316,7 @@
         "outcome",
         "quality_flags",
         "limitations",
+        "provenance",
         "value"
       ],
       "properties": {
@@ -359,6 +360,9 @@
             "type": "string",
             "maxLength": 1000
           }
+        },
+        "provenance": {
+          "type": "object"
         },
         "value": {
           "type": "object"
