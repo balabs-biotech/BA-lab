@@ -634,6 +634,13 @@ class EngineContractTests(unittest.TestCase):
             "content_sha256": "d" * 64,
             "retrieved_at": "2026-11-10T07:55:00Z",
         })
+        request["datasets"].append({
+            "provider": "BA_LABS_INTERPRETATION_PROFILE",
+            "dataset_id": "biological.context.features",
+            "dataset_version": "1.0.0",
+            "content_sha256": "e" * 64,
+            "retrieved_at": "2026-11-10T07:55:00Z",
+        })
         missing_registry = json.loads(json.dumps(request))
         missing_registry["datasets"] = [
             dataset for dataset in missing_registry["datasets"]
@@ -674,11 +681,13 @@ class EngineContractTests(unittest.TestCase):
         self.assertIn("rule_version=1.0.0", finding["statement"])
         self.assertIn("reference=ba-labs.protocols.pleurotus-fruiting@2026.1", finding["statement"])
         self.assertIn("BA_LABS_RULE_REGISTRY/ba-labs.protocols.pleurotus-fruiting@2026.1#sha256=" + ("d" * 64), result["result"]["provenance"]["source_references"])
+        self.assertIn("BA_LABS_INTERPRETATION_PROFILE/biological.context.features@1.0.0#sha256=" + ("e" * 64), result["result"]["provenance"]["source_references"])
         mismatched_context = json.loads(json.dumps(request))
         mismatched_context["parameters"]["biological_contexts"][0]["strain_code"] = "OTHER-STRAIN"
         mismatch_result = execute_registered_engine(mismatched_context)
         self.assertEqual(mismatch_result["status"], "completed")
         self.assertEqual(mismatch_result["result"]["value"]["findings"], [])
+        self.assertIn("rule_based_interpretation_evaluated_no_findings", mismatch_result["result"]["quality_flags"])
         self.assertIn("biological_interpretation_not_performed", mismatch_result["result"]["quality_flags"])
 
     def test_biological_context_features_uses_half_open_analysis_window(self):
