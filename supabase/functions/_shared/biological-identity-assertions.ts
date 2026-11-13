@@ -23,10 +23,12 @@ export async function loadAuthenticatedBiologicalIdentityAssertions(input: {
   userClient: any;
   organizationId: string;
   biologicalContexts: Row[];
+  windowStartDate: string;
+  windowLastIncludedDate: string;
 }) {
   const { userClient, organizationId } = input;
   if (!userClient || typeof userClient.from !== "function") throw new Error("caller_scoped_supabase_client_required");
-  if (!organizationId || !Array.isArray(input.biologicalContexts)) throw new Error("biological_identity_context_invalid");
+  if (!organizationId || !Array.isArray(input.biologicalContexts) ||\n      !/^\\d{4}-\\d{2}-\\d{2}$/.test(input.windowStartDate) ||\n      !/^\\d{4}-\\d{2}-\\d{2}$/.test(input.windowLastIncludedDate) ||\n      input.windowLastIncludedDate < input.windowStartDate) throw new Error("biological_identity_context_invalid");
   const organismIds = uniqueStrings(input.biologicalContexts.map((context) => context?.genetic_reference?.organism_id));
   const strainIds = uniqueStrings(input.biologicalContexts.map((context) => context?.genetic_reference?.strain_id));
   if (!organismIds.length && !strainIds.length) {
@@ -98,7 +100,7 @@ export async function loadAuthenticatedBiologicalIdentityAssertions(input: {
     if (duplicateKeys.has(key)) throw new Error("biological_identity_assertion_identity_ambiguous");
     duplicateKeys.add(key);
   }
-  const state = accepted.length ? "documented" : "not_documented";
+  const semanticValues = new Map<string, Set<string>>();\n  for (const assertion of accepted) {\n    const subjectId = assertion.subject_type === "strain" ? assertion.strain_id : assertion.organism_id;\n    const key = assertion.subject_type + ":" + subjectId + ":" + assertion.assertion_type;\n    if (!semanticValues.has(key)) semanticValues.set(key, new Set());\n    semanticValues.get(key)!.add(assertion.assertion_value);\n  }\n  const state = [...semanticValues.values()].some((values) => values.size > 1)\n    ? "conflicting" : accepted.length ? "documented" : "not_documented";
   const datasets: Row[] = [];
   for (const assertion of accepted) {
     datasets.push({
