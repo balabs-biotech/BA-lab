@@ -6,6 +6,7 @@ declare
   v_org uuid := '20000000-0000-4000-8000-000000000001';
   v_other_org uuid := '20000000-0000-4000-8000-000000000002';
   v_job uuid;
+  v_other_job uuid;
   v_duplicate uuid;
   v_claim jsonb;
   v_claim2 jsonb;
@@ -153,12 +154,15 @@ begin
   end if;
 
   -- A user who belongs only to one organization cannot inspect another tenant's job.
+  insert into private.engine_jobs (
+    organization_id, engine_code, engine_version, job_type, payload, idempotency_key
+  ) values (
+    v_other_org, 'demo.engine', '1.0.0', 'tenant_test', '{}'::jsonb, 'other-tenant-job'
+  ) returning id into v_other_job;
   perform set_config('request.jwt.claims',
     jsonb_build_object('role','authenticated','sub',v_user)::text, true);
   begin
-    perform public.get_engine_job_status(
-      (select id from private.engine_jobs where organization_id = v_other_org limit 1)
-    );
+    perform public.get_engine_job_status(v_other_job);
     raise exception 'Cross-organization job status read was accepted';
   exception when insufficient_privilege then
     null;
