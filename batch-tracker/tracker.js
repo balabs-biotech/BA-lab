@@ -6992,6 +6992,7 @@ async function loadCultureDetail(cultureId) {
   if (!culture || !panel || !title || !meta || !summary || !timeline) return;
 
   panel.dataset.cultureId = culture.id;
+  mountCultureBiologicalAssessmentPanel(culture);
   loadBiologicalLineage(culture.id);
   loadBiologicalContextPanel(culture.id);
   panel.classList.remove("hidden");
