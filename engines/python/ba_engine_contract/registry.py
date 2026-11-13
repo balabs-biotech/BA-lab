@@ -83,9 +83,14 @@ def execute_registered_engine(request: Mapping[str, Any]) -> dict[str, Any]:
             execution_environment["container_image_digest"] = image_digest
         provenance = response["result"]["provenance"]
         provenance["execution_environment"] = execution_environment
+        missing_provenance = []
         if source_revision == "unrecorded":
+            missing_provenance.append("build_revision_unavailable")
+        if not image_digest:
+            missing_provenance.append("container_image_digest_unavailable")
+        if missing_provenance:
             response["result"]["quality_flags"] = sorted(set(
-                response["result"]["quality_flags"] + ["build_revision_unavailable"]
+                response["result"]["quality_flags"] + missing_provenance
             ))
         from .validation import validate_response
         validate_response(response, request)
