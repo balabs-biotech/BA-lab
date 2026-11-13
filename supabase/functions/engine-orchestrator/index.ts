@@ -386,10 +386,12 @@ Deno.serve(async (req: Request) => {
   }
 
   const startedAt = new Date().toISOString();
-  const { error: startError } = await serviceClient.from("engine_executions")
+  const { data: startedExecution, error: startError } = await serviceClient.from("engine_executions")
     .update({ status: "running", started_at: startedAt, updated_at: startedAt })
-    .eq("organization_id", organizationId).eq("id", execution.id).eq("status", "queued");
-  if (startError) {
+    .eq("organization_id", organizationId).eq("id", execution.id).eq("status", "queued")
+    .select("id")
+    .maybeSingle();
+  if (startError || !startedExecution) {
     const persisted = await persistExecutionFailure(
       "execution_start_failed",
       "Execution could not enter the running state.",
