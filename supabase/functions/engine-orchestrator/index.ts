@@ -20,6 +20,7 @@ const headers = {
   "Cache-Control": "no-store",
 };
 const MAX_BODY_BYTES = 48_000;
+const MAX_WORKER_RESPONSE_BYTES = 128_000;
 const WORKER_TIMEOUT_MS = 20_000;
 const ENGINE_ALLOWLIST = new Map([["environmental.timeseries.qc", new Set(["0.2.0"])]]);
 const ajv = new Ajv2020({ allErrors: true, strict: true });
@@ -29,6 +30,33 @@ const validateResponse = ajv.compile(responseSchema);
 
 function reply(status: number, body: Record<string, unknown>) {
   return new Response(JSON.stringify(body), { status, headers });
+}
+async function readBoundedWorkerResponse(response: Response): Promise<string> {
+  if (!response.body) return "";
+  const reader = response.body.getReader();
+  const chunks: Uint8Array[] = [];
+  let total = 0;
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      total += value.byteLength;
+      if (total > MAX_WORKER_RESPONSE_BYTES) {
+        await reader.cancel().catch(() => undefined);
+        throw new Error("worker_response_too_large");
+      }
+      chunks.push(value);
+    }
+  } finally {
+    reader.releaseLock();
+  }
+  const bytes = new Uint8Array(total);
+  let offset = 0;
+  for (const chunk of chunks) {
+    bytes.set(chunk, offset);
+    offset += chunk.byteLength;
+  }
+  return new TextDecoder().decode(bytes);
 }
 function object(value: unknown): value is Record<string, any> {
   return !!value && typeof value === "object" && !Array.isArray(value);
@@ -475,10 +503,10 @@ Deno.serve(async (req: Request) => {
       body: workerRequestBody,
       signal: controller.signal,
     });
-    workerBody = await workerResponse.text();
-    if (workerBody.length > 128_000) throw new Error("worker_response_too_large");
+    workerBody = await readBoundedWorkerResponse(workerResponse);
   } catch (error) {
-    const code = controller.signal.aborted ? "worker_timeout" : "worker_unreachable";
+    const code = controller.signal.aborted ? "worker_timeout" :
+      error instanceof Error && error.message === "worker_response_too_large" ? "worker_response_too_large" : "worker_unreachable";
     const persisted = await persistExecutionFailure(
       code,
       "The registered engine worker did not return a usable response.",
