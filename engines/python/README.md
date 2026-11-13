@@ -58,7 +58,7 @@ Every completed registered-engine result records an `execution_environment` prov
 - installed versions of declared runtime dependencies;
 - optional immutable container image digest from `BA_ENGINE_IMAGE_DIGEST`.
 
-Build the image with the Git revision build argument shown above. At deployment, inject `BA_ENGINE_IMAGE_DIGEST` from the platform's immutable image identifier (for example, the OCI digest); do not use a mutable tag as a digest. If the source revision is missing, the result is explicitly marked with `build_revision_unavailable` and `source_revision=unrecorded`. Results remain usable for descriptive analysis, but must not be represented as fully build-reproducible.
+Build the image with the Git revision build argument shown above. At deployment, inject `BA_ENGINE_IMAGE_DIGEST` from the platform's immutable image identifier (for example, the OCI digest); do not use a mutable tag as a digest. If the source revision or immutable image digest is missing, the result is explicitly marked with `build_revision_unavailable` or `container_image_digest_unavailable` (and `source_revision=unrecorded` where applicable). Results remain usable for descriptive analysis, but must not be represented as fully build-reproducible.
 
 Health check: `GET /healthz`. Execution endpoint: authenticated `POST /v1/execute`.
 
