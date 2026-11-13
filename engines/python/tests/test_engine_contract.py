@@ -570,6 +570,95 @@ class EngineContractTests(unittest.TestCase):
         self.assertIn("biological_interpretation_not_performed", result["result"]["quality_flags"])
 
 
+    def test_biological_context_features_emits_limited_findings_for_scoped_versioned_rules(self):
+        request = json.loads(json.dumps(REQUEST))
+        request["engine"] = {
+            "engine_id": "biological.context.features",
+            "engine_version": "0.1.0",
+        }
+        culture_id = "2c2b3a4d-5e6f-4789-8123-456789abcdef"
+        request["scope"] = {
+            "organization_id": REQUEST["scope"]["organization_id"],
+            "culture_id": culture_id,
+        }
+        request["parameters"] = {
+            "window_start": "2026-11-10T00:00:00Z",
+            "window_end": "2026-11-11T00:00:00Z",
+            "timezone": "Africa/Algiers",
+            "biological_contexts": [{
+                "context_id": "5c2b3a4d-5e6f-4789-8123-456789abcdef",
+                "valid_from": "2026-11-01",
+                "valid_to": None,
+                "organism_kind": "fungus",
+                "taxon_code": "Pleurotus ostreatus",
+                "strain_code": "BA-P80",
+                "cultivar_code": None,
+                "culture_stage": "fruiting",
+                "substrate_code": "wheat-straw",
+                "production_system": "bucket",
+                "context_tags": [],
+                "genetic_reference": {
+                    "status": "not_specified",
+                    "strain_id": None,
+                    "organism_id": None,
+                    "designation": None,
+                    "origin": None,
+                    "source_description": None,
+                    "scientific_name": None,
+                    "common_name": None,
+                    "taxonomy_source": None,
+                    "taxonomy_id": None,
+                },
+            }],
+            "interpretation_rules": [{
+                "rule_id": "mycology.air_temperature.upper_bound",
+                "rule_version": "1.0.0",
+                "feature_code": "series.measurement.air_temperature.maximum",
+                "operator": "gt",
+                "threshold": 22.0,
+                "unit_code": "degC",
+                "statement": "Observed maximum exceeds the configured reference threshold.",
+                "context_match": {
+                    "taxon_code": "Pleurotus ostreatus",
+                    "strain_code": "BA-P80",
+                    "culture_stage": "fruiting",
+                },
+                "reference_id": "ba-labs.protocols.pleurotus-fruiting",
+                "reference_version": "2026.1",
+            }],
+        }
+        request["input"]["record_ids"] = []
+        request["input"]["records"] = []
+        for index, value in enumerate([21.0, 23.0, 22.0]):
+            record_id = f"dc2b3a4d-5e6f-4789-8123-456789abcde{index}"
+            request["input"]["record_ids"].append(record_id)
+            request["input"]["records"].append({
+                "record_id": record_id,
+                "record_type": "measurement",
+                "payload_sha256": "e" * 64,
+                "data": {
+                    "variable_code": "air_temperature",
+                    "normalized_value": value,
+                    "normalized_unit_code": "degC",
+                    "measured_at": f"2026-11-10T0{8 + index}:00:00Z",
+                },
+                "context": {"culture_id": culture_id},
+            })
+        result = execute_registered_engine(request)
+        self.assertEqual(result["status"], "completed", msg=str(result.get("error")))
+        value = result["result"]["value"]
+        self.assertEqual(len(value["findings"]), 1)
+        finding = value["findings"][0]
+        self.assertEqual(finding["finding_code"], "mycology.air_temperature.upper_bound")
+        self.assertEqual(finding["evidence_state"], "limited")
+        self.assertEqual(finding["supporting_record_ids"], request["input"]["record_ids"])
+        self.assertEqual(
+            finding["derived_feature_codes"],
+            ["series.measurement.air_temperature.maximum"],
+        )
+        self.assertIn("rule_version=1.0.0", finding["statement"])
+        self.assertIn("reference=ba-labs.protocols.pleurotus-fruiting@2026.1", finding["statement"])
+
     def test_biological_context_features_uses_half_open_analysis_window(self):
         request = json.loads(json.dumps(REQUEST))
         request["engine"] = {
