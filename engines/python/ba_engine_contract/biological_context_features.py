@@ -491,6 +491,8 @@ def analyze_biological_context_features(request: Mapping[str, Any]) -> dict[str,
         missing_context.append("biological_identity_not_documented")
 
     interpretation_rules = parameters.get("interpretation_rules", [])
+    if interpretation_rules and profile_state != "loaded":
+        raise ValueError("interpretation_profile_not_loaded_for_rules")
     findings, interpretation_sources = _evaluate_interpretation_rules(interpretation_rules, biological_contexts, derived_features, request.get("datasets", []), identity_state, identity_assertions)
     if findings:
         quality_flags = ["biological_diagnosis_not_performed", "rule_based_interpretation_performed"]
