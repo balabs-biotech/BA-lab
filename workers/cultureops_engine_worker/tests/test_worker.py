@@ -1,6 +1,7 @@
 import threading
 import time
 import unittest
+from urllib.error import HTTPError, URLError
 
 from bal_engine_worker.registry import EngineRegistry, EngineResult
 from bal_engine_worker.worker import ClaimedJob, EngineWorker
@@ -107,6 +108,33 @@ class WorkerTests(unittest.TestCase):
         self.assertEqual(outcome.error_code, "engine_not_registered")
         self.assertEqual(queue.failures[0][1]["retryable"], False)
         self.assertEqual(queue.completed, [])
+
+    def test_default_classifier_retries_common_transient_failures(self):
+        registry = EngineRegistry()
+        registry.register(BrokenEngine())
+        queue = FakeQueue(make_job(engine_code="broken"))
+        outcome = EngineWorker(queue, registry, "worker-a").run_once()
+        self.assertEqual(outcome.status, "failed")
+        self.assertTrue(queue.failures[0][1]["retryable"])
+
+    def test_default_classifier_keeps_unknown_and_permanent_errors_terminal(self):
+        class InvalidInputEngine:
+            engine_code = "invalid"
+            engine_version = "1.0.0"
+            def execute(self, context, payload):
+                raise ValueError("invalid biological input")
+        registry = EngineRegistry()
+        registry.register(InvalidInputEngine())
+        queue = FakeQueue(make_job(engine_code="invalid"))
+        EngineWorker(queue, registry, "worker-a").run_once()
+        self.assertFalse(queue.failures[0][1]["retryable"])
+
+    def test_default_classifier_handles_http_rate_limit_and_server_errors(self):
+        from bal_engine_worker.worker import _default_failure_classifier
+        for status in (408, 425, 429, 500, 502, 503, 504):
+            self.assertTrue(_default_failure_classifier(HTTPError("https://api.example", status, "retry", {}, None)))
+        self.assertFalse(_default_failure_classifier(HTTPError("https://api.example", 400, "bad request", {}, None)))
+        self.assertTrue(_default_failure_classifier(URLError(TimeoutError("timeout"))))
 
     def test_engine_exception_isolated_and_classified(self):
         registry = EngineRegistry()
