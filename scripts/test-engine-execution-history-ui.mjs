@@ -43,6 +43,21 @@ for (const entry of [
 }
 
 
+
+assert.ok(tracker.includes("function mountCultureBiologicalAssessmentPanel(culture)"));
+assert.ok(tracker.includes("function runCultureBiologicalAssessment(cultureId)"));
+assert.ok(tracker.includes("mountCultureBiologicalAssessmentPanel(culture)"));
+assert.ok(tracker.includes("const selectedCultureId = section.dataset.cultureId"));
+assert.ok(tracker.includes('engine_version: "0.1.0"'));
+assert.ok(tracker.includes("culture_id: cultureId"));
+assert.ok(tracker.includes('window_start: startDate + "T00:00:00+01:00"'));
+assert.ok(tracker.includes('window_end: endDate + "T00:00:00+01:00"'));
+assert.ok(tracker.includes('"mycology", "laboratory"'));
+assert.ok(tracker.includes("cultureBiologicalAssessmentRequestId"));
+assert.ok(tracker.includes("isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)"));
+assert.ok(tracker.includes("Le service engine-orchestrator n’est pas encore déployé"));
+assert.ok(tracker.includes("Le moteur BIE v0.1 n’est pas enregistré côté serveur"));
+
 assert.match(workspace, /id="overviewRecentEngineExecutions"/);
 assert.match(workspace, /Afficher les dernières analyses calculées/);
 
@@ -139,11 +154,11 @@ for (const path of [
   const page = readFileSync(path, "utf8");
   if (path.includes("green-tech")) {
     assert.match(page, /workspace\.html\?v=20261113-bie-identity-ui-1/);
-    assert.match(page, /tracker\.js\?v=20261113-bie-async-dispatch-1/);
+    assert.match(page, /tracker\.js\?v=20261113-bie-culture-workspace-1/);
     assert.match(page, /environmental-data\.js\?v=20261112-greentech-engine-qc-1/);
   } else {
     assert.match(page, /workspace\.html\?v=20261113-bie-identity-ui-1/);
-    assert.match(page, /tracker\.js\?v=20261113-bie-async-dispatch-1/);
+    assert.match(page, /tracker\.js\?v=20261113-bie-culture-workspace-1/);
   }
 }
 
