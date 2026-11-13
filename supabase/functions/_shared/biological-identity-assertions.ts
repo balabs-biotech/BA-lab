@@ -111,7 +111,8 @@ export async function loadAuthenticatedBiologicalIdentityAssertions(input: {
     const reference = referenceMap.get(row.source_reference_id + "@" + row.source_reference_version);
     if (!reference || typeof reference.content_sha256 !== "string" ||
         !/^[0-9a-f]{64}$/.test(reference.content_sha256) || !reference.reviewed_at ||
-        typeof row.reviewed_at !== "string" || !/^[0-9a-f]{64}$/.test(row.content_sha256) ||\n        await sha256(stable(assertionContentPayload(row))) !== row.content_sha256) {
+        typeof row.reviewed_at !== "string" || !/^[0-9a-f]{64}$/.test(row.content_sha256) ||
+        await sha256(stable(assertionContentPayload(row))) !== row.content_sha256) {
       throw new Error("biological_identity_source_provenance_integrity_failure");
     }
   }
