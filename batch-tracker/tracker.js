@@ -6814,6 +6814,169 @@ async function runPlantBiologicalAssessment() {
   }
 }
 
+
+let cultureBiologicalAssessmentRequestId = 0;
+
+function mountCultureBiologicalAssessmentPanel(culture) {
+  const detailPanel = document.getElementById("cultureDetailPanel");
+  if (!detailPanel || !culture?.id) return;
+  let section = document.getElementById("cultureBiologicalAssessmentPanel");
+  if (!section) {
+    section = document.createElement("section");
+    section.id = "cultureBiologicalAssessmentPanel";
+    section.className = "biological-context-panel";
+    section.setAttribute("aria-labelledby", "cultureBiologicalAssessmentTitle");
+    const heading = document.createElement("h4");
+    heading.id = "cultureBiologicalAssessmentTitle";
+    heading.textContent = "Analyse biologique de la culture · BIE v0.1";
+    const description = document.createElement("p");
+    description.className = "muted";
+    description.textContent = "Lance une analyse descriptive sur les observations, mesures et contextes datés de cette culture. Le moteur ne pose pas de diagnostic et ne prescrit pas de traitement.";
+    const grid = document.createElement("div");
+    grid.className = "grid";
+    const startLabel = document.createElement("label");
+    startLabel.textContent = "Début de la fenêtre";
+    const start = document.createElement("input");
+    start.id = "cultureBiologicalAssessmentStart";
+    start.type = "date";
+    start.required = true;
+    startLabel.appendChild(start);
+    const endLabel = document.createElement("label");
+    endLabel.textContent = "Fin de la fenêtre (exclue)";
+    const end = document.createElement("input");
+    end.id = "cultureBiologicalAssessmentEnd";
+    end.type = "date";
+    end.required = true;
+    endLabel.appendChild(end);
+    grid.append(startLabel, endLabel);
+    const button = document.createElement("button");
+    button.id = "runCultureBiologicalAssessment";
+    button.type = "button";
+    button.className = "secondary-button";
+    button.textContent = "Évaluer cette culture avec le BIE";
+    button.addEventListener("click", () => { void runCultureBiologicalAssessment(culture.id); });
+    const message = document.createElement("p");
+    message.id = "cultureBiologicalAssessmentMessage";
+    message.className = "muted";
+    message.setAttribute("role", "status");
+    message.setAttribute("aria-live", "polite");
+    message.textContent = "Le service doit être déployé et activé côté serveur pour exécuter cette évaluation.";
+    section.append(heading, description, grid, button, message);
+    const contextPanel = document.getElementById("biologicalContextPanel");
+    detailPanel.insertBefore(section, contextPanel || document.getElementById("cultureDetailTimeline"));
+  }
+  section.dataset.cultureId = culture.id;
+  const start = document.getElementById("cultureBiologicalAssessmentStart");
+  const end = document.getElementById("cultureBiologicalAssessmentEnd");
+  if (!start.value) {
+    start.value = culture.started_at
+      ? localDateValue(new Date(culture.started_at))
+      : localDateValue();
+  }
+  if (!end.value) {
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    end.value = localDateValue(tomorrow);
+  }
+}
+
+function setCultureBiologicalAssessmentMessage(value, state = "") {
+  const message = document.getElementById("cultureBiologicalAssessmentMessage");
+  if (!message) return;
+  message.textContent = value;
+  if (state) message.dataset.state = state;
+  else delete message.dataset.state;
+}
+
+async function runCultureBiologicalAssessment(cultureId) {
+  const requestId = ++cultureBiologicalAssessmentRequestId;
+  const operationRevision = authStateRevision;
+  const operationOrganizationId = organizationId;
+  const section = document.getElementById("cultureBiologicalAssessmentPanel");
+  const startDate = document.getElementById("cultureBiologicalAssessmentStart")?.value;
+  const endDate = document.getElementById("cultureBiologicalAssessmentEnd")?.value;
+  const button = document.getElementById("runCultureBiologicalAssessment");
+  if (!operationOrganizationId || !cultureId || section?.dataset.cultureId !== cultureId ||
+      !["mycology", "laboratory"].includes(document.body.dataset.domain)) {
+    setCultureBiologicalAssessmentMessage("Culture ou espace de travail indisponible.", "error");
+    return;
+  }
+  if (!startDate || !endDate || endDate <= startDate) {
+    setCultureBiologicalAssessmentMessage("Choisissez une fenêtre valide ; la date de fin est exclusive.", "error");
+    return;
+  }
+  button.disabled = true;
+  setCultureBiologicalAssessmentMessage("Préparation du snapshot biologique authentifié…");
+  try {
+    const { data, error } = await supabaseClient.functions.invoke("engine-orchestrator", {
+      body: {
+        organization_id: operationOrganizationId,
+        engine_id: "biological.context.features",
+        engine_version: "0.1.0",
+        scope: { organization_id: operationOrganizationId, culture_id: cultureId },
+        record_ids: [],
+        parameters: {
+          window_start: startDate + "T00:00:00+01:00",
+          window_end: endDate + "T00:00:00+01:00",
+          timezone: "Africa/Algiers",
+        },
+        idempotency_key: crypto.randomUUID(),
+      },
+    });
+    if (requestId !== cultureBiologicalAssessmentRequestId ||
+        section?.dataset.cultureId !== cultureId ||
+        !isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
+    if (error) {
+      const detail = String(error.message || "Erreur inconnue");
+      let errorCode = "";
+      try {
+        const response = error.context?.clone?.();
+        if (response) {
+          const payload = await response.json();
+          errorCode = typeof payload?.error === "string" ? payload.error : "";
+        }
+      } catch { /* Transport errors may not expose a JSON body. */ }
+      if (/function.*not found|not deployed|404/i.test(detail)) {
+        throw new Error("Le service engine-orchestrator n’est pas encore déployé.");
+      }
+      if (errorCode === "engine_version_not_registered") {
+        throw new Error("Le moteur BIE v0.1 n’est pas enregistré côté serveur.");
+      }
+      if (errorCode === "orchestration_not_configured") {
+        throw new Error("Le worker Python ou ses secrets serveur ne sont pas encore configurés.");
+      }
+      throw new Error(errorCode || detail);
+    }
+    await loadRecentEngineExecutions();
+    if (requestId !== cultureBiologicalAssessmentRequestId ||
+        section?.dataset.cultureId !== cultureId ||
+        !isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
+    const executionId = data?.execution_id || data?.execution?.id;
+    if (executionId && ["queued", "running"].includes(data?.status)) {
+      setCultureBiologicalAssessmentMessage(
+        "Évaluation enregistrée (" + executionId + ") ; traitement en file d’attente. Le suivi apparaît dans l’historique des analyses.",
+        "success"
+      );
+    } else {
+      setCultureBiologicalAssessmentMessage(
+        executionId
+          ? "Évaluation terminée (" + executionId + "). Consultez l’historique des analyses."
+          : "Évaluation transmise. Consultez l’historique des analyses.",
+        "success"
+      );
+    }
+  } catch (error) {
+    if (requestId !== cultureBiologicalAssessmentRequestId ||
+        !isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
+    setCultureBiologicalAssessmentMessage(error.message || "Impossible de lancer l’évaluation BIE.", "error");
+  } finally {
+    if (requestId === cultureBiologicalAssessmentRequestId &&
+        isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) {
+      button.disabled = false;
+    }
+  }
+}
+
 let cultureDetailRequestId = 0;
 
 async function loadCultureDetail(cultureId) {
