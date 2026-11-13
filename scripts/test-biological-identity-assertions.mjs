@@ -1,8 +1,17 @@
-import assert from "node:assert/strict";
+import assert from "node:assert/strict";\nimport { createHash } from "node:crypto";
 import { loadAuthenticatedBiologicalIdentityAssertions } from "../supabase/functions/_shared/biological-identity-assertions.ts";
 const organizationId = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa";
 const organismId = "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb";
 const strainId = "cccccccc-cccc-4ccc-8ccc-cccccccccccc";
+function stable(value) {
+  if (Array.isArray(value)) return "[" + value.map(stable).join(",") + "]";
+  if (value && typeof value === "object") return "{" + Object.keys(value).sort().map((key) => JSON.stringify(key) + ":" + stable(value[key])).join(",") + "}";
+  return JSON.stringify(value);
+}
+function assertionDigest(row) {
+  const payload = Object.fromEntries(["assertion_code", "assertion_version", "subject_type", "organism_id", "strain_id", "assertion_type", "assertion_value", "source_reference_id", "source_reference_version", "evidence_level", "valid_from", "valid_to"].map((key) => [key, row[key]]));
+  return createHash("sha256").update(stable(payload)).digest("hex");
+}
 const source = {
   organization_id: organizationId, reference_id: "source.taxonomy", reference_version: "1.0.0",
   content_sha256: "a".repeat(64), status: "validated", reviewed_at: "2026-11-01T00:00:00Z",
@@ -16,7 +25,7 @@ const assertion = {
   evidence_level: "documented", content_sha256: "b".repeat(64), status: "validated",
   reviewed_at: "2026-11-02T00:00:00Z", valid_from: "2026-01-01", valid_to: null,
 };
-const calls = [];
+assertion.content_sha256 = assertionDigest(assertion);\nconst calls = [];
 const client = { from(table) {
   calls.push(["from", table]);
   const query = {
@@ -43,7 +52,7 @@ const conflictingAssertion = {
   assertion_value: "P80-legacy",
   content_sha256: "c".repeat(64),
 };
-const conflictClient = { from(table) {
+conflictingAssertion.content_sha256 = assertionDigest(conflictingAssertion);\nconst conflictClient = { from(table) {
   const query = {
     select() { return this; }, eq() { return this; }, in() { return this; },
     limit() {
