@@ -109,10 +109,6 @@ class EnvironmentalQualityEngine:
                 pass
             elif not _finite_number(value):
                 flags.append("value_must_be_finite_number")
-                # Keep the persisted result strict JSON; preserve the bad input
-                # as a bounded string diagnostic instead of emitting NaN/Infinity.
-                observation["value_diagnostic"] = str(value)[:80]
-                observation["value"] = None
 
             unit = observation.get("unit_code")
             if unit is not None and (not isinstance(unit, str) or not unit.strip()):
@@ -142,8 +138,6 @@ class EnvironmentalQualityEngine:
                     not _finite_number(resolution) or resolution < 0
                 ):
                     flags.append("invalid_spatial_resolution_m")
-                    observation["spatial_resolution_diagnostic"] = str(resolution)[:80]
-                    observation["spatial_resolution_m"] = None
 
             rule = rules.get(code, {})
             if rule.get("expected_unit") and unit != rule["expected_unit"]:

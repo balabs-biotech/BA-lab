@@ -78,6 +78,15 @@ class EnvironmentalQualityEngineTests(unittest.TestCase):
             result.data["observations"][0]["qc_flags"],
         )
 
+    def test_non_finite_spatial_resolution_is_sanitized(self):
+        result = self.engine.execute(self.context, {
+            "observations": [observation(spatial_resolution_m=float("inf"))],
+        })
+        row = result.data["observations"][0]
+        self.assertEqual(row["qc_status"], "invalid")
+        self.assertIn("invalid_spatial_resolution_m", row["qc_flags"])
+        self.assertIsNone(row["observation"]["spatial_resolution_m"])
+
     def test_invalid_rule_contract_fails_job(self):
         with self.assertRaisesRegex(ValueError, "minimum cannot exceed maximum"):
             self.engine.execute(self.context, {
