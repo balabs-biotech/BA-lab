@@ -20,7 +20,7 @@ The package contains:
 - conservative handling of heartbeat uncertainty: a worker that cannot confirm its lease does not write success or failure;
 - unit tests for registry resolution, failure isolation, heartbeat and stale-lease behavior.
 
-The PostgREST adapter is implemented against the public, least-privilege RPC contract and has mocked transport tests. The database contract currently exists as a disposable PostgreSQL 17 CI fixture, not as an applied Supabase migration. Do not point the adapter at production until the CLI-generated migration has been reviewed and deployed separately.
+The PostgREST adapter is implemented against the public, least-privilege RPC contract and has mocked transport tests. The CLI-generated migration is versioned in the feature branch and is exercised by the disposable PostgreSQL 17 migration-replay CI job. It has not been applied to the hosted Supabase project.
 
 ## Local checks
 
