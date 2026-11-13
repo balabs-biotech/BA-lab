@@ -75,7 +75,7 @@ h1 span{color:#748b5e}
  .hero{padding-top:30px;padding-bottom:23px}
  .scene{border-radius:18px}
  .cluster-key{padding:12px 14px}
- 
+
 }
 @media(prefers-reduced-motion:reduce){
  .lang,.btn{transition:none!important}
@@ -150,8 +150,8 @@ h1 span{color:#748b5e}
  #miniView .linknode{min-height:88px!important;padding:12px!important}
  #miniView .linknode b{font-size:13px!important}
  #miniView .linknode small{font-size:11px!important}
- 
- 
+
+
 }
 
 /* Lisibilité et hiérarchie de la légende autour de la scène 3D */
@@ -241,10 +241,10 @@ h1 span{color:#b66d43;text-shadow:none}
  #mainView.webgl-ready{min-height:640px}
  #mainView .webgl-stage{min-height:640px}
  .under{grid-template-columns:1fr 1fr}
- 
- 
- 
- 
+
+
+
+
 }
 
 /* 2026-10-30 — Mineral daylight pass: brighten the 3D atlas without flattening its depth. */
@@ -456,11 +456,11 @@ h1 span{
  .linknode:hover,.linknode:focus-visible{transform:translate(-2px,-2px)!important;box-shadow:5px 5px 0 #171b19}
  .sphere-hops{margin-top:16px}
  .under{grid-template-columns:1fr 1fr;margin-top:42px}
- 
- 
- 
- 
- 
+
+
+
+
+
  .foot{gap:10px;font-size:8px;letter-spacing:.04em}
 }
 @media(max-width:380px){
@@ -468,8 +468,8 @@ h1 span{
  .lang{padding:6px;font-size:8px}
  .hero:after{font-size:7px}
  .under{grid-template-columns:1fr}
- 
- 
+
+
  .foot:after{font-size:8px}
 }
 @media(prefers-reduced-motion:reduce){
