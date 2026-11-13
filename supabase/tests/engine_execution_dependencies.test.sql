@@ -44,6 +44,7 @@ declare
   tampered_payload jsonb;
   qc_result_id uuid;
   got uuid;
+  claimed_count integer;
   ts timestamptz;
   qc_scope jsonb := '{"organization_id":"aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa","location_id":"eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee"}';
   params jsonb := '{"window_start":"2026-11-12T00:00:00Z","window_end":"2026-11-13T00:00:00Z"}';
@@ -164,6 +165,32 @@ begin
      and dependency_role='environmental_qc'
  ) then
    raise exception 'atomic enqueue did not persist dependency edge';
+ end if;
+
+ -- A dispatcher claim must observe the BIE row and its immutable QC edge
+ -- together; no worker may claim the downstream execution before lineage exists.
+ select count(*) into claimed_count
+ from public.claim_engine_executions(
+   'bie-dispatch-fixture-worker', 1, 120, atomic_execution_id, org_id
+ );
+ if claimed_count <> 1 then
+   raise exception 'atomically enqueued BIE execution was not claimable by dispatcher';
+ end if;
+ if not exists(
+   select 1
+   from public.engine_executions e
+   join public.engine_execution_dependencies d
+     on d.organization_id=e.organization_id
+    and d.downstream_execution_id=e.id
+   where e.organization_id=org_id
+     and e.id=atomic_execution_id
+     and e.status='running'
+     and e.claimed_by='bie-dispatch-fixture-worker'
+     and d.upstream_execution_id=qc_id
+     and d.upstream_result_id=qc_result_id
+     and d.dependency_role='environmental_qc'
+ ) then
+   raise exception 'dispatcher claim did not retain the exact QC lineage edge';
  end if;
 
  -- The enqueue boundary must reject a caller-modified QC result even when
