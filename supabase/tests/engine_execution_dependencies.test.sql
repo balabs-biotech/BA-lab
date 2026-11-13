@@ -48,13 +48,22 @@ begin
  insert into auth.users(id) values(user_id) on conflict do nothing;
  insert into public.organization_members values(org_id,user_id,'member') on conflict do nothing;
 
- insert into public.engine_executions(organization_id,id,request_id,idempotency_key,engine_id,engine_version,scope,input_record_ids,input_snapshot_sha256,request_payload,status,started_at)
+ insert into public.engine_executions(organization_id,id,request_id,idempotency_key,engine_id,engine_version,scope,input_record_ids,input_snapshot_sha256,request_payload,status)
  values(org_id,qc_id,'11111111-1111-4111-8111-111111111111','qc-dependency-fixture','environmental.timeseries.qc','0.2.0',qc_scope,'{}',repeat('a',64),
- jsonb_build_object('parameters',params),'completed',ts);
- insert into public.engine_execution_results(organization_id,execution_id,engine_id,engine_version,result_type,outcome,input_record_ids,input_snapshot_sha256,value,limitations,quality_flags,provenance,generated_at)
- values(org_id,qc_id,'environmental.timeseries.qc','0.2.0','environmental.timeseries.qc','success','{}',repeat('a',64),
- '{"series":[]}'::jsonb,'[]','[]','{"algorithm":"fixture"}',ts)
- returning id into qc_result_id;
+ jsonb_build_object('parameters',params),'queued');
+ perform public.claim_engine_executions('lineage-fixture-worker',1,120,qc_id,org_id);
+ qc_result_id := public.complete_claimed_engine_execution(
+   org_id,qc_id,
+   jsonb_build_object(
+     'contract','BA-LABS/ENGINE-RESULT','contract_version','1.0.0',
+     'request_id','11111111-1111-4111-8111-111111111111','execution_id',qc_id::text,
+     'engine',jsonb_build_object('engine_id','environmental.timeseries.qc','engine_version','0.2.0'),
+     'input_snapshot_sha256',repeat('a',64),'status','completed',
+     'result',jsonb_build_object('outcome','success','value',jsonb_build_object('series',jsonb_build_array()),
+       'limitations',jsonb_build_array(),'quality_flags',jsonb_build_array(),
+       'provenance',jsonb_build_object('algorithm','fixture'))
+   ),ts,'lineage-fixture-worker'
+ );
 
  insert into public.engine_executions(organization_id,id,request_id,idempotency_key,engine_id,engine_version,scope,input_record_ids,input_snapshot_sha256,request_payload,status)
  values(org_id,bie_id,'22222222-2222-4222-8222-222222222222','bie-dependency-fixture','biological.context.features','0.2.0',qc_scope,'{}',repeat('b',64),
