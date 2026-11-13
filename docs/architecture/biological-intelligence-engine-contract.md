@@ -213,3 +213,12 @@ The execution ledger stores the resolved parameters and dataset manifest. Idempo
 The migration `20261113110900_create_biological_reference_registry.sql` reconciles the existing profile-registry baseline into the repository migration chain and adds the tenant-scoped scientific reference table. Both registries are RLS-protected. Organization members can read; profile writes require organization writer rights; scientific reference lifecycle writes require owner/admin rights. Activated profiles and validated references are immutable, with retirement as the only controlled lifecycle transition.
 
 No scientific reference records or active interpretation profiles have been seeded. The new reference registry migration is in the PR branch only; it has not been applied to the live Supabase project. The production database already contains the profile-registry objects in its migration history, but their original migration files were absent from this repository branch; the new baseline is additive and replay-safe.
+
+
+## Versioned identity assertions and identity-scoped rules (2026-11-13)
+
+The tenant-scoped `biological_identity_assertions` catalogue reuses canonical organism and strain records. Only reviewed, validated assertions whose source reference is also validated are eligible for BIE execution. Assertions are filtered against the complete analysis date window and the organism/strain IDs in the immutable biological-context snapshot. The resolver returns an explicit state: `documented`, `not_documented`, or `conflicting`; it never upgrades a free-text designation or an unresolved genetic reference into a validated identity.
+
+Interpretation rules may optionally declare `identity_match: { assertion_type, assertion_value }`. Such a rule is evaluated only when the identity state is `documented` and a matching validated assertion belongs to the exact organism or strain ID in the biological context being evaluated. Missing, conflicting, or mismatched identities suppress that identity-scoped rule. Rules without `identity_match` retain their existing context-scoped behavior.
+
+The assertion payload and its source-reference hash are included in the worker dataset manifest, result schema and provenance. The Python contract validates assertion structure and manifest linkage before returning identity data. The catalogue remains empty until BA Labs supplies and reviews real source material; test fixtures are synthetic and must not be interpreted as scientific content.
