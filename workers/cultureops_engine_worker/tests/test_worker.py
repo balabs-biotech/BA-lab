@@ -1,6 +1,8 @@
+import threading
+import time
 import unittest
 
-from bal_engine_worker.registry import EngineExecutionContext, EngineRegistry, EngineResult
+from bal_engine_worker.registry import EngineRegistry, EngineResult
 from bal_engine_worker.worker import ClaimedJob, EngineWorker
 
 
@@ -24,11 +26,27 @@ class BrokenEngine:
         raise TimeoutError("temporary upstream timeout")
 
 
+class BlockingEngine:
+    engine_code = "blocking"
+    engine_version = "1.0.0"
+
+    def __init__(self, heartbeat_seen):
+        self.heartbeat_seen = heartbeat_seen
+
+    def execute(self, context, payload):
+        if not self.heartbeat_seen.wait(timeout=1):
+            raise AssertionError("heartbeat did not run while engine was executing")
+        return EngineResult(status="succeeded", data={}, summary="done")
+
+
 class FakeQueue:
-    def __init__(self, job):
+    def __init__(self, job, heartbeat_result=True):
         self.job = job
+        self.heartbeat_result = heartbeat_result
         self.completed = []
         self.failures = []
+        self.heartbeats = []
+        self.heartbeat_seen = threading.Event()
 
     def claim_one(self, worker_id):
         if self.job is None:
@@ -37,6 +55,11 @@ class FakeQueue:
         if job.worker_id != worker_id:
             raise AssertionError("worker identity mismatch")
         return job
+
+    def heartbeat(self, job, *, lease_seconds):
+        self.heartbeats.append((job, lease_seconds))
+        self.heartbeat_seen.set()
+        return self.heartbeat_result
 
     def complete(self, job, result):
         self.completed.append((job, result))
@@ -113,6 +136,43 @@ class WorkerTests(unittest.TestCase):
     def test_worker_id_must_be_present(self):
         with self.assertRaises(ValueError):
             EngineWorker(FakeQueue(None), EngineRegistry(), " ")
+
+    def test_heartbeat_runs_during_long_engine_execution(self):
+        registry = EngineRegistry()
+        queue = FakeQueue(make_job(engine_code="blocking"))
+        registry.register(BlockingEngine(queue.heartbeat_seen))
+        worker = EngineWorker(
+            queue, registry, "worker-a",
+            lease_seconds=3, heartbeat_interval_seconds=0.02,
+        )
+        outcome = worker.run_once()
+
+        self.assertEqual(outcome.status, "succeeded")
+        self.assertGreaterEqual(len(queue.heartbeats), 1)
+        self.assertEqual(queue.heartbeats[0][1], 3)
+
+    def test_lost_lease_prevents_result_and_failure_writes(self):
+        registry = EngineRegistry()
+        queue = FakeQueue(make_job(engine_code="blocking"), heartbeat_result=False)
+        registry.register(BlockingEngine(queue.heartbeat_seen))
+        worker = EngineWorker(
+            queue, registry, "worker-a",
+            lease_seconds=3, heartbeat_interval_seconds=0.02,
+        )
+        outcome = worker.run_once()
+
+        self.assertEqual(outcome.status, "lease_lost")
+        self.assertEqual(queue.completed, [])
+        self.assertEqual(queue.failures, [])
+
+    def test_heartbeat_configuration_is_bounded(self):
+        with self.assertRaises(ValueError):
+            EngineWorker(FakeQueue(None), EngineRegistry(), "worker-a", lease_seconds=2)
+        with self.assertRaises(ValueError):
+            EngineWorker(
+                FakeQueue(None), EngineRegistry(), "worker-a",
+                lease_seconds=10, heartbeat_interval_seconds=10,
+            )
 
 
 if __name__ == "__main__":
