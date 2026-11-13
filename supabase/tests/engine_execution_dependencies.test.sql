@@ -85,12 +85,7 @@ begin
    raise exception 'dependency edge mutation accepted';
  exception when sqlstate '55000' then null;
  end;
- begin
-   perform public.attach_environmental_qc_dependency(org_id,qc_id,qc_id);
-   raise exception 'self dependency accepted';
- exception when check_violation or invalid_parameter_value then null;
- end;
-
+ 
  if has_function_privilege('authenticated','public.attach_environmental_qc_dependency(uuid,uuid,uuid)','EXECUTE')
    or not has_function_privilege('service_role','public.attach_environmental_qc_dependency(uuid,uuid,uuid)','EXECUTE') then
    raise exception 'dependency RPC must be service-role only';
