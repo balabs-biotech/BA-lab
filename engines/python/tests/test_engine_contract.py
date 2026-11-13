@@ -699,7 +699,7 @@ class EngineContractTests(unittest.TestCase):
         self.assertEqual(unconfigured_result["status"], "completed")
         self.assertIn("no_active_interpretation_profile", unconfigured_result["result"]["value"]["coverage"]["missing_context"])
         self.assertIn("interpretation_profile_not_available", unconfigured_result["result"]["quality_flags"])
-        self.assertIn("biological_interpretation_not_performed", mismatch_result["result"]["quality_flags"])
+        self.assertNotIn("biological_interpretation_not_performed", mismatch_result["result"]["quality_flags"])
 
     def test_biological_context_features_uses_half_open_analysis_window(self):
         request = json.loads(json.dumps(REQUEST))
