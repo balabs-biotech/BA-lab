@@ -85,4 +85,28 @@ await assert.rejects(
   /interpretation_profile_rule_shape_invalid/,
 );
 
+await assert.rejects(
+  buildBiologicalInterpretationProfile({
+    ...input,
+    profiles: [{ ...profile, rules: [{ ...rule, threshold: Number.NaN }] }],
+  }),
+  /interpretation_profile_rule_content_invalid/,
+);
+
+await assert.rejects(
+  buildBiologicalInterpretationProfile({
+    ...input,
+    references: [reference, { ...reference, source_url: "https://example.org/duplicate" }],
+  }),
+  /interpretation_reference_identity_ambiguous/,
+);
+
+await assert.rejects(
+  buildBiologicalInterpretationProfile({
+    ...input,
+    profiles: [{ ...profile, profile_version: "draft-version" }],
+  }),
+  /interpretation_profile_metadata_invalid/,
+);
+
 console.log("Biological interpretation profile resolver contract passed");
