@@ -2,7 +2,8 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 
 const tracker = readFileSync("batch-tracker/tracker.js", "utf8");
-const workspace = readFileSync("batch-tracker/workspace.html", "utf8");\n
+const workspace = readFileSync("batch-tracker/workspace.html", "utf8");
+
 const i18n = readFileSync("batch-tracker/i18n.js", "utf8");
 for (const label of [
   "Évaluation du contexte biologique",
@@ -44,7 +45,8 @@ assert.match(loader, /\.limit\(8\)/);
 assert.match(loader, /engineExecutionHistoryRequestId/);
 assert.match(loader, /isCurrentWorkspaceRevision/);
 
-const renderer = tracker.slice(rendererStart, overviewStart);\n
+const renderer = tracker.slice(rendererStart, overviewStart);
+
 const biologicalRendererStart = tracker.indexOf("function renderBiologicalContextAssessment(");
 assert.ok(biologicalRendererStart >= 0 && biologicalRendererStart < rendererStart);
 const biologicalRenderer = tracker.slice(biologicalRendererStart, rendererStart);
