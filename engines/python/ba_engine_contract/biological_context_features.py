@@ -390,8 +390,55 @@ def analyze_biological_context_features(request: Mapping[str, Any]) -> dict[str,
     if "missing" in measurement_environment_states:
         missing_context.append("measurement_environment_context_missing")
 
+    identity_state = parameters.get("biological_identity_state", "not_documented")
+    identity_assertions = parameters.get("biological_identity_assertions", [])
+    if identity_state not in {"documented", "not_documented", "conflicting"}:
+        raise ValueError("invalid_biological_identity_state")
+    if not isinstance(identity_assertions, list) or len(identity_assertions) > 500:
+        raise ValueError("invalid_biological_identity_assertions")
+    identity_sources: set[str] = set()
+    identity_manifests = [
+        dataset for dataset in request.get("datasets", [])
+        if isinstance(dataset, dict) and dataset.get("provider") == "BA_LABS_BIOLOGICAL_IDENTITY"
+    ]
+    manifest_keys = {
+        (dataset.get("dataset_id"), dataset.get("dataset_version")): dataset
+        for dataset in identity_manifests
+    }
+    for assertion in identity_assertions:
+        if not isinstance(assertion, dict):
+            raise ValueError("invalid_biological_identity_assertion")
+        code = assertion.get("assertion_code")
+        version = assertion.get("assertion_version")
+        digest = assertion.get("content_sha256")
+        if (
+            not isinstance(code, str) or not code
+            or not isinstance(version, str) or not _RULE_VERSION.fullmatch(version)
+            or not isinstance(digest, str) or not re.fullmatch(r"[0-9a-f]{64}", digest)
+        ):
+            raise ValueError("invalid_biological_identity_assertion")
+        manifest = manifest_keys.get((code, version))
+        if not manifest or not isinstance(manifest.get("content_sha256"), str):
+            raise ValueError("biological_identity_manifest_missing")
+        identity_sources.add(
+            f"BA_LABS_BIOLOGICAL_IDENTITY/{code}@{version}"
+            f"#sha256={manifest['content_sha256']}"
+        )
+    if identity_state == "documented" and not identity_assertions:
+        raise ValueError("documented_biological_identity_requires_assertions")
+    if identity_state == "not_documented" and identity_assertions:
+        raise ValueError("undocumented_biological_identity_has_assertions")
+    if identity_state == "conflicting":
+        missing_context.append("biological_identity_assertions_conflict")
+    elif identity_state == "not_documented":
+        missing_context.append("biological_identity_not_documented")
+
     interpretation_rules = parameters.get("interpretation_rules", [])
     findings, interpretation_sources = _evaluate_interpretation_rules(interpretation_rules, biological_contexts, derived_features, request.get("datasets", []))
+    if identity_state == "conflicting":
+        quality_flags.append("biological_identity_conflict")
+    elif identity_state == "documented":
+        quality_flags.append("biological_identity_assertions_present")
     if findings:
         quality_flags = ["biological_diagnosis_not_performed", "rule_based_interpretation_performed"]
     elif interpretation_rules:
@@ -459,6 +506,8 @@ def analyze_biological_context_features(request: Mapping[str, Any]) -> dict[str,
                     if isinstance(reference_id, str) and reference_id
                 }),
                 "biological_contexts": biological_contexts,
+                "identity_assertion_state": identity_state,
+                "identity_assertions": identity_assertions,
             },
             "coverage": {
                 "requested_window": {
@@ -487,7 +536,7 @@ def analyze_biological_context_features(request: Mapping[str, Any]) -> dict[str,
         "provenance": {
             "algorithm": "biological-context-features-v2" if engine_identity["engine_version"] == "0.2.0" else "biological-context-features-v1",
             "libraries": [],
-            "source_references": sorted({*(f"{provider}/{dataset}" for provider, dataset in environmental_sources), *interpretation_sources, *profile_sources}),
+            "source_references": sorted({*(f"{provider}/{dataset}" for provider, dataset in environmental_sources), *interpretation_sources, *profile_sources, *identity_sources}),
         },
     }
 
