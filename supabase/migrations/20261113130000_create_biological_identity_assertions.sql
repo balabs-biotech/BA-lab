@@ -83,12 +83,26 @@ language plpgsql
 security definer
 set search_path = pg_catalog, public
 as $function$
+declare
+  v_reference_status text;
 begin
   if new.status = 'validated' and (tg_op = 'INSERT' or old.status = 'draft') then
     if not private.is_org_admin(new.organization_id) then
       raise exception 'validating a biological identity assertion requires an organization administrator'
         using errcode = '42501';
     end if;
+
+    select status into v_reference_status
+    from public.biological_reference_registry
+    where organization_id = new.organization_id
+      and reference_id = new.source_reference_id
+      and reference_version = new.source_reference_version;
+
+    if v_reference_status is distinct from 'validated' then
+      raise exception 'identity assertion requires a validated scientific source reference'
+        using errcode = '23514';
+    end if;
+
     new.reviewed_by := auth.uid();
     new.reviewed_at := now();
   end if;
