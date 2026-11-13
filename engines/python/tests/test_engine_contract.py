@@ -558,9 +558,10 @@ class EngineContractTests(unittest.TestCase):
         Draft202012Validator(biological_schema, format_checker=FormatChecker()).validate(value)
         self.assertEqual(value["subject"]["subject_type"], "culture")
         self.assertEqual(value["subject"]["subject_id"], culture_id)
-        self.assertEqual(value["coverage"]["source_record_count"], 3)
+        self.assertEqual(value["coverage"]["source_record_count"], 5)
         self.assertEqual(value["coverage"]["record_counts_by_type"]["measurement"], 3)
-        self.assertEqual(len(value["derived_features"]), 4)
+        self.assertEqual(value["coverage"]["record_counts_by_type"]["environmental_observation"], 2)
+        self.assertEqual(len(value["derived_features"]), 8)
         feature = next(item for item in value["derived_features"] if item["feature_code"] == "series.measurement.air_temperature.mean")
         self.assertEqual(feature["feature_code"], "series.measurement.air_temperature.mean")
         self.assertEqual(feature["value"], 22.0)
@@ -998,9 +999,11 @@ class EngineContractTests(unittest.TestCase):
             "engine_version": "0.2.0",
         }
         plant_culture_id = "7c2b3a4d-5e6f-4789-8123-456789abcdef"
+        location_id = "8d3c4b5e-6f70-4891-9234-56789abcdef0"
         request["scope"] = {
             "organization_id": REQUEST["scope"]["organization_id"],
             "plant_culture_id": plant_culture_id,
+            "location_id": location_id,
         }
         request["input"]["snapshot_sha256"] = "c" * 64
         request["parameters"] = {
@@ -1038,8 +1041,11 @@ class EngineContractTests(unittest.TestCase):
             ("ac2b3a4d-5e6f-4789-8123-456789abcde2", 24.0, "2026-11-10T10:00:00Z"),
             ("ac2b3a4d-5e6f-4789-8123-456789abcde3", 26.0, "2026-11-10T12:00:00Z"),
         )
-        request["input"]["record_ids"] = [item[0] for item in measurements]
-        request["input"]["records"] = [{
+        weather_observations = (
+            ("bc2b3a4d-5e6f-4789-8123-456789abcde1", 18.0, "2026-11-10T00:00:00Z"),
+            ("bc2b3a4d-5e6f-4789-8123-456789abcde2", 20.0, "2026-11-10T12:00:00Z"),
+        )
+        measurement_records = [{
             "record_id": record_id,
             "record_type": "measurement",
             "payload_sha256": "e" * 64,
@@ -1051,6 +1057,25 @@ class EngineContractTests(unittest.TestCase):
             },
             "context": {"plant_culture_id": plant_culture_id},
         } for record_id, value, measured_at in measurements]
+        weather_records = [{
+            "record_id": record_id,
+            "record_type": "environmental_observation",
+            "payload_sha256": "f" * 64,
+            "data": {
+                "variable_code": "air_temperature_mean",
+                "value": value,
+                "unit_code": "degC",
+                "observed_at": observed_at,
+                "data_family": "weather",
+                "provider_code": "NASA_POWER",
+                "dataset_code": "POWER_DAILY",
+            },
+            "context": {"location_id": location_id},
+        } for record_id, value, observed_at in weather_observations]
+        request["input"]["records"] = measurement_records + weather_records
+        request["input"]["record_ids"] = [
+            record["record_id"] for record in request["input"]["records"]
+        ]
 
         output = StringIO()
         with patch("sys.stdin", StringIO(json.dumps(request))), patch("sys.stdout", output):
@@ -1067,7 +1092,7 @@ class EngineContractTests(unittest.TestCase):
         self.assertEqual(value["subject"]["subject_id"], plant_culture_id)
         self.assertEqual(value["coverage"]["source_record_count"], 3)
         self.assertEqual(value["coverage"]["record_counts_by_type"]["measurement"], 3)
-        self.assertEqual(len(value["observed_facts"]), 3)
+        self.assertEqual(len(value["observed_facts"]), 5)
         self.assertEqual(len(value["derived_features"]), 4)
         mean_feature = next(
             feature for feature in value["derived_features"]
@@ -1076,8 +1101,25 @@ class EngineContractTests(unittest.TestCase):
         self.assertEqual(mean_feature["value"], 24.0)
         self.assertEqual(mean_feature["unit_code"], "degC")
         self.assertEqual(
-            mean_feature["source_record_ids"], request["input"]["record_ids"]
+            mean_feature["source_record_ids"],
+            [item[0] for item in measurements],
         )
+        weather_mean = next(
+            feature for feature in value["derived_features"]
+            if feature["feature_code"] == "series.environmental_observation.air_temperature_mean.mean"
+        )
+        self.assertEqual(weather_mean["value"], 19.0)
+        self.assertEqual(weather_mean["unit_code"], "degC")
+        self.assertEqual(
+            weather_mean["source_record_ids"],
+            [item[0] for item in weather_observations],
+        )
+        weather_facts = [
+            fact for fact in value["observed_facts"]
+            if fact["fact_code"] == "environmental_observation.air_temperature_mean"
+        ]
+        self.assertEqual(len(weather_facts), 2)
+        self.assertTrue(all("NASA_POWER/POWER_DAILY" in fact["statement"] for fact in weather_facts))
         self.assertEqual(value["findings"], [])
         self.assertIn("no_active_interpretation_profile", value["coverage"]["missing_context"])
         self.assertNotIn("recommendations", value)
