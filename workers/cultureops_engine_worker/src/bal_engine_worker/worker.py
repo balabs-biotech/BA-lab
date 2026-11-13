@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from threading import Event, Thread
+from urllib.error import HTTPError, URLError
 from typing import Callable, Mapping, Protocol
 
 from .registry import EngineExecutionContext, EngineRegistry, EngineResult, RegistryError
@@ -59,8 +60,18 @@ class ExecutionOutcome:
 FailureClassifier = Callable[[Exception], bool]
 
 
-def _permanent_by_default(error: Exception) -> bool:
-    """Unknown engine/configuration and unclassified failures do not retry."""
+def _default_failure_classifier(error: Exception) -> bool:
+    """Retry common transient I/O failures; keep unknown errors permanent.
+
+    Engine plugins can inject a domain-specific classifier when they have
+    richer knowledge (for example, provider-specific rate-limit exceptions).
+    """
+    if isinstance(error, (TimeoutError, ConnectionError)):
+        return True
+    if isinstance(error, HTTPError):
+        return error.code in {408, 425, 429, 500, 502, 503, 504}
+    if isinstance(error, URLError):
+        return isinstance(error.reason, (TimeoutError, ConnectionError))
     return False
 
 
@@ -111,7 +122,7 @@ class EngineWorker:
         queue: QueueClient,
         registry: EngineRegistry,
         worker_id: str,
-        failure_classifier: FailureClassifier = _permanent_by_default,
+        failure_classifier: FailureClassifier = _default_failure_classifier,
         *,
         lease_seconds: int = 60,
         heartbeat_interval_seconds: float = 20.0,
