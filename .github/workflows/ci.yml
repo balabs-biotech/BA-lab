@@ -329,7 +329,7 @@ jobs:
         run: python -m unittest discover -s workers/cultureops_engine_worker/tests -v
 
   generate-cultureops-queue-migration:
-    if: github.event_name == 'push' && github.event.head_commit.message == 'ci(supabase): generate queue migration with pinned CLI'
+    if: "${{ github.event_name == 'push' && github.event.head_commit.message == 'ci(supabase): generate queue migration with pinned CLI' }}"
     permissions:
       contents: write
     runs-on: ubuntu-latest
