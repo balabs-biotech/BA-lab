@@ -43,6 +43,8 @@ def _evaluate_interpretation_rules(
     biological_contexts: list[dict[str, Any]],
     derived_features: list[dict[str, Any]],
     datasets: Any,
+    identity_state: str = "not_documented",
+    identity_assertions: list[dict[str, Any]] | None = None,
 ) -> tuple[list[dict[str, Any]], list[str]]:
     """Evaluate explicitly scoped, versioned thresholds without asserting diagnosis."""
     if not isinstance(rules, list) or len(rules) > 100:
@@ -80,7 +82,8 @@ def _evaluate_interpretation_rules(
             "unit_code", "statement", "context_match", "reference_id",
             "reference_version",
         }
-        if not isinstance(rule, dict) or set(rule) != required:
+        optional = {"identity_match"}
+        if not isinstance(rule, dict) or not required.issubset(rule) or not set(rule).issubset(required | optional):
             raise ValueError("invalid_interpretation_rule_shape")
 
         rule_id = rule["rule_id"]
@@ -121,6 +124,16 @@ def _evaluate_interpretation_rules(
             or any(not isinstance(value, str) or not value.strip() for value in context_match.values())
         ):
             raise ValueError("interpretation_rule_requires_biological_context_scope")
+        identity_match = rule.get("identity_match")
+        if identity_match is not None and (
+            not isinstance(identity_match, dict)
+            or set(identity_match) != {"assertion_type", "assertion_value"}
+            or not isinstance(identity_match.get("assertion_type"), str)
+            or not identity_match["assertion_type"].strip()
+            or not isinstance(identity_match.get("assertion_value"), str)
+            or not identity_match["assertion_value"].strip()
+        ):
+            raise ValueError("invalid_interpretation_identity_match")
         reference_manifest = next((
             dataset for dataset in datasets
             if isinstance(dataset, dict)
@@ -130,6 +143,16 @@ def _evaluate_interpretation_rules(
         ), None)
         if reference_manifest is None:
             raise ValueError("interpretation_rule_reference_not_in_dataset_manifest")
+
+        if identity_match is not None:
+            if identity_state != "documented" or not identity_assertions:
+                continue
+            if not any(
+                assertion.get("assertion_type") == identity_match["assertion_type"]
+                and assertion.get("assertion_value") == identity_match["assertion_value"]
+                for assertion in identity_assertions
+            ):
+                continue
 
         if not any(
             all(context.get(field) == expected for field, expected in context_match.items())
@@ -438,7 +461,7 @@ def analyze_biological_context_features(request: Mapping[str, Any]) -> dict[str,
         missing_context.append("biological_identity_not_documented")
 
     interpretation_rules = parameters.get("interpretation_rules", [])
-    findings, interpretation_sources = _evaluate_interpretation_rules(interpretation_rules, biological_contexts, derived_features, request.get("datasets", []))
+    findings, interpretation_sources = _evaluate_interpretation_rules(interpretation_rules, biological_contexts, derived_features, request.get("datasets", []), identity_state, identity_assertions)
     if findings:
         quality_flags = ["biological_diagnosis_not_performed", "rule_based_interpretation_performed"]
     elif interpretation_rules:
