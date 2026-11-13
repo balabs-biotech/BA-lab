@@ -148,7 +148,7 @@ async function processExecution(
     response = await fetch(new URL("/v1/execute", workerUrl), {
       method: "POST",
       headers: {
-        "Authorization": \`Bearer \${workerToken}\`,
+        "Authorization": "Bearer " + workerToken,
         "Content-Type": "application/json",
       },
       body: JSON.stringify(request),
@@ -242,7 +242,7 @@ Deno.serve(async (req: Request) => {
   const db = createClient(url, serviceKey, {
     auth: { persistSession: false, autoRefreshToken: false },
   });
-  const workerId = \`engine-queue-dispatch:\${crypto.randomUUID()}\`;
+  const workerId = "engine-queue-dispatch:" + crypto.randomUUID();
   const { data, error } = await db.rpc("claim_engine_executions", {
     p_worker_id: workerId,
     p_limit: MAX_DISPATCH_BATCH,
