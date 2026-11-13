@@ -50,7 +50,18 @@ export async function loadAuthenticatedBiologicalIdentityAssertions(input: {
   if (results.some((result) => result.error || !Array.isArray(result.data) || result.data.length > 500)) {
     throw new Error("biological_identity_assertion_registry_unavailable");
   }
-  const rows: Row[] = results.flatMap((result) => result.data).filter((row) =>
+  const rowsById = new Map<string, Row>();
+  for (const row of results.flatMap((result) => result.data)) {
+    if (typeof row.id !== "string" || !row.id) {
+      throw new Error("biological_identity_assertion_registry_unavailable");
+    }
+    const existing = rowsById.get(row.id);
+    if (existing && stable(existing) !== stable(row)) {
+      throw new Error("biological_identity_assertion_identity_ambiguous");
+    }
+    rowsById.set(row.id, row);
+  }
+  const rows: Row[] = [...rowsById.values()].filter((row) =>
     row.organization_id === organizationId && row.status === "validated" &&
     typeof row.valid_from === "string" && row.valid_from <= input.windowStartDate &&
     (row.valid_to === null || (typeof row.valid_to === "string" && row.valid_to >= input.windowLastIncludedDate)) &&
