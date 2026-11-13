@@ -255,5 +255,96 @@ begin
  exception when sqlstate '22023' then
    null;
  end;
-end $$;
+ 
+ -- Cross-tenant attachment must fail even when the caller knows the upstream
+ -- execution UUID. The result lookup is scoped by organization_id.
+ declare
+   other_org_id uuid := 'abababab-abab-4bab-8bab-abababababab';
+ begin
+   insert into public.organizations(id,code,name)
+   values(other_org_id,'TEST-OTHER-TENANT','Other Tenant') on conflict do nothing;
+   tampered_payload := (
+     select request_payload from public.engine_executions
+     where organization_id=org_id and id=atomic_execution_id
+   );
+   tampered_payload := jsonb_set(tampered_payload,'{request_id}',
+     '"66666666-6666-4666-8666-666666666666"'::jsonb,false);
+   tampered_payload := jsonb_set(tampered_payload,'{scope,organization_id}',
+     to_jsonb(other_org_id::text),false);
+   begin
+     perform public.enqueue_bie_with_environmental_qc(
+       other_org_id,
+       '66666666-6666-4666-8666-666666666666',
+       'bie-cross-tenant-artifact',
+       jsonb_set(qc_scope || jsonb_build_object('culture_id','99999999-9999-4999-8999-999999999999'),
+         '{organization_id}',to_jsonb(other_org_id::text),false),
+       '{}'::uuid[],
+       repeat('6',64),
+       jsonb_set(tampered_payload,'{input,snapshot_sha256}',to_jsonb(repeat('6',64)),false),
+       user_id,
+       qc_id
+     );
+     raise exception 'cross-tenant upstream QC execution was accepted' using errcode='P0001';
+   exception when sqlstate '22023' then
+     null;
+   end;
+ end;
+
+ -- Exact location and time-window identity are part of the QC -> BIE edge.
+ tampered_payload := (
+   select request_payload from public.engine_executions
+   where organization_id=org_id and id=atomic_execution_id
+ );
+ tampered_payload := jsonb_set(tampered_payload,'{request_id}',
+   '"77777777-7777-4777-8777-777777777777"'::jsonb,false);
+ tampered_payload := jsonb_set(tampered_payload,'{scope,location_id}',
+   '"ffffffff-ffff-4fff-8fff-ffffffffffff"'::jsonb,false);
+ tampered_payload := jsonb_set(tampered_payload,'{input,snapshot_sha256}',
+   to_jsonb(repeat('7',64)),false);
+ begin
+   perform public.enqueue_bie_with_environmental_qc(
+     org_id,
+     '77777777-7777-4777-8777-777777777777',
+     'bie-location-mismatch',
+     jsonb_set(qc_scope || jsonb_build_object('culture_id','99999999-9999-4999-8999-999999999999'),
+       '{location_id}','"ffffffff-ffff-4fff-8fff-ffffffffffff"'::jsonb,false),
+     '{}'::uuid[],
+     repeat('7',64),
+     tampered_payload,
+     user_id,
+     qc_id
+   );
+   raise exception 'QC artifact from another location was accepted' using errcode='P0001';
+ exception when sqlstate '22023' then
+   null;
+ end;
+
+ tampered_payload := (
+   select request_payload from public.engine_executions
+   where organization_id=org_id and id=atomic_execution_id
+ );
+ tampered_payload := jsonb_set(tampered_payload,'{request_id}',
+   '"88888888-8888-4888-8888-888888888888"'::jsonb,false);
+ tampered_payload := jsonb_set(tampered_payload,'{parameters,window_start}',
+   '"2026-11-11T00:00:00Z"'::jsonb,false);
+ tampered_payload := jsonb_set(tampered_payload,'{input,snapshot_sha256}',
+   to_jsonb(repeat('8',64)),false);
+ begin
+   perform public.enqueue_bie_with_environmental_qc(
+     org_id,
+     '88888888-8888-4888-8888-888888888888',
+     'bie-window-mismatch',
+     qc_scope || jsonb_build_object('culture_id','99999999-9999-4999-8999-999999999999'),
+     '{}'::uuid[],
+     repeat('8',64),
+     tampered_payload,
+     user_id,
+     qc_id
+   );
+   raise exception 'QC artifact from another analysis window was accepted' using errcode='P0001';
+ exception when sqlstate '22023' then
+   null;
+ end;
+
+end $;
 rollback;
