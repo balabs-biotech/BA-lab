@@ -55,7 +55,7 @@ const checks = [
   ["async dispatch mode durably enqueues and returns 202 without calling the worker inline", /BA_ENGINE_ASYNC_DISPATCH[\s\S]*?return reply\(202,[\s\S]*?status: "queued"/],
   ["async mode does not require the worker URL or token in the API enqueue path", /asyncDispatchEnabled[\s\S]*?!asyncDispatchEnabled && \(!workerUrl \|\| !workerToken\)/],
   ["idempotent concurrent requests return 202 while the original execution is queued or running", /asyncDispatchEnabled && \["queued", "running"\]\.includes\(raced\.status\) \? 202 : 200/],
-  ["a competing queue worker claim is returned as an accepted execution rather than failed", /if \(startError \|\| !startedExecution\)[\s\S]*?latest\.status === "running"[\s\S]*?reply\(latest\.status === "completed" \? 200 : 202/],
+  ["a competing queue worker claim is returned as an accepted execution rather than failed", /if \\(startError \\|\\| !startedExecution\\)[\\s\\S]*?const \\{ data: latest \\}[\\s\\S]*?includes\\(latest\\.status\\)[\\s\\S]*?reply\\(latest\\.status === "completed" \\? 200 : 202/],
   ["queued execution is claimed atomically by the service-side queue RPC before worker dispatch", /serviceClient\.rpc\("claim_engine_executions"[\s\S]*?p_execution_id: execution\.id[\s\S]*?p_organization_id: organizationId[\s\S]*?const startedExecution = Array\.isArray\(claimedExecutions\) \? claimedExecutions\[0\] : null[\s\S]*?if \(startError \|\| !startedExecution\)/],
   ["atomic claim receives a bounded two-minute worker lease", /const EXECUTION_LEASE_SECONDS = 120[\s\S]*?p_lease_seconds: EXECUTION_LEASE_SECONDS/],
   ["failed ledger writes are surfaced instead of silently reported as failed", /execution_state_persistence_failed/],
