@@ -41,7 +41,6 @@ def run_poll_loop(
     once: bool = False,
     poll_interval_seconds: float = 5.0,
     stop_event: threading.Event | None = None,
-    sleep: Callable[[float], None] = time.sleep,
 ) -> int:
     """Consume jobs until stopped; transient API failures do not kill the process."""
     if poll_interval_seconds <= 0:
