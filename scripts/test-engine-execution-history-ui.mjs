@@ -120,7 +120,7 @@ assert.match(tracker, /clearTimeout\(engineExecutionPollingTimer\)/);
 assert.match(tracker, /engineExecutionPollingOrganizationId !== expectedOrganizationId/);
 assert.match(tracker, /engineExecutionPollingTimer = null/);
 assert.match(tracker, /async function monitorPlantBiologicalAssessmentExecution/);
-assert.match(tracker, /setTimeout\(resolve, 3000\)/);
+assert.match(tracker, /setTimeout\(resolve, 1000\)/);
 assert.match(tracker, /execution\?\.status === "completed"/);
 assert.match(tracker, /execution\?\.status === "failed"/);
 assert.match(tracker, /["queued", "running"]\.includes\(data\?\.status\)/);
