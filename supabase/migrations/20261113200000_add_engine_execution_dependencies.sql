@@ -88,7 +88,10 @@ begin
       using errcode = '22023';
   end if;
 
-  if v_downstream.scope <> v_upstream.scope
+  -- QC scope is intentionally narrower than BIE scope (it has no culture/plant
+  -- subject). Compare the shared tenant and location dimensions, not whole JSONB.
+  if v_downstream.scope->>'organization_id' is distinct from v_upstream.scope->>'organization_id'
+    or v_downstream.scope->>'location_id' is distinct from v_upstream.scope->>'location_id'
     or v_downstream.request_payload->'parameters'->>'window_start'
       is distinct from v_upstream.request_payload->'parameters'->>'window_start'
     or v_downstream.request_payload->'parameters'->>'window_end'
