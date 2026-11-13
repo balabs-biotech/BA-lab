@@ -29,5 +29,5 @@
   },
   "input_contract": "BA-LABS/ENGINE@1.0.0",
   "output_contract": "BA-LABS/ENGINE-RESULT@1.0.0",
-  "description": "Produces provenance-preserving coverage and descriptive biological features for authenticated culture and plant-culture snapshots. No diagnosis, causal inference or intervention recommendation."
+  "description": "Produces provenance-preserving coverage and descriptive features for authenticated culture and plant-culture snapshots; optional tenant-approved, versioned threshold rules may emit limited-evidence findings. No diagnosis, causal inference or intervention recommendation."
 }
