@@ -746,7 +746,7 @@
     ["Algorithme QC : ", "QC algorithm: ", "Algoritmo QC: ", "خوارزمية مراقبة الجودة: "],
     ["Sources du contrôle QC", "QC sources", "Fontes do controlo QC", "مصادر مراقبة الجودة"],
     ["Séries examinées par le contrôle QC : ", "Series examined by QC: ", "Séries examinadas pelo QC: ", "السلاسل التي فحصتها مراقبة الجودة: "],
-    ["Révision environnementale requise : les signaux QC sont des éléments à examiner, pas des exclusions automatiques.", "Environmental review required: QC signals are evidence to review, not automatic exclusions.", "É necessária revisão ambiental: os sinais QC são evidências a rever, não exclusões automáticas.", "المراجعة البيئية مطلوبة: إشارات مراقبة الجودة أدلة للمراجعة وليست استبعادات تلقائية."]
+    ["Révision environnementale requise : les signaux QC sont des éléments à examiner, pas des exclusions automatiques.", "Environmental review required: QC signals are evidence to review, not automatic exclusions.", "É necessária revisão ambiental: os sinais QC são evidências a rever, não exclusões automáticas.", "المراجعة البيئية مطلوبة: إشارات مراقبة الجودة أدلة للمراجعة وليست استبعادات تلقائية."],
     ["Évaluation transmise. Consultez l’historique des exécutions.", "Assessment submitted. Check execution history.", "Avaliação enviada. Consulte o histórico de execuções.", "تم إرسال التقييم. راجع سجل التنفيذ."]
   ];
   for (const [fr, en, pt, ar] of supplementalCoverage) {
