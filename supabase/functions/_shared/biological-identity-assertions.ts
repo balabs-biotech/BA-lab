@@ -19,6 +19,18 @@ async function sha256(value: string): Promise<string> {
 function uniqueStrings(values: unknown[]): string[] {
   return [...new Set(values.filter((value): value is string => typeof value === "string" && value.length > 0))];
 }
+function isCalendarDate(value: unknown): value is string {
+  if (typeof value !== "string") return false;
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
+  if (!match) return false;
+  const year = Number(match[1]);
+  const month = Number(match[2]);
+  const day = Number(match[3]);
+  if (month < 1 || month > 12 || day < 1) return false;
+  const leapYear = year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0);
+  const daysInMonth = [31, leapYear ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+  return day <= daysInMonth[month - 1];
+}
 export async function loadAuthenticatedBiologicalIdentityAssertions(input: {
   userClient: any;
   organizationId: string;
@@ -29,8 +41,8 @@ export async function loadAuthenticatedBiologicalIdentityAssertions(input: {
   const { userClient, organizationId } = input;
   if (!userClient || typeof userClient.from !== "function") throw new Error("caller_scoped_supabase_client_required");
   if (!organizationId || !Array.isArray(input.biologicalContexts) ||
-      !/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/.test(input.windowStartDate) ||
-      !/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/.test(input.windowLastIncludedDate) ||
+      !isCalendarDate(input.windowStartDate) ||
+      !isCalendarDate(input.windowLastIncludedDate) ||
       input.windowLastIncludedDate < input.windowStartDate) throw new Error("biological_identity_context_invalid");
   const organismIds = uniqueStrings(input.biologicalContexts.map((context) => context?.genetic_reference?.organism_id));
   const strainIds = uniqueStrings(input.biologicalContexts.map((context) => context?.genetic_reference?.strain_id));
