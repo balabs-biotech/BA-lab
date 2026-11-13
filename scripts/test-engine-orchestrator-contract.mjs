@@ -19,6 +19,7 @@ const checks = [
 
   ["BIE rules are disabled unless one biological context covers the full analysis window", /contextStable: snapshot\.parameters\.profile_context_stable === true/],
   ["BIE profile and reference rows are resolved through the caller JWT client", /loadAuthenticatedBiologicalInterpretationProfile\([\s\S]*?userClient/],
+  ["historical profile replay is opt-in and carried from immutable request parameters", /historicalReplay: parameters\.historical_replay === true/],
   ["BIE dataset manifests are included in the immutable engine request", /datasets: effectiveDatasets/],
   ["idempotency binds the scientific dataset manifest", /stable\(prior\.request_payload\?\.datasets \?\? \[\]\)[\s\S]*?stable\(request\.datasets \?\? \[\]\)/],
   ["caller identity is verified", /userClient\.auth\.getUser\(\)/],
