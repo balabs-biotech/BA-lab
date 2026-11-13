@@ -8,6 +8,7 @@ from __future__ import annotations
 from collections import defaultdict
 from datetime import datetime
 from math import isfinite
+import re
 from statistics import fmean
 from typing import Any, Mapping
 
@@ -25,6 +26,122 @@ def _timestamp(value: Any, field: str) -> datetime:
 
 def _iso(value: datetime) -> str:
     return value.isoformat().replace("+00:00", "Z")
+
+
+
+_RULE_ID = re.compile(r"^[a-z][a-z0-9_.-]{1,79}$")
+_RULE_VERSION = re.compile(r"^[0-9]+\\.[0-9]+\\.[0-9]+$")
+_RULE_CONTEXT_FIELDS = {
+    "organism_kind", "taxon_code", "strain_code", "cultivar_code",
+    "culture_stage", "substrate_code", "production_system",
+}
+
+
+def _evaluate_interpretation_rules(
+    rules: Any,
+    biological_contexts: list[dict[str, Any]],
+    derived_features: list[dict[str, Any]],
+) -> list[dict[str, Any]]:
+    """Evaluate explicitly scoped, versioned thresholds without asserting diagnosis."""
+    if not isinstance(rules, list) or len(rules) > 100:
+        raise ValueError("invalid_interpretation_rules")
+
+    findings: list[dict[str, Any]] = []
+    for rule in rules:
+        required = {
+            "rule_id", "rule_version", "feature_code", "operator", "threshold",
+            "unit_code", "statement", "context_match", "reference_id",
+            "reference_version",
+        }
+        if not isinstance(rule, dict) or set(rule) != required:
+            raise ValueError("invalid_interpretation_rule_shape")
+
+        rule_id = rule["rule_id"]
+        rule_version = rule["rule_version"]
+        feature_code = rule["feature_code"]
+        operator = rule["operator"]
+        threshold = rule["threshold"]
+        unit_code = rule["unit_code"]
+        statement = rule["statement"]
+        context_match = rule["context_match"]
+        reference_id = rule["reference_id"]
+        reference_version = rule["reference_version"]
+
+        if not isinstance(rule_id, str) or not _RULE_ID.fullmatch(rule_id):
+            raise ValueError("invalid_interpretation_rule_id")
+        if not isinstance(rule_version, str) or not _RULE_VERSION.fullmatch(rule_version):
+            raise ValueError("invalid_interpretation_rule_version")
+        if not isinstance(feature_code, str) or not _RULE_ID.fullmatch(feature_code):
+            raise ValueError("invalid_interpretation_feature_code")
+        if operator not in {"gt", "gte", "lt", "lte"}:
+            raise ValueError("unsupported_interpretation_operator")
+        if isinstance(threshold, bool) or not isinstance(threshold, (int, float)) or not isfinite(threshold):
+            raise ValueError("invalid_interpretation_threshold")
+        if not isinstance(unit_code, str) or not unit_code:
+            raise ValueError("invalid_interpretation_unit")
+        if not isinstance(statement, str) or not statement.strip() or len(statement) > 700:
+            raise ValueError("invalid_interpretation_statement")
+        if (
+            not isinstance(reference_id, str) or not reference_id.strip()
+            or len(reference_id) > 160
+            or not isinstance(reference_version, str) or not reference_version.strip()
+            or len(reference_version) > 80
+        ):
+            raise ValueError("invalid_interpretation_reference")
+        if (
+            not isinstance(context_match, dict) or not context_match
+            or not set(context_match).issubset(_RULE_CONTEXT_FIELDS)
+            or any(not isinstance(value, str) or not value.strip() for value in context_match.values())
+        ):
+            raise ValueError("interpretation_rule_requires_biological_context_scope")
+
+        if not any(
+            all(context.get(field) == expected for field, expected in context_match.items())
+            for context in biological_contexts
+        ):
+            continue
+
+        matching_features = [
+            feature for feature in derived_features
+            if feature["feature_code"] == feature_code and feature["unit_code"] == unit_code
+        ]
+        if not matching_features:
+            continue
+
+        def matches(value: float) -> bool:
+            if operator == "gt":
+                return value > threshold
+            if operator == "gte":
+                return value >= threshold
+            if operator == "lt":
+                return value < threshold
+            return value <= threshold
+
+        triggered = [feature for feature in matching_features if matches(feature["value"])]
+        if not triggered:
+            continue
+
+        supporting_ids = sorted({
+            record_id
+            for feature in triggered
+            for record_id in feature["source_record_ids"]
+        })
+        observed_values = sorted({feature["value"] for feature in triggered})
+        findings.append({
+            "finding_code": rule_id,
+            "statement": (
+                f"{statement} [observed_values={observed_values} {unit_code}; "
+                f"threshold={operator} {threshold} {unit_code}; "
+                f"rule_version={rule_version}; "
+                f"reference={reference_id}@{reference_version}]"
+            ),
+            "evidence_state": "limited",
+            "supporting_record_ids": supporting_ids,
+            "contradicting_record_ids": [],
+            "derived_feature_codes": [feature_code],
+        })
+
+    return findings
 
 
 def analyze_biological_context_features(request: Mapping[str, Any]) -> dict[str, Any]:
@@ -225,7 +342,8 @@ def analyze_biological_context_features(request: Mapping[str, Any]) -> dict[str,
     if "missing" in measurement_environment_states:
         missing_context.append("measurement_environment_context_missing")
 
-    quality_flags = ["biological_interpretation_not_performed"]
+    findings = _evaluate_interpretation_rules(parameters.get("interpretation_rules", []), biological_contexts, derived_features)
+    quality_flags = ["biological_interpretation_not_performed"] if not findings else ["biological_diagnosis_not_performed", "rule_based_interpretation_performed"]
     if environment_link_state == "ambiguous":
         quality_flags.append("environment_context_ambiguous")
     if environment_link_state == "conflict" or "conflict" in measurement_environment_states:
@@ -287,7 +405,7 @@ def analyze_biological_context_features(request: Mapping[str, Any]) -> dict[str,
             },
             "observed_facts": observed_facts,
             "derived_features": derived_features,
-            "findings": [],
+            "findings": findings,
             "hypotheses": [],
         },
         "limitations": [
