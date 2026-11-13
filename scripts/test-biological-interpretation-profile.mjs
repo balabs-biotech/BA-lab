@@ -183,6 +183,33 @@ await assert.rejects(
   /interpretation_profile_rule_content_invalid/,
 );
 
+const identityScopedProfile = await buildBiologicalInterpretationProfile({
+  ...input,
+  profiles: [{
+    ...profile,
+    rules: [{
+      ...rule,
+      identity_match: {
+        assertion_type: "strain.designation",
+        assertion_value: "HK35",
+      },
+    }],
+  }],
+});
+assert.equal(identityScopedProfile.state, "loaded");
+assert.equal(identityScopedProfile.rules[0].identity_match.assertion_value, "HK35");
+
+await assert.rejects(
+  buildBiologicalInterpretationProfile({
+    ...input,
+    profiles: [{
+      ...profile,
+      rules: [{ ...rule, identity_match: { assertion_type: "strain.designation" } }],
+    }],
+  }),
+  /interpretation_profile_identity_match_invalid/,
+);
+
 await assert.rejects(
   buildBiologicalInterpretationProfile({
     ...input,
