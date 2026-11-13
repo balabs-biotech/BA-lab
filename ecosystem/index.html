@@ -1221,6 +1221,39 @@ h1 span{font-style:italic!important;color:var(--field-rust)!important}
   #app.balabs-ui .editorial-link span{transition:none!important}
 }
 
+
+/* Eight-universe composition: fixed radial positions, generous separation, no orbit overlap. */
+#mainView{min-height:780px;overflow:hidden;perspective:none;transform-style:flat}
+#mainView .sphere{width:clamp(118px,10vw,136px);min-height:136px;aspect-ratio:1;padding:13px;z-index:4;transform:translate(-50%,-50%);backface-visibility:visible}
+#mainView .sphere b{font-size:clamp(11px,.95vw,13px);line-height:1.28;max-width:112px;overflow-wrap:anywhere}
+#mainView .sphere small{font-size:9px;line-height:1.35;max-width:112px}
+#mainView .hub{z-index:5;width:clamp(122px,12vw,154px)}
+#mainView .galaxy{opacity:.16;border-style:dotted}
+#mainView .galaxy.g2{opacity:.08}
+#mainView .network{z-index:1;overflow:visible}
+#mainView .network path{fill:none;vector-effect:non-scaling-stroke;pointer-events:none}
+#mainView .network path.fractal-trunk{stroke:#b6d2a4;stroke-width:1.4;stroke-opacity:.48;stroke-linecap:round}
+#mainView .network path.fractal-twig{stroke:#a9c5a3;stroke-width:.8;stroke-opacity:.2;stroke-linecap:round}
+#mainView .network path.fractal-link{stroke:#91a9bb;stroke-width:1;stroke-opacity:.18;stroke-dasharray:2 7}
+#mainView.has-focus .network path{opacity:.035}
+#mainView.has-focus .network path.focused{opacity:.88;stroke-width:1.7}
+#mainView.has-focus .sphere:not(.focused){opacity:.58;filter:saturate(.6)}
+@media(max-width:760px){
+ #mainView{min-height:0;height:auto;overflow:visible;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;padding:18px 12px}
+ #mainView .network,#mainView .galaxy{display:none}
+ #mainView .hub{position:relative;left:auto;top:auto;transform:none;grid-column:1/-1;justify-self:center;width:108px;margin:4px auto 12px}
+ #mainView .sphere,#mainView.universe-open .sphere{position:relative;left:auto;top:auto;width:100%;min-width:0;min-height:112px;aspect-ratio:auto;transform:none;border-radius:12px;padding:12px 9px;display:flex;z-index:2;animation:none}
+ #mainView .sphere b{font-size:12px;max-width:100%}
+ #mainView .sphere small{font-size:9px;max-width:100%}
+ #mainView .sphere .idx{margin-bottom:5px}
+ #mainView .sphere:before{inset:6px;border-radius:8px;transform:none;opacity:.5}
+ #mainView .sphere:after{top:10px;right:10px;width:5px;height:5px}
+ #mainView.universe-closed .sphere{display:none}
+ #mainView.universe-closed{display:block}
+ #mainView.universe-closed .hub{display:grid}
+}
+@media(max-width:380px){#mainView{gap:7px;padding-inline:8px}#mainView .sphere{min-height:106px;padding:10px 7px}}
+
 </style>
 <style>
 #mainView .webgl-focus-next{margin-top:5px;color:#829b80;font:600 9px/1.4 system-ui,sans-serif;letter-spacing:.09em;text-transform:uppercase}
@@ -2914,8 +2947,51 @@ function isSecondaryPair(a,b){return secondaryPairs.has(a+'|'+b)||secondaryPairs
 const foundationSpheres=new Set(['bio','myco','soil','lab']);
 function isBridgePair(a,b){return foundationSpheres.has(a)!==foundationSpheres.has(b)}
 let orbitAngle=-Math.PI/2,orbitTilt=0,dragState=null;
-function applyOrbit(){if(window.innerWidth<=760)return;const rings=[{ids:['bio','myco','soil','lab'],rx:24,ry:29,phase:0},{ids:['products','iot','work','learn'],rx:39,ry:37,phase:Math.PI/4}];rings.forEach((ring,ri)=>ring.ids.forEach((id,i)=>{const el=document.querySelector('[data-sphere="'+id+'"]');if(!el)return;const a=orbitAngle+ring.phase+i*Math.PI*2/ring.ids.length;const perspective=Math.sin(a+orbitTilt)*Math.cos(orbitTilt);const x=50+ring.rx*Math.cos(a),y=50+ring.ry*Math.sin(a)*Math.cos(orbitTilt);el.style.setProperty('--x',x+'%');el.style.setProperty('--y',y+'%');el.style.setProperty('--depth',(ri*18+48*perspective)+'px');el.style.zIndex=String(3+Math.round(15*perspective)+ri);el.dataset.orbit=String(ri+1)}));drawNetwork();}
-function drawNetwork(){const svg=document.getElementById('sphereNetwork'),group=document.getElementById('networkEdges');if(!svg||!group)return;const r=mainView.getBoundingClientRect();if(!r.width||!r.height)return;svg.setAttribute('viewBox','0 0 '+r.width+' '+r.height);group.replaceChildren();if(mainView.classList.contains('universe-closed'))return;const point=el=>{const b=el.getBoundingClientRect();return{x:b.left-r.left+b.width/2,y:b.top-r.top+b.height/2}};const hub=point(openUniverse);const add=(p,q,cls,a,b)=>{const line=document.createElementNS('http://www.w3.org/2000/svg','line');line.setAttribute('x1',p.x);line.setAttribute('y1',p.y);line.setAttribute('x2',q.x);line.setAttribute('y2',q.y);line.setAttribute('class',cls);if(a)line.dataset.a=a;if(b)line.dataset.b=b;group.appendChild(line)};document.querySelectorAll('.sphere').forEach(s=>add(hub,point(s),'core-edge','core',s.dataset.sphere));relatedPairs.forEach(([a,b])=>{const sa=document.querySelector('[data-sphere="'+a+'"]'),sb=document.querySelector('[data-sphere="'+b+'"]');if(sa&&sb){const edgeClass='related'+(isBridgePair(a,b)?' bridge':'')+(isSecondaryPair(a,b)?' secondary':'');add(point(sa),point(sb),edgeClass,a,b)}});applyFocus(selected,false);}
+function applyOrbit(){
+ const ids=['bio','myco','soil','products','learn','work','iot','lab'];
+ if(window.innerWidth<=760){drawNetwork();return}
+ ids.forEach((id,i)=>{
+   const el=document.querySelector('[data-sphere="'+id+'"]');if(!el)return;
+   const angle=-Math.PI/2+i*Math.PI/4;
+   el.style.setProperty('--x',(50+35*Math.cos(angle))+'%');
+   el.style.setProperty('--y',(50+39*Math.sin(angle))+'%');
+   el.style.setProperty('--depth','0px');el.style.zIndex='3';el.dataset.orbit='1';
+ });
+ drawNetwork();
+}
+function drawNetwork(){
+ const svg=document.getElementById('sphereNetwork'),group=document.getElementById('networkEdges');
+ if(!svg||!group)return;const r=mainView.getBoundingClientRect();if(!r.width||!r.height)return;
+ svg.setAttribute('viewBox','0 0 '+r.width+' '+r.height);group.replaceChildren();
+ if(mainView.classList.contains('universe-closed'))return;
+ const point=el=>{const b=el.getBoundingClientRect();return{x:b.left-r.left+b.width/2,y:b.top-r.top+b.height/2}};
+ const hub=point(openUniverse);
+ const makePath=(d,cls,a,b)=>{const p=document.createElementNS('http://www.w3.org/2000/svg','path');p.setAttribute('d',d);p.setAttribute('class',cls);if(a)p.dataset.a=a;if(b)p.dataset.b=b;group.appendChild(p)};
+ const ids=['bio','myco','soil','products','learn','work','iot','lab'];
+ ids.forEach((id,i)=>{
+   const node=document.querySelector('[data-sphere="'+id+'"]');if(!node)return;
+   const end=point(node),dx=end.x-hub.x,dy=end.y-hub.y,len=Math.hypot(dx,dy)||1;
+   const nx=-dy/len,ny=dx/len,side=i%2?1:-1,bend=Math.min(30,len*.12)*side;
+   const c1={x:hub.x+dx*.3+nx*bend,y:hub.y+dy*.3+ny*bend};
+   const c2={x:hub.x+dx*.72+nx*bend*.6,y:hub.y+dy*.72+ny*bend*.6};
+   makePath('M '+hub.x+' '+hub.y+' C '+c1.x+' '+c1.y+' '+c2.x+' '+c2.y+' '+end.x+' '+end.y,'fractal-trunk','core',id);
+   [.34,.58].forEach((t,j)=>{
+     const x=hub.x+dx*t,y=hub.y+dy*t,spread=Math.min(24,len*.12)*(j?0.72:1);
+     [-1,1].forEach(sign=>{
+       const ex=x+nx*spread*sign+dx/len*spread*.38,ey=y+ny*spread*sign+dy/len*spread*.38;
+       const cx=(x+ex)/2+nx*spread*.16*sign,cy=(y+ey)/2+ny*spread*.16*sign;
+       makePath('M '+x+' '+y+' Q '+cx+' '+cy+' '+ex+' '+ey,'fractal-twig');
+     });
+   });
+ });
+ // Five restrained bridges indicate relationships without turning the map into a knot.
+ [['bio','myco'],['myco','soil'],['lab','iot'],['products','work'],['iot','learn']].forEach(([a,b],i)=>{
+   const na=document.querySelector('[data-sphere="'+a+'"]'),nb=document.querySelector('[data-sphere="'+b+'"]');if(!na||!nb)return;
+   const p=point(na),q=point(nb),m={x:(p.x+q.x)/2,y:(p.y+q.y)/2},dx=q.x-p.x,dy=q.y-p.y,len=Math.hypot(dx,dy)||1,curve=(i%2?1:-1)*Math.min(24,len*.1);
+   makePath('M '+p.x+' '+p.y+' Q '+(m.x-dy/len*curve)+' '+(m.y+dx/len*curve)+' '+q.x+' '+q.y,'fractal-link',a,b);
+ });
+ applyFocus(selected,false);
+}
 function beginOrbit(e){if(window.innerWidth<=760||!mainView.classList.contains('universe-open')||e.target.closest('.sphere,.hub,button,a'))return;dragState={x:e.clientX,y:e.clientY,moved:false};mainView.setPointerCapture?.(e.pointerId);}
 function moveOrbit(e){if(!dragState)return;const dx=e.clientX-dragState.x,dy=e.clientY-dragState.y;if(Math.abs(dx)+Math.abs(dy)>2)dragState.moved=true;orbitAngle+=dx*.009;orbitTilt=Math.max(-1.05,Math.min(1.05,orbitTilt+dy*.004));dragState.x=e.clientX;dragState.y=e.clientY;mainView.classList.add('dragging');applyOrbit();}
 function endOrbit(){dragState=null;mainView.classList.remove('dragging');}
