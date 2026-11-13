@@ -41,7 +41,7 @@ The worker reads `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` from its process
 1. Engines are resolved by exact `engine_code` and `engine_version`; no implicit "latest" resolution.
 2. Each engine invocation receives an immutable execution context and a mapping payload.
 3. The registry does not own queue state or database connections.
-4. Engine failures are isolated to the claimed job and classified by an explicit retry policy.
+4. Engine failures are isolated to the claimed job. The default classifier retries timeouts, connection failures, HTTP 408/425/429 and 5xx responses; unknown errors remain terminal. Engine plugins can inject a narrower domain-specific classifier.
 5. The worker renews the lease in a background thread; heartbeat failure or uncertainty prevents result/failure writes.
 6. Completion and failure must still re-check the fencing token transactionally in PostgreSQL.
 7. Heavy scientific libraries belong in optional engine-specific dependency groups, not in the queue/registry core.
