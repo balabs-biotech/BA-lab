@@ -44,9 +44,19 @@ function requireValidRuleReferences(rules: unknown): Array<{ id: string; version
     }
     if (typeof rule.rule_id !== "string" || !/^[a-z][a-z0-9_.-]{1,79}$/.test(rule.rule_id) ||
         typeof rule.rule_version !== "string" || !/^\d+\.\d+\.\d+$/.test(rule.rule_version) ||
-        typeof rule.reference_id !== "string" || !rule.reference_id.trim() ||
-        typeof rule.reference_version !== "string" || !rule.reference_version.trim()) {
-      throw new Error("interpretation_profile_rule_identity_invalid");
+        typeof rule.feature_code !== "string" || !/^[a-z][a-z0-9_.-]{1,79}$/.test(rule.feature_code) ||
+        !["gt", "gte", "lt", "lte"].includes(rule.operator) ||
+        typeof rule.threshold !== "number" || !Number.isFinite(rule.threshold) ||
+        typeof rule.unit_code !== "string" || !rule.unit_code.trim() ||
+        typeof rule.statement !== "string" || !rule.statement.trim() || rule.statement.length > 700 ||
+        typeof rule.reference_id !== "string" || !rule.reference_id.trim() || rule.reference_id.length > 160 ||
+        typeof rule.reference_version !== "string" || !rule.reference_version.trim() || rule.reference_version.length > 80 ||
+        !isObject(rule.context_match) || Object.keys(rule.context_match).length === 0 ||
+        Object.keys(rule.context_match).some((key) =>
+          !["organism_kind", "taxon_code", "strain_code", "cultivar_code", "culture_stage", "substrate_code", "production_system"].includes(key)
+        ) ||
+        Object.values(rule.context_match).some((value) => typeof value !== "string" || !value.trim())) {
+      throw new Error("interpretation_profile_rule_content_invalid");
     }
     if (seen.has(rule.rule_id)) throw new Error("interpretation_profile_duplicate_rule_id");
     seen.add(rule.rule_id);
@@ -88,6 +98,13 @@ export async function buildBiologicalInterpretationProfile(input: {
   if (applicable.length !== 1) throw new Error("active_interpretation_profile_ambiguous");
 
   const profile = applicable[0];
+  if (
+    typeof profile.id !== "string" ||
+    typeof profile.profile_version !== "string" || !/^\d+\.\d+\.\d+$/.test(profile.profile_version) ||
+    typeof profile.created_at !== "string" ||
+    !/^\d{4}-\d{2}-\d{2}$/.test(profile.valid_from) ||
+    (profile.valid_to !== null && !/^\d{4}-\d{2}-\d{2}$/.test(profile.valid_to))
+  ) throw new Error("interpretation_profile_metadata_invalid");
   const references = requireValidRuleReferences(profile.rules);
   const resolvedReferences = new Map<string, Row>();
   for (const reference of input.references) {
@@ -97,7 +114,9 @@ export async function buildBiologicalInterpretationProfile(input: {
         typeof reference.content_sha256 !== "string" ||
         !/^[0-9a-f]{64}$/.test(reference.content_sha256) ||
         typeof reference.reviewed_at !== "string") continue;
-    resolvedReferences.set(reference.reference_id + "@" + reference.reference_version, reference);
+    const key = reference.reference_id + "@" + reference.reference_version;
+    if (resolvedReferences.has(key)) throw new Error("interpretation_reference_identity_ambiguous");
+    resolvedReferences.set(key, reference);
   }
 
   const datasets: Row[] = [{
