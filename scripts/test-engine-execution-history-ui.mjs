@@ -149,7 +149,7 @@ assert.match(tracker, /execution\?\.status === "completed"/);
 assert.match(tracker, /execution\?\.status === "failed"/);
 assert.match(tracker, /for \(let attempt = 0; attempt < 90; attempt\+\+\)/);
 const plantMonitorStart = tracker.indexOf("async function monitorPlantBiologicalAssessmentExecution(");
-const plantMonitorEnd = tracker.indexOf("async function runPlantBiologicalAssessment()", plantMonitorStart);
+const plantMonitorEnd = tracker.indexOf("function setCultureBiologicalAssessmentMessage(", plantMonitorStart);
 const plantMonitor = tracker.slice(plantMonitorStart, plantMonitorEnd);
 assert.doesNotMatch(plantMonitor, /await loadRecentEngineExecutions\(\)/, "BIE notices must reuse the shared tenant-safe polling loop");
 assert.match(plantMonitor, /execution\?\.status === "completed"/);
