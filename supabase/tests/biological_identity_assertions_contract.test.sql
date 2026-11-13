@@ -8,7 +8,9 @@ declare
   v_organism uuid := gen_random_uuid();
   v_strain uuid := gen_random_uuid();
   v_reference text := 'ba-labs.identity-fixture.' || replace(gen_random_uuid()::text, '-', '');
+  v_draft_reference text := 'ba-labs.identity-draft-fixture.' || replace(gen_random_uuid()::text, '-', '');
   v_assertion uuid;
+  v_draft_assertion uuid;
 begin
   if to_regclass('public.biological_identity_assertions') is null then
     raise exception 'biological_identity_assertions table is missing';
@@ -65,6 +67,34 @@ begin
   ) then
     raise exception 'identity assertion reviewer must be stamped by database trigger';
   end if;
+
+  insert into public.biological_reference_registry(
+    organization_id, reference_id, reference_version, title, citation,
+    source_type, evidence_level, content_sha256
+  ) values (
+    v_org, v_draft_reference, '1.0.0', 'Draft source fixture',
+    'Synthetic draft source; not a scientific reference.',
+    'other', 'L0', repeat('e', 64)
+  );
+
+  insert into public.biological_identity_assertions(
+    organization_id, assertion_code, assertion_version, subject_type,
+    organism_id, strain_id, assertion_type, assertion_value,
+    source_reference_id, source_reference_version, evidence_level,
+    content_sha256, valid_from
+  ) values (
+    v_org, 'test.strain.draft-source.' || substr(v_strain::text, 1, 8), '1.0.0',
+    'strain', v_organism, v_strain, 'strain.designation', 'Draft source test',
+    v_draft_reference, '1.0.0', 'L0', repeat('f', 64), current_date
+  ) returning id into v_draft_assertion;
+
+  begin
+    update public.biological_identity_assertions
+      set status='validated'
+      where id=v_draft_assertion;
+    raise exception 'identity assertion was validated against an unvalidated source';
+  exception when sqlstate '23514' then null;
+  end;
 
   begin
     update public.biological_identity_assertions
