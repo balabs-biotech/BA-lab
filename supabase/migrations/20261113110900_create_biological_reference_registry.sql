@@ -241,7 +241,8 @@ $function$;
 
 revoke all on function private.stamp_biological_reference_review() from public, anon, authenticated;
 drop trigger if exists biological_reference_registry_review_stamp on public.biological_reference_registry;
-create trigger biological_reference_registry_review_stamp
+drop trigger if exists biological_reference_registry_00_review_stamp on public.biological_reference_registry;
+create trigger biological_reference_registry_00_review_stamp
   before insert or update of status, organization_id
   on public.biological_reference_registry
   for each row execute function private.stamp_biological_reference_review();
