@@ -513,7 +513,7 @@ grant execute on function public.heartbeat_engine_job(uuid,uuid,text,integer) to
 grant execute on function public.complete_engine_job(uuid,uuid,text,jsonb,text) to service_role;
 grant execute on function public.fail_engine_job(uuid,uuid,text,text,text,boolean) to service_role;
 
-do $
+do $$
 declare
   v_user uuid := '10000000-0000-4000-8000-000000000001';
   v_org uuid := '20000000-0000-4000-8000-000000000001';
