@@ -2,7 +2,6 @@ import threading
 import unittest
 from unittest.mock import patch
 
-from bal_engine_worker.registry import EngineRegistry
 from bal_engine_worker.runner import load_registry, run_poll_loop
 from bal_engine_worker.supabase_queue import QueueTransportError
 
@@ -20,6 +19,20 @@ class FakeWorker:
         if self.outcomes:
             return self.outcomes.pop(0)
         return type("Outcome", (), {"status": "idle", "job_id": None})()
+
+
+class StopAfterWait:
+    def __init__(self):
+        self.stopped = False
+        self.waits = []
+
+    def is_set(self):
+        return self.stopped
+
+    def wait(self, seconds):
+        self.waits.append(seconds)
+        self.stopped = True
+        return True
 
 
 class RunnerTests(unittest.TestCase):
@@ -46,29 +59,18 @@ class RunnerTests(unittest.TestCase):
         self.assertEqual(run_poll_loop(worker, once=True), 1)
 
     def test_continuous_loop_stops_on_event_after_idle_poll(self):
-        stop = threading.Event()
+        stop = StopAfterWait()
         worker = FakeWorker()
-        def stop_after_wait(seconds):
-            stop.set()
-        self.assertEqual(
-            run_poll_loop(worker, poll_interval_seconds=0.01, stop_event=stop, sleep=stop_after_wait),
-            0,
-        )
+        self.assertEqual(run_poll_loop(worker, poll_interval_seconds=0.01, stop_event=stop), 0)
         self.assertEqual(worker.calls, 1)
+        self.assertEqual(stop.waits, [0.01])
 
     def test_transport_failure_is_retried_until_stop_requested(self):
-        stop = threading.Event()
+        stop = StopAfterWait()
         worker = FakeWorker(errors=[QueueTransportError("offline")])
-        original_wait = stop.wait
-        waits = []
-        def wait_then_stop(seconds):
-            waits.append(seconds)
-            stop.set()
-            return original_wait(0)
-        with patch.object(stop, "wait", side_effect=wait_then_stop):
-            self.assertEqual(run_poll_loop(worker, stop_event=stop), 0)
+        self.assertEqual(run_poll_loop(worker, stop_event=stop), 0)
         self.assertEqual(worker.calls, 1)
-        self.assertEqual(len(waits), 1)
+        self.assertEqual(stop.waits, [5.0])
 
     def test_poll_interval_must_be_positive(self):
         with self.assertRaises(ValueError):
