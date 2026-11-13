@@ -86,7 +86,7 @@ assert.equal(absentDomain.state, "not_configured");
 
 await assert.rejects(
   loadAuthenticatedBiologicalInterpretationProfile({
-    userClient: { from() { throw new Error("unexpected_registry_query"); } },
+    userClient: null,
     organizationId,
     domain: "mycology",
     domainAmbiguous: false,
