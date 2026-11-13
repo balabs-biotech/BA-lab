@@ -102,7 +102,7 @@ grant execute on function public.reap_expired_engine_executions(integer) to serv
 
 -- Supabase production has pg_cron enabled. Keep local migration replay portable
 -- by installing the recurring job only where the extension is available.
-do $
+do $lease_schedule$
 begin
   if exists (select 1 from pg_extension where extname = 'pg_cron')
      and to_regnamespace('cron') is not null then
@@ -113,7 +113,7 @@ begin
         'select public.reap_expired_engine_executions(50);';
   end if;
 end;
-$;
+$lease_schedule$;
 
 comment on column public.engine_executions.lease_expires_at is
   'Deadline for a running orchestrated execution. Expired rows are closed as failures; work is never silently replayed.';
