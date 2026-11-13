@@ -55,7 +55,7 @@ assert.doesNotMatch(source.slice(sourceReadStart, sourceReadEnd), /\.update\(/, 
 
 assert.match(
   source,
-  /async function readBoundedWorkerResponse\([\s\S]*?getReader\([\s\S]*?MAX_WORKER_RESPONSE_BYTES[\s\S]*?response\.body/,
+  /async function readBoundedWorkerResponse\([\s\S]*?response\.body\.getReader\(\)[\s\S]*?MAX_WORKER_RESPONSE_BYTES/,
   "worker response bytes are bounded while streaming, before the body is fully buffered",
 );
 assert.doesNotMatch(
