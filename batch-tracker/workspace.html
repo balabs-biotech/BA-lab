@@ -385,6 +385,53 @@
       <section id="cultureDetailPanel" class="culture-detail hidden" aria-labelledby="cultureDetailTitle">
         <div class="culture-detail-heading"><div><span class="section-kicker-label">FICHE EXPÉRIMENTALE</span><h3 id="cultureDetailTitle">Culture</h3><p id="cultureDetailMeta" class="muted"></p></div><button id="closeCultureDetail" type="button" class="secondary-button small-button">Fermer la fiche</button></div>
         <div class="culture-detail-summary" id="cultureDetailSummary"></div>
+<section class="biological-context-panel" id="biologicalContextPanel" aria-labelledby="biologicalContextTitle">
+  <div class="biological-context-heading">
+    <div><span class="section-kicker-label">CONTEXTE BIOLOGIQUE / BIE</span><h4 id="biologicalContextTitle">Identité et conditions biologiques</h4></div>
+    <span class="assisted-entry-tag">Historique daté</span>
+  </div>
+  <p class="muted">Décrivez l’organisme, la souche, le stade et son environnement réel. Chaque enregistrement est daté ; une nouvelle période ne remplace pas l’historique.</p>
+  <div id="biologicalContextHistory" class="biological-context-history" aria-live="polite"><p class="muted">Chargement des contextes biologiques…</p></div>
+  <form id="biologicalContextForm" class="biological-context-form" autocomplete="off">
+    <div><label for="biologicalContextEnvironment">Environnement associé <span class="req">*</span></label><select id="biologicalContextEnvironment" required><option value="">Chargement des environnements…</option></select></div>
+    <div><label for="biologicalContextOrganismKind">Type d’organisme <span class="req">*</span></label><select id="biologicalContextOrganismKind" required><option value="fungus">Champignon</option><option value="bacterium">Bactérie</option><option value="yeast">Levure</option><option value="plant">Végétal</option><option value="microalgae">Microalgue</option><option value="other">Autre</option></select></div>
+    <div><label for="biologicalContextTaxonCode">Taxon / nom scientifique</label><input id="biologicalContextTaxonCode" maxlength="120" placeholder="Ex. Pleurotus ostreatus"></div>
+    <div><label for="biologicalContextStrain">Souche du référentiel</label><select id="biologicalContextStrain"><option value="">Non spécifiée</option></select></div>
+    <div><label for="biologicalContextStage">Stade biologique <span class="req">*</span></label><select id="biologicalContextStage" required><option value="inoculation">Inoculation</option><option value="incubation">Incubation</option><option value="colonization">Colonisation</option><option value="fruiting">Fructification</option><option value="sporulation">Sporulation</option><option value="storage">Conservation</option><option value="analysis">Analyse</option><option value="other">Autre</option></select></div>
+    <div><label for="biologicalContextProductionSystem">Système de production <span class="req">*</span></label><select id="biologicalContextProductionSystem" required><option value="petri_dish">Boîte de Petri</option><option value="grain_spawn">Culture sur grain</option><option value="liquid_culture">Culture liquide</option><option value="substrate_block">Bloc de substrat</option><option value="monotub">Monotub</option><option value="grow_bag">Sac de culture</option><option value="tray">Bac / plateau</option><option value="bioreactor">Bioréacteur</option><option value="greenhouse">Serre</option><option value="other">Autre</option></select></div>
+    <div><label for="biologicalContextSubstrate">Substrat / milieu</label><input id="biologicalContextSubstrate" maxlength="120" placeholder="Ex. paille, PDA, grain de blé"></div>
+    <div><label for="biologicalContextCultivar">Cultivar / variante</label><input id="biologicalContextCultivar" maxlength="120" placeholder="Facultatif"></div>
+    <div><label for="biologicalContextValidFrom">Début de validité <span class="req">*</span></label><input id="biologicalContextValidFrom" type="date" required></div>
+    <div><label for="biologicalContextValidTo">Fin de validité (exclue)</label><input id="biologicalContextValidTo" type="date"><small>Laisser vide pour un contexte toujours actif.</small></div>
+    <div class="biological-context-wide"><label for="biologicalContextTags">Étiquettes contextuelles</label><input id="biologicalContextTags" maxlength="600" placeholder="Ex. fruiting-run, test-substrat, lot-pilote"><small>Séparez les étiquettes par des virgules.</small></div>
+    <div class="biological-context-wide"><button id="saveBiologicalContext" type="submit">Enregistrer ce contexte daté</button><p id="biologicalContextMessage" class="muted" role="status" aria-live="polite"></p></div>
+  </form>
+  <div class="biological-context-close">
+    <strong>Clôturer le contexte actif</strong>
+    <p class="muted">Avant d’enregistrer un nouveau contexte, clôturez la période actuelle pour éviter deux états biologiques simultanés.</p>
+    <div><label for="biologicalContextCloseDate">Date de fin (exclue)</label><input id="biologicalContextCloseDate" type="date"><button id="biologicalContextCloseButton" type="button" class="secondary-button">Clôturer le contexte actif</button></div>
+  </div>
+  <style>
+    .biological-context-panel{margin:22px 0;padding:18px;border:1px solid var(--line,#303b34);border-radius:14px;background:var(--surface,#17201b)}
+    .biological-context-heading{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap}
+    .biological-context-heading h4{margin:5px 0 0}
+    .biological-context-form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:16px}
+    .biological-context-form>div{min-width:0}
+    .biological-context-form input,.biological-context-form select{box-sizing:border-box;width:100%;max-width:100%;margin-top:5px}
+    .biological-context-form small,.biological-context-close small{display:block;color:var(--muted,#a6b2a8);font-size:11px;margin-top:4px}
+    .biological-context-wide{grid-column:1/-1}
+    .biological-context-history{display:grid;gap:8px;margin:14px 0}
+    .biological-context-record{padding:10px 12px;border:1px solid var(--line,#303b34);border-radius:9px}
+    .biological-context-record strong{display:block}
+    .biological-context-record p{margin:4px 0 0;font-size:12px;color:var(--muted,#a6b2a8)}
+    .biological-context-close{margin-top:16px;padding-top:14px;border-top:1px solid var(--line,#303b34)}
+    .biological-context-close>div{display:flex;align-items:end;gap:10px;flex-wrap:wrap}
+    .biological-context-close input{max-width:190px}
+    #biologicalContextMessage[data-state="error"]{color:#f0a59b}
+    #biologicalContextMessage[data-state="success"]{color:#a8d4a5}
+    @media(max-width:600px){.biological-context-panel{padding:13px}.biological-context-form{grid-template-columns:1fr}.biological-context-wide{grid-column:auto}.biological-context-close>div{align-items:stretch}.biological-context-close input{max-width:none;width:100%}.biological-context-close button{width:100%}}
+  </style>
+</section>
 <section class="bio-operation-panel" aria-labelledby="bioOperationTitle">
 <h4 id="bioOperationTitle">Tracer une opération biologique</h4>
 <p class="muted">Enregistrez l’opération sur la culture source. Pour un repiquage, un passage ou une division, ajoutez les codes des descendants : leurs fiches et liens de filiation seront créés ensemble.</p>
@@ -485,6 +532,41 @@
 
     <div class="overview-section-heading"><h3>Registre des cultures végétales</h3><span id="plantCultureCount" class="culture-catalog-count">0</span></div>
     <div id="plantCultureList" class="culture-catalog-list" aria-live="polite"><p class="muted">Connectez-vous pour charger les cultures végétales.</p></div>
+
+    <section class="biological-context-panel hidden" id="plantBiologicalContextPanel" aria-labelledby="plantBiologicalContextTitle">
+      <div class="biological-context-heading">
+        <div><span class="section-kicker-label">CONTEXTE BIOLOGIQUE / BIE · GREENTECH</span><h4 id="plantBiologicalContextTitle">Contexte de la culture végétale</h4><p id="plantBiologicalContextSubjectMeta" class="muted"></p></div>
+        <button id="closePlantBiologicalContextPanel" type="button" class="secondary-button small-button">Fermer la fiche</button>
+      </div>
+      <p class="muted">L’espèce et le cultivar proviennent de la fiche végétale. Enregistrez ici les stades, l’environnement et le système de production réellement observés, avec leur période de validité.</p>
+      <div id="plantBiologicalContextHistory" class="biological-context-history" aria-live="polite"><p class="muted">Chargement de l’historique biologique…</p></div>
+      <form id="plantBiologicalContextForm" class="biological-context-form" autocomplete="off">
+        <div><label for="plantBiologicalContextEnvironment">Environnement associé <span class="req">*</span></label><select id="plantBiologicalContextEnvironment" required><option value="">Chargement des environnements…</option></select></div>
+        <div><label for="plantBiologicalContextStage">Stade végétatif <span class="req">*</span></label><select id="plantBiologicalContextStage" required><option value="">Sélectionner un stade…</option><option value="sowing">Semis</option><option value="germination">Germination</option><option value="seedling">Plantule</option><option value="vegetative">Croissance végétative</option><option value="flowering">Floraison</option><option value="fruiting">Fructification</option><option value="harvest">Récolte</option><option value="dormancy">Dormance</option><option value="analysis">Analyse</option><option value="other">Autre</option></select></div>
+        <div><label for="plantBiologicalContextProduction">Système de production <span class="req">*</span></label><select id="plantBiologicalContextProduction" required><option value="">Sélectionner un système…</option><option value="greenhouse">Serre</option><option value="open_field">Plein champ</option><option value="container">Contenant / pot</option><option value="hydroponic">Hydroponie</option><option value="raised_bed">Bac / planche de culture</option><option value="other">Autre</option></select></div>
+        <div><label for="plantBiologicalContextSubstrate">Substrat / milieu racinaire</label><input id="plantBiologicalContextSubstrate" maxlength="120" placeholder="Ex. Technosoil, terre, fibre végétale"></div>
+        <div><label for="plantBiologicalContextValidFrom">Début de validité <span class="req">*</span></label><input id="plantBiologicalContextValidFrom" type="date" required></div>
+        <div><label for="plantBiologicalContextValidTo">Fin de validité (exclue)</label><input id="plantBiologicalContextValidTo" type="date"><small>Laisser vide pour un contexte toujours actif.</small></div>
+        <div class="biological-context-wide"><label for="plantBiologicalContextTags">Étiquettes contextuelles</label><input id="plantBiologicalContextTags" maxlength="600" placeholder="Ex. serre-nord, essai-technosoil, stress-thermique"><small>Séparez les étiquettes par des virgules.</small></div>
+        <div class="biological-context-wide"><button id="savePlantBiologicalContext" type="submit">Enregistrer ce contexte daté</button><p id="plantBiologicalContextMessage" class="muted" role="status" aria-live="polite"></p></div>
+      </form>
+      <div class="biological-context-close">
+        <strong>Clôturer le contexte actif</strong>
+        <p class="muted">Clôturez la période actuelle avant d’enregistrer un nouvel état biologique.</p>
+        <div><label for="plantBiologicalContextCloseDate">Date de fin (exclue)</label><input id="plantBiologicalContextCloseDate" type="date"><button id="plantBiologicalContextCloseButton" type="button" class="secondary-button">Clôturer le contexte actif</button></div>
+      </div>
+
+      <div class="biological-context-close" aria-labelledby="plantBieAssessmentTitle">
+        <strong id="plantBieAssessmentTitle">Évaluation du contexte biologique · BIE v0.2</strong>
+        <p class="muted">Lancez une évaluation descriptive sur une fenêtre datée. Le moteur mesure la couverture, la traçabilité et les séries disponibles ; il ne pose pas de diagnostic et ne formule pas de recommandation.</p>
+        <div class="grid">
+          <div><label for="plantBiologicalAssessmentStart">Début de la fenêtre</label><input id="plantBiologicalAssessmentStart" type="date" required></div>
+          <div><label for="plantBiologicalAssessmentEnd">Fin de la fenêtre (exclue)</label><input id="plantBiologicalAssessmentEnd" type="date" required></div>
+        </div>
+        <button id="runPlantBiologicalAssessment" type="button" class="secondary-button">Évaluer avec le BIE</button>
+        <p id="plantBiologicalAssessmentMessage" class="muted" role="status" aria-live="polite">Le moteur doit être déployé et activé côté serveur pour exécuter cette évaluation.</p>
+      </div>
+    </section>
   </section>
 
   <!-- ======================================================

@@ -21,6 +21,7 @@ from ba_engine_contract.registry import load_engine
 from ba_engine_contract.environmental_timeseries_qc import (
     analyze_environmental_timeseries_qc, run_environmental_timeseries_qc,
 )
+from ba_engine_contract.biological_context_features import analyze_biological_context_features
 
 ROOT = Path(__file__).resolve().parents[3]
 SCHEMA_DIR = ROOT / "schemas" / "engine" / "v1"
@@ -510,6 +511,365 @@ class EngineContractTests(unittest.TestCase):
         invalid = json.loads(json.dumps(REQUEST))
         invalid["unversioned_extra"] = True
         self.assertTrue(list(self.request_validator.iter_errors(invalid)))
+
+
+    def test_biological_context_features_reports_traceable_coverage_and_never_infers_diagnosis(self):
+        request = json.loads(json.dumps(REQUEST))
+        request["engine"] = {
+            "engine_id": "biological.context.features",
+            "engine_version": "0.1.0",
+        }
+        culture_id = "2c2b3a4d-5e6f-4789-8123-456789abcdef"
+        request["scope"] = {
+            "organization_id": REQUEST["scope"]["organization_id"],
+            "culture_id": culture_id,
+        }
+        request["parameters"] = {
+            "window_start": "2026-11-10T00:00:00Z",
+            "window_end": "2026-11-11T00:00:00Z",
+            "timezone": "Africa/Algiers",
+        }
+        request["input"]["record_ids"] = []
+        request["input"]["records"] = []
+        for index, (timestamp, value) in enumerate([
+            ("2026-11-10T08:00:00Z", 21.0),
+            ("2026-11-10T09:00:00Z", 23.0),
+            ("2026-11-10T10:00:00Z", 22.0),
+        ]):
+            record_id = f"3c2b3a4d-5e6f-4789-8123-456789abcde{index}"
+            request["input"]["record_ids"].append(record_id)
+            request["input"]["records"].append({
+                "record_id": record_id,
+                "record_type": "measurement",
+                "payload_sha256": "b" * 64,
+                "data": {
+                    "variable_code": "air_temperature",
+                    "normalized_value": value,
+                    "normalized_unit_code": "degC",
+                    "measured_at": timestamp,
+                },
+                "context": {"culture_id": culture_id},
+            })
+        result = execute_registered_engine(request)
+        self.assertEqual(result["status"], "completed", msg=str(result.get("error")))
+        value = result["result"]["value"]
+        biological_schema = json.loads((ROOT / "schemas" / "biological" / "v1" / "context-assessment.schema.json").read_text(encoding="utf-8"))
+        Draft202012Validator(biological_schema, format_checker=FormatChecker()).validate(value)
+        self.assertEqual(value["subject"]["subject_type"], "culture")
+        self.assertEqual(value["subject"]["subject_id"], culture_id)
+        self.assertEqual(value["coverage"]["source_record_count"], 3)
+        self.assertEqual(value["coverage"]["record_counts_by_type"]["measurement"], 3)
+        self.assertEqual(len(value["derived_features"]), 4)
+        feature = next(item for item in value["derived_features"] if item["feature_code"] == "series.measurement.air_temperature.mean")
+        self.assertEqual(feature["feature_code"], "series.measurement.air_temperature.mean")
+        self.assertEqual(feature["value"], 22.0)
+        self.assertEqual(feature["unit_code"], "degC")
+        self.assertEqual(set(feature["source_record_ids"]), set(request["input"]["record_ids"]))
+        self.assertEqual(value["findings"], [])
+        self.assertEqual(value["hypotheses"], [])
+        self.assertIn("biological_interpretation_not_performed", result["result"]["quality_flags"])
+
+
+    def test_biological_context_features_excludes_invalid_scope_and_explicitly_excluded_measurements(self):
+        request = json.loads(json.dumps(REQUEST))
+        request["engine"] = {
+            "engine_id": "biological.context.features",
+            "engine_version": "0.1.0",
+        }
+        culture_id = "2c2b3a4d-5e6f-4789-8123-456789abcdef"
+        other_culture_id = "5c2b3a4d-5e6f-4789-8123-456789abcdef"
+        request["scope"] = {
+            "organization_id": REQUEST["scope"]["organization_id"],
+            "culture_id": culture_id,
+        }
+        request["parameters"] = {
+            "window_start": "2026-11-10T00:00:00Z",
+            "window_end": "2026-11-11T00:00:00Z",
+            "timezone": "Africa/Algiers",
+        }
+        request["input"]["record_ids"] = []
+        request["input"]["records"] = []
+        for index, (record_culture, quality_state) in enumerate([
+            (culture_id, "valid"),
+            (culture_id, "excluded"),
+            (other_culture_id, "valid"),
+        ]):
+            record_id = f"7c2b3a4d-5e6f-4789-8123-456789abcde{index}"
+            request["input"]["record_ids"].append(record_id)
+            request["input"]["records"].append({
+                "record_id": record_id,
+                "record_type": "measurement",
+                "payload_sha256": "c" * 64,
+                "data": {
+                    "variable_code": "air_temperature",
+                    "normalized_value": 20.0 + index,
+                    "normalized_unit_code": "degC",
+                    "measured_at": f"2026-11-10T0{8 + index}:00:00Z",
+                    "quality_state": quality_state,
+                },
+                "context": {"culture_id": record_culture},
+            })
+        result = execute_registered_engine(request)
+        self.assertEqual(result["status"], "completed", msg=str(result.get("error")))
+        coverage = result["result"]["value"]["coverage"]
+        self.assertEqual(coverage["source_record_count"], 1)
+        self.assertEqual(coverage["excluded_record_count"], 2)
+        self.assertIn("input_records_excluded", result["result"]["quality_flags"])
+        self.assertEqual(result["result"]["value"]["derived_features"][0]["source_record_ids"], [request["input"]["record_ids"][0]])
+
+
+    def test_biological_context_features_reports_unlinked_environment_as_missing_context(self):
+        request = json.loads(json.dumps(REQUEST))
+        request["engine"] = {
+            "engine_id": "biological.context.features",
+            "engine_version": "0.1.0",
+        }
+        culture_id = "2c2b3a4d-5e6f-4789-8123-456789abcdef"
+        request["scope"] = {
+            "organization_id": REQUEST["scope"]["organization_id"],
+            "culture_id": culture_id,
+        }
+        request["parameters"] = {
+            "window_start": "2026-11-10T00:00:00Z",
+            "window_end": "2026-11-11T00:00:00Z",
+            "timezone": "Africa/Algiers",
+            "environment_link_state": "unlinked",
+        }
+        record_id = "9c2b3a4d-5e6f-4789-8123-456789abcdef"
+        request["input"]["record_ids"] = [record_id]
+        request["input"]["records"] = [{
+            "record_id": record_id,
+            "record_type": "measurement",
+            "payload_sha256": "d" * 64,
+            "data": {
+                "variable_code": "air_temperature",
+                "normalized_value": 22.0,
+                "normalized_unit_code": "degC",
+                "measured_at": "2026-11-10T08:00:00Z",
+            },
+            "context": {"culture_id": culture_id},
+        }]
+        result = execute_registered_engine(request)
+        self.assertEqual(result["status"], "completed", msg=str(result.get("error")))
+        missing = result["result"]["value"]["coverage"]["missing_context"]
+        self.assertIn("culture_environment_not_linked", missing)
+
+
+
+    def test_biological_context_features_reports_ambiguous_or_conflicting_environment_links(self):
+        request = json.loads(json.dumps(REQUEST))
+        request["engine"] = {
+            "engine_id": "biological.context.features",
+            "engine_version": "0.1.0",
+        }
+        culture_id = "2c2b3a4d-5e6f-4789-8123-456789abcdef"
+        request["scope"] = {
+            "organization_id": REQUEST["scope"]["organization_id"],
+            "culture_id": culture_id,
+        }
+        request["parameters"] = {
+            "window_start": "2026-11-10T00:00:00Z",
+            "window_end": "2026-11-13T00:00:00Z",
+            "timezone": "Africa/Algiers",
+            "environment_link_state": "ambiguous",
+        }
+        record_id = "ac2b3a4d-5e6f-4789-8123-456789abcdef"
+        request["input"]["record_ids"] = [record_id]
+        request["input"]["records"] = [{
+            "record_id": record_id,
+            "record_type": "measurement",
+            "payload_sha256": "e" * 64,
+            "data": {
+                "variable_code": "air_temperature",
+                "normalized_value": 22.0,
+                "normalized_unit_code": "degC",
+                "measured_at": "2026-11-10T08:00:00Z",
+            },
+            "context": {
+                "culture_id": culture_id,
+                "environment_resolution": {
+                    "status": "conflict",
+                    "reason": "measurement_environment_context_mismatch",
+                    "environment_id": None,
+                    "location_id": None,
+                },
+            },
+        }]
+        result = execute_registered_engine(request)
+        self.assertEqual(result["status"], "completed", msg=str(result.get("error")))
+        missing = result["result"]["value"]["coverage"]["missing_context"]
+        self.assertIn("analysis_window_environment_ambiguous", missing)
+        self.assertIn("measurement_environment_context_conflict", missing)
+        self.assertIn("environment_context_ambiguous", result["result"]["quality_flags"])
+        self.assertIn("environment_context_conflict", result["result"]["quality_flags"])
+
+    def test_biological_context_features_accepts_empty_snapshot_as_insufficient_data(self):
+        request = json.loads(json.dumps(REQUEST))
+        request["engine"] = {
+            "engine_id": "biological.context.features",
+            "engine_version": "0.1.0",
+        }
+        request["scope"] = {
+            "organization_id": REQUEST["scope"]["organization_id"],
+            "culture_id": "2c2b3a4d-5e6f-4789-8123-456789abcdef",
+        }
+        request["parameters"] = {
+            "window_start": "2026-11-10T00:00:00Z",
+            "window_end": "2026-11-11T00:00:00Z",
+            "timezone": "Africa/Algiers",
+            "environment_link_state": "unlinked",
+        }
+        request["input"]["record_ids"] = []
+        request["input"]["records"] = []
+        result = execute_registered_engine(request)
+        self.assertEqual(result["status"], "completed", msg=str(result.get("error")))
+        self.assertEqual(result["result"]["outcome"], "insufficient_data")
+        value = result["result"]["value"]
+        self.assertEqual(value["coverage"]["source_record_count"], 0)
+        self.assertIsNone(value["coverage"]["observed_window"])
+        self.assertEqual(value["observed_facts"], [])
+        self.assertEqual(value["derived_features"], [])
+        self.assertIn("culture_environment_not_linked", value["coverage"]["missing_context"])
+        self.assertIn("insufficient_data", result["result"]["quality_flags"])
+
+        non_biological = json.loads(json.dumps(request))
+        non_biological["engine"] = {
+            "engine_id": "environmental.timeseries.qc",
+            "engine_version": "0.2.0",
+        }
+        with self.assertRaisesRegex(ContractValidationError, "record_ids.*non-empty"):
+            validate_request(non_biological)
+
+
+    def test_biological_context_features_preserves_time_bounded_genetic_context(self):
+        request = json.loads(json.dumps(REQUEST))
+        request["engine"] = {
+            "engine_id": "biological.context.features",
+            "engine_version": "0.1.0",
+        }
+        request["scope"] = {
+            "organization_id": REQUEST["scope"]["organization_id"],
+            "culture_id": "2c2b3a4d-5e6f-4789-8123-456789abcdef",
+        }
+        strain_id = "99999999-9999-4999-8999-999999999999"
+        organism_id = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaab"
+        request["parameters"] = {
+            "window_start": "2026-11-10T00:00:00Z",
+            "window_end": "2026-11-11T00:00:00Z",
+            "timezone": "Africa/Algiers",
+            "biological_context_supplied": True,
+            "biological_contexts": [{
+                "context_id": "77777777-7777-4777-8777-777777777777",
+                "valid_from": "2026-11-01",
+                "valid_to": None,
+                "organism_kind": "fungus",
+                "taxon_code": "PLEURO",
+                "strain_code": "HK35",
+                "cultivar_code": None,
+                "culture_stage": "fruiting",
+                "substrate_code": "straw",
+                "production_system": "monotub",
+                "context_tags": ["fruiting-run"],
+                "genetic_reference": {
+                    "status": "resolved",
+                    "strain_id": strain_id,
+                    "organism_id": organism_id,
+                    "designation": "HK35",
+                    "origin": "reference collection",
+                    "source_description": "verified strain record",
+                    "scientific_name": "Pleurotus ostreatus",
+                    "common_name": "Oyster mushroom",
+                    "taxonomy_source": "NCBI",
+                    "taxonomy_id": "NCBI:fungus-example",
+                },
+            }],
+        }
+        request["input"]["record_ids"] = []
+        request["input"]["records"] = []
+        result = execute_registered_engine(request)
+        self.assertEqual(result["status"], "completed", msg=str(result.get("error")))
+        value = result["result"]["value"]
+        biological_schema = json.loads((ROOT / "schemas" / "biological" / "v1" / "context-assessment.schema.json").read_text(encoding="utf-8"))
+        Draft202012Validator(biological_schema, format_checker=FormatChecker()).validate(value)
+        self.assertEqual(value["subject"]["genetic_reference_ids"], [strain_id])
+        self.assertEqual(value["subject"]["biological_contexts"][0]["culture_stage"], "fruiting")
+        self.assertEqual(value["subject"]["biological_contexts"][0]["genetic_reference"]["scientific_name"], "Pleurotus ostreatus")
+        self.assertNotIn("biological_context_not_recorded", value["coverage"]["missing_context"])
+        self.assertEqual(result["result"]["outcome"], "insufficient_data")
+
+
+    def test_biological_context_features_supports_plant_culture_subjects(self):
+        request = json.loads(json.dumps(REQUEST))
+        request["engine"] = {
+            "engine_id": "biological.context.features",
+            "engine_version": "0.2.0",
+        }
+        plant_culture_id = "7c2b3a4d-5e6f-4789-8123-456789abcdef"
+        request["scope"] = {
+            "organization_id": REQUEST["scope"]["organization_id"],
+            "plant_culture_id": plant_culture_id,
+        }
+        request["parameters"] = {
+            "window_start": "2026-11-10T00:00:00Z",
+            "window_end": "2026-11-11T00:00:00Z",
+            "timezone": "Africa/Algiers",
+            "environment_link_state": "resolved",
+            "biological_context_supplied": True,
+            "biological_contexts": [{
+                "context_id": "77777777-7777-4777-8777-777777777777",
+                "valid_from": "2026-11-01",
+                "valid_to": None,
+                "organism_kind": "plant",
+                "taxon_code": "Solanum lycopersicum",
+                "strain_code": None,
+                "cultivar_code": "Yellow Pear",
+                "culture_stage": "vegetative",
+                "substrate_code": "Technosoil",
+                "production_system": "greenhouse",
+                "context_tags": ["greentech-trial"],
+                "genetic_reference": {
+                    "status": "not_specified", "strain_id": None, "organism_id": None,
+                    "designation": None, "origin": None, "source_description": None,
+                    "scientific_name": None, "common_name": None,
+                    "taxonomy_source": None, "taxonomy_id": None,
+                },
+            }],
+        }
+        record_id = "ac2b3a4d-5e6f-4789-8123-456789abcdef"
+        request["input"]["record_ids"] = [record_id]
+        request["input"]["records"] = [{
+            "record_id": record_id,
+            "record_type": "measurement",
+            "payload_sha256": "e" * 64,
+            "data": {
+                "variable_code": "air_temperature",
+                "normalized_value": 24.0,
+                "normalized_unit_code": "degC",
+                "measured_at": "2026-11-10T08:00:00Z",
+            },
+            "context": {
+                "plant_culture_id": plant_culture_id,
+                "environment_id": "8c2b3a4d-5e6f-4789-8123-456789abcdef",
+                "environment_resolution": {
+                    "status": "resolved", "reason": None,
+                    "environment_id": "8c2b3a4d-5e6f-4789-8123-456789abcdef",
+                    "location_id": None,
+                },
+            },
+        }]
+        result = execute_registered_engine(request)
+        self.assertEqual(result["status"], "completed", msg=str(result.get("error")))
+        self.assertEqual(result["result"]["outcome"], "success")
+        value = result["result"]["value"]
+        self.assertEqual(value["subject"]["subject_type"], "plant")
+        self.assertEqual(value["subject"]["subject_id"], plant_culture_id)
+        self.assertEqual(value["subject"]["plant_culture_id"], plant_culture_id)
+        self.assertIsNone(value["subject"]["culture_id"])
+        self.assertEqual(value["subject"]["biological_contexts"][0]["organism_kind"], "plant")
+        self.assertEqual(value["coverage"]["source_record_count"], 1)
+        schema = json.loads((ROOT / "schemas" / "biological" / "v1" / "context-assessment.schema.json").read_text(encoding="utf-8"))
+        validator(schema).validate(value)
+
 
 
 if __name__ == "__main__":

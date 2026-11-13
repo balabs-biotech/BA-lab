@@ -513,3 +513,131 @@ assert.match(reloadListener,
   /const operationRevision = authStateRevision;[\s\S]*?const operationOrganizationId = organizationId;[\s\S]*?loadRecentMeasurements\(\)\.catch\(error => \{[\s\S]*?if \(!isCurrentWorkspaceRevision\(operationRevision, operationOrganizationId\)\) return;[\s\S]*?showMessage\(error\.message, "error"\);/,
   "measurement-history reload errors must be discarded after a workspace transition");
 console.log("✓ Measurement history reload: stale errors are discarded");
+
+// Biological context editor: tenant-scoped reads/writes, required environment,
+// explicit temporal validity, and safe closure of an active context.
+const workspaceHtml = fs.readFileSync(new URL("../batch-tracker/workspace.html", import.meta.url), "utf8");
+const localization = fs.readFileSync("batch-tracker/i18n.js", "utf8");
+for (const phrase of [
+  "Identité et conditions biologiques", "Environnement associé", "Type d’organisme",
+  "Souche du référentiel", "Stade biologique", "Système de production",
+  "Début de validité", "Fin de validité (exclue)", "Enregistrer ce contexte daté"
+]) {
+  assert.ok(localization.includes(phrase),
+    "biological context editor phrase must be present in the localization catalogue: " + phrase);
+}
+for (const id of [
+  "biologicalContextPanel", "biologicalContextHistory", "biologicalContextForm",
+  "biologicalContextEnvironment", "biologicalContextOrganismKind",
+  "biologicalContextStrain", "biologicalContextStage", "biologicalContextProductionSystem",
+  "biologicalContextValidFrom", "biologicalContextValidTo",
+  "biologicalContextCloseDate", "biologicalContextCloseButton"
+]) {
+  assert.ok(workspaceHtml.includes('id="' + id + '"'),
+    "biological context editor must expose " + id);
+}
+const contextLoadStart = engine.indexOf("async function loadBiologicalContextPanel(");
+const contextSaveStart = engine.indexOf("async function saveBiologicalContext(");
+const contextCloseStart = engine.indexOf("async function closeBiologicalContext(");
+assert.ok(contextLoadStart >= 0 && contextSaveStart > contextLoadStart && contextCloseStart > contextSaveStart,
+  "biological context load, save and close handlers must exist");
+const contextHandlers = engine.slice(contextLoadStart, engine.indexOf("\nlet cultureDetailRequestId", contextLoadStart));
+assert.match(contextHandlers, /\.eq\("organization_id", loadOrganizationId\)/,
+  "biological context reads must be tenant-scoped");
+assert.match(contextHandlers, /\.from\("biological_contexts"\)/,
+  "biological context editor must use the canonical biological_contexts table");
+assert.match(contextHandlers, /valid_from/);
+assert.match(contextHandlers, /valid_to/);
+assert.match(contextHandlers, /\.eq\("organization_id", operationOrganizationId\)/,
+  "biological context writes must be tenant-scoped");
+assert.match(contextHandlers, /openContext/,
+  "new context must not overlap an unclosed active context");
+assert.match(contextHandlers, /isCurrentWorkspaceRevision/,
+  "context handlers must discard stale workspace operations");
+
+console.log("✓ Biological context editor: tenant isolation, temporal bounds and active-context closure");
+
+// GreenTech biological context must use the plant_cultures subject FK and the
+// greentech domain; it must never write a plant row as a fungal culture.
+for (const id of [
+  "plantBiologicalContextPanel", "plantBiologicalContextHistory",
+  "plantBiologicalContextForm", "plantBiologicalContextEnvironment",
+  "plantBiologicalContextStage", "plantBiologicalContextProduction",
+  "plantBiologicalContextValidFrom", "plantBiologicalContextValidTo",
+  "plantBiologicalContextCloseButton"
+]) {
+  assert.ok(workspaceHtml.includes('id="' + id + '"'),
+    "GreenTech biological context panel must expose " + id);
+}
+for (const phrase of [
+  "Contexte de la culture végétale", "Stade végétatif",
+  "Substrat / milieu racinaire", "Plein champ", "Hydroponie"
+]) {
+  assert.ok(localization.includes(phrase),
+    "GreenTech context phrase must be localized: " + phrase);
+}
+const plantContextLoadStart = engine.indexOf("async function loadPlantBiologicalContextPanel(");
+const plantContextSaveStart = engine.indexOf("async function savePlantBiologicalContext(");
+const plantContextCloseStart = engine.indexOf("async function closePlantBiologicalContext(");
+const plantContextEnd = engine.indexOf("\nlet cultureDetailRequestId", plantContextLoadStart);
+assert.ok(plantContextLoadStart >= 0 &&
+  plantContextSaveStart > plantContextLoadStart &&
+  plantContextCloseStart > plantContextSaveStart &&
+  plantContextEnd > plantContextCloseStart,
+  "GreenTech biological context load, save and close handlers must exist");
+const plantContextHandlers = engine.slice(plantContextLoadStart, plantContextEnd);
+assert.match(plantContextHandlers, /\.eq\("organization_id", loadOrganizationId\)/,
+  "GreenTech context reads must be tenant-scoped");
+assert.match(plantContextHandlers, /\.eq\("plant_culture_id", plantCultureId\)/,
+  "GreenTech context reads and writes must use plant_culture_id");
+assert.match(plantContextHandlers, /domain: "greentech"/,
+  "GreenTech context writes must use the greentech domain");
+assert.match(plantContextHandlers, /organism_kind: "plant"/,
+  "GreenTech context writes must identify the organism as plant");
+assert.match(plantContextHandlers, /culture_id: null/,
+  "GreenTech context writes must not populate the fungal culture FK");
+assert.match(plantContextHandlers, /isCurrentWorkspaceRevision/,
+  "GreenTech context handlers must discard stale workspace operations");
+assert.match(engine.slice(engine.indexOf("function renderPlantCultureList("), engine.indexOf("async function loadPlantCultures(")),
+  /loadPlantBiologicalContextPanel\(row\.id\)/,
+  "plant culture rows must open their biological context history");
+console.log("✓ GreenTech biological context: plant subject, tenant isolation and dated history");
+
+for (const id of [
+  "plantBiologicalAssessmentStart", "plantBiologicalAssessmentEnd",
+  "runPlantBiologicalAssessment", "plantBiologicalAssessmentMessage"
+]) {
+  assert.ok(workspaceHtml.includes('id="' + id + '"'),
+    "GreenTech BIE assessment UI must expose " + id);
+}
+const plantAssessmentStart = engine.indexOf("async function runPlantBiologicalAssessment(");
+const plantAssessmentEnd = engine.indexOf("\nlet cultureDetailRequestId", plantAssessmentStart);
+assert.ok(plantAssessmentStart >= 0 && plantAssessmentEnd > plantAssessmentStart,
+  "GreenTech BIE assessment action must exist");
+const plantAssessment = engine.slice(plantAssessmentStart, plantAssessmentEnd);
+assert.match(plantAssessment, /functions\.invoke\("engine-orchestrator"/,
+  "GreenTech BIE assessment must call the authenticated Edge Function");
+assert.match(plantAssessment, /engine_id: "biological\.context\.features"/,
+  "GreenTech BIE assessment must use the biological context engine");
+assert.match(plantAssessment, /engine_version: "0\.2\.0"/,
+  "GreenTech plant subjects must use BIE v0.2");
+assert.match(plantAssessment, /plant_culture_id: plantCultureId/,
+  "GreenTech BIE scope must use plant_culture_id");
+assert.match(plantAssessment, /record_ids: \[\]/,
+  "GreenTech BIE source IDs must be derived server-side");
+assert.match(plantAssessment, /timezone: "Africa\/Algiers"/,
+  "GreenTech BIE window must declare the Algeria timezone");
+assert.match(plantAssessment, /endDate <= startDate/,
+  "GreenTech BIE window must enforce a non-empty half-open interval");
+assert.match(plantAssessment, /isCurrentWorkspaceRevision/,
+  "GreenTech BIE responses must be guarded against stale workspace state");
+assert.match(plantAssessment, /panel\?\.dataset\.plantCultureId !== plantCultureId/,
+  "GreenTech BIE responses must not render after the selected plant changes");
+assert.match(engine.slice(engine.indexOf("async function loadPlantBiologicalContextPanel("), plantAssessmentStart),
+  /plantBiologicalAssessmentRequestId \+= 1/,
+  "opening another plant record must invalidate a pending BIE assessment");
+assert.match(engine.slice(engine.indexOf("async function loadPlantBiologicalContextPanel("), plantAssessmentStart),
+  /assessmentButton\.disabled = false/,
+  "switching plant records must restore the assessment control after invalidating a prior request");
+
+console.log("✓ GreenTech BIE v0.2: explicit plant subject, bounded window and authenticated orchestration");

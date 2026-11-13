@@ -5,6 +5,10 @@ import Ajv2020 from "npm:ajv@8.17.1/dist/2020.js";
 import addFormats from "npm:ajv-formats@3.0.1";
 import requestSchema from "../../../schemas/engine/v1/request.schema.json" with { type: "json" };
 import responseSchema from "../../../schemas/engine/v1/response.schema.json" with { type: "json" };
+import {
+  loadAuthenticatedBiologicalContextSnapshot,
+  loadAuthenticatedPlantBiologicalContextSnapshot,
+} from "../_shared/biological-context-loader.ts";
 
 const headers = {
   "Access-Control-Allow-Origin": "*",
@@ -87,22 +91,41 @@ Deno.serve(async (req: Request) => {
   const organizationId = parsed.organization_id;
   const engineId = parsed.engine_id;
   const engineVersion = parsed.engine_version;
-  const recordIds = parsed.record_ids;
+  const isBiologicalContextEngine = engineId === "biological.context.features";
+  const suppliedRecordIds = parsed.record_ids;
+  // BIE source IDs are derived exclusively from RLS-authorized database rows.
+  const recordIds = isBiologicalContextEngine ? [] : suppliedRecordIds;
   const recordType = parsed.record_type ?? "measurement";
   const parameters = parsed.parameters ?? {};
   const scope = parsed.scope;
   const idempotencyKey = req.headers.get("idempotency-key") ?? parsed.idempotency_key;
+  const validRecordIds = isBiologicalContextEngine
+    ? (suppliedRecordIds === undefined || (Array.isArray(suppliedRecordIds) && suppliedRecordIds.length === 0))
+    : (Array.isArray(recordIds) && recordIds.length >= 1 && recordIds.length <= 500 &&
+      recordIds.every((id) => typeof id === "string") && new Set(recordIds).size === recordIds.length);
+  const validSourceType = isBiologicalContextEngine ||
+    recordType === "measurement" || recordType === "environmental_observation";
+  const validBiologicalSubject = isBiologicalContextEngine &&
+    ((typeof scope?.culture_id === "string") !== (typeof scope?.plant_culture_id === "string"));
+  const validBiologicalVersion = !isBiologicalContextEngine ||
+    (scope?.plant_culture_id ? engineVersion === "0.2.0" : ["0.1.0", "0.2.0"].includes(engineVersion));
+  const validBiologicalRequest = !isBiologicalContextEngine ||
+    (validBiologicalSubject && validBiologicalVersion &&
+      typeof parameters.window_start === "string" &&
+      typeof parameters.window_end === "string" &&
+      typeof parameters.timezone === "string");
   if (typeof organizationId !== "string" || typeof engineId !== "string" ||
-      typeof engineVersion !== "string" || !Array.isArray(recordIds) ||
-      recordIds.length < 1 || recordIds.length > 500 ||
-      recordIds.some((id) => typeof id !== "string") ||
-      new Set(recordIds).size !== recordIds.length ||
-      (recordType !== "measurement" && recordType !== "environmental_observation") ||
+      typeof engineVersion !== "string" || !validRecordIds || !validSourceType ||
+      !validBiologicalRequest ||
       typeof idempotencyKey !== "string" || idempotencyKey.length < 8 || idempotencyKey.length > 160 ||
       !object(parameters) || !object(scope ?? {})) {
     return reply(422, { error: "invalid_or_incomplete_request" });
   }
-  if (!ENGINE_ALLOWLIST.get(engineId)?.has(engineVersion)) {
+  const allowedVersions = ENGINE_ALLOWLIST.get(engineId) ??
+    (isBiologicalContextEngine && Deno.env.get("BA_BIE_ENABLED") === "true"
+      ? new Set(["0.1.0", "0.2.0"])
+      : undefined);
+  if (!allowedVersions?.has(engineVersion)) {
     return reply(422, { error: "engine_version_not_registered" });
   }
   if (scope?.organization_id && scope.organization_id !== organizationId) {
@@ -141,97 +164,146 @@ Deno.serve(async (req: Request) => {
     return reply(403, { error: "organization_role_not_permitted" });
   }
 
-  // Source rows are read with the caller JWT; each supported source has its own RLS-scoped query.
-  let sourceRows: Record<string, any>[];
-  if (recordType === "measurement") {
-    const { data, error: sourceError } = await userClient
-      .from("measurements")
-      .select("id,variable_code,raw_value,raw_unit_code,normalized_value,normalized_unit_code,measured_at,method,instrument,quality_state,exclusion_reason,culture_id,sample_id,experimental_unit_id,event_id,result_id,metadata")
-      .eq("organization_id", organizationId)
-      .in("id", recordIds);
-    if (sourceError) return reply(422, { error: "source_records_unavailable" });
-    if (!data || data.length !== recordIds.length) {
-      return reply(422, { error: "one_or_more_source_records_missing_or_inaccessible" });
-    }
-    if (data.some((row) => row.quality_state === "excluded")) {
-      return reply(422, { error: "excluded_source_records_not_eligible" });
-    }
-    if (scope?.culture_id && data.some((row) => row.culture_id !== scope.culture_id)) {
-      return reply(422, { error: "source_scope_mismatch" });
-    }
-    sourceRows = data;
-  } else {
-    if (typeof scope?.location_id !== "string") {
-      return reply(422, { error: "environmental_location_scope_required" });
-    }
-    const { data, error: sourceError } = await userClient
-      .from("environmental_observations")
-      .select("id,location_id,data_family,provider_code,dataset_code,variable_code,value,unit_code,observed_at,retrieved_at,spatial_resolution_m,quality_flag,source_url,metadata")
-      .eq("organization_id", organizationId)
-      .eq("location_id", scope.location_id)
-      .eq("data_family", "weather")
-      .in("id", recordIds);
-    if (sourceError) return reply(422, { error: "source_records_unavailable" });
-    if (!data || data.length !== recordIds.length) {
-      return reply(422, { error: "one_or_more_source_records_missing_or_inaccessible" });
-    }
-    const sourceIdentities = new Set(data.map((row) => row.provider_code + "/" + row.dataset_code));
-    if (sourceIdentities.size !== 1) {
-      return reply(422, { error: "environmental_source_mismatch" });
-    }
-    sourceRows = data;
-  }
+  // Source rows are read with the caller JWT. BIE derives all IDs from
+  // authenticated culture/window queries; ordinary engines retain explicit IDs.
+  let orderedRecords: Record<string, any>[];
+  let effectiveRecordIds: string[];
+  let effectiveScope: Record<string, any>;
+  let effectiveParameters: Record<string, any>;
+  let snapshotHash: string;
 
-  const records = sourceRows.map((row) => recordType === "measurement" ? ({
-    record_id: row.id,
-    record_type: "measurement",
-    payload_sha256: "",
-    data: {
-      variable_code: row.variable_code,
-      raw_value: row.raw_value,
-      raw_unit_code: row.raw_unit_code,
-      normalized_value: row.normalized_value,
-      normalized_unit_code: row.normalized_unit_code,
-      measured_at: row.measured_at,
-      method: row.method,
-      instrument: row.instrument,
-      quality_state: row.quality_state,
-      exclusion_reason: row.exclusion_reason,
-      metadata: row.metadata ?? {},
-    },
-    context: {
-      culture_id: row.culture_id,
-      sample_id: row.sample_id,
-      experimental_unit_id: row.experimental_unit_id,
-      event_id: row.event_id,
-      result_id: row.result_id,
-    },
-  }) : ({
-    record_id: row.id,
-    record_type: "environmental_observation",
-    payload_sha256: "",
-    data: {
-      variable_code: row.variable_code,
-      value: row.value,
-      unit_code: row.unit_code,
-      observed_at: row.observed_at,
-      data_family: row.data_family,
-      provider_code: row.provider_code,
-      dataset_code: row.dataset_code,
-      retrieved_at: row.retrieved_at,
-      spatial_resolution_m: row.spatial_resolution_m,
-      quality_flag: row.quality_flag,
-    },
-    context: { location_id: row.location_id },
-  }));
-  const sourceRowById = new Map(sourceRows.map((row) => [row.id, row]));
-  for (const record of records) {
-    const sourceRow = sourceRowById.get(record.record_id);
-    record.payload_sha256 = await sha256(stable(sourceRow) + stable(record.context ?? {}));
+  if (isBiologicalContextEngine) {
+    let snapshot;
+    try {
+      const window = {
+        start: parameters.window_start,
+        end: parameters.window_end,
+        timezone: parameters.timezone,
+      };
+      snapshot = scope.plant_culture_id
+        ? await loadAuthenticatedPlantBiologicalContextSnapshot({
+          userClient, organizationId, plantCultureId: scope.plant_culture_id, window,
+        })
+        : await loadAuthenticatedBiologicalContextSnapshot({
+          userClient, organizationId, cultureId: scope.culture_id, window,
+        });
+    } catch (error) {
+      const code = error instanceof Error ? error.message : "biological_source_loading_failed";
+      const allowedCodes = new Set([
+        "caller_scoped_supabase_client_required", "biological_subject_scope_required",
+        "culture_not_found_or_inaccessible", "culture_tenant_scope_mismatch",
+        "plant_culture_not_found_or_inaccessible", "plant_culture_tenant_scope_mismatch",
+        "plant_biological_context_scope_mismatch", "plant_culture_measurement_scope_mismatch",
+        "biological_contexts_unavailable", "biological_analysis_context_limit_exceeded",
+        "culture_measurements_unavailable", "plant_culture_measurements_unavailable",
+        "biological_analysis_measurement_limit_exceeded", "biological_environments_unavailable",
+        "biological_locations_unavailable", "environmental_observations_unavailable",
+        "biological_strain_references_unavailable", "biological_organisms_unavailable",
+        "biological_analysis_weather_limit_exceeded", "analysis_window_must_be_timezone_aware",
+        "analysis_window_end_must_follow_start", "analysis_timezone_invalid",
+      ]);
+      return reply(422, { error: allowedCodes.has(code) ? code : "biological_source_loading_failed" });
+    }
+    orderedRecords = snapshot.input.records;
+    effectiveRecordIds = snapshot.input.record_ids;
+    effectiveScope = snapshot.scope;
+    effectiveParameters = snapshot.parameters;
+    snapshotHash = snapshot.input.snapshot_sha256;
+  } else {
+    let sourceRows: Record<string, any>[];
+    if (recordType === "measurement") {
+      const { data, error: sourceError } = await userClient
+        .from("measurements")
+        .select("id,variable_code,raw_value,raw_unit_code,normalized_value,normalized_unit_code,measured_at,method,instrument,quality_state,exclusion_reason,culture_id,sample_id,experimental_unit_id,event_id,result_id,metadata")
+        .eq("organization_id", organizationId)
+        .in("id", recordIds);
+      if (sourceError) return reply(422, { error: "source_records_unavailable" });
+      if (!data || data.length !== recordIds.length) {
+        return reply(422, { error: "one_or_more_source_records_missing_or_inaccessible" });
+      }
+      if (data.some((row) => row.quality_state === "excluded")) {
+        return reply(422, { error: "excluded_source_records_not_eligible" });
+      }
+      if (scope?.culture_id && data.some((row) => row.culture_id !== scope.culture_id)) {
+        return reply(422, { error: "source_scope_mismatch" });
+      }
+      sourceRows = data;
+    } else {
+      if (typeof scope?.location_id !== "string") {
+        return reply(422, { error: "environmental_location_scope_required" });
+      }
+      const { data, error: sourceError } = await userClient
+        .from("environmental_observations")
+        .select("id,location_id,data_family,provider_code,dataset_code,variable_code,value,unit_code,observed_at,retrieved_at,spatial_resolution_m,quality_flag,source_url,metadata")
+        .eq("organization_id", organizationId)
+        .eq("location_id", scope.location_id)
+        .eq("data_family", "weather")
+        .in("id", recordIds);
+      if (sourceError) return reply(422, { error: "source_records_unavailable" });
+      if (!data || data.length !== recordIds.length) {
+        return reply(422, { error: "one_or_more_source_records_missing_or_inaccessible" });
+      }
+      const sourceIdentities = new Set(data.map((row) => row.provider_code + "/" + row.dataset_code));
+      if (sourceIdentities.size !== 1) {
+        return reply(422, { error: "environmental_source_mismatch" });
+      }
+      sourceRows = data;
+    }
+
+    const records = sourceRows.map((row) => recordType === "measurement" ? ({
+      record_id: row.id,
+      record_type: "measurement",
+      payload_sha256: "",
+      data: {
+        variable_code: row.variable_code,
+        raw_value: row.raw_value,
+        raw_unit_code: row.raw_unit_code,
+        normalized_value: row.normalized_value,
+        normalized_unit_code: row.normalized_unit_code,
+        measured_at: row.measured_at,
+        method: row.method,
+        instrument: row.instrument,
+        quality_state: row.quality_state,
+        exclusion_reason: row.exclusion_reason,
+        metadata: row.metadata ?? {},
+      },
+      context: {
+        culture_id: row.culture_id,
+        sample_id: row.sample_id,
+        experimental_unit_id: row.experimental_unit_id,
+        event_id: row.event_id,
+        result_id: row.result_id,
+      },
+    }) : ({
+      record_id: row.id,
+      record_type: "environmental_observation",
+      payload_sha256: "",
+      data: {
+        variable_code: row.variable_code,
+        value: row.value,
+        unit_code: row.unit_code,
+        observed_at: row.observed_at,
+        data_family: row.data_family,
+        provider_code: row.provider_code,
+        dataset_code: row.dataset_code,
+        retrieved_at: row.retrieved_at,
+        spatial_resolution_m: row.spatial_resolution_m,
+        quality_flag: row.quality_flag,
+      },
+      context: { location_id: row.location_id },
+    }));
+    const sourceRowById = new Map(sourceRows.map((row) => [row.id, row]));
+    for (const record of records) {
+      const sourceRow = sourceRowById.get(record.record_id);
+      record.payload_sha256 = await sha256(stable(sourceRow) + stable(record.context ?? {}));
+    }
+    const recordMap = new Map(records.map((record) => [record.record_id, record]));
+    orderedRecords = recordIds.map((id) => recordMap.get(id)!);
+    effectiveRecordIds = recordIds;
+    effectiveScope = { ...scope, organization_id: organizationId };
+    effectiveParameters = parameters;
+    snapshotHash = await sha256(stable(orderedRecords));
   }
-  const recordMap = new Map(records.map((record) => [record.record_id, record]));
-  const orderedRecords = recordIds.map((id) => recordMap.get(id)!);
-  const snapshotHash = await sha256(stable(orderedRecords));
   const requestId = crypto.randomUUID();
   const engineRequest = {
     contract: "BA-LABS/ENGINE",
@@ -239,9 +311,9 @@ Deno.serve(async (req: Request) => {
     request_id: requestId,
     created_at: new Date().toISOString(),
     engine: { engine_id: engineId, engine_version: engineVersion },
-    scope: { ...scope, organization_id: organizationId },
-    input: { record_ids: recordIds, snapshot_sha256: snapshotHash, records: orderedRecords },
-    parameters,
+    scope: effectiveScope,
+    input: { record_ids: effectiveRecordIds, snapshot_sha256: snapshotHash, records: orderedRecords },
+    parameters: effectiveParameters,
   };
   if (!validateRequest(engineRequest)) {
     console.error("[engine-orchestrator] internally generated request failed schema validation");
@@ -276,7 +348,7 @@ Deno.serve(async (req: Request) => {
       engine_id: engineId,
       engine_version: engineVersion,
       scope: engineRequest.scope,
-      input_record_ids: recordIds,
+      input_record_ids: effectiveRecordIds,
       input_snapshot_sha256: snapshotHash,
       request_payload: engineRequest,
       status: "queued",
@@ -296,18 +368,38 @@ Deno.serve(async (req: Request) => {
     return reply(409, { error: "execution_creation_conflict" });
   }
 
+  // Every terminal failure must be durable in the execution ledger. A worker
+  // error is not considered recorded if the state transition itself failed.
+  async function persistExecutionFailure(code: string, message: string, at = new Date().toISOString()) {
+    const { data, error } = await serviceClient.from("engine_executions").update({
+      status: "failed",
+      error_code: code,
+      error_message: message,
+      completed_at: at,
+      updated_at: at,
+    }).eq("organization_id", organizationId)
+      .eq("id", execution.id)
+      .in("status", ["queued", "running"])
+      .select("id")
+      .maybeSingle();
+    return !error && !!data;
+  }
+
   const startedAt = new Date().toISOString();
-  const { error: startError } = await serviceClient.from("engine_executions")
+  const { data: startedExecution, error: startError } = await serviceClient.from("engine_executions")
     .update({ status: "running", started_at: startedAt, updated_at: startedAt })
-    .eq("organization_id", organizationId).eq("id", execution.id).eq("status", "queued");
-  if (startError) {
-    const failedAt = new Date().toISOString();
-    await serviceClient.from("engine_executions").update({
-      status: "failed", error_code: "execution_start_failed",
-      error_message: "Execution could not enter the running state.",
-      completed_at: failedAt, updated_at: failedAt,
-    }).eq("organization_id", organizationId).eq("id", execution.id);
-    return reply(500, { error: "execution_start_failed", execution_id: execution.id });
+    .eq("organization_id", organizationId).eq("id", execution.id).eq("status", "queued")
+    .select("id")
+    .maybeSingle();
+  if (startError || !startedExecution) {
+    const persisted = await persistExecutionFailure(
+      "execution_start_failed",
+      "Execution could not enter the running state.",
+    );
+    return reply(500, {
+      error: persisted ? "execution_start_failed" : "execution_state_persistence_failed",
+      execution_id: execution.id,
+    });
   }
 
   const controller = new AbortController();
@@ -325,12 +417,14 @@ Deno.serve(async (req: Request) => {
     if (workerBody.length > 128_000) throw new Error("worker_response_too_large");
   } catch (error) {
     const code = controller.signal.aborted ? "worker_timeout" : "worker_unreachable";
-    const failedAt = new Date().toISOString();
-    await serviceClient.from("engine_executions").update({
-      status: "failed", error_code: code, error_message: "The registered engine worker did not return a usable response.",
-      completed_at: failedAt, updated_at: failedAt,
-    }).eq("organization_id", organizationId).eq("id", execution.id);
-    return reply(502, { error: code, execution_id: execution.id });
+    const persisted = await persistExecutionFailure(
+      code,
+      "The registered engine worker did not return a usable response.",
+    );
+    return reply(persisted ? 502 : 500, {
+      error: persisted ? code : "execution_state_persistence_failed",
+      execution_id: execution.id,
+    });
   } finally { clearTimeout(timeout); }
 
   let result: unknown;
@@ -341,11 +435,14 @@ Deno.serve(async (req: Request) => {
       result.request_id !== requestId || result.engine.engine_id !== engineId ||
       result.engine.engine_version !== engineVersion || result.input_snapshot_sha256 !== snapshotHash) {
     const code = !workerResponse.ok ? "worker_http_error" : "worker_response_invalid_or_unbound";
-    await serviceClient.from("engine_executions").update({
-      status: "failed", error_code: code, error_message: "Worker response failed transport or correlation validation.",
-      completed_at: new Date().toISOString(), updated_at: new Date().toISOString(),
-    }).eq("organization_id", organizationId).eq("id", execution.id);
-    return reply(502, { error: code, execution_id: execution.id });
+    const persisted = await persistExecutionFailure(
+      code,
+      "Worker response failed transport or correlation validation.",
+    );
+    return reply(persisted ? 502 : 500, {
+      error: persisted ? code : "execution_state_persistence_failed",
+      execution_id: execution.id,
+    });
   }
 
   const completedAt = new Date().toISOString();
@@ -369,9 +466,9 @@ Deno.serve(async (req: Request) => {
     });
   }
 
-  await serviceClient.from("engine_executions").update({
-    status: "failed", error_code: result.error.code, error_message: result.error.message,
-    completed_at: completedAt, updated_at: completedAt,
-  }).eq("organization_id", organizationId).eq("id", execution.id);
+  const persisted = await persistExecutionFailure(result.error.code, result.error.message, completedAt);
+  if (!persisted) {
+    return reply(500, { error: "execution_state_persistence_failed", execution_id: execution.id });
+  }
   return reply(422, { execution_id: execution.id, request_id: requestId, status: "failed", error: result.error });
 });

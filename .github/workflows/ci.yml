@@ -126,6 +126,11 @@ jobs:
           node scripts/test-bal-json-schemas.mjs
           node scripts/test-engine-orchestrator-contract.mjs
           node scripts/test-engine-execution-history-ui.mjs
+          node scripts/test-biological-context-assessment-schema.mjs
+          node --experimental-strip-types scripts/test-biological-context-snapshot.mjs
+          node --experimental-strip-types scripts/test-biological-context-resolver.mjs
+          node --experimental-strip-types scripts/test-biological-context-assembly.mjs
+          node --experimental-strip-types scripts/test-biological-context-loader.mjs
           node scripts/test-environmental-fallback.mjs
           node scripts/test-workspace-scenarios.mjs
           node scripts/test-qc-check-session-errors.mjs
@@ -284,6 +289,8 @@ jobs:
         run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/role_aware_tenant_writes.test.sql
       - name: Test engine execution ledger security and idempotency
         run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/engine_executions_security.test.sql
+      - name: Test biological context temporal integrity
+        run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/biological_contexts_temporal_integrity.test.sql
 
   ecosystem-regression:
     runs-on: ubuntu-latest
