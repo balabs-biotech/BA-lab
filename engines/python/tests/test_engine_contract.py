@@ -651,7 +651,7 @@ class EngineContractTests(unittest.TestCase):
         finding = value["findings"][0]
         self.assertEqual(finding["finding_code"], "mycology.air_temperature.upper_bound")
         self.assertEqual(finding["evidence_state"], "limited")
-        self.assertEqual(finding["supporting_record_ids"], request["input"]["record_ids"])
+        self.assertEqual(finding["supporting_record_ids"], sorted(request["input"]["record_ids"]))
         self.assertEqual(
             finding["derived_feature_codes"],
             ["series.measurement.air_temperature.maximum"],
