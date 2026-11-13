@@ -521,6 +521,26 @@ class EngineContractTests(unittest.TestCase):
         self.assertIn("build_revision_unavailable", result["result"]["quality_flags"])
         self.assertIn("container_image_digest_unavailable", result["result"]["quality_flags"])
 
+    def test_registered_result_rejects_malformed_container_image_digest(self):
+        request = json.loads(json.dumps(REQUEST))
+        request["engine"] = {"engine_id": "environmental.timeseries.qc", "engine_version": "0.2.0"}
+        with patch.dict(os.environ, {
+            "BA_ENGINE_BUILD_REVISION": "a" * 40,
+            "BA_ENGINE_IMAGE_DIGEST": "sha256:not-an-oci-digest",
+        }):
+            with self.assertRaises(ContractValidationError):
+                execute_registered_engine(request)
+
+    def test_registered_result_rejects_malformed_source_revision(self):
+        request = json.loads(json.dumps(REQUEST))
+        request["engine"] = {"engine_id": "environmental.timeseries.qc", "engine_version": "0.2.0"}
+        with patch.dict(os.environ, {
+            "BA_ENGINE_BUILD_REVISION": "branch-main",
+            "BA_ENGINE_IMAGE_DIGEST": "sha256:" + "b" * 64,
+        }):
+            with self.assertRaises(ContractValidationError):
+                execute_registered_engine(request)
+
     def test_registry_rejects_unregistered_engine(self):
         request = json.loads(json.dumps(REQUEST))
         request["engine"] = {"engine_id": "environmental.unknown", "engine_version": "0.1.0"}
