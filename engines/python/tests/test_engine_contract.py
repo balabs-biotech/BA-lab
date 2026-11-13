@@ -920,6 +920,12 @@ class EngineContractTests(unittest.TestCase):
         }
         request["input"]["record_ids"] = []
         request["input"]["records"] = []
+        request["input"]["snapshot_sha256"] = hashlib.sha256(
+            json.dumps(
+                {"records": [], "biological_contexts": []},
+                sort_keys=True, separators=(",", ":"), ensure_ascii=False,
+            ).encode("utf-8")
+        ).hexdigest()
         result = execute_registered_engine(request)
         self.assertEqual(result["status"], "completed", msg=str(result.get("error")))
         self.assertEqual(result["result"]["outcome"], "insufficient_data")
@@ -939,6 +945,46 @@ class EngineContractTests(unittest.TestCase):
         with self.assertRaisesRegex(ContractValidationError, "record_ids.*non-empty"):
             validate_request(non_biological)
 
+
+    def test_biological_context_features_v020_executes_empty_new_culture_snapshot(self):
+        request = json.loads(json.dumps(REQUEST))
+        request["engine"] = {
+            "engine_id": "biological.context.features",
+            "engine_version": "0.2.0",
+        }
+        request["scope"] = {
+            "organization_id": REQUEST["scope"]["organization_id"],
+            "culture_id": "2c2b3a4d-5e6f-4789-8123-456789abcdef",
+        }
+        request["parameters"] = {
+            "window_start": "2026-11-10T00:00:00+01:00",
+            "window_end": "2026-11-11T00:00:00+01:00",
+            "timezone": "Africa/Algiers",
+            "biological_context_supplied": False,
+            "biological_contexts": [],
+            "environment_link_state": "missing",
+            "profile_context_stable": False,
+            "profile_domain": None,
+            "profile_domain_ambiguous": False,
+            "analysis_window_start_date": "2026-11-10",
+            "analysis_window_last_included_date": "2026-11-10",
+            "interpretation_rules": [],
+            "interpretation_profile_state": "not_configured",
+            "biological_identity_state": "not_documented",
+            "biological_identity_assertions": [],
+        }
+        request["datasets"] = []
+        request["input"]["record_ids"] = []
+        request["input"]["records"] = []
+        result = execute_registered_engine(request)
+        self.assertEqual(result["status"], "completed", msg=str(result.get("error")))
+        self.assertEqual(result["result"]["outcome"], "insufficient_data")
+        value = result["result"]["value"]
+        self.assertEqual(value["coverage"]["source_record_count"], 0)
+        self.assertEqual(value["observed_facts"], [])
+        self.assertEqual(value["derived_features"], [])
+        self.assertIn("analysis_window_environment_not_resolved", value["coverage"]["missing_context"])
+        self.assertIn("insufficient_data", result["result"]["quality_flags"])
 
     def test_biological_context_features_preserves_time_bounded_genetic_context(self):
         request = json.loads(json.dumps(REQUEST))
