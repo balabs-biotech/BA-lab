@@ -50,10 +50,10 @@ begin
   end if;
   v_artifact := p_request_payload->'upstream_artifacts'->0;
 
-  select * into v_result
-  from public.engine_execution_results
-  where organization_id = p_organization_id
-    and execution_id = p_upstream_execution_id;
+  select r.* into v_result
+  from public.engine_execution_results as r
+  where r.organization_id = p_organization_id
+    and r.execution_id = p_upstream_execution_id;
 
   if not found then
     raise exception 'upstream QC result is unavailable' using errcode = '22023';
