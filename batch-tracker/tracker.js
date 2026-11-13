@@ -6865,15 +6865,19 @@ function mountCultureBiologicalAssessmentPanel(culture) {
     const contextPanel = document.getElementById("biologicalContextPanel");
     detailPanel.insertBefore(section, contextPanel || document.getElementById("cultureDetailTimeline"));
   }
+  const previousCultureId = section.dataset.cultureId || "";
+  if (previousCultureId !== culture.id) {
+    cultureBiologicalAssessmentRequestId++;
+  }
   section.dataset.cultureId = culture.id;
   const start = document.getElementById("cultureBiologicalAssessmentStart");
   const end = document.getElementById("cultureBiologicalAssessmentEnd");
-  if (!start.value) {
+  if (previousCultureId !== culture.id || !start.value) {
     start.value = culture.started_at
       ? localDateValue(new Date(culture.started_at))
       : localDateValue();
   }
-  if (!end.value) {
+  if (previousCultureId !== culture.id || !end.value) {
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
     end.value = localDateValue(tomorrow);
