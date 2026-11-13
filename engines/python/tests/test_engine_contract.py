@@ -615,8 +615,7 @@ class EngineContractTests(unittest.TestCase):
             value["observed_facts"][0]["source_record_ids"],
             [request["input"]["record_ids"][0]],
         )
-        self.assertIn("outside_requested_window", value["coverage"]["missing_context"]
-                      if "outside_requested_window" in value["coverage"]["missing_context"] else [])
+        self.assertIn("some_input_records_were_excluded", value["coverage"]["missing_context"])
 
     def test_biological_context_features_excludes_invalid_scope_and_explicitly_excluded_measurements(self):
         request = json.loads(json.dumps(REQUEST))
