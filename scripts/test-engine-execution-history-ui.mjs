@@ -2,7 +2,28 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 
 const tracker = readFileSync("batch-tracker/tracker.js", "utf8");
-const workspace = readFileSync("batch-tracker/workspace.html", "utf8");
+const workspace = readFileSync("batch-tracker/workspace.html", "utf8");\n
+const i18n = readFileSync("batch-tracker/i18n.js", "utf8");
+for (const label of [
+  "Évaluation du contexte biologique",
+  "Analyse exploitable",
+  "Données insuffisantes",
+  "Signaux qualité",
+  "Sources environnementales",
+  "Méthode et limites",
+  "Fenêtre demandée : ",
+  "Contexte manquant ou non résolu",
+  "Faits observés et sources",
+  "Caractéristiques calculées",
+  "Hypothèses à vérifier",
+  "Lacunes temporelles"
+]) assert.ok(i18n.includes(JSON.stringify(label)), "Missing BIE localization source key: " + label);
+for (const translation of [
+  "Biological context assessment",
+  "Avaliação do contexto biológico",
+  "تقييم السياق البيولوجي"
+]) assert.ok(i18n.includes(translation), "Missing BIE translation: " + translation);
+
 
 assert.match(workspace, /id="overviewRecentEngineExecutions"/);
 assert.match(workspace, /Afficher les dernières analyses calculées/);
@@ -23,7 +44,16 @@ assert.match(loader, /\.limit\(8\)/);
 assert.match(loader, /engineExecutionHistoryRequestId/);
 assert.match(loader, /isCurrentWorkspaceRevision/);
 
-const renderer = tracker.slice(rendererStart, overviewStart);
+const renderer = tracker.slice(rendererStart, overviewStart);\n
+const biologicalRendererStart = tracker.indexOf("function renderBiologicalContextAssessment(");
+assert.ok(biologicalRendererStart >= 0 && biologicalRendererStart < rendererStart);
+const biologicalRenderer = tracker.slice(biologicalRendererStart, rendererStart);
+for (const contract of ["biological.context_assessment", "record_counts_by_type", "missing_context", "observed_facts", "derived_features", "findings", "hypotheses", "temporal_gaps", "quality_flags", "limitations", "provenance", "source_references", "biological_contexts", "genetic_reference", "genetic_reference_ids", "strain_code", "culture_stage", "substrate_code", "production_system", "textContent"]) {
+  assert.ok(biologicalRenderer.includes(contract), "Missing BIE UI contract: " + contract);
+}
+assert.doesNotMatch(biologicalRenderer, /innerHTML|insertAdjacentHTML/);
+assert.match(renderer, /renderBiologicalContextAssessment\(article, result\)/);
+
 assert.match(renderer, /replaceChildren\(\)/);
 assert.match(renderer, /textContent/);
 assert.match(renderer, /quality_flags/);
@@ -70,12 +100,12 @@ for (const path of [
 ]) {
   const page = readFileSync(path, "utf8");
   if (path.includes("green-tech")) {
-    assert.match(page, /workspace\.html\?v=20261112-greentech-bie-assessment-5/);
-    assert.match(page, /tracker\.js\?v=20261112-greentech-bie-assessment-5/);
+    assert.match(page, /workspace\.html\?v=20261113-bie-i18n-1/);
+    assert.match(page, /tracker\.js\?v=20261113-bie-i18n-1/);
     assert.match(page, /environmental-data\.js\?v=20261112-greentech-engine-qc-1/);
   } else {
-    assert.match(page, /workspace\.html\?v=20261112-greentech-bie-assessment-5/);
-    assert.match(page, /tracker\.js\?v=20261112-greentech-bie-assessment-5/);
+    assert.match(page, /workspace\.html\?v=20261113-bie-i18n-1/);
+    assert.match(page, /tracker\.js\?v=20261113-bie-i18n-1/);
   }
 }
 
