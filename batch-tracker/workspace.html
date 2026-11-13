@@ -411,8 +411,27 @@
     <p class="muted">Avant d’enregistrer un nouveau contexte, clôturez la période actuelle pour éviter deux états biologiques simultanés.</p>
     <div><label for="biologicalContextCloseDate">Date de fin (exclue)</label><input id="biologicalContextCloseDate" type="date"><button id="biologicalContextCloseButton" type="button" class="secondary-button">Clôturer le contexte actif</button></div>
   </div>
+  <section class="bio-assessment-panel" aria-labelledby="cultureBieAssessmentTitle">
+    <div class="biological-context-heading">
+      <div><span class="section-kicker-label">BIOLOGICAL INTELLIGENCE ENGINE</span><h4 id="cultureBieAssessmentTitle">Évaluation du contexte biologique · BIE v0.2</h4></div>
+      <span class="assisted-entry-tag">Mycology / Lab</span>
+    </div>
+    <p class="muted">Lancez une évaluation descriptive de cette culture sur une fenêtre datée. Le moteur examine les mesures, les données environnementales et les informations biologiques disponibles ; il signale les lacunes sans produire de diagnostic.</p>
+    <div class="bio-assessment-dates">
+      <div><label for="cultureBieAssessmentStart">Début de la fenêtre</label><input id="cultureBieAssessmentStart" type="date" required></div>
+      <div><label for="cultureBieAssessmentEnd">Fin de la fenêtre (exclue)</label><input id="cultureBieAssessmentEnd" type="date" required></div>
+    </div>
+    <button id="runCultureBiologicalAssessment" type="button" class="secondary-button">Évaluer avec le BIE</button>
+    <p id="cultureBiologicalAssessmentMessage" class="muted" role="status" aria-live="polite">Le moteur doit être déployé et activé côté serveur pour exécuter cette évaluation.</p>
+  </section>
   <style>
     .biological-context-panel{margin:22px 0;padding:18px;border:1px solid var(--line,#303b34);border-radius:14px;background:var(--surface,#17201b)}
+    .bio-assessment-panel{margin-top:18px;padding:14px;border:1px solid var(--line,#303b34);border-radius:10px;background:var(--surface-raised,rgba(255,255,255,.025))}
+    .bio-assessment-dates{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:12px 0}
+    .bio-assessment-dates input{box-sizing:border-box;width:100%;margin-top:5px}
+    #cultureBiologicalAssessmentMessage[data-state="error"]{color:#f0a59b}
+    #cultureBiologicalAssessmentMessage[data-state="success"]{color:#a8d4a5}
+    @media(max-width:600px){.bio-assessment-dates{grid-template-columns:1fr}}
     .biological-context-heading{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap}
     .biological-context-heading h4{margin:5px 0 0}
     .biological-context-form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:16px}
