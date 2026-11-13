@@ -155,30 +155,34 @@ def _evaluate_interpretation_rules(
         if reference_manifest is None:
             raise ValueError("interpretation_rule_reference_not_in_dataset_manifest")
 
+        matching_contexts = [
+            context for context in biological_contexts
+            if all(context.get(field) == expected for field, expected in context_match.items())
+        ]
         if identity_match is not None:
             if identity_state != "documented" or not identity_assertions:
                 continue
-            if not any(
-                assertion.get("assertion_type") == identity_match["assertion_type"]
-                and assertion.get("assertion_value") == identity_match["assertion_value"]
-                and any(
-                    (
-                        assertion.get("subject_type") == "strain"
-                        and assertion.get("strain_id") == (context.get("genetic_reference") or {}).get("strain_id")
-                    ) or (
-                        assertion.get("subject_type") == "organism"
-                        and assertion.get("organism_id") == (context.get("genetic_reference") or {}).get("organism_id")
+            # Context and identity constraints must resolve against the same
+            # dated biological context. Combining a matching context A with
+            # an identity assertion belonging to context B is invalid.
+            matching_contexts = [
+                context for context in matching_contexts
+                if any(
+                    assertion.get("assertion_type") == identity_match["assertion_type"]
+                    and assertion.get("assertion_value") == identity_match["assertion_value"]
+                    and (
+                        (
+                            assertion.get("subject_type") == "strain"
+                            and assertion.get("strain_id") == (context.get("genetic_reference") or {}).get("strain_id")
+                        ) or (
+                            assertion.get("subject_type") == "organism"
+                            and assertion.get("organism_id") == (context.get("genetic_reference") or {}).get("organism_id")
+                        )
                     )
-                    for context in biological_contexts
+                    for assertion in identity_assertions
                 )
-                for assertion in identity_assertions
-            ):
-                continue
-
-        if not any(
-            all(context.get(field) == expected for field, expected in context_match.items())
-            for context in biological_contexts
-        ):
+            ]
+        if not matching_contexts:
             continue
         reference_sources.add(f"BA_LABS_RULE_REGISTRY/{reference_id}@{reference_version}#sha256={reference_manifest['content_sha256']}")
 
@@ -487,6 +491,8 @@ def analyze_biological_context_features(request: Mapping[str, Any]) -> dict[str,
         missing_context.append("biological_identity_not_documented")
 
     interpretation_rules = parameters.get("interpretation_rules", [])
+    if interpretation_rules and profile_state != "loaded":
+        raise ValueError("interpretation_profile_not_loaded_for_rules")
     findings, interpretation_sources = _evaluate_interpretation_rules(interpretation_rules, biological_contexts, derived_features, request.get("datasets", []), identity_state, identity_assertions)
     if findings:
         quality_flags = ["biological_diagnosis_not_performed", "rule_based_interpretation_performed"]

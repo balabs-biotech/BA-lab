@@ -586,6 +586,7 @@ class EngineContractTests(unittest.TestCase):
             "window_start": "2026-11-10T00:00:00Z",
             "window_end": "2026-11-11T00:00:00Z",
             "timezone": "Africa/Algiers",
+            "interpretation_profile_state": "loaded",
             "biological_contexts": [{
                 "context_id": "5c2b3a4d-5e6f-4789-8123-456789abcdef",
                 "valid_from": "2026-11-01",
@@ -697,6 +698,13 @@ class EngineContractTests(unittest.TestCase):
         self.assertIn("reference=ba-labs.protocols.pleurotus-fruiting@2026.1", finding["statement"])
         self.assertIn("BA_LABS_RULE_REGISTRY/ba-labs.protocols.pleurotus-fruiting@2026.1#sha256=" + ("d" * 64), result["result"]["provenance"]["source_references"])
         self.assertIn("BA_LABS_INTERPRETATION_PROFILE/biological.context.features@1.0.0#sha256=" + ("e" * 64), result["result"]["provenance"]["source_references"])
+        # A worker request cannot activate a profile's rules while claiming
+        # that the biological context was unstable for the requested window.
+        unstable_profile = json.loads(json.dumps(request))
+        unstable_profile["parameters"]["interpretation_profile_state"] = "context_not_stable"
+        with self.assertRaisesRegex(ValueError, "interpretation_profile_not_loaded_for_rules"):
+            analyze_biological_context_features(unstable_profile)
+
         mismatched_context = json.loads(json.dumps(request))
         mismatched_context["parameters"]["biological_contexts"][0]["strain_code"] = "OTHER-STRAIN"
         mismatch_result = execute_registered_engine(mismatched_context)
@@ -1210,6 +1218,29 @@ class EngineContractTests(unittest.TestCase):
             [rule], mismatched_contexts, features, datasets, "documented", assertions
         )
         self.assertEqual(mismatched, [])
+        # A context match and a matching identity assertion on two different
+        # temporal contexts must not be combined into one scientific finding.
+        split_contexts = [
+            {
+                "organism_kind": "fungus",
+                "genetic_reference": {
+                    "organism_id": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb",
+                    "strain_id": "88888888-8888-4888-8888-888888888888",
+                },
+            },
+            {
+                "organism_kind": "bacterium",
+                "genetic_reference": {
+                    "organism_id": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaab",
+                    "strain_id": "99999999-9999-4999-8999-999999999999",
+                },
+            },
+        ]
+        split_context_result, _ = _evaluate_interpretation_rules(
+            [rule], split_contexts, features, datasets, "documented", assertions
+        )
+        self.assertEqual(split_context_result, [])
+
 
 
 
