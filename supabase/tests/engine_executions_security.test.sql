@@ -175,6 +175,54 @@ begin
   exception when sqlstate '55000' then null;
   end;
 
+  -- Empty biological snapshots are valid and must persist as insufficient_data.
+  insert into public.engine_executions(
+    organization_id,request_id,idempotency_key,engine_id,engine_version,scope,
+    input_record_ids,input_snapshot_sha256,request_payload,status,requested_by
+  ) values (
+    v_org,'44444444-4444-4444-8444-444444444444','test-empty-snapshot-0001',
+    'biological.context.features','0.1.0',
+    '{"organization_id":"aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa","culture_id":"55555555-5555-4555-8555-555555555555"}',
+    '{}'::uuid[],repeat('e',64),
+    '{"input":{"record_ids":[],"records":[]},"parameters":{"window_start":"2026-11-10T00:00:00Z","window_end":"2026-11-11T00:00:00Z"}}',
+    'queued',v_user
+  );
+  update public.engine_executions
+    set status='running', started_at=now(), updated_at=now()
+    where organization_id=v_org and idempotency_key='test-empty-snapshot-0001';
+
+  perform public.complete_engine_execution(
+    v_org,
+    (select id from public.engine_executions where organization_id=v_org and idempotency_key='test-empty-snapshot-0001'),
+    jsonb_build_object(
+      'contract','BA-LABS/ENGINE-RESULT',
+      'contract_version','1.0.0',
+      'request_id','44444444-4444-4444-8444-444444444444',
+      'execution_id','66666666-6666-4666-8666-666666666666',
+      'engine',jsonb_build_object('engine_id','biological.context.features','engine_version','0.1.0'),
+      'input_snapshot_sha256',repeat('e',64),
+      'status','completed',
+      'started_at',now(),
+      'completed_at',now(),
+      'result',jsonb_build_object(
+        'outcome','insufficient_data',
+        'value',jsonb_build_object('coverage',jsonb_build_object('source_record_count',0)),
+        'limitations',jsonb_build_array('No source records were available in the requested window.'),
+        'quality_flags',jsonb_build_array('insufficient_source_records'),
+        'provenance',jsonb_build_object('algorithm','biological.context.features@0.1.0','source_record_ids',jsonb_build_array())
+      )
+    ),
+    now()
+  );
+  if not exists (
+    select 1 from public.engine_execution_results r
+    join public.engine_executions e on e.organization_id=r.organization_id and e.id=r.execution_id
+    where r.organization_id=v_org and e.idempotency_key='test-empty-snapshot-0001'
+      and r.outcome='insufficient_data'
+      and cardinality(r.input_record_ids)=0
+      and e.status='completed'
+  ) then raise exception 'empty biological snapshot must persist as an insufficient_data result'; end if;
+
   raise notice 'engine execution ledger security and idempotency contract passed';
 end $$;
 
