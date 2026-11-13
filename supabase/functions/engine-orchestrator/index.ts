@@ -22,7 +22,7 @@ const headers = {
 const MAX_BODY_BYTES = 48_000;
 const MAX_WORKER_RESPONSE_BYTES = 128_000;
 const WORKER_TIMEOUT_MS = 20_000;
-const EXECUTION_LEASE_MS = 120_000;
+const EXECUTION_LEASE_SECONDS = 120;
 const ENGINE_ALLOWLIST = new Map([["environmental.timeseries.qc", new Set(["0.2.0"])]]);
 const ajv = new Ajv2020({ allErrors: true, strict: true });
 addFormats(ajv);
@@ -476,17 +476,14 @@ Deno.serve(async (req: Request) => {
     return !error && !!data;
   }
 
-  const startedAt = new Date().toISOString();
-  const { data: startedExecution, error: startError } = await serviceClient.from("engine_executions")
-    .update({
-      status: "running",
-      started_at: startedAt,
-      updated_at: startedAt,
-      lease_expires_at: new Date(Date.parse(startedAt) + EXECUTION_LEASE_MS).toISOString(),
-    })
-    .eq("organization_id", organizationId).eq("id", execution.id).eq("status", "queued")
-    .select("id")
-    .maybeSingle();
+  const { data: claimedExecutions, error: startError } = await serviceClient.rpc("claim_engine_executions", {
+    p_worker_id: `edge-engine-orchestrator:${crypto.randomUUID()}`,
+    p_limit: 1,
+    p_lease_seconds: EXECUTION_LEASE_SECONDS,
+    p_execution_id: execution.id,
+    p_organization_id: organizationId,
+  });
+  const startedExecution = Array.isArray(claimedExecutions) ? claimedExecutions[0] : null;
   if (startError || !startedExecution) {
     const persisted = await persistExecutionFailure(
       "execution_start_failed",
