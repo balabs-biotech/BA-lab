@@ -7412,6 +7412,39 @@ function renderBiologicalContextAssessment(article, result) {
     review_required: "Révision nécessaire"
   };
   addLine(article, "Résultat : " + String(outcomeLabels[result.outcome] || "État non documenté"));
+  const environmentalQc = value.environmental_quality_control;
+  if (environmentalQc && typeof environmentalQc === "object") {
+    addLine(article, "Contrôle qualité environnemental amont");
+    const qcStateLabels = { passed: "Contrôle réussi", review_required: "Révision requise" };
+    addLine(article, "État du contrôle qualité : " + String(qcStateLabels[environmentalQc.state] || "État QC non documenté"));
+    if (environmentalQc.upstream_execution_id) {
+      addLine(article, "Exécution QC liée : " + String(environmentalQc.upstream_execution_id));
+    }
+    if (environmentalQc.upstream_result_id) {
+      addLine(article, "Résultat QC lié : " + String(environmentalQc.upstream_result_id));
+    }
+    if (environmentalQc.outcome) addLine(article, "Résultat QC : " + String(environmentalQc.outcome));
+    if (typeof environmentalQc.artifact_sha256 === "string") {
+      addLine(article, "Empreinte de l’artefact QC : SHA-256 " + environmentalQc.artifact_sha256.slice(0, 16));
+    }
+    addList(article, "Signaux QC à examiner", environmentalQc.quality_flags,
+      item => typeof item === "string" ? item : JSON.stringify(item), 12);
+    addList(article, "Limites du contrôle QC", environmentalQc.limitations,
+      item => typeof item === "string" ? item : JSON.stringify(item), 12);
+    const qcProvenance = environmentalQc.provenance || {};
+    if (qcProvenance.algorithm) addLine(article, "Algorithme QC : " + String(qcProvenance.algorithm));
+    if (Array.isArray(qcProvenance.source_references) && qcProvenance.source_references.length) {
+      addList(article, "Sources du contrôle QC", qcProvenance.source_references, item => item, 8);
+    }
+    const qcValue = environmentalQc.value || {};
+    if (Array.isArray(qcValue.series)) {
+      addLine(article, "Séries examinées par le contrôle QC : " + String(qcValue.series.length));
+    }
+    if (environmentalQc.state === "review_required") {
+      addLine(article, "Révision environnementale requise : les signaux QC sont des éléments à examiner, pas des exclusions automatiques.");
+    }
+  }
+
   addList(article, "Signaux qualité", result.quality_flags, item => item, 12);
   const provenance = result.provenance || {};
   if (provenance.algorithm) addLine(article, "Algorithme : " + String(provenance.algorithm));
