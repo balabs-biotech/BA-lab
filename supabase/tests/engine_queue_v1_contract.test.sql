@@ -449,42 +449,42 @@ create or replace function public.enqueue_engine_job(
   p_priority integer default 0, p_max_attempts integer default 3
 )
 returns uuid language sql security invoker set search_path = ''
-as $ select private.enqueue_engine_job(
+as $$ select private.enqueue_engine_job(
   p_organization_id, p_engine_code, p_engine_version, p_job_type,
   p_payload, p_idempotency_key, p_priority, p_max_attempts
-) $;
+) $$;
 
 create or replace function public.get_engine_job_status(p_job_id uuid)
 returns jsonb language sql security invoker set search_path = ''
-as $ select private.get_engine_job_status(p_job_id) $;
+as $$ select private.get_engine_job_status(p_job_id) $$;
 
 create or replace function public.claim_engine_job(p_worker_id text, p_lease_seconds integer default 60)
 returns jsonb language sql security invoker set search_path = ''
-as $ select private.claim_engine_job(p_worker_id, p_lease_seconds) $;
+as $$ select private.claim_engine_job(p_worker_id, p_lease_seconds) $$;
 
 create or replace function public.heartbeat_engine_job(
   p_job_id uuid, p_lease_token uuid, p_worker_id text, p_lease_seconds integer default 60
 )
 returns boolean language sql security invoker set search_path = ''
-as $ select private.heartbeat_engine_job(p_job_id, p_lease_token, p_worker_id, p_lease_seconds) $;
+as $$ select private.heartbeat_engine_job(p_job_id, p_lease_token, p_worker_id, p_lease_seconds) $$;
 
 create or replace function public.complete_engine_job(
   p_job_id uuid, p_lease_token uuid, p_worker_id text,
   p_result jsonb, p_result_summary text default null
 )
 returns boolean language sql security invoker set search_path = ''
-as $ select private.complete_engine_job(
+as $$ select private.complete_engine_job(
   p_job_id, p_lease_token, p_worker_id, p_result, p_result_summary
-) $;
+) $$;
 
 create or replace function public.fail_engine_job(
   p_job_id uuid, p_lease_token uuid, p_worker_id text,
   p_error_code text, p_error_details text, p_retryable boolean
 )
 returns text language sql security invoker set search_path = ''
-as $ select private.fail_engine_job(
+as $$ select private.fail_engine_job(
   p_job_id, p_lease_token, p_worker_id, p_error_code, p_error_details, p_retryable
-) $;
+) $$;
 
 revoke all on function private.enqueue_engine_job(uuid,text,text,text,jsonb,text,integer,integer) from public, anon, authenticated, service_role;
 revoke all on function private.get_engine_job_status(uuid) from public, anon, authenticated, service_role;
