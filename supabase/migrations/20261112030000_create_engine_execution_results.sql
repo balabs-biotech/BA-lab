@@ -77,6 +77,9 @@ begin
   if not found or v_execution.status <> 'running' then
     raise exception 'execution is missing or not running' using errcode = '55000';
   end if;
+  if p_result->>'execution_id' is distinct from v_execution.id::text then
+    raise exception 'result execution_id does not match durable ledger identity' using errcode = '22023';
+  end if;
   if p_result->>'request_id' <> v_execution.request_id::text
     or p_result->'engine'->>'engine_id' <> v_execution.engine_id
     or p_result->'engine'->>'engine_version' <> v_execution.engine_version

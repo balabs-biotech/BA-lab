@@ -137,6 +137,22 @@ begin
     set status='running', started_at=now(), updated_at=now()
     where organization_id=v_org and idempotency_key='test-result-0001';
 
+  begin
+    perform public.complete_engine_execution(
+      v_org,
+      (select id from public.engine_executions where organization_id=v_org and idempotency_key='test-result-0001'),
+      jsonb_build_object(
+        'contract','BA-LABS/ENGINE-RESULT',
+        'status','completed',
+        'execution_id','33333333-3333-4333-8333-333333333333',
+        'result',jsonb_build_object()
+      ),
+      now()
+    );
+    raise exception 'worker-local execution id must not be accepted as durable ledger identity';
+  exception when sqlstate '22023' then null;
+  end;
+
   perform public.complete_engine_execution(
     v_org,
     (select id from public.engine_executions where organization_id=v_org and idempotency_key='test-result-0001'),
@@ -144,7 +160,7 @@ begin
       'contract','BA-LABS/ENGINE-RESULT',
       'contract_version','1.0.0',
       'request_id','11111111-1111-4111-8111-111111111111',
-      'execution_id','33333333-3333-4333-8333-333333333333',
+      'execution_id',(select id::text from public.engine_executions where organization_id=v_org and idempotency_key='test-result-0001'),
       'engine',jsonb_build_object('engine_id','environmental.timeseries.qc','engine_version','0.1.0'),
       'input_snapshot_sha256',repeat('d',64),
       'status','completed',
@@ -198,7 +214,7 @@ begin
       'contract','BA-LABS/ENGINE-RESULT',
       'contract_version','1.0.0',
       'request_id','44444444-4444-4444-8444-444444444444',
-      'execution_id','66666666-6666-4666-8666-666666666666',
+      'execution_id',(select id::text from public.engine_executions where organization_id=v_org and idempotency_key='test-empty-snapshot-0001'),
       'engine',jsonb_build_object('engine_id','biological.context.features','engine_version','0.1.0'),
       'input_snapshot_sha256',repeat('e',64),
       'status','completed',

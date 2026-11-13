@@ -54,6 +54,8 @@ const checks = [
   ["every failed execution transition is persisted and verified", /async function persistExecutionFailure[\s\S]*?status: "failed"[\s\S]*?\.in\("status", \["queued", "running"\]\)[\s\S]*?\.select\("id"\)[\s\S]*?return !error && !!data/],
   ["queued-to-running transition must return the updated ledger row before worker dispatch", /const \{ data: startedExecution, error: startError \}[\s\S]*?\.eq\("status", "queued"\)[\s\S]*?\.select\("id"\)[\s\S]*?\.maybeSingle\(\)[\s\S]*?if \(startError \|\| !startedExecution\)/],
   ["failed ledger writes are surfaced instead of silently reported as failed", /execution_state_persistence_failed/],
+  ["atomic result commit failures are persisted as terminal ledger failures", /persistExecutionFailure[\s\S]*?result_persistence_failed/],
+  ["worker result execution identity is rebound to the durable ledger row", /result\.execution_id = execution\.id/],
   ["successful results use atomic structured persistence", /rpc\("complete_engine_execution"/],
   ["atomic result persistence returns a durable result id", /result_id: resultId/],
   ["request and snapshot correlation is enforced", /input_snapshot_sha256/],
@@ -69,4 +71,14 @@ const sourceReadStart = source.indexOf("let sourceRows: Record<string, any>[];")
 const sourceReadEnd = source.indexOf("const records = sourceRows.map", sourceReadStart);
 assert.ok(sourceReadStart >= 0 && sourceReadEnd > sourceReadStart, "measurement snapshot query boundary exists");
 assert.doesNotMatch(source.slice(sourceReadStart, sourceReadEnd), /\.update\(/, "source records are never updated");
+assert.match(
+  source,
+  /async function readBoundedWorkerResponse\([\s\S]*?response\.body\.getReader\(\)[\s\S]*?MAX_WORKER_RESPONSE_BYTES/,
+  "worker response bytes are bounded while streaming, before the body is fully buffered",
+);
+assert.doesNotMatch(
+  source,
+  /workerBody = await workerResponse\.text\(\)/,
+  "orchestrator must not buffer an unbounded worker response before enforcing its limit",
+);
 console.log("Engine orchestration boundary contract passed");
