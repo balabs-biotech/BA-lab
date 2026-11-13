@@ -18,7 +18,8 @@ The package contains:
 - a standard-library PostgREST adapter for the queue RPC contract;
 - background lease heartbeat during engine execution;
 - conservative handling of heartbeat uncertainty: a worker that cannot confirm its lease does not write success or failure;
-- unit tests for registry resolution, failure isolation, heartbeat and stale-lease behavior.
+- a first deterministic environmental QC engine (`environmental.qc@1.0.0`) with explicit-rule validation, duplicate detection, provenance and bounded result summaries;
+- unit tests for registry resolution, failure isolation, heartbeat, stale-lease behavior and environmental QC.
 
 The PostgREST adapter is implemented against the public, least-privilege RPC contract and has mocked transport tests. The CLI-generated migration is versioned in the feature branch and is exercised by the disposable PostgreSQL 17 migration-replay CI job. It has not been applied to the hosted Supabase project.
 
@@ -32,7 +33,7 @@ PYTHONPATH=workers/cultureops_engine_worker/src python -m unittest discover -s w
 
 No third-party Python dependency is required for the worker-core and mocked adapter tests.
 
-The local process entry point supports `--once` (claim at most one job) and continuous polling, handles SIGINT/SIGTERM by stopping after the current job, and identifies itself as `hostname:pid`. It loads `register_engines(registry)` from `BAL_ENGINE_MODULE`; the default module is `bal_engine_worker.demo_engine`, which registers `demo.identity@1.0.0` for pipeline smoke tests. Set `BAL_ENGINE_MODULE` to a project plugin module when deploying real engines.
+The local process entry point supports `--once` (claim at most one job) and continuous polling, handles SIGINT/SIGTERM by stopping after the current job, and identifies itself as `hostname:pid`. It loads `register_engines(registry)` from `BAL_ENGINE_MODULE`; the default module is `bal_engine_worker.demo_engine`, which registers `demo.identity@1.0.0` for pipeline smoke tests. Set `BAL_ENGINE_MODULE=bal_engine_worker.environmental_engine` to load the environmental QC plugin. It expects an `observations` array and optional explicit `rules` keyed by `variable_code`; it does not infer agronomic thresholds or convert units. The default demo module remains available for queue smoke tests.
 
 From the repository root on Windows PowerShell, first set the package path and backend credentials in the current shell (replace the URL/key placeholders locally; never paste the service-role key into chat or source files):
 
