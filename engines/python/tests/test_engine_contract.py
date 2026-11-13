@@ -1274,6 +1274,88 @@ class EngineContractTests(unittest.TestCase):
         self.assertEqual(split_context_result, [])
 
 
+    def test_bie_consumes_verified_environmental_qc_artifact_without_dropping_flags(self):
+        request = json.loads(json.dumps(REQUEST))
+        request["engine"] = {
+            "engine_id": "biological.context.features",
+            "engine_version": "0.2.0",
+        }
+        location_id = "eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee"
+        request["scope"] = {
+            "organization_id": REQUEST["scope"]["organization_id"],
+            "culture_id": "2c2b3a4d-5e6f-4789-8123-456789abcdef",
+            "location_id": location_id,
+        }
+        request["parameters"] = {
+            "window_start": "2026-11-10T00:00:00Z",
+            "window_end": "2026-11-11T00:00:00Z",
+            "timezone": "Africa/Algiers",
+            "environment_link_state": "resolved",
+        }
+        request["input"]["record_ids"] = []
+        request["input"]["records"] = []
+        qc_value = {
+            "series": [{
+                "variable_code": "air_temperature",
+                "outlier_record_ids": ["3c2b3a4d-5e6f-4789-8123-456789abcdef"],
+            }],
+            "review_summary": {"outlier_count": 1},
+        }
+        artifact = {
+            "contract": "BA-LABS/UPSTREAM-ENGINE-ARTIFACT",
+            "contract_version": "1.0.0",
+            "role": "environmental_qc",
+            "execution_id": "cccccccc-cccc-4ccc-8ccc-cccccccccccc",
+            "result_id": "dddddddd-dddd-4ddd-8ddd-dddddddddddd",
+            "request_id": "11111111-1111-4111-8111-111111111111",
+            "engine_id": "environmental.timeseries.qc",
+            "engine_version": "0.2.0",
+            "completed_at": "2026-11-11T00:00:00Z",
+            "input_snapshot_sha256": "a" * 64,
+            "scope": {
+                "organization_id": request["scope"]["organization_id"],
+                "location_id": location_id,
+                "window_start": request["parameters"]["window_start"],
+                "window_end": request["parameters"]["window_end"],
+            },
+            "result": {
+                "outcome": "success",
+                "value": qc_value,
+                "limitations": ["Statistical flags require review."],
+                "quality_flags": ["outlier_detected"],
+                "provenance": {"algorithm": "environmental-timeseries-qc-v2"},
+            },
+        }
+        artifact["artifact_sha256"] = hashlib.sha256(
+            json.dumps(artifact, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode("utf-8")
+        ).hexdigest()
+        request["upstream_artifacts"] = [artifact]
+
+        result = execute_registered_engine(request)
+        self.assertEqual(result["status"], "completed", msg=str(result.get("error")))
+        value = result["result"]["value"]
+        qc = value["environmental_quality_control"]
+        self.assertEqual(qc["state"], "review_required")
+        self.assertEqual(qc["upstream_execution_id"], artifact["execution_id"])
+        self.assertEqual(qc["quality_flags"], ["outlier_detected"])
+        self.assertEqual(qc["value"], qc_value)
+        self.assertIn("environmental_qc_review_required", result["result"]["quality_flags"])
+        self.assertTrue(any(
+            source.startswith("BA_LABS_ENGINE_RESULT/environmental.timeseries.qc@0.2.0#execution=")
+            for source in result["result"]["provenance"]["source_references"]
+        ))
+        biological_schema = json.loads(
+            (ROOT / "schemas" / "biological" / "v1" / "context-assessment.schema.json").read_text(encoding="utf-8")
+        )
+        Draft202012Validator(biological_schema, format_checker=FormatChecker()).validate(value)
+
+        tampered = json.loads(json.dumps(request))
+        tampered["upstream_artifacts"][0]["result"]["quality_flags"] = []
+        with self.assertRaisesRegex(ContractValidationError, "artifact digest mismatch"):
+            validate_request(tampered)
+
+
+
 
 
 if __name__ == "__main__":
