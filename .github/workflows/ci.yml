@@ -390,9 +390,9 @@ jobs:
       - uses: denoland/setup-deno@v2
         with:
           deno-version: v2.x
-      - name: Resolve and transpile the deployed Edge orchestration entrypoints
+      - name: Resolve Edge orchestration module graphs
         run: >-
-          deno check --no-check
+          deno cache
           supabase/functions/engine-orchestrator/index.ts
           supabase/functions/engine-queue-dispatch/index.ts
 
