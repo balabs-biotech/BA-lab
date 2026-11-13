@@ -37,6 +37,14 @@ type Execution = {
 function reply(status: number, body: Record<string, unknown>) {
   return new Response(JSON.stringify(body), { status, headers });
 }
+function stable(value: unknown): string {
+  if (Array.isArray(value)) return "[" + value.map(stable).join(",") + "]";
+  if (value && typeof value === "object") {
+    const row = value as Record<string, unknown>;
+    return "{" + Object.keys(row).sort().map((key) => JSON.stringify(key) + ":" + stable(row[key])).join(",") + "}";
+  }
+  return JSON.stringify(value);
+}
 function object(value: unknown): value is Record<string, any> {
   return !!value && typeof value === "object" && !Array.isArray(value);
 }
@@ -130,7 +138,7 @@ async function processExecution(
     request.engine?.engine_id !== execution.engine_id ||
     request.engine?.engine_version !== execution.engine_version ||
     request.scope?.organization_id !== execution.organization_id ||
-    JSON.stringify(request.scope) !== JSON.stringify(execution.scope) ||
+    stable(request.scope) !== stable(execution.scope) ||
     JSON.stringify(request.input?.record_ids) !== JSON.stringify(execution.input_record_ids) ||
     request.input?.snapshot_sha256 !== execution.input_snapshot_sha256) {
     return await persistFailure(
