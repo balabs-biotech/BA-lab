@@ -119,7 +119,6 @@ h1 span{color:#c3dda9;text-shadow:0 4px 30px #b9d5a822}
 #mainView .webgl-stage .webgl-status{color:#c3dda9;text-shadow:0 2px 12px #101a12}
 @media(max-width:760px){.wrap{padding-top:13px}.aside{border-left-color:#78917c}}
 
-
 /* Mobile touch targets: keep the 3D controls comfortable on phones. */
 @media(max-width:760px){
  #mainView .webgl-stage .webgl-controls{gap:7px}
@@ -229,7 +228,6 @@ h1 span{color:#8a684e;font-style:italic}
 }
 @media(max-width:390px){.brand small{letter-spacing:.08em}.lang{font-size:8px;padding:7px 4px}.view{min-height:650px}.sphere{width:94px}.hub{width:100px}}
 
-
 /* Mobile domain view: convert the orbiting overlay into a readable editorial index */
 @media(max-width:760px){
  .mini-map{
@@ -274,7 +272,6 @@ h1 span{color:#8a684e;font-style:italic}
  .ln1,.ln6{min-height:100px}
 }
 
-
 /* Progressive discovery: domain -> resource preview -> source page */
 #spherePage{border-radius:0;background:transparent;color:#e6d0ad;border:0;border-bottom:1px solid #b58b60;padding:9px 0;font-size:11px;letter-spacing:.06em}
 .mini-map{height:auto!important;min-height:420px;display:grid;grid-template-columns:repeat(12,minmax(0,1fr));grid-template-rows:auto auto auto;gap:12px;padding:22px 0 26px;align-items:stretch}
@@ -294,14 +291,12 @@ h1 span{color:#8a684e;font-style:italic}
  .linknode b{font-size:16px}.linknode small{font-size:10px;white-space:normal}
 }
 
-
 /* BALabs — experimental field atlas identity */
 :root{--paper:#e8e3d6;--ink:#182d34;--oxide:#b95639;--petrol:#172c31}
 html,body{background:var(--paper)!important;color:var(--ink)}
 body{background-color:var(--paper)!important;background-image:linear-gradient(90deg,#182d3409 1px,transparent 1px),linear-gradient(#182d3409 1px,transparent 1px),radial-gradient(ellipse at 82% 8%,#b9563910,transparent 28%),linear-gradient(135deg,#eee9dc,#dfdacd)!important;background-size:44px 44px,44px 44px,auto,auto;background-attachment:fixed}
 .wrap{max-width:1480px;padding:22px clamp(18px,5vw,82px) 40px}
 .top{border-bottom:2px solid var(--ink);padding-bottom:14px}
-
 
 .brand{gap:15px}.brand strong{font-size:13px;letter-spacing:.26em;color:var(--ink)}.brand small{color:#6d7168;letter-spacing:.12em;font-size:8px}
 .lang{border:0!important;border-radius:0!important;background:transparent!important;color:#596761;padding:9px 10px;border-bottom:2px solid transparent!important;font-size:10px}
@@ -359,7 +354,6 @@ h1 span{color:var(--oxide)!important;font-style:italic}
 .foot strong{color:var(--oxide)!important;font:italic 18px Georgia,serif!important;letter-spacing:.08em!important}
 @media(max-width:760px){.wrap{padding:14px 15px 28px!important}.hero{padding:60px 0 48px!important;gap:20px!important}.hero:before{top:20px;font-size:8px}h1{font-size:clamp(54px,14vw,82px)!important;line-height:.86!important}.scene{box-shadow:5px 5px 0 #b956392b!important}.scenehead{padding:15px!important}.scenehead strong{font-size:16px!important}.cluster-key{padding:13px!important}.mini{padding:24px 16px!important}.miniintro h2{font-size:clamp(37px,11vw,52px)!important}.mini-map{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important}.linknode,.linknode:nth-of-type(2),.linknode:nth-of-type(7){min-height:128px!important;padding:14px 10px!important}.linknode b{font-size:17px!important}.tile b{font-size:20px!important}.tile p{font-size:10px!important}}
 
-
 /* ===== BALABS / living matter design system v2 =====
    A tactile scientific field instrument: no generic card grid, no uniform pills. */
 :root{
@@ -377,7 +371,6 @@ body{
 .wrap{max-width:1560px!important;padding:26px clamp(18px,5.5vw,88px) 54px!important}
 .top{min-height:72px!important;border-bottom:1px solid #8f9b8b!important;position:relative}
 .top:after{content:"FIELD SYSTEM  /  BAL–01";position:absolute;right:0;bottom:-20px;font:8px ui-monospace,monospace;letter-spacing:.18em;color:#8d735e}
-
 
 .brand strong{font-size:14px!important;letter-spacing:.3em!important}
 .brand small{font:9px ui-monospace,monospace!important;letter-spacing:.08em!important}
@@ -477,7 +470,6 @@ h1 span{color:var(--atlas-oxide)!important;font-style:italic!important}
 }
 @media(prefers-reduced-motion:reduce){.sphere,.linknode,.lang{transition:none!important}}
 
-
 /* ==========================================================
    BALABS — ART DIRECTION 03: BIOLOGICAL FIELD / NOT A CARD UI
    Structural redesign: editorial composition, open surfaces,
@@ -500,7 +492,6 @@ body{
 .top:before{content:"";position:absolute;left:0;right:0;bottom:0;height:1px;background:linear-gradient(90deg,var(--field-rust) 0 13%,#a9ad9e 13% 72%,transparent 100%)}
 .top:after{content:"FIELD NOTES  /  01—08";bottom:-22px!important;right:0;font:8px ui-monospace,monospace!important;letter-spacing:.2em;color:#8a7560}
 .brand{display:flex;align-items:center;gap:16px!important}
-
 
 .brand strong{font:800 13px ui-monospace,monospace!important;letter-spacing:.27em!important;color:var(--field-ink)!important}
 .brand small{font:8px ui-monospace,monospace!important;letter-spacing:.08em!important;color:#68766e!important}
@@ -717,7 +708,6 @@ h1 span{font-style:italic!important;color:var(--field-rust)!important}
 }
 @media(prefers-reduced-motion:reduce){.linknode:before,.linknode:after{transition:none!important}}
 
-
 /* BALabs living morphology: replace decorative blobs with actual branching anatomy */
 .hero:after{
  width:clamp(250px,37vw,520px)!important;height:clamp(230px,32vw,430px)!important;
@@ -766,7 +756,6 @@ h1 span{font-style:italic!important;color:var(--field-rust)!important}
  .mini-core:before{inset:-35%}
 }
 
-
 /* Morphologies: each resource node gets its own biological topology. */
 #miniView .linknode{isolation:isolate;overflow:visible;border:0!important;box-shadow:none!important}
 #miniView .linknode:before{z-index:0;opacity:.88!important;transition:transform .35s ease,opacity .35s ease,filter .35s ease}
@@ -795,7 +784,6 @@ h1 span{font-style:italic!important;color:var(--field-rust)!important}
 #miniView .mini-core:before{inset:-55%!important;opacity:.78!important;animation:mycelial-drift 24s linear infinite}
 @keyframes mycelial-drift{to{transform:rotate(360deg)}}
 @media(prefers-reduced-motion:reduce){#miniView .mini-core:before{animation:none!important}}
-
 
 /* BA Labs editorial layer — integrated around, not inside, the 3D explorer */
 .editorial-feature,.editorial-about{position:relative;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,.9fr);align-items:center;gap:clamp(28px,6vw,88px);padding:clamp(54px,8vw,108px) clamp(22px,6vw,82px);overflow:hidden}
@@ -829,7 +817,6 @@ h1 span{font-style:italic!important;color:var(--field-rust)!important}
  .art-caption{font-size:8px}
 }
 @media(prefers-reduced-motion:reduce){.editorial-link span{transition:none}}
-
 
 /* Editorial navigation: clear wayfinding between the page and the 3D panel. */
 .site-nav{position:relative;z-index:20;display:flex;align-items:center;justify-content:center;gap:clamp(22px,5vw,68px);min-height:54px;padding:0 16px;background:#111B1D;border-top:1px solid #263B38;border-bottom:1px solid #263B38}
@@ -941,7 +928,6 @@ h1 span{font-style:italic!important;color:var(--field-rust)!important}
 @media(prefers-reduced-motion:reduce){
   .site-nav a,.lang{transition:none!important}
 }
-
 
 /* Editorial refinement 03 — photographic domain cards.
    Only the editorial work section is restyled; explorer/3D markup and scripts are untouched. */
@@ -1085,8 +1071,6 @@ h1 span{font-style:italic!important;color:var(--field-rust)!important}
   .editorial-work .work-card .work-topics{margin-left:18px!important;margin-right:18px!important}
 }
 
-
-
 /* Customer experience flow: projects → interactive explorer → domain directory */
 #app > main > #chantiers{scroll-margin-top:76px}
 #app > main > #universe{
@@ -1112,7 +1096,6 @@ h1 span{font-style:italic!important;color:var(--field-rust)!important}
  #app > main > #universe #mainView{border-radius:8px}
  #app > main > #universes .universe-index-card{min-height:205px}
 }
-
 
 /* RTL editorial polish — mirror directional micro-interactions, not the biological scene. */
 #app.balabs-ui[dir="rtl"] > main .site-nav a:after,
@@ -1148,9 +1131,6 @@ h1 span{font-style:italic!important;color:var(--field-rust)!important}
   #app.balabs-ui .editorial-link span{transition:none!important}
 }
 
-
-
-
 #mainView .webgl-focus-next{margin-top:5px;color:#829b80;font:600 9px/1.4 system-ui,sans-serif;letter-spacing:.09em;text-transform:uppercase}
 #mainView .webgl-focus-links{display:flex;flex-wrap:wrap;gap:5px;max-height:132px;overflow:auto;overscroll-behavior:contain;pointer-events:auto}
 #mainView .webgl-focus-link{display:flex;flex-direction:column;align-items:flex-start;gap:2px;max-width:100%;border:1px solid #a9c5a336;border-radius:10px;padding:6px 9px;background:#a9c5a30b;color:#d9e8d4;font:500 10px/1.25 system-ui,sans-serif;cursor:pointer;text-align:start;transition:background .18s,border-color .18s,color .18s}#mainView .webgl-focus-reason{color:#9db49a;font:400 9px/1.25 system-ui,sans-serif;white-space:normal;opacity:.92}
@@ -1172,9 +1152,6 @@ h1 span{font-style:italic!important;color:var(--field-rust)!important}
 #mainView .webgl-stage .webgl-status{font-weight:800}
 @media(prefers-reduced-motion:reduce){.btn,.lang,#mainView .webgl-focus-link{transition:none!important}.btn:hover,#mainView .webgl-focus-link:hover{transform:none}}
 
-
-
-
 /* Original BA Labs mycelium vector: thicker living filaments + mineral light field.
    Inline SVG is authored for this project; no stock-image licence or external asset dependency. */
 .hero{isolation:isolate;overflow:visible}
@@ -1194,9 +1171,6 @@ h1 span{font-style:italic!important;color:var(--field-rust)!important}
 @media(max-width:760px){
  .hero:after{right:-7%!important;top:16%!important;width:74vw!important;height:300px!important;opacity:.72!important}
 }
-
-
-
 
 /* Microscopy layer: real Podospora anserina hyphae, fluorescent micrograph.
    The original custom SVG remains as a local fallback if the remote image is unavailable. */
@@ -1222,8 +1196,6 @@ h1 span{font-style:italic!important;color:var(--field-rust)!important}
  .asset-credit{font-size:7px}
 }
 @media(prefers-reduced-motion:reduce){.hero:after{transform:none!important}}
-
-
 
 /* Mobile header: keep the four language choices balanced and remove duplicate folio noise. */
 @media(max-width:760px){
@@ -1258,8 +1230,6 @@ h1 span{font-style:italic!important;color:var(--field-rust)!important}
  .top .lang{font-size:8px!important}
 }
 
-
-
 /* Keep the microscopy image atmospheric on narrow screens, never competing with the headline. */
 @media(max-width:760px){
  .hero:after{
@@ -1273,8 +1243,6 @@ h1 span{font-style:italic!important;color:var(--field-rust)!important}
  .hero>div:first-child{position:relative!important;z-index:2!important}
  .hero .aside{position:relative!important;z-index:2!important;background:linear-gradient(90deg,rgba(239,237,229,.88),rgba(239,237,229,.48))!important}
 }
-
-
 
 :root{color-scheme:dark;--bg:#10191b;--ink:#e7e8dc;--line:#34494a}
 html,body{background:#10191b!important;color:#e7e8dc!important}
@@ -1312,8 +1280,6 @@ body{background:radial-gradient(ellipse at 50% 48%,#263d38 0%,#172526 43%,#10191
  .mini{padding:100px 14px 24px!important}
 }
 
-
-
 .scenehead:before{display:none!important;content:none!important}
 .scenehead{top:86px!important;left:clamp(18px,3vw,42px)!important;right:clamp(18px,3vw,42px)!important;justify-content:flex-start!important;min-height:34px!important}
 .scenehead>div{display:flex;align-items:center;gap:12px}
@@ -1328,8 +1294,6 @@ body{background:radial-gradient(ellipse at 50% 48%,#263d38 0%,#172526 43%,#10191
  .scenehead strong{font-size:9px!important;max-width:220px}
  #mainView .webgl-stage{min-height:100%!important}
 }
-
-
 
 /* Visual language inspired by scientific field illustration, not a template landing page. */
 :root{--atlas-white:#f1f0e8;color:var(--atlas-white)!important}
@@ -1395,8 +1359,6 @@ body{background:radial-gradient(ellipse at 50% 8%,#1c302d 0%,#101a1b 45%,#080d0f
 }
 @media(prefers-reduced-motion:reduce){.hero:after{scroll-behavior:auto}}
 
-
-
 .hero{isolation:isolate!important}
 .hero .hero-micrograph{position:absolute!important;inset:0!important;z-index:-2!important;display:block!important;width:100%!important;height:100%!important;object-fit:cover!important;object-position:64% 42%!important;filter:grayscale(1) contrast(1.3) brightness(.72)!important;opacity:1!important;pointer-events:none!important}
 .hero:after{background-image:linear-gradient(90deg,rgba(6,11,13,.92) 0%,rgba(6,11,13,.70) 38%,rgba(6,11,13,.25) 78%,rgba(6,11,13,.42) 100%),linear-gradient(0deg,#080d0f 0%,transparent 34%,rgba(5,9,10,.12) 100%)!important;filter:none!important;opacity:1!important}
@@ -1409,15 +1371,12 @@ body{background:radial-gradient(ellipse at 50% 8%,#1c302d 0%,#101a1b 45%,#080d0f
  .hero .aside b{color:#f2f0e8!important}
 }
 
-
-
 /* Editorial site shell: the 3D universe is one featured panel, not the whole website. */
 :root{--shell-paper:#eeeade;--shell-ink:#172a2d;--shell-muted:#65736d;--shell-night:#0b1214}
 html,body{min-height:100%;background:var(--shell-night)!important;color:var(--shell-ink)!important}
 body{background:linear-gradient(180deg,#0b1214 0,#101a1b 44%,#eeeade 44%,#eeeade 100%)!important;background-attachment:scroll!important}
 .wrap{width:100%!important;max-width:1500px!important;min-height:0!important;margin:0 auto!important;padding:0 clamp(18px,5vw,76px) 0!important;background:transparent!important}
 .top{position:relative!important;inset:auto!important;z-index:40!important;min-height:82px!important;display:flex!important;align-items:center!important;justify-content:space-between!important;padding:14px 0!important;border-bottom:1px solid #d8ded2!important;background:#0b1214!important;backdrop-filter:none!important}
-
 
 .brand strong{color:#f0f1e9!important;letter-spacing:.22em!important}
 .brand small{color:#aab9ad!important}
@@ -1489,8 +1448,6 @@ body{background:linear-gradient(180deg,#0b1214 0,#101a1b 44%,#eeeade 44%,#eeeade
  .foot{flex-direction:column!important;align-items:flex-start!important;padding:20px 8px 26px!important}
 }
 
-
-
 /* Restore editorial readability over the microscopy hero. */
 .hero h1,.hero h1 span{color:#f2f0e7!important}
 .hero h1 span{color:#c4d0b7!important}
@@ -1505,8 +1462,6 @@ body{background:linear-gradient(180deg,#0b1214 0,#101a1b 44%,#eeeade 44%,#eeeade
  .hero .aside{background:#111B1Ddb!important;padding:12px 14px!important}
 }
 
-
-
 #app section.hero .hero-micrograph{filter:grayscale(1) contrast(1.18) brightness(.38)!important;opacity:1!important}
 #app section.hero div .eyebrow{color:#D39A7D!important;text-shadow:0 1px 8px #111B1D!important}
 #app section.hero h1,#app section.hero h1 span{color:#F2F0E7!important;text-shadow:0 2px 16px #111B1D!important}
@@ -1514,8 +1469,6 @@ body{background:linear-gradient(180deg,#0b1214 0,#101a1b 44%,#eeeade 44%,#eeeade
 #app section.hero p[data-i18n="intro"]{color:#E7E8DF!important;text-shadow:0 1px 10px #111B1D!important}
 #app section.hero .aside{background:#111B1Ddb!important;border-left:2px solid #B96B4D!important;padding:12px 16px!important;color:#D1D0C5!important}
 #app section.hero .aside b,#app section.hero .aside span{color:#D1D0C5!important}
-
-
 
 /* Responsive refinement: preserve editorial rhythm on tablets and touch screens. */
 @media (min-width:761px) and (max-width:1040px){
@@ -1534,7 +1487,6 @@ body{background:linear-gradient(180deg,#0b1214 0,#101a1b 44%,#eeeade 44%,#eeeade
 }
 :where(a,button,[tabindex]):focus-visible{outline:2px solid #B96B4D;outline-offset:4px}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto!important}}
-
 
 /* 2026-10-30 — editorial clarity pass: remove decorative noise and blur.
    Deliberately scoped to the editorial surface; the 3D explorer is not modified. */
@@ -1593,7 +1545,6 @@ body{background:linear-gradient(180deg,#0b1214 0,#101a1b 44%,#eeeade 44%,#eeeade
   border:0!important;
 }
 
-
 .work-card h3,.work-soil h3,.work-iot h3{color:#F0EEE5!important}
 .work-card p,.work-soil p,.work-iot p{color:#D1D8CF!important}
 .work-index,.work-tag,.work-soil .work-tag{color:#D6A087!important}
@@ -1621,8 +1572,6 @@ body{background:linear-gradient(180deg,#0b1214 0,#101a1b 44%,#eeeade 44%,#eeeade
   .work-card,.work-myco,.work-soil,.work-iot{background:#263B38!important}
   .editorial-method{background:#D1D0C5!important}
 }
-
-
 
 /* 2026-10-30 — structural art direction: stop the repeated illustrated-board effect.
    Remove ornamental line drawings; let typography, real imagery and whitespace carry the story.
@@ -1753,8 +1702,6 @@ body{background:linear-gradient(180deg,#0b1214 0,#101a1b 44%,#eeeade 44%,#eeeade
   .work-tag{margin-top:18px!important}
 }
 
-
-
 /* 2026-10-30 — real scientific photography in the editorial feature */
 .editorial-feature{
   grid-template-columns:minmax(0,1fr) minmax(300px,.92fr)!important;
@@ -1811,8 +1758,6 @@ body{background:linear-gradient(180deg,#0b1214 0,#101a1b 44%,#eeeade 44%,#eeeade
   .editorial-feature .art-caption{font-size:8px}
 }
 
-
-
 /* 2026-10-30 — bridge editorial simplification: remove the last decorative line drawing */
 .universe-bridge{
   display:block!important;
@@ -1860,8 +1805,6 @@ body{background:linear-gradient(180deg,#0b1214 0,#101a1b 44%,#eeeade 44%,#eeeade
   .universe-bridge .bridge-copy h2{font-size:clamp(38px,10vw,56px)!important}
   .universe-bridge .bridge-action{width:auto!important;max-width:100%;justify-content:space-between}
 }
-
-
 
 /* 2026-10-30 — work domains: three distinct, credited photographic subjects */
 .work-grid{
@@ -1926,8 +1869,6 @@ body{background:linear-gradient(180deg,#0b1214 0,#101a1b 44%,#eeeade 44%,#eeeade
     margin-left:18px!important;margin-right:18px!important
   }
 }
-
-
 
 /* 2026-10-30 — editorial rhythm and domain distinction */
 .editorial-feature,
@@ -2026,10 +1967,6 @@ body{background:linear-gradient(180deg,#0b1214 0,#101a1b 44%,#eeeade 44%,#eeeade
   }
   .editorial-method .method-steps li:first-child{border-top:0!important}
 }
-
-
-
-
 
 /* 2026-10-30 — applied visual direction: photographic editorial homepage */
 :root{--bg:#111B1D!important;--ink:#F0EEE5!important;padding:0!important;background:#111B1D!important}
@@ -2193,10 +2130,6 @@ body{background:linear-gradient(180deg,#0b1214 0,#101a1b 44%,#eeeade 44%,#eeeade
  .editorial-method .method-steps{grid-template-columns:1fr!important}
 }
 
-
-
-
-
 /* 2026-10-30 — finishing pass: image-led cards, editorial alignment and RTL */
 .editorial-work .work-card{
   position:relative!important;
@@ -2269,7 +2202,6 @@ body{background:linear-gradient(180deg,#0b1214 0,#101a1b 44%,#eeeade 44%,#eeeade
 [dir="rtl"] .editorial-work .work-card-link{flex-direction:row-reverse!important}
 [dir="rtl"] .universe-bridge .bridge-network{justify-self:start!important}
 
-
 /* Editorial refinement 07 — brighten the first impression; keep the biology visible. */
 .hero{
  background:linear-gradient(105deg,rgba(233,232,223,.98) 0%,rgba(233,232,223,.94) 42%,rgba(233,232,223,.76) 72%,rgba(38,59,56,.20) 100%)!important;
@@ -2304,8 +2236,6 @@ body{background:linear-gradient(180deg,#0b1214 0,#101a1b 44%,#eeeade 44%,#eeeade
  .hero-action-secondary{color:#263B38!important}
  .hero-credit{color:#263B38!important}
 }
-
-
 
 /* Editorial system: distinct section rhythms, mineral contrast, no stacked cream panels. */
 #app > main > .editorial-feature{
