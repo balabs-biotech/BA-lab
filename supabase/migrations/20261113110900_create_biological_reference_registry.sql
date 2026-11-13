@@ -34,23 +34,23 @@ begin
       if (to_jsonb(new) - 'status' - 'valid_to')
          is distinct from
          (to_jsonb(old) - 'status' - 'valid_to') then
-        raise exception 'activated profile scientific content is immutable';
+        raise exception 'activated profile scientific content is immutable' using errcode = '55000';
       end if;
       if new.valid_to is null then
-        raise exception 'retiring an activated profile requires a finite valid_to date';
+        raise exception 'retiring an activated profile requires a finite valid_to date' using errcode = '55000';
       end if;
       if old.valid_to is not null and new.valid_to > old.valid_to then
-        raise exception 'retirement may only shorten an activated profile validity window';
+        raise exception 'retirement may only shorten an activated profile validity window' using errcode = '55000';
       end if;
     else
       if (to_jsonb(new) - 'status') is distinct from (to_jsonb(old) - 'status') then
-        raise exception 'activated profile versions are immutable';
+        raise exception 'activated profile versions are immutable' using errcode = '55000';
       end if;
       if old.status = 'retired' and new.status <> 'retired' then
-        raise exception 'retired profile versions cannot be reactivated';
+        raise exception 'retired profile versions cannot be reactivated' using errcode = '55000';
       end if;
       if old.status = 'active' and new.status not in ('active', 'retired') then
-        raise exception 'active profile can only remain active or be retired';
+        raise exception 'active profile can only remain active or be retired' using errcode = '55000';
       end if;
     end if;
   end if;
@@ -65,7 +65,7 @@ set search_path = pg_catalog, public
 as $function$
 begin
   if old.status in ('active', 'retired') then
-    raise exception 'activated profile versions cannot be deleted';
+    raise exception 'activated profile versions cannot be deleted' using errcode = '55000';
   end if;
   return old;
 end;
@@ -207,7 +207,7 @@ begin
        and (to_jsonb(new) - 'status') is not distinct from (to_jsonb(old) - 'status') then
       return new;
     end if;
-    raise exception 'validated biological reference versions are immutable';
+    raise exception 'validated biological reference versions are immutable' using errcode = '55000';
   end if;
   if new.status in ('validated', 'retired') and (
     new.reviewed_by is null or new.reviewed_at is null
@@ -225,7 +225,7 @@ set search_path = pg_catalog, public
 as $function$
 begin
   if old.status in ('validated', 'retired') then
-    raise exception 'validated biological reference versions cannot be deleted';
+    raise exception 'validated biological reference versions cannot be deleted' using errcode = '55000';
   end if;
   return old;
 end;
