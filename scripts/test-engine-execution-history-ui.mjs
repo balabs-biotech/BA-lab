@@ -22,7 +22,13 @@ for (const label of [
 for (const entry of [
   ["Évaluation du contexte biologique", "Biological context assessment"],
   ["Évaluation du contexte biologique", "Avaliação do contexto biológico"],
-  ["Évaluation du contexte biologique", "تقييم السياق البيولوجي"]
+  ["Évaluation du contexte biologique", "تقييم السياق البيولوجي"],
+  ["Contextes biologiques datés", "Dated biological contexts"],
+  ["Contextes biologiques datés", "Contextos biológicos datados"],
+  ["Contextes biologiques datés", "السياقات البيولوجية المؤرخة"],
+  ["Résultat : ", "Result: "],
+  ["Résultat : ", "Resultado: "],
+  ["Résultat : ", "النتيجة: "]
 ]) {
   assert.ok(i18n.includes(JSON.stringify(entry[0]) + ":" + JSON.stringify(entry[1])), "Missing BIE translation: " + entry[1]);
 }
