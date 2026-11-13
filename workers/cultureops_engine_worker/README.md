@@ -15,11 +15,12 @@ Python 3.10+ worker foundation for the CultureOps execution architecture.
 The package contains:
 - an exact-version engine contract and registry;
 - a single-job worker boundary;
+- a standard-library PostgREST adapter for the queue RPC contract;
 - background lease heartbeat during engine execution;
 - conservative handling of heartbeat uncertainty: a worker that cannot confirm its lease does not write success or failure;
 - unit tests for registry resolution, failure isolation, heartbeat and stale-lease behavior.
 
-It deliberately does not connect to Supabase yet. Durable queue claiming, lease storage, fencing-token validation, retry scheduling and result persistence remain database-adapter responsibilities and are not operational until the SQL migration and integration tests exist.
+The PostgREST adapter is implemented against the public, least-privilege RPC contract and has mocked transport tests. The database contract currently exists as a disposable PostgreSQL 17 CI fixture, not as an applied Supabase migration. Do not point the adapter at production until the CLI-generated migration has been reviewed and deployed separately.
 
 ## Local checks
 
@@ -29,7 +30,9 @@ From the repository root:
 PYTHONPATH=workers/cultureops_engine_worker/src python -m unittest discover -s workers/cultureops_engine_worker/tests -v
 ```
 
-No third-party Python dependency is required for the worker-core tests.
+No third-party Python dependency is required for the worker-core and mocked adapter tests.
+
+The future local worker process will read `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` from its environment. The service-role key is backend-only: never place it in frontend code, commit it, or paste it into source files.
 
 ## Design constraints
 
