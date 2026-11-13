@@ -40,7 +40,7 @@ declare
   bie_id uuid := 'dddddddd-dddd-4ddd-8ddd-dddddddddddd';
   qc_result_id uuid;
   got uuid;
-  ts timestamptz := '2026-11-13T10:00:00Z';
+  ts timestamptz;
   qc_scope jsonb := '{"organization_id":"aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa","location_id":"eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee"}';
   params jsonb := '{"window_start":"2026-11-12T00:00:00Z","window_end":"2026-11-13T00:00:00Z"}';
 begin
@@ -53,6 +53,7 @@ begin
  values(org_id,qc_id,'11111111-1111-4111-8111-111111111111','qc-dependency-fixture','environmental.timeseries.qc','0.2.0',qc_scope,'{}',repeat('a',64),
  jsonb_build_object('parameters',params),'queued');
  perform public.claim_engine_executions('lineage-fixture-worker',1,120,qc_id,org_id);
+ ts := clock_timestamp();
  qc_result_id := public.complete_claimed_engine_execution(
    org_id,qc_id,
    jsonb_build_object(
