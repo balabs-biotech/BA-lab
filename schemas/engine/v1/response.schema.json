@@ -183,8 +183,7 @@
                 },
                 "source_revision": {
                   "type": "string",
-                  "minLength": 1,
-                  "maxLength": 80
+                  "pattern": "^(unrecorded|[a-f0-9]{40}|[a-f0-9]{64})$"
                 },
                 "python_version": {
                   "type": "string",
@@ -193,8 +192,7 @@
                 },
                 "container_image_digest": {
                   "type": "string",
-                  "minLength": 1,
-                  "maxLength": 200
+                  "pattern": "^sha256:[a-f0-9]{64}$"
                 },
                 "dependencies": {
                   "type": "array",
