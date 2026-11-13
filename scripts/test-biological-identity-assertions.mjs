@@ -1,4 +1,5 @@
-import assert from "node:assert/strict";\nimport { createHash } from "node:crypto";
+import assert from "node:assert/strict";
+import { createHash } from "node:crypto";
 import { loadAuthenticatedBiologicalIdentityAssertions } from "../supabase/functions/_shared/biological-identity-assertions.ts";
 const organizationId = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa";
 const organismId = "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb";
