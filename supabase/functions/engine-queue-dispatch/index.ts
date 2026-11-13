@@ -151,7 +151,15 @@ async function processExecution(
     ) ? "failed" : "lost";
   }
 
-  const actualSnapshotDigest = await sha256(stable(request.input?.records));
+  // BIE snapshots bind both observation records and the resolved biological
+  // context descriptors. Other engines bind their record array only.
+  const snapshotPayload = execution.engine_id === "biological.context.features"
+    ? {
+      records: request.input?.records,
+      biological_contexts: request.parameters?.biological_contexts ?? [],
+    }
+    : request.input?.records;
+  const actualSnapshotDigest = await sha256(stable(snapshotPayload));
   if (actualSnapshotDigest !== execution.input_snapshot_sha256) {
     return await persistFailure(
       db, execution, workerId, "input_snapshot_digest_mismatch",
