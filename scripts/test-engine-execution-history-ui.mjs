@@ -7,6 +7,11 @@ const workspace = readFileSync("batch-tracker/workspace.html", "utf8");
 const i18n = readFileSync("batch-tracker/i18n.js", "utf8");
 for (const label of [
   "Évaluation du contexte biologique",
+  "Identité : ",
+  "Identité biologique documentée",
+  "Identité biologique non documentée",
+  "Identité biologique contradictoire",
+  "Assertions d’identité vérifiées",
   "Analyse exploitable",
   "Données insuffisantes",
   "Signaux qualité",
@@ -21,6 +26,10 @@ for (const label of [
 ]) assert.ok(i18n.includes(JSON.stringify(label)), "Missing BIE localization source key: " + label);
 for (const entry of [
   ["Évaluation du contexte biologique", "Biological context assessment"],
+  ["Identité biologique documentée", "Documented biological identity"],
+  ["Identité biologique non documentée", "Biological identity not documented"],
+  ["Identité biologique contradictoire", "Conflicting biological identity"],
+  ["Assertions d’identité vérifiées", "Verified identity assertions"],
   ["Évaluation du contexte biologique", "Avaliação do contexto biológico"],
   ["Évaluation du contexte biologique", "تقييم السياق البيولوجي"],
   ["Contextes biologiques datés", "Dated biological contexts"],
