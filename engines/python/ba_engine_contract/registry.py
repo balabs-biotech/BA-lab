@@ -2,14 +2,13 @@
 
 from __future__ import annotations
 
-import importlib
 import hashlib
+import importlib
 import json
+import os
 import platform
 import re
 from importlib import metadata
-import os
-import re
 from pathlib import Path
 from typing import Any, Mapping
 
