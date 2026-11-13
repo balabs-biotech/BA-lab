@@ -54,6 +54,7 @@ const checks = [
   ["every failed execution transition is persisted and verified", /async function persistExecutionFailure[\s\S]*?status: "failed"[\s\S]*?\.in\("status", \["queued", "running"\]\)[\s\S]*?\.select\("id"\)[\s\S]*?return !error && !!data/],
   ["queued-to-running transition must return the updated ledger row before worker dispatch", /const \{ data: startedExecution, error: startError \}[\s\S]*?\.eq\("status", "queued"\)[\s\S]*?\.select\("id"\)[\s\S]*?\.maybeSingle\(\)[\s\S]*?if \(startError \|\| !startedExecution\)/],
   ["failed ledger writes are surfaced instead of silently reported as failed", /execution_state_persistence_failed/],
+  ["atomic result commit failures are persisted as terminal ledger failures", /persistExecutionFailure[\s\S]*?result_persistence_failed/],
   ["successful results use atomic structured persistence", /rpc\("complete_engine_execution"/],
   ["atomic result persistence returns a durable result id", /result_id: resultId/],
   ["request and snapshot correlation is enforced", /input_snapshot_sha256/],
