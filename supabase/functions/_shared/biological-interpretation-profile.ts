@@ -105,7 +105,7 @@ export async function buildBiologicalInterpretationProfile(input: {
   if (applicable.length === 0) {
     return { state: "not_configured", profile: null, rules: [], datasets: [] };
   }
-  if (applicable.length !== 1) throw new Error("interpretation_profile_ambiguous");
+  if (applicable.length !== 1) throw new Error("active_interpretation_profile_ambiguous");
 
   const profile = applicable[0];
   if (
