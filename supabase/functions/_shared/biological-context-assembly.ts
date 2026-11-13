@@ -39,7 +39,7 @@ export async function assembleResolvedBiologicalContextSnapshot(input: {
   contexts: Array<{
     id: string;
     organization_id: string;
-    domain: string;
+    domain?: string;
     culture_id: string | null;
     plant_culture_id?: string | null;
     environment_id: string;
