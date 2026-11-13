@@ -32,7 +32,9 @@ PYTHONPATH=workers/cultureops_engine_worker/src python -m unittest discover -s w
 
 No third-party Python dependency is required for the worker-core and mocked adapter tests.
 
-The future local worker process will read `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` from its environment. The service-role key is backend-only: never place it in frontend code, commit it, or paste it into source files.
+The local process entry point is `python -m bal_engine_worker.runner`. It supports `--once` (claim at most one job) and continuous polling, handles SIGINT/SIGTERM by stopping after the current job, and identifies itself as `hostname:pid`. It loads `register_engines(registry)` from `BAL_ENGINE_MODULE`; the default module is `bal_engine_worker.demo_engine`, which registers `demo.identity@1.0.0` for pipeline smoke tests. Set `BAL_ENGINE_MODULE` to a project plugin module when deploying real engines.
+
+The worker reads `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` from its process environment. The service-role key is backend-only: never place it in frontend code, commit it, or paste it into source files. Example (Linux/macOS shell): `export SUPABASE_URL=...` and `export SUPABASE_SERVICE_ROLE_KEY=...`, then run the module. Do not pass secrets as command-line arguments.
 
 ## Design constraints
 
