@@ -47,6 +47,9 @@ assert.match(workspace, /id="overviewRecentEngineExecutions"/);
 assert.match(workspace, /id="runCultureBiologicalAssessment"/);
 assert.match(workspace, /id="cultureBieAssessmentStart"/);
 assert.match(workspace, /id="cultureBieAssessmentEnd"/);
+assert.match(workspace, /class="bio-assessment-panel hidden"/);
+assert.match(tracker, /activeDomain !== "mycology" && activeDomain !== "laboratory"/);
+assert.match(tracker, /bio-assessment-panel[\s\S]*?activeDomain/);
 const cultureAssessmentStart = tracker.indexOf("async function runCultureBiologicalAssessment()");
 const plantAssessmentStart = tracker.indexOf("async function runPlantBiologicalAssessment()");
 assert.ok(cultureAssessmentStart >= 0 && plantAssessmentStart > cultureAssessmentStart,
