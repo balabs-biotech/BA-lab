@@ -330,6 +330,10 @@ def analyze_biological_context_features(request: Mapping[str, Any]) -> dict[str,
         missing_context.append("biological_context_not_recorded")
     if parameters.get("interpretation_profile_state") == "not_configured":
         missing_context.append("no_active_interpretation_profile")
+    elif parameters.get("interpretation_profile_state") == "context_not_stable":
+        missing_context.append("biological_context_not_stable_for_profile")
+    elif parameters.get("interpretation_profile_state") == "domain_ambiguous":
+        missing_context.append("biological_interpretation_domain_ambiguous")
     if any(
         (item.get("genetic_reference") or {}).get("status") == "unresolved"
         for item in biological_contexts
@@ -369,6 +373,10 @@ def analyze_biological_context_features(request: Mapping[str, Any]) -> dict[str,
         quality_flags = ["biological_interpretation_not_performed"]
     if parameters.get("interpretation_profile_state") == "not_configured":
         quality_flags.append("interpretation_profile_not_available")
+    elif parameters.get("interpretation_profile_state") == "context_not_stable":
+        quality_flags.append("interpretation_profile_context_not_stable")
+    elif parameters.get("interpretation_profile_state") == "domain_ambiguous":
+        quality_flags.append("interpretation_profile_domain_ambiguous")
     if environment_link_state == "ambiguous":
         quality_flags.append("environment_context_ambiguous")
     if environment_link_state == "conflict" or "conflict" in measurement_environment_states:
