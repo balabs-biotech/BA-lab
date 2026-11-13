@@ -32,3 +32,16 @@ stable
 as $$
   select nullif(current_setting('request.jwt.claim.sub', true), '')::uuid
 $$;
+
+
+-- Supabase JWT claims compatibility shim for worker-role contract tests.
+create or replace function auth.jwt()
+returns jsonb
+language sql
+stable
+as $$
+  select coalesce(
+    nullif(current_setting('request.jwt.claims', true), '')::jsonb,
+    '{}'::jsonb
+  )
+$$;
