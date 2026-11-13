@@ -55,6 +55,10 @@ begin
     raise exception 'organization owner must pass admin authorization helper';
   end if;
 
+  if private.is_org_admin('cccccccc-cccc-4ccc-8ccc-cccccccccccc'::uuid) then
+    raise exception 'organization admin helper must not authorize an unrelated tenant';
+  end if;
+
   insert into public.domain_interpretation_profiles(
     organization_id, domain, profile_code, profile_version, rules,
     status, valid_from
@@ -90,8 +94,18 @@ begin
   ) returning id into v_reference_id;
 
   update public.biological_reference_registry
-    set status='validated', reviewed_by=v_user, reviewed_at=now()
+    set status='validated'
     where id=v_reference_id;
+
+  if not exists (
+    select 1 from public.biological_reference_registry
+    where id=v_reference_id
+      and status='validated'
+      and reviewed_by=v_user
+      and reviewed_at is not null
+  ) then
+    raise exception 'reference review trigger must stamp reviewer identity and timestamp before immutability checks';
+  end if;
 
   begin
     update public.biological_reference_registry
