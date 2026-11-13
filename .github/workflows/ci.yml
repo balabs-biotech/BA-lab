@@ -125,6 +125,7 @@ jobs:
           node scripts/test-bal-json-import-ui.mjs
           node scripts/test-bal-json-schemas.mjs
           node scripts/test-engine-orchestrator-contract.mjs
+          node scripts/test-engine-queue-dispatcher-contract.mjs
           node scripts/test-engine-execution-history-ui.mjs
           node scripts/test-biological-context-assessment-schema.mjs
           node --experimental-strip-types scripts/test-biological-context-snapshot.mjs
