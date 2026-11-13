@@ -989,6 +989,99 @@ class EngineContractTests(unittest.TestCase):
                 self.assertIn("insufficient_data", response["result"]["quality_flags"])
                 self.assertEqual(response["input_snapshot_sha256"], "a" * 64)
 
+    def test_bie_v02_populated_plant_snapshot_through_jsonl_worker(self):
+        # Synthetic contract fixture: exercise the container's JSON-lines
+        # boundary with eligible observations, without implying biological advice.
+        request = json.loads(json.dumps(REQUEST))
+        request["engine"] = {
+            "engine_id": "biological.context.features",
+            "engine_version": "0.2.0",
+        }
+        plant_culture_id = "7c2b3a4d-5e6f-4789-8123-456789abcdef"
+        request["scope"] = {
+            "organization_id": REQUEST["scope"]["organization_id"],
+            "plant_culture_id": plant_culture_id,
+        }
+        request["input"]["snapshot_sha256"] = "c" * 64
+        request["parameters"] = {
+            "window_start": "2026-11-10T00:00:00Z",
+            "window_end": "2026-11-11T00:00:00Z",
+            "timezone": "Africa/Algiers",
+            "environment_link_state": "resolved",
+            "biological_context_supplied": True,
+            "biological_contexts": [{
+                "context_id": "77777777-7777-4777-8777-777777777777",
+                "valid_from": "2026-11-01",
+                "valid_to": None,
+                "organism_kind": "plant",
+                "taxon_code": "Solanum lycopersicum",
+                "strain_code": None,
+                "cultivar_code": "Yellow Pear",
+                "culture_stage": "vegetative",
+                "substrate_code": "synthetic-test-substrate",
+                "production_system": "greenhouse",
+                "context_tags": ["synthetic-fixture"],
+                "genetic_reference": {
+                    "status": "not_specified", "strain_id": None, "organism_id": None,
+                    "designation": None, "origin": None, "source_description": None,
+                    "scientific_name": None, "common_name": None,
+                    "taxonomy_source": None, "taxonomy_id": None,
+                },
+            }],
+            "interpretation_rules": [],
+            "interpretation_profile_state": "not_configured",
+            "biological_identity_state": "not_documented",
+            "biological_identity_assertions": [],
+        }
+        measurements = (
+            ("ac2b3a4d-5e6f-4789-8123-456789abcde1", 22.0, "2026-11-10T08:00:00Z"),
+            ("ac2b3a4d-5e6f-4789-8123-456789abcde2", 24.0, "2026-11-10T10:00:00Z"),
+            ("ac2b3a4d-5e6f-4789-8123-456789abcde3", 26.0, "2026-11-10T12:00:00Z"),
+        )
+        request["input"]["record_ids"] = [item[0] for item in measurements]
+        request["input"]["records"] = [{
+            "record_id": record_id,
+            "record_type": "measurement",
+            "payload_sha256": "e" * 64,
+            "data": {
+                "variable_code": "air_temperature",
+                "normalized_value": value,
+                "normalized_unit_code": "degC",
+                "measured_at": measured_at,
+            },
+            "context": {"plant_culture_id": plant_culture_id},
+        } for record_id, value, measured_at in measurements]
+
+        output = StringIO()
+        with patch("sys.stdin", StringIO(json.dumps(request))), patch("sys.stdout", output):
+            exit_code = worker_main()
+
+        self.assertEqual(exit_code, 0)
+        response = json.loads(output.getvalue())
+        self.assertEqual(response["status"], "completed", msg=str(response.get("error")))
+        self.assertEqual(response["engine"]["engine_version"], "0.2.0")
+        self.assertEqual(response["input_snapshot_sha256"], "c" * 64)
+        self.assertEqual(response["result"]["outcome"], "success")
+        value = response["result"]["value"]
+        self.assertEqual(value["subject"]["subject_type"], "plant")
+        self.assertEqual(value["subject"]["subject_id"], plant_culture_id)
+        self.assertEqual(value["coverage"]["source_record_count"], 3)
+        self.assertEqual(value["coverage"]["accepted_record_count"], 3)
+        self.assertEqual(len(value["observed_facts"]), 3)
+        self.assertEqual(len(value["derived_features"]), 4)
+        mean_feature = next(
+            feature for feature in value["derived_features"]
+            if feature["feature_code"] == "series.measurement.air_temperature.mean"
+        )
+        self.assertEqual(mean_feature["value"], 24.0)
+        self.assertEqual(mean_feature["unit_code"], "degC")
+        self.assertEqual(
+            mean_feature["source_record_ids"], request["input"]["record_ids"]
+        )
+        self.assertEqual(value["interpretation"]["findings"], [])
+        self.assertIn("no_active_interpretation_profile", value["coverage"]["missing_context"])
+        self.assertNotIn("recommendations", value)
+
     def test_biological_context_features_preserves_time_bounded_genetic_context(self):
         request = json.loads(json.dumps(REQUEST))
         request["engine"] = {
