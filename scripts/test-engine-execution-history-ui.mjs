@@ -43,6 +43,20 @@ for (const entry of [
 }
 
 
+
+assert.match(tracker, /function mountCultureBiologicalAssessmentPanel\(culture\)/);
+assert.match(tracker, /function runCultureBiologicalAssessment\(cultureId\)/);
+assert.match(tracker, /mountCultureBiologicalAssessmentPanel\(culture\)/);
+assert.match(tracker, /engine_version: "0\\.1\\.0"/);
+assert.match(tracker, /scope: \{ organization_id: operationOrganizationId, culture_id: cultureId \}/);
+assert.match(tracker, /window_start: startDate \+ "T00:00:00\\+01:00"/);
+assert.match(tracker, /window_end: endDate \+ "T00:00:00\\+01:00"/);
+assert.match(tracker, /!\["mycology", "laboratory"\]\.includes\(document\.body\.dataset\.domain\)/);
+assert.match(tracker, /cultureBiologicalAssessmentRequestId/);
+assert.match(tracker, /isCurrentWorkspaceRevision\(operationRevision, operationOrganizationId\)/);
+assert.match(tracker, /Le service engine-orchestrator n’est pas encore déployé/);
+assert.match(tracker, /Le moteur BIE v0\.1 n’est pas enregistré côté serveur/);
+
 assert.match(workspace, /id="overviewRecentEngineExecutions"/);
 assert.match(workspace, /Afficher les dernières analyses calculées/);
 
