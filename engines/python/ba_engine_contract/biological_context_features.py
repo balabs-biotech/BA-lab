@@ -124,7 +124,7 @@ def analyze_biological_context_features(request: Mapping[str, Any]) -> dict[str,
         except (TypeError, ValueError):
             excluded.append({"record_id": record_id, "reason": "invalid_or_timezone_naive_timestamp"})
             continue
-        if observed_at < window_start or observed_at > window_end:
+        if observed_at < window_start or observed_at >= window_end:
             excluded.append({"record_id": record_id, "reason": "outside_requested_window"})
             continue
 
