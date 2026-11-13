@@ -79,11 +79,17 @@ for (const field of ["upstream_execution_id", "upstream_result_id", "artifact_sh
 }
 for (const label of [
   "Contrôle qualité environnemental amont",
-  "État du contrôle qualité",
-  "Exécution QC liée",
-  "Résultat QC",
+  "État du contrôle qualité : ",
+  "Exécution QC liée : ",
+  "Résultat QC lié : ",
+  "Résultat QC : ",
+  "Empreinte de l’artefact QC : ",
   "Signaux QC à examiner",
-  "Révision environnementale requise"
+  "Limites du contrôle QC",
+  "Algorithme QC : ",
+  "Sources du contrôle QC",
+  "Séries examinées par le contrôle QC : ",
+  "Révision environnementale requise : les signaux QC sont des éléments à examiner, pas des exclusions automatiques."
 ]) assert.ok(i18n.includes(JSON.stringify(label)), "Missing environmental QC UI localization source key: " + label);
 
 
