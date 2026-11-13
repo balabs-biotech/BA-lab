@@ -47,6 +47,7 @@ for (const entry of [
 assert.ok(tracker.includes("function mountCultureBiologicalAssessmentPanel(culture)"));
 assert.ok(tracker.includes("function runCultureBiologicalAssessment(cultureId)"));
 assert.ok(tracker.includes("mountCultureBiologicalAssessmentPanel(culture)"));
+assert.ok(tracker.includes("const selectedCultureId = section.dataset.cultureId"));
 assert.ok(tracker.includes('engine_version: "0.1.0"'));
 assert.ok(tracker.includes("culture_id: cultureId"));
 assert.ok(tracker.includes('window_start: startDate + "T00:00:00+01:00"'));
