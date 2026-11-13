@@ -62,6 +62,8 @@ let recentObservations = [];
 let recentEngineExecutions = [];
 let recentEngineResultsByExecution = new Map();
 let engineExecutionHistoryRequestId = 0;
+let engineExecutionPollingTimer = null;
+let engineExecutionPollingOrganizationId = null;
 
 
 function isCurrentWorkspaceRevision(revision, expectedOrganizationId) {
@@ -91,6 +93,11 @@ function clearAuthenticatedWorkspaceState() {
   if (typeof recentEngineExecutions !== "undefined") recentEngineExecutions = [];
   if (typeof recentEngineResultsByExecution !== "undefined") recentEngineResultsByExecution = new Map();
   if (typeof engineExecutionHistoryRequestId !== "undefined") engineExecutionHistoryRequestId++;
+  if (typeof engineExecutionPollingTimer !== "undefined" && engineExecutionPollingTimer !== null) {
+    clearTimeout(engineExecutionPollingTimer);
+    engineExecutionPollingTimer = null;
+  }
+  if (typeof engineExecutionPollingOrganizationId !== "undefined") engineExecutionPollingOrganizationId = null;
   const engineHistoryPanel = document.getElementById("overviewRecentEngineExecutions");
   if (engineHistoryPanel) {
     engineHistoryPanel.replaceChildren();
@@ -7092,6 +7099,39 @@ async function loadRecentEngineExecutions() {
     );
   }
   renderRecentEngineExecutions();
+  scheduleEngineExecutionPolling(
+    loadOrganizationId,
+    loadRevision,
+    recentEngineExecutions.some((execution) => execution.status === "queued" || execution.status === "running")
+  );
+}
+
+function scheduleEngineExecutionPolling(expectedOrganizationId, expectedRevision, hasPendingExecutions) {
+  if (engineExecutionPollingTimer !== null) {
+    clearTimeout(engineExecutionPollingTimer);
+    engineExecutionPollingTimer = null;
+  }
+  if (!hasPendingExecutions || !expectedOrganizationId ||
+      !isCurrentWorkspaceRevision(expectedRevision, expectedOrganizationId)) {
+    engineExecutionPollingOrganizationId = null;
+    return;
+  }
+  engineExecutionPollingOrganizationId = expectedOrganizationId;
+  const delay = document.visibilityState === "hidden" ? 15000 : 5000;
+  engineExecutionPollingTimer = window.setTimeout(async () => {
+    engineExecutionPollingTimer = null;
+    if (engineExecutionPollingOrganizationId !== expectedOrganizationId ||
+        !isCurrentWorkspaceRevision(expectedRevision, expectedOrganizationId)) return;
+    try {
+      await loadRecentEngineExecutions();
+    } catch (error) {
+      if (engineExecutionPollingOrganizationId === expectedOrganizationId &&
+          isCurrentWorkspaceRevision(expectedRevision, expectedOrganizationId)) {
+        console.warn("Actualisation de l’état des analyses différée :", error);
+        scheduleEngineExecutionPolling(expectedOrganizationId, expectedRevision, true);
+      }
+    }
+  }, delay);
 }
 
 function getStoredEngineResult(execution) {
