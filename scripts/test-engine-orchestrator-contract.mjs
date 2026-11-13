@@ -62,8 +62,8 @@ const checks = [
   ["source queries are tenant-filtered", /\.eq\("organization_id", organizationId\)/],
   ["excluded source measurements cannot enter analysis", /excluded_source_records_not_eligible/],
 ];
-for (const [name, pattern] of checks) {
-  assert.ok(pattern instanceof RegExp ? pattern.test(source) : pattern, name);
+for (const [name, pattern, target = source] of checks) {
+  assert.ok(pattern instanceof RegExp ? pattern.test(target) : pattern, name);
 }
 const sourceReadStart = source.indexOf("let sourceRows: Record<string, any>[];");
 const sourceReadEnd = source.indexOf("const records = sourceRows.map", sourceReadStart);
