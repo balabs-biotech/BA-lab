@@ -543,6 +543,9 @@ begin
      set expires_at = clock_timestamp() - interval '1 second'
    where lease_token = v_token;
   perform private.recover_expired_engine_jobs();
+  -- Expiry recovery applies exponential backoff; advance it explicitly in this test.
+  update private.engine_jobs set available_at = clock_timestamp()
+   where id = v_job and status = 'retry_wait';
 
   v_claim2 := private.claim_engine_job('worker-b', 60);
   if v_claim2 is null or (v_claim2->>'job_id')::uuid <> v_job then
