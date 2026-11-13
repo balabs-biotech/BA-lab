@@ -634,6 +634,14 @@ class EngineContractTests(unittest.TestCase):
             "content_sha256": "d" * 64,
             "retrieved_at": "2026-11-10T07:55:00Z",
         })
+        missing_registry = json.loads(json.dumps(request))
+        missing_registry["datasets"] = [
+            dataset for dataset in missing_registry["datasets"]
+            if dataset["provider"] != "BA_LABS_RULE_REGISTRY"
+        ]
+        with self.assertRaisesRegex(ValueError, "interpretation_rule_reference_not_in_dataset_manifest"):
+            analyze_biological_context_features(missing_registry)
+
         request["input"]["record_ids"] = []
         request["input"]["records"] = []
         for index, value in enumerate([21.0, 23.0, 22.0]):
