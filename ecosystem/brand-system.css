@@ -1035,7 +1035,6 @@
   font: 400 clamp(42px, 5.7vw, 78px)/.98 Georgia, serif !important;
   letter-spacing: -.055em !important;
 }
-#app.balabs-ui > main > .editorial-work .work-heading h2 em { color: #526B5F !important; }
 #app.balabs-ui > main > .editorial-work .work-heading > p {
   max-width: 34ch !important;
   color: #3E4B44 !important;
@@ -1179,7 +1178,6 @@
   padding: 24px 22px 0 0 !important;
   border-right: 1px solid #536A60 !important;
 }
-#app.balabs-ui > main > .editorial-method .method-steps li + li { padding-left: 22px !important; }
 #app.balabs-ui > main > .editorial-method .method-no {
   color: #D28C6E !important;
   font: 700 10px/1 ui-monospace, monospace !important;
