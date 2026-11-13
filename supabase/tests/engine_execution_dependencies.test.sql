@@ -31,6 +31,7 @@ drop table if exists public.engine_executions cascade;
 \ir ../migrations/20261113165000_complete_claimed_engine_execution.sql
 \ir ../migrations/20261113180000_fail_claimed_engine_execution.sql
 \ir ../migrations/20261113200000_add_engine_execution_dependencies.sql
+\ir ../migrations/20261113210000_enqueue_bie_with_environmental_qc.sql
 
 do $$
 declare
@@ -38,6 +39,8 @@ declare
   user_id uuid := 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb';
   qc_id uuid := 'cccccccc-cccc-4ccc-8ccc-cccccccccccc';
   bie_id uuid := 'dddddddd-dddd-4ddd-8ddd-dddddddddddd';
+  atomic_execution_id uuid;
+  atomic_result_id uuid;
   qc_result_id uuid;
   got uuid;
   ts timestamptz;
@@ -96,6 +99,60 @@ begin
    or has_table_privilege('authenticated','public.engine_execution_dependencies','UPDATE')
    or has_table_privilege('authenticated','public.engine_execution_dependencies','DELETE') then
    raise exception 'authenticated clients must not mutate dependency edges';
+ end if;
+
+ select enqueued.execution_id, enqueued.upstream_result_id
+ into atomic_execution_id, atomic_result_id
+ from public.enqueue_bie_with_environmental_qc(
+   org_id,
+   '33333333-3333-4333-8333-333333333333',
+   'bie-atomic-fixture',
+   qc_scope || jsonb_build_object('culture_id','99999999-9999-4999-8999-999999999999'),
+   '{}'::uuid[],
+   repeat('c',64),
+   jsonb_build_object(
+     'contract','BA-LABS/ENGINE','contract_version','1.0.0',
+     'request_id','33333333-3333-4333-8333-333333333333',
+     'engine',jsonb_build_object('engine_id','biological.context.features','engine_version','0.2.0'),
+     'scope',qc_scope || jsonb_build_object('culture_id','99999999-9999-4999-8999-999999999999'),
+     'input',jsonb_build_object('record_ids','[]'::jsonb,'snapshot_sha256',repeat('c',64),'records','[]'::jsonb),
+     'parameters',jsonb_build_object(
+       'window_start','2026-11-12T00:00:00Z','window_end','2026-11-13T00:00:00Z',
+       'timezone','Africa/Algiers'
+     ),
+     'upstream_artifacts',jsonb_build_array(jsonb_build_object(
+       'role','environmental_qc',
+       'execution_id',qc_id::text,
+       'result_id',qc_result_id::text,
+       'engine_id','environmental.timeseries.qc',
+       'engine_version','0.2.0',
+       'input_snapshot_sha256',repeat('a',64),
+       'result',jsonb_build_object(
+         'outcome','success',
+         'value',jsonb_build_object('series',jsonb_build_array()),
+         'limitations',jsonb_build_array(),
+         'quality_flags',jsonb_build_array(),
+         'provenance',jsonb_build_object('algorithm','fixture')
+       ),
+       'artifact_sha256',repeat('f',64)
+     ))
+   ),
+   user_id,
+   qc_id
+ ) as enqueued;
+
+ if atomic_result_id <> qc_result_id then
+   raise exception 'atomic enqueue must bind the exact upstream result';
+ end if;
+ if not exists(
+   select 1 from public.engine_execution_dependencies
+   where organization_id=org_id
+     and downstream_execution_id=atomic_execution_id
+     and upstream_execution_id=qc_id
+     and upstream_result_id=qc_result_id
+     and dependency_role='environmental_qc'
+ ) then
+   raise exception 'atomic enqueue did not persist dependency edge';
  end if;
 end $$;
 rollback;
