@@ -217,13 +217,13 @@ Deno.serve(async (req: Request) => {
         organizationId,
         domain: snapshot.parameters.profile_domain,
         domainAmbiguous: snapshot.parameters.profile_domain_ambiguous === true,
+        contextStable: snapshot.parameters.profile_context_stable === true,
         windowStartDate: snapshot.parameters.analysis_window_start_date,
         windowLastIncludedDate: snapshot.parameters.analysis_window_last_included_date,
       });
     } catch (error) {
       const code = error instanceof Error ? error.message : "interpretation_profile_resolution_failed";
       const allowedCodes = new Set([
-        "biological_interpretation_domain_ambiguous",
         "interpretation_profile_domain_invalid",
         "interpretation_profile_registry_unavailable",
         "active_interpretation_profile_ambiguous",
