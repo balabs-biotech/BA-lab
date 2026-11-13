@@ -178,6 +178,10 @@ begin
    '"failed"'::jsonb,
    false
  );
+ tampered_payload := jsonb_set(tampered_payload, '{request_id}',
+   '"44444444-4444-4444-8444-444444444444"'::jsonb, false);
+ tampered_payload := jsonb_set(tampered_payload, '{input,snapshot_sha256}',
+   to_jsonb(repeat('d',64)), false);
  begin
    perform public.enqueue_bie_with_environmental_qc(
      org_id,
@@ -204,6 +208,10 @@ begin
    '"9.9.9"'::jsonb,
    false
  );
+ tampered_payload := jsonb_set(tampered_payload, '{request_id}',
+   '"55555555-5555-4555-8555-555555555555"'::jsonb, false);
+ tampered_payload := jsonb_set(tampered_payload, '{input,snapshot_sha256}',
+   to_jsonb(repeat('e',64)), false);
  begin
    perform public.enqueue_bie_with_environmental_qc(
      org_id,
