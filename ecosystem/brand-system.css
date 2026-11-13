@@ -2371,9 +2371,6 @@
   
   
 }
-@media(prefers-reduced-motion:reduce) {
-  
-}
 
 /* PHASE 14 — browser-capture fixes: mobile language rail, single-line nav, hero breathing room. */
 #app.balabs-ui > main > .hero {
