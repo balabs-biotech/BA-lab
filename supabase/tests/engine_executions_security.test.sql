@@ -33,6 +33,7 @@ grant execute on function private.is_org_member(uuid) to authenticated;
 
 drop table if exists public.engine_executions cascade;
 \ir ../migrations/20261112020000_create_engine_executions.sql
+\ir ../migrations/20261113140000_recover_expired_engine_execution_leases.sql
 
 do $$
 declare
