@@ -89,6 +89,14 @@ export async function loadAuthenticatedBiologicalIdentityAssertions(input: {
     if (referenceMap.has(key)) throw new Error("biological_identity_reference_ambiguous");
     referenceMap.set(key, row);
   }
+  for (const row of rows) {
+    const reference = referenceMap.get(row.source_reference_id + "@" + row.source_reference_version);
+    if (!reference || typeof reference.content_sha256 !== "string" ||
+        !/^[0-9a-f]{64}$/.test(reference.content_sha256) || !reference.reviewed_at ||
+        typeof row.reviewed_at !== "string" || !/^[0-9a-f]{64}$/.test(row.content_sha256)) {
+      throw new Error("biological_identity_source_provenance_integrity_failure");
+    }
+  }
   const accepted = rows.filter((row) => {
     const reference = referenceMap.get(row.source_reference_id + "@" + row.source_reference_version);
     return !!reference && reference.content_sha256 && /^[0-9a-f]{64}$/.test(reference.content_sha256) &&
