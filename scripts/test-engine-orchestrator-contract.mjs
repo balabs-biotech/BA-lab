@@ -59,6 +59,7 @@ const checks = [
   ["QC artifact is passed through the immutable BIE request envelope", /upstream_artifacts: upstreamArtifacts/],
   ["QC lineage uses one atomic enqueue RPC instead of a separate edge insert", /rpc\("enqueue_bie_with_environmental_qc"[\s\S]*?p_upstream_execution_id: upstreamQcExecutionId/],
   ["QC remains optional when no upstream execution ID is supplied", /if \(upstreamQcExecutionId !== undefined\)[\s\S]*?upstreamArtifacts = \[artifact\]/],
+  ["idempotency binds the exact upstream QC artifact digest and payload", /stable\(prior\.request_payload\?\.upstream_artifacts \?\? \[\]\) === stable\(request\.upstream_artifacts \?\? \[\]\)/],
   ["idempotency comparison binds the upstream artifact envelope", /upstream_artifacts[\s\S]*?sameExecutionInput/],
   ["worker response is schema validated", /validateResponse/],
   ["failed execution writes are scoped to queued state or the exact running worker owner", /async function persistExecutionFailure[\s\S]*?claimedWorkerId[\s\S]*?update\.eq\("claimed_by", claimedWorkerId\)\.eq\("status", "running"\)[\s\S]*?update\.eq\("status", "queued"\)/],
