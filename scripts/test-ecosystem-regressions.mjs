@@ -8,6 +8,9 @@ const engine = readFileSync('ecosystem/engine-v2.js', 'utf8');
 const previewEngine = readFileSync('ecosystem-preview/engine-v2.js', 'utf8');
 const expectedDomains = ['bio', 'myco', 'soil', 'lab', 'products', 'iot', 'work', 'learn'];
 const brandCss = readFileSync('ecosystem/brand-system.css', 'utf8');
+const baseCss = readFileSync('ecosystem/site-base.css', 'utf8');
+const overridesCss = readFileSync('ecosystem/site-overrides.css', 'utf8');
+const pageCss = [baseCss, brandCss, overridesCss].join('\n');
 assert.ok(html.includes('<link rel="stylesheet" href="./brand-system.css?v=14">'), 'Public homepage must load the BA Labs visual system');
 assert.ok(html.includes('<div class="wrap balabs-ui" id="app"'), 'Public homepage must opt into the BA Labs visual system');
 for (const section of ['hero', 'editorial-feature', 'editorial-about', 'editorial-work', 'universe-index', 'editorial-method']) {
@@ -18,17 +21,17 @@ assert.ok(brandCss.includes('#app.balabs-ui > .top'), 'Header styling must remai
 assert.ok(brandCss.includes('#app.balabs-ui > .foot'), 'Footer styling must remain scoped to the app footer');
 const editorialSections = ['hero', 'editorial-feature', 'editorial-about', 'editorial-work', 'universe-index', 'editorial-method', 'universe-bridge', 'scene'];
 for (const section of editorialSections) {
-  assert.match(html, new RegExp('#app\\s*>\\s*main\\s*>\\s*\\.' + section + '\\b'), 'Inline layout rules must target the nested main section: ' + section);
-  assert.doesNotMatch(html, new RegExp('#app\\s*>\\s*\\.' + section + '\\b'), 'No layout rule may target ' + section + ' as a direct app child');
+  assert.match(pageCss, new RegExp('#app\\s*>\\s*main\\s*>\\s*\\.' + section + '\\b'), 'Inline layout rules must target the nested main section: ' + section);
+  assert.doesNotMatch(pageCss, new RegExp('#app\\s*>\\s*\\.' + section + '\\b'), 'No layout rule may target ' + section + ' as a direct app child');
 }
 assert.ok(!brandCss.includes('NOT imported by ecosystem/index.html'), 'Brand stylesheet integration note must reflect the live import');
 for (const sectionId of ['chantiers', 'universe', 'universes']) {
-  assert.match(html, new RegExp('#app\\s*>\\s*main\\s*>\\s*#' + sectionId + '\\b'), 'Inline layout rules must target the nested main section ID: ' + sectionId);
-  assert.doesNotMatch(html, new RegExp('#app\\s*>\\s*#' + sectionId + '\\b'), 'No layout rule may target ' + sectionId + ' as a direct app child');
+  assert.match(pageCss, new RegExp('#app\\s*>\\s*main\\s*>\\s*#' + sectionId + '\\b'), 'Inline layout rules must target the nested main section ID: ' + sectionId);
+  assert.doesNotMatch(pageCss, new RegExp('#app\\s*>\\s*#' + sectionId + '\\b'), 'No layout rule may target ' + sectionId + ' as a direct app child');
 }
-assert.ok(html.includes('#app.balabs-ui[dir="rtl"] .site-nav a:after'), 'RTL navigation underline must mirror its animation direction');
-assert.ok(html.includes('#app.balabs-ui[dir="rtl"] .editorial-link span'), 'RTL editorial arrows must mirror their visual direction');
-assert.ok(html.includes('#app.balabs-ui[dir="rtl"] .site-nav{'), 'RTL mobile navigation must retain right-to-left reading order');
+assert.ok(pageCss.includes('#app.balabs-ui[dir="rtl"] .site-nav a:after'), 'RTL navigation underline must mirror its animation direction');
+assert.ok(pageCss.includes('#app.balabs-ui[dir="rtl"] .editorial-link span'), 'RTL editorial arrows must mirror their visual direction');
+assert.ok(pageCss.includes('#app.balabs-ui[dir="rtl"] .site-nav{', 'RTL mobile navigation must retain right-to-left reading order');
 
 const homepageSequence = [
   '<section class="hero"',
