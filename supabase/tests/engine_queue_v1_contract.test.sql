@@ -12,6 +12,7 @@ declare
   v_token uuid;
   v_token2 uuid;
   v_status jsonb;
+  v_attempt integer;
 begin
   insert into auth.users(id) values (v_user) on conflict do nothing;
   insert into public.organizations(id, code, name)
@@ -112,6 +113,56 @@ begin
     raise exception 'New lease completion was rejected';
   end if;
 
+
+
+  -- Transient failures retry with backoff; max-attempt exhaustion is terminal.
+  perform set_config('request.jwt.claims',
+    jsonb_build_object('role','authenticated','sub',v_user)::text, true);
+  v_job := public.enqueue_engine_job(
+    v_org, 'demo.engine', '1.0.0', 'retry_test',
+    '{"input":3}'::jsonb, 'queue-retry-001', 0, 2
+  );
+  perform set_config('request.jwt.claims',
+    jsonb_build_object('role','service_role','sub',v_user)::text, true);
+  v_claim := public.claim_engine_job('worker-retry-a', 60);
+  v_token := (v_claim->>'lease_token')::uuid;
+  if public.fail_engine_job(v_job, v_token, 'worker-retry-a',
+      'temporary_error', 'first attempt', true) <> 'retry_wait' then
+    raise exception 'Retryable first failure did not enter retry_wait';
+  end if;
+  select attempt_count into v_attempt from private.engine_jobs where id = v_job;
+  if v_attempt <> 1 or not exists (
+    select 1 from private.engine_jobs
+     where id = v_job and status = 'retry_wait'
+       and available_at > clock_timestamp()
+  ) then
+    raise exception 'Retry attempt count or backoff was not persisted';
+  end if;
+
+  update private.engine_jobs set available_at = clock_timestamp()
+   where id = v_job;
+  v_claim := public.claim_engine_job('worker-retry-b', 60);
+  v_token := (v_claim->>'lease_token')::uuid;
+  if public.fail_engine_job(v_job, v_token, 'worker-retry-b',
+      'temporary_error', 'second attempt', true) <> 'failed' then
+    raise exception 'Max-attempt exhaustion did not reach failed';
+  end if;
+  select attempt_count into v_attempt from private.engine_jobs where id = v_job;
+  if v_attempt <> 2 then
+    raise exception 'Attempt counter did not increment on each claim';
+  end if;
+
+  -- A user who belongs only to one organization cannot inspect another tenant's job.
+  perform set_config('request.jwt.claims',
+    jsonb_build_object('role','authenticated','sub',v_user)::text, true);
+  begin
+    perform public.get_engine_job_status(
+      (select id from private.engine_jobs where organization_id = v_other_org limit 1)
+    );
+    raise exception 'Cross-organization job status read was accepted';
+  exception when insufficient_privilege then
+    null;
+  end;
 
   if not exists (
     select 1 from pg_class c join pg_namespace n on n.oid = c.relnamespace
