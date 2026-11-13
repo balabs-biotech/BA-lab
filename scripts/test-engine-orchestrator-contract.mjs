@@ -8,7 +8,7 @@ const checks = [
   ["BIE profile loader is imported into the authenticated orchestrator", /loadAuthenticatedBiologicalInterpretationProfile/],
   ["profile resolution refuses privileged client creation and requires the caller RLS client", /caller_scoped_supabase_client_required[\s\S]*?userClient\.from/, biologicalProfile],
   ["profile resolution is restricted to approved biological domains", /ALLOWED_DOMAINS = new Set\(\["mycology", "greentech", "lab"\]\)/, biologicalProfile],
-  ["profile rules require an exact bounded schema", /Object\.keys\(rule\)\.length !== RULE_FIELDS\.size/, biologicalProfile],
+  ["profile rules require the exact base schema with one bounded optional identity matcher", /Object\.keys\(rule\)\.some\(\(key\) => !RULE_FIELDS\.has\(key\)\)[\s\S]*?filter\(\(key\) => key !== "identity_match"\)/, biologicalProfile],
   ["profile applicability requires the entire analysis window", /profile\.valid_from <= windowStartDate[\s\S]*?profile\.valid_to >= windowLastIncludedDate/, biologicalProfile],
   ["only validated references are eligible for interpretation", /reference\.status !== "validated"/, biologicalProfile],
   ["reference manifest preserves the stored SHA-256", /content_sha256: row\.content_sha256/, biologicalProfile],
