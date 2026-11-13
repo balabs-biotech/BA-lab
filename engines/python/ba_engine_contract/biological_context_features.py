@@ -8,6 +8,8 @@ from __future__ import annotations
 
 from collections import defaultdict
 from datetime import datetime
+import hashlib
+import json
 from math import isfinite
 import re
 from statistics import fmean
@@ -28,6 +30,15 @@ def _timestamp(value: Any, field: str) -> datetime:
 def _iso(value: datetime) -> str:
     return value.isoformat().replace("+00:00", "Z")
 
+
+
+
+def _stable_sha256(value: Any) -> str:
+    """Match the TypeScript stable JSON encoding used by the authenticated resolver."""
+    encoded = json.dumps(
+        value, sort_keys=True, separators=(",", ":"), ensure_ascii=False, allow_nan=False,
+    ).encode("utf-8")
+    return hashlib.sha256(encoded).hexdigest()
 
 
 _RULE_ID = re.compile(r"^[a-z][a-z0-9_.-]{1,79}$")
@@ -457,6 +468,11 @@ def analyze_biological_context_features(request: Mapping[str, Any]) -> dict[str,
             or not re.fullmatch(r"[0-9a-f]{64}", manifest["content_sha256"])
         ):
             raise ValueError("biological_identity_manifest_missing")
+        if _stable_sha256(assertion) != manifest["content_sha256"]:
+            raise ValueError("biological_identity_manifest_hash_mismatch")
+        source_digest = assertion.get("source_reference_sha256")
+        if not isinstance(source_digest, str) or not re.fullmatch(r"[0-9a-f]{64}", source_digest):
+            raise ValueError("invalid_biological_identity_source_digest")
         identity_sources.add(
             f"BA_LABS_BIOLOGICAL_IDENTITY/{code}@{version}"
             f"#sha256={manifest['content_sha256']}"
