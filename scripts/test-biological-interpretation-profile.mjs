@@ -1,5 +1,8 @@
 import assert from "node:assert/strict";
-import { buildBiologicalInterpretationProfile } from "../supabase/functions/_shared/biological-interpretation-profile.ts";
+import {
+  buildBiologicalInterpretationProfile,
+  loadAuthenticatedBiologicalInterpretationProfile,
+} from "../supabase/functions/_shared/biological-interpretation-profile.ts";
 
 const organizationId = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa";
 const rule = {
@@ -48,6 +51,52 @@ const input = {
 };
 
 const resolved = await buildBiologicalInterpretationProfile(input);
+const ambiguousDomain = await loadAuthenticatedBiologicalInterpretationProfile({
+  userClient: null,
+  organizationId,
+  domain: null,
+  domainAmbiguous: true,
+  contextStable: false,
+  windowStartDate: input.windowStartDate,
+  windowLastIncludedDate: input.windowLastIncludedDate,
+});
+assert.equal(ambiguousDomain.state, "domain_ambiguous");
+
+const unstableContext = await loadAuthenticatedBiologicalInterpretationProfile({
+  userClient: null,
+  organizationId,
+  domain: "mycology",
+  domainAmbiguous: false,
+  contextStable: false,
+  windowStartDate: input.windowStartDate,
+  windowLastIncludedDate: input.windowLastIncludedDate,
+});
+assert.equal(unstableContext.state, "context_not_stable");
+
+const absentDomain = await loadAuthenticatedBiologicalInterpretationProfile({
+  userClient: null,
+  organizationId,
+  domain: null,
+  domainAmbiguous: false,
+  contextStable: true,
+  windowStartDate: input.windowStartDate,
+  windowLastIncludedDate: input.windowLastIncludedDate,
+});
+assert.equal(absentDomain.state, "not_configured");
+
+await assert.rejects(
+  loadAuthenticatedBiologicalInterpretationProfile({
+    userClient: null,
+    organizationId,
+    domain: "mycology",
+    domainAmbiguous: false,
+    contextStable: true,
+    windowStartDate: input.windowStartDate,
+    windowLastIncludedDate: input.windowLastIncludedDate,
+  }),
+  /caller_scoped_supabase_client_required/,
+);
+
 assert.equal(resolved.state, "loaded");
 assert.equal(resolved.profile.profile_version, "1.0.0");
 assert.deepEqual(resolved.rules, [rule]);
