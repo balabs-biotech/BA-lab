@@ -99,13 +99,14 @@ def _evaluate_interpretation_rules(
             or any(not isinstance(value, str) or not value.strip() for value in context_match.values())
         ):
             raise ValueError("interpretation_rule_requires_biological_context_scope")
-        if not any(
-            isinstance(dataset, dict)
+        reference_manifest = next((
+            dataset for dataset in datasets
+            if isinstance(dataset, dict)
             and dataset.get("provider") == "BA_LABS_RULE_REGISTRY"
             and dataset.get("dataset_id") == reference_id
             and dataset.get("dataset_version") == reference_version
-            for dataset in datasets
-        ):
+        ), None)
+        if reference_manifest is None:
             raise ValueError("interpretation_rule_reference_not_in_dataset_manifest")
 
         if not any(
@@ -113,7 +114,7 @@ def _evaluate_interpretation_rules(
             for context in biological_contexts
         ):
             continue
-        reference_sources.add(f"BA_LABS_RULE_REGISTRY/{reference_id}@{reference_version}")
+        reference_sources.add(f"BA_LABS_RULE_REGISTRY/{reference_id}@{reference_version}#sha256={reference_manifest['content_sha256']}")
 
         matching_features = [
             feature for feature in derived_features
