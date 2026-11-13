@@ -44,7 +44,8 @@ declare
   qc_scope jsonb := '{"organization_id":"aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa","location_id":"eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee"}';
   params jsonb := '{"window_start":"2026-11-12T00:00:00Z","window_end":"2026-11-13T00:00:00Z"}';
 begin
- insert into public.organizations(id) values(org_id) on conflict do nothing;
+ insert into public.organizations(id,code,name)
+ values(org_id,'TEST-ENGINE-LINEAGE','Engine Lineage Test') on conflict do nothing;
  insert into auth.users(id) values(user_id) on conflict do nothing;
  insert into public.organization_members values(org_id,user_id,'member') on conflict do nothing;
 
