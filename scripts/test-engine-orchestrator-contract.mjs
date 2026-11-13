@@ -10,7 +10,7 @@ const checks = [
   ["profile resolution is restricted to approved biological domains", /ALLOWED_DOMAINS = new Set\(\["mycology", "greentech", "lab"\]\)/, biologicalProfile],
   ["profile rules require the exact base schema with one bounded optional identity matcher", /Object\.keys\(rule\)\.some\(\(key\) => !RULE_FIELDS\.has\(key\)\)[\s\S]*?filter\(\(key\) => key !== "identity_match"\)/, biologicalProfile],
   ["profile applicability requires the entire analysis window", /profile\.valid_from <= windowStartDate[\s\S]*?profile\.valid_to >= windowLastIncludedDate/, biologicalProfile],
-  ["only validated references are eligible for interpretation", /reference\.status !== "validated"/, biologicalProfile],
+  ["current interpretation only accepts validated references unless explicit historical replay is requested", /acceptedReferenceStatuses[\s\S]*?new Set\(\["validated"\]\)[\s\S]*?historicalReplay/, biologicalProfile],
   ["reference manifest preserves the stored SHA-256", /content_sha256: row\.content_sha256/, biologicalProfile],
   ["profile manifest hashes the canonical profile and rules", /content_sha256: await sha256\(stable\(/, biologicalProfile],
   ["profile lookup is organization and caller scoped", /userClient\.from\("domain_interpretation_profiles"\)[\s\S]*?\.eq\("organization_id", organizationId\)/, biologicalProfile],

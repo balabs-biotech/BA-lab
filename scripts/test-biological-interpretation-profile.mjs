@@ -144,7 +144,7 @@ assert.ok(queryLog.some((entry) =>
 ));
 assert.ok(queryLog.some((entry) =>
   entry[0] === "biological_reference_registry" &&
-  entry[1] === "eq" && entry[2] === "status" && entry[3] === "validated"
+  entry[1] === "in" && entry[2] === "status" && entry[3].join(",") === "validated"
 ));
 
 const missingReference = await assert.rejects(
@@ -158,6 +158,23 @@ const outOfWindow = await buildBiologicalInterpretationProfile({
   profiles: [{ ...profile, valid_to: "2026-11-11" }],
 });
 assert.equal(outOfWindow.state, "not_configured");
+
+const retiredHistoricalProfile = await buildBiologicalInterpretationProfile({
+  ...input,
+  historicalReplay: true,
+  profiles: [{ ...profile, status: "retired", valid_to: "2026-11-12" }],
+  references: [{ ...reference, status: "retired" }],
+});
+assert.equal(retiredHistoricalProfile.state, "loaded");
+assert.equal(retiredHistoricalProfile.profile.profile_version, "1.0.0");
+assert.equal(retiredHistoricalProfile.datasets.length, 2);
+
+const retiredProfileRejectedForCurrentResolution = await buildBiologicalInterpretationProfile({
+  ...input,
+  profiles: [{ ...profile, status: "retired", valid_to: "2026-11-12" }],
+  references: [{ ...reference, status: "retired" }],
+});
+assert.equal(retiredProfileRejectedForCurrentResolution.state, "not_configured");
 
 await assert.rejects(
   buildBiologicalInterpretationProfile({
