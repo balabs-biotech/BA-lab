@@ -59,12 +59,22 @@ begin
     raise exception 'upstream QC result is unavailable' using errcode = '22023';
   end if;
 
-  if v_artifact->>'role' is distinct from 'environmental_qc'
+  if v_artifact->>'contract' is distinct from 'BA-LABS/UPSTREAM-ENGINE-ARTIFACT'
+    or v_artifact->>'contract_version' is distinct from '1.0.0'
+    or v_artifact->>'role' is distinct from 'environmental_qc'
     or v_artifact->>'execution_id' is distinct from p_upstream_execution_id::text
+    or v_artifact->>'request_id' is distinct from (
+      select request_id::text from public.engine_executions
+      where organization_id = p_organization_id and id = p_upstream_execution_id
+    )
     or v_artifact->>'result_id' is distinct from v_result.id::text
     or v_artifact->>'engine_id' is distinct from v_result.engine_id
     or v_artifact->>'engine_version' is distinct from v_result.engine_version
     or v_artifact->>'input_snapshot_sha256' is distinct from v_result.input_snapshot_sha256
+    or v_artifact->'scope'->>'organization_id' is distinct from p_organization_id::text
+    or v_artifact->'scope'->>'location_id' is distinct from p_scope->>'location_id'
+    or v_artifact->'scope'->>'window_start' is distinct from p_request_payload->'parameters'->>'window_start'
+    or v_artifact->'scope'->>'window_end' is distinct from p_request_payload->'parameters'->>'window_end'
     or v_artifact->'result' is distinct from jsonb_build_object(
       'outcome', v_result.outcome,
       'value', v_result.value,
