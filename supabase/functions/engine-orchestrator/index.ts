@@ -545,7 +545,15 @@ Deno.serve(async (req: Request) => {
     });
     if (saveError || !resultId) {
       console.error("[engine-orchestrator] atomic result persistence failed");
-      return reply(500, { error: "result_persistence_failed", execution_id: execution.id });
+      const persisted = await persistExecutionFailure(
+        "result_persistence_failed",
+        "The worker result could not be committed atomically to the execution ledger.",
+        completedAt,
+      );
+      return reply(500, {
+        error: persisted ? "result_persistence_failed" : "execution_state_persistence_failed",
+        execution_id: execution.id,
+      });
     }
     return reply(200, {
       execution_id: execution.id,
