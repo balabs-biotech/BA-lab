@@ -44,6 +44,28 @@ for (const entry of [
 
 
 assert.match(workspace, /id="overviewRecentEngineExecutions"/);
+assert.match(workspace, /id="runCultureBiologicalAssessment"/);
+assert.match(workspace, /id="cultureBieAssessmentStart"/);
+assert.match(workspace, /id="cultureBieAssessmentEnd"/);
+const cultureAssessmentStart = tracker.indexOf("async function runCultureBiologicalAssessment()");
+const plantAssessmentStart = tracker.indexOf("async function runPlantBiologicalAssessment()");
+assert.ok(cultureAssessmentStart >= 0 && plantAssessmentStart > cultureAssessmentStart,
+  "mycology/lab cultures must have a dedicated BIE assessment path");
+const cultureAssessmentSource = tracker.slice(cultureAssessmentStart, plantAssessmentStart);
+for (const contract of [
+  'engine_id: "biological.context.features"',
+  'engine_version: "0.2.0"',
+  'culture_id: cultureId',
+  'window_start: startDate + "T00:00:00+01:00"',
+  'window_end: endDate + "T00:00:00+01:00"',
+  'idempotency_key: crypto.randomUUID()',
+  'await loadRecentEngineExecutions()',
+  'isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)'
+]) assert.ok(cultureAssessmentSource.includes(contract), "Missing culture BIE execution contract: " + contract);
+assert.match(tracker, /runCultureBiologicalAssessment\s*\n\s*\);/);
+assert.match(tracker, /assessmentStart\.value = startedDate/);
+assert.match(tracker, /assessmentEnd\.value = localDateValue\(nextDay\)/);
+
 assert.match(workspace, /Afficher les dernières analyses calculées/);
 
 const loaderStart = tracker.indexOf("async function loadRecentEngineExecutions()");
