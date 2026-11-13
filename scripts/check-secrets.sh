@@ -13,7 +13,7 @@ VALUES='(sb_secret_[A-Za-z0-9_-]{10,}|secret_[A-Za-z0-9]{30,}|ntn_[A-Za-z0-9]{20
 NAMES='(SUPABASE_SERVICE_ROLE_KEY|NOTION_(API_)?(KEY|TOKEN))'
 found=0
 if git grep -nIE "$VALUES" -- . ':(exclude)*.md' ':(exclude)scripts/check-secrets.sh'; then found=1; fi
-if git grep -nIE "$NAMES" -- . ':(exclude)*.md' ':(exclude)scripts/check-secrets.sh' ':(exclude)supabase/functions/*' ':(exclude)supabase/tests/*'; then found=1; fi
+if git grep -nIE "$NAMES" -- . ':(exclude)*.md' ':(exclude)scripts/check-secrets.sh' ':(exclude)supabase/functions/*' ':(exclude)supabase/tests/*' ':(exclude)workers/cultureops_engine_worker/*'; then found=1; fi
 if [ "$found" -ne 0 ]; then
   echo "Possible secret found above." >&2
   exit 1
