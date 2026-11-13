@@ -184,3 +184,19 @@ BIE v0.2.0 now supports authenticated plant-culture subjects without aliasing th
 - The Python engine reuses the deterministic descriptive feature pipeline but requires semantic version 0.2.0 for plant subjects. Version 0.1.0 remains available for existing culture callers.
 - The result schema now explicitly models plant subjects. No diagnostic, causal or intervention claims were added.
 - Production activation remains gated by `BA_BIE_ENABLED=true`; no flag, worker, Edge Function or schema was deployed during this tranche.
+
+
+## Scoped rule-based interpretation (2026-11-13)
+
+The biological context feature engine accepts an optional parameters.interpretation_rules array. Each rule is versioned and must declare:
+
+- a stable rule identifier and semantic version;
+- one derived feature code, a numeric comparison operator, threshold and unit;
+- a non-empty exact-match biological context scope (taxon, strain, stage, substrate, production system or organism kind);
+- a reference identifier and version.
+
+The reference must also exist in the request dataset manifest under provider BA_LABS_RULE_REGISTRY, with an exact dataset_id and dataset_version match. The resulting finding carries the supporting source-record IDs, the derived feature code, rule version and reference identifier in its statement. The registry reference is added to result provenance.
+
+Findings are emitted with evidence_state = limited. The rule evaluator does not infer causality, diagnose contamination or disease, rank strains, or recommend interventions. Rules with no matching biological context or no matching feature produce no finding. A malformed rule or unregistered reference fails the engine request rather than silently producing an untraceable result.
+
+**Operational boundary:** this is an execution contract, not yet a populated scientific rule catalogue. The authenticated server-side adapter must load approved, versioned rules and include their manifest metadata in the request. No default biological thresholds are enabled, and the connected Supabase project has not yet been populated with a rule registry. The synthetic threshold used by the regression test is test data only, not a BA Labs cultivation recommendation.
