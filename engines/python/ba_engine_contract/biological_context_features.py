@@ -52,6 +52,28 @@ def _evaluate_interpretation_rules(
 
     findings: list[dict[str, Any]] = []
     reference_sources: set[str] = set()
+    profile_manifests = [
+        dataset for dataset in datasets
+        if isinstance(dataset, dict)
+        and dataset.get("provider") == "BA_LABS_INTERPRETATION_PROFILE"
+    ]
+    if rules:
+        if len(profile_manifests) != 1:
+            raise ValueError("interpretation_profile_manifest_required")
+        profile_manifest = profile_manifests[0]
+        if (
+            profile_manifest.get("dataset_id") != "biological.context.features"
+            or not isinstance(profile_manifest.get("dataset_version"), str)
+            or not _RULE_VERSION.fullmatch(profile_manifest["dataset_version"])
+            or not isinstance(profile_manifest.get("content_sha256"), str)
+            or not re.fullmatch(r"[0-9a-f]{64}", profile_manifest["content_sha256"])
+        ):
+            raise ValueError("invalid_interpretation_profile_manifest")
+        reference_sources.add(
+            "BA_LABS_INTERPRETATION_PROFILE/"
+            f"{profile_manifest['dataset_id']}@{profile_manifest['dataset_version']}"
+            f"#sha256={profile_manifest['content_sha256']}"
+        )
     for rule in rules:
         required = {
             "rule_id", "rule_version", "feature_code", "operator", "threshold",
@@ -328,8 +350,13 @@ def analyze_biological_context_features(request: Mapping[str, Any]) -> dict[str,
         missing_context.append("some_input_records_were_excluded")
     if not biological_contexts:
         missing_context.append("biological_context_not_recorded")
-    if parameters.get("interpretation_profile_state") == "not_configured":
+    profile_state = parameters.get("interpretation_profile_state")
+    if profile_state == "not_configured":
         missing_context.append("no_active_interpretation_profile")
+    elif profile_state == "context_not_stable":
+        missing_context.append("biological_context_not_stable_for_full_window")
+    elif profile_state == "domain_ambiguous":
+        missing_context.append("biological_domain_ambiguous_for_full_window")
     elif parameters.get("interpretation_profile_state") == "context_not_stable":
         missing_context.append("biological_context_not_stable_for_profile")
     elif parameters.get("interpretation_profile_state") == "domain_ambiguous":
@@ -371,8 +398,12 @@ def analyze_biological_context_features(request: Mapping[str, Any]) -> dict[str,
         quality_flags = ["rule_based_interpretation_evaluated_no_findings"]
     else:
         quality_flags = ["biological_interpretation_not_performed"]
-    if parameters.get("interpretation_profile_state") == "not_configured":
+    if profile_state == "not_configured":
         quality_flags.append("interpretation_profile_not_available")
+    elif profile_state == "context_not_stable":
+        quality_flags.append("interpretation_profile_not_applied_context_changed")
+    elif profile_state == "domain_ambiguous":
+        quality_flags.append("interpretation_profile_not_applied_domain_ambiguous")
     elif parameters.get("interpretation_profile_state") == "context_not_stable":
         quality_flags.append("interpretation_profile_context_not_stable")
     elif parameters.get("interpretation_profile_state") == "domain_ambiguous":
