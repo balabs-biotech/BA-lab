@@ -963,7 +963,7 @@ class EngineContractTests(unittest.TestCase):
             "analysis_window_start_date": "2026-11-10",
             "analysis_window_last_included_date": "2026-11-10",
             "interpretation_rules": [],
-            "interpretation_profile_state": "not_found",
+            "interpretation_profile_state": "not_configured",
             "biological_identity_state": "not_documented",
             "biological_identity_assertions": [],
         }
