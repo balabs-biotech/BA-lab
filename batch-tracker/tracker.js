@@ -62,6 +62,8 @@ let recentObservations = [];
 let recentEngineExecutions = [];
 let recentEngineResultsByExecution = new Map();
 let engineExecutionHistoryRequestId = 0;
+let engineExecutionPollingTimer = null;
+let engineExecutionPollingOrganizationId = null;
 
 
 function isCurrentWorkspaceRevision(revision, expectedOrganizationId) {
@@ -91,6 +93,11 @@ function clearAuthenticatedWorkspaceState() {
   if (typeof recentEngineExecutions !== "undefined") recentEngineExecutions = [];
   if (typeof recentEngineResultsByExecution !== "undefined") recentEngineResultsByExecution = new Map();
   if (typeof engineExecutionHistoryRequestId !== "undefined") engineExecutionHistoryRequestId++;
+  if (typeof engineExecutionPollingTimer !== "undefined" && engineExecutionPollingTimer !== null) {
+    clearTimeout(engineExecutionPollingTimer);
+    engineExecutionPollingTimer = null;
+  }
+  if (typeof engineExecutionPollingOrganizationId !== "undefined") engineExecutionPollingOrganizationId = null;
   const engineHistoryPanel = document.getElementById("overviewRecentEngineExecutions");
   if (engineHistoryPanel) {
     engineHistoryPanel.replaceChildren();
@@ -106,6 +113,11 @@ function clearAuthenticatedWorkspaceState() {
     cultureDetailPanel.classList.add("hidden");
     cultureDetailPanel.dataset.cultureId = "";
   }
+  if (typeof cultureBiologicalAssessmentRequestId !== "undefined") {
+    cultureBiologicalAssessmentRequestId++;
+  }
+  const biologicalContextPanel = document.getElementById("biologicalContextPanel");
+  if (biologicalContextPanel) biologicalContextPanel.dataset.cultureId = "";
 
   if (recordHarvestButton) recordHarvestButton.disabled = true;
   if (saveMeasurementButton) saveMeasurementButton.disabled = true;
@@ -4612,6 +4624,10 @@ document.getElementById("plantBiologicalContextCloseButton")?.addEventListener(
   "click",
   closePlantBiologicalContext
 );
+document.getElementById("runCultureBiologicalAssessment")?.addEventListener(
+  "click",
+  runCultureBiologicalAssessment
+);
 document.getElementById("runPlantBiologicalAssessment")?.addEventListener(
   "click",
   runPlantBiologicalAssessment
@@ -6037,6 +6053,7 @@ async function saveBiologicalOperation(event) {
 let biologicalContextRequestId = 0;
 let plantBiologicalContextRequestId = 0;
 let plantBiologicalAssessmentRequestId = 0;
+let cultureBiologicalAssessmentRequestId = 0;
 
 function localDateValue(date = new Date()) {
   const year = date.getFullYear();
@@ -6190,6 +6207,14 @@ async function loadBiologicalContextPanel(cultureId) {
     document.getElementById("biologicalContextValidFrom").value =
       latest ? nextAvailableDate : startedDate;
     document.getElementById("biologicalContextValidTo").value = "";
+    const assessmentStart = document.getElementById("cultureBieAssessmentStart");
+    const assessmentEnd = document.getElementById("cultureBieAssessmentEnd");
+    assessmentStart.value = startedDate;
+    const nextDay = new Date(today + "T00:00:00");
+    nextDay.setDate(nextDay.getDate() + 1);
+    assessmentEnd.value = localDateValue(nextDay);
+    document.getElementById("runCultureBiologicalAssessment").disabled = false;
+    setCultureBiologicalAssessmentMessage("Prêt à lancer une évaluation descriptive pour cette culture.");
 
     const openContext = contexts.find(context => context.valid_to === null);
     const closeDate = document.getElementById("biologicalContextCloseDate");
@@ -6661,6 +6686,157 @@ function setPlantBiologicalAssessmentMessage(message, state = "") {
   else delete target.dataset.state;
 }
 
+async function monitorPlantBiologicalAssessmentExecution({
+  executionId,
+  requestId,
+  plantCultureId,
+  operationRevision,
+  operationOrganizationId
+}) {
+  for (let attempt = 0; attempt < 90; attempt++) {
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    if (requestId !== plantBiologicalAssessmentRequestId ||
+        !isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
+    const panel = document.getElementById("plantBiologicalContextPanel");
+    if (panel?.dataset.plantCultureId !== plantCultureId) return;
+    const execution = recentEngineExecutions.find(item => item.id === executionId);
+    if (execution?.status === "completed") {
+      setPlantBiologicalAssessmentMessage(
+        "Évaluation terminée et résultat enregistré. Consultez l’historique des analyses.",
+        "success"
+      );
+      return;
+    }
+    if (execution?.status === "failed") {
+      setPlantBiologicalAssessmentMessage(
+        "L’évaluation a échoué (" + String(execution.error_code || "erreur non documentée") + "). Consultez l’historique.",
+        "error"
+      );
+      return;
+    }
+  }
+  if (requestId === plantBiologicalAssessmentRequestId &&
+      isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) {
+    setPlantBiologicalAssessmentMessage(
+      "L’évaluation reste en attente ou en cours. L’historique peut être actualisé à tout moment.",
+      "success"
+    );
+  }
+}
+
+function setCultureBiologicalAssessmentMessage(message, state = "") {
+  const target = document.getElementById("cultureBiologicalAssessmentMessage");
+  if (!target) return;
+  target.textContent = message;
+  if (state) target.dataset.state = state;
+  else delete target.dataset.state;
+}
+
+async function runCultureBiologicalAssessment() {
+  const requestId = ++cultureBiologicalAssessmentRequestId;
+  const operationRevision = authStateRevision;
+  const operationOrganizationId = organizationId;
+  const panel = document.getElementById("biologicalContextPanel");
+  const cultureId = panel?.dataset.cultureId;
+  const startDate = document.getElementById("cultureBieAssessmentStart")?.value;
+  const endDate = document.getElementById("cultureBieAssessmentEnd")?.value;
+  const button = document.getElementById("runCultureBiologicalAssessment");
+  const domain = document.body.dataset.domain === "laboratory" ? "lab" : document.body.dataset.domain;
+
+  if (!operationOrganizationId || !cultureId || !["mycology", "lab"].includes(domain)) {
+    setCultureBiologicalAssessmentMessage("Culture ou domaine de travail indisponible.", "error");
+    return;
+  }
+  if (!startDate || !endDate || endDate <= startDate) {
+    setCultureBiologicalAssessmentMessage("Choisissez une fenêtre valide : la date de fin est exclusive et doit suivre le début.", "error");
+    return;
+  }
+
+  button.disabled = true;
+  setCultureBiologicalAssessmentMessage("Préparation du snapshot biologique authentifié…");
+  try {
+    const { data, error } = await supabaseClient.functions.invoke("engine-orchestrator", {
+      body: {
+        organization_id: operationOrganizationId,
+        engine_id: "biological.context.features",
+        engine_version: "0.2.0",
+        scope: {
+          organization_id: operationOrganizationId,
+          culture_id: cultureId,
+        },
+        record_ids: [],
+        parameters: {
+          window_start: startDate + "T00:00:00+01:00",
+          window_end: endDate + "T00:00:00+01:00",
+          timezone: "Africa/Algiers",
+        },
+        idempotency_key: crypto.randomUUID(),
+      },
+    });
+    if (requestId !== cultureBiologicalAssessmentRequestId ||
+        panel?.dataset.cultureId !== cultureId ||
+        !isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
+    if (error) {
+      const detail = String(error.message || "Erreur inconnue");
+      let errorCode = "";
+      try {
+        const response = error.context?.clone?.();
+        if (response) {
+          const payload = await response.json();
+          errorCode = typeof payload?.error === "string" ? payload.error : "";
+        }
+      } catch {
+        // Transport errors may not expose a JSON response body.
+      }
+      if (/function.*not found|not deployed|404/i.test(detail)) {
+        throw new Error("Le service engine-orchestrator n’est pas encore déployé.");
+      }
+      if (errorCode === "engine_version_not_registered") {
+        throw new Error("Le BIE v0.2 n’est pas encore activé côté serveur (BA_BIE_ENABLED).");
+      }
+      if (errorCode === "orchestration_not_configured") {
+        throw new Error("Le worker BIE ou ses secrets serveur ne sont pas encore configurés.");
+      }
+      throw new Error(errorCode || detail);
+    }
+    await loadRecentEngineExecutions();
+    if (requestId !== cultureBiologicalAssessmentRequestId ||
+        panel?.dataset.cultureId !== cultureId ||
+        !isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
+    const executionId = data?.execution_id || data?.execution?.id;
+    if (data?.status === "failed") {
+      setCultureBiologicalAssessmentMessage(
+        "L’évaluation a échoué (" + String(data.error_code || "erreur non documentée") + "). Consultez l’historique des analyses.",
+        "error"
+      );
+      return;
+    }
+    if (executionId && ["queued", "running"].includes(data?.status)) {
+      setCultureBiologicalAssessmentMessage(
+        "Évaluation enregistrée (" + executionId + "). Traitement en file d’attente ; le statut sera actualisé dans l’historique.",
+        "success"
+      );
+      return;
+    }
+    setCultureBiologicalAssessmentMessage(
+      executionId
+        ? "Évaluation terminée (" + executionId + "). Consultez l’historique des exécutions."
+        : "Évaluation transmise. Consultez l’historique des exécutions.",
+      "success"
+    );
+  } catch (error) {
+    if (requestId !== cultureBiologicalAssessmentRequestId ||
+        panel?.dataset.cultureId !== cultureId ||
+        !isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
+    setCultureBiologicalAssessmentMessage(error.message || "Impossible de lancer l’évaluation BIE.", "error");
+  } finally {
+    if (requestId === cultureBiologicalAssessmentRequestId &&
+        isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) {
+      button.disabled = false;
+    }
+  }
+}
+
 async function runPlantBiologicalAssessment() {
   const requestId = ++plantBiologicalAssessmentRequestId;
   const operationRevision = authStateRevision;
@@ -6733,9 +6909,23 @@ async function runPlantBiologicalAssessment() {
         panel?.dataset.plantCultureId !== plantCultureId ||
         !isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) return;
     const executionId = data?.execution_id || data?.execution?.id;
+    if (executionId && ["queued", "running"].includes(data?.status)) {
+      setPlantBiologicalAssessmentMessage(
+        "Évaluation enregistrée (" + executionId + "). Traitement en file d’attente…",
+        "success"
+      );
+      void monitorPlantBiologicalAssessmentExecution({
+        executionId,
+        requestId,
+        plantCultureId,
+        operationRevision,
+        operationOrganizationId
+      });
+      return;
+    }
     setPlantBiologicalAssessmentMessage(
       executionId
-        ? "Évaluation enregistrée (" + executionId + "). Consultez l’historique des exécutions."
+        ? "Évaluation terminée (" + executionId + "). Consultez l’historique des exécutions."
         : "Évaluation transmise. Consultez l’historique des exécutions.",
       "success"
     );
@@ -7003,6 +7193,10 @@ async function loadCultureDetail(cultureId) {
 async function loadRecentEngineExecutions() {
   const panel = document.getElementById("overviewRecentEngineExecutions");
   const requestId = ++engineExecutionHistoryRequestId;
+  if (engineExecutionPollingTimer !== null) {
+    clearTimeout(engineExecutionPollingTimer);
+    engineExecutionPollingTimer = null;
+  }
   const loadRevision = authStateRevision;
   const loadOrganizationId = organizationId;
   if (!loadOrganizationId || !panel) return;
@@ -7035,6 +7229,39 @@ async function loadRecentEngineExecutions() {
     );
   }
   renderRecentEngineExecutions();
+  scheduleEngineExecutionPolling(
+    loadOrganizationId,
+    loadRevision,
+    recentEngineExecutions.some((execution) => execution.status === "queued" || execution.status === "running")
+  );
+}
+
+function scheduleEngineExecutionPolling(expectedOrganizationId, expectedRevision, hasPendingExecutions) {
+  if (engineExecutionPollingTimer !== null) {
+    clearTimeout(engineExecutionPollingTimer);
+    engineExecutionPollingTimer = null;
+  }
+  if (!hasPendingExecutions || !expectedOrganizationId ||
+      !isCurrentWorkspaceRevision(expectedRevision, expectedOrganizationId)) {
+    engineExecutionPollingOrganizationId = null;
+    return;
+  }
+  engineExecutionPollingOrganizationId = expectedOrganizationId;
+  const delay = document.visibilityState === "hidden" ? 15000 : 5000;
+  engineExecutionPollingTimer = window.setTimeout(async () => {
+    engineExecutionPollingTimer = null;
+    if (engineExecutionPollingOrganizationId !== expectedOrganizationId ||
+        !isCurrentWorkspaceRevision(expectedRevision, expectedOrganizationId)) return;
+    try {
+      await loadRecentEngineExecutions();
+    } catch (error) {
+      if (engineExecutionPollingOrganizationId === expectedOrganizationId &&
+          isCurrentWorkspaceRevision(expectedRevision, expectedOrganizationId)) {
+        console.warn("Actualisation de l’état des analyses différée :", error);
+        scheduleEngineExecutionPolling(expectedOrganizationId, expectedRevision, true);
+      }
+    }
+  }, delay);
 }
 
 function getStoredEngineResult(execution) {
@@ -7728,7 +7955,10 @@ function setupUiEnhancements() {
   document.getElementById("bioOperationForm")?.addEventListener("submit", saveBiologicalOperation);
   document.getElementById("bioOperationDate")?.setAttribute("value", new Date().toISOString().slice(0,16));
   document.getElementById("closeCultureDetail")?.addEventListener("click", () => {
+    cultureBiologicalAssessmentRequestId += 1;
     document.getElementById("cultureDetailPanel")?.classList.add("hidden");
+    const contextPanel = document.getElementById("biologicalContextPanel");
+    if (contextPanel) contextPanel.dataset.cultureId = "";
   });
 
   measurementVariableSelect.addEventListener("change", updateMeasurementUnits);
