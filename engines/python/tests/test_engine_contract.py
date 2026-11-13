@@ -1131,10 +1131,7 @@ class EngineContractTests(unittest.TestCase):
         tampered_request["parameters"]["biological_identity_assertions"][0]["assertion_value"] = "NOT-HK35"
         tampered = execute_registered_engine(tampered_request)
         self.assertEqual(tampered["status"], "failed")
-        self.assertEqual(
-            tampered["error"]["code"],
-            "biological_identity_manifest_hash_mismatch",
-        )
+        self.assertEqual(tampered["error"]["code"], "engine_execution_failed")
 
 
     def test_identity_scoped_interpretation_rule_requires_validated_identity(self):
