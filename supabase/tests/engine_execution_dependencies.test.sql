@@ -41,6 +41,7 @@ declare
   bie_id uuid := 'dddddddd-dddd-4ddd-8ddd-dddddddddddd';
   atomic_execution_id uuid;
   atomic_result_id uuid;
+  tampered_payload jsonb;
   qc_result_id uuid;
   got uuid;
   ts timestamptz;
@@ -164,5 +165,60 @@ begin
  ) then
    raise exception 'atomic enqueue did not persist dependency edge';
  end if;
+
+ -- The enqueue boundary must reject a caller-modified QC result even when
+ -- execution/result IDs and all other lineage metadata still point upstream.
+ select request_payload into tampered_payload
+ from public.engine_executions
+ where organization_id=org_id and id=atomic_execution_id;
+
+ tampered_payload := jsonb_set(
+   tampered_payload,
+   '{upstream_artifacts,0,result,outcome}',
+   '"failed"'::jsonb,
+   false
+ );
+ begin
+   perform public.enqueue_bie_with_environmental_qc(
+     org_id,
+     '44444444-4444-4444-8444-444444444444',
+     'bie-tampered-artifact',
+     qc_scope || jsonb_build_object('culture_id','99999999-9999-4999-8999-999999999999'),
+     '{}'::uuid[],
+     repeat('d',64),
+     tampered_payload,
+     user_id,
+     qc_id
+   );
+   raise exception 'tampered upstream QC result was accepted' using errcode='P0001';
+ exception when sqlstate '22023' then
+   null;
+ end;
+
+ -- A different upstream engine version must not be accepted by the fixed
+ -- QC v0.2 -> BIE v0.2 composition edge.
+ tampered_payload := jsonb_set(
+   (select request_payload from public.engine_executions
+    where organization_id=org_id and id=atomic_execution_id),
+   '{upstream_artifacts,0,engine_version}',
+   '"9.9.9"'::jsonb,
+   false
+ );
+ begin
+   perform public.enqueue_bie_with_environmental_qc(
+     org_id,
+     '55555555-5555-4555-8555-555555555555',
+     'bie-wrong-upstream-version',
+     qc_scope || jsonb_build_object('culture_id','99999999-9999-4999-8999-999999999999'),
+     '{}'::uuid[],
+     repeat('e',64),
+     tampered_payload,
+     user_id,
+     qc_id
+   );
+   raise exception 'incompatible upstream QC version was accepted' using errcode='P0001';
+ exception when sqlstate '22023' then
+   null;
+ end;
 end $$;
 rollback;
