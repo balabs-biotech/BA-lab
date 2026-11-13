@@ -1,7 +1,8 @@
-"""Deterministic biological context features from an authorized immutable snapshot.
+"""Deterministic biological context features and scoped threshold findings.
 
-This first slice reports traceable observations, coverage and descriptive
-statistics only. It does not diagnose organisms or recommend interventions.
+Rule-based findings require an exact biological-context match and a versioned
+rule-registry dataset manifest. They remain limited evidence, not diagnosis or
+intervention recommendations.
 """
 from __future__ import annotations
 
