@@ -75,6 +75,38 @@ assert.equal(counts.strains, 1);
 assert.equal(counts.organisms, 1);
 assert.equal(counts.environmental_observations, 1);
 
+// A newly created culture may have no biological context, measurements,
+// environment history or weather observations. The authenticated loader
+// must still produce a valid empty snapshot and must not infer the mutable
+// current environment from cultures.environment_id.
+const emptyCultureData = {
+  cultures: [{ id: cultureId, organization_id: org, environment_id: envB }],
+  biological_contexts: [],
+  measurements: [],
+  environments: [],
+  locations: [],
+  environmental_observations: [],
+};
+const emptyCultureCounts = {};
+const emptyCultureSnapshot = await loadAuthenticatedBiologicalContextSnapshot({
+  userClient: clientFor(emptyCultureData, emptyCultureCounts),
+  organizationId: org,
+  cultureId,
+  window,
+});
+assert.deepEqual(emptyCultureSnapshot.input.records, []);
+assert.deepEqual(emptyCultureSnapshot.input.record_ids, []);
+assert.equal(emptyCultureSnapshot.scope.culture_id, cultureId);
+assert.equal(Object.hasOwn(emptyCultureSnapshot.scope, "environment_id"), false);
+assert.equal(emptyCultureSnapshot.parameters.biological_context_supplied, false);
+assert.equal(emptyCultureSnapshot.parameters.environment_link_state, "missing");
+assert.equal(emptyCultureSnapshot.parameters.profile_context_stable, false);
+assert.equal(emptyCultureSnapshot.parameters.profile_domain, null);
+assert.equal(emptyCultureCounts.environmental_observations ?? 0, 0,
+  "an empty culture must not trigger an unscoped weather query");
+assert.equal(emptyCultureCounts.strains ?? 0, 0);
+assert.equal(emptyCultureCounts.organisms ?? 0, 0);
+
 const ambiguousData = structuredClone(base);
 ambiguousData.biological_contexts.push({
   id: "88888888-8888-4888-8888-888888888888", organization_id: org, culture_id: cultureId,
