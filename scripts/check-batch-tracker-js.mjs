@@ -287,3 +287,29 @@ console.log("✓ Atomic measurement/observation writes no longer perform separat
 const forbiddenDirectWrite = engine.match(/\.from\(["'](?:events|measurements|observations)["']\)\s*\.(?:insert|upsert|update|delete)\s*\(/);
 if (forbiddenDirectWrite) throw new Error("Audit-sensitive event/measurement/observation writes must go through validated RPCs, not direct table mutations");
 console.log("✓ Tracker uses RPC-backed writes for events, measurements and observations");
+
+const evidenceReviewStart=engine.indexOf("const assertionEvidenceDetails = document.createElement(\"details\")");
+const evidenceReviewEnd=engine.indexOf("const assertions = Array.isArray(subject.biological_reference_assertions)",evidenceReviewStart);
+if(evidenceReviewStart<0||evidenceReviewEnd<0)throw new Error("Biological assertion evidence dossier UI is missing");
+const evidenceReview=engine.slice(evidenceReviewStart,evidenceReviewEnd);
+for(const snippet of [
+  "assertion.assertion_code",
+  "assertion.assertion_version",
+  "source.reference_id",
+  "source.reference_version",
+  "assertion.source_locator",
+  "assertion.reviewed_at",
+  "source.reviewed_at",
+  "assertion.applicability_state",
+  "assertion.temporal_applicability_state",
+  "assertion.matching_context_ids",
+  "assertion.uncertainty",
+  "assertion.content_sha256",
+  "source.content_sha256",
+  "source.source_url",
+  'sourceUrl.protocol === "https:"',
+  'sourceUrl.protocol === "http:"',
+  'link.rel = "noopener noreferrer"'
+])if(!evidenceReview.includes(snippet))throw new Error("Biological evidence provenance review field or URL guard missing: "+snippet);
+if(!evidenceReview.includes("slice(0, 30)"))throw new Error("Biological evidence review must bound rendered assertion records");
+console.log("✓ Biological assertion review exposes evidence, applicability, reviewer timestamps, both SHA-256 digests and safely validated source links");
