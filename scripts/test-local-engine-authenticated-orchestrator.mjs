@@ -406,6 +406,10 @@ try {
   if (tamperedWorkerDispatch.status !== 200) {
     throw new Error(`tampered-worker BIE dispatch failed: ${tamperedWorkerDispatch.status}/${JSON.stringify(tamperedWorkerDispatch.body)}`);
   }
+  const workerProxyHealth = await fetch("http://127.0.0.1:18081/healthz").then((response) => response.json());
+  if (workerProxyHealth?.bie_responses !== 2) {
+    throw new Error(`CI worker proxy did not mutate exactly the second BIE response: ${JSON.stringify(workerProxyHealth)}`);
+  }
   const tamperedWorkerLedgerRows = await api(
     `/rest/v1/engine_executions?id=eq.${tamperedWorkerBieExecutionId}&organization_id=eq.${organizationId}&select=id,status,error_code,result_payload`,
   );
