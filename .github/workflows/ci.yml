@@ -513,6 +513,7 @@ jobs:
         run: |
           node scripts/test-local-engine-authenticated-orchestrator.mjs || {
             docker logs ba-engine-worker-runtime-ci
+            cat /tmp/ba-engine-worker-test-proxy.log
             cat /tmp/ba-labs-edge-runtime.log
             exit 1
           }
