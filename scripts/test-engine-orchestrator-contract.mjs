@@ -217,7 +217,7 @@ const authenticatedRuntimeTest = readFileSync(
 );
 assert.match(
   authenticatedRuntimeTest,
-  /mismatchedLineageQcExecutionId[\s\S]*?array\[\]'?\s*\[\s*\]|array\[\s*'\s*\$\{mismatchedLineageSourceId\}/,
+  /array\['" \+ mismatchedLineageSourceId \+ "'::uuid\]/,
   "Authenticated runtime coverage must include a QC fixture whose persisted source IDs diverge from the ledger"
 );
 assert.match(
