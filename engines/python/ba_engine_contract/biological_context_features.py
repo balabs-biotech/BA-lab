@@ -165,10 +165,14 @@ def _evaluate_biological_reference_assertions(
         if _contract_stable_sha256(payload) != digest:
             raise ValueError("biological_reference_assertion_content_hash_mismatch")
 
+        _timestamp(assertion["reviewed_at"], "biological_reference_assertion_reviewed_at")
+        _timestamp(source_reviewed_at, "biological_reference_source_reviewed_at")
         context_match = applicability.get("context_match")
         matching_context_ids: list[str] = []
         applicability_state = "not_assessed"
-        if context_match is not None:
+        if context_match is not None and not biological_contexts:
+            applicability_state = "undetermined"
+        elif context_match is not None:
             if (
                 not isinstance(context_match, dict) or not context_match
                 or not set(context_match).issubset(_RULE_CONTEXT_FIELDS)
