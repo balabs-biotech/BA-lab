@@ -6739,6 +6739,9 @@ async function runPlantBiologicalAssessment() {
           plant_culture_id: plantCultureId,
         },
         record_ids: [],
+        ...(document.getElementById("plantBiologicalAssessmentQcExecution")?.value
+          ? { upstream_qc_execution_id: document.getElementById("plantBiologicalAssessmentQcExecution").value }
+          : {}),
         parameters: {
           window_start: startDate + "T00:00:00+01:00",
           window_end: endDate + "T00:00:00+01:00",
@@ -8029,6 +8032,30 @@ function renderBiologicalContextAssessment(article, result) {
   addList(article, "Lacunes temporelles", coverage.temporal_gaps, item => String(item.from || "début inconnu") + " → " + String(item.to || "fin inconnue") + " · " + String(item.duration_seconds ?? "durée inconnue") + " secondes", 8);
 }
 function renderRecentEngineExecutions() {
+  const qcSelector = document.getElementById("plantBiologicalAssessmentQcExecution");
+  if (qcSelector) {
+    const selectedQcId = qcSelector.value;
+    const eligibleQc = recentEngineExecutions.filter(execution =>
+      execution.engine_id === "environmental.timeseries.qc" &&
+      execution.status === "completed"
+    );
+    qcSelector.replaceChildren();
+    const noQc = document.createElement("option");
+    noQc.value = "";
+    noQc.textContent = "Aucun QC amont sélectionné";
+    qcSelector.appendChild(noQc);
+    for (const execution of eligibleQc) {
+      const option = document.createElement("option");
+      option.value = execution.id;
+      option.textContent = new Date(execution.created_at || 0).toLocaleString() +
+        " · " + String(execution.scope?.location_id || "localisation non documentée") +
+        " · v" + String(execution.engine_version || "?");
+      qcSelector.appendChild(option);
+    }
+    if (eligibleQc.some(execution => execution.id === selectedQcId)) {
+      qcSelector.value = selectedQcId;
+    }
+  }
   const panel = document.getElementById("overviewRecentEngineExecutions");
   if (!panel) return;
   panel.replaceChildren();
