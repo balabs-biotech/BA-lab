@@ -712,6 +712,40 @@ Deno.serve(async (req: Request) => {
     });
   }
 
+  // Bind the worker's persisted biological result to the exact QC artifact
+  // assembled from the tenant-scoped ledger. A valid response envelope alone
+  // does not prove that the worker retained the upstream artifact unchanged.
+  if (upstreamArtifacts.length === 1 && result.status === "completed") {
+    const expectedArtifact = upstreamArtifacts[0];
+    const consumedQc = result.result?.value?.environmental_quality_control;
+    const lineageMatches = object(consumedQc) &&
+      consumedQc.upstream_execution_id === expectedArtifact.execution_id &&
+      consumedQc.upstream_result_id === expectedArtifact.result_id &&
+      consumedQc.upstream_engine_id === expectedArtifact.engine_id &&
+      consumedQc.upstream_engine_version === expectedArtifact.engine_version &&
+      consumedQc.upstream_completed_at === expectedArtifact.completed_at &&
+      consumedQc.upstream_input_snapshot_sha256 === expectedArtifact.input_snapshot_sha256 &&
+      stable(consumedQc.upstream_scope) === stable(expectedArtifact.scope) &&
+      consumedQc.artifact_sha256 === expectedArtifact.artifact_sha256 &&
+      consumedQc.outcome === expectedArtifact.result.outcome &&
+      stable(consumedQc.quality_flags) === stable(expectedArtifact.result.quality_flags) &&
+      stable(consumedQc.limitations) === stable(expectedArtifact.result.limitations) &&
+      stable(consumedQc.provenance) === stable(expectedArtifact.result.provenance) &&
+      stable(consumedQc.value) === stable(expectedArtifact.result.value);
+    if (!lineageMatches) {
+      const persisted = await persistExecutionFailure(
+        "upstream_artifact_lineage_mismatch",
+        "The BIE worker result did not preserve the verified upstream QC artifact.",
+        new Date().toISOString(),
+        workerId,
+      );
+      return reply(persisted ? 502 : 500, {
+        error: persisted ? "upstream_artifact_lineage_mismatch" : "execution_state_persistence_failed",
+        execution_id: execution.id,
+      });
+    }
+  }
+
   // The durable ledger ID is authoritative; do not persist the worker-local UUID
   // as though it were the database execution identity.
   result.execution_id = execution.id;
