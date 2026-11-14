@@ -58,9 +58,9 @@ async function assertFunction(name, { headers, expectedStatus, expectedError, bo
     authorization: `Bearer ${routeSmokeJwt}`,
     ...headers,
   }, body);
-  const body = await response.json().catch(() => null);
-  if (response.status !== expectedStatus || body?.error !== expectedError) {
-    throw new Error(`${name}: expected ${expectedStatus}/${expectedError}, received ${response.status}/${JSON.stringify(body)}`);
+  const responseBody = await response.json().catch(() => null);
+  if (response.status !== expectedStatus || responseBody?.error !== expectedError) {
+    throw new Error(`${name}: expected ${expectedStatus}/${expectedError}, received ${response.status}/${JSON.stringify(responseBody)}`);
   }
   process.stdout.write(`ok ${name}: reached handler and received ${expectedStatus}/${expectedError}\\n`);
 }
