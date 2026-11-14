@@ -8132,6 +8132,39 @@ function renderBiologicalContextAssessment(article, result) {
   if (observed?.start && observed?.end) addLine(article, "Fenêtre observée : " + observed.start + " → " + observed.end);
   addList(article, "Contexte manquant ou non résolu", coverage.missing_context, item => item, 12);
   addList(article, "Faits observés et sources", value.observed_facts, item => String(item.statement || item.fact_code || "Fait") + (item.observed_at ? " · " + item.observed_at : "") + (Array.isArray(item.source_record_ids) ? " · sources : " + item.source_record_ids.join(", ") : ""), 8);
+  const temporalFeatures = Array.isArray(value.derived_features) ? value.derived_features.filter(item =>
+    item && typeof item.feature_code === "string" &&
+    (item.feature_code.endsWith(".range") || item.feature_code.endsWith(".trend_slope_per_day"))
+  ) : [];
+  if (temporalFeatures.length) {
+    const temporalPanel = document.createElement("section");
+    temporalPanel.className = "engine-temporal-interpretation";
+    temporalPanel.setAttribute("aria-label", "Indicateurs temporels descriptifs");
+    const temporalTitle = document.createElement("strong");
+    temporalTitle.textContent = "Dynamique temporelle observée";
+    temporalPanel.appendChild(temporalTitle);
+    const temporalList = document.createElement("ul");
+    for (const feature of temporalFeatures) {
+      const item = document.createElement("li");
+      const isTrend = feature.feature_code.endsWith(".trend_slope_per_day");
+      const label = document.createElement("strong");
+      label.textContent = isTrend ? "Tendance linéaire estimée" : "Amplitude observée";
+      const detail = document.createElement("p");
+      detail.className = "muted";
+      detail.textContent = String(feature.feature_code) + " : " + String(feature.value ?? "—") +
+        (feature.unit_code ? " " + feature.unit_code : "") +
+        " · " + String(feature.method || "méthode non documentée") +
+        " · " + String(Array.isArray(feature.source_record_ids) ? feature.source_record_ids.length : 0) + " source(s)";
+      item.append(label, detail);
+      temporalList.appendChild(item);
+    }
+    temporalPanel.appendChild(temporalList);
+    const note = document.createElement("p");
+    note.className = "muted";
+    note.textContent = "Indicateurs descriptifs calculés sur les observations disponibles ; ils ne constituent pas un diagnostic biologique ni une preuve de causalité.";
+    temporalPanel.appendChild(note);
+    article.appendChild(temporalPanel);
+  }
   addList(article, "Caractéristiques calculées", value.derived_features, item => String(item.feature_code || "Caractéristique") + " : " + String(item.value ?? "—") + (item.unit_code ? " " + item.unit_code : "") + (item.method ? " · méthode : " + item.method : "") + (Array.isArray(item.source_record_ids) ? " · " + item.source_record_ids.length + " sources" : ""), 10);
   addList(article, "Constats", value.findings, item => typeof item === "string" ? item : (item.statement || item.description || JSON.stringify(item)), 8);
   addList(article, "Hypothèses à vérifier", value.hypotheses, item => typeof item === "string" ? item : (item.statement || item.description || JSON.stringify(item)), 8);
