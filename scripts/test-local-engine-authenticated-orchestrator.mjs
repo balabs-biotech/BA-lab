@@ -56,6 +56,8 @@ function assertResponse(label, actual, status, error) {
 const email = `cultureops-ci-${randomUUID()}@example.test`;
 const password = `CI-${randomUUID()}-aA9!`;
 let userId;
+let locationId;
+let qcExecutionId;
 
 try {
   const created = await api("/auth/v1/admin/users", {
@@ -86,6 +88,68 @@ try {
 
   const windowStart = "2026-11-13T00:00:00Z";
   const windowEnd = "2026-11-14T00:00:00Z";
+
+  const location = await api("/rest/v1/locations?select=id", {
+    method: "POST",
+    body: {
+      organization_id: organizationId,
+      code: `CI-QC-${randomUUID().slice(0, 8)}`,
+      name: "Temporary authenticated QC integration fixture",
+      location_type: "test",
+      metadata: { purpose: "ephemeral_ci_fixture" },
+    },
+    headers: { Prefer: "return=representation" },
+  });
+  locationId = location?.[0]?.id;
+  if (typeof locationId !== "string") throw new Error("Could not create temporary QC location");
+
+  const observations = await api("/rest/v1/environmental_observations?select=id", {
+    method: "POST",
+    body: [0, 1, 2].map((hour) => ({
+      organization_id: organizationId,
+      location_id: locationId,
+      data_family: "weather",
+      provider_code: "BA_LABS_CI",
+      dataset_code: "AUTHENTICATED_QC_FIXTURE_V1",
+      variable_code: "air_temperature",
+      value: 21 + hour,
+      unit_code: "degC",
+      observed_at: `2026-11-13T0${hour}:00:00Z`,
+      quality_flag: "fixture",
+      metadata: { purpose: "ephemeral_ci_fixture" },
+    })),
+    headers: { Prefer: "return=representation" },
+  });
+  const recordIds = observations.map((row) => row.id);
+  if (recordIds.length !== 3 || recordIds.some((id) => typeof id !== "string")) {
+    throw new Error("Could not create three environmental QC source records");
+  }
+
+  const qc = await invoke(session.access_token, {
+    organization_id: organizationId,
+    engine_id: "environmental.timeseries.qc",
+    engine_version: "0.2.0",
+    record_ids: recordIds,
+    record_type: "environmental_observation",
+    parameters: { window_start: windowStart, window_end: windowEnd, minimum_points: 3 },
+    scope: { organization_id: organizationId, location_id: locationId },
+    idempotency_key: `auth-qc-real-source-${randomUUID()}`,
+  });
+  if (qc.status !== 202 || qc.body?.status !== "queued" || typeof qc.body?.execution_id !== "string") {
+    throw new Error(`authenticated QC enqueue failed: ${qc.status}/${JSON.stringify(qc.body)}`);
+  }
+  qcExecutionId = qc.body.execution_id;
+  const persisted = await api(
+    `/rest/v1/engine_executions?id=eq.${qcExecutionId}&organization_id=eq.${organizationId}&select=id,status,request_payload,input_record_ids`,
+  );
+  const stored = persisted?.[0];
+  if (stored?.status !== "queued" ||
+      JSON.stringify(stored.input_record_ids) !== JSON.stringify(recordIds) ||
+      stored.request_payload?.input?.records?.length !== 3 ||
+      stored.request_payload?.input?.records?.some((record) => !record.context?.location_id || record.data?.data_family !== "weather")) {
+    throw new Error("QC execution did not persist the exact RLS-authorized environmental snapshot");
+  }
+  process.stdout.write("ok authenticated QC: three RLS-visible environmental observations were snapshotted and queued\\n");
   const unmemberedOrganizationId = randomUUID();
 
   const denied = await invoke(session.access_token, {
@@ -130,6 +194,12 @@ try {
     "culture_not_found_or_inaccessible",
   );
 } finally {
+  if (qcExecutionId) {
+    await api(`/rest/v1/engine_executions?id=eq.${qcExecutionId}`, { method: "DELETE", headers: { Prefer: "return=minimal" } });
+  }
+  if (locationId) {
+    await api(`/rest/v1/locations?id=eq.${locationId}`, { method: "DELETE", headers: { Prefer: "return=minimal" } });
+  }
   if (userId) {
     await api(`/auth/v1/admin/users/${userId}`, { method: "DELETE" });
     process.stdout.write("ok auth fixture: temporary user removed\\n");
