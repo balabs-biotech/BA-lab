@@ -1,11 +1,11 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { matchesSingleUpstreamQcArtifact } from "../supabase/functions/_shared/upstream-qc-lineage.js";
+import { matchesSingleUpstreamQcArtifact } from "../supabase/functions/_shared/upstream-qc-lineage.mjs";
 
 const source = readFileSync("supabase/functions/engine-orchestrator/index.ts", "utf8");
 const biologicalLoader = readFileSync("supabase/functions/_shared/biological-context-loader.ts", "utf8");
 const biologicalProfile = readFileSync("supabase/functions/_shared/biological-interpretation-profile.ts", "utf8");
-const qcLineageValidator = readFileSync("supabase/functions/_shared/upstream-qc-lineage.js", "utf8");
+const qcLineageValidator = readFileSync("supabase/functions/_shared/upstream-qc-lineage.mjs", "utf8");
 const checks = [
   ["BIE profile loader is imported into the authenticated orchestrator", /loadAuthenticatedBiologicalInterpretationProfile/],
   ["profile resolution refuses privileged client creation and requires the caller RLS client", /caller_scoped_supabase_client_required[\s\S]*?userClient\.from/, biologicalProfile],
