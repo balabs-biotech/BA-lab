@@ -105,8 +105,16 @@ await assertFunction("engine-orchestrator", {
     idempotency_key: "edge-auth-smoke-001",
   },
 });
-await assertFunction("engine-queue-dispatch", {
-  headers: { "x-ba-dispatch-secret": dispatchSecret },
-  expectedStatus: 503,
-  expectedError: "dispatcher_not_configured",
+const idleDispatch = await post("engine-queue-dispatch", {
+  authorization: `Bearer ${routeSmokeJwt}`,
+  "x-ba-dispatch-secret": dispatchSecret,
 });
+const idleDispatchBody = await idleDispatch.json().catch(() => null);
+if (idleDispatch.status !== 200 ||
+    idleDispatchBody?.claimed !== 0 ||
+    idleDispatchBody?.completed !== 0 ||
+    idleDispatchBody?.failed !== 0 ||
+    idleDispatchBody?.lost !== 0) {
+  throw new Error(`engine-queue-dispatch: expected configured idle queue 200, received ${idleDispatch.status}/${JSON.stringify(idleDispatchBody)}`);
+}
+process.stdout.write("ok engine-queue-dispatch: configured worker queue is reachable and idle\\n");
