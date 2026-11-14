@@ -178,37 +178,63 @@ def analyze_environmental_timeseries_qc(request: Mapping[str, Any]) -> dict[str,
             }
             for index in sorted(outlier_indexes)
         ]
+        # Collapse duplicate timestamps to one temporal point for baseline
+        # construction. A duplicated instant is flagged separately above and
+        # must never count as multiple independent historical observations.
+        timestamp_groups: dict[datetime, list[tuple[float, str]]] = defaultdict(list)
+        for timestamp, value, record_id in points:
+            timestamp_groups[timestamp].append((value, record_id))
+        temporal_points = [
+            {
+                "timestamp": timestamp,
+                "value": median([item[0] for item in timestamp_values]),
+                "record_ids": sorted(item[1] for item in timestamp_values),
+            }
+            for timestamp, timestamp_values in sorted(timestamp_groups.items())
+        ]
+
         rolling_anomaly_evidence = []
-        for index in range(rolling_min_history, len(points)):
-            history = values[max(0, index - rolling_window_points):index]
-            baseline = median(history)
-            baseline_mad = median([abs(item - baseline) for item in history])
-            current_value = values[index]
+        for index, current in enumerate(temporal_points):
+            # A duplicate current timestamp has ambiguous record-level
+            # attribution, so it is not eligible for point anomaly scoring.
+            if len(current["record_ids"]) != 1:
+                continue
+            history = temporal_points[max(0, index - rolling_window_points):index]
+            if len(history) < rolling_min_history:
+                continue
+            history_values = [item["value"] for item in history]
+            baseline = median(history_values)
+            baseline_mad = median([abs(item - baseline) for item in history_values])
+            current_value = current["value"]
+            history_record_ids = sorted({
+                record_id for item in history for record_id in item["record_ids"]
+            })
+            evidence = {
+                "record_id": current["record_ids"][0],
+                "observed_at": _iso_utc(current["timestamp"]),
+                "observed_value": current_value,
+                "baseline_median": baseline,
+                "baseline_mad": baseline_mad,
+                "deviation_from_baseline": current_value - baseline,
+                "threshold": float(rolling_threshold),
+                "history_point_count": len(history),
+                "history_start_at": _iso_utc(history[0]["timestamp"]),
+                "history_end_at": _iso_utc(history[-1]["timestamp"]),
+                "history_record_ids": history_record_ids,
+            }
             if baseline_mad == 0:
                 if current_value != baseline:
                     rolling_anomaly_evidence.append({
-                        "record_id": points[index][2],
-                        "observed_at": _iso_utc(points[index][0]),
-                        "observed_value": current_value,
-                        "baseline_median": baseline,
-                        "baseline_mad": 0,
+                        **evidence,
                         "robust_z_score": None,
-                        "threshold": float(rolling_threshold),
-                        "history_point_count": len(history),
                         "method": "zero_mad_deviation",
                     })
                 continue
             robust_score = abs(current_value - baseline) / (1.4826 * baseline_mad)
             if robust_score > rolling_threshold:
                 rolling_anomaly_evidence.append({
-                    "record_id": points[index][2],
-                    "observed_at": _iso_utc(points[index][0]),
-                    "observed_value": current_value,
-                    "baseline_median": baseline,
-                    "baseline_mad": baseline_mad,
+                    **evidence,
                     "robust_z_score": round(robust_score, 4),
-                    "threshold": float(rolling_threshold),
-                    "history_point_count": len(history),
                     "method": "trailing_rolling_median_mad",
                 })
         flags = []
