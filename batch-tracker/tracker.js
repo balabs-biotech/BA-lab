@@ -7477,7 +7477,7 @@ function renderBiologicalContextAssessment(article, result) {
         }
         const { data: observations, error: observationsError } = await supabaseClient
           .from("environmental_observations")
-          .select("id,observed_at,variable_code,value,unit_code,provider_code,dataset_code,quality_flag")
+          .select("id,location_id,data_family,observed_at,retrieved_at,variable_code,value,unit_code,provider_code,dataset_code,quality_flag,source_url")
           .eq("organization_id", expectedOrganizationId)
           .in("id", ids)
           .order("observed_at", { ascending: true });
@@ -7487,21 +7487,62 @@ function renderBiologicalContextAssessment(article, result) {
           throw new Error("Le contexte organisationnel a changé pendant le chargement ; affichage annulé.");
         }
         const rows = Array.isArray(observations) ? observations : [];
-        addLine(traceOutput, "Observations météo retrouvées : " + rows.length + " / " + ids.length +
-          ". Identifiants non résolus dans environmental_observations : " + Math.max(0, ids.length - rows.length) + ".");
+        const resolvedIds = new Set(rows.map(row => row.id));
+        const unresolvedIds = ids.filter(id => !resolvedIds.has(id));
+        addLine(traceOutput, "Enregistrements environnementaux retrouvés : " + rows.length + " / " + ids.length +
+          ". Identifiants non résolus : " + unresolvedIds.length +
+          ". Familles présentes : " + [...new Set(rows.map(row => row.data_family || "inconnue"))].join(", "));
         const list = document.createElement("ol");
         for (const row of rows.slice(0, 500)) {
           const item = document.createElement("li");
-          item.textContent = String(row.observed_at || "date inconnue") + " · " +
+          const parts = [
+            String(row.observed_at || "date inconnue"),
             String(row.variable_code || "variable inconnue") + " = " +
-            String(row.value ?? "—") + " " + String(row.unit_code || "") +
-            " · " + String(row.provider_code || "fournisseur inconnu") + "/" +
-            String(row.dataset_code || "jeu inconnu") +
-            " · qualité : " + String(row.quality_flag || "non renseignée") +
-            " · ID : " + String(row.id);
+              String(row.value ?? "—") + " " + String(row.unit_code || ""),
+            String(row.data_family || "famille inconnue"),
+            String(row.provider_code || "fournisseur inconnu") + "/" +
+              String(row.dataset_code || "jeu inconnu"),
+            "localisation : " + String(row.location_id || "inconnue"),
+            "récupéré : " + String(row.retrieved_at || "date inconnue"),
+            "qualité : " + String(row.quality_flag || "non renseignée"),
+            "ID : " + String(row.id)
+          ];
+          const description = document.createElement("span");
+          description.textContent = parts.join(" · ");
+          item.appendChild(description);
+          if (typeof row.source_url === "string" && row.source_url) {
+            try {
+              const sourceUrl = new URL(row.source_url);
+              if (sourceUrl.protocol === "https:" || sourceUrl.protocol === "http:") {
+                const link = document.createElement("a");
+                link.href = sourceUrl.href;
+                link.textContent = "Source fournisseur";
+                link.target = "_blank";
+                link.rel = "noopener noreferrer";
+                item.appendChild(document.createTextNode(" · "));
+                item.appendChild(link);
+              }
+            } catch (_) {
+              // Invalid source URLs remain visible only as absent links.
+            }
+          }
           list.appendChild(item);
         }
         traceOutput.appendChild(list);
+        if (unresolvedIds.length) {
+          const missing = document.createElement("details");
+          const missingSummary = document.createElement("summary");
+          missingSummary.textContent = "Identifiants d’entrée non résolus (" + unresolvedIds.length + ")";
+          missing.appendChild(missingSummary);
+          const missingList = document.createElement("ul");
+          for (const id of unresolvedIds.slice(0, 100)) {
+            const entry = document.createElement("li");
+            entry.textContent = id;
+            missingList.appendChild(entry);
+          }
+          missing.appendChild(missingList);
+          traceOutput.appendChild(missing);
+        }
       } catch (error) {
         traceOutput.textContent = "Remontée de provenance impossible : " + String(error?.message || error);
       } finally {
