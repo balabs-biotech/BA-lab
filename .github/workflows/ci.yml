@@ -416,12 +416,35 @@ jobs:
         run: |
           supabase migration list
           supabase status -o env | grep -E '^(ANON_KEY|JWT_SECRET|SERVICE_ROLE_KEY)=' >> "$GITHUB_ENV"
+      - name: Build and start isolated Python engine worker
+        run: |
+          set -euo pipefail
+          token="ci-worker-token-0123456789abcdef"
+          docker build --pull --build-arg "BA_ENGINE_BUILD_REVISION=${GITHUB_SHA}" -f engines/python/Dockerfile -t ba-labs-engine-worker:runtime-ci .
+          docker run --detach --name ba-engine-worker-runtime-ci \
+            --publish 127.0.0.1:18080:8080 \
+            --env "BA_ENGINE_WORKER_TOKEN=$token" \
+            --read-only --cap-drop=ALL --security-opt=no-new-privileges \
+            --memory=256m --cpus=1 --pids-limit=64 --user=10001:10001 \
+            ba-labs-engine-worker:runtime-ci
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent http://127.0.0.1:18080/healthz >/dev/null; then exit 0; fi
+            if ! docker inspect -f '{{.State.Running}}' ba-engine-worker-runtime-ci | grep -q true; then
+              docker logs ba-engine-worker-runtime-ci
+              exit 1
+            fi
+            sleep 1
+          done
+          docker logs ba-engine-worker-runtime-ci
+          exit 1
       - name: Start real Edge Functions runtime
         run: |
           cat > /tmp/ba-labs-edge-ci.env <<'EOF'
           BA_ENGINE_ASYNC_DISPATCH=true
           BA_BIE_ENABLED=true
           BA_ENGINE_DISPATCH_TOKEN=ci-dispatch-token-0123456789abcdef
+          BA_ENGINE_WORKER_URL=http://127.0.0.1:18080
+          BA_ENGINE_WORKER_TOKEN=ci-worker-token-0123456789abcdef
           EOF
           supabase functions serve --no-verify-jwt --env-file /tmp/ba-labs-edge-ci.env > /tmp/ba-labs-edge-runtime.log 2>&1 &
           echo $! > /tmp/ba-labs-edge-runtime.pid
@@ -445,7 +468,11 @@ jobs:
             exit 1
           }
       - name: Exercise authenticated tenant and biological source boundaries
+        env:
+          BA_ENGINE_DISPATCH_TOKEN: ci-dispatch-token-0123456789abcdef
         run: node scripts/test-local-engine-authenticated-orchestrator.mjs
       - name: Stop local Supabase stack
         if: always()
-        run: supabase stop --no-backup
+        run: |
+          docker rm -f ba-engine-worker-runtime-ci >/dev/null 2>&1 || true
+          supabase stop --no-backup
