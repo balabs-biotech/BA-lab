@@ -1391,6 +1391,138 @@ class EngineContractTests(unittest.TestCase):
         self.assertEqual(tampered["error"]["code"], "engine_execution_failed")
 
 
+    def test_biological_context_features_validates_reference_assertions_and_applicability(self):
+        request = json.loads(json.dumps(REQUEST))
+        request["engine"] = {
+            "engine_id": "biological.context.features",
+            "engine_version": "0.2.0",
+        }
+        request["scope"] = {
+            "organization_id": REQUEST["scope"]["organization_id"],
+            "culture_id": "2c2b3a4d-5e6f-4789-8123-456789abcdef",
+        }
+        context = {
+            "context_id": "5c2b3a4d-5e6f-4789-8123-456789abcdef",
+            "valid_from": "2026-11-01",
+            "valid_to": None,
+            "organism_kind": "fungus",
+            "taxon_code": "NCBI:pleurotus_ostreatus",
+            "strain_code": "P80",
+            "cultivar_code": None,
+            "culture_stage": "fruiting",
+            "substrate_code": "wheat_straw",
+            "production_system": "bucket",
+            "context_tags": [],
+            "genetic_reference": {
+                "status": "not_specified", "strain_id": None, "organism_id": None,
+                "designation": None, "origin": None, "source_description": None,
+                "scientific_name": None, "common_name": None, "taxonomy_source": None,
+                "taxonomy_id": None,
+            },
+        }
+        source = {
+            "reference_id": "ba-labs.synthetic.reference",
+            "reference_version": "1.0.0",
+            "content_sha256": "a" * 64,
+            "reviewed_at": "2026-11-01T00:00:00Z",
+        }
+        assertion_payload = {
+            "assertion_code": "pleurotus.ostreatus.substrate.reported",
+            "assertion_version": "1.0.0",
+            "subject_type": "taxon",
+            "subject_ref": context["taxon_code"],
+            "predicate_code": "substrate.association",
+            "object_value": {"substrate": "wheat_straw", "relation": "reported"},
+            "unit_code": None,
+            "reference_registry_id": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb",
+            "source_locator": "section-4",
+            "evidence_level": "L0",
+            "applicability": {"context_match": {"organism_kind": "fungus", "culture_stage": "fruiting"}},
+            "uncertainty": {"assessment": "not_assessed"},
+            "source": source,
+            "reviewed_at": "2026-11-02T00:00:00Z",
+        }
+        assertion = {
+            **assertion_payload,
+            "content_sha256": _stable_sha256(assertion_payload),
+        }
+        request["parameters"] = {
+            "window_start": "2026-11-10T00:00:00Z",
+            "window_end": "2026-11-11T00:00:00Z",
+            "timezone": "Africa/Algiers",
+            "biological_contexts": [context],
+            "biological_reference_assertion_state": "documented",
+            "biological_reference_assertions": [assertion],
+        }
+        request["datasets"] = [{
+            "provider": "BA_LABS_BIOLOGICAL_REFERENCE_ASSERTION",
+            "dataset_id": assertion["assertion_code"],
+            "dataset_version": assertion["assertion_version"],
+            "content_sha256": assertion["content_sha256"],
+            "retrieved_at": assertion["reviewed_at"],
+        }]
+        request["input"]["record_ids"] = []
+        request["input"]["records"] = []
+
+        result = execute_registered_engine(request)
+        self.assertEqual(result["status"], "completed", msg=str(result.get("error")))
+        value = result["result"]["value"]
+        self.assertEqual(value["subject"]["biological_reference_assertion_state"], "documented")
+        resolved = value["subject"]["biological_reference_assertions"]
+        self.assertEqual(len(resolved), 1)
+        self.assertEqual(resolved[0]["applicability_state"], "matched")
+        self.assertEqual(resolved[0]["matching_context_ids"], [context["context_id"]])
+        self.assertEqual(resolved[0]["source"]["content_sha256"], source["content_sha256"])
+        self.assertIn("biological_reference_assertions_present", result["result"]["quality_flags"])
+        self.assertTrue(any(
+            item.startswith("BA_LABS_BIOLOGICAL_REFERENCE_ASSERTION/pleurotus.ostreatus.substrate.reported@1.0.0#sha256=")
+            for item in result["result"]["provenance"]["source_references"]
+        ))
+        biological_schema = json.loads((ROOT / "schemas" / "biological" / "v1" / "context-assessment.schema.json").read_text(encoding="utf-8"))
+        validator(biological_schema).validate(value)
+
+        not_applicable_request = json.loads(json.dumps(request))
+        not_applicable_request["parameters"]["biological_reference_assertions"][0]["applicability"]["context_match"]["culture_stage"] = "vegetative"
+        changed_payload = {
+            key: val for key, val in not_applicable_request["parameters"]["biological_reference_assertions"][0].items()
+            if key != "content_sha256"
+        }
+        changed_payload["content_sha256"] = _stable_sha256(changed_payload)
+        not_applicable_request["parameters"]["biological_reference_assertions"][0] = changed_payload
+        not_applicable_request["datasets"][0]["content_sha256"] = changed_payload["content_sha256"]
+        not_applicable = execute_registered_engine(not_applicable_request)
+        self.assertEqual(not_applicable["status"], "completed", msg=str(not_applicable.get("error")))
+        self.assertEqual(
+            not_applicable["result"]["value"]["subject"]["biological_reference_assertions"][0]["applicability_state"],
+            "not_applicable",
+        )
+
+        conflicting_request = json.loads(json.dumps(request))
+        second_payload = dict(assertion_payload)
+        second_payload["assertion_code"] = "pleurotus.ostreatus.substrate.alternative"
+        second_payload["object_value"] = {"substrate": "coffee_waste", "relation": "reported"}
+        second = {**second_payload, "content_sha256": _stable_sha256(second_payload)}
+        conflicting_request["parameters"]["biological_reference_assertion_state"] = "conflicting"
+        conflicting_request["parameters"]["biological_reference_assertions"].append(second)
+        conflicting_request["datasets"].append({
+            "provider": "BA_LABS_BIOLOGICAL_REFERENCE_ASSERTION",
+            "dataset_id": second["assertion_code"],
+            "dataset_version": second["assertion_version"],
+            "content_sha256": second["content_sha256"],
+            "retrieved_at": second["reviewed_at"],
+        })
+        conflicting = execute_registered_engine(conflicting_request)
+        self.assertEqual(conflicting["status"], "completed", msg=str(conflicting.get("error")))
+        self.assertEqual(conflicting["result"]["value"]["subject"]["biological_reference_assertion_state"], "conflicting")
+        self.assertIn("biological_reference_assertions_conflict", conflicting["result"]["quality_flags"])
+
+        tampered_request = json.loads(json.dumps(request))
+        tampered_request["parameters"]["biological_reference_assertions"][0]["source"]["content_sha256"] = "c" * 64
+        tampered = execute_registered_engine(tampered_request)
+        self.assertEqual(tampered["status"], "failed")
+        self.assertEqual(tampered["error"]["code"], "engine_execution_failed")
+
+
     def test_identity_scoped_interpretation_rule_requires_validated_identity(self):
         rule = {
             "rule_id": "strain-specific-humidity",
