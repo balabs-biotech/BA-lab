@@ -419,7 +419,13 @@ jobs:
       - name: Verify local migration state
         run: |
           supabase migration list
-          supabase status -o env | grep -E '^(ANON_KEY|JWT_SECRET|SERVICE_ROLE_KEY|DB_URL)=' >> "$GITHUB_ENV"
+          # Supabase CLI emits shell-style quoted values; strip the quotes before
+          # writing GitHub environment-file entries so libpq receives a valid URI.
+          while IFS='=' read -r key value; do
+            value="${value%\"}"
+            value="${value#\"}"
+            printf '%s=%s\\n' "$key" "$value" >> "$GITHUB_ENV"
+          done < <(supabase status -o env | grep -E '^(ANON_KEY|JWT_SECRET|SERVICE_ROLE_KEY|DB_URL)=')
       - name: Build and start isolated Python engine worker
         run: |
           set -euo pipefail
