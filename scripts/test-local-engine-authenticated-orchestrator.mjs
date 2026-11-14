@@ -1,25 +1,18 @@
-import { createHmac, randomUUID } from "node:crypto";
+import { randomUUID } from "node:crypto";
+import { spawnSync } from "node:child_process";
 
 const supabaseUrl = process.env.SUPABASE_URL ?? "http://127.0.0.1:54321";
 const anonKey = process.env.ANON_KEY ?? "";
-const serviceRoleKey = process.env.SERVICE_ROLE_KEY ?? "";
-const jwtSecret = process.env.JWT_SECRET ?? "";
-if (!anonKey || !serviceRoleKey || !jwtSecret) {
-  throw new Error("ANON_KEY, SERVICE_ROLE_KEY and JWT_SECRET must be exported by supabase status -o env");
+const databaseUrl = process.env.SUPABASE_DB_URL ?? "postgresql://postgres:postgres@127.0.0.1:54322/postgres";
+let userAccessToken;
+if (!anonKey) throw new Error("ANON_KEY must be exported by supabase status -o env");
+
+function runSql(sql) {
+  const result = spawnSync("psql", [databaseUrl, "-v", "ON_ERROR_STOP=1", "-q", "-c", sql], { encoding: "utf8" });
+  if (result.status !== 0) throw new Error(`Local fixture SQL failed: ${(result.stderr || result.stdout || "unknown psql error").slice(0, 600)}`);
 }
 
-function createServiceRoleJwt() {
-  const encode = (value) => Buffer.from(JSON.stringify(value)).toString("base64url");
-  const header = encode({ alg: "HS256", typ: "JWT" });
-  const now = Math.floor(Date.now() / 1000);
-  const payload = encode({ iss: "supabase", role: "service_role", aud: "authenticated", sub: "service_role", iat: now, exp: now + 300 });
-  const unsigned = `${header}.${payload}`;
-  const signature = createHmac("sha256", jwtSecret).update(unsigned).digest("base64url");
-  return `${unsigned}.${signature}`;
-}
-const serviceRoleJwt = createServiceRoleJwt();
-
-async function api(path, { method = "GET", key = serviceRoleKey, authorization = serviceRoleJwt, body, headers = {} } = {}) {
+async function api(path, { method = "GET", key = anonKey, authorization = userAccessToken, body, headers = {} } = {}) {
   const response = await fetch(`${supabaseUrl}${path}`, {
     method,
     headers: {
@@ -72,30 +65,21 @@ let locationId;
 let qcExecutionId;
 
 try {
-  const created = await api("/auth/v1/admin/users", {
-    method: "POST",
-    body: { email, password, email_confirm: true },
-  });
-  userId = created?.id;
-  if (typeof userId !== "string") throw new Error("Supabase Auth admin did not return a user id");
-
-  const session = await api("/auth/v1/token?grant_type=password", {
-    method: "POST",
-    key: anonKey,
-    authorization: null,
-    body: { email, password },
-  });
-  if (typeof session?.access_token !== "string") throw new Error("Supabase Auth did not issue an access token");
-
-  const organizations = await api("/rest/v1/organizations?code=eq.BA-LABS&select=id&limit=1");
+  const signup = await api("/auth/v1/signup", { method: "POST", key: anonKey, authorization: null, body: { email, password, data: { fixture: "cultureops-ci" } } });
+  userId = signup?.user?.id ?? signup?.id;
+  userAccessToken = signup?.access_token;
+  if (typeof userId !== "string") throw new Error("Supabase Auth signup did not return a user id");
+  if (typeof userAccessToken !== "string") {
+    const session = await api("/auth/v1/token?grant_type=password", { method: "POST", key: anonKey, authorization: null, body: { email, password } });
+    userAccessToken = session?.access_token;
+  }
+  if (typeof userAccessToken !== "string") throw new Error("Supabase Auth did not issue an access token");
+  const organizations = await api("/rest/v1/organizations?code=eq.BA-LABS&select=id&limit=1", { authorization: null });
   const organizationId = organizations?.[0]?.id;
-  if (typeof organizationId !== "string") throw new Error("Seeded BA-LABS organization was not found");
+  if (typeof organizationId !== "string" || !/^[0-9a-f-]{36}$/i.test(userId) || !/^[0-9a-f-]{36}$/i.test(organizationId)) throw new Error("Invalid Auth user or seeded organization UUID");
+  runSql("insert into public.organization_members (organization_id, user_id, role) values (\x27" + organizationId + "\x27::uuid, \x27" + userId + "\x27::uuid, \x27owner\x27) on conflict (organization_id, user_id) do nothing");
 
-  await api("/rest/v1/organization_members", {
-    method: "POST",
-    body: { organization_id: organizationId, user_id: userId, role: "owner" },
-    headers: { Prefer: "return=minimal" },
-  });
+
   process.stdout.write("ok auth fixture: temporary user joined the seeded BA-LABS tenant\\n");
 
   const windowStart = "2026-11-13T00:00:00Z";
@@ -137,7 +121,7 @@ try {
     throw new Error("Could not create three environmental QC source records");
   }
 
-  const qc = await invoke(session.access_token, {
+  const qc = await invoke(userAccessToken, {
     organization_id: organizationId,
     engine_id: "environmental.timeseries.qc",
     engine_version: "0.2.0",
@@ -212,8 +196,5 @@ try {
   if (locationId) {
     await api(`/rest/v1/locations?id=eq.${locationId}`, { method: "DELETE", headers: { Prefer: "return=minimal" } });
   }
-  if (userId) {
-    await api(`/auth/v1/admin/users/${userId}`, { method: "DELETE" });
-    process.stdout.write("ok auth fixture: temporary user removed\\n");
-  }
+
 }
