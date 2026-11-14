@@ -152,3 +152,30 @@ assert.ok(
   "The rendered BIE view must expose QC lineage and artifact digest from the persisted JSONB value"
 );
 console.log("✓ Persisted BIE results retain and render the complete environmental QC lineage and artifact digest");
+
+
+const persistenceCheckStart = tracker.indexOf("function canonicalizeEngineEvidence(value)");
+const persistenceCheckEnd = tracker.indexOf("\nfunction getComparableEngineExecutions", persistenceCheckStart);
+const persistenceCheck = tracker.slice(persistenceCheckStart, persistenceCheckEnd);
+assert.ok(
+  persistenceCheckStart >= 0 &&
+  persistenceCheckEnd > persistenceCheckStart &&
+  /Object\.keys\(value\)\.sort\(\)/.test(persistenceCheck) &&
+  /JSON\.stringify\(canonicalizeEngineEvidence/.test(persistenceCheck),
+  "Ledger/result parity must compare canonicalized nested JSON so JSONB key ordering cannot create false mismatches"
+);
+for (const field of ["outcome", "value", "limitations", "quality_flags", "confidence", "provenance"]) {
+  assert.ok(persistenceCheck.includes('"'+field+'"'), "Ledger/result parity must compare persisted field: " + field);
+}
+assert.ok(
+  /stored\.input_snapshot_sha256[\s\S]*?envelope\.input_snapshot_sha256/.test(persistenceCheck) &&
+  /stored\.input_record_ids[\s\S]*?execution\.input_record_ids/.test(persistenceCheck),
+  "Ledger/result parity must bind the result to the same input snapshot and source record IDs"
+);
+assert.ok(
+  /getEngineResultPersistenceConsistency\(execution\)/.test(tracker) &&
+  /Cohérence ledger \/ résultat persisté/.test(tracker) &&
+  /DIVERGENCE : /.test(tracker),
+  "The execution lineage UI must explicitly display exact agreement, divergence, or unverifiable persistence state"
+);
+console.log("✓ UI detects divergence between the immutable result row and the execution ledger envelope");
