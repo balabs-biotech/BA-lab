@@ -15,7 +15,8 @@ for (const condition of [completed, failed]) {
   assert.equal(condition.then.not.type, "object", "not schema must declare object type");
   const forbidden = condition.then.not.required[0];
   assert.ok(condition.then.not.properties[forbidden], "not.required property must be declared in the same schema");
-  assert.ok(condition.then.properties[forbidden], "then must declare the mutually exclusive property");
+  const required = condition.then.required[0];
+  assert.ok(condition.then.properties[required], "then.required property must be declared in the same schema");
 }
 assert.deepEqual(completed.then.required, ["result"]);
 assert.deepEqual(completed.then.not.required, ["error"]);
