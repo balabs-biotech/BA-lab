@@ -23,11 +23,11 @@ const unsignedToken = [
 const signature = createHmac("sha256", jwtSecret).update(unsignedToken).digest("base64url");
 const routeSmokeJwt = `${unsignedToken}.${signature}`;
 
-async function post(name, headers = {}) {
+async function post(name, headers = {}, body = {}) {
   return await fetch(`${baseUrl}/${name}`, {
     method: "POST",
     headers: { "content-type": "application/json", "apikey": anonKey, ...headers },
-    body: "{}",
+    body: JSON.stringify(body),
     signal: AbortSignal.timeout(10_000),
   });
 }
@@ -53,11 +53,11 @@ async function assertUnauthorized(name, extraHeaders = {}) {
   process.stdout.write(`ok ${name}: handler rejected missing dispatcher credentials\\n`);
 }
 
-async function assertFunction(name, { headers, expectedStatus, expectedError }) {
+async function assertFunction(name, { headers, expectedStatus, expectedError, body = {} }) {
   const response = await post(name, {
     authorization: `Bearer ${routeSmokeJwt}`,
     ...headers,
-  });
+  }, body);
   const body = await response.json().catch(() => null);
   if (response.status !== expectedStatus || body?.error !== expectedError) {
     throw new Error(`${name}: expected ${expectedStatus}/${expectedError}, received ${response.status}/${JSON.stringify(body)}`);
@@ -70,8 +70,18 @@ await assertUnauthorized("engine-queue-dispatch", { "x-ba-dispatch-secret": "" }
 
 await assertFunction("engine-orchestrator", {
   headers: {},
-  expectedStatus: 422,
-  expectedError: "invalid_or_incomplete_request",
+  expectedStatus: 401,
+  expectedError: "invalid_session",
+  body: {
+    organization_id: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+    engine_id: "environmental.timeseries.qc",
+    engine_version: "0.2.0",
+    record_ids: ["bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb"],
+    record_type: "measurement",
+    parameters: {},
+    scope: { organization_id: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa" },
+    idempotency_key: "edge-auth-smoke-001",
+  },
 });
 await assertFunction("engine-queue-dispatch", {
   headers: { "x-ba-dispatch-secret": dispatchSecret },
