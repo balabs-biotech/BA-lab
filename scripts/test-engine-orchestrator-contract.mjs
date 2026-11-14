@@ -101,3 +101,54 @@ assert.doesNotMatch(
   "orchestrator must not buffer an unbounded worker response before enforcing its limit",
 );
 console.log("Engine orchestration boundary contract passed");
+
+
+const executionResultsMigration = readFileSync(
+  "supabase/migrations/20261112030000_create_engine_execution_results.sql",
+  "utf8"
+);
+const completionMigration = readFileSync(
+  "supabase/migrations/20261113165000_complete_claimed_engine_execution.sql",
+  "utf8"
+);
+const tracker = readFileSync("batch-tracker/tracker.js", "utf8");
+const historyLoaderStart = tracker.indexOf("async function loadRecentEngineExecutions()");
+const historyLoaderEnd = tracker.indexOf("\nfunction scheduleEngineExecutionPolling", historyLoaderStart);
+const historyLoader = tracker.slice(historyLoaderStart, historyLoaderEnd);
+const storedResultStart = tracker.indexOf("function getStoredEngineResult(execution)");
+const storedResultEnd = tracker.indexOf("\nfunction getComparableEngineExecutions", storedResultStart);
+const storedResultResolver = tracker.slice(storedResultStart, storedResultEnd);
+
+assert.ok(
+  /v_payload->'value'/.test(executionResultsMigration) &&
+  /v_payload->'limitations'/.test(executionResultsMigration) &&
+  /v_payload->'quality_flags'/.test(executionResultsMigration) &&
+  /v_payload->'provenance'/.test(executionResultsMigration),
+  "Atomic result persistence must store the complete JSONB value and its evidence fields without reconstructing or projecting the payload"
+);
+assert.ok(
+  /set status = 'completed', result_payload = p_result/.test(executionResultsMigration),
+  "The execution ledger must retain the original completed result envelope"
+);
+assert.ok(
+  /return public\.complete_engine_execution\([\s\S]*?p_result/.test(completionMigration),
+  "Worker-owned completion must pass the original result envelope unchanged to the atomic result writer"
+);
+assert.ok(
+  /select\("execution_id,result_type,outcome,value,limitations,quality_flags,confidence,provenance,generated_at,input_snapshot_sha256,input_record_ids"\)/.test(historyLoader),
+  "Execution history must retrieve the full persisted result value and metadata in one organization-scoped batch"
+);
+assert.ok(
+  /\.eq\("organization_id", loadOrganizationId\)[\s\S]*?\.in\("execution_id", completedIds\)/.test(historyLoader),
+  "Persisted results must be fetched only for the active organization and the visible completed executions"
+);
+assert.ok(
+  /return stored \|\| \(envelopeResult/.test(storedResultResolver),
+  "The UI must prefer the persisted immutable result row over the ledger envelope fallback"
+);
+assert.ok(
+  /environmental_quality_control/.test(tracker) &&
+  /qc\.artifact_sha256/.test(tracker),
+  "The rendered BIE view must expose QC lineage and artifact digest from the persisted JSONB value"
+);
+console.log("✓ Persisted BIE results retain and render the complete environmental QC lineage and artifact digest");
