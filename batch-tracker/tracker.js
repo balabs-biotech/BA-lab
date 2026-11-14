@@ -7404,6 +7404,14 @@ function renderBiologicalContextAssessment(article, result) {
         " · score robuste " + String(item.robust_z_score ?? "non calculable") +
         " · seuil " + String(item.threshold ?? "—") +
         " · enregistrement " + String(item.record_id || "inconnu"), 10);
+      addList(qcDetails, "Anomalies par rapport à l'historique · " + seriesLabel, series.rolling_baseline_anomaly_evidence, item =>
+        String(item.observed_value ?? "—") + " " + series.unit_code +
+        " · référence historique " + String(item.baseline_median ?? "—") +
+        " · score robuste " + String(item.robust_z_score ?? "écart avec MAD nul") +
+        " · seuil " + String(item.threshold ?? "—") +
+        " · historique utilisé " + String(item.history_point_count ?? "—") + " points" +
+        " · " + String(item.observed_at || "date inconnue") +
+        " · enregistrement " + String(item.record_id || "inconnu"), 10);
       addList(qcDetails, "Horodatages dupliqués · " + seriesLabel, series.duplicate_timestamp_groups, item =>
         String(item.timestamp || "date inconnue") + " · " + (Array.isArray(item.record_ids) ? item.record_ids.join(", ") : ""), 10);
     }
