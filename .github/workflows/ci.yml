@@ -419,7 +419,7 @@ jobs:
       - name: Verify local migration state
         run: |
           supabase migration list
-          supabase status -o env | grep -E '^(ANON_KEY|JWT_SECRET|SERVICE_ROLE_KEY)=' >> "$GITHUB_ENV"
+          supabase status -o env | grep -E '^(ANON_KEY|JWT_SECRET|SERVICE_ROLE_KEY|DB_URL)=' >> "$GITHUB_ENV"
       - name: Build and start isolated Python engine worker
         run: |
           set -euo pipefail
