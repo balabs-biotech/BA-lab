@@ -42,20 +42,30 @@ const server = http.createServer(async (request, response) => {
 
     if (parsedRequest.engine?.engine_id === "biological.context.features") {
       bieResponses += 1;
-      if (bieResponses === 2) {
+      if (bieResponses === 2 || bieResponses === 3) {
         let workerResult;
         try { workerResult = JSON.parse(body); } catch {
           response.writeHead(502).end("worker returned invalid JSON");
           return;
         }
-        const flags = workerResult?.result?.value?.environmental_quality_control?.quality_flags;
-        if (!Array.isArray(flags)) {
-          response.writeHead(502).end("BIE QC artifact missing from worker response");
-          return;
+        if (bieResponses === 2) {
+          const flags = workerResult?.result?.value?.environmental_quality_control?.quality_flags;
+          if (!Array.isArray(flags)) {
+            response.writeHead(502).end("BIE QC artifact missing from worker response");
+            return;
+          }
+          flags.push("ci_worker_response_tampered");
+          response.setHeader("x-ba-ci-worker-mutation", "quality_flags");
+          process.stdout.write("ok test proxy: tampered second BIE worker QC artifact response\\n");
+        } else {
+          if (!workerResult?.result?.value || typeof workerResult.result.value !== "object") {
+            response.writeHead(502).end("BIE worker result value missing");
+            return;
+          }
+          delete workerResult.result.value.environmental_quality_control;
+          response.setHeader("x-ba-ci-worker-mutation", "missing_qc_artifact");
+          process.stdout.write("ok test proxy: removed QC artifact from third BIE worker response\\n");
         }
-        flags.push("ci_worker_response_tampered");
-        response.setHeader("x-ba-ci-worker-mutation", "applied");
-        process.stdout.write("ok test proxy: tampered second BIE worker QC artifact response\\n");
         response.writeHead(upstreamResponse.status, { "content-type": "application/json" });
         response.end(JSON.stringify(workerResult));
         return;
