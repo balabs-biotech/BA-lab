@@ -681,6 +681,28 @@ def analyze_biological_context_features(request: Mapping[str, Any]) -> dict[str,
                 "unit_code": "count" if suffix == "count" else unit,
                 "source_record_ids": source_ids,
             })
+        # A least-squares slope is emitted only for at least three points
+        # spanning two distinct instants. It is descriptive, not a stress score.
+        if len(points) >= 3 and len(set(times)) >= 2:
+            origin = times[0]
+            elapsed_days = [(instant - origin).total_seconds() / 86400 for instant in times]
+            mean_elapsed = fmean(elapsed_days)
+            mean_value = fmean(values)
+            denominator = sum((item - mean_elapsed) ** 2 for item in elapsed_days)
+            if denominator > 0:
+                slope_per_day = sum(
+                    (elapsed - mean_elapsed) * (value - mean_value)
+                    for elapsed, value in zip(elapsed_days, values)
+                ) / denominator
+                derived_features.append({
+                    "feature_code": f"series.{prefix}.trend_slope_per_day",
+                    "value": slope_per_day,
+                    "method": f"ordinary_least_squares_slope_per_day; source_unit={unit}",
+                    "method_version": "1.0.0",
+                    "unit_code": f"{unit}/day",
+                    "source_record_ids": source_ids,
+                })
+
         # The expected cadence is explicit and source-sensitive; this is a
         # coverage signal, not a claim that a missing observation is biological stress.
         default_gap_minutes = 2160 if record_type == "environmental_observation" else 180
