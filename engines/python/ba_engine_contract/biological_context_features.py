@@ -180,10 +180,10 @@ def _evaluate_biological_reference_assertions(
                 not isinstance(validity_window, dict)
                 or set(validity_window) != {"valid_from", "valid_to"}
                 or not isinstance(validity_window.get("valid_from"), str)
-                or not re.fullmatch(r"\\d{4}-\\d{2}-\\d{2}", validity_window["valid_from"])
+                or not re.fullmatch(r"\d{4}-\d{2}-\d{2}", validity_window["valid_from"])
                 or (validity_window.get("valid_to") is not None and (
                     not isinstance(validity_window.get("valid_to"), str)
-                    or not re.fullmatch(r"\\d{4}-\\d{2}-\\d{2}", validity_window["valid_to"])
+                    or not re.fullmatch(r"\d{4}-\d{2}-\d{2}", validity_window["valid_to"])
                 ))
             ):
                 raise ValueError("invalid_biological_reference_assertion_validity_window")
