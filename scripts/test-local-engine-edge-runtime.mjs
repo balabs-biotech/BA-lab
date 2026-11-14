@@ -20,7 +20,7 @@ async function assertFunction(name, { headers, expectedStatus, expectedError }) 
 await assertFunction("engine-orchestrator", {
   headers: {},
   expectedStatus: 422,
-  expectedError: "invalid_request",
+  expectedError: "invalid_or_incomplete_request",
 });
 await assertFunction("engine-queue-dispatch", {
   headers: { "x-ba-dispatch-secret": dispatchSecret },
