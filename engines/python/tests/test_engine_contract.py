@@ -1764,6 +1764,13 @@ class EngineContractTests(unittest.TestCase):
         qc = value["environmental_quality_control"]
         self.assertEqual(qc["state"], "review_required")
         self.assertEqual(qc["upstream_execution_id"], artifact["execution_id"])
+        self.assertEqual(qc["upstream_result_id"], artifact["result_id"])
+        self.assertEqual(qc["upstream_engine_id"], artifact["engine_id"])
+        self.assertEqual(qc["upstream_engine_version"], artifact["engine_version"])
+        self.assertEqual(qc["upstream_completed_at"], artifact["completed_at"])
+        self.assertEqual(qc["upstream_input_snapshot_sha256"], artifact["input_snapshot_sha256"])
+        self.assertEqual(qc["upstream_scope"], artifact["scope"])
+        self.assertEqual(qc["artifact_sha256"], artifact["artifact_sha256"])
         self.assertEqual(qc["quality_flags"], ["outlier_detected"])
         self.assertEqual(qc["provenance"], artifact["result"]["provenance"])
         self.assertEqual(qc["value"], qc_value)
