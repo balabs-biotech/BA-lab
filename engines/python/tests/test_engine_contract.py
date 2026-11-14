@@ -1793,25 +1793,25 @@ class EngineContractTests(unittest.TestCase):
         # its scientific result payload. Keep each mutation schema-valid so
         # validation reaches the digest-integrity check.
         mutations = [
-            lambda item: item.update(execution_id="aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa"),
-            lambda item: item.update(result_id="bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb"),
-            lambda item: item.update(request_id="22222222-2222-4222-8222-222222222222"),
-            lambda item: item.update(engine_id="environmental.timeseries.other"),
-            lambda item: item.update(engine_version="0.3.0"),
-            lambda item: item.update(completed_at="2026-11-11T00:01:00Z"),
-            lambda item: item.update(input_snapshot_sha256="b" * 64),
-            lambda item: item["scope"].update(location_id="ffffffff-ffff-4fff-8fff-ffffffffffff"),
-            lambda item: item["scope"].update(window_start="2026-11-09T00:00:00Z"),
-            lambda item: item["result"].update(outcome="review_required"),
-            lambda item: item["result"].update(limitations=["Different limitation."]),
-            lambda item: item["result"].update(provenance={"algorithm": "tampered"}),
-            lambda item: item["result"]["value"]["review_summary"].update(outlier_count=2),
+            (lambda item: item.update(execution_id="aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa"), "upstream artifact digest mismatch"),
+            (lambda item: item.update(result_id="bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb"), "upstream artifact digest mismatch"),
+            (lambda item: item.update(request_id="22222222-2222-4222-8222-222222222222"), "upstream artifact digest mismatch"),
+            (lambda item: item.update(engine_id="environmental.timeseries.other"), "upstream artifact engine is not allowlisted"),
+            (lambda item: item.update(engine_version="0.3.0"), "upstream artifact engine is not allowlisted"),
+            (lambda item: item.update(completed_at="2026-11-11T00:01:00Z"), "upstream artifact digest mismatch"),
+            (lambda item: item.update(input_snapshot_sha256="b" * 64), "upstream artifact digest mismatch"),
+            (lambda item: item["scope"].update(location_id="ffffffff-ffff-4fff-8fff-ffffffffffff"), "upstream artifact scope or analysis window mismatch"),
+            (lambda item: item["scope"].update(window_start="2026-11-09T00:00:00Z"), "upstream artifact scope or analysis window mismatch"),
+            (lambda item: item["result"].update(outcome="review_required"), "upstream artifact digest mismatch"),
+            (lambda item: item["result"].update(limitations=["Different limitation."]), "upstream artifact digest mismatch"),
+            (lambda item: item["result"].update(provenance={"algorithm": "tampered"}), "upstream artifact digest mismatch"),
+            (lambda item: item["result"]["value"]["review_summary"].update(outlier_count=2), "upstream artifact digest mismatch"),
         ]
-        for mutate in mutations:
-            with self.subTest(mutation=mutate):
+        for mutate, expected_error in mutations:
+            with self.subTest(expected_error=expected_error):
                 altered = json.loads(json.dumps(request))
                 mutate(altered["upstream_artifacts"][0])
-                with self.assertRaisesRegex(ContractValidationError, "artifact digest mismatch"):
+                with self.assertRaisesRegex(ContractValidationError, expected_error):
                     validate_request(altered)
 
 
