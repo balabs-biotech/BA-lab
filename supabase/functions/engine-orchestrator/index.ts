@@ -439,7 +439,7 @@ Deno.serve(async (req: Request) => {
   if (upstreamQcExecutionId !== undefined) {
     const { data: upstream, error: upstreamError } = await serviceClient
       .from("engine_executions")
-      .select("id,organization_id,request_id,engine_id,engine_version,scope,input_snapshot_sha256,status,completed_at,request_payload")
+      .select("id,organization_id,request_id,engine_id,engine_version,scope,input_record_ids,input_snapshot_sha256,status,completed_at,request_payload")
       .eq("organization_id", organizationId)
       .eq("id", upstreamQcExecutionId)
       .maybeSingle();
@@ -457,7 +457,7 @@ Deno.serve(async (req: Request) => {
     }
     const { data: qcResult, error: qcResultError } = await serviceClient
       .from("engine_execution_results")
-      .select("id,execution_id,engine_id,engine_version,outcome,input_snapshot_sha256,value,limitations,quality_flags,provenance,generated_at")
+      .select("id,execution_id,engine_id,engine_version,result_type,outcome,input_record_ids,input_snapshot_sha256,value,limitations,quality_flags,provenance,generated_at")
       .eq("organization_id", organizationId)
       .eq("execution_id", upstream.id)
       .maybeSingle();
@@ -465,7 +465,10 @@ Deno.serve(async (req: Request) => {
         qcResult.execution_id !== upstream.id ||
         qcResult.engine_id !== upstream.engine_id ||
         qcResult.engine_version !== upstream.engine_version ||
-        qcResult.input_snapshot_sha256 !== upstream.input_snapshot_sha256) {
+        qcResult.result_type !== upstream.engine_id ||
+        stable(qcResult.input_record_ids) !== stable(upstream.input_record_ids) ||
+        qcResult.input_snapshot_sha256 !== upstream.input_snapshot_sha256 ||
+        qcResult.generated_at !== upstream.completed_at) {
       return reply(422, { error: "upstream_qc_result_integrity_mismatch" });
     }
     const artifact: Record<string, any> = {
