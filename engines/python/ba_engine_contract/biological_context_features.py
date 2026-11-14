@@ -86,7 +86,7 @@ def _evaluate_biological_reference_assertions(
     resolved: list[dict[str, Any]] = []
     sources: set[str] = set()
     seen: set[tuple[str, str]] = set()
-    semantic_values: dict[tuple[str, str, str], set[str]] = defaultdict(set)
+    semantic_values: dict[tuple[str, str, str], list[tuple[str, frozenset[str]]]] = defaultdict(list)
     for assertion in assertions:
         if not isinstance(assertion, dict):
             raise ValueError("invalid_biological_reference_assertion")
@@ -276,9 +276,10 @@ def _evaluate_biological_reference_assertions(
             else:
                 applicability_state = "not_applicable"
 
-        semantic_values[(subject_type, subject_ref, predicate)].add(
-            _contract_stable_sha256(assertion["object_value"])
-        )
+        semantic_values[(subject_type, subject_ref, predicate)].append((
+            _contract_stable_sha256(assertion["object_value"]),
+            frozenset(matching_context_ids) if applicability_state == "matched" else frozenset(),
+        ))
         resolved_item = {
             **payload,
             "content_sha256": digest,
@@ -298,7 +299,15 @@ def _evaluate_biological_reference_assertions(
         sources.add(f"BA_LABS_BIOLOGICAL_REFERENCE_ASSERTION/{code}@{version}#sha256={digest}")
         sources.add(f"BA_LABS_BIOLOGICAL_REFERENCE_SOURCE/{source_reference_id}@{source_version}#sha256={source_digest}")
 
-    has_conflicts = any(len(values) > 1 for values in semantic_values.values())
+    # A semantic disagreement is a conflict only when both assertions are
+    # applicable to at least one identical, temporally overlapping context.
+    # Unscoped or undetermined assertions remain evidence, not conflicts.
+    has_conflicts = any(
+        left_value != right_value and bool(left_contexts.intersection(right_contexts))
+        for values in semantic_values.values()
+        for index, (left_value, left_contexts) in enumerate(values)
+        for right_value, right_contexts in values[index + 1:]
+    )
     if has_conflicts or state == "conflicting":
         state = "conflicting"
     elif resolved:
