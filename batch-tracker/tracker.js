@@ -8066,6 +8066,47 @@ function renderRecentEngineExecutions() {
     article.append(title, status, stamp);
 
     const storedResult = recentEngineResultsByExecution.get(execution.id);
+    const lineage = document.createElement("details");
+    lineage.className = "engine-execution-lineage";
+    const lineageSummary = document.createElement("summary");
+    lineageSummary.textContent = "Traçabilité d’exécution et empreintes";
+    lineage.appendChild(lineageSummary);
+    const appendLineageField = (label, value) => {
+      const line = document.createElement("p");
+      line.className = "muted";
+      line.textContent = label + " : " + String(value ?? "non documenté");
+      lineage.appendChild(line);
+    };
+    const executionInputIds = Array.isArray(execution.input_record_ids) ? execution.input_record_ids : [];
+    const resultInputIds = Array.isArray(storedResult?.input_record_ids) ? storedResult.input_record_ids : [];
+    const executionSnapshot = execution.input_snapshot_sha256 || null;
+    const resultSnapshot = storedResult?.input_snapshot_sha256 || null;
+    appendLineageField("Exécution", execution.id);
+    appendLineageField("Moteur / version", String(execution.engine_id || "inconnu") + "@" + String(execution.engine_version || "inconnue"));
+    appendLineageField("Périmètre", execution.scope ? JSON.stringify(execution.scope) : "non documenté");
+    appendLineageField("Snapshot déclaré par l’exécution (SHA-256)", executionSnapshot || "indisponible");
+    appendLineageField("Identifiants d’entrée déclarés", executionInputIds.length);
+    appendLineageField("Snapshot du résultat enregistré (SHA-256)", resultSnapshot || "indisponible");
+    appendLineageField("Identifiants d’entrée du résultat", resultInputIds.length);
+    appendLineageField("Résultat généré", storedResult?.generated_at || execution.completed_at || "non documenté");
+    let snapshotConsistency = "non vérifiable : empreinte absente";
+    if (executionSnapshot && resultSnapshot) {
+      snapshotConsistency = executionSnapshot === resultSnapshot
+        ? "concordance exacte entre ledger et résultat"
+        : "DIVERGENCE : les empreintes du ledger et du résultat diffèrent";
+    }
+    appendLineageField("Cohérence des snapshots", snapshotConsistency);
+    if (executionInputIds.length && resultInputIds.length) {
+      const executionSet = new Set(executionInputIds);
+      const resultSet = new Set(resultInputIds);
+      const sameIds = executionSet.size === resultSet.size &&
+        [...executionSet].every(id => resultSet.has(id));
+      appendLineageField("Cohérence des identifiants d’entrée",
+        sameIds ? "concordance exacte" : "DIVERGENCE : les listes d’identifiants diffèrent");
+    } else {
+      appendLineageField("Cohérence des identifiants d’entrée", "non vérifiable : liste absente dans le ledger ou le résultat");
+    }
+    article.appendChild(lineage);
     const result = getStoredEngineResult(execution);
     const summary = result?.value?.summary;
     if (execution.status === "completed" && result?.value?.result_type === "biological.context_assessment") {
