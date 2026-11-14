@@ -7365,6 +7365,28 @@ function renderBiologicalContextAssessment(article, result) {
     parent.appendChild(details);
   };
   const title = document.createElement("p"); title.textContent = "Évaluation du contexte biologique"; article.appendChild(title);
+  const qc = value.environmental_quality_control;
+  if (qc && typeof qc === "object") {
+    const qcDetails = document.createElement("details");
+    qcDetails.className = "engine-upstream-qc";
+    const qcSummary = document.createElement("summary");
+    qcSummary.textContent = "Contrôle qualité environnemental amont · " +
+      (qc.state === "passed" ? "validé" : "révision requise");
+    qcDetails.appendChild(qcSummary);
+    addLine(qcDetails, "État : " + String(qc.state || "non documenté"));
+    addLine(qcDetails, "Résultat QC : " + String(qc.outcome || "non documenté"));
+    addLine(qcDetails, "Exécution QC : " + String(qc.upstream_execution_id || "identifiant indisponible"));
+    addLine(qcDetails, "Résultat QC enregistré : " + String(qc.upstream_result_id || "identifiant indisponible"));
+    addLine(qcDetails, "Empreinte SHA-256 : " + String(qc.artifact_sha256 || "indisponible"));
+    addList(qcDetails, "Signaux qualité QC", qc.quality_flags, item => item, 12);
+    addList(qcDetails, "Limitations QC", qc.limitations, item => item, 12);
+    const qcProvenance = qc.provenance || {};
+    if (qcProvenance.algorithm) addLine(qcDetails, "Algorithme QC : " + String(qcProvenance.algorithm));
+    if (Array.isArray(qcProvenance.source_references)) {
+      addList(qcDetails, "Sources du contrôle QC", qcProvenance.source_references, item => item, 8);
+    }
+    article.appendChild(qcDetails);
+  }
   const subject = value.subject || {};
   addLine(article, "Sujet : " + String(subject.subject_type || "biologique") + " · " + String(subject.subject_id || "identifiant indisponible"));
   const biologicalContexts = Array.isArray(subject.biological_contexts) ? subject.biological_contexts : [];
