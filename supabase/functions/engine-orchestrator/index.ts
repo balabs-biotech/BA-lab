@@ -12,7 +12,7 @@ import {
 import { loadAuthenticatedBiologicalInterpretationProfile } from "../_shared/biological-interpretation-profile.ts";
 import { loadAuthenticatedBiologicalIdentityAssertions } from "../_shared/biological-identity-assertions.ts";
 import { loadAuthenticatedBiologicalReferenceAssertions } from "../_shared/biological-reference-assertions.ts";
-import { matchesSingleUpstreamQcArtifact } from "../_shared/upstream-qc-lineage.js";
+import { matchesSingleUpstreamQcArtifact } from "../_shared/upstream-qc-lineage.mjs";
 
 const headers = {
   "Access-Control-Allow-Origin": "*",
