@@ -7564,6 +7564,19 @@ function renderBiologicalContextAssessment(article, result) {
       " · " + sourceLabel +
       (item.source_locator ? " · repère " + String(item.source_locator) : "") + digest;
   };
+  const assertionEvidenceDetails = document.createElement("details");
+  assertionEvidenceDetails.className = "engine-biological-evidence";
+  const assertionEvidenceSummary = document.createElement("summary");
+  assertionEvidenceDetails.appendChild(assertionEvidenceSummary);
+  const addEvidenceField = (parent, label, fieldValue) => {
+    if (fieldValue === null || fieldValue === undefined || fieldValue === "") return;
+    const line = document.createElement("p");
+    line.className = "muted";
+    line.textContent = label + " : " + (
+      typeof fieldValue === "object" ? JSON.stringify(fieldValue) : String(fieldValue)
+    );
+    parent.appendChild(line);
+  };
   const renderAssertionReview = () => {
     const query = assertionSearch.value.trim().toLocaleLowerCase();
     visibleReferenceAssertions = allReferenceAssertions.filter(item => {
@@ -7590,67 +7603,54 @@ function renderBiologicalContextAssessment(article, result) {
       empty.textContent = "Aucune assertion ne correspond aux filtres.";
       assertionReviewList.appendChild(empty);
     }
+    assertionEvidenceSummary.textContent = "Dossiers de preuve et provenance · " +
+      visibleReferenceAssertions.length + " assertion(s) filtrée(s)";
+    assertionEvidenceDetails.replaceChildren(assertionEvidenceSummary);
+    for (const assertion of visibleReferenceAssertions.slice(0, 30)) {
+      const record = document.createElement("details");
+      record.className = "engine-biological-evidence-record";
+      const recordSummary = document.createElement("summary");
+      recordSummary.textContent = String(assertion.assertion_code || "Assertion") +
+        " · v" + String(assertion.assertion_version || "version inconnue") +
+        " · " + String(assertion.evidence_level || "preuve non évaluée");
+      record.appendChild(recordSummary);
+      const source = assertion.source || {};
+      addEvidenceField(record, "Référence source", source.reference_id);
+      addEvidenceField(record, "Version de la source", source.reference_version);
+      addEvidenceField(record, "Repère bibliographique", assertion.source_locator);
+      addEvidenceField(record, "Révision de l'assertion", assertion.reviewed_at);
+      addEvidenceField(record, "Révision de la source", source.reviewed_at);
+      addEvidenceField(record, "Applicabilité", assertion.applicability_state);
+      addEvidenceField(record, "Applicabilité temporelle", assertion.temporal_applicability_state);
+      addEvidenceField(record, "Contextes concordants", assertion.matching_context_ids);
+      addEvidenceField(record, "Incertitude documentée", assertion.uncertainty);
+      addEvidenceField(record, "SHA-256 de l'assertion", assertion.content_sha256);
+      addEvidenceField(record, "SHA-256 de la source", source.content_sha256);
+      if (typeof source.source_url === "string") {
+        try {
+          const sourceUrl = new URL(source.source_url);
+          if (sourceUrl.protocol === "https:" || sourceUrl.protocol === "http:") {
+            const link = document.createElement("a");
+            link.href = sourceUrl.href;
+            link.target = "_blank";
+            link.rel = "noopener noreferrer";
+            link.textContent = "Ouvrir la source documentaire";
+            record.appendChild(link);
+          }
+        } catch (_) {
+          // Invalid source URLs remain visible as metadata only; never create an unsafe link.
+        }
+      }
+      assertionEvidenceDetails.appendChild(record);
+    }
+    assertionEvidenceDetails.hidden = visibleReferenceAssertions.length === 0;
   };
   applicabilityFilter.addEventListener("change", renderAssertionReview);
   evidenceFilter.addEventListener("change", renderAssertionReview);
   assertionSearch.addEventListener("input", renderAssertionReview);
   renderAssertionReview();
   article.appendChild(assertionReview);
-  const assertionEvidenceDetails = document.createElement("details");
-  assertionEvidenceDetails.className = "engine-biological-evidence";
-  const assertionEvidenceSummary = document.createElement("summary");
-  assertionEvidenceSummary.textContent = "Dossiers de preuve et provenance · " +
-    (Array.isArray(subject.biological_reference_assertions) ? subject.biological_reference_assertions.length : 0);
-  assertionEvidenceDetails.appendChild(assertionEvidenceSummary);
-  const addEvidenceField = (parent, label, fieldValue) => {
-    if (fieldValue === null || fieldValue === undefined || fieldValue === "") return;
-    const line = document.createElement("p");
-    line.className = "muted";
-    line.textContent = label + " : " + (
-      typeof fieldValue === "object" ? JSON.stringify(fieldValue) : String(fieldValue)
-    );
-    parent.appendChild(line);
-  };
-  for (const assertion of visibleReferenceAssertions.slice(0, 30)) {
-    const record = document.createElement("details");
-    record.className = "engine-biological-evidence-record";
-    const recordSummary = document.createElement("summary");
-    recordSummary.textContent = String(assertion.assertion_code || "Assertion") +
-      " · v" + String(assertion.assertion_version || "version inconnue") +
-      " · " + String(assertion.evidence_level || "preuve non évaluée");
-    record.appendChild(recordSummary);
-    const source = assertion.source || {};
-    addEvidenceField(record, "Référence source", source.reference_id);
-    addEvidenceField(record, "Version de la source", source.reference_version);
-    addEvidenceField(record, "Repère bibliographique", assertion.source_locator);
-    addEvidenceField(record, "Révision de l'assertion", assertion.reviewed_at);
-    addEvidenceField(record, "Révision de la source", source.reviewed_at);
-    addEvidenceField(record, "Applicabilité", assertion.applicability_state);
-    addEvidenceField(record, "Applicabilité temporelle", assertion.temporal_applicability_state);
-    addEvidenceField(record, "Contextes concordants", assertion.matching_context_ids);
-    addEvidenceField(record, "Incertitude documentée", assertion.uncertainty);
-    addEvidenceField(record, "SHA-256 de l'assertion", assertion.content_sha256);
-    addEvidenceField(record, "SHA-256 de la source", source.content_sha256);
-    if (typeof source.source_url === "string") {
-      try {
-        const sourceUrl = new URL(source.source_url);
-        if (sourceUrl.protocol === "https:" || sourceUrl.protocol === "http:") {
-          const link = document.createElement("a");
-          link.href = sourceUrl.href;
-          link.target = "_blank";
-          link.rel = "noopener noreferrer";
-          link.textContent = "Ouvrir la source documentaire";
-          record.appendChild(link);
-        }
-      } catch (_) {
-        // Invalid source URLs remain visible as metadata only; never create an unsafe link.
-      }
-    }
-    assertionEvidenceDetails.appendChild(record);
-  }
-  if (assertionEvidenceDetails.childElementCount > 1) {
-    article.appendChild(assertionEvidenceDetails);
-  }
+  article.appendChild(assertionEvidenceDetails);
   const assertions = visibleReferenceAssertions;
   const contextById = new Map(biologicalContexts.map(context => [context.context_id, context]));
   const comparisonRows = [];
