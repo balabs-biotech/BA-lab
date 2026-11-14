@@ -72,6 +72,7 @@ for (const contract of ["biological.context_assessment", "record_counts_by_type"
   assert.ok(biologicalRenderer.includes(contract), "Missing BIE UI contract: " + contract);
 }
 assert.match(biologicalRenderer, /Remonter aux observations environnementales/);
+assert.equal((biologicalRenderer.match(/addList\(article, "Assertions d’identité vérifiées"/g) || []).length, 1, "identity assertion list must render exactly once");
 assert.match(biologicalRenderer, /from\("engine_executions"\)/);
 assert.match(biologicalRenderer, /from\("environmental_observations"\)/);
 assert.match(biologicalRenderer, /\.eq\("organization_id", expectedOrganizationId\)/);
