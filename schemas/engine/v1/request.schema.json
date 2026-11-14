@@ -197,6 +197,11 @@
               "required": ["provider"]
             },
             "then": {
+              "properties": {
+                "dataset_version": {},
+                "profile_id": {},
+                "profile_version": {}
+              },
               "required": ["dataset_version", "profile_id", "profile_version"]
             }
           }
