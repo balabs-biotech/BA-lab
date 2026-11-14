@@ -195,3 +195,34 @@ assert.ok(
   "History reload must retrieve and expose the durable result row ID and its engine identity"
 );
 console.log("✓ Persisted result row identity is bound to its durable execution ledger entry");
+
+
+const qcIntegrityBoundary = source.slice(
+  source.indexOf('const { data: qcResult, error: qcResultError }'),
+  source.indexOf('const artifact: Record<string, any>', source.indexOf('const { data: qcResult, error: qcResultError }')),
+);
+assert.match(
+  qcIntegrityBoundary,
+  /stable\(qcResult\.input_record_ids\) !== stable\(upstream\.input_record_ids\)/,
+  "A persisted QC result must retain exactly the source record IDs captured by its execution ledger"
+);
+assert.match(
+  qcIntegrityBoundary,
+  /qcResult\.generated_at !== upstream\.completed_at/,
+  "A persisted QC result generation timestamp must equal the ledger completion timestamp"
+);
+const authenticatedRuntimeTest = readFileSync(
+  "scripts/test-local-engine-authenticated-orchestrator.mjs",
+  "utf8"
+);
+assert.match(
+  authenticatedRuntimeTest,
+  /mismatchedLineageQcExecutionId[\s\S]*?array\[\]'?\s*\[\s*\]|array\[\s*'\s*\$\{mismatchedLineageSourceId\}/,
+  "Authenticated runtime coverage must include a QC fixture whose persisted source IDs diverge from the ledger"
+);
+assert.match(
+  authenticatedRuntimeTest,
+  /BIE rejects QC result with mismatched source record lineage[\s\S]*?upstream_qc_result_integrity_mismatch/,
+  "The runtime must reject a QC source-lineage mismatch before creating a BIE execution"
+);
+console.log("✓ QC result lineage and completion timestamp integrity boundaries are contract-tested");
