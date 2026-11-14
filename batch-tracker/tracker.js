@@ -7482,7 +7482,61 @@ function renderBiologicalContextAssessment(article, result) {
   };
   addLine(article, "Références scientifiques : " +
     String(referenceAssertionLabels[referenceAssertionState] || "État des références inconnu"));
-  addList(article, "Assertions bibliographiques validées", subject.biological_reference_assertions, item => {
+  const allReferenceAssertions = Array.isArray(subject.biological_reference_assertions)
+    ? subject.biological_reference_assertions
+    : [];
+  let visibleReferenceAssertions = allReferenceAssertions.slice();
+  const assertionReview = document.createElement("section");
+  assertionReview.className = "engine-biological-assertion-review";
+  const assertionReviewTitle = document.createElement("strong");
+  assertionReviewTitle.textContent = "Assertions bibliographiques validées";
+  assertionReview.appendChild(assertionReviewTitle);
+  const assertionFilters = document.createElement("div");
+  assertionFilters.className = "engine-biological-assertion-filters";
+  const makeAssertionFilter = (labelText, options) => {
+    const label = document.createElement("label");
+    label.textContent = labelText;
+    const select = document.createElement("select");
+    select.className = "engine-biological-assertion-filter";
+    for (const [value, text] of options) {
+      const option = document.createElement("option");
+      option.value = value;
+      option.textContent = text;
+      select.appendChild(option);
+    }
+    label.appendChild(select);
+    assertionFilters.appendChild(label);
+    return select;
+  };
+  const applicabilityFilter = makeAssertionFilter("Applicabilité", [
+    ["", "Tous les états"],
+    ["matched", "Concordante"],
+    ["not_applicable", "Non applicable"],
+    ["undetermined", "Indéterminée"],
+    ["not_assessed", "Non évaluée"]
+  ]);
+  const evidenceFilter = makeAssertionFilter("Niveau de preuve", [
+    ["", "Tous les niveaux"],
+    ["L0", "L0"], ["L1", "L1"], ["L2", "L2"],
+    ["L3", "L3"], ["L4", "L4"], ["L5", "L5"],
+    ["unassessed", "Non évalué"]
+  ]);
+  const assertionSearchLabel = document.createElement("label");
+  assertionSearchLabel.textContent = "Recherche";
+  const assertionSearch = document.createElement("input");
+  assertionSearch.type = "search";
+  assertionSearch.placeholder = "Code, sujet, prédicat ou source";
+  assertionSearchLabel.appendChild(assertionSearch);
+  assertionFilters.appendChild(assertionSearchLabel);
+  assertionReview.appendChild(assertionFilters);
+  const assertionReviewCount = document.createElement("p");
+  assertionReviewCount.className = "muted";
+  assertionReviewCount.setAttribute("aria-live", "polite");
+  assertionReview.appendChild(assertionReviewCount);
+  const assertionReviewList = document.createElement("ul");
+  assertionReviewList.className = "engine-biological-assertion-list";
+  assertionReview.appendChild(assertionReviewList);
+  const formatAssertion = item => {
     const source = item.source || {};
     const sourceLabel = source.reference_id && source.reference_version
       ? source.reference_id + "@" + source.reference_version
@@ -7509,7 +7563,39 @@ function renderBiologicalContextAssessment(article, result) {
       ) +
       " · " + sourceLabel +
       (item.source_locator ? " · repère " + String(item.source_locator) : "") + digest;
-  }, 12);
+  };
+  const renderAssertionReview = () => {
+    const query = assertionSearch.value.trim().toLocaleLowerCase();
+    visibleReferenceAssertions = allReferenceAssertions.filter(item => {
+      if (applicabilityFilter.value && item.applicability_state !== applicabilityFilter.value) return false;
+      if (evidenceFilter.value && item.evidence_level !== evidenceFilter.value) return false;
+      if (query && !formatAssertion(item).toLocaleLowerCase().includes(query)) return false;
+      return true;
+    });
+    assertionReviewCount.textContent = visibleReferenceAssertions.length + " assertion(s) affichée(s) sur " +
+      allReferenceAssertions.length + ".";
+    assertionReviewList.replaceChildren();
+    for (const item of visibleReferenceAssertions.slice(0, 40)) {
+      const entry = document.createElement("li");
+      entry.textContent = formatAssertion(item);
+      assertionReviewList.appendChild(entry);
+    }
+    if (visibleReferenceAssertions.length > 40) {
+      const note = document.createElement("li");
+      note.textContent = (visibleReferenceAssertions.length - 40) + " assertion(s) supplémentaires non affichées. Affinez les filtres.";
+      assertionReviewList.appendChild(note);
+    }
+    if (!visibleReferenceAssertions.length) {
+      const empty = document.createElement("li");
+      empty.textContent = "Aucune assertion ne correspond aux filtres.";
+      assertionReviewList.appendChild(empty);
+    }
+  };
+  applicabilityFilter.addEventListener("change", renderAssertionReview);
+  evidenceFilter.addEventListener("change", renderAssertionReview);
+  assertionSearch.addEventListener("input", renderAssertionReview);
+  renderAssertionReview();
+  article.appendChild(assertionReview);
   const assertionEvidenceDetails = document.createElement("details");
   assertionEvidenceDetails.className = "engine-biological-evidence";
   const assertionEvidenceSummary = document.createElement("summary");
@@ -7525,9 +7611,7 @@ function renderBiologicalContextAssessment(article, result) {
     );
     parent.appendChild(line);
   };
-  for (const assertion of (Array.isArray(subject.biological_reference_assertions)
-    ? subject.biological_reference_assertions
-    : []).slice(0, 30)) {
+  for (const assertion of visibleReferenceAssertions.slice(0, 30)) {
     const record = document.createElement("details");
     record.className = "engine-biological-evidence-record";
     const recordSummary = document.createElement("summary");
@@ -7567,9 +7651,7 @@ function renderBiologicalContextAssessment(article, result) {
   if (assertionEvidenceDetails.childElementCount > 1) {
     article.appendChild(assertionEvidenceDetails);
   }
-  const assertions = Array.isArray(subject.biological_reference_assertions)
-    ? subject.biological_reference_assertions
-    : [];
+  const assertions = visibleReferenceAssertions;
   const contextById = new Map(biologicalContexts.map(context => [context.context_id, context]));
   const comparisonRows = [];
   const isoDate = value => typeof value === "string" && /^\\d{4}-\\d{2}-\\d{2}$/.test(value)
