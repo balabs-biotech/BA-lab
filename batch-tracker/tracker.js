@@ -7444,6 +7444,53 @@ function renderBiologicalContextAssessment(article, result) {
     addList(article, "Méthode et limites", result.limitations, item => item, 12);
   }
   const coverage = value.coverage || {}; const counts = coverage.record_counts_by_type || {};
+  const reviewSignals = [];
+  if (qc?.state === "review_required") {
+    reviewSignals.push({code:"environmental_qc_review_required",label:"Contrôle qualité environnemental à réviser",evidence:Array.isArray(qc.quality_flags)?qc.quality_flags.join(", "):"Le contrôle amont n'est pas validé."});
+  }
+  if (identityState === "conflicting") {
+    reviewSignals.push({code:"biological_identity_conflict",label:"Identité biologique contradictoire",evidence:"Les assertions d'identité disponibles ne concordent pas."});
+  }
+  if (Array.isArray(coverage.missing_context) && coverage.missing_context.length) {
+    reviewSignals.push({code:"biological_context_incomplete",label:"Contexte biologique incomplet",evidence:coverage.missing_context.join(", ")});
+  }
+  if (Array.isArray(coverage.temporal_gaps) && coverage.temporal_gaps.length) {
+    reviewSignals.push({code:"temporal_gaps_detected",label:"Lacunes temporelles détectées",evidence:coverage.temporal_gaps.length+" intervalle(s) sans couverture."});
+  }
+  if (result.outcome === "insufficient_data") {
+    reviewSignals.push({code:"insufficient_data",label:"Données insuffisantes",evidence:"Le moteur ne dispose pas d'une couverture suffisante pour une analyse exploitable."});
+  }
+  if (Array.isArray(value.findings)) {
+    for (const finding of value.findings.slice(0, 8)) {
+      reviewSignals.push({
+        code:typeof finding==="object"?String(finding.rule_code||finding.code||"rule_based_finding"):"rule_based_finding",
+        label:typeof finding==="string"?finding:String(finding.statement||finding.description||"Constat issu d'une règle"),
+        evidence:typeof finding==="object"?String(finding.evidence||finding.observed_value||"Valeur évaluée par la règle configurée."):"Constat produit par une règle configurée."
+      });
+    }
+  }
+  if (reviewSignals.length) {
+    const signalPanel=document.createElement("section");
+    signalPanel.className="engine-review-signals";
+    signalPanel.setAttribute("aria-label","Signaux nécessitant une vérification");
+    const signalTitle=document.createElement("strong");
+    signalTitle.textContent="Points de vigilance · "+reviewSignals.length;
+    signalPanel.appendChild(signalTitle);
+    const signalList=document.createElement("ul");
+    for (const signal of reviewSignals) {
+      const entry=document.createElement("li");
+      const heading=document.createElement("strong"); heading.textContent=signal.label;
+      const evidence=document.createElement("p"); evidence.className="muted"; evidence.textContent=signal.evidence;
+      const code=document.createElement("small"); code.className="muted"; code.textContent=signal.code;
+      entry.append(heading,evidence,code); signalList.appendChild(entry);
+    }
+    signalPanel.appendChild(signalList);
+    const disclaimer=document.createElement("p");
+    disclaimer.className="muted";
+    disclaimer.textContent="Ces signaux indiquent des éléments à examiner. Ils ne constituent ni un diagnostic biologique ni une recommandation automatique d'intervention.";
+    signalPanel.appendChild(disclaimer);
+    article.appendChild(signalPanel);
+  }
   addLine(article, "Couverture : " + String(coverage.source_record_count ?? 0) + " retenus · " + String(coverage.excluded_record_count ?? 0) + " exclus · mesures : " + String(counts.measurement ?? 0) + " · météo : " + String(counts.environmental_observation ?? 0));
   const requested = coverage.requested_window;
   if (requested?.start && requested?.end) addLine(article, "Fenêtre demandée : " + requested.start + " → " + requested.end + " · " + String(requested.timezone || "fuseau non précisé"));
