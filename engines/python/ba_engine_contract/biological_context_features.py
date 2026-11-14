@@ -175,6 +175,8 @@ def _evaluate_biological_reference_assertions(
         matching_context_ids: list[str] = []
         applicability_state = "not_assessed"
         temporal_applicability_state = "not_scoped"
+        assertion_start = None
+        assertion_end = None
         if validity_window is not None:
             if (
                 not isinstance(validity_window, dict)
@@ -276,9 +278,25 @@ def _evaluate_biological_reference_assertions(
             else:
                 applicability_state = "not_applicable"
 
+        applicable_windows: list[tuple[str, Any, Any]] = []
+        if applicability_state == "matched":
+            from datetime import date
+            for context in biological_contexts:
+                context_id = context.get("context_id") if isinstance(context, dict) else None
+                if not isinstance(context_id, str) or context_id not in matching_context_ids:
+                    continue
+                context_start = date.fromisoformat(context["valid_from"])
+                context_end = date.fromisoformat(context["valid_to"]) if context.get("valid_to") else None
+                effective_start = max(context_start, assertion_start) if assertion_start else context_start
+                if assertion_end and (context_end is None or assertion_end < context_end):
+                    effective_end = assertion_end
+                else:
+                    effective_end = context_end
+                if effective_end is None or effective_start < effective_end:
+                    applicable_windows.append((context_id, effective_start, effective_end))
         semantic_values[(subject_type, subject_ref, predicate)].append((
             _contract_stable_sha256(assertion["object_value"]),
-            frozenset(matching_context_ids) if applicability_state == "matched" else frozenset(),
+            tuple(applicable_windows),
         ))
         resolved_item = {
             **payload,
@@ -303,10 +321,17 @@ def _evaluate_biological_reference_assertions(
     # applicable to at least one identical, temporally overlapping context.
     # Unscoped or undetermined assertions remain evidence, not conflicts.
     has_conflicts = any(
-        left_value != right_value and bool(left_contexts.intersection(right_contexts))
+        left_value != right_value
+        and any(
+            left_id == right_id
+            and (left_end is None or right_start < left_end)
+            and (right_end is None or left_start < right_end)
+            for left_id, left_start, left_end in left_windows
+            for right_id, right_start, right_end in right_windows
+        )
         for values in semantic_values.values()
-        for index, (left_value, left_contexts) in enumerate(values)
-        for right_value, right_contexts in values[index + 1:]
+        for index, (left_value, left_windows) in enumerate(values)
+        for right_value, right_windows in values[index + 1:]
     )
     if has_conflicts or state == "conflicting":
         state = "conflicting"
