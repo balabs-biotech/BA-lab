@@ -7379,6 +7379,34 @@ function renderBiologicalContextAssessment(article, result) {
     addLine(qcDetails, "Résultat QC enregistré : " + String(qc.upstream_result_id || "identifiant indisponible"));
     addLine(qcDetails, "Empreinte SHA-256 : " + String(qc.artifact_sha256 || "indisponible"));
     addList(qcDetails, "Signaux qualité QC", qc.quality_flags, item => item, 12);
+    const qcSeries = Array.isArray(qc.value?.series) ? qc.value.series : [];
+    addList(qcDetails, "Séries environnementales contrôlées", qcSeries, series => {
+      const gaps = Array.isArray(series.gap_intervals) ? series.gap_intervals : [];
+      const outliers = Array.isArray(series.outlier_evidence) ? series.outlier_evidence : [];
+      const duplicates = Array.isArray(series.duplicate_timestamp_groups) ? series.duplicate_timestamp_groups : [];
+      const parts = [
+        String(series.variable_code || "variable inconnue") + " · " + String(series.point_count || 0) + " points",
+        "période : " + String(series.time_start || "inconnue") + " → " + String(series.time_end || "inconnue"),
+        gaps.length + " lacune(s)",
+        outliers.length + " valeur(s) atypique(s)",
+        duplicates.length + " groupe(s) d'horodatages dupliqués"
+      ];
+      return parts.join(" · ");
+    }, 20);
+    for (const series of qcSeries.slice(0, 20)) {
+      const seriesLabel = String(series.variable_code || "variable") + " (" + String(series.unit_code || "unité inconnue") + ")";
+      addList(qcDetails, "Lacunes · " + seriesLabel, series.gap_intervals, gap =>
+        String(gap.from || "début inconnu") + " → " + String(gap.to || "fin inconnue") +
+        " · " + String(gap.duration_minutes ?? "—") + " min", 10);
+      addList(qcDetails, "Valeurs atypiques · " + seriesLabel, series.outlier_evidence, item =>
+        String(item.observed_value ?? "—") + " " + series.unit_code +
+        " · médiane " + String(item.median_value ?? "—") +
+        " · score robuste " + String(item.robust_z_score ?? "non calculable") +
+        " · seuil " + String(item.threshold ?? "—") +
+        " · enregistrement " + String(item.record_id || "inconnu"), 10);
+      addList(qcDetails, "Horodatages dupliqués · " + seriesLabel, series.duplicate_timestamp_groups, item =>
+        String(item.timestamp || "date inconnue") + " · " + (Array.isArray(item.record_ids) ? item.record_ids.join(", ") : ""), 10);
+    }
     addList(qcDetails, "Limitations QC", qc.limitations, item => item, 12);
     const qcProvenance = qc.provenance || {};
     if (qcProvenance.algorithm) addLine(qcDetails, "Algorithme QC : " + String(qcProvenance.algorithm));
