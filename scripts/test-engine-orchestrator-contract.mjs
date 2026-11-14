@@ -135,7 +135,7 @@ assert.ok(
   "Worker-owned completion must pass the original result envelope unchanged to the atomic result writer"
 );
 assert.ok(
-  /select\("execution_id,result_type,outcome,value,limitations,quality_flags,confidence,provenance,generated_at,input_snapshot_sha256,input_record_ids"\)/.test(historyLoader),
+  /select\("id,execution_id,engine_id,engine_version,result_type,outcome,value,limitations,quality_flags,confidence,provenance,generated_at,input_snapshot_sha256,input_record_ids"\)/.test(historyLoader),
   "Execution history must retrieve the full persisted result value and metadata in one organization-scoped batch"
 );
 assert.ok(
@@ -179,3 +179,19 @@ assert.ok(
   "The execution lineage UI must explicitly display exact agreement, divergence, or unverifiable persistence state"
 );
 console.log("✓ UI detects divergence between the immutable result row and the execution ledger envelope");
+
+
+assert.ok(
+  /stored\.execution_id !== execution\.id/.test(persistenceCheck) &&
+  /stored\.engine_id !== execution\.engine_id/.test(persistenceCheck) &&
+  /stored\.engine_version !== execution\.engine_version/.test(persistenceCheck) &&
+  /stored\.result_type !== execution\.engine_id/.test(persistenceCheck) &&
+  /typeof stored\.id !== "string"/.test(persistenceCheck),
+  "Persisted result identity, engine version, type, and durable result ID must match the ledger execution"
+);
+assert.ok(
+  /select\("id,execution_id,engine_id,engine_version,result_type/.test(historyLoader) &&
+  /Identifiant du résultat persistant/.test(tracker),
+  "History reload must retrieve and expose the durable result row ID and its engine identity"
+);
+console.log("✓ Persisted result row identity is bound to its durable execution ledger entry");
