@@ -298,6 +298,14 @@ class EngineContractTests(unittest.TestCase):
         flags = result["result"]["value"]["series"][0]["quality_flags"]
         self.assertIn("sampling_gap_detected", flags)
         self.assertIn("robust_outlier_detected", flags)
+        series = result["result"]["value"]["series"][0]
+        self.assertEqual(len(series["gap_intervals"]), 1)
+        self.assertEqual(series["gap_intervals"][0]["duration_minutes"], 230.0)
+        self.assertEqual(series["gap_intervals"][0]["after_record_id"], request["input"]["record_ids"][1])
+        self.assertEqual(series["gap_intervals"][0]["before_record_id"], request["input"]["record_ids"][2])
+        self.assertEqual(len(series["outlier_evidence"]), 1)
+        self.assertEqual(series["outlier_evidence"][0]["record_id"], request["input"]["record_ids"][3])
+        self.assertEqual(series["outlier_evidence"][0]["threshold"], 3.0)
         self.assertIn("data-quality screening only", result["result"]["limitations"][0])
 
     def test_environmental_qc_accepts_location_scoped_environmental_observations(self):
