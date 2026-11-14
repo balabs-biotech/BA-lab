@@ -460,7 +460,7 @@ class EngineContractTests(unittest.TestCase):
             ("2026-11-12T08:06:00Z", 100.0),
         ]
         for index, (timestamp, value) in enumerate(observations):
-            record_id = f"ac2b3a4d-5e6f-4789-8123-456789abcde{index:02d}"
+            record_id = f"ac2b3a4d-5e6f-4789-8123-{index:012x}"
             request["input"]["record_ids"].append(record_id)
             request["input"]["records"].append({
                 "record_id": record_id,
