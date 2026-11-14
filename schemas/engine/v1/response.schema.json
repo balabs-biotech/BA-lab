@@ -247,6 +247,7 @@
   "allOf": [
     {
       "if": {
+        "type": "object",
         "properties": {
           "status": {
             "const": "completed"
@@ -257,10 +258,18 @@
         ]
       },
       "then": {
+        "type": "object",
+        "properties": {
+          "error": {}
+        },
         "required": [
           "result"
         ],
         "not": {
+          "type": "object",
+          "properties": {
+            "error": {}
+          },
           "required": [
             "error"
           ]
@@ -269,6 +278,7 @@
     },
     {
       "if": {
+        "type": "object",
         "properties": {
           "status": {
             "const": "failed"
@@ -279,10 +289,18 @@
         ]
       },
       "then": {
+        "type": "object",
+        "properties": {
+          "result": {}
+        },
         "required": [
           "error"
         ],
         "not": {
+          "type": "object",
+          "properties": {
+            "result": {}
+          },
           "required": [
             "result"
           ]
