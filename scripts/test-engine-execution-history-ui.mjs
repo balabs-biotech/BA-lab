@@ -148,13 +148,13 @@ for (const path of [
   const page = readFileSync(path, "utf8");
   if (path.includes("green-tech")) {
     assert.match(page, /workspace\.html\?v=20261113-bie-identity-ui-1/);
-    assert.match(page, /tracker\.js\?v=20261114-rolling-baseline-anomalies-1/);
-    assert.match(page, /tracker\.css\?v=20261114-rolling-baseline-anomalies-1/);
+    assert.match(page, /tracker\.js\?v=20261114-ledger-result-identity-1/);
+    assert.match(page, /tracker\.css\?v=20261114-ledger-result-identity-1/);
     assert.match(page, /environmental-data\.js\?v=20261112-greentech-engine-qc-1/);
   } else {
     assert.match(page, /workspace\.html\?v=20261113-bie-identity-ui-1/);
-    assert.match(page, /tracker\.js\?v=20261114-rolling-baseline-anomalies-1/);
-    assert.match(page, /tracker\.css\?v=20261114-rolling-baseline-anomalies-1/);
+    assert.match(page, /tracker\.js\?v=20261114-ledger-result-identity-1/);
+    assert.match(page, /tracker\.css\?v=20261114-ledger-result-identity-1/);
   }
 }
 
@@ -250,3 +250,23 @@ assert.match(environmental, /recordIds\.length>500/);
 assert.match(environmental, /summary\.excluded_record_count/);
 assert.match(environmental, /gap_after_record_ids/);
 assert.doesNotMatch(environmental, /engineOutput\.innerHTML/);
+
+
+const persistedIdentityStart = tracker.indexOf("function getEngineResultPersistenceConsistency(execution)");
+const persistedIdentityEnd = tracker.indexOf("\nfunction getComparableEngineExecutions", persistedIdentityStart);
+assert.ok(persistedIdentityStart >= 0 && persistedIdentityEnd > persistedIdentityStart);
+const persistedIdentity = tracker.slice(persistedIdentityStart, persistedIdentityEnd);
+for (const contract of [
+  "stored.execution_id !== execution.id",
+  "stored.engine_id !== execution.engine_id",
+  "stored.engine_version !== execution.engine_version",
+  "stored.result_type !== execution.engine_id",
+  "typeof stored.id !== \"string\"",
+  "stored.input_snapshot_sha256",
+  "stored.input_record_ids"
+]) assert.ok(persistedIdentity.includes(contract), "Missing persisted-result identity guard: " + contract);
+assert.match(loader, /select\("id,execution_id,engine_id,engine_version,result_type/);
+assert.match(renderer, /Identifiant du résultat persistant/);
+assert.match(renderer, /Cohérence ledger \/ résultat persisté/);
+assert.match(renderer, /DIVERGENCE : /);
+console.log("✓ Persisted result identity, durable result ID and ledger parity are exposed in execution history");
