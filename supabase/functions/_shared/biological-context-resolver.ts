@@ -13,6 +13,7 @@ type ContextRow = {
   organization_id: string;
   culture_id: string | null;
   plant_culture_id?: string | null;
+  domain?: string | null;
   environment_id: string;
   valid_from: string;
   valid_to: string | null;
@@ -49,6 +50,27 @@ function localDate(instant: string, timezone: string): string {
 
 function validContextForDate(context: ContextRow, date: string): boolean {
   return context.valid_from <= date && (context.valid_to === null || date < context.valid_to);
+}
+
+function coversDateRange(
+  contexts: ContextRow[],
+  startDate: string,
+  lastIncludedDate: string,
+): boolean {
+  const endExclusive = new Date(Date.parse(`${lastIncludedDate}T00:00:00Z`) + 86_400_000)
+    .toISOString().slice(0, 10);
+  let cursor = startDate;
+  const ordered = [...contexts].sort((a, b) =>
+    a.valid_from.localeCompare(b.valid_from) ||
+    (a.valid_to ?? "9999-12-31").localeCompare(b.valid_to ?? "9999-12-31")
+  );
+  for (const context of ordered) {
+    if (context.valid_from > cursor) return false;
+    if (context.valid_to === null) return true;
+    if (context.valid_to > cursor) cursor = context.valid_to;
+    if (cursor >= endExclusive) return true;
+  }
+  return false;
 }
 
 function environmentExists(
@@ -97,11 +119,12 @@ export function resolveBiologicalContext(input: {
   const resolvedMeasurements = measurements.map((measurement) => {
     const date = localDate(measurement.measured_at, window.timezone);
     const applicable = scopedContexts.filter((context) => validContextForDate(context, date));
-    if (applicable.length > 1) {
+    const applicableEnvironmentIds = [...new Set(applicable.map((context) => context.environment_id))];
+    if (applicableEnvironmentIds.length > 1) {
       return { measurement_id: measurement.id, environment_id: null, location_id: null,
         status: "ambiguous", reason: "overlapping_biological_contexts" };
     }
-    const contextEnvironmentId = applicable[0]?.environment_id ?? null;
+    const contextEnvironmentId = applicableEnvironmentIds[0] ?? null;
     const measurementEnvironmentId = measurement.environment_id ?? null;
     if (contextEnvironmentId && measurementEnvironmentId &&
         contextEnvironmentId !== measurementEnvironmentId) {
@@ -126,19 +149,17 @@ export function resolveBiologicalContext(input: {
     context.valid_from <= lastIncludedDate &&
     (context.valid_to === null || context.valid_to > startDate)
   );
-  const windowContexts = intersectingContexts.filter((context) =>
-    context.valid_from <= startDate &&
-    (context.valid_to === null || context.valid_to > lastIncludedDate)
-  );
+  const windowEnvironmentIds = [...new Set(intersectingContexts.map((context) => context.environment_id))];
   let windowResolution: Record<string, unknown>;
-  if (intersectingContexts.length > 1) {
+  if (windowEnvironmentIds.length > 1) {
     windowResolution = { status: "ambiguous", environment_id: null, location_id: null,
-      reason: "analysis_window_spans_multiple_biological_contexts" };
-  } else if (windowContexts.length === 0) {
+      reason: "analysis_window_spans_multiple_environment_assignments" };
+  } else if (windowEnvironmentIds.length === 0 ||
+      !coversDateRange(intersectingContexts, startDate, lastIncludedDate)) {
     windowResolution = { status: "missing", environment_id: null, location_id: null,
       reason: "biological_context_does_not_cover_analysis_window" };
   } else {
-    const environment = environmentExists(windowContexts[0].environment_id, organizationId, environments);
+    const environment = environmentExists(windowEnvironmentIds[0], organizationId, environments);
     if (!environment) {
       windowResolution = { status: "conflict", environment_id: null, location_id: null,
         reason: "environment_not_found_in_organization" };
