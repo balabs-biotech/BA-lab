@@ -318,6 +318,7 @@
   "allOf": [
     {
       "if": {
+        "type": "object",
         "properties": {
           "engine": {
             "type": "object",
@@ -336,13 +337,17 @@
         ]
       },
       "then": {
+        "type": "object",
         "properties": {
           "input": {
+            "type": "object",
             "properties": {
               "record_ids": {
+                "type": "array",
                 "minItems": 0
               },
               "records": {
+                "type": "array",
                 "minItems": 0
               }
             }
@@ -350,13 +355,17 @@
         }
       },
       "else": {
+        "type": "object",
         "properties": {
           "input": {
+            "type": "object",
             "properties": {
               "record_ids": {
+                "type": "array",
                 "minItems": 1
               },
               "records": {
+                "type": "array",
                 "minItems": 1
               }
             }
