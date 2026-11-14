@@ -149,13 +149,63 @@ try {
     "'::uuid, '" + environmentId + "'::uuid, '2026-11-13T00:00:00Z', jsonb_build_object('purpose', 'ephemeral_ci_fixture')) returning id::text",
   );
   runSql(
-    "insert into public.biological_contexts (organization_id, domain, culture_id, environment_id, organism_kind, culture_stage, production_system, valid_from, context_tags) values ('" +
+    "insert into public.biological_contexts (organization_id, domain, culture_id, environment_id, organism_kind, taxon_code, strain_code, culture_stage, substrate_code, production_system, valid_from, context_tags) values ('" +
     organizationId + "'::uuid, 'mycology', '" + cultureId + "'::uuid, '" + environmentId +
-    "'::uuid, 'fungus', 'incubation', 'petri_agar', '2026-11-13', array['ci_fixture'])",
+    "'::uuid, 'fungus', 'CI:pleurotus_ostreatus', 'CI-P80', 'incubation', 'wheat_straw', 'petri_agar', '2026-11-13', array['ci_fixture'])",
   );
   if (![environmentId, cultureId, materialId].every((id) => typeof id === "string" && /^[0-9a-f-]{36}$/i.test(id))) {
     throw new Error("Could not create temporary biological BIE source fixture");
   }
+
+  const referenceRows = await api("/rest/v1/biological_reference_registry?select=id", {
+    method: "POST",
+    body: {
+      organization_id: organizationId,
+      reference_id: `ci.biological.reference.${randomUUID()}`,
+      reference_version: "1.0.0",
+      title: "Synthetic CI biological reference fixture",
+      citation: "Synthetic fixture used only to verify authenticated assertion lineage.",
+      source_type: "technical_document",
+      evidence_level: "L0",
+      content_sha256: "a".repeat(64),
+      status: "draft",
+    },
+    headers: { Prefer: "return=representation" },
+  });
+  const referenceRegistryId = referenceRows?.[0]?.id;
+  if (typeof referenceRegistryId !== "string") throw new Error("Could not create synthetic biological source reference");
+  await api(`/rest/v1/biological_reference_registry?id=eq.${referenceRegistryId}`, {
+    method: "PATCH",
+    body: { status: "validated" },
+    headers: { Prefer: "return=minimal" },
+  });
+  const assertionRows = await api("/rest/v1/biological_reference_assertions?select=id", {
+    method: "POST",
+    body: {
+      organization_id: organizationId,
+      assertion_code: "ci.pleurotus.substrate.association",
+      assertion_version: "1.0.0",
+      subject_type: "taxon",
+      subject_ref: "CI:pleurotus_ostreatus",
+      predicate_code: "substrate.association",
+      object_value: { substrate: "wheat_straw", relation: "reported" },
+      reference_registry_id: referenceRegistryId,
+      source_locator: "synthetic-fixture",
+      evidence_level: "L0",
+      applicability: { context_match: { organism_kind: "fungus", culture_stage: "incubation" } },
+      uncertainty: { assessment: "not_assessed" },
+      status: "draft",
+    },
+    headers: { Prefer: "return=representation" },
+  });
+  const referenceAssertionId = assertionRows?.[0]?.id;
+  if (typeof referenceAssertionId !== "string") throw new Error("Could not create synthetic biological reference assertion");
+  await api(`/rest/v1/biological_reference_assertions?id=eq.${referenceAssertionId}`, {
+    method: "PATCH",
+    body: { status: "validated" },
+    headers: { Prefer: "return=minimal" },
+  });
+  process.stdout.write("ok biological assertion fixture: source and assertion were validated through authenticated admin actions\\n");
 
   // Environmental observations are provider-ingested server data. Seed them with
   // the local database owner; the actual QC request below reads them as the
@@ -283,10 +333,15 @@ try {
           ? "review_required"
           : "passed"
       ) ||
-      !bieResult.provenance?.source_references?.some((item) => item.includes(`execution=${qcExecutionId}`))) {
-    throw new Error("BIE did not persist the verified QC artifact, result linkage, flags, and provenance");
+      !bieResult.provenance?.source_references?.some((item) => item.includes(`execution=${qcExecutionId}`)) ||
+      bieResult.value?.subject?.biological_reference_assertion_state !== "documented" ||
+      bieResult.value?.subject?.biological_reference_assertions?.length !== 1 ||
+      bieResult.value?.subject?.biological_reference_assertions?.[0]?.applicability_state !== "matched" ||
+      !bieResult.provenance?.source_references?.some((item) => item.startsWith("BA_LABS_BIOLOGICAL_REFERENCE_ASSERTION/ci.pleurotus.substrate.association@1.0.0#sha256=")) ||
+      !bieResult.provenance?.source_references?.some((item) => item.startsWith("BA_LABS_BIOLOGICAL_REFERENCE_SOURCE/ci.biological.reference."))) {
+    throw new Error("BIE did not persist the verified QC artifact and validated biological assertion lineage");
   }
-  process.stdout.write("ok live QC to BIE: worker consumed persisted QC result and saved artifact lineage, flags, and provenance\\n");
+  process.stdout.write("ok live QC to BIE: worker consumed QC plus validated biological assertion and persisted both provenance chains\\n");
 
   const unmemberedOrganizationId = randomUUID();
 
