@@ -74,18 +74,32 @@ def _evaluate_interpretation_rules(
         if len(profile_manifests) != 1:
             raise ValueError("interpretation_profile_manifest_required")
         profile_manifest = profile_manifests[0]
+        profile_id = profile_manifest.get("profile_id")
+        profile_version = profile_manifest.get("profile_version")
+        profile_digest = profile_manifest.get("content_sha256")
         if (
             profile_manifest.get("dataset_id") != "biological.context.features"
             or not isinstance(profile_manifest.get("dataset_version"), str)
             or not _RULE_VERSION.fullmatch(profile_manifest["dataset_version"])
-            or not isinstance(profile_manifest.get("content_sha256"), str)
-            or not re.fullmatch(r"[0-9a-f]{64}", profile_manifest["content_sha256"])
+            or not isinstance(profile_id, str)
+            or not _RULE_ID.fullmatch(profile_id)
+            or not isinstance(profile_version, str)
+            or not _RULE_VERSION.fullmatch(profile_version)
+            or not isinstance(profile_digest, str)
+            or not re.fullmatch(r"[0-9a-f]{64}", profile_digest)
         ):
             raise ValueError("invalid_interpretation_profile_manifest")
+        profile_content = {
+            "profile_id": profile_id,
+            "profile_version": profile_version,
+            "rules": rules,
+        }
+        if _stable_sha256(profile_content) != profile_digest:
+            raise ValueError("interpretation_profile_content_hash_mismatch")
         reference_sources.add(
             "BA_LABS_INTERPRETATION_PROFILE/"
-            f"{profile_manifest['dataset_id']}@{profile_manifest['dataset_version']}"
-            f"#sha256={profile_manifest['content_sha256']}"
+            f"{profile_id}@{profile_version}"
+            f"#sha256={profile_digest}"
         )
     for rule in rules:
         required = {
