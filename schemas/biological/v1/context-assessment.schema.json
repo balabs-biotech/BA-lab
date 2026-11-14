@@ -231,6 +231,7 @@
               "uncertainty",
               "content_sha256",
               "applicability_state",
+              "temporal_applicability_state",
               "matching_context_ids",
               "source",
               "reviewed_at"
@@ -313,6 +314,14 @@
                   "not_applicable",
                   "undetermined",
                   "not_assessed"
+                ]
+              },
+              "temporal_applicability_state": {
+                "enum": [
+                  "matched",
+                  "not_applicable",
+                  "undetermined",
+                  "not_scoped"
                 ]
               },
               "matching_context_ids": {
