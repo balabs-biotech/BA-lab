@@ -378,6 +378,42 @@ try {
   }
   process.stdout.write("ok live QC to BIE: exact QC result ID, dependency snapshot, canonical SHA-256 artifact and validated biological assertion lineage persisted\\n");
 
+  const bieUnavailableQc = await invoke(userAccessToken, {
+    organization_id: organizationId,
+    engine_id: "biological.context.features",
+    engine_version: "0.2.0",
+    upstream_qc_execution_id: randomUUID(),
+    scope: { organization_id: organizationId, culture_id: cultureId },
+    parameters: { window_start: windowStart, window_end: windowEnd, timezone: "Africa/Algiers" },
+    idempotency_key: `auth-bie-missing-qc-${randomUUID()}`,
+  });
+  assertResponse(
+    "BIE rejects unavailable upstream QC execution",
+    bieUnavailableQc,
+    422,
+    "upstream_qc_execution_unavailable_or_incompatible",
+  );
+
+  const bieMismatchedQcWindow = await invoke(userAccessToken, {
+    organization_id: organizationId,
+    engine_id: "biological.context.features",
+    engine_version: "0.2.0",
+    upstream_qc_execution_id: qcExecutionId,
+    scope: { organization_id: organizationId, culture_id: cultureId },
+    parameters: {
+      window_start: "2026-11-12T00:00:00Z",
+      window_end: "2026-11-13T00:00:00Z",
+      timezone: "Africa/Algiers",
+    },
+    idempotency_key: `auth-bie-qc-window-mismatch-${randomUUID()}`,
+  });
+  assertResponse(
+    "BIE rejects upstream QC window mismatch",
+    bieMismatchedQcWindow,
+    422,
+    "upstream_qc_scope_or_window_mismatch",
+  );
+
   const unmemberedOrganizationId = randomUUID();
 
   const denied = await invoke(userAccessToken, {
