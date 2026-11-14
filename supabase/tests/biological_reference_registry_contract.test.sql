@@ -68,6 +68,14 @@ begin
     repeat('a', 64), 'draft', current_date
   ) returning id into v_profile_id;
 
+  begin
+    update public.domain_interpretation_profiles
+      set rules='[{"rule_id":"changed-without-digest"}]'::jsonb
+      where id=v_profile_id;
+    raise exception 'draft profile content changed without refreshing its digest';
+  exception when sqlstate '23514' then null;
+  end;
+
   update public.domain_interpretation_profiles
     set status='active'
     where id=v_profile_id;
