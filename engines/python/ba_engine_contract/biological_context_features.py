@@ -52,6 +52,9 @@ _REFERENCE_ASSERTION_SUBJECT_TYPES = {
     "taxon", "strain", "cultivar", "substrate", "culture_stage",
     "production_system", "environmental_parameter", "biological_process",
 }
+_REFERENCE_ASSERTION_CODE = re.compile(r"^[a-z][a-z0-9_.-]{1,159}$")
+_REFERENCE_ASSERTION_VERSION = re.compile(r"^[0-9]+\\.[0-9]+\\.[0-9]+([+-][0-9A-Za-z.-]+)?$")
+_REFERENCE_ASSERTION_PREDICATE = re.compile(r"^[a-z][a-z0-9_.-]{1,158}$")
 _REFERENCE_ASSERTION_EVIDENCE_LEVELS = {"L0", "L1", "L2", "L3", "L4", "L5", "unassessed"}
 
 
@@ -97,21 +100,21 @@ def _evaluate_biological_reference_assertions(
         applicability = assertion.get("applicability")
         uncertainty = assertion.get("uncertainty")
         if (
-            not isinstance(code, str) or not _RULE_ID.fullmatch(code)
-            or not isinstance(version, str) or not _RULE_VERSION.fullmatch(version)
+            not isinstance(code, str) or not _REFERENCE_ASSERTION_CODE.fullmatch(code)
+            or not isinstance(version, str) or not _REFERENCE_ASSERTION_VERSION.fullmatch(version)
             or subject_type not in _REFERENCE_ASSERTION_SUBJECT_TYPES
-            or not isinstance(subject_ref, str) or not subject_ref
-            or not isinstance(predicate, str) or not _RULE_ID.fullmatch(predicate)
+            or not isinstance(subject_ref, str) or not subject_ref or len(subject_ref) > 240
+            or not isinstance(predicate, str) or not _REFERENCE_ASSERTION_PREDICATE.fullmatch(predicate)
             or not isinstance(digest, str) or not re.fullmatch(r"[0-9a-f]{64}", digest)
             or not isinstance(source, dict)
             or not isinstance(applicability, dict) or not isinstance(uncertainty, dict)
             or assertion.get("evidence_level") not in _REFERENCE_ASSERTION_EVIDENCE_LEVELS
-            or "object_value" not in assertion
+            or "object_value" not in assertion or assertion["object_value"] is None
         ):
             raise ValueError("invalid_biological_reference_assertion")
-        if assertion.get("unit_code") is not None and not isinstance(assertion.get("unit_code"), str):
+        if assertion.get("unit_code") is not None and (not isinstance(assertion.get("unit_code"), str) or len(assertion["unit_code"]) > 80):
             raise ValueError("invalid_biological_reference_assertion_unit")
-        if assertion.get("source_locator") is not None and not isinstance(assertion.get("source_locator"), str):
+        if assertion.get("source_locator") is not None and (not isinstance(assertion.get("source_locator"), str) or len(assertion["source_locator"]) > 2000):
             raise ValueError("invalid_biological_reference_assertion_source_locator")
         if not isinstance(assertion.get("reviewed_at"), str):
             raise ValueError("invalid_biological_reference_assertion_review_timestamp")
@@ -125,8 +128,8 @@ def _evaluate_biological_reference_assertions(
         source_digest = source.get("content_sha256")
         source_reviewed_at = source.get("reviewed_at")
         if (
-            not isinstance(source_reference_id, str) or not source_reference_id
-            or not isinstance(source_version, str) or not source_version
+            not isinstance(source_reference_id, str) or not source_reference_id or len(source_reference_id) > 160
+            or not isinstance(source_version, str) or not source_version or len(source_version) > 80
             or not isinstance(source_digest, str) or not re.fullmatch(r"[0-9a-f]{64}", source_digest)
             or not isinstance(source_reviewed_at, str)
             or (source.get("source_url") is not None and not isinstance(source.get("source_url"), str))
