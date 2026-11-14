@@ -11,7 +11,7 @@ create table if not exists public.engine_execution_dependencies (
   primary key (organization_id, downstream_execution_id, dependency_role),
   check (downstream_execution_id <> upstream_execution_id),
   foreign key (organization_id, downstream_execution_id)
-    references public.engine_executions(organization_id, id) on delete cascade,
+    references public.engine_executions(organization_id, id) on delete restrict,
   foreign key (organization_id, upstream_execution_id)
     references public.engine_executions(organization_id, id) on delete restrict,
   foreign key (organization_id, upstream_result_id)

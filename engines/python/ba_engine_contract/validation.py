@@ -2,7 +2,10 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
+import math
+from decimal import Decimal
 import os
 from functools import lru_cache
 from pathlib import Path
@@ -42,8 +45,39 @@ def _validate(instance: Mapping[str, Any], schema_name: str) -> None:
         raise ContractValidationError(f"{schema_name} validation failed: {details}")
 
 
+def _javascript_stable_json(value: Any) -> str:
+    """Canonical JSON matching the TypeScript JSON.stringify number semantics."""
+    if value is None or isinstance(value, (str, bool, int)):
+        return json.dumps(value, ensure_ascii=False, separators=(",", ":"))
+    if isinstance(value, float):
+        if not math.isfinite(value):
+            raise ContractValidationError("upstream artifact contains a non-finite number")
+        if value == 0:
+            return "0"
+        absolute = abs(value)
+        if value.is_integer() and absolute < 1e21:
+            return str(int(value))
+        raw = repr(value).lower()
+        if 1e-6 <= absolute < 1e21:
+            return format(Decimal(raw), "f").rstrip("0").rstrip(".") if "." in format(Decimal(raw), "f") else format(Decimal(raw), "f")
+        mantissa, exponent = raw.split("e")
+        return f"{mantissa}e{int(exponent):+d}" if int(exponent) >= 0 else f"{mantissa}e{int(exponent)}"
+    if isinstance(value, list):
+        return "[" + ",".join(_javascript_stable_json(item) for item in value) + "]"
+    if isinstance(value, Mapping):
+        return "{" + ",".join(
+            json.dumps(key, ensure_ascii=False) + ":" + _javascript_stable_json(value[key])
+            for key in sorted(value)
+        ) + "}"
+    raise ContractValidationError("upstream artifact contains an unsupported JSON value")
+
+
+def _stable_sha256(value: Any) -> str:
+    return hashlib.sha256(_javascript_stable_json(value).encode("utf-8")).hexdigest()
+
+
 def validate_request(request: Mapping[str, Any]) -> None:
-    """Validate the request schema and bind record IDs to supplied snapshots."""
+    """Validate the request schema and bind record IDs and upstream artifacts."""
     _validate(request, "request.schema.json")
     input_block = request["input"]
     declared_ids = input_block["record_ids"]
@@ -52,6 +86,34 @@ def validate_request(request: Mapping[str, Any]) -> None:
         raise ContractValidationError(
             "input.record_ids must match input.records record_id values exactly"
         )
+
+    artifacts = request.get("upstream_artifacts", [])
+    if not isinstance(artifacts, list) or len(artifacts) > 1:
+        raise ContractValidationError("at most one upstream artifact is supported")
+    if artifacts:
+        engine = request.get("engine", {})
+        if engine != {
+            "engine_id": "biological.context.features",
+            "engine_version": "0.2.0",
+        }:
+            raise ContractValidationError("environmental QC artifacts require BIE v0.2.0")
+        artifact = artifacts[0]
+        expected_scope = {
+            "organization_id": request["scope"]["organization_id"],
+            "location_id": request["scope"].get("location_id"),
+            "window_start": request["parameters"].get("window_start"),
+            "window_end": request["parameters"].get("window_end"),
+        }
+        if artifact.get("scope") != expected_scope:
+            raise ContractValidationError("upstream artifact scope or analysis window mismatch")
+        if artifact.get("engine_id") != "environmental.timeseries.qc" or artifact.get("engine_version") != "0.2.0":
+            raise ContractValidationError("upstream artifact engine is not allowlisted")
+        unsigned = {key: value for key, value in artifact.items() if key != "artifact_sha256"}
+        if _stable_sha256(unsigned) != artifact.get("artifact_sha256"):
+            raise ContractValidationError("upstream artifact digest mismatch")
+        result = artifact.get("result")
+        if not isinstance(result, dict) or not isinstance(result.get("quality_flags"), list):
+            raise ContractValidationError("upstream artifact result is incomplete")
 
 
 def validate_response(

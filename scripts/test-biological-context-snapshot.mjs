@@ -159,4 +159,25 @@ assert.notEqual(contextSnapshot.input.snapshot_sha256, historicalSnapshot.input.
 assert.notEqual(contextSnapshot.input.snapshot_sha256, changedContextSnapshot.input.snapshot_sha256,
   "changing a biological context descriptor must change the immutable snapshot hash");
 
+const halfOpenBoundary = await buildBiologicalContextSnapshot({
+  organizationId,
+  culture,
+  environment,
+  measurements: [
+    measurements[0],
+    { ...measurements[0], id: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaab", measured_at: window.end },
+  ],
+  environmentalObservations: [
+    environmentalObservations[0],
+    { ...environmentalObservations[0], id: "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbc", observed_at: window.end },
+  ],
+  window,
+});
+assert.equal(halfOpenBoundary.input.records.length, 2,
+  "the analysis window is half-open [start, end): rows exactly at end must be excluded");
+assert.ok(halfOpenBoundary.input.records.every((record) =>
+  record.record_id !== "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaab" &&
+  record.record_id !== "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbc"
+));
+
 console.log("✓ BIE source adapter: tenant, culture and environment links; mixed-source provenance; deterministic hashes; unlinked culture handling");

@@ -126,6 +126,7 @@ jobs:
           node scripts/test-bal-json-schemas.mjs
           node scripts/test-engine-orchestrator-contract.mjs
           node scripts/test-engine-queue-dispatcher-contract.mjs
+          node scripts/test-engine-response-schema.mjs
           node scripts/test-engine-execution-history-ui.mjs
           node scripts/test-biological-context-assessment-schema.mjs
           node --experimental-strip-types scripts/test-biological-context-snapshot.mjs
@@ -383,3 +384,68 @@ jobs:
           path: artifacts/3d-browser-smoke-preview/
           if-no-files-found: ignore
           retention-days: 14
+  engine-edge-runtime-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      - name: Resolve Edge orchestration module graphs
+        run: >-
+          deno cache
+          supabase/functions/engine-orchestrator/index.ts
+          supabase/functions/engine-queue-dispatch/index.ts
+      - name: Syntax-check local Edge runtime smoke test
+        run: node --check scripts/test-local-engine-edge-runtime.mjs
+      - name: Syntax-check authenticated orchestrator integration test
+        run: node --check scripts/test-local-engine-authenticated-orchestrator.mjs
+      - name: Compile engine JSON contracts with AJV strict mode
+        run: deno run --allow-read scripts/test-engine-ajv-strict.ts
+
+  supabase-local-engine-runtime:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: supabase/setup-cli@v1
+        with:
+          version: 3.0.0
+      - name: Start isolated Supabase stack and apply migrations
+        run: supabase start -x studio,mailpit,storage-api,imgproxy,realtime,logflare,vector,supavisor
+      - name: Verify local migration state
+        run: |
+          supabase migration list
+          supabase status -o env | grep -E '^(ANON_KEY|JWT_SECRET|SERVICE_ROLE_KEY)=' >> "$GITHUB_ENV"
+      - name: Start real Edge Functions runtime
+        run: |
+          cat > /tmp/ba-labs-edge-ci.env <<'EOF'
+          BA_ENGINE_ASYNC_DISPATCH=true
+          BA_BIE_ENABLED=true
+          BA_ENGINE_DISPATCH_TOKEN=ci-dispatch-token-0123456789abcdef
+          EOF
+          supabase functions serve --no-verify-jwt --env-file /tmp/ba-labs-edge-ci.env > /tmp/ba-labs-edge-runtime.log 2>&1 &
+          echo $! > /tmp/ba-labs-edge-runtime.pid
+          for attempt in $(seq 1 60); do
+            code="$(curl --silent --output /dev/null --write-out '%{http_code}' --request POST http://127.0.0.1:54321/functions/v1/engine-orchestrator --header 'content-type: application/json' --data '{}' || true)"
+            if [ "$code" = "401" ]; then exit 0; fi
+            if ! kill -0 "$(cat /tmp/ba-labs-edge-runtime.pid)" 2>/dev/null; then
+              cat /tmp/ba-labs-edge-runtime.log
+              exit 1
+            fi
+            sleep 2
+          done
+          cat /tmp/ba-labs-edge-runtime.log
+          exit 1
+      - name: Exercise both deployed Edge handlers through Kong
+        env:
+          BA_ENGINE_DISPATCH_TOKEN: ci-dispatch-token-0123456789abcdef
+        run: |
+          node scripts/test-local-engine-edge-runtime.mjs || {
+            cat /tmp/ba-labs-edge-runtime.log
+            exit 1
+          }
+      - name: Exercise authenticated tenant and biological source boundaries
+        run: node scripts/test-local-engine-authenticated-orchestrator.mjs
+      - name: Stop local Supabase stack
+        if: always()
+        run: supabase stop --no-backup

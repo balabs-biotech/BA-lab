@@ -99,7 +99,8 @@ function sameExecutionInput(prior: Record<string, any>, request: Record<string, 
     prior.input_snapshot_sha256 === request.input.snapshot_sha256 &&
     stable(prior.scope) === stable(request.scope) &&
     stable(prior.request_payload?.parameters ?? {}) === stable(request.parameters ?? {}) &&
-    stable(prior.request_payload?.datasets ?? []) === stable(request.datasets ?? []);
+    stable(prior.request_payload?.datasets ?? []) === stable(request.datasets ?? []) &&
+    stable(prior.request_payload?.upstream_artifacts ?? []) === stable(request.upstream_artifacts ?? []);
 }
 
 Deno.serve(async (req: Request) => {
@@ -124,6 +125,11 @@ Deno.serve(async (req: Request) => {
   const engineId = parsed.engine_id;
   const engineVersion = parsed.engine_version;
   const isBiologicalContextEngine = engineId === "biological.context.features";
+  const upstreamQcExecutionId = parsed.upstream_qc_execution_id;
+  const validUpstreamSelection = upstreamQcExecutionId === undefined ||
+    (isBiologicalContextEngine && engineVersion === "0.2.0" &&
+      typeof upstreamQcExecutionId === "string" &&
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(upstreamQcExecutionId));
   const suppliedRecordIds = parsed.record_ids;
   // BIE source IDs are derived exclusively from RLS-authorized database rows.
   const recordIds = isBiologicalContextEngine ? [] : suppliedRecordIds;
@@ -148,7 +154,7 @@ Deno.serve(async (req: Request) => {
       typeof parameters.timezone === "string");
   if (typeof organizationId !== "string" || typeof engineId !== "string" ||
       typeof engineVersion !== "string" || !validRecordIds || !validSourceType ||
-      !validBiologicalRequest ||
+      !validBiologicalRequest || !validUpstreamSelection ||
       typeof idempotencyKey !== "string" || idempotencyKey.length < 8 || idempotencyKey.length > 160 ||
       !object(parameters) || !object(scope ?? {})) {
     return reply(422, { error: "invalid_or_incomplete_request" });
@@ -396,6 +402,71 @@ Deno.serve(async (req: Request) => {
     effectiveParameters = parameters;
     snapshotHash = await sha256(stable(orderedRecords));
   }
+  let upstreamArtifacts: Record<string, any>[] = [];
+  if (upstreamQcExecutionId !== undefined) {
+    const { data: upstream, error: upstreamError } = await serviceClient
+      .from("engine_executions")
+      .select("id,organization_id,request_id,engine_id,engine_version,scope,input_snapshot_sha256,status,completed_at,request_payload")
+      .eq("organization_id", organizationId)
+      .eq("id", upstreamQcExecutionId)
+      .maybeSingle();
+    if (upstreamError || !upstream || upstream.status !== "completed" ||
+        upstream.engine_id !== "environmental.timeseries.qc" || upstream.engine_version !== "0.2.0") {
+      return reply(422, { error: "upstream_qc_execution_unavailable_or_incompatible" });
+    }
+    const qcParameters = upstream.request_payload?.parameters ?? {};
+    const windowStart = effectiveParameters.window_start;
+    const windowEnd = effectiveParameters.window_end;
+    if (typeof effectiveScope.location_id !== "string" ||
+        upstream.scope?.location_id !== effectiveScope.location_id ||
+        qcParameters.window_start !== windowStart || qcParameters.window_end !== windowEnd) {
+      return reply(422, { error: "upstream_qc_scope_or_window_mismatch" });
+    }
+    const { data: qcResult, error: qcResultError } = await serviceClient
+      .from("engine_execution_results")
+      .select("id,execution_id,engine_id,engine_version,outcome,input_snapshot_sha256,value,limitations,quality_flags,provenance,generated_at")
+      .eq("organization_id", organizationId)
+      .eq("execution_id", upstream.id)
+      .maybeSingle();
+    if (qcResultError || !qcResult ||
+        qcResult.execution_id !== upstream.id ||
+        qcResult.engine_id !== upstream.engine_id ||
+        qcResult.engine_version !== upstream.engine_version ||
+        qcResult.input_snapshot_sha256 !== upstream.input_snapshot_sha256) {
+      return reply(422, { error: "upstream_qc_result_integrity_mismatch" });
+    }
+    const artifact: Record<string, any> = {
+      contract: "BA-LABS/UPSTREAM-ENGINE-ARTIFACT",
+      contract_version: "1.0.0",
+      role: "environmental_qc",
+      execution_id: upstream.id,
+      result_id: qcResult.id,
+      request_id: upstream.request_id,
+      engine_id: upstream.engine_id,
+      engine_version: upstream.engine_version,
+      completed_at: upstream.completed_at,
+      input_snapshot_sha256: upstream.input_snapshot_sha256,
+      scope: {
+        organization_id: organizationId,
+        location_id: effectiveScope.location_id,
+        window_start: windowStart,
+        window_end: windowEnd,
+      },
+      result: {
+        outcome: qcResult.outcome,
+        value: qcResult.value,
+        limitations: qcResult.limitations,
+        quality_flags: qcResult.quality_flags,
+        provenance: qcResult.provenance,
+      },
+    };
+    artifact.artifact_sha256 = await sha256(stable(artifact));
+    if (new TextEncoder().encode(JSON.stringify(artifact)).byteLength > 64_000) {
+      return reply(413, { error: "upstream_qc_artifact_too_large" });
+    }
+    upstreamArtifacts = [artifact];
+  }
+
   const requestId = crypto.randomUUID();
   const engineRequest = {
     contract: "BA-LABS/ENGINE",
@@ -407,6 +478,7 @@ Deno.serve(async (req: Request) => {
     input: { record_ids: effectiveRecordIds, snapshot_sha256: snapshotHash, records: orderedRecords },
     parameters: effectiveParameters,
     datasets: effectiveDatasets,
+    ...(upstreamArtifacts.length ? { upstream_artifacts: upstreamArtifacts } : {}),
   };
   if (!validateRequest(engineRequest)) {
     console.error("[engine-orchestrator] internally generated request failed schema validation");
@@ -434,23 +506,44 @@ Deno.serve(async (req: Request) => {
       result: prior.result_payload, error_code: prior.error_code, reused: true });
   }
 
-  const { data: execution, error: insertError } = await serviceClient
-    .from("engine_executions")
-    .insert({
-      organization_id: organizationId,
-      request_id: requestId,
-      idempotency_key: idempotencyKey,
-      engine_id: engineId,
-      engine_version: engineVersion,
-      scope: engineRequest.scope,
-      input_record_ids: effectiveRecordIds,
-      input_snapshot_sha256: snapshotHash,
-      request_payload: engineRequest,
-      status: "queued",
-      requested_by: auth.user.id,
-    })
-    .select("id")
-    .single();
+  let execution: { id: string } | null = null;
+  let insertError: any = null;
+  if (upstreamArtifacts.length === 1) {
+    const { data, error } = await serviceClient.rpc("enqueue_bie_with_environmental_qc", {
+      p_organization_id: organizationId,
+      p_request_id: requestId,
+      p_idempotency_key: idempotencyKey,
+      p_scope: engineRequest.scope,
+      p_input_record_ids: effectiveRecordIds,
+      p_input_snapshot_sha256: snapshotHash,
+      p_request_payload: engineRequest,
+      p_requested_by: auth.user.id,
+      p_upstream_execution_id: upstreamQcExecutionId,
+    });
+    const row = Array.isArray(data) ? data[0] : null;
+    execution = row?.execution_id ? { id: row.execution_id } : null;
+    insertError = error;
+  } else {
+    const { data, error } = await serviceClient
+      .from("engine_executions")
+      .insert({
+        organization_id: organizationId,
+        request_id: requestId,
+        idempotency_key: idempotencyKey,
+        engine_id: engineId,
+        engine_version: engineVersion,
+        scope: engineRequest.scope,
+        input_record_ids: effectiveRecordIds,
+        input_snapshot_sha256: snapshotHash,
+        request_payload: engineRequest,
+        status: "queued",
+        requested_by: auth.user.id,
+      })
+      .select("id")
+      .single();
+    execution = data;
+    insertError = error;
+  }
   if (insertError || !execution) {
     // Resolve the unique-key race without creating a second execution.
     const { data: raced } = await serviceClient.from("engine_executions")

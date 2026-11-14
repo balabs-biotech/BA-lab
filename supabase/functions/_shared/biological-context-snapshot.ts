@@ -138,7 +138,7 @@ export async function buildBiologicalContextSnapshot(input: {
       throw new Error("measurement_" + subjectType + "_scope_mismatch");
     }
     const instant = parseInstant(row.measured_at, "measurement_timestamp");
-    if (instant < windowStart || instant > windowEnd) continue;
+    if (instant < windowStart || instant >= windowEnd) continue;
     const context = {
       [subjectField]: row[subjectField],
       environment_id: input.measurementContextById?.[row.id]
@@ -181,7 +181,7 @@ export async function buildBiologicalContextSnapshot(input: {
     }
     if (row.data_family !== "weather") continue;
     const instant = parseInstant(row.observed_at, "environmental_observation_timestamp");
-    if (instant < windowStart || instant > windowEnd) continue;
+    if (instant < windowStart || instant >= windowEnd) continue;
     const context = { location_id: row.location_id };
     const data = {
       variable_code: row.variable_code,

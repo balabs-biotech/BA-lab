@@ -522,6 +522,27 @@ def analyze_biological_context_features(request: Mapping[str, Any]) -> dict[str,
         quality_flags.append("measurement_environment_context_ambiguous")
     if "missing" in measurement_environment_states:
         quality_flags.append("measurement_environment_context_missing")
+    upstream_qc = (request.get("upstream_artifacts") or [None])[0]
+    environmental_quality_control = None
+    if upstream_qc is not None:
+        qc_result = upstream_qc["result"]
+        qc_flags = sorted(set(qc_result["quality_flags"]))
+        qc_review_required = qc_result["outcome"] != "success" or bool(qc_flags)
+        environmental_quality_control = {
+            "state": "review_required" if qc_review_required else "passed",
+            "upstream_execution_id": upstream_qc["execution_id"],
+            "upstream_result_id": upstream_qc["result_id"],
+            "artifact_sha256": upstream_qc["artifact_sha256"],
+            "outcome": qc_result["outcome"],
+            "quality_flags": qc_flags,
+            "limitations": qc_result["limitations"],
+            "provenance": qc_result["provenance"],
+            "value": qc_result["value"],
+        }
+        quality_flags.append("environmental_qc_artifact_attached")
+        if qc_review_required:
+            quality_flags.append("environmental_qc_review_required")
+
     if not observed_times:
         quality_flags.append("insufficient_data")
     if any(
@@ -585,6 +606,8 @@ def analyze_biological_context_features(request: Mapping[str, Any]) -> dict[str,
             "derived_features": derived_features,
             "findings": findings,
             "hypotheses": [],
+            **({"environmental_quality_control": environmental_quality_control}
+               if environmental_quality_control is not None else {}),
         },
         "limitations": [
             "This engine reports traceable coverage and descriptive features; optional rules produce limited threshold findings only, not biological diagnoses or intervention recommendations.",
@@ -595,7 +618,11 @@ def analyze_biological_context_features(request: Mapping[str, Any]) -> dict[str,
         "provenance": {
             "algorithm": "biological-context-features-v2" if engine_identity["engine_version"] == "0.2.0" else "biological-context-features-v1",
             "libraries": [],
-            "source_references": sorted({*(f"{provider}/{dataset}" for provider, dataset in environmental_sources), *interpretation_sources, *profile_sources, *identity_sources}),
+            "source_references": sorted({
+                *(f"{provider}/{dataset}" for provider, dataset in environmental_sources),
+                *interpretation_sources, *profile_sources, *identity_sources,
+                *([f"BA_LABS_ENGINE_RESULT/environmental.timeseries.qc@0.2.0#execution={upstream_qc['execution_id']}#result={upstream_qc['result_id']}#sha256={upstream_qc['artifact_sha256']}"] if upstream_qc is not None else []),
+            }),
         },
     }
 
