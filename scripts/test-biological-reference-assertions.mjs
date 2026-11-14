@@ -27,6 +27,12 @@ assert.equal(built.assertions[0].source_locator, "section-4");
 assert.equal(built.assertions[0].evidence_level, "L0");
 assert.equal(built.datasets[0].provider, "BA_LABS_BIOLOGICAL_REFERENCE_ASSERTION");
 assert.match(built.assertions[0].content_sha256, /^[0-9a-f]{64}$/);
+const changedSource = await buildBiologicalReferenceAssertions({
+  organizationId: org, contexts: [context], assertions: [assertion],
+  references: [{ ...source, content_sha256: "b".repeat(64) }],
+});
+assert.notEqual(changedSource.assertions[0].content_sha256, built.assertions[0].content_sha256,
+  "assertion digest must bind its validated source digest");
 
 const draft = await buildBiologicalReferenceAssertions({
   organizationId: org, contexts: [context], assertions: [{ ...assertion, status: "draft" }], references: [source],
