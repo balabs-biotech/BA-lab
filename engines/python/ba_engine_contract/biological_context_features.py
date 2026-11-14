@@ -196,7 +196,7 @@ def _evaluate_biological_reference_assertions(
             if assertion_end is not None and assertion_end <= assertion_start:
                 raise ValueError("invalid_biological_reference_assertion_validity_window")
             temporal_matches = 0
-            temporal_unknown = 0
+            temporal_unknown = 1 if not biological_contexts else 0
             for context in biological_contexts:
                 if not isinstance(context, dict):
                     temporal_unknown += 1
@@ -271,7 +271,9 @@ def _evaluate_biological_reference_assertions(
                     context["context_id"] for context in candidate_contexts
                     if isinstance(context.get("context_id"), str)
                 ]
-            elif applicability_state != "undetermined":
+            elif temporal_applicability_state == "undetermined" or applicability_state == "undetermined":
+                applicability_state = "undetermined"
+            else:
                 applicability_state = "not_applicable"
 
         semantic_values[(subject_type, subject_ref, predicate)].add(
