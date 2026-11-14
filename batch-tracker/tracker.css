@@ -2873,3 +2873,58 @@ body[data-domain] :is(button, input, select, textarea, a, [tabindex]):focus-visi
   cursor: pointer;
   font-weight: 650;
 }
+
+
+/* Biological reference assertion review: compact filters and bounded evidence lists. */
+.engine-biological-assertion-review,
+.engine-biological-evidence {
+  display: grid;
+  gap: 0.7rem;
+  margin: 0.85rem 0;
+  padding: 0.85rem;
+  border: 1px solid var(--border, #64748b);
+  border-radius: 0.65rem;
+  background: var(--surface, transparent);
+  overflow-wrap: anywhere;
+}
+.engine-biological-assertion-filters {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.65rem;
+}
+.engine-biological-assertion-filters label {
+  display: grid;
+  gap: 0.35rem;
+  min-width: 0;
+  font-size: 0.85rem;
+}
+.engine-biological-assertion-filters :is(select, input) {
+  width: 100%;
+  min-width: 0;
+}
+.engine-biological-assertion-list {
+  display: grid;
+  gap: 0.65rem;
+  margin: 0;
+  padding-left: 1.25rem;
+}
+.engine-biological-evidence-record {
+  margin: 0.55rem 0;
+  padding: 0.65rem;
+  border: 1px solid var(--border, #64748b);
+  border-radius: 0.5rem;
+}
+.engine-biological-evidence-record summary {
+  cursor: pointer;
+  font-weight: 650;
+}
+.engine-biological-evidence-record a {
+  display: inline-block;
+  margin-top: 0.35rem;
+  overflow-wrap: anywhere;
+}
+@media (max-width: 620px) {
+  .engine-biological-assertion-filters {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
