@@ -6,7 +6,7 @@ if (!anonKey) throw new Error("ANON_KEY must be exported by supabase status -o e
 async function assertFunction(name, { headers, expectedStatus, expectedError }) {
   const response = await fetch(`${baseUrl}/${name}`, {
     method: "POST",
-    headers: { "content-type": "application/json", "apikey": anonKey, "authorization": `Bearer ${anonKey}`, ...headers },
+    headers: { "content-type": "application/json", "apikey": anonKey, ...headers },
     body: "{}",
     signal: AbortSignal.timeout(10_000),
   });
