@@ -64,6 +64,7 @@ const password = `CI-${randomUUID()}-aA9!`;
 let userId;
 let locationId;
 let qcExecutionId;
+let organizationId;
 
 try {
   const signup = await api("/auth/v1/signup", { method: "POST", key: anonKey, authorization: null, body: { email, password, data: { fixture: "cultureops-ci" } } });
@@ -75,8 +76,8 @@ try {
     userAccessToken = session?.access_token;
   }
   if (typeof userAccessToken !== "string") throw new Error("Supabase Auth did not issue an access token");
-  const organizationId = runSql("select id::text from public.organizations where code = 'BA-LABS' limit 1");
-  if (typeof organizationId !== "string" || !/^[0-9a-f-]{36}$/i.test(userId) || !/^[0-9a-f-]{36}$/i.test(organizationId)) throw new Error("Invalid Auth user or seeded organization UUID");
+  organizationId = runSql("insert into public.organizations (code, name) values ($tag$CI-AUTH-" + randomUUID() + "$tag$, $tag$Temporary authenticated CI tenant$tag$) returning id::text");
+  if (typeof organizationId !== "string" || !/^[0-9a-f-]{36}$/i.test(userId) || !/^[0-9a-f-]{36}$/i.test(organizationId)) throw new Error("Could not create valid temporary Auth user and tenant UUIDs");
   runSql("insert into public.organization_members (organization_id, user_id, role) values (\x27" + organizationId + "\x27::uuid, \x27" + userId + "\x27::uuid, \x27owner\x27) on conflict (organization_id, user_id) do nothing");
 
 
@@ -196,5 +197,10 @@ try {
   if (locationId) {
     await api(`/rest/v1/locations?id=eq.${locationId}`, { method: "DELETE", headers: { Prefer: "return=minimal" } });
   }
-
+  if (userId && /^[0-9a-f-]{36}$/i.test(userId)) {
+    runSql("delete from auth.users where id = $tag$" + userId + "$tag$::uuid");
+  }
+  if (organizationId && /^[0-9a-f-]{36}$/i.test(organizationId)) {
+    runSql("delete from public.organizations where id = $tag$" + organizationId + "$tag$::uuid");
+  }
 }
