@@ -162,7 +162,10 @@ try {
   const dispatched = await dispatchQueue();
   if (dispatched.status !== 200 || dispatched.body?.claimed !== 1 ||
       dispatched.body?.completed !== 1 || dispatched.body?.failed !== 0 || dispatched.body?.lost !== 0) {
-    throw new Error(`authenticated QC worker dispatch failed: ${dispatched.status}/${JSON.stringify(dispatched.body)}`);
+    const failedRows = await api(
+      `/rest/v1/engine_executions?id=eq.${qcExecutionId}&organization_id=eq.${organizationId}&select=id,status,error_code,error_message`,
+    ).catch(() => []);
+    throw new Error(`authenticated QC worker dispatch failed: ${dispatched.status}/${JSON.stringify(dispatched.body)}; ledger=${JSON.stringify(failedRows)}`);
   }
   const completedRows = await api(
     `/rest/v1/engine_executions?id=eq.${qcExecutionId}&organization_id=eq.${organizationId}&select=id,status,result_payload,completed_at`,
