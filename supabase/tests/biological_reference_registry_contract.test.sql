@@ -7,7 +7,8 @@ declare
   v_user uuid := 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb';
   v_profile_id uuid;
   v_missing_digest_profile_id uuid;
-  v_reference_id uuid;\n  v_assertion_id uuid;
+  v_reference_id uuid;
+  v_assertion_id uuid;
 begin
   if to_regclass('public.domain_interpretation_profiles') is null then
     raise exception 'domain_interpretation_profiles baseline is missing';
