@@ -484,7 +484,12 @@ jobs:
       - name: Exercise authenticated tenant and biological source boundaries
         env:
           BA_ENGINE_DISPATCH_TOKEN: ci-dispatch-token-0123456789abcdef
-        run: node scripts/test-local-engine-authenticated-orchestrator.mjs
+        run: |
+          node scripts/test-local-engine-authenticated-orchestrator.mjs || {
+            docker logs ba-engine-worker-runtime-ci
+            cat /tmp/ba-labs-edge-runtime.log
+            exit 1
+          }
       - name: Stop local Supabase stack
         if: always()
         run: |
