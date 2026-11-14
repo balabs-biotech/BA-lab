@@ -22,7 +22,7 @@ from ba_engine_contract.registry import load_engine
 from ba_engine_contract.environmental_timeseries_qc import (
     analyze_environmental_timeseries_qc, run_environmental_timeseries_qc,
 )
-from ba_engine_contract.biological_context_features import analyze_biological_context_features, _evaluate_interpretation_rules
+from ba_engine_contract.biological_context_features import analyze_biological_context_features, _evaluate_interpretation_rules, _stable_sha256 as _profile_sha256
 
 ROOT = Path(__file__).resolve().parents[3]
 SCHEMA_DIR = ROOT / "schemas" / "engine" / "v1"
@@ -867,7 +867,7 @@ class EngineContractTests(unittest.TestCase):
             "dataset_version": "1.0.0",
             "profile_id": profile_id,
             "profile_version": profile_version,
-            "content_sha256": _stable_sha256(profile_content),
+            "content_sha256": _profile_sha256(profile_content),
             "retrieved_at": "2026-11-10T07:55:00Z",
         })
         missing_registry = json.loads(json.dumps(request))
@@ -931,7 +931,7 @@ class EngineContractTests(unittest.TestCase):
         self.assertIn("BA_LABS_RULE_REGISTRY/ba-labs.protocols.pleurotus-fruiting@2026.1#sha256=" + ("d" * 64), result["result"]["provenance"]["source_references"])
         self.assertIn(
             "BA_LABS_INTERPRETATION_PROFILE/mycology.pleurotus.fruiting@1.0.0#sha256="
-            + _stable_sha256({
+            + _profile_sha256({
                 "profile_id": profile_id,
                 "profile_version": profile_version,
                 "rules": request["parameters"]["interpretation_rules"],
@@ -1408,7 +1408,7 @@ class EngineContractTests(unittest.TestCase):
                 "dataset_version": "1.0.0",
                 "profile_id": profile_id,
                 "profile_version": profile_version,
-                "content_sha256": _stable_sha256({
+                "content_sha256": _profile_sha256({
                     "profile_id": profile_id,
                     "profile_version": profile_version,
                     "rules": [rule],
