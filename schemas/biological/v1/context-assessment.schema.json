@@ -526,12 +526,29 @@
         },
         "upstream_scope": {
           "type": "object",
-          "required": ["organization_id", "location_id", "window_start", "window_end"],
+          "required": [
+            "organization_id",
+            "location_id",
+            "window_start",
+            "window_end"
+          ],
           "properties": {
-            "organization_id": {"type": "string", "format": "uuid"},
-            "location_id": {"type": "string", "format": "uuid"},
-            "window_start": {"type": "string", "format": "date-time"},
-            "window_end": {"type": "string", "format": "date-time"}
+            "organization_id": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "location_id": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "window_start": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "window_end": {
+              "type": "string",
+              "format": "date-time"
+            }
           },
           "additionalProperties": false
         },
@@ -821,6 +838,13 @@
             "null"
           ],
           "maxLength": 80
+        },
+        "event_id": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "uuid"
         }
       },
       "additionalProperties": false
