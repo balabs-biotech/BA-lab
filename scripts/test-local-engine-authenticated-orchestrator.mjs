@@ -10,6 +10,7 @@ if (!anonKey) throw new Error("ANON_KEY must be exported by supabase status -o e
 function runSql(sql) {
   const result = spawnSync("psql", [databaseUrl, "-v", "ON_ERROR_STOP=1", "-q", "-c", sql], { encoding: "utf8" });
   if (result.status !== 0) throw new Error(`Local fixture SQL failed: ${(result.stderr || result.stdout || "unknown psql error").slice(0, 600)}`);
+  return (result.stdout || "").trim();
 }
 
 async function api(path, { method = "GET", key = anonKey, authorization = userAccessToken, body, headers = {} } = {}) {
@@ -74,8 +75,7 @@ try {
     userAccessToken = session?.access_token;
   }
   if (typeof userAccessToken !== "string") throw new Error("Supabase Auth did not issue an access token");
-  const organizations = await api("/rest/v1/organizations?code=eq.BA-LABS&select=id&limit=1", { authorization: null });
-  const organizationId = organizations?.[0]?.id;
+  const organizationId = runSql("select id::text from public.organizations where code = 'BA-LABS' limit 1");
   if (typeof organizationId !== "string" || !/^[0-9a-f-]{36}$/i.test(userId) || !/^[0-9a-f-]{36}$/i.test(organizationId)) throw new Error("Invalid Auth user or seeded organization UUID");
   runSql("insert into public.organization_members (organization_id, user_id, role) values (\x27" + organizationId + "\x27::uuid, \x27" + userId + "\x27::uuid, \x27owner\x27) on conflict (organization_id, user_id) do nothing");
 
@@ -148,7 +148,7 @@ try {
   process.stdout.write("ok authenticated QC: three RLS-visible environmental observations were snapshotted and queued\\n");
   const unmemberedOrganizationId = randomUUID();
 
-  const denied = await invoke(session.access_token, {
+  const denied = await invoke(userAccessToken, {
     organization_id: unmemberedOrganizationId,
     engine_id: "biological.context.features",
     engine_version: "0.2.0",
@@ -158,7 +158,7 @@ try {
   });
   assertResponse("orchestrator tenant isolation", denied, 403, "organization_access_denied");
 
-  const qcMissingSource = await invoke(session.access_token, {
+  const qcMissingSource = await invoke(userAccessToken, {
     organization_id: organizationId,
     engine_id: "environmental.timeseries.qc",
     engine_version: "0.2.0",
@@ -175,7 +175,7 @@ try {
     "one_or_more_source_records_missing_or_inaccessible",
   );
 
-  const bieMissingCulture = await invoke(session.access_token, {
+  const bieMissingCulture = await invoke(userAccessToken, {
     organization_id: organizationId,
     engine_id: "biological.context.features",
     engine_version: "0.2.0",
