@@ -448,13 +448,13 @@ jobs:
           echo "BA_ENGINE_WORKER_GATEWAY=$worker_gateway" >> "$GITHUB_ENV"
           BA_ENGINE_TEST_PROXY_UPSTREAM="http://${worker_gateway}:18080" node scripts/engine-worker-test-proxy.mjs > /tmp/ba-engine-worker-test-proxy.log 2>&1 &
           echo $! > /tmp/ba-engine-worker-test-proxy.pid
+          proxy_ready=0
           for attempt in $(seq 1 30); do
-            if curl --fail --silent http://127.0.0.1:18081/healthz >/dev/null 2>&1; then exit 0; fi
+            if curl --fail --silent http://127.0.0.1:18081/healthz >/dev/null 2>&1; then proxy_ready=1; break; fi
             if ! kill -0 "$(cat /tmp/ba-engine-worker-test-proxy.pid)" 2>/dev/null; then cat /tmp/ba-engine-worker-test-proxy.log; exit 1; fi
             sleep 1
           done
-          cat /tmp/ba-engine-worker-test-proxy.log
-          exit 1
+          if [ "$proxy_ready" != "1" ]; then cat /tmp/ba-engine-worker-test-proxy.log; exit 1; fi
           for attempt in $(seq 1 30); do
             if curl --fail --silent http://127.0.0.1:18080/healthz >/dev/null; then exit 0; fi
             if ! docker inspect -f '{{.State.Running}}' ba-engine-worker-runtime-ci | grep -q true; then
