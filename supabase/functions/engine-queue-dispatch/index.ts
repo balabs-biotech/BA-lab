@@ -5,6 +5,7 @@ import Ajv2020 from "npm:ajv@8.17.1/dist/2020.js";
 import addFormats from "npm:ajv-formats@3.0.1";
 import requestSchema from "../../../schemas/engine/v1/request.schema.json" with { type: "json" };
 import responseSchema from "../../../schemas/engine/v1/response.schema.json" with { type: "json" };
+import { matchesSingleUpstreamQcArtifact } from "../_shared/upstream-qc-lineage.mjs";
 
 const headers = {
   "Access-Control-Allow-Origin": "*",
@@ -215,6 +216,18 @@ async function processExecution(
       db, execution, workerId,
       !response.ok ? "worker_http_error" : "worker_response_invalid_or_unbound",
       "Worker response failed transport, schema, or execution-correlation validation.",
+    ) ? "failed" : "lost";
+  }
+
+  // The async dispatcher is the actual worker boundary for queued executions.
+  // Revalidate the exact immutable QC artifact here; the enqueue-time Edge
+  // function cannot validate a worker response that does not exist yet.
+  const upstreamArtifacts = Array.isArray(request.upstream_artifacts) ? request.upstream_artifacts : [];
+  if (upstreamArtifacts.length > 0 && result.status === "completed" &&
+      !matchesSingleUpstreamQcArtifact(upstreamArtifacts, result, stable)) {
+    return await persistFailure(
+      db, execution, workerId, "upstream_artifact_lineage_mismatch",
+      "The BIE worker result did not preserve the verified upstream QC artifact.",
     ) ? "failed" : "lost";
   }
 
