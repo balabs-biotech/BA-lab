@@ -411,7 +411,11 @@ jobs:
         with:
           version: 3.0.0
       - name: Start isolated Supabase stack and apply migrations
-        run: supabase start -x studio,mailpit,storage-api,imgproxy,realtime,logflare,vector,supavisor
+        run: |
+          # Avoid the runner's occasionally preoccupied default local DB port.
+          sed -i 's/^port = 54322$/port = 55432/' supabase/config.toml
+          sed -i 's/^shadow_port = 54320$/shadow_port = 55430/' supabase/config.toml
+          supabase start -x studio,mailpit,storage-api,imgproxy,realtime,logflare,vector,supavisor
       - name: Verify local migration state
         run: |
           supabase migration list
