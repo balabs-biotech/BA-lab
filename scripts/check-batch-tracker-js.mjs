@@ -353,6 +353,26 @@ if (!qcTraceBlock.includes("finally") || !qcTraceBlock.includes("traceButton.dis
 }
 console.log("✓ QC provenance drilldown is tenant-scoped, snapshot-aware and exposes source family, retrieval time, location, missing IDs and guarded provider links");
 
+const executionLineageStart=engine.indexOf('const lineage = document.createElement("details")');
+const executionLineageEnd=engine.indexOf("article.appendChild(lineage);",executionLineageStart);
+if(executionLineageStart<0||executionLineageEnd<0)throw new Error("Execution/result snapshot lineage panel is missing");
+const executionLineageBlock=engine.slice(executionLineageStart,executionLineageEnd);
+for(const snippet of [
+  "execution.input_snapshot_sha256",
+  "storedResult?.input_snapshot_sha256",
+  "execution.input_record_ids",
+  "storedResult?.input_record_ids",
+  "storedResult?.generated_at",
+  "execution.scope",
+  "concordance exacte entre ledger et résultat",
+  "DIVERGENCE : les empreintes du ledger et du résultat diffèrent",
+  "DIVERGENCE : les listes d’identifiants diffèrent",
+  "non vérifiable : empreinte absente"
+])if(!executionLineageBlock.includes(snippet))throw new Error("Execution/result lineage consistency check missing: "+snippet);
+if(!executionLineageBlock.includes("new Set(executionInputIds)")||!executionLineageBlock.includes("[...executionSet].every(id => resultSet.has(id))"))throw new Error("Execution/result input ID comparison must compare unique sets, not counts only");
+console.log("✓ Analytics history exposes ledger/result snapshots, engine version, scope, timestamps and exact input-lineage consistency states");
+
+
 
 
 const assertionFilterStart=engine.indexOf("const allReferenceAssertions = Array.isArray(subject.biological_reference_assertions)");
