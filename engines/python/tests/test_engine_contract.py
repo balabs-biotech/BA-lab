@@ -1796,9 +1796,12 @@ class EngineContractTests(unittest.TestCase):
             lambda item: item.update(execution_id="aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa"),
             lambda item: item.update(result_id="bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb"),
             lambda item: item.update(request_id="22222222-2222-4222-8222-222222222222"),
+            lambda item: item.update(engine_id="environmental.timeseries.other"),
+            lambda item: item.update(engine_version="0.3.0"),
             lambda item: item.update(completed_at="2026-11-11T00:01:00Z"),
             lambda item: item.update(input_snapshot_sha256="b" * 64),
             lambda item: item["scope"].update(location_id="ffffffff-ffff-4fff-8fff-ffffffffffff"),
+            lambda item: item["scope"].update(window_start="2026-11-09T00:00:00Z"),
             lambda item: item["result"].update(outcome="review_required"),
             lambda item: item["result"].update(limitations=["Different limitation."]),
             lambda item: item["result"].update(provenance={"algorithm": "tampered"}),
@@ -1808,7 +1811,7 @@ class EngineContractTests(unittest.TestCase):
             with self.subTest(mutation=mutate):
                 altered = json.loads(json.dumps(request))
                 mutate(altered["upstream_artifacts"][0])
-                with self.assertRaises(ContractValidationError):
+                with self.assertRaisesRegex(ContractValidationError, "artifact digest mismatch"):
                     validate_request(altered)
 
 
