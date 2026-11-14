@@ -192,9 +192,13 @@
           {
             "if": {
               "properties": {
-                "provider": { "const": "BA_LABS_INTERPRETATION_PROFILE" }
+                "provider": {
+                  "const": "BA_LABS_INTERPRETATION_PROFILE"
+                }
               },
-              "required": ["provider"]
+              "required": [
+                "provider"
+              ]
             },
             "then": {
               "properties": {
@@ -202,7 +206,34 @@
                 "profile_id": {},
                 "profile_version": {}
               },
-              "required": ["dataset_version", "profile_id", "profile_version"]
+              "required": [
+                "dataset_version",
+                "profile_id",
+                "profile_version"
+              ]
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "provider": {
+                  "const": "BA_LABS_BIOLOGICAL_REFERENCE_ASSERTION"
+                }
+              },
+              "required": [
+                "provider"
+              ]
+            },
+            "then": {
+              "properties": {
+                "dataset_version": {
+                  "type": "string",
+                  "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+                }
+              },
+              "required": [
+                "dataset_version"
+              ]
             }
           }
         ]
