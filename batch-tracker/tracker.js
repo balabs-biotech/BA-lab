@@ -7454,6 +7454,9 @@ function renderBiologicalContextAssessment(article, result) {
           .eq("id", upstreamExecutionId)
           .maybeSingle();
         if (upstreamError) throw upstreamError;
+        if (organizationId !== expectedOrganizationId) {
+          throw new Error("Le contexte organisationnel a changé pendant le chargement ; affichage annulé.");
+        }
         if (!upstream || upstream.id !== upstreamExecutionId) {
           throw new Error("Exécution QC introuvable dans l’organisation active.");
         }
