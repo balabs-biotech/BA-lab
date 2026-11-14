@@ -648,14 +648,20 @@ def analyze_biological_context_features(request: Mapping[str, Any]) -> dict[str,
         key = (record_type, source_label, variable, unit)
         grouped[key].append((observed_at, float(value), record_id))
         accepted_by_type[record_type] += 1
-        observed_facts.append({
+        observed_fact = {
             "fact_code": f"{record_type}.{variable}",
             "statement": f"{source_label}: {variable} = {value} {unit}",
             "observed_at": _iso(observed_at),
             "source_record_ids": [record_id],
             "value": value,
             "unit_code": unit,
-        })
+        }
+        # Preserve the exact operational event anchor when the trusted source
+        # adapter supplied one. This is traceability, not an event interpretation.
+        event_id = context.get("event_id")
+        if isinstance(event_id, str) and event_id:
+            observed_fact["event_id"] = event_id
+        observed_facts.append(observed_fact)
 
     derived_features: list[dict[str, Any]] = []
     temporal_gaps: list[dict[str, Any]] = []
