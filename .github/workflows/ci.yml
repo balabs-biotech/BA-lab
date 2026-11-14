@@ -424,7 +424,7 @@ jobs:
           while IFS='=' read -r key value; do
             value="${value%\"}"
             value="${value#\"}"
-            printf '%s=%s\\n' "$key" "$value" >> "$GITHUB_ENV"
+            printf '%s=%s\n' "$key" "$value" >> "$GITHUB_ENV"
           done < <(supabase status -o env | grep -E '^(ANON_KEY|JWT_SECRET|SERVICE_ROLE_KEY|DB_URL)=')
       - name: Build and start isolated Python engine worker
         run: |
