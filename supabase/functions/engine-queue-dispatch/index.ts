@@ -186,6 +186,14 @@ async function processExecution(
       : error instanceof DOMException && error.name === "TimeoutError"
       ? "worker_timeout"
       : "worker_unreachable";
+    // Keep transport diagnostics in Edge logs; the durable client-facing
+    // ledger message remains deliberately generic.
+    console.error("[engine-queue-dispatch] worker transport failed", {
+      execution_id: execution.id,
+      worker_url: workerUrl,
+      error_name: error instanceof Error ? error.name : "unknown",
+      error_message: error instanceof Error ? error.message.slice(0, 500) : "unknown",
+    });
     return await persistFailure(
       db, execution, workerId, code,
       "The registered engine worker did not return a usable response.",
