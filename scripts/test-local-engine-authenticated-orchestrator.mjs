@@ -7,12 +7,12 @@ if (!anonKey || !serviceRoleKey) {
   throw new Error("ANON_KEY and SERVICE_ROLE_KEY must be exported by supabase status -o env");
 }
 
-async function api(path, { method = "GET", key = serviceRoleKey, body, headers = {} } = {}) {
+async function api(path, { method = "GET", key = serviceRoleKey, authorization = key, body, headers = {} } = {}) {
   const response = await fetch(`${supabaseUrl}${path}`, {
     method,
     headers: {
       apikey: key,
-      authorization: `Bearer ${key}`,
+      ...(authorization ? { authorization: `Bearer ${authorization}` } : {}),
       ...(body === undefined ? {} : { "content-type": "application/json" }),
       ...headers,
     },
@@ -68,6 +68,7 @@ try {
   const session = await api("/auth/v1/token?grant_type=password", {
     method: "POST",
     key: anonKey,
+    authorization: null,
     body: { email, password },
   });
   if (typeof session?.access_token !== "string") throw new Error("Supabase Auth did not issue an access token");
