@@ -32,6 +32,27 @@ async function post(name, headers = {}, body = {}) {
   });
 }
 
+async function waitForEdgeRuntime() {
+  let lastResponse = "no response";
+  for (let attempt = 0; attempt < 30; attempt++) {
+    try {
+      const response = await post("engine-orchestrator", {
+        authorization: `Bearer ${routeSmokeJwt}`,
+      });
+      const responseBody = await response.json().catch(() => null);
+      if (response.status === 422 && responseBody?.error === "invalid_or_incomplete_request") {
+        process.stdout.write("ok edge runtime: orchestrator handler is ready behind Kong\\n");
+        return;
+      }
+      lastResponse = `${response.status}/${JSON.stringify(responseBody)}`;
+    } catch (error) {
+      lastResponse = error instanceof Error ? error.message : String(error);
+    }
+    await new Promise((resolve) => setTimeout(resolve, 500));
+  }
+  throw new Error(`edge runtime did not become ready through the handler: ${lastResponse}`);
+}
+
 async function assertGatewayUnauthorized(name) {
   const response = await post(name);
   if (response.status !== 401) {
@@ -65,6 +86,7 @@ async function assertFunction(name, { headers, expectedStatus, expectedError, bo
   process.stdout.write(`ok ${name}: reached handler and received ${expectedStatus}/${expectedError}\\n`);
 }
 
+await waitForEdgeRuntime();
 await assertGatewayUnauthorized("engine-orchestrator");
 await assertUnauthorized("engine-queue-dispatch", { "x-ba-dispatch-secret": "" });
 
