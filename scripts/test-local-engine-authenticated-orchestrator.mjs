@@ -383,6 +383,42 @@ try {
   }
   process.stdout.write("ok live QC to BIE: exact QC result ID, dependency snapshot, canonical SHA-256 artifact and validated biological assertion lineage persisted\\n");
 
+  // The CI-only worker proxy corrupts the second successful BIE response after
+  // the Python worker returns. The orchestrator must fail the ledger closed and
+  // must not write an immutable result row for the corrupted artifact.
+  const tamperedWorkerIdempotencyKey = `auth-bie-worker-artifact-tamper-${randomUUID()}`;
+  const bieWithTamperedWorkerArtifact = await invoke(userAccessToken, {
+    organization_id: organizationId,
+    engine_id: "biological.context.features",
+    engine_version: "0.2.0",
+    upstream_qc_execution_id: qcExecutionId,
+    scope: { organization_id: organizationId, culture_id: cultureId },
+    parameters: { window_start: windowStart, window_end: windowEnd, timezone: "Africa/Algiers" },
+    idempotency_key: tamperedWorkerIdempotencyKey,
+  });
+  if (bieWithTamperedWorkerArtifact.status !== 202 ||
+      bieWithTamperedWorkerArtifact.body?.status !== "queued" ||
+      typeof bieWithTamperedWorkerArtifact.body?.execution_id !== "string") {
+    throw new Error(`tampered-worker BIE fixture enqueue failed: ${bieWithTamperedWorkerArtifact.status}/${JSON.stringify(bieWithTamperedWorkerArtifact.body)}`);
+  }
+  const tamperedWorkerBieExecutionId = bieWithTamperedWorkerArtifact.body.execution_id;
+  const tamperedWorkerDispatch = await dispatchQueue();
+  if (tamperedWorkerDispatch.status !== 200) {
+    throw new Error(`tampered-worker BIE dispatch failed: ${tamperedWorkerDispatch.status}/${JSON.stringify(tamperedWorkerDispatch.body)}`);
+  }
+  const tamperedWorkerLedgerRows = await api(
+    `/rest/v1/engine_executions?id=eq.${tamperedWorkerBieExecutionId}&organization_id=eq.${organizationId}&select=id,status,error_code,result_payload`,
+  );
+  const tamperedWorkerResultRows = await api(
+    `/rest/v1/engine_execution_results?execution_id=eq.${tamperedWorkerBieExecutionId}&organization_id=eq.${organizationId}&select=id`,
+  );
+  if (tamperedWorkerLedgerRows?.[0]?.status !== "failed" ||
+      tamperedWorkerLedgerRows[0]?.error_code !== "upstream_artifact_lineage_mismatch" ||
+      tamperedWorkerResultRows.length !== 0) {
+    throw new Error(`orchestrator persisted or accepted tampered BIE QC lineage: ledger=${JSON.stringify(tamperedWorkerLedgerRows)} results=${JSON.stringify(tamperedWorkerResultRows)}`);
+  }
+  process.stdout.write("ok malicious worker integration: altered QC quality_flags rejected; failed ledger persisted; no BIE result row created\\n");
+
   const unavailableQcIdempotencyKey = `auth-bie-missing-qc-${randomUUID()}`;
   const bieUnavailableQc = await invoke(userAccessToken, {
     organization_id: organizationId,
