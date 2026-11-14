@@ -12,7 +12,7 @@ const issuedAt = Math.floor(Date.now() / 1000);
 const unsignedToken = [
   encodeBase64Url({ alg: "HS256", typ: "JWT" }),
   encodeBase64Url({
-    iss: "supabase-demo",
+    iss: "supabase",
     role: "authenticated",
     aud: "authenticated",
     sub: "00000000-0000-4000-8000-000000000001",
