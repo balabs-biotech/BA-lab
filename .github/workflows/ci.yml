@@ -445,7 +445,7 @@ jobs:
           BA_ENGINE_ASYNC_DISPATCH=true
           BA_BIE_ENABLED=true
           BA_ENGINE_DISPATCH_TOKEN=ci-dispatch-token-0123456789abcdef
-          BA_ENGINE_WORKER_URL=http://127.0.0.1:18080
+          BA_ENGINE_WORKER_URL=http://ba-engine-worker-runtime-ci:8080
           BA_ENGINE_WORKER_TOKEN=ci-worker-token-0123456789abcdef
           EOF
           supabase functions serve --no-verify-jwt --env-file /tmp/ba-labs-edge-ci.env > /tmp/ba-labs-edge-runtime.log 2>&1 &
