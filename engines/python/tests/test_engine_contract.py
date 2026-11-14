@@ -892,6 +892,15 @@ class EngineContractTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "invalid_interpretation_profile_manifest"):
             analyze_biological_context_features(invalid_profile_manifest)
 
+        missing_profile_identity = json.loads(json.dumps(request))
+        profile_dataset = next(
+            dataset for dataset in missing_profile_identity["datasets"]
+            if dataset["provider"] == "BA_LABS_INTERPRETATION_PROFILE"
+        )
+        del profile_dataset["profile_id"]
+        with self.assertRaisesRegex(ValueError, "request.schema.json validation failed"):
+            analyze_biological_context_features(missing_profile_identity)
+
         tampered_profile = json.loads(json.dumps(request))
         tampered_profile["parameters"]["interpretation_rules"][0]["threshold"] = 25.0
         with self.assertRaisesRegex(ValueError, "interpretation_profile_content_hash_mismatch"):
