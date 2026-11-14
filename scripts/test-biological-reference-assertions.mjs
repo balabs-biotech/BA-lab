@@ -22,7 +22,6 @@ const built = await buildBiologicalReferenceAssertions({
 });
 assert.equal(built.state, "documented");
 assert.equal(built.assertions.length, 1);
-assert.equal(built.assertions[0].source.source_reference_id, undefined);
 assert.equal(built.assertions[0].source.reference_id, source.reference_id);
 assert.equal(built.assertions[0].source_locator, "section-4");
 assert.equal(built.assertions[0].evidence_level, "L0");
@@ -42,11 +41,10 @@ const otherTenant = await buildBiologicalReferenceAssertions({
 });
 assert.equal(otherTenant.assertions.length, 0);
 
-const invalidSource = await buildBiologicalReferenceAssertions({
+await assert.rejects(buildBiologicalReferenceAssertions({
   organizationId: org, contexts: [context], assertions: [assertion],
   references: [{ ...source, status: "retired" }],
-});
-assert.equal(invalidSource.assertions.length, 0);
+}), /biological_reference_assertion_source_not_validated/);
 
 const second = {
   ...assertion, assertion_code: "pleurotus.ostreatus.substrate.alternative",
