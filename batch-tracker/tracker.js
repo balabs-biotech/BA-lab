@@ -7653,7 +7653,7 @@ function renderBiologicalContextAssessment(article, result) {
   renderAssertionReview();
   article.appendChild(assertionReview);
   article.appendChild(assertionEvidenceDetails);
-  const contextById = new Map(biologicalContexts.map(context => [context.context_id, context]));
+  const contextById = new Map(biologicalContexts.map(context => [context.context_id || context.id, context]).filter(([id]) => id));
   const assertionComparisonSection = document.createElement("section");
   assertionComparisonSection.className = "engine-biological-assertion-comparisons";
   const assertionComparisonTitle = document.createElement("strong");
@@ -7661,11 +7661,13 @@ function renderBiologicalContextAssessment(article, result) {
   assertionComparisonSection.appendChild(assertionComparisonTitle);
   const assertionComparisonList = document.createElement("ul");
   assertionComparisonSection.appendChild(assertionComparisonList);
-  const isoDate = value => typeof value === "string" && /^\\d{4}-\\d{2}-\\d{2}$/.test(value)
-    ? value
-    : null;
+  const isoDate = value => {
+    if (typeof value !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return null;
+    const parsed = new Date(value + "T00:00:00Z");
+    return Number.isNaN(parsed.getTime()) || parsed.toISOString().slice(0, 10) !== value ? null : value;
+  };
   renderAssertionComparisons = () => {
-    const assertions = visibleReferenceAssertions;
+    const assertions = visibleReferenceAssertions.slice(0, 100);
     const comparisonRows = [];
     for (let leftIndex = 0; leftIndex < assertions.length; leftIndex += 1) {
       const left = assertions[leftIndex];
@@ -7684,8 +7686,8 @@ function renderBiologicalContextAssessment(article, result) {
           if (!context) continue;
           const contextStart = isoDate(context.valid_from);
           const contextEnd = isoDate(context.valid_to);
-          const leftWindow = left.applicability?.validity_window || {};
-          const rightWindow = right.applicability?.validity_window || {};
+          const leftWindow = left.applicability?.validity_window || left.validity_window || {};
+          const rightWindow = right.applicability?.validity_window || right.validity_window || {};
           const starts = [contextStart, isoDate(leftWindow.valid_from), isoDate(rightWindow.valid_from)].filter(Boolean);
           const ends = [contextEnd, isoDate(leftWindow.valid_to), isoDate(rightWindow.valid_to)].filter(Boolean);
           const overlapStart = starts.sort().at(-1) || null;
@@ -7749,10 +7751,13 @@ function renderBiologicalContextAssessment(article, result) {
       appendComparedSource(pair.right, "Source B");
       assertionComparisonList.appendChild(entry);
     }
-    if (comparisonRows.length > 20) {
+    if (comparisonRows.length > 20 || visibleReferenceAssertions.length > 100) {
       const note = document.createElement("li");
-      note.textContent = (comparisonRows.length - 20) +
-        " divergence(s) supplémentaire(s) non affichée(s). Affinez les filtres.";
+      note.textContent = (comparisonRows.length > 20
+        ? (comparisonRows.length - 20) + " divergence(s) supplémentaire(s) non affichée(s). "
+        : "") + (visibleReferenceAssertions.length > 100
+        ? "Comparaison limitée aux 100 premières assertions filtrées pour préserver les performances. "
+        : "") + "Affinez les filtres.";
       assertionComparisonList.appendChild(note);
     }
     assertionComparisonSection.hidden = comparisonRows.length === 0;
