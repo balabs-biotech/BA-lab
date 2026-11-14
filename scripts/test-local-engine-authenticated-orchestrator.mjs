@@ -262,7 +262,16 @@ try {
       qcAssessment?.upstream_execution_id !== qcExecutionId ||
       qcAssessment?.upstream_result_id !== dependencyRows[0].upstream_result_id ||
       !/^[a-f0-9]{64}$/.test(qcAssessment?.artifact_sha256 ?? "") ||
-      !Array.isArray(qcAssessment?.quality_flags) ||
+      qcAssessment?.outcome !== qcResult.outcome ||
+      JSON.stringify(qcAssessment?.quality_flags) !== JSON.stringify(qcResult.quality_flags) ||
+      JSON.stringify(qcAssessment?.limitations) !== JSON.stringify(qcResult.value?.limitations) ||
+      JSON.stringify(qcAssessment?.provenance) !== JSON.stringify(qcResult.provenance) ||
+      JSON.stringify(qcAssessment?.value) !== JSON.stringify(qcResult.value) ||
+      qcAssessment?.state !== (
+        qcResult.outcome !== "success" || (qcResult.quality_flags?.length ?? 0) > 0
+          ? "review_required"
+          : "passed"
+      ) ||
       !bieResult.provenance?.source_references?.some((item) => item.includes(`execution=${qcExecutionId}`))) {
     throw new Error("BIE did not persist the verified QC artifact, result linkage, flags, and provenance");
   }
