@@ -313,6 +313,18 @@ for(const snippet of [
 ])if(!evidenceReview.includes(snippet))throw new Error("Biological evidence provenance review field or URL guard missing: "+snippet);
 if(!evidenceReview.includes("slice(0, 30)"))throw new Error("Biological evidence review must bound rendered assertion records");
 console.log("✓ Biological assertion review exposes evidence, applicability, reviewer timestamps, both SHA-256 digests and safely validated source links");
+const upstreamQcLinkBlock=engine.slice(
+  engine.indexOf("const qc = value.environmental_quality_control"),
+  engine.indexOf("const subject = value.subject || {}",engine.indexOf("const qc = value.environmental_quality_control"))
+);
+for(const snippet of [
+  "recentEngineExecutions.find(item => item.id === qc.upstream_execution_id)",
+  'upstreamLink.href = "#engine-execution-"',
+  'upstreamLink.textContent = "Voir l\'exécution QC amont"',
+  'article.id = "engine-execution-"'
+])if(!upstreamQcLinkBlock.includes(snippet) && !engine.includes(snippet))throw new Error("QC-to-BIE execution navigation regression: "+snippet);
+console.log("✓ Biological assessment links to its recorded upstream QC execution when available");
+
 
 const assertionFilterStart=engine.indexOf("const allReferenceAssertions = Array.isArray(subject.biological_reference_assertions)");
 const assertionFilterEnd=engine.indexOf("const contextById = new Map(biologicalContexts.map",assertionFilterStart);
