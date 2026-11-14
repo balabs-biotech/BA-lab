@@ -2827,3 +2827,49 @@ body[data-domain] :is(button, input, select, textarea, a, [tabindex]):focus-visi
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
+
+/* Evidence-linked BIE review signals: neutral, readable, and consistent
+   across the Green Tech, Mycology, and Laboratory workspace palettes. */
+.engine-review-signals {
+  display: grid;
+  gap: 0.65rem;
+  margin: 0.9rem 0;
+  padding: 0.9rem 1rem;
+  border: 1px solid var(--border-strong, #64748b);
+  border-left: 4px solid var(--warn, #b7791f);
+  border-radius: 0.65rem;
+  background: var(--surface-2, rgba(127, 127, 127, 0.08));
+  overflow-wrap: anywhere;
+}
+.engine-review-signals > strong {
+  color: var(--text, inherit);
+}
+.engine-review-signals ul {
+  display: grid;
+  gap: 0.65rem;
+  margin: 0;
+  padding-left: 1.2rem;
+}
+.engine-review-signals li > strong {
+  color: var(--text, inherit);
+}
+.engine-review-signals li p {
+  margin: 0.2rem 0;
+}
+.engine-review-signals small {
+  font-size: 0.75rem;
+}
+.engine-upstream-qc {
+  margin: 0.75rem 0;
+  padding: 0.75rem;
+  border: 1px solid var(--border, #64748b);
+  border-radius: 0.6rem;
+  background: var(--surface, transparent);
+  overflow-wrap: anywhere;
+}
+.engine-upstream-qc summary,
+.engine-review-signals summary {
+  cursor: pointer;
+  font-weight: 650;
+}
