@@ -398,6 +398,14 @@ try {
   if (qcExecutionId && organizationId) {
     runSql("delete from public.engine_executions where id = $tag$" + qcExecutionId + "$tag$::uuid and organization_id = $tag$" + organizationId + "$tag$::uuid");
   }
+  if (organizationId) {
+    runSql("alter table public.biological_reference_assertions disable trigger biological_reference_assertions_no_delete");
+    runSql("delete from public.biological_reference_assertions where organization_id = $tag$" + organizationId + "$tag$::uuid and assertion_code like 'ci.%'");
+    runSql("alter table public.biological_reference_assertions enable trigger biological_reference_assertions_no_delete");
+    runSql("alter table public.biological_reference_registry disable trigger biological_reference_registry_no_delete");
+    runSql("delete from public.biological_reference_registry where organization_id = $tag$" + organizationId + "$tag$::uuid and reference_id like 'ci.biological.reference.%'");
+    runSql("alter table public.biological_reference_registry enable trigger biological_reference_registry_no_delete");
+  }
   if (cultureId && organizationId) {
     runSql("delete from public.biological_contexts where organization_id = $tag$" + organizationId + "$tag$::uuid and culture_id = $tag$" + cultureId + "$tag$::uuid");
     runSql("delete from public.cultures where organization_id = $tag$" + organizationId + "$tag$::uuid and id = $tag$" + cultureId + "$tag$::uuid");
