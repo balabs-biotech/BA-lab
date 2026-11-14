@@ -98,6 +98,7 @@ let cultureId;
 let bieExecutionId;
 let qcExecutionId;
 let missingResultQcExecutionId;
+let mismatchedLineageQcExecutionId;
 let organizationId;
 
 try {
@@ -467,6 +468,52 @@ try {
   }
   process.stdout.write("ok missing QC result rejection leaves no BIE execution ledger row\\n");
 
+  // A second synthetic QC pair has a valid result row, but its source IDs do
+  // not match the immutable execution snapshot. Both rows are isolated fixtures.
+  const mismatchedLineageRequestId = randomUUID();
+  const mismatchedLineageSourceId = randomUUID();
+  mismatchedLineageQcExecutionId = runSql(
+    "with qc as (insert into public.engine_executions " +
+    "(organization_id, request_id, idempotency_key, engine_id, engine_version, scope, input_record_ids, input_snapshot_sha256, request_payload, status, result_payload, requested_by, completed_at) values (" +
+    "'" + organizationId + "'::uuid, '" + mismatchedLineageRequestId + "'::uuid, 'ci-qc-lineage-mismatch-" + randomUUID() + "', " +
+    "'environmental.timeseries.qc', '0.2.0', " +
+    "jsonb_build_object('organization_id', '" + organizationId + "', 'location_id', '" + locationId + "'), " +
+    "array['" + mismatchedLineageSourceId + "'::uuid], repeat('b', 64), " +
+    "jsonb_build_object('parameters', jsonb_build_object('window_start', '" + windowStart + "', 'window_end', '" + windowEnd + "')), " +
+    "'completed', jsonb_build_object('contract', 'BA-LABS/ENGINE-RESULT', 'status', 'completed', 'result', jsonb_build_object('outcome', 'success', 'value', '{}'::jsonb, 'limitations', '[]'::jsonb, 'quality_flags', '[]'::jsonb, 'provenance', '{}'::jsonb)), " +
+    "'" + userId + "'::uuid, now()) returning organization_id, id, engine_id, engine_version, input_snapshot_sha256, completed_at), " +
+    "result_row as (insert into public.engine_execution_results " +
+    "(organization_id, execution_id, engine_id, engine_version, result_type, outcome, input_record_ids, input_snapshot_sha256, value, limitations, quality_flags, provenance, generated_at) " +
+    "select organization_id, id, engine_id, engine_version, engine_id, 'success', array[]::uuid[], input_snapshot_sha256, '{}'::jsonb, '[]'::jsonb, '[]'::jsonb, '{}'::jsonb, completed_at from qc returning execution_id) " +
+    "select execution_id::text from result_row",
+  );
+  if (!/^[0-9a-f-]{36}$/i.test(mismatchedLineageQcExecutionId)) {
+    throw new Error("Could not create isolated synthetic QC lineage mismatch fixture");
+  }
+  const mismatchedLineageIdempotencyKey = `auth-bie-qc-lineage-mismatch-${randomUUID()}`;
+  const bieMismatchedLineage = await invoke(userAccessToken, {
+    organization_id: organizationId,
+    engine_id: "biological.context.features",
+    engine_version: "0.2.0",
+    upstream_qc_execution_id: mismatchedLineageQcExecutionId,
+    scope: { organization_id: organizationId, culture_id: cultureId },
+    parameters: { window_start: windowStart, window_end: windowEnd, timezone: "Africa/Algiers" },
+    idempotency_key: mismatchedLineageIdempotencyKey,
+  });
+  assertResponse(
+    "BIE rejects QC result with mismatched source record lineage",
+    bieMismatchedLineage,
+    422,
+    "upstream_qc_result_integrity_mismatch",
+  );
+  const mismatchedLineageBieRows = await api(
+    `/rest/v1/engine_executions?organization_id=eq.${organizationId}&idempotency_key=eq.${encodeURIComponent(mismatchedLineageIdempotencyKey)}&select=id`,
+  );
+  if (mismatchedLineageBieRows.length !== 0) {
+    throw new Error("BIE created a ledger row despite QC source lineage mismatch");
+  }
+  process.stdout.write("ok mismatched QC source lineage rejection leaves no BIE execution ledger row\\n");
+
   const unmemberedOrganizationId = randomUUID();
 
   const denied = await invoke(userAccessToken, {
@@ -518,6 +565,9 @@ try {
     runSql("delete from public.engine_execution_dependencies where organization_id = $tag$" + organizationId + "$tag$::uuid and downstream_execution_id = $tag$" + bieExecutionId + "$tag$::uuid");
     runSql("alter table public.engine_execution_dependencies enable trigger engine_execution_dependencies_immutable");
     runSql("delete from public.engine_executions where id = $tag$" + bieExecutionId + "$tag$::uuid and organization_id = $tag$" + organizationId + "$tag$::uuid");
+  }
+  if (mismatchedLineageQcExecutionId && organizationId) {
+    runSql("delete from public.engine_executions where id = $tag$" + mismatchedLineageQcExecutionId + "$tag$::uuid and organization_id = $tag$" + organizationId + "$tag$::uuid");
   }
   if (missingResultQcExecutionId && organizationId) {
     runSql("delete from public.engine_executions where id = $tag$" + missingResultQcExecutionId + "$tag$::uuid and organization_id = $tag$" + organizationId + "$tag$::uuid");
