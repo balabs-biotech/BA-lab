@@ -7380,6 +7380,14 @@ function renderBiologicalContextAssessment(article, result) {
     addLine(qcDetails, "Résultat QC : " + String(qc.outcome || "non documenté"));
     addLine(qcDetails, "Exécution QC : " + String(qc.upstream_execution_id || "identifiant indisponible"));
     addLine(qcDetails, "Résultat QC enregistré : " + String(qc.upstream_result_id || "identifiant indisponible"));
+    addLine(qcDetails, "Moteur amont : " + String(qc.upstream_engine_id || "indisponible") +
+      "@" + String(qc.upstream_engine_version || "version inconnue"));
+    addLine(qcDetails, "QC terminé le : " + String(qc.upstream_completed_at || "date indisponible"));
+    addLine(qcDetails, "Snapshot d’entrée QC : " + String(qc.upstream_input_snapshot_sha256 || "indisponible"));
+    const upstreamScope = qc.upstream_scope || {};
+    addLine(qcDetails, "Périmètre QC : organisation " + String(upstreamScope.organization_id || "—") +
+      " · localisation " + String(upstreamScope.location_id || "—") +
+      " · " + String(upstreamScope.window_start || "—") + " → " + String(upstreamScope.window_end || "—"));
     const upstreamExecution = recentEngineExecutions.find(item => item.id === qc.upstream_execution_id);
     if (upstreamExecution) {
       const upstreamLink = document.createElement("a");
