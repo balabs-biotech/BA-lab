@@ -274,6 +274,9 @@ console.log("✓ Persisted result identity, durable result ID and ledger parity 
 
 for (const contract of [
   'from("engine_execution_results")',
+  '.select("id,status,engine_id,engine_version,input_record_ids,input_snapshot_sha256,scope,request_payload,created_at,completed_at")',
+  'upstream.status !== "completed"',
+  'upstream.request_payload?.parameters || {}',
   'persistedQcResult.id !== qc.upstream_result_id',
   'persistedQcResult.execution_id !== upstream.id',
   'persistedQcResult.input_snapshot_sha256 !== upstream.input_snapshot_sha256',
