@@ -288,8 +288,8 @@ const forbiddenDirectWrite = engine.match(/\.from\(["'](?:events|measurements|ob
 if (forbiddenDirectWrite) throw new Error("Audit-sensitive event/measurement/observation writes must go through validated RPCs, not direct table mutations");
 console.log("✓ Tracker uses RPC-backed writes for events, measurements and observations");
 
-const evidenceReviewStart=engine.indexOf("const assertionEvidenceDetails = document.createElement(\"details\")");
-const evidenceReviewEnd=engine.indexOf("const assertions = visibleReferenceAssertions",evidenceReviewStart);
+const evidenceReviewStart=engine.indexOf("const addEvidenceField = (parent, label, fieldValue) =>");
+const evidenceReviewEnd=engine.indexOf("const contextById = new Map(biologicalContexts.map",evidenceReviewStart);
 if(evidenceReviewStart<0||evidenceReviewEnd<0)throw new Error("Biological assertion evidence dossier UI is missing");
 const evidenceReview=engine.slice(evidenceReviewStart,evidenceReviewEnd);
 for(const snippet of [
@@ -315,7 +315,7 @@ if(!evidenceReview.includes("slice(0, 30)"))throw new Error("Biological evidence
 console.log("✓ Biological assertion review exposes evidence, applicability, reviewer timestamps, both SHA-256 digests and safely validated source links");
 
 const assertionFilterStart=engine.indexOf("const allReferenceAssertions = Array.isArray(subject.biological_reference_assertions)");
-const assertionFilterEnd=engine.indexOf("const assertionEvidenceDetails",assertionFilterStart);
+const assertionFilterEnd=engine.indexOf("const contextById = new Map(biologicalContexts.map",assertionFilterStart);
 if(assertionFilterStart<0||assertionFilterEnd<0)throw new Error("Biological assertion filter panel is missing");
 const assertionFilterBlock=engine.slice(assertionFilterStart,assertionFilterEnd);
 for(const snippet of [
