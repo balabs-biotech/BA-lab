@@ -7714,16 +7714,6 @@ function renderBiologicalContextAssessment(article, result) {
       " · " + String(item.evidence_level || "niveau de preuve non précisé") +
       " · " + source + digest;
   }, 12);
-  addList(article, "Assertions d’identité vérifiées", subject.identity_assertions, item => {
-    const source = item.source_reference_id && item.source_reference_version
-      ? item.source_reference_id + "@" + item.source_reference_version
-      : "source indisponible";
-    const digest = typeof item.content_sha256 === "string" ? " · SHA-256 " + item.content_sha256.slice(0, 12) : "";
-    return String(item.assertion_type || "assertion") + " : " +
-      String(item.assertion_value || "valeur indisponible") +
-      " · " + String(item.evidence_level || "niveau de preuve non précisé") +
-      " · " + source + digest;
-  }, 12);
   const referenceAssertionState = subject.biological_reference_assertion_state || "not_documented";
   const referenceAssertionLabels = {
     documented: "Assertions scientifiques documentées",
