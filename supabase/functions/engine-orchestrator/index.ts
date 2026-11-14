@@ -11,6 +11,7 @@ import {
 } from "../_shared/biological-context-loader.ts";
 import { loadAuthenticatedBiologicalInterpretationProfile } from "../_shared/biological-interpretation-profile.ts";
 import { loadAuthenticatedBiologicalIdentityAssertions } from "../_shared/biological-identity-assertions.ts";
+import { loadAuthenticatedBiologicalReferenceAssertions } from "../_shared/biological-reference-assertions.ts";
 
 const headers = {
   "Access-Control-Allow-Origin": "*",
@@ -302,6 +303,26 @@ Deno.serve(async (req: Request) => {
       ]);
       return reply(422, { error: allowedCodes.has(code) ? code : "biological_identity_resolution_failed" });
     }
+    let referenceAssertionResolution;
+    try {
+      referenceAssertionResolution = await loadAuthenticatedBiologicalReferenceAssertions({
+        userClient,
+        organizationId,
+        biologicalContexts: snapshot.parameters.biological_contexts ?? [],
+      });
+    } catch (error) {
+      const code = error instanceof Error ? error.message : "biological_reference_assertion_resolution_failed";
+      const allowedCodes = new Set([
+        "caller_scoped_supabase_client_required",
+        "biological_reference_assertion_input_invalid",
+        "biological_reference_assertion_registry_unavailable",
+        "biological_reference_assertion_source_unavailable",
+        "biological_reference_assertion_source_ambiguous",
+        "biological_reference_assertion_source_not_validated",
+        "biological_reference_assertion_identity_ambiguous",
+      ]);
+      return reply(422, { error: allowedCodes.has(code) ? code : "biological_reference_assertion_resolution_failed" });
+    }
     effectiveParameters = {
       ...snapshot.parameters,
       interpretation_rules: interpretationProfile.rules,
@@ -309,8 +330,14 @@ Deno.serve(async (req: Request) => {
       interpretation_profile: interpretationProfile.profile,
       biological_identity_state: identityResolution.state,
       biological_identity_assertions: identityResolution.assertions,
+      biological_reference_assertion_state: referenceAssertionResolution.state,
+      biological_reference_assertions: referenceAssertionResolution.assertions,
     };
-    effectiveDatasets = [...interpretationProfile.datasets, ...identityResolution.datasets];
+    effectiveDatasets = [
+      ...interpretationProfile.datasets,
+      ...identityResolution.datasets,
+      ...referenceAssertionResolution.datasets,
+    ];
     snapshotHash = snapshot.input.snapshot_sha256;
   } else {
     let sourceRows: Record<string, any>[];
