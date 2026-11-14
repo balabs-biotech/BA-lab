@@ -8,7 +8,7 @@ let userAccessToken;
 if (!anonKey) throw new Error("ANON_KEY must be exported by supabase status -o env");
 
 function runSql(sql) {
-  const result = spawnSync("psql", [databaseUrl, "-v", "ON_ERROR_STOP=1", "-q", "-c", sql], { encoding: "utf8" });
+  const result = spawnSync("psql", [databaseUrl, "-v", "ON_ERROR_STOP=1", "-q", "-t", "-A", "-c", sql], { encoding: "utf8" });
   if (result.status !== 0) throw new Error(`Local fixture SQL failed: ${(result.stderr || result.stdout || "unknown psql error").slice(0, 600)}`);
   return (result.stdout || "").trim();
 }
