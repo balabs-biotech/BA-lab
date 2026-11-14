@@ -99,10 +99,6 @@ export async function buildBiologicalReferenceAssertions(input: {
       evidence_level: row.evidence_level,
       applicability: row.applicability,
       uncertainty: row.uncertainty,
-    };
-    accepted.push({
-      ...assertionPayload,
-      content_sha256: await sha256(stable(assertionPayload)),
       source: {
         reference_id: source.reference_id,
         reference_version: source.reference_version,
@@ -111,6 +107,10 @@ export async function buildBiologicalReferenceAssertions(input: {
         ...(typeof source.source_url === "string" ? { source_url: source.source_url } : {}),
       },
       reviewed_at: row.reviewed_at,
+    };
+    accepted.push({
+      ...assertionPayload,
+      content_sha256: await sha256(stable(assertionPayload)),
     });
   }
   accepted.sort((a, b) => a.assertion_code.localeCompare(b.assertion_code) ||
