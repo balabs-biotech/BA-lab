@@ -113,17 +113,27 @@ export async function buildBiologicalInterpretationProfile(input: {
     (profile.valid_to !== null && !/^\d{4}-\d{2}-\d{2}$/.test(profile.valid_to))
   ) throw new Error("interpretation_profile_metadata_invalid");
   const profileId = `${profile.domain}.${profile.profile_code}`;
-  if (typeof profile.content_sha256 !== "string" || !/^[0-9a-f]{64}$/.test(profile.content_sha256)) {
-    throw new Error("interpretation_profile_digest_missing");
-  }
   const expectedProfileDigest = await sha256(stable({
     profile_id: profileId,
     profile_version: profile.profile_version,
     rules: profile.rules,
   }));
-  if (expectedProfileDigest !== profile.content_sha256) {
+  const persistedProfileDigest = profile.content_sha256;
+  if (
+    persistedProfileDigest !== null &&
+    persistedProfileDigest !== undefined &&
+    (
+      typeof persistedProfileDigest !== "string" ||
+      !/^[0-9a-f]{64}$/.test(persistedProfileDigest) ||
+      expectedProfileDigest !== persistedProfileDigest
+    )
+  ) {
     throw new Error("interpretation_profile_content_hash_mismatch");
   }
+  // Legacy activated profiles predate the digest column. Their immutable DB
+  // row is still verifiable; compute the manifest digest until they are
+  // explicitly versioned again. New activations require a persisted digest.
+  const profileDigest = persistedProfileDigest ?? expectedProfileDigest;
   const references = requireValidRuleReferences(profile.rules);
   const resolvedReferences = new Map<string, Row>();
   for (const reference of input.references) {
@@ -144,7 +154,7 @@ export async function buildBiologicalInterpretationProfile(input: {
     dataset_version: "1.0.0",
     profile_id: profileId,
     profile_version: profile.profile_version,
-    content_sha256: profile.content_sha256,
+    content_sha256: profileDigest,
     retrieved_at: profile.created_at,
   }];
 
