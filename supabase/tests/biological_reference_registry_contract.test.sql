@@ -7,7 +7,7 @@ declare
   v_user uuid := 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb';
   v_profile_id uuid;
   v_missing_digest_profile_id uuid;
-  v_reference_id uuid;
+  v_reference_id uuid;\n  v_assertion_id uuid;
 begin
   if to_regclass('public.domain_interpretation_profiles') is null then
     raise exception 'domain_interpretation_profiles baseline is missing';
@@ -143,6 +143,48 @@ begin
   begin
     delete from public.biological_reference_registry where id=v_reference_id;
     raise exception 'validated scientific reference was deletable';
+  exception when sqlstate '55000' then null;
+  end;
+
+  insert into public.biological_reference_assertions(
+    organization_id, assertion_code, assertion_version,
+    subject_type, subject_ref, predicate_code, object_value,
+    reference_registry_id, source_locator, evidence_level,
+    applicability, uncertainty
+  ) values (
+    v_org, 'pleurotus.ostreatus.substrate.preference', '1.0.0',
+    'taxon', 'NCBI:placeholder-test-taxonomy', 'has_substrate_association',
+    '{"substrate":"wheat_straw","relationship":"reported"}'::jsonb,
+    v_reference_id, 'synthetic-test-section', 'L0',
+    '{"scope":"contract-test-only"}'::jsonb,
+    '{"confidence":"not_assessed","note":"synthetic fixture"}'::jsonb
+  ) returning id into v_assertion_id;
+
+  update public.biological_reference_assertions
+    set status='validated'
+    where id=v_assertion_id;
+
+  if not exists (
+    select 1 from public.biological_reference_assertions
+    where id=v_assertion_id
+      and status='validated'
+      and reviewed_by=v_user
+      and reviewed_at is not null
+  ) then
+    raise exception 'assertion review trigger must stamp reviewer identity and timestamp';
+  end if;
+
+  begin
+    update public.biological_reference_assertions
+      set object_value='{"substrate":"coffee_waste"}'::jsonb
+      where id=v_assertion_id;
+    raise exception 'validated biological assertion was mutable';
+  exception when sqlstate '55000' then null;
+  end;
+
+  begin
+    delete from public.biological_reference_assertions where id=v_assertion_id;
+    raise exception 'validated biological assertion was deletable';
   exception when sqlstate '55000' then null;
   end;
 end
