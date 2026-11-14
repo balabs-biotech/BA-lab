@@ -7577,6 +7577,7 @@ function renderBiologicalContextAssessment(article, result) {
     );
     parent.appendChild(line);
   };
+  let renderAssertionComparisons = () => {};
   const renderAssertionReview = () => {
     const query = assertionSearch.value.trim().toLocaleLowerCase();
     visibleReferenceAssertions = allReferenceAssertions.filter(item => {
@@ -7644,6 +7645,7 @@ function renderBiologicalContextAssessment(article, result) {
       assertionEvidenceDetails.appendChild(record);
     }
     assertionEvidenceDetails.hidden = visibleReferenceAssertions.length === 0;
+    renderAssertionComparisons();
   };
   applicabilityFilter.addEventListener("change", renderAssertionReview);
   evidenceFilter.addEventListener("change", renderAssertionReview);
@@ -7651,56 +7653,74 @@ function renderBiologicalContextAssessment(article, result) {
   renderAssertionReview();
   article.appendChild(assertionReview);
   article.appendChild(assertionEvidenceDetails);
-  const assertions = visibleReferenceAssertions;
   const contextById = new Map(biologicalContexts.map(context => [context.context_id, context]));
-  const comparisonRows = [];
+  const assertionComparisonSection = document.createElement("section");
+  assertionComparisonSection.className = "engine-biological-assertion-comparisons";
+  const assertionComparisonTitle = document.createElement("strong");
+  assertionComparisonTitle.textContent = "Divergences sur un même contexte et une période commune";
+  assertionComparisonSection.appendChild(assertionComparisonTitle);
+  const assertionComparisonList = document.createElement("ul");
+  assertionComparisonSection.appendChild(assertionComparisonList);
   const isoDate = value => typeof value === "string" && /^\\d{4}-\\d{2}-\\d{2}$/.test(value)
     ? value
     : null;
-  for (let leftIndex = 0; leftIndex < assertions.length; leftIndex += 1) {
-    const left = assertions[leftIndex];
-    for (let rightIndex = leftIndex + 1; rightIndex < assertions.length; rightIndex += 1) {
-      const right = assertions[rightIndex];
-      if (left.subject_type !== right.subject_type ||
-          left.subject_ref !== right.subject_ref ||
-          left.predicate_code !== right.predicate_code) continue;
-      const leftValue = JSON.stringify(left.object_value);
-      const rightValue = JSON.stringify(right.object_value);
-      if (leftValue === rightValue) continue;
-      const sharedContexts = (Array.isArray(left.matching_context_ids) ? left.matching_context_ids : [])
-        .filter(id => Array.isArray(right.matching_context_ids) && right.matching_context_ids.includes(id));
-      for (const contextId of sharedContexts) {
-        const context = contextById.get(contextId);
-        if (!context) continue;
-        const contextStart = isoDate(context.valid_from);
-        const contextEnd = isoDate(context.valid_to);
-        const leftWindow = left.applicability?.validity_window || {};
-        const rightWindow = right.applicability?.validity_window || {};
-        const starts = [contextStart, isoDate(leftWindow.valid_from), isoDate(rightWindow.valid_from)].filter(Boolean);
-        const ends = [contextEnd, isoDate(leftWindow.valid_to), isoDate(rightWindow.valid_to)].filter(Boolean);
-        const overlapStart = starts.sort().at(-1) || null;
-        const overlapEnd = ends.sort()[0] || null;
-        if (overlapStart && overlapEnd && overlapStart >= overlapEnd) continue;
-        const periodLabel = (overlapStart || "début ouvert") + " → " + (overlapEnd || "fin ouverte");
-        comparisonRows.push({
-          left,
-          right,
-          contextId,
-          periodLabel
-        });
+  renderAssertionComparisons = () => {
+    const assertions = visibleReferenceAssertions;
+    const comparisonRows = [];
+    for (let leftIndex = 0; leftIndex < assertions.length; leftIndex += 1) {
+      const left = assertions[leftIndex];
+      for (let rightIndex = leftIndex + 1; rightIndex < assertions.length; rightIndex += 1) {
+        const right = assertions[rightIndex];
+        if (left.subject_type !== right.subject_type ||
+            left.subject_ref !== right.subject_ref ||
+            left.predicate_code !== right.predicate_code) continue;
+        const leftValue = JSON.stringify(left.object_value);
+        const rightValue = JSON.stringify(right.object_value);
+        if (leftValue === rightValue) continue;
+        const sharedContexts = (Array.isArray(left.matching_context_ids) ? left.matching_context_ids : [])
+          .filter(id => Array.isArray(right.matching_context_ids) && right.matching_context_ids.includes(id));
+        for (const contextId of sharedContexts) {
+          const context = contextById.get(contextId);
+          if (!context) continue;
+          const contextStart = isoDate(context.valid_from);
+          const contextEnd = isoDate(context.valid_to);
+          const leftWindow = left.applicability?.validity_window || {};
+          const rightWindow = right.applicability?.validity_window || {};
+          const starts = [contextStart, isoDate(leftWindow.valid_from), isoDate(rightWindow.valid_from)].filter(Boolean);
+          const ends = [contextEnd, isoDate(leftWindow.valid_to), isoDate(rightWindow.valid_to)].filter(Boolean);
+          const overlapStart = starts.sort().at(-1) || null;
+          const overlapEnd = ends.sort()[0] || null;
+          if (overlapStart && overlapEnd && overlapStart >= overlapEnd) continue;
+          comparisonRows.push({
+            left,
+            right,
+            contextId,
+            periodLabel: (overlapStart || "début ouvert") + " → " + (overlapEnd || "fin ouverte")
+          });
+        }
       }
     }
-  }
-  if (comparisonRows.length) {
-    addList(article, "Divergences sur un même contexte et une période commune", comparisonRows, pair => {
+    assertionComparisonList.replaceChildren();
+    for (const pair of comparisonRows.slice(0, 20)) {
+      const entry = document.createElement("li");
       const leftCode = String(pair.left.assertion_code || "assertion A");
       const rightCode = String(pair.right.assertion_code || "assertion B");
       const leftValue = JSON.stringify(pair.left.object_value).slice(0, 120);
       const rightValue = JSON.stringify(pair.right.object_value).slice(0, 120);
-      return leftCode + " : " + leftValue + " ≠ " + rightCode + " : " + rightValue +
+      entry.textContent = leftCode + " : " + leftValue + " ≠ " + rightCode + " : " + rightValue +
         " · contexte " + pair.contextId + " · période commune " + pair.periodLabel;
-    }, 20);
-  }
+      assertionComparisonList.appendChild(entry);
+    }
+    if (comparisonRows.length > 20) {
+      const note = document.createElement("li");
+      note.textContent = (comparisonRows.length - 20) +
+        " divergence(s) supplémentaire(s) non affichée(s). Affinez les filtres.";
+      assertionComparisonList.appendChild(note);
+    }
+    assertionComparisonSection.hidden = comparisonRows.length === 0;
+  };
+  article.appendChild(assertionComparisonSection);
+  renderAssertionComparisons();
   const outcomeLabels = {
     success: "Analyse exploitable",
     insufficient_data: "Données insuffisantes",
