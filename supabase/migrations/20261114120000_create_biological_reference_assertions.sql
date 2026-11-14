@@ -6,7 +6,7 @@ create table if not exists public.biological_reference_assertions (
   id uuid primary key default gen_random_uuid(),
   organization_id uuid not null references public.organizations(id) on delete cascade,
   assertion_code text not null check (assertion_code ~ '^[a-z][a-z0-9_.-]{1,159}$'),
-  assertion_version text not null check (assertion_version ~ '^[0-9]+\\.[0-9]+\\.[0-9]+([+-][a-zA-Z0-9.-]+)?$'),
+  assertion_version text not null check (assertion_version ~ '^[0-9]+\.[0-9]+\.[0-9]+([+-][a-zA-Z0-9.-]+)?$'),
   subject_type text not null check (
     subject_type in (
       'taxon', 'strain', 'cultivar', 'substrate', 'culture_stage',
