@@ -202,6 +202,168 @@
           "items": {
             "$ref": "#/$defs/biologicalContext"
           }
+        },
+        "biological_reference_assertion_state": {
+          "enum": [
+            "documented",
+            "not_documented",
+            "conflicting",
+            "not_applicable"
+          ]
+        },
+        "biological_reference_assertions": {
+          "type": "array",
+          "maxItems": 500,
+          "items": {
+            "type": "object",
+            "required": [
+              "assertion_code",
+              "assertion_version",
+              "subject_type",
+              "subject_ref",
+              "predicate_code",
+              "object_value",
+              "unit_code",
+              "reference_registry_id",
+              "source_locator",
+              "evidence_level",
+              "applicability",
+              "uncertainty",
+              "content_sha256",
+              "applicability_state",
+              "matching_context_ids",
+              "source",
+              "reviewed_at"
+            ],
+            "properties": {
+              "assertion_code": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 160
+              },
+              "assertion_version": {
+                "type": "string",
+                "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+              },
+              "subject_type": {
+                "enum": [
+                  "taxon",
+                  "strain",
+                  "cultivar",
+                  "substrate",
+                  "culture_stage",
+                  "production_system",
+                  "environmental_parameter",
+                  "biological_process"
+                ]
+              },
+              "subject_ref": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 200
+              },
+              "predicate_code": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 80
+              },
+              "object_value": {},
+              "unit_code": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "maxLength": 80
+              },
+              "reference_registry_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "source_locator": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "maxLength": 1000
+              },
+              "evidence_level": {
+                "enum": [
+                  "L0",
+                  "L1",
+                  "L2",
+                  "L3",
+                  "L4",
+                  "L5",
+                  "unassessed"
+                ]
+              },
+              "applicability": {
+                "type": "object"
+              },
+              "uncertainty": {
+                "type": "object"
+              },
+              "content_sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "applicability_state": {
+                "enum": [
+                  "matched",
+                  "not_applicable",
+                  "undetermined",
+                  "not_assessed"
+                ]
+              },
+              "matching_context_ids": {
+                "type": "array",
+                "uniqueItems": true,
+                "items": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              },
+              "source": {
+                "type": "object",
+                "required": [
+                  "reference_id",
+                  "reference_version",
+                  "content_sha256",
+                  "reviewed_at"
+                ],
+                "properties": {
+                  "reference_id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 160
+                  },
+                  "reference_version": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 80
+                  },
+                  "content_sha256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "reviewed_at": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "source_url": {
+                    "type": "string",
+                    "format": "uri"
+                  }
+                },
+                "additionalProperties": false
+              },
+              "reviewed_at": {
+                "type": "string",
+                "format": "date-time"
+              }
+            },
+            "additionalProperties": false
+          }
         }
       },
       "additionalProperties": false
