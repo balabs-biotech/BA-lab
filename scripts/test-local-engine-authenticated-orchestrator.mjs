@@ -97,6 +97,7 @@ let environmentId;
 let cultureId;
 let bieExecutionId;
 let tamperedWorkerBieExecutionId;
+let missingArtifactWorkerBieExecutionId;
 let qcExecutionId;
 let missingResultQcExecutionId;
 let mismatchedLineageQcExecutionId;
@@ -424,6 +425,44 @@ try {
   }
   process.stdout.write("ok malicious worker integration: altered QC quality_flags rejected; failed ledger persisted; no BIE result row created\\n");
 
+  // The third successful BIE worker response deliberately omits the required QC artifact.
+  const missingArtifactIdempotencyKey = `auth-bie-worker-missing-qc-artifact-${randomUUID()}`;
+  const bieWithMissingWorkerArtifact = await invoke(userAccessToken, {
+    organization_id: organizationId,
+    engine_id: "biological.context.features",
+    engine_version: "0.2.0",
+    upstream_qc_execution_id: qcExecutionId,
+    scope: { organization_id: organizationId, culture_id: cultureId },
+    parameters: { window_start: windowStart, window_end: windowEnd, timezone: "Africa/Algiers" },
+    idempotency_key: missingArtifactIdempotencyKey,
+  });
+  if (bieWithMissingWorkerArtifact.status !== 202 ||
+      bieWithMissingWorkerArtifact.body?.status !== "queued" ||
+      typeof bieWithMissingWorkerArtifact.body?.execution_id !== "string") {
+    throw new Error(`missing-artifact BIE fixture enqueue failed: ${bieWithMissingWorkerArtifact.status}/${JSON.stringify(bieWithMissingWorkerArtifact.body)}`);
+  }
+  missingArtifactWorkerBieExecutionId = bieWithMissingWorkerArtifact.body.execution_id;
+  const missingArtifactDispatch = await dispatchQueue();
+  if (missingArtifactDispatch.status !== 200) {
+    throw new Error(`missing-artifact BIE dispatch failed: ${missingArtifactDispatch.status}/${JSON.stringify(missingArtifactDispatch.body)}`);
+  }
+  const missingArtifactProxyHealth = await fetch("http://127.0.0.1:18081/healthz").then((response) => response.json());
+  if (missingArtifactProxyHealth?.bie_responses !== 3) {
+    throw new Error(`CI worker proxy did not remove QC artifact from exactly the third BIE response: ${JSON.stringify(missingArtifactProxyHealth)}`);
+  }
+  const missingArtifactLedgerRows = await api(
+    `/rest/v1/engine_executions?id=eq.${missingArtifactWorkerBieExecutionId}&organization_id=eq.${organizationId}&select=id,status,error_code,result_payload`,
+  );
+  const missingArtifactResultRows = await api(
+    `/rest/v1/engine_execution_results?execution_id=eq.${missingArtifactWorkerBieExecutionId}&organization_id=eq.${organizationId}&select=id`,
+  );
+  if (missingArtifactLedgerRows?.[0]?.status !== "failed" ||
+      missingArtifactLedgerRows[0]?.error_code !== "upstream_artifact_lineage_mismatch" ||
+      missingArtifactResultRows.length !== 0) {
+    throw new Error(`orchestrator accepted BIE worker response without QC artifact: ledger=${JSON.stringify(missingArtifactLedgerRows)} results=${JSON.stringify(missingArtifactResultRows)}`);
+  }
+  process.stdout.write("ok missing-artifact worker integration: absent environmental_quality_control rejected; failed ledger persisted; no BIE result row created\\n");
+
   const unavailableQcIdempotencyKey = `auth-bie-missing-qc-${randomUUID()}`;
   const bieUnavailableQc = await invoke(userAccessToken, {
     organization_id: organizationId,
@@ -739,13 +778,13 @@ try {
 } finally {
   // Execution ledger rows are intentionally not deletable by authenticated
   // clients. Clean up this isolated fixture through the local DB owner.
-  if (organizationId && (bieExecutionId || tamperedWorkerBieExecutionId)) {
+  if (organizationId && (bieExecutionId || tamperedWorkerBieExecutionId || missingArtifactWorkerBieExecutionId)) {
     runSql("alter table public.engine_execution_dependencies disable trigger engine_execution_dependencies_immutable");
-    for (const downstreamExecutionId of [bieExecutionId, tamperedWorkerBieExecutionId].filter(Boolean)) {
+    for (const downstreamExecutionId of [bieExecutionId, tamperedWorkerBieExecutionId, missingArtifactWorkerBieExecutionId].filter(Boolean)) {
       runSql("delete from public.engine_execution_dependencies where organization_id = $tag$" + organizationId + "$tag$::uuid and downstream_execution_id = $tag$" + downstreamExecutionId + "$tag$::uuid");
     }
     runSql("alter table public.engine_execution_dependencies enable trigger engine_execution_dependencies_immutable");
-    for (const downstreamExecutionId of [bieExecutionId, tamperedWorkerBieExecutionId].filter(Boolean)) {
+    for (const downstreamExecutionId of [bieExecutionId, tamperedWorkerBieExecutionId, missingArtifactWorkerBieExecutionId].filter(Boolean)) {
       runSql("delete from public.engine_executions where id = $tag$" + downstreamExecutionId + "$tag$::uuid and organization_id = $tag$" + organizationId + "$tag$::uuid");
     }
   }
