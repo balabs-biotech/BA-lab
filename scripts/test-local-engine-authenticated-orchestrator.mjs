@@ -71,6 +71,17 @@ async function dispatchQueue() {
   return { status: response.status, body: parsed };
 }
 
+function canonicalJson(value) {
+  const normalize = (item) => {
+    if (Array.isArray(item)) return item.map(normalize);
+    if (item && typeof item === "object") {
+      return Object.fromEntries(Object.keys(item).sort().map((key) => [key, normalize(item[key])]));
+    }
+    return item;
+  };
+  return JSON.stringify(normalize(value));
+}
+
 function assertResponse(label, actual, status, error) {
   if (actual.status !== status || actual.body?.error !== error) {
     throw new Error(`${label}: expected ${status}/${error}, received ${actual.status}/${JSON.stringify(actual.body)}`);
@@ -206,7 +217,7 @@ try {
     throw new Error("QC worker result was not atomically persisted against the queued execution");
   }
   const resultRows = await api(
-    `/rest/v1/engine_execution_results?execution_id=eq.${qcExecutionId}&organization_id=eq.${organizationId}&select=id,outcome,value,quality_flags,provenance,input_record_ids`,
+    `/rest/v1/engine_execution_results?execution_id=eq.${qcExecutionId}&organization_id=eq.${organizationId}&select=id,outcome,value,limitations,quality_flags,provenance,input_record_ids`,
   );
   const qcResult = resultRows?.[0];
   if (!qcResult || !["success", "review_required", "insufficient_data"].includes(qcResult.outcome) ||
@@ -263,10 +274,10 @@ try {
       qcAssessment?.upstream_result_id !== dependencyRows[0].upstream_result_id ||
       !/^[a-f0-9]{64}$/.test(qcAssessment?.artifact_sha256 ?? "") ||
       qcAssessment?.outcome !== qcResult.outcome ||
-      JSON.stringify(qcAssessment?.quality_flags) !== JSON.stringify(qcResult.quality_flags) ||
-      JSON.stringify(qcAssessment?.limitations) !== JSON.stringify(qcResult.value?.limitations) ||
-      JSON.stringify(qcAssessment?.provenance) !== JSON.stringify(qcResult.provenance) ||
-      JSON.stringify(qcAssessment?.value) !== JSON.stringify(qcResult.value) ||
+      canonicalJson(qcAssessment?.quality_flags) !== canonicalJson([...(qcResult.quality_flags ?? [])].sort()) ||
+      canonicalJson(qcAssessment?.limitations) !== canonicalJson(qcResult.limitations) ||
+      canonicalJson(qcAssessment?.provenance) !== canonicalJson(qcResult.provenance) ||
+      canonicalJson(qcAssessment?.value) !== canonicalJson(qcResult.value) ||
       qcAssessment?.state !== (
         qcResult.outcome !== "success" || (qcResult.quality_flags?.length ?? 0) > 0
           ? "review_required"
