@@ -7445,27 +7445,59 @@ function renderBiologicalContextAssessment(article, result) {
   }
   const coverage = value.coverage || {}; const counts = coverage.record_counts_by_type || {};
   const reviewSignals = [];
+  const missingContextLabels = {
+    no_eligible_local_measurements: "Aucune mesure locale admissible",
+    no_linked_environmental_observations_supplied: "Aucune observation environnementale liée",
+    some_input_records_were_excluded: "Certaines données ont été écartées",
+    biological_context_not_recorded: "Contexte biologique non enregistré",
+    no_active_interpretation_profile: "Profil d'interprétation non configuré",
+    biological_context_not_stable_for_full_window: "Contexte biologique non stable sur toute la période",
+    biological_domain_ambiguous_for_full_window: "Domaine biologique ambigu sur la période",
+    genetic_reference_unresolved: "Référence génétique non résolue",
+    culture_environment_not_linked: "Environnement de culture non lié",
+    plant_environment_not_linked: "Environnement de culture végétale non lié",
+    environment_without_location: "Environnement sans localisation"
+  };
+  const missingContext = Array.isArray(coverage.missing_context) ? coverage.missing_context : [];
+  const acceptedCount = Number(coverage.source_record_count || 0);
+  const excludedCount = Number(coverage.excluded_record_count || 0);
+  if (acceptedCount === 0 && excludedCount > 0) {
+    reviewSignals.push({code:"all_input_records_excluded",label:"Aucune donnée admissible",evidence:excludedCount+" enregistrement(s) reçu(s), tous écartés lors du contrôle d'entrée."});
+  } else if (acceptedCount === 0) {
+    reviewSignals.push({code:"no_observations_available",label:"Aucune observation disponible",evidence:"Aucun enregistrement admissible n'a été fourni pour la fenêtre demandée. Cela ne signifie pas que les conditions étaient stables."});
+  }
+  if (excludedCount > 0 && acceptedCount > 0) {
+    reviewSignals.push({code:"partial_input_exclusion",label:"Jeu de données partiellement écarté",evidence:excludedCount+" enregistrement(s) exclu(s) ; "+acceptedCount+" conservé(s)."});
+  }
   if (qc?.state === "review_required") {
     reviewSignals.push({code:"environmental_qc_review_required",label:"Contrôle qualité environnemental à réviser",evidence:Array.isArray(qc.quality_flags)?qc.quality_flags.join(", "):"Le contrôle amont n'est pas validé."});
   }
   if (identityState === "conflicting") {
     reviewSignals.push({code:"biological_identity_conflict",label:"Identité biologique contradictoire",evidence:"Les assertions d'identité disponibles ne concordent pas."});
   }
-  if (Array.isArray(coverage.missing_context) && coverage.missing_context.length) {
-    reviewSignals.push({code:"biological_context_incomplete",label:"Contexte biologique incomplet",evidence:coverage.missing_context.join(", ")});
+  const unresolvedContext = missingContext.map(code => missingContextLabels[code] || String(code));
+  if (unresolvedContext.length) {
+    reviewSignals.push({code:"biological_context_incomplete",label:"Contexte biologique incomplet",evidence:unresolvedContext.join(" · ")});
   }
   if (Array.isArray(coverage.temporal_gaps) && coverage.temporal_gaps.length) {
-    reviewSignals.push({code:"temporal_gaps_detected",label:"Lacunes temporelles détectées",evidence:coverage.temporal_gaps.length+" intervalle(s) sans couverture."});
+    const examples = coverage.temporal_gaps.slice(0, 3).map(gap => String(gap.from || "début inconnu")+" → "+String(gap.to || "fin inconnue"));
+    reviewSignals.push({code:"temporal_gaps_detected",label:"Lacunes temporelles détectées",evidence:coverage.temporal_gaps.length+" intervalle(s) dépassent la cadence attendue. "+examples.join(" ; ")});
   }
-  if (result.outcome === "insufficient_data") {
-    reviewSignals.push({code:"insufficient_data",label:"Données insuffisantes",evidence:"Le moteur ne dispose pas d'une couverture suffisante pour une analyse exploitable."});
+  if (result.outcome === "insufficient_data" && acceptedCount > 0) {
+    reviewSignals.push({code:"insufficient_data",label:"Données insuffisantes",evidence:"Des enregistrements existent, mais leur couverture ou leur contexte ne permet pas une analyse exploitable."});
   }
   if (Array.isArray(value.findings)) {
     for (const finding of value.findings.slice(0, 8)) {
+      const supporting = Array.isArray(finding?.supporting_record_ids) ? finding.supporting_record_ids : [];
+      const features = Array.isArray(finding?.derived_feature_codes) ? finding.derived_feature_codes : [];
       reviewSignals.push({
-        code:typeof finding==="object"?String(finding.rule_code||finding.code||"rule_based_finding"):"rule_based_finding",
+        code:typeof finding==="object"?String(finding.finding_code||finding.rule_code||finding.code||"rule_based_finding"):"rule_based_finding",
         label:typeof finding==="string"?finding:String(finding.statement||finding.description||"Constat issu d'une règle"),
-        evidence:typeof finding==="object"?String(finding.evidence||finding.observed_value||"Valeur évaluée par la règle configurée."):"Constat produit par une règle configurée."
+        evidence:typeof finding==="object"?[
+          finding.evidence_state ? "Niveau de preuve : "+finding.evidence_state : "",
+          supporting.length ? "Enregistrements : "+supporting.join(", ") : "",
+          features.length ? "Caractéristiques : "+features.join(", ") : ""
+        ].filter(Boolean).join(" · ") || "Valeur évaluée par la règle configurée.":"Constat produit par une règle configurée."
       });
     }
   }
