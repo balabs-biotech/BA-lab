@@ -106,10 +106,10 @@ try {
   const recordIds = runSql(
     "insert into public.environmental_observations " +
     "(organization_id, location_id, data_family, provider_code, dataset_code, variable_code, value, unit_code, observed_at, quality_flag, metadata) values " +
-    "('" + organizationId + "'::uuid, '" + locationId + "'::uuid, 'weather', 'BA_LABS_CI', 'AUTHENTICATED_QC_FIXTURE_V1', 'air_temperature', 21, 'degC', '2026-11-13T00:00:00Z', 'fixture', '{\\"purpose\\":\\"ephemeral_ci_fixture\\"}'::jsonb), " +
-    "('" + organizationId + "'::uuid, '" + locationId + "'::uuid, 'weather', 'BA_LABS_CI', 'AUTHENTICATED_QC_FIXTURE_V1', 'air_temperature', 22, 'degC', '2026-11-13T01:00:00Z', 'fixture', '{\\"purpose\\":\\"ephemeral_ci_fixture\\"}'::jsonb), " +
-    "('" + organizationId + "'::uuid, '" + locationId + "'::uuid, 'weather', 'BA_LABS_CI', 'AUTHENTICATED_QC_FIXTURE_V1', 'air_temperature', 23, 'degC', '2026-11-13T02:00:00Z', 'fixture', '{\\"purpose\\":\\"ephemeral_ci_fixture\\"}'::jsonb) returning id::text",
-  ).split("\\n").filter(Boolean);
+    "('" + organizationId + "'::uuid, '" + locationId + "'::uuid, 'weather', 'BA_LABS_CI', 'AUTHENTICATED_QC_FIXTURE_V1', 'air_temperature', 21, 'degC', '2026-11-13T00:00:00Z', 'fixture', jsonb_build_object('purpose', 'ephemeral_ci_fixture')), " +
+    "('" + organizationId + "'::uuid, '" + locationId + "'::uuid, 'weather', 'BA_LABS_CI', 'AUTHENTICATED_QC_FIXTURE_V1', 'air_temperature', 22, 'degC', '2026-11-13T01:00:00Z', 'fixture', jsonb_build_object('purpose', 'ephemeral_ci_fixture')), " +
+    "('" + organizationId + "'::uuid, '" + locationId + "'::uuid, 'weather', 'BA_LABS_CI', 'AUTHENTICATED_QC_FIXTURE_V1', 'air_temperature', 23, 'degC', '2026-11-13T02:00:00Z', 'fixture', jsonb_build_object('purpose', 'ephemeral_ci_fixture')) returning id::text",
+  ).split("\n").filter(Boolean);
   if (recordIds.length !== 3 || recordIds.some((id) => typeof id !== "string")) {
     throw new Error("Could not create three environmental QC source records");
   }
