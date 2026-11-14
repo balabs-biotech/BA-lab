@@ -97,6 +97,7 @@ let environmentId;
 let cultureId;
 let bieExecutionId;
 let qcExecutionId;
+let missingResultQcExecutionId;
 let organizationId;
 
 try {
@@ -426,6 +427,46 @@ try {
   }
   process.stdout.write("ok rejected QC dependencies leave no BIE execution ledger rows\\n");
 
+  // Synthetic terminal QC ledger row with no result row: this models a broken
+  // persistence invariant without mutating or deleting the real immutable QC result.
+  missingResultQcExecutionId = runSql(
+    "insert into public.engine_executions " +
+    "(organization_id, request_id, idempotency_key, engine_id, engine_version, scope, input_record_ids, input_snapshot_sha256, request_payload, status, result_payload, requested_by, completed_at) values (" +
+    "'" + organizationId + "'::uuid, '" + randomUUID() + "'::uuid, 'ci-missing-qc-result-" + randomUUID() + "', " +
+    "'environmental.timeseries.qc', '0.2.0', " +
+    "jsonb_build_object('organization_id', '" + organizationId + "', 'location_id', '" + locationId + "'), " +
+    "array[]::uuid[], repeat('a', 64), " +
+    "jsonb_build_object('parameters', jsonb_build_object('window_start', '" + windowStart + "', 'window_end', '" + windowEnd + "')), " +
+    "'completed', jsonb_build_object('contract', 'BA-LABS/ENGINE-RESULT', 'status', 'completed', 'result', jsonb_build_object('outcome', 'success', 'value', '{}'::jsonb, 'limitations', '[]'::jsonb, 'quality_flags', '[]'::jsonb, 'provenance', '{}'::jsonb)), " +
+    "'" + userId + "'::uuid, now()) returning id::text",
+  );
+  if (!/^[0-9a-f-]{36}$/i.test(missingResultQcExecutionId)) {
+    throw new Error("Could not create isolated synthetic QC ledger fixture");
+  }
+  const missingResultIdempotencyKey = `auth-bie-qc-missing-result-${randomUUID()}`;
+  const bieMissingQcResult = await invoke(userAccessToken, {
+    organization_id: organizationId,
+    engine_id: "biological.context.features",
+    engine_version: "0.2.0",
+    upstream_qc_execution_id: missingResultQcExecutionId,
+    scope: { organization_id: organizationId, culture_id: cultureId },
+    parameters: { window_start: windowStart, window_end: windowEnd, timezone: "Africa/Algiers" },
+    idempotency_key: missingResultIdempotencyKey,
+  });
+  assertResponse(
+    "BIE rejects completed QC execution without immutable result row",
+    bieMissingQcResult,
+    422,
+    "upstream_qc_result_integrity_mismatch",
+  );
+  const missingResultBieRows = await api(
+    `/rest/v1/engine_executions?organization_id=eq.${organizationId}&idempotency_key=eq.${encodeURIComponent(missingResultIdempotencyKey)}&select=id`,
+  );
+  if (missingResultBieRows.length !== 0) {
+    throw new Error("BIE created a ledger row despite missing upstream QC result integrity");
+  }
+  process.stdout.write("ok missing QC result rejection leaves no BIE execution ledger row\\n");
+
   const unmemberedOrganizationId = randomUUID();
 
   const denied = await invoke(userAccessToken, {
@@ -477,6 +518,9 @@ try {
     runSql("delete from public.engine_execution_dependencies where organization_id = $tag$" + organizationId + "$tag$::uuid and downstream_execution_id = $tag$" + bieExecutionId + "$tag$::uuid");
     runSql("alter table public.engine_execution_dependencies enable trigger engine_execution_dependencies_immutable");
     runSql("delete from public.engine_executions where id = $tag$" + bieExecutionId + "$tag$::uuid and organization_id = $tag$" + organizationId + "$tag$::uuid");
+  }
+  if (missingResultQcExecutionId && organizationId) {
+    runSql("delete from public.engine_executions where id = $tag$" + missingResultQcExecutionId + "$tag$::uuid and organization_id = $tag$" + organizationId + "$tag$::uuid");
   }
   if (qcExecutionId && organizationId) {
     runSql("delete from public.engine_executions where id = $tag$" + qcExecutionId + "$tag$::uuid and organization_id = $tag$" + organizationId + "$tag$::uuid");
