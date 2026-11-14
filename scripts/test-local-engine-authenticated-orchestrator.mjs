@@ -82,6 +82,9 @@ const email = `cultureops-ci-${randomUUID()}@example.test`;
 const password = `CI-${randomUUID()}-aA9!`;
 let userId;
 let locationId;
+let environmentId;
+let cultureId;
+let bieExecutionId;
 let qcExecutionId;
 let organizationId;
 
@@ -118,6 +121,30 @@ try {
   });
   locationId = location?.[0]?.id;
   if (typeof locationId !== "string") throw new Error("Could not create temporary QC location");
+
+  environmentId = runSql(
+    "insert into public.environments (organization_id, location_id, name, metadata) values ('" +
+    organizationId + "'::uuid, '" + locationId + "'::uuid, 'Temporary BIE integration environment', " +
+    "jsonb_build_object('purpose', 'ephemeral_ci_fixture')) returning id::text",
+  );
+  const materialId = runSql(
+    "insert into public.materials (organization_id, material_code, material_type, state, generation, metadata) values ('" +
+    organizationId + "'::uuid, 'MAT-CI-" + randomUUID().slice(0, 8) + "', 'strain', 'active', 0, " +
+    "jsonb_build_object('purpose', 'ephemeral_ci_fixture')) returning id::text",
+  );
+  cultureId = runSql(
+    "insert into public.cultures (organization_id, code, culture_type, material_id, environment_id, started_at, metadata) values ('" +
+    organizationId + "'::uuid, 'CULTURE-CI-" + randomUUID().slice(0, 8) + "', 'agar', '" + materialId +
+    "'::uuid, '" + environmentId + "'::uuid, '2026-11-13T00:00:00Z', jsonb_build_object('purpose', 'ephemeral_ci_fixture')) returning id::text",
+  );
+  runSql(
+    "insert into public.biological_contexts (organization_id, domain, culture_id, environment_id, organism_kind, culture_stage, production_system, valid_from, context_tags) values ('" +
+    organizationId + "'::uuid, 'mycology', '" + cultureId + "'::uuid, '" + environmentId +
+    "'::uuid, 'fungus', 'incubation', 'petri_agar', '2026-11-13', array['ci_fixture'])",
+  );
+  if (![environmentId, cultureId, materialId].every((id) => typeof id === "string" && /^[0-9a-f-]{36}$/i.test(id))) {
+    throw new Error("Could not create temporary biological BIE source fixture");
+  }
 
   // Environmental observations are provider-ingested server data. Seed them with
   // the local database owner; the actual QC request below reads them as the
@@ -189,6 +216,58 @@ try {
   }
   process.stdout.write("ok authenticated QC worker: real HTTP worker completed the execution and persisted the immutable result row\\n");
 
+  const bie = await invoke(userAccessToken, {
+    organization_id: organizationId,
+    engine_id: "biological.context.features",
+    engine_version: "0.2.0",
+    upstream_qc_execution_id: qcExecutionId,
+    scope: { organization_id: organizationId, culture_id: cultureId },
+    parameters: { window_start: windowStart, window_end: windowEnd, timezone: "Africa/Algiers" },
+    idempotency_key: `auth-bie-with-qc-${randomUUID()}`,
+  });
+  if (bie.status !== 202 || bie.body?.status !== "queued" || typeof bie.body?.execution_id !== "string") {
+    throw new Error(`authenticated BIE with QC artifact enqueue failed: ${bie.status}/${JSON.stringify(bie.body)}`);
+  }
+  bieExecutionId = bie.body.execution_id;
+  const dependencyRows = await api(
+    `/rest/v1/engine_execution_dependencies?downstream_execution_id=eq.${bieExecutionId}&upstream_execution_id=eq.${qcExecutionId}&organization_id=eq.${organizationId}&select=downstream_execution_id,upstream_execution_id,upstream_result_id,dependency_role,upstream_input_snapshot_sha256`,
+  );
+  if (dependencyRows?.length !== 1 ||
+      dependencyRows[0].dependency_role !== "environmental_qc" ||
+      dependencyRows[0].upstream_execution_id !== qcExecutionId) {
+    throw new Error("BIE enqueue did not persist the immutable QC dependency edge");
+  }
+  process.stdout.write("ok QC to BIE enqueue: verified artifact and immutable dependency edge persisted\\n");
+
+  const bieDispatch = await dispatchQueue();
+  if (bieDispatch.status !== 200 || bieDispatch.body?.claimed !== 1 ||
+      bieDispatch.body?.completed !== 1 || bieDispatch.body?.failed !== 0 || bieDispatch.body?.lost !== 0) {
+    const failedRows = await api(
+      `/rest/v1/engine_executions?id=eq.${bieExecutionId}&organization_id=eq.${organizationId}&select=id,status,error_code,error_message`,
+    ).catch(() => []);
+    throw new Error(`authenticated BIE worker dispatch failed: ${bieDispatch.status}/${JSON.stringify(bieDispatch.body)}; ledger=${JSON.stringify(failedRows)}`);
+  }
+  const bieRows = await api(
+    `/rest/v1/engine_executions?id=eq.${bieExecutionId}&organization_id=eq.${organizationId}&select=id,status,result_payload,completed_at`,
+  );
+  const bieCompleted = bieRows?.[0];
+  const bieResultRows = await api(
+    `/rest/v1/engine_execution_results?execution_id=eq.${bieExecutionId}&organization_id=eq.${organizationId}&select=id,value,quality_flags,provenance`,
+  );
+  const bieResult = bieResultRows?.[0];
+  const qcAssessment = bieResult?.value?.environmental_quality_control;
+  if (bieCompleted?.status !== "completed" ||
+      bieCompleted.result_payload?.status !== "completed" ||
+      !bieResult ||
+      qcAssessment?.upstream_execution_id !== qcExecutionId ||
+      qcAssessment?.upstream_result_id !== dependencyRows[0].upstream_result_id ||
+      !/^[a-f0-9]{64}$/.test(qcAssessment?.artifact_sha256 ?? "") ||
+      !Array.isArray(qcAssessment?.quality_flags) ||
+      !bieResult.provenance?.source_references?.some((item) => item.includes(`execution=${qcExecutionId}`))) {
+    throw new Error("BIE did not persist the verified QC artifact, result linkage, flags, and provenance");
+  }
+  process.stdout.write("ok live QC to BIE: worker consumed persisted QC result and saved artifact lineage, flags, and provenance\\n");
+
   const unmemberedOrganizationId = randomUUID();
 
   const denied = await invoke(userAccessToken, {
@@ -235,8 +314,22 @@ try {
 } finally {
   // Execution ledger rows are intentionally not deletable by authenticated
   // clients. Clean up this isolated fixture through the local DB owner.
+  if (bieExecutionId && organizationId) {
+    runSql("alter table public.engine_execution_dependencies disable trigger engine_execution_dependencies_immutable");
+    runSql("delete from public.engine_execution_dependencies where organization_id = $tag$" + organizationId + "$tag$::uuid and downstream_execution_id = $tag$" + bieExecutionId + "$tag$::uuid");
+    runSql("alter table public.engine_execution_dependencies enable trigger engine_execution_dependencies_immutable");
+    runSql("delete from public.engine_executions where id = $tag$" + bieExecutionId + "$tag$::uuid and organization_id = $tag$" + organizationId + "$tag$::uuid");
+  }
   if (qcExecutionId && organizationId) {
     runSql("delete from public.engine_executions where id = $tag$" + qcExecutionId + "$tag$::uuid and organization_id = $tag$" + organizationId + "$tag$::uuid");
+  }
+  if (cultureId && organizationId) {
+    runSql("delete from public.biological_contexts where organization_id = $tag$" + organizationId + "$tag$::uuid and culture_id = $tag$" + cultureId + "$tag$::uuid");
+    runSql("delete from public.cultures where organization_id = $tag$" + organizationId + "$tag$::uuid and id = $tag$" + cultureId + "$tag$::uuid");
+    runSql("delete from public.materials where organization_id = $tag$" + organizationId + "$tag$::uuid and material_code like 'MAT-CI-%'");
+  }
+  if (environmentId && organizationId) {
+    runSql("delete from public.environments where organization_id = $tag$" + organizationId + "$tag$::uuid and id = $tag$" + environmentId + "$tag$::uuid");
   }
   if (locationId && organizationId) {
     runSql("delete from public.locations where id = $tag$" + locationId + "$tag$::uuid and organization_id = $tag$" + organizationId + "$tag$::uuid");
