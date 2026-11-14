@@ -187,7 +187,20 @@
             "format": "uri"
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "provider": { "const": "BA_LABS_INTERPRETATION_PROFILE" }
+              },
+              "required": ["provider"]
+            },
+            "then": {
+              "required": ["dataset_version", "profile_id", "profile_version"]
+            }
+          }
+        ]
       }
     },
     "upstream_artifacts": {
