@@ -320,6 +320,7 @@ Deno.serve(async (req: Request) => {
         "biological_reference_assertion_source_ambiguous",
         "biological_reference_assertion_source_not_validated",
         "biological_reference_assertion_identity_ambiguous",
+        "biological_reference_assertion_source_url_invalid",
       ]);
       return reply(422, { error: allowedCodes.has(code) ? code : "biological_reference_assertion_resolution_failed" });
     }
