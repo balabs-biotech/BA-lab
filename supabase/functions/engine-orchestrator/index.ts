@@ -12,6 +12,7 @@ import {
 import { loadAuthenticatedBiologicalInterpretationProfile } from "../_shared/biological-interpretation-profile.ts";
 import { loadAuthenticatedBiologicalIdentityAssertions } from "../_shared/biological-identity-assertions.ts";
 import { loadAuthenticatedBiologicalReferenceAssertions } from "../_shared/biological-reference-assertions.ts";
+import { matchesSingleUpstreamQcArtifact } from "../_shared/upstream-qc-lineage.js";
 
 const headers = {
   "Access-Control-Allow-Origin": "*",
@@ -719,22 +720,7 @@ Deno.serve(async (req: Request) => {
   // assembled from the tenant-scoped ledger. A valid response envelope alone
   // does not prove that the worker retained the upstream artifact unchanged.
   if (upstreamArtifacts.length > 0 && result.status === "completed") {
-    const expectedArtifact = upstreamArtifacts.length === 1 ? upstreamArtifacts[0] : null;
-    const consumedQc = result.result?.value?.environmental_quality_control;
-    const lineageMatches = upstreamArtifacts.length === 1 && !!expectedArtifact && object(consumedQc) &&
-      consumedQc.upstream_execution_id === expectedArtifact.execution_id &&
-      consumedQc.upstream_result_id === expectedArtifact.result_id &&
-      consumedQc.upstream_engine_id === expectedArtifact.engine_id &&
-      consumedQc.upstream_engine_version === expectedArtifact.engine_version &&
-      consumedQc.upstream_completed_at === expectedArtifact.completed_at &&
-      consumedQc.upstream_input_snapshot_sha256 === expectedArtifact.input_snapshot_sha256 &&
-      stable(consumedQc.upstream_scope) === stable(expectedArtifact.scope) &&
-      consumedQc.artifact_sha256 === expectedArtifact.artifact_sha256 &&
-      consumedQc.outcome === expectedArtifact.result.outcome &&
-      stable(consumedQc.quality_flags) === stable(expectedArtifact.result.quality_flags) &&
-      stable(consumedQc.limitations) === stable(expectedArtifact.result.limitations) &&
-      stable(consumedQc.provenance) === stable(expectedArtifact.result.provenance) &&
-      stable(consumedQc.value) === stable(expectedArtifact.result.value);
+    const lineageMatches = matchesSingleUpstreamQcArtifact(upstreamArtifacts, result, stable);
     if (!lineageMatches) {
       const persisted = await persistExecutionFailure(
         "upstream_artifact_lineage_mismatch",
