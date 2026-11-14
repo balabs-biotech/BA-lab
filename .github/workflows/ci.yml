@@ -47,7 +47,7 @@ jobs:
             if curl --fail --silent http://127.0.0.1:18080/healthz >/dev/null; then break; fi
             sleep 1
           done
-          BA_ENGINE_WORKER_URL=http://ba-engine-worker-runtime-ci:8080 \
+          BA_ENGINE_WORKER_URL=http://127.0.0.1:18080 \
             BA_ENGINE_WORKER_TOKEN="$token" \
             python scripts/test-engine-worker-container.py
 
