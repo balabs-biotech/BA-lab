@@ -805,6 +805,97 @@ class EngineContractTests(unittest.TestCase):
         self.assertIn("biological_interpretation_not_performed", result["result"]["quality_flags"])
 
 
+    def test_biological_context_features_detects_traceable_two_segment_mean_shift(self):
+        request = json.loads(json.dumps(REQUEST))
+        request["engine"] = {
+            "engine_id": "biological.context.features",
+            "engine_version": "0.1.0",
+        }
+        culture_id = "2c2b3a4d-5e6f-4789-8123-456789abcdef"
+        request["scope"] = {
+            "organization_id": REQUEST["scope"]["organization_id"],
+            "culture_id": culture_id,
+        }
+        request["parameters"] = {
+            "window_start": "2026-11-10T00:00:00Z",
+            "window_end": "2026-11-11T00:00:00Z",
+            "timezone": "Africa/Algiers",
+        }
+        request["input"]["record_ids"] = []
+        request["input"]["records"] = []
+        values = [20.0, 20.5, 19.5, 25.0, 25.5, 24.5]
+        for index, value in enumerate(values):
+            record_id = f"4c2b3a4d-5e6f-4789-8123-456789abcde{index}"
+            request["input"]["record_ids"].append(record_id)
+            request["input"]["records"].append({
+                "record_id": record_id,
+                "record_type": "measurement",
+                "payload_sha256": "c" * 64,
+                "data": {
+                    "variable_code": "air_temperature",
+                    "normalized_value": value,
+                    "normalized_unit_code": "degC",
+                    "measured_at": f"2026-11-10T{8 + index:02d}:00:00Z",
+                },
+                "context": {"culture_id": culture_id},
+            })
+        result = execute_registered_engine(request)
+        self.assertEqual(result["status"], "completed", msg=str(result.get("error")))
+        assessment = result["result"]["value"]
+        schema = json.loads((ROOT / "schemas" / "biological" / "v1" / "context-assessment.schema.json").read_text(encoding="utf-8"))
+        Draft202012Validator(schema, format_checker=FormatChecker()).validate(assessment)
+        shift = next(
+            item for item in assessment["derived_features"]
+            if item["feature_code"] == "series.measurement.air_temperature.largest_two_segment_mean_shift"
+        )
+        self.assertAlmostEqual(shift["value"], 5.0)
+        self.assertEqual(shift["unit_code"], "degC")
+        self.assertIn("split_at=2026-11-10T11:00:00Z", shift["method"])
+        self.assertIn("direction=up", shift["method"])
+        self.assertEqual(set(shift["source_record_ids"]), set(request["input"]["record_ids"]))
+        self.assertEqual(assessment["findings"], [])
+        self.assertEqual(assessment["hypotheses"], [])
+
+    def test_biological_context_features_does_not_emit_two_segment_shift_below_minimum_sample_size(self):
+        request = json.loads(json.dumps(REQUEST))
+        request["engine"] = {
+            "engine_id": "biological.context.features",
+            "engine_version": "0.1.0",
+        }
+        culture_id = "2c2b3a4d-5e6f-4789-8123-456789abcdef"
+        request["scope"] = {
+            "organization_id": REQUEST["scope"]["organization_id"],
+            "culture_id": culture_id,
+        }
+        request["parameters"] = {
+            "window_start": "2026-11-10T00:00:00Z",
+            "window_end": "2026-11-11T00:00:00Z",
+            "timezone": "Africa/Algiers",
+        }
+        request["input"]["record_ids"] = []
+        request["input"]["records"] = []
+        for index, value in enumerate([20.0, 20.5, 25.0, 25.5, 24.5]):
+            record_id = f"5c2b3a4d-5e6f-4789-8123-456789abcde{index}"
+            request["input"]["record_ids"].append(record_id)
+            request["input"]["records"].append({
+                "record_id": record_id,
+                "record_type": "measurement",
+                "payload_sha256": "c" * 64,
+                "data": {
+                    "variable_code": "air_temperature",
+                    "normalized_value": value,
+                    "normalized_unit_code": "degC",
+                    "measured_at": f"2026-11-10T{8 + index:02d}:00:00Z",
+                },
+                "context": {"culture_id": culture_id},
+            })
+        result = execute_registered_engine(request)
+        self.assertEqual(result["status"], "completed", msg=str(result.get("error")))
+        self.assertFalse(any(
+            item["feature_code"] == "series.measurement.air_temperature.largest_two_segment_mean_shift"
+            for item in result["result"]["value"]["derived_features"]
+        ))
+
     def test_biological_context_features_emits_limited_findings_for_scoped_versioned_rules(self):
         request = json.loads(json.dumps(REQUEST))
         request["engine"] = {
