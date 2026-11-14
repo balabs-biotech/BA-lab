@@ -251,7 +251,7 @@ def analyze_environmental_timeseries_qc(request: Mapping[str, Any]) -> dict[str,
             flags.append("duplicate_timestamps")
         if gap_indexes:
             flags.append("sampling_gap_detected")
-        if outlier_indexes:
+        if outlier_record_ids:
             flags.append("robust_outlier_detected")
         if rolling_anomaly_evidence:
             flags.append("rolling_baseline_anomaly_detected")
@@ -268,7 +268,7 @@ def analyze_environmental_timeseries_qc(request: Mapping[str, Any]) -> dict[str,
             "gap_after_record_ids": [points[index - 1][2] for index in gap_indexes],
             "gap_intervals": gap_intervals,
             "duplicate_timestamp_groups": duplicate_timestamp_groups,
-            "outlier_record_ids": [points[index][2] for index in sorted(outlier_indexes)],
+            "outlier_record_ids": sorted(outlier_record_ids),
             "outlier_evidence": outlier_evidence,
             "rolling_baseline_anomaly_evidence": rolling_anomaly_evidence,
             "quality_flags": flags,
