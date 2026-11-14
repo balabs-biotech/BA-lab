@@ -6,7 +6,7 @@
 type Row = Record<string, any>;
 const ASSERTION_CODE = /^[a-z][a-z0-9_.-]{1,159}$/;
 const ASSERTION_VERSION = /^[0-9]+\.[0-9]+\.[0-9]+([+-][0-9A-Za-z.-]+)?$/;
-const PREDICATE_CODE = /^[a-z][a-z0-9_.-]{1,158}$/;
+const PREDICATE_CODE = /^[a-z][a-z0-9_.-]{1,159}$/;
 function isObject(value: unknown): value is Row {
   return !!value && typeof value === "object" && !Array.isArray(value);
 }
