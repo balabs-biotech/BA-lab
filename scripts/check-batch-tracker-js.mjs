@@ -289,7 +289,7 @@ if (forbiddenDirectWrite) throw new Error("Audit-sensitive event/measurement/obs
 console.log("✓ Tracker uses RPC-backed writes for events, measurements and observations");
 
 const evidenceReviewStart=engine.indexOf("const assertionEvidenceDetails = document.createElement(\"details\")");
-const evidenceReviewEnd=engine.indexOf("const assertions = Array.isArray(subject.biological_reference_assertions)",evidenceReviewStart);
+const evidenceReviewEnd=engine.indexOf("const assertions = visibleReferenceAssertions",evidenceReviewStart);
 if(evidenceReviewStart<0||evidenceReviewEnd<0)throw new Error("Biological assertion evidence dossier UI is missing");
 const evidenceReview=engine.slice(evidenceReviewStart,evidenceReviewEnd);
 for(const snippet of [
