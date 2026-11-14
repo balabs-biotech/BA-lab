@@ -153,6 +153,14 @@ def _evaluate_biological_reference_assertions(
             "evidence_level": assertion["evidence_level"],
             "applicability": applicability,
             "uncertainty": uncertainty,
+            "source": {
+                "reference_id": source_reference_id,
+                "reference_version": source_version,
+                "content_sha256": source_digest,
+                "reviewed_at": source_reviewed_at,
+                **({"source_url": source["source_url"]} if isinstance(source.get("source_url"), str) else {}),
+            },
+            "reviewed_at": assertion["reviewed_at"],
         }
         if _contract_stable_sha256(payload) != digest:
             raise ValueError("biological_reference_assertion_content_hash_mismatch")
