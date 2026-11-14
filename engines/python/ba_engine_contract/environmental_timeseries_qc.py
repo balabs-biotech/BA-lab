@@ -138,7 +138,6 @@ def analyze_environmental_timeseries_qc(request: Mapping[str, Any]) -> dict[str,
     for (variable, unit), points in sorted(grouped.items()):
         points.sort(key=lambda item: (item[0], item[2]))
         values = [point[1] for point in points]
-        outlier_indexes = _robust_outliers(values, float(outlier_threshold))
         gaps = [
             (points[index][0] - points[index - 1][0]).total_seconds() / 60
             for index in range(1, len(points))
@@ -156,34 +155,19 @@ def analyze_environmental_timeseries_qc(request: Mapping[str, Any]) -> dict[str,
             for index in gap_indexes
         ]
         duplicate_groups: dict[datetime, list[str]] = defaultdict(list)
-        for timestamp, _value, record_id in points:
+        timestamp_groups: dict[datetime, list[tuple[float, str]]] = defaultdict(list)
+        for timestamp, value, record_id in points:
             duplicate_groups[timestamp].append(record_id)
+            timestamp_groups[timestamp].append((value, record_id))
         duplicate_timestamp_groups = [
             {"timestamp": _iso_utc(timestamp), "record_ids": sorted(record_ids)}
             for timestamp, record_ids in sorted(duplicate_groups.items())
             if len(record_ids) > 1
         ]
-        center = median(values)
-        mad = median([abs(value - center) for value in values])
-        robust_scale = 1.4826 * mad
-        outlier_evidence = [
-            {
-                "record_id": points[index][2],
-                "observed_value": points[index][1],
-                "median_value": center,
-                "mad": mad,
-                "robust_z_score": round(abs(points[index][1] - center) / robust_scale, 4) if robust_scale else None,
-                "threshold": float(outlier_threshold),
-                "interpretation": "deviation_from_median" if robust_scale else "zero_mad_non_median_value",
-            }
-            for index in sorted(outlier_indexes)
-        ]
-        # Collapse duplicate timestamps to one temporal point for baseline
-        # construction. A duplicated instant is flagged separately above and
-        # must never count as multiple independent historical observations.
-        timestamp_groups: dict[datetime, list[tuple[float, str]]] = defaultdict(list)
-        for timestamp, value, record_id in points:
-            timestamp_groups[timestamp].append((value, record_id))
+        # A timestamp is one temporal observation, regardless of how many
+        # records were ingested for that instant. Aggregate duplicates for
+        # robust statistics, but do not attribute an outlier to an ambiguous
+        # duplicate group at record level.
         temporal_points = [
             {
                 "timestamp": timestamp,
@@ -192,7 +176,30 @@ def analyze_environmental_timeseries_qc(request: Mapping[str, Any]) -> dict[str,
             }
             for timestamp, timestamp_values in sorted(timestamp_groups.items())
         ]
-
+        temporal_values = [item["value"] for item in temporal_points]
+        temporal_outlier_indexes = _robust_outliers(temporal_values, float(outlier_threshold))
+        outlier_record_ids = {
+            record_id
+            for index in temporal_outlier_indexes
+            for record_id in temporal_points[index]["record_ids"]
+            if len(temporal_points[index]["record_ids"]) == 1
+        }
+        center = median(temporal_values)
+        mad = median([abs(value - center) for value in temporal_values])
+        robust_scale = 1.4826 * mad
+        record_values = {record_id: value for _timestamp, value, record_id in points}
+        outlier_evidence = [
+            {
+                "record_id": record_id,
+                "observed_value": record_values[record_id],
+                "median_value": center,
+                "mad": mad,
+                "robust_z_score": round(abs(record_values[record_id] - center) / robust_scale, 4) if robust_scale else None,
+                "threshold": float(outlier_threshold),
+                "interpretation": "deviation_from_median" if robust_scale else "zero_mad_non_median_value",
+            }
+            for record_id in sorted(outlier_record_ids)
+        ]
         rolling_anomaly_evidence = []
         for index, current in enumerate(temporal_points):
             # A duplicate current timestamp has ambiguous record-level
