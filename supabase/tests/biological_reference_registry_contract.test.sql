@@ -61,10 +61,10 @@ begin
 
   insert into public.domain_interpretation_profiles(
     organization_id, domain, profile_code, profile_version, rules,
-    status, valid_from
+    content_sha256, status, valid_from
   ) values (
     v_org, 'mycology', 'biological.context.features', '1.0.0', '[]'::jsonb,
-    'draft', current_date
+    repeat('a', 64), 'draft', current_date
   ) returning id into v_profile_id;
 
   update public.domain_interpretation_profiles
@@ -72,8 +72,24 @@ begin
     where id=v_profile_id;
 
   begin
+    insert into public.domain_interpretation_profiles(
+      organization_id, domain, profile_code, profile_version, rules,
+      status, valid_from
+    ) values (
+      v_org, 'greentech', 'biological.context.features', '1.0.0', '[]'::jsonb,
+      'draft', current_date
+    ) returning id into v_profile_id;
     update public.domain_interpretation_profiles
-      set rules='[{"rule_id":"tampered"}]'::jsonb
+      set status='active'
+      where id=v_profile_id;
+    raise exception 'profile activation without content digest was accepted';
+  exception when sqlstate '23514' then null;
+  end;
+
+  begin
+    update public.domain_interpretation_profiles
+      set rules='[{"rule_id":"tampered"}]'::jsonb,
+          content_sha256=repeat('b', 64)
       where id=v_profile_id;
     raise exception 'activated interpretation profile was mutable';
   exception when sqlstate '55000' then null;
