@@ -23,7 +23,7 @@ async function assertUnauthorized(name, extraHeaders = {}) {
   if (response.status !== 401 || body?.error !== "authentication_required") {
     throw new Error(`${name}: expected 401/authentication_required, received ${response.status}/${JSON.stringify(body)}`);
   }
-  process.stdout.write(`ok ${name}: rejected request without caller/dispatcher credentials\\n`);
+  process.stdout.write(`ok ${name}: rejected request without caller/dispatcher credentials\n`);
 }
 
 async function assertFunction(name, { headers, expectedStatus, expectedError }) {
