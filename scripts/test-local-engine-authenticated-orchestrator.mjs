@@ -81,7 +81,7 @@ try {
   runSql("insert into public.organization_members (organization_id, user_id, role) values (\x27" + organizationId + "\x27::uuid, \x27" + userId + "\x27::uuid, \x27owner\x27) on conflict (organization_id, user_id) do nothing");
 
 
-  process.stdout.write("ok auth fixture: temporary user joined the seeded BA-LABS tenant\\n");
+  process.stdout.write("ok auth fixture: temporary user joined an isolated CI tenant\\n");
 
   const windowStart = "2026-11-13T00:00:00Z";
   const windowEnd = "2026-11-14T00:00:00Z";
@@ -100,24 +100,16 @@ try {
   locationId = location?.[0]?.id;
   if (typeof locationId !== "string") throw new Error("Could not create temporary QC location");
 
-  const observations = await api("/rest/v1/environmental_observations?select=id", {
-    method: "POST",
-    body: [0, 1, 2].map((hour) => ({
-      organization_id: organizationId,
-      location_id: locationId,
-      data_family: "weather",
-      provider_code: "BA_LABS_CI",
-      dataset_code: "AUTHENTICATED_QC_FIXTURE_V1",
-      variable_code: "air_temperature",
-      value: 21 + hour,
-      unit_code: "degC",
-      observed_at: `2026-11-13T0${hour}:00:00Z`,
-      quality_flag: "fixture",
-      metadata: { purpose: "ephemeral_ci_fixture" },
-    })),
-    headers: { Prefer: "return=representation" },
-  });
-  const recordIds = observations.map((row) => row.id);
+  // Environmental observations are provider-ingested server data. Seed them with
+  // the local database owner; the actual QC request below reads them as the
+  // authenticated tenant member through the production SELECT RLS policy.
+  const recordIds = runSql(
+    "insert into public.environmental_observations " +
+    "(organization_id, location_id, data_family, provider_code, dataset_code, variable_code, value, unit_code, observed_at, quality_flag, metadata) values " +
+    "('" + organizationId + "'::uuid, '" + locationId + "'::uuid, 'weather', 'BA_LABS_CI', 'AUTHENTICATED_QC_FIXTURE_V1', 'air_temperature', 21, 'degC', '2026-11-13T00:00:00Z', 'fixture', '{\\"purpose\\":\\"ephemeral_ci_fixture\\"}'::jsonb), " +
+    "('" + organizationId + "'::uuid, '" + locationId + "'::uuid, 'weather', 'BA_LABS_CI', 'AUTHENTICATED_QC_FIXTURE_V1', 'air_temperature', 22, 'degC', '2026-11-13T01:00:00Z', 'fixture', '{\\"purpose\\":\\"ephemeral_ci_fixture\\"}'::jsonb), " +
+    "('" + organizationId + "'::uuid, '" + locationId + "'::uuid, 'weather', 'BA_LABS_CI', 'AUTHENTICATED_QC_FIXTURE_V1', 'air_temperature', 23, 'degC', '2026-11-13T02:00:00Z', 'fixture', '{\\"purpose\\":\\"ephemeral_ci_fixture\\"}'::jsonb) returning id::text",
+  ).split("\\n").filter(Boolean);
   if (recordIds.length !== 3 || recordIds.some((id) => typeof id !== "string")) {
     throw new Error("Could not create three environmental QC source records");
   }
