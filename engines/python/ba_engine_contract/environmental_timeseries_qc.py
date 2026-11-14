@@ -7,7 +7,7 @@ stress, diagnose cultures, or recommend interventions.
 from __future__ import annotations
 
 from collections import defaultdict
-from datetime import datetime
+from datetime import datetime, timezone
 from math import isfinite
 from statistics import median
 from uuid import uuid4
@@ -17,7 +17,7 @@ from .validation import validate_request
 
 
 def _iso_utc(value: datetime) -> str:
-    return value.isoformat().replace("+00:00", "Z")
+    return value.astimezone(timezone.utc).isoformat().replace("+00:00", "Z")
 
 
 def _parse_timestamp(value: str) -> datetime:
