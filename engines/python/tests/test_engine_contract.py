@@ -445,6 +445,47 @@ class EngineContractTests(unittest.TestCase):
         self.assertTrue(series["duplicate_timestamps"])
         self.assertTrue(duplicate_ids.isdisjoint(anomaly_ids))
 
+    def test_environmental_qc_duplicate_timestamp_does_not_weight_global_outlier_baseline(self):
+        request = json.loads(json.dumps(REQUEST))
+        request["engine"] = {"engine_id": "environmental.timeseries.qc", "engine_version": "0.2.0"}
+        request["input"]["records"] = []
+        request["input"]["record_ids"] = []
+        observations = [
+            ("2026-11-12T08:00:00Z", 20.0),
+            ("2026-11-12T08:01:00Z", 20.1),
+            ("2026-11-12T08:02:00Z", 19.9),
+            ("2026-11-12T08:03:00Z", 20.0),
+            ("2026-11-12T08:04:00Z", 20.1),
+        ] + [("2026-11-12T08:05:00Z", 100.0)] * 10 + [
+            ("2026-11-12T08:06:00Z", 100.0),
+        ]
+        for index, (timestamp, value) in enumerate(observations):
+            record_id = f"ac2b3a4d-5e6f-4789-8123-456789abcde{index:02d}"
+            request["input"]["record_ids"].append(record_id)
+            request["input"]["records"].append({
+                "record_id": record_id,
+                "record_type": "measurement",
+                "payload_sha256": "f" * 64,
+                "data": {
+                    "variable_code": "temperature",
+                    "normalized_value": value,
+                    "normalized_unit_code": "degC",
+                    "measured_at": timestamp,
+                },
+            })
+        request["parameters"] = {
+            "minimum_points": 3,
+            "outlier_mad_threshold": 3.0,
+        }
+
+        result = run_environmental_timeseries_qc(request)
+        series = result["result"]["value"]["series"][0]
+        duplicate_ids = set(request["input"]["record_ids"][5:15])
+        outlier_ids = set(series["outlier_record_ids"])
+        self.assertIn(request["input"]["record_ids"][15], outlier_ids)
+        self.assertTrue(duplicate_ids.isdisjoint(outlier_ids))
+        self.assertIn("robust_outlier_detected", series["quality_flags"])
+
     def test_environmental_qc_accepts_location_scoped_environmental_observations(self):
         request = json.loads(json.dumps(REQUEST))
         request["engine"] = {"engine_id": "environmental.timeseries.qc", "engine_version": "0.2.0"}
