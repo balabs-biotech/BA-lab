@@ -1799,7 +1799,7 @@ class EngineContractTests(unittest.TestCase):
             lambda item: item.update(completed_at="2026-11-11T00:01:00Z"),
             lambda item: item.update(input_snapshot_sha256="b" * 64),
             lambda item: item["scope"].update(location_id="ffffffff-ffff-4fff-8fff-ffffffffffff"),
-            lambda item: item["result"].update(outcome="partial"),
+            lambda item: item["result"].update(outcome="review_required"),
             lambda item: item["result"].update(limitations=["Different limitation."]),
             lambda item: item["result"].update(provenance={"algorithm": "tampered"}),
             lambda item: item["result"]["value"]["review_summary"].update(outlier_count=2),
