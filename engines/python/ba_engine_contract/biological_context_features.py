@@ -12,7 +12,7 @@ import hashlib
 import json
 from math import isfinite
 import re
-from statistics import fmean
+from statistics import fmean, pstdev
 from typing import Any, Mapping
 
 from .validation import validate_request, _stable_sha256 as _contract_stable_sha256
@@ -692,6 +692,30 @@ def analyze_biological_context_features(request: Mapping[str, Any]) -> dict[str,
                 "unit_code": unit,
                 "source_record_ids": source_ids,
             })
+
+        # Population dispersion is descriptive only. Emit it for at least
+        # three observations; CV is omitted when the mean is zero because the
+        # ratio would be undefined or unstable.
+        if len(values) >= 3:
+            standard_deviation = pstdev(values)
+            derived_features.append({
+                "feature_code": f"series.{prefix}.population_stddev",
+                "value": standard_deviation,
+                "method": "population_standard_deviation",
+                "method_version": "1.0.0",
+                "unit_code": unit,
+                "source_record_ids": source_ids,
+            })
+            mean_value_for_cv = fmean(values)
+            if mean_value_for_cv != 0:
+                derived_features.append({
+                    "feature_code": f"series.{prefix}.coefficient_of_variation_pct",
+                    "value": (standard_deviation / abs(mean_value_for_cv)) * 100,
+                    "method": "population_stddev_over_absolute_mean_times_100",
+                    "method_version": "1.0.0",
+                    "unit_code": "percent",
+                    "source_record_ids": source_ids,
+                })
 
         # A least-squares slope is emitted only for at least three points
         # spanning two distinct instants. It is descriptive, not a stress score.
