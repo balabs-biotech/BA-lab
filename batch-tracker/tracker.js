@@ -7090,7 +7090,7 @@ async function loadRecentEngineExecutions() {
   recentEngineResultsByExecution = new Map();
   if (completedIds.length) {
     const resultsQuery = await supabaseClient.from("engine_execution_results")
-      .select("execution_id,result_type,outcome,value,limitations,quality_flags,confidence,provenance,generated_at,input_snapshot_sha256,input_record_ids")
+      .select("id,execution_id,engine_id,engine_version,result_type,outcome,value,limitations,quality_flags,confidence,provenance,generated_at,input_snapshot_sha256,input_record_ids")
       .eq("organization_id", loadOrganizationId)
       .in("execution_id", completedIds);
     if (requestId !== engineExecutionHistoryRequestId ||
@@ -7174,6 +7174,11 @@ function getEngineResultPersistenceConsistency(execution) {
   }
 
   const mismatches = [];
+  if (stored.execution_id !== execution.id) mismatches.push("execution_id");
+  if (stored.engine_id !== execution.engine_id) mismatches.push("engine_id");
+  if (stored.engine_version !== execution.engine_version) mismatches.push("engine_version");
+  if (stored.result_type !== execution.engine_id) mismatches.push("result_type");
+  if (typeof stored.id !== "string" || !stored.id) mismatches.push("result_id");
   for (const field of ["outcome", "value", "limitations", "quality_flags", "confidence", "provenance"]) {
     if (!engineEvidenceMatches(stored[field] ?? null, result[field] ?? null)) mismatches.push(field);
   }
@@ -8154,6 +8159,7 @@ function renderRecentEngineExecutions() {
     const executionSnapshot = execution.input_snapshot_sha256 || null;
     const resultSnapshot = storedResult?.input_snapshot_sha256 || null;
     appendLineageField("Exécution", execution.id);
+    appendLineageField("Identifiant du résultat persistant", storedResult?.id || "indisponible");
     appendLineageField("Moteur / version", String(execution.engine_id || "inconnu") + "@" + String(execution.engine_version || "inconnue"));
     appendLineageField("Périmètre", execution.scope ? JSON.stringify(execution.scope) : "non documenté");
     appendLineageField("Snapshot déclaré par l’exécution (SHA-256)", executionSnapshot || "indisponible");
