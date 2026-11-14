@@ -6,6 +6,10 @@ if (!upstream) throw new Error("BA_ENGINE_TEST_PROXY_UPSTREAM is required");
 
 let bieResponses = 0;
 const server = http.createServer(async (request, response) => {
+  if (request.method === "GET" && request.url === "/healthz") {
+    response.writeHead(200, { "content-type": "application/json" }).end(JSON.stringify({ status: "ok", bie_responses: bieResponses }));
+    return;
+  }
   if (request.method !== "POST" || request.url !== "/v1/execute") {
     response.writeHead(404).end();
     return;
