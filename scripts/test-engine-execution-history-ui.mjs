@@ -270,3 +270,16 @@ assert.match(renderer, /Identifiant du résultat persistant/);
 assert.match(renderer, /Cohérence ledger \/ résultat persisté/);
 assert.match(renderer, /DIVERGENCE : /);
 console.log("✓ Persisted result identity, durable result ID and ledger parity are exposed in execution history");
+
+for (const contract of [
+  'from("engine_execution_results")',
+  'persistedQcResult.id !== qc.upstream_result_id',
+  'persistedQcResult.execution_id !== upstream.id',
+  'persistedQcResult.input_snapshot_sha256 !== upstream.input_snapshot_sha256',
+  'engineEvidenceMatches(persistedQcResult.value, qc.value)',
+  'verifiedArtifactSha256 !== qc.artifact_sha256',
+  'qc.upstream_scope?.organization_id !== expectedOrganizationId',
+  'upstreamParameters.window_start !== qc.upstream_scope?.window_start',
+  'Intégrité QC : résultat persistant retrouvé'
+]) assert.ok(biologicalRenderer.includes(contract), "Missing upstream QC revalidation contract: " + contract);
+console.log("✓ BIE trace drilldown re-reads the tenant-scoped QC result and recomputes the upstream artifact SHA-256");
