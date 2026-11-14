@@ -68,7 +68,7 @@ const renderer = tracker.slice(rendererStart, overviewStart);
 const biologicalRendererStart = tracker.indexOf("function renderBiologicalContextAssessment(");
 assert.ok(biologicalRendererStart >= 0 && biologicalRendererStart < rendererStart);
 const biologicalRenderer = tracker.slice(biologicalRendererStart, rendererStart);
-for (const contract of ["biological.context_assessment", "record_counts_by_type", "missing_context", "observed_facts", "derived_features", "findings", "hypotheses", "temporal_gaps", "quality_flags", "limitations", "provenance", "source_references", "biological_contexts", "genetic_reference", "genetic_reference_ids", "strain_code", "culture_stage", "substrate_code", "production_system", "environmental_quality_control", "upstream_execution_id", "upstream_result_id", "artifact_sha256", "quality_flags", "qcProvenance", "engine-upstream-qc", "engine-review-signals", "Points de vigilance", "environmental_qc_review_required", "gap_intervals", "duplicate_timestamp_groups", "outlier_evidence", "robust_z_score", "Séries environnementales contrôlées", "Valeurs atypiques", "biological_identity_conflict", "temporal_gaps_detected", "all_input_records_excluded", "no_observations_available", "partial_input_exclusion", "no_eligible_local_measurements", "no_linked_environmental_observations_supplied", "finding_code", "supporting_record_ids", "derived_feature_codes", "Aucune donnée admissible", "Aucune observation disponible", "Jeu de données partiellement écarté", "Ces signaux indiquent des éléments à examiner", "textContent"]) {
+for (const contract of ["biological.context_assessment", "record_counts_by_type", "missing_context", "observed_facts", "derived_features", "findings", "hypotheses", "temporal_gaps", "quality_flags", "limitations", "provenance", "source_references", "biological_contexts", "genetic_reference", "genetic_reference_ids", "strain_code", "culture_stage", "substrate_code", "production_system", "environmental_quality_control", "upstream_execution_id", "upstream_result_id", "artifact_sha256", "quality_flags", "qcProvenance", "engine-upstream-qc", "engine-review-signals", "Points de vigilance", "environmental_qc_review_required", "gap_intervals", "duplicate_timestamp_groups", "outlier_evidence", "robust_z_score", "rolling_baseline_anomaly_evidence", "baseline_median", "Anomalies par rapport à l'historique", "Séries environnementales contrôlées", "Valeurs atypiques", "biological_identity_conflict", "temporal_gaps_detected", "all_input_records_excluded", "no_observations_available", "partial_input_exclusion", "no_eligible_local_measurements", "no_linked_environmental_observations_supplied", "finding_code", "supporting_record_ids", "derived_feature_codes", "Aucune donnée admissible", "Aucune observation disponible", "Jeu de données partiellement écarté", "Ces signaux indiquent des éléments à examiner", "textContent"]) {
   assert.ok(biologicalRenderer.includes(contract), "Missing BIE UI contract: " + contract);
 }
 assert.doesNotMatch(biologicalRenderer, /innerHTML|insertAdjacentHTML/);
@@ -139,13 +139,13 @@ for (const path of [
   const page = readFileSync(path, "utf8");
   if (path.includes("green-tech")) {
     assert.match(page, /workspace\.html\?v=20261113-bie-identity-ui-1/);
-    assert.match(page, /tracker\.js\?v=20261114-environmental-qc-evidence-1/);
-    assert.match(page, /tracker\.css\?v=20261114-environmental-qc-evidence-1/);
+    assert.match(page, /tracker\.js\?v=20261114-rolling-baseline-anomalies-1/);
+    assert.match(page, /tracker\.css\?v=20261114-rolling-baseline-anomalies-1/);
     assert.match(page, /environmental-data\.js\?v=20261112-greentech-engine-qc-1/);
   } else {
     assert.match(page, /workspace\.html\?v=20261113-bie-identity-ui-1/);
-    assert.match(page, /tracker\.js\?v=20261114-environmental-qc-evidence-1/);
-    assert.match(page, /tracker\.css\?v=20261114-environmental-qc-evidence-1/);
+    assert.match(page, /tracker\.js\?v=20261114-rolling-baseline-anomalies-1/);
+    assert.match(page, /tracker\.css\?v=20261114-rolling-baseline-anomalies-1/);
   }
 }
 
