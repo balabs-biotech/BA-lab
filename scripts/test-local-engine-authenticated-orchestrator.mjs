@@ -378,6 +378,7 @@ try {
   }
   process.stdout.write("ok live QC to BIE: exact QC result ID, dependency snapshot, canonical SHA-256 artifact and validated biological assertion lineage persisted\\n");
 
+  const unavailableQcIdempotencyKey = `auth-bie-missing-qc-${randomUUID()}`;
   const bieUnavailableQc = await invoke(userAccessToken, {
     organization_id: organizationId,
     engine_id: "biological.context.features",
@@ -385,7 +386,7 @@ try {
     upstream_qc_execution_id: randomUUID(),
     scope: { organization_id: organizationId, culture_id: cultureId },
     parameters: { window_start: windowStart, window_end: windowEnd, timezone: "Africa/Algiers" },
-    idempotency_key: `auth-bie-missing-qc-${randomUUID()}`,
+    idempotency_key: unavailableQcIdempotencyKey,
   });
   assertResponse(
     "BIE rejects unavailable upstream QC execution",
@@ -394,6 +395,7 @@ try {
     "upstream_qc_execution_unavailable_or_incompatible",
   );
 
+  const mismatchedQcIdempotencyKey = `auth-bie-qc-window-mismatch-${randomUUID()}`;
   const bieMismatchedQcWindow = await invoke(userAccessToken, {
     organization_id: organizationId,
     engine_id: "biological.context.features",
@@ -405,7 +407,7 @@ try {
       window_end: "2026-11-13T00:00:00Z",
       timezone: "Africa/Algiers",
     },
-    idempotency_key: `auth-bie-qc-window-mismatch-${randomUUID()}`,
+    idempotency_key: mismatchedQcIdempotencyKey,
   });
   assertResponse(
     "BIE rejects upstream QC window mismatch",
@@ -413,6 +415,16 @@ try {
     422,
     "upstream_qc_scope_or_window_mismatch",
   );
+
+  for (const rejectedKey of [unavailableQcIdempotencyKey, mismatchedQcIdempotencyKey]) {
+    const unexpectedRows = await api(
+      `/rest/v1/engine_executions?organization_id=eq.${organizationId}&idempotency_key=eq.${encodeURIComponent(rejectedKey)}&select=id`,
+    );
+    if (unexpectedRows.length !== 0) {
+      throw new Error(`Rejected BIE request ${rejectedKey} unexpectedly created an execution ledger row`);
+    }
+  }
+  process.stdout.write("ok rejected QC dependencies leave no BIE execution ledger rows\\n");
 
   const unmemberedOrganizationId = randomUUID();
 
