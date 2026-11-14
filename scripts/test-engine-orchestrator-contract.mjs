@@ -12,7 +12,7 @@ const checks = [
   ["profile applicability requires the entire analysis window", /profile\.valid_from <= windowStartDate[\s\S]*?profile\.valid_to >= windowLastIncludedDate/, biologicalProfile],
   ["only validated references are eligible for interpretation", /reference\.status !== "validated"/, biologicalProfile],
   ["reference manifest preserves the stored SHA-256", /content_sha256: row\.content_sha256/, biologicalProfile],
-  ["profile manifest verifies the persisted canonical profile digest before use", /expectedProfileDigest = await sha256\(stable\([\s\S]*?expectedProfileDigest !== profile\.content_sha256[\s\S]*?content_sha256: profile\.content_sha256/, biologicalProfile],
+  ["profile manifest verifies persisted digests and computes a digest for immutable legacy profiles", /expectedProfileDigest = await sha256\(stable\([\s\S]*?expectedProfileDigest !== persistedProfileDigest[\s\S]*?content_sha256: profileDigest/, biologicalProfile],
   ["profile lookup selects the persisted content digest", /\.select\("id,organization_id,domain,profile_code,profile_version,rules,content_sha256,status,valid_from,valid_to,created_at"\)/, biologicalProfile],
   ["profile lookup is organization and caller scoped", /userClient\.from\("domain_interpretation_profiles"\)[\s\S]*?\.eq\("organization_id", organizationId\)/, biologicalProfile],
   ["reference lookup is organization scoped and validated only", /userClient\.from\("biological_reference_registry"\)[\s\S]*?\.eq\("organization_id", organizationId\)[\s\S]*?\.eq\("status", "validated"\)/, biologicalProfile],
