@@ -63,6 +63,8 @@ const checks = [
   ["idempotency binds the exact upstream QC artifact digest and payload", /stable\(prior\.request_payload\?\.upstream_artifacts \?\? \[\]\) === stable\(request\.upstream_artifacts \?\? \[\]\)/],
   ["idempotency comparison binds the upstream artifact envelope", /upstream_artifacts[\s\S]*?sameExecutionInput/],
   ["worker response is schema validated", /validateResponse/],
+  ["completed BIE responses must preserve every upstream QC artifact identity, digest, scope and payload field", /lineageMatches = object\(consumedQc\)[\s\S]*?consumedQc\.upstream_execution_id === expectedArtifact\.execution_id[\s\S]*?consumedQc\.artifact_sha256 === expectedArtifact\.artifact_sha256[\s\S]*?stable\(consumedQc\.value\) === stable\(expectedArtifact\.result\.value\)/],
+  ["upstream QC lineage mismatch is persisted as a terminal worker-owned failure before result commit", /upstream_artifact_lineage_mismatch[\s\S]*?persistExecutionFailure[\s\S]*?workerId[\s\S]*?return reply/],
   ["failed execution writes are scoped to queued state or the exact running worker owner", /async function persistExecutionFailure[\s\S]*?claimedWorkerId[\s\S]*?update\.eq\("claimed_by", claimedWorkerId\)\.eq\("status", "running"\)[\s\S]*?update\.eq\("status", "queued"\)/],
   ["async dispatch mode durably enqueues and returns 202 without calling the worker inline", /BA_ENGINE_ASYNC_DISPATCH[\s\S]*?return reply\(202,[\s\S]*?status: "queued"/],
   ["async mode does not require the worker URL or token in the API enqueue path", /asyncDispatchEnabled[\s\S]*?!asyncDispatchEnabled && \(!workerUrl \|\| !workerToken\)/],
