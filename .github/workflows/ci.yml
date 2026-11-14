@@ -396,6 +396,8 @@ jobs:
           deno cache
           supabase/functions/engine-orchestrator/index.ts
           supabase/functions/engine-queue-dispatch/index.ts
+      - name: Syntax-check local Edge runtime smoke test
+        run: node --check scripts/test-local-engine-edge-runtime.mjs
       - name: Compile engine JSON contracts with AJV strict mode
         run: deno run --allow-read scripts/test-engine-ajv-strict.ts
 
