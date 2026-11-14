@@ -1,4 +1,4 @@
-import { randomUUID } from "node:crypto";
+import { createHash, randomUUID } from "node:crypto";
 import { spawnSync } from "node:child_process";
 
 const supabaseUrl = process.env.SUPABASE_URL ?? "http://127.0.0.1:54321";
@@ -267,10 +267,14 @@ try {
     throw new Error("QC worker result was not atomically persisted against the queued execution");
   }
   const resultRows = await api(
-    `/rest/v1/engine_execution_results?execution_id=eq.${qcExecutionId}&organization_id=eq.${organizationId}&select=id,outcome,value,limitations,quality_flags,provenance,input_record_ids`,
+    `/rest/v1/engine_execution_results?execution_id=eq.${qcExecutionId}&organization_id=eq.${organizationId}&select=id,execution_id,engine_id,engine_version,outcome,value,limitations,quality_flags,provenance,input_record_ids,input_snapshot_sha256,generated_at`,
   );
   const qcResult = resultRows?.[0];
   if (!qcResult || !["success", "review_required", "insufficient_data"].includes(qcResult.outcome) ||
+      qcResult.execution_id !== qcExecutionId ||
+      qcResult.engine_id !== "environmental.timeseries.qc" ||
+      qcResult.engine_version !== "0.2.0" ||
+      qcResult.input_snapshot_sha256 !== stored.request_payload?.input?.snapshot_sha256 ||
       JSON.stringify(qcResult.input_record_ids) !== JSON.stringify(recordIds) ||
       !qcResult.provenance || typeof qcResult.provenance !== "object") {
     throw new Error("QC worker result row is missing or does not preserve its source record lineage");
@@ -295,8 +299,10 @@ try {
   );
   if (dependencyRows?.length !== 1 ||
       dependencyRows[0].dependency_role !== "environmental_qc" ||
-      dependencyRows[0].upstream_execution_id !== qcExecutionId) {
-    throw new Error("BIE enqueue did not persist the immutable QC dependency edge");
+      dependencyRows[0].upstream_execution_id !== qcExecutionId ||
+      dependencyRows[0].upstream_result_id !== qcResult.id ||
+      dependencyRows[0].upstream_input_snapshot_sha256 !== qcResult.input_snapshot_sha256) {
+    throw new Error("BIE enqueue did not persist the exact immutable QC result and snapshot dependency edge");
   }
   process.stdout.write("ok QC to BIE enqueue: verified artifact and immutable dependency edge persisted\\n");
 
@@ -317,12 +323,41 @@ try {
   );
   const bieResult = bieResultRows?.[0];
   const qcAssessment = bieResult?.value?.environmental_quality_control;
+  const expectedQcArtifact = {
+    contract: "BA-LABS/UPSTREAM-ENGINE-ARTIFACT",
+    contract_version: "1.0.0",
+    role: "environmental_qc",
+    execution_id: qcExecutionId,
+    result_id: qcResult.id,
+    request_id: completed.request_payload?.request_id,
+    engine_id: qcResult.engine_id,
+    engine_version: qcResult.engine_version,
+    completed_at: completed.completed_at,
+    input_snapshot_sha256: qcResult.input_snapshot_sha256,
+    scope: {
+      organization_id: organizationId,
+      location_id: locationId,
+      window_start: windowStart,
+      window_end: windowEnd,
+    },
+    result: {
+      outcome: qcResult.outcome,
+      value: qcResult.value,
+      limitations: qcResult.limitations,
+      quality_flags: qcResult.quality_flags,
+      provenance: qcResult.provenance,
+    },
+  };
+  const expectedQcArtifactSha256 = createHash("sha256")
+    .update(canonicalJson(expectedQcArtifact))
+    .digest("hex");
   if (bieCompleted?.status !== "completed" ||
       bieCompleted.result_payload?.status !== "completed" ||
       !bieResult ||
       qcAssessment?.upstream_execution_id !== qcExecutionId ||
-      qcAssessment?.upstream_result_id !== dependencyRows[0].upstream_result_id ||
+      qcAssessment?.upstream_result_id !== qcResult.id ||
       !/^[a-f0-9]{64}$/.test(qcAssessment?.artifact_sha256 ?? "") ||
+      qcAssessment?.artifact_sha256 !== expectedQcArtifactSha256 ||
       qcAssessment?.outcome !== qcResult.outcome ||
       canonicalJson(qcAssessment?.quality_flags) !== canonicalJson([...(qcResult.quality_flags ?? [])].sort()) ||
       canonicalJson(qcAssessment?.limitations) !== canonicalJson(qcResult.limitations) ||
@@ -341,7 +376,7 @@ try {
       !bieResult.provenance?.source_references?.some((item) => item.startsWith("BA_LABS_BIOLOGICAL_REFERENCE_SOURCE/ci.biological.reference."))) {
     throw new Error("BIE did not persist the verified QC artifact and validated biological assertion lineage");
   }
-  process.stdout.write("ok live QC to BIE: worker consumed QC plus validated biological assertion and persisted both provenance chains\\n");
+  process.stdout.write("ok live QC to BIE: exact QC result ID, dependency snapshot, canonical SHA-256 artifact and validated biological assertion lineage persisted\\n");
 
   const unmemberedOrganizationId = randomUUID();
 
