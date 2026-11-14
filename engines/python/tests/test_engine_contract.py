@@ -343,6 +343,13 @@ class EngineContractTests(unittest.TestCase):
         self.assertEqual(evidence["record_id"], request["input"]["record_ids"][5])
         self.assertEqual(evidence["baseline_median"], 20.0)
         self.assertEqual(evidence["history_point_count"], 5)
+        self.assertEqual(
+            evidence["history_record_ids"],
+            request["input"]["record_ids"][:5],
+        )
+        self.assertEqual(evidence["history_start_at"], "2026-11-12T08:00:00Z")
+        self.assertEqual(evidence["history_end_at"], "2026-11-12T08:04:00Z")
+        self.assertEqual(evidence["deviation_from_baseline"], 10.0)
         self.assertEqual(evidence["method"], "trailing_rolling_median_mad")
         self.assertIn("no seasonal, diurnal or biological-stage adjustment", result["result"]["limitations"][2])
 
