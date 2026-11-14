@@ -250,6 +250,11 @@ def _evaluate_biological_reference_assertions(
             elif not context_matches:
                 applicability_state = "not_applicable"
 
+        if context_match is None and validity_window is not None:
+            matching_context_ids = [
+                context["context_id"] for context in biological_contexts
+                if isinstance(context, dict) and isinstance(context.get("context_id"), str)
+            ]
         if context_match is None and validity_window is None:
             applicability_state = "not_assessed"
         elif not biological_contexts:
