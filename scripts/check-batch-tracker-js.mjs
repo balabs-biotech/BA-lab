@@ -325,6 +325,29 @@ for(const snippet of [
 ])if(!upstreamQcLinkBlock.includes(snippet) && !engine.includes(snippet))throw new Error("QC-to-BIE execution navigation regression: "+snippet);
 console.log("✓ Biological assessment links to its recorded upstream QC execution when available");
 
+const qcTraceStart=engine.indexOf('const traceButton = document.createElement("button")',engine.indexOf("function renderBiologicalContextAssessment"));
+const qcTraceEnd=engine.indexOf("qcDetails.append(traceButton, traceOutput);",qcTraceStart);
+if(qcTraceStart<0||qcTraceEnd<0)throw new Error("Environmental QC source trace handler is missing");
+const qcTraceBlock=engine.slice(qcTraceStart,qcTraceEnd);
+for(const snippet of [
+  '.eq("organization_id", expectedOrganizationId)',
+  '.eq("id", upstreamExecutionId)',
+  '.from("environmental_observations")',
+  '.in("id", ids)',
+  'organizationId !== expectedOrganizationId',
+  'input_snapshot_sha256',
+  'retrieved_at',
+  'data_family',
+  'location_id',
+  'source_url',
+  'sourceUrl.protocol === "https:"',
+  'sourceUrl.protocol === "http:"',
+  'link.rel = "noopener noreferrer"',
+  'Identifiants non résolus'
+])if(!qcTraceBlock.includes(snippet))throw new Error("Environmental source trace regression: "+snippet);
+console.log("✓ QC provenance drilldown is tenant-scoped, snapshot-aware and exposes source family, retrieval time, location, missing IDs and guarded provider links");
+
+
 
 const assertionFilterStart=engine.indexOf("const allReferenceAssertions = Array.isArray(subject.biological_reference_assertions)");
 const assertionFilterEnd=engine.indexOf("const contextById = new Map(biologicalContexts.map",assertionFilterStart);
