@@ -150,12 +150,12 @@ for (const path of [
   if (path.includes("green-tech")) {
     assert.match(page, /workspace\.html\?v=20261113-bie-identity-ui-1/);
     assert.match(page, /tracker\.js\?v=20261115-bie-qc-provenance-select-1/);
-    assert.match(page, /tracker\.css\?v=20261115-bie-review-panel-dedup-1/);
+    assert.match(page, /tracker\.css\?v=20261115-bie-qc-provenance-select-1/);
     assert.match(page, /environmental-data\.js\?v=20261112-greentech-engine-qc-1/);
   } else {
     assert.match(page, /workspace\.html\?v=20261113-bie-identity-ui-1/);
     assert.match(page, /tracker\.js\?v=20261115-bie-qc-provenance-select-1/);
-    assert.match(page, /tracker\.css\?v=20261115-bie-review-panel-dedup-1/);
+    assert.match(page, /tracker\.css\?v=20261115-bie-qc-provenance-select-1/);
   }
 }
 
