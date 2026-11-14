@@ -483,6 +483,11 @@
         "state",
         "upstream_execution_id",
         "upstream_result_id",
+        "upstream_engine_id",
+        "upstream_engine_version",
+        "upstream_completed_at",
+        "upstream_input_snapshot_sha256",
+        "upstream_scope",
         "artifact_sha256",
         "outcome",
         "quality_flags",
@@ -504,6 +509,31 @@
         "upstream_result_id": {
           "type": "string",
           "format": "uuid"
+        },
+        "upstream_engine_id": {
+          "const": "environmental.timeseries.qc"
+        },
+        "upstream_engine_version": {
+          "const": "0.2.0"
+        },
+        "upstream_completed_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "upstream_input_snapshot_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "upstream_scope": {
+          "type": "object",
+          "required": ["organization_id", "location_id", "window_start", "window_end"],
+          "properties": {
+            "organization_id": {"type": "string", "format": "uuid"},
+            "location_id": {"type": "string", "format": "uuid"},
+            "window_start": {"type": "string", "format": "date-time"},
+            "window_end": {"type": "string", "format": "date-time"}
+          },
+          "additionalProperties": false
         },
         "artifact_sha256": {
           "type": "string",
