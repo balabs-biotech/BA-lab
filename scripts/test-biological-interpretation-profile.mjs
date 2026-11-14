@@ -182,6 +182,15 @@ await assert.rejects(
   /interpretation_profile_content_hash_mismatch/,
 );
 
+const legacyProfile = await buildBiologicalInterpretationProfile({
+  ...input,
+  profiles: [{ ...profile, content_sha256: null }],
+});
+assert.equal(
+  legacyProfile.datasets[0].content_sha256,
+  profileDigest("mycology.biological.context.features", "1.0.0", [rule]),
+);
+
 const missingReference = await assert.rejects(
   buildBiologicalInterpretationProfile({ ...input, references: [] }),
   /interpretation_reference_not_validated/,
