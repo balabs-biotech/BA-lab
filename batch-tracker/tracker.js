@@ -7502,7 +7502,7 @@ function renderBiologicalContextAssessment(article, result) {
         if (!expectedOrganizationId) throw new Error("Session organisationnelle absente.");
         const { data: upstream, error: upstreamError } = await supabaseClient
           .from("engine_executions")
-          .select("id,engine_id,engine_version,input_record_ids,input_snapshot_sha256,scope,created_at,completed_at")
+          .select("id,status,engine_id,engine_version,input_record_ids,input_snapshot_sha256,scope,request_payload,created_at,completed_at")
           .eq("organization_id", expectedOrganizationId)
           .eq("id", upstreamExecutionId)
           .maybeSingle();
