@@ -58,12 +58,21 @@ def analyze_environmental_timeseries_qc(request: Mapping[str, Any]) -> dict[str,
     max_gap_minutes = parameters.get("max_gap_minutes", default_max_gap_minutes)
     outlier_threshold = parameters.get("outlier_mad_threshold", 3.5)
     minimum_points = parameters.get("minimum_points", 3)
+    rolling_window_points = parameters.get("rolling_baseline_window_points", 12)
+    rolling_min_history = parameters.get("rolling_baseline_min_history", 5)
+    rolling_threshold = parameters.get("rolling_baseline_mad_threshold", outlier_threshold)
     if isinstance(max_gap_minutes, bool) or not isinstance(max_gap_minutes, (int, float)) or not isfinite(max_gap_minutes) or max_gap_minutes <= 0:
         raise ValueError("invalid_max_gap_minutes")
     if isinstance(outlier_threshold, bool) or not isinstance(outlier_threshold, (int, float)) or not isfinite(outlier_threshold) or outlier_threshold <= 0:
         raise ValueError("invalid_outlier_mad_threshold")
     if isinstance(minimum_points, bool) or not isinstance(minimum_points, int) or minimum_points < 2:
         raise ValueError("invalid_minimum_points")
+    if isinstance(rolling_window_points, bool) or not isinstance(rolling_window_points, int) or rolling_window_points < 3:
+        raise ValueError("invalid_rolling_baseline_window_points")
+    if isinstance(rolling_min_history, bool) or not isinstance(rolling_min_history, int) or rolling_min_history < 3 or rolling_min_history > rolling_window_points:
+        raise ValueError("invalid_rolling_baseline_min_history")
+    if isinstance(rolling_threshold, bool) or not isinstance(rolling_threshold, (int, float)) or not isfinite(rolling_threshold) or rolling_threshold <= 0:
+        raise ValueError("invalid_rolling_baseline_mad_threshold")
 
     grouped: dict[tuple[str, str], list[tuple[datetime, float, str]]] = defaultdict(list)
     rejected_records: list[dict[str, str]] = []
@@ -169,6 +178,39 @@ def analyze_environmental_timeseries_qc(request: Mapping[str, Any]) -> dict[str,
             }
             for index in sorted(outlier_indexes)
         ]
+        rolling_anomaly_evidence = []
+        for index in range(rolling_min_history, len(points)):
+            history = values[max(0, index - rolling_window_points):index]
+            baseline = median(history)
+            baseline_mad = median([abs(item - baseline) for item in history])
+            current_value = values[index]
+            if baseline_mad == 0:
+                if current_value != baseline:
+                    rolling_anomaly_evidence.append({
+                        "record_id": points[index][2],
+                        "observed_at": _iso_utc(points[index][0]),
+                        "observed_value": current_value,
+                        "baseline_median": baseline,
+                        "baseline_mad": 0,
+                        "robust_z_score": None,
+                        "threshold": float(rolling_threshold),
+                        "history_point_count": len(history),
+                        "method": "zero_mad_deviation",
+                    })
+                continue
+            robust_score = abs(current_value - baseline) / (1.4826 * baseline_mad)
+            if robust_score > rolling_threshold:
+                rolling_anomaly_evidence.append({
+                    "record_id": points[index][2],
+                    "observed_at": _iso_utc(points[index][0]),
+                    "observed_value": current_value,
+                    "baseline_median": baseline,
+                    "baseline_mad": baseline_mad,
+                    "robust_z_score": round(robust_score, 4),
+                    "threshold": float(rolling_threshold),
+                    "history_point_count": len(history),
+                    "method": "trailing_rolling_median_mad",
+                })
         flags = []
         if len(points) < minimum_points:
             flags.append("insufficient_series_points")
@@ -178,6 +220,8 @@ def analyze_environmental_timeseries_qc(request: Mapping[str, Any]) -> dict[str,
             flags.append("sampling_gap_detected")
         if outlier_indexes:
             flags.append("robust_outlier_detected")
+        if rolling_anomaly_evidence:
+            flags.append("rolling_baseline_anomaly_detected")
         all_flags.update(flags)
         total_points += len(points)
         series_results.append({
@@ -193,6 +237,7 @@ def analyze_environmental_timeseries_qc(request: Mapping[str, Any]) -> dict[str,
             "duplicate_timestamp_groups": duplicate_timestamp_groups,
             "outlier_record_ids": [points[index][2] for index in sorted(outlier_indexes)],
             "outlier_evidence": outlier_evidence,
+            "rolling_baseline_anomaly_evidence": rolling_anomaly_evidence,
             "quality_flags": flags,
         })
 
@@ -200,6 +245,7 @@ def analyze_environmental_timeseries_qc(request: Mapping[str, Any]) -> dict[str,
     limitations = [
         "This engine performs data-quality screening only; it does not infer biological stress or prescribe interventions.",
         "Robust outlier flags are statistical review signals, not evidence that an observation is erroneous.",
+        "Rolling baseline anomalies compare each point only with preceding observations; no seasonal, diurnal or biological-stage adjustment is applied, so these signals require contextual review.",
     ]
     if rejected_records:
         limitations.append("Some records were excluded because required values, units, source context or timestamps were missing or invalid.")
