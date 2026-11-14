@@ -12,6 +12,20 @@ const routeSmokeJwt = [
 ].join(".");
 if (!anonKey) throw new Error("ANON_KEY must be exported by supabase status -o env");
 
+async function assertUnauthorized(name, extraHeaders = {}) {
+  const response = await fetch(`${baseUrl}/${name}`, {
+    method: "POST",
+    headers: { "content-type": "application/json", "apikey": anonKey, ...extraHeaders },
+    body: "{}",
+    signal: AbortSignal.timeout(10_000),
+  });
+  const body = await response.json().catch(() => null);
+  if (response.status !== 401 || body?.error !== "authentication_required") {
+    throw new Error(`${name}: expected 401/authentication_required, received ${response.status}/${JSON.stringify(body)}`);
+  }
+  process.stdout.write(`ok ${name}: rejected request without caller/dispatcher credentials\\n`);
+}
+
 async function assertFunction(name, { headers, expectedStatus, expectedError }) {
   const response = await fetch(`${baseUrl}/${name}`, {
     method: "POST",
@@ -25,6 +39,9 @@ async function assertFunction(name, { headers, expectedStatus, expectedError }) 
   }
   process.stdout.write(`ok ${name}: reached handler and received ${expectedStatus}/${expectedError}\n`);
 }
+
+await assertUnauthorized("engine-orchestrator");
+await assertUnauthorized("engine-queue-dispatch", { "x-ba-dispatch-secret": "" });
 
 await assertFunction("engine-orchestrator", {
   headers: {},
