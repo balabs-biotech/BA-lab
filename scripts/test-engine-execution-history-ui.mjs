@@ -71,6 +71,15 @@ const biologicalRenderer = tracker.slice(biologicalRendererStart, rendererStart)
 for (const contract of ["biological.context_assessment", "record_counts_by_type", "missing_context", "observed_facts", "derived_features", "findings", "hypotheses", "temporal_gaps", "quality_flags", "limitations", "provenance", "source_references", "biological_contexts", "genetic_reference", "genetic_reference_ids", "strain_code", "culture_stage", "substrate_code", "production_system", "environmental_quality_control", "upstream_execution_id", "upstream_result_id", "artifact_sha256", "quality_flags", "qcProvenance", "engine-upstream-qc", "engine-review-signals", "Points de vigilance", "environmental_qc_review_required", "gap_intervals", "duplicate_timestamp_groups", "outlier_evidence", "robust_z_score", "rolling_baseline_anomaly_evidence", "baseline_median", "Anomalies par rapport à l'historique", "Séries environnementales contrôlées", "Valeurs atypiques", "biological_identity_conflict", "temporal_gaps_detected", "all_input_records_excluded", "no_observations_available", "partial_input_exclusion", "no_eligible_local_measurements", "no_linked_environmental_observations_supplied", "finding_code", "supporting_record_ids", "derived_feature_codes", "Aucune donnée admissible", "Aucune observation disponible", "Jeu de données partiellement écarté", "Ces signaux indiquent des éléments à examiner", "textContent"]) {
   assert.ok(biologicalRenderer.includes(contract), "Missing BIE UI contract: " + contract);
 }
+assert.match(biologicalRenderer, /Remonter aux observations environnementales/);
+assert.match(biologicalRenderer, /from\("engine_executions"\)/);
+assert.match(biologicalRenderer, /from\("environmental_observations"\)/);
+assert.match(biologicalRenderer, /\.eq\("organization_id", expectedOrganizationId\)/);
+assert.match(biologicalRenderer, /\.in\("id", ids\)/);
+assert.match(biologicalRenderer, /input_record_ids/);
+assert.match(biologicalRenderer, /Identifiants non résolus dans environmental_observations/);
+assert.match(biologicalRenderer, /organizationId !== expectedOrganizationId/);
+assert.match(biologicalRenderer, /aria-live/);
 assert.doesNotMatch(biologicalRenderer, /innerHTML|insertAdjacentHTML/);
 assert.match(renderer, /renderBiologicalContextAssessment\(article, result\)/);
 
