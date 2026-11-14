@@ -166,7 +166,7 @@ const adjacentSameEnvironment = resolveBiologicalContext({
     { ...contexts[1], id: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaab", environment_id: envA, valid_from: "2026-11-11", valid_to: "2026-11-12" },
   ],
   measurements: [],
-  window: { start: "2026-11-10T00:00:00Z", end: "2026-11-12T00:00:00Z", timezone: "Africa/Algiers" },
+  window: { start: "2026-11-09T23:00:00Z", end: "2026-11-11T23:00:00Z", timezone: "Africa/Algiers" },
 });
 assert.equal(adjacentSameEnvironment.window.status, "resolved",
   "adjacent intervals for the same environment should continuously cover the half-open window");
