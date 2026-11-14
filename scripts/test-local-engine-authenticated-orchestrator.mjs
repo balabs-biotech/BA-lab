@@ -1,13 +1,25 @@
-import { randomUUID } from "node:crypto";
+import { createHmac, randomUUID } from "node:crypto";
 
 const supabaseUrl = process.env.SUPABASE_URL ?? "http://127.0.0.1:54321";
 const anonKey = process.env.ANON_KEY ?? "";
 const serviceRoleKey = process.env.SERVICE_ROLE_KEY ?? "";
-if (!anonKey || !serviceRoleKey) {
-  throw new Error("ANON_KEY and SERVICE_ROLE_KEY must be exported by supabase status -o env");
+const jwtSecret = process.env.JWT_SECRET ?? "";
+if (!anonKey || !serviceRoleKey || !jwtSecret) {
+  throw new Error("ANON_KEY, SERVICE_ROLE_KEY and JWT_SECRET must be exported by supabase status -o env");
 }
 
-async function api(path, { method = "GET", key = serviceRoleKey, authorization = key, body, headers = {} } = {}) {
+function createServiceRoleJwt() {
+  const encode = (value) => Buffer.from(JSON.stringify(value)).toString("base64url");
+  const header = encode({ alg: "HS256", typ: "JWT" });
+  const now = Math.floor(Date.now() / 1000);
+  const payload = encode({ iss: "supabase", role: "service_role", aud: "authenticated", sub: "service_role", iat: now, exp: now + 300 });
+  const unsigned = `${header}.${payload}`;
+  const signature = createHmac("sha256", jwtSecret).update(unsigned).digest("base64url");
+  return `${unsigned}.${signature}`;
+}
+const serviceRoleJwt = createServiceRoleJwt();
+
+async function api(path, { method = "GET", key = serviceRoleKey, authorization = serviceRoleJwt, body, headers = {} } = {}) {
   const response = await fetch(`${supabaseUrl}${path}`, {
     method,
     headers: {
