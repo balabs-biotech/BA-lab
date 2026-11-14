@@ -7463,6 +7463,43 @@ function renderBiologicalContextAssessment(article, result) {
       " · " + String(item.evidence_level || "niveau de preuve non précisé") +
       " · " + source + digest;
   }, 12);
+  addList(article, "Assertions d’identité vérifiées", subject.identity_assertions, item => {
+    const source = item.source_reference_id && item.source_reference_version
+      ? item.source_reference_id + "@" + item.source_reference_version
+      : "source indisponible";
+    const digest = typeof item.content_sha256 === "string" ? " · SHA-256 " + item.content_sha256.slice(0, 12) : "";
+    return String(item.assertion_type || "assertion") + " : " +
+      String(item.assertion_value || "valeur indisponible") +
+      " · " + String(item.evidence_level || "niveau de preuve non précisé") +
+      " · " + source + digest;
+  }, 12);
+  const referenceAssertionState = subject.biological_reference_assertion_state || "not_documented";
+  const referenceAssertionLabels = {
+    documented: "Assertions scientifiques documentées",
+    not_documented: "Aucune assertion scientifique validée",
+    conflicting: "Assertions scientifiques contradictoires",
+    not_applicable: "Aucune assertion applicable à ce contexte"
+  };
+  addLine(article, "Références scientifiques : " +
+    String(referenceAssertionLabels[referenceAssertionState] || "État des références inconnu"));
+  addList(article, "Assertions bibliographiques validées", subject.biological_reference_assertions, item => {
+    const source = item.source || {};
+    const sourceLabel = source.reference_id && source.reference_version
+      ? source.reference_id + "@" + source.reference_version
+      : "source indisponible";
+    const objectValue = item.object_value && typeof item.object_value === "object"
+      ? JSON.stringify(item.object_value).slice(0, 240)
+      : String(item.object_value ?? "valeur non renseignée");
+    const digest = typeof item.content_sha256 === "string"
+      ? " · SHA-256 " + item.content_sha256.slice(0, 12)
+      : "";
+    return String(item.subject_type || "sujet") + ":" + String(item.subject_ref || "référence inconnue") +
+      " · " + String(item.predicate_code || "prédicat inconnu") + " = " + objectValue +
+      " · preuve " + String(item.evidence_level || "non évaluée") +
+      " · applicabilité " + String(item.applicability_state || "non évaluée") +
+      " · " + sourceLabel +
+      (item.source_locator ? " · repère " + String(item.source_locator) : "") + digest;
+  }, 12);
   const outcomeLabels = {
     success: "Analyse exploitable",
     insufficient_data: "Données insuffisantes",
@@ -7510,6 +7547,29 @@ function renderBiologicalContextAssessment(article, result) {
   }
   if (identityState === "conflicting") {
     reviewSignals.push({code:"biological_identity_conflict",label:"Identité biologique contradictoire",evidence:"Les assertions d'identité disponibles ne concordent pas."});
+  }
+  if (referenceAssertionState === "conflicting") {
+    reviewSignals.push({
+      code:"biological_reference_assertions_conflict",
+      label:"Références scientifiques contradictoires",
+      evidence:"Plusieurs valeurs validées revendiquent le même sujet et le même prédicat ; aucune n'est sélectionnée automatiquement."
+    });
+  }
+  const referenceAssertions = Array.isArray(subject.biological_reference_assertions)
+    ? subject.biological_reference_assertions : [];
+  if (referenceAssertions.some(item => item?.applicability_state === "undetermined")) {
+    reviewSignals.push({
+      code:"biological_reference_applicability_undetermined",
+      label:"Applicabilité scientifique indéterminée",
+      evidence:"Au moins une assertion ne peut pas être comparée aux champs du contexte biologique disponibles."
+    });
+  }
+  if (referenceAssertions.some(item => item?.applicability_state === "not_assessed")) {
+    reviewSignals.push({
+      code:"biological_reference_applicability_not_assessed",
+      label:"Applicabilité non évaluée",
+      evidence:"Au moins une assertion ne contient pas de règle explicite de correspondance au contexte."
+    });
   }
   const unresolvedContext = missingContext.map(code => missingContextLabels[code] || String(code));
   if (unresolvedContext.length) {
