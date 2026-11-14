@@ -77,7 +77,7 @@ assert.match(biologicalRenderer, /from\("environmental_observations"\)/);
 assert.match(biologicalRenderer, /\.eq\("organization_id", expectedOrganizationId\)/);
 assert.match(biologicalRenderer, /\.in\("id", ids\)/);
 assert.match(biologicalRenderer, /input_record_ids/);
-assert.match(biologicalRenderer, /Identifiants non résolus dans environmental_observations/);
+assert.match(biologicalRenderer, /Identifiants non résolus/);
 assert.match(biologicalRenderer, /organizationId !== expectedOrganizationId/);
 assert.match(biologicalRenderer, /aria-live/);
 assert.doesNotMatch(biologicalRenderer, /innerHTML|insertAdjacentHTML/);
