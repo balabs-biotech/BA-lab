@@ -265,7 +265,7 @@
               "predicate_code": {
                 "type": "string",
                 "minLength": 1,
-                "maxLength": 159
+                "maxLength": 160
               },
               "object_value": {},
               "unit_code": {
