@@ -331,3 +331,25 @@ for(const snippet of [
 ])if(!assertionFilterBlock.includes(snippet))throw new Error("Biological assertion review filter regression: "+snippet);
 if(!assertionFilterBlock.includes("visibleReferenceAssertions.length + \" assertion(s) affichée(s) sur \""))throw new Error("Biological assertion filter count must report visible and total records");
 console.log("✓ Biological assertions can be filtered by applicability, evidence level and text with bounded results and an accessible count");
+const assertionComparisonStart=engine.indexOf("renderAssertionComparisons = () => {");
+const assertionComparisonEnd=engine.indexOf("const outcomeLabels = {",assertionComparisonStart);
+if(assertionComparisonStart<0||assertionComparisonEnd<0)throw new Error("Biological assertion comparison review is missing");
+const assertionComparisonBlock=engine.slice(assertionComparisonStart,assertionComparisonEnd);
+for(const snippet of [
+  "const assertions = visibleReferenceAssertions",
+  "left.subject_type !== right.subject_type",
+  "left.predicate_code !== right.predicate_code",
+  "left.object_value",
+  "left.matching_context_ids",
+  "context.valid_from",
+  "context.valid_to",
+  "pair.periodLabel",
+  "appendComparedSource(pair.left, \"Source A\")",
+  "appendComparedSource(pair.right, \"Source B\")",
+  "source.source_url",
+  'sourceUrl.protocol === "https:"',
+  'sourceUrl.protocol === "http:"',
+  'link.rel = "noopener noreferrer"'
+])if(!assertionComparisonBlock.includes(snippet))throw new Error("Biological assertion comparison provenance regression: "+snippet);
+console.log("✓ Assertion divergences expose both source dossiers, locators, validity windows and safely validated source links");
+
