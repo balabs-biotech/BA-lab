@@ -320,6 +320,7 @@
       "if": {
         "properties": {
           "engine": {
+            "type": "object",
             "properties": {
               "engine_id": {
                 "const": "biological.context.features"
