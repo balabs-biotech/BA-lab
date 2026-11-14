@@ -7377,6 +7377,14 @@ function renderBiologicalContextAssessment(article, result) {
     addLine(qcDetails, "Résultat QC : " + String(qc.outcome || "non documenté"));
     addLine(qcDetails, "Exécution QC : " + String(qc.upstream_execution_id || "identifiant indisponible"));
     addLine(qcDetails, "Résultat QC enregistré : " + String(qc.upstream_result_id || "identifiant indisponible"));
+    const upstreamExecution = recentEngineExecutions.find(item => item.id === qc.upstream_execution_id);
+    if (upstreamExecution) {
+      const upstreamLink = document.createElement("a");
+      upstreamLink.href = "#engine-execution-" +
+        String(upstreamExecution.id).replace(/[^a-zA-Z0-9_-]/g, "-");
+      upstreamLink.textContent = "Voir l'exécution QC amont";
+      qcDetails.appendChild(upstreamLink);
+    }
     addLine(qcDetails, "Empreinte SHA-256 : " + String(qc.artifact_sha256 || "indisponible"));
     addList(qcDetails, "Signaux qualité QC", qc.quality_flags, item => item, 12);
     const qcSeries = Array.isArray(qc.value?.series) ? qc.value.series : [];
@@ -7994,6 +8002,7 @@ function renderRecentEngineExecutions() {
   for (const execution of recentEngineExecutions) {
     const article = document.createElement("article");
     article.className = "overview-observation";
+    article.id = "engine-execution-" + String(execution.id).replace(/[^a-zA-Z0-9_-]/g, "-");
     const title = document.createElement("strong");
     title.textContent = execution.engine_id + " · v" + execution.engine_version;
     const status = document.createElement("span");
