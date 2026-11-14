@@ -431,7 +431,11 @@ jobs:
       - name: Exercise both deployed Edge handlers through Kong
         env:
           BA_ENGINE_DISPATCH_TOKEN: ci-dispatch-token-0123456789abcdef
-        run: node scripts/test-local-engine-edge-runtime.mjs
+        run: |
+          node scripts/test-local-engine-edge-runtime.mjs || {
+            cat /tmp/ba-labs-edge-runtime.log
+            exit 1
+          }
       - name: Stop local Supabase stack
         if: always()
         run: supabase stop --no-backup
