@@ -5,7 +5,7 @@
  */
 type Row = Record<string, any>;
 const ASSERTION_CODE = /^[a-z][a-z0-9_.-]{1,159}$/;
-const ASSERTION_VERSION = /^[0-9]+\\.[0-9]+\\.[0-9]+([+-][0-9A-Za-z.-]+)?$/;
+const ASSERTION_VERSION = /^[0-9]+\.[0-9]+\.[0-9]+([+-][0-9A-Za-z.-]+)?$/;
 const PREDICATE_CODE = /^[a-z][a-z0-9_.-]{1,158}$/;
 function isObject(value: unknown): value is Row {
   return !!value && typeof value === "object" && !Array.isArray(value);
@@ -95,7 +95,7 @@ export async function buildBiologicalReferenceAssertions(input: {
     const source = referenceMap.get(row.reference_registry_id);
     if (!source) throw new Error("biological_reference_assertion_source_not_validated");
     if (typeof source.source_url === "string" &&
-        !/^https?:\\/\\//i.test(source.source_url)) {
+        !/^https?:\/\//i.test(source.source_url)) {
       throw new Error("biological_reference_assertion_source_url_invalid");
     }
     const key = row.assertion_code + "@" + row.assertion_version;
