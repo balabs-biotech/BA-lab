@@ -4,6 +4,9 @@
  * Only context-matching claims are exposed; draft and retired claims are never read.
  */
 type Row = Record<string, any>;
+const ASSERTION_CODE = /^[a-z][a-z0-9_.-]{1,159}$/;
+const ASSERTION_VERSION = /^[0-9]+\\.[0-9]+\\.[0-9]+([+-][0-9A-Za-z.-]+)?$/;
+const PREDICATE_CODE = /^[a-z][a-z0-9_.-]{1,158}$/;
 function isObject(value: unknown): value is Row {
   return !!value && typeof value === "object" && !Array.isArray(value);
 }
@@ -72,17 +75,29 @@ export async function buildBiologicalReferenceAssertions(input: {
   const seen = new Set<string>();
   for (const row of input.assertions) {
     if (!isObject(row) || row.organization_id !== organizationId || row.status !== "validated") continue;
-    if (typeof row.assertion_code !== "string" || typeof row.assertion_version !== "string" ||
+    if (typeof row.assertion_code !== "string" || !ASSERTION_CODE.test(row.assertion_code) ||
+        typeof row.assertion_version !== "string" || !ASSERTION_VERSION.test(row.assertion_version) ||
         typeof row.subject_type !== "string" || !SUBJECT_FIELDS[row.subject_type] ||
-        typeof row.subject_ref !== "string" || !subjectKeys.has(row.subject_type + ":" + row.subject_ref) ||
-        typeof row.predicate_code !== "string" || !isObject(row.applicability) ||
-        !isObject(row.uncertainty) || typeof row.evidence_level !== "string" ||
+        typeof row.subject_ref !== "string" || row.subject_ref.length > 240 ||
+        !subjectKeys.has(row.subject_type + ":" + row.subject_ref) ||
+        typeof row.predicate_code !== "string" || !PREDICATE_CODE.test(row.predicate_code) ||
+        row.object_value === null || row.object_value === undefined ||
+        (row.unit_code !== null && row.unit_code !== undefined &&
+          (typeof row.unit_code !== "string" || row.unit_code.length > 80)) ||
+        (row.source_locator !== null && row.source_locator !== undefined &&
+          (typeof row.source_locator !== "string" || row.source_locator.length > 2000)) ||
+        !isObject(row.applicability) || !isObject(row.uncertainty) ||
+        typeof row.evidence_level !== "string" ||
         !["L0", "L1", "L2", "L3", "L4", "L5", "unassessed"].includes(row.evidence_level) ||
         typeof row.reviewed_at !== "string" || typeof row.reference_registry_id !== "string") {
       continue;
     }
     const source = referenceMap.get(row.reference_registry_id);
     if (!source) throw new Error("biological_reference_assertion_source_not_validated");
+    if (typeof source.source_url === "string" &&
+        !/^https?:\\/\\//i.test(source.source_url)) {
+      throw new Error("biological_reference_assertion_source_url_invalid");
+    }
     const key = row.assertion_code + "@" + row.assertion_version;
     if (seen.has(key)) throw new Error("biological_reference_assertion_identity_ambiguous");
     seen.add(key);
