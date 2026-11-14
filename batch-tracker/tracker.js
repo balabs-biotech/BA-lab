@@ -7421,6 +7421,86 @@ function renderBiologicalContextAssessment(article, result) {
     if (Array.isArray(qcProvenance.source_references)) {
       addList(qcDetails, "Sources du contrôle QC", qcProvenance.source_references, item => item, 8);
     }
+    const traceButton = document.createElement("button");
+    traceButton.type = "button";
+    traceButton.className = "secondary";
+    traceButton.textContent = "Remonter aux observations environnementales";
+    const traceOutput = document.createElement("div");
+    traceOutput.className = "engine-upstream-trace";
+    traceOutput.setAttribute("aria-live", "polite");
+    traceButton.addEventListener("click", async () => {
+      const upstreamExecutionId = qc.upstream_execution_id;
+      if (typeof upstreamExecutionId !== "string" || !upstreamExecutionId) {
+        traceOutput.textContent = "Identifiant d’exécution QC indisponible : aucune remontée possible.";
+        return;
+      }
+      traceButton.disabled = true;
+      traceOutput.textContent = "Chargement de l’exécution QC et des observations liées…";
+      try {
+        const expectedOrganizationId = organizationId;
+        if (!expectedOrganizationId) throw new Error("Session organisationnelle absente.");
+        const { data: upstream, error: upstreamError } = await supabaseClient
+          .from("engine_executions")
+          .select("id,engine_id,engine_version,input_record_ids,input_snapshot_sha256,scope,created_at,completed_at")
+          .eq("organization_id", expectedOrganizationId)
+          .eq("id", upstreamExecutionId)
+          .maybeSingle();
+        if (upstreamError) throw upstreamError;
+        if (!upstream || upstream.id !== upstreamExecutionId) {
+          throw new Error("Exécution QC introuvable dans l’organisation active.");
+        }
+        const ids = Array.isArray(upstream.input_record_ids)
+          ? [...new Set(upstream.input_record_ids.filter(id => typeof id === "string" && id.length > 0))]
+          : [];
+        traceOutput.replaceChildren();
+        const metadata = document.createElement("p");
+        metadata.textContent = "Exécution : " + upstream.id + " · " +
+          String(upstream.engine_id || "moteur inconnu") + "@" + String(upstream.engine_version || "version inconnue") +
+          " · " + ids.length + " identifiant(s) d’entrée · snapshot SHA-256 " +
+          String(upstream.input_snapshot_sha256 || "indisponible");
+        traceOutput.appendChild(metadata);
+        if (!ids.length) {
+          addLine(traceOutput, "Le ledger ne contient pas de liste d’identifiants d’entrée exploitable.");
+          return;
+        }
+        if (ids.length > 500) {
+          addLine(traceOutput, "La liste dépasse la limite d’affichage de 500 enregistrements ; aucune requête partielle n’a été lancée.");
+          return;
+        }
+        const { data: observations, error: observationsError } = await supabaseClient
+          .from("environmental_observations")
+          .select("id,observed_at,variable_code,value,unit_code,provider_code,dataset_code,quality_flag")
+          .eq("organization_id", expectedOrganizationId)
+          .in("id", ids)
+          .order("observed_at", { ascending: true });
+        if (observationsError) throw observationsError;
+        if (organizationId !== expectedOrganizationId) {
+          traceOutput.replaceChildren();
+          throw new Error("Le contexte organisationnel a changé pendant le chargement ; affichage annulé.");
+        }
+        const rows = Array.isArray(observations) ? observations : [];
+        addLine(traceOutput, "Observations météo retrouvées : " + rows.length + " / " + ids.length +
+          ". Identifiants non résolus dans environmental_observations : " + Math.max(0, ids.length - rows.length) + ".");
+        const list = document.createElement("ol");
+        for (const row of rows.slice(0, 500)) {
+          const item = document.createElement("li");
+          item.textContent = String(row.observed_at || "date inconnue") + " · " +
+            String(row.variable_code || "variable inconnue") + " = " +
+            String(row.value ?? "—") + " " + String(row.unit_code || "") +
+            " · " + String(row.provider_code || "fournisseur inconnu") + "/" +
+            String(row.dataset_code || "jeu inconnu") +
+            " · qualité : " + String(row.quality_flag || "non renseignée") +
+            " · ID : " + String(row.id);
+          list.appendChild(item);
+        }
+        traceOutput.appendChild(list);
+      } catch (error) {
+        traceOutput.textContent = "Remontée de provenance impossible : " + String(error?.message || error);
+      } finally {
+        traceButton.disabled = false;
+      }
+    });
+    qcDetails.append(traceButton, traceOutput);
     article.appendChild(qcDetails);
   }
   const subject = value.subject || {};
