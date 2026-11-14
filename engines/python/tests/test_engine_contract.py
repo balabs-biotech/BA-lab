@@ -1490,6 +1490,19 @@ class EngineContractTests(unittest.TestCase):
         self.assertEqual(temporal_resolved["temporal_applicability_state"], "matched")
         self.assertEqual(temporal_resolved["applicability_state"], "matched")
 
+        temporal_only_request = json.loads(json.dumps(temporal_request))
+        temporal_only = temporal_only_request["parameters"]["biological_reference_assertions"][0]
+        temporal_only["applicability"].pop("context_match")
+        temporal_only_payload = {key: val for key, val in temporal_only.items() if key != "content_sha256"}
+        temporal_only["content_sha256"] = _stable_sha256(temporal_only_payload)
+        temporal_only_request["datasets"][0]["content_sha256"] = temporal_only["content_sha256"]
+        temporal_only_result = execute_registered_engine(temporal_only_request)
+        self.assertEqual(temporal_only_result["status"], "completed", msg=str(temporal_only_result.get("error")))
+        temporal_only_resolved = temporal_only_result["result"]["value"]["subject"]["biological_reference_assertions"][0]
+        self.assertEqual(temporal_only_resolved["temporal_applicability_state"], "matched")
+        self.assertEqual(temporal_only_resolved["applicability_state"], "matched")
+        self.assertEqual(temporal_only_resolved["matching_context_ids"], [context["context_id"]])
+
         expired_request = json.loads(json.dumps(temporal_request))
         expired_request["parameters"]["biological_contexts"][0]["valid_from"] = "2026-11-21"
         expired = execute_registered_engine(expired_request)
