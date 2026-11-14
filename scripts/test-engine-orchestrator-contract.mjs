@@ -1,9 +1,11 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
+import { matchesSingleUpstreamQcArtifact } from "../supabase/functions/_shared/upstream-qc-lineage.js";
 
 const source = readFileSync("supabase/functions/engine-orchestrator/index.ts", "utf8");
 const biologicalLoader = readFileSync("supabase/functions/_shared/biological-context-loader.ts", "utf8");
 const biologicalProfile = readFileSync("supabase/functions/_shared/biological-interpretation-profile.ts", "utf8");
+const qcLineageValidator = readFileSync("supabase/functions/_shared/upstream-qc-lineage.js", "utf8");
 const checks = [
   ["BIE profile loader is imported into the authenticated orchestrator", /loadAuthenticatedBiologicalInterpretationProfile/],
   ["profile resolution refuses privileged client creation and requires the caller RLS client", /caller_scoped_supabase_client_required[\s\S]*?userClient\.from/, biologicalProfile],
@@ -63,7 +65,9 @@ const checks = [
   ["idempotency binds the exact upstream QC artifact digest and payload", /stable\(prior\.request_payload\?\.upstream_artifacts \?\? \[\]\) === stable\(request\.upstream_artifacts \?\? \[\]\)/],
   ["idempotency comparison binds the upstream artifact envelope", /upstream_artifacts[\s\S]*?sameExecutionInput/],
   ["worker response is schema validated", /validateResponse/],
-  ["completed BIE responses must preserve every upstream QC artifact identity, digest, scope and payload field", /lineageMatches = upstreamArtifacts.length === 1 && !!expectedArtifact && object\(consumedQc\)[\s\S]*?consumedQc\.upstream_execution_id === expectedArtifact\.execution_id[\s\S]*?consumedQc\.artifact_sha256 === expectedArtifact\.artifact_sha256[\s\S]*?stable\(consumedQc\.value\) === stable\(expectedArtifact\.result\.value\)/],
+  ["completed BIE responses must preserve every upstream QC artifact identity, digest, scope and payload field", /matchesSingleUpstreamQcArtifact\(upstreamArtifacts, result, stable\)/],
+  ["QC lineage validator fails closed unless exactly one artifact is present", /upstreamArtifacts\.length !== 1/, qcLineageValidator],
+  ["QC lineage validator compares immutable identity and scientific payload fields", /upstream_execution_id[\s\S]*?upstream_result_id[\s\S]*?upstream_engine_id[\s\S]*?upstream_engine_version[\s\S]*?upstream_completed_at[\s\S]*?upstream_input_snapshot_sha256[\s\S]*?artifact_sha256[\s\S]*?quality_flags[\s\S]*?limitations[\s\S]*?provenance[\s\S]*?consumed\.value/, qcLineageValidator],
   ["upstream QC lineage mismatch is persisted as a terminal worker-owned failure before result commit", /upstream_artifact_lineage_mismatch[\s\S]*?persistExecutionFailure[\s\S]*?workerId[\s\S]*?return reply/],
   ["worker lineage rejection returns before the atomic BIE result commit path", /if \(upstreamArtifacts\.length > 0 && result\.status === "completed"\)[\s\S]*?if \(!lineageMatches\)[\s\S]*?return reply\(persisted \? 502 : 500,[\s\S]*?\}\s*\}\s*\/\/ The durable ledger ID[\s\S]*?rpc\("complete_claimed_engine_execution"/],
   ["failed execution writes are scoped to queued state or the exact running worker owner", /async function persistExecutionFailure[\s\S]*?claimedWorkerId[\s\S]*?update\.eq\("claimed_by", claimedWorkerId\)\.eq\("status", "running"\)[\s\S]*?update\.eq\("status", "queued"\)/],
@@ -87,6 +91,47 @@ const checks = [
 for (const [name, pattern, target = source] of checks) {
   assert.ok(pattern instanceof RegExp ? pattern.test(target) : pattern, name);
 }
+
+const stableFixture = (value) => {
+  if (Array.isArray(value)) return `[${value.map(stableFixture).join(",")}]`;
+  if (value && typeof value === "object") return `{${Object.keys(value).sort().map((key) => `${JSON.stringify(key)}:${stableFixture(value[key])}`).join(",")}}`;
+  return JSON.stringify(value);
+};
+const qcArtifactFixture = {
+  execution_id: "qc-execution-1", result_id: "qc-result-1",
+  engine_id: "environmental.timeseries.qc", engine_version: "0.2.0",
+  completed_at: "2026-11-14T12:00:00.000Z", input_snapshot_sha256: "a".repeat(64),
+  scope: { location_id: "loc-1", window_start: "2026-11-01", window_end: "2026-11-14" },
+  artifact_sha256: "b".repeat(64),
+  result: { outcome: "review_required", quality_flags: ["outlier_detected"], limitations: ["short_window"], provenance: { provider: "NASA_POWER" }, value: { review_summary: { outlier_count: 1 } } },
+};
+const consumedQcFixture = {
+  upstream_execution_id: qcArtifactFixture.execution_id, upstream_result_id: qcArtifactFixture.result_id,
+  upstream_engine_id: qcArtifactFixture.engine_id, upstream_engine_version: qcArtifactFixture.engine_version,
+  upstream_completed_at: qcArtifactFixture.completed_at, upstream_input_snapshot_sha256: qcArtifactFixture.input_snapshot_sha256,
+  upstream_scope: structuredClone(qcArtifactFixture.scope), artifact_sha256: qcArtifactFixture.artifact_sha256,
+  outcome: qcArtifactFixture.result.outcome, quality_flags: structuredClone(qcArtifactFixture.result.quality_flags),
+  limitations: structuredClone(qcArtifactFixture.result.limitations), provenance: structuredClone(qcArtifactFixture.result.provenance),
+  value: structuredClone(qcArtifactFixture.result.value),
+};
+const validWorkerResult = { status: "completed", result: { value: { environmental_quality_control: consumedQcFixture } } };
+assert.equal(matchesSingleUpstreamQcArtifact([qcArtifactFixture], validWorkerResult, stableFixture), true, "one exact QC artifact is accepted");
+assert.equal(matchesSingleUpstreamQcArtifact([], validWorkerResult, stableFixture), false, "zero artifacts fail closed");
+assert.equal(matchesSingleUpstreamQcArtifact([qcArtifactFixture, qcArtifactFixture], validWorkerResult, stableFixture), false, "multiple artifacts fail closed");
+assert.equal(matchesSingleUpstreamQcArtifact([qcArtifactFixture], { status: "completed", result: { value: {} } }, stableFixture), false, "missing consumed QC block is rejected");
+for (const [field, mutate] of [
+  ["execution identity", (qc) => { qc.upstream_execution_id = "other"; }],
+  ["result identity", (qc) => { qc.upstream_result_id = "other"; }],
+  ["artifact digest", (qc) => { qc.artifact_sha256 = "c".repeat(64); }],
+  ["quality flags", (qc) => { qc.quality_flags.push("silently_dropped"); }],
+  ["provenance", (qc) => { qc.provenance.provider = "untrusted"; }],
+  ["scope", (qc) => { qc.upstream_scope.location_id = "other-location"; }],
+]) {
+  const altered = structuredClone(consumedQcFixture);
+  mutate(altered);
+  assert.equal(matchesSingleUpstreamQcArtifact([qcArtifactFixture], { status: "completed", result: { value: { environmental_quality_control: altered } } }, stableFixture), false, `altered QC ${field} is rejected`);
+}
+process.stdout.write("Passed 10 fail-closed QC lineage validator cases.\\n");
 const sourceReadStart = source.indexOf("let sourceRows: Record<string, any>[];");
 const sourceReadEnd = source.indexOf("const records = sourceRows.map", sourceReadStart);
 assert.ok(sourceReadStart >= 0 && sourceReadEnd > sourceReadStart, "measurement snapshot query boundary exists");
