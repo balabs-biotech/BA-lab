@@ -313,3 +313,21 @@ for(const snippet of [
 ])if(!evidenceReview.includes(snippet))throw new Error("Biological evidence provenance review field or URL guard missing: "+snippet);
 if(!evidenceReview.includes("slice(0, 30)"))throw new Error("Biological evidence review must bound rendered assertion records");
 console.log("✓ Biological assertion review exposes evidence, applicability, reviewer timestamps, both SHA-256 digests and safely validated source links");
+
+const assertionFilterStart=engine.indexOf("const allReferenceAssertions = Array.isArray(subject.biological_reference_assertions)");
+const assertionFilterEnd=engine.indexOf("const assertionEvidenceDetails",assertionFilterStart);
+if(assertionFilterStart<0||assertionFilterEnd<0)throw new Error("Biological assertion filter panel is missing");
+const assertionFilterBlock=engine.slice(assertionFilterStart,assertionFilterEnd);
+for(const snippet of [
+  'makeAssertionFilter("Applicabilité"',
+  'makeAssertionFilter("Niveau de preuve"',
+  'assertionSearch.type = "search"',
+  'applicabilityFilter.addEventListener("change", renderAssertionReview)',
+  'evidenceFilter.addEventListener("change", renderAssertionReview)',
+  'assertionSearch.addEventListener("input", renderAssertionReview)',
+  'visibleReferenceAssertions = allReferenceAssertions.filter',
+  'slice(0, 40)',
+  'Aucune assertion ne correspond aux filtres.'
+])if(!assertionFilterBlock.includes(snippet))throw new Error("Biological assertion review filter regression: "+snippet);
+if(!assertionFilterBlock.includes("visibleReferenceAssertions.length + \" assertion(s) affichée(s) sur \""))throw new Error("Biological assertion filter count must report visible and total records");
+console.log("✓ Biological assertions can be filtered by applicability, evidence level and text with bounded results and an accessible count");
