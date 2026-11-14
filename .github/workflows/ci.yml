@@ -406,7 +406,9 @@ jobs:
       - name: Start isolated Supabase stack and apply migrations
         run: supabase start -x studio,mailpit,storage-api,imgproxy,realtime,logflare,vector,supavisor
       - name: Verify local migration state
-        run: supabase migration list
+        run: |
+          supabase migration list
+          supabase status -o env >> "$GITHUB_ENV"
       - name: Start real Edge Functions runtime
         run: |
           cat > /tmp/ba-labs-edge-ci.env <<'EOF'
