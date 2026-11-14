@@ -1,18 +1,27 @@
 const baseUrl = process.env.SUPABASE_FUNCTIONS_URL ?? "http://127.0.0.1:54321/functions/v1";
+const dispatchSecret = process.env.BA_ENGINE_DISPATCH_TOKEN ?? "";
 
-async function assertFunction(name, headers, expectedStatus = 401) {
+async function assertFunction(name, { headers, expectedStatus, expectedError }) {
   const response = await fetch(`${baseUrl}/${name}`, {
     method: "POST",
-    headers: { "content-type": "application/json", ...headers },
+    headers: { "content-type": "application/json", "authorization": "Bearer local-edge-runtime-smoke", ...headers },
     body: "{}",
     signal: AbortSignal.timeout(10_000),
   });
   const body = await response.json().catch(() => null);
-  if (response.status !== expectedStatus || body?.error !== "authentication_required") {
-    throw new Error(`${name}: expected ${expectedStatus}/authentication_required, received ${response.status}/${JSON.stringify(body)}`);
+  if (response.status !== expectedStatus || body?.error !== expectedError) {
+    throw new Error(`${name}: expected ${expectedStatus}/${expectedError}, received ${response.status}/${JSON.stringify(body)}`);
   }
-  process.stdout.write(`ok ${name}: handler executed and rejected unauthenticated request\n`);
+  process.stdout.write(`ok ${name}: reached handler and received ${expectedStatus}/${expectedError}\n`);
 }
 
-await assertFunction("engine-orchestrator", {});
-await assertFunction("engine-queue-dispatch", {});
+await assertFunction("engine-orchestrator", {
+  headers: {},
+  expectedStatus: 422,
+  expectedError: "invalid_request",
+});
+await assertFunction("engine-queue-dispatch", {
+  headers: { "x-ba-dispatch-secret": dispatchSecret },
+  expectedStatus: 503,
+  expectedError: "dispatcher_not_configured",
+});
