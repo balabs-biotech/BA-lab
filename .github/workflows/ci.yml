@@ -423,12 +423,18 @@ jobs:
           docker build --pull --build-arg "BA_ENGINE_BUILD_REVISION=${GITHUB_SHA}" -f engines/python/Dockerfile -t ba-labs-engine-worker:runtime-ci .
           docker network create ba-engine-worker-runtime-net
           docker run --detach --name ba-engine-worker-runtime-ci \
-            --network ba-engine-worker-runtime-net --network-alias ba-engine-worker-runtime-ci \
-            --publish 127.0.0.1:18080:8080 \
+            --network ba-engine-worker-runtime-net \
+            --publish 18080:8080 \
             --env "BA_ENGINE_WORKER_TOKEN=$token" \
             --read-only --cap-drop=ALL --security-opt=no-new-privileges \
             --memory=256m --cpus=1 --pids-limit=64 --user=10001:10001 \
             ba-labs-engine-worker:runtime-ci
+          worker_gateway="$(docker network inspect ba-engine-worker-runtime-net --format '{{(index .IPAM.Config 0).Gateway}}')"
+          if [ -z "$worker_gateway" ]; then
+            echo "Could not resolve Docker bridge gateway" >&2
+            exit 1
+          fi
+          echo "BA_ENGINE_WORKER_GATEWAY=$worker_gateway" >> "$GITHUB_ENV"
           for attempt in $(seq 1 30); do
             if curl --fail --silent http://127.0.0.1:18080/healthz >/dev/null; then exit 0; fi
             if ! docker inspect -f '{{.State.Running}}' ba-engine-worker-runtime-ci | grep -q true; then
@@ -445,7 +451,7 @@ jobs:
           BA_ENGINE_ASYNC_DISPATCH=true
           BA_BIE_ENABLED=true
           BA_ENGINE_DISPATCH_TOKEN=ci-dispatch-token-0123456789abcdef
-          BA_ENGINE_WORKER_URL=http://ba-engine-worker-runtime-ci:8080
+          BA_ENGINE_WORKER_URL=http://${{ env.BA_ENGINE_WORKER_GATEWAY }}:18080
           BA_ENGINE_WORKER_TOKEN=ci-worker-token-0123456789abcdef
           EOF
           supabase functions serve --no-verify-jwt --env-file /tmp/ba-labs-edge-ci.env > /tmp/ba-labs-edge-runtime.log 2>&1 &
