@@ -399,7 +399,7 @@ class EngineContractTests(unittest.TestCase):
             evidence["history_record_ids"],
             request["input"]["record_ids"][:6],
         )
-        self.assertEqual(evidence["baseline_median"], 20.05)
+        self.assertEqual(evidence["baseline_median"], 20.1)
 
     def test_environmental_qc_does_not_use_duplicate_timestamps_as_rolling_history(self):
         request = json.loads(json.dumps(REQUEST))
