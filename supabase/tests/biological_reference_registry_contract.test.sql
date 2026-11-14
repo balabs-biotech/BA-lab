@@ -6,6 +6,7 @@ declare
   v_org uuid := 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
   v_user uuid := 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb';
   v_profile_id uuid;
+  v_missing_digest_profile_id uuid;
   v_reference_id uuid;
 begin
   if to_regclass('public.domain_interpretation_profiles') is null then
@@ -78,10 +79,10 @@ begin
     ) values (
       v_org, 'greentech', 'biological.context.features', '1.0.0', '[]'::jsonb,
       'draft', current_date
-    ) returning id into v_profile_id;
+    ) returning id into v_missing_digest_profile_id;
     update public.domain_interpretation_profiles
       set status='active'
-      where id=v_profile_id;
+      where id=v_missing_digest_profile_id;
     raise exception 'profile activation without content digest was accepted';
   exception when sqlstate '23514' then null;
   end;
