@@ -256,7 +256,7 @@ try {
     throw new Error(`authenticated QC worker dispatch failed: ${dispatched.status}/${JSON.stringify(dispatched.body)}; ledger=${JSON.stringify(failedRows)}`);
   }
   const completedRows = await api(
-    `/rest/v1/engine_executions?id=eq.${qcExecutionId}&organization_id=eq.${organizationId}&select=id,status,result_payload,completed_at`,
+    `/rest/v1/engine_executions?id=eq.${qcExecutionId}&organization_id=eq.${organizationId}&select=id,status,result_payload,request_id,completed_at`,
   );
   const completed = completedRows?.[0];
   if (completed?.status !== "completed" ||
@@ -329,7 +329,7 @@ try {
     role: "environmental_qc",
     execution_id: qcExecutionId,
     result_id: qcResult.id,
-    request_id: completed.request_payload?.request_id,
+    request_id: completed.request_id,
     engine_id: qcResult.engine_id,
     engine_version: qcResult.engine_version,
     completed_at: completed.completed_at,
