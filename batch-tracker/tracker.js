@@ -7707,8 +7707,46 @@ function renderBiologicalContextAssessment(article, result) {
       const rightCode = String(pair.right.assertion_code || "assertion B");
       const leftValue = JSON.stringify(pair.left.object_value).slice(0, 120);
       const rightValue = JSON.stringify(pair.right.object_value).slice(0, 120);
-      entry.textContent = leftCode + " : " + leftValue + " ≠ " + rightCode + " : " + rightValue +
+      const summary = document.createElement("p");
+      summary.textContent = leftCode + " : " + leftValue + " ≠ " + rightCode + " : " + rightValue +
         " · contexte " + pair.contextId + " · période commune " + pair.periodLabel;
+      entry.appendChild(summary);
+      const appendComparedSource = (assertion, sideLabel) => {
+        const source = assertion.source || {};
+        const details = document.createElement("details");
+        details.className = "engine-biological-comparison-source";
+        const heading = document.createElement("summary");
+        heading.textContent = sideLabel + " · " +
+          String(source.reference_id || "référence non renseignée") +
+          " · " + String(assertion.evidence_level || "niveau de preuve non évalué");
+        details.appendChild(heading);
+        for (const [label, value] of [
+          ["Version source", source.reference_version],
+          ["Repère bibliographique", assertion.source_locator],
+          ["Période déclarée", assertion.applicability?.validity_window],
+          ["Applicabilité temporelle", assertion.temporal_applicability_state],
+          ["Révision", assertion.reviewed_at || source.reviewed_at],
+          ["Incertitude", assertion.uncertainty]
+        ]) addEvidenceField(details, label, value);
+        if (typeof source.source_url === "string") {
+          try {
+            const sourceUrl = new URL(source.source_url);
+            if (sourceUrl.protocol === "https:" || sourceUrl.protocol === "http:") {
+              const link = document.createElement("a");
+              link.href = sourceUrl.href;
+              link.target = "_blank";
+              link.rel = "noopener noreferrer";
+              link.textContent = "Consulter cette source";
+              details.appendChild(link);
+            }
+          } catch (_) {
+            // Keep invalid source URLs as non-clickable metadata.
+          }
+        }
+        entry.appendChild(details);
+      };
+      appendComparedSource(pair.left, "Source A");
+      appendComparedSource(pair.right, "Source B");
       assertionComparisonList.appendChild(entry);
     }
     if (comparisonRows.length > 20) {
