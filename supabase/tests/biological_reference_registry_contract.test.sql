@@ -22,6 +22,34 @@ begin
   if not (select relrowsecurity from pg_class where oid='public.biological_reference_registry'::regclass) then
     raise exception 'biological_reference_registry must have RLS enabled';
   end if;
+  if to_regclass('public.biological_reference_assertions') is null then
+    raise exception 'biological_reference_assertions is missing';
+  end if;
+  if not (select relrowsecurity from pg_class where oid='public.biological_reference_assertions'::regclass) then
+    raise exception 'biological_reference_assertions must have RLS enabled';
+  end if;
+  if has_table_privilege('anon','public.biological_reference_assertions','SELECT') then
+    raise exception 'anonymous access to biological reference assertions must be revoked';
+  end if;
+  if not has_table_privilege('authenticated','public.biological_reference_assertions','SELECT') then
+    raise exception 'authenticated organization members need assertion SELECT privilege';
+  end if;
+  if not exists (
+    select 1 from pg_policies
+    where schemaname='public' and tablename='biological_reference_assertions'
+      and policyname='biological_reference_assertions_select'
+      and qual like '%is_org_member%'
+  ) then
+    raise exception 'organization member read policy missing from biological reference assertions';
+  end if;
+  if not exists (
+    select 1 from pg_policies
+    where schemaname='public' and tablename='biological_reference_assertions'
+      and policyname='biological_reference_assertions_insert'
+      and with_check like '%is_org_admin%'
+  ) then
+    raise exception 'admin-only assertion insert policy missing';
+  end if;
   if has_table_privilege('anon','public.biological_reference_registry','SELECT') then
     raise exception 'anonymous access to biological references must be revoked';
   end if;
