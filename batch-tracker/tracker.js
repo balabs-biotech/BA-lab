@@ -7497,6 +7497,16 @@ function renderBiologicalContextAssessment(article, result) {
       " · " + String(item.predicate_code || "prédicat inconnu") + " = " + objectValue +
       " · preuve " + String(item.evidence_level || "non évaluée") +
       " · applicabilité " + String(item.applicability_state || "non évaluée") +
+      " · période " + (
+        item.applicability && item.applicability.validity_window
+          ? String(item.applicability.validity_window.valid_from || "début inconnu") + " → " +
+            String(item.applicability.validity_window.valid_to || "sans date de fin")
+          : "non spécifiée"
+      ) +
+      " · état temporel " + String(item.temporal_applicability_state || "non évalué") +
+      " · contextes concordants " + (
+        Array.isArray(item.matching_context_ids) ? item.matching_context_ids.length : 0
+      ) +
       " · " + sourceLabel +
       (item.source_locator ? " · repère " + String(item.source_locator) : "") + digest;
   }, 12);
