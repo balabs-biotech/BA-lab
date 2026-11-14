@@ -3,9 +3,11 @@ import { spawnSync } from "node:child_process";
 
 const supabaseUrl = process.env.SUPABASE_URL ?? "http://127.0.0.1:54321";
 const anonKey = process.env.ANON_KEY ?? "";
+const dispatchToken = process.env.BA_ENGINE_DISPATCH_TOKEN ?? "";
 const databaseUrl = process.env.SUPABASE_DB_URL ?? "postgresql://postgres:postgres@127.0.0.1:54322/postgres";
 let userAccessToken;
 if (!anonKey) throw new Error("ANON_KEY must be exported by supabase status -o env");
+if (dispatchToken.length < 32) throw new Error("BA_ENGINE_DISPATCH_TOKEN must contain at least 32 characters");
 
 function runSql(sql) {
   const result = spawnSync("psql", [databaseUrl, "-v", "ON_ERROR_STOP=1", "-q", "-t", "-A", "-c", sql], { encoding: "utf8" });
@@ -45,6 +47,23 @@ async function invoke(accessToken, body) {
     },
     body: JSON.stringify(body),
     signal: AbortSignal.timeout(10_000),
+  });
+  const text = await response.text();
+  let parsed = null;
+  try { parsed = text ? JSON.parse(text) : null; } catch { /* retain raw body for diagnostics */ }
+  return { status: response.status, body: parsed };
+}
+
+async function dispatchQueue() {
+  const response = await fetch(`${supabaseUrl}/functions/v1/engine-queue-dispatch`, {
+    method: "POST",
+    headers: {
+      apikey: anonKey,
+      "x-ba-dispatch-secret": dispatchToken,
+      "content-type": "application/json",
+    },
+    body: "{}",
+    signal: AbortSignal.timeout(30_000),
   });
   const text = await response.text();
   let parsed = null;
@@ -139,6 +158,34 @@ try {
     throw new Error("QC execution did not persist the exact RLS-authorized environmental snapshot");
   }
   process.stdout.write("ok authenticated QC: three RLS-visible environmental observations were snapshotted and queued\\n");
+
+  const dispatched = await dispatchQueue();
+  if (dispatched.status !== 200 || dispatched.body?.claimed !== 1 ||
+      dispatched.body?.completed !== 1 || dispatched.body?.failed !== 0 || dispatched.body?.lost !== 0) {
+    throw new Error(`authenticated QC worker dispatch failed: ${dispatched.status}/${JSON.stringify(dispatched.body)}`);
+  }
+  const completedRows = await api(
+    `/rest/v1/engine_executions?id=eq.${qcExecutionId}&organization_id=eq.${organizationId}&select=id,status,result_payload,completed_at`,
+  );
+  const completed = completedRows?.[0];
+  if (completed?.status !== "completed" ||
+      completed.result_payload?.status !== "completed" ||
+      completed.result_payload?.engine?.engine_id !== "environmental.timeseries.qc" ||
+      completed.result_payload?.input_snapshot_sha256 !== stored.request_payload?.input?.snapshot_sha256 ||
+      typeof completed.completed_at !== "string") {
+    throw new Error("QC worker result was not atomically persisted against the queued execution");
+  }
+  const resultRows = await api(
+    `/rest/v1/engine_execution_results?execution_id=eq.${qcExecutionId}&organization_id=eq.${organizationId}&select=id,outcome,value,quality_flags,provenance,input_record_ids`,
+  );
+  const qcResult = resultRows?.[0];
+  if (!qcResult || !["success", "review_required", "insufficient_data"].includes(qcResult.outcome) ||
+      JSON.stringify(qcResult.input_record_ids) !== JSON.stringify(recordIds) ||
+      !qcResult.provenance || typeof qcResult.provenance !== "object") {
+    throw new Error("QC worker result row is missing or does not preserve its source record lineage");
+  }
+  process.stdout.write("ok authenticated QC worker: real HTTP worker completed the execution and persisted the immutable result row\\n");
+
   const unmemberedOrganizationId = randomUUID();
 
   const denied = await invoke(userAccessToken, {
