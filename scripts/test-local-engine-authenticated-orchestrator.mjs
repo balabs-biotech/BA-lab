@@ -183,11 +183,13 @@ try {
     "culture_not_found_or_inaccessible",
   );
 } finally {
-  if (qcExecutionId) {
-    await api(`/rest/v1/engine_executions?id=eq.${qcExecutionId}`, { method: "DELETE", headers: { Prefer: "return=minimal" } });
+  // Execution ledger rows are intentionally not deletable by authenticated
+  // clients. Clean up this isolated fixture through the local DB owner.
+  if (qcExecutionId && organizationId) {
+    runSql("delete from public.engine_executions where id = $tag$" + qcExecutionId + "$tag$::uuid and organization_id = $tag$" + organizationId + "$tag$::uuid");
   }
-  if (locationId) {
-    await api(`/rest/v1/locations?id=eq.${locationId}`, { method: "DELETE", headers: { Prefer: "return=minimal" } });
+  if (locationId && organizationId) {
+    runSql("delete from public.locations where id = $tag$" + locationId + "$tag$::uuid and organization_id = $tag$" + organizationId + "$tag$::uuid");
   }
   if (userId && /^[0-9a-f-]{36}$/i.test(userId)) {
     runSql("delete from auth.users where id = $tag$" + userId + "$tag$::uuid");
