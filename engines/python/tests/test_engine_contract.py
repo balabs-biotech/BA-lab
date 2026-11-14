@@ -1471,8 +1471,32 @@ class EngineContractTests(unittest.TestCase):
         resolved = value["subject"]["biological_reference_assertions"]
         self.assertEqual(len(resolved), 1)
         self.assertEqual(resolved[0]["applicability_state"], "matched")
+        self.assertEqual(resolved[0]["temporal_applicability_state"], "not_scoped")
         self.assertEqual(resolved[0]["matching_context_ids"], [context["context_id"]])
         self.assertEqual(resolved[0]["source"]["content_sha256"], source["content_sha256"])
+
+        temporal_request = json.loads(json.dumps(request))
+        temporal_assertion = temporal_request["parameters"]["biological_reference_assertions"][0]
+        temporal_assertion["applicability"]["validity_window"] = {
+            "valid_from": "2026-11-05",
+            "valid_to": "2026-11-20",
+        }
+        temporal_payload = {key: val for key, val in temporal_assertion.items() if key != "content_sha256"}
+        temporal_assertion["content_sha256"] = _stable_sha256(temporal_payload)
+        temporal_request["datasets"][0]["content_sha256"] = temporal_assertion["content_sha256"]
+        temporal_result = execute_registered_engine(temporal_request)
+        self.assertEqual(temporal_result["status"], "completed", msg=str(temporal_result.get("error")))
+        temporal_resolved = temporal_result["result"]["value"]["subject"]["biological_reference_assertions"][0]
+        self.assertEqual(temporal_resolved["temporal_applicability_state"], "matched")
+        self.assertEqual(temporal_resolved["applicability_state"], "matched")
+
+        expired_request = json.loads(json.dumps(temporal_request))
+        expired_request["parameters"]["biological_contexts"][0]["valid_from"] = "2026-11-21"
+        expired = execute_registered_engine(expired_request)
+        self.assertEqual(expired["status"], "completed", msg=str(expired.get("error")))
+        expired_resolved = expired["result"]["value"]["subject"]["biological_reference_assertions"][0]
+        self.assertEqual(expired_resolved["temporal_applicability_state"], "not_applicable")
+        self.assertEqual(expired_resolved["applicability_state"], "not_applicable")
         self.assertIn("biological_reference_assertions_present", result["result"]["quality_flags"])
         self.assertTrue(any(
             item.startswith("BA_LABS_BIOLOGICAL_REFERENCE_ASSERTION/pleurotus.ostreatus.substrate.reported@1.0.0#sha256=")
