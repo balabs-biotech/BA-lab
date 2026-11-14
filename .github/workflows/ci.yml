@@ -411,7 +411,7 @@ jobs:
       - name: Verify local migration state
         run: |
           supabase migration list
-          supabase status -o env | grep '^ANON_KEY=' >> "$GITHUB_ENV"
+          supabase status -o env | grep -E '^(ANON_KEY|JWT_SECRET)=' >> "$GITHUB_ENV"
       - name: Start real Edge Functions runtime
         run: |
           cat > /tmp/ba-labs-edge-ci.env <<'EOF'
