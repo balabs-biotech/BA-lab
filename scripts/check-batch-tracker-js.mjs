@@ -22,6 +22,9 @@ if(!engine.includes("const modulesByDomain")||!engine.includes('domain !== "labo
 if(!engine.includes("biological_reference_assertion_state") ||
    !engine.includes("Assertions bibliographiques validées") ||
    !engine.includes("applicability_state") ||
+   !engine.includes("temporal_applicability_state") ||
+   !engine.includes("état temporel") ||
+   !engine.includes("contextes concordants") ||
    !engine.includes("biological_reference_assertions_conflict")) {
  throw new Error("Biological reference assertion state, evidence and review signals are not exposed in the results UI");
 }
