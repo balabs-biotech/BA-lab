@@ -4,7 +4,7 @@ import { spawnSync } from "node:child_process";
 const supabaseUrl = process.env.SUPABASE_URL ?? "http://127.0.0.1:54321";
 const anonKey = process.env.ANON_KEY ?? "";
 const dispatchToken = process.env.BA_ENGINE_DISPATCH_TOKEN ?? "";
-const databaseUrl = process.env.SUPABASE_DB_URL ?? process.env.DB_URL ?? "postgresql://postgres:postgres@127.0.0.1:55432/postgres";
+const databaseUrl = [process.env.SUPABASE_DB_URL, process.env.DB_URL].find((value) => typeof value === "string" && value.trim().length > 0) ?? "postgresql://postgres:postgres@127.0.0.1:55432/postgres";
 let userAccessToken;
 if (!anonKey) throw new Error("ANON_KEY must be exported by supabase status -o env");
 if (dispatchToken.length < 32) throw new Error("BA_ENGINE_DISPATCH_TOKEN must contain at least 32 characters");
