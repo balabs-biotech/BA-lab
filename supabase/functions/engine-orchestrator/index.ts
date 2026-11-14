@@ -718,10 +718,10 @@ Deno.serve(async (req: Request) => {
   // Bind the worker's persisted biological result to the exact QC artifact
   // assembled from the tenant-scoped ledger. A valid response envelope alone
   // does not prove that the worker retained the upstream artifact unchanged.
-  if (upstreamArtifacts.length === 1 && result.status === "completed") {
-    const expectedArtifact = upstreamArtifacts[0];
+  if (upstreamArtifacts.length > 0 && result.status === "completed") {
+    const expectedArtifact = upstreamArtifacts.length === 1 ? upstreamArtifacts[0] : null;
     const consumedQc = result.result?.value?.environmental_quality_control;
-    const lineageMatches = object(consumedQc) &&
+    const lineageMatches = upstreamArtifacts.length === 1 && !!expectedArtifact && object(consumedQc) &&
       consumedQc.upstream_execution_id === expectedArtifact.execution_id &&
       consumedQc.upstream_result_id === expectedArtifact.result_id &&
       consumedQc.upstream_engine_id === expectedArtifact.engine_id &&
