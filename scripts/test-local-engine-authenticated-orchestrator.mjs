@@ -96,6 +96,7 @@ let locationId;
 let environmentId;
 let cultureId;
 let bieExecutionId;
+let tamperedWorkerBieExecutionId;
 let qcExecutionId;
 let missingResultQcExecutionId;
 let mismatchedLineageQcExecutionId;
@@ -401,7 +402,7 @@ try {
       typeof bieWithTamperedWorkerArtifact.body?.execution_id !== "string") {
     throw new Error(`tampered-worker BIE fixture enqueue failed: ${bieWithTamperedWorkerArtifact.status}/${JSON.stringify(bieWithTamperedWorkerArtifact.body)}`);
   }
-  const tamperedWorkerBieExecutionId = bieWithTamperedWorkerArtifact.body.execution_id;
+  tamperedWorkerBieExecutionId = bieWithTamperedWorkerArtifact.body.execution_id;
   const tamperedWorkerDispatch = await dispatchQueue();
   if (tamperedWorkerDispatch.status !== 200) {
     throw new Error(`tampered-worker BIE dispatch failed: ${tamperedWorkerDispatch.status}/${JSON.stringify(tamperedWorkerDispatch.body)}`);
@@ -738,11 +739,15 @@ try {
 } finally {
   // Execution ledger rows are intentionally not deletable by authenticated
   // clients. Clean up this isolated fixture through the local DB owner.
-  if (bieExecutionId && organizationId) {
+  if (organizationId && (bieExecutionId || tamperedWorkerBieExecutionId)) {
     runSql("alter table public.engine_execution_dependencies disable trigger engine_execution_dependencies_immutable");
-    runSql("delete from public.engine_execution_dependencies where organization_id = $tag$" + organizationId + "$tag$::uuid and downstream_execution_id = $tag$" + bieExecutionId + "$tag$::uuid");
+    for (const downstreamExecutionId of [bieExecutionId, tamperedWorkerBieExecutionId].filter(Boolean)) {
+      runSql("delete from public.engine_execution_dependencies where organization_id = $tag$" + organizationId + "$tag$::uuid and downstream_execution_id = $tag$" + downstreamExecutionId + "$tag$::uuid");
+    }
     runSql("alter table public.engine_execution_dependencies enable trigger engine_execution_dependencies_immutable");
-    runSql("delete from public.engine_executions where id = $tag$" + bieExecutionId + "$tag$::uuid and organization_id = $tag$" + organizationId + "$tag$::uuid");
+    for (const downstreamExecutionId of [bieExecutionId, tamperedWorkerBieExecutionId].filter(Boolean)) {
+      runSql("delete from public.engine_executions where id = $tag$" + downstreamExecutionId + "$tag$::uuid and organization_id = $tag$" + organizationId + "$tag$::uuid");
+    }
   }
   if (mismatchedSnapshotQcExecutionId && organizationId) {
     runSql("delete from public.engine_executions where id = $tag$" + mismatchedSnapshotQcExecutionId + "$tag$::uuid and organization_id = $tag$" + organizationId + "$tag$::uuid");
