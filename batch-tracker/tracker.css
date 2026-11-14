@@ -2928,3 +2928,54 @@ body[data-domain] :is(button, input, select, textarea, a, [tabindex]):focus-visi
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
+
+/* Paired documentary provenance in biological assertion divergence review. */
+.engine-biological-assertion-comparisons {
+  display: grid;
+  gap: 0.75rem;
+  margin: 0.85rem 0;
+  padding: 0.85rem;
+  border: 1px solid var(--border, #64748b);
+  border-radius: 0.65rem;
+  background: var(--surface, transparent);
+  overflow-wrap: anywhere;
+}
+.engine-biological-assertion-comparisons > strong {
+  line-height: 1.4;
+}
+.engine-biological-assertion-comparisons > ul {
+  display: grid;
+  gap: 0.8rem;
+  margin: 0;
+  padding-left: 1.25rem;
+}
+.engine-biological-assertion-comparisons > ul > li {
+  min-width: 0;
+  padding: 0.65rem;
+  border: 1px solid var(--border, #64748b);
+  border-radius: 0.5rem;
+}
+.engine-biological-comparison-source {
+  margin-top: 0.55rem;
+  padding: 0.55rem;
+  border-left: 3px solid var(--border, #64748b);
+  background: var(--surface-raised, transparent);
+}
+.engine-biological-comparison-source summary {
+  cursor: pointer;
+  font-weight: 650;
+}
+.engine-biological-comparison-source a {
+  display: inline-block;
+  margin-top: 0.4rem;
+  overflow-wrap: anywhere;
+}
+@media (max-width: 620px) {
+  .engine-biological-assertion-comparisons {
+    padding: 0.65rem;
+  }
+  .engine-biological-assertion-comparisons > ul {
+    padding-left: 1rem;
+  }
+}
