@@ -7150,6 +7150,43 @@ function getStoredEngineResult(execution) {
   } : null);
 }
 
+function canonicalizeEngineEvidence(value) {
+  if (Array.isArray(value)) return value.map(canonicalizeEngineEvidence);
+  if (value && typeof value === "object") {
+    return Object.fromEntries(
+      Object.keys(value).sort().map(key => [key, canonicalizeEngineEvidence(value[key])])
+    );
+  }
+  return value;
+}
+
+function engineEvidenceMatches(left, right) {
+  return JSON.stringify(canonicalizeEngineEvidence(left)) ===
+    JSON.stringify(canonicalizeEngineEvidence(right));
+}
+
+function getEngineResultPersistenceConsistency(execution) {
+  const stored = recentEngineResultsByExecution.get(execution.id);
+  const envelope = execution.result_payload;
+  const result = envelope?.result;
+  if (!stored || !result || typeof result !== "object") {
+    return { state: "unknown", mismatches: ["résultat persistant ou enveloppe ledger indisponible"] };
+  }
+
+  const mismatches = [];
+  for (const field of ["outcome", "value", "limitations", "quality_flags", "confidence", "provenance"]) {
+    if (!engineEvidenceMatches(stored[field] ?? null, result[field] ?? null)) mismatches.push(field);
+  }
+  if (!engineEvidenceMatches(stored.input_snapshot_sha256 ?? null, envelope.input_snapshot_sha256 ?? null)) {
+    mismatches.push("input_snapshot_sha256");
+  }
+  const storedIds = Array.isArray(stored.input_record_ids) ? [...stored.input_record_ids].sort() : null;
+  const ledgerIds = Array.isArray(execution.input_record_ids) ? [...execution.input_record_ids].sort() : null;
+  if (!engineEvidenceMatches(storedIds, ledgerIds)) mismatches.push("input_record_ids");
+
+  return { state: mismatches.length ? "mismatch" : "match", mismatches };
+}
+
 function getComparableEngineExecutions() {
   return recentEngineExecutions.filter((execution) =>
     execution.status === "completed" && Boolean(getStoredEngineResult(execution)?.value)
@@ -8124,6 +8161,15 @@ function renderRecentEngineExecutions() {
     appendLineageField("Snapshot du résultat enregistré (SHA-256)", resultSnapshot || "indisponible");
     appendLineageField("Identifiants d’entrée du résultat", resultInputIds.length);
     appendLineageField("Résultat généré", storedResult?.generated_at || execution.completed_at || "non documenté");
+    const persistenceConsistency = getEngineResultPersistenceConsistency(execution);
+    appendLineageField(
+      "Cohérence ledger / résultat persisté",
+      persistenceConsistency.state === "match"
+        ? "concordance exacte des champs scientifiques et de provenance"
+        : persistenceConsistency.state === "mismatch"
+          ? "DIVERGENCE : " + persistenceConsistency.mismatches.join(", ")
+          : "non vérifiable : " + persistenceConsistency.mismatches.join(", ")
+    );
     let snapshotConsistency = "non vérifiable : empreinte absente";
     if (executionSnapshot && resultSnapshot) {
       snapshotConsistency = executionSnapshot === resultSnapshot
