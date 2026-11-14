@@ -337,6 +337,11 @@ if(assertionComparisonStart<0||assertionComparisonEnd<0)throw new Error("Biologi
 const assertionComparisonBlock=engine.slice(assertionComparisonStart,assertionComparisonEnd);
 for(const snippet of [
   "const assertions = visibleReferenceAssertions",
+  "visibleReferenceAssertions.slice(0, 100)",
+  "!/^\\d{4}-\\d{2}-\\d{2}$/.test(value)",
+  "left.applicability?.validity_window || left.validity_window",
+  "right.applicability?.validity_window || right.validity_window",
+  "visibleReferenceAssertions.length > 100",
   "left.subject_type !== right.subject_type",
   "left.predicate_code !== right.predicate_code",
   "left.object_value",
