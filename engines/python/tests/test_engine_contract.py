@@ -308,6 +308,44 @@ class EngineContractTests(unittest.TestCase):
         self.assertEqual(series["outlier_evidence"][0]["threshold"], 3.0)
         self.assertIn("data-quality screening only", result["result"]["limitations"][0])
 
+    def test_environmental_qc_detects_causal_rolling_baseline_anomaly(self):
+        request = json.loads(json.dumps(REQUEST))
+        request["engine"] = {"engine_id": "environmental.timeseries.qc", "engine_version": "0.2.0"}
+        request["input"]["records"] = []
+        request["input"]["record_ids"] = []
+        values = [20.0, 20.1, 19.9, 20.0, 20.1, 30.0]
+        for index, value in enumerate(values):
+            record_id = f"9c2b3a4d-5e6f-4789-8123-456789abcde{index}"
+            request["input"]["record_ids"].append(record_id)
+            request["input"]["records"].append({
+                "record_id": record_id,
+                "record_type": "measurement",
+                "payload_sha256": "c" * 64,
+                "data": {
+                    "variable_code": "temperature",
+                    "normalized_value": value,
+                    "normalized_unit_code": "degC",
+                    "measured_at": f"2026-11-12T08:{index:02d}:00Z"
+                }
+            })
+        request["parameters"] = {
+            "minimum_points": 3,
+            "rolling_baseline_window_points": 5,
+            "rolling_baseline_min_history": 3,
+            "rolling_baseline_mad_threshold": 3.0,
+        }
+        result = run_environmental_timeseries_qc(request)
+        validate_response(result, request)
+        series = result["result"]["value"]["series"][0]
+        self.assertIn("rolling_baseline_anomaly_detected", series["quality_flags"])
+        self.assertEqual(len(series["rolling_baseline_anomaly_evidence"]), 1)
+        evidence = series["rolling_baseline_anomaly_evidence"][0]
+        self.assertEqual(evidence["record_id"], request["input"]["record_ids"][5])
+        self.assertEqual(evidence["baseline_median"], 20.0)
+        self.assertEqual(evidence["history_point_count"], 5)
+        self.assertEqual(evidence["method"], "trailing_rolling_median_mad")
+        self.assertIn("no seasonal, diurnal or biological-stage adjustment", result["result"]["limitations"][2])
+
     def test_environmental_qc_accepts_location_scoped_environmental_observations(self):
         request = json.loads(json.dumps(REQUEST))
         request["engine"] = {"engine_id": "environmental.timeseries.qc", "engine_version": "0.2.0"}
