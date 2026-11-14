@@ -53,7 +53,7 @@ _REFERENCE_ASSERTION_SUBJECT_TYPES = {
     "production_system", "environmental_parameter", "biological_process",
 }
 _REFERENCE_ASSERTION_CODE = re.compile(r"^[a-z][a-z0-9_.-]{1,159}$")
-_REFERENCE_ASSERTION_VERSION = re.compile(r"^[0-9]+\\.[0-9]+\\.[0-9]+([+-][0-9A-Za-z.-]+)?$")
+_REFERENCE_ASSERTION_VERSION = re.compile(r"^[0-9]+\.[0-9]+\.[0-9]+([+-][0-9A-Za-z.-]+)?$")
 _REFERENCE_ASSERTION_PREDICATE = re.compile(r"^[a-z][a-z0-9_.-]{1,158}$")
 _REFERENCE_ASSERTION_EVIDENCE_LEVELS = {"L0", "L1", "L2", "L3", "L4", "L5", "unassessed"}
 
