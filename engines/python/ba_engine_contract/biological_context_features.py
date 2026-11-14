@@ -15,7 +15,7 @@ import re
 from statistics import fmean
 from typing import Any, Mapping
 
-from .validation import validate_request
+from .validation import validate_request, _stable_sha256 as _contract_stable_sha256
 
 
 def _timestamp(value: Any, field: str) -> datetime:
@@ -47,6 +47,177 @@ _RULE_CONTEXT_FIELDS = {
     "organism_kind", "taxon_code", "strain_code", "cultivar_code",
     "culture_stage", "substrate_code", "production_system",
 }
+
+_REFERENCE_ASSERTION_SUBJECT_TYPES = {
+    "taxon", "strain", "cultivar", "substrate", "culture_stage",
+    "production_system", "environmental_parameter", "biological_process",
+}
+_REFERENCE_ASSERTION_EVIDENCE_LEVELS = {"L0", "L1", "L2", "L3", "L4", "L5", "unassessed"}
+
+
+def _evaluate_biological_reference_assertions(
+    state: Any,
+    assertions: Any,
+    biological_contexts: list[dict[str, Any]],
+    datasets: Any,
+) -> tuple[str, list[dict[str, Any]], list[str]]:
+    """Validate immutable assertion manifests and assess explicit context_match applicability."""
+    if state not in {"documented", "not_documented", "conflicting", "not_applicable"}:
+        raise ValueError("invalid_biological_reference_assertion_state")
+    if not isinstance(assertions, list) or len(assertions) > 500:
+        raise ValueError("invalid_biological_reference_assertions")
+    if not isinstance(datasets, list):
+        raise ValueError("invalid_biological_reference_assertion_datasets")
+
+    manifests: dict[tuple[str, str], dict[str, Any]] = {}
+    for dataset in datasets:
+        if not isinstance(dataset, dict) or dataset.get("provider") != "BA_LABS_BIOLOGICAL_REFERENCE_ASSERTION":
+            continue
+        key = (dataset.get("dataset_id"), dataset.get("dataset_version"))
+        if not all(isinstance(value, str) and value for value in key):
+            raise ValueError("invalid_biological_reference_assertion_manifest")
+        if key in manifests:
+            raise ValueError("duplicate_biological_reference_assertion_manifest")
+        manifests[key] = dataset
+
+    resolved: list[dict[str, Any]] = []
+    sources: set[str] = set()
+    seen: set[tuple[str, str]] = set()
+    semantic_values: dict[tuple[str, str, str], set[str]] = defaultdict(set)
+    for assertion in assertions:
+        if not isinstance(assertion, dict):
+            raise ValueError("invalid_biological_reference_assertion")
+        code = assertion.get("assertion_code")
+        version = assertion.get("assertion_version")
+        subject_type = assertion.get("subject_type")
+        subject_ref = assertion.get("subject_ref")
+        predicate = assertion.get("predicate_code")
+        digest = assertion.get("content_sha256")
+        source = assertion.get("source")
+        applicability = assertion.get("applicability")
+        uncertainty = assertion.get("uncertainty")
+        if (
+            not isinstance(code, str) or not _RULE_ID.fullmatch(code)
+            or not isinstance(version, str) or not _RULE_VERSION.fullmatch(version)
+            or subject_type not in _REFERENCE_ASSERTION_SUBJECT_TYPES
+            or not isinstance(subject_ref, str) or not subject_ref
+            or not isinstance(predicate, str) or not _RULE_ID.fullmatch(predicate)
+            or not isinstance(digest, str) or not re.fullmatch(r"[0-9a-f]{64}", digest)
+            or not isinstance(source, dict)
+            or not isinstance(applicability, dict) or not isinstance(uncertainty, dict)
+            or assertion.get("evidence_level") not in _REFERENCE_ASSERTION_EVIDENCE_LEVELS
+            or "object_value" not in assertion
+        ):
+            raise ValueError("invalid_biological_reference_assertion")
+        if assertion.get("unit_code") is not None and not isinstance(assertion.get("unit_code"), str):
+            raise ValueError("invalid_biological_reference_assertion_unit")
+        if assertion.get("source_locator") is not None and not isinstance(assertion.get("source_locator"), str):
+            raise ValueError("invalid_biological_reference_assertion_source_locator")
+        if not isinstance(assertion.get("reviewed_at"), str):
+            raise ValueError("invalid_biological_reference_assertion_review_timestamp")
+        source_id = assertion.get("reference_registry_id")
+        if not isinstance(source_id, str) or not re.fullmatch(
+            r"[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}", source_id, re.I
+        ):
+            raise ValueError("invalid_biological_reference_assertion_source_id")
+        source_reference_id = source.get("reference_id")
+        source_version = source.get("reference_version")
+        source_digest = source.get("content_sha256")
+        source_reviewed_at = source.get("reviewed_at")
+        if (
+            not isinstance(source_reference_id, str) or not source_reference_id
+            or not isinstance(source_version, str) or not source_version
+            or not isinstance(source_digest, str) or not re.fullmatch(r"[0-9a-f]{64}", source_digest)
+            or not isinstance(source_reviewed_at, str)
+            or (source.get("source_url") is not None and not isinstance(source.get("source_url"), str))
+        ):
+            raise ValueError("invalid_biological_reference_assertion_source")
+        key = (code, version)
+        if key in seen:
+            raise ValueError("duplicate_biological_reference_assertion_identity")
+        seen.add(key)
+        manifest = manifests.get(key)
+        if not manifest or manifest.get("content_sha256") != digest:
+            raise ValueError("biological_reference_assertion_manifest_missing_or_mismatched")
+
+        payload = {
+            "assertion_code": code,
+            "assertion_version": version,
+            "subject_type": subject_type,
+            "subject_ref": subject_ref,
+            "predicate_code": predicate,
+            "object_value": assertion["object_value"],
+            "unit_code": assertion.get("unit_code"),
+            "reference_registry_id": source_id,
+            "source_locator": assertion.get("source_locator"),
+            "evidence_level": assertion["evidence_level"],
+            "applicability": applicability,
+            "uncertainty": uncertainty,
+        }
+        if _contract_stable_sha256(payload) != digest:
+            raise ValueError("biological_reference_assertion_content_hash_mismatch")
+
+        context_match = applicability.get("context_match")
+        matching_context_ids: list[str] = []
+        applicability_state = "not_assessed"
+        if context_match is not None:
+            if (
+                not isinstance(context_match, dict) or not context_match
+                or not set(context_match).issubset(_RULE_CONTEXT_FIELDS)
+                or any(not isinstance(value, str) or not value.strip() for value in context_match.values())
+            ):
+                raise ValueError("invalid_biological_reference_assertion_applicability")
+            unknown_contexts = 0
+            for context in biological_contexts:
+                if not isinstance(context, dict):
+                    continue
+                known = all(context.get(field) is not None for field in context_match)
+                if not known:
+                    unknown_contexts += 1
+                    continue
+                if all(context.get(field) == expected for field, expected in context_match.items()):
+                    context_id = context.get("context_id")
+                    if isinstance(context_id, str):
+                        matching_context_ids.append(context_id)
+            if matching_context_ids:
+                applicability_state = "matched"
+            elif unknown_contexts:
+                applicability_state = "undetermined"
+            else:
+                applicability_state = "not_applicable"
+
+        semantic_values[(subject_type, subject_ref, predicate)].add(
+            _contract_stable_sha256(assertion["object_value"])
+        )
+        resolved_item = {
+            **payload,
+            "content_sha256": digest,
+            "applicability_state": applicability_state,
+            "matching_context_ids": sorted(set(matching_context_ids)),
+            "source": {
+                "reference_id": source_reference_id,
+                "reference_version": source_version,
+                "content_sha256": source_digest,
+                "reviewed_at": source_reviewed_at,
+                **({"source_url": source["source_url"]} if isinstance(source.get("source_url"), str) else {}),
+            },
+            "reviewed_at": assertion["reviewed_at"],
+        }
+        resolved.append(resolved_item)
+        sources.add(f"BA_LABS_BIOLOGICAL_REFERENCE_ASSERTION/{code}@{version}#sha256={digest}")
+        sources.add(f"BA_LABS_BIOLOGICAL_REFERENCE_SOURCE/{source_reference_id}@{source_version}#sha256={source_digest}")
+
+    has_conflicts = any(len(values) > 1 for values in semantic_values.values())
+    if has_conflicts or state == "conflicting":
+        state = "conflicting"
+    elif resolved:
+        state = "documented"
+    elif state == "documented":
+        raise ValueError("documented_biological_reference_assertions_require_assertions")
+    elif state != "not_applicable":
+        state = "not_documented"
+    return state, resolved, sorted(sources)
+
 
 
 def _evaluate_interpretation_rules(
@@ -504,6 +675,21 @@ def analyze_biological_context_features(request: Mapping[str, Any]) -> dict[str,
     elif identity_state == "not_documented":
         missing_context.append("biological_identity_not_documented")
 
+    reference_assertion_state, reference_assertions, reference_assertion_sources = (
+        _evaluate_biological_reference_assertions(
+            parameters.get("biological_reference_assertion_state", "not_documented"),
+            parameters.get("biological_reference_assertions", []),
+            biological_contexts,
+            request.get("datasets", []),
+        )
+    )
+    if reference_assertion_state == "conflicting":
+        quality_flags_reference = ["biological_reference_assertions_conflict"]
+    elif reference_assertions:
+        quality_flags_reference = ["biological_reference_assertions_present"]
+    else:
+        quality_flags_reference = ["biological_reference_assertions_not_documented"]
+
     interpretation_rules = parameters.get("interpretation_rules", [])
     if interpretation_rules and profile_state != "loaded":
         raise ValueError("interpretation_profile_not_loaded_for_rules")
@@ -514,6 +700,9 @@ def analyze_biological_context_features(request: Mapping[str, Any]) -> dict[str,
         quality_flags = ["rule_based_interpretation_evaluated_no_findings"]
     else:
         quality_flags = ["biological_interpretation_not_performed"]
+    quality_flags.extend(quality_flags_reference)
+    if reference_assertion_state == "conflicting":
+        missing_context.append("biological_reference_assertions_conflict")
     if identity_state == "conflicting":
         quality_flags.append("biological_identity_conflict")
     elif identity_state == "documented":
@@ -602,6 +791,8 @@ def analyze_biological_context_features(request: Mapping[str, Any]) -> dict[str,
                 "biological_contexts": biological_contexts,
                 "identity_assertion_state": identity_state,
                 "identity_assertions": identity_assertions,
+                "biological_reference_assertion_state": reference_assertion_state,
+                "biological_reference_assertions": reference_assertions,
             },
             "coverage": {
                 "requested_window": {
@@ -627,6 +818,8 @@ def analyze_biological_context_features(request: Mapping[str, Any]) -> dict[str,
             "This engine reports traceable coverage and descriptive features; optional rules produce limited threshold findings only, not biological diagnoses or intervention recommendations.",
             "Provider-derived environmental observations remain distinct from local in-situ measurements.",
             "A biological-subject-to-environment relationship must be verified by the trusted source adapter before environmental observations are included.",
+            "Validated biological reference assertions are contextual evidence; applicability is evaluated only when an explicit exact context_match is supplied, and assertions do not independently trigger threshold findings.",
+            "Conflicting biological reference assertions are surfaced for review and are never resolved by choosing one claim automatically.",
         ],
         "quality_flags": sorted(set(quality_flags)),
         "provenance": {
@@ -634,7 +827,7 @@ def analyze_biological_context_features(request: Mapping[str, Any]) -> dict[str,
             "libraries": [],
             "source_references": sorted({
                 *(f"{provider}/{dataset}" for provider, dataset in environmental_sources),
-                *interpretation_sources, *profile_sources, *identity_sources,
+                *interpretation_sources, *profile_sources, *identity_sources, *reference_assertion_sources,
                 *([f"BA_LABS_ENGINE_RESULT/environmental.timeseries.qc@0.2.0#execution={upstream_qc['execution_id']}#result={upstream_qc['result_id']}#sha256={upstream_qc['artifact_sha256']}"] if upstream_qc is not None else []),
             }),
         },
