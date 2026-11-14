@@ -202,33 +202,45 @@ await assert.rejects(
   /active_interpretation_profile_ambiguous/,
 );
 
+const unsupportedRules = [{ ...rule, unsupported_field: true }];
 await assert.rejects(
   buildBiologicalInterpretationProfile({
     ...input,
-    profiles: [{ ...profile, rules: [{ ...rule, unsupported_field: true }] }],
+    profiles: [{
+      ...profile,
+      rules: unsupportedRules,
+      content_sha256: profileDigest("mycology.biological.context.features", "1.0.0", unsupportedRules),
+    }],
   }),
   /interpretation_profile_rule_shape_invalid/,
 );
 
+const nonFiniteRules = [{ ...rule, threshold: Number.NaN }];
 await assert.rejects(
   buildBiologicalInterpretationProfile({
     ...input,
-    profiles: [{ ...profile, rules: [{ ...rule, threshold: Number.NaN }] }],
+    profiles: [{
+      ...profile,
+      rules: nonFiniteRules,
+      content_sha256: profileDigest("mycology.biological.context.features", "1.0.0", nonFiniteRules),
+    }],
   }),
   /interpretation_profile_rule_content_invalid/,
 );
 
+const identityScopedRules = [{
+  ...rule,
+  identity_match: {
+    assertion_type: "strain.designation",
+    assertion_value: "HK35",
+  },
+}];
 const identityScopedProfile = await buildBiologicalInterpretationProfile({
   ...input,
   profiles: [{
     ...profile,
-    rules: [{
-      ...rule,
-      identity_match: {
-        assertion_type: "strain.designation",
-        assertion_value: "HK35",
-      },
-    }],
+    rules: identityScopedRules,
+    content_sha256: profileDigest("mycology.biological.context.features", "1.0.0", identityScopedRules),
   }],
 });
 assert.equal(identityScopedProfile.state, "loaded");
@@ -240,6 +252,11 @@ await assert.rejects(
     profiles: [{
       ...profile,
       rules: [{ ...rule, identity_match: { assertion_type: "strain.designation" } }],
+      content_sha256: profileDigest(
+        "mycology.biological.context.features",
+        "1.0.0",
+        [{ ...rule, identity_match: { assertion_type: "strain.designation" } }],
+      ),
     }],
   }),
   /interpretation_profile_identity_match_invalid/,
