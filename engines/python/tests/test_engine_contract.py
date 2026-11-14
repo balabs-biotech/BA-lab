@@ -1540,6 +1540,41 @@ class EngineContractTests(unittest.TestCase):
         self.assertEqual(conflicting["result"]["value"]["subject"]["biological_reference_assertion_state"], "conflicting")
         self.assertIn("biological_reference_assertions_conflict", conflicting["result"]["quality_flags"])
 
+        non_overlapping_request = json.loads(json.dumps(request))
+        first = non_overlapping_request["parameters"]["biological_reference_assertions"][0]
+        first["applicability"]["validity_window"] = {
+            "valid_from": "2026-11-01", "valid_to": "2026-11-15",
+        }
+        first_payload = {key: val for key, val in first.items() if key != "content_sha256"}
+        first["content_sha256"] = _stable_sha256(first_payload)
+        second_non_overlapping = dict(second_payload)
+        second_non_overlapping["applicability"] = {
+            "context_match": {"organism_kind": "fungus", "culture_stage": "fruiting"},
+            "validity_window": {"valid_from": "2026-11-15", "valid_to": "2026-12-01"},
+        }
+        second_non_overlapping["content_sha256"] = _stable_sha256(second_non_overlapping)
+        non_overlapping_request["parameters"]["biological_reference_assertions"] = [
+            first, second_non_overlapping,
+        ]
+        non_overlapping_request["parameters"]["biological_reference_assertion_state"] = "documented"
+        non_overlapping_request["datasets"] = [
+            {
+                "provider": "BA_LABS_BIOLOGICAL_REFERENCE_ASSERTION",
+                "dataset_id": item["assertion_code"],
+                "dataset_version": item["assertion_version"],
+                "content_sha256": item["content_sha256"],
+                "retrieved_at": item["reviewed_at"],
+            }
+            for item in (first, second_non_overlapping)
+        ]
+        non_overlapping = execute_registered_engine(non_overlapping_request)
+        self.assertEqual(non_overlapping["status"], "completed", msg=str(non_overlapping.get("error")))
+        self.assertEqual(
+            non_overlapping["result"]["value"]["subject"]["biological_reference_assertion_state"],
+            "documented",
+        )
+        self.assertNotIn("biological_reference_assertions_conflict", non_overlapping["result"]["quality_flags"])
+
         tampered_request = json.loads(json.dumps(request))
         tampered_request["parameters"]["biological_reference_assertions"][0]["source"]["content_sha256"] = "c" * 64
         tampered = execute_registered_engine(tampered_request)
