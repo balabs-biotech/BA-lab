@@ -353,6 +353,54 @@ class EngineContractTests(unittest.TestCase):
         self.assertEqual(evidence["method"], "trailing_rolling_median_mad")
         self.assertIn("no seasonal, diurnal or biological-stage adjustment", result["result"]["limitations"][2])
 
+    def test_environmental_qc_collapses_duplicate_historical_timestamps_without_losing_lineage(self):
+        request = json.loads(json.dumps(REQUEST))
+        request["engine"] = {"engine_id": "environmental.timeseries.qc", "engine_version": "0.2.0"}
+        request["input"]["records"] = []
+        request["input"]["record_ids"] = []
+        observations = [
+            ("2026-11-12T08:00:00Z", 20.0),
+            ("2026-11-12T08:00:00Z", 20.2),
+            ("2026-11-12T08:01:00Z", 20.1),
+            ("2026-11-12T08:02:00Z", 19.9),
+            ("2026-11-12T08:03:00Z", 20.0),
+            ("2026-11-12T08:04:00Z", 20.1),
+            ("2026-11-12T08:05:00Z", 30.0),
+        ]
+        for index, (timestamp, value) in enumerate(observations):
+            record_id = f"7c2b3a4d-5e6f-4789-8123-456789abcde{index}"
+            request["input"]["record_ids"].append(record_id)
+            request["input"]["records"].append({
+                "record_id": record_id,
+                "record_type": "measurement",
+                "payload_sha256": "f" * 64,
+                "data": {
+                    "variable_code": "temperature",
+                    "normalized_value": value,
+                    "normalized_unit_code": "degC",
+                    "measured_at": timestamp,
+                },
+            })
+        request["parameters"] = {
+            "minimum_points": 3,
+            "rolling_baseline_window_points": 5,
+            "rolling_baseline_min_history": 5,
+            "rolling_baseline_mad_threshold": 3.0,
+        }
+
+        result = run_environmental_timeseries_qc(request)
+        series = result["result"]["value"]["series"][0]
+        evidence = next(
+            item for item in series["rolling_baseline_anomaly_evidence"]
+            if item["record_id"] == request["input"]["record_ids"][6]
+        )
+        self.assertEqual(evidence["history_point_count"], 5)
+        self.assertEqual(
+            evidence["history_record_ids"],
+            request["input"]["record_ids"][:6],
+        )
+        self.assertEqual(evidence["baseline_median"], 20.05)
+
     def test_environmental_qc_does_not_use_duplicate_timestamps_as_rolling_history(self):
         request = json.loads(json.dumps(REQUEST))
         request["engine"] = {"engine_id": "environmental.timeseries.qc", "engine_version": "0.2.0"}
