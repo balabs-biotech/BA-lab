@@ -7513,6 +7513,72 @@ function renderBiologicalContextAssessment(article, result) {
         if (!upstream || upstream.id !== upstreamExecutionId) {
           throw new Error("Exécution QC introuvable dans l’organisation active.");
         }
+        if (upstream.status !== "completed" ||
+            upstream.engine_id !== "environmental.timeseries.qc" ||
+            upstream.engine_version !== String(qc.upstream_engine_version || "") ||
+            upstream.completed_at !== qc.upstream_completed_at ||
+            upstream.input_snapshot_sha256 !== qc.upstream_input_snapshot_sha256) {
+          throw new Error("L’identité ou l’état du ledger QC ne correspond plus à la provenance consommée par le BIE.");
+        }
+        const { data: persistedQcResult, error: persistedQcResultError } = await supabaseClient
+          .from("engine_execution_results")
+          .select("id,execution_id,engine_id,engine_version,outcome,input_snapshot_sha256,value,limitations,quality_flags,provenance")
+          .eq("organization_id", expectedOrganizationId)
+          .eq("execution_id", upstreamExecutionId)
+          .maybeSingle();
+        if (persistedQcResultError) throw persistedQcResultError;
+        if (organizationId !== expectedOrganizationId) {
+          throw new Error("Le contexte organisationnel a changé pendant la vérification du résultat QC ; affichage annulé.");
+        }
+        if (!persistedQcResult ||
+            persistedQcResult.id !== qc.upstream_result_id ||
+            persistedQcResult.execution_id !== upstream.id ||
+            persistedQcResult.engine_id !== upstream.engine_id ||
+            persistedQcResult.engine_version !== upstream.engine_version ||
+            persistedQcResult.input_snapshot_sha256 !== upstream.input_snapshot_sha256 ||
+            persistedQcResult.outcome !== qc.outcome ||
+            !engineEvidenceMatches(persistedQcResult.value, qc.value) ||
+            !engineEvidenceMatches(persistedQcResult.limitations, qc.limitations) ||
+            !engineEvidenceMatches(persistedQcResult.quality_flags, qc.quality_flags) ||
+            !engineEvidenceMatches(persistedQcResult.provenance, qc.provenance)) {
+          throw new Error("Le résultat QC persistant ne correspond pas au résultat QC consommé par le BIE.");
+        }
+        const verifiedArtifact = {
+          contract: "BA-LABS/UPSTREAM-ENGINE-ARTIFACT",
+          contract_version: "1.0.0",
+          role: "environmental_qc",
+          execution_id: upstream.id,
+          result_id: persistedQcResult.id,
+          request_id: upstream.request_id,
+          engine_id: upstream.engine_id,
+          engine_version: upstream.engine_version,
+          completed_at: upstream.completed_at,
+          input_snapshot_sha256: upstream.input_snapshot_sha256,
+          scope: qc.upstream_scope,
+          result: {
+            outcome: persistedQcResult.outcome,
+            value: persistedQcResult.value,
+            limitations: persistedQcResult.limitations,
+            quality_flags: persistedQcResult.quality_flags,
+            provenance: persistedQcResult.provenance
+          }
+        };
+        const artifactDigest = await crypto.subtle.digest(
+          "SHA-256",
+          new TextEncoder().encode(JSON.stringify(canonicalizeEngineEvidence(verifiedArtifact)))
+        );
+        const verifiedArtifactSha256 = Array.from(new Uint8Array(artifactDigest), byte => byte.toString(16).padStart(2, "0")).join("");
+        if (verifiedArtifactSha256 !== qc.artifact_sha256) {
+          throw new Error("L’empreinte SHA-256 de l’artefact QC ne correspond plus à son contenu persistant.");
+        }
+        const upstreamParameters = upstream.request_payload?.parameters || {};
+        if (upstream.scope?.location_id !== qc.upstream_scope?.location_id ||
+            upstreamParameters.window_start !== qc.upstream_scope?.window_start ||
+            upstreamParameters.window_end !== qc.upstream_scope?.window_end ||
+            qc.upstream_scope?.organization_id !== expectedOrganizationId) {
+          throw new Error("Le périmètre ou la fenêtre du QC amont ne correspond plus à la provenance BIE.");
+        }
+        addLine(traceOutput, "Intégrité QC : résultat persistant retrouvé, identité concordante et artefact SHA-256 recalculé avec succès.");
         const ids = Array.isArray(upstream.input_record_ids)
           ? [...new Set(upstream.input_record_ids.filter(id => typeof id === "string" && id.length > 0))]
           : [];
