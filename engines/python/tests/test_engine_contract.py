@@ -854,11 +854,20 @@ class EngineContractTests(unittest.TestCase):
             "content_sha256": "d" * 64,
             "retrieved_at": "2026-11-10T07:55:00Z",
         })
+        profile_id = "mycology.pleurotus.fruiting"
+        profile_version = "1.0.0"
+        profile_content = {
+            "profile_id": profile_id,
+            "profile_version": profile_version,
+            "rules": request["parameters"]["interpretation_rules"],
+        }
         request["datasets"].append({
             "provider": "BA_LABS_INTERPRETATION_PROFILE",
             "dataset_id": "biological.context.features",
             "dataset_version": "1.0.0",
-            "content_sha256": "e" * 64,
+            "profile_id": profile_id,
+            "profile_version": profile_version,
+            "content_sha256": _stable_sha256(profile_content),
             "retrieved_at": "2026-11-10T07:55:00Z",
         })
         missing_registry = json.loads(json.dumps(request))
@@ -882,6 +891,11 @@ class EngineContractTests(unittest.TestCase):
              if dataset["provider"] == "BA_LABS_INTERPRETATION_PROFILE")["dataset_id"] = "untrusted.profile"
         with self.assertRaisesRegex(ValueError, "invalid_interpretation_profile_manifest"):
             analyze_biological_context_features(invalid_profile_manifest)
+
+        tampered_profile = json.loads(json.dumps(request))
+        tampered_profile["parameters"]["interpretation_rules"][0]["threshold"] = 25.0
+        with self.assertRaisesRegex(ValueError, "interpretation_profile_content_hash_mismatch"):
+            analyze_biological_context_features(tampered_profile)
 
         request["input"]["record_ids"] = []
         request["input"]["records"] = []
@@ -915,7 +929,15 @@ class EngineContractTests(unittest.TestCase):
         self.assertIn("rule_version=1.0.0", finding["statement"])
         self.assertIn("reference=ba-labs.protocols.pleurotus-fruiting@2026.1", finding["statement"])
         self.assertIn("BA_LABS_RULE_REGISTRY/ba-labs.protocols.pleurotus-fruiting@2026.1#sha256=" + ("d" * 64), result["result"]["provenance"]["source_references"])
-        self.assertIn("BA_LABS_INTERPRETATION_PROFILE/biological.context.features@1.0.0#sha256=" + ("e" * 64), result["result"]["provenance"]["source_references"])
+        self.assertIn(
+            "BA_LABS_INTERPRETATION_PROFILE/mycology.pleurotus.fruiting@1.0.0#sha256="
+            + _stable_sha256({
+                "profile_id": profile_id,
+                "profile_version": profile_version,
+                "rules": request["parameters"]["interpretation_rules"],
+            }),
+            result["result"]["provenance"]["source_references"],
+        )
         # A worker request cannot activate a profile's rules while claiming
         # that the biological context was unstable for the requested window.
         unstable_profile = json.loads(json.dumps(request))
@@ -1377,12 +1399,20 @@ class EngineContractTests(unittest.TestCase):
                 "assertion_value": "HK35",
             },
         }
+        profile_id = "mycology.strain.humidity"
+        profile_version = "1.0.0"
         datasets = [
             {
                 "provider": "BA_LABS_INTERPRETATION_PROFILE",
                 "dataset_id": "biological.context.features",
                 "dataset_version": "1.0.0",
-                "content_sha256": "a" * 64,
+                "profile_id": profile_id,
+                "profile_version": profile_version,
+                "content_sha256": _stable_sha256({
+                    "profile_id": profile_id,
+                    "profile_version": profile_version,
+                    "rules": [rule],
+                }),
             },
             {
                 "provider": "BA_LABS_RULE_REGISTRY",
