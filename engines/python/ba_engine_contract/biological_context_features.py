@@ -171,17 +171,66 @@ def _evaluate_biological_reference_assertions(
         _timestamp(assertion["reviewed_at"], "biological_reference_assertion_reviewed_at")
         _timestamp(source_reviewed_at, "biological_reference_source_reviewed_at")
         context_match = applicability.get("context_match")
+        validity_window = applicability.get("validity_window")
         matching_context_ids: list[str] = []
         applicability_state = "not_assessed"
-        if context_match is not None and not biological_contexts:
-            applicability_state = "undetermined"
-        elif context_match is not None:
+        temporal_applicability_state = "not_scoped"
+        if validity_window is not None:
+            if (
+                not isinstance(validity_window, dict)
+                or set(validity_window) != {"valid_from", "valid_to"}
+                or not isinstance(validity_window.get("valid_from"), str)
+                or not re.fullmatch(r"\\d{4}-\\d{2}-\\d{2}", validity_window["valid_from"])
+                or (validity_window.get("valid_to") is not None and (
+                    not isinstance(validity_window.get("valid_to"), str)
+                    or not re.fullmatch(r"\\d{4}-\\d{2}-\\d{2}", validity_window["valid_to"])
+                ))
+            ):
+                raise ValueError("invalid_biological_reference_assertion_validity_window")
+            try:
+                from datetime import date
+                assertion_start = date.fromisoformat(validity_window["valid_from"])
+                assertion_end = date.fromisoformat(validity_window["valid_to"]) if validity_window["valid_to"] else None
+            except ValueError as exc:
+                raise ValueError("invalid_biological_reference_assertion_validity_window") from exc
+            if assertion_end is not None and assertion_end <= assertion_start:
+                raise ValueError("invalid_biological_reference_assertion_validity_window")
+            temporal_matches = 0
+            temporal_unknown = 0
+            for context in biological_contexts:
+                if not isinstance(context, dict):
+                    temporal_unknown += 1
+                    continue
+                try:
+                    context_start = date.fromisoformat(context["valid_from"]) if isinstance(context.get("valid_from"), str) else None
+                    context_end = date.fromisoformat(context["valid_to"]) if isinstance(context.get("valid_to"), str) else None
+                except ValueError:
+                    temporal_unknown += 1
+                    continue
+                if context_start is None:
+                    temporal_unknown += 1
+                    continue
+                if context_end is not None and context_end <= context_start:
+                    raise ValueError("invalid_biological_context_validity_window")
+                overlaps = (assertion_end is None or context_start < assertion_end) and (context_end is None or assertion_start < context_end)
+                if overlaps:
+                    temporal_matches += 1
+            if temporal_matches:
+                temporal_applicability_state = "matched"
+            elif temporal_unknown:
+                temporal_applicability_state = "undetermined"
+            else:
+                temporal_applicability_state = "not_applicable"
+
+        context_matches: set[str] | None = None
+        if context_match is not None:
             if (
                 not isinstance(context_match, dict) or not context_match
                 or not set(context_match).issubset(_RULE_CONTEXT_FIELDS)
                 or any(not isinstance(value, str) or not value.strip() for value in context_match.values())
             ):
                 raise ValueError("invalid_biological_reference_assertion_applicability")
+            context_matches = set()
             unknown_contexts = 0
             for context in biological_contexts:
                 if not isinstance(context, dict):
@@ -193,12 +242,36 @@ def _evaluate_biological_reference_assertions(
                 if all(context.get(field) == expected for field, expected in context_match.items()):
                     context_id = context.get("context_id")
                     if isinstance(context_id, str):
-                        matching_context_ids.append(context_id)
-            if matching_context_ids:
-                applicability_state = "matched"
-            elif unknown_contexts:
+                        context_matches.add(context_id)
+            if not context_matches and unknown_contexts and temporal_applicability_state != "not_applicable":
                 applicability_state = "undetermined"
-            else:
+            elif not context_matches:
+                applicability_state = "not_applicable"
+
+        if context_match is None and validity_window is None:
+            applicability_state = "not_assessed"
+        elif not biological_contexts:
+            applicability_state = "undetermined"
+        else:
+            candidate_contexts = [
+                context for context in biological_contexts
+                if isinstance(context, dict)
+                and (context_matches is None or context.get("context_id") in context_matches)
+            ]
+            if validity_window is not None:
+                candidate_contexts = [
+                    context for context in candidate_contexts
+                    if isinstance(context.get("valid_from"), str)
+                    and (assertion_end is None or context["valid_from"] < assertion_end.isoformat())
+                    and (context.get("valid_to") is None or assertion_start.isoformat() < context["valid_to"])
+                ]
+            if candidate_contexts:
+                applicability_state = "matched"
+                matching_context_ids = [
+                    context["context_id"] for context in candidate_contexts
+                    if isinstance(context.get("context_id"), str)
+                ]
+            elif applicability_state != "undetermined":
                 applicability_state = "not_applicable"
 
         semantic_values[(subject_type, subject_ref, predicate)].add(
@@ -208,6 +281,7 @@ def _evaluate_biological_reference_assertions(
             **payload,
             "content_sha256": digest,
             "applicability_state": applicability_state,
+            "temporal_applicability_state": temporal_applicability_state,
             "matching_context_ids": sorted(set(matching_context_ids)),
             "source": {
                 "reference_id": source_reference_id,
