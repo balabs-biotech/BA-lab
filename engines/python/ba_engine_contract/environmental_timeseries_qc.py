@@ -16,6 +16,10 @@ from typing import Any, Mapping
 from .validation import validate_request
 
 
+def _iso_utc(value: datetime) -> str:
+    return value.isoformat().replace("+00:00", "Z")
+
+
 def _parse_timestamp(value: str) -> datetime:
     if not isinstance(value, str) or not value:
         raise ValueError("measurement timestamp must be a non-empty string")
@@ -132,6 +136,39 @@ def analyze_environmental_timeseries_qc(request: Mapping[str, Any]) -> dict[str,
         ]
         duplicate_timestamps = len({point[0] for point in points}) != len(points)
         gap_indexes = [index for index, gap in enumerate(gaps, start=1) if gap > max_gap_minutes]
+        gap_intervals = [
+            {
+                "from": _iso_utc(points[index - 1][0]),
+                "to": _iso_utc(points[index][0]),
+                "duration_minutes": round(gaps[index - 1], 3),
+                "after_record_id": points[index - 1][2],
+                "before_record_id": points[index][2],
+            }
+            for index in gap_indexes
+        ]
+        duplicate_groups: dict[datetime, list[str]] = defaultdict(list)
+        for timestamp, _value, record_id in points:
+            duplicate_groups[timestamp].append(record_id)
+        duplicate_timestamp_groups = [
+            {"timestamp": _iso_utc(timestamp), "record_ids": sorted(record_ids)}
+            for timestamp, record_ids in sorted(duplicate_groups.items())
+            if len(record_ids) > 1
+        ]
+        center = median(values)
+        mad = median([abs(value - center) for value in values])
+        robust_scale = 1.4826 * mad
+        outlier_evidence = [
+            {
+                "record_id": points[index][2],
+                "observed_value": points[index][1],
+                "median_value": center,
+                "mad": mad,
+                "robust_z_score": round(abs(points[index][1] - center) / robust_scale, 4) if robust_scale else None,
+                "threshold": float(outlier_threshold),
+                "interpretation": "deviation_from_median" if robust_scale else "zero_mad_non_median_value",
+            }
+            for index in sorted(outlier_indexes)
+        ]
         flags = []
         if len(points) < minimum_points:
             flags.append("insufficient_series_points")
@@ -152,7 +189,10 @@ def analyze_environmental_timeseries_qc(request: Mapping[str, Any]) -> dict[str,
             "max_gap_minutes": max(gaps, default=0),
             "duplicate_timestamps": duplicate_timestamps,
             "gap_after_record_ids": [points[index - 1][2] for index in gap_indexes],
+            "gap_intervals": gap_intervals,
+            "duplicate_timestamp_groups": duplicate_timestamp_groups,
             "outlier_record_ids": [points[index][2] for index in sorted(outlier_indexes)],
+            "outlier_evidence": outlier_evidence,
             "quality_flags": flags,
         })
 
