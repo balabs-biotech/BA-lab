@@ -7527,6 +7527,7 @@ function renderBiologicalContextAssessment(article, result) {
     biological_context_not_stable_for_full_window: "Contexte biologique non stable sur toute la période",
     biological_domain_ambiguous_for_full_window: "Domaine biologique ambigu sur la période",
     genetic_reference_unresolved: "Référence génétique non résolue",
+    biological_reference_assertions_conflict: "Références scientifiques contradictoires",
     culture_environment_not_linked: "Environnement de culture non lié",
     plant_environment_not_linked: "Environnement de culture végétale non lié",
     environment_without_location: "Environnement sans localisation"
