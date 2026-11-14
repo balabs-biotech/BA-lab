@@ -8134,7 +8134,11 @@ function renderBiologicalContextAssessment(article, result) {
   addList(article, "Faits observés et sources", value.observed_facts, item => String(item.statement || item.fact_code || "Fait") + (item.observed_at ? " · " + item.observed_at : "") + (Array.isArray(item.source_record_ids) ? " · sources : " + item.source_record_ids.join(", ") : ""), 8);
   const temporalFeatures = Array.isArray(value.derived_features) ? value.derived_features.filter(item =>
     item && typeof item.feature_code === "string" &&
-    (item.feature_code.endsWith(".range") || item.feature_code.endsWith(".trend_slope_per_day"))
+    (item.feature_code.endsWith(".range") ||
+      item.feature_code.endsWith(".trend_slope_per_day") ||
+      item.feature_code.endsWith(".population_stddev") ||
+      item.feature_code.endsWith(".coefficient_of_variation_pct") ||
+      item.feature_code.endsWith(".largest_two_segment_mean_shift"))
   ) : [];
   if (temporalFeatures.length) {
     const temporalPanel = document.createElement("section");
@@ -8146,9 +8150,15 @@ function renderBiologicalContextAssessment(article, result) {
     const temporalList = document.createElement("ul");
     for (const feature of temporalFeatures) {
       const item = document.createElement("li");
-      const isTrend = feature.feature_code.endsWith(".trend_slope_per_day");
+      const featureLabels = [
+        [".trend_slope_per_day", "Tendance linéaire estimée"],
+        [".range", "Amplitude observée"],
+        [".population_stddev", "Dispersion (écart-type)"],
+        [".coefficient_of_variation_pct", "Variabilité relative"],
+        [".largest_two_segment_mean_shift", "Rupture moyenne exploratoire"]
+      ];
       const label = document.createElement("strong");
-      label.textContent = isTrend ? "Tendance linéaire estimée" : "Amplitude observée";
+      label.textContent = featureLabels.find(([suffix]) => feature.feature_code.endsWith(suffix))?.[1] || "Indicateur temporel";
       const detail = document.createElement("p");
       detail.className = "muted";
       detail.textContent = String(feature.feature_code) + " : " + String(feature.value ?? "—") +
