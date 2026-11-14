@@ -372,6 +372,22 @@ for(const snippet of [
 if(!executionLineageBlock.includes("new Set(executionInputIds)")||!executionLineageBlock.includes("[...executionSet].every(id => resultSet.has(id))"))throw new Error("Execution/result input ID comparison must compare unique sets, not counts only");
 console.log("✓ Analytics history exposes ledger/result snapshots, engine version, scope, timestamps and exact input-lineage consistency states");
 
+const qcSelectorMarkup=template.includes('id="plantBiologicalAssessmentQcExecution"');
+if(!qcSelectorMarkup)throw new Error("Plant BIE upstream environmental QC selector is missing from workspace");
+const qcSelectorRenderer=engine.slice(engine.indexOf("function renderRecentEngineExecutions()"),engine.indexOf("\\nfunction ",engine.indexOf("function renderRecentEngineExecutions()")+10));
+for(const snippet of [
+  'getElementById("plantBiologicalAssessmentQcExecution")',
+  'execution.engine_id === "environmental.timeseries.qc"',
+  'execution.status === "completed"',
+  'eligibleQc.some(execution => execution.id === selectedQcId)'
+])if(!qcSelectorRenderer.includes(snippet))throw new Error("Upstream QC selector filtering/preservation missing: "+snippet);
+const plantAssessmentStart=engine.indexOf("async function runPlantBiologicalAssessment()");
+const plantAssessmentEnd=engine.indexOf("\\nlet culture",plantAssessmentStart);
+const plantAssessmentCode=engine.slice(plantAssessmentStart,plantAssessmentEnd);
+if(!plantAssessmentCode.includes("upstream_qc_execution_id")||!plantAssessmentCode.includes('getElementById("plantBiologicalAssessmentQcExecution")'))throw new Error("Selected upstream QC execution is not forwarded to the BIE orchestration request");
+console.log("✓ Plant BIE can explicitly consume a completed, organization-scoped environmental QC execution");
+
+
 
 
 
