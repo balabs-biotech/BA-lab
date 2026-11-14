@@ -6,6 +6,7 @@ const source = readFileSync("supabase/functions/engine-orchestrator/index.ts", "
 const biologicalLoader = readFileSync("supabase/functions/_shared/biological-context-loader.ts", "utf8");
 const biologicalProfile = readFileSync("supabase/functions/_shared/biological-interpretation-profile.ts", "utf8");
 const qcLineageValidator = readFileSync("supabase/functions/_shared/upstream-qc-lineage.mjs", "utf8");
+const queueDispatcher = readFileSync("supabase/functions/engine-queue-dispatch/index.ts", "utf8");
 const checks = [
   ["BIE profile loader is imported into the authenticated orchestrator", /loadAuthenticatedBiologicalInterpretationProfile/],
   ["profile resolution refuses privileged client creation and requires the caller RLS client", /caller_scoped_supabase_client_required[\s\S]*?userClient\.from/, biologicalProfile],
@@ -66,6 +67,7 @@ const checks = [
   ["idempotency comparison binds the upstream artifact envelope", /upstream_artifacts[\s\S]*?sameExecutionInput/],
   ["worker response is schema validated", /validateResponse/],
   ["completed BIE responses must preserve every upstream QC artifact identity, digest, scope and payload field", /matchesSingleUpstreamQcArtifact\(upstreamArtifacts, result, stable\)/],
+  ["async queue dispatcher validates the worker response against the immutable QC artifact before persistence", /matchesSingleUpstreamQcArtifact\(upstreamArtifacts, result, stable\)[\s\S]*?upstream_artifact_lineage_mismatch[\s\S]*?persistFailure[\s\S]*?result\.execution_id = execution\.id/, queueDispatcher],
   ["QC lineage validator fails closed unless exactly one artifact is present", /upstreamArtifacts\.length !== 1/, qcLineageValidator],
   ["QC lineage validator compares immutable identity and scientific payload fields", /upstream_execution_id[\s\S]*?upstream_result_id[\s\S]*?upstream_engine_id[\s\S]*?upstream_engine_version[\s\S]*?upstream_completed_at[\s\S]*?upstream_input_snapshot_sha256[\s\S]*?artifact_sha256[\s\S]*?quality_flags[\s\S]*?limitations[\s\S]*?provenance[\s\S]*?consumed\.value/, qcLineageValidator],
   ["upstream QC lineage mismatch is persisted as a terminal worker-owned failure before result commit", /upstream_artifact_lineage_mismatch[\s\S]*?persistExecutionFailure[\s\S]*?workerId[\s\S]*?return reply/],
