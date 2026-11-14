@@ -717,6 +717,36 @@ def analyze_biological_context_features(request: Mapping[str, Any]) -> dict[str,
                     "source_record_ids": source_ids,
                 })
 
+        # Exploratory two-segment shift indicator. Requiring at least three
+        # observations on each side reduces trivial endpoint splits. This is
+        # not a formal change-point test and carries no significance estimate.
+        if len(values) >= 6:
+            best_delta = -1.0
+            best_split = None
+            best_direction = None
+            for split_index in range(3, len(values) - 2):
+                left_mean = fmean(values[:split_index])
+                right_mean = fmean(values[split_index:])
+                delta = abs(right_mean - left_mean)
+                if delta > best_delta:
+                    best_delta = delta
+                    best_split = split_index
+                    best_direction = "up" if right_mean > left_mean else "down" if right_mean < left_mean else "flat"
+            if best_split is not None:
+                derived_features.append({
+                    "feature_code": f"series.{prefix}.largest_two_segment_mean_shift",
+                    "value": best_delta,
+                    "method": (
+                        "largest_absolute_difference_between_adjacent_segment_means"
+                        f"; split_at={_iso(times[best_split])}"
+                        f"; direction={best_direction}"
+                        "; minimum_segment_size=3"
+                    ),
+                    "method_version": "1.0.0",
+                    "unit_code": unit,
+                    "source_record_ids": source_ids,
+                })
+
         # A least-squares slope is emitted only for at least three points
         # spanning two distinct instants. It is descriptive, not a stress score.
         if len(points) >= 3 and len(set(times)) >= 2:
