@@ -767,7 +767,10 @@ class EngineContractTests(unittest.TestCase):
                     "normalized_unit_code": "degC",
                     "measured_at": timestamp,
                 },
-                "context": {"culture_id": culture_id},
+                "context": {
+                    "culture_id": culture_id,
+                    **({"event_id": "4c2b3a4d-5e6f-4789-8123-456789abcdef"} if index == 1 else {}),
+                },
             })
         result = execute_registered_engine(request)
         self.assertEqual(result["status"], "completed", msg=str(result.get("error")))
@@ -778,6 +781,10 @@ class EngineContractTests(unittest.TestCase):
         self.assertEqual(value["subject"]["subject_id"], culture_id)
         self.assertEqual(value["coverage"]["source_record_count"], 3)
         self.assertEqual(value["coverage"]["record_counts_by_type"]["measurement"], 3)
+        event_fact = next(item for item in value["observed_facts"] if item["observed_at"] == "2026-11-10T09:00:00Z")
+        self.assertEqual(event_fact["event_id"], "4c2b3a4d-5e6f-4789-8123-456789abcdef")
+        self.assertNotIn("event_id", value["observed_facts"][0],
+            "event linkage remains absent rather than inferred when no event anchor was supplied")
         self.assertEqual(len(value["derived_features"]), 8)
         dispersion = next(item for item in value["derived_features"] if item["feature_code"] == "series.measurement.air_temperature.population_stddev")
         self.assertAlmostEqual(dispersion["value"], (2 / 3) ** 0.5, places=8)
