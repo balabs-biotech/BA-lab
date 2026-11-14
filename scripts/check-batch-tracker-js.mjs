@@ -19,6 +19,12 @@ for(const r of routes){
 }
 if(template.includes('class="domain-switcher"'))throw new Error("Switcher remains inside workspace");
 if(!engine.includes("const modulesByDomain")||!engine.includes('domain !== "laboratory"'))throw new Error("Domain module scope missing");
+if(!engine.includes("biological_reference_assertion_state") ||
+   !engine.includes("Assertions bibliographiques validées") ||
+   !engine.includes("applicability_state") ||
+   !engine.includes("biological_reference_assertions_conflict")) {
+ throw new Error("Biological reference assertion state, evidence and review signals are not exposed in the results UI");
+}
 if(!/if \(document\.body\.dataset\.domain === "agronomy"\) \{[\s\S]*?await loadPlantCultures\(\);[\s\S]*?\}/.test(engine))throw new Error("Non-agronomy workspaces must not depend on plant registry loading during authentication");
 const css=fs.readFileSync("batch-tracker/tracker.css","utf8");
 const activeCss=css.replace(/\/\*[\s\S]*?\*\//g,"");
