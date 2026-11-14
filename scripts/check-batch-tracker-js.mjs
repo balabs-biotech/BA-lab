@@ -345,6 +345,12 @@ for(const snippet of [
   'link.rel = "noopener noreferrer"',
   'Identifiants non résolus'
 ])if(!qcTraceBlock.includes(snippet))throw new Error("Environmental source trace regression: "+snippet);
+if ((qcTraceBlock.match(/organizationId !== expectedOrganizationId/g) || []).length < 2) {
+  throw new Error("Environmental source trace must revalidate the active organization after both asynchronous lookups");
+}
+if (!qcTraceBlock.includes("finally") || !qcTraceBlock.includes("traceButton.disabled = false")) {
+  throw new Error("Environmental source trace must always restore its action button");
+}
 console.log("✓ QC provenance drilldown is tenant-scoped, snapshot-aware and exposes source family, retrieval time, location, missing IDs and guarded provider links");
 
 
