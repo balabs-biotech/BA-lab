@@ -681,6 +681,18 @@ def analyze_biological_context_features(request: Mapping[str, Any]) -> dict[str,
                 "unit_code": "count" if suffix == "count" else unit,
                 "source_record_ids": source_ids,
             })
+        # Range expresses observed amplitude within this homogeneous series.
+        # It is descriptive and retains the complete contributing record lineage.
+        if len(values) >= 2:
+            derived_features.append({
+                "feature_code": f"series.{prefix}.range",
+                "value": max(values) - min(values),
+                "method": "maximum_minus_minimum",
+                "method_version": "1.0.0",
+                "unit_code": unit,
+                "source_record_ids": source_ids,
+            })
+
         # A least-squares slope is emitted only for at least three points
         # spanning two distinct instants. It is descriptive, not a stress score.
         if len(points) >= 3 and len(set(times)) >= 2:
