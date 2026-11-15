@@ -8752,3 +8752,217 @@ body[data-domain] :is(.culture-catalog-row,.batch-item,.stage,.qc-row) {
     animation: none !important;
   }
 }
+
+
+/* ============================================================
+   BA LABS CULTUREOPS — WORKBENCH COMPONENTS / PASS 41
+   Lists, record detail, measurement history, QC and data tables.
+   ============================================================ */
+body[data-domain] :is(.culture-detail,.bio-operation-panel,.bio-lineage-panel) {
+  color: var(--workspace-text);
+  border: 1px solid var(--workspace-border) !important;
+  border-radius: 14px;
+  background:
+    linear-gradient(145deg, color-mix(in srgb, var(--workspace-accent) 5%, transparent), transparent 55%),
+    var(--workspace-panel-raised) !important;
+  box-shadow: 0 10px 26px rgba(0,0,0,.14);
+}
+body[data-domain] .culture-detail {
+  margin-top: 18px;
+  padding: clamp(16px, 2.2vw, 24px);
+}
+body[data-domain] :is(.culture-detail-heading,.culture-catalog-heading,.overview-section-heading) {
+  gap: 12px;
+}
+body[data-domain] .culture-detail-heading {
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--workspace-border);
+}
+body[data-domain] .culture-detail-summary {
+  gap: 9px;
+  margin-block: 16px;
+}
+body[data-domain] .culture-detail-summary > * {
+  min-width: 0;
+  padding: 12px 13px;
+  border: 1px solid var(--workspace-border);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--workspace-panel) 82%, transparent);
+}
+body[data-domain] .culture-detail-summary :is(strong,b) {
+  color: var(--workspace-text);
+  font-variant-numeric: tabular-nums;
+}
+body[data-domain] .culture-detail :is(h3,h4) {
+  color: var(--workspace-text);
+}
+body[data-domain] .culture-timeline-entry,
+body[data-domain] .measurement-entry,
+body[data-domain] .batch-event-item {
+  position: relative;
+  padding: 13px 15px;
+  border: 1px solid var(--workspace-border);
+  border-inline-start: 3px solid var(--workspace-accent);
+  border-radius: 10px;
+  background: var(--workspace-panel);
+  color: var(--workspace-text);
+}
+body[data-domain] .culture-timeline-entry + .culture-timeline-entry,
+body[data-domain] .measurement-entry + .measurement-entry,
+body[data-domain] .batch-event-item + .batch-event-item { margin-top: 8px; }
+body[data-domain] .culture-timeline-date,
+body[data-domain] .measurement-stamp {
+  color: var(--workspace-muted);
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+}
+body[data-domain] .culture-timeline-entry strong,
+body[data-domain] .measurement-entry strong {
+  color: var(--workspace-text);
+  font-size: 12px;
+}
+body[data-domain] .culture-timeline-entry p {
+  margin: 5px 0 0;
+  color: var(--workspace-muted);
+  line-height: 1.6;
+}
+body[data-domain] .batch-list .batch-item {
+  padding: 16px 17px;
+  border-color: var(--workspace-border);
+  border-inline-start-color: var(--workspace-accent);
+  border-radius: 12px;
+  background:
+    linear-gradient(110deg, color-mix(in srgb, var(--workspace-accent) 5%, transparent), transparent 55%),
+    var(--workspace-panel-raised);
+  box-shadow: 0 5px 16px rgba(0,0,0,.12);
+}
+body[data-domain] .batch-list .batch-item + .batch-item { margin-top: 9px; }
+body[data-domain] .batch-list .batch-item strong { font-size: 14px; letter-spacing: -.01em; }
+body[data-domain] .batch-list .batch-item .muted { font-size: 11px; }
+body[data-domain] .qc-row,
+body[data-domain] .stage,
+body[data-domain] .batch-stat {
+  border: 1px solid var(--workspace-border) !important;
+  border-radius: 10px;
+  background: var(--workspace-panel) !important;
+  color: var(--workspace-text);
+}
+body[data-domain] .stage.active {
+  border-color: color-mix(in srgb, var(--workspace-accent) 65%, var(--workspace-border)) !important;
+  background: color-mix(in srgb, var(--workspace-accent) 9%, var(--workspace-panel)) !important;
+}
+body[data-domain] .stage.completed {
+  background: color-mix(in srgb, var(--workspace-accent) 5%, var(--workspace-panel)) !important;
+}
+body[data-domain] .qc-label,
+body[data-domain] .batch-stat-value { color: var(--workspace-text); }
+body[data-domain] .statistics-table-wrap,
+body[data-domain] .table-wrap {
+  border: 1px solid var(--workspace-border);
+  border-radius: 12px;
+  background: var(--workspace-panel);
+  box-shadow: 0 8px 22px rgba(0,0,0,.12);
+  scrollbar-color: var(--workspace-accent) var(--workspace-panel);
+}
+body[data-domain] .statistics-table {
+  border-collapse: separate;
+  border-spacing: 0;
+  background: transparent !important;
+  color: var(--workspace-text) !important;
+}
+body[data-domain] .statistics-table th {
+  padding: 12px 14px;
+  background: var(--workspace-panel-raised) !important;
+  color: var(--workspace-muted) !important;
+  border-bottom: 1px solid var(--workspace-border) !important;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: .11em;
+  text-transform: uppercase;
+}
+body[data-domain] .statistics-table td {
+  padding: 12px 14px;
+  color: var(--workspace-text) !important;
+  border-bottom: 1px solid color-mix(in srgb, var(--workspace-border) 70%, transparent) !important;
+  background: transparent !important;
+  font-size: 11px;
+}
+body[data-domain] .statistics-table tbody tr:nth-child(even) td {
+  background: color-mix(in srgb, var(--workspace-panel-raised) 52%, transparent) !important;
+}
+body[data-domain] .statistics-table tbody tr:hover td {
+  background: color-mix(in srgb, var(--workspace-accent) 8%, var(--workspace-panel)) !important;
+}
+body[data-domain] .statistics-table tbody tr:last-child td { border-bottom: 0 !important; }
+body[data-domain] .statistics-table caption {
+  padding: 13px 14px;
+  color: var(--workspace-text);
+  font-size: 11px;
+  font-weight: 750;
+}
+body[data-domain] :is(.culture-catalog-row,.measurement-entry,.batch-event-item,.overview-observation) {
+  border-color: var(--workspace-border);
+  background: var(--workspace-panel);
+}
+body[data-domain] .culture-catalog-row {
+  padding: 15px 17px;
+  border-inline-start-width: 3px;
+  border-radius: 12px;
+  box-shadow: 0 5px 16px rgba(0,0,0,.12);
+}
+body[data-domain] .culture-catalog-code {
+  color: var(--workspace-text);
+  font-size: 14px;
+  font-weight: 750;
+  letter-spacing: -.012em;
+}
+body[data-domain] .culture-catalog-meta { color: var(--workspace-muted); font-size: 10px; }
+body[data-domain] .culture-catalog-action {
+  min-height: 37px;
+  padding: 8px 11px;
+  border: 1px solid var(--workspace-border);
+  border-radius: 8px;
+  background: var(--workspace-panel-raised);
+  color: var(--workspace-text);
+  font-size: 11px;
+  font-weight: 700;
+}
+body[data-domain] .culture-catalog-action:hover {
+  border-color: var(--workspace-accent);
+  background: color-mix(in srgb, var(--workspace-accent) 10%, var(--workspace-panel-raised));
+}
+body[data-domain] :is(.culture-catalog-list,.plant-culture-list,.batch-list) > :is(.muted,.hint):only-child {
+  padding: 22px 18px;
+  border: 1px dashed var(--workspace-border);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--workspace-panel-raised) 65%, transparent);
+  color: var(--workspace-muted);
+  text-align: center;
+  line-height: 1.7;
+}
+body[data-domain] :is(.statistics-filters,.culture-catalog-filters,.bio-operation-form) {
+  padding: 14px;
+  border: 1px solid var(--workspace-border);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--workspace-panel-raised) 72%, transparent);
+}
+body[data-domain] .statistics-filter-action { align-self: end; }
+body[data-domain] :is(.statistics-table-wrap,.table-wrap)::-webkit-scrollbar { height: 8px; }
+body[data-domain] :is(.statistics-table-wrap,.table-wrap)::-webkit-scrollbar-thumb {
+  border: 2px solid var(--workspace-panel);
+  border-radius: 99px;
+  background: color-mix(in srgb, var(--workspace-accent) 65%, var(--workspace-muted));
+}
+@media (max-width: 760px) {
+  body[data-domain] .culture-detail { padding: 15px 13px; }
+  body[data-domain] .culture-detail-summary > * { padding: 10px; }
+  body[data-domain] .culture-catalog-row { padding: 14px; }
+  body[data-domain] .culture-catalog-actions { gap: 7px; }
+  body[data-domain] .culture-catalog-action { min-height: 40px; }
+  body[data-domain] .statistics-table-wrap,
+  body[data-domain] .table-wrap { border-radius: 9px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  body[data-domain] .culture-catalog-action,
+  body[data-domain] .batch-list .batch-item { transition: none !important; }
+}
