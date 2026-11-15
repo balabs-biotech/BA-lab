@@ -923,11 +923,11 @@ assert.match(collectionHtml, /id="cultureCatalogList"[^>]*[\s\S]*?feedback-info/
   "culture catalogue must identify its pre-authentication state as informational");
 assert.match(collectionHtml, /id="plantCultureList"[^>]*[\s\S]*?feedback-info/,
   "GreenTech registry must identify its pre-authentication state as informational");
-assert.match(collectionJs, /empty\.className = "feedback-empty"/,
+assert.match(collectionJs, /empty\.className = "muted feedback-empty"/,
   "empty culture and plant collections must use the shared empty state");
 assert.match(collectionJs, /batchList\.innerHTML = [\s\S]*?feedback-empty/,
   "empty batch collection must use the shared empty state");
-assert.match(collectionJs, /list\.className = "feedback-error"/,
+assert.match(collectionJs, /list\.className = "culture-catalog-list feedback-error"/,
   "GreenTech retrieval failure must be exposed as an error state");
 console.log("✓ Collection states: loading, unauthenticated, empty and retrieval error");
 
