@@ -8289,7 +8289,8 @@ function setupDomainWorkspaces() {
       title: 'Culture <span>&amp;</span><br>supervision agronomique',
       descriptionHero: "Suivez les conditions de culture, les mesures environnementales et l’évolution des plantes.",
       tags: ["Capteurs", "Substrats", "Croissance"],
-      status: "AGRITECH / MONITORING"
+      status: "AGRITECH / MONITORING",
+      navigation: { cultures: "Cultures végétales", measurements: "Mesures agronomiques" }
     },
     mycology: {
       heading: "Registre mycologique",
@@ -8298,7 +8299,8 @@ function setupDomainWorkspaces() {
       title: 'Souches <span>&amp;</span><br>traçabilité fongique',
       descriptionHero: "Documentez l’identité des souches, les étapes de propagation, les observations morphologiques et les incidents.",
       tags: ["Souches", "Générations", "Contamination"],
-      status: "MYCOLOGY / SPECIMEN LEDGER"
+      status: "MYCOLOGY / SPECIMEN LEDGER",
+      navigation: { cultures: "Souches & cultures", measurements: "Suivi mycologique" }
     },
     laboratory: {
       heading: "Suivi expérimental",
@@ -8307,10 +8309,13 @@ function setupDomainWorkspaces() {
       title: 'Cultures <span>&amp;</span><br>suivi scientifique',
       descriptionHero: "Enregistrez les conditions expérimentales, les variables mesurées et les résultats avec leur contexte.",
       tags: ["Milieux", "Protocoles", "Mesures"],
-      status: "LAB / EXPERIMENT TRACKING"
+      status: "LAB / EXPERIMENT TRACKING",
+      navigation: { cultures: "Cultures biologiques", measurements: "Mesures & observations" }
     }
   };
   const buttons = [...document.querySelectorAll("[data-domain-choice]")];
+  const navCultureLink = document.getElementById("navCultureLink");
+  const navMeasurementLink = document.getElementById("navMeasurementLink");
   const eyebrow = document.querySelector(".app-hero .eyebrow");
   const title = document.querySelector(".app-hero h1");
   const heroDescription = document.querySelector(".hero-description");
@@ -8351,6 +8356,8 @@ function setupDomainWorkspaces() {
       });
     }
     if (toolbarStatus) toolbarStatus.textContent = config.status;
+    if (navCultureLink) navCultureLink.textContent = config.navigation.cultures;
+    if (navMeasurementLink) navMeasurementLink.textContent = config.navigation.measurements;
     document.documentElement.dataset.domain = activeDomain;
     if (persist) {
       try { localStorage.setItem("baLabsCultureTrackerDomain", activeDomain); } catch (_) {}
