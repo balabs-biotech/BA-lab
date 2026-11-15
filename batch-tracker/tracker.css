@@ -3502,3 +3502,185 @@ html[dir="rtl"] body[data-domain] .entry-intro {
   border-inline-start: 1px solid var(--border);
   border-inline-end: 3px solid var(--workspace-accent, var(--brand));
 }
+
+
+/* ============================================================
+   CULTUREOPS — operational feedback states / pass 5
+   Consistent loading, success, warning and error feedback.
+   CSS-only: no changes to submission or authentication logic.
+   ============================================================ */
+body[data-domain] {
+  --state-success-bg: #eaf4e9;
+  --state-success-border: #a9cba8;
+  --state-success-text: #24552d;
+  --state-warning-bg: #fff4df;
+  --state-warning-border: #e5c987;
+  --state-warning-text: #684813;
+  --state-error-bg: #fff0ef;
+  --state-error-border: #e4b5b0;
+  --state-error-text: #762d2a;
+  --state-info-bg: var(--surface-2);
+  --state-info-border: var(--border);
+  --state-info-text: var(--text);
+}
+body[data-domain] #message {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+  scroll-margin-top: 96px;
+}
+body[data-domain] #message:empty {
+  display: none;
+}
+body[data-domain] #message .card {
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+  min-width: 0;
+  margin: 0;
+  padding: 14px 16px;
+  border: 1px solid var(--state-info-border);
+  border-inline-start: 4px solid var(--workspace-accent, var(--brand));
+  border-radius: 12px;
+  background: var(--state-info-bg);
+  color: var(--state-info-text);
+  box-shadow: 0 5px 16px rgba(0,0,0,.045);
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+body[data-domain] #message .card.success {
+  background: var(--state-success-bg);
+  border-color: var(--state-success-border);
+  border-inline-start-color: #43834c;
+  color: var(--state-success-text);
+}
+body[data-domain] #message .card.warning {
+  background: var(--state-warning-bg);
+  border-color: var(--state-warning-border);
+  border-inline-start-color: #b17a20;
+  color: var(--state-warning-text);
+}
+body[data-domain] #message .card.error {
+  background: var(--state-error-bg);
+  border-color: var(--state-error-border);
+  border-inline-start-color: #b64b45;
+  color: var(--state-error-text);
+}
+body[data-domain] .info {
+  border: 1px solid var(--state-info-border);
+  color: var(--state-info-text);
+  background: var(--state-info-bg);
+}
+body[data-domain] .info.success {
+  border-color: var(--state-success-border);
+  color: var(--state-success-text);
+  background: var(--state-success-bg);
+}
+body[data-domain] .info.warning {
+  border-color: var(--state-warning-border);
+  color: var(--state-warning-text);
+  background: var(--state-warning-bg);
+}
+body[data-domain] .info.error {
+  border-color: var(--state-error-border);
+  color: var(--state-error-text);
+  background: var(--state-error-bg);
+}
+body[data-domain] :is(#authStatus, #plantCultureStatus, #smartEntryStatus, #statisticsStatus) {
+  min-height: 1.5em;
+  padding: 8px 10px;
+  border-inline-start: 2px solid var(--workspace-accent, var(--brand));
+  border-radius: 0 8px 8px 0;
+  background: var(--surface-2);
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+body[data-domain] button[aria-busy="true"] {
+  opacity: .88;
+  cursor: progress;
+  pointer-events: none;
+}
+body[data-domain] button[aria-busy="true"]::before {
+  border-color: currentColor;
+  border-top-color: transparent;
+  animation: cultureops-spin .8s linear infinite;
+}
+@keyframes cultureops-spin {
+  to { transform: rotate(360deg); }
+}
+body[data-domain] button:disabled {
+  opacity: .52;
+  filter: saturate(.55);
+}
+body[data-domain] :is(input, select, textarea)[aria-invalid="true"] {
+  border-color: #bd514b !important;
+  box-shadow: 0 0 0 2px rgba(189,81,75,.13);
+}
+body[data-domain] :is(input, select, textarea):focus-visible,
+body[data-domain] button:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+body[data-domain] .progress-track,
+body[data-domain] .overview-meter {
+  overflow: hidden;
+}
+body[data-domain] .progress-track > *,
+body[data-domain] .overview-meter > * {
+  transition: width .28s ease;
+}
+body[data-domain="agronomy"] {
+  --state-success-bg: #203326;
+  --state-success-border: #486b4d;
+  --state-success-text: #d4edca;
+  --state-warning-bg: #382f1d;
+  --state-warning-border: #766039;
+  --state-warning-text: #f3d99f;
+  --state-error-bg: #3b2423;
+  --state-error-border: #80504b;
+  --state-error-text: #ffd1cb;
+}
+body[data-domain="mycology"] {
+  --state-success-bg: #eaf2e8;
+  --state-success-border: #b8cdb3;
+  --state-success-text: #315638;
+  --state-warning-bg: #fff3df;
+  --state-warning-border: #e3c99b;
+  --state-warning-text: #704b1d;
+  --state-error-bg: #fff0ed;
+  --state-error-border: #dfb9b0;
+  --state-error-text: #792f28;
+}
+body[data-domain="laboratory"] {
+  --state-success-bg: #e8f3ec;
+  --state-success-border: #b5d5c2;
+  --state-success-text: #22583a;
+  --state-warning-bg: #fff5e3;
+  --state-warning-border: #e5d0a4;
+  --state-warning-text: #70501c;
+  --state-error-bg: #fff0f0;
+  --state-error-border: #e3bcbc;
+  --state-error-text: #7b2c2c;
+}
+@media (max-width: 640px) {
+  body[data-domain] #message .card {
+    padding: 12px 13px;
+    font-size: 13px;
+  }
+  body[data-domain] :is(#authStatus, #plantCultureStatus, #smartEntryStatus, #statisticsStatus) {
+    font-size: 12px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  body[data-domain] button[aria-busy="true"]::before {
+    animation: none;
+    border-style: dotted;
+  }
+  body[data-domain] .progress-track > *,
+  body[data-domain] .overview-meter > * {
+    transition: none;
+  }
+}
+html[dir="rtl"] body[data-domain] :is(#authStatus, #plantCultureStatus, #smartEntryStatus, #statisticsStatus) {
+  border-radius: 8px 0 0 8px;
+}
