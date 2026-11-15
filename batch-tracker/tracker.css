@@ -7940,3 +7940,21 @@ body[data-domain="mycology"] #authCard #authStatus {
   color: #e9e2dc !important;
   -webkit-text-fill-color: #e9e2dc !important;
 }
+
+
+/* MYCOLOGY — align legacy design tokens with the actual dark workspace surface.
+   The browser contrast audit reads --surface as the reference background. */
+body[data-domain="mycology"] {
+  --bg: #101513;
+  --surface: #19211e;
+  --surface-2: #202a25;
+  --border: #594538;
+  --border-strong: #765b47;
+  --text: #e9e2dc;
+  --muted: #b9c2bb;
+  --brand: #c98259;
+}
+body[data-domain="mycology"] #authCard label {
+  color: #e9e2dc !important;
+  -webkit-text-fill-color: #e9e2dc !important;
+}
