@@ -56,7 +56,7 @@ Audit effectué sur le projet Supabase actif `BALabs`, les migrations appliquée
 4. Les contrats d'entrée/sortie doivent devenir des artefacts testés et versionnés, pas seulement des colonnes JSONB.
 5. La séparation des données par espace métier est aujourd'hui principalement une séparation d'interface ; le README confirme que les tables restent organisationnelles et ne sont pas partitionnées au niveau GreenTech/Mycology/Laboratory.
 6. Les fonctions Edge déployées doivent être comparées à leur source versionnée dans Git à chaque livraison.
-7. Le dépôt ne contenait pas les sources Supabase annoncées. Le snapshot exact de `engine-worker` v61 a maintenant été récupéré depuis le projet actif et versionné dans `supabase/functions/engine-worker/index.ts`, avec sa provenance et ses paramètres dans `DEPLOYMENT.md`. Le reste des fonctions Edge, `config.toml` et l'historique SQL des migrations restent à réconcilier. Le README racine a été corrigé pour ne plus présenter la synchronisation comme complète.
+7. La réconciliation des fonctions Edge est maintenant réalisée : les 10 fonctions déployées ont des snapshots dans `supabase/functions/`. Quatre fichiers préexistants correspondaient déjà exactement au distant ; trois étaient obsolètes et ont été remplacés ; deux manquaient et ont été ajoutés ; le worker v61 a été vérifié identique. L'inventaire et les paramètres de sécurité sont documentés dans `supabase/functions/DEPLOYMENT-INVENTORY.md`. `config.toml` et l'historique SQL des migrations restent à réconcilier. Le README racine a été corrigé.
 
 ## 3. Architecture logique cible
 
@@ -195,8 +195,8 @@ Une recommandation cite le signal déclencheur, le contexte, la source, le profi
 ### Phase 0 — Contrat et inventaire (en cours)
 - Documenter l'architecture et l'état réel des composants.
 - Établir la matrice des moteurs, versions, contrats, statuts, dépendances et tests.
-- Continuer la réconciliation du code Edge déployé avec les sources versionnées dans Git ; le snapshot du worker v61 est désormais présent et vérifié à l'identique.
-- Récupérer les autres fonctions, le fichier de configuration et les migrations depuis des sources vérifiées, sans reconstituer des migrations au hasard ni réécrire l'historique en production.
+- Les 10 sources Edge déployées sont désormais versionnées ; conserver un contrôle de dérive avant chaque déploiement.
+- Récupérer `config.toml` et les migrations depuis des sources vérifiées, sans reconstituer des migrations au hasard ni réécrire l'historique en production.
 - Transformer les alertes de sécurité en tickets de revue qualifiés.
 
 ### Phase 1 — Fiabiliser le socle d'exécution
