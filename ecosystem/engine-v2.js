@@ -47,7 +47,7 @@ let nav, branchDock, currentNode = null, currentAnchor = null, navigationStack =
 let selected = null, selectedBranch = null, manifest = null, transition = null;
 let distance = 13.5, zoomTargetDistance = 13.5, theta = .22, phi = 1.27, target = null, targetGoal = null;
 let opened = false, raf = 0, lastFrame = 0, dragging = false, moved = false, dragGesture = false;
-let lastPointer = null, pointers = new Map(), pinchStart = 0, pinchDistance = 0, pinchCenter = null, hoverId = null , lastBranchTouchActivationAt = 0;
+let lastPointer = null, pointers = new Map(), pinchStart = 0, pinchDistance = 0, pinchCenter = null, hoverId = null , lastBranchTouchActivationAt = 0, multiTouchGesture = false;
 let canvasRect = null, cameraInitialized = false, lastPickAt = 0;
 let _hitWorld = null;
 
@@ -537,12 +537,14 @@ function setupUI() {
   window.addEventListener('resize',resize);
 }
 function onPointerDown(e) {
+  if(pointers.size===0){multiTouchGesture=false;dragGesture=false;moved=false}
   const blocked=e.target.closest('.webgl-controls,.webgl-focus,.webgl-intro,.webgl-branch-dock');
   if(blocked||(e.pointerType!=='touch'&&e.target.closest('.webgl-hit-target')))return;
   stage?.focus({preventScroll:true});
   pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
   stage.setPointerCapture?.(e.pointerId);
   if(pointers.size>=2){
+    multiTouchGesture=true;
     const p=[...pointers.values()];
     pinchStart=Math.hypot(p[0].x-p[1].x,p[0].y-p[1].y);
     pinchCenter={x:p.reduce((sum,v)=>sum+v.x,0)/p.length,y:p.reduce((sum,v)=>sum+v.y,0)/p.length};
@@ -570,6 +572,7 @@ function onPointerMove(e) {
 }
 function onPointerUp(e) {
   const wasPointer=pointers.has(e.pointerId);pointers.delete(e.pointerId);
+  if(multiTouchGesture){if(!pointers.size){dragging=false;moved=true;dragGesture=true;lastPointer=null;pinchStart=0;pinchCenter=null}return;}
   if(pointers.size<2){pinchStart=0;pinchCenter=null}
   if(!wasPointer)return;
   if(pointers.size){
@@ -580,7 +583,7 @@ function onPointerUp(e) {
   dragging=false;
   if(!moved&&!transition&&performance.now()-lastPickAt>450&&!e.target.closest('.webgl-controls,.webgl-focus,.webgl-intro,.webgl-hit-target,.webgl-branch-dock'))pickAt(e.clientX,e.clientY);
   lastPointer=null;
-}function onPointerCancel(){pointers.clear();dragging=false;moved=true;pinchStart=0;pinchCenter=null;lastPointer=null}
+}function onPointerCancel(){if(pointers.size>=2)multiTouchGesture=true;pointers.clear();dragging=false;moved=true;dragGesture=true;pinchStart=0;pinchCenter=null;lastPointer=null}
 function onLostCapture(e){if(pointers.has(e.pointerId)){pointers.delete(e.pointerId);if(!pointers.size){dragging=false;lastPointer=null}}}
 function pickAt(x,y) {
   lastPickAt=performance.now();
