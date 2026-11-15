@@ -7371,3 +7371,80 @@ body[data-domain].workspace-authenticated .app-hero h1 {
     line-height: 1.35;
   }
 }
+
+/* ============================================================
+   CULTUREOPS — passe 23
+   États d’interaction cohérents et navigation clavier
+   ============================================================ */
+body[data-domain] :is(
+  .app-toolbar a,
+  .section-nav a,
+  .universe-home-link,
+  .language-control select,
+  button,
+  input,
+  select,
+  textarea,
+  summary
+):focus-visible {
+  outline: 2px solid var(--workspace-accent, var(--focus, #7fae91));
+  outline-offset: 3px;
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--workspace-accent, #7fae91) 18%, transparent);
+}
+body[data-domain] :is(button, .section-nav a, .universe-home-link, summary) {
+  -webkit-tap-highlight-color: transparent;
+}
+body[data-domain] :is(.section-nav a, .universe-home-link) {
+  min-height: 42px;
+  display: inline-flex;
+  align-items: center;
+}
+body[data-domain] button:not(:disabled) {
+  cursor: pointer;
+}
+body[data-domain] button:disabled,
+body[data-domain] :is(input, select, textarea):disabled {
+  cursor: not-allowed;
+  opacity: .62;
+}
+body[data-domain] :is(input, select, textarea):read-only {
+  cursor: text;
+}
+body[data-domain] :is(input, select, textarea)::placeholder {
+  color: var(--muted);
+  opacity: .82;
+}
+body[data-domain] :is(a, button) {
+  text-underline-offset: 3px;
+}
+body[data-domain] :is(a, button):active:not(:disabled) {
+  filter: brightness(.94);
+}
+body[data-domain] .section-nav a[aria-current="page"],
+body[data-domain] .section-nav a[aria-current="location"] {
+  border-color: var(--workspace-accent, var(--brand));
+}
+body[data-domain] :is(.card, .app-toolbar, .app-hero, .batch-item) {
+  min-width: 0;
+}
+body[data-domain] :is(.card, .batch-item, .info, .stage, .qc-row) {
+  overflow-wrap: anywhere;
+}
+@media (max-width: 680px) {
+  body[data-domain] :is(input, select, textarea) {
+    font-size: 16px;
+  }
+  body[data-domain] :is(.section-nav a, .universe-home-link) {
+    min-height: 44px;
+  }
+  body[data-domain] .app-toolbar :is(button, a, select) {
+    max-width: 100%;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  body[data-domain] :is(a, button, input, select, textarea, summary) {
+    scroll-behavior: auto !important;
+    transition: none !important;
+    animation: none !important;
+  }
+}
