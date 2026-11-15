@@ -3119,3 +3119,136 @@ body[data-domain] .culture-detail-field {
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
+
+
+/* Form workflow surfaces: guidance, consent and action hierarchy stay legible
+   in GreenTech, Mycology and Laboratory without changing validation logic. */
+body[data-domain] :is(.info, .hint) {
+  color: var(--muted);
+}
+body[data-domain] .info {
+  background: var(--surface-2);
+  border-color: var(--border);
+  border-radius: 10px;
+}
+body[data-domain] .hint {
+  display: block;
+  margin-top: 5px;
+  font-size: .82rem;
+  line-height: 1.45;
+}
+body[data-domain] .req {
+  color: var(--err);
+}
+body[data-domain] .consent-panel {
+  color: var(--text);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+body[data-domain] .consent-panel > strong {
+  color: var(--text);
+}
+body[data-domain] .consent-option {
+  border-top: 1px solid var(--border);
+}
+body[data-domain] :is(.auth-actions, .sync-line, .assisted-entry-actions) {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+body[data-domain] :is(.auth-actions, .assisted-entry-actions) button {
+  min-height: 42px;
+}
+body[data-domain] button:disabled,
+body[data-domain] button[aria-busy="true"] {
+  cursor: wait;
+  opacity: .68;
+  filter: saturate(.65);
+}
+body[data-domain] button[aria-busy="true"] {
+  position: relative;
+}
+body[data-domain] button:focus-visible,
+body[data-domain] a:focus-visible {
+  outline-color: var(--focus);
+}
+body[data-domain] :is(.info, .hint, .consent-panel, .sync-line, .assisted-entry-actions) {
+  overflow-wrap: anywhere;
+}
+
+
+/* Reusable native dialog contract for future create/edit/confirm workflows.
+   Native <dialog> supplies focus containment and Escape handling. */
+body[data-domain] dialog.workspace-dialog {
+  width: min(620px, calc(100vw - 32px));
+  max-width: 620px;
+  max-height: min(86dvh, 820px);
+  padding: 0;
+  overflow: auto;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: 16px;
+  box-shadow: 0 24px 80px color-mix(in srgb, var(--text) 24%, transparent);
+}
+body[data-domain] dialog.workspace-dialog::backdrop {
+  background: color-mix(in srgb, #07110c 62%, transparent);
+  backdrop-filter: blur(3px);
+}
+body[data-domain] .workspace-dialog .dialog-header,
+body[data-domain] .workspace-dialog .dialog-body,
+body[data-domain] .workspace-dialog .dialog-actions {
+  padding: 18px 22px;
+}
+body[data-domain] .workspace-dialog .dialog-header {
+  border-bottom: 1px solid var(--border);
+  background: var(--surface-2);
+}
+body[data-domain] .workspace-dialog .dialog-header h2 {
+  margin: 0;
+  color: var(--text);
+}
+body[data-domain] .workspace-dialog .dialog-body {
+  overflow-wrap: anywhere;
+}
+body[data-domain] .workspace-dialog .dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  border-top: 1px solid var(--border);
+  background: var(--surface-2);
+}
+body[data-domain] .workspace-dialog .dialog-actions .secondary-button {
+  color: var(--text);
+  background: var(--surface);
+  border-color: var(--border-strong);
+}
+@media (max-width: 600px) {
+  body[data-domain] dialog.workspace-dialog {
+    width: calc(100vw - 20px);
+    max-height: 92dvh;
+    margin: auto 10px;
+    border-radius: 14px;
+  }
+  body[data-domain] .workspace-dialog :is(.dialog-header, .dialog-body, .dialog-actions) {
+    padding: 15px;
+  }
+  body[data-domain] .workspace-dialog .dialog-actions {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+  }
+  body[data-domain] .workspace-dialog .dialog-actions button {
+    width: 100%;
+    min-height: 44px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  body[data-domain] :is(button, input, select, textarea) {
+    transition-duration: .01ms !important;
+  }
+}
