@@ -933,3 +933,31 @@ console.log("✓ Collection states: loading, unauthenticated, empty and retrieva
 
 assert.match(collectionJs, /list\.className = "culture-catalog-list";[\s\S]*?list\.removeAttribute\("role"\)/,
   "successful GreenTech reload must clear the previous retrieval-error surface");
+
+
+// Shared inline collection feedback must expose semantic state, role and busy
+// status without injecting user-facing text as HTML.
+const feedbackStateSource = extractFunction(engine, "renderCollectionFeedback");
+const feedbackContainer = {
+  children: [], attributes: {},
+  replaceChildren(...nodes) { this.children = nodes; },
+  setAttribute(name, value) { this.attributes[name] = value; },
+  removeAttribute(name) { delete this.attributes[name]; }
+};
+const feedbackStateResult = vm.runInNewContext(
+  `${feedbackStateSource}; renderCollectionFeedback(injected.container, "loading", "<chargement>")`,
+  { injected: { container: feedbackContainer }, document: { createElement: fakeElement } }
+);
+assert.equal(feedbackContainer.attributes["data-feedback-state"], "loading");
+assert.equal(feedbackContainer.attributes["aria-busy"], "true");
+assert.equal(feedbackStateResult.attributes.role, "status");
+assert.equal(feedbackStateResult.className, "feedback-loading");
+assert.equal(feedbackStateResult.textContent, "<chargement>");
+const feedbackErrorResult = vm.runInNewContext(
+  `${feedbackStateSource}; renderCollectionFeedback(injected.container, "error", "Lecture impossible")`,
+  { injected: { container: feedbackContainer }, document: { createElement: fakeElement } }
+);
+assert.equal(feedbackContainer.attributes["data-feedback-state"], "error");
+assert.equal(feedbackContainer.attributes["aria-busy"], undefined);
+assert.equal(feedbackErrorResult.attributes.role, "alert");
+console.log("✓ Shared collection feedback: semantic state, safe text and accessible roles");
