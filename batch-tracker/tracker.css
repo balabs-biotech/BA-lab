@@ -4633,3 +4633,220 @@ html[dir="rtl"] body[data-domain] .statistics-footnote {
     transition: none;
   }
 }
+
+
+/* ============================================================
+   CULTUREOPS — cross-workspace shell consistency
+   Pass 9 · shared navigation, hierarchy and interaction rhythm
+   ============================================================ */
+body[data-domain] .container {
+  width: min(100% - 32px, 1440px);
+  margin-inline: auto;
+}
+body[data-domain] .app-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  gap: clamp(10px, 1.6vw, 22px);
+  padding: 10px clamp(12px, 2vw, 22px);
+  border: 1px solid color-mix(in srgb, var(--workspace-accent, var(--brand)) 24%, var(--border));
+  border-radius: 0 0 16px 16px;
+  background: color-mix(in srgb, var(--surface) 92%, transparent);
+  backdrop-filter: blur(16px);
+}
+body[data-domain] .toolbar-brand {
+  flex: 0 0 auto;
+  min-width: max-content;
+}
+body[data-domain] .section-nav {
+  flex: 1 1 auto;
+  min-width: 0;
+  scrollbar-width: thin;
+  scrollbar-color: var(--workspace-accent, var(--brand)) transparent;
+}
+body[data-domain] .section-nav a {
+  min-height: 42px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 11px;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  white-space: nowrap;
+  transition: background-color .18s ease, border-color .18s ease, color .18s ease;
+}
+body[data-domain] .section-nav a:hover,
+body[data-domain] .section-nav a:focus-visible {
+  border-color: color-mix(in srgb, var(--workspace-accent, var(--brand)) 45%, var(--border));
+  background: color-mix(in srgb, var(--workspace-accent, var(--brand)) 10%, var(--surface));
+}
+body[data-domain] .section-nav a[aria-current="location"],
+body[data-domain] .section-nav a.is-active {
+  border-color: color-mix(in srgb, var(--workspace-accent, var(--brand)) 48%, var(--border));
+  background: color-mix(in srgb, var(--workspace-accent, var(--brand)) 13%, var(--surface));
+  color: var(--text);
+}
+body[data-domain] .nav-number {
+  color: var(--workspace-accent, var(--brand));
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+  font-weight: 850;
+}
+body[data-domain] .toolbar-status {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+body[data-domain] .universe-home-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  margin-block: 10px 4px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: none;
+}
+body[data-domain] .universe-home-link:hover {
+  color: var(--workspace-accent, var(--brand));
+}
+body[data-domain] .app-hero {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  margin-block: 10px 24px;
+  border: 1px solid color-mix(in srgb, var(--workspace-accent, var(--brand)) 25%, var(--border));
+  border-radius: 20px;
+}
+body[data-domain] .app-hero::before {
+  position: absolute;
+  z-index: -1;
+  inset-block: 0;
+  inset-inline-start: 0;
+  width: 4px;
+  background: var(--workspace-accent, var(--brand));
+  content: "";
+}
+body[data-domain] .hero-copy {
+  min-width: 0;
+}
+body[data-domain] .hero-description {
+  max-width: 66ch;
+  line-height: 1.75;
+}
+body[data-domain] .hero-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+body[data-domain] .hero-tags > span {
+  min-height: 30px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--surface-2) 78%, transparent);
+  font-size: 11px;
+  line-height: 1.3;
+}
+body[data-domain] main.container > .card {
+  scroll-margin-top: 92px;
+  min-width: 0;
+  margin-block: 18px;
+  padding: clamp(16px, 2.4vw, 28px);
+  border-radius: 16px;
+}
+body[data-domain] main.container > .card > .section-kicker {
+  margin-bottom: 16px;
+}
+body[data-domain] main.container > .card > h2,
+body[data-domain] main.container > .card .entry-intro h2 {
+  letter-spacing: -.025em;
+  line-height: 1.2;
+  text-wrap: balance;
+}
+body[data-domain] .section-kicker .kicker-line {
+  flex: 1 1 24px;
+  min-width: 12px;
+}
+body[data-domain] :is(button, a, input, select, textarea, summary) {
+  -webkit-tap-highlight-color: transparent;
+}
+body[data-domain] :is(button, .section-nav a, .universe-home-link):focus-visible {
+  outline: 2px solid var(--workspace-accent, var(--brand));
+  outline-offset: 3px;
+}
+body[data-domain] .hidden[hidden],
+body[data-domain] [hidden] {
+  display: none !important;
+}
+html[dir="rtl"] body[data-domain] .app-toolbar,
+html[dir="rtl"] body[data-domain] .section-nav {
+  direction: rtl;
+}
+html[dir="rtl"] body[data-domain] .hero-art,
+html[dir="rtl"] body[data-domain] .hero-core,
+html[dir="rtl"] body[data-domain] .brand-symbol,
+html[dir="rtl"] body[data-domain] .statistics-chart {
+  direction: ltr;
+}
+html[dir="rtl"] body[data-domain] .app-hero::before {
+  inset-inline-start: auto;
+  inset-inline-end: 0;
+}
+@media (max-width: 900px) {
+  body[data-domain] .app-toolbar {
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  body[data-domain] .section-nav {
+    order: 3;
+    flex-basis: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    padding-block: 3px 5px;
+  }
+  body[data-domain] .toolbar-status {
+    margin-inline-start: auto;
+  }
+}
+@media (max-width: 600px) {
+  body[data-domain] .container {
+    width: min(100% - 20px, 1440px);
+  }
+  body[data-domain] .app-toolbar {
+    top: 0;
+    padding: 8px 10px 6px;
+    border-radius: 0 0 12px 12px;
+  }
+  body[data-domain] .toolbar-brand .brand-wordmark small {
+    letter-spacing: .12em;
+  }
+  body[data-domain] .section-nav {
+    gap: 5px;
+  }
+  body[data-domain] .section-nav a {
+    min-height: 40px;
+    padding: 7px 9px;
+    font-size: 11px;
+  }
+  body[data-domain] .toolbar-status {
+    font-size: 9px;
+  }
+  body[data-domain] .app-hero {
+    margin-block: 8px 16px;
+    border-radius: 15px;
+  }
+  body[data-domain] main.container > .card {
+    scroll-margin-top: 118px;
+    margin-block: 12px;
+    padding: 15px 13px;
+    border-radius: 13px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  body[data-domain] .section-nav a {
+    transition: none;
+  }
+}
