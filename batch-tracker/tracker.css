@@ -7214,3 +7214,40 @@ body[data-domain="mycology"] .language-control select option {
       "result result result";
   }
 }
+
+
+/* Authenticated workspace: collapse the presentation hero to preserve working space. */
+body[data-domain].workspace-authenticated .app-hero {
+  grid-template-columns: minmax(0, 1fr);
+  min-height: 0;
+  margin-bottom: 14px;
+  padding: 14px 22px;
+  border-radius: 16px;
+  box-shadow: 0 8px 22px rgba(27, 61, 41, .09);
+}
+body[data-domain].workspace-authenticated .hero-art,
+body[data-domain].workspace-authenticated .hero-description,
+body[data-domain].workspace-authenticated .hero-tags {
+  display: none;
+}
+body[data-domain].workspace-authenticated .eyebrow {
+  margin-bottom: 5px;
+  font-size: 9px;
+  letter-spacing: .13em;
+}
+body[data-domain].workspace-authenticated .app-hero h1 {
+  max-width: none;
+  font-size: clamp(20px, 2.4vw, 27px);
+  line-height: 1.12;
+  letter-spacing: -.025em;
+}
+@media (max-width: 680px) {
+  body[data-domain].workspace-authenticated .app-hero {
+    margin-bottom: 10px;
+    padding: 12px 15px;
+    border-radius: 13px;
+  }
+  body[data-domain].workspace-authenticated .app-hero h1 {
+    font-size: 21px;
+  }
+}
