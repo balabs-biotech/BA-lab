@@ -14837,3 +14837,361 @@ body[data-domain] :is(button,a,input,select,textarea):focus-visible {
     transition:none!important; transform:none!important;
   }
 }
+
+
+/* ============================================================
+   CULTUREOPS INTERIOR REFINEMENT — PASS 73
+   Culture records, biological operations, histories and analysis
+   ============================================================ */
+body[data-domain] #cultureDetailPanel {
+  display:grid;
+  gap:15px;
+  padding:clamp(14px,2vw,22px);
+  background:var(--workspace-panel)!important;
+  border:1px solid var(--workspace-border);
+  border-radius:16px;
+}
+body[data-domain] #cultureDetailPanel .culture-detail-heading {
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:16px;
+  padding:0 0 15px;
+  border-bottom:1px solid var(--workspace-border);
+}
+body[data-domain] #cultureDetailPanel .culture-detail-heading h3 {
+  margin:5px 0 3px;
+  color:var(--workspace-text);
+  font-size:clamp(1.15rem,2vw,1.55rem);
+  line-height:1.2;
+  letter-spacing:-.035em;
+  overflow-wrap:anywhere;
+}
+body[data-domain] #cultureDetailPanel .culture-detail-heading .muted {
+  margin:0;
+  color:var(--workspace-muted);
+  font-size:.72rem;
+}
+body[data-domain] #cultureDetailPanel .culture-detail-summary {
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:8px;
+  margin:0;
+}
+body[data-domain] #cultureDetailPanel .culture-detail-field {
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  gap:7px;
+  min-width:0;
+  min-height:72px;
+  padding:11px 12px;
+  border:1px solid var(--workspace-border);
+  border-radius:11px;
+  background:var(--workspace-panel-raised);
+}
+body[data-domain] #cultureDetailPanel .culture-detail-field span {
+  color:var(--workspace-muted);
+  font-size:.61rem;
+  line-height:1.35;
+  letter-spacing:.055em;
+  text-transform:uppercase;
+}
+body[data-domain] #cultureDetailPanel .culture-detail-field strong {
+  color:var(--workspace-text);
+  font-size:.82rem;
+  line-height:1.4;
+  font-weight:650;
+  overflow-wrap:anywhere;
+}
+body[data-domain] #cultureDetailPanel :is(.bio-operation-panel,.bio-lineage-panel) {
+  margin:0;
+  padding:clamp(13px,1.8vw,18px);
+  border-radius:13px;
+}
+body[data-domain] #cultureDetailPanel .bio-operation-form {
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:12px;
+  margin-top:13px;
+}
+body[data-domain] #cultureDetailPanel .bio-operation-form > div {
+  min-width:0;
+}
+body[data-domain] #cultureDetailPanel .bio-operation-form .bio-operation-wide {
+  grid-column:1/-1;
+}
+body[data-domain] #cultureDetailPanel .bio-operation-form small {
+  display:block;
+  margin-top:5px;
+  color:var(--workspace-muted);
+  font-size:.65rem;
+  line-height:1.5;
+}
+body[data-domain] #cultureDetailPanel .bio-operation-form button {
+  width:auto;
+  min-width:min(100%,210px);
+}
+body[data-domain] #cultureDetailPanel .bio-lineage-panel .culture-lineage {
+  display:grid;
+  gap:13px;
+  margin-top:12px;
+}
+body[data-domain] #cultureDetailPanel .bio-lineage-panel .culture-lineage > section {
+  min-width:0;
+  padding-top:10px;
+  border-top:1px solid var(--workspace-border);
+}
+body[data-domain] #cultureDetailPanel .culture-lineage-list {
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:8px;
+  min-width:0;
+}
+body[data-domain] #cultureDetailPanel .culture-lineage-node {
+  min-width:0;
+  max-width:100%;
+  padding:10px 12px;
+  border:1px solid var(--workspace-border);
+  border-radius:10px;
+  background:var(--workspace-panel);
+  color:var(--workspace-text);
+  text-align:left;
+}
+body[data-domain] #cultureDetailPanel .culture-lineage-node strong,
+body[data-domain] #cultureDetailPanel .culture-lineage-node small {
+  display:block;
+  overflow-wrap:anywhere;
+}
+body[data-domain] #cultureDetailPanel .culture-lineage-node strong {
+  color:var(--workspace-text);
+  font-size:.76rem;
+}
+body[data-domain] #cultureDetailPanel .culture-lineage-node small {
+  margin-top:4px;
+  color:var(--workspace-muted);
+  font-size:.62rem;
+  line-height:1.4;
+}
+body[data-domain] #cultureDetailPanel .culture-detail-timeline {
+  display:grid;
+  gap:9px;
+  min-width:0;
+  margin-top:0;
+}
+body[data-domain] #cultureDetailPanel .culture-linked-batches {
+  display:grid;
+  gap:8px;
+}
+body[data-domain] #cultureDetailPanel .culture-linked-batches h3,
+body[data-domain] #cultureDetailPanel > h4 {
+  margin:5px 0 2px;
+  color:var(--workspace-text);
+  font-size:.8rem;
+  letter-spacing:-.01em;
+}
+body[data-domain] #cultureDetailPanel .culture-timeline-entry {
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  align-items:center;
+  gap:12px;
+  padding:12px 13px;
+  border:1px solid var(--workspace-border);
+  border-radius:11px;
+  background:var(--workspace-panel-raised);
+}
+body[data-domain] #cultureDetailPanel .culture-timeline-entry strong {
+  display:block;
+  color:var(--workspace-text);
+  font-size:.78rem;
+  overflow-wrap:anywhere;
+}
+body[data-domain] #cultureDetailPanel .culture-timeline-entry p {
+  margin:5px 0 0;
+  color:var(--workspace-muted);
+  font-size:.68rem;
+  line-height:1.5;
+  overflow-wrap:anywhere;
+}
+body[data-domain] #cultureDetailPanel .culture-timeline-entry .culture-catalog-action {
+  white-space:nowrap;
+}
+body[data-domain] #measurementCard .measurement-history {
+  display:grid;
+  gap:8px;
+}
+body[data-domain] #measurementCard .measurement-entry {
+  display:grid;
+  grid-template-columns:minmax(0,1fr) minmax(105px,auto);
+  gap:7px 14px;
+  padding:12px 13px;
+  border:1px solid var(--workspace-border);
+  border-radius:11px;
+  background:var(--workspace-panel-raised);
+}
+body[data-domain] #measurementCard .measurement-entry > div:first-child {
+  min-width:0;
+}
+body[data-domain] #measurementCard .measurement-entry strong {
+  color:var(--workspace-text);
+  font-size:.78rem;
+  line-height:1.4;
+}
+body[data-domain] #measurementCard .measurement-meta,
+body[data-domain] #measurementCard .measurement-stamp {
+  color:var(--workspace-muted);
+  font-size:.65rem;
+  line-height:1.5;
+  overflow-wrap:anywhere;
+}
+body[data-domain] #measurementCard .measurement-value {
+  align-self:center;
+  color:var(--workspace-accent);
+  font-size:1.05rem;
+  font-weight:750;
+  font-variant-numeric:tabular-nums;
+  text-align:right;
+  overflow-wrap:anywhere;
+}
+body[data-domain] #measurementCard .measurement-stamp {
+  grid-column:1/-1;
+  padding-top:6px;
+  border-top:1px solid var(--workspace-border);
+}
+body[data-domain] #measurementCard .observation-details {
+  margin-top:13px;
+  padding:13px;
+  border:1px solid var(--workspace-border);
+  border-radius:12px;
+  background:var(--workspace-panel-raised);
+}
+body[data-domain] #measurementCard .observation-details > summary {
+  color:var(--workspace-text);
+  font-weight:650;
+  cursor:pointer;
+}
+body[data-domain] #batchCard .batch-list {
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:9px;
+}
+body[data-domain] #batchCard .batch-item {
+  display:block;
+  min-width:0;
+  padding:13px 14px;
+  border:1px solid var(--workspace-border);
+  border-radius:11px;
+  background:var(--workspace-panel-raised);
+  color:var(--workspace-text);
+  text-align:left;
+  white-space:normal;
+}
+body[data-domain] #batchCard .batch-item strong {
+  display:block;
+  margin-bottom:6px;
+  color:var(--workspace-accent);
+  font-size:.78rem;
+  overflow-wrap:anywhere;
+}
+body[data-domain] #batchCard .batch-item span {
+  display:block;
+  color:var(--workspace-muted);
+  font-size:.67rem;
+  line-height:1.55;
+  overflow-wrap:anywhere;
+}
+body[data-domain] #statisticsCard .statistics-summary-item {
+  display:flex;
+  flex-direction:column;
+  gap:7px;
+  min-width:0;
+  padding:13px;
+  border:1px solid var(--workspace-border);
+  border-radius:11px;
+  background:var(--workspace-panel-raised);
+}
+body[data-domain] #statisticsCard .statistics-summary-item span {
+  color:var(--workspace-muted);
+  font-size:.63rem;
+  line-height:1.4;
+}
+body[data-domain] #statisticsCard .statistics-summary-item strong {
+  color:var(--workspace-accent);
+  font-size:1.25rem;
+  line-height:1.15;
+  font-variant-numeric:tabular-nums;
+}
+body[data-domain] #statisticsCard .statistics-chart {
+  margin-top:12px;
+  padding:12px;
+}
+body[data-domain] #statisticsCard .statistics-chart svg {
+  display:block;
+  width:100%;
+  height:auto;
+  min-width:0;
+}
+body[data-domain] #statisticsCard .statistics-table-wrap {
+  margin-top:12px;
+  overflow-x:auto;
+  -webkit-overflow-scrolling:touch;
+}
+@media(max-width:760px) {
+  body[data-domain] #cultureDetailPanel .culture-detail-summary {
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+  body[data-domain] #batchCard .batch-list {
+    grid-template-columns:minmax(0,1fr);
+  }
+}
+@media(max-width:560px) {
+  body[data-domain] #cultureDetailPanel .culture-detail-heading {
+    flex-direction:column;
+    align-items:stretch;
+  }
+  body[data-domain] #cultureDetailPanel .culture-detail-heading button {
+    width:100%;
+  }
+  body[data-domain] #cultureDetailPanel .culture-detail-summary {
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+  body[data-domain] #cultureDetailPanel .culture-detail-field {
+    min-height:66px;
+    padding:9px 10px;
+  }
+  body[data-domain] #cultureDetailPanel .bio-operation-form {
+    grid-template-columns:minmax(0,1fr);
+  }
+  body[data-domain] #cultureDetailPanel .bio-operation-form .bio-operation-wide {
+    grid-column:auto;
+  }
+  body[data-domain] #cultureDetailPanel .bio-operation-form button {
+    width:100%;
+  }
+  body[data-domain] #cultureDetailPanel .culture-timeline-entry {
+    grid-template-columns:minmax(0,1fr);
+  }
+  body[data-domain] #cultureDetailPanel .culture-timeline-entry .culture-catalog-action {
+    width:100%;
+  }
+  body[data-domain] #measurementCard .measurement-entry {
+    grid-template-columns:minmax(0,1fr);
+  }
+  body[data-domain] #measurementCard .measurement-value {
+    text-align:left;
+  }
+  body[data-domain] #measurementCard .measurement-stamp {
+    grid-column:auto;
+  }
+  body[data-domain] #statisticsCard .statistics-summary {
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+}
+@media(prefers-reduced-motion:reduce) {
+  body[data-domain] #cultureDetailPanel :is(.culture-lineage-node,.culture-timeline-entry),
+  body[data-domain] #batchCard .batch-item {
+    transition:none!important;
+    transform:none!important;
+  }
+}
