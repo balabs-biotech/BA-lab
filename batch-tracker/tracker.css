@@ -2982,3 +2982,58 @@ body[data-domain] select option {
   color: var(--text);
   background: var(--surface);
 }
+
+
+/* Operational data density: preserve scientific values and inspection states
+   when tables move from desktop to tablet and phone widths. */
+.statistics-table tbody tr {
+  transition: background-color .16s ease, box-shadow .16s ease;
+}
+.statistics-table tbody tr:hover td {
+  background: color-mix(in srgb, var(--brand) 6%, var(--surface));
+}
+.statistics-table tbody tr:focus-within td {
+  background: color-mix(in srgb, var(--brand) 9%, var(--surface));
+}
+.statistics-table tbody tr td:first-child {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+@media (max-width: 700px) {
+  .statistics-table-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border-radius: 10px;
+  }
+  .statistics-table {
+    min-width: 680px;
+  }
+  .statistics-table th,
+  .statistics-table td {
+    padding: 11px 12px;
+    white-space: nowrap;
+  }
+}
+@media (max-width: 520px) {
+  .statistics-table {
+    min-width: 620px;
+    font-size: .88rem;
+  }
+  .statistics-table caption {
+    text-align: left;
+    white-space: normal;
+  }
+}
+
+body[data-domain="agronomy"] .statistics-table tbody tr:hover td,
+body[data-domain="agronomy"] .statistics-table tbody tr:focus-within td {
+  background: #e8f1df;
+}
+body[data-domain="mycology"] .statistics-table tbody tr:hover td,
+body[data-domain="mycology"] .statistics-table tbody tr:focus-within td {
+  background: #fff0e5;
+}
+body[data-domain="laboratory"] .statistics-table tbody tr:hover td,
+body[data-domain="laboratory"] .statistics-table tbody tr:focus-within td {
+  background: #eef5fb;
+}
