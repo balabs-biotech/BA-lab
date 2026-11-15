@@ -15513,3 +15513,255 @@ body[data-domain] #batchCard .batch-compare-panel h3 {
     transition:none!important;
   }
 }
+
+
+/* ============================================================
+   CULTUREOPS INTERIOR REFINEMENT — PASS 75
+   Production entry, batch comparison and traceability actions
+   ============================================================ */
+body[data-domain] #batchCard .batch-create-panel {
+  display:grid;
+  gap:16px;
+  margin:18px 0 22px;
+  padding:clamp(15px,2.2vw,23px);
+  border:1px solid var(--workspace-border);
+  border-radius:16px;
+  background:linear-gradient(145deg,var(--workspace-panel-raised),var(--workspace-panel));
+}
+body[data-domain] #batchCard .batch-create-heading {
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:16px;
+  padding-bottom:13px;
+  border-bottom:1px solid var(--workspace-border);
+}
+body[data-domain] #batchCard .batch-create-heading h3 {
+  margin:6px 0 4px;
+  color:var(--workspace-text);
+  font-size:1.1rem;
+  letter-spacing:-.025em;
+}
+body[data-domain] #batchCard .batch-create-heading p {
+  max-width:62ch;
+  margin:0;
+  color:var(--workspace-muted);
+  font-size:.7rem;
+  line-height:1.55;
+}
+body[data-domain] #batchCard .entry-step-mark {
+  color:var(--workspace-accent);
+  font-size:.6rem;
+  font-weight:750;
+  letter-spacing:.11em;
+}
+body[data-domain] #batchCard .batch-required-note {
+  flex:none;
+  padding:7px 9px;
+  border:1px solid var(--workspace-border);
+  border-radius:8px;
+  color:var(--workspace-muted);
+  font-size:.62rem;
+  white-space:nowrap;
+}
+body[data-domain] #batchCard .batch-required-note span,
+body[data-domain] #batchCard .req {
+  color:var(--workspace-accent);
+}
+body[data-domain] #batchCard .batch-create-panel .grid {
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:13px;
+  margin:0;
+}
+body[data-domain] #batchCard .batch-create-panel .grid > div {
+  min-width:0;
+}
+body[data-domain] #batchCard .batch-create-panel label,
+body[data-domain] #batchCard .batch-harvest-entry label {
+  display:block;
+  margin:0 0 6px;
+  color:var(--workspace-text);
+  font-size:.7rem;
+  font-weight:650;
+}
+body[data-domain] #batchCard .batch-create-panel .hint {
+  display:block;
+  margin-top:5px;
+  color:var(--workspace-muted);
+  font-size:.62rem;
+  line-height:1.5;
+}
+body[data-domain] #batchCard #createBatchButton {
+  justify-self:start;
+  min-width:190px;
+  margin-top:2px;
+}
+body[data-domain] #batchCard > h3 {
+  margin:22px 0 10px;
+  color:var(--workspace-text);
+  font-size:.95rem;
+  letter-spacing:-.02em;
+}
+body[data-domain] #batchCard .batch-compare-panel {
+  display:grid;
+  gap:11px;
+  margin-top:20px;
+  padding:clamp(15px,2.2vw,22px);
+  border:1px solid var(--workspace-border);
+  border-radius:16px;
+  background:var(--workspace-panel);
+}
+body[data-domain] #batchCard .batch-compare-panel .section-kicker {
+  margin:0;
+}
+body[data-domain] #batchCard .batch-compare-panel h3 {
+  margin:0;
+  color:var(--workspace-text);
+  font-size:1rem;
+}
+body[data-domain] #batchCard .batch-compare-panel > p.muted {
+  margin:0;
+  color:var(--workspace-muted);
+  font-size:.68rem;
+  line-height:1.6;
+}
+body[data-domain] #batchCard #batchCompareSelect {
+  min-height:132px;
+  padding:8px;
+  border:1px solid var(--workspace-border);
+  border-radius:10px;
+  background:var(--workspace-panel-raised);
+  color:var(--workspace-text);
+}
+body[data-domain] #batchCard #batchCompareSelect option {
+  padding:7px;
+  border-radius:5px;
+}
+body[data-domain] #batchCard #compareBatchesButton {
+  justify-self:start;
+  min-width:210px;
+}
+body[data-domain] #batchCard #batchCompareStatus {
+  padding:9px 11px;
+  border-left:2px solid var(--workspace-accent);
+  border-radius:0 8px 8px 0;
+  background:var(--workspace-panel-raised);
+}
+body[data-domain] #batchCard #batchCompareResults {
+  min-width:0;
+  overflow-x:auto;
+  border-radius:10px;
+  -webkit-overflow-scrolling:touch;
+}
+body[data-domain] #batchCard #batchCompareResults:empty {
+  display:none;
+}
+body[data-domain] #batchCard #batchCompareResults table {
+  min-width:540px;
+}
+body[data-domain] #batchCard .batch-harvest-entry {
+  display:grid;
+  gap:11px;
+  margin-top:14px;
+  padding:clamp(13px,1.8vw,18px);
+  border:1px solid var(--workspace-border);
+  border-radius:13px;
+  background:var(--workspace-panel-raised);
+}
+body[data-domain] #batchCard .batch-harvest-entry h4 {
+  margin:0;
+  color:var(--workspace-text);
+  font-size:.82rem;
+}
+body[data-domain] #batchCard .batch-harvest-entry > p.muted {
+  margin:0;
+  color:var(--workspace-muted);
+  font-size:.66rem;
+  line-height:1.55;
+}
+body[data-domain] #batchCard .batch-harvest-entry .grid {
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:11px;
+  margin:0;
+}
+body[data-domain] #batchCard .batch-harvest-entry textarea {
+  min-height:68px;
+  resize:vertical;
+}
+body[data-domain] #batchCard .batch-harvest-entry button {
+  justify-self:start;
+  min-width:185px;
+}
+body[data-domain] #batchCard .batch-harvest-entry [role="status"] {
+  padding:8px 10px;
+  border-radius:8px;
+  background:var(--workspace-panel);
+}
+body[data-domain] #batchCard .batch-harvest-entry button:disabled,
+body[data-domain] #batchCard .qc-row button:disabled {
+  cursor:not-allowed;
+  opacity:.48;
+  filter:saturate(.5);
+}
+body[data-domain] #message {
+  display:grid;
+  gap:8px;
+  margin:0 0 14px;
+}
+body[data-domain] #message > .card {
+  display:flex;
+  align-items:flex-start;
+  gap:10px;
+  margin:0;
+  padding:12px 14px;
+  border:1px solid var(--workspace-border);
+  border-left:3px solid var(--workspace-accent);
+  border-radius:10px;
+  background:var(--workspace-panel-raised);
+  color:var(--workspace-text);
+  font-size:.73rem;
+  line-height:1.5;
+}
+body[data-domain] #message > .card.success {
+  border-left-color:#6d9e83;
+}
+body[data-domain] #message > .card.warning {
+  border-left-color:#c39a5b;
+}
+body[data-domain] #message > .card.error {
+  border-left-color:#c16e66;
+}
+body[data-domain] #batchCard :is(input,select,textarea):focus-visible {
+  outline:2px solid var(--workspace-accent);
+  outline-offset:2px;
+}
+@media(max-width:760px) {
+  body[data-domain] #batchCard .batch-create-panel .grid {
+    grid-template-columns:minmax(0,1fr);
+  }
+}
+@media(max-width:560px) {
+  body[data-domain] #batchCard .batch-create-heading {
+    flex-direction:column;
+    align-items:stretch;
+  }
+  body[data-domain] #batchCard .batch-required-note {
+    align-self:flex-start;
+  }
+  body[data-domain] #batchCard #createBatchButton,
+  body[data-domain] #batchCard #compareBatchesButton,
+  body[data-domain] #batchCard .batch-harvest-entry button {
+    width:100%;
+    min-width:0;
+  }
+  body[data-domain] #batchCard .batch-harvest-entry .grid {
+    grid-template-columns:minmax(0,1fr);
+  }
+}
+@media(prefers-reduced-motion:reduce) {
+  body[data-domain] #batchCard * {
+    scroll-behavior:auto!important;
+  }
+}
