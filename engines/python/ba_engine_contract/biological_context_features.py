@@ -592,7 +592,44 @@ def analyze_biological_context_features(request: Mapping[str, Any]) -> dict[str,
         data = record["data"]
         context = record.get("context") or {}
 
-        if record_type == "measurement":
+        if record_type == "observation":
+            if data.get("quality_state") == "excluded":
+                excluded.append({"record_id": record_id, "reason": "observation_quality_state_excluded"})
+                continue
+            if context.get(subject_field) != subject_id:
+                excluded.append({"record_id": record_id, "reason": f"observation_{subject_type}_scope_mismatch"})
+                continue
+            variable = data.get("variable_code")
+            value_text = data.get("value_text")
+            timestamp_value = data.get("observed_at")
+            if not isinstance(variable, str) or not variable:
+                excluded.append({"record_id": record_id, "reason": "missing_variable_code"})
+                continue
+            if not isinstance(value_text, str) or not value_text.strip():
+                excluded.append({"record_id": record_id, "reason": "missing_observation_text"})
+                continue
+            try:
+                observed_at = _timestamp(timestamp_value, "observation_timestamp")
+            except (TypeError, ValueError):
+                excluded.append({"record_id": record_id, "reason": "invalid_or_timezone_naive_timestamp"})
+                continue
+            if observed_at < window_start or observed_at >= window_end:
+                excluded.append({"record_id": record_id, "reason": "outside_requested_window"})
+                continue
+            observed_fact = {
+                "fact_code": f"observation.{variable}",
+                "statement": f"recorded_observation: {variable} — {value_text.strip()[:800]}",
+                "observed_at": _iso(observed_at),
+                "source_record_ids": [record_id],
+                "value": value_text.strip()[:800],
+            }
+            event_id = context.get("event_id")
+            if isinstance(event_id, str) and event_id:
+                observed_fact["event_id"] = event_id
+            observed_facts.append(observed_fact)
+            accepted_by_type[record_type] += 1
+            continue
+        elif record_type == "measurement":
             if data.get("quality_state") == "excluded":
                 excluded.append({"record_id": record_id, "reason": "measurement_quality_state_excluded"})
                 continue
