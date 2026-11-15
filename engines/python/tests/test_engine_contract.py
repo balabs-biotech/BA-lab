@@ -772,6 +772,21 @@ class EngineContractTests(unittest.TestCase):
                     **({"event_id": "4c2b3a4d-5e6f-4789-8123-456789abcdef"} if index == 1 else {}),
                 },
             })
+        observation_id = "5c2b3a4d-5e6f-4789-8123-456789abcdef"
+        event_id = "6c2b3a4d-5e6f-4789-8123-456789abcdef"
+        request["input"]["record_ids"].append(observation_id)
+        request["input"]["records"].append({
+            "record_id": observation_id,
+            "record_type": "observation",
+            "payload_sha256": "c" * 64,
+            "data": {
+                "variable_code": "morphology_note",
+                "value_text": "primordia formation observed on the north side",
+                "observed_at": "2026-11-10T09:30:00Z",
+                "quality_state": "valid",
+            },
+            "context": {"culture_id": culture_id, "event_id": event_id},
+        })
         result = execute_registered_engine(request)
         self.assertEqual(result["status"], "completed", msg=str(result.get("error")))
         value = result["result"]["value"]
@@ -779,8 +794,13 @@ class EngineContractTests(unittest.TestCase):
         Draft202012Validator(biological_schema, format_checker=FormatChecker()).validate(value)
         self.assertEqual(value["subject"]["subject_type"], "culture")
         self.assertEqual(value["subject"]["subject_id"], culture_id)
-        self.assertEqual(value["coverage"]["source_record_count"], 3)
+        self.assertEqual(value["coverage"]["source_record_count"], 4)
         self.assertEqual(value["coverage"]["record_counts_by_type"]["measurement"], 3)
+        self.assertEqual(value["coverage"]["record_counts_by_type"]["observation"], 1)
+        morphology_fact = next(item for item in value["observed_facts"] if item["fact_code"] == "observation.morphology_note")
+        self.assertIn("primordia formation", morphology_fact["statement"])
+        self.assertEqual(morphology_fact["event_id"], event_id)
+        self.assertEqual(morphology_fact["source_record_ids"], [observation_id])
         event_fact = next(item for item in value["observed_facts"] if item["observed_at"] == "2026-11-10T09:00:00Z")
         self.assertEqual(event_fact["event_id"], "4c2b3a4d-5e6f-4789-8123-456789abcdef")
         self.assertNotIn("event_id", value["observed_facts"][0],
