@@ -3374,10 +3374,15 @@ body[data-domain] .feedback-success {
   border-color: color-mix(in srgb, var(--ok) 34%, var(--border));
   border-left-color: var(--ok);
 }
+body[data-domain] .feedback-info {
+  background: color-mix(in srgb, var(--brand) 8%, var(--surface));
+  border-color: var(--border);
+  border-left-color: var(--brand);
+}
 body[data-domain] .feedback-warning {
-  background: color-mix(in srgb, var(--warning) 12%, var(--surface));
-  border-color: color-mix(in srgb, var(--warning) 38%, var(--border));
-  border-left-color: var(--warning);
+  background: color-mix(in srgb, var(--warn) 12%, var(--surface));
+  border-color: color-mix(in srgb, var(--warn) 38%, var(--border));
+  border-left-color: var(--warn);
 }
 body[data-domain] .feedback-error {
   background: color-mix(in srgb, var(--err) 10%, var(--surface));
