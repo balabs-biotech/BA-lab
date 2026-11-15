@@ -13320,3 +13320,234 @@ body[data-domain="agronomy"] #statisticsCard .statistics-filters select {backgro
 @media(prefers-reduced-motion:reduce) {
   body[data-domain] #batchCard .batch-list .batch-item {transition:none!important;transform:none!important}
 }
+
+
+/* ============================================================
+   CULTUREOPS UI REFINEMENT — PASS 67
+   Measurement capture, qualitative observations and plant registry
+   ============================================================ */
+body[data-domain] #measurementCard {
+  min-width:0; overflow:visible; scroll-margin-top:24px;
+}
+body[data-domain] #measurementCard > h2 {
+  margin-bottom:7px; letter-spacing:-.035em;
+}
+body[data-domain] #measurementCard > .muted {
+  max-width:86ch; color:var(--workspace-muted);
+  font-size:.68rem; line-height:1.65;
+}
+body[data-domain] #measurementCard .quick-capture {
+  margin:18px 0 20px; padding:clamp(14px,2vw,20px);
+  border:1px solid var(--workspace-border);
+  border-radius:15px; background:var(--workspace-panel-raised)!important;
+  color:var(--workspace-text); box-shadow:0 8px 22px rgba(0,0,0,.1);
+}
+body[data-domain] #measurementCard .quick-capture-heading {
+  align-items:center; gap:14px;
+}
+body[data-domain] #measurementCard .quick-capture-heading h3 {
+  margin:5px 0 4px; padding:0; border:0;
+  color:var(--workspace-text); font-size:clamp(.95rem,2vw,1.12rem);
+  letter-spacing:-.025em;
+}
+body[data-domain] #measurementCard .quick-capture-heading p {
+  max-width:68ch; color:var(--workspace-muted); font-size:.66rem; line-height:1.6;
+}
+body[data-domain] #measurementCard .quick-capture-spark {
+  width:40px;height:40px;flex-basis:40px;border-radius:11px;
+  background:color-mix(in srgb,var(--workspace-accent) 15%,var(--workspace-control));
+  color:var(--workspace-accent);
+}
+body[data-domain] #measurementCard .quick-capture-grid {
+  grid-template-columns:repeat(2,minmax(0,1fr)); gap:9px; margin-top:14px;
+}
+body[data-domain] #measurementCard .quick-capture-tile {
+  min-height:68px; grid-template-columns:40px minmax(0,1fr) 14px;
+  padding:11px 12px; border:1px solid var(--workspace-border);
+  border-radius:11px; background:var(--workspace-control)!important;
+  color:var(--workspace-text); box-shadow:none;
+}
+body[data-domain] #measurementCard .quick-capture-tile:hover {
+  border-color:var(--workspace-accent);
+  background:color-mix(in srgb,var(--workspace-accent) 10%,var(--workspace-control))!important;
+  color:var(--workspace-text); transform:translateY(-1px);
+}
+body[data-domain] #measurementCard .quick-capture-tile strong {
+  color:var(--workspace-text); font-size:.69rem; line-height:1.4;
+}
+body[data-domain] #measurementCard .quick-capture-tile small {
+  color:var(--workspace-muted); font-size:.61rem; line-height:1.45;
+}
+body[data-domain] #measurementCard .quick-capture-icon {
+  display:grid; place-items:center; width:38px;height:38px;
+  border:1px solid var(--workspace-border); border-radius:10px;
+  background:var(--workspace-panel-raised); color:var(--workspace-accent);
+  font-size:.72rem; font-weight:850;
+}
+body[data-domain] #measurementCard .quick-capture-arrow {color:var(--workspace-accent)}
+body[data-domain] #measurementCard .quick-capture-tip {
+  margin:12px 0 0; padding-top:10px; border-top:1px solid var(--workspace-border);
+  color:var(--workspace-muted); font-size:.61rem; line-height:1.55;
+}
+body[data-domain] #measurementCard > .grid {
+  gap:12px; margin:12px 0;
+}
+body[data-domain] #measurementCard :is(label,.context-eyebrow) {
+  color:var(--workspace-text); font-size:.67rem; font-weight:750;
+}
+body[data-domain] #measurementCard :is(input,select,textarea) {
+  min-width:0; width:100%; min-height:42px; margin-top:5px;
+  padding:9px 11px; border:1px solid var(--workspace-border);
+  border-radius:9px; background:var(--workspace-control);
+  color:var(--workspace-text); font:inherit; font-size:.7rem;
+}
+body[data-domain] #measurementCard textarea {min-height:76px;resize:vertical;line-height:1.55}
+body[data-domain] #measurementCard :is(input,select,textarea)::placeholder {
+  color:var(--workspace-muted); opacity:.78;
+}
+body[data-domain] #measurementCard #saveMeasurementButton,
+body[data-domain] #measurementCard #saveObservationButton {
+  min-height:43px; margin-top:13px; padding-inline:17px;
+  border:1px solid var(--workspace-accent); border-radius:9px;
+  background:var(--workspace-accent); color:var(--workspace-bg);
+  font-size:.69rem; font-weight:850;
+}
+body[data-domain] #measurementCard .context-divider {
+  height:1px; margin:19px 0; background:var(--workspace-border);
+}
+body[data-domain] #measurementCard .measurement-history-heading {
+  display:flex; align-items:center; justify-content:space-between;
+  gap:12px; margin:0 0 11px;
+}
+body[data-domain] #measurementCard .measurement-history-heading h3 {
+  margin:4px 0 0; padding:0; border:0;
+  color:var(--workspace-text); font-size:.95rem;
+}
+body[data-domain] #measurementCard .measurement-history-heading button {
+  min-height:37px; margin:0; border:1px solid var(--workspace-border);
+  border-radius:8px; background:var(--workspace-panel-raised);
+  color:var(--workspace-text); font-size:.64rem;
+}
+body[data-domain] #measurementCard .measurement-history {
+  display:grid; gap:9px; min-width:0;
+}
+body[data-domain] #measurementCard .measurement-entry {
+  grid-template-columns:minmax(0,1fr) auto; gap:8px 12px;
+  padding:13px 14px; border:1px solid var(--workspace-border);
+  border-radius:11px; background:var(--workspace-panel-raised);
+  color:var(--workspace-text);
+}
+body[data-domain] #measurementCard .measurement-entry strong {
+  color:var(--workspace-text); font-size:.72rem;
+}
+body[data-domain] #measurementCard .measurement-entry .measurement-value {
+  color:var(--workspace-accent); font-size:1rem; font-weight:850;
+  font-variant-numeric:tabular-nums;
+}
+body[data-domain] #measurementCard .measurement-entry .measurement-meta,
+body[data-domain] #measurementCard .measurement-entry .measurement-stamp {
+  color:var(--workspace-muted); font-size:.61rem; line-height:1.55;
+}
+body[data-domain] #measurementCard .measurement-entry .measurement-stamp {
+  border-color:var(--workspace-border);
+}
+body[data-domain] #measurementCard .observation-details {
+  margin-top:17px; padding:15px;
+  border:1px solid var(--workspace-border); border-radius:13px;
+  background:var(--workspace-panel-raised); color:var(--workspace-text);
+}
+body[data-domain] #measurementCard .observation-details > summary {
+  padding:3px 0; color:var(--workspace-text);
+  font-size:.74rem; font-weight:800; cursor:pointer;
+}
+body[data-domain] #measurementCard .observation-details[open] > summary {
+  margin-bottom:10px; padding-bottom:11px; border-bottom:1px solid var(--workspace-border);
+}
+body[data-domain] #measurementCard .observation-details > .muted {
+  color:var(--workspace-muted); font-size:.65rem; line-height:1.6;
+}
+body[data-domain] #measurementCard #observationHistory {margin-top:10px}
+body[data-domain] #plantCard > h2 {margin-bottom:7px;letter-spacing:-.035em}
+body[data-domain] #plantCard > p.muted {max-width:84ch;font-size:.68rem;line-height:1.65}
+body[data-domain] #plantCard #plantCultureForm {
+  display:grid; grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:12px; margin:17px 0 22px; padding:clamp(14px,2vw,20px);
+  border:1px solid var(--workspace-border); border-radius:15px;
+  background:var(--workspace-panel-raised); color:var(--workspace-text);
+}
+body[data-domain] #plantCard #plantCultureForm > div {min-width:0}
+body[data-domain] #plantCard #plantCultureForm label {
+  display:block; margin:0 0 5px; color:var(--workspace-text);
+  font-size:.67rem; font-weight:750;
+}
+body[data-domain] #plantCard #plantCultureForm :is(input,select,textarea) {
+  min-width:0; width:100%; min-height:42px; margin:0;
+  padding:9px 11px; border:1px solid var(--workspace-border);
+  border-radius:9px; background:var(--workspace-control);
+  color:var(--workspace-text); font:inherit; font-size:.69rem;
+}
+body[data-domain] #plantCard #plantCultureForm textarea {min-height:76px;resize:vertical}
+body[data-domain] #plantCard #plantCultureForm :is(input,select,textarea)::placeholder {
+  color:var(--workspace-muted); opacity:.78;
+}
+body[data-domain] #plantCard #plantCultureForm .bio-operation-wide {
+  grid-column:1/-1;
+}
+body[data-domain] #plantCard #savePlantCultureButton {
+  min-height:43px; padding-inline:17px; border:1px solid var(--workspace-accent);
+  border-radius:9px; background:var(--workspace-accent);
+  color:var(--workspace-bg); font-size:.69rem; font-weight:850;
+}
+body[data-domain] #plantCard #plantCultureStatus {
+  margin:8px 0 0; color:var(--workspace-muted); font-size:.63rem; line-height:1.55;
+}
+body[data-domain] #plantCard .overview-section-heading {
+  display:flex; align-items:center; justify-content:space-between;
+  gap:10px; margin:20px 0 10px;
+}
+body[data-domain] #plantCard .overview-section-heading h3 {
+  margin:0; padding:0; border:0; color:var(--workspace-text); font-size:.95rem;
+}
+body[data-domain] #plantCard #plantCultureCount {
+  min-width:29px; padding:5px 9px; border:1px solid var(--workspace-border);
+  border-radius:999px; background:var(--workspace-panel-raised);
+  color:var(--workspace-accent); font-size:.66rem; font-weight:850;
+  text-align:center; font-variant-numeric:tabular-nums;
+}
+body[data-domain] #plantCard #plantCultureList .culture-catalog-row {
+  background:var(--workspace-panel-raised)!important;
+  border-color:var(--workspace-border); color:var(--workspace-text);
+}
+body[data-domain] #plantCard #plantCultureList .culture-catalog-code {color:var(--workspace-text)}
+body[data-domain] #plantCard #plantCultureList .culture-catalog-meta {color:var(--workspace-muted)}
+body[data-domain] #plantCard #plantCultureList .culture-catalog-meta span:first-child {
+  background:color-mix(in srgb,var(--workspace-accent) 13%,var(--workspace-control));
+  color:var(--workspace-accent); border-color:var(--workspace-border);
+}
+body[data-domain] #plantCard #plantCultureList .culture-catalog-action {
+  border-color:var(--workspace-border); background:var(--workspace-control);
+  color:var(--workspace-text);
+}
+body[data-domain] #plantCard #plantCultureList .culture-catalog-action:hover {
+  border-color:var(--workspace-accent); color:var(--workspace-accent);
+}
+body[data-domain] #measurementCard :is(button,a,input,select,textarea):focus-visible,
+body[data-domain] #plantCard :is(button,a,input,select,textarea):focus-visible {
+  outline:2px solid var(--workspace-accent); outline-offset:3px;
+}
+@media(max-width:680px) {
+  body[data-domain] #measurementCard .quick-capture-grid {grid-template-columns:minmax(0,1fr)}
+  body[data-domain] #measurementCard .measurement-entry {grid-template-columns:minmax(0,1fr) auto}
+  body[data-domain] #plantCard #plantCultureForm {grid-template-columns:minmax(0,1fr)}
+  body[data-domain] #plantCard #plantCultureForm .bio-operation-wide {grid-column:auto}
+}
+@media(max-width:420px) {
+  body[data-domain] #measurementCard .quick-capture-tile {grid-template-columns:36px minmax(0,1fr) 12px;padding:10px}
+  body[data-domain] #measurementCard .measurement-history-heading {align-items:flex-start}
+  body[data-domain] #measurementCard .measurement-entry {grid-template-columns:minmax(0,1fr)}
+  body[data-domain] #measurementCard .measurement-entry .measurement-value {text-align:left}
+  body[data-domain] #plantCard #plantCultureForm {padding:12px}
+}
+@media(prefers-reduced-motion:reduce) {
+  body[data-domain] #measurementCard .quick-capture-tile {transition:none!important;transform:none!important}
+}
