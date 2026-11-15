@@ -735,6 +735,18 @@
     ["Le BIE v0.2 n’est pas encore activé côté serveur (BA_BIE_ENABLED).", "BIE v0.2 is not enabled server-side yet (BA_BIE_ENABLED).", "O BIE v0.2 ainda não está ativado no servidor (BA_BIE_ENABLED).", "لم يتم تفعيل BIE v0.2 على الخادم بعد (BA_BIE_ENABLED)."],
     ["Préparation du snapshot biologique authentifié…", "Preparing the authenticated biological snapshot…", "A preparar o snapshot biológico autenticado…", "جارٍ إعداد اللقطة البيولوجية الموثقة…"],
     ["Évaluation enregistrée", "Assessment recorded", "Avaliação registada", "تم تسجيل التقييم"],
+    ["Contrôle qualité environnemental amont", "Upstream environmental quality control", "Controlo de qualidade ambiental a montante", "مراقبة الجودة البيئية السابقة"],
+    ["État du contrôle qualité : ", "Quality control state: ", "Estado do controlo de qualidade: ", "حالة مراقبة الجودة: "],
+    ["Exécution QC liée : ", "Linked QC execution: ", "Execução QC associada: ", "تنفيذ مراقبة الجودة المرتبط: "],
+    ["Résultat QC lié : ", "Linked QC result: ", "Resultado QC associado: ", "نتيجة مراقبة الجودة المرتبطة: "],
+    ["Résultat QC : ", "QC outcome: ", "Resultado QC: ", "نتيجة مراقبة الجودة: "],
+    ["Empreinte de l’artefact QC : ", "QC artifact fingerprint: ", "Impressão digital do artefacto QC: ", "بصمة أثر مراقبة الجودة: "],
+    ["Signaux QC à examiner", "QC signals to review", "Sinais QC a rever", "إشارات مراقبة الجودة للمراجعة"],
+    ["Limites du contrôle QC", "QC limitations", "Limitações do controlo QC", "قيود مراقبة الجودة"],
+    ["Algorithme QC : ", "QC algorithm: ", "Algoritmo QC: ", "خوارزمية مراقبة الجودة: "],
+    ["Sources du contrôle QC", "QC sources", "Fontes do controlo QC", "مصادر مراقبة الجودة"],
+    ["Séries examinées par le contrôle QC : ", "Series examined by QC: ", "Séries examinadas pelo QC: ", "السلاسل التي فحصتها مراقبة الجودة: "],
+    ["Révision environnementale requise : les signaux QC sont des éléments à examiner, pas des exclusions automatiques.", "Environmental review required: QC signals are evidence to review, not automatic exclusions.", "É necessária revisão ambiental: os sinais QC são evidências a rever, não exclusões automáticas.", "المراجعة البيئية مطلوبة: إشارات مراقبة الجودة أدلة للمراجعة وليست استبعادات تلقائية."],
     ["Évaluation transmise. Consultez l’historique des exécutions.", "Assessment submitted. Check execution history.", "Avaliação enviada. Consulte o histórico de execuções.", "تم إرسال التقييم. راجع سجل التنفيذ."]
   ];
   for (const [fr, en, pt, ar] of supplementalCoverage) {
