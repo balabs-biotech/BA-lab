@@ -30,7 +30,8 @@ Audit effectué sur le projet Supabase actif `BALabs`, les migrations appliquée
 ### État observé à la date de l'audit
 
 - `environmental_observations` contient 1 491 lignes.
-- Le registre contient 7 moteurs ; les 7 jobs présents sont terminés avec succès, sans job en attente, en cours ou en échec au moment de la lecture.
+- Le registre contient 7 moteurs : `core.orchestrator`, `environmental.context` (draft), `environmental.nasapower.dailyimport`, `environmental.sentinel2.ndvi.preview`, `greentech.interpreter`, `lab.interpreter` et `mycology.interpreter`.
+- Les 7 jobs présents sont terminés avec succès, sans job en attente, en cours ou en échec au moment de la lecture.
 - Les états de santé du registre sont encore `unknown`.
 - `environmental.context` est encore au statut `draft`.
 - Les tables de mesures manuelles, lots, observations expérimentales et résultats dérivés existent, mais sont encore vides dans le projet interrogé.
@@ -45,6 +46,7 @@ Audit effectué sur le projet Supabase actif `BALabs`, les migrations appliquée
 4. Les contrats d'entrée/sortie doivent devenir des artefacts testés et versionnés, pas seulement des colonnes JSONB.
 5. La séparation des données par espace métier est aujourd'hui principalement une séparation d'interface ; le README confirme que les tables restent organisationnelles et ne sont pas partitionnées au niveau GreenTech/Mycology/Laboratory.
 6. Les fonctions Edge déployées doivent être comparées à leur source versionnée dans Git à chaque livraison.
+7. Le README racine affirme que les migrations et sources Edge sont maintenues sous `supabase/`, mais les chemins `supabase/config.toml`, `supabase/migrations/` et `supabase/functions/engine-worker/index.ts` attendus n'existent pas sur `main` à la date de l'audit. Le code déployé et l'historique des migrations existent dans Supabase, mais leur miroir Git reproductible reste à rétablir. C'est un écart de gouvernance prioritaire.
 
 ## 3. Architecture logique cible
 
@@ -184,6 +186,7 @@ Une recommandation cite le signal déclencheur, le contexte, la source, le profi
 - Documenter l'architecture et l'état réel des composants.
 - Établir la matrice des moteurs, versions, contrats, statuts, dépendances et tests.
 - Réconcilier le code Edge déployé avec les sources versionnées dans Git.
+- Corriger l'écart README/dépôt : créer un dépôt de sources Supabase reproductible à partir des définitions vérifiées, sans reconstituer des migrations au hasard ni réécrire l'historique en production.
 - Transformer les alertes de sécurité en tickets de revue qualifiés.
 
 ### Phase 1 — Fiabiliser le socle d'exécution
