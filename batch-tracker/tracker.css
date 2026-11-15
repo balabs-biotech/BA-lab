@@ -7913,3 +7913,30 @@ body[data-domain="mycology"] #authStatus.error {
   background: #3b2422 !important;
   border-color: #87504a !important;
 }
+
+
+/* MYCOLOGY — enforce readable auth-card typography above legacy selectors. */
+body[data-domain="mycology"] #authCard h2,
+body[data-domain="mycology"] #authCard label,
+body[data-domain="mycology"] #authCard .muted,
+body[data-domain="mycology"] #authCard .section-kicker,
+body[data-domain="mycology"] #authCard .section-kicker span {
+  color: #e9e2dc !important;
+  -webkit-text-fill-color: #e9e2dc !important;
+}
+body[data-domain="mycology"] #authCard .section-kicker span:first-child {
+  color: #d99a70 !important;
+  -webkit-text-fill-color: #d99a70 !important;
+}
+body[data-domain="mycology"] #authCard .section-kicker span:last-child {
+  color: #b9a99d !important;
+  -webkit-text-fill-color: #b9a99d !important;
+}
+body[data-domain="mycology"] #authCard .muted {
+  color: #b9c2bb !important;
+  -webkit-text-fill-color: #b9c2bb !important;
+}
+body[data-domain="mycology"] #authCard #authStatus {
+  color: #e9e2dc !important;
+  -webkit-text-fill-color: #e9e2dc !important;
+}
