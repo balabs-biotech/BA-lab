@@ -3,6 +3,7 @@ import vm from "node:vm";
 import assert from "node:assert/strict";
 
 const engine = fs.readFileSync("batch-tracker/tracker.js", "utf8");
+const stylesheet = fs.readFileSync("batch-tracker/tracker.css", "utf8");
 const marker = "function renderMeasurementTargets()";
 const start = engine.indexOf(marker);
 if (start < 0) throw new Error("renderMeasurementTargets() not found");
@@ -294,6 +295,16 @@ assert.match(laboratoryOverview.overviewObservationSummary.textContent, /microbi
 const fallbackOverview = overviewPresentationScenario("unknown");
 assert.equal(fallbackOverview.overviewTitle.textContent, "Tableau de bord Laboratoire");
 console.log("✓ Overview presentation: domain-specific titles, context, activity and accessible metric labels");
+
+
+// The overview dashboard must collapse cleanly before its two columns become cramped.
+assert.match(stylesheet, /@media \(max-width: 700px\)[\s\S]*?#overviewCard \.overview-lower \{\s*grid-template-columns: minmax\(0, 1fr\)/,
+  "overview activity and shortcuts must stack on tablet and mobile widths");
+assert.match(stylesheet, /#overviewCard \.overview-observation \{\s*grid-template-columns: minmax\(0, 1fr\)/,
+  "recent observation cards must use a readable single-column mobile layout");
+assert.match(stylesheet, /@media \(max-width: 520px\)[\s\S]*?#overviewCard \.overview-shortcut strong/,
+  "overview shortcut labels must remain readable on narrow phones");
+console.log("✓ Overview responsive layout: tablet stacking and narrow-screen readability");
 
 
 // Switching between the three workspaces must refresh tenant-scoped data,
