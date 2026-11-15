@@ -6472,9 +6472,16 @@ function setupUiEnhancements() {
 
   document.querySelectorAll("[data-workspace-target]").forEach((button) => {
     button.addEventListener("click", () => {
-      const target = button.getAttribute("data-workspace-target");
+      const requestedTarget = button.getAttribute("data-workspace-target");
+      // The overview shortcut is shared by all universes; route the biological
+      // culture action to the plant register inside the agronomy workspace.
+      const target = domain === "agronomy" && requestedTarget === "trackerCard"
+        ? "plantCard"
+        : requestedTarget;
+      const targetPanel = document.getElementById(target);
+      if (!targetPanel || targetPanel.hidden || targetPanel.classList.contains("hidden")) return;
       activateWorkspaceModule(target);
-      document.getElementById(target)?.scrollIntoView({
+      targetPanel.scrollIntoView({
         block: "start",
         behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth"
       });
