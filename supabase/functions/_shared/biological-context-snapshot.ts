@@ -38,6 +38,19 @@ export interface BiologicalMeasurementRow {
   metadata?: Record<string, unknown> | null;
 }
 
+export interface BiologicalObservationRow {
+  id: string;
+  organization_id: string;
+  culture_id?: string | null;
+  plant_culture_id?: string | null;
+  variable_code: string;
+  value_text: string;
+  observed_at: string;
+  event_id?: string | null;
+  quality_state?: string | null;
+  metadata?: Record<string, unknown> | null;
+}
+
 export interface BiologicalEnvironmentalObservationRow {
   id: string;
   organization_id: string;
@@ -93,6 +106,7 @@ export async function buildBiologicalContextSnapshot(input: {
   plantCulture?: BiologicalCultureRow;
   environment: BiologicalEnvironmentRow | null;
   measurements: BiologicalMeasurementRow[];
+  observations?: BiologicalObservationRow[];
   environmentalObservations: BiologicalEnvironmentalObservationRow[];
   measurementContextById?: Record<string, {
     status: string;
@@ -166,6 +180,29 @@ export async function buildBiologicalContextSnapshot(input: {
     records.push({
       record_id: row.id,
       record_type: "measurement",
+      payload_sha256: await sha256(stable({ source: row, context })),
+      data,
+      context,
+    });
+  }
+
+  for (const row of input.observations ?? []) {
+    if (row.organization_id !== organizationId || row[subjectField] !== subject.id) {
+      throw new Error("observation_" + subjectType + "_scope_mismatch");
+    }
+    const instant = parseInstant(row.observed_at, "observation_timestamp");
+    if (instant < windowStart || instant >= windowEnd) continue;
+    const context = { [subjectField]: row[subjectField], event_id: row.event_id ?? null };
+    const data = {
+      variable_code: row.variable_code,
+      value_text: row.value_text,
+      observed_at: row.observed_at,
+      quality_state: row.quality_state ?? null,
+      metadata: row.metadata ?? {},
+    };
+    records.push({
+      record_id: row.id,
+      record_type: "observation",
       payload_sha256: await sha256(stable({ source: row, context })),
       data,
       context,
