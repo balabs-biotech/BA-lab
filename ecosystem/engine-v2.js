@@ -22,8 +22,9 @@ const ROOT = document.getElementById('mainView');
 const IDS = ['bio','myco','soil','lab','products','iot','work','learn'];
 const COLORS = { bio:0x79a991, myco:0xa88fc3, soil:0xc19b73, lab:0x80aeb8, products:0xc88773, iot:0x7eaaa3, work:0xa99dbb, learn:0xb5b58d };
 const POS = {
-  bio:[0,2.55,0], myco:[-2.35,1.05,.35], soil:[-2.15,-1.05,-.1], lab:[-.05,.35,-.7],
-  products:[.2,-1.35,.55], iot:[2.45,.85,-.25], work:[2.15,-1.25,-.45], learn:[-.15,-2.8,.1],
+  // Eight evenly spaced biological colonies leave a shared central field for cross-domain anastomoses.
+  bio:[0,3.8,0], myco:[-2.7,2.7,.35], soil:[-3.8,0,-.1], lab:[-2.7,-2.7,-.7],
+  products:[0,-3.8,.55], iot:[2.7,-2.7,-.25], work:[3.8,0,-.45], learn:[2.7,2.7,.1],
 };
 const LINKS = [['bio','myco'],['myco','soil'],['soil','lab'],['lab','iot'],['lab','products'],['products','work'],['work','iot'],['products','learn'],['bio','lab'],['myco','products'],['soil','work'],['bio','iot'],['myco','learn'],['soil','products']];
 const LABELS = Object.fromEntries([...document.querySelectorAll('.sphere[data-sphere]')].map(el => [el.dataset.sphere, {
@@ -40,7 +41,7 @@ const COPY = {
 const t = key => (COPY[LANG()] || COPY.fr)[key] || COPY.fr[key];
 
 let THREE, renderer, scene, camera, raycaster, pointer, stage, panel, hint, intro, status;
-let world, cells = new Map(), pickables = [], resourceObjects = [], edges = [], signalPoints = [];
+let world, cells = new Map(), pickables = [], resourceObjects = [], overviewResources = [], edges = [], signalPoints = [];
 let resourceHitTargets = new Map(), domainHitTargets = new Map();
 let nav, branchDock, currentNode = null, currentAnchor = null, navigationStack = [];
 let selected = null, selectedBranch = null, manifest = null, transition = null;
@@ -170,7 +171,7 @@ function createWorld() {
     world.add(group);cells.set(id,{group,soma,label,hit,position:pos,color});
     const domainButton=document.createElement('button');domainButton.type='button';domainButton.className='webgl-hit-target webgl-domain-target';domainButton.setAttribute('aria-label',(LABELS[id]?.title||id)+' — '+t('domain'));domainButton.title=LABELS[id]?.title||id;domainButton.dataset.domainId=id;domainButton.style.width='116px';domainButton.style.height='116px';domainButton.addEventListener('pointerdown',()=>stage?.focus({preventScroll:true}));domainButton.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();stage?.focus({preventScroll:true});if(!selected)enterDomain(id)});stage.append(domainButton);domainHitTargets.set(id,{object:hit,button:domainButton});
     pickables.push(soma,hit,label);
-    for(let j=0;j<14;j++){
+    for(let j=0;j<8;j++){
       const a=j/14*Math.PI*2+IDS.indexOf(id)*.31;
       const start=new THREE.Vector3(Math.cos(a)*.10,Math.sin(a)*.09,Math.sin(a*1.7)*.035);
       const reach=1.0+(j%4)*.24;
@@ -185,8 +186,7 @@ function createWorld() {
         const forkCurve=new THREE.CatmullRomCurve3([at,at.clone().lerp(forkEnd,.55).add(new THREE.Vector3(0,.035,.035)),forkEnd]);
         group.add(new THREE.Mesh(new THREE.TubeGeometry(forkCurve,14,.0038,4,false),new THREE.MeshStandardMaterial({color,emissive:color,emissiveIntensity:.22,transparent:true,opacity:.52,roughness:.8})));
       }
-      const tip=new THREE.Mesh(new THREE.SphereGeometry(.026+(j%3)*.006,8,6),new THREE.MeshStandardMaterial({color,roughness:.75,emissive:color,emissiveIntensity:.18}));
-      tip.position.copy(end);group.add(tip);
+      // The visible terminal points are created from real Notion pages after the manifest loads.
     }
   }
   LINKS.forEach(([a,b],index)=>{
@@ -238,6 +238,55 @@ function smoothCamera(to,distTo,duration=950,done) {
   transition.frame=requestAnimationFrame(step);
 }
 
+function clearOverviewResources() {
+  for(const item of overviewResources){
+    world?.remove(item);
+    item.geometry?.dispose();
+    if(item.material){if(Array.isArray(item.material))item.material.forEach(mDispose);else mDispose(item.material)}
+  }
+  overviewResources=[];
+}
+function buildOverviewResources() {
+  clearOverviewResources();
+  if(!manifest?.domains?.length||selected)return;
+  const addFilament=(points,color,opacity=.34,radius=.004)=>{
+    const curve=new THREE.CatmullRomCurve3(points);
+    const mesh=new THREE.Mesh(new THREE.TubeGeometry(curve,14,radius,3,false),new THREE.MeshBasicMaterial({color,transparent:true,opacity,depthWrite:false}));
+    mesh.userData={kind:'overview-page-edge'};world.add(mesh);overviewResources.push(mesh);
+  };
+  manifest.domains.forEach((domain,domainIndex)=>{
+    const anchor=cells.get(domain.id)?.position;
+    if(!anchor)return;
+    const color=new THREE.Color(COLORS[domain.id]);
+    const nodes=[];
+    const walk=(items,parentPos,parentItem,depth,baseAngle,spread)=>{
+      const count=items?.length||0;
+      if(!count||depth>1)return;
+      items.forEach((item,index)=>{
+        const angle=baseAngle+(count===1?0:(index/(count-1)-.5)*spread*2)+(index%2?.045:-.045);
+        const radius=depth===0?1.05+Math.sqrt((index+.5)/count)*.58:.34+Math.sqrt((index+.5)/count)*.28;
+        const pos=parentPos.clone().add(new THREE.Vector3(Math.cos(angle)*radius,Math.sin(angle)*radius*.82,Math.sin(angle*1.7+domainIndex)*.12));
+        const nodeColor=color.clone().lerp(new THREE.Color(0xd1d0c5),depth===0?.28:.48);
+        const size=depth===0?.075:.045;
+        const point=new THREE.Mesh(new THREE.SphereGeometry(size,10,8),new THREE.MeshBasicMaterial({color:nodeColor,transparent:true,opacity:.96}));
+        point.position.copy(pos);
+        point.userData={kind:'overview-page',item,domainId:domain.id,depth,parentItem};
+        world.add(point);overviewResources.push(point);nodes.push(point);
+        const mid=parentPos.clone().lerp(pos,.52).add(new THREE.Vector3(0,.035,.04));
+        addFilament([parentPos.clone(),mid,pos.clone()],nodeColor,depth===0?.46:.3,depth===0?.005:.003);
+        if(depth===0&&item.children?.length)walk(item.children,pos,item,depth+1,angle,Math.min(1.25,.45+item.children.length*.09));
+      });
+    };
+    walk(domain.children||[],anchor,null,0,-Math.PI/2+domainIndex*.17,1.35);
+    // Local anastomoses make each colony a mesh, not a set of isolated spokes.
+    for(let i=0;i<nodes.length;i++){
+      const a=nodes[i],b=nodes[(i+2)%nodes.length];
+      if(!a||!b||a.userData.depth!==b.userData.depth)continue;
+      const A=a.position,B=b.position,mid=A.clone().lerp(B,.5).add(new THREE.Vector3(0,.055,.08));
+      addFilament([A.clone(),mid,B.clone()],color,.13,.0022);
+    }
+  });
+}
 function clearResources() {
   for(const button of resourceHitTargets.values())button.remove();resourceHitTargets.clear();
   for(const item of resourceObjects){world.remove(item);item.traverse?.(o=>{o.geometry?.dispose();if(o.material){if(Array.isArray(o.material))o.material.forEach(m=>m.dispose());else mDispose(o.material)}});if(item.geometry)item.geometry.dispose();if(item.material)mDispose(item.material)}
@@ -413,18 +462,18 @@ function openResource(item) {
  status.textContent=data.title||'';
 }
 function showDomainPanel(id,message='') {if(message)status.textContent=message;renderPath()}
-function enterDomain(id) {
+function enterDomain(id,initialResource=null) {
   if(!cells.has(id))return;selected=id;selectedBranch=null;opened=true;navigationStack=[];currentNode=manifest?.domains?.find(d=>d.id===id)||null;currentAnchor=cells.get(id).position.clone();
   intro.hidden=true;nav.hidden=false;ROOT.classList.remove('universe-closed');ROOT.classList.add('universe-open');panel.hidden=true;panel.replaceChildren();
   if(typeof window.enterSphere==='function')window.enterSphere(id,false,true); // Populate the hidden legacy content source only; the old engine no longer owns #mainView events.
-  const rootCount=manifest?.domains?.find(d=>d.id===id)?.children?.length||0;const initialDistance=rootCount>16?(window.innerWidth<760?20.5:11.5):7.5;smoothCamera(cells.get(id).position,initialDistance,900,()=>buildResources(id));
+  const rootCount=manifest?.domains?.find(d=>d.id===id)?.children?.length||0;const initialDistance=rootCount>16?(window.innerWidth<760?20.5:11.5):7.5;smoothCamera(cells.get(id).position,initialDistance,900,()=>{buildResources(id);if(initialResource?.children?.length)openResource(initialResource);else if(initialResource?.url)window.open(initialResource.url,'_blank','noopener')});
 }
 function goBackLevel() {
   if(navigationStack.length){const previous=navigationStack.pop();currentNode=previous.node;currentAnchor=previous.anchor.clone();smoothCamera(currentAnchor,6.2,650,()=>buildResources(selected,currentNode,currentAnchor));return}
   if(selected)goOverview();
 }
 function goOverview() {
-  selected=null;selectedBranch=null;navigationStack=[];currentNode=null;currentAnchor=null;clearResources();nav?.replaceChildren();nav.hidden=true;if(branchDock){branchDock.replaceChildren();branchDock.hidden=true}panel.hidden=true;panel.replaceChildren();
+  selected=null;selectedBranch=null;navigationStack=[];currentNode=null;currentAnchor=null;clearResources();buildOverviewResources();nav?.replaceChildren();nav.hidden=true;if(branchDock){branchDock.replaceChildren();branchDock.hidden=true}panel.hidden=true;panel.replaceChildren();
   const mini=document.getElementById('miniView');if(mini){mini.hidden=true;mini.classList.remove('spatial-source-only')}
   const homeButton=document.getElementById('homeBtn');if(homeButton)homeButton.hidden=true;
   smoothCamera(new THREE.Vector3(0,0,0),13.5,850,()=>{status.textContent='BALABS / LIVING NETWORK'});
@@ -543,6 +592,17 @@ function pickAt(x,y) {
     return{x:sx,y:sy,d:Math.hypot(sx-x,sy-y)};
   };
   if(!selected){
+    let nearestPage=null,nearestPageDistance=Infinity;
+    for(const point of overviewResources){
+      if(point.userData?.kind!=='overview-page')continue;
+      const p=screenPoint(point);
+      if(p.d<nearestPageDistance){nearestPage=point;nearestPageDistance=p.d}
+    }
+    if(nearestPage&&nearestPageDistance<(window.innerWidth<760?28:24)){
+      const {item,domainId}=nearestPage.userData;
+      enterDomain(domainId,item);
+      return;
+    }
     let nearest=null,nearestDistance=Infinity;
     for(const item of cells.values()){const p=screenPoint(item.hit);if(p.d<nearestDistance){nearest=item;nearestDistance=p.d}}
     if(nearest&&nearestDistance<(window.innerWidth<760?72:88)){enterDomain(nearest.group.userData.id);return}
@@ -613,7 +673,7 @@ async function init() {
     stage.prepend(renderer.domElement);renderer.domElement.setAttribute('tabindex','0');renderer.domElement.setAttribute('role','application');renderer.domElement.setAttribute('aria-label','BA Labs 3D network. Use arrow keys to rotate, plus and minus to zoom, Escape to go back, and Home for overview.');
     scene=new THREE.Scene();camera=new THREE.PerspectiveCamera(46,1,.1,180);raycaster=new THREE.Raycaster();pointer=new THREE.Vector2();target=new THREE.Vector3();
     createWorld();resize();cameraInitialized=true;
-    const loadManifest=()=>fetch('./notion-tree.'+LANG()+'.json',{cache:'no-cache'}).then(r=>r.ok?r.json():null).then(data=>{if(data?.version===1&&Array.isArray(data.domains)){manifest=data;if(selected&&!transition)buildResources(selected,currentNode,currentAnchor)}}).catch(()=>{});loadManifest();new MutationObserver(()=>{hint.textContent=t('hint');loadManifest()}).observe(document.documentElement,{attributes:true,attributeFilter:['lang']});
+    const loadManifest=()=>fetch('./notion-tree.'+LANG()+'.json',{cache:'no-cache'}).then(r=>r.ok?r.json():null).then(data=>{if(data?.version===1&&Array.isArray(data.domains)){manifest=data;if(selected&&!transition)buildResources(selected,currentNode,currentAnchor);else buildOverviewResources()}}).catch(()=>{});loadManifest();new MutationObserver(()=>{hint.textContent=t('hint');loadManifest()}).observe(document.documentElement,{attributes:true,attributeFilter:['lang']});
     window.__BALABS_3D_E2E__=()=>{
       const rect=renderer.domElement.getBoundingClientRect();
       const project=obj=>{const p=obj.getWorldPosition(new THREE.Vector3()).project(camera);return{x:rect.left+(p.x+1)*rect.width/2,y:rect.top+(1-p.y)*rect.height/2,z:p.z,title:obj.userData.title||obj.userData.id,hasChildren:!!obj.userData.hasChildren,depth:obj.userData.depth??0,url:obj.userData.url||null}};
