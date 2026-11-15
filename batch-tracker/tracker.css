@@ -12923,3 +12923,159 @@ body[data-domain="agronomy"] #measurementCard :is(input,select,textarea) {backgr
   body[data-domain] #cultureCatalogList .culture-catalog-row,
   body[data-domain] #measurementCard .quick-capture-tile {transition:none !important}
 }
+
+
+/* ============================================================
+   CULTUREOPS UI REFINEMENT — PASS 65
+   Data views: catalog, lineage, QC, batch history and statistics
+   ============================================================ */
+body[data-domain] :is(#cultureCatalogList,#plantCultureList,.batch-list,.stage-list,.qc-list,.culture-detail-timeline,.measurement-history,.batch-event-list) {
+  min-width:0;
+}
+body[data-domain] #cultureCatalogList .culture-catalog-row,
+body[data-domain] #plantCultureList > * {
+  position:relative; min-width:0; padding:clamp(13px,1.5vw,17px);
+  border:1px solid var(--border); border-radius:13px;
+  background:linear-gradient(145deg,color-mix(in srgb,var(--workspace-accent,var(--brand)) 5%,var(--surface)),var(--surface-2));
+  box-shadow:0 5px 18px rgba(0,0,0,.09);
+}
+body[data-domain] #cultureCatalogList .culture-catalog-row:hover {
+  border-color:var(--workspace-accent,var(--brand));
+  box-shadow:0 10px 24px rgba(0,0,0,.13); transform:translateY(-2px);
+}
+body[data-domain] #cultureCatalogList .culture-catalog-code {
+  color:var(--text); font-size:.83rem; line-height:1.45; letter-spacing:-.015em;
+}
+body[data-domain] #cultureCatalogList .culture-catalog-meta {
+  align-items:center; gap:6px; color:var(--muted); font-size:.64rem; line-height:1.45;
+}
+body[data-domain] #cultureCatalogList .culture-catalog-meta span:first-child {
+  border:1px solid var(--border); border-radius:999px;
+  background:var(--surface); color:var(--workspace-accent,var(--brand));
+  padding:4px 9px; font-weight:750;
+}
+body[data-domain] #cultureCatalogList .culture-catalog-actions {gap:8px}
+body[data-domain] #cultureCatalogList .culture-catalog-action {
+  min-height:39px; border-radius:9px; font-size:.65rem; font-weight:750;
+}
+body[data-domain] #cultureCatalogList .culture-catalog-action:focus-visible,
+body[data-domain] .culture-lineage-node:focus-visible,
+body[data-domain] .batch-item:focus-visible,
+body[data-domain] .qc-save:focus-visible {
+  outline:2px solid var(--workspace-accent,var(--brand)); outline-offset:3px;
+}
+body[data-domain] #cultureDetailPanel .culture-detail-field {
+  min-width:0; padding:13px; border:1px solid var(--border);
+  border-radius:11px; background:var(--surface-2);
+}
+body[data-domain] #cultureDetailPanel .culture-detail-field span {
+  color:var(--muted); font-size:.61rem; font-weight:700; letter-spacing:.035em;
+}
+body[data-domain] #cultureDetailPanel .culture-detail-field strong {
+  color:var(--text); font-size:.77rem; line-height:1.45;
+}
+body[data-domain] #cultureDetailPanel .culture-timeline-entry {
+  grid-template-columns:minmax(94px, .28fr) minmax(0,1fr);
+  gap:10px; padding:13px 14px; border:1px solid var(--border);
+  border-inline-start:3px solid var(--workspace-accent,var(--brand));
+  border-radius:10px; background:var(--surface-2);
+}
+body[data-domain] #cultureDetailPanel .culture-timeline-date {
+  color:var(--muted); font-size:.62rem; line-height:1.5;
+}
+body[data-domain] #cultureDetailPanel .culture-timeline-entry strong {
+  color:var(--text); font-size:.73rem;
+}
+body[data-domain] #cultureDetailPanel .culture-timeline-entry p {
+  margin-top:5px; color:var(--muted); font-size:.67rem; line-height:1.55;
+}
+body[data-domain] .batch-grid {gap:10px}
+body[data-domain] .batch-stat {
+  min-width:0; padding:13px; border:1px solid var(--border);
+  border-radius:11px; background:var(--surface-2);
+}
+body[data-domain] .batch-stat-label {
+  color:var(--muted); font-size:.62rem; font-weight:700; letter-spacing:.025em;
+}
+body[data-domain] .batch-stat-value {
+  margin-top:5px; color:var(--text); font-size:.76rem; line-height:1.5;
+  overflow-wrap:anywhere;
+}
+body[data-domain] .stage {
+  min-width:0; padding:12px 14px; border-color:var(--border);
+  border-radius:11px; background:var(--surface-2); color:var(--text);
+}
+body[data-domain] .stage-number {color:var(--muted);font-variant-numeric:tabular-nums}
+body[data-domain] .stage-name {color:var(--text);font-size:.72rem;line-height:1.4}
+body[data-domain] .stage-status {font-size:.59rem;letter-spacing:.06em}
+body[data-domain] .stage.active {
+  border-color:var(--workspace-accent,var(--brand));
+  background:color-mix(in srgb,var(--workspace-accent,var(--brand)) 10%,var(--surface));
+  box-shadow:inset 3px 0 0 var(--workspace-accent,var(--brand));
+}
+body[data-domain] .stage.completed {
+  background:color-mix(in srgb,var(--ok) 7%,var(--surface));
+}
+body[data-domain] .qc-row {
+  grid-template-columns:minmax(0,1fr) minmax(120px,.55fr) auto;
+  gap:12px; padding:13px; border-color:var(--border);
+  border-radius:11px; background:var(--surface-2); color:var(--text);
+}
+body[data-domain] .qc-label {color:var(--text);font-size:.72rem;line-height:1.45}
+body[data-domain] .qc-code {color:var(--muted);font-size:.61rem;overflow-wrap:anywhere}
+body[data-domain] .qc-row :is(select,input) {
+  min-width:0; min-height:39px; margin:0; border:1px solid var(--border-strong);
+  border-radius:8px; background:var(--surface); color:var(--text); font:inherit;font-size:.67rem;
+}
+body[data-domain] .qc-save {min-height:39px;border-radius:8px;font-size:.64rem}
+body[data-domain] .batch-event-item {
+  padding:14px 15px; border-color:var(--border); border-radius:11px;
+  background:var(--surface-2); color:var(--text);
+}
+body[data-domain] .batch-event-item strong {color:var(--text);font-size:.72rem}
+body[data-domain] .batch-event-item time {color:var(--muted);font-size:.62rem}
+body[data-domain] .batch-event-item > div:last-child {margin-top:7px;color:var(--muted);font-size:.68rem;line-height:1.55}
+body[data-domain] #batchCompareResults {min-width:0;border:1px solid var(--border);border-radius:12px;background:var(--surface)}
+body[data-domain] .statistics-table {min-width:760px;color:var(--text);font-size:.65rem}
+body[data-domain] .statistics-table caption {padding:14px;color:var(--text);font-size:.73rem}
+body[data-domain] .statistics-table th {
+  position:sticky;top:0;z-index:1;padding:11px 12px;
+  background:var(--surface-2);color:var(--muted);font-size:.59rem;
+  letter-spacing:.055em;text-transform:uppercase;
+}
+body[data-domain] .statistics-table td {
+  padding:11px 12px; border-color:var(--border); color:var(--text);
+  white-space:normal; min-width:105px; max-width:260px; line-height:1.5;
+}
+body[data-domain] .statistics-table tbody tr:nth-child(even) {background:var(--surface-2)}
+body[data-domain] .statistics-table tbody tr:hover {background:color-mix(in srgb,var(--workspace-accent,var(--brand)) 8%,var(--surface))}
+body[data-domain="mycology"] :is(#cultureCatalogList .culture-catalog-row,#cultureDetailPanel .culture-detail-field,.stage,.qc-row,.batch-stat,.batch-event-item) {
+  background:#211811;border-color:#493426;color:#f0e3d7;
+}
+body[data-domain="mycology"] #cultureCatalogList .culture-catalog-meta span:first-child {background:#17110d;border-color:#59402f;color:#d49a69}
+body[data-domain="mycology"] .statistics-table th {background:#211811}
+body[data-domain="laboratory"] :is(#cultureCatalogList .culture-catalog-row,#cultureDetailPanel .culture-detail-field,.stage,.qc-row,.batch-stat,.batch-event-item) {
+  background:#f4f8fc;border-color:#c7d6e4;color:#183a59;
+}
+body[data-domain="laboratory"] .statistics-table th {background:#edf3f9}
+body[data-domain="agronomy"] :is(#cultureCatalogList .culture-catalog-row,#cultureDetailPanel .culture-detail-field,.stage,.qc-row,.batch-stat,.batch-event-item) {
+  background:#1b2520;border-color:#3b5142;color:#e8eee7;
+}
+body[data-domain="agronomy"] .statistics-table th {background:#202c25}
+@media(max-width:680px) {
+  body[data-domain] .qc-row {grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+  body[data-domain] .qc-row > :first-child {grid-column:1/-1}
+  body[data-domain] .qc-row .qc-save {width:100%}
+  body[data-domain] #cultureDetailPanel .culture-timeline-entry {grid-template-columns:minmax(0,1fr);gap:5px}
+  body[data-domain] #cultureDetailPanel .culture-timeline-date {font-size:.59rem}
+  body[data-domain] .batch-grid {grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:420px) {
+  body[data-domain] .batch-grid {grid-template-columns:minmax(0,1fr)}
+  body[data-domain] #cultureCatalogList .culture-catalog-actions {grid-template-columns:minmax(0,1fr)}
+  body[data-domain] .stage {grid-template-columns:28px minmax(0,1fr);gap:8px}
+  body[data-domain] .stage-status {grid-column:2}
+}
+@media(prefers-reduced-motion:reduce) {
+  body[data-domain] #cultureCatalogList .culture-catalog-row {transform:none!important}
+}
