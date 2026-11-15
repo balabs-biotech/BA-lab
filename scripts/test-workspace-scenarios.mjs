@@ -881,3 +881,19 @@ assert.match(feedbackCss, /@media \\(prefers-reduced-motion: reduce\\)[\\s\\S]*?
 assert.match(feedbackCss, /body\\[data-domain\\] \\.feedback-empty/,
   "empty collections must have a distinct non-error state");
 console.log("✓ Feedback states: semantic status surfaces, loading, empty and reduced-motion behavior");
+
+
+// Feedback states need one reusable visual contract rather than scattered,
+// domain-specific overrides for each individual status message.
+const feedbackCss = fs.readFileSync("batch-tracker/tracker.css", "utf8");
+for (const state of ["info", "success", "warning", "error"]) {
+  assert.match(feedbackCss, new RegExp('body\\[data-domain\\] \\.feedback-' + state),
+    "feedback-" + state + " must expose a shared semantic surface");
+}
+assert.match(feedbackCss, /body\\[data-domain\\] \\.feedback-state\\[data-loading="true"\\]/,
+  "loading feedback must expose a stable busy state");
+assert.match(feedbackCss, /body\\[data-domain\\] \\.feedback-state\\[data-empty="true"\\]/,
+  "empty feedback must remain a first-class operational state");
+assert.match(feedbackCss, /@media \\(max-width: 600px\\)[\\s\\S]*?\\.feedback-state/,
+  "feedback surfaces must remain compact on phones");
+console.log("✓ Feedback states: semantic status, loading, empty and mobile treatment");
