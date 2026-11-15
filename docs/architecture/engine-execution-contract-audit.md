@@ -75,6 +75,20 @@ Les tests suivants doivent être exécutés sur une base locale de test ou une b
 | Panne d'un handler | handler indisponible | job échoue/réessaie sans bloquer les autres jobs |
 | Idempotence de sortie | même job relancé | pas de doublon de résultat métier |
 
+## 5 bis. Écart de migration confirmé
+
+Une comparaison directe des identifiants de migration confirme un écart important :
+
+- 92 migrations enregistrées dans le projet Supabase actif ;
+- 57 fichiers SQL dans le dépôt ;
+- 43 correspondances exactes version + nom ;
+- 49 migrations distantes sans fichier Git portant leur identifiant exact ;
+- 14 fichiers Git sans correspondance exacte dans l'historique distant.
+
+Les migrations de la file d'exécution du 15 novembre sont notamment absentes sous leurs identifiants distants exacts : `engine_execution_queue_v1`, ses durcissements, le registre versionné, les RPC enqueue, les moteurs NASA/Sentinel et le vérificateur du secret worker. La liste exhaustive est dans `supabase/migrations/RECONCILIATION.md`.
+
+Plusieurs fichiers locaux ont un nom similaire à une migration distante mais un horodatage différent. Ils ne doivent pas être renommés automatiquement : les corps SQL doivent être récupérés et comparés depuis la source originale.
+
 ## 6. Décision immédiate
 
 - Ne pas toucher au schéma de production.
