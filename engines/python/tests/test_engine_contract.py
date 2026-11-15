@@ -772,6 +772,19 @@ class EngineContractTests(unittest.TestCase):
                     **({"event_id": "4c2b3a4d-5e6f-4789-8123-456789abcdef"} if index == 1 else {}),
                 },
             })
+        event_id = "7c2b3a4d-5e6f-4789-8123-456789abcdef"
+        request["input"]["record_ids"].append(event_id)
+        request["input"]["records"].append({
+            "record_id": event_id,
+            "record_type": "event",
+            "payload_sha256": "d" * 64,
+            "data": {
+                "event_type": "fruiting_stage_started",
+                "occurred_at": "2026-11-10T09:15:00Z",
+                "payload": {"stage": "primordia"},
+            },
+            "context": {"culture_id": culture_id},
+        })
         observation_id = "5c2b3a4d-5e6f-4789-8123-456789abcdef"
         event_id = "6c2b3a4d-5e6f-4789-8123-456789abcdef"
         request["input"]["record_ids"].append(observation_id)
@@ -798,9 +811,13 @@ class EngineContractTests(unittest.TestCase):
         Draft202012Validator(biological_schema, format_checker=FormatChecker()).validate(value)
         self.assertEqual(value["subject"]["subject_type"], "culture")
         self.assertEqual(value["subject"]["subject_id"], culture_id)
-        self.assertEqual(value["coverage"]["source_record_count"], 4)
+        self.assertEqual(value["coverage"]["source_record_count"], 5)
         self.assertEqual(value["coverage"]["record_counts_by_type"]["measurement"], 3)
         self.assertEqual(value["coverage"]["record_counts_by_type"]["observation"], 1)
+        self.assertEqual(value["coverage"]["record_counts_by_type"]["event"], 1)
+        event_fact = next(item for item in value["observed_facts"] if item["fact_code"] == "event.fruiting_stage_started")
+        self.assertEqual(event_fact["event_id"], event_id)
+        self.assertEqual(event_fact["value"]["stage"], "primordia")
         morphology_fact = next(item for item in value["observed_facts"] if item["fact_code"] == "observation.morphology_note")
         self.assertIn("primordia formation", morphology_fact["statement"])
         self.assertEqual(morphology_fact["event_id"], event_id)
