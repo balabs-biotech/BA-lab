@@ -823,3 +823,20 @@ for (const domain of ["agronomy", "mycology", "laboratory"]) {
     domain + " operational tables must preserve their workspace identity");
 }
 console.log("✓ Operational data surfaces: readable rows, domain identity and mobile overflow");
+
+
+// Record cards and operational lists must inherit the active workspace tokens,
+// not retain hard-coded pale-green surfaces in Mycology or Laboratory.
+const recordCardCss = fs.readFileSync("batch-tracker/tracker.css", "utf8");
+for (const domain of ["agronomy", "mycology", "laboratory"]) {
+  assert.match(recordCardCss, new RegExp('body\\\\[data-domain="' + domain + '"\\\\]\\\\s*\\\\{[\\\\s\\\\S]*?--surface:'),
+    domain + " must define its own surface token for operational cards");
+}
+for (const component of [".batch-item", ".stage", ".qc-row", ".batch-stat", ".culture-detail-field"]) {
+  assert.match(recordCardCss, new RegExp('body\\\\[data-domain\\\\] [\\\\s\\\\S]*?' + component.replace(".", "\\\\.")),
+    component + " must inherit workspace design tokens");
+}
+assert.match(recordCardCss, /\\.batch-item:focus-visible/);
+assert.match(recordCardCss, /\\.stage:focus-within/);
+assert.match(recordCardCss, /\\.qc-row:focus-within/);
+console.log("✓ Operational record cards: domain surfaces and keyboard/focus inspection");

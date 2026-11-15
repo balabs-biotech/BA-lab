@@ -3037,3 +3037,85 @@ body[data-domain="laboratory"] .statistics-table tbody tr:hover td,
 body[data-domain="laboratory"] .statistics-table tbody tr:focus-within td {
   background: #eef5fb;
 }
+
+
+/* Operational record cards: shared structure, workspace-specific surfaces. */
+body[data-domain] :is(.batch-item, .stage, .qc-row, .batch-stat, .culture-detail-field) {
+  color: var(--text);
+  background: var(--surface);
+  border-color: var(--border);
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--text) 5%, transparent);
+}
+body[data-domain] :is(.batch-item, .stage, .qc-row, .culture-detail-field) {
+  border-radius: 12px;
+}
+body[data-domain] .batch-stat {
+  border: 1px solid var(--border);
+}
+body[data-domain] .batch-item {
+  text-align: left;
+  transition: border-color .16s ease, background-color .16s ease, box-shadow .16s ease;
+}
+body[data-domain] .batch-item:hover:not(:disabled) {
+  background: var(--surface-2);
+  border-color: var(--brand);
+}
+body[data-domain] :is(.batch-item, .stage, .qc-row):focus-within,
+body[data-domain] .batch-item:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+body[data-domain] .culture-detail-field strong,
+body[data-domain] .batch-stat-value,
+body[data-domain] .qc-label,
+body[data-domain] .stage strong {
+  color: var(--text);
+  overflow-wrap: anywhere;
+}
+body[data-domain] :is(.batch-stat-label, .qc-code, .culture-detail-field span, .culture-timeline-date) {
+  color: var(--muted);
+}
+body[data-domain] .culture-timeline-entry {
+  color: var(--text);
+  background: var(--surface);
+  border-left-color: var(--brand);
+}
+body[data-domain] .culture-timeline-entry p {
+  color: var(--muted);
+}
+body[data-domain] .culture-detail {
+  color: var(--text);
+  background: var(--surface-2);
+  border-color: var(--border);
+}
+body[data-domain] .culture-detail-field {
+  min-width: 0;
+}
+@media (max-width: 600px) {
+  body[data-domain] .batch-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+  body[data-domain] .batch-stat {
+    min-width: 0;
+    padding: 10px;
+  }
+  body[data-domain] .stage {
+    grid-template-columns: 34px minmax(0, 1fr) auto;
+    gap: 8px;
+    padding: 10px;
+  }
+  body[data-domain] .qc-row {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 8px;
+  }
+  body[data-domain] .culture-detail-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 380px) {
+  body[data-domain] .batch-grid,
+  body[data-domain] .culture-detail-summary {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
