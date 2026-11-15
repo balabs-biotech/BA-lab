@@ -787,6 +787,10 @@ class EngineContractTests(unittest.TestCase):
             },
             "context": {"culture_id": culture_id, "event_id": event_id},
         })
+        measurement_record_ids = [
+            row["record_id"] for row in request["input"]["records"]
+            if row["record_type"] == "measurement"
+        ]
         result = execute_registered_engine(request)
         self.assertEqual(result["status"], "completed", msg=str(result.get("error")))
         value = result["result"]["value"]
@@ -809,24 +813,24 @@ class EngineContractTests(unittest.TestCase):
         dispersion = next(item for item in value["derived_features"] if item["feature_code"] == "series.measurement.air_temperature.population_stddev")
         self.assertAlmostEqual(dispersion["value"], (2 / 3) ** 0.5, places=8)
         self.assertEqual(dispersion["unit_code"], "degC")
-        self.assertEqual(set(dispersion["source_record_ids"]), set(request["input"]["record_ids"]))
+        self.assertEqual(set(dispersion["source_record_ids"]), set(measurement_record_ids))
         coefficient = next(item for item in value["derived_features"] if item["feature_code"] == "series.measurement.air_temperature.coefficient_of_variation_pct")
         self.assertAlmostEqual(coefficient["value"], (((2 / 3) ** 0.5) / 22.0) * 100, places=8)
         self.assertEqual(coefficient["unit_code"], "percent")
-        self.assertEqual(set(coefficient["source_record_ids"]), set(request["input"]["record_ids"]))
+        self.assertEqual(set(coefficient["source_record_ids"]), set(measurement_record_ids))
         amplitude = next(item for item in value["derived_features"] if item["feature_code"] == "series.measurement.air_temperature.range")
         self.assertEqual(amplitude["value"], 2.0)
         self.assertEqual(amplitude["unit_code"], "degC")
-        self.assertEqual(set(amplitude["source_record_ids"]), set(request["input"]["record_ids"]))
+        self.assertEqual(set(amplitude["source_record_ids"]), set(measurement_record_ids))
         trend = next(item for item in value["derived_features"] if item["feature_code"] == "series.measurement.air_temperature.trend_slope_per_day")
         self.assertAlmostEqual(trend["value"], 12.0)
         self.assertEqual(trend["unit_code"], "degC/day")
-        self.assertEqual(set(trend["source_record_ids"]), set(request["input"]["record_ids"]))
+        self.assertEqual(set(trend["source_record_ids"]), set(measurement_record_ids))
         feature = next(item for item in value["derived_features"] if item["feature_code"] == "series.measurement.air_temperature.mean")
         self.assertEqual(feature["feature_code"], "series.measurement.air_temperature.mean")
         self.assertEqual(feature["value"], 22.0)
         self.assertEqual(feature["unit_code"], "degC")
-        self.assertEqual(set(feature["source_record_ids"]), set(request["input"]["record_ids"]))
+        self.assertEqual(set(feature["source_record_ids"]), set(measurement_record_ids))
         self.assertEqual(value["findings"], [])
         self.assertEqual(value["hypotheses"], [])
         self.assertIn("biological_interpretation_not_performed", result["result"]["quality_flags"])
