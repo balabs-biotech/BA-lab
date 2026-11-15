@@ -10222,3 +10222,39 @@ body[data-domain] #measurementCard .observation-details summary {
   body[data-domain] #measurementCard #saveObservationButton { width: 100%; }
   body[data-domain] #measurementCard .observation-details { padding: 12px; }
 }
+
+
+/* PASS 48 — keep authentication actions visible on compact screens. */
+@media (max-width: 600px) {
+  body[data-domain] #authCard {
+    padding: 16px 14px !important;
+  }
+  body[data-domain] #authCard .section-kicker {
+    margin-bottom: 11px;
+  }
+  body[data-domain] #authCard h2 {
+    margin: 0 0 8px;
+  }
+  body[data-domain] #authCard > .muted {
+    margin: 6px 0 12px;
+    line-height: 1.55;
+  }
+  body[data-domain] #authCard label {
+    margin: 10px 0 5px;
+  }
+  body[data-domain] #authCard input {
+    min-height: 40px;
+    padding: 8px 11px;
+  }
+  body[data-domain] #authCard .auth-actions {
+    gap: 8px;
+    margin: 13px 0 10px;
+  }
+  body[data-domain] #authCard .auth-actions button {
+    min-height: 40px;
+  }
+  body[data-domain] #authCard #authStatus {
+    min-height: 36px;
+    padding: 8px 10px;
+  }
+}
