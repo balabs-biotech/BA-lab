@@ -91,7 +91,18 @@
   requestAnimationFrame(()=>{const top=target===page?0:target.offsetTop-page.offsetTop;page.scrollTo({top:Math.max(0,top-12),behavior:scrollBehavior()});history.replaceState(null,'','#'+id)});
  },true);
  const localize=()=>{
-  const l=lang();groups.forEach((g,i)=>{const label=pages[i].querySelector('[data-chapter-label]');if(label)label.textContent=String(i+1).padStart(2,'0')+' / '+(g.label[l]||g.label.fr)});
+  const l=lang(),labels={
+   track:{fr:'BALabs — navigation horizontale',en:'BALabs — horizontal navigation',ar:'بالابس — التنقل الأفقي',pt:'BALabs — navegação horizontal'},
+   progress:{fr:'Progression dans les chapitres',en:'Chapter progress',ar:'التقدم بين الفصول',pt:'Progresso dos capítulos'},
+   page:{fr:'Chapitre',en:'Chapter',ar:'الفصل',pt:'Capítulo'}
+  };
+  track.setAttribute('aria-label',labels.track[l]||labels.track.fr);
+  progress.setAttribute('aria-label',labels.progress[l]||labels.progress.fr);
+  groups.forEach((g,i)=>{
+   const label=pages[i].querySelector('[data-chapter-label]');
+   if(label)label.textContent=String(i+1).padStart(2,'0')+' / '+(g.label[l]||g.label.fr);
+   pages[i].setAttribute('aria-label',(labels.page[l]||labels.page.fr)+' — '+(g.label[l]||g.label.fr));
+  });
   prev.setAttribute('aria-label',({fr:'Espace précédent',en:'Previous space',ar:'المساحة السابقة',pt:'Espaço anterior'})[l]);
   next.setAttribute('aria-label',({fr:'Espace suivant',en:'Next space',ar:'المساحة التالية',pt:'Próximo espaço'})[l]);
   controls.setAttribute('aria-label',({fr:'Navigation entre les espaces',en:'Navigate between spaces',ar:'التنقل بين المساحات',pt:'Navegar entre espaços'})[l]);
