@@ -104,13 +104,15 @@
    pages[i].setAttribute('aria-roledescription',({fr:'chapitre',en:'chapter',ar:'فصل',pt:'capítulo'})[l]||'chapter');
    pages[i].setAttribute('aria-label',(labels.page[l]||labels.page.fr)+' — '+(g.label[l]||g.label.fr));
   });
+  const rtl=document.documentElement.dir==='rtl'||l==='ar';
+  prev.textContent=rtl?'→':'←';next.textContent=rtl?'←':'→';
   prev.setAttribute('aria-label',({fr:'Espace précédent',en:'Previous space',ar:'المساحة السابقة',pt:'Espaço anterior'})[l]);
   next.setAttribute('aria-label',({fr:'Espace suivant',en:'Next space',ar:'المساحة التالية',pt:'Próximo espaço'})[l]);
   controls.setAttribute('aria-label',({fr:'Navigation entre les espaces',en:'Navigate between spaces',ar:'التنقل بين المساحات',pt:'Navegar entre espaços'})[l]);
   rail.setAttribute('aria-label',({fr:'Parcours des chapitres',en:'Chapter navigation',ar:'التنقل بين الفصول',pt:'Navegação por capítulos'})[l]);
   rail.querySelectorAll('.chapter-rail-node').forEach((b,i)=>{const label=groups[i].label[l]||groups[i].label.fr;b.setAttribute('aria-label',label);const name=b.querySelector('.chapter-rail-name');if(name)name.textContent=label;});
  };
- new MutationObserver(localize).observe(document.documentElement,{attributes:true,attributeFilter:['lang']});
+ new MutationObserver(localize).observe(document.documentElement,{attributes:true,attributeFilter:['lang','dir']});
  localize();update();
  const hash=location.hash&&document.getElementById(decodeURIComponent(location.hash.slice(1)));
  if(hash){const page=hash.closest('.experience-page');if(page){go(pages.indexOf(page));requestAnimationFrame(()=>hash.scrollIntoView({block:'start',behavior:scrollBehavior()}));}}
