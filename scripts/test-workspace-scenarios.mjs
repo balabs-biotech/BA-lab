@@ -807,3 +807,19 @@ assert.match(formThemeCss, /body\\[data-domain\\] :is\\(input, select, textarea\
 assert.match(formThemeCss, /body\\[data-domain\\] :is\\(input, select, textarea\\):disabled/,
   "disabled form controls must remain visibly distinct in every workspace");
 console.log("✓ Form controls: domain surfaces, accent controls, validation and disabled states");
+
+
+// Operational data surfaces must remain readable on narrow screens without
+// squeezing scientific values into illegible columns.
+const operationalCss = fs.readFileSync("batch-tracker/tracker.css", "utf8");
+assert.match(operationalCss, /@media \(max-width: 700px\)[\s\S]*?\.statistics-table-wrap[\s\S]*?overflow-x:\s*auto/,
+  "scientific tables must remain horizontally scrollable on narrow screens");
+assert.match(operationalCss, /@media \(max-width: 700px\)[\s\S]*?\.statistics-table[\s\S]*?min-width:/,
+  "scientific table columns must preserve a readable minimum width");
+assert.match(operationalCss, /\.statistics-table tbody tr:hover td/,
+  "operational tables must provide a row-level inspection state");
+for (const domain of ["agronomy", "mycology", "laboratory"]) {
+  assert.match(operationalCss, new RegExp('body\\[data-domain="' + domain + '"\\] \\.statistics-table th'),
+    domain + " operational tables must preserve their workspace identity");
+}
+console.log("✓ Operational data surfaces: readable rows, domain identity and mobile overflow");
