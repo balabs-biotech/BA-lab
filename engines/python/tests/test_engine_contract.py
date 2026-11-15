@@ -772,10 +772,10 @@ class EngineContractTests(unittest.TestCase):
                     **({"event_id": "4c2b3a4d-5e6f-4789-8123-456789abcdef"} if index == 1 else {}),
                 },
             })
-        event_id = "7c2b3a4d-5e6f-4789-8123-456789abcdef"
-        request["input"]["record_ids"].append(event_id)
+        operational_event_id = "7c2b3a4d-5e6f-4789-8123-456789abcdef"
+        request["input"]["record_ids"].append(operational_event_id)
         request["input"]["records"].append({
-            "record_id": event_id,
+            "record_id": operational_event_id,
             "record_type": "event",
             "payload_sha256": "d" * 64,
             "data": {
@@ -816,7 +816,7 @@ class EngineContractTests(unittest.TestCase):
         self.assertEqual(value["coverage"]["record_counts_by_type"]["observation"], 1)
         self.assertEqual(value["coverage"]["record_counts_by_type"]["event"], 1)
         event_fact = next(item for item in value["observed_facts"] if item["fact_code"] == "event.fruiting_stage_started")
-        self.assertEqual(event_fact["event_id"], event_id)
+        self.assertEqual(event_fact["event_id"], operational_event_id)
         self.assertEqual(event_fact["value"]["stage"], "primordia")
         morphology_fact = next(item for item in value["observed_facts"] if item["fact_code"] == "observation.morphology_note")
         self.assertIn("primordia formation", morphology_fact["statement"])
