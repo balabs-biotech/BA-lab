@@ -21,16 +21,11 @@
   position:relative;isolation:isolate;overflow:hidden;
   transition:transform .32s cubic-bezier(.2,.75,.25,1),border-color .32s ease,box-shadow .32s ease,background-color .32s ease!important;
 }
-#app>main>.editorial-work .work-card:after,#app>main>.universe-index .universe-index-card:after{
-  content:"";position:absolute;inset:-1px;z-index:-1;pointer-events:none;opacity:0;
-  background:radial-gradient(360px circle at var(--rb-x,50%) var(--rb-y,50%),#d1d0c51c,transparent 62%);
-  transition:opacity .3s ease;
-}
 #app>main>.editorial-work .work-card:hover,#app>main>.universe-index .universe-index-card:hover{
   transform:translateY(-5px)!important;border-color:#b96b4d99!important;
   box-shadow:0 18px 38px #0004,0 0 0 1px #b96b4d22!important;
+  background-image:radial-gradient(320px circle at 50% 0%,#d1d0c510,transparent 68%)!important;
 }
-#app>main>.editorial-work .work-card:hover:after,#app>main>.universe-index .universe-index-card:hover:after{opacity:1}
 #app>main>.editorial-work .work-card .work-media img{transition:transform .7s cubic-bezier(.2,.75,.25,1),filter .5s ease}
 #app>main>.editorial-work .work-card:hover .work-media img{transform:scale(1.045);filter:saturate(1.12) contrast(1.04)}
 #app>main>.universe-index .universe-index-card>span{transition:color .25s ease,transform .25s ease}
