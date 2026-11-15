@@ -3333,3 +3333,172 @@ html[dir="rtl"] body[data-domain] .skip-link {
     grid-template-columns: 28px minmax(0, 1fr);
   }
 }
+
+
+/* ============================================================
+   CULTUREOPS — domain workspace hierarchy / pass 4
+   Give each discipline a recognizable information hierarchy:
+   agronomy = environment & plant units; mycology = strains;
+   laboratory = experimental batches & measurements.
+   ============================================================ */
+body[data-domain] :is(#plantCard, #trackerCard, #batchCard, #measurementCard, #statisticsCard) {
+  position: relative;
+  overflow: clip;
+}
+body[data-domain] :is(#plantCard, #trackerCard, #batchCard, #measurementCard, #statisticsCard)::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 4px;
+  background: var(--workspace-accent, var(--brand));
+  opacity: .9;
+  pointer-events: none;
+}
+body[data-domain] :is(#plantCard, #trackerCard, #batchCard, #measurementCard, #statisticsCard) > .section-kicker {
+  margin-bottom: 13px;
+}
+body[data-domain] :is(#plantCard, #trackerCard, #batchCard, #measurementCard, #statisticsCard) > h2 {
+  margin-top: 0;
+  letter-spacing: -.025em;
+}
+body[data-domain] :is(#plantCard, #trackerCard, #batchCard, #measurementCard, #statisticsCard) > .muted {
+  max-width: 78ch;
+}
+body[data-domain] .entry-intro {
+  padding: 15px 17px;
+  margin: 4px 0 18px;
+  border: 1px solid var(--border);
+  border-inline-start: 3px solid var(--workspace-accent, var(--brand));
+  border-radius: 12px;
+  background: var(--surface-2);
+}
+body[data-domain] .entry-intro h2 {
+  margin: 5px 0 7px;
+}
+body[data-domain] .entry-step-mark,
+body[data-domain] .context-eyebrow {
+  color: var(--workspace-accent, var(--brand));
+}
+body[data-domain] .guided-entry-step {
+  background: color-mix(in srgb, var(--surface) 88%, var(--workspace-accent, var(--brand)) 12%);
+}
+body[data-domain] .quick-capture {
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: clamp(14px, 2.5vw, 22px);
+  background: var(--surface-2);
+}
+body[data-domain] .quick-capture-heading {
+  align-items: flex-start;
+}
+body[data-domain] .quick-capture-tile {
+  border: 1px solid var(--border-strong);
+  border-inline-start: 3px solid var(--workspace-accent, var(--brand));
+  border-radius: 12px;
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: 0 3px 12px rgba(0,0,0,.045);
+}
+body[data-domain] .quick-capture-tile:hover,
+body[data-domain] .quick-capture-tile:focus-visible {
+  border-color: var(--workspace-accent, var(--brand));
+  background: var(--surface-2);
+  box-shadow: 0 7px 18px rgba(0,0,0,.09);
+}
+body[data-domain] .quick-capture-icon {
+  color: var(--workspace-accent, var(--brand));
+  border-color: var(--border);
+}
+body[data-domain] .overview-shortcut {
+  border-inline-start: 3px solid var(--workspace-accent, var(--brand));
+}
+body[data-domain] .overview-shortcut .shortcut-index {
+  color: var(--workspace-accent, var(--brand));
+}
+body[data-domain] .statistics-filters {
+  padding: 15px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--surface-2);
+}
+body[data-domain] .statistics-summary > * {
+  border-color: var(--border);
+  border-radius: 12px;
+}
+body[data-domain] .statistics-chart,
+body[data-domain] .statistics-table-wrap {
+  border-radius: 14px;
+}
+body[data-domain="agronomy"] {
+  --workspace-accent: #91bd78;
+}
+body[data-domain="agronomy"] #plantCard::before {
+  width: 5px;
+}
+body[data-domain="agronomy"] #plantCard .section-kicker {
+  color: #a9d68f;
+}
+body[data-domain="mycology"] {
+  --workspace-accent: #b96b3e;
+}
+body[data-domain="mycology"] #trackerCard::before,
+body[data-domain="mycology"] #measurementCard::before,
+body[data-domain="mycology"] #statisticsCard::before {
+  background: #b96b3e;
+}
+body[data-domain="mycology"] .entry-intro {
+  background: #f1e4d8;
+  border-color: #ddc2ac;
+  border-inline-start-color: #a94f1d;
+}
+body[data-domain="mycology"] .quick-capture-tile {
+  background: #fffaf4;
+  color: #35251d;
+  border-color: #d7bba6;
+  border-inline-start-color: #a94f1d;
+}
+body[data-domain="mycology"] .quick-capture-tile:hover,
+body[data-domain="mycology"] .quick-capture-tile:focus-visible {
+  background: #f5e8dc;
+  border-color: #a94f1d;
+}
+body[data-domain="mycology"] .statistics-filters {
+  background: #f0e3d7;
+  border-color: #d7bba6;
+}
+body[data-domain="laboratory"] {
+  --workspace-accent: #4e8bbd;
+}
+body[data-domain="laboratory"] #trackerCard::before,
+body[data-domain="laboratory"] #batchCard::before,
+body[data-domain="laboratory"] #measurementCard::before,
+body[data-domain="laboratory"] #statisticsCard::before {
+  background: #4e8bbd;
+}
+body[data-domain="laboratory"] .entry-intro {
+  background: #e8f1f9;
+  border-color: #c7d6e4;
+  border-inline-start-color: #215b91;
+}
+body[data-domain="laboratory"] .quick-capture-tile {
+  background: #fbfdff;
+  color: #183a59;
+  border-color: #c7d6e4;
+  border-inline-start-color: #215b91;
+}
+body[data-domain="laboratory"] .quick-capture-tile:hover,
+body[data-domain="laboratory"] .quick-capture-tile:focus-visible {
+  background: #e8f1f9;
+  border-color: #215b91;
+}
+body[data-domain="laboratory"] .statistics-filters {
+  background: #e8f1f9;
+  border-color: #c7d6e4;
+}
+html[dir="rtl"] body[data-domain] :is(#plantCard, #trackerCard, #batchCard, #measurementCard, #statisticsCard)::before {
+  inset: 0 0 0 auto;
+}
+html[dir="rtl"] body[data-domain] .entry-intro {
+  border-inline-start: 1px solid var(--border);
+  border-inline-end: 3px solid var(--workspace-accent, var(--brand));
+}
