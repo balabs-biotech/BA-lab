@@ -222,6 +222,49 @@ try {
 
       const screenshotPath = path.join(artifactDir, `${workspace.slug}-${viewport.name}.png`);
       await page.screenshot({ path: screenshotPath, fullPage: true, animations: "disabled" });
+
+      // Visual fixture only: render the dashboard overview without pretending
+      // that the test Supabase stub has authenticated or loaded tenant data.
+      if (viewport.name === "desktop" || viewport.name === "mobile") {
+        await page.evaluate(() => {
+          const card = document.querySelector("#overviewCard");
+          if (card) {
+            card.classList.remove("hidden");
+            document.body.classList.add("workspace-authenticated");
+            const values = {
+              overviewCultureCount: "12",
+              overviewBatchCount: "8",
+              overviewObservationCount: "34",
+            };
+            for (const [id, value] of Object.entries(values)) {
+              const node = document.getElementById(id);
+              if (node) node.textContent = value;
+            }
+            for (const [id, width] of Object.entries({
+              overviewCultureMeter: "12%",
+              overviewBatchMeter: "27%",
+              overviewObservationMeter: "34%",
+            })) {
+              const node = document.getElementById(id);
+              if (node) node.style.width = width;
+            }
+          }
+        });
+        const overviewPath = path.join(artifactDir, `${workspace.slug}-${viewport.name}-overview-preview.png`);
+        await page.screenshot({ path: overviewPath, fullPage: true, animations: "disabled" });
+        const overviewState = await page.evaluate(() => {
+          const card = document.querySelector("#overviewCard");
+          return {
+            visible: !!card && card.getBoundingClientRect().height > 0,
+            width: document.documentElement.scrollWidth,
+            viewport: innerWidth,
+            metricCount: card?.querySelectorAll(".overview-metric").length ?? 0,
+          };
+        });
+        if (!overviewState.visible || overviewState.metricCount !== 3 || overviewState.width > overviewState.viewport + 1) {
+          failures.push(`${workspace.slug}/${viewport.name}: dashboard overview preview failed ${JSON.stringify(overviewState)}`);
+        }
+      }
       console.log(JSON.stringify({ workspace: workspace.slug, viewport: viewport.name, metrics, pageErrors, badResponses, screenshot: screenshotPath }));
       await context.close();
     }
