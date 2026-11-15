@@ -3232,3 +3232,104 @@ body[data-domain] .overview-shortcut {
     padding-inline: 9px;
   }
 }
+
+
+/* ============================================================
+   CULTUREOPS — Arabic / RTL interface refinement
+   Keep Arabic reading order natural without reversing scientific
+   identifiers, code samples, timestamps, or measurement tables.
+   ============================================================ */
+html[dir="rtl"] body[data-domain] {
+  text-align: right;
+}
+html[dir="rtl"] body[data-domain] .app-toolbar {
+  direction: rtl;
+}
+html[dir="rtl"] body[data-domain] .toolbar-brand,
+html[dir="rtl"] body[data-domain] .toolbar-status,
+html[dir="rtl"] body[data-domain] .language-control {
+  direction: rtl;
+}
+html[dir="rtl"] body[data-domain] .section-nav {
+  direction: rtl;
+  justify-content: flex-start;
+}
+html[dir="rtl"] body[data-domain] .section-nav a {
+  text-align: right;
+}
+html[dir="rtl"] body[data-domain] .app-hero {
+  direction: rtl;
+  text-align: right;
+}
+html[dir="rtl"] body[data-domain] .hero-tags {
+  justify-content: flex-start;
+}
+html[dir="rtl"] body[data-domain] .hero-note {
+  right: auto;
+  left: 0;
+  direction: rtl;
+}
+html[dir="rtl"] body[data-domain] .section-kicker,
+html[dir="rtl"] body[data-domain] .overview-heading,
+html[dir="rtl"] body[data-domain] .culture-catalog-heading {
+  direction: rtl;
+}
+html[dir="rtl"] body[data-domain] :is(
+  label, .hint, .muted, .info, .consent-panel,
+  .entry-intro, .assisted-entry-panel, .overview-activity,
+  .overview-shortcuts, .culture-catalog
+) {
+  text-align: right;
+}
+html[dir="rtl"] body[data-domain] :is(input, select, textarea) {
+  direction: rtl;
+  text-align: right;
+}
+html[dir="rtl"] body[data-domain] :is(
+  input[type="email"], input[type="url"], input[type="datetime-local"],
+  input[type="number"], code, pre, .qc-code, .batch-stat-value
+) {
+  direction: ltr;
+  text-align: left;
+  unicode-bidi: plaintext;
+}
+html[dir="rtl"] body[data-domain] .consent-option {
+  direction: rtl;
+}
+html[dir="rtl"] body[data-domain] .consent-option input {
+  margin-inline: 0 2px;
+}
+html[dir="rtl"] body[data-domain] .stage {
+  direction: rtl;
+  box-shadow: inset -4px 0 0 transparent;
+}
+html[dir="rtl"] body[data-domain] .stage.active {
+  box-shadow: inset -4px 0 0 var(--brand-hover);
+}
+html[dir="rtl"] body[data-domain] .stage.failed {
+  box-shadow: inset -4px 0 0 var(--err);
+}
+html[dir="rtl"] body[data-domain] .progress-bar {
+  transform-origin: right center;
+}
+html[dir="rtl"] body[data-domain] :is(.table-wrap, .statistics-table-wrap) {
+  direction: ltr;
+}
+html[dir="rtl"] body[data-domain] :is(.table-wrap table, .statistics-table) {
+  direction: rtl;
+}
+html[dir="rtl"] body[data-domain] .skip-link {
+  left: auto;
+  right: 12px;
+}
+@media (max-width: 640px) {
+  html[dir="rtl"] body[data-domain] .app-toolbar {
+    direction: rtl;
+  }
+  html[dir="rtl"] body[data-domain] .toolbar-status {
+    justify-self: start;
+  }
+  html[dir="rtl"] body[data-domain] .stage {
+    grid-template-columns: 28px minmax(0, 1fr);
+  }
+}
