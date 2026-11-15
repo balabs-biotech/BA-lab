@@ -8544,7 +8544,6 @@ body[data-domain] .hero-note {
 body[data-domain] .card {
   position: relative;
   isolation: isolate;
-  overflow: hidden;
   padding: clamp(20px, 2.6vw, 30px);
   margin-bottom: 20px;
   border: 1px solid var(--workspace-border) !important;
