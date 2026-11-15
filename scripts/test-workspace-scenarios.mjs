@@ -894,7 +894,7 @@ assert.ok(collectionHtml.includes('class="feedback-state feedback-loading" data-
 assert.ok(collectionHtml.includes('id="cultureCatalogList" class="culture-catalog-list" aria-live="polite"><p class="muted feedback-state feedback-info"'), "culture catalogue must identify its pre-auth state");
 assert.ok(collectionHtml.includes('id="plantCultureList" class="culture-catalog-list" aria-live="polite"><p class="muted feedback-state feedback-info"'), "plant registry must identify its pre-auth state");
 assert.ok(collectionJs.includes('empty.className = "muted feedback-empty"'), "empty culture collections need a shared state");
-assert.ok(collectionJs.includes('feedback-empty" role="status"'), "empty batch collection needs a shared state");
+assert.ok(collectionJs.includes('feedback-state feedback-empty" data-empty="true" role="status"'), "empty batch collection needs a shared state");
 assert.ok(collectionJs.includes('list.className = "culture-catalog-list feedback-error"'), "plant retrieval errors need an error state");
 assert.ok(collectionJs.includes('list.removeAttribute("role")'), "successful plant reload must clear the error role");
 console.log("✓ Collection states: authentication, loading, empty, error and recovery");
@@ -930,3 +930,6 @@ assert.ok(collectionJs.includes("catch (queryError)") && collectionJs.includes('
   "measurement history must expose network rejections as retrieval errors");
 assert.ok(collectionJs.includes("catch (observationQueryError)") && collectionJs.includes('renderCollectionFeedback(observationHistory, "error"'),
   "observation history must expose network rejections as retrieval errors");
+
+assert.ok(collectionJs.includes('batchList.removeAttribute("aria-busy")') && collectionJs.includes('batchList.removeAttribute("data-feedback-state")'),
+  "rendering batch results must clear the initial loading state");
