@@ -925,3 +925,8 @@ assert.equal(feedbackContainer.attributes["data-feedback-state"], "error");
 assert.equal(feedbackContainer.attributes["aria-busy"], undefined);
 assert.equal(feedbackErrorResult.attributes.role, "alert");
 console.log("✓ Shared collection feedback: semantic state, safe text and accessible roles");
+
+assert.ok(collectionJs.includes("catch (queryError)") && collectionJs.includes('renderCollectionFeedback(measurementHistory, "error"'),
+  "measurement history must expose network rejections as retrieval errors");
+assert.ok(collectionJs.includes("catch (observationQueryError)") && collectionJs.includes('renderCollectionFeedback(observationHistory, "error"'),
+  "observation history must expose network rejections as retrieval errors");
