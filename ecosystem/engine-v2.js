@@ -546,6 +546,9 @@ function setupUI() {
   window.addEventListener('resize',resize);
 }
 function onPointerDown(e) {
+  // Chromium may cancel the first touch pointer when a second finger joins.
+  // isPrimary=false is an independent signal, even if the pointer map was reset.
+  if(e.pointerType==='touch'&&e.isPrimary===false){multiTouchGesture=true;lastMultiTouchAt=performance.now();dragGesture=true;moved=true;touchFallback=null;}
   if(pointers.size===0){if(e.pointerType!=='touch'||(!multiTouchGesture&&performance.now()-lastMultiTouchAt>=900))multiTouchGesture=false;dragGesture=false;moved=false}
   const blocked=e.target.closest('.webgl-controls,.webgl-focus,.webgl-intro,.webgl-branch-dock');
   if(blocked||(e.pointerType!=='touch'&&e.target.closest('.webgl-hit-target')))return;
@@ -595,6 +598,8 @@ function onPointerUp(e) {
 }function onPointerCancel(){if(pointers.size>=2)multiTouchGesture=true;pointers.clear();dragging=false;moved=true;dragGesture=true;pinchStart=0;pinchCenter=null;lastPointer=null}
 function onLostCapture(e){if(pointers.has(e.pointerId)){pointers.delete(e.pointerId);if(!pointers.size){dragging=false;lastPointer=null}}}
 function pickAt(x,y) {
+  // A pinch/pan is navigation of the camera, never a spatial selection.
+  if(multiTouchGesture||performance.now()-lastMultiTouchAt<900)return;
   lastPickAt=performance.now();
   const rect=renderer.domElement.getBoundingClientRect();
   camera.updateMatrixWorld(true);world.updateMatrixWorld(true);
