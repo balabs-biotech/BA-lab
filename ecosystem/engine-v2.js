@@ -22,8 +22,9 @@ const ROOT = document.getElementById('mainView');
 const IDS = ['bio','myco','soil','lab','products','iot','work','learn'];
 const COLORS = { bio:0x79a991, myco:0xa88fc3, soil:0xc19b73, lab:0x80aeb8, products:0xc88773, iot:0x7eaaa3, work:0xa99dbb, learn:0xb5b58d };
 const POS = {
-  bio:[0,2.55,0], myco:[-2.35,1.05,.35], soil:[-2.15,-1.05,-.1], lab:[-.05,.35,-.7],
-  products:[.2,-1.35,.55], iot:[2.45,.85,-.25], work:[2.15,-1.25,-.45], learn:[-.15,-2.8,.1],
+  // Eight evenly spaced biological colonies leave a shared central field for cross-domain anastomoses.
+  bio:[0,3.8,0], myco:[-2.7,2.7,.35], soil:[-3.8,0,-.1], lab:[-2.7,-2.7,-.7],
+  products:[0,-3.8,.55], iot:[2.7,-2.7,-.25], work:[3.8,0,-.45], learn:[2.7,2.7,.1],
 };
 const LINKS = [['bio','myco'],['myco','soil'],['soil','lab'],['lab','iot'],['lab','products'],['products','work'],['work','iot'],['products','learn'],['bio','lab'],['myco','products'],['soil','work'],['bio','iot'],['myco','learn'],['soil','products']];
 const LABELS = Object.fromEntries([...document.querySelectorAll('.sphere[data-sphere]')].map(el => [el.dataset.sphere, {
@@ -40,13 +41,13 @@ const COPY = {
 const t = key => (COPY[LANG()] || COPY.fr)[key] || COPY.fr[key];
 
 let THREE, renderer, scene, camera, raycaster, pointer, stage, panel, hint, intro, status;
-let world, cells = new Map(), pickables = [], resourceObjects = [], edges = [], signalPoints = [];
+let world, cells = new Map(), pickables = [], resourceObjects = [], overviewResources = [], edges = [], signalPoints = [];
 let resourceHitTargets = new Map(), domainHitTargets = new Map();
 let nav, branchDock, currentNode = null, currentAnchor = null, navigationStack = [];
 let selected = null, selectedBranch = null, manifest = null, transition = null;
 let distance = 13.5, zoomTargetDistance = 13.5, theta = .22, phi = 1.27, target = null, targetGoal = null;
 let opened = false, raf = 0, lastFrame = 0, dragging = false, moved = false, dragGesture = false;
-let lastPointer = null, pointers = new Map(), pinchStart = 0, pinchDistance = 0, pinchCenter = null, hoverId = null , lastBranchTouchActivationAt = 0;
+let lastPointer = null, pointers = new Map(), pinchStart = 0, pinchDistance = 0, pinchCenter = null, hoverId = null , lastBranchTouchActivationAt = 0, multiTouchGesture = false, lastMultiTouchAt = 0;
 let canvasRect = null, cameraInitialized = false, lastPickAt = 0;
 let _hitWorld = null;
 
@@ -168,7 +169,7 @@ function createWorld() {
     const label=makeLabel(LABELS[id]?.title||id, color, 17);label.position.set(0,-.94,0);label.scale.set(2.8,.66,1);label.userData={id,kind:'domain-label'};group.add(label);
     const hit=new THREE.Mesh(new THREE.SphereGeometry(.96,16,12),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));hit.userData={id,kind:'domain'};group.add(hit);
     world.add(group);cells.set(id,{group,soma,label,hit,position:pos,color});
-    const domainButton=document.createElement('button');domainButton.type='button';domainButton.className='webgl-hit-target webgl-domain-target';domainButton.setAttribute('aria-label',(LABELS[id]?.title||id)+' — '+t('domain'));domainButton.title=LABELS[id]?.title||id;domainButton.dataset.domainId=id;domainButton.style.width='116px';domainButton.style.height='116px';domainButton.addEventListener('pointerdown',()=>stage?.focus({preventScroll:true}));domainButton.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();stage?.focus({preventScroll:true});if(!selected)enterDomain(id)});stage.append(domainButton);domainHitTargets.set(id,{object:hit,button:domainButton});
+    const domainButton=document.createElement('button');domainButton.type='button';domainButton.className='webgl-hit-target webgl-domain-target';domainButton.setAttribute('aria-label',(LABELS[id]?.title||id)+' — '+t('domain'));domainButton.title=LABELS[id]?.title||id;domainButton.dataset.domainId=id;domainButton.style.width='116px';domainButton.style.height='116px';domainButton.addEventListener('pointerdown',()=>stage?.focus({preventScroll:true}));domainButton.addEventListener('click',e=>{if(multiTouchGesture||performance.now()-lastMultiTouchAt<900){e.preventDefault();e.stopImmediatePropagation();return;}e.preventDefault();e.stopPropagation();stage?.focus({preventScroll:true});if(!selected)enterDomain(id)});stage.append(domainButton);domainHitTargets.set(id,{object:hit,button:domainButton});
     pickables.push(soma,hit,label);
     for(let j=0;j<14;j++){
       const a=j/14*Math.PI*2+IDS.indexOf(id)*.31;
@@ -185,8 +186,7 @@ function createWorld() {
         const forkCurve=new THREE.CatmullRomCurve3([at,at.clone().lerp(forkEnd,.55).add(new THREE.Vector3(0,.035,.035)),forkEnd]);
         group.add(new THREE.Mesh(new THREE.TubeGeometry(forkCurve,14,.0038,4,false),new THREE.MeshStandardMaterial({color,emissive:color,emissiveIntensity:.22,transparent:true,opacity:.52,roughness:.8})));
       }
-      const tip=new THREE.Mesh(new THREE.SphereGeometry(.026+(j%3)*.006,8,6),new THREE.MeshStandardMaterial({color,roughness:.75,emissive:color,emissiveIntensity:.18}));
-      tip.position.copy(end);group.add(tip);
+      // The visible terminal points are created from real Notion pages after the manifest loads.
     }
   }
   LINKS.forEach(([a,b],index)=>{
@@ -238,6 +238,55 @@ function smoothCamera(to,distTo,duration=950,done) {
   transition.frame=requestAnimationFrame(step);
 }
 
+function clearOverviewResources() {
+  for(const item of overviewResources){
+    world?.remove(item);
+    item.geometry?.dispose();
+    if(item.material){if(Array.isArray(item.material))item.material.forEach(mDispose);else mDispose(item.material)}
+  }
+  overviewResources=[];
+}
+function buildOverviewResources() {
+  clearOverviewResources();
+  if(!manifest?.domains?.length||selected)return;
+  const addFilament=(points,color,opacity=.34,radius=.004)=>{
+    const curve=new THREE.CatmullRomCurve3(points);
+    const mesh=new THREE.Mesh(new THREE.TubeGeometry(curve,14,radius,3,false),new THREE.MeshBasicMaterial({color,transparent:true,opacity,depthWrite:false}));
+    mesh.userData={kind:'overview-page-edge'};world.add(mesh);overviewResources.push(mesh);
+  };
+  manifest.domains.forEach((domain,domainIndex)=>{
+    const anchor=cells.get(domain.id)?.position;
+    if(!anchor)return;
+    const color=new THREE.Color(COLORS[domain.id]);
+    const nodes=[];
+    const walk=(items,parentPos,parentItem,depth,baseAngle,spread)=>{
+      const count=items?.length||0;
+      if(!count||depth>1)return;
+      items.forEach((item,index)=>{
+        const angle=baseAngle+(count===1?0:(index/(count-1)-.5)*spread*2)+(index%2?.045:-.045);
+        const radius=depth===0?1.05+Math.sqrt((index+.5)/count)*.58:.34+Math.sqrt((index+.5)/count)*.28;
+        const pos=parentPos.clone().add(new THREE.Vector3(Math.cos(angle)*radius,Math.sin(angle)*radius*.82,Math.sin(angle*1.7+domainIndex)*.12));
+        const nodeColor=color.clone().lerp(new THREE.Color(0xd1d0c5),depth===0?.28:.48);
+        const size=depth===0?.075:.045;
+        const point=new THREE.Mesh(new THREE.SphereGeometry(size,10,8),new THREE.MeshBasicMaterial({color:nodeColor,transparent:true,opacity:.96}));
+        point.position.copy(pos);
+        point.userData={kind:'overview-page',item,domainId:domain.id,depth,parentItem};
+        world.add(point);overviewResources.push(point);nodes.push(point);
+        const mid=parentPos.clone().lerp(pos,.52).add(new THREE.Vector3(0,.035,.04));
+        addFilament([parentPos.clone(),mid,pos.clone()],nodeColor,depth===0?.46:.3,depth===0?.005:.003);
+        if(depth===0&&item.children?.length)walk(item.children,pos,item,depth+1,angle,Math.min(1.25,.45+item.children.length*.09));
+      });
+    };
+    walk(domain.children||[],anchor,null,0,-Math.PI/2+domainIndex*.17,1.35);
+    // Local anastomoses make each colony a mesh, not a set of isolated spokes.
+    for(let i=0;i<nodes.length;i++){
+      const a=nodes[i],b=nodes[(i+2)%nodes.length];
+      if(!a||!b||a.userData.depth!==b.userData.depth)continue;
+      const A=a.position,B=b.position,mid=A.clone().lerp(B,.5).add(new THREE.Vector3(0,.055,.08));
+      addFilament([A.clone(),mid,B.clone()],color,.13,.0022);
+    }
+  });
+}
 function clearResources() {
   for(const button of resourceHitTargets.values())button.remove();resourceHitTargets.clear();
   for(const item of resourceObjects){world.remove(item);item.traverse?.(o=>{o.geometry?.dispose();if(o.material){if(Array.isArray(o.material))o.material.forEach(m=>m.dispose());else mDispose(o.material)}});if(item.geometry)item.geometry.dispose();if(item.material)mDispose(item.material)}
@@ -333,12 +382,13 @@ function renderBranchDock() {
       // gestures. Activate on the touch pointer release, then suppress its
       // compatibility click; mouse and keyboard continue through click.
       el.addEventListener('pointerup',event=>{
-        if(event.pointerType!=='touch')return;
+        if(event.pointerType!=='touch'||multiTouchGesture||event.isPrimary===false)return;
         el.dataset.touchActivatedAt=String(performance.now());
         activate(event,'touch-pointerup');
       });
       el.addEventListener('click',event=>{
         const touchAt=Number(el.dataset.touchActivatedAt||0);
+        if(multiTouchGesture){event.preventDefault();event.stopImmediatePropagation();return;}
         if(performance.now()-lastBranchTouchActivationAt<800){event.preventDefault();event.stopImmediatePropagation();return;}
         if(touchAt&&performance.now()-touchAt<800){event.preventDefault();event.stopPropagation();return}
         activate(event,event.detail===0?'keyboard':'click');
@@ -413,18 +463,18 @@ function openResource(item) {
  status.textContent=data.title||'';
 }
 function showDomainPanel(id,message='') {if(message)status.textContent=message;renderPath()}
-function enterDomain(id) {
-  if(!cells.has(id))return;selected=id;selectedBranch=null;opened=true;navigationStack=[];currentNode=manifest?.domains?.find(d=>d.id===id)||null;currentAnchor=cells.get(id).position.clone();
+function enterDomain(id,initialResource=null) {
+  if(!cells.has(id))return;selected=id;selectedBranch=null;opened=true;navigationStack=[];currentNode=manifest?.domains?.find(d=>d.id===id)||null;currentAnchor=cells.get(id).position.clone();clearOverviewResources();
   intro.hidden=true;nav.hidden=false;ROOT.classList.remove('universe-closed');ROOT.classList.add('universe-open');panel.hidden=true;panel.replaceChildren();
   if(typeof window.enterSphere==='function')window.enterSphere(id,false,true); // Populate the hidden legacy content source only; the old engine no longer owns #mainView events.
-  const rootCount=manifest?.domains?.find(d=>d.id===id)?.children?.length||0;const initialDistance=rootCount>16?(window.innerWidth<760?20.5:11.5):7.5;smoothCamera(cells.get(id).position,initialDistance,900,()=>buildResources(id));
+  const rootCount=manifest?.domains?.find(d=>d.id===id)?.children?.length||0;const initialDistance=rootCount>16?(window.innerWidth<760?20.5:11.5):7.5;smoothCamera(cells.get(id).position,initialDistance,900,()=>{buildResources(id);if(initialResource?.children?.length)openResource(initialResource);else if(initialResource?.url)window.open(initialResource.url,'_blank','noopener')});
 }
 function goBackLevel() {
   if(navigationStack.length){const previous=navigationStack.pop();currentNode=previous.node;currentAnchor=previous.anchor.clone();smoothCamera(currentAnchor,6.2,650,()=>buildResources(selected,currentNode,currentAnchor));return}
   if(selected)goOverview();
 }
 function goOverview() {
-  selected=null;selectedBranch=null;navigationStack=[];currentNode=null;currentAnchor=null;clearResources();nav?.replaceChildren();nav.hidden=true;if(branchDock){branchDock.replaceChildren();branchDock.hidden=true}panel.hidden=true;panel.replaceChildren();
+  selected=null;selectedBranch=null;navigationStack=[];currentNode=null;currentAnchor=null;clearResources();buildOverviewResources();nav?.replaceChildren();nav.hidden=true;if(branchDock){branchDock.replaceChildren();branchDock.hidden=true}panel.hidden=true;panel.replaceChildren();
   const mini=document.getElementById('miniView');if(mini){mini.hidden=true;mini.classList.remove('spatial-source-only')}
   const homeButton=document.getElementById('homeBtn');if(homeButton)homeButton.hidden=true;
   smoothCamera(new THREE.Vector3(0,0,0),13.5,850,()=>{status.textContent='BALABS / LIVING NETWORK'});
@@ -476,23 +526,37 @@ function setupUI() {
   stage.addEventListener('pointercancel',onPointerCancel);
   // Direct stage touch fallback for mobile browsers that omit pointer events.
   let touchFallback=null;
-  const rememberTouch=e=>{if(e.touches.length===1){const p=e.touches[0];touchFallback={x:p.clientX,y:p.clientY,at:performance.now()}}};
-  const finishTouch=e=>{if(e.target.closest?.('.webgl-hit-target,.webgl-branch-dock')){touchFallback=null;return}if(!touchFallback)return;const p=e.changedTouches[0],start=touchFallback;touchFallback=null;if(!p||Math.hypot(p.clientX-start.x,p.clientY-start.y)>12)return;if(performance.now()-lastPickAt>450)pickAt(p.clientX,p.clientY)};
-  stage.addEventListener('touchstart',rememberTouch,{passive:true});
+  const rememberTouch=e=>{
+    if(e.touches.length>1){multiTouchGesture=true;lastMultiTouchAt=performance.now();dragGesture=true;moved=true;touchFallback=null;return}
+    if(e.touches.length!==1){touchFallback=null;return}
+    // A new one-finger gesture clears the previous gesture's click-suppression latch.
+    // The first pointerdown of a two-finger gesture must not clear the latch set by
+    // the document-capture touchstart that already sees both contacts.
+    multiTouchGesture=false;
+    const p=e.touches[0];touchFallback={x:p.clientX,y:p.clientY,at:performance.now()};
+  };
+  const finishTouch=e=>{if(e.target.closest?.('.webgl-hit-target,.webgl-branch-dock')){touchFallback=null;return}if(!touchFallback||e.touches.length!==0||e.changedTouches.length!==1)return;const p=e.changedTouches[0],start=touchFallback;touchFallback=null;if(!p||Math.hypot(p.clientX-start.x,p.clientY-start.y)>12)return;if(performance.now()-lastPickAt>450)pickAt(p.clientX,p.clientY)};
+  document.addEventListener('touchstart',rememberTouch,{capture:true,passive:true});
   stage.addEventListener('touchend',finishTouch,{passive:true});
   stage.addEventListener('touchcancel',()=>{touchFallback=null},{passive:true});
 
-  document.addEventListener('click',e=>{if(performance.now()-lastBranchTouchActivationAt<800){e.preventDefault();e.stopImmediatePropagation();return;}if(!e.detail||dragGesture||!renderer)return;if(e.target.closest?.('.webgl-controls,.webgl-focus,.webgl-intro,.webgl-hit-target,.webgl-branch-dock'))return;const r=renderer.domElement.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)return;if(performance.now()-lastPickAt>450)pickAt(e.clientX,e.clientY)},true);
+  document.addEventListener('click',e=>{if(e.target.closest?.('#mainView.webgl-ready')&&!e.target.closest?.('.webgl-controls,.webgl-focus,.webgl-intro')&&(multiTouchGesture||performance.now()-lastMultiTouchAt<900||performance.now()-lastBranchTouchActivationAt<800)){e.preventDefault();e.stopImmediatePropagation();return;}if(!e.detail||dragGesture||!renderer)return;if(e.target.closest?.('.webgl-controls,.webgl-focus,.webgl-intro,.webgl-hit-target,.webgl-branch-dock'))return;const r=renderer.domElement.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)return;if(performance.now()-lastPickAt>450)pickAt(e.clientX,e.clientY)},true);
   stage.addEventListener('lostpointercapture',onLostCapture);
   stage.addEventListener('contextmenu',e=>e.preventDefault());
   window.addEventListener('resize',resize);
 }
 function onPointerDown(e) {
-  if(e.target.closest('.webgl-controls,.webgl-focus,.webgl-intro,.webgl-hit-target,.webgl-branch-dock'))return;
+  // Chromium may cancel the first touch pointer when a second finger joins.
+  // isPrimary=false is an independent signal, even if the pointer map was reset.
+  if(e.pointerType==='touch'&&e.isPrimary===false){multiTouchGesture=true;lastMultiTouchAt=performance.now();dragGesture=true;moved=true;}
+  if(pointers.size===0){if(e.pointerType!=='touch'||(!multiTouchGesture&&performance.now()-lastMultiTouchAt>=900))multiTouchGesture=false;dragGesture=false;moved=false}
+  const blocked=e.target.closest('.webgl-controls,.webgl-focus,.webgl-intro,.webgl-branch-dock');
+  if(blocked||(e.pointerType!=='touch'&&e.target.closest('.webgl-hit-target')))return;
   stage?.focus({preventScroll:true});
   pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
   stage.setPointerCapture?.(e.pointerId);
   if(pointers.size>=2){
+    multiTouchGesture=true;lastMultiTouchAt=performance.now();
     const p=[...pointers.values()];
     pinchStart=Math.hypot(p[0].x-p[1].x,p[0].y-p[1].y);
     pinchCenter={x:p.reduce((sum,v)=>sum+v.x,0)/p.length,y:p.reduce((sum,v)=>sum+v.y,0)/p.length};
@@ -520,6 +584,7 @@ function onPointerMove(e) {
 }
 function onPointerUp(e) {
   const wasPointer=pointers.has(e.pointerId);pointers.delete(e.pointerId);
+  if(multiTouchGesture){if(!pointers.size){dragging=false;moved=true;dragGesture=true;lastPointer=null;pinchStart=0;pinchCenter=null}return;}
   if(pointers.size<2){pinchStart=0;pinchCenter=null}
   if(!wasPointer)return;
   if(pointers.size){
@@ -528,11 +593,13 @@ function onPointerUp(e) {
     return;
   }
   dragging=false;
-  if(!moved&&!transition&&performance.now()-lastPickAt>450&&!e.target.closest('.webgl-controls,.webgl-focus,.webgl-intro'))pickAt(e.clientX,e.clientY);
+  if(!moved&&!transition&&performance.now()-lastPickAt>450&&!e.target.closest('.webgl-controls,.webgl-focus,.webgl-intro,.webgl-hit-target,.webgl-branch-dock'))pickAt(e.clientX,e.clientY);
   lastPointer=null;
-}function onPointerCancel(){pointers.clear();dragging=false;moved=true;pinchStart=0;pinchCenter=null;lastPointer=null}
+}function onPointerCancel(){if(pointers.size>=2)multiTouchGesture=true;pointers.clear();dragging=false;moved=true;dragGesture=true;pinchStart=0;pinchCenter=null;lastPointer=null}
 function onLostCapture(e){if(pointers.has(e.pointerId)){pointers.delete(e.pointerId);if(!pointers.size){dragging=false;lastPointer=null}}}
 function pickAt(x,y) {
+  // A pinch/pan is navigation of the camera, never a spatial selection.
+  if(multiTouchGesture||performance.now()-lastMultiTouchAt<900)return;
   lastPickAt=performance.now();
   const rect=renderer.domElement.getBoundingClientRect();
   camera.updateMatrixWorld(true);world.updateMatrixWorld(true);
@@ -543,6 +610,17 @@ function pickAt(x,y) {
     return{x:sx,y:sy,d:Math.hypot(sx-x,sy-y)};
   };
   if(!selected){
+    let nearestPage=null,nearestPageDistance=Infinity;
+    for(const point of overviewResources){
+      if(point.userData?.kind!=='overview-page')continue;
+      const p=screenPoint(point);
+      if(p.d<nearestPageDistance){nearestPage=point;nearestPageDistance=p.d}
+    }
+    if(nearestPage&&nearestPageDistance<(window.innerWidth<760?28:24)){
+      const {item,domainId}=nearestPage.userData;
+      enterDomain(domainId,item);
+      return;
+    }
     let nearest=null,nearestDistance=Infinity;
     for(const item of cells.values()){const p=screenPoint(item.hit);if(p.d<nearestDistance){nearest=item;nearestDistance=p.d}}
     if(nearest&&nearestDistance<(window.innerWidth<760?72:88)){enterDomain(nearest.group.userData.id);return}
@@ -613,7 +691,7 @@ async function init() {
     stage.prepend(renderer.domElement);renderer.domElement.setAttribute('tabindex','0');renderer.domElement.setAttribute('role','application');renderer.domElement.setAttribute('aria-label','BA Labs 3D network. Use arrow keys to rotate, plus and minus to zoom, Escape to go back, and Home for overview.');
     scene=new THREE.Scene();camera=new THREE.PerspectiveCamera(46,1,.1,180);raycaster=new THREE.Raycaster();pointer=new THREE.Vector2();target=new THREE.Vector3();
     createWorld();resize();cameraInitialized=true;
-    const loadManifest=()=>fetch('./notion-tree.'+LANG()+'.json',{cache:'no-cache'}).then(r=>r.ok?r.json():null).then(data=>{if(data?.version===1&&Array.isArray(data.domains)){manifest=data;if(selected&&!transition)buildResources(selected,currentNode,currentAnchor)}}).catch(()=>{});loadManifest();new MutationObserver(()=>{hint.textContent=t('hint');loadManifest()}).observe(document.documentElement,{attributes:true,attributeFilter:['lang']});
+    const loadManifest=()=>fetch('./notion-tree.'+LANG()+'.json',{cache:'no-cache'}).then(r=>r.ok?r.json():null).then(data=>{if(data?.version===1&&Array.isArray(data.domains)){manifest=data;if(selected&&!transition)buildResources(selected,currentNode,currentAnchor);else buildOverviewResources()}}).catch(()=>{});loadManifest();new MutationObserver(()=>{hint.textContent=t('hint');loadManifest()}).observe(document.documentElement,{attributes:true,attributeFilter:['lang']});
     window.__BALABS_3D_E2E__=()=>{
       const rect=renderer.domElement.getBoundingClientRect();
       const project=obj=>{const p=obj.getWorldPosition(new THREE.Vector3()).project(camera);return{x:rect.left+(p.x+1)*rect.width/2,y:rect.top+(1-p.y)*rect.height/2,z:p.z,title:obj.userData.title||obj.userData.id,hasChildren:!!obj.userData.hasChildren,depth:obj.userData.depth??0,url:obj.userData.url||null}};
