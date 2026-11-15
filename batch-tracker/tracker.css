@@ -4850,3 +4850,376 @@ html[dir="rtl"] body[data-domain] .app-hero::before {
     transition: none;
   }
 }
+
+
+/* ============================================================
+   CULTUREOPS — cohérence transversale des espaces
+   Pass 9 · navigation, vue générale et registres
+   ============================================================ */
+body[data-domain] {
+  --workspace-accent-soft: color-mix(in srgb, var(--workspace-accent, var(--brand)) 10%, var(--surface));
+  --workspace-accent-border: color-mix(in srgb, var(--workspace-accent, var(--brand)) 32%, var(--border));
+}
+body[data-domain] .app-toolbar {
+  gap: clamp(10px, 1.5vw, 18px);
+  min-width: 0;
+}
+body[data-domain] .toolbar-brand {
+  flex: 0 0 auto;
+  min-width: max-content;
+}
+body[data-domain] .brand-wordmark {
+  line-height: 1.05;
+}
+body[data-domain] .brand-wordmark small {
+  display: block;
+  margin-top: 4px;
+  letter-spacing: .16em;
+}
+body[data-domain] .section-nav {
+  min-width: 0;
+  scrollbar-width: thin;
+  scrollbar-color: var(--workspace-accent-border) transparent;
+}
+body[data-domain] .section-nav a {
+  flex: 0 0 auto;
+  min-height: 40px;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  transition: color .15s ease, background-color .15s ease, border-color .15s ease;
+}
+body[data-domain] .section-nav a:hover,
+body[data-domain] .section-nav a:focus-visible {
+  border-color: var(--workspace-accent-border);
+  background: var(--workspace-accent-soft);
+  color: var(--text);
+}
+body[data-domain] .section-nav a[aria-current="location"],
+body[data-domain] .section-nav a.active {
+  border-color: var(--workspace-accent-border);
+  background: var(--workspace-accent-soft);
+  color: var(--workspace-accent, var(--brand));
+}
+body[data-domain] .toolbar-status {
+  flex: 0 0 auto;
+  max-width: 180px;
+  overflow-wrap: anywhere;
+}
+body[data-domain] .universe-home-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 38px;
+  margin-block: 3px 12px;
+  padding: 6px 10px;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: none;
+}
+body[data-domain] .universe-home-link:hover,
+body[data-domain] .universe-home-link:focus-visible {
+  border-color: var(--workspace-accent-border);
+  background: var(--workspace-accent-soft);
+  color: var(--workspace-accent, var(--brand));
+}
+body[data-domain] .overview-heading {
+  gap: 16px;
+  align-items: flex-start;
+}
+body[data-domain] .overview-heading > div {
+  min-width: 0;
+}
+body[data-domain] .overview-heading .muted {
+  max-width: 82ch;
+  line-height: 1.65;
+}
+body[data-domain] .overview-live {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 32px;
+  padding: 6px 10px;
+  border: 1px solid var(--workspace-accent-border);
+  border-radius: 999px;
+  background: var(--workspace-accent-soft);
+  color: var(--text);
+  font-size: 10px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+body[data-domain] .overview-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-block: 18px;
+}
+body[data-domain] .overview-metric {
+  display: grid;
+  align-content: start;
+  gap: 8px;
+  min-width: 0;
+  padding: clamp(13px, 2vw, 19px);
+  border: 1px solid var(--border);
+  border-top: 2px solid var(--workspace-accent, var(--brand));
+  border-radius: 13px;
+  background: var(--surface);
+}
+body[data-domain] .overview-metric > strong {
+  color: var(--workspace-accent, var(--brand));
+  font-size: clamp(24px, 3vw, 34px);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+body[data-domain] .overview-metric-label {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 750;
+  line-height: 1.4;
+}
+body[data-domain] .overview-meter {
+  height: 7px;
+  margin-top: 4px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--surface-2);
+}
+body[data-domain] .overview-meter > span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--workspace-accent, var(--brand));
+  transition: width .25s ease;
+}
+body[data-domain] .overview-metric-note {
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.45;
+}
+body[data-domain] .overview-lower {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(230px, .8fr);
+  gap: 14px;
+}
+body[data-domain] .overview-activity,
+body[data-domain] .overview-shortcuts {
+  min-width: 0;
+  padding: clamp(14px, 2vw, 19px);
+  border: 1px solid var(--border);
+  border-radius: 13px;
+  background: var(--surface-2);
+}
+body[data-domain] .overview-section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+body[data-domain] .overview-section-heading h3,
+body[data-domain] .overview-shortcuts h3 {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 14px;
+}
+body[data-domain] .overview-shortcut {
+  display: grid;
+  grid-template-columns: 30px minmax(0, 1fr) 18px;
+  align-items: center;
+  gap: 10px;
+  min-height: 60px;
+  margin-top: 8px;
+  padding: 9px 11px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--text);
+}
+body[data-domain] .overview-shortcut:hover {
+  border-color: var(--workspace-accent-border);
+  background: var(--workspace-accent-soft);
+}
+body[data-domain] .overview-shortcut > span:nth-child(2) {
+  display: grid;
+  gap: 3px;
+  text-align: start;
+}
+body[data-domain] .overview-shortcut strong {
+  font-size: 12px;
+}
+body[data-domain] .overview-shortcut small {
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 500;
+}
+body[data-domain] .shortcut-index {
+  color: var(--workspace-accent, var(--brand));
+  font-size: 11px;
+  font-weight: 850;
+}
+body[data-domain] .overview-observation {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+  margin-top: 9px;
+  padding: 11px 12px;
+  border: 1px solid var(--border);
+  border-inline-start: 3px solid var(--workspace-accent, var(--brand));
+  border-radius: 9px;
+  background: var(--surface);
+}
+body[data-domain] .overview-observation strong {
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+body[data-domain] .overview-observation time {
+  color: var(--muted);
+  font-size: 10px;
+}
+body[data-domain] .overview-observation p {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+body[data-domain] .overview-footnote {
+  margin: 14px 0 0;
+  padding: 10px 12px;
+  border-inline-start: 3px solid var(--workspace-accent, var(--brand));
+  background: var(--workspace-accent-soft);
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.6;
+}
+body[data-domain] .culture-catalog-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  min-width: 0;
+  margin-top: 9px;
+  padding: 13px 14px;
+  border: 1px solid var(--border);
+  border-inline-start: 3px solid var(--workspace-accent, var(--brand));
+  border-radius: 11px;
+  background: var(--surface);
+}
+body[data-domain] .culture-catalog-main {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+body[data-domain] .culture-catalog-code {
+  display: block;
+  color: var(--text);
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+body[data-domain] .culture-catalog-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px 12px;
+  margin-top: 7px;
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.5;
+}
+body[data-domain] .culture-catalog-actions {
+  display: flex;
+  flex: 0 0 auto;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+body[data-domain] .culture-catalog-action {
+  width: auto;
+  min-height: 38px;
+  margin: 0;
+  padding: 7px 10px;
+  border: 1px solid var(--workspace-accent-border);
+  background: var(--workspace-accent-soft);
+  color: var(--workspace-accent, var(--brand));
+  font-size: 11px;
+  box-shadow: none;
+}
+body[data-domain] .culture-catalog-action:hover {
+  border-color: var(--workspace-accent, var(--brand));
+  background: var(--workspace-accent, var(--brand));
+  color: #fff;
+}
+body[data-domain] :is(#cultureCatalogList, #plantCultureList):empty::after {
+  content: "Aucun enregistrement à afficher.";
+  display: block;
+  padding: 18px;
+  border: 1px dashed var(--border-strong);
+  border-radius: 11px;
+  color: var(--muted);
+  font-size: 12px;
+  text-align: center;
+}
+body[data-domain] :is(#cultureCatalogList, #plantCultureList) > .muted {
+  margin: 9px 0 0;
+  padding: 17px;
+  border: 1px dashed var(--border-strong);
+  border-radius: 11px;
+  background: var(--surface-2);
+  line-height: 1.6;
+}
+html[dir="rtl"] body[data-domain] .overview-heading,
+html[dir="rtl"] body[data-domain] .overview-section-heading {
+  direction: rtl;
+}
+html[dir="rtl"] body[data-domain] .overview-observation {
+  text-align: right;
+}
+@media (max-width: 760px) {
+  body[data-domain] .app-toolbar {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+  body[data-domain] .toolbar-status {
+    max-width: none;
+    margin-inline-start: auto;
+  }
+  body[data-domain] .section-nav {
+    order: 3;
+    flex: 1 1 100%;
+    width: 100%;
+  }
+  body[data-domain] .overview-lower {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+@media (max-width: 560px) {
+  body[data-domain] .overview-metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  body[data-domain] .overview-metric:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+  }
+  body[data-domain] .overview-heading {
+    display: grid;
+  }
+  body[data-domain] .overview-live {
+    justify-self: start;
+  }
+  body[data-domain] .culture-catalog-row {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 10px;
+  }
+  body[data-domain] .culture-catalog-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  body[data-domain] .culture-catalog-action {
+    width: 100%;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  body[data-domain] .section-nav a,
+  body[data-domain] .overview-meter > span {
+    transition: none;
+  }
+}
