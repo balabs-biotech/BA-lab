@@ -126,6 +126,8 @@ try {
           toolbarPosition: toolbar ? getComputedStyle(toolbar).position : null,
           toolbarTop: toolbar?.getBoundingClientRect().top ?? null,
           toolbarRight: toolbar?.getBoundingClientRect().right ?? null,
+          toolbarBottom: toolbar?.getBoundingClientRect().bottom ?? null,
+          toolbarWidth: toolbar?.getBoundingClientRect().width ?? null,
           contentLeft: container?.getBoundingClientRect().left ?? null,
           contentRight: container?.getBoundingClientRect().right ?? null,
           heroTop: hero?.getBoundingClientRect().top ?? null,
@@ -135,7 +137,7 @@ try {
         };
       });
 
-      if (viewport.width >= 821 && metrics.contentLeft < metrics.toolbarRight + 16) failures.push(`${workspace.slug}/${viewport.name}: main content overlaps or crowds desktop navigation (${metrics.contentLeft}px vs rail end ${metrics.toolbarRight}px)`);
+      if (viewport.width >= 821 && (metrics.toolbarPosition !== "sticky" || metrics.toolbarTop < 0 || metrics.heroTop < metrics.toolbarBottom + 8 || metrics.toolbarWidth > metrics.viewportWidth)) failures.push(`${workspace.slug}/${viewport.name}: horizontal sticky toolbar layout is invalid (${JSON.stringify({ position: metrics.toolbarPosition, top: metrics.toolbarTop, bottom: metrics.toolbarBottom, heroTop: metrics.heroTop, width: metrics.toolbarWidth, viewport: metrics.viewportWidth })})`);
       if (metrics.documentWidth > metrics.viewportWidth + 1) failures.push(`${workspace.slug}/${viewport.name}: horizontal overflow ${metrics.documentWidth}px > ${metrics.viewportWidth}px`);
       if (metrics.domain !== workspace.domain) failures.push(`${workspace.slug}/${viewport.name}: wrong data-domain ${metrics.domain}`);
       if (metrics.workspaceAccent.toLowerCase() !== workspace.accent) failures.push(`${workspace.slug}/${viewport.name}: unexpected workspace accent ${metrics.workspaceAccent}; expected ${workspace.accent}`);
@@ -145,7 +147,7 @@ try {
       const labelContrast = contrastRatio(metrics.labelColor, metrics.surfaceToken);
       if (descriptionContrast < 4.5) failures.push(`${workspace.slug}/${viewport.name}: auth description contrast ${descriptionContrast.toFixed(2)}:1 is below 4.5:1`);
       if (labelContrast < 4.5) failures.push(`${workspace.slug}/${viewport.name}: auth label contrast ${labelContrast.toFixed(2)}:1 is below 4.5:1`);
-      if (viewport.name === "desktop" && (metrics.toolbarPosition !== "fixed" || metrics.heroTop > 200)) failures.push(`${workspace.slug}/${viewport.name}: desktop navigation still occupies content flow (position=${metrics.toolbarPosition}, heroTop=${metrics.heroTop})`);
+      if (viewport.name === "desktop" && (metrics.toolbarPosition !== "sticky" || metrics.heroTop < metrics.toolbarBottom + 8)) failures.push(`${workspace.slug}/${viewport.name}: desktop toolbar should remain sticky above the workspace content (position=${metrics.toolbarPosition}, toolbarBottom=${metrics.toolbarBottom}, heroTop=${metrics.heroTop})`);
       if (viewport.name === "mobile" && metrics.languageLabelWraps) failures.push(`${workspace.slug}/${viewport.name}: language label wraps unexpectedly`);
             if (!metrics.headingText || !metrics.authVisible) failures.push(`${workspace.slug}/${viewport.name}: auth content missing`);
       if (metrics.documentWidth > metrics.viewportWidth + 1) failures.push(`${workspace.slug}/${viewport.name}: horizontal overflow ${metrics.documentWidth}px > ${metrics.viewportWidth}px`);
