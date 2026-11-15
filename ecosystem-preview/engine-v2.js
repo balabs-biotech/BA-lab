@@ -46,7 +46,7 @@ let nav, branchDock, currentNode = null, currentAnchor = null, navigationStack =
 let selected = null, selectedBranch = null, manifest = null, transition = null;
 let distance = 13.5, zoomTargetDistance = 13.5, theta = .22, phi = 1.27, target = null, targetGoal = null;
 let opened = false, raf = 0, lastFrame = 0, dragging = false, moved = false, dragGesture = false;
-let lastPointer = null, pointers = new Map(), pinchStart = 0, pinchDistance = 0, pinchCenter = null, hoverId = null , lastBranchTouchActivationAt = 0;
+let lastPointer = null, pointers = new Map(), pinchStart = 0, pinchDistance = 0, pinchCenter = null, hoverId = null , lastBranchTouchActivationAt = 0, multiTouchGesture = false;
 let canvasRect = null, cameraInitialized = false, lastPickAt = 0;
 let _hitWorld = null;
 let labelWorldPosition = null;
@@ -347,12 +347,13 @@ function renderBranchDock() {
       // gestures. Activate on the touch pointer release, then suppress its
       // compatibility click; mouse and keyboard continue through click.
       el.addEventListener('pointerup',event=>{
-        if(event.pointerType!=='touch')return;
+        if(event.pointerType!=='touch'||multiTouchGesture||event.isPrimary===false)return;
         el.dataset.touchActivatedAt=String(performance.now());
         activate(event,'touch-pointerup');
       });
       el.addEventListener('click',event=>{
         const touchAt=Number(el.dataset.touchActivatedAt||0);
+        if(multiTouchGesture){event.preventDefault();event.stopImmediatePropagation();return;}
         if(performance.now()-lastBranchTouchActivationAt<800){event.preventDefault();event.stopImmediatePropagation();return;}
         if(touchAt&&performance.now()-touchAt<800){event.preventDefault();event.stopPropagation();return}
         activate(event,event.detail===0?'keyboard':'click');
@@ -498,7 +499,7 @@ function setupUI() {
   stage.addEventListener('pointercancel',onPointerCancel);
   // Direct stage touch fallback for mobile browsers that omit pointer events.
   let touchFallback=null;
-  const rememberTouch=e=>{if(e.touches.length===1){const p=e.touches[0];touchFallback={x:p.clientX,y:p.clientY,at:performance.now()}}};
+  const rememberTouch=e=>{if(e.touches.length>1){multiTouchGesture=true;dragGesture=true;moved=true;touchFallback=null;return}if(e.touches.length===1){const p=e.touches[0];touchFallback={x:p.clientX,y:p.clientY,at:performance.now()}}};
   const finishTouch=e=>{if(e.target.closest?.('.webgl-hit-target,.webgl-branch-dock')){touchFallback=null;return}if(!touchFallback)return;const p=e.changedTouches[0],start=touchFallback;touchFallback=null;if(!p||Math.hypot(p.clientX-start.x,p.clientY-start.y)>12)return;if(performance.now()-lastPickAt>120)pickAt(p.clientX,p.clientY)};
   // Spatial pointer selection is handled exclusively by the WebGL canvas ray-pick.
   stage.addEventListener('touchstart',rememberTouch,{passive:true});
@@ -509,18 +510,20 @@ function setupUI() {
   // attached outside the stage. Such an event never bubbles through stage,
   // so resolve that pointer-up at document capture using the same projected
   // screen coordinates as canvas picking.
-  document.addEventListener('pointerup',e=>{if(e.pointerType!=='touch'||stage.contains(e.target)||!e.target.closest?.('.webgl-hit-target'))return;if(transition||performance.now()-lastPickAt<=120)return;pickAt(e.clientX,e.clientY)},true);
-  document.addEventListener('click',e=>{if(performance.now()-lastBranchTouchActivationAt<800){e.preventDefault();e.stopImmediatePropagation();return;}if(!e.detail||dragGesture||!renderer)return;if(e.target.closest?.('.webgl-controls,.webgl-focus,.webgl-intro,.webgl-hit-target,.webgl-branch-dock'))return;const r=renderer.domElement.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)return;if(performance.now()-lastPickAt>120)pickAt(e.clientX,e.clientY)},true);
+  document.addEventListener('pointerup',e=>{if(multiTouchGesture||e.pointerType!=='touch'||stage.contains(e.target)||!e.target.closest?.('.webgl-hit-target'))return;if(transition||performance.now()-lastPickAt<=120)return;pickAt(e.clientX,e.clientY)},true);
+  document.addEventListener('click',e=>{if(multiTouchGesture||performance.now()-lastBranchTouchActivationAt<800){e.preventDefault();e.stopImmediatePropagation();return;}if(!e.detail||dragGesture||!renderer)return;if(e.target.closest?.('.webgl-controls,.webgl-focus,.webgl-intro,.webgl-hit-target,.webgl-branch-dock'))return;const r=renderer.domElement.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)return;if(performance.now()-lastPickAt>120)pickAt(e.clientX,e.clientY)},true);
   stage.addEventListener('lostpointercapture',onLostCapture);
   stage.addEventListener('contextmenu',e=>e.preventDefault());
   window.addEventListener('resize',resize);
 }
 function onPointerDown(e) {
+  if(pointers.size===0){multiTouchGesture=false;dragGesture=false;moved=false}
   if(e.target.closest('.webgl-controls,.webgl-focus,.webgl-intro,.webgl-hit-target,.webgl-branch-dock'))return;
   stage?.focus({preventScroll:true});
   pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
   stage.setPointerCapture?.(e.pointerId);
   if(pointers.size>=2){
+    multiTouchGesture=true;
     const p=[...pointers.values()];
     pinchStart=Math.hypot(p[0].x-p[1].x,p[0].y-p[1].y);
     pinchCenter={x:p.reduce((sum,v)=>sum+v.x,0)/p.length,y:p.reduce((sum,v)=>sum+v.y,0)/p.length};
@@ -548,6 +551,7 @@ function onPointerMove(e) {
 }
 function onPointerUp(e) {
   const wasPointer=pointers.has(e.pointerId);pointers.delete(e.pointerId);
+  if(multiTouchGesture){if(!pointers.size){dragging=false;moved=true;dragGesture=true;lastPointer=null;pinchStart=0;pinchCenter=null}return;}
   if(pointers.size<2){pinchStart=0;pinchCenter=null}
   if(!wasPointer)return;
   if(pointers.size){
@@ -558,7 +562,7 @@ function onPointerUp(e) {
   dragging=false;
   if(!moved&&!transition&&performance.now()-lastPickAt>120&&!e.target.closest('.webgl-controls,.webgl-focus,.webgl-intro'))pickAt(e.clientX,e.clientY);
   lastPointer=null;
-}function onPointerCancel(){pointers.clear();dragging=false;moved=true;pinchStart=0;pinchCenter=null;lastPointer=null}
+}function onPointerCancel(){if(pointers.size>=2)multiTouchGesture=true;pointers.clear();dragging=false;moved=true;dragGesture=true;pinchStart=0;pinchCenter=null;lastPointer=null}
 function onLostCapture(e){if(pointers.has(e.pointerId)){pointers.delete(e.pointerId);if(!pointers.size){dragging=false;lastPointer=null}}}
 function pickAt(x,y) {
   lastPickAt=performance.now();
