@@ -61,3 +61,18 @@ These are not declared defects until integration tests establish them:
 - Populate engine health state only from real probes (dependency reachability, recent execution, and error rate), never from registry presence alone.
 
 No production schema, rows, permissions, Edge Function, or secrets were changed during this review.
+
+## 7. Additional concurrency finding — lock order inversion
+
+A read-only comparison of the active PostgreSQL definitions found a potential deadlock window:
+
+- `claim_engine_job` locks the selected `engine_jobs` row first (`FOR UPDATE OF j SKIP LOCKED`), then inserts or updates its `engine_job_leases` row.
+- `finish_engine_job` locks the `engine_job_leases` row first (`FOR UPDATE`), then locks the corresponding `engine_jobs` row (`FOR UPDATE`).
+
+These opposite lock orders can deadlock around lease expiry: a claim that observes an expired lease can hold the job row while waiting for the lease row, while a finish call that began just before expiry can hold the lease row while waiting for the job row. PostgreSQL will abort one transaction with a deadlock error; the worker should treat that as a retryable transaction failure, not as successful completion.
+
+There is a related fencing concern in `finish_engine_job`: `v_now` is captured once at function entry, before waiting on row locks. Its lease predicate checks `expires_at > v_now`, so a finish transaction that waits can potentially acquire the lease lock and proceed after the wall-clock expiry, provided its entry timestamp was still before expiry. The lease should be revalidated after acquiring the relevant locks using a fresh `clock_timestamp()`.
+
+**Recommended correction (not yet applied):** standardize both claim and finish to lock `engine_jobs` before `engine_job_leases`, then re-check token ownership and expiry after lock acquisition. Preserve atomicity across job, lease, and run rows. Add a two-session PostgreSQL integration test that races finish against reclaim at the expiry boundary and asserts: no deadlock, at most one current token, and no stale-token finalization.
+
+This is a source-level concurrency risk identified from the deployed function definitions, not a reproduced production incident. No production RPC was changed.
