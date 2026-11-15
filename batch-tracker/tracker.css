@@ -6348,3 +6348,244 @@ html[dir="rtl"] body[data-domain] .culture-linked-batches .culture-timeline-entr
     transition: none !important;
   }
 }
+
+
+/* ============================================================
+   CULTUREOPS — données, observations et analyse
+   Passe 17 · lecture fiable des valeurs et de leur provenance
+   ============================================================ */
+body[data-domain] #measurementCard {
+  min-width: 0;
+  scroll-margin-top: 88px;
+}
+body[data-domain] #measurementCard .quick-capture-tile {
+  min-width: 0;
+  min-height: 76px;
+  align-items: center;
+}
+body[data-domain] #measurementCard .quick-capture-tile > * {
+  min-width: 0;
+}
+body[data-domain] #measurementCard .quick-capture-tip {
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+body[data-domain] .measurement-history {
+  display: grid;
+  gap: 9px;
+  min-width: 0;
+}
+body[data-domain] .measurement-entry {
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(112px, .65fr) minmax(120px, .8fr);
+  align-items: start;
+  gap: 12px;
+  min-width: 0;
+  padding: 13px 14px;
+  border: 1px solid var(--border);
+  border-inline-start: 3px solid var(--workspace-accent, var(--brand));
+  border-radius: 10px;
+  background: var(--surface);
+}
+body[data-domain] .measurement-entry > * {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+body[data-domain] .measurement-entry strong {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--text);
+  font-size: 13px;
+  line-height: 1.45;
+}
+body[data-domain] .measurement-meta,
+body[data-domain] .measurement-stamp {
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+body[data-domain] .measurement-value {
+  color: var(--text);
+  font-size: 17px;
+  font-weight: 750;
+  line-height: 1.35;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+body[data-domain] .measurement-value .measurement-meta {
+  display: inline;
+  font-size: 11px;
+  font-weight: 600;
+}
+body[data-domain] .measurement-stamp {
+  font-variant-numeric: tabular-nums;
+}
+body[data-domain] .observation-details {
+  min-width: 0;
+  padding: clamp(12px, 2vw, 17px);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface-2);
+}
+body[data-domain] .observation-details > summary {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  color: var(--text);
+  font-weight: 700;
+  cursor: pointer;
+}
+body[data-domain] .observation-details[open] > summary {
+  margin-bottom: 10px;
+  color: var(--workspace-accent, var(--text));
+}
+body[data-domain] .observation-details > p {
+  line-height: 1.65;
+}
+body[data-domain] #observationHistory > .muted,
+body[data-domain] #measurementHistory > .muted {
+  margin: 0;
+  padding: 13px;
+  border: 1px dashed var(--border-strong, var(--border));
+  border-radius: 10px;
+  background: var(--surface-2);
+  line-height: 1.65;
+}
+body[data-domain] #statisticsSummary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 9px;
+}
+body[data-domain] .statistics-summary-item {
+  display: grid;
+  align-content: start;
+  gap: 7px;
+  min-width: 0;
+  min-height: 76px;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface-2);
+}
+body[data-domain] .statistics-summary-item span {
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+body[data-domain] .statistics-summary-item strong {
+  color: var(--text);
+  font-size: 20px;
+  line-height: 1.15;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+body[data-domain] #statisticsStatus {
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+body[data-domain] #statisticsChart {
+  min-width: 0;
+  overflow: hidden;
+  padding: clamp(8px, 1.5vw, 14px);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface);
+}
+body[data-domain] #statisticsChart > svg {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  overflow: visible;
+}
+body[data-domain] #statisticsChart > .muted,
+body[data-domain] #statisticsChart > .statistics-demo-note {
+  margin: 8px 0 0;
+  line-height: 1.65;
+  overflow-wrap: anywhere;
+}
+body[data-domain] #statisticsChart > .statistics-demo-note {
+  padding: 10px 12px;
+  border-inline-start: 3px solid var(--workspace-accent, var(--brand));
+  border-radius: 7px;
+  background: var(--workspace-accent-soft);
+  color: var(--text);
+  font-size: 11px;
+  font-weight: 700;
+}
+body[data-domain] .statistics-table-wrap {
+  min-width: 0;
+  max-width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+}
+body[data-domain] .statistics-table {
+  min-width: 620px;
+  font-variant-numeric: tabular-nums;
+}
+body[data-domain] .statistics-table :is(th, td) {
+  overflow-wrap: anywhere;
+  vertical-align: top;
+}
+body[data-domain] .statistics-table caption {
+  padding: 10px 0;
+  color: var(--muted);
+  font-size: 11px;
+  text-align: start;
+}
+body[data-domain] #statisticsRows td {
+  line-height: 1.55;
+}
+html[dir="rtl"] body[data-domain] .measurement-entry {
+  border-inline-start: 1px solid var(--border);
+  border-inline-end: 3px solid var(--workspace-accent, var(--brand));
+}
+html[dir="rtl"] body[data-domain] .measurement-value,
+html[dir="rtl"] body[data-domain] .measurement-stamp {
+  direction: ltr;
+  text-align: right;
+}
+html[dir="rtl"] body[data-domain] #statisticsChart {
+  direction: ltr;
+}
+@media (max-width: 760px) {
+  body[data-domain] .measurement-entry {
+    grid-template-columns: minmax(0, 1fr) minmax(0, .7fr);
+  }
+  body[data-domain] .measurement-entry > :first-child {
+    grid-column: 1 / -1;
+  }
+  body[data-domain] .measurement-entry > :last-child {
+    text-align: end;
+  }
+}
+@media (max-width: 520px) {
+  body[data-domain] #statisticsSummary {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  body[data-domain] .statistics-summary-item {
+    min-height: 0;
+  }
+  body[data-domain] .measurement-entry {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 7px;
+  }
+  body[data-domain] .measurement-entry > :first-child {
+    grid-column: auto;
+  }
+  body[data-domain] .measurement-entry > :last-child {
+    text-align: start;
+  }
+  body[data-domain] .measurement-value {
+    font-size: 16px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  body[data-domain] .measurement-entry,
+  body[data-domain] .observation-details,
+  body[data-domain] #statisticsChart {
+    transition: none !important;
+  }
+}
