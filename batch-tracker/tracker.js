@@ -367,8 +367,12 @@ function showMessage(
   const div =
     document.createElement("div");
 
-  div.className =
-    `card ${type}`;
+  const supportedTypes = new Set(["success", "warning", "error", "info"]);
+  const semanticType = supportedTypes.has(type) ? type : "info";
+
+  // Keep the legacy type class for existing styling while exposing the
+  // shared semantic feedback contract to every workspace.
+  div.className = `card ${semanticType} feedback-${semanticType}`;
 
   div.setAttribute(
     "role",
