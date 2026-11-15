@@ -775,6 +775,6 @@ for (const [domain, labels] of Object.entries({
       domain + " navigation must use the label: " + label);
   }
 }
-assert.match(domainSetupSource, /navCultureLink\.textContent\s*=\s*config\.navigation\.cultures/);
-assert.match(domainSetupSource, /navMeasurementLink\.textContent\s*=\s*config\.navigation\.measurements/);
+assert.match(domainSetupSource, /navCultureLabel\.textContent\s*=\s*config\.navigation\.cultures/);
+assert.match(domainSetupSource, /navMeasurementLabel\.textContent\s*=\s*config\.navigation\.measurements/);
 console.log("✓ Primary navigation labels follow GreenTech, Mycology and Laboratory terminology");
