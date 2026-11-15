@@ -7594,6 +7594,52 @@ function renderRecentEngineExecutions() {
   }
 }
 
+function configureOverviewPresentation(domain) {
+  const presets = {
+    agronomy: {
+      title: "Tableau de bord GreenTech",
+      description: "Vue de suivi des unités végétales, des observations agronomiques et des analyses environnementales.",
+      activity: "Activité agronomique",
+      observations: "Afficher les dernières observations agronomiques",
+      analyses: "Afficher les dernières analyses environnementales",
+      metrics: "Indicateurs des cultures végétales",
+      footnote: "Les indicateurs portent sur les fiches végétales et les observations actuellement chargées. Les analyses doivent préciser la variable, l’unité, la période et le périmètre étudiés."
+    },
+    mycology: {
+      title: "Tableau de bord Mycology",
+      description: "Vue de suivi des cultures fongiques, des observations de croissance et des évaluations mycologiques.",
+      activity: "Activité mycologique",
+      observations: "Afficher les dernières observations mycologiques",
+      analyses: "Afficher les dernières évaluations mycologiques",
+      metrics: "Indicateurs des cultures fongiques",
+      footnote: "Les indicateurs portent sur les cultures et observations mycologiques actuellement chargées. Toute comparaison doit tenir compte de la souche, du protocole, du substrat et des conditions de culture."
+    },
+    laboratory: {
+      title: "Tableau de bord Laboratoire",
+      description: "Vue de suivi des cultures microbiologiques, des lots de production et des observations de laboratoire.",
+      activity: "Activité du laboratoire",
+      observations: "Afficher les dernières observations microbiologiques",
+      analyses: "Afficher les dernières analyses de laboratoire",
+      metrics: "Indicateurs des cultures et lots",
+      footnote: "Les indicateurs portent sur les cultures, lots et observations actuellement chargés. Toute comparaison doit préciser la méthode, le milieu, l’unité et la période."
+    }
+  };
+  const preset = presets[domain] || presets.laboratory;
+  const assign = (id, value) => {
+    const element = document.getElementById(id);
+    if (element) element.textContent = value;
+  };
+  assign("overviewTitle", preset.title);
+  assign("overviewDescription", preset.description);
+  assign("overviewActivityTitle", preset.activity);
+  assign("overviewObservationSummary", preset.observations);
+  assign("overviewEngineSummary", preset.analyses);
+  assign("overviewFootnote", preset.footnote);
+  const metrics = document.getElementById("overviewMetrics");
+  if (metrics) metrics.setAttribute("aria-label", preset.metrics);
+}
+
+
 function updateOverview() {
   const cultureCount = document.getElementById("overviewCultureCount");
   const batchCount = document.getElementById("overviewBatchCount");
@@ -7601,6 +7647,7 @@ function updateOverview() {
   const observationsPanel = document.getElementById("overviewRecentObservations");
   if (!cultureCount || !batchCount || !observationCount || !observationsPanel) return;
   renderRecentEngineExecutions();
+  configureOverviewPresentation(document.body.dataset.domain);
 
   const domain = document.body.dataset.domain;
   const cultureMetricLabel = cultureCount.closest(".overview-metric")?.querySelector(".overview-metric-label");
