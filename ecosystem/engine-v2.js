@@ -546,7 +546,7 @@ function setupUI() {
   window.addEventListener('resize',resize);
 }
 function onPointerDown(e) {
-  if(pointers.size===0){if(e.pointerType!=='touch'||!multiTouchGesture)multiTouchGesture=false;dragGesture=false;moved=false}
+  if(pointers.size===0){if(e.pointerType!=='touch'||(!multiTouchGesture&&performance.now()-lastMultiTouchAt>=900))multiTouchGesture=false;dragGesture=false;moved=false}
   const blocked=e.target.closest('.webgl-controls,.webgl-focus,.webgl-intro,.webgl-branch-dock');
   if(blocked||(e.pointerType!=='touch'&&e.target.closest('.webgl-hit-target')))return;
   stage?.focus({preventScroll:true});
