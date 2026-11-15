@@ -107,3 +107,9 @@ body{overscroll-behavior:none}
 .chapter-rail-node.is-active:hover .chapter-rail-name,
 .chapter-rail-node.is-active:focus-visible .chapter-rail-name{opacity:1;visibility:visible;transform:translateY(-50%)}
 @media(hover:none){.chapter-rail-node.is-active .chapter-rail-name{display:none}}
+
+
+/* Keyboard orientation: make the focused chapter visible without adding a permanent overlay. */
+.experience-page:focus-visible{outline:2px solid #b96b4d;outline-offset:-4px}
+.experience-track:focus-visible{outline:2px solid #b96b4d;outline-offset:-2px}
+@media(prefers-reduced-motion:reduce){.experience-page:focus-visible,.experience-track:focus-visible{scroll-behavior:auto}}
