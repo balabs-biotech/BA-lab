@@ -13079,3 +13079,244 @@ body[data-domain="agronomy"] .statistics-table th {background:#202c25}
 @media(prefers-reduced-motion:reduce) {
   body[data-domain] #cultureCatalogList .culture-catalog-row {transform:none!important}
 }
+
+
+/* ============================================================
+   CULTUREOPS UI REFINEMENT — PASS 66
+   Production workspace, analytical views and responsive hierarchy
+   ============================================================ */
+body[data-domain] #batchCard > h2,
+body[data-domain] #statisticsCard > h2 {letter-spacing:-.035em}
+body[data-domain] #batchCard .batch-create-panel {
+  margin:18px 0 26px; padding:clamp(15px,2.2vw,23px);
+  border:1px solid var(--border-strong); border-radius:16px;
+  background:linear-gradient(145deg,color-mix(in srgb,var(--workspace-accent,var(--brand)) 9%,var(--surface)),var(--surface-2));
+  box-shadow:0 8px 24px rgba(0,0,0,.08);
+}
+body[data-domain] #batchCard .batch-create-heading {
+  display:flex; align-items:flex-start; justify-content:space-between;
+  gap:14px; margin-bottom:16px;
+}
+body[data-domain] #batchCard .batch-create-heading h3 {
+  margin:5px 0 4px; padding:0; border:0; color:var(--text);
+  font-size:clamp(1.05rem,2vw,1.3rem); letter-spacing:-.025em;
+}
+body[data-domain] #batchCard .batch-create-heading .muted {
+  max-width:68ch; font-size:.68rem; line-height:1.6;
+}
+body[data-domain] #batchCard .batch-required-note {
+  flex:0 0 auto; padding:6px 10px; border:1px solid var(--border);
+  border-radius:999px; background:var(--surface); color:var(--muted);
+  font-size:.61rem; font-weight:700;
+}
+body[data-domain] #batchCard .batch-required-note span {color:var(--err)}
+body[data-domain] #batchCard .batch-create-panel label,
+body[data-domain] #statisticsCard .statistics-filters label {
+  color:var(--text); font-size:.68rem; font-weight:750;
+}
+body[data-domain] #batchCard .batch-create-panel :is(input,select) {
+  min-width:0; min-height:43px; border:1px solid var(--border-strong);
+  border-radius:9px; background:var(--surface); color:var(--text);
+  font:inherit; font-size:.72rem;
+}
+body[data-domain] #batchCard .batch-create-panel .hint {
+  color:var(--muted); font-size:.61rem; line-height:1.5;
+}
+body[data-domain] #batchCard #createBatchButton {
+  min-height:45px; margin-top:18px; border-radius:10px;
+  background:var(--workspace-accent,var(--brand)); color:#fff;
+  font-size:.72rem; font-weight:800;
+}
+body[data-domain] #batchCard > h3 {
+  margin:24px 0 12px; padding:0; border:0;
+  color:var(--text); font-size:1rem; letter-spacing:-.02em;
+}
+body[data-domain] #batchCard .batch-list {gap:10px}
+body[data-domain] #batchCard .batch-list .batch-item {
+  display:block; min-width:0; padding:14px 16px; border:1px solid var(--border);
+  border-radius:12px; background:var(--surface-2); color:var(--text);
+  box-shadow:0 3px 12px rgba(0,0,0,.06); line-height:1.55;
+  transition:border-color .16s ease,background .16s ease,transform .16s ease,box-shadow .16s ease;
+}
+body[data-domain] #batchCard .batch-list .batch-item strong {
+  display:block; margin-bottom:4px; color:var(--text);
+  font-size:.78rem; letter-spacing:-.01em;
+}
+body[data-domain] #batchCard .batch-list .batch-item .muted {
+  display:block; color:var(--muted); font-size:.65rem; line-height:1.6;
+  overflow-wrap:anywhere;
+}
+body[data-domain] #batchCard .batch-list .batch-item:hover {
+  border-color:var(--workspace-accent,var(--brand));
+  background:color-mix(in srgb,var(--workspace-accent,var(--brand)) 7%,var(--surface));
+  color:var(--text); transform:translateY(-1px);
+  box-shadow:0 8px 20px rgba(0,0,0,.1);
+}
+body[data-domain] #batchCard .batch-compare-panel {
+  margin-top:22px; padding:clamp(14px,2vw,20px);
+  border:1px solid var(--border); border-radius:15px;
+  background:var(--surface-2); color:var(--text);
+}
+body[data-domain] #batchCard .batch-compare-panel > h3 {
+  margin:5px 0 8px; padding:0; border:0; color:var(--text);
+  font-size:1rem; letter-spacing:-.025em;
+}
+body[data-domain] #batchCard .batch-compare-panel > .muted,
+body[data-domain] #batchCard #batchCompareHint,
+body[data-domain] #batchCard #batchCompareStatus {font-size:.66rem;line-height:1.6;color:var(--muted)}
+body[data-domain] #batchCard #batchCompareSelect {
+  min-height:126px; padding:8px; border:1px solid var(--border-strong);
+  border-radius:9px; background:var(--surface); color:var(--text);
+  font:inherit; font-size:.7rem;
+}
+body[data-domain] #batchCard #compareBatchesButton {
+  min-height:43px; margin-top:8px; border-radius:9px;
+  background:var(--workspace-accent,var(--brand)); color:#fff;
+  font-size:.68rem; font-weight:800;
+}
+body[data-domain] #batchCard #batchInfo {
+  margin-top:16px; padding:14px; border-radius:11px;
+}
+body[data-domain] #batchCard #batchStages,
+body[data-domain] #batchCard #batchQc {
+  margin-top:18px; padding:clamp(13px,1.8vw,19px);
+  border:1px solid var(--border); border-radius:14px;
+  background:var(--surface); color:var(--text);
+}
+body[data-domain] #batchCard #batchStages > h3,
+body[data-domain] #batchCard #batchQc > h3 {
+  margin:0 0 12px; padding:0; border:0; color:var(--text);
+  font-size:1rem;
+}
+body[data-domain] #batchCard .progress-label {font-size:.68rem;color:var(--muted)}
+body[data-domain] #batchCard .progress-track {height:9px;background:var(--border);border-radius:99px}
+body[data-domain] #batchCard .progress-bar {background:var(--workspace-accent,var(--brand));border-radius:99px}
+body[data-domain] #batchCard .batch-actions {gap:10px}
+body[data-domain] #batchCard .batch-actions button {
+  min-height:42px; margin:0; border-radius:9px; font-size:.68rem;
+}
+body[data-domain] #batchCard #batchQc > .muted {font-size:.67rem;line-height:1.6}
+body[data-domain] #batchCard #batchEvents {
+  margin:20px 0 0; padding:clamp(14px,2vw,20px);
+  border:1px solid var(--border); border-radius:15px;
+  background:var(--surface-2); box-shadow:none;
+}
+body[data-domain] #batchCard #batchEvents > h3 {
+  margin:5px 0 8px; padding:0; border:0; color:var(--text); font-size:1rem;
+}
+body[data-domain] #batchCard #batchEvents > .muted {font-size:.66rem;line-height:1.6}
+body[data-domain] #batchCard .batch-harvest-entry {
+  margin-top:13px; padding:14px; border:1px solid var(--border);
+  border-radius:11px; background:var(--surface); color:var(--text);
+}
+body[data-domain] #batchCard .batch-harvest-entry h4 {
+  margin:0 0 5px; color:var(--text); font-size:.78rem;
+}
+body[data-domain] #batchCard .batch-harvest-entry p {font-size:.64rem;line-height:1.55}
+body[data-domain] #batchCard .batch-harvest-entry :is(input,select,textarea) {
+  min-width:0; border:1px solid var(--border-strong); border-radius:8px;
+  background:var(--surface); color:var(--text); font:inherit; font-size:.69rem;
+}
+body[data-domain] #batchCard .batch-harvest-entry button {
+  min-height:41px; border-radius:9px; font-size:.67rem;
+}
+body[data-domain] #batchCard .batch-event-list {display:grid;gap:9px;margin-top:15px}
+body[data-domain] #statisticsCard {
+  overflow:visible; scroll-margin-top:20px;
+}
+body[data-domain] #statisticsCard > h2 {margin-bottom:7px}
+body[data-domain] #statisticsCard > .muted {max-width:85ch;font-size:.68rem;line-height:1.65}
+body[data-domain] #statisticsCard .statistics-filters {
+  display:grid; grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:12px; margin:17px 0; padding:clamp(13px,1.8vw,18px);
+  border:1px solid var(--border); border-radius:13px;
+  background:var(--surface-2);
+}
+body[data-domain] #statisticsCard .statistics-filters > div {min-width:0}
+body[data-domain] #statisticsCard .statistics-filters label {margin:0 0 6px}
+body[data-domain] #statisticsCard .statistics-filters select {
+  width:100%; min-width:0; min-height:42px; margin:0;
+  border:1px solid var(--border-strong); border-radius:8px;
+  background:var(--surface); color:var(--text); font:inherit;font-size:.68rem;
+}
+body[data-domain] #statisticsCard .statistics-filter-action {
+  display:flex; align-items:flex-end;
+}
+body[data-domain] #statisticsCard #loadStatisticsButton {
+  width:100%; min-height:42px; margin:0; border-radius:9px;
+  background:var(--workspace-accent,var(--brand)); color:#fff;
+  font-size:.68rem; font-weight:800;
+}
+body[data-domain] #statisticsCard #statisticsStatus {
+  padding:10px 12px; border-inline-start:3px solid var(--workspace-accent,var(--brand));
+  border-radius:0 8px 8px 0; background:var(--surface-2);
+  font-size:.66rem; line-height:1.55;
+}
+body[data-domain] #statisticsCard .statistics-summary {gap:10px;margin:14px 0}
+body[data-domain] #statisticsCard .statistics-summary > * {
+  min-width:0; padding:13px; border:1px solid var(--border);
+  border-radius:11px; background:var(--surface-2); color:var(--text);
+}
+body[data-domain] #statisticsCard .statistics-chart {
+  min-width:0; margin:14px 0; padding:clamp(12px,1.8vw,18px);
+  border:1px solid var(--border); border-radius:13px;
+  background:var(--surface); color:var(--text);
+}
+body[data-domain] #statisticsCard .statistics-table-wrap {
+  max-width:100%; margin:14px 0; border:1px solid var(--border);
+  border-radius:12px; background:var(--surface);
+}
+body[data-domain] #statisticsCard .statistics-table {
+  width:100%; border-collapse:separate; border-spacing:0;
+}
+body[data-domain] #statisticsCard .statistics-table caption {
+  text-align:left; font-weight:800; letter-spacing:-.01em;
+}
+body[data-domain] #statisticsCard .statistics-footnote {
+  color:var(--muted); font-size:.63rem; line-height:1.65;
+}
+body[data-domain="mycology"] #batchCard :is(.batch-create-panel,.batch-compare-panel,#batchStages,#batchQc,#batchEvents) {
+  background:#211811;border-color:#59402f;color:#f0e3d7;
+}
+body[data-domain="mycology"] #batchCard :is(.batch-create-heading h3,.batch-compare-panel h3,#batchStages h3,#batchQc h3,#batchEvents h3,.batch-harvest-entry h4) {color:#f0e3d7}
+body[data-domain="mycology"] #batchCard :is(.batch-create-panel input,.batch-create-panel select,#batchCompareSelect,.batch-harvest-entry input,.batch-harvest-entry select,.batch-harvest-entry textarea) {
+  background:#17110d;border-color:#76533d;color:#f0e3d7;
+}
+body[data-domain="mycology"] #batchCard .batch-harvest-entry {background:#19120d;border-color:#493426;color:#f0e3d7}
+body[data-domain="mycology"] #statisticsCard :is(.statistics-filters,.statistics-summary > *,.statistics-chart,.statistics-table-wrap,#statisticsStatus) {
+  background:#211811;border-color:#59402f;color:#f0e3d7;
+}
+body[data-domain="mycology"] #statisticsCard .statistics-filters select {background:#17110d;border-color:#76533d;color:#f0e3d7}
+body[data-domain="mycology"] #statisticsCard .statistics-table td {color:#f0e3d7}
+body[data-domain="laboratory"] #batchCard :is(.batch-create-panel,.batch-compare-panel,#batchStages,#batchQc,#batchEvents) {
+  background:#f4f8fc;border-color:#c7d6e4;color:#183a59;
+}
+body[data-domain="laboratory"] #batchCard :is(.batch-create-heading h3,.batch-compare-panel h3,#batchStages h3,#batchQc h3,#batchEvents h3,.batch-harvest-entry h4) {color:#183a59}
+body[data-domain="laboratory"] #batchCard :is(.batch-create-panel input,.batch-create-panel select,#batchCompareSelect,.batch-harvest-entry input,.batch-harvest-entry select,.batch-harvest-entry textarea) {background:#fff;border-color:#9eb5c9;color:#183a59}
+body[data-domain="laboratory"] #batchCard .batch-harvest-entry {background:#fff;border-color:#c7d6e4;color:#183a59}
+body[data-domain="laboratory"] #statisticsCard :is(.statistics-filters,.statistics-summary > *,.statistics-chart,.statistics-table-wrap,#statisticsStatus) {background:#f4f8fc;border-color:#c7d6e4;color:#183a59}
+body[data-domain="laboratory"] #statisticsCard .statistics-filters select {background:#fff;border-color:#9eb5c9;color:#183a59}
+body[data-domain="agronomy"] #batchCard :is(.batch-create-panel,.batch-compare-panel,#batchStages,#batchQc,#batchEvents) {background:#1b2520;border-color:#3b5142;color:#e8eee7}
+body[data-domain="agronomy"] #batchCard :is(.batch-create-heading h3,.batch-compare-panel h3,#batchStages h3,#batchQc h3,#batchEvents h3,.batch-harvest-entry h4) {color:#e8eee7}
+body[data-domain="agronomy"] #batchCard :is(.batch-create-panel input,.batch-create-panel select,#batchCompareSelect,.batch-harvest-entry input,.batch-harvest-entry select,.batch-harvest-entry textarea) {background:#141d18;border-color:#40594a;color:#e8eee7}
+body[data-domain="agronomy"] #batchCard .batch-harvest-entry {background:#141d18;border-color:#3b5142;color:#e8eee7}
+body[data-domain="agronomy"] #statisticsCard :is(.statistics-filters,.statistics-summary > *,.statistics-chart,.statistics-table-wrap,#statisticsStatus) {background:#1b2520;border-color:#3b5142;color:#e8eee7}
+body[data-domain="agronomy"] #statisticsCard .statistics-filters select {background:#141d18;border-color:#40594a;color:#e8eee7}
+@media(max-width:680px) {
+  body[data-domain] #batchCard .batch-create-heading {flex-direction:column}
+  body[data-domain] #batchCard .batch-required-note {align-self:flex-start}
+  body[data-domain] #batchCard .batch-create-panel .grid {grid-template-columns:minmax(0,1fr)}
+  body[data-domain] #batchCard .batch-actions {grid-template-columns:minmax(0,1fr)}
+  body[data-domain] #statisticsCard .statistics-filters {grid-template-columns:minmax(0,1fr)}
+  body[data-domain] #statisticsCard .statistics-filter-action {grid-column:auto}
+  body[data-domain] #statisticsCard .statistics-table-wrap {overflow-x:auto}
+}
+@media(max-width:420px) {
+  body[data-domain] #batchCard .batch-create-panel,
+  body[data-domain] #batchCard .batch-compare-panel,
+  body[data-domain] #statisticsCard {padding:13px}
+  body[data-domain] #batchCard .batch-list .batch-item {padding:12px}
+}
+@media(prefers-reduced-motion:reduce) {
+  body[data-domain] #batchCard .batch-list .batch-item {transition:none!important;transform:none!important}
+}
