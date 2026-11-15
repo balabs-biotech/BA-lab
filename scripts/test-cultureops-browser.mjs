@@ -90,10 +90,22 @@ try {
       });
 
       if (metrics.domain !== workspace.domain) failures.push(`${workspace.slug}/${viewport.name}: wrong data-domain ${metrics.domain}`);
-      if (!metrics.workspaceAccent) failures.push(`${workspace.slug}/${viewport.name}: workspace accent token missing`);
+      if (metrics.workspaceAccent !== workspace.accent) failures.push(`${workspace.slug}/${viewport.name}: unexpected workspace accent ${metrics.workspaceAccent}; expected ${workspace.accent}`);
       if (!metrics.headingText || !metrics.authVisible) failures.push(`${workspace.slug}/${viewport.name}: auth content missing`);
       if (metrics.documentWidth > metrics.viewportWidth + 1) failures.push(`${workspace.slug}/${viewport.name}: horizontal overflow ${metrics.documentWidth}px > ${metrics.viewportWidth}px`);
       if (metrics.navLinks < 5) failures.push(`${workspace.slug}/${viewport.name}: incomplete section navigation (${metrics.navLinks} links)`);
+      for (const language of ["en", "pt", "ar", "fr"]) {
+        await page.locator("#languageSelect").selectOption(language);
+        const languageState = await page.evaluate(() => ({
+          lang: document.documentElement.lang,
+          dir: document.documentElement.dir,
+        }));
+        const expectedDirection = language === "ar" ? "rtl" : "ltr";
+        if (languageState.lang !== language || languageState.dir !== expectedDirection) {
+          failures.push(`${workspace.slug}/${viewport.name}: language ${language} produced ${JSON.stringify(languageState)}`);
+        }
+      }
+      await page.locator("#languageSelect").selectOption("fr");
       if (pageErrors.length) failures.push(`${workspace.slug}/${viewport.name}: JS errors: ${pageErrors.join(" | ")}`);
       if (badResponses.length) failures.push(`${workspace.slug}/${viewport.name}: failed local assets: ${JSON.stringify(badResponses)}`);
 
