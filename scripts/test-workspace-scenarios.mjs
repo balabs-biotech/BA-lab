@@ -897,3 +897,18 @@ assert.match(feedbackCss, /body\\[data-domain\\] \\.feedback-state\\[data-empty=
 assert.match(feedbackCss, /@media \\(max-width: 600px\\)[\\s\\S]*?\\.feedback-state/,
   "feedback surfaces must remain compact on phones");
 console.log("✓ Feedback states: semantic status, loading, empty and mobile treatment");
+
+
+// The central message renderer must emit semantic classes while keeping safe
+// text insertion and accessible alert/status roles.
+const feedbackJs = fs.readFileSync("batch-tracker/tracker.js", "utf8");
+assert.match(feedbackJs, /card \\${semanticType} feedback-\\${semanticType}/,
+  "central messages must expose the shared feedback class");
+assert.match(feedbackJs, /div\\.textContent =\\s*text/,
+  "message content must remain text-only, not interpreted as HTML");
+assert.match(feedbackJs, /type === "error" \\|\\| type === "warning"[\\s\\S]*?"alert"[\\s\\S]*?"status"/,
+  "error and warning messages must keep alert semantics");
+assert.match(feedbackCss, /body\\[data-domain\\] \\.feedback-info/);
+assert.match(feedbackCss, /var\\(--warn\\)/,
+  "warning surfaces must use the established --warn design token");
+console.log("✓ Message renderer: semantic classes, safe text and accessible urgency");
