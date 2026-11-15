@@ -5433,3 +5433,98 @@ html[dir="rtl"] body[data-domain] .measurement-value {
     grid-column: 1;
   }
 }
+
+
+/* ============================================================
+   CULTUREOPS — sélecteur multilingue et navigation par domaine
+   Passe 11 · finition des contrôles globaux
+   ============================================================ */
+body[data-domain] .language-control {
+  display: inline-flex;
+  flex: 0 1 auto;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  margin: 0;
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+body[data-domain] .language-control select {
+  width: auto;
+  min-width: 112px;
+  min-height: 38px;
+  margin: 0;
+  padding: 7px 30px 7px 10px;
+  border: 1px solid var(--workspace-accent-border);
+  border-radius: 9px;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 650;
+}
+body[data-domain] .language-control select:focus-visible {
+  outline: 2px solid var(--workspace-accent, var(--brand));
+  outline-offset: 2px;
+}
+body[data-domain] .section-nav a[hidden],
+body[data-domain] [data-workspace-target][hidden] {
+  display: none !important;
+}
+body[data-domain] .section-nav a[aria-current="page"] {
+  border-color: var(--workspace-accent-border);
+  background: var(--workspace-accent-soft);
+  color: var(--workspace-accent, var(--brand));
+  font-weight: 800;
+}
+body[data-domain] .section-nav a .nav-number {
+  display: inline-grid;
+  place-items: center;
+  min-width: 21px;
+  min-height: 21px;
+  margin-inline-end: 5px;
+  border-radius: 6px;
+  background: var(--surface-2);
+  color: var(--muted);
+  font-size: 9px;
+  font-variant-numeric: tabular-nums;
+}
+body[data-domain] .section-nav a[aria-current="page"] .nav-number {
+  background: var(--workspace-accent, var(--brand));
+  color: #101510;
+}
+body[data-domain] .skip-link {
+  z-index: 1000;
+}
+body[data-domain] :is(button, a, input, select, textarea, summary):focus-visible {
+  outline-color: var(--workspace-accent, var(--brand));
+}
+html[dir="rtl"] body[data-domain] .language-control {
+  direction: rtl;
+}
+html[dir="rtl"] body[data-domain] .language-control select {
+  text-align: right;
+}
+@media (max-width: 760px) {
+  body[data-domain] .language-control {
+    order: 2;
+    margin-inline-start: auto;
+  }
+  body[data-domain] .toolbar-status {
+    order: 4;
+    flex-basis: 100%;
+    margin-inline-start: 0;
+  }
+}
+@media (max-width: 420px) {
+  body[data-domain] .language-control {
+    width: 100%;
+    justify-content: space-between;
+    margin-inline-start: 0;
+  }
+  body[data-domain] .language-control select {
+    flex: 0 1 160px;
+  }
+}
