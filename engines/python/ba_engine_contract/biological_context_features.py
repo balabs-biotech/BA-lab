@@ -857,6 +857,20 @@ def analyze_biological_context_features(request: Mapping[str, Any]) -> dict[str,
                     "duration_seconds": duration,
                 })
 
+    # Keep the fact stream chronological across measurements, free-text
+    # observations and operational events. Facts without numeric values still
+    # contribute to the observed coverage window.
+    observed_facts.sort(key=lambda item: (
+        item.get("observed_at", ""),
+        item.get("fact_code", ""),
+        tuple(item.get("source_record_ids", [])),
+    ))
+    for fact in observed_facts:
+        try:
+            observed_times.append(_timestamp(fact["observed_at"], "fact_timestamp"))
+        except (KeyError, TypeError, ValueError):
+            continue
+
     observed_window = None
     if observed_times:
         observed_window = {
