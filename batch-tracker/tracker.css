@@ -8966,3 +8966,333 @@ body[data-domain] :is(.statistics-table-wrap,.table-wrap)::-webkit-scrollbar-thu
   body[data-domain] .culture-catalog-action,
   body[data-domain] .batch-list .batch-item { transition: none !important; }
 }
+
+
+/* ============================================================
+   BA LABS CULTUREOPS — INTERACTION LAYER / PASS 42
+   Auth, guided entry, status feedback, consent and lineage.
+   ============================================================ */
+body[data-domain] :focus-visible {
+  outline: 2px solid var(--workspace-accent) !important;
+  outline-offset: 3px;
+}
+body[data-domain] .skip-link:focus-visible {
+  z-index: 1000;
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  padding: 12px 16px;
+  border-radius: 8px;
+  background: var(--workspace-panel-raised);
+  color: var(--workspace-text);
+}
+body[data-domain] #message {
+  position: relative;
+  z-index: 5;
+  margin: 0 0 14px;
+}
+body[data-domain] #message:empty { display: none; }
+body[data-domain] #message .info {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 13px 15px;
+  border-radius: 11px;
+  box-shadow: 0 8px 22px rgba(0,0,0,.14);
+  font-size: 12px;
+  line-height: 1.6;
+}
+body[data-domain] #message .info::before {
+  content: "";
+  flex: 0 0 7px;
+  width: 7px;
+  height: 7px;
+  margin-top: 5px;
+  border-radius: 50%;
+  background: currentColor;
+  box-shadow: 0 0 0 4px color-mix(in srgb, currentColor 13%, transparent);
+}
+body[data-domain] #message .info.success {
+  border-color: color-mix(in srgb, #72c58b 44%, var(--workspace-border)) !important;
+  background: color-mix(in srgb, #245d3a 20%, var(--workspace-panel)) !important;
+}
+body[data-domain] #message .info.warning {
+  border-color: color-mix(in srgb, #d9ad64 48%, var(--workspace-border)) !important;
+  background: color-mix(in srgb, #77521f 20%, var(--workspace-panel)) !important;
+}
+body[data-domain] #message .info.error {
+  border-color: color-mix(in srgb, #d97870 48%, var(--workspace-border)) !important;
+  background: color-mix(in srgb, #702f2d 22%, var(--workspace-panel)) !important;
+}
+body[data-domain] #authCard {
+  max-width: 760px;
+  margin-inline: auto;
+}
+body[data-domain] #authCard > .muted {
+  max-width: 58ch;
+  margin: 8px 0 18px;
+  line-height: 1.7;
+}
+body[data-domain] #authCard input {
+  width: 100%;
+  box-sizing: border-box;
+}
+body[data-domain] .auth-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin: 20px 0 15px;
+}
+body[data-domain] .auth-actions button {
+  min-width: 150px;
+  flex: 1 1 160px;
+}
+body[data-domain] #authStatus {
+  min-height: 42px;
+  display: flex;
+  align-items: center;
+  padding: 11px 13px;
+  border-radius: 9px;
+  font-size: 11px;
+}
+body[data-domain] .assisted-entry-panel {
+  position: relative;
+  overflow: hidden;
+  margin: 20px 0 26px;
+  padding: clamp(16px, 2.4vw, 22px);
+  border-color: color-mix(in srgb, var(--workspace-accent) 30%, var(--workspace-border)) !important;
+  border-radius: 14px;
+  background:
+    radial-gradient(ellipse at 100% 0%, color-mix(in srgb, var(--workspace-accent) 9%, transparent), transparent 20rem),
+    var(--workspace-panel-raised) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.025);
+}
+body[data-domain] .assisted-entry-heading h3 {
+  margin: 5px 0 0;
+  padding: 0;
+  border: 0;
+  font-size: 18px;
+}
+body[data-domain] .assisted-entry-tag {
+  padding: 6px 10px;
+  border-color: var(--workspace-border);
+  border-radius: 7px;
+  background: color-mix(in srgb, var(--workspace-accent) 7%, var(--workspace-panel));
+  color: var(--workspace-muted);
+  font-size: 9px;
+  font-weight: 750;
+  letter-spacing: .04em;
+}
+body[data-domain] .assisted-entry-panel textarea {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 116px;
+  margin-top: 7px;
+  padding: 13px 14px;
+  border: 1px solid var(--workspace-border);
+  border-radius: 10px;
+  background: var(--workspace-control);
+  color: var(--workspace-text);
+  font: 12px/1.65 ui-monospace, SFMono-Regular, Consolas, monospace;
+  resize: vertical;
+}
+body[data-domain] .assisted-entry-panel textarea:focus {
+  outline: 0;
+  border-color: var(--workspace-accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--workspace-accent) 12%, transparent);
+}
+body[data-domain] #smartEntryStatus {
+  flex: 1 1 240px;
+  padding: 7px 10px;
+  border-radius: 7px;
+  background: color-mix(in srgb, var(--workspace-panel) 75%, transparent);
+  font-size: 10px;
+}
+body[data-domain] #smartEntryStatus[data-state="error"] {
+  color: #f0a59b !important;
+  background: rgba(112,47,45,.18);
+}
+body[data-domain] #smartEntryStatus[data-state="success"] {
+  color: #a8d4a5 !important;
+  background: rgba(36,93,58,.18);
+}
+body[data-domain] .assisted-entry-help {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--workspace-border);
+  color: var(--workspace-muted);
+  font-size: 11px;
+}
+body[data-domain] .assisted-entry-help summary,
+body[data-domain] .overview-observations-details summary {
+  cursor: pointer;
+  color: var(--workspace-text);
+  font-weight: 700;
+}
+body[data-domain] .assisted-entry-help pre {
+  overflow: auto;
+  padding: 13px;
+  border: 1px solid var(--workspace-border);
+  border-radius: 9px;
+  background: #101614;
+  color: #c9d8cd;
+  font: 11px/1.6 ui-monospace, SFMono-Regular, Consolas, monospace;
+}
+body[data-domain] .guided-entry-step {
+  position: relative;
+  margin: 16px 0;
+  padding: 17px 18px 19px;
+  border: 1px solid var(--workspace-border);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--workspace-panel-raised) 65%, transparent);
+}
+body[data-domain] .guided-entry-step[hidden] { display: none !important; }
+body[data-domain] .guided-entry-step.is-locked {
+  border-style: dashed;
+  opacity: .72;
+}
+body[data-domain] .guided-entry-step > .entry-step-mark {
+  margin-bottom: 12px;
+}
+body[data-domain] .consent-panel {
+  margin: 18px 0;
+  padding: 17px;
+  border: 1px solid var(--workspace-border);
+  border-radius: 12px;
+  background: var(--workspace-panel-raised);
+}
+body[data-domain] .consent-panel > strong {
+  display: block;
+  margin-bottom: 9px;
+  color: var(--workspace-text);
+  font-size: 13px;
+}
+body[data-domain] .consent-panel p {
+  color: var(--workspace-muted);
+  font-size: 11px;
+  line-height: 1.7;
+}
+body[data-domain] .consent-panel a {
+  color: var(--workspace-accent);
+  text-underline-offset: 3px;
+}
+body[data-domain] .consent-option {
+  display: grid;
+  grid-template-columns: 18px minmax(0,1fr);
+  align-items: start;
+  gap: 10px;
+  margin-top: 12px;
+  padding: 12px;
+  border: 1px solid var(--workspace-border);
+  border-radius: 9px;
+  background: var(--workspace-panel);
+}
+body[data-domain] .consent-option input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  margin: 2px 0 0;
+  accent-color: var(--workspace-accent);
+}
+body[data-domain] .consent-option label {
+  margin: 0;
+  color: var(--workspace-muted);
+  font-size: 11px;
+  line-height: 1.6;
+  cursor: pointer;
+}
+body[data-domain] .sync-line {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 14px 0 22px;
+  padding: 11px 13px;
+  border: 1px solid var(--workspace-border);
+  border-radius: 9px;
+  background: color-mix(in srgb, var(--workspace-panel-raised) 70%, transparent);
+}
+body[data-domain] .sync-line .muted {
+  font-size: 10px;
+}
+body[data-domain] .culture-lineage-list {
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: 10px 0 16px;
+}
+body[data-domain] .culture-lineage-node {
+  min-width: 130px;
+  max-width: 100%;
+  display: flex;
+  flex: 1 1 150px;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  padding: 12px 13px;
+  border: 1px solid var(--workspace-border);
+  border-radius: 10px;
+  background: var(--workspace-panel);
+  color: var(--workspace-text);
+  text-align: left;
+  overflow-wrap: anywhere;
+}
+body[data-domain] button.culture-lineage-node { cursor: pointer; }
+body[data-domain] button.culture-lineage-node:hover {
+  border-color: var(--workspace-accent);
+  background: color-mix(in srgb, var(--workspace-accent) 8%, var(--workspace-panel));
+}
+body[data-domain] .culture-lineage-node strong {
+  font-size: 11px;
+  font-weight: 750;
+}
+body[data-domain] .culture-lineage-node small {
+  color: var(--workspace-muted);
+  font-size: 9px;
+  line-height: 1.5;
+}
+body[data-domain] .culture-lineage-arrow {
+  display: grid;
+  align-self: center;
+  place-items: center;
+  color: var(--workspace-accent);
+  font-weight: 800;
+}
+body[data-domain] .overview-observations-details {
+  margin-top: 13px;
+  padding-top: 12px;
+  border-top: 1px solid var(--workspace-border);
+}
+body[data-domain] .overview-observations-details summary {
+  padding: 7px 0;
+  font-size: 11px;
+}
+body[data-domain] .overview-observations {
+  padding-top: 8px;
+}
+body[data-domain] .overview-footnote {
+  margin-top: 16px;
+  padding: 11px 13px;
+  border-inline-start: 2px solid var(--workspace-accent);
+  background: color-mix(in srgb, var(--workspace-panel-raised) 70%, transparent);
+  color: var(--workspace-muted);
+  font-size: 10px;
+  line-height: 1.65;
+}
+@media (max-width: 600px) {
+  body[data-domain] #authCard { padding: 19px 16px !important; }
+  body[data-domain] .auth-actions { gap: 8px; }
+  body[data-domain] .auth-actions button { min-width: 0; }
+  body[data-domain] .guided-entry-step { padding: 14px 12px; }
+  body[data-domain] .consent-panel { padding: 13px; }
+  body[data-domain] .sync-line { align-items: flex-start; }
+  body[data-domain] .culture-lineage-list { display: grid; grid-template-columns: minmax(0,1fr); }
+  body[data-domain] .culture-lineage-arrow { transform: rotate(90deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  body[data-domain] .culture-lineage-node,
+  body[data-domain] .assisted-entry-panel,
+  body[data-domain] #message .info { animation: none !important; transition: none !important; }
+}
