@@ -148,3 +148,8 @@ body{overscroll-behavior:none}
 @media(prefers-reduced-motion:reduce){.chapter-rail{filter:none}}
 
 .chapter-filament .filament-branch{fill:none;stroke:#78958a66;stroke-width:1;stroke-linecap:round;stroke-dasharray:1.5 4;opacity:.72}
+
+
+/* Living signal: a restrained luminous node follows the user's actual scroll position. */
+.chapter-filament .filament-signal{fill:#e2c7b7;stroke:#b96b4d;stroke-width:2;filter:drop-shadow(0 0 3px #c47b5c) drop-shadow(0 0 8px #c47b5c99);pointer-events:none}
+@media(prefers-reduced-motion:reduce){.chapter-filament .filament-signal{filter:none}}
