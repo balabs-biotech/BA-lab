@@ -7581,3 +7581,67 @@ body[data-domain] #overviewCard .overview-shortcut:focus-visible {
     transition: none;
   }
 }
+
+/* CULTUREOPS — batch creation form refinement */
+body[data-domain] #batchCard .batch-create-panel {
+  margin: 22px 0 28px;
+  padding: 22px;
+  border: 1px solid var(--line, #344238);
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--surface, #17201b) 88%, var(--workspace-accent, #91bd78) 12%);
+}
+body[data-domain] #batchCard .batch-create-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+body[data-domain] #batchCard .batch-create-heading h3 {
+  margin: 5px 0 6px;
+  font-size: clamp(19px, 2vw, 23px);
+}
+body[data-domain] #batchCard .batch-create-heading p {
+  max-width: 620px;
+  margin: 0;
+  line-height: 1.55;
+}
+body[data-domain] #batchCard .batch-required-note {
+  flex: 0 0 auto;
+  padding: 6px 10px;
+  border: 1px solid var(--line, #526657);
+  border-radius: 999px;
+  color: var(--muted, #a6b2a8);
+  font-size: 11px;
+}
+body[data-domain] #batchCard .batch-required-note > span {
+  color: var(--workspace-accent, #91bd78);
+  font-weight: 800;
+}
+body[data-domain] #batchCard .batch-create-panel > .grid {
+  margin-top: 14px;
+}
+body[data-domain] #batchCard .batch-create-panel .hint {
+  display: block;
+  margin-top: 6px;
+  line-height: 1.45;
+}
+body[data-domain] #batchCard #createBatchButton {
+  min-height: 46px;
+  margin-top: 18px;
+}
+@media (max-width: 600px) {
+  body[data-domain] #batchCard .batch-create-panel {
+    padding: 15px;
+    margin-inline: -2px;
+  }
+  body[data-domain] #batchCard .batch-create-heading {
+    flex-direction: column;
+    gap: 10px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  body[data-domain] #batchCard .batch-create-panel * {
+    scroll-behavior: auto;
+  }
+}
