@@ -8314,8 +8314,8 @@ function setupDomainWorkspaces() {
     }
   };
   const buttons = [...document.querySelectorAll("[data-domain-choice]")];
-  const navCultureLink = document.getElementById("navCultureLink");
-  const navMeasurementLink = document.getElementById("navMeasurementLink");
+  const navCultureLabel = document.querySelector("#navCultureLink .nav-label");
+  const navMeasurementLabel = document.querySelector("#navMeasurementLink .nav-label");
   const eyebrow = document.querySelector(".app-hero .eyebrow");
   const title = document.querySelector(".app-hero h1");
   const heroDescription = document.querySelector(".hero-description");
@@ -8356,8 +8356,8 @@ function setupDomainWorkspaces() {
       });
     }
     if (toolbarStatus) toolbarStatus.textContent = config.status;
-    if (navCultureLink) navCultureLink.textContent = config.navigation.cultures;
-    if (navMeasurementLink) navMeasurementLink.textContent = config.navigation.measurements;
+    if (navCultureLabel) navCultureLabel.textContent = config.navigation.cultures;
+    if (navMeasurementLabel) navMeasurementLabel.textContent = config.navigation.measurements;
     document.documentElement.dataset.domain = activeDomain;
     if (persist) {
       try { localStorage.setItem("baLabsCultureTrackerDomain", activeDomain); } catch (_) {}
