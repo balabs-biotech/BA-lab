@@ -8197,6 +8197,42 @@ async function savePlantCulture(event) {
   }
 }
 
+function configureOverviewShortcuts(domain) {
+  const presets = {
+    agronomy: [
+      { target: "plantCard", title: "Créer une fiche végétale", description: "Espèce, variété et emplacement" },
+      { target: "measurementCard", title: "Saisir une mesure", description: "Climat, substrat ou irrigation" },
+      { target: "statisticsCard", title: "Analyser les cultures", description: "Mesures et évolution" }
+    ],
+    mycology: [
+      { target: "trackerCard", title: "Créer une culture fongique", description: "Souche, génération et protocole" },
+      { target: "measurementCard", title: "Enregistrer une observation", description: "Morphologie, incubation et milieu" },
+      { target: "statisticsCard", title: "Analyser les cultures", description: "Mesures et suivi des souches" }
+    ],
+    laboratory: [
+      { target: "trackerCard", title: "Créer une culture de laboratoire", description: "Ressource, milieu et protocole" },
+      { target: "batchCard", title: "Consulter les lots", description: "Étapes et contrôle qualité" },
+      { target: "measurementCard", title: "Saisir une mesure", description: "Valeur, unité et méthode" }
+    ]
+  };
+  const shortcuts = [...document.querySelectorAll(".overview-shortcut")];
+  const config = presets[domain] || presets.agronomy;
+  shortcuts.forEach((button, index) => {
+    const item = config[index];
+    if (!item) {
+      button.hidden = true;
+      return;
+    }
+    button.hidden = false;
+    button.dataset.workspaceTarget = item.target;
+    const title = button.querySelector("strong");
+    const description = button.querySelector("small");
+    if (title) title.textContent = item.title;
+    if (description) description.textContent = item.description;
+  });
+}
+
+
 function setupDomainWorkspaces() {
   const modes = {
     agronomy: {
@@ -8240,6 +8276,7 @@ function setupDomainWorkspaces() {
     const switchRevision = ++workspaceSwitchRevision;
     const activeDomain = Object.hasOwn(modes, domain) ? domain : "agronomy";
     const config = modes[activeDomain];
+    configureOverviewShortcuts(activeDomain);
     document.body.dataset.domain = activeDomain;
     buttons.forEach(button => button.setAttribute("aria-pressed", String(button.dataset.domainChoice === activeDomain)));
     if (heading) heading.textContent = config.heading;
