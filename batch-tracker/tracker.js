@@ -62,7 +62,7 @@ function isCurrentWorkspaceRevision(revision, expectedOrganizationId) {
 
 function clearAuthenticatedWorkspaceState() {
 
-  document.body.classList.remove("workspace-authenticated");
+  document.body?.classList.remove("workspace-authenticated");
 
   const sectionNavigation = document.getElementById("sectionNavigation");
   if (sectionNavigation) sectionNavigation.hidden = true;
