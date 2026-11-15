@@ -7965,3 +7965,10 @@ body[data-domain="mycology"] #authCard :is(label) {
   -webkit-text-fill-color: #e9e2dc !important;
   opacity: 1 !important;
 }
+
+/* MYCOLOGY AUTH — win against the legacy grouped selector's higher specificity. */
+body[data-domain="mycology"] #authCard :is(.muted, label, small) {
+  color: #e9e2dc !important;
+  -webkit-text-fill-color: #e9e2dc !important;
+  opacity: 1 !important;
+}
