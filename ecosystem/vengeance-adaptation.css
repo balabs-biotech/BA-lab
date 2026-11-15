@@ -1,0 +1,123 @@
+/* Vengeance UI design-system adaptation for BALabs.
+   Native CSS/JS adaptation of interaction patterns; no React runtime added.
+   Palette remapped to BALabs graphite, mineral green and oxidized copper. */
+:root{
+  --vng-background:#111B1D;
+  --vng-foreground:#D1D0C5;
+  --vng-primary:#B96B4D;
+  --vng-primary-hover:#CB8062;
+  --vng-primary-foreground:#111B1D;
+  --vng-secondary:#263B38;
+  --vng-muted:#8F9F96;
+  --vng-border:rgba(209,208,197,.20);
+  --vng-border-strong:rgba(185,107,77,.62);
+  --vng-radius-sm:3px;
+  --vng-radius-md:8px;
+  --vng-transition-speed:220ms;
+  --vng-ease:cubic-bezier(.2,.75,.25,1);
+}
+html.vng-ready{scroll-behavior:smooth}
+.vng-spotlight{position:relative;isolation:isolate}
+.vng-spotlight:before{
+ content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;
+ background:radial-gradient(230px circle at var(--vng-x,50%) var(--vng-y,50%),rgba(185,107,77,.16),transparent 72%);
+ opacity:0;transition:opacity var(--vng-transition-speed) ease;
+}
+@media(hover:hover){.vng-spotlight:hover:before{opacity:1}}
+/* Spotlight navigation: keep the original anchors and their destinations. */
+.site-nav.vng-spotlight{
+ background:transparent!important;border:0!important;
+ border-bottom:1px solid var(--vng-border)!important;
+ padding:5px clamp(8px,1.8vw,24px)!important;
+ gap:clamp(5px,1vw,14px)!important;
+}
+.site-nav.vng-spotlight:before{
+ z-index:0;inset:2px 0;background:radial-gradient(260px circle at var(--vng-x,50%) var(--vng-y,50%),rgba(185,107,77,.12),transparent 72%);
+}
+.site-nav.vng-spotlight a{
+ position:relative;z-index:1;display:inline-flex;align-items:center;
+ min-height:36px;padding:0 clamp(9px,1.2vw,16px)!important;
+ border:1px solid transparent!important;border-radius:var(--vng-radius-sm)!important;
+ background:transparent!important;color:var(--vng-foreground)!important;
+ font-size:clamp(10px,.78vw,12px)!important;letter-spacing:.025em;
+ opacity:.78;transition:color var(--vng-transition-speed),border-color var(--vng-transition-speed),opacity var(--vng-transition-speed),transform var(--vng-transition-speed);
+}
+.site-nav.vng-spotlight a:after{
+ content:"";position:absolute;left:14%;right:14%;bottom:3px;height:1px;
+ background:var(--vng-primary);transform:scaleX(0);transform-origin:left;
+ transition:transform 260ms var(--vng-ease);
+}
+.site-nav.vng-spotlight a:hover,.site-nav.vng-spotlight a:focus-visible,
+.site-nav.vng-spotlight a.chapter-active{opacity:1;color:#fff!important;border-color:var(--vng-border)!important;outline:none}
+.site-nav.vng-spotlight a:hover:after,.site-nav.vng-spotlight a:focus-visible:after,
+.site-nav.vng-spotlight a.chapter-active:after{transform:scaleX(1)}
+.site-nav.vng-spotlight a.chapter-active{background:rgba(38,59,56,.34)!important}
+/* Liquid-ink CTA: restrained surface response, not a glowing pill. */
+.hero-action-primary.vng-liquid{
+ position:relative;isolation:isolate;overflow:hidden;
+ border:1px solid rgba(209,208,197,.28)!important;border-radius:var(--vng-radius-sm)!important;
+ background:var(--vng-primary)!important;color:#fff!important;
+ box-shadow:0 5px 18px rgba(0,0,0,.14)!important;
+ transition:transform 220ms var(--vng-ease),border-color 220ms ease,box-shadow 220ms ease!important;
+}
+.hero-action-primary.vng-liquid:before{
+ content:"";position:absolute;z-index:-1;inset:-70%;
+ background:radial-gradient(circle at var(--vng-x,50%) var(--vng-y,50%),rgba(255,255,255,.34),transparent 34%);
+ opacity:0;transition:opacity 220ms ease;
+}
+.hero-action-primary.vng-liquid:hover{
+ transform:translateY(-2px);border-color:rgba(255,255,255,.62)!important;
+ box-shadow:0 9px 24px rgba(0,0,0,.22)!important;
+}
+.hero-action-primary.vng-liquid:hover:before{opacity:1}
+.hero-action-primary.vng-liquid span{display:inline-block;transition:transform 220ms var(--vng-ease)}
+.hero-action-primary.vng-liquid:hover span{transform:translate(3px,-2px)}
+.hero-action-secondary.vng-line,.work-card-link.vng-line{
+ position:relative;text-decoration:none!important;
+ transition:color 200ms ease,border-color 200ms ease;
+}
+.hero-action-secondary.vng-line:after,.work-card-link.vng-line:after{
+ content:"";position:absolute;left:0;right:0;bottom:-4px;height:1px;
+ background:var(--vng-primary);transform:scaleX(0);transform-origin:left;
+ transition:transform 260ms var(--vng-ease);
+}
+.hero-action-secondary.vng-line:hover:after,.work-card-link.vng-line:hover:after,
+.hero-action-secondary.vng-line:focus-visible:after,.work-card-link.vng-line:focus-visible:after{transform:scaleX(1)}
+/* Compact glass-dock treatment for the existing chapter controls. */
+.experience-controls{
+ gap:4px!important;padding:4px!important;
+ border:1px solid rgba(209,208,197,.22)!important;border-radius:7px!important;
+ background:rgba(17,27,29,.28)!important;backdrop-filter:blur(8px)!important;
+ box-shadow:0 4px 16px rgba(0,0,0,.12)!important;
+}
+.experience-controls button{
+ width:36px!important;height:36px!important;
+ border:1px solid transparent!important;border-radius:4px!important;
+ background:rgba(38,59,56,.42)!important;color:var(--vng-foreground)!important;
+ transition:background 180ms ease,border-color 180ms ease,transform 180ms var(--vng-ease)!important;
+}
+.experience-controls button:hover:not(:disabled),
+.experience-controls button:focus-visible{
+ background:rgba(185,107,77,.22)!important;border-color:var(--vng-border-strong)!important;
+ outline:none!important;transform:translateY(-1px);
+}
+.experience-count{color:var(--vng-foreground)!important;min-width:38px!important}
+.chapter-rail-node:focus-visible{outline:1px solid var(--vng-primary);outline-offset:2px;border-radius:50%}
+.chapter-rail-name{background:rgba(17,27,29,.72)!important;border-color:var(--vng-border)!important;backdrop-filter:blur(7px)}
+/* Premium editorial rhythm: quieter borders, sharper typography, no extra panels. */
+.experience-page-label{letter-spacing:.2em!important;color:#aab8ad!important}
+.experience-page-label:before{width:30px!important;background:var(--vng-primary)!important}
+.work-card-link{width:fit-content}
+:where(a,button):focus-visible{outline:2px solid var(--vng-primary);outline-offset:3px}
+@media(max-width:760px){
+ .site-nav.vng-spotlight{padding:3px 4px!important;gap:4px!important}
+ .site-nav.vng-spotlight a{min-height:32px;padding:0 9px!important;font-size:10px!important}
+ .experience-controls{gap:3px!important;padding:3px!important}
+ .experience-controls button{width:32px!important;height:32px!important}
+}
+@media(prefers-reduced-motion:reduce){
+ .vng-spotlight:before,.site-nav.vng-spotlight a,.site-nav.vng-spotlight a:after,
+ .hero-action-primary.vng-liquid,.hero-action-primary.vng-liquid span,
+ .experience-controls button{transition:none!important}
+ .hero-action-primary.vng-liquid:hover{transform:none}
+}
