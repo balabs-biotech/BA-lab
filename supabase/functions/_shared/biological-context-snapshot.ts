@@ -290,8 +290,8 @@ export async function buildBiologicalContextSnapshot(input: {
   records.sort((a, b) => {
     const aData = a.data as Record<string, unknown>;
     const bData = b.data as Record<string, unknown>;
-    const aTime = parseInstant(String(aData.measured_at ?? aData.observed_at ?? ""), "record_timestamp");
-    const bTime = parseInstant(String(bData.measured_at ?? bData.observed_at ?? ""), "record_timestamp");
+    const aTime = parseInstant(String(aData.measured_at ?? aData.observed_at ?? aData.occurred_at ?? ""), "record_timestamp");
+    const bTime = parseInstant(String(bData.measured_at ?? bData.observed_at ?? bData.occurred_at ?? ""), "record_timestamp");
     return aTime - bTime || String(a.record_id).localeCompare(String(b.record_id));
   });
   const recordIds = records.map((record) => String(record.record_id));
