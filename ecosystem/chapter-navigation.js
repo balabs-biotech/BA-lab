@@ -25,7 +25,7 @@
  // Preserve any future top-level section added to the source page instead of silently hiding it.
  main.querySelectorAll(':scope > section').forEach(section=>{if(!section.closest('.experience-page'))pages[pages.length-1].append(section)});
  main.replaceChildren(track);main.classList.add('experience-main');main.dataset.chaptersReady='true';
- const progress=document.createElement('div');progress.className='experience-progress';progress.innerHTML='<span></span>';main.append(progress);
+ const progress=document.createElement('div');progress.className='experience-progress';progress.setAttribute('role','progressbar');progress.setAttribute('aria-label','Progression dans les chapitres');progress.setAttribute('aria-valuemin','1');progress.setAttribute('aria-valuemax',String(pages.length));progress.innerHTML='<span></span>';main.append(progress);
  const controls=document.createElement('div');controls.className='experience-controls';controls.setAttribute('role','group');controls.setAttribute('aria-label','Navigation entre les espaces');
  const prev=document.createElement('button'),count=document.createElement('span'),next=document.createElement('button');
  prev.type=next.type='button';prev.innerHTML='←';next.innerHTML='→';prev.setAttribute('aria-label','Espace précédent');next.setAttribute('aria-label','Espace suivant');count.className='experience-count';controls.append(prev,count,next);main.append(controls);
@@ -68,7 +68,7 @@
   const x=track.scrollLeft,idx=Math.max(0,Math.min(pages.length-1,Math.round(x/Math.max(1,track.clientWidth))));
   current=idx;count.textContent=String(idx+1).padStart(2,'0')+' / '+String(pages.length).padStart(2,'0');
   prev.disabled=idx===0;next.disabled=idx===pages.length-1;
-  progress.firstElementChild.style.width=((idx+1)/pages.length*100)+'%';
+  progress.firstElementChild.style.width=(idx/Math.max(1,pages.length-1)*100)+'%';progress.setAttribute('aria-valuenow',String(idx+1));
   rail.querySelectorAll('.chapter-rail-node').forEach((b,i)=>{b.classList.toggle('is-active',i===idx);b.classList.toggle('is-past',i<idx);b.setAttribute('aria-current',i===idx?'step':'false');});
   rail.querySelectorAll('.chapter-rail-name').forEach((n,i)=>{n.textContent=groups[i].label[lang()]||groups[i].label.fr});
   if(filamentLength)filament.style.strokeDashoffset=String(filamentLength*(1-idx/Math.max(1,pages.length-1)));
