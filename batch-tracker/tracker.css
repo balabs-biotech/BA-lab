@@ -3037,3 +3037,198 @@ body[data-domain="laboratory"] .app-toolbar {
     transition-duration: .01ms !important;
   }
 }
+
+
+/* ============================================================
+   CULTUREOPS — interface refinement 2 / interaction consistency
+   ============================================================ */
+
+/* Shared controls: predictable sizing and clear interaction states. */
+body[data-domain] :is(button, .section-nav a, summary, .universe-home-link) {
+  min-height: 42px;
+}
+body[data-domain] button {
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+  transition: background-color .16s ease, border-color .16s ease,
+              color .16s ease, box-shadow .16s ease, transform .16s ease;
+}
+body[data-domain] button:not(:disabled):active {
+  transform: translateY(1px);
+}
+body[data-domain] label {
+  display: block;
+  margin: 13px 0 6px;
+  line-height: 1.45;
+}
+body[data-domain] :is(input:not([type="checkbox"]):not([type="radio"]), select) {
+  min-height: 44px;
+  box-sizing: border-box;
+  border-radius: 10px;
+  padding-inline: 12px;
+}
+body[data-domain] textarea {
+  box-sizing: border-box;
+  border-radius: 10px;
+  padding: 11px 12px;
+}
+body[data-domain] :is(input[type="checkbox"], input[type="radio"]) {
+  width: 18px;
+  height: 18px;
+  min-width: 18px;
+  min-height: 18px;
+  accent-color: var(--brand);
+  vertical-align: middle;
+}
+body[data-domain] :is(.consent-option, .consent-option label) {
+  line-height: 1.55;
+}
+body[data-domain] .consent-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface);
+}
+body[data-domain] .consent-option input {
+  flex: 0 0 18px;
+  margin: 3px 0 0;
+}
+body[data-domain] .consent-option label {
+  margin: 0;
+}
+
+/* Workspace navigation: use each domain's own accent, not the old
+   generic green active-state inherited by the Mycology/Lab themes. */
+body[data-domain="agronomy"] .section-nav a[aria-current="page"] {
+  min-height: 40px;
+  border-radius: 10px;
+  background: #a9d68f !important;
+  border-color: #a9d68f !important;
+  color: #142017 !important;
+  box-shadow: inset 0 -3px 0 rgba(20, 32, 23, .18);
+}
+body[data-domain="mycology"] .section-nav a[aria-current="page"] {
+  min-height: 40px;
+  border-radius: 10px;
+  background: #a94f1d !important;
+  border-color: #a94f1d !important;
+  color: #fff7ed !important;
+  box-shadow: inset 0 -3px 0 rgba(53, 37, 29, .25);
+}
+body[data-domain="laboratory"] .section-nav a[aria-current="page"] {
+  min-height: 40px;
+  border-radius: 10px;
+  background: #215b91 !important;
+  border-color: #215b91 !important;
+  color: #fff !important;
+  box-shadow: inset 0 -3px 0 rgba(10, 35, 58, .22);
+}
+body[data-domain] .section-nav a:not([aria-current="page"]):hover {
+  background: var(--surface-2);
+  color: var(--text);
+  border-color: var(--border-strong);
+}
+
+/* The guided entry should read as a sequence of deliberate steps. */
+body[data-domain] .guided-entry-step {
+  border-radius: 14px;
+  padding: clamp(13px, 2.2vw, 20px);
+  transition: border-color .18s ease, box-shadow .18s ease;
+}
+body[data-domain] .guided-entry-step.is-ready {
+  border-color: var(--brand);
+  box-shadow: inset 3px 0 0 var(--brand);
+}
+body[data-domain] .guided-entry-step.is-locked {
+  opacity: .72;
+}
+body[data-domain] .entry-step-mark {
+  color: var(--brand);
+}
+body[data-domain] .entry-intro {
+  margin-bottom: 16px;
+}
+body[data-domain] .entry-intro p {
+  max-width: 70ch;
+}
+
+/* Authentication and feedback should remain legible at all widths. */
+body[data-domain] #authCard {
+  align-content: start;
+}
+body[data-domain] #authCard .auth-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 16px;
+}
+body[data-domain] #authCard .auth-actions button {
+  flex: 1 1 170px;
+  min-height: 46px;
+}
+body[data-domain] #authStatus {
+  margin-top: 14px;
+  border-radius: 11px;
+  line-height: 1.55;
+}
+body[data-domain] #message:not(:empty) {
+  margin-block: 10px 16px;
+}
+body[data-domain] #message :is(.error, [role="alert"]) {
+  overflow-wrap: anywhere;
+}
+
+/* Avoid clipping long identifiers and technical labels in dense tables. */
+body[data-domain] :is(.table-wrap, .statistics-table-wrap) {
+  max-width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  -webkit-overflow-scrolling: touch;
+}
+body[data-domain] :is(.table-wrap table, .statistics-table) {
+  min-width: 560px;
+}
+body[data-domain] :is(td, th) {
+  overflow-wrap: anywhere;
+}
+body[data-domain] :is(.culture-catalog-row, .culture-detail-field, .overview-shortcut) {
+  min-width: 0;
+}
+body[data-domain] .overview-shortcut {
+  min-height: 56px;
+  text-align: left;
+}
+
+/* Small-screen touch and reading refinements. */
+@media (max-width: 640px) {
+  body[data-domain] #authCard .auth-actions {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+  }
+  body[data-domain] #authCard .auth-actions button {
+    width: 100%;
+  }
+  body[data-domain] .consent-option {
+    padding: 10px;
+  }
+  body[data-domain] .guided-entry-step {
+    margin-block: 12px;
+  }
+  body[data-domain] :is(.table-wrap, .statistics-table-wrap) {
+    margin-inline: -2px;
+  }
+}
+@media (max-width: 360px) {
+  body[data-domain] .toolbar-brand {
+    gap: 8px;
+  }
+  body[data-domain] .brand-wordmark strong {
+    letter-spacing: .12em;
+  }
+  body[data-domain] .section-nav a {
+    padding-inline: 9px;
+  }
+}
