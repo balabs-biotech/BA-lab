@@ -7645,3 +7645,227 @@ body[data-domain] #batchCard #createBatchButton {
     scroll-behavior: auto;
   }
 }
+
+
+/* ============================================================
+   BA LABS / CULTUREOPS — dark scientific workspace system
+   Shared low-glare foundation; each domain retains its own accent.
+   ============================================================ */
+:root {
+  color-scheme: dark;
+  --ui-bg: #101513;
+  --ui-panel: #19211e;
+  --ui-panel-raised: #202a25;
+  --ui-line: #35423a;
+  --ui-text: #e7eee8;
+  --ui-muted: #aab8ae;
+  --ui-control: #141c18;
+  --ui-shadow: 0 14px 34px rgba(0,0,0,.20);
+}
+body[data-domain] {
+  color-scheme: dark;
+  background: var(--ui-bg) !important;
+  color: var(--ui-text);
+}
+body[data-domain] .app-toolbar {
+  background: rgba(24,33,28,.96) !important;
+  border-color: var(--ui-line) !important;
+  box-shadow: 0 12px 32px rgba(0,0,0,.22) !important;
+}
+body[data-domain] .toolbar-brand,
+body[data-domain] .brand-wordmark,
+body[data-domain] .section-nav a,
+body[data-domain] .toolbar-status { color: var(--ui-text) !important; }
+body[data-domain] .brand-symbol { background: #26352c; color: var(--domain-accent); }
+body[data-domain] .toolbar-status { background: var(--ui-panel-raised); border: 1px solid var(--ui-line); }
+body[data-domain] .app-hero {
+  background:
+    radial-gradient(ellipse at 82% 15%, color-mix(in srgb, var(--domain-accent) 13%, transparent), transparent 22rem),
+    linear-gradient(125deg, #202b25 0%, #141b17 78%) !important;
+  border: 1px solid var(--ui-line) !important;
+  box-shadow: var(--ui-shadow) !important;
+  color: var(--ui-text) !important;
+}
+body[data-domain] .app-hero h1,
+body[data-domain] .app-hero h1 span { color: var(--ui-text) !important; }
+body[data-domain] .app-hero h1 span { color: var(--domain-accent) !important; }
+body[data-domain] .eyebrow,
+body[data-domain] .hero-description,
+body[data-domain] .hero-note small { color: var(--ui-muted) !important; }
+body[data-domain] .hero-tags span,
+body[data-domain] .hero-note {
+  background: var(--ui-panel-raised) !important;
+  color: var(--ui-text) !important;
+  border: 1px solid var(--ui-line) !important;
+}
+body[data-domain] .hero-art { color: var(--domain-accent) !important; }
+body[data-domain] .hero-orbit { border-color: color-mix(in srgb, var(--domain-accent) 32%, transparent) !important; }
+body[data-domain] .hero-core { background: color-mix(in srgb, var(--domain-accent) 8%, transparent) !important; border-color: color-mix(in srgb, var(--domain-accent) 42%, transparent) !important; }
+body[data-domain] .card,
+body[data-domain] #contextPanel,
+body[data-domain] .guided-entry-step,
+body[data-domain] .assisted-entry-panel {
+  background: var(--ui-panel) !important;
+  border-color: var(--ui-line) !important;
+  color: var(--ui-text) !important;
+  box-shadow: var(--ui-shadow);
+}
+body[data-domain] .card h2,
+body[data-domain] .card h3,
+body[data-domain] .card h4,
+body[data-domain] .card p,
+body[data-domain] .card li,
+body[data-domain] .card label,
+body[data-domain] .card legend,
+body[data-domain] .card strong,
+body[data-domain] .card .muted,
+body[data-domain] .card small { color: var(--ui-text); }
+body[data-domain] .card .muted,
+body[data-domain] .card small,
+body[data-domain] .card .hint { color: var(--ui-muted) !important; }
+body[data-domain] input:not([type="checkbox"]):not([type="radio"]),
+body[data-domain] select,
+body[data-domain] textarea,
+body[data-domain] .language-control select {
+  color: var(--ui-text) !important;
+  background: var(--ui-control) !important;
+  border: 1px solid var(--ui-line) !important;
+  -webkit-text-fill-color: var(--ui-text) !important;
+  caret-color: var(--domain-accent);
+}
+body[data-domain] input::placeholder,
+body[data-domain] textarea::placeholder { color: #87968c !important; -webkit-text-fill-color: #87968c !important; }
+body[data-domain] select option { background: var(--ui-panel); color: var(--ui-text); }
+body[data-domain] input:disabled,
+body[data-domain] select:disabled,
+body[data-domain] textarea:disabled { opacity: .62; }
+body[data-domain] .info,
+body[data-domain] .batch-stat,
+body[data-domain] .stage,
+body[data-domain] .qc-row,
+body[data-domain] .measurement-entry,
+body[data-domain] .culture-catalog-row,
+body[data-domain] .culture-detail,
+body[data-domain] .culture-detail-field,
+body[data-domain] .culture-timeline-entry,
+body[data-domain] .statistics-summary-item,
+body[data-domain] .statistics-chart,
+body[data-domain] .statistics-table-wrap,
+body[data-domain] .overview-metric,
+body[data-domain] .overview-activity,
+body[data-domain] .overview-shortcuts,
+body[data-domain] .quick-capture,
+body[data-domain] .quick-capture-tile,
+body[data-domain] .observation-details,
+body[data-domain] .bio-operation-panel,
+body[data-domain] .bio-lineage-panel {
+  background: var(--ui-panel-raised) !important;
+  border-color: var(--ui-line) !important;
+  color: var(--ui-text) !important;
+  box-shadow: none !important;
+}
+body[data-domain] .overview-metric strong,
+body[data-domain] .overview-metric-label,
+body[data-domain] .overview-shortcuts h3,
+body[data-domain] .overview-observation strong,
+body[data-domain] .culture-catalog-code,
+body[data-domain] .statistics-summary-item strong,
+body[data-domain] .statistics-table caption,
+body[data-domain] .culture-detail-field strong,
+body[data-domain] .quick-capture-heading h3,
+body[data-domain] .quick-capture-tile strong { color: var(--ui-text) !important; }
+body[data-domain] .overview-observation,
+body[data-domain] .culture-detail-field,
+body[data-domain] .data-flow li,
+body[data-domain] .culture-lineage-node { background: var(--ui-control) !important; border-color: var(--ui-line) !important; color: var(--ui-text) !important; }
+body[data-domain] .overview-observation p,
+body[data-domain] .overview-observation time,
+body[data-domain] .measurement-meta,
+body[data-domain] .measurement-stamp,
+body[data-domain] .statistics-footnote,
+body[data-domain] .culture-timeline-date,
+body[data-domain] .culture-timeline-entry p { color: var(--ui-muted) !important; }
+body[data-domain] .statistics-table th { background: #26322b !important; color: var(--ui-muted) !important; }
+body[data-domain] .statistics-table td { color: var(--ui-text) !important; border-color: var(--ui-line) !important; }
+body[data-domain] .section-nav a:hover,
+body[data-domain] .section-nav a[aria-current="page"] {
+  background: color-mix(in srgb, var(--domain-accent) 13%, var(--ui-panel)) !important;
+  border-color: color-mix(in srgb, var(--domain-accent) 38%, var(--ui-line)) !important;
+  color: var(--domain-accent) !important;
+}
+body[data-domain] .overview-live,
+body[data-domain] .culture-catalog-count,
+body[data-domain] .shortcut-index,
+body[data-domain] .quick-capture-icon {
+  background: color-mix(in srgb, var(--domain-accent) 13%, var(--ui-panel)) !important;
+  border-color: color-mix(in srgb, var(--domain-accent) 35%, var(--ui-line)) !important;
+  color: var(--domain-accent) !important;
+}
+body[data-domain] button:not(.secondary-button) {
+  background: color-mix(in srgb, var(--domain-accent) 18%, #1b2520) !important;
+  border: 1px solid color-mix(in srgb, var(--domain-accent) 48%, var(--ui-line)) !important;
+  color: var(--domain-accent) !important;
+  box-shadow: none !important;
+}
+body[data-domain] button:not(.secondary-button):hover:not(:disabled) {
+  background: color-mix(in srgb, var(--domain-accent) 27%, #1b2520) !important;
+  border-color: var(--domain-accent) !important;
+}
+body[data-domain] button.secondary-button,
+body[data-domain] .culture-catalog-action[data-culture-action="history"] {
+  background: var(--ui-control) !important;
+  border: 1px solid var(--ui-line) !important;
+  color: var(--ui-text) !important;
+}
+body[data-domain] .success { background: #1d3327 !important; color: #bfe0c5 !important; border-color: #42664d !important; }
+body[data-domain] .warning { background: #392f1d !important; color: #f0d39a !important; border-color: #76613a !important; }
+body[data-domain] .error { background: #3b2422 !important; color: #f4c4bd !important; border-color: #87504a !important; }
+body[data-domain] :is(input,select,textarea,button,a):focus-visible {
+  outline: 2px solid var(--domain-accent) !important;
+  outline-offset: 3px;
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--domain-accent) 18%, transparent) !important;
+}
+body[data-domain] .req { color: #e49a86 !important; }
+body[data-domain] .progress-track { background: #111a15 !important; }
+body[data-domain] .progress-bar { background: var(--domain-accent) !important; }
+body[data-domain] .guided-entry-step.is-ready { border-color: var(--domain-accent) !important; }
+body[data-domain] .universe-home-link { background: var(--ui-panel); border-color: var(--ui-line); color: var(--ui-text); }
+body[data-domain] .assisted-entry-tag { color: var(--ui-muted); border-color: var(--ui-line); }
+body[data-domain] .assisted-entry-help pre { background: #101613; color: var(--ui-text); }
+
+body[data-domain="agronomy"] { --domain-accent: #b4f477; }
+body[data-domain="mycology"] { --domain-accent: #c98259; }
+body[data-domain="laboratory"] {
+  --domain-accent: #78b8e8;
+  --bg: #111820; --surface: #1a2530; --surface-2: #243342;
+  --border: #3a5063; --border-strong: #59768d;
+  --text: #e5edf4; --muted: #aebdca; --brand: #78b8e8;
+  background: #111820 !important;
+}
+body[data-domain="laboratory"] .app-hero {
+  background:
+    radial-gradient(ellipse at 84% 18%, rgba(120,184,232,.14), transparent 22rem),
+    linear-gradient(125deg,#202f3c 0%,#141e28 82%) !important;
+}
+body[data-domain="laboratory"] .brand-symbol { background: #23394b; color: #78b8e8; }
+body[data-domain="mycology"] .app-hero {
+  background:
+    radial-gradient(ellipse at 82% 18%, rgba(201,130,89,.15), transparent 22rem),
+    linear-gradient(125deg,#382920 0%,#1d1917 82%) !important;
+}
+body[data-domain="mycology"] .brand-symbol { background: #3a2a21; color: #c98259; }
+body[data-domain="agronomy"] .brand-symbol { background: #26382b; color: #b4f477; }
+
+@media (max-width: 820px) {
+  body[data-domain] { padding: 10px 9px 32px !important; }
+  body[data-domain] .app-toolbar { border-radius: 13px; }
+  body[data-domain] .section-nav a { min-height: 40px; }
+  body[data-domain] .app-hero { border-radius: 17px; }
+  body[data-domain] .card { border-radius: 14px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  body[data-domain] *, body[data-domain] *::before, body[data-domain] *::after {
+    animation-duration: .01ms !important;
+    transition-duration: .01ms !important;
+  }
+}
