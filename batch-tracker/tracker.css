@@ -4408,3 +4408,228 @@ html[dir="rtl"] body[data-domain] :is(#plantCultureForm, #batchCard, #measuremen
     transition: none;
   }
 }
+
+
+/* ============================================================
+   CULTUREOPS — analytical dashboard and chart surfaces
+   Pass 8 · visual hierarchy only; no synthetic data added
+   ============================================================ */
+body[data-domain] #overviewCard,
+body[data-domain] #statisticsCard {
+  min-width: 0;
+}
+body[data-domain] #overviewCard {
+  border-top: 3px solid var(--workspace-accent, var(--brand));
+}
+body[data-domain] #overviewCard .overview-live {
+  flex: 0 0 auto;
+}
+body[data-domain] #overviewCard .overview-live > span {
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--workspace-accent, var(--brand)) 16%, transparent);
+}
+body[data-domain] #overviewCard .overview-activity,
+body[data-domain] #overviewCard .overview-shortcuts {
+  min-width: 0;
+  border-radius: 13px;
+}
+body[data-domain] #overviewCard .overview-observations-details {
+  min-width: 0;
+}
+body[data-domain] #overviewCard .overview-observations-details > summary {
+  min-height: 42px;
+  display: flex;
+  align-items: center;
+  padding: 9px 12px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+body[data-domain] #overviewCard .overview-observations-details[open] > summary {
+  margin-bottom: 10px;
+  border-color: var(--workspace-accent, var(--brand));
+}
+body[data-domain] #overviewCard .overview-observations {
+  min-width: 0;
+}
+body[data-domain] #overviewCard .overview-shortcut {
+  min-width: 0;
+  text-align: start;
+}
+body[data-domain] #statisticsCard {
+  border-top: 3px solid var(--workspace-accent, var(--brand));
+}
+body[data-domain] #statisticsCard > h2 {
+  margin-bottom: 8px;
+}
+body[data-domain] #statisticsCard > .muted {
+  max-width: 86ch;
+  line-height: 1.65;
+}
+body[data-domain] .statistics-filters {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) minmax(150px, .85fr);
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: 13px;
+  background: var(--surface-2);
+}
+body[data-domain] .statistics-filters select {
+  width: 100%;
+  min-width: 0;
+}
+body[data-domain] .statistics-filter-action {
+  display: flex;
+  align-items: end;
+}
+body[data-domain] .statistics-filter-action button {
+  width: 100%;
+  min-height: 44px;
+}
+body[data-domain] #statisticsStatus {
+  min-height: 1.5em;
+  margin: 14px 2px 10px;
+  line-height: 1.55;
+}
+body[data-domain] .statistics-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(180px, 100%), 1fr));
+  gap: 10px;
+  min-width: 0;
+  margin-block: 12px 16px;
+}
+body[data-domain] .statistics-summary-item {
+  display: grid;
+  align-content: start;
+  gap: 6px;
+}
+body[data-domain] .statistics-summary-item :is(strong, b) {
+  color: var(--workspace-accent, var(--brand));
+  font-size: 20px;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.2;
+}
+body[data-domain] .statistics-chart {
+  min-height: 120px;
+  margin-block: 12px 18px;
+  padding: clamp(10px, 2vw, 18px);
+  border: 1px solid var(--border);
+  border-radius: 13px;
+  background: var(--surface-2);
+  scrollbar-width: thin;
+}
+body[data-domain] .statistics-chart > svg {
+  display: block;
+  width: 100%;
+  min-width: 540px;
+  max-height: 340px;
+  overflow: visible;
+  color: var(--text);
+}
+body[data-domain] .statistics-chart > p {
+  line-height: 1.6;
+}
+body[data-domain] .statistics-chart .statistics-demo-note {
+  margin: 12px 0 8px;
+  padding: 10px 12px;
+  border: 1px solid color-mix(in srgb, var(--workspace-accent, var(--brand)) 48%, var(--border));
+  border-inline-start: 3px solid var(--workspace-accent, var(--brand));
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 11px;
+  font-weight: 750;
+  line-height: 1.55;
+}
+body[data-domain] .statistics-table-wrap {
+  min-width: 0;
+  max-width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface);
+  scrollbar-width: thin;
+}
+body[data-domain] .statistics-table-wrap .statistics-table {
+  min-width: 620px;
+}
+body[data-domain] .statistics-table-wrap .statistics-table caption {
+  padding: 12px 14px;
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 800;
+  text-align: start;
+  caption-side: top;
+}
+body[data-domain] .statistics-table-wrap .statistics-table tbody tr:nth-child(even) {
+  background: color-mix(in srgb, var(--surface-2) 62%, transparent);
+}
+body[data-domain] .statistics-table-wrap .statistics-table tbody tr:hover {
+  background: color-mix(in srgb, var(--workspace-accent, var(--brand)) 8%, var(--surface));
+}
+body[data-domain] .statistics-footnote {
+  margin-top: 13px;
+  padding: 11px 13px;
+  border-inline-start: 3px solid var(--workspace-accent, var(--brand));
+  border-radius: 0 8px 8px 0;
+  background: var(--surface-2);
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.65;
+}
+body[data-domain] #batchCompareResults .statistics-table {
+  min-width: 980px;
+}
+body[data-domain] #batchCompareResults:empty {
+  display: none;
+}
+html[dir="rtl"] body[data-domain] .statistics-chart {
+  direction: ltr;
+  text-align: left;
+}
+html[dir="rtl"] body[data-domain] .statistics-demo-note,
+html[dir="rtl"] body[data-domain] .statistics-footnote {
+  direction: rtl;
+  text-align: right;
+}
+@media (max-width: 900px) {
+  body[data-domain] .statistics-filters {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  body[data-domain] .statistics-filter-action {
+    grid-column: 1 / -1;
+  }
+}
+@media (max-width: 560px) {
+  body[data-domain] #overviewCard .overview-heading {
+    display: grid;
+  }
+  body[data-domain] #overviewCard .overview-live {
+    justify-self: start;
+  }
+  body[data-domain] .statistics-filters {
+    grid-template-columns: minmax(0, 1fr);
+    padding: 12px;
+  }
+  body[data-domain] .statistics-filter-action {
+    grid-column: auto;
+  }
+  body[data-domain] .statistics-chart {
+    padding: 8px;
+  }
+  body[data-domain] .statistics-chart > svg {
+    min-width: 540px;
+  }
+  body[data-domain] .statistics-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  body[data-domain] .statistics-summary-item {
+    padding: 11px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  body[data-domain] #overviewCard .overview-meter > span {
+    transition: none;
+  }
+}
