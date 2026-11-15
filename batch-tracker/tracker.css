@@ -12096,3 +12096,184 @@ body[data-domain] #measurementCard .measurement-stamp {
   #statisticsCard * { transition:none !important; animation:none !important; }
   #measurementCard .quick-capture-tile:hover { transform:none !important; }
 }
+
+
+/* Pass 59 — culture creation, searchable catalogue and experimental record */
+#trackerCard .entry-intro { position:relative; margin-bottom:1.25rem; padding:0 0 1rem; border-bottom:1px solid var(--border); }
+#trackerCard .entry-intro h2 { margin:.45rem 0 .35rem; font-size:clamp(1.25rem,2.5vw,1.75rem); letter-spacing:-.035em; }
+#trackerCard .entry-intro > .muted { max-width:65ch; margin:0; font-size:.77rem; line-height:1.55; }
+#trackerCard .guided-entry-step {
+  position:relative; margin:1rem 0; padding:clamp(.9rem,2vw,1.2rem);
+  border:1px solid var(--border); border-radius:14px;
+  background:linear-gradient(135deg,rgba(255,255,255,.035),transparent 62%),var(--surface-2);
+}
+#trackerCard .guided-entry-step[hidden] { display:none !important; }
+#trackerCard .guided-entry-step.is-locked { opacity:.62; }
+#trackerCard .guided-entry-step .entry-step-mark {
+  display:inline-flex; align-items:center; gap:.45rem; margin-bottom:.9rem;
+  color:var(--brand,var(--accent,#8ab49a)); font-size:.63rem; font-weight:800; letter-spacing:.1em;
+}
+#trackerCard .guided-entry-step label {
+  display:block; margin:.25rem 0 .42rem; color:var(--text); font-size:.77rem; font-weight:700;
+}
+#trackerCard .guided-entry-step input,
+#trackerCard .guided-entry-step select,
+#trackerCard .guided-entry-step textarea {
+  width:100%; min-width:0; min-height:42px; border:1px solid var(--border);
+  border-radius:10px; background:var(--surface); color:var(--text);
+  transition:border-color .18s ease,box-shadow .18s ease;
+}
+#trackerCard .guided-entry-step input:focus-visible,
+#trackerCard .guided-entry-step select:focus-visible,
+#trackerCard .guided-entry-step textarea:focus-visible {
+  outline:0; border-color:var(--brand,var(--accent,#8ab49a));
+  box-shadow:0 0 0 3px color-mix(in srgb,var(--brand,var(--accent,#8ab49a)) 18%,transparent);
+}
+#trackerCard .guided-entry-step .grid { gap:1rem; }
+#trackerCard #strainInfo,
+#trackerCard #generationInfo {
+  margin:.7rem 0; padding:.75rem .9rem; border:1px solid var(--border);
+  border-radius:10px; background:var(--surface); font-size:.73rem; line-height:1.5;
+}
+#trackerCard #cultureCodeHint { display:block; margin:.45rem 0 0; color:var(--muted); font-size:.67rem; line-height:1.45; }
+#trackerCard .consent-panel {
+  margin:1rem 0; padding:1rem; border:1px solid var(--border);
+  border-radius:12px; background:var(--surface);
+}
+#trackerCard .consent-panel > strong { display:block; margin-bottom:.55rem; font-size:.82rem; }
+#trackerCard .consent-panel > p,
+#trackerCard .consent-panel > .muted { color:var(--muted); font-size:.7rem; line-height:1.55; }
+#trackerCard .consent-panel a { color:var(--brand,var(--accent,#8ab49a)); text-underline-offset:3px; }
+#trackerCard .consent-option {
+  display:grid; grid-template-columns:18px minmax(0,1fr); align-items:start; gap:.65rem;
+  margin:.8rem 0; padding:.75rem; border:1px solid var(--border); border-radius:10px;
+  background:var(--surface-2);
+}
+#trackerCard .consent-option input { width:17px; height:17px; margin:.1rem 0 0; accent-color:var(--brand,var(--accent,#8ab49a)); }
+#trackerCard .consent-option label { margin:0; color:var(--text); font-size:.7rem; line-height:1.5; }
+#trackerCard #createButton { width:100%; min-height:46px; margin:.5rem 0 0; border-radius:11px; font-weight:800; }
+#trackerCard .sync-line {
+  display:flex; align-items:center; justify-content:space-between; gap:.75rem; flex-wrap:wrap;
+  margin:.85rem 0 1.5rem; padding:.7rem .85rem; border:1px solid var(--border);
+  border-radius:10px; background:var(--surface-2);
+}
+#trackerCard #syncStatus { font-size:.68rem; line-height:1.45; }
+#trackerCard .culture-catalog {
+  margin:1.4rem 0 0; padding:clamp(.9rem,2vw,1.25rem);
+  border:1px solid var(--border); border-radius:16px;
+  background:linear-gradient(145deg,rgba(255,255,255,.035),transparent 60%),var(--surface-2);
+}
+#trackerCard .culture-catalog-heading {
+  display:flex; align-items:flex-start; justify-content:space-between; gap:1rem; margin-bottom:1rem;
+}
+#trackerCard .culture-catalog-heading h3 { margin:.1rem 0 .3rem; font-size:1rem; letter-spacing:-.02em; }
+#trackerCard .culture-catalog-heading .muted { max-width:60ch; margin:0; font-size:.7rem; line-height:1.5; }
+#trackerCard .culture-catalog-count {
+  display:grid; place-items:center; flex:0 0 36px; width:36px; height:36px;
+  border:1px solid var(--border); border-radius:11px; background:var(--surface);
+  color:var(--brand,var(--accent,#8ab49a)); font-size:.85rem; font-weight:800;
+}
+#trackerCard .culture-catalog-filters {
+  display:grid; grid-template-columns:minmax(0,1.5fr) minmax(180px,1fr); gap:.8rem;
+  margin:.8rem 0 1rem; padding:.8rem; border:1px solid var(--border);
+  border-radius:11px; background:var(--surface);
+}
+#trackerCard .culture-catalog-filters label { display:block; margin-bottom:.35rem; font-size:.7rem; font-weight:700; }
+#trackerCard .culture-catalog-filters input,
+#trackerCard .culture-catalog-filters select {
+  width:100%; min-width:0; min-height:40px; border:1px solid var(--border);
+  border-radius:9px; background:var(--surface-2); color:var(--text);
+}
+#trackerCard .culture-catalog-list { display:grid; gap:.65rem; }
+#trackerCard .culture-catalog-row {
+  display:grid; grid-template-columns:minmax(0,1fr) auto; align-items:center; gap:.9rem;
+  padding:.9rem; border:1px solid var(--border); border-radius:12px;
+  background:var(--surface); transition:border-color .18s ease,transform .18s ease;
+}
+#trackerCard .culture-catalog-row:hover { border-color:var(--brand,var(--accent,#8ab49a)); transform:translateY(-1px); }
+#trackerCard .culture-catalog-main { min-width:0; }
+#trackerCard .culture-catalog-code { display:block; color:var(--text); font-size:.82rem; overflow-wrap:anywhere; }
+#trackerCard .culture-catalog-meta { display:flex; flex-wrap:wrap; gap:.35rem .8rem; margin-top:.4rem; color:var(--muted); font-size:.66rem; line-height:1.4; }
+#trackerCard .culture-catalog-actions { display:flex; justify-content:flex-end; flex-wrap:wrap; gap:.4rem; }
+#trackerCard .culture-catalog-action {
+  min-height:34px; padding:.4rem .65rem; border:1px solid var(--border);
+  border-radius:8px; background:var(--surface-2); color:var(--text); font-size:.66rem; font-weight:700;
+}
+#trackerCard .culture-catalog-action:hover { border-color:var(--brand,var(--accent,#8ab49a)); color:var(--brand,var(--accent,#8ab49a)); }
+#trackerCard .culture-catalog-action:focus-visible,
+#trackerCard #closeCultureDetail:focus-visible { outline:2px solid var(--brand,var(--accent,#8ab49a)); outline-offset:2px; }
+#trackerCard #cultureDetailPanel.culture-detail {
+  margin-top:1rem; padding:clamp(.9rem,2vw,1.25rem);
+  border:1px solid var(--brand,var(--accent,#8ab49a)); border-radius:14px;
+  background:linear-gradient(145deg,color-mix(in srgb,var(--brand,var(--accent,#8ab49a)) 7%,transparent),transparent 55%),var(--surface);
+  box-shadow:0 16px 34px rgba(0,0,0,.12);
+}
+#trackerCard .culture-detail-heading {
+  display:flex; align-items:flex-start; justify-content:space-between; gap:1rem;
+  padding-bottom:.85rem; border-bottom:1px solid var(--border);
+}
+#trackerCard .culture-detail-heading h3 { margin:.35rem 0 .2rem; font-size:1.12rem; overflow-wrap:anywhere; }
+#trackerCard .culture-detail-heading .muted { margin:0; font-size:.7rem; }
+#trackerCard .culture-detail-summary {
+  display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:.6rem; margin:1rem 0;
+}
+#trackerCard .culture-detail-field {
+  min-width:0; padding:.75rem; border:1px solid var(--border);
+  border-radius:10px; background:var(--surface-2);
+}
+#trackerCard .culture-detail-field span { display:block; color:var(--muted); font-size:.63rem; line-height:1.4; }
+#trackerCard .culture-detail-field strong { display:block; margin-top:.3rem; color:var(--text); font-size:.75rem; overflow-wrap:anywhere; }
+#trackerCard .culture-detail-heading + .culture-detail-summary { margin-top:1rem; }
+#trackerCard .bio-operation-panel,
+#trackerCard .bio-lineage-panel {
+  margin:1rem 0; padding:1rem; border:1px solid var(--border);
+  border-radius:12px; background:var(--surface-2);
+}
+#trackerCard .bio-operation-panel h4,
+#trackerCard .bio-lineage-panel h4 { margin:0 0 .45rem; font-size:.86rem; }
+#trackerCard .bio-operation-panel > .muted { font-size:.7rem; line-height:1.5; }
+#trackerCard .bio-operation-form { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:.8rem; margin-top:.9rem; }
+#trackerCard .bio-operation-form > div { min-width:0; }
+#trackerCard .bio-operation-form .bio-operation-wide { grid-column:1/-1; }
+#trackerCard .bio-operation-form label { display:block; margin-bottom:.35rem; font-size:.7rem; font-weight:700; }
+#trackerCard .bio-operation-form input,
+#trackerCard .bio-operation-form select,
+#trackerCard .bio-operation-form textarea {
+  width:100%; min-width:0; min-height:40px; border:1px solid var(--border);
+  border-radius:9px; background:var(--surface); color:var(--text);
+}
+#trackerCard .bio-operation-form small { display:block; margin-top:.35rem; color:var(--muted); font-size:.64rem; line-height:1.4; }
+#trackerCard #saveBioOperation { min-height:40px; border-radius:9px; }
+#trackerCard #bioOperationMessage { margin:.5rem 0 0; font-size:.68rem; }
+#trackerCard .culture-lineage { display:flex; align-items:stretch; flex-wrap:wrap; gap:.55rem; }
+#trackerCard .culture-lineage-node {
+  min-width:145px; padding:.7rem .8rem; border:1px solid var(--border);
+  border-radius:10px; background:var(--surface); color:var(--text); text-align:left;
+}
+#trackerCard .culture-lineage-node strong { display:block; font-size:.72rem; overflow-wrap:anywhere; }
+#trackerCard .culture-lineage-node small { display:block; margin-top:.3rem; color:var(--muted); font-size:.63rem; }
+#trackerCard .culture-detail-timeline { display:grid; gap:.55rem; margin-top:.8rem; }
+#trackerCard .culture-detail-timeline > * {
+  min-width:0; padding:.75rem .85rem; border-left:2px solid var(--brand,var(--accent,#8ab49a));
+  border-radius:0 9px 9px 0; background:var(--surface-2);
+}
+@media (max-width:760px) {
+  #trackerCard .culture-catalog-row { grid-template-columns:minmax(0,1fr); }
+  #trackerCard .culture-catalog-actions { justify-content:flex-start; }
+  #trackerCard .culture-detail-summary { grid-template-columns:repeat(2,minmax(0,1fr)); }
+}
+@media (max-width:560px) {
+  #trackerCard .culture-catalog-filters,
+  #trackerCard .bio-operation-form { grid-template-columns:minmax(0,1fr); }
+  #trackerCard .bio-operation-form .bio-operation-wide { grid-column:auto; }
+  #trackerCard .culture-detail-heading { flex-direction:column; }
+  #trackerCard .culture-detail-summary { grid-template-columns:minmax(0,1fr); }
+  #trackerCard .culture-catalog-actions { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); }
+  #trackerCard .culture-catalog-action { width:100%; }
+}
+@media (prefers-reduced-motion:reduce) {
+  #trackerCard .culture-catalog-row,
+  #trackerCard .guided-entry-step *,
+  #trackerCard .culture-catalog-action { transition:none !important; animation:none !important; }
+  #trackerCard .culture-catalog-row:hover { transform:none !important; }
+}
