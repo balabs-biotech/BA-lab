@@ -13770,3 +13770,160 @@ body[data-domain] #cultureDetailPanel :is(button,input,select,textarea):focus-vi
 @media(prefers-reduced-motion:reduce) {
   body[data-domain] #cultureDetailPanel .culture-lineage-node {transition:none!important;transform:none!important}
 }
+
+
+/* ============================================================
+   CULTUREOPS UI REFINEMENT — PASS 69
+   Shared navigation, shortcuts, workspace feedback and context
+   ============================================================ */
+body[data-domain] .app-toolbar {
+  gap:clamp(10px,1.5vw,20px); border-color:var(--workspace-border);
+  background:color-mix(in srgb,var(--workspace-panel) 92%,transparent);
+  color:var(--workspace-text);
+}
+body[data-domain] .toolbar-brand {color:var(--workspace-text)}
+body[data-domain] .brand-wordmark small {color:var(--workspace-muted)}
+body[data-domain] .toolbar-divider {background:var(--workspace-border)}
+body[data-domain] .section-nav {min-width:0; flex-wrap:wrap; gap:5px}
+body[data-domain] .section-nav a {
+  min-height:39px; padding:8px 10px; border:1px solid transparent;
+  border-radius:9px; color:var(--workspace-muted);
+  font-size:.68rem; font-weight:750; white-space:nowrap;
+}
+body[data-domain] .section-nav a:hover {
+  border-color:var(--workspace-border);
+  background:var(--workspace-panel-raised); color:var(--workspace-text);
+}
+body[data-domain] .section-nav a[aria-current="page"] {
+  border-color:color-mix(in srgb,var(--workspace-accent) 52%,var(--workspace-border));
+  background:color-mix(in srgb,var(--workspace-accent) 15%,var(--workspace-panel-raised));
+  color:var(--workspace-text);
+  box-shadow:inset 0 -2px 0 var(--workspace-accent);
+}
+body[data-domain] .section-nav .nav-number {color:var(--workspace-accent)}
+body[data-domain] .toolbar-status {
+  flex:0 0 auto; border-color:var(--workspace-border);
+  background:var(--workspace-control); color:var(--workspace-muted);
+  font-size:.57rem; letter-spacing:.07em;
+}
+body[data-domain] .status-pulse {
+  background:var(--workspace-accent);
+  box-shadow:0 0 0 4px color-mix(in srgb,var(--workspace-accent) 16%,transparent);
+}
+body[data-domain] .overview-shortcuts {
+  gap:9px; padding:clamp(13px,1.8vw,18px);
+  border-color:var(--workspace-border);
+  border-radius:14px; background:var(--workspace-panel);
+  color:var(--workspace-text);
+}
+body[data-domain] .overview-shortcuts h3 {
+  margin:0 0 3px; color:var(--workspace-text);
+  font-size:.85rem; letter-spacing:-.02em;
+}
+body[data-domain] .overview-shortcut {
+  min-width:0; min-height:58px; padding:10px;
+  border:1px solid var(--workspace-border); border-radius:10px;
+  background:var(--workspace-panel-raised); color:var(--workspace-text);
+  transition:border-color .15s ease,background .15s ease,transform .15s ease;
+}
+body[data-domain] .overview-shortcut:hover:not(:disabled) {
+  border-color:var(--workspace-accent);
+  background:color-mix(in srgb,var(--workspace-accent) 10%,var(--workspace-panel-raised));
+  color:var(--workspace-text); transform:translateY(-1px);
+}
+body[data-domain] .overview-shortcut:focus-visible {
+  outline:2px solid var(--workspace-accent); outline-offset:3px;
+}
+body[data-domain] .overview-shortcut strong {
+  color:var(--workspace-text); font-size:.69rem; line-height:1.35;
+}
+body[data-domain] .overview-shortcut small {
+  color:var(--workspace-muted); font-size:.6rem; line-height:1.45;
+}
+body[data-domain] .shortcut-index {
+  width:29px; height:29px; border:1px solid var(--workspace-border);
+  border-radius:9px;
+  background:color-mix(in srgb,var(--workspace-accent) 14%,var(--workspace-control));
+  color:var(--workspace-accent); font-weight:850;
+}
+body[data-domain] #contextPanel {
+  border-color:var(--workspace-border);
+  background:linear-gradient(155deg,var(--workspace-panel-raised),var(--workspace-panel));
+  color:var(--workspace-text);
+  box-shadow:0 10px 28px rgba(0,0,0,.14);
+}
+body[data-domain] #contextPanel .context-eyebrow {color:var(--workspace-accent)}
+body[data-domain] #contextPanel .context-title {color:var(--workspace-text)}
+body[data-domain] #contextPanel .context-copy {color:var(--workspace-muted)}
+body[data-domain] #contextPanel .data-flow li {
+  border-color:var(--workspace-border); background:var(--workspace-control);
+  color:var(--workspace-text);
+}
+body[data-domain] #contextPanel .data-flow li span {
+  background:color-mix(in srgb,var(--workspace-accent) 16%,var(--workspace-control));
+  color:var(--workspace-accent);
+}
+body[data-domain] #contextPanel .context-divider {background:var(--workspace-border)}
+body[data-domain] #contextPanel .metric-chips span {
+  border-color:var(--workspace-border); background:var(--workspace-control);
+  color:var(--workspace-text);
+}
+body[data-domain] #contextPanel .context-note {
+  border-color:var(--workspace-accent);
+  background:color-mix(in srgb,var(--workspace-accent) 11%,var(--workspace-panel));
+  color:var(--workspace-text);
+}
+body[data-domain] #message > .card {
+  margin:0 0 15px; padding:13px 16px; border-radius:12px;
+  font-size:.72rem; line-height:1.6; font-weight:650;
+  box-shadow:0 8px 22px rgba(0,0,0,.1);
+}
+body[data-domain] #message > .card.success {
+  border-color:color-mix(in srgb,#5fc58a 52%,var(--workspace-border));
+  background:color-mix(in srgb,#1d7b4a 17%,var(--workspace-panel));
+  color:var(--workspace-text);
+}
+body[data-domain] #message > .card.warning {
+  border-color:color-mix(in srgb,#e5ad4d 58%,var(--workspace-border));
+  background:color-mix(in srgb,#a66b19 18%,var(--workspace-panel));
+  color:var(--workspace-text);
+}
+body[data-domain] #message > .card.error {
+  border-color:color-mix(in srgb,#df7777 58%,var(--workspace-border));
+  background:color-mix(in srgb,#9e3535 18%,var(--workspace-panel));
+  color:var(--workspace-text);
+}
+body[data-domain] #authCard #authStatus {
+  min-width:0; padding:10px 12px; border:1px solid var(--workspace-border);
+  border-radius:9px; background:var(--workspace-control);
+  color:var(--workspace-muted); font-size:.67rem; line-height:1.55;
+  overflow-wrap:anywhere;
+}
+body[data-domain] #authCard #authStatus[aria-busy="true"] {
+  border-color:color-mix(in srgb,var(--workspace-accent) 58%,var(--workspace-border));
+}
+body[data-domain] .workspace-inactive {display:none!important}
+body[data-domain] :is(#overviewCard,#trackerCard,#plantCard,#batchCard,#measurementCard,#statisticsCard) {
+  scroll-margin-top:18px;
+}
+@media(max-width:1120px) {
+  body[data-domain] .app-toolbar {flex-wrap:wrap; align-items:center}
+  body[data-domain] .section-nav {order:3; flex:1 0 100%; overflow-x:auto; flex-wrap:nowrap; padding:3px 1px 5px}
+  body[data-domain] .toolbar-status {margin-left:auto}
+}
+@media(max-width:600px) {
+  body[data-domain] .app-toolbar {gap:9px; padding:10px 12px; border-radius:13px}
+  body[data-domain] .toolbar-brand {min-width:0; gap:8px}
+  body[data-domain] .brand-symbol {width:36px; height:36px; border-radius:10px}
+  body[data-domain] .brand-wordmark strong {font-size:10px}
+  body[data-domain] .brand-wordmark small {font-size:8px}
+  body[data-domain] .toolbar-divider {height:27px}
+  body[data-domain] .toolbar-status {padding:7px 8px; font-size:.49rem}
+  body[data-domain] .section-nav a {min-height:36px; padding:7px 9px; font-size:.62rem}
+  body[data-domain] .overview-shortcuts {padding:12px}
+  body[data-domain] .overview-shortcut {min-height:54px}
+  body[data-domain] #contextPanel {position:static}
+}
+@media(prefers-reduced-motion:reduce) {
+  body[data-domain] .overview-shortcut {transition:none!important; transform:none!important}
+}
