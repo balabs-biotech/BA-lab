@@ -5528,3 +5528,163 @@ html[dir="rtl"] body[data-domain] .language-control select {
     flex: 0 1 160px;
   }
 }
+
+
+/* ============================================================
+   CULTUREOPS — formulaires et retours de validation
+   Passe 12 · lisibilité de la saisie et états interactifs
+   ============================================================ */
+body[data-domain] :is(.guided-entry-step, .bio-operation-form, #plantCultureForm, #measurementCard, #batchCard) :is(label, .hint, small) {
+  line-height: 1.55;
+}
+body[data-domain] :is(input, select, textarea) {
+  max-width: 100%;
+  accent-color: var(--workspace-accent, var(--brand));
+}
+body[data-domain] :is(input, select, textarea):disabled,
+body[data-domain] :is(button, input[type="button"], input[type="submit"]):disabled {
+  cursor: not-allowed;
+  opacity: .58;
+  filter: saturate(.65);
+}
+body[data-domain] :is(input, select, textarea)[aria-invalid="true"],
+body[data-domain] :is(input, select, textarea):user-invalid {
+  border-color: #d9786d;
+  box-shadow: 0 0 0 2px rgb(217 120 109 / 12%);
+}
+body[data-domain] :is(input, select, textarea)[aria-invalid="true"]:focus-visible,
+body[data-domain] :is(input, select, textarea):user-invalid:focus-visible {
+  outline-color: #e18a7f;
+}
+body[data-domain] :is(input, select, textarea)::placeholder {
+  color: var(--muted);
+  opacity: .78;
+}
+body[data-domain] :is(.guided-entry-step, .bio-operation-form, #plantCultureForm) .req {
+  display: inline-block;
+  margin-inline-start: 3px;
+  color: #e18a7f;
+  font-weight: 900;
+}
+body[data-domain] :is(.guided-entry-step, .bio-operation-form, #plantCultureForm) .hint,
+body[data-domain] :is(.guided-entry-step, .bio-operation-form, #plantCultureForm) small {
+  display: block;
+  margin-top: 5px;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.55;
+}
+body[data-domain] .guided-entry-step {
+  min-width: 0;
+  padding: clamp(12px, 2.5vw, 20px);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface);
+}
+body[data-domain] .guided-entry-step.is-locked {
+  opacity: .72;
+}
+body[data-domain] .guided-entry-step[hidden] {
+  display: none !important;
+}
+body[data-domain] .guided-entry-step .entry-step-mark {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  margin-bottom: 10px;
+  padding: 4px 8px;
+  border: 1px solid var(--workspace-accent-border);
+  border-radius: 6px;
+  background: var(--workspace-accent-soft);
+  color: var(--workspace-accent, var(--brand));
+  font-size: 10px;
+  font-weight: 850;
+  letter-spacing: .06em;
+}
+body[data-domain] .guided-entry-step :is(input, select, textarea),
+body[data-domain] .bio-operation-form :is(input, select, textarea),
+body[data-domain] #plantCultureForm :is(input, select, textarea) {
+  min-width: 0;
+}
+body[data-domain] .guided-entry-step :is(input, select, textarea):focus-visible,
+body[data-domain] .bio-operation-form :is(input, select, textarea):focus-visible,
+body[data-domain] #plantCultureForm :is(input, select, textarea):focus-visible {
+  border-color: var(--workspace-accent, var(--brand));
+  box-shadow: 0 0 0 3px var(--workspace-accent-soft);
+}
+body[data-domain] .consent-panel {
+  border-color: var(--workspace-accent-border);
+  background: var(--surface-2);
+}
+body[data-domain] .consent-option {
+  align-items: flex-start;
+  gap: 11px;
+  padding: 12px 0;
+}
+body[data-domain] .consent-option input[type="checkbox"] {
+  flex: 0 0 auto;
+  width: 19px;
+  height: 19px;
+  min-height: 19px;
+  margin: 2px 0 0;
+}
+body[data-domain] .consent-option label {
+  min-width: 0;
+  line-height: 1.6;
+}
+body[data-domain] .sync-line {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 9px 14px;
+}
+body[data-domain] #authStatus,
+body[data-domain] #smartEntryStatus,
+body[data-domain] #statisticsStatus,
+body[data-domain] #batchCompareStatus {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+body[data-domain] :is(button, .button, input[type="button"], input[type="submit"])[aria-busy="true"] {
+  cursor: progress;
+}
+body[data-domain] button[aria-busy="true"]::after {
+  border-color: currentColor;
+  border-inline-end-color: transparent;
+}
+body[data-domain] :is(.error, .success, .warning, .info)[role="alert"],
+body[data-domain] :is(.error, .success, .warning, .info)[role="status"] {
+  overflow-wrap: anywhere;
+}
+body[data-domain] :is(.error, .success, .warning, .info)[role="alert"] a,
+body[data-domain] :is(.error, .success, .warning, .info)[role="status"] a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+html[dir="rtl"] body[data-domain] .consent-option {
+  flex-direction: row;
+  text-align: right;
+}
+html[dir="rtl"] body[data-domain] .guided-entry-step,
+html[dir="rtl"] body[data-domain] .bio-operation-form {
+  text-align: right;
+}
+@media (max-width: 560px) {
+  body[data-domain] .guided-entry-step {
+    padding: 12px;
+  }
+  body[data-domain] .sync-line {
+    align-items: stretch;
+  }
+  body[data-domain] .sync-line button {
+    width: 100%;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  body[data-domain] :is(input, select, textarea, button) {
+    scroll-behavior: auto;
+    transition-duration: 0.01ms !important;
+  }
+}
