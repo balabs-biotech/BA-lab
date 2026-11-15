@@ -7448,3 +7448,21 @@ body[data-domain] :is(.card, .batch-item, .info, .stage, .qc-row) {
     animation: none !important;
   }
 }
+
+/* ============================================================
+   CULTUREOPS — passe 24
+   Desktop workspace: reserve the fixed navigation rail
+   ============================================================ */
+@media (min-width: 821px) {
+  body[data-domain] .container {
+    width: min(1000px, calc(100% - 258px));
+    max-width: 1000px;
+    margin-inline-start: 234px;
+    margin-inline-end: 24px;
+  }
+}
+@media (min-width: 821px) and (max-width: 980px) {
+  body[data-domain] .container {
+    width: calc(100% - 258px);
+  }
+}
