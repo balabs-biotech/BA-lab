@@ -186,6 +186,17 @@ try {
         if (languageState.width > languageState.viewport + 1) failures.push(`${workspace.slug}/${viewport.name}/${language}: horizontal overflow ${languageState.width}px > ${languageState.viewport}px`);
       }
       await page.locator("#languageSelect").selectOption("fr");
+      await page.locator("#authEmail").fill("");
+      await page.locator("#authPassword").fill("");
+      await page.locator("#signInButton").click();
+      await page.waitForFunction(() => document.querySelector("#message")?.textContent.includes("Entrez une adresse email."), null, { timeout: 5000 });
+      await page.locator("#authEmail").fill("qa@example.invalid");
+      await page.locator("#authPassword").fill("12345");
+      await page.locator("#signUpButton").click();
+      await page.waitForFunction(() => document.querySelector("#message")?.textContent.includes("au moins 6 caractères"), null, { timeout: 5000 });
+      await page.locator("#authPassword").fill("valid-test-password");
+      await page.locator("#signInButton").click();
+      await page.waitForFunction(() => document.querySelector("#message")?.textContent.includes("Browser smoke: authentication disabled"), null, { timeout: 5000 });
       if (pageErrors.length) failures.push(`${workspace.slug}/${viewport.name}: JS errors: ${pageErrors.join(" | ")}`);
       if (badResponses.length) failures.push(`${workspace.slug}/${viewport.name}: failed local assets: ${JSON.stringify(badResponses)}`);
 
