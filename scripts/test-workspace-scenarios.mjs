@@ -829,12 +829,14 @@ console.log("✓ Operational data surfaces: readable rows, domain identity and m
 // not retain hard-coded pale-green surfaces in Mycology or Laboratory.
 const recordCardCss = fs.readFileSync("batch-tracker/tracker.css", "utf8");
 for (const domain of ["agronomy", "mycology", "laboratory"]) {
-  for (const component of [".batch-item", ".stage", ".qc-row", ".batch-stat", ".culture-detail-field"]) {
-    assert.match(recordCardCss, new RegExp('body\\[data-domain="' + domain + '"\\] ' + component.replace(".", "\\.")),
-      domain + " " + component + " must receive explicit domain card treatment");
-  }
+  assert.match(recordCardCss, new RegExp('body\\\\[data-domain="' + domain + '"\\\\]\\\\s*\\\\{[\\\\s\\\\S]*?--surface:'),
+    domain + " must define its own surface token for operational cards");
 }
-assert.match(recordCardCss, /\.batch-item:focus-visible/);
-assert.match(recordCardCss, /\.stage:focus-within/);
-assert.match(recordCardCss, /\.qc-row:focus-within/);
+for (const component of [".batch-item", ".stage", ".qc-row", ".batch-stat", ".culture-detail-field"]) {
+  assert.match(recordCardCss, new RegExp('body\\\\[data-domain\\\\] [\\\\s\\\\S]*?' + component.replace(".", "\\\\.")),
+    component + " must inherit workspace design tokens");
+}
+assert.match(recordCardCss, /\\.batch-item:focus-visible/);
+assert.match(recordCardCss, /\\.stage:focus-within/);
+assert.match(recordCardCss, /\\.qc-row:focus-within/);
 console.log("✓ Operational record cards: domain surfaces and keyboard/focus inspection");
