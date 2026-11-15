@@ -8078,6 +8078,8 @@ function renderPlantCultureList(rows) {
   const list = document.getElementById("plantCultureList");
   const count = document.getElementById("plantCultureCount");
   if (!list || !count) return;
+  list.className = "culture-catalog-list";
+  list.removeAttribute("role");
   count.textContent = String(rows.length);
   list.replaceChildren();
   updateOverview();
