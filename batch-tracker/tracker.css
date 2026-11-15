@@ -6043,3 +6043,132 @@ html[dir="rtl"] body[data-domain] #batchList > .info {
     transition: none !important;
   }
 }
+
+
+/* ============================================================
+   CULTUREOPS — cohérence des formulaires inter-espaces
+   Passe 15 · alignement, densité et saisie mobile
+   ============================================================ */
+body[data-domain] :is(#plantCultureForm, #bioOperationForm, #batchCard, #measurementCard, #batchEvents, #cultureDetailPanel) {
+  min-width: 0;
+}
+body[data-domain] :is(#plantCultureForm, #bioOperationForm, #batchCard, #measurementCard, #batchEvents) :is(input:not([type="checkbox"]):not([type="radio"]), select, textarea) {
+  min-height: 44px;
+  border: 1px solid var(--border-strong);
+  border-radius: 9px;
+  background-color: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-size: 14px;
+  line-height: 1.45;
+  box-shadow: none;
+}
+body[data-domain] :is(#plantCultureForm, #bioOperationForm, #batchCard, #measurementCard, #batchEvents) textarea {
+  min-height: 88px;
+  resize: vertical;
+}
+body[data-domain] :is(#plantCultureForm, #bioOperationForm, #batchCard, #measurementCard, #batchEvents) :is(input, select, textarea):focus-visible {
+  border-color: var(--workspace-accent, var(--focus));
+  outline: 2px solid var(--workspace-accent, var(--focus));
+  outline-offset: 2px;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--workspace-accent, var(--focus)) 15%, transparent);
+}
+body[data-domain] :is(#plantCultureForm, #bioOperationForm, #batchCard, #measurementCard, #batchEvents) :is(input, select, textarea)[aria-invalid="true"] {
+  border-color: var(--err);
+  box-shadow: 0 0 0 1px var(--err);
+}
+body[data-domain] :is(#plantCultureForm, #bioOperationForm, #batchCard, #measurementCard, #batchEvents) :is(input, select, textarea):disabled {
+  opacity: .72;
+  cursor: not-allowed;
+}
+body[data-domain] :is(#plantCultureForm, #bioOperationForm, #batchCard, #measurementCard, #batchEvents) label {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+body[data-domain] :is(#plantCultureForm, #bioOperationForm, #batchCard, #measurementCard, #batchEvents) .hint,
+body[data-domain] :is(#plantCultureForm, #bioOperationForm) small {
+  display: block;
+  margin-top: 6px;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.55;
+}
+body[data-domain] :is(#plantCultureForm, #bioOperationForm, #batchCard, #measurementCard) button,
+body[data-domain] #batchEvents button {
+  min-height: 44px;
+  max-width: 100%;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+body[data-domain] #bioOperationForm .bio-operation-wide,
+body[data-domain] #plantCultureForm > :is(.form-wide, .plant-notes-field) {
+  min-width: 0;
+}
+body[data-domain] #batchCard .batch-compare-panel,
+body[data-domain] #batchEvents .batch-harvest-entry {
+  min-width: 0;
+  padding: clamp(12px, 2vw, 17px);
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  background: var(--surface-2);
+}
+body[data-domain] #batchCard #batchCompareSelect {
+  min-height: 112px;
+}
+body[data-domain] #batchEvents .batch-harvest-entry {
+  margin-block: 12px;
+}
+body[data-domain] #batchEvents .batch-harvest-entry > div {
+  min-width: 0;
+}
+body[data-domain] #plantCultureForm input[type="number"],
+body[data-domain] #batchCard input[type="number"],
+body[data-domain] #batchEvents input[type="number"] {
+  font-variant-numeric: tabular-nums;
+}
+body[data-domain] #plantCultureForm input[type="checkbox"],
+body[data-domain] #bioOperationForm input[type="checkbox"],
+body[data-domain] #batchCard input[type="checkbox"],
+body[data-domain] #measurementCard input[type="checkbox"] {
+  width: 20px;
+  min-width: 20px;
+  min-height: 20px;
+  accent-color: var(--workspace-accent, var(--brand));
+}
+body[data-domain] :is(#plantCultureForm, #bioOperationForm, #batchCard, #measurementCard, #batchEvents) :is(input, select, textarea)::placeholder {
+  color: var(--muted);
+  opacity: .82;
+}
+html[dir="rtl"] body[data-domain] :is(#plantCultureForm, #bioOperationForm, #batchCard, #measurementCard, #batchEvents) label {
+  text-align: start;
+}
+html[dir="rtl"] body[data-domain] #bioOperationForm .bio-operation-wide {
+  grid-column: 1 / -1;
+}
+@media (max-width: 680px) {
+  body[data-domain] :is(#plantCultureForm, #bioOperationForm, #batchCard, #measurementCard) .grid,
+  body[data-domain] #bioOperationForm {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+  }
+  body[data-domain] #bioOperationForm .bio-operation-wide {
+    grid-column: 1;
+  }
+  body[data-domain] #batchEvents .batch-harvest-entry > div {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+@media (max-width: 420px) {
+  body[data-domain] :is(#plantCultureForm, #bioOperationForm, #batchCard, #measurementCard, #batchEvents) :is(input:not([type="checkbox"]):not([type="radio"]), select, textarea) {
+    font-size: 16px;
+  }
+  body[data-domain] #batchCard #batchCompareSelect {
+    min-height: 140px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  body[data-domain] :is(#plantCultureForm, #bioOperationForm, #batchCard, #measurementCard, #batchEvents) * {
+    scroll-behavior: auto !important;
+    transition-duration: .01ms !important;
+  }
+}
