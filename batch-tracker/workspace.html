@@ -562,6 +562,7 @@
         <div class="grid">
           <div><label for="plantBiologicalAssessmentStart">Début de la fenêtre</label><input id="plantBiologicalAssessmentStart" type="date" required></div>
           <div><label for="plantBiologicalAssessmentEnd">Fin de la fenêtre (exclue)</label><input id="plantBiologicalAssessmentEnd" type="date" required></div>
+          <div class="biological-context-wide"><label for="plantBiologicalAssessmentQcExecution">Contrôle qualité environnemental amont (facultatif)</label><select id="plantBiologicalAssessmentQcExecution"><option value="">Aucun QC amont sélectionné</option></select><small>Seules les exécutions QC terminées de l’organisation active sont proposées. Le serveur vérifie ensuite la localisation et la fenêtre temporelle.</small></div>
         </div>
         <button id="runPlantBiologicalAssessment" type="button" class="secondary-button">Évaluer avec le BIE</button>
         <p id="plantBiologicalAssessmentMessage" class="muted" role="status" aria-live="polite">Le moteur doit être déployé et activé côté serveur pour exécuter cette évaluation.</p>

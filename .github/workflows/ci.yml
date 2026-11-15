@@ -126,6 +126,7 @@ jobs:
           node scripts/test-bal-json-schemas.mjs
           node scripts/test-engine-orchestrator-contract.mjs
           node scripts/test-engine-queue-dispatcher-contract.mjs
+          node scripts/test-engine-response-schema.mjs
           node scripts/test-engine-execution-history-ui.mjs
           node scripts/test-biological-context-assessment-schema.mjs
           node --experimental-strip-types scripts/test-biological-context-snapshot.mjs
@@ -133,6 +134,7 @@ jobs:
           node --experimental-strip-types scripts/test-biological-context-assembly.mjs
           node --experimental-strip-types scripts/test-biological-interpretation-profile.mjs
           node --experimental-strip-types scripts/test-biological-identity-assertions.mjs
+          node --experimental-strip-types scripts/test-biological-reference-assertions.mjs
           node --experimental-strip-types scripts/test-biological-context-loader.mjs
           node scripts/test-environmental-fallback.mjs
           node scripts/test-workspace-scenarios.mjs
@@ -383,3 +385,142 @@ jobs:
           path: artifacts/3d-browser-smoke-preview/
           if-no-files-found: ignore
           retention-days: 14
+  engine-edge-runtime-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      - name: Resolve Edge orchestration module graphs
+        run: >-
+          deno cache
+          supabase/functions/engine-orchestrator/index.ts
+          supabase/functions/engine-queue-dispatch/index.ts
+      - name: Syntax-check local Edge runtime smoke test
+        run: node --check scripts/test-local-engine-edge-runtime.mjs
+      - name: Syntax-check authenticated orchestrator integration test
+        run: node --check scripts/test-local-engine-authenticated-orchestrator.mjs
+      - name: Compile engine JSON contracts with AJV strict mode
+        run: deno run --allow-read scripts/test-engine-ajv-strict.ts
+
+  supabase-local-engine-runtime:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: supabase/setup-cli@v1
+        with:
+          version: 3.0.0
+      - name: Start isolated Supabase stack and apply migrations
+        run: |
+          # Avoid the runner's occasionally preoccupied default local DB port.
+          sed -i 's/^port = 54322$/port = 55432/' supabase/config.toml
+          sed -i 's/^shadow_port = 54320$/shadow_port = 55430/' supabase/config.toml
+          supabase start -x studio,mailpit,storage-api,imgproxy,realtime,logflare,vector,supavisor
+      - name: Verify local migration state
+        run: |
+          supabase migration list
+          # Supabase CLI emits shell-style quoted values; strip the quotes before
+          # writing GitHub environment-file entries so libpq receives a valid URI.
+          while IFS='=' read -r key value; do
+            value="${value%\"}"
+            value="${value#\"}"
+            printf '%s=%s\n' "$key" "$value" >> "$GITHUB_ENV"
+          done < <(supabase status -o env | grep -E '^(ANON_KEY|JWT_SECRET|SERVICE_ROLE_KEY|DB_URL)=')
+      - name: Build and start isolated Python engine worker
+        run: |
+          set -euo pipefail
+          token="ci-worker-token-0123456789abcdef"
+          docker build --pull --build-arg "BA_ENGINE_BUILD_REVISION=${GITHUB_SHA}" -f engines/python/Dockerfile -t ba-labs-engine-worker:runtime-ci .
+          docker network create ba-engine-worker-runtime-net
+          docker run --detach --name ba-engine-worker-runtime-ci \
+            --network ba-engine-worker-runtime-net \
+            --publish 18080:8080 \
+            --env "BA_ENGINE_WORKER_TOKEN=$token" \
+            --read-only --cap-drop=ALL --security-opt=no-new-privileges \
+            --memory=256m --cpus=1 --pids-limit=64 --user=10001:10001 \
+            ba-labs-engine-worker:runtime-ci
+          worker_gateway="$(docker network inspect ba-engine-worker-runtime-net --format '{{(index .IPAM.Config 0).Gateway}}')"
+          if [ -z "$worker_gateway" ]; then
+            echo "Could not resolve Docker bridge gateway" >&2
+            exit 1
+          fi
+          echo "BA_ENGINE_WORKER_GATEWAY=$worker_gateway" >> "$GITHUB_ENV"
+          BA_ENGINE_TEST_PROXY_UPSTREAM="http://${worker_gateway}:18080" node scripts/engine-worker-test-proxy.mjs > /tmp/ba-engine-worker-test-proxy.log 2>&1 &
+          echo $! > /tmp/ba-engine-worker-test-proxy.pid
+          proxy_ready=0
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent http://127.0.0.1:18081/healthz >/dev/null 2>&1; then proxy_ready=1; break; fi
+            if ! kill -0 "$(cat /tmp/ba-engine-worker-test-proxy.pid)" 2>/dev/null; then cat /tmp/ba-engine-worker-test-proxy.log; exit 1; fi
+            sleep 1
+          done
+          if [ "$proxy_ready" != "1" ]; then cat /tmp/ba-engine-worker-test-proxy.log; exit 1; fi
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent http://127.0.0.1:18080/healthz >/dev/null; then exit 0; fi
+            if ! docker inspect -f '{{.State.Running}}' ba-engine-worker-runtime-ci | grep -q true; then
+              docker logs ba-engine-worker-runtime-ci
+              exit 1
+            fi
+            sleep 1
+          done
+          docker logs ba-engine-worker-runtime-ci
+          exit 1
+      - name: Start real Edge Functions runtime
+        run: |
+          cat > /tmp/ba-labs-edge-ci.env <<'EOF'
+          BA_ENGINE_ASYNC_DISPATCH=true
+          BA_BIE_ENABLED=true
+          BA_ENGINE_DISPATCH_TOKEN=ci-dispatch-token-0123456789abcdef
+          BA_ENGINE_WORKER_URL=http://${{ env.BA_ENGINE_WORKER_GATEWAY }}:18081
+          BA_ENGINE_WORKER_TOKEN=ci-worker-token-0123456789abcdef
+          EOF
+          supabase functions serve --no-verify-jwt --env-file /tmp/ba-labs-edge-ci.env > /tmp/ba-labs-edge-runtime.log 2>&1 &
+          echo $! > /tmp/ba-labs-edge-runtime.pid
+          edge_runtime_container=""
+          for attempt in $(seq 1 30); do
+            edge_runtime_container="$(docker ps --format '{{.ID}} {{.Names}} {{.Image}}' | awk 'tolower($0) ~ /edge.runtime/ {print $1; exit}')"
+            if [ -n "$edge_runtime_container" ]; then break; fi
+            sleep 1
+          done
+          if [ -z "$edge_runtime_container" ]; then
+            docker ps --format '{{.ID}} {{.Names}} {{.Image}}'
+            cat /tmp/ba-labs-edge-runtime.log
+            exit 1
+          fi
+          docker network connect ba-engine-worker-runtime-net "$edge_runtime_container"
+          for attempt in $(seq 1 60); do
+            code="$(curl --silent --output /dev/null --write-out '%{http_code}' --request POST http://127.0.0.1:54321/functions/v1/engine-orchestrator --header 'content-type: application/json' --data '{}' || true)"
+            if [ "$code" = "401" ]; then exit 0; fi
+            if ! kill -0 "$(cat /tmp/ba-labs-edge-runtime.pid)" 2>/dev/null; then
+              cat /tmp/ba-labs-edge-runtime.log
+              exit 1
+            fi
+            sleep 2
+          done
+          cat /tmp/ba-labs-edge-runtime.log
+          exit 1
+      - name: Exercise both deployed Edge handlers through Kong
+        env:
+          BA_ENGINE_DISPATCH_TOKEN: ci-dispatch-token-0123456789abcdef
+        run: |
+          node scripts/test-local-engine-edge-runtime.mjs || {
+            cat /tmp/ba-labs-edge-runtime.log
+            exit 1
+          }
+      - name: Exercise authenticated tenant and biological source boundaries
+        env:
+          BA_ENGINE_DISPATCH_TOKEN: ci-dispatch-token-0123456789abcdef
+        run: |
+          node scripts/test-local-engine-authenticated-orchestrator.mjs || {
+            docker logs ba-engine-worker-runtime-ci
+            cat /tmp/ba-engine-worker-test-proxy.log
+            cat /tmp/ba-labs-edge-runtime.log
+            exit 1
+          }
+      - name: Stop local Supabase stack
+        if: always()
+        run: |
+          if [ -f /tmp/ba-engine-worker-test-proxy.pid ]; then kill "$(cat /tmp/ba-engine-worker-test-proxy.pid)" >/dev/null 2>&1 || true; fi
+          docker rm -f ba-engine-worker-runtime-ci >/dev/null 2>&1 || true
+          docker network rm ba-engine-worker-runtime-net >/dev/null 2>&1 || true
+          supabase stop --no-backup

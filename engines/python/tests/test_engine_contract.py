@@ -17,12 +17,12 @@ from ba_engine_contract import (
     execute_registered_engine, validate_request, validate_response,
 )
 from ba_engine_contract.worker import main as worker_main
-from ba_engine_contract.validation import _validator
+from ba_engine_contract.validation import _validator, _stable_sha256
 from ba_engine_contract.registry import load_engine
 from ba_engine_contract.environmental_timeseries_qc import (
     analyze_environmental_timeseries_qc, run_environmental_timeseries_qc,
 )
-from ba_engine_contract.biological_context_features import analyze_biological_context_features, _evaluate_interpretation_rules
+from ba_engine_contract.biological_context_features import analyze_biological_context_features, _evaluate_interpretation_rules, _stable_sha256 as _profile_sha256
 
 ROOT = Path(__file__).resolve().parents[3]
 SCHEMA_DIR = ROOT / "schemas" / "engine" / "v1"
@@ -298,7 +298,193 @@ class EngineContractTests(unittest.TestCase):
         flags = result["result"]["value"]["series"][0]["quality_flags"]
         self.assertIn("sampling_gap_detected", flags)
         self.assertIn("robust_outlier_detected", flags)
+        series = result["result"]["value"]["series"][0]
+        self.assertEqual(len(series["gap_intervals"]), 1)
+        self.assertEqual(series["gap_intervals"][0]["duration_minutes"], 230.0)
+        self.assertEqual(series["gap_intervals"][0]["after_record_id"], request["input"]["record_ids"][1])
+        self.assertEqual(series["gap_intervals"][0]["before_record_id"], request["input"]["record_ids"][2])
+        self.assertEqual(len(series["outlier_evidence"]), 1)
+        self.assertEqual(series["outlier_evidence"][0]["record_id"], request["input"]["record_ids"][3])
+        self.assertEqual(series["outlier_evidence"][0]["threshold"], 3.0)
         self.assertIn("data-quality screening only", result["result"]["limitations"][0])
+
+    def test_environmental_qc_detects_causal_rolling_baseline_anomaly(self):
+        request = json.loads(json.dumps(REQUEST))
+        request["engine"] = {"engine_id": "environmental.timeseries.qc", "engine_version": "0.2.0"}
+        request["input"]["records"] = []
+        request["input"]["record_ids"] = []
+        values = [20.0, 20.1, 19.9, 20.0, 20.1, 30.0]
+        for index, value in enumerate(values):
+            record_id = f"9c2b3a4d-5e6f-4789-8123-456789abcde{index}"
+            request["input"]["record_ids"].append(record_id)
+            request["input"]["records"].append({
+                "record_id": record_id,
+                "record_type": "measurement",
+                "payload_sha256": "c" * 64,
+                "data": {
+                    "variable_code": "temperature",
+                    "normalized_value": value,
+                    "normalized_unit_code": "degC",
+                    "measured_at": f"2026-11-12T08:{index:02d}:00Z"
+                }
+            })
+        request["parameters"] = {
+            "minimum_points": 3,
+            "rolling_baseline_window_points": 5,
+            "rolling_baseline_min_history": 3,
+            "rolling_baseline_mad_threshold": 3.0,
+        }
+        result = run_environmental_timeseries_qc(request)
+        validate_response(result, request)
+        series = result["result"]["value"]["series"][0]
+        self.assertIn("rolling_baseline_anomaly_detected", series["quality_flags"])
+        self.assertEqual(len(series["rolling_baseline_anomaly_evidence"]), 1)
+        evidence = series["rolling_baseline_anomaly_evidence"][0]
+        self.assertEqual(evidence["record_id"], request["input"]["record_ids"][5])
+        self.assertEqual(evidence["baseline_median"], 20.0)
+        self.assertEqual(evidence["history_point_count"], 5)
+        self.assertEqual(
+            evidence["history_record_ids"],
+            request["input"]["record_ids"][:5],
+        )
+        self.assertEqual(evidence["history_start_at"], "2026-11-12T08:00:00Z")
+        self.assertEqual(evidence["history_end_at"], "2026-11-12T08:04:00Z")
+        self.assertEqual(evidence["deviation_from_baseline"], 10.0)
+        self.assertEqual(evidence["method"], "trailing_rolling_median_mad")
+        self.assertIn("no seasonal, diurnal or biological-stage adjustment", result["result"]["limitations"][2])
+
+    def test_environmental_qc_collapses_duplicate_historical_timestamps_without_losing_lineage(self):
+        request = json.loads(json.dumps(REQUEST))
+        request["engine"] = {"engine_id": "environmental.timeseries.qc", "engine_version": "0.2.0"}
+        request["input"]["records"] = []
+        request["input"]["record_ids"] = []
+        observations = [
+            ("2026-11-12T08:00:00Z", 20.0),
+            ("2026-11-12T08:00:00Z", 20.2),
+            ("2026-11-12T08:01:00Z", 20.1),
+            ("2026-11-12T08:02:00Z", 19.9),
+            ("2026-11-12T08:03:00Z", 20.0),
+            ("2026-11-12T08:04:00Z", 20.1),
+            ("2026-11-12T08:05:00Z", 30.0),
+        ]
+        for index, (timestamp, value) in enumerate(observations):
+            record_id = f"7c2b3a4d-5e6f-4789-8123-456789abcde{index}"
+            request["input"]["record_ids"].append(record_id)
+            request["input"]["records"].append({
+                "record_id": record_id,
+                "record_type": "measurement",
+                "payload_sha256": "f" * 64,
+                "data": {
+                    "variable_code": "temperature",
+                    "normalized_value": value,
+                    "normalized_unit_code": "degC",
+                    "measured_at": timestamp,
+                },
+            })
+        request["parameters"] = {
+            "minimum_points": 3,
+            "rolling_baseline_window_points": 5,
+            "rolling_baseline_min_history": 5,
+            "rolling_baseline_mad_threshold": 3.0,
+        }
+
+        result = run_environmental_timeseries_qc(request)
+        series = result["result"]["value"]["series"][0]
+        evidence = next(
+            item for item in series["rolling_baseline_anomaly_evidence"]
+            if item["record_id"] == request["input"]["record_ids"][6]
+        )
+        self.assertEqual(evidence["history_point_count"], 5)
+        self.assertEqual(
+            evidence["history_record_ids"],
+            request["input"]["record_ids"][:6],
+        )
+        self.assertEqual(evidence["baseline_median"], 20.1)
+
+    def test_environmental_qc_does_not_use_duplicate_timestamps_as_rolling_history(self):
+        request = json.loads(json.dumps(REQUEST))
+        request["engine"] = {"engine_id": "environmental.timeseries.qc", "engine_version": "0.2.0"}
+        request["input"]["records"] = []
+        request["input"]["record_ids"] = []
+        observations = [
+            ("2026-11-12T08:00:00Z", 20.0),
+            ("2026-11-12T08:01:00Z", 20.1),
+            ("2026-11-12T08:02:00Z", 19.9),
+            ("2026-11-12T08:03:00Z", 20.0),
+            ("2026-11-12T08:04:00Z", 20.1),
+            ("2026-11-12T08:05:00Z", 30.0),
+            ("2026-11-12T08:05:00Z", 29.9),
+        ]
+        for index, (timestamp, value) in enumerate(observations):
+            record_id = f"8c2b3a4d-5e6f-4789-8123-456789abcde{index}"
+            request["input"]["record_ids"].append(record_id)
+            request["input"]["records"].append({
+                "record_id": record_id,
+                "record_type": "measurement",
+                "payload_sha256": "e" * 64,
+                "data": {
+                    "variable_code": "temperature",
+                    "normalized_value": value,
+                    "normalized_unit_code": "degC",
+                    "measured_at": timestamp,
+                },
+            })
+        request["parameters"] = {
+            "minimum_points": 3,
+            "rolling_baseline_window_points": 5,
+            "rolling_baseline_min_history": 3,
+            "rolling_baseline_mad_threshold": 3.0,
+        }
+
+        result = run_environmental_timeseries_qc(request)
+        series = result["result"]["value"]["series"][0]
+        duplicate_ids = set(request["input"]["record_ids"][-2:])
+        anomaly_ids = {
+            item["record_id"] for item in series["rolling_baseline_anomaly_evidence"]
+        }
+        self.assertTrue(series["duplicate_timestamps"])
+        self.assertTrue(duplicate_ids.isdisjoint(anomaly_ids))
+
+    def test_environmental_qc_duplicate_timestamp_does_not_weight_global_outlier_baseline(self):
+        request = json.loads(json.dumps(REQUEST))
+        request["engine"] = {"engine_id": "environmental.timeseries.qc", "engine_version": "0.2.0"}
+        request["input"]["records"] = []
+        request["input"]["record_ids"] = []
+        observations = [
+            ("2026-11-12T08:00:00Z", 20.0),
+            ("2026-11-12T08:01:00Z", 20.1),
+            ("2026-11-12T08:02:00Z", 19.9),
+            ("2026-11-12T08:03:00Z", 20.0),
+            ("2026-11-12T08:04:00Z", 20.1),
+        ] + [("2026-11-12T08:05:00Z", 100.0)] * 10 + [
+            ("2026-11-12T08:06:00Z", 100.0),
+        ]
+        for index, (timestamp, value) in enumerate(observations):
+            record_id = f"ac2b3a4d-5e6f-4789-8123-{index:012x}"
+            request["input"]["record_ids"].append(record_id)
+            request["input"]["records"].append({
+                "record_id": record_id,
+                "record_type": "measurement",
+                "payload_sha256": "f" * 64,
+                "data": {
+                    "variable_code": "temperature",
+                    "normalized_value": value,
+                    "normalized_unit_code": "degC",
+                    "measured_at": timestamp,
+                },
+            })
+        request["parameters"] = {
+            "minimum_points": 3,
+            "outlier_mad_threshold": 3.0,
+        }
+
+        result = run_environmental_timeseries_qc(request)
+        series = result["result"]["value"]["series"][0]
+        duplicate_ids = set(request["input"]["record_ids"][5:15])
+        outlier_ids = set(series["outlier_record_ids"])
+        self.assertIn(request["input"]["record_ids"][15], outlier_ids)
+        self.assertTrue(duplicate_ids.isdisjoint(outlier_ids))
+        self.assertIn("robust_outlier_detected", series["quality_flags"])
 
     def test_environmental_qc_accepts_location_scoped_environmental_observations(self):
         request = json.loads(json.dumps(REQUEST))
@@ -581,8 +767,43 @@ class EngineContractTests(unittest.TestCase):
                     "normalized_unit_code": "degC",
                     "measured_at": timestamp,
                 },
-                "context": {"culture_id": culture_id},
+                "context": {
+                    "culture_id": culture_id,
+                    **({"event_id": "4c2b3a4d-5e6f-4789-8123-456789abcdef"} if index == 1 else {}),
+                },
             })
+        operational_event_id = "7c2b3a4d-5e6f-4789-8123-456789abcdef"
+        request["input"]["record_ids"].append(operational_event_id)
+        request["input"]["records"].append({
+            "record_id": operational_event_id,
+            "record_type": "event",
+            "payload_sha256": "d" * 64,
+            "data": {
+                "event_type": "fruiting_stage_started",
+                "occurred_at": "2026-11-10T09:15:00Z",
+                "payload": {"stage": "primordia"},
+            },
+            "context": {"culture_id": culture_id},
+        })
+        observation_id = "5c2b3a4d-5e6f-4789-8123-456789abcdef"
+        event_id = "6c2b3a4d-5e6f-4789-8123-456789abcdef"
+        request["input"]["record_ids"].append(observation_id)
+        request["input"]["records"].append({
+            "record_id": observation_id,
+            "record_type": "observation",
+            "payload_sha256": "c" * 64,
+            "data": {
+                "variable_code": "morphology_note",
+                "value_text": "primordia formation observed on the north side",
+                "observed_at": "2026-11-10T09:30:00Z",
+                "quality_state": "valid",
+            },
+            "context": {"culture_id": culture_id, "event_id": event_id},
+        })
+        measurement_record_ids = [
+            row["record_id"] for row in request["input"]["records"]
+            if row["record_type"] == "measurement"
+        ]
         result = execute_registered_engine(request)
         self.assertEqual(result["status"], "completed", msg=str(result.get("error")))
         value = result["result"]["value"]
@@ -590,18 +811,141 @@ class EngineContractTests(unittest.TestCase):
         Draft202012Validator(biological_schema, format_checker=FormatChecker()).validate(value)
         self.assertEqual(value["subject"]["subject_type"], "culture")
         self.assertEqual(value["subject"]["subject_id"], culture_id)
-        self.assertEqual(value["coverage"]["source_record_count"], 3)
+        self.assertEqual(value["coverage"]["source_record_count"], 5)
         self.assertEqual(value["coverage"]["record_counts_by_type"]["measurement"], 3)
-        self.assertEqual(len(value["derived_features"]), 4)
+        self.assertEqual(value["coverage"]["record_counts_by_type"]["observation"], 1)
+        self.assertEqual(value["coverage"]["record_counts_by_type"]["event"], 1)
+        fact_times = [item["observed_at"] for item in value["observed_facts"]]
+        self.assertEqual(fact_times, sorted(fact_times))
+        self.assertTrue(value["coverage"]["observed_window"]["start"] <= "2026-11-10T09:15:00Z")
+        event_fact = next(item for item in value["observed_facts"] if item["fact_code"] == "event.fruiting_stage_started")
+        self.assertEqual(event_fact["event_id"], operational_event_id)
+        self.assertEqual(event_fact["value"]["stage"], "primordia")
+        morphology_fact = next(item for item in value["observed_facts"] if item["fact_code"] == "observation.morphology_note")
+        self.assertIn("primordia formation", morphology_fact["statement"])
+        self.assertEqual(morphology_fact["event_id"], event_id)
+        self.assertEqual(morphology_fact["source_record_ids"], [observation_id])
+        event_fact = next(item for item in value["observed_facts"] if item["observed_at"] == "2026-11-10T09:00:00Z")
+        self.assertEqual(event_fact["event_id"], "4c2b3a4d-5e6f-4789-8123-456789abcdef")
+        self.assertNotIn("event_id", value["observed_facts"][0],
+            "event linkage remains absent rather than inferred when no event anchor was supplied")
+        self.assertEqual(len(value["derived_features"]), 8)
+        dispersion = next(item for item in value["derived_features"] if item["feature_code"] == "series.measurement.air_temperature.population_stddev")
+        self.assertAlmostEqual(dispersion["value"], (2 / 3) ** 0.5, places=8)
+        self.assertEqual(dispersion["unit_code"], "degC")
+        self.assertEqual(set(dispersion["source_record_ids"]), set(measurement_record_ids))
+        coefficient = next(item for item in value["derived_features"] if item["feature_code"] == "series.measurement.air_temperature.coefficient_of_variation_pct")
+        self.assertAlmostEqual(coefficient["value"], (((2 / 3) ** 0.5) / 22.0) * 100, places=8)
+        self.assertEqual(coefficient["unit_code"], "percent")
+        self.assertEqual(set(coefficient["source_record_ids"]), set(measurement_record_ids))
+        amplitude = next(item for item in value["derived_features"] if item["feature_code"] == "series.measurement.air_temperature.range")
+        self.assertEqual(amplitude["value"], 2.0)
+        self.assertEqual(amplitude["unit_code"], "degC")
+        self.assertEqual(set(amplitude["source_record_ids"]), set(measurement_record_ids))
+        trend = next(item for item in value["derived_features"] if item["feature_code"] == "series.measurement.air_temperature.trend_slope_per_day")
+        self.assertAlmostEqual(trend["value"], 12.0)
+        self.assertEqual(trend["unit_code"], "degC/day")
+        self.assertEqual(set(trend["source_record_ids"]), set(measurement_record_ids))
         feature = next(item for item in value["derived_features"] if item["feature_code"] == "series.measurement.air_temperature.mean")
         self.assertEqual(feature["feature_code"], "series.measurement.air_temperature.mean")
         self.assertEqual(feature["value"], 22.0)
         self.assertEqual(feature["unit_code"], "degC")
-        self.assertEqual(set(feature["source_record_ids"]), set(request["input"]["record_ids"]))
+        self.assertEqual(set(feature["source_record_ids"]), set(measurement_record_ids))
         self.assertEqual(value["findings"], [])
         self.assertEqual(value["hypotheses"], [])
         self.assertIn("biological_interpretation_not_performed", result["result"]["quality_flags"])
 
+
+    def test_biological_context_features_detects_traceable_two_segment_mean_shift(self):
+        request = json.loads(json.dumps(REQUEST))
+        request["engine"] = {
+            "engine_id": "biological.context.features",
+            "engine_version": "0.1.0",
+        }
+        culture_id = "2c2b3a4d-5e6f-4789-8123-456789abcdef"
+        request["scope"] = {
+            "organization_id": REQUEST["scope"]["organization_id"],
+            "culture_id": culture_id,
+        }
+        request["parameters"] = {
+            "window_start": "2026-11-10T00:00:00Z",
+            "window_end": "2026-11-11T00:00:00Z",
+            "timezone": "Africa/Algiers",
+        }
+        request["input"]["record_ids"] = []
+        request["input"]["records"] = []
+        values = [20.0, 20.5, 19.5, 25.0, 25.5, 24.5]
+        for index, value in enumerate(values):
+            record_id = f"4c2b3a4d-5e6f-4789-8123-456789abcde{index}"
+            request["input"]["record_ids"].append(record_id)
+            request["input"]["records"].append({
+                "record_id": record_id,
+                "record_type": "measurement",
+                "payload_sha256": "c" * 64,
+                "data": {
+                    "variable_code": "air_temperature",
+                    "normalized_value": value,
+                    "normalized_unit_code": "degC",
+                    "measured_at": f"2026-11-10T{8 + index:02d}:00:00Z",
+                },
+                "context": {"culture_id": culture_id},
+            })
+        result = execute_registered_engine(request)
+        self.assertEqual(result["status"], "completed", msg=str(result.get("error")))
+        assessment = result["result"]["value"]
+        schema = json.loads((ROOT / "schemas" / "biological" / "v1" / "context-assessment.schema.json").read_text(encoding="utf-8"))
+        Draft202012Validator(schema, format_checker=FormatChecker()).validate(assessment)
+        shift = next(
+            item for item in assessment["derived_features"]
+            if item["feature_code"] == "series.measurement.air_temperature.largest_two_segment_mean_shift"
+        )
+        self.assertAlmostEqual(shift["value"], 5.0)
+        self.assertEqual(shift["unit_code"], "degC")
+        self.assertIn("split_at=2026-11-10T11:00:00Z", shift["method"])
+        self.assertIn("direction=up", shift["method"])
+        self.assertEqual(set(shift["source_record_ids"]), set(request["input"]["record_ids"]))
+        self.assertEqual(assessment["findings"], [])
+        self.assertEqual(assessment["hypotheses"], [])
+
+    def test_biological_context_features_does_not_emit_two_segment_shift_below_minimum_sample_size(self):
+        request = json.loads(json.dumps(REQUEST))
+        request["engine"] = {
+            "engine_id": "biological.context.features",
+            "engine_version": "0.1.0",
+        }
+        culture_id = "2c2b3a4d-5e6f-4789-8123-456789abcdef"
+        request["scope"] = {
+            "organization_id": REQUEST["scope"]["organization_id"],
+            "culture_id": culture_id,
+        }
+        request["parameters"] = {
+            "window_start": "2026-11-10T00:00:00Z",
+            "window_end": "2026-11-11T00:00:00Z",
+            "timezone": "Africa/Algiers",
+        }
+        request["input"]["record_ids"] = []
+        request["input"]["records"] = []
+        for index, value in enumerate([20.0, 20.5, 25.0, 25.5, 24.5]):
+            record_id = f"5c2b3a4d-5e6f-4789-8123-456789abcde{index}"
+            request["input"]["record_ids"].append(record_id)
+            request["input"]["records"].append({
+                "record_id": record_id,
+                "record_type": "measurement",
+                "payload_sha256": "c" * 64,
+                "data": {
+                    "variable_code": "air_temperature",
+                    "normalized_value": value,
+                    "normalized_unit_code": "degC",
+                    "measured_at": f"2026-11-10T{8 + index:02d}:00:00Z",
+                },
+                "context": {"culture_id": culture_id},
+            })
+        result = execute_registered_engine(request)
+        self.assertEqual(result["status"], "completed", msg=str(result.get("error")))
+        self.assertFalse(any(
+            item["feature_code"] == "series.measurement.air_temperature.largest_two_segment_mean_shift"
+            for item in result["result"]["value"]["derived_features"]
+        ))
 
     def test_biological_context_features_emits_limited_findings_for_scoped_versioned_rules(self):
         request = json.loads(json.dumps(REQUEST))
@@ -668,11 +1012,20 @@ class EngineContractTests(unittest.TestCase):
             "content_sha256": "d" * 64,
             "retrieved_at": "2026-11-10T07:55:00Z",
         })
+        profile_id = "mycology.pleurotus.fruiting"
+        profile_version = "1.0.0"
+        profile_content = {
+            "profile_id": profile_id,
+            "profile_version": profile_version,
+            "rules": request["parameters"]["interpretation_rules"],
+        }
         request["datasets"].append({
             "provider": "BA_LABS_INTERPRETATION_PROFILE",
             "dataset_id": "biological.context.features",
             "dataset_version": "1.0.0",
-            "content_sha256": "e" * 64,
+            "profile_id": profile_id,
+            "profile_version": profile_version,
+            "content_sha256": _profile_sha256(profile_content),
             "retrieved_at": "2026-11-10T07:55:00Z",
         })
         missing_registry = json.loads(json.dumps(request))
@@ -696,6 +1049,20 @@ class EngineContractTests(unittest.TestCase):
              if dataset["provider"] == "BA_LABS_INTERPRETATION_PROFILE")["dataset_id"] = "untrusted.profile"
         with self.assertRaisesRegex(ValueError, "invalid_interpretation_profile_manifest"):
             analyze_biological_context_features(invalid_profile_manifest)
+
+        missing_profile_identity = json.loads(json.dumps(request))
+        profile_dataset = next(
+            dataset for dataset in missing_profile_identity["datasets"]
+            if dataset["provider"] == "BA_LABS_INTERPRETATION_PROFILE"
+        )
+        del profile_dataset["profile_id"]
+        with self.assertRaisesRegex(ValueError, "request.schema.json validation failed"):
+            analyze_biological_context_features(missing_profile_identity)
+
+        tampered_profile = json.loads(json.dumps(request))
+        tampered_profile["parameters"]["interpretation_rules"][0]["threshold"] = 25.0
+        with self.assertRaisesRegex(ValueError, "interpretation_profile_content_hash_mismatch"):
+            analyze_biological_context_features(tampered_profile)
 
         request["input"]["record_ids"] = []
         request["input"]["records"] = []
@@ -729,7 +1096,15 @@ class EngineContractTests(unittest.TestCase):
         self.assertIn("rule_version=1.0.0", finding["statement"])
         self.assertIn("reference=ba-labs.protocols.pleurotus-fruiting@2026.1", finding["statement"])
         self.assertIn("BA_LABS_RULE_REGISTRY/ba-labs.protocols.pleurotus-fruiting@2026.1#sha256=" + ("d" * 64), result["result"]["provenance"]["source_references"])
-        self.assertIn("BA_LABS_INTERPRETATION_PROFILE/biological.context.features@1.0.0#sha256=" + ("e" * 64), result["result"]["provenance"]["source_references"])
+        self.assertIn(
+            "BA_LABS_INTERPRETATION_PROFILE/mycology.pleurotus.fruiting@1.0.0#sha256="
+            + _profile_sha256({
+                "profile_id": profile_id,
+                "profile_version": profile_version,
+                "rules": request["parameters"]["interpretation_rules"],
+            }),
+            result["result"]["provenance"]["source_references"],
+        )
         # A worker request cannot activate a profile's rules while claiming
         # that the biological context was unstable for the requested window.
         unstable_profile = json.loads(json.dumps(request))
@@ -1174,6 +1549,210 @@ class EngineContractTests(unittest.TestCase):
         self.assertEqual(tampered["error"]["code"], "engine_execution_failed")
 
 
+    def test_biological_context_features_validates_reference_assertions_and_applicability(self):
+        request = json.loads(json.dumps(REQUEST))
+        request["engine"] = {
+            "engine_id": "biological.context.features",
+            "engine_version": "0.2.0",
+        }
+        request["scope"] = {
+            "organization_id": REQUEST["scope"]["organization_id"],
+            "culture_id": "2c2b3a4d-5e6f-4789-8123-456789abcdef",
+        }
+        context = {
+            "context_id": "5c2b3a4d-5e6f-4789-8123-456789abcdef",
+            "valid_from": "2026-11-01",
+            "valid_to": None,
+            "organism_kind": "fungus",
+            "taxon_code": "NCBI:pleurotus_ostreatus",
+            "strain_code": "P80",
+            "cultivar_code": None,
+            "culture_stage": "fruiting",
+            "substrate_code": "wheat_straw",
+            "production_system": "bucket",
+            "context_tags": [],
+            "genetic_reference": {
+                "status": "not_specified", "strain_id": None, "organism_id": None,
+                "designation": None, "origin": None, "source_description": None,
+                "scientific_name": None, "common_name": None, "taxonomy_source": None,
+                "taxonomy_id": None,
+            },
+        }
+        source = {
+            "reference_id": "ba-labs.synthetic.reference",
+            "reference_version": "1.0.0",
+            "content_sha256": "a" * 64,
+            "reviewed_at": "2026-11-01T00:00:00Z",
+        }
+        assertion_payload = {
+            "assertion_code": "pleurotus.ostreatus.substrate.reported",
+            "assertion_version": "1.0.0",
+            "subject_type": "taxon",
+            "subject_ref": context["taxon_code"],
+            "predicate_code": "substrate.association",
+            "object_value": {"substrate": "wheat_straw", "relation": "reported"},
+            "unit_code": None,
+            "reference_registry_id": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb",
+            "source_locator": "section-4",
+            "evidence_level": "L0",
+            "applicability": {"context_match": {"organism_kind": "fungus", "culture_stage": "fruiting"}},
+            "uncertainty": {"assessment": "not_assessed"},
+            "source": source,
+            "reviewed_at": "2026-11-02T00:00:00Z",
+        }
+        assertion = {
+            **assertion_payload,
+            "content_sha256": _stable_sha256(assertion_payload),
+        }
+        request["parameters"] = {
+            "window_start": "2026-11-10T00:00:00Z",
+            "window_end": "2026-11-11T00:00:00Z",
+            "timezone": "Africa/Algiers",
+            "biological_contexts": [context],
+            "biological_reference_assertion_state": "documented",
+            "biological_reference_assertions": [assertion],
+        }
+        request["datasets"] = [{
+            "provider": "BA_LABS_BIOLOGICAL_REFERENCE_ASSERTION",
+            "dataset_id": assertion["assertion_code"],
+            "dataset_version": assertion["assertion_version"],
+            "content_sha256": assertion["content_sha256"],
+            "retrieved_at": assertion["reviewed_at"],
+        }]
+        request["input"]["record_ids"] = []
+        request["input"]["records"] = []
+
+        result = execute_registered_engine(request)
+        self.assertEqual(result["status"], "completed", msg=str(result.get("error")))
+        value = result["result"]["value"]
+        self.assertEqual(value["subject"]["biological_reference_assertion_state"], "documented")
+        resolved = value["subject"]["biological_reference_assertions"]
+        self.assertEqual(len(resolved), 1)
+        self.assertEqual(resolved[0]["applicability_state"], "matched")
+        self.assertEqual(resolved[0]["temporal_applicability_state"], "not_scoped")
+        self.assertEqual(resolved[0]["matching_context_ids"], [context["context_id"]])
+        self.assertEqual(resolved[0]["source"]["content_sha256"], source["content_sha256"])
+
+        temporal_request = json.loads(json.dumps(request))
+        temporal_assertion = temporal_request["parameters"]["biological_reference_assertions"][0]
+        temporal_assertion["applicability"]["validity_window"] = {
+            "valid_from": "2026-11-05",
+            "valid_to": "2026-11-20",
+        }
+        temporal_payload = {key: val for key, val in temporal_assertion.items() if key != "content_sha256"}
+        temporal_assertion["content_sha256"] = _stable_sha256(temporal_payload)
+        temporal_request["datasets"][0]["content_sha256"] = temporal_assertion["content_sha256"]
+        temporal_result = execute_registered_engine(temporal_request)
+        self.assertEqual(temporal_result["status"], "completed", msg=str(temporal_result.get("error")))
+        temporal_resolved = temporal_result["result"]["value"]["subject"]["biological_reference_assertions"][0]
+        self.assertEqual(temporal_resolved["temporal_applicability_state"], "matched")
+        self.assertEqual(temporal_resolved["applicability_state"], "matched")
+
+        temporal_only_request = json.loads(json.dumps(temporal_request))
+        temporal_only = temporal_only_request["parameters"]["biological_reference_assertions"][0]
+        temporal_only["applicability"].pop("context_match")
+        temporal_only_payload = {key: val for key, val in temporal_only.items() if key != "content_sha256"}
+        temporal_only["content_sha256"] = _stable_sha256(temporal_only_payload)
+        temporal_only_request["datasets"][0]["content_sha256"] = temporal_only["content_sha256"]
+        temporal_only_result = execute_registered_engine(temporal_only_request)
+        self.assertEqual(temporal_only_result["status"], "completed", msg=str(temporal_only_result.get("error")))
+        temporal_only_resolved = temporal_only_result["result"]["value"]["subject"]["biological_reference_assertions"][0]
+        self.assertEqual(temporal_only_resolved["temporal_applicability_state"], "matched")
+        self.assertEqual(temporal_only_resolved["applicability_state"], "matched")
+        self.assertEqual(temporal_only_resolved["matching_context_ids"], [context["context_id"]])
+
+        expired_request = json.loads(json.dumps(temporal_request))
+        expired_request["parameters"]["biological_contexts"][0]["valid_from"] = "2026-11-21"
+        expired = execute_registered_engine(expired_request)
+        self.assertEqual(expired["status"], "completed", msg=str(expired.get("error")))
+        expired_resolved = expired["result"]["value"]["subject"]["biological_reference_assertions"][0]
+        self.assertEqual(expired_resolved["temporal_applicability_state"], "not_applicable")
+        self.assertEqual(expired_resolved["applicability_state"], "not_applicable")
+        self.assertIn("biological_reference_assertions_present", result["result"]["quality_flags"])
+        self.assertTrue(any(
+            item.startswith("BA_LABS_BIOLOGICAL_REFERENCE_ASSERTION/pleurotus.ostreatus.substrate.reported@1.0.0#sha256=")
+            for item in result["result"]["provenance"]["source_references"]
+        ))
+        biological_schema = json.loads((ROOT / "schemas" / "biological" / "v1" / "context-assessment.schema.json").read_text(encoding="utf-8"))
+        validator(biological_schema).validate(value)
+
+        not_applicable_request = json.loads(json.dumps(request))
+        not_applicable_request["parameters"]["biological_reference_assertions"][0]["applicability"]["context_match"]["culture_stage"] = "vegetative"
+        changed_payload = {
+            key: val for key, val in not_applicable_request["parameters"]["biological_reference_assertions"][0].items()
+            if key != "content_sha256"
+        }
+        changed_payload["content_sha256"] = _stable_sha256(changed_payload)
+        not_applicable_request["parameters"]["biological_reference_assertions"][0] = changed_payload
+        not_applicable_request["datasets"][0]["content_sha256"] = changed_payload["content_sha256"]
+        not_applicable = execute_registered_engine(not_applicable_request)
+        self.assertEqual(not_applicable["status"], "completed", msg=str(not_applicable.get("error")))
+        self.assertEqual(
+            not_applicable["result"]["value"]["subject"]["biological_reference_assertions"][0]["applicability_state"],
+            "not_applicable",
+        )
+
+        conflicting_request = json.loads(json.dumps(request))
+        second_payload = dict(assertion_payload)
+        second_payload["assertion_code"] = "pleurotus.ostreatus.substrate.alternative"
+        second_payload["object_value"] = {"substrate": "coffee_waste", "relation": "reported"}
+        second = {**second_payload, "content_sha256": _stable_sha256(second_payload)}
+        conflicting_request["parameters"]["biological_reference_assertion_state"] = "conflicting"
+        conflicting_request["parameters"]["biological_reference_assertions"].append(second)
+        conflicting_request["datasets"].append({
+            "provider": "BA_LABS_BIOLOGICAL_REFERENCE_ASSERTION",
+            "dataset_id": second["assertion_code"],
+            "dataset_version": second["assertion_version"],
+            "content_sha256": second["content_sha256"],
+            "retrieved_at": second["reviewed_at"],
+        })
+        conflicting = execute_registered_engine(conflicting_request)
+        self.assertEqual(conflicting["status"], "completed", msg=str(conflicting.get("error")))
+        self.assertEqual(conflicting["result"]["value"]["subject"]["biological_reference_assertion_state"], "conflicting")
+        self.assertIn("biological_reference_assertions_conflict", conflicting["result"]["quality_flags"])
+
+        non_overlapping_request = json.loads(json.dumps(request))
+        first = non_overlapping_request["parameters"]["biological_reference_assertions"][0]
+        first["applicability"]["validity_window"] = {
+            "valid_from": "2026-11-01", "valid_to": "2026-11-15",
+        }
+        first_payload = {key: val for key, val in first.items() if key != "content_sha256"}
+        first["content_sha256"] = _stable_sha256(first_payload)
+        second_non_overlapping = dict(second_payload)
+        second_non_overlapping["applicability"] = {
+            "context_match": {"organism_kind": "fungus", "culture_stage": "fruiting"},
+            "validity_window": {"valid_from": "2026-11-15", "valid_to": "2026-12-01"},
+        }
+        second_non_overlapping["content_sha256"] = _stable_sha256(second_non_overlapping)
+        non_overlapping_request["parameters"]["biological_reference_assertions"] = [
+            first, second_non_overlapping,
+        ]
+        non_overlapping_request["parameters"]["biological_reference_assertion_state"] = "documented"
+        non_overlapping_request["datasets"] = [
+            {
+                "provider": "BA_LABS_BIOLOGICAL_REFERENCE_ASSERTION",
+                "dataset_id": item["assertion_code"],
+                "dataset_version": item["assertion_version"],
+                "content_sha256": item["content_sha256"],
+                "retrieved_at": item["reviewed_at"],
+            }
+            for item in (first, second_non_overlapping)
+        ]
+        non_overlapping = execute_registered_engine(non_overlapping_request)
+        self.assertEqual(non_overlapping["status"], "completed", msg=str(non_overlapping.get("error")))
+        self.assertEqual(
+            non_overlapping["result"]["value"]["subject"]["biological_reference_assertion_state"],
+            "documented",
+        )
+        self.assertNotIn("biological_reference_assertions_conflict", non_overlapping["result"]["quality_flags"])
+
+        tampered_request = json.loads(json.dumps(request))
+        tampered_request["parameters"]["biological_reference_assertions"][0]["source"]["content_sha256"] = "c" * 64
+        tampered = execute_registered_engine(tampered_request)
+        self.assertEqual(tampered["status"], "failed")
+        self.assertEqual(tampered["error"]["code"], "engine_execution_failed")
+
+
     def test_identity_scoped_interpretation_rule_requires_validated_identity(self):
         rule = {
             "rule_id": "strain-specific-humidity",
@@ -1191,12 +1770,20 @@ class EngineContractTests(unittest.TestCase):
                 "assertion_value": "HK35",
             },
         }
+        profile_id = "mycology.strain.humidity"
+        profile_version = "1.0.0"
         datasets = [
             {
                 "provider": "BA_LABS_INTERPRETATION_PROFILE",
                 "dataset_id": "biological.context.features",
                 "dataset_version": "1.0.0",
-                "content_sha256": "a" * 64,
+                "profile_id": profile_id,
+                "profile_version": profile_version,
+                "content_sha256": _profile_sha256({
+                    "profile_id": profile_id,
+                    "profile_version": profile_version,
+                    "rules": [rule],
+                }),
             },
             {
                 "provider": "BA_LABS_RULE_REGISTRY",
@@ -1272,6 +1859,119 @@ class EngineContractTests(unittest.TestCase):
             [rule], split_contexts, features, datasets, "documented", assertions
         )
         self.assertEqual(split_context_result, [])
+
+
+    def test_bie_consumes_verified_environmental_qc_artifact_without_dropping_flags(self):
+        request = json.loads(json.dumps(REQUEST))
+        request["engine"] = {
+            "engine_id": "biological.context.features",
+            "engine_version": "0.2.0",
+        }
+        location_id = "eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee"
+        request["scope"] = {
+            "organization_id": REQUEST["scope"]["organization_id"],
+            "culture_id": "2c2b3a4d-5e6f-4789-8123-456789abcdef",
+            "location_id": location_id,
+        }
+        request["parameters"] = {
+            "window_start": "2026-11-10T00:00:00Z",
+            "window_end": "2026-11-11T00:00:00Z",
+            "timezone": "Africa/Algiers",
+            "environment_link_state": "resolved",
+        }
+        request["input"]["record_ids"] = []
+        request["input"]["records"] = []
+        qc_value = {
+            "series": [{
+                "variable_code": "air_temperature",
+                "outlier_record_ids": ["3c2b3a4d-5e6f-4789-8123-456789abcdef"],
+            }],
+            "review_summary": {"outlier_count": 1, "mean_temperature_c": 22.0},
+        }
+        artifact = {
+            "contract": "BA-LABS/UPSTREAM-ENGINE-ARTIFACT",
+            "contract_version": "1.0.0",
+            "role": "environmental_qc",
+            "execution_id": "cccccccc-cccc-4ccc-8ccc-cccccccccccc",
+            "result_id": "dddddddd-dddd-4ddd-8ddd-dddddddddddd",
+            "request_id": "11111111-1111-4111-8111-111111111111",
+            "engine_id": "environmental.timeseries.qc",
+            "engine_version": "0.2.0",
+            "completed_at": "2026-11-11T00:00:00Z",
+            "input_snapshot_sha256": "a" * 64,
+            "scope": {
+                "organization_id": request["scope"]["organization_id"],
+                "location_id": location_id,
+                "window_start": request["parameters"]["window_start"],
+                "window_end": request["parameters"]["window_end"],
+            },
+            "result": {
+                "outcome": "success",
+                "value": qc_value,
+                "limitations": ["Statistical flags require review."],
+                "quality_flags": ["outlier_detected"],
+                "provenance": {"algorithm": "environmental-timeseries-qc-v2"},
+            },
+        }
+        artifact["artifact_sha256"] = _stable_sha256(artifact)
+        request["upstream_artifacts"] = [artifact]
+
+        result = execute_registered_engine(request)
+        self.assertEqual(result["status"], "completed", msg=str(result.get("error")))
+        value = result["result"]["value"]
+        qc = value["environmental_quality_control"]
+        self.assertEqual(qc["state"], "review_required")
+        self.assertEqual(qc["upstream_execution_id"], artifact["execution_id"])
+        self.assertEqual(qc["upstream_result_id"], artifact["result_id"])
+        self.assertEqual(qc["upstream_engine_id"], artifact["engine_id"])
+        self.assertEqual(qc["upstream_engine_version"], artifact["engine_version"])
+        self.assertEqual(qc["upstream_completed_at"], artifact["completed_at"])
+        self.assertEqual(qc["upstream_input_snapshot_sha256"], artifact["input_snapshot_sha256"])
+        self.assertEqual(qc["upstream_scope"], artifact["scope"])
+        self.assertEqual(qc["artifact_sha256"], artifact["artifact_sha256"])
+        self.assertEqual(qc["quality_flags"], ["outlier_detected"])
+        self.assertEqual(qc["provenance"], artifact["result"]["provenance"])
+        self.assertEqual(qc["value"], qc_value)
+        self.assertIn("environmental_qc_review_required", result["result"]["quality_flags"])
+        self.assertTrue(any(
+            source.startswith("BA_LABS_ENGINE_RESULT/environmental.timeseries.qc@0.2.0#execution=")
+            for source in result["result"]["provenance"]["source_references"]
+        ))
+        biological_schema = json.loads(
+            (ROOT / "schemas" / "biological" / "v1" / "context-assessment.schema.json").read_text(encoding="utf-8")
+        )
+        Draft202012Validator(biological_schema, format_checker=FormatChecker()).validate(value)
+
+        tampered = json.loads(json.dumps(request))
+        tampered["upstream_artifacts"][0]["result"]["quality_flags"] = []
+        with self.assertRaisesRegex(ContractValidationError, "artifact digest mismatch"):
+            validate_request(tampered)
+
+        # The digest binds the entire immutable upstream envelope, not only
+        # its scientific result payload. Keep each mutation schema-valid so
+        # validation reaches the digest-integrity check.
+        mutations = [
+            (lambda item: item.update(execution_id="aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa"), "upstream artifact digest mismatch"),
+            (lambda item: item.update(result_id="bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb"), "upstream artifact digest mismatch"),
+            (lambda item: item.update(request_id="22222222-2222-4222-8222-222222222222"), "upstream artifact digest mismatch"),
+            (lambda item: item.update(engine_id="environmental.timeseries.other"), "request.schema.json validation failed"),
+            (lambda item: item.update(engine_version="0.3.0"), "request.schema.json validation failed"),
+            (lambda item: item.update(completed_at="2026-11-11T00:01:00Z"), "upstream artifact digest mismatch"),
+            (lambda item: item.update(input_snapshot_sha256="b" * 64), "upstream artifact digest mismatch"),
+            (lambda item: item["scope"].update(location_id="ffffffff-ffff-4fff-8fff-ffffffffffff"), "upstream artifact scope or analysis window mismatch"),
+            (lambda item: item["scope"].update(window_start="2026-11-09T00:00:00Z"), "upstream artifact scope or analysis window mismatch"),
+            (lambda item: item["result"].update(outcome="review_required"), "upstream artifact digest mismatch"),
+            (lambda item: item["result"].update(limitations=["Different limitation."]), "upstream artifact digest mismatch"),
+            (lambda item: item["result"].update(provenance={"algorithm": "tampered"}), "upstream artifact digest mismatch"),
+            (lambda item: item["result"]["value"]["review_summary"].update(outlier_count=2), "upstream artifact digest mismatch"),
+        ]
+        for mutate, expected_error in mutations:
+            with self.subTest(expected_error=expected_error):
+                altered = json.loads(json.dumps(request))
+                mutate(altered["upstream_artifacts"][0])
+                with self.assertRaisesRegex(ContractValidationError, expected_error):
+                    validate_request(altered)
+
 
 
 

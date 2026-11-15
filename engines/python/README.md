@@ -25,6 +25,16 @@ A Python engine is a stateless compute worker. It receives only the authorized i
 The `execute_engine` wrapper binds execution to the registered engine ID/version, builds a completed or typed-failure envelope, and validates the response before returning it. It deliberately does not pretend to enforce hard process timeouts: the deployment/orchestrator must terminate workers that exceed their wall-clock or resource budget.\n\nEngine-specific algorithms belong in separate modules/packages. They must not make one engine a mandatory dependency of another.
 
 
+## Biological reference assertions
+
+The authenticated Edge resolver supplies only organization-scoped assertions with status `validated`, each linked to a validated source record in the same organization. Draft and retired assertions are not part of the BIE request.
+
+The Python engine independently verifies each assertion's versioned dataset manifest and SHA-256 digest. The digest binds the claim payload, linked source identifier/version/digest/review timestamp, and assertion review timestamp. The result retains the evidence level, source locator, applicability, uncertainty, and source lineage.
+
+Applicability is marked `matched` only when an explicit `applicability.context_match` exactly matches fields present in a dated biological context. It is `not_applicable` only when the compared context fields are known and do not match; missing context evidence yields `undetermined`. Assertions without an explicit context matcher remain `not_assessed`. Other applicability metadata is preserved without inventing semantics.
+
+Conflicting values for the same subject and predicate are surfaced as a conflict for review. Reference assertions are descriptive evidence: they do not independently trigger threshold findings, diagnoses, or intervention recommendations. Only separately reviewed, versioned interpretation rules can generate limited threshold findings.
+
 ## HTTP worker container
 
 Build from the repository root so the versioned engine schemas are included:

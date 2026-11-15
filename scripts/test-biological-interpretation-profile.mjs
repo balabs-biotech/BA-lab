@@ -1,8 +1,26 @@
 import assert from "node:assert/strict";
+import { createHash } from "node:crypto";
 import {
   buildBiologicalInterpretationProfile,
   loadAuthenticatedBiologicalInterpretationProfile,
 } from "../supabase/functions/_shared/biological-interpretation-profile.ts";
+
+function stable(value) {
+  if (Array.isArray(value)) return "[" + value.map(stable).join(",") + "]";
+  if (value && typeof value === "object") {
+    return "{" + Object.keys(value).sort().map((key) =>
+      JSON.stringify(key) + ":" + stable(value[key])
+    ).join(",") + "}";
+  }
+  return JSON.stringify(value);
+}
+function profileDigest(profileId, profileVersion, rules) {
+  return createHash("sha256").update(stable({
+    profile_id: profileId,
+    profile_version: profileVersion,
+    rules,
+  })).digest("hex");
+}
 
 const organizationId = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa";
 const rule = {
@@ -27,6 +45,11 @@ const profile = {
   profile_code: "biological.context.features",
   profile_version: "1.0.0",
   rules: [rule],
+  content_sha256: profileDigest(
+    "mycology.biological.context.features",
+    "1.0.0",
+    [rule],
+  ),
   status: "active",
   valid_from: "2026-01-01",
   valid_to: null,
@@ -102,6 +125,10 @@ assert.equal(resolved.profile.profile_version, "1.0.0");
 assert.deepEqual(resolved.rules, [rule]);
 assert.equal(resolved.datasets.length, 2);
 assert.equal(resolved.datasets[0].provider, "BA_LABS_INTERPRETATION_PROFILE");
+assert.equal(resolved.datasets[0].dataset_id, "biological.context.features");
+assert.equal(resolved.datasets[0].profile_id, "mycology.biological.context.features");
+assert.equal(resolved.datasets[0].profile_version, "1.0.0");
+assert.equal(resolved.datasets[0].content_sha256, profile.content_sha256);
 assert.equal(resolved.datasets[1].provider, "BA_LABS_RULE_REGISTRY");
 assert.equal(resolved.datasets[1].content_sha256, "d".repeat(64));
 assert.equal(resolved.datasets[1].uri, "https://example.org/pleurotus-protocol");
@@ -147,6 +174,23 @@ assert.ok(queryLog.some((entry) =>
   entry[1] === "eq" && entry[2] === "status" && entry[3] === "validated"
 ));
 
+await assert.rejects(
+  buildBiologicalInterpretationProfile({
+    ...input,
+    profiles: [{ ...profile, content_sha256: "f".repeat(64) }],
+  }),
+  /interpretation_profile_content_hash_mismatch/,
+);
+
+const legacyProfile = await buildBiologicalInterpretationProfile({
+  ...input,
+  profiles: [{ ...profile, content_sha256: null }],
+});
+assert.equal(
+  legacyProfile.datasets[0].content_sha256,
+  profileDigest("mycology.biological.context.features", "1.0.0", [rule]),
+);
+
 const missingReference = await assert.rejects(
   buildBiologicalInterpretationProfile({ ...input, references: [] }),
   /interpretation_reference_not_validated/,
@@ -167,33 +211,45 @@ await assert.rejects(
   /active_interpretation_profile_ambiguous/,
 );
 
+const unsupportedRules = [{ ...rule, unsupported_field: true }];
 await assert.rejects(
   buildBiologicalInterpretationProfile({
     ...input,
-    profiles: [{ ...profile, rules: [{ ...rule, unsupported_field: true }] }],
+    profiles: [{
+      ...profile,
+      rules: unsupportedRules,
+      content_sha256: profileDigest("mycology.biological.context.features", "1.0.0", unsupportedRules),
+    }],
   }),
   /interpretation_profile_rule_shape_invalid/,
 );
 
+const nonFiniteRules = [{ ...rule, threshold: Number.NaN }];
 await assert.rejects(
   buildBiologicalInterpretationProfile({
     ...input,
-    profiles: [{ ...profile, rules: [{ ...rule, threshold: Number.NaN }] }],
+    profiles: [{
+      ...profile,
+      rules: nonFiniteRules,
+      content_sha256: profileDigest("mycology.biological.context.features", "1.0.0", nonFiniteRules),
+    }],
   }),
   /interpretation_profile_rule_content_invalid/,
 );
 
+const identityScopedRules = [{
+  ...rule,
+  identity_match: {
+    assertion_type: "strain.designation",
+    assertion_value: "HK35",
+  },
+}];
 const identityScopedProfile = await buildBiologicalInterpretationProfile({
   ...input,
   profiles: [{
     ...profile,
-    rules: [{
-      ...rule,
-      identity_match: {
-        assertion_type: "strain.designation",
-        assertion_value: "HK35",
-      },
-    }],
+    rules: identityScopedRules,
+    content_sha256: profileDigest("mycology.biological.context.features", "1.0.0", identityScopedRules),
   }],
 });
 assert.equal(identityScopedProfile.state, "loaded");
@@ -205,6 +261,11 @@ await assert.rejects(
     profiles: [{
       ...profile,
       rules: [{ ...rule, identity_match: { assertion_type: "strain.designation" } }],
+      content_sha256: profileDigest(
+        "mycology.biological.context.features",
+        "1.0.0",
+        [{ ...rule, identity_match: { assertion_type: "strain.designation" } }],
+      ),
     }],
   }),
   /interpretation_profile_identity_match_invalid/,

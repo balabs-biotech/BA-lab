@@ -2827,3 +2827,199 @@ body[data-domain] :is(button, input, select, textarea, a, [tabindex]):focus-visi
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
+
+/* Evidence-linked BIE review signals: neutral, readable, and consistent
+   across the Green Tech, Mycology, and Laboratory workspace palettes. */
+.engine-review-signals {
+  display: grid;
+  gap: 0.65rem;
+  margin: 0.9rem 0;
+  padding: 0.9rem 1rem;
+  border: 1px solid var(--border-strong, #64748b);
+  border-left: 4px solid var(--warn, #b7791f);
+  border-radius: 0.65rem;
+  background: var(--surface-2, rgba(127, 127, 127, 0.08));
+  overflow-wrap: anywhere;
+}
+.engine-review-signals > strong {
+  color: var(--text, inherit);
+}
+.engine-review-signals ul {
+  display: grid;
+  gap: 0.65rem;
+  margin: 0;
+  padding-left: 1.2rem;
+}
+.engine-review-signals li > strong {
+  color: var(--text, inherit);
+}
+.engine-review-signals li p {
+  margin: 0.2rem 0;
+}
+.engine-review-signals small {
+  font-size: 0.75rem;
+}
+.engine-upstream-qc {
+  margin: 0.75rem 0;
+  padding: 0.75rem;
+  border: 1px solid var(--border, #64748b);
+  border-radius: 0.6rem;
+  background: var(--surface, transparent);
+  overflow-wrap: anywhere;
+}
+.engine-upstream-qc summary,
+.engine-review-signals summary {
+  cursor: pointer;
+  font-weight: 650;
+}
+
+
+/* Biological reference assertion review: compact filters and bounded evidence lists. */
+.engine-biological-assertion-review,
+.engine-biological-evidence {
+  display: grid;
+  gap: 0.7rem;
+  margin: 0.85rem 0;
+  padding: 0.85rem;
+  border: 1px solid var(--border, #64748b);
+  border-radius: 0.65rem;
+  background: var(--surface, transparent);
+  overflow-wrap: anywhere;
+}
+.engine-biological-assertion-filters {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.65rem;
+}
+.engine-biological-assertion-filters label {
+  display: grid;
+  gap: 0.35rem;
+  min-width: 0;
+  font-size: 0.85rem;
+}
+.engine-biological-assertion-filters :is(select, input) {
+  width: 100%;
+  min-width: 0;
+}
+.engine-biological-assertion-list {
+  display: grid;
+  gap: 0.65rem;
+  margin: 0;
+  padding-left: 1.25rem;
+}
+.engine-biological-evidence-record {
+  margin: 0.55rem 0;
+  padding: 0.65rem;
+  border: 1px solid var(--border, #64748b);
+  border-radius: 0.5rem;
+}
+.engine-biological-evidence-record summary {
+  cursor: pointer;
+  font-weight: 650;
+}
+.engine-biological-evidence-record a {
+  display: inline-block;
+  margin-top: 0.35rem;
+  overflow-wrap: anywhere;
+}
+@media (max-width: 620px) {
+  .engine-biological-assertion-filters {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+
+/* Paired documentary provenance in biological assertion divergence review. */
+.engine-biological-assertion-comparisons {
+  display: grid;
+  gap: 0.75rem;
+  margin: 0.85rem 0;
+  padding: 0.85rem;
+  border: 1px solid var(--border, #64748b);
+  border-radius: 0.65rem;
+  background: var(--surface, transparent);
+  overflow-wrap: anywhere;
+}
+.engine-biological-assertion-comparisons > strong {
+  line-height: 1.4;
+}
+.engine-biological-assertion-comparisons > ul {
+  display: grid;
+  gap: 0.8rem;
+  margin: 0;
+  padding-left: 1.25rem;
+}
+.engine-biological-assertion-comparisons > ul > li {
+  min-width: 0;
+  padding: 0.65rem;
+  border: 1px solid var(--border, #64748b);
+  border-radius: 0.5rem;
+}
+.engine-biological-comparison-source {
+  margin-top: 0.55rem;
+  padding: 0.55rem;
+  border-left: 3px solid var(--border, #64748b);
+  background: var(--surface-raised, transparent);
+}
+.engine-biological-comparison-source summary {
+  cursor: pointer;
+  font-weight: 650;
+}
+.engine-biological-comparison-source a {
+  display: inline-block;
+  margin-top: 0.4rem;
+  overflow-wrap: anywhere;
+}
+@media (max-width: 620px) {
+  .engine-biological-assertion-comparisons {
+    padding: 0.65rem;
+  }
+  .engine-biological-assertion-comparisons > ul {
+    padding-left: 1rem;
+  }
+}
+
+/* Chronological biological facts with direct event-to-observation anchors. */
+.engine-biological-fact-timeline {
+  display: grid;
+  gap: 0.7rem;
+  margin: 0.9rem 0;
+  padding: 0.8rem;
+  border: 1px solid var(--border, #64748b);
+  border-radius: 0.65rem;
+  background: var(--surface, transparent);
+}
+.engine-biological-fact-timeline > ol {
+  display: grid;
+  gap: 0.75rem;
+  margin: 0;
+  padding-left: 1.4rem;
+}
+.engine-biological-fact-entry {
+  min-width: 0;
+  padding: 0.55rem 0.65rem;
+  border-left: 2px solid var(--border, #64748b);
+  overflow-wrap: anywhere;
+}
+.engine-biological-fact-entry time,
+.engine-biological-fact-entry small {
+  display: block;
+  color: var(--text-muted, #64748b);
+  font-size: 0.8rem;
+}
+.engine-biological-fact-entry p {
+  margin: 0.3rem 0;
+}
+.engine-biological-fact-event-link {
+  display: inline-block;
+  margin: 0.2rem 0.45rem 0.2rem 0;
+  font-size: 0.85rem;
+}
+.engine-biological-fact-entry:target {
+  outline: 2px solid var(--focus, currentColor);
+  outline-offset: 2px;
+}
+@media (max-width: 620px) {
+  .engine-biological-fact-timeline { padding: 0.6rem; }
+}

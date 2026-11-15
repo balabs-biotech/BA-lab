@@ -12,10 +12,10 @@ import hashlib
 import json
 from math import isfinite
 import re
-from statistics import fmean
+from statistics import fmean, pstdev
 from typing import Any, Mapping
 
-from .validation import validate_request
+from .validation import validate_request, _stable_sha256 as _contract_stable_sha256
 
 
 def _timestamp(value: Any, field: str) -> datetime:
@@ -48,6 +48,307 @@ _RULE_CONTEXT_FIELDS = {
     "culture_stage", "substrate_code", "production_system",
 }
 
+_REFERENCE_ASSERTION_SUBJECT_TYPES = {
+    "taxon", "strain", "cultivar", "substrate", "culture_stage",
+    "production_system", "environmental_parameter", "biological_process",
+}
+_REFERENCE_ASSERTION_CODE = re.compile(r"^[a-z][a-z0-9_.-]{1,159}$")
+_REFERENCE_ASSERTION_VERSION = re.compile(r"^[0-9]+\.[0-9]+\.[0-9]+([+-][0-9A-Za-z.-]+)?$")
+_REFERENCE_ASSERTION_PREDICATE = re.compile(r"^[a-z][a-z0-9_.-]{1,159}$")
+_REFERENCE_ASSERTION_EVIDENCE_LEVELS = {"L0", "L1", "L2", "L3", "L4", "L5", "unassessed"}
+
+
+def _evaluate_biological_reference_assertions(
+    state: Any,
+    assertions: Any,
+    biological_contexts: list[dict[str, Any]],
+    datasets: Any,
+) -> tuple[str, list[dict[str, Any]], list[str]]:
+    """Validate immutable assertion manifests and assess explicit context_match applicability."""
+    if state not in {"documented", "not_documented", "conflicting", "not_applicable"}:
+        raise ValueError("invalid_biological_reference_assertion_state")
+    if not isinstance(assertions, list) or len(assertions) > 500:
+        raise ValueError("invalid_biological_reference_assertions")
+    if not isinstance(datasets, list):
+        raise ValueError("invalid_biological_reference_assertion_datasets")
+
+    manifests: dict[tuple[str, str], dict[str, Any]] = {}
+    for dataset in datasets:
+        if not isinstance(dataset, dict) or dataset.get("provider") != "BA_LABS_BIOLOGICAL_REFERENCE_ASSERTION":
+            continue
+        key = (dataset.get("dataset_id"), dataset.get("dataset_version"))
+        if not all(isinstance(value, str) and value for value in key):
+            raise ValueError("invalid_biological_reference_assertion_manifest")
+        if key in manifests:
+            raise ValueError("duplicate_biological_reference_assertion_manifest")
+        manifests[key] = dataset
+
+    resolved: list[dict[str, Any]] = []
+    sources: set[str] = set()
+    seen: set[tuple[str, str]] = set()
+    semantic_values: dict[tuple[str, str, str], list[tuple[str, frozenset[str]]]] = defaultdict(list)
+    for assertion in assertions:
+        if not isinstance(assertion, dict):
+            raise ValueError("invalid_biological_reference_assertion")
+        code = assertion.get("assertion_code")
+        version = assertion.get("assertion_version")
+        subject_type = assertion.get("subject_type")
+        subject_ref = assertion.get("subject_ref")
+        predicate = assertion.get("predicate_code")
+        digest = assertion.get("content_sha256")
+        source = assertion.get("source")
+        applicability = assertion.get("applicability")
+        uncertainty = assertion.get("uncertainty")
+        if (
+            not isinstance(code, str) or not _REFERENCE_ASSERTION_CODE.fullmatch(code)
+            or not isinstance(version, str) or not _REFERENCE_ASSERTION_VERSION.fullmatch(version)
+            or subject_type not in _REFERENCE_ASSERTION_SUBJECT_TYPES
+            or not isinstance(subject_ref, str) or not subject_ref or len(subject_ref) > 240
+            or not isinstance(predicate, str) or not _REFERENCE_ASSERTION_PREDICATE.fullmatch(predicate)
+            or not isinstance(digest, str) or not re.fullmatch(r"[0-9a-f]{64}", digest)
+            or not isinstance(source, dict)
+            or not isinstance(applicability, dict) or not isinstance(uncertainty, dict)
+            or assertion.get("evidence_level") not in _REFERENCE_ASSERTION_EVIDENCE_LEVELS
+            or "object_value" not in assertion or assertion["object_value"] is None
+        ):
+            raise ValueError("invalid_biological_reference_assertion")
+        if assertion.get("unit_code") is not None and (not isinstance(assertion.get("unit_code"), str) or len(assertion["unit_code"]) > 80):
+            raise ValueError("invalid_biological_reference_assertion_unit")
+        if assertion.get("source_locator") is not None and (not isinstance(assertion.get("source_locator"), str) or len(assertion["source_locator"]) > 2000):
+            raise ValueError("invalid_biological_reference_assertion_source_locator")
+        if not isinstance(assertion.get("reviewed_at"), str):
+            raise ValueError("invalid_biological_reference_assertion_review_timestamp")
+        source_id = assertion.get("reference_registry_id")
+        if not isinstance(source_id, str) or not re.fullmatch(
+            r"[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}", source_id, re.I
+        ):
+            raise ValueError("invalid_biological_reference_assertion_source_id")
+        source_reference_id = source.get("reference_id")
+        source_version = source.get("reference_version")
+        source_digest = source.get("content_sha256")
+        source_reviewed_at = source.get("reviewed_at")
+        if (
+            not isinstance(source_reference_id, str) or not source_reference_id or len(source_reference_id) > 160
+            or not isinstance(source_version, str) or not source_version or len(source_version) > 80
+            or not isinstance(source_digest, str) or not re.fullmatch(r"[0-9a-f]{64}", source_digest)
+            or not isinstance(source_reviewed_at, str)
+            or (source.get("source_url") is not None and not isinstance(source.get("source_url"), str))
+        ):
+            raise ValueError("invalid_biological_reference_assertion_source")
+        key = (code, version)
+        if key in seen:
+            raise ValueError("duplicate_biological_reference_assertion_identity")
+        seen.add(key)
+        manifest = manifests.get(key)
+        if not manifest or manifest.get("content_sha256") != digest:
+            raise ValueError("biological_reference_assertion_manifest_missing_or_mismatched")
+
+        payload = {
+            "assertion_code": code,
+            "assertion_version": version,
+            "subject_type": subject_type,
+            "subject_ref": subject_ref,
+            "predicate_code": predicate,
+            "object_value": assertion["object_value"],
+            "unit_code": assertion.get("unit_code"),
+            "reference_registry_id": source_id,
+            "source_locator": assertion.get("source_locator"),
+            "evidence_level": assertion["evidence_level"],
+            "applicability": applicability,
+            "uncertainty": uncertainty,
+            "source": {
+                "reference_id": source_reference_id,
+                "reference_version": source_version,
+                "content_sha256": source_digest,
+                "reviewed_at": source_reviewed_at,
+                **({"source_url": source["source_url"]} if isinstance(source.get("source_url"), str) else {}),
+            },
+            "reviewed_at": assertion["reviewed_at"],
+        }
+        if _contract_stable_sha256(payload) != digest:
+            raise ValueError("biological_reference_assertion_content_hash_mismatch")
+
+        _timestamp(assertion["reviewed_at"], "biological_reference_assertion_reviewed_at")
+        _timestamp(source_reviewed_at, "biological_reference_source_reviewed_at")
+        context_match = applicability.get("context_match")
+        validity_window = applicability.get("validity_window")
+        matching_context_ids: list[str] = []
+        applicability_state = "not_assessed"
+        temporal_applicability_state = "not_scoped"
+        assertion_start = None
+        assertion_end = None
+        if validity_window is not None:
+            if (
+                not isinstance(validity_window, dict)
+                or set(validity_window) != {"valid_from", "valid_to"}
+                or not isinstance(validity_window.get("valid_from"), str)
+                or not re.fullmatch(r"\d{4}-\d{2}-\d{2}", validity_window["valid_from"])
+                or (validity_window.get("valid_to") is not None and (
+                    not isinstance(validity_window.get("valid_to"), str)
+                    or not re.fullmatch(r"\d{4}-\d{2}-\d{2}", validity_window["valid_to"])
+                ))
+            ):
+                raise ValueError("invalid_biological_reference_assertion_validity_window")
+            try:
+                from datetime import date
+                assertion_start = date.fromisoformat(validity_window["valid_from"])
+                assertion_end = date.fromisoformat(validity_window["valid_to"]) if validity_window["valid_to"] else None
+            except ValueError as exc:
+                raise ValueError("invalid_biological_reference_assertion_validity_window") from exc
+            if assertion_end is not None and assertion_end <= assertion_start:
+                raise ValueError("invalid_biological_reference_assertion_validity_window")
+            temporal_matches = 0
+            temporal_unknown = 1 if not biological_contexts else 0
+            for context in biological_contexts:
+                if not isinstance(context, dict):
+                    temporal_unknown += 1
+                    continue
+                try:
+                    context_start = date.fromisoformat(context["valid_from"]) if isinstance(context.get("valid_from"), str) else None
+                    context_end = date.fromisoformat(context["valid_to"]) if isinstance(context.get("valid_to"), str) else None
+                except ValueError:
+                    temporal_unknown += 1
+                    continue
+                if context_start is None:
+                    temporal_unknown += 1
+                    continue
+                if context_end is not None and context_end <= context_start:
+                    raise ValueError("invalid_biological_context_validity_window")
+                overlaps = (assertion_end is None or context_start < assertion_end) and (context_end is None or assertion_start < context_end)
+                if overlaps:
+                    temporal_matches += 1
+            if temporal_matches:
+                temporal_applicability_state = "matched"
+            elif temporal_unknown:
+                temporal_applicability_state = "undetermined"
+            else:
+                temporal_applicability_state = "not_applicable"
+
+        context_matches: set[str] | None = None
+        if context_match is not None:
+            if (
+                not isinstance(context_match, dict) or not context_match
+                or not set(context_match).issubset(_RULE_CONTEXT_FIELDS)
+                or any(not isinstance(value, str) or not value.strip() for value in context_match.values())
+            ):
+                raise ValueError("invalid_biological_reference_assertion_applicability")
+            context_matches = set()
+            unknown_contexts = 0
+            for context in biological_contexts:
+                if not isinstance(context, dict):
+                    continue
+                known = all(context.get(field) is not None for field in context_match)
+                if not known:
+                    unknown_contexts += 1
+                    continue
+                if all(context.get(field) == expected for field, expected in context_match.items()):
+                    context_id = context.get("context_id")
+                    if isinstance(context_id, str):
+                        context_matches.add(context_id)
+            if not context_matches and unknown_contexts and temporal_applicability_state != "not_applicable":
+                applicability_state = "undetermined"
+            elif not context_matches:
+                applicability_state = "not_applicable"
+
+        if context_match is None and validity_window is not None:
+            matching_context_ids = [
+                context["context_id"] for context in biological_contexts
+                if isinstance(context, dict) and isinstance(context.get("context_id"), str)
+            ]
+        if context_match is None and validity_window is None:
+            applicability_state = "not_assessed"
+        elif not biological_contexts:
+            applicability_state = "undetermined"
+        else:
+            candidate_contexts = [
+                context for context in biological_contexts
+                if isinstance(context, dict)
+                and (context_matches is None or context.get("context_id") in context_matches)
+            ]
+            if validity_window is not None:
+                candidate_contexts = [
+                    context for context in candidate_contexts
+                    if isinstance(context.get("valid_from"), str)
+                    and (assertion_end is None or context["valid_from"] < assertion_end.isoformat())
+                    and (context.get("valid_to") is None or assertion_start.isoformat() < context["valid_to"])
+                ]
+            if candidate_contexts:
+                applicability_state = "matched"
+                matching_context_ids = [
+                    context["context_id"] for context in candidate_contexts
+                    if isinstance(context.get("context_id"), str)
+                ]
+            elif temporal_applicability_state == "undetermined" or applicability_state == "undetermined":
+                applicability_state = "undetermined"
+            else:
+                applicability_state = "not_applicable"
+
+        applicable_windows: list[tuple[str, Any, Any]] = []
+        if applicability_state == "matched":
+            from datetime import date
+            for context in biological_contexts:
+                context_id = context.get("context_id") if isinstance(context, dict) else None
+                if not isinstance(context_id, str) or context_id not in matching_context_ids:
+                    continue
+                context_start = date.fromisoformat(context["valid_from"])
+                context_end = date.fromisoformat(context["valid_to"]) if context.get("valid_to") else None
+                effective_start = max(context_start, assertion_start) if assertion_start else context_start
+                if assertion_end and (context_end is None or assertion_end < context_end):
+                    effective_end = assertion_end
+                else:
+                    effective_end = context_end
+                if effective_end is None or effective_start < effective_end:
+                    applicable_windows.append((context_id, effective_start, effective_end))
+        semantic_values[(subject_type, subject_ref, predicate)].append((
+            _contract_stable_sha256(assertion["object_value"]),
+            tuple(applicable_windows),
+        ))
+        resolved_item = {
+            **payload,
+            "content_sha256": digest,
+            "applicability_state": applicability_state,
+            "temporal_applicability_state": temporal_applicability_state,
+            "matching_context_ids": sorted(set(matching_context_ids)),
+            "source": {
+                "reference_id": source_reference_id,
+                "reference_version": source_version,
+                "content_sha256": source_digest,
+                "reviewed_at": source_reviewed_at,
+                **({"source_url": source["source_url"]} if isinstance(source.get("source_url"), str) else {}),
+            },
+            "reviewed_at": assertion["reviewed_at"],
+        }
+        resolved.append(resolved_item)
+        sources.add(f"BA_LABS_BIOLOGICAL_REFERENCE_ASSERTION/{code}@{version}#sha256={digest}")
+        sources.add(f"BA_LABS_BIOLOGICAL_REFERENCE_SOURCE/{source_reference_id}@{source_version}#sha256={source_digest}")
+
+    # A semantic disagreement is a conflict only when both assertions are
+    # applicable to at least one identical, temporally overlapping context.
+    # Unscoped or undetermined assertions remain evidence, not conflicts.
+    has_conflicts = any(
+        left_value != right_value
+        and any(
+            left_id == right_id
+            and (left_end is None or right_start < left_end)
+            and (right_end is None or left_start < right_end)
+            for left_id, left_start, left_end in left_windows
+            for right_id, right_start, right_end in right_windows
+        )
+        for values in semantic_values.values()
+        for index, (left_value, left_windows) in enumerate(values)
+        for right_value, right_windows in values[index + 1:]
+    )
+    if has_conflicts or state == "conflicting":
+        state = "conflicting"
+    elif resolved:
+        state = "documented"
+    elif state == "documented":
+        raise ValueError("documented_biological_reference_assertions_require_assertions")
+    elif state != "not_applicable":
+        state = "not_documented"
+    return state, resolved, sorted(sources)
+
+
 
 def _evaluate_interpretation_rules(
     rules: Any,
@@ -74,18 +375,32 @@ def _evaluate_interpretation_rules(
         if len(profile_manifests) != 1:
             raise ValueError("interpretation_profile_manifest_required")
         profile_manifest = profile_manifests[0]
+        profile_id = profile_manifest.get("profile_id")
+        profile_version = profile_manifest.get("profile_version")
+        profile_digest = profile_manifest.get("content_sha256")
         if (
             profile_manifest.get("dataset_id") != "biological.context.features"
             or not isinstance(profile_manifest.get("dataset_version"), str)
             or not _RULE_VERSION.fullmatch(profile_manifest["dataset_version"])
-            or not isinstance(profile_manifest.get("content_sha256"), str)
-            or not re.fullmatch(r"[0-9a-f]{64}", profile_manifest["content_sha256"])
+            or not isinstance(profile_id, str)
+            or not _RULE_ID.fullmatch(profile_id)
+            or not isinstance(profile_version, str)
+            or not _RULE_VERSION.fullmatch(profile_version)
+            or not isinstance(profile_digest, str)
+            or not re.fullmatch(r"[0-9a-f]{64}", profile_digest)
         ):
             raise ValueError("invalid_interpretation_profile_manifest")
+        profile_content = {
+            "profile_id": profile_id,
+            "profile_version": profile_version,
+            "rules": rules,
+        }
+        if _stable_sha256(profile_content) != profile_digest:
+            raise ValueError("interpretation_profile_content_hash_mismatch")
         reference_sources.add(
             "BA_LABS_INTERPRETATION_PROFILE/"
-            f"{profile_manifest['dataset_id']}@{profile_manifest['dataset_version']}"
-            f"#sha256={profile_manifest['content_sha256']}"
+            f"{profile_id}@{profile_version}"
+            f"#sha256={profile_digest}"
         )
     for rule in rules:
         required = {
@@ -277,7 +592,74 @@ def analyze_biological_context_features(request: Mapping[str, Any]) -> dict[str,
         data = record["data"]
         context = record.get("context") or {}
 
-        if record_type == "measurement":
+        if record_type == "event":
+            if context.get(subject_field) != subject_id:
+                excluded.append({"record_id": record_id, "reason": f"event_{subject_type}_scope_mismatch"})
+                continue
+            event_type = data.get("event_type")
+            timestamp_value = data.get("occurred_at")
+            if not isinstance(event_type, str) or not event_type.strip():
+                excluded.append({"record_id": record_id, "reason": "missing_event_type"})
+                continue
+            try:
+                occurred_at = _timestamp(timestamp_value, "event_timestamp")
+            except (TypeError, ValueError):
+                excluded.append({"record_id": record_id, "reason": "invalid_or_timezone_naive_timestamp"})
+                continue
+            if occurred_at < window_start or occurred_at >= window_end:
+                excluded.append({"record_id": record_id, "reason": "outside_requested_window"})
+                continue
+            payload = data.get("payload")
+            if not isinstance(payload, dict):
+                payload = {}
+            observed_facts.append({
+                "fact_code": f"event.{event_type.strip().lower().replace('-', '_')[:60]}",
+                "statement": f"recorded_event: {event_type.strip()[:160]}",
+                "observed_at": _iso(occurred_at),
+                "source_record_ids": [record_id],
+                "event_id": record_id,
+                "value": payload,
+            })
+            accepted_by_type[record_type] += 1
+            continue
+        if record_type == "observation":
+            if data.get("quality_state") == "excluded":
+                excluded.append({"record_id": record_id, "reason": "observation_quality_state_excluded"})
+                continue
+            if context.get(subject_field) != subject_id:
+                excluded.append({"record_id": record_id, "reason": f"observation_{subject_type}_scope_mismatch"})
+                continue
+            variable = data.get("variable_code")
+            value_text = data.get("value_text")
+            timestamp_value = data.get("observed_at")
+            if not isinstance(variable, str) or not variable:
+                excluded.append({"record_id": record_id, "reason": "missing_variable_code"})
+                continue
+            if not isinstance(value_text, str) or not value_text.strip():
+                excluded.append({"record_id": record_id, "reason": "missing_observation_text"})
+                continue
+            try:
+                observed_at = _timestamp(timestamp_value, "observation_timestamp")
+            except (TypeError, ValueError):
+                excluded.append({"record_id": record_id, "reason": "invalid_or_timezone_naive_timestamp"})
+                continue
+            if observed_at < window_start or observed_at >= window_end:
+                excluded.append({"record_id": record_id, "reason": "outside_requested_window"})
+                continue
+            observed_fact = {
+                "fact_code": f"observation.{variable}",
+                "statement": f"recorded_observation: {variable} — {value_text.strip()[:800]}",
+                "observed_at": _iso(observed_at),
+                "source_record_ids": [record_id],
+                "value": value_text.strip()[:800],
+            }
+            event_id = context.get("event_id")
+            if isinstance(event_id, str) and event_id:
+                observed_fact["event_id"] = event_id
+            observed_facts.append(observed_fact)
+            accepted_by_type[record_type] += 1
+            continue
+        elif record_type == "measurement":
             if data.get("quality_state") == "excluded":
                 excluded.append({"record_id": record_id, "reason": "measurement_quality_state_excluded"})
                 continue
@@ -333,14 +715,20 @@ def analyze_biological_context_features(request: Mapping[str, Any]) -> dict[str,
         key = (record_type, source_label, variable, unit)
         grouped[key].append((observed_at, float(value), record_id))
         accepted_by_type[record_type] += 1
-        observed_facts.append({
+        observed_fact = {
             "fact_code": f"{record_type}.{variable}",
             "statement": f"{source_label}: {variable} = {value} {unit}",
             "observed_at": _iso(observed_at),
             "source_record_ids": [record_id],
             "value": value,
             "unit_code": unit,
-        })
+        }
+        # Preserve the exact operational event anchor when the trusted source
+        # adapter supplied one. This is traceability, not an event interpretation.
+        event_id = context.get("event_id")
+        if isinstance(event_id, str) and event_id:
+            observed_fact["event_id"] = event_id
+        observed_facts.append(observed_fact)
 
     derived_features: list[dict[str, Any]] = []
     temporal_gaps: list[dict[str, Any]] = []
@@ -366,6 +754,94 @@ def analyze_biological_context_features(request: Mapping[str, Any]) -> dict[str,
                 "unit_code": "count" if suffix == "count" else unit,
                 "source_record_ids": source_ids,
             })
+        # Range expresses observed amplitude within this homogeneous series.
+        # It is descriptive and retains the complete contributing record lineage.
+        if len(values) >= 2:
+            derived_features.append({
+                "feature_code": f"series.{prefix}.range",
+                "value": max(values) - min(values),
+                "method": "maximum_minus_minimum",
+                "method_version": "1.0.0",
+                "unit_code": unit,
+                "source_record_ids": source_ids,
+            })
+
+        # Population dispersion is descriptive only. Emit it for at least
+        # three observations; CV is omitted when the mean is zero because the
+        # ratio would be undefined or unstable.
+        if len(values) >= 3:
+            standard_deviation = pstdev(values)
+            derived_features.append({
+                "feature_code": f"series.{prefix}.population_stddev",
+                "value": standard_deviation,
+                "method": "population_standard_deviation",
+                "method_version": "1.0.0",
+                "unit_code": unit,
+                "source_record_ids": source_ids,
+            })
+            mean_value_for_cv = fmean(values)
+            if mean_value_for_cv != 0:
+                derived_features.append({
+                    "feature_code": f"series.{prefix}.coefficient_of_variation_pct",
+                    "value": (standard_deviation / abs(mean_value_for_cv)) * 100,
+                    "method": "population_stddev_over_absolute_mean_times_100",
+                    "method_version": "1.0.0",
+                    "unit_code": "percent",
+                    "source_record_ids": source_ids,
+                })
+
+        # Exploratory two-segment shift indicator. Requiring at least three
+        # observations on each side reduces trivial endpoint splits. This is
+        # not a formal change-point test and carries no significance estimate.
+        if len(values) >= 6:
+            best_delta = -1.0
+            best_split = None
+            best_direction = None
+            for split_index in range(3, len(values) - 2):
+                left_mean = fmean(values[:split_index])
+                right_mean = fmean(values[split_index:])
+                delta = abs(right_mean - left_mean)
+                if delta > best_delta:
+                    best_delta = delta
+                    best_split = split_index
+                    best_direction = "up" if right_mean > left_mean else "down" if right_mean < left_mean else "flat"
+            if best_split is not None:
+                derived_features.append({
+                    "feature_code": f"series.{prefix}.largest_two_segment_mean_shift",
+                    "value": best_delta,
+                    "method": (
+                        "largest_absolute_difference_between_adjacent_segment_means"
+                        f"; split_at={_iso(times[best_split])}"
+                        f"; direction={best_direction}"
+                        "; minimum_segment_size=3"
+                    ),
+                    "method_version": "1.0.0",
+                    "unit_code": unit,
+                    "source_record_ids": source_ids,
+                })
+
+        # A least-squares slope is emitted only for at least three points
+        # spanning two distinct instants. It is descriptive, not a stress score.
+        if len(points) >= 3 and len(set(times)) >= 2:
+            origin = times[0]
+            elapsed_days = [(instant - origin).total_seconds() / 86400 for instant in times]
+            mean_elapsed = fmean(elapsed_days)
+            mean_value = fmean(values)
+            denominator = sum((item - mean_elapsed) ** 2 for item in elapsed_days)
+            if denominator > 0:
+                slope_per_day = sum(
+                    (elapsed - mean_elapsed) * (value - mean_value)
+                    for elapsed, value in zip(elapsed_days, values)
+                ) / denominator
+                derived_features.append({
+                    "feature_code": f"series.{prefix}.trend_slope_per_day",
+                    "value": slope_per_day,
+                    "method": f"ordinary_least_squares_slope_per_day; source_unit={unit}",
+                    "method_version": "1.0.0",
+                    "unit_code": f"{unit}/day",
+                    "source_record_ids": source_ids,
+                })
+
         # The expected cadence is explicit and source-sensitive; this is a
         # coverage signal, not a claim that a missing observation is biological stress.
         default_gap_minutes = 2160 if record_type == "environmental_observation" else 180
@@ -380,6 +856,20 @@ def analyze_biological_context_features(request: Mapping[str, Any]) -> dict[str,
                     "to": _iso(current),
                     "duration_seconds": duration,
                 })
+
+    # Keep the fact stream chronological across measurements, free-text
+    # observations and operational events. Facts without numeric values still
+    # contribute to the observed coverage window.
+    observed_facts.sort(key=lambda item: (
+        item.get("observed_at", ""),
+        item.get("fact_code", ""),
+        tuple(item.get("source_record_ids", [])),
+    ))
+    for fact in observed_facts:
+        try:
+            observed_times.append(_timestamp(fact["observed_at"], "fact_timestamp"))
+        except (KeyError, TypeError, ValueError):
+            continue
 
     observed_window = None
     if observed_times:
@@ -490,6 +980,21 @@ def analyze_biological_context_features(request: Mapping[str, Any]) -> dict[str,
     elif identity_state == "not_documented":
         missing_context.append("biological_identity_not_documented")
 
+    reference_assertion_state, reference_assertions, reference_assertion_sources = (
+        _evaluate_biological_reference_assertions(
+            parameters.get("biological_reference_assertion_state", "not_documented"),
+            parameters.get("biological_reference_assertions", []),
+            biological_contexts,
+            request.get("datasets", []),
+        )
+    )
+    if reference_assertion_state == "conflicting":
+        quality_flags_reference = ["biological_reference_assertions_conflict"]
+    elif reference_assertions:
+        quality_flags_reference = ["biological_reference_assertions_present"]
+    else:
+        quality_flags_reference = ["biological_reference_assertions_not_documented"]
+
     interpretation_rules = parameters.get("interpretation_rules", [])
     if interpretation_rules and profile_state != "loaded":
         raise ValueError("interpretation_profile_not_loaded_for_rules")
@@ -500,6 +1005,9 @@ def analyze_biological_context_features(request: Mapping[str, Any]) -> dict[str,
         quality_flags = ["rule_based_interpretation_evaluated_no_findings"]
     else:
         quality_flags = ["biological_interpretation_not_performed"]
+    quality_flags.extend(quality_flags_reference)
+    if reference_assertion_state == "conflicting":
+        missing_context.append("biological_reference_assertions_conflict")
     if identity_state == "conflicting":
         quality_flags.append("biological_identity_conflict")
     elif identity_state == "documented":
@@ -522,6 +1030,32 @@ def analyze_biological_context_features(request: Mapping[str, Any]) -> dict[str,
         quality_flags.append("measurement_environment_context_ambiguous")
     if "missing" in measurement_environment_states:
         quality_flags.append("measurement_environment_context_missing")
+    upstream_qc = (request.get("upstream_artifacts") or [None])[0]
+    environmental_quality_control = None
+    if upstream_qc is not None:
+        qc_result = upstream_qc["result"]
+        qc_flags = sorted(set(qc_result["quality_flags"]))
+        qc_review_required = qc_result["outcome"] != "success" or bool(qc_flags)
+        environmental_quality_control = {
+            "state": "review_required" if qc_review_required else "passed",
+            "upstream_execution_id": upstream_qc["execution_id"],
+            "upstream_result_id": upstream_qc["result_id"],
+            "upstream_engine_id": upstream_qc["engine_id"],
+            "upstream_engine_version": upstream_qc["engine_version"],
+            "upstream_completed_at": upstream_qc["completed_at"],
+            "upstream_input_snapshot_sha256": upstream_qc["input_snapshot_sha256"],
+            "upstream_scope": upstream_qc["scope"],
+            "artifact_sha256": upstream_qc["artifact_sha256"],
+            "outcome": qc_result["outcome"],
+            "quality_flags": qc_flags,
+            "limitations": qc_result["limitations"],
+            "provenance": qc_result["provenance"],
+            "value": qc_result["value"],
+        }
+        quality_flags.append("environmental_qc_artifact_attached")
+        if qc_review_required:
+            quality_flags.append("environmental_qc_review_required")
+
     if not observed_times:
         quality_flags.append("insufficient_data")
     if any(
@@ -567,6 +1101,8 @@ def analyze_biological_context_features(request: Mapping[str, Any]) -> dict[str,
                 "biological_contexts": biological_contexts,
                 "identity_assertion_state": identity_state,
                 "identity_assertions": identity_assertions,
+                "biological_reference_assertion_state": reference_assertion_state,
+                "biological_reference_assertions": reference_assertions,
             },
             "coverage": {
                 "requested_window": {
@@ -585,17 +1121,25 @@ def analyze_biological_context_features(request: Mapping[str, Any]) -> dict[str,
             "derived_features": derived_features,
             "findings": findings,
             "hypotheses": [],
+            **({"environmental_quality_control": environmental_quality_control}
+               if environmental_quality_control is not None else {}),
         },
         "limitations": [
             "This engine reports traceable coverage and descriptive features; optional rules produce limited threshold findings only, not biological diagnoses or intervention recommendations.",
             "Provider-derived environmental observations remain distinct from local in-situ measurements.",
             "A biological-subject-to-environment relationship must be verified by the trusted source adapter before environmental observations are included.",
+            "Validated biological reference assertions are contextual evidence; applicability is evaluated only when an explicit exact context_match is supplied, and assertions do not independently trigger threshold findings.",
+            "Conflicting biological reference assertions are surfaced for review and are never resolved by choosing one claim automatically.",
         ],
         "quality_flags": sorted(set(quality_flags)),
         "provenance": {
             "algorithm": "biological-context-features-v2" if engine_identity["engine_version"] == "0.2.0" else "biological-context-features-v1",
             "libraries": [],
-            "source_references": sorted({*(f"{provider}/{dataset}" for provider, dataset in environmental_sources), *interpretation_sources, *profile_sources, *identity_sources}),
+            "source_references": sorted({
+                *(f"{provider}/{dataset}" for provider, dataset in environmental_sources),
+                *interpretation_sources, *profile_sources, *identity_sources, *reference_assertion_sources,
+                *([f"BA_LABS_ENGINE_RESULT/environmental.timeseries.qc@0.2.0#execution={upstream_qc['execution_id']}#result={upstream_qc['result_id']}#sha256={upstream_qc['artifact_sha256']}"] if upstream_qc is not None else []),
+            }),
         },
     }
 

@@ -19,6 +19,17 @@ for(const r of routes){
 }
 if(template.includes('class="domain-switcher"'))throw new Error("Switcher remains inside workspace");
 if(!engine.includes("const modulesByDomain")||!engine.includes('domain !== "laboratory"'))throw new Error("Domain module scope missing");
+if(!engine.includes("biological_reference_assertion_state") ||
+   !engine.includes("Assertions bibliographiques validées") ||
+   !engine.includes("applicability_state") ||
+   !engine.includes("temporal_applicability_state") ||
+   !engine.includes("état temporel") ||
+   !engine.includes("contextes concordants") ||
+   !engine.includes("Divergences sur un même contexte et une période commune") ||
+   !engine.includes("sharedContexts") ||
+   !engine.includes("biological_reference_assertions_conflict")) {
+ throw new Error("Biological reference assertion state, evidence and review signals are not exposed in the results UI");
+}
 if(!/if \(document\.body\.dataset\.domain === "agronomy"\) \{[\s\S]*?await loadPlantCultures\(\);[\s\S]*?\}/.test(engine))throw new Error("Non-agronomy workspaces must not depend on plant registry loading during authentication");
 const css=fs.readFileSync("batch-tracker/tracker.css","utf8");
 const activeCss=css.replace(/\/\*[\s\S]*?\*\//g,"");
@@ -276,3 +287,151 @@ console.log("✓ Atomic measurement/observation writes no longer perform separat
 const forbiddenDirectWrite = engine.match(/\.from\(["'](?:events|measurements|observations)["']\)\s*\.(?:insert|upsert|update|delete)\s*\(/);
 if (forbiddenDirectWrite) throw new Error("Audit-sensitive event/measurement/observation writes must go through validated RPCs, not direct table mutations");
 console.log("✓ Tracker uses RPC-backed writes for events, measurements and observations");
+
+const evidenceReviewStart=engine.indexOf("const addEvidenceField = (parent, label, fieldValue) =>");
+const evidenceReviewEnd=engine.indexOf("const contextById = new Map(biologicalContexts.map",evidenceReviewStart);
+if(evidenceReviewStart<0||evidenceReviewEnd<0)throw new Error("Biological assertion evidence dossier UI is missing");
+const evidenceReview=engine.slice(evidenceReviewStart,evidenceReviewEnd);
+for(const snippet of [
+  "assertion.assertion_code",
+  "assertion.assertion_version",
+  "source.reference_id",
+  "source.reference_version",
+  "assertion.source_locator",
+  "assertion.reviewed_at",
+  "source.reviewed_at",
+  "assertion.applicability_state",
+  "assertion.temporal_applicability_state",
+  "assertion.matching_context_ids",
+  "assertion.uncertainty",
+  "assertion.content_sha256",
+  "source.content_sha256",
+  "source.source_url",
+  'sourceUrl.protocol === "https:"',
+  'sourceUrl.protocol === "http:"',
+  'link.rel = "noopener noreferrer"'
+])if(!evidenceReview.includes(snippet))throw new Error("Biological evidence provenance review field or URL guard missing: "+snippet);
+if(!evidenceReview.includes("slice(0, 30)"))throw new Error("Biological evidence review must bound rendered assertion records");
+console.log("✓ Biological assertion review exposes evidence, applicability, reviewer timestamps, both SHA-256 digests and safely validated source links");
+const upstreamQcLinkBlock=engine.slice(
+  engine.indexOf("const qc = value.environmental_quality_control"),
+  engine.indexOf("const subject = value.subject || {}",engine.indexOf("const qc = value.environmental_quality_control"))
+);
+for(const snippet of [
+  "recentEngineExecutions.find(item => item.id === qc.upstream_execution_id)",
+  'upstreamLink.href = "#engine-execution-"',
+  'upstreamLink.textContent = "Voir l\'exécution QC amont"',
+  'article.id = "engine-execution-"'
+])if(!upstreamQcLinkBlock.includes(snippet) && !engine.includes(snippet))throw new Error("QC-to-BIE execution navigation regression: "+snippet);
+console.log("✓ Biological assessment links to its recorded upstream QC execution when available");
+
+const qcTraceStart=engine.indexOf('const traceButton = document.createElement("button")',engine.indexOf("function renderBiologicalContextAssessment"));
+const qcTraceEnd=engine.indexOf("qcDetails.append(traceButton, traceOutput);",qcTraceStart);
+if(qcTraceStart<0||qcTraceEnd<0)throw new Error("Environmental QC source trace handler is missing");
+const qcTraceBlock=engine.slice(qcTraceStart,qcTraceEnd);
+for(const snippet of [
+  '.eq("organization_id", expectedOrganizationId)',
+  '.eq("id", upstreamExecutionId)',
+  '.from("environmental_observations")',
+  '.in("id", ids)',
+  'organizationId !== expectedOrganizationId',
+  'input_snapshot_sha256',
+  'retrieved_at',
+  'data_family',
+  'location_id',
+  'source_url',
+  'sourceUrl.protocol === "https:"',
+  'sourceUrl.protocol === "http:"',
+  'link.rel = "noopener noreferrer"',
+  'Identifiants non résolus'
+])if(!qcTraceBlock.includes(snippet))throw new Error("Environmental source trace regression: "+snippet);
+if ((qcTraceBlock.match(/organizationId !== expectedOrganizationId/g) || []).length < 2) {
+  throw new Error("Environmental source trace must revalidate the active organization after both asynchronous lookups");
+}
+if (!qcTraceBlock.includes("finally") || !qcTraceBlock.includes("traceButton.disabled = false")) {
+  throw new Error("Environmental source trace must always restore its action button");
+}
+console.log("✓ QC provenance drilldown is tenant-scoped, snapshot-aware and exposes source family, retrieval time, location, missing IDs and guarded provider links");
+
+const executionLineageStart=engine.indexOf('const lineage = document.createElement("details")');
+const executionLineageEnd=engine.indexOf("article.appendChild(lineage);",executionLineageStart);
+if(executionLineageStart<0||executionLineageEnd<0)throw new Error("Execution/result snapshot lineage panel is missing");
+const executionLineageBlock=engine.slice(executionLineageStart,executionLineageEnd);
+for(const snippet of [
+  "execution.input_snapshot_sha256",
+  "storedResult?.input_snapshot_sha256",
+  "execution.input_record_ids",
+  "storedResult?.input_record_ids",
+  "storedResult?.generated_at",
+  "execution.scope",
+  "concordance exacte entre ledger et résultat",
+  "DIVERGENCE : les empreintes du ledger et du résultat diffèrent",
+  "DIVERGENCE : les listes d’identifiants diffèrent",
+  "non vérifiable : empreinte absente"
+])if(!executionLineageBlock.includes(snippet))throw new Error("Execution/result lineage consistency check missing: "+snippet);
+if(!executionLineageBlock.includes("new Set(executionInputIds)")||!executionLineageBlock.includes("[...executionSet].every(id => resultSet.has(id))"))throw new Error("Execution/result input ID comparison must compare unique sets, not counts only");
+console.log("✓ Analytics history exposes ledger/result snapshots, engine version, scope, timestamps and exact input-lineage consistency states");
+
+const qcSelectorMarkup=template.includes('id="plantBiologicalAssessmentQcExecution"');
+if(!qcSelectorMarkup)throw new Error("Plant BIE upstream environmental QC selector is missing from workspace");
+const qcSelectorRenderer=engine.slice(engine.indexOf("function renderRecentEngineExecutions()"),engine.indexOf("\nfunction ",engine.indexOf("function renderRecentEngineExecutions()")+10));
+for(const snippet of [
+  'getElementById("plantBiologicalAssessmentQcExecution")',
+  'execution.engine_id === "environmental.timeseries.qc"',
+  'execution.status === "completed"',
+  'eligibleQc.some(execution => execution.id === selectedQcId)'
+])if(!qcSelectorRenderer.includes(snippet))throw new Error("Upstream QC selector filtering/preservation missing: "+snippet);
+const plantAssessmentStart=engine.indexOf("async function runPlantBiologicalAssessment()");
+const plantAssessmentEnd=engine.indexOf("\nlet culture",plantAssessmentStart);
+const plantAssessmentCode=engine.slice(plantAssessmentStart,plantAssessmentEnd);
+if(!plantAssessmentCode.includes("upstream_qc_execution_id")||!plantAssessmentCode.includes('getElementById("plantBiologicalAssessmentQcExecution")'))throw new Error("Selected upstream QC execution is not forwarded to the BIE orchestration request");
+console.log("✓ Plant BIE can explicitly consume a completed, organization-scoped environmental QC execution");
+
+
+
+
+
+const assertionFilterStart=engine.indexOf("const allReferenceAssertions = Array.isArray(subject.biological_reference_assertions)");
+const assertionFilterEnd=engine.indexOf("const contextById = new Map(biologicalContexts.map",assertionFilterStart);
+if(assertionFilterStart<0||assertionFilterEnd<0)throw new Error("Biological assertion filter panel is missing");
+const assertionFilterBlock=engine.slice(assertionFilterStart,assertionFilterEnd);
+for(const snippet of [
+  'makeAssertionFilter("Applicabilité"',
+  'makeAssertionFilter("Niveau de preuve"',
+  'assertionSearch.type = "search"',
+  'applicabilityFilter.addEventListener("change", renderAssertionReview)',
+  'evidenceFilter.addEventListener("change", renderAssertionReview)',
+  'assertionSearch.addEventListener("input", renderAssertionReview)',
+  'visibleReferenceAssertions = allReferenceAssertions.filter',
+  'slice(0, 40)',
+  'Aucune assertion ne correspond aux filtres.'
+])if(!assertionFilterBlock.includes(snippet))throw new Error("Biological assertion review filter regression: "+snippet);
+if(!assertionFilterBlock.includes("visibleReferenceAssertions.length + \" assertion(s) affichée(s) sur \""))throw new Error("Biological assertion filter count must report visible and total records");
+console.log("✓ Biological assertions can be filtered by applicability, evidence level and text with bounded results and an accessible count");
+const assertionComparisonStart=engine.indexOf("renderAssertionComparisons = () => {");
+const assertionComparisonEnd=engine.indexOf("const outcomeLabels = {",assertionComparisonStart);
+if(assertionComparisonStart<0||assertionComparisonEnd<0)throw new Error("Biological assertion comparison review is missing");
+const assertionComparisonBlock=engine.slice(assertionComparisonStart,assertionComparisonEnd);
+for(const snippet of [
+  "const assertions = visibleReferenceAssertions",
+  "visibleReferenceAssertions.slice(0, 100)",
+  "!/^\\d{4}-\\d{2}-\\d{2}$/.test(value)",
+  "left.applicability?.validity_window || left.validity_window",
+  "right.applicability?.validity_window || right.validity_window",
+  "visibleReferenceAssertions.length > 100",
+  "left.subject_type !== right.subject_type",
+  "left.predicate_code !== right.predicate_code",
+  "left.object_value",
+  "left.matching_context_ids",
+  "context.valid_from",
+  "context.valid_to",
+  "pair.periodLabel",
+  "appendComparedSource(pair.left, \"Source A\")",
+  "appendComparedSource(pair.right, \"Source B\")",
+  "source.source_url",
+  'sourceUrl.protocol === "https:"',
+  'sourceUrl.protocol === "http:"',
+  'link.rel = "noopener noreferrer"'
+])if(!assertionComparisonBlock.includes(snippet))throw new Error("Biological assertion comparison provenance regression: "+snippet);
+console.log("✓ Assertion divergences expose both source dossiers, locators, validity windows and safely validated source links");
+

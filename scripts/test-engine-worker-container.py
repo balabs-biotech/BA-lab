@@ -157,3 +157,67 @@ assert assessment["coverage"]["record_counts_by_type"] == {
 assert assessment["findings"] == []
 assert assessment["hypotheses"] == []
 print("GreenTech BIE v0.2 HTTP smoke test passed: plant subject, local measurement, weather provenance and result correlation.")
+
+
+# QC -> BIE composition: exercise the immutable upstream artifact through the
+# actual authenticated HTTP worker container, not only the in-process engine.
+import hashlib
+
+qc_artifact = {
+    "contract": "BA-LABS/UPSTREAM-ENGINE-ARTIFACT",
+    "contract_version": "1.0.0",
+    "role": "environmental_qc",
+    "execution_id": str(uuid4()),
+    "result_id": str(uuid4()),
+    "request_id": str(uuid4()),
+    "engine_id": "environmental.timeseries.qc",
+    "engine_version": "0.2.0",
+    "completed_at": "2026-11-13T00:05:00Z",
+    "input_snapshot_sha256": "f" * 64,
+    "scope": {
+        "organization_id": plant_payload["scope"]["organization_id"],
+        "location_id": location_id,
+        "window_start": plant_payload["parameters"]["window_start"],
+        "window_end": plant_payload["parameters"]["window_end"],
+    },
+    "result": {
+        "outcome": "success",
+        "value": {
+            "review_summary": {"outlier_count": 1},
+            "series": [{"variable_code": "air_temperature", "outlier_record_ids": [plant_measurement_id]}],
+        },
+        "limitations": ["Outlier flags require scientific review."],
+        "quality_flags": ["outlier_detected"],
+        "provenance": {"algorithm": "environmental-timeseries-qc-v2", "source_references": ["NASA_POWER/POWER_DAILY"]},
+    },
+}
+canonical_artifact = json.dumps(
+    qc_artifact, sort_keys=True, separators=(",", ":"), ensure_ascii=False, allow_nan=False,
+).encode("utf-8")
+qc_artifact["artifact_sha256"] = hashlib.sha256(canonical_artifact).hexdigest()
+composed_payload = dict(plant_payload)
+composed_payload["request_id"] = str(uuid4())
+composed_payload["upstream_artifacts"] = [qc_artifact]
+
+with request("/v1/execute", composed_payload, token) as response:
+    composed_result = json.loads(response.read())
+
+assert composed_result["status"] == "completed"
+assert composed_result["request_id"] == composed_payload["request_id"]
+assert composed_result["input_snapshot_sha256"] == composed_payload["input"]["snapshot_sha256"]
+composed_assessment = composed_result["result"]["value"]
+qc_assessment = composed_assessment["environmental_quality_control"]
+assert qc_assessment["state"] == "review_required"
+assert qc_assessment["upstream_execution_id"] == qc_artifact["execution_id"]
+assert qc_assessment["upstream_result_id"] == qc_artifact["result_id"]
+assert qc_assessment["artifact_sha256"] == qc_artifact["artifact_sha256"]
+assert qc_assessment["quality_flags"] == ["outlier_detected"]
+assert qc_assessment["limitations"] == qc_artifact["result"]["limitations"]
+assert qc_assessment["provenance"] == qc_artifact["result"]["provenance"]
+assert qc_assessment["value"] == qc_artifact["result"]["value"]
+assert "environmental_qc_review_required" in composed_result["result"]["quality_flags"]
+assert any(
+    f"#execution={qc_artifact['execution_id']}#result={qc_artifact['result_id']}#sha256={qc_artifact['artifact_sha256']}" in reference
+    for reference in composed_result["result"]["provenance"]["source_references"]
+)
+print("QC -> BIE HTTP composition smoke test passed: artifact digest, lineage identifiers, QC flags, limitations, value and provenance preserved.")

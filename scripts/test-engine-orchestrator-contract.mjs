@@ -1,9 +1,12 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
+import { matchesSingleUpstreamQcArtifact } from "../supabase/functions/_shared/upstream-qc-lineage.mjs";
 
 const source = readFileSync("supabase/functions/engine-orchestrator/index.ts", "utf8");
 const biologicalLoader = readFileSync("supabase/functions/_shared/biological-context-loader.ts", "utf8");
 const biologicalProfile = readFileSync("supabase/functions/_shared/biological-interpretation-profile.ts", "utf8");
+const qcLineageValidator = readFileSync("supabase/functions/_shared/upstream-qc-lineage.mjs", "utf8");
+const queueDispatcher = readFileSync("supabase/functions/engine-queue-dispatch/index.ts", "utf8");
 const checks = [
   ["BIE profile loader is imported into the authenticated orchestrator", /loadAuthenticatedBiologicalInterpretationProfile/],
   ["profile resolution refuses privileged client creation and requires the caller RLS client", /caller_scoped_supabase_client_required[\s\S]*?userClient\.from/, biologicalProfile],
@@ -12,7 +15,8 @@ const checks = [
   ["profile applicability requires the entire analysis window", /profile\.valid_from <= windowStartDate[\s\S]*?profile\.valid_to >= windowLastIncludedDate/, biologicalProfile],
   ["only validated references are eligible for interpretation", /reference\.status !== "validated"/, biologicalProfile],
   ["reference manifest preserves the stored SHA-256", /content_sha256: row\.content_sha256/, biologicalProfile],
-  ["profile manifest hashes the canonical profile and rules", /content_sha256: await sha256\(stable\(/, biologicalProfile],
+  ["profile manifest verifies persisted digests and computes a digest for immutable legacy profiles", /expectedProfileDigest = await sha256\(stable\([\s\S]*?expectedProfileDigest !== persistedProfileDigest[\s\S]*?content_sha256: profileDigest/, biologicalProfile],
+  ["profile lookup selects the persisted content digest", /\.select\("id,organization_id,domain,profile_code,profile_version,rules,content_sha256,status,valid_from,valid_to,created_at"\)/, biologicalProfile],
   ["profile lookup is organization and caller scoped", /userClient\.from\("domain_interpretation_profiles"\)[\s\S]*?\.eq\("organization_id", organizationId\)/, biologicalProfile],
   ["reference lookup is organization scoped and validated only", /userClient\.from\("biological_reference_registry"\)[\s\S]*?\.eq\("organization_id", organizationId\)[\s\S]*?\.eq\("status", "validated"\)/, biologicalProfile],
   ["profile evaluation is withheld if biological context changes during the window", /if \(!contextStable\) return \{ state: "context_not_stable"/, biologicalProfile],
@@ -50,7 +54,24 @@ const checks = [
   ["BIE plant subjects require engine v0.2.0", /scope\?\.plant_culture_id \? engineVersion === "0\.2\.0"/],
   ["BIE v0.2 is server-flag gated", /new Set\(\["0\.1\.0", "0\.2\.0"\]\)/],
   ["environmental QC is pinned to semantic version 0.2.0", /environmental\.timeseries\.qc[\s\S]*?new Set\(\["0\.2\.0"\]\)/],
+  ["upstream QC is resolved only from the authenticated tenant's execution ledger", /from\("engine_executions"\)[\s\S]*?\.eq\("organization_id", organizationId\)[\s\S]*?\.eq\("id", upstreamQcExecutionId\)/],
+  ["only completed environmental QC v0.2 executions can be attached", /upstream\.status !== "completed"[\s\S]*?upstream\.engine_id !== "environmental\.timeseries\.qc"[\s\S]*?upstream\.engine_version !== "0\.2\.0"/],
+  ["QC result is fetched from the exact upstream execution and tenant", /from\("engine_execution_results"\)[\s\S]*?\.eq\("organization_id", organizationId\)[\s\S]*?\.eq\("execution_id", upstream\.id\)/],
+  ["QC result metadata is correlated to the upstream execution snapshot", /qcResult\.execution_id !== upstream\.id[\s\S]*?qcResult\.input_snapshot_sha256 !== upstream\.input_snapshot_sha256/],
+  ["QC attachment requires exact location and analysis window match", /upstream\.scope\?\.location_id !== effectiveScope\.location_id[\s\S]*?qcParameters\.window_start !== windowStart[\s\S]*?qcParameters\.window_end !== windowEnd/],
+  ["QC artifact is bounded before being persisted", /artifact_sha256 = await sha256\(stable\(artifact\)\)[\s\S]*?byteLength > 64_000/],
+  ["QC artifact is passed through the immutable BIE request envelope", /upstream_artifacts: upstreamArtifacts/],
+  ["QC lineage uses one atomic enqueue RPC instead of a separate edge insert", /rpc\("enqueue_bie_with_environmental_qc"[\s\S]*?p_upstream_execution_id: upstreamQcExecutionId/],
+  ["QC remains optional when no upstream execution ID is supplied", /if \(upstreamQcExecutionId !== undefined\)[\s\S]*?upstreamArtifacts = \[artifact\]/],
+  ["idempotency binds the exact upstream QC artifact digest and payload", /stable\(prior\.request_payload\?\.upstream_artifacts \?\? \[\]\) === stable\(request\.upstream_artifacts \?\? \[\]\)/],
+  ["idempotency comparison binds the upstream artifact envelope", /upstream_artifacts[\s\S]*?sameExecutionInput/],
   ["worker response is schema validated", /validateResponse/],
+  ["completed BIE responses must preserve every upstream QC artifact identity, digest, scope and payload field", /matchesSingleUpstreamQcArtifact\(upstreamArtifacts, result, stable\)/],
+  ["async queue dispatcher validates the worker response against the immutable QC artifact before persistence", /matchesSingleUpstreamQcArtifact\(upstreamArtifacts, result, stable\)[\s\S]*?persistFailure\([\s\S]*?upstream_artifact_lineage_mismatch[\s\S]*?result\.execution_id = execution\.id/, queueDispatcher],
+  ["QC lineage validator fails closed unless exactly one artifact is present", /upstreamArtifacts\.length !== 1/, qcLineageValidator],
+  ["QC lineage validator compares immutable identity and scientific payload fields", /upstream_execution_id[\s\S]*?upstream_result_id[\s\S]*?upstream_engine_id[\s\S]*?upstream_engine_version[\s\S]*?upstream_completed_at[\s\S]*?upstream_input_snapshot_sha256[\s\S]*?artifact_sha256[\s\S]*?quality_flags[\s\S]*?limitations[\s\S]*?provenance[\s\S]*?consumed\.value/, qcLineageValidator],
+  ["upstream QC lineage mismatch is persisted as a terminal worker-owned failure before result commit", /upstream_artifact_lineage_mismatch[\s\S]*?persistExecutionFailure[\s\S]*?workerId[\s\S]*?return reply/],
+  ["worker lineage rejection returns before the atomic BIE result commit path", /if \(upstreamArtifacts\.length > 0 && result\.status === "completed"\)[\s\S]*?if \(!lineageMatches\)[\s\S]*?return reply\(persisted \? 502 : 500,[\s\S]*?\}\s*\}\s*\/\/ The durable ledger ID[\s\S]*?rpc\("complete_claimed_engine_execution"/],
   ["failed execution writes are scoped to queued state or the exact running worker owner", /async function persistExecutionFailure[\s\S]*?claimedWorkerId[\s\S]*?update\.eq\("claimed_by", claimedWorkerId\)\.eq\("status", "running"\)[\s\S]*?update\.eq\("status", "queued"\)/],
   ["async dispatch mode durably enqueues and returns 202 without calling the worker inline", /BA_ENGINE_ASYNC_DISPATCH[\s\S]*?return reply\(202,[\s\S]*?status: "queued"/],
   ["async mode does not require the worker URL or token in the API enqueue path", /asyncDispatchEnabled[\s\S]*?!asyncDispatchEnabled && \(!workerUrl \|\| !workerToken\)/],
@@ -72,6 +93,47 @@ const checks = [
 for (const [name, pattern, target = source] of checks) {
   assert.ok(pattern instanceof RegExp ? pattern.test(target) : pattern, name);
 }
+
+const stableFixture = (value) => {
+  if (Array.isArray(value)) return `[${value.map(stableFixture).join(",")}]`;
+  if (value && typeof value === "object") return `{${Object.keys(value).sort().map((key) => `${JSON.stringify(key)}:${stableFixture(value[key])}`).join(",")}}`;
+  return JSON.stringify(value);
+};
+const qcArtifactFixture = {
+  execution_id: "qc-execution-1", result_id: "qc-result-1",
+  engine_id: "environmental.timeseries.qc", engine_version: "0.2.0",
+  completed_at: "2026-11-14T12:00:00.000Z", input_snapshot_sha256: "a".repeat(64),
+  scope: { location_id: "loc-1", window_start: "2026-11-01", window_end: "2026-11-14" },
+  artifact_sha256: "b".repeat(64),
+  result: { outcome: "review_required", quality_flags: ["outlier_detected"], limitations: ["short_window"], provenance: { provider: "NASA_POWER" }, value: { review_summary: { outlier_count: 1 } } },
+};
+const consumedQcFixture = {
+  upstream_execution_id: qcArtifactFixture.execution_id, upstream_result_id: qcArtifactFixture.result_id,
+  upstream_engine_id: qcArtifactFixture.engine_id, upstream_engine_version: qcArtifactFixture.engine_version,
+  upstream_completed_at: qcArtifactFixture.completed_at, upstream_input_snapshot_sha256: qcArtifactFixture.input_snapshot_sha256,
+  upstream_scope: structuredClone(qcArtifactFixture.scope), artifact_sha256: qcArtifactFixture.artifact_sha256,
+  outcome: qcArtifactFixture.result.outcome, quality_flags: structuredClone(qcArtifactFixture.result.quality_flags),
+  limitations: structuredClone(qcArtifactFixture.result.limitations), provenance: structuredClone(qcArtifactFixture.result.provenance),
+  value: structuredClone(qcArtifactFixture.result.value),
+};
+const validWorkerResult = { status: "completed", result: { value: { environmental_quality_control: consumedQcFixture } } };
+assert.equal(matchesSingleUpstreamQcArtifact([qcArtifactFixture], validWorkerResult, stableFixture), true, "one exact QC artifact is accepted");
+assert.equal(matchesSingleUpstreamQcArtifact([], validWorkerResult, stableFixture), false, "zero artifacts fail closed");
+assert.equal(matchesSingleUpstreamQcArtifact([qcArtifactFixture, qcArtifactFixture], validWorkerResult, stableFixture), false, "multiple artifacts fail closed");
+assert.equal(matchesSingleUpstreamQcArtifact([qcArtifactFixture], { status: "completed", result: { value: {} } }, stableFixture), false, "missing consumed QC block is rejected");
+for (const [field, mutate] of [
+  ["execution identity", (qc) => { qc.upstream_execution_id = "other"; }],
+  ["result identity", (qc) => { qc.upstream_result_id = "other"; }],
+  ["artifact digest", (qc) => { qc.artifact_sha256 = "c".repeat(64); }],
+  ["quality flags", (qc) => { qc.quality_flags.push("silently_dropped"); }],
+  ["provenance", (qc) => { qc.provenance.provider = "untrusted"; }],
+  ["scope", (qc) => { qc.upstream_scope.location_id = "other-location"; }],
+]) {
+  const altered = structuredClone(consumedQcFixture);
+  mutate(altered);
+  assert.equal(matchesSingleUpstreamQcArtifact([qcArtifactFixture], { status: "completed", result: { value: { environmental_quality_control: altered } } }, stableFixture), false, `altered QC ${field} is rejected`);
+}
+process.stdout.write("Passed 10 fail-closed QC lineage validator cases.\\n");
 const sourceReadStart = source.indexOf("let sourceRows: Record<string, any>[];");
 const sourceReadEnd = source.indexOf("const records = sourceRows.map", sourceReadStart);
 assert.ok(sourceReadStart >= 0 && sourceReadEnd > sourceReadStart, "measurement snapshot query boundary exists");
@@ -87,3 +149,128 @@ assert.doesNotMatch(
   "orchestrator must not buffer an unbounded worker response before enforcing its limit",
 );
 console.log("Engine orchestration boundary contract passed");
+
+
+const executionResultsMigration = readFileSync(
+  "supabase/migrations/20261112030000_create_engine_execution_results.sql",
+  "utf8"
+);
+const completionMigration = readFileSync(
+  "supabase/migrations/20261113165000_complete_claimed_engine_execution.sql",
+  "utf8"
+);
+const tracker = readFileSync("batch-tracker/tracker.js", "utf8");
+const historyLoaderStart = tracker.indexOf("async function loadRecentEngineExecutions()");
+const historyLoaderEnd = tracker.indexOf("\nfunction scheduleEngineExecutionPolling", historyLoaderStart);
+const historyLoader = tracker.slice(historyLoaderStart, historyLoaderEnd);
+const storedResultStart = tracker.indexOf("function getStoredEngineResult(execution)");
+const storedResultEnd = tracker.indexOf("\nfunction getComparableEngineExecutions", storedResultStart);
+const storedResultResolver = tracker.slice(storedResultStart, storedResultEnd);
+
+assert.ok(
+  /v_payload->'value'/.test(executionResultsMigration) &&
+  /v_payload->'limitations'/.test(executionResultsMigration) &&
+  /v_payload->'quality_flags'/.test(executionResultsMigration) &&
+  /v_payload->'provenance'/.test(executionResultsMigration),
+  "Atomic result persistence must store the complete JSONB value and its evidence fields without reconstructing or projecting the payload"
+);
+assert.ok(
+  /set status = 'completed', result_payload = p_result/.test(executionResultsMigration),
+  "The execution ledger must retain the original completed result envelope"
+);
+assert.ok(
+  /return public\.complete_engine_execution\([\s\S]*?p_result/.test(completionMigration),
+  "Worker-owned completion must pass the original result envelope unchanged to the atomic result writer"
+);
+assert.ok(
+  /select\("id,execution_id,engine_id,engine_version,result_type,outcome,value,limitations,quality_flags,confidence,provenance,generated_at,input_snapshot_sha256,input_record_ids"\)/.test(historyLoader),
+  "Execution history must retrieve the full persisted result value and metadata in one organization-scoped batch"
+);
+assert.ok(
+  /\.eq\("organization_id", loadOrganizationId\)[\s\S]*?\.in\("execution_id", completedIds\)/.test(historyLoader),
+  "Persisted results must be fetched only for the active organization and the visible completed executions"
+);
+assert.ok(
+  /return stored \|\| \(envelopeResult/.test(storedResultResolver),
+  "The UI must prefer the persisted immutable result row over the ledger envelope fallback"
+);
+assert.ok(
+  /environmental_quality_control/.test(tracker) &&
+  /qc\.artifact_sha256/.test(tracker),
+  "The rendered BIE view must expose QC lineage and artifact digest from the persisted JSONB value"
+);
+console.log("✓ Persisted BIE results retain and render the complete environmental QC lineage and artifact digest");
+
+
+const persistenceCheckStart = tracker.indexOf("function canonicalizeEngineEvidence(value)");
+const persistenceCheckEnd = tracker.indexOf("\nfunction getComparableEngineExecutions", persistenceCheckStart);
+const persistenceCheck = tracker.slice(persistenceCheckStart, persistenceCheckEnd);
+assert.ok(
+  persistenceCheckStart >= 0 &&
+  persistenceCheckEnd > persistenceCheckStart &&
+  /Object\.keys\(value\)\.sort\(\)/.test(persistenceCheck) &&
+  /JSON\.stringify\(canonicalizeEngineEvidence/.test(persistenceCheck),
+  "Ledger/result parity must compare canonicalized nested JSON so JSONB key ordering cannot create false mismatches"
+);
+for (const field of ["outcome", "value", "limitations", "quality_flags", "confidence", "provenance"]) {
+  assert.ok(persistenceCheck.includes('"'+field+'"'), "Ledger/result parity must compare persisted field: " + field);
+}
+assert.ok(
+  /stored\.input_snapshot_sha256[\s\S]*?envelope\.input_snapshot_sha256/.test(persistenceCheck) &&
+  /stored\.input_record_ids[\s\S]*?execution\.input_record_ids/.test(persistenceCheck),
+  "Ledger/result parity must bind the result to the same input snapshot and source record IDs"
+);
+assert.ok(
+  /getEngineResultPersistenceConsistency\(execution\)/.test(tracker) &&
+  /Cohérence ledger \/ résultat persisté/.test(tracker) &&
+  /DIVERGENCE : /.test(tracker),
+  "The execution lineage UI must explicitly display exact agreement, divergence, or unverifiable persistence state"
+);
+console.log("✓ UI detects divergence between the immutable result row and the execution ledger envelope");
+
+
+assert.ok(
+  /stored\.execution_id !== execution\.id/.test(persistenceCheck) &&
+  /stored\.engine_id !== execution\.engine_id/.test(persistenceCheck) &&
+  /stored\.engine_version !== execution\.engine_version/.test(persistenceCheck) &&
+  /stored\.result_type !== execution\.engine_id/.test(persistenceCheck) &&
+  /typeof stored\.id !== "string"/.test(persistenceCheck),
+  "Persisted result identity, engine version, type, and durable result ID must match the ledger execution"
+);
+assert.ok(
+  /select\("id,execution_id,engine_id,engine_version,result_type/.test(historyLoader) &&
+  /Identifiant du résultat persistant/.test(tracker),
+  "History reload must retrieve and expose the durable result row ID and its engine identity"
+);
+console.log("✓ Persisted result row identity is bound to its durable execution ledger entry");
+
+
+const qcIntegrityBoundary = source.slice(
+  source.indexOf('const { data: qcResult, error: qcResultError }'),
+  source.indexOf('const artifact: Record<string, any>', source.indexOf('const { data: qcResult, error: qcResultError }')),
+);
+assert.match(
+  qcIntegrityBoundary,
+  /stable\(qcResult\.input_record_ids\) !== stable\(upstream\.input_record_ids\)/,
+  "A persisted QC result must retain exactly the source record IDs captured by its execution ledger"
+);
+assert.match(
+  qcIntegrityBoundary,
+  /qcResult\.generated_at !== upstream\.completed_at/,
+  "A persisted QC result generation timestamp must equal the ledger completion timestamp"
+);
+const authenticatedRuntimeTest = readFileSync(
+  "scripts/test-local-engine-authenticated-orchestrator.mjs",
+  "utf8"
+);
+assert.match(
+  authenticatedRuntimeTest,
+  /array\['" \+ mismatchedLineageSourceId \+ "'::uuid\]/,
+  "Authenticated runtime coverage must include a QC fixture whose persisted source IDs diverge from the ledger"
+);
+assert.match(
+  authenticatedRuntimeTest,
+  /BIE rejects QC result with mismatched source record lineage[\s\S]*?upstream_qc_result_integrity_mismatch/,
+  "The runtime must reject a QC source-lineage mismatch before creating a BIE execution"
+);
+console.log("✓ QC result lineage and completion timestamp integrity boundaries are contract-tested");

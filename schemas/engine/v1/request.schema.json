@@ -118,7 +118,8 @@
                 "enum": [
                   "measurement",
                   "observation",
-                  "environmental_observation"
+                  "environmental_observation",
+                  "event"
                 ]
               },
               "payload_sha256": {
@@ -166,6 +167,14 @@
             "type": "string",
             "maxLength": 100
           },
+          "profile_id": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_.-]{1,79}$"
+          },
+          "profile_version": {
+            "type": "string",
+            "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+          },
           "content_sha256": {
             "type": "string",
             "pattern": "^[a-f0-9]{64}$"
@@ -179,6 +188,186 @@
             "format": "uri"
           }
         },
+        "additionalProperties": false,
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "provider": {
+                  "const": "BA_LABS_INTERPRETATION_PROFILE"
+                }
+              },
+              "required": [
+                "provider"
+              ]
+            },
+            "then": {
+              "properties": {
+                "dataset_version": {},
+                "profile_id": {},
+                "profile_version": {}
+              },
+              "required": [
+                "dataset_version",
+                "profile_id",
+                "profile_version"
+              ]
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "provider": {
+                  "const": "BA_LABS_BIOLOGICAL_REFERENCE_ASSERTION"
+                }
+              },
+              "required": [
+                "provider"
+              ]
+            },
+            "then": {
+              "properties": {
+                "dataset_version": {
+                  "type": "string",
+                  "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+([+-][0-9A-Za-z.-]+)?$"
+                }
+              },
+              "required": [
+                "dataset_version"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "upstream_artifacts": {
+      "type": "array",
+      "maxItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "contract",
+          "contract_version",
+          "role",
+          "execution_id",
+          "result_id",
+          "request_id",
+          "engine_id",
+          "engine_version",
+          "completed_at",
+          "input_snapshot_sha256",
+          "scope",
+          "result",
+          "artifact_sha256"
+        ],
+        "properties": {
+          "contract": {
+            "const": "BA-LABS/UPSTREAM-ENGINE-ARTIFACT"
+          },
+          "contract_version": {
+            "const": "1.0.0"
+          },
+          "role": {
+            "const": "environmental_qc"
+          },
+          "execution_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "result_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "request_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "engine_id": {
+            "const": "environmental.timeseries.qc"
+          },
+          "engine_version": {
+            "const": "0.2.0"
+          },
+          "completed_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "input_snapshot_sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "scope": {
+            "type": "object",
+            "required": [
+              "organization_id",
+              "location_id",
+              "window_start",
+              "window_end"
+            ],
+            "properties": {
+              "organization_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "location_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "window_start": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "window_end": {
+                "type": "string",
+                "format": "date-time"
+              }
+            },
+            "additionalProperties": false
+          },
+          "result": {
+            "type": "object",
+            "required": [
+              "outcome",
+              "value",
+              "limitations",
+              "quality_flags",
+              "provenance"
+            ],
+            "properties": {
+              "outcome": {
+                "enum": [
+                  "success",
+                  "insufficient_data",
+                  "out_of_domain",
+                  "review_required"
+                ]
+              },
+              "value": {
+                "type": "object"
+              },
+              "limitations": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "quality_flags": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "provenance": {
+                "type": "object"
+              }
+            },
+            "additionalProperties": false
+          },
+          "artifact_sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          }
+        },
         "additionalProperties": false
       }
     }
@@ -187,8 +376,10 @@
   "allOf": [
     {
       "if": {
+        "type": "object",
         "properties": {
           "engine": {
+            "type": "object",
             "properties": {
               "engine_id": {
                 "const": "biological.context.features"
@@ -204,13 +395,17 @@
         ]
       },
       "then": {
+        "type": "object",
         "properties": {
           "input": {
+            "type": "object",
             "properties": {
               "record_ids": {
+                "type": "array",
                 "minItems": 0
               },
               "records": {
+                "type": "array",
                 "minItems": 0
               }
             }
@@ -218,13 +413,17 @@
         }
       },
       "else": {
+        "type": "object",
         "properties": {
           "input": {
+            "type": "object",
             "properties": {
               "record_ids": {
+                "type": "array",
                 "minItems": 1
               },
               "records": {
+                "type": "array",
                 "minItems": 1
               }
             }

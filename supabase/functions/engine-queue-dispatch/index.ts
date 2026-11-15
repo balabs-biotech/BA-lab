@@ -5,6 +5,7 @@ import Ajv2020 from "npm:ajv@8.17.1/dist/2020.js";
 import addFormats from "npm:ajv-formats@3.0.1";
 import requestSchema from "../../../schemas/engine/v1/request.schema.json" with { type: "json" };
 import responseSchema from "../../../schemas/engine/v1/response.schema.json" with { type: "json" };
+import { matchesSingleUpstreamQcArtifact } from "../_shared/upstream-qc-lineage.mjs";
 
 const headers = {
   "Access-Control-Allow-Origin": "*",
@@ -151,7 +152,15 @@ async function processExecution(
     ) ? "failed" : "lost";
   }
 
-  const actualSnapshotDigest = await sha256(stable(request.input?.records));
+  // BIE snapshots bind both observation records and the resolved biological
+  // context descriptors. Other engines bind their record array only.
+  const snapshotPayload = execution.engine_id === "biological.context.features"
+    ? {
+      records: request.input?.records,
+      biological_contexts: request.parameters?.biological_contexts ?? [],
+    }
+    : request.input?.records;
+  const actualSnapshotDigest = await sha256(stable(snapshotPayload));
   if (actualSnapshotDigest !== execution.input_snapshot_sha256) {
     return await persistFailure(
       db, execution, workerId, "input_snapshot_digest_mismatch",
@@ -178,6 +187,14 @@ async function processExecution(
       : error instanceof DOMException && error.name === "TimeoutError"
       ? "worker_timeout"
       : "worker_unreachable";
+    // Keep transport diagnostics in Edge logs; the durable client-facing
+    // ledger message remains deliberately generic.
+    console.error("[engine-queue-dispatch] worker transport failed", {
+      execution_id: execution.id,
+      worker_url: workerUrl,
+      error_name: error instanceof Error ? error.name : "unknown",
+      error_message: error instanceof Error ? error.message.slice(0, 500) : "unknown",
+    });
     return await persistFailure(
       db, execution, workerId, code,
       "The registered engine worker did not return a usable response.",
@@ -199,6 +216,18 @@ async function processExecution(
       db, execution, workerId,
       !response.ok ? "worker_http_error" : "worker_response_invalid_or_unbound",
       "Worker response failed transport, schema, or execution-correlation validation.",
+    ) ? "failed" : "lost";
+  }
+
+  // The async dispatcher is the actual worker boundary for queued executions.
+  // Revalidate the exact immutable QC artifact here; the enqueue-time Edge
+  // function cannot validate a worker response that does not exist yet.
+  const upstreamArtifacts = Array.isArray(request.upstream_artifacts) ? request.upstream_artifacts : [];
+  if (upstreamArtifacts.length > 0 && result.status === "completed" &&
+      !matchesSingleUpstreamQcArtifact(upstreamArtifacts, result, stable)) {
+    return await persistFailure(
+      db, execution, workerId, "upstream_artifact_lineage_mismatch",
+      "The BIE worker result did not preserve the verified upstream QC artifact.",
     ) ? "failed" : "lost";
   }
 

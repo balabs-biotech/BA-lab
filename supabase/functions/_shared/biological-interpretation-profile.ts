@@ -112,6 +112,28 @@ export async function buildBiologicalInterpretationProfile(input: {
     !/^\d{4}-\d{2}-\d{2}$/.test(profile.valid_from) ||
     (profile.valid_to !== null && !/^\d{4}-\d{2}-\d{2}$/.test(profile.valid_to))
   ) throw new Error("interpretation_profile_metadata_invalid");
+  const profileId = `${profile.domain}.${profile.profile_code}`;
+  const expectedProfileDigest = await sha256(stable({
+    profile_id: profileId,
+    profile_version: profile.profile_version,
+    rules: profile.rules,
+  }));
+  const persistedProfileDigest = profile.content_sha256;
+  if (
+    persistedProfileDigest !== null &&
+    persistedProfileDigest !== undefined &&
+    (
+      typeof persistedProfileDigest !== "string" ||
+      !/^[0-9a-f]{64}$/.test(persistedProfileDigest) ||
+      expectedProfileDigest !== persistedProfileDigest
+    )
+  ) {
+    throw new Error("interpretation_profile_content_hash_mismatch");
+  }
+  // Legacy activated profiles predate the digest column. Their immutable DB
+  // row is still verifiable; compute the manifest digest until they are
+  // explicitly versioned again. New activations require a persisted digest.
+  const profileDigest = persistedProfileDigest ?? expectedProfileDigest;
   const references = requireValidRuleReferences(profile.rules);
   const resolvedReferences = new Map<string, Row>();
   for (const reference of input.references) {
@@ -128,17 +150,11 @@ export async function buildBiologicalInterpretationProfile(input: {
 
   const datasets: Row[] = [{
     provider: "BA_LABS_INTERPRETATION_PROFILE",
-    dataset_id: profile.profile_code,
-    dataset_version: profile.profile_version,
-    content_sha256: await sha256(stable({
-      organization_id: profile.organization_id,
-      domain: profile.domain,
-      profile_code: profile.profile_code,
-      profile_version: profile.profile_version,
-      rules: profile.rules,
-      valid_from: profile.valid_from,
-      valid_to: profile.valid_to,
-    })),
+    dataset_id: PROFILE_CODE,
+    dataset_version: "1.0.0",
+    profile_id: profileId,
+    profile_version: profile.profile_version,
+    content_sha256: profileDigest,
     retrieved_at: profile.created_at,
   }];
 
@@ -170,6 +186,7 @@ export async function buildBiologicalInterpretationProfile(input: {
       id: profile.id,
       domain: profile.domain,
       profile_code: profile.profile_code,
+      profile_id: profileId,
       profile_version: profile.profile_version,
       valid_from: profile.valid_from,
       valid_to: profile.valid_to,
@@ -198,7 +215,7 @@ export async function loadAuthenticatedBiologicalInterpretationProfile(input: {
   if (!ALLOWED_DOMAINS.has(domain)) throw new Error("interpretation_profile_domain_invalid");
 
   const profileResult = await userClient.from("domain_interpretation_profiles")
-    .select("id,organization_id,domain,profile_code,profile_version,rules,status,valid_from,valid_to,created_at")
+    .select("id,organization_id,domain,profile_code,profile_version,rules,content_sha256,status,valid_from,valid_to,created_at")
     .eq("organization_id", organizationId)
     .eq("domain", domain)
     .eq("profile_code", PROFILE_CODE)

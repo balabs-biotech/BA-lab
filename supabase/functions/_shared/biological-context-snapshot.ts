@@ -38,6 +38,34 @@ export interface BiologicalMeasurementRow {
   metadata?: Record<string, unknown> | null;
 }
 
+export interface BiologicalEventRow {
+  id: string;
+  organization_id: string;
+  event_type: string;
+  occurred_at: string;
+  culture_id?: string | null;
+  plant_culture_id?: string | null;
+  material_id?: string | null;
+  sample_id?: string | null;
+  experimental_unit_id?: string | null;
+  location_id?: string | null;
+  environment_id?: string | null;
+  payload?: Record<string, unknown> | null;
+}
+
+export interface BiologicalObservationRow {
+  id: string;
+  organization_id: string;
+  culture_id?: string | null;
+  plant_culture_id?: string | null;
+  variable_code: string;
+  value_text: string;
+  observed_at: string;
+  event_id?: string | null;
+  quality_state?: string | null;
+  metadata?: Record<string, unknown> | null;
+}
+
 export interface BiologicalEnvironmentalObservationRow {
   id: string;
   organization_id: string;
@@ -93,6 +121,8 @@ export async function buildBiologicalContextSnapshot(input: {
   plantCulture?: BiologicalCultureRow;
   environment: BiologicalEnvironmentRow | null;
   measurements: BiologicalMeasurementRow[];
+  observations?: BiologicalObservationRow[];
+  events?: BiologicalEventRow[];
   environmentalObservations: BiologicalEnvironmentalObservationRow[];
   measurementContextById?: Record<string, {
     status: string;
@@ -138,7 +168,7 @@ export async function buildBiologicalContextSnapshot(input: {
       throw new Error("measurement_" + subjectType + "_scope_mismatch");
     }
     const instant = parseInstant(row.measured_at, "measurement_timestamp");
-    if (instant < windowStart || instant > windowEnd) continue;
+    if (instant < windowStart || instant >= windowEnd) continue;
     const context = {
       [subjectField]: row[subjectField],
       environment_id: input.measurementContextById?.[row.id]
@@ -172,6 +202,57 @@ export async function buildBiologicalContextSnapshot(input: {
     });
   }
 
+  for (const row of input.observations ?? []) {
+    if (row.organization_id !== organizationId || row[subjectField] !== subject.id) {
+      throw new Error("observation_" + subjectType + "_scope_mismatch");
+    }
+    const instant = parseInstant(row.observed_at, "observation_timestamp");
+    if (instant < windowStart || instant >= windowEnd) continue;
+    const context = { [subjectField]: row[subjectField], event_id: row.event_id ?? null };
+    const data = {
+      variable_code: row.variable_code,
+      value_text: row.value_text,
+      observed_at: row.observed_at,
+      quality_state: row.quality_state ?? null,
+      metadata: row.metadata ?? {},
+    };
+    records.push({
+      record_id: row.id,
+      record_type: "observation",
+      payload_sha256: await sha256(stable({ source: row, context })),
+      data,
+      context,
+    });
+  }
+
+  for (const row of input.events ?? []) {
+    if (row.organization_id !== organizationId || row[subjectField] !== subject.id) {
+      throw new Error("event_" + subjectType + "_scope_mismatch");
+    }
+    const instant = parseInstant(row.occurred_at, "event_timestamp");
+    if (instant < windowStart || instant >= windowEnd) continue;
+    const context = {
+      [subjectField]: row[subjectField],
+      material_id: row.material_id ?? null,
+      sample_id: row.sample_id ?? null,
+      experimental_unit_id: row.experimental_unit_id ?? null,
+      location_id: row.location_id ?? null,
+      environment_id: row.environment_id ?? null,
+    };
+    const data = {
+      event_type: row.event_type,
+      occurred_at: row.occurred_at,
+      payload: row.payload ?? {},
+    };
+    records.push({
+      record_id: row.id,
+      record_type: "event",
+      payload_sha256: await sha256(stable({ source: row, context })),
+      data,
+      context,
+    });
+  }
+
   if (input.environmentalObservations.length && !locationId) {
     throw new Error(subjectType + "_environment_location_not_resolved");
   }
@@ -181,7 +262,7 @@ export async function buildBiologicalContextSnapshot(input: {
     }
     if (row.data_family !== "weather") continue;
     const instant = parseInstant(row.observed_at, "environmental_observation_timestamp");
-    if (instant < windowStart || instant > windowEnd) continue;
+    if (instant < windowStart || instant >= windowEnd) continue;
     const context = { location_id: row.location_id };
     const data = {
       variable_code: row.variable_code,
@@ -209,8 +290,8 @@ export async function buildBiologicalContextSnapshot(input: {
   records.sort((a, b) => {
     const aData = a.data as Record<string, unknown>;
     const bData = b.data as Record<string, unknown>;
-    const aTime = parseInstant(String(aData.measured_at ?? aData.observed_at ?? ""), "record_timestamp");
-    const bTime = parseInstant(String(bData.measured_at ?? bData.observed_at ?? ""), "record_timestamp");
+    const aTime = parseInstant(String(aData.measured_at ?? aData.observed_at ?? aData.occurred_at ?? ""), "record_timestamp");
+    const bTime = parseInstant(String(bData.measured_at ?? bData.observed_at ?? bData.occurred_at ?? ""), "record_timestamp");
     return aTime - bTime || String(a.record_id).localeCompare(String(b.record_id));
   });
   const recordIds = records.map((record) => String(record.record_id));

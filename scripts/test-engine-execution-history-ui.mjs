@@ -20,6 +20,12 @@ for (const label of [
   "Fenêtre demandée : ",
   "Contexte manquant ou non résolu",
   "Faits observés et sources",
+  "observations biologiques",
+  "événements : ",
+  "événement : ",
+  "Chronologie biologique",
+  "Voir l’événement associé",
+  "Observations liées : ",
   "Caractéristiques calculées",
   "Hypothèses à vérifier",
   "Lacunes temporelles"
@@ -68,9 +74,19 @@ const renderer = tracker.slice(rendererStart, overviewStart);
 const biologicalRendererStart = tracker.indexOf("function renderBiologicalContextAssessment(");
 assert.ok(biologicalRendererStart >= 0 && biologicalRendererStart < rendererStart);
 const biologicalRenderer = tracker.slice(biologicalRendererStart, rendererStart);
-for (const contract of ["biological.context_assessment", "record_counts_by_type", "missing_context", "observed_facts", "derived_features", "findings", "hypotheses", "temporal_gaps", "quality_flags", "limitations", "provenance", "source_references", "biological_contexts", "genetic_reference", "genetic_reference_ids", "strain_code", "culture_stage", "substrate_code", "production_system", "textContent"]) {
+for (const contract of ["biological.context_assessment", "record_counts_by_type", "missing_context", "observed_facts", "derived_features", "Dynamique temporelle observée", "Tendance linéaire estimée", "Amplitude observée", "Dispersion (écart-type)", "Variabilité relative", "Rupture moyenne exploratoire", "largest_two_segment_mean_shift", "population_stddev", "coefficient_of_variation_pct", "trend_slope_per_day", "Indicateurs descriptifs calculés", "findings", "hypotheses", "temporal_gaps", "quality_flags", "limitations", "provenance", "source_references", "biological_contexts", "genetic_reference", "genetic_reference_ids", "strain_code", "culture_stage", "substrate_code", "production_system", "environmental_quality_control", "upstream_execution_id", "upstream_result_id", "artifact_sha256", "quality_flags", "qcProvenance", "engine-upstream-qc", "engine-review-signals", "Points de vigilance", "environmental_qc_review_required", "gap_intervals", "duplicate_timestamp_groups", "outlier_evidence", "robust_z_score", "rolling_baseline_anomaly_evidence", "baseline_median", "Anomalies par rapport à l'historique", "Séries environnementales contrôlées", "Valeurs atypiques", "biological_identity_conflict", "temporal_gaps_detected", "all_input_records_excluded", "no_observations_available", "partial_input_exclusion", "no_eligible_local_measurements", "no_linked_environmental_observations_supplied", "finding_code", "supporting_record_ids", "derived_feature_codes", "Aucune donnée admissible", "Aucune observation disponible", "Jeu de données partiellement écarté", "Ces signaux indiquent des éléments à examiner", "textContent"]) {
   assert.ok(biologicalRenderer.includes(contract), "Missing BIE UI contract: " + contract);
 }
+assert.match(biologicalRenderer, /Remonter aux observations environnementales/);
+assert.equal((biologicalRenderer.match(/addList\(article, "Assertions d’identité vérifiées"/g) || []).length, 1, "identity assertion list must render exactly once");
+assert.match(biologicalRenderer, /from\("engine_executions"\)/);
+assert.match(biologicalRenderer, /from\("environmental_observations"\)/);
+assert.match(biologicalRenderer, /\.eq\("organization_id", expectedOrganizationId\)/);
+assert.match(biologicalRenderer, /\.in\("id", ids\)/);
+assert.match(biologicalRenderer, /input_record_ids/);
+assert.match(biologicalRenderer, /Identifiants non résolus/);
+assert.match(biologicalRenderer, /organizationId !== expectedOrganizationId/);
+assert.match(biologicalRenderer, /aria-live/);
 assert.doesNotMatch(biologicalRenderer, /innerHTML|insertAdjacentHTML/);
 assert.match(renderer, /renderBiologicalContextAssessment\(article, result\)/);
 
@@ -139,11 +155,13 @@ for (const path of [
   const page = readFileSync(path, "utf8");
   if (path.includes("green-tech")) {
     assert.match(page, /workspace\.html\?v=20261113-bie-identity-ui-1/);
-    assert.match(page, /tracker\.js\?v=20261113-bie-async-dispatch-1/);
+    assert.match(page, /tracker\.js\?v=20261115-bie-qc-provenance-select-1/);
+    assert.match(page, /tracker\.css\?v=20261115-bie-qc-provenance-select-1/);
     assert.match(page, /environmental-data\.js\?v=20261112-greentech-engine-qc-1/);
   } else {
     assert.match(page, /workspace\.html\?v=20261113-bie-identity-ui-1/);
-    assert.match(page, /tracker\.js\?v=20261113-bie-async-dispatch-1/);
+    assert.match(page, /tracker\.js\?v=20261115-bie-qc-provenance-select-1/);
+    assert.match(page, /tracker\.css\?v=20261115-bie-qc-provenance-select-1/);
   }
 }
 
@@ -239,3 +257,46 @@ assert.match(environmental, /recordIds\.length>500/);
 assert.match(environmental, /summary\.excluded_record_count/);
 assert.match(environmental, /gap_after_record_ids/);
 assert.doesNotMatch(environmental, /engineOutput\.innerHTML/);
+
+
+const persistedIdentityStart = tracker.indexOf("function getEngineResultPersistenceConsistency(execution)");
+const persistedIdentityEnd = tracker.indexOf("\nfunction getComparableEngineExecutions", persistedIdentityStart);
+assert.ok(persistedIdentityStart >= 0 && persistedIdentityEnd > persistedIdentityStart);
+const persistedIdentity = tracker.slice(persistedIdentityStart, persistedIdentityEnd);
+for (const contract of [
+  "stored.execution_id !== execution.id",
+  "stored.engine_id !== execution.engine_id",
+  "stored.engine_version !== execution.engine_version",
+  "stored.result_type !== execution.engine_id",
+  "typeof stored.id !== \"string\"",
+  "stored.input_snapshot_sha256",
+  "stored.input_record_ids"
+]) assert.ok(persistedIdentity.includes(contract), "Missing persisted-result identity guard: " + contract);
+assert.match(loader, /select\("id,execution_id,engine_id,engine_version,result_type/);
+assert.match(renderer, /Identifiant du résultat persistant/);
+assert.match(renderer, /Cohérence ledger \/ résultat persisté/);
+assert.match(renderer, /DIVERGENCE : /);
+assert.match(biologicalRenderer, /event_id/);
+assert.match(biologicalRenderer, /Chronologie biologique/);
+assert.match(biologicalRenderer, /Voir l’événement associé/);
+assert.match(biologicalRenderer, /engine-biological-fact-timeline/);
+assert.match(biologicalRenderer, /engine-biological-fact-event-link/);
+assert.match(biologicalRenderer, /Observations liées : /);
+assert.match(biologicalRenderer, /engine-biological-fact-related-observations/);
+console.log("✓ Persisted result identity, durable result ID and ledger parity are exposed in execution history");
+
+for (const contract of [
+  'from("engine_execution_results")',
+  '.select("id,status,engine_id,engine_version,input_record_ids,input_snapshot_sha256,scope,request_payload,created_at,completed_at")',
+  'upstream.status !== "completed"',
+  'upstream.request_payload?.parameters || {}',
+  'persistedQcResult.id !== qc.upstream_result_id',
+  'persistedQcResult.execution_id !== upstream.id',
+  'persistedQcResult.input_snapshot_sha256 !== upstream.input_snapshot_sha256',
+  'engineEvidenceMatches(persistedQcResult.value, qc.value)',
+  'verifiedArtifactSha256 !== qc.artifact_sha256',
+  'qc.upstream_scope?.organization_id !== expectedOrganizationId',
+  'upstreamParameters.window_start !== qc.upstream_scope?.window_start',
+  'Intégrité QC : résultat persistant retrouvé'
+]) assert.ok(biologicalRenderer.includes(contract), "Missing upstream QC revalidation contract: " + contract);
+console.log("✓ BIE trace drilldown re-reads the tenant-scoped QC result and recomputes the upstream artifact SHA-256");

@@ -124,3 +124,63 @@ const wrongPlant = resolveBiologicalContext({
 assert.equal(wrongPlant.window.status, "missing",
   "plant contexts must never resolve across plant_culture_id boundaries");
 console.log("✓ BIE temporal resolver: GreenTech plant_culture_id isolation and dated environment resolution");
+
+
+// Parallel domain contexts are valid when they resolve to the same environment.
+// They must not create a false environmental ambiguity.
+const parallelSameEnvironment = resolveBiologicalContext({
+  organizationId, cultureId, environments,
+  contexts: [
+    { ...contexts[0], domain: "mycology", environment_id: envA, valid_from: "2026-11-01", valid_to: null },
+    { ...contexts[0], id: "88888888-8888-4888-8888-888888888888", domain: "lab", environment_id: envA, valid_from: "2026-11-01", valid_to: null },
+  ],
+  measurements: [{ id: "m-parallel", measured_at: "2026-11-10T08:00:00Z", environment_id: envA }],
+  window: { start: "2026-11-10T00:00:00Z", end: "2026-11-11T00:00:00Z", timezone: "Africa/Algiers" },
+});
+assert.equal(parallelSameEnvironment.measurements[0].status, "resolved",
+  "parallel contexts sharing one environment must resolve a measurement");
+assert.equal(parallelSameEnvironment.window.status, "resolved",
+  "parallel domains sharing one environment must not create false window ambiguity");
+assert.equal(parallelSameEnvironment.window.environment_id, envA);
+
+// Distinct environment assignments remain ambiguous even if the contexts
+// belong to different domains and overlap for the requested date.
+const parallelDifferentEnvironments = resolveBiologicalContext({
+  organizationId, cultureId, environments,
+  contexts: [
+    { ...contexts[0], domain: "mycology", environment_id: envA, valid_from: "2026-11-01", valid_to: null },
+    { ...contexts[0], id: "99999999-9999-4999-8999-999999999999", domain: "lab", environment_id: envB, valid_from: "2026-11-01", valid_to: null },
+  ],
+  measurements: [{ id: "m-parallel-conflict", measured_at: "2026-11-10T08:00:00Z", environment_id: null }],
+  window: { start: "2026-11-10T00:00:00Z", end: "2026-11-11T00:00:00Z", timezone: "Africa/Algiers" },
+});
+assert.equal(parallelDifferentEnvironments.measurements[0].status, "ambiguous");
+assert.equal(parallelDifferentEnvironments.window.status, "ambiguous");
+
+// Adjacent half-open context intervals with the same environment jointly
+// cover the complete window and are therefore resolvable.
+const adjacentSameEnvironment = resolveBiologicalContext({
+  organizationId, cultureId, environments,
+  contexts: [
+    { ...contexts[0], environment_id: envA, valid_from: "2026-11-10", valid_to: "2026-11-11" },
+    { ...contexts[1], id: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaab", environment_id: envA, valid_from: "2026-11-11", valid_to: "2026-11-12" },
+  ],
+  measurements: [],
+  window: { start: "2026-11-09T23:00:00Z", end: "2026-11-11T23:00:00Z", timezone: "Africa/Algiers" },
+});
+assert.equal(adjacentSameEnvironment.window.status, "resolved",
+  "adjacent intervals for the same environment should continuously cover the half-open window");
+assert.equal(adjacentSameEnvironment.window.environment_id, envA);
+
+const sameEnvironmentWithGap = resolveBiologicalContext({
+  organizationId, cultureId, environments,
+  contexts: [
+    { ...contexts[0], environment_id: envA, valid_from: "2026-11-10", valid_to: "2026-11-11" },
+    { ...contexts[1], id: "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbc", environment_id: envA, valid_from: "2026-11-12", valid_to: "2026-11-13" },
+  ],
+  measurements: [],
+  window: { start: "2026-11-10T00:00:00Z", end: "2026-11-13T00:00:00Z", timezone: "Africa/Algiers" },
+});
+assert.equal(sameEnvironmentWithGap.window.status, "missing",
+  "same-environment contexts must not conceal a date gap");
+console.log("✓ BIE temporal resolver: parallel domains, stable environment identity, continuous coverage and gaps");

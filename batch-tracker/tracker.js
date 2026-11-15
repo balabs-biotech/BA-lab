@@ -6739,6 +6739,9 @@ async function runPlantBiologicalAssessment() {
           plant_culture_id: plantCultureId,
         },
         record_ids: [],
+        ...(document.getElementById("plantBiologicalAssessmentQcExecution")?.value
+          ? { upstream_qc_execution_id: document.getElementById("plantBiologicalAssessmentQcExecution").value }
+          : {}),
         parameters: {
           window_start: startDate + "T00:00:00+01:00",
           window_end: endDate + "T00:00:00+01:00",
@@ -7087,7 +7090,7 @@ async function loadRecentEngineExecutions() {
   recentEngineResultsByExecution = new Map();
   if (completedIds.length) {
     const resultsQuery = await supabaseClient.from("engine_execution_results")
-      .select("execution_id,result_type,outcome,value,limitations,quality_flags,confidence,provenance,generated_at,input_snapshot_sha256,input_record_ids")
+      .select("id,execution_id,engine_id,engine_version,result_type,outcome,value,limitations,quality_flags,confidence,provenance,generated_at,input_snapshot_sha256,input_record_ids")
       .eq("organization_id", loadOrganizationId)
       .in("execution_id", completedIds);
     if (requestId !== engineExecutionHistoryRequestId ||
@@ -7145,6 +7148,48 @@ function getStoredEngineResult(execution) {
     input_snapshot_sha256: execution.input_snapshot_sha256,
     input_record_ids: execution.input_record_ids
   } : null);
+}
+
+function canonicalizeEngineEvidence(value) {
+  if (Array.isArray(value)) return value.map(canonicalizeEngineEvidence);
+  if (value && typeof value === "object") {
+    return Object.fromEntries(
+      Object.keys(value).sort().map(key => [key, canonicalizeEngineEvidence(value[key])])
+    );
+  }
+  return value;
+}
+
+function engineEvidenceMatches(left, right) {
+  return JSON.stringify(canonicalizeEngineEvidence(left)) ===
+    JSON.stringify(canonicalizeEngineEvidence(right));
+}
+
+function getEngineResultPersistenceConsistency(execution) {
+  const stored = recentEngineResultsByExecution.get(execution.id);
+  const envelope = execution.result_payload;
+  const result = envelope?.result;
+  if (!stored || !result || typeof result !== "object") {
+    return { state: "unknown", mismatches: ["résultat persistant ou enveloppe ledger indisponible"] };
+  }
+
+  const mismatches = [];
+  if (stored.execution_id !== execution.id) mismatches.push("execution_id");
+  if (stored.engine_id !== execution.engine_id) mismatches.push("engine_id");
+  if (stored.engine_version !== execution.engine_version) mismatches.push("engine_version");
+  if (stored.result_type !== execution.engine_id) mismatches.push("result_type");
+  if (typeof stored.id !== "string" || !stored.id) mismatches.push("result_id");
+  for (const field of ["outcome", "value", "limitations", "quality_flags", "confidence", "provenance"]) {
+    if (!engineEvidenceMatches(stored[field] ?? null, result[field] ?? null)) mismatches.push(field);
+  }
+  if (!engineEvidenceMatches(stored.input_snapshot_sha256 ?? null, envelope.input_snapshot_sha256 ?? null)) {
+    mismatches.push("input_snapshot_sha256");
+  }
+  const storedIds = Array.isArray(stored.input_record_ids) ? [...stored.input_record_ids].sort() : null;
+  const ledgerIds = Array.isArray(execution.input_record_ids) ? [...execution.input_record_ids].sort() : null;
+  if (!engineEvidenceMatches(storedIds, ledgerIds)) mismatches.push("input_record_ids");
+
+  return { state: mismatches.length ? "mismatch" : "match", mismatches };
 }
 
 function getComparableEngineExecutions() {
@@ -7365,6 +7410,270 @@ function renderBiologicalContextAssessment(article, result) {
     parent.appendChild(details);
   };
   const title = document.createElement("p"); title.textContent = "Évaluation du contexte biologique"; article.appendChild(title);
+  const qc = value.environmental_quality_control;
+  if (qc && typeof qc === "object") {
+    const qcDetails = document.createElement("details");
+    qcDetails.className = "engine-upstream-qc";
+    const qcSummary = document.createElement("summary");
+    qcSummary.textContent = "Contrôle qualité environnemental amont · " +
+      (qc.state === "passed" ? "validé" : "révision requise");
+    qcDetails.appendChild(qcSummary);
+    addLine(qcDetails, "État : " + String(qc.state || "non documenté"));
+    addLine(qcDetails, "Résultat QC : " + String(qc.outcome || "non documenté"));
+    addLine(qcDetails, "Exécution QC : " + String(qc.upstream_execution_id || "identifiant indisponible"));
+    addLine(qcDetails, "Résultat QC enregistré : " + String(qc.upstream_result_id || "identifiant indisponible"));
+    addLine(qcDetails, "Moteur amont : " + String(qc.upstream_engine_id || "indisponible") +
+      "@" + String(qc.upstream_engine_version || "version inconnue"));
+    addLine(qcDetails, "QC terminé le : " + String(qc.upstream_completed_at || "date indisponible"));
+    addLine(qcDetails, "Snapshot d’entrée QC : " + String(qc.upstream_input_snapshot_sha256 || "indisponible"));
+    const upstreamScope = qc.upstream_scope || {};
+    addLine(qcDetails, "Périmètre QC : organisation " + String(upstreamScope.organization_id || "—") +
+      " · localisation " + String(upstreamScope.location_id || "—") +
+      " · " + String(upstreamScope.window_start || "—") + " → " + String(upstreamScope.window_end || "—"));
+    const upstreamExecution = recentEngineExecutions.find(item => item.id === qc.upstream_execution_id);
+    if (upstreamExecution) {
+      const upstreamLink = document.createElement("a");
+      upstreamLink.href = "#engine-execution-" +
+        String(upstreamExecution.id).replace(/[^a-zA-Z0-9_-]/g, "-");
+      upstreamLink.textContent = "Voir l'exécution QC amont";
+      qcDetails.appendChild(upstreamLink);
+    }
+    addLine(qcDetails, "Empreinte SHA-256 : " + String(qc.artifact_sha256 || "indisponible"));
+    addList(qcDetails, "Signaux qualité QC", qc.quality_flags, item => item, 12);
+    const qcSeries = Array.isArray(qc.value?.series) ? qc.value.series : [];
+    addList(qcDetails, "Séries environnementales contrôlées", qcSeries, series => {
+      const gaps = Array.isArray(series.gap_intervals) ? series.gap_intervals : [];
+      const outliers = Array.isArray(series.outlier_evidence) ? series.outlier_evidence : [];
+      const duplicates = Array.isArray(series.duplicate_timestamp_groups) ? series.duplicate_timestamp_groups : [];
+      const parts = [
+        String(series.variable_code || "variable inconnue") + " · " + String(series.point_count || 0) + " points",
+        "période : " + String(series.time_start || "inconnue") + " → " + String(series.time_end || "inconnue"),
+        gaps.length + " lacune(s)",
+        outliers.length + " valeur(s) atypique(s)",
+        duplicates.length + " groupe(s) d'horodatages dupliqués"
+      ];
+      return parts.join(" · ");
+    }, 20);
+    for (const series of qcSeries.slice(0, 20)) {
+      const seriesLabel = String(series.variable_code || "variable") + " (" + String(series.unit_code || "unité inconnue") + ")";
+      addList(qcDetails, "Lacunes · " + seriesLabel, series.gap_intervals, gap =>
+        String(gap.from || "début inconnu") + " → " + String(gap.to || "fin inconnue") +
+        " · " + String(gap.duration_minutes ?? "—") + " min", 10);
+      addList(qcDetails, "Valeurs atypiques · " + seriesLabel, series.outlier_evidence, item =>
+        String(item.observed_value ?? "—") + " " + series.unit_code +
+        " · médiane " + String(item.median_value ?? "—") +
+        " · score robuste " + String(item.robust_z_score ?? "non calculable") +
+        " · seuil " + String(item.threshold ?? "—") +
+        " · enregistrement " + String(item.record_id || "inconnu"), 10);
+      addList(qcDetails, "Anomalies par rapport à l'historique · " + seriesLabel, series.rolling_baseline_anomaly_evidence, item =>
+        String(item.observed_value ?? "—") + " " + series.unit_code +
+        " · référence historique " + String(item.baseline_median ?? "—") +
+        " · score robuste " + String(item.robust_z_score ?? "écart avec MAD nul") +
+        " · seuil " + String(item.threshold ?? "—") +
+        " · historique utilisé " + String(item.history_point_count ?? "—") + " points" +
+        " · " + String(item.observed_at || "date inconnue") +
+        " · enregistrement " + String(item.record_id || "inconnu"), 10);
+      addList(qcDetails, "Horodatages dupliqués · " + seriesLabel, series.duplicate_timestamp_groups, item =>
+        String(item.timestamp || "date inconnue") + " · " + (Array.isArray(item.record_ids) ? item.record_ids.join(", ") : ""), 10);
+    }
+    addList(qcDetails, "Limitations QC", qc.limitations, item => item, 12);
+    const qcProvenance = qc.provenance || {};
+    if (qcProvenance.algorithm) addLine(qcDetails, "Algorithme QC : " + String(qcProvenance.algorithm));
+    if (Array.isArray(qcProvenance.source_references)) {
+      addList(qcDetails, "Sources du contrôle QC", qcProvenance.source_references, item => item, 8);
+    }
+    const traceButton = document.createElement("button");
+    traceButton.type = "button";
+    traceButton.className = "secondary";
+    traceButton.textContent = "Remonter aux observations environnementales";
+    const traceOutput = document.createElement("div");
+    traceOutput.className = "engine-upstream-trace";
+    traceOutput.setAttribute("aria-live", "polite");
+    traceButton.addEventListener("click", async () => {
+      const upstreamExecutionId = qc.upstream_execution_id;
+      if (typeof upstreamExecutionId !== "string" || !upstreamExecutionId) {
+        traceOutput.textContent = "Identifiant d’exécution QC indisponible : aucune remontée possible.";
+        return;
+      }
+      traceButton.disabled = true;
+      traceOutput.textContent = "Chargement de l’exécution QC et des observations liées…";
+      try {
+        const expectedOrganizationId = organizationId;
+        if (!expectedOrganizationId) throw new Error("Session organisationnelle absente.");
+        const { data: upstream, error: upstreamError } = await supabaseClient
+          .from("engine_executions")
+          .select("id,status,engine_id,engine_version,input_record_ids,input_snapshot_sha256,scope,request_payload,created_at,completed_at")
+          .eq("organization_id", expectedOrganizationId)
+          .eq("id", upstreamExecutionId)
+          .maybeSingle();
+        if (upstreamError) throw upstreamError;
+        if (organizationId !== expectedOrganizationId) {
+          throw new Error("Le contexte organisationnel a changé pendant le chargement ; affichage annulé.");
+        }
+        if (!upstream || upstream.id !== upstreamExecutionId) {
+          throw new Error("Exécution QC introuvable dans l’organisation active.");
+        }
+        if (upstream.status !== "completed" ||
+            upstream.engine_id !== "environmental.timeseries.qc" ||
+            upstream.engine_version !== String(qc.upstream_engine_version || "") ||
+            upstream.completed_at !== qc.upstream_completed_at ||
+            upstream.input_snapshot_sha256 !== qc.upstream_input_snapshot_sha256) {
+          throw new Error("L’identité ou l’état du ledger QC ne correspond plus à la provenance consommée par le BIE.");
+        }
+        const { data: persistedQcResult, error: persistedQcResultError } = await supabaseClient
+          .from("engine_execution_results")
+          .select("id,execution_id,engine_id,engine_version,outcome,input_snapshot_sha256,value,limitations,quality_flags,provenance")
+          .eq("organization_id", expectedOrganizationId)
+          .eq("execution_id", upstreamExecutionId)
+          .maybeSingle();
+        if (persistedQcResultError) throw persistedQcResultError;
+        if (organizationId !== expectedOrganizationId) {
+          throw new Error("Le contexte organisationnel a changé pendant la vérification du résultat QC ; affichage annulé.");
+        }
+        if (!persistedQcResult ||
+            persistedQcResult.id !== qc.upstream_result_id ||
+            persistedQcResult.execution_id !== upstream.id ||
+            persistedQcResult.engine_id !== upstream.engine_id ||
+            persistedQcResult.engine_version !== upstream.engine_version ||
+            persistedQcResult.input_snapshot_sha256 !== upstream.input_snapshot_sha256 ||
+            persistedQcResult.outcome !== qc.outcome ||
+            !engineEvidenceMatches(persistedQcResult.value, qc.value) ||
+            !engineEvidenceMatches(persistedQcResult.limitations, qc.limitations) ||
+            !engineEvidenceMatches(persistedQcResult.quality_flags, qc.quality_flags) ||
+            !engineEvidenceMatches(persistedQcResult.provenance, qc.provenance)) {
+          throw new Error("Le résultat QC persistant ne correspond pas au résultat QC consommé par le BIE.");
+        }
+        const verifiedArtifact = {
+          contract: "BA-LABS/UPSTREAM-ENGINE-ARTIFACT",
+          contract_version: "1.0.0",
+          role: "environmental_qc",
+          execution_id: upstream.id,
+          result_id: persistedQcResult.id,
+          request_id: upstream.request_id,
+          engine_id: upstream.engine_id,
+          engine_version: upstream.engine_version,
+          completed_at: upstream.completed_at,
+          input_snapshot_sha256: upstream.input_snapshot_sha256,
+          scope: qc.upstream_scope,
+          result: {
+            outcome: persistedQcResult.outcome,
+            value: persistedQcResult.value,
+            limitations: persistedQcResult.limitations,
+            quality_flags: persistedQcResult.quality_flags,
+            provenance: persistedQcResult.provenance
+          }
+        };
+        const artifactDigest = await crypto.subtle.digest(
+          "SHA-256",
+          new TextEncoder().encode(JSON.stringify(canonicalizeEngineEvidence(verifiedArtifact)))
+        );
+        const verifiedArtifactSha256 = Array.from(new Uint8Array(artifactDigest), byte => byte.toString(16).padStart(2, "0")).join("");
+        if (verifiedArtifactSha256 !== qc.artifact_sha256) {
+          throw new Error("L’empreinte SHA-256 de l’artefact QC ne correspond plus à son contenu persistant.");
+        }
+        const upstreamParameters = upstream.request_payload?.parameters || {};
+        if (upstream.scope?.location_id !== qc.upstream_scope?.location_id ||
+            upstreamParameters.window_start !== qc.upstream_scope?.window_start ||
+            upstreamParameters.window_end !== qc.upstream_scope?.window_end ||
+            qc.upstream_scope?.organization_id !== expectedOrganizationId) {
+          throw new Error("Le périmètre ou la fenêtre du QC amont ne correspond plus à la provenance BIE.");
+        }
+        addLine(traceOutput, "Intégrité QC : résultat persistant retrouvé, identité concordante et artefact SHA-256 recalculé avec succès.");
+        const ids = Array.isArray(upstream.input_record_ids)
+          ? [...new Set(upstream.input_record_ids.filter(id => typeof id === "string" && id.length > 0))]
+          : [];
+        traceOutput.replaceChildren();
+        const metadata = document.createElement("p");
+        metadata.textContent = "Exécution : " + upstream.id + " · " +
+          String(upstream.engine_id || "moteur inconnu") + "@" + String(upstream.engine_version || "version inconnue") +
+          " · " + ids.length + " identifiant(s) d’entrée · snapshot SHA-256 " +
+          String(upstream.input_snapshot_sha256 || "indisponible");
+        traceOutput.appendChild(metadata);
+        if (!ids.length) {
+          addLine(traceOutput, "Le ledger ne contient pas de liste d’identifiants d’entrée exploitable.");
+          return;
+        }
+        if (ids.length > 500) {
+          addLine(traceOutput, "La liste dépasse la limite d’affichage de 500 enregistrements ; aucune requête partielle n’a été lancée.");
+          return;
+        }
+        const { data: observations, error: observationsError } = await supabaseClient
+          .from("environmental_observations")
+          .select("id,location_id,data_family,observed_at,retrieved_at,variable_code,value,unit_code,provider_code,dataset_code,quality_flag,source_url")
+          .eq("organization_id", expectedOrganizationId)
+          .in("id", ids)
+          .order("observed_at", { ascending: true });
+        if (observationsError) throw observationsError;
+        if (organizationId !== expectedOrganizationId) {
+          traceOutput.replaceChildren();
+          throw new Error("Le contexte organisationnel a changé pendant le chargement ; affichage annulé.");
+        }
+        const rows = Array.isArray(observations) ? observations : [];
+        const resolvedIds = new Set(rows.map(row => row.id));
+        const unresolvedIds = ids.filter(id => !resolvedIds.has(id));
+        addLine(traceOutput, "Enregistrements environnementaux retrouvés : " + rows.length + " / " + ids.length +
+          ". Identifiants non résolus : " + unresolvedIds.length +
+          ". Familles présentes : " + [...new Set(rows.map(row => row.data_family || "inconnue"))].join(", "));
+        const list = document.createElement("ol");
+        for (const row of rows.slice(0, 500)) {
+          const item = document.createElement("li");
+          const parts = [
+            String(row.observed_at || "date inconnue"),
+            String(row.variable_code || "variable inconnue") + " = " +
+              String(row.value ?? "—") + " " + String(row.unit_code || ""),
+            String(row.data_family || "famille inconnue"),
+            String(row.provider_code || "fournisseur inconnu") + "/" +
+              String(row.dataset_code || "jeu inconnu"),
+            "localisation : " + String(row.location_id || "inconnue"),
+            "récupéré : " + String(row.retrieved_at || "date inconnue"),
+            "qualité : " + String(row.quality_flag || "non renseignée"),
+            "ID : " + String(row.id)
+          ];
+          const description = document.createElement("span");
+          description.textContent = parts.join(" · ");
+          item.appendChild(description);
+          if (typeof row.source_url === "string" && row.source_url) {
+            try {
+              const sourceUrl = new URL(row.source_url);
+              if (sourceUrl.protocol === "https:" || sourceUrl.protocol === "http:") {
+                const link = document.createElement("a");
+                link.href = sourceUrl.href;
+                link.textContent = "Source fournisseur";
+                link.target = "_blank";
+                link.rel = "noopener noreferrer";
+                item.appendChild(document.createTextNode(" · "));
+                item.appendChild(link);
+              }
+            } catch (_) {
+              // Invalid source URLs remain visible only as absent links.
+            }
+          }
+          list.appendChild(item);
+        }
+        traceOutput.appendChild(list);
+        if (unresolvedIds.length) {
+          const missing = document.createElement("details");
+          const missingSummary = document.createElement("summary");
+          missingSummary.textContent = "Identifiants d’entrée non résolus (" + unresolvedIds.length + ")";
+          missing.appendChild(missingSummary);
+          const missingList = document.createElement("ul");
+          for (const id of unresolvedIds.slice(0, 100)) {
+            const entry = document.createElement("li");
+            entry.textContent = id;
+            missingList.appendChild(entry);
+          }
+          missing.appendChild(missingList);
+          traceOutput.appendChild(missing);
+        }
+      } catch (error) {
+        traceOutput.textContent = "Remontée de provenance impossible : " + String(error?.message || error);
+      } finally {
+        traceButton.disabled = false;
+      }
+    });
+    qcDetails.append(traceButton, traceOutput);
+    article.appendChild(qcDetails);
+  }
   const subject = value.subject || {};
   addLine(article, "Sujet : " + String(subject.subject_type || "biologique") + " · " + String(subject.subject_id || "identifiant indisponible"));
   const biologicalContexts = Array.isArray(subject.biological_contexts) ? subject.biological_contexts : [];
@@ -7405,6 +7714,297 @@ function renderBiologicalContextAssessment(article, result) {
       " · " + String(item.evidence_level || "niveau de preuve non précisé") +
       " · " + source + digest;
   }, 12);
+  const referenceAssertionState = subject.biological_reference_assertion_state || "not_documented";
+  const referenceAssertionLabels = {
+    documented: "Assertions scientifiques documentées",
+    not_documented: "Aucune assertion scientifique validée",
+    conflicting: "Assertions scientifiques contradictoires",
+    not_applicable: "Aucune assertion applicable à ce contexte"
+  };
+  addLine(article, "Références scientifiques : " +
+    String(referenceAssertionLabels[referenceAssertionState] || "État des références inconnu"));
+  const allReferenceAssertions = Array.isArray(subject.biological_reference_assertions)
+    ? subject.biological_reference_assertions
+    : [];
+  let visibleReferenceAssertions = allReferenceAssertions.slice();
+  const assertionReview = document.createElement("section");
+  assertionReview.className = "engine-biological-assertion-review";
+  const assertionReviewTitle = document.createElement("strong");
+  assertionReviewTitle.textContent = "Assertions bibliographiques validées";
+  assertionReview.appendChild(assertionReviewTitle);
+  const assertionFilters = document.createElement("div");
+  assertionFilters.className = "engine-biological-assertion-filters";
+  const makeAssertionFilter = (labelText, options) => {
+    const label = document.createElement("label");
+    label.textContent = labelText;
+    const select = document.createElement("select");
+    select.className = "engine-biological-assertion-filter";
+    for (const [value, text] of options) {
+      const option = document.createElement("option");
+      option.value = value;
+      option.textContent = text;
+      select.appendChild(option);
+    }
+    label.appendChild(select);
+    assertionFilters.appendChild(label);
+    return select;
+  };
+  const applicabilityFilter = makeAssertionFilter("Applicabilité", [
+    ["", "Tous les états"],
+    ["matched", "Concordante"],
+    ["not_applicable", "Non applicable"],
+    ["undetermined", "Indéterminée"],
+    ["not_assessed", "Non évaluée"]
+  ]);
+  const evidenceFilter = makeAssertionFilter("Niveau de preuve", [
+    ["", "Tous les niveaux"],
+    ["L0", "L0"], ["L1", "L1"], ["L2", "L2"],
+    ["L3", "L3"], ["L4", "L4"], ["L5", "L5"],
+    ["unassessed", "Non évalué"]
+  ]);
+  const assertionSearchLabel = document.createElement("label");
+  assertionSearchLabel.textContent = "Recherche";
+  const assertionSearch = document.createElement("input");
+  assertionSearch.type = "search";
+  assertionSearch.placeholder = "Code, sujet, prédicat ou source";
+  assertionSearchLabel.appendChild(assertionSearch);
+  assertionFilters.appendChild(assertionSearchLabel);
+  assertionReview.appendChild(assertionFilters);
+  const assertionReviewCount = document.createElement("p");
+  assertionReviewCount.className = "muted";
+  assertionReviewCount.setAttribute("aria-live", "polite");
+  assertionReview.appendChild(assertionReviewCount);
+  const assertionReviewList = document.createElement("ul");
+  assertionReviewList.className = "engine-biological-assertion-list";
+  assertionReview.appendChild(assertionReviewList);
+  const formatAssertion = item => {
+    const source = item.source || {};
+    const sourceLabel = source.reference_id && source.reference_version
+      ? source.reference_id + "@" + source.reference_version
+      : "source indisponible";
+    const objectValue = item.object_value && typeof item.object_value === "object"
+      ? JSON.stringify(item.object_value).slice(0, 240)
+      : String(item.object_value ?? "valeur non renseignée");
+    const digest = typeof item.content_sha256 === "string"
+      ? " · SHA-256 " + item.content_sha256.slice(0, 12)
+      : "";
+    return String(item.subject_type || "sujet") + ":" + String(item.subject_ref || "référence inconnue") +
+      " · " + String(item.predicate_code || "prédicat inconnu") + " = " + objectValue +
+      " · preuve " + String(item.evidence_level || "non évaluée") +
+      " · applicabilité " + String(item.applicability_state || "non évaluée") +
+      " · période " + (
+        item.applicability && item.applicability.validity_window
+          ? String(item.applicability.validity_window.valid_from || "début inconnu") + " → " +
+            String(item.applicability.validity_window.valid_to || "sans date de fin")
+          : "non spécifiée"
+      ) +
+      " · état temporel " + String(item.temporal_applicability_state || "non évalué") +
+      " · contextes concordants " + (
+        Array.isArray(item.matching_context_ids) ? item.matching_context_ids.length : 0
+      ) +
+      " · " + sourceLabel +
+      (item.source_locator ? " · repère " + String(item.source_locator) : "") + digest;
+  };
+  const assertionEvidenceDetails = document.createElement("details");
+  assertionEvidenceDetails.className = "engine-biological-evidence";
+  const assertionEvidenceSummary = document.createElement("summary");
+  assertionEvidenceDetails.appendChild(assertionEvidenceSummary);
+  const addEvidenceField = (parent, label, fieldValue) => {
+    if (fieldValue === null || fieldValue === undefined || fieldValue === "") return;
+    const line = document.createElement("p");
+    line.className = "muted";
+    line.textContent = label + " : " + (
+      typeof fieldValue === "object" ? JSON.stringify(fieldValue) : String(fieldValue)
+    );
+    parent.appendChild(line);
+  };
+  let renderAssertionComparisons = () => {};
+  const renderAssertionReview = () => {
+    const query = assertionSearch.value.trim().toLocaleLowerCase();
+    visibleReferenceAssertions = allReferenceAssertions.filter(item => {
+      if (applicabilityFilter.value && item.applicability_state !== applicabilityFilter.value) return false;
+      if (evidenceFilter.value && item.evidence_level !== evidenceFilter.value) return false;
+      if (query && !formatAssertion(item).toLocaleLowerCase().includes(query)) return false;
+      return true;
+    });
+    assertionReviewCount.textContent = visibleReferenceAssertions.length + " assertion(s) affichée(s) sur " +
+      allReferenceAssertions.length + ".";
+    assertionReviewList.replaceChildren();
+    for (const item of visibleReferenceAssertions.slice(0, 40)) {
+      const entry = document.createElement("li");
+      entry.textContent = formatAssertion(item);
+      assertionReviewList.appendChild(entry);
+    }
+    if (visibleReferenceAssertions.length > 40) {
+      const note = document.createElement("li");
+      note.textContent = (visibleReferenceAssertions.length - 40) + " assertion(s) supplémentaires non affichées. Affinez les filtres.";
+      assertionReviewList.appendChild(note);
+    }
+    if (!visibleReferenceAssertions.length) {
+      const empty = document.createElement("li");
+      empty.textContent = "Aucune assertion ne correspond aux filtres.";
+      assertionReviewList.appendChild(empty);
+    }
+    assertionEvidenceSummary.textContent = "Dossiers de preuve et provenance · " +
+      visibleReferenceAssertions.length + " assertion(s) filtrée(s)";
+    assertionEvidenceDetails.replaceChildren(assertionEvidenceSummary);
+    for (const assertion of visibleReferenceAssertions.slice(0, 30)) {
+      const record = document.createElement("details");
+      record.className = "engine-biological-evidence-record";
+      const recordSummary = document.createElement("summary");
+      recordSummary.textContent = String(assertion.assertion_code || "Assertion") +
+        " · v" + String(assertion.assertion_version || "version inconnue") +
+        " · " + String(assertion.evidence_level || "preuve non évaluée");
+      record.appendChild(recordSummary);
+      const source = assertion.source || {};
+      addEvidenceField(record, "Référence source", source.reference_id);
+      addEvidenceField(record, "Version de la source", source.reference_version);
+      addEvidenceField(record, "Repère bibliographique", assertion.source_locator);
+      addEvidenceField(record, "Révision de l'assertion", assertion.reviewed_at);
+      addEvidenceField(record, "Révision de la source", source.reviewed_at);
+      addEvidenceField(record, "Applicabilité", assertion.applicability_state);
+      addEvidenceField(record, "Applicabilité temporelle", assertion.temporal_applicability_state);
+      addEvidenceField(record, "Contextes concordants", assertion.matching_context_ids);
+      addEvidenceField(record, "Incertitude documentée", assertion.uncertainty);
+      addEvidenceField(record, "SHA-256 de l'assertion", assertion.content_sha256);
+      addEvidenceField(record, "SHA-256 de la source", source.content_sha256);
+      if (typeof source.source_url === "string") {
+        try {
+          const sourceUrl = new URL(source.source_url);
+          if (sourceUrl.protocol === "https:" || sourceUrl.protocol === "http:") {
+            const link = document.createElement("a");
+            link.href = sourceUrl.href;
+            link.target = "_blank";
+            link.rel = "noopener noreferrer";
+            link.textContent = "Ouvrir la source documentaire";
+            record.appendChild(link);
+          }
+        } catch (_) {
+          // Invalid source URLs remain visible as metadata only; never create an unsafe link.
+        }
+      }
+      assertionEvidenceDetails.appendChild(record);
+    }
+    assertionEvidenceDetails.hidden = visibleReferenceAssertions.length === 0;
+    renderAssertionComparisons();
+  };
+  applicabilityFilter.addEventListener("change", renderAssertionReview);
+  evidenceFilter.addEventListener("change", renderAssertionReview);
+  assertionSearch.addEventListener("input", renderAssertionReview);
+  renderAssertionReview();
+  article.appendChild(assertionReview);
+  article.appendChild(assertionEvidenceDetails);
+  const contextById = new Map(biologicalContexts.map(context => [context.context_id || context.id, context]).filter(([id]) => id));
+  const assertionComparisonSection = document.createElement("section");
+  assertionComparisonSection.className = "engine-biological-assertion-comparisons";
+  const assertionComparisonTitle = document.createElement("strong");
+  assertionComparisonTitle.textContent = "Divergences sur un même contexte et une période commune";
+  assertionComparisonSection.appendChild(assertionComparisonTitle);
+  const assertionComparisonList = document.createElement("ul");
+  assertionComparisonSection.appendChild(assertionComparisonList);
+  const isoDate = value => {
+    if (typeof value !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return null;
+    const parsed = new Date(value + "T00:00:00Z");
+    return Number.isNaN(parsed.getTime()) || parsed.toISOString().slice(0, 10) !== value ? null : value;
+  };
+  renderAssertionComparisons = () => {
+    const assertions = visibleReferenceAssertions.slice(0, 100);
+    const comparisonRows = [];
+    for (let leftIndex = 0; leftIndex < assertions.length; leftIndex += 1) {
+      const left = assertions[leftIndex];
+      for (let rightIndex = leftIndex + 1; rightIndex < assertions.length; rightIndex += 1) {
+        const right = assertions[rightIndex];
+        if (left.subject_type !== right.subject_type ||
+            left.subject_ref !== right.subject_ref ||
+            left.predicate_code !== right.predicate_code) continue;
+        const leftValue = JSON.stringify(left.object_value);
+        const rightValue = JSON.stringify(right.object_value);
+        if (leftValue === rightValue) continue;
+        const sharedContexts = (Array.isArray(left.matching_context_ids) ? left.matching_context_ids : [])
+          .filter(id => Array.isArray(right.matching_context_ids) && right.matching_context_ids.includes(id));
+        for (const contextId of sharedContexts) {
+          const context = contextById.get(contextId);
+          if (!context) continue;
+          const contextStart = isoDate(context.valid_from);
+          const contextEnd = isoDate(context.valid_to);
+          const leftWindow = left.applicability?.validity_window || left.validity_window || {};
+          const rightWindow = right.applicability?.validity_window || right.validity_window || {};
+          const starts = [contextStart, isoDate(leftWindow.valid_from), isoDate(rightWindow.valid_from)].filter(Boolean);
+          const ends = [contextEnd, isoDate(leftWindow.valid_to), isoDate(rightWindow.valid_to)].filter(Boolean);
+          const overlapStart = starts.sort().at(-1) || null;
+          const overlapEnd = ends.sort()[0] || null;
+          if (overlapStart && overlapEnd && overlapStart >= overlapEnd) continue;
+          comparisonRows.push({
+            left,
+            right,
+            contextId,
+            periodLabel: (overlapStart || "début ouvert") + " → " + (overlapEnd || "fin ouverte")
+          });
+        }
+      }
+    }
+    assertionComparisonList.replaceChildren();
+    for (const pair of comparisonRows.slice(0, 20)) {
+      const entry = document.createElement("li");
+      const leftCode = String(pair.left.assertion_code || "assertion A");
+      const rightCode = String(pair.right.assertion_code || "assertion B");
+      const leftValue = JSON.stringify(pair.left.object_value).slice(0, 120);
+      const rightValue = JSON.stringify(pair.right.object_value).slice(0, 120);
+      const summary = document.createElement("p");
+      summary.textContent = leftCode + " : " + leftValue + " ≠ " + rightCode + " : " + rightValue +
+        " · contexte " + pair.contextId + " · période commune " + pair.periodLabel;
+      entry.appendChild(summary);
+      const appendComparedSource = (assertion, sideLabel) => {
+        const source = assertion.source || {};
+        const details = document.createElement("details");
+        details.className = "engine-biological-comparison-source";
+        const heading = document.createElement("summary");
+        heading.textContent = sideLabel + " · " +
+          String(source.reference_id || "référence non renseignée") +
+          " · " + String(assertion.evidence_level || "niveau de preuve non évalué");
+        details.appendChild(heading);
+        for (const [label, value] of [
+          ["Version source", source.reference_version],
+          ["Repère bibliographique", assertion.source_locator],
+          ["Période déclarée", assertion.applicability?.validity_window],
+          ["Applicabilité temporelle", assertion.temporal_applicability_state],
+          ["Révision", assertion.reviewed_at || source.reviewed_at],
+          ["Incertitude", assertion.uncertainty]
+        ]) addEvidenceField(details, label, value);
+        if (typeof source.source_url === "string") {
+          try {
+            const sourceUrl = new URL(source.source_url);
+            if (sourceUrl.protocol === "https:" || sourceUrl.protocol === "http:") {
+              const link = document.createElement("a");
+              link.href = sourceUrl.href;
+              link.target = "_blank";
+              link.rel = "noopener noreferrer";
+              link.textContent = "Consulter cette source";
+              details.appendChild(link);
+            }
+          } catch (_) {
+            // Keep invalid source URLs as non-clickable metadata.
+          }
+        }
+        entry.appendChild(details);
+      };
+      appendComparedSource(pair.left, "Source A");
+      appendComparedSource(pair.right, "Source B");
+      assertionComparisonList.appendChild(entry);
+    }
+    if (comparisonRows.length > 20 || visibleReferenceAssertions.length > 100) {
+      const note = document.createElement("li");
+      note.textContent = (comparisonRows.length > 20
+        ? (comparisonRows.length - 20) + " divergence(s) supplémentaire(s) non affichée(s). "
+        : "") + (visibleReferenceAssertions.length > 100
+        ? "Comparaison limitée aux 100 premières assertions filtrées pour préserver les performances. "
+        : "") + "Affinez les filtres.";
+      assertionComparisonList.appendChild(note);
+    }
+    assertionComparisonSection.hidden = comparisonRows.length === 0;
+  };
+  article.appendChild(assertionComparisonSection);
+  renderAssertionComparisons();
   const outcomeLabels = {
     success: "Analyse exploitable",
     insufficient_data: "Données insuffisantes",
@@ -7422,19 +8022,275 @@ function renderBiologicalContextAssessment(article, result) {
     addList(article, "Méthode et limites", result.limitations, item => item, 12);
   }
   const coverage = value.coverage || {}; const counts = coverage.record_counts_by_type || {};
-  addLine(article, "Couverture : " + String(coverage.source_record_count ?? 0) + " retenus · " + String(coverage.excluded_record_count ?? 0) + " exclus · mesures : " + String(counts.measurement ?? 0) + " · météo : " + String(counts.environmental_observation ?? 0));
+  const reviewSignals = [];
+  const missingContextLabels = {
+    no_eligible_local_measurements: "Aucune mesure locale admissible",
+    no_linked_environmental_observations_supplied: "Aucune observation environnementale liée",
+    some_input_records_were_excluded: "Certaines données ont été écartées",
+    biological_context_not_recorded: "Contexte biologique non enregistré",
+    no_active_interpretation_profile: "Profil d'interprétation non configuré",
+    biological_context_not_stable_for_full_window: "Contexte biologique non stable sur toute la période",
+    biological_domain_ambiguous_for_full_window: "Domaine biologique ambigu sur la période",
+    genetic_reference_unresolved: "Référence génétique non résolue",
+    biological_reference_assertions_conflict: "Références scientifiques contradictoires",
+    culture_environment_not_linked: "Environnement de culture non lié",
+    plant_environment_not_linked: "Environnement de culture végétale non lié",
+    environment_without_location: "Environnement sans localisation"
+  };
+  const missingContext = Array.isArray(coverage.missing_context) ? coverage.missing_context : [];
+  const acceptedCount = Number(coverage.source_record_count || 0);
+  const excludedCount = Number(coverage.excluded_record_count || 0);
+  if (acceptedCount === 0 && excludedCount > 0) {
+    reviewSignals.push({code:"all_input_records_excluded",label:"Aucune donnée admissible",evidence:excludedCount+" enregistrement(s) reçu(s), tous écartés lors du contrôle d'entrée."});
+  } else if (acceptedCount === 0) {
+    reviewSignals.push({code:"no_observations_available",label:"Aucune observation disponible",evidence:"Aucun enregistrement admissible n'a été fourni pour la fenêtre demandée. Cela ne signifie pas que les conditions étaient stables."});
+  }
+  if (excludedCount > 0 && acceptedCount > 0) {
+    reviewSignals.push({code:"partial_input_exclusion",label:"Jeu de données partiellement écarté",evidence:excludedCount+" enregistrement(s) exclu(s) ; "+acceptedCount+" conservé(s)."});
+  }
+  if (qc?.state === "review_required") {
+    reviewSignals.push({code:"environmental_qc_review_required",label:"Contrôle qualité environnemental à réviser",evidence:Array.isArray(qc.quality_flags)?qc.quality_flags.join(", "):"Le contrôle amont n'est pas validé."});
+  }
+  if (identityState === "conflicting") {
+    reviewSignals.push({code:"biological_identity_conflict",label:"Identité biologique contradictoire",evidence:"Les assertions d'identité disponibles ne concordent pas."});
+  }
+  if (referenceAssertionState === "conflicting") {
+    reviewSignals.push({
+      code:"biological_reference_assertions_conflict",
+      label:"Références scientifiques contradictoires",
+      evidence:"Plusieurs valeurs validées revendiquent le même sujet et le même prédicat ; aucune n'est sélectionnée automatiquement."
+    });
+  }
+  const referenceAssertions = Array.isArray(subject.biological_reference_assertions)
+    ? subject.biological_reference_assertions : [];
+  if (referenceAssertions.some(item => item?.applicability_state === "undetermined")) {
+    reviewSignals.push({
+      code:"biological_reference_applicability_undetermined",
+      label:"Applicabilité scientifique indéterminée",
+      evidence:"Au moins une assertion ne peut pas être comparée aux champs du contexte biologique disponibles."
+    });
+  }
+  if (referenceAssertions.some(item => item?.applicability_state === "not_assessed")) {
+    reviewSignals.push({
+      code:"biological_reference_applicability_not_assessed",
+      label:"Applicabilité non évaluée",
+      evidence:"Au moins une assertion ne contient pas de règle explicite de correspondance au contexte."
+    });
+  }
+  const unresolvedContext = missingContext.map(code => missingContextLabels[code] || String(code));
+  if (unresolvedContext.length) {
+    reviewSignals.push({code:"biological_context_incomplete",label:"Contexte biologique incomplet",evidence:unresolvedContext.join(" · ")});
+  }
+  if (Array.isArray(coverage.temporal_gaps) && coverage.temporal_gaps.length) {
+    const examples = coverage.temporal_gaps.slice(0, 3).map(gap => String(gap.from || "début inconnu")+" → "+String(gap.to || "fin inconnue"));
+    reviewSignals.push({code:"temporal_gaps_detected",label:"Lacunes temporelles détectées",evidence:coverage.temporal_gaps.length+" intervalle(s) dépassent la cadence attendue. "+examples.join(" ; ")});
+  }
+  if (result.outcome === "insufficient_data" && acceptedCount > 0) {
+    reviewSignals.push({code:"insufficient_data",label:"Données insuffisantes",evidence:"Des enregistrements existent, mais leur couverture ou leur contexte ne permet pas une analyse exploitable."});
+  }
+  if (Array.isArray(value.findings)) {
+    for (const finding of value.findings.slice(0, 8)) {
+      const supporting = Array.isArray(finding?.supporting_record_ids) ? finding.supporting_record_ids : [];
+      const features = Array.isArray(finding?.derived_feature_codes) ? finding.derived_feature_codes : [];
+      reviewSignals.push({
+        code:typeof finding==="object"?String(finding.finding_code||finding.rule_code||finding.code||"rule_based_finding"):"rule_based_finding",
+        label:typeof finding==="string"?finding:String(finding.statement||finding.description||"Constat issu d'une règle"),
+        evidence:typeof finding==="object"?[
+          finding.evidence_state ? "Niveau de preuve : "+finding.evidence_state : "",
+          supporting.length ? "Enregistrements : "+supporting.join(", ") : "",
+          features.length ? "Caractéristiques : "+features.join(", ") : ""
+        ].filter(Boolean).join(" · ") || "Valeur évaluée par la règle configurée.":"Constat produit par une règle configurée."
+      });
+    }
+  }
+  if (reviewSignals.length) {
+    const signalPanel=document.createElement("section");
+    signalPanel.className="engine-review-signals";
+    signalPanel.setAttribute("aria-label","Signaux nécessitant une vérification");
+    const signalTitle=document.createElement("strong");
+    signalTitle.textContent="Points de vigilance · "+reviewSignals.length;
+    signalPanel.appendChild(signalTitle);
+    const signalList=document.createElement("ul");
+    for (const signal of reviewSignals) {
+      const entry=document.createElement("li");
+      const heading=document.createElement("strong"); heading.textContent=signal.label;
+      const evidence=document.createElement("p"); evidence.className="muted"; evidence.textContent=signal.evidence;
+      const code=document.createElement("small"); code.className="muted"; code.textContent=signal.code;
+      entry.append(heading,evidence,code); signalList.appendChild(entry);
+    }
+    signalPanel.appendChild(signalList);
+    const disclaimer=document.createElement("p");
+    disclaimer.className="muted";
+    disclaimer.textContent="Ces signaux indiquent des éléments à examiner. Ils ne constituent ni un diagnostic biologique ni une recommandation automatique d'intervention.";
+    signalPanel.appendChild(disclaimer);
+    article.appendChild(signalPanel);
+  }
+  addLine(article, "Couverture : " + String(coverage.source_record_count ?? 0) + " retenus · " + String(coverage.excluded_record_count ?? 0) + " exclus · mesures : " + String(counts.measurement ?? 0) + " · observations biologiques : " + String(counts.observation ?? 0) + " · événements : " + String(counts.event ?? 0) + " · météo : " + String(counts.environmental_observation ?? 0));
   const requested = coverage.requested_window;
   if (requested?.start && requested?.end) addLine(article, "Fenêtre demandée : " + requested.start + " → " + requested.end + " · " + String(requested.timezone || "fuseau non précisé"));
   const observed = coverage.observed_window;
   if (observed?.start && observed?.end) addLine(article, "Fenêtre observée : " + observed.start + " → " + observed.end);
   addList(article, "Contexte manquant ou non résolu", coverage.missing_context, item => item, 12);
-  addList(article, "Faits observés et sources", value.observed_facts, item => String(item.statement || item.fact_code || "Fait") + (item.observed_at ? " · " + item.observed_at : "") + (Array.isArray(item.source_record_ids) ? " · sources : " + item.source_record_ids.join(", ") : ""), 8);
+  const biologicalFacts = Array.isArray(value.observed_facts) ? value.observed_facts : [];
+  if (biologicalFacts.length) {
+    const factTimeline = document.createElement("section");
+    factTimeline.className = "engine-biological-fact-timeline";
+    factTimeline.setAttribute("aria-label", "Chronologie des faits biologiques");
+    const timelineHeading = document.createElement("strong");
+    timelineHeading.textContent = "Chronologie biologique · " + biologicalFacts.length;
+    factTimeline.appendChild(timelineHeading);
+    const eventFactIds = new Set(biologicalFacts
+      .filter(fact => String(fact.fact_code || "").startsWith("event.") && fact.event_id)
+      .map(fact => String(fact.event_id)));
+    const observationsByEvent = new Map();
+    for (const fact of biologicalFacts) {
+      const factCode = String(fact.fact_code || "");
+      if (!factCode.startsWith("observation.") || !fact.event_id) continue;
+      if (!observationsByEvent.has(String(fact.event_id))) observationsByEvent.set(String(fact.event_id), []);
+      observationsByEvent.get(String(fact.event_id)).push(fact);
+    }
+    const factList = document.createElement("ol");
+    const visibleFacts = biologicalFacts.slice(0, 40);
+    for (const fact of visibleFacts) {
+      const item = document.createElement("li");
+      item.className = "engine-biological-fact-entry";
+      const sourceIds = Array.isArray(fact.source_record_ids) ? fact.source_record_ids : [];
+      const primarySourceId = sourceIds.find(id => typeof id === "string" && id);
+      if (primarySourceId) item.id = "bie-record-" + primarySourceId.replace(/[^a-zA-Z0-9_-]/g, "-");
+      const timestamp = document.createElement("time");
+      timestamp.dateTime = String(fact.observed_at || "");
+      timestamp.textContent = fact.observed_at
+        ? new Date(fact.observed_at).toLocaleString()
+        : "Date inconnue";
+      const content = document.createElement("div");
+      const label = document.createElement("strong");
+      const code = String(fact.fact_code || "biological_fact");
+      label.textContent = code.startsWith("event.")
+        ? "Événement · " + code.slice(6).replaceAll("_", " ")
+        : code.startsWith("observation.")
+          ? "Observation · " + code.slice(12).replaceAll("_", " ")
+          : code.replaceAll(".", " · ").replaceAll("_", " ");
+      const statement = document.createElement("p");
+      statement.textContent = String(fact.statement || "Fait sans description");
+      content.append(label, statement);
+      if (fact.event_id && eventFactIds.has(String(fact.event_id)) && !code.startsWith("event.")) {
+        const eventLink = document.createElement("a");
+        eventLink.className = "engine-biological-fact-event-link";
+        eventLink.href = "#bie-record-" + String(fact.event_id).replace(/[^a-zA-Z0-9_-]/g, "-");
+        eventLink.textContent = "Voir l’événement associé";
+        content.appendChild(eventLink);
+      }
+      if (code.startsWith("event.") && fact.event_id) {
+        const linkedObservations = observationsByEvent.get(String(fact.event_id)) || [];
+        if (linkedObservations.length) {
+          const related = document.createElement("div");
+          related.className = "engine-biological-fact-related-observations";
+          const relatedLabel = document.createElement("small");
+          relatedLabel.textContent = "Observations liées : ";
+          related.appendChild(relatedLabel);
+          linkedObservations.forEach((observation, index) => {
+            const observationSource = Array.isArray(observation.source_record_ids)
+              ? observation.source_record_ids.find(id => typeof id === "string" && id)
+              : null;
+            if (!observationSource) return;
+            if (index > 0) related.appendChild(document.createTextNode(" · "));
+            const observationLink = document.createElement("a");
+            observationLink.href = "#bie-record-" + observationSource.replace(/[^a-zA-Z0-9_-]/g, "-");
+            observationLink.textContent = String(observation.statement || observation.fact_code || "Observation").slice(0, 90);
+            related.appendChild(observationLink);
+          });
+          content.appendChild(related);
+        }
+      }
+      if (sourceIds.length) {
+        const sources = document.createElement("small");
+        sources.className = "muted";
+        sources.textContent = "Source(s) : " + sourceIds.join(", ");
+        content.appendChild(sources);
+      }
+      item.append(timestamp, content);
+      factList.appendChild(item);
+    }
+    factTimeline.appendChild(factList);
+    if (biologicalFacts.length > visibleFacts.length) {
+      addLine(factTimeline, (biologicalFacts.length - visibleFacts.length) + " faits supplémentaires non affichés dans cette chronologie.");
+    }
+    article.appendChild(factTimeline);
+  }
+  addList(article, "Faits observés et sources", biologicalFacts, item => String(item.statement || item.fact_code || "Fait") + (item.observed_at ? " · " + item.observed_at : "") + (item.event_id ? " · événement : " + item.event_id : "") + (Array.isArray(item.source_record_ids) ? " · sources : " + item.source_record_ids.join(", ") : ""), 12);
+  const temporalFeatures = Array.isArray(value.derived_features) ? value.derived_features.filter(item =>
+    item && typeof item.feature_code === "string" &&
+    (item.feature_code.endsWith(".range") ||
+      item.feature_code.endsWith(".trend_slope_per_day") ||
+      item.feature_code.endsWith(".population_stddev") ||
+      item.feature_code.endsWith(".coefficient_of_variation_pct") ||
+      item.feature_code.endsWith(".largest_two_segment_mean_shift"))
+  ) : [];
+  if (temporalFeatures.length) {
+    const temporalPanel = document.createElement("section");
+    temporalPanel.className = "engine-temporal-interpretation";
+    temporalPanel.setAttribute("aria-label", "Indicateurs temporels descriptifs");
+    const temporalTitle = document.createElement("strong");
+    temporalTitle.textContent = "Dynamique temporelle observée";
+    temporalPanel.appendChild(temporalTitle);
+    const temporalList = document.createElement("ul");
+    for (const feature of temporalFeatures) {
+      const item = document.createElement("li");
+      const featureLabels = [
+        [".trend_slope_per_day", "Tendance linéaire estimée"],
+        [".range", "Amplitude observée"],
+        [".population_stddev", "Dispersion (écart-type)"],
+        [".coefficient_of_variation_pct", "Variabilité relative"],
+        [".largest_two_segment_mean_shift", "Rupture moyenne exploratoire"]
+      ];
+      const label = document.createElement("strong");
+      label.textContent = featureLabels.find(([suffix]) => feature.feature_code.endsWith(suffix))?.[1] || "Indicateur temporel";
+      const detail = document.createElement("p");
+      detail.className = "muted";
+      detail.textContent = String(feature.feature_code) + " : " + String(feature.value ?? "—") +
+        (feature.unit_code ? " " + feature.unit_code : "") +
+        " · " + String(feature.method || "méthode non documentée") +
+        " · " + String(Array.isArray(feature.source_record_ids) ? feature.source_record_ids.length : 0) + " source(s)";
+      item.append(label, detail);
+      temporalList.appendChild(item);
+    }
+    temporalPanel.appendChild(temporalList);
+    const note = document.createElement("p");
+    note.className = "muted";
+    note.textContent = "Indicateurs descriptifs calculés sur les observations disponibles ; ils ne constituent pas un diagnostic biologique ni une preuve de causalité.";
+    temporalPanel.appendChild(note);
+    article.appendChild(temporalPanel);
+  }
   addList(article, "Caractéristiques calculées", value.derived_features, item => String(item.feature_code || "Caractéristique") + " : " + String(item.value ?? "—") + (item.unit_code ? " " + item.unit_code : "") + (item.method ? " · méthode : " + item.method : "") + (Array.isArray(item.source_record_ids) ? " · " + item.source_record_ids.length + " sources" : ""), 10);
   addList(article, "Constats", value.findings, item => typeof item === "string" ? item : (item.statement || item.description || JSON.stringify(item)), 8);
   addList(article, "Hypothèses à vérifier", value.hypotheses, item => typeof item === "string" ? item : (item.statement || item.description || JSON.stringify(item)), 8);
   addList(article, "Lacunes temporelles", coverage.temporal_gaps, item => String(item.from || "début inconnu") + " → " + String(item.to || "fin inconnue") + " · " + String(item.duration_seconds ?? "durée inconnue") + " secondes", 8);
 }
 function renderRecentEngineExecutions() {
+  const qcSelector = document.getElementById("plantBiologicalAssessmentQcExecution");
+  if (qcSelector) {
+    const selectedQcId = qcSelector.value;
+    const eligibleQc = recentEngineExecutions.filter(execution =>
+      execution.engine_id === "environmental.timeseries.qc" &&
+      execution.status === "completed"
+    );
+    qcSelector.replaceChildren();
+    const noQc = document.createElement("option");
+    noQc.value = "";
+    noQc.textContent = "Aucun QC amont sélectionné";
+    qcSelector.appendChild(noQc);
+    for (const execution of eligibleQc) {
+      const option = document.createElement("option");
+      option.value = execution.id;
+      option.textContent = new Date(execution.created_at || 0).toLocaleString() +
+        " · " + String(execution.scope?.location_id || "localisation non documentée") +
+        " · v" + String(execution.engine_version || "?");
+      qcSelector.appendChild(option);
+    }
+    if (eligibleQc.some(execution => execution.id === selectedQcId)) {
+      qcSelector.value = selectedQcId;
+    }
+  }
   const panel = document.getElementById("overviewRecentEngineExecutions");
   if (!panel) return;
   panel.replaceChildren();
@@ -7452,6 +8308,7 @@ function renderRecentEngineExecutions() {
   for (const execution of recentEngineExecutions) {
     const article = document.createElement("article");
     article.className = "overview-observation";
+    article.id = "engine-execution-" + String(execution.id).replace(/[^a-zA-Z0-9_-]/g, "-");
     const title = document.createElement("strong");
     title.textContent = execution.engine_id + " · v" + execution.engine_version;
     const status = document.createElement("span");
@@ -7471,6 +8328,57 @@ function renderRecentEngineExecutions() {
     article.append(title, status, stamp);
 
     const storedResult = recentEngineResultsByExecution.get(execution.id);
+    const lineage = document.createElement("details");
+    lineage.className = "engine-execution-lineage";
+    const lineageSummary = document.createElement("summary");
+    lineageSummary.textContent = "Traçabilité d’exécution et empreintes";
+    lineage.appendChild(lineageSummary);
+    const appendLineageField = (label, value) => {
+      const line = document.createElement("p");
+      line.className = "muted";
+      line.textContent = label + " : " + String(value ?? "non documenté");
+      lineage.appendChild(line);
+    };
+    const executionInputIds = Array.isArray(execution.input_record_ids) ? execution.input_record_ids : [];
+    const resultInputIds = Array.isArray(storedResult?.input_record_ids) ? storedResult.input_record_ids : [];
+    const executionSnapshot = execution.input_snapshot_sha256 || null;
+    const resultSnapshot = storedResult?.input_snapshot_sha256 || null;
+    appendLineageField("Exécution", execution.id);
+    appendLineageField("Identifiant du résultat persistant", storedResult?.id || "indisponible");
+    appendLineageField("Moteur / version", String(execution.engine_id || "inconnu") + "@" + String(execution.engine_version || "inconnue"));
+    appendLineageField("Périmètre", execution.scope ? JSON.stringify(execution.scope) : "non documenté");
+    appendLineageField("Snapshot déclaré par l’exécution (SHA-256)", executionSnapshot || "indisponible");
+    appendLineageField("Identifiants d’entrée déclarés", executionInputIds.length);
+    appendLineageField("Snapshot du résultat enregistré (SHA-256)", resultSnapshot || "indisponible");
+    appendLineageField("Identifiants d’entrée du résultat", resultInputIds.length);
+    appendLineageField("Résultat généré", storedResult?.generated_at || execution.completed_at || "non documenté");
+    const persistenceConsistency = getEngineResultPersistenceConsistency(execution);
+    appendLineageField(
+      "Cohérence ledger / résultat persisté",
+      persistenceConsistency.state === "match"
+        ? "concordance exacte des champs scientifiques et de provenance"
+        : persistenceConsistency.state === "mismatch"
+          ? "DIVERGENCE : " + persistenceConsistency.mismatches.join(", ")
+          : "non vérifiable : " + persistenceConsistency.mismatches.join(", ")
+    );
+    let snapshotConsistency = "non vérifiable : empreinte absente";
+    if (executionSnapshot && resultSnapshot) {
+      snapshotConsistency = executionSnapshot === resultSnapshot
+        ? "concordance exacte entre ledger et résultat"
+        : "DIVERGENCE : les empreintes du ledger et du résultat diffèrent";
+    }
+    appendLineageField("Cohérence des snapshots", snapshotConsistency);
+    if (executionInputIds.length && resultInputIds.length) {
+      const executionSet = new Set(executionInputIds);
+      const resultSet = new Set(resultInputIds);
+      const sameIds = executionSet.size === resultSet.size &&
+        [...executionSet].every(id => resultSet.has(id));
+      appendLineageField("Cohérence des identifiants d’entrée",
+        sameIds ? "concordance exacte" : "DIVERGENCE : les listes d’identifiants diffèrent");
+    } else {
+      appendLineageField("Cohérence des identifiants d’entrée", "non vérifiable : liste absente dans le ledger ou le résultat");
+    }
+    article.appendChild(lineage);
     const result = getStoredEngineResult(execution);
     const summary = result?.value?.summary;
     if (execution.status === "completed" && result?.value?.result_type === "biological.context_assessment") {

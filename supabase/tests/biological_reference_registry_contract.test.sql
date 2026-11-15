@@ -6,7 +6,9 @@ declare
   v_org uuid := 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
   v_user uuid := 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb';
   v_profile_id uuid;
+  v_missing_digest_profile_id uuid;
   v_reference_id uuid;
+  v_assertion_id uuid;
 begin
   if to_regclass('public.domain_interpretation_profiles') is null then
     raise exception 'domain_interpretation_profiles baseline is missing';
@@ -19,6 +21,34 @@ begin
   end if;
   if not (select relrowsecurity from pg_class where oid='public.biological_reference_registry'::regclass) then
     raise exception 'biological_reference_registry must have RLS enabled';
+  end if;
+  if to_regclass('public.biological_reference_assertions') is null then
+    raise exception 'biological_reference_assertions is missing';
+  end if;
+  if not (select relrowsecurity from pg_class where oid='public.biological_reference_assertions'::regclass) then
+    raise exception 'biological_reference_assertions must have RLS enabled';
+  end if;
+  if has_table_privilege('anon','public.biological_reference_assertions','SELECT') then
+    raise exception 'anonymous access to biological reference assertions must be revoked';
+  end if;
+  if not has_table_privilege('authenticated','public.biological_reference_assertions','SELECT') then
+    raise exception 'authenticated organization members need assertion SELECT privilege';
+  end if;
+  if not exists (
+    select 1 from pg_policies
+    where schemaname='public' and tablename='biological_reference_assertions'
+      and policyname='biological_reference_assertions_select'
+      and qual like '%is_org_member%'
+  ) then
+    raise exception 'organization member read policy missing from biological reference assertions';
+  end if;
+  if not exists (
+    select 1 from pg_policies
+    where schemaname='public' and tablename='biological_reference_assertions'
+      and policyname='biological_reference_assertions_insert'
+      and with_check like '%is_org_admin%'
+  ) then
+    raise exception 'admin-only assertion insert policy missing';
   end if;
   if has_table_privilege('anon','public.biological_reference_registry','SELECT') then
     raise exception 'anonymous access to biological references must be revoked';
@@ -61,19 +91,43 @@ begin
 
   insert into public.domain_interpretation_profiles(
     organization_id, domain, profile_code, profile_version, rules,
-    status, valid_from
+    content_sha256, status, valid_from
   ) values (
     v_org, 'mycology', 'biological.context.features', '1.0.0', '[]'::jsonb,
-    'draft', current_date
+    repeat('a', 64), 'draft', current_date
   ) returning id into v_profile_id;
+
+  begin
+    update public.domain_interpretation_profiles
+      set rules='[{"rule_id":"changed-without-digest"}]'::jsonb
+      where id=v_profile_id;
+    raise exception 'draft profile content changed without refreshing its digest';
+  exception when sqlstate '23514' then null;
+  end;
 
   update public.domain_interpretation_profiles
     set status='active'
     where id=v_profile_id;
 
   begin
+    insert into public.domain_interpretation_profiles(
+      organization_id, domain, profile_code, profile_version, rules,
+      status, valid_from
+    ) values (
+      v_org, 'greentech', 'biological.context.features', '1.0.0', '[]'::jsonb,
+      'draft', current_date
+    ) returning id into v_missing_digest_profile_id;
     update public.domain_interpretation_profiles
-      set rules='[{"rule_id":"tampered"}]'::jsonb
+      set status='active'
+      where id=v_missing_digest_profile_id;
+    raise exception 'profile activation without content digest was accepted';
+  exception when sqlstate '23514' then null;
+  end;
+
+  begin
+    update public.domain_interpretation_profiles
+      set rules='[{"rule_id":"tampered"}]'::jsonb,
+          content_sha256=repeat('b', 64)
       where id=v_profile_id;
     raise exception 'activated interpretation profile was mutable';
   exception when sqlstate '55000' then null;
@@ -118,6 +172,48 @@ begin
   begin
     delete from public.biological_reference_registry where id=v_reference_id;
     raise exception 'validated scientific reference was deletable';
+  exception when sqlstate '55000' then null;
+  end;
+
+  insert into public.biological_reference_assertions(
+    organization_id, assertion_code, assertion_version,
+    subject_type, subject_ref, predicate_code, object_value,
+    reference_registry_id, source_locator, evidence_level,
+    applicability, uncertainty
+  ) values (
+    v_org, 'pleurotus.ostreatus.substrate.preference', '1.0.0',
+    'taxon', 'NCBI:placeholder-test-taxonomy', 'has_substrate_association',
+    '{"substrate":"wheat_straw","relationship":"reported"}'::jsonb,
+    v_reference_id, 'synthetic-test-section', 'L0',
+    '{"scope":"contract-test-only"}'::jsonb,
+    '{"confidence":"not_assessed","note":"synthetic fixture"}'::jsonb
+  ) returning id into v_assertion_id;
+
+  update public.biological_reference_assertions
+    set status='validated'
+    where id=v_assertion_id;
+
+  if not exists (
+    select 1 from public.biological_reference_assertions
+    where id=v_assertion_id
+      and status='validated'
+      and reviewed_by=v_user
+      and reviewed_at is not null
+  ) then
+    raise exception 'assertion review trigger must stamp reviewer identity and timestamp';
+  end if;
+
+  begin
+    update public.biological_reference_assertions
+      set object_value='{"substrate":"coffee_waste"}'::jsonb
+      where id=v_assertion_id;
+    raise exception 'validated biological assertion was mutable';
+  exception when sqlstate '55000' then null;
+  end;
+
+  begin
+    delete from public.biological_reference_assertions where id=v_assertion_id;
+    raise exception 'validated biological assertion was deletable';
   exception when sqlstate '55000' then null;
   end;
 end
