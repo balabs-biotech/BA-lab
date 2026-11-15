@@ -862,3 +862,21 @@ assert.match(workflowCss, /dialog\\.workspace-dialog \\.dialog-actions/,
 assert.match(workflowCss, /@media \\(max-width: 600px\\)[\\s\\S]*?dialog\\.workspace-dialog/,
   "workflow dialogs must fit narrow mobile viewports");
 console.log("✓ Complex forms and dialog surfaces: guidance, consent, action states and mobile layout");
+
+
+// Cross-workspace feedback states: success, warning, error, loading and empty
+// surfaces must use semantic tokens and remain accessible on reduced-motion devices.
+const feedbackCss = fs.readFileSync("batch-tracker/tracker.css", "utf8");
+for (const state of ["success", "warning", "error", "loading", "empty"]) {
+  assert.match(feedbackCss, new RegExp("body\\\\[data-domain\\\\] \\\\.feedback-" + state),
+    "feedback state " + state + " must be themed by the active workspace");
+}
+assert.match(feedbackCss, /body\\[data-domain\\] #message \\.card\\[role="alert"\\]/,
+  "urgent feedback must retain a distinct accessible alert surface");
+assert.match(feedbackCss, /body\\[data-domain\\] \\.feedback-loading::before/,
+  "loading feedback must expose a visual progress indicator");
+assert.match(feedbackCss, /@media \\(prefers-reduced-motion: reduce\\)[\\s\\S]*?feedback-loading::before/,
+  "loading indicator must respect reduced-motion preferences");
+assert.match(feedbackCss, /body\\[data-domain\\] \\.feedback-empty/,
+  "empty collections must have a distinct non-error state");
+console.log("✓ Feedback states: semantic status surfaces, loading, empty and reduced-motion behavior");
