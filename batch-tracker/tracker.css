@@ -7131,3 +7131,60 @@ html[dir="rtl"] body[data-domain] #syncStatus {
     transition: none !important;
   }
 }
+
+
+/* CultureOps UI QA — pass 20: remove desktop nav track and restore readable controls. */
+@media (min-width: 821px) {
+  body[data-domain] .app-toolbar {
+    position: fixed;
+    inset: 0 auto 0 0;
+    width: 210px;
+    height: 100vh;
+    min-height: 100vh;
+    grid-area: auto;
+    overflow-y: auto;
+  }
+  body[data-domain] .container {
+    grid-template-areas:
+      "hero hero hero"
+      "message message message"
+      "auth auth auth"
+      "tracker batch context"
+      "measurements measurements context"
+      "result result result";
+  }
+}
+.language-control {
+  flex-wrap: nowrap;
+  white-space: nowrap;
+  min-width: 0;
+}
+.language-control > span {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+@media (max-width: 420px) {
+  body[data-domain] .language-control {
+    flex-wrap: nowrap;
+    white-space: nowrap;
+  }
+}
+body[data-domain="mycology"] #authCard :is(.muted, label, small),
+body[data-domain="mycology"] #authStatus,
+body[data-domain="mycology"] #syncStatus,
+body[data-domain="mycology"] .card :is(.muted, label, small, .hint) {
+  color: #35251d !important;
+  -webkit-text-fill-color: #35251d !important;
+  opacity: 1 !important;
+}
+body[data-domain="mycology"] .language-control select {
+  color: #35251d !important;
+  -webkit-text-fill-color: #35251d !important;
+  background: #fffaf4 !important;
+  border-color: #b9957d !important;
+  color-scheme: light;
+}
+body[data-domain="mycology"] .language-control select option {
+  color: #35251d;
+  background: #fffaf4;
+}
