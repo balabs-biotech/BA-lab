@@ -3252,3 +3252,95 @@ body[data-domain] .workspace-dialog .dialog-actions .secondary-button {
     transition-duration: .01ms !important;
   }
 }
+
+
+/* Unified feedback language: semantic state is consistent, while colors and
+   surfaces come from the active scientific workspace design tokens. */
+body[data-domain] #message .card {
+  margin: 0 0 16px;
+  padding: 14px 17px;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-left: 4px solid var(--brand);
+  border-radius: 11px;
+  box-shadow: 0 3px 12px color-mix(in srgb, var(--text) 7%, transparent);
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+body[data-domain] #message .card[role="alert"] {
+  font-weight: 650;
+}
+body[data-domain] :is(.feedback-success, .feedback-warning, .feedback-error, .feedback-loading, .feedback-empty) {
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+  min-width: 0;
+  padding: 13px 15px;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--border-strong);
+  border-radius: 11px;
+  overflow-wrap: anywhere;
+}
+body[data-domain] .feedback-success {
+  border-left-color: var(--ok);
+  background: color-mix(in srgb, var(--ok) 7%, var(--surface));
+}
+body[data-domain] .feedback-warning {
+  border-left-color: var(--warn);
+  background: color-mix(in srgb, var(--warn) 8%, var(--surface));
+}
+body[data-domain] .feedback-error {
+  border-left-color: var(--err);
+  background: color-mix(in srgb, var(--err) 7%, var(--surface));
+}
+body[data-domain] .feedback-loading {
+  border-left-color: var(--brand);
+  background: var(--surface-2);
+}
+body[data-domain] .feedback-empty {
+  border-style: dashed;
+  border-left-color: var(--border-strong);
+  background: var(--surface-2);
+}
+body[data-domain] .feedback-loading::before {
+  content: "";
+  flex: 0 0 15px;
+  width: 15px;
+  height: 15px;
+  margin-top: 2px;
+  border: 2px solid var(--border-strong);
+  border-top-color: var(--brand);
+  border-radius: 50%;
+  animation: feedback-spin .8s linear infinite;
+}
+@keyframes feedback-spin { to { transform: rotate(360deg); } }
+body[data-domain] :is(.feedback-success, .feedback-warning, .feedback-error, .feedback-loading, .feedback-empty) > :first-child {
+  min-width: 0;
+}
+body[data-domain] :is(.feedback-success, .feedback-warning, .feedback-error, .feedback-loading, .feedback-empty) :is(strong, p) {
+  margin-top: 0;
+  overflow-wrap: anywhere;
+}
+body[data-domain] .feedback-error :focus-visible,
+body[data-domain] .feedback-warning :focus-visible {
+  outline-color: var(--focus);
+}
+@media (max-width: 520px) {
+  body[data-domain] :is(.feedback-success, .feedback-warning, .feedback-error, .feedback-loading, .feedback-empty) {
+    padding: 11px 12px;
+    gap: 8px;
+  }
+  body[data-domain] #message .card {
+    padding: 12px 14px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  body[data-domain] .feedback-loading::before {
+    animation: none;
+    border-top-color: var(--brand);
+    opacity: .75;
+  }
+}
