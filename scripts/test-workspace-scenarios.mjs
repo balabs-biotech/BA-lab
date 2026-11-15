@@ -933,3 +933,10 @@ assert.ok(collectionJs.includes("catch (observationQueryError)") && collectionJs
 
 assert.ok(collectionJs.includes('batchList.removeAttribute("aria-busy")') && collectionJs.includes('batchList.removeAttribute("data-feedback-state")'),
   "rendering batch results must clear the initial loading state");
+
+assert.ok(collectionJs.includes('renderCollectionFeedback(panel, "loading", "Chargement des analyses récentes…")'),
+  "the shared analytical execution panel must expose its loading state");
+assert.ok(collectionJs.includes('renderCollectionFeedback(panel, "empty", "Aucune exécution analytique enregistrée pour cette organisation.")'),
+  "the analytical execution panel must distinguish an empty history");
+assert.ok(collectionJs.includes('renderCollectionFeedback(panel, "error", "Chargement des exécutions analytiques impossible : "'),
+  "analytical execution retrieval errors must use the shared error state");
