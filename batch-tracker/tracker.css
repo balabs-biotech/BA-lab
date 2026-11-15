@@ -13551,3 +13551,222 @@ body[data-domain] #plantCard :is(button,a,input,select,textarea):focus-visible {
 @media(prefers-reduced-motion:reduce) {
   body[data-domain] #measurementCard .quick-capture-tile {transition:none!important;transform:none!important}
 }
+
+
+/* ============================================================
+   CULTUREOPS UI REFINEMENT — PASS 68
+   Culture dossier, biological operations, lineage and chronology
+   ============================================================ */
+body[data-domain] #cultureDetailPanel {
+  min-width:0; margin-top:20px; padding:clamp(15px,2.2vw,23px);
+  border:1px solid var(--workspace-border); border-radius:17px;
+  background:var(--workspace-panel)!important; color:var(--workspace-text);
+  box-shadow:0 12px 30px rgba(0,0,0,.12); scroll-margin-top:22px;
+}
+body[data-domain] #cultureDetailPanel[hidden],
+body[data-domain] #cultureDetailPanel.hidden {display:none!important}
+body[data-domain] #cultureDetailPanel .culture-detail-heading {
+  align-items:center; padding-bottom:16px;
+  border-bottom:1px solid var(--workspace-border);
+}
+body[data-domain] #cultureDetailPanel .section-kicker-label {
+  color:var(--workspace-accent); font-size:.59rem;
+  font-weight:850; letter-spacing:.14em;
+}
+body[data-domain] #cultureDetailPanel #cultureDetailTitle {
+  margin:5px 0 4px; color:var(--workspace-text);
+  font-size:clamp(1.1rem,2.5vw,1.5rem); letter-spacing:-.035em;
+  overflow-wrap:anywhere;
+}
+body[data-domain] #cultureDetailPanel #cultureDetailMeta {
+  margin:0; color:var(--workspace-muted); font-size:.68rem; line-height:1.6;
+}
+body[data-domain] #cultureDetailPanel #closeCultureDetail {
+  flex:0 0 auto; min-height:38px; margin:0; padding:7px 12px;
+  border:1px solid var(--workspace-border); border-radius:9px;
+  background:var(--workspace-panel-raised); color:var(--workspace-text);
+  font-size:.65rem; font-weight:750;
+}
+body[data-domain] #cultureDetailPanel #closeCultureDetail:hover {
+  border-color:var(--workspace-accent); color:var(--workspace-accent);
+}
+body[data-domain] #cultureDetailPanel .culture-detail-summary {
+  grid-template-columns:repeat(3,minmax(0,1fr)); gap:9px; margin:16px 0 20px;
+}
+body[data-domain] #cultureDetailPanel .culture-detail-field {
+  min-width:0; padding:12px; border:1px solid var(--workspace-border);
+  border-radius:11px; background:var(--workspace-panel-raised)!important;
+  color:var(--workspace-text);
+}
+body[data-domain] #cultureDetailPanel .culture-detail-field span {
+  color:var(--workspace-muted); font-size:.59rem; font-weight:700;
+  letter-spacing:.035em; text-transform:uppercase;
+}
+body[data-domain] #cultureDetailPanel .culture-detail-field strong {
+  margin-top:6px; color:var(--workspace-text); font-size:.75rem;
+  line-height:1.45; font-variant-numeric:tabular-nums;
+}
+body[data-domain] #cultureDetailPanel > h4,
+body[data-domain] #cultureDetailPanel .culture-linked-batches > h3 {
+  margin:22px 0 11px; padding:0; border:0;
+  color:var(--workspace-text); font-size:.92rem; letter-spacing:-.02em;
+}
+body[data-domain] #cultureDetailPanel .bio-operation-panel,
+body[data-domain] #cultureDetailPanel .bio-lineage-panel {
+  min-width:0; margin-top:16px; padding:clamp(13px,1.8vw,19px);
+  border:1px solid var(--workspace-border); border-radius:14px;
+  background:var(--workspace-panel-raised)!important; color:var(--workspace-text);
+  box-shadow:none;
+}
+body[data-domain] #cultureDetailPanel .bio-operation-panel h4,
+body[data-domain] #cultureDetailPanel .bio-lineage-panel h4 {
+  margin:0 0 7px; color:var(--workspace-text);
+  font-size:.9rem; letter-spacing:-.02em;
+}
+body[data-domain] #cultureDetailPanel .bio-operation-panel > p {
+  max-width:82ch; margin:0; color:var(--workspace-muted);
+  font-size:.65rem; line-height:1.65;
+}
+body[data-domain] #cultureDetailPanel .bio-operation-form {
+  grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin-top:15px;
+}
+body[data-domain] #cultureDetailPanel .bio-operation-form > div {min-width:0}
+body[data-domain] #cultureDetailPanel .bio-operation-form label {
+  display:block; margin:0 0 6px; color:var(--workspace-text);
+  font-size:.65rem; font-weight:750;
+}
+body[data-domain] #cultureDetailPanel .bio-operation-form :is(input,select,textarea) {
+  width:100%; min-width:0; min-height:42px; margin:0; padding:9px 11px;
+  border:1px solid var(--workspace-border); border-radius:9px;
+  background:var(--workspace-control)!important; color:var(--workspace-text)!important;
+  font:inherit; font-size:.68rem; box-shadow:none;
+}
+body[data-domain] #cultureDetailPanel .bio-operation-form textarea {
+  min-height:84px; resize:vertical; line-height:1.55;
+}
+body[data-domain] #cultureDetailPanel .bio-operation-form :is(input,select,textarea)::placeholder {
+  color:var(--workspace-muted); opacity:.78;
+}
+body[data-domain] #cultureDetailPanel .bio-operation-form .bio-operation-wide small {
+  display:block; margin-top:6px; color:var(--workspace-muted);
+  font-size:.6rem; line-height:1.55;
+}
+body[data-domain] #cultureDetailPanel #saveBioOperation {
+  min-height:43px; margin:0; padding:9px 16px;
+  border:1px solid var(--workspace-accent); border-radius:9px;
+  background:var(--workspace-accent); color:var(--workspace-bg);
+  font-size:.68rem; font-weight:850;
+}
+body[data-domain] #cultureDetailPanel #saveBioOperation:disabled {
+  opacity:.58; cursor:wait;
+}
+body[data-domain] #cultureDetailPanel #bioOperationMessage {
+  min-height:1.4em; margin:8px 0 0; color:var(--workspace-muted);
+  font-size:.64rem; line-height:1.6; overflow-wrap:anywhere;
+}
+body[data-domain] #cultureDetailPanel #cultureLineage {
+  display:grid; gap:13px; min-width:0;
+}
+body[data-domain] #cultureDetailPanel #cultureLineage > section {
+  min-width:0; padding:11px; border:1px solid var(--workspace-border);
+  border-radius:11px; background:var(--workspace-control);
+}
+body[data-domain] #cultureDetailPanel #cultureLineage > section > .muted {
+  margin:0 0 9px; color:var(--workspace-muted);
+  font-size:.61rem; font-weight:800; letter-spacing:.045em;
+  text-transform:uppercase;
+}
+body[data-domain] #cultureDetailPanel .culture-lineage-list {
+  display:flex; flex-wrap:wrap; align-items:stretch; gap:8px;
+}
+body[data-domain] #cultureDetailPanel .culture-lineage-node {
+  min-width:130px; max-width:100%; padding:10px 12px;
+  border:1px solid var(--workspace-border); border-radius:10px;
+  background:var(--workspace-panel-raised)!important; color:var(--workspace-text);
+  text-align:left; cursor:pointer;
+  transition:border-color .15s ease,background .15s ease,transform .15s ease;
+}
+body[data-domain] #cultureDetailPanel .culture-lineage-node:hover {
+  border-color:var(--workspace-accent);
+  background:color-mix(in srgb,var(--workspace-accent) 10%,var(--workspace-panel-raised))!important;
+  color:var(--workspace-text); transform:translateY(-1px);
+}
+body[data-domain] #cultureDetailPanel .culture-lineage-node strong {
+  color:var(--workspace-text); font-size:.68rem; overflow-wrap:anywhere;
+}
+body[data-domain] #cultureDetailPanel .culture-lineage-node small {
+  color:var(--workspace-muted); font-size:.59rem; line-height:1.5;
+}
+body[data-domain] #cultureDetailPanel .culture-lineage-arrow {
+  display:flex; align-items:center; color:var(--workspace-accent); font-size:.8rem;
+}
+body[data-domain] #cultureDetailPanel .culture-detail-timeline {
+  display:grid; gap:9px; min-width:0; margin-top:12px;
+}
+body[data-domain] #cultureDetailPanel .culture-linked-batches {
+  margin:0 0 10px; padding:14px;
+  border:1px solid var(--workspace-border); border-radius:13px;
+  background:var(--workspace-panel-raised);
+}
+body[data-domain] #cultureDetailPanel .culture-linked-batches > h3 {
+  margin:0 0 11px; font-size:.78rem;
+}
+body[data-domain] #cultureDetailPanel .culture-timeline-entry {
+  min-width:0; grid-template-columns:minmax(112px,145px) minmax(0,1fr);
+  gap:10px; padding:12px 13px;
+  border:1px solid var(--workspace-border);
+  border-left:3px solid var(--workspace-accent); border-radius:0 10px 10px 0;
+  background:var(--workspace-panel-raised)!important; color:var(--workspace-text);
+}
+body[data-domain] #cultureDetailPanel .culture-timeline-date {
+  color:var(--workspace-muted); font-size:.6rem; line-height:1.55;
+  font-variant-numeric:tabular-nums;
+}
+body[data-domain] #cultureDetailPanel .culture-timeline-entry strong {
+  color:var(--workspace-text); font-size:.7rem; line-height:1.45;
+}
+body[data-domain] #cultureDetailPanel .culture-timeline-entry p {
+  margin:4px 0 0; color:var(--workspace-muted);
+  font-size:.64rem; line-height:1.6; overflow-wrap:anywhere;
+}
+body[data-domain] #cultureDetailPanel .culture-timeline-entry .culture-catalog-action {
+  align-self:center; min-height:37px; margin:0; padding:7px 10px;
+  border:1px solid var(--workspace-border); border-radius:8px;
+  background:var(--workspace-control); color:var(--workspace-text);
+  font-size:.62rem; font-weight:750;
+}
+body[data-domain] #cultureDetailPanel .culture-timeline-entry .culture-catalog-action:hover {
+  border-color:var(--workspace-accent); color:var(--workspace-accent);
+}
+body[data-domain] #cultureDetailPanel #cultureDetailTimeline > .muted {
+  margin:0; padding:16px; border:1px dashed var(--workspace-border);
+  border-radius:10px; color:var(--workspace-muted);
+  font-size:.66rem; line-height:1.6;
+}
+body[data-domain] #cultureDetailPanel #cultureDetailTimeline > .info.warning,
+body[data-domain] #cultureDetailPanel #cultureDetailTimeline > .error {
+  margin:8px 0; padding:11px 13px; border-radius:9px;
+  font-size:.64rem; line-height:1.6;
+}
+body[data-domain] #cultureDetailPanel :is(button,input,select,textarea):focus-visible {
+  outline:2px solid var(--workspace-accent); outline-offset:3px;
+}
+@media(max-width:720px) {
+  body[data-domain] #cultureDetailPanel .culture-detail-summary {grid-template-columns:repeat(2,minmax(0,1fr))}
+  body[data-domain] #cultureDetailPanel .bio-operation-form {grid-template-columns:minmax(0,1fr)}
+  body[data-domain] #cultureDetailPanel .bio-operation-wide {grid-column:auto}
+}
+@media(max-width:520px) {
+  body[data-domain] #cultureDetailPanel {padding:13px}
+  body[data-domain] #cultureDetailPanel .culture-detail-heading {align-items:flex-start;flex-direction:column}
+  body[data-domain] #cultureDetailPanel #closeCultureDetail {align-self:flex-start}
+  body[data-domain] #cultureDetailPanel .culture-detail-summary {grid-template-columns:minmax(0,1fr)}
+  body[data-domain] #cultureDetailPanel .culture-timeline-entry {grid-template-columns:minmax(0,1fr);gap:5px}
+  body[data-domain] #cultureDetailPanel .culture-lineage-list {display:grid;grid-template-columns:minmax(0,1fr)}
+  body[data-domain] #cultureDetailPanel .culture-lineage-arrow {justify-content:center;min-height:12px;transform:rotate(90deg)}
+  body[data-domain] #cultureDetailPanel .culture-lineage-node {width:100%;min-width:0}
+  body[data-domain] #cultureDetailPanel .culture-timeline-entry .culture-catalog-action {justify-self:start}
+}
+@media(prefers-reduced-motion:reduce) {
+  body[data-domain] #cultureDetailPanel .culture-lineage-node {transition:none!important;transform:none!important}
+}
