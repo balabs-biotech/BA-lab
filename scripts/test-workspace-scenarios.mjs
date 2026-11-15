@@ -45,9 +45,11 @@ function callHelper(name, args, domain) {
 
 function fakeElement(tag) {
   return {
-    tag, value: "", textContent: "", label: "", children: [],
+    tag, value: "", textContent: "", label: "", className: "", children: [], attributes: {},
     appendChild(child) { this.children.push(child); return child; },
     replaceChildren(...children) { this.children = children; this.value = ""; },
+    setAttribute(name, value) { this.attributes[name] = value; },
+    removeAttribute(name) { delete this.attributes[name]; },
     get options() {
       const flatten = nodes => nodes.flatMap(node =>
         node.tag === "optgroup" ? flatten(node.children) : [node]
