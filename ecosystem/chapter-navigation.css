@@ -90,3 +90,13 @@ body{overscroll-behavior:none}
 @media(prefers-reduced-motion:reduce){
  .experience-page .rb-heading-armed,.experience-page .rb-heading-armed.rb-heading-visible{opacity:1;filter:none;transform:none;transition:none}
 }
+
+
+/* Mobile width correction: keep the chapter rail clear without squeezing the universe directory. */
+@media(max-width:760px){
+ .experience-page{padding-inline-start:24px;padding-inline-end:8px}
+ [dir=rtl] .experience-page{padding-inline-start:8px;padding-inline-end:24px}
+ .experience-page>.universe-index{width:100%;max-width:none;box-sizing:border-box;padding-inline:10px!important}
+ .experience-page>.universe-index .universe-index-grid{width:100%;grid-template-columns:minmax(0,1fr)!important}
+ .experience-page>.universe-index .universe-index-card{min-width:0;width:100%;box-sizing:border-box}
+}
