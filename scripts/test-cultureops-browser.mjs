@@ -7,14 +7,38 @@ const artifactDir = process.env.CULTUREOPS_ARTIFACT_DIR || "artifacts/cultureops
 fs.mkdirSync(artifactDir, { recursive: true });
 
 const workspaces = [
-  { slug: "green-tech", domain: "agronomy", accent: "rgb(145, 189, 120)" },
-  { slug: "mycology", domain: "mycology", accent: "rgb(185, 107, 62)" },
-  { slug: "laboratory", domain: "laboratory", accent: "rgb(78, 139, 189)" },
+  { slug: "green-tech", domain: "agronomy", accent: "#91bd78" },
+  { slug: "mycology", domain: "mycology", accent: "#b96b3e" },
+  { slug: "laboratory", domain: "laboratory", accent: "#4e8bbd" },
 ];
 const viewports = [
   { name: "desktop", width: 1440, height: 1000 },
   { name: "mobile", width: 390, height: 844 },
 ];
+function parseColor(value) {
+  const hex = value.trim().match(/^#([0-9a-f]{3}|[0-9a-f]{6})$/i);
+  if (hex) {
+    const raw = hex[1].length === 3 ? [...hex[1]].map(char => char + char).join("") : hex[1];
+    return [0, 2, 4].map(index => parseInt(raw.slice(index, index + 2), 16));
+  }
+  const rgb = value.match(/rgba?\\((\\d+)\\s*,\\s*(\\d+)\\s*,\\s*(\\d+)/i);
+  return rgb ? [Number(rgb[1]), Number(rgb[2]), Number(rgb[3])] : null;
+}
+function luminance(value) {
+  const channels = parseColor(value);
+  if (!channels) return null;
+  const linear = channels.map(channel => {
+    const normalized = channel / 255;
+    return normalized <= 0.04045 ? normalized / 12.92 : ((normalized + 0.055) / 1.055) ** 2.4;
+  });
+  return 0.2126 * linear[0] + 0.7152 * linear[1] + 0.0722 * linear[2];
+}
+function contrastRatio(first, second) {
+  const a = luminance(first), b = luminance(second);
+  if (a === null || b === null) return 0;
+  return (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
+}
+
 const supabaseStub = `
 window.supabase = {
   createClient: () => ({
@@ -81,6 +105,7 @@ try {
           documentWidth: root.scrollWidth,
           bodyBackground: style.backgroundColor,
           workspaceAccent: style.getPropertyValue("--workspace-accent").trim(),
+          surfaceToken: style.getPropertyValue("--surface").trim(),
           cardBackground: cardStyle?.backgroundColor || null,
           headingColor: headingStyle?.color || null,
           headingText: heading?.textContent?.trim() || null,
@@ -90,7 +115,9 @@ try {
       });
 
       if (metrics.domain !== workspace.domain) failures.push(`${workspace.slug}/${viewport.name}: wrong data-domain ${metrics.domain}`);
-      if (metrics.workspaceAccent !== workspace.accent) failures.push(`${workspace.slug}/${viewport.name}: unexpected workspace accent ${metrics.workspaceAccent}; expected ${workspace.accent}`);
+      if (metrics.workspaceAccent.toLowerCase() !== workspace.accent) failures.push(`${workspace.slug}/${viewport.name}: unexpected workspace accent ${metrics.workspaceAccent}; expected ${workspace.accent}`);
+      const headingContrast = contrastRatio(metrics.headingColor, metrics.surfaceToken);
+      if (headingContrast < 4.5) failures.push(`${workspace.slug}/${viewport.name}: auth heading contrast ${headingContrast.toFixed(2)}:1 is below 4.5:1`);
       if (!metrics.headingText || !metrics.authVisible) failures.push(`${workspace.slug}/${viewport.name}: auth content missing`);
       if (metrics.documentWidth > metrics.viewportWidth + 1) failures.push(`${workspace.slug}/${viewport.name}: horizontal overflow ${metrics.documentWidth}px > ${metrics.viewportWidth}px`);
       if (metrics.navLinks < 5) failures.push(`${workspace.slug}/${viewport.name}: incomplete section navigation (${metrics.navLinks} links)`);
