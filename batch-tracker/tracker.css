@@ -8405,3 +8405,351 @@ body[data-domain] :is(.success,.warning,.error) { border-style: solid !important
   }
   body[data-domain] .statistics-table-wrap table { min-width: 560px; }
 }
+
+
+/* ============================================================
+   BA LABS CULTUREOPS — VISUAL SYSTEM / PASS 40
+   Editorial hierarchy, material depth and domain-specific light.
+   Vanilla CSS only; no framework or runtime dependency.
+   ============================================================ */
+body[data-domain] {
+  position: relative;
+  isolation: isolate;
+  min-height: 100vh;
+  padding-top: 22px;
+  background:
+    radial-gradient(ellipse at 12% 0%, color-mix(in srgb, var(--workspace-accent) 10%, transparent), transparent 34rem),
+    radial-gradient(ellipse at 92% 36%, rgba(255,255,255,.025), transparent 30rem),
+    var(--workspace-bg) !important;
+}
+body[data-domain]::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: .16;
+  background-image:
+    repeating-linear-gradient(0deg, rgba(255,255,255,.018) 0, rgba(255,255,255,.018) 1px, transparent 1px, transparent 4px),
+    repeating-linear-gradient(90deg, rgba(255,255,255,.012) 0, rgba(255,255,255,.012) 1px, transparent 1px, transparent 5px);
+  mask-image: linear-gradient(180deg, #000 0%, rgba(0,0,0,.45) 65%, transparent 100%);
+}
+body[data-domain] .container { max-width: 1160px; }
+
+/* Navigation: a compact instrument rail, not a generic website navbar. */
+body[data-domain] .app-toolbar {
+  position: sticky;
+  top: 10px;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-height: 66px;
+  padding: 10px 14px;
+  margin-bottom: 16px;
+  border: 1px solid var(--workspace-border) !important;
+  border-radius: 15px;
+  background: color-mix(in srgb, var(--workspace-panel) 92%, transparent) !important;
+  box-shadow: 0 12px 32px rgba(0,0,0,.22);
+  backdrop-filter: blur(18px);
+}
+body[data-domain] .brand-symbol {
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  border: 1px solid color-mix(in srgb, var(--workspace-accent) 35%, var(--workspace-border));
+  border-radius: 11px;
+  background: color-mix(in srgb, var(--workspace-accent) 10%, var(--workspace-panel-raised));
+}
+body[data-domain] .brand-wordmark strong { letter-spacing: .13em; font-size: 12px; }
+body[data-domain] .brand-wordmark small { letter-spacing: .19em; font-size: 9px; }
+body[data-domain] .section-nav { gap: 5px; }
+body[data-domain] .section-nav a {
+  min-height: 38px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 10px;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  color: var(--workspace-muted) !important;
+  font-size: 12px;
+  transition: color .18s ease, background .18s ease, border-color .18s ease;
+}
+body[data-domain] .section-nav a:hover,
+body[data-domain] .section-nav a[aria-current="page"] {
+  background: color-mix(in srgb, var(--workspace-accent) 9%, var(--workspace-panel)) !important;
+}
+body[data-domain] .nav-number {
+  color: var(--workspace-accent);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: .08em;
+}
+body[data-domain] .toolbar-status {
+  margin-left: auto;
+  white-space: nowrap;
+  font-size: 9px;
+  letter-spacing: .13em;
+}
+body[data-domain] .status-pulse {
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--workspace-accent) 13%, transparent);
+}
+
+/* Domain hero: preserve the distinct material language of each workspace. */
+body[data-domain] .app-hero {
+  min-height: 248px;
+  margin: 0 0 24px;
+  border: 1px solid color-mix(in srgb, var(--workspace-accent) 32%, var(--workspace-border)) !important;
+  border-radius: 20px;
+  box-shadow: 0 20px 48px rgba(0,0,0,.24), inset 0 1px 0 rgba(255,255,255,.045);
+}
+body[data-domain] .app-hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(110deg, transparent 35%, rgba(255,255,255,.035) 58%, transparent 78%);
+}
+body[data-domain] .app-hero h1 { letter-spacing: -.052em; }
+body[data-domain] .hero-art { opacity: .84; }
+body[data-domain] .hero-orbit { border-color: color-mix(in srgb, var(--workspace-accent) 35%, transparent); }
+body[data-domain] .hero-core {
+  border-color: color-mix(in srgb, var(--workspace-accent) 55%, transparent);
+  box-shadow: 0 0 0 13px color-mix(in srgb, var(--workspace-accent) 5%, transparent),
+              0 0 48px color-mix(in srgb, var(--workspace-accent) 13%, transparent);
+}
+body[data-domain="agronomy"] .app-hero {
+  background:
+    radial-gradient(circle at 78% 28%, rgba(180,244,119,.17), transparent 17rem),
+    linear-gradient(120deg,#14291d 0%,#1b3827 56%,#263f2b 100%) !important;
+}
+body[data-domain="mycology"] .app-hero {
+  background:
+    radial-gradient(circle at 78% 24%, rgba(201,130,89,.19), transparent 18rem),
+    linear-gradient(120deg,#30231c 0%,#211a16 58%,#171513 100%) !important;
+}
+body[data-domain="laboratory"] .app-hero {
+  background:
+    radial-gradient(circle at 78% 24%, rgba(120,184,232,.18), transparent 18rem),
+    linear-gradient(120deg,#172a3a 0%,#1b2936 58%,#17212c 100%) !important;
+}
+body[data-domain] .hero-note {
+  border-color: color-mix(in srgb, var(--workspace-accent) 30%, transparent);
+  background: rgba(8,14,18,.34);
+}
+
+/* Panels: distinct elevation levels and a subtle spotlight on interaction. */
+body[data-domain] .card {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  padding: clamp(20px, 2.6vw, 30px);
+  margin-bottom: 20px;
+  border: 1px solid var(--workspace-border) !important;
+  border-radius: 16px;
+  background:
+    linear-gradient(145deg, rgba(255,255,255,.025), transparent 42%),
+    var(--workspace-panel) !important;
+  box-shadow: 0 12px 32px rgba(0,0,0,.16), inset 0 1px 0 rgba(255,255,255,.025) !important;
+  transition: border-color .2s ease, box-shadow .2s ease, transform .2s ease;
+}
+body[data-domain] .card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 22px;
+  width: 42px;
+  height: 2px;
+  border-radius: 0 0 3px 3px;
+  background: var(--workspace-accent);
+  opacity: .82;
+  pointer-events: none;
+}
+@media (hover: hover) and (pointer: fine) {
+  body[data-domain] .card:hover {
+    border-color: color-mix(in srgb, var(--workspace-accent) 48%, var(--workspace-border)) !important;
+    box-shadow: 0 16px 38px rgba(0,0,0,.22),
+                0 0 28px color-mix(in srgb, var(--workspace-accent) 5%, transparent) !important;
+  }
+}
+body[data-domain] .card h2 {
+  margin-bottom: 12px;
+  font-size: clamp(19px, 2vw, 23px);
+  letter-spacing: -.025em;
+}
+body[data-domain] .card h3 {
+  margin-top: 24px;
+  padding-top: 16px;
+  border-color: var(--workspace-border);
+  font-size: 15px;
+  letter-spacing: -.01em;
+}
+body[data-domain] .section-kicker {
+  margin-bottom: 17px;
+  color: var(--workspace-accent);
+  font-size: 9px;
+  letter-spacing: .17em;
+}
+body[data-domain] .entry-step-mark {
+  color: var(--workspace-accent) !important;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .13em;
+}
+body[data-domain] .muted,
+body[data-domain] .hint { line-height: 1.65; }
+
+/* Metrics and activity areas get a stronger information hierarchy. */
+body[data-domain] .overview-metric {
+  position: relative;
+  min-height: 128px;
+  padding: 17px 18px;
+  border: 1px solid var(--workspace-border) !important;
+  border-radius: 13px;
+  background: linear-gradient(145deg, color-mix(in srgb, var(--workspace-accent) 7%, var(--workspace-panel-raised)), var(--workspace-panel-raised)) !important;
+}
+body[data-domain] .overview-metric-label {
+  color: var(--workspace-muted) !important;
+  font-size: 11px;
+  font-weight: 650;
+  letter-spacing: .035em;
+}
+body[data-domain] .overview-metric strong {
+  display: block;
+  margin: 7px 0 9px;
+  color: var(--workspace-text) !important;
+  font-size: clamp(27px, 3vw, 36px);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -.05em;
+}
+body[data-domain] .overview-meter {
+  height: 4px;
+  overflow: hidden;
+  border-radius: 9px;
+  background: rgba(0,0,0,.25);
+}
+body[data-domain] .overview-meter span {
+  background: var(--workspace-accent) !important;
+  box-shadow: 0 0 12px color-mix(in srgb, var(--workspace-accent) 35%, transparent);
+}
+body[data-domain] .overview-metric-note { margin-top: 7px; font-size: 10px; }
+body[data-domain] .overview-activity,
+body[data-domain] .overview-shortcuts {
+  padding: 18px;
+  border: 1px solid var(--workspace-border) !important;
+  border-radius: 13px;
+}
+body[data-domain] .overview-section-heading h3 { margin: 0; padding: 0; border: 0; }
+body[data-domain] .overview-shortcut {
+  min-height: 58px;
+  display: grid;
+  grid-template-columns: 30px minmax(0,1fr) 18px;
+  align-items: center;
+  gap: 10px;
+  margin-top: 8px;
+  padding: 10px 12px;
+  text-align: left;
+  border: 1px solid var(--workspace-border) !important;
+  background: var(--workspace-panel-raised) !important;
+}
+body[data-domain] .shortcut-index { color: var(--workspace-accent) !important; font-size: 10px; font-weight: 800; }
+body[data-domain] .overview-shortcut strong { display: block; font-size: 12px; }
+body[data-domain] .overview-shortcut small { display: block; margin-top: 2px; font-size: 10px; }
+
+/* Inputs and actions: consistent geometry, stronger focus and clear hierarchy. */
+body[data-domain] .card label {
+  margin: 15px 0 7px;
+  color: var(--workspace-soft, var(--workspace-text)) !important;
+  font-size: 12px;
+  font-weight: 650;
+}
+body[data-domain] .card :is(input:not([type=checkbox]):not([type=radio]),select,textarea) {
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 1px solid var(--workspace-border) !important;
+  border-radius: 9px !important;
+  background: var(--workspace-control) !important;
+  box-shadow: inset 0 1px 2px rgba(0,0,0,.12);
+  transition: border-color .16s ease, box-shadow .16s ease;
+}
+body[data-domain] .card :is(input,select,textarea):focus {
+  border-color: var(--workspace-accent) !important;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--workspace-accent) 12%, transparent) !important;
+}
+body[data-domain] .card button:not(.batch-item):not(.overview-shortcut) {
+  min-height: 43px;
+  border-radius: 9px;
+  font-size: 13px;
+  letter-spacing: .005em;
+  box-shadow: 0 5px 14px rgba(0,0,0,.14);
+  transition: transform .16s ease, filter .16s ease, box-shadow .16s ease;
+}
+body[data-domain] .card button:not(:disabled):hover { filter: brightness(1.09); }
+body[data-domain] .card button:not(:disabled):active { transform: translateY(1px); }
+body[data-domain] .card button.secondary-button {
+  box-shadow: none;
+}
+body[data-domain] .card .small-button { min-height: 36px; padding: 7px 11px; }
+body[data-domain] .info:not(.success):not(.warning):not(.error) {
+  border: 1px solid var(--workspace-border);
+  border-radius: 10px;
+  background: var(--workspace-panel-raised) !important;
+}
+body[data-domain] .universe-home-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 34px;
+  margin: 0 0 10px;
+  padding: 6px 10px;
+  border: 1px solid var(--workspace-border);
+  border-radius: 8px;
+  background: var(--workspace-panel);
+  color: var(--workspace-muted) !important;
+  font-size: 11px;
+  text-decoration: none;
+}
+body[data-domain] .universe-home-link:hover {
+  border-color: var(--workspace-accent);
+  color: var(--workspace-accent) !important;
+}
+body[data-domain] .batch-item:hover,
+body[data-domain] .culture-catalog-row:hover,
+body[data-domain] .quick-capture-tile:hover,
+body[data-domain] .overview-shortcut:hover {
+  border-color: var(--workspace-accent) !important;
+  box-shadow: 0 7px 18px rgba(0,0,0,.16);
+}
+body[data-domain] :is(.culture-catalog-row,.batch-item,.stage,.qc-row) {
+  border-radius: 10px;
+}
+@media (max-width: 820px) {
+  body[data-domain] { padding: 10px 10px 30px !important; }
+  body[data-domain] .app-toolbar { position: relative; top: auto; flex-wrap: wrap; gap: 9px; }
+  body[data-domain] .section-nav { order: 4; width: 100%; overflow-x: auto; flex-wrap: nowrap; padding-bottom: 3px; }
+  body[data-domain] .section-nav a { flex: 0 0 auto; }
+  body[data-domain] .toolbar-status { margin-left: auto; }
+  body[data-domain] .app-hero { min-height: 210px; padding: 23px; }
+}
+@media (max-width: 600px) {
+  body[data-domain] .app-hero { grid-template-columns: minmax(0,1fr); min-height: 0; }
+  body[data-domain] .hero-art { display: none; }
+  body[data-domain] .app-hero h1 { font-size: clamp(30px, 9vw, 42px); }
+  body[data-domain] .hero-description { font-size: 13px; }
+  body[data-domain] .card { padding: 19px 15px !important; border-radius: 13px; }
+  body[data-domain] .overview-metric { min-height: 0; }
+  body[data-domain] .overview-activity,
+  body[data-domain] .overview-shortcuts { padding: 14px; }
+  body[data-domain] .toolbar-status { font-size: 8px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  body[data-domain] .card,
+  body[data-domain] .card *,
+  body[data-domain] .section-nav a,
+  body[data-domain] .overview-shortcut {
+    transition: none !important;
+    animation: none !important;
+  }
+}
