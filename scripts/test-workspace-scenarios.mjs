@@ -871,7 +871,7 @@ for (const state of ["success", "warning", "error", "loading", "empty"]) {
   assert.ok(feedbackCss.includes(".feedback-" + state),
     "feedback state " + state + " must have a reusable component style");
 }
-assert.match(feedbackCss, /body\\[data-domain\\] :is\\([^)]*feedback-success/);
+assert.match(feedbackCss, /body\[data-domain\] :is\([^)]*feedback-success/);
 assert.match(feedbackCss, /body\\[data-domain\\] #message \\.card\\[role="alert"\\]/,
   "urgent feedback must retain a distinct accessible alert surface");
 assert.match(feedbackCss, /body\\[data-domain\\] \\.feedback-loading::before/,
