@@ -2876,3 +2876,75 @@ body[data-domain] :is(button, input, select, textarea, a, [tabindex]):focus-visi
     overflow-wrap: anywhere;
   }
 }
+
+
+/* Domain identity cohesion: apply each workspace palette to shared navigation chrome. */
+body[data-domain="agronomy"] .app-toolbar {
+  background:rgba(25,35,30,.94);
+  border-color:#35483d;
+  box-shadow:0 10px 28px rgba(0,0,0,.22);
+}
+body[data-domain="agronomy"] .toolbar-brand,
+body[data-domain="agronomy"] .section-nav a {color:#d9e8dc}
+body[data-domain="agronomy"] .brand-symbol {
+  color:#14200f;background:#a7f36a;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.18);
+}
+body[data-domain="agronomy"] .toolbar-divider {background:#35483d}
+body[data-domain="agronomy"] .section-nav a:hover,
+body[data-domain="agronomy"] .section-nav a:focus-visible {
+  color:#d7f6c1;background:#294638;border-color:#506657;
+}
+body[data-domain="agronomy"] .nav-number {color:#a7f36a}
+body[data-domain="agronomy"] .toolbar-status {
+  color:#d9e8dc;background:#202d25;border-color:#506657;
+}
+body[data-domain="agronomy"] .status-pulse {
+  background:#a7f36a;box-shadow:0 0 0 4px rgba(167,243,106,.15);
+}
+
+body[data-domain="mycology"] .app-toolbar {
+  background:#fffaf4;border-color:#d7bba6;
+  box-shadow:4px 4px 0 #d7bba6;
+}
+body[data-domain="mycology"] .toolbar-brand,
+body[data-domain="mycology"] .section-nav a {color:#56331f}
+body[data-domain="mycology"] .brand-symbol {
+  color:#fff7ed;background:#56331f;border-radius:3px;
+  box-shadow:inset 0 0 0 2px #a94f1d;
+}
+body[data-domain="mycology"] .toolbar-divider {background:#d7bba6}
+body[data-domain="mycology"] .section-nav a:hover,
+body[data-domain="mycology"] .section-nav a:focus-visible {
+  color:#fffaf4;background:#a94f1d;border-color:#a94f1d;
+}
+body[data-domain="mycology"] .nav-number {color:#a94f1d}
+body[data-domain="mycology"] .toolbar-status {
+  color:#56331f;background:#f0dfd0;border-color:#d7bba6;border-radius:3px;
+}
+body[data-domain="mycology"] .status-pulse {
+  background:#a94f1d;box-shadow:0 0 0 4px rgba(169,79,29,.14);
+}
+
+body[data-domain="laboratory"] .app-toolbar {
+  background:#fff;border-color:#c7d6e4;
+  box-shadow:0 5px 18px rgba(24,58,89,.08);
+}
+body[data-domain="laboratory"] .toolbar-brand,
+body[data-domain="laboratory"] .section-nav a {color:#183a59}
+body[data-domain="laboratory"] .brand-symbol {
+  color:#fff;background:#215b91;border-radius:9px;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.2);
+}
+body[data-domain="laboratory"] .toolbar-divider {background:#c7d6e4}
+body[data-domain="laboratory"] .section-nav a:hover,
+body[data-domain="laboratory"] .section-nav a:focus-visible {
+  color:#183a59;background:#e4eef7;border-color:#b6ccdf;
+}
+body[data-domain="laboratory"] .nav-number {color:#215b91}
+body[data-domain="laboratory"] .toolbar-status {
+  color:#215b91;background:#f1f6fb;border-color:#c7d6e4;
+}
+body[data-domain="laboratory"] .status-pulse {
+  background:#2b8b62;box-shadow:0 0 0 4px rgba(43,139,98,.13);
+}
