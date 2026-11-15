@@ -5373,12 +5373,22 @@ async function loadRecentMeasurements() {
   if (!loadOrganizationId || !measurementHistory) return;
   renderCollectionFeedback(measurementHistory, "loading", "Chargement de l’historique des mesures…");
 
-  const { data, error } = await supabaseClient
-    .from("measurements")
-    .select("id, variable_code, raw_value, raw_unit_code, normalized_value, normalized_unit_code, measured_at, method, instrument, culture_id, plant_culture_id, event_id, metadata")
-    .eq("organization_id", loadOrganizationId)
-    .order("measured_at", { ascending: false })
-    .limit(1000);
+  let measurementQueryResult;
+  try {
+    measurementQueryResult = await supabaseClient
+      .from("measurements")
+      .select("id, variable_code, raw_value, raw_unit_code, normalized_value, normalized_unit_code, measured_at, method, instrument, culture_id, plant_culture_id, event_id, metadata")
+      .eq("organization_id", loadOrganizationId)
+      .order("measured_at", { ascending: false })
+      .limit(1000);
+  } catch (queryError) {
+    const message = "Chargement de l’historique des mesures impossible : " + (queryError?.message || "erreur réseau inconnue");
+    if (requestId === measurementHistoryRequestId && isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) {
+      renderCollectionFeedback(measurementHistory, "error", message);
+    }
+    throw new Error(message);
+  }
+  const { data, error } = measurementQueryResult;
 
   if (requestId !== measurementHistoryRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
   if (error) {
@@ -5582,11 +5592,20 @@ async function loadRecentObservations() {
   if (!loadOrganizationId || !observationHistory) return;
   renderCollectionFeedback(observationHistory, "loading", "Chargement de l’historique des observations…");
 
-  const query = await supabaseClient.from("observations")
-    .select("id, variable_code, value_text, observed_at, culture_id, plant_culture_id, event_id, metadata")
-    .eq("organization_id", loadOrganizationId)
-    .order("observed_at", { ascending: false })
-    .limit(1000);
+  let query;
+  try {
+    query = await supabaseClient.from("observations")
+      .select("id, variable_code, value_text, observed_at, culture_id, plant_culture_id, event_id, metadata")
+      .eq("organization_id", loadOrganizationId)
+      .order("observed_at", { ascending: false })
+      .limit(1000);
+  } catch (observationQueryError) {
+    const message = "Chargement de l’historique des observations impossible : " + (observationQueryError?.message || "erreur réseau inconnue");
+    if (requestId === observationHistoryRequestId && isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) {
+      renderCollectionFeedback(observationHistory, "error", message);
+    }
+    throw new Error(message);
+  }
 
   if (requestId !== observationHistoryRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
   if (query.error) {
