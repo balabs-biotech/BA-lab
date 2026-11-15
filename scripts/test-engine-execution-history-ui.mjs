@@ -20,6 +20,9 @@ for (const label of [
   "Fenêtre demandée : ",
   "Contexte manquant ou non résolu",
   "Faits observés et sources",
+  "observations biologiques",
+  "événement : ",
+  "event_id",
   "Caractéristiques calculées",
   "Hypothèses à vérifier",
   "Lacunes temporelles"
