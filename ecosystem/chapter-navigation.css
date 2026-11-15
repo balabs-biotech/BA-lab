@@ -37,3 +37,6 @@ body{overscroll-behavior:none}
  .experience-track{scroll-behavior:auto}
  .experience-progress span{transition:none}
 }
+
+.experience-track{direction:ltr}
+[dir=rtl] .experience-page{direction:rtl}
