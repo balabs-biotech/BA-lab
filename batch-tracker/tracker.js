@@ -398,6 +398,20 @@ function showMessage(
 }
 
 
+function renderCollectionFeedback(container, state, text) {
+  if (!container) return null;
+  const supportedStates = new Set(["info", "success", "warning", "error", "loading", "empty"]);
+  const semanticState = supportedStates.has(state) ? state : "info";
+  const feedback = document.createElement("p");
+  feedback.className = "feedback-" + semanticState;
+  feedback.setAttribute("role", semanticState === "error" || semanticState === "warning" ? "alert" : "status");
+  feedback.textContent = String(text ?? "");
+  container.replaceChildren(feedback);
+  container.setAttribute("data-feedback-state", semanticState);
+  if (semanticState === "loading") container.setAttribute("aria-busy", "true");
+  else container.removeAttribute("aria-busy");
+  return feedback;
+}
 function clearMessage() {
 
   message.innerHTML = "";
@@ -3165,16 +3179,17 @@ recordHarvestButton?.addEventListener("click", recordBatchHarvest);
 
 function renderBatchEventTimeline(events, loadError = null) {
   if (!batchEventList) return;
-  batchEventList.replaceChildren();
-
   if (loadError) {
-    batchEventList.textContent = "Chronologie indisponible : " + loadError;
+    renderCollectionFeedback(batchEventList, "error", "Chronologie indisponible : " + loadError);
     return;
   }
   if (!events?.length) {
-    batchEventList.innerHTML = '<p class="muted">Aucun événement enregistré pour ce lot.</p>';
+    renderCollectionFeedback(batchEventList, "empty", "Aucun événement enregistré pour ce lot.");
     return;
   }
+  batchEventList.removeAttribute("data-feedback-state");
+  batchEventList.removeAttribute("aria-busy");
+  batchEventList.replaceChildren();
 
   const labels = {
     batch_created: "Lot créé",
@@ -5352,6 +5367,7 @@ async function loadRecentMeasurements() {
   const loadRevision = authStateRevision;
   const loadOrganizationId = organizationId;
   if (!loadOrganizationId || !measurementHistory) return;
+  renderCollectionFeedback(measurementHistory, "loading", "Chargement de l’historique des mesures…");
 
   const { data, error } = await supabaseClient
     .from("measurements")
@@ -5361,7 +5377,11 @@ async function loadRecentMeasurements() {
     .limit(1000);
 
   if (requestId !== measurementHistoryRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
-  if (error) throw new Error(`Chargement de l’historique des mesures impossible : ${error.message}`);
+  if (error) {
+    const message = "Chargement de l’historique des mesures impossible : " + error.message;
+    renderCollectionFeedback(measurementHistory, "error", message);
+    throw new Error(message);
+  }
 
   const rows = data || [];
   const eventIds = [...new Set(rows.map(row => row.event_id).filter(Boolean))];
@@ -5380,9 +5400,11 @@ async function loadRecentMeasurements() {
   if (requestId !== measurementHistoryRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
   const visibleRows = rows.filter(row => belongsToActiveWorkspace(row, eventsById)).slice(0, 10);
   if (!visibleRows.length) {
-    measurementHistory.innerHTML = '<p class="muted">Aucune mesure enregistrée dans cet univers pour le moment.</p>';
+    renderCollectionFeedback(measurementHistory, "empty", "Aucune mesure enregistrée dans cet univers pour le moment.");
     return;
   }
+  measurementHistory.removeAttribute("data-feedback-state");
+  measurementHistory.removeAttribute("aria-busy");
 
   measurementHistory.innerHTML = visibleRows.map(row => {
     const variable = measurementVariables.find(item => item.code === row.variable_code);
@@ -5554,6 +5576,7 @@ async function loadRecentObservations() {
   const loadRevision = authStateRevision;
   const loadOrganizationId = organizationId;
   if (!loadOrganizationId || !observationHistory) return;
+  renderCollectionFeedback(observationHistory, "loading", "Chargement de l’historique des observations…");
 
   const query = await supabaseClient.from("observations")
     .select("id, variable_code, value_text, observed_at, culture_id, plant_culture_id, event_id, metadata")
@@ -5562,7 +5585,11 @@ async function loadRecentObservations() {
     .limit(1000);
 
   if (requestId !== observationHistoryRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
-  if (query.error) throw new Error("Chargement de l’historique des observations impossible : " + query.error.message);
+  if (query.error) {
+    const message = "Chargement de l’historique des observations impossible : " + query.error.message;
+    renderCollectionFeedback(observationHistory, "error", message);
+    throw new Error(message);
+  }
   const observationRows = query.data || [];
   const eventIds = [...new Set(observationRows.map(row => row.event_id).filter(Boolean))];
   const eventsById = {};
@@ -5581,9 +5608,11 @@ async function loadRecentObservations() {
   recentObservations = observationRows.filter(row => belongsToActiveWorkspace(row, eventsById)).slice(0, 8);
   updateOverview();
   if (!recentObservations.length) {
-    observationHistory.innerHTML = '<p class="muted">Aucune observation enregistrée dans cet univers pour le moment.</p>';
+    renderCollectionFeedback(observationHistory, "empty", "Aucune observation enregistrée dans cet univers pour le moment.");
     return;
   }
+  observationHistory.removeAttribute("data-feedback-state");
+  observationHistory.removeAttribute("aria-busy");
 
   observationHistory.innerHTML = recentObservations.map(row => {
     const variable = measurementVariables.find(item => item.code === row.variable_code);
@@ -5954,7 +5983,7 @@ async function loadBiologicalLineage(cultureId) {
   const loadRevision = authStateRevision;
   const loadOrganizationId = organizationId;
   if (!target || !loadOrganizationId) return;
-  target.textContent = biologicalWorkflowText("loading");
+  renderCollectionFeedback(target, "loading", biologicalWorkflowText("loading"));
   try {
     const { data, error } = await supabaseClient.from('cultures')
       .select('id,code,culture_type,material_id,parent_culture_id,started_at,metadata')
@@ -5964,7 +5993,7 @@ async function loadBiologicalLineage(cultureId) {
     const rows = data || [];
     const byId = new Map(rows.map(row => [row.id, row]));
     const current = byId.get(cultureId);
-    if (!current) { target.textContent = biologicalWorkflowText("missing"); return; }
+    if (!current) { renderCollectionFeedback(target, "empty", biologicalWorkflowText("missing")); return; }
     const { data: materials, error: materialError } = await supabaseClient.from('materials')
       .select('id,material_code,material_type,parent_material_id,generation,state,strain_id')
       .eq('organization_id', loadOrganizationId).limit(2000);
@@ -5978,6 +6007,8 @@ async function loadBiologicalLineage(cultureId) {
     const descendants = []; const queue = [{ id: current.id, depth: 0 }]; const visited = new Set([current.id]);
     while (queue.length && descendants.length < 200) { const node = queue.shift(); for (const child of rows.filter(row => row.parent_culture_id === node.id)) { if (visited.has(child.id)) continue; visited.add(child.id); descendants.push({ ...child, depth: node.depth + 1 }); queue.push({ id: child.id, depth: node.depth + 1 }); } }
     const renderNode = (row, label) => { const node = document.createElement('button'); node.type = 'button'; node.className = 'culture-lineage-node'; node.addEventListener('click', () => loadCultureDetail(row.id)); node.setAttribute('aria-label', biologicalWorkflowText("open") + (row.code || biologicalWorkflowText("noCode"))); const strong = document.createElement('strong'); strong.textContent = row.code || 'Culture sans code'; const small = document.createElement('small'); small.textContent = label + ' · ' + (row.culture_type || biologicalWorkflowText("typeMissing")); node.append(strong, small); return node; };
+    target.removeAttribute("data-feedback-state");
+    target.removeAttribute("aria-busy");
     target.replaceChildren();
     const makeGroup = (title, items) => { const section = document.createElement('section'); const heading = document.createElement('p'); heading.className = 'muted'; heading.textContent = title; section.appendChild(heading); const list = document.createElement('div'); list.className = 'culture-lineage-list'; items.forEach((item, index) => { if (index) { const arrow = document.createElement('span'); arrow.className = 'culture-lineage-arrow'; arrow.textContent = '→'; list.appendChild(arrow); } list.appendChild(renderNode(item.row, item.label)); }); section.appendChild(list); target.appendChild(section); };
     if (materialChain.length) {
@@ -5989,9 +6020,12 @@ async function loadBiologicalLineage(cultureId) {
     if (ancestors.length) makeGroup(biologicalWorkflowText("parents"), ancestors.map(row => ({ row, label: biologicalWorkflowText("parentCulture") })));
     makeGroup(biologicalWorkflowText("selected"), [{ row: current, label: biologicalWorkflowText("openSheet") }]);
     if (descendants.length) makeGroup(biologicalWorkflowText("descendants") + ' (' + descendants.length + ')', descendants.map(row => ({ row, label: biologicalWorkflowText("generation") + (row.depth || 1) })));
-    if (!ancestors.length && !descendants.length) { const p = document.createElement('p'); p.className = 'muted'; p.textContent = biologicalWorkflowText("noLineage"); target.appendChild(p); }
+    if (!ancestors.length && !descendants.length) renderCollectionFeedback(target, "empty", biologicalWorkflowText("noLineage"));
     if (rows.length >= 1000) { const note = document.createElement('p'); note.className = 'muted'; note.textContent = biologicalWorkflowText("partial"); target.appendChild(note); }
-  } catch (error) { if (!isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return; target.textContent = biologicalWorkflowText("loadError") + (error.message || error); }
+  } catch (error) {
+    if (!isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
+    renderCollectionFeedback(target, "error", biologicalWorkflowText("loadError") + (error.message || error));
+  }
 }
 
 async function saveBiologicalOperation(event) {
@@ -6078,11 +6112,7 @@ async function loadBiologicalContextPanel(cultureId) {
   if (!culture || !panel || !history || !environmentSelect || !strainSelect || !form) return;
 
   panel.dataset.cultureId = cultureId;
-  history.replaceChildren();
-  const loading = document.createElement("p");
-  loading.className = "muted";
-  loading.textContent = "Chargement des contextes biologiques…";
-  history.appendChild(loading);
+  renderCollectionFeedback(history, "loading", "Chargement des contextes biologiques…");
 
   try {
     const [contextResult, environmentResult] = await Promise.all([
@@ -6434,11 +6464,10 @@ async function loadPlantBiologicalContextPanel(plantCultureId) {
     });
 
     history.replaceChildren();
+    history.removeAttribute("data-feedback-state");
+    history.removeAttribute("aria-busy");
     if (!contexts.length) {
-      const empty = document.createElement("p");
-      empty.className = "muted";
-      empty.textContent = "Aucun contexte biologique enregistré pour cette culture végétale.";
-      history.appendChild(empty);
+      renderCollectionFeedback(history, "empty", "Aucun contexte biologique enregistré pour cette culture végétale.");
     } else {
       const stageLabels = {
         sowing: "Semis", germination: "Germination", seedling: "Plantule",
@@ -6513,11 +6542,7 @@ async function loadPlantBiologicalContextPanel(plantCultureId) {
   } catch (error) {
     if (requestId !== plantBiologicalContextRequestId ||
         !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
-    history.replaceChildren();
-    const message = document.createElement("p");
-    message.className = "info error";
-    message.textContent = "Chargement du contexte végétal impossible : " + error.message;
-    history.appendChild(message);
+    renderCollectionFeedback(history, "error", "Chargement du contexte végétal impossible : " + error.message);
     setPlantBiologicalContextMessage(error.message, "error");
   }
 }
