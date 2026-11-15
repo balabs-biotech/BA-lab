@@ -807,3 +807,24 @@ assert.match(formThemeCss, /body\\[data-domain\\] :is\\(input, select, textarea\
 assert.match(formThemeCss, /body\\[data-domain\\] :is\\(input, select, textarea\\):disabled/,
   "disabled form controls must remain visibly distinct in every workspace");
 console.log("✓ Form controls: domain surfaces, accent controls, validation and disabled states");
+
+
+// Statistical data tables remain keyboard-scrollable and expose column headers;
+// alternating rows retain each scientific domain's contrast system.
+const workspaceMarkup = fs.readFileSync("batch-tracker/workspace.html", "utf8");
+assert.match(workspaceMarkup, /class="statistics-table-wrap"[^>]*role="region"[^>]*tabindex="0"/,
+  "the raw-data table wrapper must be a named, keyboard-focusable scroll region");
+assert.match(workspaceMarkup, /<th scope="col">Date<\\/th>/,
+  "the raw-data table must expose semantic column headers");
+assert.match(workspaceMarkup, /<th scope="col">Culture<\\/th>/);
+assert.match(workspaceMarkup, /<th scope="col">Valeur<\\/th>/);
+assert.match(workspaceMarkup, /<th scope="col">Unité<\\/th>/);
+assert.match(workspaceMarkup, /<th scope="col">Méthode<\\/th>/);
+const tableThemeCss = fs.readFileSync("batch-tracker/tracker.css", "utf8");
+for (const domain of ["agronomy", "mycology", "laboratory"]) {
+  assert.match(tableThemeCss, new RegExp('body\\\\[data-domain="' + domain + '"\\\\] \\.statistics-table tbody tr:nth-child\\\\(even\\\\)'),
+    domain + " data table rows must have a domain-specific alternating surface");
+}
+assert.match(tableThemeCss, /\.statistics-table-wrap:focus-visible/,
+  "keyboard focus on the horizontally scrollable table region must be visible");
+console.log("✓ Data tables: semantic headers, keyboard scrolling and domain-aware row contrast");
