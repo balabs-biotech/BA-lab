@@ -32,7 +32,7 @@
  const rail=document.createElement('nav');rail.className='chapter-rail';rail.setAttribute('aria-label','Parcours des chapitres');
  rail.innerHTML='<svg class="chapter-filament" viewBox="0 0 64 500" aria-hidden="true"><path class="filament-base" d="M32 24 C8 76 55 108 32 150 S8 224 32 276 S55 350 32 402 S8 456 32 476"/><path class="filament-progress" d="M32 24 C8 76 55 108 32 150 S8 224 32 276 S55 350 32 402 S8 456 32 476"/></svg><div class="chapter-rail-nodes"></div>';
  const railNodes=rail.querySelector('.chapter-rail-nodes');
- groups.forEach((g,i)=>{const b=document.createElement('button');b.type='button';b.className='chapter-rail-node';b.dataset.index=String(i);b.innerHTML='<span class="chapter-rail-dot"></span><span class="chapter-rail-name"></span>';b.addEventListener('click',()=>go(i));railNodes.append(b)});
+ groups.forEach((g,i)=>{const b=document.createElement('button');b.type='button';b.className='chapter-rail-node';b.dataset.index=String(i);b.setAttribute('aria-controls','chapter-'+g.id);b.innerHTML='<span class="chapter-rail-dot"></span><span class="chapter-rail-name"></span>';b.addEventListener('click',()=>go(i));railNodes.append(b)});
  main.append(rail);
  // Scroll-led editorial typography: reveal only key section headings, not body copy.
  if('IntersectionObserver' in window){
@@ -68,6 +68,7 @@
   const x=track.scrollLeft,idx=Math.max(0,Math.min(pages.length-1,Math.round(x/Math.max(1,track.clientWidth))));
   current=idx;count.textContent=String(idx+1).padStart(2,'0')+' / '+String(pages.length).padStart(2,'0');
   prev.disabled=idx===0;next.disabled=idx===pages.length-1;
+  prev.setAttribute('aria-controls',pages[Math.max(0,idx-1)].id);next.setAttribute('aria-controls',pages[Math.min(pages.length-1,idx+1)].id);
   progress.firstElementChild.style.width=(idx/Math.max(1,pages.length-1)*100)+'%';progress.setAttribute('aria-valuenow',String(idx+1));progress.setAttribute('aria-valuetext',(groups[idx].label[lang()]||groups[idx].label.fr)+' — '+(idx+1)+' / '+pages.length);
   rail.querySelectorAll('.chapter-rail-node').forEach((b,i)=>{b.classList.toggle('is-active',i===idx);b.classList.toggle('is-past',i<idx);b.setAttribute('aria-current',i===idx?'step':'false');});
   rail.querySelectorAll('.chapter-rail-name').forEach((n,i)=>{n.textContent=groups[i].label[lang()]||groups[i].label.fr});
