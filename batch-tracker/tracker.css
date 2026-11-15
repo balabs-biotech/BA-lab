@@ -5688,3 +5688,226 @@ html[dir="rtl"] body[data-domain] .bio-operation-form {
     transition-duration: 0.01ms !important;
   }
 }
+
+
+/* ============================================================
+   CULTUREOPS — consultation des fiches, lots et historiques
+   Passe 13 · hiérarchie des données et lecture mobile
+   ============================================================ */
+body[data-domain] .culture-detail-heading {
+  min-width: 0;
+  flex-wrap: wrap;
+  align-items: center;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+body[data-domain] .culture-detail-heading > * {
+  min-width: 0;
+}
+body[data-domain] .culture-detail-summary {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: stretch;
+}
+body[data-domain] .culture-detail-field {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  border-color: var(--border);
+  background: var(--surface);
+  color: var(--text);
+}
+body[data-domain] .culture-detail-field span {
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 750;
+  letter-spacing: .045em;
+}
+body[data-domain] .culture-detail-field strong {
+  display: block;
+  margin-top: 5px;
+  color: var(--text);
+  font-size: 13px;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+body[data-domain] .culture-lineage {
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface-2);
+}
+body[data-domain] .culture-lineage-list {
+  min-width: 0;
+  align-items: stretch;
+  gap: 8px;
+}
+body[data-domain] .culture-lineage-node {
+  min-width: 0;
+  max-width: 100%;
+  min-height: 48px;
+  border-color: var(--border-strong);
+  background: var(--surface);
+  color: var(--text);
+  text-align: start;
+  overflow-wrap: anywhere;
+}
+body[data-domain] .culture-lineage-node:hover {
+  border-color: var(--workspace-accent, var(--brand));
+  background: var(--workspace-accent-soft);
+}
+body[data-domain] .culture-lineage-node:focus-visible {
+  outline: 2px solid var(--workspace-accent, var(--brand));
+  outline-offset: 2px;
+}
+body[data-domain] .culture-lineage-node strong {
+  font-size: 12px;
+  line-height: 1.4;
+}
+body[data-domain] .culture-lineage-arrow {
+  flex: 0 0 22px;
+}
+body[data-domain] .batch-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+body[data-domain] .batch-stat {
+  min-width: 0;
+  border: 1px solid var(--border);
+  background: var(--surface);
+}
+body[data-domain] .batch-stat-label {
+  font-size: 10px;
+  font-weight: 750;
+  letter-spacing: .045em;
+  text-transform: uppercase;
+}
+body[data-domain] .batch-stat-value {
+  color: var(--text);
+  font-size: 13px;
+  line-height: 1.45;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+body[data-domain] .batch-item {
+  min-width: 0;
+  text-align: start;
+  overflow-wrap: anywhere;
+}
+body[data-domain] .batch-item:focus-visible,
+body[data-domain] .batch-item:hover {
+  border-color: var(--workspace-accent, var(--brand));
+  outline-offset: 2px;
+}
+body[data-domain] .qc-row {
+  min-width: 0;
+  border-color: var(--border);
+  background: var(--surface);
+}
+body[data-domain] .qc-row > * {
+  min-width: 0;
+}
+body[data-domain] .qc-label {
+  color: var(--text);
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+body[data-domain] .qc-code {
+  overflow-wrap: anywhere;
+  font-variant-numeric: tabular-nums;
+}
+body[data-domain] .batch-event-item {
+  min-width: 0;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-inline-start: 3px solid var(--workspace-accent, var(--brand));
+  border-radius: 10px;
+  background: var(--surface);
+  overflow-wrap: anywhere;
+}
+body[data-domain] .batch-event-item :is(p, strong, span, time) {
+  overflow-wrap: anywhere;
+  line-height: 1.5;
+}
+body[data-domain] .measurement-entry {
+  min-width: 0;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+}
+body[data-domain] .measurement-meta,
+body[data-domain] .measurement-stamp {
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+body[data-domain] .measurement-value {
+  color: var(--text);
+  font-size: 15px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+body[data-domain] .statistics-summary {
+  min-width: 0;
+  align-items: stretch;
+}
+body[data-domain] .statistics-summary > * {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+body[data-domain] .statistics-table-wrap {
+  min-width: 0;
+  max-width: 100%;
+  overscroll-behavior-inline: contain;
+}
+body[data-domain] .statistics-table :is(th, td) {
+  overflow-wrap: anywhere;
+  vertical-align: top;
+}
+body[data-domain] .statistics-footnote {
+  max-width: 80ch;
+  line-height: 1.6;
+}
+html[dir="rtl"] body[data-domain] .culture-lineage-node {
+  text-align: right;
+}
+html[dir="rtl"] body[data-domain] .batch-event-item {
+  border-inline-start: 1px solid var(--border);
+  border-inline-end: 3px solid var(--workspace-accent, var(--brand));
+}
+@media (max-width: 700px) {
+  body[data-domain] .culture-detail-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  body[data-domain] .culture-lineage-list {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+  }
+  body[data-domain] .culture-lineage-arrow {
+    justify-self: center;
+    transform: rotate(90deg);
+  }
+  html[dir="rtl"] body[data-domain] .culture-lineage-arrow {
+    transform: rotate(90deg);
+  }
+}
+@media (max-width: 440px) {
+  body[data-domain] .culture-detail-summary,
+  body[data-domain] .batch-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  body[data-domain] .batch-stat {
+    padding: 10px;
+  }
+  body[data-domain] .measurement-entry {
+    padding: 10px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  body[data-domain] .culture-lineage-node,
+  body[data-domain] .batch-item {
+    transition: none !important;
+  }
+}
