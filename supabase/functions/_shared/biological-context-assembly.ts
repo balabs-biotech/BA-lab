@@ -9,6 +9,7 @@ import {
   type BiologicalEnvironmentRow,
   type BiologicalMeasurementRow,
   type BiologicalObservationRow,
+  type BiologicalEventRow,
   type BiologicalEnvironmentalObservationRow,
   type BiologicalContextWindow,
 } from "./biological-context-snapshot.ts";
@@ -58,6 +59,7 @@ export async function assembleResolvedBiologicalContextSnapshot(input: {
   environments: BiologicalEnvironmentRow[];
   measurements: BiologicalMeasurementRow[];
   observations?: BiologicalObservationRow[];
+  events?: BiologicalEventRow[];
   environmentalObservations: BiologicalEnvironmentalObservationRow[];
   strainReferences?: Array<{
     id: string; organization_id: string; strain_code: string; organism_id: string;
@@ -186,6 +188,7 @@ export async function assembleResolvedBiologicalContextSnapshot(input: {
     environment: resolvedEnvironment,
     measurements: input.measurements,
     observations: input.observations ?? [],
+    events: input.events ?? [],
     environmentalObservations: weatherRows,
     measurementContextById,
     biologicalContexts,
