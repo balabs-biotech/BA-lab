@@ -12391,3 +12391,96 @@ body[data-domain] #measurementCard .measurement-stamp {
   #batchCard #batchEvents .batch-harvest-entry textarea { transition:none !important; }
   #batchCard #batchList .batch-item:hover { transform:none !important; }
 }
+
+
+/* Pass 61 — align production surfaces with each workspace's own visual system */
+body[data-domain="agronomy"] #batchCard > .batch-create-panel,
+body[data-domain="agronomy"] #batchCard #batchEvents,
+body[data-domain="agronomy"] #batchCard #batchStages,
+body[data-domain="agronomy"] #batchCard #batchQc {
+  background:linear-gradient(145deg,rgba(145,185,130,.055),transparent 62%),#1b2520;
+  border-color:#394b3e; color:#e8eee7; box-shadow:0 10px 28px rgba(0,0,0,.16);
+}
+body[data-domain="agronomy"] #batchCard .batch-create-heading,
+body[data-domain="agronomy"] #batchCard .batch-harvest-entry {border-color:#394b3e}
+body[data-domain="agronomy"] #batchCard .batch-required-note,
+body[data-domain="agronomy"] #batchCard #batchEvents .batch-harvest-entry {
+  background:#243129; border-color:#394b3e; color:#e8eee7;
+}
+body[data-domain="agronomy"] #batchCard .batch-create-panel input,
+body[data-domain="agronomy"] #batchCard .batch-create-panel select,
+body[data-domain="agronomy"] #batchCard #batchEvents .batch-harvest-entry input,
+body[data-domain="agronomy"] #batchCard #batchEvents .batch-harvest-entry select,
+body[data-domain="agronomy"] #batchCard #batchEvents .batch-harvest-entry textarea {
+  background:#111815; border-color:#596e5c; color:#e8eee7;
+}
+body[data-domain="agronomy"] #batchCard #batchList .batch-item {
+  background:#202c24; border-color:#394b3e; color:#e8eee7;
+}
+body[data-domain="agronomy"] #batchCard #batchList .batch-item:hover,
+body[data-domain="agronomy"] #batchCard #batchList .batch-item:focus-visible {background:#29382f;border-color:#91b982}
+body[data-domain="agronomy"] #batchCard #batchList .batch-item .muted,
+body[data-domain="agronomy"] #batchCard .batch-create-panel .hint {color:#b1bfb2}
+body[data-domain="agronomy"] #batchCard #batchEvents #harvestStatus,
+body[data-domain="agronomy"] #batchCard #batchEvents #moveBatchStatus {background:#202c24;color:#d0dfd0;border-color:#91b982}
+
+body[data-domain="mycology"] #batchCard > .batch-create-panel,
+body[data-domain="mycology"] #batchCard #batchEvents,
+body[data-domain="mycology"] #batchCard #batchStages,
+body[data-domain="mycology"] #batchCard #batchQc {
+  background:linear-gradient(145deg,rgba(169,79,29,.055),transparent 60%),#fffaf4;
+  border:2px solid #d7bba6; border-radius:3px; color:#35251d; box-shadow:4px 4px 0 #d7bba6;
+}
+body[data-domain="mycology"] #batchCard .batch-create-heading {border-color:#d7bba6}
+body[data-domain="mycology"] #batchCard .batch-required-note,
+body[data-domain="mycology"] #batchCard #batchEvents .batch-harvest-entry {
+  background:#f7f1e9; border:2px solid #d7bba6; border-radius:3px; color:#35251d;
+}
+body[data-domain="mycology"] #batchCard .batch-create-panel input,
+body[data-domain="mycology"] #batchCard .batch-create-panel select,
+body[data-domain="mycology"] #batchCard #batchEvents .batch-harvest-entry input,
+body[data-domain="mycology"] #batchCard #batchEvents .batch-harvest-entry select,
+body[data-domain="mycology"] #batchCard #batchEvents .batch-harvest-entry textarea {
+  background:#fffdf8; border:1px solid #b98d70; border-radius:2px; color:#35251d;
+}
+body[data-domain="mycology"] #batchCard #batchList .batch-item {
+  background:#fffaf4; border:2px solid #35251d; border-radius:2px; color:#35251d; box-shadow:3px 3px 0 #d7bba6;
+}
+body[data-domain="mycology"] #batchCard #batchList .batch-item:hover,
+body[data-domain="mycology"] #batchCard #batchList .batch-item:focus-visible {background:#f3e5d8;border-color:#a94f1d}
+body[data-domain="mycology"] #batchCard #batchList .batch-item .muted,
+body[data-domain="mycology"] #batchCard .batch-create-panel .hint {color:#755b4c}
+body[data-domain="mycology"] #batchCard #batchEvents #harvestStatus,
+body[data-domain="mycology"] #batchCard #batchEvents #moveBatchStatus {background:#f0e2d5;color:#56331f;border-color:#a94f1d}
+
+body[data-domain="laboratory"] #batchCard > .batch-create-panel,
+body[data-domain="laboratory"] #batchCard #batchEvents,
+body[data-domain="laboratory"] #batchCard #batchStages,
+body[data-domain="laboratory"] #batchCard #batchQc {
+  background:linear-gradient(145deg,rgba(33,91,145,.045),transparent 62%),#fff;
+  border-color:#c7d6e4; border-radius:12px; color:#183a59; box-shadow:0 5px 18px rgba(24,58,89,.055);
+}
+body[data-domain="laboratory"] #batchCard .batch-create-heading {border-color:#d5e1eb}
+body[data-domain="laboratory"] #batchCard .batch-required-note,
+body[data-domain="laboratory"] #batchCard #batchEvents .batch-harvest-entry {
+  background:#f4f8fc; border-color:#c7d6e4; color:#183a59;
+}
+body[data-domain="laboratory"] #batchCard .batch-create-panel input,
+body[data-domain="laboratory"] #batchCard .batch-create-panel select,
+body[data-domain="laboratory"] #batchCard #batchEvents .batch-harvest-entry input,
+body[data-domain="laboratory"] #batchCard #batchEvents .batch-harvest-entry select,
+body[data-domain="laboratory"] #batchCard #batchEvents .batch-harvest-entry textarea {
+  background:#fff; border-color:#9eb5c9; color:#183a59;
+}
+body[data-domain="laboratory"] #batchCard #batchList .batch-item {
+  background:#f7fafd; border-color:#c7d6e4; color:#183a59; box-shadow:0 2px 9px rgba(24,58,89,.045);
+}
+body[data-domain="laboratory"] #batchCard #batchList .batch-item:hover,
+body[data-domain="laboratory"] #batchCard #batchList .batch-item:focus-visible {background:#eaf2f9;border-color:#215b91}
+body[data-domain="laboratory"] #batchCard #batchList .batch-item .muted,
+body[data-domain="laboratory"] #batchCard .batch-create-panel .hint {color:#476078}
+body[data-domain="laboratory"] #batchCard #batchEvents #harvestStatus,
+body[data-domain="laboratory"] #batchCard #batchEvents #moveBatchStatus {background:#edf4fa;color:#31536f;border-color:#215b91}
+@media (prefers-reduced-motion:reduce) {
+  body[data-domain] #batchCard #batchList .batch-item {transition:none}
+}
