@@ -3344,3 +3344,88 @@ body[data-domain] .feedback-warning :focus-visible {
     opacity: .75;
   }
 }
+
+
+/* Unified operational feedback contract. Existing IDs can adopt these classes
+   incrementally; semantics stay stable across all scientific workspaces. */
+body[data-domain] .feedback-state {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: start;
+  gap: 10px;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--brand);
+  border-radius: 12px;
+  color: var(--text);
+  background: var(--surface);
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+body[data-domain] .feedback-state > :first-child {
+  min-width: 0;
+}
+body[data-domain] .feedback-info {
+  background: color-mix(in srgb, var(--surface) 88%, var(--brand));
+  border-left-color: var(--brand);
+}
+body[data-domain] .feedback-success {
+  background: color-mix(in srgb, var(--ok) 12%, var(--surface));
+  border-color: color-mix(in srgb, var(--ok) 34%, var(--border));
+  border-left-color: var(--ok);
+}
+body[data-domain] .feedback-warning {
+  background: color-mix(in srgb, var(--warning) 12%, var(--surface));
+  border-color: color-mix(in srgb, var(--warning) 38%, var(--border));
+  border-left-color: var(--warning);
+}
+body[data-domain] .feedback-error {
+  background: color-mix(in srgb, var(--err) 10%, var(--surface));
+  border-color: color-mix(in srgb, var(--err) 38%, var(--border));
+  border-left-color: var(--err);
+}
+body[data-domain] .feedback-state[data-loading="true"] {
+  position: relative;
+  color: var(--muted);
+}
+body[data-domain] .feedback-state[data-loading="true"]::before {
+  content: "";
+  width: 15px;
+  height: 15px;
+  border: 2px solid color-mix(in srgb, var(--brand) 24%, transparent);
+  border-top-color: var(--brand);
+  border-radius: 50%;
+  animation: feedback-spin .8s linear infinite;
+}
+body[data-domain] .feedback-state[data-empty="true"] {
+  grid-template-columns: 1fr;
+  min-height: 96px;
+  place-content: center;
+  text-align: center;
+  color: var(--muted);
+  background: var(--surface-2);
+  border-style: dashed;
+  border-left-width: 1px;
+}
+body[data-domain] .feedback-state[hidden] {
+  display: none;
+}
+@keyframes feedback-spin {
+  to { transform: rotate(360deg); }
+}
+@media (max-width: 600px) {
+  body[data-domain] .feedback-state {
+    gap: 8px;
+    padding: 11px 12px;
+    border-radius: 10px;
+    font-size: .92rem;
+  }
+  body[data-domain] .feedback-state[data-empty="true"] {
+    min-height: 80px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  body[data-domain] .feedback-state[data-loading="true"]::before {
+    animation: none;
+  }
+}
