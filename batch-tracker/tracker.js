@@ -2755,6 +2755,8 @@ document.getElementById("compareBatchesButton")?.addEventListener("click", compa
 
 function renderBatchList() {
 
+  batchList.removeAttribute("data-feedback-state");
+  batchList.removeAttribute("aria-busy");
   batchList.innerHTML =
     "";
 
@@ -2765,7 +2767,7 @@ function renderBatchList() {
 
     batchList.innerHTML = `
 
-      <div class="info muted feedback-empty" role="status">
+      <div class="feedback-state feedback-empty" data-empty="true" role="status">
         Aucun lot créé pour le moment.
       </div>
 
@@ -6016,7 +6018,7 @@ async function loadBiologicalLineage(cultureId) {
     const rows = data || [];
     const byId = new Map(rows.map(row => [row.id, row]));
     const current = byId.get(cultureId);
-    if (!current) { renderCollectionFeedback(target, "empty", biologicalWorkflowText("missing")); return; }
+    if (!current) { renderCollectionFeedback(target, "warning", biologicalWorkflowText("missing")); return; }
     const { data: materials, error: materialError } = await supabaseClient.from('materials')
       .select('id,material_code,material_type,parent_material_id,generation,state,strain_id')
       .eq('organization_id', loadOrganizationId).limit(2000);
