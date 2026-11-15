@@ -912,3 +912,22 @@ assert.match(feedbackContractCss, /body\\[data-domain\\] \\.feedback-info/);
 assert.match(feedbackContractCss, /var\\(--warn\\)/,
   "warning surfaces must use the established --warn design token");
 console.log("✓ Message renderer: semantic classes, safe text and accessible urgency");
+
+
+// Real collection surfaces must distinguish an initial load, an empty result,
+// and a failed retrieval without presenting any of them as a successful empty list.
+const collectionHtml = fs.readFileSync(new URL("../batch-tracker/workspace.html", import.meta.url), "utf8");
+const collectionJs = fs.readFileSync("../batch-tracker/tracker.js", "utf8");
+assert.match(collectionHtml, /id="batchList"[\s\S]*?class="feedback-loading"[^>]*role="status"/,
+  "batch list must expose an accessible loading state before its first result");
+assert.match(collectionHtml, /id="cultureCatalogList"[^>]*[\s\S]*?feedback-info/,
+  "culture catalogue must identify its pre-authentication state as informational");
+assert.match(collectionHtml, /id="plantCultureList"[^>]*[\s\S]*?feedback-info/,
+  "GreenTech registry must identify its pre-authentication state as informational");
+assert.match(collectionJs, /empty\.className = "feedback-empty"/,
+  "empty culture and plant collections must use the shared empty state");
+assert.match(collectionJs, /batchList\.innerHTML = [\s\S]*?feedback-empty/,
+  "empty batch collection must use the shared empty state");
+assert.match(collectionJs, /list\.className = "feedback-error"/,
+  "GreenTech retrieval failure must be exposed as an error state");
+console.log("✓ Collection states: loading, unauthenticated, empty and retrieval error");
