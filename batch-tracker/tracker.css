@@ -6589,3 +6589,341 @@ html[dir="rtl"] body[data-domain] #statisticsChart {
     transition: none !important;
   }
 }
+
+
+/* ============================================================
+   CULTUREOPS — cohérence transversale des trois espaces
+   Passe 18 · navigation, panneaux partagés et retours système
+   ============================================================ */
+body[data-domain] .app-toolbar {
+  min-width: 0;
+  gap: clamp(10px, 1.5vw, 18px);
+  padding: 10px clamp(12px, 2vw, 20px);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--surface) 94%, transparent);
+  box-shadow: 0 8px 24px rgb(0 0 0 / .12);
+}
+body[data-domain] .toolbar-brand {
+  flex: 0 0 auto;
+  min-width: 0;
+}
+body[data-domain] .brand-wordmark strong {
+  letter-spacing: .12em;
+}
+body[data-domain] .brand-wordmark small {
+  letter-spacing: .16em;
+}
+body[data-domain] .toolbar-divider {
+  flex: 0 0 1px;
+  align-self: stretch;
+  min-height: 28px;
+  background: var(--border);
+}
+body[data-domain] .section-nav {
+  flex: 1 1 auto;
+  min-width: 0;
+  gap: 5px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-strong, var(--border)) transparent;
+}
+body[data-domain] .section-nav a {
+  flex: 0 0 auto;
+  min-height: 40px;
+  gap: 7px;
+  padding: 8px 11px;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  line-height: 1.3;
+  white-space: nowrap;
+}
+body[data-domain] .section-nav a:hover {
+  border-color: var(--border);
+  background: var(--surface-2);
+}
+body[data-domain] .section-nav a:focus-visible {
+  outline: 2px solid var(--workspace-accent, var(--brand));
+  outline-offset: 2px;
+}
+body[data-domain] .section-nav .nav-number {
+  color: var(--workspace-accent, var(--muted));
+  font-size: 10px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+body[data-domain] .toolbar-status {
+  flex: 0 0 auto;
+  max-width: 150px;
+  line-height: 1.4;
+  text-align: end;
+  overflow-wrap: anywhere;
+}
+body[data-domain] .universe-home-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  margin-block: 12px;
+  padding: 7px 11px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  color: var(--muted);
+  text-decoration: none;
+}
+body[data-domain] .universe-home-link:hover {
+  border-color: var(--workspace-accent, var(--border-strong));
+  color: var(--text);
+  background: var(--surface-2);
+}
+body[data-domain] .app-hero {
+  min-width: 0;
+  overflow: hidden;
+  isolation: isolate;
+}
+body[data-domain] .hero-copy,
+body[data-domain] .hero-art {
+  min-width: 0;
+}
+body[data-domain] .hero-description {
+  max-width: 62ch;
+  line-height: 1.7;
+}
+body[data-domain] .hero-tags {
+  gap: 8px;
+}
+body[data-domain] .hero-tags > span {
+  min-height: 30px;
+  display: inline-flex;
+  align-items: center;
+}
+body[data-domain] .card {
+  min-width: 0;
+  scroll-margin-top: 96px;
+}
+body[data-domain] .section-kicker {
+  min-width: 0;
+  flex-wrap: wrap;
+  row-gap: 6px;
+}
+body[data-domain] .section-kicker > span {
+  overflow-wrap: anywhere;
+}
+body[data-domain] #message {
+  position: relative;
+  z-index: 2;
+  min-width: 0;
+  scroll-margin-top: 90px;
+}
+body[data-domain] #message:empty {
+  display: none;
+}
+body[data-domain] #message > :is(.card, .success, .error, .warning, .info) {
+  min-width: 0;
+  margin-block: 12px;
+  padding: 13px 16px;
+  border-radius: 11px;
+  line-height: 1.65;
+  overflow-wrap: anywhere;
+}
+body[data-domain] #authCard,
+body[data-domain] #smartEntryPanel,
+body[data-domain] .consent-panel,
+body[data-domain] .batch-compare-panel,
+body[data-domain] .bio-operation-panel,
+body[data-domain] .bio-lineage-panel {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+body[data-domain] .assisted-entry-panel {
+  margin-block: 18px 24px;
+  padding: clamp(13px, 2vw, 20px);
+  border-color: var(--border);
+  border-radius: 13px;
+  background: var(--surface-2);
+}
+body[data-domain] .assisted-entry-heading {
+  align-items: center;
+}
+body[data-domain] .assisted-entry-heading h3 {
+  line-height: 1.3;
+}
+body[data-domain] .assisted-entry-tag {
+  max-width: 100%;
+  color: var(--muted);
+  overflow-wrap: anywhere;
+}
+body[data-domain] .assisted-entry-panel textarea {
+  display: block;
+  min-height: 112px;
+  padding: 12px;
+  border: 1px solid var(--border-strong, var(--border));
+  border-radius: 9px;
+  background: var(--surface);
+  color: var(--text);
+  line-height: 1.6;
+}
+body[data-domain] .assisted-entry-panel textarea:focus-visible {
+  outline: 2px solid var(--workspace-accent, var(--brand));
+  outline-offset: 2px;
+}
+body[data-domain] .assisted-entry-help {
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+}
+body[data-domain] .assisted-entry-help summary {
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  font-weight: 650;
+}
+body[data-domain] .assisted-entry-help pre {
+  max-width: 100%;
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  line-height: 1.6;
+}
+body[data-domain] .consent-panel {
+  padding: clamp(13px, 2vw, 18px);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface-2);
+}
+body[data-domain] .consent-panel > strong {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--text);
+  line-height: 1.45;
+}
+body[data-domain] .consent-panel p {
+  max-width: 78ch;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
+body[data-domain] .consent-panel a {
+  color: var(--workspace-accent, var(--brand));
+  text-underline-offset: 3px;
+  overflow-wrap: anywhere;
+}
+body[data-domain] .batch-compare-panel {
+  padding: clamp(13px, 2vw, 20px);
+  border: 1px solid var(--border);
+  border-radius: 13px;
+  background: var(--surface-2);
+}
+body[data-domain] .batch-compare-panel > h3 {
+  margin-block: 8px;
+}
+body[data-domain] .batch-compare-panel > p {
+  line-height: 1.65;
+}
+body[data-domain] .batch-compare-panel select[multiple] {
+  min-height: 132px;
+  padding: 8px;
+}
+body[data-domain] #batchCompareStatus,
+body[data-domain] #bioOperationMessage {
+  min-height: 1.5em;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+body[data-domain] .bio-lineage-panel {
+  padding: clamp(12px, 2vw, 17px);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface-2);
+}
+body[data-domain] .bio-lineage-panel h4,
+body[data-domain] .bio-operation-panel h4 {
+  margin-top: 0;
+}
+body[data-domain] :is(.bio-lineage-panel, .bio-operation-panel, .batch-compare-panel) :is(button, a, summary) {
+  scroll-margin-block: 100px;
+}
+html[dir="rtl"] body[data-domain] .toolbar-status {
+  text-align: start;
+}
+html[dir="rtl"] body[data-domain] .section-nav a {
+  direction: rtl;
+}
+html[dir="rtl"] body[data-domain] .universe-home-link {
+  direction: rtl;
+}
+@media (max-width: 900px) {
+  body[data-domain] .app-toolbar {
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  body[data-domain] .section-nav {
+    order: 3;
+    flex: 1 1 100%;
+    width: 100%;
+  }
+  body[data-domain] .toolbar-status {
+    margin-inline-start: auto;
+  }
+}
+@media (max-width: 600px) {
+  body[data-domain] .app-toolbar {
+    gap: 8px;
+    padding: 9px 10px;
+    border-radius: 11px;
+  }
+  body[data-domain] .toolbar-divider {
+    display: none;
+  }
+  body[data-domain] .section-nav {
+    padding-bottom: 5px;
+  }
+  body[data-domain] .section-nav a {
+    min-height: 42px;
+    padding: 8px 10px;
+    font-size: 12px;
+  }
+  body[data-domain] .toolbar-status {
+    max-width: 112px;
+    font-size: 9px;
+  }
+  body[data-domain] .app-hero {
+    gap: 12px;
+  }
+  body[data-domain] .hero-art {
+    max-width: 100%;
+  }
+  body[data-domain] .hero-tags {
+    align-items: flex-start;
+  }
+  body[data-domain] .assisted-entry-actions {
+    align-items: stretch;
+  }
+  body[data-domain] .assisted-entry-actions button {
+    flex: 1 1 130px;
+  }
+  body[data-domain] .batch-compare-panel > button {
+    width: 100%;
+  }
+}
+@media (max-width: 380px) {
+  body[data-domain] .toolbar-brand .brand-wordmark small {
+    letter-spacing: .1em;
+  }
+  body[data-domain] .toolbar-status {
+    max-width: 88px;
+    font-size: 8px;
+  }
+  body[data-domain] .section-nav a {
+    min-height: 40px;
+    padding-inline: 8px;
+  }
+  body[data-domain] .consent-panel {
+    padding: 11px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  body[data-domain] .section-nav,
+  body[data-domain] .section-nav a,
+  body[data-domain] .universe-home-link,
+  body[data-domain] #message {
+    scroll-behavior: auto !important;
+    transition: none !important;
+  }
+}
