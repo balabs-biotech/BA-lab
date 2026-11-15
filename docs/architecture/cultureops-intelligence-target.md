@@ -251,7 +251,7 @@ Une recommandation cite le signal déclencheur, le contexte, la source, le profi
 
 ## 9. Revue du contrat de file d'exécution
 
-La revue détaillée des RPC, ACL, leases, retries, idempotence et limites observées est consignée dans `docs/architecture/engine-queue-contract-review.md`. Elle confirme les contrôles d'accès backend et le fencing par lease token. Les tests d'intégration de concurrence, d'expiration et de frontière de retry restent à ajouter avant toute extraction du worker.
+La revue détaillée des RPC, ACL, leases, retries, idempotence et limites observées est consignée dans `docs/architecture/engine-queue-contract-review.md`. Elle confirme les contrôles d'accès backend, mais révèle aussi un ordre de verrouillage inversé entre `claim_engine_job` et `finish_engine_job`, avec un risque de deadlock autour de l'expiration, ainsi qu'une validation du lease fondée sur un horodatage capturé avant l'attente des verrous. Correction et test PostgreSQL à prévoir avant toute extraction du worker.
 
 ## 10. Contrat de santé des moteurs
 
