@@ -382,12 +382,13 @@ function renderBranchDock() {
       // gestures. Activate on the touch pointer release, then suppress its
       // compatibility click; mouse and keyboard continue through click.
       el.addEventListener('pointerup',event=>{
-        if(event.pointerType!=='touch')return;
+        if(event.pointerType!=='touch'||multiTouchGesture||event.isPrimary===false)return;
         el.dataset.touchActivatedAt=String(performance.now());
         activate(event,'touch-pointerup');
       });
       el.addEventListener('click',event=>{
         const touchAt=Number(el.dataset.touchActivatedAt||0);
+        if(multiTouchGesture){event.preventDefault();event.stopImmediatePropagation();return;}
         if(performance.now()-lastBranchTouchActivationAt<800){event.preventDefault();event.stopImmediatePropagation();return;}
         if(touchAt&&performance.now()-touchAt<800){event.preventDefault();event.stopPropagation();return}
         activate(event,event.detail===0?'keyboard':'click');
@@ -525,13 +526,17 @@ function setupUI() {
   stage.addEventListener('pointercancel',onPointerCancel);
   // Direct stage touch fallback for mobile browsers that omit pointer events.
   let touchFallback=null;
-  const rememberTouch=e=>{if(e.touches.length!==1){touchFallback=null;return}const p=e.touches[0];touchFallback={x:p.clientX,y:p.clientY,at:performance.now()}};
+  const rememberTouch=e=>{
+    if(e.touches.length>1){multiTouchGesture=true;dragGesture=true;moved=true;touchFallback=null;return}
+    if(e.touches.length!==1){touchFallback=null;return}
+    const p=e.touches[0];touchFallback={x:p.clientX,y:p.clientY,at:performance.now()};
+  };
   const finishTouch=e=>{if(e.target.closest?.('.webgl-hit-target,.webgl-branch-dock')){touchFallback=null;return}if(!touchFallback||e.touches.length!==0||e.changedTouches.length!==1)return;const p=e.changedTouches[0],start=touchFallback;touchFallback=null;if(!p||Math.hypot(p.clientX-start.x,p.clientY-start.y)>12)return;if(performance.now()-lastPickAt>450)pickAt(p.clientX,p.clientY)};
   stage.addEventListener('touchstart',rememberTouch,{passive:true});
   stage.addEventListener('touchend',finishTouch,{passive:true});
   stage.addEventListener('touchcancel',()=>{touchFallback=null},{passive:true});
 
-  document.addEventListener('click',e=>{if(performance.now()-lastBranchTouchActivationAt<800){e.preventDefault();e.stopImmediatePropagation();return;}if(!e.detail||dragGesture||!renderer)return;if(e.target.closest?.('.webgl-controls,.webgl-focus,.webgl-intro,.webgl-hit-target,.webgl-branch-dock'))return;const r=renderer.domElement.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)return;if(performance.now()-lastPickAt>450)pickAt(e.clientX,e.clientY)},true);
+  document.addEventListener('click',e=>{if(multiTouchGesture||performance.now()-lastBranchTouchActivationAt<800){e.preventDefault();e.stopImmediatePropagation();return;}if(!e.detail||dragGesture||!renderer)return;if(e.target.closest?.('.webgl-controls,.webgl-focus,.webgl-intro,.webgl-hit-target,.webgl-branch-dock'))return;const r=renderer.domElement.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)return;if(performance.now()-lastPickAt>450)pickAt(e.clientX,e.clientY)},true);
   stage.addEventListener('lostpointercapture',onLostCapture);
   stage.addEventListener('contextmenu',e=>e.preventDefault());
   window.addEventListener('resize',resize);
