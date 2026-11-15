@@ -20,7 +20,7 @@
   if(wasOpen){detail.hidden=true;return;}
   button.setAttribute('aria-expanded','true');
   const lang=document.documentElement.lang||'fr';
-  const dict=window.T||{};
+  const dict=typeof T!=='undefined'?T:{};
   const language=dict[lang]||dict.fr||{};
   const name=root.querySelector('[data-i18n="'+titles[key]+'"]')?.textContent||key;
   detail.querySelector('#methodDetailIndex').textContent=indices[key]+' / '+(labels[lang]||labels.en);
