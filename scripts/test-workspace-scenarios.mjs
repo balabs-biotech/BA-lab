@@ -889,7 +889,7 @@ console.log("✓ Message renderer: safe text and accessible feedback semantics")
 
 // Collection placeholders distinguish authentication, loading, empty and error.
 const collectionHtml = fs.readFileSync(new URL("../batch-tracker/workspace.html", import.meta.url), "utf8");
-const collectionJs = fs.readFileSync("../batch-tracker/tracker.js", "utf8");
+const collectionJs = fs.readFileSync("batch-tracker/tracker.js", "utf8");
 assert.ok(collectionHtml.includes('class="feedback-loading" role="status"'), "batch list needs an accessible loading placeholder");
 assert.ok(collectionHtml.includes('id="cultureCatalogList" class="culture-catalog-list" aria-live="polite"><p class="muted feedback-info"'), "culture catalogue must identify its pre-auth state");
 assert.ok(collectionHtml.includes('id="plantCultureList" class="culture-catalog-list" aria-live="polite"><p class="muted feedback-info"'), "plant registry must identify its pre-auth state");
