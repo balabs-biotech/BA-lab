@@ -64,7 +64,6 @@ begin
   return new;
 end
 $$;
-
 create or replace function private.guard_batch_stages()
 returns trigger
 language plpgsql
@@ -103,7 +102,6 @@ begin
   return new;
 end
 $$;
-
 create or replace function private.guard_batch_qc_checks()
 returns trigger
 language plpgsql
@@ -162,22 +160,18 @@ begin
   return new;
 end
 $$;
-
 drop trigger if exists batches_guard on public.batches;
 create trigger batches_guard
   before insert or update or delete on public.batches
   for each row execute function private.guard_batches();
-
 drop trigger if exists batch_stages_guard on public.batch_stages;
 create trigger batch_stages_guard
   before insert or update or delete on public.batch_stages
   for each row execute function private.guard_batch_stages();
-
 drop trigger if exists batch_qc_checks_guard on public.batch_qc_checks;
 create trigger batch_qc_checks_guard
   before insert or update or delete on public.batch_qc_checks
   for each row execute function private.guard_batch_qc_checks();
-
 -- ---------------------------------------------------------------------------
 -- 2. RPC du workflow : SECURITY DEFINER, contrôle d'organisation conservé
 -- ---------------------------------------------------------------------------
@@ -274,7 +268,6 @@ begin
   return v_batch;
 end;
 $$;
-
 create or replace function public.advance_batch_stage(
   p_batch_id uuid,
   p_expected_stage text
@@ -377,7 +370,6 @@ begin
   end if;
 end;
 $$;
-
 create or replace function public.release_batch(p_batch_id uuid)
 returns public.batches
 language plpgsql
@@ -457,7 +449,6 @@ begin
   return v_batch;
 end;
 $$;
-
 -- ---------------------------------------------------------------------------
 -- 3. Droits d'exécution : plus d'accès anonyme ni PUBLIC
 -- ---------------------------------------------------------------------------

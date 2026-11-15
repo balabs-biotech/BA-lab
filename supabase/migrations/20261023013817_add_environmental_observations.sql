@@ -54,7 +54,5 @@ CREATE POLICY environmental_observations_select
   FOR SELECT TO authenticated
   USING (private.is_org_member(organization_id));
 
--- Ingestion is server-managed. Authenticated clients may read their own
--- organization's observations, but cannot forge provider-sourced records.
 REVOKE ALL ON public.environmental_observations FROM anon, authenticated;
 GRANT SELECT ON public.environmental_observations TO authenticated;

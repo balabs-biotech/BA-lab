@@ -18,7 +18,9 @@ const MAX_STAC_RESPONSE_BYTES = 2 * 1024 * 1024;
 
 async function readBoundedJson(input: Request | Response, maxBytes: number): Promise<any> {
   const declaredLength = Number(input.headers.get("content-length") ?? 0);
-  if (Number.isFinite(declaredLength) && declaredLength > maxBytes) throw new Error("json_body_too_large");
+  if (Number.isFinite(declaredLength) && declaredLength > maxBytes) {
+    throw new Error("json_body_too_large");
+  }
   if (!input.body) throw new Error("empty_json_body");
   const reader = input.body.getReader();
   const chunks: Uint8Array[] = [];
@@ -78,18 +80,38 @@ Deno.serve(async (req: Request) => {
   let diagnosticStage = "request";
   if (req.method === "OPTIONS") return new Response(null, { status: 204, headers: corsHeaders });
   if (req.method !== "POST") return json(405, { error: "method_not_allowed" });
-  const authorization = req.headers.get("authorization");
+  const authorization = req.headers.get("authorization") ?? "";
   if (!authorization) return json(401, { error: "authentication_required" });
   const supabaseUrl = Deno.env.get("SUPABASE_URL");
   const anonKey = Deno.env.get("SUPABASE_PUBLISHABLE_KEY") ?? Deno.env.get("SUPABASE_ANON_KEY");
-  if (!supabaseUrl || !anonKey) return json(500, { error: "server_configuration_error" });
+  const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? Deno.env.get("SUPABASE_SECRET_KEY");
+  if (!supabaseUrl || !anonKey || !serviceKey) return json(500, { error: "server_configuration_error" });
+  const bearer = authorization.replace(/^Bearer\\s+/i, "");
+  const isInternalWorker = bearer === serviceKey &&
+    Boolean(req.headers.get("x-ba-engine-job-id")) &&
+    req.headers.get("x-ba-engine-code") === "environmental.sentinel2.ndvi.preview";
   const db = createClient(supabaseUrl, anonKey, {
     global: { headers: { Authorization: authorization } },
     auth: { persistSession: false, autoRefreshToken: false },
   });
+  const admin = createClient(supabaseUrl, serviceKey, { auth: { persistSession: false, autoRefreshToken: false } });
   try {
-    const { data: authData, error: authError } = await db.auth.getUser();
-    if (authError || !authData.user) return json(401, { error: "invalid_session" });
+    let internalOrganizationId: string | null = null;
+    if (isInternalWorker) {
+      const jobId = req.headers.get("x-ba-engine-job-id")!;
+      const { data: job, error: jobError } = await admin.from("engine_jobs")
+        .select("id,organization_id,status").eq("id", jobId).eq("status", "running").maybeSingle();
+      if (jobError || !job) return json(403, { error: "internal_job_not_active" });
+      const { data: engine, error: engineError } = await admin.from("engine_registry")
+        .select("engine_code,entrypoint,status").eq("engine_code", "environmental.sentinel2.ndvi.preview").maybeSingle();
+      if (engineError || !engine || engine.status !== "active" || engine.entrypoint !== "earth-search-sentinel2-ndvi-preview") {
+        return json(403, { error: "internal_engine_not_authorized" });
+      }
+      internalOrganizationId = job.organization_id;
+    } else {
+      const { data: authData, error: authError } = await db.auth.getUser();
+      if (authError || !authData.user) return json(401, { error: "invalid_session" });
+    }
     diagnosticStage = "parse_request";
     let body: any;
     try {
@@ -106,7 +128,10 @@ Deno.serve(async (req: Request) => {
     if (!locationId) return json(400, { error: "location_id_required" });
     if (!validDate(date) || Date.parse(date + "T00:00:00Z") >= Date.now()) return json(422, { error: "past_valid_date_required" });
     const displayMode = ["ndvi", "true_color", "false_color"].includes(body.mode) ? body.mode : "ndvi";
-    const { data: loc, error: locError } = await db.from("locations").select("id,latitude,longitude").eq("id", locationId).maybeSingle();
+    const locationQuery = isInternalWorker && internalOrganizationId
+      ? await admin.from("locations").select("id,latitude,longitude").eq("id", locationId).eq("organization_id", internalOrganizationId).maybeSingle()
+      : await db.from("locations").select("id,latitude,longitude").eq("id", locationId).maybeSingle();
+    const { data: loc, error: locError } = locationQuery;
     if (locError || !loc) return json(404, { error: "location_not_found_or_access_denied" });
     if (typeof loc.latitude !== "number" || typeof loc.longitude !== "number" || loc.latitude < -90 || loc.latitude > 90 || loc.longitude < -180 || loc.longitude > 180) {
       return json(422, { error: "valid_location_coordinates_required" });
@@ -130,8 +155,10 @@ Deno.serve(async (req: Request) => {
     let searchData: any;
     try {
       searchData = await readBoundedJson(searchResponse, MAX_STAC_RESPONSE_BYTES);
-    } catch (stacError) {
-      if (stacError instanceof Error && stacError.message === "json_body_too_large") return json(502, { error: "earth_search_catalogue_response_too_large" });
+    } catch (catalogueError) {
+      if (catalogueError instanceof Error && catalogueError.message === "json_body_too_large") {
+        return json(502, { error: "earth_search_catalogue_response_too_large", max_bytes: MAX_STAC_RESPONSE_BYTES });
+      }
       return json(502, { error: "earth_search_catalogue_invalid_json" });
     }
     const features = Array.isArray(searchData?.features) ? searchData.features : [];

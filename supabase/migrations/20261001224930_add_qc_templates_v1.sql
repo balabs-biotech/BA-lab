@@ -122,3 +122,4 @@ $$;
 
 revoke all on function public.create_batch_with_stages(uuid,text,text,text,uuid,uuid,uuid,uuid,uuid,timestamptz,numeric,text,text[]) from public;
 grant execute on function public.create_batch_with_stages(uuid,text,text,text,uuid,uuid,uuid,uuid,uuid,timestamptz,numeric,text,text[]) to authenticated;
+;

@@ -23,10 +23,8 @@ create table if not exists public.iot_devices (
   check (length(device_type) between 1 and 80),
   check (token_sha256 ~ '^[0-9a-f]{64}$')
 );
-
 create index if not exists iot_devices_environment_idx
   on public.iot_devices (organization_id, environment_id);
-
 create table if not exists public.iot_ingest_receipts (
   id uuid primary key default gen_random_uuid(),
   device_id uuid not null references public.iot_devices(id) on delete restrict,
@@ -42,18 +40,14 @@ create table if not exists public.iot_ingest_receipts (
   check (payload_sha256 ~ '^[0-9a-f]{64}$'),
   check (status in ('received', 'processed', 'rejected'))
 );
-
 create index if not exists iot_ingest_receipts_received_idx
   on public.iot_ingest_receipts (received_at desc);
-
 alter table public.iot_devices enable row level security;
 alter table public.iot_ingest_receipts enable row level security;
-
 revoke all on table public.iot_devices from anon, authenticated;
 revoke all on table public.iot_ingest_receipts from anon, authenticated;
 grant all on table public.iot_devices to service_role;
 grant all on table public.iot_ingest_receipts to service_role;
-
 comment on table public.iot_devices is
   'Server-managed registry of IoT devices. token_sha256 stores only the hash of a revocable device token.';
 comment on table public.iot_ingest_receipts is

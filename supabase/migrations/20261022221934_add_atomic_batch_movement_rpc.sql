@@ -122,3 +122,4 @@ $function$;
 
 revoke all on function public.move_batch_to_location(uuid, uuid, uuid, text) from public, anon;
 grant execute on function public.move_batch_to_location(uuid, uuid, uuid, text) to authenticated, service_role;
+;

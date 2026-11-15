@@ -47,3 +47,4 @@ grant select on public.v_culture_creation_reference to authenticated;
 
 revoke all on public.v_culture_creation_options from anon;
 revoke all on public.v_culture_creation_reference from anon;
+;
