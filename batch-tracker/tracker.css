@@ -2827,3 +2827,52 @@ body[data-domain] :is(button, input, select, textarea, a, [tabindex]):focus-visi
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
+
+/* Overview dashboard: prevent the activity/shortcut columns from compressing
+   on tablets and keep recent records readable on narrow screens. */
+@media (max-width: 700px) {
+  #overviewCard .overview-lower {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+  }
+  #overviewCard .overview-heading {
+    align-items: flex-start;
+    gap: 12px;
+  }
+  #overviewCard .overview-section-heading {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+  #overviewCard .overview-section-heading button {
+    max-width: 100%;
+  }
+  #overviewCard .overview-observation {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  #overviewCard .overview-observation time {
+    text-align: left;
+  }
+  #overviewCard .overview-shortcuts {
+    min-width: 0;
+  }
+}
+@media (max-width: 520px) {
+  #overviewCard .overview-heading > div,
+  #overviewCard .overview-heading .muted {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+  #overviewCard .overview-metric {
+    padding: 14px;
+  }
+  #overviewCard .overview-shortcut {
+    grid-template-columns: 28px minmax(0, 1fr) 12px;
+    gap: 8px;
+    padding: 10px 8px;
+  }
+  #overviewCard .overview-shortcut strong,
+  #overviewCard .overview-shortcut small {
+    overflow-wrap: anywhere;
+  }
+}
