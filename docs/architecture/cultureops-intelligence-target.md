@@ -38,6 +38,16 @@ Audit effectué sur le projet Supabase actif `BALabs`, les migrations appliquée
 - `engine_job_leases`, `iot_devices` et `iot_ingest_receipts` ont RLS activé sans politique client. Cela peut être intentionnel pour un accès exclusivement serveur, mais doit rester couvert par des tests de non-exposition.
 - Les advisors signalent aussi des RPC `SECURITY DEFINER` exécutables par `authenticated` et la protection contre les mots de passe compromis désactivée. Ces constats nécessitent une revue ciblée ; ils ne justifient pas de retirer en bloc les droits des RPC métier qui peuvent être volontairement exposées.
 
+### Résultats des advisors Supabase
+
+- **Sécurité** : 8 RPC `SECURITY DEFINER` sont exécutables par `authenticated`. Une vérification SQL complémentaire confirme pour les 8 un `search_path` explicitement configuré et la présence d'une vérification de périmètre organisationnel dans le corps. Cela réduit le risque, mais ne remplace pas une revue fonctionnelle de chaque RPC et de ses grants.
+- **Sécurité** : 3 tables sans politique RLS client (`engine_job_leases`, `iot_devices`, `iot_ingest_receipts`) ; confirmer que l'accès doit rester exclusivement serveur et tester les refus côté client.
+- **Sécurité** : la protection Auth contre les mots de passe compromis est désactivée ; réglage de projet à traiter séparément.
+- **Performance** : 8 clés étrangères sans index couvrant signalées, dont des relations dans `batch_performance_observations`, `biological_contexts` et `environment_context_profile_sensors`.
+- **Performance** : 3 tables de profils ont des politiques permissives multiples pour SELECT.
+- **Performance** : 135 index signalés comme inutilisés. Comme les tables métier sont encore peu alimentées, ce signal n'autorise pas leur suppression ; il faut attendre une charge représentative et examiner les requêtes réelles.
+- **Santé du projet** : aucun finding de santé retourné lors de cet audit. Cela ne renseigne pas encore le health status des moteurs, qui reste `unknown`.
+
 ### Limites d'architecture identifiées
 
 1. Le worker central déployé concentre un grand nombre de fonctions d'interprétation, de calcul et de dispatch. Il constitue un point de couplage et de déploiement commun.
