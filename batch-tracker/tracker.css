@@ -4084,3 +4084,327 @@ html[dir="rtl"] body[data-domain] .measurement-entry .measurement-stamp {
     transition: none;
   }
 }
+
+
+/* ============================================================
+   CULTUREOPS — forms, lineage and selected-record workbench
+   Pass 7 · layout and readability only
+   ============================================================ */
+body[data-domain] :is(#plantCultureForm, #bioOperationForm, #measurementCard, #batchCard) {
+  min-width: 0;
+}
+body[data-domain] :is(#plantCultureForm, #bioOperationForm) {
+  gap: 15px 18px;
+  align-items: start;
+}
+body[data-domain] :is(#plantCultureForm, #bioOperationForm) > div,
+body[data-domain] #batchCard > .grid > div,
+body[data-domain] #measurementCard > .grid > div {
+  min-width: 0;
+}
+body[data-domain] :is(#plantCultureForm, #bioOperationForm) label,
+body[data-domain] #batchCard label,
+body[data-domain] #measurementCard label {
+  display: block;
+  margin: 0 0 7px;
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.45;
+}
+body[data-domain] :is(#plantCultureForm, #bioOperationForm, #batchCard, #measurementCard) :is(input:not([type="checkbox"]):not([type="radio"]), select, textarea) {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+}
+body[data-domain] :is(#plantCultureForm, #bioOperationForm) textarea,
+body[data-domain] #measurementCard textarea {
+  min-height: 86px;
+  resize: vertical;
+  line-height: 1.55;
+}
+body[data-domain] :is(#plantCultureForm, #bioOperationForm) :is(input, select, textarea):focus-visible,
+body[data-domain] :is(#batchCard, #measurementCard) :is(input, select, textarea):focus-visible {
+  outline: 2px solid var(--workspace-accent, var(--brand));
+  outline-offset: 2px;
+}
+body[data-domain] .bio-operation-panel,
+body[data-domain] .bio-lineage-panel {
+  min-width: 0;
+  margin-block: 18px;
+  padding: clamp(14px, 2.4vw, 21px);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--surface-2);
+}
+body[data-domain] .bio-operation-panel {
+  border-top: 3px solid var(--workspace-accent, var(--brand));
+}
+body[data-domain] :is(.bio-operation-panel, .bio-lineage-panel) > h4 {
+  margin: 0 0 8px;
+  color: var(--text);
+  font-size: 15px;
+}
+body[data-domain] .bio-operation-panel > .muted {
+  max-width: 78ch;
+  margin: 0 0 15px;
+  line-height: 1.6;
+}
+body[data-domain] .bio-operation-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 13px 15px;
+  min-width: 0;
+}
+body[data-domain] .bio-operation-form > div {
+  min-width: 0;
+}
+body[data-domain] .bio-operation-form .bio-operation-wide {
+  grid-column: 1 / -1;
+}
+body[data-domain] .bio-operation-form small {
+  display: block;
+  margin-top: 6px;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.5;
+}
+body[data-domain] #bioOperationMessage {
+  min-height: 1.4em;
+  margin: 8px 0 0;
+  font-size: 12px;
+  line-height: 1.5;
+}
+body[data-domain] .culture-lineage {
+  display: grid;
+  gap: 14px;
+  min-width: 0;
+  margin-top: 12px;
+}
+body[data-domain] .culture-lineage > section {
+  min-width: 0;
+  padding-top: 11px;
+  border-top: 1px solid var(--border);
+}
+body[data-domain] .culture-lineage > section:first-child {
+  padding-top: 0;
+  border-top: 0;
+}
+body[data-domain] .culture-lineage > section > .muted {
+  margin: 0 0 9px;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+body[data-domain] .culture-lineage-list {
+  display: flex;
+  align-items: stretch;
+  flex-wrap: wrap;
+  gap: 8px;
+  min-width: 0;
+}
+body[data-domain] .culture-lineage-node {
+  display: grid;
+  align-content: center;
+  gap: 5px;
+  width: auto;
+  min-width: min(190px, 100%);
+  max-width: 100%;
+  min-height: 58px;
+  margin: 0;
+  padding: 10px 13px;
+  border: 1px solid var(--border-strong);
+  border-inline-start: 3px solid var(--workspace-accent, var(--brand));
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--text);
+  text-align: start;
+  box-shadow: none;
+}
+body[data-domain] button.culture-lineage-node {
+  cursor: pointer;
+}
+body[data-domain] button.culture-lineage-node:hover {
+  border-color: var(--workspace-accent, var(--brand));
+  background: var(--surface);
+  box-shadow: 0 4px 12px rgba(0,0,0,.07);
+  transform: translateY(-1px);
+}
+body[data-domain] .culture-lineage-node strong {
+  color: var(--text);
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+body[data-domain] .culture-lineage-node small {
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+body[data-domain] .culture-lineage-arrow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  align-self: center;
+  min-width: 22px;
+  color: var(--workspace-accent, var(--brand));
+  font-size: 18px;
+  font-weight: 800;
+}
+body[data-domain] #batchInfo,
+body[data-domain] #batchStages,
+body[data-domain] #batchQc,
+body[data-domain] #batchEvents {
+  min-width: 0;
+  margin-block: 16px;
+  padding: clamp(13px, 2.2vw, 20px);
+  border: 1px solid var(--border);
+  border-radius: 13px;
+  background: var(--surface-2);
+  scroll-margin-top: 92px;
+}
+body[data-domain] #batchInfo h3,
+body[data-domain] #batchStages h3,
+body[data-domain] #batchQc h3,
+body[data-domain] #batchEvents h3 {
+  margin-top: 0;
+  color: var(--text);
+}
+body[data-domain] #batchInfo :is(p, li),
+body[data-domain] #batchStages :is(p, li),
+body[data-domain] #batchQc :is(p, li),
+body[data-domain] #batchEvents :is(p, li) {
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+body[data-domain] .batch-event-list {
+  display: grid;
+  gap: 9px;
+  min-width: 0;
+  margin-top: 12px;
+}
+body[data-domain] .batch-event-item {
+  min-width: 0;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-inline-start: 3px solid var(--workspace-accent, var(--brand));
+  border-radius: 10px;
+  background: var(--surface);
+  overflow-wrap: anywhere;
+}
+body[data-domain] .batch-event-item :is(strong, time) {
+  display: block;
+}
+body[data-domain] .batch-event-item time {
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 11px;
+}
+body[data-domain] #batchCompareStatus {
+  min-height: 1.5em;
+  line-height: 1.5;
+}
+body[data-domain] #batchCompareResults {
+  margin-top: 12px;
+}
+body[data-domain] #batchCompareResults:empty {
+  display: none;
+}
+body[data-domain] .measurement-history {
+  gap: 10px;
+}
+body[data-domain] .measurement-history > .muted,
+body[data-domain] .culture-lineage > .muted {
+  margin: 0;
+  padding: 14px;
+  border: 1px dashed var(--border-strong);
+  border-radius: 10px;
+  background: var(--surface-2);
+  line-height: 1.55;
+}
+body[data-domain] .observation-details {
+  min-width: 0;
+  margin-top: 18px;
+  padding: 14px 16px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface-2);
+}
+body[data-domain] .observation-details > summary {
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 750;
+  cursor: pointer;
+}
+body[data-domain] .observation-details[open] > summary {
+  margin-bottom: 12px;
+  color: var(--workspace-accent, var(--brand));
+}
+body[data-domain] .statistics-filters {
+  align-items: end;
+  gap: 13px;
+}
+body[data-domain] .statistics-filters > div {
+  min-width: 0;
+}
+body[data-domain] .statistics-filters label {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--text);
+  font-size: 11px;
+  font-weight: 750;
+}
+body[data-domain] .statistics-summary-item {
+  min-width: 0;
+  padding: 13px 15px;
+  border: 1px solid var(--border);
+  border-inline-start: 3px solid var(--workspace-accent, var(--brand));
+  border-radius: 10px;
+  background: var(--surface);
+  overflow-wrap: anywhere;
+}
+body[data-domain] .statistics-chart {
+  min-width: 0;
+  overflow-x: auto;
+}
+html[dir="rtl"] body[data-domain] .culture-lineage-arrow {
+  transform: scaleX(-1);
+}
+html[dir="rtl"] body[data-domain] .bio-operation-form,
+html[dir="rtl"] body[data-domain] :is(#plantCultureForm, #batchCard, #measurementCard) {
+  direction: rtl;
+}
+@media (max-width: 680px) {
+  body[data-domain] .bio-operation-form {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  body[data-domain] .bio-operation-form .bio-operation-wide {
+    grid-column: auto;
+  }
+  body[data-domain] .culture-lineage-list {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+  }
+  body[data-domain] .culture-lineage-node {
+    width: 100%;
+    min-width: 0;
+  }
+  body[data-domain] .culture-lineage-arrow {
+    justify-self: center;
+    transform: rotate(90deg);
+  }
+  html[dir="rtl"] body[data-domain] .culture-lineage-arrow {
+    transform: rotate(90deg);
+  }
+  body[data-domain] .statistics-filters {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  body[data-domain] button.culture-lineage-node {
+    transition: none;
+  }
+}
