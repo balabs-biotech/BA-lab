@@ -9685,3 +9685,251 @@ body[data-domain] .culture-timeline-date {
   body[data-domain] .culture-timeline-date { white-space: normal; }
   body[data-domain] .culture-timeline-entry { gap: 7px; }
 }
+
+
+/* ============================================================
+   PASS 46 — CONNECTED OVERVIEW & DATA-ENTRY WORKBENCH
+   ============================================================ */
+body[data-domain] #overviewCard {
+  position: relative;
+  overflow: visible;
+  padding: clamp(18px, 2.6vw, 28px);
+  border-color: color-mix(in srgb, var(--workspace-accent) 30%, var(--workspace-border)) !important;
+  background:
+    radial-gradient(ellipse at 92% 0%, color-mix(in srgb, var(--workspace-accent) 10%, transparent), transparent 28rem),
+    var(--workspace-panel) !important;
+}
+body[data-domain] #overviewCard .overview-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+  margin: 8px 0 22px;
+}
+body[data-domain] #overviewCard .overview-heading h2 {
+  margin: 0 0 8px;
+  font-size: clamp(21px, 2.2vw, 29px);
+  letter-spacing: -.035em;
+}
+body[data-domain] #overviewCard .overview-heading .muted {
+  max-width: 690px;
+  line-height: 1.65;
+  font-size: 11px;
+}
+body[data-domain] #overviewCard .overview-live {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex: 0 0 auto;
+  padding: 7px 10px;
+  border: 1px solid color-mix(in srgb, var(--workspace-accent) 35%, var(--workspace-border));
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--workspace-accent) 8%, var(--workspace-panel-raised));
+  color: var(--workspace-text);
+  font-size: 10px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+body[data-domain] #overviewCard .overview-live > span {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--workspace-accent);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--workspace-accent) 14%, transparent);
+}
+body[data-domain] #overviewCard .overview-metrics {
+  display: grid;
+  grid-template-columns: repeat(3,minmax(0,1fr));
+  gap: 11px;
+}
+body[data-domain] #overviewCard .overview-metric {
+  min-width: 0;
+  padding: 16px;
+  border: 1px solid var(--workspace-border);
+  border-radius: 12px;
+  background:
+    linear-gradient(145deg, color-mix(in srgb, var(--workspace-accent) 6%, transparent), transparent 70%),
+    var(--workspace-panel-raised);
+}
+body[data-domain] #overviewCard .overview-metric-label {
+  color: var(--workspace-muted);
+  font-size: 10px;
+  font-weight: 750;
+  letter-spacing: .055em;
+  text-transform: uppercase;
+}
+body[data-domain] #overviewCard .overview-metric strong {
+  display: block;
+  margin: 8px 0 11px;
+  color: var(--workspace-text);
+  font-size: clamp(27px, 3vw, 36px);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+body[data-domain] #overviewCard .overview-meter {
+  height: 4px;
+  overflow: hidden;
+  border-radius: 99px;
+  background: color-mix(in srgb, var(--workspace-muted) 20%, transparent);
+}
+body[data-domain] #overviewCard .overview-meter > span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--workspace-accent);
+}
+body[data-domain] #overviewCard .overview-metric-note {
+  display: block;
+  margin-top: 8px;
+  color: var(--workspace-muted);
+  font-size: 9px;
+  line-height: 1.45;
+}
+body[data-domain] #overviewCard .overview-lower {
+  display: grid;
+  grid-template-columns: minmax(0,1.35fr) minmax(240px,.8fr);
+  gap: 12px;
+  margin-top: 13px;
+}
+body[data-domain] #overviewCard :is(.overview-activity,.overview-shortcuts) {
+  min-width: 0;
+  padding: 16px;
+  border: 1px solid var(--workspace-border);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--workspace-panel-raised) 86%, transparent);
+}
+body[data-domain] #overviewCard .overview-section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+body[data-domain] #overviewCard :is(.overview-section-heading h3,.overview-shortcuts h3) {
+  margin: 0;
+  color: var(--workspace-text);
+  font-size: 13px;
+}
+body[data-domain] #overviewCard .overview-shortcuts h3 { margin-bottom: 10px; }
+body[data-domain] #overviewCard .overview-observations-details {
+  border-top: 1px solid var(--workspace-border);
+  padding-top: 11px;
+}
+body[data-domain] #overviewCard .overview-observations-details summary {
+  color: var(--workspace-soft, var(--workspace-text));
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 650;
+}
+body[data-domain] #overviewCard .overview-observations {
+  margin-top: 12px;
+  color: var(--workspace-muted);
+  font-size: 11px;
+  line-height: 1.6;
+}
+body[data-domain] #overviewCard .overview-shortcut {
+  display: grid;
+  grid-template-columns: 30px minmax(0,1fr) auto;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 57px;
+  margin: 0;
+  padding: 9px 10px;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--workspace-text);
+  text-align: left;
+}
+body[data-domain] #overviewCard .overview-shortcut + .overview-shortcut {
+  border-top: 1px solid var(--workspace-border);
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+body[data-domain] #overviewCard .overview-shortcut:hover {
+  border-color: var(--workspace-border);
+  background: color-mix(in srgb, var(--workspace-accent) 8%, var(--workspace-panel));
+}
+body[data-domain] #overviewCard .shortcut-index {
+  color: var(--workspace-accent);
+  font-size: 10px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+body[data-domain] #overviewCard .overview-shortcut strong,
+body[data-domain] #overviewCard .overview-shortcut small { display: block; }
+body[data-domain] #overviewCard .overview-shortcut strong { font-size: 11px; }
+body[data-domain] #overviewCard .overview-shortcut small {
+  margin-top: 3px;
+  color: var(--workspace-muted);
+  font-size: 9px;
+}
+body[data-domain] #overviewCard .overview-footnote {
+  margin: 14px 0 0;
+  padding-top: 12px;
+  border-top: 1px solid var(--workspace-border);
+  color: var(--workspace-muted);
+  font-size: 9px;
+  line-height: 1.6;
+}
+body[data-domain] .bio-operation-panel,
+body[data-domain] .bio-lineage-panel { padding: clamp(15px,2vw,22px); }
+body[data-domain] .bio-operation-panel h4,
+body[data-domain] .bio-lineage-panel h4 {
+  margin: 0 0 8px;
+  color: var(--workspace-text);
+  font-size: 14px;
+}
+body[data-domain] .bio-operation-panel > .muted {
+  max-width: 850px;
+  font-size: 11px;
+  line-height: 1.65;
+}
+body[data-domain] .bio-operation-form {
+  display: grid;
+  grid-template-columns: repeat(2,minmax(0,1fr));
+  gap: 12px;
+  margin-top: 14px;
+}
+body[data-domain] .bio-operation-form > div { min-width: 0; }
+body[data-domain] .bio-operation-form .bio-operation-wide { grid-column: 1 / -1; }
+body[data-domain] .bio-operation-form label,
+body[data-domain] .statistics-filters label {
+  display: block;
+  margin: 0 0 6px;
+  color: var(--workspace-soft, var(--workspace-text));
+  font-size: 10px;
+  font-weight: 700;
+}
+body[data-domain] .bio-operation-form small {
+  display: block;
+  margin-top: 6px;
+  color: var(--workspace-muted);
+  font-size: 9px;
+  line-height: 1.5;
+}
+body[data-domain] .bio-operation-form textarea { min-height: 90px; resize: vertical; }
+body[data-domain] .bio-operation-form #saveBioOperation { width: auto; min-width: 190px; }
+body[data-domain] .statistics-filters {
+  display: grid;
+  grid-template-columns: repeat(2,minmax(0,1fr));
+  gap: 12px;
+}
+body[data-domain] .statistics-filters > div { min-width: 0; }
+body[data-domain] .statistics-filters .statistics-filter-action { display: flex; align-items: end; }
+body[data-domain] .statistics-filters .statistics-filter-action button { width: 100%; }
+@media (max-width: 760px) {
+  body[data-domain] #overviewCard .overview-lower { grid-template-columns: minmax(0,1fr); }
+  body[data-domain] #overviewCard .overview-metrics { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  body[data-domain] .bio-operation-form,
+  body[data-domain] .statistics-filters { grid-template-columns: minmax(0,1fr); }
+  body[data-domain] .bio-operation-form .bio-operation-wide { grid-column: auto; }
+}
+@media (max-width: 460px) {
+  body[data-domain] #overviewCard .overview-metrics { grid-template-columns: minmax(0,1fr); }
+  body[data-domain] #overviewCard .overview-heading { flex-direction: column; }
+  body[data-domain] #overviewCard .overview-live { white-space: normal; }
+  body[data-domain] #overviewCard .overview-shortcut { min-height: 54px; }
+  body[data-domain] .bio-operation-form #saveBioOperation { width: 100%; }
+}
