@@ -7251,3 +7251,72 @@ body[data-domain].workspace-authenticated .app-hero h1 {
     font-size: 21px;
   }
 }
+
+
+/* CultureOps UI QA — pass 21: put the mobile sign-in action above the fold. */
+@media (max-width: 600px) {
+  body[data-domain]:not(.workspace-authenticated) .app-hero {
+    margin-block: 4px 8px;
+    padding: 14px 16px;
+    gap: 0;
+  }
+  body[data-domain]:not(.workspace-authenticated) .app-hero h1 {
+    margin-bottom: 5px;
+    font-size: clamp(26px, 7.2vw, 31px);
+    line-height: 1.12;
+  }
+  body[data-domain]:not(.workspace-authenticated) .hero-description {
+    margin-top: 6px;
+    font-size: 13px;
+    line-height: 1.45;
+  }
+  body[data-domain]:not(.workspace-authenticated) .hero-tags {
+    gap: 5px;
+    margin-top: 8px;
+  }
+  body[data-domain]:not(.workspace-authenticated) .hero-tags > span {
+    min-height: 26px;
+    padding: 4px 8px;
+    font-size: 10px;
+  }
+  body[data-domain]:not(.workspace-authenticated) #authCard {
+    gap: 6px;
+    padding: 13px 14px;
+  }
+  body[data-domain]:not(.workspace-authenticated) #authCard > .section-kicker {
+    margin-bottom: 5px;
+    font-size: 9px;
+  }
+  body[data-domain]:not(.workspace-authenticated) #authCard > h2 {
+    margin-bottom: 3px;
+    font-size: 21px;
+    line-height: 1.2;
+  }
+  body[data-domain]:not(.workspace-authenticated) #authCard > .muted {
+    font-size: 12px;
+    line-height: 1.45;
+  }
+  body[data-domain]:not(.workspace-authenticated) #authCard label {
+    margin: 2px 0 3px;
+    font-size: 13px;
+  }
+  body[data-domain]:not(.workspace-authenticated) #authCard :is(input[type="email"], input[type="password"]) {
+    min-height: 44px;
+    padding: 9px 11px;
+  }
+  body[data-domain]:not(.workspace-authenticated) .auth-actions {
+    gap: 8px;
+    margin-block: 3px;
+  }
+  body[data-domain]:not(.workspace-authenticated) .auth-actions button {
+    min-height: 42px;
+    padding: 8px 10px;
+    font-size: 13px;
+  }
+  body[data-domain]:not(.workspace-authenticated) #authStatus {
+    margin-block: 1px;
+    padding: 8px 10px;
+    font-size: 12px;
+    line-height: 1.4;
+  }
+}
