@@ -858,7 +858,7 @@ assert.ok(workflowCss.includes("dialog.workspace-dialog"),
   "native workflow dialogs must have a reusable themed surface");
 assert.ok(workflowCss.includes("dialog.workspace-dialog::backdrop"),
   "modal backdrops must separate confirmation flows from the workspace");
-assert.ok(workflowCss.includes("dialog.workspace-dialog .dialog-actions"),
+assert.ok(workflowCss.includes(".workspace-dialog .dialog-actions {"),
   "dialog actions must preserve primary and secondary action hierarchy");
 assert.ok(workflowCss.includes("@media (max-width: 600px)") && workflowCss.includes("dialog.workspace-dialog"),
   "workflow dialogs must fit narrow mobile viewports");
