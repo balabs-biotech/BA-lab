@@ -189,6 +189,8 @@ function createWorld() {
       tip.position.copy(end);group.add(tip);
     }
   }
+  const twigPulseGeometry=new THREE.SphereGeometry(.022,7,6);
+  const twigPulseMaterial=new THREE.MeshBasicMaterial({color:0xd1d0c5,transparent:true,opacity:.78,depthWrite:false});
   LINKS.forEach(([a,b],index)=>{
     const A=cells.get(a).position,B=cells.get(b).position;
     const bend=new THREE.Vector3((A.x+B.x)/2+(index%2?-.3:.3),(A.y+B.y)/2+(index%3-.8)*.28,(A.z+B.z)/2+.45);
@@ -220,6 +222,9 @@ function createWorld() {
         const branch=new THREE.CatmullRomCurve3([root,root.clone().lerp(tip,.48).add(new THREE.Vector3(0,.045,.025)),tip]);
         const twig=new THREE.Mesh(new THREE.TubeGeometry(branch,14,.0018,3,false),new THREE.MeshBasicMaterial({color,transparent:true,opacity:.22,depthWrite:false}));
         twig.userData={kind:'hypha-branch',a,b};world.add(twig);
+        // A living signal travels along each side branch, not only the main junction.
+        const twigPulse=new THREE.Mesh(twigPulseGeometry,twigPulseMaterial);world.add(twigPulse);
+        signalPoints.push({pulse:twigPulse,curve:branch,offset:hyphaRand()});
       }
     }
   });
