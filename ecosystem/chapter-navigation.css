@@ -72,3 +72,14 @@ body{overscroll-behavior:none}
  .chapter-rail-node.is-active .chapter-rail-dot{width:11px;height:11px}
 }
 @media(prefers-reduced-motion:reduce){.filament-progress,.chapter-rail-dot,.chapter-rail-name{transition:none}}
+
+/* Editorial image reveal — restrained, scroll-triggered and scoped to chapter panels */
+.experience-page .rb-image-armed{clip-path:inset(0 0 100% 0);transform:scale(1.055);transition:clip-path .9s cubic-bezier(.2,.72,.18,1),transform 1.15s cubic-bezier(.2,.72,.18,1);will-change:clip-path,transform}
+.experience-page .rb-image-armed.rb-image-revealed{clip-path:inset(0 0 0 0);transform:scale(1)}
+@media(max-width:760px){
+ .experience-page{padding-inline-start:36px}
+ [dir=rtl] .experience-page{padding-inline-start:9px;padding-inline-end:36px}
+}
+@media(prefers-reduced-motion:reduce){
+ .experience-page .rb-image-armed,.experience-page .rb-image-armed.rb-image-revealed{clip-path:none;transform:none;transition:none;will-change:auto}
+}
