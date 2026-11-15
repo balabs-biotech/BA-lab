@@ -146,3 +146,5 @@ body{overscroll-behavior:none}
  [dir=rtl] .experience-page{padding-inline-start:8px;padding-inline-end:40px}
 }
 @media(prefers-reduced-motion:reduce){.chapter-rail{filter:none}}
+
+.chapter-filament .filament-branch{fill:none;stroke:#78958a66;stroke-width:1;stroke-linecap:round;stroke-dasharray:1.5 4;opacity:.72}
