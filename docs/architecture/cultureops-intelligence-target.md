@@ -58,6 +58,12 @@ Audit effectué sur le projet Supabase actif `BALabs`, les migrations appliquée
 6. Les fonctions Edge déployées doivent être comparées à leur source versionnée dans Git à chaque livraison.
 7. La réconciliation des fonctions Edge est maintenant réalisée : les 10 fonctions déployées ont des snapshots dans `supabase/functions/`. Quatre fichiers préexistants correspondaient déjà exactement au distant ; trois étaient obsolètes et ont été remplacés ; deux manquaient et ont été ajoutés ; le worker v61 a été vérifié identique. L'inventaire et les paramètres de sécurité sont documentés dans `supabase/functions/DEPLOYMENT-INVENTORY.md`. `config.toml` et l'historique SQL des migrations restent à réconcilier. Le README racine a été corrigé.
 
+### Audit Phase 1 — cycle d'exécution
+
+Le contrat réel des RPC `enqueue_engine_job`, `claim_engine_job`, `heartbeat_engine_job` et `finish_engine_job` a été relu dans PostgreSQL. Les privilèges observés limitent claim/heartbeat/finish à `service_role` ; enqueue reste disponible à `authenticated` et `service_role` avec contrôle organisationnel. Les jobs observés sont tous terminés avec succès (7/7), sans lease résiduelle. Les invariants déjà présents et les points de vérification sont consignés dans [l'audit détaillé du cycle d'exécution](engine-execution-contract-audit.md).
+
+Un point de cohérence reste à tester : `finish_engine_job` ne vérifie pas explicitement que la mise à jour de la ligne `engine_job_runs` affecte exactement une ligne avant de finaliser le job et supprimer la lease. Aucune correction n'est appliquée avant un test d'intégration isolé.
+
 ## 3. Architecture logique cible
 
 ```text
@@ -204,6 +210,7 @@ Une recommandation cite le signal déclencheur, le contexte, la source, le profi
 - Tester les transitions queue/lease/heartbeat/retry/idempotence et l'isolation entre organisations.
 - Vérifier les limites de taille, timeout, payload, sortie et concurrence.
 - Extraire progressivement les handlers du worker monolithique en modules testables, sans changer le contrat externe.
+- Retrouver d'abord les migrations sources exactes du schéma moteur ; les tests d'intégration doivent s'exécuter sur une base isolée et reproductible.
 
 ### Phase 2 — Context resolver v1
 - Définir un contrat unique de résolution du contexte.
