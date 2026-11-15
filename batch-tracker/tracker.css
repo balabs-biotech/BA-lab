@@ -8173,3 +8173,120 @@ body[data-domain="laboratory"] {
   body[data-domain] .auth-actions { gap: 12px; }
   body[data-domain] .app-toolbar { gap: 9px; padding: 10px; }
 }
+
+
+/* CULTUREOPS INTERIOR REFINEMENT — resolve legacy domain overrides.
+   The earlier theme blocks styled nested panels with cream/white surfaces.
+   These higher-specificity rules make the entire authenticated workspace coherent. */
+body[data-domain="agronomy"] .card :is(.culture-catalog-row,.culture-detail,.culture-detail-field,.culture-timeline-entry,.statistics-summary-item,.statistics-chart,.statistics-table-wrap,.overview-observation,.overview-shortcuts,.quick-capture,.quick-capture-tile,.bio-operation-panel,.bio-lineage-panel,.guided-entry-step,.consent-panel,.batch-create-panel,.batch-compare-panel),
+body[data-domain="agronomy"] :is(#contextPanel,.context-panel,.metric-chips span) {
+  background: #202d25 !important;
+  color: #e7efe4 !important;
+  border-color: #405648 !important;
+  box-shadow: none !important;
+}
+body[data-domain="mycology"] .card :is(.culture-catalog-row,.culture-detail,.culture-detail-field,.culture-timeline-entry,.statistics-summary-item,.statistics-chart,.statistics-table-wrap,.overview-observation,.overview-shortcuts,.quick-capture,.quick-capture-tile,.bio-operation-panel,.bio-lineage-panel,.guided-entry-step,.consent-panel,.batch-create-panel,.batch-compare-panel),
+body[data-domain="mycology"] :is(#contextPanel,.context-panel,.metric-chips span) {
+  background: #241d19 !important;
+  color: #eee4dc !important;
+  border: 1px solid #594538 !important;
+  border-radius: 12px !important;
+  box-shadow: none !important;
+}
+body[data-domain="laboratory"] .card :is(.culture-catalog-row,.culture-detail,.culture-detail-field,.culture-timeline-entry,.statistics-summary-item,.statistics-chart,.statistics-table-wrap,.overview-observation,.overview-shortcuts,.quick-capture,.quick-capture-tile,.bio-operation-panel,.bio-lineage-panel,.guided-entry-step,.consent-panel,.batch-create-panel,.batch-compare-panel),
+body[data-domain="laboratory"] :is(#contextPanel,.context-panel,.metric-chips span) {
+  background: #1e2b38 !important;
+  color: #e5edf4 !important;
+  border-color: #40586d !important;
+  border-radius: 12px !important;
+  box-shadow: none !important;
+}
+body[data-domain] .card :is(.culture-catalog-row,.culture-detail,.culture-detail-field,.culture-timeline-entry,.statistics-summary-item,.statistics-chart,.statistics-table-wrap,.overview-observation,.overview-shortcuts,.quick-capture,.quick-capture-tile,.bio-operation-panel,.bio-lineage-panel,.guided-entry-step,.consent-panel,.batch-create-panel,.batch-compare-panel) :is(h3,h4,strong,label,span,small,p,td,th,caption) {
+  color: inherit !important;
+}
+body[data-domain] .statistics-chart svg :is(text,tspan) { fill: var(--ui-muted) !important; }
+body[data-domain] .statistics-chart svg :is(line,path) { stroke: var(--ui-line); }
+body[data-domain] .statistics-chart svg path[data-series],
+body[data-domain] .statistics-chart svg .series-line { stroke: var(--domain-accent) !important; }
+body[data-domain] .culture-catalog-heading,
+body[data-domain] .batch-create-heading,
+body[data-domain] .overview-section-heading {
+  color: var(--ui-text) !important;
+}
+body[data-domain] .culture-catalog-action,
+body[data-domain] .overview-shortcut,
+body[data-domain] .quick-capture-tile {
+  min-height: 44px;
+  border-radius: 10px !important;
+  font-weight: 650;
+}
+body[data-domain] .culture-catalog-row:hover,
+body[data-domain] .quick-capture-tile:hover,
+body[data-domain] .overview-shortcut:hover {
+  transform: translateY(-1px);
+  border-color: var(--domain-accent) !important;
+  background: color-mix(in srgb, var(--domain-accent) 8%, var(--ui-panel)) !important;
+}
+body[data-domain] .culture-detail-field,
+body[data-domain] .culture-lineage-node,
+body[data-domain] .culture-timeline-entry,
+body[data-domain] .overview-observation {
+  overflow-wrap: anywhere;
+}
+body[data-domain] .statistics-chart {
+  min-height: 190px;
+  padding: 16px !important;
+}
+body[data-domain] .statistics-chart svg {
+  max-width: 100%;
+}
+body[data-domain] .culture-catalog-list {
+  grid-template-columns: repeat(2,minmax(0,1fr));
+  gap: 14px;
+}
+body[data-domain] .bio-operation-form {
+  gap: 14px;
+}
+body[data-domain] .bio-operation-form > div,
+body[data-domain] .grid > div { min-width: 0; }
+body[data-domain] .card :is(input,select,textarea) {
+  min-height: 42px;
+  border-radius: 9px !important;
+}
+body[data-domain] .card textarea { min-height: 96px; }
+body[data-domain] .card :is(input,select,textarea):focus {
+  border-color: var(--domain-accent) !important;
+}
+body[data-domain] .card .statistics-table-wrap {
+  overflow-x: auto;
+  scrollbar-color: var(--ui-line) transparent;
+}
+body[data-domain] .card .statistics-table-wrap table {
+  min-width: 620px;
+}
+body[data-domain] .card .statistics-table-wrap :is(th,td) {
+  padding: 11px 13px !important;
+}
+body[data-domain] .card .progress-track {
+  height: 7px;
+  overflow: hidden;
+  border-radius: 99px;
+  background: #111713 !important;
+}
+body[data-domain="mycology"] .card .progress-track { background: #171310 !important; }
+body[data-domain="laboratory"] .card .progress-track { background: #121c25 !important; }
+@media (max-width: 760px) {
+  body[data-domain] .culture-catalog-list,
+  body[data-domain] .overview-lower {
+    grid-template-columns: minmax(0,1fr) !important;
+  }
+  body[data-domain] .culture-catalog-filters,
+  body[data-domain] .bio-operation-form,
+  body[data-domain] .statistics-filters {
+    grid-template-columns: minmax(0,1fr) !important;
+  }
+  body[data-domain] .batch-create-heading {
+    flex-direction: column;
+  }
+  body[data-domain] .card :is(input,select,textarea) { font-size: 16px; }
+}
