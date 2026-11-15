@@ -2979,3 +2979,47 @@ body[data-domain] :is(button, input, select, textarea, a, [tabindex]):focus-visi
     padding-left: 1rem;
   }
 }
+
+/* Chronological biological facts with direct event-to-observation anchors. */
+.engine-biological-fact-timeline {
+  display: grid;
+  gap: 0.7rem;
+  margin: 0.9rem 0;
+  padding: 0.8rem;
+  border: 1px solid var(--border, #64748b);
+  border-radius: 0.65rem;
+  background: var(--surface, transparent);
+}
+.engine-biological-fact-timeline > ol {
+  display: grid;
+  gap: 0.75rem;
+  margin: 0;
+  padding-left: 1.4rem;
+}
+.engine-biological-fact-entry {
+  min-width: 0;
+  padding: 0.55rem 0.65rem;
+  border-left: 2px solid var(--border, #64748b);
+  overflow-wrap: anywhere;
+}
+.engine-biological-fact-entry time,
+.engine-biological-fact-entry small {
+  display: block;
+  color: var(--text-muted, #64748b);
+  font-size: 0.8rem;
+}
+.engine-biological-fact-entry p {
+  margin: 0.3rem 0;
+}
+.engine-biological-fact-event-link {
+  display: inline-block;
+  margin: 0.2rem 0.45rem 0.2rem 0;
+  font-size: 0.85rem;
+}
+.engine-biological-fact-entry:target {
+  outline: 2px solid var(--focus, currentColor);
+  outline-offset: 2px;
+}
+@media (max-width: 620px) {
+  .engine-biological-fact-timeline { padding: 0.6rem; }
+}
