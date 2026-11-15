@@ -2982,3 +2982,39 @@ body[data-domain] select option {
   color: var(--text);
   background: var(--surface);
 }
+
+
+/* Data-table navigation and row rhythm across all three scientific domains. */
+.statistics-table-wrap {
+  max-width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-gutter: stable;
+}
+.statistics-table-wrap:focus-visible {
+  outline: 2px solid var(--ui-accent);
+  outline-offset: 3px;
+}
+.statistics-table {
+  width: 100%;
+  min-width: 560px;
+}
+.statistics-table tbody tr:nth-child(even) td {
+  background: var(--surface-2);
+}
+.statistics-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+.statistics-table td {
+  font-variant-numeric: tabular-nums;
+}
+body[data-domain="agronomy"] .statistics-table tbody tr:nth-child(even) td {
+  background: #19251f;
+}
+body[data-domain="mycology"] .statistics-table tbody tr:nth-child(even) td {
+  background: #f5ece3;
+}
+body[data-domain="laboratory"] .statistics-table tbody tr:nth-child(even) td {
+  background: #f1f6fb;
+}
