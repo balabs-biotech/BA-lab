@@ -140,6 +140,28 @@ try {
             if (!metrics.headingText || !metrics.authVisible) failures.push(`${workspace.slug}/${viewport.name}: auth content missing`);
       if (metrics.documentWidth > metrics.viewportWidth + 1) failures.push(`${workspace.slug}/${viewport.name}: horizontal overflow ${metrics.documentWidth}px > ${metrics.viewportWidth}px`);
       if (metrics.navLinks < 5) failures.push(`${workspace.slug}/${viewport.name}: incomplete section navigation (${metrics.navLinks} links)`);
+      const accessibility = await page.evaluate(() => {
+        const ids = [...document.querySelectorAll("[id]")].map(node => node.id);
+        const duplicateIds = [...new Set(ids.filter((id, index) => ids.indexOf(id) !== index))];
+        const missingHashTargets = [...document.querySelectorAll('a[href^="#"]')]
+          .map(link => link.getAttribute("href").slice(1))
+          .filter(id => id && !document.getElementById(id));
+        const unnamedControls = [...document.querySelectorAll("input:not([type=hidden]), select, textarea, button, a[href]")]
+          .filter(element => {
+            const text = element.innerText?.trim() || element.getAttribute("aria-label") || element.getAttribute("title") || element.value || "";
+            const labelledBy = (element.getAttribute("aria-labelledby") || "").split(/\\s+/).filter(Boolean);
+            return !text && !element.labels?.length && !labelledBy.some(id => document.getElementById(id)?.textContent?.trim());
+          })
+          .map(element => ({ tag: element.tagName, id: element.id, type: element.type || null, href: element.getAttribute("href") }));
+        const brokenDescriptions = [...document.querySelectorAll("[aria-describedby]")]
+          .flatMap(element => (element.getAttribute("aria-describedby") || "").split(/\\s+/))
+          .filter(id => id && !document.getElementById(id));
+        return { duplicateIds, missingHashTargets, unnamedControls, brokenDescriptions };
+      });
+      if (accessibility.duplicateIds.length) failures.push(workspace.slug + "/" + viewport.name + ": duplicate IDs " + JSON.stringify(accessibility.duplicateIds));
+      if (accessibility.missingHashTargets.length) failures.push(workspace.slug + "/" + viewport.name + ": broken navigation targets " + JSON.stringify(accessibility.missingHashTargets));
+      if (accessibility.unnamedControls.length) failures.push(workspace.slug + "/" + viewport.name + ": controls without accessible names " + JSON.stringify(accessibility.unnamedControls));
+      if (accessibility.brokenDescriptions.length) failures.push(workspace.slug + "/" + viewport.name + ": broken aria-describedby references " + JSON.stringify(accessibility.brokenDescriptions));
       for (const language of ["en", "pt", "ar", "fr"]) {
         await page.locator("#languageSelect").selectOption(language);
         const expectedSignIn = { fr: "Se connecter", en: "Sign in", pt: "Iniciar sessão", ar: "تسجيل الدخول" };
