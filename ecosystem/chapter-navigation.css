@@ -40,3 +40,11 @@ body{overscroll-behavior:none}
 
 .experience-track{direction:ltr}
 [dir=rtl] .experience-page{direction:rtl}
+
+.site-nav a.chapter-active{color:#e7e5d9;border-color:#b96b4d;background:#263b38}
+.site-nav a[aria-current="page"]{position:relative}
+.site-nav a[aria-current="page"]:after{content:"";position:absolute;left:15%;right:15%;bottom:-4px;height:2px;background:#b96b4d}
+.experience-page[aria-current="page"]>.experience-page-label{color:#d1d0c5}
+.experience-controls button{transition:background .2s ease,transform .2s ease,opacity .2s ease}
+.experience-controls button:active:not(:disabled){transform:scale(.94)}
+@media(hover:hover){.site-nav a:not(.chapter-active){opacity:.72}.site-nav a:hover{opacity:1}}
