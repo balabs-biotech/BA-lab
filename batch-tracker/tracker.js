@@ -8125,13 +8125,13 @@ function renderBiologicalContextAssessment(article, result) {
     signalPanel.appendChild(disclaimer);
     article.appendChild(signalPanel);
   }
-  addLine(article, "Couverture : " + String(coverage.source_record_count ?? 0) + " retenus · " + String(coverage.excluded_record_count ?? 0) + " exclus · mesures : " + String(counts.measurement ?? 0) + " · météo : " + String(counts.environmental_observation ?? 0));
+  addLine(article, "Couverture : " + String(coverage.source_record_count ?? 0) + " retenus · " + String(coverage.excluded_record_count ?? 0) + " exclus · mesures : " + String(counts.measurement ?? 0) + " · observations biologiques : " + String(counts.observation ?? 0) + " · météo : " + String(counts.environmental_observation ?? 0));
   const requested = coverage.requested_window;
   if (requested?.start && requested?.end) addLine(article, "Fenêtre demandée : " + requested.start + " → " + requested.end + " · " + String(requested.timezone || "fuseau non précisé"));
   const observed = coverage.observed_window;
   if (observed?.start && observed?.end) addLine(article, "Fenêtre observée : " + observed.start + " → " + observed.end);
   addList(article, "Contexte manquant ou non résolu", coverage.missing_context, item => item, 12);
-  addList(article, "Faits observés et sources", value.observed_facts, item => String(item.statement || item.fact_code || "Fait") + (item.observed_at ? " · " + item.observed_at : "") + (Array.isArray(item.source_record_ids) ? " · sources : " + item.source_record_ids.join(", ") : ""), 8);
+  addList(article, "Faits observés et sources", value.observed_facts, item => String(item.statement || item.fact_code || "Fait") + (item.observed_at ? " · " + item.observed_at : "") + (item.event_id ? " · événement : " + item.event_id : "") + (Array.isArray(item.source_record_ids) ? " · sources : " + item.source_record_ids.join(", ") : ""), 12);
   const temporalFeatures = Array.isArray(value.derived_features) ? value.derived_features.filter(item =>
     item && typeof item.feature_code === "string" &&
     (item.feature_code.endsWith(".range") ||
