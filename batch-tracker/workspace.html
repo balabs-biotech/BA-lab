@@ -501,7 +501,8 @@
     </div>
 
 
-    <h3>Nouveau batch</h3>
+    <div class="batch-create-panel" aria-labelledby="batchCreateTitle">
+      <div class="batch-create-heading"><div><span class="entry-step-mark">NOUVELLE PRODUCTION</span><h3 id="batchCreateTitle">Créer un lot</h3><p class="muted">Identifiez le lot, reliez-le à sa culture source, puis renseignez les quantités et le lieu de production.</p></div><span class="batch-required-note"><span aria-hidden="true">*</span> Champs obligatoires</span></div>
 
 
     <div class="grid">
@@ -512,10 +513,11 @@
       Code du batch<span class="req" aria-hidden="true"> *</span>
     </label>
 
-        <input id="batchCode" aria-required="true"
+        <input id="batchCode" required aria-required="true" aria-describedby="batchCodeHint"
           type="text"
           placeholder="Ex. BATCH-PO-P80-001"
         >
+        <small class="hint" id="batchCodeHint">Identifiant unique du lot, conservé dans toute sa traçabilité.</small>
 
       </div>
 
@@ -526,10 +528,11 @@
       Nom du batch<span class="req" aria-hidden="true"> *</span>
     </label>
 
-        <input id="batchName" aria-required="true"
+        <input id="batchName" required aria-required="true" aria-describedby="batchNameHint"
           type="text"
           placeholder="Ex. Grain P80 G1"
         >
+        <small class="hint" id="batchNameHint">Nom court permettant de reconnaître le lot dans les listes.</small>
 
       </div>
 
@@ -636,6 +639,7 @@
     >
       Créer le batch
     </button>
+    </div>
 
 
     <h3>Batchs existants</h3>
