@@ -124,3 +124,25 @@ body{overscroll-behavior:none}
 
 /* Keep chapter controls comfortably tappable on compact touch screens. */
 @media(max-width:760px){.experience-controls button{touch-action:manipulation;-webkit-tap-highlight-color:transparent}}
+
+
+/* Organic rail refinement: clearer mycelial spine, balanced nodes and generous touch targets. */
+.chapter-rail{width:58px;filter:drop-shadow(0 3px 12px #0003)}
+.chapter-filament{overflow:visible}
+.filament-base{stroke:#9aafa255;stroke-width:1.35;stroke-dasharray:1.5 5}
+.filament-progress{stroke:#c47b5c;stroke-width:2.35;filter:drop-shadow(0 0 5px #c47b5c99)}
+.chapter-rail-node{width:40px;height:40px;isolation:isolate}
+.chapter-rail-dot{position:relative;z-index:1;width:8px;height:8px;border:1.5px solid #b8c4b8;background:#172724;box-shadow:0 0 0 4px #111b1dcc,0 0 0 5px #78958a22}
+.chapter-rail-node.is-past .chapter-rail-dot{background:#b96b4d;border-color:#e0a58d;box-shadow:0 0 0 4px #111b1dcc,0 0 10px #b96b4d66}
+.chapter-rail-node.is-active .chapter-rail-dot{width:14px;height:14px;border:2px solid #e6d9ca;background:#b96b4d;box-shadow:0 0 0 5px #b96b4d30,0 0 18px #b96b4dcc}
+.chapter-rail-node:focus-visible{outline:0}
+.chapter-rail-node:focus-visible .chapter-rail-dot{box-shadow:0 0 0 4px #111b1d,0 0 0 7px #d1d0c5,0 0 18px #b96b4d}
+@media(max-width:760px){
+ .chapter-rail{inset-inline-start:0;width:38px;height:min(58%,420px);opacity:1}
+ .chapter-rail-node{width:40px;height:40px}
+ .chapter-rail-dot{width:7px;height:7px}
+ .chapter-rail-node.is-active .chapter-rail-dot{width:12px;height:12px}
+ .experience-page{padding-inline-start:40px;padding-inline-end:8px}
+ [dir=rtl] .experience-page{padding-inline-start:8px;padding-inline-end:40px}
+}
+@media(prefers-reduced-motion:reduce){.chapter-rail{filter:none}}
