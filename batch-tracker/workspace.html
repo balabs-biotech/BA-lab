@@ -55,10 +55,10 @@
   <section class="card hidden workspace-inactive" id="overviewCard" aria-labelledby="overviewTitle">
     <div class="section-kicker"><span>ESPACE EXPÉRIMENTAL</span><span class="kicker-line"></span><span>ÉTAT DES DONNÉES</span></div>
     <div class="overview-heading">
-      <div><h2 id="overviewTitle">Vue générale</h2><p class="muted">Aperçu des enregistrements chargés depuis Supabase. Les compteurs reflètent les limites de chargement actuelles, pas nécessairement le total de la base.</p></div>
+      <div><h2 id="overviewTitle">Vue générale</h2><p class="muted" id="overviewDescription">Aperçu des enregistrements chargés depuis Supabase. Les compteurs reflètent les limites de chargement actuelles, pas nécessairement le total de la base.</p></div>
       <span class="overview-live"><span aria-hidden="true"></span> Session connectée</span>
     </div>
-    <div class="overview-metrics" aria-label="Compteurs de données chargées">
+    <div class="overview-metrics" id="overviewMetrics" aria-label="Compteurs de données chargées">
       <article class="overview-metric">
         <span class="overview-metric-label">Cultures chargées</span><strong id="overviewCultureCount">—</strong>
         <div class="overview-meter" role="progressbar" aria-label="Cultures chargées par rapport à la limite de chargement" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span id="overviewCultureMeter"></span></div>
@@ -79,11 +79,11 @@
       <section class="overview-activity" aria-labelledby="overviewActivityTitle">
         <div class="overview-section-heading"><h3 id="overviewActivityTitle">Activité récente</h3><button class="secondary-button small-button" id="overviewOpenData" type="button">Ouvrir les données</button></div>
         <details class="overview-observations-details">
-          <summary>Afficher les dernières observations</summary>
+          <summary id="overviewObservationSummary">Afficher les dernières observations</summary>
           <div id="overviewRecentObservations" class="overview-observations"><p class="muted">Connectez-vous pour charger les données de l’organisation.</p></div>
         </details>
         <details class="overview-observations-details" id="engineExecutionDetails">
-          <summary>Afficher les dernières analyses calculées</summary>
+          <summary id="overviewEngineSummary">Afficher les dernières analyses calculées</summary>
           <div id="overviewRecentEngineExecutions" class="overview-observations" aria-live="polite">
             <p class="muted">Les exécutions analytiques apparaîtront ici après connexion.</p>
           </div>
@@ -96,7 +96,7 @@
         <button type="button" class="overview-shortcut" data-workspace-target="measurementCard"><span class="shortcut-index">03</span><span><strong>Saisir une donnée</strong><small>Mesure ou observation</small></span><span aria-hidden="true">↗</span></button>
       </aside>
     </div>
-    <p class="overview-footnote">Cette vue ne calcule pas encore de statistiques analytiques. Toute analyse doit sélectionner une variable, une unité, une période et des lots comparables.</p>
+    <p class="overview-footnote" id="overviewFootnote">Les compteurs reflètent les données actuellement chargées. Les analyses doivent préciser une variable, une unité, une période et un périmètre comparables.</p>
   </section>
 
   <!-- ======================================================
