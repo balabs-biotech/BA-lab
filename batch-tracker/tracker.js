@@ -2749,8 +2749,8 @@ function renderBatchList() {
 
     batchList.innerHTML = `
 
-      <div class="info muted">
-        Aucun batch créé pour le moment.
+      <div class="info muted feedback-empty" role="status">
+        Aucun lot créé pour le moment.
       </div>
 
     `;
@@ -5698,7 +5698,7 @@ function renderCultureCatalog() {
   list.innerHTML = "";
   if (!filtered.length) {
     const empty = document.createElement("p");
-    empty.className = "muted";
+    empty.className = "muted feedback-empty";
     empty.textContent = cultureOptions.length
       ? "Aucune culture ne correspond à cette recherche."
       : document.body.dataset.domain === "laboratory"
@@ -8083,7 +8083,7 @@ function renderPlantCultureList(rows) {
   updateOverview();
   if (!rows.length) {
     const empty = document.createElement("p");
-    empty.className = "muted";
+    empty.className = "muted feedback-empty";
     empty.textContent = "Aucune culture végétale enregistrée. Ajoutez une plante ou un groupe de plantes ci-dessus.";
     list.appendChild(empty);
     return;
@@ -8169,7 +8169,7 @@ async function loadPlantCultures() {
     initializationWarnings.push("registre végétal");
     if (status) status.textContent = "Registre végétal indisponible : " + (error.message || "erreur inconnue");
     const list = document.getElementById("plantCultureList");
-    if (list) list.textContent = "Impossible de charger le registre végétal. Vérifiez que la migration est déployée puis rechargez la page.";
+    if (list) { list.className = "culture-catalog-list feedback-error"; list.setAttribute("role", "alert"); list.textContent = "Impossible de charger le registre végétal. Vérifiez que la migration est déployée puis rechargez la page."; }
   }
 }
 
