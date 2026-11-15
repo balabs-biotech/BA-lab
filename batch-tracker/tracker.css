@@ -12732,3 +12732,194 @@ body[data-domain="laboratory"] #batchCard #batchCompareSelect {background:#fff;c
 @media(prefers-reduced-motion:reduce) {
   #statisticsCard *,#batchCard .batch-compare-panel * {scroll-behavior:auto !important;transition:none !important;animation:none !important}
 }
+
+
+/* Pass 64 — culture records, biological operations and instrument capture */
+body[data-domain] #cultureCatalogList,
+body[data-domain] #plantCultureList {align-items:stretch;gap:12px}
+body[data-domain] #cultureCatalogList .culture-catalog-row,
+body[data-domain] #plantCultureList .culture-catalog-row {
+  min-width:0; padding:clamp(13px,1.8vw,17px); border:1px solid var(--border);
+  border-radius:13px; background:var(--surface-2); box-shadow:0 3px 12px rgba(0,0,0,.07);
+}
+body[data-domain] #cultureCatalogList .culture-catalog-row:hover,
+body[data-domain] #plantCultureList .culture-catalog-row:hover {
+  border-color:var(--workspace-accent,var(--border-strong));
+  box-shadow:0 8px 22px rgba(0,0,0,.12); transform:translateY(-1px);
+}
+body[data-domain] .culture-catalog-code {color:var(--text);font-size:.82rem;letter-spacing:.005em}
+body[data-domain] .culture-catalog-meta {gap:7px 9px;color:var(--muted);font-size:.65rem;line-height:1.45}
+body[data-domain] .culture-catalog-meta span:first-child {
+  padding:4px 8px; border:1px solid var(--border); border-radius:6px;
+  background:color-mix(in srgb,var(--workspace-accent,var(--brand)) 12%,var(--surface));
+  color:var(--text); font-weight:750;
+}
+body[data-domain] .culture-catalog-actions {gap:8px}
+body[data-domain] .culture-catalog-action {
+  min-height:39px; border:1px solid var(--border-strong); border-radius:8px;
+  background:var(--surface); color:var(--text); font-size:.66rem; font-weight:750;
+}
+body[data-domain] .culture-catalog-action[data-culture-action="observe"] {
+  border-color:var(--workspace-accent,var(--brand));
+  background:var(--workspace-accent,var(--brand)); color:#fff;
+}
+body[data-domain] .culture-catalog-action[data-culture-action="measure"] {
+  border-color:var(--border-strong);
+  background:color-mix(in srgb,var(--workspace-accent,var(--brand)) 11%,var(--surface));
+  color:var(--text);
+}
+body[data-domain] #cultureDetailPanel {
+  min-width:0; margin-top:18px; padding:clamp(14px,2.2vw,22px);
+  border:1px solid var(--border-strong); border-radius:15px;
+  background:var(--surface-2); color:var(--text);
+  box-shadow:0 12px 32px rgba(0,0,0,.12);
+}
+body[data-domain] #cultureDetailPanel .culture-detail-heading {
+  align-items:flex-start; padding-bottom:14px; border-bottom:1px solid var(--border); gap:12px;
+}
+body[data-domain] #cultureDetailPanel .culture-detail-heading h3 {
+  color:var(--text); font-size:clamp(1.05rem,2vw,1.35rem); letter-spacing:-.025em;
+}
+body[data-domain] #cultureDetailPanel .culture-detail-heading .muted {font-size:.67rem;line-height:1.5}
+body[data-domain] #cultureDetailPanel .culture-detail-summary {
+  display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:9px; margin:14px 0;
+}
+body[data-domain] #cultureDetailPanel .culture-detail-summary > * {
+  min-width:0; padding:11px 12px; border:1px solid var(--border); border-radius:10px;
+  background:var(--surface); color:var(--text); overflow-wrap:anywhere;
+}
+body[data-domain] #cultureDetailPanel .bio-operation-panel,
+body[data-domain] #cultureDetailPanel .bio-lineage-panel {
+  min-width:0; margin-top:14px; padding:clamp(12px,1.8vw,17px);
+  border:1px solid var(--border); border-radius:12px;
+  background:var(--surface); color:var(--text);
+}
+body[data-domain] #cultureDetailPanel :is(.bio-operation-panel h4,.bio-lineage-panel h4) {
+  color:var(--text); font-size:.83rem; letter-spacing:-.01em;
+}
+body[data-domain] #cultureDetailPanel .bio-operation-panel > .muted {
+  max-width:80ch; font-size:.66rem; line-height:1.6;
+}
+body[data-domain] #cultureDetailPanel .bio-operation-form {gap:11px}
+body[data-domain] #cultureDetailPanel .bio-operation-form label {
+  color:var(--text); font-size:.66rem; font-weight:750;
+}
+body[data-domain] #cultureDetailPanel .bio-operation-form :is(input,select,textarea),
+body[data-domain] #plantCultureForm :is(input,select,textarea) {
+  box-sizing:border-box; width:100%; min-width:0; min-height:41px;
+  padding:.62rem .72rem; border:1px solid var(--border-strong);
+  border-radius:8px; background:var(--surface); color:var(--text);
+  font:inherit; font-size:.7rem;
+}
+body[data-domain] #cultureDetailPanel .bio-operation-form textarea,
+body[data-domain] #plantCultureForm textarea {min-height:86px;resize:vertical}
+body[data-domain] #cultureDetailPanel .bio-operation-form :is(input,select,textarea):focus-visible,
+body[data-domain] #plantCultureForm :is(input,select,textarea):focus-visible,
+body[data-domain] #measurementCard :is(input,select,textarea):focus-visible {
+  outline:2px solid var(--workspace-accent,var(--brand)); outline-offset:2px;
+}
+body[data-domain] #cultureDetailPanel .bio-operation-form button,
+body[data-domain] #plantCultureForm button {
+  min-height:42px; border-radius:9px; font-size:.69rem; font-weight:800;
+}
+body[data-domain] #cultureDetailPanel .culture-lineage-node {
+  border-color:var(--border); border-radius:9px; background:var(--surface-2); color:var(--text);
+}
+body[data-domain] #cultureDetailPanel .culture-timeline-entry {
+  border-left-color:var(--workspace-accent,var(--brand)); border-radius:0 9px 9px 0;
+  background:var(--surface); color:var(--text);
+}
+body[data-domain] #cultureDetailPanel .culture-timeline-entry strong {color:var(--text)}
+body[data-domain] #cultureDetailPanel .culture-timeline-entry p {color:var(--muted)}
+body[data-domain] #measurementCard .quick-capture {
+  margin:16px 0 20px; padding:clamp(13px,2vw,18px);
+  border:1px solid var(--border-strong); border-radius:14px;
+  background:linear-gradient(140deg,color-mix(in srgb,var(--workspace-accent,var(--brand)) 12%,transparent),transparent 68%),var(--surface-2);
+}
+body[data-domain] #measurementCard .quick-capture-heading h3 {color:var(--text);font-size:.95rem}
+body[data-domain] #measurementCard .quick-capture-heading p,
+body[data-domain] #measurementCard .quick-capture-tip {color:var(--muted);font-size:.66rem;line-height:1.55}
+body[data-domain] #measurementCard .quick-capture-spark,
+body[data-domain] #measurementCard .quick-capture-icon {
+  border:1px solid var(--border); background:var(--surface); color:var(--workspace-accent,var(--brand));
+}
+body[data-domain] #measurementCard .quick-capture-tile {
+  min-height:68px; border:1px solid var(--border); border-radius:10px;
+  background:var(--surface); color:var(--text); box-shadow:none;
+}
+body[data-domain] #measurementCard .quick-capture-tile:hover {
+  border-color:var(--workspace-accent,var(--brand));
+  background:color-mix(in srgb,var(--workspace-accent,var(--brand)) 7%,var(--surface));
+  color:var(--text); transform:translateY(-1px);
+}
+body[data-domain] #measurementCard .quick-capture-tile strong {color:var(--text);font-size:.7rem}
+body[data-domain] #measurementCard .quick-capture-tile small {color:var(--muted);font-size:.61rem}
+body[data-domain] #measurementCard .quick-capture-arrow {color:var(--workspace-accent,var(--brand))}
+body[data-domain] #measurementCard > .grid {gap:12px;margin-block:12px}
+body[data-domain] #measurementCard > label {display:block;margin:.85rem 0 .35rem;color:var(--text);font-size:.68rem;font-weight:750}
+body[data-domain] #measurementCard :is(input,select,textarea) {
+  box-sizing:border-box; width:100%; min-width:0; min-height:42px;
+  border:1px solid var(--border-strong); border-radius:8px;
+  background:var(--surface); color:var(--text); font:inherit; font-size:.7rem;
+}
+body[data-domain] #measurementCard textarea {min-height:82px;padding:.7rem;resize:vertical}
+body[data-domain] #measurementCard #saveMeasurementButton {
+  min-height:43px; margin-top:14px; padding:.7rem 1.1rem; border-radius:9px;
+  font-size:.7rem; font-weight:800;
+}
+body[data-domain] #measurementCard .measurement-entry {
+  padding:13px; border:1px solid var(--border); border-radius:10px;
+  background:var(--surface-2); color:var(--text);
+}
+body[data-domain] #measurementCard .measurement-entry strong,
+body[data-domain] #measurementCard .measurement-entry .measurement-value {color:var(--text)}
+body[data-domain] #measurementCard .measurement-entry .measurement-meta,
+body[data-domain] #measurementCard .measurement-entry .measurement-stamp {color:var(--muted)}
+body[data-domain="mycology"] #cultureDetailPanel,
+body[data-domain="mycology"] #cultureDetailPanel .bio-operation-panel,
+body[data-domain="mycology"] #cultureDetailPanel .bio-lineage-panel,
+body[data-domain="mycology"] #measurementCard .quick-capture {
+  border-color:#59402f; background-color:#211811; color:#f0e3d7;
+}
+body[data-domain="mycology"] #cultureDetailPanel :is(.culture-detail-heading h3,.bio-operation-panel h4,.bio-lineage-panel h4),
+body[data-domain="mycology"] #cultureDetailPanel .bio-operation-form label,
+body[data-domain="mycology"] #measurementCard .quick-capture-heading h3 {color:#f0e3d7}
+body[data-domain="mycology"] #cultureDetailPanel :is(input,select,textarea),
+body[data-domain="mycology"] #plantCultureForm :is(input,select,textarea),
+body[data-domain="mycology"] #measurementCard :is(input,select,textarea) {background:#17110d;color:#f0e3d7;border-color:#76533d}
+body[data-domain="mycology"] #cultureDetailPanel .culture-detail-summary > *,
+body[data-domain="mycology"] #cultureDetailPanel .culture-lineage-node,
+body[data-domain="mycology"] #cultureDetailPanel .culture-timeline-entry,
+body[data-domain="mycology"] #measurementCard .quick-capture-tile,
+body[data-domain="mycology"] #measurementCard .measurement-entry {background:#19120d;color:#f0e3d7;border-color:#493426}
+body[data-domain="mycology"] #measurementCard .quick-capture-tile :is(strong,small) {color:#f0e3d7}
+body[data-domain="laboratory"] #cultureDetailPanel,
+body[data-domain="laboratory"] #cultureDetailPanel .bio-operation-panel,
+body[data-domain="laboratory"] #cultureDetailPanel .bio-lineage-panel,
+body[data-domain="laboratory"] #measurementCard .quick-capture {background:#f4f8fc;border-color:#c7d6e4;color:#183a59}
+body[data-domain="laboratory"] #cultureDetailPanel :is(input,select,textarea),
+body[data-domain="laboratory"] #measurementCard :is(input,select,textarea) {background:#fff;color:#183a59;border-color:#9eb5c9}
+body[data-domain="laboratory"] #measurementCard .quick-capture-tile,
+body[data-domain="laboratory"] #measurementCard .measurement-entry {background:#fff;color:#183a59;border-color:#c7d6e4}
+body[data-domain="agronomy"] #cultureDetailPanel,
+body[data-domain="agronomy"] #cultureDetailPanel .bio-operation-panel,
+body[data-domain="agronomy"] #cultureDetailPanel .bio-lineage-panel,
+body[data-domain="agronomy"] #measurementCard .quick-capture {background:#1b2520;border-color:#3b5142;color:#e8eee7}
+body[data-domain="agronomy"] #cultureDetailPanel :is(input,select,textarea),
+body[data-domain="agronomy"] #measurementCard :is(input,select,textarea) {background:#141d18;color:#e8eee7;border-color:#40594a}
+@media(max-width:720px) {
+  body[data-domain] #cultureDetailPanel .culture-detail-summary {grid-template-columns:repeat(2,minmax(0,1fr))}
+  body[data-domain] #cultureDetailPanel .culture-detail-heading {flex-direction:column}
+  body[data-domain] #cultureDetailPanel .culture-detail-heading button {width:100%}
+  body[data-domain] #measurementCard .quick-capture-grid {grid-template-columns:minmax(0,1fr)}
+}
+@media(max-width:480px) {
+  body[data-domain] #cultureDetailPanel .culture-detail-summary {grid-template-columns:minmax(0,1fr)}
+  body[data-domain] #cultureCatalogList,
+  body[data-domain] #plantCultureList {grid-template-columns:minmax(0,1fr)}
+  body[data-domain] #cultureCatalogList .culture-catalog-actions {grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(prefers-reduced-motion:reduce) {
+  body[data-domain] #cultureCatalogList .culture-catalog-row,
+  body[data-domain] #measurementCard .quick-capture-tile {transition:none !important}
+}
