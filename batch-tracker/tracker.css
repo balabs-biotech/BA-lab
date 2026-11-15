@@ -9651,3 +9651,37 @@ body[data-domain] .statistics-table tbody tr:hover td {
 @media (prefers-reduced-motion: reduce) {
   body[data-domain] .culture-catalog-action { transition: none !important; }
 }
+
+
+/* PASS 45 — complete reduced-motion contract for interactive controls */
+@media (prefers-reduced-motion: reduce) {
+  body[data-domain] *,
+  body[data-domain] *::before,
+  body[data-domain] *::after {
+    scroll-behavior: auto !important;
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+  body[data-domain] button:hover:not(:disabled),
+  body[data-domain] .culture-catalog-action:hover {
+    transform: none !important;
+  }
+}
+body[data-domain] .culture-detail-summary {
+  align-items: stretch;
+}
+body[data-domain] .culture-detail-field {
+  min-width: 0;
+}
+body[data-domain] .culture-timeline-date {
+  flex: 0 0 auto;
+  color: var(--workspace-muted) !important;
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+@media (max-width: 600px) {
+  body[data-domain] .culture-timeline-date { white-space: normal; }
+  body[data-domain] .culture-timeline-entry { gap: 7px; }
+}
