@@ -7320,3 +7320,54 @@ body[data-domain].workspace-authenticated .app-hero h1 {
     line-height: 1.4;
   }
 }
+
+
+/* CultureOps UI QA — pass 22: compact header for narrow phones. */
+@media (max-width: 380px) {
+  body[data-domain]:not(.workspace-authenticated) .app-toolbar {
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    gap: 6px 8px;
+    padding: 7px 9px;
+  }
+  body[data-domain]:not(.workspace-authenticated) .toolbar-brand {
+    grid-column: 1;
+    min-width: 0;
+  }
+  body[data-domain]:not(.workspace-authenticated) .language-control {
+    grid-column: 2;
+    justify-self: end;
+    gap: 5px;
+    font-size: 11px;
+  }
+  body[data-domain]:not(.workspace-authenticated) .language-control select {
+    width: auto;
+    min-width: 82px;
+    min-height: 36px;
+    padding: 6px 8px;
+    font-size: 12px;
+  }
+  body[data-domain]:not(.workspace-authenticated) .section-nav[hidden],
+  body[data-domain]:not(.workspace-authenticated) .toolbar-status {
+    display: none !important;
+  }
+  body[data-domain]:not(.workspace-authenticated) .app-hero {
+    margin-block: 2px 6px;
+    padding: 12px 14px;
+  }
+  body[data-domain]:not(.workspace-authenticated) .hero-tags {
+    display: none;
+  }
+  body[data-domain]:not(.workspace-authenticated) .hero-description {
+    margin-top: 5px;
+    font-size: 12px;
+    line-height: 1.35;
+  }
+  body[data-domain]:not(.workspace-authenticated) #authCard > .section-kicker {
+    margin-bottom: 3px;
+  }
+  body[data-domain]:not(.workspace-authenticated) #authCard > .muted {
+    font-size: 11px;
+    line-height: 1.35;
+  }
+}
