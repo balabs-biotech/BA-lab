@@ -836,9 +836,8 @@ for (const component of [".batch-item", ".stage", ".qc-row", ".batch-stat", ".cu
   assert.match(recordCardCss, new RegExp('body\\[data-domain\\] [\\s\\S]*?' + component.replace(".", "\\.")),
     component + " must inherit workspace design tokens");
 }
-assert.match(recordCardCss, /\.batch-item:focus-visible/);
-assert.match(recordCardCss, /\.stage:focus-within/);
-assert.match(recordCardCss, /\.qc-row:focus-within/);
+assert.match(recordCardCss, /body\\[data-domain\\] :is\\(\\.batch-item, \\.stage, \\.qc-row\\):focus-within,[\\s\\S]*?body\\[data-domain\\] \\.batch-item:focus-visible/,
+  "operational records must expose keyboard focus across nested controls and batch cards");
 console.log("✓ Operational record cards: domain surfaces and keyboard/focus inspection");
 
 
