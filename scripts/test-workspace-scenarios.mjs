@@ -931,3 +931,6 @@ assert.match(collectionJs, /batchList\.innerHTML = [\s\S]*?feedback-empty/,
 assert.match(collectionJs, /list\.className = "feedback-error"/,
   "GreenTech retrieval failure must be exposed as an error state");
 console.log("✓ Collection states: loading, unauthenticated, empty and retrieval error");
+
+assert.match(collectionJs, /list\.className = "culture-catalog-list";[\s\S]*?list\.removeAttribute\("role"\)/,
+  "successful GreenTech reload must clear the previous retrieval-error surface");
