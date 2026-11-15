@@ -2877,6 +2877,7 @@ async function loadBatch(
   hideElement(batchStages);
   hideElement(batchQc);
   hideElement(batchEvents);
+  renderCollectionFeedback(batchEventList, "loading", "Chargement de la chronologie du lot…");
 
   clearMessage();
 
@@ -3084,6 +3085,7 @@ async function loadBatch(
   } catch (error) {
     if (requestId !== batchDetailRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
     console.error("Chargement du lot :", error);
+    renderCollectionFeedback(batchEventList, "error", "Chronologie indisponible : " + (error?.message || "erreur réseau inconnue"));
     showMessage(
       `Chargement du lot impossible : ${error?.message || "erreur réseau inconnue"}`,
       "error"
