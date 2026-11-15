@@ -11711,3 +11711,106 @@ body[data-domain] #measurementCard .measurement-stamp {
 @media(prefers-reduced-motion:reduce) {
   body[data-domain] #batchStageList .stage { transition:none!important; }
 }
+
+
+/* Pass 56 — production creation, harvest, movement and operational feedback */
+#batchCard .batch-create-panel {
+  position: relative;
+  isolation: isolate;
+  margin: 1.35rem 0 1.7rem;
+  padding: clamp(1rem, 2.2vw, 1.55rem);
+  overflow: hidden;
+  border: 1px solid var(--line, rgba(255,255,255,.12));
+  border-radius: 18px;
+  background:
+    radial-gradient(ellipse at 100% 0%, color-mix(in srgb, var(--accent, #83a98a) 10%, transparent), transparent 48%),
+    linear-gradient(145deg, rgba(255,255,255,.045), rgba(255,255,255,.012)),
+    var(--surface, #151a18);
+  box-shadow: 0 18px 42px rgba(0,0,0,.16), inset 0 1px rgba(255,255,255,.035);
+}
+#batchCard .batch-create-heading {
+  display:flex; align-items:flex-start; justify-content:space-between; gap:1rem;
+  margin-bottom:1.25rem;
+}
+#batchCard .batch-create-heading h3 { margin:.35rem 0 .35rem; letter-spacing:-.025em; }
+#batchCard .batch-create-heading .muted { max-width:62ch; margin:0; line-height:1.55; }
+#batchCard .batch-required-note {
+  flex:0 0 auto; padding:.42rem .65rem; border:1px solid var(--line,rgba(255,255,255,.12));
+  border-radius:999px; color:var(--muted,#9aa49d); font-size:.72rem; white-space:nowrap;
+}
+#batchCard .batch-required-note span { color:var(--accent,#8ab49a); font-weight:800; }
+#batchCard .batch-create-panel .grid { gap:1rem; margin:.9rem 0; }
+#batchCard .batch-create-panel label,
+#batchCard .batch-harvest-entry label { display:block; margin-bottom:.42rem; font-size:.78rem; font-weight:650; letter-spacing:.015em; }
+#batchCard .batch-create-panel .hint { display:block; margin-top:.42rem; color:var(--muted,#9aa49d); line-height:1.45; font-size:.7rem; }
+#batchCard .batch-create-panel input,
+#batchCard .batch-create-panel select,
+#batchCard .batch-harvest-entry input,
+#batchCard .batch-harvest-entry select,
+#batchCard .batch-harvest-entry textarea {
+  width:100%; min-width:0; border-radius:10px; border:1px solid var(--line,rgba(255,255,255,.15));
+  background:rgba(5,10,8,.32); transition:border-color .18s ease, box-shadow .18s ease, background .18s ease;
+}
+#batchCard .batch-create-panel input:focus-visible,
+#batchCard .batch-create-panel select:focus-visible,
+#batchCard .batch-harvest-entry input:focus-visible,
+#batchCard .batch-harvest-entry select:focus-visible,
+#batchCard .batch-harvest-entry textarea:focus-visible {
+  outline:0; border-color:var(--accent,#8ab49a);
+  box-shadow:0 0 0 3px color-mix(in srgb,var(--accent,#8ab49a) 20%,transparent);
+  background:rgba(5,10,8,.48);
+}
+#batchCard #createBatchButton,
+#batchCard #recordHarvestButton,
+#batchCard #moveBatchButton {
+  min-height:42px; margin-top:.85rem; border-radius:10px; font-weight:700; letter-spacing:.01em;
+}
+#batchCard #batchList { display:grid; gap:.7rem; margin:1rem 0 1.5rem; }
+#batchCard .batch-actions { display:flex; flex-wrap:wrap; gap:.65rem; margin-top:1rem; }
+#batchCard .batch-actions button { min-height:40px; }
+#batchCard #batchEvents {
+  margin-top:1.2rem; padding:clamp(1rem,2vw,1.45rem);
+  border:1px solid var(--line,rgba(255,255,255,.12)); border-radius:16px;
+  background:linear-gradient(145deg,rgba(255,255,255,.035),transparent 68%),var(--surface, #151a18);
+}
+#batchCard .batch-harvest-entry {
+  margin:1rem 0; padding:clamp(.9rem,1.8vw,1.2rem);
+  border:1px solid var(--line,rgba(255,255,255,.12)); border-radius:13px;
+  background:rgba(0,0,0,.12);
+}
+#batchCard .batch-harvest-entry h4 { margin:0 0 .4rem; font-size:.94rem; letter-spacing:-.01em; }
+#batchCard .batch-harvest-entry > .muted { margin:.25rem 0 .9rem; line-height:1.5; font-size:.78rem; }
+#batchCard .batch-harvest-entry .grid { gap:.8rem; margin:.8rem 0; }
+#batchCard .batch-harvest-entry textarea { resize:vertical; min-height:76px; }
+#batchCard #harvestStatus, #batchCard #moveBatchStatus {
+  display:flex; align-items:flex-start; gap:.5rem; margin:.7rem 0 0;
+  padding:.65rem .75rem; border-left:2px solid var(--accent,#8ab49a);
+  border-radius:0 8px 8px 0; background:rgba(255,255,255,.025);
+  line-height:1.5; font-size:.73rem;
+}
+#batchCard button:disabled { cursor:not-allowed; opacity:.48; filter:saturate(.55); transform:none; box-shadow:none; }
+#batchCard .batch-create-panel button:not(:disabled):hover,
+#batchCard .batch-harvest-entry button:not(:disabled):hover { transform:translateY(-1px); }
+#batchCard .batch-create-panel button:focus-visible,
+#batchCard .batch-harvest-entry button:focus-visible,
+#batchCard .batch-actions button:focus-visible { outline:2px solid var(--accent,#8ab49a); outline-offset:3px; }
+#batchCard #batchList:empty::before {
+  content:"Aucun lot à afficher pour le moment."; display:block; padding:1rem;
+  border:1px dashed var(--line,rgba(255,255,255,.16)); border-radius:12px;
+  color:var(--muted,#9aa49d); text-align:center; font-size:.82rem;
+}
+@media (max-width:720px) {
+  #batchCard .batch-create-heading { flex-direction:column; gap:.65rem; }
+  #batchCard .batch-required-note { align-self:flex-start; }
+  #batchCard .batch-create-panel .grid,
+  #batchCard .batch-harvest-entry .grid { grid-template-columns:minmax(0,1fr); }
+  #batchCard .batch-actions { display:grid; grid-template-columns:1fr; }
+  #batchCard .batch-actions button { width:100%; }
+}
+@media (prefers-reduced-motion:reduce) {
+  #batchCard .batch-create-panel *,
+  #batchCard .batch-harvest-entry *,
+  #batchCard .batch-actions * { transition:none !important; animation:none !important; scroll-behavior:auto !important; }
+  #batchCard .batch-create-panel button:hover,
+  #batchCard .batch-harvest-entry button:hover { transform:none !important; }
+}
