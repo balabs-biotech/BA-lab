@@ -840,3 +840,25 @@ assert.match(recordCardCss, /\\.batch-item:focus-visible/);
 assert.match(recordCardCss, /\\.stage:focus-within/);
 assert.match(recordCardCss, /\\.qc-row:focus-within/);
 console.log("✓ Operational record cards: domain surfaces and keyboard/focus inspection");
+
+
+// Complex form and native dialog surfaces must remain coherent across all
+// three scientific workspaces, including keyboard, validation and phone states.
+const workflowCss = fs.readFileSync("batch-tracker/tracker.css", "utf8");
+assert.match(workflowCss, /body\\[data-domain\\] :is\\(\\.info, \\.hint\\)/,
+  "form guidance panels must inherit the active workspace palette");
+assert.match(workflowCss, /body\\[data-domain\\] \\.consent-panel/,
+  "consent and confirmation panels must use workspace surfaces");
+assert.match(workflowCss, /body\\[data-domain\\] :is\\(\\.auth-actions, \\.sync-line, \\.assisted-entry-actions\\)/,
+  "multi-action form rows must share consistent alignment and spacing");
+assert.match(workflowCss, /button\\[aria-busy="true"\\]/,
+  "busy actions must expose a visible non-interactive state");
+assert.match(workflowCss, /dialog\\.workspace-dialog/,
+  "native workflow dialogs must have a reusable themed surface");
+assert.match(workflowCss, /dialog\\.workspace-dialog::backdrop/,
+  "modal backdrops must separate confirmation flows from the workspace");
+assert.match(workflowCss, /dialog\\.workspace-dialog \\.dialog-actions/,
+  "dialog actions must preserve primary and secondary action hierarchy");
+assert.match(workflowCss, /@media \\(max-width: 600px\\)[\\s\\S]*?dialog\\.workspace-dialog/,
+  "workflow dialogs must fit narrow mobile viewports");
+console.log("✓ Complex forms and dialog surfaces: guidance, consent, action states and mobile layout");
