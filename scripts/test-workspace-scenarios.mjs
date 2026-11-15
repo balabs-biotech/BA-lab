@@ -778,3 +778,15 @@ for (const [domain, labels] of Object.entries({
 assert.match(domainSetupSource, /navCultureLabel\.textContent\s*=\s*config\.navigation\.cultures/);
 assert.match(domainSetupSource, /navMeasurementLabel\.textContent\s*=\s*config\.navigation\.measurements/);
 console.log("✓ Primary navigation labels follow GreenTech, Mycology and Laboratory terminology");
+
+// Shared navigation chrome must inherit each scientific workspace identity.
+const domainThemeCss = fs.readFileSync("batch-tracker/tracker.css", "utf8");
+for (const domain of ["agronomy", "mycology", "laboratory"]) {
+  assert.match(domainThemeCss, new RegExp('body\\[data-domain="' + domain + '"\\] \\.app-toolbar'),
+    domain + " toolbar must use its workspace palette");
+  assert.match(domainThemeCss, new RegExp('body\\[data-domain="' + domain + '"\\] \\.section-nav a:hover'),
+    domain + " navigation hover state must use its workspace palette");
+  assert.match(domainThemeCss, new RegExp('body\\[data-domain="' + domain + '"\\] \\.brand-symbol'),
+    domain + " brand mark must harmonize with its workspace palette");
+}
+console.log("✓ Shared navigation chrome follows all three workspace visual identities");
