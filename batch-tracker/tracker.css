@@ -14074,3 +14074,236 @@ body[data-domain] :is(#cultureCatalogCount,#plantCultureCount) {
 @media(prefers-reduced-motion:reduce) {
   body[data-domain] :is(#trackerCard,#plantCard,#batchCard,#measurementCard,#statisticsCard) :is(input,select,textarea) {transition:none}
 }
+
+
+/* ============================================================
+   BA LABS DESIGN SYSTEM — PUBLIC IDENTITY ADAPTATION / PASS 71
+   Translate the public site's clear editorial hierarchy and
+   three-part colour language into a dense scientific workspace.
+   ============================================================ */
+body[data-domain] {
+  --ui-accent: #39734d;
+  --ui-accent-strong: #285b3a;
+  --ui-accent-soft: #eaf2e8;
+  --ui-accent-line: #cbdcc8;
+  --ui-ink: #18241c;
+  --ui-muted: #637066;
+  --ui-paper: #f4f6f2;
+  --ui-panel: #ffffff;
+  --ui-panel-soft: #f8faf7;
+  --ui-line: #dfe6de;
+  --ui-shadow: 0 8px 24px rgba(22, 39, 27, .055);
+  color: var(--ui-ink);
+}
+body[data-domain="agronomy"] {
+  --ui-accent: #39734d;
+  --ui-accent-strong: #285b3a;
+  --ui-accent-soft: #eaf2e8;
+  --ui-accent-line: #cbdcc8;
+}
+body[data-domain="mycology"] {
+  --ui-accent: #b7774e;
+  --ui-accent-strong: #8e5737;
+  --ui-accent-soft: #f5ece5;
+  --ui-accent-line: #e5cbbb;
+}
+body[data-domain="laboratory"] {
+  --ui-accent: #477da8;
+  --ui-accent-strong: #315f86;
+  --ui-accent-soft: #eaf1f7;
+  --ui-accent-line: #c9d9e7;
+}
+body[data-domain] .app-toolbar {
+  border: 1px solid var(--ui-line);
+  border-radius: 15px;
+  background: rgba(255,255,255,.94);
+  box-shadow: 0 4px 16px rgba(22,39,27,.045);
+  backdrop-filter: blur(12px);
+}
+body[data-domain] .toolbar-brand { color: var(--ui-ink); }
+body[data-domain] .brand-symbol {
+  color: var(--ui-accent);
+  background: var(--ui-accent-soft);
+  border: 1px solid var(--ui-accent-line);
+}
+body[data-domain] .brand-wordmark strong { color: var(--ui-ink); letter-spacing: .11em; }
+body[data-domain] .brand-wordmark small,
+body[data-domain] .toolbar-status { color: var(--ui-muted); }
+body[data-domain] .status-pulse { background: var(--ui-accent); box-shadow: 0 0 0 4px var(--ui-accent-soft); }
+body[data-domain] .section-nav a {
+  border: 1px solid transparent;
+  border-radius: 9px;
+  color: #455248;
+  transition: background .16s ease, border-color .16s ease, color .16s ease;
+}
+body[data-domain] .section-nav a:hover,
+body[data-domain] .section-nav a[aria-current="page"] {
+  border-color: var(--ui-accent-line);
+  background: var(--ui-accent-soft);
+  color: var(--ui-accent-strong);
+}
+body[data-domain] .nav-number { color: var(--ui-accent); }
+body[data-domain] .universe-home-link {
+  color: var(--ui-accent-strong);
+  text-decoration-color: var(--ui-accent-line);
+}
+body[data-domain] .app-hero {
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 20px;
+  background:
+    radial-gradient(circle at 86% 18%, color-mix(in srgb,var(--ui-accent) 30%,transparent), transparent 18rem),
+    linear-gradient(125deg,#17211b 0%,#202b24 62%,#26342b 100%);
+  box-shadow: 0 14px 34px rgba(18,31,22,.13);
+}
+body[data-domain] .eyebrow { color: #d4dfd5; }
+body[data-domain] .eyebrow-dot { background: var(--ui-accent); box-shadow: 0 0 0 4px color-mix(in srgb,var(--ui-accent) 18%,transparent); }
+body[data-domain] .hero-copy h1 { color: #fbfcf9; letter-spacing: -.045em; }
+body[data-domain] .hero-copy h1 span { color: color-mix(in srgb,var(--ui-accent) 88%,#fff); }
+body[data-domain] .hero-description { color: #d0d9d1; max-width: 58ch; }
+body[data-domain] .hero-tags span {
+  border: 1px solid rgba(255,255,255,.14);
+  border-radius: 8px;
+  background: rgba(255,255,255,.055);
+  color: #e7eee8;
+}
+body[data-domain] .hero-core {
+  color: var(--ui-accent);
+  border-color: color-mix(in srgb,var(--ui-accent) 50%,transparent);
+  background: color-mix(in srgb,var(--ui-accent) 12%,#1d2921);
+}
+body[data-domain] .hero-note { color: #e7eee8; }
+body[data-domain] .hero-note small { color: #b7c4b9; }
+body[data-domain] .card {
+  border: 1px solid var(--ui-line);
+  border-radius: 16px;
+  background: var(--ui-panel);
+  box-shadow: var(--ui-shadow);
+}
+body[data-domain] .card h2 { color: var(--ui-ink); }
+body[data-domain] .card h2::before {
+  background: linear-gradient(180deg,var(--ui-accent),var(--ui-accent-strong));
+}
+body[data-domain] .section-kicker > span:first-child,
+body[data-domain] .entry-step-mark,
+body[data-domain] .section-kicker-label { color: var(--ui-accent-strong); }
+body[data-domain] .kicker-line { background: var(--ui-accent-line); }
+body[data-domain] .card h3 { color: #2c3b30; border-color: var(--ui-line); }
+body[data-domain] .card .muted,
+body[data-domain] .card .hint { color: var(--ui-muted); }
+body[data-domain] .card label { color: #334238; }
+body[data-domain] .card input:not([type=checkbox]):not([type=radio]),
+body[data-domain] .card select,
+body[data-domain] .card textarea {
+  border-color: #cbd5cc !important;
+  border-radius: 10px;
+  background: #fff !important;
+}
+body[data-domain] .card input:focus,
+body[data-domain] .card select:focus,
+body[data-domain] .card textarea:focus {
+  border-color: var(--ui-accent) !important;
+  box-shadow: 0 0 0 3px color-mix(in srgb,var(--ui-accent) 15%,transparent);
+}
+body[data-domain] .card button:not(.secondary-button):not(.overview-shortcut):not(.culture-catalog-action) {
+  background: var(--ui-accent-strong);
+  box-shadow: 0 3px 9px color-mix(in srgb,var(--ui-accent) 17%,transparent);
+}
+body[data-domain] .card button:not(:disabled):not(.secondary-button):hover {
+  background: var(--ui-accent);
+}
+body[data-domain] .card .secondary-button {
+  border: 1px solid var(--ui-accent-line);
+  background: var(--ui-accent-soft);
+  color: var(--ui-accent-strong);
+  box-shadow: none;
+}
+body[data-domain] .card .secondary-button:hover:not(:disabled) {
+  background: color-mix(in srgb,var(--ui-accent-soft) 72%,#fff);
+  color: var(--ui-accent-strong);
+}
+body[data-domain] .info,
+body[data-domain] .overview-shortcuts,
+body[data-domain] .statistics-filters {
+  border-color: var(--ui-line);
+  background: var(--ui-panel-soft);
+}
+body[data-domain] .overview-metric,
+body[data-domain] .statistics-summary-item,
+body[data-domain] .culture-detail-field {
+  border-color: var(--ui-line);
+  background: var(--ui-panel-soft);
+}
+body[data-domain] .overview-metric strong,
+body[data-domain] .statistics-summary-item strong,
+body[data-domain] .culture-catalog-code { color: var(--ui-accent-strong); }
+body[data-domain] .overview-meter span,
+body[data-domain] .progress-bar { background: var(--ui-accent); }
+body[data-domain] .overview-live,
+body[data-domain] .culture-catalog-count,
+body[data-domain] .shortcut-index {
+  border-color: var(--ui-accent-line);
+  background: var(--ui-accent-soft);
+  color: var(--ui-accent-strong);
+}
+body[data-domain] .overview-live span { background: var(--ui-accent); }
+body[data-domain] .overview-shortcut {
+  border-color: var(--ui-line);
+  background: #fff;
+  color: var(--ui-ink);
+}
+body[data-domain] .overview-shortcut:hover:not(:disabled) {
+  border-color: var(--ui-accent-line);
+  background: var(--ui-accent-soft);
+}
+body[data-domain] .culture-catalog,
+body[data-domain] .sync-line { border-color: var(--ui-line); }
+body[data-domain] .culture-catalog-row,
+body[data-domain] .culture-detail,
+body[data-domain] .culture-detail-field,
+body[data-domain] .culture-timeline-entry,
+body[data-domain] .measurement-entry,
+body[data-domain] .batch-item,
+body[data-domain] .stage,
+body[data-domain] .qc-row {
+  border-color: var(--ui-line);
+  background: var(--ui-panel-soft);
+}
+body[data-domain] .culture-catalog-row:hover {
+  border-color: var(--ui-accent-line);
+  box-shadow: 0 7px 18px color-mix(in srgb,var(--ui-accent) 10%,transparent);
+}
+body[data-domain] .culture-catalog-meta span:first-child {
+  background: var(--ui-accent-soft);
+  color: var(--ui-accent-strong);
+}
+body[data-domain] .culture-catalog-action[data-culture-action=observe] {
+  border-color: var(--ui-accent-strong);
+  background: var(--ui-accent-strong);
+}
+body[data-domain] .culture-catalog-action[data-culture-action=measure] {
+  border-color: var(--ui-accent-line);
+  background: var(--ui-accent-soft);
+  color: var(--ui-accent-strong);
+}
+body[data-domain] .culture-catalog-action[data-culture-action=history] {
+  border-color: var(--ui-line);
+  background: transparent;
+  color: var(--ui-accent-strong);
+}
+body[data-domain] .stage.active {
+  border-color: var(--ui-accent-line);
+  background: var(--ui-accent-soft);
+  box-shadow: inset 3px 0 var(--ui-accent);
+}
+body[data-domain] .section-nav a:focus-visible,
+body[data-domain] .universe-home-link:focus-visible {
+  outline-color: var(--ui-accent);
+}
+@media (max-width: 820px) {
+  body[data-domain] .app-toolbar { border-radius: 12px; }
+  body[data-domain] .app-hero { border-radius: 16px; }
+  body[data-domain] .card { border-radius: 13px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  body[data-domain] .section-nav a { transition: none; }
+}
