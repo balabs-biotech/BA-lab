@@ -35,9 +35,8 @@ begin
 
   return new;
 end
-$$;
-
-drop trigger if exists cultures_protect_notion_cols on public.cultures;
+$$
+drop trigger if exists cultures_protect_notion_cols on public.cultures
 create trigger cultures_protect_notion_cols
   before insert or update on public.cultures
-  for each row execute function private.protect_cultures_notion_cols();
+  for each row execute function private.protect_cultures_notion_cols()
