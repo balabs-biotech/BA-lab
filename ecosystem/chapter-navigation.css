@@ -83,3 +83,10 @@ body{overscroll-behavior:none}
 @media(prefers-reduced-motion:reduce){
  .experience-page .rb-image-armed,.experience-page .rb-image-armed.rb-image-revealed{clip-path:none;transform:none;transition:none;will-change:auto}
 }
+
+/* Vercel-style scroll focus, restrained for BA Labs editorial headings */
+.experience-page .rb-heading-armed{opacity:.22;filter:blur(5px);transform:translateY(12px);transition:opacity .7s ease,filter .7s ease,transform .7s cubic-bezier(.2,.72,.18,1)}
+.experience-page .rb-heading-armed.rb-heading-visible{opacity:1;filter:blur(0);transform:translateY(0)}
+@media(prefers-reduced-motion:reduce){
+ .experience-page .rb-heading-armed,.experience-page .rb-heading-armed.rb-heading-visible{opacity:1;filter:none;transform:none;transition:none}
+}
