@@ -100,3 +100,10 @@ body{overscroll-behavior:none}
  .experience-page>.universe-index .universe-index-grid{width:100%;grid-template-columns:minmax(0,1fr)!important}
  .experience-page>.universe-index .universe-index-card{min-width:0;width:100%;box-sizing:border-box}
 }
+
+
+/* Keep the active chapter rail clear: labels appear on hover or keyboard focus only. */
+.chapter-rail-node.is-active .chapter-rail-name{opacity:0;visibility:hidden}
+.chapter-rail-node.is-active:hover .chapter-rail-name,
+.chapter-rail-node.is-active:focus-visible .chapter-rail-name{opacity:1;visibility:visible;transform:translateY(-50%)}
+@media(hover:none){.chapter-rail-node.is-active .chapter-rail-name{display:none}}
