@@ -747,6 +747,22 @@
     ["Sources du contrôle QC", "QC sources", "Fontes do controlo QC", "مصادر مراقبة الجودة"],
     ["Séries examinées par le contrôle QC : ", "Series examined by QC: ", "Séries examinadas pelo QC: ", "السلاسل التي فحصتها مراقبة الجودة: "],
     ["Révision environnementale requise : les signaux QC sont des éléments à examiner, pas des exclusions automatiques.", "Environmental review required: QC signals are evidence to review, not automatic exclusions.", "É necessária revisão ambiental: os sinais QC são evidências a rever, não exclusões automáticas.", "المراجعة البيئية مطلوبة: إشارات مراقبة الجودة أدلة للمراجعة وليست استبعادات تلقائية."],
+    ["Créer une fiche végétale", "Create a plant record", "Criar ficha vegetal", "إنشاء بطاقة نباتية"],
+    ["Espèce, variété et emplacement", "Species, cultivar and location", "Espécie, variedade e localização", "النوع والصنف والموقع"],
+    ["Saisir une mesure", "Record a measurement", "Registar uma medição", "تسجيل قياس"],
+    ["Climat, substrat ou irrigation", "Climate, substrate or irrigation", "Clima, substrato ou irrigação", "المناخ أو الركيزة أو الري"],
+    ["Analyser les cultures", "Analyze crops", "Analisar culturas", "تحليل المحاصيل"],
+    ["Mesures et évolution", "Measurements and growth", "Medições e evolução", "القياسات والنمو"],
+    ["Créer une culture fongique", "Create a fungal culture", "Criar uma cultura fúngica", "إنشاء مزرعة فطرية"],
+    ["Souche, génération et protocole", "Strain, generation and protocol", "Estirpe, geração e protocolo", "السلالة والجيل والبروتوكول"],
+    ["Enregistrer une observation", "Record an observation", "Registar uma observação", "تسجيل ملاحظة"],
+    ["Morphologie, incubation et milieu", "Morphology, incubation and medium", "Morfologia, incubação e meio", "الشكل والحضانة والوسط"],
+    ["Mesures et suivi des souches", "Measurements and strain tracking", "Medições e acompanhamento das estirpes", "القياسات وتتبع السلالات"],
+    ["Créer une culture de laboratoire", "Create a laboratory culture", "Criar uma cultura laboratorial", "إنشاء مزرعة مخبرية"],
+    ["Ressource, milieu et protocole", "Resource, medium and protocol", "Recurso, meio e protocolo", "المورد والوسط والبروتوكول"],
+    ["Consulter les lots", "View batches", "Consultar lotes", "عرض الدفعات"],
+    ["Étapes et contrôle qualité", "Stages and quality control", "Etapas e controlo de qualidade", "المراحل ومراقبة الجودة"],
+    ["Valeur, unité et méthode", "Value, unit and method", "Valor, unidade e método", "القيمة والوحدة والطريقة"],
     ["Évaluation transmise. Consultez l’historique des exécutions.", "Assessment submitted. Check execution history.", "Avaliação enviada. Consulte o histórico de execuções.", "تم إرسال التقييم. راجع سجل التنفيذ."]
   ];
   for (const [fr, en, pt, ar] of supplementalCoverage) {
