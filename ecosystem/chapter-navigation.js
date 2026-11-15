@@ -69,6 +69,7 @@
   next.setAttribute('aria-label',({fr:'Espace suivant',en:'Next space',ar:'المساحة التالية',pt:'Próximo espaço'})[l]);
   controls.setAttribute('aria-label',({fr:'Navigation entre les espaces',en:'Navigate between spaces',ar:'التنقل بين المساحات',pt:'Navegar entre espaços'})[l]);
   rail.setAttribute('aria-label',({fr:'Parcours des chapitres',en:'Chapter navigation',ar:'التنقل بين الفصول',pt:'Navegação por capítulos'})[l]);
+  rail.querySelectorAll('.chapter-rail-node').forEach((b,i)=>{const label=groups[i].label[l]||groups[i].label.fr;b.setAttribute('aria-label',label);const name=b.querySelector('.chapter-rail-name');if(name)name.textContent=label;});
  };
  new MutationObserver(localize).observe(document.documentElement,{attributes:true,attributeFilter:['lang']});
  localize();update();
