@@ -9296,3 +9296,72 @@ body[data-domain] .overview-footnote {
   body[data-domain] .assisted-entry-panel,
   body[data-domain] #message .info { animation: none !important; transition: none !important; }
 }
+
+
+/* PASS 43 — align feedback selectors with showMessage() DOM contract.
+   tracker.js creates #message > .card.{success|warning|error}, not .info. */
+body[data-domain] #message > .card {
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+  margin: 0 0 14px;
+  padding: 13px 15px;
+  border: 1px solid var(--workspace-border);
+  border-radius: 11px;
+  background: var(--workspace-panel-raised);
+  color: var(--workspace-text);
+  box-shadow: 0 8px 22px rgba(0,0,0,.14);
+  font-size: 12px;
+  line-height: 1.6;
+}
+body[data-domain] #message > .card::before {
+  content: "";
+  flex: 0 0 7px;
+  width: 7px;
+  height: 7px;
+  margin-top: 5px;
+  border-radius: 50%;
+  background: currentColor;
+  box-shadow: 0 0 0 4px color-mix(in srgb, currentColor 13%, transparent);
+}
+body[data-domain] #message > .card.success {
+  border-color: color-mix(in srgb, #72c58b 44%, var(--workspace-border));
+  background: color-mix(in srgb, #245d3a 20%, var(--workspace-panel));
+  color: #b6dfbd;
+}
+body[data-domain] #message > .card.warning {
+  border-color: color-mix(in srgb, #d9ad64 48%, var(--workspace-border));
+  background: color-mix(in srgb, #77521f 20%, var(--workspace-panel));
+  color: #e9c98e;
+}
+body[data-domain] #message > .card.error {
+  border-color: color-mix(in srgb, #d97870 48%, var(--workspace-border));
+  background: color-mix(in srgb, #702f2d 22%, var(--workspace-panel));
+  color: #f0aaa2;
+}
+body[data-domain] #authStatus.info {
+  display: flex;
+  align-items: center;
+  min-height: 42px;
+  padding: 11px 13px;
+  border: 1px solid var(--workspace-border);
+  border-radius: 9px;
+  background: var(--workspace-panel-raised);
+  font-size: 11px;
+}
+body[data-domain] #authStatus.info::before { display: none; }
+body[data-domain] #authStatus[aria-busy="true"]::after {
+  content: "";
+  width: 12px;
+  height: 12px;
+  flex: 0 0 12px;
+  margin-left: auto;
+  border: 2px solid color-mix(in srgb, var(--workspace-accent) 30%, transparent);
+  border-top-color: var(--workspace-accent);
+  border-radius: 50%;
+  animation: ba-auth-spin .8s linear infinite;
+}
+@keyframes ba-auth-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) {
+  body[data-domain] #authStatus[aria-busy="true"]::after { animation: none; }
+}
