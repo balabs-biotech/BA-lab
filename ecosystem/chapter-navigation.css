@@ -1,0 +1,39 @@
+/* BALabs chapter navigation — horizontal exploration, vertical reading */
+html,body{height:100%;overflow:hidden}
+body{overscroll-behavior:none}
+.wrap.balabs-ui{height:100svh;max-height:100svh;display:flex;flex-direction:column;overflow:hidden;padding-bottom:10px}
+.top,.site-nav{flex:0 0 auto}
+.site-nav{position:relative;z-index:40;overflow-x:auto;white-space:nowrap;scrollbar-width:none}
+.site-nav::-webkit-scrollbar{display:none}
+#main-content.experience-main{position:relative;flex:1 1 auto;min-height:0;overflow:hidden;scroll-margin:0}
+.experience-track{display:flex;width:100%;height:100%;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scroll-behavior:smooth;overscroll-behavior-x:contain;scrollbar-width:none;touch-action:pan-x pan-y}
+.experience-track::-webkit-scrollbar{display:none}
+.experience-page{position:relative;flex:0 0 100%;width:100%;height:100%;min-width:0;min-height:0;overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;scroll-snap-align:start;scroll-snap-stop:always;padding:clamp(12px,2vw,24px);scrollbar-width:thin;scrollbar-color:#78958a55 transparent}
+.experience-page>.hero,.experience-page>.editorial-work,.experience-page>.scene,.experience-page>.universe-index,.experience-page>.product-catalogue,.experience-page>section{margin-inline:auto;max-width:1440px}
+.experience-page>.hero{min-height:100%;align-content:center;padding-top:clamp(18px,4vh,56px)}
+.experience-page>.scene{margin-top:0}
+.experience-page>.foot{max-width:1440px;margin:28px auto 0}
+.experience-page-label{display:flex;align-items:center;gap:9px;margin:0 0 14px;color:#9aafa2;font:700 9px/1.2 system-ui,sans-serif;letter-spacing:.18em;text-transform:uppercase}
+.experience-page-label:before{content:"";width:24px;height:1px;background:#b96b4d}
+.experience-controls{position:absolute;z-index:80;inset-inline-end:clamp(12px,2vw,28px);bottom:clamp(12px,2vw,24px);display:flex;align-items:center;gap:8px;padding:7px;border:1px solid #78958a66;border-radius:16px;background:#142321e8;backdrop-filter:blur(14px);box-shadow:0 8px 28px #0005}
+.experience-controls button{display:grid;place-items:center;width:42px;height:42px;border:1px solid #78958a66;border-radius:11px;background:#263b38;color:#f2f2e9;font:600 20px/1 system-ui;cursor:pointer}
+.experience-controls button:disabled{opacity:.3;cursor:default}
+.experience-controls button:focus-visible,.experience-controls button:hover:not(:disabled){outline:2px solid #d1d0c5;outline-offset:2px;background:#385044}
+.experience-count{min-width:42px;text-align:center;color:#d1d0c5;font:700 10px/1.2 system-ui;font-variant-numeric:tabular-nums;letter-spacing:.08em}
+.experience-progress{position:absolute;z-index:70;inset-inline:0;top:0;height:2px;background:#78958a22;pointer-events:none}
+.experience-progress span{display:block;height:100%;width:20%;background:#b96b4d;transition:width .25s ease}
+@media(max-width:760px){
+ .wrap.balabs-ui{padding:10px 10px 6px}
+ .top{padding-bottom:9px}
+ .site-nav{margin-top:7px;gap:7px}
+ .experience-page{padding:12px 9px 72px}
+ .experience-page>.hero{min-height:calc(100% - 12px);grid-template-columns:1fr;gap:18px}
+ .experience-page>.hero .aside{max-width:440px}
+ .experience-controls{inset-inline-end:10px;bottom:10px;padding:5px;gap:5px}
+ .experience-controls button{width:40px;height:40px}
+ .experience-page-label{margin-bottom:10px}
+}
+@media(prefers-reduced-motion:reduce){
+ .experience-track{scroll-behavior:auto}
+ .experience-progress span{transition:none}
+}
