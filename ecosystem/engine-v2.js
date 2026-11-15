@@ -537,7 +537,8 @@ function setupUI() {
   window.addEventListener('resize',resize);
 }
 function onPointerDown(e) {
-  if(e.target.closest('.webgl-controls,.webgl-focus,.webgl-intro,.webgl-hit-target,.webgl-branch-dock'))return;
+  const blocked=e.target.closest('.webgl-controls,.webgl-focus,.webgl-intro,.webgl-branch-dock');
+  if(blocked||(e.pointerType!=='touch'&&e.target.closest('.webgl-hit-target')))return;
   stage?.focus({preventScroll:true});
   pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
   stage.setPointerCapture?.(e.pointerId);
@@ -577,7 +578,7 @@ function onPointerUp(e) {
     return;
   }
   dragging=false;
-  if(!moved&&!transition&&performance.now()-lastPickAt>450&&!e.target.closest('.webgl-controls,.webgl-focus,.webgl-intro'))pickAt(e.clientX,e.clientY);
+  if(!moved&&!transition&&performance.now()-lastPickAt>450&&!e.target.closest('.webgl-controls,.webgl-focus,.webgl-intro,.webgl-hit-target,.webgl-branch-dock'))pickAt(e.clientX,e.clientY);
   lastPointer=null;
 }function onPointerCancel(){pointers.clear();dragging=false;moved=true;pinchStart=0;pinchCenter=null;lastPointer=null}
 function onLostCapture(e){if(pointers.has(e.pointerId)){pointers.delete(e.pointerId);if(!pointers.size){dragging=false;lastPointer=null}}}
