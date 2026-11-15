@@ -253,7 +253,11 @@ Une recommandation cite le signal déclencheur, le contexte, la source, le profi
 
 La revue détaillée des RPC, ACL, leases, retries, idempotence et limites observées est consignée dans `docs/architecture/engine-queue-contract-review.md`. Elle confirme les contrôles d'accès backend et le fencing par lease token. Les tests d'intégration de concurrence, d'expiration et de frontière de retry restent à ajouter avant toute extraction du worker.
 
-## 10. Priorité immédiate
+## 10. Contrat de santé des moteurs
+
+Le registre possède déjà `health_status` et `last_healthcheck_at`, mais les sept moteurs sont encore `unknown` sans probe exécutée. Le contrat de probes (worker, Edge Functions, importeurs planifiés, orchestrateur), les transitions et les règles de fraîcheur sont définis dans `docs/architecture/engine-health-probe-contract.md`. Aucune valeur ne doit passer à `healthy` par simple présence dans le registre.
+
+## 11. Priorité immédiate
 
 La prochaine unité de travail technique est **Phase 1 — fiabilité du moteur d'exécution**, en commençant par :
 1. inventorier les contrats et handlers réellement déployés ;
