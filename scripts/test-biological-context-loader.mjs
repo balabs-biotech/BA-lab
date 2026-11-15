@@ -94,7 +94,8 @@ const ambiguous = await loadAuthenticatedBiologicalContextSnapshot({
   window: { ...window, end: "2026-11-13T00:00:00Z" },
 });
 assert.equal(ambiguous.context_resolution.window.status, "ambiguous");
-assert.equal(ambiguous.input.records.length, 1);
+assert.equal(ambiguous.input.records.length, 2);
+assert.equal(ambiguous.input.records.some((row) => row.record_type === "environmental_observation"), false);
 assert.equal(ambiguousCounts.environmental_observations ?? 0, 0,
   "weather query must not run if the analysis window has no unique historical location");
 
