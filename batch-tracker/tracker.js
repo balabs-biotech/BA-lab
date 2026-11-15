@@ -8125,7 +8125,7 @@ function renderBiologicalContextAssessment(article, result) {
     signalPanel.appendChild(disclaimer);
     article.appendChild(signalPanel);
   }
-  addLine(article, "Couverture : " + String(coverage.source_record_count ?? 0) + " retenus · " + String(coverage.excluded_record_count ?? 0) + " exclus · mesures : " + String(counts.measurement ?? 0) + " · observations biologiques : " + String(counts.observation ?? 0) + " · météo : " + String(counts.environmental_observation ?? 0));
+  addLine(article, "Couverture : " + String(coverage.source_record_count ?? 0) + " retenus · " + String(coverage.excluded_record_count ?? 0) + " exclus · mesures : " + String(counts.measurement ?? 0) + " · observations biologiques : " + String(counts.observation ?? 0) + " · événements : " + String(counts.event ?? 0) + " · météo : " + String(counts.environmental_observation ?? 0));
   const requested = coverage.requested_window;
   if (requested?.start && requested?.end) addLine(article, "Fenêtre demandée : " + requested.start + " → " + requested.end + " · " + String(requested.timezone || "fuseau non précisé"));
   const observed = coverage.observed_window;
