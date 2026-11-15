@@ -61,6 +61,9 @@ function isCurrentWorkspaceRevision(revision, expectedOrganizationId) {
 
 
 function clearAuthenticatedWorkspaceState() {
+
+  const sectionNavigation = document.querySelector(".section-nav");
+  if (sectionNavigation) sectionNavigation.hidden = true;
   // Remove the previous tenant context before an auth transition can yield.
   organizationId = null;
   organization = null;
@@ -1018,6 +1021,7 @@ async function initializeAuthenticatedTracker(
     showElement(measurementCard);
     showElement(document.getElementById("statisticsCard"));
     showElement(document.getElementById("overviewCard"));
+    document.querySelector(".section-nav")?.removeAttribute("hidden");
     updateOverview();
 
 
