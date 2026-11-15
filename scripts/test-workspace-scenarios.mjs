@@ -193,6 +193,65 @@ assert.match(engine, /requestedDomain !== document\.body\.dataset\.domain/);
 console.log("✓ Culture, batch and plant registries paginate and discard stale workspace responses");
 
 
+// Overview shortcuts must point only to modules available in the selected domain.
+function overviewShortcutScenario(domain) {
+  const buttons = Array.from({ length: 3 }, () => {
+    const title = { textContent: "" };
+    const description = { textContent: "" };
+    return {
+      dataset: {},
+      hidden: false,
+      querySelector(selector) {
+        return selector === "strong" ? title : selector === "small" ? description : null;
+      },
+      title,
+      description
+    };
+  });
+  const document = {
+    querySelectorAll(selector) {
+      assert.equal(selector, ".overview-shortcut");
+      return buttons;
+    }
+  };
+  const source = extractFunction(engine, "configureOverviewShortcuts");
+  vm.runInNewContext(
+    `${source}; configureOverviewShortcuts(injected.domain)`,
+    { document, injected: { domain } }
+  );
+  return buttons.map(button => ({
+    target: button.dataset.workspaceTarget,
+    title: button.title.textContent,
+    description: button.description.textContent,
+    hidden: button.hidden
+  }));
+}
+
+const greenTechShortcuts = overviewShortcutScenario("agronomy");
+assert.deepEqual(greenTechShortcuts.map(item => item.target),
+  ["plantCard", "measurementCard", "statisticsCard"]);
+assert.deepEqual(greenTechShortcuts.map(item => item.title),
+  ["Créer une fiche végétale", "Saisir une mesure", "Analyser les cultures"]);
+assert.ok(greenTechShortcuts.every(item => !item.hidden));
+
+const mycologyShortcuts = overviewShortcutScenario("mycology");
+assert.deepEqual(mycologyShortcuts.map(item => item.target),
+  ["trackerCard", "measurementCard", "statisticsCard"]);
+assert.deepEqual(mycologyShortcuts.map(item => item.title),
+  ["Créer une culture fongique", "Enregistrer une observation", "Analyser les cultures"]);
+
+const laboratoryShortcuts = overviewShortcutScenario("laboratory");
+assert.deepEqual(laboratoryShortcuts.map(item => item.target),
+  ["trackerCard", "batchCard", "measurementCard"]);
+assert.deepEqual(laboratoryShortcuts.map(item => item.title),
+  ["Créer une culture de laboratoire", "Consulter les lots", "Saisir une mesure"]);
+
+const fallbackShortcuts = overviewShortcutScenario("unknown");
+assert.deepEqual(fallbackShortcuts.map(item => item.target),
+  ["plantCard", "measurementCard", "statisticsCard"]);
+console.log("✓ Overview shortcuts: each domain targets only its own available modules");
+
+
 // Switching between the three workspaces must refresh tenant-scoped data,
 // not merely replace the hero labels. A superseded switch must not render.
 const setupStart = engine.indexOf("function setupDomainWorkspaces()");
