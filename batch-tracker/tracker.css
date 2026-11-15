@@ -7188,3 +7188,29 @@ body[data-domain="mycology"] .language-control select option {
   color: #35251d;
   background: #fffaf4;
 }
+
+
+/* Desktop grid tracks: use the correct number of columns at each breakpoint. */
+@media (min-width: 821px) and (max-width: 1350px) {
+  body[data-domain] .container {
+    grid-template-areas:
+      "hero hero"
+      "message message"
+      "auth auth"
+      "tracker batch"
+      "measurements measurements"
+      "context context"
+      "result result";
+  }
+}
+@media (min-width: 1351px) {
+  body[data-domain] .container {
+    grid-template-areas:
+      "hero hero hero"
+      "message message message"
+      "auth auth auth"
+      "tracker batch context"
+      "measurements measurements context"
+      "result result result";
+  }
+}
