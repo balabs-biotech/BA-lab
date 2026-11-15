@@ -403,7 +403,9 @@ function renderCollectionFeedback(container, state, text) {
   const supportedStates = new Set(["info", "success", "warning", "error", "loading", "empty"]);
   const semanticState = supportedStates.has(state) ? state : "info";
   const feedback = document.createElement("p");
-  feedback.className = "feedback-" + semanticState;
+  feedback.className = "feedback-state feedback-" + semanticState;
+  if (semanticState === "loading") feedback.setAttribute("data-loading", "true");
+  if (semanticState === "empty") feedback.setAttribute("data-empty", "true");
   feedback.setAttribute("role", semanticState === "error" || semanticState === "warning" ? "alert" : "status");
   feedback.textContent = String(text ?? "");
   container.replaceChildren(feedback);
@@ -6020,7 +6022,14 @@ async function loadBiologicalLineage(cultureId) {
     if (ancestors.length) makeGroup(biologicalWorkflowText("parents"), ancestors.map(row => ({ row, label: biologicalWorkflowText("parentCulture") })));
     makeGroup(biologicalWorkflowText("selected"), [{ row: current, label: biologicalWorkflowText("openSheet") }]);
     if (descendants.length) makeGroup(biologicalWorkflowText("descendants") + ' (' + descendants.length + ')', descendants.map(row => ({ row, label: biologicalWorkflowText("generation") + (row.depth || 1) })));
-    if (!ancestors.length && !descendants.length) renderCollectionFeedback(target, "empty", biologicalWorkflowText("noLineage"));
+    if (!ancestors.length && !descendants.length) {
+      const emptyNotice = document.createElement("p");
+      emptyNotice.className = "feedback-state feedback-empty";
+      emptyNotice.setAttribute("data-empty", "true");
+      emptyNotice.setAttribute("role", "status");
+      emptyNotice.textContent = biologicalWorkflowText("noLineage");
+      target.appendChild(emptyNotice);
+    }
     if (rows.length >= 1000) { const note = document.createElement('p'); note.className = 'muted'; note.textContent = biologicalWorkflowText("partial"); target.appendChild(note); }
   } catch (error) {
     if (!isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
