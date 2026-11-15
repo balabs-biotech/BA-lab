@@ -315,7 +315,7 @@ assert.ok(engine.includes('function resize()'), 'The engine must resize its rend
 assert.ok(engine.includes('cameraPosition();'), 'Camera state must be reapplied after resize instead of resetting zoom');
 assert.ok(engine.includes('function smoothCamera('), 'Domain navigation must use a smooth camera transition');
 assert.ok(engine.includes('function goOverview()'), 'The user must be able to return to the overview');
-assert.ok(engine.includes('function enterDomain(id)'), 'Domain entry must be implemented in the new engine');
+assert.ok(engine.includes('function enterDomain(id,initialResource=null)'), 'Domain entry must be implemented in the new engine');
 assert.ok(engine.includes('The active folder owns all taps while inside a universe'), 'A selected universe must not let adjacent domains steal folder taps');
 assert.ok(engine.includes('nearestLabelDistance<(window.innerWidth<760?58:70)'), 'Folder taps must resolve against the visible labels of the active hierarchy without stealing adjacent branches');
 assert.ok(engine.includes('THREE.MathUtils.clamp(zoomTargetDistance*Math.exp((pinchStart-d)*.006),1.25,60)'), 'Mobile pinch must zoom continuously through the full depth range without forcing hierarchy changes');
