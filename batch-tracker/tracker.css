@@ -10868,3 +10868,273 @@ body[data-domain] :is(button, a, input, select, textarea, summary):focus-visible
     transform: none !important;
   }
 }
+
+
+/* ============================================================
+   PASS 53 — VENGEANCE UI APPLICATION: COMPARISON & ANALYTICS
+   Precise selectors verified against workspace.html and tracker.js.
+   ============================================================ */
+
+/* Batch comparison: selection is a deliberate workflow, not a plain form dump. */
+body[data-domain] .batch-compare-panel {
+  display: grid;
+  gap: 13px;
+  padding: clamp(17px, 2.2vw, 25px);
+  border: 1px solid var(--vui-accent-line, var(--workspace-border));
+  border-radius: 16px;
+  background:
+    radial-gradient(ellipse at 100% 0%, color-mix(in srgb, var(--workspace-accent) 9%, transparent), transparent 48%),
+    linear-gradient(145deg, color-mix(in srgb, var(--workspace-panel-raised) 92%, transparent), var(--workspace-panel));
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.035), 0 15px 34px rgba(0,0,0,.15);
+}
+body[data-domain] .batch-compare-panel > h3 {
+  margin: 0;
+  color: var(--workspace-text);
+  font-size: clamp(18px, 2vw, 22px);
+  letter-spacing: -.025em;
+}
+body[data-domain] .batch-compare-panel > .muted {
+  max-width: 78ch;
+  margin: 0;
+  line-height: 1.65;
+}
+body[data-domain] .batch-compare-panel label {
+  margin: 3px 0 -7px;
+  color: var(--workspace-muted);
+  font-size: 10px;
+  font-weight: 750;
+  letter-spacing: .075em;
+  text-transform: uppercase;
+}
+body[data-domain] #batchCompareSelect {
+  width: 100%;
+  min-height: 150px;
+  padding: 8px;
+  border: 1px solid var(--workspace-border);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--workspace-panel) 92%, #000);
+  color: var(--workspace-text);
+  scrollbar-color: var(--workspace-accent) var(--workspace-panel);
+}
+body[data-domain] #batchCompareSelect option {
+  min-height: 30px;
+  padding: 7px 9px;
+  border-radius: 7px;
+}
+body[data-domain] #batchCompareSelect option:checked {
+  background: color-mix(in srgb, var(--workspace-accent) 25%, var(--workspace-panel-raised));
+  color: var(--workspace-text);
+}
+body[data-domain] #compareBatchesButton {
+  justify-self: start;
+  min-height: 42px;
+  padding-inline: 17px;
+  border: 1px solid color-mix(in srgb, var(--workspace-accent) 52%, var(--workspace-border));
+  border-radius: 10px;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--workspace-accent) 22%, var(--workspace-panel-raised)), var(--workspace-panel-raised));
+  box-shadow: 0 7px 18px rgba(0,0,0,.14), inset 0 1px 0 rgba(255,255,255,.06);
+  color: var(--workspace-text);
+  font-weight: 700;
+}
+body[data-domain] #compareBatchesButton:hover:not(:disabled) {
+  border-color: var(--workspace-accent);
+  box-shadow: 0 10px 23px rgba(0,0,0,.2), 0 0 18px color-mix(in srgb, var(--workspace-accent) 12%, transparent);
+}
+body[data-domain] #batchCompareStatus {
+  padding: 10px 12px;
+  border-inline-start: 2px solid var(--workspace-accent);
+  border-radius: 0 8px 8px 0;
+  background: color-mix(in srgb, var(--workspace-accent) 6%, var(--workspace-panel));
+  line-height: 1.6;
+}
+body[data-domain] #batchCompareResults:empty {
+  display: none;
+}
+body[data-domain] #batchCompareResults:not(:empty) {
+  margin-top: 3px;
+}
+
+/* Statistics workspace: filter controls, summary metrics and chart become one system. */
+body[data-domain] #statisticsCard .statistics-filters {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  align-items: end;
+  gap: 12px;
+  margin: 18px 0 15px;
+  padding: 15px;
+  border: 1px solid var(--workspace-border);
+  border-radius: 13px;
+  background: color-mix(in srgb, var(--workspace-panel-raised) 86%, transparent);
+}
+body[data-domain] #statisticsCard .statistics-filters > div {
+  min-width: 0;
+}
+body[data-domain] #statisticsCard .statistics-filters label {
+  display: block;
+  margin-bottom: 7px;
+  color: var(--workspace-muted);
+  font-size: 10px;
+  font-weight: 750;
+  letter-spacing: .065em;
+  text-transform: uppercase;
+}
+body[data-domain] #statisticsCard .statistics-filters select {
+  width: 100%;
+  min-width: 0;
+  min-height: 40px;
+  padding: 8px 10px;
+  border-radius: 9px;
+  font-size: 11px;
+}
+body[data-domain] #statisticsCard .statistics-filter-action {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: flex-end;
+}
+body[data-domain] #loadStatisticsButton {
+  min-height: 41px;
+  padding-inline: 19px;
+  border: 1px solid color-mix(in srgb, var(--workspace-accent) 50%, var(--workspace-border));
+  border-radius: 10px;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--workspace-accent) 23%, var(--workspace-panel-raised)), var(--workspace-panel-raised));
+  color: var(--workspace-text);
+  font-weight: 720;
+  box-shadow: 0 7px 18px rgba(0,0,0,.13), inset 0 1px 0 rgba(255,255,255,.06);
+}
+body[data-domain] #loadStatisticsButton:hover:not(:disabled) {
+  border-color: var(--workspace-accent);
+  box-shadow: 0 10px 23px rgba(0,0,0,.19), 0 0 18px color-mix(in srgb, var(--workspace-accent) 12%, transparent);
+}
+body[data-domain] #statisticsStatus {
+  margin: 0 0 12px;
+  padding: 10px 12px;
+  border-inline-start: 2px solid var(--workspace-accent);
+  border-radius: 0 8px 8px 0;
+  background: color-mix(in srgb, var(--workspace-accent) 6%, var(--workspace-panel));
+  line-height: 1.6;
+}
+body[data-domain] #statisticsSummary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin: 12px 0 15px;
+}
+body[data-domain] #statisticsSummary:empty {
+  display: none;
+}
+body[data-domain] #statisticsSummary .statistics-summary-item {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 10px;
+  min-width: 0;
+  min-height: 82px;
+  padding: 13px 14px;
+  border: 1px solid var(--vui-accent-line, var(--workspace-border));
+  border-radius: 11px;
+  background: linear-gradient(145deg, color-mix(in srgb, var(--workspace-accent) 7%, var(--workspace-panel-raised)), var(--workspace-panel));
+}
+body[data-domain] #statisticsSummary .statistics-summary-item span {
+  color: var(--workspace-muted);
+  font-size: 9px;
+  font-weight: 750;
+  letter-spacing: .065em;
+  text-transform: uppercase;
+}
+body[data-domain] #statisticsSummary .statistics-summary-item strong {
+  color: var(--workspace-text);
+  font-size: clamp(21px, 2.4vw, 28px);
+  font-weight: 760;
+  letter-spacing: -.045em;
+  font-variant-numeric: tabular-nums;
+}
+body[data-domain] #statisticsChart {
+  min-width: 0;
+  margin: 12px 0 16px;
+  padding: clamp(10px, 1.8vw, 18px);
+  overflow: hidden;
+  border: 1px solid var(--workspace-border);
+  border-radius: 14px;
+  background:
+    radial-gradient(ellipse at 50% 0%, color-mix(in srgb, var(--workspace-accent) 6%, transparent), transparent 62%),
+    var(--workspace-panel);
+}
+body[data-domain] #statisticsChart > svg,
+body[data-domain] #statisticsChart .statistics-demo-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 390px;
+  overflow: visible;
+}
+body[data-domain] #statisticsChart svg text {
+  font-family: inherit;
+}
+body[data-domain] #statisticsCard .statistics-table-wrap {
+  margin-top: 14px;
+}
+body[data-domain] #statisticsCard .statistics-footnote {
+  margin-top: 13px;
+  padding: 11px 13px;
+  border: 1px solid var(--workspace-border);
+  border-radius: 9px;
+  background: color-mix(in srgb, var(--workspace-panel-raised) 76%, transparent);
+  color: var(--workspace-muted);
+  font-size: 10px;
+  line-height: 1.65;
+}
+
+/* Keep long comparison tables usable on touch screens without shrinking data. */
+body[data-domain] #batchCompareResults .statistics-table,
+body[data-domain] #statisticsCard .statistics-table {
+  min-width: 920px;
+}
+body[data-domain] #batchCompareResults .statistics-table th,
+body[data-domain] #statisticsCard .statistics-table th {
+  background: color-mix(in srgb, var(--workspace-panel-raised) 96%, var(--workspace-accent));
+}
+body[data-domain] #batchCompareResults .statistics-table tbody tr:nth-child(even),
+body[data-domain] #statisticsCard .statistics-table tbody tr:nth-child(even) {
+  background: color-mix(in srgb, var(--workspace-panel-raised) 44%, transparent);
+}
+body[data-domain] #batchCompareResults .statistics-table tbody tr:hover,
+body[data-domain] #statisticsCard .statistics-table tbody tr:hover {
+  background: color-mix(in srgb, var(--workspace-accent) 7%, transparent);
+}
+
+@media (max-width: 900px) {
+  body[data-domain] #statisticsCard .statistics-filters {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 600px) {
+  body[data-domain] .batch-compare-panel {
+    padding: 14px;
+  }
+  body[data-domain] #compareBatchesButton,
+  body[data-domain] #loadStatisticsButton {
+    width: 100%;
+  }
+  body[data-domain] #statisticsCard .statistics-filters {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 10px;
+    padding: 12px;
+  }
+  body[data-domain] #statisticsCard .statistics-filter-action {
+    grid-column: auto;
+  }
+  body[data-domain] #statisticsSummary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 360px) {
+  body[data-domain] #statisticsSummary {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  body[data-domain] #compareBatchesButton,
+  body[data-domain] #loadStatisticsButton {
+    transition: none !important;
+  }
+}
