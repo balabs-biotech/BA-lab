@@ -815,6 +815,9 @@ class EngineContractTests(unittest.TestCase):
         self.assertEqual(value["coverage"]["record_counts_by_type"]["measurement"], 3)
         self.assertEqual(value["coverage"]["record_counts_by_type"]["observation"], 1)
         self.assertEqual(value["coverage"]["record_counts_by_type"]["event"], 1)
+        fact_times = [item["observed_at"] for item in value["observed_facts"]]
+        self.assertEqual(fact_times, sorted(fact_times))
+        self.assertTrue(value["coverage"]["observed_window"]["start"] <= "2026-11-10T09:15:00Z")
         event_fact = next(item for item in value["observed_facts"] if item["fact_code"] == "event.fruiting_stage_started")
         self.assertEqual(event_fact["event_id"], operational_event_id)
         self.assertEqual(event_fact["value"]["stage"], "primordia")
