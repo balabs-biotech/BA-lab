@@ -312,3 +312,36 @@ jobs:
           path: artifacts/3d-browser-smoke-preview/
           if-no-files-found: ignore
           retention-days: 14
+
+  cultureops-browser-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install Playwright
+        run: npm install --no-save --no-package-lock playwright
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Serve CultureOps static application
+        run: |
+          python3 -m http.server 8787 --directory . > /tmp/cultureops-http.log 2>&1 &
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent http://127.0.0.1:8787/batch-tracker/green-tech/ > /dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/cultureops-http.log
+          exit 1
+      - name: Test three workspaces on desktop, mobile and four languages
+        run: node scripts/test-cultureops-browser.mjs
+      - name: Upload CultureOps screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cultureops-browser-smoke
+          path: artifacts/cultureops-browser-smoke/
+          if-no-files-found: ignore
+          retention-days: 14
