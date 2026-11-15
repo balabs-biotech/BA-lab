@@ -298,11 +298,11 @@ console.log("✓ Overview presentation: domain-specific titles, context, activit
 
 
 // The overview dashboard must collapse cleanly before its two columns become cramped.
-assert.match(stylesheet, /@media \\(max-width: 700px\\)[\\s\\S]*?#overviewCard \\.overview-lower \\{\\s*grid-template-columns: minmax\\(0, 1fr\\)/,
+assert.match(stylesheet, /@media \(max-width: 700px\)[\s\S]*?#overviewCard \.overview-lower \{\s*grid-template-columns: minmax\(0, 1fr\)/,
   "overview activity and shortcuts must stack on tablet and mobile widths");
-assert.match(stylesheet, /#overviewCard \\.overview-observation \\{\\s*grid-template-columns: minmax\\(0, 1fr\\)/,
+assert.match(stylesheet, /#overviewCard \.overview-observation \{\s*grid-template-columns: minmax\(0, 1fr\)/,
   "recent observation cards must use a readable single-column mobile layout");
-assert.match(stylesheet, /@media \\(max-width: 520px\\)[\\s\\S]*?#overviewCard \\.overview-shortcut strong/,
+assert.match(stylesheet, /@media \(max-width: 520px\)[\s\S]*?#overviewCard \.overview-shortcut strong/,
   "overview shortcut labels must remain readable on narrow phones");
 console.log("✓ Overview responsive layout: tablet stacking and narrow-screen readability");
 
