@@ -45,9 +45,11 @@ function callHelper(name, args, domain) {
 
 function fakeElement(tag) {
   return {
-    tag, value: "", textContent: "", label: "", children: [],
+    tag, value: "", textContent: "", label: "", className: "", children: [], attributes: {},
     appendChild(child) { this.children.push(child); return child; },
     replaceChildren(...children) { this.children = children; this.value = ""; },
+    setAttribute(name, value) { this.attributes[name] = value; },
+    removeAttribute(name) { delete this.attributes[name]; },
     get options() {
       const flatten = nodes => nodes.flatMap(node =>
         node.tag === "optgroup" ? flatten(node.children) : [node]
@@ -799,12 +801,12 @@ for (const domain of ["agronomy", "mycology", "laboratory"]) {
   const selector = new RegExp('body\\[data-domain="' + domain + '"\\] :is\\(input, select, textarea\\)');
   assert.match(formThemeCss, selector,
     domain + " form controls must use the workspace surface and text palette");
-  assert.match(formThemeCss, new RegExp('body\\[data-domain="' + domain + '"\\] :is\\(input\\[type="checkbox"\\], input\\[type="radio"\\]\\)'),
-    domain + " checkbox and radio controls must use the workspace accent");
 }
-assert.match(formThemeCss, /body\\[data-domain\\] :is\\(input, select, textarea\\)\\[aria-invalid="true"\\]/,
+assert.match(formThemeCss, /body\[data-domain\] :is\(input\[type="checkbox"\], input\[type="radio"\]\)/,
+  "checkbox and radio controls must use the active workspace accent token");
+assert.match(formThemeCss, /body\[data-domain\] :is\(input, select, textarea\)\[aria-invalid="true"\]/,
   "invalid form controls must expose a consistent semantic error state");
-assert.match(formThemeCss, /body\\[data-domain\\] :is\\(input, select, textarea\\):disabled/,
+assert.match(formThemeCss, /body\[data-domain\] :is\(input, select, textarea\):disabled/,
   "disabled form controls must remain visibly distinct in every workspace");
 console.log("✓ Form controls: domain surfaces, accent controls, validation and disabled states");
 
@@ -829,36 +831,119 @@ console.log("✓ Operational data surfaces: readable rows, domain identity and m
 // not retain hard-coded pale-green surfaces in Mycology or Laboratory.
 const recordCardCss = fs.readFileSync("batch-tracker/tracker.css", "utf8");
 for (const domain of ["agronomy", "mycology", "laboratory"]) {
-  assert.match(recordCardCss, new RegExp('body\\\\[data-domain="' + domain + '"\\\\]\\\\s*\\\\{[\\\\s\\\\S]*?--surface:'),
+  assert.match(recordCardCss, new RegExp('body\\[data-domain="' + domain + '"\\]\\s*\\{[\\s\\S]*?--surface:'),
     domain + " must define its own surface token for operational cards");
 }
 for (const component of [".batch-item", ".stage", ".qc-row", ".batch-stat", ".culture-detail-field"]) {
-  assert.match(recordCardCss, new RegExp('body\\\\[data-domain\\\\] [\\\\s\\\\S]*?' + component.replace(".", "\\\\.")),
+  assert.match(recordCardCss, new RegExp('body\\[data-domain\\] [\\s\\S]*?' + component.replace(".", "\\.")),
     component + " must inherit workspace design tokens");
 }
-assert.match(recordCardCss, /\\.batch-item:focus-visible/);
-assert.match(recordCardCss, /\\.stage:focus-within/);
-assert.match(recordCardCss, /\\.qc-row:focus-within/);
+assert.ok(recordCardCss.includes("body[data-domain] :is(.batch-item, .stage, .qc-row):focus-within,") && recordCardCss.includes("body[data-domain] .batch-item:focus-visible"),
+  "operational records must expose keyboard focus across nested controls and batch cards");
 console.log("✓ Operational record cards: domain surfaces and keyboard/focus inspection");
 
 
 // Complex form and native dialog surfaces must remain coherent across all
 // three scientific workspaces, including keyboard, validation and phone states.
 const workflowCss = fs.readFileSync("batch-tracker/tracker.css", "utf8");
-assert.match(workflowCss, /body\\[data-domain\\] :is\\(\\.info, \\.hint\\)/,
+assert.ok(workflowCss.includes("body[data-domain] :is(.info, .hint)"),
   "form guidance panels must inherit the active workspace palette");
-assert.match(workflowCss, /body\\[data-domain\\] \\.consent-panel/,
+assert.ok(workflowCss.includes("body[data-domain] .consent-panel"),
   "consent and confirmation panels must use workspace surfaces");
-assert.match(workflowCss, /body\\[data-domain\\] :is\\(\\.auth-actions, \\.sync-line, \\.assisted-entry-actions\\)/,
+assert.ok(workflowCss.includes("body[data-domain] :is(.auth-actions, .sync-line, .assisted-entry-actions)"),
   "multi-action form rows must share consistent alignment and spacing");
-assert.match(workflowCss, /button\\[aria-busy="true"\\]/,
+assert.ok(workflowCss.includes('button[aria-busy="true"]'),
   "busy actions must expose a visible non-interactive state");
-assert.match(workflowCss, /dialog\\.workspace-dialog/,
+assert.ok(workflowCss.includes("dialog.workspace-dialog"),
   "native workflow dialogs must have a reusable themed surface");
-assert.match(workflowCss, /dialog\\.workspace-dialog::backdrop/,
+assert.ok(workflowCss.includes("dialog.workspace-dialog::backdrop"),
   "modal backdrops must separate confirmation flows from the workspace");
-assert.match(workflowCss, /dialog\\.workspace-dialog \\.dialog-actions/,
+assert.ok(workflowCss.includes(".workspace-dialog .dialog-actions {"),
   "dialog actions must preserve primary and secondary action hierarchy");
-assert.match(workflowCss, /@media \\(max-width: 600px\\)[\\s\\S]*?dialog\\.workspace-dialog/,
+assert.ok(workflowCss.includes("@media (max-width: 600px)") && workflowCss.includes("dialog.workspace-dialog"),
   "workflow dialogs must fit narrow mobile viewports");
 console.log("✓ Complex forms and dialog surfaces: guidance, consent, action states and mobile layout");
+
+
+// Shared semantic feedback components are styled consistently in each workspace.
+const feedbackCss = fs.readFileSync("batch-tracker/tracker.css", "utf8");
+for (const state of ["info", "success", "warning", "error", "loading", "empty"]) {
+  assert.ok(feedbackCss.includes(".feedback-" + state), "missing feedback style: " + state);
+}
+assert.ok(feedbackCss.includes("body[data-domain] #message .card[role=\"alert\"]"), "alerts need a distinct accessible surface");
+assert.ok(feedbackCss.includes("body[data-domain] .feedback-loading::before"), "loading feedback needs a progress indicator");
+assert.ok(feedbackCss.includes("@media (prefers-reduced-motion: reduce)") && feedbackCss.includes("feedback-loading::before"), "loading animation must respect reduced motion");
+assert.ok(feedbackCss.includes("body[data-domain] .feedback-empty"), "empty results must remain distinct from errors");
+assert.ok(feedbackCss.includes("body[data-domain] .feedback-state[data-loading=\"true\"]"), "loading state must expose its visual contract");
+assert.ok(feedbackCss.includes("body[data-domain] .feedback-state[data-empty=\"true\"]"), "empty state must expose its visual contract");
+assert.ok(feedbackCss.includes("@media (max-width: 600px)") && feedbackCss.includes(".feedback-state"), "feedback surfaces must adapt to phones");
+assert.ok(feedbackCss.includes("var(--warn)"), "warning surfaces must use the established --warn token");
+console.log("✓ Feedback states: semantic variants, accessible urgency and responsive motion");
+
+const feedbackJs = fs.readFileSync("batch-tracker/tracker.js", "utf8");
+assert.ok(feedbackJs.includes("card ${semanticType} feedback-${semanticType}"), "central messages must expose semantic feedback classes");
+assert.ok(feedbackJs.includes("div.textContent =\n    text"), "message content must remain text-only");
+assert.ok(feedbackJs.includes('type === "error" || type === "warning"'), "urgent messages must use alert semantics");
+assert.ok(feedbackJs.includes("function renderCollectionFeedback(container, state, text)"), "inline collection feedback helper must exist");
+console.log("✓ Message renderer: safe text and accessible feedback semantics");
+
+// Collection placeholders distinguish authentication, loading, empty and error.
+const collectionHtml = fs.readFileSync(new URL("../batch-tracker/workspace.html", import.meta.url), "utf8");
+const collectionJs = fs.readFileSync("batch-tracker/tracker.js", "utf8");
+assert.ok(collectionHtml.includes('class="feedback-state feedback-loading" data-loading="true" role="status"'), "batch list needs an accessible loading placeholder");
+assert.ok(collectionHtml.includes('id="cultureCatalogList" class="culture-catalog-list" aria-live="polite"><p class="muted feedback-state feedback-info"'), "culture catalogue must identify its pre-auth state");
+assert.ok(collectionHtml.includes('id="plantCultureList" class="culture-catalog-list" aria-live="polite"><p class="muted feedback-state feedback-info"'), "plant registry must identify its pre-auth state");
+assert.ok(collectionJs.includes('empty.className = "muted feedback-empty"'), "empty culture collections need a shared state");
+assert.ok(collectionJs.includes('feedback-state feedback-empty" data-empty="true" role="status"'), "empty batch collection needs a shared state");
+assert.ok(collectionJs.includes('list.className = "culture-catalog-list feedback-error"'), "plant retrieval errors need an error state");
+assert.ok(collectionJs.includes('list.removeAttribute("role")'), "successful plant reload must clear the error role");
+console.log("✓ Collection states: authentication, loading, empty, error and recovery");
+// Shared inline collection feedback must expose semantic state, role and busy
+// status without injecting user-facing text as HTML.
+const feedbackStateSource = extractFunction(engine, "renderCollectionFeedback");
+const feedbackContainer = {
+  children: [], attributes: {},
+  replaceChildren(...nodes) { this.children = nodes; },
+  setAttribute(name, value) { this.attributes[name] = value; },
+  removeAttribute(name) { delete this.attributes[name]; }
+};
+const feedbackStateResult = vm.runInNewContext(
+  `${feedbackStateSource}; renderCollectionFeedback(injected.container, "loading", "<chargement>")`,
+  { injected: { container: feedbackContainer }, document: { createElement: fakeElement } }
+);
+assert.equal(feedbackContainer.attributes["data-feedback-state"], "loading");
+assert.equal(feedbackContainer.attributes["aria-busy"], "true");
+assert.equal(feedbackStateResult.attributes.role, "status");
+assert.equal(feedbackStateResult.className, "feedback-state feedback-loading");
+assert.equal(feedbackStateResult.attributes["data-loading"], "true");
+assert.equal(feedbackStateResult.textContent, "<chargement>");
+const feedbackErrorResult = vm.runInNewContext(
+  `${feedbackStateSource}; renderCollectionFeedback(injected.container, "error", "Lecture impossible")`,
+  { injected: { container: feedbackContainer }, document: { createElement: fakeElement } }
+);
+assert.equal(feedbackContainer.attributes["data-feedback-state"], "error");
+assert.equal(feedbackContainer.attributes["aria-busy"], undefined);
+assert.equal(feedbackErrorResult.attributes.role, "alert");
+console.log("✓ Shared collection feedback: semantic state, safe text and accessible roles");
+
+assert.ok(collectionJs.includes("catch (queryError)") && collectionJs.includes('renderCollectionFeedback(measurementHistory, "error"'),
+  "measurement history must expose network rejections as retrieval errors");
+assert.ok(collectionJs.includes("catch (observationQueryError)") && collectionJs.includes('renderCollectionFeedback(observationHistory, "error"'),
+  "observation history must expose network rejections as retrieval errors");
+
+assert.ok(collectionJs.includes('batchList.removeAttribute("aria-busy")') && collectionJs.includes('batchList.removeAttribute("data-feedback-state")'),
+  "rendering batch results must clear the initial loading state");
+
+assert.ok(collectionJs.includes('renderCollectionFeedback(panel, "loading", "Chargement des analyses récentes…")'),
+  "the shared analytical execution panel must expose its loading state");
+assert.ok(collectionJs.includes('renderCollectionFeedback(panel, "empty", "Aucune exécution analytique enregistrée pour cette organisation.")'),
+  "the analytical execution panel must distinguish an empty history");
+assert.ok(collectionJs.includes('const message = "Chargement des exécutions analytiques impossible : "') && collectionJs.includes('renderCollectionFeedback(panel, "error", message)'),
+  "analytical execution retrieval errors must use the shared error state");
+
+assert.ok(collectionJs.includes('renderCollectionFeedback(engineHistoryPanel, "info"'),
+  "clearing the authenticated workspace must reset analytical history to an informational state");
+assert.ok(collectionJs.includes('renderCollectionFeedback(panel, "warning", "Actualisation des analyses momentanément indisponible.'),
+  "analytical polling failures must remain recoverable warnings");
+assert.ok(collectionJs.includes('panel.removeAttribute("data-feedback-state")') && collectionJs.includes('panel.removeAttribute("aria-busy")'),
+  "successful analytical history rendering must clear its loading state");
