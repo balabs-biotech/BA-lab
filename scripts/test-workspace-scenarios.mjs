@@ -755,3 +755,26 @@ assert.match(engine.slice(engine.indexOf("async function loadPlantBiologicalCont
   "switching plant records must restore the assessment control after invalidating a prior request");
 
 console.log("✓ GreenTech BIE v0.2: explicit plant subject, bounded window and authenticated orchestration");
+
+// Domain-aware primary navigation must describe the active scientific workspace.
+const navigationHtml = fs.readFileSync("batch-tracker/workspace.html", "utf8");
+for (const id of ["navCultureLink", "navMeasurementLink"]) {
+  assert.ok(navigationHtml.includes('id="' + id + '"'),
+    "primary navigation must expose the domain-aware label hook " + id);
+}
+const domainSetupSource = extractFunction(engine, "setupDomainWorkspaces");
+for (const [domain, labels] of Object.entries({
+  agronomy: ["Cultures végétales", "Mesures agronomiques"],
+  mycology: ["Souches & cultures", "Suivi mycologique"],
+  laboratory: ["Cultures biologiques", "Mesures & observations"]
+})) {
+  assert.ok(domainSetupSource.includes(domain + ":"),
+    "domain navigation labels must define " + domain);
+  for (const label of labels) {
+    assert.ok(domainSetupSource.includes(label),
+      domain + " navigation must use the label: " + label);
+  }
+}
+assert.match(domainSetupSource, /navCultureLink\.textContent\s*=\s*config\.navigation\.cultures/);
+assert.match(domainSetupSource, /navMeasurementLink\.textContent\s*=\s*config\.navigation\.measurements/);
+console.log("✓ Primary navigation labels follow GreenTech, Mycology and Laboratory terminology");
