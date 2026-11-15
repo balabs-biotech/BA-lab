@@ -7,9 +7,9 @@ const artifactDir = process.env.CULTUREOPS_ARTIFACT_DIR || "artifacts/cultureops
 fs.mkdirSync(artifactDir, { recursive: true });
 
 const workspaces = [
-  { slug: "green-tech", domain: "agronomy", accent: "#91bd78" },
-  { slug: "mycology", domain: "mycology", accent: "#b96b3e" },
-  { slug: "laboratory", domain: "laboratory", accent: "#4e8bbd" },
+  { slug: "green-tech", domain: "agronomy", accent: "#b4f477" },
+  { slug: "mycology", domain: "mycology", accent: "#c98259" },
+  { slug: "laboratory", domain: "laboratory", accent: "#78b8e8" },
 ];
 const viewports = [
   { name: "desktop", width: 1440, height: 1000 },
